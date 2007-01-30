@@ -860,349 +860,7 @@ movieclip_ctor(const fn_call& fn)
 }
 
 #ifndef OLD_GET_MEMBER
-// TODO: consider using this same function for *every* character
-static void
-character_x_getset(const fn_call& fn)
-{
-	character* ptr = ensure_character(fn.this_ptr);
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		matrix m = ptr->get_matrix();
-		fn.result->set_double(TWIPS_TO_PIXELS(m.m_[0][2]));
-	}
-	else // setter
-	{
-		matrix m = ptr->get_matrix();
-		m.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
-		ptr->set_matrix(m);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
-	}
-
-}
-
-// TODO: consider using this same function for *every* character
-static void
-character_y_getset(const fn_call& fn)
-{
-	character* ptr = ensure_character(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		matrix m = ptr->get_matrix();
-		fn.result->set_double(TWIPS_TO_PIXELS(m.m_[1][2]));
-	}
-	else // setter
-	{
-		matrix m = ptr->get_matrix();
-		m.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
-		ptr->set_matrix(m);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
-	}
-
-}
-
-// TODO: consider using this same function for *every* character
-static void
-character_xscale_getset(const fn_call& fn)
-{
-	character* ptr = ensure_character(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		matrix m = ptr->get_matrix();
-		float xscale = m.get_x_scale();
-		fn.result->set_double(xscale * 100); // result in percent
-	}
-	else // setter
-	{
-		matrix m = ptr->get_matrix();
-
-		double scale_percent = fn.arg(0).to_number();
-
-		// Handle bogus values
-		if (isnan(scale_percent))
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Attempt to set _xscale to %g, refused",
-                            scale_percent);
-			);
-                        return;
-		}
-		else if (scale_percent < 0 )
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Attempt to set _xscale to %g, use 0",
-                            scale_percent);
-			);
-                        scale_percent = 0;
-		}
-
-		// input is in percent
-		float scale = (float)scale_percent/100.f;
-
-		// Decompose matrix and insert the desired value.
-		float x_scale = scale;
-		float y_scale = m.get_y_scale();
-		float rotation = m.get_rotation();
-		m.set_scale_rotation(x_scale, y_scale, rotation);
-
-		ptr->set_matrix(m);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
-	}
-
-}
-
-// TODO: consider using this same function for *every* character
-static void
-character_yscale_getset(const fn_call& fn)
-{
-	character* ptr = ensure_character(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		matrix m = ptr->get_matrix();
-		float yscale = m.get_y_scale();
-		fn.result->set_double(yscale * 100); // result in percent
-	}
-	else // setter
-	{
-		matrix m = ptr->get_matrix();
-
-		double scale_percent = fn.arg(0).to_number();
-
-		// Handle bogus values
-		if (isnan(scale_percent))
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Attempt to set _yscale to %g, refused",
-                            scale_percent);
-			);
-                        return;
-		}
-		else if (scale_percent < 0 )
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Attempt to set _yscale to %g, use 0",
-                            scale_percent);
-			);
-                        scale_percent = 0;
-		}
-
-		// input is in percent
-		float scale = (float)scale_percent/100.f;
-
-		// Decompose matrix and insert the desired value.
-		float x_scale = m.get_x_scale();
-		float y_scale = scale;
-		float rotation = m.get_rotation();
-		m.set_scale_rotation(x_scale, y_scale, rotation);
-
-		ptr->set_matrix(m);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
-	}
-
-}
-
-// TODO: consider using this same function for *every* character
-static void
-character_xmouse_getset(const fn_call& fn)
-{
-	character* ptr = ensure_character(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		// Local coord of mouse IN PIXELS.
-		int x, y, buttons;
-		VM::get().getRoot().get_mouse_state(x, y, buttons);
-
-		matrix m = ptr->get_world_matrix();
-
-		point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-		point b;
-			
-		m.transform_by_inverse(&b, a);
-
-		fn.result->set_double(TWIPS_TO_PIXELS(b.m_x));
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_xmouse'");
-		);
-	}
-}
-
-// TODO: consider using this same function for *every* character
-static void
-character_ymouse_getset(const fn_call& fn)
-{
-	character* ptr = ensure_character(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		// Local coord of mouse IN PIXELS.
-		int x, y, buttons;
-		VM::get().getRoot().get_mouse_state(x, y, buttons);
-
-		matrix m = ptr->get_world_matrix();
-
-		point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-		point b;
-			
-		m.transform_by_inverse(&b, a);
-
-		fn.result->set_double(TWIPS_TO_PIXELS(b.m_y));
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_ymouse'");
-		);
-	}
-}
-
-// TODO: consider using this same function for *every* character
-static void
-character_alpha_getset(const fn_call& fn)
-{
-	character* ptr = ensure_character(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		fn.result->set_double(ptr->get_cxform().m_[3][0] * 100.f);
-	}
-	else // setter
-	{
-		// Set alpha modulate, in percent.
-		cxform	cx = ptr->get_cxform();
-		cx.m_[3][0] = infinite_to_fzero(fn.arg(0).to_number()) / 100.f;
-		ptr->set_cxform(cx);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
-	}
-
-}
-
-// TODO: consider using this same function for *every* character
-static void
-character_visible_getset(const fn_call& fn)
-{
-	character* ptr = ensure_character(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		fn.result->set_bool(ptr->get_visible());
-	}
-	else // setter
-	{
-		ptr->set_visible(fn.arg(0).to_bool());
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
-	}
-
-}
-
-// TODO: consider using this same function for *every* character
-static void
-character_width_getset(const fn_call& fn)
-{
-	character* ptr = ensure_character(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		fn.result->set_double(TWIPS_TO_PIXELS(ptr->get_width()));
-	}
-	else // setter
-	{
-		// @@ tulrich: is parameter in world-coords or local-coords?
-		matrix m = ptr->get_matrix();
-		m.m_[0][0] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
-		float w = ptr->get_width();
-		if (fabsf(w) > 1e-6f)
-		{
-			m.m_[0][0] /= w;
-		}
-		ptr->set_matrix(m);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
-	}
-}
-
-// TODO: consider using this same function for *every* character
-static void
-character_height_getset(const fn_call& fn)
-{
-	character* ptr = ensure_character(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		fn.result->set_double(TWIPS_TO_PIXELS(ptr->get_height()));
-	}
-	else // setter
-	{
-		// @@ tulrich: is parameter in world-coords or local-coords?
-		matrix m = ptr->get_matrix();
-		m.m_[1][1] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
-		float h = ptr->get_height(); // WARNING: was get_width originally, sounds as a bug
-		if (fabsf(h) > 1e-6f)
-		{
-			m.m_[1][1] /= h;
-		}
-		ptr->set_matrix(m);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
-	}
-}
-
-// TODO: consider using this same function for *every* character
-static void
-character_rotation_getset(const fn_call& fn)
-{
-	character* ptr = ensure_character(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		// Verified against Macromedia player using samples/test_rotation.swf
-		float	angle = ptr->get_matrix().get_rotation();
-
-		// Result is CLOCKWISE DEGREES, [-180,180]
-		angle *= 180.0f / float(M_PI);
-
-		fn.result->set_double(angle);
-	}
-	else // setter
-	{
-		// @@ tulrich: is parameter in world-coords or local-coords?
-		matrix m = ptr->get_matrix();
-
-		// Decompose matrix and insert the desired value.
-		float x_scale = m.get_x_scale();
-		float y_scale = m.get_y_scale();
-		// input is in degrees
-		float rotation = (float) fn.arg(0).to_number() * float(M_PI) / 180.f;
-		m.set_scale_rotation(x_scale, y_scale, rotation);
-
-		ptr->set_matrix(m);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
-	}
-}
-
-// TODO: consider using this same function for *every* character
-static void
-character_parent_getset(const fn_call& fn)
-{
-	character* ptr = ensure_character(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		// NOTE: will be NULL for root frame !
-		// 	 should it be 'ptr' instead ?
-		fn.result->set_as_object(ptr->get_parent());
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_parent'");
-		);
-	}
-}
 
 static void
 sprite_currentframe_getset(const fn_call& fn)
@@ -1356,22 +1014,6 @@ sprite_url_getset(const fn_call& fn)
 }
 
 static void
-sprite_onrollover_getset(const fn_call& fn)
-{
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		ptr->get_event_handler(event_id::ROLL_OVER, fn.result);
-	}
-	else // setter
-	{
-		ptr->set_event_handler(event_id::ROLL_OVER, fn.arg(0));
-	}
-
-}
-
-static void
 sprite_onrollout_getset(const fn_call& fn)
 {
 	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
@@ -1480,40 +1122,40 @@ attachMovieClipInterface(as_object& o)
 	// Properties (TODO: move to appropriate SWF version section)
 	//
 
-	gettersetter = new builtin_function(&character_x_getset, NULL);
+	gettersetter = new builtin_function(&character::x_getset, NULL);
 	o.init_property("_x", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character_y_getset, NULL);
+	gettersetter = new builtin_function(&character::y_getset, NULL);
 	o.init_property("_y", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character_xscale_getset, NULL);
+	gettersetter = new builtin_function(&character::xscale_getset, NULL);
 	o.init_property("_xscale", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character_yscale_getset, NULL);
+	gettersetter = new builtin_function(&character::yscale_getset, NULL);
 	o.init_property("_yscale", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character_xmouse_getset, NULL);
+	gettersetter = new builtin_function(&character::xmouse_getset, NULL);
 	o.init_property("_xmouse", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character_ymouse_getset, NULL);
+	gettersetter = new builtin_function(&character::ymouse_getset, NULL);
 	o.init_property("_ymouse", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character_alpha_getset, NULL);
+	gettersetter = new builtin_function(&character::alpha_getset, NULL);
 	o.init_property("_alpha", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character_visible_getset, NULL);
+	gettersetter = new builtin_function(&character::visible_getset, NULL);
 	o.init_property("_visible", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character_width_getset, NULL);
+	gettersetter = new builtin_function(&character::width_getset, NULL);
 	o.init_property("_width", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character_height_getset, NULL);
+	gettersetter = new builtin_function(&character::height_getset, NULL);
 	o.init_property("_height", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character_rotation_getset, NULL);
+	gettersetter = new builtin_function(&character::rotation_getset, NULL);
 	o.init_property("_rotation", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character_parent_getset, NULL);
+	gettersetter = new builtin_function(&character::parent_getset, NULL);
 	o.init_property("_parent", *gettersetter, *gettersetter);
 
 	gettersetter = new builtin_function(&sprite_currentframe_getset, NULL);
@@ -1546,7 +1188,7 @@ attachMovieClipInterface(as_object& o)
 	gettersetter = new builtin_function(&sprite_soundbuftime_getset, NULL);
 	o.init_property("_soundbuftime", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&sprite_onrollover_getset, NULL);
+	gettersetter = new builtin_function(&character::onrollover_getset, NULL);
 	o.init_property("onRollOver", *gettersetter, *gettersetter);
 
 	gettersetter = new builtin_function(&sprite_onrollout_getset, NULL);

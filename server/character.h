@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.41 2007/01/26 13:17:09 strk Exp $ */
+/* $Id: character.h,v 1.42 2007/01/30 18:29:40 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -125,6 +125,40 @@ protected:
 	bool _scriptTransformed;
 
 	bool _dynamicallyCreated;
+
+	
+
+	/// @{ Common ActionScript getter-setters for characters
+
+public:  // TODO: make protected
+
+	static void onrollover_getset(const fn_call& fn);
+
+	static void x_getset(const fn_call& fn);
+
+	static void y_getset(const fn_call& fn);
+
+	static void xscale_getset(const fn_call& fn);
+
+	static void yscale_getset(const fn_call& fn);
+
+	static void xmouse_getset(const fn_call& fn);
+
+	static void ymouse_getset(const fn_call& fn);
+
+	static void alpha_getset(const fn_call& fn);
+
+	static void visible_getset(const fn_call& fn);
+
+	static void width_getset(const fn_call& fn);
+
+	static void height_getset(const fn_call& fn);
+
+	static void rotation_getset(const fn_call& fn);
+
+	static void parent_getset(const fn_call& fn);
+
+	/// @} Common ActionScript getter-setters for characters
 
 public:
 

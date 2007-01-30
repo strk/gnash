@@ -1,4 +1,12 @@
-2007-01-25 Martin Guy <martinwguy@yahoo.it>
+2007-01-30 Sandro Santilli <strk@keybit.net>
+
+	* server/: character.{h,cpp}, sprite_instance.cpp:
+	  Made generic gettersetter definitions statics
+	  in the 'character' class. Ready for reuse in button
+	  instances and whichever other ActionScript class
+	  associated with a character (_x,_y,_width...).
+
+2007-01-30 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac: Fix message about Debian packages required for boost
 
