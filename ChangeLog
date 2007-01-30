@@ -1,3 +1,7 @@
+2007-01-30 Martin Guy <martinwguy@yahoo.it>
+
+	* config.mk.in, compatibility_include.h: Remove unused GAMESWF defines
+
 2007-01-30 Sandro Santilli <strk@keybit.net>
 
 	* server/: character.{h,cpp}, sprite_instance.cpp:
@@ -6,7 +10,12 @@
 	  instances and whichever other ActionScript class
 	  associated with a character (_x,_y,_width...).
 
-2007-01-30 Martin Guy <martinwguy@yahoo.it>
+2007-01-25 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac: Make libjpeg presence mandatory and fail otherwise;
+	  otherwise compilation fails.
+
+2007-01-25 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac: Fix message about Debian packages required for boost
 

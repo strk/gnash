@@ -1,5 +1,5 @@
 # make configuration for the tu-testbed engine library
-# $Id: config.mk.in,v 1.3 2006/10/15 09:11:20 nihilus Exp $
+# $Id: config.mk.in,v 1.4 2007/01/30 23:05:42 martinwguy Exp $
 
 CC = @CC@
 CXX = @CXX@
@@ -31,18 +31,8 @@ GLU_LIBS = @GLU_LIBS@
 LIBXML_CFLAGS = @LIBXML_CFLAGS@
 LIBXML_LIBS = @LIBXML_LIBS@
 
-# If you have libmad installed
-# (http://www.underbit.com/products/mad/), and you want to compile
-# gameswf with mp3 support, uncomment below.  Note that libmad is
-# GPL'd, so if you want to distribute binaries based on this, you must
-# distribute the associated source under GPL as well.
-#GAMESWF_MP3_SUPPORT=-DGAMESWF_MP3_SUPPORT=1
-##LIBMAD_LIB=-lmad
-#LIBMAD_LIB=../../libmad-0.15.1b/msvc++/Release/libmad.lib
-#LIBMAD_INCLUDE=-I../../libmad-0.15.1b
-
 DEFS = @DEFS@
-CFLAGS := $(DEFS) $(CFLAGS) $(SDL_CFLAGS) -fPIC -Wall $(GAMESWF_MP3_SUPPORT)
+CFLAGS := $(DEFS) $(CFLAGS) $(SDL_CFLAGS) -fPIC -Wall
 MAKE_DLL := $(CC) -shared
 
 #include $(top_srcdir)/config
@@ -55,7 +45,7 @@ AR = lib /nologo
 SDL_INCLUDE := -I "$(SDL_DIR)/include"
 SDL_LIBS := winmm.lib dxguid.lib kernel32.lib user32.lib gdi32.lib # winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib
 LIBS := opengl32.lib glu32.lib $(SDL_DIR)/lib/SDLmain.lib $(SDL_DIR)/lib/SDL.lib gdi32.lib oldnames.lib $(SDL_LIBS)
-CFLAGS := $(CFLAGS) /MD -GR -GX -DWIN32=1 -D_WIN32=1 $(USE_DL_MALLOC_FLAG) -W3 $(SDL_CFLAGS) $(GAMESWF_MP3_SUPPORT)
+CFLAGS := $(CFLAGS) /MD -GR -GX -DWIN32=1 -D_WIN32=1 $(USE_DL_MALLOC_FLAG) -W3 $(SDL_CFLAGS)
 LDFLAGS := /link /NODEFAULTLIB:libc.lib /NODEFAULTLIB:libcd.lib /INCREMENTAL:NO /subsystem:console
 endif
 ifeq ($(DEBUG),1)

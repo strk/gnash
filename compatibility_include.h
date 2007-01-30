@@ -27,11 +27,6 @@
 // Some optional gameswf configuration.
 //
 
-// #define GAMESWF_FONT_NOMINAL_GLYPH_SIZE_DEFAULT 32
-
-// Define this to avoid using mesh shapes to render large text
-// #define GAMESWF_ALWAYS_USE_TEXTURES_FOR_TEXT_WHEN_POSSIBLE 1
-
 // For disabling zlib and jpeg functionality; you may be able to use
 // this in final builds of gameswf, if you preprocess all your SWF
 // content to make unpacked formats.
