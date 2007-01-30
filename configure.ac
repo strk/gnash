@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.243 2007/01/29 23:26:01 martinwguy Exp $
+dnl $Id: configure.ac,v 1.244 2007/01/30 17:41:17 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1307,8 +1307,8 @@ if test x"$BOOST_LIBS" != x; then
 else
     echo "ERROR: No BOOST development package installed!\
  You need to have the BOOST development package installed\
- to compile, or install libboost-thread1.33.1-dev\
- and libboost-dev (using apt-get) or boost-devel (using yum)."
+ to compile, or install libboost-thread-dev (using apt-get)\
+ or boost-devel (using yum)."
  nogo=true
 fi
 

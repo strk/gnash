@@ -1,3 +1,7 @@
+2007-01-25 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac: Fix message about Debian packages required for boost
+
 2007-01-30 Sandro Santilli <strk@keybit.net>
 
 	* server/: video_stream_instance.{h,cpp},
