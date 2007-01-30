@@ -481,8 +481,10 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 	// TODO: This seems dangerous, check closely
 	if(m_frame_count == 0) m_frame_count++;
 	
-	m_playlist.resize(m_frame_count);
-	m_init_action_list.resize(m_frame_count);
+	// Allocate 1 more then the expected slots
+	// for actions, to make handling malformed SWF easier.
+	m_playlist.resize(m_frame_count+1);
+	m_init_action_list.resize(m_frame_count+1);
 
 	IF_VERBOSE_PARSE(
 		m_frame_size.print();
@@ -931,6 +933,20 @@ movie_def_impl::incrementLoadedFrames()
 	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 
 	++_frames_loaded;
+	if ( _frames_loaded > m_frame_count )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+			log_swferror("number of SHOWFRAME tags "
+				"in SWF stream '%s' (" SIZET_FMT
+				") exceeds "
+				"the advertised number in header ("
+			        SIZET_FMT ").",
+				get_url().c_str(), _frames_loaded,
+				m_frame_count);
+		);
+		m_playlist.resize(_frames_loaded+1);
+		m_init_action_list.resize(_frames_loaded+1);
+	}
 
 #ifdef DEBUG_FRAMES_LOAD
 	log_msg("Loaded frame %u/%u",

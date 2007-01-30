@@ -1,5 +1,9 @@
 2007-01-30 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.cpp (incrementLoadedFrames):
+	  handle malformed SWF containing more SHOWFRAME then expected;
+	  (readHeader): allocate more slots for actions to make malformed
+	  SWF handling easier.
 	* server/asobj/: NetConnection.cpp, NetStream.cpp:
 	  Cleanups and robustness improvements.
 	* server/parser/movie_def_impl.cpp (read_all_swf):
