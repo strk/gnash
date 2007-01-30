@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.244 2007/01/30 17:41:17 martinwguy Exp $
+dnl $Id: configure.ac,v 1.245 2007/01/30 21:58:53 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -412,7 +412,7 @@ AC_LANG_POP(C++)
 
 dnl AC_CHECK_LIB(c, mremap)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
-dnl GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
+GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PATH_JPEG
 
 dnl if we're not building the extensions, then the _FLAGS and _LIBS settings
@@ -434,7 +434,7 @@ AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
 dnl currently unused
-dnl GNASH_PKG_FIND(ogg, [ogg.h], [jpeg images], jpeg_mem_init)
+dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
 
 if test x$gui = xsdl -o x$sound_handler = xsdl; then
   GNASH_PATH_SDL
@@ -1309,6 +1309,17 @@ else
  You need to have the BOOST development package installed\
  to compile, or install libboost-thread-dev (using apt-get)\
  or boost-devel (using yum)."
+ nogo=true
+fi
+
+if test x"$JPEG" != x; then
+    echo "        JPEG flags are: $JPEG_CFLAGS"
+    echo "        JPEG libs are: $JPEG_LIBS"
+else
+    echo "ERROR: No JPEG development package installed!\
+ You need to have the libjpeg package installed\
+ to compile, or install libjpeg-dev (using apt-get)\
+ or libjpeg-devel (using yum)."
  nogo=true
 fi
 
