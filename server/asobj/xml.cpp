@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.13 2007/01/29 21:28:10 martinwguy Exp $ */
+/* $Id: xml.cpp,v 1.14 2007/01/30 09:54:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -380,7 +380,6 @@ XML::parseXML(tu_string xml_in)
     //dump_memory_stats(__FUNCTION__, __LINE__, "after xmlParseMemory");
 #endif
     return ret;
-#endif
   
 }
 

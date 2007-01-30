@@ -1,3 +1,7 @@
+2007-01-30 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/xml.cpp: removed stale #endif.
+
 2007-01-29  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Remove --disable option. Bug #18905:
