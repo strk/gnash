@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.245 2007/01/30 21:58:53 martinwguy Exp $
+dnl $Id: configure.ac,v 1.246 2007/01/30 22:15:02 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1312,7 +1312,7 @@ else
  nogo=true
 fi
 
-if test x"$JPEG" != x; then
+if test x"$JPEG_LIBS" != x; then
     echo "        JPEG flags are: $JPEG_CFLAGS"
     echo "        JPEG libs are: $JPEG_LIBS"
 else
