@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.246 2007/01/30 22:15:02 martinwguy Exp $
+dnl $Id: configure.ac,v 1.247 2007/01/30 23:22:06 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -413,7 +413,6 @@ AC_LANG_POP(C++)
 dnl AC_CHECK_LIB(c, mremap)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
-GNASH_PATH_JPEG
 
 dnl if we're not building the extensions, then the _FLAGS and _LIBS settings
 dnl found in these tests are blank. This way they can be used in
