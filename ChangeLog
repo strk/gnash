@@ -1,5 +1,7 @@
 2007-01-30 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: NetConnection.cpp, NetStream.cpp:
+	  Cleanups and robustness improvements.
 	* server/parser/movie_def_impl.cpp (read_all_swf):
 	  Don't discard anything past the last SHOWFRAME,
 	  as Ming seems to still put EXPORTASSETS after it

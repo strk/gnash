@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: NetStream.cpp,v 1.23 2007/01/23 16:41:27 tgc Exp $ */
+/* $Id: NetStream.cpp,v 1.24 2007/01/30 10:52:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,6 +28,7 @@
 #include "NetStream.h"
 #include "fn_call.h"
 #include "builtin_function.h"
+#include "GnashException.h"
 
 #include "movie_root.h"
 
@@ -66,7 +67,7 @@ netstream_new(const fn_call& fn)
 		else
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-				log_warning("First argument "
+				log_aserror("First argument "
 					"to NetConnection constructor "
 					"doesn't cast to an Object (%s)",
 					fn.arg(0).to_string());
@@ -77,18 +78,29 @@ netstream_new(const fn_call& fn)
 
 }
 
+// Wrapper around dynamic_cast to implement user warning.
+// To be used by builtin properties and methods.
+static netstream_as_object*
+ensure_netstream(as_object* obj)
+{
+	netstream_as_object* ret = dynamic_cast<netstream_as_object*>(obj);
+	if ( ! ret )
+	{
+		throw ActionException("builtin method or gettersetter for NetStream objects called against non-NetStream instance");
+	}
+	return ret;
+}
+
 
 static void netstream_close(const fn_call& fn)
 {
-	assert(dynamic_cast<netstream_as_object*>(fn.this_ptr));
-	netstream_as_object* ns = static_cast<netstream_as_object*>(fn.this_ptr);
+	netstream_as_object* ns = ensure_netstream(fn.this_ptr);
 	ns->obj.close();
 }
 
 static void netstream_pause(const fn_call& fn)
 {
-	assert(dynamic_cast<netstream_as_object*>(fn.this_ptr));
-	netstream_as_object* ns = static_cast<netstream_as_object*>(fn.this_ptr);
+	netstream_as_object* ns = ensure_netstream(fn.this_ptr);
 	
 	// mode: -1 ==> toogle, 0==> pause, 1==> play
 	int mode = -1;
@@ -101,12 +113,13 @@ static void netstream_pause(const fn_call& fn)
 
 static void netstream_play(const fn_call& fn)
 {
-	assert(dynamic_cast<netstream_as_object*>(fn.this_ptr));
-	netstream_as_object* ns = static_cast<netstream_as_object*>(fn.this_ptr);
+	netstream_as_object* ns = ensure_netstream(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
-		log_error("NetStream play needs args\n");
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("NetStream play needs args");
+		);
 		return;
 	}
 
@@ -117,8 +130,7 @@ static void netstream_play(const fn_call& fn)
 }
 
 static void netstream_seek(const fn_call& fn) {
-	assert(dynamic_cast<netstream_as_object*>(fn.this_ptr));
-	netstream_as_object* ns = static_cast<netstream_as_object*>(fn.this_ptr);
+	netstream_as_object* ns = ensure_netstream(fn.this_ptr);
 
 	double time = 0;
 	if (fn.nargs > 0)
@@ -128,7 +140,9 @@ static void netstream_seek(const fn_call& fn) {
 	ns->obj.seek(time);
 
 }
-static void netstream_setbuffertime(const fn_call& /*fn*/) {
+static void netstream_setbuffertime(const fn_call& fn) {
+	netstream_as_object* ns = ensure_netstream(fn.this_ptr);
+	UNUSED(ns);
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
@@ -137,12 +151,11 @@ static void
 netstream_time(const fn_call& fn)
 {
 
-	assert(dynamic_cast<netstream_as_object*>(fn.this_ptr));
-	netstream_as_object* ns = static_cast<netstream_as_object*>(fn.this_ptr);
+	netstream_as_object* ns = ensure_netstream(fn.this_ptr);
 
 	if ( fn.nargs == 0 )
 	{
-		fn.result->set_double((double)ns->obj.time());
+		fn.result->set_double(ns->obj.time());
 	}
 	else
 	{

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.18 2007/01/27 16:55:05 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.19 2007/01/30 10:52:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -157,7 +157,18 @@ NetConnection::fill_cache(off_t size)
 	}
 
 }
-NetConnection::NetConnection() {
+NetConnection::NetConnection()
+	:
+	_cache(NULL),
+	_cachefd(0),
+	_url(),
+	_handle(NULL),
+	_mhandle(NULL),
+	_running(false),
+	localFile(true),
+	netStreamObj(NULL),
+	totalSize(0)
+{
 }
 
 NetConnection::~NetConnection() {
@@ -353,6 +364,19 @@ netconnection_as_object::~netconnection_as_object()
 {
 }
 
+// Wrapper around dynamic_cast to implement user warning.
+// To be used by builtin properties and methods.
+static netconnection_as_object*
+ensure_netconnection(as_object* obj)
+{
+	netconnection_as_object* ret = dynamic_cast<netconnection_as_object*>(obj);
+	if ( ! ret )
+	{
+		throw ActionException("builtin method or gettersetter for NetConnection objects called against non-NetConnection instance");
+	}
+	return ret;
+}
+
 
 /// \brief callback to instantiate a new NetConnection object.
 /// \param fn the parameters from the Flash movie
@@ -374,11 +398,10 @@ netconnection_connect(const fn_call& fn)
 	GNASH_REPORT_FUNCTION;
 
 	string filespec;
-	netconnection_as_object *ptr = (netconnection_as_object*)fn.this_ptr;
+	netconnection_as_object *ptr = ensure_netconnection(fn.this_ptr); 
     
-	assert(ptr);
-	if (fn.nargs != 0) {
-		ptr->obj.addToURL(fn.env->bottom(fn.first_arg_bottom_index).to_string());
+	if (fn.nargs > 0) {
+		ptr->obj.addToURL(fn.arg(0).to_string());
 	}    
 }
 
