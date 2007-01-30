@@ -1,3 +1,10 @@
+2007-01-30 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_def_impl.cpp (read_all_swf):
+	  Don't discard anything past the last SHOWFRAME,
+	  as Ming seems to still put EXPORTASSETS after it
+	  (possibly bogus, but we want to accept it).
+
 2007-01-30 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStreamGst.cpp: Fixed wrong return type.

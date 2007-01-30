@@ -836,6 +836,8 @@ movie_def_impl::read_all_swf()
 
 		SWF::tag_type tag_type = str.open_tag();
 
+parse_tag:
+
 		if (s_progress_function != NULL)
                 {
 			s_progress_function((uint32_t)str.get_position(),
@@ -856,20 +858,17 @@ movie_def_impl::read_all_swf()
 			if ( _frames_loaded == m_frame_count )
 			{
 				str.close_tag();
-				if ( str.open_tag() != SWF::END )
+				tag_type = str.open_tag();
+				if ( tag_type != SWF::END )
 				{
 					IF_VERBOSE_MALFORMED_SWF(
 					log_swferror("last expected SHOWFRAME "
-						"in SWF stream "
-						"isn't followed by an END. "
-						"Discarding the rest.");
+						"in SWF stream '%s' isn't "
+						"followed by an END (%d).",
+						get_url().c_str(), tag_type);
 					);
 				}
-				// WARNING: might not match with SWF size
-				//          advertised in header
-				setBytesLoaded(str.get_position());
-				str.close_tag();
-				break;
+				goto parse_tag;
 			}
 
 		}
