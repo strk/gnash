@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.11 2006/11/02 14:00:12 udog Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.12 2007/01/31 15:24:13 bjacques Exp $ */
 
 #include <cstdio>
 #include <cerrno>
@@ -122,16 +122,6 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
 	);
 	
 }
-
-static int
-valid_coord(int coord, int max)
-{ 
-    if (coord<0) return 0;
-    else if (coord>=max) return max;
-
-    return coord;
-}
-
 
 void
 GtkAggGlue::render()

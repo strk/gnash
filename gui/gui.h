@@ -32,8 +32,8 @@
 // Forward declarations
 namespace gnash
 {
-	class render_handler;
-	class movie_root;
+    class render_handler;
+    class movie_root;
 }
 
 namespace gnash
@@ -70,7 +70,7 @@ public:
     Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
 
     virtual ~Gui();
-    
+
     /** \brief
      * Initialise the gui and the associated renderer.
      * 
@@ -103,7 +103,12 @@ public:
 
     /// Register event handlers.
     virtual bool setupEvents() = 0;
-    
+
+    /// Render the current buffer.
+
+    /// For OpenGL, this means that the front and back buffers are swapped.
+    virtual void renderBuffer() = 0;
+
     /// Gives the GUI a *hint* which region of the stage should be redrawn.
     //
     /// There is *no* restriction what the GUI might do with these coordinates. 
@@ -119,46 +124,62 @@ public:
     /// correct results. It is up to the GUI to forward this information to
     /// the renderer.
     ///
-    virtual void set_invalidated_region(const rect& /*bounds*/) {
-      // does not need to be implemented (optional feature),
-      // but still needs to be available.
-      //
-      // Why "rect" (floats)? Because the gui does not really
-      // know about the scale the renderer currently uses... 
-      //
-      // <strk> but it does not about the "semantic" of the TWIPS
-      //        coordinate space, which is integer values...
-      //        The question really is: why floats for TWIPS ?
-      //        (guess this goes deep in the core/server libs)
-    } 
+    // does not need to be implemented (optional feature),
+    // but still needs to be available.
+    //
+    // Why "rect" (floats)? Because the gui does not really
+    // know about the scale the renderer currently uses... 
+    //
+    // <strk> but it does not about the "semantic" of the TWIPS
+    //        coordinate space, which is integer values...
+    //        The question really is: why floats for TWIPS ?
+    //        (guess this goes deep in the core/server libs)
+    virtual void setInvalidatedRegion(const rect& bounds);
 
     /// Asks the GUI handler if the next frame should be redrawn completely. 
     //
     /// For example, when the contents of the player window have been destroyed,
-    /// then want_redraw() should return true so that set_invalidated_region() is
+    /// then want_redraw() should return true so that setInvalidatedRegion() is
     /// called with the coordinates of the complete screen. 
-    virtual bool want_redraw() {
-      return false;
-    }
+    virtual bool want_redraw();
 
 
     /// Sets the current mouse cursor for the Gui window.
     virtual void setCursor(gnash_cursor_type newcursor);
 
-
-    /// Render the current buffer.
-    //
-    /// For OpenGL, this means that the buffer is swapped.
-    virtual void renderBuffer() = 0;
-
     /// @return The value to which the movie width should be scaled.
-    float getXScale()                { return _xscale; }
+    float getXScale();
 
     /// @return The value to which the movie height shold be scaled.
-    float getYScale()                { return _yscale; }
+    float getYScale();
 
     /// @return Whether or not the movie should be looped indefinitely.
-    bool loops()                     { return _loop; }
+    bool loops();
+
+    /// Mouse notification callback to be called when the mouse is moved.
+    //
+    /// @param x The mouse coordinate X component in pixels.
+    /// @param y The mouse coordinate Y component in pixels.
+    void notify_mouse_moved(int x, int y);
+
+    /// Mouse notification callback to be called when the mouse is clicked.
+    //
+    /// @param mouse_pressed Determines whether the mouse button is being
+    ///                      pressed (true) or being released (false)
+    /// @param mask A binary representation of the buttons currently pressed.
+    void notify_mouse_clicked(bool mouse_pressed, int mask);
+
+    /// Resize the client area view and the window accordingly.
+    //
+    /// @param width  The desired width in pixels.
+    /// @param height The desired height in pixels.
+    void resize_view(int width, int height);
+
+
+    /// \brief
+    /// Advances the movie to the next frame. This is to take place after the
+    /// interval specified in the call to setInterval().
+    static bool advance_movie(Gui* gui);
 
     /** @name Menu callbacks
      *  These callbacks will be called when a menu item is clicked.
@@ -176,30 +197,6 @@ public:
     static void menu_jump_backward();
     static void menu_toggle_sound();
     /// @}
- 
-    /// Mouse notification callback to be called when the mouse is moved.
-    //
-    /// @param x The mouse coordinate X component in pixels.
-    /// @param y The mouse coordinate Y component in pixels.
-    void notify_mouse_moved(int x, int y);
-
-    /// Mouse notification callback to be called when the mouse is clicked.
-    //
-    /// @param mouse_pressed Determines whether the mouse button is being
-    ///                      pressed (true) or being released (false)
-    /// @param mask A binary representation of the buttons currently pressed.
-    void notify_mouse_clicked(bool mouse_pressed, int mask);
-
-    /// \brief
-    /// Advances the movie to the next frame. This is to take place after the
-    /// interval specified in the call to setInterval().
-    static bool advance_movie(Gui* gui);
-
-    /// Resize the client area view and the window accordingly.
-    //
-    /// @param width  The desired width in pixels.
-    /// @param height The desired height in pixels.
-    void resize_view(int width, int height);
 
 protected:
     /// Determines if playback should restart after the movie ends.

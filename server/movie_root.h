@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.32 2007/01/18 22:53:21 strk Exp $ */
+/* $Id: movie_root.h,v 1.33 2007/01/31 15:24:13 bjacques Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -342,7 +342,7 @@ public:
 	///
 	void set_active_entity(character* ch);
 	
-	void get_invalidated_bounds(rect* bounds, bool force);
+	DSOEXPORT void get_invalidated_bounds(rect* bounds, bool force);
 
 	/// Return true if the mouse pointer is over an active entity
 	bool isMouseOverActiveEntity() const;

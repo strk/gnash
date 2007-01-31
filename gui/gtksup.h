@@ -131,7 +131,7 @@ class DSOEXPORT GtkGui : public Gui
 
     GdkPixbuf* create_pixbuf(const gchar *filename);
     
-    void set_invalidated_region(const rect& bounds);
+    void setInvalidatedRegion(const rect& bounds);
 
     virtual void setCursor(gnash_cursor_type newcursor);
     
@@ -157,7 +157,6 @@ class DSOEXPORT GtkGui : public Gui
     static gnash::key::code gdk_to_gnash_key(guint key);
     static void             open_file(GtkWidget* dialog, gpointer data);
 
-    int    valid_coord(int coord, int max);
 };
 
 

@@ -25,6 +25,9 @@
 #include <fltk/run.h>
 #include <fltk/Cursor.h>
 #include <fltk/layout.h>
+#include <fltk/MenuBar.h>
+#include <fltk/ItemGroup.h>
+#include <fltk/file_chooser.h>
 
 #include "fltksup.h"
 #include "gnash.h"
@@ -36,13 +39,16 @@
 using namespace std;
 using namespace fltk;
 
+
+
 namespace gnash 
 {
 
 
 FltkGui::FltkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
   : Window(0, 0),
-    Gui(xid, scale, loop, depth)
+    Gui(xid, scale, loop, depth),
+    _menu_height(_xid ? 0 : 20)
 {
 }
 
@@ -55,14 +61,6 @@ FltkGui::~FltkGui()
 void
 FltkGui::renderBuffer()
 {
-    redraw();
-}
-
-// All drawing operations (i.e., the drawing calls the renderer makes) must take
-// place in draw().
-void
-FltkGui::draw()
-{
     // FLTK has a nice mechanism where you can set damage() to whatever you want
     // so in draw() you can check what exactly you want to redraw. But
     // unfortunately it doesn't seem to remember what bits you turn on. So I'll
@@ -71,12 +69,12 @@ FltkGui::draw()
 
     if (firstRun) {
       // Redraw the whole rendering area.
-      rect draw_bounds(-1e10f, -1e10f, +1e10f, +1e10f);
-      set_invalidated_region(draw_bounds);
+      rect draw_bounds(0, 0, _width, _height);
+      setInvalidatedRegion(draw_bounds);
       firstRun = false;
     }
 
-    _glue.draw();
+    _glue->redraw();
 }
 
 int
@@ -97,10 +95,13 @@ FltkGui::handle(int event)
         return true;
       case MOVE:
       {
+        if (!_xid && event_y() < _menu_height) {
+          return Window::handle(event);
+        }
         int x = event_x() / _xscale;
-        int y = event_y() / _yscale;
+        int y = (event_y() - _menu_height) / _yscale;
         notify_mouse_moved(x, y);
-        return true;
+        return Window::handle(event);;
       }
       case KEY:
         handleKey(event_key());
@@ -158,6 +159,7 @@ FltkGui::handleKey(unsigned key)
 #endif
     };
 
+
     for (int i = 0; table[i].fltkKey; i++) {
         if (key == table[i].fltkKey) {
             gnash::notify_key_event(table[i].gnashKey, true);
@@ -177,8 +179,6 @@ FltkGui::run()
 bool
 FltkGui::init(int argc, char **argv[])
 {
-    _renderer = _glue.createRenderHandler();
-    set_render_handler(_renderer);
 
     return true;
 }
@@ -204,14 +204,31 @@ FltkGui::create()
 bool
 FltkGui::createWindow(const char* title, int width, int height)
 {
-    resize(width, height);
+    resize(width, _menu_height + height);
 
-    _glue.initBuffer(width, height);
 
     label(title);
     begin();
+
+    if (!_xid) {
+      MenuBar* menubar = new MenuBar(0, 0, width, _menu_height);
+      menubar->begin();
+      addMenuItems();
+      menubar->end();
+    }
+#ifdef RENDERER_AGG
+    _glue = new FltkAggGlue(0, _menu_height, width, height);
+#elif defined(RENDERER_CAIRO)
+#error FLTK/Cairo is currently broken. Please try again soon... 
+    FltkCairoGlue _glue;
+#endif
     createMenu();
     end();
+
+    _renderer = _glue->createRenderHandler();
+    set_render_handler(_renderer);
+
+    _glue->initBuffer(width, height);
 
     // The minimum size of the window is 1x1 pixels.
     size_range (1, 1);
@@ -221,15 +238,72 @@ FltkGui::createWindow(const char* title, int width, int height)
     return true;
 }
 
-bool
-FltkGui::createMenu()
-{
-    _popup_menu = new PopupMenu(0, 0, w(), h());
-    _popup_menu->type(PopupMenu::POPUP3);
 
-    _popup_menu->begin();
+static void menu_fltk_open_file()
+{
+    const char *newfile = fltk::file_chooser("Open File", "*.swf", NULL);
+    if (!newfile) {
+      return;
+    }
+
+    // menu_open_file()..
+}
+
+static void menu_fltk_save_file_as()
+{
+    const char* savefile = file_chooser("Save File as", NULL, NULL);
+    if (!savefile) {
+      return;
+    }
+
+    // menu_save_file();
+}
+
+static void full(Widget*, void* ptr)
+{
+    GNASH_REPORT_FUNCTION;
+
+    static bool fullscreen = false;
+    static Rectangle oldBounds;
+
+    fullscreen = !fullscreen;
+
+    FltkGui* gui = static_cast<FltkGui*>(ptr);
+    if (fullscreen) {
+      oldBounds.set(gui->x(), gui->y(), gui->w(), gui->h());
+      gui->fullscreen();
+    } else {
+      gui->fullscreen_off(oldBounds.x(), oldBounds.y(), oldBounds.w(), oldBounds.h());
+    }
+}
+
+
+void
+FltkGui::addMenuItems()
+{
 
 #define callback_cast(ptr) reinterpret_cast<Callback*>(ptr)
+    ItemGroup* file = new ItemGroup("File");
+    file->begin();
+    new Item("Open",                    0, callback_cast(menu_fltk_open_file));
+    new Item("Save as",                 0, callback_cast(menu_fltk_save_file_as));
+    //new Item("Save as..."               0, callback_cast(menu_fltk_save_as));
+    new Item("Quit",                    0, callback_cast(menu_quit));
+    file->end();
+
+    ItemGroup* edit = new ItemGroup("Edit");
+    edit->begin();
+    new Item("Preferences");
+    edit->end();
+
+    ItemGroup* view = new ItemGroup("View");
+    view->begin();
+    new Item("Double size");
+    new Item("Fullscreen",              0, callback_cast(full), this);
+    view->end();
+
+    ItemGroup* movie_ctrl = new ItemGroup("Movie control");
+    movie_ctrl->begin();
     new Item("Play Movie",              0, callback_cast(menu_play));
     new Item("Pause Movie",             0, callback_cast(menu_pause));
     new Item("Stop Movie",              0, callback_cast(menu_stop));
@@ -239,8 +313,27 @@ FltkGui::createMenu()
     new Item("Jump Forward 10 Frames",  0, callback_cast(menu_jump_forward));
     new Item("Jump Backward 10 Frames", 0, callback_cast(menu_jump_backward));
     new Item("Toggle Sound",            0, callback_cast(menu_toggle_sound));
-    new Item("Quit",                    0, callback_cast(menu_quit));
+    movie_ctrl->end();
+
+    ItemGroup* help = new ItemGroup("Help");
+    help->begin();
+    new Item("About");
+    help->end();
+
 #undef callback_cast
+}
+
+
+
+bool
+FltkGui::createMenu()
+{
+    _popup_menu = new PopupMenu(0, 0, w(), h());
+    _popup_menu->type(PopupMenu::POPUP3);
+
+    _popup_menu->begin();
+
+     addMenuItems();
 
     _popup_menu->end();
 
@@ -250,10 +343,6 @@ FltkGui::createMenu()
 void
 FltkGui::layout()
 {
-    if ((layout_damage() & LAYOUT_CHILD )) {
-      // We're not interested in children. Sorry.
-      return;
-    }
     if (!VM::isInitialized()) {
       // No movie yet; don't bother resizing anything.
       return;
@@ -263,15 +352,15 @@ FltkGui::layout()
     Window::layout();
 
     if ((layout_damage() & LAYOUT_WH)) {
-      _glue.resize(w(), h());
-      resize_view(w(), h());
+      _glue->resize(w(), h() - _menu_height);
+      resize_view(w(), h() - _menu_height);
     }
 
     // Invalidate the whole drawing area.
-    rect draw_bounds(-1e10f, -1e10f, +1e10f, +1e10f);
-    set_invalidated_region(draw_bounds);
+    rect draw_bounds(0, 0, _width, _height);
+    setInvalidatedRegion(draw_bounds);
 
-    redraw();
+    _glue->redraw();
 }
 
 void 
@@ -294,9 +383,12 @@ FltkGui::setCursor(gnash_cursor_type newcursor)
 }
 
 void
-FltkGui::set_invalidated_region(const rect& bounds)
+FltkGui::setInvalidatedRegion(const rect& bounds)
 {
-    _glue.invalidateRegion(bounds);
+#if 0
+    // temporarily disabled
+    _glue->invalidateRegion(bounds);
+#endif
 }
 
 

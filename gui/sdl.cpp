@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.50 2006/12/22 09:21:00 strk Exp $ */
+/* $Id: sdl.cpp,v 1.51 2007/01/31 15:24:13 bjacques Exp $ */
 
 // XXXbjacques: Screw up the indentation in this file, and you're dead. And by
 //              screw up, I mean not adhering the indentation used throughout
@@ -324,7 +324,7 @@ SDLGui::resize_event()
 void
 SDLGui::expose_event()
 {
-	// TODO: implement and use set_invalidated_region instead?
+	// TODO: implement and use setInvalidatedRegion instead?
 	renderBuffer();
 }
 

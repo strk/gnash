@@ -401,7 +401,7 @@ int FBGui::valid_y(int y) {
   return y;
 }
 
-void FBGui::set_invalidated_region(const rect& bounds) {
+void FBGui::setInvalidatedRegion(const rect& bounds) {
 
 #ifdef DOUBLE_BUFFER
   
@@ -419,7 +419,7 @@ void FBGui::set_invalidated_region(const rect& bounds) {
 
 #endif
   
-}  // set_invalidated_region
+}  // setInvalidatedRegion
 
 void FBGui::disable_terminal() {
   /*

@@ -21,6 +21,8 @@
 #include "config.h"
 #endif
 
+#include <fltk/Widget.h>
+
 #include "gnash.h"
 #include "log.h"
 #include "gui.h"
@@ -33,10 +35,10 @@ using namespace fltk;
 
 namespace gnash {
 
-class FltkAggGlue
+class FltkAggGlue : public fltk::Widget
 {
     public:
-      FltkAggGlue();
+      FltkAggGlue(int x, int y, int width, int height);
       ~FltkAggGlue();
      // resize(int width, int height);
       void draw();

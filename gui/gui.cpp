@@ -132,7 +132,7 @@ Gui::resize_view(int width, int height)
 	// set new size ?
 	_width = width;
 	_height = height;
-	_validbounds.setTo(0, 0, _width-1, _height-1);
+	_validbounds.setTo(0, 0, _width, _height);
 	//log_msg("new size (in twips) is: %dx%d", _width*20, _height*20); 
 
 }
@@ -302,9 +302,9 @@ Gui::display(movie_root* m)
 		// *new* invalidated region is visible
 		// (helps debugging)
 		rect worldregion; worldregion.set_world();
-		set_invalidated_region(worldregion);
+		setInvalidatedRegion(worldregion);
 #else
-		set_invalidated_region(changed_bounds);
+		setInvalidatedRegion(changed_bounds);
 #endif
 
 		// render the frame.
@@ -389,6 +389,35 @@ Gui::advance_movie(Gui* gui)
 
 void
 Gui::setCursor(gnash_cursor_type /*newcursor*/)
+{
+}
+
+bool
+Gui::want_redraw()
+{
+    return false;
+}
+
+float
+Gui::getXScale()
+{
+    return _xscale;
+}
+
+float
+Gui::getYScale()
+{
+    return _yscale;
+}
+
+bool
+Gui::loops()
+{
+    return _loop;
+}
+
+void
+Gui::setInvalidatedRegion (const rect& bounds)
 {
 }
 

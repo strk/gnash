@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: riscos.cpp,v 1.2 2006/11/28 12:34:47 nihilus Exp $ */
+/* $Id: riscos.cpp,v 1.3 2007/01/31 15:24:13 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -191,7 +191,7 @@ RiscosGui::setInterval(unsigned int interval)
 }
 
 void
-RiscosGui::set_invalidated_region(const rect& bounds)
+RiscosGui::setInvalidatedRegion(const rect& bounds)
 {
     // Note: Bounds coordinates are in TWIPS
 
@@ -277,7 +277,7 @@ RiscosGui::run()
           // TODO: Make this use the clipping rectangle (convert to TWIPS)
           rect bounds(-1e10f, -1e10f, 1e10f, 1e10f);
 #ifdef RENDERER_AGG
-          set_invalidated_region(bounds);
+          setInvalidatedRegion(bounds);
 #endif
           renderBuffer();
           error = xwimp_get_rectangle(&block.redraw, &more);

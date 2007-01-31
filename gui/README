@@ -32,10 +32,10 @@ STATUS
 GTK2:
 - implemented OpenGL, Agg and Cairo backends.
 - Events work.
-- Pop-up menu is available.
+- Pop-up menu is available. Window menu available for standalone.
 - Firefox plugin works.
 
-SDL:
+SDL: deprecated in favour of FLTK.
 - OpenGL, Agg and Cairo backends.
 - Mouse events work (keyboard events don't).
 - There's no pop-up menu (and there probably never will be one).
@@ -47,7 +47,11 @@ QT/KDE:
 - Klash plugin for konqueror is available.
 
 FLTK:
-- Doesn't work just yet.
+- Requires FLTK2.
+- Implements Agg and Cairo backends.
+- Events work.
+- Popup menu is available.
+- Firefox plugin and KDE Kpart work.
 
 Framebuffer:
 - Working as output device only, no input devices currently supported.

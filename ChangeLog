@@ -1,3 +1,26 @@
+2007-01-31 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_agg.cpp, gui/{gui.cpp, gtk.cpp}: Do not
+	subtract 1 from	the rendering width and height (fixes bug #18904).
+	* gui/README: update to current status.
+	* gui: Rename Gui::set_invalidated_region to setInvalidatedRegion to
+	match naming style.
+	* gui/fltk{.cpp, sup.h, _glue_agg.cpp, _glue_agg.h}: Add a menu bar
+	to the FLTK window. Make the AGG glue inherit from fltk::Widget, so
+	it can be added to the FLTK window without interfering with menu
+	drawing. Since the same hasn't yet been done for the Cairo glue,
+	disable Cairo/FLTK for now. Account for the menu height when passing
+	the mouse position to the rest of Gnash. Delay initialisation of the
+	Glue until we are ready to add it to the FLTK window. Until we can
+	solve rendering issues, disable region based clipping for AGG.
+	Note that some FLTK menu items are not yet implemented.
+	* gui/gtk{.cpp, _glue_agg.cpp}: Remove the unused valid_coord method.
+	* gui/gui{.cpp, .h}: Declarations in the header, implementation in
+	the .cpp file. Shuffle the order of declarations so they are grouped
+	by type.
+	* server/movie_root.h: set_invalidated_region is used across libraries,
+	so visibility should be DSO_EXPORT.
+
 2007-01-31 Sandro Santilli <strk@keybit.net>
 
 	* server/button_character_instance.{h,cpp}:

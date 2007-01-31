@@ -32,8 +32,9 @@ using namespace std;
 
 namespace gnash {
 
-FltkAggGlue::FltkAggGlue()
- : _offscreenbuf(NULL)
+FltkAggGlue::FltkAggGlue(int x, int y, int width, int height)
+ : Widget(x, y, width, height),
+   _offscreenbuf(NULL)
 {
 }
 
@@ -77,7 +78,7 @@ FltkAggGlue::initBuffer(int width, int height)
     _width = width;
     _height = height;
 
-    _validbounds.setTo(0, 0, _width-1, _height-1);
+    _validbounds.setTo(0, 0, _width, _height);
     _drawbounds = _validbounds;
 
 }
@@ -93,7 +94,7 @@ FltkAggGlue::draw()
 
     fltk::drawimage(_offscreenbuf + offset, fltk::RGB, bounds, _stride);
 }
-//miny*(_width*(_bpp/8)) + minx*(_bpp/8)
+
 void
 FltkAggGlue::resize(int width, int height)
 {

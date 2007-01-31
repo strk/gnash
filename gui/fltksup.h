@@ -55,21 +55,23 @@ public:
     virtual void setCursor(gnash_cursor_type newcursor);
     virtual bool setupEvents() { return true;}
 
-    void set_invalidated_region(const rect& bounds);
+    void setInvalidatedRegion(const rect& bounds);
 
     void create();
-    void draw();
     int handle(int event);
     void layout();
+    void addMenuItems();
  private:
     void handleKey(unsigned key);
 
     fltk::PopupMenu  *_popup_menu;
     float _interval;
+    unsigned int _menu_height;
+
 #ifdef RENDERER_AGG
-    FltkAggGlue _glue;
+    FltkAggGlue *_glue;
 #elif defined(RENDERER_CAIRO)
-    FltkCairoGlue _glue;
+    FltkCairoGlue* _glue;
 #endif
 };
 

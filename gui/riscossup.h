@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: riscossup.h,v 1.2 2006/11/28 12:34:47 nihilus Exp $ */
+/* $Id: riscossup.h,v 1.3 2007/01/31 15:24:13 bjacques Exp $ */
 
 #ifndef __ROSUP_H__
 #define __ROSUP_H__
@@ -55,7 +55,7 @@ class DSOEXPORT RiscosGui : public Gui
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
-    virtual void set_invalidated_region(const rect& bounds);
+    virtual void setInvalidatedRegion(const rect& bounds);
 
 
  private:

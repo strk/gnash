@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.54 2007/01/17 16:31:30 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.55 2007/01/31 15:24:13 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -523,7 +523,7 @@ public:
     m_pixf = new PixelFormat(m_rbuf);
     //m_rbase = new renderer_base(*m_pixf);  --> does not work!!??
     
-    _clipbounds.setTo(0, 0, xres-1, yres-1);
+    _clipbounds.setTo(0, 0, xres, yres);
         
     log_msg("initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes", 
       mem, size, x, y, row_size);
@@ -1441,7 +1441,7 @@ public:
   
       // TODO: cache 'visiblerect' and maintain in sync with
       //       xres/yres.
-      Range2d<int> visiblerect(0, 0, xres-1, yres-1);
+      Range2d<int> visiblerect(0, 0, xres, yres);
       _clipbounds = Intersection(pixbounds, visiblerect);
   
   }

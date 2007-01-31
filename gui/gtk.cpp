@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gtk.cpp,v 1.64 2007/01/23 19:53:41 martinwguy Exp $ */
+/* $Id: gtk.cpp,v 1.65 2007/01/31 15:24:13 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -234,7 +234,7 @@ GtkGui::createWindow(int width, int height)
 	_width = width;
 	_height = height;
 
-	_validbounds.setTo(0, 0, _width-1, _height-1);
+	_validbounds.setTo(0, 0, _width, _height);
 	_drawbounds = _validbounds;
     
 	glue.setRenderHandlerSize(_width, _height);
@@ -251,16 +251,8 @@ GtkGui::renderBuffer()
 		_drawbounds.getMaxX(), _drawbounds.getMaxY());
 }
 
-int
-GtkGui::valid_coord(int coord, int max)
-{
-	if (coord<0) return 0;
-	else if (coord>=max) return max;
-	return coord;
-}
-
 void
-GtkGui::set_invalidated_region(const rect& bounds)
+GtkGui::setInvalidatedRegion(const rect& bounds)
 {
 #ifdef RENDERER_AGG
 	// forward to renderer
@@ -998,7 +990,7 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
 	//       (look at the GdkEventExpose)
 	rect draw_bounds; draw_bounds.set_world();
 
-	gui->set_invalidated_region(draw_bounds);
+	gui->setInvalidatedRegion(draw_bounds);
 
 	gui->renderBuffer();
 
