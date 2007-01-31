@@ -210,7 +210,7 @@ as_object::set_member_default(const std::string& key, const as_value& val )
 		}
 		catch (ActionException& exc)
 		{
-			log_warning("%s", exc.what());
+			log_warning("%s: %s. Will create a new member.", key.c_str(), exc.what());
 		}
 	}
 

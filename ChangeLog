@@ -1,3 +1,8 @@
+2007-01-31 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.cpp (set_member_default): more verbose warning
+	  for invalid properties found in the inheritance chain.
+
 2007-01-31 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_agg.cpp, gui/{gui.cpp, gtk.cpp}: Do not
