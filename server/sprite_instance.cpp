@@ -2673,7 +2673,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror("GotoFrame(" SIZET_FMT ") targets a yet "
-				"to be loaded frame (" SIZET_FMT ") loaded).\n"
+				"to be loaded frame (" SIZET_FMT ") loaded). "
 				"We'll wait for it but a more correct form "
 				"is explicitly using WaitForFrame instead.",
 				target_frame_number+1,
