@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.42 2007/01/30 18:29:40 strk Exp $ */
+/* $Id: character.h,v 1.43 2007/01/31 15:11:58 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -133,6 +133,16 @@ protected:
 public:  // TODO: make protected
 
 	static void onrollover_getset(const fn_call& fn);
+
+	static void onrollout_getset(const fn_call& fn);
+
+	static void onload_getset(const fn_call& fn);
+
+	static void onpress_getset(const fn_call& fn);
+
+	static void onrelease_getset(const fn_call& fn);
+
+	static void onreleaseoutside_getset(const fn_call& fn);
 
 	static void x_getset(const fn_call& fn);
 

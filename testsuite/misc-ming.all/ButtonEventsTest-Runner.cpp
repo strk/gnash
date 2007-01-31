@@ -40,7 +40,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	// the textfield value.
 	tester.movePointerTo(60, 60);
 	check_equals(string(text->get_text_value()), string("MouseOver"));
-	xcheck_equals(string(text2->get_text_value()), string("RollOver"));
+	check_equals(string(text2->get_text_value()), string("RollOver"));
 	check(tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is yellow !
 
@@ -48,7 +48,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	// the textfield value.
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), string("MouseDown"));
-	xcheck_equals(string(text2->get_text_value()), string("Press"));
+	check_equals(string(text2->get_text_value()), string("Press"));
 	check(tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is green !
 
@@ -56,7 +56,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	// the textfield value.
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), string("MouseUp"));
-	xcheck_equals(string(text2->get_text_value()), string("Release"));
+	check_equals(string(text2->get_text_value()), string("Release"));
 	check(tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is yellow !
 
@@ -64,7 +64,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	// the textfield value.
 	tester.movePointerTo(39, 60);
 	check_equals(string(text->get_text_value()), string("MouseOut"));
-	xcheck_equals(string(text2->get_text_value()), string("RollOut"));
+	check_equals(string(text2->get_text_value()), string("RollOut"));
 	check(!tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is red !
 
@@ -72,7 +72,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	// as we're outside of the button.
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), string("MouseOut"));
-	xcheck_equals(string(text2->get_text_value()), string("RollOut"));
+	check_equals(string(text2->get_text_value()), string("RollOut"));
 	check(!tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is red !
 
@@ -80,19 +80,19 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	// as we're outside of the button.
 	tester.depressMouseButton();
 	check_equals(string(text->get_text_value()), string("MouseOut"));
-	xcheck_equals(string(text2->get_text_value()), string("RollOut"));
+	check_equals(string(text2->get_text_value()), string("RollOut"));
 	check(!tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is red !
 
 	// Now press the mouse inside and release outside
 	tester.movePointerTo(60, 60);
 	check_equals(string(text->get_text_value()), string("MouseOver"));
-	xcheck_equals(string(text2->get_text_value()), string("RollOver"));
+	check_equals(string(text2->get_text_value()), string("RollOver"));
 	check(tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is yellow !
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), string("MouseDown"));
-	xcheck_equals(string(text2->get_text_value()), string("Press"));
+	check_equals(string(text2->get_text_value()), string("Press"));
 	check(tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is green !
 	tester.movePointerTo(39, 60);

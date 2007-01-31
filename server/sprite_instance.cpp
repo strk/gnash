@@ -1014,36 +1014,6 @@ sprite_url_getset(const fn_call& fn)
 }
 
 static void
-sprite_onrollout_getset(const fn_call& fn)
-{
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		ptr->get_event_handler(event_id::ROLL_OUT, fn.result);
-	}
-	else // setter
-	{
-		ptr->set_event_handler(event_id::ROLL_OUT, fn.arg(0));
-	}
-}
-
-static void
-sprite_onload_getset(const fn_call& fn)
-{
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		ptr->get_event_handler(event_id::LOAD, fn.result);
-	}
-	else // setter
-	{
-		ptr->set_event_handler(event_id::LOAD, fn.arg(0));
-	}
-}
-
-static void
 sprite_highquality_getset(const fn_call& fn)
 {
 	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
@@ -1064,6 +1034,7 @@ sprite_highquality_getset(const fn_call& fn)
 	}
 }
 
+// TODO: move this to character class, _focusrect seems a generic property
 static void
 sprite_focusrect_getset(const fn_call& fn)
 {
@@ -1191,10 +1162,10 @@ attachMovieClipInterface(as_object& o)
 	gettersetter = new builtin_function(&character::onrollover_getset, NULL);
 	o.init_property("onRollOver", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&sprite_onrollout_getset, NULL);
+	gettersetter = new builtin_function(&character::onrollout_getset, NULL);
 	o.init_property("onRollOut", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&sprite_onload_getset, NULL);
+	gettersetter = new builtin_function(&character::onload_getset, NULL);
 	o.init_property("onLoad", *gettersetter, *gettersetter);
 
 #endif // ndef OLD_GET_MEMBER

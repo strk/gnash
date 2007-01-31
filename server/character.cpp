@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.16 2007/01/30 18:29:40 strk Exp $ */
+/* $Id: character.cpp,v 1.17 2007/01/31 15:11:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -222,6 +222,81 @@ character::onrollover_getset(const fn_call& fn)
 		ptr->set_event_handler(event_id::ROLL_OVER, fn.arg(0));
 	}
 
+}
+
+void
+character::onrollout_getset(const fn_call& fn)
+{
+	character* ptr = ensure_character(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		ptr->get_event_handler(event_id::ROLL_OUT, fn.result);
+	}
+	else // setter
+	{
+		ptr->set_event_handler(event_id::ROLL_OUT, fn.arg(0));
+	}
+}
+
+void
+character::onpress_getset(const fn_call& fn)
+{
+	character* ptr = ensure_character(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		ptr->get_event_handler(event_id::PRESS, fn.result);
+	}
+	else // setter
+	{
+		ptr->set_event_handler(event_id::PRESS, fn.arg(0));
+	}
+}
+
+void
+character::onrelease_getset(const fn_call& fn)
+{
+	character* ptr = ensure_character(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		ptr->get_event_handler(event_id::RELEASE, fn.result);
+	}
+	else // setter
+	{
+		ptr->set_event_handler(event_id::RELEASE, fn.arg(0));
+	}
+}
+
+void
+character::onreleaseoutside_getset(const fn_call& fn)
+{
+	character* ptr = ensure_character(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		ptr->get_event_handler(event_id::RELEASE_OUTSIDE, fn.result);
+	}
+	else // setter
+	{
+		ptr->set_event_handler(event_id::RELEASE_OUTSIDE, fn.arg(0));
+	}
+}
+
+void
+character::onload_getset(const fn_call& fn)
+{
+	character* ptr = ensure_character(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		ptr->get_event_handler(event_id::LOAD, fn.result);
+	}
+	else // setter
+	{
+		ptr->set_event_handler(event_id::LOAD, fn.arg(0));
+	}
 }
 
 void

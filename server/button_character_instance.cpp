@@ -18,6 +18,7 @@
 #include "sprite_instance.h"
 #include "movie_root.h"
 #include "VM.h"
+#include "builtin_function.h"
 
 /** \page buttons Buttons and mouse behaviour
 
@@ -149,6 +150,73 @@ frame loop:
 
 namespace gnash {
 
+static void
+attachButtonInterface(as_object& o)
+{
+	//int target_version = o.getVM().getSWFVersion();
+
+	boost::intrusive_ptr<builtin_function> gettersetter;
+
+	//
+	// Properties (TODO: move to appropriate SWF version section)
+	//
+
+	gettersetter = new builtin_function(&character::x_getset, NULL);
+	o.init_property("_x", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::y_getset, NULL);
+	o.init_property("_y", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::xscale_getset, NULL);
+	o.init_property("_xscale", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::yscale_getset, NULL);
+	o.init_property("_yscale", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::xmouse_getset, NULL);
+	o.init_property("_xmouse", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::ymouse_getset, NULL);
+	o.init_property("_ymouse", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::alpha_getset, NULL);
+	o.init_property("_alpha", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::visible_getset, NULL);
+	o.init_property("_visible", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::width_getset, NULL);
+	o.init_property("_width", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::height_getset, NULL);
+	o.init_property("_height", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::rotation_getset, NULL);
+	o.init_property("_rotation", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::parent_getset, NULL);
+	o.init_property("_parent", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::onrollover_getset, NULL);
+	o.init_property("onRollOver", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::onrollout_getset, NULL);
+	o.init_property("onRollOut", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::onpress_getset, NULL);
+	o.init_property("onPress", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::onrelease_getset, NULL);
+	o.init_property("onRelease", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::onreleaseoutside_getset, NULL);
+	o.init_property("onReleaseOutside", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::onload_getset, NULL);
+	o.init_property("onLoad", *gettersetter, *gettersetter);
+
+}
+
 button_character_instance::button_character_instance(
 		button_character_definition* def,
 		character* parent, int id)
@@ -160,6 +228,8 @@ button_character_instance::button_character_instance(
 	m_mouse_state(UP)
 {
 	assert(m_def);
+
+	attachButtonInterface(*this);
 
 	int r, r_num =  m_def->m_button_records.size();
 	m_record_character.resize(r_num);
@@ -201,13 +271,13 @@ bool
 button_character_instance::on_event(const event_id& id)
 {
 
+#if 0
 	if (id.m_id != event_id::KEY_PRESS)
 	{
 		log_warning("Unsupported event for button instance: %s", id.get_function_name().c_str());
 		return false;
 	}
-
-	bool called = false;
+#endif
 
 	static const event_id s_key[32] =
 	{
@@ -233,8 +303,13 @@ button_character_instance::on_event(const event_id& id)
 		// 32-126 folows ASCII
 	};
 
+	bool called = false;
+
+	sprite_instance* parent = get_parent()->to_movie();
+	assert ( parent );
 
 	// Add appropriate actions to the movie's execute list...
+	// TODO: should we execute immediately instead ?
 	for (size_t i = 0, ie=m_def->m_button_actions.size(); i<ie; ++i)
 	{
 		button_action& ba = m_def->m_button_actions[i];
@@ -246,9 +321,7 @@ button_character_instance::on_event(const event_id& id)
 			// Matching action.
 			for (size_t j=0, je=ba.m_actions.size(); j<je; ++j)
 			{
-				sprite_instance* si = get_parent()->to_movie();
-				assert ( si );
-				si->add_action_buffer(ba.m_actions[j]);
+				parent->add_action_buffer(ba.m_actions[j]);
 			}
 			called = true;
 		}
@@ -500,10 +573,21 @@ button_character_instance::on_button_event(const event_id& event)
 				ActionExec exec(*ab, get_environment());
 				exec();
 				
-				//get_parent()->add_action_buffer(ab);
 			}
 		}
 	}}
+
+	// check for built-in event handler.
+	as_value method;
+	if ( get_event_handler(event, &method) && ! method.is_undefined() )
+	{
+		call_method0(method, &(get_environment()), this);
+	}
+	else
+	{
+		log_warning("No handler for event: %s", event.get_function_name().c_str());
+	}
+
 
 	// Call conventional attached method.
 	// @@ TODO
@@ -547,157 +631,6 @@ button_character_instance::restart_characters(int condition)
 // ActionScript overrides
 //
 
-void
-button_character_instance::set_member(const std::string& name,
-		const as_value& val)
-{
-
-	// TODO: pull these up into a base class, to
-	// share as much as possible with sprite_instance.
-	as_standard_member	std_member = get_standard_member(name);
-	switch (std_member)
-	{
-	default:
-	case M_INVALID_MEMBER:
-		break;
-	case M_VISIBLE:  // _visible
-	{
-		m_visible = val.to_bool();
-		return;
-	}
-	case M_ALPHA:  // _alpha
-	{
-		// Set alpha modulate, in percent.
-		cxform	cx = get_cxform();
-		cx.m_[3][0] = infinite_to_fzero(val.to_number()) / 100.f;
-		set_cxform(cx);
-		//m_accept_anim_moves = false;
-		return;
-	}
-	case M_X:  // _x
-	{
-		matrix	m = get_matrix();	// @@ get_world_matrix()???
-		m.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
-		this->set_matrix(m);
-		return;
-	}
-	case M_Y:  // _y
-	{
-		matrix	m = get_matrix();	// @@ get_world_matrix()???
-		m.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
-		this->set_matrix(m);
-		return;
-	}
-// evan : need set_width and set_height function for struct character
-#if 0
-	case M_WIDTH:  // _width
-	{
-		for (int i = 0; i < m_def->m_button_records.size(); i++)
-		{
-			button_record&	rec = m_def->m_button_records[i];
-			if (m_record_character[i] == NULL)
-			{
-				continue;
-			}
-			if ((m_mouse_state == UP && rec.m_up)
-			    || (m_mouse_state == DOWN && rec.m_down)
-			    || (m_mouse_state == OVER && rec.m_over))
-			{
-				m_record_character[i]->set_width(val.to_number);
-				// @@ evan: should we return here?
-				return;
-			}
-		}
-
-		return;
-	}
-	//What is this from???
-	/*else if (name == "enabled")
-	{
-		m_enabled = val.to_bool();
-	}*/
-	case M_HEIGHT:  // _height
-	{
-		for (int i = 0; i < m_def->m_button_records.size(); i++)
-		{
-			button_record&	rec = m_def->m_button_records[i];
-			if (m_record_character[i] == NULL)
-			{
-				continue;
-			}
-			if ((m_mouse_state == UP && rec.m_up)
-			    || (m_mouse_state == DOWN && rec.m_down)
-			    || (m_mouse_state == OVER && rec.m_over))
-			{
-				m_record_character[i]->set_height(val.to_number);
-				// @@ evan: should we return here?
-				return;
-			}
-		}
-
-		return;
-	}
-#endif
-	}
-
-	log_error("button_character_instance::set_member('%s', '%s') not implemented yet",
-			  name.c_str(),
-			  val.to_string());
-}
-
-bool
-button_character_instance::get_member(const std::string& name, as_value* val)
-{
-	// TODO: pull these up into a base class, to
-	// share as much as possible with sprite_instance.
-	as_standard_member	std_member = get_standard_member(name);
-	switch (std_member)
-	{
-	default:
-	case M_INVALID_MEMBER:
-		break;
-	case M_VISIBLE:  // _visible
-	{
-		val->set_bool(this->get_visible());
-		return true;
-	}
-	case M_ALPHA:  // _alpha
-	{
-		// @@ TODO this should be generic to struct character!
-		// Alpha units are in percent.
-		val->set_double(get_cxform().m_[3][0] * 100.f);
-		return true;
-	}
-	case M_X:  // _x
-	{
-		matrix	m = get_matrix();	// @@ get_world_matrix()???
-		val->set_double(TWIPS_TO_PIXELS(m.m_[0][2]));
-		return true;
-	}
-	case M_Y:  // _y
-	{
-		matrix	m = get_matrix();	// @@ get_world_matrix()???
-		val->set_double(TWIPS_TO_PIXELS(m.m_[1][2]));
-		return true;
-	}
-	case M_WIDTH:  // _width
-	{
-		float width = get_width();
-		if ( width ) width = TWIPS_TO_PIXELS(width);
-		val->set_double(width);
-		return true;
-	}
-	case M_HEIGHT:  // _height
-	{
-		float width = get_height();
-		if ( width ) width = TWIPS_TO_PIXELS(width);
-		val->set_double(width);
-		return true;
-	}
-	} // end of switch
-
-	return false;
-}
 
 void 
 button_character_instance::get_invalidated_bounds(rect* bounds, bool force) 

@@ -1,5 +1,17 @@
 2007-01-31 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.{h,cpp}:
+	  Use getter-setter properties, and avoid override
+	  of get_member/set_member methods.
+	* server/character.{cpp,h}: define more generic
+	  getter-setters.
+	* server/sprite_instance.cpp: use character class
+	  statics for onload and onrollout events
+	* testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp:
+	  expect less failures :)
+
+2007-01-31 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (goto_frame): fix
 	  check for target frame being already loaded.
 	* server/button_character_instance.cpp (on_event):
