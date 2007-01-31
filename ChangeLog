@@ -1,4 +1,10 @@
-2007-01-29 Zou Lunkai <zoulunkai@gmail.com>
+2007-01-31 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: ButtonEventTest.c,
+	  ButtonEventTest-Runner.cpp: added some (failing)
+	  tests for user defined event handlers.
+
+2007-01-30 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/goto_frame_test.c:
 	  add test for consecutive goto

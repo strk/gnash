@@ -50,7 +50,7 @@ SWFFont font;
 
 void add_event(SWFMovie mo, const char* name, const char* event, const char* action);
 void add_code(SWFMovie mo, const char* code);
-void add_text_field(SWFMovie mo, const char* name, int depth);
+void add_text_field(SWFMovie mo, const char* name, const char* varname, const char* initial_label, int depth, int x, int y);
 void set_text(SWFMovie mo, const char* text);
 SWFDisplayItem add_square(SWFMovie mo, byte r, byte g, byte b, int depth);
 
@@ -104,8 +104,10 @@ add_button(SWFMovie mo)
 	SWFButton_addAction(bu, compileSWFActionCode("_root.msg=\"MouseOver\";"), SWFBUTTON_MOUSEOVER);
 	SWFButton_addAction(bu, compileSWFActionCode("_root.msg=\"MouseDown\";"), SWFBUTTON_MOUSEDOWN);
 	SWFButton_addAction(bu, compileSWFActionCode("_root.msg=\"MouseUp\";"), SWFBUTTON_MOUSEUP);
+	SWFButton_addAction(bu, compileSWFActionCode("_root.msg=\"MouseUpOutside\";"), SWFBUTTON_MOUSEUPOUTSIDE);
 
-	SWFMovieClip_add(mc, (SWFBlock)bu);
+	it = SWFMovieClip_add(mc, (SWFBlock)bu);
+	SWFDisplayItem_setName(it, "button");
 	SWFMovieClip_nextFrame(mc); /* showFrame */
 
 	it = SWFMovie_add(mo, (SWFBlock)mc);
@@ -113,23 +115,31 @@ add_button(SWFMovie mo)
 }
 
 void
-add_text_field(SWFMovie mo, const char* name, int depth)
+add_text_field(SWFMovie mo, const char* name, const char* varname, const char* initial_label, int depth, int x, int y)
 {
 	SWFDisplayItem it;
 	SWFTextField tf = newSWFTextField();
-	/*SWFTextField_setFlags(tf, SWFTEXTFIELD_DRAWBOX);*/
-
 	SWFTextField_setFont(tf, (void*)font);
 	SWFTextField_addChars(tf, " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345689:.,/\\#@?!");
-	SWFTextField_addString(tf, "Play with the button");
-	SWFTextField_setVariableName(tf, name);
+	SWFTextField_setVariableName(tf, varname);
+	SWFTextField_addString(tf, "Idle");
+	SWFTextField_setBounds(tf, 120, 12);
+	SWFTextField_setFlags(tf, SWFTEXTFIELD_DRAWBOX|SWFTEXTFIELD_NOEDIT);
 
 	it = SWFMovie_add(mo, (SWFBlock)tf);
-	//SWFDisplayItem_scale(it, 0.3, 0.3);
-	SWFDisplayItem_moveTo(it, 0, 10);
-	//SWFTextField_setBounds(tf, 120*(1/0.3), 10*(1/0.3));
+	SWFDisplayItem_moveTo(it, x, y+2);
 	SWFDisplayItem_setDepth(it, depth);
-	SWFDisplayItem_setName(it, "textfield");
+	SWFDisplayItem_setName(it, name); // "textfield");
+
+	// Label 
+	tf = newSWFTextField();
+	SWFTextField_setFont(tf, (void*)font);
+	SWFTextField_addString(tf, initial_label);
+	SWFTextField_setFlags(tf, SWFTEXTFIELD_DRAWBOX|SWFTEXTFIELD_NOEDIT);
+	it = SWFMovie_add(mo, (SWFBlock)tf);
+	SWFDisplayItem_scale(it, 0.3, 0.3);
+	SWFDisplayItem_setDepth(it, depth*10);
+	SWFDisplayItem_moveTo(it, x, y);
 }
 
 void
@@ -162,7 +172,7 @@ main(int argc, char **argv)
  
 	mo = newSWFMovie();
 	SWFMovie_setDimension(mo, 120, 120);
-	SWFMovie_setRate(mo, 0.2);
+	SWFMovie_setRate(mo, 1);
 
 	if ( argc>1 ) srcdir=argv[1];
 	else
@@ -181,7 +191,9 @@ main(int argc, char **argv)
 	/*SWFBrowserFont bfont = newSWFBrowserFont("_sans");*/
 	font = loadSWFFontFromFile(font_file);
 
-	add_text_field(mo, "_root.msg", 10);
+	add_text_field(mo, "textfield", "_root.msg", "Button events", 10, 0, 5);
+	add_text_field(mo, "textfield2", "_root.msg2", "Key events", 11, 0, 100);
+	add_text_field(mo, "textfield3", "_root.msg3", "Mouse events", 12, 0, 80);
 
 	/*****************************************************
 	 *
@@ -190,9 +202,26 @@ main(int argc, char **argv)
 	 *****************************************************/
 
 	it = add_button(mo);
-	SWFDisplayItem_moveTo(it, 40, 40);
+	SWFDisplayItem_moveTo(it, 40, 30);
 	SWFDisplayItem_setName(it, "square1");
 	SWFDisplayItem_setDepth(it, 2);
+
+	// Mouse pointer events
+	add_actions(mo, "square1.button.onRollOver = function() { _root.msg2 = 'RollOver'; };");
+	add_actions(mo, "square1.button.onRollOut = function() { _root.msg2 = 'RollOut'; };");
+
+	// Mouse buttons events
+	add_actions(mo, "square1.button.onPress = function() { _root.msg2 = 'Press'; };");
+	add_actions(mo, "square1.button.onRelease = function() { _root.msg2 = 'Release'; };");
+	add_actions(mo, "square1.button.onReleaseOutside = function() { _root.msg2 = 'ReleaseOutside'; };");
+
+	// Focus events
+	add_actions(mo, "square1.button.onSetFocus = function() { _root.msg3 = 'SetFocus'; };");
+
+	// Key events - button needs focus for these to work
+	add_actions(mo, "square1.button.onKeyDown = function() { _root.msg3 = 'KeyDown'; };");
+	add_actions(mo, "square1.button.onKeyUp = function() { _root.msg3 = 'KeyUp'; };");
+
 
 	SWFMovie_nextFrame(mo); /* showFrame */
 
