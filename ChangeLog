@@ -1,3 +1,14 @@
+2007-01-30 Ann Barcomb <ann@lulu.com>
+
+	* Added: devtools/lib/Gnash/Distribution.pm and
+	  devtools/lib/Gnash/Utils.pm
+	  These libraries will be used to support the devtools/testsuite
+	  tests, which are tests intended to increase conformance with
+	  coding standards.
+	* Added devtools/testsuite/uncuddled_else.t
+	  It is a test which searches for instances of uncuddled elses
+	  in C++ source files.
+
 2007-01-30 Martin Guy <martinwguy@yahoo.it>
 
 	* config.mk.in, compatibility_include.h: Remove unused GAMESWF defines
