@@ -34,6 +34,8 @@
 	by type.
 	* server/movie_root.h: set_invalidated_region is used across libraries,
 	so visibility should be DSO_EXPORT.
+	* server/sprite_instance.cpp: Assert that our pointer is non-NULL
+	before attempting to dereference it.
 
 2007-01-31 Sandro Santilli <strk@keybit.net>
 
