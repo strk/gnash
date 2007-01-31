@@ -1,5 +1,7 @@
 2007-01-31 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.cpp (on_event):
+	  added verbose output for unsupported button events.
 	* testsuite/misc-ming.all/: ButtonEventTest.c,
 	  ButtonEventTest-Runner.cpp: added some (failing)
 	  tests for user defined event handlers.

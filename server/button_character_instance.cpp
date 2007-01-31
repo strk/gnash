@@ -196,12 +196,14 @@ button_character_instance::~button_character_instance()
 }
 
 // called from keypress listener only
+// (the above line is wrong, it's also called with onConstruct, for instance)
 bool
 button_character_instance::on_event(const event_id& id)
 {
 
 	if (id.m_id != event_id::KEY_PRESS)
 	{
+		log_warning("Unsupported event for button instance: %s", id.get_function_name().c_str());
 		return false;
 	}
 
