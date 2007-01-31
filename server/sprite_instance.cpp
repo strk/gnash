@@ -225,9 +225,16 @@ static void sprite_attach_movie(const fn_call& fn)
 	/// because attachCharacter() will reset matrix !!
 	if (fn.nargs > 3 ) {
 		as_object* initObject = fn.arg(3).to_object();
-		assert(initObject);
-		log_msg("Initializing properties from object");
-		newch->copyProperties(*initObject);
+		if ( initObject ) {
+			log_msg("Initializing properties from object");
+			newch->copyProperties(*initObject);
+		} else {
+			IF_VERBOSE_MALFORMED_SWF(
+			log_aserror("Third argument to attachMovie "
+				"doesn't cast to an object (%s)",
+				fn.arg(3).to_string());
+			);
+		}
 	}
 
 	fn.result->set_as_object(newch.get()); 

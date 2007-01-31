@@ -1,3 +1,9 @@
+2007-01-31 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (sprite_attach_movie):
+	  tolerate bogus third argument to attachMovie().
+	  Fixes bug #18920.
+
 2007-01-31 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac: Remove check for png.h; it is not a Gnash dependency.
