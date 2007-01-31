@@ -81,7 +81,7 @@ main(int argc, char** argv)
   add_actions(mo, " check_equals(mc_red._currentframe, 1);  \
                     mc_red.gotoAndStop(3); \
                     check_equals(mc_red._currentframe, 3); \
-                    _root.goAndStop(3); ");               
+                    _root.gotoAndStop(3); ");               
   SWFMovie_nextFrame(mo); //2nd frame
   
   add_actions(mo, " _root.gotoAndStop(4); \
