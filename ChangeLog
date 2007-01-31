@@ -1,5 +1,8 @@
 2007-01-31 Sandro Santilli <strk@keybit.net>
 
+	* server/mouse_button_state.h: symbolic button states.
+	* server/movie_root.cpp (generate_mouse_button_events):
+	  use symbolic names for button states.
 	* server/as_object.cpp (set_member_default): more verbose warning
 	  for invalid properties found in the inheritance chain.
 

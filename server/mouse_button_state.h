@@ -27,6 +27,16 @@ class mouse_button_state
 
 public:
 
+	/// Possible button states
+	enum state {
+
+		/// Button is depressed
+		UP=0,
+
+		/// Button is pressed
+		DOWN=1
+	};
+
 	/// entity that currently owns the mouse pointer
 	boost::intrusive_ptr<character>	m_active_entity;
 
@@ -44,8 +54,8 @@ public:
 
 	mouse_button_state()
 		:
-		m_mouse_button_state_last(0),
-		m_mouse_button_state_current(0),
+		m_mouse_button_state_last(UP),
+		m_mouse_button_state_current(UP),
 		m_mouse_inside_entity_last(false)
 	{
 	}

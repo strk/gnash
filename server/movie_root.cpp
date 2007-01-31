@@ -170,7 +170,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 	// Did this event trigger any action that needs redisplay ?
 	bool need_redisplay = false;
 
-	if (ms->m_mouse_button_state_last == 1)
+	if (ms->m_mouse_button_state_last == mouse_button_state::DOWN)
 	{
 		// Mouse button was down.
 
@@ -244,7 +244,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 		}
 	}
 
-	if (ms->m_mouse_button_state_last == 0)
+	if ( ms->m_mouse_button_state_last == mouse_button_state::UP )
 	{
 		// Mouse button was up.
 
@@ -277,7 +277,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 		}
 
 		// mouse button press
-		if (ms->m_mouse_button_state_current == 1)
+		if (ms->m_mouse_button_state_current == mouse_button_state::DOWN )
 		{
 			// onPress
 
@@ -318,7 +318,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 				need_redisplay=true;
 			}
 			ms->m_mouse_inside_entity_last = true;
-			ms->m_mouse_button_state_last = 1;
+			ms->m_mouse_button_state_last = mouse_button_state::DOWN;
 		}
 	}
 
