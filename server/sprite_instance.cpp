@@ -2665,18 +2665,22 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	}
 
 	size_t loaded_frames = get_loaded_frames();
-	if ( target_frame_number > loaded_frames )
+	// target_frame_number is 0-based, get_loaded_frames() is 1-based
+	// so in order to goto_frame(3) loaded_frames must be at least 4
+	// if goto_frame(4) is called, and loaded_frames is 4 we're jumping
+	// forward
+	if ( target_frame_number >= loaded_frames )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror("GotoFrame(" SIZET_FMT ") targets a yet "
 				"to be loaded frame (" SIZET_FMT ") loaded).\n"
 				"We'll wait for it but a more correct form "
 				"is explicitly using WaitForFrame instead.",
-				target_frame_number,
+				target_frame_number+1,
 				loaded_frames);
 
 		);
-		m_def->ensure_frame_loaded(target_frame_number);
+		m_def->ensure_frame_loaded(target_frame_number+1);
 	}
 	
 	m_current_frame = target_frame_number;      
