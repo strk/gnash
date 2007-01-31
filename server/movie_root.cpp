@@ -213,10 +213,10 @@ generate_mouse_button_events(mouse_button_state* ms)
 		}
 
 		// Handle onRelease, onReleaseOutside
-		if (ms->m_mouse_button_state_current == 0)
+		if (ms->m_mouse_button_state_current == mouse_button_state::UP)
 		{
 			// Mouse button just went up.
-			ms->m_mouse_button_state_last = 0;
+			ms->m_mouse_button_state_last = mouse_button_state::UP;
 
 			if (active_entity != NULL)
 			{
