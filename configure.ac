@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.247 2007/01/30 23:22:06 martinwguy Exp $
+dnl $Id: configure.ac,v 1.248 2007/01/31 17:25:52 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -422,9 +422,6 @@ if test x$extensions = xyes; then
   AC_DEFINE(USE_EXTENSIONS, [], [Defined if you enable building the exetensions])
 fi
 AM_CONDITIONAL(ENABLE_MYSQL, [ test x"$mysql" = xyes ])
-
-dnl currently used by Fedora Core 6
-GNASH_PKG_FIND(png, [png.h], [decode PNG images], png_process_data)
 
 AC_PATH_MING
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
@@ -940,18 +937,6 @@ if test x$kde = xyes; then
       nogo=true
     fi
   fi
-fi
-
-if test x"${png}" != x ; then
-  if test x"${PNG_CFLAGS}" != x ; then
-    echo "        PNG flags are: $PNG_CFLAGS"
-  else
-    echo "        PNG flags are: default include path"
-  fi
-  echo "        PNG libs are: $PNG_LIBS"
-else
-  echo "        ERROR: No PNG library development package installed!"
-  nogo=true
 fi
 
 if test x"${JPEG_LIBS}" != x ; then

@@ -1,3 +1,9 @@
+2007-01-31 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac: Remove check for png.h; it is not a Gnash dependency.
+	  It is a sub-dependency of gtk and pango, not required for gtk-less
+	  builds.
+
 2007-01-31 Sandro Santilli <strk@keybit.net>
 
 	* server/mouse_button_state.h: symbolic button states.
