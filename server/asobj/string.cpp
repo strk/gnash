@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: string.cpp,v 1.13 2007/01/18 22:53:22 strk Exp $ */
+/* $Id: string.cpp,v 1.14 2007/02/01 23:18:21 martinwguy Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -156,10 +156,7 @@ string_concat(const fn_call& fn)
 	
 	tu_string returnstring(newstr);
 	fn.result->set_tu_string(returnstring);
-	delete[] newstr;
-	
-	//FIXME:  is the "delete newstr[];" okay ?
-	// Because I don't know if tu_string copies newstr or not. Michael Meier 2006/11/21
+	delete[] newstr;	// because tu_string copies newstr
 }
 
 // 1st param: start_index, 2nd param: end_index
@@ -184,7 +181,13 @@ string_slice(const fn_call& fn)
 		end = iclamp(end, 0, utf8_len);
 	}
 	
-	assert(end >= start);
+	if (end < start) {
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_error("string.slice() called with end < start");
+		)
+		// Swap start and end, cos that's what substr does
+		swap(&start, &end);
+	}
 
 	fn.result->set_tu_string(this_string.utf8_substring(start, end));
 	return;
@@ -354,7 +357,6 @@ string_sub_string(const fn_call& fn)
 	}
 
 	if (end < start) swap(&start, &end);	// dumb, but that's what the docs say
-	assert(end >= start);
 
 	fn.result->set_tu_string(this_string.utf8_substring(start, end));
 	return;
@@ -416,7 +418,18 @@ string_char_code_at(const fn_call& fn)
 	tu_string_as_object* this_string_ptr = (tu_string_as_object*) fn.this_ptr;
 	assert(this_string_ptr);
 
-	assert(fn.nargs == 1);
+	// assert(fn.nargs == 1);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("string.charCodeAt needs one argument");
+		)
+	     fn.result->set_nan();	// Same as for out-of-range arg
+	     return;
+	}
+	IF_VERBOSE_ASCODING_ERRORS(
+	    if (fn.nargs > 1)
+		log_aserror("string.charCodeAt has more than one argument");
+	)
 
 	int	index = static_cast<int>(fn.arg(0).to_number());
 	if (index >= 0 && index < this_string_ptr->m_string.utf8_length())
@@ -436,7 +449,18 @@ string_char_at(const fn_call& fn)
 	tu_string_as_object* this_string_ptr = (tu_string_as_object*) fn.this_ptr;
 	assert(this_string_ptr);
 
-	assert(fn.nargs == 1);
+	// assert(fn.nargs == 1);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+		)
+	    fn.result->set_tu_string("");	// Same as for out-of-range arg
+	    return;
+	}
+	IF_VERBOSE_ASCODING_ERRORS(
+	    if (fn.nargs > 1)
+		log_aserror(__FUNCTION__ " has more than one argument");
+	)
 
 	int	index = static_cast<int>(fn.arg(0).to_number());
 	if (index >= 0 && index < this_string_ptr->m_string.utf8_length())

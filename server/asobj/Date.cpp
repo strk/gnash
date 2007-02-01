@@ -486,209 +486,401 @@ void date_getyear(const fn_call& fn) {
 // TODO: Also, confirm this is the appropriate behavior for the setUTC()
 // functions. Right now, we convert the time to UTC, set the variable,
 // then convert back to local time. We should confirm the official behavior!
-void date_setdate(const fn_call& fn) {
-	assert(fn.nargs == 1);
-	date_as_object* date = ensure_date_object(fn.this_ptr);
-	date->obj.date = (long int)(fn.arg(0).to_number());
 
-	date->obj.Normalize();
+void date_setdate(const fn_call& fn) {
+	date_as_object* date = ensure_date_object(fn.this_ptr);
+
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+		date->obj.date = (long int)(fn.arg(0).to_number());
+		date->obj.Normalize();
+	}
+
+	if (fn.nargs > 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " has more than one argument");
+	    )
+	}
+
 	fn.result->set_double(date->obj.getTime());
 }
-void date_setfullyear(const fn_call& fn) {
-	assert(fn.nargs >= 1 && fn.nargs <= 3);
-	date_as_object* date = ensure_date_object(fn.this_ptr);
-	date->obj.year = (long int)(fn.arg(0).to_number() - 1900);
-	if (fn.nargs >= 2)
-		date->obj.month = (long int)(fn.arg(1).to_number());
-	if (fn.nargs >= 3)
-		date->obj.date = (long int)(fn.arg(2).to_number());
 
-	date->obj.Normalize();
+/// \brief Set year [, month [, date]]
+
+void date_setfullyear(const fn_call& fn) {
+	date_as_object* date = ensure_date_object(fn.this_ptr);
+
+	// assert(fn.nargs >= 1 && fn.nargs <= 3);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    date->obj.year = (long int)(fn.arg(0).to_number() - 1900);
+	    if (fn.nargs >= 2)
+		    date->obj.month = (long int)(fn.arg(1).to_number());
+	    if (fn.nargs >= 3)
+		    date->obj.date = (long int)(fn.arg(2).to_number());
+	    if (fn.nargs > 3) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than three arguments");
+		)
+	    }
+	    date->obj.Normalize();
+	}
 	fn.result->set_double(date->obj.getTime());
 }
 void date_sethours(const fn_call& fn) {
-	assert(fn.nargs >= 1 && fn.nargs <= 4);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	date->obj.hour = (long int)(fn.arg(0).to_number());
-	if (fn.nargs >= 2)
-		date->obj.minute = (long int)(fn.arg(1).to_number());
-	if (fn.nargs >= 3)
-		date->obj.second = (long int)(fn.arg(2).to_number());
-	if (fn.nargs >= 4)
-		date->obj.millisecond = (long int)(fn.arg(3).to_number());
 
-	date->obj.Normalize();
+	// assert(fn.nargs >= 1 && fn.nargs <= 4);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    date->obj.hour = (long int)(fn.arg(0).to_number());
+	    if (fn.nargs >= 2)
+		    date->obj.minute = (long int)(fn.arg(1).to_number());
+	    if (fn.nargs >= 3)
+		    date->obj.second = (long int)(fn.arg(2).to_number());
+	    if (fn.nargs >= 4)
+		    date->obj.millisecond = (long int)(fn.arg(3).to_number());
+	    if (fn.nargs > 4) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than four arguments");
+		)
+	    }
+	    date->obj.Normalize();
+	}
 	fn.result->set_double(date->obj.getTime());
 }
 void date_setmilliseconds(const fn_call& fn) {
-	assert(fn.nargs == 1);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	date->obj.millisecond = (long int)(fn.arg(0).to_number());
 
-	date->obj.Normalize();
+	// assert(fn.nargs == 1);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    date->obj.millisecond = (long int)(fn.arg(0).to_number());
+	    if (fn.nargs > 1) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than one argument");
+		)
+	    }
+	    date->obj.Normalize();
+	}
 	fn.result->set_double(date->obj.getTime());
 }
 void date_setminutes(const fn_call& fn) {
-	assert(fn.nargs >= 1 && fn.nargs <= 3);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	// Seconds (value between 0 and 59) won't be affected by timezone
-	date->obj.minute = (long int)(fn.arg(0).to_number());
-	if (fn.nargs >= 2) date->obj.second = (long int)(fn.arg(1).to_number());
-	if (fn.nargs >= 3) date->obj.millisecond = (long int)(fn.arg(2).to_number());
 
-	date->obj.Normalize();
+	//assert(fn.nargs >= 1 && fn.nargs <= 3);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    // Seconds (value between 0 and 59) won't be affected by timezone
+	    date->obj.minute = (long int)(fn.arg(0).to_number());
+	    if (fn.nargs >= 2) date->obj.second = (long int)(fn.arg(1).to_number());
+	    if (fn.nargs >= 3) date->obj.millisecond = (long int)(fn.arg(2).to_number());
+	    if (fn.nargs > 3) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than three arguments");
+		)
+	    }
+	    date->obj.Normalize();
+	}
 	fn.result->set_double(date->obj.getTime());
 }
 void date_setmonth(const fn_call& fn) {
-	assert(fn.nargs >= 1 && fn.nargs <= 2);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	date->obj.month = (long int)(fn.arg(0).to_number());
-	if (fn.nargs >= 2)
-		date->obj.date = (long int)(fn.arg(1).to_number());
 
-	date->obj.Normalize();
+	// assert(fn.nargs >= 1 && fn.nargs <= 2);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    date->obj.month = (long int)(fn.arg(0).to_number());
+	    if (fn.nargs >= 2)
+		date->obj.date = (long int)(fn.arg(1).to_number());
+	    if (fn.nargs > 2) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than two arguments");
+		)
+	    }
+
+	    date->obj.Normalize();
+	}
 	fn.result->set_double(date->obj.getTime());
 }
 void date_setseconds(const fn_call& fn) {
-	assert(fn.nargs >= 1 && fn.nargs <= 2);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	// Seconds (value between 0 and 59) won't be affected by timezone
-	date->obj.second = (long int)(fn.arg(0).to_number());
-	if (fn.nargs >= 2) date->obj.millisecond = (long int)(fn.arg(1).to_number());
 
-	date->obj.Normalize();
+	// assert(fn.nargs >= 1 && fn.nargs <= 2);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    // Seconds (value between 0 and 59) won't be affected by timezone
+	    date->obj.second = (long int)(fn.arg(0).to_number());
+	    if (fn.nargs >= 2)
+		date->obj.millisecond = (long int)(fn.arg(1).to_number());
+	    if (fn.nargs > 2) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than two arguments");
+		)
+	    }
+
+	    date->obj.Normalize();
+	}
 	fn.result->set_double(date->obj.getTime());
 }
 void date_settime(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	UNUSED(date);
-	log_msg("%s:unimplemented \n", __FUNCTION__);
+
+	// assert(fn.nargs == 1);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    log_msg("%s:unimplemented \n", __FUNCTION__);
+	}
+
+	fn.result->set_double(date->obj.getTime());
 }
 void date_setutcdate(const fn_call& fn) {
-	assert(fn.nargs == 1);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
-	tm utctime = date->obj.convertUTC();
-	// Set mday to our new UTC date (yday and wday don't need to be set)
-	utctime.tm_mday = int(fn.arg(0).to_number());
+	// assert(fn.nargs == 1);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    tm utctime = date->obj.convertUTC();
+	    // Set mday to our new UTC date (yday and wday don't need to be set)
+	    utctime.tm_mday = int(fn.arg(0).to_number());
 
-	// Convert back from UTC to local time
-	utctime.tm_min += date->obj.minutesEast;
+	    // Convert back from UTC to local time
+	    utctime.tm_min += date->obj.minutesEast;
 
-	// Normalize the time, then set as this object's new time
-	time_t newtime = mktime(&utctime);
-	date->obj.setFromTM(*(localtime(&newtime)));
+	    // Normalize the time, then set as this object's new time
+	    time_t newtime = mktime(&utctime);
+	    date->obj.setFromTM(*(localtime(&newtime)));
+
+	    if (fn.nargs > 1) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than one argument");
+		)
+	    }
+	}
 	
 	fn.result->set_double(date->obj.getTime());
 }
 void date_setutcfullyear(const fn_call& fn) {
-	assert(fn.nargs >= 1 && fn.nargs <= 3);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
-	tm utctime = date->obj.convertUTC();
-	// Set year to our new UTC date
-	utctime.tm_year = int(fn.arg(0).to_number()-1900);
-	if (fn.nargs >= 2)
+	// assert(fn.nargs >= 1 && fn.nargs <= 3);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    tm utctime = date->obj.convertUTC();
+	    // Set year to our new UTC date
+	    utctime.tm_year = int(fn.arg(0).to_number()-1900);
+	    if (fn.nargs >= 2)
 		utctime.tm_mon = (long int)(fn.arg(1).to_number());
-	if (fn.nargs >= 3)
+	    if (fn.nargs >= 3)
 		utctime.tm_mday = (long int)(fn.arg(2).to_number());
+	    if (fn.nargs > 3) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than three arguments");
+		)
+	    }
 
-	// Convert back from UTC to local time
-	utctime.tm_min += date->obj.minutesEast;
+	    // Convert back from UTC to local time
+	    utctime.tm_min += date->obj.minutesEast;
 
-	// Normalize the time, then set as this object's new time
-	time_t newtime = mktime(&utctime);
-	date->obj.setFromTM(*(localtime(&newtime)));
+	    // Normalize the time, then set as this object's new time
+	    time_t newtime = mktime(&utctime);
+	    date->obj.setFromTM(*(localtime(&newtime)));
+	}
 	
 	fn.result->set_double(date->obj.getTime());
 }
 void date_setutchours(const fn_call& fn) {
-	assert(fn.nargs >= 1 && fn.nargs <= 4);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
-	if (fn.nargs >= 4)
-	{
+	// assert(fn.nargs >= 1 && fn.nargs <= 4);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+
+	    if (fn.nargs >= 4)
+	    {
 		date->obj.millisecond = (long int)(fn.arg(3).to_number());
 		date->obj.Normalize();
-	}
+	    }
 
-	tm utctime = date->obj.convertUTC();
-	// Set year to our new UTC date
-	utctime.tm_hour = int(fn.arg(0).to_number());
-	if (fn.nargs >= 2)
+	    tm utctime = date->obj.convertUTC();
+	    // Set year to our new UTC date
+	    utctime.tm_hour = int(fn.arg(0).to_number());
+	    if (fn.nargs >= 2)
 		utctime.tm_min = (long int)(fn.arg(1).to_number());
-	if (fn.nargs >= 3)
+	    if (fn.nargs >= 3)
 		utctime.tm_sec = (long int)(fn.arg(2).to_number());
+	    if (fn.nargs > 4) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than four arguments");
+		)
+	    }
 
-	// Convert back from UTC to local time
-	utctime.tm_min += date->obj.minutesEast;
+	    // Convert back from UTC to local time
+	    utctime.tm_min += date->obj.minutesEast;
 
-	// Normalize the time, then set as this object's new time
-	time_t newtime = mktime(&utctime);
-	date->obj.setFromTM(*(localtime(&newtime)));
+	    // Normalize the time, then set as this object's new time
+	    time_t newtime = mktime(&utctime);
+	    date->obj.setFromTM(*(localtime(&newtime)));
+	}
 	
 	fn.result->set_double(date->obj.getTime());
 }
 void date_setutcmilliseconds(const fn_call& fn) {
-	assert(fn.nargs == 1);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	date->obj.millisecond = (long int)(fn.arg(0).to_number());
 
-	date->obj.Normalize();
+	// assert(fn.nargs == 1);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    date->obj.millisecond = (long int)(fn.arg(0).to_number());
+	    if (fn.nargs > 1) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than one argument");
+		)
+	    }
+
+	    date->obj.Normalize();
+	}
 	fn.result->set_double(date->obj.getTime());
 }
 void date_setutcminutes(const fn_call& fn) {
-	assert(fn.nargs >= 1 && fn.nargs <= 3);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	// Seconds (value between 0 and 59) won't be affected by timezone
-	date->obj.minute = (long int)(fn.arg(0).to_number());
-	if (fn.nargs >= 2) date->obj.second = (long int)(fn.arg(1).to_number());
-	if (fn.nargs >= 3) date->obj.millisecond = (long int)(fn.arg(2).to_number());
 
-	// Setting milliseconds to less than 0 or more than 999 affects seconds
-	date->obj.second += date->obj.millisecond / 1000;
-	date->obj.millisecond = date->obj.millisecond % 1000;
+	// assert(fn.nargs >= 1 && fn.nargs <= 3);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    // Seconds (value between 0 and 59) won't be affected by timezone
+	    date->obj.minute = (long int)(fn.arg(0).to_number());
+	    if (fn.nargs >= 2) date->obj.second = (long int)(fn.arg(1).to_number());
+	    if (fn.nargs >= 3) date->obj.millisecond = (long int)(fn.arg(2).to_number());
+	    if (fn.nargs > 3) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than three arguments");
+		)
+	    }
 
-	date->obj.Normalize();
+	    // Setting milliseconds to less than 0 or more than 999 affects seconds
+
+	    // TODO: both of these lines are wrong for negative values
+	    date->obj.second += date->obj.millisecond / 1000;
+	    date->obj.millisecond = date->obj.millisecond % 1000;
+
+	    date->obj.Normalize();
+	}
 	fn.result->set_double(date->obj.getTime());
 }
 void date_setutcmonth(const fn_call& fn) {
-	assert(fn.nargs >= 1 && fn.nargs <= 2);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
-	tm utctime = date->obj.convertUTC();
-	// Set year to our new UTC date
-	utctime.tm_mon = int(fn.arg(0).to_number());
-	if (fn.nargs >= 2)
+	// assert(fn.nargs >= 1 && fn.nargs <= 2);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    tm utctime = date->obj.convertUTC();
+	    // Set year to our new UTC date
+	    utctime.tm_mon = int(fn.arg(0).to_number());
+	    if (fn.nargs >= 2)
 		utctime.tm_mday = (long int)(fn.arg(1).to_number());
+	    if (fn.nargs > 2) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than two arguments");
+		)
+	    }
 
-	// Convert back from UTC to local time
-	utctime.tm_min += date->obj.minutesEast;
+	    // Convert back from UTC to local time
+	    utctime.tm_min += date->obj.minutesEast;
 
-	// Normalize the time, then set as this object's new time
-	time_t newtime = mktime(&utctime);
-	date->obj.setFromTM(*(localtime(&newtime)));
-	
+	    // Normalize the time, then set as this object's new time
+	    time_t newtime = mktime(&utctime);
+	    date->obj.setFromTM(*(localtime(&newtime)));
+	}
 	fn.result->set_double(date->obj.getTime());
 }
 void date_setutcseconds(const fn_call& fn) {
-	assert(fn.nargs >= 1 && fn.nargs <= 2);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	// Seconds (value between 0 and 59) won't be affected by timezone
-	date->obj.second = (long int)(fn.arg(0).to_number());
-	if (fn.nargs >= 2) date->obj.millisecond = (long int)(fn.arg(1).to_number());
 
-	date->obj.Normalize();
+	// assert(fn.nargs >= 1 && fn.nargs <= 2);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    // Seconds (value between 0 and 59) won't be affected by timezone
+	    date->obj.second = (long int)(fn.arg(0).to_number());
+	    if (fn.nargs >= 2)
+		date->obj.millisecond = (long int)(fn.arg(1).to_number());
+	    if (fn.nargs > 2) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than two arguments");
+		)
+	    }
+
+	    date->obj.Normalize();
+	}
 	fn.result->set_double(date->obj.getTime());
 }
+
 void date_setyear(const fn_call& fn) {
-	assert(fn.nargs == 1);
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	date->obj.year = (long int)(fn.arg(0).to_number());
 
-	date->obj.Normalize();
+	// assert(fn.nargs == 1);
+	if (fn.nargs < 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(__FUNCTION__ " needs one argument");
+	    )
+	} else {
+	    date->obj.year = (long int)(fn.arg(0).to_number());
+	    if (fn.nargs > 1) {
+		IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(__FUNCTION__ " has more than two arguments");
+		)
+	    }
+
+	    date->obj.Normalize();
+	}
 	fn.result->set_double(date->obj.getTime());
 }
+
 void date_tostring(const fn_call& fn) {
 	// TODO: I have no idea what the real flash player does, but at least this
 	// gives something functional for now. Tried to mimic the "date" command

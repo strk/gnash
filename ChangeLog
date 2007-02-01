@@ -1,3 +1,10 @@
+2007-02-01 Martin Guy <martinwguy@yahoo.it>
+
+	* server/asobj/{Date,Global,string}.cpp: Convert all assert()s that
+	  triggered by illegal number of args in runtime ActionScript
+	  to IF_VERBOSE_ASCODING_ERRORS() warnings with and keep going,
+	  giving safe default return values.
+
 2007-02-01 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamFfmpeg.h: Switch multithread_queue over to

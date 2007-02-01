@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.38 2007/02/01 20:45:52 martinwguy Exp $ */
+/* $Id: Global.cpp,v 1.39 2007/02/01 23:18:21 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -67,6 +67,20 @@
 #include "xml.h"
 #include "xmlsocket.h"
 
+// Common code to warn and return if a required single arg is not present
+// and to warn if there are extra args.
+#define ASSERT_FN_ARGS_IS_1						\
+    if (fn.nargs < 1) {							\
+	IF_VERBOSE_ASCODING_ERRORS(					\
+            log_aserror(__FUNCTION__ " needs one argument");		\
+            )								\
+         return;							\
+    }									\
+    IF_VERBOSE_ASCODING_ERRORS(						\
+	if (fn.nargs > 1)						\
+            log_aserror(__FUNCTION__ " has more than one argument");	\
+    )
+
 using namespace std;
 
 namespace gnash {
@@ -76,35 +90,13 @@ static Extension et;
 static void
 as_global_trace(const fn_call& fn)
 {
-    assert(fn.nargs >= 1);
-
-// @@ NOTHING should get special treatment,
-//    as_value::to_string() will take care of everything
-#if 0
-    // Special case for objects: try the toString() method.
-    if (fn.arg(0).get_type() == as_value::OBJECT)
-	{
-	    as_object* obj = fn.arg(0).to_object();
-	    assert(obj);
-
-	    as_value method;
-	    if (obj->get_member("toString", &method)
-		&& method.is_function())
-		{
-		    as_value result = call_method0(method, fn.env, obj);
-		    log_msg("%s\n", result.to_string());
-
-		    return;
-		}
-	}
-#endif
+    ASSERT_FN_ARGS_IS_1
 
     // Log our argument.
     //
     // @@ what if we get extra args?
     //
-    // @@ Array gets special treatment.
-    // @@ NOTHING should get special treatment,
+    // @@ Nothing needs special treatment,
     //    as_value::to_string() will take care of everything
     const char* arg0 = fn.arg(0).to_string();
     log_msg("%s\n", arg0);
@@ -114,7 +106,7 @@ as_global_trace(const fn_call& fn)
 static void
 as_global_isnan(const fn_call& fn)
 {
-    assert(fn.nargs == 1);
+    ASSERT_FN_ARGS_IS_1
 
     fn.result->set_bool(fn.arg(0).is_nan());
 }
@@ -122,7 +114,7 @@ as_global_isnan(const fn_call& fn)
 static void
 as_global_isfinite(const fn_call& fn)
 {
-    assert(fn.nargs == 1);
+    ASSERT_FN_ARGS_IS_1
 
     fn.result->set_bool(fn.arg(0).is_finite());
 }
@@ -147,7 +139,7 @@ as_global_escape(const fn_call& fn)
     const string escapees = " \"#$%&+,/:;<=>?@[\\]^`{|}~";
     const string hexdigits = "0123456789ABCDEF";
 
-    assert(fn.nargs == 1);
+    ASSERT_FN_ARGS_IS_1
 
     string input = fn.arg(0).to_string();
 
@@ -175,7 +167,7 @@ as_global_escape(const fn_call& fn)
 static void
 as_global_unescape(const fn_call& fn)
 {
-    assert(fn.nargs == 1);
+    ASSERT_FN_ARGS_IS_1
 
     string input = fn.arg(0).to_string();
     int hexcode;
@@ -207,7 +199,7 @@ as_global_unescape(const fn_call& fn)
 static void
 as_global_parsefloat(const fn_call& fn)
 {
-    assert(fn.nargs == 1);
+    ASSERT_FN_ARGS_IS_1
 
     float result;
 
@@ -222,7 +214,17 @@ as_global_parsefloat(const fn_call& fn)
 static void
 as_global_parseint(const fn_call& fn)
 {
-    assert(fn.nargs == 2 || fn.nargs == 1);
+    // assert(fn.nargs == 2 || fn.nargs == 1);
+    if (fn.nargs < 1) {
+	IF_VERBOSE_ASCODING_ERRORS(	
+            log_aserror(__FUNCTION__ " needs at least one argument");
+            )
+         return;
+    }
+    IF_VERBOSE_ASCODING_ERRORS(
+	if (fn.nargs > 2)
+            log_aserror(__FUNCTION__ " has more than two arguments");
+    )
 
     // Make sure our argument is the correct type
     if (fn.nargs > 1)
@@ -319,29 +321,42 @@ as_global_parseint(const fn_call& fn)
 static void
 as_global_assetpropflags(const fn_call& fn)
 {
-	int version = fn.env->get_version();
+    int version = fn.env->get_version();
 
-	//log_msg("ASSetPropFlags called with %d args", fn.nargs);
+    //log_msg("ASSetPropFlags called with %d args", fn.nargs);
 
-	// Check the arguments
-	assert(fn.nargs == 3 || fn.nargs == 4);
-	assert((version == 5) ? (fn.nargs == 3) : true);
+    // Check the arguments
+    // assert(fn.nargs == 3 || fn.nargs == 4);
+    // assert((version == 5) ? (fn.nargs == 3) : true);
+
+    if (fn.nargs < 3) {
+	IF_VERBOSE_ASCODING_ERRORS(	
+            log_aserror(__FUNCTION__ " needs at least three arguments");
+            )
+         return;
+    }
+    IF_VERBOSE_ASCODING_ERRORS(
+	if (fn.nargs > 4)
+            log_aserror(__FUNCTION__ " has more than four arguments");
+	if (version == 5 && fn.nargs == 4)
+            log_aserror(__FUNCTION__ " has four arguments in a SWF version 5 movie");
+    )
 		
-	// ASSetPropFlags(obj, props, n, allowFalse=false)
+    // ASSetPropFlags(obj, props, n, allowFalse=false)
 
-	// object
-	as_object* obj = fn.arg(0).to_object();
-	if ( ! obj )
-	{
+    // object
+    as_object* obj = fn.arg(0).to_object();
+    if ( ! obj )
+    {
 		log_warning("Invalid call to ASSetPropFlags: "
 			"object argument is not an object: %s",
 			fn.arg(0).to_string());
 		return;
-	}
+    }
 
-	// list of child names
+    // list of child names
 
-	as_value& props = fn.arg(1);
+    as_value& props = fn.arg(1);
 
     // a number which represents three bitwise flags which
     // are used to determine whether the list of child names should be hidden,
