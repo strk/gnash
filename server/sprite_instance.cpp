@@ -229,8 +229,12 @@ static void sprite_attach_movie(const fn_call& fn)
 			log_msg("Initializing properties from object");
 			newch->copyProperties(*initObject);
 		} else {
+			// This is actually a valid thing to do,
+			// the documented behaviour is to just NOT
+			// initializing the properties in this
+			// case.
 			IF_VERBOSE_MALFORMED_SWF(
-			log_aserror("Third argument to attachMovie "
+			log_aserror("Fourth argument of attachMovie "
 				"doesn't cast to an object (%s)",
 				fn.arg(3).to_string());
 			);
