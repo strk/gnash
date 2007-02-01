@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.19 2007/02/01 11:57:20 strk Exp $";
+rcsid="$Id: Object.as,v 1.20 2007/02/01 13:40:08 strk Exp $";
 
 #include "check.as"
 
@@ -55,7 +55,7 @@ obj.member = 1;
 check (obj.member == 1)
 check_equals(typeof(obj.toString()), 'string');
 check_equals(obj.toString(), '[object Object]');
-xcheck_equals(typeof(obj.valueOf()), 'object');
+check_equals(typeof(obj.valueOf()), 'object');
 check_equals(obj.valueOf(), obj);
 
 // Test Object creation using literal initialization

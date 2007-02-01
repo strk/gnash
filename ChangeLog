@@ -1,5 +1,17 @@
 2007-02-01 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.h (get_primitive_value): return
+	  an OBJECT value by default (not a number).
+	* server/as_value.cpp (operator==): avoid infinite
+	  recursion now that get_primitive_value is allowed
+	  to return an OBJECT again.
+	* server/asobj/Numbec.cpp: override get_primitive_value
+	  to return a NUMBER value.
+	* testsuite/actionscript.all/Object.as: don't expect
+	  failures for valueOf tests.
+
+2007-02-01 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Object.as: add tests for toString
 	  and valueOf. The latter doesn't work yet.
 	* server/asobj/Object.cpp: add valueOf and toString methods,

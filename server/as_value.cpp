@@ -536,7 +536,10 @@ as_value::operator==(const as_value& v) const
 	else
 	{
 		// convert this value to a primitive and recurse
-		return to_primitive() == v;
+		as_value v2 = to_primitive();
+		if ( v2.is_object() ) return false;
+		else return v2 == v;
+		//return to_primitive() == v;
 	}
     }
     else

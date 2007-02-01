@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Number.cpp,v 1.10 2007/02/01 11:23:56 strk Exp $ */
+/* $Id: Number.cpp,v 1.11 2007/02/01 13:40:08 strk Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -94,6 +94,11 @@ public:
 	double get_numeric_value() const
 	{
 		return _val;
+	}
+
+	as_value get_primitive_value() const 
+	{
+		return get_numeric_value();
 	}
 
 };
