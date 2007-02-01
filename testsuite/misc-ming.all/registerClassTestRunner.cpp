@@ -45,7 +45,7 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
-	check_equals(root->get_frame_count(), 3);
+	check_equals(root->get_frame_count(), 5);
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 
@@ -56,23 +56,45 @@ main(int /*argc*/, char** /*argv*/)
 	check(!tester.isMouseOverMouseEntity());
 
 	tester.advance();
+	check_equals(root->get_current_frame(), 1);
 
 	check( tester.findDisplayItemByDepth(*root, 71) );
 	check(! tester.findDisplayItemByDepth(*root, 72) );
 
 	tester.movePointerTo(30, 30);
-	/**/ check(tester.isMouseOverMouseEntity());
+	check(tester.isMouseOverMouseEntity());
 	tester.movePointerTo(100, 30);
 	check(!tester.isMouseOverMouseEntity());
 
 	tester.advance();
+	check_equals(root->get_current_frame(), 2);
 
 	check(tester.findDisplayItemByDepth(*root, 71) );
 	check(tester.findDisplayItemByDepth(*root, 72) );
 
 	tester.movePointerTo(30, 30);
-	/**/ check(tester.isMouseOverMouseEntity());
+	check(tester.isMouseOverMouseEntity());
 	tester.movePointerTo(100, 30);
-	/**/ check(tester.isMouseOverMouseEntity());
+	xcheck(tester.isMouseOverMouseEntity());
+
+	tester.advance();
+	check_equals(root->get_current_frame(), 3);
+
+	check(tester.findDisplayItemByDepth(*root, 71) );
+	check(tester.findDisplayItemByDepth(*root, 72) );
+	check(tester.findDisplayItemByDepth(*root, 73) );
+
+	tester.movePointerTo(30, 30);
+	check(tester.isMouseOverMouseEntity());
+	tester.movePointerTo(100, 30);
+	xcheck(tester.isMouseOverMouseEntity());
+	tester.movePointerTo(170, 30);
+	xcheck(tester.isMouseOverMouseEntity());
+
+	tester.advance();
+	check_equals(root->get_current_frame(), 4);
+
+	tester.advance();
+	check_equals(root->get_current_frame(), 4); // we should be in stop mode
 }
 

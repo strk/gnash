@@ -24,6 +24,8 @@
  * 2) attach it to main timeline 
  * 3) register a custom class to it
  * 4) attach it again (expected to have the custom class interface)
+ * 4) register another custom class to it, this time deriving from MovieClip
+ * 5) attach it again (expected to be both instance of custom class and instance of MovieClip)
  *
  * run as ./registerClass
  */
@@ -115,17 +117,7 @@ main(int argc, char** argv)
 	SWFMovie_nextFrame(mo); /* end of frame2 */
 
 	add_actions(mo,
-		"function CustomClass() { "
-		"}"
-		"CustomClass.prototype.moveRight = function(pix) {"
-		"	this._x += pix;"
-		"};"
-		"CustomClass.prototype.sayHello = function() {"
-		"	note('Hello from CustomClass instance');"
-		"};"
-		"MovieClip.prototype.sayHello = function() {"
-		"	note('Hello from MovieClip instance');"
-		"};"
+		"function CustomClass() { this._x = 80; }"
 		"Object.registerClass('redsquare', CustomClass);"
 		);
 
@@ -133,26 +125,48 @@ main(int argc, char** argv)
 		"var name2 = 'square'+counter;"
 		"attachMovie('redsquare', name2, 70+counter);"
 		"var clip2 = this[name2];"
-		"clip2.moveRight(80);" // TODO:  test this!
 		"counter++;"
 		);
 
 
+	SWFMovie_nextFrame(mo); /* end of frame3 */
+
+	add_actions(mo,
+		"function CustomClass2() { this._x = 160; } "
+		"CustomClass2.prototype = new MovieClip;"
+		"Object.registerClass('redsquare', CustomClass2);"
+		);
+
+	add_actions(mo,
+		"var name3 = 'square'+counter;"
+		"attachMovie('redsquare', name3, 70+counter);"
+		"var clip3 = this[name3];"
+		"counter++;"
+		);
+
+	SWFMovie_nextFrame(mo); /* end of frame4 */
+
 	check_equals(mo, "typeof(clip1)", "'movieclip'");
 	check(mo, "clip1 instanceOf MovieClip");
+	check_equals(mo, "clip1._x", "0");
 	check(mo, "! clip1 instanceOf CustomClass");
 
 	check_equals(mo, "typeof(clip2)", "'movieclip'");
-	/**/ check(mo, "clip2 instanceOf CustomClass");
-	/**/ check(mo, "! clip2 instanceOf MovieClip");
+	check(mo, "clip2 instanceOf CustomClass");
+	xcheck_equals(mo, "clip2._x", "80");
+	check(mo, "! clip2 instanceOf MovieClip");
+
+	check_equals(mo, "typeof(clip3)", "'movieclip'");
+	xcheck_equals(mo, "clip3._x", "160");
+	check(mo, "clip3 instanceOf CustomClass2");
+	check(mo, "clip3 instanceOf MovieClip");
 
 	add_actions(mo,
 		"totals();"
 		"stop();"
 		);
 
-	SWFMovie_nextFrame(mo); /* end of frame3 */
-
+	SWFMovie_nextFrame(mo); /* end of frame5 */
 
 	/*****************************************************
 	 *
