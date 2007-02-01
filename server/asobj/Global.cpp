@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.37 2007/02/01 19:35:36 martinwguy Exp $ */
+/* $Id: Global.cpp,v 1.38 2007/02/01 20:45:52 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -128,15 +128,16 @@ as_global_isfinite(const fn_call& fn)
 }
 
 /// \brief Encode a string to URL-encoded format
-///	   converting all dodgy characters to %AB hex sequences
-// "Dodgy" means
-// - ASCII control characters: 0-31 and 127
-// - Non-ASCII chars: 128-255
-// - URL syntax characters: $ & + , / : ; = ? @
-// - Unsafe characters: SPACE " < > # % { } | \ ^ ~ [ ] `
-// Encoding is a % followed by two hexadecimal characters, case insensitive.
-// See RFC1738 http://www.rfc-editor.org/rfc/rfc1738.txt,
-// Section 2.2 "URL Character Encoding Issues"
+/// converting all dodgy characters to %AB hex sequences
+//
+/// Characters that need escaping are:
+/// - ASCII control characters: 0-31 and 127
+/// - Non-ASCII chars: 128-255
+/// - URL syntax characters: $ & + , / : ; = ? @
+/// - Unsafe characters: SPACE " < > # % { } | \ ^ ~ [ ] `
+/// Encoding is a % followed by two hexadecimal characters, case insensitive.
+/// See RFC1738 http://www.rfc-editor.org/rfc/rfc1738.txt,
+/// Section 2.2 "URL Character Encoding Issues"
 
 static void
 as_global_escape(const fn_call& fn)
@@ -164,7 +165,13 @@ as_global_escape(const fn_call& fn)
 }
 
 /// \brief Decode a string from URL-encoded format
-//	   converting all hexadecimal sequences to ASCII characters.
+/// converting all hexadecimal sequences to ASCII characters.
+//
+/// A sequence to convert is % followed by two case-independent hexadecimal
+/// digits, which is replaced by the equivalent ASCII character.
+/// See RFC1738 http://www.rfc-editor.org/rfc/rfc1738.txt,
+/// Section 2.2 "URL Character Encoding Issues"
+
 static void
 as_global_unescape(const fn_call& fn)
 {
@@ -173,9 +180,9 @@ as_global_unescape(const fn_call& fn)
     string input = fn.arg(0).to_string();
     int hexcode;
 
-    for (unsigned int i=0;i<input.length();)
+    for (unsigned int i=0; i<input.length(); i++)
 	{
-	    if ((input.length() > i + 2) && input[i] == '%' &&
+	    if (input[i] == '%' && (input.length() > i + 2) &&
 		isxdigit(input[i+1]) && isxdigit(input[i+2]))
 		{
 		    input[i+1] = toupper(input[i+1]);
@@ -190,100 +197,9 @@ as_global_unescape(const fn_call& fn)
 		    else
 			hexcode += (input[i+2] - 'A' + 10);
 
-		    input.erase(i,3);
-#if 1
-		    input.insert(i,string(1,(char)hexcode));
-#else
-		    string insertst;
-
-		    switch (hexcode)
-			{
-			  case 0x20: // space
-			      insertst = ' ';
-			      break;
-			  case 0x22: // "
-			      insertst = '\"';
-			      break;
-			  case 0x23: // #
-			      insertst = '#';
-			      break;
-			  case 0x24: // $
-			      insertst = '$';
-			      break;
-			  case 0x25: // %
-			      insertst = '%';
-			      break;
-			  case 0x26: // &
-			      insertst = '&';
-			      break;
-			  case 0x2B: // +
-			      insertst = '+';
-			      break;
-			  case 0x2C: // ,
-			      insertst = ',';
-			      break;
-			  case 0x2F: // /
-			      insertst = '/';
-			      break;
-			  case 0x3A: // :
-			      insertst = ':';
-			      break;
-			  case 0x3B: // ;
-			      insertst = ';';
-			      break;
-			  case 0x3C: // <
-			      insertst = '<';
-			      break;
-			  case 0x3D: // =
-			      insertst = '=';
-			      break;
-			  case 0x3E: // >
-			      insertst = '>';
-			      break;
-			  case 0x3F: // ?
-			      insertst = '?';
-			      break;
-			  case 0x40: // @
-			      insertst = '@';
-			      break;
-			  case 0x5B: // [
-			      insertst = '[';
-			      break;
-			  case 0x5C: // \ (backslash)
-			      insertst = '\\';
-			      break;
-			  case 0x5D: // ]
-			      insertst = ']';
-			      break;
-			  case 0x5E: // ^
-			      insertst = '^';
-			      break;
-			  case 0x60: // `
-			      insertst = '`';
-			      break;
-			  case 0x7B: // {
-			      insertst = '{';
-			      break;
-			  case 0x7C: // |
-			      insertst = '|';
-			      break;
-			  case 0x7D: // }
-			      insertst = '}';
-			      break;
-			  case 0x7E: // ~
-			      insertst = '~';
-			      break;
-			  default:
-			      log_action("ERROR: unescape() function reached "
-							  "unknown hexcode %d, aborting unescape()\n",hexcode);
-			      fn.result->set_string(fn.arg(0).to_string());
-			      return;
-			}
-		    input.insert(i,insertst);
-#endif
+		    input[i] = (char)hexcode;
+		    input.erase(i+1, 2);
 		}
-	    else
-		i++;
 	}
     fn.result->set_string(input.c_str());
 }
@@ -333,13 +249,14 @@ as_global_parseint(const fn_call& fn)
 	bNegative = false;
 
     // Convert the string to uppercase
-    for (int i=0;i<int(strlen(input));i++)
+    for (int i=strlen(input)-1; i >= 0; i--)
 	input[i] = toupper(input[i]);
 
     // if we were sent a second argument, that's our base
     if (fn.nargs > 1)
 	{
-	    base = fn.arg(1).to_number();
+	    // to_number returns a double. atoi() would be better
+	    base = (int)(fn.arg(1).to_number());
 	}
     // if the string starts with "0x" then a hex digit
     else if (strlen(input) > 2 && input[0] == '0' && input[1] == 'X'
