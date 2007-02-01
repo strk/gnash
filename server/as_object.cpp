@@ -495,8 +495,7 @@ as_object::tostring_method(const fn_call& fn)
 	}
 	else
 	{
-		assert(fn.result->is_undefined());
-		//fn.result->set_undefined();
+		fn.result->set_string("[object Object]");
 	}
 }
 
