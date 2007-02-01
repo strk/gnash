@@ -30,6 +30,7 @@
 #include "Property.h" // for findGetterSetter
 #include "VM.h"
 #include "GnashException.h"
+#include "fn_call.h" // for generic methods
 
 #include <set>
 #include <string>
@@ -479,6 +480,33 @@ as_object::delProperty(const std::string& name)
 	{
 		return _members.delProperty(name);
 	}
+}
+
+void
+as_object::tostring_method(const fn_call& fn)
+{
+	assert(dynamic_cast<as_object*>(fn.this_ptr));
+	as_object* obj = static_cast<as_object*>(fn.this_ptr);
+
+	const char* text_val = obj->get_text_value();
+	if ( text_val )
+	{
+		fn.result->set_string(text_val);
+	}
+	else
+	{
+		assert(fn.result->is_undefined());
+		//fn.result->set_undefined();
+	}
+}
+
+void
+as_object::valueof_method(const fn_call& fn)
+{
+	assert(dynamic_cast<as_object*>(fn.this_ptr));
+	as_object* obj = static_cast<as_object*>(fn.this_ptr);
+
+	*(fn.result) = obj->get_primitive_value();
 }
 
 } // end of gnash namespace

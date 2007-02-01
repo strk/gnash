@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Number.cpp,v 1.9 2007/01/18 22:53:21 strk Exp $ */
+/* $Id: Number.cpp,v 1.10 2007/02/01 11:23:56 strk Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -37,7 +37,7 @@ namespace gnash {
 //static void number_to_string(const fn_call& fn);
 
 static void
-attachNumberInterface(as_object& /*o*/)
+attachNumberInterface(as_object& o)
 {
 	// FIXME: add Number interface here:
 	// Number.MAX_VALUE
@@ -45,8 +45,12 @@ attachNumberInterface(as_object& /*o*/)
 	// Number.NaN
 	// Number.NEGATIVE_INFINITY
 	// Number.POSITIVE_INFINITY
+
 	// Number.toString()
+	o.init_member("toString", &as_object::tostring_method);
+
 	// Number.valueOf()
+	o.init_member("valueOf", &as_object::valueof_method);
 }
 
 static as_object*

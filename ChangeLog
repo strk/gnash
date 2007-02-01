@@ -1,3 +1,13 @@
+2007-02-01 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.{cpp,h}: add generic and reusable
+	  actionscript method handlers for toString() and
+	  valueOf().
+	* server/asobj/Number.cpp (attachNumberInterface):
+	  define toString() and valueOf() methods.
+	* testsuite/actionscript.all/Number.as: test toString()
+	  and valueOf().
+
 2007-01-31 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (sprite_attach_movie):

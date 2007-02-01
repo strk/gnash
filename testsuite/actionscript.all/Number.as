@@ -26,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.8 2006/11/05 00:45:27 rsavoye Exp $";
+rcsid="$Id: Number.as,v 1.9 2007/02/01 11:23:56 strk Exp $";
 
 #include "check.as"
 
@@ -42,4 +42,26 @@ check ( ! (n1 === Number(268)) );
 // but they have the same numeric value
 check_equals (n1 , 268 );
 check_equals (268 , n1 );
+
+// Test Number.toString 
+check_equals(typeof(n1.toString), "function");
+check_equals(typeof(n1.toString()), "string"); 
+check_equals(n1.toString(), "268");
+#if OUTPUT_VERSION > 5
+check(Number.prototype.toString != Object.prototype.toString);
+#else
+// equality of function for SW5 makes no sense, it seems
+xcheck_equals(Number.prototype.toString, Object.prototype.toString);
+#endif
+
+// Test Number.valueOf 
+check_equals(typeof(n1.valueOf), "function");
+check_equals(typeof(n1.valueOf()), "number");
+check_equals(n1.toString(), 268);
+#if OUTPUT_VERSION > 5
+check(Number.prototype.valueOf != Object.prototype.valueOf);
+#else
+// equality of function for SW5 makes no sense, it seems
+xcheck_equals(Number.prototype.valueOf, Object.prototype.valueOf);
+#endif
 

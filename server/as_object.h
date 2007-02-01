@@ -330,6 +330,15 @@ public:
 	const as_object* get_prototype() const {
 		return m_prototype.get();
 	}
+	
+	/// @{ Common ActionScript methods for characters
+	/// TODO: make protected
+
+	static void tostring_method(const fn_call& fn);
+
+	static void valueof_method(const fn_call& fn);
+
+	/// @} Common ActionScript getter-setters for characters
 
 protected:
 
