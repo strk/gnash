@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.11 2007/01/18 22:53:21 strk Exp $ */
+/* $Id: Object.cpp,v 1.12 2007/02/01 11:57:19 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -32,6 +32,7 @@
 #include "character.h" // for Object.registerClass  (get_root_movie)
 #include "sprite_instance.h" // for Object.registerClass  (get_movie_definition)
 #include "sprite_definition.h" // for Object.registerClass  (get_movie_definition)
+#include "VM.h" // for SWF version (attachObjectInterface)
 
 #include "log.h"
 
@@ -48,11 +49,21 @@ static void object_registerClass(const fn_call&);
 static void
 attachObjectInterface(as_object& o)
 {
+	int target_version = o.getVM().getSWFVersion();
+
 	// FIXME: add Object interface here:
-	o.init_member("addProperty", &object_addproperty);
-	o.set_member_flags("addProperty", 1); // hidden
 	o.init_member("registerClass", &object_registerClass);
 	o.set_member_flags("registerClass", 1); // hidden
+
+	// Object.valueOf()
+	o.init_member("valueOf", &as_object::valueof_method);
+
+	// Object.toString()
+	o.init_member("toString", &as_object::tostring_method);
+
+	if ( target_version  < 6 ) return;
+	o.init_member("addProperty", &object_addproperty);
+	o.set_member_flags("addProperty", 1); // hidden
 }
 
 static as_object*

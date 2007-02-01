@@ -20,9 +20,20 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.18 2006/11/27 00:53:46 strk Exp $";
+rcsid="$Id: Object.as,v 1.19 2007/02/01 11:57:20 strk Exp $";
 
 #include "check.as"
+
+// Test existance of methods
+check_equals(typeof(Object), 'function');
+check_equals(typeof(Object.prototype), 'object');
+check_equals(typeof(Object.prototype.toString), 'function');
+check_equals(typeof(Object.prototype.valueOf), 'function');
+#if OUTPUT_VERSION > 5
+check_equals(typeof(Object.prototype.addProperty), 'function');
+#else
+check_equals(typeof(Object.prototype.addProperty), 'undefined');
+#endif
 
 // Test Object creation using 'new'
 var obj = new Object; // uses SWFACTION_NEWOBJECT
@@ -30,9 +41,22 @@ check (obj != undefined);
 check (typeof(obj) == "object");
 check (obj.__proto__.constructor == Object);
 
+// Test instantiated Object methods
+check_equals(typeof(obj.toString), 'function');
+check_equals(typeof(obj.valueOf), 'function');
+#if OUTPUT_VERSION > 5
+check_equals(typeof(obj.addProperty), 'function');
+#else
+check_equals(typeof(obj.addProperty), 'undefined');
+#endif
+
 // Test instantiated Object members
 obj.member = 1;
 check (obj.member == 1)
+check_equals(typeof(obj.toString()), 'string');
+check_equals(obj.toString(), '[object Object]');
+xcheck_equals(typeof(obj.valueOf()), 'object');
+check_equals(obj.valueOf(), obj);
 
 // Test Object creation using literal initialization
 var obj2 = { member:1 }; // uses SWFACTION_INITOBJECT
@@ -73,6 +97,9 @@ check (copy.__proto__.constructor == Object);
 //----------------------
 // Test addProperty
 //----------------------
+
+// Object.addProperty wasn't in SWF5
+#if OUTPUT_VERSION > 5
 
 // the 'getter' function
 function getLen() {
@@ -118,6 +145,8 @@ check_equals (inh1.len, 5);
 check_equals (inh2.len, 7);
 check_equals (proto.len, undefined);
 
+// Object.addProperty wasn't in SWF5
+#endif // OUTPUT_VERSION > 5
 
 //----------------------
 // Test enumeration

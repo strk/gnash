@@ -26,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.9 2007/02/01 11:23:56 strk Exp $";
+rcsid="$Id: Number.as,v 1.10 2007/02/01 11:57:20 strk Exp $";
 
 #include "check.as"
 
@@ -47,21 +47,16 @@ check_equals (268 , n1 );
 check_equals(typeof(n1.toString), "function");
 check_equals(typeof(n1.toString()), "string"); 
 check_equals(n1.toString(), "268");
-#if OUTPUT_VERSION > 5
-check(Number.prototype.toString != Object.prototype.toString);
-#else
-// equality of function for SW5 makes no sense, it seems
-xcheck_equals(Number.prototype.toString, Object.prototype.toString);
-#endif
+var backup = Object.prototype.toString;
+Object.prototype.toString = function() { return "fake_string"; };
+check_equals(n1.toString(), "268"); // doesn't inherit from Object
+Object.prototype.toString = backup;
 
 // Test Number.valueOf 
 check_equals(typeof(n1.valueOf), "function");
 check_equals(typeof(n1.valueOf()), "number");
-check_equals(n1.toString(), 268);
-#if OUTPUT_VERSION > 5
-check(Number.prototype.valueOf != Object.prototype.valueOf);
-#else
-// equality of function for SW5 makes no sense, it seems
-xcheck_equals(Number.prototype.valueOf, Object.prototype.valueOf);
-#endif
-
+check_equals(n1.valueOf(), 268);
+var backup = Object.prototype.valueOf;
+Object.prototype.valueOf = function() { return "fake_value"; };
+check_equals(n1.valueOf(), 268); // doesn't inherit from Object
+Object.prototype.valueOf = backup;
