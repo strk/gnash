@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.7 2007/01/30 12:49:03 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.8 2007/02/01 21:56:00 bjacques Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -73,79 +73,64 @@ class multithread_queue
 
 	multithread_queue()
 		{
-			pthread_mutex_init(&m_mutex, NULL);
-		};
+		}
 
 	~multithread_queue()
 		{
-			lock();
+			boost::mutex::scoped_lock lock(_mutex);
 			while (m_queue.size() > 0)
 			{
 				T x = m_queue.front();
 				m_queue.pop();
 				delete x;
 			}
-			unlock();
-
-			pthread_mutex_destroy(&m_mutex);
 		}
 
 		size_t size()
 		{
-			lock();
+			boost::mutex::scoped_lock lock(_mutex);
 			size_t n = m_queue.size();
-			unlock();
 			return n;
 		}
 
 		bool push(T member)
 		{
 			bool rc = false;
-			lock();
+			boost::mutex::scoped_lock lock(_mutex);
+			// So.. if there are 20 items in the queue...
+			// disregard the next item? WTF?
+
 			if (m_queue.size() < 20)	// hack
 			{
 				m_queue.push(member);
 				rc = true;
 			}
-			unlock();
 			return rc;
 		}
 
 		T front()
 		{
-			lock();
+			boost::mutex::scoped_lock lock(_mutex);
 			T member = NULL;
 			if (m_queue.size() > 0)
 			{
 				member = m_queue.front();
 			}
-			unlock();
 			return member;
 		}
 
 		void pop()
 		{
-			lock();
+			boost::mutex::scoped_lock lock(_mutex);
 			if (m_queue.size() > 0)
 			{
 				m_queue.pop();
 			}
-			unlock();
 		}
 
 	private:
 
-		inline void lock()
-		{
-			pthread_mutex_lock(&m_mutex);
-		}
-
-		inline void unlock()
-		{
-			pthread_mutex_unlock(&m_mutex);
-		}
-
-		pthread_mutex_t m_mutex;
+		boost::mutex _mutex;
 		std::queue < T > m_queue;
 };
 
