@@ -1,5 +1,11 @@
 2007-02-01 Martin Guy <martinwguy@yahoo.it>
 
+	* server/asobj/Global.cpp: Rewrite lame code in string conversions:
+	  remove insane case statement and avoid unnecessary use of floating
+	  point
+
+2007-02-01 Martin Guy <martinwguy@yahoo.it>
+
 	* testsuite/actionscript.all/Global.as: fix bug in parseInt octal test
 	  (now succeeds)
 

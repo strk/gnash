@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.35 2007/01/27 16:55:05 tgc Exp $ */
+/* $Id: Global.cpp,v 1.36 2007/02/01 18:08:15 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -127,13 +127,14 @@ as_global_isfinite(const fn_call& fn)
     fn.result->set_bool(fn.arg(0).is_finite());
 }
 
+/// \brief Decode a string from URL-encoded format
+//	   converting all hexadecimal sequences to ASCII characters.
 static void
 as_global_unescape(const fn_call& fn)
 {
     assert(fn.nargs == 1);
 
     string input = fn.arg(0).to_string();
-    string insertst;
     int hexcode;
 
     for (unsigned int i=0;i<input.length();)
@@ -154,7 +155,11 @@ as_global_unescape(const fn_call& fn)
 			hexcode += (input[i+2] - 'A' + 10);
 
 		    input.erase(i,3);
-				
+#if 1
+		    input.insert(i,string(1,(char)hexcode));
+#else
+		    string insertst;
+
 		    switch (hexcode)
 			{
 			  case 0x20: // space
@@ -239,6 +244,7 @@ as_global_unescape(const fn_call& fn)
 			      return;
 			}
 		    input.insert(i,insertst);
+#endif
 		}
 	    else
 		i++;
@@ -275,8 +281,7 @@ as_global_parseint(const fn_call& fn)
     char *input_buffer = new char[strlen(fn.arg(0).to_string())+1];
     char *input = input_buffer;
     strcpy(input,fn.arg(0).to_string());
-    double base;
-    int result = 0, i;
+    int base;
     bool bNegative;
 
     // Skip leading whitespace
@@ -292,7 +297,7 @@ as_global_parseint(const fn_call& fn)
 	bNegative = false;
 
     // Convert the string to uppercase
-    for (i=0;i<int(strlen(input));i++)
+    for (int i=0;i<int(strlen(input));i++)
 	input[i] = toupper(input[i]);
 
     // if we were sent a second argument, that's our base
@@ -304,21 +309,26 @@ as_global_parseint(const fn_call& fn)
     else if (strlen(input) > 2 && input[0] == '0' && input[1] == 'X'
 	     && (isdigit(input[2]) || (input[2] >= 'A' && input[2] <= 'F')))
 	{
-	    base = 16.0;	// the base is 16
+	    base = 16;	// the base is 16
 	    input = input + 2; // skip the leading "0x"
 	}
     // if the string starts with "0" then an octal digit
     else if (strlen(input) > 1 && input[0] == '0' &&
 	     (input[1] >= '0' && input[1] <= '7'))
 	{
-	    base = 8.0;
+	    base = 8;
 	    input++; // skip the leading '0'
 	}
     else
 	// default base is 10
-	base = 10.0;
+	base = 10;
 
-    assert (base >= 2 && base <= 36);
+    if (base < 2 || base > 36)
+	{
+	    fn.result->set_nan();
+	    delete [] input_buffer;
+	    return;
+	}
 
     int numdigits = 0;
 
@@ -337,9 +347,10 @@ as_global_parseint(const fn_call& fn)
 	    return;
 	}
 
-    for (i=0;i<numdigits;i++)
+    int result = 0;
+    for (int i=0;i<numdigits;i++)
 	{
-		result += digits.find(input[i]) * (int)pow(base, numdigits - i - 1);
+	    result = result * base + digits.find(input[i]);
 	}
 
     if (bNegative)
