@@ -918,6 +918,16 @@ parse_tag:
 		log_error("Parsing exception: %s", e.what());
 	}
 
+	if ( ! m_playlist[_frames_loaded].empty() || ! m_init_action_list[_frames_loaded].empty() )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("%d action blocks and %d init action blocks are NOT followed by"
+			" a SHOWFRAME tag",
+			m_playlist[_frames_loaded].size(),
+			m_init_action_list[_frames_loaded].size());
+		);
+	}
+
 }
 
 size_t
