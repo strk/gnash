@@ -1523,11 +1523,13 @@
 	untested):
 	<programlisting>
 
-	check(expression);
+	check(expression, [message]);
 
 		Evaluate the expression.
 		Trace result (PASSED: expression / FAILED: expression).
 		If fails, *visually* trace the failure.
+		If second argument is given, it will be used instead of
+		'expression' for printing results.
 
 	check_equals(obtained, expected)
 
@@ -1535,11 +1537,13 @@
 		Trace result (PASSED: obtained == expected / FAILED: expected X, obtained Y)
 		If fails, *visually* trace the failure.
 
-	xcheck(expression);
+	xcheck(expression, [message]);
 
 		Evaluate the expression.
 		Trace result (XPASSED: expression / XFAILED: expression).
 		If fails, *visually* trace the failure.
+		If second argument is given, it will be used instead of
+		'expression' for printing results.
 
 	xcheck_equals(obtained, expected)
 

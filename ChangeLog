@@ -1,5 +1,13 @@
 2007-02-01 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/internals.xml (Writing self-contained SWF tests):
+	  Document new optional argument for check() and xcheck().
+	* testsuite/misc-ming.all/ming_utils.c (get_dejagnu_actions):
+	  Allow second argument to check() and xcheck() for an explicit
+	  label.
+
+2007-02-01 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.h (get_primitive_value): return
 	  an OBJECT value by default (not a number).
 	* server/as_value.cpp (operator==): avoid infinite

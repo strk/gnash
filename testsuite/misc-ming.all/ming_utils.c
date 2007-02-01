@@ -162,7 +162,7 @@ get_dejagnu_actions()
 {
 	SWFAction ac;
 
-	static const size_t BUFLEN = 2048;
+	static const size_t BUFLEN = 4096;
 
 	char buf[BUFLEN];
 	snprintf(buf, BUFLEN,
@@ -222,13 +222,13 @@ get_dejagnu_actions()
 		" if ( obt == exp ) _root.runtest.xpass(obt+' == '+exp);\n"
 		" else _root.runtest.xfail('expected: '+exp+' , obtained: '+obt);\n"
 		"};\n"
-		"_root.check = function(a) {\n"
-		" if ( a ) _root.runtest.pass(a);\n"
-		" else _root.runtest.fail(a);\n"
+		"_root.check = function(a, msg) {\n"
+		" if ( a ) _root.runtest.pass(msg != undefined ? msg : a);\n"
+		" else _root.runtest.fail(msg != undefined ? msg : a);\n"
 		"};\n"
-		"_root.xcheck = function(a) {\n"
-		" if ( a ) _root.runtest.xpass(a);\n"
-		" else _root.runtest.xfail(a);\n"
+		"_root.xcheck = function(a, msg) {\n"
+		" if ( a ) _root.runtest.xpass(msg != undefined ? msg : a);\n"
+		" else _root.runtest.xfail(msg != undefined ? msg : a);\n"
 		"};\n"
 		"_root.fail = function(msg) {\n"
 		" _root.runtest.fail(msg);\n"
