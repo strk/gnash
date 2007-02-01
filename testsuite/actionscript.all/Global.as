@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.15 2006/11/25 14:56:43 strk Exp $";
+rcsid="$Id: Global.as,v 1.16 2007/02/01 17:47:17 martinwguy Exp $";
 
 #include "check.as"
 
@@ -35,7 +35,7 @@ check ( parseInt('-1.234') == -1 );
 // Test parseint with hex
 check ( parseInt('0x111') == 273 );
 // Test parseint with octal
-xcheck_equals (parseInt('   0352'), 352 );
+check (parseInt('   0352') == 0352 );
 // Test parseint with 36 base
 check ( parseInt('2GA',36) == (10+16*36+2*36*36) );
 // Test parseint with base 17 - the 'H' is not part of base 17, only the first two digits are valid
