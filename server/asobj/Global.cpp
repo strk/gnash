@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.36 2007/02/01 18:08:15 martinwguy Exp $ */
+/* $Id: Global.cpp,v 1.37 2007/02/01 19:35:36 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -125,6 +125,42 @@ as_global_isfinite(const fn_call& fn)
     assert(fn.nargs == 1);
 
     fn.result->set_bool(fn.arg(0).is_finite());
+}
+
+/// \brief Encode a string to URL-encoded format
+///	   converting all dodgy characters to %AB hex sequences
+// "Dodgy" means
+// - ASCII control characters: 0-31 and 127
+// - Non-ASCII chars: 128-255
+// - URL syntax characters: $ & + , / : ; = ? @
+// - Unsafe characters: SPACE " < > # % { } | \ ^ ~ [ ] `
+// Encoding is a % followed by two hexadecimal characters, case insensitive.
+// See RFC1738 http://www.rfc-editor.org/rfc/rfc1738.txt,
+// Section 2.2 "URL Character Encoding Issues"
+
+static void
+as_global_escape(const fn_call& fn)
+{
+    // List of chars we must convert to escape sequences
+    // (list taken from crazy case statement in as_global_unescape)
+    const string escapees = " \"#$%&+,/:;<=>?@[\\]^`{|}~";
+    const string hexdigits = "0123456789ABCDEF";
+
+    assert(fn.nargs == 1);
+
+    string input = fn.arg(0).to_string();
+
+    for (unsigned int i=0;i<input.length(); i++)
+	{
+	    unsigned c = input[i] & 0xFF;	// ensure value is 0-255 not -ve
+
+	    if (c < 32 || c > 126 || escapees.find((char)c) != string::npos) {
+		input[i] = '%';
+		input.insert(++i, hexdigits.substr(c >> 4, 1));
+		input.insert(++i, hexdigits.substr(c & 0xF, 1));
+	    }
+	}
+    fn.result->set_string(input.c_str());
 }
 
 /// \brief Decode a string from URL-encoded format
@@ -473,15 +509,11 @@ Global::Global(VM& vm)
 	number_class_init(*this); 
 	string_class_init(*this); 
 	array_class_init(*this);
-	// unescape
+	init_member("escape", as_global_escape);
 	init_member("unescape", as_global_unescape);
-	// parseFloat
 	init_member("parseFloat", as_global_parsefloat);
-	// parseInt
 	init_member("parseInt", as_global_parseint);
-	// isNan
 	init_member("isNaN", as_global_isnan);
-	// isFinite
 	init_member("isFinite", as_global_isfinite);
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;

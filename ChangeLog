@@ -1,3 +1,8 @@
+2007-02-01 Martin Guy <martinwguy@yahoo.it>
+
+	* server/asobj/Global.cpp: Implement ActionScript 5 "escape" method
+	* testsuite/actionscript.all/Global.as: Add test case for "escape"
+
 2007-02-01 Bernhard Rosenkraenzer <bero@arklinux.org>
 
 	* Makefile.am: Add the plugin directory to our SUBDIRS when we don't

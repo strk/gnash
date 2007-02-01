@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.16 2007/02/01 17:47:17 martinwguy Exp $";
+rcsid="$Id: Global.as,v 1.17 2007/02/01 19:35:36 martinwguy Exp $";
 
 #include "check.as"
 
@@ -59,8 +59,12 @@ check ( isNaN(parseFloat('         x1.234')) );
 // All %NN must become the corresponding ascii char
 check ( unescape('%3A%2F%3F%3D%26') == ':/?=&' );
 
-// All ascii char become the corresponding %NN hex
-xcheck (escape(':/?=&') == '%3A%2F%3F%3D%26');
+// All URL-special chars become the corresponding %NN hex
+check (escape(' "#$%&+,/:;<=') == '%20%22%23%24%25%26%2B%2C%2F%3A%3B%3C%3D');
+check (escape('>?@[\\]^`{|}~') == '%3E%3F%40%5B%5C%5D%5E%60%7B%7C%7D%7E');
+check (escape('!()*-._0123456789') == '!()*-._0123456789');
+check (escape('ABCDEFGHIJKLMNOPQRSTUVWXYZ') == 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+check (escape('abcdefghijklmnopqrstuvwxyz') == 'abcdefghijklmnopqrstuvwxyz');
 
 // How to test failure of setInterval and success of clearInterval ?
 // The problem is that there is no way 
