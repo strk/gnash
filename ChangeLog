@@ -1,3 +1,10 @@
+2007-02-01 Bernhard Rosenkraenzer <bero@arklinux.org>
+
+	* Makefile.am: Add the plugin directory to our SUBDIRS when we don't
+	have GTK but when we do want Klash.
+	* plugin/klash/klash_part.cpp: Move visibility annotations to from 
+	the class implementation into the declaration.
+
 2007-02-01 Martin Guy <martinwguy@yahoo.it>
 
 	* server/asobj/Global.cpp: Rewrite lame code in string conversions:

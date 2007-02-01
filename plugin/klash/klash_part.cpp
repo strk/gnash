@@ -47,9 +47,9 @@ class KXMLGUIClient; // workaround for kde3.3 on sarge with gcc4, kactioncollect
 
 class KlashFactory : public KParts::Factory {
 public:
-    KlashFactory ();
-    virtual ~KlashFactory ();
-    virtual KParts::Part *createPartObject
+    KDE_NO_CDTOR_EXPORT KlashFactory ();
+    KDE_NO_CDTOR_EXPORT virtual ~KlashFactory ();
+    KDE_NO_CDTOR_EXPORT virtual KParts::Part *createPartObject
         (QWidget *wparent, const char *wname,
          QObject *parent, const char *name,
          const char *className, const QStringList &args);
@@ -62,15 +62,15 @@ K_EXPORT_COMPONENT_FACTORY (libklashpart, KlashFactory)
 
 KInstance *KlashFactory::s_instance = 0;
 
-KDE_NO_CDTOR_EXPORT KlashFactory::KlashFactory () {
+KlashFactory::KlashFactory () {
     s_instance = new KInstance ("klash");
 }
 
-KDE_NO_CDTOR_EXPORT KlashFactory::~KlashFactory () {
+KlashFactory::~KlashFactory () {
     delete s_instance;
 }
 
-KDE_NO_EXPORT KParts::Part *KlashFactory::createPartObject
+KParts::Part *KlashFactory::createPartObject
   (QWidget *wparent, const char *wname,
    QObject *parent, const char * name,
    const char * cls, const QStringList & args) {

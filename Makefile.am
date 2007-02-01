@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.60 2007/01/24 20:03:43 martinwguy Exp $
+# $Id: Makefile.am,v 1.61 2007/02/01 18:46:57 bjacques Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -37,6 +37,10 @@ STD_DIRS = \
 if PLUGIN
 if HAVE_GTK2
 PLUGIN_DIRS = plugin
+else
+if KLASH
+PLUGIN_DIRS = plugin
+endif
 endif
 endif
 
