@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.61 2007/02/01 18:46:57 bjacques Exp $
+# $Id: Makefile.am,v 1.62 2007/02/02 01:57:57 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -163,9 +163,13 @@ endif
 	@echo "GUI Toolkit decoding support..."	
 	@echo "	SDL_CFLAGS is $(SDL_CFLAGS)"
 	@echo "	SDL_LIBS is $(SDL_LIBS)"
-if USE_GUI_KDE
+if HAVE_KDE
 	@echo "	KDE_CFLAGS is $(KDE_CFLAGS)"
 	@echo "	KDE_LIBS is $(KDE_LIBS)"
+endif
+if HAVE_QT
+	@echo "	QT_CFLAGS is $(QT_CFLAGS)"
+	@echo "	QT_LIBS is $(QT_LIBS)"
 endif
 if USE_GUI_FLTK
 	@echo "	FLTK2_CFLAGS is $(FLTK2_CFLAGS)"

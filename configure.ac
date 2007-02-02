@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.248 2007/01/31 17:25:52 martinwguy Exp $
+dnl $Id: configure.ac,v 1.249 2007/02/02 01:57:57 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -459,22 +459,16 @@ fi
 
 dnl # Check KDE if kde gui or klash were requested
 if test x"$gui" = xkde -o x$klash = xyes; then
-  KDE_SET_PREFIX
-  AM_KDE_WITH_NLS
-  AC_PATH_KDE
-  KDE_USE_QT(3)
+  kde=yes
+  qt=yes
+  GNASH_PATH_KDE
+  GNASH_PATH_QT
 fi
-
-if test x$have_kde = xyes; then
-  KDE_CFLAGS="$all_includes -I$kde_includes/kio"
-  KDE_LIBS="$KDE_LDFLAGS $LIB_KDEUI $LIB_KDECORE $LIB_KDEPRINT $QT_LDFLAGS $kde_int_qt"
-else
-  KDE_CFLAGS=""
-  KDE_LIBS=""
-fi
+AM_CONDITIONAL(HAVE_KDE, [test x$has_kde = xyes])
+AM_CONDITIONAL(HAVE_QT, [test x$has_qt = xyes])
 
 dnl # NO kde ? NO klash !
-if test x$have_kde != xyes; then
+if test x$has_kde != xyes; then
   if test x$klash = xyes; then
     echo "WARNING: No KDE development package installed, disabling klash"
     klash=no
@@ -926,14 +920,26 @@ if test x$extensions = xyes; then
   fi
 fi
 
-if test x$kde = xyes; then
-  if test x"$KDE_CFLAGS" != x; then
+if test x$kde = xyes -o x$klash = xyes; then
+  if test x"$has_kde" = xyes; then
     echo "        KDE flags are: $KDE_CFLAGS"
     echo "        KDE libs are: $KDE_LIBS"
   else
     if test x$gui = xkde -o x$klash = xyes ; then
       echo "        ERROR: No kde development package installed!"
       echo "               Reconfigure with --disable-klash to continue"
+      echo "               and/or change to a different gui"
+      nogo=true
+    fi
+  fi
+  if test x"$has_qt" = xyes; then
+    echo "        QT flags are: $QT_CFLAGS"
+    echo "        QT libs are: $QT_LIBS"
+  else
+    if test x$gui = xkde -o x$klash = xyes ; then
+      echo "        ERROR: No QT development package installed!"
+      echo "               Reconfigure with --disable-klash to continue"
+      echo "               and/or change to a different gui"
       nogo=true
     fi
   fi

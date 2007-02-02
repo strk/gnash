@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.36 2007/01/17 15:57:44 strk Exp $
+dnl $Id: gnashpkgtool.m4,v 1.37 2007/02/02 01:57:57 rsavoye Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
@@ -50,17 +50,17 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
     dnl Look for the header
     if test x"${$1}" = x"yes"; then
       AC_ARG_WITH($1_incl, AC_HELP_STRING([--with-$1-incl], [directory where $2 is]), with_$1_incl=${withval})
-	AC_CACHE_VAL(ac_cv_path_$1_incl, [
+	    AC_CACHE_VAL(ac_cv_path_$1_incl, [
   	  if test x"${with_$1_incl}" != x ; then
- 	    if test -f ${with_$1_incl}/$2 ; then
+ 	      if test -f ${with_$1_incl}/$2 ; then
   	      ac_cv_path_$1_incl=-I`(cd ${with_$1_incl}; pwd)`
- 	    else
-	      AC_MSG_ERROR([${with_$1_incl} directory doesn't contain $2.])
+ 	      else
+	        AC_MSG_ERROR([${with_$1_incl} directory doesn't contain $2.])
+	      fi
 	    fi
-	  fi
-	])
+	  ])
 
-         if test x$cross_compiling = xno; then
+  if test x$cross_compiling = xno; then
 	  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_incl}" = x; then
 	    AC_MSG_CHECKING([for $2 header using pkg-config])
 	    $PKG_CONFIG --exists libDOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --cflags libDOWN[]`
@@ -73,7 +73,7 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
 	    else
 	      AC_MSG_RESULT(not found)
 	    fi
-          fi
+    fi
 	fi
 
 	dnl If the path hasn't been specified, go look for it.
