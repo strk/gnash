@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.13 2007/01/23 17:43:09 strk Exp $";
+rcsid="$Id: Date.as,v 1.14 2007/02/02 10:31:32 strk Exp $";
 
 #include "check.as"
 
@@ -70,7 +70,7 @@ check (date.toString != undefined);
 check_equals (date.UTC, undefined);
 
 #if OUTPUT_VERSION > 6
-xcheck(Date.UTC != undefined);
+check(Date.UTC != undefined);
 
 // From SWF 7 up methods are case-sensitive !
 check_equals (date.getdate, undefined);

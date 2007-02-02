@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.40 2007/02/02 02:10:36 rsavoye Exp $ */
+/* $Id: Global.cpp,v 1.41 2007/02/02 10:31:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -433,7 +433,7 @@ Global::Global(VM& vm)
 	selection_class_init(*this); // Selection
 	init_member("Sound", as_value(sound_new));
 	init_member("XMLSocket", as_value(xmlsocket_new));
-	init_member("Date", as_value(date_new));
+	date_class_init(*this);
 	xml_class_init(*this);
 	xmlnode_class_init(*this);
 	mouse_class_init(*this);

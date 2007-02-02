@@ -25,6 +25,7 @@
 #include "Date.h"
 #include "fn_call.h"
 #include "GnashException.h"
+#include "builtin_function.h"
 
 #include <ctime>
 
@@ -37,6 +38,115 @@
 #include <sys/timeb.h>
 
 namespace gnash {
+
+static void date_new(const fn_call& fn);
+static void date_getdate(const fn_call& fn);
+static void date_getday(const fn_call& fn);
+static void date_getfullyear(const fn_call& fn);
+static void date_gethours(const fn_call& fn);
+static void date_getmilliseconds(const fn_call& fn);
+static void date_getminutes(const fn_call& fn);
+static void date_getmonth(const fn_call& fn);
+static void date_getseconds(const fn_call& fn);
+static void date_gettime(const fn_call& fn);
+static void date_gettimezoneoffset(const fn_call& fn);
+static void date_getutcdate(const fn_call& fn);
+static void date_getutcday(const fn_call& fn);
+static void date_getutcfullyear(const fn_call& fn);
+static void date_getutchours(const fn_call& fn);
+static void date_getutcmilliseconds(const fn_call& fn);
+static void date_getutcminutes(const fn_call& fn);
+static void date_getutcmonth(const fn_call& fn);
+static void date_getutcseconds(const fn_call& fn);
+static void date_getyear(const fn_call& fn);
+static void date_setdate(const fn_call& fn);
+static void date_setfullyear(const fn_call& fn);
+static void date_sethours(const fn_call& fn);
+static void date_setmilliseconds(const fn_call& fn);
+static void date_setminutes(const fn_call& fn);
+static void date_setmonth(const fn_call& fn);
+static void date_setseconds(const fn_call& fn);
+static void date_settime(const fn_call& fn);
+static void date_setutcdate(const fn_call& fn);
+static void date_setutcfullyear(const fn_call& fn);
+static void date_setutchours(const fn_call& fn);
+static void date_setutcmilliseconds(const fn_call& fn);
+static void date_setutcminutes(const fn_call& fn);
+static void date_setutcmonth(const fn_call& fn);
+static void date_setutcseconds(const fn_call& fn);
+static void date_setyear(const fn_call& fn);
+static void date_tostring(const fn_call& fn);
+static void date_utc(const fn_call& fn);
+static as_object* getDateInterface();
+static void attachDateInterface(as_object& o);
+static void attachDateStaticInterface(as_object& o);
+
+class Date {
+public:
+	 Date();
+	 ~Date();
+	// Use double to avoid overflow
+	double getTime();
+	void getTimezoneOffset();
+	void getUTCDate();
+	void getUTCDay();
+	void getUTCFullYear();
+	void getUTCHours();
+	void getUTCMilliseconds();
+	void getUTCMinutes();
+	void getUTCMonth();
+	void getUTCSeconds();
+	void getYear();
+	void setDate();
+	void setFullYear();
+	void setHours();
+	void setMilliseconds();
+	void setMinutes();
+	void setMonth();
+	void setSeconds();
+	void setTime();
+	void setUTCDate();
+	void setUTCFullYear();
+	void setUTCHours();
+	void setUTCMilliseconds();
+	void setUTCMinutes();
+	void setUTCMonth();
+	void setUTCSeconds();
+	void setYear();
+	void toString();
+	void UTC();
+
+	// These store the local time
+	bool isDST;
+	long year,month,date,hour,minute,second,millisecond;
+	int minutesEast;
+	int dayWeek,dayYear;
+
+	// This returns a tm struct representing this date in UTC time
+	tm convertUTC();
+	// This returns a tm struct representing this date in local time
+	tm convertTM();
+	// This sets the values in the date object to those in the tm struct
+	// And ignores any values not stored in the tm struct
+	void setFromTM(const tm newtime);
+	// This function normalizes the time - for example, if we set the date to
+	// Jan-32, 1:61:60, after normalize the time will be Feb-1, 2:02:00
+	void Normalize();
+private:
+};
+
+class date_as_object : public as_object
+{
+
+public:
+	 Date obj;
+
+	 date_as_object()
+		 :
+		 as_object(getDateInterface())
+	 {
+	 }
+};
 
 Date::Date() {
 }
@@ -297,6 +407,66 @@ Date::Normalize()
 	setFromTM(*(localtime(&newtime)));
 }
 
+static void
+attachDateInterface(as_object& o)
+{
+	o.init_member("getDate", &date_getdate);
+	o.init_member("getDay", &date_getday);
+	o.init_member("getFullYear", &date_getfullyear);
+	o.init_member("getHours", &date_gethours);
+	o.init_member("getMilliseconds", &date_getmilliseconds);
+	o.init_member("getMinutes", &date_getminutes);
+	o.init_member("getMonth", &date_getmonth);
+	o.init_member("getSeconds", &date_getseconds);
+	o.init_member("getTime", &date_gettime);
+	o.init_member("getTimezoneOffset", &date_gettimezoneoffset);
+	o.init_member("getUTCDate", &date_getutcdate);
+	o.init_member("getUTCDay", &date_getutcday);
+	o.init_member("getUTCFullYear", &date_getutcfullyear);
+	o.init_member("getUTCHours", &date_getutchours);
+	o.init_member("getUTCMilliseconds", &date_getutcmilliseconds);
+	o.init_member("getUTCMinutes", &date_getutcminutes);
+	o.init_member("getUTCMonth", &date_getutcmonth);
+	o.init_member("getUTCSeconds", &date_getutcseconds);
+	o.init_member("getYear", &date_getyear);
+	o.init_member("setDate", &date_setdate);
+	o.init_member("setFullYear", &date_setfullyear);
+	o.init_member("setHours", &date_sethours);
+	o.init_member("setMilliseconds", &date_setmilliseconds);
+	o.init_member("setMinutes", &date_setminutes);
+	o.init_member("setMonth", &date_setmonth);
+	o.init_member("setSeconds", &date_setseconds);
+	o.init_member("setTime", &date_settime);
+	o.init_member("setUTCDate", &date_setutcdate);
+	o.init_member("setUTCFullYear", &date_setutcfullyear);
+	o.init_member("setUTCHours", &date_setutchours);
+	o.init_member("setUTCMilliseconds", &date_setutcmilliseconds);
+	o.init_member("setUTCMinutes", &date_setutcminutes);
+	o.init_member("setUTCMonth", &date_setutcmonth);
+	o.init_member("setUTCSeconds", &date_setutcseconds);
+	o.init_member("setYear", &date_setyear);
+	o.init_member("toString", &date_tostring);
+}
+
+static void
+attachDateStaticInterface(as_object& o)
+{
+	// TODO: This should *only* be available when SWF version is > 6
+	o.init_member("UTC", &date_utc);
+}
+
+static as_object*
+getDateInterface()
+{
+	static boost::intrusive_ptr<as_object> o;
+	if ( o == NULL )
+	{
+		o = new as_object();
+		attachDateInterface(*o);
+	}
+	return o.get();
+}
+
 void
 date_new(const fn_call& fn)
 {
@@ -306,44 +476,8 @@ date_new(const fn_call& fn)
 
 	date_as_object *date_obj = new date_as_object;
 
-	date_obj->init_member("getDate", &date_getdate);
-	date_obj->init_member("getDay", &date_getday);
-	date_obj->init_member("getFullYear", &date_getfullyear);
-	date_obj->init_member("getHours", &date_gethours);
-	date_obj->init_member("getMilliseconds", &date_getmilliseconds);
-	date_obj->init_member("getMinutes", &date_getminutes);
-	date_obj->init_member("getMonth", &date_getmonth);
-	date_obj->init_member("getSeconds", &date_getseconds);
-	date_obj->init_member("getTime", &date_gettime);
-	date_obj->init_member("getTimezoneOffset", &date_gettimezoneoffset);
-	date_obj->init_member("getUTCDate", &date_getutcdate);
-	date_obj->init_member("getUTCDay", &date_getutcday);
-	date_obj->init_member("getUTCFullYear", &date_getutcfullyear);
-	date_obj->init_member("getUTCHours", &date_getutchours);
-	date_obj->init_member("getUTCMilliseconds", &date_getutcmilliseconds);
-	date_obj->init_member("getUTCMinutes", &date_getutcminutes);
-	date_obj->init_member("getUTCMonth", &date_getutcmonth);
-	date_obj->init_member("getUTCSeconds", &date_getutcseconds);
-	date_obj->init_member("getYear", &date_getyear);
-	date_obj->init_member("setDate", &date_setdate);
-	date_obj->init_member("setFullYear", &date_setfullyear);
-	date_obj->init_member("setHours", &date_sethours);
-	date_obj->init_member("setMilliseconds", &date_setmilliseconds);
-	date_obj->init_member("setMinutes", &date_setminutes);
-	date_obj->init_member("setMonth", &date_setmonth);
-	date_obj->init_member("setSeconds", &date_setseconds);
-	date_obj->init_member("setTime", &date_settime);
-	date_obj->init_member("setUTCDate", &date_setutcdate);
-	date_obj->init_member("setUTCFullYear", &date_setutcfullyear);
-	date_obj->init_member("setUTCHours", &date_setutchours);
-	date_obj->init_member("setUTCMilliseconds", &date_setutcmilliseconds);
-	date_obj->init_member("setUTCMinutes", &date_setutcminutes);
-	date_obj->init_member("setUTCMonth", &date_setutcmonth);
-	date_obj->init_member("setUTCSeconds", &date_setutcseconds);
-	date_obj->init_member("setYear", &date_setyear);
-	date_obj->init_member("toString", &date_tostring);
-	date_obj->init_member("UTC", &date_utc);
 
+	// TODO: move this to date_as_object constructor
 	struct tm *ti;
 	if (fn.nargs == 0) {
 #ifndef HAVE_GETTIMEOFDAY
@@ -374,7 +508,7 @@ date_new(const fn_call& fn)
 		date_obj->obj.isDST = ti->tm_isdst;
 	}
 	else
-		log_error("date_new constructor with %d arguments unimplemented!\n",fn.nargs);
+		log_error("date_new constructor with %d arguments unimplemented!", fn.nargs);
 
 	fn.result->set_as_object(date_obj);
 }
@@ -392,93 +526,93 @@ ensure_date_object(as_object* obj)
 	return ret;
 }
 
-void date_getdate(const fn_call& fn) {
+static void date_getdate(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.date);
 }
-void date_getday(const fn_call& fn) {
+static void date_getday(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.dayWeek);
 }
-void date_getfullyear(const fn_call& fn) {
+static void date_getfullyear(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.year + 1900);
 }
-void date_gethours(const fn_call& fn) {
+static void date_gethours(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.hour);
 }
-void date_getmilliseconds(const fn_call& fn) {
+static void date_getmilliseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.millisecond);
 }
-void date_getminutes(const fn_call& fn) {
+static void date_getminutes(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.minute);
 }
-void date_getmonth(const fn_call& fn) {
+static void date_getmonth(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.month);
 }
-void date_getseconds(const fn_call& fn) {
+static void date_getseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.second);
 }
-void date_gettime(const fn_call& fn) {
+static void date_gettime(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_double(date->obj.getTime());
 }
-void date_gettimezoneoffset(const fn_call& fn) {
+static void date_gettimezoneoffset(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.minutesEast);
 }
-void date_getutcdate(const fn_call& fn) {
+static void date_getutcdate(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	tm result = date->obj.convertUTC();
 
 	fn.result->set_int(int(result.tm_mday));
 }
-void date_getutcday(const fn_call& fn) {
+static void date_getutcday(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	tm result = date->obj.convertUTC();
 
 	fn.result->set_int(int(result.tm_wday));
 }
-void date_getutcfullyear(const fn_call& fn) {
+static void date_getutcfullyear(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	tm result = date->obj.convertUTC();
 
 	fn.result->set_int(int(result.tm_year)+1900);
 }
-void date_getutchours(const fn_call& fn) {
+static void date_getutchours(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	tm result = date->obj.convertUTC();
 
 	fn.result->set_int(int(result.tm_hour));
 }
-void date_getutcmilliseconds(const fn_call& fn) {
+static void date_getutcmilliseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	// Milliseconds (value between 0 and 999) won't be affected by timezone
 	fn.result->set_int(int(date->obj.millisecond));
 }
-void date_getutcminutes(const fn_call& fn) {
+static void date_getutcminutes(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	tm result = date->obj.convertUTC();
 
 	fn.result->set_int(int(result.tm_min));
 }
-void date_getutcmonth(const fn_call& fn) {
+static void date_getutcmonth(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	tm result = date->obj.convertUTC();
 
 	fn.result->set_int(int(result.tm_mon));
 }
-void date_getutcseconds(const fn_call& fn) {
+static void date_getutcseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	// Seconds (value between 0 and 59) won't be affected by timezone
 	fn.result->set_int(int(date->obj.second));
 }
-void date_getyear(const fn_call& fn) {
+static void date_getyear(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_int(date->obj.year);
 }
@@ -491,7 +625,7 @@ void date_getyear(const fn_call& fn) {
 // functions. Right now, we convert the time to UTC, set the variable,
 // then convert back to local time. We should confirm the official behavior!
 
-void date_setdate(const fn_call& fn) {
+static void date_setdate(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	if (fn.nargs < 1) {
@@ -514,7 +648,7 @@ void date_setdate(const fn_call& fn) {
 
 /// \brief Set year [, month [, date]]
 
-void date_setfullyear(const fn_call& fn) {
+static void date_setfullyear(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 3);
@@ -537,7 +671,7 @@ void date_setfullyear(const fn_call& fn) {
 	}
 	fn.result->set_double(date->obj.getTime());
 }
-void date_sethours(const fn_call& fn) {
+static void date_sethours(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 4);
@@ -562,7 +696,7 @@ void date_sethours(const fn_call& fn) {
 	}
 	fn.result->set_double(date->obj.getTime());
 }
-void date_setmilliseconds(const fn_call& fn) {
+static void date_setmilliseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs == 1);
@@ -581,7 +715,7 @@ void date_setmilliseconds(const fn_call& fn) {
 	}
 	fn.result->set_double(date->obj.getTime());
 }
-void date_setminutes(const fn_call& fn) {
+static void date_setminutes(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	//assert(fn.nargs >= 1 && fn.nargs <= 3);
@@ -603,7 +737,7 @@ void date_setminutes(const fn_call& fn) {
 	}
 	fn.result->set_double(date->obj.getTime());
 }
-void date_setmonth(const fn_call& fn) {
+static void date_setmonth(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
@@ -625,7 +759,7 @@ void date_setmonth(const fn_call& fn) {
 	}
 	fn.result->set_double(date->obj.getTime());
 }
-void date_setseconds(const fn_call& fn) {
+static void date_setseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
@@ -648,7 +782,7 @@ void date_setseconds(const fn_call& fn) {
 	}
 	fn.result->set_double(date->obj.getTime());
 }
-void date_settime(const fn_call& fn) {
+static void date_settime(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs == 1);
@@ -673,7 +807,7 @@ void date_settime(const fn_call& fn) {
 
 	fn.result->set_double(date->obj.getTime());
 }
-void date_setutcdate(const fn_call& fn) {
+static void date_setutcdate(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs == 1);
@@ -702,7 +836,7 @@ void date_setutcdate(const fn_call& fn) {
 	
 	fn.result->set_double(date->obj.getTime());
 }
-void date_setutcfullyear(const fn_call& fn) {
+static void date_setutcfullyear(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 3);
@@ -734,7 +868,7 @@ void date_setutcfullyear(const fn_call& fn) {
 	
 	fn.result->set_double(date->obj.getTime());
 }
-void date_setutchours(const fn_call& fn) {
+static void date_setutchours(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 4);
@@ -773,7 +907,7 @@ void date_setutchours(const fn_call& fn) {
 	
 	fn.result->set_double(date->obj.getTime());
 }
-void date_setutcmilliseconds(const fn_call& fn) {
+static void date_setutcmilliseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs == 1);
@@ -793,7 +927,7 @@ void date_setutcmilliseconds(const fn_call& fn) {
 	}
 	fn.result->set_double(date->obj.getTime());
 }
-void date_setutcminutes(const fn_call& fn) {
+static void date_setutcminutes(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 3);
@@ -822,7 +956,7 @@ void date_setutcminutes(const fn_call& fn) {
 	}
 	fn.result->set_double(date->obj.getTime());
 }
-void date_setutcmonth(const fn_call& fn) {
+static void date_setutcmonth(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
@@ -851,7 +985,7 @@ void date_setutcmonth(const fn_call& fn) {
 	}
 	fn.result->set_double(date->obj.getTime());
 }
-void date_setutcseconds(const fn_call& fn) {
+static void date_setutcseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
@@ -877,7 +1011,7 @@ void date_setutcseconds(const fn_call& fn) {
 
 // If year is an integer between 0-99, setYear sets the year at 1900 + year;
 // otherwise, the year is the value of the year parameter.
-void date_setyear(const fn_call& fn) {
+static void date_setyear(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs == 1);
@@ -899,7 +1033,7 @@ void date_setyear(const fn_call& fn) {
 	fn.result->set_double(date->obj.getTime());
 }
 
-void date_tostring(const fn_call& fn) {
+static void date_tostring(const fn_call& fn) {
 	// TODO: I have no idea what the real flash player does, but at least this
 	// gives something functional for now. Tried to mimic the "date" command
 	char buffer[128];
@@ -918,8 +1052,29 @@ void date_tostring(const fn_call& fn) {
 }
 
 // This should be a static method - not quite sure what that means...
-void date_utc(const fn_call& fn) {
+static void date_utc(const fn_call& fn) {
+	date_as_object* date = ensure_date_object(fn.this_ptr);
+	UNUSED(date);
 	log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+
+// extern (used by Global.cpp)
+void date_class_init(as_object& global)
+{
+	// This is going to be the global String "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&date_new, getDateInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachDateStaticInterface(*cl);
+	}
+
+	// Register _global.Date
+	global.init_member("Date", cl.get());
+
 }
 
 } // end of gnash namespace
