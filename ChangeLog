@@ -1,3 +1,8 @@
+2007-02-02 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStreamFfmpeg.cpp: Fixed a deadlock when deleting
+	  netstream before playback started.
+
 2007-02-02  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* plugin/klash/Makefile.am: Simplify heavily as most of the KDE

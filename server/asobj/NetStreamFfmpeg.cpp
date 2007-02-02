@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.11 2007/01/30 12:49:03 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.12 2007/02/02 20:41:55 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -54,6 +54,9 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	m_Frame(NULL),
 	m_Resample(NULL),
 
+	m_thread(NULL),
+	startThread(NULL),
+
 	m_go(false),
 	m_imageframe(NULL),
 	m_video_clock(0),
@@ -92,15 +95,20 @@ void NetStreamFfmpeg::pause(int mode)
 
 void NetStreamFfmpeg::close()
 {
+
 	if (m_go)
 	{
 		// terminate thread
 		m_go = false;
 
 		// wait till thread is complete before main continues
-		m_thread->join();
-		if (m_thread) delete m_thread;
+		if (m_thread) {
+			m_thread->join();
+			delete m_thread;
+		}
+
 	}
+
 	if (startThread) {
 		delete startThread;
 	}
@@ -406,7 +414,6 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 
 	int delay = 0;
 	ns->m_start_clock = tu_timer::ticks_to_seconds(tu_timer::get_ticks());
-	ns->m_go = true;
 	ns->m_unqueued_data = NULL;
 
 	while (ns->m_go)
