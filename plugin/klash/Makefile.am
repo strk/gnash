@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.23 2007/01/21 22:41:02 rsavoye Exp $
+# $Id: Makefile.am,v 1.24 2007/02/02 08:45:41 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -25,6 +25,8 @@ AM_CPPFLAGS= -I$(kde_includes)/kio $(all_includes)
 
 METASOURCES= AUTO
 
+# Dunno the correct 
+kde_moduledir = $(KDE_MODULESDIR)
 kde_module_LTLIBRARIES= libklashpart.la
 
 libklashpart_la_SOURCES = klash_part.cpp klash_part.h
@@ -47,6 +49,7 @@ libklashpart.la: $(libklashpart_la_DEPENDENCIES) $(libklashpart_la_OBJECTS)
 
 #xdg_apps_DATA = klash.desktop
 
+kde_servicesdir = $(KDE_SERVICESDIR)
 dist_kde_services_DATA = klash_part.desktop
 
 dist_rc_DATA = klashpartui.rc
