@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.21 2007/01/23 22:44:32 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.22 2007/02/02 10:38:13 strk Exp $";
 
 #include "check.as"
 
@@ -45,6 +45,10 @@ var functionObject = new Function();
 #if OUTPUT_VERSION > 5
 check_equals(typeof(functionObject), 'object');
 #else
+// TODO: this is likely dependent on *player* version 
+//       rather then on *SWF* version, in which case
+//       we should completely avoid testing it.
+//       Can anyone confirm ?
 xcheck_equals(typeof(functionObject), 'undefined');
 #endif
 
@@ -230,7 +234,7 @@ check_equals(typeof(MovieClip.prototype._x), 'undefined');
 //------------------------------------------------
 
 function Test() {}
-xcheck_equals(typeof(Date.prototype), 'object');
+check_equals(typeof(Date.prototype), 'object');
 Test.prototype = new Date();
 var t = new Test;
 check_equals(typeof(t.getYear), 'function');
@@ -240,8 +244,8 @@ check_equals(typeof(t.getYear()), 'undefined');
 
 var t2 = new Object;
 t2.__proto__ = Date.prototype;
-xcheck_equals(typeof(t2.getYear), 'function');
-xcheck_equals(typeof(t2.setYear), 'function');
+check_equals(typeof(t2.getYear), 'function');
+check_equals(typeof(t2.setYear), 'function');
 t2.setYear(2007);
 check_equals(typeof(t2.getYear()), 'undefined');
 

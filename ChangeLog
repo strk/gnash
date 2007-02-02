@@ -1,5 +1,7 @@
 2007-02-02 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Inheritance.as: don't expect
+	  failures with Date object.
 	* server/asobj/: Date.{cpp,h}, Global.cpp:
 	  Ported Date object to new layout; make Date.UTC a not-exported
 	  class-static
