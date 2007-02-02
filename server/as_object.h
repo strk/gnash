@@ -334,6 +334,15 @@ public:
 	const as_object* get_prototype() const {
 		return m_prototype.get();
 	}
+
+	/// Set this object's '__proto__' member
+	//
+	/// There is no point to make this function
+	/// protected or private, as a call to the
+	/// public: set_member("__proto__", <anyting>)
+	/// will do just the same
+	///
+	void set_prototype(as_object* proto);
 	
 	/// @{ Common ActionScript methods for characters
 	/// TODO: make protected
@@ -391,14 +400,6 @@ protected:
 	///	case *sensitive* from SWF7 up.
 	///
 	void set_member_default(const std::string& name, const as_value& val);
-
-	/// Set this object's '__proto__' member
-	//
-	/// This is protected to allow character instances to set a prototype,
-	/// since character instances are NOT direct subclasses of as_object
-	/// ( as_object -> character -> specific_character ).
-	///
-	void set_prototype(as_object* proto);
 
 	/// The Virtual Machine used to create this object
 	VM& _vm;
