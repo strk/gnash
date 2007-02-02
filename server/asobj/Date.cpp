@@ -52,6 +52,8 @@ Date::getTime()
 	return double(count) * 1000.0;
 }
 
+// These are not used anywhere, and look like a half-finished good idea.
+#if 0
 void
 Date::getTimezoneOffset()
 {
@@ -219,6 +221,7 @@ Date::UTC()
 {
 	log_msg("%s:unimplemented \n", __FUNCTION__);
 }
+#endif
 
 tm
 Date::convertUTC()
