@@ -656,7 +656,18 @@ void date_settime(const fn_call& fn) {
 		log_aserror(__FUNCTION__ " needs one argument");
 	    )
 	} else {
-	    log_msg("%s:unimplemented \n", __FUNCTION__);
+	    double millitime = fn.arg(0).to_number();
+	    date->obj.millisecond = (long) fmod(millitime, 1000.0);
+	    time_t sectime = (time_t) (millitime / 1000.0);
+	    tm *tm = gmtime(&sectime);
+	    date->obj.second = tm->tm_sec;
+	    date->obj.minute = tm->tm_min;
+	    date->obj.hour = tm->tm_hour;
+	    date->obj.date = tm->tm_mday;
+	    date->obj.month = tm->tm_mon;
+	    date->obj.year = tm->tm_year; // No of years since 1900, the same.
+	    
+	    date->obj.Normalize();
 	}
 
 	fn.result->set_double(date->obj.getTime());
@@ -863,6 +874,8 @@ void date_setutcseconds(const fn_call& fn) {
 	fn.result->set_double(date->obj.getTime());
 }
 
+// If year is an integer between 0-99, setYear sets the year at 1900 + year;
+// otherwise, the year is the value of the year parameter.
 void date_setyear(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
@@ -873,6 +886,7 @@ void date_setyear(const fn_call& fn) {
 	    )
 	} else {
 	    date->obj.year = (long int)(fn.arg(0).to_number());
+	    if (date->obj.year < 100) date->obj.year += 1900;
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror(__FUNCTION__ " has more than two arguments");
