@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.39 2007/02/01 23:18:21 martinwguy Exp $ */
+/* $Id: Global.cpp,v 1.40 2007/02/02 02:10:36 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -72,13 +72,13 @@
 #define ASSERT_FN_ARGS_IS_1						\
     if (fn.nargs < 1) {							\
 	IF_VERBOSE_ASCODING_ERRORS(					\
-            log_aserror(__FUNCTION__ " needs one argument");		\
+            log_aserror(__FUNCTION__, " needs one argument");		\
             )								\
          return;							\
     }									\
     IF_VERBOSE_ASCODING_ERRORS(						\
 	if (fn.nargs > 1)						\
-            log_aserror(__FUNCTION__ " has more than one argument");	\
+            log_aserror(__FUNCTION__, " has more than one argument");	\
     )
 
 using namespace std;
@@ -217,13 +217,13 @@ as_global_parseint(const fn_call& fn)
     // assert(fn.nargs == 2 || fn.nargs == 1);
     if (fn.nargs < 1) {
 	IF_VERBOSE_ASCODING_ERRORS(	
-            log_aserror(__FUNCTION__ " needs at least one argument");
+            log_aserror(__FUNCTION__, " needs at least one argument");
             )
          return;
     }
     IF_VERBOSE_ASCODING_ERRORS(
 	if (fn.nargs > 2)
-            log_aserror(__FUNCTION__ " has more than two arguments");
+            log_aserror(__FUNCTION__, " has more than two arguments");
     )
 
     // Make sure our argument is the correct type
@@ -331,15 +331,15 @@ as_global_assetpropflags(const fn_call& fn)
 
     if (fn.nargs < 3) {
 	IF_VERBOSE_ASCODING_ERRORS(	
-            log_aserror(__FUNCTION__ " needs at least three arguments");
+            log_aserror(__FUNCTION__, " needs at least three arguments");
             )
          return;
     }
     IF_VERBOSE_ASCODING_ERRORS(
 	if (fn.nargs > 4)
-            log_aserror(__FUNCTION__ " has more than four arguments");
+            log_aserror(__FUNCTION__, " has more than four arguments");
 	if (version == 5 && fn.nargs == 4)
-            log_aserror(__FUNCTION__ " has four arguments in a SWF version 5 movie");
+            log_aserror(__FUNCTION__, " has four arguments in a SWF version 5 movie");
     )
 		
     // ASSetPropFlags(obj, props, n, allowFalse=false)

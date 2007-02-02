@@ -14,11 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
-/* $Id: string.cpp,v 1.14 2007/02/01 23:18:21 martinwguy Exp $ */
+/* $Id: string.cpp,v 1.15 2007/02/02 02:10:36 rsavoye Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -452,14 +448,14 @@ string_char_at(const fn_call& fn)
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__ " needs one argument");
+		log_aserror(__FUNCTION__, " needs one argument");
 		)
 	    fn.result->set_tu_string("");	// Same as for out-of-range arg
 	    return;
 	}
 	IF_VERBOSE_ASCODING_ERRORS(
 	    if (fn.nargs > 1)
-		log_aserror(__FUNCTION__ " has more than one argument");
+		log_aserror(__FUNCTION__, " has more than one argument");
 	)
 
 	int	index = static_cast<int>(fn.arg(0).to_number());
