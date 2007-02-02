@@ -1,5 +1,8 @@
 2007-02-02 Sandro Santilli <strk@keybit.net>
 
+	* server/: character.h, sprite_instance.h: get_current_frame()
+	  and has_looped() removed from character class (meaningless).
+	  Added some comments about restart().
 	* plugin/klash/Makefile.am: defined kde_moduledir
 	  and kde_servicesdir as required by automake 1.9.6.
 	  Used KDE_MODULESDIR and KDE_SERVICESDIR, which are

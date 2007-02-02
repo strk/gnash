@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.43 2007/01/31 15:11:58 strk Exp $ */
+/* $Id: character.h,v 1.44 2007/02/02 10:07:50 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -358,9 +358,18 @@ public:
 		return get_relative_target_common(name);
 	}
 
-    virtual size_t	get_current_frame() const { assert(0); return 0; }
-    virtual bool	has_looped() const { assert(0); return false; }
-    virtual void	restart() { /*assert(0);*/ }
+    //virtual size_t	get_current_frame() const { assert(0); return 0; }
+    //virtual bool	has_looped() const { assert(0); return false; }
+
+	/// Restart the character
+	//
+	/// This is only meaningful for sprite instances, but default
+	/// it's a no-op.
+	///
+	/// It is needed by button_character_instance
+	/// TODO: have button_character_instance cast to_movie()
+	///       and drop this one
+	virtual void	restart() { }
 
     virtual void	advance(float /*delta_time*/)
     {

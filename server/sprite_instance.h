@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.59 2007/01/29 07:33:14 zoulunkai Exp $ */
+/* $Id: sprite_instance.h,v 1.60 2007/02/02 10:07:50 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -201,7 +201,7 @@ public:
 	void	restart();
 
 
-	virtual bool has_looped() const
+	bool has_looped() const
 	{
 		return m_has_looped;
 	}
