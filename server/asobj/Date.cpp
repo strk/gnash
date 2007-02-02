@@ -630,7 +630,7 @@ static void date_setdate(const fn_call& fn) {
 
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setDate needs one argument");
 	    )
 	} else {
 		date->obj.date = (long int)(fn.arg(0).to_number());
@@ -639,7 +639,7 @@ static void date_setdate(const fn_call& fn) {
 
 	if (fn.nargs > 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " has more than one argument");
+		log_aserror("Date.setDate has more than one argument");
 	    )
 	}
 
@@ -654,7 +654,7 @@ static void date_setfullyear(const fn_call& fn) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 3);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setFullYear needs one argument");
 	    )
 	} else {
 	    date->obj.year = (long int)(fn.arg(0).to_number() - 1900);
@@ -664,7 +664,7 @@ static void date_setfullyear(const fn_call& fn) {
 		    date->obj.date = (long int)(fn.arg(2).to_number());
 	    if (fn.nargs > 3) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than three arguments");
+		    log_aserror("Date.setFullYear has more than three arguments");
 		)
 	    }
 	    date->obj.Normalize();
@@ -677,7 +677,7 @@ static void date_sethours(const fn_call& fn) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 4);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setHours needs one argument");
 	    )
 	} else {
 	    date->obj.hour = (long int)(fn.arg(0).to_number());
@@ -689,7 +689,7 @@ static void date_sethours(const fn_call& fn) {
 		    date->obj.millisecond = (long int)(fn.arg(3).to_number());
 	    if (fn.nargs > 4) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than four arguments");
+		    log_aserror("Date.setHours has more than four arguments");
 		)
 	    }
 	    date->obj.Normalize();
@@ -702,13 +702,13 @@ static void date_setmilliseconds(const fn_call& fn) {
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setMilliseconds needs one argument");
 	    )
 	} else {
 	    date->obj.millisecond = (long int)(fn.arg(0).to_number());
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than one argument");
+		    log_aserror("Date.setMilliseconds has more than one argument");
 		)
 	    }
 	    date->obj.Normalize();
@@ -721,7 +721,7 @@ static void date_setminutes(const fn_call& fn) {
 	//assert(fn.nargs >= 1 && fn.nargs <= 3);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setMinutes needs one argument");
 	    )
 	} else {
 	    // Seconds (value between 0 and 59) won't be affected by timezone
@@ -730,7 +730,7 @@ static void date_setminutes(const fn_call& fn) {
 	    if (fn.nargs >= 3) date->obj.millisecond = (long int)(fn.arg(2).to_number());
 	    if (fn.nargs > 3) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than three arguments");
+		    log_aserror("Date.setMinutes has more than three arguments");
 		)
 	    }
 	    date->obj.Normalize();
@@ -743,7 +743,7 @@ static void date_setmonth(const fn_call& fn) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setMonth needs one argument");
 	    )
 	} else {
 	    date->obj.month = (long int)(fn.arg(0).to_number());
@@ -751,7 +751,7 @@ static void date_setmonth(const fn_call& fn) {
 		date->obj.date = (long int)(fn.arg(1).to_number());
 	    if (fn.nargs > 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than two arguments");
+		    log_aserror("Date.setMonth has more than two arguments");
 		)
 	    }
 
@@ -765,7 +765,7 @@ static void date_setseconds(const fn_call& fn) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setSeconds needs one argument");
 	    )
 	} else {
 	    // Seconds (value between 0 and 59) won't be affected by timezone
@@ -774,7 +774,7 @@ static void date_setseconds(const fn_call& fn) {
 		date->obj.millisecond = (long int)(fn.arg(1).to_number());
 	    if (fn.nargs > 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than two arguments");
+		    log_aserror("Date.setSeconds has more than two arguments");
 		)
 	    }
 
@@ -788,7 +788,7 @@ static void date_settime(const fn_call& fn) {
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setTime needs one argument");
 	    )
 	} else {
 	    double millitime = fn.arg(0).to_number();
@@ -804,6 +804,11 @@ static void date_settime(const fn_call& fn) {
 	    
 	    date->obj.Normalize();
 	}
+	if (fn.nargs > 1) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Date.setTime has more than one argument");
+	    )
+	}
 
 	fn.result->set_double(date->obj.getTime());
 }
@@ -813,7 +818,7 @@ static void date_setutcdate(const fn_call& fn) {
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setUTCDate needs one argument");
 	    )
 	} else {
 	    tm utctime = date->obj.convertUTC();
@@ -829,7 +834,7 @@ static void date_setutcdate(const fn_call& fn) {
 
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than one argument");
+		    log_aserror("Date.setUTCDate has more than one argument");
 		)
 	    }
 	}
@@ -842,7 +847,7 @@ static void date_setutcfullyear(const fn_call& fn) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 3);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setUTCFullYear needs one argument");
 	    )
 	} else {
 	    tm utctime = date->obj.convertUTC();
@@ -854,7 +859,7 @@ static void date_setutcfullyear(const fn_call& fn) {
 		utctime.tm_mday = (long int)(fn.arg(2).to_number());
 	    if (fn.nargs > 3) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than three arguments");
+		    log_aserror("Date.setUTCFullYear has more than three arguments");
 		)
 	    }
 
@@ -874,7 +879,7 @@ static void date_setutchours(const fn_call& fn) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 4);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setUTCHours needs one argument");
 	    )
 	} else {
 
@@ -893,7 +898,7 @@ static void date_setutchours(const fn_call& fn) {
 		utctime.tm_sec = (long int)(fn.arg(2).to_number());
 	    if (fn.nargs > 4) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than four arguments");
+		    log_aserror("Date.setUTCHours has more than four arguments");
 		)
 	    }
 
@@ -913,13 +918,13 @@ static void date_setutcmilliseconds(const fn_call& fn) {
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setUTCMilliseconds needs one argument");
 	    )
 	} else {
 	    date->obj.millisecond = (long int)(fn.arg(0).to_number());
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than one argument");
+		    log_aserror("Date.setUTCMilliseconds has more than one argument");
 		)
 	    }
 
@@ -933,7 +938,7 @@ static void date_setutcminutes(const fn_call& fn) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 3);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setUTCMinutes needs one argument");
 	    )
 	} else {
 	    // Seconds (value between 0 and 59) won't be affected by timezone
@@ -942,7 +947,7 @@ static void date_setutcminutes(const fn_call& fn) {
 	    if (fn.nargs >= 3) date->obj.millisecond = (long int)(fn.arg(2).to_number());
 	    if (fn.nargs > 3) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than three arguments");
+		    log_aserror("Date.setUTCMinutes has more than three arguments");
 		)
 	    }
 
@@ -962,7 +967,7 @@ static void date_setutcmonth(const fn_call& fn) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setUTCMonth needs one argument");
 	    )
 	} else {
 	    tm utctime = date->obj.convertUTC();
@@ -972,7 +977,7 @@ static void date_setutcmonth(const fn_call& fn) {
 		utctime.tm_mday = (long int)(fn.arg(1).to_number());
 	    if (fn.nargs > 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than two arguments");
+		    log_aserror("Date.setUTCMonth has more than two arguments");
 		)
 	    }
 
@@ -991,7 +996,7 @@ static void date_setutcseconds(const fn_call& fn) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setUTCSeconds needs one argument");
 	    )
 	} else {
 	    // Seconds (value between 0 and 59) won't be affected by timezone
@@ -1000,7 +1005,7 @@ static void date_setutcseconds(const fn_call& fn) {
 		date->obj.millisecond = (long int)(fn.arg(1).to_number());
 	    if (fn.nargs > 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than two arguments");
+		    log_aserror("Date.setUTCSeconds has more than two arguments");
 		)
 	    }
 
@@ -1017,14 +1022,14 @@ static void date_setyear(const fn_call& fn) {
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror(__FUNCTION__, " needs one argument");
+		log_aserror("Date.setYear needs one argument");
 	    )
 	} else {
 	    date->obj.year = (long int)(fn.arg(0).to_number());
 	    if (date->obj.year < 100) date->obj.year += 1900;
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(__FUNCTION__, " has more than two arguments");
+		    log_aserror("Date.setYear has more than two arguments");
 		)
 	    }
 
@@ -1055,7 +1060,7 @@ static void date_tostring(const fn_call& fn) {
 static void date_utc(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	UNUSED(date);
-	log_msg("%s:unimplemented \n", __FUNCTION__);
+	log_msg("Date.UTC unimplemented\n");
 }
 
 // extern (used by Global.cpp)
