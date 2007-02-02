@@ -1,5 +1,7 @@
 2007-02-02 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: add a few more checks
+	  for properties.
 	* testsuite/actionscript.all/Inheritance.as: don't expect
 	  failures with Date object; add a test about constructors
 	  calling order.

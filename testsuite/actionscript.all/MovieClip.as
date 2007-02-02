@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.29 2007/01/23 22:44:32 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.30 2007/02/02 12:57:51 strk Exp $";
 
 #include "check.as"
 
@@ -39,6 +39,9 @@ check(_root == this);
 // Check inheritance
 check(MovieClip);
 check_equals(mc.__proto__, MovieClip.prototype);
+check_equals(typeof(MovieClip.prototype._width), "undefined");
+check_equals(typeof(MovieClip.prototype.attachMovie), "function");
+check_equals(typeof(mc._width), "number");
 
 // Check methods existance
 
@@ -274,3 +277,5 @@ check_equals(cl.__proto__.constructor, MovieClip);
 check(cl instanceOf MovieClip);
 xcheck(cl instanceOf Object);
 check_equals(typeof(cl), "object");
+check_equals(typeof(cl.attachMovie), "function");
+check_equals(typeof(cl._width), "undefined");
