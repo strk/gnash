@@ -15,8 +15,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -39,6 +37,7 @@
 
 namespace gnash {
 
+// forwrd declarations
 static void date_new(const fn_call& fn);
 static void date_getdate(const fn_call& fn);
 static void date_getday(const fn_call& fn);
@@ -80,332 +79,6 @@ static void date_utc(const fn_call& fn);
 static as_object* getDateInterface();
 static void attachDateInterface(as_object& o);
 static void attachDateStaticInterface(as_object& o);
-
-class Date {
-public:
-	 Date();
-	 ~Date();
-	// Use double to avoid overflow
-	double getTime();
-	void getTimezoneOffset();
-	void getUTCDate();
-	void getUTCDay();
-	void getUTCFullYear();
-	void getUTCHours();
-	void getUTCMilliseconds();
-	void getUTCMinutes();
-	void getUTCMonth();
-	void getUTCSeconds();
-	void getYear();
-	void setDate();
-	void setFullYear();
-	void setHours();
-	void setMilliseconds();
-	void setMinutes();
-	void setMonth();
-	void setSeconds();
-	void setTime();
-	void setUTCDate();
-	void setUTCFullYear();
-	void setUTCHours();
-	void setUTCMilliseconds();
-	void setUTCMinutes();
-	void setUTCMonth();
-	void setUTCSeconds();
-	void setYear();
-	void toString();
-	void UTC();
-
-	// These store the local time
-	bool isDST;
-	long year,month,date,hour,minute,second,millisecond;
-	int minutesEast;
-	int dayWeek,dayYear;
-
-	// This returns a tm struct representing this date in UTC time
-	tm convertUTC();
-	// This returns a tm struct representing this date in local time
-	tm convertTM();
-	// This sets the values in the date object to those in the tm struct
-	// And ignores any values not stored in the tm struct
-	void setFromTM(const tm newtime);
-	// This function normalizes the time - for example, if we set the date to
-	// Jan-32, 1:61:60, after normalize the time will be Feb-1, 2:02:00
-	void Normalize();
-private:
-};
-
-class date_as_object : public as_object
-{
-
-public:
-	 Date obj;
-
-	 date_as_object()
-		 :
-		 as_object(getDateInterface())
-	 {
-	 }
-};
-
-Date::Date() {
-}
-
-Date::~Date() {
-}
-
-double
-Date::getTime()
-{
-	tm result = convertTM();
-	time_t count = mktime(&result);
-	return double(count) * 1000.0;
-}
-
-// These are not used anywhere, and look like a half-finished good idea.
-#if 0
-void
-Date::getTimezoneOffset()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getUTCDate()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getUTCDay()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getUTCFullYear()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getUTCHours()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getUTCMilliseconds()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getUTCMinutes()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getUTCMonth()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getUTCSeconds()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::getYear()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setDate()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setFullYear()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setHours()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setMilliseconds()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setMinutes()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setMonth()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setSeconds()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setTime()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setUTCDate()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setUTCFullYear()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setUTCHours()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setUTCMilliseconds()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setUTCMinutes()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setUTCMonth()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setUTCSeconds()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::setYear()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::toString()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Date::UTC()
-{
-	log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-#endif
-
-tm
-Date::convertUTC()
-{
-	tm utctime;
-
-	utctime.tm_sec = second;
-	utctime.tm_min = minute;
-	utctime.tm_hour = hour;
-	utctime.tm_mday = date;
-	utctime.tm_mon = month;
-	utctime.tm_year = year;
-	utctime.tm_wday = dayWeek;
-	utctime.tm_yday = dayYear;
-	utctime.tm_isdst = isDST;
-
-	time_t normalized;
-
-	normalized = mktime(&utctime);
-
-	tm *result = gmtime(&normalized);
-
-	return *result;
-}
-
-tm
-Date::convertTM()
-{
-	tm thistime;
-
-	thistime.tm_sec = second;
-	thistime.tm_min = minute;
-	thistime.tm_hour = hour;
-	thistime.tm_mday = date;
-	thistime.tm_mon = month;
-	thistime.tm_year = year;
-	thistime.tm_wday = dayWeek;
-	thistime.tm_yday = dayYear;
-	thistime.tm_isdst = isDST;
-
-	time_t normalized;
-
-	normalized = mktime(&thistime);
-
-	tm *result = localtime(&normalized);
-
-	return *result;
-}
-
-void
-Date::setFromTM(const tm newtime)
-{
-	second = newtime.tm_sec;
-	minute = newtime.tm_min;
-	hour = newtime.tm_hour;
-	date = newtime.tm_mday;
-	month = newtime.tm_mon;
-	year = newtime.tm_year;
-	dayWeek = newtime.tm_wday;
-	dayYear = newtime.tm_yday;
-	isDST = newtime.tm_isdst;
-}
-
-
-void
-Date::Normalize()
-{
-	second += (millisecond / 1000);
-	millisecond = millisecond % 1000;
-
-	tm thistime = convertTM();
-	time_t newtime = mktime(&thistime);
-	setFromTM(*(localtime(&newtime)));
-}
 
 static void
 attachDateInterface(as_object& o)
@@ -467,6 +140,122 @@ getDateInterface()
 	return o.get();
 }
 
+class date_as_object : public as_object
+{
+public:
+	// Use double to avoid overflow
+	double getTime();
+	void UTC();
+
+	// These store the local time
+	bool isDST;
+	long year,month,date,hour,minute,second,millisecond;
+	int minutesEast;
+	int dayWeek,dayYear;
+
+	// This returns a tm struct representing this date in UTC time
+	tm convertUTC();
+	// This returns a tm struct representing this date in local time
+	tm convertTM();
+	// This sets the values in the date object to those in the tm struct
+	// And ignores any values not stored in the tm struct
+	void setFromTM(const tm newtime);
+	// This function normalizes the time - for example, if we set the date
+	// to Jan-32, 1:61:60, after normalize the time will be Feb-1, 2:02:00
+	void Normalize();
+
+	date_as_object()
+		:
+		as_object(getDateInterface())
+	{
+	}
+
+private:
+};
+
+// Return time as number of milliseconds since 1 Jan 1970 UTC
+double
+date_as_object::getTime()
+{
+	tm result = convertTM();
+	time_t count = mktime(&result);
+	return double(count) * 1000.0;
+}
+
+tm
+date_as_object::convertUTC()
+{
+	tm utctime;
+
+	utctime.tm_sec = second;
+	utctime.tm_min = minute;
+	utctime.tm_hour = hour;
+	utctime.tm_mday = date;
+	utctime.tm_mon = month;
+	utctime.tm_year = year;
+	utctime.tm_wday = dayWeek;
+	utctime.tm_yday = dayYear;
+	utctime.tm_isdst = isDST;
+
+	time_t normalized;
+
+	normalized = mktime(&utctime);
+
+	tm *result = gmtime(&normalized);
+
+	return *result;
+}
+
+tm
+date_as_object::convertTM()
+{
+	tm thistime;
+
+	thistime.tm_sec = second;
+	thistime.tm_min = minute;
+	thistime.tm_hour = hour;
+	thistime.tm_mday = date;
+	thistime.tm_mon = month;
+	thistime.tm_year = year;
+	thistime.tm_wday = dayWeek;
+	thistime.tm_yday = dayYear;
+	thistime.tm_isdst = isDST;
+
+	time_t normalized;
+
+	normalized = mktime(&thistime);
+
+	tm *result = localtime(&normalized);
+
+	return *result;
+}
+
+void
+date_as_object::setFromTM(const tm newtime)
+{
+	second = newtime.tm_sec;
+	minute = newtime.tm_min;
+	hour = newtime.tm_hour;
+	date = newtime.tm_mday;
+	month = newtime.tm_mon;
+	year = newtime.tm_year;
+	dayWeek = newtime.tm_wday;
+	dayYear = newtime.tm_yday;
+	isDST = newtime.tm_isdst;
+}
+
+
+void
+date_as_object::Normalize()
+{
+	second += (millisecond / 1000);
+	millisecond = millisecond % 1000;
+
+	tm thistime = convertTM();
+	time_t newtime = mktime(&thistime);
+	setFromTM(*(localtime(&newtime)));
+}
+
 void
 date_new(const fn_call& fn)
 {
@@ -486,26 +275,26 @@ date_new(const fn_call& fn)
 		ftime (&tb);
 		ti = localtime(&tb.time); 
 		log_error("date_new constructor doesn't set timezone or milliseconds on your system - using defaults\n");
-		date_obj->obj.millisecond = 0;
-		date_obj->obj.minutesEast = 0;
+		date_obj->millisecond = 0;
+		date_obj->minutesEast = 0;
 #else		
 		struct timeval tEnd;
 		struct timezone tZone;
 		gettimeofday(&tEnd,&tZone);
-		date_obj->obj.millisecond = tEnd.tv_usec;
-		date_obj->obj.minutesEast = -tZone.tz_minuteswest;
+		date_obj->millisecond = tEnd.tv_usec;
+		date_obj->minutesEast = -tZone.tz_minuteswest;
 		time_t t = time(&t);
 		ti = localtime(&t);
 #endif
-		date_obj->obj.second = ti->tm_sec;
-		date_obj->obj.minute = ti->tm_min;
-		date_obj->obj.hour = ti->tm_hour;
-		date_obj->obj.date = ti->tm_mday;
-		date_obj->obj.month = ti->tm_mon;
-		date_obj->obj.year = ti->tm_year;
-		date_obj->obj.dayWeek = ti->tm_wday;
-		date_obj->obj.dayYear = ti->tm_yday;
-		date_obj->obj.isDST = ti->tm_isdst;
+		date_obj->second = ti->tm_sec;
+		date_obj->minute = ti->tm_min;
+		date_obj->hour = ti->tm_hour;
+		date_obj->date = ti->tm_mday;
+		date_obj->month = ti->tm_mon;
+		date_obj->year = ti->tm_year;
+		date_obj->dayWeek = ti->tm_wday;
+		date_obj->dayYear = ti->tm_yday;
+		date_obj->isDST = ti->tm_isdst;
 	}
 	else
 		log_error("date_new constructor with %d arguments unimplemented!", fn.nargs);
@@ -528,93 +317,93 @@ ensure_date_object(as_object* obj)
 
 static void date_getdate(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	fn.result->set_int(date->obj.date);
+	fn.result->set_int(date->date);
 }
 static void date_getday(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	fn.result->set_int(date->obj.dayWeek);
+	fn.result->set_int(date->dayWeek);
 }
 static void date_getfullyear(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	fn.result->set_int(date->obj.year + 1900);
+	fn.result->set_int(date->year + 1900);
 }
 static void date_gethours(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	fn.result->set_int(date->obj.hour);
+	fn.result->set_int(date->hour);
 }
 static void date_getmilliseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	fn.result->set_int(date->obj.millisecond);
+	fn.result->set_int(date->millisecond);
 }
 static void date_getminutes(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	fn.result->set_int(date->obj.minute);
+	fn.result->set_int(date->minute);
 }
 static void date_getmonth(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	fn.result->set_int(date->obj.month);
+	fn.result->set_int(date->month);
 }
 static void date_getseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	fn.result->set_int(date->obj.second);
+	fn.result->set_int(date->second);
 }
 static void date_gettime(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_gettimezoneoffset(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	fn.result->set_int(date->obj.minutesEast);
+	fn.result->set_int(date->minutesEast);
 }
 static void date_getutcdate(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	tm result = date->obj.convertUTC();
+	tm result = date->convertUTC();
 
 	fn.result->set_int(int(result.tm_mday));
 }
 static void date_getutcday(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	tm result = date->obj.convertUTC();
+	tm result = date->convertUTC();
 
 	fn.result->set_int(int(result.tm_wday));
 }
 static void date_getutcfullyear(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	tm result = date->obj.convertUTC();
+	tm result = date->convertUTC();
 
 	fn.result->set_int(int(result.tm_year)+1900);
 }
 static void date_getutchours(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	tm result = date->obj.convertUTC();
+	tm result = date->convertUTC();
 
 	fn.result->set_int(int(result.tm_hour));
 }
 static void date_getutcmilliseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	// Milliseconds (value between 0 and 999) won't be affected by timezone
-	fn.result->set_int(int(date->obj.millisecond));
+	fn.result->set_int(int(date->millisecond));
 }
 static void date_getutcminutes(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	tm result = date->obj.convertUTC();
+	tm result = date->convertUTC();
 
 	fn.result->set_int(int(result.tm_min));
 }
 static void date_getutcmonth(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	tm result = date->obj.convertUTC();
+	tm result = date->convertUTC();
 
 	fn.result->set_int(int(result.tm_mon));
 }
 static void date_getutcseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	// Seconds (value between 0 and 59) won't be affected by timezone
-	fn.result->set_int(int(date->obj.second));
+	fn.result->set_int(int(date->second));
 }
 static void date_getyear(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	fn.result->set_int(date->obj.year);
+	fn.result->set_int(date->year);
 }
 
 // TODO: for all these "set" functions, what do we do if sent illegal values?
@@ -633,8 +422,8 @@ static void date_setdate(const fn_call& fn) {
 		log_aserror("Date.setDate needs one argument");
 	    )
 	} else {
-		date->obj.date = (long int)(fn.arg(0).to_number());
-		date->obj.Normalize();
+		date->date = (long int)(fn.arg(0).to_number());
+		date->Normalize();
 	}
 
 	if (fn.nargs > 1) {
@@ -643,7 +432,7 @@ static void date_setdate(const fn_call& fn) {
 	    )
 	}
 
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 
 /// \brief Set year [, month [, date]]
@@ -657,19 +446,19 @@ static void date_setfullyear(const fn_call& fn) {
 		log_aserror("Date.setFullYear needs one argument");
 	    )
 	} else {
-	    date->obj.year = (long int)(fn.arg(0).to_number() - 1900);
+	    date->year = (long int)(fn.arg(0).to_number() - 1900);
 	    if (fn.nargs >= 2)
-		    date->obj.month = (long int)(fn.arg(1).to_number());
+		    date->month = (long int)(fn.arg(1).to_number());
 	    if (fn.nargs >= 3)
-		    date->obj.date = (long int)(fn.arg(2).to_number());
+		    date->date = (long int)(fn.arg(2).to_number());
 	    if (fn.nargs > 3) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setFullYear has more than three arguments");
 		)
 	    }
-	    date->obj.Normalize();
+	    date->Normalize();
 	}
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_sethours(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -680,21 +469,21 @@ static void date_sethours(const fn_call& fn) {
 		log_aserror("Date.setHours needs one argument");
 	    )
 	} else {
-	    date->obj.hour = (long int)(fn.arg(0).to_number());
+	    date->hour = (long int)(fn.arg(0).to_number());
 	    if (fn.nargs >= 2)
-		    date->obj.minute = (long int)(fn.arg(1).to_number());
+		    date->minute = (long int)(fn.arg(1).to_number());
 	    if (fn.nargs >= 3)
-		    date->obj.second = (long int)(fn.arg(2).to_number());
+		    date->second = (long int)(fn.arg(2).to_number());
 	    if (fn.nargs >= 4)
-		    date->obj.millisecond = (long int)(fn.arg(3).to_number());
+		    date->millisecond = (long int)(fn.arg(3).to_number());
 	    if (fn.nargs > 4) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setHours has more than four arguments");
 		)
 	    }
-	    date->obj.Normalize();
+	    date->Normalize();
 	}
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_setmilliseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -705,15 +494,15 @@ static void date_setmilliseconds(const fn_call& fn) {
 		log_aserror("Date.setMilliseconds needs one argument");
 	    )
 	} else {
-	    date->obj.millisecond = (long int)(fn.arg(0).to_number());
+	    date->millisecond = (long int)(fn.arg(0).to_number());
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setMilliseconds has more than one argument");
 		)
 	    }
-	    date->obj.Normalize();
+	    date->Normalize();
 	}
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_setminutes(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -725,17 +514,17 @@ static void date_setminutes(const fn_call& fn) {
 	    )
 	} else {
 	    // Seconds (value between 0 and 59) won't be affected by timezone
-	    date->obj.minute = (long int)(fn.arg(0).to_number());
-	    if (fn.nargs >= 2) date->obj.second = (long int)(fn.arg(1).to_number());
-	    if (fn.nargs >= 3) date->obj.millisecond = (long int)(fn.arg(2).to_number());
+	    date->minute = (long int)(fn.arg(0).to_number());
+	    if (fn.nargs >= 2) date->second = (long int)(fn.arg(1).to_number());
+	    if (fn.nargs >= 3) date->millisecond = (long int)(fn.arg(2).to_number());
 	    if (fn.nargs > 3) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setMinutes has more than three arguments");
 		)
 	    }
-	    date->obj.Normalize();
+	    date->Normalize();
 	}
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_setmonth(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -746,18 +535,18 @@ static void date_setmonth(const fn_call& fn) {
 		log_aserror("Date.setMonth needs one argument");
 	    )
 	} else {
-	    date->obj.month = (long int)(fn.arg(0).to_number());
+	    date->month = (long int)(fn.arg(0).to_number());
 	    if (fn.nargs >= 2)
-		date->obj.date = (long int)(fn.arg(1).to_number());
+		date->date = (long int)(fn.arg(1).to_number());
 	    if (fn.nargs > 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setMonth has more than two arguments");
 		)
 	    }
 
-	    date->obj.Normalize();
+	    date->Normalize();
 	}
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_setseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -769,18 +558,18 @@ static void date_setseconds(const fn_call& fn) {
 	    )
 	} else {
 	    // Seconds (value between 0 and 59) won't be affected by timezone
-	    date->obj.second = (long int)(fn.arg(0).to_number());
+	    date->second = (long int)(fn.arg(0).to_number());
 	    if (fn.nargs >= 2)
-		date->obj.millisecond = (long int)(fn.arg(1).to_number());
+		date->millisecond = (long int)(fn.arg(1).to_number());
 	    if (fn.nargs > 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setSeconds has more than two arguments");
 		)
 	    }
 
-	    date->obj.Normalize();
+	    date->Normalize();
 	}
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_settime(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -792,17 +581,17 @@ static void date_settime(const fn_call& fn) {
 	    )
 	} else {
 	    double millitime = fn.arg(0).to_number();
-	    date->obj.millisecond = (long) fmod(millitime, 1000.0);
+	    date->millisecond = (long) fmod(millitime, 1000.0);
 	    time_t sectime = (time_t) (millitime / 1000.0);
 	    tm *tm = gmtime(&sectime);
-	    date->obj.second = tm->tm_sec;
-	    date->obj.minute = tm->tm_min;
-	    date->obj.hour = tm->tm_hour;
-	    date->obj.date = tm->tm_mday;
-	    date->obj.month = tm->tm_mon;
-	    date->obj.year = tm->tm_year; // No of years since 1900, the same.
+	    date->second = tm->tm_sec;
+	    date->minute = tm->tm_min;
+	    date->hour = tm->tm_hour;
+	    date->date = tm->tm_mday;
+	    date->month = tm->tm_mon;
+	    date->year = tm->tm_year; // No of years since 1900, the same.
 	    
-	    date->obj.Normalize();
+	    date->Normalize();
 	}
 	if (fn.nargs > 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
@@ -810,7 +599,7 @@ static void date_settime(const fn_call& fn) {
 	    )
 	}
 
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_setutcdate(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -821,16 +610,16 @@ static void date_setutcdate(const fn_call& fn) {
 		log_aserror("Date.setUTCDate needs one argument");
 	    )
 	} else {
-	    tm utctime = date->obj.convertUTC();
+	    tm utctime = date->convertUTC();
 	    // Set mday to our new UTC date (yday and wday don't need to be set)
 	    utctime.tm_mday = int(fn.arg(0).to_number());
 
 	    // Convert back from UTC to local time
-	    utctime.tm_min += date->obj.minutesEast;
+	    utctime.tm_min += date->minutesEast;
 
 	    // Normalize the time, then set as this object's new time
 	    time_t newtime = mktime(&utctime);
-	    date->obj.setFromTM(*(localtime(&newtime)));
+	    date->setFromTM(*(localtime(&newtime)));
 
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -839,7 +628,7 @@ static void date_setutcdate(const fn_call& fn) {
 	    }
 	}
 	
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_setutcfullyear(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -850,7 +639,7 @@ static void date_setutcfullyear(const fn_call& fn) {
 		log_aserror("Date.setUTCFullYear needs one argument");
 	    )
 	} else {
-	    tm utctime = date->obj.convertUTC();
+	    tm utctime = date->convertUTC();
 	    // Set year to our new UTC date
 	    utctime.tm_year = int(fn.arg(0).to_number()-1900);
 	    if (fn.nargs >= 2)
@@ -864,14 +653,14 @@ static void date_setutcfullyear(const fn_call& fn) {
 	    }
 
 	    // Convert back from UTC to local time
-	    utctime.tm_min += date->obj.minutesEast;
+	    utctime.tm_min += date->minutesEast;
 
 	    // Normalize the time, then set as this object's new time
 	    time_t newtime = mktime(&utctime);
-	    date->obj.setFromTM(*(localtime(&newtime)));
+	    date->setFromTM(*(localtime(&newtime)));
 	}
 	
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_setutchours(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -885,11 +674,11 @@ static void date_setutchours(const fn_call& fn) {
 
 	    if (fn.nargs >= 4)
 	    {
-		date->obj.millisecond = (long int)(fn.arg(3).to_number());
-		date->obj.Normalize();
+		date->millisecond = (long int)(fn.arg(3).to_number());
+		date->Normalize();
 	    }
 
-	    tm utctime = date->obj.convertUTC();
+	    tm utctime = date->convertUTC();
 	    // Set year to our new UTC date
 	    utctime.tm_hour = int(fn.arg(0).to_number());
 	    if (fn.nargs >= 2)
@@ -903,14 +692,14 @@ static void date_setutchours(const fn_call& fn) {
 	    }
 
 	    // Convert back from UTC to local time
-	    utctime.tm_min += date->obj.minutesEast;
+	    utctime.tm_min += date->minutesEast;
 
 	    // Normalize the time, then set as this object's new time
 	    time_t newtime = mktime(&utctime);
-	    date->obj.setFromTM(*(localtime(&newtime)));
+	    date->setFromTM(*(localtime(&newtime)));
 	}
 	
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_setutcmilliseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -921,16 +710,16 @@ static void date_setutcmilliseconds(const fn_call& fn) {
 		log_aserror("Date.setUTCMilliseconds needs one argument");
 	    )
 	} else {
-	    date->obj.millisecond = (long int)(fn.arg(0).to_number());
+	    date->millisecond = (long int)(fn.arg(0).to_number());
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setUTCMilliseconds has more than one argument");
 		)
 	    }
 
-	    date->obj.Normalize();
+	    date->Normalize();
 	}
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_setutcminutes(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -942,9 +731,9 @@ static void date_setutcminutes(const fn_call& fn) {
 	    )
 	} else {
 	    // Seconds (value between 0 and 59) won't be affected by timezone
-	    date->obj.minute = (long int)(fn.arg(0).to_number());
-	    if (fn.nargs >= 2) date->obj.second = (long int)(fn.arg(1).to_number());
-	    if (fn.nargs >= 3) date->obj.millisecond = (long int)(fn.arg(2).to_number());
+	    date->minute = (long int)(fn.arg(0).to_number());
+	    if (fn.nargs >= 2) date->second = (long int)(fn.arg(1).to_number());
+	    if (fn.nargs >= 3) date->millisecond = (long int)(fn.arg(2).to_number());
 	    if (fn.nargs > 3) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setUTCMinutes has more than three arguments");
@@ -954,12 +743,12 @@ static void date_setutcminutes(const fn_call& fn) {
 	    // Setting milliseconds to less than 0 or more than 999 affects seconds
 
 	    // TODO: both of these lines are wrong for negative values
-	    date->obj.second += date->obj.millisecond / 1000;
-	    date->obj.millisecond = date->obj.millisecond % 1000;
+	    date->second += date->millisecond / 1000;
+	    date->millisecond = date->millisecond % 1000;
 
-	    date->obj.Normalize();
+	    date->Normalize();
 	}
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_setutcmonth(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -970,7 +759,7 @@ static void date_setutcmonth(const fn_call& fn) {
 		log_aserror("Date.setUTCMonth needs one argument");
 	    )
 	} else {
-	    tm utctime = date->obj.convertUTC();
+	    tm utctime = date->convertUTC();
 	    // Set year to our new UTC date
 	    utctime.tm_mon = int(fn.arg(0).to_number());
 	    if (fn.nargs >= 2)
@@ -982,13 +771,13 @@ static void date_setutcmonth(const fn_call& fn) {
 	    }
 
 	    // Convert back from UTC to local time
-	    utctime.tm_min += date->obj.minutesEast;
+	    utctime.tm_min += date->minutesEast;
 
 	    // Normalize the time, then set as this object's new time
 	    time_t newtime = mktime(&utctime);
-	    date->obj.setFromTM(*(localtime(&newtime)));
+	    date->setFromTM(*(localtime(&newtime)));
 	}
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 static void date_setutcseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -1000,18 +789,18 @@ static void date_setutcseconds(const fn_call& fn) {
 	    )
 	} else {
 	    // Seconds (value between 0 and 59) won't be affected by timezone
-	    date->obj.second = (long int)(fn.arg(0).to_number());
+	    date->second = (long int)(fn.arg(0).to_number());
 	    if (fn.nargs >= 2)
-		date->obj.millisecond = (long int)(fn.arg(1).to_number());
+		date->millisecond = (long int)(fn.arg(1).to_number());
 	    if (fn.nargs > 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setUTCSeconds has more than two arguments");
 		)
 	    }
 
-	    date->obj.Normalize();
+	    date->Normalize();
 	}
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 
 // If year is an integer between 0-99, setYear sets the year at 1900 + year;
@@ -1025,17 +814,17 @@ static void date_setyear(const fn_call& fn) {
 		log_aserror("Date.setYear needs one argument");
 	    )
 	} else {
-	    date->obj.year = (long int)(fn.arg(0).to_number());
-	    if (date->obj.year < 100) date->obj.year += 1900;
+	    date->year = (long int)(fn.arg(0).to_number());
+	    if (date->year < 100) date->year += 1900;
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setYear has more than two arguments");
 		)
 	    }
 
-	    date->obj.Normalize();
+	    date->Normalize();
 	}
-	fn.result->set_double(date->obj.getTime());
+	fn.result->set_double(date->getTime());
 }
 
 static void date_tostring(const fn_call& fn) {
@@ -1049,9 +838,9 @@ static void date_tostring(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	snprintf((char *)&buffer,128,"%s %s %2ld %.2ld:%.2ld:%.2ld %ld",
-		dayweekname[date->obj.dayWeek],monthname[date->obj.month],
-		date->obj.date,date->obj.hour,date->obj.minute,date->obj.second,
-		1900+date->obj.year);
+		dayweekname[date->dayWeek],monthname[date->month],
+		date->date,date->hour,date->minute,date->second,
+		1900+date->year);
 
 	fn.result->set_string((char *)&buffer);
 }
