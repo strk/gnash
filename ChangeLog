@@ -1,3 +1,8 @@
+2007-02-01 Martin Guy <martinwguy@yahoo.it>
+
+	* server/Date.cpp: Add date_utc unimplemenrted stub for
+	  ActionScript Date.UTC method
+
 2007-02-01  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Use the new KDE and QT macros.

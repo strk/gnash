@@ -342,6 +342,7 @@ date_new(const fn_call& fn)
 	date_obj->init_member("setUTCSeconds", &date_setutcseconds);
 	date_obj->init_member("setYear", &date_setyear);
 	date_obj->init_member("toString", &date_tostring);
+	date_obj->init_member("UTC", &date_utc);
 
 	struct tm *ti;
 	if (fn.nargs == 0) {
@@ -914,6 +915,11 @@ void date_tostring(const fn_call& fn) {
 		1900+date->obj.year);
 
 	fn.result->set_string((char *)&buffer);
+}
+
+// This should be a static method - not quite sure what that means...
+void date_utc(const fn_call& fn) {
+	log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
 } // end of gnash namespace
