@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.44 2007/01/23 16:41:27 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.45 2007/02/02 15:01:17 bjacques Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,6 +32,8 @@
 #include <vector>
 #include <SDL.h>
 
+using namespace boost;
+
 static void sdl_audio_callback(void *udata, Uint8 *stream, int len); // SDL C audio handler
 
 SDL_sound_handler::SDL_sound_handler()
@@ -39,9 +41,6 @@ SDL_sound_handler::SDL_sound_handler()
 		soundsPlaying(0),
 		muted(false)
 {
-	// Init mutex
-	pthread_mutex_init(&mutex , NULL);
-
 	// This is our sound settings
 	audioSpec.freq = 44100;
 	audioSpec.format = AUDIO_S16SYS; // AUDIO_S8 AUDIO_U8;
@@ -59,7 +58,6 @@ SDL_sound_handler::~SDL_sound_handler()
 		delete_sound(i);
 	}
 	if (soundOpened) SDL_CloseAudio();
-	pthread_mutex_destroy(&mutex);
 }
 
 
@@ -90,7 +88,7 @@ int	SDL_sound_handler::create_sound(
 	int16_t*	adjusted_data = 0;
 	int	adjusted_size = 0;
 
-	pthread_mutex_lock(&mutex);
+        mutex::scoped_lock lock(_mutex);
 
 	switch (format)
 	{
@@ -100,7 +98,6 @@ int	SDL_sound_handler::create_sound(
 			convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 1, sample_rate, stereo);
 			if (!adjusted_data) {
 				gnash::log_error("Some kind of error with raw sound data\n");
-				pthread_mutex_unlock(&mutex);
 				return -1;
 			}
 			sounddata->data_size = adjusted_size;
@@ -114,7 +111,6 @@ int	SDL_sound_handler::create_sound(
 			convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 2, sample_rate, stereo);
 			if (!adjusted_data) {
 				gnash::log_error("Some kind of error with adpcm sound data\n");
-				pthread_mutex_unlock(&mutex);
 				return -1;
 			}
 			sounddata->data_size = adjusted_size;
@@ -127,14 +123,12 @@ int	SDL_sound_handler::create_sound(
 #ifndef USE_FFMPEG
 #ifndef USE_MAD
 		gnash::log_warning("gnash has not been compiled to handle mp3 audio\n");
-		pthread_mutex_unlock(&mutex);
 		return -1;
 #endif
 #endif
 		sounddata->data = new Uint8[data_bytes];
 		if (!sounddata->data) {
 			gnash::log_error("could not allocate space for data in soundhandler\n");
-			pthread_mutex_unlock(&mutex);
 			return -1;
 		}
 		memcpy(sounddata->data, data, data_bytes);
@@ -143,14 +137,11 @@ int	SDL_sound_handler::create_sound(
 	default:
 		// Unhandled format.
 		gnash::log_error("unknown format sound requested; gnash does not handle it\n");
-		pthread_mutex_unlock(&mutex);
 		return -1; // Unhandled format, set to NULL.
 	}
 
 	m_sound_data.push_back(sounddata);
 	int sound_id = m_sound_data.size()-1;
-
-	pthread_mutex_unlock(&mutex);
 
 	return sound_id;
 
@@ -160,11 +151,10 @@ int	SDL_sound_handler::create_sound(
 long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_count, int handle_id)
 {
 
-	pthread_mutex_lock(&mutex);
+	mutex::scoped_lock lock(_mutex);
 	// @@ does a negative handle_id have any meaning ?
 	//    should we change it to unsigned instead ?
 	if (handle_id < 0 || (unsigned int) handle_id+1 > m_sound_data.size()) {
-		pthread_mutex_unlock(&mutex);
 		return 1;
 	}
 	int start_size = 0;
@@ -179,7 +169,6 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 		convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 2, sounddata->sample_rate, sounddata->stereo);
 		if (!adjusted_data || adjusted_size < 1) {
 			gnash::log_error("Some kind of error with re-formating sound data\n");
-			pthread_mutex_unlock(&mutex);
 			return -1;
 		}
 		adjusted_data = static_cast<int16_t*>(data);
@@ -227,8 +216,6 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 		gnash::log_error("Behavior for this audio codec is unknown. Please send this SWF to the developers\n");
 	}
 
-	pthread_mutex_unlock(&mutex);
-
 	return start_size;
 }
 
@@ -236,13 +223,12 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long start_position, std::vector<sound_envelope>* envelopes)
 // Play the index'd sample.
 {
-	pthread_mutex_lock(&mutex);
+	mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists, or if audio is muted
 	if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= m_sound_data.size() || muted)
 	{
 		// Invalid handle or muted
-		pthread_mutex_unlock(&mutex);
 		return;
 	}
 
@@ -252,7 +238,6 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	// sound isn't already playing. If a active_sound-struct is existing we
 	// assume it is also playing.
 	if (start_position > 0 && sounddata->m_active_sounds.size() > 0) {
-		pthread_mutex_unlock(&mutex);
 		return;
 	}
 
@@ -290,7 +275,6 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 		if (!sound->codec) {
 			gnash::log_error("Your FFMPEG can't decode MP3?!\n");
-			pthread_mutex_unlock(&mutex);
 			return;
 		}
 
@@ -319,7 +303,6 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
 			gnash::log_error("Unable to START SOUND: %s\n", SDL_GetError());
-			pthread_mutex_unlock(&mutex);
 			return;
 		}
 		soundOpened = true;
@@ -333,14 +316,12 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 		SDL_PauseAudio(0);
 	}
 
-	pthread_mutex_unlock(&mutex);
-
 }
 
 
 void	SDL_sound_handler::stop_sound(int sound_handle)
 {
-	pthread_mutex_lock(&mutex);
+	mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
@@ -375,7 +356,6 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 			}
 		}
 	}
-	pthread_mutex_unlock(&mutex);
 
 }
 
@@ -383,13 +363,12 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 void	SDL_sound_handler::delete_sound(int sound_handle)
 // this gets called when it's done with a sample.
 {
-	pthread_mutex_lock(&mutex);
+	mutex::scoped_lock lock(_mutex);
 
 	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < m_sound_data.size())
 	{
 		delete[] m_sound_data[sound_handle]->data;
 	}
-	pthread_mutex_unlock(&mutex);
 
 }
 
@@ -398,7 +377,7 @@ void	SDL_sound_handler::delete_sound(int sound_handle)
 // for what sounds is associated with what SWF.
 void	SDL_sound_handler::stop_all_sounds()
 {
-	pthread_mutex_lock(&mutex);
+	mutex::scoped_lock lock(_mutex);
 
 	int32_t num_sounds = (int32_t) m_sound_data.size()-1;
 	for (int32_t j = num_sounds; j > -1; j--) {//Optimized
@@ -429,7 +408,6 @@ void	SDL_sound_handler::stop_all_sounds()
 			}
 		}
 	}
-	pthread_mutex_unlock(&mutex);
 }
 
 
@@ -437,7 +415,7 @@ void	SDL_sound_handler::stop_all_sounds()
 //	where 0 is off and 100 is full volume. The default setting is 100.
 int	SDL_sound_handler::get_volume(int sound_handle) {
 
-	pthread_mutex_lock(&mutex);
+	mutex::scoped_lock lock(_mutex);
 
 	int ret;
 	// Check if the sound exists.
@@ -447,7 +425,6 @@ int	SDL_sound_handler::get_volume(int sound_handle) {
 	} else {
 		ret = 0; // Invalid handle
 	}
-	pthread_mutex_unlock(&mutex);
 	return ret;
 }
 
@@ -456,7 +433,7 @@ int	SDL_sound_handler::get_volume(int sound_handle) {
 //	100 is full volume and 0 is no volume. The default setting is 100.
 void	SDL_sound_handler::set_volume(int sound_handle, int volume) {
 
-	pthread_mutex_lock(&mutex);
+	mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= m_sound_data.size())
@@ -467,14 +444,13 @@ void	SDL_sound_handler::set_volume(int sound_handle, int volume) {
 		// Set volume for this sound. Should this only apply to the active sounds?
 		m_sound_data[sound_handle]->volume = volume;
 	}
-	pthread_mutex_unlock(&mutex);
 
 
 }
 	
 void SDL_sound_handler::get_info(int sound_handle, int* format, bool* stereo) {
 
-	pthread_mutex_lock(&mutex);
+	mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < m_sound_data.size())
@@ -483,7 +459,6 @@ void SDL_sound_handler::get_info(int sound_handle, int* format, bool* stereo) {
 		*stereo = m_sound_data[sound_handle]->stereo;
 	}
 
-	pthread_mutex_unlock(&mutex);
 }
 
 // gnash calls this to mute audio
@@ -518,7 +493,6 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
 			gnash::log_error("Unable to START SOUND: %s\n", SDL_GetError());
-			pthread_mutex_unlock(&mutex);
 			return;
 		}
 		soundOpened = true;
@@ -766,7 +740,7 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 		return;
 	}
 
-	pthread_mutex_lock(&handler->mutex);
+	mutex::scoped_lock lock(handler->_mutex);
 
 	// Mixed sounddata buffer
 	Uint8* buffer = stream;
@@ -790,11 +764,10 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 			SDL_MixAudio(stream, buf, buffer_length, SDL_MIX_MAXVOLUME);
 
 		}
-		delete buf;
+		delete [] buf;
 	}
 
 #ifdef WIN32	// hack
-	pthread_mutex_unlock(&handler->mutex);
 	return;
 #endif
 
@@ -1043,7 +1016,6 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 
 		}
 	}
-	pthread_mutex_unlock(&handler->mutex);
 
 }
 

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.14 2007/01/18 11:53:37 tgc Exp $
+// $Id: sound_handler_sdl.h,v 1.15 2007/02/02 15:01:17 bjacques Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -32,7 +32,9 @@
 #include <vector>
 
 #include <SDL_audio.h>
-#include <pthread.h>
+#include <boost/thread/thread.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread/mutex.hpp>
 
 /// Used to hold the info about active sounds
 class active_sound
@@ -161,7 +163,7 @@ public:
 	bool muted;
 	
 	/// Mutex for making sure threads doesn't mess things up
-	pthread_mutex_t mutex;
+	boost::mutex _mutex;
 
 	SDL_sound_handler();
 	virtual ~SDL_sound_handler();
