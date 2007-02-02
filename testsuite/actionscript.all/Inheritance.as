@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.22 2007/02/02 10:38:13 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.23 2007/02/02 11:36:57 strk Exp $";
 
 #include "check.as"
 
@@ -193,9 +193,9 @@ check_equals(SubObj1.prototype.constructor.__proto__.constructor, Function);
 // see check.as
 #ifdef MING_SUPPORTS_ASM_EXTENDS
 
-function BaseClass1() {}
+function BaseClass1() { this.baseClassCtorCalled = 1; }
 BaseClass1.prototype.var1 = "var_in_Base_prototype";
-function DerivedClass1() {}
+function DerivedClass1() { this.derivedClassCtorCalled = 1; }
 asm {
 	push "DerivedClass1"
 	getvariable
@@ -205,6 +205,11 @@ asm {
 };
 DerivedClass1.prototype.var2 = "var_in_Derived_prototype";
 var obj = new DerivedClass1;
+check_equals(obj.derivedClassCtorCalled, 1);
+// constructor of 'super' is not automatically called
+// add 'super();' in DerivedClass1 function and see
+// the difference
+check_equals(obj.baseClassCtorCalled, undefined);
 check(obj instanceOf DerivedClass1);
 check(obj instanceOf BaseClass1);
 check_equals(obj.__proto__, DerivedClass1.prototype);
@@ -271,3 +276,9 @@ var b = t4.die(4);
 check_equals(typeof(b), 'undefined');
 
 
+//------------------------------------------------------
+// Test constructors chain calling
+//------------------------------------------------------
+
+function BaseClass() { this.x = 3; }
+function DerivedClass() { this.x += 1; }
