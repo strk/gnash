@@ -75,6 +75,8 @@ namespace gnash {
 
 // Forward declarations
 static as_object* getMovieClipInterface();
+static void attachMovieClipInterface(as_object& o);
+static void attachMovieClipProperties(as_object& o);
 
 // Initialize unnamed instance count
 unsigned int sprite_instance::_lastUnnamedInstanceNum=0;
@@ -111,19 +113,6 @@ ensure_sprite(as_object* obj)
 	if ( ! ret )
 	{
 		throw ActionException("builtin method or gettersetter for sprite objects called against non-sprite instance");
-	}
-	return ret;
-}
-
-// Wrapper around dynamic_cast to implement user warning.
-// To be used by builtin properties and methods.
-static character*
-ensure_character(as_object* obj)
-{
-	character* ret = dynamic_cast<character*>(obj);
-	if ( ! ret )
-	{
-		throw ActionException("builtin method or gettersetter for character objects called against non-character instance");
 	}
 	return ret;
 }
@@ -183,6 +172,7 @@ static void sprite_attach_movie(const fn_call& fn)
 
 	// Get exported resource 
 	std::string id_name = fn.arg(0).to_std_string();
+
 	boost::intrusive_ptr<resource> exported = sprite->get_movie_definition()->get_exported_resource(id_name.c_str());
 	if ( exported == NULL )
 	{
@@ -213,11 +203,22 @@ static void sprite_attach_movie(const fn_call& fn)
 
 	boost::intrusive_ptr<character> newch = exported_movie->create_character_instance(sprite, depth_val);
 	assert( dynamic_cast<sprite_instance*>(newch.get()) );
+	assert( newch.get() > (void*)0xFFFF );
+	assert(newch->get_ref_count() > 0);
 
-	if (! sprite->attachCharacter(*newch, depth_val, newname) )
+	newch->set_name(newname.c_str());
+
+	// place_character() will set depth on newch
+	if ( ! sprite->attachCharacter(*newch, depth_val) )
 	{
+		log_error("Could not attach character at depth %d", depth_val);
 		return;
 	}
+
+	// MOVE THIS CODE TO dlist.cpp, and have sprite_instance::construct
+	// call execute_frame_tags(0, false)
+	//sprite_instance* newsprite = dynamic_cast<sprite_instance*>(newch.get());
+	//if ( newsprite ) newsprite->construct();
 
 	newch->setDynamic();
 
@@ -868,6 +869,7 @@ static void
 movieclip_ctor(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> clip = new as_object(getMovieClipInterface());
+	attachMovieClipProperties(*clip);
 	fn.result->set_as_object(clip.get());
 }
 
@@ -1092,6 +1094,7 @@ sprite_soundbuftime_getset(const fn_call& fn)
 
 #endif // ndef OLD_GET_MEMBER
 
+/// Properties (and/or methods) *inherited* by MovieClip instances
 static void
 attachMovieClipInterface(as_object& o)
 {
@@ -1099,7 +1102,57 @@ attachMovieClipInterface(as_object& o)
 
 	boost::intrusive_ptr<builtin_function> gettersetter;
 
-#ifndef OLD_GET_MEMBER
+	// SWF5 or higher
+	o.init_member("attachMovie", &sprite_attach_movie);
+	o.init_member("play", &sprite_play);
+	o.init_member("stop", &sprite_stop);
+	o.init_member("gotoAndStop", &sprite_goto_and_stop);
+	o.init_member("gotoAndPlay", &sprite_goto_and_play);
+	o.init_member("nextFrame", &sprite_next_frame);
+	o.init_member("prevFrame", &sprite_prev_frame);
+	o.init_member("getBytesLoaded", &sprite_get_bytes_loaded);
+	o.init_member("getBytesTotal", &sprite_get_bytes_total);
+	o.init_member("loadMovie", &sprite_load_movie);
+	o.init_member("hitTest", &sprite_hit_test);
+	o.init_member("duplicateMovieClip", &sprite_duplicate_movieclip);
+	o.init_member("swapDepths", &sprite_swap_depths);
+	o.init_member("removeMovieClip", &sprite_remove_movieclip);
+	o.init_member("startDrag", &sprite_startDrag);
+	o.init_member("stopDrag", &sprite_stopDrag);
+	o.init_member("getURL", &sprite_getURL);
+	o.init_member("getBounds", &sprite_getBounds);
+	o.init_member("globalToLocal", &sprite_globalToLocal);
+	if ( target_version  < 6 ) return;
+
+	// SWF6 or higher
+	o.init_member("beginFill", &sprite_beginFill);
+	o.init_member("beginGradientFill", &sprite_beginGradientFill);
+	o.init_member("clear", &sprite_clear);
+	o.init_member("curveTo", &sprite_curveTo);
+	o.init_member("lineStyle", &sprite_lineStyle);
+	o.init_member("lineTo", &sprite_lineTo);
+	o.init_member("endFill", &sprite_endFill);
+	o.init_member("attachAudio", &sprite_attach_audio);
+	o.init_member("createTextField", &sprite_create_text_field);
+	o.init_member("getDepth", &sprite_get_depth);
+	o.init_member("createEmptyMovieClip", &sprite_create_empty_movieclip);
+	if ( target_version  < 7 ) return;
+
+	// SWF7 or higher
+	o.init_member("getNextHighestDepth", &sprite_getNextHighestDepth);
+	if ( target_version  < 8 ) return;
+
+	// TODO: many more methods, see MovieClip class ...
+
+}
+
+/// Properties (and/or methods) attached to every *instance* of a MovieClip 
+static void
+attachMovieClipProperties(as_object& o)
+{
+	//int target_version = o.getVM().getSWFVersion();
+
+	boost::intrusive_ptr<builtin_function> gettersetter;
 
 	//
 	// Properties (TODO: move to appropriate SWF version section)
@@ -1179,50 +1232,6 @@ attachMovieClipInterface(as_object& o)
 
 	gettersetter = new builtin_function(&character::onload_getset, NULL);
 	o.init_property("onLoad", *gettersetter, *gettersetter);
-
-#endif // ndef OLD_GET_MEMBER
-
-	// SWF5 or higher
-	o.init_member("attachMovie", &sprite_attach_movie);
-	o.init_member("play", &sprite_play);
-	o.init_member("stop", &sprite_stop);
-	o.init_member("gotoAndStop", &sprite_goto_and_stop);
-	o.init_member("gotoAndPlay", &sprite_goto_and_play);
-	o.init_member("nextFrame", &sprite_next_frame);
-	o.init_member("prevFrame", &sprite_prev_frame);
-	o.init_member("getBytesLoaded", &sprite_get_bytes_loaded);
-	o.init_member("getBytesTotal", &sprite_get_bytes_total);
-	o.init_member("loadMovie", &sprite_load_movie);
-	o.init_member("hitTest", &sprite_hit_test);
-	o.init_member("duplicateMovieClip", &sprite_duplicate_movieclip);
-	o.init_member("swapDepths", &sprite_swap_depths);
-	o.init_member("removeMovieClip", &sprite_remove_movieclip);
-	o.init_member("startDrag", &sprite_startDrag);
-	o.init_member("stopDrag", &sprite_stopDrag);
-	o.init_member("getURL", &sprite_getURL);
-	o.init_member("getBounds", &sprite_getBounds);
-	o.init_member("globalToLocal", &sprite_globalToLocal);
-	if ( target_version  < 6 ) return;
-
-	// SWF6 or higher
-	o.init_member("beginFill", &sprite_beginFill);
-	o.init_member("beginGradientFill", &sprite_beginGradientFill);
-	o.init_member("clear", &sprite_clear);
-	o.init_member("curveTo", &sprite_curveTo);
-	o.init_member("lineStyle", &sprite_lineStyle);
-	o.init_member("lineTo", &sprite_lineTo);
-	o.init_member("endFill", &sprite_endFill);
-	o.init_member("attachAudio", &sprite_attach_audio);
-	o.init_member("createTextField", &sprite_create_text_field);
-	o.init_member("getDepth", &sprite_get_depth);
-	o.init_member("createEmptyMovieClip", &sprite_create_empty_movieclip);
-	if ( target_version  < 7 ) return;
-
-	// SWF7 or higher
-	o.init_member("getNextHighestDepth", &sprite_getNextHighestDepth);
-	if ( target_version  < 8 ) return;
-
-	// TODO: many more methods, see MovieClip class ...
 
 }
 
@@ -1409,25 +1418,16 @@ sprite_instance::sprite_instance(
 	assert(m_def != NULL);
 	assert(m_root != NULL);
 
-	if ( registerClass )
-	{
-		attachMovieClipInterface(*this);
-		// TODO: call the constructor ?
-		as_object* proto = registerClass->getPrototype();
-		log_msg("registerClass prototype : %p", proto);
-		copyProperties(*proto);
-		set_prototype(proto);
-	}
-	else
-	{
-		set_prototype(getMovieClipInterface());
-	}
+	set_prototype(getMovieClipInterface());
 			
 	//m_root->add_ref();	// @@ circular!
 	m_as_environment.set_target(this);
 
 	// Initialize the flags for init action executed.
 	m_init_actions_executed.assign(m_def->get_frame_count(), false);
+
+	// TODO: have the 'MovieClip' constructor take care of this !
+	attachMovieClipProperties(*this);
 
 }
 
@@ -1902,7 +1902,6 @@ void sprite_instance::clone_display_object(const std::string& name,
 	}
 }
 
-#if 1
 void sprite_instance::remove_display_object(const tu_string& name_tu)
 {
 //	    GNASH_REPORT_FUNCTION;
@@ -1917,7 +1916,6 @@ void sprite_instance::remove_display_object(const tu_string& name_tu)
 	    remove_display_object(ch->get_depth(), ch->get_id());
 	}
 }
-#endif
 
 bool sprite_instance::on_event(const event_id& id)
 {
@@ -2792,9 +2790,8 @@ void sprite_instance::swap_characters(character* ch1, character* ch2)
 }
 
 bool
-sprite_instance::attachCharacter(character& newch, uint16_t depth, std::string& name)
+sprite_instance::attachCharacter(character& newch, uint16_t depth)
 {
-	newch.set_name(name.c_str());
 
 	// place_character() will set depth on newch
 	m_display_list.place_character(
@@ -3410,6 +3407,43 @@ sprite_instance::get_text_value() const
 		if ( _target_dot[i] == '/' ) _target_dot[i] = '.';
 	}
 	return _target_dot.c_str();
+}
+
+// WARNING: THIS SNIPPET NEEDS THE CHARACTER TO BE "INSTANTIATED", which is
+//          it's target path needs to exist, or any as_value for it will be
+//          a dangling reference to an unexistent sprite !
+void
+sprite_instance::construct()
+{
+	on_event(event_id::CONSTRUCT);
+	execute_frame_tags(0, false);	
+
+	sprite_definition* def = dynamic_cast<sprite_definition*>(m_def.get());
+
+	// We won't "construct" top-level movies
+	if ( ! def ) return;
+
+	// instance name will be needed for properly setting up
+	// a reference to 'this' object.
+	assert(!_name.empty());
+
+	as_function* ctor = def->getRegisteredClass();
+	log_msg("Attached sprite's registered class is %p", (void*)ctor); 
+
+	// TODO: builtin constructors are different from user-defined ones
+	// we should likely change that. See also vm/ASHandlers.cpp (construct_object)
+	if ( ctor && ! ctor->isBuiltin() )
+	{
+		// Set the new prototype *after* the constructor was called
+		as_object* proto = ctor->getPrototype();
+		set_prototype(proto);
+
+		log_msg("Calling the user-defined constructor against this sprite_instance");
+		as_value ret; // we don't use the constructor return (should we?)
+		fn_call call(&ret, this, &(get_environment()), 0, 0);
+		(*ctor)(call);
+
+	}
 }
 
 void

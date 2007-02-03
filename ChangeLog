@@ -1,5 +1,14 @@
 2007-02-03 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.cpp: call character::construct() everytime an object
+	  is placed on stage, making the code much more readable and clean
+	  (IMHO).
+	* server/sprite_instance.{h,cpp}: implement 'construct' method
+	  to take care of properly handling user-defined registered
+	  classes for sprites and to execute tags in frame0; attach
+	  properties to *instances* rather then to the MovieClip
+	  exported interface.
+	* server/character.h: add a 'construct' method.
 	* testsuite/misc-ming.all/: registerClassTest.c,
 	  registerClassTestRunner.cpp: add new tests, a fix
 	  for gnash will follow shortly.

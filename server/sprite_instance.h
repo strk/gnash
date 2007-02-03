@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.60 2007/02/02 10:07:50 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.61 2007/02/03 23:02:07 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -355,15 +355,27 @@ public:
 	/// @param depth
 	///	The depth to assign to the instance.
 	///
-	/// @param name
-	///	The name to assign to the instance.
-	///
 	/// @return true on success, false on failure
 	///	FIXME: currently never returns false !
 	///
-	bool attachCharacter(character& newch, uint16_t depth,
-			std::string& name);
+	bool attachCharacter(character& newch, uint16_t depth);
 
+	/// Construct this instance as an ActionScript object.
+	//
+	/// This function must be called when the sprite is placed on
+	/// stage for the first time. It will take care of invoking
+	/// the constructor of its associated class, either MovieClip
+	/// or any user-specified one (see sprite_definition::registerClass).
+	///
+	/// Make sure this sprite got an instance name before calling
+	/// this method (it's needed for properly setting the "this" pointer
+	/// when calling user-defined constructors).
+	///
+	/// TODO: check if we only need to construct "named" instances
+	/// TODO: consider moving this function up to the 'character' class.
+	/// TODO: possibly have this function call the onConstruct() event handler
+	///
+	void construct();
 
 	/// Updates the transform properties of the object at
 	/// the specified depth.

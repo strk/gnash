@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.44 2007/02/02 10:07:50 strk Exp $ */
+/* $Id: character.h,v 1.45 2007/02/03 23:02:07 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -549,6 +549,21 @@ public:
 	///
 	virtual void get_invalidated_bounds(rect* bounds, bool force) = 0;
 
+	/// Construct this instance as an ActionScript object.
+	//
+	/// This function must be called when the character is placed on
+	/// stage for the first time. It will take care of invoking
+	/// the constructor of its associated class and calling the
+	/// 'onConstruct' event handler.
+	///
+	/// Make sure this instance got an instance name before calling
+	/// this method (it's needed for properly setting the "this" pointer
+	/// when calling user-defined constructors).
+	///
+	virtual void construct()
+	{
+		on_event(event_id::CONSTRUCT);
+	}
 
 	
 };

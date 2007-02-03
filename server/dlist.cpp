@@ -210,10 +210,8 @@ DisplayList::place_character(
 		*it = DisplayItem(ch);
 	}
 
-	ch->on_event(event_id::CONSTRUCT);
-
-	sprite_instance* sprite_ch = ch->to_movie();
-	if ( sprite_ch ) sprite_ch->execute_frame_tags(0, false);	
+	// Give life to this instance
+	ch->construct();
 }
 
 void
@@ -284,9 +282,8 @@ DisplayList::replace_character(
 		// add the new char
 		_characters.insert(it, di);
 
-		ch->on_event(event_id::CONSTRUCT);
-		sprite_instance* sprite_ch = ch->to_movie();
-		if ( sprite_ch ) sprite_ch->execute_frame_tags(0, false);	
+		// Give life to this instance
+		ch->construct();
 	}
 	else
 	{
@@ -304,6 +301,9 @@ DisplayList::replace_character(
 
 		// replace existing char
 		*it = di;
+
+		// Shouldn't we construct the new object here too ?
+		//ch->construct();
 	}
 
 }
