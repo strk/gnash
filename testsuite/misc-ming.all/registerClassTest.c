@@ -24,8 +24,10 @@
  * 2) attach it to main timeline 
  * 3) register a custom class to it
  * 4) attach it again (expected to have the custom class interface)
- * 4) register another custom class to it, this time deriving from MovieClip
- * 5) attach it again (expected to be both instance of custom class and instance of MovieClip)
+ * 5) register another custom class to it, this time deriving from MovieClip
+ * 6) attach it again (expected to be both instance of custom class and instance of MovieClip)
+ * 7) call registerClass again, this time with an *single* argument
+ * 8) attach it again (expected to be instance of of MovieClip)
  *
  * run as ./registerClass
  */
@@ -146,6 +148,20 @@ main(int argc, char** argv)
 
 	SWFMovie_nextFrame(mo); /* end of frame4 */
 
+	add_actions(mo,
+		"Object.registerClass('redsquare');"
+		);
+
+	add_actions(mo,
+		"var name4 = 'square'+counter;"
+		"attachMovie('redsquare', name4, 70+counter);"
+		"var clip4 = this[name4];"
+		"clip4._x = 240;"
+		"counter++;"
+		);
+
+	SWFMovie_nextFrame(mo); /* end of frame5 */
+
 	check_equals(mo, "typeof(clip1)", "'movieclip'");
 	check(mo, "clip1 instanceOf MovieClip");
 	check_equals(mo, "clip1._x", "0");
@@ -153,13 +169,18 @@ main(int argc, char** argv)
 
 	check_equals(mo, "typeof(clip2)", "'movieclip'");
 	check(mo, "clip2 instanceOf CustomClass");
-	xcheck_equals(mo, "clip2._x", "80");
+	check_equals(mo, "clip2._x", "80");
+	check_equals(mo, "typeof(clip2.lineTo)", "'undefined'");
 	check(mo, "! clip2 instanceOf MovieClip");
 
 	check_equals(mo, "typeof(clip3)", "'movieclip'");
-	xcheck_equals(mo, "clip3._x", "160");
+	check_equals(mo, "clip3._x", "160");
 	check(mo, "clip3 instanceOf CustomClass2");
 	check(mo, "clip3 instanceOf MovieClip");
+
+	check_equals(mo, "typeof(clip4)", "'movieclip'");
+	check_equals(mo, "clip4._x", "240");
+	check(mo, "clip4 instanceOf MovieClip");
 
 	add_actions(mo,
 		"totals();"

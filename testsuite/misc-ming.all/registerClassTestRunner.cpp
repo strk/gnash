@@ -45,7 +45,7 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
-	check_equals(root->get_frame_count(), 5);
+	check_equals(root->get_frame_count(), 6);
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 
@@ -75,7 +75,7 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(30, 30);
 	check(tester.isMouseOverMouseEntity());
 	tester.movePointerTo(100, 30);
-	xcheck(tester.isMouseOverMouseEntity());
+	check(tester.isMouseOverMouseEntity());
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 3);
@@ -87,14 +87,26 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(30, 30);
 	check(tester.isMouseOverMouseEntity());
 	tester.movePointerTo(100, 30);
-	xcheck(tester.isMouseOverMouseEntity());
+	check(tester.isMouseOverMouseEntity());
 	tester.movePointerTo(170, 30);
-	xcheck(tester.isMouseOverMouseEntity());
+	check(tester.isMouseOverMouseEntity());
 
 	tester.advance();
 	check_equals(root->get_current_frame(), 4);
 
+	tester.movePointerTo(30, 30);
+	check(tester.isMouseOverMouseEntity());
+	tester.movePointerTo(100, 30);
+	check(tester.isMouseOverMouseEntity());
+	tester.movePointerTo(170, 30);
+	check(tester.isMouseOverMouseEntity());
+	tester.movePointerTo(240, 30);
+	check(tester.isMouseOverMouseEntity());
+
 	tester.advance();
-	check_equals(root->get_current_frame(), 4); // we should be in stop mode
+	check_equals(root->get_current_frame(), 5);
+
+	tester.advance();
+	check_equals(root->get_current_frame(), 5); // we should be in stop mode
 }
 
