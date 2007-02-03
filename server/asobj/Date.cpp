@@ -409,7 +409,7 @@ date_get_proto(date_getseconds, localtime, tm_sec)
 
 static void date_getmilliseconds(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
-	fn.result->set_int((int) fmod(date->value, 1000.0));
+	fn.result->set_int((int) std::fmod(date->value, 1000.0));
 }
 
 // The same functions for universal time.
@@ -521,7 +521,7 @@ static void
 local_date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec)
 {
 	time_t t = (time_t)(date->value / 1000.0);
-	msec = fmod(date->value, 1000.0);
+	msec = std::fmod(date->value, 1000.0);
 	_localtime_r(&t, &tm);	// break out date/time elements
 }
 
@@ -550,7 +550,7 @@ local_tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date)
 static void
 utc_date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec)
 {
-	msec = fmod(date->value, 1000.0);
+	msec = std::fmod(date->value, 1000.0);
 	time_t t = (time_t)(date->value / 1000.0);
 
 	_gmtime_r(&t, &tm);
@@ -868,7 +868,7 @@ static void date_setmilliseconds(const fn_call& fn) {
 	    )
 	} else {
 	    // Zero the milliseconds and set them from the argument.
-	    date->value = fmod(date->value, 1000.0) + fn.arg(0).to_number();
+	    date->value = std::fmod(date->value, 1000.0) + fn.arg(0).to_number();
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setMilliseconds was called with more than one argument");
