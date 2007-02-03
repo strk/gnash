@@ -26,6 +26,7 @@
 #include "builtin_function.h"
 
 #include <ctime>
+#include <cmath>
 
 #if defined(_WIN32) || defined(WIN32)
 # define snprintf _snprintf
@@ -581,7 +582,7 @@ static void date_settime(const fn_call& fn) {
 	    )
 	} else {
 	    double millitime = fn.arg(0).to_number();
-	    date->millisecond = (long) fmod(millitime, 1000.0);
+	    date->millisecond = (long) std::fmod(millitime, 1000.0);
 	    time_t sectime = (time_t) (millitime / 1000.0);
 	    tm *tm = gmtime(&sectime);
 	    date->second = tm->tm_sec;
