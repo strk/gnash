@@ -75,6 +75,12 @@ public:
 	///
 	void registerClass(as_function* the_class);
 
+	/// Get the Class registered to this definition.
+	as_function* getRegisteredClass()
+	{
+		return registeredClass.get();
+	}
+
 private:
 
 	void read(stream* in);
