@@ -3428,7 +3428,7 @@ sprite_instance::construct()
 	assert(!_name.empty());
 
 	as_function* ctor = def->getRegisteredClass();
-	log_msg("Attached sprite's registered class is %p", (void*)ctor); 
+	//log_msg("Attached sprite's registered class is %p", (void*)ctor); 
 
 	// TODO: builtin constructors are different from user-defined ones
 	// we should likely change that. See also vm/ASHandlers.cpp (construct_object)
@@ -3438,7 +3438,7 @@ sprite_instance::construct()
 		as_object* proto = ctor->getPrototype();
 		set_prototype(proto);
 
-		log_msg("Calling the user-defined constructor against this sprite_instance");
+		//log_msg("Calling the user-defined constructor against this sprite_instance");
 		as_value ret; // we don't use the constructor return (should we?)
 		fn_call call(&ret, this, &(get_environment()), 0, 0);
 		(*ctor)(call);
