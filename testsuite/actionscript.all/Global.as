@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.17 2007/02/01 19:35:36 martinwguy Exp $";
+rcsid="$Id: Global.as,v 1.18 2007/02/03 04:03:30 martinwguy Exp $";
 
 #include "check.as"
 
@@ -58,6 +58,9 @@ check ( isNaN(parseFloat('         x1.234')) );
 
 // All %NN must become the corresponding ascii char
 check ( unescape('%3A%2F%3F%3D%26') == ':/?=&' );
+check ( unescape('%3a%2f%3f%3d%26') == ':/?=&' );
+check ( unescape('%3a%2f%3f%3d%26%') == ':/?=&%' );
+check ( unescape('%3a%2f%3f%3d%26%2') == ':/?=&%2' );
 
 // All URL-special chars become the corresponding %NN hex
 check (escape(' "#$%&+,/:;<=') == '%20%22%23%24%25%26%2B%2C%2F%3A%3B%3C%3D');

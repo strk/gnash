@@ -1,3 +1,8 @@
+2007-02-02 Martin Guy <martinwguy@yahoo.it>
+
+	* testsuite/actionscript.all/Global.as: add checks for malformed
+	  encoded URLs
+
 2007-02-02 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStreamFfmpeg.cpp: Fixed a deadlock when deleting
