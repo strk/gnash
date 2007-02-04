@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 dnl Copyright (C) 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
-dnl $Id: pthreads.m4,v 1.22 2007/01/21 22:41:03 rsavoye Exp $
+dnl $Id: pthreads.m4,v 1.23 2007/02/04 23:22:25 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
@@ -65,7 +65,7 @@ dnl The ordering *is* (sometimes) important.  Some notes on the
 dnl individual items follow:
 
 dnl pthreads:	AIX (must check this before -lpthread)
-dnl none:		in case threads are in libc; should be tried before -Kthread and
+dnl none:	in case threads are in libc; should be tried before -Kthread and
 dnl 		other compiler flags to prevent continual compiler warnings
 dnl -Kthread:	Sequent (threads in libc, but -Kthread needed for pthread.h)
 dnl -kthread:	FreeBSD kernel threads (preferred to -pthread since SMP-able)
@@ -152,7 +152,7 @@ if test x"$pthreads" = xno; then
     AC_TRY_LINK([#include <pthread.h>],
       [pthread_t th; pthread_join(th, 0);
       pthread_attr_init(0); pthread_cleanup_push(0, 0);
-      pthread_create(0,0,0,0); pthread_cleanup_pop(0); ],
+      pthread_create(0,0,0,0); pthread_cleanup_pop(0);],
       [pthreads=yes])
 
     LIBS="$save_LIBS"
