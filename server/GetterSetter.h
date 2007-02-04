@@ -49,11 +49,12 @@ public:
 	/// updates ref count of getter/setter.
 	GetterSetter(const GetterSetter& s);
 
-	/// copy operator
+	/// Assignment operator
 	//
 	/// updates ref count of getter/setter.
 	/// checks for self-assignment
-	GetterSetter& operator==(const GetterSetter& s);
+	///
+	GetterSetter& operator=(const GetterSetter& s);
 
 	/// Construct a getter/setter parameter
 	//

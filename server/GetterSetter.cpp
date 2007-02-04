@@ -54,7 +54,7 @@ GetterSetter::setValue(as_object* this_ptr, const as_value& val) const
 }
 
 GetterSetter&
-GetterSetter::operator==(const GetterSetter& s)
+GetterSetter::operator=(const GetterSetter& s)
 {
 	if ( s._getter != _getter )
 	{
