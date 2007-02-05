@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: xmlnode.cpp,v 1.8 2007/01/19 15:46:50 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.9 2007/02/05 07:18:30 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -253,7 +253,7 @@ XMLNode::cloneNode(XMLNode &newnode, bool deep)
 /// method. If beforeNode is not a child of my_xml, the insertion
 /// fails.
 void
-XMLNode::insertBefore(XMLNode */* newnode */, XMLNode */* node */)
+XMLNode::insertBefore(XMLNode * /* newnode */, XMLNode * /* node */)
 {
     log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }

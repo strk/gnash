@@ -419,7 +419,7 @@ movie_root::clear_interval_timer(int x)
 }
 	
 void
-movie_root::do_something(void */* timer */)
+movie_root::do_something(void * /* timer */)
 {
     log_msg("FIXME: %s: unimplemented\n", __FUNCTION__);
 }

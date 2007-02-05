@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.14 2007/01/30 09:54:22 strk Exp $ */
+/* $Id: xml.cpp,v 1.15 2007/02/05 07:18:30 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -114,7 +114,7 @@ XML::XML(tu_string xml_in)
     parseXML(xml_in);
 }
 
-XML::XML(struct node */* childNode */)
+XML::XML(struct node * /* childNode */)
 	:
 	as_object(getXMLInterface()),
 	_loaded(false), 
@@ -168,7 +168,7 @@ XML::nodeValue()
 }
 
 void
-XML::nodeNameSet(const char */*name */)
+XML::nodeNameSet(const char * /*name */)
 {
   if (!_nodes) {
     _nodes = new XMLNode;
@@ -180,7 +180,7 @@ XML::nodeNameSet(const char */*name */)
 }
 
 void
-XML::nodeValueSet(const char */* value */)
+XML::nodeValueSet(const char * /* value */)
 {
   if (!_nodes) {
     _nodes = new XMLNode;
@@ -442,7 +442,7 @@ XML::operator [] (int x) {
 }
 
 void
-XML::cleanupStackFrames(XMLNode */* xml */)
+XML::cleanupStackFrames(XMLNode * /* xml */)
 {
     GNASH_REPORT_FUNCTION;
 }
@@ -542,7 +542,7 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
 /// If multiple calls are made to set the same header name, each
 /// successive value replaces the value set in the previous call.
 void
-XML::addRequestHeader(const char */* name */, const char */* value */)
+XML::addRequestHeader(const char * /* name */, const char * /* value */)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
@@ -600,7 +600,7 @@ XML::cloneNode(XMLNode &newnode, bool deep)
 /// the XML.createTextNode() method are the constructor methods for
 /// creating nodes for an XML object. 
 XMLNode *
-XML::createElement(const char */* name */)
+XML::createElement(const char * /* name */)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
     return (XMLNode*)0;
@@ -615,7 +615,7 @@ XML::createElement(const char */* name */)
 /// XML.createElement() method are the constructor methods for
 /// creating nodes for an XML object.
 XMLNode *
-XML::createTextNode(const char */* name */)
+XML::createTextNode(const char * /* name */)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
     return (XMLNode*)0;
@@ -629,7 +629,7 @@ XML::createTextNode(const char */* name */)
 /// method. If beforeNode is not a child of my_xml, the insertion
 /// fails.
 void
-XML::insertBefore(XMLNode */* newnode */, XMLNode */* node */)
+XML::insertBefore(XMLNode * /* newnode */, XMLNode * /* node */)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
