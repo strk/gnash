@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.cpp,v 1.42 2007/01/30 02:02:28 rsavoye Exp $ */
+/* $Id: log.cpp,v 1.43 2007/02/05 00:06:51 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,7 +38,9 @@
 #include <libxml/parser.h>
 #include <libxml/xmlreader.h>
 #include <ctime>
-#define BOOST_HAS_THREADS 1
+/* #define BOOST_HAS_THREADS 1
+   This should be set by boost itself.
+*/
 
 #if defined(_WIN32) || defined(WIN32)
 #define lock(io_mutex) ;
