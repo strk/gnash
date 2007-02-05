@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: cygnal.cpp,v 1.5 2006/12/29 20:13:50 strk Exp $ */
+/* $Id: cygnal.cpp,v 1.6 2007/02/05 20:13:05 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,7 +52,6 @@ extern "C"{
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 

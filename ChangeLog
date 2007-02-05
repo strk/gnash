@@ -15,6 +15,7 @@
 
 	* macros/pthreads.m4: Fixed a quirky LIBS/CFLAGS-bug.
 	* libbase/log.cpp: Removed BOOST_HAS_THREADS.
+	* cygnal/cygnal.cpp: Removed implicit include.
 
 2007-02-03 Sandro Santilli <strk@keybit.net>
 
