@@ -47,6 +47,10 @@ namespace gnash {
 
 /// Set of properties associated to an ActionScript object.
 //
+/// The PropertyList container is the sole owner of the Property
+/// elements in it contained and has full responsibility of their
+/// construction and destruction.
+///
 class PropertyList
 {
 
@@ -100,7 +104,7 @@ public:
 	PropertyList(const PropertyList& pl);
 
 	/// Assignment operator
-	PropertyList& operator==(const PropertyList&);
+	PropertyList& operator=(const PropertyList&);
 
 	/// Delete all Property objects in the container
 	~PropertyList();

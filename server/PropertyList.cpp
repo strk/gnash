@@ -46,9 +46,13 @@ PropertyList::PropertyList(const PropertyList& pl)
 }
 
 PropertyList&
-PropertyList::operator==(const PropertyList& pl)
+PropertyList::operator=(const PropertyList& pl)
 {
-	if ( this != &pl ) import(pl);
+	if ( this != &pl )
+	{
+		clear();
+		import(pl);
+	}
 	return *this;
 }
 
@@ -200,7 +204,17 @@ PropertyList::import(const PropertyList& o)
 		const std::string& name = it->first;
 		const Property* prop = it->second;
 
-		_props[name] = prop->clone();
+		// Delete any previous property with this name
+		iterator found = _props.find( name );
+		if ( found != _props.end() )
+		{
+			delete found->second;
+			found->second = prop->clone();
+		}
+		else
+		{
+			_props[name] = prop->clone();
+		}
 	}
 }
 
