@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 dnl Copyright (C) 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
-dnl $Id: pthreads.m4,v 1.23 2007/02/04 23:22:25 nihilus Exp $
+dnl $Id: pthreads.m4,v 1.24 2007/02/05 00:04:36 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
@@ -109,6 +109,7 @@ if test x"$pthreads" = xno; then
       -*)
         AC_MSG_CHECKING([whether pthreads work with $flag])
         PTHREAD_CFLAGS="$flag"
+	PTHREAD_LIBS=""
         ;;
 
       pth-config)
@@ -132,6 +133,7 @@ if test x"$pthreads" = xno; then
       *)
         AC_MSG_CHECKING([for the pthreads library -l$flag])
         PTHREAD_LIBS="-l$flag"
+	PTHREAD_CFLAGS=""
         ;;
     esac
 
