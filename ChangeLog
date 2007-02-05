@@ -2,7 +2,7 @@
 
 	* server/PropertyList.cpp: delete overridden properties in import();
 	  properly clear current container on assignment operator (also fixed
-	  it's signature).
+	  it's signature). Properly delete Property in delProperty().
 	* server/PropertyList.h: Properly document Property ownership.
 
 2007-02-05 Zou Lunkai <zoulunkai@gmail.com>

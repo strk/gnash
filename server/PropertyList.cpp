@@ -150,6 +150,7 @@ PropertyList::delProperty(const std::string& key)
 		return std::make_pair(true,false);
 	}
 
+	delete it->second;
 	_props.erase(it);
 	return std::make_pair(true,true);
 }
