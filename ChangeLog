@@ -1,3 +1,11 @@
+2007-02-05 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetConnection.cpp: Make sure we don't setup a connection
+	  that already exists.
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: Fixed a potential hanging thread.
+	* server/asobj/NetStreamGst.{cpp,h}: Switched from pthreads to boost.
+	  Fixed a potential hanging thread.
+
 2007-02-05 Sandro Santilli <strk@keybit.net>
 
 	* server/PropertyList.cpp: delete overridden properties in import();

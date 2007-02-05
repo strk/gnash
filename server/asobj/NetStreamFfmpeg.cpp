@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.12 2007/02/02 20:41:55 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.13 2007/02/05 22:22:32 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -101,17 +101,15 @@ void NetStreamFfmpeg::close()
 		// terminate thread
 		m_go = false;
 
-		// wait till thread is complete before main continues
-		if (m_thread) {
-			m_thread->join();
-			delete m_thread;
-		}
-
-	}
-
-	if (startThread) {
+		startThread->join();
 		delete startThread;
+
+		// wait till thread is complete before main continues
+		m_thread->join();
+		delete m_thread;
+
 	}
+
 
 	// When closing gnash before playback is finished, the soundhandler 
 	// seems to be removed before netstream is destroyed.
@@ -405,6 +403,9 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
 
 	boost::mutex::scoped_lock  lock(ns->start_mutex);
+
+	// This should only happen if close() is called before setup is complete
+	if (!ns->m_go) return;
 
 	ns->set_status("NetStream.Play.Start");
 

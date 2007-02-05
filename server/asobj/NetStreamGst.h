@@ -25,7 +25,9 @@
 
 #ifdef SOUND_GST
 
-#include <pthread.h>
+#include <boost/thread/thread.hpp>
+#include <boost/bind.hpp> 
+#include <boost/thread/mutex.hpp>
 #include "impl.h"
 #include "video_stream_instance.h"
 #include <gst/gst.h>
@@ -58,7 +60,7 @@ public:
 		return m_go;
 	}
 
-	static void* startPlayback(void* arg);
+	static void startPlayback(NetStreamGst* ns);
 	static void callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 	static void callback_newpad (GstElement *decodebin, GstPad *pad, gboolean last, gpointer data);
 private:
@@ -88,7 +90,7 @@ private:
 
 	image::image_base* m_imageframe;
 
-	pthread_t startThread;
+	boost::thread *startThread;
 	bool m_pause;
 
 	long inputPos;

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.9 2007/02/02 15:01:17 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.10 2007/02/05 22:22:32 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -26,7 +26,6 @@
 #ifdef USE_FFMPEG
 
 #include <queue>
-//#include <pthread.h>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp> 
 #include <boost/thread/mutex.hpp>

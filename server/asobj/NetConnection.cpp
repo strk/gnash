@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.20 2007/01/30 12:49:03 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.21 2007/02/05 22:22:32 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -190,12 +190,16 @@ NetConnection::~NetConnection() {
 /*public*/
 bool NetConnection::openConnection(const char* char_url, NetStream* ns)
 {
+
+	// if already running there is no need to setup things again
+	if (_running) return true;
+
 	netStreamObj = ns;
 	if (_url.size() > 0) {
 		_url += "/";
 	}
 	_url += char_url;
-	_running = 1;
+	_running = true;
 	_cache = NULL;
 
 	localFile = false;

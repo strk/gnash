@@ -53,6 +53,7 @@ NetStreamGst::NetStreamGst():
 	audioconv(NULL),
 	m_go(false),
 	m_imageframe(NULL),
+	startThread(NULL),
 	m_pause(false),
 	inputPos(0),
 	videowidth(0),
@@ -95,6 +96,8 @@ void NetStreamGst::close()
 	if (m_go)
 	{
 		m_go = false;
+		startThread->join();
+		delete startThread;
 	}
 
 	gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
@@ -127,10 +130,7 @@ NetStreamGst::play(const char* c_url)
 	m_go = true;
 
 	// To avoid blocking while connecting, we use a thread.
-	if (pthread_create(&startThread, NULL, NetStreamGst::startPlayback, this) != 0)
-	{
-		return 0;
-	};
+	startThread = new boost::thread(boost::bind(NetStreamGst::startPlayback, this));
 	return 0;
 }
 
@@ -236,17 +236,17 @@ NetStreamGst::callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*p
 }
 
 
-void*
-NetStreamGst::startPlayback(void* arg)
+void
+NetStreamGst::startPlayback(NetStreamGst* ns)
 {
-	NetStreamGst* ns = static_cast<NetStreamGst*>(arg);
 	NetConnection* nc = ns->_netCon;
+	assert(nc);
 
 	// Pass stuff from/to the NetConnection object.
 	assert(ns); // ns->_parent being null seems ok
 	if ( !nc->openConnection(ns->url.c_str(), ns->_parent) ) {
 		log_warning("Gnash could not open movie url: %s", ns->url.c_str());
-		return 0;
+		return;
 	}
 
 	ns->inputPos = 0;
@@ -274,11 +274,11 @@ NetStreamGst::startPlayback(void* arg)
 	// Check if the creation of the gstreamer pipeline and audiosink was a succes
 	if (!ns->pipeline) {
 		gnash::log_error("The gstreamer pipeline element could not be created\n");
-		return 0;
+		return;
 	}
 	if (!ns->audiosink) {
 		gnash::log_error("The gstreamer audiosink element could not be created\n");
-		return 0;
+		return;
 	}
 
 	// setup gnashnc source (our homegrown source element)
@@ -322,7 +322,7 @@ NetStreamGst::startPlayback(void* arg)
 
 	if (!ns->source || !ns->audioconv || !ns->volume || !ns->decoder || !ns->colorspace || !ns->videocaps || !ns->videorate || !ns->videosink) {
 		gnash::log_error("Gstreamer element(s) for movie handling could not be created\n");
-		return 0;
+		return;
 	}
 
 	// put it all in the pipeline
@@ -335,7 +335,7 @@ NetStreamGst::startPlayback(void* arg)
 	
 	// start playing	
 	gst_element_set_state (ns->pipeline, GST_STATE_PLAYING);
-	return 0;
+	return;
 }
 
 image::image_base* NetStreamGst::get_video()
