@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,11 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
-/* $Id: as_environment.h,v 1.39 2007/01/15 14:16:06 strk Exp $ */
+/* $Id: as_environment.h,v 1.40 2007/02/06 17:46:25 rsavoye Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -320,11 +316,25 @@ public:
 	///
 	as_value& local_register(uint8_t n);
 
+        /// Set the Nth local register to something
+        void set_local_register(uint8_t n, as_value &val) {
+	    if (n <= m_local_register.size()) {
+		m_local_register[n] = val;
+	    }
+	}
+
 	/// Return a reference to the Nth global register.
 	as_value& global_register(unsigned int n)
 	{
 		assert(n<4);
 		return m_global_register[n];
+	}
+
+        /// Set the Nth local register to something
+        void set_global_register(uint8_t n, as_value &val) {
+	    if (n <= 4) {
+		m_global_register[n] = val;
+	    }
 	}
 
 	/// Find the sprite/movie referenced by the given path.
@@ -413,7 +423,6 @@ public:
 	/// TODO: make private. currently an hack in timers.cpp prevents this.
 	///
 	LocalFrames m_local_frames;
-
 
 private:
 

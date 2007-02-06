@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,9 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-
-/* $Id: ActionExec.cpp,v 1.14 2007/01/18 22:53:22 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.15 2007/02/06 17:46:25 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,6 +29,7 @@
 #include "swf.h"
 #include "ASHandlers.h"
 #include "as_environment.h"
+#include "debugger.h"
 
 #include <typeinfo> 
 #include <boost/algorithm/string/case_conv.hpp>
@@ -48,7 +47,7 @@
 // too much information for my tastes. I really want just
 // to see how stack changes while executing actions...
 // --strk Fri Jun 30 02:28:46 CEST 2006
-#define DEBUG_STACK 1
+// #define DEBUG_STACK 1
 #endif
 
 using namespace gnash;
@@ -62,6 +61,9 @@ namespace gnash {
 
 static const SWFHandlers& ash = SWFHandlers::instance();
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
+#ifdef USE_DEBUGGER
+static Debugger& debugger = Debugger::getDefaultInstance();
+#endif
 
 // External interface (to be moved under swf/ASHandlers)
 fscommand_callback s_fscommand_handler = NULL;
@@ -85,9 +87,11 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 	retval(nRetVal)
 {
 	//GNASH_REPORT_FUNCTION;
-
+    
 	// See comment in header
-	if ( env.get_version() > 5 ) _with_stack_limit = 15;
+	if ( env.get_version() > 5 ) {
+	    _with_stack_limit = 15;
+	}
 }
 
 ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
@@ -106,7 +110,9 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
 	//GNASH_REPORT_FUNCTION;
 
 	/// See comment in header
-	if ( env.get_version() > 5 ) _with_stack_limit = 15;
+	if ( env.get_version() > 5 ) {
+	    _with_stack_limit = 15;
+	}
 }
 
 void
@@ -139,16 +145,13 @@ ActionExec::operator() ()
 	);
 #endif
 
-    while (pc<stop_pc)
-    {
-
-	// Cleanup any expired "with" blocks.
-	while ( ! with_stack.empty() && pc >= with_stack.back().end_pc() )
-	{
+	while (pc<stop_pc) {
+	    // Cleanup any expired "with" blocks.
+	    while ( ! with_stack.empty() && pc >= with_stack.back().end_pc() ) {
 		// Drop last stack element
 		with_stack.pop_back();
-	}
-	
+	    }
+	    
 	// Get the opcode.
 	uint8_t action_id = code[pc];
 
@@ -178,6 +181,13 @@ ActionExec::operator() ()
 
 	ash.execute((action_type)action_id, *this);
 
+#ifdef USE_DEBUGGER
+ 	debugger.setEnvStack(&env);
+	if (debugger.isTracing()) {
+	    debugger.dissasemble(code.read_string(pc));
+	}
+#endif
+	
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
 		log_action( " After execution, PC is " SIZET_FMT ".", pc);
@@ -198,24 +208,20 @@ ActionExec::operator() ()
     env.set_target(original_target);
 
     // check if the stack was smashed
-    if ( _initial_stack_size > env.stack_size() )
-    {
-	    log_warning("Stack smashed (ActionScript compiler bug?)."
-                  "Fixing by pushing undefined values to the missing slots, "
-		  " but don't expect things to work afterwards.");
-	    size_t missing = _initial_stack_size - env.stack_size();
-	    for (size_t i=0; i<missing; ++i)
-	    {
-		    env.push(as_value());
-	    }
-    }
-    else if ( _initial_stack_size < env.stack_size() )
-    {
-	    // We can argue this would be an "size-optimized" SWF instead...
-	    IF_VERBOSE_MALFORMED_SWF(
+    if ( _initial_stack_size > env.stack_size() ) {
+	log_warning("Stack smashed (ActionScript compiler bug?)."
+		    "Fixing by pushing undefined values to the missing slots, "
+		    " but don't expect things to work afterwards.");
+	size_t missing = _initial_stack_size - env.stack_size();
+	for (size_t i=0; i<missing; ++i) {
+	    env.push(as_value());
+	}
+    } else if ( _initial_stack_size < env.stack_size() ) {
+	// We can argue this would be an "size-optimized" SWF instead...
+	IF_VERBOSE_MALFORMED_SWF(
 	    log_warning("Elements left on the stack after block execution. Cleaning up.");
 	    );
-	    env.drop(env.stack_size()-_initial_stack_size);
+	env.drop(env.stack_size()-_initial_stack_size);
     }
 }
 
@@ -224,39 +230,37 @@ ActionExec::skip_actions(size_t offset)
 {
 	//pc = next_pc;
 
-	for(size_t i=0; i<offset; ++i)
-	{
+	for(size_t i=0; i<offset; ++i) {
 #if 1
-		// we need to check at every iteration because
-		// an action can be longer then a single byte
-		if ( next_pc >= stop_pc )
-		{
-			log_error("End of DoAction block hit while skipping "
-				SIZET_FMT " action tags (pc:" SIZET_FMT 
-				", stop_pc:" SIZET_FMT ") - Mallformed SWF ?"
-				"(WaitForFrame, probably)", offset, next_pc,
-				stop_pc);
-			next_pc = stop_pc;
-			return;
-		}
+	    // we need to check at every iteration because
+	    // an action can be longer then a single byte
+	    if ( next_pc >= stop_pc ) {
+		log_error("End of DoAction block hit while skipping "
+			  SIZET_FMT " action tags (pc:" SIZET_FMT 
+			  ", stop_pc:" SIZET_FMT ") - Mallformed SWF ?"
+			  "(WaitForFrame, probably)", offset, next_pc,
+			  stop_pc);
+		next_pc = stop_pc;
+		return;
+	    }
 #endif
-
-		// Get the opcode.
-		uint8_t action_id = code[next_pc];
-
-		// Set default next_pc offset, control flow action handlers
-		// will be able to reset it. 
-		if ((action_id & 0x80) == 0) {
-			// action with no extra data
-			next_pc++;
-		} else {
-			// action with extra data
-			int16_t length = code.read_int16(next_pc+1);
-			assert( length >= 0 );
-			next_pc += length + 3;
-		}
-
-		//pc = next_pc;
+	    
+	    // Get the opcode.
+	    uint8_t action_id = code[next_pc];
+	    
+	    // Set default next_pc offset, control flow action handlers
+	    // will be able to reset it. 
+	    if ((action_id & 0x80) == 0) {
+		// action with no extra data
+		next_pc++;
+	    } else {
+		// action with extra data
+		int16_t length = code.read_int16(next_pc+1);
+		assert( length >= 0 );
+		next_pc += length + 3;
+	    }
+	    
+	    //pc = next_pc;
 	}
 }
 
@@ -265,9 +269,8 @@ ActionExec::pushWithEntry(const with_stack_entry& entry)
 {
 	// See comment in header about _with_stack_limit
 	IF_VERBOSE_ASCODING_ERRORS (
-	if (with_stack.size() >= _with_stack_limit)
-	{
-		log_aserror("'With' stack depth (" SIZET_FMT ") "
+	if (with_stack.size() >= _with_stack_limit) {
+	    log_aserror("'With' stack depth (" SIZET_FMT ") "
 			"exceeds the allowed limit for current SWF "
 			"target version (" SIZET_FMT " for version %d)."
 			" Don't expect this movie to work with all players.",
@@ -275,7 +278,7 @@ ActionExec::pushWithEntry(const with_stack_entry& entry)
 			env.get_version());
 	}
 	);
-
+	
 	with_stack.push_back(entry);
 	return true;
 }
@@ -284,32 +287,43 @@ bool
 ActionExec::delVariable(const std::string& name)
 {
 	VM& vm = VM::get(); // cache this ?
-	if ( vm.getSWFVersion() < 7 )
-	{
-		std::string namei = name;
-		boost::to_lower(namei, vm.getLocale());
-		return env.del_variable_raw(namei, with_stack);
+	std::string namei = name;
+	if ( vm.getSWFVersion() < 7 ) {
+	    boost::to_lower(namei, vm.getLocale());
 	}
-	else
-	{
-		return env.del_variable_raw(name, with_stack);
-	}
+	
+	return env.del_variable_raw(namei, with_stack);
 }
 
 void
 ActionExec::setVariable(const std::string& name, const as_value& val)
 {
 	VM& vm = VM::get(); // cache this ?
-	if ( vm.getSWFVersion() < 7 )
-	{
-		std::string namei = name;
-		boost::to_lower(namei, vm.getLocale());
-		return env.set_variable(namei, val, getWithStack());
+	std::string namei = name;
+	if ( vm.getSWFVersion() < 7 ) {
+	    boost::to_lower(namei, vm.getLocale());
 	}
-	else
-	{
-		return env.set_variable(name, val, getWithStack());
+	
+#ifdef USE_DEBUGGER
+	debugger.matchWatchPoint(namei, Debugger::WRITES);
+#endif
+	return env.set_variable(namei, val, getWithStack());
+}
+
+as_value
+ActionExec::getVariable(const std::string& name)
+{
+	VM& vm = VM::get();
+
+	std::string namei = name;
+	if ( vm.getSWFVersion() < 7 ) {
+	    boost::to_lower(namei, vm.getLocale());
 	}
+	
+#ifdef USE_DEBUGGER
+	debugger.matchWatchPoint(namei, Debugger::READS);
+#endif
+	return env.get_variable(namei, getWithStack());
 }
 
 void
@@ -318,40 +332,18 @@ ActionExec::setLocalVariable(const std::string& name_, const as_value& val)
 	VM& vm = VM::get(); // cache this ?
 
 	std::string name = name_;
-	if ( vm.getSWFVersion() < 7 )
-	{
-		boost::to_lower(name, vm.getLocale());
+	if ( vm.getSWFVersion() < 7 ) {
+	    boost::to_lower(name, vm.getLocale());
 	}
 
-	if ( isFunction() )
-	{
-		// TODO: set local in the function object?
-		env.set_local(name, val);
+	if ( isFunction() ) {
+	    // TODO: set local in the function object?
+	    env.set_local(name, val);
+	} else {
+	    // TODO: set target member  ?
+	    //       what about 'with' stack ?
+	    env.set_variable(name, val);
 	}
-	else
-	{
-		// TODO: set target member  ?
-		//       what about 'with' stack ?
-		env.set_variable(name, val);
-	}
-}
-
-as_value
-ActionExec::getVariable(const std::string& name)
-{
-	VM& vm = VM::get();
-
-	if ( vm.getSWFVersion() < 7 )
-	{
-		std::string namei = name;
-		boost::to_lower(namei, vm.getLocale());
-		return env.get_variable(namei, getWithStack());
-	}
-	else
-	{
-		return env.get_variable(name, getWithStack());
-	}
-
 }
 
 void
@@ -359,17 +351,14 @@ ActionExec::setObjectMember(as_object& obj, const std::string& var, const as_val
 {
 	VM& vm = VM::get();
 
-	if ( vm.getSWFVersion() < 7 )
-	{
-		std::string vari = var;
-		boost::to_lower(vari, vm.getLocale());
-		obj.set_member(vari, val);
+	if ( vm.getSWFVersion() < 7 ) {
+	    std::string vari = var;
+	    boost::to_lower(vari, vm.getLocale());
+	    obj.set_member(vari, val);
+	} else {
+	    obj.set_member(var, val);
 	}
-	else
-	{
-		obj.set_member(var, val);
-	}
-
+	
 }
 
 bool
@@ -377,15 +366,12 @@ ActionExec::getObjectMember(as_object& obj, const std::string& var, as_value& va
 {
 	VM& vm = VM::get();
 
-	if ( vm.getSWFVersion() < 7 )
-	{
-		std::string vari = var;
-		boost::to_lower(vari, vm.getLocale());
-		return obj.get_member(vari, &val);
-	}
-	else
-	{
-		return obj.get_member(var, &val);
+	if ( vm.getSWFVersion() < 7 ) {
+	    std::string vari = var;
+	    boost::to_lower(vari, vm.getLocale());
+	    return obj.get_member(vari, &val);
+	} else {
+	    return obj.get_member(var, &val);
 	}
 
 }

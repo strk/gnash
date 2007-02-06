@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.250 2007/02/03 21:15:00 martinwguy Exp $
+dnl $Id: configure.ac,v 1.251 2007/02/06 17:46:24 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -64,6 +64,18 @@ esac],fork=yes)
 if test x"$fork" = x"yes"; then
   AC_DEFINE([USE_FORK], [], [Fork player instead of thread])
 fi
+
+AC_ARG_ENABLE(debugger, AC_HELP_STRING([--disable-debugger],[Disable the Flash debugger]),
+[case "${enableval}" in
+  yes) debugger=yes ;;
+  no)  debugger=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-debugger option]) ;;
+esac],debugger=yes)
+
+if test x"$debugger" = x"yes"; then
+  AC_DEFINE([USE_DEBUGGER], [], [Flash Debugger support])
+fi
+AM_CONDITIONAL(DEBUGGER, test x$debugger = xyes)
 
 dnl Write the file to disk in the plugin, if specified.
 AC_ARG_ENABLE(write, AC_HELP_STRING([--enable-write], [Makes the Mozilla plugin write the currently playing SWF movie to /tmp.]),
@@ -873,6 +885,12 @@ if test x"$cygnal" = x"yes"; then
   echo "        Building Cygnal media server enabled (default). Use --disable-cygnal to disable."
 else
   echo "        Building Cygnal media server disabled."
+fi
+
+if test x"$debugger" = x"yes"; then
+  echo "        Building Flash debugger support (default). Use --disable-debugger to disable."
+else
+  echo "        Building the Flash debugger is disabled."
 fi
 
 echo "        Renderer engine: "$renderer

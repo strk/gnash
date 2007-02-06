@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.99 2007/01/13 20:06:17 tgc Exp $
+# $Id: Makefile.am,v 1.100 2007/02/06 17:46:24 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -48,26 +48,26 @@ AM_CPPFLAGS = \
 libgnashserver_la_SOURCES = \
 	GetterSetter.cpp \
 	PropertyList.cpp \
-	URLAccessManager.cpp	\
-	as_environment.cpp	 \
-	as_function.cpp		\
-	as_object.cpp	\
-	as_value.cpp	 \
+	URLAccessManager.cpp \
+	as_environment.cpp \
+	as_function.cpp	\
+	as_object.cpp \
+	as_value.cpp \
 	character.cpp \
 	edit_text_character.cpp \
 	generic_character.cpp \
-	matrix.cpp	\
+	matrix.cpp \
 	movie_instance.cpp \
 	movie_root.cpp \
 	rect.cpp \
 	shm.cpp	\
 	sprite_instance.cpp \
 	swf/TagLoadersTable.cpp	\
-	swf/tag_loaders.cpp	\
-	swf_function.cpp	\
+	swf/tag_loaders.cpp \
+	swf_function.cpp \
 	video_stream_instance.cpp \
 	StreamProvider.cpp \
-    array.cpp \
+	array.cpp \
 	button_character_instance.cpp \
 	dlist.cpp \
 	font.cpp \
@@ -90,19 +90,20 @@ noinst_HEADERS = \
 	Property.h \
 	PropertyList.h \
 	Sprite.h \
-	StreamProvider.h	\
+	StreamProvider.h \
 	StringPredicates.h \
-	URLAccessManager.h	\
+	URLAccessManager.h \
 	array.h	\
 	as_environment.h \
-	as_function.h 		\
+	as_function.h \
 	as_object.h \
 	as_prop_flags.h	\
 	as_value.h \
-	bitmap_info.h		\
-	builtin_function.h	\
+	bitmap_info.h \
+	builtin_function.h \
 	button_character_instance.h \
 	character.h \
+	debugger.h \
 	dlist.h	\
 	drag_state.h \
 	edit_text_character.h \
@@ -130,7 +131,7 @@ noinst_HEADERS = \
 	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
 	swf_event.h \
-	swf_function.h		\
+	swf_function.h \
 	tesselate.h \
 	text.h \
 	textformat.h \
@@ -149,6 +150,12 @@ libgnashserver_la_LIBADD = \
 
 if USE_SOUND_GST
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
+endif
+
+
+# Enable building the Flash debugger
+if DEBUGGER
+libgnashserver_la_SOURCES += debugger.cpp
 endif
 
 #libserver_la_LDFLAGS = -module -avoid-version -no-undefined

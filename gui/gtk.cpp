@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gtk.cpp,v 1.65 2007/01/31 15:24:13 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.66 2007/02/06 17:46:24 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -813,7 +813,7 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
     };
 
     const gchar *artists[] = { 
-	"P. J. Savoye",
+	"Jason Savoye",
         NULL 
     };
 

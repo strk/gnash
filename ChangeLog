@@ -1,3 +1,15 @@
+2007-02-06  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Add --disable-debugger option.
+	* server/debugger.h, debugger.cpp: New files for Flash debugger
+	support.
+	* gui/gnash.cpp: Add -g option to start the debugger console.
+	* server/as_environment.h: Add methods to set registers.
+	* server/parser/action_buffer.cpp: Add to existing string value,
+	don't replace it.
+	* server/vm/ActionExec.cpp: Add support for the Flash
+	debugger. Simplify the methods where case conversion is done.
+
 2007-02-06 Sandro Santilli <strk@keybit.net>
 
 	* server/as_environment.cpp (get_variable_raw):

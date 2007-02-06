@@ -14,9 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-
-/* $Id: action_buffer.cpp,v 1.12 2006/12/13 21:38:51 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.13 2007/02/06 17:46:25 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -223,7 +221,7 @@ disasm(const unsigned char* instruction_data)
 	} else if (fmt == ARG_STR) {
 	    string str;
 	    for (int i = 0; i < length; i++) {
-		str = instruction_data[3 + i];
+		str += instruction_data[3 + i];
 	    }
 	    dbglogfile << "\"" << str.c_str() << "\"" << endl;
 	} else if (fmt == ARG_U8) {

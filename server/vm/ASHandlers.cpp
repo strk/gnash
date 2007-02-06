@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,9 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-
-/* $Id: ASHandlers.cpp,v 1.31 2007/01/18 22:53:22 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.32 2007/02/06 17:46:25 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
