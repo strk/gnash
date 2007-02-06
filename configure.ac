@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.251 2007/02/06 17:46:24 rsavoye Exp $
+dnl $Id: configure.ac,v 1.252 2007/02/06 18:07:14 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -399,6 +399,7 @@ AC_CHECK_FUNCS(shmget shmat shmdt mmap)
 AC_CHECK_FUNCS(gettimeofday)
 AC_CHECK_FUNCS(tzset)
 AC_CHECK_FUNCS(localtime_r)
+AC_CHECK_FUNCS(memmove)
 AC_CHECK_FUNCS(strlcpy, AC_DEFINE(HAVE_STRLCPY_PROTO, [1],[Define if you have the strlcpy prototype]))
 AC_CHECK_FUNCS(strlcat, AC_DEFINE(HAVE_STRLCAT_PROTO, [1],[Define if you have the strlcat prototype]))
 dnl Look for Win32 networking stuff
