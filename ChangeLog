@@ -1,3 +1,11 @@
+2007-02-06 Martin Guy <martinwguy@yahoo.it>
+
+	* server/asobj/Data.cpp: Fixed bug in setUTCHours(),
+	  make utc/localtime specification compulsory in inner workings.
+	* server/asobj/Number.cpp: Convert numbers to strings the same way as a
+	  certain commercial Flash Player does.
+	* configure.ac: Add check for memmove, used in Number.cpp
+
 2007-02-06  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Add --disable-debugger option.
