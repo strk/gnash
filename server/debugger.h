@@ -44,7 +44,7 @@ public:
     void usage();
 //    bool command(const char cmd, as_environment &env);
 
-    void dissasemble(unsigned char *data);
+    void dissasemble(const unsigned char *data);
     void dissasemble();
     void setBreakPoint(std::string &var);
     void removeBreakPoint(std::string &var);

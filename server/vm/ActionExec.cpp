@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ActionExec.cpp,v 1.15 2007/02/06 17:46:25 rsavoye Exp $ */
+/* $Id: ActionExec.cpp,v 1.16 2007/02/06 22:02:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -184,7 +184,7 @@ ActionExec::operator() ()
 #ifdef USE_DEBUGGER
  	debugger.setEnvStack(&env);
 	if (debugger.isTracing()) {
-	    debugger.dissasemble(code.read_string(pc));
+	    debugger.dissasemble(code.get_buffer(pc));
 	}
 #endif
 	

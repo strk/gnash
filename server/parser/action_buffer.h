@@ -120,7 +120,14 @@ public:
 	///
 	const char* read_string(size_t pc) const
 	{
+		//assert(pc < m_buffer.size() );
 		return (const char*)(&m_buffer[pc]);
+	}
+
+	const unsigned char* get_buffer(size_t pc) const
+	{
+		//assert(pc < m_buffer.size() );
+		return (const unsigned char*)(&m_buffer[pc]);
 	}
 
 	/// Get an integer value from given offset
