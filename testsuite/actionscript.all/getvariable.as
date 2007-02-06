@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.5 2007/01/15 00:06:59 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.6 2007/02/06 11:00:36 strk Exp $";
 
 #include "check.as"
 
@@ -244,7 +244,7 @@ asm {
 check_equals(checkpoint, 1);
 #else // OUTPUT_VERSION < 6
 // _global was added in SWF6 !
-xcheck_equals(checkpoint, undefined);
+check_equals(checkpoint, undefined);
 #endif
 
 //-----------------------------------------------------------------------

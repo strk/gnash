@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.54 2007/01/15 14:16:06 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.55 2007/02/06 11:00:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -139,12 +139,17 @@ as_environment::get_variable_raw(
 	return as_value(m_target->get_root_movie());
     }
 
-    as_object* global = VM::get().getGlobal();
+    VM& vm = VM::get();
+    as_object* global = vm.getGlobal();
 
-    if (varname == "_global") {
+    if ( vm.getSWFVersion() > 5 && varname == "_global" )
+    {
+	// The "_global" ref was added in SWF6
 	return as_value(global);
     }
-    if (global->get_member(varname.c_str(), &val)) {
+
+    if (global->get_member(varname.c_str(), &val))
+    {
 	return val;
     }
     

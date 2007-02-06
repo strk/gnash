@@ -1,3 +1,16 @@
+2007-02-06 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.cpp (get_variable_raw):
+	  Don't provide "_global" when SWF version is < 6.
+	* testsuite/actionscript.all/getvariable.as: don't expect
+	  failures in SWF5 mode (_global related)
+	* testsuite/actionscript.all/Global.as: use check_equals
+	  when possible, fix for missing SWF5 _global, remove
+	  escape() tests with SWF > 5 as I can't confirm correct
+	  result.
+	* testsuite/actionscript.all/delete.as: fix for SWF5 run
+	  (_global related).
+
 2007-02-05 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetConnection.cpp: Make sure we don't setup a connection

@@ -1,4 +1,4 @@
-rcsid="$Id: delete.as,v 1.7 2006/12/10 18:39:22 strk Exp $";
+rcsid="$Id: delete.as,v 1.8 2007/02/06 11:00:36 strk Exp $";
 
 #include "check.as"
 
@@ -29,8 +29,15 @@ with(anotherObject)
 	check(delete a);
 	check_equals(a, "a");
 	check(delete a);
+
+#if OUTPUT_VERSION > 5
 	check_equals(a, "_global.a");
 	check(delete a);
+#else
+	check_equals(a, undefined);
+	check(! delete a);
+#endif
+
 	check_equals(a, undefined);
 	check(!delete a);
 }
