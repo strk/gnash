@@ -527,11 +527,13 @@ void *
 Debugger::lookupSymbol(std::string &name)
 {
     GNASH_REPORT_FUNCTION;
-    std::map<void *, std::string>::const_iterator it;
-    for (it=_symbols.begin(); it != _symbols.end(); it++) {
-	if (it->second == name) {
-	    dbglogfile << "Found symbol " << name.c_str() << " at address: " << it->first << endl;
-	    return it->first;
+    if (_symbols.size()) {
+	std::map<void *, std::string>::const_iterator it;
+	for (it=_symbols.begin(); it != _symbols.end(); it++) {
+	    if (it->second == name) {
+		dbglogfile << "Found symbol " << name.c_str() << " at address: " << it->first << endl;
+		return it->first;
+	    }
 	}
     }
     return static_cast<void *>(0);
@@ -551,12 +553,15 @@ std::string
 Debugger::lookupSymbol(void *ptr)
 {
     GNASH_REPORT_FUNCTION;
-    std::map<void *, std::string>::const_iterator it;
-    it = _symbols.find(ptr);
-    if (it != _symbols.end()) {
-	dbglogfile << "Found symbol " << it->second.c_str() << " at address: " << ptr << endl;
-	return it->second;
-    }    
+
+    if (_symbols.size()) {
+	std::map<void *, std::string>::const_iterator it;
+	it = _symbols.find(ptr);
+	if (it != _symbols.end()) {
+	    dbglogfile << "Found symbol " << it->second.c_str() << " at address: " << ptr << endl;
+	    return it->second;
+	}
+    }
 }
 
 void
