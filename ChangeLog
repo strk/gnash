@@ -1,3 +1,13 @@
+2007-02-06 Sandro Santilli <strk@keybit.net>
+
+	* server/debugger.{h,cpp}: (dissasemble): first argument
+	  can safely be passed as a 'const' pointer.
+	* server/parser/action_buffer.h: added get_buffer() to
+	  return an unsugned char.
+	* server/vm/ActionExec.cpp (operator()): use
+	  action_buffer::get_buffer() to fetch an appropriate argument
+	  for Debugger::dissasemble.
+
 2007-02-06 Martin Guy <martinwguy@yahoo.it>
 
 	* server/asobj/Data.cpp: Fixed bug in setUTCHours(),
