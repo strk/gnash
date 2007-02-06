@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: processor.cpp,v 1.46 2007/01/30 02:02:29 rsavoye Exp $ */
+/* $Id: processor.cpp,v 1.47 2007/02/06 23:06:18 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,6 +31,7 @@
 #include "rc.h"
 #include "URL.h"
 #include "GnashException.h"
+#include "debugger.h"
 #include "VM.h"
 
 #include <iostream>
@@ -81,6 +82,9 @@ static void usage (const char *);
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+#ifdef USE_DEBUGGER
+gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
+#endif
 }
 
 struct movie_data
@@ -138,7 +142,7 @@ main(int argc, char *argv[])
         dbglogfile.setVerbosity();
     }
 
-    while ((c = getopt (argc, argv, "hwvapr:")) != -1) {
+    while ((c = getopt (argc, argv, "hwvapr:g")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage (argv[0]);
@@ -151,6 +155,14 @@ main(int argc, char *argv[])
 	      dbglogfile.setVerbosity();
 	      dbglogfile << "Verbose output turned on" << endl;
 	      break;
+          case 'g':
+#ifdef USE_DEBUGGER
+              debugger.enabled(true);
+              debugger.console();
+              dbglogfile << "Setting debugger ON" << std::endl;
+#else
+              dbglogfile << "WARNING: The debugger has been disabled at configuration time" << std::endl;
+#endif
 	  case 'a':
 #if VERBOSE_ACTION
 	      dbglogfile.setActionDump(true); 

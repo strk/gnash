@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,10 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
-//
 
 #ifndef GNASH_ACTION_BUFFER_H
 #define GNASH_ACTION_BUFFER_H
@@ -122,6 +118,18 @@ public:
 	{
 		//assert(pc < m_buffer.size() );
 		return (const char*)(&m_buffer[pc]);
+	}
+
+        /// Get a pointer to the current instruction within the code
+	unsigned char* getFramePointer(size_t pc) const
+	{
+		return ((unsigned char*)&m_buffer[pc]);
+	}
+
+        /// Get the base pointer of the code buffer.
+        unsigned char* getCodeStart()
+	{
+		return reinterpret_cast<unsigned char*>(&m_buffer);
 	}
 
 	const unsigned char* get_buffer(size_t pc) const

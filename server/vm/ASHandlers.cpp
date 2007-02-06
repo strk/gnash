@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.32 2007/02/06 17:46:25 rsavoye Exp $ */
+/* $Id: ASHandlers.cpp,v 1.33 2007/02/06 23:06:18 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,7 +44,7 @@
 #include "drag_state.h"
 #include "VM.h" // for getting the root
 #include "movie_root.h" // for set_drag_state (ActionStartDragMovie)
-#include "gstring.h"
+#include "debugger.h"
 
 #include <string>
 #include <map>
@@ -55,7 +55,10 @@
 using namespace std;
 
 namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+static gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+#ifdef USE_DEBUGGER
+static gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
+#endif
 }
 
 // Define this to have WaitForFrame actions really
@@ -192,7 +195,7 @@ ActionHandler::ActionHandler(action_type type, action_callback_t func)
 //	GNASH_REPORT_FUNCTION;
 }
 
-ActionHandler::ActionHandler(action_type type, std::string name,
+ActionHandler::ActionHandler(action_type type, string name,
                              action_callback_t func)
 	:
 	_type(type),
@@ -205,7 +208,7 @@ ActionHandler::ActionHandler(action_type type, std::string name,
 //	GNASH_REPORT_FUNCTION;
 }
 
-ActionHandler::ActionHandler(action_type type, std::string name,
+ActionHandler::ActionHandler(action_type type, string name,
                              action_callback_t func, as_arg_t format)
     : _debug(false), _stack_args(0)
 {
@@ -216,7 +219,7 @@ ActionHandler::ActionHandler(action_type type, std::string name,
     _arg_format = format;
 }
 
-ActionHandler::ActionHandler(action_type type, std::string name,
+ActionHandler::ActionHandler(action_type type, string name,
                              action_callback_t func, as_arg_t format, int nargs)
     : _debug(false)
 {
@@ -244,7 +247,7 @@ SWFHandlers::SWFHandlers()
 {
 //    GNASH_REPORT_FUNCTION;
 
-    std::vector<std::string> & property_names = get_property_names();
+    vector<std::string> & property_names = get_property_names();
 
     property_names.reserve(32);
     property_names.push_back("_x");
@@ -483,17 +486,17 @@ SWFHandlers::~SWFHandlers()
 }
 
 
-std::vector<ActionHandler> &
+vector<ActionHandler> &
 SWFHandlers::get_handlers()
 {
 	static container_type handlers(255);
 	return handlers;
 }
 
-std::vector<std::string> &
+vector<string> &
 SWFHandlers::get_property_names()
 {
-	static std::vector<std::string> prop_names;
+	static vector<string> prop_names;
 	return prop_names;
 }
 
@@ -737,7 +740,7 @@ SWFHandlers::ActionSetTarget(ActionExec& thread)
 	assert(code[pc] == SWF::ACTION_SETTARGET); // 0x8B
 
 	// Change the movie we're working on.
-	std::string target_name ( code.read_string(pc+3) );
+	string target_name ( code.read_string(pc+3) );
 
 	CommonSetTarget(env, target_name);
 }
@@ -967,7 +970,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     // Truncate if necessary.
     //size = imin(str.length() - base, size);
 
-    // TODO: unsafe: use std::string::substr instead !
+    // TODO: unsafe: use string::substr instead !
     tu_string	new_string = str.c_str() + base;
     new_string.resize(size);
     
@@ -1010,7 +1013,7 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 		return;
 	}
 
-	std::string var_string(ptr);
+	string var_string(ptr);
 
 	top_value = thread.getVariable(var_string);
 
@@ -1042,9 +1045,9 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	assert(env.top(1).to_string());
 	thread.setVariable(env.top(1).to_std_string(), env.top(0));
 
-		IF_VERBOSE_ACTION (
-	log_action("-- set var: %s", env.top(1).to_string());
-		);
+        IF_VERBOSE_ACTION (
+            log_action("-- set var: %s", env.top(1).to_string());
+            );
 
 	env.drop(2);
 }
@@ -1063,7 +1066,7 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 	//strk: shouldn't we use env.pop() instead ? No (see above comment)
 	//const char * target_name = env.top(0).to_string();
 	assert(env.top(0).to_string());
-	std::string target_name = env.top(0).to_string();
+	string target_name = env.top(0).to_string();
 	env.drop(1); // pop the target name off the stack
 
 	CommonSetTarget(env, target_name);
@@ -1099,9 +1102,9 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 		if ( prop_number < get_property_names().size() )
 		{
 			as_value val;
-			// TODO: check if get_propery_names() can return a std::string
+			// TODO: check if get_propery_names() can return a string
 			//       directly.
-			std::string propname = get_property_names()[prop_number].c_str();
+			string propname = get_property_names()[prop_number].c_str();
 			//target->get_member(propname &val);
 			thread.getObjectMember(*target, propname, val);
 			env.top(1) = val;
@@ -1141,8 +1144,8 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
 //        set_property(target, prop_number, env.top(0));
         if ( prop_number < get_property_names().size() )
 	{
-	    // TODO: check if get_property_names() return a std::string&
-	    std::string member_name = get_property_names()[prop_number].c_str();
+	    // TODO: check if get_property_names() return a string&
+	    string member_name = get_property_names()[prop_number].c_str();
 	    thread.setObjectMember(*target, member_name, prop_val);
 	}
 	else
@@ -1525,9 +1528,9 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 	assert( length >= 0 );
 
 #if 0 // is this really useful ?
-		IF_VERBOSE_ACTION (
-	log_action("[push length=%d]", length);
-		);
+        IF_VERBOSE_ACTION (
+            log_action("[push length=%d]", length);
+            );
 #endif
 
 	//---------------
@@ -1857,14 +1860,14 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 // http://sswf.sourceforge.net/SWFalexref.html#action_set_target
 // http://sswf.sourceforge.net/SWFalexref.html#action_get_dynamic
 void 
-SWFHandlers::CommonSetTarget(as_environment& env, const std::string& target_name)
+SWFHandlers::CommonSetTarget(as_environment& env, const string& target_name)
 {
 	character *new_target;
     
 	// if the string is blank, we set target to the root movie
 	// TODO - double check this is correct?
 	if ( target_name.empty() ) {
-		new_target = env.find_target(std::string("/"));
+		new_target = env.find_target(string("/"));
 	} else {
 		as_value target_val = env.get_variable(target_name);
 		new_target = target_val.to_sprite();
@@ -1948,7 +1951,7 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 void
 SWFHandlers::ActionCallFrame(ActionExec& thread)
 {
-//	GNASH_REPORT_FUNCTION;
+        GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
 	thread.ensureStack(1); // frame spec
@@ -2143,7 +2146,7 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
 void
 SWFHandlers::ActionCallFunction(ActionExec& thread)
 {
-	//GNASH_REPORT_FUNCTION;
+        GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
 	thread.ensureStack(2); // func name, nargs
@@ -2155,7 +2158,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	if ( ! function.is_function() )
 	{
 		// Let's consider it a as a string and lookup the function.
-		std::string function_name(function.to_string());
+		string function_name(function.to_string());
 		function = thread.getVariable(function_name);
 		
 		if ( ! function.is_function() )
@@ -2181,6 +2184,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	env.drop(nargs + 1);
 	env.top(0) = result;
 
+
 	//cerr << "After ActionCallFunction:"<<endl;
 	//env.dump_stack();
 }
@@ -2188,7 +2192,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 void
 SWFHandlers::ActionReturn(ActionExec& thread)
 {
-	//GNASH_REPORT_FUNCTION;
+        GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 	as_value* retval = thread.retval;
 
@@ -2241,7 +2245,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
 	thread.ensureStack(2); // classname, nargs
 
 	as_value val = env.pop();
-	std::string classname;
+	string classname;
 	if ( val.to_string() ) classname = val.to_string();
 
 	IF_VERBOSE_ACTION (
@@ -2258,6 +2262,9 @@ SWFHandlers::ActionNew(ActionExec& thread)
 	as_value new_obj = construct_object(constructor, env, nargs,
 		env.get_top_index());
 
+#ifdef USE_DEBUGGER
+        debugger.addSymbol(&new_obj, classname);
+#endif
 	env.drop(nargs);
 	env.push(new_obj);
 
@@ -2269,7 +2276,7 @@ SWFHandlers::ActionVar(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1); // var name
-    std::string varname = env.top(0).to_std_string();
+    string varname = env.top(0).to_std_string();
     env.declare_local(varname);
     env.drop(1);
 }
@@ -2338,7 +2345,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
     // Set provided members
     for (int i=0; i<nmembers; ++i) {
         as_value member_value = env.pop();
-	std::string member_name = env.pop().to_std_string();
+	string member_name = env.pop().to_std_string();
         //new_obj_ptr->set_member(member_name, member_value);
 	thread.setObjectMember(*new_obj_ptr, member_name, member_value);
     }
@@ -2395,7 +2402,7 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 
 	// Get the object
 	as_value& var_name = env.top(0);
-	std::string var_string = var_name.to_std_string();
+	string var_string = var_name.to_std_string();
 	as_value variable = thread.getVariable(var_string);
 	const as_object* obj = variable.to_object();
 
@@ -2568,7 +2575,7 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
 	thread.ensureStack(3); // value, member, object
 
 	as_object* obj = env.top(2).to_object();
-	std::string member_name = env.top(1).to_std_string();
+	string member_name = env.top(1).to_std_string();
 	const as_value& member_value = env.top(0);
 
 	if (obj)
@@ -2631,7 +2638,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     //int version = env.get_version();
 
     // Get name of the method
-    std::string method_name = env.top(0).to_std_string();
+    string method_name = env.top(0).to_std_string();
 
     // Get an object
     as_value& obj_value = env.top(1);
@@ -2726,7 +2733,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 	}
 
 	as_value method_val;
-	std::string method_string = method_name.to_std_string();
+	string method_string = method_name.to_std_string();
 	//if ( ! obj->get_member(method_name.to_tu_stringi(), &method_val) )
 	if ( ! thread.getObjectMember(*obj, method_string, method_val) )
 	{
@@ -2971,7 +2978,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 
 	// Extract name.
 	// @@ security: watch out for possible missing terminator here!
-	std::string name = code.read_string(i);
+	string name = code.read_string(i);
 	i += name.length() + 1; // add NULL-termination
 
 	//cerr << " name:" << name << endl;
@@ -3050,6 +3057,9 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	{
 		env.push_val(function_value);
 	}
+#ifdef USE_DEBUGGER
+        debugger.addSymbol(&function_value, name);
+#endif
 }
 
 void
@@ -3074,7 +3084,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
 	thread.ensureStack(1);  // the object
 	as_object* with_obj = env.pop().to_object();
 
-	const std::vector<with_stack_entry>& with_stack = thread.getWithStack();
+	const vector<with_stack_entry>& with_stack = thread.getWithStack();
 	IF_VERBOSE_ACTION (
 	log_action("-------------- with block start: stack size is " SIZET_FMT,
 		   with_stack.size());
@@ -3111,7 +3121,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
 void
 SWFHandlers::ActionDefineFunction(ActionExec& thread)
 {
-//	GNASH_REPORT_FUNCTION;
+//        GNASH_REPORT_FUNCTION;
 
 	as_environment& env = thread.env;
 	const action_buffer& code = thread.code;
@@ -3132,7 +3142,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 
 	// Extract name.
 	// @@ security: watch out for possible missing terminator here!
-	std::string name = code.read_string(i);
+	string name = code.read_string(i);
 	i += name.length() + 1;
 
 	//cerr << " name:" << name << endl;
@@ -3176,6 +3186,9 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	{
 		//env.set_member(name, function_value);
 		thread.setVariable(name, function_value);
+#ifdef USE_DEBUGGER
+                debugger.addSymbol(&function_value, name);
+#endif
 	}
 
 	// Otherwise push the function literal on the stack

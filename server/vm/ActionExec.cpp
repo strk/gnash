@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ActionExec.cpp,v 1.16 2007/02/06 22:02:01 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.17 2007/02/06 23:06:18 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -182,9 +182,10 @@ ActionExec::operator() ()
 	ash.execute((action_type)action_id, *this);
 
 #ifdef USE_DEBUGGER
+ 	debugger.setFramePointer(code.getFramePointer(pc));
  	debugger.setEnvStack(&env);
 	if (debugger.isTracing()) {
-	    debugger.dissasemble(code.get_buffer(pc));
+	    debugger.dissasemble();
 	}
 #endif
 	

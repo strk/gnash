@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,10 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
-/* $Id: as_value.h,v 1.24 2006/12/21 14:12:00 strk Exp $ */
+/* $Id: as_value.h,v 1.25 2007/02/06 23:06:18 rsavoye Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -253,6 +250,12 @@ public:
 		return m_type == C_FUNCTION;
 	}
 
+	/// Return true if this value is a AS function
+	bool is_as_function() const
+	{
+		return m_type == AS_FUNCTION;
+	}
+
 	/// Return true if this value is strictly a string
 	//
 	/// Note that you usually DON'T need to call this
@@ -374,11 +377,27 @@ public:
 	// in preference to generic overloaded set().  You are
 	// more likely to get a warning/error if misused.
 
-	void	set_tu_string(const tu_string& str) { drop_refs(); m_type = STRING; m_string_value = str; }
+	void	set_tu_string(const tu_string& str) {
+          drop_refs();
+          m_type = STRING;
+          m_string_value = str;
+        }
 
-	void	set_string(const char* str) { drop_refs(); m_type = STRING; m_string_value = str; }
-	void	set_double(double val) { drop_refs(); m_type = NUMBER; m_number_value = val; }
-	void	set_bool(bool val) { drop_refs(); m_type = BOOLEAN; m_boolean_value = val; }
+	void	set_string(const char* str) {
+          drop_refs();
+          m_type = STRING;
+          m_string_value = str;
+        }
+	void	set_double(double val) {
+          drop_refs();
+          m_type = NUMBER;
+          m_number_value = val;
+        }
+	void	set_bool(bool val) {
+          drop_refs();
+          m_type = BOOLEAN;
+          m_boolean_value = val;
+        }
 	void	set_sprite(const std::string& path);
 	void	set_sprite(const sprite_instance& sp);
 	void	set_int(int val) { set_double(val); }

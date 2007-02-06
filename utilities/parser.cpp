@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: parser.cpp,v 1.34 2007/01/30 02:02:29 rsavoye Exp $ */
+/* $Id: parser.cpp,v 1.35 2007/02/06 23:06:18 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,6 +44,7 @@ extern "C"{
 #include "gnash.h"
 #include "rc.h"
 #include "hash_wrapper.h"
+#include "debugger.h"
 
 #define TWIPS_TO_PIXELS(x) ((x) / 20.f)
 #define PIXELS_TO_TWIPS(x) ((x) * 20.f)
@@ -77,6 +78,9 @@ static void usage (const char *);
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+#ifdef USE_DEBUGGER
+gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
+#endif
 }
 
 namespace parser
@@ -634,12 +638,20 @@ main(int argc, char *argv[])
         dbglogfile.setVerbosity();
     }
     
-    while ((c = getopt (argc, argv, "h")) != -1) {
+    while ((c = getopt (argc, argv, "hg")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage (argv[0]);
               dbglogfile.removeLog();
 	      exit(0);
+          case 'g':
+#ifdef USE_DEBUGGER
+              debugger.enabled(true);
+              debugger.console();
+              dbglogfile << "Setting debugger ON" << std::endl;
+#else
+              dbglogfile << "WARNING: The debugger has been disabled at configuration time" << std::endl;
+#endif
 	  default:
 	      break;
 	}
@@ -687,6 +699,7 @@ usage (const char *)
 	"usage: gparser [swf files to process...]\n"
 	"  --help(-h)  Print this info.\n"
 	"  --version   Print the version numbers.\n"
+	"  -g          Start the Flash debugger.\n"
 	);
 }
 

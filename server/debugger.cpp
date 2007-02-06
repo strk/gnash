@@ -21,7 +21,9 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <boost/algorithm/string/case_conv.hpp>
 
+#include "VM.h"
 #include "rc.h"
 #include "debugger.h"
 #include "log.h"
@@ -433,11 +435,10 @@ Debugger::dumpStackFrame(as_environment &env)
 // FIXME: we want to print the name of the function
 // 	    if (val.is_as_function()) {
 // 	    }
-// 	    string name = this->lookupSymbol(val.to_object());
-// 	    if (name.size()) {
-// 		cerr << "NAME IS: " << name << endl;
-// 	    }
-	    
+ 	    string name = this->lookupSymbol(val.to_object());
+//  	    if (name.size()) {
+//  		cerr << "NAME IS: " << name << endl;
+//  	    }	    
 	    if (val.is_object()) {
 		cerr << " has #" << val.to_object()->get_ref_count() << " references";
 	    }
@@ -528,10 +529,15 @@ Debugger::lookupSymbol(std::string &name)
 {
     GNASH_REPORT_FUNCTION;
     if (_symbols.size()) {
+	VM& vm = VM::get(); // cache this ?
+	std::string namei = name;
+	if ( vm.getSWFVersion() < 7 ) {
+	    boost::to_lower(namei, vm.getLocale());
+	}
 	std::map<void *, std::string>::const_iterator it;
 	for (it=_symbols.begin(); it != _symbols.end(); it++) {
-	    if (it->second == name) {
-		dbglogfile << "Found symbol " << name.c_str() << " at address: " << it->first << endl;
+	    if (it->second == namei) {
+		dbglogfile << "Found symbol " << namei.c_str() << " at address: " << it->first << endl;
 		return it->first;
 	    }
 	}
@@ -542,9 +548,14 @@ Debugger::lookupSymbol(std::string &name)
 void
 Debugger::addSymbol(void *ptr, std::string name)
 {
-    GNASH_REPORT_FUNCTION;
-    dbglogfile << "Adding symbol " << name << " at address: " << ptr << endl;
-    _symbols[ptr] = name;
+//    GNASH_REPORT_FUNCTION;
+    VM& vm = VM::get(); // cache this ?
+    std::string namei = name;
+    if ( vm.getSWFVersion() < 7 ) {
+	boost::to_lower(namei, vm.getLocale());
+    }
+    dbglogfile << "Adding symbol " << namei << " at address: " << ptr << endl;
+    _symbols[ptr] = namei;
 }
 
 
@@ -552,16 +563,22 @@ Debugger::addSymbol(void *ptr, std::string name)
 std::string
 Debugger::lookupSymbol(void *ptr)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
+    string str;
     if (_symbols.size()) {
 	std::map<void *, std::string>::const_iterator it;
 	it = _symbols.find(ptr);
+	dbglogfile.setStamp(false);
 	if (it != _symbols.end()) {
 	    dbglogfile << "Found symbol " << it->second.c_str() << " at address: " << ptr << endl;
-	    return it->second;
+	    str = it->second;
+// 	} else {
+// 	    dbglogfile << "No symbol found for address " << ptr << endl;
 	}
     }
+    dbglogfile.setStamp(false);
+    return str;
 }
 
 void
