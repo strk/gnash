@@ -21,7 +21,8 @@
 
 #include "Player.h"
 #include "log.h" // for dbglogfile (I hate this)
-#include "rc.h" // for use of rcfile 
+#include "rc.h" // for use of rcfile
+#include "debugger.h"
 
 #if defined(_WIN32) || defined(WIN32)
         #include "getopt_win32.h"
@@ -39,6 +40,7 @@ extern "C"{
 #endif // ! Win32
 
 
+#include <string>
 #include <iostream>
 
 //using namespace gnash; // for dbglogfile
@@ -51,7 +53,12 @@ char* url = NULL;
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+#ifdef USE_DEBUGGER
+gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
+#endif
 }
+
+//extern bool g_debug;
 
 static void
 usage()
@@ -79,6 +86,7 @@ usage()
 	"  -j <width>  Set window width\n"
 	"  -k <height> Set window height\n"
         "  -1          Play once; exit when/if movie reaches the last frame\n"
+        "  -g          Turn on the Flash debugger\n"
         "  -r <0|1|2|3>\n"
 	"              0 disables both rendering & sound (good for batch tests)\n"
         "              1 enables rendering & disables sound\n"
@@ -155,7 +163,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         }
     }
     
-    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:")) != -1)
+    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:g")) != -1)
     {
 	switch (c) {
     	  // case 'c' (Disable SDL core dumps) is decoded in sdl.cpp:init()
@@ -205,6 +213,15 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
           case 'j':
               player.setWidth ( strtol(optarg, NULL, 0) );
               dbglogfile << "Setting width to: " << player.getWidth() << std::endl;
+              break;
+          case 'g':
+#ifdef USE_DEBUGGER
+              debugger.enabled(true);
+              debugger.console();
+              dbglogfile << "Setting debugger ON" << std::endl;
+#else
+              dbglogfile << "WARNING: The debugger has been disabled at configuration time" << std::endl;
+#endif
               break;
           case 'k':
               player.setHeight ( strtol(optarg, NULL, 0) );
