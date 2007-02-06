@@ -532,7 +532,7 @@ local_tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date)
 {
 	time_t t = mktime(&tm);
 
-	// Recostruct the time value and put the milliseconds back in.
+	// Reconstruct the time value and put the milliseconds back in.
 	// If mktime fails to reconstruct the date, change nothing.
 	if (t == (time_t)(-1)) {
 		log_error("Failed to set a date.\n");
@@ -550,9 +550,8 @@ local_tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date)
 static void
 utc_date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec)
 {
-	msec = std::fmod(date->value, 1000.0);
 	time_t t = (time_t)(date->value / 1000.0);
-
+	msec = std::fmod(date->value, 1000.0);
 	_gmtime_r(&t, &tm);
 }
 
@@ -569,8 +568,8 @@ utc_tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date)
 	if (t == (time_t)(-1)) {
 	    log_error("utc_tm_msec_to_date failed to convert back to Date");
 	} else {
-	    // Restore the UTC time-of-day
-	    t = (t % 86400) + tm.tm_sec + 60 * (tm.tm_min + 60 * tm.tm_hour);
+	    // Knock out the H:M:S part of t and replace with UTC time-of-day
+	    t = t - (t % 86400) + tm.tm_sec + 60 * (tm.tm_min + 60 * tm.tm_hour);
 	}
 	
 	date->value = t * 1000.0 + msec;
@@ -621,7 +620,7 @@ date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec, bool utc)
 /// If changing the year or month results in an impossible date, it is
 /// normalised: 29 Feb becomes 1 Mar, 31 April becomes 1 May etc.
 
-static void _date_setfullyear(const fn_call& fn, bool utc=false) {
+static void _date_setfullyear(const fn_call& fn, bool utc) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 3);
@@ -881,7 +880,7 @@ static void date_setmilliseconds(const fn_call& fn) {
 // Bindings for localtime versions
 #define local_proto(item) \
 	static void date_set##item(const fn_call& fn) { \
-		_date_set##item(fn); \
+		_date_set##item(fn, false); \
 	}
 local_proto(fullyear)
 local_proto(month)
@@ -889,6 +888,7 @@ local_proto(date)
 local_proto(hours)
 local_proto(minutes)
 local_proto(seconds)
+#undef local_proto
 
 // The same things for UTC.
 #define utc_proto(item) \
@@ -901,6 +901,7 @@ utc_proto(date)
 utc_proto(hours)
 utc_proto(minutes)
 utc_proto(seconds)
+#undef utc_proto
 
 
 /// \brief Date.toString()
@@ -947,6 +948,7 @@ static void date_tostring(const fn_call& fn) {
 		// tm_isdst is negative: cannot get TZ info.
 		// Convert and print in UTC instead.
 		_gmtime_r(&t, &tm);
+		tzhours = tzminutes = 0;
 	}
 
 	// If timezone is negative, both hours and minutes will be negative
