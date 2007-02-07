@@ -1,5 +1,7 @@
 2007-02-07 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (movieclip_ctor): don't attach MovieClip
+	  properties, as those are only good for real sprites.
 	* server/swf/tag_loaders.cpp: use log_swferror where appropriate,
 	  (swf_event::read): tolerate malformed header.
 

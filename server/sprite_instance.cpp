@@ -869,7 +869,7 @@ static void
 movieclip_ctor(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> clip = new as_object(getMovieClipInterface());
-	attachMovieClipProperties(*clip);
+	//attachMovieClipProperties(*clip);
 	fn.result->set_as_object(clip.get());
 }
 
