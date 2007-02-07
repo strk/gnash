@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.71 2007/02/07 00:59:59 rsavoye Exp $ */
+/* $Id: tag_loaders.cpp,v 1.72 2007/02/07 09:07:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -671,15 +671,13 @@ void define_shape_loader(stream* in, tag_type tag, movie_definition* m)
 	   || tag == SWF::DEFINESHAPE3);
 
     uint16_t	character_id = in->read_u16();
-
-    shape_character_def*	ch = new shape_character_def;
-    ch->read(in, tag, true, m);
-
 		IF_VERBOSE_PARSE
 		(
     log_parse("  shape_loader: id = %d", character_id);
-    log_parse("  bound rect:"); ch->get_bound().print();
     		);
+
+    shape_character_def*	ch = new shape_character_def;
+    ch->read(in, tag, true, m);
 
     m->add_character(character_id, ch);
 }
