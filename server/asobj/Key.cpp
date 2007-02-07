@@ -28,6 +28,8 @@
 #include "action.h" // for call_method
 #include "VM.h"
 
+#include <boost/algorithm/string/case_conv.hpp>
+
 namespace gnash {
 
 Key::Key() {
@@ -344,22 +346,35 @@ void	notify_key_event(key::code k, bool down)
 		mroot.notify_keypress_listeners(k);
 	}
 
-	as_value	kval;
-	as_object* global = VM::get().getGlobal();
-	// This isn't very performant... do we allow user override
-	// of _global.Key, btw ?
-	global->init_member("Key", &kval);
-	if (kval.is_object() )
+	//static boost::intrusive_ptr<key_as_object*> keyobject = NULL;
+	static key_as_object* keyobject = NULL;
+	if ( ! keyobject )
 	{
-	    key_as_object*	ko = static_cast<key_as_object*>( kval.to_object() );
-	    assert(ko);
+		// This isn't very performant... do we allow user override
+		// of _global.Key, btw ?
 
-	    if (down) ko->set_key_down(k);
-	    else ko->set_key_up(k);
+		as_value kval;
+		as_object* global = VM::get().getGlobal();
+
+		std::string objName = "Key";
+		VM& vm = VM::get();
+		if ( vm.getSWFVersion() < 7 )
+		{
+			boost::to_lower(objName, vm.getLocale());
+		}
+		global->get_member(objName, &kval);
+
+		keyobject = dynamic_cast<key_as_object*>( kval.to_object() );
+	}
+
+	if ( keyobject )
+	{
+		if (down) keyobject->set_key_down(k);
+		else keyobject->set_key_up(k);
 	}
 	else
 	{
-	    log_error("gnash::notify_key_event(): no Key built-in\n");
+		log_error("gnash::notify_key_event(): _global.Key doesn't exist, or isn't the expected built-in\n");
 	}
 }
 

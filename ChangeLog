@@ -1,5 +1,7 @@
 2007-02-07 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Key.cpp (notify_key_event): fix update
+	  of the _global.Key object (need a testcase for this!).
 	* server/sprite_instance.cpp (movieclip_ctor): don't attach MovieClip
 	  properties, as those are only good for real sprites.
 	* server/swf/tag_loaders.cpp: use log_swferror where appropriate,
