@@ -121,15 +121,15 @@ public:
 	}
 
         /// Get a pointer to the current instruction within the code
-	unsigned char* getFramePointer(size_t pc) const
+	const unsigned char* getFramePointer(size_t pc) const
 	{
-		return ((unsigned char*)&m_buffer[pc]);
+		return reinterpret_cast<const unsigned char*>(&m_buffer[pc]);
 	}
 
         /// Get the base pointer of the code buffer.
-        unsigned char* getCodeStart()
+        const unsigned char* getCodeStart()
 	{
-		return reinterpret_cast<unsigned char*>(&m_buffer);
+		return reinterpret_cast<const unsigned char*>(&m_buffer);
 	}
 
 	const unsigned char* get_buffer(size_t pc) const

@@ -76,8 +76,8 @@ public:
     as_environment *getEnvStack() { return _env; };
 
     // 
-    void setFramePointer(unsigned char *x) { _pc = x; };
-    unsigned char *getFramePointer() { return _pc; };
+    void setFramePointer(const unsigned char *x) { _pc = x; };
+    const unsigned char *getFramePointer() const { return _pc; };
 
     void console(as_environment &env);
     void console();
@@ -113,8 +113,8 @@ private:
     bool			_tracing;
     debug_state_e               _state;
     int				_skipb;
-    as_environment	       *_env;
-    unsigned char 	       *_pc;
+    as_environment		*_env;
+    const unsigned char		*_pc;
     std::map<std::string, watch_state_e> _watchpoints;
     std::map<std::string, bool> _breakpoints;
     std::map<void *, std::string> _symbols;
