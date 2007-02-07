@@ -447,8 +447,6 @@ void key_class_init(as_object& global)
     key_obj->init_member("removeListener", &key_remove_listener);
 
     global.init_member("Key", key_obj);
-    log_msg("Registered %s object %p as _global.Key member",
-		    typeid(*key_obj).name(), key_obj);
 }
 
 } // end of gnash namespace
