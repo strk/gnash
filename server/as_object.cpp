@@ -31,6 +31,7 @@
 #include "VM.h"
 #include "GnashException.h"
 #include "fn_call.h" // for generic methods
+#include "Object.h" // for getObjectInterface
 
 #include <set>
 #include <string>
@@ -104,12 +105,9 @@ as_object::get_member_default(const std::string& name, as_value* val)
 	//
 	if (name == "__proto__")
 	{
-		if ( ! m_prototype )
-		{
-			log_msg("as_object %p has no prototype\n", (void*)this);
-			return false;
-		}
-		val->set_as_object(m_prototype.get());
+		as_object* p = get_prototype();
+		assert(p);
+		val->set_as_object(get_prototype());
 		return true;
 	}
 
@@ -142,7 +140,7 @@ as_object::findProperty(const std::string& key)
 	{
 		Property* prop = obj->_members.getProperty(key);
 		if ( prop ) return prop;
-		else obj = obj->m_prototype.get();
+		else obj = obj->get_prototype();
 	}
 
 	// No Property found
@@ -168,7 +166,7 @@ as_object::findGetterSetter(const std::string& key)
 			// NOT a getter/setter ?
 			return prop;
 		}
-		obj = obj->m_prototype.get();
+		obj = obj->get_prototype();
 	}
 
 	// No Getter/Setter property found
@@ -323,7 +321,7 @@ as_object::instanceOf(as_function* ctor)
 	while (obj && visited.insert(obj).second )
 	{
 		if ( obj->get_prototype() == ctor->getPrototype() ) return true;
-		obj = obj->get_prototype();
+		obj = obj->get_prototype(); 
 	}
 
 	if ( obj ) log_warning("Circular inheritance chain detected during instanceOf call");
@@ -436,7 +434,7 @@ as_object::enumerateProperties(as_environment& env) const
 	while ( obj && visited.insert(obj).second )
 	{
 		obj->_members.enumerateValues(env);
-		obj = obj->m_prototype.get();
+		obj = obj->get_prototype();
 	}
 
 	if ( obj ) log_warning("prototype loop during Enumeration");
@@ -506,6 +504,14 @@ as_object::valueof_method(const fn_call& fn)
 	as_object* obj = static_cast<as_object*>(fn.this_ptr);
 
 	*(fn.result) = obj->get_primitive_value();
+}
+
+as_object*
+as_object::get_prototype()
+{
+	if ( m_prototype ) return m_prototype.get();
+	//log_msg("as_object::get_prototype(): Hit top of inheritance chain");
+	return getObjectInterface();
 }
 
 } // end of gnash namespace

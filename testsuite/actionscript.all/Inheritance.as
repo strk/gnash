@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.23 2007/02/02 11:36:57 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.24 2007/02/07 10:28:40 strk Exp $";
 
 #include "check.as"
 
@@ -126,7 +126,7 @@ check_equals(subInstance.sayHello(), "hello from subInstance" );
 // Test the instanceOf operator
 check(subInstance instanceOf SubClass);
 check(subInstance instanceOf SuperClass);
-xcheck(subInstance instanceOf Object);
+check(subInstance instanceOf Object);
 
 
 //------------------------------------------------
@@ -169,8 +169,8 @@ var sobj1 = new SubObj1();
 check_equals(sobj1.__proto__.constructor, SubObj1);
 #if OUTPUT_VERSION > 5
 check(SubObj1 instanceOf Function);
-xcheck(Function instanceOf Object);
-xcheck(SubObj1 instanceOf Object);
+check(Function instanceOf Object);
+check(SubObj1 instanceOf Object);
 #endif
 
 // inheritance chain is NOT subobj1,SubObj1,Function,Object, as the
@@ -178,7 +178,7 @@ xcheck(SubObj1 instanceOf Object);
 check(!sobj1 instanceOf Function);
 
 // but still, sobj1 is an instance of Object *and* SubObj1
-xcheck(sobj1 instanceOf Object);
+check(sobj1 instanceOf Object);
 check(sobj1 instanceOf SubObj1);
 
 check(SubObj1.prototype != undefined);

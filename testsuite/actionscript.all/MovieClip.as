@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.30 2007/02/02 12:57:51 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.31 2007/02/07 10:28:40 strk Exp $";
 
 #include "check.as"
 
@@ -275,7 +275,7 @@ check_equals(_root.b, 1);
 var cl = new MovieClip();
 check_equals(cl.__proto__.constructor, MovieClip);
 check(cl instanceOf MovieClip);
-xcheck(cl instanceOf Object);
+check(cl instanceOf Object);
 check_equals(typeof(cl), "object");
 check_equals(typeof(cl.attachMovie), "function");
 check_equals(typeof(cl._width), "undefined");

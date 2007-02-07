@@ -1,5 +1,19 @@
 2007-02-07 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Object.{cpp,h}: export getObjectInterface()
+	* server/asobj/as_object.{cpp,h} (get_prototype): return
+	  Object class interface when hit top of inheritance chain;
+	  make sure to never access m_prototype directly but always
+	  use get_prototype() instead. This ensures that *every* object
+	  ends up being an Object instance.
+	* testsuite/actionscript.all/Function.as: a few more tests to
+	  ensure that functions are instance of Object.
+	* testsuite/actionscript.all/: MovieClip.as, Inheritance.as:
+	  Don't expect failures while checking for objects being
+	  instance of Object class.
+
+2007-02-07 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/tag_loaders.cpp (define_shape_loader): neater parse
 	  print.
 	* server/types.{cpp,h}: add output operator and toString

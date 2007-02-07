@@ -35,6 +35,9 @@ void object_class_init(as_object& global);
 /// Return an Object instance
 std::auto_ptr<as_object> init_object_instance();
 
+as_object* getObjectInterface();
+
+
 }
 
 #endif // GNASH_OBJECT_H

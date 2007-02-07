@@ -324,12 +324,11 @@ public:
 	/// The __proto__ member is the exported interface ('prototype')
 	/// of the class this object is an instance of.
 	///
-	as_object* get_prototype() {
-		return m_prototype.get();
-	}
+	as_object* get_prototype();
 
 	const as_object* get_prototype() const {
-		return m_prototype.get();
+		// cast away constness
+		return const_cast<as_object*>(this)->get_prototype();
 	}
 
 	/// Set this object's '__proto__' member

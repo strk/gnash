@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.12 2007/02/01 11:57:19 strk Exp $ */
+/* $Id: Object.cpp,v 1.13 2007/02/07 10:28:40 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -66,7 +66,7 @@ attachObjectInterface(as_object& o)
 	o.set_member_flags("addProperty", 1); // hidden
 }
 
-static as_object*
+as_object*
 getObjectInterface()
 {
 	static boost::intrusive_ptr<as_object> o;
@@ -74,6 +74,7 @@ getObjectInterface()
 	{
 		o = new as_object();
 		attachObjectInterface(*o);
+		o->set_prototype(o.get());
 	}
 	return o.get();
 }

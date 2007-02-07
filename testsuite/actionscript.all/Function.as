@@ -20,10 +20,9 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.21 2007/01/08 11:54:09 strk Exp $";
+rcsid="$Id: Function.as,v 1.22 2007/02/07 10:28:40 strk Exp $";
 
 #include "check.as"
-
 
 // Define a function returning 'this'.name and the given args
 function getThisName(a,b,c) { return this.name+a+b+c; }
@@ -175,6 +174,19 @@ check (testInstance.name == "Test");
 // Test inheritance
 check (testInstance.__proto__ != undefined);
 check (testInstance.__proto__ == TestClass.prototype);
+check (testInstance instanceOf TestClass);
+check (testInstance instanceOf Object);
+#if OUTPUT_VERSION > 5
+// Function was added in version 5
+check_equals (typeOf(Function.prototype.addProperty), 'function');
+check_equals (testInstance.__proto__, TestClass.prototype)
+check_equals (TestClass.__proto__, Function.prototype)
+check_equals (testInstance.addProperty, Object.prototype.addProperty)
+Object.prototype.addProperty = function() { return 7; };
+var t = testInstance.addProperty();
+check_equals(t, 7);
+check (Function instanceOf Object);
+#endif
 
 check_equals (typeOf(TestClass.prototype.constructor), 'function');
 
