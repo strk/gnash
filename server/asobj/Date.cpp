@@ -31,6 +31,8 @@
 //	thousands of years BC, but the localtime code here only works for
 //	valid Unix dates Dec 13 20:45:52 1901 - Jan 19 03:14:07 2038.
 //	Our UTC code could be hacked into working outside this range but
+//	this is not worth doing unless we also implement full-range localtime
+//	operations too.
 //
 // To probe FlashPlayer functionality put something like:
 // class Test {
@@ -72,12 +74,13 @@
 // In the absence of gettimeofday() we use ftime() to get milliseconds,
 // but not for timezone offset bcos ftime's TZ stuff is unreliable.
 // For that we use tzset()/timezone if it is available
+// However, ftime() is the only reliable way to get the timezone offset.
 
-#if HAVE_GETTIMEOFDAY
+#if HAVE_FTIME
 # include <sys/timeb.h>		// for ftime()
-# if HAVE_TZSET
-	extern long timezone;	// for tzset()/timezone
-# endif
+#endif
+#if HAVE_TZSET
+extern long timezone;		// for tzset()/timezone
 #endif
 
 namespace gnash {
@@ -586,10 +589,8 @@ local_date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec)
 	_localtime_r(&t, &tm);	// break out date/time elements
 }
 
-// convert Unix time structure and the remaining milliseconds to
+// Convert Unix time structure and the remaining milliseconds to
 // Flash datestamp.
-// To prevent mktime() from altering the hour if tm_isdst is wrong, we have to
-// do a preliminary pass to set tm_isdst.
 static void
 local_tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date)
 {
@@ -1123,7 +1124,7 @@ void date_class_init(as_object& global)
  *	When munging this, bear in mind that for calculation
  *	the year starts on March the 1st (yday == 0)
  *
- *	These routines have been tested exhaistively against gmtime() and
+ *	These routines have been tested exhaustively against gmtime() and
  *	may work for dates outside the range that gmtime() can handle
  *	(Dec 13 20:45:52 1901 - Jan 19 03:14:07 2038)
  *	Dates up to 2100 should work; ones before 1900 I doubt it.
