@@ -20,14 +20,14 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.15 2007/02/07 18:51:14 martinwguy Exp $";
+rcsid="$Id: Date.as,v 1.16 2007/02/07 19:08:44 martinwguy Exp $";
 
 #include "check.as"
 
 check (Date);
 
 // test the Date constuctor
-var date = new Date(70,1,2,3,4,5,6,7);
+var date = new Date(70,1,2,3,4,5,6);
 check (date);
 
 // test methods existance
@@ -112,6 +112,17 @@ check_equals (date.tostring, undefined);
 
 #endif
 
+// var date = new Date(70,1,2,3,4,5,6);
+trace ("Testing random date");
+check_equals (date.getFullYear(), 1970);
+check_equals (date.getYear(), 70);
+check_equals (date.getMonth(), 1);
+check_equals (date.getDate(), 2);
+check_equals (date.getHours(), 3);
+check_equals (date.getMinutes(), 4);
+check_equals (date.getSeconds(), 5);
+check_equals (date.getMilliseconds(), 6);
+
 // Test decoding methods
 // Check the epoch, 1 Jan 1970
 trace ("Testing 1 Jan 1970 UTC");
@@ -127,11 +138,6 @@ check_equals (date.getUTCSeconds(), 0);
 check_equals (date.getUTCMilliseconds(), 0);
 check_equals (date.valueOf(), 0);
 
-// localtime functions and toString are hard to test cos we can't find out
-// whether DST is in force or not.
-// However, DST only add 0 to 1 hour to the local hour so we can set the
-// UTC time to compensate for the year-long offset and check it is between
-// 0 and 1
 trace ("Testing 1 Jan 2000 UTC");
 date.setUTCFullYear(2000, 0, 1);
 date.setUTCHours(0, 0, 0);
