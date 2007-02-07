@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.20 2007/02/01 13:40:08 strk Exp $";
+rcsid="$Id: Object.as,v 1.21 2007/02/07 11:09:07 strk Exp $";
 
 #include "check.as"
 
@@ -121,6 +121,13 @@ check_equals (obj3.len, 3);
 obj3.len = 5;
 check_equals (obj3._len, 5);
 check_equals (obj3.len, 5);
+
+// TODO: try omitting the "setter" argument
+var ret = obj3.addProperty("len2", getLen);
+check_equals(ret, false);
+check_equals (obj3.len2, undefined);
+obj3.len2 = 'test';
+check_equals (obj3.len2, 'test');
 
 // TODO: try using the name of an existing property
 
