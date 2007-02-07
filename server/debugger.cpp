@@ -394,7 +394,7 @@ Debugger::matchWatchPoint(std::string &var, watch_state_e state)
     std::map<std::string, watch_state_e>::const_iterator it;
     it =_watchpoints.find(var);
     if (it == _watchpoints.end()) {
-	dbglogfile << "No Match for variable \"" << var << "\"" << endl;
+//	dbglogfile << "No Match for variable \"" << var << "\"" << endl;
  	return false;
     } else {
 	if (state == _watchpoints[var]) {
@@ -554,8 +554,11 @@ Debugger::addSymbol(void *ptr, std::string name)
     if ( vm.getSWFVersion() < 7 ) {
 	boost::to_lower(namei, vm.getLocale());
     }
-    dbglogfile << "Adding symbol " << namei << " at address: " << ptr << endl;
-    _symbols[ptr] = namei;
+    if (namei.size() > 1) {
+//    dbglogfile << "Adding symbol " << namei << " at address: " << ptr << endl;
+	_symbols[ptr] = namei;
+    }
+    
 }
 
 

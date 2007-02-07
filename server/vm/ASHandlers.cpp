@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.33 2007/02/06 23:06:18 rsavoye Exp $ */
+/* $Id: ASHandlers.cpp,v 1.34 2007/02/07 00:59:59 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2146,7 +2146,7 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
 void
 SWFHandlers::ActionCallFunction(ActionExec& thread)
 {
-        GNASH_REPORT_FUNCTION;
+//        GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
 	thread.ensureStack(2); // func name, nargs
@@ -2192,7 +2192,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 void
 SWFHandlers::ActionReturn(ActionExec& thread)
 {
-        GNASH_REPORT_FUNCTION;
+//        GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 	as_value* retval = thread.retval;
 
