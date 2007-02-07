@@ -1,8 +1,7 @@
-M ChangeLog
-M server/as_object.cpp
-M server/types.cpp
-M server/asobj/Object.cpp
-M server/vm/fn_call.h
+2007-02-07 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loaders.cpp: use log_swferror where appropriate,
+	  (swf_event::read): tolerate malformed header.
 
 2007-02-07 Sandro Santilli <strk@keybit.net>
 

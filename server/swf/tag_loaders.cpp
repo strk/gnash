@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.72 2007/02/07 09:07:36 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.73 2007/02/07 16:29:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -141,9 +141,11 @@ frame_label_loader(stream* in, tag_type tag, movie_definition* m)
 		}
 		else
 		{
-	log_warning("frame_label_loader end position " SIZET_FMT ", "
-			"read up to " SIZET_FMT " (Malformed SWF?)",
+			IF_VERBOSE_MALFORMED_SWF(
+	log_swferror("frame_label_loader end position " SIZET_FMT ", "
+			"read up to " SIZET_FMT,
 			end_tag, curr_pos);
+			);
 		}
 	}
 
@@ -735,8 +737,10 @@ void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
 	}
 	else
 	{
-		log_error("define_font_info_loader: "
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("define_font_info_loader: "
 			"can't find font w/ id %d", font_id);
+		);
 	}
 }
 
@@ -860,14 +864,29 @@ public:
 			action_buffer action;
 			action.read(in);
 
-			if (action.get_length() != event_length)
+			size_t readlen = action.size();
+			if (readlen > event_length)
 			{
-				log_error("swf_event::read(), "
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror("swf_event::read(), "
 					"event_length = %d, "
-					"but read %lu",
-					event_length,
-					static_cast<unsigned long>(action.get_length()));
+					"but read " SIZET_FMT
+					". Breaking for safety.",
+					event_length, readlen);
+				);
+				// or should we just continue here ?
 				break;
+			}
+			else if ( readlen < event_length )
+			{
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror("swf_event::read(), "
+					"event_length = %d, "
+					"but read " SIZET_FMT 
+					". Skipping excessive bytes.",
+					event_length, readlen);
+				);
+				in->skip_bytes(event_length - readlen);
 			}
 
 			// 13 bits reserved, 19 bits used
@@ -899,7 +918,9 @@ public:
 			// Let's see if the event flag we received is for an event that we know of
 			if ((pow(2.0, int( sizeof(s_code_bits) / sizeof(s_code_bits[0]) )) - 1) < flags)
 			{
-				log_error("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x", flags);
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x", flags);
+				);
 			}
 
 			for (int i = 0, mask = 1; i < int(sizeof(s_code_bits)/sizeof(s_code_bits[0])); i++, mask <<= 1)
@@ -1184,7 +1205,9 @@ sprite_loader(stream* in, tag_type tag, movie_definition* m)
 	// would be a malformed SWF
 	if ( ! dynamic_cast<movie_def_impl*>(m) )
 	{
-		log_error("Malformed SWF (nested DEFINESPRITE tags)");
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("nested DEFINESPRITE tags");
+		);
 	}
 
 	// will automatically read the sprite
@@ -1404,7 +1427,9 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 		// something smarter, if we agree on semantic
 		if (source_movie == m)
 		{
-		    log_warning("Won't let movie import it's own exported symbols... ");
+		    IF_VERBOSE_MALFORMED_SWF(
+		    log_swferror("Movie attempts to import symbols from itself.");
+		    );
 		    return;
 		}
 	}
@@ -1583,7 +1608,9 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 		if (! (sample_rate >= 0 && sample_rate <= 3))
 		{
-			log_error("Bad sample rate read from SWF header.");
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror("Bad sample rate read from SWF header.");
+			);
                 	return;
 		}
 
@@ -1676,7 +1703,9 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	{
 		if (s_sound_handler)
 		{
-			log_error("start_sound_loader: sound_id %d is not defined", sound_id);
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror("start_sound_loader: sound_id %d is not defined", sound_id);
+			);
 		}
 	}
 	
@@ -1727,7 +1756,9 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
 	if (! (sample_rate >= 0 && sample_rate <= 3))
 	{
-		log_error("Bad sample rate read from SWF header.");
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("Bad sample rate read from SWF header.");
+		);
 		return;
 	}
 
