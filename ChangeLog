@@ -1,3 +1,17 @@
+M ChangeLog
+M server/as_object.cpp
+M server/types.cpp
+M server/asobj/Object.cpp
+M server/vm/fn_call.h
+
+2007-02-07 Sandro Santilli <strk@keybit.net>
+
+	* server/types.cpp (rgba::read): made more readable.
+	* server/vm/fn_call.h: add dump_args() method.
+	* server/asobj/Object.cpp: use log_aserror() where appropriate,
+	  dump function args when invalid. Don't giveup when number of 
+	  args is greater then required.
+
 2007-02-07 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Object.as: add tests for invalid calls

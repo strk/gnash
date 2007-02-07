@@ -192,13 +192,16 @@ namespace gnash {
 
 	void	rgba::read(stream* in, int tag_type)
 	{
-		if (tag_type <= 22)
+		switch (tag_type)
 		{
-			read_rgb(in);
-		}
-		else
-		{
-			read_rgba(in);
+			case SWF::DEFINESHAPE:
+			case SWF::DEFINESHAPE2:
+				read_rgb(in);
+				break;
+			default:
+			case SWF::DEFINESHAPE3:
+				read_rgba(in);
+				break;
 		}
 	}
 

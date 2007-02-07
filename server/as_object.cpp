@@ -437,7 +437,9 @@ as_object::enumerateProperties(as_environment& env) const
 		obj = obj->get_prototype();
 	}
 
-	if ( obj ) log_warning("prototype loop during Enumeration");
+	// This happens always since top object in hierarchy
+	// is always Object, which in turn derives from itself
+	//if ( obj ) log_warning("prototype loop during Enumeration");
 }
 
 as_object::as_object()

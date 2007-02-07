@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.13 2007/02/07 10:28:40 strk Exp $ */
+/* $Id: Object.cpp,v 1.14 2007/02/07 13:31:26 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -157,19 +157,30 @@ object_addproperty(const fn_call& fn)
 
 	if ( fn.nargs != 3 )
 	{
-		log_warning("Invalid call to Object.addProperty() - "
-			"wrong number of args: %d, expected 3 "
-			"(property name, getter function, setter function)",
-			fn.nargs);
-		fn.result->set_bool(false);
-		return;
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss;
+		fn.dump_args(ss);
+		log_aserror("Invalid call to Object.addProperty(%s) - "
+			"expected 3 arguments (<name>, <getter>, <setter>).",
+		       	ss.str().c_str());
+		);
+
+		// if we've been given more args then needed there's
+		// no need to abort here
+		if ( fn.nargs < 3 )
+		{
+			fn.result->set_bool(false);
+			return;
+		}
 	}
 
 	std::string propname = fn.arg(0).to_string();
 	if ( propname.empty() )
 	{
-		log_warning("Invalid call to Object.addProperty() - "
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Invalid call to Object.addProperty() - "
 			"empty property name");
+		);
 		fn.result->set_bool(false);
 		return;
 	}
@@ -177,8 +188,10 @@ object_addproperty(const fn_call& fn)
 	as_function* getter = fn.arg(1).to_as_function();
 	if ( ! getter )
 	{
-		log_warning("Invalid call to Object.addProperty() - "
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Invalid call to Object.addProperty() - "
 			"getter is not an AS function");
+		);
 		fn.result->set_bool(false);
 		return;
 	}
@@ -186,8 +199,10 @@ object_addproperty(const fn_call& fn)
 	as_function* setter = fn.arg(2).to_as_function();
 	if ( ! setter )
 	{
-		log_warning("Invalid call to Object.addProperty() - "
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Invalid call to Object.addProperty() - "
 			"setter is not an AS function");
+		);
 		fn.result->set_bool(false);
 		return;
 	}
@@ -206,25 +221,33 @@ static void
 object_registerClass(const fn_call& fn)
 {
 	assert(fn.this_ptr);
-	as_object* obj = fn.this_ptr;
+	//as_object* obj = fn.this_ptr;
 
 	if ( fn.nargs != 2 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-			log_warning("Invalid call to Object.registerClass() - "
-				"wrong number of args: %d, expected 2.",
-				fn.nargs);
+		std::stringstream ss;
+		fn.dump_args(ss);
+		log_aserror("Invalid call to Object.registerClass(%s) - "
+			"expected 2 arguments (<symbol>, <constructor>).",
+			ss.str().c_str());
 		);
-		fn.result->set_bool(false);
-		return;
+
+		// if we've been given more args then needed there's
+		// no need to abort here
+		if ( fn.nargs < 2 )
+		{
+			fn.result->set_bool(false);
+			return;
+		}
 	}
 
 	std::string symbolid = fn.arg(0).to_std_string();
 	if ( symbolid.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-			log_warning("Invalid call to Object.registerClass() - "
-				"empty symbol id");
+		log_aserror("Invalid call to Object.registerClass() - "
+			"empty symbol id");
 		);
 		fn.result->set_bool(false);
 		return;
@@ -234,8 +257,8 @@ object_registerClass(const fn_call& fn)
 	if ( ! theclass )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-			log_warning("Invalid call to Object.registerClass() - "
-				"class is not a function");
+		log_aserror("Invalid call to Object.registerClass() - "
+			"class is not a function");
 		);
 		fn.result->set_bool(false);
 		return;
@@ -249,11 +272,14 @@ object_registerClass(const fn_call& fn)
 	boost::intrusive_ptr<resource> exp_res = def->get_exported_resource(symbolid.c_str());
 	if ( ! exp_res )
 	{
-		log_warning("Object.registerClass(%s, %s): "
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Object.registerClass(%s, %s): "
 			"can't find exported symbol",
 			symbolid.c_str(), 
 			typeid(theclass).name());
+		);
 		fn.result->set_bool(false);
+		return;
 	}
 
 	// Check that the exported resource is a sprite_definition
@@ -265,13 +291,16 @@ object_registerClass(const fn_call& fn)
 
 	if ( ! exp_clipdef )
 	{
-		log_warning("Object.registerClass(%s, %s): "
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Object.registerClass(%s, %s): "
 			"exported symbol is not a MovieClip symbol "
 			"(sprite_definition), but a %s",
 			symbolid.c_str(), 
 			typeid(theclass).name(),
 			typeid(*exp_res).name());
+		);
 		fn.result->set_bool(false);
+		return;
 	}
 
 	exp_clipdef->registerClass(theclass);

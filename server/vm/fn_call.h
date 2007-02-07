@@ -28,6 +28,7 @@
 #include "as_environment.h" // for inlines (arg)
 
 #include <cassert> // for inlines (arg)
+#include <ostream> // for inlines (dump_args)
 
 namespace gnash {
 
@@ -65,6 +66,16 @@ public:
 	{
 		assert(n < nargs);
 		return env->bottom(first_arg_bottom_index - n);
+	}
+
+	/// Dump arguments to given output stream
+	void dump_args(std::ostream& os) const
+	{
+		for (int i=0; i<nargs; ++i)
+		{
+			if ( i ) os << ", ";
+			os << arg(i).to_string();
+		}
 	}
 
 };
