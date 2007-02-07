@@ -1,3 +1,10 @@
+2007-02-06 Martin Guy <martinwguy@yahoo.it>
+
+	* server/asobj/Data.cpp: Completed reverse engineering of get/set
+	  methods
+	* configure.ac: Added check for ftime()
+	* testsuite/actionscript.all/Date.as: Add tests for get/set methods
+
 2007-02-07 Sandro Santilli <strk@keybit.net>
 
 	* server/debugger.h: const-correctness fixes.

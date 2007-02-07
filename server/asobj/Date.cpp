@@ -22,6 +22,15 @@
 //
 // TODO:
 //	implement static method Date.UTC
+// BUGS:
+//	Flash Player does not seem to respect TZ or the zoneinfo database;
+//	It changes to/from daylight saving time according to its own rules.
+//	We use the operating system's localtime routines.
+//
+//	Flash player handles a huge range of dates, including
+//	thousands of years BC, but the localtime code here only works for
+//	valid Unix dates Dec 13 20:45:52 1901 - Jan 19 03:14:07 2038.
+//	Our UTC code could be hacked into working outside this range but
 //
 // To probe FlashPlayer functionality put something like:
 // class Test {
@@ -29,8 +38,11 @@
 //
 //        static function main(mc) {
 //		var now = new Date();
+//		var s:String;
 //               _root.createTextField("tf",0,0,0,320,200);
-//              _root.tf.text = now.toString();
+//		s = now.toString();	// or whatever
+//		trace(s);			// output in gnash -v
+//              _root.tf.text = now.toString(); // output in flash player
 //        }
 // }
 // in test.as, compile with
@@ -61,21 +73,53 @@
 // but not for timezone offset bcos ftime's TZ stuff is unreliable.
 // For that we use tzset()/timezone if it is available
 
-#ifndef HAVE_GETTIMEOFDAY
+#if HAVE_GETTIMEOFDAY
 # include <sys/timeb.h>		// for ftime()
-# ifdef HAVE_TZSET
+# if HAVE_TZSET
 	extern long timezone;	// for tzset()/timezone
 # endif
 #endif
 
 namespace gnash {
 
-#ifdef HAVE_LOCALTIME_R
-	// Use the library functions
-#	define _gmtime_r gmtime_r
+// We have our own UTC time converter that works with Flash timestamps
+// (double milliseconds after 1970) rather than the time-limited time_t.
+// Define USE_UTCCONV as 1 to use these versions;
+// Undefine USE_UTCCONV or define it as 0 to use gmtime_r() and mktime()
+// for UTC date conversions (the mktime() versions sometimes set the time
+// wrong by an hour).
+#define USE_UTCCONV 1
+
+#if USE_UTCCONV
+// forward declarations
+static void utctime(double tim, struct tm *tmp, double *msecp);
+static double mkutctime(struct tm *tmp, double msec);
+#endif
+
+// Select functions to implement _localtime_r and _gmtime_r
+// For localtime we use the glibc stuff; for UTC we prefer our own routines
+// because the C library does not provide a function to convert
+// from struct tm to datestamp in UTC.
+
+#if HAVE_LOCALTIME_R
+	// Use the library function
 #	define _localtime_r localtime_r
-#else
-// Roll our own compatible versions rather checking the ifdef everywhere
+
+# if USE_UTCCONV
+static struct tm *
+_gmtime_r(time_t *t, struct tm *tm)
+{
+	double msec;
+	utctime(*t * 1000.0, tm, &msec);
+	return(tm);
+}
+# else
+#	define _gmtime_r gmtime_r
+# endif
+
+#else // HAVE_LOCALTIME_R
+
+// Roll our own compatible versions rather than checking the ifdef everywhere
 static struct tm *
 _localtime_r(time_t *t, struct tm *tm)
 {
@@ -87,14 +131,43 @@ _localtime_r(time_t *t, struct tm *tm)
 static struct tm *
 _gmtime_r(time_t *t, struct tm *tm)
 {
+#if USE_UTCCONV
+	double msec;
+	utctime(*t * 1000.0, &tm, &msec);
+#else
 	struct tm *tmp;
 	tmp = gmtime(t);
 	memcpy(tm, tmp, sizeof(struct tm));
 	return(tm);
-}
 #endif
+}
+#endif // HAVE_LOCALTIME_R
 
-// forwrd declarations
+// A modified version of mktime that works in localtime on struct tm
+// without you having to set tm_isdst.
+// If the real mktime() sees isdst==0 with a DST date, it sets
+// t_isdst and modifies the hour fields, but we need to set the
+// specified hour in the localtime in force at that time.
+//
+// To do this we set tm_isdst to the correct value for that moment in time
+// by doing an initial conversion of the time to find out is_dst for that
+// moment without DST, then do the real conversion.
+// This may get things wrong around the hour when the clocks go back or forth.
+static time_t
+_mktime(struct tm *tmp)
+{
+	struct tm tm2 = *tmp;
+	time_t t2;
+
+       	tm2.tm_isdst = 0;
+	t2 = mktime(&tm2);		// Convert the time without DST,
+	_localtime_r(&t2, &tm2);	// find out whether DST was in force
+	tmp->tm_isdst = tm2.tm_isdst;	// and apply that to the given time
+	return(mktime(tmp));
+}
+
+
+// forward declarations
 static void date_new(const fn_call& fn);
 static void date_getdate(const fn_call& fn);
 static void date_getday(const fn_call& fn);
@@ -267,14 +340,6 @@ date_new(const fn_call& fn)
                 tm.tm_mday = 1;
                 tm.tm_mon = (int) fn.arg(1).to_number();
                 tm.tm_year = (int) fn.arg(0).to_number();
-		// We need to know whether DST was in effect at the date they
-		// mention to know how to interpret the hour they specify.
-		// In fact this is impossible bcos on the day that the
-		// clocks go back there are two hours of time with the same
-		// local year-month-day-hour-minute values.
-		// Example: 1995 Apr 2 01:00-59 and 02:00-59 give the same UTC,
-		// both in GMT (which is wrong: BST started 26 March!)
-		// We'll do our best...
 
 		switch (fn.nargs) {
 		default:
@@ -282,7 +347,8 @@ date_new(const fn_call& fn)
 			log_aserror("Date constructor called with more than 7 arguments");
 		    )
 		case 7:
-			millisecs = fn.arg(6).to_number();
+			// fractions of milliseconds are ignored
+			millisecs = (int)fn.arg(6).to_number();
 		case 6:
 			tm.tm_sec = (int)fn.arg(5).to_number();
 		case 5:
@@ -301,9 +367,8 @@ date_new(const fn_call& fn)
 			// Fractional part of a year is ignored.
 			if (tm.tm_year >= 100) tm.tm_year -= 1900;
 		}
-		// Experimentally, glibc mktime ignores and tm_isdst and sets
-		// it from the date, applying it at midnight (not at 2am)
-		utcsecs = mktime(&tm);	// mktime converts from local time
+
+		utcsecs = _mktime(&tm);	// convert from local time
 		if (utcsecs == -1) {
 			// mktime could not represent the time
 			log_error("Date() failed to initialise from arguments");
@@ -338,28 +403,18 @@ ensure_date_object(as_object* obj)
 // Functions to return broken-out elements of the date and time.
 
 // We use a prototype macro to generate the function bodies because the many
-// individual functions are almost identical.
-//
-// localtime() and gmtime() return pointers to static structures, which is
-// not thread-safe, so we use the local-storage variants localtime_r gmtime_r
-// if they are available, hence two versions of the macro here.
+// individual functions are small and almost identical.
 
-#if HAVE_LOCALTIME_R
+// This calls _gmtime_r and _localtime_r, which are defined above into
+// gmtime_r and localtime_r or our own local equivalents.
+
 #define date_get_proto(function, timefn, element) \
 	static void function(const fn_call& fn) { \
 		date_as_object* date = ensure_date_object(fn.this_ptr); \
 		time_t t = (time_t)(date->value / 1000.0); \
 		struct tm tm; \
-		fn.result->set_int(timefn##_r(&t, &tm)->element); \
+		fn.result->set_int(_##timefn##_r(&t, &tm)->element); \
 	}
-#else
-#define date_get_proto(function, timefn, element) \
-	static void function(const fn_call& fn) { \
-		date_as_object* date = ensure_date_object(fn.this_ptr); \
-		time_t t = (time_t)(date->value / 1000.0); \
-		fn.result->set_int(timefn(&t)->element); \
-	}
-#endif
 
 /// \brief Date.getYear returns the year of the specified Date object
 /// according to local time. The year is the full year minus 1900.
@@ -439,24 +494,31 @@ date_get_proto(date_getutcseconds,  gmtime, tm_sec)
 
 static int minutes_east_of_gmt()
 {
-#ifdef HAVE_GETTIMEOFDAY
-	struct timeval tv;
-	struct timezone tz;
-	gettimeofday(&tv,&tz);
-	return(-tz.tz_minuteswest);
-#elif defined(HAVE_TZSET)
+#if HAVE_TZSET
 	tzset();
 	return(-timezone/60); // timezone is seconds west of GMT
-#else
+#elif HAVE_FTIME
 	// ftime(3): "These days the contents of the timezone and dstflag
 	// fields are undefined."
 	// In practice, timezone is -120 in Italy when it should be -60.
-	// Still, mancansa d'asu, t'acuma i buoi.
 	struct timeb tb;
 		
 	ftime (&tb);
 	// tb.timezone is number of minutes west of GMT
 	return(-tb.timezone);
+#elif HAVE_GETTIMEOFDAY
+	// gettimeofday(3):
+	// "The use of the timezone structure is obsolete; the tz argument
+	// should normally be specified as NULL. The tz_dsttime field has
+	// never been used under Linux; it has not been and will not be
+	// supported by libc or glibc."
+	// Still, mancansa d'asu, t'acuma i buoi.
+	struct timeval tv;
+	struct timezone tz;
+	gettimeofday(&tv,&tz);
+	return(-tz.tz_minuteswest);
+#else
+	return(0);	// No idea.
 #endif
 }
 
@@ -502,8 +564,7 @@ static void date_settime(const fn_call& fn) {
 // The Adobe player 9 behaves strangely. e.g., after "new date = Date(0)":
 // date.setYear(1970); date.setMonth(1); date.setDate(29); gives Mar 1 but
 // date.setYear(1970); date.setDate(29); date.setMonth(1); gives Feb 28
-// I doubt we can reproduce its exact operation, so just let mktime do what
-// it wants with rogue values.
+// For now, just let mktime do as it pleases with rogue values.
 
 // We need two sets of the same functions: those that take localtime values
 // and those that take UTC (GMT) values.
@@ -526,11 +587,13 @@ local_date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec)
 }
 
 // convert Unix time structure and the remaining milliseconds to
-// Flash datestamp
+// Flash datestamp.
+// To prevent mktime() from altering the hour if tm_isdst is wrong, we have to
+// do a preliminary pass to set tm_isdst.
 static void
 local_tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date)
 {
-	time_t t = mktime(&tm);
+	time_t t = _mktime(&tm);
 
 	// Reconstruct the time value and put the milliseconds back in.
 	// If mktime fails to reconstruct the date, change nothing.
@@ -544,15 +607,18 @@ local_tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date)
 // Two low-level functions to convert between datestamps and time structures
 // whose contents are in UTC
 //
-// Unfortunately, mktime() only works in localtime.
-// gmtime() will split it for us, but how do we put it back together again?
+// gmtime() will split it for us, but mktime() only works in localtime.
 
 static void
 utc_date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec)
 {
+#if USE_UTCCONV
+	utctime(date->value, &tm, &msec);
+#else
 	time_t t = (time_t)(date->value / 1000.0);
 	msec = std::fmod(date->value, 1000.0);
 	_gmtime_r(&t, &tm);
+#endif
 }
 
 // TODO:
@@ -564,6 +630,9 @@ utc_date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec)
 static void
 utc_tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date)
 {
+#if USE_UTCCONV
+	date->value = mkutctime(&tm, msec);
+#else
 	time_t t = mktime(&tm);
 	if (t == (time_t)(-1)) {
 	    log_error("utc_tm_msec_to_date failed to convert back to Date");
@@ -573,6 +642,7 @@ utc_tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date)
 	}
 	
 	date->value = t * 1000.0 + msec;
+#endif
 }
 
 // Now the generic version of these two functions that switch according to
@@ -620,6 +690,19 @@ date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec, bool utc)
 /// If changing the year or month results in an impossible date, it is
 /// normalised: 29 Feb becomes 1 Mar, 31 April becomes 1 May etc.
 
+// When changing the year/month/date from a date in Daylight Saving Time to a
+// date not in DST or vice versa, with setYear and setFullYear the hour of day
+// remains the same in *local time* not in UTC.
+// So if a date object is set to midnight in January and you change the date
+// to June, it will still be midnight localtime.
+//
+// When using setUTCFullYear instead, the time of day remains the same *in UTC*
+// so, in the northern hemisphere, changing midnight from Jan to June gives
+// 01:00 localtime.
+//
+// Heaven knows what happens if it is 1.30 localtime and you change the date
+// to the day the clocks go forward.
+
 static void _date_setfullyear(const fn_call& fn, bool utc) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
@@ -653,11 +736,11 @@ static void _date_setfullyear(const fn_call& fn, bool utc) {
 /// If year is an integer between 0-99, setYear sets the year at 1900 + year;
 /// otherwise, the year is a four-digit one.
 //
-/// Contrary to the spec at sephiroth.it, this takes and acts on optional
-/// parameters month and day; if they are unspecified their values are not
-/// changed.
-///
-/// There is no setUTCYear() function.
+// Contrary to the spec at sephiroth.it, this takes and acts on optional
+// parameters month and day; if they are unspecified their values are not
+// changed.
+//
+// There is no setUTCYear() function.
 
 static void date_setyear(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -694,7 +777,7 @@ static void date_setyear(const fn_call& fn) {
 /// month: An integer from 0 (January) to 11 (December).
 /// date: An integer from 1 to 31. [optional]
 
-static void _date_setmonth(const fn_call& fn, bool utc=false) {
+static void _date_setmonth(const fn_call& fn, bool utc) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
@@ -724,7 +807,7 @@ static void _date_setmonth(const fn_call& fn, bool utc=false) {
 //
 /// date: An integer from 1 to 31
 
-static void _date_setdate(const fn_call& fn, bool utc=false) {
+static void _date_setdate(const fn_call& fn, bool utc) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	if (fn.nargs < 1) {
@@ -757,11 +840,15 @@ static void _date_setdate(const fn_call& fn, bool utc=false) {
 ///
 /// If optional fields are omitted, their values in the Date object
 /// are left the same as they were.
-///
-/// Contrary to the spec at sephiroth.it, this takes and acts on optional
-/// parameters min, sec and millisec.
+//
+// Contrary to the spec at sephiroth.it, this takes and acts on optional
+// parameters min, sec and millisec.
+//
+// Flash Player only takes notice of the whole part of millisec,
+// truncating it, not rounding it. The only way to set a fractional number of
+// milliseconds is to use setTime(n) or call the constructor with one argmuent.
 
-static void _date_sethours(const fn_call& fn, bool utc=false) {
+static void _date_sethours(const fn_call& fn, bool utc) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 4);
@@ -779,7 +866,7 @@ static void _date_sethours(const fn_call& fn, bool utc=false) {
 	    if (fn.nargs >= 3)
 		    tm.tm_sec = (int) fn.arg(2).to_number();
 	    if (fn.nargs >= 4)
-		    msec = fn.arg(3).to_number();
+		    msec = (int) fn.arg(3).to_number();
 	    if (fn.nargs > 4) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setHours was called with more than four arguments");
@@ -797,7 +884,7 @@ static void _date_sethours(const fn_call& fn, bool utc=false) {
 /// Contrary to the spec at sephiroth.it, this takes and acts on optional
 /// extra parameters secs and millisecs.
 
-static void _date_setminutes(const fn_call& fn, bool utc=false) {
+static void _date_setminutes(const fn_call& fn, bool utc) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	//assert(fn.nargs >= 1 && fn.nargs <= 3);
@@ -813,7 +900,7 @@ static void _date_setminutes(const fn_call& fn, bool utc=false) {
 	    if (fn.nargs >= 2)
 		    tm.tm_sec = (int) fn.arg(1).to_number();
 	    if (fn.nargs >= 3)
-		    msec = fn.arg(2).to_number();
+		    msec = (int) fn.arg(2).to_number();
 	    if (fn.nargs > 3) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setMinutes was called with more than three arguments");
@@ -828,7 +915,7 @@ static void _date_setminutes(const fn_call& fn, bool utc=false) {
 /// the milliseconds for the specified Date object in local time
 /// and returns the new time in milliseconds.
 
-static void _date_setseconds(const fn_call& fn, bool utc=false) {
+static void _date_setseconds(const fn_call& fn, bool utc) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
@@ -846,7 +933,7 @@ static void _date_setseconds(const fn_call& fn, bool utc=false) {
 	    date_to_tm_msec(date, tm, msec, utc);
 	    tm.tm_sec = (int) fn.arg(0).to_number();
 	    if (fn.nargs >= 2)
-		    msec = fn.arg(1).to_number();
+		    msec = (int) fn.arg(1).to_number();
 	    if (fn.nargs > 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setMinutes was called with more than three arguments");
@@ -867,7 +954,7 @@ static void date_setmilliseconds(const fn_call& fn) {
 	    )
 	} else {
 	    // Zero the milliseconds and set them from the argument.
-	    date->value = std::fmod(date->value, 1000.0) + fn.arg(0).to_number();
+	    date->value = std::fmod(date->value, 1000.0) + (int) fn.arg(0).to_number();
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror("Date.setMilliseconds was called with more than one argument");
@@ -1009,6 +1096,121 @@ void date_class_init(as_object& global)
 	global.init_member("Date", cl.get());
 
 }
+
+#ifdef USE_UTCCONV
+/*
+ * This routine converts time as follows.
+ * The epoch is 00:00 Jan 1 1970 GMT.
+ * The argument time is in seconds since then.
+ * utctime() fills the structure pointed to by tmp as follows:
+ *
+ *	tm_sec		seconds (0-59)
+ *	tm_min		minutes (0-59)
+ *	tm_hour		hours (0-23)
+ *	tm_mday		day of month (1-31)
+ *	tm_mon		month (0-11)
+ *	tm_year		year - 1900 (70- )
+ *	tm_wday		weekday (0-6, Sun is 0)
+ *	tm_yday		day of the year (0-364/5)
+ *	tm_isdst	is daylight saving time in force? (always 0 = GMT)
+ *
+ *	Reference: Algorithm 199 by Robert G. Tantzen
+ *	from "Collected Algorithms from ACM" Volume 1
+ *	Published by the Association for Computing Machinery, 1980.
+ *	See http://portal.acm.org/citation.cfm?id=390020 (pay-to-know site)
+ *	See also http://ftp.unicamp.br/pub/unix-c/calendars/jday-jdate.c
+ *
+ *	When munging this, bear in mind that for calculation
+ *	the year starts on March the 1st (yday == 0)
+ *
+ *	These routines have been tested exhaistively against gmtime() and
+ *	may work for dates outside the range that gmtime() can handle
+ *	(Dec 13 20:45:52 1901 - Jan 19 03:14:07 2038)
+ *	Dates up to 2100 should work; ones before 1900 I doubt it.
+ */
+
+static void
+utctime(double tim, struct tm *tmp, double *msecp)
+{
+	register int d; /* workhorse variable */
+	register int y, m, a;
+
+	/*
+	 *	This routine is good until year 2100.
+	 */
+
+	*msecp = std::fmod(tim, 1000.0); tim = trunc(tim / 1000.0);
+	tmp->tm_sec = (d = (int) std::fmod(tim, 86400.0)) % 60;
+	tmp->tm_min = (d/=60) % 60;
+	tmp->tm_hour = d/60;
+
+	d = (int) trunc(tim / 86400.0); /* no of days after 1 Jan 1970 */
+
+	/* Make time of day positive when time is negative */
+	if (tim < 0) {
+		if (*msecp < 0) { *msecp += 1000; tmp->tm_sec--; }
+		if (tmp->tm_sec < 0) { tmp->tm_sec += 60; tmp->tm_min--; }
+		if (tmp->tm_min < 0) { tmp->tm_min += 60; tmp->tm_hour--; }
+		if (tmp->tm_hour < 0) { tmp->tm_hour += 24; d--; }
+	}
+
+	/*
+	 * d is the day number after 1 Jan 1970. Generate day of the week.
+	 * The addend is 4 mod 7 (1/1/1970 was Thursday)
+	 */
+
+	if (d >= -4) tmp->tm_wday = (d+4)%7;
+	else tmp->tm_wday = 6 - (((-5)-d)%7);
+
+	// 693902 is the days from 1st March 0000 to 1st Jan 1900
+	// 25567 is the days from 1st Jan 1900 to 1st Jan 1970
+	// 10957 is the days from 1st Jan 1970 to 1st Jan 2000
+	// 1461 is the number of days in 4 years
+
+	/* deal with years 2000-2099 */
+	if ( d > 10957+59 /* 29 Feb 2000 */ ) y = 100; else y = 0;
+	y += ( d = ( 4 * ( d + 693902+25567 ) - 1 ) % 146097 | 3 ) / 1461;
+	a = ( d = ( d % 1461 ) / 4 + 1 ) - 307;
+	m = ( ( d *= 5 ) - 3 ) / 153;
+	tmp->tm_mday = ( d + 2 - 153 * m ) / 5;
+
+	/* adjust for fact that day==0 is 1st Mar */
+	if ((m += 2) > 11) { m -= 12; y++; }
+	tmp->tm_yday = ( a >= 0 ? a : a+365 );
+	if ( (y & 3) == 0 && a < 0) tmp->tm_yday++;
+	tmp->tm_mon=m;
+	tmp->tm_year=y;
+	tmp->tm_isdst = 0;
+}
+
+/* Convert a gregorian calendar date to milliseconds since 1 Jan 1970 UTC */
+static double
+mkutctime(struct tm *tmp, double msec)
+{
+	int d = tmp->tm_mday;
+	int m = tmp->tm_mon + 1;
+	int ya = tmp->tm_year;	/* Years since 1900 */
+	int k;	/* day number since 1 Jan 1900 */
+
+	// For calculation, convert to a year starting on 1 March
+	if (m > 2) m -= 3;
+	else {
+		m += 9;
+		ya--;
+	}
+
+	k = (1461 * ya) / 4 + (153 * m + 2) / 5 + d + 58;
+
+	/* K is now the day number since 1 Jan 1900.
+	 * Convert to minutes since 1 Jan 1970 */
+	/* 25567 is the number of days from 1 Jan 1900 to 1 Jan 1970 */
+	k = ((k - 25567) * 24 + tmp->tm_hour) * 60 + tmp->tm_min;
+	
+	// Converting to double after minutes allows for +/- 4082 years with
+	// 32-bit signed integers.
+	return  (k * 60.0 + tmp->tm_sec) * 1000.0 + msec;
+}
+#endif // UTCCONV
 
 } // end of gnash namespace
 
