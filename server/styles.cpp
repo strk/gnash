@@ -82,8 +82,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 
 		IF_VERBOSE_PARSE
 		(
-        log_parse("  color: ");
-        m_color.print();
+        log_parse("  color: %s", m_color.toString().c_str());
 		);
     }
     else if (m_type == SWF::FILL_LINEAR_GRADIENT

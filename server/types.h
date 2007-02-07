@@ -12,6 +12,8 @@
 #include "gnash.h"
 #include "tu_types.h"
 
+#include <string>
+
 
 namespace gnash {
 	extern bool	s_verbose_action;
@@ -31,6 +33,9 @@ namespace gnash {
 	class rgba
 	{
 	public:
+
+		friend std::ostream& operator<< (std::ostream& os, const rgba& r);
+
 		uint8_t	m_r, m_g, m_b, m_a;
 
 		/// Default RGBA value is FF.FF.FF.FF
@@ -81,7 +86,12 @@ namespace gnash {
 
 		/// Debug log.
 		void	print() const;
+
+		/// Debug print.
+		std::string toString() const;
 	};
+
+	std::ostream& operator<< (std::ostream& os, const rgba& r);
 
 
 }	// end namespace gnash

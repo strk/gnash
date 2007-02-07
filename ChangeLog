@@ -1,3 +1,11 @@
+2007-02-07 Sandro Santilli <strk@keybit.net>
+
+	* server/types.{cpp,h}: add output operator and toString
+	  method for rgba class.
+	* server/styles.cpp (fill_stle::read): neater color print.
+	* server/parser/shape_character_def.cpp (read):
+	  neater parse print.
+
 2007-02-06 Sandro Santilli <strk@keybit.net>
 
 	* server/debugger.{h,cpp}: (dissasemble): first argument

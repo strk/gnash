@@ -11,7 +11,9 @@
 #include "stream.h"
 #include "render.h"
 #include "gnash.h"
+
 #include <cstring>
+#include <sstream> // for ::print and ::toString
 
 
 #ifndef HAVE_ISFINITE
@@ -220,6 +222,13 @@ namespace gnash {
 		log_parse("rgba: %d %d %d %d", m_r, m_g, m_b, m_a);
 	}
 
+	std::string rgba::toString() const
+	// For debugging.
+	{
+		std::stringstream ss;
+		ss << *this;
+		return ss.str();
+	}
 	
 	void	rgba::set_lerp(const rgba& a, const rgba& b, float f)
 	{
@@ -229,6 +238,15 @@ namespace gnash {
 		m_a = (uint8_t) frnd(flerp(a.m_a, b.m_a, f));
 	}
 
+std::ostream&
+operator<< (std::ostream& os, const rgba& r)
+{
+	return os << "rgba: "
+		<< (unsigned)r.m_r << ", "
+		<< (unsigned)r.m_g << ", "
+		<< (unsigned)r.m_b << ", "
+		<< (unsigned)r.m_a;
+}
 
 }	// end namespace gnash
 
