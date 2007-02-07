@@ -91,6 +91,10 @@ namespace gnash {
 // Undefine USE_UTCCONV or define it as 0 to use gmtime_r() and mktime()
 // for UTC date conversions (the mktime() versions sometimes set the time
 // wrong by an hour).
+//
+// Currently, without this, setting times in UTC to a moment when DST is active
+// gets the hour and datestamp wrong, and changing the date into/out of a
+// DST period without adjusts the UTC time of day (it shouldn't).
 #define USE_UTCCONV 1
 
 #if USE_UTCCONV
