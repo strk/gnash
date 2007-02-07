@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.21 2007/02/07 11:09:07 strk Exp $";
+rcsid="$Id: Object.as,v 1.22 2007/02/07 21:51:57 strk Exp $";
 
 #include "check.as"
 
@@ -151,6 +151,12 @@ inh2._len = 7;
 check_equals (inh1.len, 5);
 check_equals (inh2.len, 7);
 check_equals (proto.len, undefined);
+
+// Override addProperty member
+var o = new Object();
+o.addProperty = function(a, b) { return a+b; };
+var c = o.addProperty(2,5);
+check_equals(c, 7);
 
 // Object.addProperty wasn't in SWF5
 #endif // OUTPUT_VERSION > 5
