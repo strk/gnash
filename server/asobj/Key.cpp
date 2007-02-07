@@ -406,11 +406,11 @@ void	notify_key_event(key::code k, bool down)
 
 void key_class_init(as_object& global)
 {
-	// FIXME: conform to getKeyInterface/attachKeyInterface
 
-//	    GNASH_REPORT_FUNCTION;
+//  GNASH_REPORT_FUNCTION;
 
     // Create built-in key object.
+    // NOTE: _global.Key *is* an object, not a constructor
     as_object*	key_obj = new key_as_object;
 
     // constants
@@ -433,10 +433,6 @@ void key_class_init(as_object& global)
     KEY_CONST(SPACE);
     KEY_CONST(TAB);
     KEY_CONST(UP);
-
-    // FIXME: is this function even called/allowed ?
-    //        if so we shouldn't ever explicitly set
-    //        these methods, but rather rely on inheritance
 
     // methods
     key_obj->init_member("addListener", &key_add_listener);
