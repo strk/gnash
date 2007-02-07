@@ -157,7 +157,13 @@ key_as_object::set_key_down(int code)
 
 	    m_keymap[byte_index] |= mask;
 
-	    notify_listeners(event_id(event_id::KEY_DOWN).get_function_name());
+	std::string funcname = event_id(event_id::KEY_DOWN).get_function_name();
+	VM& vm = VM::get();
+	if ( vm.getSWFVersion() < 7 )
+	{
+		boost::to_lower(funcname, vm.getLocale());
+	}
+	notify_listeners(funcname);
 }
 
 
@@ -174,7 +180,13 @@ key_as_object::set_key_up(int code)
 
 	    m_keymap[byte_index] &= ~mask;
 
-	    notify_listeners(event_id(event_id::KEY_UP).get_function_name());
+	std::string funcname = event_id(event_id::KEY_UP).get_function_name();
+	VM& vm = VM::get();
+	if ( vm.getSWFVersion() < 7 )
+	{
+		boost::to_lower(funcname, vm.getLocale());
+	}
+	notify_listeners(funcname);
 }
 
 // TODO: take a std::string
@@ -346,8 +358,19 @@ void	notify_key_event(key::code k, bool down)
 		mroot.notify_keypress_listeners(k);
 	}
 
-	//static boost::intrusive_ptr<key_as_object*> keyobject = NULL;
-	static key_as_object* keyobject = NULL;
+	//
+	// Notify the _global.Key object about key event
+	//
+
+
+	VM& vm = VM::get();
+	if ( vm.getSWFVersion() < 6 )
+	{
+		// _global.Key was added in SWF6
+		return;
+	}
+
+	static boost::intrusive_ptr<key_as_object> keyobject = NULL;
 	if ( ! keyobject )
 	{
 		// This isn't very performant... do we allow user override
@@ -357,14 +380,17 @@ void	notify_key_event(key::code k, bool down)
 		as_object* global = VM::get().getGlobal();
 
 		std::string objName = "Key";
-		VM& vm = VM::get();
 		if ( vm.getSWFVersion() < 7 )
 		{
 			boost::to_lower(objName, vm.getLocale());
 		}
-		global->get_member(objName, &kval);
-
-		keyobject = dynamic_cast<key_as_object*>( kval.to_object() );
+		if ( global->get_member(objName, &kval) )
+		{
+			log_msg("Found member 'Key' in _global: %s", kval.to_string());
+			as_object* obj = kval.to_object();
+			log_msg("_global.Key to_object() : %s @ %p", typeid(*obj).name(), obj);
+			keyobject = dynamic_cast<key_as_object*>( obj );
+		}
 	}
 
 	if ( keyobject )
@@ -421,6 +447,8 @@ void key_class_init(as_object& global)
     key_obj->init_member("removeListener", &key_remove_listener);
 
     global.init_member("Key", key_obj);
+    log_msg("Registered %s object %p as _global.Key member",
+		    typeid(*key_obj).name(), key_obj);
 }
 
 } // end of gnash namespace
