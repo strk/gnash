@@ -80,6 +80,7 @@ check_PROGRAMS = \
 	simple_loop_testrunner \
 	action_execution_order_test \
 	KeyTest-Runner \
+	loadMovieTest \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -433,6 +434,26 @@ ButtonEventsTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	ButtonEventsTest.swf	\
 	$(NULL)
+
+loadMovieTest_SOURCES =	\
+	loadMovieTest.c	\
+	ming_utils.h	\
+	ming_utils.c	\
+	$(NULL)
+loadMovieTest_LDADD = $(MING_LIBS)
+loadMovieTest.swf: loadMovieTest
+	./loadMovieTest $(top_srcdir)/testsuite/media
+
+#loadMovieTest_Runner_SOURCES = \
+#	loadMovieTest-Runner.cpp \
+#	$(NULL)
+#loadMovieTest_Runner_LDADD = \
+#	$(top_builddir)/testsuite/libtestsuite.la \
+#	$(NULL)
+#loadMovieTest_Runner_DEPENDENCIES = \
+#	$(top_builddir)/testsuite/libtestsuite.la \
+#	loadMovieTest.swf	\
+#	$(NULL)
 
 # This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
 VarAndCharClashTest.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/VarAndCharClashTest.as 
