@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.42 2007/01/18 22:53:21 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.43 2007/02/08 13:57:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -440,7 +440,7 @@ void
 edit_text_character::set_member(const std::string& name,
 		const as_value& val)
 {
-	log_msg("edit_text_character.set_member(%s, %s)", name.c_str(), val.to_string());
+	//log_msg("edit_text_character.set_member(%s, %s)", name.c_str(), val.to_string());
 
 	// FIXME: Turn all standard members into getter/setter properties
 	//        of the TextField class. See attachTextFieldInterface()
