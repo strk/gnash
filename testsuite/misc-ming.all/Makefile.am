@@ -530,6 +530,7 @@ TEST_CASES = \
 	action_execution_order_testrunner \
 	simple_loop_testrunner \
 	KeyTest-Runner \
+	loadMovieTestRunner \
 	$(NULL)
 
 

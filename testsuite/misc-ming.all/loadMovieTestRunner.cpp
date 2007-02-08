@@ -97,7 +97,7 @@ main(int /*argc*/, char** /*argv*/)
 	sleep(1); // give it some time to load
 	coverartch = const_cast<character*>(tester.findDisplayItemByName(*root, "coverart"));
 	coverart = coverartch->to_movie();
-	xcheck_equals(coverart->get_movie_definition()->get_url(), offspringURL.str());
+	check_equals(coverart->get_movie_definition()->get_url(), offspringURL.str());
 
 }
 
