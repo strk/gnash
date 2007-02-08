@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.31 2007/02/07 10:28:40 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.32 2007/02/08 12:19:02 strk Exp $";
 
 #include "check.as"
 
@@ -252,9 +252,11 @@ check_equals(_root._target, "/");
 // unfortunately we can't use createEmptyMovieClip with
 // lower SWF targets...
 var mc4 = _root.createEmptyMovieClip("mc4_mc", 60);
+check_equals(mc4._parent, _root);
 check_equals(mc4._target, "/mc4_mc");
 var mc5 = mc4.createEmptyMovieClip("mc5_mc", 60);
 check_equals(mc5._target, "/mc4_mc/mc5_mc");
+check_equals(mc5._parent, mc4);
 #endif
 
 //----------------------------------------------
@@ -279,3 +281,4 @@ check(cl instanceOf Object);
 check_equals(typeof(cl), "object");
 check_equals(typeof(cl.attachMovie), "function");
 check_equals(typeof(cl._width), "undefined");
+check_equals(typeof(cl._parent), "undefined");

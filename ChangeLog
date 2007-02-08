@@ -1,3 +1,8 @@
+2007-02-08 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClip.as: add test for _parent
+	  member of actionscript created movieclips.
+
 2007-02-07 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Global.as: expect failures with
