@@ -46,6 +46,7 @@
 #include "VM.h"
 #include "Range2d.h" // for getBounds
 #include "GnashException.h"
+#include "URL.h"
 
 #include <vector>
 #include <string>
@@ -502,10 +503,47 @@ static void sprite_get_bytes_total(const fn_call& fn)
 	fn.result->set_int(sprite->get_bytes_total());
 }
 
+// my_mc.loadMovie(url:String [,variables:String]) : Void
 static void sprite_load_movie(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
+
+	if (fn.nargs < 1) // url
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_msg("Invalid call to MovieClip.loadMove(), "
+			"expected 1 or 2 args, got %d - returning undefined",
+			fn.nargs);
+		);
+		return;
+	}
+
+	std::string urlstr = fn.arg(0).to_std_string();
+	if (urlstr.empty())
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_msg("First argument passed to MovieClip.loadMove(%s) "
+			"evaluates to an empty string - "
+			"returning undefined",
+			ss.str().c_str());
+		);
+		return;
+	}
+	const URL& baseurl = get_base_url();
+	URL url(urlstr, baseurl);
+
+	if (fn.nargs > 1)
+	{
+		// TODO: implement support for second argument
+		log_error("FIXME: second argument of MovieClip.loadMovie(%s, <variables>) "
+			"will be discarded (unsupported)", urlstr.c_str());
+		//return;
+	}
+
+	log_msg("MovieClip.loadMovie: url is %s", url.str().c_str());
+
 
 	log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
 	//moviecliploader_loadclip(fn);
@@ -3061,46 +3099,55 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 bool
 sprite_instance::can_handle_mouse_event() const
 {
-    // We should cache this!
-    as_value dummy;
+	as_value dummy;
 
-    // Functions that qualify as mouse event handlers.
-    const char* FN_NAMES[] = {
-	"onKeyPress",
-	"onRelease",
-	"onDragOver",
-	"onDragOut",
-	"onPress",
-	"onReleaseOutside",
-	"onRollout",
-	"onRollover",
-    };
-    for (unsigned int i = 0; i < ARRAYSIZE(FN_NAMES); i++) {
-	    // The const_cast is needed because get_member, due to
-	    // possible "getter" methods executing stuff, is a non-const
-	    // function. We take the "risk" here...
-	if (const_cast<sprite_instance*>(this)->get_member(FN_NAMES[i], &dummy)) {
-	    return true;
+	// Event handlers that qualify as mouse event handlers.
+	static const event_id EH[] =
+	{
+		event_id(event_id::PRESS),
+		event_id(event_id::RELEASE),
+		event_id(event_id::RELEASE_OUTSIDE),
+		event_id(event_id::ROLL_OVER),
+		event_id(event_id::ROLL_OUT),
+		event_id(event_id::DRAG_OVER),
+		event_id(event_id::DRAG_OUT),
+	};
+
+	int swfversion =  _vm.getSWFVersion();
+	for (unsigned int i = 0; i < ARRAYSIZE(EH); i++)
+	{
+		const event_id &event = EH[i];
+
+		// Check event handlers
+		if (get_event_handler(event.id(), &dummy))
+		{
+			return true;
+		}
+
+		// Check user-defined event handlers
+		// TODO: check if it's possible to actually
+		//       have an hard-coded handler and a user-defined
+		//       one. If this is not the case we should add
+		//       gettersetter memebers for all these handlers.
+		//
+		std::string fname = event.get_function_name();
+		if ( swfversion < 7 )
+		{
+			// TODO: have event.get_function_name()
+			//       return an SWF-contextual string  instead!
+			boost::to_lower(fname, _vm.getLocale());
+		}
+
+		// The const_cast is needed because get_member, due to
+		// possible "getter" methods executing stuff, is a non-const
+		// function. We take the "risk" here...
+		if (const_cast<sprite_instance*>(this)->get_member(fname, &dummy))
+		{
+			return true;
+		}
 	}
-    }
 
-    // Event handlers that qualify as mouse event handlers.
-    const event_id::id_code EH_IDS[] = {
-	event_id::PRESS,
-	event_id::RELEASE,
-	event_id::RELEASE_OUTSIDE,
-	event_id::ROLL_OVER,
-	event_id::ROLL_OUT,
-	event_id::DRAG_OVER,
-	event_id::DRAG_OUT,
-    };
-    {for (unsigned int i = 0; i < ARRAYSIZE(EH_IDS); i++) {
-	if (get_event_handler(EH_IDS[i], &dummy)) {
-	    return true;
-	}
-    }}
-
-    return false;
+	return false;
 }
 		
 void sprite_instance::restart()

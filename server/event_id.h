@@ -92,14 +92,14 @@ public:
 		EVENT_COUNT
 	};
 
-	unsigned char	m_id;
+	id_code	m_id;
 	unsigned char	m_key_code;
 
 	event_id() : m_id(INVALID), m_key_code(key::INVALID) {}
 
 	event_id(id_code id, key::code c = key::INVALID)
 		:
-		m_id((unsigned char) id),
+		m_id(id),
 		m_key_code((unsigned char) c)
 	{
 		// For the button key events, you must supply a keycode.
@@ -128,6 +128,8 @@ public:
 	/// Return true if this is a mouse event
 	/// (triggerable with a mouse activity)
 	bool is_mouse_event() const;
+
+	id_code id() const { return m_id; }
 };
 
 }	// end namespace gnash
