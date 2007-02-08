@@ -117,7 +117,7 @@ Debugger::console(as_environment &env)
  	return;
     }
     
-    if (_env == static_cast<as_environment *>(0)) {
+    if (!_env) {
 	cerr << "WARNING: environment not set yet";
 	cerr << "\nOnly watch point commands will work untill after you continue." << endl;
     }
@@ -423,7 +423,7 @@ void
 Debugger::dumpStackFrame(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;    
-    if (_env == static_cast<as_environment *>(0)) {
+    if (!_env) {
 	dbglogfile << "WARNING: environment not set in " << __PRETTY_FUNCTION__ << endl;
 	return;
     }
@@ -461,7 +461,7 @@ void
 Debugger::dumpLocalRegisters(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_env == static_cast<as_environment *>(0)) {
+    if (!_env) {
 	dbglogfile << "WARNING: environment not set in " << __PRETTY_FUNCTION__ << endl;
 	return;
     }
@@ -486,7 +486,7 @@ void
 Debugger::dumpGlobalRegisters(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;  
-    if (_env == static_cast<as_environment *>(0)) {
+    if (!_env) {
 	dbglogfile << "WARNING: environment not set in " << __PRETTY_FUNCTION__ << endl;
 	return;
     }
@@ -511,7 +511,7 @@ void
 Debugger::dumpLocalVariables(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;
-    if (_env == static_cast<as_environment *>(0)) {
+    if (!_env) {
 	dbglogfile << "WARNING: environment not set in " << __PRETTY_FUNCTION__ << endl;
 	return;
     }
@@ -542,7 +542,7 @@ Debugger::lookupSymbol(std::string &name)
 	    }
 	}
     }
-    return static_cast<void *>(0);
+    return NULL; 
 }
 
 void
