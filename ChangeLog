@@ -1,3 +1,10 @@
+2007-02-07 Martin Guy <martinwguy@yahoo.it>
+
+	* server/asobj/Number.cpp: Only do string-to-number conversion when
+	  text value is required, not on every math operation; moved text
+	  conversion code out of class definition into its own function.
+	* server/asobj/Number.cpp: Added text conversion of NaN and Infinities.
+
 2007-02-08 Sandro Santilli <strk@keybit.net>
 
 	* server/event_id.h: add id() accessor, properly use the id_code enum.
