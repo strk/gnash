@@ -18,7 +18,7 @@
 //
 //
 
-//  $Id: embedVideoDecoder.h,v 1.1 2007/02/08 13:25:41 tgc Exp $
+//  $Id: embedVideoDecoder.h,v 1.2 2007/02/08 14:40:20 tgc Exp $
 
 #ifndef __EMBEDVIDEODECODER_H__
 #define __EMBEDVIDEODECODER_H__
@@ -49,6 +49,8 @@ public:
 		CODEC_H263 = 2,	// H263/SVQ3 video codec
 		CODEC_SCREENVIDEO = 3,	// Screenvideo codec
 		CODEC_VP6 = 4,		// On2 VP6 video codec
+		CODEC_VP6A = 5,		// On2 VP6 Alpha video codec
+		CODEC_SCREENVIDEO2 = 6,	// Screenvideo2 codec
 	};
 
 	// Assign handles however you like.

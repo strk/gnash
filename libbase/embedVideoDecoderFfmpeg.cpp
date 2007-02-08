@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderFfmpeg.cpp,v 1.1 2007/02/08 13:25:41 tgc Exp $
+// $Id: embedVideoDecoderFfmpeg.cpp,v 1.2 2007/02/08 14:40:20 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -47,8 +47,8 @@ embedVideoDecoderFfmpeg::createDecoder(int widthi, int heighti, int deblockingi,
 	if (format == CODEC_H263) {
 		codec = avcodec_find_decoder(CODEC_ID_FLV1);
 	} else if (format == CODEC_VP6) {
-		codec = avcodec_find_decoder(CODEC_ID_VP6);
-	} else if (format == CODEC_SCREENVIDEO) {
+		codec = avcodec_find_decoder(CODEC_ID_VP6F);
+	} else {
 		return;
 	}
 

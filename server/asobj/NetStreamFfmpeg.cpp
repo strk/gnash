@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.14 2007/02/08 13:25:41 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.15 2007/02/08 14:40:20 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -265,7 +265,12 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	pd->filename = "";
 	pd->buf = new uint8_t[2048];
 	pd->buf_size = 2048;
-	readPacket(ns, pd->buf, pd->buf_size);
+
+	if (readPacket(ns, pd->buf, pd->buf_size) < 1){
+ 		log_warning("Gnash could not read from movie url: %s", ns->url.c_str());
+ 		delete[] pd->buf;
+ 		return;
+	}
 
 	AVInputFormat* inputFmt = av_probe_input_format(pd, 1);
 

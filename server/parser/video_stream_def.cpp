@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.2 2007/02/08 13:25:42 tgc Exp $
+// $Id: video_stream_def.cpp,v 1.3 2007/02/08 14:40:20 tgc Exp $
 
 #include "embedVideoDecoderFfmpeg.h"
 #include "video_stream_def.h"
@@ -61,7 +61,7 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 	}
 	else if (tag == SWF::VIDEOFRAME)
 	{
-		int frameNum = in->read_u16();
+		in->skip_bytes(2); //int frameNum = in->read_u16();
 		int size = in->get_tag_end_position() - in->get_position();
 		uint8_t* data = new uint8_t[size];
 		for (int i = 0; i < size; i++)

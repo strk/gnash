@@ -122,6 +122,15 @@ NetStreamGst::play(const char* c_url)
 		return 0;
 	}
 
+	// Does it have an associated NetConnectoin ?
+	if ( ! _netCon )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("No NetConnection associated with this NetStream, won't play");
+		);
+		return 0;
+	}
+
 	url += c_url;
 	// Remove any "mp3:" prefix. Maybe should use this to mark as audio-only
 	if (url.compare(0, 4, std::string("mp3:")) == 0) {

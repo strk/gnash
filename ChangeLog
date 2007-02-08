@@ -1,5 +1,14 @@
 2007-02-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
+	* libbase/embedVideoDecoder.h, libbase/embedVideoDecoderFfmpeg.cpp:
+	  Added more video codecs.
+	* server/asobj/NetStreamFfmpeg.cpp: Check if url is readable.
+	* server/asobj/NetStreamGst.cpp: Check if a NetConnection object exists.
+	* server/parser/video_stream_def.cpp: Fixed a warning.
+	* testsuite/actionscript.all/rtmp.as: Made it actually test something.
+
+2007-02-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
 	* libbase/Makefile.am: Added embedVideoDecoder.h, 
 	  embedVideoDecoderFfmpeg.{h,cpp}
 	* libbase/embedVideoDecoderFfmpeg.{h,cpp} Added. Decoder for embedded video

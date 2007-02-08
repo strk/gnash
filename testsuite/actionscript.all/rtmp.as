@@ -19,19 +19,20 @@
 //
 
 
-rcsid='$Id: rtmp.as,v 1.3 2006/11/17 08:06:24 strk Exp $';
+rcsid='$Id: rtmp.as,v 1.4 2007/02/08 14:40:20 tgc Exp $';
 
 #include "dejagnu.as"
 #include "utils.as"
 
-note("Staring...");
+note("Starting...");
 
 client_nc = new NetConnection();
 //client_nc.connect("rtmp://localhost/software/gnash/tests/1153948634.flv", "userx");
-client_nc.connect("rtmpt://localhost:8080/software/gnash/tests/1153948634.flv", "userx");
+//client_nc.connect("rtmpt://localhost:8080/software/gnash/tests/1153948634.flv", "userx");
+client_nc.connect("rtmpt://localhost:8080/software/gnash/tests/");
 
-var myStream = new NetStream(myConnection);
-myStream.play("fooby");
+var myStream = new NetStream(client_nc);
+myStream.play("1153948634.flv");
 
 var myVideo = new Video();
 MyVideo.attachVideo(NewStream);
