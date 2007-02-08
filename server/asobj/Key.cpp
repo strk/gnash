@@ -386,9 +386,9 @@ void	notify_key_event(key::code k, bool down)
 		}
 		if ( global->get_member(objName, &kval) )
 		{
-			log_msg("Found member 'Key' in _global: %s", kval.to_string());
+			//log_msg("Found member 'Key' in _global: %s", kval.to_string());
 			as_object* obj = kval.to_object();
-			log_msg("_global.Key to_object() : %s @ %p", typeid(*obj).name(), obj);
+			//log_msg("_global.Key to_object() : %s @ %p", typeid(*obj).name(), obj);
 			keyobject = dynamic_cast<key_as_object*>( obj );
 		}
 	}
