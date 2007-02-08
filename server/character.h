@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.45 2007/02/03 23:02:07 strk Exp $ */
+/* $Id: character.h,v 1.46 2007/02/08 13:14:36 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -90,7 +90,7 @@ protected:
 	/// Implement mouse-dragging for this movie.
 	void do_mouse_drag();
 
-	/// look for '.', '..', '_level0' and '_root'
+	/// look for '.', 'this',  '..', '_parent', '_level0' and '_root'
 	character* get_relative_target_common(const std::string& name);
 
 	/// \brief

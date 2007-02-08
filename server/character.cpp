@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.17 2007/01/31 15:11:58 strk Exp $ */
+/* $Id: character.cpp,v 1.18 2007/02/08 13:14:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -138,7 +138,7 @@ character::get_relative_target_common(const std::string& name)
 	{
 	    return this;
 	}
-	else if (name == "..")
+	else if (name == ".." || name == "_parent")
 	{
 		// Never NULL
 		character* parent = get_parent();
