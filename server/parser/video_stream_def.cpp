@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.3 2007/02/08 14:40:20 tgc Exp $
+// $Id: video_stream_def.cpp,v 1.4 2007/02/08 23:30:15 tgc Exp $
 
 #include "embedVideoDecoderFfmpeg.h"
 #include "video_stream_def.h"
@@ -110,10 +110,10 @@ video_stream_definition::get_decoder(){
 
 void 
 video_stream_definition::get_frame_data(int frameNum, uint8_t** data, int* size){
+	if (m_video_frames.size() == 0) return;
 	int cur_frame = frameNum - m_start_frame;
 	*size = m_video_frames_size[cur_frame];
 	*data = m_video_frames[cur_frame];
-	if (data == NULL) printf("data is NULL\n");
 }
 
 }

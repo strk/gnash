@@ -1,3 +1,9 @@
+2007-02-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/video_stream_instance.cpp, server/parser/video_stream_def.cpp:
+	  Make sure current video really is from a VideoFrame tag, before trying to
+	  decode.
+
 2007-02-08 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: Makefile.am, loadMovieTestRunner.cpp:
@@ -47,7 +53,7 @@
 
 	* libbase/Makefile.am: Added embedVideoDecoder.h, 
 	  embedVideoDecoderFfmpeg.{h,cpp}
-	* libbase/embedVideoDecoderFfmpeg.{h,cpp} Added. Decoder for embedded video
+	* libbase/embedVideoDecoderFfmpeg.{h,cpp}: Added. Decoder for embedded video
 	  using ffmpeg.
 	* server/impl.cpp: Added support for parsing swf embedded in a player (.exe)
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: Fixed some warnings.

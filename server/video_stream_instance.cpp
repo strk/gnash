@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.cpp,v 1.8 2007/02/08 13:25:41 tgc Exp $
+// $Id: video_stream_instance.cpp,v 1.9 2007/02/08 23:30:15 tgc Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -75,6 +75,7 @@ video_stream_instance::display()
 	rect bounds(0.0f, 0.0f, PIXELS_TO_TWIPS(m_def->m_width), PIXELS_TO_TWIPS(m_def->m_height));
 
 
+	// If this is a video from a NetStream object, retrieve a video frame from there.
 	if (_ns)
 	{
 		NetStream* nso = _ns;
@@ -87,9 +88,9 @@ video_stream_instance::display()
 				gnash::render::drawVideoFrame(i, &m, &bounds);
 			}
 		}
-	} else {
-		// If _ns is null, this must be a VideoFrame (embedded video)
 
+	// If this is a video from a VideoFrame tag, retrieve a video frame from there.
+	} else if (m_decoder) {
 		uint8_t* data = 0;
 		int size = 0;
 		int current_frame = get_parent()->to_movie()->get_current_frame();
