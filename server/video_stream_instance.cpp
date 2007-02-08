@@ -1,10 +1,29 @@
+// 
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+// 
+// $Id: video_stream_instance.cpp,v 1.8 2007/02/08 13:25:41 tgc Exp $
+
+#include "sprite_instance.h"
 #include "video_stream_instance.h"
 #include "video_stream_def.h"
 #include "fn_call.h"
 #include "as_value.h"
 #include "NetStream.h"
 #include "render.h"
-//#include <SDL.h>
 
 namespace gnash {
 
@@ -41,20 +60,23 @@ namespace gnash {
 	assert(m_def);
 	// FIXME: use new layout
 	init_member("attachVideo", &attach_video);
+	m_decoder = m_def->get_decoder();
 }
 
 video_stream_instance::~video_stream_instance()
 {
+	delete m_decoder;
 }
 
 void
 video_stream_instance::display()
 {
+	matrix m = get_world_matrix();
+	rect bounds(0.0f, 0.0f, PIXELS_TO_TWIPS(m_def->m_width), PIXELS_TO_TWIPS(m_def->m_height));
+
+
 	if (_ns)
 	{
-		matrix m = get_world_matrix();
-		rect bounds(0.0f, 0.0f, PIXELS_TO_TWIPS(m_def->m_width), PIXELS_TO_TWIPS(m_def->m_height));
-
 		NetStream* nso = _ns;
 
 		if (nso->playing())
@@ -65,6 +87,22 @@ video_stream_instance::display()
 				gnash::render::drawVideoFrame(i, &m, &bounds);
 			}
 		}
+	} else {
+		// If _ns is null, this must be a VideoFrame (embedded video)
+
+		uint8_t* data = 0;
+		int size = 0;
+		int current_frame = get_parent()->to_movie()->get_current_frame();
+		m_def->get_frame_data(current_frame, &data, &size);
+
+		image::image_base* i = m_decoder->decodeFrame(data, size);
+		if (i)
+		{
+			gnash::render::drawVideoFrame(i, &m, &bounds);
+		} else {
+			log_warning("An error occured while decoding video frame.");
+		}
+
 	}
 }
 

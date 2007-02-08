@@ -193,7 +193,6 @@ private:
 	hash<int, boost::intrusive_ptr<font> >	 		m_fonts;
 	hash<int, boost::intrusive_ptr<bitmap_character_def> >	m_bitmap_characters;
 	hash<int, boost::intrusive_ptr<sound_sample> >		m_sound_samples;
-	hash<int, boost::intrusive_ptr<sound_sample> >		m_sound_streams;
 
 	/// A list of movie control events for each frame.
 	std::vector<PlayList> m_playlist;

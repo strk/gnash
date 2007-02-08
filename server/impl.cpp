@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.87 2007/01/10 17:28:49 strk Exp $ */
+/* $Id: impl.cpp,v 1.88 2007/02/08 13:25:41 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -338,9 +338,9 @@ get_file_type(tu_file* in)
 {
 	in->set_position(0);
 
-	unsigned char buf[5];
-	memset(buf, 0, 5);
-	if ( 4 < in->read_bytes(buf, 4) )
+	unsigned char buf[3];
+	memset(buf, 0, 3);
+	if ( 3 < in->read_bytes(buf, 3) )
 	{
 		log_error("Can't read file header!\n");
 		return "unknown";
@@ -349,6 +349,7 @@ get_file_type(tu_file* in)
 	// This is the magic number for any JPEG format file
 	if ((buf[0] == 0xff) && (buf[1] == 0xd8) && (buf[2] == 0xff))
 	{
+		in->set_position(0);
 		return "jpeg";
 	}
 
@@ -357,9 +358,24 @@ get_file_type(tu_file* in)
 		(buf[1] == 'W') &&
 		(buf[2] == 'S') )
 	{
+		in->set_position(0);
 		return "swf";
 	}
+	
+	// Check if it is an swf embedded in a player (.exe-file)
+	if ((buf[0] == 'M') && (buf[1] == 'Z')) {
 
+		if ( 3 < in->read_bytes(buf, 3) ) return "unknown";
+
+		while (buf[0]!='F' && buf[0]!='C' || buf[1]!='W' || buf[2]!='S') {
+			buf[0] = buf[1];
+			buf[1] = buf[2];
+			buf[2] = in->read_byte();
+			if (in->get_eof()) return "unknown";
+		}
+		in->set_position(in->get_position()-3);
+		return "swf";
+	}
 	return "unknown";
 }
 
@@ -369,8 +385,6 @@ get_file_type(tu_file* in)
 static movie_def_impl*
 create_swf_movie(std::auto_ptr<tu_file> in, const std::string& url, bool startLoaderThread)
 {
-
-	in->set_position(0);
 
 	// Avoid leaks on error 
 	std::auto_ptr<movie_def_impl> m(

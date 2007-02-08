@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.73 2007/02/07 16:29:36 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.74 2007/02/08 13:25:42 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1871,7 +1871,7 @@ define_video_loader(stream* in, tag_type tag, movie_definition* m)
 	assert(tag == SWF::DEFINEVIDEOSTREAM); // 60
 	uint16_t character_id = in->read_u16();
 
-	video_stream_definition* ch = new video_stream_definition;
+	video_stream_definition* ch = new video_stream_definition(character_id);
 	ch->read(in, tag, m);
 
 	m->add_character(character_id, ch);
@@ -1891,6 +1891,7 @@ video_loader(stream* in, tag_type tag, movie_definition* m)
 	assert(ch != NULL);
 
 	ch->read(in, tag, m);
+
 }
 
 void

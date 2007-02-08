@@ -1,3 +1,16 @@
+2007-02-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/Makefile.am: Added embedVideoDecoder.h, 
+	  embedVideoDecoderFfmpeg.{h,cpp}
+	* libbase/embedVideoDecoderFfmpeg.{h,cpp} Added. Decoder for embedded video
+	  using ffmpeg.
+	* server/impl.cpp: Added support for parsing swf embedded in a player (.exe)
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: Fixed some warnings.
+	* server/parser/movie_def_impl.h: Removed unused soundstream list.
+	* server/video_stream_instance.{cpp,h}, 
+	  server/parser/video_stream_def.{cpp,h}, server/swf/tag_loaders.cpp:
+	  Added support for embedded video.
+
 2007-02-08 Sandro Santilli <strk@keybit.net>
 
 	* server/character.{h,cpp} (get_relative_target_common):

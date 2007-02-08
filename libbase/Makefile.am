@@ -139,6 +139,14 @@ libgnashbase_la_CPPFLAGS += $(GSTREAMER_CFLAGS)
 libgnashbase_la_LIBADD += $(GSTREAMER_LIBS) -lgstbase-0.10
 endif
 
+if USE_FFMPEG_ENGINE
+libgnashbase_la_SOURCES += embedVideoDecoderFfmpeg.cpp
+noinst_HEADERS += embedVideoDecoderFfmpeg.h
+libgnashbase_la_LIBADD += $(FFMPEG_LIBS)
+libgnashbase_la_CPPFLAGS+= $(FFMPEG_CFLAGS)
+endif
+
+
 # libgnashbase_la_LDFLAGS = -export-dynamic
 libgnashbase_la_LDFLAGS = -avoid-version
 

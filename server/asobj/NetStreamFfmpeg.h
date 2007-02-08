@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.10 2007/02/05 22:22:32 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.11 2007/02/08 13:25:41 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -192,18 +192,18 @@ private:
 
 	ReSampleContext *m_Resample;
 
+	boost::thread *m_thread;
+	boost::thread *startThread;
+	boost::mutex decoding_mutex;
+	boost::mutex start_mutex;
+	boost::mutex::scoped_lock *lock;
+
 	volatile bool m_go;
 	unsigned int runtime;
 
 	image::image_base* m_imageframe;
 
 	double m_video_clock;
-
-	boost::thread *m_thread;
-	boost::thread *startThread;
-	boost::mutex decoding_mutex;
-	boost::mutex start_mutex;
-	boost::mutex::scoped_lock *lock;
 
 	multithread_queue <raw_videodata_t*> m_qaudio;
 	multithread_queue <raw_videodata_t*> m_qvideo;
