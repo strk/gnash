@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.61 2007/02/03 23:02:07 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.62 2007/02/08 17:01:01 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -445,6 +445,11 @@ public:
 
 	sprite_instance* to_movie () { return this; }
 
+	/// Load a movie in this sprite, replacing it
+	//
+	/// Return: true if it succeeded, false otherwise
+	///
+	bool loadMovie(const URL& url);
 
 	//
 	// ActionScript support

@@ -542,10 +542,11 @@ static void sprite_load_movie(const fn_call& fn)
 		//return;
 	}
 
-	log_msg("MovieClip.loadMovie: url is %s", url.str().c_str());
+	sprite->loadMovie(url);
+	log_warning("MovieClip.loadMovie(%s) - TESTING ", url.str().c_str());
 
 
-	log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
+	//log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
 	//moviecliploader_loadclip(fn);
 }
 
@@ -3533,6 +3534,68 @@ sprite_instance::sameEvents(const Events& eventsMap, const SWFEventsVector& even
 
 	return true;
 	
+}
+
+bool
+sprite_instance::loadMovie(const URL& url)
+{
+	boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
+	if (md == NULL)
+	{
+		log_error("can't create movie_definition for %s\n",
+			url.str().c_str());
+		return false;
+	}
+
+	boost::intrusive_ptr<movie_instance> extern_movie;
+	extern_movie = md->create_movie_instance();
+	if (extern_movie == NULL)
+	{
+		log_error("can't create extern movie_instance "
+			"for %s\n", url.str().c_str());
+		return false;
+	}
+
+	save_extern_movie(extern_movie.get());
+
+	const char* name = get_name().c_str();
+	uint16_t depth = get_depth();
+	bool use_cxform = false;
+	cxform color_transform = get_cxform();
+	bool use_matrix = false;
+	matrix mat = get_matrix();
+	float ratio = get_ratio();
+	uint16_t clip_depth = get_clip_depth();
+	//character* new_movie = extern_movie->get_root_movie();
+
+	// Get a pointer to our own parent 
+	character* parent = get_parent();
+	if ( parent )
+	{
+		extern_movie->set_parent(parent);
+
+		sprite_instance* parent_sp = parent->to_movie();
+		assert(parent_sp);
+		parent_sp->replace_display_object(
+				   extern_movie.get(),
+				   name,
+				   depth,
+				   use_cxform,
+				   color_transform,
+				   use_matrix,
+				   mat,
+				   ratio,
+				   clip_depth);
+	}
+	else
+	{
+		movie_root& root = _vm.getRoot();
+		// Make sure we won't kill ourself !
+		assert(get_ref_count() > 1);
+		root.setRootMovie(extern_movie.get());
+	}
+
+	return true;
 }
 
 } // namespace gnash

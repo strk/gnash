@@ -186,25 +186,12 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	//       the loading thread actually started
 	dispatchEvent("onLoadStart", events_call);
 
-	boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
-	if (md == NULL)
-	{
-		log_error("can't create movie_definition for %s\n",
-			url.str().c_str());
-		return false;
-	}
+	bool ret = target.loadMovie(url);
+	if ( ! ret ) return false;
 
-	boost::intrusive_ptr<sprite_instance> extern_movie;
-	extern_movie = md->create_instance();
-	if (extern_movie == NULL)
-	{
-		log_error("can't create extern movie_interface "
-			"for %s\n", url.str().c_str());
-		return false;
-	}
 
 	/// This event must be dispatched when actions
-	/// in first frame of loaded clip have been  executed.
+	/// in first frame of loaded clip have been executed.
 	///
 	/// Since movie_def_impl::create_instance takes
 	/// care of this, this should be the correct place
@@ -214,37 +201,6 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	///       this function though...
 	///
 	dispatchEvent("onLoadInit", events_call);
-  
-
-	save_extern_movie(extern_movie.get());
-
-	const char* name = target.get_name().c_str();
-	uint16_t depth = target.get_depth();
-	bool use_cxform = false;
-	cxform color_transform =  target.get_cxform();
-	bool use_matrix = false;
-	matrix mat = target.get_matrix();
-	float ratio = target.get_ratio();
-	uint16_t clip_depth = target.get_clip_depth();
-	character* new_movie = extern_movie->get_root_movie();
-
-	// Get a pointer to target's sprite parent 
-	character* parent = target.get_parent();
-	assert(parent);
-	new_movie->set_parent(parent);
-
-	sprite_instance* parent_sp = dynamic_cast<sprite_instance*>(parent);
-	assert(parent_sp);
-	parent_sp->replace_display_object(
-			   new_movie,
-			   name,
-			   depth,
-			   use_cxform,
-			   color_transform,
-			   use_matrix,
-			   mat,
-			   ratio,
-			   clip_depth);
 
 	struct mcl *mcl_data = getProgress(&target);
 

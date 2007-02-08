@@ -446,6 +446,15 @@ movie_root::advance(float delta_time)
 	size_t prevframe = _movie->get_current_frame();
 #endif
 
+	// Keep root sprite alive during actions execution.
+	//
+	// This is *very* important, as actions in the movie itself
+	// could get rid of it. A simple example:
+	//
+	// 	_root.loadMovie(other);
+	//
+	boost::intrusive_ptr<sprite_instance> keepMovieAlive(_movie.get());
+
 	_movie->advance(delta_time);
 
 #ifdef GNASH_DEBUG
