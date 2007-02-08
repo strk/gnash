@@ -26,7 +26,7 @@
 #include "movie_root.h"
 #include "sprite_instance.h"
 #include "as_environment.h"
-#include "gnash.h" // for create_movie and create_library_movie
+#include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
 #include "VM.h" // for initialization
 
 #include <cstdio>
@@ -147,6 +147,18 @@ void
 MovieTester::depressMouseButton()
 {
 	_movie_root->notify_mouse_clicked(false, 1);
+}
+
+void
+MovieTester::pressKey(key::code code)
+{
+	notify_key_event(code, true);
+}
+
+void
+MovieTester::releaseKey(key::code code)
+{
+	notify_key_event(code, false);
 }
 
 bool

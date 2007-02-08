@@ -1,5 +1,10 @@
 2007-02-07 Sandro Santilli <strk@keybit.net>
 
+
+	* testsuite/MovieTester.{cpp,h}: add pressKey() and releaseKey()
+	  methods.
+	* testsuite/misc-ming.all/: KeyTest-Runner.cpp, KeyTest.as,
+	  Makefile.am: test for Key events.
 	* testsuite/actionscript.all/Object.as: add test for overriding
 	  addProperty() member of an object.
 

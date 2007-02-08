@@ -31,7 +31,8 @@ CLEANFILES =  \
       testrun.sum \
       testrun.log
 
-EXTRA_DIST = VarAndCharClashTest.as 
+EXTRA_DIST = VarAndCharClashTest.as \
+	KeyTest.as
 
 
 AM_CPPFLAGS = -I.. \
@@ -78,6 +79,7 @@ check_PROGRAMS = \
 	simple_loop_test \
 	simple_loop_testrunner \
 	action_execution_order_test \
+	KeyTest-Runner \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -439,6 +441,26 @@ VarAndCharClashTest-Runner: $(srcdir)/../generic-testrunner.sh VarAndCharClashTe
 	sh $< $(top_builddir) VarAndCharClashTest.swf > $@
 	chmod 755 $@
 
+# This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
+# Uses a low frame rate to test immediate redraw on key event
+KeyTest.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/KeyTest.as 
+	$(MAKESWF) -o $@ ../Dejagnu.swf $(srcdir)/../media/green.swf $(srcdir)/KeyTest.as
+
+KeyTest_Runner_SOURCES = \
+	KeyTest-Runner.cpp \
+	$(NULL)
+KeyTest_Runner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+KeyTest_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+KeyTest_Runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	KeyTest.swf	\
+	$(NULL)
+
 Dejagnu_SOURCES =	\
 	Dejagnu.c	\
 	ming_utils.h				\
@@ -470,6 +492,7 @@ TEST_CASES = \
 	registerClassTestRunner \
 	action_execution_order_testrunner \
 	simple_loop_testrunner \
+	KeyTest-Runner \
 	$(NULL)
 
 

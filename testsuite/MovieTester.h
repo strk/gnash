@@ -21,6 +21,7 @@
 #define _GNASH_MOVIETESTER_H
 
 #include "Range2d.h"
+#include "gnash.h" // for namespace key
 
 #include <memory> // for auto_ptr
 #include <string> // for auto_ptr
@@ -91,6 +92,18 @@ public:
 
 	/// Notify mouse button was depressed
 	void depressMouseButton();
+
+	/// Notify key press
+	//
+	/// See key codes in namespace gnash::key (gnash.h)
+	///
+	void pressKey(key::code k);
+
+	/// Notify key release
+	//
+	/// See key codes in namespace gnash::key (gnash.h)
+	///
+	void releaseKey(key::code k);
 
 	/// Return true if the currently active 
 	/// character is over a character that
