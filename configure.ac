@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.252 2007/02/06 18:07:14 martinwguy Exp $
+dnl $Id: configure.ac,v 1.253 2007/02/08 16:33:46 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -397,6 +397,7 @@ AC_REPLACE_FUNCS(getopt)
 AC_CHECK_FUNCS(sysconf)
 AC_CHECK_FUNCS(shmget shmat shmdt mmap)
 AC_CHECK_FUNCS(gettimeofday)
+AC_CHECK_FUNCS(ftime)
 AC_CHECK_FUNCS(tzset)
 AC_CHECK_FUNCS(localtime_r)
 AC_CHECK_FUNCS(memmove)
