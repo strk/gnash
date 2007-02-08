@@ -1,3 +1,8 @@
+2007-02-08 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: Makefile.am, loadMovieTestRunner.cpp:
+	  Test runner for loadMovie.swf.
+
 2007-02-08 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/debugger.cpp: Simple cleanup: remove unneeded casts.

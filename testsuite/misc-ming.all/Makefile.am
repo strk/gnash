@@ -81,6 +81,7 @@ check_PROGRAMS = \
 	action_execution_order_test \
 	KeyTest-Runner \
 	loadMovieTest \
+	loadMovieTestRunner \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -443,6 +444,21 @@ loadMovieTest_SOURCES =	\
 loadMovieTest_LDADD = $(MING_LIBS)
 loadMovieTest.swf: loadMovieTest
 	./loadMovieTest $(top_srcdir)/testsuite/media
+loadMovieTestRunner_SOURCES = \
+	loadMovieTestRunner.cpp \
+	$(NULL)
+loadMovieTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+loadMovieTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	-DMEDIADIR='"$(top_srcdir)/testsuite/media"'
+	$(NULL)
+loadMovieTestRunner_DEPENDENCIES = \
+	loop_test.swf \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
 
 #loadMovieTest_Runner_SOURCES = \
 #	loadMovieTest-Runner.cpp \
