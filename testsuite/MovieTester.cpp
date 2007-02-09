@@ -102,9 +102,9 @@ MovieTester::advance()
 	// introduce differences, so better to reproduce
 	// real runs as close as possible, by calling display().
 	//
-	_movie->display();
+	_movie_root->display();
 
-	_movie->advance(1.0);
+	_movie_root->advance(1.0);
 #ifdef SHOW_INVALIDATED_BOUNDS_ON_ADVANCE
 	geometry::Range2d<float> invalidatedbounds = getInvalidatedBounds();
 	std::stringstream ss;
