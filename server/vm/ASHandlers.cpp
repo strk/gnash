@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.34 2007/02/07 00:59:59 rsavoye Exp $ */
+/* $Id: ASHandlers.cpp,v 1.35 2007/02/09 05:52:49 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -108,9 +108,9 @@ construct_object(const as_value& constructor,
 
     if ( constructor.is_c_function() )
     {
-		IF_VERBOSE_ACTION (
-        log_action("Constructor is a C_FUNCTION");
-		);
+        IF_VERBOSE_ACTION (
+            log_action("Constructor is a C_FUNCTION");
+            );
 
         // C function is responsible for creating the new object and setting members.
         fn_call call(&new_obj, NULL, &env, nargs, first_arg_index);
@@ -149,8 +149,8 @@ construct_object(const as_value& constructor,
             bool func_has_prototype = ctor_as_func->get_member("prototype", &proto);
             assert(func_has_prototype);
             
-		IF_VERBOSE_ACTION (
-            log_action("constructor prototype is %s", proto.to_string());
+            IF_VERBOSE_ACTION (
+                log_action("constructor prototype is %s", proto.to_string());
 		);
             
             // Create an empty object, with a ref to the constructor's prototype.
@@ -2263,7 +2263,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
 		env.get_top_index());
 
 #ifdef USE_DEBUGGER
-        debugger.addSymbol(&new_obj, classname);
+        debugger.addSymbol(new_obj.to_object(), classname);
 #endif
 	env.drop(nargs);
 	env.push(new_obj);
@@ -3058,7 +3058,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 		env.push_val(function_value);
 	}
 #ifdef USE_DEBUGGER
-        debugger.addSymbol(&function_value, name);
+        debugger.addSymbol(function_value.to_object(), name);
 #endif
 }
 
@@ -3187,7 +3187,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 		//env.set_member(name, function_value);
 		thread.setVariable(name, function_value);
 #ifdef USE_DEBUGGER
-                debugger.addSymbol(&function_value, name);
+                debugger.addSymbol(function_value.to_object(), name);
 #endif
 	}
 

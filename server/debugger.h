@@ -49,6 +49,7 @@ public:
     void setBreakPoint(std::string &var);
     void removeBreakPoint(std::string &var);
     void dumpBreakPoints();
+    void dumpMovieInfo();
 
     /// Set a watchpoint of a variable. Gnash stops and generates a
     /// command prompt when there is a match.
@@ -106,6 +107,22 @@ public:
     void *lookupSymbol(std::string &name);
     std::string lookupSymbol(void *ptr);
     void dumpSymbols();
+
+    // Change the value of a parameter on the stack
+    void changeStackValue(int index, as_value &val);
+    void changeStackValue(as_environment &env, int index, as_value &val);
+    
+    // Change the value of a local variable
+    void changeLocalVariable(std::string &var, as_value &val);
+    void changeLocalVariable(as_environment &env, std::string &val, as_value &val);
+    
+    // Change the value of a local variable
+    void changeLocalRegister(int index, as_value &val);
+    void changeLocalRegister(as_environment &env, int index, as_value &val);
+    
+    // Change the value of a local variable
+    void changeGlobalRegister(int index, as_value &val);
+    void changeGlobalRegister(as_environment &env, int index, as_value &val);
     
     debug_state_e state() { return _state; };
 private:

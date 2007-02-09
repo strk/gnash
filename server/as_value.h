@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.25 2007/02/06 23:06:18 rsavoye Exp $ */
+/* $Id: as_value.h,v 1.26 2007/02/09 05:52:49 rsavoye Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -28,6 +28,7 @@
 
 #include "container.h"
 #include "tu_config.h"
+
 //#include "resource.h" // for inheritance of as_object
 
 namespace gnash {
@@ -364,7 +365,7 @@ public:
 
 	/// Force type to string.
 	void	convert_to_string();
-
+    
 	/// Force type to string.
 	//
 	/// uses swf-version-aware converter
@@ -381,6 +382,12 @@ public:
           drop_refs();
           m_type = STRING;
           m_string_value = str;
+        }
+
+	void	set_std_string(const std::string& str) {
+          drop_refs();
+          m_type = STRING;
+          m_string_value = str.c_str();
         }
 
 	void	set_string(const char* str) {
@@ -509,3 +516,9 @@ inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
 } // namespace gnash
 
 #endif // GNASH_AS_VALUE_H
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
+

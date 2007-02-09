@@ -282,6 +282,10 @@ public:
 	///
 	void setPropFlags(as_value& props, int set_false, int set_true);
 
+#ifdef USE_DEBUGGER
+	/// Get the properties of this objects 
+	PropertyList &get_properties() { return _members; };
+#endif
 	/// Copy properties from the given object
 	void copyProperties(const as_object& o);
 

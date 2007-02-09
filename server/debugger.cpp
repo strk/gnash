@@ -31,6 +31,7 @@
 #include "as_environment.h"
 #include "swf.h"
 #include "ASHandlers.h"
+#include "movie_root.h"
 
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
@@ -86,6 +87,7 @@ Debugger::usage()
     cerr << "\tc - Continue" << endl;
     cerr << "\td - Dissasemble current line" << endl;
     // info commands
+    cerr << "\ti i - Dump Movie Info" << endl;
     cerr << "\ti f - Dump Stack Frame" << endl;
     cerr << "\ti s - Dump symbols" << endl;
     cerr << "\ti g - Global Regs" << endl;
@@ -96,6 +98,11 @@ Debugger::usage()
     cerr << "\tw name [r:w:b] - set variable watchpoint" << endl;
     cerr << "\tw name d - delete variable watchpoint" << endl;
     cerr << "\tb name - set function break point" << endl;
+    // change data
+    cerr << "\tset var [name] [value] - set a local variable" << endl;
+    cerr << "\tset stack [index] [value] - set a stack entry" << endl;
+    cerr << "\tset reg [index] [value] - set a local register" << endl;
+    cerr << "\tset global [index] [value] - set a global register" << endl;
 }
 
 void
@@ -125,7 +132,8 @@ Debugger::console(as_environment &env)
 //  	this->hitBreak();
 //     } else {
     string action;
-    string var, sstate;
+    string var, val, sstate;
+    int index;
     Debugger::watch_state_e wstate;
     bool keep_going = true;
 
@@ -144,6 +152,41 @@ Debugger::console(as_environment &env)
 	      this->go(10);
 	      keep_going = false;
 	      break;
+	      // Change the value of a variable on the stack
+	  case 's':
+	      if (action == "set") {
+		  cin >> var;
+		  as_value asval;
+		  switch(var[0]) {
+		        // change a parameter on the stack
+		    case 's':
+			cin >> index >> val;
+			asval.set_std_string(val);
+			this->changeStackValue(index, asval);
+			break;
+			// change a local variable
+		    case 'v':
+			cin >> var >> val;
+			asval.set_std_string(val);
+			this->changeLocalVariable(var, asval);
+			break;
+			// change a local register
+		    case 'r':
+			cin >> index >> val;
+			asval.set_std_string(val);
+			this->changeLocalRegister(index, asval);
+			break;
+			// change a global register
+		    case 'g':
+			cin >> index >> val;
+			asval.set_std_string(val);
+			this->changeGlobalRegister(index, asval);
+			break;
+		    default:
+			break;
+		  }
+	      }
+	      break;
 	      // Informational commands.
 	  case 'i':
 	      cin >> var;
@@ -151,6 +194,9 @@ Debugger::console(as_environment &env)
 		case 'd':
 		    this->dissasemble();
 		  break;
+		case 'i':
+		    this->dumpMovieInfo();
+		    break;
 		case 'b':
 		    this->dumpBreakPoints();
 		    break;
@@ -215,6 +261,22 @@ Debugger::console(as_environment &env)
 	  default:
 	      break;
 	};
+    }
+}
+
+void
+Debugger::dumpMovieInfo()
+{
+//    GNASH_REPORT_FUNCTION;
+    if (VM::isInitialized()) {
+	VM& vm = VM::get();
+	movie_root &mr = vm.getRoot();
+	int x, y, buttons;
+	mr.get_mouse_state(x, y, buttons);
+	
+	cerr << "Movie is Flash v" << vm.getSWFVersion() << endl;
+	cerr << "Mouse coordinates are: X=" << x << ", Y=" << y << endl;
+	vm.getGlobal()->dump_members();
     }
 }
 
@@ -419,6 +481,27 @@ Debugger::dumpStackFrame()
     this->dumpStackFrame(*_env);
 }
 
+// Change the value of a parameter on the stack
+void
+Debugger::changeStackValue(int index, as_value &val)
+{
+//    GNASH_REPORT_FUNCTION;
+    changeStackValue(*_env, index, val);
+}
+
+void
+Debugger::changeStackValue(as_environment &env, int index, as_value &val)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (!_env) {
+	dbglogfile << "WARNING: environment not set in " << __PRETTY_FUNCTION__ << endl;
+	return;
+    }
+    if (env.stack_size()) {
+	env.m_stack[index] = val;
+    }
+}
+
 void
 Debugger::dumpStackFrame(as_environment &env)
 {
@@ -429,24 +512,26 @@ Debugger::dumpStackFrame(as_environment &env)
     }
     if (env.stack_size()) {
         dbglogfile << "Stack Dump of: " << (void *)&env << endl;
-        for (unsigned int i=0, n=env.stack_size(); i<n; i++) {
-            cerr << "\t" << i << ": \"" << env.m_stack[i].to_string() << "\"";
+        for (unsigned int i=0, n=env.stack_size(); i<n; i++) {    
+            cerr << "\t" << i << ": "; // << env.m_stack[i].to_string() << "\"";
 	    as_value val = env.m_stack[i];
 // FIXME: we want to print the name of the function
-// 	    if (val.is_as_function()) {
-// 	    }
- 	    string name = this->lookupSymbol(val.to_object());
-//  	    if (name.size()) {
-//  		cerr << "NAME IS: " << name << endl;
-//  	    }	    
+ 	    if (val.is_as_function()) {
+//		cerr << val.get_symbol_handle() << endl;
+		string name = this->lookupSymbol(val.to_object());
+		if (name.size()) {
+		    cerr << name << " ";
+		}
+	    }
+            cerr << env.m_stack[i].to_string();
 	    if (val.is_object()) {
 		cerr << " has #" << val.to_object()->get_ref_count() << " references";
 	    }
 	    cerr << endl;
-        }
+	}
     }
     else {
-        dbglogfile << "Stack Dump of 0x" << (void *)&env << ": empty" << endl;
+	dbglogfile << "Stack Dump of 0x" << (void *)&env << ": empty" << endl;
     }
 }
 
@@ -500,6 +585,53 @@ Debugger::dumpGlobalRegisters(as_environment &env)
     cerr << ss.str().c_str() << endl;
 }
 
+    // Change the value of a local variable
+void
+Debugger::changeLocalVariable(std::string &var, as_value &val)
+{
+//    GNASH_REPORT_FUNCTION;
+    changeLocalVariable(*_env, var, val);
+}
+
+void
+Debugger::changeLocalVariable(as_environment &env, std::string &var, as_value &val)
+{
+//    GNASH_REPORT_FUNCTION;
+    env.set_local(var, val);
+}
+
+// Change the value of a local variable
+void
+Debugger::changeLocalRegister(int index, as_value &val)
+{
+//    GNASH_REPORT_FUNCTION;
+    this->changeLocalRegister(*_env, index, val);
+}
+
+void
+Debugger::changeLocalRegister(as_environment &env, int index, as_value &val)
+{
+//    GNASH_REPORT_FUNCTION;
+    if (index <= env.num_local_registers()) {
+	env.set_local_register(static_cast<uint8_t>(index), val);
+    }
+}   
+
+// Change the value of a global variable
+void
+Debugger::changeGlobalRegister(int index, as_value &val)
+{
+//    GNASH_REPORT_FUNCTION;
+    this->changeLocalRegister(*_env, index, val);
+}
+
+void
+Debugger::changeGlobalRegister(as_environment &env, int index, as_value &val)
+{
+//    GNASH_REPORT_FUNCTION;
+    env.set_global_register(index, val);
+}   
+
 void
 Debugger::dumpLocalVariables()
 {
@@ -515,11 +647,19 @@ Debugger::dumpLocalVariables(as_environment &env)
 	dbglogfile << "WARNING: environment not set in " << __PRETTY_FUNCTION__ << endl;
 	return;
     }
+    int index = 0;
     dbglogfile << "Local variable Dump:" << endl;
     as_environment::frame_slot slot;
     for (size_t i = 0, n=env.get_local_frame_top(); i < n; ++i) {
         slot  = env.m_local_frames[i];
-	cerr << "\t" << slot.m_name << " = " << slot.m_value.to_std_string() << endl;
+	string var = slot.m_value.to_std_string();
+	cerr << "\tvar #" << index << ": ";
+	if (slot.m_name.size()) {
+	    cerr << slot.m_name << " = \"" << var << "\"" << endl;
+	} else {
+	    cerr << "\"null\"" << " = " << var << endl;
+	}
+	index++;
     }
 }
 
@@ -527,7 +667,7 @@ Debugger::dumpLocalVariables(as_environment &env)
 void *
 Debugger::lookupSymbol(std::string &name)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     if (_symbols.size()) {
 	VM& vm = VM::get(); // cache this ?
 	std::string namei = name;
@@ -537,7 +677,7 @@ Debugger::lookupSymbol(std::string &name)
 	std::map<void *, std::string>::const_iterator it;
 	for (it=_symbols.begin(); it != _symbols.end(); it++) {
 	    if (it->second == namei) {
-		dbglogfile << "Found symbol " << namei.c_str() << " at address: " << it->first << endl;
+//		dbglogfile << "Found symbol " << namei.c_str() << " at address: " << it->first << endl;
 		return it->first;
 	    }
 	}
@@ -555,12 +695,11 @@ Debugger::addSymbol(void *ptr, std::string name)
 	boost::to_lower(namei, vm.getLocale());
     }
     if (namei.size() > 1) {
-//    dbglogfile << "Adding symbol " << namei << " at address: " << ptr << endl;
+	dbglogfile << "Adding symbol " << namei << " at address: " << ptr << endl;
 	_symbols[ptr] = namei;
     }
     
 }
-
 
 /// Get the name associated with an address
 std::string
@@ -574,7 +713,7 @@ Debugger::lookupSymbol(void *ptr)
 	it = _symbols.find(ptr);
 	dbglogfile.setStamp(false);
 	if (it != _symbols.end()) {
-	    dbglogfile << "Found symbol " << it->second.c_str() << " at address: " << ptr << endl;
+//	    dbglogfile << "Found symbol " << it->second.c_str() << " at address: " << ptr << endl;
 	    str = it->second;
 // 	} else {
 // 	    dbglogfile << "No symbol found for address " << ptr << endl;
@@ -588,13 +727,15 @@ void
 Debugger::dumpSymbols()
 {
 //    GNASH_REPORT_FUNCTION;
+    int index = 0;
     std::map<void *, std::string>::const_iterator it;    
     for (it=_symbols.begin(); it != _symbols.end(); it++) {
 	string name = it->second;
 	void *addr = it->first;
 	if (name.size()) {
-	    cerr << addr << ": " << name << endl;
+	    cerr << "\tsym #" << index << ": " << name << " <" << addr << ">" << endl;
 	}
+	index++;
     }
 }
 

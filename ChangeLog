@@ -1,3 +1,16 @@
+2007-02-08  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* server/as_object.h: Return the raw properties handle so the
+	debugger can use it. Add set_std_string method to let one add
+	standard STL strings. 
+	* server/debugger.cpp, debugger.h: Add support for setting
+	variables or registers from the debugger console. Fix the symbol
+	table to actually work, so now function names are displayed when
+	doing a stack frame dump instead of just the address. Add minimal
+	support for dumping information about the movie.
+	* server/vm/ASHandlers.cpp: Grab the correct address when adding
+	symbols to the debugger.
+
 2007-02-08 Sandro Santilli <strk@keybit.net>
 
 	* server/timers.{h,cpp}: add execution operator.
@@ -147,6 +160,22 @@
 	* server/styles.cpp (fill_stle::read): neater color print.
 	* server/parser/shape_character_def.cpp (read):
 	  neater parse print.
+
+2007-02-06  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* server/as_value.h: Add is_as_function() .
+	* server/debugger.cpp: Try to lookup a symbol name for each
+	address when dumping the stack. Add support for a symbol table for
+	all functions and "new" objects and an "i s" command to dump the
+	symbol table. "i f" now dumps the stack frame, it was "i s"
+	before. 
+	* server/parser/action_buffer.h: Add accessors for the code
+	buffer.
+	* server/vm/ASHandlers.cpp: Don't need std:: since we're using the
+	std namespace. Add a symbol for function definitions.
+	* server/vm/ActionExec.cpp: Stash the pc pointer for later instead
+	of passing it in on the command line.
+	* utilities/parser.cpp, processor.cpp: Add support for the debugger.
 
 2007-02-06 Sandro Santilli <strk@keybit.net>
 

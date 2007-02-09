@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.34 2007/02/09 00:19:07 strk Exp $ */
+/* $Id: movie_root.h,v 1.35 2007/02/09 05:52:49 rsavoye Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -393,8 +393,8 @@ private:
 	TimerList _intervalTimers;
 
 	std::vector< as_object* >	m_keypress_listeners;
-	character* m_active_input_text;
-	float m_time_remainder;
+	character*              m_active_input_text;
+	float                   m_time_remainder;
 
 	/// @@ fold this into m_mouse_button_state?
 	drag_state m_drag_state;
@@ -419,3 +419,8 @@ private:
 } // namespace gnash
 
 #endif // GNASH_MOVIE_ROOT_H
+
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
