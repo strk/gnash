@@ -18,7 +18,7 @@
 //
 //
 
-//  $Id: embedVideoDecoder.h,v 1.2 2007/02/08 14:40:20 tgc Exp $
+//  $Id: embedVideoDecoder.h,v 1.3 2007/02/09 16:40:42 tgc Exp $
 
 #ifndef __EMBEDVIDEODECODER_H__
 #define __EMBEDVIDEODECODER_H__
@@ -37,6 +37,7 @@ class embedVideoDecoder
 {
 public:
 
+	// This is copied from the render and should be changed if the original is.
 	enum videoOutputFormat
 	{
 		NONE,

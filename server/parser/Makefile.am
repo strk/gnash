@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.20 2006/12/01 16:35:38 strk Exp $
+# $Id: Makefile.am,v 1.21 2007/02/09 16:40:42 tgc Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -76,6 +76,10 @@ libgnashparser_la_LIBADD = \
 libgnashparser_la_LDFLAGS = \
 	-avoid-version \
 	$(BOOST_LIBS)
+
+if USE_SOUND_GST
+AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
+endif
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

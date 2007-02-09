@@ -133,8 +133,8 @@ noinst_HEADERS = \
 	URL.h
 
 if USE_SOUND_GST
-libgnashbase_la_SOURCES += gstgnashsrc.c
-noinst_HEADERS += gstgnashsrc.h
+libgnashbase_la_SOURCES += gstgnashsrc.c embedVideoDecoderGst.cpp
+noinst_HEADERS += gstgnashsrc.h embedVideoDecoderGst.h
 libgnashbase_la_CPPFLAGS += $(GSTREAMER_CFLAGS)
 libgnashbase_la_LIBADD += $(GSTREAMER_LIBS) -lgstbase-0.10
 endif

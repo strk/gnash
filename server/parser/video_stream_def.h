@@ -15,10 +15,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.3 2007/02/08 13:25:42 tgc Exp $
+// $Id: video_stream_def.h,v 1.4 2007/02/09 16:40:42 tgc Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "character_def.h"
 #include "stream.h" // for read()

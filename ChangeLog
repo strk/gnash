@@ -1,3 +1,14 @@
+2007-02-09 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/Makefile.am: Added embedVideoDecoderGst.{cpp,h}.
+	* libbase/embedVideoDecoderGst.{cpp,h}: Added. Use Gstreamer to decode 
+	  embedded video.
+	* libbase/embedVideoDecoder.h, libbase/embedVideoDecoderFfmpeg.cpp:
+	  Added support for more codecs.
+	* server/parser/Makefile.am, server/parser/video_stream_def.cpp,
+	  server/parser/video_stream_def.h: Added support for using Gstreamer
+	  to decode embedded video.
+
 2007-02-09 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/dejagnu_so_init.as: made use

@@ -15,12 +15,17 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.4 2007/02/08 23:30:15 tgc Exp $
+// $Id: video_stream_def.cpp,v 1.5 2007/02/09 16:40:42 tgc Exp $
 
-#include "embedVideoDecoderFfmpeg.h"
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
 #include "render.h"
+
+#ifdef USE_FFMPEG
+#include "embedVideoDecoderFfmpeg.h"
+#elif defined(SOUND_GST)
+#include "embedVideoDecoderGst.h"
+#endif
 
 namespace gnash {
 
@@ -92,11 +97,12 @@ video_stream_definition::get_decoder(){
 
 #ifdef USE_FFMPEG
 	decoder = new embedVideoDecoderFfmpeg();
-//#elif defined(SOUND_GST)
-//	decoder = new embedVideoDecoderGst();
+#elif defined(SOUND_GST)
+	decoder = new embedVideoDecoderGst();
 #else
 	decoder = new embedVideoDecoder();
 #endif
+
 	decoder->createDecoder(
 				m_width,
 				m_height,
