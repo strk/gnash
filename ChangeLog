@@ -1,9 +1,15 @@
+2007-02-09 Sandro Santilli <strk@keybit.net>
+
+	 * server/asobj/Global.cpp: add setInterval and clearInterval
+	   global functions.
+	 * testsuite/actionscript.all/Global.as: test existance of
+	   setInterval and clearInterval function.
+
 2007-02-08  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* server/debugger.cpp: Dump the name of as_objects on the stack
 	too. Some objects are created internally, so don't have a symbol
 	table entry.
-	
 	* server/as_object.h: Return the raw properties handle so the
 	debugger can use it. Add set_std_string method to let one add
 	standard STL strings. 

@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.41 2007/02/02 10:31:33 strk Exp $ */
+/* $Id: Global.cpp,v 1.42 2007/02/09 09:34:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -60,6 +60,7 @@
 #include "Video.h"
 #include "extension.h"
 #include "VM.h"
+#include "timers.h"
 
 #include "fn_call.h"
 #include "sprite_instance.h"
@@ -398,6 +399,10 @@ Global::Global(VM& vm)
 
 	// ASSetPropFlags
 	init_member("ASSetPropFlags", as_global_assetpropflags);
+
+	// Defined in timers.h
+	init_member("setInterval", timer_setinterval);
+	init_member("clearInterval", timer_clearinterval);
 
 	// System and Function were added in Player Version 6, but
 	// seem to be available even if SWF target version is

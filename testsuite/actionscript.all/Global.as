@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.20 2007/02/08 00:53:31 strk Exp $";
+rcsid="$Id: Global.as,v 1.21 2007/02/09 09:34:56 strk Exp $";
 
 #include "check.as"
 
@@ -93,13 +93,5 @@ check_equals (escape('abcdefghijklmnopqrstuvwxyz'), 'abcdefghijklmnopqrstuvwxyz'
 // to run an interval before a frame is executed
 // so this will require onEnterFrame to work.
 // We don't want to test onEnterFrame here, do we ?
-INTERVALRUN=0;
-INTERVALVARIABLE=undefined;
-function intervalChecker() {
-	check("setInterval called" | true);
-	if ( INTERVALRUN ) check("clearInterval not called" & false);
-	INTERVALRUN=1;
-	clearInterval(INTERVALVARIABLE);
-}
-INTERVALVARIABLE=setInterval(intervalChecker, 5); // 1 second
-
+check_equals(typeof(setInterval), 'function');
+check_equals(typeof(clearInterval), 'function');
