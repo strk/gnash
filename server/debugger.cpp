@@ -513,18 +513,22 @@ Debugger::dumpStackFrame(as_environment &env)
     if (env.stack_size()) {
         dbglogfile << "Stack Dump of: " << (void *)&env << endl;
         for (unsigned int i=0, n=env.stack_size(); i<n; i++) {    
-            cerr << "\t" << i << ": "; // << env.m_stack[i].to_string() << "\"";
+            cerr << "\t" << i << ": ";
 	    as_value val = env.m_stack[i];
 // FIXME: we want to print the name of the function
- 	    if (val.is_as_function()) {
-//		cerr << val.get_symbol_handle() << endl;
-		string name = this->lookupSymbol(val.to_object());
-		if (name.size()) {
-		    cerr << name << " ";
-		}
-	    }
+//  	    if (val.is_as_function()) {
+// //		cerr << val.get_symbol_handle() << endl;
+// 		string name = this->lookupSymbol(val.to_object());
+// 		if (name.size()) {
+// 		    cerr << name << " ";
+// 		}
+// 	    }
             cerr << env.m_stack[i].to_string();
 	    if (val.is_object()) {
+		string name = this->lookupSymbol(val.to_object());
+		if (name.size()) {
+		    cerr << " \"" << name << "\"";
+		}
 		cerr << " has #" << val.to_object()->get_ref_count() << " references";
 	    }
 	    cerr << endl;

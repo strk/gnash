@@ -1,5 +1,9 @@
 2007-02-08  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* server/debugger.cpp: Dump the name of as_objects on the stack
+	too. Some objects are created internally, so don't have a symbol
+	table entry.
+	
 	* server/as_object.h: Return the raw properties handle so the
 	debugger can use it. Add set_std_string method to let one add
 	standard STL strings. 
