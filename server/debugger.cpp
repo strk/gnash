@@ -699,7 +699,7 @@ Debugger::addSymbol(void *ptr, std::string name)
 	boost::to_lower(namei, vm.getLocale());
     }
     if (namei.size() > 1) {
-	dbglogfile << "Adding symbol " << namei << " at address: " << ptr << endl;
+	//dbglogfile << "Adding symbol " << namei << " at address: " << ptr << endl;
 	_symbols[ptr] = namei;
     }
     

@@ -585,7 +585,7 @@ button_character_instance::on_button_event(const event_id& event)
 	}
 	else
 	{
-		log_warning("No handler for event: %s", event.get_function_name().c_str());
+		//log_warning("No handler for event: %s", event.get_function_name().c_str());
 	}
 
 
