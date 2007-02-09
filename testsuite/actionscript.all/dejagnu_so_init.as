@@ -1,4 +1,15 @@
 
+// frame loop seems not-working with SWF target 5, while
+// setInterval is not working with Gnash, we use both
+// to make sure it works :)
+//
+// Update: setInterval/clearInterval works now, so we
+//         don't need the frameloop anymore. We'll keep
+//	   the define here just in case we want to make
+//	   life easier for other free software players.
+//
+#define USE_FRAMELOOP
+
 // NOTE: when using ming-0.4.0-beta, a bug in 'makeswf' will
 //       prevent __shared_assets clip to work (the movieclip
 //       will be published with a frame-count of 0, thus
@@ -26,9 +37,11 @@ else
 checkIt = function() {
 	if ( _root.dejagnu_module_initialized )
 	{
-		// disable frameloop
-		onEnterFrame = undefined;
+		// disable loop
 		clearInterval(_dejagnu_checker_interval);
+#ifdef USE_FRAMELOOP
+		onEnterFrame = undefined;
+#endif
 
 		// setup some dejagnu wrappers
 		info = function(msg) {
@@ -60,9 +73,11 @@ checkIt = function() {
 	}
 	else if ( ++_dejagnu_checker_iterations > _dejagnu_checker_timeout )
 	{
-		// disable frameloop
+		// disable loop
 		clearInterval(_dejagnu_checker_interval);
+#ifdef USE_FRAMELOOP
 		this.onEnterFrame = undefined;
+#endif
 
 		// complain
 		trace("No properly initialized dejagnu module found after "
@@ -145,6 +160,8 @@ checkIt = function() {
 // to make sure it works :)
 
 _dejagnu_checker_interval = setInterval(checkIt, _dejagnu_checker_interval); 
+#ifdef USE_FRAMELOOP
 this.onEnterFrame = checkIt;
+#endif
 
 stop();

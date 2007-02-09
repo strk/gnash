@@ -1,5 +1,8 @@
 2007-02-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/dejagnu_so_init.as: made use
+	  of frame loop a compile-time define for having another way
+	  to test setInterval.
 	* testsuite/misc-ming.all/: Makefile.am, intervalTest.as,
 	  intervalTestRunner.cpp: add test *runner* for intervalTest.swf
 
