@@ -1,3 +1,7 @@
+2007-02-09 Martin Guy <martinwguy@yahoo.it>
+
+	* server/asobj/Math.cpp: Methods for constants have uppercase names
+
 2007-02-09 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/: movie_def_impl.h, movie_definition.h:

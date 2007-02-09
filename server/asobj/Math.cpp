@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.14 2007/01/18 22:53:21 strk Exp $ */
+/* $Id: Math.cpp,v 1.15 2007/02/09 13:29:14 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -263,14 +263,14 @@ math_as_object::math_as_object()
 	// TODO: rely on ineritance, use init_property ?
 
 	// constant
-	init_member("e", 2.7182818284590452354);
-	init_member("ln2", 0.69314718055994530942);
-	init_member("log2e", 1.4426950408889634074);
-	init_member("ln10", 2.30258509299404568402);
-	init_member("log10e", 0.43429448190325182765);
-	init_member("pi", 3.14159265358979323846);
-	init_member("sqrt1_2", 0.7071067811865475244);
-	init_member("sqrt2", 1.4142135623730950488);
+	init_member("E", 2.7182818284590452354);
+	init_member("LN2", 0.69314718055994530942);
+	init_member("LOG2E", 1.4426950408889634074);
+	init_member("LN10", 2.30258509299404568402);
+	init_member("LOG10E", 0.43429448190325182765);
+	init_member("PI", 3.14159265358979323846);
+	init_member("SQRT1_2", 0.7071067811865475244);
+	init_member("SQRT2", 1.4142135623730950488);
 
 	// math methods
 	init_member("abs", &math_abs);
