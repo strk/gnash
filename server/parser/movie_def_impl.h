@@ -22,7 +22,6 @@
 
 #include "container.h"
 #include "smart_ptr.h"
-#include "timers.h" // for Timer
 #include "fontlib.h"
 #include "font.h"
 #include "jpeg.h"

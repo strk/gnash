@@ -47,7 +47,6 @@
 
 #include "character_def.h" // for inheritance
 #include "container.h"
-#include "timers.h" // for Timer
 #include "fontlib.h"
 #include "jpeg.h"
 #include "tu_file.h"
