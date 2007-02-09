@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.35 2007/02/09 05:52:49 rsavoye Exp $ */
+/* $Id: movie_root.h,v 1.36 2007/02/09 13:38:50 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -76,11 +76,10 @@
 #include "mouse_button_state.h" // for composition
 #include "drag_state.h" // for composition
 #include "sprite_instance.h" // for inlines
+#include "timers.h" // for composition
 
 // Forward declarations
-namespace gnash {
-	class Timer;
-}
+// none needed
 
 namespace gnash
 {
@@ -204,10 +203,13 @@ public:
 
 	/// Add an interval timer
 	//
+	/// @param timer
+	///	A Timer, will be copied.
+	///
 	/// @return an integer indentifying the timer
 	///         for subsequent call to clear_interval_timer
 	///
-	unsigned int add_interval_timer(Timer& timer);
+	unsigned int add_interval_timer(const Timer& timer);
 
 	/// Remove timer identified by given integer
 	//
@@ -389,7 +391,7 @@ private:
 	//        for timers, as we'll be removing them from the
 	//        list but still want Timer "identifiers" to be
 	//        valid.
-	typedef std::vector<Timer *> TimerList;
+	typedef std::vector<Timer> TimerList;
 	TimerList _intervalTimers;
 
 	std::vector< as_object* >	m_keypress_listeners;

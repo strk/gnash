@@ -1,3 +1,23 @@
+2007-02-09 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.{cpp,h}: Store Timer objects
+	  by value, not by pointer (make memory management easier);
+	  I might change this in the future, but for now it works
+	  fine. Possible future changes include: reserving a number
+	  of slots for timers (possibly setting a limit), reusing
+	  slots of expired timers (needs a testcase to see if that's
+	  allowed).
+	* server/timers.{cpp,h}: Big cleanup; got rid of timer_as_object;
+	  use integer values for times, reduced function calls (store timeouts
+	  in microseconds directly); documented.
+	* server/asobj/xmlsocket.cpp: fix use of Timer class.
+	* testsuite/misc-ming.all/: Makefile.am, intervalTest.as: new
+	  test for setInterval() and clearInterval(). Lacks a test *runner*
+	  but the manually running it clearly shows it works with this commit
+	  (and not before). Note that self-contained tests are already
+	  present, but a MovieTester based runner is required for proper
+	  testing.
+
 2007-02-09 Martin Guy <martinwguy@yahoo.it>
 
 	* server/asobj/Math.cpp: Methods for constants have uppercase names

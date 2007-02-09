@@ -401,29 +401,26 @@ movie_root::get_url(const char *url)
 #endif
 
 unsigned int
-movie_root::add_interval_timer(Timer& timer)
+movie_root::add_interval_timer(const Timer& timer)
 {
 	assert(testInvariant());
 			
-	int id = _intervalTimers.size();
+	int id = _intervalTimers.size()+1;
 
 	// TODO: find first NULL element in vector for reuse ?
-	_intervalTimers.push_back(&timer);
+	_intervalTimers.push_back(timer);
 	return id;
 }
 	
 bool
 movie_root::clear_interval_timer(unsigned int x)
 {
-	if ( x >= _intervalTimers.size() ) return false;
+	if ( ! x || x > _intervalTimers.size() ) return false;
 
-	Timer* timer = _intervalTimers[x];
+	Timer& timer = _intervalTimers[x-1];
 
-	// Check that _intervalTimers[x] does really exists.
-	if ( ! timer ) return false;
-
-	timer->clearInterval();
-	_intervalTimers[x] = NULL;
+	// will make sure next expire() will always return false!
+	timer.clearInterval();
 
 	assert(testInvariant());
 
@@ -441,10 +438,7 @@ movie_root::advance(float delta_time)
 			it != itEnd;
 			++it)
 	{
-		Timer* timerptr = *it;
-		if ( ! timerptr ) continue;
-
-		Timer& timer = *timerptr;
+		Timer& timer = *it;
 		if ( timer.expired() )
 		{
 			// log_msg("FIXME: Interval Timer Expired!\n");

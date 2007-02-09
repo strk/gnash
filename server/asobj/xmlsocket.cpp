@@ -26,6 +26,7 @@
 #include "fn_call.h"
 #include "sprite_instance.h"
 #include "VM.h"
+#include "builtin_function.h" // for setting timer, should likely avoid that..
 
 #include "log.h"
 
@@ -529,10 +530,9 @@ xmlsocket_connect(const fn_call& fn)
 
 #if 1
   Timer *timer = new Timer;
-  as_c_function_ptr ondata_handler =
-    (as_c_function_ptr)&xmlsocket_event_ondata;
-  timer->setInterval(ondata_handler, 50, ptr, fn.env);
-  timer->setObject(ptr);
+  boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(
+		  &xmlsocket_event_ondata, NULL);
+  timer->setInterval(*ondata_handler, 50, ptr, fn.env);
   VM::get().getRoot().add_interval_timer(*timer);
 #endif
 

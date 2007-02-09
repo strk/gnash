@@ -27,13 +27,17 @@
 
 #include "as_value.h" // for struct variable composition
 #include "as_object.h" // for inheritance
+#include "as_function.h" // for visibility of destructor by intrusive_ptr
+#include "smart_ptr.h"
 
 #include "tu_timer.h"
 
 #include <string>
 
+// Forward declarations
 namespace gnash {
 	class fn_call;
+	class as_function;
 }
 
 namespace gnash {
@@ -43,62 +47,97 @@ namespace gnash {
     as_value value;
   };
 
-  class Timer
-    {
-    public:
+/// An interval timer.
+//
+/// This is constructed when _global.setInterval() is called.
+/// Instances of this class will be stored in the movie_root singleton.
+///
+/// A timer has a function to call, a context in which to call it, and
+/// interval specifying how often the function must be called.
+//
+/// It is *not* a "smart" timer, which is
+/// it will *not* automatically execute at given intervals. Rather, it
+/// will be movie_root responsibility to execute the timer-associated
+/// function at regular intervals. As a facility, the Timer class provides
+/// an execution operator, proxying the execution to the associated function
+/// with properly set-up context.
+///
+///
+class Timer
+{
+
+public:
+
+      /// Construct a disabled (cleared) timer.
       Timer();
-      Timer(as_value *obj, int ms);
-      Timer(as_value method, int ms);
+
       ~Timer();
-      int setInterval(as_value obj, int ms);
-      int setInterval(as_value obj, int ms, as_object *this_ptr, as_environment *env);
-      int setInterval(as_value obj, int ms, as_environment *env);
-      int setInterval(as_value obj, int ms, std::vector<variable *> *locals);
-      void setInterval(int ms) 
-      {
-        _interval = ms * 0.000001;
-      }
 
+      /// Setup the Timer, enabling it.
+      //
+      /// @param method
+      ///	The function to call from execution operator.
+      ///	Will be stored in an intrusive_ptr.
+      ///
+      /// @param ms
+      ///	The number of milliseconds between expires.
+      ///
+      /// @param this_ptr
+      ///	The object to be used as 'this' pointer when calling the
+      ///	associated function. Will be stored in an intrusive_ptr.
+      ///	It is allowed to be NULL as long as fn_call is allowed
+      ///	a NULL as 'this_ptr' (we might want to change this).
+      ///
+      /// @param env
+      /// 	The environment in which the associated function will be run.
+      ///	Not sure we should provide this rather then extracting from this_ptr...
+      ///
+      void setInterval(as_function& method, unsigned ms, as_object* this_ptr, as_environment *env);
+
+      /// Clear the timer, ready for reuse
+      //
+      /// When a Timer is cleared, the expired() function
+      /// will always return false.
+      ///
+      /// Use setInterval() to reset it.
+      ///
       void clearInterval();
-      void start();
-      bool expired();
-      void setObject(as_object *ao) { _object = ao; }
-      as_object *getObject() { return _object; }
-      
-      // Accessors
-      const as_value& getASFunction() { return _function;  }
-      as_environment *getASEnvironment() { return _env;  }
-      as_object *getASObject() { return _object;  }
-      std::vector<struct variable *> *getLocals() { return _locals;  }
-      int getIntervalID()  { return _which;  }
-      void add_local(const std::string& name, as_value value) {
-        struct variable *var = new struct variable; // FIXME: who'll delete ?
-        var->name = name;
-        var->value = value;
-        _locals->push_back(var);
-      }
 
-      /// Execute timer function
+      /// Return true if interval ticks are passed since last call to start()
+      //
+      /// Always returns false if the timer is cleared.
+      //
+      bool expired();
+
+      /// Execute associated function properly setting up context
       void operator() ();
       
       
 
-    private:
-      int             _which;                // Which timer
-      double          _interval;
-      double          _start;
-      as_value        _function;
-      as_object      *_object;
+private:
+
+      /// Set timer start
+      //
+      /// Called by every function setting the interval.
+      ///
+      void start();
+
+      /// Number of microseconds between expirations 
+      uint64 _interval;
+
+      /// Number of microseconds since epoch at Timer start
+      uint64 _start;
+
+      /// The associated function, stored in an intrusive pointer
+      boost::intrusive_ptr<as_function> _function;
+
+      /// Context for the function call. Will be used as 'this' pointer.
+      boost::intrusive_ptr<as_object> _object;
+
+      /// how to keep this alive ?
       as_environment *_env;
-      std::vector<struct variable *> *_locals;
-      
-    };
-  
-  class timer_as_object : public gnash::as_object
-  {
-  public:
-    Timer obj;
-  };
+
+};
   
   void timer_setinterval(const fn_call& fn);
   void timer_clearinterval(const fn_call& fn);

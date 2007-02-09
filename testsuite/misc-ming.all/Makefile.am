@@ -478,6 +478,9 @@ VarAndCharClashTest-Runner: $(srcdir)/../generic-testrunner.sh VarAndCharClashTe
 	sh $< $(top_builddir) VarAndCharClashTest.swf > $@
 	chmod 755 $@
 
+intervalTest.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/intervalTest.as 
+	$(MAKESWF) -o $@ ../Dejagnu.swf $(srcdir)/intervalTest.as
+
 # This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
 # Uses a low frame rate to test immediate redraw on key event
 KeyTest.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/KeyTest.as 
