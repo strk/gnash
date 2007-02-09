@@ -32,6 +32,7 @@ do_this = function() {
 		if ( this_counter > 4 )
 		{
 			totals();
+			test_completed = 1;
 		}
 	}
 };

@@ -1,5 +1,10 @@
 2007-02-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, intervalTest.as,
+	  intervalTestRunner.cpp: add test *runner* for intervalTest.swf
+
+2007-02-09 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/MovieTester.cpp: advance the movie_root, not
 	  the topmost sprite ! This properly run interval timers.
 	* server/movie_root.{cpp,h}: Store Timer objects

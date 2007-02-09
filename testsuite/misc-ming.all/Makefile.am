@@ -82,6 +82,7 @@ check_PROGRAMS = \
 	KeyTest-Runner \
 	loadMovieTest \
 	loadMovieTestRunner \
+	intervalTestRunner \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -480,6 +481,20 @@ VarAndCharClashTest-Runner: $(srcdir)/../generic-testrunner.sh VarAndCharClashTe
 
 intervalTest.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/intervalTest.as 
 	$(MAKESWF) -o $@ ../Dejagnu.swf $(srcdir)/intervalTest.as
+intervalTestRunner_SOURCES = \
+	intervalTestRunner.cpp \
+	$(NULL)
+intervalTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+intervalTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+intervalTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	intervalTest.swf	\
+	$(NULL)
 
 # This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
 # Uses a low frame rate to test immediate redraw on key event
@@ -534,6 +549,7 @@ TEST_CASES = \
 	simple_loop_testrunner \
 	KeyTest-Runner \
 	loadMovieTestRunner \
+	intervalTestRunner \
 	$(NULL)
 
 
