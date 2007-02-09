@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: tu_types.h,v 1.31 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: tu_types.h,v 1.32 2007/02/09 17:23:03 bjacques Exp $ */
 
 #ifndef TU_TYPES_H
 #define TU_TYPES_H
@@ -73,7 +73,7 @@
 #  endif // BYTE_ORDER
 #endif // BYTE_ORDER
 
-#if ((BYTE_ORDER == __LITTLE_ENDIAN)||(BYTE_ORDER == _LITTLE_ENDIAN))
+#if ((BYTE_ORDER == LITTLE_ENDIAN) || (BYTE_ORDER == __LITTLE_ENDIAN) || (BYTE_ORDER == _LITTLE_ENDIAN))
 #	define _TU_LITTLE_ENDIAN_ 1
 #else
 #	undef _TU_LITTLE_ENDIAN_
