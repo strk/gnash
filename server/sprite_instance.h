@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.62 2007/02/08 17:01:01 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.63 2007/02/09 00:19:07 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -103,16 +103,6 @@ public:
 	};
 
 	virtual void has_keypress_event();
-
-	// delegates to movie_root 
-	virtual int    add_interval_timer(void *timer);
-
-	// delegates to movie_root 
-	virtual void  clear_interval_timer(int x);
-	
-
-	/// Interval timer timeout executor
-	virtual void    do_something(void *timer);
 
 	/// \brief
 	/// Return this sprite's relative root as

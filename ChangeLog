@@ -1,3 +1,16 @@
+2007-02-08 Sandro Santilli <strk@keybit.net>
+
+	* server/timers.{h,cpp}: add execution operator.
+	* server/movie_root.{h,cpp}: removed do_something method,
+	  replaced by Timer's execution operator. Changed add_interval_timer
+	  to take a Timer& rather then a void*. Fixed clear_interval_timer
+	  to avoid modifying the Timer list consequently making interval
+	  ids invalid (all commented, check out for details).
+	* server/sprite_instance.{h,cpp}: removed {add,clear}_interval_timer
+	  and do_somthing methods. Callers should use the ones in movie_root.
+	* server/asobj/xmlsocket.cpp: don't register setInterval and
+	  clearInterval functions as they should be globals !
+
 2007-02-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/video_stream_instance.cpp, server/parser/video_stream_def.cpp:

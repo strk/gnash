@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.20 2006/12/06 10:58:34 strk Exp $ */
+/* $Id: timers.cpp,v 1.21 2007/02/09 00:19:07 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -27,6 +27,8 @@
 #include "sprite_instance.h"
 #include "fn_call.h"
 #include "xml.h"
+#include "VM.h"
+#include "movie_root.h"
 
 using namespace std;
 
@@ -140,31 +142,51 @@ namespace gnash {
     return false;
   }
 
-  void
-  timer_setinterval(const fn_call& fn)
-  {
-    int i;
-    as_value	method;
-    log_msg("%s: args=%d\n", __FUNCTION__, fn.nargs);
-    
-    timer_as_object *ptr = new timer_as_object;
-    
-    //  action_buffer	m_action_buffer;
-    //timer_as_object*	ptr = (timer_as_object*) (as_object*) this_ptr;
-    assert(ptr);
-    
-    sprite_instance* mov = fn.env->get_target()->get_root_movie();
-    as_function *as_func = fn.env->bottom(fn.first_arg_bottom_index).to_as_function();
-    as_value val(as_func);
-    int ms = static_cast<int>(fn.env->bottom(fn.first_arg_bottom_index-1).to_number());
+void
+Timer::operator() ()
+{
+    //printf("FIXME: %s:\n", __FUNCTION__);
+    //log_msg("INTERVAL ID is %d\n", getIntervalID());
 
-    string local_name;
-    as_value local_val;
+    const as_value& timer_method = getASFunction();
+    as_environment* as_env = getASEnvironment();
+		
+    as_object* obj = getObject();
+    as_value val = call_method(timer_method, as_env, obj, 0, 0);
 
-    fn.env->add_frame_barrier();
-    //method = env->get_variable("loopvar");
+    //as_object* this_ptr = getASObject();
+    //as_value val = call_method(timer_method, as_env, this_ptr, 0, 0);
 
-#if 1
+}
+
+void
+timer_setinterval(const fn_call& fn)
+{
+	log_msg("%s: args=%d\n", __FUNCTION__, fn.nargs);
+    
+	timer_as_object *ptr = new timer_as_object;
+    
+	// Get interval function
+	as_function *as_func = fn.arg(0).to_as_function();
+	if ( ! as_func )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Invalid call to setInterval(%s) "
+				"- first argument is not a function",
+				ss.str().c_str());
+		);
+		return;
+	}
+
+
+	// Get interval time
+	int ms = int(fn.arg(1).to_number());
+
+	fn.env->add_frame_barrier();
+	//method = env->get_variable("loopvar");
+
+#if 0
     // FIXME: This is pretty gross, but something is broke elsewhere and it doesn't
     // seem to effect anything else. When a function is called from a executing
     // function, like calling setInterval() from within the callback to
@@ -177,48 +199,33 @@ namespace gnash {
         //method = env->get_variable(env->m_local_frames[i].m_name);
         //if (method.get_type() != as_value::UNDEFINED)
         {
-          local_name  = fn.env->m_local_frames[i].m_name;
-          local_val = fn.env->m_local_frames[i].m_value;
+          string local_name  = fn.env->m_local_frames[i].m_name;
+          as_value local_val = fn.env->m_local_frames[i].m_value;
           fn.env->set_variable(local_name, local_val);
         }
       }
     }
 #endif
-    //    ptr->obj.setInterval(val, ms, (as_object *)ptr, env);
+
+	as_value val(as_func);
+
+	//Ptr->obj.setInterval(val, ms);
+	ptr->obj.setInterval(val, ms, ptr, fn.env);
     
-    //Ptr->obj.setInterval(val, ms);
-    ptr->obj.setInterval(val, ms, (as_object *)ptr, fn.env);
-    
-    fn.result->set_int(mov->add_interval_timer(&ptr->obj));
-  }
+	movie_root& root = VM::get().getRoot();
+	int id = root.add_interval_timer(ptr->obj);
+	fn.result->set_int(id);
+}
   
-  void
-  timer_expire(const fn_call& fn)
-  {
-    //log_msg("%s:\n", __FUNCTION__);
+void
+timer_clearinterval(const fn_call& fn)
+{
+	log_msg("%s: nargs = %d\n", __FUNCTION__, fn.nargs);
 
-    timer_as_object*	ptr = (timer_as_object*) (as_object*) fn.this_ptr;
-    assert(ptr);
-    const as_value&	val = ptr->obj.getASFunction();
-    
-    if (as_function* as_func = val.to_as_function()) {
-      // It's an ActionScript function.  Call it.
-      log_msg("Calling ActionScript function for setInterval Timer\n");
-      (*as_func)(fn_call(fn.result, fn.this_ptr, fn.env, 0, 0));
-    } else {
-      log_error("FIXME: Couldn't find setInterval Timer!\n");
-    }
-  }
-  
-  void
-  timer_clearinterval(const fn_call& fn)
-  {
-    //log_msg("%s: nargs = %d\n", __FUNCTION__, nargs);
+	int id = int(fn.arg(0).to_number());
 
-    double id = fn.env->bottom(fn.first_arg_bottom_index).to_number();
-
-    sprite_instance* mov = fn.env->get_target()->get_root_movie();
-    mov->clear_interval_timer((int)id);
-    fn.result->set_bool(true); 
-  }
+	movie_root& root = VM::get().getRoot();
+	bool ret = root.clear_interval_timer(id);
+	fn.result->set_bool(ret);
+}
 }

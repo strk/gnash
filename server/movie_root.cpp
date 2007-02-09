@@ -400,46 +400,58 @@ movie_root::get_url(const char *url)
 }
 #endif
 
-int
-movie_root::add_interval_timer(void *timer)
+unsigned int
+movie_root::add_interval_timer(Timer& timer)
 {
 	assert(testInvariant());
-    Timer *ptr = static_cast<Timer *>(timer);
 			
-    m_interval_timers.push_back(ptr);
-    return m_interval_timers.size();
+	int id = _intervalTimers.size();
+
+	// TODO: find first NULL element in vector for reuse ?
+	_intervalTimers.push_back(&timer);
+	return id;
 }
 	
-void
-movie_root::clear_interval_timer(int x)
+bool
+movie_root::clear_interval_timer(unsigned int x)
 {
-    m_interval_timers.erase(m_interval_timers.begin() + x-1);
-    //m_interval_timers[x]->clearInterval();
+	if ( x >= _intervalTimers.size() ) return false;
+
+	Timer* timer = _intervalTimers[x];
+
+	// Check that _intervalTimers[x] does really exists.
+	if ( ! timer ) return false;
+
+	timer->clearInterval();
+	_intervalTimers[x] = NULL;
+
 	assert(testInvariant());
+
+	return true;
 }
 	
-void
-movie_root::do_something(void * /* timer */)
-{
-    log_msg("FIXME: %s: unimplemented\n", __FUNCTION__);
-}
-		
 void
 movie_root::advance(float delta_time)
 {
 	// GNASH_REPORT_FUNCTION;
 
+	// TODO: wrap this in a executeTimers() method 
+	for (TimerList::iterator it=_intervalTimers.begin(),
+			itEnd=_intervalTimers.end();
+			it != itEnd;
+			++it)
+	{
+		Timer* timerptr = *it;
+		if ( ! timerptr ) continue;
 
-    if (m_interval_timers.size() > 0) {
-        for (unsigned int i=0; i<m_interval_timers.size(); i++) {
-            if (m_interval_timers[i]->expired()) {
-                // printf("FIXME: Interval Timer Expired!\n");
-                //_movie->on_event_interval_timer();
-                _movie->do_something(m_interval_timers[i]);
-                // clear_interval_timer(m_interval_timers[i]->getIntervalID()); // FIXME: we shouldn't really disable the timer here
-            }
-        }
-    }
+		Timer& timer = *timerptr;
+		if ( timer.expired() )
+		{
+			// log_msg("FIXME: Interval Timer Expired!\n");
+			//_movie->on_event_interval_timer();
+			timer();
+		}
+	}
 			
 #ifdef GNASH_DEBUG
 	size_t totframes = _movie->get_frame_count();

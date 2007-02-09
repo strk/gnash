@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.33 2007/01/31 15:24:13 bjacques Exp $ */
+/* $Id: movie_root.h,v 1.34 2007/02/09 00:19:07 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -78,7 +78,9 @@
 #include "sprite_instance.h" // for inlines
 
 // Forward declarations
-// none needed
+namespace gnash {
+	class Timer;
+}
 
 namespace gnash
 {
@@ -200,9 +202,18 @@ public:
 		return _movie->get_movie_definition();
 	}
 
-	int add_interval_timer(void *timer);
-	void clear_interval_timer(int x);
-	void do_something(void *timer);
+	/// Add an interval timer
+	//
+	/// @return an integer indentifying the timer
+	///         for subsequent call to clear_interval_timer
+	///
+	unsigned int add_interval_timer(Timer& timer);
+
+	/// Remove timer identified by given integer
+	//
+	/// @return true on success, false on error (no such timer)
+	///
+	bool clear_interval_timer(unsigned int x);
 
 	/// 0-based!!
 	size_t get_current_frame() const {
@@ -372,7 +383,15 @@ private:
 	bool			m_on_event_xmlsocket_ondata_called;
 	bool			m_on_event_xmlsocket_onxml_called;
 	bool			m_on_event_load_progress_called;
-	std::vector<Timer *>	m_interval_timers;
+
+	// TODO: should maintain refcount ?
+	// FIXME: std::vector is not an appropriate container
+	//        for timers, as we'll be removing them from the
+	//        list but still want Timer "identifiers" to be
+	//        valid.
+	typedef std::vector<Timer *> TimerList;
+	TimerList _intervalTimers;
+
 	std::vector< as_object* >	m_keypress_listeners;
 	character* m_active_input_text;
 	float m_time_remainder;
@@ -393,6 +412,7 @@ private:
 	/// more info.
 	///
         bool fire_mouse_event();
+
 };
 
 

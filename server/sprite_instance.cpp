@@ -3183,40 +3183,6 @@ float sprite_instance::get_width() const
 	return f.getWidth(); 
 }
 
-void sprite_instance::do_something(void *timer)
-{
-    as_value	val;
-    as_object      *obj, *this_ptr;
-    as_environment *as_env;
-
-    //printf("FIXME: %s:\n", __FUNCTION__);
-    Timer *ptr = (Timer *)timer;
-    //log_msg("INTERVAL ID is %d\n", ptr->getIntervalID());
-
-    const as_value&	timer_method = ptr->getASFunction();
-    as_env = ptr->getASEnvironment();
-    this_ptr = ptr->getASObject();
-    obj = ptr->getObject();
-    //m_as_environment.push(obj);
-		
-    as_c_function_ptr	cfunc = timer_method.to_c_function();
-    if (cfunc) {
-	// It's a C function. Call it.
-	//log_msg("Calling C function for interval timer\n");
-	//(*cfunc)(&val, obj, as_env, 0, 0);
-	(*cfunc)(fn_call(&val, obj, &m_as_environment, 0, 0));
-			
-    } else if (as_function* as_func = timer_method.to_as_function()) {
-	// It's an ActionScript function. Call it.
-	as_value method;
-	//log_msg("Calling ActionScript function for interval timer\n");
-	(*as_func)(fn_call(&val, (as_object *)this_ptr, as_env, 0, 0));
-	//(*as_func)(&val, (as_object *)this_ptr, &m_as_environment, 1, 1);
-    } else {
-	log_error("error in call_method(): method is not a function\n");
-    }    
-}	
-
 character*
 sprite_instance::get_character(int /* character_id */)
 {
@@ -3233,18 +3199,6 @@ sprite_instance::get_character(int /* character_id */)
 //	return m_root->get_timer();
 //}
 
-
-void
-sprite_instance::clear_interval_timer(int x)
-{
-	_vm.getRoot().clear_interval_timer(x);
-}
-
-int
-sprite_instance::add_interval_timer(void *timer)
-{
-	return _vm.getRoot().add_interval_timer(timer);
-}
 
 sprite_instance*
 sprite_instance::get_root_movie()

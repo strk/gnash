@@ -77,6 +77,10 @@ namespace gnash {
         var->value = value;
         _locals->push_back(var);
       }
+
+      /// Execute timer function
+      void operator() ();
+      
       
 
     private:

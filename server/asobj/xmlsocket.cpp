@@ -25,6 +25,7 @@
 #include "as_function.h"
 #include "fn_call.h"
 #include "sprite_instance.h"
+#include "VM.h"
 
 #include "log.h"
 
@@ -527,13 +528,12 @@ xmlsocket_connect(const fn_call& fn)
   }
 
 #if 1
-  sprite_instance* mov = fn.env->get_target()->get_root_movie();
   Timer *timer = new Timer;
   as_c_function_ptr ondata_handler =
     (as_c_function_ptr)&xmlsocket_event_ondata;
   timer->setInterval(ondata_handler, 50, ptr, fn.env);
   timer->setObject(ptr);
-  mov->add_interval_timer(timer);
+  VM::get().getRoot().add_interval_timer(*timer);
 #endif
 
   fn.env->pop();
@@ -603,11 +603,10 @@ xmlsocket_new(const fn_call& fn)
   //periodic_events.set_event_handler(xmlsock_obj);
   
   
-#if 1
+#if 0 // TODO: setInterval and clearInterval shall be _global methods
   //
   //as_c_function_ptr int_handler = (as_c_function_ptr)&timer_setinterval;
   //env->set_member("setInterval", int_handler);
-  // TODO:  check this, sounds suspicious
   fn.env->set_member("setInterval", timer_setinterval);
   
   //as_c_function_ptr clr_handler = timer_clearinterval;
@@ -625,6 +624,7 @@ xmlsocket_new(const fn_call& fn)
   timer->setObject(xmlsock_obj);
   current_movie->add_interval_timer(timer);
 #endif
+#endif
   
   fn.result->set_bool(xmlsock_obj);
 
@@ -633,7 +633,6 @@ xmlsocket_new(const fn_call& fn)
   //mallopt(M_TRIM_THRESHOLD,-1);
   //mallopt(M_MMAP_THRESHOLD,16);
 
-#endif
 }
 
 
