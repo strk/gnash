@@ -1,3 +1,10 @@
+2007-02-09  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/ffmpeg.m4: Check for the version of ffmpeg and print a
+	warning if it's too old to use.
+	* configure.ac: Print warning if you have ffmpeg, but it's a
+	version older than 5.29.0.
+
 2007-02-09 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libbase/tu_types.h: Add the BYTE_ORDER name used on Mac OSX.

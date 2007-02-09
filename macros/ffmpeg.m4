@@ -1,5 +1,5 @@
 dnl  
-dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+dnl    Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.27 2007/01/09 00:43:43 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.28 2007/02/09 20:03:15 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -34,6 +34,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   if test x${cross_compiling} = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
       $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec`
+      topdir=`$PKG_CONFIG --cflags-only-I libavcodec | cut -d ' ' -f 2 | sed -e 's:-I::'`
     fi
   fi
 
@@ -42,6 +43,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     for i in $incllist; do
       if test -f $i/ffmpeg/avcodec.h; then
         ac_cv_path_ffmpeg_incl="-I$i/ffmpeg"
+        topdir=$i
         break
       fi
     done
@@ -54,6 +56,22 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     fi
   else
     AC_MSG_RESULT(${ac_cv_path_ffmpeg_incl})
+  fi
+
+  dnl We need LIBAVCODEC VERSION of at least 51.29.0 to get avcodec_decode_audio2
+dnl   AC_PATH_PROG(FFMPEG, ffmpeg, ,[${pathlist}])
+dnl   if test "x$FFMPEG" = "x" ; then
+dnl     ffmpeg_version=`$FFMPEG uglyhack 2>&1 | grep "libavcodec version" | cut -d ' ' -f 5 | tr -d '.'`
+dnl     if test $ffmpeg -lt 51290; then
+dnl       AC_MSG_ERROR([])
+dnl     fi
+dnl   fi
+  ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | cut -d ' ' -f 8 | tr -d '.'`
+dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes], [avfound=no])
+  if test $ffmpeg_version -lt 51290; then
+    AC_MSG_WARN([Wrong avcode version! 51.29.0 or greater required])
+  else
+    ffmpeg_version=ok
   fi
 
   if test x"${ac_cv_path_ffmpeg_incl}" != x ; then
@@ -77,11 +95,13 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   dnl Try with pkg-config
   if test x${cross_compiling} = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" = x; then
-      $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_lib=`$PKG_CONFIG --libs libavcodec`
+      $PKG_CONFIG --exists libavcodec && libavcodec=`$PKG_CONFIG --libs libavcodec`
     fi
   fi
 
-  if test x"${ac_cv_path_ffmpeg_lib}" = x; then
+  if test x"${libavcodec}" != x; then
+    ac_cv_path_ffmpeg_lib="${libavcodec}"
+  else
     AC_MSG_CHECKING([for libavcodec library])
     topdir=""
     for i in $libslist; do
@@ -101,13 +121,14 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     if test x"${ac_cv_path_ffmpeg_lib}" = x; then
       AC_MSG_RESULT(no)
       if test x${cross_compiling} = xno; then
+        dnl avcodec_decode_audio2 starts 51.29.0
         AC_CHECK_LIB(avcodec, ff_eval, [ac_cv_path_ffmpeg_lib="-lavcodec"])
       fi
     fi
+  fi
 
-    if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" != x; then
-      $PKG_CONFIG --exists libavcodec && topdir=`$PKG_CONFIG --libs-only-L libavcodec | sed -e 's/-L//' | cut -d ' ' -f 1`
-    fi
+  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" != x; then
+    $PKG_CONFIG --exists libavcodec && topdir=`$PKG_CONFIG --libs-only-L libavcodec | sed -e 's/-L//' | cut -d ' ' -f 1`
   fi
 
   dnl Look for the DTS library, which is required on some systems.

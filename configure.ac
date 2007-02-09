@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.253 2007/02/08 16:33:46 martinwguy Exp $
+dnl $Id: configure.ac,v 1.254 2007/02/09 20:03:15 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1140,24 +1140,28 @@ if test "$sound_handler" = "sdl"; then
       nogo=true
     fi
   else
-  if test x"$mp3_decoder" = x"ffmpeg"; then
-    if test x"$FFMPEG_LIBS" != x; then
-      echo "        MP3 support enabled through ffmpeg"
-      if test x"$FFMPEG_CFLAGS" != x; then
-        echo "        ffmpeg flags are: $FFMPEG_CFLAGS"
-      else
-        echo "        ffmpeg flags are: default include path"
+    if test x"$mp3_decoder" = x"ffmpeg"; then
+      if test x${ffmpeg_version} != xok; then
+         echo "WARNING: You have version ${ffmpeg_version} of ffmpeg installed.\
+Version 51.29.0 or newer is highly recommended"
       fi
-        echo "        ffmpeg libs are: $FFMPEG_LIBS"
-    else
-      echo "ERROR: No ffmpeg development package installed!\
+      if test x"$FFMPEG_LIBS" != x; then
+        echo "        MP3 support enabled through ffmpeg"
+        if test x"$FFMPEG_CFLAGS" != x; then
+          echo "        ffmpeg flags are: $FFMPEG_CFLAGS"
+        else
+          echo "        ffmpeg flags are: default include path"
+        fi
+          echo "        ffmpeg libs are: $FFMPEG_LIBS"
+      else
+        echo "ERROR: No ffmpeg development package installed!\
  You need to have the ffmpeg development package installed\
  to enable mp3 decoding. You can either reconfigure using \
  --with-mp3-decoder=mad to use libmad or install libavcodec-dev \
  and libdts-dev (using apt-get) or <package_names_here> (using yum).".
-      nogo=true
+        nogo=true
+      fi
     fi
-  fi
   fi
 fi
 
