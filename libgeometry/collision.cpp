@@ -5,10 +5,13 @@
 
 // Misc helper code for doing collision tests.
 
+/* $Id: collision.cpp,v 1.11 2007/02/10 18:33:03 nihilus Exp $ */
 
 #include <cfloat>
 
 #include "collision.h"
+
+using namespace std;
 
 ray_query::ray_query(const vec3& start_pos, const vec3& unit_direction, float distance)
 	:

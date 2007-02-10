@@ -7,8 +7,11 @@
 //
 // Instantiate our templated algo from triangulate_inst.h
 
+/* $Id: triangulate_sint32.cpp,v 1.5 2007/02/10 18:33:03 nihilus Exp $ */
+
 #include "triangulate_impl.h"
 
+using namespace std;
 
 namespace triangulate
 {
