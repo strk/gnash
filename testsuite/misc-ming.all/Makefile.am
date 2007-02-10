@@ -457,7 +457,7 @@ loadMovieTestRunner_CXXFLAGS = \
 	-DMEDIADIR='"$(top_srcdir)/testsuite/media"'
 	$(NULL)
 loadMovieTestRunner_DEPENDENCIES = \
-	loop_test.swf \
+	loadMovieTest.swf \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
