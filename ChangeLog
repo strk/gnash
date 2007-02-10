@@ -1,9 +1,14 @@
 2007-02-09  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* server/debugger.{cpp, h}: Implement breakpoint functions. Add a
+	call stack.
+	* server/vm/ASHandlers.cpp: Break and watch point here.
+	* server/vm/ActionExec.cpp: Don't watchpoint here anymore.
+
 	* macros/ffmpeg.m4: Check for the version of ffmpeg and print a
 	warning if it's too old to use.
 	* configure.ac: Print warning if you have ffmpeg, but it's a
-	version older than 5.29.0.
+	version older than 5.29.0. #18663.
 
 2007-02-09 Bastiaan Jacques <bastiaan@bjacques.org>
 

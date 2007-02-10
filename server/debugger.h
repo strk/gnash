@@ -44,12 +44,15 @@ public:
     void usage();
 //    bool command(const char cmd, as_environment &env);
 
+    void dumpMovieInfo();
+
     void dissasemble(const unsigned char *data);
     void dissasemble();
-    void setBreakPoint(std::string &var);
+    void setBreakPoint(std::string &var, bool enabled);
     void removeBreakPoint(std::string &var);
     void dumpBreakPoints();
-    void dumpMovieInfo();
+    /// Does the function name match any breakpoints ?
+    bool matchBreakPoint(std::string &var, bool);
 
     /// Set a watchpoint of a variable. Gnash stops and generates a
     /// command prompt when there is a match.
@@ -123,6 +126,11 @@ public:
     // Change the value of a local variable
     void changeGlobalRegister(int index, as_value &val);
     void changeGlobalRegister(as_environment &env, int index, as_value &val);
+
+    void callStackPush(std::string &str) { _callstack.push_back(str); };
+    void callStackPop() { _callstack.pop_back(); };
+    void callStackDump();
+    std::string &callStackFrame() { return _callstack.back(); };
     
     debug_state_e state() { return _state; };
 private:
@@ -135,6 +143,7 @@ private:
     std::map<std::string, watch_state_e> _watchpoints;
     std::map<std::string, bool> _breakpoints;
     std::map<void *, std::string> _symbols;
+    std::vector<std::string>    _callstack;
 };
 
 } // end of gnash namespace

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ActionExec.cpp,v 1.17 2007/02/06 23:06:18 rsavoye Exp $ */
+/* $Id: ActionExec.cpp,v 1.18 2007/02/10 01:30:32 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -305,9 +305,6 @@ ActionExec::setVariable(const std::string& name, const as_value& val)
 	    boost::to_lower(namei, vm.getLocale());
 	}
 	
-#ifdef USE_DEBUGGER
-	debugger.matchWatchPoint(namei, Debugger::WRITES);
-#endif
 	return env.set_variable(namei, val, getWithStack());
 }
 
@@ -321,9 +318,6 @@ ActionExec::getVariable(const std::string& name)
 	    boost::to_lower(namei, vm.getLocale());
 	}
 	
-#ifdef USE_DEBUGGER
-	debugger.matchWatchPoint(namei, Debugger::READS);
-#endif
 	return env.get_variable(namei, getWithStack());
 }
 

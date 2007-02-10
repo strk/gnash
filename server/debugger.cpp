@@ -94,10 +94,12 @@ Debugger::usage()
     cerr << "\ti l - Local Variables" << endl;
     cerr << "\ti w - Dump watch points" << endl;
     cerr << "\ti b - Dump break points" << endl;
+    cerr << "\ti c - Dump Function Call Stack" << endl;
     // break and watch points
     cerr << "\tw name [r:w:b] - set variable watchpoint" << endl;
     cerr << "\tw name d - delete variable watchpoint" << endl;
-    cerr << "\tb name - set function break point" << endl;
+    cerr << "\tb name [t:f]- enable/disable function break point" << endl;
+    cerr << "\tb name d - delete function break point" << endl;
     // change data
     cerr << "\tset var [name] [value] - set a local variable" << endl;
     cerr << "\tset stack [index] [value] - set a stack entry" << endl;
@@ -218,6 +220,10 @@ Debugger::console(as_environment &env)
 		case 's':
 		    this->dumpSymbols();
 		    break;
+		case 'c':
+		    
+		    this->callStackDump();
+		    break;
 	      };
 	      break;
 	      // Tracing mode. This prints a disasembly every time
@@ -234,6 +240,20 @@ Debugger::console(as_environment &env)
 	      this->usage();
 	      break;
 	      // Set a watchpoint
+	  case 'b':
+	      cin >> var >> sstate;
+	      switch (sstate[0]) {
+		case 't':
+		    this->setBreakPoint(var, true);
+		    break;
+		case 'f':
+		    this->setBreakPoint(var, false);
+		    break;
+		case 'd':
+		    this->removeBreakPoint(var);
+		    break;
+	      };
+	      break;
 	  case 'w':
 	      cin >> var >> sstate;
 	      switch (sstate[0]) {
@@ -257,10 +277,23 @@ Debugger::console(as_environment &env)
 	      } else {
 		  this->setWatchPoint(var, wstate);
 	      }
+	      sstate.erase();
 	      break;
 	  default:
 	      break;
 	};
+    }
+}
+
+void
+Debugger::callStackDump()
+{
+//    GNASH_REPORT_FUNCTION;
+    vector<string>::const_iterator it;
+    for (it=_callstack.begin(); it!=_callstack.end(); it++) {
+	string str = *it;
+	void *addr = this->lookupSymbol(str);
+	cerr << "\t=> " << *it << "() <" << addr << ">" << endl;
     }
 }
 
@@ -372,22 +405,22 @@ Debugger::dissasemble(const unsigned char *data)
 }
 
 void
-Debugger::setBreakPoint(std::string & /* asname */)
+Debugger::setBreakPoint(std::string &func, bool enabled)
 {
 //    GNASH_REPORT_FUNCTION;
-    dbglogfile << "WARNING: " << __PRETTY_FUNCTION__ << " is unimplemented!" << endl;
+    _breakpoints[func] = enabled;
 }
 
 void
-Debugger::removeBreakPoint(std::string &var)
+Debugger::removeBreakPoint(std::string &func)
 {
 //    GNASH_REPORT_FUNCTION;
     
     string name;
     std::map<std::string, bool>::const_iterator it;
-    it = _breakpoints.find(var);
+    it = _breakpoints.find(func);
     if (it != _breakpoints.end()) {
-	_breakpoints.erase(var);
+	_breakpoints.erase(func);
     }
 }
 
@@ -398,13 +431,34 @@ Debugger::dumpBreakPoints()
     string name;
     bool val;
     std::map<std::string, bool>::const_iterator it;
-    
+
+    int index = 0;
     for (it=_breakpoints.begin(); it != _breakpoints.end(); it++) {
 	name = it->first;
 	val = it->second;
 	if (name.size()) {
-	    dbglogfile << name << endl;
+	    string str = (val) ? " is enabled" : " is disabled";
+	    cerr << "\tbreak #" << index++ << ": " << name << str << endl;
 	}
+    }
+}
+
+bool
+Debugger::matchBreakPoint(std::string &func, bool state)
+{
+//    GNASH_REPORT_FUNCTION;
+    std::map<std::string, bool>::const_iterator it;
+    it =_breakpoints.find(func);
+    if (it == _breakpoints.end()) {
+//	dbglogfile << "No Match for variable \"" << var << "\"" << endl;
+ 	return false;
+    } else {
+	if (state == _breakpoints[func]) {
+//	    dbglogfile << "Matched for Function \"" << func << "\"" << endl;
+	    this->console();
+	    return true;
+	}
+	return false;
     }
 }
 
@@ -699,7 +753,7 @@ Debugger::addSymbol(void *ptr, std::string name)
 	boost::to_lower(namei, vm.getLocale());
     }
     if (namei.size() > 1) {
-	//dbglogfile << "Adding symbol " << namei << " at address: " << ptr << endl;
+//	dbglogfile << "Adding symbol " << namei << " at address: " << ptr << endl;
 	_symbols[ptr] = namei;
     }
     

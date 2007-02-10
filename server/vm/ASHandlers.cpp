@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.35 2007/02/09 05:52:49 rsavoye Exp $ */
+/* $Id: ASHandlers.cpp,v 1.36 2007/02/10 01:30:32 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -103,6 +103,7 @@ construct_object(const as_value& constructor,
 	as_environment& env, unsigned int nargs,
 	unsigned int first_arg_index)
 {
+//    GNASH_REPORT_FUNCTION;
 
     as_value new_obj;
 
@@ -163,7 +164,7 @@ construct_object(const as_value& constructor,
             call_method(constructor, &env, new_obj_ptr.get(), nargs, first_arg_index);
         }
     }
-
+    
     return new_obj;
 }
 
@@ -1030,6 +1031,9 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 				(void*)top_value.to_object());
 		}
 	);
+#ifdef USE_DEBUGGER
+	debugger.matchWatchPoint(var_string, Debugger::READS);
+#endif
 }
 
 void
@@ -1043,11 +1047,16 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	thread.ensureStack(2); 
 
 	assert(env.top(1).to_string());
+        string name = env.top(1).to_std_string();
 	thread.setVariable(env.top(1).to_std_string(), env.top(0));
 
         IF_VERBOSE_ACTION (
             log_action("-- set var: %s", env.top(1).to_string());
             );
+
+#ifdef USE_DEBUGGER
+	debugger.matchWatchPoint(name, Debugger::WRITES);
+#endif
 
 	env.drop(2);
 }
@@ -2148,6 +2157,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 {
 //        GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
+        string function_name;
 
 	thread.ensureStack(2); // func name, nargs
 
@@ -2158,7 +2168,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	if ( ! function.is_function() )
 	{
 		// Let's consider it a as a string and lookup the function.
-		string function_name(function.to_string());
+                function_name = function.to_string();
 		function = thread.getVariable(function_name);
 		
 		if ( ! function.is_function() )
@@ -2176,6 +2186,11 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 
 	//log_msg("Function's nargs: %d", nargs);
     
+#ifdef USE_DEBUGGER
+//        cerr << "entering function: " << function_name << endl;
+        debugger.callStackPush(function_name);
+	debugger.matchBreakPoint(function_name, true);
+#endif
 	as_value result = call_method(function, &env, env.get_target(),
 				  nargs, env.get_top_index() - 2);
 
@@ -2207,6 +2222,11 @@ SWFHandlers::ActionReturn(ActionExec& thread)
 		*retval = env.top(0);
 	}
 	env.drop(1);
+
+#ifdef USE_DEBUGGER
+//        cerr << "Returning from function: " << env.top(0).to_string() << endl;
+        debugger.callStackPop();
+#endif
 
 	//log_msg("After top/drop");
 	//env.dump_stack();
@@ -2265,6 +2285,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
 #ifdef USE_DEBUGGER
         debugger.addSymbol(new_obj.to_object(), classname);
 #endif
+
 	env.drop(nargs);
 	env.push(new_obj);
 
@@ -2387,7 +2408,7 @@ SWFHandlers::ActionTargetPath(ActionExec& /*thread*/)
 static void
 enumerateObject(as_environment& env, const as_object& obj)
 {
-    
+//    GNASH_REPORT_FUNCTION;    
 	assert( env.top(0).is_null() );
 	obj.enumerateProperties(env);
 }
@@ -2682,6 +2703,11 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
           }
           else
           {
+#ifdef USE_DEBUGGER
+//        cerr << "FIXME: method name is: " << method_name << endl;
+              debugger.callStackPush(method_name);
+              debugger.matchBreakPoint(method_name, true);
+#endif
             result = call_method( method, &env, obj, nargs,
                 env.get_top_index() - 3);
           }
