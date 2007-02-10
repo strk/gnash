@@ -243,18 +243,8 @@ bool FBGui::initialize_renderer() {
     var_screeninfo.green.length);
   log_msg("blue channel: %d / %d", var_screeninfo.blue.offset, 
     var_screeninfo.blue.length);
+  log_msg("Total bits per pixel: %d", var_screeninfo.bits_per_pixel);
     
-  
-  /*
-  // please keep this for a while; I have to fix a strange bug in mode 
-  // detection... (Udo)   
-  log_msg("(var_screeninfo.red.offset==16) : %d",   (var_screeninfo.red.offset==16) );
-  log_msg("(var_screeninfo.red.length==8)  : %d",   (var_screeninfo.red.length==8) );  
-  log_msg("(var_screeninfo.green.offset==8): %d",   (var_screeninfo.green.offset==8) );
-  log_msg("(var_screeninfo.green.length==8): %d",   (var_screeninfo.green.length==8) );
-  log_msg("(var_screeninfo.blue.offset==0) : %d",   (var_screeninfo.blue.offset==0) ); 
-  log_msg("(var_screeninfo.blue.length==8) : %d",   (var_screeninfo.blue.length==8) );
-  */ 
   
   // 15 bits RGB (hicolor)
   if ((var_screeninfo.red.offset==10)
@@ -268,7 +258,7 @@ bool FBGui::initialize_renderer() {
       
   } else   
   // 16 bits RGB (hicolor)
-  if ((var_screeninfo.red.offset=11)
+  if ((var_screeninfo.red.offset==11)
    && (var_screeninfo.red.length==5)
    && (var_screeninfo.green.offset==5)
    && (var_screeninfo.green.length==6)
@@ -287,7 +277,10 @@ bool FBGui::initialize_renderer() {
    && (var_screeninfo.blue.offset==0)
    && (var_screeninfo.blue.length==8) ) {
    
-    agg_handler = create_render_handler_agg("RGB24");
+    if (_bpp==24)
+      agg_handler = create_render_handler_agg("BGR24");
+    else
+      agg_handler = create_render_handler_agg("BGRA32");
       
   } else   
   // 24 bits BGR (truecolor)
@@ -296,9 +289,12 @@ bool FBGui::initialize_renderer() {
    && (var_screeninfo.green.offset==8)
    && (var_screeninfo.green.length==8)
    && (var_screeninfo.blue.offset==16)
-   && (var_screeninfo.blue.length==8) ) {
+   && (var_screeninfo.blue.length==8)) {
    
-    agg_handler = create_render_handler_agg("BGR24");
+    if (_bpp==24)
+      agg_handler = create_render_handler_agg("RGB24");
+    else
+      agg_handler = create_render_handler_agg("RGBA32");
       
   } else {
     log_error("The pixel format of your framebuffer is not supported.");
@@ -425,9 +421,6 @@ int FBGui::valid_y(int y) {
 }
 
 void FBGui::setInvalidatedRegion(const rect& bounds) {
-
-
-  bounds.print();
 
 #ifdef DOUBLE_BUFFER
   
