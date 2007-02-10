@@ -8,6 +8,7 @@
 #include "geometry.h"
 #include "tu_file.h"
 
+using namespace std;
 
 const vec3	vec3::zero(0, 0, 0);
 const vec3	vec3::x_axis(1, 0, 0);

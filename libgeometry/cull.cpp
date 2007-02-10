@@ -7,6 +7,8 @@
 #include "tu_math.h"
 #include "utility.h"
 
+using namespace std;
+
 namespace cull {
 
 

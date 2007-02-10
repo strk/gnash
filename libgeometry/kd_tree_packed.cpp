@@ -15,7 +15,7 @@
 #include "axial_box.h"
 #include "kd_tree_dynamic.h"
 
-
+using namespace std;
 
 #if 0
 

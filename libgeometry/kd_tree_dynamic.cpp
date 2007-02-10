@@ -15,6 +15,7 @@
 #include <cfloat>
 #include "hash_wrapper.h"
 
+using namespace std;
 using namespace gnash;
 
 static const float	EPSILON = 1e-4f;
