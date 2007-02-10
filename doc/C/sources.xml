@@ -950,6 +950,7 @@
 	to limit what is required for a quite build of <emphasis>Gnash</emphasis>.
       </para>
 
+      <variablelist>
 	<varlistentry>
 	  <term>--disable-fork</term>
 	  <listitem>
@@ -960,7 +961,7 @@
 	    </para>
 	  </listitem>
 	</varlistentry>
-
+	
 	<varlistentry>
 	  <term>--enable-plugin</term>
 	  <listitem>
@@ -994,6 +995,16 @@
 	      support for building KDE programs is found, Klash is
 	      built by default. This option limits the plugin to only
 	      the Mozilla/Firefox one.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--disable-debugger</term>
+	  <listitem>
+	    <para>
+	      Disable support for the Flash debugger. The debugger is
+	      mainly of interest to Flash developers.
 	    </para>
 	  </listitem>
 	</varlistentry>

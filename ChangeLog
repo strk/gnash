@@ -1,5 +1,11 @@
 2007-02-09  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* doc/C/debugger.xml: New file about the Flash debugger.
+	* doc/C/sources.xml: Add --disable-debugger option.
+	* doc/C/gnash.xml: Add info about the -g option. Add an entity for
+	the new debugger chapter.
+	* doc/C/gnash-man.xml: Add info about the -g option.
+
 	* server/debugger.{cpp, h}: Implement breakpoint functions. Add a
 	call stack.
 	* server/vm/ASHandlers.cpp: Break and watch point here.

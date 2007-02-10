@@ -157,6 +157,16 @@ gnash (options)... (file)...
   </varlistentry>
 
   <varlistentry>
+    <term>-g</term>
+    <listitem>
+      <para>
+          Start Gnash with a Flash debugger console so one can set
+	  break points or watchpoints.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
     <term>-w</term>
     <listitem>
       <para>
