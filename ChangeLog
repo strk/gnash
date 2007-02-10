@@ -1,5 +1,8 @@
 2007-02-10 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: remove characters
+	  not in current DisplayList from _frame0_chars when
+	  looping back. See patch #5620.
 	* testsuite/misc-ming.all/Makefile.am:
 	  fixed typo in loadMovieTestRunner dependency.
 

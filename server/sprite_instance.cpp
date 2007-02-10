@@ -1362,21 +1362,28 @@ public:
 /// by ActionScript
 ///
 class ScriptObjectsFinder {
-	std::vector<character*>& _chars;
+	std::vector<character*>& _dynamicChars;
+	std::vector<character*>& _staticChars;
 public:
-	ScriptObjectsFinder(std::vector<character*>& chars)
+	ScriptObjectsFinder(std::vector<character*>& dynamicChars,
+			std::vector<character*>& staticChars)
 		:
-		_chars(chars)
+		_dynamicChars(dynamicChars),
+		_staticChars(staticChars)
 	{}
 
 	bool operator() (character* ch) 
 	{
 		// TODO: Are script-transformed object to be kept ?
 		//       Need a testcase for this
-		if ( ! ch->get_accept_anim_moves() )
-		//if ( ch->isDynamic() )
+		//if ( ! ch->get_accept_anim_moves() )
+		if ( ch->isDynamic() )
 		{
-			_chars.push_back(ch);
+			_dynamicChars.push_back(ch);
+		}
+		else
+		{
+			_staticChars.push_back(ch);
 		}
 		return true; // keep scanning
 	}
@@ -2530,8 +2537,13 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 
 		// Add script objects in current DisplayList
 		std::vector<character*> charsToAdd; 
-		ScriptObjectsFinder scriptObjFinder(charsToAdd);
+		std::vector<character*> charsToKeep; 
+		ScriptObjectsFinder scriptObjFinder(charsToAdd, charsToKeep);
 		m_display_list.visitForward(scriptObjFinder);
+
+		// Remove characters which have been removed
+		_frame0_chars.clear_except(charsToKeep);
+
 		// NOTE: script objects are *not* allowed to replace depths
 		//       of static objects (change second argument to switch)
 		_frame0_chars.addAll(charsToAdd, false);
