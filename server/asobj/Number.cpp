@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Number.cpp,v 1.16 2007/02/10 18:33:03 nihilus Exp $ */
+/* $Id: Number.cpp,v 1.17 2007/02/10 18:54:16 nihilus Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -37,6 +37,11 @@
 
 /* C99: 7.12 6 defines for floating point classification */
 
+#undef FP_ZERO
+#undef FP_SUBNORMAL
+#undef FP_NORMAL
+#undef FP_INFINITE
+#undef FP_NAN
 #define   FP_ZERO          1
 #define   FP_SUBNORMAL     2
 #define   FP_NORMAL        4
