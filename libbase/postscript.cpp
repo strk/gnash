@@ -14,6 +14,7 @@
 #include <cmath>
 #include <cstdio>
 
+using namespace std;
 // Loosely translated into C++ from:
 // -- ps.lua
 // -- lua interface to postscript
