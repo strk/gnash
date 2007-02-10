@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.15 2007/02/09 13:29:14 martinwguy Exp $ */
+/* $Id: Math.cpp,v 1.16 2007/02/10 17:05:35 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,6 +28,8 @@
 #include "fn_call.h"
 #include "GMath.h"
 #include "log.h"
+
+using namespace std;
 
 namespace gnash {
 

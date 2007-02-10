@@ -12,6 +12,8 @@
 #include <cmath>
 #include <cfloat>
 
+using namespace std;
+
 // OSX doesn't have single precision math functions defined in math.h
 #ifdef __MACH__
     #define sinf sin
@@ -26,36 +28,6 @@
     #define expf exp
     #define fabsf fabs
     #define powf pow
-#elif !defined(__GNUC__) //Non gnuism...
-    #define sinf std::sinf
-    #define floorf std::floorf
-    #define cosf std::cosf
-    #define tanf std::tanf
-    #define asinf std::asinf
-    #define acosf std::acosf
-    #define atanf std::atanf
-    #define atan2f std::atan2f
-    #define sqrtf std::sqrtf
-    #define logf std::logf
-    #define expf std::expf
-    #define fabsf std::fabsf
-    #define powf std::powf
-    #define ceilf std::ceilf
-    #define sqrt std::sqrt
-    #define floor std::floor
-    #define sin std::sin
-    #define cos std::cos
-    #define log std::log
-    #define ceil std::ceil
-    #define pow std::pow
-    #define exp std::exp
-    #define asin std::asin
-    #define acos std::acos
-    #define atan std::atan
-    #define tan std::tan
-    #define fabs std::fabs
-    #define atan2 std::atan2
-    #define modff std::modff
 #endif
 
 // isfinite() comes with C99; fake version here in case compiler lacks it.
