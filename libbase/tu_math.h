@@ -12,8 +12,6 @@
 #include <cmath>
 #include <cfloat>
 
-using namespace std;
-
 // OSX doesn't have single precision math functions defined in math.h
 #ifdef __MACH__
     #define sinf sin
