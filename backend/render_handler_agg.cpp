@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.55 2007/01/31 15:24:13 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.56 2007/02/10 17:22:47 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1532,6 +1532,9 @@ DSOEXPORT render_handler_agg_base*	create_render_handler_agg(char *pixelformat)
 
 	else if (!strcmp(pixelformat, "RGBA32"))
 	  return new render_handler_agg<agg::pixfmt_rgba32> (32);
+
+	else if (!strcmp(pixelformat, "BGRA32"))
+	  return new render_handler_agg<agg::pixfmt_bgra32> (32);
 	  	  
 	else {
 		log_error("Unknown pixelformat: %s\n", pixelformat);

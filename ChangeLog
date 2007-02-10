@@ -9,7 +9,9 @@
   * gui/fb.cpp: fixed some compilation problems when DOUBLE_BUFFER is 
     disabled; fixed _validbounds so that the movie is visible again; 
     added 2 pixel border to invalidated bounds to fix anti-aliasing
-    problems; set scaling to view movie full-screen         
+    problems; set scaling to view movie full-screen; added/fixed 
+    support for 24 and 32 bit modes
+  * render_handler_agg.cpp: added pixel format BGRA32          
 
 2007-02-10 Sandro Santilli <strk@keybit.net>
 
