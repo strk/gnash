@@ -3,6 +3,7 @@
 	* server/asobj/Math.cpp: using namespace std;
 	* server/asobj/Number.cpp: using namespace std;
 	* libbase/tu_math.h: using namespace std;
+	* libbase/tu_file.cpp: namespacing.
 
 2007-02-10 Udo Giacomozzi <udo.gnu@nova-sys.net>
 

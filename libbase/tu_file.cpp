@@ -18,6 +18,7 @@
 
 using namespace gnash;
 
+namespace gnash {
 static int
 std_read_func(void* dst, int bytes, void* appdata) 
 // Return the number of bytes actually read.  EOF or an error would
@@ -112,10 +113,9 @@ public:
     int		m_position;
     
     filebuf()
-	:
-	m_position(0),
-	m_read_only(false)
 	{
+		m_position = 0; 
+		m_read_only = false;
 	}
     
     filebuf(int size, void* data)
@@ -283,7 +283,7 @@ static int mem_close_func(void* appdata)
     
     return 0;
 }
-
+}
 
 //
 // generic functionality
