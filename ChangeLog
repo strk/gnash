@@ -1,3 +1,10 @@
+2007-02-10 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+  * gui/fb.cpp: fixed some compilation problems when DOUBLE_BUFFER is 
+    disabled; fixed _validbounds so that the movie is visible again; 
+    added 2 pixel border to invalidated bounds to fix anti-aliasing
+    problems; set scaling to view movie full-screen         
+
 2007-02-10 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp: remove characters

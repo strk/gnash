@@ -52,6 +52,7 @@ namespace gnash
 ///     15 bit: R5/G5/B5
 ///     16 bit: R5/G6/B5
 ///     24 bit: R8/G8/B8, B8/G8/R8
+///     32 bit: none yet!
 ///
 ///
 /// Supported input devices:

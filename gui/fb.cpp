@@ -106,7 +106,9 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 {
 	fd 			= -1;
 	fbmem 	= NULL;
+	#ifdef DOUBLE_BUFFER
 	buffer  = NULL;
+	#endif
 	
 	signal(SIGINT, terminate_signal);
 	signal(SIGTERM, terminate_signal);
@@ -121,10 +123,12 @@ FBGui::~FBGui()
 		close(fd);
 	}
 
+  #ifdef DOUBLE_BUFFER
 	if (buffer) {
 		log_msg("Free'ing offscreen buffer\n");
 		free(buffer);
 	}
+	#endif
 }
 
 
@@ -217,10 +221,14 @@ bool FBGui::initialize_renderer() {
   m_stage_width = _width;
   m_stage_height = _height;
   
+  _validbounds.setTo(0, 0, _width, _height);
+    
   
   #ifdef DOUBLE_BUFFER
+  log_msg("Double buffering enabled");
   _mem = buffer;
   #else
+  log_msg("Double buffering disabled");
   _mem = fbmem;
   #endif
   
@@ -235,6 +243,18 @@ bool FBGui::initialize_renderer() {
     var_screeninfo.green.length);
   log_msg("blue channel: %d / %d", var_screeninfo.blue.offset, 
     var_screeninfo.blue.length);
+    
+  
+  /*
+  // please keep this for a while; I have to fix a strange bug in mode 
+  // detection... (Udo)   
+  log_msg("(var_screeninfo.red.offset==16) : %d",   (var_screeninfo.red.offset==16) );
+  log_msg("(var_screeninfo.red.length==8)  : %d",   (var_screeninfo.red.length==8) );  
+  log_msg("(var_screeninfo.green.offset==8): %d",   (var_screeninfo.green.offset==8) );
+  log_msg("(var_screeninfo.green.length==8): %d",   (var_screeninfo.green.length==8) );
+  log_msg("(var_screeninfo.blue.offset==0) : %d",   (var_screeninfo.blue.offset==0) ); 
+  log_msg("(var_screeninfo.blue.length==8) : %d",   (var_screeninfo.blue.length==8) );
+  */ 
   
   // 15 bits RGB (hicolor)
   if ((var_screeninfo.red.offset==10)
@@ -258,6 +278,7 @@ bool FBGui::initialize_renderer() {
     agg_handler = create_render_handler_agg("RGB565");
       
   } else   
+  
   // 24 bits RGB (truecolor)
   if ((var_screeninfo.red.offset==16)
    && (var_screeninfo.red.length==8)
@@ -299,6 +320,9 @@ bool FBGui::initialize_renderer() {
 bool FBGui::run()
 {
   double timer = 0.0;
+  
+  // let the GUI recompute the x/y scale factors to best fit the whole screen
+  resize_view(_validbounds.width(), _validbounds.height());
 
 	while (!terminate_request) {
 	
@@ -320,13 +344,12 @@ bool FBGui::run()
 
 void FBGui::renderBuffer()
 {
-
 	if ( _drawbounds.isNull() ) return; // nothing to do..
 
 	assert ( ! _drawbounds.isWorld() );
 
 #ifdef DOUBLE_BUFFER
-  
+
   // Size of a pixel in bytes
   // NOTE: +7 to support 15 bpp
   const unsigned int pixel_size = (var_screeninfo.bits_per_pixel+7)/8;
@@ -403,19 +426,20 @@ int FBGui::valid_y(int y) {
 
 void FBGui::setInvalidatedRegion(const rect& bounds) {
 
+
+  bounds.print();
+
 #ifdef DOUBLE_BUFFER
   
 	// forward to renderer
 	_renderer->set_invalidated_region(bounds);
 
 	// update _drawbounds, which are the bounds that need to
-	// be rerendered (??)
+	// be rerendered
 	//
 	_drawbounds = Intersection(
-			_renderer->world_to_pixel(bounds),
-			_validbounds);
-  
-	// TODO: add two pixels because of anti-aliasing...
+    _renderer->world_to_pixel(bounds).growBy(2), // add two pixels because of anti-aliasing...
+    _validbounds);
 
 #endif
   
