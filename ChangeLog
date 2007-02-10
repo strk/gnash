@@ -1,6 +1,7 @@
 2007-02-10 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/asobj/Math.cpp: using namespace std;
+	* server/asobj/Number.cpp: using namespace std;
 	* libbase/tu_math.h: using namespace std;
 
 2007-02-10 Udo Giacomozzi <udo.gnu@nova-sys.net>

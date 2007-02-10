@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Number.cpp,v 1.14 2007/02/08 16:39:37 martinwguy Exp $ */
+/* $Id: Number.cpp,v 1.15 2007/02/10 17:10:57 nihilus Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -32,6 +32,8 @@
 
 #include <sstream>
 #include <cmath>
+
+using namespace std;
 
 namespace gnash {
 
@@ -182,7 +184,7 @@ number_val_to_str(double _val, char *_str)
 
 	// Handle non-numeric values.
 	// "printf" gives "nan", "inf", "-inf", so we check explicitly
-	switch (std::fpclassify(_val)) {
+	switch (fpclassify(_val)) {
 	case FP_NAN:
 		strcpy(_str, "NaN");
 		break;
@@ -191,8 +193,8 @@ number_val_to_str(double _val, char *_str)
 		strcpy(_str, _val < 0 ? "-Infinity" : "Infinity");
 		break;
 	default:	// FP_ZERO, FP_NORMAL and FP_SUBNORMAL
-		if (std::fabs(_val) < 0.0001 &&
-		    std::fabs(_val) >= 0.00001) {
+		if (fabs(_val) < 0.0001 &&
+		    fabs(_val) >= 0.00001) {
 			// This is the range for which %.15g gives scientific
 			// notation but for which we must give decimal.
 			// We can't easily use %f bcos it prints a fixed number
@@ -283,10 +285,10 @@ void number_class_init(as_object& global)
 
 }
 
-std::auto_ptr<as_object>
+auto_ptr<as_object>
 init_number_instance(double val)
 {
-	return std::auto_ptr<as_object>(new number_as_object(val));
+	return auto_ptr<as_object>(new number_as_object(val));
 }
   
 } // namespace gnash
