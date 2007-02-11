@@ -79,6 +79,11 @@
 #if HAVE_FTIME
 # include <sys/timeb.h>		// for ftime()
 #endif
+
+// Is broken on BSD where timezone(int,int) is a function (!)
+// See comment at line 497 for a better implementation
+#undef HAVE_TZSET	
+
 #if HAVE_TZSET
 extern long timezone;		// for tzset()/timezone
 #endif
