@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 dnl Copyright (C) 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
-dnl $Id: pthreads.m4,v 1.24 2007/02/05 00:04:36 nihilus Exp $
+dnl $Id: pthreads.m4,v 1.25 2007/02/11 15:45:29 strk Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
@@ -83,7 +83,7 @@ dnl pth(read)-config: use pthread-config program (for GNU Pth library)
 
 case "${host_cpu}-${host_os}" in
   *linux*)
-    pthread_flags=""
+    pthread_flags="-pthread"
     ;;
   *solaris*)
 

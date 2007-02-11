@@ -1,3 +1,8 @@
+2007-02-11 Sandro Santilli <strk@keybit.net>
+
+	* macros/pthreads.m4: use -pthread for linux, as
+	  suggested by boost error.
+
 2007-02-11 Martin Guy <martinwguy@yahoo.it>
 
 	* server/asobj/Date.cpp: Disable use of tzset/timezone that does not
