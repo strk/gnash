@@ -90,8 +90,9 @@ Debugger::usage()
     cerr << "\ti i - Dump Movie Info" << endl;
     cerr << "\ti f - Dump Stack Frame" << endl;
     cerr << "\ti s - Dump symbols" << endl;
-    cerr << "\ti g - Global Regs" << endl;
-    cerr << "\ti l - Local Variables" << endl;
+    cerr << "\ti g - Dump Global Regs" << endl;
+    cerr << "\ti r - Dump Local Regs" << endl;
+    cerr << "\ti l - Dump Local Variables" << endl;
     cerr << "\ti w - Dump watch points" << endl;
     cerr << "\ti b - Dump break points" << endl;
     cerr << "\ti c - Dump Function Call Stack" << endl;

@@ -27,11 +27,14 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I.. -I$(srcdir) \
 	-I$(top_srcdir)	\
 	-I$(top_srcdir)/server	\
+	-I$(top_srcdir)/server/swf	\
 	$(PTHREAD_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(LIBXML_CFLAGS) \
 	$(PNG_CFLAGS) \
 	$(SDL_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	$(GSTREAMER_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(Z_CFLAGS) \
 	$(JPEG_CFLAGS) \

@@ -64,6 +64,10 @@ if USE_MAD_ENGINE
  GNASH_LIBS += $(MAD_LIBS)
 endif
 
+#if USE_SOUND_GST
+ GNASH_LIBS += $(GLIB_LIBS) $(GSTREAMER_LIBS)
+#endif
+
 bin_PROGRAMS = gparser gprocessor
 noinst_PROGRAMS = dumpshm
 

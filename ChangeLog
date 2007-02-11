@@ -1,3 +1,19 @@
+2007-02-10  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* libbase/Makefile.am: Add glib and gstreamer cflags, needed when
+	cross compiling with Gstreamer support.
+	* macros/gnashpkgtool.m4: Search_libs after a directory search. 
+	* macros/pkg.m4: Use pathlist to find pkg-config.
+	* server/Makefile.am:  Add glib and gstreamer cflags, needed when
+	cross compiling with Gstreamer support.
+	* server/debugger.cpp,: Tweak usage 
+	* server/parser/Makefile.am: Add libxml, glib, and gstreamer
+	cflags, needed when cross compiling with Gstreamer support.
+	* server/vm/Makefile.am: Add glib and gstreamer cflags, needed
+	when cross compiling with Gstreamer support.
+	* utilities/Makefile.am: With GST for sound, include glib and
+	gstreamer libraries.
+
 2007-02-10 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/asobj/Math.cpp: using namespace std;
@@ -7,12 +23,12 @@
 
 2007-02-10 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
-  * gui/fb.cpp: fixed some compilation problems when DOUBLE_BUFFER is 
-    disabled; fixed _validbounds so that the movie is visible again; 
-    added 2 pixel border to invalidated bounds to fix anti-aliasing
-    problems; set scaling to view movie full-screen; added/fixed 
-    support for 24 and 32 bit modes
-  * render_handler_agg.cpp: added pixel format BGRA32          
+	* gui/fb.cpp: fixed some compilation problems when DOUBLE_BUFFER is 
+	disabled; fixed _validbounds so that the movie is visible again; 
+	added 2 pixel border to invalidated bounds to fix anti-aliasing
+	problems; set scaling to view movie full-screen; added/fixed 
+	support for 24 and 32 bit modes
+	* render_handler_agg.cpp: added pixel format BGRA32          
 
 2007-02-10 Sandro Santilli <strk@keybit.net>
 

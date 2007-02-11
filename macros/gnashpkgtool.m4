@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.37 2007/02/02 01:57:57 rsavoye Exp $
+dnl $Id: gnashpkgtool.m4,v 1.38 2007/02/11 06:21:30 rsavoye Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
@@ -85,36 +85,36 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
 	        if test x"${ac_cv_path_$1_incl}" = x; then
 	          for i in $incllist; do
 	            if test -f $i/$name; then
-                      found_$1_incl="yes"
-		      if test x"$i" != x"/usr/include"; then
-		        ac_cv_path_$1_incl="-I$i"
-		        break
-		      else
-		        ac_cv_path_$1_incl=""
-		        break
-		      fi
+                found_$1_incl="yes"
+		            if test x"$i" != x"/usr/include"; then
+		              ac_cv_path_$1_incl="-I$i"
+		              break
+		            else
+		              ac_cv_path_$1_incl=""
+		              break
+		            fi
 	            else
-		      if test -f $i/$name/$2; then
-                        found_$1_incl="yes"
-		        ac_cv_path_$1_incl="-I$i/$name"
-		        break
-		      else
-		        if test -f $i/$2; then
-                          found_$1_incl="yes"
-		          ac_cv_path_$1_incl="-I$i"
-		          break
-		        fi
-		      fi
+		            if test -f $i/$name/$2; then
+                  found_$1_incl="yes"
+		              ac_cv_path_$1_incl="-I$i/$name"
+		              break
+		            else
+		              if test -f $i/$2; then
+                    found_$1_incl="yes"
+		                  ac_cv_path_$1_incl="-I$i"
+		                  break
+		              fi
+		            fi
 	            fi
 	          done
 	        fi
 	      ])
-            ])
-          ])
+      ])
+    ])
 	])
-    fi
+  fi
 
-    if test x"${found_$1_incl}" = "xyes"; then
+  if test x"${found_$1_incl}" = "xyes"; then
 
       dnl It seems we need to explicitly call AC_DEFINE as AC_CHECK_HEADER doesn't
       dnl do this automatically. AC_CHECK_HEADERS (not the final S) would do it.
@@ -174,19 +174,20 @@ if test x"${$1}" = x"yes"; then
 	])
 
 	dnl If the header doesn't exist, there is no point looking for the library.
-	if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_lib}" = x; then
-		$PKG_CONFIG --exists libDOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --libs libDOWN[]`
-		$PKG_CONFIG --exists DOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --libs DOWN[]`
-		$PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib=`$PKG_CONFIG --libs lib$name`
-		$PKG_CONFIG --exists $name && ac_cv_path_$1_lib=`$PKG_CONFIG --libs $name`
-		AC_MSG_CHECKING([for lib$1 library])      
-		AC_MSG_RESULT(${ac_cv_path_$1_lib})
-	fi
+  if test x$cross_compiling = xno; then
+	  if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_$1_lib}" = x; then
+		  $PKG_CONFIG --exists libDOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --libs libDOWN[]`
+		  $PKG_CONFIG --exists DOWN[] && ac_cv_path_$1_lib=`$PKG_CONFIG --libs DOWN[]`
+		  $PKG_CONFIG --exists lib$name && ac_cv_path_$1_lib=`$PKG_CONFIG --libs lib$name`
+		  $PKG_CONFIG --exists $name && ac_cv_path_$1_lib=`$PKG_CONFIG --libs $name`
+		  AC_MSG_CHECKING([for lib$1 library])      
+		  AC_MSG_RESULT(${ac_cv_path_$1_lib})
+	  fi
+  fi
 
 	if test x"${ac_cv_path_$1_lib}" = x; then
 		ac_save_LIBS=$LIBS
 		LIBS=""
-		AC_SEARCH_LIBS($2, $1 $name, [ac_cv_path_$1_lib="$LIBS $5"],[
 		for i in $libslist; do
 			if test -f $i/lib$1.a -o -f $i/lib$1.so; then
 				if test -f "$i/lib$1.a" -o -f "$i/lib$1.so"; then
@@ -209,9 +210,13 @@ if test x"${$1}" = x"yes"; then
 					fi
 				fi
 			fi
-		done])      
+		done
 		LIBS=$ac_save_LIBS
 	fi
+
+	if test x"${ac_cv_path_$1_lib}" = x ; then
+    AC_SEARCH_LIBS($2, $1 $name, [ac_cv_path_$1_lib="$LIBS $5"])
+  fi
 
 	if test x"${ac_cv_path_$1_lib}" != x ; then
 		UP[]_LIBS="${ac_cv_path_$1_lib}"

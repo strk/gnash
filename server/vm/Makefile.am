@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.6 2006/12/17 20:24:58 rsavoye Exp $
+# $Id: Makefile.am,v 1.7 2007/02/11 06:21:29 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -31,6 +31,8 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
+	$(GLIB_CFLAGS) \
+	$(GSTREAMER_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS) \

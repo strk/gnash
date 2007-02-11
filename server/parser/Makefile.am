@@ -15,10 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# 
-#
-
-# $Id: Makefile.am,v 1.21 2007/02/09 16:40:42 tgc Exp $
+# $Id: Makefile.am,v 1.22 2007/02/11 06:21:29 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -39,6 +36,9 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)/libgeometry \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)	\
+	$(LIBXML_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	$(GSTREAMER_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
         $(BOOST_CFLAGS)

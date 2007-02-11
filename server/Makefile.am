@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.100 2007/02/06 17:46:24 rsavoye Exp $
+# $Id: Makefile.am,v 1.101 2007/02/11 06:21:29 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -41,6 +41,8 @@ AM_CPPFLAGS = \
 	-I$(top_srcdir)	\
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
+	$(GLIB_CFLAGS) \
+	$(GSTREAMER_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(LIBXML_CFLAGS) \
 	$(NULL)
