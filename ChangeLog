@@ -1,3 +1,9 @@
+2007-02-11 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Number.cpp: don't redefine fpclassify: _fpclassify
+	  won't build on an ubuntu dapper; fpclassify is defined in math.h,
+	  already included.
+
 2007-02-10  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* libbase/Makefile.am: Add glib and gstreamer cflags, needed when
