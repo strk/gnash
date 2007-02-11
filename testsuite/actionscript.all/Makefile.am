@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.64 2007/01/17 14:39:31 strk Exp $
+# $Id: Makefile.am,v 1.65 2007/02/11 22:07:29 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -84,6 +84,7 @@ ASTESTS =			\
 	Microphone.as		\
 	Mouse.as		\
 	MovieClip.as		\
+	MovieClipLoader.as	\
 	NetStream.as		\
 	Number.as		\
 	Selection.as		\

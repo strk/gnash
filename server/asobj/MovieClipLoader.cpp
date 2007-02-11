@@ -36,6 +36,7 @@
 #include "character.h" // for loadClip (get_parent)
 #include "log.h"
 #include "URL.h" // for url parsing
+#include "builtin_function.h"
 
 #include <typeinfo> 
 #include <string>
@@ -81,6 +82,7 @@ getMovieClipLoaderInterface()
 	if ( o == NULL )
 	{
 		o = new as_object();
+		//log_msg("MovieClipLoader interface @ %p", o.get());
 		attachMovieClipLoaderInterface(*o);
 	}
 	return o.get();
@@ -187,7 +189,11 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	dispatchEvent("onLoadStart", events_call);
 
 	bool ret = target.loadMovie(url);
-	if ( ! ret ) return false;
+	if ( ! ret ) 
+	{
+		// TODO: dispatchEvent("onLoadError", ...)
+		return false;
+	}
 
 
 	/// This event must be dispatched when actions
@@ -210,6 +216,8 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	//mcl_data->bytes_total = stats.st_size;
 	mcl_data->bytes_loaded = 666; // fake values for now
 	mcl_data->bytes_total = 666;
+
+	// TODO: dispatchEvent("onLoadProgress", ...)
 
 	log_warning("FIXME: MovieClipLoader calling onLoadComplete *before* movie has actually been fully loaded (cheating)");
 	dispatchEvent("onLoadComplete", events_call);
@@ -359,6 +367,7 @@ moviecliploader_new(const fn_call& fn)
 {
 
   as_object*	mov_obj = new MovieClipLoader;
+  //log_msg("MovieClipLoader instance @ %p", mov_obj);
 
   fn.result->set_as_object(mov_obj); // will store in a boost::intrusive_ptr
 }
@@ -421,7 +430,18 @@ moviecliploader_removelistener(const fn_call& fn)
 void
 moviecliploader_class_init(as_object& global)
 {
-	global.init_member("MovieClipLoader", as_value(moviecliploader_new));
+	// This is going to be the global Number "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl=NULL;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&moviecliploader_new, getMovieClipLoaderInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachMovieClipLoaderInterface(*cl);  // not sure we should be doing this..
+	}
+	global.init_member("MovieClipLoader", cl.get()); //as_value(moviecliploader_new));
+	log_msg("MovieClipLoader class @ %p", cl.get());
 }
 
 } // end of gnash namespace

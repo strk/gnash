@@ -1,3 +1,12 @@
+2007-02-11 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/MovieClipLoader.cpp: properly register
+	  the MovieClipLoader global class (use builtin_function,
+	  not a "dumb" c_function.
+	* testsuite/actionscript.all/: Makefile.am, MovieClipLoader.as:
+	  simple test for MovieClipLoader (just inheritance and functions
+	  availability).
+
 2007-02-11 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/asobj/Number.cpp: Reverted stupid mistake.
