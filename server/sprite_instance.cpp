@@ -550,6 +550,16 @@ static void sprite_load_movie(const fn_call& fn)
 	//moviecliploader_loadclip(fn);
 }
 
+// my_mc.unloadMovie() : Void
+static void sprite_unload_movie(const fn_call& fn)
+{
+	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	UNUSED(sprite);
+
+	// See http://sephiroth.it/reference.php?id=429
+	log_error("FIXME: MovieClip.unloadMovie() not implemented yet");
+}
+
 static void sprite_hit_test(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -1152,6 +1162,7 @@ attachMovieClipInterface(as_object& o)
 	o.init_member("getBytesLoaded", &sprite_get_bytes_loaded);
 	o.init_member("getBytesTotal", &sprite_get_bytes_total);
 	o.init_member("loadMovie", &sprite_load_movie);
+	o.init_member("unloadMovie", &sprite_unload_movie);
 	o.init_member("hitTest", &sprite_hit_test);
 	o.init_member("duplicateMovieClip", &sprite_duplicate_movieclip);
 	o.init_member("swapDepths", &sprite_swap_depths);

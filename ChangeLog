@@ -1,5 +1,7 @@
 2007-02-11 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: stubbed unloadMovie ActionScript
+	  function.
 	* server/asobj/MovieClipLoader.cpp: properly register
 	  the MovieClipLoader global class (use builtin_function,
 	  not a "dumb" c_function.
