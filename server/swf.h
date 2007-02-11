@@ -101,7 +101,7 @@ typedef enum
     PLACEOBJECT3          = 70,
 
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_import2
-    IMPORT2               = 71,
+    IMPORTASSETS2         = 71,
 
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_definefontalignzones
     DEFINEALIGNZONES      = 73,
