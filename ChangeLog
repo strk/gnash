@@ -1,7 +1,8 @@
 2007-02-11 Sandro Santilli <strk@keybit.net>
 
 	* server/: impl.cpp, swf.h: renamed IMPORT2 as IMPORTASSETS2, tracking
-	  Ming naming convention.
+	  Ming naming convention; add ENABLEDEBUGGER2 definition (and null
+	  loader).
 	* server/asobj/Number.cpp: don't redefine fpclassify: _fpclassify
 	  won't build on an ubuntu dapper; fpclassify is defined in math.h,
 	  already included.

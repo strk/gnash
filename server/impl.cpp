@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.89 2007/02/11 08:28:18 strk Exp $ */
+/* $Id: impl.cpp,v 1.90 2007/02/11 12:47:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -163,6 +163,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::DEFINESHAPE2,	define_shape_loader);
 	register_tag_loader(SWF::DEFINEBUTTONCXFORM, fixme_loader); // 23
 	// "protect" tag; we're not an authoring tool so we don't care.
+	// (might be nice to dump the password instead..)
 	register_tag_loader(SWF::PROTECT,	null_loader);
 	register_tag_loader(SWF::PATHSAREPOSTSCRIPT, fixme_loader); // 25
 	register_tag_loader(SWF::PLACEOBJECT2,	place_object_2_loader);
@@ -195,13 +196,22 @@ static void	ensure_loaders_registered()
 	// 53 - _UNKNOWN_ unimplemented
 	// 54 - _UNKNOWN_ unimplemented
 	// 55 - _UNKNOWN_ unimplemented
-	register_tag_loader(SWF::EXPORTASSETS,	export_loader);
-	register_tag_loader(SWF::IMPORTASSETS,  import_loader);
-	// 58 - _UNKNOWN_ unimplemented
-	register_tag_loader(SWF::INITACTION, do_init_action_loader);   
+	register_tag_loader(SWF::EXPORTASSETS,	export_loader); // 56
+	register_tag_loader(SWF::IMPORTASSETS,  import_loader); // 57
+
+	//  We're not an authoring tool so we don't care.
+	// (might be nice to dump the password instead..)
+	register_tag_loader(SWF::ENABLEDEBUGGER, null_loader);    // 58
+
+	register_tag_loader(SWF::INITACTION, do_init_action_loader);  // 59  
 
 	register_tag_loader(SWF::DEFINEVIDEOSTREAM, define_video_loader); // 60
 	register_tag_loader(SWF::VIDEOFRAME, video_loader); // 61
+	// 62 - _UNKNOWN_ unimplemented
+	// 63 - _UNKNOWN_ unimplemented
+	//  We're not an authoring tool so we don't care.
+	// (might be nice to dump the password instead..)
+	register_tag_loader(SWF::ENABLEDEBUGGER2, null_loader);    // 64
 	
 	register_tag_loader(SWF::FILEATTRIBUTES, file_attributes_loader); // 69
 	register_tag_loader(SWF::PLACEOBJECT3, fixme_loader); // 70

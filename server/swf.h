@@ -83,6 +83,8 @@ typedef enum
     FONTREF		  = 52,
     EXPORTASSETS          = 56,
     IMPORTASSETS          = 57,
+
+    /// See http://sswf.sourceforge.net/SWFalexref.html#tag_protectdebug
     ENABLEDEBUGGER	  = 58,
 
     /// For actions specified with initclip directive
@@ -93,6 +95,10 @@ typedef enum
 
     /// DefineFontInfo2 (swf6)
     DEFINEFONTINFO2       = 62,
+
+    /// See http://flasm.sourceforge.net/#protect
+    /// See http://sswf.sourceforge.net/SWFalexref.html#tag_protectdebug
+    ENABLEDEBUGGER2	  = 64,
 
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_fileattributes
     FILEATTRIBUTES        = 69,
