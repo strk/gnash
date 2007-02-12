@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.64 2007/02/12 14:00:05 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.65 2007/02/12 14:18:43 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -631,7 +631,7 @@ private:
 	// the _currentframe property
 	size_t		m_current_frame;
 	// the frame which contains the current executing actions
-	size_t      m_executing_frame; 
+	//size_t      m_executing_frame; 
 	bool		m_update_frame;
 	bool		m_has_looped;
 

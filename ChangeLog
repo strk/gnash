@@ -1,5 +1,11 @@
 2007-02-12 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: reverted
+	  goto_frame patch introducing regression failures.
+	  See bug #19020.
+
+2007-02-12 Sandro Santilli <strk@keybit.net>
+
 	* server/tesselate.cpp: std::fabsf => std::abs.
 	* server/execute_tag.h: doxygen documentation,
 	  add new execute_action() function.
