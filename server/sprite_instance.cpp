@@ -73,6 +73,9 @@ namespace gnash {
 // and failign with the previous.
 //
 //#define OLD_GET_MEMBER
+//
+
+//#define GNASH_DEBUG 1
 
 // Forward declarations
 static as_object* getMovieClipInterface();
@@ -3389,6 +3392,10 @@ sprite_instance::get_text_value() const
 void
 sprite_instance::construct()
 {
+#ifdef GNASH_DEBUG
+	log_msg("Constructing sprite '%s'", getTargetPath().c_str());
+#endif
+
 	on_event(event_id::CONSTRUCT);
 	execute_frame_tags(0, TAG_DLIST|TAG_ACTION);	
 
