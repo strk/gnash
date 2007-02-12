@@ -1,3 +1,12 @@
+2007-02-12 Sandro Santilli <strk@keybit.net>
+
+	* server/tesselate.cpp: std::fabsf => std::abs.
+	* server/execute_tag.h: doxygen documentation,
+	  add new execute_action() function.
+	* server/sprite_instance.{cpp,h}: changed signature
+	  of execute_frame_tags() to allow executions of
+	  action tags only.
+
 2007-02-12 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/debugger.h: &val, &val -> &var, &val
