@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.254 2007/02/09 20:03:15 rsavoye Exp $
+dnl $Id: configure.ac,v 1.255 2007/02/12 23:49:10 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -445,6 +445,9 @@ AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
+AC_PATH_MTASC
+AM_CONDITIONAL(ENABLE_MTASC, [ test x"$MTASC" != x ])
+
 dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
 
@@ -817,6 +820,7 @@ testsuite/libgeometry/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
 testsuite/misc-ming.all/Makefile
+testsuite/misc-mtasc.all/Makefile
 testsuite/movies.all/Makefile
 testsuite/server/Makefile
 gui/Makefile
@@ -1349,6 +1353,15 @@ else
  You need to have the Ming development and utilities packages installed\
  to run most of the tests in Gnash testsuite. Some of the tests will be\
  run anyway."
+fi
+
+if test x"$MTASC" != x; then
+    echo "        MTASC is $MTASC"
+    echo "        MTASC CLASSPATH is $MTASC_CLASSPATH"
+else
+    echo "Warning:\
+ You need to have the MTASC compiler packages installed\
+ to run some of the tests in Gnash testsuite."
 fi
 
 if test x"$Z_LIBS" != x; then

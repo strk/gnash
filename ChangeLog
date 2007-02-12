@@ -1,5 +1,17 @@
 2007-02-12 Sandro Santilli <strk@keybit.net>
 
+	* macros/mtasc.m4: provide some detection for mtasc
+	  (CLASSPATH detection needs more work).
+	* configure.ac: detect mtasc availability.
+	* Makefile.am: dump MTASC info on 'make dumpconfig'.
+	* testsuite/Makefile.am: descend in misc-mtasc.all
+	* testsuite/misc-mtasc.all/Makefile.am: initial Makefile
+	  for mtasc.
+	* testsuite/misc-mtasc.all/hello.as: simple test 
+	  (build with 'make hello.swf').
+
+2007-02-12 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.cpp (on_button_event):
 	  Survive MOUSE_DOWN and MOUSE_UP events.
 	* server/movie_root.cpp: (generate_mouse_button_events):

@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.62 2007/02/02 01:57:57 rsavoye Exp $
+# $Id: Makefile.am,v 1.63 2007/02/12 23:49:10 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -218,6 +218,8 @@ endif
 	@echo "	MING_LIBS $(MING_LIBS) "
 	@echo "	MING_CFLAGS $(MING_CFLAGS) "
 	@echo "	MAKESWF $(MAKESWF) "
+	@echo " MTASC $(MTASC)"
+	@echo " MTASC CLASSPATH $(MTASC_CLASSPATH)"
 	@echo "Graphics support..."	
 	@echo "	CAIRO_CFLAGS is $(CAIRO_CFLAGS)"
 	@echo "	CAIRO_LIBS is $(CAIRO_LIBS)"
