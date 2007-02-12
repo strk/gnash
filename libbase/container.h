@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: container.h,v 1.49 2006/12/01 10:22:12 alexeev Exp $ */
+/* $Id: container.h,v 1.50 2007/02/12 01:23:17 nihilus Exp $ */
 
 #ifndef __CONTAINER_H__
 #define __CONTAINER_H__
@@ -584,7 +584,7 @@ private:
 		}
 
 		// Force new_size to be a power of two.
-		int	bits = fchop(log2((float)(new_size-1)) + 1);
+		int	bits = fchop(std::log2((float)(new_size-1)) + 1);
 		assert((1 << bits) >= new_size);
 
 		new_size = 1 << bits;
