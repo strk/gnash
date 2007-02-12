@@ -24,59 +24,46 @@
 #endif
 
 #include "impl.h"
-#include "as_object.h" // for inheritance 
+#include "as_object.h" // for inheritance
+#include "NetConnection.h"
 
 namespace gnash {
 
 // Forward declarations
 class fn_call;
   
-class Sound {
+class Sound : public as_object {
 public:
-    Sound();
-    ~Sound();
-   void attachSound();
-   void getBytesLoaded();
-   void getBytesTotal();
-   void getPan();
-   void getTransform();
-   void getVolume();
-   void loadSound();
-   void setPan();
-   void setTransform();
-   void setVolume();
-   void start();
-   void stop();
+	Sound();
+	~Sound();
+	void attachSound(int si, const char* name);
+	void getBytesLoaded();
+	void getBytesTotal();
+	void getPan();
+	void getTransform();
+	int getVolume();
+	void loadSound(std::string file, bool streaming);
+	void setPan();
+	void setTransform();
+	void setVolume(int volume);
+	void start(int offset, int loops);
+	void stop(int si);
+
+	std::string soundName;
 private:
-    bool _duration;
-    bool _id3;
-    bool _onID3;
-    bool _onLoad;
-    bool _onomplete;
-    bool _position;
+	bool _duration;
+	bool _id3;
+	bool _onID3;
+	bool _onLoad;
+	bool _onComplete;
+	bool _position;
+	NetConnection* connection;
+
+	int soundId;
+	bool externalSound;
 };
 
-class sound_as_object : public as_object
-{
-public:
-    //Sound obj;
-    std::string sound;
-    int sound_id;
-};
-
-void sound_new(const fn_call& fn);
-void sound_attachsound(const fn_call& fn);
-void sound_getbytesloaded(const fn_call& fn);
-void sound_getbytestotal(const fn_call& fn);
-void sound_getpan(const fn_call& fn);
-void sound_gettransform(const fn_call& fn);
-void sound_getvolume(const fn_call& fn);
-void sound_loadsound(const fn_call& fn);
-void sound_setpan(const fn_call& fn);
-void sound_settransform(const fn_call& fn);
-void sound_setvolume(const fn_call& fn);
-void sound_start(const fn_call& fn);
-void sound_stop(const fn_call& fn);
+void sound_class_init(as_object& global);
 
 } // end of gnash namespace
 

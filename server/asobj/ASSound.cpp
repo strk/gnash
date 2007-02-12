@@ -26,12 +26,33 @@
 #include "movie_definition.h"
 #include "sprite_instance.h"
 #include "fn_call.h"
+#include "GnashException.h"
+#include "builtin_function.h"
 
 #include <string>
 
 namespace gnash {
 
-Sound::Sound() {
+static void sound_new(const fn_call& fn);
+static void sound_attachsound(const fn_call& fn);
+static void sound_getbytesloaded(const fn_call& fn);
+static void sound_getbytestotal(const fn_call& fn);
+static void sound_getpan(const fn_call& fn);
+static void sound_gettransform(const fn_call& fn);
+static void sound_getvolume(const fn_call& fn);
+static void sound_loadsound(const fn_call& fn);
+static void sound_setpan(const fn_call& fn);
+static void sound_settransform(const fn_call& fn);
+static void sound_setvolume(const fn_call& fn);
+static void sound_start(const fn_call& fn);
+static void sound_stop(const fn_call& fn);
+static as_object* getSoundInterface();
+
+Sound::Sound() 	:
+	as_object(getSoundInterface()),
+	soundName(""),
+	soundId(-1)
+{
 }
 
 Sound::~Sound() {
@@ -39,9 +60,10 @@ Sound::~Sound() {
 
 
 void
-Sound::attachSound()
+Sound::attachSound(int si, const char* name)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	soundId = si;
+	soundName = name;
 }
 
 void
@@ -68,16 +90,24 @@ Sound::getTransform()
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-void
+int
 Sound::getVolume()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	int volume = 0;
+	sound_handler* s = get_sound_handler();
+	if (s != NULL)
+	{
+		volume = s->get_volume(soundId);
+	}
+	return volume;
 }
 
 void
-Sound::loadSound()
+Sound::loadSound(std::string /*file*/, bool /*streaming*/)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_msg("%s is still testing!! \n", __FUNCTION__);
+
+
 }
 
 void
@@ -93,88 +123,122 @@ Sound::setTransform()
 }
 
 void
-Sound::setVolume()
+Sound::setVolume(int volume)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	// sanity check
+	if (volume >= 0 && volume <=100)
+	{
+		sound_handler* s = get_sound_handler();
+		if (s != NULL)
+		{
+			s->set_volume(soundId, volume);
+		}
+	}
 }
 
 void
-Sound::start()
+Sound::start(int offset, int loops)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	    sound_handler* s = get_sound_handler();
+	    if (s) s->play_sound(soundId, loops, offset, 0, NULL);
+    
 }
 
 void
-Sound::stop()
+Sound::stop(int si)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+
+	sound_handler* s = get_sound_handler();
+	if (s != NULL)
+	{
+	    if (si > -1) {
+			s->stop_sound(soundId);
+		} else {
+			s->stop_sound(si);
+		}
+	}
 }
 
 void
 sound_new(const fn_call& fn)
 {
-    sound_as_object *sound_obj = new sound_as_object;
+	Sound *sound_obj = new Sound;
 
-    sound_obj->init_member("attachSound", &sound_attachsound);
-    sound_obj->init_member("getBytesLoaded", &sound_getbytesloaded);
-    sound_obj->init_member("getBytesTotal", &sound_getbytestotal);
-    sound_obj->init_member("getPan", &sound_getpan);
-    sound_obj->init_member("getTransform", &sound_gettransform);
-    sound_obj->init_member("getVolume", &sound_getvolume);
-    sound_obj->init_member("loadSound", &sound_loadsound);
-    sound_obj->init_member("setPan", &sound_setpan);
-    sound_obj->init_member("setTransform", &sound_settransform);
-    sound_obj->init_member("setVolume", &sound_setvolume);
-    sound_obj->init_member("start", &sound_start);
-    sound_obj->init_member("stop", &sound_stop);
+	fn.result->set_as_object(sound_obj);
+}
 
-    fn.result->set_as_object(sound_obj);
+// Wrapper around dynamic_cast to implement user warning.
+// To be used by builtin properties and methods.
+static Sound*
+ensure_sound(as_object* obj)
+{
+	Sound* ret = dynamic_cast<Sound*>(obj);
+	if ( ! ret )
+	{
+		throw ActionException("builtin method or gettersetter for Sound objects called against non-Sound instance");
+	}
+	return ret;
 }
 
 void
 sound_start(const fn_call& fn)
 {
-    log_action("-- start sound \n");
-    sound_handler* s = get_sound_handler();
-		if (s != NULL)
-		{
-			int loop = 0;
-			int secondOffset = 0;
-			if (fn.nargs > 0)
-			{
-				int secondOffset = (int) fn.arg(0).to_number();
+	log_action("-- start sound \n");
+	Sound* so = ensure_sound(fn.this_ptr);
+	int loop = 0;
+	int secondOffset = 0;
 
-				// sanity check
-				secondOffset = secondOffset <= 0 ? 0 : secondOffset;
+	if (fn.nargs > 0) {
+		secondOffset = (int) fn.arg(0).to_number();
 
-				if (fn.nargs > 1)
-				{
-					loop = (int) fn.arg(1).to_number() - 1;
+		if (fn.nargs > 1) {
+			loop = (int) fn.arg(1).to_number() - 1;
 
-					// -1 means infinite playing of sound
-					// sanity check
-					loop = loop < 0 ? -1 : loop;
-				}
-			}
-
-			sound_as_object*	so = (sound_as_object*) (as_object*) fn.this_ptr;
-			assert(so);
-			s->play_sound(so->sound_id, loop, secondOffset, 0, NULL);
+			// -1 means infinite playing of sound
+			// sanity check
+			loop = loop < 0 ? -1 : loop;
 		}
+	}
+	so->start(secondOffset, loop);
 
 }
 
 void
 sound_stop(const fn_call& fn)
 {
-    log_action("-- stop sound \n");
-    sound_handler* s = get_sound_handler();
-    if (s != NULL)
-	{
-	    sound_as_object*	so = (sound_as_object*) (as_object*) fn.this_ptr;
-	    assert(so);
-	    s->stop_sound(so->sound_id);
+	log_action("-- stop sound \n");
+	Sound* so = ensure_sound(fn.this_ptr);
+
+	int si = -1;
+
+	if (fn.nargs > 0) {
+		const char* name = fn.arg(0).to_string();
+
+		// check the import.
+		movie_definition* def = fn.env->get_target()->get_root_movie()->get_movie_definition();
+		assert(def);
+		boost::intrusive_ptr<resource> res = def->get_exported_resource(name);
+		if (res == NULL)
+		{
+		    log_error("import error: resource '%s' is not exported\n", name);
+		    return;
+		}
+
+		sound_sample_impl* ss = (sound_sample_impl*) res->cast_to_sound_sample();
+
+		if (ss != NULL)
+		{
+		    si = ss->m_sound_handler_id;
+		}
+		else
+		{
+		    log_error("sound sample is NULL\n");
+		    return;
+		}
+
 	}
+	so->stop(si);
+
 }
 
 void
@@ -187,19 +251,21 @@ sound_attachsound(const fn_call& fn)
 	    return;
 	}
 
-    sound_as_object*	so = (sound_as_object*) (as_object*) fn.this_ptr;
-    assert(so);
+	Sound* so = ensure_sound(fn.this_ptr);
 
     const char* name = fn.arg(0).to_string();
-    if ( name ) so->sound = name;
+    if (!name) {
+		log_error("attachSound need a non-null argument\n");
+		return;
+	}
 
     // check the import.
     movie_definition* def = fn.env->get_target()->get_root_movie()->get_movie_definition();
     assert(def);
-    boost::intrusive_ptr<resource> res = def->get_exported_resource(so->sound.c_str());
+    boost::intrusive_ptr<resource> res = def->get_exported_resource(so->soundName.c_str());
     if (res == NULL)
 	{
-	    log_error("import error: resource '%s' is not exported\n", so->sound.c_str());
+	    log_error("import error: resource '%s' is not exported\n", so->soundName.c_str());
 	    return;
 	}
 
@@ -218,7 +284,7 @@ sound_attachsound(const fn_call& fn)
 
     // sanity check
     assert(si >= 0 && si < 1000);
-    so->sound_id = si;
+    so->attachSound(si, name);
 }
 
 void
@@ -248,14 +314,13 @@ sound_gettransform(const fn_call& /*fn*/)
 void
 sound_getvolume(const fn_call& fn)
 {
-	sound_handler* s = get_sound_handler();
-	if (s != NULL)
-	{
-		sound_as_object*	so = (sound_as_object*) (as_object*) fn.this_ptr;
-		assert(so);
-		int volume = s->get_volume(so->sound_id);
-    fn.result->set_int(volume);
-	}
+
+	Sound* so = ensure_sound(fn.this_ptr);
+
+	int volume = so->getVolume();
+
+	fn.result->set_int(volume);
+
 	return;
 }
 
@@ -285,20 +350,96 @@ sound_setvolume(const fn_call& fn)
 		log_error("set volume of sound needs one argument\n");
 		return;
 	}
-		
+
+	Sound* so = ensure_sound(fn.this_ptr);	
 	int volume = (int) fn.arg(0).to_number();
 
-	// sanity check
-	if (volume >= 0 && volume <=100)
+	so->setVolume(volume);
+}
+
+void
+sound_duration(const fn_call& /*fn*/)
+{
+	log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+
+void
+sound_ID3(const fn_call& /*fn*/)
+{
+	log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+
+void
+sound_position(const fn_call& /*fn*/)
+{
+	log_msg("%s:unimplemented \n", __FUNCTION__);
+}
+
+void
+attachSoundInterface(as_object& o)
+{
+
+	o.init_member("attachSound", &sound_attachsound);
+	o.init_member("getBytesLoaded", &sound_getbytesloaded);
+	o.init_member("getBytesTotal", &sound_getbytestotal);
+	o.init_member("getPan", &sound_getpan);
+	o.init_member("getTransform", &sound_gettransform);
+	o.init_member("getVolume", &sound_getvolume);
+	o.init_member("loadSound", &sound_loadsound);
+	o.init_member("setPan", &sound_setpan);
+	o.init_member("setTransform", &sound_settransform);
+	o.init_member("setVolume", &sound_setvolume);
+	o.init_member("start", &sound_start);
+	o.init_member("stop", &sound_stop);
+
+	// Properties
+
+	boost::intrusive_ptr<builtin_function> gettersetter;
+
+	gettersetter = new builtin_function(&sound_duration, NULL);
+	o.init_property("duration", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sound_ID3, NULL);
+	o.init_property("ID3", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&sound_position, NULL);
+	o.init_property("position", *gettersetter, *gettersetter);
+
+}
+
+static as_object*
+getSoundInterface()
+{
+
+	static boost::intrusive_ptr<as_object> o;
+	if ( o == NULL )
 	{
-		sound_handler* s = get_sound_handler();
-		if (s != NULL)
-		{
-			sound_as_object*	so = (sound_as_object*) (as_object*) fn.this_ptr;
-			assert(so);
-			s->set_volume(so->sound_id, volume);
-		}
+		o = new as_object();
+		attachSoundInterface(*o);
 	}
+
+	return o.get();
+}
+
+// extern (used by Global.cpp)
+void sound_class_init(as_object& global)
+{
+
+	// This is going to be the global Sound "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&sound_new, getSoundInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachSoundInterface(*cl);
+		     
+	}
+
+	// Register _global.String
+	global.init_member("Sound", cl.get());
+
 }
 
 } // end of gnash namespace
