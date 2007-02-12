@@ -70,9 +70,9 @@ main(int argc, char** argv)
   sh_red = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc_red, (SWFBlock)sh_red);  
   add_clip_actions(mc_red, " _root.xtrace('as in frame1 of mc_red'); _root.x1 = \"as_in_mc_red\"; ");
-  SWFMovieClip_nextFrame(mc_red);/ *1st frame */
+  SWFMovieClip_nextFrame(mc_red); /* 1st frame */
   add_clip_actions(mc_red, " _root.xtrace('as in frame2 of mc_red'); _root.x2 = \"as_in_mc_red\"; stop(); ");
-  SWFMovieClip_nextFrame(mc_red);/* 2nd frame */
+  SWFMovieClip_nextFrame(mc_red); /* 2nd frame */
   
   /* Add mc_red to _root and name it as "mc_red" */
   SWFDisplayItem it_red;
