@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.32 2007/02/08 12:19:02 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.33 2007/02/12 14:06:01 strk Exp $";
 
 #include "check.as"
 
@@ -51,6 +51,7 @@ check(mc.getBytesLoaded);
 check(mc.getBytesTotal);
 check(mc.getBounds);
 check(mc.globalToLocal);
+check_equals(typeOf(mc.unloadMovie), 'function');
 
 
 //
@@ -125,7 +126,6 @@ check(mc.duplicateMovieClip);
     xcheck(mc.setMask);
     check(mc.startDrag);
     check(mc.stopDrag);
-    xcheck(mc.unloadMovie);
     xcheck(mc.enabled);
 
     // maybe this is the start condition...
