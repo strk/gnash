@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.63 2007/02/09 00:19:07 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.64 2007/02/12 14:00:05 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -100,6 +100,19 @@ public:
 	{
 		PLAY,
 		STOP
+	};
+
+	/// Type of execute tags
+	//
+	/// TODO: move to execute_tag.h ?
+	///
+	enum control_tag_type
+	{
+		/// Action tag
+		TAG_ACTION = 1<<0,
+
+		/// DisplayList tag
+		TAG_DLIST  = 1<<1
 	};
 
 	virtual void has_keypress_event();
@@ -216,26 +229,6 @@ public:
 	virtual void	advance(float delta_time);
 	//virtual void	advance_root(float delta_time);
 	virtual void	advance_sprite(float delta_time);
-
-	/// Execute the tags associated with the specified frame.
-	//
-	/// Execution of 1st frame tags is specially handled:
-	///
-	/// - After executing them for the first time
-	///   the DisplayList state is saved.
-	///
-	/// - Before subsequent executions (loop mode)
-	///   the DisplayList is restored from saved state.
-	///
-	/// @param frame
-	///	Frame number. 0-based
-	///
-	/// @param state_only
-	///     If false (the default), all tags are executed.
-	///	If true, only 'state' tags are executed (place,move,replace).
-	///	Note that 'action' tags are NOT 'state' tags.
-	///
-	void execute_frame_tags(size_t frame, bool state_only = false);
 
 
 	/// Execute the tags associated with the specified frame,
@@ -709,6 +702,25 @@ private:
 	DisplayList _frame0_chars;
 
 protected:
+
+	/// Execute the tags associated with the specified frame.
+	//
+	/// Execution of 1st frame tags is specially handled:
+	///
+	/// - After executing them for the first time
+	///   the DisplayList state is saved.
+	///
+	/// - Before subsequent executions (loop mode)
+	///   the DisplayList is restored from saved state.
+	///
+	/// @param frame
+	///	Frame number. 0-based
+	///
+	/// @param typeflags
+	///     Which kind of control tags we want to execute. 
+	///	See control_tag_type enum.
+	///
+	void execute_frame_tags(size_t frame, int typeflags=TAG_DLIST|TAG_ACTION); // bool state_only = false;
 
 	/// \brief
 	/// This is either sprite_definition (for sprites defined by

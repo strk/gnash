@@ -40,26 +40,45 @@ class sprite_instance;
 class execute_tag
 {
 public:
+
 	virtual ~execute_tag()
 	{
 	}
 
+	/// Execute this tag
 	virtual void execute(sprite_instance* /*m*/)
 	{
 	}
 
+	/// Execute this tag but only if controls the DisplayList 
 	virtual void execute_state(sprite_instance* /*m*/)
 	{
 	}
 
-	// Is the 'frame' arg is really needed ?
+	/// Execute this tag but only if it is an action tag
+	void execute_action(sprite_instance* m)
+	{
+		if ( is_action_tag() ) execute(m);
+	}
+
+	/// Execute the reverse version of this (state) tag.
+	//
+	/// Reverse execution is only meaningful for state tegs.
+	///
+	/// @param m
+	///
+	/// @param frame
+	///
 	virtual void execute_state_reverse(sprite_instance* m, int /*frame*/)
 	{
+		// is the 'frame' arg is really needed ?
 		execute_state(m);
 	}
 
+	/// Return true if this is a RemoveObject tag
 	virtual bool	is_remove_tag() const { return false; }
 
+	/// Return true if this is an action tag.
 	virtual bool	is_action_tag() const { return false; }
 
 	/// \brief

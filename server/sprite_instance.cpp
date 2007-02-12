@@ -216,11 +216,6 @@ static void sprite_attach_movie(const fn_call& fn)
 		return;
 	}
 
-	// MOVE THIS CODE TO dlist.cpp, and have sprite_instance::construct
-	// call execute_frame_tags(0, false)
-	//sprite_instance* newsprite = dynamic_cast<sprite_instance*>(newch.get());
-	//if ( newsprite ) newsprite->construct();
-
 	newch->setDynamic();
 
 	/// Properties must be copied *after* the call to attachCharacter
@@ -2424,7 +2419,7 @@ void sprite_instance::advance_sprite(float delta_time)
 		// First time execute_frame_tags(0) executed in dlist.cpp(child) or movie_def_impl(root)
 		if (m_current_frame != (size_t)prev_frame)
 		{
-			execute_frame_tags(m_current_frame);
+			execute_frame_tags(m_current_frame, TAG_DLIST|TAG_ACTION);
 		}
 	}
 #ifdef GNASH_DEBUG
@@ -2466,13 +2461,13 @@ void sprite_instance::advance_sprite(float delta_time)
 		{
 			for (size_t f = m_executing_frame+1; f<m_current_frame; ++f)
 			{
-				execute_frame_tags(f, true);
+				execute_frame_tags(f, TAG_DLIST);
 			} 
 		}
 		m_action_list.clear();
 		
 		// extract the target frame actions
-		execute_frame_tags(m_current_frame, false);
+		execute_frame_tags(m_current_frame, TAG_DLIST|TAG_ACTION);
 		// store the target frame actions to m_goto_frame_action_list
 		m_goto_frame_action_list = m_action_list; 
 		m_action_list.clear(); 
@@ -2533,7 +2528,7 @@ sprite_instance::execute_action(action_buffer& ab)
 
 // 0-based frame number !
 void
-sprite_instance::execute_frame_tags(size_t frame, bool state_only)
+sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 {
 	testInvariant();
 
@@ -2601,21 +2596,17 @@ sprite_instance::execute_frame_tags(size_t frame, bool state_only)
 	IF_VERBOSE_ACTION(
 		// Use 1-based frame numbers
 		log_action("Executing " SIZET_FMT " tags in frame "
-			SIZET_FMT "/" SIZET_FMT " of sprite %s %s",
+			SIZET_FMT "/" SIZET_FMT " of sprite %s",
 			playlist.size(), frame+1, get_frame_count(),
-			getTargetPath().c_str(),
-			state_only ? "(state only)" : "" );
+			getTargetPath().c_str());
 	);
 
-	if (state_only)
+	for (PlayList::const_iterator it=playlist.begin(), itEnd=playlist.end();
+			it != itEnd; ++it)
 	{
-		std::for_each(playlist.begin(), playlist.end(),
-			std::bind2nd(std::mem_fun(&execute_tag::execute_state), this));
-	}
-	else
-	{
-		std::for_each(playlist.begin(), playlist.end(),
-			std::bind2nd(std::mem_fun(&execute_tag::execute), this));
+		execute_tag* tag = *it;
+		if ( typeflags & TAG_DLIST ) tag->execute_state(this);
+		if ( typeflags & TAG_ACTION ) tag->execute_action(this);
 	}
 
 	if ( frame == 0 && ! has_looped() )
@@ -2755,10 +2746,10 @@ sprite_instance::goto_frame(size_t target_frame_number)
 		// Construct the DisplayList of the target frame
 		for (size_t f = m_current_frame+1; f<target_frame_number; ++f)
 		{
-			// Second argument requests that only "state" tags
+			// Second argument requests that only "DisplayList" tags
 			// are executed. This means NO actions will be
 			// pushed on m_action_list.
-			execute_frame_tags(f, true);
+			execute_frame_tags(f, TAG_DLIST);
 		}
 
 	}
@@ -2769,8 +2760,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 
 	// Get the actions of target frame.(We don't have a direct way to
 	// do this, so use execute_frame_tags instead).
-	execute_frame_tags(target_frame_number, false);
-
+	execute_frame_tags(target_frame_number, TAG_ACTION|TAG_DLIST);
 
 	//FIXME: set m_current_frame to the target frame;
 	//  I think it's too early to do it here! Later actions in the 
@@ -3441,7 +3431,7 @@ void
 sprite_instance::construct()
 {
 	on_event(event_id::CONSTRUCT);
-	execute_frame_tags(0, false);	
+	execute_frame_tags(0, TAG_DLIST|TAG_ACTION);	
 
 	sprite_definition* def = dynamic_cast<sprite_definition*>(m_def.get());
 
