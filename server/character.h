@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.46 2007/02/08 13:14:36 strk Exp $ */
+/* $Id: character.h,v 1.47 2007/02/12 11:50:21 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -371,10 +371,18 @@ public:
 	///       and drop this one
 	virtual void	restart() { }
 
-    virtual void	advance(float /*delta_time*/)
-    {
-//	printf("%s:\n", __PRETTY_FUNCTION__); // FIXME:
-    }	// for buttons and sprites
+	/// Advance this character to next frame.
+	//
+	/// Character advancement is only meaningful for sprites
+	/// and sprite containers (button characters) because
+	/// sprites are the only characters that have frames.
+	/// 
+	/// Frame advancement include execution of all control tags.
+	/// 
+	virtual void advance(float /*delta_time*/)
+	{
+		// GNASH_REPORT_FUNCTION 
+	}
 
     virtual void	goto_frame(size_t /*target_frame*/) {}
 
