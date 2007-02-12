@@ -1,5 +1,7 @@
 2007-02-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: add consecutive_goto_frame_test
+	  to the 'make check' loop.
 	* libbase/utility.h: std::logf => std::log.
 
 2007-02-12 Zou Lunkai <zoulunkai@gmail.com>
