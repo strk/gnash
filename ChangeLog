@@ -1,3 +1,9 @@
+2007-02-10 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/consecutive_goto_frame_test.c
+	add a new testcase for testing consecutive ActionGotoAndStop.
+
+	
 2007-02-12 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/utility.h: Added note on log2	
