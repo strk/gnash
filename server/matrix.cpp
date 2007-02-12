@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.6 2006/11/02 14:00:55 udog Exp $ 
+// $Id: matrix.cpp,v 1.7 2007/02/12 12:26:13 nihilus Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -36,6 +36,8 @@
 #  define isfinite finite
 # endif 
 #endif 
+
+using namespace std;
 
 namespace gnash {
 
