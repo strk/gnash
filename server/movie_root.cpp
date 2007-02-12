@@ -224,6 +224,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 				{
 					// onRelease
 					active_entity->on_button_event(event_id::RELEASE);
+					active_entity->on_button_event(event_id::MOUSE_UP);
 					// TODO: have on_button_event return
 					//       wheter the action must trigger
 					//       a redraw.
@@ -312,6 +313,7 @@ generate_mouse_button_events(mouse_button_state* ms)
 			if (active_entity != NULL)
 			{
 				active_entity->on_button_event(event_id::PRESS);
+				active_entity->on_button_event(event_id::MOUSE_DOWN);
 				// TODO: have on_button_event return
 				//       wheter the action must trigger
 				//       a redraw.

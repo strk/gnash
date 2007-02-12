@@ -3087,6 +3087,8 @@ sprite_instance::can_handle_mouse_event() const
 		event_id(event_id::ROLL_OUT),
 		event_id(event_id::DRAG_OVER),
 		event_id(event_id::DRAG_OUT),
+		event_id(event_id::MOUSE_DOWN),
+		event_id(event_id::MOUSE_UP)
 	};
 
 	int swfversion =  _vm.getSWFVersion();

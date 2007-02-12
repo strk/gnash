@@ -1,3 +1,11 @@
+2007-02-12 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.cpp: (generate_mouse_button_events):
+	  Dispatch events MOUSE_DOWN and MOUSE_UP togheter with PRESS 
+	  and RELEASE (see bug #19040).
+	* server/sprite_instance.cpp (can_hanle_mouse_envent):
+	  Consider MOUSE_DOWN and MOUSE_UP events (see bug #19040).
+
 2007-02-12 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/ASSound.{cpp,h}, server/asobj/Global.cpp: Updated the
