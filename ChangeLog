@@ -1,5 +1,8 @@
 2007-02-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/action_execution_order_test.c: made
+	  more verbose, reduced frame rate to better see what goes on,
+	  don't use C++ comments.
 	* testsuite/misc-ming.all/Makefile.am: add consecutive_goto_frame_test
 	  to the 'make check' loop.
 	* libbase/utility.h: std::logf => std::log.

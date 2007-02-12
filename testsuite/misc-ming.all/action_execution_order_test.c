@@ -24,6 +24,10 @@
  * set a variable with a new value under _root, then set it again under anther movieClip.
  *   the variable will only record the later assignment. Checking the final result of the
  *   variable will tell us which action(assignment) is executed first.
+ *
+ * Expected result is:
+ *   In the frame placing mc_red,  actions in mc_red is executed *after* actions in _root
+ *   In subsequent frames, actions in mc_red is executed *before* actions in _root
  */
 
 #include <stdlib.h>
@@ -55,40 +59,40 @@ main(int argc, char** argv)
   Ming_init();
   mo = newSWFMovieWithVersion(OUTPUT_VERSION);
   SWFMovie_setDimension(mo, 800, 600);
-  SWFMovie_setRate (mo, 12.0);
+  SWFMovie_setRate (mo, 1.0);
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+  SWFMovie_nextFrame(mo);
 
   
   mc_red = newSWFMovieClip();
   sh_red = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc_red, (SWFBlock)sh_red);  
-  add_clip_actions(mc_red, " _root.x1 = \"as_in_mc_red\"; ");
-  SWFMovieClip_nextFrame(mc_red);//1st frame
-  add_clip_actions(mc_red, " _root.x2 = \"as_in_mc_red\"; stop(); ");
-  SWFMovieClip_nextFrame(mc_red);//2nd frame
+  add_clip_actions(mc_red, " _root.xtrace('as in frame1 of mc_red'); _root.x1 = \"as_in_mc_red\"; ");
+  SWFMovieClip_nextFrame(mc_red);/ *1st frame */
+  add_clip_actions(mc_red, " _root.xtrace('as in frame2 of mc_red'); _root.x2 = \"as_in_mc_red\"; stop(); ");
+  SWFMovieClip_nextFrame(mc_red);/* 2nd frame */
   
-  //add mc_red to _root and name it as "mc_red"
+  /* Add mc_red to _root and name it as "mc_red" */
   SWFDisplayItem it_red;
   it_red = SWFMovie_add(mo, (SWFBlock)mc_red);  
   SWFDisplayItem_setDepth(it_red, 3); 
   SWFDisplayItem_setName(it_red, "mc_red");
   
-  add_actions(mo, " var x1 = \"as_in_root\"; ");
-  SWFMovie_nextFrame(mo); //1st frame
-  add_actions(mo, " _root.x2 = \"as_in_root\"; ");
-  SWFMovie_nextFrame(mo); //2nd frame
+  add_actions(mo, " xtrace('as in frame1 of root'); var x1 = \"as_in_root\"; ");
+  SWFMovie_nextFrame(mo); /* 1st frame */
+  add_actions(mo, " xtrace('as in frame2 of root'); _root.x2 = \"as_in_root\"; ");
+  SWFMovie_nextFrame(mo); /* 2nd frame */
 
-  //checks
-  //at 1st frame, actions in mc_red is executed *after* actions in _root
+  /* In the frame placing mc_red,  actions in mc_red is executed *after* actions in _root */
   check_equals(mo, "_root.x1", "'as_in_mc_red'");
-  //at 2nd frame, actions in mc_red is executed *before* actions in _root
+  /* In subsequent frames, actions in mc_red is executed *before* actions in _root */
   xcheck_equals(mo, "_root.x2", "'as_in_root'");
   add_actions(mo, " _root.totals(); stop(); ");
-  SWFMovie_nextFrame(mo); //3rd frame
+  SWFMovie_nextFrame(mo); /* 3rd frame */
 
-  //Output movie
+  /* Output movie */
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);
 
