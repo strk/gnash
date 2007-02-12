@@ -497,7 +497,7 @@ namespace tesselate {
 		float	qx = (midx + p1x) * 0.5f;
 		float	qy = (midy + p1y) * 0.5f;
 
-		float	dist = fabsf(midx - qx) + fabsf(midy - qy);
+		float	dist = std::fabsf(midx - qx) + std::fabsf(midy - qy);
 
 		if (dist < s_tolerance)
 		{
