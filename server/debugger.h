@@ -14,6 +14,8 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+/* $Id: debugger.h,v 1.6 2007/02/12 12:20:07 nihilus Exp $ */
+
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
 
@@ -117,7 +119,7 @@ public:
     
     // Change the value of a local variable
     void changeLocalVariable(std::string &var, as_value &val);
-    void changeLocalVariable(as_environment &env, std::string &val, as_value &val);
+    void changeLocalVariable(as_environment &env, std::string &var, as_value &val);
     
     // Change the value of a local variable
     void changeLocalRegister(int index, as_value &val);
