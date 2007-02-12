@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Number.cpp,v 1.19 2007/02/11 19:24:26 nihilus Exp $ */
+/* $Id: Number.cpp,v 1.20 2007/02/12 01:18:45 nihilus Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -32,19 +32,6 @@
 
 #include <sstream>
 #include <cmath>
-
-/* C99: 7.12 6 defines for floating point classification */
-
-#undef FP_ZERO
-#undef FP_SUBNORMAL
-#undef FP_NORMAL
-#undef FP_INFINITE
-#undef FP_NAN
-#define   FP_ZERO          1
-#define   FP_SUBNORMAL     2
-#define   FP_NORMAL        4
-#define   FP_INFINITE      8
-#define   FP_NAN           16 
 
 using namespace std;
 
@@ -197,15 +184,11 @@ number_val_to_str(double _val, char *_str)
 
 	// Handle non-numeric values.
 	// "printf" gives "nan", "inf", "-inf", so we check explicitly
-	switch (fpclassify(_val)) {
-	case FP_NAN:
+	if(isnan(_val))
 		strcpy(_str, "NaN");
-		break;
-	case FP_INFINITE:
-		// isinf() cannot be relied on to distinguish -Infinity
+	else if(isinf(_val))
 		strcpy(_str, _val < 0 ? "-Infinity" : "Infinity");
-		break;
-	default:	// FP_ZERO, FP_NORMAL and FP_SUBNORMAL
+	else{	// FP_ZERO, FP_NORMAL and FP_SUBNORMAL
 		if (fabs(_val) < 0.0001 &&
 		    fabs(_val) >= 0.00001) {
 			// This is the range for which %.15g gives scientific
