@@ -1,5 +1,7 @@
 2007-02-12 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.cpp (on_button_event):
+	  Survive MOUSE_DOWN and MOUSE_UP events.
 	* server/movie_root.cpp: (generate_mouse_button_events):
 	  Dispatch events MOUSE_DOWN and MOUSE_UP togheter with PRESS 
 	  and RELEASE (see bug #19040).

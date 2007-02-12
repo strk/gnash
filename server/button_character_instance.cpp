@@ -464,6 +464,7 @@ button_character_instance::on_button_event(const event_id& event)
 		break;
 
 	case event_id::RELEASE:
+	case event_id::MOUSE_UP:
 	case event_id::ROLL_OVER:
 	case event_id::DRAG_OUT:
 		new_state = OVER;
@@ -471,6 +472,7 @@ button_character_instance::on_button_event(const event_id& event)
 
 	case event_id::PRESS:
 	case event_id::DRAG_OVER:
+	case event_id::MOUSE_DOWN:
 		new_state = DOWN;
 		break;
 
