@@ -42,8 +42,10 @@
 /// so that only the last region (red frame) will be visible. However, this 
 /// slows down rendering as each frame is fully re-rendered. If you want to 
 /// debug the GUI part, however (see if blitting the region works), then you 
-/// probably won't define this. 
-#define REGION_UPDATES_DEBUGGING_FULL_REDRAW 1 
+/// probably won't define this.
+#ifdef ENABLE_REGION_UPDATES_DEBUGGING 
+#define REGION_UPDATES_DEBUGGING_FULL_REDRAW 1
+#endif 
 
 #ifdef ENABLE_REGION_UPDATES_DEBUGGING
 // a runtime check would make the { x; } block conditionally executed
