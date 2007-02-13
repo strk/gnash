@@ -16,6 +16,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+AUTOMAKE_OPTIONS = dejagnu
+
 if ENABLE_MTASC
 if ENABLE_MING
 
@@ -27,12 +29,39 @@ ASTESTS =			\
 	hello.as		\
  	$(NULL)
 
+ASTESTS_OUT = $(ASTESTS:.as=.swf)
+
+TEST_DRIVERS = ../simple.exp
+TEST_CASES = \
+	alltests-runner
+
+alltests-runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_OUT)
+	sh $< $(top_builddir) $(ASTESTS_OUT) > $@
+	chmod 755 $@
 
 .as.swf:
 	$(MTASC) $(MTASC_FLAGS) -swf mtasc-$@ -main $<
 	$(MAKESWF) -o $@ $(DEJAGNU_SO_PATH) mtasc-$@  $(DEJAGNU_SO_FINI)
 
 CLEANFILES = *.swf
+
+check-DEJAGNU: site-update $(TEST_CASES)
+	@runtest=$(RUNTEST); \
+	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
+	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
+	else \
+	  echo "WARNING: could not find \`runtest'" 1>&2; \
+          for i in "$(TEST_CASES)"; do \
+	    $(SHELL) $$i; \
+	  done; \
+	fi
+
+site-update: site.exp
+	@rm -fr site.exp.bak
+	@cp site.exp site.exp.bak
+	@sed -e '/testcases/d' site.exp.bak > site.exp
+	@echo "# This is a list of the pre-compiled testcases" >> site.exp
+	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
 
 endif
 endif
