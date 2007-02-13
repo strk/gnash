@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.13 2006/10/14 03:23:44 nihilus Exp $ */
+/* $Id: shape.h,v 1.14 2007/02/13 17:03:18 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -48,18 +48,66 @@ namespace gnash {
 	{
 	public:
 		path();
+
 		path(float ax, float ay, int fill0, int fill1, int line);
 
 		void	reset(float ax, float ay, int fill0, int fill1, int line);
+
 		bool	is_empty() const;
 
 		bool	point_test(float x, float y);
 
-		// Push the path into the tesselator.
+		/// Push the path into the tesselator.
 		void	tesselate() const;
 
+		void addEdge(const edge& e)
+		{
+			m_edges.push_back(e);
+		}
+
+		/// Set the beginning of the path.
+		void setStartPoint(float ax, float ay)
+		{
+			m_ax = ax;
+			m_ay = ay;
+		}
+
+		/// Set the fill to use on the left side
+		//
+		/// @param f
+		///	The fill index. When this path is
+		///	added to a shape_character_def, the
+		///	fill will reference the vector of
+		///	fill_style defined for that shape
+		///
+		void setLeftFill(int f)
+		{
+			m_fill0 = f;
+		}
+
+		/// Set the fill to use on the left side
+		//
+		/// @param f
+		///	The fill index. When this path is
+		///	added to a shape_character_def, the
+		///	fill will reference the vector of
+		///	fill_style defined for that shape
+		///
+		void setRightFill(int f)
+		{
+			m_fill1 = f;
+		}
+
+
 	//private:
-		int	m_fill0, m_fill1, m_line;
+
+		/// Left fill
+		int	m_fill0;
+
+		/// Right fill
+	        int	m_fill1;
+
+	        int	m_line;
 		float	m_ax, m_ay;	// starting point
 		std::vector<edge>	m_edges;
 		bool	m_new_shape;
