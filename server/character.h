@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.47 2007/02/12 11:50:21 strk Exp $ */
+/* $Id: character.h,v 1.48 2007/02/13 11:01:21 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -224,8 +224,10 @@ public:
     void	set_matrix(const matrix& m)
 	{
 	    assert(m.is_valid());
-	    set_invalidated();
-	    m_matrix = m;
+	    if (!(m == m_matrix)) {
+	      set_invalidated();
+	      m_matrix = m;
+	    }
 	}
     const cxform&	get_cxform() const { return m_color_transform; }
     void	set_cxform(const cxform& cx) 
