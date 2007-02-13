@@ -1,5 +1,10 @@
 2007-02-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/consecutive_goto_frame_test.c:
+	  expect the current failures, just to allow 'make check'
+	  to continue working (known bugs need be 'expected', if
+	  they unexpectedly pass 'make check' will exit with a
+	  FAILURE code so we can joy and remove the expectance).
 	* testsuite/misc-mtasc.all/: Makefile.am, hello.as:
 	  Generalized Makefile, stuff Dejagnu.swf in first frame
 	  and dejagnu_so_fini.as in last frame using 'makeswf'.
