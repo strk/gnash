@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.56 2007/02/10 17:22:47 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.57 2007/02/13 13:56:35 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -258,6 +258,7 @@ public:
   void clear(geometry::Range2d<int> region)
   {
 	  if (region.isNull()) return;
+	  assert ( region.isFinite() );
 
 	  const agg::gray8 black(0);
 	  	  
@@ -550,10 +551,11 @@ public:
 	{
 	  assert(m_pixf != NULL);
 
-	  // clear the stage using the background color    
-    clear_framebuffer(_clipbounds, agg::rgba8(background_color.m_r,
-		background_color.m_g, background_color.m_b,
-		background_color.m_a));
+	  // clear the stage using the background color
+    if ( ! _clipbounds.isNull() )    
+      clear_framebuffer(_clipbounds, agg::rgba8(background_color.m_r,
+  		  background_color.m_g, background_color.m_b,
+  		  background_color.m_a));
     	  
     // calculate final pixel scale
     /*double scaleX, scaleY;
@@ -652,6 +654,8 @@ public:
 	// Draw the line strip formed by the sequence of points.
 	{
 	  assert(m_pixf != NULL);
+	  
+	  if ( _clipbounds.isNull() ) return;
 
     point pnt;
     
@@ -717,7 +721,8 @@ public:
     
     agg_alpha_mask* new_mask = new agg_alpha_mask(xres, yres);
     
-    new_mask->clear(_clipbounds);
+    if ( ! _clipbounds.isNull() ) 
+      new_mask->clear(_clipbounds);
     
     m_alpha_mask.push_back(new_mask);
     
@@ -927,6 +932,8 @@ public:
 	  assert(m_pixf != NULL);
 	  
 	  assert(!m_drawing_mask);
+	  
+	  if ( _clipbounds.isNull() ) return;
 
     // Gnash stuff 
     int pno, eno, fno;
@@ -941,15 +948,12 @@ public:
     agg::span_allocator<agg::rgba8> alloc;  // span allocator (?)
     agg_style_handler sh;               // holds fill style definitions
     
-        // TODO: what do do if _clipbox.isNull() or _clipbox.isWorld() ?
-	//       currently an assertion will fail when get{Min,Max}{X,Y}
-	//       are called below
 
-	rasc.clip_box(
-		(double)_clipbounds.getMinX(),
-		(double)_clipbounds.getMinY(),
-		(double)_clipbounds.getMaxX(),
-		(double)_clipbounds.getMaxY());    	
+  	rasc.clip_box(
+  		(double)_clipbounds.getMinX(),
+  		(double)_clipbounds.getMinY(),
+  		(double)_clipbounds.getMaxX(),
+  		(double)_clipbounds.getMaxY());    	
     
     // debug
     int edge_count=0;
@@ -1240,6 +1244,8 @@ public:
 	  
 	  if (m_drawing_mask)    // Flash ignores lines in mask /definitions/
       return;    
+    
+    if ( _clipbounds.isNull() ) return;
 
     // TODO: While walking the paths for filling them, remember when a path
     // has a line style associated, so that we avoid walking the paths again
@@ -1344,6 +1350,8 @@ public:
 
     if (corner_count<1) return;
     
+    if ( _clipbounds.isNull() ) return;
+    
     // TODO: Use aliased scanline renderer instead of anti-aliased one since
     // it is undesired anyway.
     renderer_base rbase(*m_pixf);
@@ -1433,7 +1441,7 @@ public:
   virtual void set_invalidated_region(const rect& bounds) {
   
       using gnash::geometry::Range2d;
-    
+      
       Range2d<int> pixbounds = world_to_pixel(bounds);
       
       // add 2 pixels (GUI does that too)
@@ -1443,6 +1451,7 @@ public:
       //       xres/yres.
       Range2d<int> visiblerect(0, 0, xres, yres);
       _clipbounds = Intersection(pixbounds, visiblerect);
+
   
   }
   
