@@ -1,5 +1,9 @@
 2007-02-13 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/shape_character_def.h: new add_path() and
+	  add_fill_style() methods, to allow for programmatic
+	  definition of shape chars (will likely need more of these
+	  for implementing the Drawing API).
 	* server/sprite_instance.h: add a protected place_character
 	  method, to fiddle with displaylist w/out character *ids*.
 	* server/shape.h (class path): add setLeftFill, setRightFill
