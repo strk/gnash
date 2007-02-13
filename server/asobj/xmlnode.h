@@ -29,6 +29,9 @@
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 #include <vector>
+#include <string>
+#include <sstream>
+
 #include "action.h"
 #include "impl.h"
 
@@ -50,7 +53,6 @@ class DSOLOCAL XMLNode : public gnash::as_object
 public:
     XMLNode();
     ~XMLNode();
-    
     int length()                 { return _children.size(); }
     const char *nodeName();
     const char *nodeValue();
@@ -71,6 +73,7 @@ public:
     void nodeValueSet(const char *value);
     //  nodeType 	XML.nodeType
 
+    const char *stringify(XMLNode *xml, std::stringstream *xmlout);
     bool hasChildNodes()
     {
 	    return ! _children.empty();

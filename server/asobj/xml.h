@@ -28,6 +28,7 @@
 
 //#define DEBUG_MEMORY_ALLOCATION 1
 #include <vector>
+#include <sstream>
 
 #include "xmlattrs.h"
 #include "xmlnode.h"
@@ -40,17 +41,16 @@
 #include <libxml/parser.h>
 #include <libxml/xmlreader.h>
 
-// Forward declarations
-namespace gnash {
-	class fn_call;
-}
+using namespace std;
 
 namespace gnash {
-  
+
+// Forward declarations
+class fn_call;
+
 /// XML class and ActionScript object
 class DSOLOCAL XML : public as_object
 {
-
 public:
 
     XML();
@@ -90,18 +90,18 @@ public:
         delete _nodes;
     }
   
-  std::vector<XMLNode *> childNodes();
+    std::vector<XMLNode *> childNodes();
   
-    const char *stringify(XMLNode *xml);
+    const char *stringify(XMLNode *xml, std::stringstream *str);
     //  Returns true if the specified node has child nodes; otherwise, returns false.
-  bool hasChildNodes() {
-    if (_nodes) {
-      if (_nodes->_children.size()) {
-        return true;
-      } 
+    bool hasChildNodes() {
+	if (_nodes) {
+	    if (_nodes->_children.size()) {
+		return true;
+	    } 
+	}
+	return false;
     }
-    return false;
-  }
     
     XMLNode *extractNode(xmlNodePtr node, bool mem);
     XMLNode *processNode(xmlTextReaderPtr reader, XMLNode *node);

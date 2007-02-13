@@ -24,6 +24,7 @@
 #include "tu_config.h"
 #include "xml.h"
 #include "impl.h"
+#include "network.h"
 
 #include <string>
 
@@ -31,62 +32,61 @@ namespace gnash {
 
 extern const int SOCKET_DATA;
   
-class DSOLOCAL XMLSocket {
- public:
-  XMLSocket();
-  ~XMLSocket();
-  
-  bool connect(const char *host, int port);
-  bool send(std::string str);
-  void close();
-
-  
-  bool anydata(char **msgs);
-  bool anydata(int sockfd, char **msgs);
-  bool connected() { return _connect; };
-  bool fdclosed() { return _closed; }
-  bool xmlmsg() { return _xmldata; }
-  
-  void messagesClear()      { _messages.clear(); }
-  void messageRemove(int x) { _messages.erase(_messages.begin() + x); }
-  int messagesCount()       { return _messages.size(); }
-  std::string operator [] (int x)  { return _messages[x]; }
-  
-  bool processingData();
-  void processing(bool x);
- 
-  // Event Handlers
-  void onClose(std::string);
-  void onConnect(std::string);
-  void onData(std::string);
-  void onXML(std::string);
-
-  // These handle the array of XML nodes
-  void push(as_object *obj);
-  void clear();
-  int  count();
-
-  int checkSockets(void);
-  int checkSockets(int x);
-
- private:
-  std::string	_host;
-  short         _port;
-  int           _sockfd;
-  bool          _data;
-  bool          _xmldata;
-  bool          _closed;
-  bool          _connect;
-  bool          _processing;
-  std::vector<std::string> _messages;
-  std::vector<as_object *>  _nodes;
+class DSOLOCAL XMLSocket : public Network {
+public:
+    XMLSocket();
+    ~XMLSocket();
+    
+    bool connect(const char *host, short port);
+    bool send(std::string str);
+    void close();
+    
+    bool anydata(char **msgs);
+    bool anydata(int sockfd, char **msgs);
+    bool connected() { return _connect; };
+    bool fdclosed() { return _closed; }
+    bool xmlmsg() { return _xmldata; }
+    
+    void messagesClear()      { _messages.clear(); }
+    void messageRemove(int x) { _messages.erase(_messages.begin() + x); }
+    int messagesCount()       { return _messages.size(); }
+    std::string operator [] (int x)  { return _messages[x]; }
+    
+    bool processingData();
+    void processing(bool x);
+    
+    // Event Handlers
+    void onClose(std::string);
+    void onConnect(std::string);
+    void onData(std::string);
+    void onXML(std::string);
+    
+    // These handle the array of XML nodes
+    void push(as_object *obj);
+    void clear();
+    int  count();
+    
+    int checkSockets(void);
+    int checkSockets(int x);
+    
+private:
+    std::string	_host;
+    short         _port;
+    int           _sockfd;
+    bool          _data;
+    bool          _xmldata;
+    bool          _closed;
+    bool          _connect;
+    bool          _processing;
+    std::vector<std::string> _messages;
+    std::vector<as_object *>  _nodes;
 };
 
 
 class DSOLOCAL xmlsocket_as_object : public gnash::as_object
 {
 public:
-  XMLSocket obj;
+    XMLSocket obj;
 };
 
 DSOEXPORT void xmlsocket_connect(const fn_call& fn);
@@ -109,3 +109,7 @@ DSOEXPORT int check_sockets(int fd);
 // __XMLSOCKETSOCKET_H__
 #endif
 
+// Local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

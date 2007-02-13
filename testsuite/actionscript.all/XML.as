@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,13 +16,11 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-
 // Test case for XML ActionScript class
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.16 2007/01/18 22:53:22 strk Exp $";
+rcsid="$Id: XML.as,v 1.17 2007/02/13 19:36:34 rsavoye Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -231,97 +229,77 @@ if (tmp.getBytesLoaded() == tmp.getBytesTotal()) {
     fail("bytes counts are not the same");
 }
 
-check(XML);
 
+check(XML);
 myXML = new XML();
 check(myXML != undefined);
-
-var before = myXML.hasChildNodes();
-//trace(before);
-
 check(myXML.createElement);
 
-getElement = myXML.createElement("module");
+//    file.puts("function: dodo()");
+// create three XML nodes using createElement()
+var element1 = myXML.createElement("element1");
+check(element1.nodeName == "element1");
 
-check(getElement);
-trace(typeof(getElement));
-check(getElement.nodeName != undefined );
-#if OUTPUT_VERSION > 6
-// we're case-sensitive in version 7 !!
-check_equals(getElement.nodename, undefined );
-#else
-check(getElement.nodename != undefined );
-#endif
+var element2 = myXML.createElement("element2");
+check(element2.nodeName == "element2");
 
-check_equals(getElement.nodeName, "module");
-if (getElement.nodeName == "module") {
-    pass("XML::createElementNode() works");
-} else {
-    fail("XML::createElementNode() doesn't work");
-}
+var element3 = myXML.createElement("element3");
+check(element3.nodeName == "element3");
 
-textElement = myXML.createTextNode("Hello World");
-if (textElement.nodeValue == "Hello World") {
-    pass("XML::createTextNode() works");
-} else {
-    fail("XML::createTextNode() doesn't work");
-}
+check(myXML.createTextNode);
 
-check_equals(textElement.nodeType, 3);
-check_equals(textElement.nodeValue, "Hello World");
-check_equals(typeof(textElement.nodeName), 'null');
-check_equals(textElement.nodeName, null);
+// create two XML text nodes using createTextNode()
+var textNode1 = myXML.createTextNode("textNode1 String value");
+check(textNode1.nodeValue == "textNode1 String value");
 
-//note(textElement);
+var textNode2 = myXML.createTextNode("textNode2 String value");
+check(textNode2.nodeValue == "textNode2 String value");
 
-check(getElement);
-check(getElement.appendChild);
-check(textElement);
+// place the new nodes into the XML tree
+element2.appendChild(textNode1);
+check(element2.nodeValue == "textNode1 String value");
 
-check_equals(getElement.hasChildNodes(), false);
+element3.appendChild(textNode2);
+check(element3.nodeValue == "textNode2 String value");
 
-getElement.appendChild(textElement);
-if ( getElement.hasChildNodes() ) {
-    pass("Appending Text Node to Element Node works");
-} else {
-    xfail("Appending Text Node to Element Node doesn't work");
-}
+// place the new nodes into the XML tree
+doc.appendChild(element1);
+//check(doc.firstChild.nodeName == "element1");
 
-nodename = getElement.nodeName;
-myXML.appendChild(getElement);
-var after = myXML.hasChildNodes();
+element1.appendChild(element2);
+check(element1.hasChildNodes());
+// trace(element1.nodeName);
+// trace(element1.firstChild.nodeName);
+check(element1.firstChild.nodeName == "element2");
 
-//trace(after);
+element2.appendChild(element3);
+check(element2.hasChildNodes());
 
-if ((before == false) && (after == true) && (nodename == "module")) {
-	pass("XML::appendChild() works");
-} else {
-	fail("XML::appendChild() doesn't work");
-}
+trace(doc.toString());
 
-// trace(myXML.toString());
+// // trace(myXML.toString());
 
-newnode = myXML.cloneNode(false);
+// newnode = myXML.cloneNode(false);
 
-//trace(myXML.nodeName);
-//trace(newnode.nodeValue);
+// //trace(myXML.nodeName);
+// //trace(newnode.nodeValue);
 
-//trace("Child1" + _global.child1);
-//trace("Child2" + _global.child2);
+// //trace("Child1" + _global.child1);
+// //trace("Child2" + _global.child2);
 
-// This won't work as onLoad is not called unless you
-// actually *load* the XML, we're using parseXML that
-// does *not* trigger loading (see also getBytesLoaded
-// and getBytesTotal) and does *not* trigger onLoad 
-// event to execute.
-#if 0 
-if ((_global.child1 == "sub sub1 node data 1")
-    && (global.child2 == "sub sub1 node data 2")) {
-	pass("XML::onLoad works");
-} else {
-	fail("XML::onLoad doesn't work");
-}
-#endif
+// // This won't work as onLoad is not called unless you
+// // actually *load* the XML, we're using parseXML that
+// // does *not* trigger loading (see also getBytesLoaded
+// // and getBytesTotal) and does *not* trigger onLoad 
+// // event to execute.
+// #if 0 
+// if ((_global.child1 == "sub sub1 node data 1")
+//     && (global.child2 == "sub sub1 node data 2")) {
+// 	pass("XML::onLoad works");
+// } else {
+// 	fail("XML::onLoad doesn't work");
+// }
+// #endif
 
 // We're done
 totals();

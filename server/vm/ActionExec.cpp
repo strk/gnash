@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ActionExec.cpp,v 1.18 2007/02/10 01:30:32 rsavoye Exp $ */
+/* $Id: ActionExec.cpp,v 1.19 2007/02/13 19:36:34 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -47,7 +47,7 @@
 // too much information for my tastes. I really want just
 // to see how stack changes while executing actions...
 // --strk Fri Jun 30 02:28:46 CEST 2006
-// #define DEBUG_STACK 1
+#define DEBUG_STACK 1
 #endif
 
 using namespace gnash;

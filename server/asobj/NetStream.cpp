@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,12 +13,9 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
-/* $Id: NetStream.cpp,v 1.25 2007/01/30 12:49:03 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.26 2007/02/13 19:36:34 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

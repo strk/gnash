@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,11 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
-/* $Id: Number.cpp,v 1.20 2007/02/12 01:18:45 nihilus Exp $ */
+/* $Id: Number.cpp,v 1.21 2007/02/13 19:36:34 rsavoye Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -32,6 +28,23 @@
 
 #include <sstream>
 #include <cmath>
+
+// Why ?
+//#undef fpclassify
+//#define fpclassify(x) _fpclassify(x)
+
+/* C99: 7.12 6 defines for floating point classification */
+
+#undef FP_ZERO
+#define FP_ZERO          1
+#undef FP_SUBNORMAL
+#define FP_SUBNORMAL     2
+#undef FP_NORMAL
+#define FP_NORMAL        4
+#undef FP_INFINITE
+#define FP_INFINITE      8
+#undef FP_NAN
+#define FP_NAN           16 
 
 using namespace std;
 
