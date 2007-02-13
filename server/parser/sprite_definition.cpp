@@ -49,7 +49,7 @@ sprite_definition::create_character_instance(character* parent,
 	log_msg("Instanciating sprite_def %p", (void*)this);
 #endif
 	sprite_instance* si = new sprite_instance(this,
-		parent->get_root(), parent, id, registeredClass.get());
+		parent->get_root(), parent, id);
 	return si;
 }
 

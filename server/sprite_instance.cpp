@@ -1448,7 +1448,7 @@ public:
 
 sprite_instance::sprite_instance(
 		movie_definition* def, movie_instance* r,
-		character* parent, int id, as_function* registerClass)
+		character* parent, int id)
 	:
 	character(parent, id),
 	m_mouse_state(UP),
