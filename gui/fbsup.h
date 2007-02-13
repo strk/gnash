@@ -38,11 +38,27 @@ namespace gnash
 
 
 /// A Framebuffer-based GUI for Gnash.
-//
-/// It currently requires the AGG backend to render the frames.
-/// It operates in fullscreen mode and uses the screen mode 
-/// currently active.
+/// ----------------------------------
 ///
+/// This is a simple "GUI" that works with any framebuffer device (/dev/fb0).
+/// No window system is required, it will run straigt from a console. 
+///
+/// The current version requires that your system boots in graphics mode (that
+/// is, with a framebuffer driver - like vesafb - and most probably the 
+/// virtual console enabled). Which graphics mode Gnash runs in depends on the 
+/// mode your machine boots in and can be choosen using the kernel command line.
+/// With other words: Gnash does not change the graphics mode.
+/// Refer to the framebuffer docs for more information.
+///
+/// The fb gui now also supports pointing devices like mice or touchscreens, but
+/// it is not required. It works with /dev/input/mice so any PS/2 compatible 
+/// mouse should do. Your kernel can emulate the "mice" device for other devices
+/// (like touchscreens and tablets) so this method is very flexible.
+///
+/// There is currently no visible mouse pointer built in, which is fine for 
+/// touchscreens but will make it difficult for standard mice. This will be 
+/// fixed in near time.
+//
 /// Supported graphics modes:
 ///
 ///   Resolution: any
@@ -52,13 +68,15 @@ namespace gnash
 ///     15 bit: R5/G5/B5
 ///     16 bit: R5/G6/B5
 ///     24 bit: R8/G8/B8, B8/G8/R8
-///     32 bit: none yet!
+///     32 bit: R8/G8/B8/A8, B8/G8/R8/A8
 ///
 ///
 /// Supported input devices:
 ///
-///   None, yet. But may be added easily.    
-///
+///   any PS/2 compatible mouse (may be emulated by the kernel) talking 
+///   to /dev/input/mice
+
+
 class FBGui : public Gui
 {
 	private:
@@ -72,6 +90,9 @@ class FBGui : public Gui
 
     int m_stage_width;
     int m_stage_height;
+
+  	int input_fd; /// file descriptor for /dev/input/mice
+  	int mouse_x, mouse_y, mouse_btn;
 
     struct fb_var_screeninfo var_screeninfo;
   	struct fb_fix_screeninfo fix_screeninfo;
@@ -90,9 +111,18 @@ class FBGui : public Gui
   	/// reverts disable_terminal() changes
   	void enable_terminal();
   	
+  	/// Sends a command to the mouse and waits for the response
+  	bool mouse_command(unsigned char cmd, unsigned char *buf, int count);
+  	
+  	/// Initializes mouse routines
+  	bool init_mouse();
+  	
+  	/// Checks for any mouse activity
+  	void check_mouse();
+  	
   	int valid_x(int x);
   	int valid_y(int y);
-  	
+  	  	
 	public:
 		FBGui();
 		FBGui(unsigned long xid, float scale, bool loop, unsigned int depth);

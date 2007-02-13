@@ -14,9 +14,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-//
-
 // -----------------------------------------------------------------------------
    
 
@@ -109,6 +106,8 @@ FBGui::FBGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 	#ifdef DOUBLE_BUFFER
 	buffer  = NULL;
 	#endif
+
+  input_fd=-1;
 	
 	signal(SIGINT, terminate_signal);
 	signal(SIGTERM, terminate_signal);
@@ -122,6 +121,8 @@ FBGui::~FBGui()
 		log_msg("Closing framebuffer device\n");
 		close(fd);
 	}
+	
+	close(input_fd);
 
   #ifdef DOUBLE_BUFFER
 	if (buffer) {
@@ -173,6 +174,13 @@ bool FBGui::set_grayscale_lut8()
 
 bool FBGui::init(int /*argc*/, char *** /*argv*/)
 {
+
+  // Initialize mouse (don't abort if no mouse found)
+  if (!init_mouse()) {
+    // just report to the user, keep on going...
+    log_msg("You won't have any input device, sorry.");
+  }
+
   // Open the framebuffer device
   fd = open("/dev/fb0", O_RDWR);
   if (fd<0) {
@@ -328,6 +336,8 @@ bool FBGui::run()
 		
 		  usleep(1); // task switch
 		  
+		  check_mouse();
+		  
       struct timeval tv;
       if (!gettimeofday(&tv, NULL))
         timer = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
@@ -360,6 +370,7 @@ void FBGui::renderBuffer()
   // copy each row
   const int minx = _drawbounds.getMinX();
   const int maxy = _drawbounds.getMaxY();
+
   for (int y=_drawbounds.getMinY(); y<maxy; ++y) {
   
     const unsigned int pixel_index = y * scanline_size + minx*pixel_size;
@@ -420,7 +431,8 @@ int FBGui::valid_y(int y) {
   return y;
 }
 
-void FBGui::setInvalidatedRegion(const rect& bounds) {
+void FBGui::setInvalidatedRegion(const rect& bounds) 
+{
 
 #ifdef DOUBLE_BUFFER
   
@@ -429,7 +441,7 @@ void FBGui::setInvalidatedRegion(const rect& bounds) {
 
 	// update _drawbounds, which are the bounds that need to
 	// be rerendered
-	//
+	//	
 	_drawbounds = Intersection(
     _renderer->world_to_pixel(bounds).growBy(2), // add two pixels because of anti-aliasing...
     _validbounds);
@@ -438,7 +450,8 @@ void FBGui::setInvalidatedRegion(const rect& bounds) {
   
 }  // setInvalidatedRegion
 
-void FBGui::disable_terminal() {
+void FBGui::disable_terminal() 
+{
   /*
   --> doesn't work as this hides the cursor of the *current* terminal (which
   --> doesn't have to be the fb one). Maybe just detach from terminal?
@@ -446,9 +459,136 @@ void FBGui::disable_terminal() {
   fflush(stdout);*/
 }
 
-void FBGui::enable_terminal() {
+void FBGui::enable_terminal() 
+{
   /*printf("\033[?25h");  
   fflush(stdout);*/
+}
+
+bool FBGui::mouse_command(unsigned char cmd, unsigned char *buf, int count) {
+  int n;
+  
+  write(input_fd, &cmd, 1);
+  
+  while (count>0) {
+    usleep(250*1000); // 250 ms inter-char timeout (simple method)
+    // TODO: use select() instead
+    
+    n = read(input_fd, buf, count);
+    if (n<=0) return false;
+    count-=n;
+    buf+=n;
+  }
+  return true;
+  
+} //command()
+
+bool FBGui::init_mouse() 
+{
+
+  // see http://www.computer-engineering.org/ps2mouse/
+  
+
+  // Try to open mouse device, be error tolerant (FD is kept open all the time)
+  // TODO: Make device name configurable
+  input_fd = open("/dev/input/mice", O_RDWR);
+  
+  if (input_fd<0) {
+    log_msg("Could not open /dev/input/mice: %s", strerror(errno));    
+    return false;
+  }
+  
+  unsigned char buf[10], byte;
+
+  if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK)<0) {
+    log_error("Could not set non-blocking mode for mouse device: %s", strerror(errno));
+    close(input_fd);
+    input_fd=-1;
+    return false; 
+  }
+  
+  // Clear input buffer
+  while ( read(input_fd, buf, sizeof buf) > 0 ) { }
+  
+  // Reset mouse
+  if ((!mouse_command(0xFF, buf, 3)) || (buf[0]!=0xFA)) {
+    log_msg("Mouse reset failed");
+    close(input_fd);
+    input_fd=-1;
+    return false; 
+  }
+  
+  // Enable mouse data reporting
+  if ((!mouse_command(0xF4, &byte, 1)) || (byte!=0xFA)) {
+    log_msg("Could not activate Data Reporting mode for mouse");
+    close(input_fd);
+    input_fd=-1;
+    return false; 
+  }
+  
+  
+  log_msg("Mouse enabled.");
+      
+  mouse_x = 0;
+  mouse_y = 0;
+  mouse_btn = 0;
+  
+  return true;
+}
+
+void FBGui::check_mouse() 
+{
+  if (input_fd<0) return;   // no mouse available
+  
+  unsigned char buf[3];
+  int i;
+  int xmove, ymove, btn, btn_changed;
+  
+  while ( read(input_fd, buf, 1) == 1 ) {
+  
+    if (buf[0] & 8 == 0) continue; // bit 3 must be high for the first byte
+    
+    if (read(input_fd, buf+1, 2) != 2) continue; // expect total 3 bytes
+    
+    // TODO: The method above can loose data. Use a permanent buffer instead!
+    
+    xmove = buf[1];
+    ymove = buf[2];
+    btn = buf[0] & 1;
+    
+    if (buf[0] & 0x10) xmove = -(256-xmove);
+    if (buf[0] & 0x20) ymove = -(256-ymove);
+    
+    ymove *= -1; // vertical movement is upside-down
+    
+    //log_msg("x/y %d/%d btn %d", xmove, ymove, btn);
+
+    // movement    
+    mouse_x += xmove;
+    mouse_y += ymove;
+    
+    if (mouse_x<0) mouse_x=0;
+    if (mouse_y<0) mouse_y=0;
+    if (mouse_x>m_stage_width) mouse_x=m_stage_width;
+    if (mouse_y>m_stage_height) mouse_y=m_stage_height;
+    
+    //log_msg("mouse @ %d / %d, btn %d", mouse_x, mouse_y, mouse_btn);
+    
+    float xscale = getXScale();
+    float yscale = getYScale();
+    notify_mouse_moved(int(mouse_x / xscale), int(mouse_y / yscale));
+    
+    // button
+    if (btn != mouse_btn) {
+      mouse_btn = btn;
+      
+      notify_mouse_clicked(btn, 1);  // mark=??
+      //log_msg("mouse click! %d", btn);
+    }    
+
+  
+  }
+  
 }
 
 // end of namespace gnash
