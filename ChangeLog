@@ -1,3 +1,8 @@
+2007-02-13  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* extensions/fileio/Makefile.am, fileio.cpp, fileio.h, test.as:
+	New files for direct File I/O extension for Gnash.
+
 2007-02-12 Sandro Santilli <strk@keybit.net>
 
 	* macros/mtasc.m4: provide some detection for mtasc
@@ -86,8 +91,8 @@
 
 2007-02-11 Sandro Santilli <strk@keybit.net>
 
-	* macros/pthreads.m4: use -pthread for linux, as
-	  suggested by boost error.
+	* macros/pthreads.m4: use -pthread for linux, as suggested by boost
+	error.
 
 2007-02-11 Martin Guy <martinwguy@yahoo.it>
 
