@@ -1,5 +1,10 @@
 2007-02-13 Sandro Santilli <strk@keybit.net>
 
+	* server/render.h: had doxygen comments point
+	  to the correct place (render_handler).
+
+2007-02-13 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/: Makefile.am, BitmapMovieDefinition.h:
 	  Class used to return a movie_definition from load of a JPEG.
 	* server/: Makefile.am, BitmapMovieInstance.{cpp,h}: 
