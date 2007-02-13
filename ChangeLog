@@ -1,3 +1,8 @@
+2007-02-13 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+  * gui/gui.cpp: Make full redraw on ENABLE_REGION_UPDATES_DEBUGGING 
+    configurable
+ 
 2007-02-13  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* extensions/fileio/Makefile.am, fileio.cpp, fileio.h, test.as:
