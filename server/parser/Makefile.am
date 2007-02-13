@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.22 2007/02/11 06:21:29 rsavoye Exp $
+# $Id: Makefile.am,v 1.23 2007/02/13 13:35:34 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -61,6 +61,7 @@ noinst_HEADERS = \
 	button_character_def.h \
 	character_def.h	\
 	bitmap_character_def.h \
+	BitmapMovieDefinition.h \
 	edit_text_character_def.h \
 	text_character_def.h \
 	morph2_character_def.h \

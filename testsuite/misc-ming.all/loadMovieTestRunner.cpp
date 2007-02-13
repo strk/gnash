@@ -86,8 +86,9 @@ main(int /*argc*/, char** /*argv*/)
 	sleep(1); // give it some time...
 	coverartch = const_cast<character*>(tester.findDisplayItemByName(*root, "coverart"));
 	coverart = coverartch->to_movie();
-	// Load of JPEG files is still unsupported
-	xcheck_equals(coverart->get_movie_definition()->get_url(), greenURL.str());
+	check_equals(coverart->get_movie_definition()->get_url(), greenURL.str());
+	// TODO: find a way to test if the jpeg is really displayed
+	//       (like turn it into a mouse-event-handling char and use isMouseOverActiveEntity ?)
 
 	// Click on the third (offspring)
 	tester.movePointerTo(480, 80);

@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.101 2007/02/11 06:21:29 rsavoye Exp $
+# $Id: Makefile.am,v 1.102 2007/02/13 13:35:34 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -48,6 +48,7 @@ AM_CPPFLAGS = \
 	$(NULL)
 
 libgnashserver_la_SOURCES = \
+	BitmapMovieInstance.cpp \
 	GetterSetter.cpp \
 	PropertyList.cpp \
 	URLAccessManager.cpp \
@@ -102,6 +103,7 @@ noinst_HEADERS = \
 	as_prop_flags.h	\
 	as_value.h \
 	bitmap_info.h \
+	BitmapMovieInstance.h \
 	builtin_function.h \
 	button_character_instance.h \
 	character.h \

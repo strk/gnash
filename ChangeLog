@@ -1,5 +1,17 @@
 2007-02-13 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/: Makefile.am, BitmapMovieDefinition.h:
+	  Class used to return a movie_definition from load of a JPEG.
+	* server/: Makefile.am, BitmapMovieInstance.{cpp,h}: 
+	  Instance of a BitmapMovieDefinition (a movie_instance).
+	* server/impl.cpp: move the unimplemented stuff over
+	  to the new BitmapMovie classes.
+	* testsuite/misc-ming.all/loadMovieTestRunner.cpp:
+	  Don't expect a failure in loading the external JPEG
+	  (it loads, just doesn't display).
+
+2007-02-13 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-mtasc.all/.cvsignore: new file.
 	* testsuite/misc-ming.all/consecutive_goto_frame_test.c:
 	  expect the current failures, just to allow 'make check'

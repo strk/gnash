@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.90 2007/02/11 12:47:03 strk Exp $ */
+/* $Id: impl.cpp,v 1.91 2007/02/13 13:35:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -51,6 +51,7 @@
 #include "StreamProvider.h"
 #include "sprite_instance.h"
 #include "VM.h"
+#include "BitmapMovieDefinition.h"
 
 #include <string>
 #include <map>
@@ -319,22 +320,27 @@ void	get_movie_info(
 // Create a movie_definition from a jpeg stream
 // NOTE: this method assumes this *is* a jpeg stream
 static movie_definition*
-create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& /*url*/)
+create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& url)
 {
 	// FIXME: temporarly disabled
-	log_msg("Loading of jpegs unsupported");
-	return NULL;
+	//log_msg("Loading of jpegs unsupported");
+	//return NULL;
 
 
-	bitmap_info* bi = NULL;
-	image::rgb* im = image::read_jpeg(in.get());
-	if (im != NULL) {
-		bi = render::create_bitmap_info_rgb(im);
-		delete im;
-	} else {
+	std::auto_ptr<image::rgb> im ( image::read_jpeg(in.get()) );
+
+	if ( ! im.get() )
+	{
 		log_error("Can't read jpeg\n");
 		return NULL;
-	}
+	} 
+
+	boost::intrusive_ptr<bitmap_character_def> def = new bitmap_character_def(im);
+
+	BitmapMovieDefinition* mdef = new BitmapMovieDefinition(def, url);
+	log_msg("BitmapMovieDefinition %p created", mdef);
+	return mdef;
+
 
 	// FIXME: create a movie_definition from a jpeg
 	//bitmap_character*	 ch = new bitmap_character(bi);
@@ -675,6 +681,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
 	// calling create_library_movie() again and NOT finding
 	// the just-created movie.
 	movie_definition* mov = create_movie(url, real_url, false);
+	log_msg("create_movie(%s, %s, false) returned %p", url.str().c_str(), real_url, mov);
 
 	if (mov == NULL)
 	{
@@ -701,6 +708,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
 		}
 	}
 
+	log_msg("create_library_movie(%s, %s, startLoaderThread=%d) about to return %p", url.str().c_str(), real_url, startLoaderThread, mov);
 	return mov;
 }
 
