@@ -3286,14 +3286,20 @@ sprite_instance::get_invalidated_bounds(rect* bounds, bool force)
 		return;
 	}
   
-	// Add old invalidated bounds 
-	bounds->expand_to_rect(m_old_invalidated_bounds);
+ 
+  // m_child_invalidated does not require our own bounds
+  if ( m_invalidated || force )      
+  {
+  	// Add old invalidated bounds 
+  	bounds->expand_to_rect(m_old_invalidated_bounds);
 #ifdef DEBUG_INVALIDATED_BOUNDS
-	log_msg("After expanding to old_invalidated_bounds (%s) "
-			"new bounds are: %s",
-			m_old_invalidated_bounds.toString().c_str(),
-			bounds->toString().c_str());
+  	log_msg("After expanding to old_invalidated_bounds (%s) "
+  			"new bounds are: %s",
+  			m_old_invalidated_bounds.toString().c_str(),
+  			bounds->toString().c_str());
 #endif
+  }
+  
   
 	m_display_list.get_invalidated_bounds(bounds, force||m_invalidated);
 
