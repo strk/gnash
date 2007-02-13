@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.255 2007/02/12 23:49:10 strk Exp $
+dnl $Id: configure.ac,v 1.256 2007/02/13 19:39:46 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -261,7 +261,7 @@ else
   export pathlist=$PATH
 fi
 
-GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
+dnl GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
 
 AC_CHECK_FUNCS(mallinfo)
@@ -827,6 +827,7 @@ gui/Makefile
 extensions/Makefile
 extensions/dejagnu/Makefile
 extensions/mysql/Makefile
+extensions/fileio/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 cygnal/Makefile

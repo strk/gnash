@@ -22,4 +22,4 @@ if ENABLE_MYSQL
 MYSQL_DIR = mysql
 endif
 
-SUBDIRS = dejagnu $(MYSQL_DIR)
+SUBDIRS = dejagnu fileio $(MYSQL_DIR)
