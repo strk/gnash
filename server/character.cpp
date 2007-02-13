@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.18 2007/02/08 13:14:36 strk Exp $ */
+/* $Id: character.cpp,v 1.19 2007/02/13 14:21:01 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -171,7 +171,12 @@ character::get_relative_target_common(const std::string& name)
 void
 character::set_invalidated()
 {
-	if ( m_parent ) m_parent->set_invalidated();
+  // Set the invalidated-flag of the parent. Note this does not mean that
+  // the parent must re-draw itself, it just means that one of it's childs
+  // needs to be re-drawn.
+	//if ( m_parent ) m_parent->set_invalidated();	
+	if ( m_parent ) m_parent->set_child_invalidated(); 
+  
   
 	// Ok, at this point the instance will change it's
 	// visual aspect after the
@@ -187,6 +192,16 @@ character::set_invalidated()
 		get_invalidated_bounds(&m_old_invalidated_bounds, true);
 	}
 
+}
+
+void
+character::set_child_invalidated()
+{
+  if ( ! m_child_invalidated ) 
+  {
+    m_child_invalidated=true;
+  	if ( m_parent ) m_parent->set_child_invalidated();
+  } 
 }
 
 //---------------------------------------------------------------------

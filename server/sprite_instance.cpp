@@ -3278,7 +3278,7 @@ sprite_instance::get_invalidated_bounds(rect* bounds, bool force)
 
 	// nothing to do if this sprite's bounds are
 	// not invalidated (unless *forced*)
-	if ( ! m_invalidated && ! force )
+	if ( ! m_invalidated && ! m_child_invalidated && ! force )
 	{
 #ifdef DEBUG_INVALIDATED_BOUNDS
 		log_msg("Not invalidated and not forced, bounds untouched");

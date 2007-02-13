@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.48 2007/02/13 11:01:21 udog Exp $ */
+/* $Id: character.h,v 1.49 2007/02/13 14:21:01 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -102,6 +102,12 @@ protected:
 	/// so it starts in invalidated mode.
 	///
 	bool m_invalidated;
+	
+	
+	/// Just like m_invalidated but set when a child is invalidated instead
+  /// of this character instance. m_invalidated and m_child_invalidated
+  /// can be set at the same time. 
+	bool m_child_invalidated;
 
 
 	/// \brief
@@ -184,6 +190,7 @@ public:
 	m_visible(true),
 	m_parent(parent),
 	m_invalidated(true),
+	m_child_invalidated(true),
 	m_old_invalidated_bounds(),
 	_scriptTransformed(false),
 	_dynamicallyCreated(false)
@@ -533,10 +540,17 @@ public:
 	/// @see \ref region_update
 	///
 	void set_invalidated();
+	
+	/// Called by a child to signalize it has changed visibily. The
+	/// difference to set_invalidated() is that *this* character does
+	/// not need to redraw itself completely. This function will 
+  /// recursively inform all it's parents of the change.
+  void set_child_invalidated();
   
 	/// Clear invalidated flag and reset m_old_invalidated_bounds to null.
 	void clear_invalidated() {
-		m_invalidated = false;    
+		m_invalidated = false;
+    m_child_invalidated = false;    
 		// Is it correct to set old bounds to null ?
 		// Why are we doing so ?
 		m_old_invalidated_bounds.set_null();
