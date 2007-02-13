@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.66 2007/02/13 16:10:47 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.67 2007/02/13 17:06:28 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -696,6 +696,13 @@ private:
 	DisplayList _frame0_chars;
 
 protected:
+
+	void place_character(character* ch, uint16_t depth,
+			const cxform& color_transform, const matrix& mat,
+			float ratio, uint16_t clip_depth)
+	{
+		m_display_list.place_character(ch, depth, color_transform, mat, ratio, clip_depth);
+	}
 
 	/// Execute the tags associated with the specified frame.
 	//

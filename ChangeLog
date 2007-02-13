@@ -1,5 +1,7 @@
 2007-02-13 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.h: add a protected place_character
+	  method, to fiddle with displaylist w/out character *ids*.
 	* server/shape.h (class path): add setLeftFill, setRightFill
 	  and setStartPoint methods; document some more.
 	* server/sprite_instance.{cpp,h}:
