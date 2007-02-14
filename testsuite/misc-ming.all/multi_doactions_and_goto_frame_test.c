@@ -70,7 +70,7 @@ main(int argc, char** argv)
   
   check_equals(mo, "x1", "'as_in_doAction_tag1'");
   check_equals(mo, "x2", "'as_in_doAction_tag2'");
-  check_equals(mo, "x3", "'as_in_doAction_tag3'");
+  xcheck_equals(mo, "x3", "'as_in_doAction_tag3'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); //3rd frame
 

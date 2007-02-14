@@ -77,6 +77,7 @@ check_PROGRAMS = \
 	registerClassTestRunner \
 	goto_frame_test \
 	consecutive_goto_frame_test \
+	multi_doactions_and_goto_frame_test \
 	simple_loop_test \
 	simple_loop_testrunner \
 	action_execution_order_test \
@@ -94,6 +95,7 @@ check_SCRIPTS = \
 	place_and_remove_object_insane_testrunner \
 	goto_frame_testrunner \
 	consecutive_goto_frame_testrunner \
+	multi_doactions_and_goto_frame_testrunner \
 	action_execution_order_testrunner \
 	$(NULL)
 
@@ -367,6 +369,20 @@ consecutive_goto_frame_testrunner: $(srcdir)/../generic-testrunner.sh consecutiv
 	sh $< $(top_builddir) consecutive_goto_frame_test.swf > $@
 	chmod 755 $@
 
+multi_doactions_and_goto_frame_test_SOURCES =	\
+	multi_doactions_and_goto_frame_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+multi_doactions_and_goto_frame_test_LDADD = $(MING_LIBS)
+
+multi_doactions_and_goto_frame_test.swf: multi_doactions_and_goto_frame_test
+	./multi_doactions_and_goto_frame_test $(top_srcdir)/testsuite/media
+
+multi_doactions_and_goto_frame_testrunner: $(srcdir)/../generic-testrunner.sh multi_doactions_and_goto_frame_test.swf
+	sh $< $(top_builddir) multi_doactions_and_goto_frame_test.swf > $@
+	chmod 755 $@
+
 action_execution_order_test_SOURCES =	\
 	action_execution_order_test.c	\
 	ming_utils.h		\
@@ -561,6 +577,7 @@ TEST_CASES = \
 	attachMovieLoopingTestRunner \
 	goto_frame_testrunner \
 	consecutive_goto_frame_testrunner \
+	multi_doactions_and_goto_frame_testrunner \
 	registerClassTestRunner \
 	action_execution_order_testrunner \
 	simple_loop_testrunner \

@@ -1,5 +1,9 @@
 2007-02-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: run the multi_doactions
+	  gotoframe test.
+	* testsuite/misc-ming.all/multi_doactions_and_goto_frame_test.c:
+	  expect the failure.
 	* server/BitmapMovieInstance.{cpp,h}: use sprite_instance::display,
 	  don't override it. instead, place the bitmap shape in the
 	  displaylist.
