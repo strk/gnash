@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.15 2007/01/30 12:49:03 strk Exp $ */
+/* $Id: NetConnection.h,v 1.16 2007/02/14 20:41:48 tgc Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -53,7 +53,7 @@ public:
 	~NetConnection();
 
 	/// Opens the connection to char_url
-	bool openConnection(const char* char_url, NetStream* ns);
+	bool openConnection(const char* char_url, as_object* ns);
 
 	/// Put read pointer at given position
 	bool seek(size_t pos);
@@ -113,7 +113,7 @@ private:
 
 	// The NetStream object which handles the video playback
 	// Watch out for circular dependencies, see NetStream.h
-	NetStream* netStreamObj;
+	as_object* netStreamObj;
 
 	// Total filesize
 	double totalSize;

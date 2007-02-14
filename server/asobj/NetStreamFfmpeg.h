@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.11 2007/02/08 13:25:41 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.12 2007/02/14 20:41:48 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -163,7 +163,7 @@ public:
 
 	static void startPlayback(NetStreamFfmpeg* ns);
 	static void av_streamer(NetStreamFfmpeg* ns);
-	static void audio_streamer(void *udata, uint8 *stream, int len);
+	static bool audio_streamer(void *udata, uint8 *stream, int len);
 
 private:
 

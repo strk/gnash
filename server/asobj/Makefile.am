@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.31 2007/02/14 09:41:38 tgc Exp $
+# $Id: Makefile.am,v 1.32 2007/02/14 20:41:48 tgc Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -42,7 +42,6 @@ AM_CPPFLAGS = \
 
 
 libgnashasobjs_la_SOURCES = \
-	Sound.cpp	\
 	Boolean.cpp	\
 	Camera.cpp	\
 	Color.cpp	\
@@ -63,6 +62,7 @@ libgnashasobjs_la_SOURCES = \
 	Object.cpp	\
 	Selection.cpp	\
 	SharedObject.cpp\
+	Sound.cpp	\
 	Stage.cpp	\
 	System.cpp	\
 	TextSnapshot.cpp\
@@ -76,7 +76,6 @@ libgnashasobjs_la_SOURCES = \
 	$(NULL)
 
 noinst_HEADERS = \
-	Sound.h 	\
 	Boolean.h	\
 	Camera.h	\
 	Color.h		\
@@ -100,6 +99,10 @@ noinst_HEADERS = \
 	Object.h	\
 	Selection.h	\
 	SharedObject.h	\
+	Sound.h 	\
+	SoundFfmpeg.h \
+	SoundGst.h \
+	SoundMad.h \
 	Stage.h		\
 	System.h	\
 	TextSnapshot.h	\
@@ -116,15 +119,21 @@ libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la
 
 if USE_FFMPEG_ENGINE
-libgnashasobjs_la_SOURCES += NetStreamFfmpeg.cpp
+libgnashasobjs_la_SOURCES += NetStreamFfmpeg.cpp SoundFfmpeg.cpp
 AM_CPPFLAGS += $(FFMPEG_CFLAGS)
 libgnashasobjs_la_LIBADD += $(FFMPEG_LIBS)
 endif
 
 if USE_SOUND_GST
-libgnashasobjs_la_SOURCES += NetStreamGst.cpp
+libgnashasobjs_la_SOURCES += NetStreamGst.cpp SoundGst.cpp
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
 libgnashasobjs_la_LIBADD += $(GSTREAMER_LIBS)
+endif
+
+if USE_MAD_ENGINE
+libgnashasobjs_la_SOURCES += SoundMad.cpp
+AM_CPPFLAGS += $(MAD_CFLAGS)
+libgnashasobjs_la_LIBADD += $(MAD_LIBS)
 endif
 
 libgnashasobjs_la_LDFLAGS = -avoid-version

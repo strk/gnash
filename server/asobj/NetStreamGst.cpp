@@ -37,6 +37,25 @@
 
 namespace gnash {
 
+static gboolean
+register_elements (GstPlugin *plugin)
+{
+	return gst_element_register (plugin, "gnashsrc", GST_RANK_NONE, GST_TYPE_GNASH_SRC);
+}
+
+static GstPluginDesc gnash_plugin_desc = {
+	0, // GST_VERSION_MAJOR
+	10, // GST_VERSION_MINOR
+	"gnashsrc",
+	"Use gnash as source via callbacks",
+	register_elements,
+	"0.0.1",
+	"LGPL",
+	"gnash",
+	"gnash",
+	"http://www.gnu.org/software/gnash/",
+	GST_PADDING_INIT
+};
 
 NetStreamGst::NetStreamGst():
 

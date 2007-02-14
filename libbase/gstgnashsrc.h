@@ -17,7 +17,7 @@
 // Based on the filesrc and fdsrc element in Gstreamer-core
 //
 
-/* $Id: gstgnashsrc.h,v 1.4 2007/01/18 11:53:37 tgc Exp $ */
+/* $Id: gstgnashsrc.h,v 1.5 2007/02/14 20:41:48 tgc Exp $ */
 
 #ifndef __GST_GNASH_SRC_H__
 #define __GST_GNASH_SRC_H__
@@ -76,25 +76,5 @@ struct _GstGnashSrcClass {
 GType gst_gnash_src_get_type (void);
 
 G_END_DECLS
-
-static gboolean
-register_elements (GstPlugin *plugin)
-{
-  return gst_element_register (plugin, "gnashsrc", GST_RANK_NONE, GST_TYPE_GNASH_SRC);
-}
-
-GstPluginDesc gnash_plugin_desc = {
-  0, // GST_VERSION_MAJOR
-  10, // GST_VERSION_MINOR
-  "gnashsrc",
-  "Use gnash as source via callbacks",
-  register_elements,
-  "0.0.1",
-  "LGPL",
-  "gnash",
-  "gnash",
-  "http://www.gnu.org/software/gnash/",
-  GST_PADDING_INIT
-};
 
 #endif /* __GST_GNASH_SRC_H__ */

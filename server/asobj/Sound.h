@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-#ifndef __ASSOUND_H__
-#define __ASSOUND_H__
+#ifndef __SOUND_H__
+#define __SOUND_H__
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,21 +36,24 @@ class Sound : public as_object {
 public:
 	Sound();
 	~Sound();
-	void attachSound(int si, const char* name);
-	void getBytesLoaded();
-	void getBytesTotal();
-	void getPan();
-	void getTransform();
-	int getVolume();
-	void loadSound(std::string file, bool streaming);
-	void setPan();
-	void setTransform();
-	void setVolume(int volume);
-	void start(int offset, int loops);
-	void stop(int si);
+	virtual void attachSound(int si, const char* name);
+	virtual void getBytesLoaded();
+	virtual void getBytesTotal();
+	virtual void getPan();
+	virtual void getTransform();
+	virtual int getVolume();
+	virtual void loadSound(std::string file, bool streaming);
+	virtual void setPan();
+	virtual void setTransform();
+	virtual void setVolume(int volume);
+	virtual void start(int offset, int loops);
+	virtual void stop(int si);
+	virtual unsigned int getDuration();
+	virtual unsigned int getPosition();
 
 	std::string soundName;
-private:
+
+protected:
 	bool _duration;
 	bool _id3;
 	bool _onID3;
@@ -61,12 +64,14 @@ private:
 
 	int soundId;
 	bool externalSound;
+	std::string externalURL;
+	bool isStreaming;
 };
 
 void sound_class_init(as_object& global);
 
 } // end of gnash namespace
 
-// __ASSOUND_H__
+// __SOUND_H__
 #endif
 

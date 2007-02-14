@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.45 2007/02/02 15:01:17 bjacques Exp $
+// $Id: sound_handler_sdl.cpp,v 1.46 2007/02/14 20:41:48 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -759,8 +759,8 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 
 			SDL_sound_handler::aux_streamer_ptr aux_streamer = it->second; //handler->m_aux_streamer[i]->ptr;
 			void* owner = it->first;
-			(aux_streamer)(owner, buf, buffer_length);
-
+			bool ret = (aux_streamer)(owner, buf, buffer_length);
+			if (!ret) handler->m_aux_streamer.erase(it);
 			SDL_MixAudio(stream, buf, buffer_length, SDL_MIX_MAXVOLUME);
 
 		}

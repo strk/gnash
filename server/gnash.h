@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.83 2007/01/18 22:53:21 strk Exp $ */
+/* $Id: gnash.h,v 1.84 2007/02/14 20:41:48 tgc Exp $ */
 
 /// \mainpage
 ///
@@ -411,7 +411,7 @@ class DSOEXPORT sound_handler
 {
 public:
 
-	typedef void (*aux_streamer_ptr)(void *udata, uint8 *stream, int len);
+	typedef bool (*aux_streamer_ptr)(void *udata, uint8 *stream, int len);
 
 	struct sound_envelope
 	{

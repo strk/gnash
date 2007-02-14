@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,6 +29,14 @@
 #include "GnashException.h"
 #include "builtin_function.h"
 
+#ifdef SOUND_GST
+#include "SoundGst.h"
+#elif defined(USE_FFMPEG)
+#include "SoundFfmpeg.h"
+#elif defined(USE_MAD)
+#include "SoundMad.h"
+#endif
+
 #include <string>
 
 namespace gnash {
@@ -50,12 +58,15 @@ static as_object* getSoundInterface();
 
 Sound::Sound() 	:
 	as_object(getSoundInterface()),
-	soundName(""),
-	soundId(-1)
+	connection(NULL),
+	soundId(-1),
+	externalSound(false),
+	isStreaming(false)
 {
 }
 
 Sound::~Sound() {
+	if (connection) delete connection;
 }
 
 
@@ -103,11 +114,18 @@ Sound::getVolume()
 }
 
 void
-Sound::loadSound(std::string /*file*/, bool /*streaming*/)
+Sound::loadSound(std::string file, bool /*streaming*/)
 {
-    log_msg("%s is still testing!! \n", __FUNCTION__);
+	log_msg("%s is still testing!! \n", __FUNCTION__);
 
+	if (connection) {
+		log_warning("This sound already has a connection?? (We try to handle this by deleting the old one...)\n");
+		delete connection;
+	}
+	externalURL = file;
 
+	connection = new NetConnection();
+	connection->openConnection(externalURL.c_str(), this);
 }
 
 void
@@ -159,11 +177,35 @@ Sound::stop(int si)
 	}
 }
 
+unsigned int
+Sound::getDuration()
+{
+	log_error("%s: only works when ffmpeg, gstreamer or libmad is enabled\n", __FUNCTION__);
+	return 0;
+}
+
+unsigned int
+Sound::getPosition()
+{
+	log_error("%s: only works when ffmpeg, gstreamer or libmad is enabled\n", __FUNCTION__);
+	return 0;
+}
+
+
 void
 sound_new(const fn_call& fn)
 {
-	Sound *sound_obj = new Sound;
-
+	Sound* sound_obj;
+       
+#ifdef SOUND_GST
+	sound_obj = new SoundGst();
+#elif defined(USE_FFMPEG)
+	sound_obj = new SoundFfmpeg();
+#elif defined(USE_MAD)
+	sound_obj = new SoundMad();
+#else
+	sound_obj = new Sound();
+#endif
 	fn.result->set_as_object(sound_obj);
 }
 
@@ -325,9 +367,16 @@ sound_getvolume(const fn_call& fn)
 }
 
 void
-sound_loadsound(const fn_call& /*fn*/)
+sound_loadsound(const fn_call& fn)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	if (fn.nargs != 2) {
+	    log_error("loadSound needs 2 arguments!\n");
+	    return;		
+	}
+
+	Sound* so = ensure_sound(fn.this_ptr);
+	so->loadSound(fn.arg(0).to_std_string(), fn.arg(1).to_bool());
+
 }
 
 void
@@ -358,9 +407,16 @@ sound_setvolume(const fn_call& fn)
 }
 
 void
-sound_duration(const fn_call& /*fn*/)
+sound_duration(const fn_call& fn)
 {
-	log_msg("%s:unimplemented \n", __FUNCTION__);
+	Sound* so = ensure_sound(fn.this_ptr);
+	if ( fn.nargs == 0 ) {
+		fn.result->set_int(so->getDuration());
+    } else {
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Tried to set read-only property Sound.duration");
+		);
+    }
 }
 
 void
@@ -370,9 +426,16 @@ sound_ID3(const fn_call& /*fn*/)
 }
 
 void
-sound_position(const fn_call& /*fn*/)
+sound_position(const fn_call& fn)
 {
-	log_msg("%s:unimplemented \n", __FUNCTION__);
+	Sound* so = ensure_sound(fn.this_ptr);
+	if ( fn.nargs == 0 ) {
+		fn.result->set_int(so->getPosition());
+    } else {
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Tried to set read-only property Sound.position");
+		);
+    }
 }
 
 void

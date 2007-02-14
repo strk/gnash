@@ -1,3 +1,18 @@
+2007-02-14 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp, server/asobj/NetStreamFfmpeg.{h,cpp},
+	  server/gnash.h: Changed the aux_streamer_ptr callback to return bool.
+	* libbase/gstgnashsrc.h, server/asobj/NetStreamGst.cpp: Moved definition
+	  of gnash_plugin_desc to registering file to avoid multiple definitions.
+	* server/asobj/SoundGst.{cpp,h}, server/asobj/SoundFfmpeg.{cpp,h},
+	  server/asobj/SoundMad.{cpp,h} Added FFMPEG, Gstreamer and libmad 
+	  backends for the Sound class.
+	* server/asobj/Sound.{cpp,h}: Added support for the new backends.
+	* server/asobj/Makefile.am: Added SoundGst.{h,cpp}, SoundFfmpeg.{h,cpp},
+	  and SoundMad.{h,cpp},
+	* server/asobj/NetConnection.{cpp,h}: Made accept as_object as argument 
+	  instead of NetStream, to allow Sound to use NetConnection.
+
 2007-02-14 Sandro Santilli <strk@keybit.net>
 
 	* server/shape.h: add more public functions for

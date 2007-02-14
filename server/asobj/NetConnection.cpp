@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.21 2007/02/05 22:22:32 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.22 2007/02/14 20:41:48 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -188,7 +188,7 @@ NetConnection::~NetConnection() {
 /// RTMP. Newer Flash movies have a parameter to connect which is a
 /// URL string like rtmp://foobar.com/videos/bar.flv
 /*public*/
-bool NetConnection::openConnection(const char* char_url, NetStream* ns)
+bool NetConnection::openConnection(const char* char_url, as_object* ns)
 {
 
 	// if already running there is no need to setup things again
