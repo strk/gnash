@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.92 2007/02/14 09:03:53 strk Exp $ */
+/* $Id: impl.cpp,v 1.93 2007/02/14 14:12:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -336,7 +336,7 @@ create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& url)
 	} 
 
 	BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
-	log_msg("BitmapMovieDefinition %p created", mdef);
+	//log_msg("BitmapMovieDefinition %p created", mdef);
 	return mdef;
 
 
@@ -679,7 +679,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
 	// calling create_library_movie() again and NOT finding
 	// the just-created movie.
 	movie_definition* mov = create_movie(url, real_url, false);
-	log_msg("create_movie(%s, %s, false) returned %p", url.str().c_str(), real_url, mov);
+	//log_msg("create_movie(%s, %s, false) returned %p", url.str().c_str(), real_url, mov);
 
 	if (mov == NULL)
 	{
@@ -706,7 +706,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
 		}
 	}
 
-	log_msg("create_library_movie(%s, %s, startLoaderThread=%d) about to return %p", url.str().c_str(), real_url, startLoaderThread, mov);
+	//log_msg("create_library_movie(%s, %s, startLoaderThread=%d) about to return %p", url.str().c_str(), real_url, startLoaderThread, mov);
 	return mov;
 }
 
