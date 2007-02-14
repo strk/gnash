@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape_character_def.h,v 1.6 2007/02/13 17:11:06 strk Exp $ */
+/* $Id: shape_character_def.h,v 1.7 2007/02/14 00:51:05 strk Exp $ */
 
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
@@ -42,8 +42,12 @@ namespace gnash {
 			const std::vector<fill_style>& fill_styles,
 			const std::vector<line_style>& line_styles) const;
 		virtual void	tesselate(float error_tolerance, tesselate::trapezoid_accepter* accepter) const;
+
+		/// Get cached bounds of this shape.
 		const rect&	get_bound() const { return m_bound; }
-		void	compute_bound(rect* r) const;	// @@ what's the difference between this and get_bound?
+
+		/// Compute bounds by looking at the component paths
+		void	compute_bound(rect* r) const;
 
 		void	output_cached_data(tu_file* out, const cache_options& options);
 		void	input_cached_data(tu_file* in);
@@ -76,6 +80,7 @@ namespace gnash {
 		std::vector<path>	m_paths;
 
 	private:
+
 		void	sort_and_clean_meshes() const;
 		
 		rect	m_bound;
