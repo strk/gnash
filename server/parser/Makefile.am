@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.23 2007/02/13 13:35:34 strk Exp $
+# $Id: Makefile.am,v 1.24 2007/02/14 09:03:53 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -46,6 +46,7 @@ AM_CPPFLAGS = \
 libgnashparser_la_SOURCES = \
 	action_buffer.cpp \
 	bitmap_character_def.cpp \
+	BitmapMovieDefinition.cpp \
 	button_character_def.cpp \
 	character_def.cpp \
 	edit_text_character_def.cpp \

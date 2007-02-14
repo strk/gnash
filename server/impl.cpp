@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.91 2007/02/13 13:35:34 strk Exp $ */
+/* $Id: impl.cpp,v 1.92 2007/02/14 09:03:53 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -335,9 +335,7 @@ create_jpeg_movie(std::auto_ptr<tu_file> in, const std::string& url)
 		return NULL;
 	} 
 
-	boost::intrusive_ptr<bitmap_character_def> def = new bitmap_character_def(im);
-
-	BitmapMovieDefinition* mdef = new BitmapMovieDefinition(def, url);
+	BitmapMovieDefinition* mdef = new BitmapMovieDefinition(im, url);
 	log_msg("BitmapMovieDefinition %p created", mdef);
 	return mdef;
 

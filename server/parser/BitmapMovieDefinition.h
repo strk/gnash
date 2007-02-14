@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
 #include "movie_definition.h" // for inheritance
 #include "rect.h" // for composition
 #include "BitmapMovieInstance.h" // for create_instance
+#include "bitmap_character_def.h" // for destructor visibility by intrusive_ptr
+#include "shape_character_def.h" // for destructor visibility by intrusive_ptr
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -48,38 +50,39 @@ class BitmapMovieDefinition : public movie_definition
 	std::vector<PlayList> _playlist;
 	float _framerate;
 	std::string _url;
+
+	std::auto_ptr<image::rgb> _image;
+
 	boost::intrusive_ptr<bitmap_character_def> _bitmap;
+
+	boost::intrusive_ptr<shape_character_def> _shapedef;
+
+	/// Get the shape character definition for this bitmap movie
+	//
+	/// It will create the definition the first time it's called
+	///
+	shape_character_def* getShapeDef();
 
 public:
 
 
-	/// Default constructor
+	/// Construct a BitmapMovieDefinition for the given image (rgb)
 	//
 	/// Will be initialized with the following values
 	///
 	///  - SWF version 6
-	///  - 640x480 size
+	///  - Framesize extracted from image 
 	///  - Single frame (unlabeled)
 	///  - 12 FPS
 	///  - 0 bytes (for get_bytes_loaded()/get_bytes_total())
-	///  - empty url
+	///  - provided url
 	///
-	BitmapMovieDefinition(boost::intrusive_ptr<bitmap_character_def> bi, const std::string& url)
-		:
-		_version(6),
-		// FIXME: extract size from the bitmap_character
-		_framesize(0, 0, 640*20, 480*20),
-		_framecount(1),
-		_playlist(_framecount),
-		_framerate(12),
-		_url(url),
-		_bitmap(bi)
-	{
-	}
+	BitmapMovieDefinition(std::auto_ptr<image::rgb> image, const std::string& url);
 
-	bitmap_character_def* get_bitmap_char_def()
+	// Discard id, always return the only shape character we have 
+	virtual character_def* get_character_def(int /*id*/)
 	{
-		return _bitmap.get();
+		return getShapeDef();
 	}
 
 	virtual int	get_version() const {
@@ -127,7 +130,7 @@ public:
 	/// Create a playable movie_instance from this def.
 	virtual movie_instance* create_movie_instance()
 	{
-		return new BitmapMovieInstance(this, NULL);
+		return new BitmapMovieInstance(this);
 	}
 
 	virtual const PlayList& get_playlist(size_t frame_number) {

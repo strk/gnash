@@ -1,5 +1,12 @@
 2007-02-13 Sandro Santilli <strk@keybit.net>
 
+	* server/BitmapMovieInstance.{cpp,h}: use sprite_instance::display,
+	  don't override it. instead, place the bitmap shape in the
+	  displaylist.
+	* server/parser/BitmapMovieDefinition.{cpp,h}: change
+	  constructor to take an image rather then a bitmap_character_def
+	  (the latter has a poor interface).
+	* server/impl.cpp: updated construction of BitmapMovieDefinition.
 	* server/parser/shape_character_def.h: new add_line_style()
 	  method, for programmatic definition of shapes.
 

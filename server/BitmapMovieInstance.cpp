@@ -24,39 +24,27 @@
 
 #include "BitmapMovieInstance.h"
 #include "BitmapMovieDefinition.h"
+#include "fill_style.h"
+#include "shape.h" // for class path and class edge
 #include "render.h" // for ::display
 
 using namespace std;
 
 namespace gnash {
 
-BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def,
-		character* parent)
+BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def)
 	:
-	movie_instance(def, parent),
-	_bitmap(def->get_bitmap_char_def())
+	movie_instance(def, NULL)
 {
-	// TODO: 
-	//   - Define a rectangle fill shape using the bitmap as a fill
-	//   - add the shape to the display list 
-
+	// We need to assign a character id to the instance, or an assertion
+	// will fail in character.cpp (parent==NULL || id != -1)
+	character_def* chdef = def->get_character_def(1); 
+	assert(chdef);
+	boost::intrusive_ptr<character> ch = chdef->create_character_instance(this, 1);
+	log_msg("Created char in BitmapMovieInstance is a %s", typeid(*ch).name());
+	int depth = 1;
+	place_character(ch.get(), depth, cxform(), matrix(), 1.0, 0);
 }
 
-void
-BitmapMovieInstance::display()
-{
-	// TODO: when things in the constructor are done we can
-	//       completely avoid overriding ::display
-	//       and things should automatically work
-	//       (use sprite_instance::display)
-	//
-	log_error("FIXME: display of BitmapMovieInstance unimplemented !");
-
-	clear_invalidated(); // clear_invalidated is just needed so display()
-	                     // is not called over and over - to reduce verbosity
-			     // of the FIXME error above.
-
-	do_display_callback();
-}
 
 } // namespace gnash

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: BitmapMovieInstance.h,v 1.1 2007/02/13 13:35:34 strk Exp $ */
+/* $Id: BitmapMovieInstance.h,v 1.2 2007/02/14 09:03:53 strk Exp $ */
 
 #ifndef GNASH_BITMAPMOVIEINSTANCE_H
 #define GNASH_BITMAPMOVIEINSTANCE_H
@@ -27,7 +27,6 @@
 #endif
 
 #include "movie_instance.h" // for inheritance
-#include "bitmap_character_def.h" // for destructor visibility by intrusive_ptr
 
 // Forward declarations
 namespace gnash
@@ -43,15 +42,11 @@ namespace gnash
 class BitmapMovieInstance : public movie_instance
 {
 
-	boost::intrusive_ptr<bitmap_character_def> _bitmap;
-
 public:
 
-	BitmapMovieInstance(BitmapMovieDefinition* def, character* parent);
+	BitmapMovieInstance(BitmapMovieDefinition* def); 
 
 	virtual ~BitmapMovieInstance() {}
-
-	virtual void display ();
 
 };
 
