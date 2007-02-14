@@ -183,6 +183,7 @@ namespace gnash {
 		align();
 
 		int	len = read_u8();
+		log_msg("String length: %d", len);
 		if (len <= 0)
 		{
 			return NULL;
@@ -206,6 +207,13 @@ namespace gnash {
 		align();
 
 		unsigned int	len = read_u8();
+		read_string_with_length(len, to);
+	}
+
+	void stream::read_string_with_length(unsigned len, std::string& to)
+	{
+		align();
+
 		to.resize(len);
 
 		for (unsigned int i = 0; i < len; ++i)
@@ -258,6 +266,7 @@ namespace gnash {
 		if (tag_length == 0x3F) {
 			tag_length = m_input->read_le32();
 		}
+		_current_tag_length = tag_length;
 
 		IF_VERBOSE_PARSE (
 			log_parse("SWF[%u]: tag type = %d, tag length = %d",

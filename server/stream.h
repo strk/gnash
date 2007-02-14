@@ -71,15 +71,29 @@ namespace gnash {
 		/// Reads *and new[]'s* the string from the given file.
 		/// Ownership passes to the caller; caller must delete[] the
 		/// string when it is done with it.
-		/// For string that begins with an 8-bit length code.
+		/// Length of string is read from the first byte.
+		///
 		char*	read_string_with_length();
 
-		/// \brief
-		/// Reads a sized string from the given file and
-		/// assigns it to the given std::string,k overriding any
-		/// previous value of it.
+		/// Reads a sized string into a provided std::string.
+		//
+		/// Length of string is read from the first byte.
+		///
+		/// @param to
+		/// 	Output argument. Any previous value will be overriden.
 		///
 		void	read_string_with_length(std::string& to);
+
+		/// Reads a sized string into a provided std::string.
+		//
+		///
+		/// @param len
+		///	Length of string to read.
+		///
+		/// @param to
+		/// 	Output argument. Any previous value will be overriden.
+		///
+		void	read_string_with_length(unsigned len, std::string& to);
 
 		/// Return our current (byte) position in the input stream.
 		int	get_position();
@@ -89,6 +103,11 @@ namespace gnash {
 
 		/// Return the file position of the end of the current tag.
 		int	get_tag_end_position();
+
+		/// Return the length of the current tag.
+		int	get_tag_length() {
+			return _current_tag_length;
+		}
 
 		/// Return the tag type.
 		SWF::tag_type	open_tag();
@@ -111,6 +130,8 @@ namespace gnash {
 		}
 
 	private:
+		int _current_tag_length;
+
 		tu_file*	m_input;
 		uint8_t	m_current_byte;
 		uint8_t	m_unused_bits;

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.93 2007/02/14 14:12:47 strk Exp $ */
+/* $Id: impl.cpp,v 1.94 2007/02/14 22:48:55 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -182,7 +182,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::DEFINEVIDEO,	fixme_loader); // 38
 	register_tag_loader(SWF::DEFINESPRITE,  sprite_loader);
 	register_tag_loader(SWF::NAMECHARACTER, fixme_loader); // 40
-	register_tag_loader(SWF::SERIALNUMBER,  fixme_loader); // 41
+	register_tag_loader(SWF::SERIALNUMBER,  serialnumber_loader); // 41
 	register_tag_loader(SWF::DEFINETEXTFORMAT, fixme_loader); // 42
 	register_tag_loader(SWF::FRAMELABEL,	frame_label_loader); // 43
 	// 44 - _UNKNOWN_ unimplemented

@@ -1,3 +1,11 @@
+2007-02-14 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loaders.{cpp,h}: implement serialnumber_loader.
+	* server/impl.cpp: register SERIALNUMBER loader.
+	* server/stream.{h,cpp}: add read_string_with_lenght() function
+	  taking length as argument; add get_tag_length() function
+	  returning length of current tag.
+
 2007-02-14 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp, server/asobj/NetStreamFfmpeg.{h,cpp},

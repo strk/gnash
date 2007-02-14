@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.74 2007/02/08 13:25:42 tgc Exp $ */
+/* $Id: tag_loaders.cpp,v 1.75 2007/02/14 22:48:55 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1952,6 +1952,24 @@ metadata_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 	//       (should we parse the XML maybe?)
 
 	delete [] metadata;
+
+}
+
+void
+serialnumber_loader(stream* in, tag_type tag, movie_definition* /*m*/)
+{
+	assert(tag == SWF::SERIALNUMBER); // 41
+
+	std::string serial;
+	in->read_string_with_length(in->get_tag_length(), serial);
+
+	IF_VERBOSE_PARSE (
+		log_parse("  serialnumber = [[\n%s\n]]", serial.c_str());
+	);
+
+	log_msg("SERIALNUMBER: %s", serial.c_str());
+
+	// attach to movie_definition ?
 
 }
 

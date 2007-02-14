@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.h,v 1.13 2007/01/04 18:39:25 strk Exp $ */
+/* $Id: tag_loaders.h,v 1.14 2007/02/14 22:48:55 strk Exp $ */
 
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
@@ -139,6 +139,10 @@ file_attributes_loader(stream* in, tag_type tag, movie_definition* m);
 
 void
 metadata_loader(stream* in, tag_type tag, movie_definition* m);
+
+/// Load a SWF::SERIALNUMBER tag.
+void
+serialnumber_loader(stream* in, tag_type tag, movie_definition* /*m*/);
 
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
