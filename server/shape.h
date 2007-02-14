@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.15 2007/02/14 12:15:11 strk Exp $ */
+/* $Id: shape.h,v 1.16 2007/02/14 12:48:18 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -100,20 +100,7 @@ namespace gnash {
 		/// Name of these functions track Ming interface
 		///
 
-		/// Draw a straight line using offsets.
-		//
-		/// Offset values are relative to last point in path
-		/// and expressed in TWIPS.
-		///
-		/// @param dx
-		///	X offset (delta).
-		///
-		/// @param dy
-		///	Y offset (delta).
-		///
-		void drawLine(float dx, float dy);
-
-		/// Draw a straight line using coordinates (slower).
+		/// Draw a straight line.
 		//
 		/// Point coordinates are relative to path origin
 		/// and expressed in TWIPS.
@@ -126,26 +113,7 @@ namespace gnash {
 		///
 		void drawLineTo(float x, float y);
 
-		/// Draw a curve using offsets.
-		//
-		/// Offset values are relative to last point in path and
-		/// expressed in TWIPS.
-		///
-		/// @param cdx
-		///	Control point's X offset (delta).
-		///
-		/// @param cdy
-		///	Control point's Y offset (delta).
-		///
-		/// @param adx
-		///	Anchor point's X offset (delta).
-		///
-		/// @param ady
-		///	Anchor point's Y offset (delta).
-		///
-		void drawCurve(float cdx, float cdy, float adx, float ady);
-
-		/// Draw a curve using coordinates (slower)
+		/// Draw a curve.
 		//
 		/// Offset values are relative to path origin and
 		/// expressed in TWIPS.

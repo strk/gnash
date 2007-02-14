@@ -51,7 +51,7 @@ BitmapMovieDefinition::getShapeDef()
 	// Add the bitmap fill style (fill style 0)
 
 	fill_style bmFill(_bitmap.get());
-	line_style line(2, rgba(255, 0, 0, 255));
+	line_style line(40, rgba(255, 0, 0, 255));
 	_shapedef->add_fill_style(bmFill);
 	_shapedef->add_line_style(line);
 
@@ -62,7 +62,7 @@ BitmapMovieDefinition::getShapeDef()
 
 	log_msg("Creating a shape_definition wrapping a %f x %f bitmap", w, h);
 
-	path bmPath(w, h, 0, -1, 0);
+	path bmPath(w, h, 1, 0, 1);
 	bmPath.drawLineTo(w, 0);
 	bmPath.drawLineTo(0, 0);
 	bmPath.drawLineTo(0, h);

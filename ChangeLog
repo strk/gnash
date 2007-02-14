@@ -1,10 +1,11 @@
 2007-02-14 Sandro Santilli <strk@keybit.net>
 
 	* server/shape.{cpp,h}: added primitives for
-	  drawing API: draw{Line,Curve}{To,}.
+	  drawing API: drawLineTo, drawCurveTo.
 	  Method names track Ming interface.
 	* server/parser/BitmapMovieDefinition.cpp: 
-	  Use the path drawing api. (still doesn't work).
+	  Use the path drawing api, draw a thicker outline
+	  (outline works, fill not).
 
 2007-02-14 Sandro Santilli <strk@keybit.net>
 
