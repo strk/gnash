@@ -2442,6 +2442,13 @@ void sprite_instance::advance_sprite(float delta_time)
 	// Advance everything in the display list.
 	m_display_list.advance(delta_time);
 
+	// goto_frame_action (for now) need be executed
+	// *after* actions in child sprites have
+	// been executed. When action execution order
+	// is fixed, we can move this code inside
+	// do_action, or completely drop m_goto_frame_action_list
+	// or rather push actions in goto_frame target frame
+	// directly in the m_action_list (simplest)
 	if ( ! m_goto_frame_action_list.empty() )
 	{
 		IF_VERBOSE_ACTION(
@@ -2453,6 +2460,7 @@ void sprite_instance::advance_sprite(float delta_time)
 		assert(m_goto_frame_action_list.empty());
 	}
 	
+
 }
 
 // child movieclip advance
@@ -2720,6 +2728,10 @@ sprite_instance::goto_frame(size_t target_frame_number)
 
 	}
 
+	/// Backup current action list, as we're going to use it
+	/// to fetch actions in the target frame
+	ActionList actionListBackup = m_action_list;
+
 	// m_action_list contains actions from frame 'target_frame_number'
 	// to frame 'm_current_frame', too much than needed, clear it first.
 	m_action_list.clear();
@@ -2743,15 +2755,16 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	// Macromedia Flash do goto_frame then run actions from this frame.
 	// We do too.
 
-	//Zou: stores the target frame actions to m_goto_frame_action_list, which
-	//  will be exectued in next advance_sprite
+	// Stores the target frame actions to m_goto_frame_action_list, which
+	// will be executed in after advancing child characters.
+	// When actions execution order will be fixed all of this might
+	// become obsoleted and the target frame actions could be pushed
+	// directly on the preexisting m_action_list (and no need to back it up).
+	//
 	m_goto_frame_action_list = m_action_list; 
 
-	// FIXME: We can't clear the action_list here! All actions in the current 
-	//  frame should be executed no matter how many gotoFrames come up, but 
-	//  unfortunately the actions in the current frame have already been ruined 
-	//  by above code.(Zou)
-	m_action_list.clear();
+	// Restore ActionList  from backup
+	m_action_list = actionListBackup;
 
 }
 
