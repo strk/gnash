@@ -21,7 +21,7 @@
 #endif
 
 #include "log.h"
-#include "ASSound.h"
+#include "Sound.h"
 #include "sound.h" // for sound_sample_impl
 #include "movie_definition.h"
 #include "sprite_instance.h"

@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.30 2007/02/13 19:36:34 rsavoye Exp $
+# $Id: Makefile.am,v 1.31 2007/02/14 09:41:38 tgc Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -42,7 +42,7 @@ AM_CPPFLAGS = \
 
 
 libgnashasobjs_la_SOURCES = \
-	ASSound.cpp	\
+	Sound.cpp	\
 	Boolean.cpp	\
 	Camera.cpp	\
 	Color.cpp	\
@@ -76,7 +76,7 @@ libgnashasobjs_la_SOURCES = \
 	$(NULL)
 
 noinst_HEADERS = \
-	ASSound.h 	\
+	Sound.h 	\
 	Boolean.h	\
 	Camera.h	\
 	Color.h		\

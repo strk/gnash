@@ -1,3 +1,10 @@
+2007-02-14 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/ASSound.{cpp,h}: Renamed to Sound.{h,cpp}.
+	* server/asobj/Global.cpp, server/asobj/Makefile.am, win32/VC8/gnash.vcproj, 
+	  win32/VC8/npgnash.vcproj: Updated to use Sound.{h,cpp} instead of
+	  ASSound.{h,cpp}.
+
 2007-02-14 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/Makefile.am: run the multi_doactions

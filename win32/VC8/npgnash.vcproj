@@ -233,7 +233,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\ASSound.cpp"
+				RelativePath="..\..\server\asobj\Sound.cpp"
 				>
 			</File>
 			<File
@@ -715,7 +715,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\server\asobj\ASSound.h"
+				RelativePath="..\..\server\asobj\Sound.h"
 				>
 			</File>
 			<File

@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.43 2007/02/12 17:35:51 tgc Exp $ */
+/* $Id: Global.cpp,v 1.44 2007/02/14 09:41:38 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,7 +52,7 @@
 #include "NetStream.h"
 #include "Selection.h"
 #include "SharedObject.h"
-#include "ASSound.h"
+#include "Sound.h"
 #include "Stage.h"
 #include "System.h"
 #include "textformat.h"
