@@ -63,10 +63,10 @@ BitmapMovieDefinition::getShapeDef()
 	log_msg("Creating a shape_definition wrapping a %f x %f bitmap", w, h);
 
 	path bmPath(w, h, 0, -1, 0);
-	bmPath.addEdge(edge(w, 0, w, 0)); // line to top-right
-	//bmPath.addEdge(edge(0, 0, 0, 0)); // line to top-left
-	bmPath.addEdge(edge(0, h, 0, h)); // line to bottom-left
-	bmPath.addEdge(edge(w, h, w, h)); // line to bottom-right
+	bmPath.drawLineTo(w, 0);
+	bmPath.drawLineTo(0, 0);
+	bmPath.drawLineTo(0, h);
+	bmPath.drawLineTo(w, h);
 
 	// Add the path 
 

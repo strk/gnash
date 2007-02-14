@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.14 2007/02/13 17:03:18 strk Exp $ */
+/* $Id: shape.h,v 1.15 2007/02/14 12:15:11 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -49,8 +49,43 @@ namespace gnash {
 	public:
 		path();
 
+		/// Initialize a path 
+		//
+		/// @param ax
+		///	X coordinate of path origin in TWIPS
+		///
+		/// @param ay
+		///	Y coordinate in path origin in TWIPS
+		///
+		/// @param fill0
+		///	Fill style index for left fill
+		///
+		/// @param fill1
+		///	Fill style index for right fill
+		//
+		/// @param line
+		///	Line style index for right fill
+		///
+		///
 		path(float ax, float ay, int fill0, int fill1, int line);
 
+		/// Re-initialize a path 
+		//
+		/// @param ax
+		///	X coordinate of path origin in TWIPS
+		///
+		/// @param ay
+		///	Y coordinate in path origin in TWIPS
+		///
+		/// @param fill0
+		///	Fill style index for left fill
+		///
+		/// @param fill1
+		///	Fill style index for right fill
+		//
+		/// @param line
+		///	Line style index for right fill
+		///
 		void	reset(float ax, float ay, int fill0, int fill1, int line);
 
 		bool	is_empty() const;
@@ -60,17 +95,76 @@ namespace gnash {
 		/// Push the path into the tesselator.
 		void	tesselate() const;
 
-		void addEdge(const edge& e)
-		{
-			m_edges.push_back(e);
-		}
+		/// @{ Primitives for the Drawing API
+		///
+		/// Name of these functions track Ming interface
+		///
 
-		/// Set the beginning of the path.
-		void setStartPoint(float ax, float ay)
-		{
-			m_ax = ax;
-			m_ay = ay;
-		}
+		/// Draw a straight line using offsets.
+		//
+		/// Offset values are relative to last point in path
+		/// and expressed in TWIPS.
+		///
+		/// @param dx
+		///	X offset (delta).
+		///
+		/// @param dy
+		///	Y offset (delta).
+		///
+		void drawLine(float dx, float dy);
+
+		/// Draw a straight line using coordinates (slower).
+		//
+		/// Point coordinates are relative to path origin
+		/// and expressed in TWIPS.
+		///
+		/// @param x
+		///	X coordinate in TWIPS
+		///
+		/// @param y
+		///	Y coordinate in TWIPS
+		///
+		void drawLineTo(float x, float y);
+
+		/// Draw a curve using offsets.
+		//
+		/// Offset values are relative to last point in path and
+		/// expressed in TWIPS.
+		///
+		/// @param cdx
+		///	Control point's X offset (delta).
+		///
+		/// @param cdy
+		///	Control point's Y offset (delta).
+		///
+		/// @param adx
+		///	Anchor point's X offset (delta).
+		///
+		/// @param ady
+		///	Anchor point's Y offset (delta).
+		///
+		void drawCurve(float cdx, float cdy, float adx, float ady);
+
+		/// Draw a curve using coordinates (slower)
+		//
+		/// Offset values are relative to path origin and
+		/// expressed in TWIPS.
+		///
+		/// @param cx
+		///	Control point's X coordinate.
+		///
+		/// @param cy
+		///	Control point's Y coordinate.
+		///
+		/// @param ax
+		///	Anchor point's X ordinate.
+		///
+		/// @param ay
+		///	Anchor point's Y ordinate.
+		///
+		void drawCurveTo(float cx, float cy, float ax, float ay);
+
+		/// @} Primitives for the Drawing API
 
 		/// Set the fill to use on the left side
 		//
@@ -108,7 +202,10 @@ namespace gnash {
 	        int	m_fill1;
 
 	        int	m_line;
-		float	m_ax, m_ay;	// starting point
+
+		/// Path/shape origin
+		float	m_ax, m_ay;
+
 		std::vector<edge>	m_edges;
 		bool	m_new_shape;
 	};

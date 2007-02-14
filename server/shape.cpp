@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.cpp,v 1.26 2006/11/29 00:21:40 nihilus Exp $ */
+/* $Id: shape.cpp,v 1.27 2007/02/14 12:15:11 strk Exp $ */
 
 #include "shape.h"
 
@@ -281,6 +281,38 @@ void	path::tesselate() const
 	m_edges[i].tesselate_curve();
     }
     tesselate::end_path();
+}
+
+void 
+path::drawLine(float dx, float dy)
+{
+	m_edges.push_back(edge(dx, dy, dx, dy)); 
+}
+
+void 
+path::drawLineTo(float x, float y)
+{
+	float dx = x-m_ax;
+	float dy = x-m_ay;
+	// TODO: return if dx + dy == 0 ?
+	drawLine(dx, dy);
+}
+
+void 
+path::drawCurve(float cdx, float cdy, float adx, float ady)
+{
+	m_edges.push_back(edge(cdx, cdy, adx, ady)); 
+}
+
+void 
+path::drawCurveTo(float cx, float cy, float ax, float ay)
+{
+	float cdx = cx-m_ax;
+	float cdy = cx-m_ay;
+	float adx = ax-m_ax;
+	float ady = ax-m_ay;
+	// TODO: any check for skipping here ?
+	drawCurve(cdx, cdy, adx, ady);
 }
 
 
