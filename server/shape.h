@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.16 2007/02/14 12:48:18 strk Exp $ */
+/* $Id: shape.h,v 1.17 2007/02/14 13:10:11 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -58,13 +58,16 @@ namespace gnash {
 		///	Y coordinate in path origin in TWIPS
 		///
 		/// @param fill0
-		///	Fill style index for left fill
+		///	Fill style index for left fill (1-based).
+		///	Zero means NO style.
 		///
 		/// @param fill1
-		///	Fill style index for right fill
-		//
+		///	Fill style index for right fill (1-based)
+		///	Zero means NO style.
+		///
 		/// @param line
-		///	Line style index for right fill
+		///	Line style index for right fill (1-based).
+		///	Zero means NO style.
 		///
 		///
 		path(float ax, float ay, int fill0, int fill1, int line);
@@ -163,18 +166,22 @@ namespace gnash {
 
 	//private:
 
-		/// Left fill
+		/// Left fill style index (1-based)
 		int	m_fill0;
 
-		/// Right fill
+		/// Right fill style index (1-based)
 	        int	m_fill1;
 
+		/// Line style index (1-based)
 	        int	m_line;
 
 		/// Path/shape origin
 		float	m_ax, m_ay;
 
-		std::vector<edge>	m_edges;
+		/// Edges forming the path
+		std::vector<edge> m_edges;
+
+		/// ?
 		bool	m_new_shape;
 	};
 
