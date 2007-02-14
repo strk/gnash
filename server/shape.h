@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.17 2007/02/14 13:10:11 strk Exp $ */
+/* $Id: shape.h,v 1.18 2007/02/14 13:50:30 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -135,45 +135,100 @@ namespace gnash {
 		///
 		void drawCurveTo(float cx, float cy, float ax, float ay);
 
+		/// Remove all edges and reset style infomation 
+		void clear()
+		{
+			m_edges.resize(0);
+			m_fill0 = m_fill1 = m_line = 0;
+		}
+
 		/// @} Primitives for the Drawing API
 
 		/// Set the fill to use on the left side
 		//
 		/// @param f
-		///	The fill index. When this path is
-		///	added to a shape_character_def, the
-		///	fill will reference the vector of
-		///	fill_style defined for that shape
+		///	The fill index (1-based).
+		///	When this path is added to a shape_character_def,
+		///	the index (decremented by 1) will reference an element
+		///	in the fill_style vector defined for that shape.
+		///	If zero, no fill will be active.
 		///
-		void setLeftFill(int f)
+		void setLeftFill(unsigned f)
 		{
 			m_fill0 = f;
+		}
+
+		unsigned getLeftFill() const
+		{
+			return m_fill0;
 		}
 
 		/// Set the fill to use on the left side
 		//
 		/// @param f
-		///	The fill index. When this path is
-		///	added to a shape_character_def, the
-		///	fill will reference the vector of
-		///	fill_style defined for that shape
+		///	The fill index (1-based).
+		///	When this path is added to a shape_character_def,
+		///	the index (decremented by 1) will reference an element
+		///	in the fill_style vector defined for that shape.
+		///	If zero, no fill will be active.
 		///
-		void setRightFill(int f)
+		void setRightFill(unsigned f)
 		{
 			m_fill1 = f;
 		}
 
+		unsigned getRightFill() const
+		{
+			return m_fill1;
+		}
+
+		/// Set the line style to use for this path
+		//
+		/// @param f
+		///	The line_style index (1-based).
+		///	When this path is added to a shape_character_def,
+		///	the index (decremented by 1) will reference an element
+		///	in the line_style vector defined for that shape.
+		///	If zero, no fill will be active.
+		///
+		void setLineStyle(unsigned i)
+		{
+			m_line = i;
+		}
+
+		unsigned getLineStyle() const
+		{
+			return m_line;
+		}
+
+		/// Return the number of edges in this path
+		size_t size() const
+		{
+			return m_edges.size();
+		}
+
+		/// Return a reference to the Nth edge 
+		edge& operator[] (size_t n)
+		{
+			return m_edges[n];
+		}
+
+		/// Return a const reference to the Nth edge 
+		const edge& operator[] (size_t n) const
+		{
+			return m_edges[n];
+		}
 
 	//private:
 
 		/// Left fill style index (1-based)
-		int	m_fill0;
+		unsigned m_fill0;
 
 		/// Right fill style index (1-based)
-	        int	m_fill1;
+	        unsigned m_fill1;
 
 		/// Line style index (1-based)
-	        int	m_line;
+	        unsigned m_line;
 
 		/// Path/shape origin
 		float	m_ax, m_ay;
@@ -182,7 +237,7 @@ namespace gnash {
 		std::vector<edge> m_edges;
 
 		/// ?
-		bool	m_new_shape;
+		bool m_new_shape;
 	};
 
 	/// For holding a pre-tesselated shape.

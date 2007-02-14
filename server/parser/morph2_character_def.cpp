@@ -68,33 +68,36 @@ namespace gnash {
 		{
 			path& p = m_paths[i];
 			const path& p1 = m_shape1->get_paths()[i];
+			const path& p2 = m_shape2->get_paths()[n];
 
-			p.m_fill0 = p1.m_fill0;
-			p.m_fill1 = p1.m_fill1;
+			float new_ax = flerp(p1.m_ax, p2.m_ax, ratio);
+			float new_ay = flerp(p1.m_ay, p2.m_ay, ratio);
+
+			p.reset ( new_ax, new_ay, p1.getLeftFill(), p2.getRightFill(), p1.getLineStyle() );
 
  			// @@ hack.
-			if (p.m_fill0 == 0 && p.m_fill1 == 0)
+			if (p.getLeftFill() == 0 && p.getRightFill() == 0)
 			{
-				if (m_shape1->get_fill_styles().size() > 0) p.m_fill0 = 1;
+				if (m_shape1->get_fill_styles().size() > 0) p.setLeftFill(1); 
 			}
       
-			p.m_line = p1.m_line;
-
-			p.m_ax = flerp(p1.m_ax, m_shape2->get_paths()[n].m_ax, ratio);
-			p.m_ay = flerp(p1.m_ay, m_shape2->get_paths()[n].m_ay, ratio);
       
 			//  edges;
-			int len = p1.m_edges.size();
+			size_t len = p1.size();
 			p.m_edges.resize(len);
 
-			for (unsigned int j=0; j < p.m_edges.size(); j++)
+			for (size_t j=0; j < p.size(); j++)
 			{
-				p.m_edges[j].m_cx = flerp(p1.m_edges[j].m_cx, m_shape2->get_paths()[n].m_edges[k].m_cx, ratio);
-				p.m_edges[j].m_cy = flerp(p1.m_edges[j].m_cy, m_shape2->get_paths()[n].m_edges[k].m_cy, ratio);
-				p.m_edges[j].m_ax = flerp(p1.m_edges[j].m_ax, m_shape2->get_paths()[n].m_edges[k].m_ax, ratio);
-				p.m_edges[j].m_ay = flerp(p1.m_edges[j].m_ay, m_shape2->get_paths()[n].m_edges[k].m_ay, ratio);
+				edge& e = p[j];
+				const edge& e1 = p1[j];
+				const edge& e2 = p2[k];
+
+				e.m_cx = flerp(e1.m_cx, e2.m_cx, ratio);
+				e.m_cy = flerp(e1.m_cy, e2.m_cy, ratio);
+				e.m_ax = flerp(e1.m_ax, e2.m_ax, ratio);
+				e.m_ay = flerp(e1.m_ay, e2.m_ay, ratio);
 				k++;
-				if (m_shape2->get_paths()[n].m_edges.size() <= k)
+				if (p2.size() <= k)
 				{
 					k=0; n++;
 				}

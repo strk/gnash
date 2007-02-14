@@ -1,5 +1,15 @@
 2007-02-14 Sandro Santilli <strk@keybit.net>
 
+	* server/shape.h: add more public functions for
+	  manipulation.
+	* server/parser/morph2_character_def.cpp: try to
+	  avoid direct access to shape private wonnabes;
+	  simplified code, hopefully more readable now.
+	* server/parser/shape_character_def.cpp: try
+	  to avoid direct access to shape pritave wonnabes.
+
+2007-02-14 Sandro Santilli <strk@keybit.net>
+
 	* server/shape.{cpp,h}: added primitives for
 	  drawing API: drawLineTo, drawCurveTo.
 	  Method names track Ming interface.

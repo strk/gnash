@@ -6,7 +6,7 @@
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
 
-/* $Id: shape_character_def.cpp,v 1.10 2007/02/07 08:43:33 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.11 2007/02/14 13:50:30 strk Exp $ */
 
 #include "shape_character_def.h"
 
@@ -233,11 +233,11 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += fill_base;
 		}
-		current_path.m_fill0 = style;
+		current_path.setLeftFill(style); 
 		IF_VERBOSE_PARSE
 		(
 		if (SHAPE_LOG) {
-		    log_parse("  shape_character read: fill0 = %d", current_path.m_fill0);
+		    log_parse("  shape_character read: fill0 (left) = %d", current_path.getLeftFill());
 		}
 		);
 		
@@ -254,10 +254,10 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += fill_base;
 		}
-		current_path.m_fill1 = style;
+		current_path.setRightFill(style); // getRightFill() = style;
 		IF_VERBOSE_PARSE (
 		if (SHAPE_LOG) {
-		    log_parse("  shape_character read: fill1 = %d", current_path.m_fill1);
+		    log_parse("  shape_character read: fill1 (right) = %d", current_path.getRightFill());
 		}
 		);
 	    }
@@ -273,11 +273,11 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += line_base;
 		}
-		current_path.m_line = style;
+		current_path.setLineStyle(style);
 		IF_VERBOSE_PARSE (
 		if (SHAPE_LOG)
 		{
-		    log_parse("  shape_character_read: line = %d", current_path.m_line);
+		    log_parse("  shape_character_read: line = %d", current_path.getLineStyle());
 		}
 		);
 	    }
@@ -294,13 +294,9 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		// Store the current path if any.
 		if (! current_path.is_empty()) {
 		    m_paths.push_back(current_path);
-		    current_path.m_edges.resize(0);
-
-		    // Clear styles.
-		    current_path.m_fill0 = -1;
-		    current_path.m_fill1 = -1;
-		    current_path.m_line = -1;
+		    current_path.clear();
 		}
+
 		// Tack on an empty path signalling a new shape.
 		// @@ need better understanding of whether this is correct??!?!!
 		// @@ i.e., we should just start a whole new shape here, right?
@@ -459,7 +455,7 @@ static void	debug_display_shape_paths(
 //			if (i > 0) break;//xxxxxxxx
 	const path&	p = paths[i];
 
-	if (p.m_fill0 == 0 && p.m_fill1 == 0) {
+	if (p.getLeftFill() == 0 && p.getRightFill() == 0) {
 	    continue;
 	}
 
@@ -467,8 +463,8 @@ static void	debug_display_shape_paths(
 
 	// Color the line according to which side has
 	// fills.
-	if (p.m_fill0 == 0) glColor4f(1, 0, 0, 0.5);
-	else if (p.m_fill1 == 0) glColor4f(0, 1, 0, 0.5);
+	if (p.getLeftFill() == 0) glColor4f(1, 0, 0, 0.5);
+	else if (p.getRightFill() == 0) glColor4f(0, 1, 0, 0.5);
 	else glColor4f(0, 0, 1, 0.5);
 
 	// Offset according to which loop we are.
@@ -506,7 +502,7 @@ static void	debug_display_shape_paths(
 		right = point(-dir.m_y, dir.m_x);	// perpendicular
 
 		const float	ARROW_MAG = 60.f;	// TWIPS?
-		if (p.m_fill0 != 0)
+		if (p.getLeftFill() != 0)
 		    {
 			glColor4f(0, 1, 0, 0.5);
 			glVertex2f(p0.m_x,
@@ -516,9 +512,9 @@ static void	debug_display_shape_paths(
 
 			show_fill_number(point(p0.m_x - right.m_x * ARROW_MAG * 4,
 					       p0.m_y - right.m_y * ARROW_MAG * 4),
-					 p.m_fill0);
+					 p.getLeftFill());
 		    }
-		if (p.m_fill1 != 0)
+		if (p.getRightFill() != 0)
 		    {
 			glColor4f(1, 0, 0, 0.5);
 			glVertex2f(p0.m_x,
@@ -528,7 +524,7 @@ static void	debug_display_shape_paths(
 
 			show_fill_number(point(p0.m_x + right.m_x * ARROW_MAG * 4,
 					       p0.m_y + right.m_y * ARROW_MAG * 4),
-					 p.m_fill1);
+					 p.getRightFill());
 		    }
 	    }}
 	glEnd();
