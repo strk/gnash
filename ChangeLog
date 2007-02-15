@@ -1,5 +1,9 @@
 2007-02-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/action_execution_order_test.c:
+	  Add an additional complexity to the test, checking
+	  for proper DisplayList construction to happen *before*
+	  actions execution.
 	* server/asobj/xmlnode.cpp: fix getter-setters for read-only
 	  properties to survive attempts to set (logging the aserror).
 

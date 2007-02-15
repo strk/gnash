@@ -44,8 +44,9 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip  mc_red, dejagnuclip;
-  SWFShape  sh_red;
+  SWFMovieClip  mc_red, mc_blu, dejagnuclip;
+  SWFShape  sh_red, sh_blu;
+  SWFDisplayItem it_red, it_blu;
 
   const char *srcdir=".";
   if ( argc>1 ) 
@@ -65,28 +66,44 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo);
 
+  mc_blu = newSWFMovieClip();
+  sh_blu = make_fill_square (20, 320, 20, 20, 0, 0, 255, 0, 0, 255);
+  SWFMovieClip_add(mc_blu, (SWFBlock)sh_blu);  
+  add_clip_actions(mc_blu, " _root.note('as in frame1 of mc_blu'); _root.x1 = \"as_in_mc_blu\"; ");
+  SWFMovieClip_nextFrame(mc_blu); /* 1st frame */
+  add_clip_actions(mc_blu, " _root.note('as in frame2 of mc_blu'); _root.x2 = \"as_in_mc_blu\"; stop(); ");
+  SWFMovieClip_nextFrame(mc_blu); /* 2nd frame */
   
   mc_red = newSWFMovieClip();
   sh_red = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc_red, (SWFBlock)sh_red);  
-  add_clip_actions(mc_red, " _root.xtrace('as in frame1 of mc_red'); _root.x1 = \"as_in_mc_red\"; ");
+  /* Add mc_blu to mc_red and name it as "mc_red" */
+  it_blu = SWFMovieClip_add(mc_red, (SWFBlock)mc_blu);  
+  SWFDisplayItem_setDepth(it_blu, 3); 
+  SWFDisplayItem_setName(it_blu, "mc_blu");
+  add_clip_actions(mc_red, " _root.note('as in frame1 of mc_red'); _root.x1 = \"as_in_mc_red\"; ");
   SWFMovieClip_nextFrame(mc_red); /* 1st frame */
-  add_clip_actions(mc_red, " _root.xtrace('as in frame2 of mc_red'); _root.x2 = \"as_in_mc_red\"; stop(); ");
+  add_clip_actions(mc_red, " _root.note('as in frame2 of mc_red'); _root.x2 = \"as_in_mc_red\"; stop(); ");
   SWFMovieClip_nextFrame(mc_red); /* 2nd frame */
   
   /* Add mc_red to _root and name it as "mc_red" */
-  SWFDisplayItem it_red;
   it_red = SWFMovie_add(mo, (SWFBlock)mc_red);  
   SWFDisplayItem_setDepth(it_red, 3); 
   SWFDisplayItem_setName(it_red, "mc_red");
   
-  add_actions(mo, " xtrace('as in frame1 of root'); var x1 = \"as_in_root\"; ");
+  add_actions(mo, " note('as in frame1 of root'); var x1 = \"as_in_root\"; ");
+  /*
+   * Check that the DisplayList is initialized deep to the mc_blue level
+   * Even if their actions are not expected to be executed yet
+   */
+  check_equals(mo, "typeOf(_root.mc_red)", "'movieclip'");
+  check_equals(mo, "typeOf(_root.mc_red.mc_blu)", "'movieclip'");
   SWFMovie_nextFrame(mo); /* 1st frame */
-  add_actions(mo, " xtrace('as in frame2 of root'); _root.x2 = \"as_in_root\"; ");
+  add_actions(mo, " note('as in frame2 of root'); _root.x2 = \"as_in_root\"; ");
   SWFMovie_nextFrame(mo); /* 2nd frame */
 
   /* In the frame placing mc_red,  actions in mc_red is executed *after* actions in _root */
-  check_equals(mo, "_root.x1", "'as_in_mc_red'");
+  check_equals(mo, "_root.x1", "'as_in_mc_blu'");
   /* In subsequent frames, actions in mc_red is executed *before* actions in _root */
   xcheck_equals(mo, "_root.x2", "'as_in_root'");
   add_actions(mo, " _root.totals(); stop(); ");
