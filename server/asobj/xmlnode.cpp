@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.11 2007/02/15 04:05:41 rsavoye Exp $ */
+/* $Id: xmlnode.cpp,v 1.12 2007/02/15 08:12:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -636,7 +636,13 @@ xmlnode_nodetype(const fn_call& fn)
     assert(dynamic_cast<XMLNode*>(fn.this_ptr));
     XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
 
-    fn.result->set_int(ptr->nodeType());
+    if ( fn.nargs == 0 ) {
+	fn.result->set_int(ptr->nodeType());
+    } else {
+	IF_VERBOSE_ASCODING_ERRORS(
+	    log_aserror("Tried to set read-only property XMLNode.nodeType");
+	    );
+    }
 }
 
 // Both a getter and a (do-nothing) setter for firstChild
@@ -646,12 +652,23 @@ xmlnode_firstchild(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     assert(dynamic_cast<XMLNode*>(fn.this_ptr));
     XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
-    XMLNode *node = ptr->firstChild();
-    if (node == NULL) {
-	fn.result->set_null();
-    } else {
-	fn.result->set_as_object(node);
+
+    if ( fn.nargs == 0 )
+    {
+	    XMLNode *node = ptr->firstChild();
+	    if (node == NULL) {
+		fn.result->set_null();
+	    } else {
+		fn.result->set_as_object(node);
+	    }
     }
+    else
+    {
+	IF_VERBOSE_ASCODING_ERRORS(
+	    log_aserror("Tried to set read-only property XMLNode.firstChild");
+	    );
+    }
+
 }
 
 // Both a getter and a (do-nothing) setter for lastChild
@@ -661,6 +678,15 @@ xmlnode_lastchild(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     assert(dynamic_cast<XMLNode*>(fn.this_ptr));
     XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
+
+    if ( fn.nargs != 0 )
+    {
+	IF_VERBOSE_ASCODING_ERRORS(
+	    log_aserror("Tried to set read-only property XMLNode.lastChild");
+	    );
+	return;
+    } 
+
     XMLNode *node = ptr->lastChild();
     if (node == NULL) {
 	fn.result->set_null();
@@ -674,6 +700,14 @@ static void
 xmlnode_nextsibling(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
+
+    if ( fn.nargs != 0 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror("Tried to set read-only property XMLNode.nextSibling");
+        );
+	return;
+    }
     
     assert(dynamic_cast<XMLNode*>(fn.this_ptr));
     XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
@@ -690,6 +724,15 @@ static void
 xmlnode_previoussibling(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
+
+    if ( fn.nargs != 0 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror("Tried to set read-only property XMLNode.previousSibling");
+        );
+	return;
+    }
+
     assert(dynamic_cast<XMLNode*>(fn.this_ptr));
     XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
     XMLNode *node = ptr->previousSibling();
