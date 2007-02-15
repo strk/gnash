@@ -183,7 +183,7 @@ namespace gnash {
 		align();
 
 		int	len = read_u8();
-		log_msg("String length: %d", len);
+		//log_msg("String length: %d", len);
 		if (len <= 0)
 		{
 			return NULL;
