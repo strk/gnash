@@ -74,24 +74,11 @@ public:
     //  nodeType 	XML.nodeType
 
     const char *stringify(XMLNode *xml, std::stringstream *xmlout);
-    bool hasChildNodes()
-    {
-	    return ! _children.empty();
-    }
-  
-    XMLNode *firstChild()
-    {
-	    return _children.empty() ? NULL : _children.front();
-    }
-
-    XMLNode *lastChild()
-    {
-	    return _children.empty() ? NULL : _children.back();
-    }
-  
-    std::vector<XMLNode *>& childNodes()  {
-	    return _children;
-    }
+    bool hasChildNodes();
+    XMLNode *firstChild();
+    XMLNode *lastChild();
+    
+    std::vector<XMLNode *>& childNodes() { return _children; }
     
     XMLNode *operator [] (int x) {
         gnash::log_msg("%s: get element %d\n", __PRETTY_FUNCTION__, x);
@@ -117,10 +104,12 @@ public:
         return this;
     }
 
-    XMLNode* previousSibling(int x);
-    XMLNode* nextSibling(int x);
+    XMLNode* previousSibling();
+    XMLNode* nextSibling();
     XMLNode &cloneNode(XMLNode &newnode, bool deep);
     void appendChild(XMLNode *node);
+    void setParent(XMLNode *node) { _parent = node; };
+    XMLNode *getParent() { return _parent; };
 
     void insertBefore(XMLNode *newnode, XMLNode *node);
     void removeNode();
@@ -135,6 +124,7 @@ public:
     char                *_value;
 
     xmlElementType      _type;
+    XMLNode		*_parent;
     std::vector<XMLNode *>    _children;
     std::vector<XMLAttr *>    _attributes;
 

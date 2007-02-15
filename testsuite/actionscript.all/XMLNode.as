@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,25 +16,28 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-
 // Test case for XML ActionScript class
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XMLNode.as,v 1.8 2007/01/18 15:30:53 strk Exp $";
+rcsid="$Id: XMLNode.as,v 1.9 2007/02/15 04:05:41 rsavoye Exp $";
 
 #include "dejagnu.as"
 
-check(XMLNode);
-var textnode = new XMLNode(3, "text content");
+var doc = new XML();
 
-check(textnode);
+check(doc);
+var textnode = doc.createTextNode("text content");
+check_equals(typeOf(textnode), 'object');
 
 // test the XMLNode constuctor
 //dejagnu(node, "XMLNode::XMLNode()");
 
 //note("Test the existance of all the methods");
+
+//check_equals(typeOf(myXML.createElement), 'function');
+
+
 
 check(textnode.appendChild);
 check(textnode.cloneNode);
@@ -63,30 +66,47 @@ check_equals(typeof(textnode.previousSibling), 'null');
 
 //note("Now test the functionality of the methods");
 
-var childnode1 = new XMLNode(3, "first child");
-check_equals(childnode1.nodeType, 3);
-textnode.appendChild(childnode1);
 
-check_equals(textnode.hasChildNodes(), true);
-check_equals(textnode.firstChild, childnode1);
-check_equals(textnode.lastChild, childnode1);
-check_equals(childnode1.nextSibling, undefined);
-check_equals(childnode1.previousSibling, undefined);
+var node1 = doc.createElement("node1");
+var node2 = doc.createElement("node2");
+var textnode1 = doc.createTextNode("first text node");
+var textnode2 = doc.createTextNode("second text node");
+check_equals(textnode1.nodeType, 3);
+node1.appendChild(textnode1);
+node2.appendChild(textnode2);
+node1.appendChild(node2);
+check_equals(node1.hasChildNodes(), true);
 
-var nextnode = new XMLNode(3, "second child");
-check_equals(nextnode.nodeType, 3);
-textnode.appendChild(nextnode);
+check_equals(node1.firstChild.nodeValue, "second text node");
+check_equals(node1.lastChild.nodeValue, "second text node");
+xcheck_equals(node2.lastChild, "null"); // FIXME
 
-check_equals(textnode.hasChildNodes(), true);
-check_equals(textnode.firstChild, childnode1);
-check_equals(textnode.lastChild, nextnode);
-xcheck_equals(childnode1.nextSibling, nextnode);
-check_equals(childnode1.previousSibling, undefined);
-xcheck_equals(nextnode.previousSibling, childnode1);
+var node3 = doc.createElement("node3");
+var textnode3 = doc.createTextNode("third text node");
+node3.appendChild(textnode3);
+node1.appendChild(node3);
 
-//var out = textnode.toString();
-//trace(out);
+// trace(node1.toString());
+trace("===========================================");
+
+// trace(node1.firstChild.nodeValue);
+// trace(node1.lastChild.nodeValue);
+check_equals(node1.firstChild.nodeValue, "second text node");
+check_equals(node1.lastChild.nodeValue, "third text node");
+
+trace(node1.lastChild.previousSibling);
+trace(node1.firstChild.nextSibling);
+
+check_equals(node1.firstChild.nodeName, "node2");
+check_equals(node1.lastChild.nodeName, "node3");
+
+xcheck_equals(node2.previousSibling.nodeValue, "second text node");
 
 // TODO: test removeNode, insertNode
+
+// for (var aNode = node1.firstChild; node1 != null; aNode = node1.nextSibling) {
+//     trace(aNode);
+// }
+
 
 totals();
