@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.256 2007/02/13 19:39:46 rsavoye Exp $
+dnl $Id: configure.ac,v 1.257 2007/02/15 20:11:23 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -828,11 +828,11 @@ extensions/Makefile
 extensions/dejagnu/Makefile
 extensions/mysql/Makefile
 extensions/fileio/Makefile
+extensions/gtk2/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 cygnal/Makefile
 )
-dnl cygnal/Makefile
 
 echo ""
 echo "Configurable options are:"

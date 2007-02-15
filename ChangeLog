@@ -1,7 +1,15 @@
+2007-02-15  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* extensions/gtk2: New directory for Gtk2 API extension.
+	* extensions/gtk2/hello.as: The well known Gtk "Hello" example
+	program written in ActionScript.
+	* extensions/gtk2/gtkext.{cpp,h}: Wrappers for the Gtk2 API to
+	export it into Gnash.
+
 2007-02-14 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
-  * server/BitmapMovieInstance.cpp, server/parser/BitmapMovieDefinition.cpp:
-    Corrected JPG scale  
+	* server/BitmapMovieInstance.cpp, server/parser/BitmapMovieDefinition.cpp:
+	Corrected JPG scale	 
 
 2007-02-14 Sandro Santilli <strk@keybit.net>
 
