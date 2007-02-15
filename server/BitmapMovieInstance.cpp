@@ -36,6 +36,9 @@ BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def)
 	:
 	movie_instance(def, NULL)
 {
+  matrix mat;
+  mat.concatenate_scale(20.0);
+  
 	// We need to assign a character id to the instance, or an assertion
 	// will fail in character.cpp (parent==NULL || id != -1)
 	character_def* chdef = def->get_character_def(1); 
@@ -43,7 +46,7 @@ BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def)
 	boost::intrusive_ptr<character> ch = chdef->create_character_instance(this, 1);
 	//log_msg("Created char in BitmapMovieInstance is a %s", typeid(*ch).name());
 	int depth = 1;
-	place_character(ch.get(), depth, cxform(), matrix(), 1.0, 0);
+	place_character(ch.get(), depth, cxform(), mat, 1.0, 0);
 }
 
 
