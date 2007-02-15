@@ -98,6 +98,8 @@ public:
 	virtual float	get_height_pixels() const = 0;
 	virtual size_t	get_frame_count() const = 0;
 	virtual float	get_frame_rate() const = 0;
+
+	/// Return size of frame, in TWIPS 
 	virtual const rect& get_frame_size() const = 0;
 
 	virtual size_t get_bytes_loaded() const = 0;

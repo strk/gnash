@@ -90,11 +90,11 @@ public:
 	}
 
 	virtual float	get_width_pixels() const {
-		return _framesize.width()/20;
+		return ceilf(TWIPS_TO_PIXELS(_framesize.width()));
 	}
 
 	virtual float	get_height_pixels() const {
-		return _framesize.height()/20;
+		return ceilf(TWIPS_TO_PIXELS(_framesize.height()));
 	}
 
 	virtual size_t	get_frame_count() const {

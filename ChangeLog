@@ -1,3 +1,11 @@
+2007-02-15 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_definition.h: documented get_frame_size().
+	* server/parser/BitmapMovieDefinition.h (get_{width,height}_pixels):
+	  use TWIPS_TO_PIXELS for consistency with movie_definition.
+	* server/parser/BitmapMovieDefinition.cpp (getShapeDef): use 1 twip
+	  per image pixel while drawing.
+
 2007-02-15  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* extensions/gtk2: New directory for Gtk2 API extension.

@@ -55,10 +55,13 @@ BitmapMovieDefinition::getShapeDef()
 
 	// Define a rectangle filled with the bitmap style
 
-	float w = _framesize.width();
-	float h = _framesize.height();
+	// We use one twip for each pixel in the image
+	// The character will be scaled * 20
+	// when placed in BitmapMovieInstance's DisplayList
+	float w = _framesize.width()/20;
+	float h = _framesize.height()/20;
 
-	//log_msg("Creating a shape_definition wrapping a %f x %f bitmap", w, h);
+	log_msg("Creating a shape_definition wrapping a %g x %g bitmap", w, h);
 
 	path bmPath(w, h, 1, 0, 0);
 	bmPath.drawLineTo(w, 0);
@@ -78,7 +81,8 @@ BitmapMovieDefinition::BitmapMovieDefinition(
 		const std::string& url)
 	:
 	_version(6),
-	_framesize(0, 0, image->m_width, image->m_height),
+	// image::rgb size is in pixels
+	_framesize(0, 0, image->m_width*20, image->m_height*20),
 	_framecount(1),
 	_playlist(_framecount),
 	_framerate(12),
