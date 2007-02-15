@@ -30,6 +30,7 @@
 #include "movie_instance.h" // for implicit upcast to sprite_instance
 #include "render.h"
 #include "VM.h"
+#include "tu_random.h"
 
 #include <iostream>
 #include <string>
@@ -448,6 +449,11 @@ movie_root::advance(float delta_time)
 			timer();
 		}
 	}
+
+	// random should go continuously that:
+	// 1. after restart of the player the situation has not repeated
+	// 2. by different machines the random gave different numbers
+	tu_random::next_random();
 			
 #ifdef GNASH_DEBUG
 	size_t totframes = _movie->get_frame_count();

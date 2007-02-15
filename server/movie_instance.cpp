@@ -31,7 +31,6 @@
 #include "movie_instance.h"
 #include "movie_definition.h"
 #include "movie_root.h"
-#include "tu_random.h"
 
 #include <vector>
 #include <string>
@@ -69,14 +68,9 @@ movie_instance::advance(float delta_time)
 	_def->ensure_frame_loaded(min(get_current_frame()+2,
 		get_frame_count()));
 
-	// random should go continuously that:
-	// 1. after restart of the player the situation has not repeated
-	// 2. by different machines the random gave different numbers
-	tu_random::next_random();
-
 	if (m_on_event_load_called == false)
 	{
-		execute_frame_tags(0); 
+		construct();
 	}
 
 	advance_sprite(delta_time);

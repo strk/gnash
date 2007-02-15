@@ -1,5 +1,10 @@
 2007-02-14 Sandro Santilli <strk@keybit.net>
 
+	* server/: movie_instance.cpp, movie_root.cpp: move
+	  tu_random reset from movie_instance to movie_root
+	  (random number generation should be taken care at global level);
+	  Have movie_instance::advance call ::construct() rather
+	  then manually executing frame tags.
 	* testsuite/misc-ming.all/action_execution_order_test.c:
 	  Add an additional complexity to the test, checking
 	  for proper DisplayList construction to happen *before*
