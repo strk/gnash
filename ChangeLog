@@ -8,6 +8,11 @@
 
 2007-02-15  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* doc/C/gtkext.xml: Chapter on the Gtk extension.
+	* doc/C/mysqlext.xml: Chapter on the MySQL extension.
+	* doc/C/fileext.xml: Chapter on the File I/O extension.
+	* doc/C/Makefile.am: Add new files to dependencies.
+	
 	* doc/C/extensions.xml: New file on the extension mechanism, and
 	on writing extensions.
 	* doc/C/gnash.xml: Add extensions chapter.

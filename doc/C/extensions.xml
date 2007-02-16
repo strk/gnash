@@ -287,6 +287,22 @@
     </programlisting>
 
   </sect2>
+  
+  <sect2 id="inclext">
+    <title>Included Extensions</title>
+
+    <para>
+      Gnash has sme extensions included in the distribution. This is
+      mostly because they were written by the Gnash team. Extensions
+      can be external to gnash, Gnash needs no compiled in knowledge
+      to load an extension file.
+    </para>
+    
+    &gtk;
+    &file;
+    &mysql;
+
+  </sect2>
 
 </sect1>
 
