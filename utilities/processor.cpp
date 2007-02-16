@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: processor.cpp,v 1.47 2007/02/06 23:06:18 rsavoye Exp $ */
+/* $Id: processor.cpp,v 1.48 2007/02/16 09:32:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -54,6 +54,12 @@ static const size_t waitforadvance = 5;
 // How many time do we allow for loop backs
 // (goto frame < current frame)
 static const size_t allowloopbacks = 10;
+
+// How many times to call 'advance' ?
+// If 0 number of advance is unlimited
+// (see other constraints)
+// TODO: add a command-line switch to control this
+static size_t limit_advances = 0;
 
 bool gofast = false;		// FIXME: this flag gets set based on
 				// an XML message written using
@@ -142,7 +148,7 @@ main(int argc, char *argv[])
         dbglogfile.setVerbosity();
     }
 
-    while ((c = getopt (argc, argv, "hwvapr:g")) != -1) {
+    while ((c = getopt (argc, argv, ":hwvapr:gf:")) != -1) {
 	switch (c) {
 	  case 'h':
 	      usage (argv[0]);
@@ -180,6 +186,16 @@ main(int argc, char *argv[])
 	  case 'r':
               allowed_end_hits = strtol(optarg, NULL, 0);
 	      break;
+	  case 'f':
+              limit_advances = strtol(optarg, NULL, 0);
+	      break;
+	  case ':':
+              fprintf(stderr, "Missing argument for switch ``%c''\n", optopt); 
+	      exit(1);
+	  case '?':
+	  default:
+              fprintf(stderr, "Unknown switch ``%c''\n", optopt); 
+	      exit(1);
 	}
     }
     
@@ -292,6 +308,7 @@ play_movie(const char* filename)
     size_t loop_back_count=0;
     size_t latest_frame=0;
     size_t end_hitcount=0;
+    size_t nadvances=0;
     // Run through the movie.
     for (;;) {
 	// @@ do we also have to run through all sprite frames
@@ -307,6 +324,12 @@ play_movie(const char* filename)
 	size_t	last_frame = m.get_current_frame();
 	m.advance(0.010f);
 	m.display();
+	++nadvances;
+	if ( limit_advances && nadvances >= limit_advances)
+	{
+		printf("exiting after %d advances\n", nadvances);
+		break;
+	}
 
 	size_t curr_frame = m.get_current_frame();
 	
@@ -424,9 +447,13 @@ usage (const char *name)
 #if VERBOSE_ACTION
 	"  -va         Be verbose about ActionScript\n"
 #endif
-	"  -r <times>  Allow the given number of runs.\n"
+	"  -r <times>  Allow the given number of complete runs.\n"
 	"              Keep looping undefinitely if set to 0.\n"
 	"              Default is 1 (end as soon as the last frame is reached).\n"
+	"  -f <frames>  \n"
+	"              Allow the given number of frame advancements.\n"
+	"              Keep advancing untill any other stop condition\n"
+        "              is encountered if set to 0 (default).\n"
 	, name
 	);
 }

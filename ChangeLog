@@ -1,3 +1,8 @@
+2007-02-16 Sandro Santilli <strk@keybit.net>
+
+	* utilities/processor.cpp: add -f <frames> switch to control
+	  the number of "advance" calls on the top movie.
+
 2007-02-15 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/movie_definition.h: documented get_frame_size().
