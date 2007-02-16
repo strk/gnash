@@ -70,6 +70,11 @@ main(int argc, char** argv)
   mc_blu = newSWFMovieClip();
   sh_blu = make_fill_square (20, 320, 20, 20, 0, 0, 255, 0, 0, 255);
   SWFMovieClip_add(mc_blu, (SWFBlock)sh_blu);  
+  add_clip_actions(mc_blu, " onUnload = function () { "
+		  "_root.note('onUnload of mc_blu'); "
+		  "_root.mc_unload_executed = 1; "
+		  "_root.x3 = 'as_in_mc_blu_unload'; "
+		  "};");
   add_clip_actions(mc_blu, " _root.note('as in frame1 of mc_blu'); _root.x1 = \"as_in_mc_blu\"; ");
   SWFMovieClip_nextFrame(mc_blu); /* 1st frame */
   add_clip_actions(mc_blu, " _root.note('as in frame2 of mc_blu'); _root.x2 = \"as_in_mc_blu\"; stop(); ");
@@ -85,7 +90,8 @@ main(int argc, char** argv)
   add_clip_actions(mc_red, " _root.note('as in frame1 of mc_red'); _root.x1 = \"as_in_mc_red\"; ");
   add_clip_actions(mc_red, " func = function() {}; ");
   SWFMovieClip_nextFrame(mc_red); /* 1st frame */
-  add_clip_actions(mc_red, " _root.note('as in frame2 of mc_red'); _root.x2 = \"as_in_mc_red\"; stop(); ");
+  add_clip_actions(mc_red, " _root.note('as in frame2 of mc_red'); _root.x2 = 'as_in_mc_red'; _root.x3 = 'as_in_mc_red_frame2'; stop(); ");
+  SWFDisplayItem_remove(it_blu);
   SWFMovieClip_nextFrame(mc_red); /* 2nd frame */
   
   /* Add mc_red to _root and name it as "mc_red" */
@@ -110,6 +116,8 @@ main(int argc, char** argv)
   check_equals(mo, "_root.x1", "'as_in_mc_blu'");
   /* In subsequent frames, actions in mc_red is executed *before* actions in _root */
   check_equals(mo, "_root.x2", "'as_in_root'");
+  check_equals(mo, "_root.x3", "'as_in_mc_blu_unload'");
+  check_equals(mo, "_root.mc_unload_executed", "1");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 3rd frame */
 

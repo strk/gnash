@@ -2549,6 +2549,10 @@ void sprite_instance::advance_sprite(float delta_time)
 	//log_msg("Executing actions in %s timeline", getTargetPath().c_str());
 	do_actions();
 
+	// Call UNLOAD event of just removed chars !
+	DisplayList justRemoved = oldDisplayList;
+	justRemoved.clear_except(m_display_list, true);
+
 	// Finally, execute actions in newly added childs
 	//
 	// These are elements in the current DisplayList, cleared

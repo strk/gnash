@@ -1,5 +1,14 @@
 2007-02-16 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.{h,cpp}: don't dispatch UNLOAD event
+	  unless explicitly requested by caller. 
+	* server/sprite_instance.cpp: properly dispatch
+	  UNLOAD event on just-removed chars.
+	* testsuite/misc-ming.all/action_execution_order_test.c:
+	  Added an additional test for order of onLoad event call.
+
+2007-02-16 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp: 
 	  Warn only once about unsupported stuff; Provide
 	  the *unimplemented* MovieClip.moveTo method.

@@ -120,12 +120,18 @@ public:
 		uint16_t clip_depth);
 
 	/// Removes the object at the specified depth.
+	//
+	/// Does *not* calls UNLOAD event 
+	///
 	void	remove_display_object(uint16_t depth);
 
-	/// \brief
-	/// Clear the display list, calling the UNLOAD event
-	/// on each item still present
-	void clear();
+	/// Clear the display list.
+	//
+	/// @param call_unload
+	///	If true, UNLOAD event will be invoked on the characters being
+	///	removed. False by default.
+	///
+	void clear(bool call_unload=false);
 
 	/// \brief
 	/// Clear all characters in this DisplayList that are also found
@@ -189,12 +195,16 @@ public:
 	//
 	// TODO: remove this method
 	//
-	void clear_unaffected(std::vector<uint16>& affected_depths);
+	/// @param call_unload
+	///	If true, UNLOAD event will be invoked on the characters being
+	///	removed. False by default.
+	///
+	void clear_unaffected(std::vector<uint16>& affected_depths, bool call_unload=false);
 
-	/// \brief
-	/// Clear the display list, w/out calling the UNLOAD event
-	/// on the items.
-	void reset();
+	/// Just an alias for clear()
+	void reset() {
+		clear();
+	}
 
 	/// advance referenced characters.
 	void advance(float delta_time);

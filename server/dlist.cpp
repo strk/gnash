@@ -375,14 +375,6 @@ DisplayList::remove_display_object(uint16_t depth)
 
 	if ( new_end != _characters.end() )
 	{
-		// UNLOAD event in DisplayList::clear() it is not caused,
-		// since character is removed already
-		DisplayItem& di = *new_end;
-		if (new_end->get())
-		{
-			di->on_event(event_id::UNLOAD);
-		}
-
 		_characters.erase(new_end, _characters.end());
 
 	}
@@ -398,17 +390,21 @@ DisplayList::remove_display_object(uint16_t depth)
 	
 // clear the display list.
 void
-DisplayList::clear()
+DisplayList::clear(bool call_unload)
 {
 	//GNASH_REPORT_FUNCTION;
 
-	for (iterator it = _characters.begin(),
-			itEnd = _characters.end();
-		it != itEnd; ++it)
+	// This might eventually become obsoleted
+	if ( call_unload )
 	{
-		DisplayItem& di = *it;
-		if ( ! it->get() ) continue;
-		di->on_event(event_id::UNLOAD);
+		for (iterator it = _characters.begin(),
+				itEnd = _characters.end();
+			it != itEnd; ++it)
+		{
+			DisplayItem& di = *it;
+			if ( ! it->get() ) continue;
+			di->on_event(event_id::UNLOAD); // if call_unload
+		}
 	}
 		
 	_characters.clear();
@@ -425,7 +421,7 @@ void DisplayList::swap_characters(character* ch1, character* ch2)
 	}
 }
 	
-void DisplayList::clear_unaffected(std::vector<uint16>& affected_depths)
+void DisplayList::clear_unaffected(std::vector<uint16>& affected_depths, bool call_unload)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -448,7 +444,7 @@ void DisplayList::clear_unaffected(std::vector<uint16>& affected_depths)
 
 		if (is_affected == false)
 		{
-			di->on_event(event_id::UNLOAD);
+			if ( call_unload ) di->on_event(event_id::UNLOAD);
 			it = _characters.erase(it);
 			continue;
 		}
@@ -545,18 +541,6 @@ DisplayList::clear(const DisplayList& from, bool unload)
 		}
 		it++;
 	}
-}
-	
-// reset the references to the display list.
-void
-DisplayList::reset()
-{
-	// GNASH_REPORT_FUNCTION;
-
-	// We just clear the container, but
-	// might eventually keep it allocated
-	// to reduce allocation costs.
-	_characters.clear();
 }
 	
 void
