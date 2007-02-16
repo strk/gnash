@@ -242,8 +242,15 @@ public:
 	
 
 	/// Return number of elements in the list
-	size_t size() const { 
+	size_t size() const
+	{ 
 		return _characters.size();
+	}
+
+	/// Return true if the list contains no elements 
+	bool empty() const 
+	{
+		return _characters.empty();
 	}
 
 	/// Return the next highest available depth
