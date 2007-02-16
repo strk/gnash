@@ -128,17 +128,31 @@ public:
 	void clear();
 
 	/// \brief
+	/// Clear all characters in this DisplayList that are also found
+	/// in the given DisplayList
+	//
+	/// @param from
+	///	A DisplayList containing character instances to clear.
+	///	Any instance found in in will be removed from this DisplayList.
+	///
+	/// @param call_unload
+	///	If true, UNLOAD event will be invoked on the characters being
+	///	removed. False by default.
+	///
+	void clear(const DisplayList& from, bool call_unload=false);
+
+	/// \brief
 	/// Clear all characters in the display list except the ones
 	/// contained in the given vector.
 	//
 	/// @param exclude
 	///	A vector containing character instances to keep.
 	///	Any instance not found in the vector will be removed
-	///	from the displaylist.
+	///	from this DisplayList.
 	///
 	/// @param call_unload
 	///	If true, UNLOAD event will be invoked on the characters being
-	///	removed.
+	///	removed. False by default.
 	///
 	void clear_except(std::vector<character*>& exclude, bool call_unload=false);
 
@@ -149,11 +163,11 @@ public:
 	/// @param exclude
 	///	A DisplayList containing character instances to keep.
 	///	Any instance not found in in will be removed
-	///	from the this DisplayList.
+	///	from this DisplayList.
 	///
 	/// @param call_unload
 	///	If true, UNLOAD event will be invoked on the characters being
-	///	removed.
+	///	removed. False by default.
 	///
 	void clear_except(const DisplayList& exclude, bool call_unload=false);
 

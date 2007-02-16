@@ -2,7 +2,8 @@
 
 	* server/dlist.{cpp,h}: add clear_except() override taking
 	  a DisplayList as argument. Add a call_unload argument
-	  for both clear_except() methods; add empty() method.
+	  for both clear_except() methods; add empty() method;
+	  add clear() override taking a DisplayList as argument.
 	* utilities/processor.cpp: add -f <frames> switch to control
 	  the number of "advance" calls on the top movie.
 

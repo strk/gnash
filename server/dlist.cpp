@@ -497,7 +497,38 @@ DisplayList::clear_except(const DisplayList& exclude, bool unload)
 		DisplayItem& di = *it;
 
 		bool is_affected = false;
-		for (const_iterator kit = keepchars.begin(), kitEnd = keepchars.end(); kit != kitEnd; )
+		for (const_iterator kit = keepchars.begin(), kitEnd = keepchars.end(); kit != kitEnd; ++kit)
+		{
+			if ( *kit == di )
+			{
+				is_affected = true;
+				break;
+			}
+		}
+
+		if (is_affected == false)
+		{
+			if ( unload ) di->on_event(event_id::UNLOAD);
+			it = _characters.erase(it);
+			continue;
+		}
+		it++;
+	}
+}
+
+void
+DisplayList::clear(const DisplayList& from, bool unload)
+{
+	//GNASH_REPORT_FUNCTION;
+
+	const container_type dropchars = from._characters;
+
+	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
+	{
+		DisplayItem& di = *it;
+
+		bool is_affected = false;
+		for (const_iterator kit = dropchars.begin(), kitEnd = dropchars.end(); kit != kitEnd; ++kit)
 		{
 			if ( *kit == di )
 			{
