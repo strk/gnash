@@ -73,17 +73,44 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-void color_getrgb(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+void color_getrgb(const fn_call& /*fn*/)
+{
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_warning("%s: unimplemented", __FUNCTION__);
+		warned = true;
+	}
 }
-void color_gettransform(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+
+void color_gettransform(const fn_call& /*fn*/)
+{
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_warning("%s: unimplemented", __FUNCTION__);
+		warned = true;
+	}
 }
-void color_setrgb(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+
+void color_setrgb(const fn_call& /*fn*/)
+{
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_warning("%s: unimplemented", __FUNCTION__);
+		warned = true;
+	}
 }
-void color_settransform(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+
+void color_settransform(const fn_call& /*fn*/)
+{
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_warning("%s: unimplemented", __FUNCTION__);
+		warned = true;
+	}
 }
 
 void
