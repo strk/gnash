@@ -1,5 +1,7 @@
 2007-02-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/consecutive_goto_frame_test.c:
+	  Visually trace action execution, use C-style comments.
 	* server/sprite_instance.cpp (advance_sprite):
 	  always update oldDisplayList, not only when in PLAY state !
 	* testsuite/misc-ming.all/action_execution_order_test.c:
