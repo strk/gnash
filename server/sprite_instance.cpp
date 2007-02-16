@@ -2985,9 +2985,6 @@ sprite_instance::add_display_object(
 		return NULL;
 	}
 
-	std::string instance_name;
-	if ( name ) instance_name = name;
-
 	character* existing_char = m_display_list.get_character_at_depth(depth);
 
 	if (existing_char)
@@ -3003,6 +3000,7 @@ sprite_instance::add_display_object(
 				sameEvents(existing_char->get_event_handlers(),
 					event_handlers) )
 		{
+			// TODO: update name ?
 			move_display_object(depth, true, color_transform,
 				true, matrix, ratio, clip_depth);
 			return NULL;
@@ -3025,7 +3023,9 @@ sprite_instance::add_display_object(
 	// TODO: check if we need to do this *only* for sprite characters
 	//       also, consider asking for "nextInstanceName" to the character
 	//       definition...
-	if ( instance_name.empty() ) instance_name = getNextUnnamedInstanceName();
+	std::string instance_name;
+	if ( name ) instance_name = name;
+	else instance_name = getNextUnnamedInstanceName();
 
 	ch->set_name(instance_name.c_str());
 
