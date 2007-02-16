@@ -67,6 +67,7 @@ check_PROGRAMS = \
 	loop_test \
 	loop_test-Runner \
 	place_object_test \
+	move_object_test \
 	place_and_remove_object_test \
 	place_and_remove_object_insane_test \
 	attachMovieTest \
@@ -91,6 +92,7 @@ check_SCRIPTS = \
 	VarAndCharClashTest-Runner \
 	timeline_var_test-Runner \
 	place_object_testrunner \
+	move_object_testrunner \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
 	goto_frame_testrunner \
@@ -235,6 +237,20 @@ place_object_test.swf: place_object_test
 
 place_object_testrunner: $(srcdir)/../generic-testrunner.sh place_object_test.swf
 	sh $< -r5 $(top_builddir) place_object_test.swf > $@
+	chmod 755 $@
+
+move_object_test_SOURCES =	\
+	move_object_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+move_object_test_LDADD = $(MING_LIBS)
+
+move_object_test.swf: move_object_test
+	./move_object_test $(top_srcdir)/testsuite/media
+
+move_object_testrunner: $(srcdir)/../generic-testrunner.sh move_object_test.swf
+	sh $< -r5 $(top_builddir) move_object_test.swf > $@
 	chmod 755 $@
 
 place_and_remove_object_test_SOURCES =	\
@@ -571,6 +587,7 @@ TEST_CASES = \
 	root_stop_testrunner \
 	loop_test-Runner \
 	place_object_testrunner \
+	move_object_testrunner \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
 	attachMovieTestRunner \
