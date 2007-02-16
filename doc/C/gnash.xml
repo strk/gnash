@@ -4,8 +4,8 @@
   <!ENTITY legal SYSTEM "legal.xml">
   <!ENTITY fdl-app SYSTEM "fdl-appendix.xml">
   <!ENTITY appversion "0.7.2">
-  <!ENTITY manrevision "0.3">
-  <!ENTITY date "Oct 2006">
+  <!ENTITY manrevision "0.3.9">
+  <!ENTITY date "Feb 2007">
   <!ENTITY app "<application>Gnash</application>">
   <!ENTITY appname "Gnash">
   <!ENTITY version "0.7.2">
@@ -55,6 +55,10 @@
   <!ENTITY rtmp SYSTEM "rtmp.xml">
   <!ENTITY gnashrc SYSTEM "gnashrc.xml">
   <!ENTITY debugger SYSTEM "debugger.xml">
+  <!ENTITY extend SYSTEM "extensions.xml">
+  <!ENTITY mysql SYSTEM "mysqlext.xml">
+  <!ENTITY file SYSTEM "fileext.xml">
+  <!ENTITY gtk SYSTEM "gtkext.xml">
  ]
 >
 
@@ -71,7 +75,7 @@
 <!-- translators: uncomment this:
 
   <copyright>
-   <year>2005, 2006</year>
+   <year>2005, 2006, 2007</year>
    <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
   </copyright>
 
@@ -84,7 +88,7 @@
     </publisher> 
 
 <!-- 
-      Copyright (c)  2005, 2006, Free Software Foundation, Inc.
+      Copyright (c)  2005, 2006, 2007, Free Software Foundation, Inc.
       Permission is granted to copy, distribute and/or modify this document
       under the terms of the GNU Free Documentation License, Version 1.2
       or any later version published by the Free Software Foundation;
@@ -705,6 +709,7 @@
 
   &sources;
   &internals;
+  &extend;
   &appendix;
 
 <!-- ============= Authors ================================ -->
