@@ -62,7 +62,7 @@ main(int argc, char** argv)
   Ming_init();
   mo = newSWFMovieWithVersion(OUTPUT_VERSION);
   SWFMovie_setDimension(mo, 800, 600);
-  SWFMovie_setRate (mo, 12.0);
+  SWFMovie_setRate (mo, 1.0);
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
