@@ -1454,6 +1454,7 @@ sprite_instance::sprite_instance(
 	m_mouse_state(UP),
 	m_root(r),
 	m_display_list(),
+	oldDisplayList(),
 	m_action_list(),
 	m_goto_frame_action_list(),
 	m_play_state(PLAY),
@@ -2392,9 +2393,9 @@ void sprite_instance::advance_sprite(float delta_time)
 	size_t frame_count = m_def->get_frame_count();
 
 	log_msg("sprite '%s' ::advance_sprite is at frame %u/%u "
-		"- onload called: %d",
+		"- onload called: %d - oldDIsplayList has %d elements",
 		getTargetPath().c_str(), m_current_frame,
-		frame_count, m_on_event_load_called);
+		frame_count, m_on_event_load_called, oldDisplayList.size());
 #endif
 
 	// Update current and next frames.
@@ -2421,6 +2422,8 @@ void sprite_instance::advance_sprite(float delta_time)
 		// First time execute_frame_tags(0) executed in dlist.cpp(child) or movie_def_impl(root)
 		if (m_current_frame != (size_t)prev_frame)
 		{
+			// Backup the DisplayList *before* manipulating it !
+			oldDisplayList = m_display_list;
 			execute_frame_tags(m_current_frame, TAG_DLIST|TAG_ACTION);
 		}
 	}
@@ -2433,14 +2436,47 @@ void sprite_instance::advance_sprite(float delta_time)
 	}
 #endif
 
+	// Advance DisplayList elements which has not been just-added.
+	// 
+	// These are elements in oldDisplayList cleared of all but elements
+	// still in current DisplayList (the other must have been removed
+	// by RemoveObject tags). I'm not sure we should do this actually,
+	// as maybe we need to execute actions in removed objects *before*
+	// we drop them...
+	//
+	// We do *not* dispatch UNLOAD event on the removed objects here
+	// as we assume the event was dispatched by execution of the
+	// RemoveObject tag itself. I might be wrong though, will come
+	// back to this issue later.
+	//
+	// Note that we work on a *copy* of oldDisplayList as we're going
+	// to need oldDisplayList again later, to extract the list of
+	// newly added characters
+	//
+	DisplayList stillAlive = oldDisplayList;
+	stillAlive.clear_except(m_display_list, false);
+	//log_msg("Advancing %d pre-existing childs of %s", stillAlive.size(), getTargetPath().c_str());
+	stillAlive.advance(delta_time);
+	
+	// Now execute actions on this timeline, after actions
+	// in old childs timelines have been executed.
+	//log_msg("Executing actions in %s timeline", getTargetPath().c_str());
 	do_actions();
 
-#ifdef GNASH_DEBUG
-	log_msg(" advancing display list (we always do that!)");
-#endif
-
-	// Advance everything in the display list.
-	m_display_list.advance(delta_time);
+	// Finally, execute actions in newly added childs
+	//
+	// These are elements in the current DisplayList, cleared
+	// by all elements in oldDisplayList.
+	//
+	// Of course we do NOT call UNLOAD events here, as
+	// the chars we're clearing have *not* been removed:
+	// we're simply doing internal work here...
+	//
+	DisplayList newlyAdded = m_display_list;
+	//log_msg("%s has %d current childs and %d old childs", getTargetPath().c_str(), m_display_list.size(), oldDisplayList.size());
+	newlyAdded.clear(oldDisplayList, false);
+	//log_msg("Advancing %d newly-added (after clearing) childs of %s", newlyAdded.size(), getTargetPath().c_str());
+	newlyAdded.advance(delta_time);
 
 	// goto_frame_action (for now) need be executed
 	// *after* actions in child sprites have
@@ -3416,6 +3452,9 @@ sprite_instance::construct()
 #ifdef GNASH_DEBUG
 	log_msg("Constructing sprite '%s'", getTargetPath().c_str());
 #endif
+
+	// Backup the DisplayList *before* manipulating it !
+	assert( oldDisplayList.empty() );
 
 	on_event(event_id::CONSTRUCT);
 	execute_frame_tags(0, TAG_DLIST|TAG_ACTION);	

@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.67 2007/02/13 17:06:28 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.68 2007/02/16 11:09:41 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -616,7 +616,15 @@ private:
 	// TODO: shouldn't we keep this by intrusive_ptr ?
 	movie_instance*	m_root;
 
+	/// Current Display List contents.
 	DisplayList	m_display_list;
+
+	/// oldDisplayList is a backup of current DisplayList
+	/// (m_display_list) updated at each call to ::advance
+	/// and at first call to ::construct (it's empty in
+	/// this latter case).
+	/// It will be used to control actions execution order.
+	DisplayList	oldDisplayList;
 
 	ActionList	m_action_list;
 	ActionList	m_goto_frame_action_list;

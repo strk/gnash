@@ -1,5 +1,14 @@
 2007-02-16 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: Fixed (hopefully)
+	  the action execution order. Implementation is far
+	  from elegant, but gives the idea of how it should work,
+	  and actually passed our test for it, w/out breaking
+	  anything else.
+	* testsuite/misc-ming.all/action_execution_order_test.c:
+	  Add an additional test to verify that function definitions
+	  are not specially handled as it comes to action execution
+	  order. Don't expect failures anymore.
 	* server/dlist.{cpp,h}: add clear_except() override taking
 	  a DisplayList as argument. Add a call_unload argument
 	  for both clear_except() methods; add empty() method;

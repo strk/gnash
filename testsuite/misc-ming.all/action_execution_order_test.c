@@ -64,6 +64,7 @@ main(int argc, char** argv)
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+  add_actions(mo, " trace('as in frame0 of root');"); // can't use 'note' here, as it's not been defined yet
   SWFMovie_nextFrame(mo);
 
   mc_blu = newSWFMovieClip();
@@ -82,6 +83,7 @@ main(int argc, char** argv)
   SWFDisplayItem_setDepth(it_blu, 3); 
   SWFDisplayItem_setName(it_blu, "mc_blu");
   add_clip_actions(mc_red, " _root.note('as in frame1 of mc_red'); _root.x1 = \"as_in_mc_red\"; ");
+  add_clip_actions(mc_red, " func = function() {}; ");
   SWFMovieClip_nextFrame(mc_red); /* 1st frame */
   add_clip_actions(mc_red, " _root.note('as in frame2 of mc_red'); _root.x2 = \"as_in_mc_red\"; stop(); ");
   SWFMovieClip_nextFrame(mc_red); /* 2nd frame */
@@ -97,15 +99,17 @@ main(int argc, char** argv)
    * Even if their actions are not expected to be executed yet
    */
   check_equals(mo, "typeOf(_root.mc_red)", "'movieclip'");
+  check_equals(mo, "typeOf(_root.mc_red.func)", "'undefined'");
   check_equals(mo, "typeOf(_root.mc_red.mc_blu)", "'movieclip'");
   SWFMovie_nextFrame(mo); /* 1st frame */
   add_actions(mo, " note('as in frame2 of root'); _root.x2 = \"as_in_root\"; ");
+  check_equals(mo, "typeOf(_root.mc_red.func)", "'function'");
   SWFMovie_nextFrame(mo); /* 2nd frame */
 
   /* In the frame placing mc_red,  actions in mc_red is executed *after* actions in _root */
   check_equals(mo, "_root.x1", "'as_in_mc_blu'");
   /* In subsequent frames, actions in mc_red is executed *before* actions in _root */
-  xcheck_equals(mo, "_root.x2", "'as_in_root'");
+  check_equals(mo, "_root.x2", "'as_in_root'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 3rd frame */
 
