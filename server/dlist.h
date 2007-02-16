@@ -136,7 +136,26 @@ public:
 	///	Any instance not found in the vector will be removed
 	///	from the displaylist.
 	///
-	void clear_except(std::vector<character*>& exclude);
+	/// @param call_unload
+	///	If true, UNLOAD event will be invoked on the characters being
+	///	removed.
+	///
+	void clear_except(std::vector<character*>& exclude, bool call_unload=false);
+
+	/// \brief
+	/// Clear all characters in this DisplayList except the ones
+	/// contained in the given DisplayList
+	//
+	/// @param exclude
+	///	A DisplayList containing character instances to keep.
+	///	Any instance not found in in will be removed
+	///	from the this DisplayList.
+	///
+	/// @param call_unload
+	///	If true, UNLOAD event will be invoked on the characters being
+	///	removed.
+	///
+	void clear_except(const DisplayList& exclude, bool call_unload=false);
 
 	/// Add all chars in the list
 	void addAll(std::vector<character*>& chars, bool replace);

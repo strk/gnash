@@ -457,7 +457,7 @@ void DisplayList::clear_unaffected(std::vector<uint16>& affected_depths)
 }
 
 void
-DisplayList::clear_except(std::vector<character*>& exclude)
+DisplayList::clear_except(std::vector<character*>& exclude, bool call_unload)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -477,7 +477,38 @@ DisplayList::clear_except(std::vector<character*>& exclude)
 
 		if (is_affected == false)
 		{
-			di->on_event(event_id::UNLOAD);
+			if ( call_unload ) di->on_event(event_id::UNLOAD);
+			it = _characters.erase(it);
+			continue;
+		}
+		it++;
+	}
+}
+
+void
+DisplayList::clear_except(const DisplayList& exclude, bool unload)
+{
+	//GNASH_REPORT_FUNCTION;
+
+	const container_type keepchars = exclude._characters;
+
+	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
+	{
+		DisplayItem& di = *it;
+
+		bool is_affected = false;
+		for (const_iterator kit = keepchars.begin(), kitEnd = keepchars.end(); kit != kitEnd; )
+		{
+			if ( *kit == di )
+			{
+				is_affected = true;
+				break;
+			}
+		}
+
+		if (is_affected == false)
+		{
+			if ( unload ) di->on_event(event_id::UNLOAD);
 			it = _characters.erase(it);
 			continue;
 		}
