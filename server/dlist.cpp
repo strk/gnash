@@ -537,7 +537,7 @@ DisplayList::clear(const DisplayList& from, bool unload)
 			}
 		}
 
-		if (is_affected == false)
+		if (is_affected)
 		{
 			if ( unload ) di->on_event(event_id::UNLOAD);
 			it = _characters.erase(it);
