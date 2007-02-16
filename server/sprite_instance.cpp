@@ -2508,8 +2508,6 @@ void sprite_instance::advance_sprite(float delta_time)
 		// First time execute_frame_tags(0) executed in dlist.cpp(child) or movie_def_impl(root)
 		if (m_current_frame != (size_t)prev_frame)
 		{
-			// Backup the DisplayList *before* manipulating it !
-			oldDisplayList = m_display_list;
 			execute_frame_tags(m_current_frame, TAG_DLIST|TAG_ACTION);
 		}
 	}
@@ -2586,7 +2584,8 @@ void sprite_instance::advance_sprite(float delta_time)
 		assert(m_goto_frame_action_list.empty());
 	}
 	
-
+	// Remember current state of the DisplayList for next iteration
+	oldDisplayList = m_display_list;
 }
 
 // child movieclip advance

@@ -72,7 +72,7 @@ main(int argc, char** argv)
   SWFMovieClip_add(mc_blu, (SWFBlock)sh_blu);  
   add_clip_actions(mc_blu, " onUnload = function () { "
 		  "_root.note('onUnload of mc_blu'); "
-		  "_root.mc_unload_executed = 1; "
+		  "_root.mc_unload_executed++; "
 		  "_root.x3 = 'as_in_mc_blu_unload'; "
 		  "};");
   add_clip_actions(mc_blu, " _root.note('as in frame1 of mc_blu'); _root.x1 = \"as_in_mc_blu\"; ");
