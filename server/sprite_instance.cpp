@@ -3000,7 +3000,7 @@ sprite_instance::add_display_object(
 		//  someone to scream about it...)
 		//
 		if ( existing_char->get_id() == character_id &&
-				instance_name == existing_char->get_name() &&
+//				instance_name == existing_char->get_name() &&
 				sameEvents(existing_char->get_event_handlers(),
 					event_handlers) )
 		{
@@ -3414,7 +3414,6 @@ sprite_instance::get_invalidated_bounds(rect* bounds, bool force)
 	}
 
 	// TODO: check if alpha=0 (return if so)
-
 	// nothing to do if this sprite's bounds are
 	// not invalidated (unless *forced*)
 	if ( ! m_invalidated && ! m_child_invalidated && ! force )
