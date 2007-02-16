@@ -3000,7 +3000,6 @@ sprite_instance::add_display_object(
 		//  someone to scream about it...)
 		//
 		if ( existing_char->get_id() == character_id &&
-//				instance_name == existing_char->get_name() &&
 				sameEvents(existing_char->get_event_handlers(),
 					event_handlers) )
 		{
