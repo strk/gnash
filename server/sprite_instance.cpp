@@ -2989,16 +2989,10 @@ sprite_instance::add_display_object(
 
 	if (existing_char)
 	{
+
 		// If we already have this object on this
 		// plane, then move it instead of replacing it.
-		//
-		// TODO: we need a testcase for this !
-		// (maybe we should abort and wait for
-		//  someone to scream about it...)
-		//
-		if ( existing_char->get_id() == character_id &&
-				sameEvents(existing_char->get_event_handlers(),
-					event_handlers) )
+		if ( existing_char->get_id() == character_id )
 		{
 			// TODO: update name ?
 			move_display_object(depth, true, color_transform,

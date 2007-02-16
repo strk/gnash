@@ -1,5 +1,8 @@
 2007-02-16 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (add_display_object):
+	  don't check for "events" match when comparing existing
+	  char at given depth. Fixes move_object_test.swf.
 	* testsuite/misc-ming.all/: Makefile.am, move_object_test.c:
 	  Test unnamed instances handling on restart, and also test
 	  for syntetized instance names.
