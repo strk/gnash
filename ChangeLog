@@ -8,6 +8,10 @@
 
 2007-02-15  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* doc/C/extensions.xml: New file on the extension mechanism, and
+	on writing extensions.
+	* doc/C/gnash.xml: Add extensions chapter.
+	
 	* extensions/gtk2: New directory for Gtk2 API extension.
 	* extensions/gtk2/hello.as: The well known Gtk "Hello" example
 	program written in ActionScript.
