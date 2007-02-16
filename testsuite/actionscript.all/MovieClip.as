@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.33 2007/02/12 14:06:01 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.34 2007/02/16 11:30:34 strk Exp $";
 
 #include "check.as"
 
@@ -87,6 +87,7 @@ check(mc.duplicateMovieClip);
 	check(mc.curveTo);
 	check(mc.lineStyle);
 	check(mc.lineTo);
+	check(mc.moveTo);
 	check(mc.attachAudio);
 	check(mc.endFill);
 	check(mc.getDepth);
@@ -122,7 +123,6 @@ check(mc.duplicateMovieClip);
     //check(mc.loadVariables != undefined);
 
     xcheck(mc.localToGlobal);
-    xcheck(mc.moveTo);
     xcheck(mc.setMask);
     check(mc.startDrag);
     check(mc.stopDrag);

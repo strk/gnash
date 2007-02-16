@@ -1,5 +1,14 @@
 2007-02-16 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: 
+	  Warn only once about unsupported stuff; Provide
+	  the *unimplemented* MovieClip.moveTo method.
+	* testsuite/actionscript.all/MovieClip.as: don't
+	  expect failure in checking moveTo.
+
+2007-02-16 Sandro Santilli <strk@keybit.net>
+
+
 	* server/asobj/: Color.cpp, Sound.cpp:
 	  Warn only once about unsupported stuff; don't terminate
 	  log_<whatever> with a newline (will be added); properly

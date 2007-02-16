@@ -250,8 +250,13 @@ static void sprite_attach_audio(const fn_call& fn)
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
 
-	log_error("FIXME: MovieClip.attachAudio() unimplemented -- "
-		"returning undefined");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.attachAudio() unimplemented -- "
+			"returning undefined");
+		warned=true;
+	}
 }
 
 //createEmptyMovieClip(name:String, depth:Number) : MovieClip
@@ -555,7 +560,13 @@ static void sprite_unload_movie(const fn_call& fn)
 	UNUSED(sprite);
 
 	// See http://sephiroth.it/reference.php?id=429
-	log_error("FIXME: MovieClip.unloadMovie() not implemented yet");
+
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.unloadMovie() not implemented yet");
+		warned=true;
+	}
 }
 
 static void sprite_hit_test(const fn_call& fn)
@@ -783,7 +794,12 @@ sprite_getURL(const fn_call& fn)
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
 
-	log_error("FIXME: MovieClip.getURL() not implemented yet");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.getURL() not implemented yet");
+		warned=true;
+	}
 }
 
 // getBounds(targetCoordinateSpace:Object) : Object
@@ -814,7 +830,12 @@ sprite_getBounds(const fn_call& fn)
 	bounds_obj->init_member("yMax", as_value(yMax));
 
 	// xMin, xMax, yMin, and yMax
-	log_error("FIXME: MovieClip.getBounds() not implemented yet (just stubbed)");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.getBounds() not implemented yet (just stubbed)");
+		warned=true;
+	}
 
 	fn.result->set_as_object(bounds_obj.get());
 }
@@ -825,7 +846,12 @@ sprite_globalToLocal(const fn_call& fn)
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
 
-	log_error("FIXME: MovieClip.globalToLocal() not implemented yet");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.globalToLocal() not implemented yet");
+		warned=true;
+	}
 }
 
 static void
@@ -834,7 +860,12 @@ sprite_endFill(const fn_call& fn)
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
 
-	log_error("FIXME: MovieClip.endFill() not implemented yet");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.endFill() not implemented yet");
+		warned=true;
+	}
 }
 
 static void
@@ -843,7 +874,26 @@ sprite_lineTo(const fn_call& fn)
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
 
-	log_error("FIXME: MovieClip.lineTo() not implemented yet");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.lineTo() not implemented yet");
+		warned=true;
+	}
+}
+
+static void
+sprite_moveTo(const fn_call& fn)
+{
+	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	UNUSED(sprite);
+
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.moveTo() not implemented yet");
+		warned=true;
+	}
 }
 
 static void
@@ -852,7 +902,12 @@ sprite_lineStyle(const fn_call& fn)
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
 
-	log_error("FIXME: MovieClip.lineStyle() not implemented yet");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.lineStyle() not implemented yet");
+		warned=true;
+	}
 }
 
 static void
@@ -861,7 +916,12 @@ sprite_curveTo(const fn_call& fn)
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
 
-	log_error("FIXME: MovieClip.curveTo() not implemented yet");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.curveTo() not implemented yet");
+		warned=true;
+	}
 }
 
 static void
@@ -870,7 +930,12 @@ sprite_clear(const fn_call& fn)
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
 
-	log_error("FIXME: MovieClip.clear() not implemented yet");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.clear() not implemented yet");
+		warned=true;
+	}
 }
 
 static void
@@ -879,7 +944,12 @@ sprite_beginFill(const fn_call& fn)
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
 
-	log_error("FIXME: MovieClip.beginFill() not implemented yet");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.beginFill() not implemented yet");
+		warned=true;
+	}
 }
 
 static void
@@ -888,7 +958,12 @@ sprite_beginGradientFill(const fn_call& fn)
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
 
-	log_error("FIXME: MovieClip.beginGradientFill() not implemented yet");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.beginGradientFill() not implemented yet");
+		warned=true;
+	}
 }
 
 // startDrag([lockCenter:Boolean], [left:Number], [top:Number],
@@ -899,7 +974,12 @@ sprite_startDrag(const fn_call& fn)
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
 
-	log_error("FIXME: MovieClip.startDrag() not implemented yet");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.startDrag() not implemented yet");
+		warned=true;
+	}
 }
 
 // stopDrag() : Void
@@ -909,7 +989,12 @@ sprite_stopDrag(const fn_call& fn)
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
 
-	log_error("FIXME: MovieClip.stopDrag() not implemented yet");
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: MovieClip.stopDrag() not implemented yet");
+		warned=true;
+	}
 }
 
 static void
@@ -1179,6 +1264,7 @@ attachMovieClipInterface(as_object& o)
 	o.init_member("curveTo", &sprite_curveTo);
 	o.init_member("lineStyle", &sprite_lineStyle);
 	o.init_member("lineTo", &sprite_lineTo);
+	o.init_member("moveTo", &sprite_moveTo);
 	o.init_member("endFill", &sprite_endFill);
 	o.init_member("attachAudio", &sprite_attach_audio);
 	o.init_member("createTextField", &sprite_create_text_field);
