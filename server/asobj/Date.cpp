@@ -22,17 +22,32 @@
 //
 // TODO:
 //	implement static method Date.UTC
-// BUGS:
-//	Flash Player does not seem to respect TZ or the zoneinfo database;
-//	It changes to/from daylight saving time according to its own rules.
-//	We use the operating system's localtime routines.
+//	Make Date constructor treat years <100 as after (or before) 1900.
+//	Check whether Date.TimezoneOffset just returns geographical timezone
+//	or if it also includes DST in force at the specified moment.
+//	What does Flash setTime() do/return if you hand it 0 parameters?
 //
+// BUGS:
 //	Flash player handles a huge range of dates, including
 //	thousands of years BC, but the localtime code here only works for
 //	valid Unix dates Dec 13 20:45:52 1901 - Jan 19 03:14:07 2038.
 //	Our UTC code could be hacked into working outside this range but
 //	this is not worth doing unless we also implement full-range localtime
 //	operations too.
+//
+//	If day=31 and you setYear() to April, or if you change Feb 29 from a
+//	leap year to a non-leap year, the date should "wrap" into the next
+//	month; our current code does not modify the date at all.
+//
+//	If setMonth is called with one parameter, the new month has fewer
+//	days than the old and the old day is beyond the end of the new month,
+//	the day-of-month should be set to the last day of the requested month
+//	(our current code wraps it into the first days of the following month).
+//
+// FEATURES:
+//	Flash Player does not seem to respect TZ or the zoneinfo database;
+//	It changes to/from daylight saving time according to its own rules.
+//	We use the operating system's localtime routines.
 //
 // To probe FlashPlayer functionality put something like:
 // class Test {
@@ -150,8 +165,8 @@ _gmtime_r(time_t *t, struct tm *tm)
 	struct tm *tmp;
 	tmp = gmtime(t);
 	memcpy(tm, tmp, sizeof(struct tm));
-	return(tm);
 #endif
+	return(tm);
 }
 #endif // HAVE_LOCALTIME_R
 
@@ -269,7 +284,7 @@ attachDateInterface(as_object& o)
 static void
 attachDateStaticInterface(as_object& o)
 {
-	// TODO: This should *only* be available when SWF version is > 6
+	// This should *only* be available when SWF version is > 6
 	// Are you sure? the references say it's in from v5 -martin
 	o.init_member("UTC", &date_utc);
 }
@@ -309,9 +324,12 @@ private:
 /// new Date() sets the Date to the current time of day
 /// new Date(timeValue:Number) sets the date to a number of milliseconds since
 ///	1 Jan 1970 UTC
-/// new Date(year:Number, month:Number [, date:Number [, hour:Number
-///	     [, minute:Number [, second:Number [, millisecond:Number ]]]]])
-///	sets the date object to a specified year/month etc in local time
+/// new Date(year, month[,date[,hour[,minute[,second[,millisecond]]]]])
+///	creates a Date date object and sets it to a specified year/month etc
+///	in local time.
+///	year 0-99 means 1900-1999, other positive values are gregorian years
+///	and negative values are years prior to 1900. Thus the only way to
+///	specify	the year 50AD is as -1850.
 ///	Defaults are 0 except for date (day of month) whose default it 1.
 
 void
@@ -375,7 +393,7 @@ date_new(const fn_call& fn)
 			// 0-99 means years since 1900
 			// 100- means full year
 			// negative values are so much before 1900
-			// (so 55AC is only expressible as -1845)
+			// (so 55AD is only expressible as -1845)
 			// Fractional part of a year is ignored.
 			if (tm.tm_year >= 100) tm.tm_year -= 1900;
 		}
@@ -428,49 +446,53 @@ ensure_date_object(as_object* obj)
 		fn.result->set_int(_##timefn##_r(&t, &tm)->element); \
 	}
 
-/// \brief Date.getYear returns the year of the specified Date object
-/// according to local time. The year is the full year minus 1900.
-/// For example, the year 2000 is represented as 100.
+/// \brief Date.getYear
+/// returns a Date's Gregorian year minus 1900 according to local time.
 
 date_get_proto(date_getyear, localtime, tm_year);
 
-/// \brief Date.getFullYear returns the full year (a four-digit number,
-/// such as 2000) of the specified Date object, according to local time.
+/// \brief Date.getFullYear
+/// returns a Date's Gregorian year according to local time.
 
 date_get_proto(date_getfullyear, localtime, tm_year + 1900)
 
-/// \brief Date.getMonth returns the month (0 for January, 1 for February,
-/// and so on) of the specified Date object, according to local time
+/// \brief Date.getMonth
+/// returns a Date's month in the range 0 to 11.
 
 date_get_proto(date_getmonth, localtime, tm_mon)
 
-/// \brief Date.getDate returns the day of the month (an integer from 1 to 31)
-/// of the specified Date object according to local time.
+/// \brief Date.getDate
+/// returns a Date's day-of-month, from 1 to 31 according to local time.
 
 date_get_proto(date_getdate, localtime, tm_mday)
 
-/// \brief Date.getDay returns the day of the week (0 for Sunday, 1 for Monday,
-/// and so on) of the specified Date object according to local time.
+/// \brief Date.getDay
+/// returns the day of the week for a Date according to local time,
+/// where 0 is Sunday and 6 is Saturday.
 
 date_get_proto(date_getday, localtime, tm_wday)
 
-/// \brief Date.getHours returns the hour (an integer from 0 to 23)
-/// of the specified Date object, according to local time
+/// \brief Date.getHours
+/// Returns the hour number for a Date, from 0 to 23, according to local time.
 
 date_get_proto(date_gethours, localtime, tm_hour)
 
-/// \brief Date.getMinutes returns the minutes (an integer from 0 to 59)
-/// of the specified Date object, according to local time
+/// \brief Date.getMinutes
+/// returns a Date's minutes, from 0-59, according to localtime.
+// (Yes, some places do have a fractions of an hour's timezone offset
+// or daylight saving time!)
 
 date_get_proto(date_getminutes, localtime, tm_min)
 
-/// \brief Date.getSeconds returns the seconds (an integer from 0 to 59)
-/// of the specified Date object, according to local time
+/// \brief Date.getSeconds
+/// returns a Date's seconds, from 0-59.
+/// Localtime should be irrelevant.
 
 date_get_proto(date_getseconds, localtime, tm_sec)
 
-/// \brief Date.getMilliseconds returns the milliseconds (an integer
-/// from 0 to 999) of the specified Date object. Localtime is irrelevant!
+/// \brief Date.getMilliseconds
+/// returns a Date's millisecond component as an integer from 0 to 999.
+/// Localtime is irrelevant!
 //
 // Also implements Date.getUTCMilliseconds
 
@@ -490,12 +512,6 @@ date_get_proto(date_getutcminutes,  gmtime, tm_min)
 date_get_proto(date_getutcseconds,  gmtime, tm_sec)
 // date_getutcmilliseconds is implemented by date_getmilliseconds.
 
-
-/// \brief Date.getTimezoneOffset returns the difference in minutes between
-/// the computer's local time and universal time as minutes east of GMT.
-//
-/// In fact this has nothing to do with the Date object, since it depends on
-/// the system timezone settings, not on the value in a Date.
 
 // Return number of minutes east of GMT, also used in toString()
 
@@ -534,6 +550,9 @@ static int minutes_east_of_gmt()
 #endif
 }
 
+/// \brief Date.getTimezoneOffset
+/// returns the difference between localtime and UTC.
+
 static void date_gettimezoneoffset(const fn_call& fn) {
 	fn.result->set_int(minutes_east_of_gmt());
 }
@@ -543,9 +562,9 @@ static void date_gettimezoneoffset(const fn_call& fn) {
 //    =========    Functions to set dates in various ways    ========
 //
 
-/// \brief Date.setTime sets the date for the specified Date object
-/// in milliseconds since midnight on January 1, 1970, and returns
-/// the new time in milliseconds.
+/// \brief Date.setTime
+/// sets a Date in milliseconds after January 1, 1970 00:00 UTC.
+/// Returns value is the same aqs the paramemeter.
 static void date_settime(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 
@@ -681,13 +700,14 @@ date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec, bool utc)
 //
 // There are two flavours: those that work with localtime and those that do so
 // in UTC (except for setYear, which has no UTC version). We avoid duplication
-// by passing an optional variable "utc": if present and true, we use the
-// UTC conversion funtions. Otherwise the localtime ones.
+// by passing an extra parameter "utc": if true, we use the UTC conversion
+// functions, otherwise the localtime ones.
+//
+// All non-UTC functions take dates/times to be in local time and their return
+// value is the new date in UTC milliseconds after 1/1/1970 00:00 UTC.
 //
 
 /// \brief Date.setFullYear(year[,month[,day]])
-/// sets the year of the specified Date object according to local time
-/// and returns the new time in milliseconds.
 //
 /// If the month and date parameters are specified, they are set in local time.
 /// year: A four-digit number specifying a year.
@@ -741,14 +761,17 @@ static void _date_setfullyear(const fn_call& fn, bool utc) {
 }
 
 /// \brief Date.setYear(year[,month[,day]])
-/// sets the year for the specified Date object in local time
-/// and returns the new time in milliseconds
-/// If year is an integer between 0-99, setYear sets the year at 1900 + year;
-/// otherwise, the year is a four-digit one.
-//
-// Contrary to the spec at sephiroth.it, this takes and acts on optional
-// parameters month and day; if they are unspecified their values are not
-// changed.
+/// if year is 0-99, this means 1900-1999, otherwise it is a Gregorian year.
+/// Negative values for year set negative years (years BC).
+/// This means that you cannot set a Date to the years 0-99 AD using setYear().
+/// "month" is 0 - 11 and day 1 - 31 as usual.
+///
+/// If month and/or day are omitted, they are left unchanged except:
+/// - when the day is 29, 30 or 31 and changing to a month that has less days,
+///   the month gets set to the following one and the date should wrap,
+///   becoming 1, 2 or 3.
+/// - when changing from 29 Feb in a leap year to a non-leap year, the date
+///   should end up at March 1st of the same year.
 //
 // There is no setUTCYear() function.
 
@@ -780,12 +803,13 @@ static void date_setyear(const fn_call& fn) {
 	fn.result->set_double(date->value);
 }
 
-/// \brief Date.setMonth(month[,date]) sets the month and optionally the day
-/// of the month for the specified Date object in local time and returns
-/// the new time in milliseconds
-//
-/// month: An integer from 0 (January) to 11 (December).
-/// date: An integer from 1 to 31. [optional]
+/// \brief Date.setMonth(month[,day])
+/// sets the month (0-11) and day-of-month (1-31) components of a Date.
+///
+/// If the day argument is omitted, the new month has less days than the
+/// old one and the new day is beyond the end of the month,
+/// the day should be set to the last day of the specified month.
+/// This implementation currently wraps it into the next month, which is wrong.
 
 static void _date_setmonth(const fn_call& fn, bool utc) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -812,10 +836,11 @@ static void _date_setmonth(const fn_call& fn, bool utc) {
 	fn.result->set_double(date->value);
 }
 
-/// \brief Date.setDate(date) sets the day of the month for the specified Date
-/// object according to local time, and returns the new time in milliseconds.
-//
-/// date: An integer from 1 to 31
+/// \brief Date.setDate(day)
+/// Set the day-of-month (1-31) for a Date object.
+/// If the day-of-month is beyond the end of the current month, it wraps into
+/// the first days of the following  month.  This also happens if you set the
+/// day > 31. Example: setting the 35th in January results in Feb 4th.
 
 static void _date_setdate(const fn_call& fn, bool utc) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -840,23 +865,16 @@ static void _date_setdate(const fn_call& fn, bool utc) {
 }
 
 /// \brief Date.setHours(hour[,min[,sec[,millisec]]])
-/// sets the components of the specified Date object according to local time
-/// and returns the new time in milliseconds
-//
-/// hour: An integer from 0 (midnight) to 23 (11 p.m.).
-/// min: An integer from 0 to 59. [optional]
-/// sec: An integer from 0 to 59. [optional]
-/// millisec: An integer from 0 to 999. [optional]
+/// change the time-of-day in a Date object. If optional fields are omitted,
+/// their values in the Date object are left the same as they were.
 ///
-/// If optional fields are omitted, their values in the Date object
-/// are left the same as they were.
+/// If hour>23 or min/sec>59, these are accepted and wrap into the following
+/// minute, hour or calendar day.
+/// Similarly, negative values carry you back into the previous minute/hour/day.
 //
-// Contrary to the spec at sephiroth.it, this takes and acts on optional
-// parameters min, sec and millisec.
-//
-// Flash Player only takes notice of the whole part of millisec,
-// truncating it, not rounding it. The only way to set a fractional number of
-// milliseconds is to use setTime(n) or call the constructor with one argmuent.
+/// Only the integer part of millisec is used, truncating it, not rounding it.
+/// The only way to set a fractional number of milliseconds is to use
+/// setTime(n) or call the constructor with one argument.
 
 static void _date_sethours(const fn_call& fn, bool utc) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -887,12 +905,13 @@ static void _date_sethours(const fn_call& fn, bool utc) {
 	fn.result->set_double(date->value);
 }
 
-/// \brief Date.setMinutes(minutes[,secs[,millisecs]]) sets the given fields
-/// for a specified Date object according to local time and returns the new
-/// time in milliseconds.
-//
-/// Contrary to the spec at sephiroth.it, this takes and acts on optional
-/// extra parameters secs and millisecs.
+/// \brief Date.setMinutes(minutes[,secs[,millisecs]])
+/// change the time-of-day in a Date object. If optional fields are omitted,
+/// their values in the Date object are left the same as they were.
+///
+/// If min/sec>59, these are accepted and wrap into the following minute, hour
+/// or calendar day.
+/// Similarly, negative values carry you back into the previous minute/hour/day.
 
 static void _date_setminutes(const fn_call& fn, bool utc) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -921,9 +940,11 @@ static void _date_setminutes(const fn_call& fn, bool utc) {
 	fn.result->set_double(date->value);
 }
 
-/// \brief Date.setSeconds(secs[,millisecs]) sets the seconds and optionally
-/// the milliseconds for the specified Date object in local time
-/// and returns the new time in milliseconds.
+/// \brief Date.setSeconds(secs[,millisecs])
+/// set the "seconds" component in a date object.
+///
+/// Values <0, >59 for secs or >999 for millisecs take the date back to the
+/// previous minute (or hour or calendar day) or on to the following ones.
 
 static void _date_setseconds(const fn_call& fn, bool utc) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -1002,8 +1023,7 @@ utc_proto(seconds)
 
 
 /// \brief Date.toString()
-/// returns a string value for the specified date object in a readable format
-//
+/// convert a Date to a printable string.
 /// The format is "Thu Jan 1 00:00:00 GMT+0000 1970" and it is displayed in
 /// local time.
 
@@ -1062,17 +1082,13 @@ static void date_tostring(const fn_call& fn) {
 	fn.result->set_string((char *)&buffer);
 }
 
-// Date.UTC(year:Number,month[,date[,hour[,minute[,second[,millisecond]]]]]
-// returns the number of milliseconds between midnight on January 1, 1970,
-// universal time, and the time specified in the parameters.
+// Date.UTC(year:Number,month[,day[,hour[,minute[,second[,millisecond]]]]]
 //
-// This is a static method that is invoked through the Date object constructor,
-// not through a specific Date object. This method lets you create a Date object
-// that assumes universal time, whereas the Date constructor assumes local time.
+// Convert a UTC date/time specification to number of milliseconds since
+// 1 Jan 1970 00:00 UTC.
 //
-// year: A four-digit integer that represents the year (for example, 2000).
-//
-// e.g. var maryBirthday_date:Date = new Date(Date.UTC(1974, 7, 12));
+// year is a Gregorian year; unspecified arguments default to 0 except for
+// day-of-month, which defaults to 1.
 
 static void date_utc(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
@@ -1081,8 +1097,10 @@ static void date_utc(const fn_call& fn) {
 }
 
 /// \brief Date.valueOf() returns the number of milliseconds since midnight
-/// January 1, 1970, universal time, for this Date.
-/// Also used for Date.getTime()
+/// January 1, 1970 00:00 UTC, for a Date. The return value can be a fractional
+/// number of milliseconds.
+// Also used to implement Date.getTime()
+
 static void date_valueof(const fn_call& fn) {
 	date_as_object* date = ensure_date_object(fn.this_ptr);
 	fn.result->set_double(date->value);
@@ -1223,4 +1241,3 @@ mkutctime(struct tm *tmp, double msec)
 #endif // UTCCONV
 
 } // end of gnash namespace
-
