@@ -1,6 +1,11 @@
 2007-02-16 Martin Guy <martinwguy@yahoo.it>
 
 	* doc/C/sources.xml: Correct Debian dev package names.
+	* server/asobj/Date.cpp: Remove commentary copied from sephiroth;
+	  it was lifted straight from MacroMedia copyright material
+	  (see http://www.brajeshwar.com/reference/as2)
+	* server/asobj/Date.cpp: Document incompatabilities with FlashPlayer.
+	* server/asobj/Math.cpp: Remove unused and duplicate code.
 
 2007-02-16 Sandro Santilli <strk@keybit.net>
 

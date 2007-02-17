@@ -16,7 +16,8 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.16 2007/02/10 17:05:35 nihilus Exp $ */
+/* $Id: Math.cpp,v 1.17 2007/02/17 17:11:16 martinwguy Exp $ */
+
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,7 +34,7 @@ using namespace std;
 
 namespace gnash {
 
-void math_abs(const fn_call& fn);
+void math_fabs(const fn_call& fn);	// Implements AS "abs"
 void math_acos(const fn_call& fn);
 void math_asin(const fn_call& fn);
 void math_atan(const fn_call& fn);
@@ -52,121 +53,6 @@ void math_sin(const fn_call& fn);
 void math_sqrt(const fn_call& fn);
 void math_tan(const fn_call& fn);
 
-Math::Math() {
-}
-
-Math::~Math() {
-}
-
-
-void
-Math::abs()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::acos()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::asin()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::atan()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::atan2()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::ceil()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::cos()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::exp()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::floor()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::log()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::max()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::min()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::pow()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::random()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::round()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::sin()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::sqrt()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
-void
-Math::tan()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
-
 void
 math_class_init(as_object& global)
 {
@@ -177,32 +63,20 @@ math_class_init(as_object& global)
 }
 
 //
-// math object
+// Macro to wrap math library functions as method implementation functions
 //
 
-
-#if 0
 // One-argument simple functions.
-#define MATH_WRAP_FUNC1(funcname)							\
-	void	math_##funcname(as_value* result, as_object* this_ptr,		\
-				as_environment* env, int nargs, int first_arg_bottom_index)	\
-	{											\
-		double	arg = env->bottom(first_arg_bottom_index).to_number();			\
-		result->set_double(funcname(arg));						\
+#define MATH_WRAP_FUNC1(funcname)				\
+	void	math_##funcname(const fn_call& fn)		\
+	{							\
+		double	arg = fn.arg(0).to_number();		\
+		fn.result->set_double(funcname(arg));		\
 	}
-#else
-// One-argument simple functions.
-#define MATH_WRAP_FUNC1(funcname)							\
-	void	math_##funcname(const fn_call& fn)						\
-	{											\
-		double	arg = fn.arg(0).to_number();						\
-		fn.result->set_double(funcname(arg));						\
-	}
-#endif
 
 #ifndef __GNUC__  //Some hacks are ugly and dirty, we call them 'fulhack'.
-	#undef TU_MATH_H
-	#include "tu_math.h"
+#	undef TU_MATH_H
+#	include "tu_math.h"
 #endif
 
 MATH_WRAP_FUNC1(fabs)
@@ -218,25 +92,15 @@ MATH_WRAP_FUNC1(sin)
 MATH_WRAP_FUNC1(sqrt)
 MATH_WRAP_FUNC1(tan)
 
-#if 0
 // Two-argument functions.
-#define MATH_WRAP_FUNC2_EXP(funcname, expr)										\
-	void	math_##funcname(as_value* result, as_object* this_ptr, as_environment* env, int nargs, int first_arg_bottom_index)	\
-	{															\
-		double	arg0 = env->bottom(first_arg_bottom_index).to_number();							\
-		double	arg1 = env->bottom(first_arg_bottom_index - 1).to_number();						\
-		result->set_double(expr);											\
+#define MATH_WRAP_FUNC2_EXP(funcname, expr)			\
+	void	math_##funcname(const fn_call& fn)		\
+	{							\
+		double	arg0 = fn.arg(0).to_number();		\
+		double	arg1 = fn.arg(1).to_number();		\
+		fn.result->set_double(expr);			\
 	}
-#else
-// Two-argument functions.
-#define MATH_WRAP_FUNC2_EXP(funcname, expr)										\
-	void	math_##funcname(const fn_call& fn)										\
-	{															\
-		double	arg0 = fn.arg(0).to_number();										\
-		double	arg1 = fn.arg(1).to_number();										\
-		fn.result->set_double(expr);											\
-	}
-#endif
+
 MATH_WRAP_FUNC2_EXP(atan2, (atan2(arg0, arg1)))
 MATH_WRAP_FUNC2_EXP(max, (arg0 > arg1 ? arg0 : arg1))
 MATH_WRAP_FUNC2_EXP(min, (arg0 < arg1 ? arg0 : arg1))
@@ -248,6 +112,7 @@ void	math_random(const fn_call& fn)
     // Random number between 0 and 1.
     fn.result->set_double(tu_random::next_random() / double(uint32_t(0x0FFFFFFFF)));
 }
+
 void	math_round(const fn_call& fn)
 {
     // round argument to nearest int.
@@ -255,7 +120,6 @@ void	math_round(const fn_call& fn)
     fn.result->set_double(floor(arg0 + 0.5));
 }
 	
-
 
 math_as_object::math_as_object()
 	:
@@ -274,8 +138,8 @@ math_as_object::math_as_object()
 	init_member("SQRT1_2", 0.7071067811865475244);
 	init_member("SQRT2", 1.4142135623730950488);
 
-	// math methods
-	init_member("abs", &math_abs);
+	// math methods, 1-arg
+	init_member("abs", &math_fabs);		// AS "abs" is math "fabs"
 	init_member("acos", &math_acos);
 	init_member("asin", &math_asin);
 	init_member("atan", &math_atan);
@@ -290,23 +154,13 @@ math_as_object::math_as_object()
 	init_member("sqrt", &math_sqrt);
 	init_member("tan", &math_tan);
 
+	// math methods, 2-arg
 	init_member("atan2", &math_atan2);
 	init_member("max", &math_max);
 	init_member("min", &math_min);
 	init_member("pow", &math_pow);
 }
 
-void
-math_new(const fn_call& fn)
-{
-    math_as_object *math_obj = new math_as_object;
-    fn.result->set_as_object(math_obj);
-}
-
-void math_abs(const fn_call& fn) {
-	return math_fabs(fn);
-    //log_msg("%s:unimplemented \n", __FUNCTION__);
-}
 
 
 } // end of gnash namespace
