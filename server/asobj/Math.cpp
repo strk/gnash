@@ -16,19 +16,34 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.17 2007/02/17 17:11:16 martinwguy Exp $ */
+/* $Id: Math.cpp,v 1.18 2007/02/17 20:18:09 martinwguy Exp $ */
+
+//
+// This file implements methods of the ActionScript Math class.
+//
+// They are all static methods; there is no Math class object as such.
+//
+// TODO:
+//	min(), max() and pow(1) return NaN here; they should return
+//	Infinity, -Infinity and 1 respectively
+//
 
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-
 #include <cmath>
 #include <string>
 #include "tu_random.h"
 #include "fn_call.h"
 #include "GMath.h"
 #include "log.h"
+
+#ifndef NAN
+// This throws a warning with some compilers. If that bugs you, use
+// static double nan_zero = 0.0; and (nan_zero/nan_zero)
+# define NAN (0.0/0.0)
+#endif
 
 using namespace std;
 
@@ -63,15 +78,25 @@ math_class_init(as_object& global)
 }
 
 //
-// Macro to wrap math library functions as method implementation functions
+// Macros to wrap C math library functions as ActionScript Math methods
 //
 
+//
 // One-argument simple functions.
+//
+// All one-argument Math functions called with no args return NaN
+//
+
 #define MATH_WRAP_FUNC1(funcname)				\
 	void	math_##funcname(const fn_call& fn)		\
 	{							\
-		double	arg = fn.arg(0).to_number();		\
-		fn.result->set_double(funcname(arg));		\
+		double result;					\
+		if (fn.nargs < 1) result = NAN;			\
+		else {						\
+			double	arg = fn.arg(0).to_number();	\
+			result = funcname(arg);			\
+		}						\
+		fn.result->set_double(result);			\
 	}
 
 #ifndef __GNUC__  //Some hacks are ugly and dirty, we call them 'fulhack'.
@@ -93,12 +118,27 @@ MATH_WRAP_FUNC1(sqrt)
 MATH_WRAP_FUNC1(tan)
 
 // Two-argument functions.
+//
+// In general, two-argument functions called with no or one argument
+// return NaN.
+// This is always true for atan2, but there are the following exceptions:
+// pow(1) == 1, max() == -Infinity and min() == Infinity
+//
+// Flash's pow() is clever cos it copes with negative numbers to an integral
+// power, and can do pow(-2, -1) == -0.5 and pow(-2, -2) == 0.25.
+// Fortunately, pow() in the cmath library works the same way.
+
 #define MATH_WRAP_FUNC2_EXP(funcname, expr)			\
 	void	math_##funcname(const fn_call& fn)		\
 	{							\
-		double	arg0 = fn.arg(0).to_number();		\
-		double	arg1 = fn.arg(1).to_number();		\
-		fn.result->set_double(expr);			\
+		double result;					\
+		if (fn.nargs < 2) result = NAN;			\
+		else {						\
+			double	arg0 = fn.arg(0).to_number();	\
+			double	arg1 = fn.arg(1).to_number();	\
+			result = (expr);			\
+		}						\
+		fn.result->set_double(result);			\
 	}
 
 MATH_WRAP_FUNC2_EXP(atan2, (atan2(arg0, arg1)))
@@ -115,11 +155,17 @@ void	math_random(const fn_call& fn)
 
 void	math_round(const fn_call& fn)
 {
-    // round argument to nearest int.
-    double	arg0 = fn.arg(0).to_number();
-    fn.result->set_double(floor(arg0 + 0.5));
+	// round argument to nearest int. 0.5 goes to 1 and -0.5 goes to 0
+	double result;
+
+	if (fn.nargs < 1) result = NAN;
+	else {
+		double arg0 = fn.arg(0).to_number();
+		result = floor(arg0 + 0.5);
+	}
+	fn.result->set_double(result);
 }
-	
+
 
 math_as_object::math_as_object()
 	:
@@ -139,7 +185,7 @@ math_as_object::math_as_object()
 	init_member("SQRT2", 1.4142135623730950488);
 
 	// math methods, 1-arg
-	init_member("abs", &math_fabs);		// AS "abs" is math "fabs"
+	init_member("abs", &math_fabs);	 // ActionScript "abs" is math "fabs"
 	init_member("acos", &math_acos);
 	init_member("asin", &math_asin);
 	init_member("atan", &math_atan);
@@ -162,6 +208,4 @@ math_as_object::math_as_object()
 }
 
 
-
 } // end of gnash namespace
-
