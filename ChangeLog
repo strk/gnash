@@ -7,6 +7,8 @@
 	* server/asobj/Date.cpp: Document incompatabilities with FlashPlayer.
 	* server/asobj/Math.cpp: Remove unused and duplicate code.
 	* server/asobj/Math.cpp: Don't abort on missing args; return NAN
+	* testsuite/actionscript.all/Math.as: Add test suite for Math methods.
+	* testsuite/actionscript.all/Makefile.am: Add Math.as to tests to run.
 
 2007-02-16 Sandro Santilli <strk@keybit.net>
 
