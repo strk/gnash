@@ -6,7 +6,7 @@
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
 
-/* $Id: shape_character_def.cpp,v 1.11 2007/02/14 13:50:30 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.12 2007/02/18 09:50:48 strk Exp $ */
 
 #include "shape_character_def.h"
 
@@ -20,6 +20,7 @@
 #include "tu_file.h"
 
 #include <cfloat>
+#include <algorithm>
 
 
 //#define DEBUG_DISPLAY_SHAPE_PATHS    // won't probably work anymore (Udo)
@@ -645,6 +646,29 @@ void	shape_character_def::input_cached_data(tu_file* in)
     }
 }
 
+size_t
+shape_character_def::add_fill_style(const fill_style& stl)
+{
+	typedef FillStyleVect V;
+	V& v=m_fill_styles;
+
+	// TODO: check if the style is already in our list
+	//       (needs operator== defined for fill_style)
+	v.push_back(stl);
+	return v.size(); // 1-based !
+}
+
+size_t
+shape_character_def::add_line_style(const line_style& stl)
+{
+	typedef LineStyleVect V;
+	V& v=m_line_styles;
+
+	// TODO: check if the style is already in our list
+	//       (needs operator== defined for line_style)
+	v.push_back(stl);
+	return v.size(); // 1-based !
+}
 	
 }	// end namespace gnash
 

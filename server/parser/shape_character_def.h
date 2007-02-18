@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape_character_def.h,v 1.8 2007/02/14 08:47:12 strk Exp $ */
+/* $Id: shape_character_def.h,v 1.9 2007/02/18 09:50:48 strk Exp $ */
 
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
@@ -25,6 +25,10 @@ namespace gnash {
 	class shape_character_def : public character_def, public tesselate::tesselating_shape
 	{
 	public:
+
+		typedef std::vector<fill_style> FillStyleVect;
+		typedef std::vector<line_style> LineStyleVect;
+
 		shape_character_def();
 		virtual ~shape_character_def();
 
@@ -52,9 +56,10 @@ namespace gnash {
 		void	output_cached_data(tu_file* out, const cache_options& options);
 		void	input_cached_data(tu_file* in);
 
-		const std::vector<fill_style>&	get_fill_styles() const { return m_fill_styles; }
-		const std::vector<line_style>&	get_line_styles() const { return m_line_styles; }
-		const std::vector<path>&	get_paths() const { return m_paths; }
+		const FillStyleVect& get_fill_styles() const { return m_fill_styles; }
+		const LineStyleVect& get_line_styles() const { return m_line_styles; }
+
+		const std::vector<path>& get_paths() const { return m_paths; }
 
 		// morph uses this
 		void	set_bound(const rect& r) { m_bound = r; /* should do some verifying */ }
@@ -65,17 +70,27 @@ namespace gnash {
 			m_paths.push_back(pth);
 		}
 
-		/// Used for programmatically creating shapes
-		void add_fill_style(const fill_style& stl)
-		{
-			m_fill_styles.push_back(stl);
-		}
+		/// \brief
+		/// Add a fill style, possibly reusing an existing
+		/// one if existent.
+		//
+		/// @return the 1-based offset of the fill style,
+		///	either added or found.
+		///	This offset is the one required to properly
+		///	reference it in gnash::path instances.
+		///
+		size_t add_fill_style(const fill_style& stl);
 
-		/// Used for programmatically creating shapes
-		void add_line_style(const line_style& stl)
-		{
-			m_line_styles.push_back(stl);
-		}
+		/// \brief
+		/// Add a line style, possibly reusing an existing
+		/// one if existent.
+		//
+		/// @return the 1-based offset of the line style,
+		///	either added or found.
+		///	This offset is the one required to properly
+		///	reference it in gnash::path instances.
+		///
+		size_t add_line_style(const line_style& stl);
 
 	protected:
 		friend class morph2_character_def;

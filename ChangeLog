@@ -1,3 +1,15 @@
+2007-02-17 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/shape_character_def.{cpp,h}:
+	  Changed signature of add_fill_style and
+	  add_line_style to take into account reuse
+	  of existing styles and to abstract offset
+	  semantic (1-based).
+	* server/parser/BitmapMovieDefinition.cpp:
+	  Update call to add_fill_stle; don't make
+	  assumption about offset of the newly added
+	  style.
+
 2007-02-16 Martin Guy <martinwguy@yahoo.it>
 
 	* doc/C/sources.xml: Correct Debian dev package names.
