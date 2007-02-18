@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.25 2007/02/02 15:50:28 rsavoye Exp $
+# $Id: Makefile.am,v 1.26 2007/02/18 18:36:25 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -23,6 +23,10 @@ if KLASH
 AM_CPPFLAGS= $(KDE_CFLAGS) $(QT_CFLAGS)
 
 plugindir   = $(libdir)/kde3
+kde_servicesdir = $(prefix)/share/services
+rcdir       = $(prefix)/share/apps/klash
+appsdatadir = $(prefix)/share/apps/klash
+
 plugin_LTLIBRARIES= libklashpart.la
 
 libklashpart_la_SOURCES = klash_part.cpp klash_part.h
@@ -32,6 +36,12 @@ libklashpart_la_LDFLAGS = -avoid-version -L$(plugindir)
 else
 libklashpart_la_LDFLAGS = -module -avoid-version -L$(plugindir)
 endif
+
+dist_kde_services_DATA = klash_part.desktop
+dist_rc_DATA = klashpartui.rc
+dist_appsdata_DATA = pluginsinfo
+
+DIST_COMMON = $(dist_appsdata_DATA) $(dist_kde_services_DATA) $(dist_rc_DATA)
 
 BUILT_SOURCES = klash_part.moc klash.moc
 CLEANFILES = klash_part.moc klash.moc

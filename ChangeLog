@@ -1,3 +1,9 @@
+2007-02-18  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* plugin/klash/Makefile.am: Install klashpartui.rc,
+	klash_part.desktop, and pluginsinfo in their correct
+	directories. bug #190821.
+
 2007-02-17 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/shape_character_def.{cpp,h}:
