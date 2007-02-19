@@ -45,6 +45,8 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
+	as_value tmp;
+
 	check_equals(root->get_frame_count(), 5);
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
@@ -69,6 +71,25 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(100, 30);
 	check(!tester.isMouseOverMouseEntity());
 
+	root->get_member("mouseDown", &tmp);
+	check(tmp.is_undefined());
+	root->get_member("mouseUp", &tmp);
+	check(tmp.is_undefined());
+
+	// Note that we are *not* on an active entity !
+	tester.pressMouseButton();
+
+	root->get_member("mouseDown", &tmp);
+	xcheck_equals(tmp.to_number(), 1);
+	root->get_member("mouseUp", &tmp);
+	check(tmp.is_undefined());
+
+	tester.depressMouseButton();
+
+	root->get_member("mouseDown", &tmp);
+	xcheck_equals(tmp.to_number(), 1);
+	root->get_member("mouseUp", &tmp);
+	xcheck_equals(tmp.to_number(), 1);
 
 	tester.advance();
 
@@ -103,5 +124,15 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.movePointerTo(240, 30);
 	check(tester.isMouseOverMouseEntity());
+
+	tester.movePointerTo(340, 30);
+	check(! tester.isMouseOverMouseEntity());
+
+	// Note that we are *not* on an active entity !
+	tester.pressMouseButton();
+
+	root->get_member("mouseDown", &tmp);
+	xcheck_equals(tmp.to_number(), 5);
+
 }
 

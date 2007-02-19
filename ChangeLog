@@ -1,3 +1,10 @@
+2007-02-19 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: attachMovieTest.c,
+	  attachMovieTestRunner.cpp:
+	  Add onMouseDown and onMouseUp handlers to
+	  exported symbol. Confirms bug #19040.
+
 2007-02-19  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/boost.m4: Tweak patch for bug #18788 to work when cross
