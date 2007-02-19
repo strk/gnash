@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape_character_def.h,v 1.9 2007/02/18 09:50:48 strk Exp $ */
+/* $Id: shape_character_def.h,v 1.10 2007/02/19 11:08:23 strk Exp $ */
 
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
@@ -64,34 +64,6 @@ namespace gnash {
 		// morph uses this
 		void	set_bound(const rect& r) { m_bound = r; /* should do some verifying */ }
 
-		/// Used for programmatically creating shapes
-		void add_path(const path& pth)
-		{
-			m_paths.push_back(pth);
-		}
-
-		/// \brief
-		/// Add a fill style, possibly reusing an existing
-		/// one if existent.
-		//
-		/// @return the 1-based offset of the fill style,
-		///	either added or found.
-		///	This offset is the one required to properly
-		///	reference it in gnash::path instances.
-		///
-		size_t add_fill_style(const fill_style& stl);
-
-		/// \brief
-		/// Add a line style, possibly reusing an existing
-		/// one if existent.
-		//
-		/// @return the 1-based offset of the line style,
-		///	either added or found.
-		///	This offset is the one required to properly
-		///	reference it in gnash::path instances.
-		///
-		size_t add_line_style(const line_style& stl);
-
 	protected:
 		friend class morph2_character_def;
 
@@ -99,12 +71,15 @@ namespace gnash {
 		std::vector<fill_style>	m_fill_styles;
 		std::vector<line_style>	m_line_styles;
 		std::vector<path>	m_paths;
+		rect	m_bound;
+
+		/// Free all meshes
+		void clear_meshes();
 
 	private:
 
 		void	sort_and_clean_meshes() const;
 		
-		rect	m_bound;
 
 		// Cached pre-tesselated meshes.
 		mutable std::vector<mesh_set*>	m_cached_meshes;

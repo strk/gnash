@@ -42,7 +42,7 @@ BitmapMovieDefinition::getShapeDef()
 
 	// Create the shape definition
 
-	_shapedef = new shape_character_def();
+	_shapedef = new DynamicShape();
 
 	// Set its boundaries
 

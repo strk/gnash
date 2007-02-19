@@ -872,12 +872,24 @@ static void
 sprite_lineTo(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
-	UNUSED(sprite);
+
+	if ( fn.nargs < 2 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("MovieClip.lineTo() takes two args");
+		);
+		return;
+	}
+
+	float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+	float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+
+	sprite->lineTo(x, y);
 
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.lineTo() not implemented yet");
+		log_warning("MovieClip.lineTo() TESTING");
 		warned=true;
 	}
 }
@@ -886,12 +898,24 @@ static void
 sprite_moveTo(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
-	UNUSED(sprite);
+
+	if ( fn.nargs < 2 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("MovieClip.moveTo() takes two args");
+		);
+		return;
+	}
+
+	float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+	float y = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+
+	sprite->moveTo(x, y);
 
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.moveTo() not implemented yet");
+		log_warning("MovieClip.moveTo() TESTING");
 		warned=true;
 	}
 }
@@ -900,12 +924,45 @@ static void
 sprite_lineStyle(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
-	UNUSED(sprite);
+
+	if ( fn.nargs < 1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("MovieClip.lineStyle(<thickness>, [<rgb>], [<alpha>]) takes at least 1 arg");
+		);
+		return;
+	}
+
+	uint16_t thickness = uint16_t(PIXELS_TO_TWIPS(uint16_t(fclamp(fn.arg(0).to_number(), 0, 255))));
+	uint8_t r = 0;
+	uint8_t g = 0;
+	uint8_t b = 0;
+	uint8_t a = 255;
+
+	if ( fn.nargs > 1 )
+	{
+		// 2^24 is the max here
+		uint32_t rgbval = uint32_t(fclamp(fn.arg(1).to_number(), 0, 16777216));
+		r = uint8_t( (rgbval&0xFF0000) >> 16);
+		g = uint8_t( (rgbval&0x00FF00) >> 8);
+		b = uint8_t( (rgbval&0x0000FF) );
+	}
+
+	if ( fn.nargs > 2 )
+	{
+		float alphaval = fclamp(fn.arg(2).to_number(), 0, 255);
+		a = uint8_t(alphaval);
+	}
+
+	rgba color(r, g, b, a);
+	//log_msg("Color: %s", color.toString().c_str());
+
+	sprite->lineStyle(thickness, color);
 
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.lineStyle() not implemented yet");
+		log_warning("FIXME: MovieClip.lineStyle() TESTING");
 		warned=true;
 	}
 }
@@ -914,12 +971,26 @@ static void
 sprite_curveTo(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
-	UNUSED(sprite);
+
+	if ( fn.nargs < 4 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("MovieClip.curveTo() takes four args");
+		);
+		return;
+	}
+
+	float cx = PIXELS_TO_TWIPS(fn.arg(0).to_number());
+	float cy = PIXELS_TO_TWIPS(fn.arg(1).to_number());
+	float ax = PIXELS_TO_TWIPS(fn.arg(2).to_number());
+	float ay = PIXELS_TO_TWIPS(fn.arg(3).to_number());
+
+	sprite->curveTo(cx, cy, ax, ay);
 
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.curveTo() not implemented yet");
+		log_warning("MovieClip.curveTo() TESTING");
 		warned=true;
 	}
 }
@@ -928,12 +999,13 @@ static void
 sprite_clear(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
-	UNUSED(sprite);
+
+	sprite->clear();
 
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.clear() not implemented yet");
+		log_warning("FIXME: MovieClip.clear() TESTING");
 		warned=true;
 	}
 }
@@ -1541,6 +1613,8 @@ sprite_instance::sprite_instance(
 	m_root(r),
 	m_display_list(),
 	oldDisplayList(),
+	_drawable(new DynamicShape),
+	_drawable_inst(_drawable->create_character_instance(this, 0)),
 	m_action_list(),
 	m_goto_frame_action_list(),
 	m_play_state(PLAY),
@@ -2927,11 +3001,25 @@ void sprite_instance::display()
 	// check if the sprite (and it's childs) needs to be drawn 
 	rect bounds;
 	m_display_list.get_invalidated_bounds(&bounds, true);
+
+	// expand to bounds of _drawable 
+	bounds.expand_to_transformed_rect(get_world_matrix(), _drawable->get_bound());
 	
 	if (gnash::render::bounds_in_clipping_area(bounds))
 	{
-	  m_display_list.display();
-	  clear_invalidated();
+		_drawable->finalize();
+		// TODO: I'd like to draw the definition directly..
+		//       but it seems that the backend insists in
+		//       accessing the *parent* of the character
+		//       passed as "instance" for the drawing.
+		//       When displaying top-level movie this will
+		//       be NULL and gnash will segfault
+		//       Thus, this drawable_instance is basically just
+		//       a container for a parent :(
+		_drawable_inst->display();
+
+		m_display_list.display();
+		clear_invalidated();
 	}
 	  
 	do_display_callback();

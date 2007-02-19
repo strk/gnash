@@ -6,7 +6,7 @@
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
 
-/* $Id: shape_character_def.cpp,v 1.12 2007/02/18 09:50:48 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.13 2007/02/19 11:08:22 strk Exp $ */
 
 #include "shape_character_def.h"
 
@@ -127,16 +127,28 @@ read_line_styles(std::vector<line_style>& styles, stream* in, int tag_type)
 
 
 shape_character_def::shape_character_def()
+	:
+	m_fill_styles(),
+	m_line_styles(),
+	m_paths(),
+	m_bound(),
+	m_cached_meshes()
 {
 }
 
 
-shape_character_def::~shape_character_def()
+void
+shape_character_def::clear_meshes()
 {
     // Free our mesh_sets.
     for (unsigned int i = 0; i < m_cached_meshes.size(); i++) {
 	delete m_cached_meshes[i];
     }
+}
+
+shape_character_def::~shape_character_def()
+{
+	clear_meshes();
 }
 
 
@@ -646,30 +658,6 @@ void	shape_character_def::input_cached_data(tu_file* in)
     }
 }
 
-size_t
-shape_character_def::add_fill_style(const fill_style& stl)
-{
-	typedef FillStyleVect V;
-	V& v=m_fill_styles;
-
-	// TODO: check if the style is already in our list
-	//       (needs operator== defined for fill_style)
-	v.push_back(stl);
-	return v.size(); // 1-based !
-}
-
-size_t
-shape_character_def::add_line_style(const line_style& stl)
-{
-	typedef LineStyleVect V;
-	V& v=m_line_styles;
-
-	// TODO: check if the style is already in our list
-	//       (needs operator== defined for line_style)
-	v.push_back(stl);
-	return v.size(); // 1-based !
-}
-	
 }	// end namespace gnash
 
 

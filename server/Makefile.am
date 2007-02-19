@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.103 2007/02/13 15:19:32 strk Exp $
+# $Id: Makefile.am,v 1.104 2007/02/19 11:08:22 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -57,6 +57,7 @@ libgnashserver_la_SOURCES = \
 	as_object.cpp \
 	as_value.cpp \
 	character.cpp \
+	DynamicShape.cpp	\
 	edit_text_character.cpp \
 	generic_character.cpp \
 	matrix.cpp \
@@ -109,6 +110,7 @@ noinst_HEADERS = \
 	button_character_instance.h \
 	character.h \
 	debugger.h \
+	DynamicShape.h	\
 	dlist.h	\
 	drag_state.h \
 	edit_text_character.h \

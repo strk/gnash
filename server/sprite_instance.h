@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.68 2007/02/16 11:09:41 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.69 2007/02/19 11:08:22 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -33,6 +33,7 @@
 #include "dlist.h" // DisplayList 
 #include "log.h"
 #include "as_environment.h" // for composition
+#include "DynamicShape.h" // for composition
 
 #include <vector>
 #include <list>
@@ -593,6 +594,38 @@ public:
 	/// _target and _target_dot.
 	virtual void set_name(const char* name);
 
+	/// @{ Drawing API
+	
+	void lineStyle(uint16_t thickness, const rgba& color)
+	{
+		_drawable->lineStyle(thickness, color);
+	}
+
+	void moveTo(float x, float y)
+	{
+		_drawable->moveTo(x, y);
+	}
+
+	void lineTo(float x, float y)
+	{
+		set_invalidated();
+		_drawable->lineTo(x, y);
+	}
+
+	void curveTo(float cx, float cy, float ax, float ay)
+	{
+		set_invalidated();
+		_drawable->curveTo(cx, cy, ax, ay);
+	}
+
+	void clear()
+	{
+		set_invalidated();
+		_drawable->clear();
+	}
+
+	/// @} Drawing API
+
 private:
 
 	// Used to assign a name to unnamed (movieclip-only?) instances
@@ -625,6 +658,24 @@ private:
 	/// this latter case).
 	/// It will be used to control actions execution order.
 	DisplayList	oldDisplayList;
+
+	/// The canvas for dynamic drawing
+	//
+	/// WARNING: since DynamicShape is a character_def, which is
+	///          in turn a ref_counted, we'd better keep
+	///          this by intrusive_ptr, even if we're the sole
+	///          owners. The problem is in case a pointer to this
+	///	     instance ever gets passed to some function wrapping
+	///	     it into an intrusive_ptr, in which case the stack
+	///          object will be destroyed, with horrible consequences ...
+	///
+	boost::intrusive_ptr<DynamicShape> _drawable;
+
+	/// The need of an instance here is due to the renderer
+	/// insising on availability a shape_character_def instance
+	/// that has a parent (why?)
+	///
+	boost::intrusive_ptr<character> _drawable_inst;
 
 	ActionList	m_action_list;
 	ActionList	m_goto_frame_action_list;

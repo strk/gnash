@@ -25,7 +25,7 @@
 #include "rect.h" // for composition
 #include "BitmapMovieInstance.h" // for create_instance
 #include "bitmap_character_def.h" // for destructor visibility by intrusive_ptr
-#include "shape_character_def.h" // for destructor visibility by intrusive_ptr
+#include "DynamicShape.h" // for destructor visibility by intrusive_ptr
 
 #include <string>
 #include <memory> // for auto_ptr
@@ -55,7 +55,7 @@ class BitmapMovieDefinition : public movie_definition
 
 	boost::intrusive_ptr<bitmap_character_def> _bitmap;
 
-	boost::intrusive_ptr<shape_character_def> _shapedef;
+	boost::intrusive_ptr<DynamicShape> _shapedef;
 
 	/// Get the shape character definition for this bitmap movie
 	//

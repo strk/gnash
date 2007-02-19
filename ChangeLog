@@ -1,5 +1,17 @@
 2007-02-19 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/shape_character_def.{h,cpp}: removed calls
+	  for dynamic drawing. Use DynamicShape instead.
+	* server/: Makefile.am, DynamicShape.{cpp,h}:
+	  New subclass of shape_character_def to abstract dynami drawing
+	* server/sprite_instance.{cpp,h}:
+	  Implement lineStyle, moveTo, lineTo methods of MovieClip
+	  class. This works by maintaining a DynamicShape member.
+	* server/parser/BitmapMovieDefinition.{cpp,h}: use
+	  a DynamicShape rather then a shape_character_def.
+
+2007-02-19 Sandro Santilli <strk@keybit.net>
+
 	* server/shape.{cpp,h}: new empty() and close()
 	  methods.
 
