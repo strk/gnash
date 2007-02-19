@@ -925,34 +925,34 @@ sprite_lineStyle(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
-	if ( fn.nargs < 1 )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("MovieClip.lineStyle(<thickness>, [<rgb>], [<alpha>]) takes at least 1 arg");
-		);
-		return;
-	}
-
-	uint16_t thickness = uint16_t(PIXELS_TO_TWIPS(uint16_t(fclamp(fn.arg(0).to_number(), 0, 255))));
+	uint16_t thickness = 0;
 	uint8_t r = 0;
 	uint8_t g = 0;
 	uint8_t b = 0;
 	uint8_t a = 255;
 
-	if ( fn.nargs > 1 )
+
+	if ( fn.nargs > 0 )
 	{
-		// 2^24 is the max here
-		uint32_t rgbval = uint32_t(fclamp(fn.arg(1).to_number(), 0, 16777216));
-		r = uint8_t( (rgbval&0xFF0000) >> 16);
-		g = uint8_t( (rgbval&0x00FF00) >> 8);
-		b = uint8_t( (rgbval&0x0000FF) );
+		thickness = uint16_t(PIXELS_TO_TWIPS(uint16_t(fclamp(fn.arg(0).to_number(), 0, 255))));
+
+		if ( fn.nargs > 1 )
+		{
+			// 2^24 is the max here
+			uint32_t rgbval = uint32_t(fclamp(fn.arg(1).to_number(), 0, 16777216));
+			r = uint8_t( (rgbval&0xFF0000) >> 16);
+			g = uint8_t( (rgbval&0x00FF00) >> 8);
+			b = uint8_t( (rgbval&0x0000FF) );
+
+			if ( fn.nargs > 2 )
+			{
+				float alphaval = fclamp(fn.arg(2).to_number(), 0, 255);
+				a = uint8_t(alphaval);
+			}
+		}
+
 	}
 
-	if ( fn.nargs > 2 )
-	{
-		float alphaval = fclamp(fn.arg(2).to_number(), 0, 255);
-		a = uint8_t(alphaval);
-	}
 
 	rgba color(r, g, b, a);
 	//log_msg("Color: %s", color.toString().c_str());
