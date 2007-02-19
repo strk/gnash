@@ -30,7 +30,31 @@
 #define PIXELFORMAT_LUT8
 #define CMAP_SIZE (256*2)
 
+// If defined, an internal software-buffer is used for rendering and is then
+// copied to the video RAM. This avoids flicker and is faster for complex 
+// graphics, as video RAM access is usually slower. 
+// (strongly suggested)
 #define DOUBLE_BUFFER
+
+
+// TODO: Make this configurable via ./configure!
+
+
+// Define this to read from /dev/input/mice (any PS/2 compatbile mouse or
+// emulated by the Kernel) 
+#define USE_MOUSE_PS2
+
+// Define this to support eTurboTouch / eGalax touchscreens. When reading from
+// a serial device, it must be initialized (stty) externally. 
+//#define USE_MOUSE_ETT
+
+#ifdef USE_MOUSE_PS2
+#define MOUSE_DEVICE "/dev/input/mice"
+#endif
+
+#ifdef USE_MOUSE_ETT
+#define MOUSE_DEVICE "/dev/usb/tkpanel0"
+#endif
 
 
 namespace gnash
@@ -93,6 +117,8 @@ class FBGui : public Gui
 
   	int input_fd; /// file descriptor for /dev/input/mice
   	int mouse_x, mouse_y, mouse_btn;
+  	unsigned char mouse_buf[256];
+  	int mouse_buf_size;
 
     struct fb_var_screeninfo var_screeninfo;
   	struct fb_fix_screeninfo fix_screeninfo;
@@ -110,9 +136,14 @@ class FBGui : public Gui
   	
   	/// reverts disable_terminal() changes
   	void enable_terminal();
-  	
+
+#ifdef USE_MOUSE_PS2  	
   	/// Sends a command to the mouse and waits for the response
   	bool mouse_command(unsigned char cmd, unsigned char *buf, int count);
+#endif
+
+    /// Fills the mouse data input buffer with fresh data
+    void read_mouse_data();  	
   	
   	/// Initializes mouse routines
   	bool init_mouse();

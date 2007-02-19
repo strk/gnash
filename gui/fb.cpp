@@ -336,7 +336,7 @@ bool FBGui::run()
 		
 		  usleep(1); // task switch
 		  
-		  check_mouse();
+		  check_mouse(); // TODO: Exit delay loop on mouse events! 
 		  
       struct timeval tv;
       if (!gettimeofday(&tv, NULL))
@@ -465,6 +465,34 @@ void FBGui::enable_terminal()
   fflush(stdout);*/
 }
 
+void FBGui::read_mouse_data()
+{
+  if (input_fd<0) return;   // no mouse available
+  
+  int count;  
+  
+  unsigned char *ptr;
+  
+  ptr = mouse_buf + mouse_buf_size;
+  
+  count = read(input_fd, mouse_buf + mouse_buf_size, 
+    sizeof(mouse_buf) - mouse_buf_size);
+    
+  if (count<=0) return;
+  
+  /*
+  printf("read data: ");
+  int i;
+  for (i=0; i<count; i++) 
+    printf("%02x ", ptr[i]);
+  printf("\n");
+  */
+  
+  mouse_buf_size += count;
+  
+}
+
+#ifdef USE_MOUSE_PS2  	
 bool FBGui::mouse_command(unsigned char cmd, unsigned char *buf, int count) {
   int n;
   
@@ -482,7 +510,9 @@ bool FBGui::mouse_command(unsigned char cmd, unsigned char *buf, int count) {
   return true;
   
 } //command()
+#endif
 
+#ifdef USE_MOUSE_PS2  	
 bool FBGui::init_mouse() 
 {
 
@@ -490,11 +520,10 @@ bool FBGui::init_mouse()
   
 
   // Try to open mouse device, be error tolerant (FD is kept open all the time)
-  // TODO: Make device name configurable
-  input_fd = open("/dev/input/mice", O_RDWR);
+  input_fd = open(MOUSE_DEVICE, O_RDWR);
   
   if (input_fd<0) {
-    log_msg("Could not open /dev/input/mice: %s", strerror(errno));    
+    log_msg("Could not open " MOUSE_DEVICE ": %s", strerror(errno));    
     return false;
   }
   
@@ -535,33 +564,46 @@ bool FBGui::init_mouse()
   
   return true;
 }
+#endif
 
+#ifdef USE_MOUSE_PS2  	
 void FBGui::check_mouse() 
 {
   if (input_fd<0) return;   // no mouse available
   
-  unsigned char buf[3];
   int i;
   int xmove, ymove, btn, btn_changed;
   
-  while ( read(input_fd, buf, 1) == 1 ) {
+  read_mouse_data();
   
-    if (buf[0] & 8 == 0) continue; // bit 3 must be high for the first byte
+  // resync
+  int pos = -1;
+  for (i=0; i<mouse_buf_size; i++)
+  if (mouse_buf[i] & 8) { // bit 3 must be high for the first byte
+    pos = i;
+    break;    
+  }
+  if (pos<0) return; // no sync or no data
+  
+  if (pos>0) {
+    // remove garbage:
+    memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
+    mouse_buf_size -= pos;
+  }
+  
+  
+  if (mouse_buf_size >= 3) {
+  
+    xmove = mouse_buf[1];
+    ymove = mouse_buf[2];
+    btn = mouse_buf[0] & 1;
     
-    if (read(input_fd, buf+1, 2) != 2) continue; // expect total 3 bytes
-    
-    // TODO: The method above can loose data. Use a permanent buffer instead!
-    
-    xmove = buf[1];
-    ymove = buf[2];
-    btn = buf[0] & 1;
-    
-    if (buf[0] & 0x10) xmove = -(256-xmove);
-    if (buf[0] & 0x20) ymove = -(256-ymove);
+    if (mouse_buf[0] & 0x10) xmove = -(256-xmove);
+    if (mouse_buf[0] & 0x20) ymove = -(256-ymove);
     
     ymove *= -1; // vertical movement is upside-down
     
-    //log_msg("x/y %d/%d btn %d", xmove, ymove, btn);
+    log_msg("x/y %d/%d btn %d", xmove, ymove, btn);
 
     // movement    
     mouse_x += xmove;
@@ -586,10 +628,118 @@ void FBGui::check_mouse()
       //log_msg("mouse click! %d", btn);
     }    
 
+    // remove from buffer
+    pos=3;
+    memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
+    mouse_buf_size -= pos;  
+    
   
   }
   
 }
+#endif
+
+#ifdef USE_MOUSE_ETT  	
+bool FBGui::init_mouse()
+{
+  // Try to open mouse device, be error tolerant (FD is kept open all the time)
+  input_fd = open(MOUSE_DEVICE, O_RDWR);
+  
+  if (input_fd<0) {
+    log_msg("Could not open " MOUSE_DEVICE ": %s", strerror(errno));    
+    return false;
+  }
+  
+  unsigned char buf[10], byte;
+
+  if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK)<0) {
+    log_error("Could not set non-blocking mode for touchpad device: %s", strerror(errno));
+    close(input_fd);
+    input_fd=-1;
+    return false; 
+  }
+  
+  // Clear input buffer
+  while ( read(input_fd, buf, sizeof buf) > 0 ) { }
+  
+  mouse_buf_size=0;
+  
+  log_msg("Touchpad enabled.");
+  return true;
+} 
+#endif
+
+#ifdef USE_MOUSE_ETT  	
+void FBGui::check_mouse() 
+{
+  if (input_fd<0) return;   // no mouse available
+  
+  read_mouse_data();
+  
+  // resync
+  int pos = -1;
+  int i;
+  for (i=0; i<mouse_buf_size; i++)
+  if (mouse_buf[i] & 0x80) { 
+    pos = i;
+    break;    
+  }
+  if (pos<0) return; // no sync or no data
+  
+  if (pos>0) {
+    //printf("touchscreen: removing %d bytes garbage!\n", pos);  
+    memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
+    mouse_buf_size -= pos;
+  }
+    
+  // packet complete?
+  while (mouse_buf_size > 4) {
+    /*
+    eTurboTouch version??
+    mouse_btn = ((mouse_buf[0] >> 4) & 1);
+    mouse_x = (mouse_buf[1] << 4) | (mouse_buf[2] >> 3);
+    mouse_y = (mouse_buf[3] << 4) | (mouse_buf[4] >> 3);
+    */
+
+    int new_btn = (mouse_buf[0] & 1);
+    int new_x = (mouse_buf[1] << 7) | (mouse_buf[2]);
+    int new_y = (mouse_buf[3] << 7) | (mouse_buf[4]);
+    
+    /*
+    printf("touchscreen: %02x %02x %02x %02x %02x | status %d, pos: %d/%d\n",
+      mouse_buf[0], mouse_buf[1], mouse_buf[2], mouse_buf[3], mouse_buf[4],   
+      new_btn, new_x, new_y);
+    */
+    
+    
+    new_x = ((new_x*1.0) - 355) / (1702 - 355) * 1536 + 256;
+    new_y = ((new_y*1.0) - 482) / (1771 - 482) * 1536 + 256;
+    
+    
+    new_x = new_x * m_stage_width / 2048;
+    new_y = (2048-new_y) * m_stage_height / 2048;
+    
+    if ((new_x!=mouse_x) || (new_y!=mouse_y)) {
+      float xscale = getXScale();
+      float yscale = getYScale();
+      mouse_x = new_x;
+      mouse_y = new_y;
+      notify_mouse_moved(int(mouse_x / xscale), int(mouse_y / yscale));
+    }
+    
+    if (new_btn != mouse_btn) {
+      mouse_btn = new_btn;      
+      notify_mouse_clicked(mouse_btn, 1);  // mask=?
+    }
+    
+    // remove from buffer
+    pos=5;
+    memmove(mouse_buf, mouse_buf + pos, mouse_buf_size - pos);
+    mouse_buf_size -= pos;    
+  }
+  
+}
+#endif
 
 // end of namespace gnash
 }
