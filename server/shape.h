@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.18 2007/02/14 13:50:30 strk Exp $ */
+/* $Id: shape.h,v 1.19 2007/02/19 10:41:57 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -91,7 +91,14 @@ namespace gnash {
 		///
 		void	reset(float ax, float ay, int fill0, int fill1, int line);
 
+		/// Return true if this path contains no edges
 		bool	is_empty() const;
+
+		/// Return true if this path contains no edges
+		bool	empty() const
+		{
+			return is_empty();
+		}
 
 		bool	point_test(float x, float y);
 
@@ -218,6 +225,9 @@ namespace gnash {
 		{
 			return m_edges[n];
 		}
+
+		/// Close this path with a straight line, if not already closed
+		void close();
 
 	//private:
 

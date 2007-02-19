@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.cpp,v 1.28 2007/02/14 12:48:18 strk Exp $ */
+/* $Id: shape.cpp,v 1.29 2007/02/19 10:41:57 strk Exp $ */
 
 #include "shape.h"
 
@@ -293,6 +293,21 @@ void
 path::drawCurveTo(float cdx, float cdy, float adx, float ady)
 {
 	m_edges.push_back(edge(cdx, cdy, adx, ady)); 
+}
+
+void
+path::close()
+{
+	// nothing to do if path there are no edges
+	if ( m_edges.empty() ) return;
+
+	// Close it with a straight edge if needed
+	const edge& lastedge = m_edges.back();
+	if ( lastedge.m_ax != m_ax || lastedge.m_ay != m_ay )
+	{
+		edge newedge(m_ax, m_ay, m_ax, m_ay);
+		m_edges.push_back(newedge);
+	}
 }
 
 // Utility.
