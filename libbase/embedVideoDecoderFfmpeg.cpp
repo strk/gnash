@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderFfmpeg.cpp,v 1.3 2007/02/09 16:40:42 tgc Exp $
+// $Id: embedVideoDecoderFfmpeg.cpp,v 1.4 2007/02/19 21:45:41 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -24,8 +24,19 @@
 
 #include "embedVideoDecoderFfmpeg.h"
 
-embedVideoDecoderFfmpeg::embedVideoDecoderFfmpeg()
+embedVideoDecoderFfmpeg::embedVideoDecoderFfmpeg() :
+	codec(NULL),
+	cc(NULL),
+	decodedFrame(NULL)
 {
+}
+
+embedVideoDecoderFfmpeg::~embedVideoDecoderFfmpeg()
+{
+	if (cc) avcodec_close(cc);
+
+	if(decodedFrame) delete decodedFrame;
+
 }
 
 void
@@ -46,8 +57,10 @@ embedVideoDecoderFfmpeg::createDecoder(int widthi, int heighti, int deblockingi,
 	// Find the decoder and init the parser
 	if (format == CODEC_H263) {
 		codec = avcodec_find_decoder(CODEC_ID_FLV1);
+#ifdef FFMPEG_VP6
 	} else if (format == CODEC_VP6) {
 		codec = avcodec_find_decoder(CODEC_ID_VP6F);
+#endif
 	} else if (format == CODEC_SCREENVIDEO) {
 		codec = avcodec_find_decoder(CODEC_ID_FLASHSV);
 	} else {
@@ -71,19 +84,13 @@ embedVideoDecoderFfmpeg::createDecoder(int widthi, int heighti, int deblockingi,
 	}
 }
 
-embedVideoDecoderFfmpeg::~embedVideoDecoderFfmpeg()
-{
-	if (decodedFrame) delete decodedFrame;
 
-	if (cc) avcodec_close(cc);
-
-}
 // gnash calls this when it wants you to decode the given videoframe
 image::image_base*
 embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 {
 
-	if (data == NULL) return decodedFrame;
+	if (data == NULL || codec == NULL) return decodedFrame;
 
 	// Allocate a frame to store the decoded frame in
 	AVFrame* frame = avcodec_alloc_frame();

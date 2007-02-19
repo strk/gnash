@@ -239,7 +239,6 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 	AVPacket packet;
 	int rc;
 	bool loop = true;
-	int outputsamples = 0;
 	uint8_t* ptr = new uint8_t[AVCODEC_MAX_AUDIO_FRAME_SIZE];
 	bool ret = true;
 	while (loop) {
@@ -254,7 +253,12 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 				{
 					// Decode audio
 					int frame_size;
+#ifdef FFMPEG_AUDIO2
+					frame_size = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
+					if (avcodec_decode_audio2(so->audioCodecCtx, (int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
+#else
 					if (avcodec_decode_audio(so->audioCodecCtx, (int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
+#endif
 					{
 
 						bool stereo = so->audioCodecCtx->channels > 1 ? true : false;
@@ -323,28 +327,29 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 }
 
 SoundFfmpeg::~SoundFfmpeg() {
-	if (leftOverData && leftOverSize) delete[] leftOverData;
+	if (externalSound) {
+		 if (leftOverData && leftOverSize) delete[] leftOverData;
 
-	if (audioCodecCtx) avcodec_close(audioCodecCtx);
-	audioCodecCtx = NULL;
+		if (audioCodecCtx) avcodec_close(audioCodecCtx);
+		audioCodecCtx = NULL;
 
-	if (formatCtx) {
-		formatCtx->iformat->flags = AVFMT_NOFILE;
-		av_close_input_file(formatCtx);
-		formatCtx = NULL;
-	}
-
-	if (resampleCtx) {
-		audio_resample_close (resampleCtx);
-	}
-
-/*	if (isAttached) {
-		sound_handler* s = get_sound_handler();
-		if (s) {
-			s->detach_aux_streamer(this);
+		if (formatCtx) {
+			formatCtx->iformat->flags = AVFMT_NOFILE;
+			av_close_input_file(formatCtx);
+			formatCtx = NULL;
 		}
-	}*/
 
+		if (resampleCtx) {
+			audio_resample_close (resampleCtx);
+		}
+
+		/*	if (isAttached) {
+			sound_handler* s = get_sound_handler();
+			if (s) {
+				s->detach_aux_streamer(this);
+			}
+		}*/
+	}
 }
 
 void

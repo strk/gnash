@@ -212,13 +212,16 @@ SoundGst::setupDecoder(SoundGst* so)
 
 SoundGst::~SoundGst() {
 
-	gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
-	gst_object_unref (GST_OBJECT (pipeline));
+	if (externalSound && pipeline) {
+		gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
+		gst_object_unref (GST_OBJECT (pipeline));
+	}
 }
 
 void
 SoundGst::loadSound(std::string file, bool streaming)
 {
+	pipeline = NULL;
 	remainingLoops = 0;
 
 	if (connection) {

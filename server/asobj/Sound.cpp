@@ -348,35 +348,35 @@ sound_attachsound(const fn_call& fn)
 		return;
 	}
 
-    // check the import.
-    movie_definition* def = fn.env->get_target()->get_root_movie()->get_movie_definition();
-    assert(def);
-    boost::intrusive_ptr<resource> res = def->get_exported_resource(so->soundName.c_str());
-    if (res == NULL)
+	// check the import.
+	movie_definition* def = fn.env->get_target()->get_root_movie()->get_movie_definition();
+	assert(def);
+	boost::intrusive_ptr<resource> res = def->get_exported_resource(name);
+	if (res == NULL)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-	    log_swferror("import error: resource '%s' is not exported", so->soundName.c_str());
-	    	);
-	    return;
+		log_swferror("import error: resource '%s' is not exported", name);
+			);
+		return;
 	}
 
-    int si = 0;
-    // FIXME: shouldn't we use dynamic_cast here (or rely on sound_sample interface) ?
-    sound_sample_impl* ss = (sound_sample_impl*) res->cast_to_sound_sample();
+	int si = 0;
+	// FIXME: shouldn't we use dynamic_cast here (or rely on sound_sample interface) ?
+	sound_sample_impl* ss = (sound_sample_impl*) res->cast_to_sound_sample();
 
-    if (ss != NULL)
+	if (ss != NULL)
 	{
-	    si = ss->m_sound_handler_id;
+		si = ss->m_sound_handler_id;
 	}
-    else
+	else
 	{
-	    log_error("sound sample is NULL (doesn't cast to sound_sample_impl)");
-	    return;
+		log_error("sound sample is NULL (doesn't cast to sound_sample_impl)");
+		return;
 	}
 
-    // sanity check
-    assert(si >= 0 && si < 1000);
-    so->attachSound(si, name);
+	// sanity check
+	assert(si >= 0 && si < 1000);
+	so->attachSound(si, name);
 }
 
 void

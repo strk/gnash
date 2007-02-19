@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.46 2007/02/14 20:41:48 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.47 2007/02/19 21:45:41 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -830,7 +830,12 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 									0 ,0);	//pts, dts
 
 						int tmp = 0;
+#ifdef FFMPEG_AUDIO2
+						outsize = AVCODEC_MAX_AUDIO_FRAME_SIZE;
+						tmp = avcodec_decode_audio2(sound->cc, (int16_t*)(tmp_raw_buffer), &outsize, frame, framesize);
+#else
 						tmp = avcodec_decode_audio(sound->cc, (int16_t*)(tmp_raw_buffer), &outsize, frame, framesize);
+#endif
 
 						if (bytes_decoded < 0 || tmp < 0 || outsize < 0) {
 							gnash::log_error("Error while decoding MP3-stream. Upgrading ffmpeg/libavcodec might fix this issue.\n");

@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.28 2007/02/09 20:03:15 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.29 2007/02/19 21:45:41 tgc Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -34,7 +34,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   if test x${cross_compiling} = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
       $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec`
-      topdir=`$PKG_CONFIG --cflags-only-I libavcodec | cut -d ' ' -f 2 | sed -e 's:-I::'`
+      topdir=`$PKG_CONFIG --cflags-only-I libavcodec | sed -e 's:-I::' | sed -e 's: *$::'`
     fi
   fi
 
@@ -66,12 +66,23 @@ dnl     if test $ffmpeg -lt 51290; then
 dnl       AC_MSG_ERROR([])
 dnl     fi
 dnl   fi
-  ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | cut -d ' ' -f 8 | tr -d '.'`
+
+  ffmpeg_num_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | cut -d ' ' -f 8 | tr -d '.'`
 dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes], [avfound=no])
-  if test $ffmpeg_version -lt 51290; then
-    AC_MSG_WARN([Wrong avcode version! 51.29.0 or greater required])
+  if test $ffmpeg_num_version -lt 51110; then
+    AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required])
   else
     ffmpeg_version=ok
+  fi
+
+  if test $ffmpeg_num_version -gt 51280; then
+    AC_DEFINE(FFMPEG_AUDIO2, 1, [Define if avcodec_decode_audio2 can be used.])
+  fi
+
+  if test $ffmpeg_num_version -lt 51270; then
+    AC_MSG_WARN([This version of ffmpeg/libavcodec is not able to play VP6 encoded video!])
+  else
+    AC_DEFINE(FFMPEG_VP6, 1, [Define if ffmpeg can play VP6.])
   fi
 
   if test x"${ac_cv_path_ffmpeg_incl}" != x ; then

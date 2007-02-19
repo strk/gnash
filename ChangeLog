@@ -1,3 +1,19 @@
+2007-02-19 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* macros/ffmpeg.m4: The minimum LIBAVCODEC_VERSION is now 51.11.0.
+	  Also we can now handle if VP6 (FFMPEG_VP6) or avcodec_decode_audio2() 
+	  (FFMPEG_AUDIO2) is not supported by the used version of ffmpeg.
+	* backend/sound_handler_sdl.cpp: Added support for FFMPEG_AUDIO2
+	* libbase/embedVideoDecoderFfmpeg.cpp: Made use of the constructor and
+	  deconstructor. Added support for FFMPEG_VP6.
+	* libbase/embedVideoDecoderGst.cpp: Made use of the constructor and
+	  deconstructor.
+	* server/asobj/NetStreamFfmpeg.cpp: Added support for FFMPEG_AUDIO2.
+ 	* server/asobj/Sound.cpp: Use the supplied name when searching for exports.
+	* server/asobj/SoundFfmpeg.cpp: Added support for FFMPEG_AUDIO2.
+	  Made the deconstructor work better.
+	* server/asobj/SoundGst.cpp: Made the deconstructor work better.
+
 2007-02-19 Sandro Santilli <strk@keybit.net>
 
 	* server/: DynamicShape.{cpp,h}, sprite_instance.{cpp,h}:

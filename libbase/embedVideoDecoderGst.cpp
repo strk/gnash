@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderGst.cpp,v 1.1 2007/02/09 16:40:42 tgc Exp $
+// $Id: embedVideoDecoderGst.cpp,v 1.2 2007/02/19 21:45:41 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -24,8 +24,27 @@
 
 #include "embedVideoDecoderGst.h"
 
-embedVideoDecoderGst::embedVideoDecoderGst()
+embedVideoDecoderGst::embedVideoDecoderGst() :
+	pipeline(NULL),
+	input(NULL),
+	inputcaps(NULL),
+	videocaps(NULL),
+	output(NULL),
+	decoder(NULL),
+	colorspace(NULL),
+	decodedFrame(NULL)
+
 {
+}
+
+embedVideoDecoderGst::~embedVideoDecoderGst()
+{
+	if(decodedFrame) delete decodedFrame;
+
+	if (pipeline) {
+		gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
+		gst_object_unref (GST_OBJECT (pipeline));
+	}
 }
 
 void
@@ -138,14 +157,6 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 	gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
 }
 
-embedVideoDecoderGst::~embedVideoDecoderGst()
-{
-	if (decodedFrame) delete decodedFrame;
-
-	gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
-	gst_object_unref (GST_OBJECT (pipeline));
-
-}
 
 // gnash calls this when it wants you to decode the given videoframe
 image::image_base*

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.16 2007/02/14 20:41:48 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.17 2007/02/19 21:45:41 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -543,7 +543,12 @@ bool NetStreamFfmpeg::read_frame()
 			{
 				int frame_size;
 				uint8_t* ptr = (uint8_t*) malloc((AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2);
+#ifdef FFMPEG_AUDIO2
+				frame_size = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
+				if (avcodec_decode_audio2(m_ACodecCtx, (int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
+#else
 				if (avcodec_decode_audio(m_ACodecCtx, (int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
+#endif
 				{
 
 					bool stereo = m_ACodecCtx->channels > 1 ? true : false;
