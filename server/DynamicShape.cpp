@@ -16,10 +16,9 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.3 2007/02/19 21:40:32 strk Exp $ */
+/* $Id: DynamicShape.cpp,v 1.4 2007/02/19 22:51:50 strk Exp $ */
 
 #include "DynamicShape.h"
-#include "log.h"
 
 #include <cfloat>
 #include <algorithm>
@@ -50,8 +49,6 @@ DynamicShape::clear()
 void
 DynamicShape::add_path(const path& pth)
 {
-	log_msg("Adding path with origin(%f,%f), lefFill(%u), rightFill(%u), lineStyle(%u)",
-			pth.m_ax, pth.m_ay, pth.m_fill0, pth.m_fill1, pth.m_line);
 	m_paths.push_back(pth);
 	_currpath = &(m_paths.back());
 	compute_bound(&m_bound);
