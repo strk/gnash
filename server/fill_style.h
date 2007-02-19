@@ -16,7 +16,7 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-/* $Id: fill_style.h,v 1.1 2007/02/13 15:19:32 strk Exp $ */
+/* $Id: fill_style.h,v 1.2 2007/02/19 11:56:21 strk Exp $ */
 
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
@@ -60,6 +60,8 @@ public:
 	/// TODO: use a subclass for this
 	///
 	fill_style(bitmap_character_def* bitmap);
+
+	setSolid(const rgba& color);
 
 	virtual ~fill_style();
 	

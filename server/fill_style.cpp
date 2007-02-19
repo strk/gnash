@@ -447,6 +447,13 @@ fill_style::fill_style(bitmap_character_def* bitmap)
 	m_type = SWF::FILL_CLIPPED_BITMAP;
 }
 
+void
+fill_style::setSolid(const rgba& color)
+{
+	m_type = SWF::FILL_SOLID;
+	m_color = color;
+}
+
 
 // end of namespace
 }
