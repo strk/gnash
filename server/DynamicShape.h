@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: DynamicShape.h,v 1.1 2007/02/19 11:08:22 strk Exp $ */
+/* $Id: DynamicShape.h,v 1.2 2007/02/19 21:40:32 strk Exp $ */
 
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
@@ -50,6 +50,9 @@ public:
 	/// Draw a curve from current position to given one
 	/// using given control points.
 	void curveTo(float cx, float cy, float ax, float ay);
+
+	/// Start drawing with a solid fill
+	void beginFill(const rgba& color);
 
 	/// Close an existing filled path, if any.
 	void endFill();
@@ -102,8 +105,6 @@ private:
 	// for origin, fill and line styles.
 	//
 	void startNewPath();
-
-	path _filledpath;
 
 	path* _currpath;
 

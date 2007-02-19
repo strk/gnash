@@ -858,12 +858,12 @@ static void
 sprite_endFill(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
-	UNUSED(sprite);
+	sprite->endFill();
 
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.endFill() not implemented yet");
+		log_warning("MovieClip.endFill() TESTING");
 		warned=true;
 	}
 }
@@ -1014,12 +1014,30 @@ static void
 sprite_beginFill(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
-	UNUSED(sprite);
+
+	uint8_t r = 0;
+	uint8_t g = 0;
+	uint8_t b = 0;
+	uint8_t a = 255;
+
+	if ( fn.nargs > 0 )
+	{
+		// 2^24 is the max here
+		uint32_t rgbval = uint32_t(fclamp(fn.arg(0).to_number(), 0, 16777216));
+		r = uint8_t( (rgbval&0xFF0000) >> 16);
+		g = uint8_t( (rgbval&0x00FF00) >> 8);
+		b = uint8_t( (rgbval&0x0000FF) );
+
+	}
+
+	rgba color(r, g, b, a);
+
+	sprite->beginFill(color);
 
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.beginFill() not implemented yet");
+		log_warning("MovieClip.beginFill() TESTING");
 		warned=true;
 	}
 }

@@ -16,9 +16,10 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.2 2007/02/19 11:21:58 strk Exp $ */
+/* $Id: DynamicShape.cpp,v 1.3 2007/02/19 21:40:32 strk Exp $ */
 
 #include "DynamicShape.h"
+#include "log.h"
 
 #include <cfloat>
 #include <algorithm>
@@ -49,6 +50,8 @@ DynamicShape::clear()
 void
 DynamicShape::add_path(const path& pth)
 {
+	log_msg("Adding path with origin(%f,%f), lefFill(%u), rightFill(%u), lineStyle(%u)",
+			pth.m_ax, pth.m_ay, pth.m_fill0, pth.m_fill1, pth.m_line);
 	m_paths.push_back(pth);
 	_currpath = &(m_paths.back());
 	compute_bound(&m_bound);
@@ -57,18 +60,8 @@ DynamicShape::add_path(const path& pth)
 void
 DynamicShape::endFill()
 {
-	// Nothing to do if path is already filled
-	if ( _filledpath.empty() ) return;
-
 	// Close the path
-	_filledpath.close();
-
-	// Add this path to the drawed ones
-	add_path(_filledpath);
-
-	// Reset filled path, so next path will be drawn from scratch
-	_filledpath.clear(); 
-	assert(_filledpath.empty());
+	if ( _currpath ) _currpath->close();
 
 	// Remove reference to the "current" path, as
 	// next drawing will happen on a different one
@@ -78,10 +71,22 @@ DynamicShape::endFill()
 	_currfill = 0;
 
 	// TODO: should I also clear _currline ?
+}
 
-	// Mark as changed
-	changed();
+void
+DynamicShape::beginFill(const rgba& color)
+{
+	// Add the new fill style and set as current
+	fill_style style; style.setSolid(color);
 
+	endFill();
+
+	_currfill = add_fill_style(style);
+	// TODO: how to know wheter the fill should be set
+	//       as *left* or *right* fill ?
+	//       A quick test shows that *left* always work fine !
+	path newPath(_x, _y, _currfill, 0, _currline);
+	add_path(newPath);
 }
 
 void

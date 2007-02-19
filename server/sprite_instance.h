@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.69 2007/02/19 11:08:22 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.70 2007/02/19 21:40:32 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -599,6 +599,16 @@ public:
 	void lineStyle(uint16_t thickness, const rgba& color)
 	{
 		_drawable->lineStyle(thickness, color);
+	}
+
+	void beginFill(const rgba& color)
+	{
+		_drawable->beginFill(color);
+	}
+
+	void endFill()
+	{
+		_drawable->endFill();
 	}
 
 	void moveTo(float x, float y)
