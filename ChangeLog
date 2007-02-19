@@ -1,3 +1,8 @@
+2007-02-19  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/boost.m4: Tweak patch for bug #18788 to work when cross
+	configuring.
+
 2007-02-19 Wil Mahan <wmahan+gnu@gmail.com>
 
 	* configure.ac, macros/boost.m4: add check for libboost-date-time
@@ -56,7 +61,7 @@
 
 2007-02-18  Rob Savoye  <rob@bertha.welcomehome.org>
 
-	* plugin/klash/Makefile.am: Install klashpartui.rc,
+	* plugin/.klash/Makefile.am: Install klashpartui.rc,
 	klash_part.desktop, and pluginsinfo in their correct
 	directories. bug #190821.
 

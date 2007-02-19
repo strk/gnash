@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.29 2007/02/19 22:21:13 strk Exp $
+dnl $Id: boost.m4,v 1.30 2007/02/19 22:27:07 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -109,24 +109,27 @@ AC_DEFUN([GNASH_PATH_BOOST],
   AC_LANG_PUSH(C++)
   if test x"${ac_cv_path_boost_lib}" = x; then
     AC_MSG_CHECKING([for Boost thread library])
-      for i in $libslist; do
-        boostnames=`ls -dr $i/libboost?thread*.so 2>/dev/null`
-        for libname in ${boostnames}; do
-      	  if test -f ${libname}; then
-            linkname=`basename ${libname} | sed -e 's/lib//' -e 's/.so//'`
-      	    if test x"$i" != x"/usr/lib"; then
-	            ac_cv_path_boost_lib="-L$i -l${linkname}"
-      	      break
-            else
-      	      ac_cv_path_boost_lib="-l${linkname}"
-      	      break
-            fi
+    for i in $libslist; do
+      boostnames=`ls -dr $i/libboost?thread*.so 2>/dev/null`
+      for libname in ${boostnames}; do
+    	  if test -f ${libname}; then
+          linkname=`basename ${libname} | sed -e 's/lib//' -e 's/.so//'`
+    	    if test x"$i" != x"/usr/lib"; then
+           ac_cv_path_boost_lib="-L$i -l${linkname}"
+    	      break
+          else
+    	      ac_cv_path_boost_lib="-l${linkname}"
+    	      break
           fi
-        done
-        if test x"${ac_cv_path_boost_lib}" != x ; then 
-          break; 
-        fi        
+        fi
       done
+      if test x"${ac_cv_path_boost_lib}" != x ; then 
+        break; 
+      fi        
+    done
+	  if test -f $i/libboost_date_time.a -o $i/libboost_date_time.so; then
+      ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -lboost_date_time"
+    fi
     AC_MSG_RESULT(${ac_cv_path_boost_lib})
   else
     for k in ${boostnames}; do
