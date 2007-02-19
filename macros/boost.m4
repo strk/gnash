@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.28 2007/01/09 00:43:43 rsavoye Exp $
+dnl $Id: boost.m4,v 1.29 2007/02/19 22:21:13 strk Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -142,6 +142,12 @@ AC_DEFUN([GNASH_PATH_BOOST],
   if test x"${ac_cv_path_boost_lib}" = x; then
     AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib="${LIBS}"])
   fi
+
+  dnl In Debian, date-time is currently in a separate package,
+  dnl so check whether it's installed.
+  LIBS="$ac_cv_path_boost_lib $save_LIBS"
+  AC_CHECK_LIB(boost_date_time, main, [boost_date_time="yes"], [boost_date_time="no"])
+
   AC_LANG_POP(C++)
   
   dnl we don't want any boost libraries in LIBS, we prefer to kep it seperate.

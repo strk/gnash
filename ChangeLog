@@ -1,3 +1,8 @@
+2007-02-19 Wil Mahan <wmahan+gnu@gmail.com>
+
+	* configure.ac, macros/boost.m4: add check for libboost-date-time
+	  (see bug #18788).
+
 2007-02-19 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* macros/ffmpeg.m4: The minimum LIBAVCODEC_VERSION is now 51.11.0.
