@@ -54,4 +54,5 @@ FLTK:
 - Firefox plugin and KDE Kpart work.
 
 Framebuffer:
-- Working as output device only, no input devices currently supported.
+- Working with any hi- or truecolor framebuffer device (/dev/fb0). Supports
+  PS/2 compatible mice and eGalax touchscreens.
