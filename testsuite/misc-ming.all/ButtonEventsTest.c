@@ -192,8 +192,8 @@ main(int argc, char **argv)
 	font = loadSWFFontFromFile(font_file);
 
 	add_text_field(mo, "textfield", "_root.msg", "Button events", 10, 0, 5);
-	add_text_field(mo, "textfield2", "_root.msg2", "Key events", 11, 0, 100);
-	add_text_field(mo, "textfield3", "_root.msg3", "Mouse events", 12, 0, 80);
+	add_text_field(mo, "textfield2", "_root.msg2", "Mouse events", 11, 0, 100);
+	add_text_field(mo, "textfield3", "_root.msg3", "Key events", 12, 0, 80);
 
 	/*****************************************************
 	 *
