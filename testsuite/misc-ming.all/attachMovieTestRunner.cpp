@@ -81,8 +81,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	root->get_member("mousedown", &tmp);
 	check_equals(tmp.to_number(), 1);
-	root->get_member("mouseup", &tmp);
-	check(tmp.is_undefined());
+	check ( ! root->get_member("mouseup", &tmp) );
 
 	tester.depressMouseButton();
 
