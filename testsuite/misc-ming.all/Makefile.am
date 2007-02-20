@@ -108,9 +108,6 @@ check_SCRIPTS = \
 # TESTS = \
 # 	DefineEditTextVariableNameTest-Runner 
 
-eventSoundTest1_SOURCES = eventSoundTest1.c
-eventSoundTest1_LDADD = $(MING_LIBS)
-
 definebitsjpeg2_SOURCES = definebitsjpeg2.c
 definebitsjpeg2_LDADD = $(MING_LIBS)
 
@@ -151,6 +148,9 @@ PlaceObject2Test_LDADD = $(MING_LIBS)
 
 RemoveObject2Test_SOURCES = RemoveObject2Test.c
 RemoveObject2Test_LDADD = $(MING_LIBS)
+
+eventSoundTest1_SOURCES = eventSoundTest1.c
+eventSoundTest1_LDADD = $(MING_LIBS)
 
 eventSoundTest1.swf: eventSoundTest1
 	./eventSoundTest1 $(srcdir)/../media/sound1.mp3

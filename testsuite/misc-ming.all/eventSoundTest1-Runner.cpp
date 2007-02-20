@@ -17,7 +17,7 @@
  *
  */ 
 
-#define INPUT_FILENAME "event_sound_test1.swf"
+#define INPUT_FILENAME "eventSoundTest1.swf"
 
 #include "MovieTester.h"
 #include "sprite_instance.h"
