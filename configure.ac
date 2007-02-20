@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.258 2007/02/19 22:21:13 strk Exp $
+dnl $Id: configure.ac,v 1.259 2007/02/20 12:50:26 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1121,7 +1121,7 @@ if test "$sound_handler" = "gst"; then
     fi
       echo "        Gstreamer libs are: $GSTREAMER_LIBS"
   else
-    echo "ERROR: gstreamer sound requested, but no gstreamer found"
+    echo "ERROR: gstreamer sound requested, but no gstreamer 0.10+ found"
     nogo=true
   fi
 fi
