@@ -56,16 +56,19 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Inside bottom-left blue fill
 	tester.movePointerTo(60, 215);
-	xcheck(tester.isMouseOverMouseEntity());
+	check(tester.isMouseOverMouseEntity());
 
 	// Inside cyan clockwise fill
 	tester.movePointerTo(190, 112);
-	xcheck(tester.isMouseOverMouseEntity());
+	check(tester.isMouseOverMouseEntity());
 
 	// Inside green counterclockwise fill
 	tester.movePointerTo(220, 112);
-	xcheck(tester.isMouseOverMouseEntity());
+	check(tester.isMouseOverMouseEntity());
 
+	// Inside red "thick" line
+	tester.movePointerTo(146, 146);
+	xcheck(tester.isMouseOverMouseEntity());
 
 }
 

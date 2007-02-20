@@ -3324,6 +3324,10 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 	MouseEntityFinder finder(p.m_x, p.m_y);
 	m_display_list.visitBackward(finder);
 	character* ch = finder.getEntity();
+	if ( ! ch ) 
+	{
+		ch = _drawable_inst->get_topmost_mouse_entity(p.m_x, p.m_y);
+	}
 
 	if ( ch && can_handle_mouse_event() )
 	{
