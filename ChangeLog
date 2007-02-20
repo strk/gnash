@@ -1,3 +1,18 @@
+2007-02-20 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/gnash.h: Added support for the new test-soundhandler.
+	* testsuite/sound_handler_test.{h,cpp}: Added. A soundhandler for 
+	  testing gnash.
+	* testsuite/Makefile.am: Added the new test-soundhandler.
+	* testsuite/MovieTester.{cpp,h}:  Added support for the new 
+	  test-soundhandler.
+	* testsuite/misc-ming.all/{eventSoundTest1.c,eventSoundTest1-Runner.cpp}:
+	  Added. Tests simple event sounds.
+	* testsuite/misc-ming.all/Makefile.am: Added the eventSoundTest1 
+	  testcase and its runner.
+	* testsuite/media/sound1.mp3: Added. Used in the eventSoundTest1
+	  testcase.
+
 2007-02-20 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: DrawingApi.as => DrawingApiTest.as,

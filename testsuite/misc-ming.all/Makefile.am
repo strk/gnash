@@ -1,6 +1,6 @@
 ## Process this fill with automake to generate Makefile.in
 # 
-# Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+# Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,10 +26,10 @@ abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-ming.all; pwd)
 if ENABLE_MING
 
 CLEANFILES =  \
-      gnash-dbg.log \
-      site.exp.bak \
-      testrun.sum \
-      testrun.log
+    gnash-dbg.log \
+	site.exp.bak \
+	testrun.sum \
+	testrun.log
 
 EXTRA_DIST = VarAndCharClashTest.as \
 	KeyTest.as \
@@ -37,13 +37,13 @@ EXTRA_DIST = VarAndCharClashTest.as \
 
 
 AM_CPPFLAGS = -I.. \
-        -I$(top_srcdir)		\
-        -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/server  \
-        -I$(top_srcdir)/server/parser  \
-        -I$(top_srcdir)/libgeometry \
-        -I$(top_srcdir)/testsuite \
-        $(MING_CFLAGS) \
+	-I$(top_srcdir)		\
+	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/server  \
+	-I$(top_srcdir)/server/parser  \
+	-I$(top_srcdir)/libgeometry \
+	-I$(top_srcdir)/testsuite \
+	$(MING_CFLAGS) \
 	$(NULL)
 
 
@@ -87,6 +87,8 @@ check_PROGRAMS = \
 	loadMovieTest \
 	loadMovieTestRunner \
 	intervalTestRunner \
+	eventSoundTest1 \
+	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
 	$(NULL)
 
@@ -105,6 +107,9 @@ check_SCRIPTS = \
 
 # TESTS = \
 # 	DefineEditTextVariableNameTest-Runner 
+
+eventSoundTest1_SOURCES = eventSoundTest1.c
+eventSoundTest1_LDADD = $(MING_LIBS)
 
 definebitsjpeg2_SOURCES = definebitsjpeg2.c
 definebitsjpeg2_LDADD = $(MING_LIBS)
@@ -146,6 +151,23 @@ PlaceObject2Test_LDADD = $(MING_LIBS)
 
 RemoveObject2Test_SOURCES = RemoveObject2Test.c
 RemoveObject2Test_LDADD = $(MING_LIBS)
+
+eventSoundTest1.swf: eventSoundTest1
+	./eventSoundTest1 $(srcdir)/../media/sound1.mp3
+
+eventSoundTest1_Runner_SOURCES = \
+	eventSoundTest1-Runner.cpp \
+	$(NULL)
+eventSoundTest1_Runner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+eventSoundTest1_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+eventSoundTest1_Runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	eventSoundTest1.swf      \
+	$(NULL)
 
 definebitsjpeg2.swf: definebitsjpeg2
 	./definebitsjpeg2 $(srcdir)/../media/lynch.jpg
@@ -627,6 +649,7 @@ TEST_CASES = \
 	KeyTest-Runner \
 	loadMovieTestRunner \
 	intervalTestRunner \
+	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
 	$(NULL)
 

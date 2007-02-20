@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.84 2007/02/14 20:41:48 tgc Exp $ */
+/* $Id: gnash.h,v 1.85 2007/02/20 16:37:19 tgc Exp $ */
 
 /// \mainpage
 ///
@@ -157,8 +157,8 @@ DSOEXPORT render_handler*	create_render_handler_ogl();
 //DSOEXPORT render_handler*	create_render_handler_cairo(void* cairohandle);
 
 DSOEXPORT sound_handler*	create_sound_handler_sdl();
-DSOEXPORT sound_handler* create_sound_handler_gst();
-
+DSOEXPORT sound_handler*	create_sound_handler_gst();
+DSOEXPORT sound_handler*	create_sound_handler_test();
 class font;
 
 /// For caching precomputed stuff.  Generally of

@@ -65,6 +65,10 @@ MovieTester::MovieTester(const std::string& url)
 		throw GnashException("Could not load movie from "+url);
 	}
 
+	// Create a soundhandler
+	_sound_handler.reset( static_cast<TEST_sound_handler*>(gnash::create_sound_handler_test()));
+	gnash::set_sound_handler(_sound_handler.get());
+
 	_movie_root = &(VM::init(*_movie_def).getRoot());
 
 	// Now complete load of the movie
@@ -186,6 +190,18 @@ MovieTester::getInvalidatedBounds() const
 
 	return pixrange;
 	
+}
+
+int
+MovieTester::soundsStarted()
+{
+	return _sound_handler.get()->test_times_started_all();
+}
+
+int
+MovieTester::soundsStopped()
+{
+	return _sound_handler.get()->test_times_stopped_all();
 }
 
 } // namespace gnash

@@ -22,6 +22,7 @@
 
 #include "Range2d.h"
 #include "gnash.h" // for namespace key
+#include "sound_handler_test.h"
 
 #include <memory> // for auto_ptr
 #include <string> // for auto_ptr
@@ -110,6 +111,12 @@ public:
 	/// handles mouse events
 	bool isMouseOverMouseEntity();
 
+	/// Return the number of times a sound has been stopped.
+	int soundsStopped();
+
+	/// Return the number of times a sound has been started.
+	int soundsStarted();
+
 private:
 
 	gnash::movie_root* _movie_root;
@@ -118,6 +125,7 @@ private:
 
 	gnash::sprite_instance* _movie;
 
+	std::auto_ptr<TEST_sound_handler> _sound_handler;
 };
 
 } // namespace gnash
