@@ -71,25 +71,25 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(100, 30);
 	check(!tester.isMouseOverMouseEntity());
 
-	root->get_member("mouseDown", &tmp);
+	root->get_member("mousedown", &tmp);
 	check(tmp.is_undefined());
-	root->get_member("mouseUp", &tmp);
+	root->get_member("mouseup", &tmp);
 	check(tmp.is_undefined());
 
 	// Note that we are *not* on an active entity !
 	tester.pressMouseButton();
 
-	root->get_member("mouseDown", &tmp);
-	xcheck_equals(tmp.to_number(), 1);
-	root->get_member("mouseUp", &tmp);
+	root->get_member("mousedown", &tmp);
+	check_equals(tmp.to_number(), 1);
+	root->get_member("mouseup", &tmp);
 	check(tmp.is_undefined());
 
 	tester.depressMouseButton();
 
-	root->get_member("mouseDown", &tmp);
-	xcheck_equals(tmp.to_number(), 1);
-	root->get_member("mouseUp", &tmp);
-	xcheck_equals(tmp.to_number(), 1);
+	root->get_member("mousedown", &tmp);
+	check_equals(tmp.to_number(), 1);
+	root->get_member("mouseup", &tmp);
+	check_equals(tmp.to_number(), 1);
 
 	tester.advance();
 
@@ -131,8 +131,8 @@ main(int /*argc*/, char** /*argv*/)
 	// Note that we are *not* on an active entity !
 	tester.pressMouseButton();
 
-	root->get_member("mouseDown", &tmp);
-	xcheck_equals(tmp.to_number(), 5);
+	root->get_member("mousedown", &tmp);
+	check_equals(tmp.to_number(), 5);
 
 }
 
