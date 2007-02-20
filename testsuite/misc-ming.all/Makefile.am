@@ -587,7 +587,7 @@ DrawingApiTestRunner_LDADD = \
 	$(NULL)
 DrawingApiTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
-	DrawingApi.swf	\
+	DrawingApiTest.swf	\
 	$(NULL)
 
 Dejagnu_SOURCES =	\
