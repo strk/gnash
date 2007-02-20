@@ -3576,6 +3576,14 @@ sprite_instance::get_invalidated_bounds(rect* bounds, bool force)
 			"new bounds are: %s",
 			bounds->toString().c_str());
 #endif
+
+	_drawable_inst->get_invalidated_bounds(bounds, force||m_invalidated);
+
+#ifdef DEBUG_INVALIDATED_BOUNDS
+	log_msg("After getting invalidated bounds from _drawable_inst, "
+			"new bounds are: %s",
+			bounds->toString().c_str());
+#endif
 }
 
 const char*

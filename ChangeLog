@@ -1,5 +1,7 @@
 2007-02-20 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (get_invalidated_bounds):
+	  Include bounds of drawable instance.
 	* server/vm/with_stack_entry.h: add non-const
 	  version of object() accessor.
 	* server/vm/ActionExec.{cpp,h}: add getTarget()
