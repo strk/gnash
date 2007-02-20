@@ -1,5 +1,6 @@
 2007-02-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/simple.exp: have CR also break lines.
 	* testsuite/misc-ming.all/attachMovieTestRunner.cpp:
 	  Oops, SWF6 is converting stuff to lowercase, so
 	  we need to get_member( "mousedown"/"mouseup" )
