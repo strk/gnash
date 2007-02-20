@@ -122,6 +122,7 @@ Fileio::fflush()
     if (_stream) {
         return ::fflush(_stream);
     }
+    return -1;
 }
 
 void
@@ -140,6 +141,7 @@ Fileio::fseek(long offset)
     if (_stream) {
         ::fseek(_stream, offset, SEEK_SET);
     }
+    return -1;
 }
 
 int
@@ -149,6 +151,7 @@ Fileio::fseek(long offset, int whence)
     if (_stream) {
         return ::fseek(_stream, offset, whence);
     }
+    return -1;
 }
 
 long
@@ -158,6 +161,7 @@ Fileio::ftell()
     if (_stream) {
         return ::ftell(_stream);
     }
+    return -1;
 }
 
 bool
