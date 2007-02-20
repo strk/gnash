@@ -32,7 +32,8 @@ CLEANFILES =  \
       testrun.log
 
 EXTRA_DIST = VarAndCharClashTest.as \
-	KeyTest.as
+	KeyTest.as \
+	DrawingApiTest.as
 
 
 AM_CPPFLAGS = -I.. \
@@ -86,6 +87,7 @@ check_PROGRAMS = \
 	loadMovieTest \
 	loadMovieTestRunner \
 	intervalTestRunner \
+	DrawingApiTestRunner \
 	$(NULL)
 
 check_SCRIPTS = \
@@ -570,6 +572,24 @@ KeyTest_Runner_DEPENDENCIES = \
 	KeyTest.swf	\
 	$(NULL)
 
+DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
+	$(MAKESWF) -o $@ $(srcdir)/DrawingApiTest.as
+
+DrawingApiTestRunner_SOURCES = \
+	DrawingApiTestRunner.cpp \
+	$(NULL)
+DrawingApiTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+DrawingApiTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+DrawingApiTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	DrawingApi.swf	\
+	$(NULL)
+
 Dejagnu_SOURCES =	\
 	Dejagnu.c	\
 	ming_utils.h				\
@@ -607,6 +627,7 @@ TEST_CASES = \
 	KeyTest-Runner \
 	loadMovieTestRunner \
 	intervalTestRunner \
+	DrawingApiTestRunner \
 	$(NULL)
 
 

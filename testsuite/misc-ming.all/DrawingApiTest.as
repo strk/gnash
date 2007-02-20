@@ -9,9 +9,9 @@
 //
 
 // Can draw both on a dynamically-created movie...
-//createEmptyMovieClip("a", 10);
+createEmptyMovieClip("a", 10);
 // ... or on a statically-created one
-a = _root;
+//a = _root;
 
 with (a)
 {
@@ -60,5 +60,10 @@ with (a)
 	lineTo(230, 120);
 	lineTo(230, 100);
 	endFill();
+
 }
+
+// Make the MovieClip "active" (grabbing mouse events)
+// This allows testing of fill styles and "thick" lines
+a.onRollOver = function() {};
 
