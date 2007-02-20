@@ -47,8 +47,8 @@ addRedSquareExport(SWFMovie mo)
 	SWFMovieClip_add(mc, (SWFBlock)sh);
 	/* This is here just to turn the clip into an active one */
 	add_clip_actions(mc, "onRollOver = function() {};");
-	add_clip_actions(mc, "onMouseDown = function() { _root.mouseDown++; _root.note('mouseDown '+_root.mouseDown); };");
-	add_clip_actions(mc, "onMouseUp = function() { _root.mouseUp++; _root.note('mouseUp '+_root.mouseUp); };");
+	add_clip_actions(mc, "onMouseDown = function() { _root.mouseDown++; _root.note(_name+' mouseDown '+_root.mouseDown); };");
+	add_clip_actions(mc, "onMouseUp = function() { _root.mouseUp++; _root.note(_name+' mouseUp '+_root.mouseUp); };");
 	SWFMovieClip_nextFrame(mc);
 
 	SWFMovie_addExport(mo, (SWFBlock)mc, "redsquare");

@@ -128,6 +128,7 @@ movie_root::notify_mouse_moved(int x, int y)
 
     m_mouse_x = x;
     m_mouse_y = y;
+    notify_mouse_listeners(event_id(event_id::MOUSE_MOVE));
     return fire_mouse_event();
 
 }
@@ -137,12 +138,19 @@ movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
 {
 	assert(testInvariant());
 
-    if (mouse_pressed) {
-        m_mouse_buttons |= button_mask;
-    } else {
-        m_mouse_buttons &= ~button_mask;
-    }
-    return fire_mouse_event();
+	//log_msg("Mouse click notification");
+	if (mouse_pressed)
+	{
+		m_mouse_buttons |= button_mask;
+		notify_mouse_listeners(event_id(event_id::MOUSE_DOWN));
+	}
+	else
+	{
+		m_mouse_buttons &= ~button_mask;
+		notify_mouse_listeners(event_id(event_id::MOUSE_UP));
+	}
+
+	return fire_mouse_event();
 }
 
 void
@@ -225,7 +233,6 @@ generate_mouse_button_events(mouse_button_state* ms)
 				{
 					// onRelease
 					active_entity->on_button_event(event_id::RELEASE);
-					active_entity->on_button_event(event_id::MOUSE_UP);
 					// TODO: have on_button_event return
 					//       wheter the action must trigger
 					//       a redraw.
@@ -314,7 +321,6 @@ generate_mouse_button_events(mouse_button_state* ms)
 			if (active_entity != NULL)
 			{
 				active_entity->on_button_event(event_id::PRESS);
-				active_entity->on_button_event(event_id::MOUSE_DOWN);
 				// TODO: have on_button_event return
 				//       wheter the action must trigger
 				//       a redraw.
@@ -547,19 +553,16 @@ char* movie_root::call_method_args(const char* method_name,
 
 void movie_root::notify_keypress_listeners(key::code k)
 {
-	for (std::vector< as_object* >::iterator iter = m_keypress_listeners.begin();
+	for (ListenerSet::iterator iter = m_keypress_listeners.begin();
 			 iter != m_keypress_listeners.end(); ++iter)
 	{
-		if (*iter == NULL)
-		{
-				continue;
-		}
-
-		boost::intrusive_ptr<as_object>  listener = *iter; // Hold an owning reference.
-
 		// sprite, button & input_edit_text characters
-		character* ch = (character*) listener.get();
-		ch->on_event(event_id(event_id::KEY_PRESS, (key::code) k));
+		// TODO: invoke functions on non-characters !
+		character* ch = dynamic_cast<character*>(iter->get());
+		if ( ch )
+		{
+			ch->on_event(event_id(event_id::KEY_PRESS, k));
+		}
 	}
 
 	assert(testInvariant());
@@ -567,33 +570,45 @@ void movie_root::notify_keypress_listeners(key::code k)
 
 void movie_root::add_keypress_listener(as_object* listener)
 {
-	std::vector< as_object* >::const_iterator end = m_keypress_listeners.end();
-	for (std::vector< as_object* >::iterator iter = m_keypress_listeners.begin();
-			iter != end; ++iter) 
-	{
-		if (*iter == NULL)
-		{
-			// Already in the list.
-			return;
-		}
-	}
-	m_keypress_listeners.push_back(listener);
-
+	m_keypress_listeners.insert(listener);
 	assert(testInvariant());
 }
 
 void movie_root::remove_keypress_listener(as_object* listener)
 {
-	for (std::vector< as_object* >::iterator iter = m_keypress_listeners.begin();
-			iter != m_keypress_listeners.end(); )
+	m_keypress_listeners.erase(listener);
+	assert(testInvariant());
+}
+
+void movie_root::add_mouse_listener(as_object* listener)
+{
+	m_mouse_listeners.insert(listener);
+	assert(testInvariant());
+}
+
+void movie_root::remove_mouse_listener(as_object* listener)
+{
+	m_mouse_listeners.erase(listener);
+	assert(testInvariant());
+}
+
+void movie_root::notify_mouse_listeners(const event_id& event)
+{
+	//log_msg("Notifying " SIZET_FMT " listeners about %s",
+	//		m_mouse_listeners.size(), event.get_function_name().c_str());
+
+	for (ListenerSet::iterator iter = m_mouse_listeners.begin();
+			iter != m_mouse_listeners.end(); ++iter)
 	{
-		if (*iter == listener)
+		// sprite, button & input_edit_text characters
+		// TODO: invoke functions on non-characters !
+		character* ch = dynamic_cast<character*>(iter->get()); 
+		if ( ch )
 		{
-			iter = m_keypress_listeners.erase(iter);
-			continue;
+			ch->on_event(event);
 		}
-		iter++;
 	}
+
 	assert(testInvariant());
 }
 

@@ -464,9 +464,9 @@ button_character_instance::on_button_event(const event_id& event)
 		break;
 
 	case event_id::RELEASE:
-	case event_id::MOUSE_UP:
 	case event_id::ROLL_OVER:
 	case event_id::DRAG_OUT:
+	case event_id::MOUSE_UP:
 		new_state = OVER;
 		break;
 
@@ -477,7 +477,8 @@ button_character_instance::on_button_event(const event_id& event)
 		break;
 
 	default:
-		assert(0);	// missed a case?
+		//assert(0);	// missed a case?
+		log_error("Unhandled button event %s", event.get_function_name().c_str());
 		break;
 	};
 	

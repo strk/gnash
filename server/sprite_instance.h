@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.70 2007/02/19 21:40:32 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.71 2007/02/20 10:00:48 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -110,7 +110,11 @@ public:
 		TAG_DLIST  = 1<<1
 	};
 
-	virtual void has_keypress_event();
+	virtual void has_keypress_event() {
+		m_has_keypress_event = true;
+	}
+
+	virtual void has_mouse_event();
 
 	/// \brief
 	/// Return this sprite's relative root as
@@ -213,6 +217,9 @@ public:
 
 
 	/// Return true if we have any mouse event handlers.
+	//
+	/// NOTE: this function currently does not consider
+	///       general mouse event handlers MOUSE_MOVE, MOUSE
 	virtual bool can_handle_mouse_event() const;
 
 	/// \brief
@@ -709,6 +716,8 @@ private:
 	void increment_frame_and_check_for_loop();
 
 	bool m_has_keypress_event;
+
+	bool m_has_mouse_event;
 
 	/// A container for textfields, indexed by their variable name
 	typedef std::map< std::string, boost::intrusive_ptr<edit_text_character> > TextfieldMap;

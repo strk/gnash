@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.19 2007/02/13 14:21:01 udog Exp $ */
+/* $Id: character.cpp,v 1.20 2007/02/20 10:00:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -296,6 +296,51 @@ character::onreleaseoutside_getset(const fn_call& fn)
 	else // setter
 	{
 		ptr->set_event_handler(event_id::RELEASE_OUTSIDE, fn.arg(0));
+	}
+}
+
+void
+character::onmouseup_getset(const fn_call& fn)
+{
+	character* ptr = ensure_character(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		ptr->get_event_handler(event_id::MOUSE_UP, fn.result);
+	}
+	else // setter
+	{
+		ptr->set_event_handler(event_id::MOUSE_UP, fn.arg(0));
+	}
+}
+
+void
+character::onmousedown_getset(const fn_call& fn)
+{
+	character* ptr = ensure_character(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		ptr->get_event_handler(event_id::MOUSE_DOWN, fn.result);
+	}
+	else // setter
+	{
+		ptr->set_event_handler(event_id::MOUSE_DOWN, fn.arg(0));
+	}
+}
+
+void
+character::onmousemove_getset(const fn_call& fn)
+{
+	character* ptr = ensure_character(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		ptr->get_event_handler(event_id::MOUSE_MOVE, fn.result);
+	}
+	else // setter
+	{
+		ptr->set_event_handler(event_id::MOUSE_MOVE, fn.arg(0));
 	}
 }
 
@@ -646,11 +691,41 @@ character::parent_getset(const fn_call& fn)
 	}
 }
 
+void
+character::set_event_handler(const event_id& id, const as_value& method)
+{
+	_event_handlers[id] = method;
+
+	//log_msg("Setting handler for event %s", id.get_function_name().c_str());
+
+	// Set the character as a listener iff the
+	// kind of event is a KEY or MOUSE one 
+	if ( method.is_function() )
+	{
+		switch (id.m_id)
+		{
+			case event_id::KEY_PRESS:
+				has_keypress_event();
+				break;
+			case event_id::MOUSE_UP:
+			case event_id::MOUSE_DOWN:
+			case event_id::MOUSE_MOVE:
+	//log_msg("Registering character as having mouse events");
+				has_mouse_event();
+				break;
+			default:
+				break;
+		}
+	}
+	// todo: drop the character as a listener
+	//       if it gets no valid handlers for
+	//       mouse or keypress events.
+}
 
 
 } // namespace gnash
 
-// Local Variables:
-// mode: C++
+// local variables:
+// mode: c++
 // indent-tabs-mode: t
-// End:
+// end:

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.49 2007/02/13 14:21:01 udog Exp $ */
+/* $Id: character.h,v 1.50 2007/02/20 10:00:48 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -149,6 +149,12 @@ public:  // TODO: make protected
 	static void onrelease_getset(const fn_call& fn);
 
 	static void onreleaseoutside_getset(const fn_call& fn);
+
+	static void onmouseup_getset(const fn_call& fn);
+
+	static void onmousedown_getset(const fn_call& fn);
+
+	static void onmousemove_getset(const fn_call& fn);
 
 	static void x_getset(const fn_call& fn);
 
@@ -297,16 +303,34 @@ public:
 		return true;
 	}
 
-	void set_event_handler(const event_id& id, const as_value& method)
-	{
-		_event_handlers[id] = method;
-		if (id.m_id == event_id::KEY_PRESS)
-		{
-			has_keypress_event();
-		}
-	}
+	/// Set a function handler for the given event
+	//
+	/// Mark the character as having mouse or keypress event
+	/// handlers if this is the case.
+	///
+	void set_event_handler(const event_id& id, const as_value& method);
 
-		virtual void has_keypress_event() {}
+	/// \brief
+	/// Call this when a character get equipped
+	/// with a keypress event handler
+	//
+	/// TODO: provide a function to *unset*
+	///       the flag. This should happen
+	///       when keypress event handler is
+	///       set to undefined or equivalent..
+	///
+	virtual void has_keypress_event() {}
+
+	/// \brief
+	/// Call this when a character get equipped
+	/// with a mouse event handler (move,down,up)
+	//
+	/// TODO: provide a function to *unset*
+	///       the flag. This should happen
+	///       when all mouse event handlers are
+	///       set to undefined or equivalent..
+	///
+	virtual void has_mouse_event() {}
 
     // Movie interfaces.  By default do nothing.  sprite_instance and some others override these.
     virtual void	display() {}

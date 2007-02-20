@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.36 2007/02/09 13:38:50 strk Exp $ */
+/* $Id: movie_root.h,v 1.37 2007/02/20 10:00:48 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -77,6 +77,9 @@
 #include "drag_state.h" // for composition
 #include "sprite_instance.h" // for inlines
 #include "timers.h" // for composition
+
+#include <vector>
+#include <set>
 
 // Forward declarations
 // none needed
@@ -342,6 +345,10 @@ public:
 	void add_keypress_listener(as_object* listener);
 	void remove_keypress_listener(as_object* listener);
 
+	DSOEXPORT void notify_mouse_listeners(const event_id& event);
+	void add_mouse_listener(as_object* listener);
+	void remove_mouse_listener(as_object* listener);
+
 	/// Get the character having focus
 	//
 	/// @return the character having focus or NULL of none.
@@ -394,7 +401,15 @@ private:
 	typedef std::vector<Timer> TimerList;
 	TimerList _intervalTimers;
 
-	std::vector< as_object* >	m_keypress_listeners;
+	/// A set of as_objects kept by intrusive_ptr
+	typedef std::set< boost::intrusive_ptr<as_object> > ListenerSet;
+
+	/// Objects listening for keypress events
+	ListenerSet m_keypress_listeners;
+
+	/// Objects listening for mouse events (down,up,move)
+	ListenerSet m_mouse_listeners;
+
 	character*              m_active_input_text;
 	float                   m_time_remainder;
 

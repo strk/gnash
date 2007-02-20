@@ -1,6 +1,26 @@
+2007-02-20 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/attachMovieTest.c:
+	  print instance name on mouse down/up events.
+	* server/button_character_instance.cpp (on_button_event):
+	  survive on unhandled event handler. 
+	* server/character.{cpp,h}: add getter_setter for
+	  onMouseDown, onMouseUp and onMouseMove; add has_mouse_event()
+	  method.
+	* server/movie_root.{cpp,h}: 
+	  Add mouse listeners. Change key listeners to use std::set
+	  (more appropriate) and to use intrusive_ptr (safer);
+	  Notify mouse listeners on move and click events, don't
+	  duplicate notification on *active* entity as these events
+	  (mouse up,down,move) are not restricted to entity under the
+	  mouse.
+	* server/sprite_instance.{cpp,h}: (on_event): if a builtin
+	  handler is invoked, don't go look for functions; register
+	  as a mouse listener if have mouse event handlers.
+
 2007-02-20 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
-  * extensions/fileio/fileio.cpp: Fixed some compiler warnings 
+	* extensions/fileio/fileio.cpp: Fixed some compiler warnings 
 
 2007-02-19 Sandro Santilli <strk@keybit.net>
 

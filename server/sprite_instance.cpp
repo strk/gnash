@@ -1457,6 +1457,15 @@ attachMovieClipProperties(as_object& o)
 	gettersetter = new builtin_function(&character::onload_getset, NULL);
 	o.init_property("onLoad", *gettersetter, *gettersetter);
 
+	gettersetter = new builtin_function(&character::onmouseup_getset, NULL);
+	o.init_property("onMouseUp", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::onmousedown_getset, NULL);
+	o.init_property("onMouseDown", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::onmousemove_getset, NULL);
+	o.init_property("onMouseMove", *gettersetter, *gettersetter);
+
 }
 
 static as_object*
@@ -1642,6 +1651,7 @@ sprite_instance::sprite_instance(
 	m_init_actions_executed(),
 	m_as_environment(),
 	m_has_keypress_event(false),
+	m_has_mouse_event(false),
 	_text_variables(),
 	m_sound_stream_id(-1),
 	_target(), // don't initialize now, as parent can be assigned later
@@ -1670,6 +1680,11 @@ sprite_instance::~sprite_instance()
 	if (m_has_keypress_event)
 	{
 		_vm.getRoot().remove_keypress_listener(this);
+	}
+
+	if (m_has_mouse_event)
+	{
+		_vm.getRoot().remove_mouse_listener(this);
 	}
 
 	m_display_list.clear();
@@ -2150,7 +2165,8 @@ void sprite_instance::remove_display_object(const tu_string& name_tu)
 	}
 }
 
-bool sprite_instance::on_event(const event_id& id)
+bool
+sprite_instance::on_event(const event_id& id)
 {
 	testInvariant();
 
@@ -2170,6 +2186,14 @@ bool sprite_instance::on_event(const event_id& id)
 			// every event type.)
 		}
 	}
+
+	// If we called a built-in event handler
+	// we stop here. If we don't do this,
+	// MOUSE_UP, MOUSE_DOWN and MOUSE_MOVE will
+	// be called twice !
+	// Don't know if this is generally valid for every
+	// kind of event, but we do have testcases for this one...
+	if ( called ) return true;
 
 	// Check for member function.
 	{
@@ -2550,11 +2574,6 @@ void sprite_instance::set_variable(const char* path_to_var,
 	    m_as_environment.set_variable(path, val);
 }
 
-void sprite_instance::has_keypress_event()
-{
-	m_has_keypress_event = true;
-}
-
 void sprite_instance::advance_sprite(float delta_time)
 {
 	//GNASH_REPORT_FUNCTION;
@@ -2694,11 +2713,19 @@ void sprite_instance::advance(float delta_time)
 #endif
 		on_event(event_id::LOAD);	// clip onload
 
-		//
 		if (m_has_keypress_event)
 		{
 			_vm.getRoot().add_keypress_listener(this);
 		}
+		// Mouse events listening is done in has_mouse_event directly.
+		// This shows to work better for attachMovieTest.swf,
+		// but might actually be a completely unrelated issue.
+		// In particular, copying event handlers in attachMovie should
+		// be more closely inspected (and need more ad-hoc testcases)
+		//if (m_has_mouse_event)
+		//{
+			//_vm.getRoot().add_mouse_listener(this);
+		//}
 	}
 	
 	advance_sprite(delta_time);
@@ -3324,8 +3351,13 @@ sprite_instance::can_handle_mouse_event() const
 		event_id(event_id::ROLL_OUT),
 		event_id(event_id::DRAG_OVER),
 		event_id(event_id::DRAG_OUT),
-		event_id(event_id::MOUSE_DOWN),
-		event_id(event_id::MOUSE_UP)
+		// MOUSE_{DOWN,UP,MOVE} are handled
+		// differently, in that they are called
+		// reguardles of mouse position
+		// See has_mouse_event
+		//event_id(event_id::MOUSE_DOWN),
+		//event_id(event_id::MOUSE_UP)
+		//event_id(event_id::MOUSE_MOVE)
 	};
 
 	int swfversion =  _vm.getSWFVersion();
@@ -3776,6 +3808,13 @@ sprite_instance::loadMovie(const URL& url)
 	}
 
 	return true;
+}
+
+void
+sprite_instance::has_mouse_event()
+{
+	m_has_mouse_event = true;
+	_vm.getRoot().add_mouse_listener(this);
 }
 
 } // namespace gnash
