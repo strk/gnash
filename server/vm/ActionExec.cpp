@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ActionExec.cpp,v 1.19 2007/02/13 19:36:34 rsavoye Exp $ */
+/* $Id: ActionExec.cpp,v 1.20 2007/02/20 20:05:41 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -388,6 +388,20 @@ ActionExec::fixStackUnderrun(size_t required)
 	//);
 
 	env.padStack(_initial_stack_size, missing);
+}
+
+as_object*
+ActionExec::getTarget()
+{
+	if ( ! with_stack.empty() )
+	{
+		//return const_cast<as_object*>(with_stack.back().object());
+		return with_stack.back().object();
+	}
+	else
+	{
+		return env.get_target();
+	}
 }
 
 } // end of namespace gnash

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.36 2007/02/10 01:30:32 rsavoye Exp $ */
+/* $Id: ASHandlers.cpp,v 1.37 2007/02/20 20:05:41 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2191,7 +2191,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         debugger.callStackPush(function_name);
 	debugger.matchBreakPoint(function_name, true);
 #endif
-	as_value result = call_method(function, &env, env.get_target(),
+	as_value result = call_method(function, &env, thread.getTarget(),
 				  nargs, env.get_top_index() - 2);
 
 	//log_msg("Function's result: %s", result.to_string());

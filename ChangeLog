@@ -1,5 +1,16 @@
 2007-02-20 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/with_stack_entry.h: add non-const
+	  version of object() accessor.
+	* server/vm/ActionExec.{cpp,h}: add getTarget()
+	  method to properly set "this" pointer for function
+	  calls.
+	* server/vm/ASHandlers.cpp (ActionCallFunction):
+	  Properly set the "this" pointer by fetching it
+	  from ActionExec "thread" (looks in 'with' stack).
+
+2007-02-20 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/with.as: add test for function
 	  call in 'with' context (fails!).
 	* testsuite/misc-ming.all/eventSoundTest1-Runner.cpp:

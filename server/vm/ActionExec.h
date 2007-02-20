@@ -159,38 +159,6 @@ public:
 	///
 	ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal);
 
-#if 0
-	/// Create an execution thread for a function call.
-	//
-	/// @param abuf
-	///	the action code
-	///
-	/// @param newEnv
-	///	the execution environment (variables scope, stack etc.)
-	///
-	/// @param nStartPC
-	///	where to start execution (offset from start of action code)
-	///
-	/// @param nExecBytes
-	///	Number of bytes to run this is probably a redundant
-	///	information, as an ActionEnd should tell us when to stop.
-	///	We'll keep this parameter as an SWF integrity checker.
-	///
-	/// @param nRetval
-	///	where to return a value, if this is a function call (??)
-	///
-	/// @param initial_with_stack
-	///	the 'with' stack to use
-	///
-	/// @param nIsFunction2
-	///	wheter the given action code is actually a Function2
-	///	
-	ActionExec(const action_buffer& abuf, as_environment& newEnv,
-		size_t nStartPC, size_t nExecBytes, as_value* nRetval,  
-		const std::vector<with_stack_entry>& initial_with_stack,
-		bool nIsFunction2);
-#endif
-
 	/// Is this execution thread a function2 call ?
 	bool isFunction2() { return _function_var==2; }
 
@@ -303,6 +271,20 @@ public:
 	///	True if the member was found, false otherwise.
 	///
 	bool getObjectMember(as_object& obj, const std::string& name, as_value& val);
+
+	/// Get current target.
+	//
+	/// This function returns top 'with' stack entry, if any.
+	/// Main use for this function is for calling methods and
+	/// properly setting the "this" pointer. 
+	///
+	/// TODO:
+	/// A better, cleaner and less error-prone approach
+	/// would be providing a callFunction() method in
+	/// ActionExec. This will likely help debugger too
+	/// 
+	///
+	as_object* getTarget();
 
 	/// Execute.
 	void operator() ();

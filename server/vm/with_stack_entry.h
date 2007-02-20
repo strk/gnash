@@ -63,6 +63,11 @@ public:
 		return _object.get();
 	}
 
+	as_object* object() 
+	{
+		return _object.get();
+	}
+
 private:
 
 	boost::intrusive_ptr<as_object>	_object;
