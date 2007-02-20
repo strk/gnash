@@ -71,12 +71,12 @@ main(int /*argc*/, char** /*argv*/)
 	int sounds = 1;
 	while (frame < 21) {
 //		check_equals(root->get_current_frame(), frame);
-		check_equals(tester.soundsStarted(), sounds);
+		xcheck_equals(tester.soundsStarted(), sounds);
 		tester.advance();
 		frame++;
 
 //		check_equals(root->get_current_frame(), frame);
-		check_equals(tester.soundsStopped(), sounds);
+		xcheck_equals(tester.soundsStopped(), sounds);
 		tester.advance();
 		frame++;
 		sounds++;		
