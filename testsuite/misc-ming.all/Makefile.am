@@ -195,6 +195,9 @@ root_stop_testrunner_SOURCES = \
 root_stop_testrunner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
+root_stop_testrunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' 
 root_stop_testrunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	root_stop_test.swf      \
@@ -461,6 +464,9 @@ RollOverOutTest_Runner_SOURCES = \
 RollOverOutTest_Runner_LDADD = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
+RollOverOutTest_Runner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' 
 RollOverOutTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	RollOverOutTest.swf	\

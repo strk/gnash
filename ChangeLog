@@ -1,5 +1,8 @@
 2007-02-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am,
+	  RollOverOutTest-Runner.cpp, root_stop_testrunner.cpp:
+	  Allow run of test runners from external dirs.
 	* configure.ac: report failign gstreamer detection
 	  to refer to failign 0.10 or higher gstreamer 
 	  detection.
