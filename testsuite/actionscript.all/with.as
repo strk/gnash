@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.7 2007/01/12 10:59:48 strk Exp $";
+rcsid="$Id: with.as,v 1.8 2007/02/20 19:31:30 strk Exp $";
 
 #include "check.as"
 
@@ -104,3 +104,16 @@ with(o) { with(o) { with(o) { with(o) { with(o) { with(o) { with(o) { with(0) {
 }}}}}}}}}}}}}}}}}
 check_equals(found17, undefined); 
 #endif
+
+//---------------------------------------------------------
+// Test function calls in 'with' context
+//---------------------------------------------------------
+
+var name = "timeline";
+get_name = function() { return this.name; }; 
+var obj1 = { name: "obj1", get_name: get_name }; 
+check_equals(get_name(), "timeline");
+with(obj1)
+{
+	check_equals(get_name(), "obj1");
+}
