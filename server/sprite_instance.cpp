@@ -2016,6 +2016,14 @@ void sprite_instance::do_actions()
 {
 	testInvariant();
 
+	IF_VERBOSE_ACTION(
+		log_action("Executing %u actions in frame %u/%u"
+			" of sprite %s",
+			m_action_list.size(),
+			m_current_frame+1,
+			m_def->get_frame_count(), getTargetPath().c_str());
+	);
+
 	execute_actions(m_action_list);
 	assert(m_action_list.empty());
 

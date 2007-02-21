@@ -1,5 +1,7 @@
 2007-02-21 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (do_actions): report actions
+	  execution with -va.
 	* server/vm/ASHandlers.cpp: Store number of arguments
 	  into an unsigned integer. Fixes an abort with a malformed
 	  SWF.
