@@ -45,12 +45,15 @@ public:
 	{
 	}
 
-	/// Execute this tag
+	/// Execute this tag, whatever it is.
 	virtual void execute(sprite_instance* /*m*/)
 	{
 	}
 
-	/// Execute this tag but only if controls the DisplayList 
+	/// Execute this tag but only if it's a "state" tag.
+	//
+	/// State tags include all tags except action tags.
+	///
 	virtual void execute_state(sprite_instance* /*m*/)
 	{
 	}
