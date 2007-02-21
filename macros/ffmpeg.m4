@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.31 2007/02/21 17:41:11 tgc Exp $
+dnl $Id: ffmpeg.m4,v 1.32 2007/02/21 19:18:45 tgc Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -67,14 +67,12 @@ dnl       AC_MSG_ERROR([])
 dnl     fi
 dnl   fi
 
-  ffmpeg_num_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | sed -e "s%[^0-9]%%g"`
-  ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | sed -e "s%[^0-9.]%%g"`
+  ffmpeg_num_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | sed -e "s%[[^0-9]]%%g"`
+  ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | sed -e "s%[[^0-9.]]%%g"`
 
   if test x"${ffmpeg_version}" = x ; then
-    ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${topdir}/avcodec.h | sed -e "s%[^0-9.]%%g"`
-    ffmpeg_num_version=`$EGREP "define LIBAVCODEC_BUILD " ${topdir}/avcodec.h | sed -e "s%[^0-9]%%g"`
-    AC_MSG_RESULT(${ffmpeg_version})
-    AC_MSG_RESULT(${ffmpeg_num_version})
+    ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${topdir}/avcodec.h | sed -e "s%[[^0-9.]]%%g"`
+    ffmpeg_num_version=`$EGREP "define LIBAVCODEC_BUILD " ${topdir}/avcodec.h | sed -e "s%[[^0-9]]%%g"`
   fi
 
 dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes], [avfound=no])

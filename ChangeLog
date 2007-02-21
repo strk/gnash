@@ -1,5 +1,11 @@
 2007-02-21 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
+	* backend/sound_handler_{gst,sdl}.cpp: Removed newline from warnings, and 
+	  added more user help.
+	* macros/ffmpeg.m4: Yet another go at bug #16663.
+
+2007-02-21 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
 	* configure.ac, macros/ffmpeg.m4: Another go at bug #16663.
 	* backend/sound_handler_gst.cpp: Added warnings when using fluendos
 	  mp3 plugin for gstreamer, since it doesn't support soundstreams.
