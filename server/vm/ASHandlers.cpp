@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.37 2007/02/20 20:05:41 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.38 2007/02/21 17:13:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2180,7 +2180,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 			);
 		}
 	}
-	int	nargs = (int)env.top(1).to_number();
+	unsigned nargs = unsigned(env.top(1).to_number());
 
 	thread.ensureStack(2+nargs); // func name, nargs, args
 
@@ -2273,7 +2273,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
 			classname.c_str());
 	);
 
-	int	nargs = (int) env.pop().to_number();
+	unsigned nargs = unsigned(env.pop().to_number());
 
 	thread.ensureStack(nargs); // previous 2 entries popped
 
@@ -2666,7 +2666,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     as_object *obj = obj_value.to_object();
 
     // Get number of arguments
-    int nargs = static_cast<int>(env.top(2).to_number());
+    unsigned nargs = unsigned(env.top(2).to_number());
 
     thread.ensureStack(3+nargs); // actual args
 
@@ -2743,7 +2743,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 
 	as_value method_name = env.pop().to_string();
 	as_value obj_val = env.pop();
-	int nargs = (int)env.pop().to_number();
+	unsigned nargs = unsigned(env.pop().to_number());
 
 	thread.ensureStack(nargs); // previous 3 entries popped
 
@@ -3010,7 +3010,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	//cerr << " name:" << name << endl;
 
 	// Get number of arguments.
-	int nargs = code.read_int16(i);
+	unsigned nargs = code.read_int16(i);
 	i += 2;
 
 	//cerr << " nargs:" << nargs << endl;
@@ -3030,7 +3030,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	func->set_function2_flags(flags);
 
 	// Get the register assignments and names of the arguments.
-	for (int n = 0; n < nargs; n++)
+	for (unsigned n = 0; n < nargs; n++)
 	{
 		uint8 arg_register = code[i];
 		++i;
@@ -3174,13 +3174,13 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	//cerr << " name:" << name << endl;
 
 	// Get number of arguments.
-	int nargs = code.read_int16(i);
+	unsigned nargs = code.read_int16(i);
 	i += 2;
 
 	//cerr << " nargs:" << nargs << endl;
 
 	// Get the names of the arguments.
-	for (int n = 0; n < nargs; n++)
+	for (unsigned n = 0; n < nargs; n++)
 	{
 		const char* arg = code.read_string(i);
 		//cerr << " arg" << n << " : " << arg << endl;
