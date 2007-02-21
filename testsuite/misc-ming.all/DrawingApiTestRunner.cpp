@@ -17,7 +17,7 @@
  *
  */ 
 
-#define INPUT_FILENAME "DrawingApi.swf"
+#define INPUT_FILENAME "DrawingApiTest.swf"
 
 #include "MovieTester.h"
 #include "sprite_instance.h"
