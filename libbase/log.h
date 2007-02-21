@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.h,v 1.41 2007/01/30 02:02:28 rsavoye Exp $ */
+/* $Id: log.h,v 1.42 2007/02/21 20:22:59 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -175,6 +175,7 @@ DSOEXPORT void log_msg(const char* fmt, ...) __attribute__((format (printf, 1, 2
 DSOEXPORT void log_error(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 DSOEXPORT void log_warning(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 DSOEXPORT void log_trace(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
+DSOEXPORT void log_debug(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 DSOEXPORT void log_action(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 DSOEXPORT void log_parse(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
 DSOEXPORT void log_security(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
@@ -186,6 +187,7 @@ DSOEXPORT void log_msg(const char* fmt, ...);
 DSOEXPORT void log_error(const char* fmt, ...);
 DSOEXPORT void log_warning(const char* fmt, ...);
 DSOEXPORT void log_trace(const char* fmt, ...);
+DSOEXPORT void log_debug(const char* fmt, ...);
 DSOEXPORT void log_action(const char* fmt, ...);
 DSOEXPORT void log_parse(const char* fmt, ...);
 DSOEXPORT void log_security(const char* fmt, ...);
@@ -239,22 +241,22 @@ public:
     // Only print function tracing messages when tmultiplewo -v
     // options have been supplied. 
     __Host_Function_Report__(void) {
-	log_trace("entering");
+	log_debug("entering");
     }
 
     __Host_Function_Report__(char *_func) {
 	func = _func;
-	log_trace("%s enter", func);
+	log_debug("%s enter", func);
     }
 
     __Host_Function_Report__(const char *_func) {
 	func = _func;
-	log_trace("%s enter", func);
+	log_debug("%s enter", func);
     }
 
     ~__Host_Function_Report__(void) {
 	if (LogFile::getDefaultInstance().getVerbosity() >= TRACELEVEL+1) {
-	    log_trace("returning");
+	    log_debug("returning");
 	}
     }
 };
@@ -265,10 +267,10 @@ public:
 #define GNASH_REPORT_RETURN
 #else
 #define GNASH_REPORT_FUNCTION \
-    log_trace("entering")
+    log_debug("entering")
 
 #define GNASH_REPORT_RETURN \
-    log_trace("returning")
+    log_debug("returning")
 #endif
 
 }

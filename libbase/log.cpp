@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.cpp,v 1.43 2007/02/05 00:06:51 nihilus Exp $ */
+/* $Id: log.cpp,v 1.44 2007/02/21 20:22:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -183,6 +183,24 @@ log_trace(const char* fmt, ...)
     tmp[BUFFER_SIZE-1] = '\0';
     
     dbglogfile << "TRACE: " << tmp << endl;
+    
+    va_end (ap);
+}
+
+void
+log_debug(const char* fmt, ...)
+{
+    LogFile& dbglogfile = LogFile::getDefaultInstance();
+
+    va_list ap;
+    char tmp[BUFFER_SIZE];
+    
+    va_start (ap, fmt);
+    //vsprintf (tmp, fmt, ap);
+    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+    tmp[BUFFER_SIZE-1] = '\0';
+    
+    dbglogfile << "DEBUG: " << tmp << endl;
     
     va_end (ap);
 }
@@ -597,7 +615,7 @@ LogFile::operator << (const char *str)
     _logentry += ": ";
 
     // See if we have the TRACE keyword
-    if (strstr(str, "TRACE:")) {
+    if (strstr(str, "DEBUG:")) {
 	_trace = true;
     }	  
 

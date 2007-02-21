@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.44 2007/02/14 09:41:38 tgc Exp $ */
+/* $Id: Global.cpp,v 1.45 2007/02/21 20:22:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -100,7 +100,7 @@ as_global_trace(const fn_call& fn)
     // @@ Nothing needs special treatment,
     //    as_value::to_string() will take care of everything
     const char* arg0 = fn.arg(0).to_string();
-    log_msg("%s\n", arg0);
+    log_trace("%s", arg0);
 }
 
 

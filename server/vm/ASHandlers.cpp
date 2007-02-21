@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.38 2007/02/21 17:13:44 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.39 2007/02/21 20:22:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1215,9 +1215,7 @@ SWFHandlers::ActionTrace(ActionExec& thread)
 
     thread.ensureStack(1); 
 
-    // strk: why not using pop() ?
-    dbglogfile << env.top(0).to_string() << endl;
-    env.drop(1);
+    log_trace(env.pop().to_string());
 }
 
 void
