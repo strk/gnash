@@ -33,6 +33,7 @@ CLEANFILES =  \
 
 EXTRA_DIST = VarAndCharClashTest.as \
 	KeyTest.as \
+	gotoFrame2Test.as \
 	DrawingApiTest.as
 
 
@@ -94,6 +95,7 @@ check_PROGRAMS = \
 
 check_SCRIPTS = \
 	VarAndCharClashTest-Runner \
+	gotoFrame2Test-Runner \
 	timeline_var_test-Runner \
 	place_object_testrunner \
 	move_object_testrunner \
@@ -103,6 +105,7 @@ check_SCRIPTS = \
 	consecutive_goto_frame_testrunner \
 	multi_doactions_and_goto_frame_testrunner \
 	action_execution_order_testrunner \
+	gotoFrame2Test-Runner \
 	$(NULL)
 
 # TESTS = \
@@ -578,7 +581,7 @@ intervalTestRunner_DEPENDENCIES = \
 # Uses a low frame rate to test immediate redraw on key event
 KeyTest.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/KeyTest.as 
 	$(MAKESWF) -o $@ ../Dejagnu.swf $(srcdir)/../media/green.swf $(srcdir)/KeyTest.as
-
+#
 KeyTest_Runner_SOURCES = \
 	KeyTest-Runner.cpp \
 	$(NULL)
@@ -593,6 +596,15 @@ KeyTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	KeyTest.swf	\
 	$(NULL)
+
+gotoFrame2Test.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/gotoFrame2Test.as 
+	$(MAKESWF) -o $@ -i../Dejagnu.swf:dejagnu $(srcdir)/../actionscript.all/dejagnu_so_init.as \
+		$(srcdir)/gotoFrame2Test.as 
+
+gotoFrame2Test-Runner: $(srcdir)/../generic-testrunner.sh gotoFrame2Test.swf
+	sh $< $(top_builddir) gotoFrame2Test.swf > $@
+	chmod 755 $@
+
 
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
 	$(MAKESWF) -o $@ $(srcdir)/DrawingApiTest.as
@@ -651,6 +663,7 @@ TEST_CASES = \
 	intervalTestRunner \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
+	gotoFrame2Test-Runner \
 	$(NULL)
 
 

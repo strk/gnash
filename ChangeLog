@@ -1,7 +1,12 @@
+2007-02-21 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: Makefile.am, gotoFrame2Test.as:
+	  Stubbed Udo's test as Ming source and build rule and test runner.
+
 2007-02-21 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
-  * testsuite/samples/GotoAndPlayTest.{as,swf}: Testcase for
-    gotoAndPlay() bug  
+	* testsuite/samples/GotoAndPlayTest.{as,swf}: Testcase for
+	  gotoAndPlay() bug  
 
 2007-02-21 Sandro Santilli <strk@keybit.net>
 
