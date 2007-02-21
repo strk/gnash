@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.17 2007/02/19 21:45:41 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.18 2007/02/21 14:51:01 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -113,11 +113,11 @@ void NetStreamFfmpeg::close()
 
 	// When closing gnash before playback is finished, the soundhandler 
 	// seems to be removed before netstream is destroyed.
-	/*sound_handler* s = get_sound_handler();
+	sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
 		s->detach_aux_streamer((void*) NULL);
-	}*/
+	}
 
 	if (m_Frame) av_free(m_Frame);
 	m_Frame = NULL;

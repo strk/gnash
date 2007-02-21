@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.29 2007/02/19 21:45:41 tgc Exp $
+dnl $Id: ffmpeg.m4,v 1.30 2007/02/21 14:51:01 tgc Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -68,9 +68,17 @@ dnl     fi
 dnl   fi
 
   ffmpeg_num_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | cut -d ' ' -f 8 | tr -d '.'`
+  ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | cut -d ' ' -f 8`
+
+  if test x"${ffmpeg_version}" = x ; then
+    ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${topdir}/avcodec.h | cut -d ' ' -f 9`
+    ffmpeg_num_version=`$EGREP "define LIBAVCODEC_BUILD " ${topdir}/avcodec.h | cut -d ' ' -f 9`
+  fi
+
 dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes], [avfound=no])
   if test $ffmpeg_num_version -lt 51110; then
     AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required])
+    ffmpeg_version=
   else
     ffmpeg_version=ok
   fi

@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.259 2007/02/20 12:50:26 strk Exp $
+dnl $Id: configure.ac,v 1.260 2007/02/21 14:51:00 tgc Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1148,6 +1148,7 @@ if test "$sound_handler" = "sdl"; then
     if test x"$mp3_decoder" = x"ffmpeg"; then
       if test x${ffmpeg_version} != xok; then
          echo "WARNING: You have version ${ffmpeg_version} of ffmpeg installed.\
+This version of ffmpeg may not work!\
 Version 51.29.0 or newer is highly recommended"
       fi
       if test x"$FFMPEG_LIBS" != x; then

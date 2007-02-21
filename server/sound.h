@@ -97,8 +97,13 @@ namespace gnash {
 		/// Insert ourself into the movie.
 		void	read(movie_definition* m, int handler_id, long start);
 
+		/// StartStreamSound is a "state" tag.
+		void	execute_state(sprite_instance* m);
 
-		void	execute(sprite_instance* m);
+		void execute(sprite_instance* m)
+		{
+			execute_state(m);
+		}
 	};
 
 }

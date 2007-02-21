@@ -132,7 +132,7 @@ start_stream_sound_tag::read(movie_definition* m, int handler_id, long start)
 
 
 void
-start_stream_sound_tag::execute(sprite_instance* m)
+start_stream_sound_tag::execute_state(sprite_instance* m)
 {
 	using globals::s_sound_handler;
 	if (s_sound_handler)

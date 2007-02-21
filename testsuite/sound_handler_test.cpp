@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: sound_handler_test.cpp,v 1.1 2007/02/20 16:37:19 tgc Exp $
+// $Id: sound_handler_test.cpp,v 1.2 2007/02/21 14:51:01 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -169,6 +169,8 @@ void	TEST_sound_handler::play_sound(int sound_handle, int loop_count, int offset
 	sound->loop_count = loop_count;
 
 	++soundsPlaying;
+	sounddata->started++;
+	started_all++;
 	sounddata->m_active_sounds.push_back(sound);
 
 }
@@ -199,6 +201,9 @@ void	TEST_sound_handler::stop_sound(int sound_handle)
 				soundsPlaying--;
 			}
 		}
+		sounddata->stopped++;
+		stopped_all++;
+
 	}
 
 }

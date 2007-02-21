@@ -343,12 +343,12 @@ SoundFfmpeg::~SoundFfmpeg() {
 			audio_resample_close (resampleCtx);
 		}
 
-		/*	if (isAttached) {
+		if (isAttached) {
 			sound_handler* s = get_sound_handler();
 			if (s) {
 				s->detach_aux_streamer(this);
 			}
-		}*/
+		}
 	}
 }
 
