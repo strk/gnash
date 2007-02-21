@@ -1356,7 +1356,6 @@
 	<emphasis>==</emphasis> to check for equality. When possible, use of the
 	<emphasis>check_equals()</emphasis> macro is preferred over <emphasis>check()</emphasis>
 	because it shows what the actual result was in case of a failure. 
-	DejaGnu.
       </para>
       
       <para>
@@ -1366,15 +1365,16 @@
       </para>
       
       <para>
-	Test units are built by running <emphasis>make TestName.swf</emphasis>.
-	This will use TestName.as as source. To build a "visual" tracing
-	version you'd run <emphasis>make TestName.vswf</emphasis>.
+	Test units are built by running <emphasis>make TestName-v#.swf</emphasis>.
+	This will use TestName.as as source and the value of # as target version.
+	Allowed target version are from 5 to 8 (inclusive).
       </para>
       
       <para>
 	Note that if you get a syntax error from the compiler, the line
 	number will refer to the pre-processed file. This file is called
-	<emphasis>TestName.as.pp</emphasis> and it's not thrown away by
+	<emphasis>TestName.as.pp</emphasis> or <emphasis>TestName-v#.swf.frame#.pp</emphasis>
+	(depending on Ming version) and it's not thrown away by
 	<emphasis>makeswf</emphasis> to make debugging easier.
       </para>
 
