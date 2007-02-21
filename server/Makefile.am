@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.104 2007/02/19 11:08:22 strk Exp $
+# $Id: Makefile.am,v 1.105 2007/02/21 13:22:37 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -68,6 +68,7 @@ libgnashserver_la_SOURCES = \
 	sprite_instance.cpp \
 	swf/TagLoadersTable.cpp	\
 	swf/tag_loaders.cpp \
+	swf/DefineFontAlignZonesTag.cpp \
 	swf_function.cpp \
 	video_stream_instance.cpp \
 	StreamProvider.cpp \
@@ -138,6 +139,7 @@ noinst_HEADERS = \
 	swf.h \
 	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
+	swf/DefineFontAlignZonesTag.h \
 	swf_event.h \
 	swf_function.h \
 	tesselate.h \

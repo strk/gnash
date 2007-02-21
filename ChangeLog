@@ -1,5 +1,15 @@
 2007-02-21 Sandro Santilli <strk@keybit.net>
 
+	* server/Makefile.am,
+	  server/swf/DefineFontAlignZonesTag.{cpp,h}:
+	  Initial implementation of DefineFontAlignZones
+	  tag loader (unfinished).
+	* server/impl.cpp: use unfinished loader for
+	  DEFINEFONTALIGNZONES.
+	* server/stream.h: add skip_to_tag_end() method.
+
+2007-02-21 Sandro Santilli <strk@keybit.net>
+
 	* server/font.{cpp,h}, server/impl.cpp,
 	  server/swf/tag_loaders.{cpp,h}:
 	  Add support for DEFINEFONT3 tag (not much done,

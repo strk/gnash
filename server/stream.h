@@ -129,6 +129,12 @@ namespace gnash {
 			set_position(curpos+num);
 		}
 
+		/// Discard all bytes up to end of tag
+		void skip_to_tag_end()
+		{
+			set_position(get_tag_end_position());
+		}
+
 	private:
 		int _current_tag_length;
 

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.95 2007/02/21 11:35:51 strk Exp $ */
+/* $Id: impl.cpp,v 1.96 2007/02/21 13:22:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,6 +52,7 @@
 #include "sprite_instance.h"
 #include "VM.h"
 #include "BitmapMovieDefinition.h"
+#include "DefineFontAlignZonesTag.h"
 
 #include <string>
 #include <map>
@@ -217,7 +218,9 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::FILEATTRIBUTES, file_attributes_loader); // 69
 	register_tag_loader(SWF::PLACEOBJECT3, fixme_loader); // 70
 	register_tag_loader(SWF::IMPORTASSETS2, fixme_loader); // 71
-	register_tag_loader(SWF::DEFINEALIGNZONES, fixme_loader); // 73
+
+	register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader); // 73
+
 	register_tag_loader(SWF::CSMTEXTSETTINGS, fixme_loader); // 74
 	register_tag_loader(SWF::DEFINEFONT3, define_font_loader); // 75
 	register_tag_loader(SWF::METADATA, metadata_loader); // 77
