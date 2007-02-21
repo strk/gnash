@@ -5,6 +5,11 @@
 
 var temp = _currentframe;
 
+if (was_here) {
+  trace("NOTE: Frame 2 has been executed again!!");
+}
+was_here=true;
+
 if (temp!=2) {
  
   trace("UNRESOLVED: _currentframe reports frame "+temp+", can't continue test");
