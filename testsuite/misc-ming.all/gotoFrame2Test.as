@@ -1,7 +1,7 @@
 // gotoAndPlay() testcase
 // Source file provided for reference
 
-// This code is in frame #2 of a 3-frame file!
+// This code is in frame #2 of a 2-frame file!
 
 ++counter;
 
@@ -13,7 +13,10 @@ check_equals(counter, 1);
 // this would emit a function call
 //gotoAndPlay(temp);
 
-// this emits a GOTOFRAME2 tag
+// this would emit a GOTOFRAME tag
+//gotoFrame(2);
+
+// this emits a GOTOFRAME2 (GOTOEXPRESSION) tag
 gotoFrame(temp);
 
 check_equals(_currentframe, temp);
