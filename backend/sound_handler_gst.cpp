@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.30 2006/11/17 19:24:57 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.31 2007/02/21 17:41:11 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -322,8 +322,10 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 
 		gst_element->decoder = gst_element_factory_make ("mad", NULL);
 		if (gst_element->decoder == NULL) gst_element->decoder = gst_element_factory_make ("ffdec_mp3", NULL);
-		if (gst_element->decoder == NULL) gst_element->decoder = gst_element_factory_make ("flump3dec", NULL);
-
+		if (gst_element->decoder == NULL) {
+			gst_element->decoder = gst_element_factory_make ("flump3dec", NULL);
+			if (gst_element->decoder != NULL) gnash::log_warning("Fluendos mp3 plugin does not support flash streaming sounds.");
+		}
 		// Check if the element was correctly created
 		if (!gst_element->decoder) {
 			gnash::log_error("A gstreamer mp3-decoder element could not be created\n");
