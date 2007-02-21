@@ -59,7 +59,18 @@ namespace gnash {
 		void read(stream* in, int tag_type,
 			movie_definition* m, const sound_sample_impl* sam);
 
-		void	execute(sprite_instance* m);
+		/// StartSound is a "state" tag.
+		void	execute_state(sprite_instance* m);
+
+		/// This implementation of 'execute' should likely
+		/// be the default one.
+		void execute(sprite_instance* m)
+		{
+			execute_state(m);
+		}
+
+		/// TODO: provide execute_reverse ?
+		/// (for StartSound would StopSound and vice-versa)
 	};
 
 	/// SWF Tag SoundStreamBlock (19) 

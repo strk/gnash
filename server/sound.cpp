@@ -97,9 +97,11 @@ start_sound_tag::read(stream* in, int /* tag_type */, movie_definition* m,
 
 
 void
-start_sound_tag::execute(sprite_instance* /* m */)
+start_sound_tag::execute_state(sprite_instance* /* m */)
 {
 	using globals::s_sound_handler;
+
+	//GNASH_REPORT_FUNCTION;
 
 	if (s_sound_handler)
 	{

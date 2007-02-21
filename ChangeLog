@@ -1,5 +1,8 @@
 2007-02-21 Sandro Santilli <strk@keybit.net>
 
+	* server/sound.{h,cpp}: made start_sound_tag a "state"
+	  tag. This seems to fixes eventSoundTest1.swf, altoguth
+	  it's runner still fails (a bug in the tester, most likely).
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp:
 	  Fixed input filename (sorry guys).
 
