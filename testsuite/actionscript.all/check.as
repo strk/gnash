@@ -55,6 +55,14 @@
 #endif
 
 //
+// Use to get stuff in the testsuite/media.
+// Example:
+//
+//   getUrl( MEDIA(green.swf) );
+//
+#define MEDIA(x) MEDIADIR + "/" + #x
+
+//
 // Use check(<expression>)
 //
 #define check(expr)  \
