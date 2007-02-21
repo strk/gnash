@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.94 2007/02/14 22:48:55 strk Exp $ */
+/* $Id: impl.cpp,v 1.95 2007/02/21 11:35:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -189,7 +189,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader); // 45
 	register_tag_loader(SWF::DEFINEMORPHSHAPE, define_shape_morph_loader);
 	register_tag_loader(SWF::FRAMETAG,	fixme_loader); // 47
-	register_tag_loader(SWF::DEFINEFONT2,	define_font_loader);
+	register_tag_loader(SWF::DEFINEFONT2,	define_font_loader); // 48
 	register_tag_loader(SWF::GENCOMMAND,	fixme_loader); // 49
 	register_tag_loader(SWF::DEFINECOMMANDOBJ, fixme_loader); // 50
 	register_tag_loader(SWF::CHARACTERSET,  fixme_loader); // 51
@@ -219,7 +219,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::IMPORTASSETS2, fixme_loader); // 71
 	register_tag_loader(SWF::DEFINEALIGNZONES, fixme_loader); // 73
 	register_tag_loader(SWF::CSMTEXTSETTINGS, fixme_loader); // 74
-	register_tag_loader(SWF::DEFINEFONT3, fixme_loader); // 75
+	register_tag_loader(SWF::DEFINEFONT3, define_font_loader); // 75
 	register_tag_loader(SWF::METADATA, metadata_loader); // 77
 	register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
 	register_tag_loader(SWF::DEFINESHAPE4, fixme_loader); // 83

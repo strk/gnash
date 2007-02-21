@@ -99,8 +99,8 @@ namespace gnash {
 	}
 
 	/// \brief
-	/// A 'font' definition as read from SWF::DefineFont or
-	/// SWF::DefineFont2 tags.
+	/// A 'font' definition as read from SWF::DefineFont,
+	/// SWF::DefineFont2 or SWF::DefineFont3 tags.
 	/// Includes definitions from SWF::DefineFontInfo tags
 	///
 	class font : public resource
@@ -186,8 +186,8 @@ namespace gnash {
 	private:
 		void	read_code_table(stream* in);
 
-		/// Read a DefineFont2 tag
-		void readDefineFont2(stream* in, movie_definition* m);
+		/// Read a DefineFont2 or DefineFont3 tag
+		void readDefineFont2_or_3(stream* in, movie_definition* m);
 
 		// Read a DefineFont tag
 		void readDefineFont(stream* in, movie_definition* m);

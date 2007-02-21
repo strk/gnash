@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.75 2007/02/14 22:48:55 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.76 2007/02/21 11:35:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -707,7 +707,7 @@ void define_shape_morph_loader(stream* in, tag_type tag, movie_definition* m)
 void	define_font_loader(stream* in, tag_type tag, movie_definition* m)
     // Load a DefineFont or DefineFont2 tag.
 {
-    assert(tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2); // 10 || 48
+    assert(tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2 || tag == SWF::DEFINEFONT3 ); // 10 || 48 || 75
 
     uint16_t	font_id = in->read_u16();
 		
@@ -726,7 +726,7 @@ void	define_font_loader(stream* in, tag_type tag, movie_definition* m)
 // See description in header
 void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
 {
-	assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2); 
+	assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2);
 
 	uint16_t font_id = in->read_u16();
 		

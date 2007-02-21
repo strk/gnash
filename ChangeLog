@@ -1,5 +1,14 @@
 2007-02-21 Sandro Santilli <strk@keybit.net>
 
+	* server/font.{cpp,h}, server/impl.cpp,
+	  server/swf/tag_loaders.{cpp,h}:
+	  Add support for DEFINEFONT3 tag (not much done,
+	  as Alexis report it to be equal to DEFINEFONT2 
+	  in definition - needs support of DEFINEALIGNZONES
+	  tag to be fully supported.
+
+2007-02-21 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am, gotoFrame2Test.as:
 	  Stubbed Udo's test as Ming source and build rule and test runner.
 

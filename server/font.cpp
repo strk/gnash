@@ -112,8 +112,8 @@ namespace gnash {
 		}
 		else
 		{
-			assert (tag == SWF::DEFINEFONT2);
-			readDefineFont2(in, m);
+			assert (tag == SWF::DEFINEFONT2 || tag == SWF::DEFINEFONT3);
+			readDefineFont2_or_3(in, m);
 		}
 	}
 
@@ -167,11 +167,11 @@ namespace gnash {
 		}
 	}
 
-	// Read a DefineFont2 tag
-	void font::readDefineFont2(stream* in, movie_definition* m)
+	// Read a DefineFont2 or DefineFont3 tag
+	void font::readDefineFont2_or_3(stream* in, movie_definition* m)
 	{
 		IF_VERBOSE_PARSE (
-		log_parse("reading DefineFont2");
+		log_parse("reading DefineFont2 or DefineFont3");
 		);
 
 		bool	has_layout = (in->read_uint(1) != 0);
