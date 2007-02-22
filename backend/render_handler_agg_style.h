@@ -81,7 +81,7 @@ public:
   image_accessor_clip_transp(const PixelFormat& pixf)  
   {
     agg::image_accessor_clip<PixelFormat>::image_accessor_clip(pixf, 
-      agg::rgba8_pre(255, 0, 0, 0).premultiply());
+      agg::rgba8_pre(255, 0, 0, 0));
   }
 };
 
@@ -143,6 +143,7 @@ public:
     if (!m_cx.is_identity())      
     for (unsigned int i=0; i<len; i++) {
       m_cx.transform(span->r, span->g, span->b, span->a);
+      span->premultiply();
       ++span;
     }
   }
@@ -201,23 +202,23 @@ public:
       mat.m_[0][1], mat.m_[1][1], 
       mat.m_[0][2], mat.m_[1][2]);
       
+    m_cx = cx;
             
-    // Built gradient lookup table
+    // Build gradient lookup table
     m_gradient_lut.remove_all(); 
     
     for (int i=0; i<fs.get_color_stop_count(); i++) {
     
       const gradient_record gr = fs.get_color_stop(i); 
+      rgba trans_color = m_cx.transform(gr.m_color);
       
-      m_gradient_lut.add_color(gr.m_ratio/255.0, agg::rgba8(gr.m_color.m_r, 
-        gr.m_color.m_g, gr.m_color.m_b, gr.m_color.m_a));
+      m_gradient_lut.add_color(gr.m_ratio/255.0, agg::rgba8_pre(trans_color.m_r, 
+        trans_color.m_g, trans_color.m_b, trans_color.m_a));
         
     } // for
     
     m_gradient_lut.build_lut();
     
-    m_cx = cx;
-
   } // agg_style_gradient constructor
 
 
@@ -229,14 +230,6 @@ public:
   void generate_span(color_type* span, int x, int y, unsigned len) 
   {
     m_sg.generate(span, x, y, len);
-
-    // Apply color transform
-    // TODO: Check if this can be optimized
-    if (!m_cx.is_identity())      
-    for (unsigned int i=0; i<len; i++) {
-      m_cx.transform(span->r, span->g, span->b, span->a);
-      ++span;
-    }
   }
   
 private:
@@ -308,7 +301,7 @@ public:
 	// See server/styles.h comments about when NULL return is possible.
 	// Don't warn here, we already warn at parse-time
         //log_msg("WARNING: add_bitmap called with bi=NULL");
-        add_color(agg::rgba8(0,0,0,0));
+        add_color(agg::rgba8_pre(0,0,0,0));
         return;
       }
 
@@ -377,7 +370,7 @@ public:
     
       // tiled, nearest neighbor method (faster)   
 
-      typedef agg::pixfmt_rgb24 PixelFormat;
+      typedef agg::pixfmt_rgb24_pre PixelFormat;
       typedef agg::span_allocator<PixelFormat> span_allocator_type;
       typedef agg::wrap_mode_repeat wrap_type;
       typedef agg::image_accessor_wrap<PixelFormat, wrap_type, wrap_type> img_source_type; 
@@ -400,7 +393,7 @@ public:
 
       // clipped, nearest neighbor method (faster)   
 
-      typedef agg::pixfmt_rgb24 PixelFormat;
+      typedef agg::pixfmt_rgb24_pre PixelFormat;
       typedef agg::span_allocator<PixelFormat> span_allocator_type;
       typedef image_accessor_clip_transp<PixelFormat> img_source_type; 
       typedef agg::span_interpolator_linear_subdiv<agg::trans_affine> interpolator_type;
@@ -421,7 +414,7 @@ public:
 
       // tiled, bilinear method (better quality)   
 
-      typedef agg::pixfmt_rgb24 PixelFormat;
+      typedef agg::pixfmt_rgb24_pre PixelFormat;
       typedef agg::span_allocator<PixelFormat> span_allocator_type;
       typedef agg::wrap_mode_repeat wrap_type;
       typedef agg::image_accessor_wrap<PixelFormat, wrap_type, wrap_type> img_source_type; 
@@ -442,7 +435,7 @@ public:
 
       // clipped, bilinear method (better quality)   
 
-      typedef agg::pixfmt_rgb24 PixelFormat;
+      typedef agg::pixfmt_rgb24_pre PixelFormat;
       typedef agg::span_allocator<PixelFormat> span_allocator_type;
       typedef image_accessor_clip_transp<PixelFormat> img_source_type; 
       typedef agg::span_interpolator_linear_subdiv<agg::trans_affine> interpolator_type;
@@ -465,7 +458,7 @@ public:
     
       // tiled, nearest neighbor method (faster)   
 
-      typedef agg::pixfmt_rgba32 PixelFormat;
+      typedef agg::pixfmt_rgba32_pre PixelFormat;
       typedef agg::span_allocator<PixelFormat> span_allocator_type;
       typedef agg::wrap_mode_repeat wrap_type;
       typedef agg::image_accessor_wrap<PixelFormat, wrap_type, wrap_type> img_source_type; 
@@ -488,7 +481,7 @@ public:
 
       // clipped, nearest neighbor method (faster)   
 
-      typedef agg::pixfmt_rgba32 PixelFormat;
+      typedef agg::pixfmt_rgba32_pre PixelFormat;
       typedef agg::span_allocator<PixelFormat> span_allocator_type;
       typedef image_accessor_clip_transp<PixelFormat> img_source_type; 
       typedef agg::span_interpolator_linear_subdiv<agg::trans_affine> interpolator_type;
@@ -509,7 +502,7 @@ public:
 
       // tiled, bilinear method (better quality)   
 
-      typedef agg::pixfmt_rgba32 PixelFormat;
+      typedef agg::pixfmt_rgba32_pre PixelFormat;
       typedef agg::span_allocator<PixelFormat> span_allocator_type;
       typedef agg::wrap_mode_repeat wrap_type;
       typedef agg::image_accessor_wrap<PixelFormat, wrap_type, wrap_type> img_source_type; 
@@ -530,7 +523,7 @@ public:
 
       // clipped, bilinear method (better quality)   
 
-      typedef agg::pixfmt_rgba32 PixelFormat;
+      typedef agg::pixfmt_rgba32_pre PixelFormat;
       typedef agg::span_allocator<PixelFormat> span_allocator_type;
       typedef image_accessor_clip_transp<PixelFormat> img_source_type; 
       typedef agg::span_interpolator_linear_subdiv<agg::trans_affine> interpolator_type;
@@ -556,7 +549,7 @@ public:
       typedef agg::gradient_x gradient_func_type;
       //typedef agg::gradient_repeat_adaptor<gradient_func_type> gradient_adaptor_type;
       typedef gradient_func_type gradient_adaptor_type;
-      typedef agg::gradient_lut<agg::color_interpolator<agg::rgba8>, 256> color_func_type;
+      typedef agg::gradient_lut<agg::color_interpolator<color_type>, 256> color_func_type;
       typedef agg::span_gradient<color_type,
                                  interpolator_type,
                                  gradient_adaptor_type,
@@ -582,7 +575,7 @@ public:
       typedef agg::span_interpolator_linear<agg::trans_affine> interpolator_type;
       typedef agg::gradient_radial gradient_func_type;
       typedef gradient_func_type gradient_adaptor_type;
-      typedef agg::gradient_lut<agg::color_interpolator<agg::rgba8>, 256> color_func_type;
+      typedef agg::gradient_lut<agg::color_interpolator<color_type>, 256> color_func_type;
       typedef agg::span_gradient<color_type,
                                  interpolator_type,
                                  gradient_adaptor_type,

@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.57 2007/02/13 13:56:35 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.58 2007/02/22 10:21:02 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -357,7 +357,7 @@ public:
 	// that can later be passed to fill_styleX_bitmap(), to set a
 	// bitmap fill style.
 	{	   
-	  return new agg_bitmap_info<agg::pixfmt_rgb24> (im->m_width, im->m_height,
+	  return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (im->m_width, im->m_height,
       im->m_pitch, im->m_data, 24);
     assert(0); 
 	}
@@ -370,7 +370,7 @@ public:
 	//
 	// This version takes an image with an alpha channel.
 	{
-	  return new agg_bitmap_info<agg::pixfmt_rgba32> (im->m_width, im->m_height,
+	  return new agg_bitmap_info<agg::pixfmt_rgba32_pre> (im->m_width, im->m_height,
       im->m_pitch, im->m_data, 32); 
 	}
 
@@ -384,7 +384,7 @@ public:
 	{
 	  // bitmaps currently not supported! - return dummy for fontlib
 	  unsigned char dummy=0;
-	  return new agg_bitmap_info<agg::pixfmt_rgb24> (0, 0, 0, &dummy, 24);
+	  return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (0, 0, 0, &dummy, 24);
 	}
 
   gnash::bitmap_info*	create_bitmap_info_alpha(int /*w*/, int /*h*/, uint8_t* /*data*/)
@@ -553,7 +553,7 @@ public:
 
 	  // clear the stage using the background color
     if ( ! _clipbounds.isNull() )    
-      clear_framebuffer(_clipbounds, agg::rgba8(background_color.m_r,
+      clear_framebuffer(_clipbounds, agg::rgba8_pre(background_color.m_r,
   		  background_color.m_g, background_color.m_b,
   		  background_color.m_a));
     	  
@@ -692,7 +692,7 @@ public:
   	ras.add_path(stroke);
 
   	// Set the color and render the scanlines
-  	ren_sl.color(agg::rgba8(color.m_r, color.m_g, color.m_b, color.m_a));
+  	ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
   	agg::render_scanlines(ras, sl, ren_sl);
 
 	} // draw_line_strip
@@ -963,7 +963,7 @@ public:
       rasc.filling_rule(agg::fill_even_odd);
     else
       rasc.filling_rule(agg::fill_non_zero);
-  
+//printf("even_odd=%d\n",even_odd);  
       
     // tell AGG what styles are used
     fcount = fill_styles.size();
@@ -1020,11 +1020,11 @@ public:
 
         case SWF::FILL_SOLID:
         default:
-        {    
+        {            
           rgba color = cx.transform(fill_styles[fno].get_color());
-          
+//printf("fill style %d: solid fill (%d, %d, %d, %d);\n", fno, color.m_r, color.m_g, color.m_b, color.m_a);          
           // add the color to our self-made style handler (basically just a list)
-          sh.add_color(agg::rgba8(color.m_r, color.m_g, color.m_b, color.m_a));
+          sh.add_color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
         } 
         
       } // switch
@@ -1037,6 +1037,7 @@ public:
     int current_subshape = 0; 
 
     for (pno=0; pno<pcount; pno++) {
+//printf("pno=%d\n", pno);    
     
       const path &this_path = paths[pno];
       agg::path_storage path;
@@ -1049,15 +1050,22 @@ public:
         // Skip this path as it is not part of the requested sub-shape.
         continue;
       }
-        
+
+      if ((this_path.m_fill0==0) && (this_path.m_fill1==0)) {
+        // Skip this path as it contains no fill style
+        continue;
+      }
+      
       // Tell the rasterizer which styles the following path will use.
       // The good thing is, that it already supports two fill styles out of
       // the box. 
       // Flash uses value "0" for "no fill", whereas AGG uses "-1" for that. 
       rasc.styles(this_path.m_fill0-1, this_path.m_fill1-1);
+//printf("rasc.styles(%d, %d);\n", this_path.m_fill0-1, this_path.m_fill1-1);      
       
       // starting point of path
-      path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);      
+      path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
+//printf("path.move_to(%f, %f)\n", this_path.m_ax*xscale, this_path.m_ay*yscale);            
       
       ecount = this_path.m_edges.size();
       edge_count += ecount;
@@ -1070,16 +1078,26 @@ public:
         else
           path.curve3(this_edge.m_cx*xscale, this_edge.m_cy*yscale,
                       this_edge.m_ax*xscale, this_edge.m_ay*yscale);
+                      
+/*        if (this_edge.is_straight())
+          printf("path.line_to(%f, %f)\n", this_edge.m_ax*xscale, this_edge.m_ay*yscale);
+        else
+          printf("path.curve3(%f, %f, %f, %f)\n", this_edge.m_cx*xscale, this_edge.m_cy*yscale,
+                      this_edge.m_ax*xscale, this_edge.m_ay*yscale);
+*/                      
+                      
         
       }
       
       // add path to the compound rasterizer
-      rasc.add_path(curve); 
+      rasc.add_path(curve);
+//printf("rasc.add_path(curve);\n");       
     
     }
     //log_msg("%d edges\n", edge_count);
     
     // render!
+//printf("agg::render_scanlines_compound_layered(rasc, sl, rbase, alloc, sh);\n");    
     agg::render_scanlines_compound_layered(rasc, sl, rbase, alloc, sh);
     
   } // draw_shape
@@ -1331,7 +1349,7 @@ public:
       
       
       ras.add_path(stroke);
-      ren_sl.color(agg::rgba8(color.m_r, color.m_g, color.m_b, color.m_a));
+      ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
       
       agg::render_scanlines(ras, sl, ren_sl);
     
@@ -1393,7 +1411,7 @@ public:
     // fill polygon
     if (fill.m_a>0) {
       ras.add_path(path);
-      ren_sl.color(agg::rgba8(fill.m_r, fill.m_g, fill.m_b, fill.m_a));
+      ren_sl.color(agg::rgba8_pre(fill.m_r, fill.m_g, fill.m_b, fill.m_a));
       agg::render_scanlines(ras, sl, ren_sl);
     }
     
@@ -1403,7 +1421,7 @@ public:
       
       stroke.width(1);
       
-      ren_sl.color(agg::rgba8(outline.m_r, outline.m_g, outline.m_b, outline.m_a));
+      ren_sl.color(agg::rgba8_pre(outline.m_r, outline.m_g, outline.m_b, outline.m_a));
       
       ras.add_path(stroke);
       agg::render_scanlines(ras, sl, ren_sl);
@@ -1528,22 +1546,22 @@ DSOEXPORT render_handler_agg_base*	create_render_handler_agg(char *pixelformat)
   log_msg("framebuffer pixel format is %s", pixelformat);
   
   if (!strcmp(pixelformat, "RGB555"))
-	  return new render_handler_agg<agg::pixfmt_rgb555> (16); // yep, 16!
+	  return new render_handler_agg<agg::pixfmt_rgb555_pre> (16); // yep, 16!
 	
 	else if (!strcmp(pixelformat, "RGB565") || !strcmp(pixelformat, "RGBA16"))
-	  return new render_handler_agg<agg::pixfmt_rgb565> (16);
+	  return new render_handler_agg<agg::pixfmt_rgb565_pre> (16);
 	
 	else if (!strcmp(pixelformat, "RGB24"))
-	  return new render_handler_agg<agg::pixfmt_rgb24> (24);
+	  return new render_handler_agg<agg::pixfmt_rgb24_pre> (24);
 		
 	else if (!strcmp(pixelformat, "BGR24"))
-	  return new render_handler_agg<agg::pixfmt_bgr24> (24);
+	  return new render_handler_agg<agg::pixfmt_bgr24_pre> (24);
 
 	else if (!strcmp(pixelformat, "RGBA32"))
-	  return new render_handler_agg<agg::pixfmt_rgba32> (32);
+	  return new render_handler_agg<agg::pixfmt_rgba32_pre> (32);
 
 	else if (!strcmp(pixelformat, "BGRA32"))
-	  return new render_handler_agg<agg::pixfmt_bgra32> (32);
+	  return new render_handler_agg<agg::pixfmt_bgra32_pre> (32);
 	  	  
 	else {
 		log_error("Unknown pixelformat: %s\n", pixelformat);
