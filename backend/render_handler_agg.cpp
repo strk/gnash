@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.59 2007/02/22 10:36:37 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.60 2007/02/22 10:43:04 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1034,12 +1034,13 @@ public:
     // push paths to AGG
     pcount = paths.size();
     int current_subshape = 0; 
+    agg::path_storage path;
+    agg::conv_curve< agg::path_storage > curve(path);
 
     for (pno=0; pno<pcount; pno++) {
     
-      const path &this_path = paths[pno];
-      agg::path_storage path;
-      agg::conv_curve< agg::path_storage > curve(path);
+      const gnash::path &this_path = paths[pno];
+      path.remove_all();
       
       if (this_path.m_new_shape) 
         current_subshape++;
@@ -1165,11 +1166,13 @@ public:
     
     // push paths to AGG
     unsigned int pcount = paths.size();
+    agg::path_storage path;
+    agg::conv_curve< agg::path_storage > curve(path);
+
     for (unsigned int pno=0; pno < pcount; pno++) {
     
-      const path& this_path = paths[pno];
-      agg::path_storage path;
-      agg::conv_curve< agg::path_storage > curve(path);
+      const gnash::path& this_path = paths[pno];
+      path.remove_all();
       
       // reduce everything to just one fill style!
       rasc.styles(this_path.m_fill0==0 ? -1 : 0,
@@ -1276,11 +1279,11 @@ public:
 	//       currently an assertion will fail when get{Min,Max}{X,Y}
 	//       are called below
 
-	ras.clip_box(
-		(double)_clipbounds.getMinX(),
-		(double)_clipbounds.getMinY(),
-		(double)_clipbounds.getMaxX(),
-		(double)_clipbounds.getMaxY());    	
+  	ras.clip_box(
+  		(double)_clipbounds.getMinX(),
+  		(double)_clipbounds.getMinY(),
+  		(double)_clipbounds.getMaxX(),
+  		(double)_clipbounds.getMaxY());    	
 
     agg::conv_curve< agg::path_storage > curve(agg_path);    // to render curves
     agg::conv_stroke< agg::conv_curve < agg::path_storage > > 
