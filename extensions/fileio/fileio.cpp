@@ -113,6 +113,7 @@ Fileio::Fileio()
 Fileio::~Fileio()
 {
 //    GNASH_REPORT_FUNCTION;
+    fclose();
 }
 
 int
