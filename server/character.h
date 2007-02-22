@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.50 2007/02/20 10:00:48 strk Exp $ */
+/* $Id: character.h,v 1.51 2007/02/22 17:28:04 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -575,8 +575,6 @@ public:
 	void clear_invalidated() {
 		m_invalidated = false;
     m_child_invalidated = false;    
-		// Is it correct to set old bounds to null ?
-		// Why are we doing so ?
 		m_old_invalidated_bounds.set_null();
 	}
   
