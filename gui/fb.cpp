@@ -36,6 +36,7 @@
 #include "gui.h"
 #include "fbsup.h"
 #include "log.h"
+#include "movie_root.h"
 
 #include "render_handler.h"
 #include "render_handler_agg.h"
@@ -323,7 +324,16 @@ bool FBGui::initialize_renderer() {
 
 bool FBGui::run()
 {
+  struct timeval tv;
+
   double timer = 0.0;
+  double start_timer;
+  
+  if (!gettimeofday(&tv, NULL))
+    start_timer = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
+  else
+    start_timer = 0.0;
+    
   
   // let the GUI recompute the x/y scale factors to best fit the whole screen
   resize_view(_validbounds.width(), _validbounds.height());
@@ -337,12 +347,17 @@ bool FBGui::run()
 		  usleep(1); // task switch
 		  
 		  check_mouse(); // TODO: Exit delay loop on mouse events! 
-		  
-      struct timeval tv;
+		        
       if (!gettimeofday(&tv, NULL))
         timer = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
     }
-	
+  
+    // update global timer (getTimer())    
+    // (Udo): Just a quick hack. I suggest we solve this in a different way
+    gnash::movie_root* m = gnash::get_current_root();
+    m->set_timer(timer - start_timer);
+    
+    // advance movie	
 		Gui::advance_movie(this);
 	}
 	return true;
