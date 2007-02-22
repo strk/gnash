@@ -310,7 +310,8 @@ fileio_fgets(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);
-    string str = ptr->fgets(str);
+    string str; 
+    str = ptr->fgets(str);
     fn.result->set_string(str.c_str());
 }
 
