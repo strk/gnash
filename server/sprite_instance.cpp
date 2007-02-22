@@ -442,7 +442,6 @@ static void sprite_goto_and_play(const fn_call& fn)
 
 	// Convert to 0-based
 	size_t target_frame = size_t(fn.arg(0).to_number() - 1);
-
 	sprite->goto_frame(target_frame);
 	sprite->set_play_state(sprite_instance::PLAY);
 }
@@ -3550,8 +3549,9 @@ sprite_instance::get_invalidated_bounds(rect* bounds, bool force)
 	if (!m_visible)
 	{
 #ifdef DEBUG_INVALIDATED_BOUNDS
-		log_msg("Not visible, bounds untouched");
+		log_msg("Not visible, use old invalidated bounds only");
 #endif
+    bounds->expand_to_rect(m_old_invalidated_bounds); // (in case we just hided)
 		return;
 	}
 
