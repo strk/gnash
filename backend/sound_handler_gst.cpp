@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.32 2007/02/21 19:18:45 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.33 2007/02/22 13:00:17 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -321,14 +321,15 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 	if (sounddata->format == FORMAT_MP3) { // || sounddata->format == FORMAT_VORBIS) {
 
 		gst_element->decoder = gst_element_factory_make ("mad", NULL);
-		if (gst_element->decoder == NULL) gst_element->decoder = gst_element_factory_make ("ffdec_mp3", NULL);
 		if (gst_element->decoder == NULL) {
 			gst_element->decoder = gst_element_factory_make ("flump3dec", NULL);
-			if (gst_element->decoder != NULL) gnash::log_warning("Fluendos mp3 plugin does not support flash streaming sounds.");
+			if (gst_element->decoder != NULL && !gst_default_registry_check_feature_version("flump3dec", 0, 10, 4)) {
+				gnash::log_warning("This version of fluendos mp3 plugin does not support flash streaming sounds, please upgrade to version 0.10.4 or higher.");
+			}
 		}
 		// Check if the element was correctly created
 		if (!gst_element->decoder) {
-			gnash::log_error("A gstreamer mp3-decoder element could not be created! You probably need to install a mp3-decoder plugin like gstreamer0.10-mad or gstreamer0.10-ffmpeg.");
+			gnash::log_error("A gstreamer mp3-decoder element could not be created! You probably need to install a mp3-decoder plugin like gstreamer0.10-mad or gstreamer0.10-fluendo-mp3.");
 			return;
 		}
 		gst_bin_add (GST_BIN (gst_element->bin), gst_element->decoder);
