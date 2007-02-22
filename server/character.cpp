@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.20 2007/02/20 10:00:48 strk Exp $ */
+/* $Id: character.cpp,v 1.21 2007/02/22 17:25:25 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -174,7 +174,6 @@ character::set_invalidated()
   // Set the invalidated-flag of the parent. Note this does not mean that
   // the parent must re-draw itself, it just means that one of it's childs
   // needs to be re-drawn.
-	//if ( m_parent ) m_parent->set_invalidated();	
 	if ( m_parent ) m_parent->set_child_invalidated(); 
   
   
