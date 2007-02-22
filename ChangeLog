@@ -18,16 +18,16 @@
 
 2007-02-22 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
-  * backend/render_handler_agg.cpp, backend/render_handler_agg_style.h:
-    Switched to pre-multiplied pixel values. Fixes some anti-aliasing issues
-    and improves rendering performance, especially for gradients.   
-  * backend/render_handler_agg.cpp: Avoid re-initialisation of AGG path class
-    inside for-loop.
-  * extensions/fileio/fileio.cpp: Fixed fgets() to avoid segfauls; call fclose()
-    in destructor to close file descriptor in any case.
-  * server/movie_root.h: Provided write access for m_timer
-  * gui/fb.cpp: Update global timer to make getTimer() work at least with the
-    FB GUI        
+	* backend/render_handler_agg.cpp, backend/render_handler_agg_style.h:
+	  Switched to pre-multiplied pixel values. Fixes some anti-aliasing
+	  issues and improves rendering performance, especially for gradients.
+	* backend/render_handler_agg.cpp:
+	  Avoid re-initialisation of AGG path class inside for-loop.
+	* extensions/fileio/fileio.cpp: Fixed fgets() to avoid segfaults;
+	  call fclose() in destructor to close file descriptor in any case.
+	* server/movie_root.h: Provided write access for m_timer
+	* gui/fb.cpp: Update global timer to make getTimer() work
+	  at least with the FB GUI        
 
 2007-02-22 Sandro Santilli <strk@keybit.net>
 
