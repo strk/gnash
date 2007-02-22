@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.58 2007/02/22 10:21:02 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.59 2007/02/22 10:36:37 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -963,7 +963,6 @@ public:
       rasc.filling_rule(agg::fill_even_odd);
     else
       rasc.filling_rule(agg::fill_non_zero);
-//printf("even_odd=%d\n",even_odd);  
       
     // tell AGG what styles are used
     fcount = fill_styles.size();
@@ -1022,7 +1021,7 @@ public:
         default:
         {            
           rgba color = cx.transform(fill_styles[fno].get_color());
-//printf("fill style %d: solid fill (%d, %d, %d, %d);\n", fno, color.m_r, color.m_g, color.m_b, color.m_a);          
+
           // add the color to our self-made style handler (basically just a list)
           sh.add_color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
         } 
@@ -1037,7 +1036,6 @@ public:
     int current_subshape = 0; 
 
     for (pno=0; pno<pcount; pno++) {
-//printf("pno=%d\n", pno);    
     
       const path &this_path = paths[pno];
       agg::path_storage path;
@@ -1061,11 +1059,9 @@ public:
       // the box. 
       // Flash uses value "0" for "no fill", whereas AGG uses "-1" for that. 
       rasc.styles(this_path.m_fill0-1, this_path.m_fill1-1);
-//printf("rasc.styles(%d, %d);\n", this_path.m_fill0-1, this_path.m_fill1-1);      
       
       // starting point of path
       path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
-//printf("path.move_to(%f, %f)\n", this_path.m_ax*xscale, this_path.m_ay*yscale);            
       
       ecount = this_path.m_edges.size();
       edge_count += ecount;
@@ -1078,26 +1074,16 @@ public:
         else
           path.curve3(this_edge.m_cx*xscale, this_edge.m_cy*yscale,
                       this_edge.m_ax*xscale, this_edge.m_ay*yscale);
-                      
-/*        if (this_edge.is_straight())
-          printf("path.line_to(%f, %f)\n", this_edge.m_ax*xscale, this_edge.m_ay*yscale);
-        else
-          printf("path.curve3(%f, %f, %f, %f)\n", this_edge.m_cx*xscale, this_edge.m_cy*yscale,
-                      this_edge.m_ax*xscale, this_edge.m_ay*yscale);
-*/                      
-                      
         
       }
       
       // add path to the compound rasterizer
       rasc.add_path(curve);
-//printf("rasc.add_path(curve);\n");       
     
     }
     //log_msg("%d edges\n", edge_count);
     
     // render!
-//printf("agg::render_scanlines_compound_layered(rasc, sl, rbase, alloc, sh);\n");    
     agg::render_scanlines_compound_layered(rasc, sl, rbase, alloc, sh);
     
   } // draw_shape
