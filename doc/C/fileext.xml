@@ -42,7 +42,7 @@
       <term>fgets</term>
       <listitem>
 	<para>
-	  Read a single line until a Cariage Return from the opened file.
+	  Read a single line until a Carriage Return from the opened file.
 	</para>
       </listitem>
     </varlistentry>

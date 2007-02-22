@@ -6,8 +6,8 @@
     The MySQL ActionScript class follows the same API as MySQL, even down
     to the same arguments to the same function names. This enables a
     Flash movie to have direct access to a MySQL
-    database. Traditionally Flash movies have had no datatbase
-    support, they either hsad to use arrays, or use XML to communicate
+    database. Traditionally Flash movies have had no database
+    support, they either had to use arrays, or use XML to communicate
     to an application specific external database daemon.
   </para>
 

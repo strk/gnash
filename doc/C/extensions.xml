@@ -47,7 +47,7 @@
     extension files specify the class name and methods it implements
     in an identical style as adding any new ActionScript class. The
     advantage is the class itself is compiled code, and runs much
-    faster than the equivilant byte codes which all have to be
+    faster than the equivalent byte codes which all have to be
     interpreted..
   </para>
 
@@ -96,7 +96,7 @@
       layer, than to get carried away with creating beautiful
       abstractions. Higher-level classes that offer a lot of new
       functionality are fine, but is different than wrapping a library
-      so it can be used from withint Gnash.
+      so it can be used from within Gnash.
     </para>
 
     <sect3 id="craftext">
@@ -292,7 +292,7 @@
     <title>Included Extensions</title>
 
     <para>
-      Gnash has sme extensions included in the distribution. This is
+      Gnash has some extensions included in the distribution. This is
       mostly because they were written by the Gnash team. Extensions
       can be external to gnash, Gnash needs no compiled in knowledge
       to load an extension file.
