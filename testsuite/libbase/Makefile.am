@@ -78,7 +78,9 @@ RcTest_CPPFLAGS = -DSRCDIR="$(srcdir)"
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
-	$(check_PROGRAMS) \
+	NoSeekFileTest \
+	URLTest \
+	RcTest
 	$(NULL)
 
 check-DEJAGNU: site-update $(TEST_CASES)

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,13 +29,24 @@
 
 using namespace std;
 
+const char* post = NULL;
+
 #define CHUNK_SIZE 4
 
 static void
 dump_curl(const char* url, ostream& os)
 {
-	tu_file* reader = curl_adapter::make_stream(url);
-	assert(reader);
+	std::auto_ptr<tu_file> reader;
+	if ( post )
+	{
+		reader.reset( curl_adapter::make_stream(url, post) );
+	}
+	else
+	{
+		reader.reset( curl_adapter::make_stream(url) );
+	}
+
+	assert(reader.get());
 
 	char buf[CHUNK_SIZE];
 
@@ -91,9 +102,18 @@ main(int argc, char** argv)
 {
 	const char* input = INPUT; // Should be the path to this file
 
+	if ( argc == 1 )
+	{
+		cerr << "Usage: " << argv[0] << " <url> [<postdata>]" << endl;
+		exit(EXIT_FAILURE);
+	}
+
 	if ( argc > 1 ) input = argv[1];
 
+	if ( argc > 2 ) post = argv[2];
+
 	cout << "input: " << input << endl;
+	if ( post ) cout << "post data: " << post << endl;
 
 #if 0
 	cout << "FILE" << endl;

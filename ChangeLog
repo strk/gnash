@@ -1,3 +1,15 @@
+2007-02-22 Sandro Santilli <strk@keybit.net>
+
+	* libbase/curl_adapter.cpp:
+	  Use a member to store post data, as it
+	  needs a longer lifetime for libcurl to work.
+	* testsuite/libbase/Makefile.am:
+	  Don't run CurlStreamTest by 'make check'
+	  as it's not ready for automatic testing.
+	* testsuite/libbase/CurlStreamTest.cpp: 
+	  Turn the test into a tool supporting POST
+	  operations (for manual testing it).
+
 2007-02-22 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_gst.cpp: Removed the use of ffdec_mp3 since

@@ -16,7 +16,7 @@
 
 // 
 
-/* $Id: curl_adapter.cpp,v 1.20 2007/02/22 08:53:37 strk Exp $ */
+/* $Id: curl_adapter.cpp,v 1.21 2007/02/22 16:36:13 strk Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -37,7 +37,10 @@
 #include "log.h"
 
 #include <map>
+#include <iostream>
 #include <string>
+
+using namespace std;
 
 //#define GNASH_CURL_VERBOSE 1
 
@@ -142,6 +145,9 @@ private:
 
 	// transfer in progress
 	int _running;
+
+	// Post data. Empty if no POST has been requested
+	std::string _postdata;
 
 	// Attempt at filling the cache up to the given size.
 	// Will call libcurl routines to fetch data.
@@ -358,7 +364,8 @@ CurlStreamFile::CurlStreamFile(const std::string& url)
 CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
 {
 	init(url);
-	// TODO: post data !
+
+	_postdata = vars;
 
 	CURLcode ccode;
 
@@ -367,12 +374,15 @@ CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
 
-	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDS, vars.c_str());
+	// libcurl needs to access the POSTFIELDS during 'perform' operations,
+	// so we must use a string whose lifetime is ensured to be longer then
+	// the multihandle itself.
+	// The _postdata member should meet this requirement
+	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDS, _postdata.c_str());
 	if ( ccode != CURLE_OK ) {
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
 
-	// CURLMcode ret = 
 	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
 	if ( mcode != CURLM_OK ) {
 		throw gnash::GnashException(curl_multi_strerror(mcode));
