@@ -16,7 +16,7 @@
 
 // 
 
-/* $Id: curl_adapter.cpp,v 1.19 2006/11/09 13:05:39 bjacques Exp $ */
+/* $Id: curl_adapter.cpp,v 1.20 2007/02/22 08:53:37 strk Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -35,6 +35,9 @@
 #include "utility.h"
 #include "GnashException.h"
 #include "log.h"
+
+#include <map>
+#include <string>
 
 //#define GNASH_CURL_VERBOSE 1
 
@@ -84,8 +87,20 @@ class CurlStreamFile
 
 public:
 
+	typedef std::map<std::string, std::string> PostData;
+
 	/// Open a stream from the specified URL
 	CurlStreamFile(const std::string& url);
+
+	/// Open a stream from the specified URL posting the specified variables
+	//
+	/// @param url
+	///	The url to post to.
+	///
+	/// @param vars
+	///	The url-encoded post data.
+	///
+	CurlStreamFile(const std::string& url, const std::string& vars);
 
 	~CurlStreamFile();
 
@@ -105,6 +120,8 @@ public:
 	bool seek(size_t pos);
 
 private:
+
+	void init(const std::string& url);
 
 	// Use this file to cache data
 	FILE* _cache;
@@ -250,13 +267,14 @@ CurlStreamFile::printInfo()
 	fprintf(stderr, "_cache.tell = " SIZET_FMT "\n", tell());
 }
 
-/*public*/
-CurlStreamFile::CurlStreamFile(const std::string& url)
-	:
-	_url(url),
-	_running(1)
+/*private*/
+void
+CurlStreamFile::init(const std::string& url)
 {
 	ensure_libcurl_initialized();
+
+	_url = url;
+	_running = 1;
 
 	_handle = curl_easy_init();
 	_mhandle = curl_multi_init();
@@ -270,7 +288,6 @@ CurlStreamFile::CurlStreamFile(const std::string& url)
 	_cachefd = fileno(_cache);
 
 	CURLcode ccode;
-	CURLMcode mcode;
 
 	ccode = curl_easy_setopt(_handle, CURLOPT_USERAGENT, "Gnash-" VERSION);
 	if ( ccode != CURLE_OK ) {
@@ -321,14 +338,46 @@ are not honored during the DNS lookup - which you can  work  around  by
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
 
+	//fill_cache(32); // pre-cache 32 bytes
+	//curl_multi_perform(_mhandle, &_running);
+}
+
+/*public*/
+CurlStreamFile::CurlStreamFile(const std::string& url)
+{
+	init(url);
+
 	// CURLMcode ret = 
-	mcode = curl_multi_add_handle(_mhandle, _handle);
+	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
+	if ( mcode != CURLM_OK ) {
+		throw gnash::GnashException(curl_multi_strerror(mcode));
+	}
+}
+
+/*public*/
+CurlStreamFile::CurlStreamFile(const std::string& url, const std::string& vars)
+{
+	init(url);
+	// TODO: post data !
+
+	CURLcode ccode;
+
+	ccode = curl_easy_setopt(_handle, CURLOPT_POST, 1);
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	ccode = curl_easy_setopt(_handle, CURLOPT_POSTFIELDS, vars.c_str());
+	if ( ccode != CURLE_OK ) {
+		throw gnash::GnashException(curl_easy_strerror(ccode));
+	}
+
+	// CURLMcode ret = 
+	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
 	if ( mcode != CURLM_OK ) {
 		throw gnash::GnashException(curl_multi_strerror(mcode));
 	}
 
-	//fill_cache(32); // pre-cache 32 bytes
-	//curl_multi_perform(_mhandle, &_running);
 }
 
 /*public*/
@@ -472,7 +521,10 @@ close(void* appdata)
 	return 0;
 }
 
-// this is the only exported interface
+//-------------------------------------------
+// Exported interfaces
+//-------------------------------------------
+
 tu_file*
 make_stream(const char* url)
 {
@@ -486,6 +538,36 @@ make_stream(const char* url)
 
 	try {
 		stream = new CurlStreamFile(url);
+	} catch (const std::exception& ex) {
+		fprintf(stderr, "curl stream: %s\n", ex.what());
+		delete stream;
+		return NULL;
+	}
+
+	return new tu_file(
+		(void*)stream, // opaque user pointer
+		read, // read
+		write, // write
+		seek, // seek
+		seek_to_end, // seek_to_end
+		tell, // tell
+		eof, // get eof
+		close);
+}
+
+tu_file*
+make_stream(const char* url, const std::string& postdata)
+{
+	ensure_libcurl_initialized();
+
+#ifdef GNASH_CURL_VERBOSE
+	fprintf(stderr, "making curl stream for %s\n", url);
+#endif
+
+	CurlStreamFile* stream = NULL;
+
+	try {
+		stream = new CurlStreamFile(url, postdata);
 	} catch (const std::exception& ex) {
 		fprintf(stderr, "curl stream: %s\n", ex.what());
 		delete stream;

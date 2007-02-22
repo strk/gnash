@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: curl_adapter.h,v 1.4 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: curl_adapter.h,v 1.5 2007/02/22 08:53:37 strk Exp $ */
 
 #ifndef CURL_ADAPTER_H
 #define CURL_ADAPTER_H
@@ -41,6 +41,20 @@ namespace curl_adapter
 /// The caller owns the returned tu_file*.  
 ///
 DSOEXPORT tu_file* make_stream(const char* url);
+
+/// \brief
+/// Returns a read-only tu_file stream that fetches data
+/// from an url getting posted to.
+//
+/// The caller owns the returned tu_file*.  
+///
+/// @param url
+///	The url to post to.
+///
+/// @param postdata
+///	The url-encoded post data
+///
+DSOEXPORT tu_file* make_stream(const char* url, const std::string& postdata);
 
 }
 
