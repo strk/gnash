@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.261 2007/02/21 17:41:11 tgc Exp $
+dnl $Id: configure.ac,v 1.262 2007/02/22 18:55:23 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -194,6 +194,18 @@ if test x$renderer = xagg; then
 fi
 AM_CONDITIONAL(USE_RENDERER_AGG, test x$renderer = xagg)
 
+if test x$renderer = xagg; then
+  if test x"$gui" = x"gtk"; then
+    AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24 pixel format])
+  else
+    AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555 pixel format])
+    AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565 pixel format])
+    AC_DEFINE(PIXELFORMAT_RGB24,  [1], [RGB24 pixel format])
+    AC_DEFINE(PIXELFORMAT_BGR24,  [1], [BGR24 pixel format])
+    AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGB32 pixel format])
+    AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32 pixel format])
+  fi
+fi
 dnl --------------------------------------------------------
 dnl  Select sound streamer
 dnl --------------------------------------------------------
@@ -1379,6 +1391,42 @@ else
   echo "Warning:\
  You need to have the zlib development packages installed\
  to play compressed SWF (most of them from version 6 up). "
+fi
+
+if test x$kde = xyes -o x$klash = xyes; then
+  if test x"$has_kde" = xyes; then
+    echo "        KDE flags are: $KDE_CFLAGS"
+    echo "        KDE libs are: $KDE_LIBS"
+  else
+    if test x$gui = xkde -o x$klash = xyes ; then
+      echo "        ERROR: No kde development package installed!"
+      echo "               Reconfigure with --disable-klash to continue"
+      echo "               and/or change to a different gui"
+      nogo=true
+    fi
+  fi
+  if test x"$has_qt" = xyes; then
+    echo "        QT flags are: $QT_CFLAGS"
+    echo "        QT libs are: $QT_LIBS"
+  else
+    if test x$gui = xkde -o x$klash = xyes ; then
+      echo "        ERROR: No QT development package installed!"
+      echo "               Reconfigure with --disable-klash to continue"
+      echo "               and/or change to a different gui"
+      nogo=true
+    fi
+  fi
+fi
+
+if test x$extensions = xyes; then
+  if test x$mysql != xno; then
+    if test x"$MYSQL_LIBS" != x; then
+      echo "        MYSQL flags are: $MYSQC_CFLAGS"
+      echo "        MYSQL libs are: $MYSQL_LIBS"
+    else
+      echo "        ERROR: No MySQL development package installed!"
+    fi
+  fi
 fi
 
 # If anything critical is missing, don't bother to continue

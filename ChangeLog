@@ -1,3 +1,9 @@
+2007-02-22  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* configure.ac: Set the pixel type when using AGG for better
+	efficiency by looking at the GUI type. Print out MySQL paths if
+	extensions are enabled. Don't build klash if KDE isn't found.
+
 2007-02-22 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/sprite_instance.cpp: Respect m_old_invalidated_bounds even 
