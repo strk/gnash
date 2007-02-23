@@ -420,6 +420,7 @@ xmlsocket_connect(const fn_call& fn)
     }
     
 #if 1
+    // TODO: don't allocate on heap!
     Timer *timer = new Timer;
     boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(
         &xmlsocket_event_ondata, NULL);
