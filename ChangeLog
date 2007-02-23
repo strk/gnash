@@ -1,3 +1,8 @@
+2007-02-23 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+  * backend/render_handler_agg.cpp: Use PIXELFORMAT_xxx defines
+    introduced by Rob		  
+
 2007-02-22  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* configure.ac: Set the pixel type when using AGG for better

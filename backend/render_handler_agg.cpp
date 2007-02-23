@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.60 2007/02/22 10:43:04 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.61 2007/02/23 09:50:36 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1534,25 +1534,39 @@ DSOEXPORT render_handler_agg_base*	create_render_handler_agg(char *pixelformat)
 
   log_msg("framebuffer pixel format is %s", pixelformat);
   
+#ifdef PIXELFORMAT_RGB555  
   if (!strcmp(pixelformat, "RGB555"))
 	  return new render_handler_agg<agg::pixfmt_rgb555_pre> (16); // yep, 16!
 	
-	else if (!strcmp(pixelformat, "RGB565") || !strcmp(pixelformat, "RGBA16"))
-	  return new render_handler_agg<agg::pixfmt_rgb565_pre> (16);
-	
-	else if (!strcmp(pixelformat, "RGB24"))
-	  return new render_handler_agg<agg::pixfmt_rgb24_pre> (24);
-		
-	else if (!strcmp(pixelformat, "BGR24"))
+	else
+#endif	 
+#ifdef PIXELFORMAT_RGB565  
+	if (!strcmp(pixelformat, "RGB565") || !strcmp(pixelformat, "RGBA16"))
+	  return new render_handler_agg<agg::pixfmt_rgb565_pre> (16);	
+	else 
+#endif	 
+#ifdef PIXELFORMAT_RGB24  
+	if (!strcmp(pixelformat, "RGB24"))
+	  return new render_handler_agg<agg::pixfmt_rgb24_pre> (24);		
+	else 
+#endif	 
+#ifdef PIXELFORMAT_BGR24  
+	if (!strcmp(pixelformat, "BGR24"))
 	  return new render_handler_agg<agg::pixfmt_bgr24_pre> (24);
-
-	else if (!strcmp(pixelformat, "RGBA32"))
+	else 
+#endif	 
+#ifdef PIXELFORMAT_RGBA32 
+  if (!strcmp(pixelformat, "RGBA32"))
 	  return new render_handler_agg<agg::pixfmt_rgba32_pre> (32);
-
-	else if (!strcmp(pixelformat, "BGRA32"))
+	else 
+#endif	 
+#ifdef PIXELFORMAT_BGRA32  
+	if (!strcmp(pixelformat, "BGRA32"))
 	  return new render_handler_agg<agg::pixfmt_bgra32_pre> (32);
 	  	  
-	else {
+	else 
+#endif
+	{
 		log_error("Unknown pixelformat: %s\n", pixelformat);
 		assert(0);
 	}
