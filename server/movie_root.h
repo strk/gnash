@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.38 2007/02/22 14:04:42 udog Exp $ */
+/* $Id: movie_root.h,v 1.39 2007/02/23 18:25:33 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -209,8 +209,9 @@ public:
 	/// @param timer
 	///	A Timer, will be copied.
 	///
-	/// @return an integer indentifying the timer
-	///         for subsequent call to clear_interval_timer
+	/// @return An integer indentifying the timer
+	///         for subsequent call to clear_interval_timer.
+	///         It will NEVER be zero.
 	///
 	unsigned int add_interval_timer(const Timer& timer);
 
