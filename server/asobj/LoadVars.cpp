@@ -34,6 +34,8 @@
 #include "URL.h"
 #include "gnash.h" // for get_base_url
 #include "tu_file.h"
+#include "timers.h"
+#include "VM.h"
 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
@@ -53,6 +55,9 @@ static void loadvars_ctor(const fn_call& fn);
 //static as_object* getLoadVarsInterface();
 //static void attachLoadVarsInterface(as_object& o);
 
+class LoadVarsLoader
+{
+};
 
 /// LoadVars ActionScript class
 //
@@ -61,23 +66,20 @@ class LoadVars: public as_object
 
 public:
 
-	LoadVars()
-		:
-		as_object(getLoadVarsInterface()),
-		_env(0),
-		_bytesTotal(0),
-		_bytesLoaded(0),
-		_loadRequests(),
-		_currentLoad(_loadRequests.end())
-	{}
+	/// @param env
+	/// 	Environment to use for event handlers calls
+	///
+	LoadVars(as_environment* env);
+
+	~LoadVars();
 
 	/// Load data from given URL
 	//
-	/// @param env
-	///	The environment to use when invoking event
-	///	handlers (onLoad, onData)
+	/// Actually adds a arequest for the load.
+	/// The loader thread will only be started
+	/// later.
 	///
-	void load(const std::string& url, as_environment* env);
+	void load(const std::string& url);
 
 	static as_object* getLoadVarsInterface();
 
@@ -108,6 +110,9 @@ private:
 		return _currentLoad != _loadRequests.end();
 	}
 
+	/// Check for completed loading threads, fire
+	/// new threads if needed.
+	void checkLoads();
 
 	/// Process current load request
 	//
@@ -148,7 +153,9 @@ private:
 	/// workaround that limitation (in either boost or more
 	/// likely my own knowledge of it)
 	static void execCompleteLoad(LoadVars* lv) {
+		log_msg("LoadVars loading thread started");
 		lv->completeLoad();
+		log_msg("LoadVars loading thread completed");
 	}
 
 	/// Parse an url-encoded query string
@@ -186,6 +193,8 @@ private:
 		_onData = fn;
 	}
 
+	static void checkLoads_wrapper(const fn_call& fn);
+
 	static void onData_getset(const fn_call& fn);
 
 	static void onLoad_getset(const fn_call& fn);
@@ -197,8 +206,6 @@ private:
 	boost::intrusive_ptr<as_function> _onLoad;
 
 	boost::intrusive_ptr<as_function> _onData;
-
-	boost::thread* _loaderThread;
 
 	as_environment* _env;
 
@@ -228,7 +235,46 @@ private:
 	std::auto_ptr<tu_file> _stream;
 
 	mutable boost::mutex _loadRequestsMutex;
+
+	unsigned int _loadCheckerTimer;
 };
+
+LoadVars::LoadVars(as_environment* env)
+		:
+		as_object(getLoadVarsInterface()),
+		_env(env),
+		_bytesTotal(0),
+		_bytesLoaded(0),
+		_loadRequests(),
+		_currentLoad(_loadRequests.end())
+{
+	//log_msg("LoadVars %p created", this);
+}
+
+LoadVars::~LoadVars()
+{
+	//log_msg("Deleting LoadVars %p", this);
+}
+
+void
+LoadVars::checkLoads()
+{
+	// TODO: take care of setting members here,
+	// we can't trust the loading thread to do so
+	if ( _loadRequests.empty() )
+	{
+		assert(_currentLoad == _loadRequests.end());
+		// TODO: remove the timer, which would likely
+		//       destroy ourselves
+		//log_msg("checkLoads(): no more requests, should shut down timer");
+		VM::get().getRoot().clear_interval_timer(_loadCheckerTimer);
+	}
+	else if ( _currentLoad == _loadRequests.end() )
+	{
+		_currentLoad = _loadRequests.begin();
+		processCurrentLoadRequest();
+	}
+}
 
 void
 LoadVars::attachLoadVarsInterface(as_object& o)
@@ -269,7 +315,7 @@ LoadVars::dispatchDataEvent()
 {
 	if ( ! _onData ) return;
 	
-	log_msg("Calling _onData func");
+	//log_msg("Calling _onData func");
 	// This would be the function calls "context"
 	// will likely be the same to all events
 	as_value ret;
@@ -284,7 +330,7 @@ LoadVars::dispatchLoadEvent()
 {
 	if ( ! _onLoad ) return;
 	
-	log_msg("Calling _onLoad func");
+	//log_msg("Calling _onLoad func");
 	// This would be the function calls "context"
 	// will likely be the same to all events
 	as_value ret;
@@ -389,15 +435,7 @@ LoadVars::endCurrentLoad()
 {
 	boost::mutex::scoped_lock lock(_loadRequestsMutex);
 	_loadRequests.erase(_currentLoad);
-	if ( _loadRequests.empty() )
-	{
-		_currentLoad = _loadRequests.end();
-	}
-	else
-	{
-		_currentLoad = _loadRequests.begin();
-		processCurrentLoadRequest();
-	}
+	_currentLoad = _loadRequests.end();
 }
 
 void
@@ -415,31 +453,31 @@ LoadVars::processCurrentLoadRequest()
 	//          endCurrentLoad and is called by it!)
 	// When are we going to drop this ?
 	boost::thread thread(boost::bind(LoadVars::execCompleteLoad, this));
-	//boost::thread* thr = new boost::thread (boost::bind(LoadVars::execCompleteLoad, this));
 }
 
 void
 LoadVars::addLoadRequest(const std::string& urlstr)
 {
 	boost::mutex::scoped_lock lock(_loadRequestsMutex);
-	_loadRequests.insert(_loadRequests.end(), urlstr);
-	if ( ! isLoading() )
+
+	if ( _loadRequests.empty() )
 	{
-		_currentLoad = _loadRequests.begin();
-		processCurrentLoadRequest();
+		//log_msg("addLoadRequest(): new requests, starting timer");
+
+		using boost::intrusive_ptr;
+		intrusive_ptr<builtin_function> loadsChecker = new builtin_function(
+			&LoadVars::checkLoads_wrapper, NULL);
+		Timer timer; timer.setInterval(*loadsChecker, 50, this, _env);
+		_loadCheckerTimer = VM::get().getRoot().add_interval_timer(timer);
 	}
+
+	_loadRequests.insert(_loadRequests.end(), urlstr);
 }
 
 void
-LoadVars::load(const std::string& urlstr, as_environment* env)
+LoadVars::load(const std::string& urlstr)
 {
-	// I belive that the environment should be set
-	// once and for all calls
-	//assert(_env == env);
-	_env = env;
-
 	addLoadRequest(urlstr);
-
 }
 
 static LoadVars*
@@ -470,6 +508,16 @@ LoadVars::onLoad_getset(const fn_call& fn)
 		as_function* h = fn.arg(0).to_as_function();
 		if ( h ) ptr->setLoadHandler(h);
 	}
+}
+
+/* private static */
+void
+LoadVars::checkLoads_wrapper(const fn_call& fn)
+{
+
+	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+	ptr->checkLoads();
+
 }
 
 /* private static */
@@ -547,7 +595,7 @@ loadvars_load(const fn_call& fn)
 		return;
 	}
 
-	obj->load(urlstr, fn.env);
+	obj->load(urlstr);
 	fn.result->set_bool(true);
 	
 }
@@ -579,7 +627,7 @@ loadvars_tostring(const fn_call& fn)
 static void
 loadvars_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new LoadVars;
+	boost::intrusive_ptr<as_object> obj = new LoadVars(fn.env);
 	
 	fn.result->set_as_object(obj.get()); // will keep alive
 }
