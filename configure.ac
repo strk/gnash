@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.262 2007/02/22 18:55:23 rsavoye Exp $
+dnl $Id: configure.ac,v 1.263 2007/02/23 15:10:59 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -194,16 +194,57 @@ if test x$renderer = xagg; then
 fi
 AM_CONDITIONAL(USE_RENDERER_AGG, test x$renderer = xagg)
 
-if test x$renderer = xagg; then
-  if test x"$gui" = x"gtk"; then
-    AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24 pixel format])
-  else
-    AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555 pixel format])
-    AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565 pixel format])
-    AC_DEFINE(PIXELFORMAT_RGB24,  [1], [RGB24 pixel format])
-    AC_DEFINE(PIXELFORMAT_BGR24,  [1], [BGR24 pixel format])
-    AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGB32 pixel format])
-    AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32 pixel format])
+
+pixelformat=all
+AC_ARG_WITH(
+  pixelformat,
+  AC_HELP_STRING([--with-pixelformat=], [Use the specified pixel format for AGG]),
+  if test -n ${withval}; then
+    pixelformat="${withval}"
+    withval=`echo ${withval} | tr '\054' ' ' `
+  fi
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+    [case "${val}" in
+      rgb32|RGB32)
+        AC_DEFINE(PIXELFORMAT_RGB32, [1], [RGB32])
+        ;;
+      bgr32|BGR32)
+        AC_DEFINE(PIXELFORMAT_BGR32, [1], [BGR32])
+        ;;
+      rgb24|RGB24)
+        AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24])
+        ;;
+      bgr24|BGR24)
+        AC_DEFINE(PIXELFORMAT_BGR24, [1], [BGR24])
+        ;;
+      rgb555|RGB555)
+        AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555])
+        ;;
+      rgb565|RGB565)
+        AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565])
+       ;;
+      esac]
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test x$val = x$withval; then
+      break;
+    fi
+  done
+)
+
+if test x$pixelformat = xall; then
+  if test x$renderer = xagg; then
+    if test x"$gui" = x"gtk"; then
+      AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24 pixel format])
+      pixelformat="RGB24"
+    else
+      AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555 pixel format])
+      AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565 pixel format])
+      AC_DEFINE(PIXELFORMAT_RGB24,  [1], [RGB24 pixel format])
+      AC_DEFINE(PIXELFORMAT_BGR24,  [1], [BGR24 pixel format])
+      AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGB32 pixel format])
+      AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32 pixel format])
+    fi
   fi
 fi
 dnl --------------------------------------------------------
@@ -1314,6 +1355,7 @@ if test x"$CURL_LIBS" != x; then
 fi
 
 if test x$renderer = xagg; then
+  echo "        AGG Pixel format is: $pixelformat"
   if test x"${agg25}" = xyes; then
     if test x"$AGG_LIBS" != x; then
       if test x"$AGG_CFLAGS" != x; then
