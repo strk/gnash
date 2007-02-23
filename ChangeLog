@@ -1,5 +1,8 @@
 2007-02-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/media/: vars.txt, vars2.txt: data
+	  files for use with LoadVars and loadVariables
+	  tests.
 	* server/as_function.h: add a call() function
 	  to make operator() calls nicer when having
 	  an as_function pointer.
