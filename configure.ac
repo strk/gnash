@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.265 2007/02/23 16:13:28 rsavoye Exp $
+dnl $Id: configure.ac,v 1.266 2007/02/23 16:18:41 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -194,7 +194,9 @@ if test x$renderer = xagg; then
 fi
 AM_CONDITIONAL(USE_RENDERER_AGG, test x$renderer = xagg)
 
-
+dnl 16 bit: RGB555, RGB565
+dnl 24 bit: RGB24, BGR24
+dnl 32 bit: RGBA32, BGRA32
 pixelformat=all
 AC_ARG_WITH(
   pixelformat,
@@ -206,6 +208,9 @@ AC_ARG_WITH(
   while test -n "${withval}" ; do
     val=`echo ${withval} | cut -d ' ' -f 1`
     [case "${val}" in
+      rgba32|RGBA32)
+        AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32])
+        ;;
       bgra32|BGRA32)
         AC_DEFINE(PIXELFORMAT_BGR32, [1], [BGRA32])
         ;;
@@ -222,7 +227,7 @@ AC_ARG_WITH(
         AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565])
         ;;
       *) AC_MSG_ERROR([invalid pixel format ${withval} given (accept: RGB555|RG
-B565|RGB24|BGR24|BGRA32)])
+B565|RGB24|BGR24|BGRA32|RGBA32)])
          ;;
       esac]
     withval=`echo ${withval} | cut -d ' ' -f 2-6`
