@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.263 2007/02/23 15:10:59 rsavoye Exp $
+dnl $Id: configure.ac,v 1.264 2007/02/23 15:39:06 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -223,7 +223,10 @@ AC_ARG_WITH(
         ;;
       rgb565|RGB565)
         AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565])
-       ;;
+        ;;
+      *) AC_MSG_ERROR([invalid pixel format ${withval} given (accept: RGB555|RG
+B565|RGB24|BGR24|RGB32|BGRA32)])
+         ;;
       esac]
     withval=`echo ${withval} | cut -d ' ' -f 2-6`
     if test x$val = x$withval; then

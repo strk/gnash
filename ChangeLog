@@ -1,7 +1,9 @@
 2007-02-23  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* configure.ac: Add --with-pixelformat=option to set the AGG pixel
-	format via the command line to override the defaults if desired.
+	format via the command line to override the defaults if
+	desired. Exit if one of the values for --with-pixelformat is
+	bogus.
 
 2007-02-23 Sandro Santilli <strk@keybit.net>
 
