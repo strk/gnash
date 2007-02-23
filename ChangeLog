@@ -1,3 +1,10 @@
+2007-02-23 Sandro Santilli <strk@keybit.net>
+
+	* server/StreamProvider.{cpp,h}: turn into
+	  a singleton, add getStream() version taking
+	  post data.
+	* server/impl.cpp: use the StreamProvider singleton.
+
 2007-02-23 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: Use PIXELFORMAT_xxx defines

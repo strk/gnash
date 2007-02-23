@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.96 2007/02/21 13:22:37 strk Exp $ */
+/* $Id: impl.cpp,v 1.97 2007/02/23 11:26:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -66,7 +66,7 @@ namespace gnash
 namespace globals { // gnash::globals
 
 	/// global StreamProvider
-	static StreamProvider streamProvider;
+	StreamProvider& streamProvider = StreamProvider::getDefaultInstance();
 
 	/// Base url (for relative urls resolution)
 	//

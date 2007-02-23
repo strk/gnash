@@ -53,6 +53,13 @@
 namespace gnash
 {
 
+StreamProvider&
+StreamProvider::getDefaultInstance()
+{
+	static StreamProvider inst;
+	return inst;
+}
+
 tu_file*
 StreamProvider::getStream(const URL& url)
 {
@@ -77,8 +84,43 @@ StreamProvider::getStream(const URL& url)
 		std::string url_str = url.str();
 		const char* c_url = url_str.c_str();
 		if ( URLAccessManager::allow(url) ) {
-		//if ( URLAccessManager::host_check(url.hostname()) ) {
 			return curl_adapter::make_stream(c_url);
+		} else {
+			return NULL;
+		}
+#else
+		log_error("Unsupported network connections");
+		return NULL;
+#endif
+	}
+}
+
+tu_file*
+StreamProvider::getStream(const URL& url, const std::string& postdata)
+{
+//    GNASH_REPORT_FUNCTION;
+
+	if (url.protocol() == "file")
+	{
+		log_warning("POST data discarded while getting a stream from non-http uri");
+		std::string path = url.path();
+		if ( path == "-" )
+		{
+			FILE *newin = fdopen(dup(0), "rb");
+			return new tu_file(newin, false);
+		}
+		else
+		{
+        		return new tu_file(path.c_str(), "rb");
+		}
+	}
+	else
+	{
+#ifdef USE_CURL
+		std::string url_str = url.str();
+		const char* c_url = url_str.c_str();
+		if ( URLAccessManager::allow(url) ) {
+			return curl_adapter::make_stream(c_url, postdata);
 		} else {
 			return NULL;
 		}
