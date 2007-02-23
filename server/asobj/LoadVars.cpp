@@ -153,9 +153,9 @@ private:
 	/// workaround that limitation (in either boost or more
 	/// likely my own knowledge of it)
 	static void execCompleteLoad(LoadVars* lv) {
-		log_msg("LoadVars loading thread started");
+		//log_msg("LoadVars loading thread started");
 		lv->completeLoad();
-		log_msg("LoadVars loading thread completed");
+		//log_msg("LoadVars loading thread completed");
 	}
 
 	/// Parse an url-encoded query string
