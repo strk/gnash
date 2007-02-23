@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.266 2007/02/23 16:18:41 rsavoye Exp $
+dnl $Id: configure.ac,v 1.267 2007/02/23 16:26:03 udog Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -212,7 +212,7 @@ AC_ARG_WITH(
         AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32])
         ;;
       bgra32|BGRA32)
-        AC_DEFINE(PIXELFORMAT_BGR32, [1], [BGRA32])
+        AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
         ;;
       rgb24|RGB24)
         AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24])
@@ -247,7 +247,7 @@ if test x$pixelformat = xall; then
       AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565 pixel format])
       AC_DEFINE(PIXELFORMAT_RGB24,  [1], [RGB24 pixel format])
       AC_DEFINE(PIXELFORMAT_BGR24,  [1], [BGR24 pixel format])
-      AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGB32 pixel format])
+      AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32 pixel format])
       AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32 pixel format])
     fi
   fi
