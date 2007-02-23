@@ -74,6 +74,9 @@ public:
 	/// Dispatch.
 	virtual void operator()(const fn_call& fn)=0;
 
+	/// Alias for operator()
+	void call(const fn_call& fn) { return operator()(fn); }
+
 	/// Get this function's "prototype" member (exported interface).
 	//
 	/// This is never NULL, and created on purpose if not provided
