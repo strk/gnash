@@ -55,8 +55,193 @@ static void loadvars_ctor(const fn_call& fn);
 //static as_object* getLoadVarsInterface();
 //static void attachLoadVarsInterface(as_object& o);
 
-class LoadVarsLoader
+class LoadRequest
 {
+public:
+	typedef map<string, string> ValuesMap;
+
+	LoadRequest(const URL& url)
+		:
+		_stream(StreamProvider::getDefaultInstance().getStream(url)),
+		_completed(false)
+	{
+	}
+
+	LoadRequest(const URL& url, const std::string& postdata)
+		:
+		_stream(StreamProvider::getDefaultInstance().getStream(url, postdata)),
+		_completed(false)
+	{
+	}
+
+	LoadRequest(const LoadRequest& lr)
+		:
+		_stream(const_cast<LoadRequest&>(lr)._stream),
+		_completed(false)
+	{
+	}
+
+	ValuesMap& getValues()
+	{
+		return _vals;
+	}
+
+	void process()
+	{
+		assert(!_thread.get());
+		_thread.reset( new boost::thread(boost::bind(LoadRequest::execLoadingThread, this)) );
+	}
+
+	bool inProgress()
+	{
+		return ( _thread.get() != NULL );
+	}
+
+	/// Mutex-protected inspector for thread completion
+	bool completed()
+	{
+		boost::mutex::scoped_lock lock(_mutex);
+		if (  _completed && _thread.get() )
+		{
+			_thread->join();
+		}
+		return _completed;
+	}
+
+	/// Mutex-protected mutator for thread completion
+	void setCompleted()
+	{
+		boost::mutex::scoped_lock lock(_mutex);
+		_completed = true;
+		_thread.reset();
+	}
+
+	/// Since I haven't found a way to pass boost::thread 
+	/// constructor a non-static function, this is here to
+	/// workaround that limitation (in either boost or more
+	/// likely my own knowledge of it)
+	static void execLoadingThread(LoadRequest* ptr)
+	{
+		//log_msg("LoadVars loading thread started");
+		ptr->completeLoad();
+		//log_msg("LoadVars loading thread completed");
+	}
+
+	size_t getBytesLoaded() const {
+		return _bytesLoaded;
+	}
+
+	size_t getBytesTotal() const {
+		return _bytesTotal;
+	}
+
+
+private:
+
+	/// Load all data from the _stream input.
+	//
+	/// This function should be run by a separate thread.
+	///
+	void completeLoad()
+	{
+		using std::string;
+
+		// TODO: how to set _bytesTotal ?
+
+		// this is going to override any previous setting,
+		// better do this inside a subclass (in a separate thread)
+		_bytesLoaded = 0;
+
+		//log_msg("completeLoad called");
+
+		string toparse;
+
+		size_t CHUNK_SIZE = 1024;
+		char buf[CHUNK_SIZE];
+		unsigned int parsedLines = 0;
+		while ( size_t read = _stream->read_bytes(buf, CHUNK_SIZE) )
+		{
+			// TODO: use read_string ?
+			string chunk(buf, read);
+			toparse += chunk;
+
+			//log_msg("toparse: %s", toparse.c_str());
+
+			// parse remainder
+			size_t lastamp = toparse.rfind('&');
+			if ( lastamp != string::npos )
+			{
+				string parseable = toparse.substr(0, lastamp);
+				//log_msg("parseable: %s", parseable.c_str());
+				parse(parseable);
+				//log_msg("Parsed %d vals", parsed);
+				toparse = toparse.substr(lastamp+1);
+				++parsedLines;
+			}
+
+			_bytesLoaded += read;
+			//dispatchDataEvent();
+
+			// found newline, discard anything before that
+			if ( strchr(buf, '\n') )
+			{
+				if ( parsedLines ) break;
+				else toparse.clear();
+			}
+
+			// eof, get out !
+			if ( _stream->get_eof() ) break;
+		}
+
+		if ( ! toparse.empty() )
+		{
+			parse(toparse);
+		}
+
+		_stream->go_to_end();
+		_bytesLoaded = _stream->get_position();
+		_bytesTotal = _bytesLoaded;
+
+		//dispatchLoadEvent();
+
+		setCompleted();
+	}
+
+
+	/// Parse an url-encoded query string
+	//
+	/// Variables in the string will be added as properties
+	/// of this object.
+	///
+	/// @param querystring
+	///	An url-encoded query string.
+	///	The string will be parsed using URL::parse_querystring
+	///
+	/// @return the number of variables found in the string
+	///
+	size_t parse(const std::string& str)
+	{
+		using std::map;
+		using std::string;
+
+		URL::parse_querystring(str, _vals);
+
+		return _vals.size();
+	}
+
+	size_t _bytesLoaded;
+
+	size_t _bytesTotal;
+
+	std::auto_ptr<tu_file> _stream;
+
+	std::auto_ptr<boost::thread> _thread;
+
+	ValuesMap _vals;
+
+	bool _completed;
+
+	boost::mutex _mutex;
 };
 
 /// LoadVars ActionScript class
@@ -114,62 +299,17 @@ private:
 	/// new threads if needed.
 	void checkLoads();
 
-	/// Process current load request
-	//
-	/// This function is called by addLoadRequest()
-	/// if the just-added request is the only one in the queue
-	/// and by endCurrentLoad() if any other request is
-	/// in the queue.
-	///
-	/// It will start a separate thread to process
-	/// the request
-	///
-	void processCurrentLoadRequest();
-
-	/// Mark current load as done
-	//
-	/// This function removes the request from
-	/// the _loadRequests list and resets the
-	/// _currentLoad iterator.
-	/// If _loadRequests is not empty, it processes
-	/// the next request.
-	///
-	void endCurrentLoad();
-
 	/// \brief
 	/// Add a load request to the queue, processing it
 	/// if no other loads are in progress.
 	///
-	void addLoadRequest(const std::string& urlstr);
+	/// @param postdata
+	///	URL-encoded post data. NULL for no post.
+	///
+	void addLoadRequest(const std::string& urlstr, const char* postdata=NULL);
 
-	/// Load all data from the _stream input.
-	//
-	/// This function should be run by a separate thread.
-	///
-	void completeLoad();
-
-	/// Since I haven't found a way to pass boost::thread 
-	/// constructor a non-static function, this is here to
-	/// workaround that limitation (in either boost or more
-	/// likely my own knowledge of it)
-	static void execCompleteLoad(LoadVars* lv) {
-		//log_msg("LoadVars loading thread started");
-		lv->completeLoad();
-		//log_msg("LoadVars loading thread completed");
-	}
-
-	/// Parse an url-encoded query string
-	//
-	/// Variables in the string will be added as properties
-	/// of this object.
-	///
-	/// @param querystring
-	///	An url-encoded query string.
-	///	The string will be parsed using URL::parse_querystring
-	///
-	/// @return the number of variables found in the string
-	///
-	size_t parse(const std::string& querystring);
+	/// Process a completed load
+	size_t processLoaded(LoadRequest& lr);
 
 	/// Dispatch load event, if any
 	void dispatchLoadEvent();
@@ -214,7 +354,7 @@ private:
 	size_t _bytesLoaded;
 
 	/// List of load requests
-	typedef std::list<std::string> LoadRequests;
+	typedef std::list<LoadRequest> LoadRequests;
 
 	/// Load requests queue
 	//
@@ -233,8 +373,6 @@ private:
 	LoadRequests::iterator _currentLoad;
 
 	std::auto_ptr<tu_file> _stream;
-
-	mutable boost::mutex _loadRequestsMutex;
 
 	unsigned int _loadCheckerTimer;
 };
@@ -259,20 +397,25 @@ LoadVars::~LoadVars()
 void
 LoadVars::checkLoads()
 {
-	// TODO: take care of setting members here,
-	// we can't trust the loading thread to do so
-	if ( _loadRequests.empty() )
+	/// Process a completed load if any
+	if ( isLoading() && _currentLoad->completed() )
 	{
-		assert(_currentLoad == _loadRequests.end());
-		// TODO: remove the timer, which would likely
-		//       destroy ourselves
-		//log_msg("checkLoads(): no more requests, should shut down timer");
-		VM::get().getRoot().clear_interval_timer(_loadCheckerTimer);
+		processLoaded(*_currentLoad);
+		_loadRequests.pop_front();
+		_currentLoad = _loadRequests.end();
 	}
-	else if ( _currentLoad == _loadRequests.end() )
+
+	if ( ! isLoading() )
 	{
-		_currentLoad = _loadRequests.begin();
-		processCurrentLoadRequest();
+		if ( ! _loadRequests.empty() )
+		{
+			_currentLoad = _loadRequests.begin();
+			_currentLoad->process();
+		}
+		else
+		{
+			VM::get().getRoot().clear_interval_timer(_loadCheckerTimer);
+		}
 	}
 }
 
@@ -341,16 +484,12 @@ LoadVars::dispatchLoadEvent()
 
 /* private */
 size_t
-LoadVars::parse(const std::string& str)
+LoadVars::processLoaded(LoadRequest& lr)
 {
-	using std::map;
+	typedef LoadRequest::ValuesMap ValuesMap;
 	using std::string;
 
-	typedef map<string, string> ValuesMap;
-
-	ValuesMap vals;
-	URL::parse_querystring(str, vals);
-
+	ValuesMap& vals = lr.getValues();
 	for  (ValuesMap::iterator it=vals.begin(), itEnd=vals.end();
 			it != itEnd; ++it)
 	{
@@ -358,108 +497,17 @@ LoadVars::parse(const std::string& str)
 		//log_msg("Setting %s == %s", it->first.c_str(), it->second.c_str());
 	}
 
-	return vals.size();
-}
-
-/* private */
-void
-LoadVars::completeLoad()
-{
-	using std::string;
-
-	assert(isLoading());
-
-	// TODO: how to set _bytesTotal ?
-
-	// this is going to override any previous setting,
-	// better do this inside a subclass (in a separate thread)
-	_bytesLoaded = 0;
-
-	//log_msg("completeLoad called");
-
-	string toparse;
-
-	size_t CHUNK_SIZE = 1024;
-	char buf[CHUNK_SIZE];
-	unsigned int parsedLines = 0;
-	while ( size_t read = _stream->read_bytes(buf, CHUNK_SIZE) )
-	{
-		// TODO: use read_string ?
-		string chunk(buf, read);
-		toparse += chunk;
-
-		//log_msg("toparse: %s", toparse.c_str());
-
-		// parse remainder
-		size_t lastamp = toparse.rfind('&');
-		if ( lastamp != string::npos )
-		{
-			string parseable = toparse.substr(0, lastamp);
-			//log_msg("parseable: %s", parseable.c_str());
-			parse(parseable);
-			//log_msg("Parsed %d vals", parsed);
-			toparse = toparse.substr(lastamp+1);
-			++parsedLines;
-		}
-
-		_bytesLoaded += read;
-		dispatchDataEvent();
-
-		// found newline, discard anything before that
-		if ( strchr(buf, '\n') )
-		{
-			if ( parsedLines ) break;
-			else toparse.clear();
-		}
-
-		// eof, get out !
-		if ( _stream->get_eof() ) break;
-	}
-
-	if ( ! toparse.empty() )
-	{
-		parse(toparse);
-	}
-
-	_stream->go_to_end();
-	_bytesLoaded = _stream->get_position();
-	_bytesTotal = _bytesLoaded;
+	_bytesLoaded = lr.getBytesLoaded();
+	_bytesTotal = lr.getBytesTotal();
 
 	dispatchLoadEvent();
 
-	endCurrentLoad();
+	return vals.size();
 }
 
 void
-LoadVars::endCurrentLoad()
+LoadVars::addLoadRequest(const std::string& urlstr, const char* postdata)
 {
-	boost::mutex::scoped_lock lock(_loadRequestsMutex);
-	_loadRequests.erase(_currentLoad);
-	_currentLoad = _loadRequests.end();
-}
-
-void
-LoadVars::processCurrentLoadRequest()
-{
-
-	std::string& urlstr = *_currentLoad;
-	StreamProvider& provider = StreamProvider::getDefaultInstance();
-	URL url(urlstr, get_base_url());
-
-	_stream.reset ( provider.getStream(url) );
-
-	// WARNING: completeLoad must be called by a separate thread,
-	//          or we'll end up with a dead lock  (completeLoad calls
-	//          endCurrentLoad and is called by it!)
-	// When are we going to drop this ?
-	boost::thread thread(boost::bind(LoadVars::execCompleteLoad, this));
-}
-
-void
-LoadVars::addLoadRequest(const std::string& urlstr)
-{
-	boost::mutex::scoped_lock lock(_loadRequestsMutex);
-
 	if ( _loadRequests.empty() )
 	{
 		//log_msg("addLoadRequest(): new requests, starting timer");
@@ -471,7 +519,12 @@ LoadVars::addLoadRequest(const std::string& urlstr)
 		_loadCheckerTimer = VM::get().getRoot().add_interval_timer(timer);
 	}
 
-	_loadRequests.insert(_loadRequests.end(), urlstr);
+	URL url(urlstr, get_base_url());
+	if ( postdata ) {
+		_loadRequests.insert( _loadRequests.end(), LoadRequest(url, postdata) );
+	} else {
+		_loadRequests.insert( _loadRequests.end(), LoadRequest(url) );
+	}
 }
 
 void
