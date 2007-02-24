@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: processor.cpp,v 1.49 2007/02/24 10:37:57 strk Exp $ */
+/* $Id: processor.cpp,v 1.50 2007/02/24 10:41:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,7 +52,7 @@ extern "C"{
 
 // How many seconds to wait for a frame advancement 
 // before kicking the movie (forcing it to next frame)
-static const double waitforadvance = 1;
+static const double waitforadvance = 5;
 
 // How many time do we allow for loop backs
 // (goto frame < current frame)
