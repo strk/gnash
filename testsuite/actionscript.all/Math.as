@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-rcsid="$Id: Math.as,v 1.1 2007/02/17 20:33:38 martinwguy Exp $";
+rcsid="$Id: Math.as,v 1.2 2007/02/24 11:14:06 strk Exp $";
 
 // Test case for Math ActionScript class
 //
@@ -36,32 +36,32 @@ rcsid="$Id: Math.as,v 1.1 2007/02/17 20:33:38 martinwguy Exp $";
 check (Math);
 
 // test methods existance
-check (Math.abs != undefined);
-check (Math.acos != undefined);
-check (Math.asin != undefined);
-check (Math.atan != undefined);
-check (Math.ceil != undefined);
-check (Math.cos != undefined);
-check (Math.exp != undefined);
-check (Math.floor != undefined);
-check (Math.log != undefined);
-check (Math.random != undefined);
-check (Math.round != undefined);
-check (Math.sin != undefined);
-check (Math.sqrt != undefined);
-check (Math.tan != undefined);
-check (Math.atan2 != undefined);
-check (Math.max != undefined);
-check (Math.min != undefined);
-check (Math.pow != undefined);
-check (Math.E != undefined);
-check (Math.LN2 != undefined);
-check (Math.LOG2E != undefined);
-check (Math.LN10 != undefined);
-check (Math.LOG10E != undefined);
-check (Math.PI != undefined);
-check (Math.SQRT1_2 != undefined);
-check (Math.SQRT2 != undefined);
+check_equals (typeOf(Math.abs), 'function');
+check_equals (typeOf(Math.acos), 'function');
+check_equals (typeOf(Math.asin), 'function');
+check_equals (typeOf(Math.atan), 'function');
+check_equals (typeOf(Math.ceil), 'function');
+check_equals (typeOf(Math.cos), 'function');
+check_equals (typeOf(Math.exp), 'function');
+check_equals (typeOf(Math.floor), 'function');
+check_equals (typeOf(Math.log), 'function');
+check_equals (typeOf(Math.random), 'function');
+check_equals (typeOf(Math.round), 'function');
+check_equals (typeOf(Math.sin), 'function');
+check_equals (typeOf(Math.sqrt), 'function');
+check_equals (typeOf(Math.tan), 'function');
+check_equals (typeOf(Math.atan2), 'function');
+check_equals (typeOf(Math.max), 'function');
+check_equals (typeOf(Math.min), 'function');
+check_equals (typeOf(Math.pow), 'function');
+check_equals (typeOf(Math.E), 'number');
+check_equals (typeOf(Math.LN2), 'number');
+check_equals (typeOf(Math.LOG2E), 'number');
+check_equals (typeOf(Math.LN10), 'number');
+check_equals (typeOf(Math.LOG10E), 'number');
+check_equals (typeOf(Math.PI), 'number');
+check_equals (typeOf(Math.SQRT1_2), 'number');
+check_equals (typeOf(Math.SQRT2), 'number');
 
 #if OUTPUT_VERSION > 6
 check(Date.UTC != undefined);
@@ -125,7 +125,12 @@ check_equals (Math.abs(-15), 15);
 check_equals (Math.abs(plusinf), plusinf);
 check_equals (Math.abs(minusinf), plusinf);
 check_equals (Math.abs(notanumber).toString(), "NaN");
-check_equals (Math.abs(undefined).toString(), "NaN");
+
+#if OUTPUT_VERSION < 7
+check_equals (Math.abs(undefined).toString(), "0");
+#else
+xcheck_equals (Math.abs(undefined).toString(), "NaN");
+#endif
 check_equals (Math.abs().toString(), "NaN");
 
 check_equals (Math.acos(0).toString(), pi_2s);
@@ -135,14 +140,22 @@ check_equals (Math.acos(-0.5).toString(), "2.0943951023932");
 check_equals (Math.acos(-1).toString(), pis);
 check_equals (Math.acos(2).toString(), "NaN");
 check_equals (Math.acos(-2).toString(), "NaN");
-check_equals (Math.acos(undefined).toString(), "NaN");
+
+#if OUTPUT_VERSION < 7
+check_equals (Math.acos(undefined).toString(), "1.5707963267949");
+check_equals (Math.acos(acos(2)).toString(), "1.5707963267949");
+check_equals (Math.acos(undefined).toString(), "1.5707963267949");
+#else
+xcheck_equals (Math.acos(undefined).toString(), "NaN");
+xcheck_equals (Math.acos(acos(2)).toString(), "NaN");
+xcheck_equals (Math.acos(undefined).toString(), "NaN");
+#endif
+
 check_equals (Math.acos(1.0/0.0).toString(), "NaN");
 check_equals (Math.acos(-1.0/0.0).toString(), "NaN");
-check_equals (Math.acos(acos(2)).toString(), "NaN");
 check_equals (Math.acos(plusinf).toString(), "NaN");
 check_equals (Math.acos(minusinf).toString(), "NaN");
 check_equals (Math.acos(notanumber).toString(), "NaN");
-check_equals (Math.acos(undefined).toString(), "NaN");
 check_equals (Math.acos().toString(), "NaN");
 
 check_equals (Math.asin(0), 0);
@@ -155,7 +168,11 @@ check_equals (Math.asin(-2).toString(), "NaN");
 check_equals (Math.asin(plusinf).toString(), "NaN");
 check_equals (Math.asin(minusinf).toString(), "NaN");
 check_equals (Math.asin(notanumber).toString(), "NaN");
-check_equals (Math.asin(undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+check_equals (Math.asin(undefined).toString(), "0");
+#else
+xcheck_equals (Math.asin(undefined).toString(), "NaN");
+#endif
 check_equals (Math.asin().toString(), "NaN");
 
 check_equals (Math.atan(0), 0);
@@ -168,7 +185,11 @@ check_equals (Math.atan(-2).toString(), "-1.10714871779409");
 check_equals (Math.atan(plusinf).toString(), pi_2s);
 check_equals (Math.atan(minusinf).toString(), "-" + pi_2s);
 check_equals (Math.atan(notanumber).toString(), "NaN");
-check_equals (Math.atan(undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.atan(undefined).toString(), "0");
+#else
+ xcheck_equals (Math.atan(undefined).toString(), "NaN");
+#endif
 check_equals (Math.atan().toString(), "NaN");
 
 check_equals (Math.ceil(0), 0);
@@ -183,7 +204,11 @@ check_equals (Math.ceil(-0.9), 0);
 check_equals (Math.ceil(notanumber).toString(), "NaN");
 check_equals (Math.ceil(plusinf), plusinf);
 check_equals (Math.ceil(minusinf), minusinf);
-check_equals (Math.ceil(undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.ceil(undefined).toString(), "0");
+#else
+ xcheck_equals (Math.ceil(undefined).toString(), "NaN");
+#endif
 check_equals (Math.ceil().toString(), "NaN");
 
 check_equals (Math.cos(0), 1);
@@ -200,7 +225,11 @@ check_equals (Math.cos(-1).toString(), "0.54030230586814");
 check_equals (Math.cos(plusinf).toString(), "NaN");
 check_equals (Math.cos(minusinf).toString(), "NaN");
 check_equals (Math.cos(notanumber).toString(), "NaN");
-check_equals (Math.cos(undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.cos(undefined).toString(), "1");
+#else
+ xcheck_equals (Math.cos(undefined).toString(), "NaN");
+#endif
 check_equals (Math.cos().toString(), "NaN");
 
 check_equals (Math.exp(0), 1);
@@ -210,7 +239,11 @@ check_equals (Math.exp(-1).toString(), "0.367879441171442");
 check_equals (Math.exp(plusinf).toString(), "Infinity");
 check_equals (Math.exp(minusinf), 0);
 check_equals (Math.exp(notanumber).toString(), "NaN");
-check_equals (Math.exp(undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.exp(undefined).toString(), "1");
+#else
+ xcheck_equals (Math.exp(undefined).toString(), "NaN");
+#endif
 check_equals (Math.exp().toString(), "NaN");
 
 check_equals (Math.floor(0), 0);
@@ -225,7 +258,11 @@ check_equals (Math.floor(-2), -2);
 check_equals (Math.floor(plusinf).toString(), "Infinity");
 check_equals (Math.floor(minusinf).toString(), "-Infinity");
 check_equals (Math.floor(notanumber).toString(), "NaN");
-check_equals (Math.floor(undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.floor(undefined).toString(), "0");
+#else
+ xcheck_equals (Math.floor(undefined).toString(), "NaN");
+#endif
 check_equals (Math.floor().toString(), "NaN");
 
 check_equals (Math.log(0).toString(), "-Infinity");
@@ -236,7 +273,11 @@ check_equals (Math.log(-1).toString(), "NaN");
 check_equals (Math.log(plusinf).toString(), "Infinity");
 check_equals (Math.log(minusinf).toString(), "NaN");
 check_equals (Math.log(notanumber).toString(), "NaN");
-check_equals (Math.log(undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.log(undefined).toString(), "-Infinity");
+#else
+ xcheck_equals (Math.log(undefined).toString(), "NaN");
+#endif
 check_equals (Math.log().toString(), "NaN");
 
 var math_random = new Number(Math.random());
@@ -257,7 +298,11 @@ check_equals (Math.round(-0.9), -1);
 check_equals (Math.round(plusinf).toString(), "Infinity");
 check_equals (Math.round(minusinf).toString(), "-Infinity");
 check_equals (Math.round(notanumber).toString(), "NaN");
-check_equals (Math.round(undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.round(undefined).toString(), "0"); 
+#else
+ xcheck_equals (Math.round(undefined).toString(), "NaN");
+#endif
 check_equals (Math.round().toString(), "NaN");
 // Don't know what round() and friends do with huge numbers that cannot be
 // resolved to individual integer resolution. Don't really care either...
@@ -277,7 +322,11 @@ check_equals (Math.sin(-100).toString(), "0.506365641109759");
 check_equals (Math.sin(plusinf).toString(), "NaN");
 check_equals (Math.sin(minusinf).toString(), "NaN");
 check_equals (Math.sin(notanumber).toString(), "NaN");
-check_equals (Math.sin(undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.sin(undefined).toString(), "0"); 
+#else
+ xcheck_equals (Math.sin(undefined).toString(), "NaN"); 
+#endif
 check_equals (Math.sin().toString(), "NaN");
 
 check_equals (Math.sqrt(0), 0);
@@ -289,7 +338,11 @@ check_equals (Math.sqrt(2).toString(), "1.4142135623731");
 check_equals (Math.sqrt(plusinf).toString(), "Infinity");
 check_equals (Math.sqrt(minusinf).toString(), "NaN");
 check_equals (Math.sqrt(notanumber).toString(), "NaN");
-check_equals (Math.sqrt(undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.sqrt(undefined).toString(), "0"); 
+#else
+ xcheck_equals (Math.sqrt(undefined).toString(), "NaN"); 
+#endif
 check_equals (Math.sqrt().toString(), "NaN");
 
 check_equals (Math.tan(0), 0);
@@ -305,7 +358,11 @@ check_equals (Math.tan(-100).toString(), "0.587213915156929");
 check_equals (Math.tan(plusinf).toString(), "NaN");
 check_equals (Math.tan(minusinf).toString(), "NaN");
 check_equals (Math.tan(notanumber).toString(), "NaN");
-check_equals (Math.tan(undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.tan(undefined).toString(), "0"); 
+#else
+ xcheck_equals (Math.tan(undefined).toString(), "NaN"); 
+#endif
 check_equals (Math.tan().toString(), "NaN");
 
 //
@@ -335,8 +392,13 @@ check_equals (Math.atan2(minusinf, plusinf).toString(), "-" + pi_4s);
 // Rogue values
 check_equals (Math.atan2(notanumber,1).toString(), "NaN");
 check_equals (Math.atan2(1,notanumber).toString(), "NaN");
-check_equals (Math.atan2(undefined,1).toString(), "NaN");
-check_equals (Math.atan2(1,undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.atan2(undefined,1).toString(), "0"); 
+ check_equals (Math.atan2(1,undefined).toString(), "1.5707963267949"); 
+#else
+ xcheck_equals (Math.atan2(undefined,1).toString(), "NaN"); 
+ xcheck_equals (Math.atan2(1,undefined).toString(), "NaN"); 
+#endif
 
 xcheck_equals (Math.max().toString(), "-Infinity");  // Heaven knows why!
 check_equals (Math.max(1).toString(), "NaN");
@@ -348,7 +410,11 @@ check_equals (Math.max(-2,-1), -1);
 check_equals (Math.max(0,plusinf).toString(), "Infinity");
 check_equals (Math.max(0,minusinf), 0);
 check_equals (Math.max(plusinf,minusinf).toString(), "Infinity");
-check_equals (Math.max(0,undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.max(0,undefined).toString(), "0"); 
+#else
+ xcheck_equals (Math.max(0,undefined).toString(), "NaN"); 
+#endif
 check_equals (Math.max(0,notanumber).toString(), "NaN");
 
 xcheck_equals (Math.min().toString(), "Infinity");  // Heaven knows why!
@@ -362,7 +428,11 @@ check_equals (Math.min(-2,-1), -2);
 check_equals (Math.min(0,plusinf), 0);
 check_equals (Math.min(0,minusinf).toString(), "-Infinity");
 check_equals (Math.min(plusinf,minusinf).toString(), "-Infinity");
-check_equals (Math.min(0,undefined).toString(), "NaN");
+#if OUTPUT_VERSION < 7
+ check_equals (Math.min(0,undefined).toString(), "0"); 
+#else
+ xcheck_equals (Math.min(0,undefined).toString(), "NaN"); 
+#endif
 check_equals (Math.min(0,notanumber).toString(), "NaN");
 
 check_equals (Math.pow().toString(), "NaN");
