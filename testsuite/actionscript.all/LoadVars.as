@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.7 2007/01/11 11:26:50 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.8 2007/02/24 10:37:57 strk Exp $";
 
 #include "check.as"
 
@@ -58,5 +58,73 @@ check_equals (typeof(loadvarsObj.send), 'function');
 check_equals (typeof(loadvarsObj.sendAndLoad), 'function');
 // test the LoadVars::tostring method
 check_equals (typeof(loadvarsObj.toString), 'function');
+
+//--------------------------------------------------------------------------
+// Test LoadVars::load()
+//--------------------------------------------------------------------------
+
+varsloaded = 0;
+datareceived = 0;
+//var1 = undefined;
+//var2 = undefined;
+loadvarsObj.onLoad = function() {
+	varsloaded++;
+	note("LoadVars.onLoad called "+varsloaded+". "
+		+"Bytes loaded: "+loadvarsObj.getBytesLoaded()
+		+"/"+loadvarsObj.getBytesTotal());
+
+	//delete loadvarsObj; // this to test robustness
+
+	check(varsloaded < 3);
+
+	// onLoad is called after all vars have been called
+	check_equals( loadvarsObj.getBytesLoaded(), loadvarsObj.getBytesTotal() );
+
+	//for (var i in _root) { note("_root["+i+"] = "+_root[i]); }
+
+	if ( varsloaded == 2 )
+	{
+		check_equals(loadvarsObj['var1'], 'val1');
+		check_equals(loadvarsObj['var2'], 'val2');
+		check_equals(loadvarsObj['v2_var1'], 'val1');
+		check_equals(loadvarsObj['v2_var2'], 'val2');
+		play();
+	}
+};
+
+// If LoadVars.onData is defined, onLoad won't be called !
+// (at least this is what I see)
+#if 0
+loadvarsObj.onData = function() {
+	datareceived++;
+	note("LoadVars.onData called ("+datareceived+"), byte loaded: "
+		+loadvarsObj.getBytesLoaded()
+		+"/"+loadvarsObj.getBytesTotal());
+	//check_equals(loadvarsObj['var1'], 'val1');
+	//check_equals(loadvarsObj['var2'], 'val2');
+	//for (var i in _root) { note("_root["+i+"] = "+_root[i]); }
+	//play();
+};
+#endif
+
+loadvarsObj.var1 = "previous val1";
+
+// We expect the loaded file to return this string:
+//
+// 	"var1=val1&var2=val2&"
+//
+// The final '&' char is important, and it must
+// not start with a '?' char.
+// 
+check( loadvarsObj.load( MEDIA(vars.txt) ) );
+check( loadvarsObj.load( MEDIA(vars2.txt) ) );
+//loadvarsObj.load( 'vars.cgi' );
+
+check_equals(varsloaded, 0);
+check_equals(loadvarsObj['var1'], 'previous val1'); // will be overridden
+check_equals(loadvarsObj['var2'], undefined);
+//delete loadvarsObj; // this to test robustness
+
+stop();
 
 #endif //  OUTPUT_VERSION >= 6

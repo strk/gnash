@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: processor.cpp,v 1.48 2007/02/16 09:32:27 strk Exp $ */
+/* $Id: processor.cpp,v 1.49 2007/02/24 10:37:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,6 +36,9 @@
 
 #include <iostream>
 #include <cstdio>
+#include <sys/time.h>
+#include <time.h>
+
 extern "C"{
 	#include <unistd.h>
 #ifdef HAVE_GETOPT_H
@@ -49,7 +52,7 @@ extern "C"{
 
 // How many seconds to wait for a frame advancement 
 // before kicking the movie (forcing it to next frame)
-static const size_t waitforadvance = 5;
+static const double waitforadvance = 1;
 
 // How many time do we allow for loop backs
 // (goto frame < current frame)
@@ -107,6 +110,23 @@ static bool s_stop_on_errors = true;
 
 // How many time do we allow to hit the end ?
 static size_t allowed_end_hits = 1;
+
+double lastAdvanceTimer;
+
+void
+resetLastAdvanceTimer()
+{
+	using namespace tu_timer;
+	lastAdvanceTimer = ticks_to_seconds(get_ticks());
+}
+
+double
+secondsSinceLastAdvance()
+{
+	using namespace tu_timer;
+	double now = ticks_to_seconds(get_ticks());
+	return ( now - lastAdvanceTimer);
+}
 
 int
 main(int argc, char *argv[])
@@ -298,11 +318,7 @@ play_movie(const char* filename)
 
     md->completeLoad();
     
-    // How many times we allow a movie to be STOPPED
-    // in the same frame ?
-    float fps = md->get_frame_rate();
-    int maxstops=waitforadvance*(int)fps;
-
+    resetLastAdvanceTimer();
     int	kick_count = 0;
     int stop_count=0;
     size_t loop_back_count=0;
@@ -346,17 +362,18 @@ play_movie(const char* filename)
 	if (curr_frame == last_frame)
 	{
 		// Max stop counts reached, kick it
-		if ( ++stop_count >= maxstops)
+		if ( secondsSinceLastAdvance() > waitforadvance )
 		{
 			stop_count=0;
 
 			// Kick the movie.
 			if ( last_frame + 1 > md->get_frame_count() -1 )
 			{
-				printf("exiting after %d times in STOP mode at last frame\n", maxstops);
+				fprintf(stderr, "Exiting after %g seconds in STOP mode at last frame\n", waitforadvance);
 				break;
 			}
-			printf("kicking movie after %d frames in STOP mode, kick ct = %d\n", maxstops, kick_count);
+			fprintf(stderr, "Kicking movie after %g seconds in STOP mode, kick ct = %d\n", waitforadvance, kick_count);
+			fflush(stderr);
 			m.goto_frame(last_frame + 1);
 			m.set_play_state(gnash::sprite_instance::PLAY);
 			kick_count++;
@@ -365,6 +382,8 @@ play_movie(const char* filename)
 				printf("movie is stalled; giving up on playing it through.\n");
 				break;
 			}
+
+	    		resetLastAdvanceTimer(); // It's like we advanced
 		}
 	}
 	
@@ -385,6 +404,7 @@ play_movie(const char* filename)
 	{
 	    kick_count = 0;
 	    stop_count = 0;
+	    resetLastAdvanceTimer();
 	}
     }
     

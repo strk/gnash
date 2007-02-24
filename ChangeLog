@@ -2,6 +2,13 @@
 
 	* server/asobj/LoadVars.cpp: 
 	  Made code more robust, and hopefully also cleaner.
+	* utilities/processor.cpp:
+	  Fix waitforadvance handling. Wait 1 seconds before
+	  kicking movie to next frame. This allows for testing
+	  intervals and similar time-dependent features.
+	* testsuite/actionscript.all/LoadVars.as:
+	  Add test for LoadVars.load, LoadVars.getBytesTotal,
+	  LoadVars.getBytesLoaded and LoadVars.onLoad.
 
 2007-02-23 Sandro Santilli <strk@keybit.net>
 
