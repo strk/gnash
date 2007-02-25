@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AUTOMAKE_OPTIONS = 
+AUTOMAKE_OPTIONS = dejagnu
 
 # this is where Gnash plugins get installed
 pluginsdir = $(libdir)/gnash/plugins
@@ -46,11 +46,12 @@ fileio_la_LDFLAGS = -module -avoid-version -no-undefined
 fileio_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) $(AM_LDFLAGS)
 
 
-check_PROGRAMS = test
+check_SCRIPTS = test
 CLEANFILES = \
 	gnash-dbg.log \
 	test.swf.frame0.pp \
 	test.swf \
+	test \
 	logfile
 
 install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
@@ -58,8 +59,9 @@ install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(plugins_LTLIBRARIES) "$(DESTDIR)$(pluginsdir)/$(plugins_LTLIBRARIES)"
 	$(RM) $(DESTDIR)$(pluginsdir)/*.a 
 
-test: test.swf
-	../../utilities/gprocessor test.swf
+test: $(srcdir)/../../testsuite/generic-testrunner.sh test.swf
+	sh $< $(top_builddir) test.swf > $@
+	chmod +x $@
 
 test.swf: test.as
 
@@ -70,3 +72,26 @@ test.swf: test.as
 SUFFIXES = as swf
 .as.swf: 
 	$(MAKESWF) $(DEF_MAKESWF_FLAGS)	$(MAKESWF_FLAGS) -o $@ $<
+
+TEST_DRIVERS = ../../testsuite/simple.exp
+TEST_CASES = \
+	$(check_SCRIPTS)
+
+site-update: site.exp
+	@rm -fr site.exp.bak
+	@cp site.exp site.exp.bak
+	@sed -e '/testcases/d' site.exp.bak > site.exp
+	@echo "# This is a list of the pre-compiled testcases" >> site.exp
+	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
+
+check-DEJAGNU: site-update $(TEST_CASES)
+	@runtest=$(RUNTEST); \
+	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
+	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
+	else \
+	  echo "WARNING: could not find \`runtest'" 1>&2; \
+          for i in "$(TEST_CASES)"; do \
+	    $(SHELL) $$i; \
+	  done; \
+	fi
+
