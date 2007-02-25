@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: Number.cpp,v 1.21 2007/02/13 19:36:34 rsavoye Exp $ */
+/* $Id: Number.cpp,v 1.22 2007/02/25 17:07:07 nihilus Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -217,7 +217,7 @@ number_val_to_str(double _val, char *_str)
 			
 			sprintf(_str, "%.15g", _val * 10.0);
 			if ((cp = strchr(_str, '.')) == NULL || cp[1] != '0') {
-				log_error("Internal error: Cannot find \".0\" in \%s for %.15g\n", _str, _val);
+				log_error("Internal error: Cannot find \".0\" in %s for %.15g\n", _str, _val);
 				// Just give it to them raw instead
 				sprintf(_str, "%.15g", _val);
 			} else {
