@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.16 2007/02/14 20:41:48 tgc Exp $ */
+/* $Id: NetConnection.h,v 1.17 2007/02/25 16:21:21 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -23,7 +23,7 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_CURL_CURL_H
+#ifdef USE_CURL
 #include <curl/curl.h>
 #include <stdexcept>
 #include <cstdio>
@@ -85,11 +85,13 @@ private:
 	// TODO: don't really do this :)
 	std::string _url;
 
+#ifdef USE_CURL
 	// the libcurl easy handle
 	CURL *_handle;
 
 	// the libcurl multi handle
 	CURLM *_mhandle;
+#endif
 
 	// transfer in progress
 	int _running;

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.22 2007/02/14 20:41:48 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.23 2007/02/25 16:21:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,7 +44,7 @@ static void netconnection_new(const fn_call& fn);
 static void netconnection_connect(const fn_call& fn);
 static as_object* getNetConnectionInterface();
 
-#ifdef HAVE_CURL_CURL_H
+#ifdef USE_CURL
 
 /// \class NetConnection
 /// \brief Opens a local connection through which you can play

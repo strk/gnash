@@ -1,5 +1,7 @@
 2007-02-25 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetConnection.{cpp,h}:
+	  Allow build w/out libcurl.
 	* extensions/fileio/Makefile.am: fix
 	  'make check' and 'make dist' rules.
 	* server/asobj/LoadVars.cpp: implemented
