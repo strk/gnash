@@ -106,6 +106,40 @@ public:
 	///	
 	static void parse_querystring(const std::string& query_string,
 		 std::map<std::string, std::string>& target_map);
+
+	/// \brief
+	/// Encode a string to URL-encoded format
+	/// converting all dodgy characters to %AB hex sequences
+	//
+	/// Characters that need escaping are:
+	/// - ASCII control characters: 0-31 and 127
+	/// - Non-ASCII chars: 128-255
+	/// - URL syntax characters: $ & + , / : ; = ? @
+	/// - Unsafe characters: SPACE " < > # % { } | \ ^ ~ [ ] `
+	/// Encoding is a % followed by two hexadecimal characters, case insensitive.
+	/// See RFC1738 http://www.rfc-editor.org/rfc/rfc1738.txt,
+	/// Section 2.2 "URL Character Encoding Issues"
+	///
+	///
+	/// @param str
+	///	The input/output string
+	///
+	static void encode(std::string& str);
+
+	/// \brief
+	/// Decode a string from URL-encoded format
+	/// converting all hexadecimal sequences to ASCII characters.
+	//
+	/// A sequence to convert is % followed by two case-independent hexadecimal
+	/// digits, which is replaced by the equivalent ASCII character.
+	/// See RFC1738 http://www.rfc-editor.org/rfc/rfc1738.txt,
+	/// Section 2.2 "URL Character Encoding Issues"
+	///
+	/// @param str
+	///	The input/output string
+	///
+	static void decode(std::string& str);
+
 private:
 	void init_absolute(const std::string& absurl);
 

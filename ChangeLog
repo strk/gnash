@@ -1,5 +1,12 @@
 2007-02-25 Sandro Santilli <strk@keybit.net>
 
+	* libbase/URL.{cpp,h}: add encode() and decode()
+	  public static functions.
+	* server/asobj/Global.cpp (escape/unescape):
+	  Use URL::encode and URL::decode.
+
+2007-02-25 Sandro Santilli <strk@keybit.net>
+
 	* server/PropertyList.{cpp,h}: add
 	  enumerateKeyValue() method; renamed
 	  enumerateValues to enumerateKeys (makes more sense).

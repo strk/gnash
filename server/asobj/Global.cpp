@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.45 2007/02/21 20:22:59 strk Exp $ */
+/* $Id: Global.cpp,v 1.46 2007/02/25 18:32:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -61,6 +61,7 @@
 #include "extension.h"
 #include "VM.h"
 #include "timers.h"
+#include "URL.h" // for URL::encode and URL::decode (escape/unescape)
 
 #include "fn_call.h"
 #include "sprite_instance.h"
@@ -144,16 +145,8 @@ as_global_escape(const fn_call& fn)
 
     string input = fn.arg(0).to_string();
 
-    for (unsigned int i=0;i<input.length(); i++)
-	{
-	    unsigned c = input[i] & 0xFF;	// ensure value is 0-255 not -ve
+    URL::encode(input);
 
-	    if (c < 32 || c > 126 || escapees.find((char)c) != string::npos) {
-		input[i] = '%';
-		input.insert(++i, hexdigits.substr(c >> 4, 1));
-		input.insert(++i, hexdigits.substr(c & 0xF, 1));
-	    }
-	}
     fn.result->set_string(input.c_str());
 }
 
@@ -171,29 +164,7 @@ as_global_unescape(const fn_call& fn)
     ASSERT_FN_ARGS_IS_1
 
     string input = fn.arg(0).to_string();
-    int hexcode;
-
-    for (unsigned int i=0; i<input.length(); i++)
-	{
-	    if (input[i] == '%' && (input.length() > i + 2) &&
-		isxdigit(input[i+1]) && isxdigit(input[i+2]))
-		{
-		    input[i+1] = toupper(input[i+1]);
-		    input[i+2] = toupper(input[i+2]);
-		    if (isdigit(input[i+1]))
-			hexcode = (input[i+1] - '0') * 16;
-		    else
-			hexcode = (input[i+1] - 'A' + 10) * 16;
-
-		    if (isdigit(input[i+2]))
-			hexcode += (input[i+2] - '0');
-		    else
-			hexcode += (input[i+2] - 'A' + 10);
-
-		    input[i] = (char)hexcode;
-		    input.erase(i+1, 2);
-		}
-	}
+    URL::decode(input);
     fn.result->set_string(input.c_str());
 }
 
