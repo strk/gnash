@@ -157,7 +157,7 @@ private:
 		string toparse;
 
 		size_t CHUNK_SIZE = 1024;
-		char buf[CHUNK_SIZE];
+		char *buf = new char[CHUNK_SIZE];
 		unsigned int parsedLines = 0;
 		while ( size_t read = _stream->read_bytes(buf, CHUNK_SIZE) )
 		{
@@ -203,7 +203,7 @@ private:
 		_bytesTotal = _bytesLoaded;
 
 		//dispatchLoadEvent();
-
+		delete[] buf;
 		setCompleted();
 	}
 

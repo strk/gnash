@@ -29,6 +29,8 @@
 	* server/asobj/Date.cpp: Removed extra ; thus letting gcc compile
 	  it with -pedantic.
 	* libbase/embedVideoDecoder.h: Removed errornous ','.
+	* server/asobj/LoadVars.cpp: Fixed "LoadVars.cpp:160: error: ISO C++ 
+	  forbids variable-size array 'buf'"
 
 2007-02-24 Sandro Santilli <strk@keybit.net>
 
