@@ -284,6 +284,11 @@ public:
 		return _bytesTotal;
 	}
 
+	// Retur number of completed loads
+	unsigned int loaded() const {
+		return _loaded;
+	}
+
 private:
 
 	/// Return true if a load is currently in progress.
@@ -335,6 +340,8 @@ private:
 
 	static void checkLoads_wrapper(const fn_call& fn);
 
+	static void loaded_getset(const fn_call& fn);
+
 	static void onData_getset(const fn_call& fn);
 
 	static void onLoad_getset(const fn_call& fn);
@@ -375,6 +382,9 @@ private:
 	std::auto_ptr<tu_file> _stream;
 
 	unsigned int _loadCheckerTimer;
+
+	/// Number of clompleted loads
+	unsigned int _loaded;
 };
 
 LoadVars::LoadVars(as_environment* env)
@@ -384,7 +394,8 @@ LoadVars::LoadVars(as_environment* env)
 		_bytesTotal(0),
 		_bytesLoaded(0),
 		_loadRequests(),
-		_currentLoad(_loadRequests.end())
+		_currentLoad(_loadRequests.end()),
+		_loaded(0)
 {
 	//log_msg("LoadVars %p created", this);
 }
@@ -438,6 +449,9 @@ LoadVars::attachLoadVarsInterface(as_object& o)
 
 	gettersetter = new builtin_function(&LoadVars::onData_getset, NULL);
 	o.init_property("onData", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&LoadVars::loaded_getset, NULL);
+	o.init_property("loaded", *gettersetter, *gettersetter);
 }
 
 as_object*
@@ -499,6 +513,7 @@ LoadVars::processLoaded(LoadRequest& lr)
 
 	_bytesLoaded = lr.getBytesLoaded();
 	_bytesTotal = lr.getBytesTotal();
+	++_loaded;
 
 	dispatchLoadEvent();
 
@@ -590,6 +605,26 @@ LoadVars::onData_getset(const fn_call& fn)
 	{
 		as_function* h = fn.arg(0).to_as_function();
 		if ( h ) ptr->setDataHandler(h);
+	}
+}
+
+/* private static */
+void
+LoadVars::loaded_getset(const fn_call& fn)
+{
+
+	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		fn.result->set_bool(ptr->loaded() > 0);
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_msg("Tried to set LoadVars.loaded, which is a read-only property");
+		);
+		return;
 	}
 }
 

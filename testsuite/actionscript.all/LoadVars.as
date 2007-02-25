@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.8 2007/02/24 10:37:57 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.9 2007/02/25 14:14:14 strk Exp $";
 
 #include "check.as"
 
@@ -80,6 +80,8 @@ loadvarsObj.onLoad = function() {
 	// onLoad is called after all vars have been called
 	check_equals( loadvarsObj.getBytesLoaded(), loadvarsObj.getBytesTotal() );
 
+	check_equals( loadvarsObj.loaded, true );
+
 	//for (var i in _root) { note("_root["+i+"] = "+_root[i]); }
 
 	if ( varsloaded == 2 )
@@ -120,6 +122,9 @@ check( loadvarsObj.load( MEDIA(vars.txt) ) );
 check( loadvarsObj.load( MEDIA(vars2.txt) ) );
 //loadvarsObj.load( 'vars.cgi' );
 
+check_equals( loadvarsObj.loaded, false );
+loadvars.Obj.loaded = true;
+check_equals( loadvarsObj.loaded, false );
 check_equals(varsloaded, 0);
 check_equals(loadvarsObj['var1'], 'previous val1'); // will be overridden
 check_equals(loadvarsObj['var2'], undefined);
