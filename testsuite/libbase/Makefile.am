@@ -42,7 +42,8 @@ abs_builddir=`(cd $(top_builddir)/testsuite/libbase; pwd)`
 check_PROGRAMS = \
 	NoSeekFileTest \
 	URLTest \
-	RcTest
+	RcTest \
+	$(NULL)
 
 if CURL
 check_PROGRAMS += CurlStreamTest
@@ -80,7 +81,7 @@ TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	NoSeekFileTest \
 	URLTest \
-	RcTest
+	RcTest \
 	$(NULL)
 
 check-DEJAGNU: site-update $(TEST_CASES)
