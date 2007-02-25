@@ -449,7 +449,7 @@ ensure_date_object(as_object* obj)
 /// \brief Date.getYear
 /// returns a Date's Gregorian year minus 1900 according to local time.
 
-date_get_proto(date_getyear, localtime, tm_year);
+date_get_proto(date_getyear, localtime, tm_year)
 
 /// \brief Date.getFullYear
 /// returns a Date's Gregorian year according to local time.

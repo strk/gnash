@@ -15,6 +15,8 @@
 	* utilities/processor.cpp: Fixed optopt as extern ifndef _GNUC_
 	* macros/boost.m4: Generic approach to test date-time.
 	* testsuite/libbase/Makefile.am: Fixed $(NULL)-bug.
+	* server/asobj/Date.cpp: Removed extra ; thus letting gcc compile
+	  it with -pedantic.
 
 2007-02-24 Sandro Santilli <strk@keybit.net>
 
