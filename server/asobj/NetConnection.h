@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.17 2007/02/25 16:21:21 strk Exp $ */
+/* $Id: NetConnection.h,v 1.18 2007/02/25 16:31:48 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -23,14 +23,15 @@
 #include "config.h"
 #endif
 
-#ifdef USE_CURL
+#ifdef HAVE_CURL_CURL_H
 #include <curl/curl.h>
+#endif
+
 #include <stdexcept>
 #include <cstdio>
 #include <cerrno>
 #include <sys/types.h>
 #include <sys/stat.h>
-#endif
 
 #include <string>
 

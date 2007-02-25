@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.23 2007/02/25 16:21:21 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.24 2007/02/25 16:31:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,8 +44,6 @@ static void netconnection_new(const fn_call& fn);
 static void netconnection_connect(const fn_call& fn);
 static as_object* getNetConnectionInterface();
 
-#ifdef USE_CURL
-
 /// \class NetConnection
 /// \brief Opens a local connection through which you can play
 /// back video (FLV) files from an HTTP address or from the local file
@@ -57,8 +55,13 @@ static void ensure_libcurl_initialized()
 {
 	static bool initialized=0;
 	if ( ! initialized ) {
+#ifdef USE_CURL
+
 		// TODO: handle an error here
 		curl_global_init(CURL_GLOBAL_ALL);
+#else
+		log_error("Network support disabled (libcurl disabled at compile-time)");
+#endif
 		initialized=1;
 	}
 }
@@ -133,6 +136,7 @@ NetConnection::fill_cache(off_t size)
 {
 	struct stat statbuf;
 
+#ifdef USE_CURL
 	CURLMcode mcode;
 	while (_running)
 	{
@@ -155,16 +159,19 @@ NetConnection::fill_cache(off_t size)
 
 
 	}
-
+#endif
 }
+
 NetConnection::NetConnection()
 	:
 	as_object(getNetConnectionInterface()),
 	_cache(NULL),
 	_cachefd(0),
 	_url(),
+#ifdef USE_CURL
 	_handle(NULL),
 	_mhandle(NULL),
+#endif
 	_running(false),
 	localFile(true),
 	netStreamObj(NULL),
@@ -173,9 +180,11 @@ NetConnection::NetConnection()
 }
 
 NetConnection::~NetConnection() {
+#ifdef USE_CURL
 	curl_multi_remove_handle(_mhandle, _handle);
 	curl_easy_cleanup(_handle);
 	curl_multi_cleanup(_mhandle);
+#endif
 	fclose(_cache);
 }
 
@@ -229,6 +238,7 @@ bool NetConnection::openConnection(const char* char_url, as_object* ns)
 		}
 	}
 
+#ifdef USE_CURL
 	ensure_libcurl_initialized();
 
 	_handle = curl_easy_init();
@@ -308,6 +318,7 @@ are not honored during the DNS lookup - which you can  work  around  by
 		throw gnash::GnashException(curl_multi_strerror(mcode));
 	}
 	fill_cache(50000); // pre-cache 50 Kbytes
+#endif // defined USE_CURL
 
 	return true;
 }
@@ -354,8 +365,6 @@ NetConnection::seek(size_t pos)
 
 }
 
-
-#endif // HAVE_CURL_CURL_H
 
 
 
@@ -421,6 +430,7 @@ getNetConnectionInterface()
 	return o.get();
 }
 
+
 // extern (used by Global.cpp)
 void netconnection_class_init(as_object& global)
 {
@@ -441,6 +451,7 @@ void netconnection_class_init(as_object& global)
 	global.init_member("NetConnection", cl.get());
 
 }
+
 
 } // end of gnash namespace
 
