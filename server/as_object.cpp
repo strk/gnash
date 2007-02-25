@@ -449,7 +449,7 @@ as_object::enumerateProperties(std::map<std::string, std::string>& to)
 	as_object* obj = this;
 	while ( obj && visited.insert(obj).second )
 	{
-		obj->_members.enumerateKeyValue(*obj, to);
+		obj->_members.enumerateKeyValue(*this, to);
 		obj = obj->get_prototype();
 	}
 
