@@ -12,6 +12,7 @@
 2007-02-25 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/libslist: Check in lib32 before lib64.
+	* utilities/processor.cpp: Fixed optopt as extern ifndef _GNUC_
 	* macros/boost.m4: Generic approach to test date-time.
 
 2007-02-24 Sandro Santilli <strk@keybit.net>

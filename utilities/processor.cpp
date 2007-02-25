@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: processor.cpp,v 1.50 2007/02/24 10:41:13 strk Exp $ */
+/* $Id: processor.cpp,v 1.51 2007/02/25 16:28:47 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,6 +46,7 @@ extern "C"{
 #endif
 #ifndef __GNUC__
 	extern char *optarg;
+	extern int   optopt;
 	extern int optind, getopt(int, char *const *, const char *);
 #endif
 }
