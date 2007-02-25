@@ -308,8 +308,26 @@ public:
 
 	/// \brief
 	/// Enumerate all non-hidden properties pushing
-	/// their value to the given as_environment.
-	void enumerateValues(as_environment& env) const;
+	/// their keys to the given as_environment.
+	void enumerateKeys(as_environment& env) const;
+
+	/// \brief
+	/// Enumerate all non-hidden properties inserting
+	/// their name/value pair to the given map
+	///
+	/// @param this_ptr
+	/// 	The as_object used to set the 'this' pointer
+	/// 	for calling getter/setter function (GetterSetterProperty);
+	/// 	it will be unused when getting or setting SimpleProperty
+	/// 	properties.
+	///	This parameter is non-const as nothing prevents an
+	///	eventual "Getter" function from actually modifying it,
+	///	so we can't promise constness.
+	///	Note that the PropertyList itself might be changed
+	///	from this call, accessed trough the 'this' pointer,
+	///	so this method too is non-const (this is crazy, should cut it out)
+	/// 
+	void enumerateKeyValue(as_object& this_ptr, std::map<std::string, std::string>& to);
 
 	/// Remove all entries in the container
 	void clear();

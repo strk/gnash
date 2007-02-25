@@ -429,13 +429,30 @@ as_object::enumerateProperties(as_environment& env) const
 	const as_object* obj = this;
 	while ( obj && visited.insert(obj).second )
 	{
-		obj->_members.enumerateValues(env);
+		obj->_members.enumerateKeys(env);
 		obj = obj->get_prototype();
 	}
 
 	// This happens always since top object in hierarchy
 	// is always Object, which in turn derives from itself
 	//if ( obj ) log_warning("prototype loop during Enumeration");
+}
+
+void
+as_object::enumerateProperties(std::map<std::string, std::string>& to)
+{
+
+	// this set will keep track of visited objects,
+	// to avoid infinite loops
+	std::set<const as_object*> visited;
+
+	as_object* obj = this;
+	while ( obj && visited.insert(obj).second )
+	{
+		obj->_members.enumerateKeyValue(*obj, to);
+		obj = obj->get_prototype();
+	}
+
 }
 
 as_object::as_object()

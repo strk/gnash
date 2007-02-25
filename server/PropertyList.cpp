@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@
 #include "log.h"
 
 #include "as_function.h"
-#include "as_environment.h" // for enumerateValues
+#include "as_environment.h" // for enumerateKeys
 #include "as_value.h" // for enumerateValues
 
 #include <utility> // for std::make_pair
@@ -175,7 +175,7 @@ PropertyList::setFlagsAll(const PropertyList& props,
 }
 
 void
-PropertyList::enumerateValues(as_environment& env) const
+PropertyList::enumerateKeys(as_environment& env) const
 {
 	for ( const_iterator i=begin(), ie=end(); i != ie; ++i)
 	{
@@ -184,6 +184,20 @@ PropertyList::enumerateValues(as_environment& env) const
 		if ( prop->getFlags().get_dont_enum() ) continue;
 
 		env.push(as_value(i->first.c_str()));
+	}
+}
+
+void
+PropertyList::enumerateKeyValue(as_object& this_ptr, std::map<std::string, std::string>& to) 
+{
+	for ( const_iterator i=begin(), ie=end(); i != ie; ++i)
+	{
+		const Property* prop = i->second;
+
+		if ( prop->getFlags().get_dont_enum() ) continue;
+
+		to.insert(make_pair(i->first,
+				prop->getValue(this_ptr).to_string()));
 	}
 }
 

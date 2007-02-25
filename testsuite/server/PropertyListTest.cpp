@@ -105,5 +105,12 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(delpair.second, false); // property was NOT deleted
 	check_equals(props.size(), 4);
 
+	std::map<std::string, std::string> vals;
+	props.enumerateKeyValue(obj, vals);
+	check_equals( vals.size(), 4 );
+	check_equals( vals["var0"], "value3" );
+	check_equals( vals["Var0"], "value2" );
+	check_equals( vals["var1"], "value" );
+
 }
 

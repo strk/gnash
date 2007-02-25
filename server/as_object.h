@@ -301,6 +301,17 @@ public:
 	void enumerateProperties(as_environment& env) const;
 
 	/// \brief
+	/// Enumerate all non-hidden properties inserting
+	/// their name/value pair to the given map.
+	//
+	/// The enumeration recurse in prototype.
+	/// This implementation will keep track of visited object
+	/// to avoid loops in prototype chain. 
+	/// NOTE: the MM player just chokes in this case (loop)
+	///
+	void enumerateProperties(std::map<std::string, std::string>& to);
+
+	/// \brief
 	/// Add a getter/setter property, if no member already has
 	/// that name (or should we allow override ? TODO: check this)
 	//
