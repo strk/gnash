@@ -16,7 +16,7 @@
 
 // 
 
-/* $Id: curl_adapter.cpp,v 1.21 2007/02/22 16:36:13 strk Exp $ */
+/* $Id: curl_adapter.cpp,v 1.22 2007/02/25 20:30:56 strk Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -121,6 +121,9 @@ public:
 
 	/// Put read pointer at given position
 	bool seek(size_t pos);
+
+	/// Put read pointer at eof
+	bool seek_to_end();
 
 private:
 
@@ -469,6 +472,33 @@ CurlStreamFile::seek(size_t pos)
 
 }
 
+/*public*/
+bool
+CurlStreamFile::seek_to_end()
+{
+	CURLMcode mcode;
+	while (_running)
+	{
+		do
+		{
+			mcode=curl_multi_perform(_mhandle, &_running);
+		} while ( mcode == CURLM_CALL_MULTI_PERFORM );
+		
+		if ( mcode != CURLM_OK )
+		{
+			throw gnash::GnashException(curl_multi_strerror(mcode));
+		}
+	}
+
+	if ( fseek(_cache, 0, SEEK_END) == -1 ) {
+		fprintf(stderr, "Warning: fseek to end failed\n");
+		return false;
+	} else {
+		return true;
+	}
+
+}
+
 /***********************************************************************
  *
  * Adapter calls
@@ -507,10 +537,11 @@ seek(int pos, void* appdata)
 }
 
 static int
-seek_to_end(void* /*appdata*/)
+seek_to_end(void* appdata)
 {
-	assert(0); // not supported
-	return 0;
+	CurlStreamFile* stream = (CurlStreamFile*) appdata;
+	if ( stream->seek_to_end() ) return 0;
+	else return TU_FILE_SEEK_ERROR;
 }
 
 static int
