@@ -388,6 +388,8 @@ URL::parse_querystring(const std::string& query_string,
 
 		string name = query_string.substr(start, eq-start);
 		string value = query_string.substr(eq+1, amp-(eq+1));
+		decode(name);
+		decode(value);
 
 		target_map[name] = value;
 
@@ -413,6 +415,10 @@ URL::encode(std::string& input)
 			input.insert(++i, hexdigits.substr(c >> 4, 1));
 			input.insert(++i, hexdigits.substr(c & 0xF, 1));
 	    	}
+		else if ( c == ' ' )
+		{
+			input[i] = '+';
+		}
 	}
 }
 
@@ -441,6 +447,10 @@ URL::decode(std::string& input)
 
 			input[i] = (char)hexcode;
 			input.erase(i+1, 2);
+		}
+		else if ( input[i] == '+' )
+		{
+			input[i] = ' ';
 		}
 	}
 }

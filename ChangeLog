@@ -1,5 +1,10 @@
 2007-02-25 Sandro Santilli <strk@keybit.net>
 
+	* libbase/URL.cpp (encode,decode): support ' ' <=> '+' conversion.
+	* server/asobj/LoadVars.cpp: add support for LoadVars.sendAndLoad().
+
+2007-02-25 Sandro Santilli <strk@keybit.net>
+
 	* libbase/curl_adapter.cpp: implemented seek_to_end 
 	  for curl-based stream.
 	* server/as_object.cpp (enumerateProperties):

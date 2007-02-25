@@ -161,6 +161,15 @@ private:
 		unsigned int parsedLines = 0;
 		while ( size_t read = _stream->read_bytes(buf, CHUNK_SIZE) )
 		{
+			bool newlineFound = false;
+
+			// found newline, discard anything before that
+			if ( char* ptr=strchr(buf, '\n') )
+			{
+				newlineFound = true;
+				*ptr = '\0';
+			}
+
 			// TODO: use read_string ?
 			string chunk(buf, read);
 			toparse += chunk;
@@ -183,7 +192,7 @@ private:
 			//dispatchDataEvent();
 
 			// found newline, discard anything before that
-			if ( strchr(buf, '\n') )
+			if ( newlineFound )
 			{
 				if ( parsedLines ) break;
 				else toparse.clear();
@@ -221,9 +230,6 @@ private:
 	///
 	size_t parse(const std::string& str)
 	{
-		using std::map;
-		using std::string;
-
 		URL::parse_querystring(str, _vals);
 
 		return _vals.size();
@@ -266,6 +272,27 @@ public:
 	///
 	void load(const std::string& url);
 
+	/// \brief
+	/// Load data from given URL into the given target, sending
+	/// enumerable properties of this object using either POST or
+	/// GET method.
+	//
+	/// Actually adds a request for the load.
+	/// The loader thread will only be started later.
+	///
+	/// @param urlstr
+	///	The base url string to post to (and load from).
+	///
+	/// @param target
+	///	The LoadVars that will process a completed load, thus
+	///	getting the members from the response attached.
+	///
+	/// @param post
+	///	If false, variables will be sent using the GET method.
+	///	If true (the default), variables will be sent using POST.
+	///
+	void sendAndLoad(const std::string& urlstr, LoadVars& target, bool post=true);
+
 	static as_object* getLoadVarsInterface();
 
 	static void attachLoadVarsInterface(as_object& o);
@@ -290,6 +317,13 @@ public:
 	}
 
 private:
+
+	/// Return enumerable property pairs in url-encoded form
+	//
+	/// TODO: move up to as_object and make public,
+	///       for use by loadVariables ?
+	///
+	std::string getURLEncodedProperties();
 
 	/// Return true if a load is currently in progress.
 	//
@@ -548,13 +582,60 @@ LoadVars::load(const std::string& urlstr)
 	addLoadRequest(urlstr);
 }
 
+std::string
+LoadVars::getURLEncodedProperties()
+{
+	// TODO: optimize this function... 
+
+	using std::string;
+
+	string qstring;
+
+	typedef std::map<std::string, std::string> VarMap;
+	VarMap vars;
+
+	//return qstring;
+
+	// TODO: it seems that calling enumerateProperties(vars) here
+	//       somehow corrupts the stack !
+	enumerateProperties(vars);
+
+	for (VarMap::iterator it=vars.begin(), itEnd=vars.end();
+			it != itEnd; ++it)
+	{
+		string var = it->first; URL::encode(var);
+		string val = it->second; URL::encode(val);
+		if ( it != vars.begin() ) qstring += string("&");
+		qstring += var + string("=") + val;
+	}
+
+	return qstring;
+}
+
+void
+LoadVars::sendAndLoad(const std::string& urlstr, LoadVars& target, bool post)
+{
+	std::string querystring = getURLEncodedProperties();
+	if ( post ) {
+		target.addLoadRequest(urlstr, querystring.c_str());
+	} else {
+		std::string url = urlstr + "?" + querystring;
+		target.addLoadRequest(urlstr);
+	}
+}
+
 static LoadVars*
 ensureLoadVars(as_object* obj)
 {
 	LoadVars* ret = dynamic_cast<LoadVars*>(obj);
 	if ( ! ret )
 	{
-		throw ActionException("builtin method or gettersetter for LoadVars objects called against non-LoadVars instance");
+		std::stringstream ss;
+		ss << "builtin method or gettersetter for LoadVars objects "
+			<< "called against non-LoadVars instance ("
+			<< typeid(*obj).name() << ")";
+		throw ActionException(ss.str());
+		//throw ActionException("builtin method or gettersetter for LoadVars objects called against non-LoadVars instance (%s)", typeid(*obj).name());
 	}
 	return ret;
 }
@@ -582,7 +663,6 @@ LoadVars::onLoad_getset(const fn_call& fn)
 void
 LoadVars::checkLoads_wrapper(const fn_call& fn)
 {
-
 	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
 	ptr->checkLoads();
 
@@ -700,8 +780,44 @@ static void
 loadvars_sendandload(const fn_call& fn)
 {
 	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
-	UNUSED(ptr);
-	log_error("%s: unimplemented", __FUNCTION__);
+
+	if ( fn.nargs < 2 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("LoadVars.sendAndLoad() requires at least two arguments");
+		);
+		fn.result->set_bool(false);
+		return;
+	}
+
+	std::string urlstr = fn.arg(0).to_std_string();
+	if ( urlstr.empty() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("LoadVars.sendAndLoad(): invalid empty url ");
+		);
+		fn.result->set_bool(false);
+		return;
+	}
+
+	LoadVars* target = dynamic_cast<LoadVars*>(fn.arg(1).to_object());
+	if ( ! target )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("LoadVars.sendAndLoad(): invalid target (must be a LoadVars object)");
+		);
+		fn.result->set_bool(false);
+		return;
+	}
+
+	// Post by default, override by ActionScript third argument
+	bool post = true;
+	if ( fn.nargs > 2 && fn.arg(2).to_std_string() == "GET" ) post = false;
+
+	//log_msg("LoadVars.sendAndLoad(%s, %p) called, and returning TRUE", urlstr.c_str(), target);
+
+	ptr->sendAndLoad(urlstr, *target, post);
+	fn.result->set_bool(true);
 }
 
 static void
