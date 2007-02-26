@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: tag_loaders.h,v 1.15 2007/02/21 11:35:51 strk Exp $ */
+/* $Id: tag_loaders.h,v 1.16 2007/02/26 22:58:38 strk Exp $ */
 
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
@@ -113,7 +113,7 @@ void	frame_label_loader(stream*, tag_type, movie_definition*);
 
 void	export_loader(stream*, tag_type, movie_definition*);
 
-/// Load an SWF::IMPORTASSETS tag (for pulling in external resources)
+/// Load an SWF::IMPORTASSETS or SWF::IMPORTASSETS2 tag (for pulling in external resources)
 void	import_loader(stream*, tag_type, movie_definition*);
 
 /// Load a SWF::DEFINESOUND tag.

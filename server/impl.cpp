@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.97 2007/02/23 11:26:54 strk Exp $ */
+/* $Id: impl.cpp,v 1.98 2007/02/26 22:58:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -217,7 +217,7 @@ static void	ensure_loaders_registered()
 	
 	register_tag_loader(SWF::FILEATTRIBUTES, file_attributes_loader); // 69
 	register_tag_loader(SWF::PLACEOBJECT3, fixme_loader); // 70
-	register_tag_loader(SWF::IMPORTASSETS2, fixme_loader); // 71
+	register_tag_loader(SWF::IMPORTASSETS2, import_loader); // 71
 
 	register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader); // 73
 

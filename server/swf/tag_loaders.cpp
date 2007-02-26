@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.76 2007/02/21 11:35:51 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.77 2007/02/26 22:58:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1392,18 +1392,30 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 
 void	import_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == SWF::IMPORTASSETS);
+	assert(tag == SWF::IMPORTASSETS || tag == SWF::IMPORTASSETS2);
 
-    char*	source_url = in->read_string();
-    int	count = in->read_u16();
+	char* source_url = in->read_string();
 
-    // Resolve relative urls against baseurl
-    URL abs_url(source_url, get_base_url());
+	// Resolve relative urls against baseurl
+	URL abs_url(source_url, get_base_url());
 
-		IF_VERBOSE_PARSE
-		(
-    log_parse("  import: source_url = %s (%s), count = %d", abs_url.str().c_str(), source_url, count);
-    		);
+	unsigned char import_version = 0;
+
+	if ( tag == SWF::IMPORTASSETS2 )
+	{
+		import_version = in->read_uint(8);
+		unsigned char reserved = in->read_uint(8);
+		UNUSED(reserved);
+	}
+
+	int	count = in->read_u16();
+
+	IF_VERBOSE_PARSE
+	(
+	log_parse("  import: version = %u, source_url = %s (%s), count = %d", import_version, abs_url.str().c_str(), source_url, count);
+	//log_parse("  import: version = %u, source_url = %s (%s), count = %d", import_version, abs_url.str().c_str(), source_url, count);
+	);
+
 
     // Try to load the source movie into the movie library.
     movie_definition*	source_movie = NULL;
@@ -1442,7 +1454,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 		IF_VERBOSE_PARSE
 		(
 	    log_parse("  import: id = %d, name = %s", id, symbol_name);
-	    	)
+	    	);
 	    
 	    if (s_no_recurse_while_loading)
 		{
