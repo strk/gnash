@@ -11,13 +11,14 @@ check_equals(temp, 2);
 check_equals(counter, 1);
 
 // this would emit a function call
-//gotoAndPlay(temp);
+//this.gotoAndPlay(temp);
 
 // this would emit a GOTOFRAME tag
 //gotoFrame(2);
 
 // this emits a GOTOFRAME2 (GOTOEXPRESSION) tag
-gotoFrame(temp);
+// (only if Ming version is 00040004 or higher)
+gotoAndPlay(temp);
 
 check_equals(_currentframe, temp);
 check_equals(counter, 1); // gotoFrame(_currentframe) is a no-op
