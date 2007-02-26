@@ -190,7 +190,7 @@ main(int argc, char **argv)
 	set_text(mo, "Frame1: move the mouse on the square");
 	add_code(mo, "square1._visible = true; square2._visible=false;");
 
-	add_event(mo, "square1", "RollOver", "gotoFrame(2)");
+	add_event(mo, "square1", "RollOver", "gotoAndPlay(2)");
 	//add_event(mo, "square", "RollOver", "");
 	//add_event(mo, "square", "RollOut", "");
 	//add_event(mo, "square", "MouseDown", "");
@@ -209,9 +209,9 @@ main(int argc, char **argv)
 	set_text(mo, "Frame2: move the mouse off the square");
 	add_code(mo, "square2._visible = true; square1._visible=false;");
 
-	//add_event(mo, "square", "RollOver", "gotoFrame(2)");
+	//add_event(mo, "square", "RollOver", "gotoAndPlay(2)");
 	//add_event(mo, "square", "RollOver", "");
-	add_event(mo, "square2", "RollOut", "gotoFrame(1)");
+	add_event(mo, "square2", "RollOut", "gotoAndPlay(1)");
 	//add_event(mo, "square", "MouseDown", "");
 	//add_event(mo, "square", "MouseUp", "");
 
