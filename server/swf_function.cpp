@@ -259,8 +259,6 @@ swf_function::operator()(const fn_call& fn)
 		{
 			// Put 'super' in a register.
 			our_env->local_register(current_reg).set_as_object(getSuper(*(fn.this_ptr)));
-			log_warning("UNTESTED: 'super' in function2 dispatch (register)");
-
 			current_reg++;
 		}
 
