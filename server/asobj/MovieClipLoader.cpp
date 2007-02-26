@@ -441,7 +441,7 @@ moviecliploader_class_init(as_object& global)
 		attachMovieClipLoaderInterface(*cl);  // not sure we should be doing this..
 	}
 	global.init_member("MovieClipLoader", cl.get()); //as_value(moviecliploader_new));
-	log_msg("MovieClipLoader class @ %p", cl.get());
+	//log_msg("MovieClipLoader class @ %p", cl.get());
 }
 
 } // end of gnash namespace
