@@ -119,7 +119,7 @@ private:
 	///
 	virtual size_t get_bytes_total() const
 	{
-		return m_movie_def ? m_movie_def->get_bytes_total() : 0;
+		return m_movie_def->get_bytes_total();
 	}
 
 	/// \brief
@@ -128,13 +128,12 @@ private:
 	///
 	virtual size_t get_bytes_loaded() const
 	{
-		return m_movie_def ? m_movie_def->get_bytes_loaded() : 0;
+		return m_movie_def->get_bytes_loaded();
 	}
 
 	virtual float	get_frame_rate() const
 	{
-		// or should we assert(0) here ?
-		return m_movie_def ? m_movie_def->get_frame_rate() : 0.0;
+		return m_movie_def->get_frame_rate();
 	}
 
 	const rect& get_frame_size() const
@@ -149,9 +148,6 @@ private:
 
 	virtual int	get_version() const
 	{
-		// how do we tell version if we don't have a refenrece
-		// to the topmost movie ??
-		assert(m_movie_def);
 		return m_movie_def->get_version();
 	}
 
@@ -167,20 +163,13 @@ private:
 	/// Delegate call to associated root movie
 	virtual font* get_font(int id)
 	{
-		// how do we resolve fonts if we don't have a reference
-		// to the topmost movie ??
-		return m_movie_def ? m_movie_def->get_font(id) : NULL;
+		return m_movie_def->get_font(id);
 	}
 
 	/// Delegate call to associated root movie
 	virtual bitmap_character_def* get_bitmap_character_def(int id)
 	{
-		// how do we query characters by id
-		// if we don't have a reference to the topmost movie ??
-		return m_movie_def ?
-			m_movie_def->get_bitmap_character_def(id)
-			:
-			NULL;
+		return m_movie_def->get_bitmap_character_def(id);
 	}
 
 	/// Overridden just for complaining  about malformed SWF
@@ -196,9 +185,7 @@ private:
 	/// Delegate call to associated root movie
 	virtual sound_sample* get_sound_sample(int id)
 	{
-		// how do we query sound samples by id
-		// if we don't have a reference to the topmost movie ??
-		return m_movie_def ? m_movie_def->get_sound_sample(id) : NULL;
+		return m_movie_def->get_sound_sample(id);
 	}
 
 	/// Overridden just for complaining  about malformed SWF
@@ -213,20 +200,14 @@ private:
 	/// Delegate call to associated root movie
 	virtual void set_loading_sound_stream_id(int id) 
 	{
-		if ( m_movie_def )
-		{
-			m_movie_def->set_loading_sound_stream_id(id);
-		}
+		m_movie_def->set_loading_sound_stream_id(id);
 
 	}
 
 	/// Delegate call to associated root movie, or return -1
 	virtual int get_loading_sound_stream_id()
 	{ 
-		return m_movie_def ? 
-			m_movie_def->get_loading_sound_stream_id()
-			:
-			-1;
+		return m_movie_def->get_loading_sound_stream_id();
 	}
 
 	
@@ -242,10 +223,7 @@ private:
 	/// Delegate call to associated root movie
 	virtual boost::intrusive_ptr<resource> get_exported_resource(const tu_string& sym)
 	{
-		return m_movie_def ? 
-			m_movie_def->get_exported_resource(sym)
-			:
-			NULL;
+		return m_movie_def->get_exported_resource(sym);
 	}
 
 	/// \brief
@@ -254,10 +232,7 @@ private:
 	///
 	virtual character_def*	get_character_def(int id)
 	{
-	    return m_movie_def ?
-	    	m_movie_def->get_character_def(id)
-		:
-		NULL;
+	    return m_movie_def->get_character_def(id);
 	}
 
 	/// Overridden just for complaining  about malformed SWF
@@ -328,11 +303,7 @@ private:
 
 	virtual const std::string& get_url() const
 	{
-	    static std::string null_url;
-	    return m_movie_def ?
-	    	m_movie_def->get_url()
-		:
-		null_url;
+		return m_movie_def->get_url();
 	}
 
 	/// \brief

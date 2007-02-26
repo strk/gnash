@@ -1,5 +1,8 @@
 2007-02-26 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/sprite_definition.h: don't check 
+	  for movie definition being NULL as we're not allowing
+	  this anymore.
 	* server/parser/sprite_definition.cpp (ctor) *require*
 	  a movie_definition as we'll need it for a few things,
 	  including getVersion..
