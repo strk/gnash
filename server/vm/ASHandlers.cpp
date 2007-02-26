@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.39 2007/02/21 20:22:59 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.40 2007/02/26 14:19:23 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2040,14 +2040,18 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 				target->goto_frame(frame_number);
 				success = true;
 			}
+			else
+			{
+				log_error("ActionGotoExpression: conversion of string '%s' to a number failed", frame_label);
+			}
 			// else no-op.
 		}
 	}
 	else if ( expression.is_number() )
 	{
-		// Frame numbers appear to be 0-based!  @@ Verify.
+		// Frame number is 1-based !
 		int frame_number = int(expression.to_number());
-		target->goto_frame(frame_number);
+		target->goto_frame(frame_number-1);
 		success = true;
 	}
 //	else
@@ -2065,6 +2069,10 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 	if (success)
 	{
 		target->set_play_state(state);
+	}
+	else
+	{
+		log_error("No success in gotoFrame2 ? should this ever happen ?");
 	}
 		  
 	env.drop(1);
