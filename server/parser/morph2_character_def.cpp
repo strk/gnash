@@ -15,6 +15,72 @@
 
 
 namespace gnash {
+
+// Facilities for working with list of paths.
+class PathList {
+
+public:
+
+	PathList(const std::vector<path>& paths)
+		:
+		_paths(paths),
+		_currpath(0),
+		_curredge(0),
+		_nedges(computeNumberOfEdges(_paths))
+	{}
+
+	/// Return number of edges in the path list
+	size_t size()
+	{
+		return _nedges;
+	}
+
+	/// Get next edge in the path list.
+	//
+	/// After last edge in the list has been fetched,
+	/// next call to this function will return first
+	/// edge again.
+	///
+	const edge& getNextEdge()
+	{
+		const edge& ret = _paths[_currpath][_curredge];
+		if ( ++_curredge >= _paths[_currpath].size() )
+		{
+			if ( ++_currpath >= _paths.size() )
+			{
+				// this is not really needed,
+				// but it's simpler to do so that
+				// to make next call fail or abort..
+				_currpath = 0;
+				_curredge = 0;
+			}
+		}
+		return ret;
+	}
+
+	/// Compute total number of edges 
+	static size_t computeNumberOfEdges(const std::vector<path>& paths)
+	{
+		size_t count=0;
+		for (size_t i = 0, e=paths.size(); i<e; ++i)
+		{
+			count += paths[i].size();
+		}
+		return count;
+	}
+
+private:
+
+	const std::vector<path>& _paths;
+
+	size_t _currpath;
+
+	size_t _curredge;
+
+	size_t _nedges;
+
+};
+
 	morph2_character_def::morph2_character_def():
 		m_last_ratio(-1.0f), m_mesh(0)
 	{
@@ -62,13 +128,21 @@ namespace gnash {
 			ls.m_color.set_lerp(ls1.get_color(), ls2.get_color(), ratio);
 		}
 
+		// This is used for cases in which number 
+		// of paths in start shape and end shape are not 
+		// the same.
+		path empty_path;
+		edge empty_edge;
+
 		// shape
 		unsigned int k=0, n=0;
+		const std::vector<path>& paths1 = m_shape1->get_paths();
+		const std::vector<path>& paths2 = m_shape2->get_paths();
 		for (i=0; i < m_paths.size(); i++)
 		{
 			path& p = m_paths[i];
-			const path& p1 = m_shape1->get_paths()[i];
-			const path& p2 = m_shape2->get_paths()[n];
+			const path& p1 = i < paths1.size() ? paths1[i] : empty_path; 
+			const path& p2 = n < paths2.size() ? paths2[n] : empty_path;
 
 			float new_ax = flerp(p1.m_ax, p2.m_ax, ratio);
 			float new_ay = flerp(p1.m_ay, p2.m_ay, ratio);
@@ -89,8 +163,8 @@ namespace gnash {
 			for (size_t j=0; j < p.size(); j++)
 			{
 				edge& e = p[j];
-				const edge& e1 = p1[j];
-				const edge& e2 = p2[k];
+				const edge& e1 = j < p1.size() ? p1[j] : empty_edge;
+				const edge& e2 = k < p2.size() ? p2[k] : empty_edge;
 
 				e.m_cx = flerp(e1.m_cx, e2.m_cx, ratio);
 				e.m_cy = flerp(e1.m_cy, e2.m_cy, ratio);
@@ -276,24 +350,39 @@ namespace gnash {
 		m_line_styles.resize(m_shape1->m_line_styles.size());
 		m_paths.resize(m_shape1->m_paths.size());
 
-		int edges_count1 = 0;
-		for (k = 0; k < m_paths.size(); k++)
+		unsigned edges_count1 = PathList::computeNumberOfEdges(m_shape1->m_paths);
+		unsigned edges_count2 = PathList::computeNumberOfEdges(m_shape2->m_paths);
+
+		IF_VERBOSE_PARSE(
+		  log_parse("morph: "
+			  "startShape(paths:%u, edges:%u), "
+			  "endShape(paths:%u, edges:%u)",
+			  m_shape1->m_paths.size(), edges_count1,
+			  m_shape2->m_paths.size(), edges_count2);
+		);
+
+		assert(edges_count1 == edges_count2);
+		IF_VERBOSE_MALFORMED_SWF(
+
+
+		if ( m_shape1->m_paths.size() != m_shape2->m_paths.size() )
 		{
-			path& p = m_paths[k];
-			path& p1 = m_shape1->m_paths[k];
-			int len = p1.m_edges.size();
-			edges_count1 += len;
-			p.m_edges.resize(len);
+			log_swferror("Different number of paths "
+				"in start (%u) and end (%u) shapes "
+				"of a morph",
+				m_shape1->m_paths.size(),
+				m_shape2->m_paths.size());
+		}
+		else if ( edges_count1 != edges_count2 )
+		{
+			log_swferror("Different number of edges "
+				"in start (%u) and end (%u) shapes "
+				"of a morph",
+				edges_count1, edges_count1);
 		}
 
-		int edges_count2 = 0;
-		for (k = 0; k < m_shape2->m_paths.size(); k++)
-		{
-			path& p2 = m_shape2->m_paths[k];
-			int len = p2.m_edges.size();
-			edges_count2 += len;
-		}
-		assert(edges_count1 == edges_count2);
+		);
+
 	}
 }
 

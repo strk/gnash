@@ -1,5 +1,12 @@
 2007-02-26 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/morph2_character_def.cpp (display):
+	  survive malformed SWF (mismatching number of paths
+	  or edges in start and end shape); (read): warn
+	  about malformed swf. Fixes bug #19085.
+
+2007-02-26 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-mtasc.all/: Makefile.am, inheritance.as:
 	  Test inheritance using MTASC.
 	* server/swf_function.cpp: 'super' in function2 register is now
