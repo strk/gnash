@@ -659,7 +659,7 @@ sprite_create_text_field(const fn_call& fn)
 		);
 		return;
 	}
-	//std::string txt_name = fn.arg(0).to_string();
+	std::string txt_name = fn.arg(0).to_string();
 
 	if ( ! fn.arg(1).is_number() )
 	{
@@ -669,8 +669,7 @@ sprite_create_text_field(const fn_call& fn)
 		);
 		return;
 	}
-
-	//double txt_depth = fn.arg(1).to_number();
+	int txt_depth = int(fn.arg(1).to_number());
 
 	if ( ! fn.arg(2).is_number() ) 
 	{
@@ -680,8 +679,7 @@ sprite_create_text_field(const fn_call& fn)
 		);
 		return;
 	}
-
-	//double txt_x = fn.arg(2).to_number();
+	float txt_x = fn.arg(2).to_number();
 
 	if ( ! fn.arg(3).is_number() )
 	{
@@ -691,8 +689,7 @@ sprite_create_text_field(const fn_call& fn)
 		);
 		return;
 	}
-
-	//double txt_y = fn.arg(3).to_number();
+	float txt_y = fn.arg(3).to_number();
 
 	if ( ! fn.arg(4).is_number() )
 	{
@@ -702,7 +699,7 @@ sprite_create_text_field(const fn_call& fn)
 		);
 		return;
 	}
-	//double txt_width = fn.arg(4).to_number();
+	float txt_width = fn.arg(4).to_number();
 
 	if ( ! fn.arg(5).is_number() ) 
 	{
@@ -712,68 +709,14 @@ sprite_create_text_field(const fn_call& fn)
 		);
 		return;
 	}
-	//double txt_height = fn.arg(5).to_number();
+	float txt_height = fn.arg(5).to_number();
 
-
-	// sprite is ourself, we should add a new
-	// member, named txt_name and being a
-	// TextField (text_character_def?)
-	//
-
-	// Get target's movie definition
-	movie_definition *mds = sprite->get_movie_definition();
-
-	//log_msg("Target's movie definition at %p\n", (void*)mds);
-
-	// Do I need the smart_ptr.here ?
-	boost::intrusive_ptr<text_character_def> txt = new text_character_def(mds);
-
-	// Now add a the new TextField to the display list.
-
-	// display_list::add wants a character, so we
-	// must construct one.
-	//
-	// Unfortunately our text_character_def does
-	// not inherit from character, but from character_def
-	// which seems to be in another inheritance branch...
-	//
-	// Should we make text_character_def inherit from
-	// character or define a new structure for TextField ?
-	//
-#if 0
-	movie *m = sprite->get_root_movie();
-	assert(m);
-
-	character *txt_char = new character(m);
-	assert(txt_char);
-#endif
-
-
-	log_error("FIXME: %s unfinished\n", __PRETTY_FUNCTION__);
-
-#if 0
-	// Here we add the character to the displayList.
-
-	cxform txt_cxform;
-	matrix txt_matrix;
-	bool replace_if_depth_occupied = true;
-	sprite->m_display_list->add_display_object(
-		txt_char, txt_depth, replace_if_depth_occupied,
-		txt_cxform, txt_matrix, txt_ratio, clip_depth
-		);
-#endif
-
-	
-
+	boost::intrusive_ptr<character> txt = sprite->add_textfield(txt_name,
+			txt_depth, txt_x, txt_y, txt_width, txt_height);
 
 	// We should return a ref to the newly created
 	// TextField here
-	
-	//fn.result->set_as_object(txt.get());
-
-
-
-	//assert(0); 
+	fn.result->set_as_object(txt.get());
 }
 
 //getNextHighestDepth() : Number
@@ -2115,7 +2058,7 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 	matrix matrix;
 
 	// empty_sprite_def will be deleted during deliting sprite
-	sprite_definition* empty_sprite_def = new sprite_definition(NULL, NULL);
+	sprite_definition* empty_sprite_def = new sprite_definition(get_movie_definition(), NULL);
 
 	sprite_instance* sprite = new sprite_instance(empty_sprite_def, m_root, this, 0);
 	sprite->set_name(name);
@@ -2130,6 +2073,49 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 		0); 
 
 	return sprite;
+}
+
+boost::intrusive_ptr<character>
+sprite_instance::add_textfield(const std::string& name, int depth, float x, float y, float width, float height)
+{
+	matrix txt_matrix;
+
+	// Do I need the smart_ptr.here ?
+	boost::intrusive_ptr<text_character_def> txt = new text_character_def(get_movie_definition());
+	boost::intrusive_ptr<character> txt_char = txt->create_character_instance(this, 0);
+
+	txt_char->set_name(name.c_str());
+	txt_char->setDynamic();
+
+	// Here we should set the proper matrix using x,y width and height
+
+	// set _x
+	txt_matrix.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(x));
+	// set _y
+	txt_matrix.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(y));
+	// set _width
+	txt_matrix.m_[0][0] = infinite_to_fzero(PIXELS_TO_TWIPS(width));
+	// set _height
+	txt_matrix.m_[1][1] = infinite_to_fzero(PIXELS_TO_TWIPS(height));
+
+	// Here we add the character to the displayList.
+
+	m_display_list.place_character(
+		txt_char.get(),
+		depth,
+		cxform(),
+		txt_matrix,
+		0.0f,
+		0);
+
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_error("FIXME: %s unfinished", __PRETTY_FUNCTION__);
+		warned = true;
+	}
+
+	return txt_char;
 }
 
 void sprite_instance::clone_display_object(const std::string& name,

@@ -185,8 +185,10 @@ sprite_definition::sprite_definition(movie_definition* m, stream* in)
 	m_loading_frame(0),
 	registeredClass(0)
 {
+	assert(m_movie_def);
+
 	// create empty sprite_definition (it is used for createEmptyMovieClip() method)
-	if (m_movie_def == NULL && in == NULL)
+	if (in == NULL)
 	{
 		m_frame_count = 1;
 		m_loading_frame = 1;
@@ -196,7 +198,6 @@ sprite_definition::sprite_definition(movie_definition* m, stream* in)
 	}
 	else
 	{
-		assert(m_movie_def);
 		read(in);
 	}
 }

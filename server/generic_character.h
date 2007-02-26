@@ -45,7 +45,7 @@ class generic_character : public character
 
 protected:
 
-	character_def*	m_def;
+	boost::intrusive_ptr<character_def> m_def;
 
 public:
 
@@ -91,7 +91,7 @@ public:
 	/// \brief
 	/// Return the character definition from which this
 	/// instance derive. 
-	character_def* get_character_def() { return m_def; }
+	character_def* get_character_def() { return m_def.get(); }
   
 	void enclose_own_bounds(rect *) const;
 

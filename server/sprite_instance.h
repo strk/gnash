@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.71 2007/02/20 10:00:48 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.72 2007/02/26 22:08:06 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -160,14 +160,14 @@ public:
 	/// (not sprite!)
 	size_t get_bytes_total() const
 	{
-		return m_def->get_bytes_total();
+		return isDynamic() ? 0 : m_def->get_bytes_total();
 	}
 
 	/// Return number of loaded bytes in the movie
 	/// (not sprite!)
 	size_t get_bytes_loaded() const
 	{
-		return m_def->get_bytes_loaded();
+		return isDynamic() ? 0 : m_def->get_bytes_loaded();
 	}
 
 	const rect& get_frame_size() const
@@ -281,6 +281,9 @@ public:
 	void swap_characters(character* ch1, character* ch2);
 	character* get_character_at_depth(int depth);
 	character* add_empty_movieclip(const char* name, int depth);
+
+	boost::intrusive_ptr<character> add_textfield(const std::string& name,
+			int depth, float x, float y, float width, float height);
 
 	/// Add an object to the DisplayList. 
 	//

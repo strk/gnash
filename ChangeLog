@@ -1,5 +1,17 @@
 2007-02-26 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/sprite_definition.cpp (ctor) *require*
+	  a movie_definition as we'll need it for a few things,
+	  including getVersion..
+	* server/generic_character.h: store character_def
+	  by intrusive_ptr !
+	* server/sprite_instance.{cpp,h}: new add_textfield method;
+	  fix add_empty_movieclip to provide a movie_definition to
+	  sprite-definition constructor; handle dynamic sprites
+	  when calling getBytestLoaded/getBytesTotal.
+
+2007-02-26 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Inheritance.as:
 	  a couple of additional tests for accessing
 	  a function's prototype after a call to
