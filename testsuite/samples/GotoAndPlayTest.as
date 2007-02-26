@@ -20,8 +20,8 @@ if (temp!=2) {
   
   temp=_currentframe;
   
-  //gotoAndPlay(temp);
-  gotoAndStop(temp);
+  gotoAndPlay(temp);
+  //gotoAndStop(temp);
   
   if (_currentframe==temp) 
     trace("PASSED: _currentframe is correct after gotoAndPlay() call ("+_currentframe+")");
