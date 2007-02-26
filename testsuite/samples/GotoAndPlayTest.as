@@ -18,13 +18,16 @@ if (temp!=2) {
 
   trace("PASSED: _currentframe reports frame 2");
   
-  gotoAndPlay(temp);
+  temp=_currentframe;
+  
+  //gotoAndPlay(temp);
+  gotoAndStop(temp);
   
   if (_currentframe==temp) 
-    trace("PASSED: _currentframe is correct after gotoAndPlay() call");
+    trace("PASSED: _currentframe is correct after gotoAndPlay() call ("+_currentframe+")");
   else
     trace("FAILED: _currentframe reports frame "+_currentframe+" instead of "+temp);
   
 }
 
-stop();
+
