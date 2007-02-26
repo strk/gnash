@@ -1,5 +1,11 @@
 2007-02-26 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/samples/Makefile.am: 
+	  Enabled run of GotoAndPlayTest.swf self-contained
+	  testcase.
+
+2007-02-26 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/morph2_character_def.cpp (display):
 	  survive malformed SWF (mismatching number of paths
 	  or edges in start and end shape); (read): warn

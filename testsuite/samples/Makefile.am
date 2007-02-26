@@ -39,6 +39,10 @@ check_PROGRAMS = \
 	clip_as_button2-TestRunner \
 	$(NULL)
 
+check_SCRIPTS = \
+	GotoAndPlayTestRunner \
+	$(NULL)
+
 clip_as_button2_TestRunner_SOURCES = \
 	clip_as_button2-TestRunner.cpp \
 	$(NULL)
@@ -53,16 +57,22 @@ clip_as_button2_TestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
+GotoAndPlayTestRunner: $(srcdir)/../generic-testrunner.sh $(srcdir)/GotoAndPlayTest.swf
+	sh $< $(top_builddir) $(srcdir)/GotoAndPlayTest.swf > $@
+	chmod 755 $@
+
 clean-local: 
 
 EXTRA_DIST = \
 	clip_as_button2.swf \
+	GotoAndPlayTest.swf \
 	README \
 	$(NULL)
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
-	$(check_PROGRAMS)
+	$(check_PROGRAMS) \
+	$(check_SCRIPTS)
 
 check-DEJAGNU: site-update $(check_PROGRAMS)
 	@runtest=$(RUNTEST); \
