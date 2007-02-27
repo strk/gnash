@@ -100,6 +100,10 @@
 # include <sys/time.h>
 #endif
 
+#ifndef NAN
+	#define NAN (0.0/0.0)
+#endif
+
 // Declaration for replacement timezone functions
 // In the absence of gettimeofday() we use ftime() to get milliseconds,
 // but not for timezone offset bcos ftime's TZ stuff is unreliable.
