@@ -31,6 +31,8 @@ INCLUDES = -I$(srcdir)  \
             -I$(top_srcdir)/server/vm \
 	    -I$(top_srcdir)/server/parser \
 	    -I$(top_srcdir)/server/asobjs \
+	    $(BOOST_CFLAGS) \
+	    $(PTHREAD_CFLAGS) \
 	    $(INCLTDL)
 
 AM_LDFLAGS =  \

@@ -1,3 +1,7 @@
+2007-02-26 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* extensions/fileio/Makefile.am: Added {PTHREAD,BOOST}_CFLAGS
+
 2007-02-26 Sandro Santilli <strk@keybit.net>
 
 	* server/impl.cpp, server/swf/tag_loaders.{cpp,h}:
