@@ -26,6 +26,7 @@
 #include "render.h"  // debug
 #include "render_handler.h"
 #include "sound_handler.h"
+#include "gnash.h" for get_sound_handler
 #include "movie_root.h"
 #include "VM.h"
 

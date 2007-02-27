@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.99 2007/02/27 09:10:20 strk Exp $ */
+/* $Id: impl.cpp,v 1.100 2007/02/27 09:54:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -78,6 +78,11 @@ namespace globals { // gnash::globals
 	static std::auto_ptr<URL> baseurl;
 
 } // namespace gnash::global
+
+// global Sound handler stuff. Should this be moved to the VM class ?
+static sound_handler* _sound_handler = 0;
+void	set_sound_handler(sound_handler* s) { _sound_handler = s; }
+sound_handler*	get_sound_handler() { return _sound_handler; }
 
 void
 set_base_url(const URL& url)

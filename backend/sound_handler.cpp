@@ -19,27 +19,6 @@
 
 namespace gnash {
 
-namespace globals {
-
-// Callback interface to host, for handling sounds.  If it's NULL,
-// sound is ignored.
-sound_handler*	s_sound_handler = 0;
-
-} // namespace gnash::global
-
-
-void	set_sound_handler(sound_handler* s)
-// Called by host, to set a handler for all sounds.
-// Can pass in 0 to disable sound.
-{
-	globals::s_sound_handler = s;
-}
-
-
-sound_handler*	get_sound_handler()
-{
-	return globals::s_sound_handler;
-}
 
 
 } // namespace gnash

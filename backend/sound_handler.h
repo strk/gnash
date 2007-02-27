@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.1 2007/02/27 09:10:20 strk Exp $ */
+/* $Id: sound_handler.h,v 1.2 2007/02/27 09:54:48 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -150,17 +150,6 @@ public:
 
 
 };
-
-/// Pass in a sound handler, so you can handle audio on behalf of
-/// gnash.  This is optional; if you don't set a handler, or set
-/// NULL, then sounds won't be played.
-///
-/// If you want sound support, you should set this at startup,
-/// before loading or playing any movies!
-DSOEXPORT void	set_sound_handler(sound_handler* s);
-
-/// You probably don't need this. (@@ make it private?)
-DSOEXPORT sound_handler* get_sound_handler();
 
 // TODO: move to appropriate specific sound handlers
 DSOEXPORT sound_handler*	create_sound_handler_sdl();

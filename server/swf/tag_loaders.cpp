@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.78 2007/02/27 09:10:20 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.79 2007/02/27 09:54:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -60,9 +60,6 @@ namespace gnash {
 	// @@ TODO get rid of this; make it the normal mode.
 	extern bool s_no_recurse_while_loading;
 
-	namespace globals {
-		extern sound_handler* s_sound_handler;
-	}
 }
 
 namespace gnash {
@@ -1592,7 +1589,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 {
 	assert(tag == SWF::DEFINESOUND); // 14
 
-	using globals::s_sound_handler;
+	sound_handler* handler = get_sound_handler();
 
 	uint16_t	character_id = in->read_u16();
 
@@ -1614,7 +1611,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	// If we have a sound_handler, ask it to init this sound.
 	
-	if (s_sound_handler)
+	if (handler)
 	{
 		int	data_bytes = 0;
 		unsigned char*	data = NULL;
@@ -1663,7 +1660,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 			}
 		}
 		
-		int	handler_id = s_sound_handler->create_sound(
+		int	handler_id = handler->create_sound(
 			data,
 			data_bytes,
 			sample_count,
@@ -1694,7 +1691,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 void
 start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 {
-	using globals::s_sound_handler;
+	sound_handler* handler = get_sound_handler();
 
 	assert(tag == SWF::STARTSOUND); // 15
 
@@ -1714,7 +1711,7 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	}
 	else
 	{
-		if (s_sound_handler)
+		if (handler)
 		{
 			IF_VERBOSE_MALFORMED_SWF(
 			log_swferror("start_sound_loader: sound_id %d is not defined", sound_id);
@@ -1728,13 +1725,13 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 void
 sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 {
-	using globals::s_sound_handler;
+	sound_handler* handler = get_sound_handler();
 
 	// 18 || 45
 	assert(tag == SWF::SOUNDSTREAMHEAD || tag == SWF::SOUNDSTREAMHEAD2);
 
 	// If we don't have a sound_handler registered stop here
-	if (!s_sound_handler) return;
+	if (!handler) return;
 
 	// FIXME:
 	// no character id for soundstreams... so we make one up... 
@@ -1778,7 +1775,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	// Since the ADPCM is converted to NATIVE16, the format is set to that...
 	if (format == sound_handler::FORMAT_ADPCM) format = sound_handler::FORMAT_NATIVE16;
 
-	int	handler_id = s_sound_handler->create_sound(
+	int	handler_id = handler->create_sound(
 		NULL,
 		data_bytes,
 		sample_count,
@@ -1794,7 +1791,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 void
 sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 {
-	using globals::s_sound_handler;
+	sound_handler* handler = get_sound_handler();
 
 	assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
@@ -1804,7 +1801,7 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
 
 	// If we don't have a sound_handler registered stop here
-	if (!s_sound_handler) return;
+	if (!handler) return;
 
 	int handle_id = m->get_loading_sound_stream_id();
 
@@ -1822,7 +1819,7 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 	bool stereo = true;
 	int sample_count = -1;
 	
-	s_sound_handler->get_info(handle_id, &format, &stereo);
+	handler->get_info(handle_id, &format, &stereo);
 
 	if (format == sound_handler::FORMAT_ADPCM)
 	{
@@ -1867,7 +1864,7 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
 	// Fill the data on the apropiate sound, and receives the starting point
 	// for later "start playing from this frame" events.
-	long start = s_sound_handler->fill_stream_data(data, data_bytes, sample_count, handle_id);
+	long start = handler->fill_stream_data(data, data_bytes, sample_count, handle_id);
 
 	delete [] data;
 

@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.86 2007/02/27 09:10:20 strk Exp $ */
+/* $Id: gnash.h,v 1.87 2007/02/27 09:54:49 strk Exp $ */
 
 /// \mainpage
 ///
@@ -76,6 +76,22 @@ class sound_handler;
 class stream;
 class URL;
 class rect;
+
+// Sound callbacks stuff
+
+/// \brief
+/// Pass in a sound handler, so you can handle audio on behalf of
+/// gnash.  This is optional; if you don't set a handler, or set
+/// NULL, then sounds won't be played.
+///
+/// If you want sound support, you should set this at startup,
+/// before loading or playing any movies!
+///
+DSOEXPORT void	set_sound_handler(sound_handler* s);
+
+/// Get currently registered sound handler
+DSOEXPORT sound_handler* get_sound_handler();
+
 
 ///
 /// Log & error reporting control.

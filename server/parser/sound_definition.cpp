@@ -16,13 +16,14 @@
 namespace gnash {
 
 
-	sound_sample::~sound_sample()
+sound_sample::~sound_sample()
+{
+	sound_handler* handler = get_sound_handler();
+	if (handler)
 	{
-		if (globals::s_sound_handler)
-		{
-			globals::s_sound_handler->delete_sound(m_sound_handler_id);
-		}
+		handler->delete_sound(m_sound_handler_id);
 	}
+}
 
 
 
@@ -77,19 +78,20 @@ start_sound_tag::read(stream* in, int /* tag_type */, movie_definition* m,
 void
 start_sound_tag::execute_state(sprite_instance* /* m */)
 {
-	using globals::s_sound_handler;
+	// Make static ?
+	sound_handler* handler = get_sound_handler();
 
 	//GNASH_REPORT_FUNCTION;
 
-	if (s_sound_handler)
+	if (handler)
 	{
 		if (m_stop_playback)
 		{
-			s_sound_handler->stop_sound(m_handler_id);
+			handler->stop_sound(m_handler_id);
 		}
 		else
 		{
-			s_sound_handler->play_sound(m_handler_id, m_loop_count, 0,0, (m_envelopes.size() == 0 ? NULL : &m_envelopes));
+			handler->play_sound(m_handler_id, m_loop_count, 0,0, (m_envelopes.size() == 0 ? NULL : &m_envelopes));
 		}
 	}
 }
@@ -112,12 +114,13 @@ start_stream_sound_tag::read(movie_definition* m, int handler_id, long start)
 void
 start_stream_sound_tag::execute_state(sprite_instance* m)
 {
-	using globals::s_sound_handler;
-	if (s_sound_handler)
+	// Make static ?
+	sound_handler* handler = get_sound_handler();
+	if (handler)
 	{
 		// This makes it possible to stop only the stream when framejumping.
 		m->set_sound_stream_id(m_handler_id);
-		s_sound_handler->play_sound(m_handler_id, 0, 0, m_start, NULL);
+		handler->play_sound(m_handler_id, 0, 0, m_start, NULL);
 	}
 }
 
