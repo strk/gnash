@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.10 2007/02/27 11:24:11 strk Exp $ */
+/* $Id: Range2d.h,v 1.11 2007/02/27 11:27:50 strk Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -273,10 +273,10 @@ public:
 	//
 	/// Note that:
 	///
-	///	- WORLD ranges contain every range
+	///	- WORLD ranges contain every range except NULL ones
 	///	  and are only contained in WORLD ranges
 	///
-	///	- NULL ranges contain no range and are contained in no range.
+	///	- NULL ranges contain no ranges and are contained in no ranges.
 	///
 	bool contains(const Range2d<T>& other) const
 	{
