@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.9 2006/12/17 19:21:20 nihilus Exp $ */
+/* $Id: Range2d.h,v 1.10 2007/02/27 11:24:11 strk Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -266,6 +266,28 @@ public:
 			return false;
 		}
 		return true;
+	}
+
+	/// \brief
+	/// Return true if this rectangle contains the given rectangle.
+	//
+	/// Note that:
+	///
+	///	- WORLD ranges contain every range
+	///	  and are only contained in WORLD ranges
+	///
+	///	- NULL ranges contain no range and are contained in no range.
+	///
+	bool contains(const Range2d<T>& other) const
+	{
+		if ( isNull() || other.isNull() ) return false;
+		if ( isWorld() ) return true;
+		if ( other.isWorld() ) return false;
+
+		return _xmin <= other._xmin &&
+			_xmax >= other._xmax &&
+			_ymin <= other._ymin &&
+			_ymax >= other._ymax;
 	}
 
 	/// \brief

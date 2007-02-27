@@ -275,5 +275,49 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals( (Range2d<int>)Range2d<float>(-0.1, 0.1, 10.1, 10.2),
 			Range2d<int>(-1, 0, 11, 11) );
 
+
+	//
+	// Test Contains
+	//
+
+	// Null ranges don't contain anything, not even themselves
+	check( ! nullIntRange1.contains(10, 10) );
+	check( ! nullIntRange1.contains(nullIntRange1) );
+	check( ! nullIntRange1.contains(worldIntRange1) );
+
+	// World ranges contain everything except null ranges
+	check( worldIntRange1.contains(10, -190) );
+	check( worldIntRange1.contains(worldIntRange1) );
+	check( ! worldIntRange1.contains(nullIntRange1) );
+
+	// Self-containment
+	check( fIntRange1.contains(fIntRange1) );
+
+	cout << "fIntRange1 == " << fIntRange1 << endl;
+
+	// Boundary overlaps
+	check( fIntRange1.contains(0, 0) );
+	check( fIntRange1.contains(10, 5) );
+	check( fIntRange1.contains(5, 10) );
+	check( fIntRange1.contains(5, 0) );
+	check( fIntRange1.contains(Range2d<int>(0, 0, 2, 2)) );
+	check( fIntRange1.contains(Range2d<int>(0, 4, 2, 6)) );
+	check( fIntRange1.contains(Range2d<int>(0, 8, 2, 10)) );
+	check( fIntRange1.contains(Range2d<int>(4, 8, 6, 10)) );
+	check( fIntRange1.contains(Range2d<int>(8, 8, 10, 10)) );
+	check( fIntRange1.contains(Range2d<int>(8, 4, 10, 6)) );
+	check( fIntRange1.contains(Range2d<int>(8, 0, 10, 2)) );
+	check( fIntRange1.contains(Range2d<int>(4, 0, 6, 2)) );
+
+	// Strict containment
+	check( fIntRange1.contains(Range2d<int>(2, 2, 4, 4)) );
+	check( fIntRange1.contains(5, 5) );
+
+	// Intersection (partial overlap)
+	check( ! fIntRange1.contains(Range2d<int>(-2, 0, 2, 2)) );
+	check( ! fIntRange1.contains(Range2d<int>(8, 8, 10, 11)) );
+	check( ! fIntRange1.contains(Range2d<int>(8, 8, 11, 11)) );
+	
+
 }
 
