@@ -5,6 +5,7 @@
 	* testsuite/actionscript.all/Date.cpp: Test Date.UTC()
 	* server/asobj/Global.cpp: remove oxbow code.
 	* server/asobj/Global.cpp: bugfixen: log_aserror is (now?) printf-like
+	* server/asobj/string.cpp: bugfixen: log_aserror is (now?) printf-like
 
 2007-02-27 Sandro Santilli <strk@keybit.net>
 
