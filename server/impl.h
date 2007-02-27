@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.h,v 1.41 2006/12/06 10:21:32 strk Exp $ */
+/* $Id: impl.h,v 1.42 2007/02/27 09:10:20 strk Exp $ */
 
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
@@ -34,7 +34,6 @@
 #include "container.h"
 #include "utility.h"
 #include "smart_ptr.h"
-#include "resource.h" // for sound_sample inheritance
 #include "swf/TagLoadersTable.h"
 #include "matrix.h" // for display_info composition
 
@@ -54,12 +53,6 @@ class font;
 class movie_root;
 class stream;
 class sprite_instance;
-
-class sound_sample : public resource //virtual public ref_counted
-{
-public:
-    virtual sound_sample*	cast_to_sound_sample() { return this; }
-};
 
 DSOEXPORT void save_extern_movie(sprite_instance* m);
 

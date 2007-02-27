@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.24 2007/02/14 09:03:53 strk Exp $
+# $Id: Makefile.am,v 1.25 2007/02/27 09:10:20 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -54,6 +54,7 @@ libgnashparser_la_SOURCES = \
 	movie_def_impl.cpp \
         morph2_character_def.cpp \
 	shape_character_def.cpp	\
+	sound_definition.cpp \
 	sprite_definition.cpp \
 	video_stream_def.cpp
 
@@ -69,6 +70,7 @@ noinst_HEADERS = \
 	movie_definition.h \
 	movie_def_impl.h \
 	shape_character_def.h \
+	sound_definition.h \
 	sprite_definition.h \
 	video_stream_def.h
 

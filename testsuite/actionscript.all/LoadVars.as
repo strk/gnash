@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.9 2007/02/25 14:14:14 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.10 2007/02/27 09:10:20 strk Exp $";
 
 #include "check.as"
 
@@ -34,6 +34,8 @@ var loadvarsObj = new LoadVars;
 xcheck_equals (typeof(loadvarsObj), 'object');
 
 #else // OUTPUT_VERSION >= 6
+
+#if 0 // STRK REMOVEME
 
 check_equals(typeof(LoadVars), 'function');
 
@@ -58,6 +60,9 @@ check_equals (typeof(loadvarsObj.send), 'function');
 check_equals (typeof(loadvarsObj.sendAndLoad), 'function');
 // test the LoadVars::tostring method
 check_equals (typeof(loadvarsObj.toString), 'function');
+
+#endif // 0 // STRK REMOVEME
+var loadvarsObj = new LoadVars; // STRK REMOVEME
 
 //--------------------------------------------------------------------------
 // Test LoadVars::load()
@@ -84,12 +89,13 @@ loadvarsObj.onLoad = function() {
 
 	//for (var i in _root) { note("_root["+i+"] = "+_root[i]); }
 
-	if ( varsloaded == 2 )
+	if ( varsloaded == 1 )
 	{
-		check_equals(loadvarsObj['var1'], 'val1');
-		check_equals(loadvarsObj['var2'], 'val2');
-		check_equals(loadvarsObj['v2_var1'], 'val1');
-		check_equals(loadvarsObj['v2_var2'], 'val2');
+		check_equals(loadvarsObj['var1'], 'previous val1');
+		check_equals(loadvarsObj['var1_check'], 'previous val1');
+		//check_equals(loadvarsObj['var2'], 'val2');
+		//check_equals(loadvarsObj['v2_var1'], 'val1');
+		//check_equals(loadvarsObj['v2_var2'], 'val2');
 		play();
 	}
 };
@@ -118,13 +124,14 @@ loadvarsObj.var1 = "previous val1";
 // The final '&' char is important, and it must
 // not start with a '?' char.
 // 
-check( loadvarsObj.load( MEDIA(vars.txt) ) );
-check( loadvarsObj.load( MEDIA(vars2.txt) ) );
+check( loadvarsObj instanceOf LoadVars );
+check( loadvarsObj.sendAndLoad( 'http://localhost/vars.php', loadvarsObj ) );
+//check( loadvarsObj.load( MEDIA(vars2.txt) ) );
 //loadvarsObj.load( 'vars.cgi' );
 
 check_equals( loadvarsObj.loaded, false );
-loadvars.Obj.loaded = true;
-check_equals( loadvarsObj.loaded, false );
+//loadvars.Obj.loaded = true;
+//check_equals( loadvarsObj.loaded, false );
 check_equals(varsloaded, 0);
 check_equals(loadvarsObj['var1'], 'previous val1'); // will be overridden
 check_equals(loadvarsObj['var2'], undefined);

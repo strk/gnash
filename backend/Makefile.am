@@ -58,6 +58,7 @@ AM_CPPFLAGS = -I.. \
 	$(NULL)
 
 noinst_HEADERS = \
+	sound_handler.h \
 	render_handler.h \
 	render_handler_tri.h
 
@@ -67,6 +68,7 @@ noinst_HEADERS = \
 lib_LTLIBRARIES = libgnashbackend.la
 
 RENDER_SOURCES = render_handler_tri.cpp
+SOUND_SOURCES = sound_handler.cpp
 
 if USE_RENDERER_CAIRO
 RENDER_SOURCES += render_handler_cairo.cpp
@@ -81,7 +83,7 @@ AM_CPPFLAGS += $(OPENGL_CFLAGS) # $(GLEXT_CFLAGS)
 endif
 
 if USE_SOUND_GST
-SOUND_SOURCES = sound_handler_gst.cpp sound_handler_gst.h 
+SOUND_SOURCES += sound_handler_gst.cpp sound_handler_gst.h 
 libgnashbackend_LIBS += $(GSTREAMER_LIBS) 
 libgnashbackend_LIBS += $(LIBXML_LIBS) 
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
@@ -89,7 +91,7 @@ AM_CPPFLAGS += $(LIBXML_CFLAGS)
 endif
 
 if USE_SOUND_SDL
-SOUND_SOURCES = sound_handler_sdl.cpp sound_handler_sdl.h
+SOUND_SOURCES += sound_handler_sdl.cpp sound_handler_sdl.h
 if USE_FFMPEG_ENGINE
 libgnashbackend_LIBS += $(FFMPEG_LIBS)
 AM_CPPFLAGS += $(FFMPEG_CFLAGS)

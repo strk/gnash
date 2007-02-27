@@ -22,4 +22,5 @@ if ENABLE_MYSQL
 MYSQL_DIR = mysql
 endif
 
+DISTSUBDIRS = dejagnu fileio mysql gtk2
 SUBDIRS = dejagnu fileio $(MYSQL_DIR)

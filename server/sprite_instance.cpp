@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 #include "log.h" 
 #include "action.h" // for call_method_parsed (call_method_args)
-#include "gnash.h"
+//#include "gnash.h"
 #include "render.h"  // for bounds_in_clipping_area()
 #include "sprite_instance.h"
 #include "movie_definition.h"
@@ -47,6 +47,7 @@
 #include "Range2d.h" // for getBounds
 #include "GnashException.h"
 #include "URL.h"
+#include "sound_handler.h"
 
 #include <vector>
 #include <string>

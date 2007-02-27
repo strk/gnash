@@ -8,9 +8,8 @@
 #define GNASH_MOUSE_BUTTON_STATE_H
 
 
-//#include "impl.h" // should get rid of this
 #include "character_def.h"
-#include "sound.h"
+//#include "sound.h"
 #include "smart_ptr.h" // for composition and inlines
 #include "character.h" // for use in intrusive_ptr
 

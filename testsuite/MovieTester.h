@@ -22,7 +22,7 @@
 
 #include "Range2d.h"
 #include "gnash.h" // for namespace key
-#include "sound_handler_test.h"
+#include "sound_handler_test.h" // for creating the "test" sound handler
 
 #include <memory> // for auto_ptr
 #include <string> // for auto_ptr

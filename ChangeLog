@@ -1,3 +1,30 @@
+2007-02-27 Sandro Santilli <strk@keybit.net>
+
+	* backend/Makefile.am, backend/sound_handler.h,
+	  backend/sound_handler.cpp, backend/sound_handler_gst.h,
+	  backend/sound_handler_sdl.h, extensions/Makefile.am,
+	  gui/Player.cpp, gui/Player.h, gui/gtk.cpp, gui/gui.cpp,
+	  server/Makefile.am, server/button_character_instance.h,
+	  server/gnash.h, server/impl.cpp, server/impl.h,
+	  server/mouse_button_state.h, server/sound.cpp, server/sound.h,
+	  server/sprite_instance.cpp, server/asobj/Sound.cpp,
+	  server/asobj/SoundFfmpeg.cpp, server/asobj/SoundGst.cpp,
+	  server/asobj/SoundMad.cpp, server/parser/Makefile.am,
+	  server/parser/button_character_def.cpp,
+	  server/parser/button_character_def.h,
+	  server/parser/movie_def_impl.cpp,
+	  server/parser/sound_definition.cpp,
+	  server/parser/sound_definition.h, server/swf/tag_loaders.cpp,
+	  server/vm/ASHandlers.cpp, server/vm/action.cpp,
+	  testsuite/Makefile.am, testsuite/MovieTester.cpp,
+	  testsuite/MovieTester.h, testsuite/sound_handler_test.h,
+	  testsuite/actionscript.all/LoadVars.as,
+	  testsuite/misc-ming.all/Makefile.am,
+	  testsuite/misc-mtasc.all/hello.as,
+	  testsuite/movies.all/Makefile.am, testsuite/samples/Makefile.am:
+	  Files scramble. sound_handler has now it's own header, sound.{cpp,h}
+	  has been moved to parser/sound_definition.{cpp,h}.
+
 2007-02-26 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* extensions/fileio/Makefile.am: Added {PTHREAD,BOOST}_CFLAGS

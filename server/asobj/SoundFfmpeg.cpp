@@ -22,7 +22,7 @@
 
 #include "log.h"
 #include "SoundFfmpeg.h"
-#include "sound.h" // for sound_sample_impl
+#include "sound_definition.h" // for sound_sample
 #include "movie_definition.h"
 #include "sprite_instance.h"
 #include "fn_call.h"

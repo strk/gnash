@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.77 2007/02/26 22:58:38 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.78 2007/02/27 09:10:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -53,6 +53,7 @@
 #include "URL.h"
 #include "GnashException.h"
 #include "video_stream_def.h"
+#include "sound_definition.h"
 
 namespace gnash {
 
@@ -1672,7 +1673,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 		if (handler_id >= 0)
 		{
-			sound_sample*	sam = new sound_sample_impl(handler_id);
+			sound_sample* sam = new sound_sample(handler_id);
 			m->add_sound_sample(character_id, sam);
 		}
 
@@ -1699,7 +1700,7 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	uint16_t	sound_id = in->read_u16();
 
-	sound_sample_impl*	sam = (sound_sample_impl*) m->get_sound_sample(sound_id);
+	sound_sample* sam = m->get_sound_sample(sound_id);
 	if (sam)
 	{
 		start_sound_tag*	sst = new start_sound_tag();

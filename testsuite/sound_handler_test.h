@@ -14,12 +14,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_test.h,v 1.1 2007/02/20 16:37:19 tgc Exp $
+// $Id: sound_handler_test.h,v 1.2 2007/02/27 09:10:20 strk Exp $
 
 #ifndef SOUND_HANDLER_TEST_H
 #define SOUND_HANDLER_TEST_H
 
-#include "gnash.h"
+#include "gnash.h" // still needed ?
+#include "sound_handler.h" // for inheritance
 #include "hash_wrapper.h"
 
 #include <vector>

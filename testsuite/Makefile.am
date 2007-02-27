@@ -27,11 +27,13 @@ libtestsuite_la_SOURCES = \
 	sound_handler_test.cpp \
 	$(NULL)
 libtestsuite_la_LIBADD = \
+	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 libtestsuite_la_CXXFLAGS = \
 	-I$(top_srcdir)/libbase \
+	-I$(top_srcdir)/backend \
 	-I$(top_srcdir)/libgeometry \
 	-I$(top_srcdir)/server  \
 	-I$(top_srcdir)/server/parser  \

@@ -17,7 +17,9 @@
 #ifndef SOUND_HANDLER_GST_H
 #define SOUND_HANDLER_GST_H
 
-#include "gnash.h"
+//#include "gnash.h"
+#include "sound_handler.h" // for inheritance
+
 #include <vector>
 
 #include <gst/gst.h>

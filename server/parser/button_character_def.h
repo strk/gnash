@@ -11,8 +11,10 @@
 
 
 #include "character_def.h"
-#include "sound.h"
+#include "sound_definition.h"
 #include "rect.h" // for get_bound
+#include "matrix.h" // for composition
+#include "gnash.h" // for class cxform :(
 
 #ifndef UNUSED
 #define UNUSED(x) ((x) = (x))
@@ -108,7 +110,7 @@ public:
 	struct button_sound_info
 	{
 		uint16_t m_sound_id;
-		sound_sample_impl*	m_sam;
+		sound_sample*	m_sam;
 		sound_info m_sound_style;
 	};
 

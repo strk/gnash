@@ -35,6 +35,8 @@
 #include "movie_root.h"
 #include "VM.h" // for assertions
 #include "GnashException.h" // for parser exception
+#include "execute_tag.h"
+#include "sound_definition.h" // for sound_sample
 
 #include <memory>
 #include <string>

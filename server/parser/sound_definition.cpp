@@ -6,7 +6,7 @@
 // Code to handle SWF sound-related tags.
 
 
-#include "sound.h"
+#include "sound_definition.h"
 #include "stream.h"
 #include "impl.h"
 #include "execute_tag.h" // for start_sound_tag inheritance
@@ -15,30 +15,8 @@
 
 namespace gnash {
 
-namespace globals {
 
-	// Callback interface to host, for handling sounds.  If it's NULL,
-	// sound is ignored.
-	sound_handler*	s_sound_handler = 0;
-
-} // namespace gnash::global
-
-
-	void	set_sound_handler(sound_handler* s)
-	// Called by host, to set a handler for all sounds.
-	// Can pass in 0 to disable sound.
-	{
-		globals::s_sound_handler = s;
-	}
-
-
-	sound_handler*	get_sound_handler()
-	{
-		return globals::s_sound_handler;
-	}
-
-
-	sound_sample_impl::~sound_sample_impl()
+	sound_sample::~sound_sample()
 	{
 		if (globals::s_sound_handler)
 		{
@@ -54,7 +32,7 @@ namespace globals {
 
 void
 start_sound_tag::read(stream* in, int /* tag_type */, movie_definition* m,
-		const sound_sample_impl* sam)
+		const sound_sample* sam)
 {
 	assert(sam);
 

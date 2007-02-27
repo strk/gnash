@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,19 +17,19 @@
 // 
 //
 
-/* $Id: gtk.cpp,v 1.66 2007/02/06 17:46:24 rsavoye Exp $ */
+/* $Id: gtk.cpp,v 1.67 2007/02/27 09:10:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "gnash.h"
-//#include "movie_definition.h" 
+#include "gnash.h" // is this still needed ?
 #include "log.h"
 
 #include "gui.h"
 #include "rc.h"
 #include "gtksup.h"
+#include "sound_handler.h"
 #include "render_handler.h"
 
 #include <iostream>

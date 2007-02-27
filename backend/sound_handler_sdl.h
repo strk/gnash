@@ -14,20 +14,20 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.15 2007/02/02 15:01:17 bjacques Exp $
+// $Id: sound_handler_sdl.h,v 1.16 2007/02/27 09:10:20 strk Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
 
+
+#include "sound_handler.h" // for inheritance
+#include "hash_wrapper.h"
 
 #ifdef USE_FFMPEG
 #include <ffmpeg/avcodec.h>
 #elif defined(USE_MAD)
 #include <mad.h>
 #endif
-
-#include "gnash.h"
-#include "hash_wrapper.h"
 
 #include <vector>
 

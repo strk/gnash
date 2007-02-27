@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -53,8 +53,9 @@
 
 #include "NullGui.h"
 
-#include "gnash.h"
+#include "gnash.h" // still needed ?
 #include "movie_definition.h"
+#include "sound_handler.h" // for set_sound_handler and create_sound_handler_*
 #include "sprite_instance.h" // for setting FlashVars
 #include "movie_root.h" 
 #include "Player.h"

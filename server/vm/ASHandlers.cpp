@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.40 2007/02/26 14:19:23 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.41 2007/02/27 09:10:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,6 +45,7 @@
 #include "VM.h" // for getting the root
 #include "movie_root.h" // for set_drag_state (ActionStartDragMovie)
 #include "debugger.h"
+#include "sound_handler.h"
 
 #include <string>
 #include <map>

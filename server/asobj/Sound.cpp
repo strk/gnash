@@ -22,7 +22,7 @@
 
 #include "log.h"
 #include "Sound.h"
-#include "sound.h" // for sound_sample_impl
+#include "sound_definition.h" // for sound_sample
 #include "movie_definition.h"
 #include "sprite_instance.h"
 #include "fn_call.h"
@@ -309,7 +309,7 @@ sound_stop(const fn_call& fn)
 		}
 
 		// FIXME: shouldn't we use dynamic_cast here (or rely on sound_sample interface) ?
-		sound_sample_impl* ss = (sound_sample_impl*) res->cast_to_sound_sample();
+		sound_sample* ss = res->cast_to_sound_sample();
 
 		if (ss != NULL)
 		{
@@ -317,7 +317,7 @@ sound_stop(const fn_call& fn)
 		}
 		else
 		{
-		    log_error("sound sample is NULL (doesn't cast to sound_sample_impl)");
+		    log_error("sound sample is NULL (doesn't cast to sound_sample)");
 		    return;
 		}
 
@@ -361,8 +361,7 @@ sound_attachsound(const fn_call& fn)
 	}
 
 	int si = 0;
-	// FIXME: shouldn't we use dynamic_cast here (or rely on sound_sample interface) ?
-	sound_sample_impl* ss = (sound_sample_impl*) res->cast_to_sound_sample();
+	sound_sample* ss = res->cast_to_sound_sample();
 
 	if (ss != NULL)
 	{
@@ -370,7 +369,7 @@ sound_attachsound(const fn_call& fn)
 	}
 	else
 	{
-		log_error("sound sample is NULL (doesn't cast to sound_sample_impl)");
+		log_error("sound sample is NULL (doesn't cast to sound_sample)");
 		return;
 	}
 
