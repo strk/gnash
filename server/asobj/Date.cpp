@@ -101,7 +101,7 @@
 #endif
 
 #ifndef NAN
-	#define NAN (0.0/0.0)
+	#define NAN static_cast<const float>(0.0/0.0)
 #endif
 
 // Declaration for replacement timezone functions
