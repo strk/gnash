@@ -49,6 +49,21 @@
 //	It changes to/from daylight saving time according to its own rules.
 //	We use the operating system's localtime routines.
 //
+// For portability it may be useful to convert this to use libboost's
+// date_time stuff http://www.boost.org/doc/html/date_time.html but the
+// mapping between Flash's perverse behaviour and date_time's coherent
+// behaviour.
+// Plus:
+// *	OS portability is done by libboost, not here;
+// *	extends correct date handling from POSIX to 1 Jan 1400 - 31 Dec 9999
+// Minus:
+// *	it doesn't handle fractions of milliseconds (and who cares?);
+// *	using it to implement this class's methods is more tricky,
+// 	including the need to handle all boundary cases and exceptions
+// 	explicitly (e.g. mapping of 38 Nov to 8 Dec, mapping negative
+// 	month/day-of-month/hours/min/secs/millisecs into the previous
+// 	year/month/day/hour/min/sec and so on).
+//
 // To probe FlashPlayer functionality put something like:
 // class Test {
 //        }
@@ -114,7 +129,7 @@ namespace gnash {
 //
 // Currently, without this, setting times in UTC to a moment when DST is active
 // gets the hour and datestamp wrong, and changing the date into/out of a
-// DST period without adjusts the UTC time of day (it shouldn't).
+// DST period changes the UTC time of day (it shouldn't).
 #define USE_UTCCONV 1
 
 #if USE_UTCCONV
@@ -179,7 +194,8 @@ _gmtime_r(time_t *t, struct tm *tm)
 // To do this we set tm_isdst to the correct value for that moment in time
 // by doing an initial conversion of the time to find out is_dst for that
 // moment without DST, then do the real conversion.
-// This may get things wrong around the hour when the clocks go back or forth.
+// This may still get things wrong around the hour when the clocks go back
+// or forth.
 static time_t
 _mktime(struct tm *tmp)
 {
@@ -234,7 +250,9 @@ static void date_setyear(const fn_call& fn);
 static void date_tostring(const fn_call& fn);
 static void date_valueof(const fn_call& fn);
 
+// Static AS methods
 static void date_utc(const fn_call& fn);
+
 static as_object* getDateInterface();
 static void attachDateInterface(as_object& o);
 static void attachDateStaticInterface(as_object& o);
@@ -285,7 +303,7 @@ static void
 attachDateStaticInterface(as_object& o)
 {
 	// This should *only* be available when SWF version is > 6
-	// Are you sure? the references say it's in from v5 -martin
+	// Are you sure? The online reference say it's in from v5 -martin
 	o.init_member("UTC", &date_utc);
 }
 
@@ -402,7 +420,7 @@ date_new(const fn_call& fn)
 		if (utcsecs == -1) {
 			// mktime could not represent the time
 			log_error("Date() failed to initialise from arguments");
-			date->value = 0;
+			date->value = 0;	// or undefined?
 		} else {
 			date->value = (double)utcsecs * 1000.0 + millisecs;
 		}
@@ -619,17 +637,19 @@ local_date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec)
 
 // Convert Unix time structure and the remaining milliseconds to
 // Flash datestamp.
-static void
-local_tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date)
+static double
+local_tm_msec_to_date(struct tm &tm, double &msec)
 {
 	time_t t = _mktime(&tm);
 
 	// Reconstruct the time value and put the milliseconds back in.
-	// If mktime fails to reconstruct the date, change nothing.
 	if (t == (time_t)(-1)) {
+		// If mktime fails to reconstruct the date, return bogus value;
+		// Not sure when/how this can happen. Values outside POSIX time?
 		log_error("Failed to set a date.\n");
+		return(NAN);
 	} else {
-		date->value = t * 1000.0 + msec;
+		return(t * 1000.0 + msec);
 	}
 }
 
@@ -650,27 +670,26 @@ utc_date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec)
 #endif
 }
 
-// TODO:
 // Until we find the correct algorithm, we can use mktime which, by
 // experiment, seems to flip timezone at midnight, not at 2 in the morning,
 // so we use that to do year/month/day and put the unadjusted hours/mins/secs
 // in by hand. It's probably not right but it'll do for the moment.
 
-static void
-utc_tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date)
+static double
+utc_tm_msec_to_date(struct tm &tm, double &msec)
 {
 #if USE_UTCCONV
-	date->value = mkutctime(&tm, msec);
+	return (mkutctime(&tm, msec));	// The better algorithm :)
 #else
 	time_t t = mktime(&tm);
 	if (t == (time_t)(-1)) {
-	    log_error("utc_tm_msec_to_date failed to convert back to Date");
+	    log_error("utc_tm_msec_to_date failed to convert a date");
 	} else {
 	    // Knock out the H:M:S part of t and replace with UTC time-of-day
 	    t = t - (t % 86400) + tm.tm_sec + 60 * (tm.tm_min + 60 * tm.tm_hour);
 	}
-	
-	date->value = t * 1000.0 + msec;
+
+	return (t * 1000.0 + msec);
 #endif
 }
 
@@ -681,9 +700,9 @@ static void
 tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date, bool utc)
 {
     if (utc)
-	utc_tm_msec_to_date(tm, msec, date);
+	date->value = utc_tm_msec_to_date(tm, msec);
     else
-	local_tm_msec_to_date(tm, msec, date);
+	date->value = local_tm_msec_to_date(tm, msec);
 }
 
 static void
@@ -1087,13 +1106,114 @@ static void date_tostring(const fn_call& fn) {
 // Convert a UTC date/time specification to number of milliseconds since
 // 1 Jan 1970 00:00 UTC.
 //
-// year is a Gregorian year; unspecified arguments default to 0 except for
-// day-of-month, which defaults to 1.
+// unspecified optional arguments default to 0 except for day-of-month,
+// which defaults to 1.
+//
+// year is a Gregorian year; special values 0 to 99 mean 1900 to 1999 so it is
+// impossible to specify the year 55 AD using this interface.
+//
+// Any fractional part in the number of milliseconds is ignored (truncated)
+//
+// If 0 or 1 argument are passed, the result is the "undefined" value.
+//
+// This probably doesn't handle exceptional cases such as NaNs and infinities
+// the same as the commercial player. What that does is:
+// - if any argument is NaN, the result is NaN
+// - if one or more arguments are +Infinity, the result is +Infinity
+// - if one or more arguments are -Infinity, the result is -Infinity
+// - if both +Infinity and -Infinity are present in the args, result is NaN.
+
+static double rogue_date_args(const fn_call& fn);	// Forward decl
 
 static void date_utc(const fn_call& fn) {
-	date_as_object* date = ensure_date_object(fn.this_ptr);
-	UNUSED(date);
-	log_msg("Date.UTC is unimplemented\n");
+	struct tm tm;	// Date structure for values down to seconds
+	double millisecs;	// and the miliseconds component.
+	double result;	// Resulting Flash timestamp
+
+	if (fn.nargs < 2) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Date.UTC needs one argument");
+	    )
+	    fn.result->set_undefined();
+	    return;
+	}
+
+	// Check for presence of NaNs and Infinities in the arguments 
+	// and return the appropriate value if so.
+	if ( (result = rogue_date_args(fn)) != 0.0) {
+		fn.result->set_double(result);
+		return;
+	}
+
+	// Preset default values
+	// Year and month are always given explicitly
+	tm.tm_mday = 1;
+	tm.tm_hour = tm.tm_min = tm.tm_sec = 0;
+	tm.tm_isdst = 0;	// Not used by our UTCTIME code.
+	millisecs = 0;
+	switch (fn.nargs) {
+	default:	// More than 7
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Date.UTC was called with more than 7 arguments");
+	    )
+	case 7:
+	    // millisecs is double, but fractions of millisecs are ignored.
+	    millisecs = (int) fn.arg(6).to_number();
+	case 6:
+	    tm.tm_sec = (int) fn.arg(5).to_number();
+	case 5:
+	    tm.tm_min = (int) fn.arg(4).to_number();
+	case 4:
+	    tm.tm_hour = (int) fn.arg(3).to_number();
+	case 3:
+	    tm.tm_mday = (int) fn.arg(2).to_number();
+	case 2:		// these last two are always performed
+	    tm.tm_mon = (int) fn.arg(1).to_number();
+	    {
+		int y = (int) fn.arg(0).to_number();
+		if (y < 100 && y >= 0) y += 1900;
+		// y is now the Gregorian year number
+		tm.tm_year = y - 1900;
+	    }
+	}
+
+	result = utc_tm_msec_to_date(tm, millisecs);
+	fn.result->set_double(result);
+}
+
+// Auxillary function checks for Infinities and NaN in a function's args and
+// returns 0.0 if there are none, 
+static double
+rogue_date_args(const fn_call& fn) {
+	int plusinf_present = 0;
+	int minusinf_present = 0;
+	double infinity;	// The kind of infinity we found
+
+	for (int i = 0; i < fn.nargs; i++) {
+		double arg = fn.arg(i).to_number();
+
+		if (isnan(arg)) return(NAN);
+
+		if (isinf(arg)) {
+			if (arg > 0) {	// Plus infinity
+				plusinf_present = 1;
+			} else {	// Minus infinity
+				minusinf_present = 1;
+			}
+			// Remember the kind of infinity we found
+			infinity = arg;
+		}
+	}
+	// If both kinds of infinity were present in the args,
+	// the result is NaN.
+	if (plusinf_present && minusinf_present) return(NAN);
+
+	// If only one kind of infinity was in the args, return that.
+	if (plusinf_present || minusinf_present) return(infinity);
+	
+	// Otherwise indicate that the function arguments contained
+	// no rogue values
+	return(0.0);
 }
 
 /// \brief Date.valueOf() returns the number of milliseconds since midnight
