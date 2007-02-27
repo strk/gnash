@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.46 2007/02/25 18:32:00 strk Exp $ */
+/* $Id: Global.cpp,v 1.47 2007/02/27 22:46:25 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -136,17 +136,10 @@ as_global_isfinite(const fn_call& fn)
 static void
 as_global_escape(const fn_call& fn)
 {
-    // List of chars we must convert to escape sequences
-    // (list taken from crazy case statement in as_global_unescape)
-    const string escapees = " \"#$%&+,/:;<=>?@[\\]^`{|}~";
-    const string hexdigits = "0123456789ABCDEF";
-
     ASSERT_FN_ARGS_IS_1
 
     string input = fn.arg(0).to_string();
-
     URL::encode(input);
-
     fn.result->set_string(input.c_str());
 }
 
