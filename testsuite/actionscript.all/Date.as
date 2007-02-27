@@ -20,13 +20,14 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.16 2007/02/07 19:08:44 martinwguy Exp $";
+rcsid="$Id: Date.as,v 1.17 2007/02/27 22:44:46 martinwguy Exp $";
 
 #include "check.as"
 
 check (Date);
 
-// test the Date constuctor
+// test the Date constructor.
+// This specific value is used below to check conversion back to year/mon/day etc
 var date = new Date(70,1,2,3,4,5,6);
 check (date);
 
@@ -67,10 +68,11 @@ check (date.setUTCMonth != undefined);
 check (date.setUTCSeconds != undefined);
 check (date.setYear != undefined);
 check (date.toString != undefined);
+// UTC is a static method present from v5
 check_equals (date.UTC, undefined);
+check (Date.UTC != undefined);
 
 #if OUTPUT_VERSION > 6
-check(Date.UTC != undefined);
 
 // From SWF 7 up methods are case-sensitive !
 check_equals (date.getdate, undefined);
@@ -109,10 +111,11 @@ check_equals (date.setUTCmonth, undefined);
 check_equals (date.setUTCseconds, undefined);
 check_equals (date.setyear, undefined);
 check_equals (date.tostring, undefined);
+check_equals (Date.utc, undefined);
 
 #endif
 
-// var date = new Date(70,1,2,3,4,5,6);
+// var date = new Date(70,1,2,3,4,5,6);	// See above
 trace ("Testing random date");
 check_equals (date.getFullYear(), 1970);
 check_equals (date.getYear(), 70);
@@ -149,7 +152,7 @@ check_equals (date.getUTCHours(), 0);
 check_equals (date.getUTCMinutes(), 0);
 check_equals (date.getUTCSeconds(), 0);
 check_equals (date.getUTCMilliseconds(), 0);
-check_equals (date.valueOf(), 946684800000.0);	// I asked flashplayer
+check_equals (date.valueOf(), 946684800000.0);	// Same as flashplayer gives
 
 trace ("Testing 1 Jul 2000 UTC");
 date.setUTCFullYear(2000, 6, 1);
@@ -162,7 +165,7 @@ check_equals (date.getUTCHours(), 0);
 check_equals (date.getUTCMinutes(), 0);
 check_equals (date.getUTCSeconds(), 0);
 check_equals (date.getUTCMilliseconds(), 0);
-check_equals (date.valueOf(), 962409600000.0);	// I asked flashplayer
+check_equals (date.valueOf(), 962409600000.0);	// Same as flashplayer gives
 
 trace ("Testing 1 Jan 2000 localtime");
 // The many-argument version of the Date constructor sets the date in localtime
@@ -232,3 +235,15 @@ check_equals (date.getHours(), 0);
 
 // It's not easy to test the toString() code here cos we cannot find out from
 // within AS whether DST is in effect or not.
+
+check_equals (Date.UTC(1970,0), 0);
+check_equals (Date.UTC(70,0), 0);
+
+// Check that Date.UTC gives the same as setUTC*, which we tested above.
+// Test two dates: one in DST and one not.
+date.setUTCFullYear(2000, 0, 1);
+date.setUTCHours(0, 0, 0, 0);
+check (Date.UTC(2000,0,1,0,0,0,0) == date.valueOf());
+date.setUTCFullYear(2000, 6, 1);
+date.setUTCHours(0, 0, 0, 0);
+check (Date.UTC(2000,6,1,0,0,0,0) == date.valueOf());
