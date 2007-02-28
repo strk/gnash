@@ -1,5 +1,7 @@
 2007-03-01 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionGotoExpression):
+	  Simplified function, reduced emitted warnings.
 	* server/asobj/Global.cpp: register Stage object always.
 	* server/asobj/Stage.cpp: don't register addListener
 	  and removeListener if SWF < 6.

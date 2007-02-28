@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.42 2007/02/28 10:12:23 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.43 2007/02/28 23:40:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2008,75 +2008,12 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 		return;
 	}
 
-	bool success = false;
-		  
-	as_value& expression = env.top(0);
+	as_value expression = env.pop();
 
-	// TODO: here we're treating STRING or NUMBER
-	//       values differently, should we simplify
-	//       by forcing a conversion instead ?
-	//       My gut feeling is we should convert to string
-	//       as that would be able to keep information for
-	//       both a number or a label.
-
-	if (expression.is_string() )
-	{
-		// @@ TODO: parse possible sprite path...
-		//
-		// Also, if the frame spec is actually a number (not a label),
-		// then we need to do the conversion...
-		      
-		const char* frame_label = expression.to_string();
-		if (target->goto_labeled_frame(frame_label))
-		{
-			success = true;
-		}
-		else
-		{
-			// Couldn't find the label. Try converting to a number.
-			double num;
-			if ( string_to_number(&num, frame_label) )
-			{
-				int frame_number = int(num);
-				target->goto_frame(frame_number);
-				success = true;
-			}
-			else
-			{
-				log_error("ActionGotoExpression: conversion of string '%s' to a number failed", frame_label);
-			}
-			// else no-op.
-		}
-	}
-	else if ( expression.is_number() )
-	{
-		// Frame number is 1-based !
-		int frame_number = int(expression.to_number());
-		target->goto_frame(frame_number-1);
-		success = true;
-	}
-//	else
-//	{
-//		if (expression.is_undefined())
-//		{
-//			// No-op.
-//		}
-//		if (expression.is_object() )
-//		{
-//			// This is a no-op; see test_goto_frame.swf
-//		}
-//	}
+	size_t frame_number = target->get_frame_number(expression);
+	target->goto_frame(frame_number);
+	target->set_play_state(state);
 		  
-	if (success)
-	{
-		target->set_play_state(state);
-	}
-	else
-	{
-		log_error("No success in gotoFrame2 ? should this ever happen ?");
-	}
-		  
-	env.drop(1);
 }
 
 void
