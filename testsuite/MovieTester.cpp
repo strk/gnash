@@ -179,9 +179,13 @@ MovieTester::getInvalidatedBounds() const
 
 	rect ret;
 	assert(ret.is_null());
-	_movie_root->get_invalidated_bounds(&ret, false);
+	
+	// TODO: Support multiple bounds in testsuite
+	//_movie_root->get_invalidated_bounds(&ret, false);
+	InvalidatedRanges ranges;
+	_movie_root->add_invalidated_bounds(ranges, false);
 
-	Range2d<float> range = ret.getRange();
+	Range2d<float> range = ranges.getFullArea();
 
 	// scale by 1/20 (twips to pixels)
 	range.scale(1.0/20);

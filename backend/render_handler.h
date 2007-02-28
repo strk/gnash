@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.28 2007/01/26 13:31:29 strk Exp $ */
+/* $Id: render_handler.h,v 1.29 2007/02/28 17:25:25 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -163,7 +163,8 @@
 #include "tu_config.h" // for DSOEXPORT
 
 #include "shape_character_def.h"  
-#include "generic_character.h"    
+#include "generic_character.h"
+#include "Range2d.h"
 
 
 // Forward declarations.
@@ -275,9 +276,21 @@ public:
 	virtual void set_invalidated_region(const rect& /*bounds*/) {    
 		// implementation is optional    
 	}
+
+	virtual void set_invalidated_regions(const InvalidatedRanges& /*ranges*/) {    
+		// implementation is optional    
+	}
 	
   /// Converts world coordinates to pixel coordinates
   virtual geometry::Range2d<int> world_to_pixel(const rect& worldbounds) = 0;
+  
+  virtual geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& worldbounds) {
+  	if ((worldbounds.isNull() || worldbounds.isWorld())) 	
+  		return worldbounds;
+
+		return world_to_pixel(rect(worldbounds.getMinX(), worldbounds.getMinY(),
+		                           worldbounds.getMaxX(), worldbounds.getMaxY()));  
+	}
 		
 	/// Bracket the displaying of a frame from a movie.
 	//
@@ -396,7 +409,19 @@ public:
   ///
   /// See also gnash::renderer::bounds_in_clipping_area
   ///
-  virtual bool bounds_in_clipping_area(const rect& /*bounds*/) {
+  virtual bool bounds_in_clipping_area(const rect& bounds) {
+    return bounds_in_clipping_area(bounds.getRange());
+  }
+  
+  virtual bool bounds_in_clipping_area(const InvalidatedRanges& ranges) {
+  	for (int rno=0; rno<ranges.size(); rno++) 
+  		if (bounds_in_clipping_area(ranges.getRange(rno)))
+  			return true;
+  			
+  	return false;
+	}
+  
+  virtual bool bounds_in_clipping_area(const geometry::Range2d<float>& /*bounds*/) {
     return true;
   }
 

@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.72 2007/02/26 22:08:06 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.73 2007/02/28 17:25:26 udog Exp $ */
 
 // Stateful live Sprite instance
 
@@ -564,7 +564,7 @@ public:
 	void set_textfield_variable(const std::string& name,
 			edit_text_character* ch);
 
-	void get_invalidated_bounds(rect* bounds, bool force);
+	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 			
 
 	const DisplayList& getDisplayList() const {

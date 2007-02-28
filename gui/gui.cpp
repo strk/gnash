@@ -46,7 +46,7 @@
 /// debug the GUI part, however (see if blitting the region works), then you 
 /// probably won't define this.
 #ifdef ENABLE_REGION_UPDATES_DEBUGGING 
-#define REGION_UPDATES_DEBUGGING_FULL_REDRAW 1
+//#define REGION_UPDATES_DEBUGGING_FULL_REDRAW 1
 #endif 
 
 #ifdef ENABLE_REGION_UPDATES_DEBUGGING
@@ -275,7 +275,7 @@ bool
 Gui::display(movie_root* m)
 {
 
-	rect changed_bounds;  // area of the stage that must be updated 
+	InvalidatedRanges changed_ranges;
 	bool redraw_flag;
 
 	// Should the frame be rendered completely, even if it did not change?
@@ -289,18 +289,34 @@ Gui::display(movie_root* m)
 	// due to ActionScript code, the timeline or user events. The GUI can still
 	// choose to render a different part of the stage. 
 	//
-	// TODO: is it needed to call get_invalidated_bounds even when redraw_flag is true ??
-	//
-	m->get_invalidated_bounds(&changed_bounds, false);
+	if (!redraw_flag) {
+		
+		// Choose distance (note these are TWIPS!) 
+		// 10% of normalized stage size
+		changed_ranges.snap_distance = sqrt(
+		  m->get_movie_definition()->get_width_pixels() * 20.0 * 
+			m->get_movie_definition()->get_height_pixels() * 20.0) * 0.10;
+			
+		// Use multi ranges only when GUI/Renderer supports it
+		// (Useless CPU overhead, otherwise)
+		changed_ranges.single_mode = !want_multiple_regions();
+
+		// scan through all sprites to compute invalidated bounds  
+		m->add_invalidated_bounds(changed_ranges, false);
+		
+		// optimize ranges
+		changed_ranges.combine_ranges();
+		
+	}
 
 	if (redraw_flag)     // TODO: Remove this and want_redraw to avoid confusion!?
 	{
-		changed_bounds.set_world();
+		changed_ranges.setWorld();
 	}
   
 	// Avoid drawing of stopped movies
 
-	if ( ! changed_bounds.is_null() ) // use 'else'?
+	if ( ! changed_ranges.isNull() ) // use 'else'?
 	{
 		// Tell the GUI(!) that we only need to update this
 		// region. Note the GUI can do whatever it wants with
@@ -313,10 +329,11 @@ Gui::display(movie_root* m)
 		// redraw the full screen so that only the
 		// *new* invalidated region is visible
 		// (helps debugging)
-		rect worldregion; worldregion.set_world();
-		setInvalidatedRegion(worldregion);
+		InvalidatedRanges world_ranges;
+		world_ranges.setWorld();
+		setInvalidatedRegions(world_ranges);
 #else
-		setInvalidatedRegion(changed_bounds);
+		setInvalidatedRegions(changed_ranges);
 #endif
 
 		// render the frame.
@@ -327,26 +344,33 @@ Gui::display(movie_root* m)
 		// show invalidated region using a red rectangle
 		// (Flash debug style)
 		IF_DEBUG_REGION_UPDATES (
-		if ( ! changed_bounds.is_world() )
+		if ( ! changed_ranges.isWorld() )
 		{
-			point corners[4];
-			float xmin = changed_bounds.get_x_min();
-			float xmax = changed_bounds.get_x_max();
-			float ymin = changed_bounds.get_y_min();
-			float ymax = changed_bounds.get_y_max();
+		
+			for (int rno=0; rno<changed_ranges.size(); rno++) {
+			
+				geometry::Range2d<float> bounds = changed_ranges.getRange(rno);
 
-			corners[0].m_x = xmin;
-			corners[0].m_y = ymin;
-			corners[1].m_x = xmax;
-			corners[1].m_y = ymin;
-			corners[2].m_x = xmax;
-			corners[2].m_y = ymax;
-			corners[3].m_x = xmin;
-			corners[3].m_y = ymax;
-			matrix dummy;    	
-			gnash::render::set_matrix(dummy); // reset matrix
-			gnash::render::draw_poly(&corners[0], 4,
-				rgba(0,0,0,0), rgba(255,0,0,255));
+				point corners[4];
+				float xmin = bounds.getMinX();
+				float xmax = bounds.getMaxX();
+				float ymin = bounds.getMinY();
+				float ymax = bounds.getMaxY();
+				
+				corners[0].m_x = xmin;
+				corners[0].m_y = ymin;
+				corners[1].m_x = xmax;
+				corners[1].m_y = ymin;
+				corners[2].m_x = xmax;
+				corners[2].m_y = ymax;
+				corners[3].m_x = xmin;
+				corners[3].m_y = ymax;
+				matrix dummy;    	
+				gnash::render::set_matrix(dummy); // reset matrix
+				gnash::render::draw_poly(&corners[0], 4,
+					rgba(0,0,0,0), rgba(255,0,0,255));
+					
+			}
 		}
 		);
 
@@ -429,9 +453,27 @@ Gui::loops()
 }
 
 void
-Gui::setInvalidatedRegion (const rect& bounds)
+Gui::setInvalidatedRegion(const rect& bounds)
 {
 }
+
+void
+Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
+{
+	// fallback to single regions
+	geometry::Range2d<float> full = ranges.getFullArea();
+	
+	rect bounds;
+	
+	if (full.isFinite())
+		bounds = rect(full.getMinX(), full.getMinY(), full.getMaxX(), full.getMaxY());
+	else
+	if (full.isWorld())
+		bounds.set_world();
+	
+	setInvalidatedRegion(bounds);
+}
+
 
 // end of namespace
 }

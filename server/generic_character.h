@@ -27,7 +27,7 @@
 
 #include "character.h" // for inheritance
 
-#include "shape_character_def.h" // for get_invalidated_bounds 
+#include "shape_character_def.h" // for add_invalidated_bounds 
 
 #include <cassert>
 
@@ -95,7 +95,7 @@ public:
   
 	void enclose_own_bounds(rect *) const;
 
-	void get_invalidated_bounds(rect* bounds, bool force);
+	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
     
 
 };

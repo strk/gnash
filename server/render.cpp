@@ -208,11 +208,26 @@ namespace gnash {
     }
 
     bool bounds_in_clipping_area(const rect& bounds) {
+    	return bounds_in_clipping_area(bounds.getRange());
       if (s_render_handler) 
         return s_render_handler->bounds_in_clipping_area(bounds);
       else
         return true;
     }
+    
+    bool bounds_in_clipping_area(const InvalidatedRanges& ranges) {
+      if (s_render_handler) 
+        return s_render_handler->bounds_in_clipping_area(ranges);
+      else
+        return true;
+		}
+    
+    bool bounds_in_clipping_area(const geometry::Range2d<float>& bounds) {
+      if (s_render_handler) 
+        return s_render_handler->bounds_in_clipping_area(bounds);
+      else
+        return true;
+		}
 
 
 

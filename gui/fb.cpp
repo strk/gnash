@@ -41,7 +41,7 @@
 #include "render_handler.h"
 #include "render_handler_agg.h"
 
-//#define DEBUG_SHOW_FPS  // prints number of frames per second to STDOUT
+#define DEBUG_SHOW_FPS  // prints number of frames per second to STDOUT
 
 #ifdef DEBUG_SHOW_FPS
 # include <sys/types.h>
@@ -365,9 +365,7 @@ bool FBGui::run()
 
 void FBGui::renderBuffer()
 {
-	if ( _drawbounds.isNull() ) return; // nothing to do..
-
-	assert ( ! _drawbounds.isWorld() );
+	if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
 #ifdef DOUBLE_BUFFER
 
@@ -379,24 +377,29 @@ void FBGui::renderBuffer()
   const unsigned int scanline_size =
     var_screeninfo.xres * pixel_size;
     
-  // Size, in bytes, of a row that has to be copied
-  const unsigned int row_size = _drawbounds.width() * pixel_size;
     
-  // copy each row
-  const int minx = _drawbounds.getMinX();
-  const int maxy = _drawbounds.getMaxY();
-
-  for (int y=_drawbounds.getMinY(); y<maxy; ++y) {
-  
-    const unsigned int pixel_index = y * scanline_size + minx*pixel_size;
+  for (int bno=0; bno < _drawbounds.size(); bno++) {
+	
+		geometry::Range2d<int>& bounds = _drawbounds[bno];
+		
+		assert ( ! bounds.isWorld() );  
     
-    memcpy(&fbmem[pixel_index], &buffer[pixel_index], row_size);
-    
-  }  
-     
-
-	/*memcpy(fbmem, buffer, var_screeninfo.xres*var_screeninfo.yres*
-    (var_screeninfo.bits_per_pixel/8));*/
+	  // Size, in bytes, of a row that has to be copied
+	  const unsigned int row_size = (bounds.width()+1) * pixel_size;
+	    
+	  // copy each row
+	  const int minx = bounds.getMinX();
+	  const int maxy = bounds.getMaxY();
+	  
+	  for (int y=bounds.getMinY(); y<=maxy; ++y) {
+	  
+	    const unsigned int pixel_index = y * scanline_size + minx*pixel_size;
+	    
+	    memcpy(&fbmem[pixel_index], &buffer[pixel_index], row_size);
+	    
+	  }
+	}  
+	     
 #endif
 	
 #ifdef DEBUG_SHOW_FPS
@@ -446,24 +449,27 @@ int FBGui::valid_y(int y) {
   return y;
 }
 
-void FBGui::setInvalidatedRegion(const rect& bounds) 
+void FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
+	_renderer->set_invalidated_regions(ranges);
 
-#ifdef DOUBLE_BUFFER
-  
-	// forward to renderer
-	_renderer->set_invalidated_region(bounds);
-
-	// update _drawbounds, which are the bounds that need to
-	// be rerendered
-	//	
-	_drawbounds = Intersection(
-    _renderer->world_to_pixel(bounds).growBy(2), // add two pixels because of anti-aliasing...
-    _validbounds);
-
-#endif
-  
-}  // setInvalidatedRegion
+	_drawbounds.clear();
+		
+	for (int rno=0; rno<ranges.size(); rno++) {
+	
+		geometry::Range2d<int> bounds = Intersection(
+	    _renderer->world_to_pixel(ranges.getRange(rno)),
+	    _validbounds);
+			
+		// it may happen that a particular range is out of the screen, which 
+		// will lead to bounds==null. 
+		if (bounds.isNull()) continue; 
+		
+		_drawbounds.push_back(bounds);
+	    
+	}
+	
+}
 
 void FBGui::disable_terminal() 
 {

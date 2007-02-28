@@ -5,7 +5,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.12 2007/02/27 09:10:20 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.13 2007/02/28 17:25:25 udog Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -101,7 +101,7 @@ public:
 	// ActionScript overrides
 	//
 
-	void get_invalidated_bounds(rect* bounds, bool force);
+	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 	
 
 	// not sure if we need to override this one.

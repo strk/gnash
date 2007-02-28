@@ -643,10 +643,9 @@ movie_root::isMouseOverActiveEntity() const
 }
 
 void
-movie_root::get_invalidated_bounds(rect* bounds, bool force)
+movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
-	bounds->set_null();
-	_movie->get_invalidated_bounds(bounds, force);
+	_movie->add_invalidated_bounds(ranges, force);
 }
 
 } // namespace gnash

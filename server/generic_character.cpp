@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: generic_character.cpp,v 1.3 2006/11/21 00:25:46 strk Exp $ */
+/* $Id: generic_character.cpp,v 1.4 2007/02/28 17:25:26 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,13 +30,16 @@ namespace gnash
 {
 
 void
-generic_character::get_invalidated_bounds(rect* bounds, bool force)
+generic_character::add_invalidated_bounds(InvalidatedRanges& ranges, 
+	bool force)
 {
-	bounds->expand_to_rect(m_old_invalidated_bounds);
+	ranges.add(m_old_invalidated_ranges);
 	if (m_visible && (m_invalidated||force))
 	{
-		bounds->expand_to_transformed_rect(get_world_matrix(), 
-			m_def->get_bound());            
+		rect bounds;		
+		bounds.expand_to_transformed_rect(get_world_matrix(), 
+			m_def->get_bound());
+		ranges.add(bounds.getRange());            
 	}    
 }
 

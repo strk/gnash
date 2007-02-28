@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.cpp,v 1.9 2007/02/08 23:30:15 tgc Exp $
+// $Id: video_stream_instance.cpp,v 1.10 2007/02/28 17:25:26 udog Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -113,10 +113,12 @@ video_stream_instance::advance(float /*delta_time*/)
 }
 
 void
-video_stream_instance::get_invalidated_bounds(rect* bounds, bool /*force*/)
+video_stream_instance::add_invalidated_bounds(InvalidatedRanges& ranges, 
+	bool /*force*/)
 {
-	bounds->expand_to_point(-1e10f, -1e10f);
-	bounds->expand_to_point(1e10f, 1e10f);
+	rect bounds;
+	bounds.set_world();
+	ranges.add(bounds.getRange());
 }
 
 } // end of namespace gnash

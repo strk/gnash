@@ -2771,12 +2771,15 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 		// NOTE: script objects are *not* allowed to replace depths
 		//       of static objects (change second argument to switch)
 		_frame0_chars.addAll(charsToAdd, false);
-
-		// Set this character as invalidated *before*
-		// actually updating the displaylist !
-		set_invalidated();
-
-		m_display_list = _frame0_chars;
+		
+		if ( ! (m_display_list == _frame0_chars) ) {
+	
+			// Set this character as invalidated *before*
+			// actually updating the displaylist !
+			set_invalidated();
+	
+			m_display_list = _frame0_chars;			
+		};
 	}
 
 	// Execute this frame's init actions, if necessary.
@@ -3037,14 +3040,16 @@ void sprite_instance::display()
 		return;
 	}
 	
-	// check if the sprite (and it's childs) needs to be drawn 
-	rect bounds;
-	m_display_list.get_invalidated_bounds(&bounds, true);
-
-	// expand to bounds of _drawable 
-	bounds.expand_to_transformed_rect(get_world_matrix(), _drawable->get_bound());
+	// check if the sprite (and it's childs) needs to be drawn
+	InvalidatedRanges ranges;
+	m_display_list.add_invalidated_bounds(ranges, true);
 	
-	if (gnash::render::bounds_in_clipping_area(bounds))
+	// expand to bounds of _drawable
+	rect drawable_bounds; 
+	drawable_bounds.expand_to_transformed_rect(get_world_matrix(), _drawable->get_bound());
+	ranges.add(drawable_bounds.getRange());
+	
+	if (gnash::render::bounds_in_clipping_area(ranges))
 	{
 		_drawable->finalize();
 		// TODO: I'd like to draw the definition directly..
@@ -3520,25 +3525,16 @@ sprite_instance::get_textfield_variable(const std::string& name)
 	}
 } 
 
-void 
-sprite_instance::get_invalidated_bounds(rect* bounds, bool force)
-{
-//#define DEBUG_INVALIDATED_BOUNDS
 
-#ifdef DEBUG_INVALIDATED_BOUNDS
-	log_msg("%p) sprite_instance::get_invalidated_bounds(%s, %d) "
-			"called [ %s ]",
-		       (void*)this, bounds->toString().c_str(), force,
-		       typeid(*this).name());
-#endif
+void 
+sprite_instance::add_invalidated_bounds(InvalidatedRanges& ranges, 
+	bool force)
+{
 
 	// nothing to do if this sprite is not visible
 	if (!m_visible)
 	{
-#ifdef DEBUG_INVALIDATED_BOUNDS
-		log_msg("Not visible, use old invalidated bounds only");
-#endif
-    bounds->expand_to_rect(m_old_invalidated_bounds); // (in case we just hided)
+    ranges.add(m_old_invalidated_ranges); // (in case we just hided)
 		return;
 	}
 
@@ -3547,9 +3543,6 @@ sprite_instance::get_invalidated_bounds(rect* bounds, bool force)
 	// not invalidated (unless *forced*)
 	if ( ! m_invalidated && ! m_child_invalidated && ! force )
 	{
-#ifdef DEBUG_INVALIDATED_BOUNDS
-		log_msg("Not invalidated and not forced, bounds untouched");
-#endif
 		return;
 	}
   
@@ -3557,33 +3550,17 @@ sprite_instance::get_invalidated_bounds(rect* bounds, bool force)
   // m_child_invalidated does not require our own bounds
   if ( m_invalidated || force )      
   {
-  	// Add old invalidated bounds 
-  	bounds->expand_to_rect(m_old_invalidated_bounds);
-#ifdef DEBUG_INVALIDATED_BOUNDS
-  	log_msg("After expanding to old_invalidated_bounds (%s) "
-  			"new bounds are: %s",
-  			m_old_invalidated_bounds.toString().c_str(),
-  			bounds->toString().c_str());
-#endif
+  	// Add old invalidated bounds
+		ranges.add(m_old_invalidated_ranges); 
   }
   
   
-	m_display_list.get_invalidated_bounds(bounds, force||m_invalidated);
+	m_display_list.add_invalidated_bounds(ranges, force||m_invalidated);
 
-#ifdef DEBUG_INVALIDATED_BOUNDS
-	log_msg("After getting invalidated bounds from display list, "
-			"new bounds are: %s",
-			bounds->toString().c_str());
-#endif
+	_drawable_inst->add_invalidated_bounds(ranges, force||m_invalidated);
 
-	_drawable_inst->get_invalidated_bounds(bounds, force||m_invalidated);
-
-#ifdef DEBUG_INVALIDATED_BOUNDS
-	log_msg("After getting invalidated bounds from _drawable_inst, "
-			"new bounds are: %s",
-			bounds->toString().c_str());
-#endif
 }
+
 
 const char*
 sprite_instance::call_method_args(const char* method_name,

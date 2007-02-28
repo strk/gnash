@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.7 2007/02/08 13:25:41 tgc Exp $
+// $Id: video_stream_instance.h,v 1.8 2007/02/28 17:25:26 udog Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -23,6 +23,7 @@
 #include "character.h" // for inheritance
 #include "video_stream_def.h"
 #include "embedVideoDecoder.h"
+#include "snappingrange.h"
 
 // Forward declarations
 namespace gnash {
@@ -51,7 +52,7 @@ public:
 	virtual void	advance(float delta_time);
 	void	display();
 
-	void get_invalidated_bounds(rect* bounds, bool force);
+	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
 	/// Set the input stream for this video
 	void setStream(NetStream* ns)

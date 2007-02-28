@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.12 2007/01/31 15:24:13 bjacques Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.13 2007/02/28 17:25:25 udog Exp $ */
 
 #include <cstdio>
 #include <cerrno>
@@ -151,8 +151,8 @@ GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
 		_drawing_area->style->fg_gc[GTK_STATE_NORMAL],
 		minx,
   	miny,
-		maxx-minx,
-		maxy-miny,
+		maxx-minx+1,
+		maxy-miny+1,
 		GDK_RGB_DITHER_NORMAL,
 		_offscreenbuf + miny*(_width*(_bpp/8)) + minx*(_bpp/8),
 		(int)((_width)*_bpp/8)

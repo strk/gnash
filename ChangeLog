@@ -1,5 +1,40 @@
-2007-02-28 Sandro Santilli <strk@keybit.net>
+2007-02-28 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
+  * backend/render_handler.h, 
+    gui/fb.cpp, gui/fbsup.h, gui/gtk.cpp, gui/gtksup.h, gui/gui.cpp, 
+		gui/gui.h,
+    server/button_character_instance.cpp,  
+    server/button_character_instance.h,    
+    server/character.cpp,                  
+    server/character.h,                    
+    server/dlist.cpp,                      
+    server/dlist.h,                        
+    server/edit_text_character.cpp,        
+    server/edit_text_character.h,          
+    server/generic_character.cpp,          
+    server/generic_character.h,            
+    server/movie_root.cpp,                 
+    server/movie_root.h,                   
+    server/render.cpp,                     
+    server/render.h,                       
+    server/sprite_instance.cpp,            
+    server/sprite_instance.h,              
+    server/video_stream_instance.cpp,      
+    server/video_stream_instance.h: replace single invalidated bounds
+		with new, abstract InvalidatedRanges class and 
+		add_invalidated_range() function to support multiple ranges.		    
+	* gui/gtk_glue_agg.cpp: corrected calculation of width/height      
+  * backend/render_handler_agg.cpp: Redesigned and optimized rendering 
+   	engine; avoid re-calculation of edges for sub-shapes; re-use AGG 
+		paths; initialize AGG styles only once
+	* libgeometry/snappingrange.h, libgeometry/Makefile.am: new class
+	  for 2D range lists
+	* testsuite/MovieTester.cpp: Adapted to work with multiple ranges
+	* testsuite/misc-ming.all/loadMovieTestRunner.cpp: add return value		    
+        
+  
+2007-02-28 Sandro Santilli <strk@keybit.net>
+  
 	* testsuite/: Makefile.am, DummyCharacter.h:
 	  Dummy character instance for use in test cases.
 	* testsuite/server/: Makefile.am, DisplayListTest.cpp:

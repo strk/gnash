@@ -26,6 +26,8 @@
 #include "container.h"
 #include "types.h"
 #include "impl.h"
+#include "snappingrange.h"
+#include "character.h"
 
 #include <list>
 #include <iosfwd>
@@ -263,9 +265,9 @@ public:
 	/// dump list to given output stream (debugging)
 	void dump(std::ostream& os) const;
 
-  /// Like character_instance::get_invalidated_bounds() this method calls the
+  /// Like character_instance::add_invalidated_bounds() this method calls the
   /// method with the same name of all childs.	
-	void get_invalidated_bounds(rect* bounds, bool force);
+	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);	
 	
 
 	/// Return number of elements in the list
@@ -300,7 +302,7 @@ public:
 	/// need reordering.
 	///
 	void sort ();
-
+	
 	bool operator==(const DisplayList& other) const { return _characters == other._characters; }
 
 	bool operator!=(const DisplayList& other) const { return _characters != other._characters; }

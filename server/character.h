@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.51 2007/02/22 17:28:04 udog Exp $ */
+/* $Id: character.h,v 1.52 2007/02/28 17:25:25 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -36,6 +36,7 @@
 #include "rect.h" // for composition (invalidated bounds)
 #include "matrix.h" // for composition
 #include "log.h"
+#include "snappingrange.h"
 
 #include <map>
 #include <cstdarg>
@@ -119,7 +120,7 @@ protected:
 	///
 	/// NOTE: this is currently initialized as the NULL rectangle.
 	///
-	rect m_old_invalidated_bounds;
+	InvalidatedRanges m_old_invalidated_ranges;
   	
 	/// Wheter this character has been transformed by ActionScript code
 	//
@@ -197,13 +198,13 @@ public:
 	m_parent(parent),
 	m_invalidated(true),
 	m_child_invalidated(true),
-	m_old_invalidated_bounds(),
+	m_old_invalidated_ranges(),
 	_scriptTransformed(false),
 	_dynamicallyCreated(false)
 	{
 	    assert((parent == NULL && m_id == -1)
 		   || (parent != NULL && m_id >= 0));
-	    assert(m_old_invalidated_bounds.is_null());
+	    assert(m_old_invalidated_ranges.isNull());
 	}
 
 	/// Return a reference to the variable scope of this character.
@@ -575,13 +576,12 @@ public:
 	void clear_invalidated() {
 		m_invalidated = false;
     m_child_invalidated = false;    
-		m_old_invalidated_bounds.set_null();
+		m_old_invalidated_ranges.setNull();
 	}
   
   
 	/// \brief
-	/// Expand the given rectangle to enclose this character's
-	/// invalidated bounds.
+	/// Add the character's invalidated bounds to the ranges list.
 	//
 	/// NOTE that this method should include the bounds that it
 	/// covered the last time clear_invalidated() was called,
@@ -593,8 +593,8 @@ public:
 	/// Only instances with m_invalidated flag set are checked unless
 	/// force is set.
 	///
-	virtual void get_invalidated_bounds(rect* bounds, bool force) = 0;
-
+	virtual void add_invalidated_bounds(InvalidatedRanges& ranges, bool force) = 0;
+	
 	/// Construct this instance as an ActionScript object.
 	//
 	/// This function must be called when the character is placed on

@@ -635,12 +635,14 @@ button_character_instance::restart_characters(int condition)
 //
 
 
+
 void 
-button_character_instance::get_invalidated_bounds(rect* bounds, bool force) 
+button_character_instance::add_invalidated_bounds(InvalidatedRanges& ranges, 
+	bool force)
 {
   if (!m_visible) return; // not visible anyway
-  
-  bounds->expand_to_rect(m_old_invalidated_bounds);
+
+	ranges.add(m_old_invalidated_ranges);  
 
   // TODO: Instead of using these for loops again and again, wouldn't it be a
   // good idea to have a generic "get_record_character()" method?
@@ -657,10 +659,11 @@ button_character_instance::get_invalidated_bounds(rect* bounds, bool force)
 		{
 				/*bounds->expand_to_transformed_rect(get_world_matrix(), 
           m_record_character[i]->get_bound());*/
-        m_record_character[i]->get_invalidated_bounds(bounds, 
+        m_record_character[i]->add_invalidated_bounds(ranges, 
           force||m_invalidated);        
 		}
 	}
+
 }
 
 float

@@ -131,7 +131,10 @@ class DSOEXPORT GtkGui : public Gui
 
     GdkPixbuf* create_pixbuf(const gchar *filename);
     
-    void setInvalidatedRegion(const rect& bounds);
+#ifdef RENDERER_AGG    
+    void setInvalidatedRegions(const InvalidatedRanges& ranges);
+    bool want_multiple_regions() { return true; }
+#endif    
 
     virtual void setCursor(gnash_cursor_type newcursor);
     
@@ -142,7 +145,8 @@ class DSOEXPORT GtkGui : public Gui
     GtkMenu     *_popup_menu;
     GtkWidget   *_menubar;
     GtkWidget   *_vbox;
-    geometry::Range2d<int> _drawbounds;
+    //geometry::Range2d<int> _drawbounds;
+    std::vector< geometry::Range2d<int> > _drawbounds;
 
 #ifdef RENDERER_CAIRO
     cairo_t     *_cairo_handle;

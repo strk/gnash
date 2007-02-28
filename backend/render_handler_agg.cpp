@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.61 2007/02/23 09:50:36 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.62 2007/02/28 17:25:25 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -113,6 +113,8 @@ AGG ressources
 #endif
 
 
+#include <vector>
+
 #include "gnash.h"
 #include "types.h"
 #include "image.h"
@@ -123,7 +125,7 @@ AGG ressources
 #include "Range2d.h"
 
 #include "shape_character_def.h" 
-#include "generic_character.h"  
+#include "generic_character.h"
 
 #include <agg_rendering_buffer.h>
 #include <agg_renderer_base.h>
@@ -255,7 +257,7 @@ public:
     delete [] m_buffer;
   }
   
-  void clear(geometry::Range2d<int> region)
+  void clear(const geometry::Range2d<int>& region)
   {
 	  if (region.isNull()) return;
 	  assert ( region.isFinite() );
@@ -313,7 +315,9 @@ class render_handler_agg : public render_handler_agg_base
 {
 private:
   typedef agg::renderer_base<PixelFormat> renderer_base;
-    
+  
+  typedef agg::conv_stroke< agg::conv_curve< agg::path_storage > > stroke_type;
+  
   // TODO: Change these!!
 	unsigned char *memaddr;
 	int	memsize;
@@ -430,8 +434,8 @@ public:
 	  point a;
 	  mat->transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
 
-          int xpos = round( TWIPS_TO_PIXELS(a.m_x) );
-	  int ypos = round( TWIPS_TO_PIXELS(a.m_y) );
+    int xpos = (int)round( TWIPS_TO_PIXELS(a.m_x) );
+	  int ypos = (int)round( TWIPS_TO_PIXELS(a.m_y) );
 
 	  // TODO: handle this by only blitting part of the source RGB image.
 	  if (xpos < 0) {
@@ -448,7 +452,7 @@ public:
 	  // for performance purposes. Therefore, we need to use the
 	  // actual image size so we don't copy padding bytes to the Agg
 	  // buffer.
-	  int frame_width = TWIPS_TO_PIXELS(bounds->width()) * bytes_per_pixel;
+	  int frame_width = (int)TWIPS_TO_PIXELS(bounds->width()) * bytes_per_pixel;
 	  unsigned char* rgbbuf_ptr = frame->m_data;
 	  unsigned char* rgbbuf_end = rgbbuf_ptr + frame_width *
 				      frame->m_height;
@@ -524,8 +528,6 @@ public:
     m_pixf = new PixelFormat(m_rbuf);
     //m_rbase = new renderer_base(*m_pixf);  --> does not work!!??
     
-    _clipbounds.setTo(0, 0, xres, yres);
-        
     log_msg("initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes", 
       mem, size, x, y, row_size);
   }
@@ -552,8 +554,8 @@ public:
 	  assert(m_pixf != NULL);
 
 	  // clear the stage using the background color
-    if ( ! _clipbounds.isNull() )    
-      clear_framebuffer(_clipbounds, agg::rgba8_pre(background_color.m_r,
+	  for (unsigned int i=0; i<_clipbounds.size(); i++) 
+      clear_framebuffer(_clipbounds[i], agg::rgba8_pre(background_color.m_r,
   		  background_color.m_g, background_color.m_b,
   		  background_color.m_a));
     	  
@@ -572,10 +574,11 @@ public:
 	/// still correct, but slower. 
   /// This function clears only a certain portion of the screen, while /not/ 
   /// being notably slower for a fullscreen clear. 
-	void clear_framebuffer(geometry::Range2d<int> region,
+	void clear_framebuffer(const geometry::Range2d<int>& region,
 		    agg::rgba8 color)
 	{
-	    unsigned int width = region.width();
+			assert(region.isFinite());
+	    unsigned int width = region.width()+1;
 	    if (width < 1)
 	    {
 		log_warning("clear_framebuffer() called with width=%d",
@@ -589,11 +592,9 @@ public:
 			region.height());
 		return;
 	    }
-	  
-	    // to be exact, it's one off the max. (?)
 	    unsigned int left=region.getMinX();
 	    for (unsigned int y=region.getMinY(), maxy=region.getMaxY();
-		    y<maxy; ++y) 
+		    y<=maxy; ++y) 
 	    {
 		m_pixf->copy_hline(left, y, width, color);
 	    }
@@ -649,51 +650,68 @@ public:
 	}
 
 
+	template <class ras_type>
+	void apply_clip_box(ras_type& ras, 
+		const geometry::Range2d<int>& bounds)
+	{
+		assert(bounds.isFinite());
+		ras.clip_box(
+			(double)bounds.getMinX(),
+			(double)bounds.getMinY(),
+			(double)bounds.getMaxX()+1,
+			(double)bounds.getMaxY()+1);  
+	}
+
 
   void	draw_line_strip(const void* coords, int vertex_count, const rgba color)
 	// Draw the line strip formed by the sequence of points.
 	{
 	  assert(m_pixf != NULL);
 	  
-	  if ( _clipbounds.isNull() ) return;
+	  if ( _clipbounds.size()==0 ) return;
 
     point pnt;
     
     renderer_base rbase(*m_pixf);
+    
+    typedef agg::rasterizer_scanline_aa<> ras_type;
 
+  	ras_type ras;
   	agg::scanline_p8 sl;
-  	agg::rasterizer_scanline_aa<> ras;
   	agg::renderer_scanline_aa_solid<
     	agg::renderer_base<PixelFormat> > ren_sl(rbase);
     	
-	ras.clip_box(
-		(double)_clipbounds.getMinX(),
-		(double)_clipbounds.getMinY(),
-		(double)_clipbounds.getMaxX(),
-		(double)_clipbounds.getMaxY());    	
-
-    agg::path_storage path;
-    agg::conv_stroke<agg::path_storage> stroke(path);
-    stroke.width(1);
-    stroke.line_cap(agg::round_cap);
-    stroke.line_join(agg::round_join);
-    path.remove_all(); // Not obligatory in this case
-
-    const int16_t *vertex = static_cast<const int16_t*>(coords);
-    
-    m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
-  	path.move_to(pnt.m_x * xscale, pnt.m_y * yscale);
-
-    for (vertex += 2;  vertex_count > 1;  vertex_count--, vertex += 2) {
-      m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
-    	path.line_to(pnt.m_x * xscale, pnt.m_y * yscale);
-    }
-		// The vectorial pipeline
-  	ras.add_path(stroke);
-
-  	// Set the color and render the scanlines
-  	ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
-  	agg::render_scanlines(ras, sl, ren_sl);
+		for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+		
+			const geometry::Range2d<int>& bounds = _clipbounds[cno];
+						
+			apply_clip_box<ras_type> (ras, bounds);
+			   	
+	    agg::path_storage path;
+	    agg::conv_stroke<agg::path_storage> stroke(path);
+	    stroke.width(1);
+	    stroke.line_cap(agg::round_cap);
+	    stroke.line_join(agg::round_join);
+	    path.remove_all(); // Not obligatory in this case
+	
+	    const int16_t *vertex = static_cast<const int16_t*>(coords);
+	    
+	    m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
+	  	path.move_to(pnt.m_x * xscale, pnt.m_y * yscale);
+	
+	    for (vertex += 2;  vertex_count > 1;  vertex_count--, vertex += 2) {
+	      m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
+	    	path.line_to(pnt.m_x * xscale, pnt.m_y * yscale);
+	    }
+			// The vectorial pipeline
+	  	ras.add_path(stroke);
+	
+	  	// Set the color and render the scanlines
+	  	ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
+	
+  	
+	  	agg::render_scanlines(ras, sl, ren_sl);
+	  }
 
 	} // draw_line_strip
 
@@ -721,8 +739,8 @@ public:
     
     agg_alpha_mask* new_mask = new agg_alpha_mask(xres, yres);
     
-    if ( ! _clipbounds.isNull() ) 
-      new_mask->clear(_clipbounds);
+    for (unsigned int cno=0; cno<_clipbounds.size(); cno++)  
+      new_mask->clear(_clipbounds[cno]);
     
     m_alpha_mask.push_back(new_mask);
     
@@ -750,24 +768,104 @@ public:
       
     // NOTE: def->get_bound() is NULL for glyphs so we can't check the 
     // clipping area (bounds_in_clipping_area):
-      
     // create a new path with the matrix applied   
     std::vector<path> paths;    
     apply_matrix_to_path(def->get_paths(), paths, mat);
-      
+    
+    // convert to AGG paths
+    std::vector<agg::path_storage> agg_paths;
+    build_agg_paths(agg_paths, paths);
+    
     // make sure m_single_fill_styles contains the required color 
     need_single_fill_style(color);
 
+    // prepare style handler
+    agg_style_handler sh;
+    build_agg_styles(sh, m_single_fill_styles, mat, m_neutral_cxform);
+    
+    // select all clipping ranges. 
+    // NOTE: Glyphs are loaded like normal shape definitons, but w/o style
+    // definitons, which unfortunately include shape bounds. So "def" has
+    // no bounds (isNull) and thus select_clipbounds() won't work.
+    // TODO: Find a different solution since it's suboptimal to render in
+    // all clipping bounds.
+    select_all_clipbounds();
+      
     // draw the shape
     if (m_drawing_mask)
-	draw_mask_shape(paths, false);
+			draw_mask_shape(paths, false);
     else
-	draw_shape(-1, paths, m_single_fill_styles, m_neutral_cxform,  
-	    mat, false);
+			draw_shape(-1, paths, agg_paths, sh, false);
     
     // NOTE: Do not use even-odd filling rule for glyphs!
+    
+    // clear clipping ranges to ease debugging
+    _clipbounds_selected.clear();
   }
 
+
+	/// Fills _clipbounds_selected with pointers to _clipbounds members who
+	/// intersect with the given character (transformed by mat). This avoids
+	/// rendering of characters outside a particular clipping range.
+	/// "_clipbounds_selected" is used by draw_shape() and draw_outline() and
+	/// *must* be initialized prior to using those function.
+	void select_clipbounds(const shape_character_def *def, const matrix& mat) {
+	
+		_clipbounds_selected.clear();
+		_clipbounds_selected.reserve(_clipbounds.size());
+		
+		rect ch_bounds = def->get_bound();
+
+		if (ch_bounds.is_null()) {
+			log_msg("warning: select_clipbounds encountered a character definition "
+				"with null bounds");
+			return;
+		}		
+
+		rect bounds;		
+		bounds.set_null();
+		bounds.expand_to_transformed_rect(mat, ch_bounds);
+		bounds.scale_x(xscale);
+		bounds.scale_y(yscale);
+		
+		const geometry::Range2d<float>& range_float = bounds.getRange();
+		
+		assert(range_float.isFinite());
+		
+		geometry::Range2d<int> range_int(
+		  (int) range_float.getMinX(),
+		  (int) range_float.getMinY(),
+		  (int) range_float.getMaxX(),
+		  (int) range_float.getMaxY()
+		);
+		
+		
+		int count = _clipbounds.size();
+		for (int cno=0; cno<count; cno++) {
+					
+			if (_clipbounds[cno].intersects(bounds.getRange())) 
+				_clipbounds_selected.push_back(&_clipbounds[cno]);
+
+		}
+	
+		/*	
+		printf("Selected %d out of %d bounds.\n", _clipbounds_selected.size(),
+			_clipbounds.size());
+		*/
+	}
+	
+	void select_all_clipbounds() {
+	
+		if (_clipbounds_selected.size() == _clipbounds.size()) 
+			return; // already all selected
+	
+		_clipbounds_selected.clear();
+		_clipbounds_selected.resize(_clipbounds.size());
+		
+		int count = _clipbounds.size();
+		for (int cno=0; cno<count; cno++) 
+			_clipbounds_selected[cno] = &_clipbounds[cno];
+	}
 
   void draw_shape_character(shape_character_def *def, 
     const matrix& mat,
@@ -776,28 +874,50 @@ public:
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles) {
 
-    std::vector<path> paths;
+    std::vector< path > paths;
+    std::vector< agg::path_storage > agg_paths;
     
     apply_matrix_to_path(def->get_paths(), paths, mat);
-
+    build_agg_paths(agg_paths, paths);
+    
+    
     if (m_drawing_mask) {
       
       // Shape is drawn inside a mask, skip sub-shapes handling and outlines
       draw_mask_shape(paths, true);      
     
     } else {
+    
+    	// select ranges
+    	select_clipbounds(def, mat);
+    	
+    	if (_clipbounds_selected.empty()) {
+	    	log_msg("warning: AGG renderer skipping a whole character");
+	    	return; // nothing to draw!?
+			}
+    
+    	// prepare fill styles
+    	agg_style_handler sh;
+    	build_agg_styles(sh, fill_styles, mat, cx);
+    	
+    	/*
+    	// prepare strokes
+    	std::vector<stroke_type*> strokes;
+    	build_agg_strokes(strokes, agg_paths, paths, line_styles, mat);
+    	*/
       
-      // We need to separate sub-shapes during rendering. The current 
-      // implementation is a bit sub-optimal because the fill styles get
-      // re-initialized for each sub-shape. Maybe this will be no more a problem
-      // once fill styles get cached, anyway.     
+      // We need to separate sub-shapes during rendering. 
       const int subshape_count=count_sub_shapes(paths);
       
       for (int subshape=0; subshape<subshape_count; subshape++) {
-        draw_shape(subshape, paths, fill_styles, cx, mat, true);    
-        draw_outlines(subshape, paths, line_styles, cx, mat);
+        draw_shape(subshape, paths, agg_paths, sh, true);    
+        draw_outlines(subshape, paths, agg_paths, line_styles, cx, mat);
       }
+      
     } // if not drawing mask
+    
+    // Clear selected clipbounds to ease debugging 
+    _clipbounds_selected.clear();
     
   } // draw_shape_character
 
@@ -875,98 +995,95 @@ public:
     return sscount;
   }
   
-
-  /// Draws the given path using the given fill style and color transform.
-  /// Normally, Flash shapes are drawn using even-odd filling rule. However,
-  /// for glyphs non-zero filling rule should be used (even_odd=0).
-  /// Note the paths have already been transformed by the matrix and 
-  /// 'fillstyle_matrix' is only provided for bitmap transformations.
-  /// 'subshape_id' defines which sub-shape should be drawn (-1 means all 
-  /// subshapes)  
-  void draw_shape(int subshape_id, const std::vector<path> &paths,
-    const std::vector<fill_style> &fill_styles, const cxform& cx,
-    const matrix& fillstyle_matrix, int even_odd) {
-    
-    if (m_alpha_mask.empty()) {
-    
-      // No mask active, use normal scanline renderer
-      
-      typedef agg::scanline_u8 scanline_type;
-      
-      scanline_type sl;
-      
-      draw_shape_impl<scanline_type> (subshape_id, paths, fill_styles, cx, 
-        fillstyle_matrix, even_odd, sl);
-        
-    } else {
-    
-      // Mask is active, use alpha mask scanline renderer
-      
-      typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
-      
-      scanline_type sl(m_alpha_mask.back()->get_amask());
-      
-      draw_shape_impl<scanline_type> (subshape_id, paths, fill_styles, cx, 
-        fillstyle_matrix, even_odd, sl);
-        
-    }
-    
-  }
-   
-  /// Template for draw_shape(). Two different scanline types are suppored, 
-  /// one with and one without an alpha mask. This makes drawing without masks
-  /// much faster.  
-  template <class scanline_type>
-  void draw_shape_impl(int subshape_id, const std::vector<path> &paths,
-    const std::vector<fill_style> &fill_styles, const cxform& cx,
-    const matrix& fillstyle_matrix, int even_odd, scanline_type& sl) {
-    /*
-    Fortunately, AGG provides a rasterizer that fits perfectly to the flash
-    data model. So we just have to feed AGG with all data and we're done. :-)
-    This is also far better than recomposing the polygons as the rasterizer
-    can do everything in one pass and it is also better for adjacent edges
-    (anti aliasing).
-    Thank to Maxim Shemanarev for providing us such a great tool with AGG...
-    */
-    
-	  assert(m_pixf != NULL);
+  
+  /// Transposes Gnash paths to AGG paths, which can be used for both outlines
+  /// and shapes. Subshapes are ignored (ie. all paths are converted). Converts 
+	/// TWIPS to pixels on the fly.
+  void build_agg_paths(std::vector<agg::path_storage>& dest, const std::vector<path>& paths) {
 	  
-	  assert(!m_drawing_mask);
+	  int pcount = paths.size();
+
+		dest.resize(pcount);	  
 	  
-	  if ( _clipbounds.isNull() ) return;
-
-    // Gnash stuff 
-    int pno, eno, fno;
-    int pcount, ecount, fcount;
-    
-    // AGG stuff
-    renderer_base rbase(*m_pixf);
-    agg::rasterizer_scanline_aa<> ras;  // anti alias
-    agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> rasc;  // flash-like renderer
-    agg::renderer_scanline_aa_solid<
-      agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
-    agg::span_allocator<agg::rgba8> alloc;  // span allocator (?)
-    agg_style_handler sh;               // holds fill style definitions
-    
-
-  	rasc.clip_box(
-  		(double)_clipbounds.getMinX(),
-  		(double)_clipbounds.getMinY(),
-  		(double)_clipbounds.getMaxX(),
-  		(double)_clipbounds.getMaxY());    	
-    
-    // debug
-    int edge_count=0;
-    
-    // activate even-odd filling rule
-    if (even_odd)
-      rasc.filling_rule(agg::fill_even_odd);
-    else
-      rasc.filling_rule(agg::fill_non_zero);
-      
-    // tell AGG what styles are used
-    fcount = fill_styles.size();
-    for (fno=0; fno<fcount; fno++) {
+	  for (int pno=0; pno<pcount; pno++) {
+	  	
+	  	const gnash::path& this_path = paths[pno];
+			agg::path_storage& new_path = dest[pno];
+			
+			new_path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
+			
+			int ecount = this_path.m_edges.size();
+			
+			for (int eno=0; eno<ecount; eno++) {
+				
+				const edge& this_edge = this_path.m_edges[eno];
+				
+        if (this_edge.is_straight())
+          new_path.line_to(this_edge.m_ax*xscale, this_edge.m_ay*yscale);
+        else
+          new_path.curve3(this_edge.m_cx*xscale, this_edge.m_cy*yscale,
+                      this_edge.m_ax*xscale, this_edge.m_ay*yscale);
+				
+				
+			}
+		
+		}
+	  
+	} //build_agg_paths
+	
+	
+	// Builds vector strokes for paths
+	// WARNING 1 : This is not used and will probably be removed soon.
+	// WARNING 2 : Strokes vector returns pointers which are never freed.
+	void build_agg_strokes(std::vector<stroke_type*>& dest, 
+	  std::vector<agg::path_storage>& agg_paths,
+	  const std::vector<path> &paths,
+		const std::vector<line_style> &line_styles,
+		const matrix& linestyle_matrix) {
+		
+		assert(0); // should not be used currently
+	  
+	  int pcount=paths.size(); 
+	  dest.resize(pcount);
+	  
+    // use avg between x and y scale
+    const float stroke_scale = 
+      (linestyle_matrix.get_x_scale() + linestyle_matrix.get_y_scale()) / 2.0f
+      * (xscale+yscale)/2.0f;	  
+	  
+	  for (int pno=0; pno<pcount; pno++) {
+	  	  	
+	  	agg::conv_curve<agg::path_storage> curve(agg_paths[pno]);
+	  	stroke_type* this_stroke = new stroke_type(curve);
+	  	
+	  	const gnash::path &this_path_gnash = paths[pno];
+			 
+      const line_style& lstyle = line_styles[this_path_gnash.m_line-1];
+	        
+      int width = lstyle.get_width();
+      if (width==1)
+        this_stroke->width(1);
+      else
+        this_stroke->width(width*stroke_scale);
+			 
+			this_stroke->attach(curve);
+			this_stroke->line_cap(agg::round_cap);
+			this_stroke->line_join(agg::round_join);
+			
+			dest[pno] = this_stroke;
+		
+		}
+	  
+	}
+	
+	// Initializes the internal styles class for AGG renderer
+	void build_agg_styles(agg_style_handler& sh, 
+	  const std::vector<fill_style>& fill_styles,
+		const matrix& fillstyle_matrix,
+		const cxform& cx) {
+	  
+    int fcount = fill_styles.size();
+    for (int fno=0; fno<fcount; fno++) {
     
       bool smooth=false;
       int fill_type = fill_styles[fno].get_type();
@@ -1029,65 +1146,140 @@ public:
       } // switch
         
     } // for
-    
-      
-    // push paths to AGG
-    pcount = paths.size();
-    int current_subshape = 0; 
-    agg::path_storage path;
-    agg::conv_curve< agg::path_storage > curve(path);
+	  
+	} //build_agg_styles
+  
 
-    for (pno=0; pno<pcount; pno++) {
+  /// Draws the given path using the given fill style and color transform.
+  /// Normally, Flash shapes are drawn using even-odd filling rule. However,
+  /// for glyphs non-zero filling rule should be used (even_odd=0).
+  /// Note the paths have already been transformed by the matrix and 
+  /// 'subshape_id' defines which sub-shape should be drawn (-1 means all 
+  /// subshapes).
+	/// Note the *coordinates* in "paths" are not used because they are 
+	/// already prepared in agg_paths. The (nearly ambiguous) "path" parameter
+	/// is used to access other properties like fill styles and subshapes.   
+  void draw_shape(int subshape_id, const std::vector<path> &paths,
+    const std::vector<agg::path_storage>& agg_paths,  
+    agg_style_handler& sh, int even_odd) {
     
-      const gnash::path &this_path = paths[pno];
-      path.remove_all();
+    if (m_alpha_mask.empty()) {
+    
+      // No mask active, use normal scanline renderer
       
-      if (this_path.m_new_shape) 
-        current_subshape++;
+      typedef agg::scanline_u8 scanline_type;
+      
+      scanline_type sl;
+      
+      draw_shape_impl<scanline_type> (subshape_id, paths, agg_paths, 
+			  sh, even_odd, sl);
         
-      if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
-        // Skip this path as it is not part of the requested sub-shape.
-        continue;
-      }
-
-      if ((this_path.m_fill0==0) && (this_path.m_fill1==0)) {
-        // Skip this path as it contains no fill style
-        continue;
-      }
-      
-      // Tell the rasterizer which styles the following path will use.
-      // The good thing is, that it already supports two fill styles out of
-      // the box. 
-      // Flash uses value "0" for "no fill", whereas AGG uses "-1" for that. 
-      rasc.styles(this_path.m_fill0-1, this_path.m_fill1-1);
-      
-      // starting point of path
-      path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
-      
-      ecount = this_path.m_edges.size();
-      edge_count += ecount;
-      for (eno=0; eno<ecount; eno++) {
-      
-        const edge &this_edge = this_path.m_edges[eno];
-
-        if (this_edge.is_straight())
-          path.line_to(this_edge.m_ax*xscale, this_edge.m_ay*yscale);
-        else
-          path.curve3(this_edge.m_cx*xscale, this_edge.m_cy*yscale,
-                      this_edge.m_ax*xscale, this_edge.m_ay*yscale);
-        
-      }
-      
-      // add path to the compound rasterizer
-      rasc.add_path(curve);
+    } else {
     
+      // Mask is active, use alpha mask scanline renderer
+      
+      typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
+      
+      scanline_type sl(m_alpha_mask.back()->get_amask());
+      
+      draw_shape_impl<scanline_type> (subshape_id, paths, agg_paths, 
+			  sh, even_odd, sl);
+        
     }
-    //log_msg("%d edges\n", edge_count);
     
-    // render!
-    agg::render_scanlines_compound_layered(rasc, sl, rbase, alloc, sh);
+  }
+   
+  /// Template for draw_shape(). Two different scanline types are suppored, 
+  /// one with and one without an alpha mask. This makes drawing without masks
+  /// much faster.  
+  template <class scanline_type>
+  void draw_shape_impl(int subshape_id, const std::vector<path> &paths,
+  	const std::vector<agg::path_storage>& agg_paths,
+    agg_style_handler& sh, int even_odd, scanline_type& sl) {
+    /*
+    Fortunately, AGG provides a rasterizer that fits perfectly to the flash
+    data model. So we just have to feed AGG with all data and we're done. :-)
+    This is also far better than recomposing the polygons as the rasterizer
+    can do everything in one pass and it is also better for adjacent edges
+    (anti aliasing).
+    Thank to Maxim Shemanarev for providing us such a great tool with AGG...
+    */
     
-  } // draw_shape
+	  assert(m_pixf != NULL);
+	  
+	  assert(!m_drawing_mask);
+	  
+	  if ( _clipbounds.size()==0 ) return;
+
+    // Gnash stuff 
+    int pno;
+    int pcount;
+    
+    // AGG stuff
+    typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> ras_type;
+    renderer_base rbase(*m_pixf);
+    ras_type rasc;  // flash-like renderer
+    agg::renderer_scanline_aa_solid<
+      agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
+    agg::span_allocator<agg::rgba8> alloc;  // span allocator (?)
+    
+
+    // activate even-odd filling rule
+    if (even_odd)
+      rasc.filling_rule(agg::fill_even_odd);
+    else
+      rasc.filling_rule(agg::fill_non_zero);
+      
+    
+		for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
+		
+			const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
+			
+			apply_clip_box<ras_type> (rasc, *bounds);
+			
+			int current_subshape=0;
+	      
+	    // push paths to AGG
+	    pcount = paths.size();
+	
+	    for (pno=0; pno<pcount; pno++) {
+	    
+	    	const gnash::path &this_path_gnash = paths[pno];
+	      agg::path_storage &this_path_agg = 
+				  const_cast<agg::path_storage&>(agg_paths[pno]);
+	      agg::conv_curve< agg::path_storage > curve(this_path_agg);	      
+	    	
+	    	if (this_path_gnash.m_new_shape)
+	    		current_subshape++;
+	    		
+	    	if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
+	    		// Skip this path as it is not part of the requested sub-shape.
+	    		continue;
+				}
+				
+				if ((this_path_gnash.m_fill0==0) && (this_path_gnash.m_fill1==0)) {
+				  // Skip this path as it contains no fill style
+				  continue;
+				} 
+	    		      
+	      
+	      // Tell the rasterizer which styles the following path will use.
+	      // The good thing is, that it already supports two fill styles out of
+	      // the box. 
+	      // Flash uses value "0" for "no fill", whereas AGG uses "-1" for that. 
+	      rasc.styles(this_path_gnash.m_fill0-1, this_path_gnash.m_fill1-1);
+	      	      
+	      // add path to the compound rasterizer
+	      rasc.add_path(curve);
+	    
+	    }
+	    //log_msg("%d edges\n", edge_count);
+	    
+				    	
+	    agg::render_scanlines_compound_layered(rasc, sl, rbase, alloc, sh);
+	  }
+    
+  } // draw_shape_impl
 
 
 
@@ -1211,6 +1403,7 @@ public:
 
   /// Just like draw_shapes() except that it draws an outline.
   void draw_outlines(int subshape_id, const std::vector<path> &paths,
+  	const std::vector<agg::path_storage>& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx,
     const matrix& linestyle_matrix) {
     
@@ -1222,8 +1415,8 @@ public:
       
       scanline_type sl;
       
-      draw_outlines_impl<scanline_type> (subshape_id, paths, line_styles, 
-        cx, linestyle_matrix, sl);
+      draw_outlines_impl<scanline_type> (subshape_id, paths, agg_paths, 
+			  line_styles, cx, linestyle_matrix, sl);
         
     } else {
     
@@ -1233,17 +1426,18 @@ public:
       
       scanline_type sl(m_alpha_mask.back()->get_amask());
       
-      draw_outlines_impl<scanline_type> (subshape_id, paths, line_styles, 
-        cx, linestyle_matrix, sl);
+      draw_outlines_impl<scanline_type> (subshape_id, paths, agg_paths,
+			  line_styles, cx, linestyle_matrix, sl);
         
     }
     
-  }
+  } //draw_outlines
 
 
   /// Template for draw_outlines(), see draw_shapes_impl().
   template <class scanline_type>
   void draw_outlines_impl(int subshape_id, const std::vector<path> &paths,
+    const std::vector<agg::path_storage>& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx, 
     const matrix& linestyle_matrix, scanline_type& sl) {
     
@@ -1252,15 +1446,15 @@ public:
 	  if (m_drawing_mask)    // Flash ignores lines in mask /definitions/
       return;    
     
-    if ( _clipbounds.isNull() ) return;
+    if ( _clipbounds.size()==0 ) return;
 
     // TODO: While walking the paths for filling them, remember when a path
     // has a line style associated, so that we avoid walking the paths again
     // when there really are no outlines to draw...
     
     // Gnash stuff    
-    int pno, eno;
-    int pcount, ecount;
+    int pno;
+    int pcount;
     
     // use avg between x and y scale
     const float stroke_scale = 
@@ -1269,83 +1463,70 @@ public:
     
     
     // AGG stuff
+    typedef agg::rasterizer_scanline_aa<> ras_type; 
+    ras_type ras;  // anti alias
     renderer_base rbase(*m_pixf);
-    agg::rasterizer_scanline_aa<> ras;  // anti alias
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
-    agg::path_storage agg_path;             // a path in the AGG world
+      
+		
+		for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
+		
+			const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
+			   	
+			apply_clip_box<ras_type> (ras, *bounds);
+			
+			int current_subshape=0;
 
-        // TODO: what do do if _clipbox.isNull() or _clipbox.isWorld() ?
-	//       currently an assertion will fail when get{Min,Max}{X,Y}
-	//       are called below
-
-  	ras.clip_box(
-  		(double)_clipbounds.getMinX(),
-  		(double)_clipbounds.getMinY(),
-  		(double)_clipbounds.getMaxX(),
-  		(double)_clipbounds.getMaxY());    	
-
-    agg::conv_curve< agg::path_storage > curve(agg_path);    // to render curves
-    agg::conv_stroke< agg::conv_curve < agg::path_storage > > 
-      stroke(curve);  // to get an outline
-    
-    
-    int current_subshape = 0; 
-    pcount = paths.size();   
-    for (pno=0; pno<pcount; pno++) {
-      
-      const path &this_path = paths[pno];
-      
-      if (this_path.m_new_shape)
-        current_subshape++;
-        
-      if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
-        // Skip this path as it is not part of the requested sub-shape.
-        continue;
-      }
-      
-      if (!this_path.m_line)  
-        continue;     // invisible line
-               
-        
-      const line_style &lstyle = line_styles[this_path.m_line-1];
-      rgba color = cx.transform(lstyle.get_color());
-      int width = lstyle.get_width();
-      if (width==1)
-        stroke.width(1);
-      else
-        stroke.width(width*stroke_scale);
-      stroke.line_cap(agg::round_cap);
-      stroke.line_join(agg::round_join);
-
-        
-      agg_path.remove_all();  // clear path
-      
-      agg_path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
-        
-      ecount = this_path.m_edges.size();
-      for (eno=0; eno<ecount; eno++) {
-      
-        const edge &this_edge = this_path.m_edges[eno];
-        
-        if (this_edge.is_straight())
-          agg_path.line_to(this_edge.m_ax*xscale, this_edge.m_ay*yscale);
-        else
-          agg_path.curve3(this_edge.m_cx*yscale, this_edge.m_cy*yscale,
-                      this_edge.m_ax*yscale, this_edge.m_ay*yscale);
-        
-      } // for edges
-      
-      
-      ras.add_path(stroke);
-      ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
-      
-      agg::render_scanlines(ras, sl, ren_sl);
+	    pcount = paths.size();   
+	    for (pno=0; pno<pcount; pno++) {
+	      
+	      const gnash::path& this_path_gnash = paths[pno];
+	      agg::path_storage &this_path_agg = 
+				  const_cast<agg::path_storage&>(agg_paths[pno]);
+	      
+	    	if (this_path_gnash.m_new_shape)
+	    		current_subshape++;
+	    		
+	    	if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
+	    		// Skip this path as it is not part of the requested sub-shape.
+	    		continue;
+				}
+				
+				if (this_path_gnash.m_line==0) {
+				  // Skip this path as it contains no line style
+				  continue;
+				} 
+	      
+	      agg::conv_curve< agg::path_storage > curve(this_path_agg); // to render curves
+		    agg::conv_stroke< agg::conv_curve < agg::path_storage > > 
+		      stroke(curve);  // to get an outline
+	      
+	      const line_style& lstyle = line_styles[this_path_gnash.m_line-1];
+		      
+	      int width = lstyle.get_width();
+	      if (width==1)
+	        stroke.width(1);
+	      else
+	        stroke.width(width*stroke_scale);
+	        
+	      stroke.line_cap(agg::round_cap);	      
+	      stroke.line_join(agg::round_join); 
+	      	      
+	      ras.reset();
+	      ras.add_path(stroke);
+	      
+	      rgba color = cx.transform(lstyle.get_color());
+	      ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));	      
+					    	
+	      agg::render_scanlines(ras, sl, ren_sl);
+	      
+	    }
     
     
     }
       
-  } // draw_outlines
+  } // draw_outlines_impl
 
 
   
@@ -1357,63 +1538,67 @@ public:
 
     if (corner_count<1) return;
     
-    if ( _clipbounds.isNull() ) return;
+    if ( _clipbounds.size()==0 ) return;
     
     // TODO: Use aliased scanline renderer instead of anti-aliased one since
     // it is undesired anyway.
+    typedef agg::rasterizer_scanline_aa<> ras_type;
     renderer_base rbase(*m_pixf);
     agg::scanline_p8 sl;
-    agg::rasterizer_scanline_aa<> ras;
+    ras_type ras;
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase);
 
-        // TODO: what do do if _clipbox.isNull() or _clipbox.isWorld() ?
-	//       currently an assertion will fail when get{Min,Max}{X,Y}
-	//       are called below
+		for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+		
+			const geometry::Range2d<int>& bounds = _clipbounds[cno];
+			   
+			apply_clip_box<ras_type> (ras, bounds);	
 
-	ras.clip_box(
-		(double)_clipbounds.getMinX(),
-		(double)_clipbounds.getMinY(),
-		(double)_clipbounds.getMaxX(),
-		(double)_clipbounds.getMaxY());    	
-      
-    agg::path_storage path;
-    point pnt, origin;
-    
-    // Note: The coordinates are rounded and 0.5 is added to snap them to the 
-    // center of the pixel. This avoids blurring caused by anti-aliasing.
-    
-    m_current_matrix.transform(&origin, 
-      point(trunc(corners[0].m_x), trunc(corners[0].m_y)));
-    path.move_to(trunc(origin.m_x*xscale)+0.5, trunc(origin.m_y*yscale)+0.5);
-    
-    for (unsigned int i=1; i<corner_count; i++) {
-    
-      m_current_matrix.transform(&pnt, point(corners[i].m_x, corners[i].m_y));
-        
-      path.line_to(trunc(pnt.m_x*xscale)+0.5, trunc(pnt.m_y*yscale)+0.5);
-    }
-    
-    // close polygon
-    path.line_to(trunc(origin.m_x*xscale)+0.5, trunc(origin.m_y*yscale)+0.5);
-    
-    // fill polygon
-    if (fill.m_a>0) {
-      ras.add_path(path);
-      ren_sl.color(agg::rgba8_pre(fill.m_r, fill.m_g, fill.m_b, fill.m_a));
-      agg::render_scanlines(ras, sl, ren_sl);
-    }
-    
-    // draw outline
-    if (outline.m_a>0) {
-      agg::conv_stroke<agg::path_storage> stroke(path);
-      
-      stroke.width(1);
-      
-      ren_sl.color(agg::rgba8_pre(outline.m_r, outline.m_g, outline.m_b, outline.m_a));
-      
-      ras.add_path(stroke);
-      agg::render_scanlines(ras, sl, ren_sl);
+	        // TODO: what do do if _clipbox.isNull() or _clipbox.isWorld() ?
+		//       currently an assertion will fail when get{Min,Max}{X,Y}
+		//       are called below
+	
+	    agg::path_storage path;
+	    point pnt, origin;
+	    
+	    // Note: The coordinates are rounded and 0.5 is added to snap them to the 
+	    // center of the pixel. This avoids blurring caused by anti-aliasing.
+	    
+	    m_current_matrix.transform(&origin, 
+	      point(trunc(corners[0].m_x), trunc(corners[0].m_y)));
+	    path.move_to(trunc(origin.m_x*xscale)+0.5, trunc(origin.m_y*yscale)+0.5);
+	    
+	    for (unsigned int i=1; i<corner_count; i++) {
+	    
+	      m_current_matrix.transform(&pnt, point(corners[i].m_x, corners[i].m_y));
+	        
+	      path.line_to(trunc(pnt.m_x*xscale)+0.5, trunc(pnt.m_y*yscale)+0.5);
+	    }
+	    
+	    // close polygon
+	    path.line_to(trunc(origin.m_x*xscale)+0.5, trunc(origin.m_y*yscale)+0.5);
+	    
+	    // fill polygon
+	    if (fill.m_a>0) {
+	      ras.add_path(path);
+	      ren_sl.color(agg::rgba8_pre(fill.m_r, fill.m_g, fill.m_b, fill.m_a));
+	      
+	      agg::render_scanlines(ras, sl, ren_sl);
+	    }
+	    
+	    // draw outline
+	    if (outline.m_a>0) {
+	      agg::conv_stroke<agg::path_storage> stroke(path);
+	      
+	      stroke.width(1);
+	      
+	      ren_sl.color(agg::rgba8_pre(outline.m_r, outline.m_g, outline.m_b, outline.m_a));
+	      
+	      ras.add_path(stroke);
+	      
+				agg::render_scanlines(ras, sl, ren_sl);
+			}
     }
     
   }
@@ -1444,31 +1629,72 @@ public:
     return Range2d<int>(xmin, ymin, xmax, ymax);
   }
   
-  
-  virtual void set_invalidated_region(const rect& bounds) {
-  
-      using gnash::geometry::Range2d;
-      
-      Range2d<int> pixbounds = world_to_pixel(bounds);
-      
-      // add 2 pixels (GUI does that too)
-      pixbounds.growBy(2);
-  
-      // TODO: cache 'visiblerect' and maintain in sync with
-      //       xres/yres.
-      Range2d<int> visiblerect(0, 0, xres, yres);
-      _clipbounds = Intersection(pixbounds, visiblerect);
+  geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& wb)
+  {
+  	if (wb.isNull() || wb.isWorld()) return wb;
+  	
+  	int xmin, ymin, xmax, ymax;
 
+    world_to_pixel(xmin, ymin, wb.getMinX(), wb.getMinY());
+    world_to_pixel(xmax, ymax, wb.getMaxX(), wb.getMaxY());
+
+    return geometry::Range2d<int>(xmin, ymin, xmax, ymax);
+	}
+  
+	virtual void set_invalidated_region(const rect& bounds) {
+	
+		// NOTE: Both single and multi ranges are supported by AGG renderer.
+		
+		InvalidatedRanges ranges;
+		ranges.add(bounds.getRange());
+		set_invalidated_regions(ranges);
   
   }
-  
-  virtual bool bounds_in_clipping_area(const rect& bounds) {    
-    int bxmin, bxmax, bymin, bymax;
-    
-	using gnash::geometry::Range2d;
+	  
+	virtual void set_invalidated_regions(const InvalidatedRanges& ranges) {
+		using gnash::geometry::Range2d;
+		
+		int count=0;
 
-	Range2d<int> pixbounds = world_to_pixel(bounds);
-	return Intersect(pixbounds, _clipbounds);
+		_clipbounds_selected.clear();
+		_clipbounds.clear();    
+
+    // TODO: cache 'visiblerect' and maintain in sync with
+    //       xres/yres.
+    Range2d<int> visiblerect(0, 0, xres, yres);
+		
+		for (int rno=0; rno<ranges.size(); rno++) {
+		
+			const Range2d<float>& range = ranges.getRange(rno);
+
+	    Range2d<int> pixbounds = world_to_pixel(range);
+	    
+	    geometry::Range2d<int> bounds = Intersection(pixbounds, visiblerect);
+	    
+	    if (bounds.isNull()) continue; // out of screen
+	    
+	    assert(bounds.isFinite());
+	    
+	    _clipbounds.push_back(bounds);
+	    
+	    count++;
+	  }
+	  //log_msg("%d inv. bounds in frame", count);
+	  
+	}
+  
+  
+  virtual bool bounds_in_clipping_area(const geometry::Range2d<float>& bounds) {    
+    
+		using gnash::geometry::Range2d;
+	
+		Range2d<int> pixbounds = world_to_pixel(bounds);
+		
+		for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {  
+			if (Intersect(pixbounds, _clipbounds[cno]))
+				return true;
+		}
+		return false;
   }
 
   void get_pixel(rgba& color_return, float world_x, float world_y) {
@@ -1515,7 +1741,8 @@ private:  // private variables
   PixelFormat *m_pixf;
   
   /// clipping rectangle
-  geometry::Range2d<int> _clipbounds;
+  std::vector< geometry::Range2d<int> > _clipbounds;
+  std::vector< geometry::Range2d<int>* > _clipbounds_selected;
   
   // this flag is set while a mask is drawn
   bool m_drawing_mask; 

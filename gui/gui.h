@@ -26,6 +26,7 @@
 
 #include "tu_config.h"
 #include "rect.h"  // for composition
+#include "snappingrange.h"  // for InvalidatedRanges
 
 #include <string>
 
@@ -134,7 +135,13 @@ public:
     //        coordinate space, which is integer values...
     //        The question really is: why floats for TWIPS ?
     //        (guess this goes deep in the core/server libs)
+    //
     virtual void setInvalidatedRegion(const rect& bounds);
+    virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
+    
+    // Should return TRUE when the GUI/Renderer combination supports multiple
+    // invalidated bounds regions. 
+    virtual bool want_multiple_regions() { return false; }
 
     /// Asks the GUI handler if the next frame should be redrawn completely. 
     //

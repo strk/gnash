@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gtk.cpp,v 1.69 2007/02/28 04:27:59 nihilus Exp $ */
+/* $Id: gtk.cpp,v 1.70 2007/02/28 17:25:25 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -61,8 +61,7 @@ GtkGui::~GtkGui()
 
 GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 	:
-	Gui(xid, scale, loop, depth),
-	_drawbounds(0, 0, 0, 0)
+	Gui(xid, scale, loop, depth)
 {
 }
 
@@ -235,7 +234,6 @@ GtkGui::createWindow(int width, int height)
 	_height = height;
 
 	_validbounds.setTo(0, 0, _width, _height);
-	_drawbounds = _validbounds;
     
 	glue.setRenderHandlerSize(_width, _height);
 
@@ -245,16 +243,24 @@ GtkGui::createWindow(int width, int height)
 void
 GtkGui::renderBuffer()
 {
-	if ( _drawbounds.isNull() ) return;
-	assert ( ! _drawbounds.isWorld() );
-	glue.render(_drawbounds.getMinX(), _drawbounds.getMinY(),
-		_drawbounds.getMaxX(), _drawbounds.getMaxY());
+  if ( _drawbounds.size() == 0 ) return; // nothing to do..
+
+	for (int bno=0; bno < _drawbounds.size(); bno++) {
+	
+		geometry::Range2d<int>& bounds = _drawbounds[bno];
+		
+		assert ( bounds.isFinite() );  
+		
+		glue.render(bounds.getMinX(), bounds.getMinY(),
+		  bounds.getMaxX(), bounds.getMaxY());
+	
+	}
 }
 
-void
-GtkGui::setInvalidatedRegion(const rect& bounds)
-{
 #ifdef RENDERER_AGG
+void
+GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
+{
 	// forward to renderer
 	//
 	// Why? Why have the region been invalidated ??
@@ -266,18 +272,28 @@ GtkGui::setInvalidatedRegion(const rect& bounds)
 	// To be safe just assume this 'invalidated' region is actually
 	// the offscreen buffer, for safety, but we need to clarify this.
 	//
-	_renderer->set_invalidated_region(bounds);
+	_renderer->set_invalidated_regions(ranges);
+	
+	_drawbounds.clear();
+		
+	for (int rno=0; rno<ranges.size(); rno++) {
+	
+		geometry::Range2d<int> bounds = Intersection(
+	    _renderer->world_to_pixel(ranges.getRange(rno)),
+	    _validbounds);
+			
+		// it may happen that a particular range is out of the screen, which 
+		// will lead to bounds==null. 
+		if (bounds.isNull()) continue;
+		
+		assert(bounds.isFinite()); 
+		
+		_drawbounds.push_back(bounds);
+	    
+	}
 
-	// update _drawbounds, which are the bounds that need to
-	// be rerendered (??)
-	//
-	_drawbounds = Intersection(
-			// add two pixels because of anti-aliasing...
-			_renderer->world_to_pixel(bounds).growBy(2),
-			_validbounds);
-
-#endif
 }
+#endif
 
 void
 GtkGui::setTimeout(unsigned int timeout)

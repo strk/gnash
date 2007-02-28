@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.21 2007/02/22 17:25:25 udog Exp $ */
+/* $Id: character.cpp,v 1.22 2007/02/28 17:25:25 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -187,8 +187,19 @@ character::set_invalidated()
 	if ( ! m_invalidated )
 	{
 		m_invalidated = true;
-		m_old_invalidated_bounds.set_null();
-		get_invalidated_bounds(&m_old_invalidated_bounds, true);
+		
+		// NOTE: we need to set snap_distance in order to avoid too tight 
+		// invalidated ranges. The GUI chooses the appropriate distance in base
+		// of various parameters but for this internal ranges list we don't know
+		// that value. So we set snap_distance to some generic value and hope this
+		// does not produce too many nor too coarse ranges. Note when calculating
+		// the actual invalidated ranges the correct distance is used (but there
+		// may be problems when the GUI chooses a smaller value). Needs to be 
+		// fixed. 
+		m_old_invalidated_ranges.snap_distance = 200.0; 
+				
+		m_old_invalidated_ranges.setNull();
+		add_invalidated_bounds(m_old_invalidated_ranges, true);
 	}
 
 }

@@ -700,8 +700,9 @@ DisplayList::dump(std::ostream& os) const
 	}
 }
 
+
 void 
-DisplayList::get_invalidated_bounds(rect* bounds, bool force) {
+DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force) {
     
 	for( iterator it = _characters.begin(),
 			endIt = _characters.end();
@@ -709,7 +710,7 @@ DisplayList::get_invalidated_bounds(rect* bounds, bool force) {
 	{
     DisplayItem& dobj = *it;
     assert(dobj->get_ref_count() > 0);
-    dobj->get_invalidated_bounds(bounds, force);
+    dobj->add_invalidated_bounds(ranges, force);
 	}
 	
 }

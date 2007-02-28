@@ -119,6 +119,8 @@ namespace gnash {
 				
 		/// See render_handler::bounds_in_clipping_area (in backend/render_handler.h)
 		bool bounds_in_clipping_area(const rect& bounds);
+		bool bounds_in_clipping_area(const InvalidatedRanges& ranges);
+		bool bounds_in_clipping_area(const geometry::Range2d<float>& bounds);
 				
 		/// See render_handler::begin_submit_mask (in backend/render_handler.h)
 		void	begin_submit_mask();

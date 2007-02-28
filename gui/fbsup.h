@@ -24,6 +24,8 @@
 #include "config.h"
 #endif
 
+#include <vector>
+
 #include "gui.h"
 #include <linux/fb.h>
 
@@ -42,11 +44,11 @@
 
 // Define this to read from /dev/input/mice (any PS/2 compatbile mouse or
 // emulated by the Kernel) 
-#define USE_MOUSE_PS2
+//#define USE_MOUSE_PS2
 
 // Define this to support eTurboTouch / eGalax touchscreens. When reading from
 // a serial device, it must be initialized (stty) externally. 
-//#define USE_MOUSE_ETT
+#define USE_MOUSE_ETT
 
 #ifdef USE_MOUSE_PS2
 #define MOUSE_DEVICE "/dev/input/mice"
@@ -110,7 +112,7 @@ class FBGui : public Gui
 		unsigned char *buffer; // offscreen buffer
 #endif		
 
-    geometry::Range2d<int> _drawbounds;
+    std::vector< geometry::Range2d<int> > _drawbounds;
 
     int m_stage_width;
     int m_stage_height;
@@ -167,7 +169,8 @@ class FBGui : public Gui
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
     
-    virtual void setInvalidatedRegion(const rect& bounds);
+    virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
+    virtual bool want_multiple_regions() { return true; }
 };
 
 // end of namespace gnash

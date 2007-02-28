@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.43 2007/02/08 13:57:45 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.44 2007/02/28 17:25:26 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -252,16 +252,20 @@ edit_text_character::display()
 
 
 void
-edit_text_character::get_invalidated_bounds(rect* bounds, bool force)
+edit_text_character::add_invalidated_bounds(InvalidatedRanges& ranges, 
+	bool force)
 {
     if (!force && !m_invalidated) return; // no need to redraw
     
-    bounds->expand_to_rect(m_old_invalidated_bounds);	
+    ranges.add(m_old_invalidated_ranges);
+		
+		rect bounds;	
 	
-    bounds->expand_to_transformed_rect(get_world_matrix(), 
-    				       m_def->get_bound());            
+    bounds.expand_to_transformed_rect(get_world_matrix(), 
+    				       m_def->get_bound());
+									 
+		ranges.add(bounds.getRange());            
 }
-
 
 bool
 edit_text_character::on_event(const event_id& id)
