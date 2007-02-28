@@ -24,13 +24,13 @@
 #include "character.h" // for inheritance
 #include "rect.h" // for composition
 #include "movie_instance.h" // for create_movie_instance
+#include "snappingrange.h" // for InvalidatedRanges typedef (don't like it)
 
 #include <string>
 #include <memory> // for auto_ptr
 
 // Forward declarations
 namespace gnash {
-	//class bitmap_character_def;
 }
 
 namespace gnash
@@ -54,7 +54,7 @@ public:
 	{
 	}
 
-	void get_invalidated_bounds(rect* /*bounds*/, bool /*force*/) {}
+	void add_invalidated_bounds(InvalidatedRanges& /*bounds*/, bool /*force*/) {}
 
 };
 
