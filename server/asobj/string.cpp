@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.17 2007/02/28 09:59:54 strk Exp $ */
+/* $Id: string.cpp,v 1.18 2007/02/28 10:52:38 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -31,6 +31,7 @@
 #include "log.h"
 #include "array.h"
 #include "as_value.h"
+#include "GnashException.h"
 
 namespace gnash {
 
@@ -56,22 +57,22 @@ static void
 attachStringInterface(as_object& o)
 {
 	// TODO fill in the rest
-	o.init_member("concat", &string_concat);
-	o.init_member("slice", &string_slice);
-	o.init_member("split", &string_split);
-	o.init_member("lastIndexOf", &string_last_index_of);
-	o.init_member("substr", &string_sub_str);
-	o.init_member("substring", &string_sub_string);
-	o.init_member("indexOf", &string_index_of);
-	o.init_member("toString", &string_to_string);
-	o.init_member("fromCharCode", &string_from_char_code);
-	o.init_member("charAt", &string_char_at);
-	o.init_member("charCodeAt", &string_char_code_at);
-	o.init_member("toUpperCase", &string_to_upper_case);
-	o.init_member("toLowerCase", &string_to_lower_case);
+	o.init_member("concat", new builtin_function(string_concat));
+	o.init_member("slice", new builtin_function(string_slice));
+	o.init_member("split", new builtin_function(string_split));
+	o.init_member("lastIndexOf", new builtin_function(string_last_index_of));
+	o.init_member("substr", new builtin_function(string_sub_str));
+	o.init_member("substring", new builtin_function(string_sub_string));
+	o.init_member("indexOf", new builtin_function(string_index_of));
+	o.init_member("toString", new builtin_function(string_to_string));
+	o.init_member("fromCharCode", new builtin_function(string_from_char_code));
+	o.init_member("charAt", new builtin_function(string_char_at));
+	o.init_member("charCodeAt", new builtin_function(string_char_code_at));
+	o.init_member("toUpperCase", new builtin_function(string_to_upper_case));
+	o.init_member("toLowerCase", new builtin_function(string_to_lower_case));
 	
-	boost::intrusive_ptr<builtin_function> length_getter(new builtin_function(&string_get_length,NULL));
-	boost::intrusive_ptr<builtin_function> length_setter(new builtin_function(&string_set_length,NULL));
+	boost::intrusive_ptr<builtin_function> length_getter(new builtin_function(string_get_length));
+	boost::intrusive_ptr<builtin_function> length_setter(new builtin_function(string_set_length));
 	o.init_property("length", *length_getter, *length_setter);
 
 }
@@ -112,11 +113,23 @@ public:
 
 };
 
+static tu_string_as_object *
+ensureString(as_object* obj)
+{
+	tu_string_as_object* ret = dynamic_cast<tu_string_as_object*>(obj);
+	if ( ! ret )
+	{
+		throw ActionException("builtin method or gettersetter for String objects called against non-String instance");
+	}
+	return ret;
+}
 
 static void
 string_get_length(const fn_call& fn)
 {
-	fn.result->set_int(((tu_string_as_object*) fn.this_ptr)->m_string.utf8_length());
+	tu_string_as_object* str = ensureString(fn.this_ptr);
+
+	fn.result->set_int(str->m_string.utf8_length());
 	return;
 
 }
@@ -134,7 +147,8 @@ string_set_length(const fn_call& /*fn*/)
 static void
 string_concat(const fn_call& fn)
 {
-	tu_string this_string = ((tu_string_as_object*) fn.this_ptr)->m_string;
+	tu_string_as_object* str = ensureString(fn.this_ptr);
+	tu_string this_string = str->m_string;
 	
 	int len = strlen(this_string.c_str());
 	int pos = len;
@@ -159,7 +173,8 @@ string_concat(const fn_call& fn)
 static void
 string_slice(const fn_call& fn)
 {
-	tu_string this_string = ((tu_string_as_object*) fn.this_ptr)->m_string;
+	tu_string_as_object* str = ensureString(fn.this_ptr);
+	tu_string this_string = str->m_string;
 	// Pull a slice out of this_string.
 	int	start = 0;
 	int	utf8_len = this_string.utf8_length();
@@ -192,8 +207,9 @@ string_slice(const fn_call& fn)
 static void
 string_split(const fn_call& fn)
 {
+	tu_string_as_object* str = ensureString(fn.this_ptr);
 
-	boost::intrusive_ptr<tu_string_as_object> this_string_ptr((tu_string_as_object*) fn.this_ptr);
+	boost::intrusive_ptr<tu_string_as_object> this_string_ptr(str); // why ??
 	
 	as_value val;
 	
@@ -210,7 +226,7 @@ string_split(const fn_call& fn)
 	
 	if (fn.nargs >= 1)
 	{
-		tu_string this_string = ((tu_string_as_object*) fn.this_ptr)->m_string;
+		tu_string this_string = this_string_ptr->m_string;
 		
 		int	utf8_len = this_string.utf8_length();
 
@@ -269,8 +285,7 @@ string_split(const fn_call& fn)
 static void
 string_last_index_of(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = (tu_string_as_object*) fn.this_ptr;
-	assert(this_string_ptr);
+	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
@@ -311,7 +326,9 @@ string_last_index_of(const fn_call& fn)
 static void
 string_sub_str(const fn_call& fn)
 {
-	tu_string this_string = ((tu_string_as_object*) fn.this_ptr)->m_string;
+	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
+	tu_string this_string = this_string_ptr->m_string;
+
 	// Pull a slice out of this_string.
 	int	start = 0;
 	int	utf8_len = this_string.utf8_length();
@@ -336,7 +353,8 @@ string_sub_str(const fn_call& fn)
 static void
 string_sub_string(const fn_call& fn)
 {
-	tu_string this_string = ((tu_string_as_object*) fn.this_ptr)->m_string;
+	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
+	tu_string this_string = this_string_ptr->m_string;
 	// Pull a slice out of this_string.
 	int	start = 0;
 	int	utf8_len = this_string.utf8_length();
@@ -361,8 +379,7 @@ string_sub_string(const fn_call& fn)
 static void
 string_index_of(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = (tu_string_as_object*) fn.this_ptr;
-	assert(this_string_ptr);
+	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
@@ -394,8 +411,7 @@ string_index_of(const fn_call& fn)
 static void
 string_from_char_code(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = (tu_string_as_object*) fn.this_ptr;
-	assert(this_string_ptr);
+	//tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 
 	tu_string result;
 
@@ -411,8 +427,7 @@ string_from_char_code(const fn_call& fn)
 static void
 string_char_code_at(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = (tu_string_as_object*) fn.this_ptr;
-	assert(this_string_ptr);
+	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
@@ -442,8 +457,7 @@ string_char_code_at(const fn_call& fn)
 static void
 string_char_at(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = (tu_string_as_object*) fn.this_ptr;
-	assert(this_string_ptr);
+	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
@@ -475,8 +489,7 @@ string_char_at(const fn_call& fn)
 static void
 string_to_upper_case(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = (tu_string_as_object*) fn.this_ptr;
-	assert(this_string_ptr);
+	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 
 	fn.result->set_tu_string(this_string_ptr->m_string.utf8_to_upper());
 	return;		
@@ -485,8 +498,7 @@ string_to_upper_case(const fn_call& fn)
 static void
 string_to_lower_case(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = (tu_string_as_object*) fn.this_ptr;
-	assert(this_string_ptr);
+	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 
 	fn.result->set_tu_string(this_string_ptr->m_string.utf8_to_lower());
 	return;		
@@ -495,9 +507,7 @@ string_to_lower_case(const fn_call& fn)
 static void
 string_to_string(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = (tu_string_as_object*) fn.this_ptr;
-	assert(this_string_ptr);
-
+	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 	fn.result->set_tu_string(this_string_ptr->m_string);
 }
 

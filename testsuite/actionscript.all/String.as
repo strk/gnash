@@ -1,7 +1,7 @@
 // Mike Carlson's test program for actionscript strings
 // June 19th, 2006
 
-rcsid="$Id: String.as,v 1.11 2007/02/28 09:56:40 strk Exp $";
+rcsid="$Id: String.as,v 1.12 2007/02/28 10:52:38 strk Exp $";
 
 #include "check.as"
 
@@ -55,6 +55,8 @@ check_equals ( a.substr(-1,1), "z" );
 check_equals ( a.substr(-2,3), "yz" );
 check_equals ( a.substr(-3,2), "xy" );
 check_equals ( a.slice(-5,-3), "vw" );
+check_equals ( a.slice.call(a, -5, -3), "vw" );
+check_equals ( String.prototype.slice.call(a, -5, -3), "vw" );
 check_equals ( a.slice(-4), "wxyz" );
 check_equals ( a.substring(5,2), "cde" );
 check_equals ( a.substring(5,7), "fg" );

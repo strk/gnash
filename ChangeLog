@@ -1,5 +1,16 @@
 2007-02-28 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/string.cpp: robustness and
+	  correctness improvements: use builtin_function,
+	  not c_function for buildin methods; make sure
+	  methods are applied to a String instance.
+	* testsuite/actionscript.all/String.as: add a
+	  test for builtin methods being allowed to be
+	  called using Function interface
+	  (String.prototype.slice.call: just a small example)
+
+2007-02-28 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp: use log_aserror for
 	  ActionScript errors; (ActionExtends): check
 	  that the thing being extended is a function !!
