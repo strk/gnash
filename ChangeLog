@@ -1,5 +1,15 @@
 2007-02-28 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/: Makefile.am, DummyCharacter.h:
+	  Dummy character instance for use in test cases.
+	* testsuite/server/: Makefile.am, DisplayListTest.cpp:
+	  Initial test for DisplayList (just tests equality
+	  and inequality operators).
+	* server/dlist.{cpp,h}: Add equality, inequality
+	  and output operators.
+
+2007-02-28 Sandro Santilli <strk@keybit.net>
+
 	* server/array.cpp: use builtin_method for builtin
 	  methods :) ensure the 'this' pointer passed
 	  to builtin methods is valid.

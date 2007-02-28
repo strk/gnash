@@ -199,13 +199,13 @@ DisplayList::place_character(
 
 	if ( it == _characters.end() || (*it)->get_depth() != depth )
 	{
-		//IF_VERBOSE_DEBUG(dbglogfile << "This is a new character" << std::endl );
+		//log_msg("place_character: new character at depth %d", depth);
 		// add the new char
 		_characters.insert(it, DisplayItem(ch));
 	}
 	else
 	{
-		//IF_VERBOSE_DEBUG(dbglogfile << "Replacing existing character" << std::endl );
+		//log_msg("place_character: replacing existing character at depth %d", depth);
 		// replace existing char
 		*it = DisplayItem(ch);
 	}
@@ -729,6 +729,23 @@ void
 DisplayList::sort()
 {
 	_characters.sort(DisplayItemDepthLess());
+}
+
+std::ostream& operator<< (std::ostream& os, const DisplayList& dl)
+{
+	for (DisplayList::const_iterator it = dl._characters.begin(),
+			itEnd = dl._characters.end();
+			it != itEnd;
+			++it)
+	{
+		const DisplayItem& item = *it; 
+		if ( it != dl._characters.begin() ) os << " | ";
+		os << "Character id:" << item->get_id()
+			<< " name:" << item->get_name()
+			<< " depth:" << item->get_depth();
+	}
+
+	return os;
 }
 
 } // namespace gnash

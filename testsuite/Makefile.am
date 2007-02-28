@@ -13,7 +13,7 @@ SUBDIRS = \
 	actionscript.all	\
 	$(NULL)
 
-EXTRA_DIST = check.h media
+EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h media
 
 dist_noinst_SCRIPTS = anaylse-results.sh
 

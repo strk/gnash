@@ -1,6 +1,6 @@
 ## Process this fill with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ check_PROGRAMS = \
 	PropertyListTest \
 	GetterSetterTest \
 	as_prop_flagsTest \
+	DisplayListTest \
 	$(NULL)
 
 CLEANFILES = \
@@ -70,6 +71,13 @@ GetterSetterTest_LDADD = \
 
 as_prop_flagsTest_SOURCES = as_prop_flagsTest.cpp
 as_prop_flagsTest_LDADD = \
+	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/server/vm/libgnashvm.la \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(NULL)
+
+DisplayListTest_SOURCES = DisplayListTest.cpp
+DisplayListTest_LDADD = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/libbase/libgnashbase.la \

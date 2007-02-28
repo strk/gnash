@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,6 +45,9 @@ typedef boost::intrusive_ptr<character> DisplayItem;
 class DisplayList {
 
 public:
+
+	/// Output operator
+	friend std::ostream& operator<< (std::ostream&, const DisplayList&);
 
 	/// \brief
 	/// Place a new character in this display list
@@ -298,6 +301,10 @@ public:
 	///
 	void sort ();
 
+	bool operator==(const DisplayList& other) const { return _characters == other._characters; }
+
+	bool operator!=(const DisplayList& other) const { return _characters != other._characters; }
+
 private:
 
 	typedef std::list<DisplayItem> container_type;
@@ -359,7 +366,9 @@ DisplayList::visitBackward(V& visitor)
 	}
 }
 
-}
+std::ostream& operator<< (std::ostream&, const DisplayList&);
+
+} // namespace gnash
 
 
 #endif // GNASH_DLIST_H
