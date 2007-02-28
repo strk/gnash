@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.4 2007/02/28 18:29:53 strk Exp $
+// $Id: snappingrange.h,v 1.5 2007/02/28 18:33:21 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -271,7 +271,7 @@ public:
 	/// Returns true if any of the ranges contains the point
 	bool contains(T x, T y) const {
 	
-		for (int rno=0; rno<rcount; rno++) 
+		for (unsigned rno=0, rcount=_ranges.size(); rno<rcount; rno++) 
 		if (_ranges[rno].contains(x,y))
 			return true;
 			
