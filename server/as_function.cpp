@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@
 #include "array.h"
 #include "gnash.h"
 #include "fn_call.h"
-#include "sprite_instance.h"
+//#include "sprite_instance.h"
+#include "GnashException.h"
 
 #include <typeinfo>
 #include <iostream>
@@ -167,26 +168,36 @@ function_class_init(as_object& global)
 
 }
 
+// Wrapper around dynamic_cast to implement user warning.
+// To be used by builtin properties and methods.
+static as_function*
+ensureFunction(as_object* obj)
+{
+	as_function* ret = dynamic_cast<as_function*>(obj);
+	if ( ! ret )
+	{
+		throw ActionException("builtin method or gettersetter for Function objects called against non-Function instance");
+	}
+	return ret;
+}
+
 void
 function_apply(const fn_call& fn)
 {
 	int pushed=0; // new values we push on the stack
 
 	// Get function body 
-	as_function* function_obj = fn.env->top(1).to_as_function();
-	assert(function_obj);
+	as_function* function_obj = ensureFunction(fn.this_ptr);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
 	fn_call new_fn_call(fn);
 	new_fn_call.nargs=0;
 
-	assert(fn.this_ptr);
-
 	if ( ! fn.nargs )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_warning ("Function.apply() called with no args");
+		log_aserror ("Function.apply() called with no args");
 		);
 	}
 	else
@@ -204,7 +215,7 @@ function_apply(const fn_call& fn)
 			IF_VERBOSE_ASCODING_ERRORS(
 				if ( fn.nargs > 2 )
 				{
-					log_warning("Function.apply() got %d"
+					log_aserror("Function.apply() got %d"
 						" args, expected at most 2"
 						" -- discarding the ones in"
 						" excess",
@@ -216,7 +227,7 @@ function_apply(const fn_call& fn)
 			if ( ! arg1 )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
-					log_warning("Second arg of Function.apply"
+					log_aserror("Second arg of Function.apply"
 						" is of type %s, with value %s"
 						" (expected array)"
 						" - considering as call with no args",
@@ -232,7 +243,7 @@ function_apply(const fn_call& fn)
 			if ( ! arg_array )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
-					log_warning("Second arg of Function.apply"
+					log_aserror("Second arg of Function.apply"
 						" is of type %s, with value %s"
 						" (expected array)"
 						" - considering as call with no args",
@@ -273,8 +284,7 @@ function_call(const fn_call& fn)
 {
 
 	// Get function body 
-	as_function* function_obj = fn.env->top(1).to_as_function();
-	assert(function_obj);
+	as_function* function_obj = ensureFunction(fn.this_ptr);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
