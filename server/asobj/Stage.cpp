@@ -26,6 +26,7 @@
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
+#include "VM.h"
 
 namespace gnash {
 
@@ -36,8 +37,11 @@ void stage_ctor(const fn_call& fn);
 static void
 attachStageInterface(as_object& o)
 {
-	o.init_member("addListener", &stage_addlistener);
-	o.init_member("removeListener", &stage_removelistener);
+	if ( VM::get().getSWFVersion() > 5 )
+	{
+		o.init_member("addListener", &stage_addlistener);
+		o.init_member("removeListener", &stage_removelistener);
+	}
 }
 
 static as_object*

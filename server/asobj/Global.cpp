@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.48 2007/02/27 22:55:29 martinwguy Exp $ */
+/* $Id: Global.cpp,v 1.49 2007/02/28 23:24:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -374,6 +374,10 @@ Global::Global(VM& vm)
 	system_class_init(*this); // System and System.capabilities
 	function_class_init(*this);
 
+	// I find Stage object used in SWF5 movies, don't
+	// see a good reason not to enable this always
+	stage_class_init(*this);
+
 	if ( vm.getSWFVersion() < 3 ) goto extscan;
 	//-----------------------
 	// SWF3
@@ -430,7 +434,6 @@ Global::Global(VM& vm)
 	video_class_init(*this); // Video
 	camera_class_init(*this); // Camera
 	microphone_class_init(*this); // Microphone
-	stage_class_init(*this);
 	sharedobject_class_init(*this);
 	loadvars_class_init(*this);
 	customactions_class_init(*this);

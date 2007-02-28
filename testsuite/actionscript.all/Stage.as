@@ -20,15 +20,11 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Stage.as,v 1.7 2007/01/11 12:47:26 strk Exp $";
+rcsid="$Id: Stage.as,v 1.8 2007/02/28 23:24:45 strk Exp $";
 
 #include "check.as"
 
-#if OUTPUT_VERSION > 5
 check_equals (typeof(Stage), 'object');
-#else // Gnash doesn't register a Stage object if SWF < 6 !
-xcheck_equals (typeof(Stage), 'object');
-#endif
 
 var stageObj = new Stage;
 check_equals (typeof(stageObj), 'undefined');
