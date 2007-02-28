@@ -1,5 +1,9 @@
 2007-02-28 Sandro Santilli <strk@keybit.net>
 
+	* server/as_function.cpp: fix Function.apply()
+	  and Function.call() to correctly fetch  the
+	  'this' pointer (ie: not accessing the stack
+	  directly).
 	* server/swf_function.{h,cpp}: properly setup
 	  the 'arguments' variable at dispatch time.
 	* testsuite/actionscript.all/Function.as:
