@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.12 2007/02/28 12:26:32 martinwguy Exp $ */
+/* $Id: Range2d.h,v 1.13 2007/02/28 22:53:24 strk Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -484,14 +484,14 @@ public:
 		{
 			_xmin = scaleMin(_xmin, xfactor);
 			_xmax = scaleMax(_xmax, xfactor);
-			assert(_xmin < _xmax); // in case of overflow...
+			assert(_xmin <= _xmax); // in case of overflow...
 		}
 
 		if ( yfactor != 1 )
 		{
 			_ymin = scaleMin(_ymin, yfactor);
 			_ymax = scaleMax(_ymax, yfactor);
-			assert(_ymin < _ymax); // in case of overflow...
+			assert(_ymin <= _ymax); // in case of overflow...
 		}
 
 		return *this;

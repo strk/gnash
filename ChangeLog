@@ -1,5 +1,7 @@
 2007-02-28 Sandro Santilli <strk@keybit.net>
 
+	* libgeometry/Range2d.h (scale): allow the scaled range to be
+	  monodimensional in any direction.
 	* gui/gui.cpp: removed extra tokens at end of #include directive.
 	* libgeometry/snappingrange.h: strip CRs, fix contains(), copyright
 	  notice and doxygen formatting.
