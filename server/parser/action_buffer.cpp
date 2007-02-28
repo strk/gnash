@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: action_buffer.cpp,v 1.13 2007/02/06 17:46:25 rsavoye Exp $ */
+/* $Id: action_buffer.cpp,v 1.14 2007/02/28 09:46:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -113,8 +113,8 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     
     // Actual processing.
     size_t i = start_pc;
-    int16 length = read_int16(i+1);
-    int16 count = read_int16(i+3);
+    uint16_t length = uint16_t(read_int16(i+1));
+    uint16 count = uint16_t(read_int16(i+3)); 
     i += 2;
     
 //log_msg("Start at %d, stop at %d, length read was %d, count read was %d", start_pc, stop_pc, length, count);

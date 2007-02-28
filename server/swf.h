@@ -395,6 +395,8 @@ typedef enum
     ///
     ACTION_EXTENDS                 = 0x69,
 
+    /// See:
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_declare_dictionary
     ACTION_CONSTANTPOOL            = 0x88,
 
 

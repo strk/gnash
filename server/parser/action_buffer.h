@@ -144,7 +144,7 @@ public:
 	///
 	int16_t read_int16(size_t pc) const
 	{
-		int ret = m_buffer[pc] | (m_buffer[pc + 1] << 8);
+		int16_t ret = m_buffer[pc] | (m_buffer[pc + 1] << 8);
 		return ret;
 	}
 

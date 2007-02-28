@@ -1,5 +1,19 @@
 2007-02-28 Sandro Santilli <strk@keybit.net>
 
+	* server/swf.h: add reference to ActionConstantPool
+	  description
+	* server/parser/action_buffer.h (read_int16):
+	  Use int16_t type, not 'int'.
+	* server/parser/action_buffer.cpp (process_decl_dict):
+	  Use int16_t type, not 'int'.
+	* server/vm/ActionExec.{cpp,h} (operator()):
+	  Additional SWF consistency check for action 'length'
+	  field.
+
+2007-02-28 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ActionExec.{cpp,h}: Survive malformed
+	  SWF containing 
 	* server/as_function.cpp: fix Function.apply()
 	  and Function.call() to correctly fetch  the
 	  'this' pointer (ie: not accessing the stack

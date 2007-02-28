@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ActionExec.cpp,v 1.20 2007/02/20 20:05:41 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.21 2007/02/28 09:46:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -25,6 +25,7 @@
 #include "swf_function.h" 
 #include "log.h"
 #include "VM.h"
+#include "GnashException.h"
 
 #include "swf.h"
 #include "ASHandlers.h"
@@ -167,9 +168,24 @@ ActionExec::operator() ()
 		next_pc = pc+1;
 	} else {
 		// action with extra data
-		int16_t length = code.read_int16(pc+1);
-		assert( length >= 0 );
+		uint16_t length = uint16_t(code.read_int16(pc+1));
 		next_pc = pc + length + 3;
+		if ( next_pc > stop_pc )
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+			std::stringstream ss;
+			ss << "Length " << length << " (" << (int)length << ") of action tag"
+				<< " id " << (unsigned)action_id
+				<< " at pc " << pc
+				<< " overflows actions buffer size "
+				<< stop_pc;
+			//throw ActionException(ss.str());;
+			log_swferror("%s", ss.str().c_str());
+			);
+			// Give this action handler a chance anyway.
+			// Maybe it will be able to do something about 
+			// this anyway..
+		}
 	}
 
 	// Do we still need this ?
