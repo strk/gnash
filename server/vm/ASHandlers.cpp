@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.41 2007/02/27 09:10:20 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.42 2007/02/28 10:12:23 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -930,7 +930,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     if ( base < 1 )
     {
 	IF_VERBOSE_ASCODING_ERRORS (
-    	log_warning("Less then 1 base in ActionSubString, "
+    	log_aserror("Less then 1 base in ActionSubString, "
 		"setting to 1.");
 	);
 	base=1;
@@ -939,7 +939,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     else if ( base >= str.length() )
     {
 	IF_VERBOSE_ASCODING_ERRORS (
-    	log_warning("base goes beyond input string in ActionSubString, "
+    	log_aserror("base goes beyond input string in ActionSubString, "
 		"returning the empty string.");
 	);
     	env.drop(2);
@@ -953,7 +953,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     if ( base+size > str.length() )
     {
 	IF_VERBOSE_ASCODING_ERRORS (
-    	log_warning("base+size goes beyond input string in ActionSubString, "
+    	log_aserror("base+size goes beyond input string in ActionSubString, "
 		"adjusting size");
 	);
 	size = str.length()-base;
@@ -1130,7 +1130,7 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 	{
 		// ASCODING error ? (well, last time it was a gnash error ;)
 		IF_VERBOSE_ASCODING_ERRORS (
-		log_warning("Could not find GetProperty target (%s)",
+		log_aserror("Could not find GetProperty target (%s)",
 				tgt_val.to_string());
 		);
 		env.top(1) = as_value();
@@ -1884,7 +1884,7 @@ SWFHandlers::CommonSetTarget(as_environment& env, const string& target_name)
 	if (new_target == NULL)
 	{
 		IF_VERBOSE_ASCODING_ERRORS (
-		log_warning(
+		log_aserror(
 			"Couldn't find movie \"%s\" to set target to!"
 			" Not setting target at all...",
 			target_name.c_str());
@@ -2181,7 +2181,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 		if ( ! function.is_function() )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-				log_warning("error in call_function: "
+				log_aserror("error in call_function: "
 					"'%s' is not a function",
 					function_name.c_str());
 			);
@@ -2690,7 +2690,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
     if (!obj)
     {
         IF_VERBOSE_ASCODING_ERRORS(
-          log_warning("call_method invoked in something that "
+          log_aserror("call_method invoked in something that "
             "doesn't cast to an as_object: %s",
             obj_value.to_string());
         );
@@ -2704,7 +2704,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
           if ( ! method.is_function() ) 
           {
               IF_VERBOSE_ASCODING_ERRORS(
-                log_warning("call_method: '%s' is not a method",
+                log_aserror("call_method: '%s' is not a method",
                     method_name.c_str());
               );
           }
@@ -2722,7 +2722,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
         else
         {
             IF_VERBOSE_ASCODING_ERRORS(
-                log_warning("call_method can't find method %s "
+                log_aserror("call_method can't find method %s "
                     "for object %s (%p)", method_name.c_str(), 
                     typeid(*obj).name(), (void*)obj);
             );
@@ -2959,18 +2959,18 @@ SWFHandlers::ActionExtends(ActionExec& thread)
 	as_function* super = env.top(0).to_as_function();
 	as_function* sub = env.top(1).to_as_function();
 
-	if ( ! super )
+	if ( ! super || ! sub )
 	{
 		IF_VERBOSE_ASCODING_ERRORS
 		(
 			if ( ! super )
 			{
-				log_warning("Super is not an as_function (%s)",
+				log_aserror("ActionExtends: Super is not an as_function (%s)",
 					env.top(0).to_string());
 			}
 			if ( ! sub )
 			{
-				log_warning("Sub is not an as_function (%s)",
+				log_aserror("ActionExtends: Sub is not an as_function (%s)",
 					env.top(1).to_string());
 			}
 		);

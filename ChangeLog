@@ -1,5 +1,11 @@
 2007-02-28 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp: use log_aserror for
+	  ActionScript errors; (ActionExtends): check
+	  that the thing being extended is a function !!
+
+2007-02-28 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/String.as: add
 	  test for read-only nature of 'length' property;
 	  fix test for SWF5 target.
