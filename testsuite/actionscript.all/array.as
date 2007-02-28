@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.12 2007/02/28 07:41:27 strk Exp $";
+rcsid="$Id: array.as,v 1.13 2007/02/28 13:00:05 strk Exp $";
 
 #include "check.as"
 
@@ -43,6 +43,14 @@ check_equals ( a[4] , 9 );
 check_equals ( a.join() , "200,551,7,8,9" );
 a.reverse();
 check_equals ( a.join() , "9,8,7,551,200" );
+#if OUTPUT_VERSION > 5
+check_equals ( Array.prototype.join.apply(a), "9,8,7,551,200" );
+check_equals ( a.join.apply(a), "9,8,7,551,200" );
+#else
+// It seems that up to SWF5 we couldn't do this ...
+xcheck_equals ( Array.prototype.join.apply(a), undefined );
+xcheck_equals ( a.join.apply(a), undefined );
+#endif
 check_equals ( a.join("test") , "9test8test7test551test200" );
 
 // Test one of our sorting type members
@@ -151,6 +159,14 @@ check_equals(c.length, 2);
 check_equals(c[8], undefined);
 
 // $Log: array.as,v $
+// Revision 1.13  2007/02/28 13:00:05  strk
+//         * server/array.cpp: use builtin_method for builtin
+//           methods :) ensure the 'this' pointer passed
+//           to builtin methods is valid.
+//         * testsuite/actionscript.all/array.as:
+//           Add test for calling Array builtin functions
+//           using FUnction.call.
+//
 // Revision 1.12  2007/02/28 07:41:27  strk
 //         * server/array.{cpp,h}: allow resize trough
 //           setting the 'length' property.
@@ -162,58 +178,4 @@ check_equals(c[8], undefined);
 //         * server/array.cpp: more fixes.
 //         * testsuite/actionscript.all/array.as: added some tests for
 //           invalid calls to Array.slice()
-//
-// Revision 1.10  2006/10/15 02:30:55  rsavoye
-// 	* testsuite/actionscript.all/swf_exists.exp: Use local_exec()
-// 	instead of spawn/expect. This works better with batch tests.
-// 	* testsuite/actionscript.all/check.as: Add xcheck and
-// 	xcheck_equals to handle expected failures.
-// 	* testsuite/actionscript.all/dejagnu.as: Add xpass and xfail to
-// 	handle expect failures.
-// 	* testsuite/actionscript.all/Boolean.as, Date.as, Global.as,
-// 	Inheritance.as, MovieClip.as, NetConnection.as, Number.as,
-// 	Object.as, Selection.as, array.as, delete.as, inheritance.as: Use
-// 	xcheck and xcheck_equals for tests expected to not work yet.
-// 	* testsuite/actionscript.all/XML.as, XMLNode.as: Use xpass and
-// 	xfail for tests expected to not work yet.
-//
-// Revision 1.9  2006/07/06 08:16:31  strk
-// Added instanceOf test for both new Array() and [...] constructors.
-//
-// Revision 1.8  2006/07/06 07:55:24  strk
-// "tostring" => "toString" (SWF 7 and up are case-sensitive in this); added tests for Array constants.
-//
-// Revision 1.7  2006/06/20 20:45:27  strk
-//         * testsuite/actionscript.all/: added rcsid variable
-//         to all testfiles, had check.as print testfile info at
-//         the beginning rather then at each check.
-//
-// Revision 1.6  2006/04/27 16:31:56  strk
-//         * server/: (array.cpp, array.h): big cleanup, provided
-//         overrides for get_member() and set_member() to add support
-//         for the special 'length' element, turned array_as_object into
-//         a real class.
-//         * server/: (Object.cpp, Object.h): moved get_member
-//         and set_member to get_member_default and set_member_default
-//         with protected access level, provided public virtuals
-//         invoking the protected non-virtuals. This is to allow cleaner
-//         hooking for ActionScript classes.
-//
-// Revision 1.5  2006/04/27 09:37:00  strk
-// completed switch to check_equals() macro
-//
-// Revision 1.4  2006/04/27 07:27:25  strk
-//         * testsuite/actionscript.all/array.as: turned length()
-//         method calls to length data member accesses.
-//
-// Revision 1.3  2006/04/26 20:02:41  strk
-// More uses of the check_equals macro
-//
-// Revision 1.2  2006/02/14 08:17:51  corfe
-// Change all tests to use new check macro. Add tests for all implemented array functions, as well as several tests for the unimplemented sort function.
-//
-// Revision 1.1  2006/02/01 11:43:16  strk
-// Added generic rule to build .swf from .as using makeswf (Ming).
-// Changed array.as source to avoid ActionScript2 constructs (class).
-// Added initial version of a movieclip AS class tester.
 //

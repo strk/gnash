@@ -29,17 +29,17 @@
 #include <pthread.h>
 #endif
 
-#include <string>
-#include <algorithm>
-#include <memory> // for auto_ptr
-
 #include "as_value.h"
 #include "array.h"
-//#include "action.h"
 #include "log.h"
 #include "builtin_function.h" // for Array class
 #include "as_function.h" // for sort user-defined comparator
 #include "fn_call.h"
+#include "GnashException.h"
+
+#include <string>
+#include <algorithm>
+#include <memory> // for auto_ptr
 
 namespace gnash {
 
@@ -457,21 +457,31 @@ as_array_object::sort(as_function& comparator, uint8_t flags)
 
 }
 
+static as_array_object *
+ensureArray(as_object* obj)
+{
+	as_array_object* ret = dynamic_cast<as_array_object*>(obj);
+	if ( ! ret )
+	{
+		throw ActionException("builtin method or gettersetter for Array objects called against non-Array instance");
+	}
+	return ret;
+}
+
 static void
 array_splice(const fn_call& fn)
 {
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
+	UNUSED(array);
 
-	log_error("Array.splice() method not implemented yet!\n");
+	log_error("FIXME: Array.splice() method not implemented yet!\n");
 	fn.result->set_undefined();
 }
 
 static void
 array_sort(const fn_call& fn)
 {
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
 
 	uint8_t flags;
 
@@ -499,10 +509,10 @@ array_sort(const fn_call& fn)
 static void
 array_sortOn(const fn_call& fn)
 {
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	//as_array_object* array = static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
+	UNUSED(array);
 
-	log_error("Array.sortOn() method not implemented yet!\n");
+	log_error("FIXME: Array.sortOn() method not implemented yet!");
 	fn.result->set_undefined();
 }
 
@@ -510,12 +520,10 @@ array_sortOn(const fn_call& fn)
 static void
 array_push(const fn_call& fn)
 {
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	as_array_object* array = \
-		static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
 
 		IF_VERBOSE_ACTION (
-	log_action("calling array push, pushing %d values onto back of array\n",fn.nargs);
+	log_action("calling array push, pushing %d values onto back of array",fn.nargs);
 		);
 
 	for (int i=0;i<fn.nargs;i++)
@@ -528,12 +536,10 @@ array_push(const fn_call& fn)
 static void
 array_unshift(const fn_call& fn)
 {
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	as_array_object* array = \
-		static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
 
 		IF_VERBOSE_ACTION (
-	log_action("calling array unshift, pushing %d values onto front of array\n",fn.nargs);
+	log_action("calling array unshift, pushing %d values onto front of array",fn.nargs);
 		);
 
 	for (int i=fn.nargs-1;i>=0;i--)
@@ -546,49 +552,46 @@ array_unshift(const fn_call& fn)
 static void
 array_pop(const fn_call& fn)
 {
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	as_array_object* array = \
-		static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
 
 	// Get our index, log, then return result
 	(*fn.result) = array->pop();
 
-		IF_VERBOSE_ACTION (
-	log_action("calling array pop, result:%s, new array size:%d\n",fn.result->to_string(),array->size());
-		);
+	IF_VERBOSE_ACTION (
+	log_action("calling array pop, result:%s, new array size:%d",
+		fn.result->to_string(), array->size());
+	);
 }
 
 // Callback to pop a value from the front of an array
 static void
 array_shift(const fn_call& fn)
 {
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	as_array_object* array = \
-		static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
 
 	// Get our index, log, then return result
 	(*fn.result) = array->shift();
 
-		IF_VERBOSE_ACTION (
-	log_action("calling array shift, result:%s, new array size:%d\n",fn.result->to_string(),array->size());
-		);
+	IF_VERBOSE_ACTION (
+	log_action("calling array shift, result:%s, new array size:%d",
+		fn.result->to_string(), array->size());
+	);
 }
 
 // Callback to reverse the position of the elements in an array
 static void
 array_reverse(const fn_call& fn)
 {
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	as_array_object* array = \
-		static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
 
 	array->reverse();
 
 	fn.result->set_as_object(array);
 
-		IF_VERBOSE_ACTION (
-	log_action("called array reverse, result:%s, new array size:%d\n",fn.result->to_string(),array->size());
-		);
+	IF_VERBOSE_ACTION (
+	log_action("called array reverse, result:%s, new array size:%d",
+		fn.result->to_string(), array->size());
+	);
 	
 }
 
@@ -596,9 +599,7 @@ array_reverse(const fn_call& fn)
 static void
 array_join(const fn_call& fn)
 {
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	as_array_object* array = \
-		static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
 
 	std::string separator = ",";
 
@@ -613,21 +614,17 @@ array_join(const fn_call& fn)
 static void
 array_size(const fn_call& fn)
 {
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	as_array_object* array = \
-		static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
 
 	fn.result->set_int(array->size());
 }
 
 // Callback to convert array to a string
+// TODO CHECKME: rely on Object.toString  ? (
 static void
 array_to_string(const fn_call& fn)
 {
-
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	as_array_object* array = \
-		static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
 
 	std::string ret = array->toString();
 
@@ -650,9 +647,7 @@ array_to_string(const fn_call& fn)
 static void
 array_concat(const fn_call& fn)
 {
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	as_array_object* array = \
-		static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
 
 	// use copy ctor
 	as_array_object* newarray = new as_array_object(*array);
@@ -679,9 +674,7 @@ array_concat(const fn_call& fn)
 static void
 array_slice(const fn_call& fn)
 {
-	assert(dynamic_cast<as_array_object*>(fn.this_ptr));
-	as_array_object* array = \
-		static_cast<as_array_object*>(fn.this_ptr);
+	as_array_object* array = ensureArray(fn.this_ptr);
 
 	// start and end index of the part we're slicing
 	int startindex, endindex;
@@ -793,19 +786,20 @@ attachArrayInterface(as_object& proto)
 	// within overridden get_member()
 	//proto->init_member("length", &array_length);
 
-	proto.init_member("join", &array_join);
-	proto.init_member("concat", &array_concat);
-	proto.init_member("slice", &array_slice);
-	proto.init_member("push", &array_push);
-	proto.init_member("unshift", &array_unshift);
-	proto.init_member("pop", &array_pop);
-	proto.init_member("shift", &array_shift);
-	proto.init_member("splice", &array_splice);
-	proto.init_member("sort", &array_sort);
-	proto.init_member("size", &array_size);
-	proto.init_member("sortOn", &array_sortOn);
-	proto.init_member("reverse", &array_reverse);
-	proto.init_member("toString", &array_to_string);
+	proto.init_member("join", new builtin_function(array_join));
+	proto.init_member("concat", new builtin_function(array_concat));
+	proto.init_member("slice", new builtin_function(array_slice));
+	proto.init_member("push", new builtin_function(array_push));
+	proto.init_member("unshift", new builtin_function(array_unshift));
+	proto.init_member("pop", new builtin_function(array_pop));
+	proto.init_member("shift", new builtin_function(array_shift));
+	proto.init_member("splice", new builtin_function(array_splice));
+	proto.init_member("sort", new builtin_function(array_sort));
+	proto.init_member("size", new builtin_function(array_size));
+	proto.init_member("sortOn", new builtin_function(array_sortOn));
+	proto.init_member("reverse", new builtin_function(array_reverse));
+	proto.init_member("toString", new builtin_function(array_to_string));
+
 	proto.init_member("CASEINSENSITIVE", as_array_object::fCaseInsensitive);
 	proto.init_member("DESCENDING", as_array_object::fDescending);
 	proto.init_member("UNIQUESORT", as_array_object::fUniqueSort);

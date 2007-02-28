@@ -1,5 +1,14 @@
 2007-02-28 Sandro Santilli <strk@keybit.net>
 
+	* server/array.cpp: use builtin_method for builtin
+	  methods :) ensure the 'this' pointer passed
+	  to builtin methods is valid.
+	* testsuite/actionscript.all/array.as:
+	  Add test for calling Array builtin functions 
+	  using FUnction.call.
+
+2007-02-28 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/gen-asclass.sh: updated to
 	  use new, more robust and more correct layout.
 	* server/asobj/string.cpp: robustness and
