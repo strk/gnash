@@ -41,7 +41,7 @@
 #include "render_handler.h"
 #include "render_handler_agg.h"
 
-#define DEBUG_SHOW_FPS  // prints number of frames per second to STDOUT
+//#define DEBUG_SHOW_FPS  // prints number of frames per second to STDOUT
 
 #ifdef DEBUG_SHOW_FPS
 # include <sys/types.h>
