@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.13 2007/02/28 13:00:05 strk Exp $";
+rcsid="$Id: array.as,v 1.14 2007/02/28 23:58:26 strk Exp $";
 
 #include "check.as"
 
@@ -48,8 +48,8 @@ check_equals ( Array.prototype.join.apply(a), "9,8,7,551,200" );
 check_equals ( a.join.apply(a), "9,8,7,551,200" );
 #else
 // It seems that up to SWF5 we couldn't do this ...
-xcheck_equals ( Array.prototype.join.apply(a), undefined );
-xcheck_equals ( a.join.apply(a), undefined );
+check_equals ( Array.prototype.join.apply(a), undefined );
+check_equals ( a.join.apply(a), undefined );
 #endif
 check_equals ( a.join("test") , "9test8test7test551test200" );
 
@@ -159,6 +159,20 @@ check_equals(c.length, 2);
 check_equals(c[8], undefined);
 
 // $Log: array.as,v $
+// Revision 1.14  2007/02/28 23:58:26  strk
+//         * testsuite/actionscript.all/: array.as, Function.as
+//           Don't expect failures when checking for missing
+//           apply/call in SWF5.
+//         * server/as_function.cpp (getFunctionPrototype):
+//           Don't register 'apply' and 'call' members if
+//           SWF < 6; use builtin_function when registering them.
+//         * testsuite/actionscript.all/String.as:
+//           Add test for 'substring' with base == length;
+//           Fix test for SWF5 (no Function.call or Function.apply
+//           there)
+//         * server/vm/ASHandlers.cpp (ActionSubString):
+// 	  fix case in which base is == length.
+//
 // Revision 1.13  2007/02/28 13:00:05  strk
 //         * server/array.cpp: use builtin_method for builtin
 //           methods :) ensure the 'this' pointer passed

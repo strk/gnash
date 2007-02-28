@@ -1,7 +1,22 @@
-// Mike Carlson's test program for actionscript strings
-// June 19th, 2006
+// 
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-rcsid="$Id: String.as,v 1.12 2007/02/28 10:52:38 strk Exp $";
+// Original author: Mike Carlson - June 19th, 2006
+
+rcsid="$Id: String.as,v 1.13 2007/02/28 23:58:26 strk Exp $";
 
 #include "check.as"
 
@@ -55,8 +70,15 @@ check_equals ( a.substr(-1,1), "z" );
 check_equals ( a.substr(-2,3), "yz" );
 check_equals ( a.substr(-3,2), "xy" );
 check_equals ( a.slice(-5,-3), "vw" );
+#if OUTPUT_VERSION > 5
 check_equals ( a.slice.call(a, -5, -3), "vw" );
 check_equals ( String.prototype.slice.call(a, -5, -3), "vw" );
+#else
+// There was no 'call' or 'apply' thing up to SWF5
+// Actually, there was no Function interface at all!
+check_equals ( a.slice.call(a, -5, -3), undefined );
+check_equals ( String.prototype.slice.call(a, -5, -3), undefined );
+#endif
 check_equals ( a.slice(-4), "wxyz" );
 check_equals ( a.substring(5,2), "cde" );
 check_equals ( a.substring(5,7), "fg" );
@@ -110,6 +132,15 @@ asm {
 	setvariable
 };
 check_equals( b, "");
+asm {
+	push "b"
+	push "all"
+	push "3" // base is 1-based!
+	push "1" 
+	substring
+	setvariable
+};
+check_equals( b, "l");
 #endif
 
 

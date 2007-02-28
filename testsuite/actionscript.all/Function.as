@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.23 2007/02/28 07:46:23 strk Exp $";
+rcsid="$Id: Function.as,v 1.24 2007/02/28 23:58:26 strk Exp $";
 
 #include "check.as"
 
@@ -107,7 +107,7 @@ var ret=getThisName.apply(undefined, "7");
 #else // OUTPUT_VERSION < 6
 
 // No Function.apply... for SWF up to 5
-xcheck_equals(typeOf(getThisName.apply), 'undefined');
+check_equals(typeOf(getThisName.apply), 'undefined');
 
 #endif
 
@@ -124,7 +124,7 @@ check_equals ( getThisName.call(this_ref, 1, 2, 3), "extname123" );
 
 #else // OUTPUT_VERSION < 6
 
-xcheck_equals ( typeOf(getThisName.call), 'undefined' );
+check_equals ( typeOf(getThisName.call), 'undefined' );
 
 #endif
 

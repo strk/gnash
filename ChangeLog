@@ -1,7 +1,18 @@
 2007-03-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: array.as, Function.as
+	  Don't expect failures when checking for missing
+	  apply/call in SWF5.
+	* server/as_function.cpp (getFunctionPrototype):
+	  Don't register 'apply' and 'call' members if
+	  SWF < 6; use builtin_function when registering them.
+	* testsuite/actionscript.all/String.as:
+	  Add test for 'substring' with base == length;
+	  Fix test for SWF5 (no Function.call or Function.apply
+	  there)
 	* server/vm/ASHandlers.cpp (ActionGotoExpression):
-	  Simplified function, reduced emitted warnings.
+	  Simplified function, reduced emitted warnings;
+	  (ActionSubString): fix case in which base is == length.
 	* server/asobj/Global.cpp: register Stage object always.
 	* server/asobj/Stage.cpp: don't register addListener
 	  and removeListener if SWF < 6.

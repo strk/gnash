@@ -29,8 +29,8 @@
 #include "array.h"
 #include "gnash.h"
 #include "fn_call.h"
-//#include "sprite_instance.h"
 #include "GnashException.h"
+#include "VM.h"
 
 #include <typeinfo>
 #include <iostream>
@@ -78,8 +78,12 @@ static as_object* getFunctionPrototype()
 	if ( proto.get() == NULL ) {
 		// Initialize Function prototype
 		proto = new as_object();
-		proto->init_member("apply", &function_apply);
-		proto->init_member("call", &function_call);
+
+		if ( VM::get().getSWFVersion() >= 6 )
+		{
+			proto->init_member("apply", new builtin_function(function_apply));
+			proto->init_member("call", new builtin_function(function_call));
+		}
 	}
 
 	return proto.get();

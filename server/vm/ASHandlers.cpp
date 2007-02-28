@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.43 2007/02/28 23:40:44 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.44 2007/02/28 23:58:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -77,21 +77,6 @@ namespace gnash {
 namespace gnash {
 
 namespace SWF { // gnash::SWF
-
-// Utility.  Try to convert str to a number.  If successful,
-// put the result in *result, and return true.  If not
-// successful, put 0 in *result, and return false.
-static bool string_to_number(double* result, const char* str)
-{
-    char* tail = 0;
-    *result = strtod(str, &tail);
-    if (tail == str || *tail != 0)
-	{
-	    // Failed conversion to Number.
-	    return false;
-	}
-    return true;
-}
 
 // 
 // Utility: construct an object using given constructor.
@@ -936,7 +921,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 	base=1;
     }
 
-    else if ( base >= str.length() )
+    else if ( base > str.length() )
     {
 	IF_VERBOSE_ASCODING_ERRORS (
     	log_aserror("base goes beyond input string in ActionSubString, "
