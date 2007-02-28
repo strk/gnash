@@ -1,5 +1,6 @@
 2007-02-28 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp: removed extra tokens at end of #include directive.
 	* libgeometry/snappingrange.h: strip CRs, fix contains(), copyright
 	  notice and doxygen formatting.
 	* testsuite/DummyCharacter.h: update to add_invalidated_bounds
