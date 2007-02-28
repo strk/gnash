@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.6 2007/02/06 11:00:36 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.7 2007/02/28 23:05:58 strk Exp $";
 
 #include "check.as"
 
@@ -126,6 +126,26 @@ asm {
         setvariable
 };
 check_equals(checkpoint, undefined);
+
+//---------------------------------------------------------------------
+// Check 'obj:variable_in_object' access 
+//---------------------------------------------------------------------
+
+var obj = { variable_in_object: 'yes' };
+check_equals(obj.variable_in_object, 'yes');
+asm {
+        push 'checkpoint'
+	push 'obj:variable_in_object'
+	getvariable
+        setvariable
+};
+check_equals(checkpoint, 'yes');
+asm {
+	push 'obj:variable_in_object'
+        push 'yes2'
+        setvariable
+};
+check_equals(obj.variable_in_object, 'yes2');
 
 //---------------------------------------------------------------------
 // Check '../invalidname' access 
