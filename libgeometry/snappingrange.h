@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.3 2007/02/28 18:29:09 strk Exp $
+// $Id: snappingrange.h,v 1.4 2007/02/28 18:29:53 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -309,3 +309,4 @@ typedef SnappingRanges2d<float> InvalidatedRanges;
 } //namespace gnash
 
 #endif
+
