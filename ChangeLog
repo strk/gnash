@@ -1,5 +1,11 @@
 2007-02-28 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/String.as: add
+	  test for read-only nature of 'length' property;
+	  fix test for SWF5 target.
+
+2007-02-28 Sandro Santilli <strk@keybit.net>
+
 	* server/swf.h: add reference to ActionConstantPool
 	  description
 	* server/parser/action_buffer.h (read_int16):

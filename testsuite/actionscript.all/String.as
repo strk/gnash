@@ -1,7 +1,7 @@
 // Mike Carlson's test program for actionscript strings
 // June 19th, 2006
 
-rcsid="$Id: String.as,v 1.10 2007/01/02 15:43:42 strk Exp $";
+rcsid="$Id: String.as,v 1.11 2007/02/28 09:56:40 strk Exp $";
 
 #include "check.as"
 
@@ -25,12 +25,21 @@ check_equals ( a.indexOf("hing"), -1 );
 check_equals ( a.split()[0], "wallawallawashinGTON" );
 check_equals ( a.split().length, 1 );
 check ( a.split() instanceof Array );
+#if OUTPUT_VERSION > 5
 check_equals ( a.split("")[0], "w" );
 check_equals ( a.split("")[19], "N" );
 check_equals ( a.split("la")[0], "wal" );
 check_equals ( a.split("la")[1], "wal" );
 check_equals ( a.split("la")[2], "washinGTON" );
 check_equals ( a.split("la").length, 3 );
+#else
+xcheck_equals ( a.split("")[0], "wallawallawashinGTON" );
+xcheck_equals ( a.split("")[19], undefined );
+xcheck_equals ( a.split("la")[0], "wallawallawashinGTON" );
+xcheck_equals ( a.split("la")[1], undefined );
+xcheck_equals ( a.split("la")[2], undefined );
+xcheck_equals ( a.split("la").length, 1 );
+#endif
 
 
 // This is the correct usage pattern
@@ -106,7 +115,7 @@ check_equals( b, "");
 var stringInstance = new String();
 check (stringInstance.__proto__ != undefined);
 check (stringInstance.__proto__ == String.prototype);
-check (String.prototype.constructor != undefined);
+check_equals (typeOf(String.prototype.constructor), 'function');
 check (String.prototype.constructor == String);
 check (stringInstance.__proto__.constructor == String);
 
@@ -129,3 +138,10 @@ check_equals (a_string.toUpperCase(), "A_STRING");
 check_equals (a_string.indexOf("hing"), -1 );
 check_equals (a_string.indexOf("string"), 2 );
 check_equals (a_string.charCodeAt(0), 97 );
+
+// Test String.length not being overridable
+a_string = "1234567890";
+check_equals(a_string.length, 10);
+a_string.length = 4;
+check_equals(a_string.length, 10);
+check_equals(a_string, "1234567890");
