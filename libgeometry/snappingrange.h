@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.2 2007/02/28 18:28:08 strk Exp $
+// $Id: snappingrange.h,v 1.3 2007/02/28 18:29:09 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -37,6 +37,7 @@ namespace gnash {
 /// Snapping range class. Can hold a number of 2D ranges and combines 
 /// ranges that come very close. This class is used for multiple invalidated
 /// bounds calculation.
+//
 /// Additionally to merge intersecting ranges this class also "snaps" ranges
 /// together which are very close to each other. The "snap_distance" property
 /// (which *must* be initialized before using the class!) decides below what
