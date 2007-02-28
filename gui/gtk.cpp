@@ -17,20 +17,19 @@
 // 
 //
 
-/* $Id: gtk.cpp,v 1.68 2007/02/27 09:54:49 strk Exp $ */
+/* $Id: gtk.cpp,v 1.69 2007/02/28 04:27:59 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "gnash.h" // is this still needed ?
 #include "log.h"
 
 #include "gui.h"
 #include "rc.h"
 #include "gtksup.h"
 #include "sound_handler.h"
-#include "gnash.h" for get_sound_handler
+#include "gnash.h" // for get_sound_handler
 #include "render_handler.h"
 
 #include <iostream>
