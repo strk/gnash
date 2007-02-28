@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.1 2007/02/28 17:25:26 udog Exp $
+// $Id: snappingrange.h,v 1.2 2007/02/28 18:28:08 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
