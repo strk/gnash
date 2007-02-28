@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.11 2007/02/27 11:27:50 strk Exp $ */
+/* $Id: Range2d.h,v 1.12 2007/02/28 12:26:32 martinwguy Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -522,8 +522,7 @@ public:
 	{
 		if ( isNull() || isWorld() || amount==0 ) return *this;
 
-		// NOTE: whith will likely trigger a compiler
-		//       warning when T is an unsigned type
+		// NOTE: triggers a compiler warning when T is an unsigned type
 		if ( amount < 0 ) return shrinkBy(-amount);
 
 		T newxmin = _xmin - amount;
