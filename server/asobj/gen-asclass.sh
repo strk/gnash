@@ -143,6 +143,7 @@ cat <<EOF>>${srcname}
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
+#include "GnashException.h" // for ActionException
 
 namespace gnash {
 
@@ -151,7 +152,7 @@ for i in $methods; do
 # DO NOT CONVERT CASE, SWF7+ is case-sensitive 
 newi=`echo $i | sed -e 's/)//g'` # | tr '[A-Z]' '[a-z]'
 cat <<EOF>>${srcname}
-void ${lowname}_${newi}const fn_call& fn);
+static void ${lowname}_${newi}const fn_call& fn);
 EOF
 done
 cat <<EOF>>${srcname}
@@ -166,7 +167,7 @@ for i in $methods; do
     # DO NOT CONVERT CASE, SWF7+ is case-sensitive 
     newi=`echo $i | sed -e 's/()//g'` # | tr '[A-Z]' '[a-z]'
     cat <<EOF>>${srcname}
-	o.init_member("${newi}", &${lowname}_${newi});
+	o.init_member("${newi}", new builtin_function(${lowname}_${newi}));
 EOF
 done
 cat <<EOF>>${srcname}
@@ -203,12 +204,28 @@ public:
 
 EOF
 
+cat <<EOF>>${srcname}
+static ${lowname}_as_object* 
+ensure_${lowname}(as_object* obj)
+{
+	${lowname}_as_object* ret = dynamic_cast<${lowname}_as_object*>(obj);
+	if ( ! ret )
+	{
+		throw ActionException("builtin method or gettersetter for ${asname} objects called against non-${asname} instance");
+	}
+	return ret;
+}
+EOF
 for i in $methods; do
 # DO NOT CONVERT CASE, SWF7+ is case-sensitive 
 newi=`echo $i | sed -e 's/)//g'` # | tr '[A-Z]' '[a-z]'
 cat <<EOF>>${srcname}
-void ${lowname}_${newi}const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+static void
+${lowname}_${newi}const fn_call& fn)
+{
+	${lowname}_as_object* ptr = ensure_${lowname}(fn.this_ptr);
+	UNUSED(ptr);
+	log_warning("%s: unimplemented", __FUNCTION__);
 }
 EOF
 done
