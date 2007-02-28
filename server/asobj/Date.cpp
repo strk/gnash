@@ -49,17 +49,16 @@
 //	It changes to/from daylight saving time according to its own rules.
 //	We use the operating system's localtime routines.
 //
-// For portability it may be useful to convert this to use libboost's
-// date_time stuff http://www.boost.org/doc/html/date_time.html but the
-// mapping between Flash's perverse behaviour and date_time's coherent
-// behaviour.
-// Plus:
+// It may be useful to convert this to use libboost's date_time stuff
+// http://www.boost.org/doc/html/date_time.html
+// Pros:
 // *	OS portability is done by libboost, not here;
-// *	extends correct date handling from POSIX to 1 Jan 1400 - 31 Dec 9999
-// Minus:
+// *	it extends correct date handling from POSIX to 1 Jan 1400 - 31 Dec 9999
+// Cons:
 // *	it doesn't handle fractions of milliseconds (and who cares?);
-// *	using it to implement this class's methods is more tricky,
-// 	including the need to handle all boundary cases and exceptions
+// *	mapping between boost's coherent date_time methods and Flash's
+//	ideosyncratic ones to implement this class' methods is more tricky;
+// *	it brings the need to handle all boundary cases and exceptions
 // 	explicitly (e.g. mapping of 38 Nov to 8 Dec, mapping negative
 // 	month/day-of-month/hours/min/secs/millisecs into the previous
 // 	year/month/day/hour/min/sec and so on).
