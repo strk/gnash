@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.16 2007/02/27 23:03:02 martinwguy Exp $ */
+/* $Id: string.cpp,v 1.17 2007/02/28 09:59:54 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -125,7 +125,7 @@ static void
 string_set_length(const fn_call& /*fn*/)
 {
 	IF_VERBOSE_ASCODING_ERRORS(
-		log_msg("String: length property is read-only");
+	log_aserror("String: length property is read-only");
 	);
 	return;
 }
@@ -179,7 +179,7 @@ string_slice(const fn_call& fn)
 	
 	if (end < start) {
 		IF_VERBOSE_ASCODING_ERRORS(
-			log_error("string.slice() called with end < start");
+			log_aserror("string.slice() called with end < start");
 		)
 		// Swap start and end, cos that's what substr does
 		swap(&start, &end);
