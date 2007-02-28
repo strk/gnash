@@ -394,7 +394,11 @@
 	  through the <emphasis>obj</emphasis>.
 
 	  <programlisting>
-	    foo_as_object *foo = env.top(0).to_object();
+            // ensureFoo(as_object*) should be defined as
+            // checking the type of given pointer being
+            // a foo_as_object, throwing an ActionException
+            // if this is not the case.
+	    foo_as_object *foo = ensureFoo(fn.this_ptr);
 	    bool result = foo->obj.GetBar();
 	  </programlisting>
 
