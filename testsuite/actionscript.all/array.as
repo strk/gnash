@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.11 2006/11/21 10:53:08 strk Exp $";
+rcsid="$Id: array.as,v 1.12 2007/02/28 07:41:27 strk Exp $";
 
 #include "check.as"
 
@@ -143,7 +143,20 @@ check_equals ( c[1001] , undefined );
 check_equals ( c[999] , undefined );
 check_equals ( c.length, 1001 );
 
+// Test that the 'length' property is overridable
+c[8] = 'eight';
+check_equals(c[8], 'eight');
+c.length = 2;
+check_equals(c.length, 2);
+check_equals(c[8], undefined);
+
 // $Log: array.as,v $
+// Revision 1.12  2007/02/28 07:41:27  strk
+//         * server/array.{cpp,h}: allow resize trough
+//           setting the 'length' property.
+//         * testsuite/actionscript.all/array.as: test
+//           that arrays 'length' is settable.
+//
 // Revision 1.11  2006/11/21 10:53:08  strk
 //         * server/array.h: documented ::slice function
 //         * server/array.cpp: more fixes.

@@ -332,6 +332,12 @@ as_array_object::get_member(const std::string& name, as_value *val)
 	return get_member_default(name, val);
 }
 
+void
+as_array_object::resize(unsigned int newsize)
+{
+	elements.resize(newsize);
+}
+
 /* virtual public, overriding as_object::set_member */
 void
 as_array_object::set_member(const std::string& name,
@@ -339,7 +345,8 @@ as_array_object::set_member(const std::string& name,
 {
 	if ( name == "length" ) 
 	{
-		log_warning("Attempt to assign to Array.length - ignored");
+		//log_warning("Attempt to assign to Array.length - ignored");
+		resize(unsigned(val.to_number()));
 		return;
 	}
 

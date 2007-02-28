@@ -85,7 +85,7 @@ public:
 
 	unsigned int size() const;
 
-	//void resize(unsigned int);
+	void resize(unsigned int);
 
 	void concat(const as_array_object& other);
 
