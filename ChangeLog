@@ -1,5 +1,9 @@
 2007-02-28 Sandro Santilli <strk@keybit.net>
 
+	* server/swf_function.{h,cpp}: properly setup
+	  the 'arguments' variable at dispatch time.
+	* testsuite/actionscript.all/Function.as:
+	  Test the 'arguments' variable in function context.
 	* server/array.{cpp,h}: allow resize trough
 	  setting the 'length' property.
 	* testsuite/actionscript.all/array.as: test

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.22 2007/02/07 10:28:40 strk Exp $";
+rcsid="$Id: Function.as,v 1.23 2007/02/28 07:46:23 strk Exp $";
 
 #include "check.as"
 
@@ -344,3 +344,45 @@ func();
 
 check_equals(this.a, "a_in_root");
 
+//----------------------------------------------------------
+//  Test the 'arguments' object
+//----------------------------------------------------------
+
+// this is to be called argsChecker(1,2,3)
+function argsChecker()
+{
+	check_equals(typeof(arguments), 'object');
+	check(arguments instanceOf Array);
+	check(arguments instanceOf Object);
+	check_equals(typeof(arguments.callee), 'function');
+	check_equals(arguments.callee, argsChecker); 
+	check_equals(arguments.length, 3);
+	check_equals(arguments[0], 1);
+	check_equals(arguments[1], 2);
+	check_equals(arguments[2], 3);
+	check_equals(arguments[3], undefined);
+	arguments[3] = 3;
+	check_equals(arguments[3], 3);
+	arguments[0] = 'zero';
+	check_equals(arguments[0], 'zero');
+	arguments.length = 10;
+	check_equals(arguments.length, 10);
+	arguments.pop();
+	check_equals(arguments.length, 9);
+	arguments.somethingelse = "can extend";
+	check_equals(arguments.somethingelse, "can extend");
+}
+argsChecker(1, 2, 3);
+
+function argsCounter() {
+	return arguments.length;
+}
+check_equals(argsCounter(1,2,3), 3);
+check_equals(argsCounter(a,b,c,d), 4);
+check_equals(argsCounter([a,b]), 1);
+
+function factorial(n) {
+	return n <= 1 ? n : n*factorial(n-1);
+}
+check_equals(factorial(3), 6);
+check_equals(factorial(4), 24);

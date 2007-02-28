@@ -139,6 +139,27 @@ swf_function::getSuper(as_object& obj)
 
 }
 
+/*private static*/
+as_array_object* 
+swf_function::getArguments(swf_function& callee, const fn_call& fn)
+{ 
+	// We'll be storing the callee as_object into an as_value
+	// so you must make sure you have a reference on it before
+	// callign this function.
+	assert(callee.get_ref_count() > 0);
+
+	// Super class prototype is : obj.__proto__.constructor.prototype 
+	as_array_object* arguments = new as_array_object();
+	for (int i=0; i<fn.nargs; ++i)
+	{
+		arguments->push(fn.arg(i));
+	}
+	arguments->set_member("callee", &callee);
+
+	return arguments;
+
+}
+
 // Dispatch.
 void
 swf_function::operator()(const fn_call& fn)
@@ -172,12 +193,16 @@ swf_function::operator()(const fn_call& fn)
 			our_env->add_local(m_args[i].m_name, fn.arg(i));
 		}
 
+		// Add 'this'
 		assert(fn.this_ptr);
 		our_env->set_local("this", fn.this_ptr);
 
 		// Add 'super'
 		as_object* super = getSuper(*(fn.this_ptr));
 		our_env->set_local("super", super);
+
+		// Add 'arguments'
+		our_env->set_local("arguments", getArguments(*this, fn));
 	}
 	else
 	{
@@ -228,14 +253,7 @@ swf_function::operator()(const fn_call& fn)
 		boost::intrusive_ptr<as_array_object>	arg_array;
 		if ((m_function2_flags & PRELOAD_ARGUMENTS) || ! (m_function2_flags & SUPPRESS_ARGUMENTS))
 		{
-			arg_array = new as_array_object;
-
-			as_value	index_number;
-			for (int i = 0; i < fn.nargs; i++)
-			{
-				index_number.set_int(i);
-				arg_array->init_member(index_number.to_string(), fn.arg(i));
-			}
+			arg_array = getArguments(*this, fn);
 		}
 
 		if (m_function2_flags & PRELOAD_ARGUMENTS)

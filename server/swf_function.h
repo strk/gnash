@@ -32,6 +32,7 @@
 namespace gnash {
 	class action_buffer;
 	class as_environmnet;
+	class as_array_object;
 }
 
 namespace gnash {
@@ -87,6 +88,18 @@ private:
 	///	  (getConstructor, for example)
 	///
 	static as_object* getSuper(as_object& obj);
+
+	/// Return an 'arguments' object.
+	//
+	/// The 'arguments' variable is an array with an additional
+	/// 'callee' member, set to the function being called.
+	///
+	/// NOTE: the callee as_object will be stored in an as_value, thus
+	///       getting wrapped into an intrusive_ptr. Make sure you have
+	///	  a reference on it!
+	///	  
+	///
+	static as_array_object* getArguments(swf_function& callee, const fn_call& fn);
 
 public:
 
