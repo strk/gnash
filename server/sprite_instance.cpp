@@ -3495,7 +3495,6 @@ sprite_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 		return;
 	}
 
-	// not invalidated (unless *forced*)
 	if ( ! m_invalidated && ! m_child_invalidated && ! force )
 	{
 		return;
