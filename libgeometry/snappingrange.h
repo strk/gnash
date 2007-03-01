@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.7 2007/03/01 11:06:32 udog Exp $
+// $Id: snappingrange.h,v 1.8 2007/03/01 13:12:23 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -213,12 +213,8 @@ public:
 	/// Resets to one range with world flags
 	void setWorld() {
 		if (isWorld()) return;
-		
-		RangeType world;
-		world.setWorld();
-		
-		_ranges.clear();
-		_ranges.push_back(world);
+		_ranges.resize(1);
+		_ranges[0].setWorld();
 	}
 	
 	/// Returns true, wenn the ranges equal world range
