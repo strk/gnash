@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.44 2007/02/28 23:58:26 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.45 2007/03/01 20:34:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -149,6 +149,13 @@ construct_object(const as_value& constructor,
             // We don't need the function result.
             call_method(constructor, &env, new_obj_ptr.get(), nargs, first_arg_index);
         }
+    }
+    else
+    {
+	    // callers should make sure constructor is a function !
+	    // Actually, we should change this function interface
+	    // to take an as_function directly... (TODO)
+	    assert(0);
     }
     
     return new_obj;
@@ -2207,6 +2214,15 @@ SWFHandlers::ActionNew(ActionExec& thread)
 	thread.ensureStack(nargs); // previous 2 entries popped
 
 	as_value constructor = thread.getVariable(classname); 
+	if ( ! constructor.is_function() )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("ActionNew: "
+			"constructor parameter is NOT a function");
+		);
+		env.drop(nargs);
+		env.push(as_value()); // should we push an object anyway ?
+	}
 
 	as_value new_obj = construct_object(constructor, env, nargs,
 		env.get_top_index());
@@ -2670,7 +2686,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 
 	thread.ensureStack(3); // method, object, nargs
 
-	as_value method_name = env.pop().to_string();
+	as_value method_name = env.pop();
 	as_value obj_val = env.pop();
 	unsigned nargs = unsigned(env.pop().to_number());
 
@@ -2684,29 +2700,48 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 			"On ActionNewMethod: "
 			"no object found on stack on ActionMethod");
 		env.drop(nargs);
+		env.push(as_value());
 		return;
 	}
 
 	as_value method_val;
-	string method_string = method_name.to_std_string();
-	//if ( ! obj->get_member(method_name.to_tu_stringi(), &method_val) )
-	if ( ! thread.getObjectMember(*obj, method_string, method_val) )
+	if ( method_name.is_undefined() )
 	{
-		// SWF integrity check 
-		log_warning(
-			"On ActionNewMethod: "
-			"can't find method %s of object %s",
-			method_name.to_string(), obj_val.to_string());
-		env.drop(nargs);
-		return;
+		method_val = obj_val;
+		if ( ! method_val.is_function() )
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror("ActionNewMethod: "
+				"method name is undefined, "
+				"and object is not a function");
+			);
+			env.drop(nargs);
+			env.push(as_value()); // should we push an object anyway ?
+			return;
+		}
+	}
+	else
+	{
+		string method_string = method_name.to_std_string();
+		if ( ! thread.getObjectMember(*obj, method_string, method_val) )
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror("ActionNewMethod: "
+				"can't find method %s of object %s",
+				method_name.to_string(), obj_val.to_string());
+			);
+			env.drop(nargs);
+			env.push(as_value()); // should we push an object anyway ?
+			return;
+		}
 	}
 
 	// Construct the object
 	as_value new_obj = construct_object(method_val, env, nargs,
 			env.get_top_index());
 
-	log_msg("%s.%s( [%d args] ) returned %s", obj_val.to_string(),
-		method_name.to_string(), nargs, new_obj.to_string());
+	//log_msg("%s( [%d args] ) returned %s", method_val.to_string(),
+	//	nargs, new_obj.to_string());
 
 
 	env.drop(nargs);

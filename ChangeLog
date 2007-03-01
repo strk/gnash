@@ -1,5 +1,10 @@
 2007-03-01 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionNewMethod):
+	  Use object parameter as *the* function if method name is
+	  undefined; check that the constructor is actually a function;
+	  (ActionNew) check that the constructor is actually a function;
+	  (constructor_object) assert that the constructor is a function.
 	* testsuite/misc-mtasc.all/inheritance.as:
 	  Add test provided by P T Withington for debugging
 	  problems with OpenLaszlo foundation classes.
