@@ -1,3 +1,9 @@
+2007-03-01 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/video_stream_instance.cpp: simplify add_invalidated_bounds()
+	* libgeometry/snappingrange.h: Clarify comment; use initialization list
+	  in constructor; some minimal changes	
+	
 2007-03-01 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/dlist.cpp: keep function declaration consistent with the headfile;

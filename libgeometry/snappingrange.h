@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.5 2007/02/28 18:33:21 strk Exp $
+// $Id: snappingrange.h,v 1.6 2007/03/01 09:38:18 udog Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -68,17 +68,21 @@ class DSOLOCAL SnappingRanges2d
 {
 public:
 	typedef geometry::Range2d<T> RangeType;
+	typedef std::vector<RangeType> RangeList; // TODO: list might be more appropriate
+	typedef typename RangeList::size_type size_type;	
 	
 	/// distance (horizontally *plus* vertically) below ranges are snapped
-	/// You MUST initialize this! 
+	/// You should initialize this when single_mode=false! 
 	T snap_distance;
 	
 	/// if set, only a single, outer range is maintained (extended). 
 	bool single_mode;	
 	
-	SnappingRanges2d() {
-		snap_distance = 0;
-		single_mode = false;
+	SnappingRanges2d() 
+		:
+		snap_distance(0),
+		single_mode(false)
+	{
 	}
 	
 	/// Add a Range to the set, merging when possible and appropriate
@@ -96,7 +100,6 @@ public:
 		
 			if (_ranges.empty()) {
 				RangeType temp;
-				temp.setNull();
 				_ranges.push_back(temp);
 			}
 			
@@ -225,11 +228,11 @@ public:
 	
 	/// Returns true, when there is no range
 	bool isNull() const {
-		return size()==0;
+		return _ranges.empty();
 	}
 	
 	/// Returns the number of ranges in the list
-	int size() const {
+	size_type size() const {
 		return _ranges.size();
 	}
 	
@@ -293,9 +296,7 @@ private:
 		if (b<0) b*=-1;
 		return min(a,b);
 	}
-	
-	typedef std::vector<RangeType> RangeList; // TODO: list might be more appropriate
-	
+		
 	// The current Ranges list
 	RangeList _ranges;
 	
