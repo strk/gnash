@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.cpp,v 1.12 2007/03/01 09:46:09 udog Exp $
+// $Id: video_stream_instance.cpp,v 1.13 2007/03/01 09:50:59 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -24,6 +24,7 @@
 #include "as_value.h"
 #include "NetStream.h"
 #include "render.h"
+#include "Range2d.h"
 
 namespace gnash {
 
