@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.24 2007/02/25 16:31:48 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.25 2007/03/01 10:05:51 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -214,7 +214,9 @@ bool NetConnection::openConnection(const char* char_url, as_object* ns)
 	localFile = false;
 
 
-	URL uri(_url);
+	URL uri(_url, get_base_url());
+
+	_url = uri.str().c_str();
 
 	// Check if we're allowed to open url
 	if (URLAccessManager::allow(uri)) {
@@ -223,16 +225,19 @@ bool NetConnection::openConnection(const char* char_url, as_object* ns)
 		{
 			localFile = true;
 		}
+
 	} else {
+		log_warning("Gnash is not allowed to open this url.");
 		return false;
 	}
 
 	if (localFile) {
-		_cache = fopen(char_url, "rb");
+		_cache = fopen(uri.path().c_str(), "rb");
 		if (_cache) {
 			_cachefd = fileno(_cache);
 			return true;
 		} else {
+			log_warning("Gnash failed to open local file.");
 			_cachefd = -1;
 			return false;
 		}
@@ -273,7 +278,7 @@ are not honored during the DNS lookup - which you can  work  around  by
 	}
 
 	// set url
-	ccode = curl_easy_setopt(_handle, CURLOPT_URL, char_url);
+	ccode = curl_easy_setopt(_handle, CURLOPT_URL, _url.c_str());
 	if ( ccode != CURLE_OK ) {
 		throw gnash::GnashException(curl_easy_strerror(ccode));
 	}
@@ -318,6 +323,7 @@ are not honored during the DNS lookup - which you can  work  around  by
 		throw gnash::GnashException(curl_multi_strerror(mcode));
 	}
 	fill_cache(50000); // pre-cache 50 Kbytes
+
 #endif // defined USE_CURL
 
 	return true;
@@ -327,7 +333,9 @@ are not honored during the DNS lookup - which you can  work  around  by
 void
 NetConnection::addToURL(const char* url)
 {
-	_url += url;
+	if (strcmp(url, "null") != 0 && strcmp(url, "NULL") != 0) {
+		_url += url;
+	}
 }
 
 /*public*/
@@ -405,7 +413,7 @@ netconnection_connect(const fn_call& fn)
     
 	if (fn.nargs > 0) {
 		ptr->addToURL(fn.arg(0).to_string());
-	}    
+	}
 }
 
 void

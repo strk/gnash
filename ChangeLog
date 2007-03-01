@@ -1,3 +1,8 @@
+2007-03-01 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetConnection.cpp: Added support for relative path.
+	* server/asobj/NetStreamFfmpeg.cpp: include sound_handler.h.
+
 2007-03-01 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/video_stream_instance.cpp: simplify add_invalidated_bounds()

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.18 2007/02/21 14:51:01 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.19 2007/03/01 10:05:51 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,6 +29,7 @@
 #include "render.h"	
 #include "movie_root.h"
 #include "NetConnection.h"
+#include "sound_handler.h"
 
 #include "tu_file.h"
 
