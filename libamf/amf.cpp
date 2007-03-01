@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: amf.cpp,v 1.23 2006/12/17 19:21:20 nihilus Exp $ */
+/* $Id: amf.cpp,v 1.24 2007/03/01 08:00:41 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -265,7 +265,7 @@ AMF::readElement(void *in)
 }
 
 bool
-AMF::readObject(void */* in */)
+AMF::readObject(void * /* in */)
 {
     GNASH_REPORT_FUNCTION;
 		return true;
@@ -660,7 +660,7 @@ AMF::extractString(const char *in)
 }
 
 int
-AMF::extractNumber(const char */* in */)
+AMF::extractNumber(const char * /* in */)
 {
     GNASH_REPORT_FUNCTION;    
 		return 0;	

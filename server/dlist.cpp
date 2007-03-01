@@ -482,7 +482,7 @@ DisplayList::clear_except(std::vector<character*>& exclude, bool call_unload)
 }
 
 void
-DisplayList::clear_except(const DisplayList& exclude, bool unload)
+DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -504,7 +504,7 @@ DisplayList::clear_except(const DisplayList& exclude, bool unload)
 
 		if (is_affected == false)
 		{
-			if ( unload ) di->on_event(event_id::UNLOAD);
+			if ( call_unload ) di->on_event(event_id::UNLOAD);
 			it = _characters.erase(it);
 			continue;
 		}
@@ -513,7 +513,7 @@ DisplayList::clear_except(const DisplayList& exclude, bool unload)
 }
 
 void
-DisplayList::clear(const DisplayList& from, bool unload)
+DisplayList::clear(const DisplayList& from, bool call_unload)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -535,7 +535,7 @@ DisplayList::clear(const DisplayList& from, bool unload)
 
 		if (is_affected)
 		{
-			if ( unload ) di->on_event(event_id::UNLOAD);
+			if ( call_unload ) di->on_event(event_id::UNLOAD);
 			it = _characters.erase(it);
 			continue;
 		}

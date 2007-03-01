@@ -1,3 +1,8 @@
+2007-03-01 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/dlist.cpp: keep function declaration consistent with the headfile;
+	  libamf/amf.cpp: typos, get rid of warnings for vc8 compiler.
+	
 2007-03-01 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/: array.as, Function.as
