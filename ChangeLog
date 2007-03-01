@@ -1,3 +1,9 @@
+2007-03-01 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-mtasc.all/inheritance.as:
+	  Add test provided by P T Withington for debugging
+	  problems with OpenLaszlo foundation classes.
+
 2007-03-01 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetConnection.cpp: Added support for relative path.
