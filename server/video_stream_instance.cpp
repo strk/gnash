@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.cpp,v 1.11 2007/03/01 09:38:18 udog Exp $
+// $Id: video_stream_instance.cpp,v 1.12 2007/03/01 09:46:09 udog Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -116,7 +116,7 @@ void
 video_stream_instance::add_invalidated_bounds(InvalidatedRanges& ranges, 
 	bool /*force*/)
 {
-	Range2d<float> bounds; 
+	geometry::Range2d<float> bounds; 
 	bounds.setWorld();
 	ranges.add(bounds);
 }
