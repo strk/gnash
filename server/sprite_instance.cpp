@@ -3489,14 +3489,12 @@ sprite_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 {
 
 	// nothing to do if this sprite is not visible
-	if (!m_visible)
+	if (!m_visible || get_cxform().is_invisible() )
 	{
     ranges.add(m_old_invalidated_ranges); // (in case we just hided)
 		return;
 	}
 
-	// TODO: check if alpha=0 (return if so)
-	// nothing to do if this sprite's bounds are
 	// not invalidated (unless *forced*)
 	if ( ! m_invalidated && ! m_child_invalidated && ! force )
 	{

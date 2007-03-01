@@ -7,7 +7,11 @@
 
 	* server/video_stream_instance.cpp: simplify add_invalidated_bounds()
 	* libgeometry/snappingrange.h: Clarify comment; use initialization list
-	  in constructor; some minimal changes	
+	  in constructor; some minimal changes
+	* backend/render_handler.h, libgeometry/snappingrange.h: fixed some compiler 
+	  warnings
+	* server/gnash.h, server/types.cpp: introducing cxform::is_invisible()
+	* server/sprite_instance.cpp: treat cxform.alpha==0 like !m_visible	 		
 	
 2007-03-01 Zou Lunkai <zoulunkai@gmail.com>
 

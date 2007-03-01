@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.29 2007/02/28 17:25:25 udog Exp $ */
+/* $Id: render_handler.h,v 1.30 2007/03/01 11:06:32 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -414,7 +414,7 @@ public:
   }
   
   virtual bool bounds_in_clipping_area(const InvalidatedRanges& ranges) {
-  	for (int rno=0; rno<ranges.size(); rno++) 
+  	for (unsigned int rno=0; rno<ranges.size(); rno++) 
   		if (bounds_in_clipping_area(ranges.getRange(rno)))
   			return true;
   			

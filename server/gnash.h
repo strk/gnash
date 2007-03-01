@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.87 2007/02/27 09:54:49 strk Exp $ */
+/* $Id: gnash.h,v 1.88 2007/03/01 11:06:32 udog Exp $ */
 
 /// \mainpage
 ///
@@ -467,6 +467,9 @@ public:
     
     /// Returns true when the cxform equals identity (no transform)
     bool is_identity() const;
+    
+    /// Returns true when the cxform leads to alpha == 0
+    bool is_invisible() const;
     
     /// The identity color transform (no transform)
     static cxform	identity;

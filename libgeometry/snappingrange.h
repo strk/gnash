@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.6 2007/03/01 09:38:18 udog Exp $
+// $Id: snappingrange.h,v 1.7 2007/03/01 11:06:32 udog Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -109,7 +109,7 @@ public:
 		
 			// multi range mode
 		
-			for (int rno=0; rno<_ranges.size(); rno++) {
+			for (unsigned int rno=0; rno<_ranges.size(); rno++) {
 				if (snaptest(_ranges[rno], range)) {
 					_ranges[rno].expandTo(range);
 					return;
@@ -126,7 +126,7 @@ public:
 	
 	/// combines two snapping ranges
 	void add(SnappingRanges2d<T> other_ranges) {
-		for (int rno=0; rno<other_ranges.size(); rno++)
+		for (unsigned int rno=0; rno<other_ranges.size(); rno++)
 			add(other_ranges.getRange(rno));
 	}
 	
@@ -237,8 +237,7 @@ public:
 	}
 	
 	/// Returns the range at the specified index
-	RangeType getRange(int index) const {
-		assert(index>=0);
+	RangeType getRange(unsigned int index) const {
 		assert(index<size());
 		
 		return _ranges[index];

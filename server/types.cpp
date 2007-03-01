@@ -185,6 +185,11 @@ namespace gnash {
 	  return true;
   }
 
+	bool	cxform::is_invisible() const
+	// Returns true when the cxform leads to alpha == 0
+	{
+		return (255.0 * m_[3][0] + m_[3][1]) <= 0.0;	
+  }
 
 	//
 	// rgba
