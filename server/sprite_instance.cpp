@@ -802,13 +802,6 @@ sprite_endFill(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	sprite->endFill();
-
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_warning("MovieClip.endFill() TESTING");
-		warned=true;
-	}
 }
 
 static void
@@ -829,12 +822,6 @@ sprite_lineTo(const fn_call& fn)
 
 	sprite->lineTo(x, y);
 
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_warning("MovieClip.lineTo() TESTING");
-		warned=true;
-	}
 }
 
 static void
@@ -855,12 +842,6 @@ sprite_moveTo(const fn_call& fn)
 
 	sprite->moveTo(x, y);
 
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_warning("MovieClip.moveTo() TESTING");
-		warned=true;
-	}
 }
 
 static void
@@ -902,12 +883,6 @@ sprite_lineStyle(const fn_call& fn)
 
 	sprite->lineStyle(thickness, color);
 
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_warning("FIXME: MovieClip.lineStyle() TESTING");
-		warned=true;
-	}
 }
 
 static void
@@ -930,12 +905,6 @@ sprite_curveTo(const fn_call& fn)
 
 	sprite->curveTo(cx, cy, ax, ay);
 
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_warning("MovieClip.curveTo() TESTING");
-		warned=true;
-	}
 }
 
 static void
@@ -945,12 +914,6 @@ sprite_clear(const fn_call& fn)
 
 	sprite->clear();
 
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_warning("FIXME: MovieClip.clear() TESTING");
-		warned=true;
-	}
 }
 
 static void
@@ -977,12 +940,6 @@ sprite_beginFill(const fn_call& fn)
 
 	sprite->beginFill(color);
 
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_warning("MovieClip.beginFill() TESTING");
-		warned=true;
-	}
 }
 
 static void
