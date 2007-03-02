@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.46 2007/03/02 16:17:13 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.47 2007/03/02 16:28:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2201,8 +2201,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
 	thread.ensureStack(2); // classname, nargs
 
 	as_value val = env.pop();
-	string classname;
-	if ( val.to_string() ) classname = val.to_string();
+	string classname = val.to_std_string();;
 
 	IF_VERBOSE_ACTION (
 		log_action("---new object: %s",
@@ -2216,9 +2215,9 @@ SWFHandlers::ActionNew(ActionExec& thread)
 	as_value constructor = thread.getVariable(classname); 
 	if ( ! constructor.is_function() )
 	{
-		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("ActionNew: "
-			"constructor parameter is NOT a function");
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("ActionNew: "
+			"'%s' is NOT a constructor", classname.c_str());
 		);
 		env.drop(nargs);
 		env.push(as_value()); // should we push an object anyway ?
