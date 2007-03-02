@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.45 2007/03/01 20:34:36 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.46 2007/03/02 16:17:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2222,6 +2222,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
 		);
 		env.drop(nargs);
 		env.push(as_value()); // should we push an object anyway ?
+		return;
 	}
 
 	as_value new_obj = construct_object(constructor, env, nargs,

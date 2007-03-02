@@ -1,5 +1,7 @@
 2007-03-02 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionNew): add missing
+	  premature return on malformed SWF.
 	* server/debugger.{cpp,h}: proxy local variables and
 	  registers dumping to as_environment funx.
 
