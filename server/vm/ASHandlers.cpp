@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.48 2007/03/02 17:35:29 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.49 2007/03/02 18:15:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1044,9 +1044,10 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	thread.setVariable(env.top(1).to_std_string(), env.top(0));
 
         IF_VERBOSE_ACTION (
-            log_action("-- set var: %s", env.top(1).to_string());
+            log_action("-- set var: %s = %s", env.top(1).to_string(), env.top(0).to_string());
             );
 
+	// TODO: move this to ActionExec::setVariable !
 #ifdef USE_DEBUGGER
 	debugger.matchWatchPoint(name, Debugger::WRITES);
 #endif
