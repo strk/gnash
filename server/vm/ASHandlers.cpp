@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.47 2007/03/02 16:28:26 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.48 2007/03/02 17:35:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2243,7 +2243,16 @@ SWFHandlers::ActionVar(ActionExec& thread)
     as_environment& env = thread.env;
     thread.ensureStack(1); // var name
     string varname = env.top(0).to_std_string();
-    env.declare_local(varname);
+    if ( thread.isFunction() )
+    {
+       env.declare_local(varname);
+    }
+    else
+    {
+       IF_VERBOSE_ASCODING_ERRORS(
+       log_aserror("The 'var whatever' syntax in timeline context is a no-op.");
+       );
+    }
     env.drop(1);
 }
 
