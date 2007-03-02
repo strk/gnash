@@ -1,3 +1,8 @@
+2007-03-02 Sandro Santilli <strk@keybit.net>
+
+	* server/debugger.{cpp,h}: proxy local variables and
+	  registers dumping to as_environment funx.
+
 2007-03-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/libgeometry/snappingrangetest.cpp: Testcase for snapping 

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: debugger.h,v 1.6 2007/02/12 12:20:07 nihilus Exp $ */
+/* $Id: debugger.h,v 1.7 2007/03/02 15:50:42 strk Exp $ */
 
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
@@ -72,11 +72,11 @@ public:
     // These functions manipulate the environment stack
     void dumpStackFrame(as_environment &env);
     void dumpStackFrame();
-    void dumpLocalRegisters(as_environment &env);
+    static void dumpLocalRegisters(as_environment &env);
     void dumpLocalRegisters();
     void dumpGlobalRegisters(as_environment &env);
     void dumpGlobalRegisters();
-    void dumpLocalVariables(as_environment &env);
+    static void dumpLocalVariables(as_environment &env);
     void dumpLocalVariables();
     void setEnvStack(as_environment *x) { _env = x; };
     as_environment *getEnvStack() { return _env; };

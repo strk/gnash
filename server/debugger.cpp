@@ -605,18 +605,7 @@ void
 Debugger::dumpLocalRegisters(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;
-    if (!_env) {
-	dbglogfile << "WARNING: environment not set in " << __PRETTY_FUNCTION__ << endl;
-	return;
-    }
-    size_t n=env.num_local_registers();
-    if ( ! n ) {
-        return;
-    }
-    dbglogfile << "Local Register Dump: " << endl;
-    for (unsigned int i=0; i<n; i++) {
-        cerr << "\treg #" << i << ": \"" << env.local_register(i).to_string() << "\"" << endl;
-    }
+	env.dump_local_registers(cerr);
 }
 
 void
@@ -701,25 +690,7 @@ Debugger::dumpLocalVariables()
 void
 Debugger::dumpLocalVariables(as_environment &env)
 {
-//    GNASH_REPORT_FUNCTION;
-    if (!_env) {
-	dbglogfile << "WARNING: environment not set in " << __PRETTY_FUNCTION__ << endl;
-	return;
-    }
-    int index = 0;
-    dbglogfile << "Local variable Dump:" << endl;
-    as_environment::frame_slot slot;
-    for (size_t i = 0, n=env.get_local_frame_top(); i < n; ++i) {
-        slot  = env.m_local_frames[i];
-	string var = slot.m_value.to_std_string();
-	cerr << "\tvar #" << index << ": ";
-	if (slot.m_name.size()) {
-	    cerr << slot.m_name << " = \"" << var << "\"" << endl;
-	} else {
-	    cerr << "\"null\"" << " = " << var << endl;
-	}
-	index++;
-    }
+	env.dump_local_variables(cerr);
 }
 
 /// Get the address associated with a name
