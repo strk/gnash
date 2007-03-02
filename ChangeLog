@@ -1,3 +1,8 @@
+2007-03-02  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/libslist: Add /usr/X11/lib, without the usual R6.
+	* macros/incllist: Add /usr/X11/include, without the usual R6.
+
 2007-03-02 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-mtasc.all/inheritance.as:
