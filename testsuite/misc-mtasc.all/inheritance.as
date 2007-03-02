@@ -12,6 +12,13 @@ class Test extends MovieClip
 	{
 	}
 
+	function test_proto_ext()
+	{
+		_root.note("This is "+this);
+		Function.prototype.make = function() { return true; };
+		_root.check(arguments.callee.make());
+	}
+
 	function test_laszlo_core()
 	{
 		var A = function() { this.constructor = arguments.callee; };
@@ -28,6 +35,7 @@ class Test extends MovieClip
 		var binst = new B();
 		_root.check_equals(typeof(binst), 'object');
 		_root.check_equals(typeof(binst.test), 'function');
+		_root.note("test_laszlo_core called");
 		binst.test();
 	}
 
@@ -36,7 +44,15 @@ class Test extends MovieClip
 		_root.check_equals(typeof(this.loadMovie), 'function');
 		_root.check_equals(this.loadMovie, super.loadMovie);
 		_root.check(this.lineTo != super.lineTo); // overridden
+		_root.check_equals(typeof(this.test_laszlo_core), 'function');
+		_root.check_equals(typeof(this.test_proto_ext), 'function');
 		this.test_laszlo_core();
+		_root.check_equals(typeof(this.test_laszlo_core), 'function');
+		_root.check_equals(typeof(this.test_proto_ext), 'function');
+		this.test_proto_ext();
+		_root.check_equals(typeof(this.test_laszlo_core), 'function');
+		_root.check_equals(typeof(this.test_proto_ext), 'function');
+		_root.note("This is "+this);
 
 	}
 
