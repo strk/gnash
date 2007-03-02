@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.8 2007/03/01 13:12:23 strk Exp $
+// $Id: snappingrange.h,v 1.9 2007/03/02 15:30:04 udog Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -64,7 +64,7 @@ namespace gnash {
 /// if they nearly touch each other.
 ///
 template <typename T>
-class DSOLOCAL SnappingRanges2d
+class SnappingRanges2d
 {
 public:
 	typedef geometry::Range2d<T> RangeType;

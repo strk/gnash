@@ -1,3 +1,9 @@
+2007-03-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* testsuite/libgeometry/snappingrangetest.cpp: Testcase for snapping 
+	  ranges
+	* libgeometry/snappingrange.h: drop DSOLOCAL
+			
 2007-03-02  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/libslist: Add /usr/X11/lib, without the usual R6.

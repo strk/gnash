@@ -35,6 +35,7 @@ INCLUDES = -I.. \
 
 check_PROGRAMS = \
 	Range2dTest	\
+	snappingrangetest	\
 	$(NULL)
 
 CLEANFILES = \
@@ -43,9 +44,11 @@ CLEANFILES = \
       gnash-dbg.log \
       site.exp.bak \
       Range2dTest \
+      snappingrangetest \
       $(NULL)
 
 Range2dTest_SOURCES = Range2dTest.cpp
+snappingrangetest_SOURCES = snappingrangetest.cpp
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
