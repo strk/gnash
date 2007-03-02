@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_environment.h,v 1.40 2007/02/06 17:46:25 rsavoye Exp $ */
+/* $Id: as_environment.h,v 1.41 2007/03/02 19:38:56 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -245,7 +245,7 @@ public:
 	/// @param val
 	///	The value to assign to the variable. 
 	///
-	void	set_local(const std::string& varname, const as_value& val);
+	void set_local(const std::string& varname, const as_value& val);
 
 	/// \brief
 	/// Add a local var with the given name and value to our
@@ -254,7 +254,14 @@ public:
 	/// Use this when you know the var
 	/// doesn't exist yet, since it's faster than set_local();
 	/// e.g. when setting up args for a function.
-	void	add_local(const std::string& varname, const as_value& val);
+	///
+	void add_local(const std::string& varname, const as_value& val)
+	{
+		assert(varname.length() > 0);	// null varnames are invalid!
+		assert(_localFrames.size());
+		LocalVars& locals = _localFrames.back().locals;
+		locals.push_back(frame_slot(varname, val));
+	}
 
 	/// Create the specified local var if it doesn't exist already.
 	void	declare_local(const std::string& varname);
@@ -274,53 +281,47 @@ public:
 	///
 	void	set_member(const std::string& varname, const as_value& val);
 
-	// Parameter/local stack frame management.
-	int	get_local_frame_top() const { return m_local_frames.size(); }
-	void	set_local_frame_top(unsigned int t) {
-		assert(t <= m_local_frames.size());
-		m_local_frames.resize(t);
-	}
-	void	add_frame_barrier() { m_local_frames.push_back(frame_slot()); }
-
 	/// Add 'count' local registers (add space to end)
 	//
 	/// Local registers are only meaningful within a function2 context.
 	///
-	void	add_local_registers(unsigned int register_count);
-
-	/// Drop 'count' local registers (drop space from end)
-	//
-	/// Local registers are only meaningful within a function2 context.
-	///
-	void	drop_local_registers(unsigned int register_count);
+	void add_local_registers(unsigned int register_count)
+	{
+		assert(_localFrames.size());
+		return _localFrames.back().registers.resize(register_count);
+	}
 
 	/// Return the number of local registers currently available
 	//
 	/// Local registers are only meaningful within a function2 context.
 	///
-	size_t num_local_registers() const {
-		return m_local_register.size();
-	}
-
-	/// Set number of local registers.
-	//
-	/// Local registers are only meaningful within a function2 context.
-	///
-	void resize_local_registers(unsigned int register_count) {
-		m_local_register.resize(register_count);
+	size_t num_local_registers() const
+	{
+		assert(_localFrames.size());
+		return _localFrames.back().registers.size();
 	}
 
 	/// Return a reference to the Nth local register.
 	//
 	/// Local registers are only meaningful within a function2 context.
 	///
-	as_value& local_register(uint8_t n);
+	as_value& local_register(uint8_t n)
+	{
+		assert(_localFrames.size());
+		return _localFrames.back().registers[n];
+	}
 
         /// Set the Nth local register to something
-        void set_local_register(uint8_t n, as_value &val) {
-	    if (n <= m_local_register.size()) {
-		m_local_register[n] = val;
-	    }
+        void set_local_register(uint8_t n, as_value &val)
+	{
+		if (_localFrames.size() )
+		{
+			Registers& registers = _localFrames.back().registers;
+			if ( n < registers.size() )
+			{
+				registers[n] = val;
+			}
+		}
 	}
 
 	/// Return a reference to the Nth global register.
@@ -415,24 +416,63 @@ public:
 	/// The variables container (case-insensitive)
 	typedef std::map<std::string, as_value, StringNoCaseLessThen> Variables;
 
-	/// The locals container (TODO: use a std::map here !)
-	typedef std::vector<frame_slot>	LocalFrames;
+	/// The locals container 
+	typedef std::vector<frame_slot>	LocalVars;
 
-	/// Local variables.
+	typedef std::vector<as_value> Registers;
+
+	struct CallFrame
+	{
+		CallFrame(as_function* funcPtr)
+			:
+			func(funcPtr)
+		{}
+
+		/// function use this 
+		LocalVars locals;
+
+		/// function2 also use this
+		Registers registers;
+
+		as_function* func;
+	};
+
+	/// Push a frame on the calls stack.
 	//
-	/// TODO: make private. currently an hack in timers.cpp prevents this.
+	/// This should happen right before calling an ActionScript
+	/// function. Function local registers and variables
+	/// must be set *after* pushCallFrame has been invoked
 	///
-	LocalFrames m_local_frames;
+	/// Call popCallFrame() at ActionScript function return.
+	///
+	/// @param func
+	///	The function being called
+	///
+	void pushCallFrame(as_function* func)
+	{
+		_localFrames.push_back(CallFrame(func));
+	}
+
+	/// Remove current call frame from the stack
+	//
+	/// This should happen when an ActionScript function returns.
+	///
+	void popCallFrame()
+	{
+		assert(_localFrames.size());
+		_localFrames.pop_back();
+	}
 
 private:
+
+	typedef std::vector<CallFrame> CallStack;
+		
+	CallStack _localFrames;
 
 	/// Variables available in this environment
 	Variables _variables;
 
 	as_value m_global_register[4];
-
-	/// function2 uses this (could move to swf_function2 class)
-	std::vector<as_value>	m_local_register;
 
 	/// Movie target. 
 	character* m_target;
@@ -447,38 +487,90 @@ private:
 
 
 	/// \brief
-	/// Return an iterator to the local variable with given name,
-	/// or an iterator to it's end() iterator if none found
+	/// Get a local variable given its name,
+	//
+	/// @param varname
+	///	Name of the local variable
+	///
+	/// @param ret
+	///	If a variable is found it's assigned to this parameter.
+	///	Untouched if the variable is not found.
+	///
+	/// @param descend
+	///	If true the seek don't stop at current call frame, but
+	///	descends in upper frames. By default it is false.
+	///
+	/// @return true if the variable was found, false otherwise
+	///
+	bool findLocal(const std::string& varname, frame_slot& ret, bool descend=false);
+
+	bool findLocal(const std::string& varname, frame_slot& ret, bool descend=false) const
+	{
+		return const_cast<as_environment*>(this)->findLocal(varname, ret, descend);
+	}
+
+	/// Find a variable in the given LocalVars
+	//
+	/// @param varname
+	///	Name of the local variable
+	///
+	/// @param ret
+	///	If a variable is found it's assigned to this parameter.
+	///	Untouched if the variable is not found.
+	///
+	/// @return true if the variable was found, false otherwise
+	///
+	static bool findLocal(LocalVars& locals, const std::string& name, frame_slot& ret);
+
+	/// Delete a local variable
 	//
 	/// @param varname
 	///	Name of the local variable
 	///
 	/// @param descend
-	///	If true the seek don't stop at local frame top, but
+	///	If true the seek don't stop at current call frame, but
 	///	descends in upper frames. By default it is false.
 	///
-	LocalFrames::iterator findLocal(const std::string& varname, bool descend=false);
+	/// @return true if the variable was found, false otherwise
+	///
+	bool delLocal(const std::string& varname, bool descend=false);
 
-	LocalFrames::const_iterator findLocal(const std::string& varname, bool descend=false) const
-	{
-		return const_cast<as_environment*>(this)->findLocal(varname, descend);
-	}
+	/// Delete a variable from the given LocalVars
+	//
+	/// @param varname
+	///	Name of the local variable
+	///
+	/// @return true if the variable was found, false otherwise
+	///
+	static bool delLocal(LocalVars& locals, const std::string& varname);
 
-	LocalFrames::iterator endLocal() {
-		return m_local_frames.end();
-	}
+	/// Set a local variable, if it exists.
+	//
+	/// @param varname
+	///	Name of the local variable
+	///
+	/// @param val
+	///	Value to assign to the variable
+	///
+	/// @param descend
+	///	If true the seek don't stop at current call frame, but
+	///	descends in upper frames. By default it is false.
+	///
+	/// @return true if the variable was found, false otherwise
+	///
+	bool setLocal(const std::string& varname, const as_value& val, bool descend=false);
 
-	LocalFrames::const_iterator endLocal() const {
-		return m_local_frames.end();
-	}
-
-	LocalFrames::iterator beginLocal() {
-		return m_local_frames.begin();
-	}
-
-	LocalFrames::const_iterator beginLocal() const {
-		return m_local_frames.begin();
-	}
+	/// Set a variable from the given LocalVars, if it exists.
+	//
+	/// @param varname
+	///	Name of the local variable
+	///
+	/// @param val
+	///	Value to assign to the variable
+	///
+	/// @return true if the variable was found, false otherwise
+	///
+	static bool setLocal(LocalVars& locals, const std::string& varname, const as_value& val);
 
 	/// Find an object referenced by the given path (slash syntax).
 	//

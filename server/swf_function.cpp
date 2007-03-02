@@ -178,8 +178,7 @@ swf_function::operator()(const fn_call& fn)
 #endif
 
 	// Set up local stack frame, for parameters and locals.
-	int	local_stack_top = our_env->get_local_frame_top();
-	our_env->add_frame_barrier();
+	our_env->pushCallFrame(this);
 
 	if (m_is_function2 == false)
 	{
@@ -320,14 +319,7 @@ swf_function::operator()(const fn_call& fn)
 	ActionExec exec(*this, *our_env, fn.result);
 	exec();
 
-	// Clean up stack frame.
-	our_env->set_local_frame_top(local_stack_top);
-
-	if (m_is_function2)
-	{
-		// Clean up the local registers.
-		our_env->drop_local_registers(m_local_register_count);
-	}
+	our_env->popCallFrame();
 }
 
 void

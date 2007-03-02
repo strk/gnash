@@ -1,5 +1,13 @@
 2007-03-02 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.{cpp,h}, server/swf_function.cpp:
+	  Registers must also be stacked between function calls,
+	  like local vars.
+	  With this commit I put local registers, local variables
+	  and a function pointer into a CallFrame struct
+	  and stack that directly. pushCallFrame() and popCallFrame()
+	  now replace the add_frame_barrier/set_local_frame_top things.
+	  This commit fixes the testcase under misc-mtasc.all !
 	* server/vm/ASHandlers.cpp (ActionVar):
 	  Ignore local variable declarations in non-function
 	  context, and make it an aserror.
