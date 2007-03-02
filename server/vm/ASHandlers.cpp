@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.49 2007/03/02 18:15:34 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.50 2007/03/02 19:19:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2087,6 +2087,10 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
     as_value value = env.pop();
     as_value varname = env.pop();
     thread.setLocalVariable(varname.to_std_string(), value);
+
+    IF_VERBOSE_ACTION (
+    log_action("-- set local var: %s = %s", varname.to_string(), value.to_string());
+    );
 }
 
 void
