@@ -1,3 +1,7 @@
+2007-03-03 Martin Guy <martinwguy@yahoo.it>
+
+	* server/as_value.cpp: More conseratove version of NAN fixes.
+
 2007-03-03 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/gtk.cpp: Don't neglect to render the buffer for renderers other
