@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.cpp,v 1.29 2007/02/19 10:41:57 strk Exp $ */
+/* $Id: shape.cpp,v 1.30 2007/03/03 13:05:27 martinwguy Exp $ */
 
 #include "shape.h"
 
@@ -119,6 +119,7 @@ bool	path::point_test(float x, float y)
 	return false;
     }
 
+    // This test makes no sense: m_fill0 is unsigned and "1-based" -martin
     if (m_fill0 < 0) {
 	// No interior fill.
 	
