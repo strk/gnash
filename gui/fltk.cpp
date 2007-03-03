@@ -61,6 +61,7 @@ FltkGui::~FltkGui()
 void
 FltkGui::renderBuffer()
 {
+#if 0
     // FLTK has a nice mechanism where you can set damage() to whatever you want
     // so in draw() you can check what exactly you want to redraw. But
     // unfortunately it doesn't seem to remember what bits you turn on. So I'll
@@ -73,6 +74,11 @@ FltkGui::renderBuffer()
       setInvalidatedRegion(draw_bounds);
       firstRun = false;
     }
+#endif
+
+    rect bounds;
+    bounds.set_world();
+    _glue->invalidateRegion(bounds);
 
     _glue->redraw();
 }

@@ -2,6 +2,9 @@
 
 	* gui/gtk.cpp: Don't neglect to render the buffer for renderers other
 	than AGG.
+	* gui/fltk.cpp: Invalidate the whole drawing area, which now appears
+	to be a requirement for Agg when we choose not to let the GUI deal with
+	clipping.
 
 2007-03-03 Martin Guy <martinwguy@yahoo.it>
 
