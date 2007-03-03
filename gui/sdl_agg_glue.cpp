@@ -148,6 +148,11 @@ SdlAggGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
 void
 SdlAggGlue::render()
 {
+    rect bounds;
+    bounds.set_world();
+    
+    _agg_renderer->set_invalidated_region(bounds);
+
 	// Update the entire screen
 	SDL_BlitSurface(_sdl_surface, 0, _screen, 0);
 	SDL_UpdateRect(_screen, 0, 0, 0, 0);
