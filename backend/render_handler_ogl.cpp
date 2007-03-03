@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.63 2007/01/13 20:06:17 tgc Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.64 2007/03/03 13:06:14 martinwguy Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -59,7 +59,7 @@ public:
 	virtual void layout_image(image::image_base* im);
 };
 
-static GLint iquad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
+// static GLint iquad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
 
 class render_handler_ogl : public gnash::triangulating_render_handler
 {
@@ -363,12 +363,14 @@ public:
 #endif
 		glPushAttrib(GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
 
+#if GLYUV
 		static GLfloat yuv_rgb[16] = {
 			1, 1, 1, 0,
 			0, -0.3946517043589703515f, 2.032110091743119266f, 0,
 			1.139837398373983740f, -0.5805986066674976801f, 0, 0,
 			0, 0, 0, 1
 		};
+#endif
 
 		glMatrixMode(GL_COLOR);
 		glPushMatrix();
