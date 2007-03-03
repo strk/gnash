@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.16 2007/02/13 19:36:34 rsavoye Exp $ */
+/* $Id: xml.cpp,v 1.17 2007/03/03 13:04:28 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -72,7 +72,6 @@ static void xml_firstchild(const fn_call& fn);
 static void xml_childnodes(const fn_call& fn);
 
 // These are the event handlers called for this object
-static void xml_onload(const fn_call& fn);
 static void xml_ondata(const fn_call& fn);
 static void xml_loaded(const fn_call& fn);
 
@@ -727,7 +726,7 @@ XML::stringify(XMLNode *xml, stringstream *xmlout)
 // 	str += ">";
     }
 
-    int length = xml->_children.size();
+//    int length = xml->_children.size();
 //    log_msg("\tProcessing %d children nodes for %s", length, nodename);
     
     vector<XMLNode *>::iterator itx;
@@ -747,7 +746,7 @@ XML::stringify(XMLNode *xml, stringstream *xmlout)
 //      str += ">";
     }
 
-    const char *xxx = xmlout->str().c_str();
+//    const char *xxx = xmlout->str().c_str();
 //    cerr << "XMLOUT XML= " << xxx << endl;
     return xmlout->str().c_str();
 //    return str.c_str();
@@ -1079,6 +1078,16 @@ void xml_clonenode(const fn_call& fn)
     }
 
 }
+
+/// \brief create a new XML element
+///
+/// Method; creates a new XML element with the name specified in the
+/// parameter. The new element initially has no parent, no children,
+/// and no siblings. The method returns a reference to the newly
+/// created XML object that represents the element. This method and
+/// the XML.createTextNode() method are the constructor methods for
+/// creating nodes for an XML object. 
+
 void xml_createelement(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1101,6 +1110,14 @@ void xml_createelement(const fn_call& fn)
     }
 }
 
+/// \brief Create a new XML node
+/// 
+/// Method; creates a new XML text node with the specified text. The
+/// new node initially has no parent, and text nodes cannot have
+/// children or siblings. This method returns a reference to the XML
+/// object that represents the new text node. This method and the
+/// XML.createElement() method are the constructor methods for
+/// creating nodes for an XML object.
 
 void xml_createtextnode(const fn_call& fn)
 {
@@ -1145,6 +1162,15 @@ void xml_haschildnodes(const fn_call& fn)
     assert(ptr);
     fn.result->set_bool(ptr->hasChildNodes());
 }
+
+/// \brief insert a node before a node
+///
+/// Method; inserts a new child node into the XML object's child
+/// list, before the beforeNode node. If the beforeNode parameter is
+/// undefined or null, the node is added using the appendChild()
+/// method. If beforeNode is not a child of my_xml, the insertion
+/// fails.
+
 void xml_insertbefore(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
@@ -1155,6 +1181,7 @@ void xml_insertbefore(const fn_call& fn)
 //    ptr->insertBefore();
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
+
 void xml_parsexml(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1197,6 +1224,9 @@ void xml_parsexml(const fn_call& fn)
 #endif
 //    fn.result->set_int(ptr->getAllocated());
 }
+
+/// \brief removes the specified XML object from its parent. Also
+/// deletes all descendants of the node.
     
 void xml_removenode(const fn_call& fn)
 {
@@ -1230,6 +1260,9 @@ void xml_tostring(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     XML *ptr = (XML*)fn.this_ptr;
     assert(ptr);
+
+    // TODO: There is also the "stringify" function to be used here.
+    // See above. Wot does FlashPlayer return for this call?
 
     string str = ptr->toString();
 //     cerr << "AAAAHHHHH: " << str << endl;
