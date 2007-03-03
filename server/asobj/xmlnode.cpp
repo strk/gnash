@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.13 2007/03/03 13:03:19 martinwguy Exp $ */
+/* $Id: xmlnode.cpp,v 1.14 2007/03/03 17:07:47 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -300,26 +300,21 @@ XMLNode::removeNode()
     log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
-// I see bugs:
-// - there are two variables called "node" here, one always set to 0,
-//   one set but never user.
-// Query: here ".begin" and ".end" are used; elsewhere ".front" and ".back".
-//   What's the difference?
 XMLNode *
 XMLNode::previousSibling()
 {
     GNASH_REPORT_FUNCTION;
 
     vector<XMLNode *>::iterator itx;
-    XMLNode *node = 0;
+    XMLNode *previous_node = NULL;
     if (_parent) {
  	if (_parent->_children.size() > 1) {
 	    for (itx = _parent->_children.begin(); itx != _parent->_children.end(); itx++) {
 		if ((*itx) == this) {
 		    // log_msg("Found the previous XMLNode child !!!! %s <%p>\n", (*itx)->nodeName(), (void*)*itx);
-		    return node;
+		    return previous_node;
 		}
-		XMLNode *node = *itx;
+		previous_node = *itx;
 	    }
  	}
     }
@@ -327,10 +322,6 @@ XMLNode::previousSibling()
     return NULL;
 }
 
-// I see bugs:
-// - itx gets incremented twice per loop cycle
-// - if the next sibling is also _parent->_children.end, it will not be returned
-//   but NULL will instead
 XMLNode *
 XMLNode::nextSibling()
 {
@@ -339,10 +330,14 @@ XMLNode::nextSibling()
     if (_parent) {
  	if (_parent->_children.size() > 1) {
 	    for (itx = _parent->_children.begin(); itx != _parent->_children.end(); itx++) {
-		if (((*itx++) == this) && (itx != _parent->_children.end())) {
-		    XMLNode *node = *itx;
-		    // log_msg("Found the previous XMLNode child !!!! %s <%p>\n", (*itx)->nodeName(), (void*)*itx);
-		    return node;
+		if ((*itx) == this) {
+		    // We've found ourselves; now find next sibling if any
+		    XMLNode *sibling = *++itx;
+		    if (itx == _parent->_children.end()) return NULL;
+		    else {
+		        // log_msg("Found the next XMLNode child !!!! %s <%p>\n", (*itx)->nodeName(), (void*)*itx);
+		        return sibling;
+		    }
 		}
 	    }
  	}
