@@ -11,6 +11,7 @@
 
 	* server/as_value.cpp: Revert "NaN" change: it makes all GUI canvasses
 	  0-sized (!)
+	* server/asobj/XMLNode.cpp: Fix garbled code in {previous,next}Sibling
 
 2007-03-03 Martin Guy <martinwguy@yahoo.it>
 
