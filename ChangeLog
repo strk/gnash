@@ -1,9 +1,15 @@
-2007-03-03 martin Guy <martinwguy@yahoo.it>
+2007-03-03 Martin Guy <martinwguy@yahoo.it>
 
 	* testsuite/actionscript.all/Number.as: Add test for unary minus
 	* testsuite/actionscript.all/Date.as: Turn "date" temp var into "d" 
 	* testsuite/actionscript.all/TODO: Check result of call to undefined fn
 	* server/as_value.cpp: Return NAN for bad arguments
+	* server/asobj/Date.cpp: Fix compiler warning
+	* server/asobj/xmlnode.cpp: Remove unused vars, highlight 2 bugs
+	* server/asobj/xml.cpp: Remove unused vars, reproduce commentary
+	* server/asobj/shape.cpp: Highlight possible bug
+	* backend/render_handler_ogl.cpp: Removed unused variables
+	* gui/gtk.cpp: Fix compiler warning signed/unsigned
 
 2007-03-02 Sandro Santilli <strk@keybit.net>
 
