@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gtk.cpp,v 1.70 2007/02/28 17:25:25 udog Exp $ */
+/* $Id: gtk.cpp,v 1.71 2007/03/03 13:17:39 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -245,7 +245,7 @@ GtkGui::renderBuffer()
 {
   if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
-	for (int bno=0; bno < _drawbounds.size(); bno++) {
+	for (unsigned bno=0; bno < _drawbounds.size(); bno++) {
 	
 		geometry::Range2d<int>& bounds = _drawbounds[bno];
 		
