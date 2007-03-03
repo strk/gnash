@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.267 2007/02/23 16:26:03 udog Exp $
+dnl $Id: configure.ac,v 1.268 2007/03/03 15:48:37 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1383,9 +1383,20 @@ Please upgrade to AGG 2.4 or greater."
   fi
 fi
 
-if test x"$BOOST_LIBS" != x -a x"$boost_date_time" = xyes; then
-    echo "        BOOST flags are: $BOOST_CFLAGS"
-    echo "        BOOST libs are: $BOOST_LIBS"
+if test x"$BOOST_LIBS" != x; then
+    # Only cygnal requires date_time at present, so it's OK if either
+    # you don't want cygnal or do have date_time installed.
+    if test x"$cygnal" == xno -o x"$boost_date_time" = xyes; then
+	echo "        BOOST flags are: $BOOST_CFLAGS"
+	echo "        BOOST libs are: $BOOST_LIBS"
+    else
+	# They have some boost libs but no date_time and want to compile cygnal.
+	echo "ERROR: No BOOST date_time package installed!\
+ You also need to have the BOOST date_time development package installed\
+ to compile cygnal, or install libboost-date-time-dev (using apt-get)\
+ or --disable-cygnal."
+	nogo=true
+    fi
 else
     echo "ERROR: No BOOST development package installed!\
  You need to have the BOOST development package installed\
