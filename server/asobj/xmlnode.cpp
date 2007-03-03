@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.12 2007/02/15 08:12:32 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.13 2007/03/03 13:03:19 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,7 +49,6 @@ using namespace std;
 namespace gnash {
 
 static void xmlnode_new(const fn_call& fn);
-static void xmlnode_haschildren(const fn_call& fn);
 static void xmlnode_nodename(const fn_call& fn);
 static void xmlnode_nodevalue(const fn_call& fn);
 static void xmlnode_nodetype(const fn_call& fn);
@@ -301,6 +300,11 @@ XMLNode::removeNode()
     log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
+// I see bugs:
+// - there are two variables called "node" here, one always set to 0,
+//   one set but never user.
+// Query: here ".begin" and ".end" are used; elsewhere ".front" and ".back".
+//   What's the difference?
 XMLNode *
 XMLNode::previousSibling()
 {
@@ -323,6 +327,10 @@ XMLNode::previousSibling()
     return NULL;
 }
 
+// I see bugs:
+// - itx gets incremented twice per loop cycle
+// - if the next sibling is also _parent->_children.end, it will not be returned
+//   but NULL will instead
 XMLNode *
 XMLNode::nextSibling()
 {
@@ -354,7 +362,6 @@ const char *
 XMLNode::stringify(XMLNode *xml, stringstream *xmlout)
 {
 //    GNASH_REPORT_FUNCTION;
-    int           child;
     const char    *nodevalue = xml->nodeValue();
     const char    *nodename = xml->nodeName();
     
@@ -379,7 +386,7 @@ XMLNode::stringify(XMLNode *xml, stringstream *xmlout)
 	*xmlout << "</" << nodename << ">";
     }
 
-    int length = xml->_children.size();
+//    int length = xml->_children.size();
 //    log_msg("\tProcessing %d children nodes for %s", length, nodename);
     
     vector<XMLNode *>::iterator itx;
