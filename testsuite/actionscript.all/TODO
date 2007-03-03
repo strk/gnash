@@ -13,3 +13,7 @@ file would need to lay around).
 Note also that the 'prebuilt' clip feature is a pretty new one, so
 might need some work on the Ming side (including support for
 prebuild clips in the command-line compiler)
+
+P T Withington <ptw@openlaszlo.org> says:
+"In the real SWF player, calling undefined is not fatal,
+ it returns undefined and continues." (we should check we do this too)
