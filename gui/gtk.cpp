@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gtk.cpp,v 1.72 2007/03/03 15:07:24 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.73 2007/03/03 15:10:40 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -256,8 +256,9 @@ GtkGui::renderBuffer()
 		  bounds.getMaxX(), bounds.getMaxY());
 	
 	}
-#endif
+#else
     glue.render();
+#endif
 }
 
 #ifdef RENDERER_AGG
