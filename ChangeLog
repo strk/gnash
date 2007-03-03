@@ -1,6 +1,8 @@
 2007-03-03 Martin Guy <martinwguy@yahoo.it>
 
-	* server/as_value.cpp: More conseratove version of NAN fixes.
+	* server/as_value.cpp: More conservative version of NAN fixes.
+	* testsuite/actionscript.all/Date.as: Check for Date.UTC() existing
+	  and working even before a Date object is instantiated.
 
 2007-03-03 Bastiaan Jacques <bastiaan@bjacques.org>
 
