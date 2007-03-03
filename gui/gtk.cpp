@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gtk.cpp,v 1.71 2007/03/03 13:17:39 martinwguy Exp $ */
+/* $Id: gtk.cpp,v 1.72 2007/03/03 15:07:24 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -243,6 +243,7 @@ GtkGui::createWindow(int width, int height)
 void
 GtkGui::renderBuffer()
 {
+#ifdef RENDERER_AGG
   if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
 	for (unsigned bno=0; bno < _drawbounds.size(); bno++) {
@@ -255,6 +256,8 @@ GtkGui::renderBuffer()
 		  bounds.getMaxX(), bounds.getMaxY());
 	
 	}
+#endif
+    glue.render();
 }
 
 #ifdef RENDERER_AGG

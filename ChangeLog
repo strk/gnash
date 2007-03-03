@@ -1,3 +1,8 @@
+2007-03-03 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/gtk.cpp: Don't neglect to render the buffer for renderers other
+	than AGG.
+
 2007-03-03 Martin Guy <martinwguy@yahoo.it>
 
 	* testsuite/actionscript.all/Number.as: Add test for unary minus
