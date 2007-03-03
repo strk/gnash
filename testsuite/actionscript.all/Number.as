@@ -26,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.10 2007/02/01 11:57:20 strk Exp $";
+rcsid="$Id: Number.as,v 1.11 2007/03/03 11:28:36 martinwguy Exp $";
 
 #include "check.as"
 
@@ -60,3 +60,8 @@ var backup = Object.prototype.valueOf;
 Object.prototype.valueOf = function() { return "fake_value"; };
 check_equals(n1.valueOf(), 268); // doesn't inherit from Object
 Object.prototype.valueOf = backup;
+
+// Check unary minus operator
+n1 = -n1;
+check_equals (-268 , n1);
+check_equals (n1.toString(), "-268");
