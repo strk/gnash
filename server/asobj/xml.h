@@ -171,18 +171,18 @@ private:
     int         _bytes_loaded;
     int         _bytes_total;
     
-    bool        _contentType;
+    bool        _contentType;	// TODO Should be String
     bool        _attributes;
     bool        _childNodes;
-    bool        _xmlDecl;
-    bool        _docTypeDecl;
+    bool        _xmlDecl;	// TODO Should be String
+    bool        _docTypeDecl;	// TODO Should be String
     bool        _ignoreWhite;
     bool        _lastChild;
     bool        _nextSibling;
     bool        _nodeType;
     bool        _nodeValue;
     bool        _parentNode;
-    bool        _status;
+    bool        _status;	// TODO Should be Number
     bool        _previousSibling;
 
 };
