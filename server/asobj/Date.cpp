@@ -1188,9 +1188,13 @@ static void date_utc(const fn_call& fn) {
 // returns 0.0 if there are none, 
 static double
 rogue_date_args(const fn_call& fn) {
+	// Two flags: Did we find any +Infinity (or -Infinity) values in the
+	// argument list? If so, "infinity" must be set to the kind that we
+	// found.
 	int plusinf_present = 0;
 	int minusinf_present = 0;
-	double infinity;	// The kind of infinity we found
+	double infinity = 0.0;	// The kind of infinity we found.
+				// 0.0 == none yet.
 
 	for (int i = 0; i < fn.nargs; i++) {
 		double arg = fn.arg(i).to_number();
