@@ -20,11 +20,17 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.18 2007/03/03 11:29:46 martinwguy Exp $";
+rcsid="$Id: Date.as,v 1.19 2007/03/03 17:27:29 martinwguy Exp $";
 
 #include "check.as"
 
 check (Date);
+
+// Static method should be available even if you haven't asked for a Date object.
+//
+// We have to specify "000.0" bucause ming fails to parse large integer constants,
+// returning 2147483647 instead of the correct value.
+check_equals (Date.UTC(2000,0,1).valueOf(), 946684800000.0);
 
 // test the Date constructor.
 // This specific value is used below to check conversion back to year/mon/day etc
