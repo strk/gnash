@@ -1,3 +1,10 @@
+2007-03-03 martin Guy <martinwguy@yahoo.it>
+
+	* testsuite/actionscript.all/Number.as: Add test for unary minus
+	* testsuite/actionscript.all/Date.as: Turn "date" temp var into "d" 
+	* testsuite/actionscript.all/TODO: Check result of call to undefined fn
+	* server/as_value.cpp: Return NAN for bad arguments
+
 2007-03-02 Sandro Santilli <strk@keybit.net>
 
 	* server/as_environment.{cpp,h}, server/swf_function.cpp:
