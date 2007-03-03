@@ -30,8 +30,6 @@
 #include "gstring.h" // for automatic as_value::STRING => String as object
 #include "Number.h" // for automatic as_value::NUMBER => Number as object
 
-#include <cmath>
-
 using namespace std;
 
 #ifdef WIN32
@@ -39,13 +37,6 @@ using namespace std;
 #endif
 
 namespace gnash {
-
-#ifndef NAN
-	// Pre-C99 compilers
-#	define NAN (0.0/0.0)
-//	If this makes your compiler die with div by zero,
-//	use "static double zzzero = 0.0;" and "(zzzero/zzzero)"
-#endif
 
 //
 // as_value -- ActionScript value type
@@ -273,22 +264,25 @@ as_value::to_number() const
 	// gets converted; otherwise it is set to NaN.
 	//
 	// Also, "Infinity", "-Infinity", and "NaN"
-	// are recognized by strtod() but not by Flash Player.
+	// are recognized.
 	char* tail=0;
 	m_number_value = strtod(m_string_value.c_str(), &tail);
 	if ( tail == m_string_value.c_str() || *tail != 0 )
 	{
 		// Failed conversion to Number.
-		m_number_value = NAN;
+
+		// avoid divide by zero compiler warning by using a variable
+		double temp = 0.0;
+
+		// this division by zero creates a NaN value in the double
+		m_number_value = temp / temp;
 	}
 	return m_number_value;
     } else if (m_type == NULLTYPE) {
-	// Evan says: from my tests 0
-	// Martin tries var foo = new Number(null) and gets NaN
-	return NAN;
+	// Evan: from my tests
+	return 0;
     } else if (m_type == BOOLEAN) {
 	// Evan: from my tests
-	// Martin: confirmed
 	return (this->m_boolean_value) ? 1 : 0;
     } else if (m_type == NUMBER) {
 	return m_number_value;
@@ -308,7 +302,7 @@ as_value::to_number() const
 	
 	return 0.0;
     } else {
-	return NAN;
+	return 0.0;
     }
 }
 
