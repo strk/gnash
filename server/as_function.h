@@ -71,6 +71,9 @@ public:
 	/// Decrement refcount on the exported interface.
 	virtual ~as_function() {}
 
+	// Avoid RTTI
+	as_function* to_function() { return this; }
+
 	/// Dispatch.
 	virtual void operator()(const fn_call& fn)=0;
 

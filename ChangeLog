@@ -1,5 +1,7 @@
 2007-03-03 Sandro Santilli <strk@keybit.net>
 
+	* server/: as_object.h, as_function.h:
+	  Add virtual to_function() method to reduce RTTI use.
 	* testsuite/actionscript.all/Function.as:
 	  Test using 'this' as a constructor. Doesn't currently
 	  work becase the 'this' as value is initialized to be

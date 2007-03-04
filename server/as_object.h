@@ -257,6 +257,9 @@ public:
 	/// Cast to a sprite, or return NULL
 	virtual sprite_instance* to_movie() { return NULL; }
 
+	/// Cast to a as_function, or return NULL
+	virtual as_function* to_function() { return NULL; }
+
 	void	clear();
 
 	/// Check whether this object is an instance of the given
