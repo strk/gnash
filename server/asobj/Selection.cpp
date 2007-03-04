@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -42,14 +42,14 @@ void selection_ctor(const fn_call& fn);
 static void
 attachSelectionInterface(as_object& o)
 {
-	o.init_member("addListener", &selection_addlistener);
-	o.init_member("getBeginIndex", &selection_getbeginindex);
-	o.init_member("getCaretIndex", &selection_getcaretindex);
-	o.init_member("getEndIndex", &selection_getendindex);
-	o.init_member("getFocus", &selection_getfocus);
-	o.init_member("removeListener", &selection_removelistener);
-	o.init_member("setFocus", &selection_setfocus);
-	o.init_member("setSelection", &selection_setselection);
+	o.init_member("addListener", new builtin_function(selection_addlistener));
+	o.init_member("getBeginIndex", new builtin_function(selection_getbeginindex));
+	o.init_member("getCaretIndex", new builtin_function(selection_getcaretindex));
+	o.init_member("getEndIndex", new builtin_function(selection_getendindex));
+	o.init_member("getFocus", new builtin_function(selection_getfocus));
+	o.init_member("removeListener", new builtin_function(selection_removelistener));
+	o.init_member("setFocus", new builtin_function(selection_setfocus));
+	o.init_member("setSelection", new builtin_function(selection_setselection));
 }
 
 static as_object*

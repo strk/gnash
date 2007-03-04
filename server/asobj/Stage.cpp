@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@ attachStageInterface(as_object& o)
 {
 	if ( VM::get().getSWFVersion() > 5 )
 	{
-		o.init_member("addListener", &stage_addlistener);
-		o.init_member("removeListener", &stage_removelistener);
+		o.init_member("addListener", new builtin_function(stage_addlistener));
+		o.init_member("removeListener", new builtin_function(stage_removelistener));
 	}
 }
 

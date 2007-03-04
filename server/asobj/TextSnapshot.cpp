@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -45,14 +45,14 @@ attachTextSnapshotInterface(as_object& o)
 	// FIXME: check name case of all methods, and only initialize
 	//        the ones expected to be found based on SWF version
 
-	o.init_member("findText", &textsnapshot_findtext);
-	o.init_member("getCount", &textsnapshot_getcount);
-	o.init_member("getSelected", &textsnapshot_getselected);
-	o.init_member("getSelectedText", &textsnapshot_getselectedtext);
-	o.init_member("getText", &textsnapshot_gettext);
-	o.init_member("hitTestTextNearPos", &textsnapshot_hittesttextnearpos);
-	o.init_member("setSelectColor", &textsnapshot_setselectcolor);
-	o.init_member("setSelected", &textsnapshot_setselected);
+	o.init_member("findText", new builtin_function(textsnapshot_findtext));
+	o.init_member("getCount", new builtin_function(textsnapshot_getcount));
+	o.init_member("getSelected", new builtin_function(textsnapshot_getselected));
+	o.init_member("getSelectedText", new builtin_function(textsnapshot_getselectedtext));
+	o.init_member("getText", new builtin_function(textsnapshot_gettext));
+	o.init_member("hitTestTextNearPos", new builtin_function(textsnapshot_hittesttextnearpos));
+	o.init_member("setSelectColor", new builtin_function(textsnapshot_setselectcolor));
+	o.init_member("setSelected", new builtin_function(textsnapshot_setselected));
 }
 
 static as_object*

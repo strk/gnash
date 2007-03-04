@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.17 2007/03/03 13:04:28 martinwguy Exp $ */
+/* $Id: xml.cpp,v 1.18 2007/03/04 02:00:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -923,23 +923,23 @@ void
 attachXMLInterface(as_object& o)
 {
     // FIXME: this doesn't appear to exist in the MM player, should it ?
-    o.init_member("loaded", &xml_loaded);
+    o.init_member("loaded", new builtin_function(xml_loaded));
 	
-    o.init_member("addRequestHeader", &xml_addrequestheader);
-    o.init_member("appendChild", &xml_appendchild);
-    o.init_member("cloneNode", &xml_clonenode);
-    o.init_member("createElement", &xml_createelement);
-    o.init_member("createTextNode", &xml_createtextnode);
-    o.init_member("getBytesLoaded", &xml_getbytesloaded);
-    o.init_member("getBytesTotal", &xml_getbytestotal);
-    o.init_member("hasChildNodes", &xml_haschildnodes);
-    o.init_member("insertBefore", &xml_insertbefore);
-    o.init_member("load", &xml_load);
-    o.init_member("parseXML", &xml_parsexml);
-    o.init_member("removeNode", &xml_removenode);
-    o.init_member("send", &xml_send);
-    o.init_member("sendAndLoad", &xml_sendandload);
-    o.init_member("toString", &xml_tostring);
+    o.init_member("addRequestHeader", new builtin_function(xml_addrequestheader));
+    o.init_member("appendChild", new builtin_function(xml_appendchild));
+    o.init_member("cloneNode", new builtin_function(xml_clonenode));
+    o.init_member("createElement", new builtin_function(xml_createelement));
+    o.init_member("createTextNode", new builtin_function(xml_createtextnode));
+    o.init_member("getBytesLoaded", new builtin_function(xml_getbytesloaded));
+    o.init_member("getBytesTotal", new builtin_function(xml_getbytestotal));
+    o.init_member("hasChildNodes", new builtin_function(xml_haschildnodes));
+    o.init_member("insertBefore", new builtin_function(xml_insertbefore));
+    o.init_member("load", new builtin_function(xml_load));
+    o.init_member("parseXML", new builtin_function(xml_parsexml));
+    o.init_member("removeNode", new builtin_function(xml_removenode));
+    o.init_member("send", new builtin_function(xml_send));
+    o.init_member("sendAndLoad", new builtin_function(xml_sendandload));
+    o.init_member("toString", new builtin_function(xml_tostring));
 
     // Properties
 

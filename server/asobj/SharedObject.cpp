@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,10 +39,10 @@ static void
 attachSharedObjectInterface(as_object& o)
 {
 	// TODO: clear, flush and getSize not in SWF<6 , it seems
-	o.init_member("clear", &sharedobject_clear);
-	o.init_member("flush", &sharedobject_flush);
-	o.init_member("getLocal", &sharedobject_getlocal);
-	o.init_member("getSize", &sharedobject_getsize);
+	o.init_member("clear", new builtin_function(sharedobject_clear));
+	o.init_member("flush", new builtin_function(sharedobject_flush));
+	o.init_member("getLocal", new builtin_function(sharedobject_getlocal));
+	o.init_member("getSize", new builtin_function(sharedobject_getsize));
 }
 
 static as_object*

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -55,22 +55,22 @@ static void moviecliploader_removelistener(const fn_call& fn);
 static void
 attachMovieClipLoaderInterface(as_object& o)
 {
-  	o.init_member("loadClip", &moviecliploader_loadclip);
-	o.init_member("unloadClip", &moviecliploader_unloadclip);
-	o.init_member("getProgress", &moviecliploader_getprogress);
+  	o.init_member("loadClip", new builtin_function(moviecliploader_loadclip));
+	o.init_member("unloadClip", new builtin_function(moviecliploader_unloadclip));
+	o.init_member("getProgress", new builtin_function(moviecliploader_getprogress));
 
-	o.init_member("addListener", &moviecliploader_addlistener);
-	o.init_member("removeListener", &moviecliploader_removelistener);
+	o.init_member("addListener", new builtin_function(moviecliploader_addlistener));
+	o.init_member("removeListener", new builtin_function(moviecliploader_removelistener));
 
 #if 0
 	// Load the default event handlers. These should really never
 	// be called directly, as to be useful they are redefined
 	// within the SWF script. These get called if there is a problem
 	// Setup the event handlers
-	o.set_event_handler(event_id::LOAD_INIT, &event_test);
-	o.set_event_handler(event_id::LOAD_START, &event_test);
-	o.set_event_handler(event_id::LOAD_PROGRESS, &event_test);
-	o.set_event_handler(event_id::LOAD_ERROR, &event_test);
+	o.set_event_handler(event_id::LOAD_INIT, new builtin_function(event_test));
+	o.set_event_handler(event_id::LOAD_START, new builtin_function(event_test));
+	o.set_event_handler(event_id::LOAD_PROGRESS, new builtin_function(event_test));
+	o.set_event_handler(event_id::LOAD_ERROR, new builtin_function(event_test));
 #endif
   
 }

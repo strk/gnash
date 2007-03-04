@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@ void video_ctor(const fn_call& fn);
 static void
 attachVideoInterface(as_object& o)
 {
-	o.init_member("attachVideo", &video_attachvideo);
-	o.init_member("clear", &video_clear);
+	o.init_member("attachVideo", new builtin_function(video_attachvideo));
+	o.init_member("clear", new builtin_function(video_clear));
 }
 
 static as_object*

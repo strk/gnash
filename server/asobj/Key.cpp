@@ -80,12 +80,12 @@ key_new(const fn_call& fn)
 {
     key_as_object *key_obj = new key_as_object;
 
-    key_obj->init_member("addlistener", new builtin_function(key_addlistener));
-    key_obj->init_member("getascii", new builtin_function(key_getascii));
-    key_obj->init_member("getcode", new builtin_function(key_getcode));
-    key_obj->init_member("isdown", new builtin_function(key_isdown));
-    key_obj->init_member("istoggled", new builtin_function(key_istoggled));
-    key_obj->init_member("removelistener", new builtin_function(key_removelistener));
+    key_obj->init_member("addListener", new builtin_function(key_addlistener));
+    key_obj->init_member("getAscii", new builtin_function(key_getascii));
+    key_obj->init_member("getCode", new builtin_function(key_getcode));
+    key_obj->init_member("isDown", new builtin_function(key_isdown));
+    key_obj->init_member("isToggled", new builtin_function(key_istoggled));
+    key_obj->init_member("removeListener", new builtin_function(key_removelistener));
 
     fn.result->set_as_object(key_obj);
 }
@@ -436,12 +436,12 @@ void key_class_init(as_object& global)
     KEY_CONST(UP);
 
     // methods
-    key_obj->init_member("addListener", &key_add_listener);
-    key_obj->init_member("getAscii", &key_get_ascii);
-    key_obj->init_member("getCode", &key_get_code);
-    key_obj->init_member("isDown", &key_is_down);
-    key_obj->init_member("isToggled", &key_is_toggled);
-    key_obj->init_member("removeListener", &key_remove_listener);
+    key_obj->init_member("addListener", new builtin_function(key_addlistener));
+    key_obj->init_member("getAscii", new builtin_function(key_getascii));
+    key_obj->init_member("getCode", new builtin_function(key_getcode));
+    key_obj->init_member("isDown", new builtin_function(key_isdown));
+    key_obj->init_member("isToggled", new builtin_function(key_istoggled));
+    key_obj->init_member("removeListener", new builtin_function(key_removelistener));
 
     global.init_member("Key", key_obj);
 }

@@ -530,18 +530,18 @@ void
 attachSoundInterface(as_object& o)
 {
 
-	o.init_member("attachSound", &sound_attachsound);
-	o.init_member("getBytesLoaded", &sound_getbytesloaded);
-	o.init_member("getBytesTotal", &sound_getbytestotal);
-	o.init_member("getPan", &sound_getpan);
-	o.init_member("getTransform", &sound_gettransform);
-	o.init_member("getVolume", &sound_getvolume);
-	o.init_member("loadSound", &sound_loadsound);
-	o.init_member("setPan", &sound_setpan);
-	o.init_member("setTransform", &sound_settransform);
-	o.init_member("setVolume", &sound_setvolume);
-	o.init_member("start", &sound_start);
-	o.init_member("stop", &sound_stop);
+	o.init_member("attachSound", new builtin_function(sound_attachsound));
+	o.init_member("getBytesLoaded", new builtin_function(sound_getbytesloaded));
+	o.init_member("getBytesTotal", new builtin_function(sound_getbytestotal));
+	o.init_member("getPan", new builtin_function(sound_getpan));
+	o.init_member("getTransform", new builtin_function(sound_gettransform));
+	o.init_member("getVolume", new builtin_function(sound_getvolume));
+	o.init_member("loadSound", new builtin_function(sound_loadsound));
+	o.init_member("setPan", new builtin_function(sound_setpan));
+	o.init_member("setTransform", new builtin_function(sound_settransform));
+	o.init_member("setVolume", new builtin_function(sound_setvolume));
+	o.init_member("start", new builtin_function(sound_start));
+	o.init_member("stop", new builtin_function(sound_stop));
 
 	// Properties
 

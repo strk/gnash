@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.14 2007/02/07 13:31:26 strk Exp $ */
+/* $Id: Object.cpp,v 1.15 2007/03/04 02:00:42 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -52,17 +52,17 @@ attachObjectInterface(as_object& o)
 	int target_version = o.getVM().getSWFVersion();
 
 	// FIXME: add Object interface here:
-	o.init_member("registerClass", &object_registerClass);
+	o.init_member("registerClass", new builtin_function(object_registerClass));
 	o.set_member_flags("registerClass", 1); // hidden
 
 	// Object.valueOf()
-	o.init_member("valueOf", &as_object::valueof_method);
+	o.init_member("valueOf", new builtin_function(as_object::valueof_method));
 
 	// Object.toString()
-	o.init_member("toString", &as_object::tostring_method);
+	o.init_member("toString", new builtin_function(as_object::tostring_method));
 
 	if ( target_version  < 6 ) return;
-	o.init_member("addProperty", &object_addproperty);
+	o.init_member("addProperty", new builtin_function(object_addproperty));
 	o.set_member_flags("addProperty", 1); // hidden
 }
 

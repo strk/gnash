@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: Number.cpp,v 1.22 2007/02/25 17:07:07 nihilus Exp $ */
+/* $Id: Number.cpp,v 1.23 2007/03/04 02:00:42 strk Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -65,10 +65,10 @@ attachNumberInterface(as_object& o)
 	// Number.POSITIVE_INFINITY
 
 	// Number.toString()
-	o.init_member("toString", &as_object::tostring_method);
+	o.init_member("toString", new builtin_function(as_object::tostring_method));
 
 	// Number.valueOf()
-	o.init_member("valueOf", &as_object::valueof_method);
+	o.init_member("valueOf", new builtin_function(as_object::valueof_method));
 }
 
 static as_object*

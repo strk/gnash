@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -73,12 +73,12 @@ getSystemSecurityInterface()
 	if ( proto == NULL )
 	{
 		proto = new as_object();
-		proto->init_member("allowDomain", &system_security_allowdomain);
+		proto->init_member("allowDomain", new builtin_function(system_security_allowdomain));
 
 		// TODO: only available when SWF >= 7 
-		proto->init_member("allowInsecureDomain", &system_security_allowinsecuredomain);
+		proto->init_member("allowInsecureDomain", new builtin_function(system_security_allowinsecuredomain));
 
-		proto->init_member("loadPolicyFile", &system_security_loadpolicyfile);
+		proto->init_member("loadPolicyFile", new builtin_function(system_security_loadpolicyfile));
 	}
 	return proto.get();
 }
@@ -101,8 +101,8 @@ attachSystemInterface(as_object& proto)
 	// Initialize Function prototype
 	proto.init_member("security", getSystemSecurityInterface());
 	proto.init_member("capabilities", getSystemCapabilitiesInterface());
-	proto.init_member("setClipboard", &system_setclipboard);
-	proto.init_member("showSettings", &system_showsettings);
+	proto.init_member("setClipboard", new builtin_function(system_setclipboard));
+	proto.init_member("showSettings", new builtin_function(system_showsettings));
 }
 
 static as_object*
@@ -113,7 +113,7 @@ getSystemInterface()
 	{
 		proto = new as_object();
 		attachSystemInterface(*proto);
-		proto->init_member("constructor", &system_new); 
+		proto->init_member("constructor", new builtin_function(system_new)); 
 	}
 	return proto.get();
 }
