@@ -51,29 +51,6 @@ namespace gnash {
 //
 
 
-as_value::as_value(as_object* obj)
-    :
-    m_type(OBJECT),
-    m_object_value(obj)
-{
-	if (m_object_value)
-	{
-		sprite_instance* sp = m_object_value->to_movie();
-		if ( sp && 0)
-		{
-			m_type = MOVIECLIP;
-			// TODO: simplify next statement when m_string_value
-			//       will become a std::string
-			m_string_value = sp->get_text_value();
-		}
-		else
-		{
-			m_object_value->add_ref();
-		}
-	}
-}
-
-
 as_value::as_value(as_function* func)
     :
     m_type(AS_FUNCTION),
@@ -81,6 +58,8 @@ as_value::as_value(as_function* func)
 {
     if (m_as_function_value) {
 	m_as_function_value->add_ref();
+    } else {
+        m_type = NULLTYPE;
     }
 }
 
@@ -479,6 +458,12 @@ as_value::set_as_object(as_object* obj)
 		set_sprite(*sp);
 		return;
 	}
+	as_function* func = obj->to_function();
+	if ( func )
+	{
+		set_as_function(func);
+		return;
+	}
 	if (m_type != OBJECT || m_object_value != obj)
 	{
 		drop_refs();
@@ -500,6 +485,8 @@ as_value::set_as_function(as_function* func)
 	m_as_function_value = func;
 	if (m_as_function_value) {
 	    m_as_function_value->add_ref();
+	} else {
+	    m_type = NULLTYPE;
 	}
     }
 }

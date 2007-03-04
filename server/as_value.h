@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.26 2007/02/09 05:52:49 rsavoye Exp $ */
+/* $Id: as_value.h,v 1.27 2007/03/04 00:56:43 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -92,7 +92,12 @@ public:
 		/// Object reference
 		OBJECT,
 
-		/// Internal function pointer
+		/// Internal function pointer (to drop)
+		//
+		/// TODO: deprecate this ! *every* function
+		///       in actionscript must be equipped with
+		///       ActionScript properties. Every as_value
+		///       function MUST be an AS_FUNCTION !!
 		C_FUNCTION,
 
 		/// ActionScript function reference
@@ -203,10 +208,30 @@ public:
 	{
 	}
 
-	/// Construct an OBJECT value
-	as_value(as_object* obj);
+	/// Construct a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
+	//
+	/// See as_object::to_movie and as_object::to_function
+	///
+	/// Internally adds a reference to the ref-counted as_object, 
+	/// if not-null
+	///
+	as_value(as_object* obj)
+		:
+		// Initialize to non-object type here,
+		// or set_as_object will call
+		// drop_ref on undefined memory !!
+		m_type(UNDEFINED)
+	{
+		set_as_object(obj);
+	}
 
 	/// Construct a C_FUNCTION value
+	//
+	/// TODO: deprecate this ! *every* function
+	///       in actionscript must be equipped with
+	///       ActionScript properties. Every as_value
+	///       function MUST be an AS_FUNCTION !!
+	///
 	as_value(as_c_function_ptr func)
 		:
 		m_type(C_FUNCTION),
@@ -214,7 +239,7 @@ public:
 	{
 	}
 
-	/// Construct an AS_FUNCTION value
+	/// Construct a NULL or AS_FUNCTION value
 	as_value(as_function* func);
 
 	~as_value() { drop_refs(); }
@@ -410,14 +435,21 @@ public:
 	void	set_int(int val) { set_double(val); }
 	void	set_nan() { double x = 0.0; set_double(x/x); }
 
-	/// Make this value an as_object.
-	/// Internally adds a reference to the ref-counted as_object.
+	/// Make this value a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
+	//
+	/// See as_object::to_movie and as_object::to_function
+	///
+	/// Internally adds a reference to the ref-counted as_object, 
+	/// if not-null
+	///
 	void	set_as_object(as_object* obj);
 
 	void	set_as_c_function_ptr(as_c_function_ptr func)
 	{
 		drop_refs(); m_type = C_FUNCTION; m_c_function_value = func;
 	}
+
+	/// Make this a NULL or AS_FUNCTION value
 	void	set_as_function(as_function* func);
 
 	void	set_undefined() { drop_refs(); m_type = UNDEFINED; }

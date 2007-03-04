@@ -1,5 +1,10 @@
 2007-03-03 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.{cpp,h}: always check for real type
+	  of an as_object to properly set type to AS_FUNCTION
+	  for actual as_function instances. always check
+	  for NULL pointers to properly set type to NULLTYPE.
+	  Fixes latest tests in Function.as.
 	* server/: as_object.h, as_function.h:
 	  Add virtual to_function() method to reduce RTTI use.
 	* testsuite/actionscript.all/Function.as:
