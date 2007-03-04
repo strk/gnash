@@ -1,3 +1,11 @@
+2007-03-03 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Function.as:
+	  Test using 'this' as a constructor. Doesn't currently
+	  work becase the 'this' as value is initialized to be
+	  of kind OBJECT rather then AS_FUNCTION (as_value constructor
+	  by as_object doesn't check real type).
+
 2007-03-03 Martin Guy <martinwguy@yahoo.it>
 
 	* server/as_value.cpp: More conservative version of NAN fixes.

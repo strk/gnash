@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.24 2007/02/28 23:58:26 strk Exp $";
+rcsid="$Id: Function.as,v 1.25 2007/03/04 00:17:04 strk Exp $";
 
 #include "check.as"
 
@@ -386,3 +386,22 @@ function factorial(n) {
 }
 check_equals(factorial(3), 6);
 check_equals(factorial(4), 24);
+
+//------------------------------------------------------
+// Test using 'this' as a constructor
+//------------------------------------------------------
+
+#if OUTPUT_VERSION >= 6
+
+Function.prototype.new = function()
+{
+	return new this;
+};
+
+function Foo() {};
+
+var fooInstance = Foo.new();
+check_equals(typeof(fooInstance), 'object');
+check(fooInstance instanceOf Foo);
+
+#endif // OUTPUT_VERSION >= 6 
