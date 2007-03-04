@@ -1,5 +1,9 @@
 2007-03-03 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: MovieClipLoader.cpp, Number.cpp, Object.cpp,
+	  Selection.cpp, SharedObject.cpp, Sound.cpp, Stage.cpp,
+	  System.cpp, TextSnapshot.cpp, Video.cpp, xml.cpp:
+	  Use builtin_function when initializing methods.
 	* server/asobj/: Boolean.cpp, Camera.cpp, Color.cpp,
 	  ContextMenu.cpp, CustomActions.cpp, Date.cpp, Error.cpp,
 	  Global.cpp, Key.cpp, gLoadVars.cpp, LocalConnection.cpp,
