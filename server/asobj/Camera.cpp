@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,10 +38,10 @@ void camera_ctor(const fn_call& fn);
 static void
 attachCameraInterface(as_object& o)
 {
-	o.init_member("get", &camera_get);
-	o.init_member("setmode", &camera_setmode);
-	o.init_member("setmotionlevel", &camera_setmotionlevel);
-	o.init_member("setquality", &camera_setquality);
+	o.init_member("get", new builtin_function(camera_get));
+	o.init_member("setmode", new builtin_function(camera_setmode));
+	o.init_member("setmotionlevel", new builtin_function(camera_setmotionlevel));
+	o.init_member("setquality", new builtin_function(camera_setquality));
 }
 
 static as_object*

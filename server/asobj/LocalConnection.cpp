@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@
 #include "LocalConnection.h"
 #include "network.h"
 #include "fn_call.h"
+#include "builtin_function.h" 
 
 namespace gnash {
 
@@ -103,16 +104,16 @@ localconnection_new(const fn_call& fn)
 {
     localconnection_as_object *localconnection_obj = new localconnection_as_object;
 
-    localconnection_obj->init_member("close", &localconnection_close);
-    localconnection_obj->init_member("connect", &localconnection_connect);
-    localconnection_obj->init_member("domain", &localconnection_domain);
-    localconnection_obj->init_member("send", &localconnection_send);
+    localconnection_obj->init_member("close", new builtin_function(localconnection_close));
+    localconnection_obj->init_member("connect", new builtin_function(localconnection_connect));
+    localconnection_obj->init_member("domain", new builtin_function(localconnection_domain));
+    localconnection_obj->init_member("send", new builtin_function(localconnection_send));
 //#ifdef ENABLE_TESTING
 #ifndef NETWORK_CONN
-    localconnection_obj->init_member("getname",  &shm_getname);
-    localconnection_obj->init_member("getsize",  &shm_getsize);
-    localconnection_obj->init_member("getallocated",  &shm_getallocated);
-    localconnection_obj->init_member("exists",  &shm_exists);
+    localconnection_obj->init_member("getname",  new builtin_function(shm_getname));
+    localconnection_obj->init_member("getsize",  new builtin_function(shm_getsize));
+    localconnection_obj->init_member("getallocated",  new builtin_function(shm_getallocated));
+    localconnection_obj->init_member("exists",  new builtin_function(shm_exists));
 #endif
 
     fn.result->set_as_object(localconnection_obj);

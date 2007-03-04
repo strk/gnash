@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "movie_root.h"
 #include "action.h" // for call_method
 #include "VM.h"
+#include "builtin_function.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
 
@@ -79,12 +80,12 @@ key_new(const fn_call& fn)
 {
     key_as_object *key_obj = new key_as_object;
 
-    key_obj->init_member("addlistener", &key_addlistener);
-    key_obj->init_member("getascii", &key_getascii);
-    key_obj->init_member("getcode", &key_getcode);
-    key_obj->init_member("isdown", &key_isdown);
-    key_obj->init_member("istoggled", &key_istoggled);
-    key_obj->init_member("removelistener", &key_removelistener);
+    key_obj->init_member("addlistener", new builtin_function(key_addlistener));
+    key_obj->init_member("getascii", new builtin_function(key_getascii));
+    key_obj->init_member("getcode", new builtin_function(key_getcode));
+    key_obj->init_member("isdown", new builtin_function(key_isdown));
+    key_obj->init_member("istoggled", new builtin_function(key_istoggled));
+    key_obj->init_member("removelistener", new builtin_function(key_removelistener));
 
     fn.result->set_as_object(key_obj);
 }

@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.26 2007/02/13 19:36:34 rsavoye Exp $ */
+/* $Id: NetStream.cpp,v 1.27 2007/03/04 01:39:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -181,11 +181,11 @@ void
 attachNetStreamInterface(as_object& o)
 {
 
-	o.init_member("close", &netstream_close);
-	o.init_member("pause", &netstream_pause);
-	o.init_member("play", &netstream_play);
-	o.init_member("seek", &netstream_seek);
-	o.init_member("setBufferTime", &netstream_setbuffertime);
+	o.init_member("close", new builtin_function(netstream_close));
+	o.init_member("pause", new builtin_function(netstream_pause));
+	o.init_member("play", new builtin_function(netstream_play));
+	o.init_member("seek", new builtin_function(netstream_seek));
+	o.init_member("setBufferTime", new builtin_function(netstream_setbuffertime));
 
 
     // Properties

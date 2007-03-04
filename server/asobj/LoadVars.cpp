@@ -467,14 +467,14 @@ LoadVars::checkLoads()
 void
 LoadVars::attachLoadVarsInterface(as_object& o)
 {
-	o.init_member("addRequestHeader", &loadvars_addrequestheader);
-	o.init_member("decode", &loadvars_decode);
-	o.init_member("getBytesLoaded", &LoadVars::getBytesLoaded_method);
-	o.init_member("getBytesTotal", &LoadVars::getBytesTotal_method);
-	o.init_member("load", &loadvars_load);
-	o.init_member("send", &loadvars_send);
-	o.init_member("sendAndLoad", &loadvars_sendandload);
-	o.init_member("toString", &loadvars_tostring);
+	o.init_member("addRequestHeader", new builtin_function(loadvars_addrequestheader));
+	o.init_member("decode", new builtin_function(loadvars_decode));
+	o.init_member("getBytesLoaded", new builtin_function(LoadVars::getBytesLoaded_method));
+	o.init_member("getBytesTotal", new builtin_function(LoadVars::getBytesTotal_method));
+	o.init_member("load", new builtin_function(loadvars_load));
+	o.init_member("send", new builtin_function(loadvars_send));
+	o.init_member("sendAndLoad", new builtin_function(loadvars_sendandload));
+	o.init_member("toString", new builtin_function(loadvars_tostring));
 
 	boost::intrusive_ptr<builtin_function> gettersetter;
 

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,10 +38,10 @@ void color_ctor(const fn_call& fn);
 static void
 attachColorInterface(as_object& o)
 {
-	o.init_member("getRGB", &color_getrgb);
-	o.init_member("getTransform", &color_gettransform);
-	o.init_member("setRGB", &color_setrgb);
-	o.init_member("setTransform", &color_settransform);
+	o.init_member("getRGB", new builtin_function(color_getrgb));
+	o.init_member("getTransform", new builtin_function(color_gettransform));
+	o.init_member("setRGB", new builtin_function(color_setrgb));
+	o.init_member("setTransform", new builtin_function(color_settransform));
 }
 
 static as_object*

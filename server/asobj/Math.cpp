@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.18 2007/02/17 20:18:09 martinwguy Exp $ */
+/* $Id: Math.cpp,v 1.19 2007/03/04 01:39:01 strk Exp $ */
 
 //
 // This file implements methods of the ActionScript Math class.
@@ -38,6 +38,7 @@
 #include "fn_call.h"
 #include "GMath.h"
 #include "log.h"
+#include "builtin_function.h" 
 
 #ifndef NAN
 // This throws a warning with some compilers. If that bugs you, use
@@ -185,26 +186,26 @@ math_as_object::math_as_object()
 	init_member("SQRT2", 1.4142135623730950488);
 
 	// math methods, 1-arg
-	init_member("abs", &math_fabs);	 // ActionScript "abs" is math "fabs"
-	init_member("acos", &math_acos);
-	init_member("asin", &math_asin);
-	init_member("atan", &math_atan);
-	init_member("ceil", &math_ceil);
-	init_member("cos", &math_cos);
-	init_member("exp", &math_exp);
-	init_member("floor", &math_floor);
-	init_member("log", &math_log);
-	init_member("random", &math_random);
-	init_member("round", &math_round);
-	init_member("sin", &math_sin);
-	init_member("sqrt", &math_sqrt);
-	init_member("tan", &math_tan);
+	init_member("abs", new builtin_function(math_fabs)); // ActionScript "abs" is math "fabs"
+	init_member("acos", new builtin_function(math_acos));
+	init_member("asin", new builtin_function(math_asin));
+	init_member("atan", new builtin_function(math_atan));
+	init_member("ceil", new builtin_function(math_ceil));
+	init_member("cos", new builtin_function(math_cos));
+	init_member("exp", new builtin_function(math_exp));
+	init_member("floor", new builtin_function(math_floor));
+	init_member("log", new builtin_function(math_log));
+	init_member("random", new builtin_function(math_random));
+	init_member("round", new builtin_function(math_round));
+	init_member("sin", new builtin_function(math_sin));
+	init_member("sqrt", new builtin_function(math_sqrt));
+	init_member("tan", new builtin_function(math_tan));
 
 	// math methods, 2-arg
-	init_member("atan2", &math_atan2);
-	init_member("max", &math_max);
-	init_member("min", &math_min);
-	init_member("pow", &math_pow);
+	init_member("atan2", new builtin_function(math_atan2));
+	init_member("max", new builtin_function(math_max));
+	init_member("min", new builtin_function(math_min));
+	init_member("pow", new builtin_function(math_pow));
 }
 
 

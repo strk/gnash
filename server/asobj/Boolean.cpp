@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@ void boolean_ctor(const fn_call& fn);
 static void
 attachBooleanInterface(as_object& o)
 {
-	o.init_member("toString", &boolean_tostring);
-	o.init_member("valueOf", &boolean_valueof);
+	o.init_member("toString", new builtin_function(boolean_tostring));
+	o.init_member("valueOf", new builtin_function(boolean_valueof));
 }
 
 static as_object*

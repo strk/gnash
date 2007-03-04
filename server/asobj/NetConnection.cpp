@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.25 2007/03/01 10:05:51 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.26 2007/03/04 01:39:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -420,7 +420,7 @@ void
 attachNetConnectionInterface(as_object& o)
 {
 
-	o.init_member("connect", &netconnection_connect);
+	o.init_member("connect", new builtin_function(netconnection_connect));
 
 }
 

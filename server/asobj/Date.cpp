@@ -1,5 +1,5 @@
 // 
-//	Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//	Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -263,43 +263,43 @@ static void attachDateStaticInterface(as_object& o);
 static void
 attachDateInterface(as_object& o)
 {
-	o.init_member("getDate", &date_getdate);
-	o.init_member("getDay", &date_getday);
-	o.init_member("getFullYear", &date_getfullyear);
-	o.init_member("getHours", &date_gethours);
-	o.init_member("getMilliseconds", &date_getmilliseconds);
-	o.init_member("getMinutes", &date_getminutes);
-	o.init_member("getMonth", &date_getmonth);
-	o.init_member("getSeconds", &date_getseconds);
-	o.init_member("getTime", &date_valueof);
-	o.init_member("getTimezoneOffset", &date_gettimezoneoffset);
-	o.init_member("getUTCDate", &date_getutcdate);
-	o.init_member("getUTCDay", &date_getutcday);
-	o.init_member("getUTCFullYear", &date_getutcfullyear);
-	o.init_member("getUTCHours", &date_getutchours);
-	o.init_member("getUTCMilliseconds", &date_getmilliseconds); // same
-	o.init_member("getUTCMinutes", &date_getutcminutes);
-	o.init_member("getUTCMonth", &date_getutcmonth);
-	o.init_member("getUTCSeconds", &date_getutcseconds);
-	o.init_member("getYear", &date_getyear);
-	o.init_member("setDate", &date_setdate);
-	o.init_member("setFullYear", &date_setfullyear);
-	o.init_member("setHours", &date_sethours);
-	o.init_member("setMilliseconds", &date_setmilliseconds);
-	o.init_member("setMinutes", &date_setminutes);
-	o.init_member("setMonth", &date_setmonth);
-	o.init_member("setSeconds", &date_setseconds);
-	o.init_member("setTime", &date_settime);
-	o.init_member("setUTCDate", &date_setutcdate);
-	o.init_member("setUTCFullYear", &date_setutcfullyear);
-	o.init_member("setUTCHours", &date_setutchours);
-	o.init_member("setUTCMilliseconds", &date_setmilliseconds); // same
-	o.init_member("setUTCMinutes", &date_setutcminutes);
-	o.init_member("setUTCMonth", &date_setutcmonth);
-	o.init_member("setUTCSeconds", &date_setutcseconds);
-	o.init_member("setYear", &date_setyear);
-	o.init_member("toString", &date_tostring);
-	o.init_member("valueOf", &date_valueof);
+	o.init_member("getDate", new builtin_function(date_getdate));
+	o.init_member("getDay", new builtin_function(date_getday));
+	o.init_member("getFullYear", new builtin_function(date_getfullyear));
+	o.init_member("getHours", new builtin_function(date_gethours));
+	o.init_member("getMilliseconds", new builtin_function(date_getmilliseconds));
+	o.init_member("getMinutes", new builtin_function(date_getminutes));
+	o.init_member("getMonth", new builtin_function(date_getmonth));
+	o.init_member("getSeconds", new builtin_function(date_getseconds));
+	o.init_member("getTime", new builtin_function(date_valueof));
+	o.init_member("getTimezoneOffset", new builtin_function(date_gettimezoneoffset));
+	o.init_member("getUTCDate", new builtin_function(date_getutcdate));
+	o.init_member("getUTCDay", new builtin_function(date_getutcday));
+	o.init_member("getUTCFullYear", new builtin_function(date_getutcfullyear));
+	o.init_member("getUTCHours", new builtin_function(date_getutchours));
+	o.init_member("getUTCMilliseconds", new builtin_function(date_getmilliseconds)); // same
+	o.init_member("getUTCMinutes", new builtin_function(date_getutcminutes));
+	o.init_member("getUTCMonth", new builtin_function(date_getutcmonth));
+	o.init_member("getUTCSeconds", new builtin_function(date_getutcseconds));
+	o.init_member("getYear", new builtin_function(date_getyear));
+	o.init_member("setDate", new builtin_function(date_setdate));
+	o.init_member("setFullYear", new builtin_function(date_setfullyear));
+	o.init_member("setHours", new builtin_function(date_sethours));
+	o.init_member("setMilliseconds", new builtin_function(date_setmilliseconds));
+	o.init_member("setMinutes", new builtin_function(date_setminutes));
+	o.init_member("setMonth", new builtin_function(date_setmonth));
+	o.init_member("setSeconds", new builtin_function(date_setseconds));
+	o.init_member("setTime", new builtin_function(date_settime));
+	o.init_member("setUTCDate", new builtin_function(date_setutcdate));
+	o.init_member("setUTCFullYear", new builtin_function(date_setutcfullyear));
+	o.init_member("setUTCHours", new builtin_function(date_setutchours));
+	o.init_member("setUTCMilliseconds", new builtin_function(date_setmilliseconds)); // same
+	o.init_member("setUTCMinutes", new builtin_function(date_setutcminutes));
+	o.init_member("setUTCMonth", new builtin_function(date_setutcmonth));
+	o.init_member("setUTCSeconds", new builtin_function(date_setutcseconds));
+	o.init_member("setYear", new builtin_function(date_setyear));
+	o.init_member("toString", new builtin_function(date_tostring));
+	o.init_member("valueOf", new builtin_function(date_valueof));
 }
 
 static void
@@ -307,7 +307,7 @@ attachDateStaticInterface(as_object& o)
 {
 	// This should *only* be available when SWF version is > 6
 	// Are you sure? The online reference say it's in from v5 -martin
-	o.init_member("UTC", &date_utc);
+	o.init_member("UTC", new builtin_function(date_utc));
 }
 
 static as_object*

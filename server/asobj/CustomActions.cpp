@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,10 +38,10 @@ void customactions_ctor(const fn_call& fn);
 static void
 attachCustomActionsInterface(as_object& o)
 {
-	o.init_member("get", &customactions_get);
-	o.init_member("install", &customactions_install);
-	o.init_member("list", &customactions_list);
-	o.init_member("uninstall", &customactions_uninstall);
+	o.init_member("get", new builtin_function(customactions_get));
+	o.init_member("install", new builtin_function(customactions_install));
+	o.init_member("list", new builtin_function(customactions_list));
+	o.init_member("uninstall", new builtin_function(customactions_uninstall));
 }
 
 static as_object*

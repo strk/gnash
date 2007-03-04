@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -38,10 +38,10 @@ void mouse_ctor(const fn_call& fn);
 static void
 attachMouseInterface(as_object& o)
 {
-	o.init_member("addlistener", &mouse_addlistener);
-	o.init_member("hide", &mouse_hide);
-	o.init_member("removelistener", &mouse_removelistener);
-	o.init_member("show", &mouse_show);
+	o.init_member("addlistener", new builtin_function(mouse_addlistener));
+	o.init_member("hide", new builtin_function(mouse_hide));
+	o.init_member("removelistener", new builtin_function(mouse_removelistener));
+	o.init_member("show", new builtin_function(mouse_show));
 }
 
 static as_object*

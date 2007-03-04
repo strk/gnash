@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,8 +36,8 @@ void contextmenu_ctor(const fn_call& fn);
 static void
 attachContextMenuInterface(as_object& o)
 {
-	o.init_member("copy", &contextmenu_copy);
-	o.init_member("hideBuiltInItems", &contextmenu_hidebuiltinitems);
+	o.init_member("copy", new builtin_function(contextmenu_copy));
+	o.init_member("hideBuiltInItems", new builtin_function(contextmenu_hidebuiltinitems));
 }
 
 static as_object*

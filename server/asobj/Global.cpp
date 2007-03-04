@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.49 2007/02/28 23:24:45 strk Exp $ */
+/* $Id: Global.cpp,v 1.50 2007/03/04 01:39:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,6 +62,7 @@
 #include "VM.h"
 #include "timers.h"
 #include "URL.h" // for URL::encode and URL::decode (escape/unescape)
+#include "builtin_function.h"
 
 #include "fn_call.h"
 #include "sprite_instance.h"
@@ -362,11 +363,11 @@ Global::Global(VM& vm)
 	//-------------------------------------------------
 
 	// ASSetPropFlags
-	init_member("ASSetPropFlags", as_global_assetpropflags);
+	init_member("ASSetPropFlags", new builtin_function(as_global_assetpropflags));
 
 	// Defined in timers.h
-	init_member("setInterval", timer_setinterval);
-	init_member("clearInterval", timer_clearinterval);
+	init_member("setInterval", new builtin_function(timer_setinterval));
+	init_member("clearInterval", new builtin_function(timer_clearinterval));
 
 	// System and Function were added in Player Version 6, but
 	// seem to be available even if SWF target version is
@@ -390,7 +391,7 @@ Global::Global(VM& vm)
 	// SWF4
 	//-----------------------
 
-	init_member("trace", as_value(as_global_trace));
+	init_member("trace", new builtin_function(as_global_trace));
 	// The methods of the Math class are available
 	// as global methods in SWF4 and as members of
 	// the Math class from SWF5 up
@@ -405,7 +406,7 @@ Global::Global(VM& vm)
 	color_class_init(*this);
 	selection_class_init(*this); // Selection
 	sound_class_init(*this);
-	init_member("XMLSocket", as_value(xmlsocket_new));
+	init_member("XMLSocket", new builtin_function(xmlsocket_new));
 	date_class_init(*this);
 	xml_class_init(*this);
 	xmlnode_class_init(*this);
@@ -414,12 +415,12 @@ Global::Global(VM& vm)
 	number_class_init(*this); 
 	string_class_init(*this); 
 	array_class_init(*this);
-	init_member("escape", as_global_escape);
-	init_member("unescape", as_global_unescape);
-	init_member("parseFloat", as_global_parsefloat);
-	init_member("parseInt", as_global_parseint);
-	init_member("isNaN", as_global_isnan);
-	init_member("isFinite", as_global_isfinite);
+	init_member("escape", new builtin_function(as_global_escape));
+	init_member("unescape", new builtin_function(as_global_unescape));
+	init_member("parseFloat", new builtin_function(as_global_parsefloat));
+	init_member("parseInt", new builtin_function(as_global_parseint));
+	init_member("isNaN", new builtin_function(as_global_isnan));
+	init_member("isFinite", new builtin_function(as_global_isfinite));
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------
@@ -428,8 +429,8 @@ Global::Global(VM& vm)
 
 	// See: http://sephiroth.it/reference.php?id=717&cat=1
 	textsnapshot_class_init(*this);
-	init_member("LocalConnection", as_value(localconnection_new));
-	init_member("TextFormat", as_value(textformat_new));
+	init_member("LocalConnection", new builtin_function(localconnection_new));
+	init_member("TextFormat", new builtin_function(textformat_new));
 	key_class_init(*this); // Key
 	video_class_init(*this); // Video
 	camera_class_init(*this); // Camera

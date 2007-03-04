@@ -1,5 +1,14 @@
 2007-03-03 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: Boolean.cpp, Camera.cpp, Color.cpp,
+	  ContextMenu.cpp, CustomActions.cpp, Date.cpp, Error.cpp,
+	  Global.cpp, Key.cpp, gLoadVars.cpp, LocalConnection.cpp,
+	  Math.cpp, Microphone.cpp, Mouse.cpp, NetConnection.cpp,
+	  NetStream.cpp:
+	  Use builtin_function when initializing methods.
+
+2007-03-03 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.{cpp,h}: always check for real type
 	  of an as_object to properly set type to AS_FUNCTION
 	  for actual as_function instances. always check

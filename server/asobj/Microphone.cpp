@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,11 +39,11 @@ void microphone_ctor(const fn_call& fn);
 static void
 attachMicrophoneInterface(as_object& o)
 {
-	o.init_member("get", &microphone_get);
-	o.init_member("setgain", &microphone_setgain);
-	o.init_member("setrate", &microphone_setrate);
-	o.init_member("setsilencelevel", &microphone_setsilencelevel);
-	o.init_member("setuseechosuppression", &microphone_setuseechosuppression);
+	o.init_member("get", new builtin_function(microphone_get));
+	o.init_member("setGain", new builtin_function(microphone_setgain));
+	o.init_member("setRate", new builtin_function(microphone_setrate));
+	o.init_member("setSilenceLevel", new builtin_function(microphone_setsilencelevel));
+	o.init_member("setUseEchoSuppression", new builtin_function(microphone_setuseechosuppression));
 }
 
 static as_object*
