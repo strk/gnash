@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.25 2007/02/26 20:11:22 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.26 2007/03/04 00:58:53 strk Exp $";
 
 #include "check.as"
 
@@ -279,10 +279,3 @@ check_equals(typeof(t4.die), 'function');
 var b = t4.die(4);
 check_equals(typeof(b), 'undefined');
 
-
-//------------------------------------------------------
-// Test constructors chain calling
-//------------------------------------------------------
-
-function BaseClass() { this.x = 3; }
-function DerivedClass() { this.x += 1; }
