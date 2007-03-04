@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.27 2007/03/04 00:56:43 strk Exp $ */
+/* $Id: as_value.h,v 1.28 2007/03/04 02:22:00 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -64,7 +64,11 @@ static inline int isnan_ld (long double x) { return x != x; }
 	static inline int isinf_ld (long double x) { return isnan (x - x); }
 #endif
  
+#define ALLOW_C_FUNCTION_VALUES
+
+//#ifdef ALLOW_C_FUNCTION_VALUES
 typedef void (*as_c_function_ptr)(const fn_call& fn);
+//#endif
 
 // ActionScript value type.
 
@@ -92,6 +96,7 @@ public:
 		/// Object reference
 		OBJECT,
 
+#ifdef ALLOW_C_FUNCTION_VALUES
 		/// Internal function pointer (to drop)
 		//
 		/// TODO: deprecate this ! *every* function
@@ -99,6 +104,7 @@ public:
 		///       ActionScript properties. Every as_value
 		///       function MUST be an AS_FUNCTION !!
 		C_FUNCTION,
+#endif
 
 		/// ActionScript function reference
 		AS_FUNCTION,
@@ -225,6 +231,7 @@ public:
 		set_as_object(obj);
 	}
 
+#ifdef ALLOW_C_FUNCTION_VALUES
 	/// Construct a C_FUNCTION value
 	//
 	/// TODO: deprecate this ! *every* function
@@ -238,6 +245,7 @@ public:
 		m_c_function_value(func)
 	{
 	}
+#endif
 
 	/// Construct a NULL or AS_FUNCTION value
 	as_value(as_function* func);
@@ -259,9 +267,14 @@ public:
 	/// (C_FUNCTION or AS_FUNCTION).
 	bool is_function() const
 	{
+#ifdef ALLOW_C_FUNCTION_VALUES
 		return m_type == C_FUNCTION || m_type == AS_FUNCTION;
+#else
+		return m_type == AS_FUNCTION;
+#endif
 	}
 
+#ifdef ALLOW_C_FUNCTION_VALUES
 	/// Return true if this value is a C function
 	//
 	/// This is currently only important to know from the
@@ -275,6 +288,7 @@ public:
 	{
 		return m_type == C_FUNCTION;
 	}
+#endif
 
 	/// Return true if this value is a AS function
 	bool is_as_function() const
@@ -375,10 +389,12 @@ public:
 	///
 	sprite_instance* to_sprite() const;
 
+#ifdef ALLOW_C_FUNCTION_VALUES
 	/// \brief
 	/// Return value as a C function ptr
 	/// or NULL if it is not a C function.
 	as_c_function_ptr	to_c_function() const;
+#endif
 
 	/// \brief
 	/// Return value as an ActionScript function ptr
@@ -444,10 +460,12 @@ public:
 	///
 	void	set_as_object(as_object* obj);
 
+#ifdef ALLOW_C_FUNCTION_VALUES
 	void	set_as_c_function_ptr(as_c_function_ptr func)
 	{
 		drop_refs(); m_type = C_FUNCTION; m_c_function_value = func;
 	}
+#endif
 
 	/// Make this a NULL or AS_FUNCTION value
 	void	set_as_function(as_function* func);
@@ -472,7 +490,9 @@ public:
 		//TODO: don't use c_str() when m_string_value will be a std::string
 		else if (v.m_type == MOVIECLIP) set_sprite(v.m_string_value.c_str());
 
+#ifdef ALLOW_C_FUNCTION_VALUES
 		else if (v.m_type == C_FUNCTION) set_as_c_function_ptr(v.m_c_function_value);
+#endif
 		else if (v.m_type == AS_FUNCTION) set_as_function(v.m_as_function_value);
 		else assert(0);
 	}
@@ -535,7 +555,9 @@ private:
 		// @@ hm, what about PS2, where double is bad?  should maybe have int&float types.
 		mutable	double	m_number_value;
 		as_object*	m_object_value;
+#ifdef ALLOW_C_FUNCTION_VALUES
 		as_c_function_ptr	m_c_function_value;
+#endif
 		as_function*	m_as_function_value;
 	};
 

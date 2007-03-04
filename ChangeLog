@@ -1,5 +1,9 @@
 2007-03-03 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.h: add ALLOW_C_FUNCTION_VALUES to prepare
+	  for dropping C_FUNCTION value types as a whole. Undefine
+	  it to make finding bogus uses easier and finish the
+	  work in asobj/.
 	* server/asobj/: MovieClipLoader.cpp, Number.cpp, Object.cpp,
 	  Selection.cpp, SharedObject.cpp, Sound.cpp, Stage.cpp,
 	  System.cpp, TextSnapshot.cpp, Video.cpp, xml.cpp:
