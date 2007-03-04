@@ -48,6 +48,8 @@ public:
 	void set_status(const char* code);
 	void setNetCon(as_object* nc);
 	int64_t time();
+	long bytesLoaded();
+	long bytesTotal();
 
 	// Used for gstreamer data read and seek callbacks
 	static int readPacket(void* opaque, char* buf, int buf_size);

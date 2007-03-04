@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.20 2007/01/30 12:49:03 strk Exp $ */
+/*  $Id: NetStream.h,v 1.21 2007/03/04 21:35:31 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -43,9 +43,6 @@ namespace gnash {
 class NetStream : public as_object {
 
 protected:
-
-	// Watch out for circular dependencies, see NetStream.h
-	NetStream* _parent;
 
 	NetConnection* _netCon;
 
@@ -76,11 +73,9 @@ public:
 
 	virtual int64_t time() { return 0; }
 
-	/// What is supposed to happens if ns is NULL ?
-	void set_parent(NetStream* ns)
-	{
-		_parent = ns;
-	}
+	virtual long bytesLoaded() { return 0; }
+
+	virtual long bytesTotal() { return 0; }
 
 	virtual bool playing()
 	{

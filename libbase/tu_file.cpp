@@ -87,6 +87,21 @@ std_get_eof_func(void *appdata)
     }
 }
 
+static long
+std_get_stream_size_func(void *appdata)
+// Return -1 on failure, or the size
+{
+    assert(appdata);
+    int	org_pos = ftell((FILE*)appdata);
+
+	fseek((FILE*)appdata, 0, SEEK_END);
+	int ret = ftell((FILE*)appdata);
+
+	fseek((FILE*)appdata, org_pos, SEEK_SET);
+	return ret;
+}
+
+
 static int
 std_close_func(void *appdata)
 // Return 0 on success, or TU_FILE_CLOSE_ERROR on failure.
@@ -271,6 +286,18 @@ mem_get_eof_func(void* appdata)
     return buf->m_position >= buf->m_.size();
 }
 
+static long
+mem_get_stream_size(void* appdata)
+// Return the file size, or -1 on failure.
+{
+    assert(appdata);
+    
+    filebuf* buf = (filebuf*) appdata;
+    assert(buf->is_valid());
+    
+    return buf->m_.size();
+}
+
 static int mem_close_func(void* appdata)
 // Return 0 on success, or TU_FILE_CLOSE_ERROR on failure.
 {
@@ -292,7 +319,7 @@ static int mem_close_func(void* appdata)
 // Create a file using the custom callbacks.
 tu_file::tu_file(void * appdata, read_func rf, write_func wf,
 		 seek_func sf, seek_to_end_func ef, tell_func tf,
-		 get_eof_func gef, close_func cf)
+		 get_eof_func gef, get_stream_size_func gss, get_cur_stream_size_func gcss, close_func cf)
 {
     m_data = appdata;
     m_read = rf;
@@ -301,6 +328,8 @@ tu_file::tu_file(void * appdata, read_func rf, write_func wf,
     m_seek_to_end = ef;
     m_tell = tf;
     m_get_eof = gef;
+    m_get_stream_size = gss;
+    m_get_cur_stream_size = gcss;
     m_close = cf;
     m_error = TU_FILE_NO_ERROR;
 }
@@ -317,6 +346,8 @@ tu_file::tu_file(FILE* fp, bool autoclose=false)
     m_seek_to_end = std_seek_to_end_func;
     m_tell = std_tell_func;
     m_get_eof = std_get_eof_func;
+    m_get_stream_size = std_get_stream_size_func;
+    m_get_cur_stream_size = std_get_stream_size_func;
     m_close = autoclose ? std_close_func : NULL;
     m_error = TU_FILE_NO_ERROR;
 }
@@ -335,6 +366,8 @@ tu_file::tu_file(const char * name, const char * mode)
 	m_seek_to_end = std_seek_to_end_func;
 	m_tell = std_tell_func;
 	m_get_eof = std_get_eof_func;
+    m_get_stream_size = std_get_stream_size_func;
+    m_get_cur_stream_size = std_get_stream_size_func;
 	m_close = std_close_func;
 	m_error = TU_FILE_NO_ERROR;
     } else {
@@ -344,6 +377,8 @@ tu_file::tu_file(const char * name, const char * mode)
 	m_seek_to_end = NULL;
 	m_tell = NULL;
 	m_get_eof = NULL;
+    m_get_stream_size = NULL;
+    m_get_cur_stream_size = NULL;
 	m_close = NULL;
 	m_error = TU_FILE_OPEN_ERROR;
     }
@@ -360,6 +395,8 @@ tu_file::tu_file(memory_buffer_enum /* m */)
     m_seek_to_end = mem_seek_to_end_func;
     m_tell = mem_tell_func;
     m_get_eof = mem_get_eof_func;
+    m_get_stream_size = mem_get_stream_size;
+    m_get_cur_stream_size = mem_get_stream_size;
     m_close = mem_close_func;
     m_error = TU_FILE_NO_ERROR;
 }
@@ -376,6 +413,8 @@ tu_file::tu_file(memory_buffer_enum /* m */, int size, void* data)
     m_seek_to_end = mem_seek_to_end_func;
     m_tell = mem_tell_func;
     m_get_eof = mem_get_eof_func;
+    m_get_stream_size = mem_get_stream_size;
+    m_get_cur_stream_size = mem_get_stream_size;
     m_close = mem_close_func;
     m_error = TU_FILE_NO_ERROR;
 }

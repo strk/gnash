@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.19 2007/03/01 10:05:51 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.20 2007/03/04 21:35:31 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -75,11 +75,8 @@ NetStreamFfmpeg::~NetStreamFfmpeg()
 // called from avstreamer thread
 void NetStreamFfmpeg::set_status(const char* /*code*/)
 {
-	if (_parent)
-	{
-		//m_netstream_object->init_member("onStatus_Code", code);
-		//push_video_event(m_netstream_object);
-	}
+	//m_netstream_object->init_member("onStatus_Code", code);
+	//push_video_event(this);
 }
 
 void NetStreamFfmpeg::pause(int mode)
@@ -245,8 +242,8 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	assert(nc);
 
 	// Pass stuff from/to the NetConnection object.
-	assert(ns); // ns->_parent is ok being NULL
-	if ( !nc->openConnection(ns->url.c_str(), ns->_parent) ) {
+	assert(ns);
+	if ( !nc->openConnection(ns->url.c_str(), ns) ) {
 		log_warning("Gnash could not open movie url: %s", ns->url.c_str());
 		return;
 	}
@@ -461,7 +458,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 			}
 			else
 			{
-				delay = int((video_clock - clock)*1000000);
+				delay = int((video_clock - clock)*10000000); 
 			}
 
 			// Don't hog the CPU.
@@ -759,6 +756,17 @@ NetStreamFfmpeg::time()
 	}
 }
 
+long
+NetStreamFfmpeg::bytesLoaded()
+{
+	return _netCon->getBytesLoaded();
+}
+
+long
+NetStreamFfmpeg::bytesTotal()
+{
+	return _netCon->getBytesTotal();
+}
 } // gnash namespcae
 
 #endif // USE_FFMPEG

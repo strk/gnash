@@ -89,11 +89,8 @@ NetStreamGst::~NetStreamGst()
 // called from avstreamer thread
 void NetStreamGst::set_status(const char* /*code*/)
 {
-	if (_parent)
-	{
-		//m_netstream_object->init_member("onStatus_Code", code);
-		//push_video_event(m_netstream_object);
-	}
+	//m_netstream_object->init_member("onStatus_Code", code);
+	//push_video_event(this);
 }
 
 void NetStreamGst::pause(int mode)
@@ -271,8 +268,8 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	assert(nc);
 
 	// Pass stuff from/to the NetConnection object.
-	assert(ns); // ns->_parent being null seems ok
-	if ( !nc->openConnection(ns->url.c_str(), ns->_parent) ) {
+	assert(ns);
+	if ( !nc->openConnection(ns->url.c_str(), ns) ) {
 		log_warning("Gnash could not open movie url: %s", ns->url.c_str());
 		return;
 	}
@@ -406,6 +403,18 @@ NetStreamGst::time()
 	} else {
 		return 0;
 	}
+}
+
+long
+NetStreamGst::bytesLoaded()
+{
+	return _netCon->getBytesLoaded();
+}
+
+long
+NetStreamGst::bytesTotal()
+{
+	return _netCon->getBytesTotal();
 }
 
 // Gstreamer callback function

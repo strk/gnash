@@ -1,3 +1,17 @@
+2007-03-04 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/curl_adapter.cpp: Added support for getting the total size
+	  of file being downloaded (get_stream_size()), and the current cached 
+	  size (get_cur_stream_size()).
+	* libbase/tu_file.{cpp,h}: Added get_size() and get_cur_size() which 
+	  uses get_stream_size() and get_cur_stream_size().
+	* libbase/noseek_fd_adapter.cpp, libbase/zlib_adapter.cpp: Added dummy
+	  support for get_stream_size() and get_cur_stream_size()
+	* server/asobj/NetConnection.{cpp,h}: Switched to use StreamProvider
+	* server/asobj/NetStream.{cpp,h}, server/asobj/NetStreamFfmpeg.{cpp,h},
+	  server/asobj/NetStreamGst.{cpp,h}: Added support for the bytesLoaded 
+	  and bytesTotal property.
+
 2007-03-03 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.h: add ALLOW_C_FUNCTION_VALUES to prepare

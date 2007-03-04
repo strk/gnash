@@ -322,6 +322,8 @@ namespace zlib_adapter
 				inflate_seek_to_end,
 				inflate_tell,
 				inflate_get_eof,
+				NULL, // get stream size
+				NULL, // get cur stream size
 				inflate_close)
 			);
 	}

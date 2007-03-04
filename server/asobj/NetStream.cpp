@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.27 2007/03/04 01:39:01 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.28 2007/03/04 21:35:31 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,7 +49,6 @@ static as_object* getNetStreamInterface();
 NetStream::NetStream()
 	:
 	as_object(getNetStreamInterface()),
-	_parent(NULL),
 	_netCon(NULL)
 {
 }
@@ -177,6 +176,44 @@ netstream_time(const fn_call& fn)
 	}
 }
 
+// Both a getter and a (do-nothing) setter for bytesLoaded
+static void
+netstream_bytesloaded(const fn_call& fn)
+{
+
+	NetStream* ns = ensure_netstream(fn.this_ptr);
+
+	if ( fn.nargs == 0 )
+	{
+		fn.result->set_double(ns->bytesLoaded());
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Tried to set read-only property NetStream.bytesLoaded");
+		);
+	}
+}
+
+// Both a getter and a (do-nothing) setter for bytesTotal
+static void
+netstream_bytestotal(const fn_call& fn)
+{
+
+	NetStream* ns = ensure_netstream(fn.this_ptr);
+
+	if ( fn.nargs == 0 )
+	{
+		fn.result->set_double(ns->bytesTotal());
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Tried to set read-only property NetStream.bytesTotal");
+		);
+	}
+}
+
 void
 attachNetStreamInterface(as_object& o)
 {
@@ -194,6 +231,12 @@ attachNetStreamInterface(as_object& o)
 
     gettersetter = new builtin_function(&netstream_time, NULL);
     o.init_property("time", *gettersetter, *gettersetter);
+
+    gettersetter = new builtin_function(&netstream_bytesloaded, NULL);
+    o.init_property("bytesLoaded", *gettersetter, *gettersetter);
+
+    gettersetter = new builtin_function(&netstream_bytestotal, NULL);
+    o.init_property("bytesTotal", *gettersetter, *gettersetter);
 
 }
 

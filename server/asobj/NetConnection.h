@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.18 2007/02/25 16:31:48 strk Exp $ */
+/* $Id: NetConnection.h,v 1.19 2007/03/04 21:35:31 tgc Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -23,9 +23,7 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_CURL_CURL_H
-#include <curl/curl.h>
-#endif
+#include "tu_file.h"
 
 #include <stdexcept>
 #include <cstdio>
@@ -54,7 +52,7 @@ public:
 	~NetConnection();
 
 	/// Opens the connection to char_url
-	bool openConnection(const char* char_url, as_object* ns);
+	bool openConnection(const char* char_url, as_object* owner);
 
 	/// Put read pointer at given position
 	bool seek(size_t pos);
@@ -71,61 +69,26 @@ public:
 	/// Report global position within the file
 	size_t tell();
 
-	// Extend the URL to be used for playing
+	/// Extend the URL to be used for playing
 	void addToURL(const char* url);
-	
+
+	///	Returns the number of bytes cached
+	long getBytesLoaded();
+
+	///	Returns the total size of the file
+	long getBytesTotal();
+
+
 private:
-	// Use this file to cache data
-	FILE* _cache;
 
-	// _cache file descriptor
-	int _cachefd;
-
-	// we keep a copy here to be sure the char*
-	// is alive for the whole CurlStreamFile lifetime
-	// TODO: don't really do this :)
+	/// the url of the file
 	std::string _url;
 
-#ifdef USE_CURL
-	// the libcurl easy handle
-	CURL *_handle;
+	/// the as_object which owns the connection
+	as_object* _owner;
 
-	// the libcurl multi handle
-	CURLM *_mhandle;
-#endif
-
-	// transfer in progress
-	int _running;
-
-	// Attempt at filling the cache up to the given size.
-	// Will call libcurl routines to fetch data.
-	void fill_cache(off_t size);
-
-	// Append sz bytes to the cache
-	size_t cache(void *from, size_t sz);
-
-	void printInfo();
-
-	// Callback for libcurl, will be called
-	// by fill_cache() and will call cache() 
-	static size_t recv(void *buf, size_t  size, 
-		size_t  nmemb, void *userp);
-
-	// If the file is local
-	bool localFile;
-
-	// The NetStream object which handles the video playback
-	// Watch out for circular dependencies, see NetStream.h
-	as_object* netStreamObj;
-
-	// Total filesize
-	double totalSize;
-
-	// Callback for libcurl, will be used to detect total filesize
-	static int progress_callback(void *clientp, double dltotal, 
-		double dlnow, double ultotal, double ulnow);
-
-
+	/// The file connection
+	tu_file* _stream;
 };
 
 void netconnection_class_init(as_object& global);
