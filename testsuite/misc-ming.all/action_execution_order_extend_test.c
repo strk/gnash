@@ -60,7 +60,7 @@ main(int argc, char** argv)
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  add_actions(mo, " trace('as in frame0 of root');"); // can't use 'note' here, as it's not been defined yet
+  add_actions(mo, " trace('as in frame1 of root');"); // can't use 'note' here, as it's not been defined yet
   SWFMovie_nextFrame(mo); /* 1st frame */
 
   mc_blu = newSWFMovieClip();
