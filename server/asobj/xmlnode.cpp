@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.14 2007/03/03 17:07:47 martinwguy Exp $ */
+/* $Id: xmlnode.cpp,v 1.15 2007/03/05 22:33:20 ann Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -402,12 +402,12 @@ XMLNode::stringify(XMLNode *xml, stringstream *xmlout)
 void
 attachXMLNodeInterface(as_object& o)
 {
-    o.init_member("appendChild", &xmlnode_appendchild);
-    o.init_member("cloneNode", &xmlnode_clonenode);
-    o.init_member("hasChildNodes", &xmlnode_haschildnodes);
-    o.init_member("insertBefore", &xmlnode_insertbefore);
-    o.init_member("removeNode", &xmlnode_removenode);
-    o.init_member("toString", &xmlnode_tostring);
+    o.init_member("appendChild", new builtin_function(xmlnode_appendchild));
+    o.init_member("cloneNode", new builtin_function(xmlnode_clonenode));
+    o.init_member("hasChildNodes", new builtin_function(xmlnode_haschildnodes));
+    o.init_member("insertBefore", new builtin_function(xmlnode_insertbefore));
+    o.init_member("removeNode", new builtin_function(xmlnode_removenode));
+    o.init_member("toString", new builtin_function(xmlnode_tostring));
 
     // Properties - FIXME: use addProperty !
 

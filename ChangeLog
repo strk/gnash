@@ -1,3 +1,8 @@
+2007-03-05 Ann Barcomb <ann@lulu.com>
+
+	* server/asobj/xmlnode.cpp: convert init_member to new
+          interface.
+
 2007-03-05 Sandro Santilli <strk@keybit.net>
 
 	* server/: character.h, sprite_instance.{h,cpp}:
