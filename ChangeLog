@@ -1,3 +1,10 @@
+2007-03-05 Sandro Santilli <strk@keybit.net>
+
+	* utilities/processor.cpp: don't call gnash::clear, I suspect
+	  we're unable to properly cancel loading threads, and this
+	  being the cause for the occasional segfaults raising on 
+	  'make check' (to be confirmed, hopefully).
+
 2007-03-05 Ann Barcomb <ann@lulu.com>
 
 	* server/asobj/xmlnode.cpp: convert init_member to new

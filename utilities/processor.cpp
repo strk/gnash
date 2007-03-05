@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: processor.cpp,v 1.51 2007/02/25 16:28:47 nihilus Exp $ */
+/* $Id: processor.cpp,v 1.52 2007/03/05 22:58:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -283,7 +283,7 @@ main(int argc, char *argv[])
     }
 
     // Clean up as much as possible, so valgrind will help find actual leaks.
-    gnash::clear();
+    //gnash::clear();
     
     return 0;
 }
