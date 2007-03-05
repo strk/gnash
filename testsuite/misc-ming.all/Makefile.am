@@ -85,6 +85,7 @@ check_PROGRAMS = \
 	simple_loop_test \
 	simple_loop_testrunner \
 	action_execution_order_test \
+	action_execution_order_extend_test \
 	KeyTest-Runner \
 	loadMovieTest \
 	loadMovieTestRunner \
@@ -106,6 +107,7 @@ check_SCRIPTS = \
 	consecutive_goto_frame_testrunner \
 	multi_doactions_and_goto_frame_testrunner \
 	action_execution_order_testrunner \
+	action_execution_order_extend_testrunner \
 	gotoFrame2Test-Runner \
 	$(NULL)
 
@@ -444,6 +446,20 @@ action_execution_order_testrunner: $(srcdir)/../generic-testrunner.sh action_exe
 	sh $< $(top_builddir) action_execution_order_test.swf > $@
 	chmod 755 $@
 
+action_execution_order_extend_test_SOURCES =	\
+	action_execution_order_extend_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+action_execution_order_extend_test_LDADD = $(MING_LIBS)
+
+action_execution_order_extend_test.swf: action_execution_order_extend_test
+	./action_execution_order_extend_test $(top_srcdir)/testsuite/media
+
+action_execution_order_extend_testrunner: $(srcdir)/../generic-testrunner.sh action_execution_order_extend_test.swf
+	sh $< $(top_builddir) action_execution_order_extend_test.swf > $@
+	chmod 755 $@
+
 registerClassTest_SOURCES =	\
 	registerClassTest.c	\
 	ming_utils.h		\
@@ -658,6 +674,7 @@ TEST_CASES = \
 	multi_doactions_and_goto_frame_testrunner \
 	registerClassTestRunner \
 	action_execution_order_testrunner \
+	action_execution_order_extend_testrunner \
 	simple_loop_testrunner \
 	KeyTest-Runner \
 	loadMovieTestRunner \
