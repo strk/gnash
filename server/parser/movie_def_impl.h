@@ -336,7 +336,7 @@ public:
 		return _bytes_loaded;
 	}
 
-	/// Get total number of bytes in input stream
+	/// Get total number of bytes as parsed from the SWF header
 	size_t	get_bytes_total() const {
 		return m_file_length;
 	}

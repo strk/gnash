@@ -103,6 +103,14 @@ public:
 	virtual const rect& get_frame_size() const = 0;
 
 	virtual size_t get_bytes_loaded() const = 0;
+
+	/// Get total number of bytes in (uncompressed for SWF) input stream
+	//
+	/// Note that this is different from actual file size if
+	/// this is a *compressed* SWF.
+	/// For other kind of movie definitions (Bitmaps, for example),
+	/// the returned value should likely match the file size.
+	///
 	virtual size_t get_bytes_total() const = 0;
 	
 	/// Create a playable sprite_instance from a def.
