@@ -1,5 +1,6 @@
 2007-03-05 Sandro Santilli <strk@keybit.net>
 
+	* libgeometry/snappingrange.h: add visit() templated function.
 	* server/parser/movie_def_impl.h, server/parser/movie_definition.h:
 	  Document movie_definition::get_bytes_total().
 	* testsuite/misc-ming.all/Makefile.am: enable run

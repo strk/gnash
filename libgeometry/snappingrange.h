@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.9 2007/03/02 15:30:04 udog Exp $
+// $Id: snappingrange.h,v 1.10 2007/03/05 12:28:22 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -280,10 +280,27 @@ public:
 	
 	/// Visit the current Ranges set
 	//
-	/// Visitor instance will be invoked
+	/// Visitor functor will be invoked
 	/// for each RangeType in the current set.
+	/// 
+	/// The visitor functor will 
+	/// receive a RangeType reference; must return true if
+	/// it wants next item or false to exit the loop.
 	///
-	//template <class V> void visit(V& v) const;
+	template <class V>
+	inline void visit(V& v) const
+	{
+		for (typename RangeList::const_iterator
+			it = _ranges.begin(), itEnd = _ranges.end();
+			it != itEnd;
+			++it)
+		{
+			if ( ! visitor(*it) )
+			{
+				break;
+			}
+		}
+	}
 	
 private:
 
@@ -295,8 +312,7 @@ private:
 	// The current Ranges list
 	RangeList _ranges;
 	
-}; //class SnappingRange
-
+}; //class SnappingRanges2d
 
 /// Standard snapping 2d ranges type for invalidated bounds calculation  
 typedef SnappingRanges2d<float> InvalidatedRanges;
