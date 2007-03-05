@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.10 2007/03/05 12:28:22 strk Exp $
+// $Id: snappingrange.h,v 1.11 2007/03/05 13:23:52 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -288,7 +288,7 @@ public:
 	/// it wants next item or false to exit the loop.
 	///
 	template <class V>
-	inline void visit(V& v) const
+	inline void visit(V& visitor) const
 	{
 		for (typename RangeList::const_iterator
 			it = _ranges.begin(), itEnd = _ranges.end();
