@@ -1,3 +1,9 @@
+2007-03-05 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/action_execution_order_test.c: comments fix;
+	  testsuite/action_execution_order_extend_test.c: a new testcase for testing 
+	  action execution order.
+	  
 2007-03-04 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/curl_adapter.cpp: Added support for getting the total size

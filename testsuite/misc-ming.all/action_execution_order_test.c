@@ -65,7 +65,7 @@ main(int argc, char** argv)
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   add_actions(mo, " trace('as in frame0 of root');"); // can't use 'note' here, as it's not been defined yet
-  SWFMovie_nextFrame(mo);
+  SWFMovie_nextFrame(mo);  /* 1st frame */
 
   mc_blu = newSWFMovieClip();
   sh_blu = make_fill_square (20, 320, 20, 20, 0, 0, 255, 0, 0, 255);
@@ -83,7 +83,7 @@ main(int argc, char** argv)
   mc_red = newSWFMovieClip();
   sh_red = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc_red, (SWFBlock)sh_red);  
-  /* Add mc_blu to mc_red and name it as "mc_red" */
+  /* Add mc_blu to mc_red and name it as "mc_blu" */
   it_blu = SWFMovieClip_add(mc_red, (SWFBlock)mc_blu);  
   SWFDisplayItem_setDepth(it_blu, 3); 
   SWFDisplayItem_setName(it_blu, "mc_blu");
@@ -107,10 +107,10 @@ main(int argc, char** argv)
   check_equals(mo, "typeOf(_root.mc_red)", "'movieclip'");
   check_equals(mo, "typeOf(_root.mc_red.func)", "'undefined'");
   check_equals(mo, "typeOf(_root.mc_red.mc_blu)", "'movieclip'");
-  SWFMovie_nextFrame(mo); /* 1st frame */
+  SWFMovie_nextFrame(mo); /* 2nd frame */
   add_actions(mo, " note('as in frame2 of root'); _root.x2 = \"as_in_root\"; ");
   check_equals(mo, "typeOf(_root.mc_red.func)", "'function'");
-  SWFMovie_nextFrame(mo); /* 2nd frame */
+  SWFMovie_nextFrame(mo); /* 3rd frame */
 
   /* In the frame placing mc_red,  actions in mc_red is executed *after* actions in _root */
   check_equals(mo, "_root.x1", "'as_in_mc_blu'");
@@ -119,7 +119,7 @@ main(int argc, char** argv)
   check_equals(mo, "_root.x3", "'as_in_mc_blu_unload'");
   check_equals(mo, "_root.mc_unload_executed", "1");
   add_actions(mo, " _root.totals(); stop(); ");
-  SWFMovie_nextFrame(mo); /* 3rd frame */
+  SWFMovie_nextFrame(mo); /* 4th frame */
 
   /* Output movie */
   puts("Saving " OUTPUT_FILENAME );
