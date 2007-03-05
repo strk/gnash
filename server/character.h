@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.52 2007/02/28 17:25:25 udog Exp $ */
+/* $Id: character.h,v 1.53 2007/03/05 21:53:48 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -609,6 +609,19 @@ public:
 	virtual void construct()
 	{
 		on_event(event_id::CONSTRUCT);
+	}
+
+	/// Unload this instance from the stage.
+	//
+	/// This function must be called when the character is removed
+	/// from the stage.
+	/// stage for the first time. It will take care of properly
+	/// unloading any child characters and calling the 'UNLOAD'
+	/// event handler.
+	///
+	virtual void unload()
+	{
+		on_event(event_id::UNLOAD);
 	}
 
 	

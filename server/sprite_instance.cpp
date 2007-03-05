@@ -1526,6 +1526,15 @@ public:
 	}
 };
 
+/// A DisplayList visitor used to unload all characters
+struct UnloaderVisitor {
+	bool operator() (character* ch)
+	{
+		ch->unload();
+		return true;
+	}
+};
+
 
 //------------------------------------------------
 // sprite_instance
@@ -3642,6 +3651,19 @@ sprite_instance::construct()
 		(*ctor)(call);
 
 	}
+}
+
+void
+sprite_instance::unload()
+{
+#ifdef GNASH_DEBUG
+	log_msg("Unloading sprite '%s'", getTargetPath().c_str());
+#endif
+
+	UnloaderVisitor visitor;
+	m_display_list.visitForward(visitor);
+	on_event(event_id::UNLOAD); // if call_unload
+
 }
 
 void

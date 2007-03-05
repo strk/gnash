@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.73 2007/02/28 17:25:26 udog Exp $ */
+/* $Id: sprite_instance.h,v 1.74 2007/03/05 21:53:48 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -364,6 +364,10 @@ public:
 	/// TODO: possibly have this function call the onConstruct() event handler
 	///
 	void construct();
+
+	/// Unload all contents in the displaylist and this instance
+	/// See character::unload for more info
+	void unload();
 
 	/// Updates the transform properties of the object at
 	/// the specified depth.

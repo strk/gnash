@@ -403,7 +403,7 @@ DisplayList::clear(bool call_unload)
 		{
 			DisplayItem& di = *it;
 			if ( ! it->get() ) continue;
-			di->on_event(event_id::UNLOAD); // if call_unload
+			di->unload(); // if call_unload
 		}
 	}
 		
@@ -444,7 +444,7 @@ void DisplayList::clear_unaffected(std::vector<uint16>& affected_depths, bool ca
 
 		if (is_affected == false)
 		{
-			if ( call_unload ) di->on_event(event_id::UNLOAD);
+			if ( call_unload ) di->unload();
 			it = _characters.erase(it);
 			continue;
 		}
@@ -473,7 +473,7 @@ DisplayList::clear_except(std::vector<character*>& exclude, bool call_unload)
 
 		if (is_affected == false)
 		{
-			if ( call_unload ) di->on_event(event_id::UNLOAD);
+			if ( call_unload ) di->unload();
 			it = _characters.erase(it);
 			continue;
 		}
@@ -504,7 +504,7 @@ DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 
 		if (is_affected == false)
 		{
-			if ( call_unload ) di->on_event(event_id::UNLOAD);
+			if ( call_unload ) di->unload();
 			it = _characters.erase(it);
 			continue;
 		}
@@ -535,7 +535,7 @@ DisplayList::clear(const DisplayList& from, bool call_unload)
 
 		if (is_affected)
 		{
-			if ( call_unload ) di->on_event(event_id::UNLOAD);
+			if ( call_unload ) di->unload();
 			it = _characters.erase(it);
 			continue;
 		}

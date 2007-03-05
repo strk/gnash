@@ -169,7 +169,7 @@ main(int argc, char** argv)
   /* actions in main timeline is executed *after* mc_blu.onEnterFrame */
   check_equals(mo, "_root.y5", "'as_in_root'");
   /* actions in main timeline is executed *before* mc_blu.onUnload */
-  xcheck_equals(mo, "_root.y6", "'mc_blu onUnload called'");
+  check_equals(mo, "_root.y6", "'mc_blu onUnload called'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 5th frame */
   

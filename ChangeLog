@@ -1,3 +1,13 @@
+2007-03-05 Sandro Santilli <strk@keybit.net>
+
+	* server/: character.h, sprite_instance.{h,cpp}:
+	  Add character::unload() virtual method to properly unload
+	  child elements.
+	* server/dlist.cpp: call character::unload() rather then
+	  directly invoking the UNLOAD event.
+	* testsuite/misc-ming.all/action_execution_order_extend_test.c:
+	  Do not expect failures of unload event execution.
+
 2007-03-05 Ann Barcomb <ann@lulu.com>
 
 	* doc/C/internals.xml: section 'ActionScript Support' was updated
