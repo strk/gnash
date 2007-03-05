@@ -88,6 +88,10 @@ main(int argc, char** argv)
   it_red = SWFMovie_add(mo, (SWFBlock)mc_red);  
   SWFDisplayItem_setDepth(it_red, 20); 
   SWFDisplayItem_setName(it_red, "mc_red");
+  SWFDisplayItem_addAction(it_red,
+		compileSWFActionCode("note('mc_red clip load executed'); "
+			"_root.y1bis = 'mc_red onClipLoad called';"),
+		SWFACTION_ONLOAD);
   
   add_actions(mo, " note('as in frame2 of root'); var x1 = \"as_in_root\"; ");
   add_actions(mo, " _root.mc_red.onLoad = function () \
@@ -149,8 +153,9 @@ main(int argc, char** argv)
   check_equals(mo, "_root.x2", "'as_in_root'");
   SWFMovie_nextFrame(mo); /* 4th frame */
   
-  /* mc_red Onload is not called */
-  xcheck_equals(mo, "_root.y1", "undefined");
+  /* mc_red onload is only called IFF onClipEvent(load) is also defined! */
+  check_equals(mo, "_root.y1", "'mc_red onLoad called'");
+  xcheck_equals(mo, "_root.y1bis", "'mc_red onClipLoad called'");
   /* actions in main timeline is executed *after* mc_red.onEnterFrame */
   check_equals(mo, "_root.y2", "'as_in_root'");
   /* actions in main timeline is executed *before* mc_red.onUnload in

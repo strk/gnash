@@ -1,5 +1,9 @@
 2007-03-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/action_execution_order_extend_test.c:
+	  Add onLoad *clip* event and verify that having the clip event
+	  defined triggers actual execution of the the onLoad event
+	  for it (even the user-defined one!).
 	* libgeometry/snappingrange.h: add visit() templated function.
 	* server/parser/movie_def_impl.h, server/parser/movie_definition.h:
 	  Document movie_definition::get_bytes_total().
