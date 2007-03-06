@@ -1,3 +1,10 @@
+2007-03-06 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionCallMethod): when method name
+	  is undefined, we must use the provided object's constructor.
+	* testsuite/misc-mtasc.all/function.as: add (failing) test for
+	  'this' pointer being correctly set on ActionCallMethod.
+
 2007-03-06 Ann Barcomb <ann@lulu.com>
 
 	* server/asobj/xmlsocket.cpp: convert init_member to new

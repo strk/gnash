@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.53 2007/03/06 14:57:06 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.54 2007/03/06 15:14:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2635,20 +2635,33 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	);
 
 	as_value method_val;
-	as_object *obj = obj_value.to_object(); // for this_ptr
+	as_object* obj = obj_value.to_object(); // for this_ptr, but should probably not be used that wayobject
 	if ( method_name.is_undefined() )
 	{
 		method_val = obj_value;
 		if ( ! method_val.is_function() )
 		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("ActionCallMethod: "
-				"Tried to invoke an %s value as method.",
-				obj_value.typeOf());
-			);
-			env.drop(nargs+2);
-			env.top(0).set_undefined(); // should we push an object anyway ?
-			return;
+			// TODO: all this crap should go into an as_object::getConstructor instead
+			as_value ctor;
+			if ( ! obj->get_member("constructor", &ctor) )
+			{
+				IF_VERBOSE_ASCODING_ERRORS(
+				log_aserror("ActionCallMethod: object has no constructor");
+				);
+				env.drop(nargs+2);
+				env.top(0).set_undefined();
+				return;
+			}
+			if ( ! ctor.is_function() )
+			{
+				IF_VERBOSE_ASCODING_ERRORS(
+				log_aserror("ActionCallMethod: object constructor is not a function");
+				);
+				env.drop(nargs+2);
+				env.top(0).set_undefined(); 
+				return;
+			}
+			method_val = ctor;
 		}
 	}
 	else
