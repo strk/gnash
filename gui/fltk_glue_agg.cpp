@@ -63,8 +63,7 @@ FltkAggGlue::initBuffer(int width, int height)
 
 #define CHUNK_SIZE (100 * 100 * depth_bytes)
 
-    //int bufsize = static_cast<int>(width * height * depth_bytes / CHUNK_SIZE + 1) * CHUNK_SIZE;
-    int bufsize = height * _stride;
+    int bufsize = (width * height * depth_bytes / CHUNK_SIZE + 1) * CHUNK_SIZE;
 
     _offscreenbuf = new unsigned char[bufsize];
 
@@ -81,6 +80,13 @@ FltkAggGlue::initBuffer(int width, int height)
     _validbounds.setTo(0, 0, _width, _height);
     _drawbounds = _validbounds;
 
+}
+
+void
+FltkAggGlue::render(geometry::Range2d<int>& bounds)
+{
+    _drawbounds = bounds;
+    redraw();
 }
 
 void
@@ -106,17 +112,6 @@ FltkAggGlue::resize(int width, int height)
 
     delete [] _offscreenbuf;
     initBuffer(width, height);
-}
-
-void
-FltkAggGlue::invalidateRegion(const rect& bounds)
-{
-    _renderer->set_invalidated_region(bounds);
-
-    _drawbounds = Intersection(
-			// add two pixels because of anti-aliasing...
-			_renderer->world_to_pixel(bounds).growBy(2),
-			_validbounds);
 }
 
 } // namespace gnash

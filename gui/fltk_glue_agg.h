@@ -45,7 +45,8 @@ class FltkAggGlue : public fltk::Widget
       render_handler* createRenderHandler();
       void initBuffer(int width, int height);
       void resize(int width, int height);
-      void invalidateRegion(const rect& bounds);
+      void render(geometry::Range2d<int>& bounds);
+
 
     private:
       int _width;

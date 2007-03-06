@@ -145,7 +145,6 @@ class DSOEXPORT GtkGui : public Gui
     GtkMenu     *_popup_menu;
     GtkWidget   *_menubar;
     GtkWidget   *_vbox;
-    //geometry::Range2d<int> _drawbounds;
     std::vector< geometry::Range2d<int> > _drawbounds;
 
 #ifdef RENDERER_CAIRO

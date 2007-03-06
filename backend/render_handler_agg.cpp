@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.64 2007/03/06 11:07:22 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.65 2007/03/06 17:40:04 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -505,7 +505,7 @@ public:
   /// owned by the renderer and init_buffer() may be called multiple times
   /// when the buffer size changes, for example. However, bits_per_pixel must
   /// remain the same. 
-  /// This method *must* be called prior to any other method of the class! 
+  /// This method *must* be called prior to any other method of the class!
   void init_buffer(unsigned char *mem, int size, int x, int y)
   {
         assert(x > 0);
@@ -579,11 +579,10 @@ public:
 		    agg::rgba8 color)
 	{
 			assert(region.isFinite());
-	    unsigned int width = region.width()+1;
-	    if (width < 1)
+	    if (region.width() < 1)
 	    {
 		log_warning("clear_framebuffer() called with width=%d",
-			width);
+			region.width());
 		return;
 	    }
     
@@ -594,10 +593,11 @@ public:
 		return;
 	    }
 	    unsigned int left=region.getMinX();
+
 	    for (unsigned int y=region.getMinY(), maxy=region.getMaxY();
 		    y<=maxy; ++y) 
 	    {
-		m_pixf->copy_hline(left, y, width, color);
+		m_pixf->copy_hline(left, y, region.width(), color);
 	    }
   }
 

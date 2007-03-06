@@ -61,7 +61,6 @@ FltkGui::~FltkGui()
 void
 FltkGui::renderBuffer()
 {
-#if 0
     // FLTK has a nice mechanism where you can set damage() to whatever you want
     // so in draw() you can check what exactly you want to redraw. But
     // unfortunately it doesn't seem to remember what bits you turn on. So I'll
@@ -69,18 +68,24 @@ FltkGui::renderBuffer()
     static bool firstRun = true;
 
     if (firstRun) {
-      // Redraw the whole rendering area.
-      rect draw_bounds(0, 0, _width, _height);
-      setInvalidatedRegion(draw_bounds);
-      firstRun = false;
+      using namespace geometry;
+      Range2d<int> bounds(0, 0, _width, _height);
+      _glue->render(bounds);
+
+      return;
     }
-#endif
 
-    rect bounds;
-    bounds.set_world();
-    _glue->invalidateRegion(bounds);
+    if (! _drawbounds_vec.size() ) { 
+      return; // XXX what about Cairo?
+    }
+  
+    for (unsigned bno=0; bno < _drawbounds_vec.size(); bno++) {
+       geometry::Range2d<int>& bounds = _drawbounds_vec[bno];
 
-    _glue->redraw();
+       assert ( bounds.isFinite() );
+
+       _glue->render(bounds);
+    }
 }
 
 int
@@ -339,7 +344,7 @@ FltkGui::createMenu()
 
     _popup_menu->begin();
 
-     addMenuItems();
+    addMenuItems();
 
     _popup_menu->end();
 
@@ -361,12 +366,6 @@ FltkGui::layout()
       _glue->resize(w(), h() - _menu_height);
       resize_view(w(), h() - _menu_height);
     }
-
-    // Invalidate the whole drawing area.
-    rect draw_bounds(0, 0, _width, _height);
-    setInvalidatedRegion(draw_bounds);
-
-    _glue->redraw();
 }
 
 void 
@@ -389,13 +388,40 @@ FltkGui::setCursor(gnash_cursor_type newcursor)
 }
 
 void
-FltkGui::setInvalidatedRegion(const rect& bounds)
+FltkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
-#if 0
-    // temporarily disabled
-    _glue->invalidateRegion(bounds);
-#endif
+    // forward to renderer
+    //
+    // Why? Why have the region been invalidated ??
+    // Was the renderer offscreen buffer also invalidated
+    // (need to rerender)?
+    // Was only the 'onscreen' buffer be invalidated (no need to rerender,
+    // just to blit) ??
+    //
+    // To be safe just assume this 'invalidated' region is actually
+    // the offscreen buffer, for safety, but we need to clarify this.
+    //
+    _renderer->set_invalidated_regions(ranges);
+
+    _drawbounds_vec.clear();
+
+    for (int rno=0; rno<ranges.size(); rno++) {
+
+      geometry::Range2d<int> bounds = Intersection(
+      _renderer->world_to_pixel(ranges.getRange(rno)),
+      _validbounds);
+
+      // it may happen that a particular range is out of the screen, which 
+      // will lead to bounds==null. 
+      if (bounds.isNull()) continue;
+
+      assert(bounds.isFinite());
+
+      _drawbounds_vec.push_back(bounds);
+
+    }
 }
+
 
 
 // end of namespace

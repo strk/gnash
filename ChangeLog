@@ -1,3 +1,10 @@
+2007-03-06 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_agg.cpp: Fix an off-by-one error causing
+	invalid memory accesses.
+	* gui/fltk{.cpp, sup.h, _glue_agg.cpp, _glue_agg.h}: Reimplement AGG
+	clipping using the new interfaces.
+
 2007-03-06 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.cpp (to_to_string): positive Infinity 
@@ -35,7 +42,7 @@
 2007-03-06 Ann Barcomb <ann@lulu.com>
 
 	* server/asobj/xmlsocket.cpp: convert init_member to new
-          syntax.
+	syntax.
 
 2007-03-06 Sandro Santilli <strk@keybit.net>
 

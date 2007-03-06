@@ -55,7 +55,7 @@ public:
     virtual void setCursor(gnash_cursor_type newcursor);
     virtual bool setupEvents() { return true;}
 
-    void setInvalidatedRegion(const rect& bounds);
+    void setInvalidatedRegions(const InvalidatedRanges& ranges);
 
     void create();
     int handle(int event);
@@ -67,6 +67,8 @@ public:
     fltk::PopupMenu  *_popup_menu;
     float _interval;
     unsigned int _menu_height;
+
+    std::vector< geometry::Range2d<int> > _drawbounds_vec;
 
 #ifdef RENDERER_AGG
     FltkAggGlue *_glue;
