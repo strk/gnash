@@ -304,6 +304,9 @@ Gui::display(movie_root* m)
 		// scan through all sprites to compute invalidated bounds  
 		m->add_invalidated_bounds(changed_ranges, false);
 		
+		// grow ranges by a 2 pixels to avoid anti-aliasing issues		
+		changed_ranges.growBy(40.0f / _xscale);
+		
 		// optimize ranges
 		changed_ranges.combine_ranges();
 		

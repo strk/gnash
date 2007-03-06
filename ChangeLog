@@ -12,6 +12,9 @@
 	* backend/render_handler_agg.cpp: Round outline edge anchor points to
 	  eliminate anti-aliasing blur and to do it the MM way...; draw outlines 	
 	  always with at least 1.0 pixels width
+	* libgeometry/snappingrange2d.h: Implement growBy()
+	* gui/gui.cpp: grow invalidated ranges by 2 pixels to solve anti-aliasing
+	  and outline displacement problems 	
 
 2007-03-06 Sandro Santilli <strk@keybit.net>
 

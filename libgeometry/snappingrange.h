@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.11 2007/03/05 13:23:52 strk Exp $
+// $Id: snappingrange.h,v 1.12 2007/03/06 14:27:22 udog Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -128,6 +128,20 @@ public:
 	void add(SnappingRanges2d<T> other_ranges) {
 		for (unsigned int rno=0; rno<other_ranges.size(); rno++)
 			add(other_ranges.getRange(rno));
+	}
+	
+	/// Grows all ranges by the specified amount 
+	void growBy(T amount) {
+	
+		if (isWorld() || isNull()) 
+			return;
+		
+		unsigned rcount = _ranges.size();
+		
+		for (unsigned int rno=0; rno<rcount; rno++)
+			_ranges[rno].growBy(amount);
+			
+		combine_ranges();
 	}
 	
 	/// Combines known ranges. Previously merged ranges may have come close
