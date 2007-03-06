@@ -1,5 +1,8 @@
 2007-03-06 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (to_to_string): positive Infinity 
+	  doesn't have the plus sign prepended (at least for SWF5, didn't
+	  check with other targets).
 	* server/vm/ASHandlers.cpp (ActionCallMethod): properly
 	  setup the 'this' pointer when not specified in the tag
 	  itself as the object parameter.
