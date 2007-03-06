@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: debugger.h,v 1.7 2007/03/02 15:50:42 strk Exp $ */
+/* $Id: debugger.h,v 1.8 2007/03/06 08:22:44 strk Exp $ */
 
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
@@ -50,11 +50,11 @@ public:
 
     void dissasemble(const unsigned char *data);
     void dissasemble();
-    void setBreakPoint(std::string &var, bool enabled);
-    void removeBreakPoint(std::string &var);
+    void setBreakPoint(const std::string &var, bool enabled);
+    void removeBreakPoint(const std::string &var);
     void dumpBreakPoints();
     /// Does the function name match any breakpoints ?
-    bool matchBreakPoint(std::string &var, bool);
+    bool matchBreakPoint(const std::string &var, bool);
 
     /// Set a watchpoint of a variable. Gnash stops and generates a
     /// command prompt when there is a match.
@@ -122,14 +122,14 @@ public:
     void changeLocalVariable(as_environment &env, std::string &var, as_value &val);
     
     // Change the value of a local variable
-    void changeLocalRegister(int index, as_value &val);
-    void changeLocalRegister(as_environment &env, int index, as_value &val);
+    void changeLocalRegister(unsigned index, as_value &val);
+    void changeLocalRegister(as_environment &env, unsigned index, as_value &val);
     
     // Change the value of a local variable
-    void changeGlobalRegister(int index, as_value &val);
-    void changeGlobalRegister(as_environment &env, int index, as_value &val);
+    void changeGlobalRegister(unsigned index, as_value &val);
+    void changeGlobalRegister(as_environment &env, unsigned index, as_value &val);
 
-    void callStackPush(std::string &str) { _callstack.push_back(str); };
+    void callStackPush(const std::string &str) { _callstack.push_back(str); };
     void callStackPop() { _callstack.pop_back(); };
     void callStackDump();
     std::string &callStackFrame() { return _callstack.back(); };

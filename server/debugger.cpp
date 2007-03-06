@@ -406,14 +406,14 @@ Debugger::dissasemble(const unsigned char *data)
 }
 
 void
-Debugger::setBreakPoint(std::string &func, bool enabled)
+Debugger::setBreakPoint(const std::string &func, bool enabled)
 {
 //    GNASH_REPORT_FUNCTION;
     _breakpoints[func] = enabled;
 }
 
 void
-Debugger::removeBreakPoint(std::string &func)
+Debugger::removeBreakPoint(const std::string &func)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -445,7 +445,7 @@ Debugger::dumpBreakPoints()
 }
 
 bool
-Debugger::matchBreakPoint(std::string &func, bool state)
+Debugger::matchBreakPoint(const std::string &func, bool state)
 {
 //    GNASH_REPORT_FUNCTION;
     std::map<std::string, bool>::const_iterator it;
@@ -650,31 +650,29 @@ Debugger::changeLocalVariable(as_environment &env, std::string &var, as_value &v
 
 // Change the value of a local variable
 void
-Debugger::changeLocalRegister(int index, as_value &val)
+Debugger::changeLocalRegister(unsigned index, as_value &val)
 {
 //    GNASH_REPORT_FUNCTION;
-    this->changeLocalRegister(*_env, index, val);
+    changeLocalRegister(*_env, index, val);
 }
 
 void
-Debugger::changeLocalRegister(as_environment &env, int index, as_value &val)
+Debugger::changeLocalRegister(as_environment &env, unsigned index, as_value &val)
 {
 //    GNASH_REPORT_FUNCTION;
-    if (index <= env.num_local_registers()) {
-	env.set_local_register(static_cast<uint8_t>(index), val);
-    }
+	env.set_local_register(index, val);
 }   
 
 // Change the value of a global variable
 void
-Debugger::changeGlobalRegister(int index, as_value &val)
+Debugger::changeGlobalRegister(unsigned index, as_value &val)
 {
 //    GNASH_REPORT_FUNCTION;
     this->changeLocalRegister(*_env, index, val);
 }
 
 void
-Debugger::changeGlobalRegister(as_environment &env, int index, as_value &val)
+Debugger::changeGlobalRegister(as_environment &env, unsigned index, as_value &val)
 {
 //    GNASH_REPORT_FUNCTION;
     env.set_global_register(index, val);

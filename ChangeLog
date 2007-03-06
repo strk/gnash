@@ -1,3 +1,8 @@
+2007-03-06 Sandro Santilli <strk@keybit.net>
+
+	* server/debugger.{h,cpp}: use unsigned types for register indexes;
+	  properly accept *const* string refs.
+
 2007-03-05 Sandro Santilli <strk@keybit.net>
 
 	* utilities/processor.cpp: don't call gnash::clear, I suspect
