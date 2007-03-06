@@ -1,5 +1,9 @@
 2007-03-06 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.cpp (instanceOf): made circular inheritance an
+	  aserror. 
+	* testsuite/actionscript.all/Inheritance.as: test circular inheritance
+	  detection.
 	* server/vm/ASHandlers.cpp (ActionWith): survive empty 'with' blocks.
 	* testsuite/actionscript.all/with.as: test empty 'with' block.
 

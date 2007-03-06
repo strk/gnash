@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.26 2007/03/04 00:58:53 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.27 2007/03/06 11:08:46 strk Exp $";
 
 #include "check.as"
 
@@ -279,3 +279,18 @@ check_equals(typeof(t4.die), 'function');
 var b = t4.die(4);
 check_equals(typeof(b), 'undefined');
 
+//------------------------------------------------
+// Test circular inheritance
+//------------------------------------------------
+
+function Test5() {}
+function Test4() {}
+Test5.__proto__ = Test4.prototype;
+Test4.__proto__ = Test5.prototype;
+var t5 = new Test5; 
+var t4 = new Test4;
+
+check(t5 instanceOf Test5);
+check(! t5 instanceOf Test4);
+check(t4 instanceOf Test4);
+check(! t4 instanceOf Test5);

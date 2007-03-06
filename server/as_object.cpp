@@ -320,7 +320,10 @@ as_object::instanceOf(as_function* ctor)
 		obj = obj->get_prototype(); 
 	}
 
-	if ( obj ) log_warning("Circular inheritance chain detected during instanceOf call");
+	// See actionscript.all/Inheritance.as for a way to trigger this
+	IF_VERBOSE_ASCODING_ERRORS(
+	if ( obj ) log_aserror("Circular inheritance chain detected during instanceOf call");
+	);
 
 	return false;
 }
