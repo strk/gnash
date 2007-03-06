@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.12 2007/03/06 14:27:22 udog Exp $
+// $Id: snappingrange.h,v 1.13 2007/03/06 15:23:38 udog Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -81,7 +81,8 @@ public:
 	SnappingRanges2d() 
 		:
 		snap_distance(0),
-		single_mode(false)
+		single_mode(false),
+		_combine_counter(0)
 	{
 	}
 	
@@ -119,7 +120,7 @@ public:
 			// reached this point we need a new range 
 			_ranges.push_back(range);
 			
-			combine_ranges();
+			combine_ranges_lazy();
 		}
 	}
 	
@@ -141,7 +142,7 @@ public:
 		for (unsigned int rno=0; rno<rcount; rno++)
 			_ranges[rno].growBy(amount);
 			
-		combine_ranges();
+		combine_ranges_lazy();
 	}
 	
 	/// Combines known ranges. Previously merged ranges may have come close
@@ -152,6 +153,8 @@ public:
 			return;
 	
 		bool restart=true;
+		
+		_combine_counter=0;
 		
 		while (restart) {
 		
@@ -185,6 +188,15 @@ public:
 	
 	}
 	
+	
+	/// Calls combine_ranges() once in a while, but not always. Avoids too many
+	/// combine_ranges() checks, which could slow down everything.
+	void combine_ranges_lazy() {
+		_combine_counter++;
+		if (_combine_counter > 5) 
+			combine_ranges();
+	}
+			
 	/// returns true, when two ranges should be merged together
 	inline bool snaptest(const RangeType& range1, const RangeType& range2) {
 	
@@ -243,11 +255,13 @@ public:
 	
 	/// Returns the number of ranges in the list
 	size_type size() const {
+		finalize();
 		return _ranges.size();
 	}
 	
 	/// Returns the range at the specified index
 	RangeType getRange(unsigned int index) const {
+		finalize();
 		assert(index<size());
 		
 		return _ranges[index];
@@ -282,6 +296,8 @@ public:
 	
 	/// Returns true if any of the ranges contains the point
 	bool contains(T x, T y) const {
+	
+		finalize();
 	
 		for (unsigned rno=0, rcount=_ranges.size(); rno<rcount; rno++) 
 		if (_ranges[rno].contains(x,y))
@@ -322,9 +338,19 @@ private:
 		if (b<0) b*=-1;
 		return min(a,b);
 	}
+	
+	void finalize() const {
+		if (_combine_counter > 0) {
+			SnappingRanges2d<T>* me_nonconst = const_cast< SnappingRanges2d<T>* > (this); 
+			me_nonconst->combine_ranges();
+		}
+	} 
+	
 		
 	// The current Ranges list
 	RangeList _ranges;
+	
+	unsigned int _combine_counter;
 	
 }; //class SnappingRanges2d
 

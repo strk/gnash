@@ -1,3 +1,8 @@
+2007-03-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* libgeometry/snappingrange2d.h: do not call combine_ranges() too 
+	  often	
+
 2007-03-06 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (ActionCallMethod): when method name
