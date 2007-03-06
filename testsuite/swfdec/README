@@ -1,0 +1,5 @@
+This directory is intended to be filled with Makefiles allowing
+run of the swfdec testsuite with Gnash.
+Currently there's only a simple stabbed tester for single movies,
+in the future I'd like to add a --with-swfdec-testsuite configure
+switch to run all tests as part of our 'make check' rule.

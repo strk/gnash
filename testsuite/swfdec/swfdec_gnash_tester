@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+	echo "Usage: `basename $0` <swffile>" >&2
+	exit 1
+fi
+
+in="$1"
+out="${in}.trace-gnash"
+exp="${in}.trace"
+
+GPROCESSOR=/extra/gnash-cvs/bin/gprocessor
+
+${GPROCESSOR} -r10 -v "$in"  | grep TRACE | sed 's/.*TRACE: //' | fromdos > $out
+diff "$exp" "$out"

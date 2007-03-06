@@ -1,3 +1,8 @@
+2007-03-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/swfdec/: README, swfdec_gnash_tester:
+	  Initial stuff to hook on swfdec testsuite.
+
 2007-03-06 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_agg.cpp: Fix an off-by-one error causing
