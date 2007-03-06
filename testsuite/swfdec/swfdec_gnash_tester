@@ -1,15 +1,23 @@
-#!/bin/sh
+#!/bin/sh 
+
+# Get this from environment if available
+GPROCESSOR=${GPROCESSOR:=gprocessor}
 
 if [ -z "$1" ]; then
 	echo "Usage: `basename $0` <swffile>" >&2
 	exit 1
 fi
 
+echo "Using gprocessor ${GPROCESSOR}"
+
 in="$1"
 out=`basename "${in}"`.trace-gnash
 exp="${in}.trace"
 
-GPROCESSOR=/extra/gnash-cvs/bin/gprocessor
-
 ${GPROCESSOR} -r10 -v "$in"  | grep TRACE | sed 's/.*TRACE: //' | fromdos > $out
-diff -u3 "$exp" "$out"
+if test "$?" != 0; then
+	exit 1
+else
+	diff -u3 "$exp" "$out"
+	exit $?
+fi
