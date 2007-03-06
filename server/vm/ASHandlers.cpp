@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.50 2007/03/02 19:19:30 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.51 2007/03/06 08:31:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2607,85 +2607,103 @@ SWFHandlers::ActionDecrement(ActionExec& thread)
 void
 SWFHandlers::ActionCallMethod(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+//	GNASH_REPORT_FUNCTION;
 
-    thread.ensureStack(3);  // method_name, obj, nargs
+	as_environment& env = thread.env;
 
-    as_value result;
+	thread.ensureStack(3);  // method_name, obj, nargs
 
-    // Some corner case behaviors depend on the SWF file version.
-    //int version = env.get_version();
+	// Some corner case behaviors depend on the SWF file version.
+	//int version = env.get_version();
 
-    // Get name of the method
-    string method_name = env.top(0).to_std_string();
+	// Get name function of the method
+	as_value& method_name = env.top(0);
 
-    // Get an object
-    as_value& obj_value = env.top(1);
-    as_object *obj = obj_value.to_object();
+	// Get an object
+	as_value& obj_value = env.top(1);
 
-    // Get number of arguments
-    unsigned nargs = unsigned(env.top(2).to_number());
+	// Get number of arguments
+	unsigned nargs = unsigned(env.top(2).to_number());
 
-    thread.ensureStack(3+nargs); // actual args
+	thread.ensureStack(3+nargs); // actual args
+
 
 	IF_VERBOSE_ACTION (
-    log_action(" method name: %s", method_name.c_str());
-    log_action(" method object: %p", (void*)obj);
-    log_action(" method nargs: %d", nargs);
+	log_action(" method name: %s", method_name.to_string());
+	log_action(" method object/func: %p", obj_value.to_string());
+	log_action(" method nargs: %d", nargs);
 	);
 
-	// for temporarly storing result of automatic
-	// String and Number conversion
-	boost::intrusive_ptr<as_object> obj_ptr;
+	as_value method_val;
+	as_object *obj = obj_value.to_object(); // for this_ptr
+	if ( method_name.is_undefined() )
+	{
+		method_val = obj_value;
+		if ( ! method_val.is_function() )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("ActionCallMethod: "
+				"Tried to invoke an %s value as method.",
+				obj_value.typeOf());
+			);
+			env.drop(nargs+2);
+			env.top(0).set_undefined(); // should we push an object anyway ?
+			return;
+		}
+	}
+	else
+	{
+		if ( ! obj )
+		{
+			// SWF integrity check 
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("ActionCallMethod: "
+				"Tried to invoke method '%s' on non-object value %s.",
+				method_name.to_string(),
+				obj_value.typeOf());
+			);
+			env.drop(nargs+2);
+			env.top(0).set_undefined();
+			return;
+		}
 
-    if (!obj)
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-          log_aserror("call_method invoked in something that "
-            "doesn't cast to an as_object: %s",
-            obj_value.to_string());
-        );
-    }
-    else
-    {
-        as_value method;
-        //if (obj->get_member(method_name, &method))
-        if ( thread.getObjectMember(*obj, method_name, method) )
-        {
-          if ( ! method.is_function() ) 
-          {
-              IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror("call_method: '%s' is not a method",
-                    method_name.c_str());
-              );
-          }
-          else
-          {
+		string method_string = method_name.to_std_string();
+		if ( ! thread.getObjectMember(*obj, method_string, method_val) )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_swferror("ActionCallMethod: "
+				"Can't find method %s of object %s",
+				method_name.to_string(),
+				obj_value.to_string());
+			);
+			env.drop(nargs+2);
+			env.top(0).set_undefined(); // should we push an object anyway ?
+			return;
+		}
+	}
+
 #ifdef USE_DEBUGGER
-//        cerr << "FIXME: method name is: " << method_name << endl;
-              debugger.callStackPush(method_name);
-              debugger.matchBreakPoint(method_name, true);
+//	cerr << "FIXME: method name is: " << method_name << endl;
+//	// IT IS NOT GUARANTEE WE DO HAVE A METHOD NAME HERE !
+	if ( ! method_name.is_undefined() )
+	{
+		debugger.callStackPush(method_name.to_std_string());
+		debugger.matchBreakPoint(method_name.to_std_string(), true);
+	}
+	else
+	{
+		log_warning("FIXME: debugger doesn't deal with anonymous function calls");
+	}
 #endif
-            result = call_method( method, &env, obj, nargs,
-                env.get_top_index() - 3);
-          }
-        }
-        else
-        {
-            IF_VERBOSE_ASCODING_ERRORS(
-                log_aserror("call_method can't find method %s "
-                    "for object %s (%p)", method_name.c_str(), 
-                    typeid(*obj).name(), (void*)obj);
-            );
-        }
-    }
-    
-    env.drop(nargs + 2);
-    env.top(0) = result;
 
-    // This is to check stack status after call method
-    //log_msg("at doActionCallMethod() end, stack: "); env.dump_stack();
+	as_value result = call_method(method_val, &env, obj,
+			nargs, env.get_top_index()-3);
+    
+	env.drop(nargs + 2);
+	env.top(0) = result;
+
+	// This is to check stack status after call method
+	//log_msg("at doActionCallMethod() end, stack: "); env.dump_stack();
     
 }
 

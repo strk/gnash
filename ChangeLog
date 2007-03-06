@@ -1,5 +1,9 @@
 2007-03-06 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionCallMethod): use object as a
+	  function when method name is undefined. This makes a step
+	  forward with laszlo, altough I'm not sure about wheter
+	  the 'this' pointer is correctly set to the function itself.
 	* server/debugger.{h,cpp}: use unsigned types for register indexes;
 	  properly accept *const* string refs.
 
