@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.62 2007/02/28 17:25:25 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.63 2007/03/06 09:57:13 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -873,13 +873,28 @@ public:
     float /*pixel_scale*/,
     const std::vector<fill_style>& fill_styles,
     const std::vector<line_style>& line_styles) {
+    
+    bool have_shape, have_outline;
+    
+    analyze_paths(def->get_paths(), have_shape, have_outline);
+    
+    if (!have_shape && !have_outline) 
+			return; // invisible character
 
     std::vector< path > paths;
     std::vector< agg::path_storage > agg_paths;
-    
+    std::vector< agg::path_storage > agg_paths_rounded;
     apply_matrix_to_path(def->get_paths(), paths, mat);
-    build_agg_paths(agg_paths, paths);
+    if (have_shape)
+    	build_agg_paths(agg_paths, paths);
+    	
+    // <Udo>: not sure if the anchor points of the *shape* edges should be
+    // rounded too...
     
+    if (have_outline) {
+	    agg_paths_rounded.reserve(agg_paths.size());
+	    build_agg_paths_rounded(agg_paths_rounded, paths);
+	  }
     
     if (m_drawing_mask) {
       
@@ -898,7 +913,8 @@ public:
     
     	// prepare fill styles
     	agg_style_handler sh;
-    	build_agg_styles(sh, fill_styles, mat, cx);
+    	if (have_shape)
+    		build_agg_styles(sh, fill_styles, mat, cx);
     	
     	/*
     	// prepare strokes
@@ -910,8 +926,10 @@ public:
       const int subshape_count=count_sub_shapes(paths);
       
       for (int subshape=0; subshape<subshape_count; subshape++) {
-        draw_shape(subshape, paths, agg_paths, sh, true);    
-        draw_outlines(subshape, paths, agg_paths, line_styles, cx, mat);
+				if (have_shape)
+        	draw_shape(subshape, paths, agg_paths, sh, true);    
+				if (have_outline)      
+        	draw_outlines(subshape, paths, agg_paths_rounded, line_styles, cx, mat);
       }
       
     } // if not drawing mask
@@ -920,6 +938,36 @@ public:
     _clipbounds_selected.clear();
     
   } // draw_shape_character
+  
+  
+  /// Analyzes a set of paths to detect real presence of fills and/or outlines
+	/// TODO: This should be something the character tells us and should be 
+	/// cached. 
+  void analyze_paths(const std::vector<path> &paths, bool& have_shape,
+		bool& have_outline) {
+		
+		have_shape=false;
+		have_outline=false;
+		
+		int pcount = paths.size();
+		
+		for (int pno=0; pno<pcount; pno++) {
+		
+			const path &the_path = paths[pno];
+		
+			if ((the_path.m_fill0>0) || (the_path.m_fill1>0)) {
+				have_shape=true;
+				if (have_outline) return; // have both
+			}
+		
+			if (the_path.m_line>0) {
+				have_outline=true;
+				if (have_shape) return; // have both
+			}
+		
+		}
+		
+	}
 
 
   /// Takes a path and translates it using the given matrix. The new path
@@ -1030,6 +1078,47 @@ public:
 		}
 	  
 	} //build_agg_paths
+	
+	
+	// Version of build_agg_paths that uses rounded coordinates.
+	// This is used for outlines which are aligned to the pixel grid to avoid
+	// anti-aliasing problems (a perfect horizontal line being drawn over two
+	// lines and looking blurry). The proprietary player does this too.  
+	// Remember the middle of a pixel is at .5 / .5 (at it's subpixel center). 
+	void build_agg_paths_rounded(std::vector<agg::path_storage>& dest, 
+		const std::vector<path>& paths) {
+	
+	  
+	  int pcount = paths.size();
+
+		dest.resize(pcount);	  
+	  
+	  for (int pno=0; pno<pcount; pno++) {
+	  	
+	  	const gnash::path& this_path = paths[pno];
+			agg::path_storage& new_path = dest[pno];
+			
+			new_path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
+			
+			int ecount = this_path.m_edges.size();
+			
+			for (int eno=0; eno<ecount; eno++) {
+				
+				const edge& this_edge = this_path.m_edges[eno];
+				
+        if (this_edge.is_straight())
+          new_path.line_to(round(this_edge.m_ax*xscale)+0.5, 
+						round(this_edge.m_ay*yscale)+0.5);
+        else
+          new_path.curve3(this_edge.m_cx*xscale, this_edge.m_cy*yscale,
+            round(this_edge.m_ax*xscale)+0.5, round(this_edge.m_ay*yscale)+0.5);
+				
+				
+			}
+		
+		}
+	  		
+	} //build_agg_paths_rounded
 	
 	
 	// Builds vector strokes for paths

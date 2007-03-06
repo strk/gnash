@@ -1,3 +1,8 @@
+2007-03-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: Round outline edge anchor points to
+	  eliminate anti-aliasing blur and to do it the MM way...	
+
 2007-03-06 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-mtasc.all/: Makefile.am, TestClass.as, function.as:
