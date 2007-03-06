@@ -4,7 +4,8 @@ class Test extends TestClass
 {
 	function Test()
 	{
-		super();
+		_root.check_equals(typeof(super), 'object');
+		super(); // how can we invoke an object here !?
 	}
 
 	static function main(mc)
