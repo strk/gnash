@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.55 2007/03/06 16:05:18 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.56 2007/03/06 16:56:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2634,15 +2634,20 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	log_action(" method nargs: %d", nargs);
 	);
 
+	string method_string = method_name.to_std_string();
 	as_value method_val;
 	as_object* obj = obj_value.to_object(); 
-	if ( method_name.is_undefined() )
+	if ( method_name.is_undefined() || method_string.empty() )
 	{
 
 		// Does this ever happen ?
-		//method_val = obj_value;
-		//if ( ! method_val.is_function() )
-		//{
+		method_val = obj_value;
+		if ( ! method_val.is_function() )
+		{
+			log_warning("Function object given to ActionCallMethod"
+				       " is not a function, will try to use"
+				       " its 'constructor' member");
+
 			if ( ! obj )
 			{
 				log_error("ActionCallMethod invoked with "
@@ -2675,7 +2680,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 			}
 			method_val = ctor;
 			obj = thread.getThisPointer();
-		//}
+		}
 	}
 	else
 	{
@@ -2693,7 +2698,6 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 			return;
 		}
 
-		string method_string = method_name.to_std_string();
 		if ( ! thread.getObjectMember(*obj, method_string, method_val) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -2762,8 +2766,9 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 		return;
 	}
 
+	string method_string = method_name.to_std_string();
 	as_value method_val;
-	if ( method_name.is_undefined() )
+	if ( method_name.is_undefined() || method_string.empty() )
 	{
 		method_val = obj_val;
 		if ( ! method_val.is_function() )
@@ -2780,13 +2785,12 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 	}
 	else
 	{
-		string method_string = method_name.to_std_string();
 		if ( ! thread.getObjectMember(*obj, method_string, method_val) )
 		{
 			IF_VERBOSE_MALFORMED_SWF(
 			log_swferror("ActionNewMethod: "
 				"can't find method %s of object %s",
-				method_name.to_string(), obj_val.to_string());
+				method_string.c_str(), obj_val.to_string());
 			);
 			env.drop(nargs);
 			env.push(as_value()); // should we push an object anyway ?
