@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.8 2007/02/20 19:31:30 strk Exp $";
+rcsid="$Id: with.as,v 1.9 2007/03/06 10:16:04 strk Exp $";
 
 #include "check.as"
 
@@ -117,3 +117,10 @@ with(obj1)
 {
 	check_equals(get_name(), "obj1");
 }
+
+//---------------------------------------------------------
+// Test empty 'with' block
+//---------------------------------------------------------
+
+with(_root) { ; }
+// not aborting is enough to pass this test
