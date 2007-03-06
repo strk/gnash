@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.52 2007/03/06 10:22:18 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.53 2007/03/06 14:57:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2630,7 +2630,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
 	IF_VERBOSE_ACTION (
 	log_action(" method name: %s", method_name.to_string());
-	log_action(" method object/func: %p", obj_value.to_string());
+	log_action(" method object/func: %s", obj_value.to_string());
 	log_action(" method nargs: %d", nargs);
 	);
 
