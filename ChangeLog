@@ -9,6 +9,8 @@
 	invalid memory accesses.
 	* gui/fltk{.cpp, sup.h, _glue_agg.cpp, _glue_agg.h}: Reimplement AGG
 	clipping using the new interfaces.
+	* macros/boost.m4: Fix order of lines so that the value of LIBS is
+	properly restored. Fixes bug #19211.
 
 2007-03-06 Sandro Santilli <strk@keybit.net>
 
