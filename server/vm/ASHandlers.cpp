@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.51 2007/03/06 08:31:21 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.52 2007/03/06 10:22:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3115,18 +3115,30 @@ SWFHandlers::ActionWith(ActionExec& thread)
 	++pc; // skip tag code
 
 	int tag_length = code.read_int16(pc); // read tag len (should be 2)
-	assert(tag_length == 2); // or SWF is malformed !
+	if ( tag_length != 2 )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("ActionWith tag length != 2 - skipping");
+		);
+		return;
+	}
 	pc += 2; // skip tag len
 
-	int block_length = code.read_int16(pc); // read 'with' body size
-	assert(block_length > 0);
+	unsigned block_length = code.read_int16(pc); // read 'with' body size
+	if ( block_length == 0 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Empty with() block...");
+		);
+		return;
+	}
 	pc += 2; // skip with body size
 
 	// now we should be on the first action of the 'with' body
 	assert(thread.next_pc == pc);
 
 	// where does the 'with' block ends ?
-	int block_end = thread.next_pc + block_length;
+	unsigned block_end = thread.next_pc + block_length;
 
 	if ( ! thread.pushWithEntry(with_stack_entry(with_obj, block_end)) )
 	{

@@ -1,6 +1,7 @@
 2007-03-06 Sandro Santilli <strk@keybit.net>
 
-	* testsuite/actionscript.all/with.as: test empty with block.
+	* server/vm/ASHandlers.cpp (ActionWith): survive empty 'with' blocks.
+	* testsuite/actionscript.all/with.as: test empty 'with' block.
 
 2007-03-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
