@@ -11,6 +11,8 @@ class Test extends TestClass
 	static function main(mc)
 	{
 		var myTest = new Test;
-		_root.check_equals(myTest.TestClassCtorCalled, 'called');
+		// odd enough, if we output an SWF7 movie, this fails
+		// with the reference player too !x
+		_root.xcheck_equals(myTest.TestClassCtorCalled, 'called');
 	}
 }
