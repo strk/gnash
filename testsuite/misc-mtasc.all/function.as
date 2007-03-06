@@ -33,7 +33,7 @@ class Test extends TestClass
 
 		// This checks that the 'this' pointer is properly set
 		// (and shows it's NOT properly set with Gnash)
-		_root.xcheck_equals(typeof(myTest.__proto__.TestClassCtorCalled), 'undefined');
+		_root.check_equals(typeof(myTest.__proto__.TestClassCtorCalled), 'undefined');
 
 		// This checks that the 'this' pointer is properly set for "normal"
 		// ActionCallMethod (see setX(2) in Test ctor)	

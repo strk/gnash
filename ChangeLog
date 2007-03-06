@@ -1,5 +1,18 @@
 2007-03-06 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionCallMethod): properly
+	  setup the 'this' pointer when not specified in the tag
+	  itself as the object parameter.
+	* server/vm/ActionExec.{h,cpp}:
+	  Add a _this_ptr member and a getThisPointer() function
+	  for use with function calls.
+	* server/swf_function.cpp (operator()): setup the this_ptr
+	  in ActionExec instance.
+	* testsuite/misc-mtasc.all/function.as: unexpect last failure.
+	  Looking for more failures now...
+
+2007-03-06 Sandro Santilli <strk@keybit.net>
+
         * testsuite/misc-mtasc.all/function.as:
           Add a (succeeding) test for 'this' pointer being correctly set
 	  on ActionCallMethod with *defined* name.

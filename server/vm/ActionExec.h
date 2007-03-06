@@ -25,6 +25,7 @@
 
 #include "with_stack_entry.h"
 #include "as_environment.h" // for ensureStack
+#include "smart_ptr.h"
 
 #include <vector>
 
@@ -73,6 +74,9 @@ private:
 	/// and maintained in a stack (the call stack)
 	///
 	const swf_function* _func;
+
+	/// The 'this' pointer, if this is a function call
+	boost::intrusive_ptr<as_object> _this_ptr;
 
 	size_t _initial_stack_size;
 
@@ -157,13 +161,16 @@ public:
 	/// @param nRetval
 	///	Where to return a value. If NULL any return will be discarded.
 	///
-	ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal);
+	ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal, as_object* this_ptr);
 
 	/// Is this execution thread a function2 call ?
 	bool isFunction2() { return _function_var==2; }
 
 	/// Is this execution thread a function call ?
 	bool isFunction() { return _function_var!=0; }
+
+	/// Get the current 'this' pointer, for use in function calls
+	as_object* getThisPointer() { return _function_var ? _this_ptr.get() : getTarget(); }
 
 	/// Returns 'with' stack associated with this execution thread
 	// 

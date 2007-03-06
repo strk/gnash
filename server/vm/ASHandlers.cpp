@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.54 2007/03/06 15:14:52 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.55 2007/03/06 16:05:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2635,12 +2635,24 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	);
 
 	as_value method_val;
-	as_object* obj = obj_value.to_object(); // for this_ptr, but should probably not be used that wayobject
+	as_object* obj = obj_value.to_object(); 
 	if ( method_name.is_undefined() )
 	{
-		method_val = obj_value;
-		if ( ! method_val.is_function() )
-		{
+
+		// Does this ever happen ?
+		//method_val = obj_value;
+		//if ( ! method_val.is_function() )
+		//{
+			if ( ! obj )
+			{
+				log_error("ActionCallMethod invoked with "
+						"undefined method_name "
+						"and non-object object/func");
+				env.drop(nargs+2);
+				env.top(0).set_undefined();
+				return;
+			}
+
 			// TODO: all this crap should go into an as_object::getConstructor instead
 			as_value ctor;
 			if ( ! obj->get_member("constructor", &ctor) )
@@ -2662,7 +2674,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 				return;
 			}
 			method_val = ctor;
-		}
+			obj = thread.getThisPointer();
+		//}
 	}
 	else
 	{

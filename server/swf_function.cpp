@@ -316,7 +316,7 @@ swf_function::operator()(const fn_call& fn)
 
 	// Execute the actions.
 	//ActionExec exec(*m_action_buffer, *our_env, m_start_pc, m_length, fn.result, m_with_stack, m_is_function2);
-	ActionExec exec(*this, *our_env, fn.result);
+	ActionExec exec(*this, *our_env, fn.result, fn.this_ptr);
 	exec();
 
 	our_env->popCallFrame();

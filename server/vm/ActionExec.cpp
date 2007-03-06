@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ActionExec.cpp,v 1.21 2007/02/28 09:46:48 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.22 2007/03/06 16:05:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -73,13 +73,14 @@ void	register_fscommand_callback(fscommand_callback handler)
     s_fscommand_handler = handler;
 }
 
-ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal)
+ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal, as_object* this_ptr)
 	:
 	with_stack(func.getWithStack()),
 	// See comment in header
 	_with_stack_limit(7),
 	_function_var(func.isFunction2() ? 2 : 1),
 	_func(&func),
+	_this_ptr(this_ptr),
 	code(func.getActionBuffer()),
 	pc(func.getStartPC()),
 	stop_pc(pc+func.getLength()),
