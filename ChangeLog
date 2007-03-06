@@ -1,5 +1,8 @@
 2007-03-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-mtasc.all/: Makefile.am, TestClass.as, function.as:
+	  Testcase for ActionCallMethod showing the 'this' pointer is not
+	  correctly set in Gnash when we lack a method name.
 	* server/vm/ASHandlers.cpp (ActionCallMethod): use object as a
 	  function when method name is undefined. This makes a step
 	  forward with laszlo, altough I'm not sure about wheter

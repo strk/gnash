@@ -28,7 +28,10 @@ MTASC_FLAGS= -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
 ASTESTS =			\
 	hello.as		\
 	inheritance.as		\
+	function.as		\
  	$(NULL)
+
+EXTRA_DIST = TestClass.as
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)
 
