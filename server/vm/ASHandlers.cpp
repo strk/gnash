@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.56 2007/03/06 16:56:45 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.57 2007/03/06 23:58:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2701,7 +2701,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 		if ( ! thread.getObjectMember(*obj, method_string, method_val) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_swferror("ActionCallMethod: "
+			log_aserror("ActionCallMethod: "
 				"Can't find method %s of object %s",
 				method_name.to_string(),
 				obj_value.to_string());
@@ -2787,8 +2787,8 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 	{
 		if ( ! thread.getObjectMember(*obj, method_string, method_val) )
 		{
-			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("ActionNewMethod: "
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("ActionNewMethod: "
 				"can't find method %s of object %s",
 				method_string.c_str(), obj_val.to_string());
 			);
