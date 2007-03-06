@@ -6,7 +6,8 @@
 2007-03-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: Round outline edge anchor points to
-	  eliminate anti-aliasing blur and to do it the MM way...	
+	  eliminate anti-aliasing blur and to do it the MM way...; draw outlines 	
+	  always with at least 1.0 pixels width
 
 2007-03-06 Sandro Santilli <strk@keybit.net>
 

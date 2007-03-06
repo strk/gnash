@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.63 2007/03/06 09:57:13 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.64 2007/03/06 11:07:22 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -114,6 +114,7 @@ AGG ressources
 
 
 #include <vector>
+#include <cmath>
 
 #include "gnash.h"
 #include "types.h"
@@ -1084,7 +1085,17 @@ public:
 	// This is used for outlines which are aligned to the pixel grid to avoid
 	// anti-aliasing problems (a perfect horizontal line being drawn over two
 	// lines and looking blurry). The proprietary player does this too.  
-	// Remember the middle of a pixel is at .5 / .5 (at it's subpixel center). 
+	// Remember the middle of a pixel is at .5 / .5 (at it's subpixel center).
+	//
+	// TODO:
+	// For "correct" results alignment should be done only in these cases:
+	//   - the line is straight and pure horizontal or vertical
+	//   - the line width on screen is 1.0
+	// However this leads to awful rounded rectangles, but the MM player 
+	// does it that way... :(
+	// BTW, most probably this is for speed reasons (those lines are most
+	// probably implemented without anti-aliasing calculations, like a 
+	// Bresenham line). 
 	void build_agg_paths_rounded(std::vector<agg::path_storage>& dest, 
 		const std::vector<path>& paths) {
 	
@@ -1098,7 +1109,8 @@ public:
 	  	const gnash::path& this_path = paths[pno];
 			agg::path_storage& new_path = dest[pno];
 			
-			new_path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
+			new_path.move_to(round(this_path.m_ax*xscale)+0.5f, 
+				round(this_path.m_ay*yscale)+0.5f);
 			
 			int ecount = this_path.m_edges.size();
 			
@@ -1107,11 +1119,13 @@ public:
 				const edge& this_edge = this_path.m_edges[eno];
 				
         if (this_edge.is_straight())
-          new_path.line_to(round(this_edge.m_ax*xscale)+0.5, 
-						round(this_edge.m_ay*yscale)+0.5);
+          new_path.line_to(round(this_edge.m_ax*xscale)+0.5f, 
+						round(this_edge.m_ay*yscale)+0.5f);
         else
-          new_path.curve3(this_edge.m_cx*xscale, this_edge.m_cy*yscale,
-            round(this_edge.m_ax*xscale)+0.5, round(this_edge.m_ay*yscale)+0.5);
+          new_path.curve3(round(this_edge.m_cx*xscale)+0.5f, 
+						round(this_edge.m_cy*yscale)+0.5f,
+            round(this_edge.m_ax*xscale)+0.5f, 
+						round(this_edge.m_ay*yscale)+0.5f);
 				
 				
 			}
@@ -1597,7 +1611,7 @@ public:
 	      if (width==1)
 	        stroke.width(1);
 	      else
-	        stroke.width(width*stroke_scale);
+	        stroke.width(std::max(1.0f, width*stroke_scale));
 	        
 	      stroke.line_cap(agg::round_cap);	      
 	      stroke.line_join(agg::round_join); 
