@@ -479,9 +479,10 @@ xmlsocket_new(const fn_call& fn)
     
     as_object*	xmlsock_obj = new xmlsocket_as_object;
     //log_msg("\tCreated New XMLSocket object at 0x%X\n", (unsigned int)xmlsock_obj);
-    xmlsock_obj->init_member("connect", &xmlsocket_connect);
-    xmlsock_obj->init_member("send", &xmlsocket_send);
-    xmlsock_obj->init_member("close", &xmlsocket_close);
+    xmlsock_obj->init_member("connect",
+                             new builtin_function(xmlsocket_connect));
+    xmlsock_obj->init_member("send", new builtin_function(xmlsocket_send));
+    xmlsock_obj->init_member("close", new builtin_function(xmlsocket_close));
     xmlsock_obj->init_member("Connected", true);
     // swf_event*	ev = new swf_event;
     // m_event_handlers.push_back(ev);
