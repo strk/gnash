@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.31 2007/02/25 15:45:32 nihilus Exp $
+dnl $Id: boost.m4,v 1.32 2007/03/06 18:06:13 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -34,9 +34,8 @@ AC_DEFUN([GNASH_PATH_BOOST],
   fi ])
 
   dnl Attempt to find the top level directory, which unfortunately has a
-  dnl version number attached. At least on Debain based systems, this
+  dnl version number attached. At least on Debian based systems, this
   dnl doesn't seem to get a directory that is unversioned.
-
   AC_MSG_CHECKING([for the Boost Version])
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x; then
@@ -132,12 +131,17 @@ dnl    	      break
     for k in ${boostnames}; do
       if test -f ${ac_cv_path_boost_lib}/lib${k}.a -o -f ${ac_cv_path_boost_lib}/lib${k}.so; then
         if test x"${ac_cv_path_boost_lib}" != x"/usr/lib"; then
-	  ac_cv_path_boost_lib="-L${ac_cv_path_boost_lib} -l${k}"
+	        ac_cv_path_boost_lib="-L${ac_cv_path_boost_lib} -l${k}"
+          break
         else
           ac_cv_path_boost_lib="-l${k}"
+          break
         fi
       fi
     done
+	  if test -f $k/libboost_date_time.a -o $k/libboost_date_time.so; then
+      ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -lboost_date_time"
+    fi
   fi
   if test x"${ac_cv_path_boost_lib}" = x; then
     AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib="${LIBS}"])

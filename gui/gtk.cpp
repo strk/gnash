@@ -14,10 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
-/* $Id: gtk.cpp,v 1.73 2007/03/03 15:10:40 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.74 2007/03/06 18:06:13 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

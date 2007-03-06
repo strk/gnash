@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.71 2007/01/26 19:41:41 rsavoye Exp $ */
+/* $Id: plugin.cpp,v 1.72 2007/03/06 18:06:12 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -84,7 +84,7 @@ PR_CALLBACK Destructor(void * /* data */)
 char*
 NPP_GetMIMEDescription(void)
 {
-    return MIME_TYPES_DESCRIPTION;
+    return const_cast<char *>(MIME_TYPES_DESCRIPTION);
 }
 
 //

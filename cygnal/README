@@ -4,8 +4,8 @@ Adobe Communication server's features, as these will determine a
 rough feature set for Cygnal. Some of the limitations commented on in
 these notes should be consider a place where Cygnal can do better.
 
-Flash Communication Server features:
------------------------------------
+General Communication Server features:
+-------------------------------------
 
 The most common way of streaming Flash movies is using progressive
 streaming. Progressive streams don't allow seeking within the data
@@ -31,8 +31,8 @@ when running. Some statistics modify the stream while it is playing,
 and the other are for load balancing on larger installations, like a
 cluster.
 
-The server can also transcode between codecs. The MacroMedia server
-can only real MPEG4.. Since the server is using Gstreamer, it can
+The server can also transcode between codecs. The Adobe server
+can only convert MPEG4. Since the Cygnal server is using Gstreamer, it can
 convert between any supported codec. Along with this, by using the
 statistics collected for each data transfer, the server can also
 change the resolution of the movie to adjust to varying network
@@ -81,8 +81,8 @@ network connections.
 * Audio and data have the highest priority, video packets are thrown
 away to stay synchronized.
 
-Internals:
----------
+Cygnal Internals:
+----------------
 
 Since all data streams need no knowledge of other streams, each
 incoming connection will get a new thread to handle it. If the CPU

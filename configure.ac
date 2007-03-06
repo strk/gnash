@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.268 2007/03/03 15:48:37 martinwguy Exp $
+dnl $Id: configure.ac,v 1.269 2007/03/06 18:06:12 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -53,17 +53,6 @@ AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
 AC_DISABLE_STATIC dnl Disable building static libs.
-
-AC_ARG_ENABLE(fork, AC_HELP_STRING([--disable-fork],[Use a thread instead forking the standalone player.]),
-[case "${enableval}" in
-  yes) fork=yes ;;
-  no)  fork=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-fork option]) ;;
-esac],fork=yes)
-
-if test x"$fork" = x"yes"; then
-  AC_DEFINE([USE_FORK], [], [Fork player instead of thread])
-fi
 
 AC_ARG_ENABLE(debugger, AC_HELP_STRING([--disable-debugger],[Disable the Flash debugger]),
 [case "${enableval}" in
@@ -252,6 +241,7 @@ if test x$pixelformat = xall; then
     fi
   fi
 fi
+
 dnl --------------------------------------------------------
 dnl  Select sound streamer
 dnl --------------------------------------------------------
@@ -307,9 +297,10 @@ dnl To override thise, use the --with-*-incl= and --with-*-libs=
 dnl options to configure.
 if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([Configuring Gnash for cross compilation])
-  export incllist="${prefix}/${host_alias}/include ${prefix}/include"
-  export libslist="${prefix}/${host_alias}/lib ${prefix}/lib64 ${prefix}/lib32 ${prefix}/lib"
-  export pathlist="${prefix}/${host_alias}/bin:${prefix}/bin"
+  export pkgroot=`$CXX -print-search-dirs | grep "install:" | sed -e 's/install: //' -e 's:/lib/gcc/.*::'`
+  export incllist="${pkgroot}/${host_alias}/include ${pkgroot}/include"
+  export libslist="${pkgroot}/${host_alias}/lib ${pkgroot}/lib64 ${pkgroot}/lib32 ${pkgroot}/lib"
+  export pathlist="${pkgroot}/${host_alias}/bin:${pkgroot}/bin"
   LDFLAGS="${LDFLAGS} -Wl,--as-needed"
   plugin=no
 else

@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.38 2007/02/11 06:21:30 rsavoye Exp $
+dnl $Id: gnashpkgtool.m4,v 1.39 2007/03/06 18:06:13 rsavoye Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
@@ -34,13 +34,14 @@ AC_DEFUN([GNASH_PKG_INCLUDES],
   pushdef([DOWN], translit([$1], [A-Z], [a-z]))dnl Lowercase
   pushdef([UPHEADER], translit([$2], [a-z./], [A-Z__]))dnl Uppercase header
 
-  AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]), [
-    case "${enableval}" in
-      yes) $1=yes ;;	
-      no)  $1=no ;;
-      *)   AC_MSG_ERROR([bad value ${enableval} for enable-$1 option]) ;;
-    esac], $1=yes)
+dnl   AC_ARG_ENABLE($1, AC_HELP_STRING([--enable-$1], [Enable support for $3.]), [
+dnl     case "${enableval}" in
+dnl       yes) $1=yes ;;	
+dnl       no)  $1=no ;;
+dnl       *)   AC_MSG_ERROR([bad value ${enableval} for enable-$1 option]) ;;
+dnl     esac], $1=yes)
 
+    $1=yes
     if test x$4 = x; then
       name=$1 
     else

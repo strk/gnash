@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,10 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
-//
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -110,7 +106,7 @@ Network::operator = (Network &net)
 bool
 Network::createServer(void)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     return createServer(DEFAULTPORT);
 }
@@ -118,7 +114,7 @@ Network::createServer(void)
 bool
 Network::createServer(short port)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     struct protoent *ppe;
     struct sockaddr_in sock_in;
@@ -126,6 +122,11 @@ Network::createServer(short port)
     int             retries = 0;
     in_addr_t       nodeaddr;
 
+    if (port < 1024) {
+	log_error("Can't connect to priviledged port #%d!\n", port);
+	return false;
+    }
+  
     const struct hostent *host = gethostbyname("localhost");
     struct in_addr *thisaddr = reinterpret_cast<struct in_addr *>(host->h_addr_list[0]);
     _ipaddr = thisaddr->s_addr;
@@ -191,9 +192,11 @@ Network::createServer(short port)
         log_msg("Host Name is %s, IP is %s", host->h_name, ascip);
 #endif
     
-        log_msg("Server bound to service on port: %hd, %s using fd #%d\n",
-                ntohs(sock_in.sin_port), inet_ntoa(sock_in.sin_addr),
-                _listenfd);
+	if (_debug) {
+	    log_msg("Server bound to service on port: %hd, %s using fd #%d\n",
+		    ntohs(sock_in.sin_port), inet_ntoa(sock_in.sin_addr),
+		    _listenfd);
+	}
         
         if (type == SOCK_STREAM && listen(_listenfd, 5) < 0) {
             log_msg("ERROR: unable to listen on port: %hd: %s ",
@@ -218,7 +221,7 @@ Network::createServer(short port)
 bool
 Network::newConnection(void)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     return newConnection(true);
 }
@@ -226,7 +229,7 @@ Network::newConnection(void)
 bool
 Network::newConnection(bool block)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     struct sockaddr	newfsin;
     socklen_t		alen;
@@ -299,8 +302,10 @@ Network::newConnection(bool block)
         log_msg("unable to accept : %s\n", strerror(errno));
         return false;
     }
-  
-    log_msg("Accepting tcp/ip connection on fd #%d\n", _sockfd);
+
+    if (_debug) {
+	log_msg("Accepting tcp/ip connection on fd #%d\n", _sockfd);
+    }
 
     return true;
 }
@@ -456,7 +461,7 @@ Network::createClient(const char *hostname, short port)
 bool
 Network::closeNet()
 {  
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     if (_sockfd > 0) {
         closeNet(_sockfd);
@@ -470,7 +475,7 @@ Network::closeNet()
 bool
 Network::closeNet(int sockfd)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     
     int retries = 0;
     
@@ -577,15 +582,14 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
     if (fd) {
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
-
-        // Reset the timeout value, since select modifies it on return
-        // Reset the timeout value, since select modifies it on return
-        if (timeout <= 0) {
-            timeout = 5;
-        }
-        tval.tv_sec = timeout;
-        tval.tv_usec = 0;
-        ret = select(fd+1, &fdset, NULL, NULL, &tval);
+	
+        if (timeout < 0) {
+	    tval.tv_sec = 5;
+	    tval.tv_usec = 0;
+	    ret = select(fd+1, &fdset, NULL, NULL, &tval);
+        } else {
+	    ret = select(fd+1, &fdset, NULL, NULL, NULL);
+	}
         
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
@@ -606,8 +610,10 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
         }
     
         ret = read(fd, buffer, nbytes);
-        dbglogfile << "read " << ret << " bytes from fd #"
-                   << fd << endl;
+	if (_debug) {
+	    dbglogfile << "read " << ret << " bytes from fd #"
+		       << fd << endl;
+	}
     }
     
     return ret;
@@ -712,12 +718,16 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
         if (ret > 0) {
             bufptr += ret;
             if (ret != nbytes) {
-                dbglogfile << "wrote " << ret << " bytes to fd #" << fd
-                           << " expected " << nbytes << endl;
+		if (_debug) {
+		    dbglogfile << "wrote " << ret << " bytes to fd #" << fd
+			       << " expected " << nbytes << endl;
+		}
 //                retries++;
             } else {
-                dbglogfile << "wrote " << ret << " bytes to fd #"
-                           << fd << endl;
+		if (_debug) {
+		    dbglogfile << "wrote " << ret << " bytes to fd #"
+			       << fd << endl;
+		}
                 return ret;
             }
             

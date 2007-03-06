@@ -1,0 +1,14 @@
+arch_canon:     geode:  i386	1
+buildarchtranslate: geode: i386
+
+os_compat: 	olpc: Linux
+os_canon:       olpc: cross_compile	1
+buildostranslate: olpc: Linux
+
+optflags:	geode	cross_compile   1
+
+buildarchtranslate:	geode: i386
+buildostranslate: 	geode: Linux
+arch_compat: 		geode: i386 i485 i585 i686
+os_compat: 		olpc: Linux
+

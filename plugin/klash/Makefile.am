@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.27 2007/02/19 02:00:56 rsavoye Exp $
+# $Id: Makefile.am,v 1.28 2007/03/06 18:06:13 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -26,6 +26,7 @@ plugindir   = $(libdir)/kde3
 kde_servicesdir = $(prefix)/share/services
 rcdir       = $(prefix)/share/apps/klash
 appsdatadir = $(prefix)/share/apps/klash
+configdir = $(prefix)/share/config
 
 plugin_LTLIBRARIES= libklashpart.la
 
@@ -40,11 +41,12 @@ endif
 dist_kde_services_DATA = klash_part.desktop
 dist_rc_DATA = klashpartui.rc
 dist_appsdata_DATA = pluginsinfo
+#dist_config_DATA = klashrc
 
 # DIST_COMMON = $(dist_appsdata_DATA) $(dist_kde_services_DATA) $(dist_rc_DATA)
 
-BUILT_SOURCES = klash_part.moc klash.moc
-CLEANFILES = klash_part.moc klash.moc
+BUILT_SOURCES = klash_part.moc
+CLEANFILES = klash_part.moc
 
 klash_part.moc: $(srcdir)/klash_part.h
 	@if test x"$(MOC)" != x; then \
@@ -53,15 +55,6 @@ klash_part.moc: $(srcdir)/klash_part.h
 	else  \
 	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
 	  ln -s $(srcdir)/klash_part.moc.in klash_part.moc; \
-	fi
-
-klash.moc: $(srcdir)/klash.cpp
-	@if test x"$(MOC)" != x; then \
-	  echo "Generating MOC file..."; \
-	  $(MOC) $(srcdir)/klash.cpp -o klash.moc; \
-	else  \
-	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
-	  ln -s $(srcdir)/klash.moc.in klash.moc; \
 	fi
 
 install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
@@ -77,3 +70,5 @@ else
 all:
 	$echo "Building klash is disabled"
 endif
+
+force:

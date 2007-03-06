@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: curl.m4,v 1.13 2007/01/21 22:41:02 rsavoye Exp $
+dnl $Id: curl.m4,v 1.14 2007/03/06 18:06:13 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_CURL],
 [
@@ -31,7 +31,7 @@ AC_DEFUN([GNASH_PATH_CURL],
   ])
 
   curlconfig=""
-  AC_CHECK_PROG(curlconfig, [echo], [curl-config], , ${pathlist})
+  AC_PATH_PROG(curlconfig, curl-config, ,[${pathlist}])
   if test x"${curlconfig}" != "x" ; then
     AC_MSG_CHECKING([for RTMP support])
     rtmp=`${curlconfig} --protocols|grep -c RTMP`
@@ -48,7 +48,7 @@ AC_DEFUN([GNASH_PATH_CURL],
   if test x"${ac_cv_path_curl_incl}" = x; then
 
     AC_MSG_CHECKING([for libcurl header])
-    if test x"${curlconfig}" != "x"  -a x$cross_compiling = xno; then
+    if test x"${curlconfig}" != "x"; then
       ac_cv_path_curl_incl=`${curlconfig} --cflags`
     else
       for i in $incllist; do
@@ -88,7 +88,7 @@ AC_DEFUN([GNASH_PATH_CURL],
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_curl_lib}" = x; then # {
 
-    if test x"${curlconfig}" != "x"  -a x$cross_compiling = xno; then # {
+    if test x"${curlconfig}" != "x"; then # {
       ac_cv_path_curl_lib=`${curlconfig} --libs`
     else # }{
       AC_MSG_CHECKING([for libcurl library])

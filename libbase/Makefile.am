@@ -55,9 +55,9 @@ libgnashbase_la_LIBADD = \
 	$(Z_LIBS) \
 	$(CURL_LIBS) \
 	$(OPENGL_LIBS) \
-	$(PTHREAD_LIBS) \
 	$(LIBLTDL) \
 	$(BOOST_LIBS) \
+	$(PTHREAD_LIBS) \
 	$(NULL)
 
 if HAS_SDL
@@ -103,6 +103,7 @@ noinst_HEADERS = \
 	demo.h \
 	dlmalloc.h \
 	extension.h \
+	embedVideoDecoder.h \
 	GnashException.h \
 	grid_index.h \
 	image.h	\

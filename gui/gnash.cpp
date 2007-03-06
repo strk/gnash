@@ -216,9 +216,10 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               break;
           case 'g':
 #ifdef USE_DEBUGGER
-              debugger.enabled(true);
-              debugger.console();
               dbglogfile << "Setting debugger ON" << std::endl;
+              debugger.enabled(true);
+//              debugger.startServer(&debugger);
+              debugger.console();
 #else
               dbglogfile << "WARNING: The debugger has been disabled at configuration time" << std::endl;
 #endif

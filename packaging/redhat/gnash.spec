@@ -1,38 +1,44 @@
+%define version 20070306
 Name:           gnash
-Version:        0.7.2
+Version:        %{version}
 Release:        1%{?dist}
 Summary:        GNU flash movie player
 
 Group:          Applications/Multimedia
+Vendor:		Gnash Project
+Packager:	Rob Savoye <rob@welcomehome.org>
 License:        GPL
 URL:            http://www.gnu.org/software/gnash/
 Source0:        http://www.gnu.org/software/gnash/releases/%{name}-%{version}.tar.gz
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
-BuildRequires:  libxml2-devel libpng-devel libjpeg-devel libogg-devel
-BuildRequires:  boost-devel curl-devel 
+#AutoReqProv: no
+
+BuildRequires:  libxml2 libpng libjpeg libogg
+BuildRequires:  gtk2 libX11 agg
+# BuildRequires:  boost curl
 # the opengl devel packages are required by gtkglext-devel
 # monolithic Xorg
 #BuildRequires:  xorg-x11-devel
 # modular Xorg 
 #BuildRequires:  libGLU-devel libGL-devel
-BuildRequires:  SDL-devel 
-BuildRequires:  kdelibs-devel
-BuildRequires:  gtkglext-devel
+#BuildRequires:  gtkglext-devel
+BuildRequires:  mysql mysqlclient14
+BuildRequires:  SDL
+BuildRequires:  kdelibs
 BuildRequires:  docbook2X
-BuildRequires:  gstreamer-devel >= 0.10
-BuildRequires:  scrollkeeper
+BuildRequires:  gstreamer >= 0.10
+# BuildRequires:  scrollkeeper
 
-Requires(post): scrollkeeper
-Requires(postun): scrollkeeper
+#Requires(post): scrollkeeper
+#Requires(postun): scrollkeeper
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
 
 %description
-Gnash is a GNU Flash movie player based on GameSWF,
-and supports many SWF v7 features.
+Gnash is a GNU Flash movie player that supports many SWF v7 features.
 
 %package plugin
 Summary:   Web-client flash movie player plugin 
@@ -51,40 +57,115 @@ Group:     Applications/Multimedia
 %description klash
 The gnash flash movie player plugin for Konqueror.
 
+%package cygnal
+Summary:   Streaming media server
+Requires:  %{name} = %{version}-%{release}
+Group:     Applications/Multimedia
+
+%description cygnal
+Cygnal is a streaming media server that's Flash aware.
+
 %prep
 %setup -q
 
 %build
-[ -n "$QTDIR" ] || . %{_sysconfdir}/profile.d/qt.sh
-%configure --disable-static --with-plugindir=%{_libdir}/mozilla/plugins \
-  --enable-ghelp --enable-docbook --enable-sound=GST \
-  --disable-dependency-tracking --disable-rpath \
-  --with-qtdir=$QTDIR
-make %{?_smp_mflags}
 
+[ -n "$QTDIR" ] || . %{_sysconfdir}/profile.d/qt.sh
+
+# handle cross building rpms. This gets messy when building for two
+# archtectures with the same CPU type, like x86-Linux -> OLPC. We have
+# to do this because an OLPC requires RPMs to install software, but
+# doesn't have the resources to do native builds. So this hack lets us
+# build RPM packages on one host for the OLPC, or other RPM based
+# embedded distributions.
+%if %{_target_cpu} != %{_build_arch}
+%define cross_compile 1
+%else
+%define cross_compile 0
+%endif
+%{?do_cross_compile:%define cross_compile 1}
+
+%define cross_compile 1
+%define olpc 1
+
+# Build rpms for an ARM based processor, in our case the Nokia 770/800
+# tablet. 
+%ifarch arm
+RPM_TARGET=%{_target}
+%endif
+# Build rpms for an OLPC, which although it's geode based, our
+# toolchain treat this as a stock i386. Our toolchain has geode
+# specific optimizations added, which was properly handled by setting
+# the vendor field of the config triplet to olpc. Since rpm has no
+# concept of a vendor other than Redhat, we force it to use the proper
+# config triplet so configure uses the correct cross compiler.
+%if %{olpc}
+%define _target_platform %{_build_cpu}-%{_build_os}-linux
+RPM_TARGET=i386-olpc-linux
+%endif
+
+%if %{cross_compile}
+# cross building an RPM. This works as long as you have a good cross
+# compiler installed. We currently do want to cross compile the
+# Mozilla plugin, but not the Konqueror one till we make KDE work
+# better than it does now.
+  CROSS_OPTS="--build=%{_host} --host=$RPM_TARGET --target=$RPM_TARGET"
+  RENDERER="--enable-renderer=agg"		# could be opengl
+  %ifarch arm
+    SOUND="--disable-sound --disable-plugin --disable-klash"
+  %else
+    SOUND="--enable-sound=gst"			# could also be sdl
+  %endif
+# The OLPC is a weird case, it's basically an i386-linux toolchain
+# targeted towards Fedora Core 6. The machine itself is too limited to
+# build RPMs on, so we do it this way.
+  %if olpc
+    CROSS_OPTS="$CROSS_OPTS --disable-klash"
+    SOUND="--enable-sound=gst"	# could be sdl
+  %endif
+%else
+# Native RPM build
+  CROSS_OPTS="--enable-ghelp --enable-docbook"
+  SOUND="--enable-sound=sdl --with-mp3-decoder=ffmpeg"
+  RENDERER=""
+%endif
+
+# The default options for the configure aren't suitable for
+# cross configuring, so we force them to be what we know is correct.
+# export CONFIG_SHELL="sh -x"
+# sh -x ./configure \
+./configure \
+	--with-qtdir=$QTDIR \
+	$CROSS_OPTS \
+	$SOUND \
+	$RENDERER \
+	--disable-static \
+	--disable-dependency-tracking \
+	--disable-rpath \
+	--enable-extensions \
+        --prefix=%{_prefix} \
+	--with-plugindir=%{_libdir}/mozilla/plugins
+
+make CXXFLAGS="-g" dumpconfig all
 
 %install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
-rm $RPM_BUILD_ROOT/%{_libdir}/*.la
-rm \
- $RPM_BUILD_ROOT/%{_libdir}/libgnashamf.so \
- $RPM_BUILD_ROOT/%{_libdir}/libgnashbackend.so \
- $RPM_BUILD_ROOT/%{_libdir}/libgnashbase.so \
- $RPM_BUILD_ROOT/%{_libdir}/libgnashgeo.so \
- $RPM_BUILD_ROOT/%{_libdir}/libgnashgui.so \
- $RPM_BUILD_ROOT/%{_libdir}/libgnashserver.so
-rm -rf $RPM_BUILD_ROOT/%{_localstatedir}/scrollkeeper
+rm $RPM_BUILD_ROOT%{_libdir}/*.la
+%if !%{cross_compile}
+rm -rf $RPM_BUILD_ROOT%{_localstatedir}/scrollkeeper
 rm -f $RPM_BUILD_ROOT%{_infodir}/dir
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-
 %post 
 /sbin/ldconfig
+%if !%{cross_compile}
 scrollkeeper-update -q -o %{_datadir}/omf/%{name} || :
 /sbin/install-info --entry="* Gnash: (gnash). GNU Flash Player" %{_infodir}/%{name}.info %{_infodir}/dir || :
+%endif
 
 %preun
 if [ $1 = 0 ]; then
@@ -93,21 +174,32 @@ fi
 
 %postun
 /sbin/ldconfig
+%if !%{cross_compile}
 scrollkeeper-update -q || :
+%endif
 
 %files
 %defattr(-,root,root,-)
+%dump
 %doc README AUTHORS COPYING NEWS 
-%doc doc/C/gnash.html 
-%doc doc/C/images
 %{_bindir}/gnash
 %{_bindir}/gparser
 %{_bindir}/gprocessor
-%{_libdir}/libgnash*-*.so
-%{_mandir}/man1/gnash*
-%{_infodir}/gnash*
-%{_datadir}/gnash/
-%{_datadir}/omf/gnash/
+%{_libdir}/libgnash*.so
+%{_libdir}/gnash/plugins/*.so
+%{_libdir}/gnash/plugins/*.la
+%{_libdir}/libltdl*
+%{_prefix}/include/ltdl.h
+%{_prefix}/share/gnash/GnashG.png
+%{_prefix}/share/gnash/gnash_128_96.ico
+%{_prefix}/man/man1/gnash.1*
+%if !%{cross_compile}
+%doc doc/C/gnash.html 
+%doc %{_prefix}/share/gnash/doc/gnash/C/images
+%{_datadir}/omf/gnash/gnash-C.omf
+%{_infodir}/gnash.info*.gz
+%{_prefix}/share/gnash/doc/gnash/C/*.xml
+%endif
 
 %files plugin
 %defattr(-,root,root,-)
@@ -115,13 +207,21 @@ scrollkeeper-update -q || :
 
 %files klash
 %defattr(-,root,root,-)
-%{_bindir}/klash
+%{_bindir}/gnash
+%if !%{cross_compile}
 %{_libdir}/kde3/libklashpart.*
 %{_datadir}/apps/klash/
-%{_datadir}/config/klashrc
 %{_datadir}/services/klash_part.desktop
+%endif
+
+%files cygnal
+%defattr(-,root,root,-)
+%{_bindir}/cygnal
 
 %changelog
+* Sat Mar  4 2007 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
+- update for OLPC release.
+
 * Sat Nov  6 2006 Rob Savoye <rob@welcomehome.org> - 0.7.2-1
 - update for 0.7.2 release.
 

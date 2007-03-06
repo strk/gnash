@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.59 2007/01/26 19:41:41 rsavoye Exp $
+# $Id: Makefile.am,v 1.60 2007/03/06 18:06:13 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -30,6 +30,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
+        $(LIBXML_CFLAGS) \
         $(SDL_CFLAGS) \
         $(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS) \
@@ -79,10 +80,8 @@ if USE_GUI_SDL
 endif # USE_GUI_SDL
 if USE_GUI_KDE
   KDE_OPENGL_SRCS = kde_glue_opengl.cpp kde_glue_opengl.h
-  AM_LDFLAGS += \
-        $(KDE_LDFLAGS) \
-	$(LIB_KDECORE) \
-	$(LIB_KDEUI)
+  AM_CPPFLAGS += $(KDE_CFLAGS) $(QT_CFLAGS)
+  AM_LDFLAGS +=  $(KDE_LIBS) $(QT_LIBS)
   BUILT_SOURCES = klash.moc
 endif # USE_GUI_KDE
 else # ! USE_RENDERER_OPENGL

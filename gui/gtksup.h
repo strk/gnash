@@ -137,7 +137,7 @@ class DSOEXPORT GtkGui : public Gui
 #endif    
 
     virtual void setCursor(gnash_cursor_type newcursor);
-    
+    GtkWidget *getWindow() { return _window; };
  private:
     GtkWidget   *_window;
     GdkPixbuf 	*_window_icon_pixbuf;

@@ -16,7 +16,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-# $Id: Makefile.am,v 1.3 2007/01/09 00:43:42 rsavoye Exp $
+# $Id: Makefile.am,v 1.4 2007/03/06 18:06:13 rsavoye Exp $
 
 ## Process this file with automake to generate Makefile.in
 
@@ -59,7 +59,7 @@ cygnal_SOURCES = \
 #	transcode.cpp
 #	flash.cpp
 
-noinst_HEADRRS = \
+noinst_HEADERS = \
 	http.h \
 	netstats.h \
 	stream.h \

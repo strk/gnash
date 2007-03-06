@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: mysql.m4,v 1.2 2007/01/09 00:43:43 rsavoye Exp $
+dnl $Id: mysql.m4,v 1.3 2007/03/06 18:06:13 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_MYSQL],
 [
@@ -39,7 +39,7 @@ AC_DEFUN([GNASH_PATH_MYSQL],
   fi
 
   if test x"${ac_cv_prog_mconfig}" != "x" ; then
-     ac_cv_path_mysql_incl=`${mconfig} --cflags`
+     ac_cv_path_mysql_incl=`${mconfig} --include`
   fi
 
   AC_MSG_CHECKING([for MySQL headers])

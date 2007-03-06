@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.63 2007/02/12 23:49:10 strk Exp $
+# $Id: Makefile.am,v 1.64 2007/03/06 18:06:12 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -62,7 +62,7 @@ man_MANS = doc/gnash.1
 
 DIST_SUBDIRS = $(STD_DIRS) doc plugin cygnal extensions
 
-EXTRA_DIST= $(man_MANS)
+EXTRA_DIST= $(man_MANS) macros/incllist macros/libslist
 #EXTRA_DIST = macros
 # if HTTP
 # SUBDIRS += net $(STD_DIRS)
@@ -72,10 +72,17 @@ EXTRA_DIST= $(man_MANS)
 
 noinst_HEADERS = compatibility_include.h
 
+# # Build an RPM package targeted to the OLPC http://www.laptop.org.
+# olpc: dist-gzip $(srcdir)/packaging/redhat/gnash.spec
+# 	cp -f $(srcdir)/packaging/redhat/gnash.spec /usr/src/redhat/SPECS/
+# 	cp -f gnash-$(VERSION).tar.gz /usr/src/redhat/SOURCES/
+# 	rpmbuild -rcfile=$(srcdir)/packaging/redhat/rpmrc:/usr/lib/rpm/rpmrc \
+# 	         -ba --target=geode-olpc /usr/src/redhat/SPECS/gnash.spec
+
 # Build an RPM package
 rpm redhat: dist-gzip $(srcdir)/packaging/redhat/gnash.spec
 	cp -f $(srcdir)/packaging/redhat/gnash.spec /usr/src/redhat/SPECS/
-	cp -f gnash-${VERSION}.tar.gz /usr/src/redhat/SOURCES/
+	cp -f gnash-$(VERSION).tar.gz /usr/src/redhat/SOURCES/
 	rpmbuild -ba /usr/src/redhat/SPECS/gnash.spec
 
 # Build a Debian GNU/Linux package

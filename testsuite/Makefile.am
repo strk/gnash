@@ -15,7 +15,7 @@ SUBDIRS = \
 
 EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h media
 
-dist_noinst_SCRIPTS = anaylse-results.sh
+dist_noinst_SCRIPTS = anaylse-results.sh generic-testrunner.sh
 
 # could not find a way to only build this on make check
 check_LTLIBRARIES = libtestsuite.la 

@@ -14,10 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl  
-dnl 
-
-dnl $Id: opengl.m4,v 1.28 2007/01/09 00:43:43 rsavoye Exp $
+dnl $Id: opengl.m4,v 1.29 2007/03/06 18:06:13 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_OPENGL],
 [
