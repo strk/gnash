@@ -6,11 +6,14 @@
 2007-03-06 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_agg.cpp: Fix an off-by-one error causing
-	invalid memory accesses.
+	invalid memory accesses. Use rint() instead of the missing round()
+	on OpenBSD 3.9.
 	* gui/fltk{.cpp, sup.h, _glue_agg.cpp, _glue_agg.h}: Reimplement AGG
 	clipping using the new interfaces.
 	* macros/boost.m4: Fix order of lines so that the value of LIBS is
 	properly restored. Fixes bug #19211.
+	* server/asobj/Date.cpp: Add an implementation (written by Sandro)
+	of trunc for platforms that don't define it, e.g. OpenBSD 3.9.
 
 2007-03-06 Sandro Santilli <strk@keybit.net>
 

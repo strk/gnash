@@ -103,6 +103,11 @@
 	#define NAN (0.0/0.0)
 #endif
 
+#ifndef trunc
+#define trunc(x) ( x < 0 ?  -floor(-x) : floor(x) )
+#endif
+
+
 // Declaration for replacement timezone functions
 // In the absence of gettimeofday() we use ftime() to get milliseconds,
 // but not for timezone offset bcos ftime's TZ stuff is unreliable.

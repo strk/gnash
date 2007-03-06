@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.65 2007/03/06 17:40:04 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.66 2007/03/06 20:45:55 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -173,6 +173,10 @@ AGG ressources
 
 #ifndef trunc
 #define trunc(x) ( x < 0 ?  -floor(-x) : floor(x) )
+#endif
+
+#ifndef round
+#define round rint
 #endif
 
 using namespace gnash;
