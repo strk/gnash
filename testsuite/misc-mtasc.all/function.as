@@ -10,6 +10,6 @@ class Test extends TestClass
 	static function main(mc)
 	{
 		var myTest = new Test;
-		_root.check_equals(myTest.TestClassCtorCalled, true);
+		_root.check_equals(myTest.TestClassCtorCalled, 'called');
 	}
 }
