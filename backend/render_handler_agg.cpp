@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.67 2007/03/07 10:59:42 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.68 2007/03/07 11:03:42 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -275,7 +275,7 @@ public:
 
 	  unsigned int left=region.getMinX();
 	  unsigned int width=region.width()+1;
-	  // to be exact, it's one off the max. (?)
+
 	  const unsigned int max_y = region.getMaxY();
           for (unsigned int y=region.getMinY(); y<=max_y; y++) 
 	  {
