@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.64 2007/03/06 18:06:12 rsavoye Exp $
+# $Id: Makefile.am,v 1.65 2007/03/07 15:11:24 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -221,12 +221,19 @@ endif
 	@echo "	CURL_LIBS is $(CURL_LIBS)"
 	@echo "	BOOST_CFLAGS is $(BOOST_CFLAGS)"
 	@echo "	BOOST_LIBS is $(BOOST_LIBS)"
+if ENABLE_MING
 	@echo "	MING_VERSION_CODE $(MING_VERSION_CODE) "
 	@echo "	MING_LIBS $(MING_LIBS) "
 	@echo "	MING_CFLAGS $(MING_CFLAGS) "
 	@echo "	MAKESWF $(MAKESWF) "
+endif
+if ENABLE_MTASC
 	@echo " MTASC $(MTASC)"
 	@echo " MTASC CLASSPATH $(MTASC_CLASSPATH)"
+endif
+if ENABLE_SWFDEC_TESTSUITE
+	@echo " SWFDEC_TESTSUITE $(SWFDEC_TESTSUITE)"
+endif
 	@echo "Graphics support..."	
 	@echo "	CAIRO_CFLAGS is $(CAIRO_CFLAGS)"
 	@echo "	CAIRO_LIBS is $(CAIRO_LIBS)"

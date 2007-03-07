@@ -1,3 +1,13 @@
+2007-03-07 Sandro Santilli <strk@keybit.net>
+
+	* Makefile.am, configure.ac, testsuite/Makefile.am,
+	  testsuite/misc-ming.all/Makefile.am, testsuite/swfdec/.cvsignore,
+	  testsuite/swfdec/Makefile.am, testsuite/swfdec/PASSING,
+	  testsuite/swfdec/README, testsuite/swfdec/gen_run_swfdec_testsuite.sh,
+	  testsuite/swfdec/swfdec_gnash_tester:
+	  Add --with-swfdec-testsuite switch to configure, enabling run of
+	  trace-based testsuite from swfdec to be run by 'make check'.
+
 2007-03-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: fixed segfault #19223; set correct

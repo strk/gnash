@@ -3,6 +3,7 @@ AUTOMAKE_OPTIONS =
 # movies.all
 SUBDIRS = \
 	.			\
+	swfdec			\
 	libbase			\
 	libgeometry		\
 	server			\

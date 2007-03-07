@@ -1,5 +1,14 @@
-This directory is intended to be filled with Makefiles allowing
-run of the swfdec testsuite with Gnash.
-Currently there's only a simple stabbed tester for single movies,
-in the future I'd like to add a --with-swfdec-testsuite configure
-switch to run all tests as part of our 'make check' rule.
+2007-03-07
+
+This directory is contain scripts to run swfdec trace-based testsuite.
+
+The PASSING file is a list of SWF files in the testsuite which is expected to pass,
+when new tests are added they'll be expected to fail by default.
+If you see an unexpected success you can add the name of the file to PASSING.
+
+You'll need to pass the --with-swfdec-testsuite switch to configure in order
+for swfdec tests to be run as part of the 'make check' rule.
+
+Have fun.
+
+--strk;

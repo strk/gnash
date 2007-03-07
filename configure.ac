@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.269 2007/03/06 18:06:12 rsavoye Exp $
+dnl $Id: configure.ac,v 1.270 2007/03/07 15:11:24 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -491,6 +491,13 @@ AM_CONDITIONAL(ENABLE_MYSQL, [ test x"$mysql" = xyes ])
 AC_PATH_MING
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
 
+AC_ARG_WITH([swfdec_testsuite],
+	AC_HELP_STRING([--with-swfdec-testsuite],
+		[directory where swfdec testsuite (the 'test' dir) is]),
+	SWFDEC_TESTSUITE=${withval})
+AC_SUBST(SWFDEC_TESTSUITE)
+AM_CONDITIONAL(ENABLE_SWFDEC_TESTSUITE, [ test x"$SWFDEC_TESTSUITE" != x ])
+
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
@@ -868,6 +875,7 @@ testsuite/libbase/Makefile
 testsuite/libgeometry/Makefile
 testsuite/actionscript.all/Makefile
 testsuite/samples/Makefile
+testsuite/swfdec/Makefile
 testsuite/misc-ming.all/Makefile
 testsuite/misc-mtasc.all/Makefile
 testsuite/movies.all/Makefile
@@ -1418,6 +1426,10 @@ else
  You need to have the Ming development and utilities packages installed\
  to run most of the tests in Gnash testsuite. Some of the tests will be\
  run anyway."
+fi
+
+if test x"$SWFDEC_TESTSUITE" != x; then
+    echo "        SWFDEC testsuite dir is $SWFDEC_TESTSUITE"
 fi
 
 if test x"$MTASC" != x; then
