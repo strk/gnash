@@ -1,5 +1,10 @@
 2007-03-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/simple.exp: hopefully made properly
+	  deal with buffering. Any test is welcome.
+
+2007-03-07 Sandro Santilli <strk@keybit.net>
+
 	* Makefile.am, configure.ac, testsuite/Makefile.am,
 	  testsuite/misc-ming.all/Makefile.am, testsuite/swfdec/.cvsignore,
 	  testsuite/swfdec/Makefile.am, testsuite/swfdec/PASSING,

@@ -29,50 +29,51 @@ foreach file $testcases {
     spawn -noecho ./$file 
 
     expect {
-	-re "NOTE:\[^\n\r\]*\[\n\r\]" {
-	    regsub "\[\n\r\t\]*NOTE: " $expect_out(0,string) "" output
+	-re "^\[^\n]*NOTE:\[^\n]*\n" {
+	    regsub ".*NOTE: " $expect_out(0,string) "" output
 	    set output [string range $output 0 end-2]
 	    verbose "${file} $output" 
 	    exp_continue -continue_timer
 	}
-	-re "XPASSED:\[^\n\r\]*\[\n\r\]" {
-	    regsub "\[\n\r\t\]*XPASSED: " $expect_out(0,string) "" output
+	-re "^\[^\n]*XPASSED:\[^\n]*\n" {
+	    regsub ".*XPASSED: " $expect_out(0,string) "" output
 	    set output [string range $output 0 end-2]
 	    xpass "${file}: $output"
 	    exp_continue -continue_timer
 	}
-	-re "PASSED:\[^\n\r\]*\[\n\r\]" {
-	    regsub "\[\n\r\t\]*PASSED: " $expect_out(0,string) "" output
+	-re "^\[^\n]*PASSED:\[^\n]*\n" {
+	    regsub ".*PASSED: " $expect_out(0,string) "" output
 	    set output [string range $output 0 end-2]
 	    pass "${file}: $output"
 	    exp_continue -continue_timer
 	}
-	-re "XFAILED:\[^\n\r]*\[\n\r\]" {
-	    regsub "\[\n\r\t\]*XFAILED: " $expect_out(0,string) "" output
+	-re "^\[^\n]*XFAILED:\[^\n]*\n" {
+	    regsub ".*XFAILED: " $expect_out(0,string) "" output
 	    set output [string range $output 0 end-2] 
 	    xfail "${file}: $output"
 	    exp_continue -continue_timer
 	}
-	-re "FAILED:\[^\n\r\]*\[\n\r\]" {
-	    regsub "\[\n\r\t\]*FAILED: " $expect_out(0,string) "" output
+	-re "^\[^\n]*FAILED:\[^\n]*\n" {
+	    regsub ".*FAILED: " $expect_out(0,string) "" output
 	    set output [string range $output 0 end-2] 
 	    fail "${file}: $output"
 	    exp_continue -continue_timer
 	}
-	-re "UNTESTED:\[^\n\r\]*\[\n\r\]" {
-	    regsub "\[\n\r\t\]*TESTED: " $expect_out(0,string) "" output
-	    set output [string range $output 8 end-2]
+	-re "^\[^\n]*UNTESTED:\[^\n]*\n" {
+	    regsub ".*UNTESTED: " $expect_out(0,string) "" output
+	    set output [string range $output 0 end-2]
 	    untested "${file}: $output"
 	    exp_continue -continue_timer
 	}
-	-re "UNRESOLVED:\[^\n\r\]*\[\n\r\]" {
-	    regsub "\[\n\r\t\]*UNRESOLVED: " $expect_out(0,string) "" output
-	    set output [string range $output 8 end-2]
+	-re "^\[^\n]*UNRESOLVED:\[^\n]*\n" {
+	    regsub ".*UNRESOLVED: " $expect_out(0,string) "" output
+	    set output [string range $output 0 end-2]
 	    unresolved "${file}: $output"
 	    exp_continue -continue_timer
 	}
-	-re "Totals" {
-	    verbose "All done" 2
+	-re "^\[^\n]*\n" {
+            # just remove non-matching lines!
+            exp_continue -continue_timer
 	}
 	eof {
 	    #	    unresolved "${file} died prematurely"
