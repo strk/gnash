@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.72 2007/03/06 18:06:12 rsavoye Exp $ */
+/* $Id: plugin.cpp,v 1.73 2007/03/07 19:06:12 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -295,7 +295,7 @@ nsPluginInstance::init(NPWindow* aWindow)
 void
 nsPluginInstance::shut()
 {
-    if (_childpid) {
+    if (_childpid > 0) {
 	// it seems that waiting after a SIGINT hangs firefox
 	// IFF not run from the console (see bug#17082).
 	// SIGTERM instead solves this problem

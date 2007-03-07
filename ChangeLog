@@ -1,3 +1,8 @@
+2007-03-07 Robert Millan <rmh@aybabtu.com>
+
+	* plugin/plugin.cpp: Guard the first argument to kill() for previously
+	unconsidered values.
+
 2007-03-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: fixed segfault #19223; set correct
