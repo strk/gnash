@@ -1,5 +1,7 @@
 2007-03-07 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/ContextMenu.cpp: Some more stubs.
+	* testsuite/actionscript.all/ContextMenu.as: Some more tests.
 	* server/as_value.cpp (to_bool) don't choke
 	  when converting a movieclip value to a boolean.
 	* testsuite/actionscript.all/Boolean.as:
