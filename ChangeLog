@@ -6,7 +6,10 @@
 	  scandir() function (may move to a separate extension); same story
 		for unlink()
 	* server/sprite_instance.cpp: Make sure clear_invalidated() is called 
-	  for sprites which currently have an empty DisplayList	 	
+	  for sprites which currently have an empty DisplayList
+	* server/button_character_instance.{h,cpp}: Implemented correct behaviour
+	  on button state change (invalidate only when needed, restart only
+		reappeared characters)		 	
 
 2007-03-06 Sandro Santilli <strk@keybit.net>
 

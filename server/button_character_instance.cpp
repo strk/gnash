@@ -482,12 +482,9 @@ button_character_instance::on_button_event(const event_id& event)
 		break;
 	};
 	
-	if (new_state!=m_mouse_state) {
-    set_invalidated();
-    m_mouse_state=new_state; 
-  }
+	
+	set_current_state(new_state);
     
-
 	// Button transition sounds.
 	if (m_def->m_sound != NULL)
 	{
@@ -536,6 +533,7 @@ button_character_instance::on_button_event(const event_id& event)
 		}
 	}
 
+
 	// @@ eh, should just be a lookup table.
 	int	c = 0;
 	if (event.m_id == event_id::ROLL_OVER) c |= (button_action::IDLE_TO_OVER_UP);
@@ -549,7 +547,7 @@ button_character_instance::on_button_event(const event_id& event)
 	//OVER_DOWN_TO_IDLE = 1 << 8,
 
 	// restart the characters of the new state.
-	restart_characters(c);
+	//restart_characters(c);  --> <Udo> done by set_current_state() now
 
 	// From: "ActionScript - The Definiteve Guide" by Colin Moock
 	// (chapter 10: Events and Event Handlers)
@@ -560,7 +558,7 @@ button_character_instance::on_button_event(const event_id& event)
 	// Immediately execute all events actions (don't append to
 	// parent's action buffer for later execution!)
 
-	{for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
+	for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
 	{
 		if (m_def->m_button_actions[i].m_conditions & c)
 		{
@@ -578,7 +576,7 @@ button_character_instance::on_button_event(const event_id& event)
 				
 			}
 		}
-	}}
+	}
 
 	// check for built-in event handler.
 	as_value method;
@@ -596,6 +594,76 @@ button_character_instance::on_button_event(const event_id& event)
 	// @@ TODO
 }
 
+void 
+button_character_instance::get_active_characters(std::vector<character*>& list)
+{
+	get_active_characters(list, m_mouse_state);
+}
+
+void 
+button_character_instance::get_active_characters(std::vector<character*>& list,
+  e_mouse_state state)
+{
+	list.clear();
+	
+	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	{
+		button_record&	rec = m_def->m_button_records[i];
+		if (m_record_character[i] == NULL)
+		{
+			continue;
+		}
+		if ((state == UP && rec.m_up)
+		    || (state == DOWN && rec.m_down)
+		    || (state == OVER && rec.m_over))
+		{
+			list.push_back(m_record_character[i].get());
+		}
+	} // for button record	
+}
+
+void
+button_character_instance::set_current_state(e_mouse_state new_state)
+{
+	if (new_state == m_mouse_state)
+		return;
+		
+	// save current "display list"
+	std::vector<character*> old_list;
+	get_active_characters(old_list, m_mouse_state);
+	
+	// load new "display list" 
+	// NOTE: We don't change state yet, so that set_invalidated() can 
+	// load the current bounds first.
+	std::vector<character*> new_list;
+	get_active_characters(new_list, new_state);
+		
+	// see if the two lists differ and restart characters if needed
+	if (new_list.size() != old_list.size())
+		set_invalidated();		// something changed 
+  
+  unsigned int old_count = old_list.size();
+  unsigned int new_count = new_list.size();
+  for (unsigned int i=0; i<new_count; i++) {
+
+  	bool found=false;
+  	for (unsigned int j=0; j<old_count; j++) { 
+	  	if (new_list[i] == old_list[j]) {
+				found=true;
+				break; 
+			}
+		}
+		if (!found) {
+			// character (re-)appeared on stage -> restart!
+			new_list[i]->restart();
+			set_invalidated();
+		} 
+	}
+
+	// effectively change state
+	m_mouse_state=new_state;
+	 
+}
 
 void
 button_character_instance::restart_characters(int condition)

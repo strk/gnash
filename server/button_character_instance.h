@@ -5,7 +5,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.13 2007/02/28 17:25:25 udog Exp $ */
+/* $Id: button_character_instance.h,v 1.14 2007/03/07 18:42:23 udog Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -76,6 +76,14 @@ public:
 	virtual void	advance(float delta_time);
 
 	void	display();
+	
+	void set_current_state(e_mouse_state new_state);
+	
+	/// Returns all characters that are currently visible based on the
+	/// current button state. The "_visible" property does not matter here. 
+	void get_active_characters(std::vector<character*>& list);
+	void get_active_characters(std::vector<character*>& list, e_mouse_state state);
+	
 
 	/// Combine the flags to avoid a conditional.
 	//  It would be faster with a macro.
