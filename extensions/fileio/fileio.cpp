@@ -24,13 +24,15 @@
 #include <cstdio>
 #include <boost/algorithm/string/case_conv.hpp>
 
+#include <dirent.h> // used by scandir()
+
 #include "VM.h"
 #include "log.h"
 #include "fn_call.h"
 #include "as_object.h"
 #include "builtin_function.h" // need builtin_function
 #include "fileio.h"
-
+#include "array.h"  // used by scandir()
 
 using namespace std;
 
@@ -56,6 +58,12 @@ void fileio_fflush(const fn_call& fn);
 void fileio_ftell(const fn_call& fn);
 void fileio_fseek(const fn_call& fn);
 
+// <Udo> I needed a scandir() function and implemented it here for simplicity.
+// Maybe this should be moved to a dedicated extension and a different class? 
+// The scandir() syntax comes from PHP, since the C syntax is not quite 
+// applicable in ActionScript.
+void fileio_scandir(const fn_call& fn);
+
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 static void
@@ -80,6 +88,8 @@ attachInterface(as_object *obj)
     obj->set_member("fseek", &fileio_fseek);
     obj->set_member("ftell", &fileio_ftell);
     obj->set_member("fclose", &fileio_fclose);
+    
+    obj->set_member("scandir", &fileio_scandir);
 }
 
 static as_object*
@@ -169,7 +179,6 @@ bool
 Fileio::fopen(string &filespec, string &mode)
 {
 //    GNASH_REPORT_FUNCTION;
-
     _stream = ::fopen(filespec.c_str(), mode.c_str());
     if (_stream) {
         return true;
@@ -260,6 +269,36 @@ Fileio::fclose()
         return ret;
     }
     return -1;
+}
+
+void
+Fileio::scandir(const string dir, as_value* result) 
+{
+
+	struct dirent **namelist;
+	
+	int n = ::scandir(dir.c_str(), &namelist, 0, alphasort);
+	
+	if (n<0) {
+		result->set_bool(false);
+		return;
+	}
+	
+	as_array_object* array = new as_array_object();	
+	as_value item;
+	
+	//array->resize(n);
+	// TODO: Looks like I can't set an array item by index since
+	// array::at() returns not a reference.
+	
+	for (int idx=0; idx<n; idx++) {
+		item.set_string(namelist[idx]->d_name);
+		array->push(item);
+		free(namelist[idx]);
+	}
+	free(namelist);
+	
+	result->set_as_object(array);
 }
 
 void
@@ -416,6 +455,20 @@ fileio_ftell(const fn_call& fn)
     assert(ptr);
     int i = ptr->ftell();
     fn.result->set_int(i);
+}
+
+void
+fileio_scandir(const fn_call& fn)
+{
+//    GNASH_REPORT_FUNCTION;
+
+		// TODO: Check optional second parameter and sort array if it's true
+		// or missing.
+
+    Fileio *ptr = (Fileio*)fn.this_ptr;
+    assert(ptr);    
+    string str = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+    ptr->scandir(str, fn.result);
 }
 
 std::auto_ptr<as_object>

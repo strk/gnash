@@ -48,6 +48,7 @@ public:
     int fseek(long offset);
     int fseek(long offset, int whence);
     long ftell();
+    void scandir(const string dir, as_value* result);
 private:
     FILE        *_stream;
     std::string _filespec;

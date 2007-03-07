@@ -1,7 +1,9 @@
 2007-03-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: fixed segfault #19223; set correct
-	  visiblerect; fixed Range2d.width() usage; fixed getMaxY() usage 	
+	  visiblerect; fixed Range2d.width() usage; fixed getMaxY() usage
+	* extensions/fileio/fileio.{h,cpp}: implemented an experimental 
+	  scandir() function (may move to a separate extension)	 	
 
 2007-03-06 Sandro Santilli <strk@keybit.net>
 
