@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.74 2007/03/06 18:06:13 rsavoye Exp $ */
+/* $Id: gtk.cpp,v 1.75 2007/03/07 23:52:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -277,7 +277,7 @@ GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 	
 	_drawbounds.clear();
 		
-	for (int rno=0; rno<ranges.size(); rno++) {
+	for (unsigned rno=0; rno<ranges.size(); rno++) {
 	
 		geometry::Range2d<int> bounds = Intersection(
 	    _renderer->world_to_pixel(ranges.getRange(rno)),
@@ -904,19 +904,21 @@ GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
 
 /// \brief Toggle the sound on or off
 void
-GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_toggle_sound();
+    Gui* gui = static_cast<Gui*>(data);
+    gui->menu_toggle_sound();
 }
 
 
 /// \brief restart the movie from the beginning
 void
-GtkGui::menuitem_restart_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+GtkGui::menuitem_restart_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_restart();
+    Gui* gui = static_cast<Gui*>(data);
+    gui->menu_restart();
 }
 
 /// \brief quit complete, and close the application
@@ -930,62 +932,69 @@ GtkGui::menuitem_quit_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 
 /// \brief Start the movie playing from the current frame.
 void
-GtkGui::menuitem_play_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+GtkGui::menuitem_play_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_play();
+    Gui* gui = static_cast<Gui*>(data);
+    gui->menu_play();
 }
 
 /// \brief toggle that's playing or paused.
 void
-GtkGui::menuitem_pause_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+GtkGui::menuitem_pause_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_pause();
+    Gui* gui = static_cast<Gui*>(data);
+    gui->menu_pause();
 }
 
 /// \brief stop the movie that's playing.
 void
-GtkGui::menuitem_stop_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
+GtkGui::menuitem_stop_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
-    menu_stop();
+    GNASH_REPORT_FUNCTION;
+    Gui* gui = static_cast<Gui*>(data);
+    gui->menu_stop();
 }
 
 /// \brief step forward 1 frame
 void
 GtkGui::menuitem_step_forward_callback(GtkMenuItem* /*menuitem*/,
-		gpointer /*data*/)
+		gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_step_forward();
+    Gui* gui = static_cast<Gui*>(data);
+    gui->menu_step_forward();
 }
 
 /// \brief step backward 1 frame
 void
 GtkGui::menuitem_step_backward_callback(GtkMenuItem* /*menuitem*/,
-		gpointer /*data*/)
+		gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_step_backward();
+    Gui* gui = static_cast<Gui*>(data);
+    gui->menu_step_backward();
 }
 
 /// \brief jump forward 10 frames
 void
 GtkGui::menuitem_jump_forward_callback(GtkMenuItem* /*menuitem*/,
-                               gpointer /*data*/)
+                               gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_jump_forward();
+    Gui* gui = static_cast<Gui*>(data);
+    gui->menu_jump_forward();
 }
 
 /// \brief jump backward 10 frames
 void
 GtkGui::menuitem_jump_backward_callback(GtkMenuItem* /*menuitem*/,
-                                gpointer /*data*/)
+                                gpointer data)
 {
 //    GNASH_REPORT_FUNCTION;
-    menu_jump_backward();
+    Gui* gui = static_cast<Gui*>(data);
+    gui->menu_jump_backward();
 }
 
 //
@@ -1145,9 +1154,11 @@ GtkGui::gdk_to_gnash_key(guint key)
 gboolean
 GtkGui::key_press_event(GtkWidget *const /*widget*/,
                 GdkEventKey *const event,
-                const gpointer /*data*/)
+                const gpointer data)
 {
     GNASH_REPORT_FUNCTION;
+
+    Gui* gui = static_cast<Gui*>(data);
 
     /* Forward key event to gnash */
     gnash::key::code	c = gdk_to_gnash_key(event->keyval);
@@ -1168,14 +1179,14 @@ GtkGui::key_press_event(GtkWidget *const /*widget*/,
         dbglogfile << "Got Control-key: " << key << endl;
         switch(key) {
           case 'r':
-              menu_restart();
+              gui->menu_restart();
               break;
           case 'p':
-              menu_pause();
+              gui->menu_pause();
               break;
           case 'q':
           case 'w':
-              menu_quit();
+              gui->menu_quit();
               break;
           default:
               break;
@@ -1363,14 +1374,23 @@ GtkGui::createControlMenu(GtkWidget *obj)
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Play Movie"));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_play));
     gtk_widget_show(GTK_WIDGET(menuitem_play));    
+    g_signal_connect ((gpointer) menuitem_play, "activate",
+        G_CALLBACK (&menuitem_play_callback), this);
+
     GtkMenuItem *menuitem_pause =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Pause Movie"));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_pause));
     gtk_widget_show(GTK_WIDGET(menuitem_pause));
+    g_signal_connect ((gpointer) menuitem_pause, "activate",
+        G_CALLBACK (&menuitem_pause_callback), this);
+
     GtkMenuItem *menuitem_stop =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Stop Movie"));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_stop));
     gtk_widget_show(GTK_WIDGET(menuitem_stop));
+    g_signal_connect ((gpointer) menuitem_stop, "activate",
+        G_CALLBACK (&menuitem_stop_callback), this);
+
     GtkMenuItem *menuitem_restart =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Restart Movie"));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_restart));

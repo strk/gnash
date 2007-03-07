@@ -68,7 +68,8 @@ Gui::Gui() :
     _depth(16),
     _interval(0),
     _renderer(NULL),
-    _redraw_flag(true)
+    _redraw_flag(true),
+    _stopped(false)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -84,7 +85,8 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
     _depth(depth),
     _interval(0),
     _renderer(NULL),
-    _redraw_flag(true)
+    _redraw_flag(true),
+    _stopped(false)
 {
 }
 
@@ -160,7 +162,8 @@ void
 Gui::menu_play()
 {
 //    GNASH_REPORT_FUNCTION;
-    get_current_root()->set_play_state(gnash::sprite_instance::PLAY);
+    //get_current_root()->set_play_state(gnash::sprite_instance::PLAY);
+    play();
 }
 
 void
@@ -168,12 +171,13 @@ Gui::menu_pause()
 {
 //    GNASH_REPORT_FUNCTION;
 
-    movie_root* m = get_current_root();
-    if (m->get_play_state() == gnash::sprite_instance::STOP) {
-      m->set_play_state(gnash::sprite_instance::PLAY);
-    } else {
-      m->set_play_state(gnash::sprite_instance::STOP);
-    }
+    pause();
+//    movie_root* m = get_current_root();
+//    if (m->get_play_state() == gnash::sprite_instance::STOP) {
+//      m->set_play_state(gnash::sprite_instance::PLAY);
+//    } else {
+//      m->set_play_state(gnash::sprite_instance::STOP);
+//    }
 
 }
 
@@ -181,7 +185,8 @@ void
 Gui::menu_stop()
 {
 //    GNASH_REPORT_FUNCTION;
-    get_current_root()->set_play_state(gnash::sprite_instance::STOP);
+    //get_current_root()->set_play_state(gnash::sprite_instance::STOP);
+    stop();
 }
 
 void
@@ -389,6 +394,8 @@ bool
 Gui::advance_movie(Gui* gui)
 {
 	assert(gui);
+
+	if ( gui->isStopped() ) return true;
   
 //	GNASH_REPORT_FUNCTION;
 

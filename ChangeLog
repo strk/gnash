@@ -1,5 +1,11 @@
 2007-03-07 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.{h,cpp}: add play(), pause() and stop() methods,
+	  change implementation to be semantically correct and not
+	  mess with sprites playstate; Changed menu_* to non-statics
+	  to properly acces state. I'm sure this will break fltk but
+	  fixing should be easy with men_fun and bind1st..
+	* gui/gtk.cpp: enable stop(), pause() and play() menu items.
 	* server/asobj/ContextMenu.cpp: Some more stubs.
 	* testsuite/actionscript.all/ContextMenu.as: Some more tests.
 	* server/as_value.cpp (to_bool) don't choke

@@ -188,21 +188,42 @@ public:
     /// interval specified in the call to setInterval().
     static bool advance_movie(Gui* gui);
 
+    /// Put the application in "stop" mode
+    //
+    /// When in stop mode the application won't be advanced.
+    ///
+    void stop() { _stopped=true; }
+
+    /// Put the application in "play" mode
+    //
+    /// When in stop mode the application will be advanced as usual.
+    ///
+    void play() { _stopped=false; }
+
+    /// Toggle between "stop" and "play" mode
+    //
+    /// See stop() and play()
+    ///
+    void pause() { _stopped = !_stopped; }
+
+    /// See stop(), play() and pause()
+    bool isStopped() const { return _stopped; }
+
     /** @name Menu callbacks
      *  These callbacks will be called when a menu item is clicked.
      *  @{
      */
-    static void menu_restart();
-    static void menu_quit();
-    static void menu_about();
-    static void menu_play();
-    static void menu_pause();
-    static void menu_stop();
-    static void menu_step_forward();
-    static void menu_step_backward();
-    static void menu_jump_forward();
-    static void menu_jump_backward();
-    static void menu_toggle_sound();
+    void menu_restart();
+    void menu_quit();
+    void menu_about();
+    void menu_play();
+    void menu_pause();
+    void menu_stop();
+    void menu_step_forward();
+    void menu_step_backward();
+    void menu_jump_forward();
+    void menu_jump_backward();
+    void menu_toggle_sound();
     /// @}
 
 protected:
@@ -236,6 +257,8 @@ protected:
     /// Signals that the next frame must be re-rendered completely because the
     /// window size did change.
     bool            _redraw_flag;
+
+    bool            _stopped;
 
 private:
 
