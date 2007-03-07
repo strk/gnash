@@ -25,6 +25,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 #include <dirent.h> // used by scandir()
+#include <unistd.h> // used by unlink()
 
 #include "VM.h"
 #include "log.h"
@@ -57,11 +58,14 @@ void fileio_putchar(const fn_call& fn);
 void fileio_fflush(const fn_call& fn);
 void fileio_ftell(const fn_call& fn);
 void fileio_fseek(const fn_call& fn);
+void fileio_unlink(const fn_call& fn);
 
 // <Udo> I needed a scandir() function and implemented it here for simplicity.
 // Maybe this should be moved to a dedicated extension and a different class? 
 // The scandir() syntax comes from PHP, since the C syntax is not quite 
 // applicable in ActionScript.
+// Same applies for unlink(). Maybe a class FileOP or sim. would be 
+// appriopriate. 
 void fileio_scandir(const fn_call& fn);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
@@ -88,6 +92,8 @@ attachInterface(as_object *obj)
     obj->set_member("fseek", &fileio_fseek);
     obj->set_member("ftell", &fileio_ftell);
     obj->set_member("fclose", &fileio_fclose);
+    
+    obj->set_member("unlink", &fileio_unlink);
     
     obj->set_member("scandir", &fileio_scandir);
 }
@@ -271,6 +277,13 @@ Fileio::fclose()
     return -1;
 }
 
+bool
+Fileio::unlink(std::string &filespec)
+{
+//    GNASH_REPORT_FUNCTION;
+		return ::unlink(filespec.c_str()) >= 0;		
+}
+
 void
 Fileio::scandir(const string dir, as_value* result) 
 {
@@ -395,7 +408,7 @@ fileio_fputc(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
-    int c = fn.env->bottom(fn.first_arg_bottom_index).to_number();
+    int c = (int) fn.env->bottom(fn.first_arg_bottom_index).to_number();
     fn.result->set_bool(ptr->fputc(c));
 }
 
@@ -443,7 +456,7 @@ fileio_fseek(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
-    long c = fn.env->bottom(fn.first_arg_bottom_index).to_number();
+    long c = (long) fn.env->bottom(fn.first_arg_bottom_index).to_number();
     fn.result->set_int(ptr->fseek(c));
 }
 
@@ -455,6 +468,16 @@ fileio_ftell(const fn_call& fn)
     assert(ptr);
     int i = ptr->ftell();
     fn.result->set_int(i);
+}
+
+void
+fileio_unlink(const fn_call& fn)
+{
+//    GNASH_REPORT_FUNCTION;
+    Fileio *ptr = (Fileio*)fn.this_ptr;
+    assert(ptr);
+    string str = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+    fn.result->set_bool(ptr->unlink(str));
 }
 
 void
