@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.66 2007/03/06 20:45:55 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.67 2007/03/07 10:59:42 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -269,17 +269,18 @@ public:
 
 	  const agg::gray8 black(0);
 	  	  
-	  // TODO: what to do in this case ?
+	  // region can't be world as it should be intersected with 
+	  // the visible rect
 	  assert (! region.isWorld() );
-	  
+
 	  unsigned int left=region.getMinX();
-	  unsigned int width=region.width();
+	  unsigned int width=region.width()+1;
 	  // to be exact, it's one off the max. (?)
 	  const unsigned int max_y = region.getMaxY();
-          for (unsigned int y=region.getMinY(); y<max_y; y++) 
+          for (unsigned int y=region.getMinY(); y<=max_y; y++) 
 	  {
-             m_pixf.copy_hline(left, y, width, black);
-          }
+       m_pixf.copy_hline(left, y, width, black);
+    }
   }
   
   renderer_base& get_rbase() {
@@ -583,25 +584,22 @@ public:
 		    agg::rgba8 color)
 	{
 			assert(region.isFinite());
-	    if (region.width() < 1)
-	    {
-		log_warning("clear_framebuffer() called with width=%d",
-			region.width());
-		return;
-	    }
-    
-	    if (region.height() < 1)
-	    {
-		log_warning("clear_framebuffer() called with height=%d",
-			region.height());
-		return;
-	    }
+			
+			// add 1 to width since we have still to draw a pixel when 
+			// getMinX==getMaxX			
+			unsigned int width=region.width()+1;
+			
+			// <Udo> Note: We don't need to check for width/height anymore because
+			// Range2d will take care that getMinX <= getMaxX and it's okay when
+			// region.width()==0 because in that case getMinX==getMaxX and we have
+			// still a pixel to draw. 
+
 	    unsigned int left=region.getMinX();
 
 	    for (unsigned int y=region.getMinY(), maxy=region.getMaxY();
 		    y<=maxy; ++y) 
 	    {
-		m_pixf->copy_hline(left, y, region.width(), color);
+				m_pixf->copy_hline(left, y, width, color);
 	    }
   }
 
@@ -882,7 +880,7 @@ public:
     bool have_shape, have_outline;
     
     analyze_paths(def->get_paths(), have_shape, have_outline);
-    
+
     if (!have_shape && !have_outline) 
 			return; // invisible character
 
@@ -1768,7 +1766,7 @@ public:
 
     // TODO: cache 'visiblerect' and maintain in sync with
     //       xres/yres.
-    Range2d<int> visiblerect(0, 0, xres, yres);
+    Range2d<int> visiblerect(0, 0, xres-1, yres-1);
 		
 		for (int rno=0; rno<ranges.size(); rno++) {
 		
