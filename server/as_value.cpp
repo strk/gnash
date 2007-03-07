@@ -321,6 +321,8 @@ as_value::to_bool() const
 	return m_c_function_value != NULL;
     } else if (m_type == AS_FUNCTION) {
 	return m_as_function_value != NULL;
+    } else if (m_type == MOVIECLIP) {
+	return true;
     } else {
 	assert(m_type == UNDEFINED || m_type == NULLTYPE);
 	return false;

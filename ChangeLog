@@ -1,3 +1,10 @@
+2007-03-07 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.cpp (to_bool) don't choke
+	  when converting a movieclip value to a boolean.
+	* testsuite/actionscript.all/Boolean.as:
+	  Add tests for convertion to boolean value.
+
 2007-03-07 Robert Millan <rmh@aybabtu.com>
 
 	* plugin/plugin.cpp: Guard the first argument to kill() for previously
@@ -16,7 +23,7 @@
 	  on button state change (invalidate only when needed, restart only
 		reappeared characters)		 	
 
-2007-03-06 Sandro Santilli <strk@keybit.net>
+2007-03-07 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/: README, swfdec_gnash_tester:
 	  Initial stuff to hook on swfdec testsuite.

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Boolean.as,v 1.10 2006/11/25 14:50:23 strk Exp $";
+rcsid="$Id: Boolean.as,v 1.11 2007/03/07 19:46:46 strk Exp $";
 
 #include "check.as"
 
@@ -53,3 +53,48 @@ var falseBool = new Boolean(false);
 check_equals(falseBool.toString(), "false");
 check_equals(falseBool.valueOf(), false);
 
+
+//---------------------------------------------------
+// Test convertion to boolean
+//---------------------------------------------------
+
+// boolean
+check( true );
+check( ! false );
+ 
+// number
+check( 1 );
+check( !0 );
+
+// movieclip
+check( _root );
+
+// string
+check( "1" );
+#if OUTPUT_VERSION < 7
+ check( ! "0" );
+ xcheck( ! "true" );
+ check( ! "false" );
+#else
+ xcheck( "0" );
+ check( "true" );
+ xcheck( "false" );
+#endif
+
+// Null 
+check_equals(typeOf(null), "null" );
+check( ! null );
+
+// Undefined
+check( ! undefined );
+
+// Function
+check( play );
+
+// Object - conversion might depend on object type
+emptyArray = new Array();
+check( emptyArray );
+falseBoolean = new Boolean(false);
+check( falseBoolean );
+trueBoolean = new Boolean(true);
+check( trueBoolean );
