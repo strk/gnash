@@ -1,25 +1,12 @@
-2007-03-07 Sandro Santilli <strk@keybit.net>
-
-	* testsuite/simple.exp: hopefully made properly
-	  deal with buffering. Any test is welcome.
-
-2007-03-07 Sandro Santilli <strk@keybit.net>
-
-	* Makefile.am, configure.ac, testsuite/Makefile.am,
-	  testsuite/misc-ming.all/Makefile.am, testsuite/swfdec/.cvsignore,
-	  testsuite/swfdec/Makefile.am, testsuite/swfdec/PASSING,
-	  testsuite/swfdec/README, testsuite/swfdec/gen_run_swfdec_testsuite.sh,
-	  testsuite/swfdec/swfdec_gnash_tester:
-	  Add --with-swfdec-testsuite switch to configure, enabling run of
-	  trace-based testsuite from swfdec to be run by 'make check'.
-
 2007-03-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: fixed segfault #19223; set correct
 	  visiblerect; fixed Range2d.width() usage; fixed getMaxY() usage
 	* extensions/fileio/fileio.{h,cpp}: implemented an experimental 
 	  scandir() function (may move to a separate extension); same story
-		for unlink()	 	
+		for unlink()
+	* server/sprite_instance.cpp: Make sure clear_invalidated() is called 
+	  for sprites which currently have an empty DisplayList	 	
 
 2007-03-06 Sandro Santilli <strk@keybit.net>
 

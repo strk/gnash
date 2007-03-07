@@ -3028,9 +3028,9 @@ void sprite_instance::display()
 		//       a container for a parent :(
 		_drawable_inst->display();
 
-		m_display_list.display();
-		clear_invalidated();
+		m_display_list.display();		
 	}
+	clear_invalidated();
 	  
 	do_display_callback();
 }
