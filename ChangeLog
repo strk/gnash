@@ -1,3 +1,8 @@
+2007-03-05 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/action_execution_order_extend_test.c:
+	  Add a check, seems PlaceObject2 tag should not define any functions
+	  
 2007-03-07 Sandro Santilli <strk@keybit.net>
 
 	* gui/gtk.cpp: hook restart menu

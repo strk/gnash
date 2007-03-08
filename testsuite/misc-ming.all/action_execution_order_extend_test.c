@@ -92,7 +92,10 @@ main(int argc, char** argv)
 		compileSWFActionCode("note('mc_red clip load executed'); "
 			"_root.y1bis = 'mc_red onClipLoad called';"),
 		SWFACTION_ONLOAD);
-  
+  /* Woo, the PlaceObject tag hasn't defined an 'onLoad' function.
+		 maybe just pushed something to the action list???
+	*/
+  xcheck_equals(mo, "typeOf(_root.mc_red.onLoad)", "'undefined'");
   add_actions(mo, " note('as in frame2 of root'); var x1 = \"as_in_root\"; ");
   add_actions(mo, " _root.mc_red.onLoad = function () \
                    { \
