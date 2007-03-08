@@ -1,3 +1,9 @@
+2007-03-07 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/gtk.cpp: Fix GTK/AGG redrawing upon expose events by switching
+	to the new invalidation interface. In this incarnation, only the area
+	which is newly exposed is redrawn.
+
 2007-03-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* extensions/fileio/fileio.cpp: Fixed fread() 

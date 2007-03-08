@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.76 2007/03/08 00:11:13 strk Exp $ */
+/* $Id: gtk.cpp,v 1.77 2007/03/08 17:58:33 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -247,7 +247,7 @@ GtkGui::renderBuffer()
 	
 		geometry::Range2d<int>& bounds = _drawbounds[bno];
 		
-		assert ( bounds.isFinite() );  
+		assert ( bounds.isFinite() );
 		
 		glue.render(bounds.getMinX(), bounds.getMinY(),
 		  bounds.getMaxX(), bounds.getMaxY());
@@ -1004,20 +1004,23 @@ GtkGui::menuitem_jump_backward_callback(GtkMenuItem* /*menuitem*/,
 
 gboolean
 GtkGui::expose_event(GtkWidget *const /*widget*/,
-             GdkEventExpose *const /*event*/,
+             GdkEventExpose *const event,
              const gpointer data)
 {
 //	GNASH_REPORT_FUNCTION;
 
 	GtkGui* gui = static_cast<GtkGui*>(data);
 
-	// Set an invalidate region that contains the entire screen for sure
-	// TODO: be more conservative in setting draw_bounds
-	//       (look at the GdkEventExpose)
-	rect draw_bounds; draw_bounds.set_world();
+	InvalidatedRanges ranges;
 
-	gui->setInvalidatedRegion(draw_bounds);
+	int xmin = event->area.x, xmax = event->area.x + event->area.width,
+	    ymin = event->area.y, ymax = event->area.y + event->area.height;
 
+	geometry::Range2d<float> exposed(PIXELS_TO_TWIPS(xmin),
+          PIXELS_TO_TWIPS(ymin), PIXELS_TO_TWIPS(xmax), PIXELS_TO_TWIPS(ymax));
+
+	ranges.add(exposed);
+	gui->setInvalidatedRegions(ranges);
 	gui->renderBuffer();
 
 	return TRUE;
