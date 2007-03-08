@@ -292,6 +292,12 @@ public:
 	/// Copy properties from the given object
 	void copyProperties(const as_object& o);
 
+	/// Drop all properties from this object
+	void clearProperties()
+	{
+		_members.clear();
+	}
+
 	/// \brief
 	/// Enumerate all non-hidden properties pushing
 	/// their value to the given as_environment.

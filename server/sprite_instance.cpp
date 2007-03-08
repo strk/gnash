@@ -3386,6 +3386,7 @@ void sprite_instance::restart()
     oldDisplayList.clear();
 
     // TODO: wipe out all members !!
+    clearProperties();
 
     // Construct the sprite again
     construct();

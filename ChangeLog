@@ -1,5 +1,10 @@
 2007-03-07 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.h: new protected clearProperties() method.
+	* server/sprite_instance.cpp (restart): clear properties.
+
+2007-03-07 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (construct):
 	  Ensure first frame is loaded, to eventually not waiting for
 	  ::advance to call ::construct and finally remove the startup
