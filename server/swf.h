@@ -275,7 +275,13 @@ typedef enum
 
     ACTION_TYPEOF                  = 0x44,
     ACTION_TARGETPATH              = 0x45,
+
+    /// SWF5
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_enumerate
+    ///
     ACTION_ENUMERATE               = 0x46,
+
     ACTION_NEWADD                  = 0x47,
     ACTION_NEWLESSTHAN             = 0x48,
 
