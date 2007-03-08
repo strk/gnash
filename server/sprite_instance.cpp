@@ -3368,14 +3368,27 @@ sprite_instance::can_handle_mouse_event() const
 		
 void sprite_instance::restart()
 {
+	GNASH_REPORT_FUNCTION;
+
+    // forgive me udo, I'll leave correct thing to you
+    set_invalidated();
     m_current_frame = 0;
     m_update_frame = true;
     m_has_looped = false;
     m_play_state = PLAY;
 
+    // DisplayList::clear is bogus in that
+    // id won't recursively call character::unload
+    // unless we pass 'true' as the second argument.
+    // But passing 'true' will also call the onLoad
+    // method, which is wrong.
+    // This will likely be fixed as soon as we get
+    // the action execution list correctly implemented.
+    m_display_list.clear(true);
+
+    // Not sure we should re-execute this, anyway
+    // elvis.swf restarts fine...
     execute_frame_tags(m_current_frame);
-    //we don't have the concept of a DisplayList update anymore
-    //m_display_list.update();
 }
 
 float sprite_instance::get_height() const

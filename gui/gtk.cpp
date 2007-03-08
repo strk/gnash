@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.75 2007/03/07 23:52:13 strk Exp $ */
+/* $Id: gtk.cpp,v 1.76 2007/03/08 00:11:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -916,7 +916,7 @@ GtkGui::menuitem_sound_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 void
 GtkGui::menuitem_restart_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
-//    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     Gui* gui = static_cast<Gui*>(data);
     gui->menu_restart();
 }
@@ -1395,6 +1395,9 @@ GtkGui::createControlMenu(GtkWidget *obj)
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Restart Movie"));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_restart));
     gtk_widget_show(GTK_WIDGET(menuitem_restart));
+    g_signal_connect ((gpointer) menuitem_restart, "activate",
+        G_CALLBACK (&menuitem_restart_callback), this);
+
     GtkMenuItem *menuitem_step_forward =
  	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Step Forward Frame"));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_step_forward));
