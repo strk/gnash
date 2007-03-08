@@ -1,5 +1,15 @@
 2007-03-07 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (construct):
+	  Ensure first frame is loaded, to eventually not waiting for
+	  ::advance to call ::construct and finally remove the startup
+	  lateny we're currently experiencing;
+	  (restart): call construct() directly, rather then postponing
+	  the call to ::adnvace and relying on the crappy
+	  m_onload_event_called flag.
+
+2007-03-07 Sandro Santilli <strk@keybit.net>
+
 	* server/character.h: document set_event_hanlder,
 	  get_event_handler (as we're getting it wrong).
 	* testsuite/actionscript.all/MovieClip.as:

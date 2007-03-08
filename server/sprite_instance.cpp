@@ -3385,9 +3385,10 @@ void sprite_instance::restart()
     m_display_list.clear();
     oldDisplayList.clear();
 
-    // setting on_event_load_called will trigger
-    // a call to ::construct next time we advance
-    m_on_event_load_called = false;
+    // TODO: wipe out all members !!
+
+    // Construct the sprite again
+    construct();
 
 }
 
@@ -3632,20 +3633,29 @@ sprite_instance::construct()
 	log_msg("Constructing sprite '%s'", getTargetPath().c_str());
 #endif
 
+	// We *might* avoid this, but better safe then sorry
+	m_def->ensure_frame_loaded(0);
+
 	// Backup the DisplayList *before* manipulating it !
 	assert( oldDisplayList.empty() );
 
 	on_event(event_id::CONSTRUCT);
 	execute_frame_tags(0, TAG_DLIST|TAG_ACTION);	
 
+	if ( _name.empty() )
+	{
+		// instance name will be needed for properly setting up
+		// a reference to 'this' object for ActionScript actions.
+		// If the instance doesn't have a name, it will NOT be
+		// an ActionScript referenciable object so we don't have
+		// anything more to do.
+		return;
+	}
+
 	sprite_definition* def = dynamic_cast<sprite_definition*>(m_def.get());
 
 	// We won't "construct" top-level movies
 	if ( ! def ) return;
-
-	// instance name will be needed for properly setting up
-	// a reference to 'this' object.
-	assert(!_name.empty());
 
 	as_function* ctor = def->getRegisteredClass();
 	//log_msg("Attached sprite's registered class is %p", (void*)ctor); 
