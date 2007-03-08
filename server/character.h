@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.53 2007/03/05 21:53:48 strk Exp $ */
+/* $Id: character.h,v 1.54 2007/03/08 11:35:51 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -294,7 +294,14 @@ public:
 	/// Maps from our local space into normal color space.
 	virtual cxform	get_world_cxform() const;
 
-    // Event handler accessors.
+	/// Get a built-in function handler for the given event
+	//
+	/// NOTE: this function is only for getting statically-defined
+	///       event handlers, which are the ones attached to a character
+	///       with a PlaceObject2. It's the character's responsibility
+	///       to properly fetch any user-defined event handler, which 
+	///       are the ones attached to a character with ActionScript code.
+	///
 	bool get_event_handler(const event_id& id, as_value* result) const
 	{
 		std::map<event_id, as_value>::const_iterator it = \
@@ -304,10 +311,20 @@ public:
 		return true;
 	}
 
-	/// Set a function handler for the given event
+	/// Set a built-in function handler for the given event
 	//
 	/// Mark the character as having mouse or keypress event
 	/// handlers if this is the case.
+	///
+	/// NOTE: this function is only for registering statically-defined
+	///       event handlers, which are the ones attached to a character
+	///       with a PlaceObject2. It's the character's responsibility
+	///       to properly invoke any user-defined event handler, which 
+	///       are the ones attached to a character with ActionScript code.
+	///
+	/// @param id
+	///
+	/// @param method
 	///
 	void set_event_handler(const event_id& id, const as_value& method);
 
