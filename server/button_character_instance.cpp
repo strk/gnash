@@ -19,6 +19,8 @@
 #include "movie_root.h"
 #include "VM.h"
 #include "builtin_function.h"
+#include "fn_call.h" // for shared ActionScript getter-setters
+#include "GnashException.h" // for shared ActionScript getter-setters
 
 /** \page buttons Buttons and mouse behaviour
 
@@ -215,6 +217,11 @@ attachButtonInterface(as_object& o)
 	gettersetter = new builtin_function(&character::onload_getset, NULL);
 	o.init_property("onLoad", *gettersetter, *gettersetter);
 
+	//--
+
+	gettersetter = new builtin_function(&button_character_instance::enabled_getset, NULL);
+	o.init_property("enabled", *gettersetter, *gettersetter);
+
 }
 
 button_character_instance::button_character_instance(
@@ -225,7 +232,8 @@ button_character_instance::button_character_instance(
 	m_def(def),
 	m_last_mouse_flags(IDLE),
 	m_mouse_flags(IDLE),
-	m_mouse_state(UP)
+	m_mouse_state(UP),
+	m_enabled(true)
 {
 	assert(m_def);
 
@@ -264,6 +272,46 @@ button_character_instance::~button_character_instance()
 {
 	_vm.getRoot().remove_keypress_listener(this);
 }
+
+
+bool 
+button_character_instance::get_enabled()
+{
+	return m_enabled;
+}
+
+void 
+button_character_instance::set_enabled(bool value)
+{
+	if (value == m_enabled) return;
+	m_enabled = value; 
+	
+	// NOTE: no visual change
+}
+
+
+void
+button_character_instance::enabled_getset(const fn_call& fn)
+{
+	button_character_instance* ptr = 
+		dynamic_cast<button_character_instance*>(fn.this_ptr);
+		
+	if ( ! ptr )
+	{
+		throw ActionException("enabled_getset() called against non-character instance");
+	}
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		fn.result->set_bool(ptr->get_enabled());
+	}
+	else // setter
+	{
+		ptr->set_enabled(fn.arg(0).to_bool());
+	}
+}
+
+
 
 // called from keypress listener only
 // (the above line is wrong, it's also called with onConstruct, for instance)
@@ -417,7 +465,7 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 // Return the topmost entity that the given point covers.  NULL if none.
 // I.e. check against ourself.
 {
-	if (get_visible() == false) {
+	if ((get_visible() == false) || (get_enabled() == false)) {
 		return false;
 	}
 

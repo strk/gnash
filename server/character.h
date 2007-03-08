@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.54 2007/03/08 11:35:51 strk Exp $ */
+/* $Id: character.h,v 1.55 2007/03/08 18:40:18 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -73,7 +73,6 @@ private:
 	matrix	m_matrix;
 	float	m_ratio;
 	uint16_t	m_clip_depth;
-	bool	m_enabled;
 	Events _event_handlers;
 	void	(*m_display_callback)(void*);
 	void*	m_display_callback_user_ptr;
@@ -191,7 +190,6 @@ public:
 	m_depth(-1),
 	m_ratio(0.0f),
 	m_clip_depth(0),
-	m_enabled(true),
 	m_display_callback(NULL),
 	m_display_callback_user_ptr(NULL),
 	m_visible(true),

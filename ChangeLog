@@ -1,3 +1,9 @@
+2007-03-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/character.h: drop m_enabled since nobody uses it
+	* server/button_character_instance.{h,cpp}: add "enabled" property
+	  and receive mouse events only when enabled		  
+
 2007-03-07 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/gtk.cpp: Fix GTK/AGG redrawing upon expose events by switching
