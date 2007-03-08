@@ -47,7 +47,6 @@ void fileio_fread(const fn_call& fn);
 void fileio_fgetc(const fn_call& fn);
 void fileio_fgets(const fn_call& fn);
 void fileio_gets(const fn_call& fn);
-void fileio_fread(const fn_call& fn);
 void fileio_fwrite(const fn_call& fn);
 void fileio_fputc(const fn_call& fn);
 void fileio_fputs(const fn_call& fn);
@@ -202,7 +201,7 @@ Fileio::fread(string &str)
     if (_stream) {
         char buf[BUFSIZE];
         memset(buf, 0, BUFSIZE);    
-        ret = ::fread(buf, BUFSIZE, 1, _stream);
+        ret = ::fread(buf, 1, BUFSIZE, _stream);
         if (ret) {
             str = buf;
         }
@@ -343,7 +342,15 @@ fileio_fread(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
-    assert(ptr);    
+    assert(ptr);
+		
+		string str;
+		int count = ptr->fread(str);
+
+		if (count<0)
+			fn.result->set_bool(false);
+		else
+			fn.result->set_string(str.c_str());    
 }
 
 void
