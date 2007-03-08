@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.34 2007/02/16 11:30:34 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.35 2007/03/08 10:58:15 strk Exp $";
 
 #include "check.as"
 
@@ -282,3 +282,12 @@ check_equals(typeof(cl), "object");
 check_equals(typeof(cl.attachMovie), "function");
 check_equals(typeof(cl._width), "undefined");
 check_equals(typeof(cl._parent), "undefined");
+
+//------------------------------------------------
+// Test onLoad to be allowed to be set to anything
+//------------------------------------------------
+
+_root.onLoad = 3;
+check_equals(typeof(_root.onLoad), 'number');
+_root.onLoad = "test";
+check_equals(typeof(_root.onLoad), 'string');
