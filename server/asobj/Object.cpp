@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.16 2007/03/09 01:11:42 strk Exp $ */
+/* $Id: Object.cpp,v 1.17 2007/03/09 10:03:42 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -314,13 +314,6 @@ object_registerClass(const fn_call& fn)
 	}
 
 	exp_clipdef->registerClass(theclass);
-	
-
-	log_warning("Object.registerClass(%s, %s [%p]) TESTING)",
-			symbolid.c_str(),
-			typeid(theclass).name(),
-			(void*)theclass);
-	fn.result->set_bool(false);
 }
 
 void
@@ -344,7 +337,6 @@ object_hasOwnProperty(const fn_call& fn)
 		return;
 	}
 	fn.result->set_bool(fn.this_ptr->getOwnProperty(propname) != NULL);
-	log_warning("TESTING: %s", __FUNCTION__);
 }
 
 void
@@ -376,7 +368,6 @@ object_isPropertyEnumerable(const fn_call& fn)
 	}
 
 	fn.result->set_bool( ! prop->getFlags().get_dont_enum() );
-	log_warning("TESTING: %s", __FUNCTION__);
 }
 
 void
@@ -403,19 +394,27 @@ object_isPrototypeOf(const fn_call& fn)
 	}
 
 	fn.result->set_bool(fn.this_ptr->prototypeOf(*obj));
-	log_warning("TESTING: %s", __FUNCTION__);
+
 }
 
 void
 object_watch(const fn_call&)
 {
-	log_error("FIXME: %s: unimplemented", __FUNCTION__);
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: %s unimplemented", __FUNCTION__);
+		warned=true;
+	}
 }
 
 void
 object_unwatch(const fn_call&)
 {
-	log_error("FIXME: %s: unimplemented", __FUNCTION__);
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: %s unimplemented", __FUNCTION__);
+		warned=true;
+	}
 }
   
 } // namespace gnash

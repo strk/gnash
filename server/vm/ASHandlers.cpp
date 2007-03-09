@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.57 2007/03/06 23:58:08 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.58 2007/03/09 10:03:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2722,7 +2722,11 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	}
 	else
 	{
-		log_warning("FIXME: debugger doesn't deal with anonymous function calls");
+		static bool warned=false;
+		if ( ! warned ) {
+			log_warning("FIXME: debugger doesn't deal with anonymous function calls");
+			warned=true;
+		}
 	}
 #endif
 
@@ -2870,7 +2874,12 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 
 	enumerateObject(env, *obj);
 
-	dbglogfile << __PRETTY_FUNCTION__ << ": testing" << endl;
+	static bool warned=false;
+	if ( ! warned )
+	{
+		log_warning("TESTING: %s", __PRETTY_FUNCTION__);
+		warned=true;
+	}
 }
 
 void
