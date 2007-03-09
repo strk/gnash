@@ -1,8 +1,8 @@
 2007-03-09 Sandro Santilli <strk@keybit.net>
 
 	* server/: sprite_instance.cpp, textformat.cpp,
-	  video_stream_instance.cpp: Use builtin_function for
-	  function as_values.
+	  video_stream_instance.cpp, edit_text_character.cpp:
+	  Use builtin_function for function as_values.
 
 2007-03-09 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 

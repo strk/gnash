@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.44 2007/02/28 17:25:26 udog Exp $ */
+/* $Id: edit_text_character.cpp,v 1.45 2007/03/09 15:12:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -113,7 +113,7 @@ getTextFieldInterface()
 	{
 		proto = new as_object();
 		attachTextFieldInterface(*proto);
-		proto->init_member("constructor", &textfield_ctor); 
+		proto->init_member("constructor", new builtin_function(textfield_ctor)); 
 	}
 	return proto.get();
 }
