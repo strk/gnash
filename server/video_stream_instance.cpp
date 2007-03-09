@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.cpp,v 1.13 2007/03/01 09:50:59 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.14 2007/03/09 15:00:59 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -25,6 +25,7 @@
 #include "NetStream.h"
 #include "render.h"
 #include "Range2d.h"
+#include "builtin_function.h" // for getter/setter properties
 
 namespace gnash {
 
@@ -60,7 +61,7 @@ namespace gnash {
 {
 	assert(m_def);
 	// FIXME: use new layout
-	init_member("attachVideo", &attach_video);
+	init_member("attachVideo", new builtin_function(attach_video));
 	m_decoder = m_def->get_decoder();
 }
 

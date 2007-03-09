@@ -1222,45 +1222,45 @@ attachMovieClipInterface(as_object& o)
 	boost::intrusive_ptr<builtin_function> gettersetter;
 
 	// SWF5 or higher
-	o.init_member("attachMovie", &sprite_attach_movie);
-	o.init_member("play", &sprite_play);
-	o.init_member("stop", &sprite_stop);
-	o.init_member("gotoAndStop", &sprite_goto_and_stop);
-	o.init_member("gotoAndPlay", &sprite_goto_and_play);
-	o.init_member("nextFrame", &sprite_next_frame);
-	o.init_member("prevFrame", &sprite_prev_frame);
-	o.init_member("getBytesLoaded", &sprite_get_bytes_loaded);
-	o.init_member("getBytesTotal", &sprite_get_bytes_total);
-	o.init_member("loadMovie", &sprite_load_movie);
-	o.init_member("unloadMovie", &sprite_unload_movie);
-	o.init_member("hitTest", &sprite_hit_test);
-	o.init_member("duplicateMovieClip", &sprite_duplicate_movieclip);
-	o.init_member("swapDepths", &sprite_swap_depths);
-	o.init_member("removeMovieClip", &sprite_remove_movieclip);
-	o.init_member("startDrag", &sprite_startDrag);
-	o.init_member("stopDrag", &sprite_stopDrag);
-	o.init_member("getURL", &sprite_getURL);
-	o.init_member("getBounds", &sprite_getBounds);
-	o.init_member("globalToLocal", &sprite_globalToLocal);
+	o.init_member("attachMovie", new builtin_function(sprite_attach_movie));
+	o.init_member("play", new builtin_function(sprite_play));
+	o.init_member("stop", new builtin_function(sprite_stop));
+	o.init_member("gotoAndStop", new builtin_function(sprite_goto_and_stop));
+	o.init_member("gotoAndPlay", new builtin_function(sprite_goto_and_play));
+	o.init_member("nextFrame", new builtin_function(sprite_next_frame));
+	o.init_member("prevFrame", new builtin_function(sprite_prev_frame));
+	o.init_member("getBytesLoaded", new builtin_function(sprite_get_bytes_loaded));
+	o.init_member("getBytesTotal", new builtin_function(sprite_get_bytes_total));
+	o.init_member("loadMovie", new builtin_function(sprite_load_movie));
+	o.init_member("unloadMovie", new builtin_function(sprite_unload_movie));
+	o.init_member("hitTest", new builtin_function(sprite_hit_test));
+	o.init_member("duplicateMovieClip", new builtin_function(sprite_duplicate_movieclip));
+	o.init_member("swapDepths", new builtin_function(sprite_swap_depths));
+	o.init_member("removeMovieClip", new builtin_function(sprite_remove_movieclip));
+	o.init_member("startDrag", new builtin_function(sprite_startDrag));
+	o.init_member("stopDrag", new builtin_function(sprite_stopDrag));
+	o.init_member("getURL", new builtin_function(sprite_getURL));
+	o.init_member("getBounds", new builtin_function(sprite_getBounds));
+	o.init_member("globalToLocal", new builtin_function(sprite_globalToLocal));
 	if ( target_version  < 6 ) return;
 
 	// SWF6 or higher
-	o.init_member("beginFill", &sprite_beginFill);
-	o.init_member("beginGradientFill", &sprite_beginGradientFill);
-	o.init_member("clear", &sprite_clear);
-	o.init_member("curveTo", &sprite_curveTo);
-	o.init_member("lineStyle", &sprite_lineStyle);
-	o.init_member("lineTo", &sprite_lineTo);
-	o.init_member("moveTo", &sprite_moveTo);
-	o.init_member("endFill", &sprite_endFill);
-	o.init_member("attachAudio", &sprite_attach_audio);
-	o.init_member("createTextField", &sprite_create_text_field);
-	o.init_member("getDepth", &sprite_get_depth);
-	o.init_member("createEmptyMovieClip", &sprite_create_empty_movieclip);
+	o.init_member("beginFill", new builtin_function(sprite_beginFill));
+	o.init_member("beginGradientFill", new builtin_function(sprite_beginGradientFill));
+	o.init_member("clear", new builtin_function(sprite_clear));
+	o.init_member("curveTo", new builtin_function(sprite_curveTo));
+	o.init_member("lineStyle", new builtin_function(sprite_lineStyle));
+	o.init_member("lineTo", new builtin_function(sprite_lineTo));
+	o.init_member("moveTo", new builtin_function(sprite_moveTo));
+	o.init_member("endFill", new builtin_function(sprite_endFill));
+	o.init_member("attachAudio", new builtin_function(sprite_attach_audio));
+	o.init_member("createTextField", new builtin_function(sprite_create_text_field));
+	o.init_member("getDepth", new builtin_function(sprite_get_depth));
+	o.init_member("createEmptyMovieClip", new builtin_function(sprite_create_empty_movieclip));
 	if ( target_version  < 7 ) return;
 
 	// SWF7 or higher
-	o.init_member("getNextHighestDepth", &sprite_getNextHighestDepth);
+	o.init_member("getNextHighestDepth", new builtin_function(sprite_getNextHighestDepth));
 	if ( target_version  < 8 ) return;
 
 	// TODO: many more methods, see MovieClip class ...
@@ -1373,7 +1373,7 @@ getMovieClipInterface()
 	{
 		proto = new as_object();
 		attachMovieClipInterface(*proto);
-		proto->init_member("constructor", &movieclip_ctor); 
+		proto->init_member("constructor", new builtin_function(movieclip_ctor));
 	}
 	return proto.get();
 }

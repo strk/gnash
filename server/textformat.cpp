@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "log.h"
 #include "textformat.h"
 #include "fn_call.h"
+#include "builtin_function.h" // for getter/setter properties
 
 namespace gnash {  
 
@@ -126,7 +127,7 @@ void textformat_new(const fn_call& fn)
   //
   // TODO we should handle setTextFormat as a method on TextField,
   // instead of doing this.
-  fn.env->set_variable("setTextFormat", &textformat_setformat);
+  fn.env->set_variable("setTextFormat", new builtin_function(textformat_setformat));
   
   fn.result->set_as_object(text_obj);
 }
