@@ -1,5 +1,11 @@
+2007-03-09 Stuart Anderson <anderson@netsweng.com>
+
+	* testsuite/misc-ming.all/Makefile.am: fix check rule
+	  when building with Ming < 0.4.0-beta2.
+
 2007-03-09 Sandro Santilli <strk@keybit.net>
 
+	* configure.ad: Add MAKESWF_SUPPORTS_PREBUILT_CLIPS conditional.
 	* extensions/dejagnu/dejagnu.cpp, extensions/fileio/fileio.cpp:
 	  Use builtin_function and init_member for members initialization.
 	* server/as_value.{cpp,h}, server/vm/ASHandlers.cpp,

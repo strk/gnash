@@ -86,18 +86,19 @@ check_PROGRAMS = \
 	simple_loop_testrunner \
 	action_execution_order_test \
 	action_execution_order_extend_test \
-	KeyTest-Runner \
 	loadMovieTest \
 	loadMovieTestRunner \
-	intervalTestRunner \
 	eventSoundTest1 \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
 	$(NULL)
 
+if MAKESWF_SUPPORTS_PREBUILT_CLIPS
+check_PROGRAMS += KeyTest-Runner \
+	intervalTestRunner 
+endif
+
 check_SCRIPTS = \
-	VarAndCharClashTest-Runner \
-	gotoFrame2Test-Runner \
 	timeline_var_test-Runner \
 	place_object_testrunner \
 	move_object_testrunner \
@@ -110,6 +111,11 @@ check_SCRIPTS = \
 	action_execution_order_extend_testrunner \
 	gotoFrame2Test-Runner \
 	$(NULL)
+
+if MAKESWF_SUPPORTS_PREBUILT_CLIPS
+check_SCRIPTS += VarAndCharClashTest-Runner \
+	gotoFrame2Test-Runner 
+endif
 
 # TESTS = \
 # 	DefineEditTextVariableNameTest-Runner 
@@ -681,9 +687,12 @@ TEST_CASES = \
 	intervalTestRunner \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
-	gotoFrame2Test-Runner \
 	$(NULL)
 
+if MAKESWF_SUPPORTS_PREBUILT_CLIPS
+TEST_CASES += KeyTest-Runner \
+	gotoFrame2Test-Runner 
+endif
 
 check-DEJAGNU: site-update $(check_PROGRAMS)
 	@runtest=$(RUNTEST); \
