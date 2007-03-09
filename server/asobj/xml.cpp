@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.18 2007/03/04 02:00:42 strk Exp $ */
+/* $Id: xml.cpp,v 1.19 2007/03/09 13:34:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -24,6 +24,7 @@
 #include "tu_config.h"
 #include "as_function.h" // for as_function
 #include "fn_call.h"
+#include "action.h" // for call_method
 
 #include "xmlattrs.h"
 #include "xmlnode.h"
@@ -590,9 +591,9 @@ XML::cloneNode(XMLNode &newnode, bool deep)
 // 	newnode.nodeValueSet((char *)_nodes->nodeValue());    
     }
 
-    return newnode;
-  
     log_msg("%s:partially unimplemented \n", __PRETTY_FUNCTION__);
+
+    return newnode;
 }
 
 # if 0
@@ -801,12 +802,15 @@ xml_load(const fn_call& fn)
         //    log_msg("FIXME: Found onLoad!\n");
         fn.env->set_variable("success", true);
         fn.arg(0) = true;
+#if 0
         as_c_function_ptr	func = method.to_c_function();
         if (func) {
 	    // It's a C function.  Call it.
 	    log_msg("Calling C function for onLoad\n");
 	    (*func)(fn_call(&val, xml_obj, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
-	} else if (as_function* as_func = method.to_as_function()) {
+	} else
+#endif
+	if (as_function* as_func = method.to_as_function()) {
 	    // It's an ActionScript function.  Call it.
 	    log_msg("Calling ActionScript function for onLoad\n");
 	    (*as_func)(fn_call(&val, xml_obj, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
@@ -851,23 +855,7 @@ xml_onload(const fn_call& fn)
     
         if (fn.this_ptr->get_member("onLoad", &method)) {
             // log_msg("FIXME: Found onLoad!\n");
-            as_c_function_ptr	func = method.to_c_function();
-            if (func)
-                {
-                    // It's a C function.  Call it.
-                    log_msg("Calling C function for onLoad\n");
-                    (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-                }
-            else if (as_function* as_func = method.to_as_function())
-                {
-                    // It's an ActionScript function.  Call it.
-                    log_msg("Calling ActionScript function for onLoad\n");
-                    (*as_func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-                }
-            else
-                {
-                    log_error("error in call_method(): method is not a function\n");
-                }    
+	    val = call_method(method, fn.env, fn.this_ptr, 0, 0);
         } else {
             log_msg("FIXME: Couldn't find onLoad!\n");
         }
@@ -892,24 +880,9 @@ xml_ondata(const fn_call& fn)
     if ((ptr->loaded()) && (first)) {
         if (fn.this_ptr->get_member("onData", &method)) {
             log_msg("FIXME: Found onData!\n");
-            as_c_function_ptr	func = method.to_c_function();
+	    // TODO: this is suspicious (set_variable for what??)
             fn.env->set_variable("success", true);
-            if (func)
-                {
-                    // It's a C function.  Call it.
-                    log_msg("Calling C function for onData\n");
-                    (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-                }
-            else if (as_function* as_func = method.to_as_function())
-                {
-                    // It's an ActionScript function.  Call it.
-                    log_msg("Calling ActionScript function for onData\n");
-                    (*as_func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-                }
-            else
-                {
-                    log_error("error in call_method(): method is not a function\n");
-                }    
+	    val = call_method(method, fn.env, fn.this_ptr, 0, 0);
         } else {
             log_msg("FIXME: Couldn't find onData!\n");
         }
@@ -1201,20 +1174,9 @@ void xml_parsexml(const fn_call& fn)
 #if 1
     if (fn.this_ptr->get_member("onLoad", &method)) {
         log_msg("FIXME: Found onLoad!\n");
-        fn.env->set_variable("success", true);
-	fn.arg(0) = true;
-        as_c_function_ptr	func = method.to_c_function();
-        if (func) {
-	    // It's a C function.  Call it.
-	    log_msg("Calling C function for onLoad\n");
-	    (*func)(fn_call(&val, ptr, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
-	} else if (as_function* as_func = method.to_as_function()) {
-	    // It's an ActionScript function.  Call it.
-	    log_msg("Calling ActionScript function for onLoad\n");
-	    (*as_func)(fn_call(&val, ptr, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
-	} else {
-	    log_error("error in call_method(): method is not a function\n");
-	}
+        fn.env->set_variable("success", true); // what is this for ?
+	fn.arg(0) = true; // what is this for ?
+	val = call_method(method, fn.env, fn.this_ptr, 0, 0);
     } else {
         log_msg("Couldn't find onLoad event handler, setting up callback\n");
         // ptr->set_event_handler(event_id::XML_LOAD, (as_c_function_ptr)&xml_onload);
