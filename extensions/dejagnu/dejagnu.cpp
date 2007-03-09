@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -49,9 +49,9 @@ attachInterface(as_object *obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    obj->set_member("pass", &dejagnu_pass);
-    obj->set_member("fail", &dejagnu_fail);
-    obj->set_member("totals", &dejagnu_totals);
+    obj->init_member("pass", new builtin_function(dejagnu_pass));
+    obj->init_member("fail", new builtin_function(dejagnu_fail));
+    obj->init_member("totals", new builtin_function(dejagnu_totals));
 }
 
 static as_object*
@@ -95,6 +95,7 @@ DejaGnu::pass (const char *msg)
 
     passed++;
     dbglogfile << "PASSED: " << msg << endl;
+    return NULL;
 }
 
 const char *
@@ -104,6 +105,7 @@ DejaGnu::fail (const char *msg)
 
     failed++;
     dbglogfile << "FAILED: " << msg << endl;
+    return NULL;
 }
 
 void
@@ -164,7 +166,7 @@ extern "C" {
  	    attachInterface(cl.get());
 	}
 	
-	obj.set_member("DejaGnu", cl.get());
+	obj.init_member("DejaGnu", cl.get());
     }
 } // end of extern C
 

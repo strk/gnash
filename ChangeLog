@@ -1,5 +1,7 @@
 2007-03-09 Sandro Santilli <strk@keybit.net>
 
+	* extensions/dejagnu/dejagnu.cpp, extensions/fileio/fileio.cpp:
+	  Use builtin_function and init_member for members initialization.
 	* server/as_value.{cpp,h}, server/vm/ASHandlers.cpp,
 	  server/vm/action.cpp: Drop C_FUNCTION as_value type.
 	  WARNING: attempts to initialize as_values with

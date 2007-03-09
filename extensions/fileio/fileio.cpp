@@ -74,27 +74,27 @@ attachInterface(as_object *obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    obj->set_member("fopen", &fileio_fopen);
-    obj->set_member("fread", &fileio_fread);
-    obj->set_member("fgetc", &fileio_fgetc);
-    obj->set_member("fgets", &fileio_fgets);
-    obj->set_member("gets", &fileio_fgets);
-    obj->set_member("getchar", &fileio_getchar);
+    obj->init_member("fopen", new builtin_function(fileio_fopen));
+    obj->init_member("fread", new builtin_function(fileio_fread));
+    obj->init_member("fgetc", new builtin_function(fileio_fgetc));
+    obj->init_member("fgets", new builtin_function(fileio_fgets));
+    obj->init_member("gets", new builtin_function(fileio_fgets));
+    obj->init_member("getchar", new builtin_function(fileio_getchar));
 
-    obj->set_member("fwrite", &fileio_fwrite);
-    obj->set_member("fputc", &fileio_fputc);
-    obj->set_member("fputs", &fileio_fputs);
-    obj->set_member("puts", &fileio_puts);
-    obj->set_member("putchar", &fileio_putchar);
+    obj->init_member("fwrite", new builtin_function(fileio_fwrite));
+    obj->init_member("fputc", new builtin_function(fileio_fputc));
+    obj->init_member("fputs", new builtin_function(fileio_fputs));
+    obj->init_member("puts", new builtin_function(fileio_puts));
+    obj->init_member("putchar", new builtin_function(fileio_putchar));
     
-    obj->set_member("fflush", &fileio_fflush);
-    obj->set_member("fseek", &fileio_fseek);
-    obj->set_member("ftell", &fileio_ftell);
-    obj->set_member("fclose", &fileio_fclose);
+    obj->init_member("fflush", new builtin_function(fileio_fflush));
+    obj->init_member("fseek", new builtin_function(fileio_fseek));
+    obj->init_member("ftell", new builtin_function(fileio_ftell));
+    obj->init_member("fclose", new builtin_function(fileio_fclose));
     
-    obj->set_member("unlink", &fileio_unlink);
+    obj->init_member("unlink", new builtin_function(fileio_unlink));
     
-    obj->set_member("scandir", &fileio_scandir);
+    obj->init_member("scandir", new builtin_function(fileio_scandir));
 }
 
 static as_object*
