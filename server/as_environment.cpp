@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.56 2007/03/02 19:38:56 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.57 2007/03/09 10:39:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -823,7 +823,7 @@ dump(const as_environment::Registers& r, std::ostream& out)
 	for (size_t i=0; i<r.size(); ++i)
 	{
 		if (i) out << ", ";
-		out << '"' << r[i].to_string() << '"';
+		out << i << ':' << '"' << r[i].to_string() << '"';
 	}
 }
 

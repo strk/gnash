@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.58 2007/03/09 10:03:42 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.59 2007/03/09 10:39:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2390,15 +2390,13 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 	// fetching the as_object* obj above or it will get lost
 	env.top(0).set_null();
 
-	IF_VERBOSE_ACTION (
-	log_action("---enumerate - push: NULL");
-	);
-
 	if ( ! obj )
 	{
-		log_warning("Top of stack not an object (%s) at "
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Top of stack not an object (%s) at "
 			"ActionEnumerate execution",
 			variable.to_string());
+		);
 		return;
 	}
 
@@ -2866,9 +2864,11 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 	as_object* obj = obj_val.to_object();
 	if ( ! obj )
 	{
-		log_warning("Top of stack not an object (%s) at ActionEnum2 "
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Top of stack not an object (%s [%s]) at ActionEnum2 "
 			" execution",
-			obj_val.to_string());
+			obj_val.to_string(), obj_val.typeOf());
+		);
 		return;
 	}
 

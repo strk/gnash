@@ -1,5 +1,8 @@
 2007-03-09 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp: include index in registers dump.
+	* server/vm/ASHandlers.cpp (ActionEnumerate, ActionEnumerate2):
+	  Make 'for (i in <non-object-value>)' an ASCODING error.
 	* server/: sprite_instance.{cpp,h}, character.{cpp,h}:
 	  Moved getNextUnnamedInstanceName() from sprite_instance
 	  to character, for use withing other character types
