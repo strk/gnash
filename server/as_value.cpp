@@ -182,11 +182,13 @@ as_value::to_tu_string() const
 			}
 			break;
 
+#ifdef ALLOW_C_FUNCTION_VALUES
 		case C_FUNCTION:
 			snprintf(buffer, 50, "<c_function %p>",
 				(const void *) &m_c_function_value);
 			m_string_value = buffer;
 			break;
+#endif
 
 		case AS_FUNCTION:
 			snprintf(buffer, 50, "<as_function %p>",
@@ -234,7 +236,9 @@ as_value::to_primitive() const
 		case BOOLEAN:
 		case STRING:
 		case NUMBER:
+#ifdef ALLOW_C_FUNCTION_VALUES
 		case C_FUNCTION:
+#endif
 		default:
 			return *this;
 	}
@@ -317,8 +321,10 @@ as_value::to_bool() const
 	return this->m_boolean_value;
     } else if (m_type == OBJECT) {
 	return m_object_value != NULL;
+#ifdef ALLOW_C_FUNCTION_VALUES
     } else if (m_type == C_FUNCTION) {
 	return m_c_function_value != NULL;
+#endif
     } else if (m_type == AS_FUNCTION) {
 	return m_as_function_value != NULL;
     } else if (m_type == MOVIECLIP) {
@@ -395,6 +401,7 @@ as_value::set_sprite(const std::string& path)
 	m_string_value = path.c_str();
 }
 
+#ifdef ALLOW_C_FUNCTION_VALUES
 as_c_function_ptr
 as_value::to_c_function() const
     // Return value as a C function ptr.  Returns NULL if value is
@@ -407,6 +414,7 @@ as_value::to_c_function() const
 	return NULL;
     }
 }
+#endif
 
 // Return value as an ActionScript function.  Returns NULL if value is
 // not an ActionScript function.
@@ -503,12 +511,14 @@ as_value::operator==(const as_value& v) const
     {
 	return this_nulltype == v_nulltype;
     }
+#ifdef ALLOW_C_FUNCTION_VALUES
     else if (m_type == C_FUNCTION || v.m_type == C_FUNCTION)
     {
 	// a C_FUNCTION is only equal to itself
     	return m_type == v.m_type
 		&& m_c_function_value == v.m_c_function_value;
     }
+#endif
     else if (m_type == STRING)
     {
 	return m_string_value == v.to_tu_string();
@@ -604,7 +614,9 @@ as_value::typeOf() const
 			return "null";
 
 		case as_value::AS_FUNCTION:
+#ifdef ALLOW_C_FUNCTION_VALUES
 		case as_value::C_FUNCTION:
+#endif
 			return "function";
 
 		default:

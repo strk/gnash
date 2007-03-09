@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.59 2007/03/09 10:39:11 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.60 2007/03/09 15:19:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -93,6 +93,7 @@ construct_object(const as_value& constructor,
 
     as_value new_obj;
 
+#if 0 // C_FUNCTION values do not exist anymore !
     if ( constructor.is_c_function() )
     {
         IF_VERBOSE_ACTION (
@@ -104,8 +105,10 @@ construct_object(const as_value& constructor,
 
         (constructor.to_c_function())(call);
     }
+    else
+#endif // C_FUNCTION values do not exist anymore !
 
-    else if (as_function* ctor_as_func = constructor.to_as_function())
+    if (as_function* ctor_as_func = constructor.to_as_function())
     {
         // This function is being used as a constructor; make sure
         // it has a prototype object.

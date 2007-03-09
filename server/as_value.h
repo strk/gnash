@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.28 2007/03/04 02:22:00 strk Exp $ */
+/* $Id: as_value.h,v 1.29 2007/03/09 15:19:26 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -64,7 +64,7 @@ static inline int isnan_ld (long double x) { return x != x; }
 	static inline int isinf_ld (long double x) { return isnan (x - x); }
 #endif
  
-#define ALLOW_C_FUNCTION_VALUES
+//#define ALLOW_C_FUNCTION_VALUES
 
 //#ifdef ALLOW_C_FUNCTION_VALUES
 typedef void (*as_c_function_ptr)(const fn_call& fn);
