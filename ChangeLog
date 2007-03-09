@@ -1,3 +1,8 @@
+2007-03-09 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/swfdec/swfdec_gnash_tester: 
+	  Fixed to allow loopbacks.
+
 2007-03-09 Stuart Anderson <anderson@netsweng.com>
 
 	* testsuite/misc-ming.all/Makefile.am: fix check rule
