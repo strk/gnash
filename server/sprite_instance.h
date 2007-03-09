@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.75 2007/03/08 09:33:40 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.76 2007/03/09 10:18:49 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -651,12 +651,6 @@ public:
 	/// @} Drawing API
 
 private:
-
-	// Used to assign a name to unnamed (movieclip-only?) instances
-	static unsigned int _lastUnnamedInstanceNum;
-
-	// Used to assign a name to unnamed (movieclip-only?) instances
-	static std::string getNextUnnamedInstanceName();
 
 	/// Execute a single action buffer (DOACTION block)
 	void execute_action(action_buffer& ab);

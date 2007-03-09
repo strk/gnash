@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.55 2007/03/08 18:40:18 udog Exp $ */
+/* $Id: character.h,v 1.56 2007/03/09 10:18:49 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -77,8 +77,13 @@ private:
 	void	(*m_display_callback)(void*);
 	void*	m_display_callback_user_ptr;
 
+	/// Used to assign a name to unnamed instances
+	static unsigned int _lastUnnamedInstanceNum;
 
 protected:
+
+	/// Used to assign a name to unnamed instances
+	static std::string getNextUnnamedInstanceName();
 
 	/// Name of this character (if any)
 	std::string	_name;

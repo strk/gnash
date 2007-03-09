@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.22 2007/02/28 17:25:25 udog Exp $ */
+/* $Id: character.cpp,v 1.23 2007/03/09 10:18:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,6 +33,19 @@
 
 namespace gnash
 {
+
+// Initialize unnamed instance count
+unsigned int character::_lastUnnamedInstanceNum=0;
+
+/*protected static*/
+std::string
+character::getNextUnnamedInstanceName()
+{
+	std::stringstream ss;
+	ss << "instance" << ++_lastUnnamedInstanceNum;
+	return ss.str();
+}
+
 
 // TODO: this should likely go in movie_root instead !
 void

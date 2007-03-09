@@ -1,5 +1,13 @@
 2007-03-09 Sandro Santilli <strk@keybit.net>
 
+	* server/: sprite_instance.{cpp,h}, character.{cpp,h}:
+	  Moved getNextUnnamedInstanceName() from sprite_instance
+	  to character, for use withing other character types
+	  (like buttons) and use a single counter for the whole
+	  application.
+
+2007-03-09 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Object.cpp: remove TESTING
 	  warnings for getOwnProperty, isPrototypeOf and
 	  isPropertyEnumerable. Warn only once about unimplemented

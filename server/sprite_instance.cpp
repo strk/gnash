@@ -83,9 +83,6 @@ static as_object* getMovieClipInterface();
 static void attachMovieClipInterface(as_object& o);
 static void attachMovieClipProperties(as_object& o);
 
-// Initialize unnamed instance count
-unsigned int sprite_instance::_lastUnnamedInstanceNum=0;
-
 //------------------------------------------------
 // Utility funx
 //------------------------------------------------
@@ -3699,15 +3696,6 @@ sprite_instance::set_name(const char* name)
 	// time someone request them.
 	_target.clear();
 	_target_dot.clear();
-}
-
-/*private static*/
-std::string
-sprite_instance::getNextUnnamedInstanceName()
-{
-	std::stringstream ss;
-	ss << "instance" << ++_lastUnnamedInstanceNum;
-	return ss.str();
 }
 
 /* private static */
