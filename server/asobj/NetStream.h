@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.21 2007/03/04 21:35:31 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.22 2007/03/09 14:38:29 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -27,8 +27,10 @@
 #include "config.h"
 #endif
 
-#include <queue>
-#include <pthread.h>
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS
+#endif
+
 #include "impl.h"
 #include "video_stream_instance.h"
 

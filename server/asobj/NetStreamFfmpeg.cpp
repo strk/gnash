@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.20 2007/03/04 21:35:31 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.21 2007/03/09 14:38:29 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -22,16 +22,14 @@
 
 #ifdef USE_FFMPEG
 
-#include "log.h"
 #include "NetStreamFfmpeg.h"
+#include "log.h"
 #include "fn_call.h"
 #include "NetStream.h"
 #include "render.h"	
 #include "movie_root.h"
 #include "NetConnection.h"
 #include "sound_handler.h"
-
-#include "tu_file.h"
 
 #if defined(_WIN32) || defined(WIN32)
 	#include <Windows.h>	// for sleep()
@@ -207,7 +205,7 @@ NetStreamFfmpeg::play(const char* c_url)
 		return 0;
 	}
 
-	// Does it have an associated NetConnectoin ?
+	// Does it have an associated NetConnection ?
 	if ( ! _netCon )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -326,11 +324,12 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 					ns->m_video_stream = ns->m_FormatCtx->streams[i];
 				}
 				break;
-			case CODEC_TYPE_DATA:
+			/*case CODEC_TYPE_DATA:
 			case CODEC_TYPE_SUBTITLE:
-			case CODEC_TYPE_UNKNOWN:
+			case CODEC_TYPE_UNKNOWN:*/
+			default:
 				break;
-    }
+		}
 	}
 
 	if (ns->m_video_index < 0)
@@ -748,6 +747,7 @@ NetStreamFfmpeg::setBufferTime()
 int64_t
 NetStreamFfmpeg::time()
 {
+
 	if (m_FormatCtx && m_FormatCtx->nb_streams > 0) {
 		double time = (double)m_FormatCtx->streams[0]->time_base.num / (double)m_FormatCtx->streams[0]->time_base.den * (double)m_FormatCtx->streams[0]->cur_dts;
 	return static_cast<int64_t>(time);

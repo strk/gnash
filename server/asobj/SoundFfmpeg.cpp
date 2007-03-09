@@ -20,8 +20,8 @@
 #include "config.h"
 #endif
 
-#include "log.h"
 #include "SoundFfmpeg.h"
+#include "log.h"
 #include "sound_definition.h" // for sound_sample
 #include "movie_definition.h"
 #include "sprite_instance.h"

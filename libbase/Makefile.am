@@ -95,7 +95,8 @@ libgnashbase_la_SOURCES = \
 	noseek_fd_adapter.cpp \
 	zlib_adapter.cpp \
 	Thread.cpp \
-	URL.cpp
+	URL.cpp \
+	LoadThread.cpp
 
 
 noinst_HEADERS = \
@@ -134,7 +135,8 @@ noinst_HEADERS = \
 	noseek_fd_adapter.h \
 	zlib_adapter.h \
 	Thread.h \
-	URL.h
+	URL.h \
+	LoadThread.h
 
 if USE_SOUND_GST
 libgnashbase_la_SOURCES += gstgnashsrc.c embedVideoDecoderGst.cpp

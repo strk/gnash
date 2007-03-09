@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.27 2007/03/04 21:35:31 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.28 2007/03/09 14:38:29 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -56,7 +56,7 @@ NetConnection::NetConnection()
 	as_object(getNetConnectionInterface()),
 	_url(),
 	_owner(NULL),
-	_stream(NULL)
+	_loader(NULL)
 {
 }
 
@@ -77,7 +77,7 @@ bool NetConnection::openConnection(const char* char_url, as_object* owner)
 {
 
 	// if already running there is no need to setup things again
-	if (_stream) return true;
+	if (_loader) return true;
 
 	_owner = owner;
 	if (_url.size() > 0) {
@@ -95,9 +95,7 @@ bool NetConnection::openConnection(const char* char_url, as_object* owner)
 		return false;
 	}
 
-	_stream = StreamProvider::getDefaultInstance().getStream(uri);
-
-	if (!_stream) return false;
+	_loader = new LoadThread(StreamProvider::getDefaultInstance().getStream(uri));
 
 	return true;
 }
@@ -116,39 +114,29 @@ bool
 NetConnection::eof()
 {
 
-	if (!_stream) return false;
-
-	return _stream->get_eof();
+	return _loader->eof();
 }
 
 /*public*/
 size_t
 NetConnection::read(void *dst, size_t bytes)
 {
-	if (!_stream) return 0;
-
-	return _stream->read_bytes(dst, bytes);
+	return _loader->read(dst, bytes);
 }
 
 /*public*/
 bool
 NetConnection::seek(size_t pos)
 {
-	if (!_stream) return false;
+	return _loader->seek(pos);
 
-	_stream->set_position(pos);
-
-	if (_stream->get_position() == pos)	return true;
-	else return false;
 }
 
 /*public*/
 size_t
 NetConnection::tell()
 {
-	if (!_stream) return 0;
-
-	return _stream->get_position();
+	return _loader->tell();
 
 }
 
@@ -156,9 +144,7 @@ NetConnection::tell()
 long
 NetConnection::getBytesLoaded()
 {
-	if (!_stream) return -1;
-
-	return _stream->get_cur_size();
+	return _loader->getBytesLoaded();
 }
 
 
@@ -166,9 +152,7 @@ NetConnection::getBytesLoaded()
 long
 NetConnection::getBytesTotal()
 {
-	if (!_stream) return -1;
-
-	return _stream->get_size();
+	return _loader->getBytesLoaded();
 }
 
 

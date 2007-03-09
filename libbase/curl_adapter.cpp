@@ -16,7 +16,7 @@
 
 // 
 
-/* $Id: curl_adapter.cpp,v 1.23 2007/03/04 21:35:31 tgc Exp $ */
+/* $Id: curl_adapter.cpp,v 1.24 2007/03/09 14:38:29 tgc Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -128,8 +128,6 @@ public:
 	/// Returns the size of the stream
 	long get_stream_size();
 
-	/// Returns the size of the cached part of the stream
-	long get_cur_stream_size();
 private:
 
 	void init(const std::string& url);
@@ -529,18 +527,6 @@ CurlStreamFile::get_stream_size()
 
 }
 
-/*public*/
-long
-CurlStreamFile::get_cur_stream_size()
-{
-
-#ifdef GNASH_CURL_VERBOSE
-	fprintf(stderr, "get_cur_stream_size() returning %ld\n", _cached);
-#endif
-
-	return _cached;
-
-}
 /***********************************************************************
  *
  * Adapter calls
@@ -601,14 +587,6 @@ get_stream_size(void* appdata)
 
 }
 
-static long
-get_cur_stream_size(void* appdata)
-{
-	CurlStreamFile* stream = (CurlStreamFile*) appdata;
-	return stream->get_cur_stream_size();
-
-}
-
 static int
 close(void* appdata)
 {
@@ -652,7 +630,6 @@ make_stream(const char* url)
 		tell, // tell
 		eof, // get eof
 		get_stream_size, // size of stream 
-		get_cur_stream_size, // current size of cached stream 
 		close);
 }
 
@@ -684,7 +661,6 @@ make_stream(const char* url, const std::string& postdata)
 		tell, // tell
 		eof, // get eof
 		get_stream_size, // size of stream 
-		get_cur_stream_size, // current size of cached stream 
 		close);
 }
 

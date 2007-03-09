@@ -1,3 +1,15 @@
+2007-03-09 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/LoadThread.{h,cpp}: Added implementation of a download thread.
+	* libbase/Makefile.am: Included LoadThread.{h,cpp}.
+	* libbase/curl_adapter.cpp, libbase/noseek_fd_adapter.cpp, 
+	  libbase/tu_file.{h,cpp}, libbase/zlib_adapter.cpp: Removed 
+	  get_cur_stream_size(), instead used LoadThread::getBytesLoaded().
+	* server/asobj/NetConnection.cpp: Use LoadThread.
+	* server/asobj/NetStream.{h,cpp}, server/asobj/NetStreamFfmpeg.{h,cpp},
+	  server/asobj/Sound.{h,cpp}, server/asobj/SoundFfmpeg.{h,cpp}: Fixed
+	  compilation with newer FFMPEG versions.
+
 2007-03-09 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/xmlsocket.cpp: use call_method() and call_method0()

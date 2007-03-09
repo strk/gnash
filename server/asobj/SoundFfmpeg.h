@@ -23,6 +23,10 @@
 #include "config.h"
 #endif
 
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS
+#endif
+
 #include "impl.h"
 #include "as_object.h"
 #include "NetConnection.h"

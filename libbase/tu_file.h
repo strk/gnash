@@ -44,7 +44,6 @@ public:
     typedef int (* tell_func)(void* appdata);
     typedef bool (* get_eof_func)(void* appdata);
     typedef long (* get_stream_size_func)(void* appdata);
-    typedef long (* get_cur_stream_size_func)(void* appdata);
     typedef int (* close_func)(void* appdata);
     
     // The generic constructor; supply functions for the implementation.
@@ -57,7 +56,6 @@ public:
 	tell_func tf,
 	get_eof_func gef,
 	get_stream_size_func gss,
-	get_cur_stream_size_func gcss,
 	close_func cf=NULL);
     
     // Make a file from an ordinary FILE*.
@@ -139,7 +137,6 @@ public:
 
 	// get the size of the stream
 	int get_size() { return m_get_stream_size(m_data); }
-	int get_cur_size() { return m_get_cur_stream_size(m_data); }
 
     // printf-style convenience function.
     int	printf(const char* fmt, ...);
@@ -193,7 +190,6 @@ private:
     tell_func		m_tell;
     get_eof_func	m_get_eof;
     get_stream_size_func	m_get_stream_size;
-    get_cur_stream_size_func	m_get_cur_stream_size;
     close_func		m_close;
     int		m_error;
 };

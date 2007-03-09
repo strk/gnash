@@ -16,7 +16,7 @@
 
 // 
 
-/* $Id: noseek_fd_adapter.cpp,v 1.13 2007/03/04 21:35:31 tgc Exp $ */
+/* $Id: noseek_fd_adapter.cpp,v 1.14 2007/03/09 14:38:29 tgc Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -490,7 +490,6 @@ make_stream(int fd, const char* cachefilename)
 		tell, // tell
 		eof, // get eof
 		NULL, // get stream size
-		NULL, // get cur stream size
 		close);
 }
 

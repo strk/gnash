@@ -15,11 +15,13 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.28 2007/03/04 21:35:31 tgc Exp $ */
+/* $Id: NetStream.cpp,v 1.29 2007/03/09 14:38:29 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#include "NetStream.h"
 
 #include "log.h"
 #ifdef SOUND_GST
@@ -27,7 +29,6 @@
 #elif defined(USE_FFMPEG)
 # include "NetStreamFfmpeg.h"
 #endif
-#include "NetStream.h"
 #include "fn_call.h"
 #include "builtin_function.h"
 #include "GnashException.h"

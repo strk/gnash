@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.13 2007/03/04 21:35:31 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.14 2007/03/09 14:38:29 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -25,6 +25,10 @@
 
 #ifdef USE_FFMPEG
 
+#ifndef __STDC_CONSTANT_MACROS
+#define __STDC_CONSTANT_MACROS
+#endif
+
 #include <queue>
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp> 
@@ -32,7 +36,9 @@
 
 #include "impl.h"
 #include "video_stream_instance.h"
+
 #include <ffmpeg/avformat.h>
+
 #include "image.h"
 #include "StreamProvider.h"	
 #include "NetStream.h" // for inheritance
