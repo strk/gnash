@@ -328,6 +328,27 @@ as_object::instanceOf(as_function* ctor)
 	return false;
 }
 
+bool
+as_object::prototypeOf(as_object& instance)
+{
+	const as_object* obj = &instance;
+
+	std::set<const as_object*> visited;
+
+	while (obj && visited.insert(obj).second )
+	{
+		if ( obj->get_prototype() == this ) return true;
+		obj = obj->get_prototype(); 
+	}
+
+	// See actionscript.all/Inheritance.as for a way to trigger this
+	IF_VERBOSE_ASCODING_ERRORS(
+	if ( obj ) log_aserror("Circular inheritance chain detected during isPrototypeOf call");
+	);
+
+	return false;
+}
+
 void
 as_object::dump_members() 
 {
@@ -495,6 +516,21 @@ as_object::delProperty(const std::string& name)
 	else
 	{
 		return _members.delProperty(name);
+	}
+}
+
+Property*
+as_object::getOwnProperty(const std::string& name)
+{
+	if ( _vm.getSWFVersion() < 7 )
+	{
+        	std::string key = name;
+		boost::to_lower(key, _vm.getLocale());
+		return _members.getProperty(key);
+	}
+	else
+	{
+		return _members.getProperty(name);
 	}
 }
 

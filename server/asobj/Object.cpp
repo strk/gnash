@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.15 2007/03/04 02:00:42 strk Exp $ */
+/* $Id: Object.cpp,v 1.16 2007/03/09 01:11:42 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -43,7 +43,12 @@ namespace gnash {
 
 // Forward declarations
 static void object_addproperty(const fn_call&);
-static void object_registerClass(const fn_call&);
+static void object_registerClass(const fn_call& fn);
+static void object_hasOwnProperty(const fn_call&);
+static void object_isPropertyEnumerable(const fn_call&);
+static void object_isPrototypeOf(const fn_call&);
+static void object_watch(const fn_call&);
+static void object_unwatch(const fn_call&);
 
 
 static void
@@ -62,8 +67,13 @@ attachObjectInterface(as_object& o)
 	o.init_member("toString", new builtin_function(as_object::tostring_method));
 
 	if ( target_version  < 6 ) return;
+
 	o.init_member("addProperty", new builtin_function(object_addproperty));
-	o.set_member_flags("addProperty", 1); // hidden
+	o.init_member("hasOwnProperty", new builtin_function(object_hasOwnProperty));
+	o.init_member("isPropertyEnumerable", new builtin_function(object_isPropertyEnumerable));
+	o.init_member("isPrototypeOf", new builtin_function(object_isPrototypeOf));
+	o.init_member("watch", new builtin_function(object_watch));
+	o.init_member("unwatch", new builtin_function(object_unwatch));
 }
 
 as_object*
@@ -311,6 +321,101 @@ object_registerClass(const fn_call& fn)
 			typeid(theclass).name(),
 			(void*)theclass);
 	fn.result->set_bool(false);
+}
+
+void
+object_hasOwnProperty(const fn_call& fn)
+{
+	assert(fn.result->is_undefined());
+	if ( fn.nargs < 1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Object.hasOwnProperty() requires one arg");
+		);
+		return;
+	}
+	as_value& arg = fn.arg(0);
+	std::string propname = arg.to_std_string();
+	if ( arg.is_undefined() || propname.empty() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Invalid call to Object.hasOwnProperty('%s')", arg.to_string());
+		);
+		return;
+	}
+	fn.result->set_bool(fn.this_ptr->getOwnProperty(propname) != NULL);
+	log_warning("TESTING: %s", __FUNCTION__);
+}
+
+void
+object_isPropertyEnumerable(const fn_call& fn)
+{
+	assert(fn.result->is_undefined());
+	if ( fn.nargs < 1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Object.isPropertyEnumerable() requires one arg");
+		);
+		return;
+	}
+	as_value& arg = fn.arg(0);
+	std::string propname = arg.to_std_string();
+	if ( arg.is_undefined() || propname.empty() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Invalid call to Object.isPropertyEnumerable('%s')", arg.to_string());
+		);
+		return;
+	}
+
+	Property* prop = fn.this_ptr->getOwnProperty(propname);
+	if ( ! prop )
+	{
+		fn.result->set_bool(false);
+		return;
+	}
+
+	fn.result->set_bool( ! prop->getFlags().get_dont_enum() );
+	log_warning("TESTING: %s", __FUNCTION__);
+}
+
+void
+object_isPrototypeOf(const fn_call& fn)
+{
+	assert(fn.result->is_undefined());
+	if ( fn.nargs < 1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Object.isPrototypeOf() requires one arg");
+		);
+		fn.result->set_bool(false); 
+		return;
+	}
+
+	as_object* obj = fn.arg(0).to_object();
+	if ( ! obj )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("First arg to Object.isPrototypeOf(%s) is not an object", fn.arg(0).to_string());
+		);
+		fn.result->set_bool(false);
+		return;
+	}
+
+	fn.result->set_bool(fn.this_ptr->prototypeOf(*obj));
+	log_warning("TESTING: %s", __FUNCTION__);
+}
+
+void
+object_watch(const fn_call&)
+{
+	log_error("FIXME: %s: unimplemented", __FUNCTION__);
+}
+
+void
+object_unwatch(const fn_call&)
+{
+	log_error("FIXME: %s: unimplemented", __FUNCTION__);
 }
   
 } // namespace gnash

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.22 2007/02/07 21:51:57 strk Exp $";
+rcsid="$Id: Object.as,v 1.23 2007/03/09 01:11:42 strk Exp $";
 
 #include "check.as"
 
@@ -31,8 +31,18 @@ check_equals(typeof(Object.prototype.toString), 'function');
 check_equals(typeof(Object.prototype.valueOf), 'function');
 #if OUTPUT_VERSION > 5
 check_equals(typeof(Object.prototype.addProperty), 'function');
+check_equals(typeof(Object.prototype.hasOwnProperty), 'function');
+check_equals(typeof(Object.prototype.isPropertyEnumerable), 'function');
+check_equals(typeof(Object.prototype.isPrototypeOf), 'function');
+check_equals(typeof(Object.prototype.watch), 'function');
+check_equals(typeof(Object.prototype.unwatch), 'function');
 #else
 check_equals(typeof(Object.prototype.addProperty), 'undefined');
+check_equals(typeof(Object.prototype.hasOwnProperty), 'undefined');
+check_equals(typeof(Object.prototype.isPropertyEnumerable), 'undefined');
+check_equals(typeof(Object.prototype.isPrototypeOf), 'undefined');
+check_equals(typeof(Object.prototype.watch), 'undefined');
+check_equals(typeof(Object.prototype.unwatch), 'undefined');
 #endif
 
 // Test Object creation using 'new'
@@ -94,9 +104,9 @@ check_equals( obj3.test, 4 );
 check (copy.__proto__.constructor == Object);
 
 
-//----------------------
-// Test addProperty
-//----------------------
+//---------------------------------------------
+// Test addProperty / hasOwnProperty (SWF6 up)
+//---------------------------------------------
 
 // Object.addProperty wasn't in SWF5
 #if OUTPUT_VERSION > 5
@@ -114,6 +124,22 @@ function setLen(l) {
 // add the "len" property
 var ret = obj3.addProperty("len", getLen, setLen);
 check_equals(ret, true);
+
+// toString is not obj3 "own" property, but it's inherited !
+check_equals(typeof(obj3.toString), 'function');
+ownPropertyCheck = obj3.hasOwnProperty("toString");
+check_equals(typeof(ownPropertyCheck), 'boolean');
+check(!ownPropertyCheck);
+
+// 'member' is an obj3 "own" member (not inherited) 
+ownPropertyCheck = obj3.hasOwnProperty("member");
+check_equals(typeof(ownPropertyCheck), 'boolean');
+check(ownPropertyCheck);
+
+// 'len' is an obj3 "own" property (not inherited) 
+ownPropertyCheck = obj3.hasOwnProperty("len");
+check_equals(typeof(ownPropertyCheck), 'boolean');
+check(ownPropertyCheck);
 
 check_equals (obj3.len, undefined);
 obj3._len = 3;
@@ -157,6 +183,7 @@ var o = new Object();
 o.addProperty = function(a, b) { return a+b; };
 var c = o.addProperty(2,5);
 check_equals(c, 7);
+check(o.addProperty != Object.prototype.addProperty );
 
 // Object.addProperty wasn't in SWF5
 #endif // OUTPUT_VERSION > 5
@@ -208,3 +235,87 @@ check_equals(obj5['A'], 1);
 #else
 check_equals(obj5['A'], undefined);
 #endif
+
+//----------------------------------------------------
+// Test Object.isPropertyEnumerable (SWF6 up)
+//----------------------------------------------------
+
+#if OUTPUT_VERSION > 5
+
+// quick built-ins check
+check( Object.prototype.hasOwnProperty("isPropertyEnumerable") );
+check( ! Object.prototype.isPropertyEnumerable("isPropertyEnumerable") );
+check( Object.prototype.hasOwnProperty("addProperty") );
+check( ! Object.prototype.isPropertyEnumerable("addProperty") );
+check( Object.prototype.hasOwnProperty("hasOwnProperty") );
+check( ! Object.prototype.isPropertyEnumerable("hasOwnProperty") );
+
+obj6 = new Object();
+obj6.member = "a member";
+
+ret = obj6.isPropertyEnumerable('unexistent');
+check_equals(typeof(ret), 'boolean');
+check( ! ret ); // non-existant
+
+ret = obj6.isPropertyEnumerable('member');
+check_equals(typeof(ret), 'boolean');
+check( ret );
+
+function enumerableThings()
+{
+	this.member1 = "a string";
+	this.member2 = 3;
+	ASSetPropFlags(this, "member2", 1); // hide member2
+}
+enumerableThings.prototype.member3 = new Object;
+
+ret = enumerableThing.isPropertyEnumerable('member1');
+check_equals( typeof(ret), 'undefined' );
+
+obj7 = new enumerableThings();
+check( obj7.isPropertyEnumerable('member1') );
+check( ! obj7.isPropertyEnumerable('member2') );
+check_equals( typeof(obj7.member3), 'object' );
+check( ! obj7.isPropertyEnumerable('member3') );
+
+#endif // OUTPUT_VERSION > 5
+
+//----------------------------------------------------
+// Test Object.isPrototypeOf (SWF6 up)
+//----------------------------------------------------
+
+#if OUTPUT_VERSION > 5
+
+obj8 = function() {};
+obj9 = function() {};
+obj9.__proto__ = new obj8;
+obj10 = new obj9;
+
+check_equals( typeof(obj8.isPrototypeOf(obj8)), 'boolean' );
+check_equals( typeof(obj8.isPrototypeOf(undefined)), 'boolean' );
+check( obj9.prototype.isPrototypeOf(obj10) );
+check( ! obj8.prototype.isPrototypeOf(obj10) );
+check( obj8.prototype.isPrototypeOf(obj9) );
+// TODO: add tests here !
+
+#endif // OUTPUT_VERSION > 5
+
+//----------------------------------------------------
+// Test Object.watch (SWF6 up)
+//----------------------------------------------------
+
+#if OUTPUT_VERSION > 5
+
+// TODO: add tests here !
+
+#endif // OUTPUT_VERSION > 5
+
+//----------------------------------------------------
+// Test Object.unwatch (SWF6 up)
+//----------------------------------------------------
+
+#if OUTPUT_VERSION > 5
+
+// TODO: add tests here !
+
+#endif // OUTPUT_VERSION > 5

@@ -235,6 +235,21 @@ public:
 	///
 	std::pair<bool,bool> delProperty(const std::string& name);
 
+	/// Get this object's own named property, if existing.
+	//
+	/// This function does *not* recurse in this object's prototype.
+	///
+	/// @parame name
+	///     Name of the property.
+	///	Case insensitive up to SWF6,
+	///	case *sensitive* from SWF7 up.
+	///
+	/// @return
+	///	a Property pointer, or NULL if this object doesn't
+	///	contain the named property.
+	///
+	Property* getOwnProperty(const std::string& name);
+
 	/// Set member flags (probably used by ASSetPropFlags)
 	//
 	/// @parame name
@@ -262,6 +277,7 @@ public:
 
 	void	clear();
 
+	/// \brief
 	/// Check whether this object is an instance of the given
 	/// as_function constructor
 	//
@@ -269,6 +285,12 @@ public:
 	/// work
 	///
 	bool instanceOf(as_function* ctor);
+
+	/// \brief
+	/// Check whether this object is a 'prototype' in the given
+	/// object's inheritance chain.
+	//
+	bool prototypeOf(as_object& instance);
 
 	/// Set property flags
 	//
