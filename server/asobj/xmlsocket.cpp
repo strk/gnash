@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -399,22 +399,8 @@ xmlsocket_connect(const fn_call& fn)
     fn.env->push(as_value(true));
     if (fn.this_ptr->get_member("onConnect", &method)) {
         //    log_msg("FIXME: Found onConnect!\n");
-        as_c_function_ptr	func = method.to_c_function();
-        first = false;
-        //env->set_variable("success", true, 0);
-        
-        if (func) {
-            // It's a C function.  Call it.
-            log_msg("Calling C function for onConnect\n");
-            (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-        }
-        else if (as_function* as_func = method.to_as_function()) {
-            // It's an ActionScript function.  Call it.
-            log_msg("Calling ActionScript function for onConnect\n");
-            (*as_func)(fn_call(&val, fn.this_ptr, fn.env, 2, 2));
-        } else {
-            log_error("error in call_method(): method is not a function\n");
-        }    
+        first = false; // what is this for ?
+        val = call_method0(method, fn.env, fn.this_ptr);
     } else {
         //ptr->set_event_handler(event_id::SOCK_CONNECT, (as_c_function_ptr)&xmlsocket_event_connect);
     }
@@ -544,8 +530,6 @@ xmlsocket_event_ondata(const fn_call& fn)
     std::vector<const char *> msgs;
     char          *messages[200];
     int           i;
-    as_c_function_ptr	func;
-    as_function*       as_func;
     
     xmlsocket_as_object*	ptr = (xmlsocket_as_object*)fn.this_ptr;
     assert(ptr);
@@ -563,8 +547,6 @@ xmlsocket_event_ondata(const fn_call& fn)
     
     if (ptr->obj.anydata(messages)) {
         if (fn.this_ptr->get_member("onData", &method)) {
-            func = method.to_c_function();
-            as_func = method.to_as_function();
             //log_msg("Got %d messages from XMLsocket\n", msgs.size());
             //      for (i=0; i<msgs.size(); i++) {
             for (i=0; messages[i] != 0; i++) {
@@ -577,17 +559,7 @@ xmlsocket_event_ondata(const fn_call& fn)
 #endif
                 as_environment *env = new as_environment;
                 env->push(datain);
-                if (func) {
-                    // It's a C function.  Call it.
-                    //log_msg("Calling C function for onData\n");
-                    (*func)(fn_call(&val, fn.this_ptr, env, 1, 0));
-                } else if (as_func) {
-                    // It's an ActionScript function.  Call it.
-                    //log_msg("Calling ActionScript function for onData, processing msg %d\n", i);
-                    (*as_func)(fn_call(&val, fn.this_ptr, env, 1, 0));
-                } else {
-                    log_error("error in call_method(): method is not a function\n");
-        }
+        	val = call_method(method, env, fn.this_ptr, 1, 0);
         env->pop();
         delete env;
 #ifndef USE_DMALLOC
@@ -651,23 +623,7 @@ xmlsocket_event_connect(const fn_call& fn)
         //env->bottom(0) = true;
         
         if (fn.this_ptr->get_member("onConnect", &method)) {
-            as_c_function_ptr	func = method.to_c_function();
-            if (func)
-                {
-                    // It's a C function.  Call it.
-                    //log_msg("Calling C function for onConnect\n");
-                    (*func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-                }
-            else if (as_function* as_func = method.to_as_function())
-                {
-                    // It's an ActionScript function.  Call it.
-                    //log_msg("Calling ActionScript function for onConnect\n");
-                    (*as_func)(fn_call(&val, fn.this_ptr, fn.env, 0, 0));
-                }
-            else
-                {
-                    log_error("error in call_method(): method is not a function\n");
-                }    
+	    val = call_method0(method, fn.env, fn.this_ptr);
         } else {
             log_msg("FIXME: Couldn't find onConnect!\n");
         }

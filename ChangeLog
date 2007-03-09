@@ -1,5 +1,7 @@
 2007-03-09 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlsocket.cpp: use call_method() and call_method0()
+	  rather then duplicate its implementation.
 	* server/asobj/xml.cpp: use call_method() rather then 
 	  duplicate its implementation.
 	* server/as_environment.cpp: include index in registers dump.
