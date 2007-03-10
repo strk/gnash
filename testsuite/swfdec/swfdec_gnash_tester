@@ -14,7 +14,7 @@ in="$1"
 out=`basename "${in}"`.trace-gnash
 exp="${in}.trace"
 
-${GPROCESSOR} -r10 -f10 -v "$in"  | grep TRACE | sed 's/.*TRACE: //' | fromdos > $out
+${GPROCESSOR} -r10 -f11 -v "$in"  | grep TRACE | sed 's/.*TRACE: //' | fromdos > $out
 if test "$?" != 0; then
 	echo "gprocessor returned an error"
 	exit 1

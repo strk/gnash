@@ -1,5 +1,10 @@
 2007-03-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/swfdec_gnash_tester: allow 11 advances
+	  rather then 10 (this is likely due to Gnash current
+	  additional advance required for proper construction
+	  of initial stage). Makes 5 more tests from the swfdec
+	  testsuite pass (including gotoframe!!).
 	* server/sprite_instance.cpp (add_display_object):
 	  Only syntetize instance names for sprite instances
 	  (fixes swfdec's names.swf testcase).
