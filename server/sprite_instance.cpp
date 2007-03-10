@@ -3106,15 +3106,19 @@ sprite_instance::add_display_object(
 	boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, character_id);
 	assert(ch.get() != NULL);
 
-	// Syntetize an instance name if this character doesn't have one
-	// TODO: check if we need to do this *only* for sprite characters
-	//       also, consider asking for "nextInstanceName" to the character
-	//       definition...
-	std::string instance_name;
-	if ( name ) instance_name = name;
-	else instance_name = getNextUnnamedInstanceName();
-
-	ch->set_name(instance_name.c_str());
+	if ( name )
+	{
+		ch->set_name(name);
+	}
+	else if ( ch->to_movie() )
+	{
+		// MovieClip instances *need* a name, to properly setup
+		// an as_value for them (values are kept by "target path"
+		// reference.  We syntetize an instance name in this case.
+		// TODO: check if we need to do this for other character types
+		std::string instance_name = getNextUnnamedInstanceName();
+		ch->set_name(instance_name.c_str());
+	}
 
 	// Attach event handlers (if any).
 	for (size_t i = 0, n = event_handlers.size(); i < n; i++)
@@ -3153,7 +3157,7 @@ sprite_instance::replace_display_object(
 	if (cdef == NULL)
 	{
 		log_error("sprite::replace_display_object(): "
-			"unknown cid = %d\n", character_id);
+			"unknown cid = %d", character_id);
 		return;
 	}
 	assert(cdef);
