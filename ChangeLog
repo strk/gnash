@@ -1,5 +1,6 @@
 2007-03-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: expect 5 more successes.
 	* testsuite/swfdec/swfdec_gnash_tester: allow 11 advances
 	  rather then 10 (this is likely due to Gnash current
 	  additional advance required for proper construction
