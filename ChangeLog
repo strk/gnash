@@ -1,5 +1,9 @@
 2007-03-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am: 
+	  Import Dejagnu.swf from the same dir the SWF
+	  is in, to work around player8+ lame
+	  security model.
 	* server/array.{cpp,h}: provide an override
 	  for Object.toString().
 	* testsuite/swfdec/PASSING: array.swf now passes.
