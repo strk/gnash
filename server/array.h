@@ -79,9 +79,16 @@ public:
 
 	void reverse();
 
-	std::string join(const std::string& separator);
+	std::string join(const std::string& separator) const;
 
-	std::string toString();
+	std::string toString() const;
+
+	// override from as_object
+	const char* get_text_value() const
+	{
+		_strval = toString();
+		return _strval.c_str();
+	}
 
 	unsigned int size() const;
 
@@ -140,6 +147,10 @@ private:
 	// it takes a string that is the member name of the array and returns -1
 	// if the string does not refer to an index, or an appropriate int if the string does refer to an index
 	int index_requested(const std::string& name);
+
+	// Required due to dumb as_object::get_text_value()
+	// method returning by 'const' char *
+	mutable std::string _strval;
 
 };
 

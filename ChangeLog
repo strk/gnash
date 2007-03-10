@@ -1,5 +1,11 @@
 2007-03-10 Sandro Santilli <strk@keybit.net>
 
+	* server/array.{cpp,h}: provide an override
+	  for Object.toString().
+	* testsuite/swfdec/PASSING: array.swf now passes.
+
+2007-03-10 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/swfdec/PASSING: expect 5 more successes.
 	* testsuite/swfdec/swfdec_gnash_tester: allow 11 advances
 	  rather then 10 (this is likely due to Gnash current

@@ -221,7 +221,7 @@ as_array_object::reverse()
 }
 
 std::string
-as_array_object::join(const std::string& separator)
+as_array_object::join(const std::string& separator) const
 {
 	// TODO - confirm this is the right format!
 	// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
@@ -263,7 +263,7 @@ as_array_object::concat(const as_array_object& other)
 }
 
 std::string
-as_array_object::toString()
+as_array_object::toString() const
 {
 	return join(",");
 }
