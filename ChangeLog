@@ -1,3 +1,10 @@
+2007-03-10  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/boost.m4: Only select one library! So please leave the
+	break lines in after the libraries are matched in the file
+	system. Check for date_time in the same way to handle the weird
+	naming of boost libraries.
+
 2007-03-10 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Makefile.am: 
@@ -188,6 +195,51 @@
 
 	* testsuite/swfdec/: README, swfdec_gnash_tester:
 	  Initial stuff to hook on swfdec testsuite.
+
+2007-03-06  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* missing: Update to newer version.
+	* mkinstalldirs: Update to newer version.
+	* Makefile.am: Add new "olpc" target to cross build RPM using a
+	non standard config triplet to force rpmbuild to work correctly,
+	since it doesn't support the vendor field. Add macros/incllist
+	macros/libslist to EXTRA_DIST. 
+	* packaging/redhat/gnash.spec: Add support for cross building
+	RPMs.
+	* packaging/redhat/rpmrc: Config file for rpmbuild to convert non
+	standard config for geode-olpc into a standard i386-olpc-linux
+	build, but use the correct cross compiler.
+	* plugin/plugin.cpp: Cast away the const for MIME_TYPES_DESCRIPTION.
+	* plugin/klash/Makefile.am: Don't build klash.moc, it's built in
+	gui now.
+	* configure.ac: Remove --enable-fork option, it's unused. Get the
+	root directory to look for headers and libraries for a cross build
+	from GCC, as the path is different when building RPMs.
+	* cygnal/Makefile.am: Fix spelling of noinst_HEADERS.
+	* cygnal/README: Fix typo.
+	* extensions/Makefile.am: Add support for other directories for
+	building a distribution.
+	* extensions/gtk2/Makefile.am: Include from gui directory
+	too. Don't build test program by default for now.
+	* gui/Makefile.am: Add XML to include paths.
+	* gui/gnash.cpp: Disable network support for now.
+	* gui/gtksup.h: Return the GtkWidget handle of a window.
+	* libbase/Makefile.am: PTHREAD_LIBS should always be after
+	BOOST_LIBS.
+	* libbase/network.cpp: Tweak debug messages. Test for priviledged
+	ports. Add support for a blocking select when waiting for a
+	connection.
+	* macros/boost.m4: Break when the right path is found.
+	* macros/ffmpeg.m4: Handle multiple directories with -I when
+	setting topdir. Print a warning if avcodec.h is found, but
+	avformat.h is not.
+	* macros/gnashpkgtool.m4: Don't create an enable option for
+	everything, it's confusing.
+	* macros/kde.m4: Look in incllist as well as libslist for QT
+	headers.
+	* testsuite/Makefile.am: Add generic-testrunner.sh to dist_noinst_SCRIPTS.
+	* testsuite/misc-ming.all/Makefile.am: Add intervalTest.as to
+	EXTRA_DIST.
 
 2007-03-06 Bastiaan Jacques <bastiaan@bjacques.org>
 

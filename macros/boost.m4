@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.33 2007/03/06 20:07:07 bjacques Exp $
+dnl $Id: boost.m4,v 1.34 2007/03/11 00:15:55 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -24,14 +24,15 @@ AC_DEFUN([GNASH_PATH_BOOST],
 [
   dnl Lool for the header
   AC_ARG_WITH(boost_incl, AC_HELP_STRING([--with-boost-incl], [directory where boost headers are]), with_boost_incl=${withval})
-  AC_CACHE_VAL(ac_cv_path_boost_incl,[
-  if test x"${with_boost_incl}" != x ; then
-    if test -f ${with_boost_incl}/boost/detail/lightweight_mutex.hpp ; then
-      ac_cv_path_boost_incl=-I`(cd ${with_boost_incl}; pwd)`
-    else
-      AC_MSG_ERROR([${with_boost_incl} directory doesn't contain any headers])
+  AC_CACHE_VAL(ac_cv_path_boost_incl, [
+    if test x"${with_boost_incl}" != x ; then
+      if test -f ${with_boost_incl}/boost/detail/lightweight_mutex.hpp ; then
+        ac_cv_path_boost_incl=-I`(cd ${with_boost_incl}; pwd)`
+      else
+        AC_MSG_ERROR([${with_boost_incl} directory doesn't contain any headers])
+      fi
     fi
-  fi ])
+  ])
 
   dnl Attempt to find the top level directory, which unfortunately has a
   dnl version number attached. At least on Debian based systems, this
@@ -51,6 +52,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
         if test -f ${j}/boost/detail/lightweight_mutex.hpp; then
           gnash_boost_topdir=`basename $j`
           gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`
+          ac_cv_path_boost_incl="-I$j"
           break
         fi
       done
@@ -66,27 +68,10 @@ AC_DEFUN([GNASH_PATH_BOOST],
    AC_MSG_RESULT(${gnash_boost_version})
   fi
 
-  AC_LANG_PUSH(C++)
-  if test x"${ac_cv_path_boost_incl}" = x ; then
-    if test x"${ac_cv_path_boost_incl}" = x; then
-      for i in $incllist; do
-        if test -f $i/boost/detail/lightweight_mutex.hpp; then
-          ac_cv_path_boost_incl="-I$i"
-          break
-        fi
-        for j in `ls -dr $i/boost* 2>/dev/null`; do
-          if test -f $j/boost/detail/lightweight_mutex.hpp; then
-            ac_cv_path_boost_incl="-I$j"
-            break
-          fi
-        done
-      done
-   fi
-  fi
   if test x"${ac_cv_path_boost_incl}" = x ; then
     AC_CHECK_HEADERS(boost/detail/lightweight_mutex.hpp, [ac_cv_path_boost_incl="-I/usr/include"])
   fi
-  AC_LANG_POP(C++)
+
   AC_MSG_CHECKING([for boost header])
   AC_MSG_RESULT(${ac_cv_path_boost_incl})
   BOOST_CFLAGS="$ac_cv_path_boost_incl"
@@ -94,31 +79,35 @@ AC_DEFUN([GNASH_PATH_BOOST],
 
   dnl Look for the library
   AC_ARG_WITH(boost_lib, AC_HELP_STRING([--with-boost-lib], [directory where boost libraries are]), with_boost_lib=${withval})
-  AC_CACHE_VAL(ac_cv_path_boost_lib,[
-  if test x"${with_boost_lib}" != x ; then
-     ac_cv_path_boost_lib=`(cd ${with_boost_lib}; pwd)`
-  fi
-])
+  AC_CACHE_VAL(ac_cv_path_boost_lib, [
+    if test x"${with_boost_lib}" != x ; then
+      ac_cv_path_boost_lib=`(cd ${with_boost_lib}; pwd)`
+    fi
+  ])
 
-  dnl This is the default list of names to search for. The function needs to be
-  dnl a C function, as double colons screw up autoconf. We also force the probable 
-  boostnames="boost_thread-gcc-mt boost_thread boost-thread boost_thread-mt boost-thread-gcc-mt"
-  version_suffix=`echo ${gnash_boost_version} | tr '_' '.'`
-  save_LIBS="$LIBS"
   AC_LANG_PUSH(C++)
+  save_LIBS="$LIBS"
+
+  dnl Specify the list of probable names. Boost creates 8 identical
+  dnl libraries with different names. The prefered order is to always
+  dnl use the one with -mt on it, because it's the thread safe
+  dnl version. Then look for the version with -gcc in it, as it's the
+  dnl version compiled with GCC instead of the native
+  dnl compiler. Finally look for the library without any qualitfying
+  dnl attributes.
+  boostnames="boost_thread-gcc-mt boost_thread boost-thread-mt boost_thread-gcc"
+  version_suffix=`echo ${gnash_boost_version} | tr '_' '.'`
   if test x"${ac_cv_path_boost_lib}" = x; then
-    AC_MSG_CHECKING([for Boost's thread and date-time libraries])
+    AC_MSG_CHECKING([for Boost's thread libraries])
     for i in $libslist; do
-      boostnames="`ls -dr $i/libboost?thread*.so 2>/dev/null` `ls -dr $i/libboost?date?time*.so 2>/dev/null`"
       for libname in ${boostnames}; do
-    	  if test -f ${libname}; then
-          linkname=`basename ${libname} | sed -e 's/lib//' -e 's/.so//'`
+    	  if test -f $i/lib${libname}.a -o -f $i/lib${libname}.so; then
     	    if test x"$i" != x"/usr/lib"; then
-           ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -L$i -l${linkname}"
-dnl    	      break
+            ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -L$i -l${libname}"
+            break
           else
-    	      ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${linkname}"
-dnl    	      break
+    	      ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${libname}"
+            break
           fi
         fi
       done
@@ -131,37 +120,54 @@ dnl    	      break
     for k in ${boostnames}; do
       if test -f ${ac_cv_path_boost_lib}/lib${k}.a -o -f ${ac_cv_path_boost_lib}/lib${k}.so; then
         if test x"${ac_cv_path_boost_lib}" != x"/usr/lib"; then
-	        ac_cv_path_boost_lib="-L${ac_cv_path_boost_lib} -l${k}"
-          break
+	        ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -L${ac_cv_path_boost_lib} -l${k}"
         else
-          ac_cv_path_boost_lib="-l${k}"
-          break
+          ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${k}"
         fi
       fi
     done
-	  if test -f $k/libboost_date_time.a -o $k/libboost_date_time.so; then
-      ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -lboost_date_time"
-    fi
   fi
   if test x"${ac_cv_path_boost_lib}" = x; then
     AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib="${LIBS}"])
   fi
 
-  dnl In Debian, date-time is currently in a separate package,
-  dnl so check whether it's installed.
-  save_LIBS="$LIBS"
-  LIBS="$ac_cv_path_boost_lib $save_LIBS"
-  LIBS="$LIBS $BOOST_CFLAGS"
+  dnl The naming convention is the same as for threads. -mt is the
+  dnl preferance, followed by -gcc-mt, followed by -gcc.
+  boostnames="boost_date_time_mt boost_date_time-gcc-mt boost_date_time-gcc boost_date_time-mt boost_date_time"
+  if test x"${ac_cv_path_boost_lib}" != x; then
+    AC_MSG_CHECKING([for Boost's date time libraries])
+    for i in $libslist; do
+      for libname in ${boostnames}; do
+    	  if test -f $i/lib${libname}.a -o -f $i/lib${libname}.so; then
+    	    if test x"$i" != x"/usr/lib"; then
+            ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -L$i -l${libname}"
+            break;
+          else
+    	      ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${libname}"
+            break;
+          fi
+        fi
+      done
+    done
+    AC_MSG_RESULT(${ac_cv_path_boost_lib})
+  else
+    for k in ${boostnames}; do
+      if test -f ${ac_cv_path_boost_lib}/lib${k}.a -o -f ${ac_cv_path_boost_lib}/lib${k}.so; then
+        if test x"${ac_cv_path_boost_lib}" != x"/usr/lib"; then
+	        ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -L${ac_cv_path_boost_lib} -l${k}"
+          break;
+        else
+          ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${k}"
+          break;
+        fi
+      fi
+    done
+  fi
+  if test x"${ac_cv_path_boost_lib}" = x; then
+    AC_SEARCH_LIBS(boost::date_time::nth_as_str, ${boostnames}, [ac_cv_path_boost_lib="${LIBS}"], , -lpthread)
+  fi
 
-  AC_TRY_LINK([#include <boost/date_time/gregorian/gregorian.hpp> 
-  using namespace boost::gregorian;], [
-	date d1(from_undelimited_string("20020125"));
-	date::ymd_type ymd = d1.year_month_day();
-	greg_weekday wd = d1.day_of_week();], [boost_date_time="yes"], [boost_date_time="no"])
-
-  LIBS="$save_LIBS"
-  AC_LANG_POP(C++)
-  
+  AC_LANG_POP(C++)  
   dnl we don't want any boost libraries in LIBS, we prefer to kep it seperate.
   LIBS="$save_LIBS"
   BOOST_LIBS="$ac_cv_path_boost_lib"
