@@ -25,6 +25,7 @@
 #include <iostream>
 #include <cerrno>
 #include <sys/mman.h>
+#include <unistd.h>
 
 #include "stream.h"
 #include "network.h"

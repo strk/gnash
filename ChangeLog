@@ -1,3 +1,7 @@
+2007-03-11 Deanna Phillips <deanna>
+
+	* cygnal/stream.cpp: Added #include <unistd.h>
+
 2007-03-10  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/boost.m4: Only select one library! So please leave the
