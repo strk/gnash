@@ -49,7 +49,7 @@ public:
     typedef enum {
         NO_OSTYPE,
         LINUX,
-        BSD,
+        BSDS,
         DARWIN,
         WIN32,
         SOLARIS
