@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.35 2007/03/11 05:17:14 rsavoye Exp $
+dnl $Id: boost.m4,v 1.36 2007/03/11 05:53:20 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -93,7 +93,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl version compiled with GCC instead of the native
   dnl compiler. Finally look for the library without any qualitfying
   dnl attributes.
-  boostnames="boost_thread-gcc-mt boost_thread boost-thread-mt boost_thread-gcc"
+  boostnames="boost_thread-gcc-mt boost_thread-mt boost_thread boost_thread-gcc"
   version_suffix=`echo ${gnash_boost_version} | tr '_' '.'`
   if test x"${ac_cv_path_boost_lib}" = x; then
     AC_MSG_CHECKING([for Boost's thread libraries])
