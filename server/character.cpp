@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.23 2007/03/09 10:18:49 strk Exp $ */
+/* $Id: character.cpp,v 1.24 2007/03/15 22:39:53 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -702,9 +702,9 @@ character::parent_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		// NOTE: will be NULL for root frame !
-		// 	 should it be 'ptr' instead ?
-		fn.result->set_as_object(ptr->get_parent());
+		as_object* p = ptr->get_parent();
+		if ( p ) fn.result->set_as_object(p);
+		else { assert(fn.result->is_undefined()); }
 	}
 	else // setter
 	{

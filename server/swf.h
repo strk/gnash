@@ -291,13 +291,52 @@ typedef enum
     ///
     ACTION_NEWEQUALS               = 0x49,
 
+    /// SWF5
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_number
+    ///
     ACTION_TONUMBER                = 0x4A,
+
+    /// SWF5
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_string
+    ///
     ACTION_TOSTRING                = 0x4B,
+
+    /// SWF5
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_duplicate
+    ///
     ACTION_DUP                     = 0x4C,
+
+    /// SWF5
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_swap
+    ///
     ACTION_SWAP                    = 0x4D,
+
+    /// SWF5
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_get_member
+    ///
     ACTION_GETMEMBER               = 0x4E,
+
+    /// SWF5
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_set_member
+    ///
     ACTION_SETMEMBER               = 0x4F,
+
+    /// SWF5
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_increment
+    ///
     ACTION_INCREMENT               = 0x50,
+
+    /// SWF5
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_decrement
+    ///
     ACTION_DECREMENT               = 0x51,
 
     /// SWF5

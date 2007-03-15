@@ -239,23 +239,6 @@ button_character_instance::button_character_instance(
 
 	attachButtonInterface(*this);
 
-	int r, r_num =  m_def->m_button_records.size();
-	m_record_character.resize(r_num);
-
-	for (r = 0; r < r_num; r++)
-	{
-		button_record& bdef = m_def->m_button_records[r];
-
-		const matrix&	mat = m_def->m_button_records[r].m_button_matrix;
-		const cxform&	cx = m_def->m_button_records[r].m_button_cxform;
-
-		boost::intrusive_ptr<character> ch = bdef.m_character_def->create_character_instance(this, id);
-		m_record_character[r] = ch;
-		ch->set_matrix(mat);
-		ch->set_cxform(cx);
-		ch->restart();
-	}
-
 	// check up presence KeyPress events
 	for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
 	{
@@ -820,6 +803,61 @@ button_character_instance::get_height() const
 		}
 	}
 	return 0.0;
+}
+
+character*
+button_character_instance::get_relative_target(const std::string& name)
+{
+	character* ch = get_relative_target_common(name);
+
+	if ( ! ch )
+	{
+		int size = m_record_character.size();
+		
+		// See if we have a match on the button records list
+		// TODO: Should we scan only currently visible characters 
+		// (get_active_characters) ?? 
+		for (int i=0; i<size; i++) {
+			character* child = m_record_character[i].get();
+			if (child->get_name() == name)
+				return child;
+		}
+	}
+
+	return ch; // possibly NULL
+}
+
+void
+button_character_instance::construct()
+{
+	int r, r_num =  m_def->m_button_records.size();
+	m_record_character.resize(r_num);
+
+	for (r = 0; r < r_num; r++)
+	{
+		button_record& bdef = m_def->m_button_records[r];
+
+		const matrix&	mat = m_def->m_button_records[r].m_button_matrix;
+		const cxform&	cx = m_def->m_button_records[r].m_button_cxform;
+
+		// we don't need an id here, do we ?
+		boost::intrusive_ptr<character> ch = bdef.m_character_def->create_character_instance(this, 0);
+		m_record_character[r] = ch;
+		ch->set_matrix(mat);
+		ch->set_cxform(cx);
+		ch->set_parent(this);
+		
+		if (ch->get_name().empty() && ch->wantsInstanceName()) {
+			std::string instance_name = getNextUnnamedInstanceName();
+			ch->set_name(instance_name.c_str());
+		}
+
+		ch->restart();
+		
+	}
+
+	// does a CONSTRUCT event even exist ?
+	// We'll not call it here..
 }
 
 } // end of namespace gnash

@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.50 2007/03/04 01:39:01 strk Exp $ */
+/* $Id: Global.cpp,v 1.51 2007/03/15 22:39:53 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -70,6 +70,8 @@
 #include "xml.h"
 #include "xmlsocket.h"
 
+#include <limits> // for numeric_limits<double>::quiet_NaN
+
 // Common code to warn and return if a required single arg is not present
 // and to warn if there are extra args.
 #define ASSERT_FN_ARGS_IS_1						\
@@ -111,7 +113,7 @@ as_global_isnan(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    fn.result->set_bool(fn.arg(0).is_nan());
+    fn.result->set_bool( isnan(fn.arg(0).to_number(fn.env)) );
 }
 
 static void
@@ -119,7 +121,7 @@ as_global_isfinite(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    fn.result->set_bool(fn.arg(0).is_finite());
+    fn.result->set_bool( isfinite(fn.arg(0).to_number(fn.env)) );
 }
 
 /// \brief Encode a string to URL-encoded format
@@ -421,6 +423,14 @@ Global::Global(VM& vm)
 	init_member("parseInt", new builtin_function(as_global_parseint));
 	init_member("isNaN", new builtin_function(as_global_isnan));
 	init_member("isFinite", new builtin_function(as_global_isfinite));
+
+	// NaN should only be in _global since SWF6, but this is just because
+	// SWF5 or lower did not have a "_global" reference at all, most likely
+	init_member("NaN", as_value(std::numeric_limits<double>::quiet_NaN()));
+
+	// Infinity should only be in _global since SWF6, but this is just because
+	// SWF5 or lower did not have a "_global" reference at all, most likely
+	init_member("Infinity", as_value(std::numeric_limits<double>::infinity()));
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------

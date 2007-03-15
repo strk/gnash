@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: VM.cpp,v 1.4 2006/12/06 10:21:32 strk Exp $ */
+/* $Id: VM.cpp,v 1.5 2007/03/15 22:39:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -97,6 +97,17 @@ int
 VM::getSWFVersion() const
 {
 	return _swfversion;
+}
+
+const std::string&
+VM::getPlayerVersion() const
+{
+	// TODO: find a "compatible" representation so that
+	//       player version checkers (javascript or similar)
+	//       will accept Gnash as a working player.
+	//       
+	static const std::string version("Gnash-" VERSION);
+	return version;
 }
 
 movie_root&

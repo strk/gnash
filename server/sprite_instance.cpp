@@ -48,6 +48,9 @@
 #include "GnashException.h"
 #include "URL.h"
 #include "sound_handler.h"
+#include "StreamProvider.h"
+#include "URLAccessManager.h" // for loadVariables
+#include "LoadVariablesThread.h" 
 
 #include <vector>
 #include <string>
@@ -544,6 +547,55 @@ static void sprite_load_movie(const fn_call& fn)
 
 	sprite->loadMovie(url);
 	log_warning("MovieClip.loadMovie(%s) - TESTING ", url.str().c_str());
+
+
+	//log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
+	//moviecliploader_loadclip(fn);
+}
+
+// my_mc.loadVariables(url:String [, variables:String]) : Void
+static void sprite_load_variables(const fn_call& fn)
+{
+	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	UNUSED(sprite);
+
+	if (fn.nargs < 1) // url
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_msg("Invalid call to MovieClip.loadVariables(), "
+			"expected 1 or 2 args, got %d - returning undefined",
+			fn.nargs);
+		);
+		return;
+	}
+
+	std::string urlstr = fn.arg(0).to_std_string();
+	if (urlstr.empty())
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_msg("First argument passed to MovieClip.loadVariables(%s) "
+			"evaluates to an empty string - "
+			"returning undefined",
+			ss.str().c_str());
+		);
+		return;
+	}
+	const URL& baseurl = get_base_url();
+	URL url(urlstr, baseurl);
+
+	short method = 0;
+
+	if (fn.nargs > 1)
+	{
+		std::string methodstring = fn.arg(1).to_std_string();
+		// Should we be case-insensitive in comparing these ?
+		if ( methodstring == "GET" ) method = 1;
+		else if ( methodstring == "POST" ) method = 2;
+	}
+
+	sprite->loadVariables(url, method);
+	log_warning("MovieClip.loadVariables(%s) - TESTING ", url.str().c_str());
 
 
 	//log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
@@ -1232,6 +1284,7 @@ attachMovieClipInterface(as_object& o)
 	o.init_member("getBytesLoaded", new builtin_function(sprite_get_bytes_loaded));
 	o.init_member("getBytesTotal", new builtin_function(sprite_get_bytes_total));
 	o.init_member("loadMovie", new builtin_function(sprite_load_movie));
+	o.init_member("loadVariables", new builtin_function(sprite_load_variables));
 	o.init_member("unloadMovie", new builtin_function(sprite_unload_movie));
 	o.init_member("hitTest", new builtin_function(sprite_hit_test));
 	o.init_member("duplicateMovieClip", new builtin_function(sprite_duplicate_movieclip));
@@ -1274,6 +1327,9 @@ attachMovieClipProperties(as_object& o)
 	//int target_version = o.getVM().getSWFVersion();
 
 	boost::intrusive_ptr<builtin_function> gettersetter;
+
+	// This is a normal property, can be overridden, deleted and enumerated
+	o.init_member( "$version", VM::get().getPlayerVersion(), 0); 
 
 	//
 	// Properties (TODO: move to appropriate SWF version section)
@@ -2534,6 +2590,9 @@ void sprite_instance::advance_sprite(float delta_time)
 {
 	//GNASH_REPORT_FUNCTION;
 
+	// Process any pending loadVariables request
+	processCompletedLoadVariableRequests();
+
 	// mouse drag.
 	character::do_mouse_drag();
 
@@ -3110,7 +3169,7 @@ sprite_instance::add_display_object(
 	{
 		ch->set_name(name);
 	}
-	else if ( ch->to_movie() )
+	else if ( ch->wantsInstanceName() )
 	{
 		// MovieClip instances *need* a name, to properly setup
 		// an as_value for them (values are kept by "target path"
@@ -3151,7 +3210,7 @@ sprite_instance::replace_display_object(
 		uint16_t clip_depth)
 {
 	assert(m_def != NULL);
-	// printf("%s: character %s, id is %d\n", __FUNCTION__, name, character_id); // FIXME: debugging crap
+	// log_msg("%s: character %s, id is %d", __FUNCTION__, name, character_id); // FIXME: debugging crap
 
 	character_def*	cdef = m_def->get_character_def(character_id);
 	if (cdef == NULL)
@@ -3617,11 +3676,19 @@ sprite_instance::get_text_value() const
 {
 	if ( ! _target_dot.empty() ) return _target_dot.c_str();
 
-	_target_dot = "_level0" + getTargetPath();
-	for (std::string::size_type i=0; i<_target_dot.length(); ++i)
+	std::string levelString = "_level0"; // TODO: support real levels!
+
+	const std::string& targetPath = getTargetPath();
+	if ( targetPath == "/" ) _target_dot = levelString;
+	else
 	{
-		if ( _target_dot[i] == '/' ) _target_dot[i] = '.';
+		_target_dot = levelString + targetPath;
+		for (std::string::size_type i=0; i<_target_dot.length(); ++i)
+		{
+			if ( _target_dot[i] == '/' ) _target_dot[i] = '.';
+		}
 	}
+
 	return _target_dot.c_str();
 }
 
@@ -3730,7 +3797,7 @@ sprite_instance::loadMovie(const URL& url)
 	boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
 	if (md == NULL)
 	{
-		log_error("can't create movie_definition for %s\n",
+		log_error("can't create movie_definition for %s",
 			url.str().c_str());
 		return false;
 	}
@@ -3740,7 +3807,7 @@ sprite_instance::loadMovie(const URL& url)
 	if (extern_movie == NULL)
 	{
 		log_error("can't create extern movie_instance "
-			"for %s\n", url.str().c_str());
+			"for %s", url.str().c_str());
 		return false;
 	}
 
@@ -3791,6 +3858,65 @@ sprite_instance::has_mouse_event()
 {
 	m_has_mouse_event = true;
 	_vm.getRoot().add_mouse_listener(this);
+}
+
+void 
+sprite_instance::loadVariables(const URL& url, short sendVarsMethod)
+{
+	// Check host security
+	if ( ! URLAccessManager::allow(url) )
+	{
+		return;
+	}
+
+	if ( sendVarsMethod )
+	{
+		log_error("FIXME: MovieClip.loadVariables() with GET/POST unimplemented yet - won't append vars for now");
+	}
+
+	_loadVariableRequests.push_back(new LoadVariablesThread(url));
+	_loadVariableRequests.back().process();
+	//log_msg(SIZET_FMT " loadVariables requests pending", _loadVariableRequests.size());
+
+}
+
+/*private*/
+void
+sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& request)
+{
+	assert(request.completed());
+
+	// TODO: consider adding a setVariables(std::map) for use by this
+	//       and by Player class when dealing with -P command-line switch
+
+	LoadVariablesThread::ValuesMap& vals = request.getValues();
+	for (LoadVariablesThread::ValuesMap::const_iterator it=vals.begin(),
+			itEnd=vals.end();
+		it != itEnd; ++it)
+	{
+		const string& name = it->first;
+		const string& val = it->second;
+		set_variable(name.c_str(), val.c_str()); // should it be set_member ?
+	}
+}
+
+/*private*/
+void
+sprite_instance::processCompletedLoadVariableRequests()
+{
+	// Nothing to do (just for clarity)
+	if ( _loadVariableRequests.empty() ) return;
+
+	for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
+			it != _loadVariableRequests.end(); ++it)
+	{
+		LoadVariablesThread& request = *it;
+		if ( request.completed() )
+		{
+			processCompletedLoadVariableRequest(request);
+			it = _loadVariableRequests.erase(it);
+		}
+	}
 }
 
 } // namespace gnash

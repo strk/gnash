@@ -86,6 +86,9 @@ check_PROGRAMS = \
 	simple_loop_testrunner \
 	action_execution_order_test \
 	action_execution_order_extend_test \
+	action_execution_order_test1 \
+	action_execution_order_test2 \
+	action_execution_order_test3 \
 	loadMovieTest \
 	loadMovieTestRunner \
 	eventSoundTest1 \
@@ -110,6 +113,9 @@ check_SCRIPTS = \
 	action_execution_order_testrunner \
 	action_execution_order_extend_testrunner \
 	gotoFrame2Test-Runner \
+	action_execution_order_test1runner \
+	action_execution_order_test2runner \
+	action_execution_order_test3runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -452,6 +458,48 @@ action_execution_order_testrunner: $(srcdir)/../generic-testrunner.sh action_exe
 	sh $< $(top_builddir) action_execution_order_test.swf > $@
 	chmod 755 $@
 
+action_execution_order_test1_SOURCES =	\
+	action_execution_order_test1.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+action_execution_order_test1_LDADD = $(MING_LIBS)
+
+action_execution_order_test1.swf: action_execution_order_test1
+	./action_execution_order_test1 $(top_srcdir)/testsuite/media
+
+action_execution_order_test1runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test1.swf
+	sh $< $(top_builddir) action_execution_order_test1.swf > $@
+	chmod 755 $@
+
+action_execution_order_test2_SOURCES =	\
+	action_execution_order_test2.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+action_execution_order_test2_LDADD = $(MING_LIBS)
+
+action_execution_order_test2.swf: action_execution_order_test2
+	./action_execution_order_test2 $(top_srcdir)/testsuite/media
+
+action_execution_order_test2runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test2.swf
+	sh $< $(top_builddir) action_execution_order_test2.swf > $@
+	chmod 755 $@
+
+action_execution_order_test3_SOURCES =	\
+	action_execution_order_test3.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+action_execution_order_test3_LDADD = $(MING_LIBS)
+
+action_execution_order_test3.swf: action_execution_order_test3
+	./action_execution_order_test3 $(top_srcdir)/testsuite/media
+
+action_execution_order_test3runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test3.swf
+	sh $< $(top_builddir) action_execution_order_test3.swf > $@
+	chmod 755 $@
+
 action_execution_order_extend_test_SOURCES =	\
 	action_execution_order_extend_test.c	\
 	ming_utils.h		\
@@ -687,6 +735,9 @@ TEST_CASES = \
 	intervalTestRunner \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
+	action_execution_order_test1runner \
+	action_execution_order_test2runner \
+	action_execution_order_test3runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS

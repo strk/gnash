@@ -16,3 +16,7 @@ gnash-dbg.log
 site.exp
 testrun.log
 testrun.sum
+action_execution_order_test1
+action_execution_order_test2
+action_execution_order_test3
+eventSoundTest1

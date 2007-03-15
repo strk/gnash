@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.29 2007/03/09 15:19:26 strk Exp $ */
+/* $Id: as_value.h,v 1.30 2007/03/15 22:39:53 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -37,6 +37,7 @@ class as_object;
 class fn_call;
 class as_function;
 class sprite_instance;
+class as_environment;
 
 #ifndef HAVE_ISFINITE
 # ifndef isfinite 
@@ -64,11 +65,7 @@ static inline int isnan_ld (long double x) { return x != x; }
 	static inline int isinf_ld (long double x) { return isnan (x - x); }
 #endif
  
-//#define ALLOW_C_FUNCTION_VALUES
-
-//#ifdef ALLOW_C_FUNCTION_VALUES
 typedef void (*as_c_function_ptr)(const fn_call& fn);
-//#endif
 
 // ActionScript value type.
 
@@ -95,16 +92,6 @@ public:
 
 		/// Object reference
 		OBJECT,
-
-#ifdef ALLOW_C_FUNCTION_VALUES
-		/// Internal function pointer (to drop)
-		//
-		/// TODO: deprecate this ! *every* function
-		///       in actionscript must be equipped with
-		///       ActionScript properties. Every as_value
-		///       function MUST be an AS_FUNCTION !!
-		C_FUNCTION,
-#endif
 
 		/// ActionScript function reference
 		AS_FUNCTION,
@@ -134,6 +121,15 @@ public:
 		:
 		m_type(STRING),
 		m_string_value(str),
+		m_number_value(0.0)
+	{
+	}
+
+	/// Construct a STRING value 
+	as_value(const std::string& str)
+		:
+		m_type(STRING),
+		m_string_value(str.c_str()),
 		m_number_value(0.0)
 	{
 	}
@@ -231,22 +227,6 @@ public:
 		set_as_object(obj);
 	}
 
-#ifdef ALLOW_C_FUNCTION_VALUES
-	/// Construct a C_FUNCTION value
-	//
-	/// TODO: deprecate this ! *every* function
-	///       in actionscript must be equipped with
-	///       ActionScript properties. Every as_value
-	///       function MUST be an AS_FUNCTION !!
-	///
-	as_value(as_c_function_ptr func)
-		:
-		m_type(C_FUNCTION),
-		m_c_function_value(func)
-	{
-	}
-#endif
-
 	/// Construct a NULL or AS_FUNCTION value
 	as_value(as_function* func);
 
@@ -264,31 +244,11 @@ public:
 
 	/// \brief
 	/// Return true if this value is callable
-	/// (C_FUNCTION or AS_FUNCTION).
+	/// (AS_FUNCTION).
 	bool is_function() const
 	{
-#ifdef ALLOW_C_FUNCTION_VALUES
-		return m_type == C_FUNCTION || m_type == AS_FUNCTION;
-#else
 		return m_type == AS_FUNCTION;
-#endif
 	}
-
-#ifdef ALLOW_C_FUNCTION_VALUES
-	/// Return true if this value is a C function
-	//
-	/// This is currently only important to know from the
-	/// ActionNew tag hander, in that C_FUNCTION constructors
-	/// and AS_FUNCTION constructor act in a sligtly different
-	/// way. We should likely *drop* support for C_FUNCTIONS
-	/// OR make them to act exactly like the AS_FUNCTION
-	/// counterparts.
-	///
-	bool is_c_function() const
-	{
-		return m_type == C_FUNCTION;
-	}
-#endif
 
 	/// Return true if this value is a AS function
 	bool is_as_function() const
@@ -329,13 +289,39 @@ public:
 	}
 
 	/// Get a C string representation of this value.
-	const char*	to_string() const;
+	//
+	/// @param env
+	///	The environment to use for running the toString() method
+	///	for object values. If NULL, toString() won't be run.
+	///
+	const char*	to_string(as_environment* env=NULL) const;
 
 	/// Get a tu_string representation for this value.
-	const tu_string&	to_tu_string() const;
+	//
+	/// @param env
+	///	The environment to use for running the toString() method
+	///	for object values. If NULL, toString() won't be run.
+	///
+	const tu_string&	to_tu_string(as_environment* env=NULL) const;
 
 	/// Get a std::string representation for this value.
-	std::string to_std_string() const;
+	//
+	/// @param env
+	///	The environment to use for running the toString() method
+	///	for object values. If NULL, toString() won't be run.
+	///
+	std::string to_std_string(as_environment* env=NULL) const;
+
+	/// Get a version-dependent std::string representation for this value.
+	//
+	/// @param version
+	///	The SWF version to be compatible with.
+	///
+	/// @param env
+	///	The environment to use for running the toString() method
+	///	for object values. If NULL, toString() won't be run.
+	///
+	std::string to_std_string_versioned(int version, as_environment* env=NULL) const;
 
 	/// Get a tu_string representation for this value.
 	//
@@ -344,16 +330,54 @@ public:
 	/// source. 
 	/// @@ shouldn't this be the default ?
 	///
-	const tu_string&	to_tu_string_versioned(int version) const;
+	/// @param env
+	///	The environment to use for running the toString() method
+	///	for object values. If NULL, toString() won't be run.
+	///
+	const tu_string&	to_tu_string_versioned(int version, as_environment* env=NULL) const;
 
 	/// Calls to_tu_string() returning a cast to tu_stringi
-	const tu_stringi&	to_tu_stringi() const;
+	//
+	/// @param env
+	///	The environment to use for running the toString() method
+	///	for object values. If NULL, toString() won't be run.
+	///
+	const tu_stringi&	to_tu_stringi(as_environment* env=NULL) const;
 
-	/// Conversion to double.
-	double	to_number() const;
+	/// Conversion to number 
+	//
+	/// @param env
+	///	The environment to use for running the valueOf() method
+	///	for object values. If NULL, valueOf() won't be run.
+	///
+	double	to_number(as_environment* env=NULL) const;
 
 	/// Conversion to boolean.
+	//
+	/// Will call version-dependent functions
+	/// based on current version.
+	///
+	/// See to_bool_v5(), to_bool_v6(), to_bool_v7() 
+	///
 	bool	to_bool() const;
+
+	/// Conversion to boolean for SWF7 and up
+	//
+	/// See to_bool()
+	///
+	bool	to_bool_v7() const;
+
+	/// Conversion to boolean for SWF6
+	//
+	/// See to_bool()
+	///
+	bool	to_bool_v6() const;
+
+	/// Conversion to boolean up to SWF5
+	//
+	/// See to_bool()
+	///
+	bool	to_bool_v5() const;
 
 	/// Return value as a primitive type
 	//
@@ -389,13 +413,6 @@ public:
 	///
 	sprite_instance* to_sprite() const;
 
-#ifdef ALLOW_C_FUNCTION_VALUES
-	/// \brief
-	/// Return value as a C function ptr
-	/// or NULL if it is not a C function.
-	as_c_function_ptr	to_c_function() const;
-#endif
-
 	/// \brief
 	/// Return value as an ActionScript function ptr
 	/// or NULL if it is not an ActionScript function.
@@ -411,9 +428,13 @@ public:
 	//
 	/// uses swf-version-aware converter
 	///
+	/// @param env
+	///	The environment to use for running the toString() method
+	///	for object values. If NULL, toString() won't be run.
+	///
 	/// @see to_tu_string_versionioned
 	///
-	void	convert_to_string_versioned(int version);
+	void	convert_to_string_versioned(int version, as_environment* env=NULL);
 
 	// These set_*()'s are more type-safe; should be used
 	// in preference to generic overloaded set().  You are
@@ -460,13 +481,6 @@ public:
 	///
 	void	set_as_object(as_object* obj);
 
-#ifdef ALLOW_C_FUNCTION_VALUES
-	void	set_as_c_function_ptr(as_c_function_ptr func)
-	{
-		drop_refs(); m_type = C_FUNCTION; m_c_function_value = func;
-	}
-#endif
-
 	/// Make this a NULL or AS_FUNCTION value
 	void	set_as_function(as_function* func);
 
@@ -490,21 +504,13 @@ public:
 		//TODO: don't use c_str() when m_string_value will be a std::string
 		else if (v.m_type == MOVIECLIP) set_sprite(v.m_string_value.c_str());
 
-#ifdef ALLOW_C_FUNCTION_VALUES
-		else if (v.m_type == C_FUNCTION) set_as_c_function_ptr(v.m_c_function_value);
-#endif
 		else if (v.m_type == AS_FUNCTION) set_as_function(v.m_as_function_value);
 		else assert(0);
 	}
 
-	bool	is_nan() const { return (m_type == NUMBER && isnan(m_number_value)); }
-	bool	is_inf() const { return (m_type == NUMBER && isinf(m_number_value)); }
-
 	bool	is_undefined() const { return (m_type == UNDEFINED); }
 
 	bool	is_null() const { return (m_type == NULLTYPE); }
-
-	bool is_finite() const { return (m_type == NUMBER && isfinite(m_number_value)); }
 
 	/// Return true if this value is strictly equal to the given one
 	//
@@ -515,19 +521,31 @@ public:
 	///
 	bool strictly_equals(const as_value& v) const;
 
+	/// Return true if this value is abstractly equal to the given one
+	//
+	/// See ECMA-262 abstract equality comparison (sect 11.9.3)
+	///
+	/// @param env
+	///	The environment to use for running the toString() method
+	///	for object values. If NULL, toString() won't be run.
+	///
+	bool equals(const as_value& v, as_environment* env=NULL) const;
+
+	/// @deprecated use equals() instead
 	bool	operator==(const as_value& v) const;
+
 	bool	operator!=(const as_value& v) const;
 	bool	operator<(const as_value& v) const { return to_number() < v.to_number(); }
-	void	operator+=(const as_value& v) { set_double(this->to_number() + v.to_number()); }
-	void	operator-=(const as_value& v) { set_double(this->to_number() - v.to_number()); }
-	void	operator*=(const as_value& v) { set_double(this->to_number() * v.to_number()); }
-	void	operator/=(const as_value& v) { set_double(this->to_number() / v.to_number()); }  // @@ check for div/0
-	void	operator&=(const as_value& v) { set_int(int(this->to_number()) & int(v.to_number())); }
-	void	operator|=(const as_value& v) { set_int(int(this->to_number()) | int(v.to_number())); }
-	void	operator^=(const as_value& v) { set_int(int(this->to_number()) ^ int(v.to_number())); }
-	void	shl(const as_value& v) { set_int(int(this->to_number()) << int(v.to_number())); }
-	void	asr(const as_value& v) { set_int(int(this->to_number()) >> int(v.to_number())); }
-	void	lsr(const as_value& v) { set_int((uint32_t(this->to_number()) >> int(v.to_number()))); }
+	void	operator+=(const as_value& v) { set_double(to_number() + v.to_number()); }
+	void	operator-=(const as_value& v) { set_double(to_number() - v.to_number()); }
+	void	operator*=(const as_value& v) { set_double(to_number() * v.to_number()); }
+	void	operator/=(const as_value& v) { set_double(to_number() / v.to_number()); }  // @@ check for div/0
+	void	operator&=(const as_value& v) { set_int(int(to_number()) & int(v.to_number())); }
+	void	operator|=(const as_value& v) { set_int(int(to_number()) | int(v.to_number())); }
+	void	operator^=(const as_value& v) { set_int(int(to_number()) ^ int(v.to_number())); }
+	void	shl(const as_value& v) { set_int(int(to_number()) << int(v.to_number())); }
+	void	asr(const as_value& v) { set_int(int(to_number()) >> int(v.to_number())); }
+	void	lsr(const as_value& v) { set_int((uint32_t(to_number()) >> int(v.to_number()))); }
 
 	/// Sets this value to this string plus the given string.
 	void	string_concat(const tu_string& str);
@@ -555,9 +573,6 @@ private:
 		// @@ hm, what about PS2, where double is bad?  should maybe have int&float types.
 		mutable	double	m_number_value;
 		as_object*	m_object_value;
-#ifdef ALLOW_C_FUNCTION_VALUES
-		as_c_function_ptr	m_c_function_value;
-#endif
 		as_function*	m_as_function_value;
 	};
 

@@ -5,7 +5,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.15 2007/03/08 18:40:18 udog Exp $ */
+/* $Id: button_character_instance.h,v 1.16 2007/03/15 22:39:53 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -100,6 +100,14 @@ public:
 	/// I.e. check against ourself.
 	///
 	virtual character* get_topmost_mouse_entity(float x, float y);
+	
+	virtual bool wantsInstanceName()
+	{
+		return true; // buttons can be referenced 
+	}
+	
+	/// Overridden to look in button records for a match
+	virtual character* get_relative_target(const std::string& name);
 
 	virtual void	on_button_event(const event_id& event);
 
@@ -124,6 +132,9 @@ public:
 	bool get_enabled();
 	void set_enabled(bool value);
 	
+	/// Properly initialize instance names for contained sprites
+	virtual void construct();
+
 private:
 	bool m_enabled;
 

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: debugger.h,v 1.8 2007/03/06 08:22:44 strk Exp $ */
+/* $Id: debugger.h,v 1.9 2007/03/15 22:39:53 strk Exp $ */
 
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
@@ -130,7 +130,7 @@ public:
     void changeGlobalRegister(as_environment &env, unsigned index, as_value &val);
 
     void callStackPush(const std::string &str) { _callstack.push_back(str); };
-    void callStackPop() { _callstack.pop_back(); };
+    void callStackPop() { if ( ! _callstack.empty() ) _callstack.pop_back(); };
     void callStackDump();
     std::string &callStackFrame() { return _callstack.back(); };
     

@@ -18,13 +18,14 @@
 #include "config.h"
 #endif
 
-#include "check.h"
 #include "as_prop_flags.h"
 
 #include <iostream>
 #include <sstream>
 #include <cassert>
 #include <string>
+
+#include "check.h"
 
 using namespace std;
 using namespace gnash;

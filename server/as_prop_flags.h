@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -78,6 +78,16 @@ public:
 	as_prop_flags(const int flags)
 		: _flags(flags), _protected(false)
 	{
+	}
+
+	bool operator== (const as_prop_flags& o) const
+	{
+		return ( _flags == o._flags ) && ( _protected == o._protected );
+	}
+
+	bool operator!= (const as_prop_flags& o) const
+	{
+		return ( _flags != o._flags ) || ( _protected != o._protected );
 	}
 
 	/// Get "read-only" flag 

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-rcsid="$Id: Math.as,v 1.2 2007/02/24 11:14:06 strk Exp $";
+rcsid="$Id: Math.as,v 1.3 2007/03/15 22:39:54 strk Exp $";
 
 // Test case for Math ActionScript class
 //
@@ -129,7 +129,7 @@ check_equals (Math.abs(notanumber).toString(), "NaN");
 #if OUTPUT_VERSION < 7
 check_equals (Math.abs(undefined).toString(), "0");
 #else
-xcheck_equals (Math.abs(undefined).toString(), "NaN");
+check_equals (Math.abs(undefined).toString(), "NaN");
 #endif
 check_equals (Math.abs().toString(), "NaN");
 
@@ -146,9 +146,9 @@ check_equals (Math.acos(undefined).toString(), "1.5707963267949");
 check_equals (Math.acos(acos(2)).toString(), "1.5707963267949");
 check_equals (Math.acos(undefined).toString(), "1.5707963267949");
 #else
-xcheck_equals (Math.acos(undefined).toString(), "NaN");
-xcheck_equals (Math.acos(acos(2)).toString(), "NaN");
-xcheck_equals (Math.acos(undefined).toString(), "NaN");
+check_equals (Math.acos(undefined).toString(), "NaN");
+check_equals (Math.acos(acos(2)).toString(), "NaN");
+check_equals (Math.acos(undefined).toString(), "NaN");
 #endif
 
 check_equals (Math.acos(1.0/0.0).toString(), "NaN");
@@ -171,7 +171,7 @@ check_equals (Math.asin(notanumber).toString(), "NaN");
 #if OUTPUT_VERSION < 7
 check_equals (Math.asin(undefined).toString(), "0");
 #else
-xcheck_equals (Math.asin(undefined).toString(), "NaN");
+check_equals (Math.asin(undefined).toString(), "NaN");
 #endif
 check_equals (Math.asin().toString(), "NaN");
 
@@ -188,7 +188,7 @@ check_equals (Math.atan(notanumber).toString(), "NaN");
 #if OUTPUT_VERSION < 7
  check_equals (Math.atan(undefined).toString(), "0");
 #else
- xcheck_equals (Math.atan(undefined).toString(), "NaN");
+ check_equals (Math.atan(undefined).toString(), "NaN");
 #endif
 check_equals (Math.atan().toString(), "NaN");
 
@@ -207,7 +207,7 @@ check_equals (Math.ceil(minusinf), minusinf);
 #if OUTPUT_VERSION < 7
  check_equals (Math.ceil(undefined).toString(), "0");
 #else
- xcheck_equals (Math.ceil(undefined).toString(), "NaN");
+ check_equals (Math.ceil(undefined).toString(), "NaN");
 #endif
 check_equals (Math.ceil().toString(), "NaN");
 
@@ -228,7 +228,7 @@ check_equals (Math.cos(notanumber).toString(), "NaN");
 #if OUTPUT_VERSION < 7
  check_equals (Math.cos(undefined).toString(), "1");
 #else
- xcheck_equals (Math.cos(undefined).toString(), "NaN");
+ check_equals (Math.cos(undefined).toString(), "NaN");
 #endif
 check_equals (Math.cos().toString(), "NaN");
 
@@ -242,7 +242,7 @@ check_equals (Math.exp(notanumber).toString(), "NaN");
 #if OUTPUT_VERSION < 7
  check_equals (Math.exp(undefined).toString(), "1");
 #else
- xcheck_equals (Math.exp(undefined).toString(), "NaN");
+ check_equals (Math.exp(undefined).toString(), "NaN");
 #endif
 check_equals (Math.exp().toString(), "NaN");
 
@@ -261,7 +261,7 @@ check_equals (Math.floor(notanumber).toString(), "NaN");
 #if OUTPUT_VERSION < 7
  check_equals (Math.floor(undefined).toString(), "0");
 #else
- xcheck_equals (Math.floor(undefined).toString(), "NaN");
+ check_equals (Math.floor(undefined).toString(), "NaN");
 #endif
 check_equals (Math.floor().toString(), "NaN");
 
@@ -276,7 +276,7 @@ check_equals (Math.log(notanumber).toString(), "NaN");
 #if OUTPUT_VERSION < 7
  check_equals (Math.log(undefined).toString(), "-Infinity");
 #else
- xcheck_equals (Math.log(undefined).toString(), "NaN");
+ check_equals (Math.log(undefined).toString(), "NaN");
 #endif
 check_equals (Math.log().toString(), "NaN");
 
@@ -301,7 +301,7 @@ check_equals (Math.round(notanumber).toString(), "NaN");
 #if OUTPUT_VERSION < 7
  check_equals (Math.round(undefined).toString(), "0"); 
 #else
- xcheck_equals (Math.round(undefined).toString(), "NaN");
+ check_equals (Math.round(undefined).toString(), "NaN");
 #endif
 check_equals (Math.round().toString(), "NaN");
 // Don't know what round() and friends do with huge numbers that cannot be
@@ -325,7 +325,7 @@ check_equals (Math.sin(notanumber).toString(), "NaN");
 #if OUTPUT_VERSION < 7
  check_equals (Math.sin(undefined).toString(), "0"); 
 #else
- xcheck_equals (Math.sin(undefined).toString(), "NaN"); 
+ check_equals (Math.sin(undefined).toString(), "NaN"); 
 #endif
 check_equals (Math.sin().toString(), "NaN");
 
@@ -341,7 +341,7 @@ check_equals (Math.sqrt(notanumber).toString(), "NaN");
 #if OUTPUT_VERSION < 7
  check_equals (Math.sqrt(undefined).toString(), "0"); 
 #else
- xcheck_equals (Math.sqrt(undefined).toString(), "NaN"); 
+ check_equals (Math.sqrt(undefined).toString(), "NaN"); 
 #endif
 check_equals (Math.sqrt().toString(), "NaN");
 
@@ -361,7 +361,7 @@ check_equals (Math.tan(notanumber).toString(), "NaN");
 #if OUTPUT_VERSION < 7
  check_equals (Math.tan(undefined).toString(), "0"); 
 #else
- xcheck_equals (Math.tan(undefined).toString(), "NaN"); 
+ check_equals (Math.tan(undefined).toString(), "NaN"); 
 #endif
 check_equals (Math.tan().toString(), "NaN");
 
@@ -396,8 +396,8 @@ check_equals (Math.atan2(1,notanumber).toString(), "NaN");
  check_equals (Math.atan2(undefined,1).toString(), "0"); 
  check_equals (Math.atan2(1,undefined).toString(), "1.5707963267949"); 
 #else
- xcheck_equals (Math.atan2(undefined,1).toString(), "NaN"); 
- xcheck_equals (Math.atan2(1,undefined).toString(), "NaN"); 
+ check_equals (Math.atan2(undefined,1).toString(), "NaN"); 
+ check_equals (Math.atan2(1,undefined).toString(), "NaN"); 
 #endif
 
 xcheck_equals (Math.max().toString(), "-Infinity");  // Heaven knows why!
@@ -413,7 +413,7 @@ check_equals (Math.max(plusinf,minusinf).toString(), "Infinity");
 #if OUTPUT_VERSION < 7
  check_equals (Math.max(0,undefined).toString(), "0"); 
 #else
- xcheck_equals (Math.max(0,undefined).toString(), "NaN"); 
+ check_equals (Math.max(0,undefined).toString(), "NaN"); 
 #endif
 check_equals (Math.max(0,notanumber).toString(), "NaN");
 
@@ -431,7 +431,7 @@ check_equals (Math.min(plusinf,minusinf).toString(), "-Infinity");
 #if OUTPUT_VERSION < 7
  check_equals (Math.min(0,undefined).toString(), "0"); 
 #else
- xcheck_equals (Math.min(0,undefined).toString(), "NaN"); 
+ check_equals (Math.min(0,undefined).toString(), "NaN"); 
 #endif
 check_equals (Math.min(0,notanumber).toString(), "NaN");
 

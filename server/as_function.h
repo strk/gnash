@@ -93,6 +93,13 @@ public:
 	/// Return true if this is a built-in class.
 	virtual bool isBuiltin()  { return false; }
 
+	/// TODO: check if a user-defined 'toString'
+	///       will be used when available.
+	const char* get_text_value() const
+	{
+		return "[type Function]";
+	}
+
 protected:
 
 	/// Construct a function with given interface

@@ -223,15 +223,13 @@ as_object::set_member_default(const std::string& key, const as_value& val )
 }
 
 void
-as_object::init_member(const std::string& key, const as_value& val )
+as_object::init_member(const std::string& key, const as_value& val, int flags)
 {
 
 	//log_msg("Setting member %s (SWF version:%d)", key.c_str(), vm.getSWFVersion());
 	//log_msg("Found NO getter/setter property for key %s", key.c_str());
 
 	VM& vm = _vm;
-
-	int flags = as_prop_flags::dontDelete||as_prop_flags::dontEnum;
 
 	if ( vm.getSWFVersion() < 7 )
 	{

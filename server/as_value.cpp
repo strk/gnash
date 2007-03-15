@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,8 +29,10 @@
 #include "movie_root.h" // for MOVIECLIP values
 #include "gstring.h" // for automatic as_value::STRING => String as object
 #include "Number.h" // for automatic as_value::NUMBER => Number as object
+#include "action.h" // for call_method0
 
 #include <cmath>	// for NAN
+#include <boost/algorithm/string/case_conv.hpp>
 
 using namespace std;
 
@@ -50,6 +52,13 @@ namespace gnash {
 // as_value -- ActionScript value type
 //
 
+static void
+lowercase_if_needed(std::string& str)
+{
+	VM& vm = VM::get();
+	if ( vm.getSWFVersion() >= 7 ) return;
+	boost::to_lower(str, vm.getLocale());
+}
 
 as_value::as_value(as_function* func)
     :
@@ -66,33 +75,30 @@ as_value::as_value(as_function* func)
 
 // Conversion to string.
 const char
-*as_value::to_string() const
+*as_value::to_string(as_environment* env) const
 {
-    return to_tu_string().c_str();
+    return to_tu_string(env).c_str();
 }
 
 
 std::string
-as_value::to_std_string() const
+as_value::to_std_string(as_environment* env) const
 {
-    const char* c = to_string();
+    const char* c = to_string(env);
     assert(c);
     return std::string(c);
 }
 
 const tu_stringi
-&as_value::to_tu_stringi() const
+&as_value::to_tu_stringi(as_environment* env) const
 {
-    return reinterpret_cast<const tu_stringi&>(to_tu_string());
+    return reinterpret_cast<const tu_stringi&>(to_tu_string(env));
 }
 
 // Conversion to const tu_string&.
 const tu_string&
-as_value::to_tu_string() const
+as_value::to_tu_string(as_environment* env) const
 {
-	char buffer[50];
-	const char*	val = NULL;
-
 	switch (m_type)
 	{
 
@@ -120,6 +126,10 @@ as_value::to_tu_string() const
 				{
 					m_string_value = "-Infinity";
 				}
+			}
+			else if ( m_number_value == -0.0 || m_number_value == 0.0 )
+			{
+					m_string_value = "0";
 			}
 			else
 			{
@@ -151,50 +161,56 @@ as_value::to_tu_string() const
 			break;
 
 		case OBJECT:
+		case AS_FUNCTION:
+		{
+			//printf("as_value to string conversion, env=%p\n", env);
 			// @@ Moock says, "the value that results from
 			// calling toString() on the object".
 			//
-			// The default toString() returns "[object
-			// Object]" but may be customized.
+			// When the toString() method doesn't exist, or
+			// doesn't return a valid number, the default
+			// text representation for that object is used
+			// instead.
 			//
-			// A Movieclip returns the absolute path of the object.
-			//
-			if (m_object_value)
+			as_object* obj = to_object();
+			bool gotValidToStringResult = false;
+			if ( env )
 			{
-				val = m_object_value->get_text_value();
+				std::string methodname = "toString";
+				lowercase_if_needed(methodname);
+				as_value method;
+				if ( obj->get_member(methodname, &method) )
+				{
+					as_value ret = call_method0(method, env, obj);
+					if ( ret.is_string() )
+					{
+						gotValidToStringResult=true;
+						m_string_value = ret.m_string_value;
+					}
+					else
+					{
+						log_msg("call_method0(%s) did not return a string", methodname.c_str());
+					}
+				}
+				else
+				{
+					log_msg("get_member(%s) returned false", methodname.c_str());
+				}
 			}
-			if (val)
+			if ( ! gotValidToStringResult )
 			{
-				m_string_value = val;
-			}
-			else
-			{
-				// Do we have a "toString" method?
-				//
-				// TODO: we need an environment in order to
-				// call toString()!
-
-				// This is the default.
-				//m_string_value = "[object Object]";
-				snprintf(buffer, 50, "<as_object %p>",
-					(void *) m_object_value);
-				m_string_value = buffer;
+				if ( m_type == OBJECT )
+				{
+					m_string_value = "[type Object]";
+				}
+				else
+				{
+					assert(m_type == AS_FUNCTION);
+					m_string_value = "[type Function]";
+				}
 			}
 			break;
-
-#ifdef ALLOW_C_FUNCTION_VALUES
-		case C_FUNCTION:
-			snprintf(buffer, 50, "<c_function %p>",
-				(const void *) &m_c_function_value);
-			m_string_value = buffer;
-			break;
-#endif
-
-		case AS_FUNCTION:
-			snprintf(buffer, 50, "<as_function %p>",
-				(void *) m_as_function_value);
-			m_string_value = buffer;
-			break;
+		}
 
 		default:
 			m_string_value = "<bad type> "+m_type;
@@ -206,7 +222,7 @@ as_value::to_tu_string() const
 
 // Conversion to const tu_string&.
 const tu_string
-&as_value::to_tu_string_versioned(int version) const
+&as_value::to_tu_string_versioned(int version, as_environment* env) const
 {
     if (m_type == UNDEFINED) {
 	// Version-dependent behavior.
@@ -218,7 +234,14 @@ const tu_string
 	return m_string_value;
     }
 		
-    return to_tu_string();
+    return to_tu_string(env);
+}
+
+// Version-based Conversion to std::string
+std::string
+as_value::to_std_string_versioned(int version, as_environment* env) const
+{
+	return std::string(to_tu_string_versioned(version, env).c_str());
 }
 
 // Conversion to primitive value.
@@ -236,9 +259,6 @@ as_value::to_primitive() const
 		case BOOLEAN:
 		case STRING:
 		case NUMBER:
-#ifdef ALLOW_C_FUNCTION_VALUES
-		case C_FUNCTION:
-#endif
 		default:
 			return *this;
 	}
@@ -247,8 +267,13 @@ as_value::to_primitive() const
 
 // Conversion to double.
 double
-as_value::to_number() const
+as_value::to_number(as_environment* env) const
 {
+    // TODO:  split in to_number_# (version based)
+    // TODO:  call valueOf when needed  (this is why we take an as_environment!)
+
+    int swfversion = VM::get().getSWFVersion();
+
     if (m_type == STRING) {
 	// @@ Moock says the rule here is: if the
 	// string is a valid float literal, then it
@@ -264,10 +289,11 @@ as_value::to_number() const
 		m_number_value = NAN;
 	}
 	return m_number_value;
-    } else if (m_type == NULLTYPE) {
+    } else if (m_type == NULLTYPE || m_type == UNDEFINED) {
 	// Evan: from my tests
 	// Martin: I tried var foo = new Number(null) and got NaN
-	return 0;
+	if ( swfversion >= 7 ) return std::numeric_limits<double>::quiet_NaN();
+	else return 0;
     } else if (m_type == BOOLEAN) {
 	// Evan: from my tests
 	// Martin: confirmed
@@ -296,43 +322,109 @@ as_value::to_number() const
     }
 }
 
+// Conversion to boolean for SWF7 and up
+bool
+as_value::to_bool_v7() const
+{
+	    switch (m_type)
+	    {
+		case  STRING:
+			return m_string_value != "";
+		case NUMBER:
+			return m_number_value && ! isnan(m_number_value);
+		case BOOLEAN:
+			return this->m_boolean_value;
+		case OBJECT:
+			// it is possible we'll need to convert to number anyway first
+			return m_object_value != NULL;
+		case AS_FUNCTION:
+			return m_as_function_value != NULL;
+		case MOVIECLIP:
+			return true;
+		default:
+			assert(m_type == UNDEFINED || m_type == NULLTYPE);
+			return false;
+	}
+}
+
+// Conversion to boolean up to SWF5
+bool
+as_value::to_bool_v5() const
+{
+	    switch (m_type)
+	    {
+		case  STRING:
+		{
+			if (m_string_value == "false") return false;
+			else if (m_string_value == "true") return true;
+			else
+			{
+				double num = to_number();
+				bool ret = num && ! isnan(num);
+				log_msg("m_string_value: %s, to_number: %g, to_bool: %d", m_string_value.c_str(), num, ret);
+				return ret;
+			}
+		}
+		case NUMBER:
+			return ! isnan(m_number_value) && m_number_value; 
+		case BOOLEAN:
+			return this->m_boolean_value;
+		case OBJECT:
+			// it is possible we'll need to convert to number anyway first
+			return m_object_value != NULL;
+		case AS_FUNCTION:
+			return m_as_function_value != NULL;
+		case MOVIECLIP:
+			return true;
+		default:
+			assert(m_type == UNDEFINED || m_type == NULLTYPE);
+			return false;
+	}
+}
+
+// Conversion to boolean for SWF6
+bool
+as_value::to_bool_v6() const
+{
+	    switch (m_type)
+	    {
+		case  STRING:
+		{
+			if (m_string_value == "false") return false;
+			else if (m_string_value == "true") return true;
+			else
+			{
+				double num = to_number();
+				bool ret = num && ! isnan(num);
+				log_msg("m_string_value: %s, to_number: %g, to_bool: %d", m_string_value.c_str(), num, ret);
+				return ret;
+			}
+		}
+		case NUMBER:
+			return isfinite(m_number_value) && m_number_value; 
+		case BOOLEAN:
+			return this->m_boolean_value;
+		case OBJECT:
+			// it is possible we'll need to convert to number anyway first
+			return m_object_value != NULL;
+		case AS_FUNCTION:
+			return m_as_function_value != NULL;
+		case MOVIECLIP:
+			return true;
+		default:
+			assert(m_type == UNDEFINED || m_type == NULLTYPE);
+			return false;
+	}
+}
+
 // Conversion to boolean.
 bool
 as_value::to_bool() const
 {
-    // From Moock
-    if (m_type == STRING) {
-	if (m_string_value == "false") {
-	    return false;
-	} else if (m_string_value == "true") {
-	    return true;
-	} else {
-	    // @@ Moock: "true if the string can
-	    // be converted to a valid nonzero
-	    // number".
-	    //
-	    // Empty string --> false
-	    return to_number() != 0.0;
-	}
-    } else if (m_type == NUMBER) {
-	// If m_number_value is NaN, comparison will automatically be false, as it should
-	return m_number_value != 0.0;
-    } else if (m_type == BOOLEAN) {
-	return this->m_boolean_value;
-    } else if (m_type == OBJECT) {
-	return m_object_value != NULL;
-#ifdef ALLOW_C_FUNCTION_VALUES
-    } else if (m_type == C_FUNCTION) {
-	return m_c_function_value != NULL;
-#endif
-    } else if (m_type == AS_FUNCTION) {
-	return m_as_function_value != NULL;
-    } else if (m_type == MOVIECLIP) {
-	return true;
-    } else {
-	assert(m_type == UNDEFINED || m_type == NULLTYPE);
-	return false;
-    }
+    int ver = VM::get().getSWFVersion();
+    if ( ver >= 7 ) return to_bool_v7();
+    else if ( ver == 6 ) return to_bool_v6();
+    else return to_bool_v5();
 }
 	
 // Return value as an object.
@@ -401,21 +493,6 @@ as_value::set_sprite(const std::string& path)
 	m_string_value = path.c_str();
 }
 
-#ifdef ALLOW_C_FUNCTION_VALUES
-as_c_function_ptr
-as_value::to_c_function() const
-    // Return value as a C function ptr.  Returns NULL if value is
-    // not a C function.
-{
-    if (m_type == C_FUNCTION) {
-	// OK.
-	return m_c_function_value;
-    } else {
-	return NULL;
-    }
-}
-#endif
-
 // Return value as an ActionScript function.  Returns NULL if value is
 // not an ActionScript function.
 as_function*
@@ -446,10 +523,10 @@ as_value::convert_to_string()
 
 
 void
-as_value::convert_to_string_versioned(int version)
+as_value::convert_to_string_versioned(int version, as_environment* env)
     // Force type to string.
 {
-    to_tu_string_versioned(version);	// init our string data.
+    to_tu_string_versioned(version, env); // init our string data.
     m_type = STRING;	// force type.
 }
 
@@ -511,14 +588,6 @@ as_value::operator==(const as_value& v) const
     {
 	return this_nulltype == v_nulltype;
     }
-#ifdef ALLOW_C_FUNCTION_VALUES
-    else if (m_type == C_FUNCTION || v.m_type == C_FUNCTION)
-    {
-	// a C_FUNCTION is only equal to itself
-    	return m_type == v.m_type
-		&& m_c_function_value == v.m_c_function_value;
-    }
-#endif
     else if (m_type == STRING)
     {
 	return m_string_value == v.to_tu_string();
@@ -546,6 +615,49 @@ as_value::operator==(const as_value& v) const
 		if ( v2.is_object() ) return false;
 		else return v2 == v;
 		//return to_primitive() == v;
+	}
+    }
+    else
+    {
+	assert(0);
+    }
+}
+
+bool
+as_value::equals(const as_value& v, as_environment* env) const
+{
+    bool this_nulltype = (m_type == UNDEFINED || m_type == NULLTYPE);
+    bool v_nulltype = (v.get_type() == UNDEFINED || v.get_type() == NULLTYPE);
+    if (this_nulltype || v_nulltype)
+    {
+	return this_nulltype == v_nulltype;
+    }
+    else if (m_type == STRING)
+    {
+	return m_string_value == v.to_tu_string(env);
+    }
+    else if (m_type == NUMBER)
+    {
+	return m_number_value == v.to_number();
+    }
+    else if (m_type == BOOLEAN)
+    {
+	return m_boolean_value == v.to_bool();
+
+    }
+    else if (is_object())
+    {
+    	if ( v.is_object() )
+	{
+		// compare by reference
+		return to_object() == v.to_object();
+	}
+	else
+	{
+		// convert this value to a primitive and recurse
+		as_value v2 = to_primitive(); // TODO: should forward environment ?
+		if ( v2.is_object() ) return false;
+		else return v2.equals(v, env);
 	}
     }
     else
@@ -614,9 +726,6 @@ as_value::typeOf() const
 			return "null";
 
 		case as_value::AS_FUNCTION:
-#ifdef ALLOW_C_FUNCTION_VALUES
-		case as_value::C_FUNCTION:
-#endif
 			return "function";
 
 		default:

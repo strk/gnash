@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.13 2007/02/28 23:58:26 strk Exp $";
+rcsid="$Id: String.as,v 1.14 2007/03/15 22:39:54 strk Exp $";
 
 #include "check.as"
 
@@ -178,3 +178,46 @@ check_equals(a_string.length, 10);
 a_string.length = 4;
 check_equals(a_string.length, 10);
 check_equals(a_string, "1234567890");
+
+
+//----------------------------------------------------
+// Test automatic string conversion when adding stuff
+//-----------------------------------------------------
+a = "one";
+b = "two";
+check_equals(a+b, "onetwo");
+c = new Object();
+
+check_equals(b+c, "two[object Object]");
+
+// check that calls to toString() use the current environment
+c.toString = function() { return a; };
+prevToStringFunc = c.toString;
+check_equals(b+c, "twoone");
+
+// this won't be used as a valid toString method !
+c.toString = function() { return 4; };
+#if OUTPUT_VERSION >= 6
+check(c.toString != prevToStringFunc);
+#endif
+check_equals(b+c, "two[type Object]");
+
+Object.prototype.toString = undefined;
+check_equals(typeof(c.toString), 'function');
+check_equals(b+c, "two[type Object]");
+
+c.toString = undefined;
+check_equals(typeof(c.toString), 'undefined');
+check_equals(b+c, "two[type Object]");
+
+stringObject = new String("1234");
+check_equals(stringObject, "1234");
+check_equals(stringObject, 1234);
+numberObject = new Number(1234);
+#if OUTPUT_VERSION >= 6
+check(stringObject != numberObject);
+#else
+xcheck_equals(stringObject, numberObject); // SWF5 always converts to string !!
+#endif
+check_equals(numberObject.toString(), stringObject);
+check_equals(numberObject.toString(), stringObject.toString());

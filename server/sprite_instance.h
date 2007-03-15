@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.76 2007/03/09 10:18:49 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.77 2007/03/15 22:39:53 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -34,17 +34,20 @@
 #include "log.h"
 #include "as_environment.h" // for composition
 #include "DynamicShape.h" // for composition
+//#include "LoadVariablesThread.h" // for composition
 
 #include <vector>
 #include <list>
 #include <map>
 #include <string>
+#include <boost/ptr_container/ptr_list.hpp>
 
 // Forward declarations
 namespace gnash {
 	class movie_instance;
 	class swf_event;
 	class drag_state;
+	class LoadVariablesThread;
 }
 
 namespace gnash
@@ -227,6 +230,11 @@ public:
 	/// covers that can receive mouse events.  NULL if
 	/// none.  Coords are in parent's frame.
 	virtual character* get_topmost_mouse_entity(float x, float y);
+	
+	virtual bool wantsInstanceName()
+	{
+		return true; // sprites can be referenced 
+	}
 
 	virtual void	advance(float delta_time);
 	//virtual void	advance_root(float delta_time);
@@ -442,6 +450,29 @@ public:
 	/// Return: true if it succeeded, false otherwise
 	///
 	bool loadMovie(const URL& url);
+
+	/// \brief
+	/// Load url-encoded variables from the given url, optionally
+	/// sending variables from this timeline too.
+	//
+	///
+	/// A LoadVariablesThread will be started to load and parse variables
+	/// and added to the _loadVariableRequests. Then, at every ::advance_sprite
+	/// any completed threads will be processed
+	/// (see processCompletedLoadVariableRequests)
+	///
+	/// NOTE: the given url will be securit-checked
+	///
+	/// @param url
+	///	The url to load variables from. It is expected that
+	///	the caller already checked host security.
+	///
+	/// @param sendVarsMethod
+	///	If 0 (the default) no variables will be sent.
+	///	If 1, GET will be used.
+	///	If 2, POST will be used.
+	///
+	void loadVariables(const URL& url, short sendVarsMethod=0);
 
 	//
 	// ActionScript support
@@ -809,6 +840,21 @@ protected:
 
 	bool m_on_event_load_called;
 
+	/// List of loadVariables requests
+	typedef boost::ptr_list<LoadVariablesThread> LoadVariablesThreads;
+
+	/// List of active loadVariable requests 
+	//
+	/// At ::advance_sprite time, all completed requests will
+	/// be processed (variables imported in this timeline scope)
+	/// and removed from the list.
+	LoadVariablesThreads _loadVariableRequests;
+
+	/// Process any completed loadVariables request
+	void processCompletedLoadVariableRequests();
+
+	/// Process a completed loadVariables request
+	void processCompletedLoadVariableRequest(LoadVariablesThread& request);
 };
 
 /// Initialize the global MovieClip class

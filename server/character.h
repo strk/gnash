@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.56 2007/03/09 10:18:49 strk Exp $ */
+/* $Id: character.h,v 1.57 2007/03/15 22:39:53 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -559,6 +559,13 @@ public:
 	virtual character* get_topmost_mouse_entity(float /* x */, float /* y */)
 	{
 		return NULL;
+	}
+	
+	/// Returns true when the object (type) should get a instance name even 
+	/// if none is provided manually.
+	virtual bool wantsInstanceName()
+	{
+		return false; 
 	}
 
 	/// @}

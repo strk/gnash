@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: processor.cpp,v 1.52 2007/03/05 22:58:51 strk Exp $ */
+/* $Id: processor.cpp,v 1.53 2007/03/15 22:39:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -355,6 +355,7 @@ play_movie(const char* filename)
 	{
 		if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits )
 		{
+			printf("exiting after %d times last frame was reached\n", end_hitcount);
 	    		break;
 		}
 	}

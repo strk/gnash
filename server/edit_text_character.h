@@ -51,7 +51,13 @@ public:
 	~edit_text_character();
 
 	virtual bool can_handle_mouse_event() const { return true; }
-	virtual character* get_topmost_mouse_entity(float x, float y);	
+	virtual character* get_topmost_mouse_entity(float x, float y);
+	
+	virtual bool wantsInstanceName()
+	{
+		return true; // text fields can be referenced 
+	}	
+		
 	virtual bool on_event(const event_id& id);	
 
 	const char* get_variable_name() const

@@ -18,7 +18,6 @@
 #include "config.h"
 #endif
 
-#include "check.h"
 #include "dlist.h"
 #include "as_value.h"
 #include "character.h"
@@ -32,6 +31,8 @@
 #include <sstream>
 #include <cassert>
 #include <string>
+
+#include "check.h"
 
 using namespace std;
 using namespace gnash;

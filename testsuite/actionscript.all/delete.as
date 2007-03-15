@@ -1,11 +1,14 @@
-rcsid="$Id: delete.as,v 1.8 2007/02/06 11:00:36 strk Exp $";
+rcsid="$Id: delete.as,v 1.9 2007/03/15 22:39:54 strk Exp $";
 
 #include "check.as"
 
-var anObject = new Object();
+anObject = new Object();
 check(anObject != undefined);
+
+anObjectBackup = anObject;
 check(delete anObject);
-check(anObject == undefined);
+check_equals(typeof(anObject), 'undefined'); 
+check_equals(typeof(anObjectBackup), 'object'); 
 check(!delete noObject);
 
 //
@@ -42,3 +45,15 @@ with(anotherObject)
 	check(!delete a);
 }
 
+//
+// Deleting a user function's prototype
+//
+
+function func() {};
+func.prototype.appended_value = 4;
+check_equals(typeof(func.prototype), 'object');
+check_equals(func.prototype.appended_value, 4);
+//protoback = MovieClip.prototype;
+check(!delete func.prototype);
+check_equals(typeof(func.prototype), 'object');
+check_equals(func.prototype.appended_value, 4);

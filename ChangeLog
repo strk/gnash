@@ -1,3 +1,131 @@
+2007-03-13 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.h (to_number): null and undefined are converted
+	  to NaN for SWF7 up; drop is_inf,is_finite and is_nan methods,
+	  handle in the caller.
+	* server/asobj/Global.cpp: proved _global.NaN and _global.Infinity
+	  values; fix isFinite() and isNaN().
+	* testsuite/actionscript.all/Number.as: more tests for the NaN and
+	  Infinity values.
+	* server/as_value.cpp (to_tu_string): both -0.0 and 0.0 number values
+	  get converted to the string "0".
+	* testsuite/actionscript.all/Boolean.as: do not expect failures for
+	  string to boolean conversion for SWF7 up.
+	* server/as_value.cpp (to_bool): have NaN numbers evaluate to
+	  false; add version-specific versions to_bool_v5(), to_bool_v6() and
+	  to_bool_v7(); add to_std_string_versioned.
+	* testsuite/server/: DisplayListTest.cpp, GetterSetterTest.cpp,
+	  MatrixTest.cpp, PropertyListTest.cpp, as_prop_flagsTest.cpp: 
+	  include check.h last, to avoid 'check' macro to clash with boost
+	  headers (ptr_container stuff).
+	* server/sprite_instance.cpp: add support for MovieClip.loadVariables.
+	* server/Makefile.am, server/LoadVariablesThread.{cpp,h},
+	  server/asobj/LoadVars.cpp: extracted what was previously called LoadRequest
+	  in LoadVars.cpp, for general use, cleanups.
+	* server/vm/ASHandlers.cpp (CommonGetUrl): add support for the
+	  loadVariables flag.
+	* testsuite/misc-mtasc.all/function.as: add more test for
+	  the arguments object.
+	* server/vm/ASHandlers.cpp (ActionNewAdd, ActionTrace): pass an environment when
+	  converting as_value to string, to properly invoke any toString
+	  method.
+	* server/character.cpp (parent_getset): _parent is undefined (not
+	  null) for _root sprite.
+	* testsuite/actionscript.all/String.as: add tests for automatic
+	  calling of the toString() method.
+	* testsuite/actionscript.all/Function.as: add tests for toString
+	  method.
+	* server/as_function.h: override get_text_value() to properly return
+	  '[type Function]'.
+	* server/as_value.cpp (convertion to string): Invoke any toString method
+	  associated with objects, if caller properly passes an as_environment
+	  to use in the call.
+	* testsuite/swfdec/PASSING: many more successes.
+	* server/as_value.h: add constructor by const std::string ref.
+	* server/vm/VM.{h,cpp}: add getPlayerVersion()
+	* server/asobj/System.{h,cpp}: cleanups, use getPlayerVersion()
+	  for System.capabilities.version
+	* server/sprite_instance.cpp (attachMovieClipProperties): initialize
+	  the $version member.
+	* testsuite/actionscript.all/MovieClip.as: more tests for the '$version'
+	  built-in variable; new test for _parent of root being undefined (not
+	  null).
+	* server/as_object.{cpp,h}: add a third argument for init_member to
+	  override protection (can be omitted to use previous default).
+	  
+2007-03-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/System.as: add checks for $version.
+	* testsuite/swfdec/PASSING: 3 more tests succeed.
+	* server/sprite_instance.cpp (get_text_value): remove the trailing
+	  dot from name of top-level movies.
+
+2007-03-12  John Gilmore  <gnu@quiet.toad.com>
+
+	* configure.ac:  Suggest agg-2.5 rather than 2.4 if
+	agg_gradient_lut.h is missing.
+	* configure.ac:  Sandro's fix to "ming version" test that failed if
+	ming was not installed.
+	
+2007-03-12 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.cpp (init_member): fix typo setting flags
+	  for buiting methods all wrong.
+	* testsuite/actionscript.all/delete.as: don't expect the failures
+	  on function prototype deletion anymore.
+	* server/button_character_instance.{cpp,h}: implement
+	  ::construct() to postpone characters instance name assignmnet
+	  at stage placement time.
+
+2007-03-12 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/character.h: introduce wantsInstanceName() to provide
+	  a clean way to tell which objects need an instance name	
+	* server/button_character_instance.{h,cpp}: Give childs a name;
+	  implement get_relative_target() for buttons; define that
+	  buttons should get instance names	
+	* server/edit_text_character.h: text fields need instance names
+	  too
+	* server/sprite_instance.{h,cpp}: implement and use 
+	  wantInstancename()
+				 
+
+2007-03-12 Sandro Santilli <strk@keybit.net>
+
+	* server/as_prop_flags.h: add equality and inequality operators.
+	* testsuite/actionscript.all/delete.as: add test verifying that
+	  delete on object references won't affect other references
+	  on the same object; add test to check that a user-defined
+	  function's prototype is not deletable (fails in Gnash!).
+	* server/vm/ASHandlers.cpp (ActionCallFunction, ActionCallMethod,
+	  ActionNewMethod): rather then pushing undefined values for
+	  missing argument values on the stack, warn about the type of
+	  SWF malformation and modify the number of args by using at most
+	  what's on the stack.
+	* testsuite/swfdec/PASSING: callfunction-stack.swf
+	  now succeeds.
+
+2007-03-12 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/Boolean.cpp: Add ensureBoolean() to guard
+	  casts.
+
+2007-03-12 Sandro Santilli <strk@keybit.net>
+ 
+	* testsuite/actionscript.all/Global.as: argh, it
+	  seems that _global is a non-Object object :!? 
+	* testsuite/swfdec/PASSING: 3 newly added swfdec tests
+	  succeed in Gnash.
+	* testsuite/misc-ming.all/Makefile.am: activated the
+	  new action execution order tests.
+
+2007-03-11 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/action_execution_order_test1.c.
+	* testsuite/misc-ming.all/action_execution_order_test2.c.
+	* testsuite/misc-ming.all/action_execution_order_test3.c.
+	  3 new testcases to verify action execution order.
+	  
 2007-03-11 Deanna Phillips <deanna>
 
 	* cygnal/stream.cpp: Added #include <unistd.h>

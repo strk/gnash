@@ -3,6 +3,7 @@ Makefile
 gnash-dbg.log
 site.exp
 testrun.log
-testrun.sum
+*.sum
 *.trace-gnash
 *.log
+run_swfdec_testsuite

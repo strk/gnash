@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.35 2007/03/08 10:58:15 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.36 2007/03/15 22:39:54 strk Exp $";
 
 #include "check.as"
 
@@ -31,10 +31,9 @@ var mc = _root;
 check(typeof(mc)=="movieclip");
 
 // Check some references
-check(this != undefined);
-check(_parent == undefined);
-check(_root != undefined);
-check(_root == this);
+check_equals(typeof(this), 'movieclip');
+check_equals(typeof(_parent), 'undefined');
+check_equals(_root, this);
 
 // Check inheritance
 check(MovieClip);
@@ -291,3 +290,32 @@ _root.onLoad = 3;
 check_equals(typeof(_root.onLoad), 'number');
 _root.onLoad = "test";
 check_equals(typeof(_root.onLoad), 'string');
+
+//-----------------------------------------------------------
+// Test $version
+//-----------------------------------------------------------
+
+#if OUTPUT_VERSION >= 6
+check(this.hasOwnProperty("$version"));
+#endif
+check_equals(typeof(this.$version), 'string');
+
+function enumerate(obj, enum)
+{
+	var enumlen = 0;
+	for (var i in obj) {
+		enum[i] = obj[i];
+		++enumlen;
+	}
+	return enumlen;
+}
+
+// Check that $version is enumerable
+enum = new Object; enumlen = enumerate(this, enum);
+check_equals(typeof(enum['$version']), 'string');
+
+// Check that $version is overridable and deletable
+this.$version = "fake version";
+check_equals(this.$version, 'fake version');
+check(delete $version);
+check_equals(typeof(this.$version), 'undefined');

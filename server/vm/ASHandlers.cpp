@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.60 2007/03/09 15:19:26 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.61 2007/03/15 22:39:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -243,6 +243,13 @@ ActionHandler::execute(ActionExec& thread) const
 SWFHandlers::SWFHandlers()
 {
 //    GNASH_REPORT_FUNCTION;
+
+	// Just to be sure we can start using different handler
+	// based on version (would make sense)
+	if ( ! VM::isInitialized() )
+	{
+		log_error("FIXME: VM not initialized at SWFHandlers construction time, can't set action handlers based on SWF version");
+	}
 
     vector<std::string> & property_names = get_property_names();
 
@@ -1212,7 +1219,9 @@ SWFHandlers::ActionTrace(ActionExec& thread)
 
     thread.ensureStack(1); 
 
-    log_trace(env.pop().to_string());
+    //std::string val = env.pop().to_std_string_versioned(VM::get().getSWFVersion(), &env);
+    std::string val = env.pop().to_std_string(&env);
+    log_trace(val.c_str());
 }
 
 void
@@ -1742,7 +1751,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 #define GETURL2_LOADVARIABLE_FLAG 1<<8
 
 	// Parse the method bitfield
-	uint8_t sendVarsMethod = method & 3;
+	short sendVarsMethod = method & 3;
 	bool loadTargetFlag    = method & 64;
 	bool loadVariableFlag  = method & 128;
 
@@ -1754,19 +1763,10 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		sendVarsMethod=0;
 	}
 
-	// Warn about unsupported features
-	if ( loadVariableFlag ) {
-		log_warning("Unhandled GetUrl2 loadVariable flag");
-	}
-	if ( sendVarsMethod ) {
-		log_warning("Unhandled GetUrl2 sendVariableMethod (%d)",
-			sendVarsMethod);
-	}
-
 	const char* target_string = NULL;
 	if ( ! target.is_undefined() && ! target.is_null() )
 	{
-		target_string = target.to_string();
+		target_string = target.to_string(&env);
 	}
 
 	// If the url starts with "FSCommand:", then this is
@@ -1814,17 +1814,8 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	log_msg("get url: target=%s, url=%s (%s)", target_string,
 		url.str().c_str(), url_c);
 
-	// Check host security
-	if ( ! URLAccessManager::allow(url) )
-	{
-		return;
-	}
-
-
 	if ( loadTargetFlag )
 	{
-		log_msg("getURL2 target load");
-		      
 		character* target_ch = env.find_target(target);
 		if ( ! target_ch )
 		{
@@ -1841,11 +1832,44 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			return;
 		}
 
-		sprite_instance* root_movie = env.get_target()->get_root_movie();
-		attach_extern_movie(url.str().c_str(), target_movie, root_movie);
+		if ( loadVariableFlag )
+		{
+			log_msg("getURL2 loadVariable");
+
+			//log_warning("Unhandled GetUrl2 loadVariable flag. loadTargetFlag=%d, target=%s (%s)", loadTargetFlag, target.typeOf(), target.to_string());
+			target_movie->loadVariables(url, sendVarsMethod);
+		}
+		else
+		{
+			log_msg("getURL2 target load");
+		      
+			// Check host security
+			if ( ! URLAccessManager::allow(url) )
+			{
+				return;
+			}
+
+
+			if ( sendVarsMethod )
+			{
+				log_warning("Unhandled GetUrl2 sendVariableMethod (%d)"
+					" with loadTargetFlag and ! loadVariablesFlag",
+					sendVarsMethod);
+			}
+
+			sprite_instance* root_movie = env.get_target()->get_root_movie();
+			attach_extern_movie(url.str().c_str(), target_movie, root_movie);
+		}
 	}
 	else
 	{
+		if ( sendVarsMethod )
+		{
+			log_warning("Unhandled GetUrl2 sendVariableMethod (%d)"
+				" with no loadTargetFlag",
+				sendVarsMethod);
+		}
+
 		string command = "firefox -remote \"openurl(";
 		command += url.str();
 #if 0 // target testing
@@ -2124,9 +2148,19 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 			);
 		}
 	}
-	unsigned nargs = unsigned(env.top(1).to_number());
 
-	thread.ensureStack(2+nargs); // func name, nargs, args
+	// Get number of args, modifying it if not enough values are on the stack.
+	unsigned nargs = unsigned(env.top(1).to_number());
+	unsigned available_args = env.stack_size()-2; // 2 for func name and nargs
+	if ( available_args < nargs )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("Attempt to call a function with %u arguments "
+			"while only %u are available on the stack.",
+			nargs, available_args);
+		);
+		nargs = available_args;
+	}
 
 	//log_msg("Function's nargs: %d", nargs);
     
@@ -2409,20 +2443,27 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 void
 SWFHandlers::ActionNewAdd(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
     thread.ensureStack(2); 
 
-    int version = env.get_version();
-    if (env.top(0).is_string() || env.top(1).is_string() )
+    as_value& v1 = env.top(0);
+    as_value& v2 = env.top(1);
+
+    //log_msg("ActionNewAdd(%s[%s],%s[%s]) called", v1.typeOf(), v1.to_string(), v2.typeOf(), v2.to_string(env));
+
+
+    if (v1.is_string() || v2.is_string() )
     {
-        env.top(1).convert_to_string_versioned(version);
-        env.top(1).string_concat(env.top(0).to_tu_string_versioned(version));
+    	int version = env.get_version();
+        // modify env.top(1)
+        v2.convert_to_string_versioned(version, &env);
+        v2.string_concat(v1.to_tu_string_versioned(version, &env));
     }
     else
     {
-        env.top(1) += env.top(0);
+        v2 += v1;  // modifies env.top(1) uses numeric semantic
     }
     env.drop(1);
 }
@@ -2454,7 +2495,7 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     thread.ensureStack(2); 
 
     /// ECMA-262 abstract equality comparison (sect 11.9.3)
-    env.top(1).set_bool(env.top(1) == env.top(0));
+    env.top(1).set_bool(env.top(1).equals(env.top(0), &env));
     env.drop(1);
 }
 
@@ -2623,10 +2664,18 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	// Get an object
 	as_value& obj_value = env.top(1);
 
-	// Get number of arguments
+	// Get number of args, modifying it if not enough values are on the stack.
 	unsigned nargs = unsigned(env.top(2).to_number());
-
-	thread.ensureStack(3+nargs); // actual args
+	unsigned available_args = env.stack_size()-3; // 3 for obj, func and nargs
+	if ( available_args < nargs )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("Attempt to call a method with %u arguments "
+			"while only %u are available on the stack.",
+			nargs, available_args);
+		);
+		nargs = available_args;
+	}
 
 
 	IF_VERBOSE_ACTION (
@@ -2755,9 +2804,19 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 
 	as_value method_name = env.pop();
 	as_value obj_val = env.pop();
-	unsigned nargs = unsigned(env.pop().to_number());
 
-	thread.ensureStack(nargs); // previous 3 entries popped
+	// Get number of args, modifying it if not enough values are on the stack.
+	unsigned nargs = unsigned(env.pop().to_number());
+	unsigned available_args = env.stack_size(); // previous 3 entries popped
+	if ( available_args < nargs )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("Attempt to call a constructor with %u arguments "
+			"while only %u are available on the stack.",
+			nargs, available_args);
+		);
+		nargs = available_args;
+	}
 
 	as_object* obj = obj_val.to_object();
 	if ( ! obj )

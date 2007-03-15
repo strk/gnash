@@ -20,16 +20,29 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.21 2007/02/09 09:34:56 strk Exp $";
+rcsid="$Id: Global.as,v 1.22 2007/03/15 22:39:54 strk Exp $";
 
 #include "check.as"
 
 // Check that _global.parseInt is in effect what parseInt resolves to
 #if OUTPUT_VERSION > 5
 check ( parseInt == _global.parseInt );
+
+check_equals(typeof(Object._global), 'undefined');
+check_equals(typeof(Object.prototype._global), 'undefined');
+check_equals(typeof(_global._global), 'undefined');
+check_equals(typeof(this.__proto__._global), 'undefined');
+
+// odd stuff.. not every value of type 'object' is an instance of Object :!!
+check_equals(typeof(_global), 'object');
+xcheck( ! _global instanceof Object );
+xcheck_equals( typeof(_global.__proto__), 'undefined' );
+xcheck_equals(typeof(_global.toString), 'undefined');
+
 #else
 check_equals ( typeof(_global.parseInt), 'undefined' );
 #endif
+
 
 // Test parseInt
 check ( parseInt('45b') == 45 );

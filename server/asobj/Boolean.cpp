@@ -26,6 +26,7 @@
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
+#include "GnashException.h"
 
 namespace gnash {
 
@@ -79,20 +80,34 @@ public:
 	
 };
 
+static boolean_as_object *
+ensureBoolean(as_object* obj)
+{
+        boolean_as_object* ret = dynamic_cast<boolean_as_object*>(obj);
+        if ( ! ret )
+        {
+                throw ActionException("builtin method or gettersetter for " \
+				      " Boolean objects called against " \
+				      " non-Boolean instance");
+        }
+        return ret;
+}
+
 void boolean_tostring(const fn_call& fn) {
 
 	static char* strtrue = "true";
 	static char* strfalse = "false";
 
-	boolean_as_object* boolobj = (boolean_as_object*) (as_object*) fn.this_ptr;
+	boolean_as_object* boolobj = ensureBoolean(fn.this_ptr);
 	
 	if (boolobj->val) 
 		fn.result->set_string(strtrue);
 	else
 		fn.result->set_string(strfalse);
 }
+
 void boolean_valueof(const fn_call& fn) {
-    boolean_as_object* boolobj = (boolean_as_object*) (as_object*) fn.this_ptr;
+    boolean_as_object* boolobj = ensureBoolean(fn.this_ptr);
     
     fn.result->set_bool(boolobj->val);
 }

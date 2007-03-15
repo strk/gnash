@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.106 2007/02/27 09:10:20 strk Exp $
+# $Id: Makefile.am,v 1.107 2007/03/15 22:39:53 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -79,6 +79,7 @@ libgnashserver_la_SOURCES = \
 	font.cpp \
 	fontlib.cpp \
 	impl.cpp \
+	LoadVariablesThread.cpp \
 	render.cpp \
 	shape.cpp \
 	stream.cpp \
@@ -122,6 +123,7 @@ noinst_HEADERS = \
 	generic_character.h \
 	gnash.h	\
 	impl.h \
+	LoadVariablesThread.h \
 	matrix.h \
 	mouse_button_state.h \
 	movie_instance.h \

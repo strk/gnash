@@ -316,7 +316,5 @@ function_call(const fn_call& fn)
 	//log_msg("%s: tocheck \n", __FUNCTION__);
 }
 
-
-
 } // end of gnash namespace
 

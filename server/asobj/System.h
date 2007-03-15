@@ -30,6 +30,7 @@
 
 namespace gnash {
   
+#if 0
 class System {
 public:
     System();
@@ -72,6 +73,7 @@ private:
     bool _onStatus;
     bool _useCodepage;
 };
+#endif
 
 class system_as_object : public as_object
 {

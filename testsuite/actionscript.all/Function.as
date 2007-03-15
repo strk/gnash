@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.25 2007/03/04 00:17:04 strk Exp $";
+rcsid="$Id: Function.as,v 1.26 2007/03/15 22:39:54 strk Exp $";
 
 #include "check.as"
 
@@ -62,7 +62,7 @@ check ( ret == "extname123" );
 
 var ret=getThisName.apply();
 #if OUTPUT_VERSION > 6
-  xcheck ( isNaN(ret) ); // result of the *numerical* sum of all undefined
+  check ( isNaN(ret) ); // result of the *numerical* sum of all undefined
 #else
   check_equals ( ret , 0 ); // result of the *numerical* sum of all undefined
 #endif
@@ -85,21 +85,21 @@ var ret=getThisName.apply(this_ref, 9);
 
 var ret=getThisName.apply(undefined, [4,5,6], 4);
 #if OUTPUT_VERSION >= 7
-  xcheck ( isNaN(ret) ); // the sum will be considered numerical
+  check ( isNaN(ret) ); // the sum will be considered numerical
 #else
   check_equals ( ret , 15 ); // the sum will be considered numerical
 #endif
 
 var ret=getThisName.apply(undefined, 7);
 #if OUTPUT_VERSION >= 7
-  xcheck ( isNaN(ret) ); 
+  check ( isNaN(ret) ); 
 #else
   check_equals ( ret , 0 );
 #endif
 
 var ret=getThisName.apply(undefined, "7");
 #if OUTPUT_VERSION >= 7
-  xcheck ( isNaN(ret) ); 
+  check ( isNaN(ret) ); 
 #else
   check_equals ( ret , 0 );
 #endif
@@ -405,3 +405,39 @@ check_equals(typeof(fooInstance), 'object');
 check(fooInstance instanceOf Foo);
 
 #endif // OUTPUT_VERSION >= 6 
+
+//----------------------------------------------------------
+//
+// Test conversion to string
+//
+//----------------------------------------------------------
+
+function textOutFunc() {};
+#if OUTPUT_VERSION >= 6
+check_equals(typeof(textOutFunc.toString()), 'string');
+check_equals(textOutFunc.toString(), '[type Function]');
+// the toString method is inherited from Object class
+check(!textOutFunc.hasOwnProperty('toString'));
+check(!Function.prototype.hasOwnProperty('toString'));
+check(Object.prototype.hasOwnProperty('toString'));
+check_equals(textOutFunc.toString, Object.prototype.toString);
+#else
+xcheck_equals(typeof(textOutFunc.toString), 'undefined');
+#endif
+textOutFunc.toString = function() { return "custom text rep"; };
+#if OUTPUT_VERSION >= 6
+check(textOutFunc.hasOwnProperty('toString'));
+#endif
+check_equals(textOutFunc.toString(), 'custom text rep');
+check_equals(typeof(textOutFunc.toString()), 'string');
+
+// expect 'custom text rep', not '[type Function]' in output.
+// No way to check in this framework, but it's known to be bogus.
+note(textOutFunc);
+
+textOutFunc.toString = 4;
+check_equals(typeof(textOutFunc.toString), 'number');
+
+// expect '[type Function]', not 'custom text rep' in output (no way to check this!!)
+note(textOutFunc);
+

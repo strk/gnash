@@ -26,9 +26,11 @@
 #include "System.h"
 #include "fn_call.h"
 #include "builtin_function.h"
+#include "VM.h" // for getPlayerVersion() 
 
 namespace gnash {
 
+#if 0
 System::System() {
 }
 
@@ -66,6 +68,8 @@ System::showSettings()
     log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
 }
 
+#endif
+
 static as_object*
 getSystemSecurityInterface()
 {
@@ -90,7 +94,7 @@ getSystemCapabilitiesInterface()
 	if ( proto == NULL )
 	{
 		proto = new as_object();
-		proto->init_member("version", "Gnash-" VERSION);
+		proto->init_member("version", VM::get().getPlayerVersion() );
 	}
 	return proto.get();
 }

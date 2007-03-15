@@ -137,6 +137,13 @@ public:
 	///
 	int getSWFVersion() const;
 
+	/// Get version of the player, in a compatible representation
+	//
+	/// This information will be used for the System.capabilities.version
+	/// and $version ActionScript variables.
+	///
+	const std::string& getPlayerVersion() const;
+
 	/// Get a pointer to this VM's Root movie 
 	movie_root& getRoot() const;
 

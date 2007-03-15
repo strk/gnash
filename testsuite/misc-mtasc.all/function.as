@@ -6,6 +6,19 @@ class Test extends TestClass
 
 	function setX(nx)
 	{
+		_root.check(!arguments.hasOwnProperty('toString'));
+		_root.check_equals(arguments.toString(), '2');
+		_root.check(arguments instanceof Object);
+		_root.check_equals(typeof(arguments.__proto__), 'object');
+		_root.check_equals(typeof(arguments.__proto__.constructor), 'function');
+		_root.check_equals(typeof(arguments.__proto__.constructor.__proto__), 'object');
+		_root.check_equals(typeof(arguments.__proto__.constructor.__proto__.constructor), 'function');
+		_root.check_equals(arguments.__proto__, arguments.__proto__.constructor.prototype);
+		_root.check(arguments.__proto__.hasOwnProperty('toString'));
+		_root.check(arguments.__proto__.toString != Object.prototype.toString);
+		_root.check(arguments.__proto__ !=  Object.prototype);
+		_root.check(arguments.__proto__.constructor.__proto__ != Object.prototype);
+		_root.check(arguments.__proto__.constructor.__proto__ != Array.prototype);
 		this.x = nx;
 	}
 

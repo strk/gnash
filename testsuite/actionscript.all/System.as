@@ -20,11 +20,9 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: System.as,v 1.9 2007/01/12 10:15:13 strk Exp $";
+rcsid="$Id: System.as,v 1.10 2007/03/15 22:39:54 strk Exp $";
 
 #include "check.as"
-
-#if OUTPUT_VERSION >= 6
 
 check_equals(typeof(System), 'object');
 
@@ -52,4 +50,19 @@ check_equals ( typeof(System.security.allowInsecureDomain), 'function' );
 
 #endif // OUTPUT_VERSION >= 7
 
-#endif // OUTPUT_VERSION >= 6
+
+// test System.capabilities
+check_equals(typeof(System.capabilities), 'object');
+
+// test System.version (should also match the global $version)
+check_equals(typeof(System.capabilities.version), 'string');
+check_equals(typeof($version), 'string');
+check_equals(System.capabilities.version, $version);
+check_equals(typeof(_global.$version), 'undefined');
+check_equals(typeof(this.$version), 'string');
+check_equals(this.$version, System.capabilities.version);
+#if OUTPUT_VERSION >= 6
+check(this.hasOwnProperty("$version"));
+check(! MovieClip.prototype.hasOwnProperty("$version") );
+#endif
+

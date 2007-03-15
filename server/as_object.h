@@ -28,6 +28,7 @@
 #include "PropertyList.h"
 #include "as_value.h" // for return of get_primitive_value
 #include "smart_ptr.h"
+#include "as_prop_flags.h" // for enum
 
 #include <cmath>
 #include <utility> // for std::pair
@@ -113,7 +114,7 @@ public:
 	virtual ~as_object() {}
 	
 	/// Return a text representation for this object
-	virtual const char* get_text_value() const { return NULL; }
+	virtual const char* get_text_value() const { return "[object Object]"; }
 
 	/// Return the numeric value of this object
 	//
@@ -162,9 +163,10 @@ public:
 	/// (VM initialization in general) as will avoid to scan the
 	/// inheritance chain and perform lowercase conversion when
 	/// VM version is initialized at versions < 7.
-	/// Also, members initialized by calling this function will
-	/// be protected from deletion and not shown in enumeration
-	/// TODO: provide an additional argument to prevent 'protection' ?
+	///
+	/// By dedfault, members initialized by calling this function will
+	/// be protected from deletion and not shown in enumeration.
+	/// These flags can be explicitly set using the third argument.
 	///
 	/// @param name
 	///     Name of the member.
@@ -173,7 +175,11 @@ public:
 	/// @param val
 	///     Value to assign to the member.
 	///
-	void init_member(const std::string& name, const as_value& val);
+	/// @param flags
+	///     Flags for the new member. By default dontDelete and dontEnum.
+	///	See as_prop_flags::Flags.
+	///
+	void init_member(const std::string& name, const as_value& val, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
 
 	/// \brief
 	/// Initialize a getter/setter property

@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.271 2007/03/09 18:38:35 strk Exp $
+dnl $Id: configure.ac,v 1.272 2007/03/15 22:39:53 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -490,7 +490,8 @@ AM_CONDITIONAL(ENABLE_MYSQL, [ test x"$mysql" = xyes ])
 
 AC_PATH_MING
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
-AM_CONDITIONAL(MAKESWF_SUPPORTS_PREBUILT_CLIPS, [ test $MING_VERSION_CODE -ge 00040002 ])
+AM_CONDITIONAL(MAKESWF_SUPPORTS_PREBUILT_CLIPS,
+        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040002  ])
 
 AC_ARG_WITH([swfdec_testsuite],
 	AC_HELP_STRING([--with-swfdec-testsuite],
@@ -1378,8 +1379,8 @@ dnl      echo "          needs compatibility layer: $agg_need_compatibility_laye
 dnl    nogo=true
     fi
   else
-    echo "Your installation of AGG appears to be a version older than 2.4. \
-Please upgrade to AGG 2.4 or greater."
+    echo "Your installation of AGG appears to be version 2.4 or older. \
+Please upgrade to AGG 2.5 or greater."
   fi
 fi
 

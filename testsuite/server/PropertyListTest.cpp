@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 #include "config.h"
 #endif
 
-#include "check.h"
 #include "PropertyList.h"
 #include "DummyMovieDefinition.h"
 #include "VM.h"
@@ -33,6 +32,8 @@
 #include <cassert>
 #include <string>
 #include <utility> // for make_pair
+
+#include "check.h"
 
 using namespace std;
 using namespace gnash;

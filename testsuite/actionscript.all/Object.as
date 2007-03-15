@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.23 2007/03/09 01:11:42 strk Exp $";
+rcsid="$Id: Object.as,v 1.24 2007/03/15 22:39:54 strk Exp $";
 
 #include "check.as"
 
@@ -187,6 +187,18 @@ check(o.addProperty != Object.prototype.addProperty );
 
 // Object.addProperty wasn't in SWF5
 #endif // OUTPUT_VERSION > 5
+
+//----------------------------------------------------
+// Test Object.toString 
+//----------------------------------------------------
+
+check_equals(Object.prototype.toString(), '[object Object]');
+backup = Object.prototype.toString;
+Object.prototype.toString = function() { return new Object; };
+check_equals(typeof(Object.prototype.toString()), 'object');
+Object.prototype.toString = function() { return new Number; };
+check_equals(Object.prototype.toString(), 0);
+Object.prototype.toString = backup;
 
 //----------------------
 // Test enumeration
