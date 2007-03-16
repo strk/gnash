@@ -89,6 +89,8 @@ check_PROGRAMS = \
 	action_execution_order_test1 \
 	action_execution_order_test2 \
 	action_execution_order_test3 \
+	action_execution_order_test4 \
+	action_execution_order_test5 \
 	loadMovieTest \
 	loadMovieTestRunner \
 	eventSoundTest1 \
@@ -116,6 +118,8 @@ check_SCRIPTS = \
 	action_execution_order_test1runner \
 	action_execution_order_test2runner \
 	action_execution_order_test3runner \
+	action_execution_order_test4runner \
+	action_execution_order_test5runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -500,6 +504,34 @@ action_execution_order_test3runner: $(srcdir)/../generic-testrunner.sh action_ex
 	sh $< $(top_builddir) action_execution_order_test3.swf > $@
 	chmod 755 $@
 
+action_execution_order_test4_SOURCES =	\
+	action_execution_order_test4.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+action_execution_order_test4_LDADD = $(MING_LIBS)
+
+action_execution_order_test4.swf: action_execution_order_test4
+	./action_execution_order_test4 $(top_srcdir)/testsuite/media
+
+action_execution_order_test4runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test4.swf
+	sh $< $(top_builddir) action_execution_order_test4.swf > $@
+	chmod 755 $@
+
+action_execution_order_test5_SOURCES =	\
+	action_execution_order_test5.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+action_execution_order_test5_LDADD = $(MING_LIBS)
+
+action_execution_order_test5.swf: action_execution_order_test5
+	./action_execution_order_test5 $(top_srcdir)/testsuite/media
+
+action_execution_order_test5runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test5.swf
+	sh $< $(top_builddir) action_execution_order_test5.swf > $@
+	chmod 755 $@
+
 action_execution_order_extend_test_SOURCES =	\
 	action_execution_order_extend_test.c	\
 	ming_utils.h		\
@@ -738,6 +770,8 @@ TEST_CASES = \
 	action_execution_order_test1runner \
 	action_execution_order_test2runner \
 	action_execution_order_test3runner \
+	action_execution_order_test4runner \
+	action_execution_order_test5runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS

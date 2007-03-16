@@ -1,3 +1,8 @@
+2007-03-16 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: .cvsignore, Makefile.am:
+	  Automate run of the new testcases.
+
 2007-03-16 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/action_execution_order_test4.c.
