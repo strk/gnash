@@ -20,12 +20,15 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.26 2007/03/15 22:39:54 strk Exp $";
+rcsid="$Id: Function.as,v 1.27 2007/03/16 16:40:17 strk Exp $";
 
 #include "check.as"
 
 // Define a function returning 'this'.name and the given args
 function getThisName(a,b,c) { return this.name+a+b+c; }
+
+// Every newly created function's super class is Object
+check_equals(getThisName.prototype.__proto__, Object.prototype);
 
 #if OUTPUT_VERSION >=6 
  check (getThisName != undefined);

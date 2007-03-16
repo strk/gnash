@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.27 2007/03/06 11:08:46 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.28 2007/03/16 16:40:17 strk Exp $";
 
 #include "check.as"
 
@@ -44,6 +44,8 @@ var functionObject = new Function();
 
 #if OUTPUT_VERSION > 5
 check_equals(typeof(functionObject), 'object');
+check(functionObject.hasOwnProperty('__constructor__'));
+check_equals(functionObject.__constructor__, Function);
 #else
 // TODO: this is likely dependent on *player* version 
 //       rather then on *SWF* version, in which case
@@ -97,6 +99,10 @@ check (Ball.prototype.constructor == Ball);
 Ball.prototype.gravity = 9.8;
 
 var myBall = new Ball(3);
+#if OUTPUT_VERSION > 5
+check(myBall.hasOwnProperty('__constructor__'));
+check_equals(myBall.__constructor__, Ball);
+#endif
 check (myBall.gravity == 9.8);
 check(myBall.radius == 3);
 
@@ -108,6 +114,34 @@ myBall.gravity = 5;
 check(myBall.gravity == 5);
 check(myBall.__proto__ == Ball.prototype);
 
+check(!_root.hasOwnProperty('__constructor__'));
+
+//-------------------------------------------------------------------------
+// Try changing value of __constructor__ from within the constructor itself
+//-------------------------------------------------------------------------
+
+function TypeChanger(changeit)
+{
+	if ( changeit ) this.__constructor__ = Object;
+}
+
+o1 = new TypeChanger(false);
+#if OUTPUT_VERSION > 5
+check_equals(o1.__constructor__, TypeChanger);
+#else
+xcheck_equals(o1.__constructor__, TypeChanger);
+#endif
+check(o1 instanceof TypeChanger);
+check(o1 instanceof Object);
+o2 = new TypeChanger(true);
+check_equals(o2.__constructor__, Object);
+check(o2 instanceof TypeChanger);
+check(o2 instanceof Object);
+
+//-------------------------------------------------------------------------
+// Old-style inheritance
+//-------------------------------------------------------------------------
+
 // Define a superclass
 function SuperClass() {
 	this.sayHello = function() { return "hello from SuperClass"; };
@@ -115,8 +149,19 @@ function SuperClass() {
 
 // Define a class derived from SuperClass
 function SubClass () {}
+check_equals(SubClass.prototype.constructor, SubClass);
+check_equals(typeof(SubClass.prototype.__constructor__), 'undefined');
+
 SubClass.prototype = new SuperClass();
+check_equals(SubClass.prototype.constructor, SuperClass);
+
 subInstance = new SubClass();
+#if OUTPUT_VERSION > 5
+check(subInstance.hasOwnProperty('__constructor__'));
+check_equals(subInstance.__constructor__, SubClass);
+check_equals(subInstance.__proto__.constructor, SuperClass);
+#endif
+
 check_equals(subInstance.sayHello(), "hello from SuperClass" );
 SubClass.prototype.sayHello = function() { return "hello from SubClass"; };
 check_equals(subInstance.sayHello(), "hello from SubClass" );
@@ -196,6 +241,7 @@ check_equals(SubObj1.prototype.constructor.__proto__.constructor, Function);
 function BaseClass1() { this.baseClassCtorCalled = 1; }
 BaseClass1.prototype.var1 = "var_in_Base_prototype";
 function DerivedClass1() { this.derivedClassCtorCalled = 1; }
+DerivedClass1.prototype.var3 = "var3_in_Derived_prototype";
 asm {
 	push "DerivedClass1"
 	getvariable
@@ -203,9 +249,35 @@ asm {
 	getvariable
 	extends
 };
+
+// One effect of 'extends' is setting up a __constructor__ member in the prototype 
+#if OUTPUT_VERSION > 5
+xcheck_equals(typeof(DerivedClass1.prototype.__constructor__), 'function');
+xcheck(DerivedClass1.prototype.hasOwnProperty('__constructor__'));
+xcheck_equals(DerivedClass1.prototype.__constructor__, BaseClass1);
+check(DerivedClass1.prototype.__constructor__ != DerivedClass1);
+#else // SWF5 or below don't set __constructor__, it seems
+check_equals(typeof(DerivedClass1.prototype.__constructor__), 'undefined');
+#endif
+
+check_equals(typeof(DerivedClass1.prototype.constructor), 'function');
+check_equals(typeof(DerivedClass1.constructor), 'function');
+#if OUTPUT_VERSION > 6
+xcheck(! DerivedClass1.prototype.hasOwnProperty('constructor'));
+xcheck(DerivedClass1.hasOwnProperty('constructor'));
+#endif
+check_equals(DerivedClass1.prototype.constructor, BaseClass1);
+
 DerivedClass1.prototype.var2 = "var_in_Derived_prototype";
 var obj = new DerivedClass1;
 check_equals(obj.derivedClassCtorCalled, 1);
+#if OUTPUT_VERSION > 5
+check_equals(typeof(obj.__constructor__), 'function');
+check(obj.hasOwnProperty('__constructor__'));
+check_equals(obj.__constructor__, DerivedClass1);
+xcheck_equals(obj.__proto__.__constructor__, BaseClass1);
+#endif
+
 // constructor of 'super' is not automatically called
 // add 'super();' in DerivedClass1 function and see
 // the difference
@@ -216,6 +288,7 @@ check_equals(obj.__proto__, DerivedClass1.prototype);
 check_equals(DerivedClass1.prototype.constructor, BaseClass1);
 check_equals(obj.var1, "var_in_Base_prototype");
 check_equals(obj.var2, "var_in_Derived_prototype");
+check_equals(typeof(obj.var3), 'undefined');
 
 function MyClass() {}
 var proto = MyClass.prototype;

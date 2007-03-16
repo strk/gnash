@@ -1,5 +1,7 @@
 2007-03-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: Function.as, Inheritance.as:
+	  Some more tests for __constructor__.
 	* server/vm/ASHandlers.cpp (construct_object): set up the
 	  undocumented and non-standard __constructor__ member.
 	* server/asobj/Object.cpp (object_registerClass): don't forget
