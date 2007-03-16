@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.25 2007/03/16 15:00:49 rsavoye Exp $ */
+/* $Id: amf.cpp,v 1.26 2007/03/16 19:35:12 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -262,13 +262,6 @@ AMF::readElement(void *in)
     return x;
 }
 
-bool
-AMF::readObject(void * /* in */)
-{
-    GNASH_REPORT_FUNCTION;
-		return true;
-    
-}
 
 /// \brief Write an AMF element
 ///
@@ -688,6 +681,91 @@ AMF::extractNumber(const char *in)
     return num;
 }
 
+void *
+AMF::encodeVariable(amf_element_t &el)
+{
+    GNASH_REPORT_FUNCTION;
+}
+
+void *
+AMF::encodeVariable(const char *name, amfnum_t bignum)
+{
+    GNASH_REPORT_FUNCTION;
+    int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
+    char *out = new char[outsize];
+    char *tmpptr = out;
+    short length;
+    amfnum_t newnum = bignum;
+    char *numptr = (char *)&newnum;
+
+    length = strlen(name);
+    swapBytes(&length, 2);
+    memcpy(tmpptr, &length, 2);
+    tmpptr += 2;
+    strcpy(tmpptr, name);
+    tmpptr += strlen(name);
+    *tmpptr = AMF::NUMBER;
+    tmpptr++;
+//    swapBytes(numptr, AMF_NUMBER_SIZE);
+    memcpy(tmpptr, numptr, AMF_NUMBER_SIZE);
+
+    return out;    
+}
+
+void *
+AMF::encodeVariable(const char *name, const char *val)
+{
+    GNASH_REPORT_FUNCTION;
+
+    int outsize = strlen(name) + strlen(val) + 5;
+    char *out = new char[outsize];
+    char *tmpptr = out;
+    short length;
+
+    length = strlen(name);
+    swapBytes(&length, 2);
+    memcpy(tmpptr, &length, 2);
+    tmpptr += 2;
+    strcpy(tmpptr, name);
+    tmpptr += strlen(name);
+    *tmpptr = AMF::STRING;
+    tmpptr++;
+    length = strlen(val);
+    swapBytes(&length, 2);
+    memcpy(tmpptr, &length, 2);
+    tmpptr += 2;
+    strcpy(tmpptr, val);
+
+    return out;
+}
+
+void *
+AMF::encodeVariable(std::string &name, std::string &val)
+{
+    GNASH_REPORT_FUNCTION;
+
+    int outsize = name.size() + val.size() + 5;
+    unsigned char *out = new unsigned char[outsize];
+    unsigned char *tmpptr = out;
+    short length;
+
+    length = name.size() && 0xffff;
+    swapBytes(&length, 2);
+    memcpy(tmpptr, &length, 2);
+    tmpptr += 2;
+    memcpy(tmpptr, name.c_str(), name.size());
+    tmpptr += name.size();
+    *tmpptr = AMF::STRING;
+    tmpptr++;
+    length = val.size() && 0xffff;
+    swapBytes(&length, 2);
+    memcpy(tmpptr, &length, 2);
+    tmpptr += 2;
+    memcpy(tmpptr, val.c_str(), name.size());
+
+    return out;
+}
+
 int
 AMF::headerSize(char header)
 {
@@ -898,7 +976,7 @@ AMF::parseBody(unsigned char *in, int bytes)
               break;
           case OBJECT:
               do {
-                  tmpptr = extractVariables(el, tmpptr);
+                  tmpptr = extractVariables(&el, tmpptr);
               } while (el.type != AMF::OBJECT_END);
               break;
           case MOVIECLIP:
@@ -927,7 +1005,7 @@ AMF::parseBody(unsigned char *in, int bytes)
 }
 
 unsigned char *
-AMF::extractVariables(amf_element_t &el, unsigned char *in)
+AMF::extractVariables(amf_element_t *el, unsigned char *in)
 {
     GNASH_REPORT_FUNCTION;
     
@@ -935,22 +1013,22 @@ AMF::extractVariables(amf_element_t &el, unsigned char *in)
     unsigned char *tmpptr = in;
     short length = 0;
 
-    el.length = 0;
-    el.name.erase();
-    if (el.data) {
-        el.data = 0;
+    el->length = 0;
+    el->name.erase();
+    if (el->data) {
+        el->data = 0;
     }
     
     memset(buffer, 0, 300);
     // @@ casting generic pointers to bigger types may be dangerous
     //    due to memory alignment constraints
     length = ntohs((*(const short *)tmpptr) & 0xffff);
-    el.length = length;
+    el->length = length;
     if (length == 0) {
         if (*(tmpptr+2) == AMF::OBJECT_END) {
             dbglogfile << "End of Object definition." << endl;
-            el.length = 0;
-            el.type = AMF::OBJECT_END;
+            el->length = 0;
+            el->type = AMF::OBJECT_END;
             tmpptr+=3;
             return tmpptr;
         }
@@ -966,40 +1044,45 @@ AMF::extractVariables(amf_element_t &el, unsigned char *in)
     if (length > 0) {
         dbglogfile << "AMF element length is: " << length << endl;
         memcpy(buffer, tmpptr, length);
-        el.name = reinterpret_cast<char *>(buffer);
+        el->name = reinterpret_cast<char *>(buffer);
         tmpptr += length;
     }
     
 //    dbglogfile << "AMF element name is: " << buffer << endl;
-    char type = *(const astype_e *)tmpptr++;
+    astype_e type = (astype_e)((*tmpptr++) & 0xff);
 
     if (type <= AMF::TYPED_OBJECT) {
         dbglogfile << "AMF type is: " << astype_str[(int)type] << endl;
+	el->type = type;
     }
+
     
-    switch ((astype_e)type) {
+    switch (type) {
       case NUMBER:
           memcpy(buffer, tmpptr, AMF_NUMBER_SIZE);
           swapBytes(buffer, AMF_NUMBER_SIZE);
+          el->data = new unsigned char[AMF_NUMBER_SIZE+1];
+	  memset((void *)el->data, 0, AMF_NUMBER_SIZE+1);
+          memcpy((void *)el->data, buffer, AMF_NUMBER_SIZE);
           unsigned char hexint[AMF_NUMBER_SIZE*3];
-          hexify((unsigned char *)hexint, (unsigned char *)tmpptr, AMF_NUMBER_SIZE, false);
-          dbglogfile << "Number \"" << el.name.c_str() << "\" is: 0x" << hexint << endl;
+          hexify((unsigned char *)hexint, (unsigned char *)buffer, AMF_NUMBER_SIZE, false);
+          dbglogfile << "Number \"" << el->name.c_str() << "\" is: 0x" << hexint << endl;
 //          amfnum_t *num = extractNumber(tmpptr);
           tmpptr += 8;
           break;
       case BOOLEAN:
 //          int value = *tmpptr;
-           el.data = (const unsigned char*)tmpptr; 
-           dbglogfile << "Boolean \"" << el.name.c_str() << "\" is: " << ( (*tmpptr == 0) ? "true" :"false") << endl;
+           el->data = (const unsigned char*)tmpptr; 
+           dbglogfile << "Boolean \"" << el->name.c_str() << "\" is: " << ( (*tmpptr == 0) ? "true" :"false") << endl;
            tmpptr += 1;
            break;
       case STRING:
-          length = ntohs(*reinterpret_cast<const short *>(tmpptr)); // @@ this cast is dangerous due to memory alignment constraints
+	  length = ntohs((*(const short *)tmpptr) & 0xffff);
           tmpptr += sizeof(short);
-          el.data = (const unsigned char*)tmpptr; 
-          dbglogfile << "Variable \"" << el.name.c_str() << "\" is: " << el.data << endl;
+          el->data = (const unsigned char*)tmpptr; 
+          dbglogfile << "Variable \"" << el->name.c_str() << "\" is: " << el->data << endl;
           tmpptr += length;
-          el.length = length;
+          el->length = length;
           break;
       case OBJECT:
       case MOVIECLIP:
@@ -1009,10 +1092,10 @@ AMF::extractVariables(amf_element_t &el, unsigned char *in)
       case ECMA_ARRAY:
       case OBJECT_END:
           dbglogfile << "End of Object definition." << endl;
-          el.name.erase();
-          el.length = 0;
-          el.data = 0;
-          el.type = AMF::OBJECT_END;
+          el->name.erase();
+          el->length = 0;
+          el->data = 0;
+          el->type = AMF::OBJECT_END;
           break;
       case STRICT_ARRAY:
       case DATE:

@@ -188,12 +188,16 @@ public:
         return encodeElement (NUMBER, &num, AMF_NUMBER_SIZE);
     };
     
+    void *encodeVariable(amf_element_t &el);
+    void *encodeVariable(const char *name, amfnum_t num);
+    void *encodeVariable(std::string &name, std::string &val);
+    void *encodeVariable(const char *name, const char *val);
+    
 //     amfhead_t *encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data);
 //     amfbody_t *encodeBody(amfutf8_t *target, amfutf8_t *response, int nbytes, void *data);
 //    amfpacket_t *encodePacket(std::vector<amfhead_t *> messages);
 
     char *readElement(void *in);
-    bool readObject(void *in);
     
     astype_e extractElementHeader(void *in);
     int extractElementLength(void *in);
@@ -201,7 +205,8 @@ public:
     amfnum_t *extractNumber(const char *in);
     amf_element_t *extractObject(const char *in);
 
-    unsigned char *extractVariables(amf_element_t &el, unsigned char *in);
+    
+    unsigned char *extractVariables(amf_element_t *el, unsigned char *in);
     
     bool parseAMF(char *in);
     static int headerSize(char header);
@@ -224,7 +229,7 @@ public:
     
  private:
     content_types_e     _type;
-//    std::map<std::string, amf_element_t &> _elements;
+    std::map<std::string, amf_element_t *> _elements;
     int                 _amf_index;
     int                 _header_size;
     int                 _total_size;

@@ -1,3 +1,32 @@
+2007-03-16  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* testsuite/libamf.all/string-variable.amf:  Binary test case for
+	string variables.
+	* testsuite/libamf.all/number-variable.amf: Binary test case for
+	numeric variables.
+	* testsuite/libamf.all/test_variable.cpp: Test case for encoding
+	and decoding variable assignments which as used in AMF objects.
+	* libamf/amf.cpp, amf.h: Add support for encoding variables. Make
+	extractVariables actually set the fields of the element so they
+	have some value when returned.
+	
+	* libamf/amf.cpp, amf.h: Use capitols for enum values. Fix
+	encoding and decoding of numbers, strings, and objects.
+	* libamf/rtmp.cpp, rtmp.h: Use capitols for enum values. 
+	* libamf/Makefile.am: Remove amftest.cpp, it's now in testsuites
+	where it belongs.
+	* testsuite/Makefile.am: Add libamf.all directory.
+	* testsuite/libamf.all/Makefile.am: Build test cases, do "make
+	check".
+	* testsuite/libamf.all/test_number.cpp: Test case for AMF numbers.
+	* testsuite/libamf.all/test_object.cpp: Test case for AMF objects.
+	* testsuite/libamf.all/test_string.cpp: Test case for AMF strings.
+	* testsuite/libamf.all/f03f.amf: Binary test file for number format.
+	* testsuite/libamf.all/connect-object.amf: Binary test file for
+	object format. 
+	* testsuite/libamf.all/connect-string.amf: Binary test file for
+	string format.
+
 2007-03-16 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/: Function.as, Inheritance.as:
@@ -11,7 +40,7 @@
 
 2007-03-16 Sandro Santilli <strk@keybit.net>
 
-	* server/as_value.{cpp,h}: deprecate operator+=, implement valueOf
+	* server/as_value.{cpp,h}: depreciate operator+=, implement valueOf
 	  calling.
 	* server/vm/ASHandlers.cpp (ActionNewAdd): pass environment over
 	  calls to as_value::to_number, for properly calling valueOf.
@@ -21,7 +50,7 @@
 
 2007-03-16 Zou Lunkai <zoulunkai@gmail.com>
 
-	* testsuite/misc-ming.all/action_execution_order_test4.c.
+	* tesrttsuite/misc-ming.all/action_execution_order_test4.c.
 	* testsuite/misc-ming.all/action_execution_order_test5.c.
 	  add 2 more testcases to verify actions execution order.
 	  

@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.1 2007/03/16 15:00:49 rsavoye Exp $
+# $Id: Makefile.am,v 1.2 2007/03/16 19:35:12 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -45,13 +45,15 @@ INCLUDES = -I.. \
 # AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
 
 
-check_PROGRAMS = test_number test_string test_object
+check_PROGRAMS = test_number test_string test_object test_variable
 test_number_SOURCES = test_number.cpp
 test_number_LDADD = $(AM_LDFLAGS)
 test_string_SOURCES = test_string.cpp
 test_string_LDADD = $(AM_LDFLAGS)
 test_object_SOURCES = test_object.cpp
 test_object_LDADD = $(AM_LDFLAGS)
+test_variable_SOURCES = test_variable.cpp
+test_variable_LDADD = $(AM_LDFLAGS)
 
 
 # Rebuild with GCC 4.x Mudflap support

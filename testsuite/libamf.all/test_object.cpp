@@ -44,14 +44,6 @@ static int verbosity;
 
 TestState runtest;
 
-void test_Number(void);
-void test_Boolean(void);
-void test_String(void);
-
-void test_Header(void);
-void test_Body(void);
-void test_Packet(void);
-
 // These are used to print more intelligent debug messages
 const char *astype_str[] = {
     "Number",
