@@ -45,7 +45,7 @@ namespace gnash {
 #ifndef NAN
 //	If this makes your compiler die with div by zero,
 //	use "static double zzzero = 0.0;" and "(zzzero/zzzero)"
-#	define NAN (0.0/0.0)
+#	define NAN std::numeric_limits<double>::quiet_NaN();
 #endif
 
 //
@@ -172,7 +172,7 @@ as_value::to_tu_string(as_environment* env) const
 			// text representation for that object is used
 			// instead.
 			//
-			as_object* obj = to_object();
+			as_object* obj = m_type == OBJECT ? m_object_value : m_as_function_value;
 			bool gotValidToStringResult = false;
 			if ( env )
 			{
@@ -269,57 +269,97 @@ as_value::to_primitive() const
 double
 as_value::to_number(as_environment* env) const
 {
-    // TODO:  split in to_number_# (version based)
-    // TODO:  call valueOf when needed  (this is why we take an as_environment!)
+	// TODO:  split in to_number_# (version based)
 
-    int swfversion = VM::get().getSWFVersion();
+	int swfversion = VM::get().getSWFVersion();
 
-    if (m_type == STRING) {
-	// @@ Moock says the rule here is: if the
-	// string is a valid float literal, then it
-	// gets converted; otherwise it is set to NaN.
-	//
-	// Also, "Infinity", "-Infinity", and "NaN"
-	// are recognized by strtod() but not by Flash Player.
-	char* tail=0;
-	m_number_value = strtod(m_string_value.c_str(), &tail);
-	if ( tail == m_string_value.c_str() || *tail != 0 )
+	switch (m_type)
 	{
-		// Failed conversion to Number.
-		m_number_value = NAN;
+		case STRING:
+		{
+			// @@ Moock says the rule here is: if the
+			// string is a valid float literal, then it
+			// gets converted; otherwise it is set to NaN.
+			//
+			// Also, "Infinity", "-Infinity", and "NaN"
+			// are recognized by strtod() but not by Flash Player.
+			char* tail=0;
+			m_number_value = strtod(m_string_value.c_str(), &tail);
+			if ( tail == m_string_value.c_str() || *tail != 0 )
+			{
+				// Failed conversion to Number.
+				m_number_value = NAN;
+			}
+			return m_number_value;
+		}
+
+		case NULLTYPE:
+		case UNDEFINED:
+			// Evan: from my tests
+			// Martin: I tried var foo = new Number(null) and got NaN
+			if ( swfversion >= 7 ) return std::numeric_limits<double>::quiet_NaN();
+			else return 0;
+
+		case BOOLEAN:
+			// Evan: from my tests
+			// Martin: confirmed
+			return (this->m_boolean_value) ? 1 : 0;
+
+		case NUMBER:
+			return m_number_value;
+
+		case OBJECT:
+		case AS_FUNCTION:
+		{
+			// @@ Moock says the result here should be
+			// "the return value of the object's valueOf()
+			// method".
+			//
+			// Arrays and Movieclips should return NaN.
+
+			//log_msg("OBJECT to number conversion, env is %p", env);
+
+			as_object* obj = m_type == OBJECT ? m_object_value : m_as_function_value;
+			bool gotValidValueOfResult = false;
+			if ( env )
+			{
+				std::string methodname = "valueOf";
+				lowercase_if_needed(methodname);
+				as_value method;
+				if ( obj->get_member(methodname, &method) )
+				{
+					as_value ret = call_method0(method, env, obj);
+					if ( ret.is_number() )
+					{
+						gotValidValueOfResult=true;
+						return ret.m_number_value;
+					}
+					else
+					{
+						log_msg("call_method0(%s) did not return a number", methodname.c_str());
+					}
+				}
+				else
+				{
+					log_msg("get_member(%s) returned false", methodname.c_str());
+				}
+			}
+			if ( ! gotValidValueOfResult )
+			{
+				return obj->get_numeric_value(); 
+			}
+		}
+
+		case MOVIECLIP:
+			// This is tested, no valueOf is going
+			// to be invoked for movieclips.
+			return NAN; 
+
+		default:
+			// Other object types should return NaN, but if we implement that,
+			// every GUI's movie canvas shrinks to size 0x0. No idea why.
+			return NAN; // 0.0;
 	}
-	return m_number_value;
-    } else if (m_type == NULLTYPE || m_type == UNDEFINED) {
-	// Evan: from my tests
-	// Martin: I tried var foo = new Number(null) and got NaN
-	if ( swfversion >= 7 ) return std::numeric_limits<double>::quiet_NaN();
-	else return 0;
-    } else if (m_type == BOOLEAN) {
-	// Evan: from my tests
-	// Martin: confirmed
-	return (this->m_boolean_value) ? 1 : 0;
-    } else if (m_type == NUMBER) {
-	return m_number_value;
-    } else if (m_type == OBJECT && m_object_value != NULL) {
-	// @@ Moock says the result here should be
-	// "the return value of the object's valueOf()
-	// method".
-	//
-	// Arrays and Movieclips should return NaN.
-	
-	// Text characters with var names could get in
-	// here.
-	const char* textval = m_object_value->get_text_value();
-	if (textval) {
-	    return atof(textval);
-	}
-	
-	return 0.0;
-    } else {
-	// Other object types should return NaN, but if we implement that,
-	// every GUI's movie canvas shrinks to size 0x0. No idea why.
-	return 0.0;
-    }
 }
 
 // Conversion to boolean for SWF7 and up

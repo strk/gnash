@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.61 2007/03/15 22:39:54 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.62 2007/03/16 10:12:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -822,7 +822,7 @@ SWFHandlers::ActionEqual(ActionExec& thread)
     as_value& op1 = env.top(0);
     as_value& op2 = env.top(1);
 
-    env.top(1).set_bool(op1.to_number() == op2.to_number());
+    env.top(1).set_bool(op1.to_number(&env) == op2.to_number(&env));
 
     // Flash4 used 1 and 0 as return from this tag
     if ( env.get_version() < 5 ) {
@@ -2451,7 +2451,7 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
     as_value& v1 = env.top(0);
     as_value& v2 = env.top(1);
 
-    //log_msg("ActionNewAdd(%s[%s],%s[%s]) called", v1.typeOf(), v1.to_string(), v2.typeOf(), v2.to_string(env));
+    //log_msg("ActionNewAdd(%s[%s],%s[%s]) called", v1.typeOf(), v1.to_string(), v2.typeOf(), v2.to_string());
 
 
     if (v1.is_string() || v2.is_string() )
@@ -2463,7 +2463,13 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
     }
     else
     {
-        v2 += v1;  // modifies env.top(1) uses numeric semantic
+	// use numeric semantic
+	double v2num = v2.to_number(&env);
+	//log_msg("v2 num = %g", v2num);
+	double v1num = v1.to_number(&env);
+	//log_msg("v1 num = %g", v1num);
+
+        v2.set_double(v2num + v1num); // modify env.top(1)
     }
     env.drop(1);
 }

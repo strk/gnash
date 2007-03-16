@@ -26,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.12 2007/03/15 22:39:54 strk Exp $";
+rcsid="$Id: Number.as,v 1.13 2007/03/16 10:12:58 strk Exp $";
 
 #include "check.as"
 
@@ -47,6 +47,7 @@ check_equals (268 , n1 );
 check_equals(typeof(n1.toString), "function");
 check_equals(typeof(n1.toString()), "string"); 
 check_equals(n1.toString(), "268");
+
 var backup = Object.prototype.toString;
 Object.prototype.toString = function() { return "fake_string"; };
 check_equals(n1.toString(), "268"); // doesn't inherit from Object
@@ -56,10 +57,21 @@ Object.prototype.toString = backup;
 check_equals(typeof(n1.valueOf), "function");
 check_equals(typeof(n1.valueOf()), "number");
 check_equals(n1.valueOf(), 268);
+
+#if OUTPUT_VERSION >= 6
+check(Number.prototype.hasOwnProperty('valueOf'));
+check(Object.prototype.hasOwnProperty('valueOf'));
+#endif
+
 var backup = Object.prototype.valueOf;
 Object.prototype.valueOf = function() { return "fake_value"; };
 check_equals(n1.valueOf(), 268); // doesn't inherit from Object
 Object.prototype.valueOf = backup;
+
+backup = Number.prototype.valueOf;
+Number.prototype.valueOf = function() { return "fake_value"; };
+check_equals(n1.valueOf(), "fake_value"); // does inherit from Number
+Number.prototype.valueOf = backup;
 
 // Check unary minus operator
 n1 = -n1;
@@ -146,11 +158,19 @@ check(! this.__proto__.hasOwnProperty('Infinity'));
 // Test automatic conversion to number 
 //--------------------------------------------------------
 
-xcheck(isNaN(0+this));
-xcheck(isNaN(this));
+check(isNaN(0+this));
+check(isNaN(this));
+this.valueOf = function() { return 5; };
+check(isNaN(this));
 o = new Object;
 xcheck(isNaN(o));
 xcheck(isNaN(0+o));
 o.valueOf = function() { return 3; };
-xcheck_equals(0+o, 3);
+check_equals(0+o, 3);
 check_equals(0+"string", "0string");
+
+#if OUTPUT_VERSION < 6
+check(!isNaN(2+Number));
+#else
+xcheck(isNaN(2+Number));
+#endif
