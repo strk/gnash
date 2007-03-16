@@ -26,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.13 2007/03/16 10:12:58 strk Exp $";
+rcsid="$Id: Number.as,v 1.14 2007/03/16 10:52:26 strk Exp $";
 
 #include "check.as"
 
@@ -174,3 +174,33 @@ check(!isNaN(2+Number));
 #else
 xcheck(isNaN(2+Number));
 #endif
+
+#if OUTPUT_VERSION >= 7
+check(isNaN(2/undefined));
+check(isNaN(undefined/2));
+check(!isFinite(undefined/2));
+check(2/undefined != Infinity);
+#else
+check(!isNaN(2/undefined));
+check(!isNaN(undefined/2));
+check(isFinite(undefined/2));
+check_equals(2/undefined, Infinity);
+#endif
+
+check(!isFinite(Infinity));
+check(!isFinite(2/undefined));
+
+
+note(undef);
+note(undef+undef);
+note(undef+'text');
+note('text'+undef);
+note(undef+2);
+note(2+undef);
+note(undef*2);
+note(2*undef);
+note(undef-2);
+note(2-undef);
+note(undef/2);
+note(2/undef);
+note(2/undefined);
