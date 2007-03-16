@@ -1139,9 +1139,10 @@ sprite_name_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_name'");
-		);
+		ptr->set_name(fn.arg(0).to_string(fn.env));
+		//IF_VERBOSE_ASCODING_ERRORS(
+		//log_aserror("Attempt to set read-only property '_name'");
+		//);
 	}
 
 }
@@ -3648,7 +3649,8 @@ sprite_instance::computeTargetPath() const
 		// Don't push the _root name on the stack
 		if ( ! parent )
 		{
-			assert(ch->get_name().empty());
+			// it is completely legal to set root's _name
+			//assert(ch->get_name().empty());
 			break;
 		}
 

@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.36 2007/03/15 22:39:54 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.37 2007/03/16 12:11:48 strk Exp $";
 
 #include "check.as"
 
@@ -194,6 +194,9 @@ xcheck(mc._lockroot != undefined);
 #if OUTPUT_VERSION > 5
 check_equals(mc._name, "");
 check_equals(typeof(mc._name), "string");
+mc._name = "changed";
+check_equals(typeof(mc._name), "string");
+check_equals(typeof(mc), "movieclip");
 #else
 check_equals(mc._name, undefined);
 #endif
