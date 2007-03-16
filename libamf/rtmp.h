@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,9 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 
 #ifndef _RTMP_H_
 #define _RTMP_H_
@@ -54,6 +51,55 @@ public:
         DELETE_ATTRIBUTE = 0xa,
         INITIAL_DATA = 0xb
     } sharedobj_types_e;
+    typedef enum {
+        RTMP_STATE_HANDSHAKE_SEND,
+        RTMP_STATE_HANDSHAKE_RECV,
+        RTMP_STATE_HANDSHAKE_ACK,
+        RTMP_STATE_CONNECT,
+        RTMP_STATE_NETCONNECT,
+        RTMP_STATE_NETSTREAM,
+        RTMP_STATE_HEADER,
+        RTMP_STATE_DONE
+    } rtmp_state_t;
+    typedef enum {
+        RTMP_ERR_UNDEF=0,
+        RTMP_ERR_NOTFOUND,
+        RTMP_ERR_PERM,
+        RTMP_ERR_DISKFULL,
+        RTMP_ERR_ILLEGAL,
+        RTMP_ERR_UNKNOWNID,
+        RTMP_ERR_EXISTS,
+        RTMP_ERR_NOSUCHUSER,
+        RTMP_ERR_TIMEOUT,
+        RTMP_ERR_NORESPONSE
+    } rtmp_error_t;
+
+// Each header consists of the following:
+//
+// * UTF string (including length bytes) - name
+// * Boolean - specifies if understanding the header is `required'
+// * Long - Length in bytes of header
+// * Variable - Actual data (including a type code)
+    typedef struct {
+        amf::amfutf8_t name;
+        amf::AMF_Byte_t required;
+        amf::AMF_Long_t length;
+        void *data;
+    } rtmp_head_t;
+    
+// Each body consists of the following:
+//
+// * UTF String - Target
+// * UTF String - Response
+// * Long - Body length in bytes
+// * Variable - Actual data (including a type code)
+    typedef struct {
+        amf::amfutf8_t target;
+        amf::amfutf8_t response;
+        amf::AMF_Long_t length;
+        void *data;
+    } rtmp_body_t;
+    
     RTMPproto();
     virtual ~RTMPproto();
     virtual bool handShakeWait();
@@ -78,3 +124,9 @@ private:
 
 // end of _RTMP_H_
 #endif
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
+

@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.20 2007/01/21 22:41:02 rsavoye Exp $
+# $Id: Makefile.am,v 1.21 2007/03/16 15:00:49 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -39,10 +39,6 @@ AM_CPPFLAGS = -I.. -I$(srcdir) \
         $(LIBXML_CFLAGS)
 
 noinst_HEADERS = amfutf8.h amf.h rtmp.h protocol.h
-
-EXTRA_PROGRAMS = amftest
-amftest_SOURCES = amftest.cpp
-amftest_LDADD = $(AM_LDFLAGS) libgnashamf.la
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

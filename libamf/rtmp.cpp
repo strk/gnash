@@ -312,3 +312,8 @@ RTMPproto::packetRead()
 }
 
 } // end of cygnal namespace
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:

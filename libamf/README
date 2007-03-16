@@ -479,7 +479,7 @@ All numbers are 64 bit big endian in AMF
 0xc9 0x14 0x0
 
 0x02 <--- string type
-0x00 0x07 connect	
+0x00 0x07 connect
 0x00 <---- number type (64 bit big endian)
 0x3f 0xf0 0x00 0x00 0x00 0x00 0x00 0x00
 
@@ -530,3 +530,7 @@ All numbers are 64 bit big endian in AMF
 
  00 00 09 00
  end of array
+
+
+Good examples for SharedObj
+http://www.flash-communications.net/technotes/sharedObjectEditor/editor.html

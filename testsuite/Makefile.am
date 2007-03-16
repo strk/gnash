@@ -2,16 +2,17 @@ AUTOMAKE_OPTIONS =
 
 # movies.all
 SUBDIRS = \
-	.			\
-	swfdec			\
-	libbase			\
-	libgeometry		\
-	server			\
-	samples			\
-	misc-ming.all		\
-	misc-mtasc.all		\
-	movies.all		\
-	actionscript.all	\
+	.	\
+	swfdec \
+	libbase	\
+	libgeometry \
+	server \
+	samples	\
+	libamf.all \
+	misc-ming.all \
+	misc-mtasc.all \
+	movies.all \
+	actionscript.all \
 	$(NULL)
 
 EXTRA_DIST = check.h DummyMovieDefinition.h DummyCharacter.h media

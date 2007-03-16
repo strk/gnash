@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,9 +13,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 
 #ifndef _AMF_H_
 #define _AMF_H_
@@ -40,6 +37,7 @@ typedef long amfnum_t;
 typedef long long amfnum_t;
 #define AMFNUM_F "%lld"
 #endif
+const char AMF_NUMBER_SIZE = 0x08;
 
 // These are the data types defined by AMF
 typedef char AMF_Byte_t;
@@ -59,38 +57,16 @@ typedef enum {
 
 const char AMF_VERSION = 0;
 const int  AMF_HEADSIZE_MASK = 0xc0;
-const char AMF_INDEX_MASK = 0x03;
+const char AMF_HEADER_SIZE = 0x03;
+const char AMF_INDEX_MASK = 0x03f;
 const int  AMF_VIDEO_PACKET_SIZE = 128;
 const int  AMF_AUDIO_PACKET_SIZE = 64;
+// This is the sized used when reading from the network to
+// be the most efficient
+const int  AMF_PACKET_SIZE = 7096;
 
 // For terminating sequences, a byte with value 0x09 is used.
 const char TERMINATOR = 0x09;
-
-// Each header consists of the following:
-//
-// * UTF string (including length bytes) - name
-// * Boolean - specifies if understanding the header is `required'
-// * Long - Length in bytes of header
-// * Variable - Actual data (including a type code)
-typedef struct {
-    amfutf8_t name;
-    AMF_Byte_t required;
-    AMF_Long_t length;
-    void *data;
-} amfhead_t;
-
-// Each body consists of the following:
-//
-// * UTF String - Target
-// * UTF String - Response
-// * Long - Body length in bytes
-// * Variable - Actual data (including a type code)
-typedef struct {
-    amfutf8_t target;
-    amfutf8_t response;
-    AMF_Long_t length;
-    void *data;
-} amfbody_t;
 
 // Each packet consists of the following:
 //
@@ -123,25 +99,25 @@ typedef enum {
 
 class AMF {
 public:
-    // The folowing elements are defined within AMF:
+    // The following elements are defined within AMF:
     typedef enum {
-        Number=0x00,
-        Boolean=0x01,
-        String=0x02,
-        Object=0x03,
-        MovieClip=0x04,
-        Null=0x05,
-        Undefined=0x06,
-        Reference=0x07,
-        ECMAArray=0x08,
-        ObjectEnd=0x09,
-        StrictArray=0x0a,
-        Date=0x0b,
-        LongString=0x0c,
-        Unsupported=0x0d,
-        Recordset=0x0e,
-        XMLObject=0x0f,
-        TypedObject=0x10
+        NUMBER=0x00,
+        BOOLEAN=0x01,
+        STRING=0x02,
+        OBJECT=0x03,
+        MOVIECLIP=0x04,
+        NULL_VALUE=0x05,
+        UNDEFINED=0x06,
+        REFERENCE=0x07,
+        ECMA_ARRAY=0x08,
+        OBJECT_END=0x09,
+        STRICT_ARRAY=0x0a,
+        DATE=0x0b,
+        LONG_STRING=0x0c,
+        UNSUPPORTED=0x0d,
+        RECORD_SET=0x0e,
+        XML_OBJECT=0x0f,
+        TYPED_OBJECT=0x10
     } astype_e;
     typedef enum {
         HEADER_12 = 0x0,
@@ -160,26 +136,39 @@ public:
         LongUTF8
     } amftype_e;
     typedef enum {
-      NONE = 0x0,
+        NONE = 0x0,
         CHUNK_SIZE = 0x1,
-//    UNKNOWN = 0x2,
+        UNKNOWN = 0x2,
         BYTES_READ = 0x3,
         PING = 0x4,
         SERVER = 0x5,
         CLIENT = 0x6,
-//    UNKNOWN2 = 0x7,
+        UNKNOWN2 = 0x7,
         AUDIO_DATA = 0x8,
         VIDEO_DATA = 0x9,
-//    UNKNOWN3 = 0xa,
+        UNKNOWN3 = 0xa,
         NOTIFY = 0x12,
         SHARED_OBJ = 0x13,
         INVOKE = 0x14
     } content_types_e;
+    typedef enum {
+        CONNECT = 0x01,
+        DISCONNECT = 0x02,
+        SET_ATTRIBUTE = 0x03,
+        UPDATE_DATA = 0x04,
+        UPDATE_ATTRIBUTE = 0x05,
+        SEND_MESSAGE = 0x06,
+        STATUS = 0x07,
+        CLEAR_DATA = 0x08,
+        DELETE_DATA = 0x09,
+        DELETE_ATTRIBYTE = 0x0a,
+        INITIAL_DATA = 0x0b
+    } shared_obj_types_e;
     typedef struct {
-      astype_e       type;
-      short          length;
-      std::string     name;
-      const unsigned char   *data;
+        astype_e       type;
+        short          length;
+        std::string     name;
+        const unsigned char   *data;
     } amf_element_t;
     AMF();
     AMF(int size);
@@ -189,15 +178,28 @@ public:
     void *swapBytes(void *word, int size);
     
     void *encodeElement(astype_e type, void *in, int nbytes);
-    amfhead_t *encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data);
-    amfbody_t *encodeBody(amfutf8_t *target, amfutf8_t *response, int nbytes, void *data);
-    amfpacket_t *encodePacket(std::vector<amfhead_t *> messages);
+    void *encodeString(char *str)  {
+        return encodeElement (STRING, str, strlen(str));
+    };
+    void *encodeString(std::string &str) {
+        return encodeElement (STRING, (void *)str.c_str(), str.size());
+    };
+    void *encodeNumber(amfnum_t num)  {
+        return encodeElement (NUMBER, &num, AMF_NUMBER_SIZE);
+    };
+    
+//     amfhead_t *encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data);
+//     amfbody_t *encodeBody(amfutf8_t *target, amfutf8_t *response, int nbytes, void *data);
+//    amfpacket_t *encodePacket(std::vector<amfhead_t *> messages);
+
     char *readElement(void *in);
     bool readObject(void *in);
+    
     astype_e extractElementHeader(void *in);
     int extractElementLength(void *in);
-    std::string extractString(const char *in); // FIXME: 
-    int extractNumber(const char *in); // FIXME: 
+    char *extractString(const char *in);
+    amfnum_t *extractNumber(const char *in);
+    amf_element_t *extractObject(const char *in);
 
     unsigned char *extractVariables(amf_element_t &el, unsigned char *in);
     
@@ -209,10 +211,17 @@ public:
     int parseBody();
     int parseBody(unsigned char *in, int bytes);
     
-    int getHeaderSize() {  return _header_size; }; 
-    int getTotalSize() {  return _total_size; }; 
+    int getHeaderSize()         { return _header_size; }; 
+    int getTotalSize()          { return _total_size; }; 
+    int getPacketSize()         { return _packet_size; };
+    int getMysteryWord()        { return _mystery_word; };
+    int getRouting()            { return _src_dest; };
+
+    content_types_e getType()   { return _type; };
+    
     unsigned char *addPacketData(unsigned char *data, int bytes);
     //    std::map<amf_element_t *, std::vector<unsigned char *> > *getElements() { return &_elements; };
+    
  private:
     content_types_e     _type;
 //    std::map<std::string, amf_element_t &> _elements;
@@ -231,3 +240,8 @@ public:
 
 // end of _AMF_H_
 #endif
+
+// local Variables:
+// mode: C++
+// indent-tabs-mode: t
+// End:
