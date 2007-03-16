@@ -1,5 +1,7 @@
 2007-03-16 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Object.cpp (object_registerClass): don't forget
+	  to return a boolean value !
 	* server/sprite_instance.cpp: allow overriding the _name property.
 	* testsuite/swfdec/PASSING: more successes.
 

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.17 2007/03/09 10:03:42 strk Exp $ */
+/* $Id: Object.cpp,v 1.18 2007/03/16 12:16:46 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -314,6 +314,7 @@ object_registerClass(const fn_call& fn)
 	}
 
 	exp_clipdef->registerClass(theclass);
+	fn.result->set_bool(true);
 }
 
 void
