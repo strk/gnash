@@ -1,5 +1,6 @@
 2007-03-16 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp: more usage of as_value::to_debug_string().
 	* server/as_value.{cpp,h}: add to_debug_string(), have output
 	  operator use it.
 	* server/as_environment.{cpp,h}: use debugging output for as_values

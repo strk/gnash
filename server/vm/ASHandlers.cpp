@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.63 2007/03/16 13:36:44 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.64 2007/03/16 22:23:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -136,7 +136,7 @@ construct_object(const as_value& constructor,
             assert(func_has_prototype);
             
             IF_VERBOSE_ACTION (
-                log_action("constructor prototype is %s", proto.to_string());
+                log_action("constructor prototype is %s", proto.to_debug_string().c_str());
 		);
             
             // Create an empty object, with a ref to the constructor's prototype.
@@ -1029,7 +1029,7 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 		if (top_value.to_object() == NULL) {
 			log_action("-- get var: %s=%s",
 				var_string.c_str(),
-				top_value.to_string());
+				top_value.to_debug_string().c_str());
 		} else {
 			log_action("-- get var: %s=%s at %p",
 				var_string.c_str(),
@@ -1054,10 +1054,10 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 
 	assert(env.top(1).to_string());
         string name = env.top(1).to_std_string();
-	thread.setVariable(env.top(1).to_std_string(), env.top(0));
+	thread.setVariable(name, env.top(0));
 
         IF_VERBOSE_ACTION (
-            log_action("-- set var: %s = %s", env.top(1).to_string(), env.top(0).to_string());
+            log_action("-- set var: %s = %s", name.c_str(), env.top(0).to_debug_string().c_str());
             );
 
 	// TODO: move this to ActionExec::setVariable !
@@ -1137,7 +1137,7 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 		// ASCODING error ? (well, last time it was a gnash error ;)
 		IF_VERBOSE_ASCODING_ERRORS (
 		log_aserror("Could not find GetProperty target (%s)",
-				tgt_val.to_string());
+				tgt_val.to_debug_string().c_str());
 		);
 		env.top(1) = as_value();
 	}
@@ -1244,7 +1244,7 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 		st.setCharacter( tgt );
 	} else {
 		log_error("start_drag of invalid target '%s'.",
-			env.top(0).to_string());
+			env.top(0).to_debug_string().c_str());
 	}
     
 	st.setLockCentered( env.top(1).to_bool() );
@@ -1341,9 +1341,9 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 	if (!super || ! instance)
 	{
 		IF_VERBOSE_ACTION (
-		log_action("-- %s instance_of %s (invalid args?)",
-			env.top(1).to_string(),
-			env.top(0).to_string());
+		log_action("-- %s cast_to %s (invalid args?)",
+			env.top(1).to_debug_string().c_str(),
+			env.top(0).to_debug_string().c_str());
 		);
 
 		env.drop(1);
@@ -1360,6 +1360,8 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 	{
 		env.top(0) = as_value();
 	}
+
+	log_warning("ActionCastOp TESTING");
 }
 
 void
@@ -1691,11 +1693,11 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		IF_VERBOSE_ACTION (
 		if ( type == pushDict8 || type == pushDict16 )
 		{
-			log_action("\t%d) type=%s (%d), value=%s", count, pushType[type], id, env.top(0).to_string());
+			log_action("\t%d) type=%s (%d), value=%s", count, pushType[type], id, env.top(0).to_debug_string().c_str());
 		}
 		else
 		{
-			log_action("\t%d) type=%s, value=%s", count, pushType[type], env.top(0).to_string());
+			log_action("\t%d) type=%s, value=%s", count, pushType[type], env.top(0).to_debug_string().c_str());
 		}
 		++count;
 		);
@@ -2119,7 +2121,7 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
     thread.setLocalVariable(varname.to_std_string(), value);
 
     IF_VERBOSE_ACTION (
-    log_action("-- set local var: %s = %s", varname.to_string(), value.to_string());
+    log_action("-- set local var: %s = %s", varname.to_string(), value.to_debug_string().c_str());
     );
 }
 
@@ -2435,7 +2437,7 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("Top of stack not an object (%s) at "
 			"ActionEnumerate execution",
-			variable.to_string());
+			variable.to_debug_string().c_str());
 		);
 		return;
 	}
@@ -2573,7 +2575,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
     
 	IF_VERBOSE_ACTION (
     log_action(" ActionGetMember: target: %s (object %p)",
-               target.to_string(), (void*)obj);
+               target.to_debug_string().c_str(), (void*)obj);
 	);
     
     // Special case: String has a member "length"
@@ -2616,7 +2618,7 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
 			log_action("-- set_member %s.%s=%s",
 				env.top(2).to_tu_string().c_str(),
 				member_name.c_str(),
-				member_value.to_string());
+				member_value.to_debug_string().c_str());
 		);
 	}
 	else
@@ -2625,9 +2627,9 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
 		IF_VERBOSE_ACTION (
 			// Invalid object, can't set.
 			log_action("-- set_member %s.%s=%s on invalid object!",
-				env.top(2).to_tu_string().c_str(),
+				env.top(2).to_debug_string().c_str(),
 				member_name.c_str(),
-				member_value.to_string());
+				member_value.to_debug_string().c_str());
 		);
 	}
 
@@ -2688,8 +2690,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
 
 	IF_VERBOSE_ACTION (
-	log_action(" method name: %s", method_name.to_string());
-	log_action(" method object/func: %s", obj_value.to_string());
+	log_action(" method name: %s", method_name.to_debug_string().c_str());
+	log_action(" method object/func: %s", obj_value.to_debug_string().c_str());
 	log_action(" method nargs: %d", nargs);
 	);
 
@@ -2703,10 +2705,6 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 		method_val = obj_value;
 		if ( ! method_val.is_function() )
 		{
-			log_warning("Function object given to ActionCallMethod"
-				       " is not a function, will try to use"
-				       " its 'constructor' member");
-
 			if ( ! obj )
 			{
 				log_error("ActionCallMethod invoked with "
@@ -2716,6 +2714,10 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 				env.top(0).set_undefined();
 				return;
 			}
+
+			log_warning("Function object given to ActionCallMethod"
+				       " is not a function, will try to use"
+				       " its 'constructor' member");
 
 			// TODO: all this crap should go into an as_object::getConstructor instead
 			as_value ctor;
@@ -2749,7 +2751,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror("ActionCallMethod: "
 				"Tried to invoke method '%s' on non-object value %s.",
-				method_name.to_string(),
+				method_name.to_debug_string().c_str(),
 				obj_value.typeOf());
 			);
 			env.drop(nargs+2);
@@ -2762,8 +2764,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror("ActionCallMethod: "
 				"Can't find method %s of object %s",
-				method_name.to_string(),
-				obj_value.to_string());
+				method_name.to_debug_string().c_str(),
+				obj_value.to_debug_string().c_str());
 			);
 			env.drop(nargs+2);
 			env.top(0).set_undefined(); // should we push an object anyway ?
@@ -2863,7 +2865,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror("ActionNewMethod: "
 				"can't find method %s of object %s",
-				method_string.c_str(), obj_val.to_string());
+				method_string.c_str(), obj_val.to_debug_string().c_str());
 			);
 			env.drop(nargs);
 			env.push(as_value()); // should we push an object anyway ?
@@ -2901,9 +2903,9 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
     // Invalid args!
     if (!super || ! instance) {
         IF_VERBOSE_ACTION(
-        log_action("-- %s instance_of %s (invalid args?)",
-                env.top(1).to_string(),
-                env.top(0).to_string());
+        log_action("-- %s instanceof %s (invalid args?)",
+                env.top(1).to_debug_string().c_str(),
+                env.top(0).to_debug_string().c_str());
         );
 
         env.drop(1);
@@ -2936,9 +2938,9 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 	if ( ! obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Top of stack not an object (%s [%s]) at ActionEnum2 "
+		log_aserror("Top of stack not an object %s at ActionEnum2 "
 			" execution",
-			obj_val.to_string(), obj_val.typeOf());
+			obj_val.to_debug_string().c_str());
 		);
 		return;
 	}
@@ -3065,12 +3067,12 @@ SWFHandlers::ActionExtends(ActionExec& thread)
 			if ( ! super )
 			{
 				log_aserror("ActionExtends: Super is not an as_function (%s)",
-					env.top(0).to_string());
+					env.top(0).to_debug_string().c_str());
 			}
 			if ( ! sub )
 			{
 				log_aserror("ActionExtends: Sub is not an as_function (%s)",
-					env.top(1).to_string());
+					env.top(1).to_debug_string().c_str());
 			}
 		);
 		env.drop(2);
@@ -3365,7 +3367,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 	      
 		IF_VERBOSE_ACTION (
 		log_action("-------------- local register[%d] = '%s'",
-			reg, env.top(0).to_string());
+			reg, env.top(0).to_debug_string().c_str());
 		);
 	}
 	else if (reg < 4)
@@ -3374,7 +3376,7 @@ SWFHandlers::ActionSetRegister(ActionExec& thread)
 		      
 		IF_VERBOSE_ACTION (
 		log_action("-------------- global register[%d] = '%s'",
-			reg, env.top(0).to_string() );
+			reg, env.top(0).to_debug_string().c_str() );
 		);
 
 	}
