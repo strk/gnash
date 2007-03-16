@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.62 2007/03/16 10:12:58 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.63 2007/03/16 13:36:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -93,21 +93,6 @@ construct_object(const as_value& constructor,
 
     as_value new_obj;
 
-#if 0 // C_FUNCTION values do not exist anymore !
-    if ( constructor.is_c_function() )
-    {
-        IF_VERBOSE_ACTION (
-            log_action("Constructor is a C_FUNCTION");
-            );
-
-        // C function is responsible for creating the new object and setting members.
-        fn_call call(&new_obj, NULL, &env, nargs, first_arg_index);
-
-        (constructor.to_c_function())(call);
-    }
-    else
-#endif // C_FUNCTION values do not exist anymore !
-
     if (as_function* ctor_as_func = constructor.to_as_function())
     {
         // This function is being used as a constructor; make sure
@@ -127,6 +112,17 @@ construct_object(const as_value& constructor,
 
             fn_call call(&new_obj, NULL, &env, nargs, first_arg_index);
             (*ctor_as_func)(call);
+
+            // Add a __constructor__ member to the new object, but only for SWF6 up
+	    // (to be checked). NOTE that we assume the builtin constructors
+	    // won't set __constructor__ to some other value...
+	    if ( VM::get().getSWFVersion() > 5 )
+	    {
+		    as_object* newobj = new_obj.to_object();
+		    assert(newobj); // we assume builtin functions do return objects !!
+                    newobj->init_member("__constructor__", constructor);
+            }
+
         }
 	else
 	{
@@ -145,6 +141,13 @@ construct_object(const as_value& constructor,
             
             // Create an empty object, with a ref to the constructor's prototype.
             boost::intrusive_ptr<as_object> new_obj_ptr(new as_object(proto.to_object()));
+
+            // Add a __constructor__ member to the new object, but only for SWF6 up
+	    // (to be checked)
+	    if ( VM::get().getSWFVersion() > 5 )
+	    {
+	    	new_obj_ptr->init_member("__constructor__", constructor);
+            }
             
             new_obj.set_as_object(new_obj_ptr.get());
             
