@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.31 2007/03/16 10:12:58 strk Exp $ */
+/* $Id: as_value.h,v 1.32 2007/03/16 21:06:44 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -312,6 +312,8 @@ public:
 	///
 	std::string to_std_string(as_environment* env=NULL) const;
 
+	std::string to_debug_string() const;
+
 	/// Get a version-dependent std::string representation for this value.
 	//
 	/// @param version
@@ -582,7 +584,7 @@ private:
 };
 
 inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
-	return os << v.to_string();
+	return os << v.to_debug_string();
 }
 
 } // namespace gnash

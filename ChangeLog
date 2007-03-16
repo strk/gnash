@@ -1,3 +1,10 @@
+2007-03-16 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.{cpp,h}: add to_debug_string(), have output
+	  operator use it.
+	* server/as_environment.{cpp,h}: use debugging output for as_values
+	  when dumping stack,registers and locals.
+
 2007-03-16  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* testsuite/libamf.all/string-variable.amf:  Binary test case for

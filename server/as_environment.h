@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_environment.h,v 1.41 2007/03/02 19:38:56 strk Exp $ */
+/* $Id: as_environment.h,v 1.42 2007/03/16 21:06:44 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -361,7 +361,7 @@ public:
 		for (unsigned int i=0, n=m_stack.size(); i<n; i++)
 		{
 			if (i) out << " | ";
-			out << '"' << m_stack[i].to_string() << '"';
+			out << '"' << m_stack[i] << '"';
 		}
 		out << std::endl;
 	}

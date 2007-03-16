@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.57 2007/03/09 10:39:10 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.58 2007/03/16 21:06:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -220,14 +220,14 @@ as_environment::set_variable(
 {
 	IF_VERBOSE_ACTION (
     log_action("-------------- %s = %s",
-	       varname.c_str(), val.to_string());
+	       varname.c_str(), val.to_debug_string().c_str());
 	);
 
     // Path lookup rigamarole.
     as_object* target = m_target;
     std::string	path;
     std::string	var;
-    //log_msg("set_variable(%s, %s)", varname.c_str(), val.to_string());
+    //log_msg("set_variable(%s, %s)", varname.c_str(), val.to_debug_string().c_str());
     bool is_slash_based;
     if (parse_path(varname, path, var, &is_slash_based)) {
     	//log_msg("Variable '%s' parsed into path='%s', var='%s'", varname.c_str(), path.c_str(), var.c_str());
@@ -241,7 +241,7 @@ as_environment::set_variable(
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("Path target '%s' not found while setting %s=%s",
-			path.c_str(), varname.c_str(), val.to_string());
+			path.c_str(), varname.c_str(), val.to_debug_string().c_str());
 		);
 	}
     } else {
@@ -441,7 +441,7 @@ as_environment::find_target(const as_value& val) const
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("as_environment::find_target: '%s': "
 			"invalid path; neither string nor object",
-			val.to_string());
+			val.to_debug_string().c_str() );
 		);
 		return NULL;
 	}
@@ -823,7 +823,7 @@ dump(const as_environment::Registers& r, std::ostream& out)
 	for (size_t i=0; i<r.size(); ++i)
 	{
 		if (i) out << ", ";
-		out << i << ':' << '"' << r[i].to_string() << '"';
+		out << i << ':' << '"' << r[i] << '"';
 	}
 }
 
@@ -879,7 +879,7 @@ as_environment::dump_global_registers(std::ostream& out) const
 	{
 		if (i) registers += std::string(" | ");
 		registers += std::string("\"") +
-			m_global_register[i].to_std_string() +
+			m_global_register[i].to_debug_string() +
 			std::string("\"");
 		if ( ! m_global_register[i].is_undefined() ) defined++;
 	}

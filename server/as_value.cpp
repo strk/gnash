@@ -783,6 +783,38 @@ as_value::strictly_equals(const as_value& v) const
 	return *this == v;
 }
 
+std::string
+as_value::to_debug_string() const
+{
+	std::string ret;
+	char buf[512];
+
+	switch (m_type)
+	{
+		case UNDEFINED:
+			return "[undefined]";
+		case NULLTYPE:
+			return "[null]";
+		case BOOLEAN:
+			sprintf(buf, "[bool:%s]", m_boolean_value ? "true" : "false");
+			return buf;
+		case OBJECT:
+			sprintf(buf, "[object:%p]", m_object_value);
+			return buf;
+		case AS_FUNCTION:
+			sprintf(buf, "[function:%p]", m_as_function_value);
+			return buf;
+		case STRING:
+			ret = "[string:" + std::string(m_string_value.c_str()) + std::string("]");
+			return ret;
+		case NUMBER:
+			sprintf(buf, "[number:%g]", m_number_value);
+			return buf;
+		default:
+			assert(0);
+	}
+}
+
 } // namespace gnash
 
 
