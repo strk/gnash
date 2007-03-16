@@ -810,6 +810,9 @@ as_value::to_debug_string() const
 		case NUMBER:
 			sprintf(buf, "[number:%g]", m_number_value);
 			return buf;
+		case MOVIECLIP:
+			sprintf(buf, "[movieclip:%s]", m_string_value.c_str());
+			return buf;
 		default:
 			assert(0);
 	}
