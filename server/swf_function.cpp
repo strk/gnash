@@ -180,6 +180,9 @@ swf_function::operator()(const fn_call& fn)
 	// Set up local stack frame, for parameters and locals.
 	our_env->pushCallFrame(this);
 
+	// Some features are version-dependant
+	unsigned swfversion = VM::get().getSWFVersion();
+
 	if (m_is_function2 == false)
 	{
 		// Conventional function.
@@ -196,9 +199,12 @@ swf_function::operator()(const fn_call& fn)
 		assert(fn.this_ptr);
 		our_env->set_local("this", fn.this_ptr);
 
-		// Add 'super'
-		as_object* super = getSuper(*(fn.this_ptr));
-		our_env->set_local("super", super);
+		// Add 'super' (SWF6+ only)
+		if ( swfversion > 5 )
+		{
+			as_object* super = getSuper(*(fn.this_ptr));
+			our_env->set_local("super", super);
+		}
 
 		// Add 'arguments'
 		our_env->set_local("arguments", getArguments(*this, fn));
@@ -272,9 +278,9 @@ swf_function::operator()(const fn_call& fn)
 			our_env->add_local("arguments", as_value(arg_array.get()));
 		}
 
-		if (m_function2_flags & PRELOAD_SUPER)
+		if ( (m_function2_flags & PRELOAD_SUPER) && swfversion > 5)
 		{
-			// Put 'super' in a register.
+			// Put 'super' in a register (SWF6+ only).
 			our_env->local_register(current_reg).set_as_object(getSuper(*(fn.this_ptr)));
 			current_reg++;
 		}
@@ -283,9 +289,9 @@ swf_function::operator()(const fn_call& fn)
 		{
 			// Don't put 'super' in a local var.
 		}
-		else
+		else if ( swfversion > 5 )
 		{
-			// Put 'super' in a local var.
+			// Put 'super' in a local var (SWF6+ only)
 			our_env->add_local("super", as_value(getSuper(*(fn.this_ptr))));
 		}
 

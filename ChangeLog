@@ -1,3 +1,8 @@
+2007-03-17 Sandro Santilli <strk@keybit.net>
+
+	* server/swf_function.cpp (call operator): don't
+	  provide 'super' if SWF version is < 6.
+
 2007-03-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libamf/amf.h: Fixed a naming issue on non-GCC.
