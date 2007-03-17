@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.64 2007/03/16 22:23:45 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.65 2007/03/17 22:04:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2590,9 +2590,10 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
         }
         
 	IF_VERBOSE_ACTION (
-        log_action("-- get_member %s=%s",
-                   member_name.to_tu_string().c_str(),
-                   env.top(1).to_tu_string().c_str());
+        log_action("-- get_member %s.%s=%s",
+		   target.to_debug_string().c_str(),
+                   member_name.to_debug_string().c_str(),
+                   env.top(1).to_debug_string().c_str());
 	);
     }
     env.drop(1);
@@ -2616,7 +2617,7 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
 		thread.setObjectMember(*obj, member_name, member_value);
 		IF_VERBOSE_ACTION (
 			log_action("-- set_member %s.%s=%s",
-				env.top(2).to_tu_string().c_str(),
+				env.top(2).to_debug_string().c_str(),
 				member_name.c_str(),
 				member_value.to_debug_string().c_str());
 		);
