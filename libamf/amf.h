@@ -58,7 +58,7 @@ typedef enum {
 const char AMF_VERSION = 0;
 const int  AMF_HEADSIZE_MASK = 0xc0;
 const char AMF_HEADER_SIZE = 0x03;
-const char AMF_INDEX_MASK = 0x03f;
+const char AMF_INDEX_MASK = 0x3f;
 const int  AMF_VIDEO_PACKET_SIZE = 128;
 const int  AMF_AUDIO_PACKET_SIZE = 64;
 // This is the sized used when reading from the network to
@@ -170,30 +170,39 @@ public:
         std::string     name;
         const unsigned char   *data;
     } amf_element_t;
+
     AMF();
     AMF(int size);
     ~AMF();
     size_t size() { return _total_size; };
     // Swap the bytes for Little Endian machines
     void *swapBytes(void *word, int size);
-    
+
+    // encode an element
     void *encodeElement(astype_e type, void *in, int nbytes);
+    // encode a string
     void *encodeString(char *str)  {
         return encodeElement (STRING, str, strlen(str));
     };
     void *encodeString(std::string &str) {
         return encodeElement (STRING, (void *)str.c_str(), str.size());
     };
+    // encode a 64 bit number
     void *encodeNumber(amfnum_t num)  {
         return encodeElement (NUMBER, &num, AMF_NUMBER_SIZE);
     };
-    
+
+    // encode a variable. These are a name, followed by a string or number
+    void *encodeVariable(const char *name);
     void *encodeVariable(amf_element_t &el);
+    void *encodeVariable(const char *name, bool flag);
     void *encodeVariable(const char *name, amfnum_t num);
     void *encodeVariable(std::string &name, std::string &val);
     void *encodeVariable(const char *name, const char *val);
-    
-//     amfhead_t *encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data);
+
+    void *encodeRTMPHeader(int amf_index, amf_headersize_e size, int size,
+                           content_types_e type, amfsource_e routing);
+//    amfhead_t *encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data);
 //     amfbody_t *encodeBody(amfutf8_t *target, amfutf8_t *response, int nbytes, void *data);
 //    amfpacket_t *encodePacket(std::vector<amfhead_t *> messages);
 
@@ -206,7 +215,7 @@ public:
     amf_element_t *extractObject(const char *in);
 
     
-    unsigned char *extractVariables(amf_element_t *el, unsigned char *in);
+    unsigned char *extractVariable(amf_element_t *el, unsigned char *in);
     
     bool parseAMF(char *in);
     static int headerSize(char header);
@@ -220,13 +229,18 @@ public:
     int getTotalSize()          { return _total_size; }; 
     int getPacketSize()         { return _packet_size; };
     int getMysteryWord()        { return _mystery_word; };
-    int getRouting()            { return _src_dest; };
+    amfsource_e getRouting()    { return _src_dest; };
+    int getAMFIndex()           { return _amf_index; };
 
     content_types_e getType()   { return _type; };
     
     unsigned char *addPacketData(unsigned char *data, int bytes);
-    //    std::map<amf_element_t *, std::vector<unsigned char *> > *getElements() { return &_elements; };
-    
+    std::map<std::string, amf_element_t *> *getElements() { return &_elements; };
+    unsigned char *appendPtr(unsigned char *data, unsigned char *var, int bytes) {
+      memcpy(data, var, bytes);
+      return data += bytes;
+    }
+        
  private:
     content_types_e     _type;
     std::map<std::string, amf_element_t *> _elements;
@@ -237,7 +251,7 @@ public:
     unsigned char       *_amf_data;
     unsigned char       *_seekptr;
     int                 _mystery_word;
-    int                 _src_dest;
+    amfsource_e         _src_dest;
 };
 
  

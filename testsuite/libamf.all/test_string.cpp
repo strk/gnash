@@ -80,8 +80,9 @@ main(int argc, char *argv[])
     ret = read(fd, buf, AMF_VIDEO_PACKET_SIZE);
     close(fd);
 
+    char *connect = "connect";
     char *str = amf_obj.extractString(buf);
-    if (strcmp(str, "connect") == 0) {
+    if (strcmp(str, connect) == 0) {
         runtest.pass("Extracted \"connect\" string");
     } else {
         runtest.fail("Extracted \"connect\" string");
@@ -89,7 +90,6 @@ main(int argc, char *argv[])
 
     // Now make sure we can also create strings. We'll create the same
     // string we just read, and make sure they match.
-    char *connect = "connect";
     void *out = amf_obj.encodeElement(AMF::STRING, connect, strlen(connect));
     if (memcmp(out, buf, 10) == 0) {
         runtest.pass("Encoded \"connect\" string");

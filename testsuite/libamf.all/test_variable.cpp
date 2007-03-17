@@ -117,7 +117,7 @@ main(int argc, char *argv[])
     ret = read(fd, buf, AMF_PACKET_SIZE);
     close(fd);
 
-    if (amf_obj.extractVariables(&el, buf)) {
+    if (amf_obj.extractVariable(&el, buf)) {
         runtest.pass("Got String element");
     } else {
         runtest.fail("Got String element");
@@ -170,7 +170,7 @@ main(int argc, char *argv[])
     ret = read(fd, buf, AMF_PACKET_SIZE);
     close(fd);
 
-    if (amf_obj.extractVariables(&el, buf)) {
+    if (amf_obj.extractVariable(&el, buf)) {
         runtest.pass("Got Number element");
     } else {
         runtest.fail("Got Number element");

@@ -92,7 +92,7 @@ main(int argc, char *argv[])
 //     hexify((unsigned char *)hexint, (unsigned char *)&value, 8, false);
 //     cerr << "AMF value is: 0x" << hexint << endl;
 
-    if (((char *)num)[7] == 0x3f) {
+    if ((((char *)num)[6] == -16) && (((char *)num)[7] == 0x3f)) {
 //    if (memcmp(num, &value, AMF_NUMBER_SIZE) == 0) {
         runtest.pass("Extracted Number AMF object");
     } else {

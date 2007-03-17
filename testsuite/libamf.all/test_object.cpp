@@ -138,20 +138,324 @@ main(int argc, char *argv[])
         runtest.fail("Message Routing");
     }
 
-    amf_obj.parseBody(buf + amf_obj.getHeaderSize(), amf_obj.getTotalSize());
+//    amf_obj.parseBody(buf + amf_obj.getHeaderSize(), amf_obj.getTotalSize());
 
-    tmpptr = buf;
-
+    // This extracts a "connect" message from the RTMP data stream. We
+    // look for everything ourselves to be the most accurate.
+    tmpptr = buf  + amf_obj.getHeaderSize();
+    char *str = amf_obj.extractString((char *)tmpptr);
+    if (strcmp(str, "connect") == 0) {
+        runtest.pass("Extracted \"connect\" string");
+    } else {
+        runtest.fail("Extracted \"connect\" string");
+    }
     
-//    tmpptr = amf_obj.extractVariables(el, tmpptr);
+    tmpptr += strlen(str) + AMF_HEADER_SIZE;    
+    amfnum_t *num = amf_obj.extractNumber((char *)tmpptr);
+    char     *numptr = (char *)num;
+    if ((numptr[6] == -16)
+        && (numptr[7] == 0x3f)) {
+        runtest.pass("Extracted \"connect\" number");
+    } else {
+        runtest.fail("Extracted \"connect\" number");
+    }
+    tmpptr += AMF_NUMBER_SIZE + 2;
     
-//     char *str = amf_obj.extractObject(buf);
-//     if (strcmp(str, "connect") == 0) {
-//         runtest.pass("Extracted \"connect\" string");
-//     } else {
-//         runtest.fail("Extracted \"connect\" string");
-//     }
+    tmpptr = amf_obj.extractVariable(&el, tmpptr);
+    if (el.name == "app") {
+        runtest.pass("Extracted \"app\" variable");
+    } else {
+        runtest.fail("Extracted \"app\" variable");
+    }
+//    cerr << el.name << endl;
+    
+    tmpptr = amf_obj.extractVariable(&el, tmpptr);
+    if (el.name == "flashVer") {
+        runtest.pass("Extracted \"flashVer\" variable");
+    } else {
+        runtest.fail("Extracted \"flashVer\" variable");
+    }
+//    cerr << el.name << endl;
+    
+    tmpptr = amf_obj.extractVariable(&el, tmpptr);
+    if (el.name == "swfUrl") {
+        runtest.pass("Extracted \"swfUrl\" variable");
+    } else {
+        runtest.fail("Extracted \"swfUrl\" variable");
+    }
+//    cerr << el.name << endl;
+    
+    tmpptr = amf_obj.extractVariable(&el, tmpptr);
+    if (el.name == "tcUrl") {
+        runtest.pass("Extracted \"tcUrl\" variable");
+    } else {
+        runtest.fail("Extracted \"tcUrl\" variable");
+    }
+//    cerr << el.name << endl;
+    
+    tmpptr = amf_obj.extractVariable(&el, tmpptr);
+    if (el.name == "fpad") {
+        runtest.pass("Extracted \"fpad\" variable");
+    } else {
+        runtest.fail("Extracted \"fpad\" variable");
+    }
+//    cerr << el.name << endl;
+    
+    tmpptr = amf_obj.extractVariable(&el, tmpptr);
+    if (el.name == "audioCodecs") {
+        runtest.pass("Extracted \"audioCodecs\" variable");
+    } else {
+        runtest.fail("Extracted \"audioCodecs\" variable");
+    }
+//    cerr << el.name << endl;
+    
+    tmpptr = amf_obj.extractVariable(&el, tmpptr);
+    if (el.name == "videoCodecs") {
+        runtest.pass("Extracted \"videoCodecs\" variable");
+    } else {
+        runtest.fail("Extracted \"videoCodecs\" variable");
+    }
+//    cerr << el.name << endl;
+    
+    tmpptr = amf_obj.extractVariable(&el, tmpptr);
+    if (el.name == "videoFunction") {
+        runtest.pass("Extracted \"videoFunction\" variable");
+    } else {
+        runtest.fail("Extracted \"videoFunction\" variable");
+    }
+//    cerr << el.name << endl;
 
+    tmpptr = amf_obj.extractVariable(&el, tmpptr);
+    if (el.name == "pageUrl") {
+        runtest.pass("Extracted \"pageURL\" variable");
+    } else {
+        runtest.fail("Extracted \"pageURL\" variable");
+    }
+//    cerr << el.name << endl;
+    
+    amf_obj.extractVariable(&el, tmpptr);
+    if (el.name == "objectEncoding") {
+        runtest.pass("Extracted \"objectEncoding\" variable");
+    } else {
+        runtest.fail("Extracted \"objectEncoding\" variable");
+    }
+//    cerr << el.name << endl;
+    
+    // Now build our own connect message with the same data, which
+    // should give us an exact copy.
+    int amf_index = amf_obj.getAMFIndex();
+    AMF::amf_headersize_e head_size = AMF::HEADER_12;
+    int total_size = amf_obj.getTotalSize();
+    AMF::content_types_e type = AMF::INVOKE;
+    amfsource_e routing = amf_obj.getRouting();
+    AMF rtmp;
+
+    // First build and test the header. This uses the same data as the
+    // previous one
+    unsigned char *out = reinterpret_cast<unsigned char *>(rtmp.encodeRTMPHeader(amf_index, head_size, total_size, type, routing));
+    tmpptr = out;
+    rtmp.parseHeader(out);
+    if (rtmp.getTotalSize() == 269) {
+        runtest.pass("New Message Header Total Size");
+    } else {
+        runtest.fail("New Message Header Total Size");
+    }
+    
+    if (rtmp.getHeaderSize() == 12) {
+        runtest.pass("New Message Header Size");
+    } else {
+        runtest.fail("New Message Header Size");
+    }
+    
+    if (rtmp.getMysteryWord() == 0) {
+        runtest.pass("New Message Mystery Word");
+    } else {
+        runtest.fail("Message Mystery Word");
+    }
+    
+    if (rtmp.getRouting() == CLIENT) {
+        runtest.pass("New Message Routing");
+    } else {
+        runtest.fail("New Message Routing");
+    }
+
+    if (memcmp(out, buf, 12) == 0) {
+        runtest.pass("RTMP Headers match");
+    } else {
+        runtest.fail("RTMP Headers match");
+    }
+
+    tmpptr += rtmp.getHeaderSize();
+    
+    // Now build up a body of a connect message
+    unsigned char *var;
+
+    var = (unsigned char *)rtmp.encodeString("connect");
+    if (strncmp(rtmp.extractString((char *)var), "connect", strlen("connect")) == 0) {
+        runtest.pass("Encoded \"connect\" string");
+    } else {
+        runtest.fail("Encoded \"connect\" string");
+    }
+    tmpptr = rtmp.appendPtr(tmpptr, var, strlen("connect") + 3);
+    delete var;
+
+    amfnum_t bignum = 0x3ff0000000000000LL;
+    numptr = (char *)&bignum;
+    var = (unsigned char *)rtmp.encodeNumber(bignum);
+    if (*rtmp.extractNumber((char *)var) == bignum) {
+        runtest.pass("Encoded \"connect\" number");
+    } else {
+        runtest.fail("Encoded \"connect\" number");
+    }
+
+    tmpptr = rtmp.appendPtr(tmpptr, var, AMF_NUMBER_SIZE + 1);
+    delete var;
+
+    // Start the object
+    *tmpptr++ = AMF::OBJECT;
+    
+    var = (unsigned char *)rtmp.encodeVariable("app", "oflaDemo");
+    rtmp.extractVariable(&el, var);
+    if ((el.name == "app") && (strncmp((char *)el.data, "oflaDemo", 8) == 0)) {
+        runtest.pass("Encoded \"app\" variable");
+    } else {
+        runtest.fail("Encoded \"app\" variable");
+    }
+    tmpptr = rtmp.appendPtr(tmpptr, var, el.length + strlen("app") + 5);
+    delete var;
+    
+    var = (unsigned char *)rtmp.encodeVariable("flashVer", "LNX 9,0,31,0");
+    rtmp.extractVariable(&el, var);
+    if ((el.name == "flashVer") && (strncmp((char *)el.data, "LNX 9,0,31,0", el.length) == 0)) {
+        runtest.pass("Encoded \"flashVer\" variable");
+    } else {
+        runtest.fail("Encoded \"flashVer\" variable");
+    }
+    tmpptr = rtmp.appendPtr(tmpptr, var, el.length + strlen("flashVer") + 5);
+    delete var;
+    
+    var = (unsigned char *)rtmp.encodeVariable("swfUrl", "http://www.red5.nl/tools/publisher/publisher.swf");
+    rtmp.extractVariable(&el, var);
+    if ((el.name == "swfUrl") && (strncmp((char *)el.data, "http://www.red5.nl/tools/publisher/publisher.swf", el.length) == 0)) {
+        runtest.pass("Encoded \"swfUrl\" variable");
+    } else {
+        runtest.fail("Encoded \"swfUrl\" variable");
+    }
+    tmpptr = rtmp.appendPtr(tmpptr, var, el.length + strlen("swfUrl") + 5);
+    delete var;
+    
+    var = (unsigned char *)rtmp.encodeVariable("tcUrl", "rtmp://localhost/oflaDemo");
+    rtmp.extractVariable(&el, var);
+    if ((el.name == "tcUrl") && (strncmp((char *)el.data, "rtmp://localhost/oflaDemo", 25) == 0)) {
+        runtest.pass("Encoded \"tcUrl\" variable");
+    } else {
+        runtest.fail("Encoded \"tcUrl\" variable");
+    }
+    tmpptr = rtmp.appendPtr(tmpptr, var, el.length + strlen("tcUrl") + 5);
+    delete var;
+
+    var = (unsigned char *)rtmp.encodeVariable("fpad", false);
+    rtmp.extractVariable(&el, var);
+    if ((el.name == "fpad") && (*el.data == 0)) {
+        runtest.pass("Encoded \"fpad\" Boolean variable");
+    } else {
+        runtest.fail("Encoded \"fpad\" Boolean variable");
+    }
+    tmpptr = rtmp.appendPtr(tmpptr, var, 1 + strlen("fpad") + 3);
+    delete var;
+    
+    bignum = 0x388340LL;
+    numptr = (char *)&bignum;
+    var = (unsigned char *)rtmp.encodeVariable("audioCodecs", bignum);
+    rtmp.extractVariable(&el, var);
+    
+    if ((el.type == amf::AMF::NUMBER)
+        && (el.name == "audioCodecs")
+        && (el.data[5] == 0x38)
+        && (el.data[6] == 0x83)
+        && (el.data[7] == 0x40)) {
+        runtest.pass("Encoded \"audioCodecs\" variable");
+    } else {
+        runtest.fail("Encoded \"audioCodecs\" variable");
+    }
+    tmpptr = rtmp.appendPtr(tmpptr, var, el.name.size() + AMF_NUMBER_SIZE + 3);
+    delete var;
+    
+    bignum = 0x5f40LL;
+    numptr = (char *)&bignum;
+    var = (unsigned char *)rtmp.encodeVariable("videoCodecs", bignum);
+    rtmp.extractVariable(&el, var);
+    
+    if ((el.type == amf::AMF::NUMBER)
+        && (el.name == "videoCodecs")
+        && (el.data[6] == 0x5f)
+        && (el.data[7] == 0x40)) {
+        runtest.pass("Encoded \"videoCodecs\" variable");
+    } else {
+        runtest.fail("Encoded \"videoCodecs\" variable");
+    }
+    tmpptr = rtmp.appendPtr(tmpptr, var, el.name.size() + AMF_NUMBER_SIZE + 3);
+    delete var;
+    
+    bignum = 0xf03fLL;
+    numptr = (char *)&bignum;
+    var = (unsigned char *)rtmp.encodeVariable("videoFunction", bignum);
+    rtmp.extractVariable(&el, var);
+    
+    if ((el.type == amf::AMF::NUMBER)
+        && (el.name == "videoFunction")
+        && (el.data[6] == 0xf0)
+        && (el.data[7] == 0x3f)) {
+        runtest.pass("Encoded \"videoFunction\" variable");
+    } else {
+        runtest.fail("Encoded \"videoFunction\" variable");
+    }
+    tmpptr = rtmp.appendPtr(tmpptr, var, el.name.size() + AMF_NUMBER_SIZE + 3);
+    delete var;
+    
+    var = (unsigned char *)rtmp.encodeVariable("pageUrl");
+    rtmp.extractVariable(&el, var);
+    if ((el.type == amf::AMF::UNDEFINED)
+        && (el.name == "pageUrl")) {
+        runtest.pass("Encoded \"pageUrl\" undefined variable");
+    } else {
+        runtest.fail("Encoded \"pageUrl\" undefined variable");
+    }
+    tmpptr = rtmp.appendPtr(tmpptr, var, el.name.size() + 3);
+    delete var;
+    
+    bignum = 0x0;
+    numptr = (char *)&bignum;
+    var = (unsigned char *)rtmp.encodeVariable("objectEncoding", bignum);
+    rtmp.extractVariable(&el, var);
+    
+    if ((el.type == amf::AMF::NUMBER)
+        && (el.name == "objectEncoding")
+        && (el.data[6] == 0x0)
+        && (el.data[7] == 0x0)) {
+        runtest.pass("Encoded \"objectEncoding\" variable");
+    } else {
+        runtest.fail("Encoded \"objectEncoding\" variable");
+    }
+    tmpptr = rtmp.appendPtr(tmpptr, var, el.name.size() + AMF_NUMBER_SIZE + 3);
+    delete var;
+
+    // Start the object
+    *tmpptr++ = AMF::OBJECT_END;
+    
+    if (memcmp(buf, out, amf_obj.getTotalSize()) == 0) {
+        runtest.pass("Object Packets match");
+    } else {
+        runtest.fail("Object Packets match");
+    }    
+
+    unsigned char hexint[AMF_PACKET_SIZE];
+    hexify((unsigned char *)hexint, (unsigned char *)buf, amf_obj.getTotalSize() + 10, true);
+    cerr << "buf is: 0x" << hexint << ", size is: " << amf_obj.getTotalSize() << endl;
+    hexify((unsigned char *)hexint, (unsigned char *)out, rtmp.getTotalSize() + 10, true);
+    cerr << "out is: 0x" << hexint << ", size is: " << rtmp.getTotalSize() << endl;
+    
+//    delete out;
 }
 
 static void
