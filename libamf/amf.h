@@ -200,7 +200,7 @@ public:
     void *encodeVariable(std::string &name, std::string &val);
     void *encodeVariable(const char *name, const char *val);
 
-    void *encodeRTMPHeader(int amf_index, amf_headersize_e size, int size,
+    void *encodeRTMPHeader(int amf_index, amf_headersize_e size, int headsize,
                            content_types_e type, amfsource_e routing);
 //    amfhead_t *encodeHeader(amfutf8_t *name, bool required, int nbytes, void *data);
 //     amfbody_t *encodeBody(amfutf8_t *target, amfutf8_t *response, int nbytes, void *data);
