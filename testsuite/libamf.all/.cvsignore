@@ -1,0 +1,12 @@
+.deps
+.libs
+Makefile
+Makefile.in
+gnash-dbg.log
+site.exp
+test_number
+test_object
+test_string
+test_variable
+testrun.log
+testrun.sum
