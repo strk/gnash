@@ -1,6 +1,7 @@
 2007-03-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libamf/amf.h: Fixed a naming issue on non-GCC.
+	* server/asobj/Date.cpp: Fixed namespace-issue for 'trunc'
 
 2007-03-16 Sandro Santilli <strk@keybit.net>
 

@@ -104,7 +104,7 @@
 #endif
 
 #ifndef trunc
-#define trunc(x) ( x < 0 ?  -floor(-x) : floor(x) )
+#define trunc(x) ( x < 0 ?  -(std::floor(-x)) : std::floor(x) )
 #endif
 
 
