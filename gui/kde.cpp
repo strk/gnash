@@ -150,7 +150,7 @@ void
 qwidget::menuitem_restart_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    Gui::menu_restart();
+    _godfather->menu_restart();
 }
 
 /// \brief quit complete, and close the application
@@ -171,7 +171,7 @@ void
 qwidget::menuitem_play_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    Gui::menu_play();
+    _godfather->menu_play();
 }
 
 /// \brief toggle that's playing or paused.
@@ -179,7 +179,7 @@ void
 qwidget::menuitem_pause_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    Gui::menu_pause();
+    _godfather->menu_pause();
 }
 
 /// \brief stop the movie that's playing.
@@ -187,7 +187,7 @@ void
 qwidget::menuitem_stop_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    Gui::menu_stop();
+    _godfather->menu_stop();
 }
 
 /// \brief step forward 1 frame
@@ -195,7 +195,7 @@ void
 qwidget::menuitem_step_forward_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    Gui::menu_step_forward();
+    _godfather->menu_step_forward();
 }
 
 /// \brief step backward 1 frame
@@ -203,7 +203,7 @@ void
 qwidget::menuitem_step_backward_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    Gui::menu_step_backward();
+    _godfather->menu_step_backward();
 }
 
 /// \brief jump forward 10 frames
@@ -211,7 +211,7 @@ void
 qwidget::menuitem_jump_forward_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    Gui::menu_jump_forward();
+    _godfather->menu_jump_forward();
 }
 
 /// \brief jump backward 10 frames
@@ -219,7 +219,7 @@ void
 qwidget::menuitem_jump_backward_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-    Gui::menu_jump_backward();
+    _godfather->menu_jump_backward();
 }
 
 //

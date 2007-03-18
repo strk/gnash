@@ -1,3 +1,8 @@
+2007-03-18 Antti Ajanki <antti.ajanki@iki.fi>
+
+	* gui/kde.cpp: Since the GUI callbacks are no longer statics, adjust
+	our usage of them to match.
+
 2007-03-17 Sandro Santilli <strk@keybit.net>
 
 	* server/swf_function.cpp (call operator): don't
