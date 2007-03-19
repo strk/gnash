@@ -22,6 +22,8 @@
 	* all over the place: Switch all ActionScript-called methods over to
 	return as_value. Adjust all related methods. Also make fn_call::nargs
 	unsigned.
+	* server/as_value.h: Add additional constructors taking longs as
+	arguments to account for platforms that define size types as longs.
 
 2007-03-19 Ann Barcomb <ann@lulu.com>
 

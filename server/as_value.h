@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.33 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: as_value.h,v 1.34 2007/03/19 18:49:03 bjacques Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -203,6 +203,20 @@ public:
 
 	/// Construct a NUMBER value
 	as_value(double val)
+		:
+		m_type(NUMBER),
+		m_number_value(val)
+	{
+	}
+
+	as_value(long val)
+		:
+		m_type(NUMBER),
+		m_number_value(val)
+	{
+	}
+	
+	as_value(unsigned long val)
 		:
 		m_type(NUMBER),
 		m_number_value(val)
