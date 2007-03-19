@@ -408,10 +408,8 @@ protected:
 	/// This is the default implementation, taking care of
 	/// the inheritance chain and getter/setter functions.
 	///
-	/// If a derivate class needs special handling of get member
-	/// request it should override the get_member() method instead.
-	/// NOTE: This might change in the near future trough use of
-	///       getter/setter properties instead..
+        /// The derived class should not override this method,
+        /// but instead implement its own gettersetter properties.
 	///
 	/// NOTE that this method is non-const becase a property
 	///      could also be a getter/setter and we can't promise
@@ -435,10 +433,8 @@ protected:
 	/// This is the default implementation, taking care of
 	/// the inheritance chain and getter/setter functions.
 	///
-	/// If a derivate class needs special handling of get member
-	/// request it should override the get_member() method instead.
-	/// NOTE: This might change in the near future trough use of
-	///       getter/setter properties instead..
+        /// The derived class should not override this method,
+        /// but instead implement its own gettersetter properties.
 	///
 	/// TODO: take a std::string rather then a tu_stringi
 	///
