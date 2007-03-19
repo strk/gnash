@@ -149,17 +149,21 @@
         <sect3 id="additional_fn_call">
           <title>Additional &fn_call; Members</title>
           <para>
-            In addition to the aforementioned 
-            <link linkend="return">result pointer</link>, there
-            are two other useful members of the &fn_call;
+            There are two other useful members of the &fn_call;
             structure, namely <emphasis>this_ptr</emphasis> and
             <emphasis>nargs</emphasis>.  The former points to the
             class which is invoking this method, while the latter
-            is a count of the number of 
+            is a count of the number of
             <link linkend="arguments">arguments in the stack</link>.
+          </para>
+          <para>
             You may also see instances of the <emphasis>env</emphasis>
-            pointer being used, but it has been deprecated.
-	  </para>
+            pointer being used.   This is being deprecated.  Instances
+            which could be replaced with
+            <link linkend="arguments"><emphasis>arg()</emphasis></link>
+            are already deprecated; other uses will be deprecated
+            in the near future.
+          </para>
           <para>
             Beyond the <emphasis><link 
             linkend="arguments">arg()</link></emphasis> method, there
@@ -167,6 +171,7 @@
             can be used in debugging to output the entire argument
             stack.
 	  </para>
+
         </sect3>
       </sect2>
 
