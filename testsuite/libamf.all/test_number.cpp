@@ -50,11 +50,8 @@ int
 main(int argc, char *argv[])
 {
     bool dump = false;
-    char buffer[300];
     int c, retries = 3;
 
-    memset(buffer, 0, 300);
-    
     while ((c = getopt (argc, argv, "hdvsm:")) != -1) {
         switch (c) {
           case 'h':
@@ -81,7 +78,7 @@ main(int argc, char *argv[])
     string filespec = SRCDIR;
     filespec += "/f03f.amf";
     fd = open(filespec.c_str(), O_RDONLY);
-    ret = read(fd, buf, 12);
+    ret = read(fd, buf, AMF_NUMBER_SIZE);
     close(fd);
 
     num = amf_obj.extractNumber(buf);
