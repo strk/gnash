@@ -1,3 +1,10 @@
+2007-03-19 Ann Barcomb <ann@lulu.com>
+
+	* ActionScript has been removed from the Gnash manual.
+	  A new ActionScript manual has been created.  Most of
+	  the material has been rewritten and incorporates Sandro's
+	  feedback on the previous version.
+
 2007-03-19 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* testsuite/misc-ming.all/ming_utils.h: Add Ming defines available only in

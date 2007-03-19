@@ -84,12 +84,13 @@ xml_files = $(entities) $(docname).xml
 #noinst_SCRIPT = gen-doc.sh
 dist_man_MANS = gnash.1
 
-html: gnash.html
-pdf:  gnash.pdf
-man:  gnash.1
-texi: gnash.texi
-info: gnash.info
+html: gnash.html actionscript.html
+pdf:  gnash.pdf actionscript.pdf
+man:  gnash.1 
+texi: gnash.texi actionscript.texi
+info: gnash.info actionscript.info
 gnash.pdf gnash.html gnash.texi: $(xml_files)
+actionscript.pdf actionscript.html actionscript.texi: actionscript.xml actionscript/main.xml
 
 SUFFIXES = .xml .html .texi .pdf .info .1 .fo
 
@@ -97,8 +98,11 @@ EXTRA_DIST = \
 	$(xml_files) \
 	$(omffile) \
 	gnash.texi \
+	actionscript.texi \
 	gnash-man.xml \
+	actionscript.info \
 	gnash.info \
+	actionscript.html \
 	gnash.html \
 	gnash.1
 
