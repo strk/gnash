@@ -1,3 +1,8 @@
+2007-03-19 Zou Lunkai <zoulunkai@gmail.com>
+
+	* tesrttsuite/misc-ming.all/action_execution_order_test4.c.
+	  add tests about onClipEvent(onConstruct) and user defined onLoad for _root
+	  
 2007-03-18 Bastiaan Jacques
 
 	* testsuite/libamf.all/test_number.cpp: Don't overflow the data buffer.
