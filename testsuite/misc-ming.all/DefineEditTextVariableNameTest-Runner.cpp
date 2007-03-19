@@ -56,7 +56,7 @@ main(int /*argc*/, char** /*argv*/)
 	check(mc3);
 
 	check_equals(root->get_current_frame(), 0);
-	for (int f=root->get_current_frame(); f<root->get_frame_count()-1; ++f)
+	for (unsigned f=root->get_current_frame(); f<root->get_frame_count()-1; ++f)
 	{
 		check_equals(root->get_current_frame(), f);
 		check_equals(root->get_play_state(), sprite_instance::PLAY);
