@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.22 2007/02/09 13:38:50 strk Exp $ */
+/* $Id: timers.cpp,v 1.23 2007/03/19 14:41:27 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -114,23 +114,89 @@ void
 timer_setinterval(const fn_call& fn)
 {
 	//log_msg("%s: args=%d", __FUNCTION__, fn.nargs);
+	// TODO: support setInterval(object, propertyname, intervaltime, arguments...) too
     
-	// Get interval function
-	boost::intrusive_ptr<as_function> as_func = fn.arg(0).to_as_function();
-	if ( ! as_func )
+	if ( fn.nargs < 2 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 			std::stringstream ss; fn.dump_args(ss);
 			log_aserror("Invalid call to setInterval(%s) "
-				"- first argument is not a function",
+				"- need at least 2 arguments",
 				ss.str().c_str());
 		);
 		return;
 	}
 
+	unsigned timer_arg = 1;
+
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+	if ( ! obj )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Invalid call to setInterval(%s) "
+				"- first argument is not an object or function",
+				ss.str().c_str());
+		);
+		return;
+	}
+
+	// Get interval function
+	boost::intrusive_ptr<as_function> as_func = obj->to_function(); 
+	if ( ! as_func )
+	{
+		as_value method;
+		std::string method_name = fn.arg(1).to_std_string();
+		if ( ! obj->get_member(method_name, &method) )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+				std::stringstream ss; fn.dump_args(ss);
+				log_aserror("Invalid call to setInterval(%s) "
+					"- can't find member %s of object %s",
+					ss.str().c_str(), method_name.c_str(),
+					fn.arg(0).to_debug_string().c_str());
+			);
+			return;
+		}
+		as_func = method.to_as_function();
+		if ( ! as_func )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+				std::stringstream ss; fn.dump_args(ss);
+				log_aserror("Invalid call to setInterval(%s) "
+					"- %s.%s is not a function",
+					ss.str().c_str(),
+					fn.arg(0).to_debug_string().c_str(),
+					method_name.c_str());
+			);
+			return;
+		}
+
+		timer_arg = 2;
+	}
+
+
+	if ( fn.nargs < timer_arg+1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+			std::stringstream ss; fn.dump_args(ss);
+			log_aserror("Invalid call to setInterval(%s) "
+				"- missing timeout argument",
+				ss.str().c_str());
+		);
+		return;
+	}
 
 	// Get interval time
-	int ms = int(fn.arg(1).to_number());
+	int ms = int(fn.arg(timer_arg).to_number());
+
+	// TODO: parse arguments !!
+	if ( fn.nargs > timer_arg+1 )
+	{
+		std::stringstream ss; fn.dump_args(ss);
+		log_error("FIXME: discarding arguments "
+				"in setInterval(%s) call", ss.str().c_str());
+	}
 
 	Timer timer;
 	timer.setInterval(*as_func, ms, fn.this_ptr, fn.env);

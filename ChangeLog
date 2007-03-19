@@ -1,3 +1,9 @@
+2007-03-19 Sandro Santilli <strk@keybit.net>
+
+	* server/timers.cpp (timer_setinterval):
+	  Accept call in the form setInterval(obj, methodname, timer);
+	  warn about unsupported args (right-most arguments).
+
 2007-03-19 Ann Barcomb <ann@lulu.com>
 
 	* ActionScript has been removed from the Gnash manual.
