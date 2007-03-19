@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.27 2007/03/16 16:40:17 strk Exp $";
+rcsid="$Id: Function.as,v 1.28 2007/03/19 17:37:09 strk Exp $";
 
 #include "check.as"
 
@@ -444,3 +444,124 @@ check_equals(typeof(textOutFunc.toString), 'number');
 // expect '[type Function]', not 'custom text rep' in output (no way to check this!!)
 note(textOutFunc);
 
+
+//-----------------------------------------------------
+// Test constructor and __constructor__ properties
+//-----------------------------------------------------
+
+a = 4; // number primitive to Number object
+check_equals(typeof(a.constructor), 'function');
+#if OUTPUT_VERSION > 5
+xcheck_equals(typeof(a.__constructor__), 'function');
+#if OUTPUT_VERSION == 6
+xcheck(a.hasOwnProperty('constructor'));
+#else
+check(!a.hasOwnProperty('constructor'));
+#endif
+xcheck(a.hasOwnProperty('__constructor__'));
+check_equals(a.constructor, Number);
+xcheck_equals(a.__constructor__, Number);
+check(! a instanceof Number);
+check(a.constructor != Object);
+#endif
+
+a = "string"; // string primitive to String object
+check_equals(typeof(a.constructor), 'function');
+#if OUTPUT_VERSION > 5
+xcheck_equals(typeof(a.__constructor__), 'function');
+#if OUTPUT_VERSION == 6
+xcheck(a.hasOwnProperty('constructor'));
+#else
+check(!a.hasOwnProperty('constructor'));
+#endif
+xcheck(a.hasOwnProperty('__constructor__'));
+check_equals(a.constructor, String);
+xcheck_equals(a.__constructor__, String);
+check(! a instanceof String);
+check(a.constructor != Object);
+#endif
+
+a = true; // boolean primitive to Boolean object
+xcheck_equals(typeof(a.constructor), 'function');
+#if OUTPUT_VERSION > 5
+xcheck_equals(typeof(a.__constructor__), 'function');
+#if OUTPUT_VERSION == 6
+xcheck(a.hasOwnProperty('constructor'));
+#else
+check(!a.hasOwnProperty('constructor'));
+#endif
+xcheck(a.hasOwnProperty('__constructor__'));
+xcheck_equals(a.constructor, Boolean);
+xcheck_equals(a.__constructor__, Boolean);
+check(! a instanceof String);
+check(a.constructor != Object);
+#endif
+
+//-----------------------------------------------------
+// Test use of 'super'
+//-----------------------------------------------------
+
+function Mail(recipient, message)
+{
+	this.to = recipient;
+	this.message = message;
+}
+
+function Email(subject, recipient, message)
+{
+	this.subject = subject;
+
+#if OUTPUT_VERSION > 5
+	check_equals(typeof(super), 'object');
+#else // OUTPUT_VERSION <= 5
+	check_equals(typeof(super), 'undefined');
+#endif
+	super(recipient, message);
+}
+
+check_equals(typeof(Email.prototype.__constructor__), 'undefined');
+
+// Email is a Function instance, and it's "constructor" property
+// tells us so
+check_equals(typeof(Email.constructor), 'function');
+check_equals(Email.constructor, Function);
+#if OUTPUT_VERSION > 5
+xcheck(Email.hasOwnProperty('constructor'));
+#endif // OUTPUT_VERSION > 5
+
+// Anyway, Email was not created using 'new', so it does
+// not have a __constructor__ property
+check_equals(typeof(Email.__constructor__), 'undefined');
+check( ! Email.hasOwnProperty('__constructor__') );
+
+Email.prototype = new Mail;
+#if OUTPUT_VERSION > 5 
+check_equals(typeof(Email.prototype.__constructor__), 'function');
+#else
+check_equals(typeof(Email.prototype.__constructor__), 'undefined');
+#endif
+
+myMail = new Email('greetings', "you", "hello");
+check_equals(myMail.subject, 'greetings');
+
+#if OUTPUT_VERSION > 5
+xcheck_equals(myMail.to, 'you');
+xcheck_equals(myMail.message, 'hello');
+#else // OUTPUT_VERSION <= 5
+// no 'super' defined for SWF5 and below, so don't expect it to be called
+check_equals(typeof(myMail.to), 'undefined');
+check_equals(typeof(myMail.message), 'undefined');
+#endif
+
+function Spam()
+{
+	this.to = 'everyone';
+	this.message = 'enlarge yourself';
+}
+
+Email.prototype.__constructor__ = Spam;
+
+myMail = new Email('greetings', "you", "hello");
+check_equals(myMail.subject, 'greetings');
+xcheck_equals(myMail.to, 'everyone');
+xcheck_equals(myMail.message, 'enlarge yourself');

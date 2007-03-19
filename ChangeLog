@@ -1,3 +1,9 @@
+2007-03-19 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Function.as: add more tests
+	  for 'constructor', '__constructor__' and super.
+	  A lot of them fail and the test is still not complete.
+
 2007-03-19 Ann Barcomb <ann@lulu.com>
 
 	* doc/C/actionscript/new_as_class.xml: document the changed syntax
