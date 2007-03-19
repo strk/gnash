@@ -14,6 +14,8 @@
   <!ENTITY version "0.7.2">
 
   <!ENTITY main SYSTEM "actionscript/main.xml">
+  <!ENTITY new_as_class SYSTEM "actionscript/new_as_class.xml">
+  <!ENTITY as_value SYSTEM "actionscript/as_value.xml">
  ]
 >
 
@@ -118,6 +120,8 @@
 
 <!-- ============= Document Body ============================= -->
   &main;
+  &new_as_class;
+  &as_value;
 
 <!-- ============= Application License ============================= -->
 
