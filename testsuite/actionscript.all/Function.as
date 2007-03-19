@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.28 2007/03/19 17:37:09 strk Exp $";
+rcsid="$Id: Function.as,v 1.29 2007/03/19 19:59:50 strk Exp $";
 
 #include "check.as"
 
@@ -524,6 +524,7 @@ check_equals(typeof(Email.prototype.__constructor__), 'undefined');
 // Email is a Function instance, and it's "constructor" property
 // tells us so
 check_equals(typeof(Email.constructor), 'function');
+check_equals(typeof(Email.constructor.constructor), 'function');
 check_equals(Email.constructor, Function);
 #if OUTPUT_VERSION > 5
 xcheck(Email.hasOwnProperty('constructor'));
@@ -563,5 +564,10 @@ Email.prototype.__constructor__ = Spam;
 
 myMail = new Email('greetings', "you", "hello");
 check_equals(myMail.subject, 'greetings');
+#if OUTPUT_VERSION > 5
 xcheck_equals(myMail.to, 'everyone');
 xcheck_equals(myMail.message, 'enlarge yourself');
+#else
+xcheck_equals(myMail.to, undefined);
+xcheck_equals(myMail.message, undefined);
+#endif
