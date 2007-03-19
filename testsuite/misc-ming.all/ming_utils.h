@@ -22,6 +22,49 @@
 
 #include <ming.h>
 
+/* Missing define to allow using older Ming releases */
+
+#ifndef SWFACTION_INIT
+# define SWFACTION_INIT       (1<<9)
+#endif
+
+#ifndef SWFACTION_PRESS
+# define SWFACTION_PRESS              (1<<10)
+#endif
+
+#ifndef SWFACTION_RELEASE
+# define SWFACTION_RELEASE     (1<<11)
+#endif
+
+#ifndef SWFACTION_RELEASEOUTSIDE
+# define SWFACTION_RELEASEOUTSIDE (1<<12)
+#endif
+
+#ifndef SWFACTION_ROLLOVER
+# define SWFACTION_ROLLOVER    (1<<13)
+#endif
+
+#ifndef SWFACTION_ROLLOUT
+# define SWFACTION_ROLLOUT     (1<<14)
+#endif
+
+#ifndef SWFACTION_DRAGOVER
+# define SWFACTION_DRAGOVER    (1<<15)
+#endif
+
+#ifndef SWFACTION_DRAGOUT
+# define SWFACTION_DRAGOUT     (1<<16)
+#endif
+
+#ifndef SWFACTION_KEYPRESS
+# define SWFACTION_KEYPRESS    (1<<17)
+#endif
+
+#ifndef SWFACTION_CONSTRUCT
+# define SWFACTION_CONSTRUCT   (1<<18)
+#endif
+
+
 /** \brief
  * Get the default font for Gnash testcases.
  * 

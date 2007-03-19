@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.10 2007/02/27 09:10:20 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.11 2007/03/19 14:10:22 bjacques Exp $";
 
 #include "check.as"
 
@@ -91,9 +91,9 @@ loadvarsObj.onLoad = function() {
 
 	if ( varsloaded == 1 )
 	{
-		check_equals(loadvarsObj['var1'], 'previous val1');
-		check_equals(loadvarsObj['var1_check'], 'previous val1');
-		//check_equals(loadvarsObj['var2'], 'val2');
+		check_equals(loadvarsObj['var1'], 'val1');
+		//check_equals(loadvarsObj['var1_check'], 'previous val1');
+		check_equals(loadvarsObj['var2'], 'val2');
 		//check_equals(loadvarsObj['v2_var1'], 'val1');
 		//check_equals(loadvarsObj['v2_var2'], 'val2');
 		play();
@@ -125,8 +125,8 @@ loadvarsObj.var1 = "previous val1";
 // not start with a '?' char.
 // 
 check( loadvarsObj instanceOf LoadVars );
-check( loadvarsObj.sendAndLoad( 'http://localhost/vars.php', loadvarsObj ) );
-//check( loadvarsObj.load( MEDIA(vars2.txt) ) );
+//check( loadvarsObj.sendAndLoad( 'http://localhost/vars.php', loadvarsObj ) );
+check( loadvarsObj.load( MEDIA(vars.txt) ) );
 //loadvarsObj.load( 'vars.cgi' );
 
 check_equals( loadvarsObj.loaded, false );

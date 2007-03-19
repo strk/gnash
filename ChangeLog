@@ -1,9 +1,21 @@
+2007-03-19 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* testsuite/misc-ming.all/ming_utils.h: Add Ming defines available only in
+	CVS; some of the new testcases depend on these.
+
+2007-03-19 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/LoadVars.as: Don't assume that the system on
+	which testcases are run has a HTTP server running on localhost that meets
+	our specifications. Instead, read object property data from a local file
+	and update the expected output to match. Suggested by Company.
+
 2007-03-19 Zou Lunkai <zoulunkai@gmail.com>
 
-	* testsuite/misc-ming.all/action_execution_order_test4.c.
+	* testsuite/misc-ming.all/action_execution_order_test4.c:
 	  add tests about onClipEvent(onConstruct) and user defined onLoad for _root
 	  
-2007-03-18 Bastiaan Jacques
+2007-03-18 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* testsuite/libamf.all/test_number.cpp: Don't overflow the data buffer.
 
