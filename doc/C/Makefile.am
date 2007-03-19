@@ -90,7 +90,7 @@ man:  gnash.1
 texi: gnash.texi actionscript.texi
 info: gnash.info actionscript.info
 gnash.pdf gnash.html gnash.texi: $(xml_files)
-actionscript.pdf actionscript.html actionscript.texi: actionscript.xml actionscript/main.xml
+actionscript.pdf actionscript.html actionscript.texi: actionscript.xml actionscript/main.xml actionscript/as_value.xml actionscript/new_as_class.xml
 
 SUFFIXES = .xml .html .texi .pdf .info .1 .fo
 

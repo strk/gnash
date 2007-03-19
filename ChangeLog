@@ -1,3 +1,7 @@
+2007-03-19 Ann Barcomb <ann@lulu.com>
+	* doc/C/actionscript.xml, doc/C/actionscript/*, doc/C/Makefile.am:
+	  Split main.xml into multiple files.
+
 2007-03-19 Sandro Santilli <strk@keybit.net>
 
 	* server/timers.cpp (timer_setinterval):
@@ -6,9 +10,10 @@
 
 2007-03-19 Ann Barcomb <ann@lulu.com>
 
-	* ActionScript has been removed from the Gnash manual.
-	  A new ActionScript manual has been created.  Most of
-	  the material has been rewritten and incorporates Sandro's
+	* doc/C/actionscript.xml, doc/C/gnash.xml, doc/C/actionscript/main.xml,
+	  doc/C/Makefile.am: ActionScript has been removed from the Gnash
+	  manual.  A new ActionScript manual has been created.  Most of
+	  material has been rewritten and incorporates Sandro's
 	  feedback on the previous version.
 
 2007-03-19 Bastiaan Jacques <bastiaan@bjacques.org>
