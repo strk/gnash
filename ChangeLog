@@ -1,3 +1,8 @@
+2007-03-19 Ann Barcomb <ann@lulu.com>
+
+	* doc/C/actionscript/new_as_class.xml: document the changed syntax
+	  for returning a value (see Bastiaan's commit).
+
 2007-03-19 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/vm/fn_call.h: Remove fn_call::result. Instead, all methods and

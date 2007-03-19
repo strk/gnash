@@ -106,13 +106,6 @@
           Every method you implement and 
           <link linkend="prototype">attach</link> will receive an
           &fn_call; data structure as an argument when it is called.
-          The most important members of the &fn_call; structure are
-          the <link linkend="arguments">stack of arguments</link>
-          to the function and a
-          <link linkend="return">pointer to the result</link>, which will
-          be returned to the (ActionScript) caller.  The remainder
-          of the <link linkend="additional_fn_call">&fn_call; 
-          structure</link> is described later in this section.
         </para>
 
         <sect3 id="arguments">
@@ -133,16 +126,12 @@
         <sect3 id="return">
           <title>Returning a Value to ActionScript</title>
           <para>
-            The return value should be set <emphasis>result</emphasis>
-            pointer of the &fn_call; structure.  For example:
-            <programlisting>
-              fn.result->set_string('Goodbye, cruel world.');
-            </programlisting>
-          </para>
-          <para>
-            The return value is an 
+            The return value should be an
             <link linkend="as_value"><emphasis>as_value</emphasis> 
-            object</link>.
+            object</link>.  For example:
+            <programlisting>
+              return as_value('Goodbye, cruel world.');
+            </programlisting>
           </para>
         </sect3>
 
@@ -153,17 +142,17 @@
             structure, namely <emphasis>this_ptr</emphasis> and
             <emphasis>nargs</emphasis>.  The former points to the
             class which is invoking this method, while the latter
-            is a count of the number of
+            is a count of the number of 
             <link linkend="arguments">arguments in the stack</link>.
-          </para>
-          <para>
+	  </para>
+	  <para>
             You may also see instances of the <emphasis>env</emphasis>
             pointer being used.   This is being deprecated.  Instances
             which could be replaced with
             <link linkend="arguments"><emphasis>arg()</emphasis></link>
             are already deprecated; other uses will be deprecated
             in the near future.
-          </para>
+	  </para>
           <para>
             Beyond the <emphasis><link 
             linkend="arguments">arg()</link></emphasis> method, there
@@ -171,7 +160,6 @@
             can be used in debugging to output the entire argument
             stack.
 	  </para>
-
         </sect3>
       </sect2>
 
