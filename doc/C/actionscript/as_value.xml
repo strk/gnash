@@ -13,7 +13,7 @@
           <emphasis>BOOLEAN</emphasis>, <emphasis>STRING</emphasis>,
           <emphasis>NUMBER</emphasis>, <emphasis>OBJECT</emphasis>,
           <emphasis>AS_FUNCTION</emphasis>, and 
-          <emphasis>MOVIECLIP</emphasis>.  
+          <emphasis>MOVIECLIP</emphasis> (sprite).  
           The type <emphasis>C_FUNCTION</emphasis> is being deprecated.
         </para>
       </sect2>
@@ -25,7 +25,10 @@
           <emphasis>as_value</emphasis> is of a specific type.  These
           follow the form of <emphasis>is_TYPE</emphasis>, for example
           <emphasis>is_as_function()</emphasis> and 
-          <emphasis>is_number()</emphasis>.
+          <emphasis>is_number()</emphasis>.  In general, the type names
+          match the <link linkend="data_types">data types</link> listed
+          above, with the exception of the type <emphasis>MOVIECLIP</emphasis>
+          which has a method <emphasis>is_sprite()</emphasis>.
         </para>
       </sect2>
 
@@ -36,7 +39,10 @@
           the value as a particular type.  They follow the
           <emphasis>to_TYPE</emphasis> naming convention.  Examples
           are <emphasis>to_number()</emphasis> and
-          <emphasis>to_bool()</emphasis>.  
+          <emphasis>to_bool()</emphasis>.  The type names are as 
+          <link linkend="data_types">listed</link> earlier, except for
+          <emphasis>MOVIECLIP</emphasis>, which uses 
+          <emphasis>to_sprite()</emphasis>.
         </para>
       </sect2>
 
@@ -47,7 +53,10 @@
           of methods.  They change the type to the type specified in
           the method name, and set the value to the one given as an
           argument.  It is also possible to accomplish the same thing
-          with the <emphasis>=</emphasis> operator.
+          with the <emphasis>=</emphasis> operator.  Again, type names
+          match those <link linkend="data_types">named earlier</link>,
+          except in the case of <emphasis>MOVIECLASS</emphasis>.  Its
+          method is called <emphasis>set_sprite()</emphasis>.
         </para>
       </sect2>
 
