@@ -29,11 +29,11 @@
 
 namespace gnash {
 
-void camera_get(const fn_call& fn);
-void camera_setmode(const fn_call& fn);
-void camera_setmotionlevel(const fn_call& fn);
-void camera_setquality(const fn_call& fn);
-void camera_ctor(const fn_call& fn);
+as_value camera_get(const fn_call& fn);
+as_value camera_setmode(const fn_call& fn);
+as_value camera_setmotionlevel(const fn_call& fn);
+as_value camera_setquality(const fn_call& fn);
+as_value camera_ctor(const fn_call& fn);
 
 static void
 attachCameraInterface(as_object& o)
@@ -73,25 +73,30 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-void camera_get(const fn_call& /*fn*/) {
+as_value camera_get(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void camera_setmode(const fn_call& /*fn*/) {
+as_value camera_setmode(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void camera_setmotionlevel(const fn_call& /*fn*/) {
+as_value camera_setmotionlevel(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void camera_setquality(const fn_call& /*fn*/) {
+as_value camera_setquality(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+
+    return as_value();
 }
 
-void
-camera_ctor(const fn_call& fn)
+as_value
+camera_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> obj = new camera_as_object;
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

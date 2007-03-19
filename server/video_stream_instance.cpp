@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.cpp,v 1.14 2007/03/09 15:00:59 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.15 2007/03/19 17:11:14 bjacques Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -29,7 +29,7 @@
 
 namespace gnash {
 
-	static void
+	static as_value
 	attach_video(const fn_call& fn)
 	{
 		assert(dynamic_cast<video_stream_instance*>(fn.this_ptr));
@@ -40,7 +40,7 @@ namespace gnash {
 			IF_VERBOSE_ASCODING_ERRORS(
 	    		log_aserror("attachVideo needs 1 arg");
 			);
-			return;
+			return as_value();
 		}
 
 		NetStream* ns = dynamic_cast<NetStream*>(fn.arg(0).to_object());
@@ -48,6 +48,7 @@ namespace gnash {
 		{
 			video->setStream(ns);
 		}
+		return as_value();
 	}
 
 	video_stream_instance::video_stream_instance(

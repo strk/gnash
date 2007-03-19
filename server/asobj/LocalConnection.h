@@ -67,11 +67,11 @@ public:
     LocalConnection obj;
 };
 
-void localconnection_new(const fn_call& fn);
-void localconnection_close(const fn_call& fn);
-void localconnection_connect(const fn_call& fn);
-void localconnection_domain(const fn_call& fn);
-void localconnection_send(const fn_call& fn);
+as_value localconnection_new(const fn_call& fn);
+as_value localconnection_close(const fn_call& fn);
+as_value localconnection_connect(const fn_call& fn);
+as_value localconnection_domain(const fn_call& fn);
+as_value localconnection_send(const fn_call& fn);
 
 } // end of gnash namespace
 

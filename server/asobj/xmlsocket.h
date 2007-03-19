@@ -89,17 +89,17 @@ public:
     XMLSocket obj;
 };
 
-DSOEXPORT void xmlsocket_connect(const fn_call& fn);
-DSOEXPORT void xmlsocket_send(const fn_call& fn);
-DSOEXPORT void xmlsocket_xml_new(const fn_call& fn);
-DSOEXPORT void xmlsocket_new(const fn_call& fn);
-DSOEXPORT void xmlsocket_close(const fn_call& fn);
+DSOEXPORT as_value xmlsocket_connect(const fn_call& fn);
+DSOEXPORT as_value xmlsocket_send(const fn_call& fn);
+DSOEXPORT as_value xmlsocket_xml_new(const fn_call& fn);
+DSOEXPORT as_value xmlsocket_new(const fn_call& fn);
+DSOEXPORT as_value xmlsocket_close(const fn_call& fn);
 
 // These are the event handlers called for this object
-DSOEXPORT void xmlsocket_event_ondata(const fn_call& fn);
-DSOEXPORT void xmlsocket_event_close(const fn_call& fn);
-DSOEXPORT void xmlsocket_event_connect(const fn_call& fn);
-DSOEXPORT void xmlsocket_event_xml(const fn_call& fn);
+DSOEXPORT as_value xmlsocket_event_ondata(const fn_call& fn);
+DSOEXPORT as_value xmlsocket_event_close(const fn_call& fn);
+DSOEXPORT as_value xmlsocket_event_connect(const fn_call& fn);
+DSOEXPORT as_value xmlsocket_event_xml(const fn_call& fn);
 
 DSOEXPORT int check_sockets(int fd);
  

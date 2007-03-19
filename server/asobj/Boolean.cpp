@@ -30,9 +30,9 @@
 
 namespace gnash {
 
-void boolean_tostring(const fn_call& fn);
-void boolean_valueof(const fn_call& fn);
-void boolean_ctor(const fn_call& fn);
+as_value boolean_tostring(const fn_call& fn);
+as_value boolean_valueof(const fn_call& fn);
+as_value boolean_ctor(const fn_call& fn);
 
 static void
 attachBooleanInterface(as_object& o)
@@ -93,7 +93,7 @@ ensureBoolean(as_object* obj)
         return ret;
 }
 
-void boolean_tostring(const fn_call& fn) {
+as_value boolean_tostring(const fn_call& fn) {
 
 	static char* strtrue = "true";
 	static char* strfalse = "false";
@@ -101,18 +101,18 @@ void boolean_tostring(const fn_call& fn) {
 	boolean_as_object* boolobj = ensureBoolean(fn.this_ptr);
 	
 	if (boolobj->val) 
-		fn.result->set_string(strtrue);
+		return as_value(strtrue);
 	else
-		fn.result->set_string(strfalse);
+		return as_value(strfalse);
 }
 
-void boolean_valueof(const fn_call& fn) {
+as_value boolean_valueof(const fn_call& fn) {
     boolean_as_object* boolobj = ensureBoolean(fn.this_ptr);
     
-    fn.result->set_bool(boolobj->val);
+    return as_value(boolobj->val);
 }
 
-void
+as_value
 boolean_ctor(const fn_call& fn)
 {
 	bool val = false;
@@ -122,7 +122,7 @@ boolean_ctor(const fn_call& fn)
 	}
 	boost::intrusive_ptr<as_object> obj = new boolean_as_object(val);
 
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

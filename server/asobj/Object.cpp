@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.18 2007/03/16 12:16:46 strk Exp $ */
+/* $Id: Object.cpp,v 1.19 2007/03/19 17:11:14 bjacques Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -42,13 +42,13 @@
 namespace gnash {
 
 // Forward declarations
-static void object_addproperty(const fn_call&);
-static void object_registerClass(const fn_call& fn);
-static void object_hasOwnProperty(const fn_call&);
-static void object_isPropertyEnumerable(const fn_call&);
-static void object_isPrototypeOf(const fn_call&);
-static void object_watch(const fn_call&);
-static void object_unwatch(const fn_call&);
+static as_value object_addproperty(const fn_call&);
+static as_value object_registerClass(const fn_call& fn);
+static as_value object_hasOwnProperty(const fn_call&);
+static as_value object_isPropertyEnumerable(const fn_call&);
+static as_value object_isPrototypeOf(const fn_call&);
+static as_value object_watch(const fn_call&);
+static as_value object_unwatch(const fn_call&);
 
 
 static void
@@ -103,7 +103,7 @@ public:
 
 };
 
-static void
+static as_value
 object_ctor(const fn_call& fn)
     // Constructor for ActionScript class Object.
 {
@@ -114,8 +114,7 @@ object_ctor(const fn_call& fn)
 		// WARNING: it is likely that fn.result and fn.arg(0)
 		// are the same location... so we might skip
 		// the set_as_object() call as a whole.
-		fn.result->set_as_object(fn.arg(0).to_object());
-		return;
+		return as_value(fn.arg(0).to_object());
 	}
 
 	boost::intrusive_ptr<as_object> new_obj;
@@ -129,7 +128,7 @@ object_ctor(const fn_call& fn)
 		new_obj = new object_as_object();
 	}
 
-	fn.result->set_as_object(new_obj.get()); // will keep alive
+	return as_value(new_obj.get()); // will keep alive
 }
 
 std::auto_ptr<as_object>
@@ -159,7 +158,7 @@ void object_class_init(as_object& global)
 
 }
 
-static void
+static as_value
 object_addproperty(const fn_call& fn)
 {
 	assert(fn.this_ptr);
@@ -179,8 +178,7 @@ object_addproperty(const fn_call& fn)
 		// no need to abort here
 		if ( fn.nargs < 3 )
 		{
-			fn.result->set_bool(false);
-			return;
+			return as_value(false);
 		}
 	}
 
@@ -191,8 +189,7 @@ object_addproperty(const fn_call& fn)
 		log_aserror("Invalid call to Object.addProperty() - "
 			"empty property name");
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 	as_function* getter = fn.arg(1).to_as_function();
@@ -202,8 +199,7 @@ object_addproperty(const fn_call& fn)
 		log_aserror("Invalid call to Object.addProperty() - "
 			"getter is not an AS function");
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 	as_function* setter = fn.arg(2).to_as_function();
@@ -213,8 +209,7 @@ object_addproperty(const fn_call& fn)
 		log_aserror("Invalid call to Object.addProperty() - "
 			"setter is not an AS function");
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 
@@ -224,10 +219,10 @@ object_addproperty(const fn_call& fn)
 	bool result = obj->add_property(propname, *getter, *setter);
 
 	//log_warning("Object.addProperty(): testing");
-	fn.result->set_bool(result);
+	return as_value(result);
 }
 
-static void
+static as_value
 object_registerClass(const fn_call& fn)
 {
 	assert(fn.this_ptr);
@@ -247,8 +242,7 @@ object_registerClass(const fn_call& fn)
 		// no need to abort here
 		if ( fn.nargs < 2 )
 		{
-			fn.result->set_bool(false);
-			return;
+			return as_value(false);
 		}
 	}
 
@@ -259,8 +253,7 @@ object_registerClass(const fn_call& fn)
 		log_aserror("Invalid call to Object.registerClass() - "
 			"empty symbol id");
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 	as_function* theclass = fn.arg(1).to_as_function();
@@ -270,8 +263,7 @@ object_registerClass(const fn_call& fn)
 		log_aserror("Invalid call to Object.registerClass() - "
 			"class is not a function");
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 	// Find the exported resource
@@ -288,8 +280,7 @@ object_registerClass(const fn_call& fn)
 			symbolid.c_str(), 
 			typeid(theclass).name());
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 	// Check that the exported resource is a sprite_definition
@@ -309,24 +300,23 @@ object_registerClass(const fn_call& fn)
 			typeid(theclass).name(),
 			typeid(*exp_res).name());
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 	exp_clipdef->registerClass(theclass);
-	fn.result->set_bool(true);
+	return as_value(true);
 }
 
-void
+as_value
 object_hasOwnProperty(const fn_call& fn)
 {
-	assert(fn.result->is_undefined());
+	//assert(fn.result->is_undefined());
 	if ( fn.nargs < 1 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("Object.hasOwnProperty() requires one arg");
 		);
-		return;
+		return as_value();
 	}
 	as_value& arg = fn.arg(0);
 	std::string propname = arg.to_std_string();
@@ -335,21 +325,21 @@ object_hasOwnProperty(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("Invalid call to Object.hasOwnProperty('%s')", arg.to_string());
 		);
-		return;
+		return as_value();
 	}
-	fn.result->set_bool(fn.this_ptr->getOwnProperty(propname) != NULL);
+	return as_value(fn.this_ptr->getOwnProperty(propname) != NULL);
 }
 
-void
+as_value
 object_isPropertyEnumerable(const fn_call& fn)
 {
-	assert(fn.result->is_undefined());
+	//assert(fn.result->is_undefined());
 	if ( fn.nargs < 1 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("Object.isPropertyEnumerable() requires one arg");
 		);
-		return;
+		return as_value();
 	}
 	as_value& arg = fn.arg(0);
 	std::string propname = arg.to_std_string();
@@ -358,30 +348,28 @@ object_isPropertyEnumerable(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("Invalid call to Object.isPropertyEnumerable('%s')", arg.to_string());
 		);
-		return;
+		return as_value();
 	}
 
 	Property* prop = fn.this_ptr->getOwnProperty(propname);
 	if ( ! prop )
 	{
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
-	fn.result->set_bool( ! prop->getFlags().get_dont_enum() );
+	return as_value( ! prop->getFlags().get_dont_enum() );
 }
 
-void
+as_value
 object_isPrototypeOf(const fn_call& fn)
 {
-	assert(fn.result->is_undefined());
+	//assert(fn.result->is_undefined());
 	if ( fn.nargs < 1 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("Object.isPrototypeOf() requires one arg");
 		);
-		fn.result->set_bool(false); 
-		return;
+		return as_value(false); 
 	}
 
 	as_object* obj = fn.arg(0).to_object();
@@ -390,15 +378,14 @@ object_isPrototypeOf(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("First arg to Object.isPrototypeOf(%s) is not an object", fn.arg(0).to_string());
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
-	fn.result->set_bool(fn.this_ptr->prototypeOf(*obj));
+	return as_value(fn.this_ptr->prototypeOf(*obj));
 
 }
 
-void
+as_value
 object_watch(const fn_call&)
 {
 	static bool warned = false;
@@ -406,9 +393,10 @@ object_watch(const fn_call&)
 		log_error("FIXME: %s unimplemented", __FUNCTION__);
 		warned=true;
 	}
+	return as_value();
 }
 
-void
+as_value
 object_unwatch(const fn_call&)
 {
 	static bool warned = false;
@@ -416,6 +404,7 @@ object_unwatch(const fn_call&)
 		log_error("FIXME: %s unimplemented", __FUNCTION__);
 		warned=true;
 	}
+	return as_value();
 }
   
 } // namespace gnash

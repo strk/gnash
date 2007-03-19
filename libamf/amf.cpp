@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.27 2007/03/17 05:21:33 rsavoye Exp $ */
+/* $Id: amf.cpp,v 1.28 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -739,6 +739,7 @@ void *
 AMF::encodeVariable(amf_element_t & /* el */)
 {
     GNASH_REPORT_FUNCTION;
+    return NULL;
 }
 
 void *

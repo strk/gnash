@@ -29,12 +29,12 @@
 
 namespace gnash {
 
-void microphone_get(const fn_call& fn);
-void microphone_setgain(const fn_call& fn);
-void microphone_setrate(const fn_call& fn);
-void microphone_setsilencelevel(const fn_call& fn);
-void microphone_setuseechosuppression(const fn_call& fn);
-void microphone_ctor(const fn_call& fn);
+as_value microphone_get(const fn_call& fn);
+as_value microphone_setgain(const fn_call& fn);
+as_value microphone_setrate(const fn_call& fn);
+as_value microphone_setsilencelevel(const fn_call& fn);
+as_value microphone_setuseechosuppression(const fn_call& fn);
+as_value microphone_ctor(const fn_call& fn);
 
 static void
 attachMicrophoneInterface(as_object& o)
@@ -75,28 +75,33 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-void microphone_get(const fn_call& /*fn*/) {
+as_value microphone_get(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void microphone_setgain(const fn_call& /*fn*/) {
+as_value microphone_setgain(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void microphone_setrate(const fn_call& /*fn*/) {
+as_value microphone_setrate(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void microphone_setsilencelevel(const fn_call& /*fn*/) {
+as_value microphone_setsilencelevel(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void microphone_setuseechosuppression(const fn_call& /*fn*/) {
+as_value microphone_setuseechosuppression(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
 
-void
-microphone_ctor(const fn_call& fn)
+as_value
+microphone_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> obj = new microphone_as_object;
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

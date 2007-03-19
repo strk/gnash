@@ -207,9 +207,7 @@ public:
 	/// Get the value (invokes the getter)
 	as_value getValue(as_object& this_ptr) const
 	{
-		as_value ret;
-		_getset.getValue(&this_ptr, ret);
-		return ret;
+		return _getset.getValue(&this_ptr);
 	}
 
 	/// Set the value (invokes the setter)

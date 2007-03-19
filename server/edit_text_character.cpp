@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.45 2007/03/09 15:12:08 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.46 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,21 +43,20 @@
 namespace gnash {
 
 // Forward declarations
-static void textfield_get_variable(const fn_call& fn);
-static void textfield_set_variable(const fn_call& fn);
+static as_value textfield_get_variable(const fn_call& fn);
+static as_value textfield_set_variable(const fn_call& fn);
 
-static void
+static as_value
 textfield_get_variable(const fn_call& fn)
 {
 	assert( dynamic_cast<edit_text_character*>(fn.this_ptr) );
 	edit_text_character* text = static_cast<edit_text_character*>(fn.this_ptr);
 
-	fn.result->set_string(text->get_variable_name());
-	return;
+	return as_value(text->get_variable_name());
 
 }
 
-static void
+static as_value
 textfield_set_variable(const fn_call& fn)
 {
 	assert( dynamic_cast<edit_text_character*>(fn.this_ptr) );
@@ -68,18 +67,18 @@ textfield_set_variable(const fn_call& fn)
 
 	text->set_variable_name(newname);
 
-	return;
+	return as_value();
 }
 
 //
 // TextField interface functions
 //
 
-static void
-textfield_ctor(const fn_call& fn)
+static as_value
+textfield_ctor(const fn_call& /* fn */)
 {
 	log_msg("User tried to invoke new TextField()");
-	fn.result->set_undefined();
+	return as_value();
 }
 
 //

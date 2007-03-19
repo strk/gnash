@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.19 2007/03/09 13:34:39 strk Exp $ */
+/* $Id: xml.cpp,v 1.20 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -51,34 +51,34 @@ namespace gnash {
 
 static as_object* getXMLInterface();
 
-DSOEXPORT void xml_new(const fn_call& fn);
-static void xml_load(const fn_call& fn);
-static void xml_set_current(const fn_call& fn);
+DSOEXPORT as_value xml_new(const fn_call& fn);
+static as_value xml_load(const fn_call& fn);
+static as_value xml_set_current(const fn_call& fn);
 
-static void xml_addrequestheader(const fn_call& fn);
-static void xml_appendchild(const fn_call& fn);
-static void xml_clonenode(const fn_call& fn);
-static void xml_createelement(const fn_call& fn);
-static void xml_createtextnode(const fn_call& fn);
-static void xml_getbytesloaded(const fn_call& fn);
-static void xml_getbytestotal(const fn_call& fn);
-static void xml_haschildnodes(const fn_call& fn);
-static void xml_insertbefore(const fn_call& fn);
-static void xml_parsexml(const fn_call& fn);
-static void xml_removenode(const fn_call& fn);
-static void xml_send(const fn_call& fn);
-static void xml_sendandload(const fn_call& fn);
-static void xml_tostring(const fn_call& fn);
-static void xml_firstchild(const fn_call& fn);
-static void xml_childnodes(const fn_call& fn);
+static as_value xml_addrequestheader(const fn_call& fn);
+static as_value xml_appendchild(const fn_call& fn);
+static as_value xml_clonenode(const fn_call& fn);
+static as_value xml_createelement(const fn_call& fn);
+static as_value xml_createtextnode(const fn_call& fn);
+static as_value xml_getbytesloaded(const fn_call& fn);
+static as_value xml_getbytestotal(const fn_call& fn);
+static as_value xml_haschildnodes(const fn_call& fn);
+static as_value xml_insertbefore(const fn_call& fn);
+static as_value xml_parsexml(const fn_call& fn);
+static as_value xml_removenode(const fn_call& fn);
+static as_value xml_send(const fn_call& fn);
+static as_value xml_sendandload(const fn_call& fn);
+static as_value xml_tostring(const fn_call& fn);
+static as_value xml_firstchild(const fn_call& fn);
+static as_value xml_childnodes(const fn_call& fn);
 
 // These are the event handlers called for this object
-static void xml_ondata(const fn_call& fn);
-static void xml_loaded(const fn_call& fn);
+static as_value xml_ondata(const fn_call& fn);
+static as_value xml_loaded(const fn_call& fn);
 
 // Properties
-static void xml_nodename(const fn_call& fn);
-static void xml_nodevalue(const fn_call& fn);
+static as_value xml_nodename(const fn_call& fn);
+static as_value xml_nodevalue(const fn_call& fn);
 
 static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 #ifdef USE_DEBUGGER
@@ -757,11 +757,12 @@ XML::stringify(XMLNode *xml, stringstream *xmlout)
 // Callbacks. These are the wrappers for the C++ functions so they'll work as
 // callbacks from within gnash.
 //
-void
+as_value
 xml_load(const fn_call& fn)
 {
     as_value	method;
     as_value	val;
+    as_value	rv = false;
     bool          ret;
     struct stat   stats;
 
@@ -774,17 +775,17 @@ xml_load(const fn_call& fn)
     // If the file doesn't exist, don't try to do anything.
     if (stat(filespec.c_str(), &stats) < 0) {
         fprintf(stderr, "ERROR: doesn't exist.%s\n", filespec.c_str());
-        fn.result->set_bool(false);
-        return;
+	rv = false;
+        return rv;
     }
   
     // Set the argument to the function event handler based on whether the load
     // was successful or failed.
     ret = xml_obj->load(filespec.c_str());
-    fn.result->set_bool(ret);
+    rv = ret;
 
     if (ret == false) {
-        return;
+        return rv;
     }
     
     //env->bottom(first_arg) = ret;
@@ -813,7 +814,8 @@ xml_load(const fn_call& fn)
 	if (as_function* as_func = method.to_as_function()) {
 	    // It's an ActionScript function.  Call it.
 	    log_msg("Calling ActionScript function for onLoad\n");
-	    (*as_func)(fn_call(&val, xml_obj, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
+	    // XXX other than being assigned into, val appears to be unused.
+	    val = (*as_func)(fn_call(xml_obj, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
 	} else {
 	    log_error("error in call_method(): method is not a function\n");
 	}
@@ -826,12 +828,13 @@ xml_load(const fn_call& fn)
 
 #endif
 
-    fn.result->set_bool(true);
+    rv = true;
+    return rv;
 }
 
 // This executes the event handler for XML::XML_LOAD if it's been defined,
 // and the XML file has loaded sucessfully.
-void
+as_value
 xml_onload(const fn_call& fn)
 {
     //log_msg("%s:\n", __FUNCTION__);
@@ -861,11 +864,11 @@ xml_onload(const fn_call& fn)
         }
     }
       
-    fn.result->set_bool(val.to_bool());
+    return as_value(val.to_bool());
 }
 
 // This is the default event handler, and is usually redefined in the SWF script
-void
+as_value
 xml_ondata(const fn_call& fn)
 {
     log_msg("%s:\n", __FUNCTION__);
@@ -889,7 +892,7 @@ xml_ondata(const fn_call& fn)
     }
 
     //fn.result->set(&val);
-    fn.result->set_bool(val.to_bool());
+    return as_value(val.to_bool());
 }
 
 void
@@ -942,7 +945,7 @@ getXMLInterface()
     return o.get();
 }
 
-void
+as_value
 xml_new(const fn_call& fn)
 {
     as_value      inum;
@@ -968,15 +971,14 @@ xml_new(const fn_call& fn)
             XML*	xml_obj = (XML*)obj;
             //log_msg("\tCloned the XML object at %p\n", xml_obj);
             //result->set(xml_obj);
-            fn.result->set_as_object(xml_obj);
-            return;
+            return as_value(xml_obj);
         }
     } else {
         xml_obj = new XML;
         //log_msg("\tCreated New XML object at %p\n", xml_obj);
     }
 
-    fn.result->set_as_object(xml_obj);
+    return as_value(xml_obj);
 }
 
 //
@@ -987,7 +989,7 @@ xml_new(const fn_call& fn)
 // determines whether the document-loading process initiated by the XML.load()
 // call has completed. If the process completes successfully, the method
 // returns true; otherwise, it returns false.
-void
+as_value
 xml_loaded(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
@@ -1000,22 +1002,23 @@ xml_loaded(const fn_call& fn)
     assert(ptr);
     std::string filespec = fn.arg(0).to_string();
     //fn.result->set(ptr->loaded());
-    fn.result->set_bool(ptr->loaded());
+    return as_value(ptr->loaded());
 }
 
 
-void xml_addrequestheader(const fn_call& fn)
+as_value xml_addrequestheader(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     XML *ptr = (XML*)fn.this_ptr;
     assert(ptr);
     
-//    fn.result->set_int(ptr->getAllocated());
+//    return as_value(ptr->getAllocated());
 //    ptr->addRequestHeader();
     log_msg("%s:unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void xml_appendchild(const fn_call& fn)
+as_value xml_appendchild(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
@@ -1031,9 +1034,10 @@ void xml_appendchild(const fn_call& fn)
     } else {
         log_msg("ERROR: no child XMLNode paramaters!\\n");
     }
+    return as_value();
 }
 
-void xml_clonenode(const fn_call& fn)
+as_value xml_clonenode(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
@@ -1045,11 +1049,12 @@ void xml_clonenode(const fn_call& fn)
 	bool deep = fn.arg(0).to_bool(); 
 	xml_obj = new XMLNode;
 	ptr->cloneNode(*xml_obj, deep);
-	fn.result->set_as_object(xml_obj);
+	return as_value(xml_obj);
     } else {
         log_msg("ERROR: no Depth paramater!\n");
     }
 
+    return as_value();
 }
 
 /// \brief create a new XML element
@@ -1061,7 +1066,7 @@ void xml_clonenode(const fn_call& fn)
 /// the XML.createTextNode() method are the constructor methods for
 /// creating nodes for an XML object. 
 
-void xml_createelement(const fn_call& fn)
+as_value xml_createelement(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -1076,11 +1081,12 @@ void xml_createelement(const fn_call& fn)
 	xml_obj->nodeTypeSet(XML_ELEMENT_NODE);
 //	ptr->set_member(text, xml_obj); // FIXME: use a getter/setter !
 	// no return code from this method
-	fn.result->set_as_object(xml_obj);
+	return as_value(xml_obj);
 	
     } else {
         log_msg("ERROR: no text for element creation!\n");
     }
+    return as_value();
 }
 
 /// \brief Create a new XML node
@@ -1092,7 +1098,7 @@ void xml_createelement(const fn_call& fn)
 /// XML.createElement() method are the constructor methods for
 /// creating nodes for an XML object.
 
-void xml_createtextnode(const fn_call& fn)
+as_value xml_createtextnode(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -1107,33 +1113,34 @@ void xml_createtextnode(const fn_call& fn)
 	xml_obj = new XMLNode;
 	xml_obj->nodeValueSet(text);
 	xml_obj->nodeTypeSet(XML_TEXT_NODE);
-	fn.result->set_as_object(xml_obj);
+	return as_value(xml_obj);
 //	log_msg("%s: xml obj is %p\n", __PRETTY_FUNCTION__, xml_obj);
     } else {
 	log_msg("ERROR: no text for text node creation!\n");
     }
+    return as_value();
 }
 
-void xml_getbytesloaded(const fn_call& fn)
+as_value xml_getbytesloaded(const fn_call& fn)
 {
     XML *ptr = (XML*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_int(ptr->getBytesLoaded());
+    return as_value(ptr->getBytesLoaded());
 }
 
-void xml_getbytestotal(const fn_call& fn)
+as_value xml_getbytestotal(const fn_call& fn)
 {
     XML *ptr = (XML*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_int(ptr->getBytesTotal());
+    return as_value(ptr->getBytesTotal());
 }
 
-void xml_haschildnodes(const fn_call& fn)
+as_value xml_haschildnodes(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     XML *ptr = (XML*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_bool(ptr->hasChildNodes());
+    return as_value(ptr->hasChildNodes());
 }
 
 /// \brief insert a node before a node
@@ -1144,18 +1151,19 @@ void xml_haschildnodes(const fn_call& fn)
 /// method. If beforeNode is not a child of my_xml, the insertion
 /// fails.
 
-void xml_insertbefore(const fn_call& fn)
+as_value xml_insertbefore(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     XML *ptr = (XML*)fn.this_ptr;
     assert(ptr);
     
-//    fn.result->set_int(ptr->getAllocated());
+//    return as_value(ptr->getAllocated());
 //    ptr->insertBefore();
     log_msg("%s:unimplemented \n", __FUNCTION__);
+    return as_value();
 }
 
-void xml_parsexml(const fn_call& fn)
+as_value xml_parsexml(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     const char *text;
@@ -1184,40 +1192,44 @@ void xml_parsexml(const fn_call& fn)
 #else
     
 #endif
-//    fn.result->set_int(ptr->getAllocated());
+    return as_value();
+//    return as_value(ptr->getAllocated());
 }
 
 /// \brief removes the specified XML object from its parent. Also
 /// deletes all descendants of the node.
     
-void xml_removenode(const fn_call& fn)
+as_value xml_removenode(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     XML *ptr = (XML*)fn.this_ptr;
     assert(ptr);
     
-//    fn.result->set_int(ptr->getAllocated());
+//    return as_value(ptr->getAllocated());
     ptr->removeNode();
+    return as_value();
 }
-void xml_send(const fn_call& fn)
+as_value xml_send(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     XML *ptr = (XML*)fn.this_ptr;
     assert(ptr);
     
-//    fn.result->set_int(ptr->getAllocated());
+//    return as_value(ptr->getAllocated());
     ptr->send();
+    return as_value();
 }
-void xml_sendandload(const fn_call& fn)
+as_value xml_sendandload(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     XML *ptr = (XML*)fn.this_ptr;
     assert(ptr);
     
-//    fn.result->set_int(ptr->getAllocated());
+//    return as_value(ptr->getAllocated());
     ptr->sendAndLoad();
+    return as_value();
 }
-void xml_tostring(const fn_call& fn)
+as_value xml_tostring(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     XML *ptr = (XML*)fn.this_ptr;
@@ -1228,11 +1240,11 @@ void xml_tostring(const fn_call& fn)
 
     string str = ptr->toString();
 //     cerr << "AAAAHHHHH: " << str << endl;
-    fn.result->set_string(str.c_str());
+    return as_value(str.c_str());
 }
 
 // Both a getter and a setter for nodeName
-static void
+static as_value
 xml_nodename(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1242,17 +1254,18 @@ xml_nodename(const fn_call& fn)
     if ( fn.nargs == 0 ) {
 	const char* val = ptr->nodeName();
 	if ( val ) {
-	    fn.result->set_string(val);
+	    return as_value(val);
 	} else {
-	    fn.result->set_null();
+	    return as_value();
 	}
     } else {
 	ptr->nodeNameSet(fn.arg(0).to_string());
     }
+    return as_value();
 }
 
 // Both a getter and a setter for nodeValue
-static void
+static as_value
 xml_nodevalue(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1265,18 +1278,19 @@ xml_nodevalue(const fn_call& fn)
 	//log_msg("  nodeValue() returns '%s'", ptr->nodeValue());
 	const char* val = ptr->nodeValue();
 	if ( val ) {
-	    fn.result->set_string(val);
+	    return as_value(val);
 	} else {
-	    fn.result->set_null();
+	    return as_value();
 	}
     } else {
 	//log_msg(" arg(0) == '%s'", fn.arg(0).to_string());
 	ptr->nodeValueSet(fn.arg(0).to_string());
     }
+    return as_value();
 }
 
 // Both a getter and a (do-nothing) setter for firstChild
-static void
+static as_value
 xml_firstchild(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
@@ -1284,17 +1298,18 @@ xml_firstchild(const fn_call& fn)
     XML *ptr = static_cast<XML*>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) {
-	//fn.result->set_as_object(ptr->firstChild());
-	fn.result->set_as_object(ptr);
+	//return as_value(ptr->firstChild());
+	return as_value(ptr);
     } else {
 	IF_VERBOSE_ASCODING_ERRORS(
 	    log_aserror("Tried to set read-only property XML.firstChild");
 	    );
     }
+    return as_value();
 }
 
 // Both a getter and a (do-nothing) setter for childNodes
-static void
+static as_value
 xml_childnodes(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
@@ -1302,13 +1317,14 @@ xml_childnodes(const fn_call& fn)
     XML *ptr = static_cast<XML*>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) {
-	//fn.result->set_as_object(ptr->childNodes());
-	fn.result->set_as_object(ptr);
+	//return as_value(ptr->childNodes());
+	return as_value(ptr);
     } else {
 	IF_VERBOSE_ASCODING_ERRORS(
 	    log_aserror("Tried to set read-only property XML.childNodes");
 	    );
     }
+    return as_value();
 }
 
 int

@@ -29,11 +29,11 @@
 
 namespace gnash {
 
-void color_getrgb(const fn_call& fn);
-void color_gettransform(const fn_call& fn);
-void color_setrgb(const fn_call& fn);
-void color_settransform(const fn_call& fn);
-void color_ctor(const fn_call& fn);
+as_value color_getrgb(const fn_call& fn);
+as_value color_gettransform(const fn_call& fn);
+as_value color_setrgb(const fn_call& fn);
+as_value color_settransform(const fn_call& fn);
+as_value color_ctor(const fn_call& fn);
 
 static void
 attachColorInterface(as_object& o)
@@ -73,7 +73,7 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-void color_getrgb(const fn_call& /*fn*/)
+as_value color_getrgb(const fn_call& /*fn*/)
 {
 	static bool warned = false;
 	if ( ! warned )
@@ -81,9 +81,10 @@ void color_getrgb(const fn_call& /*fn*/)
 		log_warning("%s: unimplemented", __FUNCTION__);
 		warned = true;
 	}
+	return as_value();
 }
 
-void color_gettransform(const fn_call& /*fn*/)
+as_value color_gettransform(const fn_call& /*fn*/)
 {
 	static bool warned = false;
 	if ( ! warned )
@@ -91,9 +92,10 @@ void color_gettransform(const fn_call& /*fn*/)
 		log_warning("%s: unimplemented", __FUNCTION__);
 		warned = true;
 	}
+	return as_value();
 }
 
-void color_setrgb(const fn_call& /*fn*/)
+as_value color_setrgb(const fn_call& /*fn*/)
 {
 	static bool warned = false;
 	if ( ! warned )
@@ -101,9 +103,10 @@ void color_setrgb(const fn_call& /*fn*/)
 		log_warning("%s: unimplemented", __FUNCTION__);
 		warned = true;
 	}
+	return as_value();
 }
 
-void color_settransform(const fn_call& /*fn*/)
+as_value color_settransform(const fn_call& /*fn*/)
 {
 	static bool warned = false;
 	if ( ! warned )
@@ -111,14 +114,15 @@ void color_settransform(const fn_call& /*fn*/)
 		log_warning("%s: unimplemented", __FUNCTION__);
 		warned = true;
 	}
+	return as_value();
 }
 
-void
-color_ctor(const fn_call& fn)
+as_value
+color_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> obj = new color_as_object;
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

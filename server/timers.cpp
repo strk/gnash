@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.23 2007/03/19 14:41:27 strk Exp $ */
+/* $Id: timers.cpp,v 1.24 2007/03/19 17:11:14 bjacques Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -110,7 +110,7 @@ Timer::operator() ()
 }
 
 // TODO: move to Global.cpp
-void
+as_value
 timer_setinterval(const fn_call& fn)
 {
 	//log_msg("%s: args=%d", __FUNCTION__, fn.nargs);
@@ -124,7 +124,7 @@ timer_setinterval(const fn_call& fn)
 				"- need at least 2 arguments",
 				ss.str().c_str());
 		);
-		return;
+		return as_value();
 	}
 
 	unsigned timer_arg = 1;
@@ -138,7 +138,7 @@ timer_setinterval(const fn_call& fn)
 				"- first argument is not an object or function",
 				ss.str().c_str());
 		);
-		return;
+		return as_value();
 	}
 
 	// Get interval function
@@ -156,7 +156,7 @@ timer_setinterval(const fn_call& fn)
 					ss.str().c_str(), method_name.c_str(),
 					fn.arg(0).to_debug_string().c_str());
 			);
-			return;
+			return as_value();
 		}
 		as_func = method.to_as_function();
 		if ( ! as_func )
@@ -169,7 +169,7 @@ timer_setinterval(const fn_call& fn)
 					fn.arg(0).to_debug_string().c_str(),
 					method_name.c_str());
 			);
-			return;
+			return as_value();
 		}
 
 		timer_arg = 2;
@@ -184,7 +184,7 @@ timer_setinterval(const fn_call& fn)
 				"- missing timeout argument",
 				ss.str().c_str());
 		);
-		return;
+		return as_value();
 	}
 
 	// Get interval time
@@ -203,11 +203,11 @@ timer_setinterval(const fn_call& fn)
     
 	movie_root& root = VM::get().getRoot();
 	int id = root.add_interval_timer(timer);
-	fn.result->set_int(id);
+	return as_value(id);
 }
   
 // TODO: move to Global.cpp
-void
+as_value
 timer_clearinterval(const fn_call& fn)
 {
 	//log_msg("%s: nargs = %d", __FUNCTION__, fn.nargs);
@@ -216,7 +216,7 @@ timer_clearinterval(const fn_call& fn)
 
 	movie_root& root = VM::get().getRoot();
 	bool ret = root.clear_interval_timer(id);
-	fn.result->set_bool(ret);
+	return as_value(ret);
 }
 
 } // namespace gnash

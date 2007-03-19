@@ -104,11 +104,11 @@ private:
 	/// Get the ContextMenu.prototype ActionScript object
 	static as_object* getExportedInterface();
 
-	static void ctor_method(const fn_call& fn);
+	static as_value ctor_method(const fn_call& fn);
 
-	static void hideBuiltInItems_method(const fn_call& fn);
+	static as_value hideBuiltInItems_method(const fn_call& fn);
 
-	static void copy_method(const fn_call& fn);
+	static as_value copy_method(const fn_call& fn);
 };
 
 /* static private */
@@ -134,25 +134,27 @@ ContextMenu::getExportedInterface()
 
 
 /* static private */
-void
+as_value
 ContextMenu::copy_method(const fn_call& fn)
 {
 	ContextMenu* ptr = ensureContextMenu(fn.this_ptr);
 	UNUSED(ptr);
 	log_warning("%s: unimplemented", __FUNCTION__);
+	return as_value();
 }
 
 /* static private */
-void
+as_value
 ContextMenu::hideBuiltInItems_method(const fn_call& fn)
 {
 	ContextMenu* ptr = ensureContextMenu(fn.this_ptr);
 	UNUSED(ptr);
 	log_warning("%s: unimplemented", __FUNCTION__);
+	return as_value();
 }
 
 /* static private */
-void
+as_value
 ContextMenu::ctor_method(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj;
@@ -161,7 +163,7 @@ ContextMenu::ctor_method(const fn_call& fn)
 	else
 		obj = new ContextMenu();
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 /* static public */

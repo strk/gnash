@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.29 2007/03/09 14:38:29 tgc Exp $ */
+/* $Id: NetStream.cpp,v 1.30 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,13 +38,13 @@
 
 namespace gnash {
  
-static void netstream_new(const fn_call& fn);
-static void netstream_close(const fn_call& fn);
-static void netstream_pause(const fn_call& fn);
-static void netstream_play(const fn_call& fn);
-static void netstream_seek(const fn_call& fn);
-static void netstream_setbuffertime(const fn_call& fn);
-static void netstream_time(const fn_call& fn);
+static as_value netstream_new(const fn_call& fn);
+static as_value netstream_close(const fn_call& fn);
+static as_value netstream_pause(const fn_call& fn);
+static as_value netstream_play(const fn_call& fn);
+static as_value netstream_seek(const fn_call& fn);
+static as_value netstream_setbuffertime(const fn_call& fn);
+static as_value netstream_time(const fn_call& fn);
 static as_object* getNetStreamInterface();
 
 NetStream::NetStream()
@@ -54,7 +54,7 @@ NetStream::NetStream()
 {
 }
 
-static void
+static as_value
 netstream_new(const fn_call& fn)
 {
 
@@ -86,7 +86,7 @@ netstream_new(const fn_call& fn)
 			);
 		}
 	}
-	fn.result->set_as_object(netstream_obj);
+	return as_value(netstream_obj);
 
 }
 
@@ -104,13 +104,14 @@ ensure_netstream(as_object* obj)
 }
 
 
-static void netstream_close(const fn_call& fn)
+static as_value netstream_close(const fn_call& fn)
 {
 	NetStream* ns = ensure_netstream(fn.this_ptr);
 	ns->close();
+	return as_value();
 }
 
-static void netstream_pause(const fn_call& fn)
+static as_value netstream_pause(const fn_call& fn)
 {
 	NetStream* ns = ensure_netstream(fn.this_ptr);
 	
@@ -121,9 +122,10 @@ static void netstream_pause(const fn_call& fn)
 		mode = fn.arg(0).to_bool() ? 0 : 1;
 	}
 	ns->pause(mode);	// toggle mode
+	return as_value();
 }
 
-static void netstream_play(const fn_call& fn)
+static as_value netstream_play(const fn_call& fn)
 {
 	NetStream* ns = ensure_netstream(fn.this_ptr);
 
@@ -132,16 +134,17 @@ static void netstream_play(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("NetStream play needs args");
 		);
-		return;
+		return as_value();
 	}
 
 	if (ns->play(fn.arg(0).to_string()) != 0)
 	{
 		ns->close();
 	};
+	return as_value();
 }
 
-static void netstream_seek(const fn_call& fn) {
+static as_value netstream_seek(const fn_call& fn) {
 	NetStream* ns = ensure_netstream(fn.this_ptr);
 
 	double time = 0;
@@ -151,15 +154,17 @@ static void netstream_seek(const fn_call& fn) {
 	}
 	ns->seek(time);
 
+	return as_value();
 }
-static void netstream_setbuffertime(const fn_call& fn) {
+static as_value netstream_setbuffertime(const fn_call& fn) {
 	NetStream* ns = ensure_netstream(fn.this_ptr);
 	UNUSED(ns);
     log_msg("%s:unimplemented \n", __FUNCTION__);
+	return as_value();
 }
 
 // Both a getter and a (do-nothing) setter for time
-static void
+static as_value
 netstream_time(const fn_call& fn)
 {
 
@@ -167,7 +172,7 @@ netstream_time(const fn_call& fn)
 
 	if ( fn.nargs == 0 )
 	{
-		fn.result->set_double(ns->time());
+		return as_value(static_cast<double>(ns->time()));
 	}
 	else
 	{
@@ -175,10 +180,11 @@ netstream_time(const fn_call& fn)
 			log_aserror("Tried to set read-only property NetStream.time");
 		);
 	}
+	return as_value();
 }
 
 // Both a getter and a (do-nothing) setter for bytesLoaded
-static void
+static as_value
 netstream_bytesloaded(const fn_call& fn)
 {
 
@@ -186,7 +192,7 @@ netstream_bytesloaded(const fn_call& fn)
 
 	if ( fn.nargs == 0 )
 	{
-		fn.result->set_double(ns->bytesLoaded());
+		return as_value(int(ns->bytesLoaded()));
 	}
 	else
 	{
@@ -194,10 +200,11 @@ netstream_bytesloaded(const fn_call& fn)
 			log_aserror("Tried to set read-only property NetStream.bytesLoaded");
 		);
 	}
+	return as_value();
 }
 
 // Both a getter and a (do-nothing) setter for bytesTotal
-static void
+static as_value
 netstream_bytestotal(const fn_call& fn)
 {
 
@@ -205,7 +212,7 @@ netstream_bytestotal(const fn_call& fn)
 
 	if ( fn.nargs == 0 )
 	{
-		fn.result->set_double(ns->bytesTotal());
+		return as_value(int(ns->bytesTotal()));
 	}
 	else
 	{
@@ -213,6 +220,7 @@ netstream_bytestotal(const fn_call& fn)
 			log_aserror("Tried to set read-only property NetStream.bytesTotal");
 		);
 	}
+	return as_value();
 }
 
 void

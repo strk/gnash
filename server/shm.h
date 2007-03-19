@@ -177,10 +177,10 @@ public:
 };
 
 //#ifdef ENABLE_TESTING 
-void shm_getname(const fn_call& fn);
-void shm_getsize(const fn_call& fn);
-void shm_getallocated(const fn_call& fn);
-void shm_exists(const fn_call& fn);
+as_value shm_getname(const fn_call& fn);
+as_value shm_getsize(const fn_call& fn);
+as_value shm_getallocated(const fn_call& fn);
+as_value shm_exists(const fn_call& fn);
 //#endif
 
 } // end of gnash namespace

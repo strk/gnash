@@ -29,9 +29,9 @@
 
 namespace gnash {
 
-void video_attachvideo(const fn_call& fn);
-void video_clear(const fn_call& fn);
-void video_ctor(const fn_call& fn);
+as_value video_attachvideo(const fn_call& fn);
+as_value video_clear(const fn_call& fn);
+as_value video_ctor(const fn_call& fn);
 
 static void
 attachVideoInterface(as_object& o)
@@ -69,19 +69,21 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-void video_attachvideo(const fn_call& /*fn*/) {
+as_value video_attachvideo(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void video_clear(const fn_call& /*fn*/) {
+as_value video_clear(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
 
-void
-video_ctor(const fn_call& fn)
+as_value
+video_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> obj = new video_as_object;
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

@@ -365,7 +365,7 @@ XMLSocket::checkSockets(int fd)
     return ret;
 }
 
-void
+as_value
 xmlsocket_connect(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
@@ -374,8 +374,7 @@ xmlsocket_connect(const fn_call& fn)
     static bool first = true;     // This event handler should only be executed once.
     
     if (!first) {
-        fn.result->set_bool(true);
-        return;
+        return as_value(true);
     }
     
     log_msg("%s: nargs=%d\n", __FUNCTION__, fn.nargs);
@@ -416,11 +415,11 @@ xmlsocket_connect(const fn_call& fn)
     
     fn.env->pop();
     
-    fn.result->set_bool(true);
+    return as_value(true);
 }
 
 
-void
+as_value
 xmlsocket_send(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
@@ -431,10 +430,10 @@ xmlsocket_send(const fn_call& fn)
     assert(ptr);
     const std::string object = fn.env->bottom( fn.first_arg_bottom_index).to_string();
     //  log_msg("%s: host=%s, port=%g\n", __FUNCTION__, host, port);
-    fn.result->set_bool(ptr->obj.send(object));
+    return as_value(ptr->obj.send(object));
 }
 
-void
+as_value
 xmlsocket_close(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
@@ -446,19 +445,21 @@ xmlsocket_close(const fn_call& fn)
     // Since the return code from close() doesn't get used by Shockwave,
     // we don't care either.
     ptr->obj.close();
+    return as_value();
 }
 
-void
+as_value
 xmlsocket_xml_new(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     //log_msg("%s: nargs=%d\n", __FUNCTION__, nargs);
     
     xml_new(fn);
+    return as_value();
 }
 
-void
-xmlsocket_new(const fn_call& fn)
+as_value
+xmlsocket_new(const fn_call& /* fn */)
 {
     GNASH_REPORT_FUNCTION;
     //log_msg("%s: nargs=%d\n", __FUNCTION__, nargs);
@@ -509,7 +510,7 @@ xmlsocket_new(const fn_call& fn)
 #endif
 #endif
     
-    fn.result->set_bool(xmlsock_obj);
+    return as_value(xmlsock_obj);
     
     // Tune malloc for the best performance
     //mallopt(M_MMAP_MAX,0);
@@ -519,7 +520,7 @@ xmlsocket_new(const fn_call& fn)
 }
 
 
-void
+as_value
 xmlsocket_event_ondata(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
@@ -535,8 +536,7 @@ xmlsocket_event_ondata(const fn_call& fn)
     assert(ptr);
     if (ptr->obj.processingData()) {
         log_msg("Still processing data!\n");
-        fn.result->set_bool(false);
-        return;
+        return as_value(false);
     }
     
     memset(messages, 0, sizeof(char *)*200);
@@ -584,10 +584,10 @@ xmlsocket_event_ondata(const fn_call& fn)
   //malloc_trim(0);
   
   //result->set(&data);
-  fn.result->set_bool(true);
+  return as_value(true);
 }
 
-void
+as_value
 xmlsocket_event_close(const fn_call& /* fn */)
 {
 #if 0
@@ -598,9 +598,10 @@ xmlsocket_event_close(const fn_call& /* fn */)
 #else
   log_error("%s: unimplemented!\n", __FUNCTION__);
 #endif
+  return as_value();
 }
 
-void
+as_value
 xmlsocket_event_connect(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
@@ -609,8 +610,7 @@ xmlsocket_event_connect(const fn_call& fn)
     static bool first = true;     // This event handler should only be executed once.
     
     if (!first) {
-        fn.result->set_bool(true);
-        return;
+        return as_value(true);
     }
     
     xmlsocket_as_object*	ptr = (xmlsocket_as_object*) (as_object*) fn.this_ptr;
@@ -629,9 +629,9 @@ xmlsocket_event_connect(const fn_call& fn)
         }
     }
     
-    fn.result->set_bool(val.to_bool()); 
+    return as_value(val.to_bool()); 
 }
-void
+as_value
 xmlsocket_event_xml(const fn_call& /* fn */)
 {
     GNASH_REPORT_FUNCTION;
@@ -643,6 +643,7 @@ xmlsocket_event_xml(const fn_call& /* fn */)
 #else
     log_error("%s: unimplemented!\n", __FUNCTION__);
 #endif  
+    return as_value();
 }
 
 static XMLSocket xs;

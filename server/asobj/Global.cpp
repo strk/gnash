@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.51 2007/03/15 22:39:53 strk Exp $ */
+/* $Id: Global.cpp,v 1.52 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -79,7 +79,7 @@
 	IF_VERBOSE_ASCODING_ERRORS(					\
             log_aserror("%s needs one argument", __FUNCTION__);		\
             )								\
-         return;							\
+         return as_value();							\
     }									\
     IF_VERBOSE_ASCODING_ERRORS(						\
 	if (fn.nargs > 1)						\
@@ -92,7 +92,7 @@ namespace gnash {
 
 static Extension et;
 
-static void
+static as_value
 as_global_trace(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
@@ -105,23 +105,24 @@ as_global_trace(const fn_call& fn)
     //    as_value::to_string() will take care of everything
     const char* arg0 = fn.arg(0).to_string();
     log_trace("%s", arg0);
+    return as_value();
 }
 
 
-static void
+static as_value
 as_global_isnan(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    fn.result->set_bool( isnan(fn.arg(0).to_number(fn.env)) );
+    return as_value( static_cast<bool>(isnan(fn.arg(0).to_number(fn.env)) ));
 }
 
-static void
+static as_value
 as_global_isfinite(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    fn.result->set_bool( isfinite(fn.arg(0).to_number(fn.env)) );
+    return as_value( isfinite(fn.arg(0).to_number(fn.env)) );
 }
 
 /// \brief Encode a string to URL-encoded format
@@ -136,14 +137,14 @@ as_global_isfinite(const fn_call& fn)
 /// See RFC1738 http://www.rfc-editor.org/rfc/rfc1738.txt,
 /// Section 2.2 "URL Character Encoding Issues"
 
-static void
+static as_value
 as_global_escape(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
     string input = fn.arg(0).to_string();
     URL::encode(input);
-    fn.result->set_string(input.c_str());
+    return as_value(input.c_str());
 }
 
 /// \brief Decode a string from URL-encoded format
@@ -154,32 +155,35 @@ as_global_escape(const fn_call& fn)
 /// See RFC1738 http://www.rfc-editor.org/rfc/rfc1738.txt,
 /// Section 2.2 "URL Character Encoding Issues"
 
-static void
+static as_value
 as_global_unescape(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
     string input = fn.arg(0).to_string();
     URL::decode(input);
-    fn.result->set_string(input.c_str());
+    return as_value(input.c_str());
 }
 
-static void
+static as_value
 as_global_parsefloat(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
     float result;
+    as_value rv;
 
     // sscanf will handle the whitespace / unneeded characters etc. automatically
     if (1 == sscanf(fn.arg(0).to_string(), "%f", &result))
-	fn.result->set_double(double(result));
+	rv = double(result);
     else
 	// if sscanf didn't find anything, return NaN
-	fn.result->set_nan();
+	rv.set_nan();
+
+    return rv;
 }
 
-static void
+static as_value
 as_global_parseint(const fn_call& fn)
 {
     // assert(fn.nargs == 2 || fn.nargs == 1);
@@ -187,7 +191,7 @@ as_global_parseint(const fn_call& fn)
 	IF_VERBOSE_ASCODING_ERRORS(
             log_aserror("%s needs at least one argument", __FUNCTION__);
             )
-         return;
+         return as_value();
     }
     IF_VERBOSE_ASCODING_ERRORS(
 	if (fn.nargs > 2)
@@ -248,9 +252,10 @@ as_global_parseint(const fn_call& fn)
 
     if (base < 2 || base > 36)
 	{
-	    fn.result->set_nan();
 	    delete [] input_buffer;
-	    return;
+	    as_value rv;
+	    rv.set_nan();
+	    return rv;
 	}
 
     int numdigits = 0;
@@ -265,9 +270,10 @@ as_global_parseint(const fn_call& fn)
     // If we didn't get any digits, we should return NaN
     if (numdigits == 0)
 	{
-	    fn.result->set_nan();
 	    delete [] input_buffer;
-	    return;
+	    as_value rv;
+	    rv.set_nan();
+	    return rv;
 	}
 
     int result = 0;
@@ -282,11 +288,11 @@ as_global_parseint(const fn_call& fn)
     delete [] input_buffer;
     
     // Now return the parsed string
-    fn.result->set_int(result);
+    return as_value(result);
 }
 
 // ASSetPropFlags function
-static void
+static as_value
 as_global_assetpropflags(const fn_call& fn)
 {
     int version = fn.env->get_version();
@@ -301,7 +307,7 @@ as_global_assetpropflags(const fn_call& fn)
 	IF_VERBOSE_ASCODING_ERRORS(	
             log_aserror("%s needs at least three arguments", __FUNCTION__);
             )
-         return;
+         return as_value();
     }
     IF_VERBOSE_ASCODING_ERRORS(
 	if (fn.nargs > 4)
@@ -319,7 +325,7 @@ as_global_assetpropflags(const fn_call& fn)
 		log_warning("Invalid call to ASSetPropFlags: "
 			"object argument is not an object: %s",
 			fn.arg(0).to_string());
-		return;
+		return as_value();
     }
 
     // list of child names
@@ -344,6 +350,7 @@ as_global_assetpropflags(const fn_call& fn)
 
 	obj->setPropFlags(props, set_false, set_true);
 
+    return as_value();
 }
 
 Global::Global(VM& vm)

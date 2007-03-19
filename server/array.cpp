@@ -127,8 +127,8 @@ public:
 		env.push(b);
 
 		as_value ret(false); // bool value
-		fn_call fn(&ret, NULL, &env, 2, 0);
-		_comp(fn);
+		fn_call fn(NULL, &env, 2, 0);
+		ret = _comp(fn);
 		return ( ret.to_bool() );
 	}
 };
@@ -468,17 +468,17 @@ ensureArray(as_object* obj)
 	return ret;
 }
 
-static void
+static as_value
 array_splice(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
 	UNUSED(array);
 
 	log_error("FIXME: Array.splice() method not implemented yet!\n");
-	fn.result->set_undefined();
+	return as_value();
 }
 
-static void
+static as_value
 array_sort(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
@@ -496,28 +496,26 @@ array_sort(const fn_call& fn)
 	else
 	{
 		log_error("Array.sort(comparator) method not implemented!\n");
-		fn.result->set_undefined();
-		return;
+		return as_value();
 	}
 
 	array->sort(flags);
-	fn.result->set_undefined(); // returns void
-	return;
+	return as_value(); // returns void
 
 }
 
-static void
+static as_value
 array_sortOn(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
 	UNUSED(array);
 
 	log_error("FIXME: Array.sortOn() method not implemented yet!");
-	fn.result->set_undefined();
+	return as_value();
 }
 
 // Callback to push values to the back of an array
-static void
+static as_value
 array_push(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
@@ -526,14 +524,14 @@ array_push(const fn_call& fn)
 	log_action("calling array push, pushing %d values onto back of array",fn.nargs);
 		);
 
-	for (int i=0;i<fn.nargs;i++)
+	for (unsigned int i=0;i<fn.nargs;i++)
 		array->push(fn.arg(i));
 
-	fn.result->set_int(array->size());
+	return as_value(array->size());
 }
 
 // Callback to push values to the front of an array
-static void
+static as_value
 array_unshift(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
@@ -542,61 +540,63 @@ array_unshift(const fn_call& fn)
 	log_action("calling array unshift, pushing %d values onto front of array",fn.nargs);
 		);
 
-	for (int i=fn.nargs-1;i>=0;i--)
+	for (int i=fn.nargs-1; i>=0; i--)
 		array->unshift(fn.arg(i));
 
-	fn.result->set_int(array->size());
+	return as_value(array->size());
 }
 
 // Callback to pop a value from the back of an array
-static void
+static as_value
 array_pop(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
 
 	// Get our index, log, then return result
-	(*fn.result) = array->pop();
+	as_value rv = array->pop();
 
 	IF_VERBOSE_ACTION (
 	log_action("calling array pop, result:%s, new array size:%d",
-		fn.result->to_string(), array->size());
+		rv.to_string(), array->size());
 	);
+        return rv;
 }
 
 // Callback to pop a value from the front of an array
-static void
+static as_value
 array_shift(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
 
 	// Get our index, log, then return result
-	(*fn.result) = array->shift();
+	as_value rv = array->shift();
 
 	IF_VERBOSE_ACTION (
 	log_action("calling array shift, result:%s, new array size:%d",
-		fn.result->to_string(), array->size());
+		rv.to_string(), array->size());
 	);
+	return rv;
 }
 
 // Callback to reverse the position of the elements in an array
-static void
+static as_value
 array_reverse(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
 
 	array->reverse();
 
-	fn.result->set_as_object(array);
+	as_value rv = as_value(array);
 
 	IF_VERBOSE_ACTION (
 	log_action("called array reverse, result:%s, new array size:%d",
-		fn.result->to_string(), array->size());
+		rv.to_string(), array->size());
 	);
-	
+	return rv;
 }
 
 // Callback to convert array to a string with optional custom separator (default ',')
-static void
+static as_value
 array_join(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
@@ -608,20 +608,20 @@ array_join(const fn_call& fn)
 
 	std::string ret = array->join(separator);
 
-	fn.result->set_string(ret.c_str());
+	return as_value(ret.c_str());
 }
 
-static void
+static as_value
 array_size(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
 
-	fn.result->set_int(array->size());
+	return as_value(array->size());
 }
 
 // Callback to convert array to a string
 // TODO CHECKME: rely on Object.toString  ? (
-static void
+static as_value
 array_to_string(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
@@ -636,7 +636,7 @@ array_to_string(const fn_call& fn)
 	log_action("to_string result is: %s", ret.c_str());
 		);
 
-	fn.result->set_string(ret.c_str());
+	return as_value(ret.c_str());
 }
 
 /// concatenates the elements specified in the parameters with
@@ -644,7 +644,7 @@ array_to_string(const fn_call& fn)
 /// value parameters specify an array, the elements of that
 /// array are concatenated, rather than the array itself. The
 /// array my_array is left unchanged.
-static void
+static as_value
 array_concat(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
@@ -652,7 +652,7 @@ array_concat(const fn_call& fn)
 	// use copy ctor
 	as_array_object* newarray = new as_array_object(*array);
 
-	for (int i=0; i<fn.nargs; i++)
+	for (unsigned int i=0; i<fn.nargs; i++)
 	{
 		// Array args get concatenated by elements
 		if ( as_array_object* other = dynamic_cast<as_array_object*>(fn.arg(i).to_object()) )
@@ -666,12 +666,12 @@ array_concat(const fn_call& fn)
 		}
 	}
 
-	fn.result->set_as_object(newarray);		
+	return as_value(newarray);		
 }
 
 // Callback to slice part of an array to a new array
 // without changing the original
-static void
+static as_value
 array_slice(const fn_call& fn)
 {
 	as_array_object* array = ensureArray(fn.this_ptr);
@@ -693,8 +693,7 @@ array_slice(const fn_call& fn)
 	if (fn.nargs < 1)
 	{
 		as_array_object* newarray = new as_array_object(*array);
-		fn.result->set_as_object(newarray);
-		return;
+		return as_value(newarray);
 	}
 
 
@@ -729,11 +728,11 @@ array_slice(const fn_call& fn)
 	std::auto_ptr<as_array_object> newarray(array->slice(
 		startindex, endindex));
 
-	fn.result->set_as_object(newarray.release());		
+	return as_value(newarray.release());		
 
 }
 
-void
+as_value
 array_new(const fn_call& fn)
 {
 	IF_VERBOSE_ACTION (
@@ -764,7 +763,7 @@ array_new(const fn_call& fn)
 	{
 		// Use the arguments as initializers.
 		as_value	index_number;
-		for (int i = 0; i < fn.nargs; i++)
+		for (unsigned int i = 0; i < fn.nargs; i++)
 		{
 			ao->push(fn.arg(i));
 		}
@@ -774,8 +773,8 @@ array_new(const fn_call& fn)
 		log_action("array_new setting object %p in result", (void*)ao);
 	);
 
-	//fn.result->set_as_object(ao.get());
-	fn.result->set_as_object(ao);
+	//return as_value(ao.get());
+	return as_value(ao);
 }
 
 static void

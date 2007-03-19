@@ -29,15 +29,15 @@
 
 namespace gnash {
 
-void selection_addlistener(const fn_call& fn);
-void selection_getbeginindex(const fn_call& fn);
-void selection_getcaretindex(const fn_call& fn);
-void selection_getendindex(const fn_call& fn);
-void selection_getfocus(const fn_call& fn);
-void selection_removelistener(const fn_call& fn);
-void selection_setfocus(const fn_call& fn);
-void selection_setselection(const fn_call& fn);
-void selection_ctor(const fn_call& fn);
+as_value selection_addlistener(const fn_call& fn);
+as_value selection_getbeginindex(const fn_call& fn);
+as_value selection_getcaretindex(const fn_call& fn);
+as_value selection_getendindex(const fn_call& fn);
+as_value selection_getfocus(const fn_call& fn);
+as_value selection_removelistener(const fn_call& fn);
+as_value selection_setfocus(const fn_call& fn);
+as_value selection_setselection(const fn_call& fn);
+as_value selection_ctor(const fn_call& fn);
 
 static void
 attachSelectionInterface(as_object& o)
@@ -81,37 +81,45 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-void selection_addlistener(const fn_call& /*fn*/) {
+as_value selection_addlistener(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void selection_getbeginindex(const fn_call& /*fn*/) {
+as_value selection_getbeginindex(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void selection_getcaretindex(const fn_call& /*fn*/) {
+as_value selection_getcaretindex(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void selection_getendindex(const fn_call& /*fn*/) {
+as_value selection_getendindex(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void selection_getfocus(const fn_call& /*fn*/) {
+as_value selection_getfocus(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void selection_removelistener(const fn_call& /*fn*/) {
+as_value selection_removelistener(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void selection_setfocus(const fn_call& /*fn*/) {
+as_value selection_setfocus(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void selection_setselection(const fn_call& /*fn*/) {
+as_value selection_setselection(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
 
-void
-selection_ctor(const fn_call& fn)
+as_value
+selection_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> obj = new selection_as_object;
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

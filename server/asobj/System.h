@@ -82,12 +82,12 @@ public:
 	system_as_object();
 };
 
-void system_new(const fn_call& fn);
-void system_security_allowdomain(const fn_call& fn);
-void system_security_allowinsecuredomain(const fn_call& fn);
-void system_security_loadpolicyfile(const fn_call& fn);
-void system_setclipboard(const fn_call& fn);
-void system_showsettings(const fn_call& fn);
+as_value system_new(const fn_call& fn);
+as_value system_security_allowdomain(const fn_call& fn);
+as_value system_security_allowinsecuredomain(const fn_call& fn);
+as_value system_security_loadpolicyfile(const fn_call& fn);
+as_value system_setclipboard(const fn_call& fn);
+as_value system_showsettings(const fn_call& fn);
 
 void system_class_init(as_object& global);
 

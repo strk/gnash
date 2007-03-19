@@ -29,8 +29,8 @@
 
 namespace gnash {
 
-void error_tostring(const fn_call& fn);
-void error_ctor(const fn_call& fn);
+as_value error_tostring(const fn_call& fn);
+as_value error_ctor(const fn_call& fn);
 
 static void
 attachErrorInterface(as_object& o)
@@ -69,16 +69,17 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-void error_tostring(const fn_call& /*fn*/) {
+as_value error_tostring(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
 
-void
-error_ctor(const fn_call& fn)
+as_value
+error_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> obj = new error_as_object;
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

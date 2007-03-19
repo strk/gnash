@@ -532,7 +532,7 @@ as_object::getOwnProperty(const std::string& name)
 	}
 }
 
-void
+as_value
 as_object::tostring_method(const fn_call& fn)
 {
 	assert(dynamic_cast<as_object*>(fn.this_ptr));
@@ -541,21 +541,21 @@ as_object::tostring_method(const fn_call& fn)
 	const char* text_val = obj->get_text_value();
 	if ( text_val )
 	{
-		fn.result->set_string(text_val);
+		return as_value(text_val);
 	}
 	else
 	{
-		fn.result->set_string("[object Object]");
+		return as_value("[object Object]");
 	}
 }
 
-void
+as_value
 as_object::valueof_method(const fn_call& fn)
 {
 	assert(dynamic_cast<as_object*>(fn.this_ptr));
 	as_object* obj = static_cast<as_object*>(fn.this_ptr);
 
-	*(fn.result) = obj->get_primitive_value();
+	return obj->get_primitive_value();
 }
 
 as_object*

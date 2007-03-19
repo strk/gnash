@@ -29,15 +29,15 @@
 
 namespace gnash {
 
-void textsnapshot_findtext(const fn_call& fn);
-void textsnapshot_getcount(const fn_call& fn);
-void textsnapshot_getselected(const fn_call& fn);
-void textsnapshot_getselectedtext(const fn_call& fn);
-void textsnapshot_gettext(const fn_call& fn);
-void textsnapshot_hittesttextnearpos(const fn_call& fn);
-void textsnapshot_setselectcolor(const fn_call& fn);
-void textsnapshot_setselected(const fn_call& fn);
-void textsnapshot_ctor(const fn_call& fn);
+as_value textsnapshot_findtext(const fn_call& fn);
+as_value textsnapshot_getcount(const fn_call& fn);
+as_value textsnapshot_getselected(const fn_call& fn);
+as_value textsnapshot_getselectedtext(const fn_call& fn);
+as_value textsnapshot_gettext(const fn_call& fn);
+as_value textsnapshot_hittesttextnearpos(const fn_call& fn);
+as_value textsnapshot_setselectcolor(const fn_call& fn);
+as_value textsnapshot_setselected(const fn_call& fn);
+as_value textsnapshot_ctor(const fn_call& fn);
 
 static void
 attachTextSnapshotInterface(as_object& o)
@@ -84,37 +84,45 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-void textsnapshot_findtext(const fn_call& /*fn*/) {
+as_value textsnapshot_findtext(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void textsnapshot_getcount(const fn_call& /*fn*/) {
+as_value textsnapshot_getcount(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void textsnapshot_getselected(const fn_call& /*fn*/) {
+as_value textsnapshot_getselected(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void textsnapshot_getselectedtext(const fn_call& /*fn*/) {
+as_value textsnapshot_getselectedtext(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void textsnapshot_gettext(const fn_call& /*fn*/) {
+as_value textsnapshot_gettext(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void textsnapshot_hittesttextnearpos(const fn_call& /*fn*/) {
+as_value textsnapshot_hittesttextnearpos(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void textsnapshot_setselectcolor(const fn_call& /*fn*/) {
+as_value textsnapshot_setselectcolor(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void textsnapshot_setselected(const fn_call& /*fn*/) {
+as_value textsnapshot_setselected(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
 
-void
-textsnapshot_ctor(const fn_call& fn)
+as_value
+textsnapshot_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> obj = new textsnapshot_as_object;
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

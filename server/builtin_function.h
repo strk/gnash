@@ -27,7 +27,7 @@
 
 namespace gnash {
 
-typedef void (*as_c_function_ptr)(const fn_call& fn);
+typedef as_value (*as_c_function_ptr)(const fn_call& fn);
 
 
 /// Any built-in function/class should be of this type
@@ -57,10 +57,10 @@ public:
 	}
 
 	/// Invoke this function or this Class constructor
-	virtual void operator()(const fn_call& fn)
+	virtual as_value operator()(const fn_call& fn)
 	{
 		assert(_func);
-		_func(fn);
+		return _func(fn);
 	}
 
 	bool isBuiltin()  { return true; }

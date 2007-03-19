@@ -44,10 +44,10 @@ gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 namespace gnash {
 
 // should be static, probably
-void function_apply(const fn_call& fn);
-void function_call(const fn_call& fn);
+as_value function_apply(const fn_call& fn);
+as_value function_call(const fn_call& fn);
 static as_object* getFunctionPrototype();
-static void function_ctor(const fn_call& fn);
+static as_value function_ctor(const fn_call& fn);
 
 /* 
  * This function returns the singleton
@@ -90,15 +90,12 @@ static as_object* getFunctionPrototype()
 
 }
 
-static void
-function_ctor(const fn_call& fn)
+static as_value
+function_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> func = new as_object(getFunctionPrototype());
 	//log_msg("User tried to invoke new Function()");
-	if ( fn.result )
-	{
-		fn.result->set_as_object(func.get());
-	}
+	return as_value(func.get());
 }
 
 
@@ -185,7 +182,7 @@ ensureFunction(as_object* obj)
 	return ret;
 }
 
-void
+as_value
 function_apply(const fn_call& fn)
 {
 	int pushed=0; // new values we push on the stack
@@ -276,14 +273,15 @@ function_apply(const fn_call& fn)
 	call_it:
 
 	// Call the function 
-	(*function_obj)(new_fn_call);
+	as_value rv = (*function_obj)(new_fn_call);
 
 	// Drop additional values we pushed on the stack 
 	fn.env->drop(pushed);
 
+        return rv;
 }
 
-void
+as_value
 function_call(const fn_call& fn)
 {
 
@@ -309,7 +307,7 @@ function_call(const fn_call& fn)
 	}
 
 	// Call the function 
-	(*function_obj)(new_fn_call);
+	return (*function_obj)(new_fn_call);
 
 	//log_msg("at function_call exit, stack: \n"); fn.env->dump_stack();
 

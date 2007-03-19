@@ -41,19 +41,19 @@
 
 namespace gnash {
 
-static void sound_new(const fn_call& fn);
-static void sound_attachsound(const fn_call& fn);
-static void sound_getbytesloaded(const fn_call& fn);
-static void sound_getbytestotal(const fn_call& fn);
-static void sound_getpan(const fn_call& fn);
-static void sound_gettransform(const fn_call& fn);
-static void sound_getvolume(const fn_call& fn);
-static void sound_loadsound(const fn_call& fn);
-static void sound_setpan(const fn_call& fn);
-static void sound_settransform(const fn_call& fn);
-static void sound_setvolume(const fn_call& fn);
-static void sound_start(const fn_call& fn);
-static void sound_stop(const fn_call& fn);
+static as_value sound_new(const fn_call& fn);
+static as_value sound_attachsound(const fn_call& fn);
+static as_value sound_getbytesloaded(const fn_call& fn);
+static as_value sound_getbytestotal(const fn_call& fn);
+static as_value sound_getpan(const fn_call& fn);
+static as_value sound_gettransform(const fn_call& fn);
+static as_value sound_getvolume(const fn_call& fn);
+static as_value sound_loadsound(const fn_call& fn);
+static as_value sound_setpan(const fn_call& fn);
+static as_value sound_settransform(const fn_call& fn);
+static as_value sound_setvolume(const fn_call& fn);
+static as_value sound_start(const fn_call& fn);
+static as_value sound_stop(const fn_call& fn);
 static as_object* getSoundInterface();
 
 Sound::Sound() 	:
@@ -232,8 +232,8 @@ Sound::getPosition()
 }
 
 
-void
-sound_new(const fn_call& fn)
+as_value
+sound_new(const fn_call& /* fn */)
 {
 	Sound* sound_obj;
        
@@ -246,7 +246,7 @@ sound_new(const fn_call& fn)
 #else
 	sound_obj = new Sound();
 #endif
-	fn.result->set_as_object(sound_obj);
+	return as_value(sound_obj);
 }
 
 // Wrapper around dynamic_cast to implement user warning.
@@ -262,7 +262,7 @@ ensure_sound(as_object* obj)
 	return ret;
 }
 
-void
+as_value
 sound_start(const fn_call& fn)
 {
 	log_action("-- start sound");
@@ -282,10 +282,10 @@ sound_start(const fn_call& fn)
 		}
 	}
 	so->start(secondOffset, loop);
-
+	return as_value();
 }
 
-void
+as_value
 sound_stop(const fn_call& fn)
 {
 	log_action("-- stop sound ");
@@ -305,7 +305,7 @@ sound_stop(const fn_call& fn)
 			IF_VERBOSE_MALFORMED_SWF(
 		    log_swferror("import error: resource '%s' is not exported", name);
 		    	);
-		    return;
+		    return as_value();
 		}
 
 		// FIXME: shouldn't we use dynamic_cast here (or rely on sound_sample interface) ?
@@ -318,15 +318,15 @@ sound_stop(const fn_call& fn)
 		else
 		{
 		    log_error("sound sample is NULL (doesn't cast to sound_sample)");
-		    return;
+		    return as_value();
 		}
 
 	}
 	so->stop(si);
-
+	return as_value();
 }
 
-void
+as_value
 sound_attachsound(const fn_call& fn)
 {
     log_action("-- attach sound");
@@ -335,7 +335,7 @@ sound_attachsound(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 	    log_aserror("attach sound needs one argument");
 	    	);
-	    return;
+	    return as_value();
 	}
 
 	Sound* so = ensure_sound(fn.this_ptr);
@@ -345,7 +345,7 @@ sound_attachsound(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("attachSound need a non-null argument");
 		);
-		return;
+		return as_value();
 	}
 
 	// check the import.
@@ -357,7 +357,7 @@ sound_attachsound(const fn_call& fn)
 		IF_VERBOSE_MALFORMED_SWF(
 		log_swferror("import error: resource '%s' is not exported", name);
 			);
-		return;
+		return as_value();
 	}
 
 	int si = 0;
@@ -370,15 +370,16 @@ sound_attachsound(const fn_call& fn)
 	else
 	{
 		log_error("sound sample is NULL (doesn't cast to sound_sample)");
-		return;
+		return as_value();
 	}
 
 	// sanity check
 	assert(si >= 0 && si < 1000);
 	so->attachSound(si, name);
+	return as_value();
 }
 
-void
+as_value
 sound_getbytesloaded(const fn_call& /*fn*/)
 {
 	static bool warned = false;
@@ -387,9 +388,10 @@ sound_getbytesloaded(const fn_call& /*fn*/)
 		log_warning("%s: unimplemented", __FUNCTION__);
 		warned = true;
 	}
+	return as_value();
 }
 
-void
+as_value
 sound_getbytestotal(const fn_call& /*fn*/)
 {
 	static bool warned = false;
@@ -398,9 +400,10 @@ sound_getbytestotal(const fn_call& /*fn*/)
 		log_warning("%s: unimplemented", __FUNCTION__);
 		warned = true;
 	}
+	return as_value();
 }
 
-void
+as_value
 sound_getpan(const fn_call& /*fn*/)
 {
 	static bool warned = false;
@@ -409,9 +412,10 @@ sound_getpan(const fn_call& /*fn*/)
 		log_warning("%s: unimplemented", __FUNCTION__);
 		warned = true;
 	}
+	return as_value();
 }
 
-void
+as_value
 sound_gettransform(const fn_call& /*fn*/)
 {
 	static bool warned = false;
@@ -420,9 +424,10 @@ sound_gettransform(const fn_call& /*fn*/)
 		log_warning("%s: unimplemented", __FUNCTION__);
 		warned = true;
 	}
+	return as_value();
 }
 
-void
+as_value
 sound_getvolume(const fn_call& fn)
 {
 
@@ -430,27 +435,27 @@ sound_getvolume(const fn_call& fn)
 
 	int volume = so->getVolume();
 
-	fn.result->set_int(volume);
+	return as_value(volume);
 
-	return;
 }
 
-void
+as_value
 sound_loadsound(const fn_call& fn)
 {
 	if (fn.nargs != 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
 	    log_aserror("loadSound needs 2 arguments!");
 	    	);
-	    return;		
+	    return as_value();		
 	}
 
 	Sound* so = ensure_sound(fn.this_ptr);
 	so->loadSound(fn.arg(0).to_std_string(), fn.arg(1).to_bool());
 
+	return as_value();
 }
 
-void
+as_value
 sound_setpan(const fn_call& /*fn*/)
 {
 	static bool warned = false;
@@ -459,9 +464,10 @@ sound_setpan(const fn_call& /*fn*/)
 		log_warning("%s: unimplemented", __FUNCTION__);
 		warned = true;
 	}
+	return as_value();
 }
 
-void
+as_value
 sound_settransform(const fn_call& /*fn*/)
 {
 	static bool warned = false;
@@ -470,9 +476,10 @@ sound_settransform(const fn_call& /*fn*/)
 		log_warning("%s: unimplemented", __FUNCTION__);
 		warned = true;
 	}
+	return as_value();
 }
 
-void
+as_value
 sound_setvolume(const fn_call& fn)
 {
 	if (fn.nargs < 1)
@@ -480,29 +487,31 @@ sound_setvolume(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("set volume of sound needs one argument");
 		);
-		return;
+		return as_value();
 	}
 
 	Sound* so = ensure_sound(fn.this_ptr);	
 	int volume = (int) fn.arg(0).to_number();
 
 	so->setVolume(volume);
+	return as_value();
 }
 
-void
+as_value
 sound_duration(const fn_call& fn)
 {
 	Sound* so = ensure_sound(fn.this_ptr);
 	if ( fn.nargs == 0 ) {
-		fn.result->set_int(so->getDuration());
+		return as_value(so->getDuration());
     } else {
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror("Tried to set read-only property Sound.duration");
 		);
     }
+	return as_value();
 }
 
-void
+as_value
 sound_ID3(const fn_call& /*fn*/)
 {
 	static bool warned = false;
@@ -511,19 +520,21 @@ sound_ID3(const fn_call& /*fn*/)
 		log_warning("%s: unimplemented", __FUNCTION__);
 		warned = true;
 	}
+	return as_value();
 }
 
-void
+as_value
 sound_position(const fn_call& fn)
 {
 	Sound* so = ensure_sound(fn.this_ptr);
 	if ( fn.nargs == 0 ) {
-		fn.result->set_int(so->getPosition());
+		return as_value(so->getPosition());
     } else {
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror("Tried to set read-only property Sound.position");
 		);
     }
+	return as_value();
 }
 
 void

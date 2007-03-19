@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.28 2007/03/09 14:38:29 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.29 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,8 +41,8 @@ gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 
 namespace gnash {
 
-static void netconnection_new(const fn_call& fn);
-static void netconnection_connect(const fn_call& fn);
+static as_value netconnection_new(const fn_call& fn);
+static as_value netconnection_connect(const fn_call& fn);
 static as_object* getNetConnectionInterface();
 
 /// \class NetConnection
@@ -174,17 +174,17 @@ ensure_netconnection(as_object* obj)
 /// \param fn the parameters from the Flash movie
 /// \return nothing from the function call.
 /// \note The return value is returned through the fn.result member.
-static void
-netconnection_new(const fn_call& fn)
+static as_value
+netconnection_new(const fn_call& /* fn */)
 {
 	GNASH_REPORT_FUNCTION;
 
 	NetConnection *netconnection_obj = new NetConnection;
 
-	fn.result->set_as_object(netconnection_obj);
+	return as_value(netconnection_obj);
 }
 
-static void
+static as_value
 netconnection_connect(const fn_call& fn)
 {
 	GNASH_REPORT_FUNCTION;
@@ -194,6 +194,7 @@ netconnection_connect(const fn_call& fn)
 	if (fn.nargs > 0) {
 		ptr->addToURL(fn.arg(0).to_string());
 	}
+	return as_value();
 }
 
 void

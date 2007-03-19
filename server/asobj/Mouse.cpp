@@ -29,11 +29,11 @@
 
 namespace gnash {
 
-void mouse_addlistener(const fn_call& fn);
-void mouse_hide(const fn_call& fn);
-void mouse_removelistener(const fn_call& fn);
-void mouse_show(const fn_call& fn);
-void mouse_ctor(const fn_call& fn);
+as_value mouse_addlistener(const fn_call& fn);
+as_value mouse_hide(const fn_call& fn);
+as_value mouse_removelistener(const fn_call& fn);
+as_value mouse_show(const fn_call& fn);
+as_value mouse_ctor(const fn_call& fn);
 
 static void
 attachMouseInterface(as_object& o)
@@ -73,25 +73,29 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-void mouse_addlistener(const fn_call& /*fn*/) {
+as_value mouse_addlistener(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void mouse_hide(const fn_call& /*fn*/) {
+as_value mouse_hide(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void mouse_removelistener(const fn_call& /*fn*/) {
+as_value mouse_removelistener(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void mouse_show(const fn_call& /*fn*/) {
+as_value mouse_show(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
 
-void
-mouse_ctor(const fn_call& fn)
+as_value
+mouse_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> obj = new mouse_as_object;
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

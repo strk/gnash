@@ -29,11 +29,11 @@
 
 namespace gnash {
 
-void sharedobject_clear(const fn_call& fn);
-void sharedobject_flush(const fn_call& fn);
-void sharedobject_getlocal(const fn_call& fn);
-void sharedobject_getsize(const fn_call& fn);
-void sharedobject_ctor(const fn_call& fn);
+as_value sharedobject_clear(const fn_call& fn);
+as_value sharedobject_flush(const fn_call& fn);
+as_value sharedobject_getlocal(const fn_call& fn);
+as_value sharedobject_getsize(const fn_call& fn);
+as_value sharedobject_ctor(const fn_call& fn);
 
 static void
 attachSharedObjectInterface(as_object& o)
@@ -74,25 +74,29 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-void sharedobject_clear(const fn_call& /*fn*/) {
+as_value sharedobject_clear(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void sharedobject_flush(const fn_call& /*fn*/) {
+as_value sharedobject_flush(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void sharedobject_getlocal(const fn_call& /*fn*/) {
+as_value sharedobject_getlocal(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void sharedobject_getsize(const fn_call& /*fn*/) {
+as_value sharedobject_getsize(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
 
-void
-sharedobject_ctor(const fn_call& fn)
+as_value
+sharedobject_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> obj = new sharedobject_as_object;
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

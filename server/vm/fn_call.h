@@ -43,17 +43,15 @@ class as_value;
 class fn_call
 {
 public:
-	as_value* result;
 	as_object* this_ptr;
 	as_environment* env;
-	int nargs;
+	unsigned int nargs;
 	int first_arg_bottom_index;
 
-	fn_call(as_value* res_in, as_object* this_in,
+	fn_call(as_object* this_in,
 			as_environment* env_in,
 			int nargs_in, int first_in)
 		:
-		result(res_in),
 		this_ptr(this_in),
 		env(env_in),
 		nargs(nargs_in),
@@ -62,7 +60,7 @@ public:
 	}
 
 	/// Access a particular argument.
-	as_value& arg(int n) const
+	as_value& arg(unsigned int n) const
 	{
 		assert(n < nargs);
 		return env->bottom(first_arg_bottom_index - n);
@@ -71,7 +69,7 @@ public:
 	/// Dump arguments to given output stream
 	void dump_args(std::ostream& os) const
 	{
-		for (int i=0; i<nargs; ++i)
+		for (unsigned int i=0; i<nargs; ++i)
 		{
 			if ( i ) os << ", ";
 			os << arg(i).to_string();
@@ -81,7 +79,7 @@ public:
 };
 
 /// Signature of a builtin function callable from ActionScript
-typedef void (*as_c_function_ptr)(const fn_call& fn);
+typedef as_value (*as_c_function_ptr)(const fn_call& fn);
 
 
 } // namespace gnash

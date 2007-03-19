@@ -1,4 +1,14 @@
+2007-03-19 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/vm/fn_call.h: Remove fn_call::result. Instead, all methods and
+	functions called by ActionScript must return as_value. Thanks to Ann 
+	for the suggestion and for help with regular expressions.
+	* all over the place: Switch all ActionScript-called methods over to
+	return as_value. Adjust all related methods. Also make fn_call::nargs
+	unsigned.
+
 2007-03-19 Ann Barcomb <ann@lulu.com>
+
 	* doc/C/actionscript.xml, doc/C/actionscript/*, doc/C/Makefile.am:
 	  Split main.xml into multiple files.
 
@@ -18,8 +28,8 @@
 
 2007-03-19 Bastiaan Jacques <bastiaan@bjacques.org>
 
-	* testsuite/misc-ming.all/ming_utils.h: Add Ming defines available only in
-	CVS; some of the new testcases depend on these.
+	* testsuite/misc-ming.all/ming_utils.h: Add Ming defines available onl
+	in CVS; some of the new testcases depend on these.
 
 2007-03-19 Sandro Santilli <strk@keybit.net>
 

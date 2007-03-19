@@ -139,9 +139,9 @@ private:
 
 };
   
-  void timer_setinterval(const fn_call& fn);
-  void timer_clearinterval(const fn_call& fn);
-  void timer_expire(const fn_call& fn);
+  as_value timer_setinterval(const fn_call& fn);
+  as_value timer_clearinterval(const fn_call& fn);
+  as_value timer_expire(const fn_call& fn);
   
 } // end of namespace gnash
 

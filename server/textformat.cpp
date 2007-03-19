@@ -114,7 +114,7 @@ text_format::getTextFormat (int start, int end)
 }
 #endif
 
-void textformat_new(const fn_call& fn)
+as_value textformat_new(const fn_call& fn)
 {
   //log_msg("%s: args=%d\n", __FUNCTION__, nargs);
 
@@ -129,11 +129,11 @@ void textformat_new(const fn_call& fn)
   // instead of doing this.
   fn.env->set_variable("setTextFormat", new builtin_function(textformat_setformat));
   
-  fn.result->set_as_object(text_obj);
+  return as_value(text_obj);
 }
 
 
-void textformat_setformat(const fn_call& fn)
+as_value textformat_setformat(const fn_call& fn)
 {
   as_value	method;
   //log_msg("%s: args=%d at %p\n", __FUNCTION__, nargs, this_ptr);
@@ -213,6 +213,7 @@ void textformat_setformat(const fn_call& fn)
   
   //ptr->obj.setTextFormat(start, end, obj->obj);
   //result->set_bool(true);
+  return as_value();
 }
 #if 0
   void

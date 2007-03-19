@@ -195,9 +195,9 @@ public:
 	text_format obj;
 };
 
-DSOEXPORT void textformat_new(const fn_call& fn);
-DSOEXPORT void textformat_setformat(const fn_call& fn);
-DSOEXPORT void textformat_getformat(const fn_call& fn);
+DSOEXPORT as_value textformat_new(const fn_call& fn);
+DSOEXPORT as_value textformat_setformat(const fn_call& fn);
+DSOEXPORT as_value textformat_getformat(const fn_call& fn);
 
 } // end of gnash namespace
 

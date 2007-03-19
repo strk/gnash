@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.24 2007/03/15 22:39:53 strk Exp $ */
+/* $Id: character.cpp,v 1.25 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -246,151 +246,170 @@ ensure_character(as_object* obj)
 	return ret;
 }
 
-void
+as_value
 character::onrollover_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		ptr->get_event_handler(event_id::ROLL_OVER, fn.result);
+		rv = ptr->get_event_handler(event_id::ROLL_OVER);
 	}
 	else // setter
 	{
 		ptr->set_event_handler(event_id::ROLL_OVER, fn.arg(0));
 	}
+	return rv;
 
 }
 
-void
+as_value
 character::onrollout_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		ptr->get_event_handler(event_id::ROLL_OUT, fn.result);
+		rv = ptr->get_event_handler(event_id::ROLL_OUT);
 	}
 	else // setter
 	{
 		ptr->set_event_handler(event_id::ROLL_OUT, fn.arg(0));
 	}
+	return rv;
 }
 
-void
+as_value
 character::onpress_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		ptr->get_event_handler(event_id::PRESS, fn.result);
+		rv = ptr->get_event_handler(event_id::PRESS);
 	}
 	else // setter
 	{
 		ptr->set_event_handler(event_id::PRESS, fn.arg(0));
 	}
+	return rv;
 }
 
-void
+as_value
 character::onrelease_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		ptr->get_event_handler(event_id::RELEASE, fn.result);
+		rv = ptr->get_event_handler(event_id::RELEASE);
 	}
 	else // setter
 	{
 		ptr->set_event_handler(event_id::RELEASE, fn.arg(0));
 	}
+	return rv;
 }
 
-void
+as_value
 character::onreleaseoutside_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		ptr->get_event_handler(event_id::RELEASE_OUTSIDE, fn.result);
+		rv = ptr->get_event_handler(event_id::RELEASE_OUTSIDE);
 	}
 	else // setter
 	{
 		ptr->set_event_handler(event_id::RELEASE_OUTSIDE, fn.arg(0));
 	}
+	return rv;
 }
 
-void
+as_value
 character::onmouseup_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		ptr->get_event_handler(event_id::MOUSE_UP, fn.result);
+		rv = ptr->get_event_handler(event_id::MOUSE_UP);
 	}
 	else // setter
 	{
 		ptr->set_event_handler(event_id::MOUSE_UP, fn.arg(0));
 	}
+	return rv;
 }
 
-void
+as_value
 character::onmousedown_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		ptr->get_event_handler(event_id::MOUSE_DOWN, fn.result);
+		rv = ptr->get_event_handler(event_id::MOUSE_DOWN);
 	}
 	else // setter
 	{
 		ptr->set_event_handler(event_id::MOUSE_DOWN, fn.arg(0));
 	}
+	return rv;
 }
 
-void
+as_value
 character::onmousemove_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		ptr->get_event_handler(event_id::MOUSE_MOVE, fn.result);
+		rv = ptr->get_event_handler(event_id::MOUSE_MOVE);
 	}
 	else // setter
 	{
 		ptr->set_event_handler(event_id::MOUSE_MOVE, fn.arg(0));
 	}
+	return rv;
 }
 
-void
+as_value
 character::onload_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		ptr->get_event_handler(event_id::LOAD, fn.result);
+		rv = ptr->get_event_handler(event_id::LOAD);
 	}
 	else // setter
 	{
 		ptr->set_event_handler(event_id::LOAD, fn.arg(0));
 	}
+	return rv;
 }
 
-void
+as_value
 character::x_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
 		matrix m = ptr->get_matrix();
-		fn.result->set_double(TWIPS_TO_PIXELS(m.m_[0][2]));
+		rv = as_value(TWIPS_TO_PIXELS(m.m_[0][2]));
 	}
 	else // setter
 	{
@@ -399,18 +418,20 @@ character::x_getset(const fn_call& fn)
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
+	return rv;;
 
 }
 
-void
+as_value
 character::y_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
 		matrix m = ptr->get_matrix();
-		fn.result->set_double(TWIPS_TO_PIXELS(m.m_[1][2]));
+		rv = as_value(TWIPS_TO_PIXELS(m.m_[1][2]));
 	}
 	else // setter
 	{
@@ -419,19 +440,21 @@ character::y_getset(const fn_call& fn)
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
+	return rv;
 
 }
 
-void
+as_value
 character::xscale_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
 		matrix m = ptr->get_matrix();
 		float xscale = m.get_x_scale();
-		fn.result->set_double(xscale * 100); // result in percent
+		rv = as_value(xscale * 100); // result in percent
 	}
 	else // setter
 	{
@@ -446,7 +469,7 @@ character::xscale_getset(const fn_call& fn)
 			log_aserror("Attempt to set _xscale to %g, refused",
                             scale_percent);
 			);
-                        return;
+                        return as_value();
 		}
 		else if (scale_percent < 0 )
 		{
@@ -469,19 +492,21 @@ character::xscale_getset(const fn_call& fn)
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
+	return rv;
 
 }
 
-void
+as_value
 character::yscale_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
 		matrix m = ptr->get_matrix();
 		float yscale = m.get_y_scale();
-		fn.result->set_double(yscale * 100); // result in percent
+		rv = as_value(yscale * 100); // result in percent
 	}
 	else // setter
 	{
@@ -496,7 +521,7 @@ character::yscale_getset(const fn_call& fn)
 			log_aserror("Attempt to set _yscale to %g, refused",
                             scale_percent);
 			);
-                        return;
+                        return as_value();
 		}
 		else if (scale_percent < 0 )
 		{
@@ -519,14 +544,16 @@ character::yscale_getset(const fn_call& fn)
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
+	return rv;
 
 }
 
-void
+as_value
 character::xmouse_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
 		// Local coord of mouse IN PIXELS.
@@ -540,7 +567,7 @@ character::xmouse_getset(const fn_call& fn)
 			
 		m.transform_by_inverse(&b, a);
 
-		fn.result->set_double(TWIPS_TO_PIXELS(b.m_x));
+		rv = as_value(TWIPS_TO_PIXELS(b.m_x));
 	}
 	else // setter
 	{
@@ -548,13 +575,15 @@ character::xmouse_getset(const fn_call& fn)
 		log_aserror("Attempt to set read-only property '_xmouse'");
 		);
 	}
+	return rv;
 }
 
-void
+as_value
 character::ymouse_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
 		// Local coord of mouse IN PIXELS.
@@ -568,7 +597,7 @@ character::ymouse_getset(const fn_call& fn)
 			
 		m.transform_by_inverse(&b, a);
 
-		fn.result->set_double(TWIPS_TO_PIXELS(b.m_y));
+		rv = as_value(TWIPS_TO_PIXELS(b.m_y));
 	}
 	else // setter
 	{
@@ -576,16 +605,18 @@ character::ymouse_getset(const fn_call& fn)
 		log_aserror("Attempt to set read-only property '_ymouse'");
 		);
 	}
+	return rv;
 }
 
-void
+as_value
 character::alpha_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		fn.result->set_double(ptr->get_cxform().m_[3][0] * 100.f);
+		rv = as_value(ptr->get_cxform().m_[3][0] * 100.f);
 	}
 	else // setter
 	{
@@ -595,34 +626,38 @@ character::alpha_getset(const fn_call& fn)
 		ptr->set_cxform(cx);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
+	return rv;
 
 }
 
-void
+as_value
 character::visible_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		fn.result->set_bool(ptr->get_visible());
+		rv = as_value(ptr->get_visible());
 	}
 	else // setter
 	{
 		ptr->set_visible(fn.arg(0).to_bool());
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
+	return rv;
 
 }
 
-void
+as_value
 character::width_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		fn.result->set_double(TWIPS_TO_PIXELS(ptr->get_width()));
+		rv = as_value(TWIPS_TO_PIXELS(ptr->get_width()));
 	}
 	else // setter
 	{
@@ -637,16 +672,18 @@ character::width_getset(const fn_call& fn)
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
+	return rv;
 }
 
-void
+as_value
 character::height_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		fn.result->set_double(TWIPS_TO_PIXELS(ptr->get_height()));
+		rv = as_value(TWIPS_TO_PIXELS(ptr->get_height()));
 	}
 	else // setter
 	{
@@ -661,13 +698,15 @@ character::height_getset(const fn_call& fn)
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
+	return rv;
 }
 
-void
+as_value
 character::rotation_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
 		// Verified against Macromedia player using samples/test_rotation.swf
@@ -676,7 +715,7 @@ character::rotation_getset(const fn_call& fn)
 		// Result is CLOCKWISE DEGREES, [-180,180]
 		angle *= 180.0f / float(M_PI);
 
-		fn.result->set_double(angle);
+		rv = as_value(angle);
 	}
 	else // setter
 	{
@@ -693,18 +732,22 @@ character::rotation_getset(const fn_call& fn)
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
+	return rv;
 }
 
-void
+as_value
 character::parent_getset(const fn_call& fn)
 {
 	character* ptr = ensure_character(fn.this_ptr);
 
+	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
 		as_object* p = ptr->get_parent();
-		if ( p ) fn.result->set_as_object(p);
-		else { assert(fn.result->is_undefined()); }
+		if ( p )
+		{
+			rv = as_value(p);
+		}
 	}
 	else // setter
 	{
@@ -712,6 +755,7 @@ character::parent_getset(const fn_call& fn)
 		log_aserror("Attempt to set read-only property '_parent'");
 		);
 	}
+	return rv;
 }
 
 void

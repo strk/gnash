@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.57 2007/03/15 22:39:53 strk Exp $ */
+/* $Id: character.h,v 1.58 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -143,47 +143,47 @@ protected:
 
 public:  // TODO: make protected
 
-	static void onrollover_getset(const fn_call& fn);
+	static as_value onrollover_getset(const fn_call& fn);
 
-	static void onrollout_getset(const fn_call& fn);
+	static as_value onrollout_getset(const fn_call& fn);
 
-	static void onload_getset(const fn_call& fn);
+	static as_value onload_getset(const fn_call& fn);
 
-	static void onpress_getset(const fn_call& fn);
+	static as_value onpress_getset(const fn_call& fn);
 
-	static void onrelease_getset(const fn_call& fn);
+	static as_value onrelease_getset(const fn_call& fn);
 
-	static void onreleaseoutside_getset(const fn_call& fn);
+	static as_value onreleaseoutside_getset(const fn_call& fn);
 
-	static void onmouseup_getset(const fn_call& fn);
+	static as_value onmouseup_getset(const fn_call& fn);
 
-	static void onmousedown_getset(const fn_call& fn);
+	static as_value onmousedown_getset(const fn_call& fn);
 
-	static void onmousemove_getset(const fn_call& fn);
+	static as_value onmousemove_getset(const fn_call& fn);
 
-	static void x_getset(const fn_call& fn);
+	static as_value x_getset(const fn_call& fn);
 
-	static void y_getset(const fn_call& fn);
+	static as_value y_getset(const fn_call& fn);
 
-	static void xscale_getset(const fn_call& fn);
+	static as_value xscale_getset(const fn_call& fn);
 
-	static void yscale_getset(const fn_call& fn);
+	static as_value yscale_getset(const fn_call& fn);
 
-	static void xmouse_getset(const fn_call& fn);
+	static as_value xmouse_getset(const fn_call& fn);
 
-	static void ymouse_getset(const fn_call& fn);
+	static as_value ymouse_getset(const fn_call& fn);
 
-	static void alpha_getset(const fn_call& fn);
+	static as_value alpha_getset(const fn_call& fn);
 
-	static void visible_getset(const fn_call& fn);
+	static as_value visible_getset(const fn_call& fn);
 
-	static void width_getset(const fn_call& fn);
+	static as_value width_getset(const fn_call& fn);
 
-	static void height_getset(const fn_call& fn);
+	static as_value height_getset(const fn_call& fn);
 
-	static void rotation_getset(const fn_call& fn);
+	static as_value rotation_getset(const fn_call& fn);
 
-	static void parent_getset(const fn_call& fn);
+	static as_value parent_getset(const fn_call& fn);
 
 	/// @} Common ActionScript getter-setters for characters
 
@@ -305,13 +305,12 @@ public:
 	///       to properly fetch any user-defined event handler, which 
 	///       are the ones attached to a character with ActionScript code.
 	///
-	bool get_event_handler(const event_id& id, as_value* result) const
+	as_value get_event_handler(const event_id& id) const
 	{
 		std::map<event_id, as_value>::const_iterator it = \
 			_event_handlers.find(id);
-		if ( it == _event_handlers.end() ) return false;
-		*result = it->second;
-		return true;
+		if ( it == _event_handlers.end() ) return as_value();
+		return it->second;
 	}
 
 	/// Set a built-in function handler for the given event

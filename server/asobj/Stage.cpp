@@ -30,9 +30,9 @@
 
 namespace gnash {
 
-void stage_addlistener(const fn_call& fn);
-void stage_removelistener(const fn_call& fn);
-void stage_ctor(const fn_call& fn);
+as_value stage_addlistener(const fn_call& fn);
+as_value stage_removelistener(const fn_call& fn);
+as_value stage_ctor(const fn_call& fn);
 
 static void
 attachStageInterface(as_object& o)
@@ -73,19 +73,21 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-void stage_addlistener(const fn_call& /*fn*/) {
+as_value stage_addlistener(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void stage_removelistener(const fn_call& /*fn*/) {
+as_value stage_removelistener(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
 
-void
-stage_ctor(const fn_call& fn)
+as_value
+stage_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> obj = new stage_as_object;
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

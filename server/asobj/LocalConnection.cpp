@@ -99,8 +99,8 @@ LocalConnection::send()
 }
 
 /// \brief Instantiate a new LocalConnection object within a flash movie
-void
-localconnection_new(const fn_call& fn)
+as_value
+localconnection_new(const fn_call& /* fn */)
 {
     localconnection_as_object *localconnection_obj = new localconnection_as_object;
 
@@ -116,11 +116,11 @@ localconnection_new(const fn_call& fn)
     localconnection_obj->init_member("exists",  new builtin_function(shm_exists));
 #endif
 
-    fn.result->set_as_object(localconnection_obj);
+    return as_value(localconnection_obj);
 }
 
 /// \brief The callback for LocalConnection::close()
-void localconnection_close(const fn_call& fn)
+as_value localconnection_close(const fn_call& fn)
 {
 //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     
@@ -128,10 +128,11 @@ void localconnection_close(const fn_call& fn)
     assert(ptr);
     
     ptr->obj.close();
+    return as_value();
 }
 
 /// \brief The callback for LocalConnection::connect()
-void localconnection_connect(const fn_call& fn)
+as_value localconnection_connect(const fn_call& fn)
 {
 //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     bool ret;
@@ -145,22 +146,23 @@ void localconnection_connect(const fn_call& fn)
         ret = ptr->obj.connect("localhost"); // FIXME: This should probably
                                        // fail instead
     }
-    fn.result->set_bool(ret);
+    return as_value(ret);
 }
 
 /// \brief The callback for LocalConnection::domain()
-void localconnection_domain(const fn_call& fn)
+as_value localconnection_domain(const fn_call& fn)
 {
 //    log_msg("%s:\n", __PRETTY_FUNCTION__);
     localconnection_as_object *ptr = (localconnection_as_object*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_tu_string(ptr->obj.domain().c_str());
+    return as_value(ptr->obj.domain().c_str());
 }
 
 // \brief The callback for LocalConnection::send()
-void localconnection_send(const fn_call& /*fn*/)
+as_value localconnection_send(const fn_call& /*fn*/)
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
+    return as_value();
 }
 
 } // end of gnash namespace

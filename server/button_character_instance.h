@@ -5,7 +5,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.16 2007/03/15 22:39:53 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.17 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -127,7 +127,7 @@ public:
 
 	virtual float get_height() const;
 	
-	static void enabled_getset(const fn_call& fn);
+	static as_value enabled_getset(const fn_call& fn);
 	
 	bool get_enabled();
 	void set_enabled(bool value);

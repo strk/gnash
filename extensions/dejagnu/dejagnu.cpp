@@ -32,9 +32,9 @@ using namespace std;
 namespace gnash
 {
 
-void dejagnu_pass(const fn_call& fn);
-void dejagnu_fail(const fn_call& fn);
-void dejagnu_totals(const fn_call& fn);
+as_value dejagnu_pass(const fn_call& fn);
+as_value dejagnu_fail(const fn_call& fn);
+as_value dejagnu_totals(const fn_call& fn);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -65,14 +65,14 @@ getInterface()
     return o.get();
 }
 
-static void
+static as_value
 dejagnu_ctor(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     dejagnu_as_object* obj = new dejagnu_as_object();
 
     attachInterface(obj);
-    fn.result->set_as_object(obj); // will keep alive
+    return as_value(obj); // will keep alive
 //    printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
 }
 
@@ -108,7 +108,7 @@ DejaGnu::fail (const char *msg)
     return NULL;
 }
 
-void
+as_value
 dejagnu_pass(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -117,11 +117,11 @@ dejagnu_pass(const fn_call& fn)
     
     if (fn.nargs > 0) {
 	const char *text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-	fn.result->set_string(ptr->obj.pass(text));
+	return as_value(ptr->obj.pass(text));
     }
 }
 
-void
+as_value
 dejagnu_fail(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -130,11 +130,11 @@ dejagnu_fail(const fn_call& fn)
     
     if (fn.nargs > 0) {
 	const char *text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-	fn.result->set_string(ptr->obj.fail(text));
+	return as_value(ptr->obj.fail(text));
     }
 }
 
-void
+as_value
 dejagnu_totals(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -142,7 +142,7 @@ dejagnu_totals(const fn_call& fn)
     assert(ptr);
     
     ptr->obj.totals();
-    fn.result->set_bool(true);
+    return as_value(true);
 }
 
     

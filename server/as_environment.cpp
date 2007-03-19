@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.58 2007/03/16 21:06:44 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.59 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -192,12 +192,14 @@ as_environment::del_variable_raw(
 		return true;
 	}
 
+
 	// Try target
 	std::pair<bool,bool> ret = m_target->delProperty(varname);
 	if ( ret.first )
 	{
 		return ret.second;
 	}
+
 
 	// Try _global
 	return VM::get().getGlobal()->delProperty(varname).second;

@@ -226,7 +226,7 @@ call_method(
     // arg2 is at env->bottom(6), etc.
 {
 	as_value val;
-	fn_call call(&val, this_ptr, env, nargs, first_arg_bottom_index);
+	fn_call call(this_ptr, env, nargs, first_arg_bottom_index);
 
 	try 
 	{
@@ -241,7 +241,7 @@ call_method(
 		if ( as_function* as_func = method.to_as_function() )
 		{
 		    // It's an ActionScript function.  Call it.
-		    (*as_func)(call);
+		    val = (*as_func)(call);
 		}
 		else
 		{
@@ -465,10 +465,11 @@ movie_load()
 //
 
 
-void
+as_value
 event_test(const fn_call& /*fn*/)
 {
     log_msg("FIXME: %s\n", __FUNCTION__);
+    return as_value();
 }
 	
 

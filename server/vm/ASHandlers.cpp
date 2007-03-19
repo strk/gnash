@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.65 2007/03/17 22:04:32 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.66 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -110,8 +110,8 @@ construct_object(const as_value& constructor,
             log_action("it's a built-in class");
 		);
 
-            fn_call call(&new_obj, NULL, &env, nargs, first_arg_index);
-            (*ctor_as_func)(call);
+            fn_call call(NULL, &env, nargs, first_arg_index);
+            new_obj = (*ctor_as_func)(call);
 
             // Add a __constructor__ member to the new object, but only for SWF6 up
 	    // (to be checked). NOTE that we assume the builtin constructors
@@ -2041,10 +2041,11 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 		  
 }
 
+
 void
 SWFHandlers::ActionDelete(ActionExec& thread)
 {
-//	GNASH_REPORT_FUNCTION;
+	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
 	assert(thread.code[thread.pc] == SWF::ACTION_DELETE); // 0x3A
@@ -2080,6 +2081,7 @@ SWFHandlers::ActionDelete(ActionExec& thread)
 				"Assuming 'undefined' for Object arg.");
 		);
 	}
+
 
 	as_object* obj = (as_object*) object.to_object();
 	bool ret;
@@ -2320,7 +2322,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     
     // Call the array constructor, to create an empty array.
     as_value	result;
-    array_new(fn_call(&result, NULL, &env, 0, env.get_top_index()));
+    result = array_new(fn_call(NULL, &env, 0, env.get_top_index()));
     
     as_object*	ao = result.to_object();
     assert(ao);

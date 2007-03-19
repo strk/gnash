@@ -45,12 +45,12 @@
 namespace gnash {
 
 // Forward declarations
-static void moviecliploader_loadclip(const fn_call& fn);
-static void moviecliploader_unloadclip(const fn_call& fn);
-static void moviecliploader_getprogress(const fn_call& fn);
-static void moviecliploader_new(const fn_call& fn);
-static void moviecliploader_addlistener(const fn_call& fn);
-static void moviecliploader_removelistener(const fn_call& fn);
+static as_value moviecliploader_loadclip(const fn_call& fn);
+static as_value moviecliploader_unloadclip(const fn_call& fn);
+static as_value moviecliploader_getprogress(const fn_call& fn);
+static as_value moviecliploader_new(const fn_call& fn);
+static as_value moviecliploader_addlistener(const fn_call& fn);
+static as_value moviecliploader_removelistener(const fn_call& fn);
 
 static void
 attachMovieClipLoaderInterface(as_object& o)
@@ -175,7 +175,7 @@ MovieClipLoader::loadClip(const std::string& url_str, sprite_instance& target)
 	// Prepare function call for events...
 	as_environment env;
 	env.push(as_value(&target));
-	fn_call events_call(NULL, this, &env, 1, 0);
+	fn_call events_call(this, &env, 1, 0);
 
 	URL url(url_str.c_str(), get_base_url());
 	
@@ -301,7 +301,7 @@ log_msg(" Listener %p doesn't have an %s event to listen for, skipped",
 
 }
 
-static void
+static as_value
 moviecliploader_loadclip(const fn_call& fn)
 {
 	as_value	val, method;
@@ -321,7 +321,7 @@ moviecliploader_loadclip(const fn_call& fn)
 	if ( ! url_arg.is_string() )
 	{
 		log_error("Malformed SWF, MovieClipLoader.loadClip() first argument is not a string (%s)", url_arg.to_string());
-		fn.result->set_bool(false);
+		return as_value(false);
 		return;
 	}
 #endif
@@ -331,16 +331,14 @@ moviecliploader_loadclip(const fn_call& fn)
 	if ( ! target )
 	{
 		log_error("Could not find target %s", fn.arg(1).to_string());
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 	sprite_instance* sprite = dynamic_cast<sprite_instance*>(target);
 	if ( ! sprite )
 	{
 		log_error("Target is not a sprite instance (%s)",
 			typeid(*target).name());
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 #if GNASH_DEBUG
@@ -350,31 +348,31 @@ moviecliploader_loadclip(const fn_call& fn)
 
 	bool ret = ptr->loadClip(str_url, *sprite);
 
-	fn.result->set_bool(ret);
+	return as_value(ret);
 
 }
 
-static void
+static as_value
 moviecliploader_unloadclip(const fn_call& fn)
 {
   const std::string filespec = fn.arg(0).to_string();
   log_msg("%s: FIXME: Load Movie Clip: %s\n", __FUNCTION__, filespec.c_str());
-  
+  return as_value();
 }
 
-static void
-moviecliploader_new(const fn_call& fn)
+static as_value
+moviecliploader_new(const fn_call& /* fn */)
 {
 
   as_object*	mov_obj = new MovieClipLoader;
   //log_msg("MovieClipLoader instance @ %p", mov_obj);
 
-  fn.result->set_as_object(mov_obj); // will store in a boost::intrusive_ptr
+  return as_value(mov_obj); // will store in a boost::intrusive_ptr
 }
 
 // Invoked every time the loading content is written to disk during
 // the loading process.
-static void
+static as_value
 moviecliploader_getprogress(const fn_call& fn)
 {
   //log_msg("%s: nargs = %d\n", __FUNCTION__, nargs);
@@ -391,10 +389,10 @@ moviecliploader_getprogress(const fn_call& fn)
   mcl_obj->init_member("bytesLoaded", mcl_data->bytes_loaded);
   mcl_obj->init_member("bytesTotal",  mcl_data->bytes_total);
   
-  fn.result->set_as_object(mcl_obj); // will store in a boost::intrusive_ptr
+  return as_value(mcl_obj); // will store in a boost::intrusive_ptr
 }
 
-static void
+static as_value
 moviecliploader_addlistener(const fn_call& fn)
 {
 	assert(dynamic_cast<MovieClipLoader*>(fn.this_ptr));
@@ -404,13 +402,14 @@ moviecliploader_addlistener(const fn_call& fn)
 	if ( ! listener )
 	{
 		log_error("ActionScript bug: Listener given to MovieClipLoader.addListener() is not an object");
-		return;
+		return as_value();
 	}
 
 	mcl->addListener(listener);
+	return as_value();
 }
 
-static void
+static as_value
 moviecliploader_removelistener(const fn_call& fn)
 {
 	assert(dynamic_cast<MovieClipLoader*>(fn.this_ptr));
@@ -420,10 +419,11 @@ moviecliploader_removelistener(const fn_call& fn)
 	if ( ! listener )
 	{
 		log_error("ActionScript bug: Listener given to MovieClipLoader.removeListener() is not an object");
-		return;
+		return as_value();
 	}
 
 	mcl->removeListener(listener);
+	return as_value();
 }
 
 

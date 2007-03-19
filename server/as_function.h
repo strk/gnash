@@ -75,10 +75,10 @@ public:
 	as_function* to_function() { return this; }
 
 	/// Dispatch.
-	virtual void operator()(const fn_call& fn)=0;
+	virtual as_value operator()(const fn_call& fn)=0;
 
 	/// Alias for operator()
-	void call(const fn_call& fn) { return operator()(fn); }
+	as_value call(const fn_call& fn) { return operator()(fn); }
 
 	/// Get this function's "prototype" member (exported interface).
 	//
@@ -133,8 +133,8 @@ private:
 void function_class_init(as_object& global);
 
 // To be made statics instead
-void function_apply(const fn_call& fn);
-void function_call(const fn_call& fn);
+as_value function_apply(const fn_call& fn);
+as_value function_call(const fn_call& fn);
 
 
 } // end of gnash namespace

@@ -220,24 +220,25 @@ for i in $methods; do
 # DO NOT CONVERT CASE, SWF7+ is case-sensitive 
 newi=`echo $i | sed -e 's/)//g'` # | tr '[A-Z]' '[a-z]'
 cat <<EOF>>${srcname}
-static void
+static as_value
 ${lowname}_${newi}const fn_call& fn)
 {
 	${lowname}_as_object* ptr = ensure_${lowname}(fn.this_ptr);
 	UNUSED(ptr);
 	log_warning("%s: unimplemented", __FUNCTION__);
+	return as_value();
 }
 EOF
 done
 
 cat <<EOF>>${srcname}
 
-void
+as_value
 ${lowname}_ctor(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj = new ${lowname}_as_object;
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

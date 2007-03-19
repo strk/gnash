@@ -39,16 +39,16 @@ using namespace std;
 using namespace gnash;
 
 /// return the object's text value
-static void getter(const fn_call& fn)
+static as_value getter(const fn_call& fn)
 {
 	as_object* o = fn.this_ptr;
 	assert(fn.nargs == 0);
 	const char* txt = o->get_text_value();
-	fn.result->set_string(txt);
+	return as_value(txt);
 }
 
 /// set a new member to the object
-static void setter(const fn_call& fn)
+static as_value setter(const fn_call& fn)
 {
 	as_object* o = fn.this_ptr;
 	assert(fn.nargs == 1);
@@ -93,7 +93,7 @@ main(int /*argc*/, char** /*argv*/)
 	GetterSetter getset(*get, *set);
 
 	as_value val;
-	getset.getValue(&obj, val);
+        val = getset.getValue(&obj);
 	check_equals(obj.getText(), string("initial text"));
 	check_equals(val, as_value("initial text"));
 
@@ -102,14 +102,14 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(obj.getText(), string("second try"));
 	val.set_string("");
 
-	getset.getValue(&obj, val);
+	val = getset.getValue(&obj);
 	check_equals(val, as_value("second try"));
 
 	// Test copy ctor
 
 	GetterSetter getset2(getset);
 
-	getset2.getValue(&obj2, val);
+	val = getset2.getValue(&obj2);
 	check_equals(obj2.getText(), string("other obj"));
 	check_equals(val, as_value("other obj"));
 
@@ -118,19 +118,19 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(obj2.getText(), string("second try for other"));
 	val.set_string("");
 
-	getset2.getValue(&obj2, val);
+	val = getset2.getValue(&obj2);
 	check_equals(val, as_value("second try for other"));
 
-	getset2.getValue(&obj, val);
+	val = getset2.getValue(&obj);
 	check_equals(val, as_value("second try"));
 
 	// Test assignment
 	
 	GetterSetter tmp(getset);
-	tmp.getValue(&obj, val);
+	val = tmp.getValue(&obj);
 	check_equals(val, as_value("second try"));
 	tmp = getset2;
-	tmp.getValue(&obj2, val);
+	val = tmp.getValue(&obj2);
 	check_equals(val, as_value("second try for other"));
 }
 

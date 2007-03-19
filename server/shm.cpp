@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: shm.cpp,v 1.27 2006/11/19 17:39:01 nihilus Exp $ */
+/* $Id: shm.cpp,v 1.28 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -498,29 +498,29 @@ Shm::exists()
 // These are the callbacks used to define custom methods for our AS
 // classes. This way we can examine the private data after calling a
 // method to see if it worked correctly.
-void shm_getname(const fn_call& fn)
+as_value shm_getname(const fn_call& fn)
 {
     shm_as_object *ptr = (shm_as_object*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_tu_string(ptr->obj.getName());
+    return as_value(ptr->obj.getName());
 }
-void shm_getsize(const fn_call& fn)
+as_value shm_getsize(const fn_call& fn)
 {
     shm_as_object *ptr = (shm_as_object*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_int(ptr->obj.getSize());
+    return as_value(ptr->obj.getSize());
 }
-void shm_getallocated(const fn_call& fn)
+as_value shm_getallocated(const fn_call& fn)
 {
     shm_as_object *ptr = (shm_as_object*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_int(ptr->obj.getAllocated());
+    return as_value(ptr->obj.getAllocated());
 }
-void shm_exists(const fn_call& fn)
+as_value shm_exists(const fn_call& fn)
 {
     shm_as_object *ptr = (shm_as_object*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_bool(ptr->obj.exists());
+    return as_value(ptr->obj.exists());
 }
 //#endif
 

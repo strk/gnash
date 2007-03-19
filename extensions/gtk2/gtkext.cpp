@@ -49,14 +49,14 @@ static Debugger& debugger = Debugger::getDefaultInstance();
 #endif
 
 // prototypes for the callbacks required by Gnash
-void gtkext_window_new(const fn_call& fn);
-void gtkext_signal_connect(const fn_call& fn);
-void gtkext_container_set_border_width(const fn_call& fn);
-void gtkext_button_new_with_label(const fn_call& fn);
-void gtkext_signal_connect_swapped(const fn_call& fn);
-void gtkext_container_add(const fn_call& fn);
-void gtkext_widget_show(const fn_call& fn);
-void gtkext_main(const fn_call& fn);
+as_value gtkext_window_new(const fn_call& fn);
+as_value gtkext_signal_connect(const fn_call& fn);
+as_value gtkext_container_set_border_width(const fn_call& fn);
+as_value gtkext_button_new_with_label(const fn_call& fn);
+as_value gtkext_signal_connect_swapped(const fn_call& fn);
+as_value gtkext_container_add(const fn_call& fn);
+as_value gtkext_widget_show(const fn_call& fn);
+as_value gtkext_main(const fn_call& fn);
 
 // Sigh... We can't store the callbacks for the events in the GtkExt
 // class object because that data is inaccessible to a C symbol based
@@ -136,14 +136,14 @@ getInterface()
     return o.get();
 }
 
-static void
+static as_value
 gtkext_ctor(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     GtkExt *obj = new GtkExt();
 
     attachInterface(obj);
-    fn.result->set_as_object(obj); // will keep alive
+    return as_value(obj); // will keep alive
 }
 
 
@@ -199,7 +199,7 @@ GtkExt::main()
 }
 
 // this callback takes no arguments
-void gtkext_window_new(const fn_call& fn)
+as_value gtkext_window_new(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
@@ -207,12 +207,12 @@ void gtkext_window_new(const fn_call& fn)
 
     GtkExt *obj = new GtkExt;
     obj->window_new();
-    fn.result->set_as_object(obj);
+    return as_value(obj);
 }
 
 // this callback takes 4 arguments, we only need two of them
 // g_signal_connect (instance, detailed_signal, c_handler, data)
-void gtkext_signal_connect(const fn_call& fn)
+as_value gtkext_signal_connect(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
@@ -230,11 +230,12 @@ void gtkext_signal_connect(const fn_call& fn)
  	g_signal_connect (G_OBJECT (window->getWindow()), name.c_str(),
 			  G_CALLBACK (generic_callback), (void *)name.c_str());
     }
+    return as_value();
 }
 
 // this callback takes 2 arguments
 // void gtk_container_set_border_width (GtkContainer *container, guint border_width);
-void gtkext_container_set_border_width(const fn_call& fn)
+as_value gtkext_container_set_border_width(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -247,11 +248,12 @@ void gtkext_container_set_border_width(const fn_call& fn)
 	window->container_set_border_width(width);
 	dbglogfile << "set container border width to " << width << " !" << endl;
     }
+    return as_value();
 }
 
 // Creates a new button with the label "Hello World".
 // GtkWidget *gtk_button_new_with_label (const gchar *label);
-void gtkext_button_new_with_label(const fn_call& fn)
+as_value gtkext_button_new_with_label(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
@@ -261,8 +263,9 @@ void gtkext_button_new_with_label(const fn_call& fn)
 	const char *label = fn.arg(0).to_string();
 	GtkExt *obj = new GtkExt;
 	obj->button_new_with_label(label);
-	fn.result->set_as_object(obj);
+	return as_value(obj);
     }
+    return as_value();
 }
 
 // g_signal_connect_swapped(instance, detailed_signal, c_handler, data)
@@ -275,7 +278,7 @@ void gtkext_button_new_with_label(const fn_call& fn)
 // c_handler : 	the GCallback to connect.
 // data : 	data to pass to c_handler calls.
 // Returns : 	the handler id
-void gtkext_signal_connect_swapped(const fn_call& fn)
+as_value gtkext_signal_connect_swapped(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
@@ -293,10 +296,11 @@ void gtkext_signal_connect_swapped(const fn_call& fn)
 				  G_CALLBACK (gtk_widget_destroy),
 				  G_OBJECT (parent->getWindow()));
     }
+    return as_value();
 }
 
 // this takes two arguments
-void gtkext_container_add(const fn_call& fn)
+as_value gtkext_container_add(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
@@ -306,11 +310,12 @@ void gtkext_container_add(const fn_call& fn)
 	GtkExt *parent = dynamic_cast<GtkExt *>(fn.arg(0).to_object());
 	GtkExt *child = dynamic_cast<GtkExt *>(fn.arg(1).to_object());
 	gtk_container_add (GTK_CONTAINER (parent->getWindow()), child->getWindow());
-	fn.result->set_bool(true);
+	return as_value(true);
     }
+    return as_value(false);
 }
 
-void gtkext_widget_show(const fn_call& fn)
+as_value gtkext_widget_show(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
@@ -320,16 +325,18 @@ void gtkext_widget_show(const fn_call& fn)
 	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object());
 	gtk_widget_show(window->getWindow());
     }
+    return as_value();
 }
 
 // gtk_main taks no arguments.
-void gtkext_main(const fn_call& fn)
+as_value gtkext_main(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
     assert(ptr);
 
     gtk_main();
+    return as_value();
 }
 
 std::auto_ptr<as_object>

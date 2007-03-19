@@ -34,13 +34,13 @@
 
 namespace gnash {
 
-void
-GetterSetter::getValue(as_object* this_ptr, as_value& ret) const
+as_value
+GetterSetter::getValue(as_object* this_ptr) const
 {
 	as_environment env;
-	fn_call fn(&ret, this_ptr, &env, 0, 0);
+	fn_call fn(this_ptr, &env, 0, 0);
 	// TODO: need as_function::operator to be const..
-	(*const_cast<as_function*>(_getter))(fn);
+	return (*const_cast<as_function*>(_getter))(fn);
 }
 
 void
@@ -48,7 +48,7 @@ GetterSetter::setValue(as_object* this_ptr, const as_value& val) const
 {
 	as_environment env;
 	env.push(val);
-	fn_call fn(NULL, this_ptr, &env, 1, 0);
+	fn_call fn(this_ptr, &env, 1, 0);
 	// TODO: need as_function::operator to be const..
 	(*const_cast<as_function*>(_setter))(fn);
 }

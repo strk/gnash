@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.16 2007/03/09 13:39:34 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.17 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -48,21 +48,21 @@ using namespace std;
 
 namespace gnash {
 
-static void xmlnode_new(const fn_call& fn);
-static void xmlnode_nodename(const fn_call& fn);
-static void xmlnode_nodevalue(const fn_call& fn);
-static void xmlnode_nodetype(const fn_call& fn);
-static void xmlnode_appendchild(const fn_call& fn);
-static void xmlnode_clonenode(const fn_call& fn);
-static void xmlnode_haschildnodes(const fn_call& fn);
-static void xmlnode_insertbefore(const fn_call& fn);
-static void xmlnode_removenode(const fn_call& fn);
-static void xmlnode_tostring(const fn_call& fn);
-static void xmlnode_nodename(const fn_call& fn);
-static void xmlnode_firstchild(const fn_call& fn);
-static void xmlnode_lastchild(const fn_call& fn);
-static void xmlnode_nextsibling(const fn_call& fn);
-static void xmlnode_previoussibling(const fn_call& fn);
+static as_value xmlnode_new(const fn_call& fn);
+static as_value xmlnode_nodename(const fn_call& fn);
+static as_value xmlnode_nodevalue(const fn_call& fn);
+static as_value xmlnode_nodetype(const fn_call& fn);
+static as_value xmlnode_appendchild(const fn_call& fn);
+static as_value xmlnode_clonenode(const fn_call& fn);
+static as_value xmlnode_haschildnodes(const fn_call& fn);
+static as_value xmlnode_insertbefore(const fn_call& fn);
+static as_value xmlnode_removenode(const fn_call& fn);
+static as_value xmlnode_tostring(const fn_call& fn);
+static as_value xmlnode_nodename(const fn_call& fn);
+static as_value xmlnode_firstchild(const fn_call& fn);
+static as_value xmlnode_lastchild(const fn_call& fn);
+static as_value xmlnode_nextsibling(const fn_call& fn);
+static as_value xmlnode_previoussibling(const fn_call& fn);
 static as_object* getXMLNodeInterface();
 
 static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
@@ -471,7 +471,7 @@ getXMLNodeInterface()
     return o.get();
 }
 
-static void
+static as_value
 xmlnode_new(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -485,10 +485,10 @@ xmlnode_new(const fn_call& fn)
 	}
     }
     
-    fn.result->set_as_object(xml_obj);
+    return as_value(xml_obj);
 }
 
-static void
+static as_value
 xmlnode_appendchild(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -519,9 +519,10 @@ xmlnode_appendchild(const fn_call& fn)
     } else {
         log_msg("ERROR: no child XMLNode paramaters!\\n");
     }
+    return as_value();
 }
 
-static void
+static as_value
 xmlnode_clonenode(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
@@ -534,37 +535,41 @@ xmlnode_clonenode(const fn_call& fn)
 	bool deep = fn.arg(0).to_bool();
 	xmlnode_obj = new XMLNode;
 	ptr->cloneNode(*xmlnode_obj, deep);
-	fn.result->set_as_object(xmlnode_obj);
+	return as_value(xmlnode_obj);
     } else {
         log_msg("ERROR: no Depth paramater!\n");
     }
+    return as_value();
 
 }
 
-static void
+static as_value
 xmlnode_insertbefore(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     XMLNode *ptr = (XMLNode*)fn.this_ptr;
     assert(ptr);
     
-//    fn.result->set_int(ptr->obj.getAllocated());
+//    return as_value(ptr->obj.getAllocated());
 //    ptr->obj.insertBefore();
     log_msg("%s:unimplemented \n", __PRETTY_FUNCTION__);
+    return as_value();
 }
-static void
+
+static as_value
 xmlnode_removenode(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     XMLNode *ptr = (XMLNode*)fn.this_ptr;
     assert(ptr);
     
-//    fn.result->set_int(ptr->obj.getAllocated());
+//    return as_value(ptr->obj.getAllocated());
     ptr->removeNode();
+    return as_value();
 }
 
 // TODO: shouldn't overriding get_text_value() be fine ?
-static void
+static as_value
 xmlnode_tostring(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -572,64 +577,66 @@ xmlnode_tostring(const fn_call& fn)
     XMLNode *ptr = (XMLNode*)fn.this_ptr;
     assert(ptr);
     
-    fn.result->set_string(ptr->toString());
+    return as_value(ptr->toString());
 }
 
-static void
+static as_value
 xmlnode_haschildnodes(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     XMLNode *ptr = (XMLNode*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_bool(ptr->hasChildNodes());
+    return as_value(ptr->hasChildNodes());
 }
 
 // Both a getter and a setter for nodeValue
-static void
+static as_value
 xmlnode_nodevalue(const fn_call& fn)
 {
     //GNASH_REPORT_FUNCTION;
 
     assert(dynamic_cast<XMLNode*>(fn.this_ptr));
     XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
+    as_value rv;
+    rv.set_null();
     
     //log_msg("xmlnode_nodevalue called with %d args against 'this' = %p", fn.nargs, ptr);
     if ( fn.nargs == 0 ) {
 	//log_msg("  nodeValue() returns '%s'", ptr->nodeValue());
 	const char* val = ptr->nodeValue();
 	if ( val ) {
-	    fn.result->set_string(val);
-	} else {
-	    fn.result->set_null();
+	    rv = val;
 	}
     } else {
 	//log_msg(" arg(0) == '%s'", fn.arg(0).to_string());
 	ptr->nodeValueSet(fn.arg(0).to_string());
     }
+    return rv;
 }
 
 // Both a getter and a setter for nodeName
-static void
+static as_value
 xmlnode_nodename(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     assert(dynamic_cast<XMLNode*>(fn.this_ptr));
     XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
+    as_value rv;
+    rv.set_null();
 
     if ( fn.nargs == 0 ) {
 	const char* val = ptr->nodeName();
 	if ( val ) {
-	    fn.result->set_string(val);
-	} else {
-	    fn.result->set_null();
+	    rv = val;
 	}
     } else {
 	ptr->nodeNameSet(fn.arg(0).to_string());
     }
+    return rv;
 }
 
 // Both a getter and a (do-nothing) setter for nodeType
-static void
+static as_value
 xmlnode_nodetype(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -638,29 +645,30 @@ xmlnode_nodetype(const fn_call& fn)
     XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) {
-	fn.result->set_int(ptr->nodeType());
+	return as_value(ptr->nodeType());
     } else {
 	IF_VERBOSE_ASCODING_ERRORS(
 	    log_aserror("Tried to set read-only property XMLNode.nodeType");
 	    );
     }
+    return as_value();
 }
 
 // Both a getter and a (do-nothing) setter for firstChild
-static void
+static as_value
 xmlnode_firstchild(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     assert(dynamic_cast<XMLNode*>(fn.this_ptr));
     XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
+    as_value rv;
+    rv.set_null();
 
     if ( fn.nargs == 0 )
     {
 	    XMLNode *node = ptr->firstChild();
-	    if (node == NULL) {
-		fn.result->set_null();
-	    } else {
-		fn.result->set_as_object(node);
+	    if (node) {
+		rv = node;
 	    }
     }
     else
@@ -670,78 +678,82 @@ xmlnode_firstchild(const fn_call& fn)
 	    );
     }
 
+    return rv;
 }
 
 // Both a getter and a (do-nothing) setter for lastChild
-static void
+static as_value
 xmlnode_lastchild(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     assert(dynamic_cast<XMLNode*>(fn.this_ptr));
     XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
+    as_value rv;
+    rv.set_null();
 
     if ( fn.nargs != 0 )
     {
 	IF_VERBOSE_ASCODING_ERRORS(
 	    log_aserror("Tried to set read-only property XMLNode.lastChild");
 	    );
-	return;
+	return rv;
     } 
 
     XMLNode *node = ptr->lastChild();
-    if (node == NULL) {
-	fn.result->set_null();
-    } else {
-	fn.result->set_as_object(node);
+    if (node) {
+	rv = node;
     }
+    return rv;
 }
 
 // Both a getter and a (do-nothing) setter for nextSibling
-static void
+static as_value
 xmlnode_nextsibling(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
+    as_value rv;
+    rv.set_null();
 
     if ( fn.nargs != 0 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror("Tried to set read-only property XMLNode.nextSibling");
         );
-	return;
+	return rv;
     }
     
     assert(dynamic_cast<XMLNode*>(fn.this_ptr));
     XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
     XMLNode *node = ptr->nextSibling();
-    if (node == NULL) {
-	fn.result->set_null();
-    } else {
-	fn.result->set_as_object(node);
+    if (node) {
+	rv = node;
     }
+    return rv;
 }
 
 // Both a getter and a (do-nothing) setter for previousSibling
-static void
+static as_value
 xmlnode_previoussibling(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
+    as_value rv;
+    rv.set_null();
 
     if ( fn.nargs != 0 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror("Tried to set read-only property XMLNode.previousSibling");
         );
-	return;
+	return rv;
     }
 
     assert(dynamic_cast<XMLNode*>(fn.this_ptr));
     XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
     XMLNode *node = ptr->previousSibling();
-    if (node == NULL) {
-	fn.result->set_null();
-    } else {
-	fn.result->set_as_object(node);
+    if (node) {
+	rv = node;
     }
+    return rv;
 }
 
 // extern (used by Global.cpp)

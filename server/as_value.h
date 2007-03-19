@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.32 2007/03/16 21:06:44 strk Exp $ */
+/* $Id: as_value.h,v 1.33 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -65,7 +65,6 @@ static inline int isnan_ld (long double x) { return x != x; }
 	static inline int isinf_ld (long double x) { return isnan (x - x); }
 #endif
  
-typedef void (*as_c_function_ptr)(const fn_call& fn);
 
 // ActionScript value type.
 
@@ -582,6 +581,8 @@ private:
 	};
 
 };
+
+typedef as_value (*as_c_function_ptr)(const fn_call& fn);
 
 inline std::ostream& operator<< (std::ostream& os, const as_value& v) {
 	return os << v.to_debug_string();

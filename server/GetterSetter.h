@@ -72,7 +72,7 @@ public:
 	~GetterSetter();
 
 	/// invoke the getter function
-	void getValue(as_object* this_ptr, as_value& ret) const;
+	as_value getValue(as_object* this_ptr) const;
 
 	/// invoke the setter function
 	void setValue(as_object* this_ptr, const as_value& val) const;

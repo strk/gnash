@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.18 2007/02/28 10:52:38 strk Exp $ */
+/* $Id: string.cpp,v 1.19 2007/03/19 17:11:14 bjacques Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -36,22 +36,22 @@
 namespace gnash {
 
 // Forward declarations
-static void string_get_length(const fn_call& fn);
-static void string_set_length(const fn_call& fn);
-static void string_concat(const fn_call& fn);
-static void string_slice(const fn_call& fn);
-static void string_split(const fn_call& fn);
-static void string_last_index_of(const fn_call& fn);
-static void string_sub_str(const fn_call& fn);
-static void string_sub_string(const fn_call& fn);
-static void string_index_of(const fn_call& fn);
-static void string_from_char_code(const fn_call& fn);
-static void string_char_code_at(const fn_call& fn);
-static void string_char_at(const fn_call& fn);
-static void string_to_upper_case(const fn_call& fn);
-static void string_to_lower_case(const fn_call& fn);
-static void string_to_string(const fn_call& fn);
-static void string_ctor(const fn_call& fn);
+static as_value string_get_length(const fn_call& fn);
+static as_value string_set_length(const fn_call& fn);
+static as_value string_concat(const fn_call& fn);
+static as_value string_slice(const fn_call& fn);
+static as_value string_split(const fn_call& fn);
+static as_value string_last_index_of(const fn_call& fn);
+static as_value string_sub_str(const fn_call& fn);
+static as_value string_sub_string(const fn_call& fn);
+static as_value string_index_of(const fn_call& fn);
+static as_value string_from_char_code(const fn_call& fn);
+static as_value string_char_code_at(const fn_call& fn);
+static as_value string_char_at(const fn_call& fn);
+static as_value string_to_upper_case(const fn_call& fn);
+static as_value string_to_lower_case(const fn_call& fn);
+static as_value string_to_string(const fn_call& fn);
+static as_value string_ctor(const fn_call& fn);
 
 static void
 attachStringInterface(as_object& o)
@@ -124,27 +124,26 @@ ensureString(as_object* obj)
 	return ret;
 }
 
-static void
+static as_value
 string_get_length(const fn_call& fn)
 {
 	tu_string_as_object* str = ensureString(fn.this_ptr);
 
-	fn.result->set_int(str->m_string.utf8_length());
-	return;
+	return as_value(str->m_string.utf8_length());
 
 }
 
-static void
+static as_value
 string_set_length(const fn_call& /*fn*/)
 {
 	IF_VERBOSE_ASCODING_ERRORS(
 	log_aserror("String: length property is read-only");
 	);
-	return;
+	return as_value();
 }
 
 // all the arguments will be converted to string and concatenated
-static void
+static as_value
 string_concat(const fn_call& fn)
 {
 	tu_string_as_object* str = ensureString(fn.this_ptr);
@@ -152,11 +151,11 @@ string_concat(const fn_call& fn)
 	
 	int len = strlen(this_string.c_str());
 	int pos = len;
-	for (int i = 0; i < fn.nargs; i++) len += strlen(fn.arg(i).to_string());
+	for (unsigned int i = 0; i < fn.nargs; i++) len += strlen(fn.arg(i).to_string());
 	
 	char *newstr = new char[len + 1];
 	memcpy(newstr, this_string.c_str(),pos); // because pos at the moments holds the strlen of this_string!
-	for (int i = 0; i < fn.nargs; i++) 
+	for (unsigned int i = 0; i < fn.nargs; i++) 
 	{
 		int len = strlen(fn.arg(i).to_string());
 		memcpy((newstr + pos),fn.arg(i).to_string(),len);
@@ -165,12 +164,12 @@ string_concat(const fn_call& fn)
 	newstr[len] = '\0';
 	
 	tu_string returnstring(newstr);
-	fn.result->set_tu_string(returnstring);
 	delete[] newstr;	// because tu_string copies newstr
+	return as_value(returnstring);
 }
 
 // 1st param: start_index, 2nd param: end_index
-static void
+static as_value
 string_slice(const fn_call& fn)
 {
 	tu_string_as_object* str = ensureString(fn.this_ptr);
@@ -200,11 +199,10 @@ string_slice(const fn_call& fn)
 		swap(&start, &end);
 	}
 
-	fn.result->set_tu_string(this_string.utf8_substring(start, end));
-	return;
+	return as_value(this_string.utf8_substring(start, end));
 }
 
-static void
+static as_value
 string_split(const fn_call& fn)
 {
 	tu_string_as_object* str = ensureString(fn.this_ptr);
@@ -220,11 +218,8 @@ string_split(const fn_call& fn)
 		val.set_tu_string(this_string_ptr->m_string);
 		array->push(val);
 		
-		fn.result->set_as_object(array.get());
-		return;
-	}
-	
-	if (fn.nargs >= 1)
+		return as_value(array.get());
+	} else
 	{
 		tu_string this_string = this_string_ptr->m_string;
 		
@@ -236,8 +231,7 @@ string_split(const fn_call& fn)
 				val.set_tu_string(this_string.utf8_substring(i,i+1));
 				array->push(val);
 			}
-			fn.result->set_as_object(array.get());
-			return;
+			return as_value(array.get());
 		}
 		else 
 		{
@@ -267,30 +261,27 @@ string_split(const fn_call& fn)
 				pstart = pend + delimeter_len;
 				if (!(*pstart))
 				{
-					fn.result->set_as_object(array.get());
-					return;
+					return as_value(array.get());
 				}
 				pend = strstr(pstart,delimeter);
 				
 			}
 			val.set_tu_string(tu_string(pstart));
 			array->push(val);
-			fn.result->set_as_object(array.get());
-			return;
+			return as_value(array.get());
 		}
 	}
 	
 }
 
-static void
+static as_value
 string_last_index_of(const fn_call& fn)
 {
 	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
-		fn.result->set_double(-1);
-		return;
+		return as_value(-1);
 	}
 	else
 	{
@@ -305,8 +296,7 @@ string_last_index_of(const fn_call& fn)
 			fn.arg(0).to_string());
 		if (p == NULL)
 		{
-			fn.result->set_double(-1);
-			return;
+			return as_value(-1);
 		}
 		
 		const char* lastocc = p;
@@ -317,13 +307,12 @@ string_last_index_of(const fn_call& fn)
 			if (p) lastocc = p;
 		}
 		
-		fn.result->set_double(tu_string::utf8_char_count(str, int(lastocc - str)));
-		return;
+		return as_value(tu_string::utf8_char_count(str, int(lastocc - str)));
 	}
 }
 
 // 1st param: start_index, 2nd param: length (NOT end_index)
-static void
+static as_value
 string_sub_str(const fn_call& fn)
 {
 	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
@@ -345,12 +334,11 @@ string_sub_str(const fn_call& fn)
 		end = iclamp(end, start, utf8_len);
 	}
 
-	fn.result->set_tu_string(this_string.utf8_substring(start, end));
-	return;
+	return as_value(this_string.utf8_substring(start, end));
 }
 
 // 1st param: start_index, 2nd param: end_index
-static void
+static as_value
 string_sub_string(const fn_call& fn)
 {
 	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
@@ -372,19 +360,17 @@ string_sub_string(const fn_call& fn)
 
 	if (end < start) swap(&start, &end);	// dumb, but that's what the docs say
 
-	fn.result->set_tu_string(this_string.utf8_substring(start, end));
-	return;
+	return as_value(this_string.utf8_substring(start, end));
 }
 
-static void
+static as_value
 string_index_of(const fn_call& fn)
 {
 	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
-		fn.result->set_double(-1);
-		return;
+		return as_value(-1);
 	}
 	else
 	{
@@ -399,32 +385,30 @@ string_index_of(const fn_call& fn)
 			fn.arg(0).to_string());
 		if (p == NULL)
 		{
-			fn.result->set_double(-1);
-			return;
+			return as_value(-1);
 		}
 
-		fn.result->set_double(tu_string::utf8_char_count(str, p - str));
-		return;
+		return as_value(tu_string::utf8_char_count(str, p - str));
 	}
 }
  
-static void
+static as_value
 string_from_char_code(const fn_call& fn)
 {
 	//tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 
 	tu_string result;
 
-	for (int i = 0; i < fn.nargs; i++)
+	for (unsigned int i = 0; i < fn.nargs; i++)
 	{
 		uint32 c = (uint32) fn.arg(i).to_number();
 		result.append_wide_char(c);
 	}
 
-	fn.result->set_tu_string(result);
+	return as_value(result);
 }
 
-static void
+static as_value
 string_char_code_at(const fn_call& fn)
 {
 	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
@@ -434,8 +418,9 @@ string_char_code_at(const fn_call& fn)
 	    IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("string.charCodeAt needs one argument");
 		)
-	     fn.result->set_nan();	// Same as for out-of-range arg
-	     return;
+	     as_value rv;
+	     rv.set_nan();
+	     return rv;	// Same as for out-of-range arg
 	}
 	IF_VERBOSE_ASCODING_ERRORS(
 	    if (fn.nargs > 1)
@@ -445,16 +430,14 @@ string_char_code_at(const fn_call& fn)
 	int	index = static_cast<int>(fn.arg(0).to_number());
 	if (index >= 0 && index < this_string_ptr->m_string.utf8_length())
 	{
-		fn.result->set_double(this_string_ptr->m_string.utf8_char_at(index));
-		return;
+		return as_value(this_string_ptr->m_string.utf8_char_at(index));
 	}
 
 	double temp = 0.0;	// This variable will let us divide by zero without a compiler warning
-	fn.result->set_double(temp/temp);	// this division by zero creates a NaN value
-	return;
+	return as_value(temp/temp);	// this division by zero creates a NaN value
 }
 
-static void
+static as_value
 string_char_at(const fn_call& fn)
 {
 	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
@@ -464,8 +447,7 @@ string_char_at(const fn_call& fn)
 	    IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("%s needs one argument", __FUNCTION__);
 		)
-	    fn.result->set_tu_string("");	// Same as for out-of-range arg
-	    return;
+	    return as_value("");	// Same as for out-of-range arg
 	}
 	IF_VERBOSE_ASCODING_ERRORS(
 	    if (fn.nargs > 1)
@@ -477,42 +459,38 @@ string_char_at(const fn_call& fn)
 	{
 		tu_string result;
 		result += this_string_ptr->m_string.utf8_char_at(index);
-		fn.result->set_tu_string(result);
-		return;
+		return as_value(result);
 	}
 
 	double temp = 0.0;	// This variable will let us divide by zero without a compiler warning
-	fn.result->set_double(temp/temp);	// this division by zero creates a NaN value
-	return;		
+	return as_value(temp/temp);	// this division by zero creates a NaN value
 }
 
-static void
+static as_value
 string_to_upper_case(const fn_call& fn)
 {
 	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 
-	fn.result->set_tu_string(this_string_ptr->m_string.utf8_to_upper());
-	return;		
+	return as_value(this_string_ptr->m_string.utf8_to_upper());
 }
 
-static void
+static as_value
 string_to_lower_case(const fn_call& fn)
 {
 	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
 
-	fn.result->set_tu_string(this_string_ptr->m_string.utf8_to_lower());
-	return;		
+	return as_value(this_string_ptr->m_string.utf8_to_lower());
 }
 
-static void
+static as_value
 string_to_string(const fn_call& fn)
 {
 	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
-	fn.result->set_tu_string(this_string_ptr->m_string);
+	return as_value(this_string_ptr->m_string);
 }
 
 
-static void
+static as_value
 string_ctor(const fn_call& fn)
 {
 	boost::intrusive_ptr<tu_string_as_object> str = new tu_string_as_object;
@@ -525,7 +503,7 @@ string_ctor(const fn_call& fn)
 	// this shouldn't be needed
 	//attachStringInterface(*str);
 
-	fn.result->set_as_object(str.get());
+	return as_value(str.get());
 }
 
 // extern (used by Global.cpp)

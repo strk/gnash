@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: Number.cpp,v 1.23 2007/03/04 02:00:42 strk Exp $ */
+/* $Id: Number.cpp,v 1.24 2007/03/19 17:11:14 bjacques Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -52,7 +52,7 @@ namespace gnash {
 
 // Forward declarations
 static void number_val_to_str(double val, char *str);
-//static void number_to_string(const fn_call& fn);
+//static as_value number_to_string(const fn_call& fn);
 
 static void
 attachNumberInterface(as_object& o)
@@ -261,7 +261,7 @@ number_val_to_str(double _val, char *_str)
 	}
 }
 
-static void
+static as_value
 number_ctor(const fn_call& fn)
 {
 	double val = 0;
@@ -272,7 +272,7 @@ number_ctor(const fn_call& fn)
 
 	number_as_object* obj = new number_as_object(val);
 	
-	fn.result->set_as_object(obj); // will keep alive
+	return as_value(obj); // will keep alive
 }
 
 // extern (used by Global.cpp)

@@ -33,16 +33,16 @@ using namespace std;
 namespace gnash
 {
 
-void mysql_connect(const fn_call& fn);
-void mysql_qetData(const fn_call& fn);
-void mysql_disconnect(const fn_call& fn);
+as_value mysql_connect(const fn_call& fn);
+as_value mysql_qetData(const fn_call& fn);
+as_value mysql_disconnect(const fn_call& fn);
 
-void mysql_query(const fn_call& fn);
-void mysql_row(const fn_call& fn);
-void mysql_fields(const fn_call& fn);
-void mysql_fetch(const fn_call& fn);
-void mysql_store(const fn_call& fn);
-void mysql_free(const fn_call& fn);
+as_value mysql_query(const fn_call& fn);
+as_value mysql_row(const fn_call& fn);
+as_value mysql_fields(const fn_call& fn);
+as_value mysql_fetch(const fn_call& fn);
+as_value mysql_store(const fn_call& fn);
+as_value mysql_free(const fn_call& fn);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -79,7 +79,7 @@ getInterface()
     return o.get();
 }
 
-static void
+static as_value
 mysql_ctor(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -87,7 +87,7 @@ mysql_ctor(const fn_call& fn)
     mysql_as_object* obj = new mysql_as_object();
 
     attachInterface(obj);
-    fn.result->set_as_object(obj); // will keep alive
+    return as_value(obj); // will keep alive
 //    printf ("Hello World from %s !!!\n", __PRETTY_FUNCTION__);
 }
 
@@ -293,7 +293,7 @@ MySQL::disconnect()
 
 
 // Entry points for ActionScript methods
-void
+as_value
 mysql_connect(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -306,13 +306,13 @@ mysql_connect(const fn_call& fn)
 	const char *db = fn.env->bottom(fn.first_arg_bottom_index-1).to_string();
 	const char *user = fn.env->bottom(fn.first_arg_bottom_index-2).to_string();
 	const char *passwd = fn.env->bottom(fn.first_arg_bottom_index-3).to_string();	
-	fn.result->set_bool(ptr->obj.connect(host, db, user, passwd));
+	return as_value(ptr->obj.connect(host, db, user, passwd));
     } else {
-	fn.result->set_bool(false);
+	return as_value(false);
     }
 }
 
-void
+as_value
 mysql_qetData(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -325,7 +325,10 @@ mysql_qetData(const fn_call& fn)
 	as_array_object *arr = (as_array_object *)fn.env->bottom(fn.first_arg_bottom_index-1).to_object();
 //	std::vector< std::vector<const char *> >
 	MySQL::query_t qresult;
-	fn.result->set_bool(ptr->obj.getData(sql, qresult));
+#if 0
+	// This clearly makes no sense...
+	return as_value(ptr->obj.getData(sql, qresult));
+#endif
 	for (size_t i=0; i<qresult.size(); i++) {
 	    vector<const char *> row;
 	    row = qresult[i];
@@ -335,32 +338,32 @@ mysql_qetData(const fn_call& fn)
 		arr->push(entry);
 	    }
 	}
- 	fn.result->set_bool(true);
+ 	return as_value(true);
 //     } else {
-// 	fn.result->set_bool(false);
+// 	return as_value(false);
     }
 }
 
-void
+as_value
 mysql_free(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
     assert(ptr);
     ptr->obj.free_result();
-    fn.result->set_bool(true);
+    return as_value(true);
 }
 
-void
+as_value
 mysql_fields(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_int(ptr->obj.num_fields());
+    return as_value(ptr->obj.num_fields());
 }
 
-void
+as_value
 mysql_fetch(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -371,20 +374,20 @@ mysql_fetch(const fn_call& fn)
 	as_value aaa = *res;       
 	as_array_object *arr = new as_array_object;
 	arr->push(aaa);
-	fn.result->set_as_object(arr);
+	return as_value(arr);
     }
 }
 
-void
+as_value
 mysql_store(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_bool(ptr->obj.store_result());
+    return as_value(ptr->obj.store_result());
 }
 
-void
+as_value
 mysql_query(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -392,18 +395,18 @@ mysql_query(const fn_call& fn)
     if (fn.nargs > 0) {
 	const char *sql = fn.env->bottom(fn.first_arg_bottom_index).to_string();
 	assert(ptr);
-	fn.result->set_int(ptr->obj.guery(sql));
+	return as_value(ptr->obj.guery(sql));
     }
 }
 
-void
+as_value
 mysql_disconnect(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
 
     mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
     assert(ptr);
-    fn.result->set_bool(ptr->obj.disconnect());
+    return as_value(ptr->obj.disconnect());
 }
 
 extern "C" {

@@ -220,7 +220,7 @@ public:
 	void	set_length(int len);
 
 	/// Dispatch.
-	void	operator()(const fn_call& fn);
+	as_value	operator()(const fn_call& fn);
 
 	//void	lazy_create_properties();
 };

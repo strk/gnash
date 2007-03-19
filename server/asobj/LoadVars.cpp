@@ -42,13 +42,13 @@
 
 namespace gnash {
 
-static void loadvars_addrequestheader(const fn_call& fn);
-static void loadvars_decode(const fn_call& fn);
-static void loadvars_load(const fn_call& fn);
-static void loadvars_send(const fn_call& fn);
-static void loadvars_sendandload(const fn_call& fn);
-static void loadvars_tostring(const fn_call& fn);
-static void loadvars_ctor(const fn_call& fn);
+static as_value loadvars_addrequestheader(const fn_call& fn);
+static as_value loadvars_decode(const fn_call& fn);
+static as_value loadvars_load(const fn_call& fn);
+static as_value loadvars_send(const fn_call& fn);
+static as_value loadvars_sendandload(const fn_call& fn);
+static as_value loadvars_tostring(const fn_call& fn);
+static as_value loadvars_ctor(const fn_call& fn);
 //static as_object* getLoadVarsInterface();
 //static void attachLoadVarsInterface(as_object& o);
 
@@ -155,10 +155,10 @@ private:
 	size_t processLoaded(LoadVariablesThread& lr);
 
 	/// Dispatch load event, if any
-	void dispatchLoadEvent();
+	as_value dispatchLoadEvent();
 
 	/// Dispatch data event, if any
-	void dispatchDataEvent();
+	as_value dispatchDataEvent();
 
 	void setLoadHandler(as_function* fn) {
 		_onLoad = fn;
@@ -176,17 +176,17 @@ private:
 		_onData = fn;
 	}
 
-	static void checkLoads_wrapper(const fn_call& fn);
+	static as_value checkLoads_wrapper(const fn_call& fn);
 
-	static void loaded_getset(const fn_call& fn);
+	static as_value loaded_getset(const fn_call& fn);
 
-	static void onData_getset(const fn_call& fn);
+	static as_value onData_getset(const fn_call& fn);
 
-	static void onLoad_getset(const fn_call& fn);
+	static as_value onLoad_getset(const fn_call& fn);
 
-	static void getBytesLoaded_method(const fn_call& fn);
+	static as_value getBytesLoaded_method(const fn_call& fn);
 
-	static void getBytesTotal_method(const fn_call& fn);
+	static as_value getBytesTotal_method(const fn_call& fn);
 
 	boost::intrusive_ptr<as_function> _onLoad;
 
@@ -304,33 +304,31 @@ LoadVars::getLoadVarsInterface()
 }
 
 /*private*/
-void
+as_value
 LoadVars::dispatchDataEvent()
 {
-	if ( ! _onData ) return;
+	if ( ! _onData ) return as_value();
 	
 	//log_msg("Calling _onData func");
 	// This would be the function calls "context"
 	// will likely be the same to all events
-	as_value ret;
-	fn_call fn(&ret, this, _env, 0, 0);
+	fn_call fn(this, _env, 0, 0);
 
-	_onData->call(fn);
+	return _onData->call(fn);
 }
 
 /* private */
-void
+as_value
 LoadVars::dispatchLoadEvent()
 {
-	if ( ! _onLoad ) return;
+	if ( ! _onLoad ) return as_value();
 	
 	//log_msg("Calling _onLoad func");
 	// This would be the function calls "context"
 	// will likely be the same to all events
-	as_value ret;
-	fn_call fn(&ret, this, _env, 0, 0);
+	fn_call fn(this, _env, 0, 0);
 
-	_onLoad->call(fn);
+	return _onLoad->call(fn);
 }
 
 /* private */
@@ -444,7 +442,7 @@ ensureLoadVars(as_object* obj)
 }
 
 /* private static */
-void
+as_value
 LoadVars::onLoad_getset(const fn_call& fn)
 {
 	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
@@ -452,27 +450,28 @@ LoadVars::onLoad_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		as_function* h = ptr->getLoadHandler();
-		if ( h ) fn.result->set_as_function(h);
-		else fn.result->set_undefined();
+		if ( h ) return as_value(h);
+		else return as_value();
 	}
 	else // setter
 	{
 		as_function* h = fn.arg(0).to_as_function();
 		if ( h ) ptr->setLoadHandler(h);
 	}
+	return as_value();
 }
 
 /* private static */
-void
+as_value
 LoadVars::checkLoads_wrapper(const fn_call& fn)
 {
 	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
 	ptr->checkLoads();
-
+	return as_value();
 }
 
 /* private static */
-void
+as_value
 LoadVars::onData_getset(const fn_call& fn)
 {
 
@@ -481,18 +480,19 @@ LoadVars::onData_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		as_function* h = ptr->getDataHandler();
-		if ( h ) fn.result->set_as_function(h);
-		else fn.result->set_undefined();
+		if ( h ) return as_value(h);
+		else return as_value();
 	}
 	else // setter
 	{
 		as_function* h = fn.arg(0).to_as_function();
 		if ( h ) ptr->setDataHandler(h);
 	}
+	return as_value();
 }
 
 /* private static */
-void
+as_value
 LoadVars::loaded_getset(const fn_call& fn)
 {
 
@@ -500,49 +500,51 @@ LoadVars::loaded_getset(const fn_call& fn)
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		fn.result->set_bool(ptr->loaded() > 0);
+		return as_value(ptr->loaded() > 0);
 	}
 	else // setter
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_msg("Tried to set LoadVars.loaded, which is a read-only property");
 		);
-		return;
+		return as_value();
 	}
 }
 
 
-static void
+static as_value
 loadvars_addrequestheader(const fn_call& fn)
 {
 	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
 	UNUSED(ptr);
 	log_error("%s: unimplemented", __FUNCTION__);
+	return as_value(); 
 }
 
-static void
+static as_value
 loadvars_decode(const fn_call& fn)
 {
 	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
 	UNUSED(ptr);
 	log_error("%s: unimplemented", __FUNCTION__);
+	return as_value(); 
 }
 
-void
+as_value
 LoadVars::getBytesLoaded_method(const fn_call& fn)
 {
 	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
-	fn.result->set_int(ptr->getBytesLoaded());
+	return as_value(ptr->getBytesLoaded());
 }
 
-void
+as_value
 LoadVars::getBytesTotal_method(const fn_call& fn)
 {
 	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
-	fn.result->set_int(ptr->getBytesTotal());
+	return as_value(ptr->getBytesTotal());
 }
 
-static void
+static as_value
 loadvars_load(const fn_call& fn)
 {
 	LoadVars* obj = ensureLoadVars(fn.this_ptr);
@@ -552,8 +554,7 @@ loadvars_load(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("LoadVars.load() requires at least one argument");
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 	std::string urlstr = fn.arg(0).to_std_string();
@@ -562,24 +563,24 @@ loadvars_load(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("LoadVars.load(): invalid empty url ");
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 	obj->load(urlstr);
-	fn.result->set_bool(true);
+	return as_value(true);
 	
 }
 
-static void
+static as_value
 loadvars_send(const fn_call& fn)
 {
 	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
 	UNUSED(ptr);
 	log_error("%s: unimplemented", __FUNCTION__);
+	return as_value(); 
 }
 
-static void
+static as_value
 loadvars_sendandload(const fn_call& fn)
 {
 	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
@@ -589,8 +590,7 @@ loadvars_sendandload(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("LoadVars.sendAndLoad() requires at least two arguments");
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 	std::string urlstr = fn.arg(0).to_std_string();
@@ -599,8 +599,7 @@ loadvars_sendandload(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("LoadVars.sendAndLoad(): invalid empty url ");
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 	LoadVars* target = dynamic_cast<LoadVars*>(fn.arg(1).to_object());
@@ -609,8 +608,7 @@ loadvars_sendandload(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("LoadVars.sendAndLoad(): invalid target (must be a LoadVars object)");
 		);
-		fn.result->set_bool(false);
-		return;
+		return as_value(false);
 	}
 
 	// Post by default, override by ActionScript third argument
@@ -620,23 +618,24 @@ loadvars_sendandload(const fn_call& fn)
 	//log_msg("LoadVars.sendAndLoad(%s, %p) called, and returning TRUE", urlstr.c_str(), target);
 
 	ptr->sendAndLoad(urlstr, *target, post);
-	fn.result->set_bool(true);
+	return as_value(true);
 }
 
-static void
+static as_value
 loadvars_tostring(const fn_call& fn)
 {
 	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
 	UNUSED(ptr);
 	log_error("%s: unimplemented", __FUNCTION__);
+	return as_value(); 
 }
 
-static void
+static as_value
 loadvars_ctor(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj = new LoadVars(fn.env);
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

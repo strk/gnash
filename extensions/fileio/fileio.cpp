@@ -42,22 +42,22 @@ namespace gnash
 
 static const int BUFSIZE = 1024;
 
-void fileio_fopen(const fn_call& fn);
-void fileio_fread(const fn_call& fn);
-void fileio_fgetc(const fn_call& fn);
-void fileio_fgets(const fn_call& fn);
-void fileio_gets(const fn_call& fn);
-void fileio_fwrite(const fn_call& fn);
-void fileio_fputc(const fn_call& fn);
-void fileio_fputs(const fn_call& fn);
-void fileio_puts(const fn_call& fn);
-void fileio_fclose(const fn_call& fn);
-void fileio_getchar(const fn_call& fn);
-void fileio_putchar(const fn_call& fn);
-void fileio_fflush(const fn_call& fn);
-void fileio_ftell(const fn_call& fn);
-void fileio_fseek(const fn_call& fn);
-void fileio_unlink(const fn_call& fn);
+as_value fileio_fopen(const fn_call& fn);
+as_value fileio_fread(const fn_call& fn);
+as_value fileio_fgetc(const fn_call& fn);
+as_value fileio_fgets(const fn_call& fn);
+as_value fileio_gets(const fn_call& fn);
+as_value fileio_fwrite(const fn_call& fn);
+as_value fileio_fputc(const fn_call& fn);
+as_value fileio_fputs(const fn_call& fn);
+as_value fileio_puts(const fn_call& fn);
+as_value fileio_fclose(const fn_call& fn);
+as_value fileio_getchar(const fn_call& fn);
+as_value fileio_putchar(const fn_call& fn);
+as_value fileio_fflush(const fn_call& fn);
+as_value fileio_ftell(const fn_call& fn);
+as_value fileio_fseek(const fn_call& fn);
+as_value fileio_unlink(const fn_call& fn);
 
 // <Udo> I needed a scandir() function and implemented it here for simplicity.
 // Maybe this should be moved to a dedicated extension and a different class? 
@@ -65,7 +65,7 @@ void fileio_unlink(const fn_call& fn);
 // applicable in ActionScript.
 // Same applies for unlink(). Maybe a class FileOP or sim. would be 
 // appriopriate. 
-void fileio_scandir(const fn_call& fn);
+as_value fileio_scandir(const fn_call& fn);
 
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -108,14 +108,14 @@ getInterface()
     return o.get();
 }
 
-static void
+static as_value
 fileio_ctor(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     Fileio * obj = new Fileio();
 
     attachInterface(obj);
-    fn.result->set_as_object(obj); // will keep alive
+    return as_value(obj); // will keep alive
 }
 
 
@@ -313,7 +313,7 @@ Fileio::scandir(const string dir, as_value* result)
 	result->set_as_object(array);
 }
 
-void
+as_value
 fileio_fopen(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -323,21 +323,21 @@ fileio_fopen(const fn_call& fn)
     if (fn.nargs > 0) {
 	string filespec = fn.env->bottom(fn.first_arg_bottom_index).to_string();
 	string mode = fn.env->bottom(fn.first_arg_bottom_index-1).to_string();
-	fn.result->set_bool(ptr->fopen(filespec, mode));
+	return as_value(ptr->fopen(filespec, mode));
     }
 }
 
-void
+as_value
 fileio_fclose(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio *)fn.this_ptr;
     assert(ptr);
     
-    fn.result->set_bool(ptr->fclose());
+    return as_value(ptr->fclose());
 }
 
-void
+as_value
 fileio_fread(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -348,12 +348,12 @@ fileio_fread(const fn_call& fn)
 		int count = ptr->fread(str);
 
 		if (count<0)
-			fn.result->set_bool(false);
+			return as_value(false);
 		else
-			fn.result->set_string(str.c_str());    
+			return as_value(str.c_str());    
 }
 
-void
+as_value
 fileio_fgetc(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -361,10 +361,10 @@ fileio_fgetc(const fn_call& fn)
     assert(ptr);
     int i = ptr->fgetc();
     char *c = reinterpret_cast<char *>(&i);
-    fn.result->set_string(c);
+    return as_value(c);
 }
 
-void
+as_value
 fileio_fgets(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -372,10 +372,10 @@ fileio_fgets(const fn_call& fn)
     assert(ptr);
     string str; 
     str = ptr->fgets(str);
-    fn.result->set_string(str.c_str());
+    return as_value(str.c_str());
 }
 
-void
+as_value
 fileio_gets(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -384,11 +384,11 @@ fileio_gets(const fn_call& fn)
     char buf[BUFSIZE];
     memset(buf, 0, BUFSIZE);
     string str = ::gets(buf);
-    fn.result->set_string(buf);
+    return as_value(buf);
 }
 
 // Read a single character from standard in
-void
+as_value
 fileio_getchar(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -396,98 +396,98 @@ fileio_getchar(const fn_call& fn)
     assert(ptr);
     int i = ::getchar();
     char *c = reinterpret_cast<char *>(&i);
-    fn.result->set_string(c);
+    return as_value(c);
 }
 
-void
+as_value
 fileio_fwrite(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);
     string str = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-    fn.result->set_int(ptr->fputs(str));
+    return as_value(ptr->fputs(str));
 }
 
-void
+as_value
 fileio_fputc(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
     int c = (int) fn.env->bottom(fn.first_arg_bottom_index).to_number();
-    fn.result->set_bool(ptr->fputc(c));
+    return as_value(ptr->fputc(c));
 }
 
-void
+as_value
 fileio_fputs(const fn_call& fn)
 {
     //   GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
     string str = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-    fn.result->set_bool(ptr->fputs(str));
+    return as_value(ptr->fputs(str));
 }
 
 // print to standard put
-void
+as_value
 fileio_puts(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     string str = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-    fn.result->set_int(::puts(str.c_str()));
+    return as_value(::puts(str.c_str()));
 }
 
-void
+as_value
 fileio_putchar(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
     string x = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-    fn.result->set_int(::putchar(x[0]));
+    return as_value(::putchar(x[0]));
 }
 
-void
+as_value
 fileio_fflush(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
-    fn.result->set_int(ptr->fflush());
+    return as_value(ptr->fflush());
 }
 
-void
+as_value
 fileio_fseek(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
     long c = (long) fn.env->bottom(fn.first_arg_bottom_index).to_number();
-    fn.result->set_int(ptr->fseek(c));
+    return as_value(ptr->fseek(c));
 }
 
-void
+as_value
 fileio_ftell(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);
     int i = ptr->ftell();
-    fn.result->set_int(i);
+    return as_value(i);
 }
 
-void
+as_value
 fileio_unlink(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);
     string str = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-    fn.result->set_bool(ptr->unlink(str));
+    return as_value(ptr->unlink(str));
 }
 
-void
+as_value
 fileio_scandir(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;

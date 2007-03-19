@@ -75,11 +75,11 @@ Key::removeListener()
 {
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
-void
-key_new(const fn_call& fn)
+as_value
+key_new(const fn_call& /* fn */)
 {
     key_as_object *key_obj = new key_as_object;
-    fn.result->set_as_object(key_obj);
+    return as_value(key_obj);
 }
 
 /************************************************************************
@@ -222,65 +222,64 @@ key_as_object::get_last_key_pressed() const
 }
 
 
-void
+as_value
 key_add_listener(const fn_call& fn)
 {
     if (fn.nargs < 1)
 	{
 	    log_error("key_add_listener needs one argument (the listener object)\n");
-	    return;
+	    return as_value();
 	}
 
     as_object*	listener = fn.arg(0).to_object();
     if (listener == NULL)
 	{
 	    log_error("key_add_listener passed a NULL object; ignored\n");
-	    return;
+	    return as_value();
 	}
 
     key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
     assert(ko);
 
     ko->add_listener(listener);
+    return as_value();
 }
 
-void	key_get_ascii(const fn_call& fn)
+as_value	key_get_ascii(const fn_call& fn)
     // Return the ascii value of the last key pressed.
 {
     key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
     assert(ko);
 
-    fn.result->set_undefined();
-
     int	code = ko->get_last_key_pressed();
-    if (code > 0)
-	{
-	    // @@ Crude for now; just jamming the key code in a string, as a character.
-	    // Need to apply shift/capslock/numlock, etc...
-	    char	buf[2];
-	    buf[0] = (char) code;
-	    buf[1] = 0;
+    if (code < 0)
+        return as_value();
 
-	    fn.result->set_string(buf);
-	}
+    // @@ Crude for now; just jamming the key code in a string, as a character.
+    // Need to apply shift/capslock/numlock, etc...
+    char	buf[2];
+    buf[0] = (char) code;
+    buf[1] = 0;
+
+    return as_value(buf);
 }
 
-void	key_get_code(const fn_call& fn)
+as_value	key_get_code(const fn_call& fn)
     // Returns the keycode of the last key pressed.
 {
     key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
     assert(ko);
 
-    fn.result->set_int(ko->get_last_key_pressed());
+    return as_value(ko->get_last_key_pressed());
 }
 
-void	key_is_down(const fn_call& fn)
+as_value	key_is_down(const fn_call& fn)
     // Return true if the specified (first arg keycode) key is pressed.
 {
     if (fn.nargs < 1)
 	{
 	    log_error("key_is_down needs one argument (the key code)\n");
-	    return;
+	    return as_value();
 	}
 
     int	code = (int) fn.arg(0).to_number();
@@ -288,37 +287,38 @@ void	key_is_down(const fn_call& fn)
     key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
     assert(ko);
 
-    fn.result->set_bool(ko->is_key_down(code));
+    return as_value(ko->is_key_down(code));
 }
 
-void	key_is_toggled(const fn_call& fn)
+as_value	key_is_toggled(const fn_call& /* fn */)
     // Given the keycode of NUM_LOCK or CAPSLOCK, returns true if
     // the associated state is on.
 {
     // @@ TODO
-    fn.result->set_bool(false);
+    return as_value(false);
 }
 
-void	key_remove_listener(const fn_call& fn)
+as_value	key_remove_listener(const fn_call& fn)
     // Remove a previously-added listener.
 {
     if (fn.nargs < 1)
 	{
 	    log_error("key_remove_listener needs one argument (the listener object)\n");
-	    return;
+	    return as_value();
 	}
 
     as_object*	listener = fn.arg(0).to_object();
     if (listener == NULL)
 	{
 	    log_error("key_remove_listener passed a NULL object; ignored\n");
-	    return;
+	    return as_value();
 	}
 
     key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
     assert(ko);
 
     ko->remove_listener(listener);
+    return as_value();
 }
 
 void	notify_key_event(key::code k, bool down)

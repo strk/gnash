@@ -395,9 +395,9 @@ public:
 	/// @{ Common ActionScript methods for characters
 	/// TODO: make protected
 
-	static void tostring_method(const fn_call& fn);
+	static as_value tostring_method(const fn_call& fn);
 
-	static void valueof_method(const fn_call& fn);
+	static as_value valueof_method(const fn_call& fn);
 
 	/// @} Common ActionScript getter-setters for characters
 

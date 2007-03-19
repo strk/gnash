@@ -29,11 +29,11 @@
 
 namespace gnash {
 
-void customactions_get(const fn_call& fn);
-void customactions_install(const fn_call& fn);
-void customactions_list(const fn_call& fn);
-void customactions_uninstall(const fn_call& fn);
-void customactions_ctor(const fn_call& fn);
+as_value customactions_get(const fn_call& fn);
+as_value customactions_install(const fn_call& fn);
+as_value customactions_list(const fn_call& fn);
+as_value customactions_uninstall(const fn_call& fn);
+as_value customactions_ctor(const fn_call& fn);
 
 static void
 attachCustomActionsInterface(as_object& o)
@@ -73,25 +73,29 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-void customactions_get(const fn_call& /*fn*/) {
+as_value customactions_get(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void customactions_install(const fn_call& /*fn*/) {
+as_value customactions_install(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void customactions_list(const fn_call& /*fn*/) {
+as_value customactions_list(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
-void customactions_uninstall(const fn_call& /*fn*/) {
+as_value customactions_uninstall(const fn_call& /*fn*/) {
     log_warning("%s: unimplemented \n", __FUNCTION__);
+    return as_value();
 }
 
-void
-customactions_ctor(const fn_call& fn)
+as_value
+customactions_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> obj = new customactions_as_object;
 	
-	fn.result->set_as_object(obj.get()); // will keep alive
+	return as_value(obj.get()); // will keep alive
 }
 
 // extern (used by Global.cpp)

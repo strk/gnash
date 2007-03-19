@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.19 2007/03/04 01:39:01 strk Exp $ */
+/* $Id: Math.cpp,v 1.20 2007/03/19 17:11:14 bjacques Exp $ */
 
 //
 // This file implements methods of the ActionScript Math class.
@@ -50,24 +50,24 @@ using namespace std;
 
 namespace gnash {
 
-void math_fabs(const fn_call& fn);	// Implements AS "abs"
-void math_acos(const fn_call& fn);
-void math_asin(const fn_call& fn);
-void math_atan(const fn_call& fn);
-void math_atan2(const fn_call& fn);
-void math_ceil(const fn_call& fn);
-void math_cos(const fn_call& fn);
-void math_exp(const fn_call& fn);
-void math_floor(const fn_call& fn);
-void math_log(const fn_call& fn);
-void math_max(const fn_call& fn);
-void math_min(const fn_call& fn);
-void math_pow(const fn_call& fn);
-void math_random(const fn_call& fn);
-void math_round(const fn_call& fn);
-void math_sin(const fn_call& fn);
-void math_sqrt(const fn_call& fn);
-void math_tan(const fn_call& fn);
+as_value math_fabs(const fn_call& fn);	// Implements AS "abs"
+as_value math_acos(const fn_call& fn);
+as_value math_asin(const fn_call& fn);
+as_value math_atan(const fn_call& fn);
+as_value math_atan2(const fn_call& fn);
+as_value math_ceil(const fn_call& fn);
+as_value math_cos(const fn_call& fn);
+as_value math_exp(const fn_call& fn);
+as_value math_floor(const fn_call& fn);
+as_value math_log(const fn_call& fn);
+as_value math_max(const fn_call& fn);
+as_value math_min(const fn_call& fn);
+as_value math_pow(const fn_call& fn);
+as_value math_random(const fn_call& fn);
+as_value math_round(const fn_call& fn);
+as_value math_sin(const fn_call& fn);
+as_value math_sqrt(const fn_call& fn);
+as_value math_tan(const fn_call& fn);
 
 void
 math_class_init(as_object& global)
@@ -89,7 +89,7 @@ math_class_init(as_object& global)
 //
 
 #define MATH_WRAP_FUNC1(funcname)				\
-	void	math_##funcname(const fn_call& fn)		\
+	as_value math_##funcname(const fn_call& fn)		\
 	{							\
 		double result;					\
 		if (fn.nargs < 1) result = NAN;			\
@@ -97,7 +97,7 @@ math_class_init(as_object& global)
 			double	arg = fn.arg(0).to_number();	\
 			result = funcname(arg);			\
 		}						\
-		fn.result->set_double(result);			\
+		return as_value(result);			\
 	}
 
 #ifndef __GNUC__  //Some hacks are ugly and dirty, we call them 'fulhack'.
@@ -130,7 +130,7 @@ MATH_WRAP_FUNC1(tan)
 // Fortunately, pow() in the cmath library works the same way.
 
 #define MATH_WRAP_FUNC2_EXP(funcname, expr)			\
-	void	math_##funcname(const fn_call& fn)		\
+	as_value math_##funcname(const fn_call& fn)		\
 	{							\
 		double result;					\
 		if (fn.nargs < 2) result = NAN;			\
@@ -139,7 +139,7 @@ MATH_WRAP_FUNC1(tan)
 			double	arg1 = fn.arg(1).to_number();	\
 			result = (expr);			\
 		}						\
-		fn.result->set_double(result);			\
+		return as_value(result);			\
 	}
 
 MATH_WRAP_FUNC2_EXP(atan2, (atan2(arg0, arg1)))
@@ -148,13 +148,13 @@ MATH_WRAP_FUNC2_EXP(min, (arg0 < arg1 ? arg0 : arg1))
 MATH_WRAP_FUNC2_EXP(pow, (pow(arg0, arg1)))
 
 // A couple of oddballs.
-void	math_random(const fn_call& fn)
+as_value	math_random(const fn_call& /* fn */)
 {
     // Random number between 0 and 1.
-    fn.result->set_double(tu_random::next_random() / double(uint32_t(0x0FFFFFFFF)));
+    return as_value(tu_random::next_random() / double(uint32_t(0x0FFFFFFFF)));
 }
 
-void	math_round(const fn_call& fn)
+as_value	math_round(const fn_call& fn)
 {
 	// round argument to nearest int. 0.5 goes to 1 and -0.5 goes to 0
 	double result;
@@ -164,7 +164,7 @@ void	math_round(const fn_call& fn)
 		double arg0 = fn.arg(0).to_number();
 		result = floor(arg0 + 0.5);
 	}
-	fn.result->set_double(result);
+	return as_value(result);
 }
 
 

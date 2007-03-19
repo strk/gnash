@@ -122,14 +122,15 @@ ensure_sprite(as_object* obj)
 	return ret;
 }
 
-static void sprite_play(const fn_call& fn)
+static as_value sprite_play(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
 	sprite->set_play_state(sprite_instance::PLAY);
+	return as_value();
 }
 
-static void sprite_stop(const fn_call& fn)
+static as_value sprite_stop(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
@@ -145,10 +146,11 @@ static void sprite_stop(const fn_call& fn)
 
 /*	sound_handler* sh = get_sound_handler();
 	if (sh != NULL) sh->stop_all_sounds();*/
+	return as_value();
 }
 
 //removeMovieClip() : Void
-static void sprite_remove_movieclip(const fn_call& fn)
+static as_value sprite_remove_movieclip(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
@@ -157,13 +159,15 @@ static void sprite_remove_movieclip(const fn_call& fn)
 	{
 		parent->remove_display_object(sprite->get_depth(), 0);
 	}
+	return as_value();
 }
 
 // attachMovie(idName:String, newName:String,
 //             depth:Number [, initObject:Object]) : MovieClip
-static void sprite_attach_movie(const fn_call& fn)
+static as_value sprite_attach_movie(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	as_value rv;
 
 	if (fn.nargs < 3 || fn.nargs > 4)
 	{
@@ -172,7 +176,7 @@ static void sprite_attach_movie(const fn_call& fn)
 			" expected 3 to 4, got (%d) - returning undefined",
 			fn.nargs);
 		);
-		return;
+		return rv;
 	}
 
 	// Get exported resource 
@@ -186,7 +190,7 @@ static void sprite_attach_movie(const fn_call& fn)
 			"returning undefined",
 			id_name.c_str());
 		);
-		return;
+		return rv; 
 	}
 	movie_definition* exported_movie = dynamic_cast<movie_definition*>(exported.get());
 	if ( ! exported_movie )
@@ -198,7 +202,7 @@ static void sprite_attach_movie(const fn_call& fn)
 			id_name.c_str(),
 			typeid(*(exported.get())).name());
 		);
-		return;
+		return rv;
 	}
 
 	std::string newname = fn.arg(1).to_std_string();
@@ -217,7 +221,7 @@ static void sprite_attach_movie(const fn_call& fn)
 	if ( ! sprite->attachCharacter(*newch, depth_val) )
 	{
 		log_error("Could not attach character at depth %d", depth_val);
-		return;
+		return rv;
 	}
 
 	newch->setDynamic();
@@ -241,12 +245,12 @@ static void sprite_attach_movie(const fn_call& fn)
 			);
 		}
 	}
-
-	fn.result->set_as_object(newch.get()); 
+	rv = as_value(newch.get());
+	return rv;
 }
 
 // attachAudio(id:Object) : Void
-static void sprite_attach_audio(const fn_call& fn)
+static as_value sprite_attach_audio(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
@@ -258,10 +262,11 @@ static void sprite_attach_audio(const fn_call& fn)
 			"returning undefined");
 		warned=true;
 	}
+	return as_value();
 }
 
 //createEmptyMovieClip(name:String, depth:Number) : MovieClip
-static void sprite_create_empty_movieclip(const fn_call& fn)
+static as_value sprite_create_empty_movieclip(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
@@ -275,7 +280,7 @@ static void sprite_create_empty_movieclip(const fn_call& fn)
 					" returning undefined.",
 					fn.nargs);
 			);
-			return;
+			return as_value();
 		}
 		else
 		{
@@ -289,30 +294,31 @@ static void sprite_create_empty_movieclip(const fn_call& fn)
 	}
 
 	character* ch = sprite->add_empty_movieclip(fn.arg(0).to_string(), int(fn.arg(1).to_number()));
-	fn.result->set_as_object(ch);
+	return as_value(ch);
 }
 
-static void sprite_get_depth(const fn_call& fn)
+static as_value sprite_get_depth(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
 	int n = sprite->get_depth();
 
 	// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
-	fn.result->set_int( - (n + 16383 - 1));
+	return as_value( - (n + 16383 - 1));
 }
 
 //swapDepths(target:Object) : Void
-static void sprite_swap_depths(const fn_call& fn)
+static as_value sprite_swap_depths(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	
+	as_value rv;
 	if (fn.nargs < 1)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("swapDepths needs one arg");
 		);
-		return;
+		return rv;
 	}
 
 	sprite_instance* target;
@@ -334,7 +340,7 @@ static void sprite_swap_depths(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("swapDepths has received invalid arg\n");
     		);
-		return;
+		return rv;
 	}
 
 	if (sprite == NULL || target == NULL)
@@ -342,7 +348,7 @@ static void sprite_swap_depths(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("It is impossible to swap NULL character");
 		);
-		return;
+		return rv;
 	}
 
 	if (sprite->get_parent() == target->get_parent() && sprite->get_parent() != NULL)
@@ -361,13 +367,14 @@ static void sprite_swap_depths(const fn_call& fn)
 			"with different parents");
 		);
 	}
+	return rv;
 }
 
 // TODO: wrap the functionality in a sprite_instance method
 //       and invoke it from here, this should only be a wrapper
 //
 //duplicateMovieClip(name:String, depth:Number, [initObject:Object]) : MovieClip
-static void sprite_duplicate_movieclip(const fn_call& fn)
+static as_value sprite_duplicate_movieclip(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	
@@ -376,7 +383,7 @@ static void sprite_duplicate_movieclip(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("duplicateMovieClip needs 2 or 3 args\n");
 	    	);
-		return;
+		return as_value();
 	}
 
 	// strk question: Would a call to 
@@ -426,10 +433,10 @@ static void sprite_duplicate_movieclip(const fn_call& fn)
 		}
 
 	}
-	fn.result->set_as_object(ch);
+	return as_value(ch);
 }
 
-static void sprite_goto_and_play(const fn_call& fn)
+static as_value sprite_goto_and_play(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
@@ -438,16 +445,17 @@ static void sprite_goto_and_play(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("sprite_goto_and_play needs one arg");
 		);
-		return;
+		return as_value();
 	}
 
 	// Convert to 0-based
 	size_t target_frame = size_t(fn.arg(0).to_number() - 1);
 	sprite->goto_frame(target_frame);
 	sprite->set_play_state(sprite_instance::PLAY);
+	return as_value();
 }
 
-static void sprite_goto_and_stop(const fn_call& fn)
+static as_value sprite_goto_and_stop(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
@@ -456,7 +464,7 @@ static void sprite_goto_and_stop(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("sprite_goto_and_stop needs one arg");
 		);
-		return;
+		return as_value();
 	}
 
 	// Convert to 0-based
@@ -464,9 +472,10 @@ static void sprite_goto_and_stop(const fn_call& fn)
 
 	sprite->goto_frame(target_frame);
 	sprite->set_play_state(sprite_instance::STOP);
+	return as_value();
 }
 
-static void sprite_next_frame(const fn_call& fn)
+static as_value sprite_next_frame(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
@@ -477,9 +486,10 @@ static void sprite_next_frame(const fn_call& fn)
 	    sprite->goto_frame(current_frame + 1);
 	}
 	sprite->set_play_state(sprite_instance::STOP);
+	return as_value();
 }
 
-static void sprite_prev_frame(const fn_call& fn)
+static as_value sprite_prev_frame(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
@@ -489,25 +499,26 @@ static void sprite_prev_frame(const fn_call& fn)
 	    sprite->goto_frame(current_frame - 1);
 	}
 	sprite->set_play_state(sprite_instance::STOP);
+	return as_value();
 }
 
-static void sprite_get_bytes_loaded(const fn_call& fn)
+static as_value sprite_get_bytes_loaded(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
-	fn.result->set_int(sprite->get_bytes_loaded());
+	return as_value(sprite->get_bytes_loaded());
 }
 
-static void sprite_get_bytes_total(const fn_call& fn)
+static as_value sprite_get_bytes_total(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
 	// @@ horrible uh ?
-	fn.result->set_int(sprite->get_bytes_total());
+	return as_value(sprite->get_bytes_total());
 }
 
 // my_mc.loadMovie(url:String [,variables:String]) : Void
-static void sprite_load_movie(const fn_call& fn)
+static as_value sprite_load_movie(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
@@ -519,7 +530,7 @@ static void sprite_load_movie(const fn_call& fn)
 			"expected 1 or 2 args, got %d - returning undefined",
 			fn.nargs);
 		);
-		return;
+		return as_value();
 	}
 
 	std::string urlstr = fn.arg(0).to_std_string();
@@ -532,7 +543,7 @@ static void sprite_load_movie(const fn_call& fn)
 			"returning undefined",
 			ss.str().c_str());
 		);
-		return;
+		return as_value();
 	}
 	const URL& baseurl = get_base_url();
 	URL url(urlstr, baseurl);
@@ -551,10 +562,11 @@ static void sprite_load_movie(const fn_call& fn)
 
 	//log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
 	//moviecliploader_loadclip(fn);
+	return as_value();
 }
 
 // my_mc.loadVariables(url:String [, variables:String]) : Void
-static void sprite_load_variables(const fn_call& fn)
+static as_value sprite_load_variables(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
@@ -566,7 +578,7 @@ static void sprite_load_variables(const fn_call& fn)
 			"expected 1 or 2 args, got %d - returning undefined",
 			fn.nargs);
 		);
-		return;
+		return as_value();
 	}
 
 	std::string urlstr = fn.arg(0).to_std_string();
@@ -579,7 +591,7 @@ static void sprite_load_variables(const fn_call& fn)
 			"returning undefined",
 			ss.str().c_str());
 		);
-		return;
+		return as_value();
 	}
 	const URL& baseurl = get_base_url();
 	URL url(urlstr, baseurl);
@@ -600,10 +612,11 @@ static void sprite_load_variables(const fn_call& fn)
 
 	//log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
 	//moviecliploader_loadclip(fn);
+	return as_value();
 }
 
 // my_mc.unloadMovie() : Void
-static void sprite_unload_movie(const fn_call& fn)
+static as_value sprite_unload_movie(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
@@ -616,9 +629,10 @@ static void sprite_unload_movie(const fn_call& fn)
 		log_error("FIXME: MovieClip.unloadMovie() not implemented yet");
 		warned=true;
 	}
+	return as_value();
 }
 
-static void sprite_hit_test(const fn_call& fn)
+static as_value sprite_hit_test(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	UNUSED(sprite);
@@ -639,7 +653,7 @@ static void sprite_hit_test(const fn_call& fn)
 				log_aserror("Can't find hitTest target %s",
 					tgt_val.to_string());
 				);
-				return;
+				return as_value();
 			}
 			if ( ! warned_1_arg ) {
 				log_error("FIXME: hitTest(target) unimplemented");
@@ -683,11 +697,11 @@ static void sprite_hit_test(const fn_call& fn)
 		}
 	}
 
-	return;
+	return as_value();
 
 }
 
-static void
+static as_value
 sprite_create_text_field(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -698,7 +712,7 @@ sprite_create_text_field(const fn_call& fn)
 		log_msg("createTextField called with %d args, "
 			"expected 6 - returning undefined", fn.nargs);
 		);
-		return;
+		return as_value();
 	}
 
 	if ( ! fn.arg(0).is_string() ) 
@@ -707,7 +721,7 @@ sprite_create_text_field(const fn_call& fn)
 		log_msg("First argument of createTextField is not a string"
 			" - returning undefined");
 		);
-		return;
+		return as_value();
 	}
 	std::string txt_name = fn.arg(0).to_string();
 
@@ -717,7 +731,7 @@ sprite_create_text_field(const fn_call& fn)
 		log_msg("Second argument of createTextField is not a number"
 			" - returning undefined");
 		);
-		return;
+		return as_value();
 	}
 	int txt_depth = int(fn.arg(1).to_number());
 
@@ -727,7 +741,7 @@ sprite_create_text_field(const fn_call& fn)
 		log_msg("Third argument of createTextField is not a number"
 			" - returning undefined");
 		);
-		return;
+		return as_value();
 	}
 	float txt_x = fn.arg(2).to_number();
 
@@ -737,7 +751,7 @@ sprite_create_text_field(const fn_call& fn)
 		log_msg("Fourth argument of createTextField is not a number"
 			" - returning undefined");
 		);
-		return;
+		return as_value();
 	}
 	float txt_y = fn.arg(3).to_number();
 
@@ -747,7 +761,7 @@ sprite_create_text_field(const fn_call& fn)
 		log_msg("Fifth argument of createTextField is not a number"
 			" - returning undefined");
 		);
-		return;
+		return as_value();
 	}
 	float txt_width = fn.arg(4).to_number();
 
@@ -757,7 +771,7 @@ sprite_create_text_field(const fn_call& fn)
 		log_msg("Fifth argument of createTextField is not a number"
 			" - returning undefined");
 		);
-		return;
+		return as_value();
 	}
 	float txt_height = fn.arg(5).to_number();
 
@@ -766,21 +780,21 @@ sprite_create_text_field(const fn_call& fn)
 
 	// We should return a ref to the newly created
 	// TextField here
-	fn.result->set_as_object(txt.get());
+	return as_value(txt.get());
 }
 
 //getNextHighestDepth() : Number
-static void
+static as_value
 sprite_getNextHighestDepth(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
 	unsigned int nextdepth = sprite->getNextHighestDepth();
-	fn.result->set_double(static_cast<double>(nextdepth));
+	return as_value(static_cast<double>(nextdepth));
 }
 
 // getURL(url:String, [window:String], [method:String]) : Void
-static void
+static as_value
 sprite_getURL(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -792,10 +806,11 @@ sprite_getURL(const fn_call& fn)
 		log_error("FIXME: MovieClip.getURL() not implemented yet");
 		warned=true;
 	}
+	return as_value();
 }
 
 // getBounds(targetCoordinateSpace:Object) : Object
-static void
+static as_value
 sprite_getBounds(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -829,10 +844,10 @@ sprite_getBounds(const fn_call& fn)
 		warned=true;
 	}
 
-	fn.result->set_as_object(bounds_obj.get());
+	return as_value(bounds_obj.get());
 }
 
-static void
+static as_value
 sprite_globalToLocal(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -844,16 +859,18 @@ sprite_globalToLocal(const fn_call& fn)
 		log_error("FIXME: MovieClip.globalToLocal() not implemented yet");
 		warned=true;
 	}
+	return as_value();
 }
 
-static void
+static as_value
 sprite_endFill(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 	sprite->endFill();
+	return as_value();
 }
 
-static void
+static as_value
 sprite_lineTo(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -863,7 +880,7 @@ sprite_lineTo(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror("MovieClip.lineTo() takes two args");
 		);
-		return;
+		return as_value();
 	}
 
 	float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
@@ -871,9 +888,10 @@ sprite_lineTo(const fn_call& fn)
 
 	sprite->lineTo(x, y);
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_moveTo(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -883,7 +901,7 @@ sprite_moveTo(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror("MovieClip.moveTo() takes two args");
 		);
-		return;
+		return as_value();
 	}
 
 	float x = PIXELS_TO_TWIPS(fn.arg(0).to_number());
@@ -891,9 +909,10 @@ sprite_moveTo(const fn_call& fn)
 
 	sprite->moveTo(x, y);
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_lineStyle(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -932,9 +951,10 @@ sprite_lineStyle(const fn_call& fn)
 
 	sprite->lineStyle(thickness, color);
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_curveTo(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -944,7 +964,7 @@ sprite_curveTo(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror("MovieClip.curveTo() takes four args");
 		);
-		return;
+		return as_value();
 	}
 
 	float cx = PIXELS_TO_TWIPS(fn.arg(0).to_number());
@@ -954,18 +974,20 @@ sprite_curveTo(const fn_call& fn)
 
 	sprite->curveTo(cx, cy, ax, ay);
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_clear(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
 
 	sprite->clear();
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_beginFill(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -989,9 +1011,10 @@ sprite_beginFill(const fn_call& fn)
 
 	sprite->beginFill(color);
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_beginGradientFill(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -1003,11 +1026,12 @@ sprite_beginGradientFill(const fn_call& fn)
 		log_error("FIXME: MovieClip.beginGradientFill() not implemented yet");
 		warned=true;
 	}
+	return as_value();
 }
 
 // startDrag([lockCenter:Boolean], [left:Number], [top:Number],
 // 	[right:Number], [bottom:Number]) : Void`
-static void
+static as_value
 sprite_startDrag(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -1019,10 +1043,11 @@ sprite_startDrag(const fn_call& fn)
 		log_error("FIXME: MovieClip.startDrag() not implemented yet");
 		warned=true;
 	}
+	return as_value();
 }
 
 // stopDrag() : Void
-static void
+static as_value
 sprite_stopDrag(const fn_call& fn)
 {
 	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
@@ -1034,27 +1059,28 @@ sprite_stopDrag(const fn_call& fn)
 		log_error("FIXME: MovieClip.stopDrag() not implemented yet");
 		warned=true;
 	}
+	return as_value();
 }
 
-static void
-movieclip_ctor(const fn_call& fn)
+static as_value
+movieclip_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> clip = new as_object(getMovieClipInterface());
 	//attachMovieClipProperties(*clip);
-	fn.result->set_as_object(clip.get());
+	return as_value(clip.get());
 }
 
 #ifndef OLD_GET_MEMBER
 
 
-static void
+static as_value
 sprite_currentframe_getset(const fn_call& fn)
 {
 	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		fn.result->set_int(ptr->get_current_frame() + 1);
+		return as_value(ptr->get_current_frame() + 1);
 	}
 	else // setter
 	{
@@ -1063,16 +1089,17 @@ sprite_currentframe_getset(const fn_call& fn)
 		);
 	}
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_totalframes_getset(const fn_call& fn)
 {
 	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		fn.result->set_int(ptr->get_frame_count());
+		return as_value(ptr->get_frame_count());
 	}
 	else // setter
 	{
@@ -1081,16 +1108,17 @@ sprite_totalframes_getset(const fn_call& fn)
 		);
 	}
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_framesloaded_getset(const fn_call& fn)
 {
 	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		fn.result->set_int(ptr->get_loaded_frames());
+		return as_value(ptr->get_loaded_frames());
 	}
 	else // setter
 	{
@@ -1099,16 +1127,17 @@ sprite_framesloaded_getset(const fn_call& fn)
 		);
 	}
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_target_getset(const fn_call& fn)
 {
 	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		fn.result->set_string(ptr->getTargetPath().c_str());
+		return as_value(ptr->getTargetPath().c_str());
 	}
 	else // setter
 	{
@@ -1117,9 +1146,10 @@ sprite_target_getset(const fn_call& fn)
 		);
 	}
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_name_getset(const fn_call& fn)
 {
 	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
@@ -1130,11 +1160,11 @@ sprite_name_getset(const fn_call& fn)
 		const std::string& name = ptr->get_name();
 		if ( vm.getSWFVersion() < 6 && name.empty() )
 		{
-			return;
+			return as_value();
 		} 
 		else
 		{
-			fn.result->set_string(name.c_str());
+			return as_value(name.c_str());
 		}
 	}
 	else // setter
@@ -1145,9 +1175,10 @@ sprite_name_getset(const fn_call& fn)
 		//);
 	}
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_droptarget_getset(const fn_call& fn)
 {
 	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
@@ -1165,11 +1196,11 @@ sprite_droptarget_getset(const fn_call& fn)
 		VM& vm = VM::get();
 		if ( vm.getSWFVersion() > 5 )
 		{
-			fn.result->set_string("");
+			return as_value("");
 		} 
 		else
 		{
-			return;
+			return as_value();
 		}
 	}
 	else // setter
@@ -1179,16 +1210,17 @@ sprite_droptarget_getset(const fn_call& fn)
 		);
 	}
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_url_getset(const fn_call& fn)
 {
 	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
-		fn.result->set_string(ptr->get_movie_definition()->get_url().c_str());
+		return as_value(ptr->get_movie_definition()->get_url().c_str());
 	}
 	else // setter
 	{
@@ -1197,9 +1229,10 @@ sprite_url_getset(const fn_call& fn)
 		);
 	}
 
+	return as_value();
 }
 
-static void
+static as_value
 sprite_highquality_getset(const fn_call& fn)
 {
 	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
@@ -1208,7 +1241,7 @@ sprite_highquality_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		// We don't support quality settings
-		fn.result->set_bool(true);
+		return as_value(true);
 	}
 	else // setter
 	{
@@ -1218,10 +1251,11 @@ sprite_highquality_getset(const fn_call& fn)
 			warned = true;
 		}
 	}
+	return as_value();
 }
 
 // TODO: move this to character class, _focusrect seems a generic property
-static void
+static as_value
 sprite_focusrect_getset(const fn_call& fn)
 {
 	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
@@ -1231,7 +1265,7 @@ sprite_focusrect_getset(const fn_call& fn)
 	{
 		// Is a yellow rectangle visible around a focused movie clip (?)
 		// We don't support focuserct settings
-		fn.result->set_bool(false);
+		return as_value(false);
 	}
 	else // setter
 	{
@@ -1241,9 +1275,10 @@ sprite_focusrect_getset(const fn_call& fn)
 			warned = true;
 		}
 	}
+	return as_value();
 }
 
-static void
+static as_value
 sprite_soundbuftime_getset(const fn_call& fn)
 {
 	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
@@ -1252,7 +1287,7 @@ sprite_soundbuftime_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		// Number of seconds before sound starts to stream.
-		fn.result->set_double(0.0);
+		return as_value(0.0);
 	}
 	else // setter
 	{
@@ -1262,6 +1297,7 @@ sprite_soundbuftime_getset(const fn_call& fn)
 			warned = true;
 		}
 	}
+	return as_value();
 }
 
 #endif // ndef OLD_GET_MEMBER
@@ -2187,8 +2223,9 @@ sprite_instance::on_event(const event_id& id)
 			
 	// First, check for built-in event handler.
 	{
-		as_value	method;
-		if (get_event_handler(id, &method))
+		as_value	method = get_event_handler(id);
+                   
+		if (!method.is_undefined())
 		{
 			// Dispatch.
 			call_method0(method, &m_as_environment, this);
@@ -3395,7 +3432,8 @@ sprite_instance::can_handle_mouse_event() const
 		const event_id &event = EH[i];
 
 		// Check event handlers
-		if (get_event_handler(event.id(), &dummy))
+		dummy = get_event_handler(event.id());
+		if (!dummy.is_undefined())
 		{
 			return true;
 		}
@@ -3740,10 +3778,10 @@ sprite_instance::construct()
 		set_prototype(proto);
 
 		//log_msg("Calling the user-defined constructor against this sprite_instance");
-		as_value ret; // we don't use the constructor return (should we?)
-		fn_call call(&ret, this, &(get_environment()), 0, 0);
-		(*ctor)(call);
+		fn_call call(this, &(get_environment()), 0, 0);
 
+		// we don't use the constructor return (should we?)
+		(*ctor)(call);
 	}
 }
 

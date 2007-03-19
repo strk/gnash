@@ -273,7 +273,7 @@ button_character_instance::set_enabled(bool value)
 }
 
 
-void
+as_value
 button_character_instance::enabled_getset(const fn_call& fn)
 {
 	button_character_instance* ptr = 
@@ -284,14 +284,17 @@ button_character_instance::enabled_getset(const fn_call& fn)
 		throw ActionException("enabled_getset() called against non-character instance");
 	}
 
+	as_value rv;
+
 	if ( fn.nargs == 0 ) // getter
 	{
-		fn.result->set_bool(ptr->get_enabled());
+		rv = as_value(ptr->get_enabled());
 	}
 	else // setter
 	{
 		ptr->set_enabled(fn.arg(0).to_bool());
 	}
+	return rv;
 }
 
 
@@ -610,8 +613,8 @@ button_character_instance::on_button_event(const event_id& event)
 	}
 
 	// check for built-in event handler.
-	as_value method;
-	if ( get_event_handler(event, &method) && ! method.is_undefined() )
+	as_value method = get_event_handler(event);
+	if ( ! method.is_undefined() )
 	{
 		call_method0(method, &(get_environment()), this);
 	}

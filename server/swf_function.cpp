@@ -150,7 +150,7 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn)
 
 	// Super class prototype is : obj.__proto__.constructor.prototype 
 	as_array_object* arguments = new as_array_object();
-	for (int i=0; i<fn.nargs; ++i)
+	for (unsigned int i=0; i<fn.nargs; ++i)
 	{
 		arguments->push(fn.arg(i));
 	}
@@ -161,7 +161,7 @@ swf_function::getArguments(swf_function& callee, const fn_call& fn)
 }
 
 // Dispatch.
-void
+as_value
 swf_function::operator()(const fn_call& fn)
 {
 
@@ -322,10 +322,12 @@ swf_function::operator()(const fn_call& fn)
 
 	// Execute the actions.
 	//ActionExec exec(*m_action_buffer, *our_env, m_start_pc, m_length, fn.result, m_with_stack, m_is_function2);
-	ActionExec exec(*this, *our_env, fn.result, fn.this_ptr);
+        as_value result;
+	ActionExec exec(*this, *our_env, &result, fn.this_ptr);
 	exec();
 
 	our_env->popCallFrame();
+        return result;
 }
 
 void

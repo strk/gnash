@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.11 2007/01/18 22:53:21 strk Exp $ */
+/* $Id: Key.h,v 1.12 2007/03/19 17:11:14 bjacques Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -77,12 +77,12 @@ private:
     //Key obj;
 //};
 
-void key_addlistener(const fn_call& fn);
-void key_getascii(const fn_call& fn);
-void key_getcode(const fn_call& fn);
-void key_isdown(const fn_call& fn);
-void key_istoggled(const fn_call& fn);
-void key_removelistener(const fn_call& fn);
+as_value key_addlistener(const fn_call& fn);
+as_value key_getascii(const fn_call& fn);
+as_value key_getcode(const fn_call& fn);
+as_value key_isdown(const fn_call& fn);
+as_value key_istoggled(const fn_call& fn);
+as_value key_removelistener(const fn_call& fn);
 
 /************************************************************************
  *
