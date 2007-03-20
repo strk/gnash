@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.21 2007/03/09 14:38:29 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.22 2007/03/20 15:57:56 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -156,7 +156,7 @@ NetStreamFfmpeg::readPacket(void* opaque, uint8_t* buf, int buf_size)
 {
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(opaque);
-	NetConnection* nc = ns->_netCon;
+	boost::intrusive_ptr<NetConnection> nc = ns->_netCon;
 
 	size_t ret = nc->read(static_cast<void*>(buf), buf_size);
 	ns->inputPos += ret;
@@ -169,7 +169,7 @@ offset_t
 NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(opaque);
-	NetConnection* nc = ns->_netCon;
+	boost::intrusive_ptr<NetConnection> nc = ns->_netCon;
 
 
 	// Offset is absolute new position in the file
@@ -236,7 +236,7 @@ void
 NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 {
 
-	NetConnection* nc = ns->_netCon;
+	boost::intrusive_ptr<NetConnection> nc = ns->_netCon;
 	assert(nc);
 
 	// Pass stuff from/to the NetConnection object.

@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LocalConnection.as,v 1.10 2007/03/20 14:55:09 strk Exp $";
+rcsid="$Id: LocalConnection.as,v 1.11 2007/03/20 15:57:56 bjacques Exp $";
 
 #include "dejagnu.as"
 
@@ -86,8 +86,8 @@ tmp.close();
 var ret = tmp.connect("lc_test");
 
 // There's no such 'getname' method of LocalConnection !!!
-xcheck_equals(typeof(tmp.getname), 'undefined');
-xcheck_equals(typeof(tmp.getName), 'undefined');
+check_equals(typeof(tmp.getname), 'undefined');
+check_equals(typeof(tmp.getName), 'undefined');
 
 // NOTE: This test will fail if a shared memory segment of the same
 // name exists. So the first time it'll pass, then it'll fail.

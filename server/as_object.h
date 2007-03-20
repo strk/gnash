@@ -465,25 +465,25 @@ private:
 };
 
 /// Template which does a dynamic cast for as_object pointers. It throws an
-/// error if the dynamic cast fails.
+/// exception if the dynamic cast fails.
 /// @param T the class to which the obj pointer should be cast.
 /// @param obj the pointer to be cast.
 /// @return If the cast succeeds, the pointer cast to the requested type.
 ///         Otherwise, NULL.
 template <typename T>
-T*
-ensureType (as_object* obj)
+boost::intrusive_ptr<T>
+ensureType (boost::intrusive_ptr<as_object> obj)
 {
-  	T* ret = dynamic_cast<T*>(obj);
+	boost::intrusive_ptr<T> ret = boost::dynamic_pointer_cast<T>(obj);
 
-  	if (!ret) {
-		std::string 	target = typeid(T).name(),
+	if (!ret) {
+		std::string     target = typeid(T).name(),
 				source = typeid(obj).name();
 #if defined(__GNUC__) && __GNUC__ > 2
 		int status;
 		char* target_unmangled = 
 			abi::__cxa_demangle (target.c_str(), NULL, NULL,
-					       &status);
+					     &status);
 		if (status == 0) {
 			target = target_unmangled;
 			free(target_unmangled);
@@ -491,7 +491,7 @@ ensureType (as_object* obj)
 
 		char* source_unmangled =
 			abi::__cxa_demangle (source.c_str(), NULL, NULL,
-                                             &status);
+					     &status);
 
 		if (status == 0) {
 			source = source_unmangled;
@@ -503,32 +503,8 @@ ensureType (as_object* obj)
 			target + " called from " + source + " instance.";
 
 		throw ActionException(msg);
-        }
-        return ret;
-}
-
-/// Template which does a dynamic cast for as_object pointers. It throws an
-/// error if the dynamic cast fails.
-/// @param T the class to which the obj pointer should be cast.
-/// @param obj the pointer to be cast.
-/// @return If the cast succeeds, the pointer cast to the requested type.
-///         Otherwise, NULL.
-template <typename T>
-boost::intrusive_ptr<T>
-ensureType (boost::intrusive_ptr<as_object> obj)
-{
-	boost::intrusive_ptr<T> ret = boost::dynamic_pointer_cast<T>(obj);
-
-	// This path is fairly unlikely, so it's a potential  __builtin_expect.
-  	if (!ret) {
-		std::ostringstream stream;
-		stream 	<< "builtin method or gettersetter for " 
-			<< typeid(T).name() << " called from "
-			<< typeid(obj).name() << " instance.";
-
-		throw ActionException(stream.str());
-        }
-        return ret;
+	}
+	return ret;
 }
 
 

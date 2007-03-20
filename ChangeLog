@@ -76,6 +76,11 @@
 	the AS stack in the hopes that it magically has a property which might
 	be the object that is to be deleted. Instead, traverse the stack using
 	delVariable().
+	* server/as_object.h: Remove the ensureType for raw pointers in favour
+	of the one for intrusive pointers; the former is now unused.
+	* server/asobj/NetStreamFfmpeg.cpp: Update for changes in ensureType.
+	* testsuite/actionscript.all/LocalConnection.as: Expect two more
+	successes.
 
 2007-03-19 Sandro Santilli <strk@keybit.net>
 
