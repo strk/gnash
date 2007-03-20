@@ -1,3 +1,8 @@
+2007-03-20 Ann Barcomb <ann@lulu.com>
+
+	* server/asobj/gen-asclass.pl: Produces exactly the same output
+	  as gen-asclass.sh with some extra features.
+
 2007-03-20 Sandro Santilli <strk@keybit.net>
 
 	* server/builtin_function.h (ctor): add a 'constructor'
