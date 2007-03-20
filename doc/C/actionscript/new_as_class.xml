@@ -188,19 +188,19 @@
             MyClass::myProperty_getset(const fn_call&amp; fn)
             {
 
-               MyClass* ptr = ensureType&lt;MyClass&gt;(fn.this_ptr);
+                boost::intrusive_ptr&lt;MyClass&gt; ptr = ensureType&lt;MyClass&gt;(fn.this_ptr);
 
-               // setter
-               if ( fn.nargs > 0 )
-               {
-                 bool h = fn.arg(0).to_bool();
-                 ptr->MyMethod(h);
-                 return;
-               }
+                // setter
+                if ( fn.nargs > 0 )
+                {
+                    bool h = fn.arg(0).to_bool();
+                    ptr->MyMethod(h);
+                    return;
+                }
 
-               // getter
-               bool h = ptr->MyMethod();
-               fn.result->set_bool(h);
+                // getter
+                bool h = ptr->MyMethod();
+                fn.result->set_bool(h);
             }
           </programlisting>
         </para>

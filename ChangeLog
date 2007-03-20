@@ -1,3 +1,8 @@
+2007-03-20 Ann Barcomb <ann@lulu.com>
+
+	* doc/C/actionscript/new_as_class.xml: Change documentation to
+	  intrusive_ptr (see Sandro's previous commits).
+
 2007-03-20 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.cpp, server/asobj/Boolean.cpp,
