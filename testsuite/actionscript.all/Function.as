@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.36 2007/03/20 19:13:42 strk Exp $";
+rcsid="$Id: Function.as,v 1.37 2007/03/20 21:48:49 strk Exp $";
 
 #include "check.as"
 
@@ -541,8 +541,13 @@ check_equals(typeof(Email.__constructor__), 'undefined');
 check( ! Email.hasOwnProperty('__constructor__') );
 
 Email.prototype = new Mail;
+
+check_equals(typeof(Email.prototype.constructor), 'function');
+check_equals(Email.prototype.constructor, Mail);
+
 #if OUTPUT_VERSION > 5 
 check_equals(typeof(Email.prototype.__constructor__), 'function');
+check_equals(Email.prototype.__constructor__, Email.prototype.constructor);
 #else
 check_equals(typeof(Email.prototype.__constructor__), 'undefined');
 #endif
