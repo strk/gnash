@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LocalConnection.as,v 1.13 2007/03/20 18:10:49 bjacques Exp $";
+rcsid="$Id: LocalConnection.as,v 1.14 2007/03/20 18:12:30 bjacques Exp $";
 
 #include "dejagnu.as"
 
@@ -110,6 +110,10 @@ if (ret == true) {
 // Close the connection, and then check the state
 ret = tmp.close();
 xcheck(ret);
+
+// There's no such 'exists' method of LocalConnection !!!
+check_equals(typeof(tmp.exists), 'undefined');
+
 
 #endif // OUTPUT_VERSION >= 6
 
