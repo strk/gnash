@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.66 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: ASHandlers.cpp,v 1.67 2007/03/20 09:55:08 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2045,7 +2045,7 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 void
 SWFHandlers::ActionDelete(ActionExec& thread)
 {
-	GNASH_REPORT_FUNCTION;
+//	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
 	assert(thread.code[thread.pc] == SWF::ACTION_DELETE); // 0x3A
@@ -2064,36 +2064,11 @@ SWFHandlers::ActionDelete(ActionExec& thread)
 	}
 
 	as_value var = env.pop();
-	as_value object; // undefined
 
-	if ( stacksize > 1 )
-	{
-		// I'm not sure this is correct, what happens
-		// if the stack actually has an additional 
-		// value but it is not meant for us ??
-		object = env.pop();
-	}
-	else
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-			log_warning("One element on the stack "
-				"at ActionDelete (0x3A). "
-				"Assuming 'undefined' for Object arg.");
-		);
-	}
-
-
-	as_object* obj = (as_object*) object.to_object();
-	bool ret;
-	if (obj) {
-		ret = obj->delProperty(var.to_std_string()).second;
-	} else {
-		ret = thread.delVariable(var.to_std_string());
-	}
-
+	bool ret = thread.delVariable(var.to_std_string());
 	env.push(as_value(ret));
-	return;
 
+	return;
 }
 
 void

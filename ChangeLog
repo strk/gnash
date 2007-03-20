@@ -8,6 +8,10 @@
 	* server/as_object.h: Add ensureType<classname>, which is intended to
 	replace the class-specific ensureClass functions. Suggested by Ann.
 	* server/asobj/Boolean.cpp: Switch ensureClass to ensureType.
+	* server/vm/ASHandlers.cpp: In ActionDelete(), don't pop an object off
+	the AS stack in the hopes that it magically has a property which might
+	be the object that is to be deleted. Instead, traverse the stack using
+	delVariable().
 
 2007-03-19 Sandro Santilli <strk@keybit.net>
 
