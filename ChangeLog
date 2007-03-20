@@ -1,5 +1,7 @@
 2007-03-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/LocalConnection.as: add tests
+	  for existance of functions that somehow slipped into Gnash.
 	* server/as_function.{cpp,h}: add getFunctionConstructor()
 	  public static method.
 	* server/swf_function.cpp: assing Function as the constructor
