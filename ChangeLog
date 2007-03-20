@@ -78,17 +78,18 @@
 	  material has been rewritten and incorporates Sandro's
 	  feedback on the previous version.
 
-2007-03-19 Bastiaan Jacques <bastiaan@bjacques.org>
+2007-03-19 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ming_utils.h: Add Ming defines available onl
-	in CVS; some of the new testcases depend on these.
+	in CVS; some of the new testcases depend on these. Suggested by
+	Benjamin Otte.
 
-2007-03-19 Sandro Santilli <strk@keybit.net>
+2007-03-19 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* testsuite/actionscript.all/LoadVars.as: Don't assume that the system on
 	which testcases are run has a HTTP server running on localhost that meets
 	our specifications. Instead, read object property data from a local file
-	and update the expected output to match. Suggested by Benjamin Otte.
+	and update the expected output to match.
 
 2007-03-19 Zou Lunkai <zoulunkai@gmail.com>
 
