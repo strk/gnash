@@ -63,10 +63,10 @@ lowercase_if_needed(std::string& str)
 as_value::as_value(as_function* func)
     :
     m_type(AS_FUNCTION),
-    m_as_function_value(func)
+    m_object_value(func)
 {
-    if (m_as_function_value) {
-	m_as_function_value->add_ref();
+    if (m_object_value) {
+	m_object_value->add_ref();
     } else {
         m_type = NULLTYPE;
     }
@@ -172,7 +172,7 @@ as_value::to_tu_string(as_environment* env) const
 			// text representation for that object is used
 			// instead.
 			//
-			as_object* obj = m_type == OBJECT ? m_object_value : m_as_function_value;
+			as_object* obj = m_object_value; 
 			bool gotValidToStringResult = false;
 			if ( env )
 			{
@@ -251,9 +251,8 @@ as_value::to_primitive() const
 	switch (m_type)
 	{
 		case OBJECT:
-			return m_object_value->get_primitive_value();
 		case AS_FUNCTION:
-			return m_as_function_value->get_primitive_value();
+			return m_object_value->get_primitive_value();
 		case UNDEFINED:
 		case NULLTYPE:
 		case BOOLEAN:
@@ -319,7 +318,7 @@ as_value::to_number(as_environment* env) const
 
 			//log_msg("OBJECT to number conversion, env is %p", env);
 
-			as_object* obj = m_type == OBJECT ? m_object_value : m_as_function_value;
+			as_object* obj = m_object_value; 
 			bool gotValidValueOfResult = false;
 			if ( env )
 			{
@@ -375,10 +374,9 @@ as_value::to_bool_v7() const
 		case BOOLEAN:
 			return this->m_boolean_value;
 		case OBJECT:
+		case AS_FUNCTION:
 			// it is possible we'll need to convert to number anyway first
 			return m_object_value != NULL;
-		case AS_FUNCTION:
-			return m_as_function_value != NULL;
 		case MOVIECLIP:
 			return true;
 		default:
@@ -410,10 +408,9 @@ as_value::to_bool_v5() const
 		case BOOLEAN:
 			return this->m_boolean_value;
 		case OBJECT:
+		case AS_FUNCTION:
 			// it is possible we'll need to convert to number anyway first
 			return m_object_value != NULL;
-		case AS_FUNCTION:
-			return m_as_function_value != NULL;
 		case MOVIECLIP:
 			return true;
 		default:
@@ -445,10 +442,9 @@ as_value::to_bool_v6() const
 		case BOOLEAN:
 			return this->m_boolean_value;
 		case OBJECT:
+		case AS_FUNCTION:
 			// it is possible we'll need to convert to number anyway first
 			return m_object_value != NULL;
-		case AS_FUNCTION:
-			return m_as_function_value != NULL;
 		case MOVIECLIP:
 			return true;
 		default:
@@ -474,10 +470,8 @@ as_value::to_object() const
 	switch (m_type)
 	{
 		case OBJECT:
-			return m_object_value;
-
 		case AS_FUNCTION:
-			return m_as_function_value;
+			return m_object_value;
 
 		case MOVIECLIP:
 			return to_sprite();
@@ -540,7 +534,7 @@ as_value::to_as_function() const
 {
     if (m_type == AS_FUNCTION) {
 	// OK.
-	return m_as_function_value;
+	return m_object_value->to_function();
     } else {
 	return NULL;
     }
@@ -606,12 +600,12 @@ as_value::set_as_object(as_object* obj)
 void
 as_value::set_as_function(as_function* func)
 {
-    if (m_type != AS_FUNCTION || m_as_function_value != func) {
+    if (m_type != AS_FUNCTION || m_object_value != func) {
 	drop_refs();
 	m_type = AS_FUNCTION;
-	m_as_function_value = func;
-	if (m_as_function_value) {
-	    m_as_function_value->add_ref();
+	m_object_value = func;
+	if (m_object_value) {
+	    m_object_value->add_ref();
 	} else {
 	    m_type = NULLTYPE;
 	}
@@ -726,17 +720,13 @@ as_value::string_concat(const tu_string& str)
 void
 as_value::drop_refs()
 {
-    if (m_type == AS_FUNCTION) {
-	if (m_as_function_value) {
-	    m_as_function_value->drop_ref();
-	    m_as_function_value = 0;
-	}
-    } else if (m_type == OBJECT) {
-	if (m_object_value) {
+    if (m_type == AS_FUNCTION || m_type == OBJECT )
+    {
+	if (m_object_value) // should assert here ?
+	{
 	    m_object_value->drop_ref();
-	    m_object_value = 0;
 	}
-    }
+    } 
 }
 
 const char*
@@ -802,7 +792,7 @@ as_value::to_debug_string() const
 			sprintf(buf, "[object:%p]", m_object_value);
 			return buf;
 		case AS_FUNCTION:
-			sprintf(buf, "[function:%p]", m_as_function_value);
+			sprintf(buf, "[function:%p]", m_object_value);
 			return buf;
 		case STRING:
 			ret = "[string:" + std::string(m_string_value.c_str()) + std::string("]");
@@ -816,6 +806,23 @@ as_value::to_debug_string() const
 		default:
 			assert(0);
 	}
+}
+
+void
+as_value::operator=(const as_value& v)
+{
+	if (v.m_type == UNDEFINED) set_undefined();
+	else if (v.m_type == NULLTYPE) set_null();
+	else if (v.m_type == BOOLEAN) set_bool(v.m_boolean_value);
+	else if (v.m_type == STRING) set_tu_string(v.m_string_value);
+	else if (v.m_type == NUMBER) set_double(v.m_number_value);
+	else if (v.m_type == OBJECT) set_as_object(v.m_object_value);
+
+	//TODO: don't use c_str() when m_string_value will be a std::string
+	else if (v.m_type == MOVIECLIP) set_sprite(v.m_string_value.c_str());
+
+	else if (v.m_type == AS_FUNCTION) set_as_function(v.m_object_value->to_function());
+	else assert(0);
 }
 
 } // namespace gnash

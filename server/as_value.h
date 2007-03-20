@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.34 2007/03/19 18:49:03 bjacques Exp $ */
+/* $Id: as_value.h,v 1.35 2007/03/20 09:19:33 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -507,21 +507,7 @@ public:
 	///
 	as_value& set_null() { drop_refs(); m_type = NULLTYPE; return *this; }
 
-	void	operator=(const as_value& v)
-	{
-		if (v.m_type == UNDEFINED) set_undefined();
-		else if (v.m_type == NULLTYPE) set_null();
-		else if (v.m_type == BOOLEAN) set_bool(v.m_boolean_value);
-		else if (v.m_type == STRING) set_tu_string(v.m_string_value);
-		else if (v.m_type == NUMBER) set_double(v.m_number_value);
-		else if (v.m_type == OBJECT) set_as_object(v.m_object_value);
-
-		//TODO: don't use c_str() when m_string_value will be a std::string
-		else if (v.m_type == MOVIECLIP) set_sprite(v.m_string_value.c_str());
-
-		else if (v.m_type == AS_FUNCTION) set_as_function(v.m_as_function_value);
-		else assert(0);
-	}
+	void	operator=(const as_value& v);
 
 	bool	is_undefined() const { return (m_type == UNDEFINED); }
 
@@ -568,7 +554,7 @@ public:
 	/// Sets this value to this string plus the given string.
 	void	string_concat(const tu_string& str);
 
-	tu_string* get_mutable_tu_string() { assert(m_type == STRING); return &m_string_value; }
+	//tu_string* get_mutable_tu_string() { assert(m_type == STRING); return &m_string_value; }
 
 private:
 
@@ -591,7 +577,6 @@ private:
 		// @@ hm, what about PS2, where double is bad?  should maybe have int&float types.
 		mutable	double	m_number_value;
 		as_object*	m_object_value;
-		as_function*	m_as_function_value;
 	};
 
 };

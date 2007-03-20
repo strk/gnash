@@ -1,3 +1,11 @@
+2007-03-19 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.{cpp,h}: simplify union by using
+	  a single pointer value, toward using a smart pointer
+	  there.
+	* testsuite/actionscript.all/Function.as: expect a couple
+	  of successes I missed on last commit.
+
 2007-03-19 Ann Barcomb <ann@lulu.com>
 
 	* server/as_object.h: corrected Doxygen comments about

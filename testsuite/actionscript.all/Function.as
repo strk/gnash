@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.30 2007/03/19 20:03:23 strk Exp $";
+rcsid="$Id: Function.as,v 1.31 2007/03/20 09:19:33 strk Exp $";
 
 #include "check.as"
 
@@ -455,7 +455,7 @@ check_equals(typeof(a.constructor), 'function');
 xcheck_equals(typeof(a.__constructor__), 'function');
 #if OUTPUT_VERSION == 6
 xcheck(a.hasOwnProperty('constructor'));
-#else
+#else // OUTPUT_VERSION > 6
 check(!a.hasOwnProperty('constructor'));
 #endif
 xcheck(a.hasOwnProperty('__constructor__'));
@@ -471,7 +471,7 @@ check_equals(typeof(a.constructor), 'function');
 xcheck_equals(typeof(a.__constructor__), 'function');
 #if OUTPUT_VERSION == 6
 xcheck(a.hasOwnProperty('constructor'));
-#else
+#else // OUTPUT_VERSION > 6
 check(!a.hasOwnProperty('constructor'));
 #endif
 xcheck(a.hasOwnProperty('__constructor__'));
@@ -487,7 +487,7 @@ xcheck_equals(typeof(a.constructor), 'function');
 xcheck_equals(typeof(a.__constructor__), 'function');
 #if OUTPUT_VERSION == 6
 xcheck(a.hasOwnProperty('constructor'));
-#else
+#else // OUTPUT_VERSION > 6
 check(!a.hasOwnProperty('constructor'));
 #endif
 xcheck(a.hasOwnProperty('__constructor__'));
@@ -573,6 +573,6 @@ check_equals(myMail.subject, 'greetings');
 xcheck_equals(myMail.to, 'everyone');
 xcheck_equals(myMail.message, 'enlarge yourself');
 #else
-xcheck_equals(myMail.to, undefined);
-xcheck_equals(myMail.message, undefined);
+check_equals(myMail.to, undefined);
+check_equals(myMail.message, undefined);
 #endif
