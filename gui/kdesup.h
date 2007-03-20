@@ -63,7 +63,7 @@ class DSOEXPORT qwidget : public QGLWidget
 {
     Q_OBJECT
 public:
-    qwidget(WId embed, KdeGui* godfather);
+    qwidget(KdeGui* godfather);
     void setInterval(unsigned int interval);
 protected:
     void contextMenuEvent(QContextMenuEvent *event);

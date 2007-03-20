@@ -536,12 +536,7 @@ static const int XKeyPress = KeyPress;
 #undef Unsorted
 #undef Bool
 
-KlashEmbed::KlashEmbed (KlashView * view) : QXEmbed (view), m_view (view) {
-    setProtocol (QXEmbed::XPLAIN);
-    int scr = DefaultScreen (qt_xdisplay ());
-    embed (XCreateSimpleWindow (qt_xdisplay(), view->winId (), 0, 0, width(), height(), 1, BlackPixel (qt_xdisplay(), scr), BlackPixel (qt_xdisplay(), scr)));
-    XClearWindow (qt_xdisplay(), embeddedWinId ());
-}
+KlashEmbed::KlashEmbed (KlashView * view) : QXEmbed (view), m_view (view) {}
 
 KlashEmbed::~KlashEmbed () {}
 
@@ -557,7 +552,7 @@ void KlashView::resizeEvent (QResizeEvent *) {
 }
 
 WId KlashView::embedId () {
-    return m_embed->embeddedWinId ();
+    return m_embed->winId ();
 }
 
 #include "klash_part.moc"

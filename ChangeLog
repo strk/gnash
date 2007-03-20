@@ -1,3 +1,9 @@
+2007-03-20 Antti Ajanki <antti.ajanki@iki.fi>
+
+	* gui/{kde.cpp, kdesup.h}, plugin/klash/klash_part.cpp: When
+	embedding a Gnash into Konqueror, skip window creation. This also
+	fixes a problem with scaling.	
+
 2007-03-20 Ann Barcomb <ann@lulu.com>
 
 	* doc/C/actionscript/new_as_class.xml: Change documentation to

@@ -27,6 +27,7 @@
 #include <qwidget.h>
 #include <qmessagebox.h>
 #include <qcursor.h>
+#include <qxembed.h>
 
 #include "gnash.h"
 #include "movie_definition.h" 
@@ -67,7 +68,11 @@ bool
 KdeGui::init(int argc, char **argv[])
 {
     _qapp = new QApplication(argc, *argv);
-    _qwidget = new qwidget(_xid, this); 
+    _qwidget = new qwidget(this); 
+    if (_xid) {
+        QXEmbed::initialize();
+        QXEmbed::embedClientIntoWindow(_qwidget, _xid);
+    }
 
 //    GNASH_REPORT_FUNCTION;
     _glue.init (argc, argv);
@@ -238,11 +243,9 @@ qwidget::mouseMoveEvent(QMouseEvent *event)
     _godfather->notify_mouse_moved(position.x(), position.y());
 }
 
-qwidget::qwidget(WId embed, KdeGui* godfather)
+qwidget::qwidget(KdeGui* godfather)
   : QGLWidget(0, "hi")
 {
-    create (embed);
-
     _qmenu.insertItem("Play Movie", this, SLOT(menuitem_play_callback()));
     _qmenu.insertItem("Pause Movie", this, SLOT(menuitem_pause_callback()));
     _qmenu.insertItem("Stop Movie", this, SLOT(menuitem_stop_callback()));
