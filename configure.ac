@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.273 2007/03/16 21:31:33 strk Exp $
+dnl $Id: configure.ac,v 1.274 2007/03/20 20:27:29 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1013,9 +1013,11 @@ if test x$kde = xyes -o x$klash = xyes; then
     echo "        KDE libs are: $KDE_LIBS"
   else
     if test x$gui = xkde -o x$klash = xyes ; then
-      echo "        ERROR: No kde development package installed!"
-      echo "               Reconfigure with --disable-klash to continue"
-      echo "               and/or change to a different gui"
+      echo "        ERROR: No KDE development package installed!"
+      echo "               Reconfigure with --disable-klash and/or"
+      echo "               change to a different gui with --enable-gui=..."
+      echo "               or install the KDE development environment, or"
+      echo "               install kdelibs-dev (using apt-get) or something-else (using yum)."
       nogo=true
     fi
   fi
@@ -1024,9 +1026,18 @@ if test x$kde = xyes -o x$klash = xyes; then
     echo "        QT libs are: $QT_LIBS"
   else
     if test x$gui = xkde -o x$klash = xyes ; then
-      echo "        ERROR: No QT development package installed!"
-      echo "               Reconfigure with --disable-klash to continue"
-      echo "               and/or change to a different gui"
+      if test x"$has_kde" != xyes; then
+	# We have already moaned about KDE absence, so presumably they'll get
+	# QT-dev when they install KDE-dev
+	:
+      else
+	# This should never happen unless they have a very odd version of KDE
+        echo "        ERROR: No QT development package installed!"
+        echo "               Reconfigure with --disable-klash and/or"
+        echo "               change to a different gui with --enable-gui=..."
+        echo "               or install a QT development environment, or"
+        echo "               install libqt3-mt-dev (using apt-get) or something-else (using yum)."
+      fi
       nogo=true
     fi
   fi
@@ -1041,6 +1052,8 @@ if test x"${JPEG_LIBS}" != x ; then
   echo "        JPEG libs are: $JPEG_LIBS"
 else
   echo "        ERROR: No JPEG library development package installed!"
+  echo "        You need to have the libjpeg package installed to compile, or"
+  echo "        install libjpeg-dev (using apt-get) or libjpeg-devel (using yum)."
   nogo=true
 fi
 
@@ -1408,17 +1421,6 @@ else
  nogo=true
 fi
 
-if test x"$JPEG_LIBS" != x; then
-    echo "        JPEG flags are: $JPEG_CFLAGS"
-    echo "        JPEG libs are: $JPEG_LIBS"
-else
-    echo "ERROR: No JPEG development package installed!\
- You need to have the libjpeg package installed\
- to compile, or install libjpeg-dev (using apt-get)\
- or libjpeg-devel (using yum)."
- nogo=true
-fi
-
 if test x"$MING_LIBS" != x; then
     echo "        MING version code is $MING_VERSION_CODE"
     echo "        MING flags are $MING_CFLAGS"
@@ -1457,38 +1459,15 @@ else
  to play compressed SWF (most of them from version 6 up). "
 fi
 
-if test x$kde = xyes -o x$klash = xyes; then
-  if test x"$has_kde" = xyes; then
-    echo "        KDE flags are: $KDE_CFLAGS"
-    echo "        KDE libs are: $KDE_LIBS"
-  else
-    if test x$gui = xkde -o x$klash = xyes ; then
-      echo "        ERROR: No kde development package installed!"
-      echo "               Reconfigure with --disable-klash to continue"
-      echo "               and/or change to a different gui"
-      nogo=true
-    fi
-  fi
-  if test x"$has_qt" = xyes; then
-    echo "        QT flags are: $QT_CFLAGS"
-    echo "        QT libs are: $QT_LIBS"
-  else
-    if test x$gui = xkde -o x$klash = xyes ; then
-      echo "        ERROR: No QT development package installed!"
-      echo "               Reconfigure with --disable-klash to continue"
-      echo "               and/or change to a different gui"
-      nogo=true
-    fi
-  fi
-fi
-
 if test x$extensions = xyes; then
   if test x$mysql != xno; then
     if test x"$MYSQL_LIBS" != x; then
       echo "        MYSQL flags are: $MYSQC_CFLAGS"
       echo "        MYSQL libs are: $MYSQL_LIBS"
     else
-      echo "        ERROR: No MySQL development package installed!"
+      echo "        ERROR: No MySQL development package is installed."
+      echo "               Either reconfigure with --disable-extensions, or install"
+      echo "               libmysqlclient-dev (using apt-get) or something-else (using yum)"
     fi
   fi
 fi

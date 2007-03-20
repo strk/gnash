@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: kde.m4,v 1.27 2007/03/06 18:06:13 rsavoye Exp $
+dnl $Id: kde.m4,v 1.28 2007/03/20 20:27:29 martinwguy Exp $
 
 AC_DEFUN([GNASH_PATH_KDE],
 [
@@ -176,12 +176,32 @@ AC_DEFUN([GNASH_PATH_QT],
         break
       fi
     done
-    if test x$gnash_qt_version != x; then
+
+    if test "x$gnash_qt_version" != x; then
       break;
     fi
   done
 
-  dnl incllist is inherited from configure.ac.
+dnl On Debian the dir is /usr/include/qt3 with /usr/lib/libqt-mt.*
+dnl so we set topdir to /usr so that $topdir/lib/libqt-mt.* works below,
+dnl and version to 3 or whatever.
+dnl incllist is inherited from configure.ac.
+  if test "x$gnash_qt_version" == x; then
+    for i in $incllist; do
+      for j in `ls -dr $i/qt[[0-9]] 2>/dev/null`; do
+        if test -f $j/qobject.h; then
+          gnash_qt_topdir=`echo "$i" | sed 's:/include::'`
+          gnash_qt_version=`echo "$j" | sed "s:$i/qt::"`
+          ac_cv_path_qt_incl="-I$j"
+          break
+        fi
+      done
+      if test x$gnash_qt_version != x; then
+        break;
+      fi
+    done
+  fi
+
   if test x"${ac_cv_path_qt_incl}" = x; then
     AC_MSG_RESULT(no)
   else
@@ -210,9 +230,12 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
   if test x"${ac_cv_path_qt_lib}" = x; then
     AC_MSG_CHECKING([for qt library])
     if test -f ${gnash_qt_topdir}/lib/libqt-mt.a -o -f ${gnash_qt_topdir}/lib/libqt-mt.so ; then
-      AC_MSG_RESULT(${gnash_qt_topdir}/lib/libqt-mt)
       ac_cv_path_qt_lib="-L${gnash_qt_topdir}/lib -lqt-mt"
-      break
+    fi
+    if test x"${ac_cv_path_qt_lib}" != x; then
+      AC_MSG_RESULT(${gnash_qt_topdir}/lib/libqt-mt)
+    else
+      AC_MSG_RESULT(no)
     fi
   fi
 

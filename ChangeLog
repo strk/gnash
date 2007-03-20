@@ -1,3 +1,11 @@
+2007-03-20 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac:
+	  Remove duplicate of presence tests for JPEG KDE QT.
+	  Say what to install for KDE QT MYSQL.
+	* configure.ac macros/kde.m4:
+	  Fix broken QT detection on Debian.
+
 2007-03-20 Ann Barcomb <ann@lulu.com>
 
 	* server/asobj/gen-asclass.pl: Produces exactly the same output
@@ -52,6 +60,7 @@
 	* testsuite/actionscript.all/Function.as:
 	  Couple of more successes.
 
+>>>>>>> 1.2655
 2007-03-20 Sandro Santilli <strk@keybit.net>
 
 	* server/array.cpp, server/as_environment.cpp,
