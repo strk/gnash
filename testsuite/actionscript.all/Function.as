@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.34 2007/03/20 17:14:27 strk Exp $";
+rcsid="$Id: Function.as,v 1.35 2007/03/20 18:41:19 strk Exp $";
 
 #include "check.as"
 
@@ -534,8 +534,8 @@ check_equals(typeof(Email.constructor.constructor.constructor), 'function');
 check_equals(Email.constructor.constructor.constructor, Function);
 #if OUTPUT_VERSION > 5
 check(Email.hasOwnProperty('constructor'));
-xcheck(Email.constructor.hasOwnProperty('constructor'));
-xcheck(Email.constructor.constructor.hasOwnProperty('constructor'));
+check(Email.constructor.hasOwnProperty('constructor'));
+check(Email.constructor.constructor.hasOwnProperty('constructor'));
 #endif // OUTPUT_VERSION > 5
 
 // Anyway, Email was not created using 'new', so it does

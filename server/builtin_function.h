@@ -54,6 +54,7 @@ public:
 		as_function(iface),
 		_func(func)
 	{
+		init_member("constructor", this);
 	}
 
 	/// Invoke this function or this Class constructor

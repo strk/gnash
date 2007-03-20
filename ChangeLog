@@ -1,5 +1,7 @@
 2007-03-20 Sandro Santilli <strk@keybit.net>
 
+	* server/builtin_function.h (ctor): add a 'constructor'
+	  property pointing to self.
 	* testsuite/actionscript.all/LocalConnection.as: add tests
 	  for existance of functions that somehow slipped into Gnash.
 	* server/as_function.{cpp,h}: add getFunctionConstructor()
