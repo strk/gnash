@@ -1,5 +1,13 @@
 2007-03-20 Sandro Santilli <strk@keybit.net>
 
+	* server/as_function.{cpp,h}: add getFunctionConstructor()
+	  public static method.
+	* server/swf_function.cpp: assing Function as the constructor
+	  property of user-defined functions.
+	* testsuite/actionscript.all/Function.as: more successes.
+
+2007-03-20 Sandro Santilli <strk@keybit.net>
+
 	* server/as_function.{cpp,h}: add a constructInstance()
 	  function taking care of proper ActionScript instances
 	  initialization.

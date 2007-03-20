@@ -20,9 +20,11 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.33 2007/03/20 16:41:00 strk Exp $";
+rcsid="$Id: Function.as,v 1.34 2007/03/20 17:14:27 strk Exp $";
 
 #include "check.as"
+
+#if 0 // REMOVEME STRK
 
 // Define a function returning 'this'.name and the given args
 function getThisName(a,b,c) { return this.name+a+b+c; }
@@ -445,6 +447,7 @@ check_equals(typeof(textOutFunc.toString), 'number');
 note(textOutFunc);
 
 
+#endif //  REMOVEME STRK
 //-----------------------------------------------------
 // Test constructor and __constructor__ properties
 //-----------------------------------------------------
@@ -454,7 +457,7 @@ check_equals(typeof(a.constructor), 'function');
 #if OUTPUT_VERSION > 5
 check_equals(typeof(a.__constructor__), 'function');
 #if OUTPUT_VERSION == 6
-xcheck(a.hasOwnProperty('constructor'));
+check(a.hasOwnProperty('constructor'));
 #else // OUTPUT_VERSION > 6
 check(!a.hasOwnProperty('constructor'));
 #endif
@@ -470,7 +473,7 @@ check_equals(typeof(a.constructor), 'function');
 #if OUTPUT_VERSION > 5
 check_equals(typeof(a.__constructor__), 'function');
 #if OUTPUT_VERSION == 6
-xcheck(a.hasOwnProperty('constructor'));
+check(a.hasOwnProperty('constructor'));
 #else // OUTPUT_VERSION > 6
 check(!a.hasOwnProperty('constructor'));
 #endif
@@ -486,7 +489,7 @@ check_equals(typeof(a.constructor), 'function');
 #if OUTPUT_VERSION > 5
 check_equals(typeof(a.__constructor__), 'function');
 #if OUTPUT_VERSION == 6
-xcheck(a.hasOwnProperty('constructor'));
+check(a.hasOwnProperty('constructor'));
 #else // OUTPUT_VERSION > 6
 check(!a.hasOwnProperty('constructor'));
 #endif
@@ -530,7 +533,7 @@ check_equals(Email.constructor.constructor, Function);
 check_equals(typeof(Email.constructor.constructor.constructor), 'function');
 check_equals(Email.constructor.constructor.constructor, Function);
 #if OUTPUT_VERSION > 5
-xcheck(Email.hasOwnProperty('constructor'));
+check(Email.hasOwnProperty('constructor'));
 xcheck(Email.constructor.hasOwnProperty('constructor'));
 xcheck(Email.constructor.constructor.hasOwnProperty('constructor'));
 #endif // OUTPUT_VERSION > 5

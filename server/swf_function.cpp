@@ -27,6 +27,7 @@
 #include "action_buffer.h"
 #include "ActionExec.h" // for operator()
 #include "VM.h" // for storing _global in a local register
+#include "builtin_function.h" // for Function constructor
 
 #include <typeinfo>
 #include <iostream>
@@ -66,10 +67,11 @@ swf_function::swf_function(const action_buffer* ab,
 	//as_object* proto = _properties;
 	//proto->add_ref();
 
-	//proto->init_member("constructor", this); //as_value(func));
-	//proto->init_member_flags("constructor", 1);
+	//proto->init_member("constructor", this); 
 
 	//init_member("prototype", as_value(proto));
+
+	init_member("constructor", as_value(as_function::getFunctionConstructor().get()));
 }
 
 /*private static*/

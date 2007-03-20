@@ -151,21 +151,24 @@ as_function::getPrototype()
 	return _properties.get();
 }
 
+/* static public */
+boost::intrusive_ptr<builtin_function>
+as_function::getFunctionConstructor()
+{
+	static boost::intrusive_ptr<builtin_function> func=new builtin_function(
+		function_ctor, // function constructor doesn't do anything
+		getFunctionPrototype() // exported interface
+		);
+	return func;
+}
+
 /*
  * Initialize the "Function" member of a _global object.
  */
 void
 function_class_init(as_object& global)
 {
-	// This is going to be the global Function "class"/"function"
-	// TODO: use Function() instead (where Function derives from as_function, being a class)
-
-	// Make sure the prototype is always alive
-	// (static boost::intrusive_ptr<> should ensure this)
-	static boost::intrusive_ptr<as_function> func=new builtin_function(
-		function_ctor, // function constructor doesn't do anything
-		getFunctionPrototype() // exported interface
-		);
+	boost::intrusive_ptr<builtin_function> func=as_function::getFunctionConstructor();
 
 	// Register _global.Function
 	global.init_member("Function", func.get());
@@ -308,9 +311,11 @@ as_function::constructInstance( as_environment& env,
 {
 //	GNASH_REPORT_FUNCTION;
 
-	as_value new_obj;
-
 	assert(get_ref_count() > 0);
+
+	int swfversion = VM::get().getSWFVersion();
+
+	boost::intrusive_ptr<as_object> newobj;
 
         // a built-in class takes care of assigning a prototype
 	// TODO: change this
@@ -322,16 +327,20 @@ as_function::constructInstance( as_environment& env,
 		);
 
 		fn_call fn(NULL, &env, nargs, first_arg_index);
-		new_obj = call(fn);
+		newobj = call(fn).to_object();
+		assert(newobj); // we assume builtin functions do return objects !!
 
 		// Add a __constructor__ member to the new object, but only for SWF6 up
 		// (to be checked). NOTE that we assume the builtin constructors
 		// won't set __constructor__ to some other value...
-		if ( VM::get().getSWFVersion() > 5 )
+		if ( swfversion > 5 )
 		{
-			boost::intrusive_ptr<as_object> newobj = new_obj.to_object();
-			assert(newobj); // we assume builtin functions do return objects !!
 			newobj->init_member("__constructor__", as_value(this));
+
+			if ( swfversion == 6 )
+			{
+				newobj->init_member("constructor", as_value(this));
+			}
 		}
 
         }
@@ -351,23 +360,26 @@ as_function::constructInstance( as_environment& env,
 		);
 
 		// Create an empty object, with a ref to the constructor's prototype.
-		boost::intrusive_ptr<as_object> new_obj_ptr(new as_object(proto.to_object()));
+		newobj = new as_object(proto.to_object());
 
 		// Add a __constructor__ member to the new object, but only for SWF6 up
 		// (to be checked)
-		if ( VM::get().getSWFVersion() > 5 )
+		if ( swfversion > 5 )
 		{
-			new_obj_ptr->init_member("__constructor__", as_value(this));
-		}
+			newobj->init_member("__constructor__", as_value(this));
 
-		new_obj.set_as_object(new_obj_ptr.get());
+			if ( swfversion == 6 )
+			{
+				newobj->init_member("constructor", as_value(this));
+			}
+		}
 
 		// Call the actual constructor function; new_obj is its 'this'.
 		// We don't need the function result.
-		call(fn_call(new_obj_ptr.get(), &env, nargs, first_arg_index));
+		call(fn_call(newobj.get(), &env, nargs, first_arg_index));
 	}
     
-	return new_obj.to_object();
+	return newobj;
 }
 
 } // end of gnash namespace

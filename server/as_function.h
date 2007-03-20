@@ -30,6 +30,7 @@
 // Forward declarations
 namespace gnash {
 	class fn_call;
+	class builtin_function;
 }
 
 namespace gnash {
@@ -119,6 +120,9 @@ public:
 	{
 		return "[type Function]";
 	}
+
+	/// Return the built-in Function constructor
+	static boost::intrusive_ptr<builtin_function> getFunctionConstructor();
 
 protected:
 
