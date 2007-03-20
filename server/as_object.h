@@ -32,6 +32,10 @@
 #include "GnashException.h"
 #include <sstream>
 
+#if defined(__GNUC__) && __GNUC__ > 2
+#  include <cxxabi.h>
+#endif
+
 #include <cmath>
 #include <utility> // for std::pair
 
@@ -469,14 +473,33 @@ ensureType (as_object* obj)
 {
   	T* ret = dynamic_cast<T*>(obj);
 
-	// This path is fairly unlikely, so it's a potential  __builtin_expect.
   	if (!ret) {
-		std::ostringstream stream;
-		stream 	<< "builtin method or gettersetter for " 
-			<< typeid(T).name() << " called from "
-			<< typeid(obj).name() << " instance.";
+		std::string 	target = typeid(T).name(),
+				source = typeid(obj).name();
+#if defined(__GNUC__) && __GNUC__ > 2
+		int status;
+		char* target_unmangled = 
+			abi::__cxa_demangle (target.c_str(), NULL, NULL,
+					       &status);
+		if (status == 0) {
+			target = target_unmangled;
+			free(target_unmangled);
+		}
 
-		throw ActionException(stream.str());
+		char* source_unmangled =
+			abi::__cxa_demangle (source.c_str(), NULL, NULL,
+                                             &status);
+
+		if (status == 0) {
+			source = source_unmangled;
+			free(source_unmangled);
+		}
+#endif // __GNUC__ > 2
+
+		std::string msg = "builtin method or gettersetter for " +
+			target + " called from " + source + " instance.";
+
+		throw ActionException(msg);
         }
         return ret;
 }

@@ -18,6 +18,8 @@
 
 	* server/as_object.h: Add ensureType<classname>, which is intended to
 	replace the class-specific ensureClass functions. Suggested by Ann.
+	Demangle the object name in the exception message if GCC >= 3 is being
+	used.
 	* server/asobj/Boolean.cpp: Switch ensureClass to ensureType.
 	* server/vm/ASHandlers.cpp: In ActionDelete(), don't pop an object off
 	the AS stack in the hopes that it magically has a property which might
