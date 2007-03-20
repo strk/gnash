@@ -188,7 +188,7 @@
             MyClass::myProperty_getset(const fn_call&amp; fn)
             {
 
-               MyClass* ptr = ensureMyClass(fn.this_ptr);
+               MyClass* ptr = ensureType&lt;MyClass&gt;(fn.this_ptr);
 
                // setter
                if ( fn.nargs > 0 )
