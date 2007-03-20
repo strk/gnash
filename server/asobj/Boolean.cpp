@@ -136,6 +136,13 @@ void boolean_class_init(as_object& global)
 
 }
 
+boost::intrusive_ptr<as_object>
+init_boolean_instance(bool val)
+{
+	// TODO: properly initialize the __constructor__ and constructor members
+	//       (should as_object ctor do this?)
+	return boost::intrusive_ptr<as_object>(new boolean_as_object(val));
+}
 
 } // end of gnash namespace
 

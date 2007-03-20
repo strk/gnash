@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,6 +23,12 @@
 #ifndef GNASH_STRING_H
 #define GNASH_STRING_H
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "smart_ptr.h"
+
 #include <memory> // for auto_ptr
 
 namespace gnash {
@@ -33,7 +39,7 @@ class as_object;
 void string_class_init(as_object& global);
 
 /// Return a String instance
-std::auto_ptr<as_object> init_string_instance(const char* val);
+boost::intrusive_ptr<as_object> init_string_instance(const char* val);
 
 }
 

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.21 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: string.cpp,v 1.22 2007/03/20 15:26:05 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -513,12 +513,15 @@ void string_class_init(as_object& global)
 
 }
 
-std::auto_ptr<as_object>
+boost::intrusive_ptr<as_object>
 init_string_instance(const char* val)
 {
-	tu_string_as_object* obj = new tu_string_as_object();
+	// TODO: properly initialize the __constructor__ and constructor members
+	//       (should as_object ctor do this?)
+
+	boost::intrusive_ptr<tu_string_as_object> obj = new tu_string_as_object();
 	if ( val ) obj->m_string = val;
-	return std::auto_ptr<as_object>(obj);
+	return boost::dynamic_pointer_cast<as_object>(obj);
 }
   
 } // namespace gnash

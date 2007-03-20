@@ -1,5 +1,17 @@
 2007-03-20 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp, server/asobj/Boolean.cpp,
+	  server/asobj/Boolean.h, server/asobj/Number.cpp,
+	  server/asobj/Number.h, server/asobj/gstring.h,
+	  server/asobj/string.cpp: Implement init_boolean_instance
+	  and change init_{number,string}_instance to return
+	  by intrusive_ptr (rather then auto_ptr).
+	  Do automatic boolean to Boolean conversion in as_value::to_object.
+	* testsuite/actionscript.all/Function.as:
+	  Couple of more successes.
+
+2007-03-20 Sandro Santilli <strk@keybit.net>
+
 	* server/array.cpp, server/as_environment.cpp,
 	server/as_function.cpp, server/as_object.cpp,
 	server/as_object.h, server/as_value.cpp, server/as_value.h,

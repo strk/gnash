@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.31 2007/03/20 09:19:33 strk Exp $";
+rcsid="$Id: Function.as,v 1.32 2007/03/20 15:26:05 strk Exp $";
 
 #include "check.as"
 
@@ -482,7 +482,7 @@ check(a.constructor != Object);
 #endif
 
 a = true; // boolean primitive to Boolean object
-xcheck_equals(typeof(a.constructor), 'function');
+check_equals(typeof(a.constructor), 'function');
 #if OUTPUT_VERSION > 5
 xcheck_equals(typeof(a.__constructor__), 'function');
 #if OUTPUT_VERSION == 6
@@ -491,7 +491,7 @@ xcheck(a.hasOwnProperty('constructor'));
 check(!a.hasOwnProperty('constructor'));
 #endif
 xcheck(a.hasOwnProperty('__constructor__'));
-xcheck_equals(a.constructor, Boolean);
+check_equals(a.constructor, Boolean);
 xcheck_equals(a.__constructor__, Boolean);
 check(! a instanceof String);
 check(a.constructor != Object);

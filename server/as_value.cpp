@@ -29,6 +29,7 @@
 #include "movie_root.h" // for MOVIECLIP values
 #include "gstring.h" // for automatic as_value::STRING => String as object
 #include "Number.h" // for automatic as_value::NUMBER => Number as object
+#include "Boolean.h" // for automatic as_value::BOOLEAN => Boolean as object
 #include "action.h" // for call_method0
 
 #include <cmath>	// for NAN
@@ -481,17 +482,13 @@ as_value::to_object() const
 			return ptr(to_sprite());
 
 		case STRING:
-			// FIXME: update when init_whatever_instance will
-			//        return an intrusive_ptr directly
-			return ptr(init_string_instance(m_string_value.c_str()).release());
+			return init_string_instance(m_string_value.c_str());
 
 		case NUMBER:
-			// FIXME: update when init_whatever_instance will
-			//        return an intrusive_ptr directly
-			return ptr(init_number_instance(m_number_value).release());
+			return init_number_instance(m_number_value);
 
 		case BOOLEAN:
-			log_error("FIXME: boolean to Boolean conversion unimplemented yet");
+			return init_boolean_instance(m_boolean_value);
 
 		default:
 			return NULL;

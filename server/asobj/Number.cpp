@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: Number.cpp,v 1.24 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: Number.cpp,v 1.25 2007/03/20 15:26:04 strk Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -294,10 +294,12 @@ void number_class_init(as_object& global)
 
 }
 
-auto_ptr<as_object>
+boost::intrusive_ptr<as_object>
 init_number_instance(double val)
 {
-	return auto_ptr<as_object>(new number_as_object(val));
+	// TODO: properly initialize the __constructor__ and constructor members
+	//       (should as_object ctor do this?)
+	return boost::intrusive_ptr<as_object>(new number_as_object(val));
 }
   
 } // namespace gnash
