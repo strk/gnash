@@ -203,19 +203,6 @@ public:
 };
 
 EOF
-
-cat <<EOF>>${srcname}
-static ${lowname}_as_object* 
-ensure_${lowname}(as_object* obj)
-{
-	${lowname}_as_object* ret = dynamic_cast<${lowname}_as_object*>(obj);
-	if ( ! ret )
-	{
-		throw ActionException("builtin method or gettersetter for ${asname} objects called against non-${asname} instance");
-	}
-	return ret;
-}
-EOF
 for i in $methods; do
 # DO NOT CONVERT CASE, SWF7+ is case-sensitive 
 newi=`echo $i | sed -e 's/)//g'` # | tr '[A-Z]' '[a-z]'
@@ -223,7 +210,7 @@ cat <<EOF>>${srcname}
 static as_value
 ${lowname}_${newi}const fn_call& fn)
 {
-	${lowname}_as_object* ptr = ensure_${lowname}(fn.this_ptr);
+	${lowname}_as_object* ptr = ensureType<${lowname}_as_object>(fn.this_ptr);
 	UNUSED(ptr);
 	log_warning("%s: unimplemented", __FUNCTION__);
 	return as_value();

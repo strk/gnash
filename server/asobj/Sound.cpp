@@ -249,24 +249,11 @@ sound_new(const fn_call& /* fn */)
 	return as_value(sound_obj);
 }
 
-// Wrapper around dynamic_cast to implement user warning.
-// To be used by builtin properties and methods.
-static Sound*
-ensure_sound(as_object* obj)
-{
-	Sound* ret = dynamic_cast<Sound*>(obj);
-	if ( ! ret )
-	{
-		throw ActionException("builtin method or gettersetter for Sound objects called against non-Sound instance");
-	}
-	return ret;
-}
-
 as_value
 sound_start(const fn_call& fn)
 {
 	log_action("-- start sound");
-	Sound* so = ensure_sound(fn.this_ptr);
+	Sound* so = ensureType<Sound>(fn.this_ptr);
 	int loop = 0;
 	int secondOffset = 0;
 
@@ -289,7 +276,7 @@ as_value
 sound_stop(const fn_call& fn)
 {
 	log_action("-- stop sound ");
-	Sound* so = ensure_sound(fn.this_ptr);
+	Sound* so = ensureType<Sound>(fn.this_ptr);
 
 	int si = -1;
 
@@ -338,7 +325,7 @@ sound_attachsound(const fn_call& fn)
 	    return as_value();
 	}
 
-	Sound* so = ensure_sound(fn.this_ptr);
+	Sound* so = ensureType<Sound>(fn.this_ptr);
 
     const char* name = fn.arg(0).to_string();
     if (!name) {
@@ -431,7 +418,7 @@ as_value
 sound_getvolume(const fn_call& fn)
 {
 
-	Sound* so = ensure_sound(fn.this_ptr);
+	Sound* so = ensureType<Sound>(fn.this_ptr);
 
 	int volume = so->getVolume();
 
@@ -449,7 +436,7 @@ sound_loadsound(const fn_call& fn)
 	    return as_value();		
 	}
 
-	Sound* so = ensure_sound(fn.this_ptr);
+	Sound* so = ensureType<Sound>(fn.this_ptr);
 	so->loadSound(fn.arg(0).to_std_string(), fn.arg(1).to_bool());
 
 	return as_value();
@@ -490,7 +477,7 @@ sound_setvolume(const fn_call& fn)
 		return as_value();
 	}
 
-	Sound* so = ensure_sound(fn.this_ptr);	
+	Sound* so = ensureType<Sound>(fn.this_ptr);	
 	int volume = (int) fn.arg(0).to_number();
 
 	so->setVolume(volume);
@@ -500,7 +487,7 @@ sound_setvolume(const fn_call& fn)
 as_value
 sound_duration(const fn_call& fn)
 {
-	Sound* so = ensure_sound(fn.this_ptr);
+	Sound* so = ensureType<Sound>(fn.this_ptr);
 	if ( fn.nargs == 0 ) {
 		return as_value(so->getDuration());
     } else {
@@ -526,7 +513,7 @@ sound_ID3(const fn_call& /*fn*/)
 as_value
 sound_position(const fn_call& fn)
 {
-	Sound* so = ensure_sound(fn.this_ptr);
+	Sound* so = ensureType<Sound>(fn.this_ptr);
 	if ( fn.nargs == 0 ) {
 		return as_value(so->getPosition());
     } else {

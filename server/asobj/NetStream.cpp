@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.30 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: NetStream.cpp,v 1.31 2007/03/20 10:36:45 ann Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -90,30 +90,16 @@ netstream_new(const fn_call& fn)
 
 }
 
-// Wrapper around dynamic_cast to implement user warning.
-// To be used by builtin properties and methods.
-static NetStream*
-ensure_netstream(as_object* obj)
-{
-	NetStream* ret = dynamic_cast<NetStream*>(obj);
-	if ( ! ret )
-	{
-		throw ActionException("builtin method or gettersetter for NetStream objects called against non-NetStream instance");
-	}
-	return ret;
-}
-
-
 static as_value netstream_close(const fn_call& fn)
 {
-	NetStream* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
 	ns->close();
 	return as_value();
 }
 
 static as_value netstream_pause(const fn_call& fn)
 {
-	NetStream* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
 	
 	// mode: -1 ==> toogle, 0==> pause, 1==> play
 	int mode = -1;
@@ -127,7 +113,7 @@ static as_value netstream_pause(const fn_call& fn)
 
 static as_value netstream_play(const fn_call& fn)
 {
-	NetStream* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
@@ -145,7 +131,7 @@ static as_value netstream_play(const fn_call& fn)
 }
 
 static as_value netstream_seek(const fn_call& fn) {
-	NetStream* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
 
 	double time = 0;
 	if (fn.nargs > 0)
@@ -157,7 +143,7 @@ static as_value netstream_seek(const fn_call& fn) {
 	return as_value();
 }
 static as_value netstream_setbuffertime(const fn_call& fn) {
-	NetStream* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
 	UNUSED(ns);
     log_msg("%s:unimplemented \n", __FUNCTION__);
 	return as_value();
@@ -168,7 +154,7 @@ static as_value
 netstream_time(const fn_call& fn)
 {
 
-	NetStream* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
 
 	if ( fn.nargs == 0 )
 	{
@@ -188,7 +174,7 @@ static as_value
 netstream_bytesloaded(const fn_call& fn)
 {
 
-	NetStream* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
 
 	if ( fn.nargs == 0 )
 	{
@@ -208,7 +194,7 @@ static as_value
 netstream_bytestotal(const fn_call& fn)
 {
 
-	NetStream* ns = ensure_netstream(fn.this_ptr);
+	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
 
 	if ( fn.nargs == 0 )
 	{

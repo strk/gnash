@@ -87,16 +87,6 @@ private:
 		set_member("onSelect", callback);
 	}
 
-	static ContextMenu* ensureContextMenu(as_object* obj)
-	{
-		ContextMenu* ret = dynamic_cast<ContextMenu*>(obj);
-		if ( ! ret )
-		{
-			throw ActionException("builtin method or gettersetter for ContextMenu objects called against non-ContextMenu instance");
-		}
-		return ret;
-	}
-
 	/// Attach the exported interface of this ActionScript class
 	/// to the given object.
 	static void attachExportedInterface(as_object& o);
@@ -137,7 +127,7 @@ ContextMenu::getExportedInterface()
 as_value
 ContextMenu::copy_method(const fn_call& fn)
 {
-	ContextMenu* ptr = ensureContextMenu(fn.this_ptr);
+	ContextMenu* ptr = ensureType<ContextMenu>(fn.this_ptr);
 	UNUSED(ptr);
 	log_warning("%s: unimplemented", __FUNCTION__);
 	return as_value();
@@ -147,7 +137,7 @@ ContextMenu::copy_method(const fn_call& fn)
 as_value
 ContextMenu::hideBuiltInItems_method(const fn_call& fn)
 {
-	ContextMenu* ptr = ensureContextMenu(fn.this_ptr);
+	ContextMenu* ptr = ensureType<ContextMenu>(fn.this_ptr);
 	UNUSED(ptr);
 	log_warning("%s: unimplemented", __FUNCTION__);
 	return as_value();

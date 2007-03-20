@@ -1,5 +1,11 @@
 2007-03-20 Ann Barcomb <ann@lulu.com>
 
+	* server/asobj/ContextMenu.cpp, Date.cpp, LoadVars.cpp, string.cpp,
+	  NetConnection.cpp, NetStream.cpp, Sound.cpp, gen-asclass.sh:
+	  Changed instances of ensureClass to use inherited ensureType.
+
+2007-03-20 Ann Barcomb <ann@lulu.com>
+
 	* doc/C/actionscript/new_as_class.xml: syntax of 'ensure'
 	  changed to correspond with Bastiaan's last commit.
 

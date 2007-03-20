@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.19 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: string.cpp,v 1.20 2007/03/20 10:36:45 ann Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -113,21 +113,10 @@ public:
 
 };
 
-static tu_string_as_object *
-ensureString(as_object* obj)
-{
-	tu_string_as_object* ret = dynamic_cast<tu_string_as_object*>(obj);
-	if ( ! ret )
-	{
-		throw ActionException("builtin method or gettersetter for String objects called against non-String instance");
-	}
-	return ret;
-}
-
 static as_value
 string_get_length(const fn_call& fn)
 {
-	tu_string_as_object* str = ensureString(fn.this_ptr);
+	tu_string_as_object* str = ensureType<tu_string_as_object>(fn.this_ptr);
 
 	return as_value(str->m_string.utf8_length());
 
@@ -146,7 +135,7 @@ string_set_length(const fn_call& /*fn*/)
 static as_value
 string_concat(const fn_call& fn)
 {
-	tu_string_as_object* str = ensureString(fn.this_ptr);
+	tu_string_as_object* str = ensureType<tu_string_as_object>(fn.this_ptr);
 	tu_string this_string = str->m_string;
 	
 	int len = strlen(this_string.c_str());
@@ -172,7 +161,7 @@ string_concat(const fn_call& fn)
 static as_value
 string_slice(const fn_call& fn)
 {
-	tu_string_as_object* str = ensureString(fn.this_ptr);
+	tu_string_as_object* str = ensureType<tu_string_as_object>(fn.this_ptr);
 	tu_string this_string = str->m_string;
 	// Pull a slice out of this_string.
 	int	start = 0;
@@ -205,7 +194,7 @@ string_slice(const fn_call& fn)
 static as_value
 string_split(const fn_call& fn)
 {
-	tu_string_as_object* str = ensureString(fn.this_ptr);
+	tu_string_as_object* str = ensureType<tu_string_as_object>(fn.this_ptr);
 
 	boost::intrusive_ptr<tu_string_as_object> this_string_ptr(str); // why ??
 	
@@ -277,7 +266,7 @@ string_split(const fn_call& fn)
 static as_value
 string_last_index_of(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
+	tu_string_as_object* this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
@@ -315,7 +304,7 @@ string_last_index_of(const fn_call& fn)
 static as_value
 string_sub_str(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
+	tu_string_as_object* this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
 	tu_string this_string = this_string_ptr->m_string;
 
 	// Pull a slice out of this_string.
@@ -341,7 +330,7 @@ string_sub_str(const fn_call& fn)
 static as_value
 string_sub_string(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
+	tu_string_as_object* this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
 	tu_string this_string = this_string_ptr->m_string;
 	// Pull a slice out of this_string.
 	int	start = 0;
@@ -366,7 +355,7 @@ string_sub_string(const fn_call& fn)
 static as_value
 string_index_of(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
+	tu_string_as_object* this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
@@ -395,7 +384,7 @@ string_index_of(const fn_call& fn)
 static as_value
 string_from_char_code(const fn_call& fn)
 {
-	//tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
+	//tu_string_as_object* this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
 
 	tu_string result;
 
@@ -411,7 +400,7 @@ string_from_char_code(const fn_call& fn)
 static as_value
 string_char_code_at(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
+	tu_string_as_object* this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
 
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
@@ -440,7 +429,7 @@ string_char_code_at(const fn_call& fn)
 static as_value
 string_char_at(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
+	tu_string_as_object* this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
 
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
@@ -469,7 +458,7 @@ string_char_at(const fn_call& fn)
 static as_value
 string_to_upper_case(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
+	tu_string_as_object* this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
 
 	return as_value(this_string_ptr->m_string.utf8_to_upper());
 }
@@ -477,7 +466,7 @@ string_to_upper_case(const fn_call& fn)
 static as_value
 string_to_lower_case(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
+	tu_string_as_object* this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
 
 	return as_value(this_string_ptr->m_string.utf8_to_lower());
 }
@@ -485,7 +474,7 @@ string_to_lower_case(const fn_call& fn)
 static as_value
 string_to_string(const fn_call& fn)
 {
-	tu_string_as_object* this_string_ptr = ensureString(fn.this_ptr);
+	tu_string_as_object* this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
 	return as_value(this_string_ptr->m_string);
 }
 

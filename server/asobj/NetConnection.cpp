@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.29 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: NetConnection.cpp,v 1.30 2007/03/20 10:36:45 ann Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -156,20 +156,6 @@ NetConnection::getBytesTotal()
 }
 
 
-// Wrapper around dynamic_cast to implement user warning.
-// To be used by builtin properties and methods.
-static NetConnection*
-ensure_netconnection(as_object* obj)
-{
-	NetConnection* ret = dynamic_cast<NetConnection*>(obj);
-	if ( ! ret )
-	{
-		throw ActionException("builtin method or gettersetter for NetConnection objects called against non-NetConnection instance");
-	}
-	return ret;
-}
-
-
 /// \brief callback to instantiate a new NetConnection object.
 /// \param fn the parameters from the Flash movie
 /// \return nothing from the function call.
@@ -189,7 +175,7 @@ netconnection_connect(const fn_call& fn)
 {
 	GNASH_REPORT_FUNCTION;
 
-	NetConnection *ptr = ensure_netconnection(fn.this_ptr); 
+	NetConnection *ptr = ensureType<NetConnection>(fn.this_ptr); 
     
 	if (fn.nargs > 0) {
 		ptr->addToURL(fn.arg(0).to_string());

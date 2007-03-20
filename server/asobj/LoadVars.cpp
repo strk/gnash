@@ -26,7 +26,6 @@
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
-#include "GnashException.h" // for ActionException in ensureLoadVars
 #include "as_function.h" // for calling event handlers
 #include "as_environment.h" // for setting up a fn_call
 #include "as_value.h" // for setting up a fn_call
@@ -425,27 +424,11 @@ LoadVars::sendAndLoad(const std::string& urlstr, LoadVars& target, bool post)
 	}
 }
 
-static LoadVars*
-ensureLoadVars(as_object* obj)
-{
-	LoadVars* ret = dynamic_cast<LoadVars*>(obj);
-	if ( ! ret )
-	{
-		std::stringstream ss;
-		ss << "builtin method or gettersetter for LoadVars objects "
-			<< "called against non-LoadVars instance ("
-			<< typeid(*obj).name() << ")";
-		throw ActionException(ss.str());
-		//throw ActionException("builtin method or gettersetter for LoadVars objects called against non-LoadVars instance (%s)", typeid(*obj).name());
-	}
-	return ret;
-}
-
 /* private static */
 as_value
 LoadVars::onLoad_getset(const fn_call& fn)
 {
-	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -465,7 +448,7 @@ LoadVars::onLoad_getset(const fn_call& fn)
 as_value
 LoadVars::checkLoads_wrapper(const fn_call& fn)
 {
-	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
 	ptr->checkLoads();
 	return as_value();
 }
@@ -475,7 +458,7 @@ as_value
 LoadVars::onData_getset(const fn_call& fn)
 {
 
-	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -496,7 +479,7 @@ as_value
 LoadVars::loaded_getset(const fn_call& fn)
 {
 
-	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -515,7 +498,7 @@ LoadVars::loaded_getset(const fn_call& fn)
 static as_value
 loadvars_addrequestheader(const fn_call& fn)
 {
-	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
 	UNUSED(ptr);
 	log_error("%s: unimplemented", __FUNCTION__);
 	return as_value(); 
@@ -524,7 +507,7 @@ loadvars_addrequestheader(const fn_call& fn)
 static as_value
 loadvars_decode(const fn_call& fn)
 {
-	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
 	UNUSED(ptr);
 	log_error("%s: unimplemented", __FUNCTION__);
 	return as_value(); 
@@ -533,21 +516,21 @@ loadvars_decode(const fn_call& fn)
 as_value
 LoadVars::getBytesLoaded_method(const fn_call& fn)
 {
-	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
 	return as_value(ptr->getBytesLoaded());
 }
 
 as_value
 LoadVars::getBytesTotal_method(const fn_call& fn)
 {
-	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
 	return as_value(ptr->getBytesTotal());
 }
 
 static as_value
 loadvars_load(const fn_call& fn)
 {
-	LoadVars* obj = ensureLoadVars(fn.this_ptr);
+	LoadVars* obj = ensureType<LoadVars>(fn.this_ptr);
 
 	if ( fn.nargs < 1 )
 	{
@@ -574,7 +557,7 @@ loadvars_load(const fn_call& fn)
 static as_value
 loadvars_send(const fn_call& fn)
 {
-	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
 	UNUSED(ptr);
 	log_error("%s: unimplemented", __FUNCTION__);
 	return as_value(); 
@@ -583,7 +566,7 @@ loadvars_send(const fn_call& fn)
 static as_value
 loadvars_sendandload(const fn_call& fn)
 {
-	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
 
 	if ( fn.nargs < 2 )
 	{
@@ -624,7 +607,7 @@ loadvars_sendandload(const fn_call& fn)
 static as_value
 loadvars_tostring(const fn_call& fn)
 {
-	LoadVars* ptr = ensureLoadVars(fn.this_ptr);
+	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
 	UNUSED(ptr);
 	log_error("%s: unimplemented", __FUNCTION__);
 	return as_value(); 
