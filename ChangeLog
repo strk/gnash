@@ -60,7 +60,6 @@
 	* testsuite/actionscript.all/Function.as:
 	  Couple of more successes.
 
->>>>>>> 1.2655
 2007-03-20 Sandro Santilli <strk@keybit.net>
 
 	* server/array.cpp, server/as_environment.cpp,
