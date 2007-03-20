@@ -1,3 +1,9 @@
+2007-03-20 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/LocalConnection.as: Fix the test to NOT
+	  rely on Gnash extensions. Actually check that the extensions are
+	  *not* there, as we want to be compatible !!
+
 2007-03-20 Ann Barcomb <ann@lulu.com>
 
 	* server/asobj/Key.cpp, MovieClipLoader.cpp, xml.cpp, xmlnode.cpp,

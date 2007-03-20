@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LocalConnection.as,v 1.9 2007/01/10 00:09:56 strk Exp $";
+rcsid="$Id: LocalConnection.as,v 1.10 2007/03/20 14:55:09 strk Exp $";
 
 #include "dejagnu.as"
 
@@ -85,21 +85,24 @@ if (domain  == "localhost") {
 tmp.close();
 var ret = tmp.connect("lc_test");
 
+// There's no such 'getname' method of LocalConnection !!!
+xcheck_equals(typeof(tmp.getname), 'undefined');
+xcheck_equals(typeof(tmp.getName), 'undefined');
+
 // NOTE: This test will fail if a shared memory segment of the same
 // name exists. So the first time it'll pass, then it'll fail.
-if ((tmp.getname() == "/lc_test") && (ret == true)) {
+if (ret == true) {
 	pass("LocalConnection::connect()");
 } else {	
 	fail("LocalConnection::connect()");
 }
 
 // Close the connection, and then check the state
-tmp.close();
-if (tmp.exists() == false) {
-	pass("LocalConnection::close()");
-} else {
-	fail("LocalConnection::close()");
-}
+ret = tmp.close();
+xcheck(ret);
+
+// There's no such 'exists' method of LocalConnection !!!
+xcheck_equals(typeof(tmp.exists), 'undefined');
 
 #endif // OUTPUT_VERSION >= 6
 
