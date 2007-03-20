@@ -457,21 +457,10 @@ as_array_object::sort(as_function& comparator, uint8_t flags)
 
 }
 
-static as_array_object *
-ensureArray(as_object* obj)
-{
-	as_array_object* ret = dynamic_cast<as_array_object*>(obj);
-	if ( ! ret )
-	{
-		throw ActionException("builtin method or gettersetter for Array objects called against non-Array instance");
-	}
-	return ret;
-}
-
 static as_value
 array_splice(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 	UNUSED(array);
 
 	log_error("FIXME: Array.splice() method not implemented yet!\n");
@@ -481,7 +470,7 @@ array_splice(const fn_call& fn)
 static as_value
 array_sort(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 	uint8_t flags;
 
@@ -507,7 +496,7 @@ array_sort(const fn_call& fn)
 static as_value
 array_sortOn(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 	UNUSED(array);
 
 	log_error("FIXME: Array.sortOn() method not implemented yet!");
@@ -518,7 +507,7 @@ array_sortOn(const fn_call& fn)
 static as_value
 array_push(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 		IF_VERBOSE_ACTION (
 	log_action("calling array push, pushing %d values onto back of array",fn.nargs);
@@ -534,7 +523,7 @@ array_push(const fn_call& fn)
 static as_value
 array_unshift(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 		IF_VERBOSE_ACTION (
 	log_action("calling array unshift, pushing %d values onto front of array",fn.nargs);
@@ -550,7 +539,7 @@ array_unshift(const fn_call& fn)
 static as_value
 array_pop(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 	// Get our index, log, then return result
 	as_value rv = array->pop();
@@ -566,7 +555,7 @@ array_pop(const fn_call& fn)
 static as_value
 array_shift(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 	// Get our index, log, then return result
 	as_value rv = array->shift();
@@ -582,11 +571,11 @@ array_shift(const fn_call& fn)
 static as_value
 array_reverse(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 	array->reverse();
 
-	as_value rv = as_value(array);
+	as_value rv(array.get()); 
 
 	IF_VERBOSE_ACTION (
 	log_action("called array reverse, result:%s, new array size:%d",
@@ -599,7 +588,7 @@ array_reverse(const fn_call& fn)
 static as_value
 array_join(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 	std::string separator = ",";
 
@@ -614,7 +603,7 @@ array_join(const fn_call& fn)
 static as_value
 array_size(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 	return as_value(array->size());
 }
@@ -624,7 +613,7 @@ array_size(const fn_call& fn)
 static as_value
 array_to_string(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 	std::string ret = array->toString();
 
@@ -632,7 +621,7 @@ array_to_string(const fn_call& fn)
 		(
 	log_action("array_to_string called, nargs = %d, "
 			"this_ptr = %p",
-			fn.nargs, (void*)fn.this_ptr);
+			fn.nargs, (void*)fn.this_ptr.get());
 	log_action("to_string result is: %s", ret.c_str());
 		);
 
@@ -647,7 +636,7 @@ array_to_string(const fn_call& fn)
 static as_value
 array_concat(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 	// use copy ctor
 	as_array_object* newarray = new as_array_object(*array);
@@ -655,9 +644,9 @@ array_concat(const fn_call& fn)
 	for (unsigned int i=0; i<fn.nargs; i++)
 	{
 		// Array args get concatenated by elements
-		if ( as_array_object* other = dynamic_cast<as_array_object*>(fn.arg(i).to_object()) )
+		boost::intrusive_ptr<as_array_object> other = boost::dynamic_pointer_cast<as_array_object>(fn.arg(1).to_object());
+		if ( other )
 		{
-			assert(other);
 			newarray->concat(*other);
 		}
 		else
@@ -674,7 +663,7 @@ array_concat(const fn_call& fn)
 static as_value
 array_slice(const fn_call& fn)
 {
-	as_array_object* array = ensureArray(fn.this_ptr);
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 	// start and end index of the part we're slicing
 	int startindex, endindex;

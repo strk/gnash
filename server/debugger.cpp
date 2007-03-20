@@ -580,11 +580,12 @@ Debugger::dumpStackFrame(as_environment &env)
 // 	    }
             cerr << env.m_stack[i].to_string();
 	    if (val.is_object()) {
-		string name = this->lookupSymbol(val.to_object());
+		boost::intrusive_ptr<as_object> o = val.to_object();
+		string name = lookupSymbol(o.get());
 		if (name.size()) {
 		    cerr << " \"" << name << "\"";
 		}
-		cerr << " has #" << val.to_object()->get_ref_count() << " references";
+		cerr << " has #" << o->get_ref_count() << " references";
 	    }
 	    cerr << endl;
 	}

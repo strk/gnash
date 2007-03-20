@@ -43,12 +43,23 @@ class as_value;
 class fn_call
 {
 public:
-	as_object* this_ptr;
+	boost::intrusive_ptr<as_object> this_ptr;
 	as_environment* env;
 	unsigned int nargs;
 	int first_arg_bottom_index;
 
 	fn_call(as_object* this_in,
+			as_environment* env_in,
+			int nargs_in, int first_in)
+		:
+		this_ptr(this_in),
+		env(env_in),
+		nargs(nargs_in),
+		first_arg_bottom_index(first_in)
+	{
+	}
+
+	fn_call(boost::intrusive_ptr<as_object> this_in,
 			as_environment* env_in,
 			int nargs_in, int first_in)
 		:

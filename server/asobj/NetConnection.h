@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.20 2007/03/09 14:38:29 tgc Exp $ */
+/* $Id: NetConnection.h,v 1.21 2007/03/20 15:01:20 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -41,7 +41,7 @@
 
 // Forward declarations
 namespace gnash {
-	class NetStream;
+	//class NetStream;
 }
 
 namespace gnash {

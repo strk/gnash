@@ -453,7 +453,7 @@ date_new(const fn_call& fn)
 
 #define date_get_proto(function, timefn, element) \
 	static as_value function(const fn_call& fn) { \
-		date_as_object* date = ensureType<date_as_object>(fn.this_ptr); \
+		boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr); \
 		time_t t = (time_t)(date->value / 1000.0); \
 		struct tm tm; \
 		return as_value(_##timefn##_r(&t, &tm)->element); \
@@ -510,7 +510,7 @@ date_get_proto(date_getseconds, localtime, tm_sec)
 // Also implements Date.getUTCMilliseconds
 
 static as_value date_getmilliseconds(const fn_call& fn) {
-	date_as_object* date = ensureType<date_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 	return as_value((int) std::fmod(date->value, 1000.0));
 }
 
@@ -579,7 +579,7 @@ static as_value date_gettimezoneoffset(const fn_call& /* fn */) {
 /// sets a Date in milliseconds after January 1, 1970 00:00 UTC.
 /// Returns value is the same aqs the paramemeter.
 static as_value date_settime(const fn_call& fn) {
-	date_as_object* date = ensureType<date_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
@@ -623,10 +623,10 @@ static as_value date_settime(const fn_call& fn) {
 // convert flash datestamp (number of milliseconds since the epoch as a double)
 // to time structure and remaining milliseconds expressed in localtime.
 static void
-local_date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec)
+local_date_to_tm_msec(date_as_object& date, struct tm &tm, double &msec)
 {
-	time_t t = (time_t)(date->value / 1000.0);
-	msec = std::fmod(date->value, 1000.0);
+	time_t t = (time_t)(date.value / 1000.0);
+	msec = std::fmod(date.value, 1000.0);
 	_localtime_r(&t, &tm);	// break out date/time elements
 }
 
@@ -654,13 +654,13 @@ local_tm_msec_to_date(struct tm &tm, double &msec)
 // gmtime() will split it for us, but mktime() only works in localtime.
 
 static void
-utc_date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec)
+utc_date_to_tm_msec(date_as_object& date, struct tm &tm, double &msec)
 {
 #if USE_UTCCONV
-	utctime(date->value, &tm, &msec);
+	utctime(date.value, &tm, &msec);
 #else
-	time_t t = (time_t)(date->value / 1000.0);
-	msec = std::fmod(date->value, 1000.0);
+	time_t t = (time_t)(date.value / 1000.0);
+	msec = std::fmod(date.value, 1000.0);
 	_gmtime_r(&t, &tm);
 #endif
 }
@@ -692,16 +692,16 @@ utc_tm_msec_to_date(struct tm &tm, double &msec)
 // what the customer asked for
 
 static void
-tm_msec_to_date(struct tm &tm, double &msec, date_as_object* &date, bool utc)
+tm_msec_to_date(struct tm &tm, double &msec, date_as_object& date, bool utc)
 {
     if (utc)
-	date->value = utc_tm_msec_to_date(tm, msec);
+	date.value = utc_tm_msec_to_date(tm, msec);
     else
-	date->value = local_tm_msec_to_date(tm, msec);
+	date.value = local_tm_msec_to_date(tm, msec);
 }
 
 static void
-date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec, bool utc)
+date_to_tm_msec(date_as_object& date, struct tm &tm, double &msec, bool utc)
 {
     if (utc)
 	utc_date_to_tm_msec(date, tm, msec);
@@ -748,7 +748,7 @@ date_to_tm_msec(date_as_object* &date, struct tm &tm, double &msec, bool utc)
 // to the day the clocks go forward.
 
 static as_value _date_setfullyear(const fn_call& fn, bool utc) {
-	date_as_object* date = ensureType<date_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 3);
 	if (fn.nargs < 1) {
@@ -758,7 +758,7 @@ static as_value _date_setfullyear(const fn_call& fn, bool utc) {
 	} else {
 	    struct tm tm; double msec;
 
-	    date_to_tm_msec(date, tm, msec, utc);
+	    date_to_tm_msec(*date, tm, msec, utc);
 	    tm.tm_year = (int) fn.arg(0).to_number() - 1900;
 	    if (fn.nargs >= 2)
 		    tm.tm_mon = (int) fn.arg(1).to_number();
@@ -769,7 +769,7 @@ static as_value _date_setfullyear(const fn_call& fn, bool utc) {
 		    log_aserror("Date.setFullYear was called with more than three arguments");
 		)
 	    }
-	    tm_msec_to_date(tm, msec, date, utc);
+	    tm_msec_to_date(tm, msec, *date, utc);
 	}
 	return as_value(date->value);
 }
@@ -790,7 +790,7 @@ static as_value _date_setfullyear(const fn_call& fn, bool utc) {
 // There is no setUTCYear() function.
 
 static as_value date_setyear(const fn_call& fn) {
-	date_as_object* date = ensureType<date_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
@@ -800,7 +800,7 @@ static as_value date_setyear(const fn_call& fn) {
 	} else {
 	    struct tm tm; double msec;
 
-	    date_to_tm_msec(date, tm, msec, false);
+	    date_to_tm_msec(*date, tm, msec, false);
 	    tm.tm_year = (int) fn.arg(0).to_number();
 	    if (tm.tm_year < 100) tm.tm_year += 1900;
 	    if (fn.nargs >= 2)
@@ -812,7 +812,7 @@ static as_value date_setyear(const fn_call& fn) {
 		    log_aserror("Date.setYear was called with more than three arguments");
 		)
 	    }
-	    tm_msec_to_date(tm, msec, date, false);
+	    tm_msec_to_date(tm, msec, *date, false);
 	}
 	return as_value(date->value);
 }
@@ -826,7 +826,7 @@ static as_value date_setyear(const fn_call& fn) {
 /// This implementation currently wraps it into the next month, which is wrong.
 
 static as_value _date_setmonth(const fn_call& fn, bool utc) {
-	date_as_object* date = ensureType<date_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
 	if (fn.nargs < 1) {
@@ -836,7 +836,7 @@ static as_value _date_setmonth(const fn_call& fn, bool utc) {
 	} else {
 	    struct tm tm; double msec;
 
-	    date_to_tm_msec(date, tm, msec, utc);
+	    date_to_tm_msec(*date, tm, msec, utc);
 	    tm.tm_mon = (int) fn.arg(0).to_number();
 	    if (fn.nargs >= 2)
 		    tm.tm_mday = (int) fn.arg(2).to_number();
@@ -845,7 +845,7 @@ static as_value _date_setmonth(const fn_call& fn, bool utc) {
 		    log_aserror("Date.setMonth was called with more than three arguments");
 		)
 	    }
-	    tm_msec_to_date(tm, msec, date, utc);
+	    tm_msec_to_date(tm, msec, *date, utc);
 	}
 	return as_value(date->value);
 }
@@ -857,7 +857,7 @@ static as_value _date_setmonth(const fn_call& fn, bool utc) {
 /// day > 31. Example: setting the 35th in January results in Feb 4th.
 
 static as_value _date_setdate(const fn_call& fn, bool utc) {
-	date_as_object* date = ensureType<date_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
@@ -866,9 +866,9 @@ static as_value _date_setdate(const fn_call& fn, bool utc) {
 	} else {
 		struct tm tm; double msec;
 
-		date_to_tm_msec(date, tm, msec, utc);
-		tm.tm_mday = (int)(fn.arg(0).to_number());
-		tm_msec_to_date(tm, msec, date, utc);
+		date_to_tm_msec(*date, tm, msec, utc);
+		tm.tm_mday = int(fn.arg(0).to_number());
+		tm_msec_to_date(tm, msec, *date, utc);
 	}
 	if (fn.nargs > 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
@@ -891,7 +891,7 @@ static as_value _date_setdate(const fn_call& fn, bool utc) {
 /// setTime(n) or call the constructor with one argument.
 
 static as_value _date_sethours(const fn_call& fn, bool utc) {
-	date_as_object* date = ensureType<date_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 4);
 	if (fn.nargs < 1) {
@@ -901,7 +901,7 @@ static as_value _date_sethours(const fn_call& fn, bool utc) {
 	} else {
 	    struct tm tm; double msec;
 
-	    date_to_tm_msec(date, tm, msec, utc);
+	    date_to_tm_msec(*date, tm, msec, utc);
 	    tm.tm_hour = (int) fn.arg(0).to_number();
 	    if (fn.nargs >= 2)
 		    tm.tm_min = (int) fn.arg(1).to_number();
@@ -914,7 +914,7 @@ static as_value _date_sethours(const fn_call& fn, bool utc) {
 		    log_aserror("Date.setHours was called with more than four arguments");
 		)
 	    }
-	    tm_msec_to_date(tm, msec, date, utc);
+	    tm_msec_to_date(tm, msec, *date, utc);
 	}
 	return as_value(date->value);
 }
@@ -928,7 +928,7 @@ static as_value _date_sethours(const fn_call& fn, bool utc) {
 /// Similarly, negative values carry you back into the previous minute/hour/day.
 
 static as_value _date_setminutes(const fn_call& fn, bool utc) {
-	date_as_object* date = ensureType<date_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
 	//assert(fn.nargs >= 1 && fn.nargs <= 3);
 	if (fn.nargs < 1) {
@@ -938,7 +938,7 @@ static as_value _date_setminutes(const fn_call& fn, bool utc) {
 	} else {
 	    struct tm tm; double msec;
 
-	    date_to_tm_msec(date, tm, msec, utc);
+	    date_to_tm_msec(*date, tm, msec, utc);
 	    tm.tm_min = (int) fn.arg(0).to_number();
 	    if (fn.nargs >= 2)
 		    tm.tm_sec = (int) fn.arg(1).to_number();
@@ -949,7 +949,7 @@ static as_value _date_setminutes(const fn_call& fn, bool utc) {
 		    log_aserror("Date.setMinutes was called with more than three arguments");
 		)
 	    }
-	    tm_msec_to_date(tm, msec, date, utc);
+	    tm_msec_to_date(tm, msec, *date, utc);
 	}
 	return as_value(date->value);
 }
@@ -961,7 +961,7 @@ static as_value _date_setminutes(const fn_call& fn, bool utc) {
 /// previous minute (or hour or calendar day) or on to the following ones.
 
 static as_value _date_setseconds(const fn_call& fn, bool utc) {
-	date_as_object* date = ensureType<date_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
 	if (fn.nargs < 1) {
@@ -975,7 +975,7 @@ static as_value _date_setseconds(const fn_call& fn, bool utc) {
 	    // take account of leap seconds.
 	    struct tm tm; double msec;
 
-	    date_to_tm_msec(date, tm, msec, utc);
+	    date_to_tm_msec(*date, tm, msec, utc);
 	    tm.tm_sec = (int) fn.arg(0).to_number();
 	    if (fn.nargs >= 2)
 		    msec = (int) fn.arg(1).to_number();
@@ -984,13 +984,13 @@ static as_value _date_setseconds(const fn_call& fn, bool utc) {
 		    log_aserror("Date.setMinutes was called with more than three arguments");
 		)
 	    }
-	    tm_msec_to_date(tm, msec, date, utc);
+	    tm_msec_to_date(tm, msec, *date, utc);
 	}
 	return as_value(date->value);
 }
 
 static as_value date_setmilliseconds(const fn_call& fn) {
-	date_as_object* date = ensureType<date_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
@@ -1049,7 +1049,7 @@ static as_value date_tostring(const fn_call& fn) {
 		{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
 	char* dayweekname[7] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 
-	date_as_object* date = ensureType<date_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 	
 	time_t t = (time_t) (date->value / 1000.0);
 	struct tm tm;
@@ -1221,7 +1221,7 @@ rogue_date_args(const fn_call& fn) {
 // Also used to implement Date.getTime()
 
 static as_value date_valueof(const fn_call& fn) {
-	date_as_object* date = ensureType<date_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 	return as_value(date->value);
 }
 

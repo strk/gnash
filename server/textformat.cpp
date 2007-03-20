@@ -137,14 +137,27 @@ as_value textformat_setformat(const fn_call& fn)
 {
   as_value	method;
   //log_msg("%s: args=%d at %p\n", __FUNCTION__, nargs, this_ptr);
-#if 0
-  // FIXME: these are only commented out to eliminate compilation warnings.
-  textformat_as_object*	ptr = (textformat_as_object*) fn.this_ptr;	// tulrich: TODO fix this unsafe cast; see textformat_new().
-  assert(ptr);
-  double start = fn.arg(0).to_number();
-  double end = fn.arg(1).to_number();
-#endif
-  textformat_as_object *obj = (textformat_as_object*) fn.arg(2).to_object();	// tulrich: TODO fix this unsafe cast.  (need cast_to_textformat())
+
+  boost::intrusive_ptr<textformat_as_object> ptr = ensureType<textformat_as_object>(fn.this_ptr);
+  //double start = fn.arg(0).to_number();
+  //double end = fn.arg(1).to_number();
+
+  if ( fn.nargs < 3 )
+  {
+    IF_VERBOSE_ASCODING_ERRORS(
+    log_aserror("TextFormat.setFormat() needs at least 3 arguments - ...me thinks");
+    );
+    return as_value();
+  }
+
+  boost::intrusive_ptr<textformat_as_object> obj = boost::dynamic_pointer_cast<textformat_as_object>(fn.arg(2).to_object());
+  if ( ! obj )
+  {
+    IF_VERBOSE_ASCODING_ERRORS(
+    log_aserror("Argument 3 given to TextFormat.setFormat() is not a TextFormat object - ... should it?");
+    );
+    return as_value();
+  }
   assert(obj);
 
   //log_msg("Change from %f for %f characters for object at %p\n", start, end, obj);

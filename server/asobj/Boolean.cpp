@@ -86,7 +86,7 @@ as_value boolean_tostring(const fn_call& fn)
 	static char* strtrue = "true";
 	static char* strfalse = "false";
 
-	boolean_as_object* boolobj = ensureType<boolean_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<boolean_as_object> boolobj = ensureType<boolean_as_object>(fn.this_ptr);
 
 	
 	if (boolobj->val) 
@@ -98,7 +98,7 @@ as_value boolean_tostring(const fn_call& fn)
 
 as_value boolean_valueof(const fn_call& fn) 
 {
-	boolean_as_object* boolobj = ensureType<boolean_as_object>(fn.this_ptr);
+	boost::intrusive_ptr<boolean_as_object> boolobj = ensureType<boolean_as_object>(fn.this_ptr);
 
 	return as_value(boolobj->val);
 }

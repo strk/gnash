@@ -109,22 +109,9 @@ sprite_instance::execute_actions(sprite_instance::ActionList& action_list)
 	}
 }
 
-// Wrapper around dynamic_cast to implement user warning.
-// To be used by builtin properties and methods.
-static sprite_instance*
-ensure_sprite(as_object* obj)
-{
-	sprite_instance* ret = dynamic_cast<sprite_instance*>(obj);
-	if ( ! ret )
-	{
-		throw ActionException("builtin method or gettersetter for sprite objects called against non-sprite instance");
-	}
-	return ret;
-}
-
 static as_value sprite_play(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	sprite->set_play_state(sprite_instance::PLAY);
 	return as_value();
@@ -132,7 +119,7 @@ static as_value sprite_play(const fn_call& fn)
 
 static as_value sprite_stop(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	sprite->set_play_state(sprite_instance::STOP);
 
@@ -152,7 +139,7 @@ static as_value sprite_stop(const fn_call& fn)
 //removeMovieClip() : Void
 static as_value sprite_remove_movieclip(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	sprite_instance* parent = dynamic_cast<sprite_instance*>(sprite->get_parent());
 	if (parent)
@@ -166,7 +153,7 @@ static as_value sprite_remove_movieclip(const fn_call& fn)
 //             depth:Number [, initObject:Object]) : MovieClip
 static as_value sprite_attach_movie(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	as_value rv;
 
 	if (fn.nargs < 3 || fn.nargs > 4)
@@ -210,7 +197,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	// should we support negative depths ?
 	uint16_t depth_val = uint16_t(fn.arg(2).to_number());
 
-	boost::intrusive_ptr<character> newch = exported_movie->create_character_instance(sprite, depth_val);
+	boost::intrusive_ptr<character> newch = exported_movie->create_character_instance(sprite.get(), depth_val);
 	assert( dynamic_cast<sprite_instance*>(newch.get()) );
 	assert( newch.get() > (void*)0xFFFF );
 	assert(newch->get_ref_count() > 0);
@@ -229,7 +216,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	/// Properties must be copied *after* the call to attachCharacter
 	/// because attachCharacter() will reset matrix !!
 	if (fn.nargs > 3 ) {
-		as_object* initObject = fn.arg(3).to_object();
+		boost::intrusive_ptr<as_object> initObject = fn.arg(3).to_object();
 		if ( initObject ) {
 			log_msg("Initializing properties from object");
 			newch->copyProperties(*initObject);
@@ -252,7 +239,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 // attachAudio(id:Object) : Void
 static as_value sprite_attach_audio(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
 	static bool warned = false;
@@ -268,7 +255,7 @@ static as_value sprite_attach_audio(const fn_call& fn)
 //createEmptyMovieClip(name:String, depth:Number) : MovieClip
 static as_value sprite_create_empty_movieclip(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	if (fn.nargs != 2)
 	{
@@ -299,7 +286,7 @@ static as_value sprite_create_empty_movieclip(const fn_call& fn)
 
 static as_value sprite_get_depth(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	int n = sprite->get_depth();
 
@@ -310,7 +297,7 @@ static as_value sprite_get_depth(const fn_call& fn)
 //swapDepths(target:Object) : Void
 static as_value sprite_swap_depths(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	
 	as_value rv;
 	if (fn.nargs < 1)
@@ -321,19 +308,21 @@ static as_value sprite_swap_depths(const fn_call& fn)
 		return rv;
 	}
 
-	sprite_instance* target;
+	boost::intrusive_ptr<character> target = NULL;
 	if (fn.arg(0).is_object() )
 	{
-		target = (sprite_instance*) fn.arg(0).to_object();
+		target = boost::dynamic_pointer_cast<character>(fn.arg(0).to_object());
 	}
-	else
-	if (fn.arg(0).is_number() )
+	else if (fn.arg(0).is_number() )
 	{
 		// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
 		int target_depth = int(fn.arg(0).to_number()) + 16383 + 1;
 
-		sprite_instance* parent = (sprite_instance*) sprite->get_parent();
-		target = (sprite_instance*) parent->get_character_at_depth(target_depth);
+		boost::intrusive_ptr<sprite_instance> parent = dynamic_cast<sprite_instance*>(sprite->get_parent());
+		if ( parent )
+		{
+			target = parent->get_character_at_depth(target_depth);
+		}
 	}
 	else
 	{
@@ -357,8 +346,11 @@ static as_value sprite_swap_depths(const fn_call& fn)
 		target->set_depth(sprite->get_depth());
 		sprite->set_depth(target_depth);
 
-		sprite_instance* parent = (sprite_instance*) sprite->get_parent();
-		parent->swap_characters(sprite, target);
+		boost::intrusive_ptr<sprite_instance> parent = dynamic_cast<sprite_instance*>(sprite->get_parent());
+		if ( parent )
+		{
+			parent->swap_characters(sprite.get(), target.get());
+		}
 	}
 	else
 	{
@@ -376,7 +368,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
 //duplicateMovieClip(name:String, depth:Number, [initObject:Object]) : MovieClip
 static as_value sprite_duplicate_movieclip(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	
 	if (fn.nargs < 2)
 	{
@@ -428,7 +420,7 @@ static as_value sprite_duplicate_movieclip(const fn_call& fn)
 		// Copy members from initObject
 		if (fn.nargs == 3 && ch)
 		{
-			as_object* initObject = fn.arg(2).to_object();
+			boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object();
 			if ( initObject ) ch->copyProperties(*initObject);
 		}
 
@@ -438,7 +430,7 @@ static as_value sprite_duplicate_movieclip(const fn_call& fn)
 
 static as_value sprite_goto_and_play(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
@@ -457,7 +449,7 @@ static as_value sprite_goto_and_play(const fn_call& fn)
 
 static as_value sprite_goto_and_stop(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
@@ -477,7 +469,7 @@ static as_value sprite_goto_and_stop(const fn_call& fn)
 
 static as_value sprite_next_frame(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	size_t frame_count = sprite->get_frame_count();
 	size_t current_frame = sprite->get_current_frame();
@@ -491,7 +483,7 @@ static as_value sprite_next_frame(const fn_call& fn)
 
 static as_value sprite_prev_frame(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	size_t current_frame = sprite->get_current_frame();
 	if (current_frame > 0)
@@ -504,14 +496,14 @@ static as_value sprite_prev_frame(const fn_call& fn)
 
 static as_value sprite_get_bytes_loaded(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	return as_value(sprite->get_bytes_loaded());
 }
 
 static as_value sprite_get_bytes_total(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	// @@ horrible uh ?
 	return as_value(sprite->get_bytes_total());
@@ -520,7 +512,7 @@ static as_value sprite_get_bytes_total(const fn_call& fn)
 // my_mc.loadMovie(url:String [,variables:String]) : Void
 static as_value sprite_load_movie(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
 	if (fn.nargs < 1) // url
@@ -568,7 +560,7 @@ static as_value sprite_load_movie(const fn_call& fn)
 // my_mc.loadVariables(url:String [, variables:String]) : Void
 static as_value sprite_load_variables(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
 	if (fn.nargs < 1) // url
@@ -618,7 +610,7 @@ static as_value sprite_load_variables(const fn_call& fn)
 // my_mc.unloadMovie() : Void
 static as_value sprite_unload_movie(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
 	// See http://sephiroth.it/reference.php?id=429
@@ -634,7 +626,7 @@ static as_value sprite_unload_movie(const fn_call& fn)
 
 static as_value sprite_hit_test(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
 	static bool warned_1_arg = false;
@@ -704,7 +696,7 @@ static as_value sprite_hit_test(const fn_call& fn)
 static as_value
 sprite_create_text_field(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	if (fn.nargs != 6) // name, depth, x, y, width, height
 	{
@@ -787,7 +779,7 @@ sprite_create_text_field(const fn_call& fn)
 static as_value
 sprite_getNextHighestDepth(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	unsigned int nextdepth = sprite->getNextHighestDepth();
 	return as_value(static_cast<double>(nextdepth));
@@ -797,7 +789,7 @@ sprite_getNextHighestDepth(const fn_call& fn)
 static as_value
 sprite_getURL(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
 	static bool warned = false;
@@ -813,7 +805,7 @@ sprite_getURL(const fn_call& fn)
 static as_value
 sprite_getBounds(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	boost::intrusive_ptr<as_object> target;
 	if ( fn.nargs > 0 )
@@ -850,7 +842,7 @@ sprite_getBounds(const fn_call& fn)
 static as_value
 sprite_globalToLocal(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
 	static bool warned = false;
@@ -865,7 +857,7 @@ sprite_globalToLocal(const fn_call& fn)
 static as_value
 sprite_endFill(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	sprite->endFill();
 	return as_value();
 }
@@ -873,7 +865,7 @@ sprite_endFill(const fn_call& fn)
 static as_value
 sprite_lineTo(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	if ( fn.nargs < 2 )
 	{
@@ -894,7 +886,7 @@ sprite_lineTo(const fn_call& fn)
 static as_value
 sprite_moveTo(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	if ( fn.nargs < 2 )
 	{
@@ -915,7 +907,7 @@ sprite_moveTo(const fn_call& fn)
 static as_value
 sprite_lineStyle(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	uint16_t thickness = 0;
 	uint8_t r = 0;
@@ -957,7 +949,7 @@ sprite_lineStyle(const fn_call& fn)
 static as_value
 sprite_curveTo(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	if ( fn.nargs < 4 )
 	{
@@ -980,7 +972,7 @@ sprite_curveTo(const fn_call& fn)
 static as_value
 sprite_clear(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	sprite->clear();
 
@@ -990,7 +982,7 @@ sprite_clear(const fn_call& fn)
 static as_value
 sprite_beginFill(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	uint8_t r = 0;
 	uint8_t g = 0;
@@ -1017,7 +1009,7 @@ sprite_beginFill(const fn_call& fn)
 static as_value
 sprite_beginGradientFill(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
 	static bool warned = false;
@@ -1034,7 +1026,7 @@ sprite_beginGradientFill(const fn_call& fn)
 static as_value
 sprite_startDrag(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
 	static bool warned = false;
@@ -1050,7 +1042,7 @@ sprite_startDrag(const fn_call& fn)
 static as_value
 sprite_stopDrag(const fn_call& fn)
 {
-	sprite_instance* sprite = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
 	static bool warned = false;
@@ -1076,7 +1068,7 @@ movieclip_ctor(const fn_call& /* fn */)
 static as_value
 sprite_currentframe_getset(const fn_call& fn)
 {
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -1095,7 +1087,7 @@ sprite_currentframe_getset(const fn_call& fn)
 static as_value
 sprite_totalframes_getset(const fn_call& fn)
 {
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -1114,7 +1106,7 @@ sprite_totalframes_getset(const fn_call& fn)
 static as_value
 sprite_framesloaded_getset(const fn_call& fn)
 {
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -1133,7 +1125,7 @@ sprite_framesloaded_getset(const fn_call& fn)
 static as_value
 sprite_target_getset(const fn_call& fn)
 {
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -1152,7 +1144,7 @@ sprite_target_getset(const fn_call& fn)
 static as_value
 sprite_name_getset(const fn_call& fn)
 {
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -1181,7 +1173,7 @@ sprite_name_getset(const fn_call& fn)
 static as_value
 sprite_droptarget_getset(const fn_call& fn)
 {
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(ptr);
 
 	if ( fn.nargs == 0 ) // getter
@@ -1216,7 +1208,7 @@ sprite_droptarget_getset(const fn_call& fn)
 static as_value
 sprite_url_getset(const fn_call& fn)
 {
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -1235,7 +1227,7 @@ sprite_url_getset(const fn_call& fn)
 static as_value
 sprite_highquality_getset(const fn_call& fn)
 {
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(ptr);
 
 	if ( fn.nargs == 0 ) // getter
@@ -1258,7 +1250,7 @@ sprite_highquality_getset(const fn_call& fn)
 static as_value
 sprite_focusrect_getset(const fn_call& fn)
 {
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(ptr);
 
 	if ( fn.nargs == 0 ) // getter
@@ -1281,7 +1273,7 @@ sprite_focusrect_getset(const fn_call& fn)
 static as_value
 sprite_soundbuftime_getset(const fn_call& fn)
 {
-	sprite_instance* ptr = ensure_sprite(fn.this_ptr);
+	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(ptr);
 
 	if ( fn.nargs == 0 ) // getter

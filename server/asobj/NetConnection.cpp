@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.30 2007/03/20 10:36:45 ann Exp $ */
+/* $Id: NetConnection.cpp,v 1.31 2007/03/20 15:01:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -175,7 +175,7 @@ netconnection_connect(const fn_call& fn)
 {
 	GNASH_REPORT_FUNCTION;
 
-	NetConnection *ptr = ensureType<NetConnection>(fn.this_ptr); 
+	boost::intrusive_ptr<NetConnection> ptr = ensureType<NetConnection>(fn.this_ptr); 
     
 	if (fn.nargs > 0) {
 		ptr->addToURL(fn.arg(0).to_string());

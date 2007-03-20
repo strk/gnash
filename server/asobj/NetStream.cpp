@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.31 2007/03/20 10:36:45 ann Exp $ */
+/* $Id: NetStream.cpp,v 1.32 2007/03/20 15:01:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -71,7 +71,7 @@ netstream_new(const fn_call& fn)
 
 	if (fn.nargs > 0)
 	{
-		NetConnection* ns = dynamic_cast<NetConnection*>(fn.arg(0).to_object());
+		boost::intrusive_ptr<NetConnection> ns = boost::dynamic_pointer_cast<NetConnection>(fn.arg(0).to_object());
 		if ( ns )
 		{
 			netstream_obj->setNetCon(ns);
@@ -92,14 +92,14 @@ netstream_new(const fn_call& fn)
 
 static as_value netstream_close(const fn_call& fn)
 {
-	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 	ns->close();
 	return as_value();
 }
 
 static as_value netstream_pause(const fn_call& fn)
 {
-	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 	
 	// mode: -1 ==> toogle, 0==> pause, 1==> play
 	int mode = -1;
@@ -113,7 +113,7 @@ static as_value netstream_pause(const fn_call& fn)
 
 static as_value netstream_play(const fn_call& fn)
 {
-	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
 	if (fn.nargs < 1)
 	{
@@ -131,7 +131,7 @@ static as_value netstream_play(const fn_call& fn)
 }
 
 static as_value netstream_seek(const fn_call& fn) {
-	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
 	double time = 0;
 	if (fn.nargs > 0)
@@ -143,7 +143,7 @@ static as_value netstream_seek(const fn_call& fn) {
 	return as_value();
 }
 static as_value netstream_setbuffertime(const fn_call& fn) {
-	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 	UNUSED(ns);
     log_msg("%s:unimplemented \n", __FUNCTION__);
 	return as_value();
@@ -154,7 +154,7 @@ static as_value
 netstream_time(const fn_call& fn)
 {
 
-	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
 	if ( fn.nargs == 0 )
 	{
@@ -174,7 +174,7 @@ static as_value
 netstream_bytesloaded(const fn_call& fn)
 {
 
-	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
 	if ( fn.nargs == 0 )
 	{
@@ -194,7 +194,7 @@ static as_value
 netstream_bytestotal(const fn_call& fn)
 {
 
-	NetStream* ns = ensureType<NetStream>(fn.this_ptr);
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
 	if ( fn.nargs == 0 )
 	{

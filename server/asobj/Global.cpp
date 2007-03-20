@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.52 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: Global.cpp,v 1.53 2007/03/20 15:01:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -319,7 +319,7 @@ as_global_assetpropflags(const fn_call& fn)
     // ASSetPropFlags(obj, props, n, allowFalse=false)
 
     // object
-    as_object* obj = fn.arg(0).to_object();
+    boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
     if ( ! obj )
     {
 		log_warning("Invalid call to ASSetPropFlags: "

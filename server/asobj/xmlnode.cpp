@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.18 2007/03/20 11:36:48 ann Exp $ */
+/* $Id: xmlnode.cpp,v 1.19 2007/03/20 15:01:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -493,12 +493,20 @@ xmlnode_appendchild(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     if (fn.nargs > 0) {
-	XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
+      boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 //    log_msg("%s: %p, %d args\n", __PRETTY_FUNCTION__, ptr, fn.nargs);
 	
-	XMLNode *xml_obj = dynamic_cast<XMLNode*>(fn.arg(0).to_object());	
+	boost::intrusive_ptr<XMLNode> xml_obj = boost::dynamic_pointer_cast<XMLNode>(fn.arg(0).to_object());	
+	if ( ! xml_obj )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("First argument to XMLNode::appendChild() is not an XMLNode");
+		);
+		return as_value();
+	}
+
 	if (xml_obj->nodeType() == XML_ELEMENT_NODE) {
-	    ptr->appendChild(xml_obj);
+	    ptr->appendChild(xml_obj.get());
 	} else {
 	    ptr->nodeValueSet(xml_obj->nodeValue());
 	}
@@ -514,7 +522,7 @@ xmlnode_appendchild(const fn_call& fn)
 //  	ptr->set_member("nextSibling", xml_obj->obj.nextSibling(ptr->obj.length()));
 	}
 	// The last child in the list is always the one we just appended
-	ptr->set_member("lastChild", xml_obj); // FIXME: don't do this, rely on getter/setter
+	ptr->set_member("lastChild", xml_obj.get()); // FIXME: don't do this, rely on getter/setter
     } else {
         log_msg("ERROR: no child XMLNode paramaters!\\n");
     }
@@ -526,7 +534,7 @@ xmlnode_clonenode(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
-    XMLNode	*ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     XMLNode   *xmlnode_obj;
 
     if (fn.nargs > 0) {
@@ -545,7 +553,7 @@ static as_value
 xmlnode_insertbefore(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     
 //    return as_value(ptr->obj.getAllocated());
 //    ptr->obj.insertBefore();
@@ -557,7 +565,7 @@ static as_value
 xmlnode_removenode(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     
 //    return as_value(ptr->obj.getAllocated());
     ptr->removeNode();
@@ -570,7 +578,7 @@ xmlnode_tostring(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     
     return as_value(ptr->toString());
 }
@@ -579,7 +587,7 @@ static as_value
 xmlnode_haschildnodes(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     return as_value(ptr->hasChildNodes());
 }
 
@@ -589,7 +597,7 @@ xmlnode_nodevalue(const fn_call& fn)
 {
     //GNASH_REPORT_FUNCTION;
 
-    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
     
@@ -612,7 +620,7 @@ static as_value
 xmlnode_nodename(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
 
@@ -633,7 +641,7 @@ xmlnode_nodetype(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) {
 	return as_value(ptr->nodeType());
@@ -650,7 +658,7 @@ static as_value
 xmlnode_firstchild(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
 
@@ -676,7 +684,7 @@ static as_value
 xmlnode_lastchild(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
 
@@ -711,7 +719,7 @@ xmlnode_nextsibling(const fn_call& fn)
 	return rv;
     }
     
-    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     XMLNode *node = ptr->nextSibling();
     if (node) {
 	rv = node;
@@ -735,7 +743,7 @@ xmlnode_previoussibling(const fn_call& fn)
 	return rv;
     }
 
-    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     XMLNode *node = ptr->previousSibling();
     if (node) {
 	rv = node;

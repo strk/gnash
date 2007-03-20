@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.46 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: edit_text_character.cpp,v 1.47 2007/03/20 15:01:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,8 +49,7 @@ static as_value textfield_set_variable(const fn_call& fn);
 static as_value
 textfield_get_variable(const fn_call& fn)
 {
-	assert( dynamic_cast<edit_text_character*>(fn.this_ptr) );
-	edit_text_character* text = static_cast<edit_text_character*>(fn.this_ptr);
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
 
 	return as_value(text->get_variable_name());
 
@@ -59,8 +58,7 @@ textfield_get_variable(const fn_call& fn)
 static as_value
 textfield_set_variable(const fn_call& fn)
 {
-	assert( dynamic_cast<edit_text_character*>(fn.this_ptr) );
-	edit_text_character* text = static_cast<edit_text_character*>(fn.this_ptr);
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
 
 	assert ( fn.nargs > 0 );
 	std::string newname = fn.arg(0).to_std_string();

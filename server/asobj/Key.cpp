@@ -183,7 +183,7 @@ key_as_object::notify_listeners(const std::string& funcname)
 }
 
 void
-key_as_object::add_listener(as_object* listener)
+key_as_object::add_listener(boost::intrusive_ptr<as_object> listener)
 {
 
     // Should we bother doing this every time someone calls add_listener(),
@@ -201,7 +201,7 @@ key_as_object::add_listener(as_object* listener)
 }
 
 void
-key_as_object::remove_listener(as_object* listener)
+key_as_object::remove_listener(boost::intrusive_ptr<as_object> listener)
 {
 
   for (std::vector<boost::intrusive_ptr<as_object> >::iterator iter = m_listeners.begin(); iter != m_listeners.end(); )
@@ -231,14 +231,14 @@ key_add_listener(const fn_call& fn)
 	    return as_value();
 	}
 
-    as_object*	listener = fn.arg(0).to_object();
+    boost::intrusive_ptr<as_object> listener = fn.arg(0).to_object();
     if (listener == NULL)
 	{
 	    log_error("key_add_listener passed a NULL object; ignored\n");
 	    return as_value();
 	}
 
-    key_as_object* ko = ensureType<key_as_object>( fn.this_ptr );
+    boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
     ko->add_listener(listener);
     return as_value();
@@ -247,7 +247,7 @@ key_add_listener(const fn_call& fn)
 as_value	key_get_ascii(const fn_call& fn)
     // Return the ascii value of the last key pressed.
 {
-    key_as_object* ko = ensureType<key_as_object>( fn.this_ptr );
+    boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
     int	code = ko->get_last_key_pressed();
     if (code < 0)
@@ -265,7 +265,7 @@ as_value	key_get_ascii(const fn_call& fn)
 as_value	key_get_code(const fn_call& fn)
     // Returns the keycode of the last key pressed.
 {
-    key_as_object* ko = ensureType<key_as_object>( fn.this_ptr );
+    boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
     return as_value(ko->get_last_key_pressed());
 }
@@ -281,7 +281,7 @@ as_value	key_is_down(const fn_call& fn)
 
     int	code = (int) fn.arg(0).to_number();
 
-    key_as_object* ko = ensureType<key_as_object>( fn.this_ptr );
+    boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
     return as_value(ko->is_key_down(code));
 }
@@ -303,14 +303,14 @@ as_value	key_remove_listener(const fn_call& fn)
 	    return as_value();
 	}
 
-    as_object*	listener = fn.arg(0).to_object();
+    boost::intrusive_ptr<as_object> listener = fn.arg(0).to_object();
     if (listener == NULL)
 	{
 	    log_error("key_remove_listener passed a NULL object; ignored\n");
 	    return as_value();
 	}
 
-    key_as_object* ko = ensureType<key_as_object>( fn.this_ptr );
+    boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr); 
 
     ko->remove_listener(listener);
     return as_value();
@@ -357,9 +357,9 @@ void	notify_key_event(key::code k, bool down)
 		if ( global->get_member(objName, &kval) )
 		{
 			//log_msg("Found member 'Key' in _global: %s", kval.to_string());
-			as_object* obj = kval.to_object();
+			boost::intrusive_ptr<as_object> obj = kval.to_object();
 			//log_msg("_global.Key to_object() : %s @ %p", typeid(*obj).name(), obj);
-			keyobject = dynamic_cast<key_as_object*>( obj );
+			keyobject = boost::dynamic_pointer_cast<key_as_object>( obj );
 		}
 	}
 

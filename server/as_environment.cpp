@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.59 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: as_environment.cpp,v 1.60 2007/03/20 15:01:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -427,9 +427,10 @@ as_environment::find_target(const as_value& val) const
 
 	if ( val.is_object() )
 	{
-		as_object* obj = val.to_object();
+		boost::intrusive_ptr<as_object> obj = val.to_object();
 		assert (obj);
-		character* s=dynamic_cast<character*>(obj);
+		character* s=dynamic_cast<character*>(obj.get());
+		assert(s->get_ref_count() > 1); // or the intrusive_ptr above going out-of-scope will kill it
 		//log_msg("find_target is a character, returning it");
 		return s; // might be NULL
 	}
@@ -651,15 +652,17 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 		}
 	} 
 
-	env = tmp.to_object();
-
 	// Debugging only:
-	if ( env == NULL ) {
+	if ( ! tmp.is_object() ) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("Member %s for object %p found but doesn't cast to an as_object", subpart.c_str(), env);
 		);
 		return NULL;
 	}
+
+	env = tmp.to_object().get();
+	assert(env->get_ref_count() > 0); // still alive...
+
 
 	//@@   _level0 --> root, .. --> parent, . --> this, other == character
 	
@@ -791,14 +794,14 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 			}
 		} 
 
-		as_object* newenv = tmp.to_object();
 		// Debugging only:
-		if ( newenv == NULL ) {
+		if ( ! tmp.is_object() ) {
 			log_msg("Member %s for object %p found but doesn't cast to an as_object", subpart.c_str(), env);
 			return NULL;
 		}
 
-		env = newenv;
+		env = tmp.to_object().get();
+		assert(env->get_ref_count() > 0);
 	}
 
 	//@@   _level0 --> root, .. --> parent, . --> this, other == character

@@ -107,6 +107,9 @@ public:
 	/// Adds a reference to the prototype, if any.
 	as_object(as_object* proto);
 
+	/// Construct an ActionScript object based on the given prototype.
+	as_object(boost::intrusive_ptr<as_object> proto);
+
 	/// Copy an as_object
 	//
 	/// TODO: write more about this, is it allowed ? is it safe ?
@@ -396,7 +399,7 @@ public:
 	/// public: set_member("__proto__", <anyting>)
 	/// will do just the same
 	///
-	void set_prototype(as_object* proto);
+	void set_prototype(boost::intrusive_ptr<as_object> proto);
 	
 	/// @{ Common ActionScript methods for characters
 	/// TODO: make protected
@@ -500,6 +503,30 @@ ensureType (as_object* obj)
 			target + " called from " + source + " instance.";
 
 		throw ActionException(msg);
+        }
+        return ret;
+}
+
+/// Template which does a dynamic cast for as_object pointers. It throws an
+/// error if the dynamic cast fails.
+/// @param T the class to which the obj pointer should be cast.
+/// @param obj the pointer to be cast.
+/// @return If the cast succeeds, the pointer cast to the requested type.
+///         Otherwise, NULL.
+template <typename T>
+boost::intrusive_ptr<T>
+ensureType (boost::intrusive_ptr<as_object> obj)
+{
+	boost::intrusive_ptr<T> ret = boost::dynamic_pointer_cast<T>(obj);
+
+	// This path is fairly unlikely, so it's a potential  __builtin_expect.
+  	if (!ret) {
+		std::ostringstream stream;
+		stream 	<< "builtin method or gettersetter for " 
+			<< typeid(T).name() << " called from "
+			<< typeid(obj).name() << " instance.";
+
+		throw ActionException(stream.str());
         }
         return ret;
 }

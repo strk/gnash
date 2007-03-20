@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.77 2007/03/15 22:39:53 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.78 2007/03/20 15:01:20 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -577,8 +577,8 @@ public:
 		assert(m_parent == NULL);
 
 		as_value obj = m_as_environment.get_variable(std::string(path_to_object));
-		as_object* as_obj = obj.to_object();
-		character* ch = dynamic_cast<character*>(as_obj);
+		boost::intrusive_ptr<as_object> as_obj = obj.to_object();
+		boost::intrusive_ptr<character> ch = boost::dynamic_pointer_cast<character>(as_obj);
 		if (ch)
 		{
 			ch->set_display_callback(callback, user_ptr);

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.67 2007/03/20 09:55:08 bjacques Exp $ */
+/* $Id: ASHandlers.cpp,v 1.68 2007/03/20 15:01:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -118,7 +118,7 @@ construct_object(const as_value& constructor,
 	    // won't set __constructor__ to some other value...
 	    if ( VM::get().getSWFVersion() > 5 )
 	    {
-		    as_object* newobj = new_obj.to_object();
+		    boost::intrusive_ptr<as_object> newobj = new_obj.to_object();
 		    assert(newobj); // we assume builtin functions do return objects !!
                     newobj->init_member("__constructor__", constructor);
             }
@@ -1026,7 +1026,8 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 
 	IF_VERBOSE_ACTION
 	(
-		if (top_value.to_object() == NULL) {
+	        boost::intrusive_ptr<as_object> obj=top_value.to_object();
+		if (obj == NULL) {
 			log_action("-- get var: %s=%s",
 				var_string.c_str(),
 				top_value.to_debug_string().c_str());
@@ -1034,7 +1035,7 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 			log_action("-- get var: %s=%s at %p",
 				var_string.c_str(),
 				top_value.to_tu_string().c_str(),
-				(void*)top_value.to_object());
+				(void*)obj.get());
 		}
 	);
 #ifdef USE_DEBUGGER
@@ -1335,7 +1336,7 @@ SWFHandlers::ActionCastOp(ActionExec& thread)
 	as_function* super = env.top(0).to_as_function();
 
 	// Get the "instance" 
-	as_object* instance = env.top(1).to_object();
+	boost::intrusive_ptr<as_object> instance = env.top(1).to_object();
 
 	// Invalid args!
 	if (!super || ! instance)
@@ -2252,7 +2253,14 @@ SWFHandlers::ActionNew(ActionExec& thread)
 		env.get_top_index());
 
 #ifdef USE_DEBUGGER
-        debugger.addSymbol(new_obj.to_object(), classname);
+	// WARNING: new_obj.to_object() can return a newly allocated
+	//          thing into the intrusive_ptr, so the debugger
+	//          will be left with a deleted object !!
+	//          Rob: we don't want to use void pointers here..
+	boost::intrusive_ptr<as_object> o = new_obj.to_object();
+	o->add_ref(); // this will leak, but at least debugger won't end up
+	              // with a dandling reference...
+        debugger.addSymbol(o.get(), classname);
 #endif
 
 	env.drop(nargs);
@@ -2299,7 +2307,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     as_value	result;
     result = array_new(fn_call(NULL, &env, 0, env.get_top_index()));
     
-    as_object*	ao = result.to_object();
+    boost::intrusive_ptr<as_object> ao = result.to_object();
     assert(ao);
     
     // Fill the elements with the initial values from the stack.
@@ -2403,7 +2411,7 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 	as_value& var_name = env.top(0);
 	string var_string = var_name.to_std_string();
 	as_value variable = thread.getVariable(var_string);
-	const as_object* obj = variable.to_object();
+	const boost::intrusive_ptr<as_object> obj = variable.to_object();
 
 	// The end of the enumeration, don't set top(0) *before*
 	// fetching the as_object* obj above or it will get lost
@@ -2540,7 +2548,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
     as_value member_name = env.top(0);
     as_value target = env.top(1);
     
-    as_object* obj = target.to_object();
+    boost::intrusive_ptr<as_object> obj = target.to_object();
     if (!obj) {
 //         IF_VERBOSE_DEBUG(log_msg("getMember called against "
 //                                  "a value that does not cast "
@@ -2552,7 +2560,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
     
 	IF_VERBOSE_ACTION (
     log_action(" ActionGetMember: target: %s (object %p)",
-               target.to_debug_string().c_str(), (void*)obj);
+               target.to_debug_string().c_str(), (void*)obj.get());
 	);
     
     // Special case: String has a member "length"
@@ -2585,7 +2593,7 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
 
 	thread.ensureStack(3); // value, member, object
 
-	as_object* obj = env.top(2).to_object();
+	boost::intrusive_ptr<as_object> obj = env.top(2).to_object();
 	string member_name = env.top(1).to_std_string();
 	const as_value& member_value = env.top(0);
 
@@ -2675,7 +2683,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 
 	string method_string = method_name.to_std_string();
 	as_value method_val;
-	as_object* obj = obj_value.to_object(); 
+	boost::intrusive_ptr<as_object> obj = obj_value.to_object(); 
 	if ( method_name.is_undefined() || method_string.empty() )
 	{
 
@@ -2769,7 +2777,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	}
 #endif
 
-	as_value result = call_method(method_val, &env, obj,
+	as_value result = call_method(method_val, &env, obj.get(),
 			nargs, env.get_top_index()-3);
     
 	env.drop(nargs + 2);
@@ -2807,7 +2815,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 		nargs = available_args;
 	}
 
-	as_object* obj = obj_val.to_object();
+	boost::intrusive_ptr<as_object> obj = obj_val.to_object();
 	if ( ! obj )
 	{
 		// SWF integrity check 
@@ -2876,7 +2884,7 @@ SWFHandlers::ActionInstanceOf(ActionExec& thread)
     as_function* super = env.top(0).to_as_function();
 
     // Get the "instance" (but avoid implicit conversion of primitive values!)
-    as_object* instance = env.top(1).is_object() ? env.top(1).to_object() : NULL;
+    boost::intrusive_ptr<as_object> instance = env.top(1).is_object() ? env.top(1).to_object() : NULL;
 
     // Invalid args!
     if (!super || ! instance) {
@@ -2912,7 +2920,7 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 	// as we copied that as_value.
 	env.top(0).set_null(); 
 
-	as_object* obj = obj_val.to_object();
+	boost::intrusive_ptr<as_object> obj = obj_val.to_object();
 	if ( ! obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -3170,7 +3178,14 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 		env.push_val(function_value);
 	}
 #ifdef USE_DEBUGGER
-        debugger.addSymbol(function_value.to_object(), name);
+	// WARNING: function_value.to_object() can return a newly allocated
+	//          thing into the intrusive_ptr, so the debugger
+	//          will be left with a deleted object !!
+	//          Rob: we don't want to use void pointers here..
+	boost::intrusive_ptr<as_object> o = function_value.to_object();
+	o->add_ref(); // this will leak, but at least debugger won't end up
+	              // with a dandling reference...
+        debugger.addSymbol(o.get(), name);
 #endif
 }
 
@@ -3194,7 +3209,7 @@ SWFHandlers::ActionWith(ActionExec& thread)
 	assert( code[pc] == SWF::ACTION_WITH );
 
 	thread.ensureStack(1);  // the object
-	as_object* with_obj = env.pop().to_object();
+	boost::intrusive_ptr<as_object> with_obj = env.pop().to_object();
 
 	const vector<with_stack_entry>& with_stack = thread.getWithStack();
 	IF_VERBOSE_ACTION (
@@ -3311,7 +3326,14 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 		//env.set_member(name, function_value);
 		thread.setVariable(name, function_value);
 #ifdef USE_DEBUGGER
-                debugger.addSymbol(function_value.to_object(), name);
+		// WARNING: new_obj.to_object() can return a newly allocated
+		//          thing into the intrusive_ptr, so the debugger
+		//          will be left with a deleted object !!
+		//          Rob: we don't want to use void pointers here..
+		boost::intrusive_ptr<as_object> o = function_value.to_object();
+		o->add_ref(); // this will leak, but at least debugger won't end up
+	              // with a dandling reference...
+                debugger.addSymbol(o.get(), name);
 #endif
 	}
 

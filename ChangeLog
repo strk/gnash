@@ -1,5 +1,33 @@
 2007-03-20 Sandro Santilli <strk@keybit.net>
 
+	* server/array.cpp, server/as_environment.cpp,
+	server/as_function.cpp, server/as_object.cpp,
+	server/as_object.h, server/as_value.cpp, server/as_value.h,
+	server/button_character_instance.cpp, server/character.cpp,
+	server/debugger.cpp, server/edit_text_character.cpp,
+	server/shm.cpp, server/sprite_instance.cpp,
+	server/sprite_instance.h, server/swf_function.cpp,
+	server/swf_function.h, server/textformat.cpp, server/timers.cpp,
+	server/timers.h, server/video_stream_instance.cpp,
+	server/video_stream_instance.h, server/asobj/Boolean.cpp,
+	server/asobj/ContextMenu.cpp, server/asobj/Date.cpp,
+	server/asobj/Global.cpp, server/asobj/Key.cpp, server/asobj/Key.h,
+	server/asobj/LoadVars.cpp, server/asobj/LocalConnection.cpp,
+	server/asobj/MovieClipLoader.cpp,
+	server/asobj/NetConnection.cpp, server/asobj/NetConnection.h,
+	server/asobj/NetStream.cpp, server/asobj/NetStream.h,
+	server/asobj/NetStreamGst.cpp, server/asobj/Object.cpp,
+	server/asobj/Sound.cpp, server/asobj/string.cpp,
+	server/asobj/xml.cpp, server/asobj/xmlnode.cpp,
+	server/asobj/xmlsocket.cpp, server/vm/ASHandlers.cpp,
+	server/vm/fn_call.h, server/vm/with_stack_entry.h,
+	testsuite/server/GetterSetterTest.cpp:
+	Reduce use of "dumb" pointers, using intrusive_ptr instead.
+	A side-effect is the player2.swf premature deletion assertion
+	is not triggered anymore now.
+
+2007-03-20 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/LocalConnection.as: Fix the test to NOT
 	  rely on Gnash extensions. Actually check that the extensions are
 	  *not* there, as we want to be compatible !!

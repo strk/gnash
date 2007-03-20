@@ -127,7 +127,7 @@ ContextMenu::getExportedInterface()
 as_value
 ContextMenu::copy_method(const fn_call& fn)
 {
-	ContextMenu* ptr = ensureType<ContextMenu>(fn.this_ptr);
+	boost::intrusive_ptr<ContextMenu> ptr = ensureType<ContextMenu>(fn.this_ptr);
 	UNUSED(ptr);
 	log_warning("%s: unimplemented", __FUNCTION__);
 	return as_value();
@@ -137,7 +137,7 @@ ContextMenu::copy_method(const fn_call& fn)
 as_value
 ContextMenu::hideBuiltInItems_method(const fn_call& fn)
 {
-	ContextMenu* ptr = ensureType<ContextMenu>(fn.this_ptr);
+	boost::intrusive_ptr<ContextMenu> ptr = ensureType<ContextMenu>(fn.this_ptr);
 	UNUSED(ptr);
 	log_warning("%s: unimplemented", __FUNCTION__);
 	return as_value();

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.24 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: timers.cpp,v 1.25 2007/03/20 15:01:20 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -49,7 +49,7 @@ namespace gnash {
   
 
   void
-  Timer::setInterval(as_function& method, unsigned ms, as_object* this_ptr, as_environment *env)
+  Timer::setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr, as_environment *env)
   {
     _function = &method;
     _interval = ms * 1000; // transform to microseconds 

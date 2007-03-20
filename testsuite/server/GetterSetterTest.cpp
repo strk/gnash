@@ -32,7 +32,6 @@
 #include <cassert>
 #include <string>
 
-#include "check.h"
 #include "check.h" 
 
 using namespace std;
@@ -41,7 +40,7 @@ using namespace gnash;
 /// return the object's text value
 static as_value getter(const fn_call& fn)
 {
-	as_object* o = fn.this_ptr;
+	boost::intrusive_ptr<as_object> o = fn.this_ptr;
 	assert(fn.nargs == 0);
 	const char* txt = o->get_text_value();
 	return as_value(txt);
@@ -50,10 +49,11 @@ static as_value getter(const fn_call& fn)
 /// set a new member to the object
 static as_value setter(const fn_call& fn)
 {
-	as_object* o = fn.this_ptr;
+	boost::intrusive_ptr<as_object> o = fn.this_ptr;
 	assert(fn.nargs == 1);
 	as_value& val = fn.arg(0);
 	o->set_member(val.to_std_string(), val);
+	return as_value();
 }
 
 struct test_object: public as_object {
@@ -82,55 +82,55 @@ main(int /*argc*/, char** /*argv*/)
 	dbglogfile.setVerbosity();
 
 	boost::intrusive_ptr<movie_definition> md6 ( new DummyMovieDefinition(6) );
-	VM& vm = VM::init(*md6);
+	VM::init(*md6);
 
-	test_object obj("initial text");
-	test_object obj2("other obj");
+	boost::intrusive_ptr<test_object> obj(new test_object("initial text"));
+	boost::intrusive_ptr<test_object> obj2(new test_object("other obj"));
 
-	builtin_function* get = new builtin_function(&getter);
-	builtin_function* set = new builtin_function(&setter);
+	builtin_function* get = new builtin_function(getter);
+	builtin_function* set = new builtin_function(setter);
 
 	GetterSetter getset(*get, *set);
 
 	as_value val;
-        val = getset.getValue(&obj);
-	check_equals(obj.getText(), string("initial text"));
+        val = getset.getValue(obj.get());
+	check_equals(obj->getText(), string("initial text"));
 	check_equals(val, as_value("initial text"));
 
 	val.set_string("second try");
-	getset.setValue(&obj, val);
-	check_equals(obj.getText(), string("second try"));
+	getset.setValue(obj.get(), val);
+	check_equals(obj->getText(), string("second try"));
 	val.set_string("");
 
-	val = getset.getValue(&obj);
+	val = getset.getValue(obj.get());
 	check_equals(val, as_value("second try"));
 
 	// Test copy ctor
 
 	GetterSetter getset2(getset);
 
-	val = getset2.getValue(&obj2);
-	check_equals(obj2.getText(), string("other obj"));
+	val = getset2.getValue(obj2.get());
+	check_equals(obj2->getText(), string("other obj"));
 	check_equals(val, as_value("other obj"));
 
 	val.set_string("second try for other");
-	getset2.setValue(&obj2, val);
-	check_equals(obj2.getText(), string("second try for other"));
+	getset2.setValue(obj2.get(), val);
+	check_equals(obj2->getText(), string("second try for other"));
 	val.set_string("");
 
-	val = getset2.getValue(&obj2);
+	val = getset2.getValue(obj2.get());
 	check_equals(val, as_value("second try for other"));
 
-	val = getset2.getValue(&obj);
+	val = getset2.getValue(obj.get());
 	check_equals(val, as_value("second try"));
 
 	// Test assignment
 	
 	GetterSetter tmp(getset);
-	val = tmp.getValue(&obj);
+	val = tmp.getValue(obj.get());
 	check_equals(val, as_value("second try"));
 	tmp = getset2;
-	val = tmp.getValue(&obj2);
+	val = tmp.getValue(obj2.get());
 	check_equals(val, as_value("second try for other"));
 }
 

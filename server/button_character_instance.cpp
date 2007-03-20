@@ -152,6 +152,10 @@ frame loop:
 
 namespace gnash {
 
+/// A couple of typedefs to make code neater
+typedef button_character_instance Button;
+typedef boost::intrusive_ptr<Button> ButtonPtr;
+
 static void
 attachButtonInterface(as_object& o)
 {
@@ -276,13 +280,7 @@ button_character_instance::set_enabled(bool value)
 as_value
 button_character_instance::enabled_getset(const fn_call& fn)
 {
-	button_character_instance* ptr = 
-		dynamic_cast<button_character_instance*>(fn.this_ptr);
-		
-	if ( ! ptr )
-	{
-		throw ActionException("enabled_getset() called against non-character instance");
-	}
+	ButtonPtr ptr = ensureType<Button>(fn.this_ptr);
 
 	as_value rv;
 

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.19 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: Object.cpp,v 1.20 2007/03/20 15:01:20 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -162,7 +162,7 @@ static as_value
 object_addproperty(const fn_call& fn)
 {
 	assert(fn.this_ptr);
-	as_object* obj = fn.this_ptr;
+	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
 
 	if ( fn.nargs != 3 )
 	{
@@ -372,11 +372,11 @@ object_isPrototypeOf(const fn_call& fn)
 		return as_value(false); 
 	}
 
-	as_object* obj = fn.arg(0).to_object();
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
 	if ( ! obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("First arg to Object.isPrototypeOf(%s) is not an object", fn.arg(0).to_string());
+		log_aserror("First arg to Object.isPrototypeOf(%s) is not an object", fn.arg(0).to_debug_string().c_str());
 		);
 		return as_value(false);
 	}

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.25 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: character.cpp,v 1.26 2007/03/20 15:01:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -233,23 +233,10 @@ character::set_child_invalidated()
 //
 //---------------------------------------------------------------------
 
-// Wrapper around dynamic_cast to implement user warning.
-// To be used by builtin properties and methods.
-static character*
-ensure_character(as_object* obj)
-{
-	character* ret = dynamic_cast<character*>(obj);
-	if ( ! ret )
-	{
-		throw ActionException("builtin method or gettersetter for character objects called against non-character instance");
-	}
-	return ret;
-}
-
 as_value
 character::onrollover_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -267,7 +254,7 @@ character::onrollover_getset(const fn_call& fn)
 as_value
 character::onrollout_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -284,7 +271,7 @@ character::onrollout_getset(const fn_call& fn)
 as_value
 character::onpress_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -301,7 +288,7 @@ character::onpress_getset(const fn_call& fn)
 as_value
 character::onrelease_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -318,7 +305,7 @@ character::onrelease_getset(const fn_call& fn)
 as_value
 character::onreleaseoutside_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -335,7 +322,7 @@ character::onreleaseoutside_getset(const fn_call& fn)
 as_value
 character::onmouseup_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -352,7 +339,7 @@ character::onmouseup_getset(const fn_call& fn)
 as_value
 character::onmousedown_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -369,7 +356,7 @@ character::onmousedown_getset(const fn_call& fn)
 as_value
 character::onmousemove_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -386,7 +373,7 @@ character::onmousemove_getset(const fn_call& fn)
 as_value
 character::onload_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -403,7 +390,7 @@ character::onload_getset(const fn_call& fn)
 as_value
 character::x_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -425,7 +412,7 @@ character::x_getset(const fn_call& fn)
 as_value
 character::y_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -447,7 +434,7 @@ character::y_getset(const fn_call& fn)
 as_value
 character::xscale_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -499,7 +486,7 @@ character::xscale_getset(const fn_call& fn)
 as_value
 character::yscale_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -551,7 +538,7 @@ character::yscale_getset(const fn_call& fn)
 as_value
 character::xmouse_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -581,7 +568,7 @@ character::xmouse_getset(const fn_call& fn)
 as_value
 character::ymouse_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -611,7 +598,7 @@ character::ymouse_getset(const fn_call& fn)
 as_value
 character::alpha_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -633,7 +620,7 @@ character::alpha_getset(const fn_call& fn)
 as_value
 character::visible_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -652,7 +639,7 @@ character::visible_getset(const fn_call& fn)
 as_value
 character::width_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -678,7 +665,7 @@ character::width_getset(const fn_call& fn)
 as_value
 character::height_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -704,7 +691,7 @@ character::height_getset(const fn_call& fn)
 as_value
 character::rotation_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
@@ -738,12 +725,12 @@ character::rotation_getset(const fn_call& fn)
 as_value
 character::parent_getset(const fn_call& fn)
 {
-	character* ptr = ensure_character(fn.this_ptr);
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		as_object* p = ptr->get_parent();
+		boost::intrusive_ptr<as_object> p = ptr->get_parent();
 		if ( p )
 		{
 			rv = as_value(p);

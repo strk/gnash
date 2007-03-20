@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.35 2007/03/20 09:19:33 strk Exp $ */
+/* $Id: as_value.h,v 1.36 2007/03/20 15:01:20 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -23,13 +23,12 @@
 #include "config.h"
 #endif
 
-#include <cmath>
-#include <string>
-
 #include "container.h"
 #include "tu_config.h"
+#include "smart_ptr.h"
 
-//#include "resource.h" // for inheritance of as_object
+#include <cmath>
+#include <string>
 
 namespace gnash {
 
@@ -66,9 +65,12 @@ static inline int isnan_ld (long double x) { return x != x; }
 #endif
  
 
-// ActionScript value type.
-
-//No private: ???
+/// ActionScript value type.
+//
+/// Any ActionScript value is stored into an instance of this
+/// class. The instance keeps primitive types by value and
+/// composite types by reference (smart pointer).
+///
 class DSOEXPORT as_value
 {
 public:
@@ -240,6 +242,8 @@ public:
 		set_as_object(obj);
 	}
 
+	as_value(boost::intrusive_ptr<as_object> obj);
+
 	/// Construct a NULL or AS_FUNCTION value
 	as_value(as_function* func);
 
@@ -402,18 +406,18 @@ public:
 
 	/// Return value as an object, converting primitive values as needed.
 	//
-	/// Make sure you store the returned pointer in a boost::intrusive_ptr
-	/// as it might be a newly allocated one in case of a conversion from
-	/// a primitive string, number or boolean value.
+	/// Make sure you don't break the intrusive_ptr chain
+	/// as the returned object might be a newly allocated one in case
+	/// of a conversion from a primitive string, number or boolean value.
 	///
 	/// string values will be converted to String objects,
 	/// numeric values will be converted to Number objects,
-	/// boolean values are currently NOT converted...
+	/// boolean values are currently NOT converted, but should (FIXME!)
 	///
 	/// If you want to avoid the conversion, check with is_object() before
 	/// calling this function.
 	///
-	as_object* to_object() const;
+	boost::intrusive_ptr<as_object> to_object() const;
 
 	/// Return value as a sprite or NULL if this is not possible.
 	//
@@ -495,6 +499,8 @@ public:
 	/// if not-null
 	///
 	void	set_as_object(as_object* obj);
+
+	void	set_as_object(boost::intrusive_ptr<as_object> obj);
 
 	/// Make this a NULL or AS_FUNCTION value
 	void	set_as_function(as_function* func);

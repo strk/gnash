@@ -92,7 +92,7 @@ public:
       /// 	The environment in which the associated function will be run.
       ///	Not sure we should provide this rather then extracting from this_ptr...
       ///
-      void setInterval(as_function& method, unsigned ms, as_object* this_ptr, as_environment *env);
+      void setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr, as_environment *env);
 
       /// Clear the timer, ready for reuse
       //

@@ -142,7 +142,10 @@ as_function::getPrototype()
 	get_member("prototype", &proto);
 	if ( proto.to_object() != _properties.get() )
 	{
-		log_warning("Exported interface of function %p has been overwritten (from %p to %p)!", this, _properties.get(), proto.to_object());
+		log_warning("Exported interface of function %p "
+				"has been overwritten (from %p to %p)!",
+				this, _properties.get(),
+				(void*)proto.to_object().get());
 		_properties = proto.to_object();
 	}
 	return _properties.get();
@@ -169,26 +172,13 @@ function_class_init(as_object& global)
 
 }
 
-// Wrapper around dynamic_cast to implement user warning.
-// To be used by builtin properties and methods.
-static as_function*
-ensureFunction(as_object* obj)
-{
-	as_function* ret = dynamic_cast<as_function*>(obj);
-	if ( ! ret )
-	{
-		throw ActionException("builtin method or gettersetter for Function objects called against non-Function instance");
-	}
-	return ret;
-}
-
 as_value
 function_apply(const fn_call& fn)
 {
 	int pushed=0; // new values we push on the stack
 
 	// Get function body 
-	as_function* function_obj = ensureFunction(fn.this_ptr);
+	boost::intrusive_ptr<as_function> function_obj = ensureType<as_function>(fn.this_ptr);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
@@ -204,7 +194,7 @@ function_apply(const fn_call& fn)
 	else
 	{
 		// Get the object to use as 'this' reference
-		as_object *this_ptr = fn.arg(0).to_object();
+		boost::intrusive_ptr<as_object> this_ptr = fn.arg(0).to_object();
 		if ( this_ptr ) new_fn_call.this_ptr = this_ptr;
 		// ... or recycle this function's call 'this' pointer
 		// (most likely the Function instance)
@@ -224,22 +214,20 @@ function_apply(const fn_call& fn)
 				}
 			);
 
-			as_object *arg1 = fn.arg(1).to_object();
+			boost::intrusive_ptr<as_object> arg1 = fn.arg(1).to_object();
 			if ( ! arg1 )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 					log_aserror("Second arg of Function.apply"
-						" is of type %s, with value %s"
-						" (expected array)"
+						" is %s (expected array)"
 						" - considering as call with no args",
-						fn.arg(1).typeOf(),
-						fn.arg(1).to_string());
+						fn.arg(1).to_debug_string().c_str());
 				);
 				goto call_it;
 			}
 
-			as_array_object *arg_array = \
-					dynamic_cast<as_array_object*>(arg1);
+			boost::intrusive_ptr<as_array_object> arg_array = \
+					boost::dynamic_pointer_cast<as_array_object>(arg1);
 
 			if ( ! arg_array )
 			{
@@ -273,7 +261,7 @@ function_apply(const fn_call& fn)
 	call_it:
 
 	// Call the function 
-	as_value rv = (*function_obj)(new_fn_call);
+	as_value rv = function_obj->call(new_fn_call);
 
 	// Drop additional values we pushed on the stack 
 	fn.env->drop(pushed);
@@ -286,7 +274,7 @@ function_call(const fn_call& fn)
 {
 
 	// Get function body 
-	as_function* function_obj = ensureFunction(fn.this_ptr);
+	boost::intrusive_ptr<as_function> function_obj = ensureType<as_function>(fn.this_ptr);
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
@@ -300,7 +288,7 @@ function_call(const fn_call& fn)
 	else
 	{
 		// Get the object to use as 'this' reference
-		as_object *this_ptr = fn.arg(0).to_object();
+		boost::intrusive_ptr<as_object> this_ptr = fn.arg(0).to_object();
 		new_fn_call.this_ptr = this_ptr;
 		new_fn_call.nargs--;
 		new_fn_call.first_arg_bottom_index--;

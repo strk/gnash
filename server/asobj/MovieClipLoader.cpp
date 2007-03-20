@@ -126,9 +126,9 @@ public:
 	/// This function will call add_ref() on the
 	/// given object.
 	///
-	void addListener(as_object* listener);
+	void addListener(boost::intrusive_ptr<as_object> listener);
 
-	void removeListener(as_object* listener);
+	void removeListener(boost::intrusive_ptr<as_object> listener);
 
 	/// Invoke any listener for the specified event
 	void dispatchEvent(const std::string& eventName, fn_call& fn);
@@ -137,7 +137,9 @@ public:
 
 private:
 
-	std::set<as_object*> _listeners;
+	typedef std::set< boost::intrusive_ptr<as_object> > Listeners;
+
+	Listeners _listeners;
 	bool          _started;
 	bool          _completed;
 	tu_string     _filespec;
@@ -233,31 +235,20 @@ MovieClipLoader::unloadClip(void *)
 
 
 void
-MovieClipLoader::addListener(as_object* listener)
+MovieClipLoader::addListener(boost::intrusive_ptr<as_object> listener)
 {
 	assert(listener); // caller should check
-	if ( _listeners.insert(listener).second )
-	{
-		// listener inserted
-		listener->add_ref();
-	}
-	else
-	{
-		// listener already present, no need to
-		// increment ref count
-	}
-
+	_listeners.insert(listener);
 }
 
 
 void
-MovieClipLoader::removeListener(as_object* listener)
+MovieClipLoader::removeListener(boost::intrusive_ptr<as_object> listener)
 {
 	assert(listener); // caller should check
-	std::set<as_object*>::iterator it = _listeners.find(listener);
+	Listeners::iterator it = _listeners.find(listener);
 	if ( it != _listeners.end() )
 	{
-		(*it)->drop_ref();
 		_listeners.erase(it);
 	}
 }
@@ -267,7 +258,7 @@ MovieClipLoader::removeListener(as_object* listener)
 void
 MovieClipLoader::dispatchEvent(const std::string& event, fn_call& fn)
 {
-	typedef std::set<as_object*>::iterator iterator;
+	typedef Listeners::iterator iterator;
 
 #if GNASH_DEBUG
 	log_msg("Dispatching %s event to " SIZET_FMT " listeners",
@@ -278,7 +269,7 @@ MovieClipLoader::dispatchEvent(const std::string& event, fn_call& fn)
 			it != itEnd;
 			++it)
 	{
-		as_object* listener = *it;
+		boost::intrusive_ptr<as_object> listener = *it;
 		as_value method;
 		if ( ! listener->get_member(event.c_str(), &method) )
 		{
@@ -296,7 +287,7 @@ log_msg(" Listener %p doesn't have an %s event to listen for, skipped",
 			" %s function", event.c_str());
 #endif
 
-		call_method(method, fn.env, fn.this_ptr, fn.nargs, fn.first_arg_bottom_index);
+		call_method(method, fn.env, fn.this_ptr.get(), fn.nargs, fn.first_arg_bottom_index);
 	}
 
 }
@@ -308,7 +299,7 @@ moviecliploader_loadclip(const fn_call& fn)
 
 	//log_msg("%s: nargs = %d\n", __FUNCTION__, fn.nargs);
 
-	MovieClipLoader* ptr = ensureType<MovieClipLoader>(fn.this_ptr);
+	boost::intrusive_ptr<MovieClipLoader> ptr = ensureType<MovieClipLoader>(fn.this_ptr);
   
 	as_value& url_arg = fn.arg(0);
 #if 0 // whatever it is, we'll need a string, the check below would only be worth
@@ -374,26 +365,26 @@ moviecliploader_getprogress(const fn_call& fn)
 {
   //log_msg("%s: nargs = %d\n", __FUNCTION__, nargs);
   
-  MovieClipLoader* ptr = ensureType<MovieClipLoader>(fn.this_ptr);
+  boost::intrusive_ptr<MovieClipLoader> ptr = ensureType<MovieClipLoader>(fn.this_ptr);
   
-  as_object *target = fn.arg(0).to_object();
+  boost::intrusive_ptr<as_object> target = fn.arg(0).to_object();
   
-  struct mcl *mcl_data = ptr->getProgress(target);
+  struct mcl *mcl_data = ptr->getProgress(target.get());
 
-  mcl_as_object *mcl_obj = new mcl_as_object;
+  boost::intrusive_ptr<mcl_as_object> mcl_obj ( new mcl_as_object );
 
   mcl_obj->init_member("bytesLoaded", mcl_data->bytes_loaded);
   mcl_obj->init_member("bytesTotal",  mcl_data->bytes_total);
   
-  return as_value(mcl_obj); // will store in a boost::intrusive_ptr
+  return as_value(mcl_obj.get()); // will store in a boost::intrusive_ptr
 }
 
 static as_value
 moviecliploader_addlistener(const fn_call& fn)
 {
-	MovieClipLoader* mcl = ensureType<MovieClipLoader>(fn.this_ptr);
+	boost::intrusive_ptr<MovieClipLoader> mcl = ensureType<MovieClipLoader>(fn.this_ptr);
   
-	as_object *listener = fn.arg(0).to_object();
+	boost::intrusive_ptr<as_object> listener = fn.arg(0).to_object();
 	if ( ! listener )
 	{
 		log_error("ActionScript bug: Listener given to MovieClipLoader.addListener() is not an object");
@@ -407,9 +398,9 @@ moviecliploader_addlistener(const fn_call& fn)
 static as_value
 moviecliploader_removelistener(const fn_call& fn)
 {
-	MovieClipLoader* mcl = ensureType<MovieClipLoader>(fn.this_ptr);
+	boost::intrusive_ptr<MovieClipLoader> mcl = ensureType<MovieClipLoader>(fn.this_ptr);
   
-	as_object *listener = fn.arg(0).to_object();
+	boost::intrusive_ptr<as_object> listener = fn.arg(0).to_object();
 	if ( ! listener )
 	{
 		log_error("ActionScript bug: Listener given to MovieClipLoader.removeListener() is not an object");

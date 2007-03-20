@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: shm.cpp,v 1.28 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: shm.cpp,v 1.29 2007/03/20 15:01:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -500,25 +500,25 @@ Shm::exists()
 // method to see if it worked correctly.
 as_value shm_getname(const fn_call& fn)
 {
-    shm_as_object *ptr = (shm_as_object*)fn.this_ptr;
+    boost::intrusive_ptr<shm_as_object> ptr = ensureType<shm_as_object>(fn.this_ptr);
     assert(ptr);
     return as_value(ptr->obj.getName());
 }
 as_value shm_getsize(const fn_call& fn)
 {
-    shm_as_object *ptr = (shm_as_object*)fn.this_ptr;
+    boost::intrusive_ptr<shm_as_object> ptr = ensureType<shm_as_object>(fn.this_ptr);
     assert(ptr);
     return as_value(ptr->obj.getSize());
 }
 as_value shm_getallocated(const fn_call& fn)
 {
-    shm_as_object *ptr = (shm_as_object*)fn.this_ptr;
+    boost::intrusive_ptr<shm_as_object> ptr = ensureType<shm_as_object>(fn.this_ptr);
     assert(ptr);
     return as_value(ptr->obj.getAllocated());
 }
 as_value shm_exists(const fn_call& fn)
 {
-    shm_as_object *ptr = (shm_as_object*)fn.this_ptr;
+    boost::intrusive_ptr<shm_as_object> ptr = ensureType<shm_as_object>(fn.this_ptr);
     assert(ptr);
     return as_value(ptr->obj.exists());
 }

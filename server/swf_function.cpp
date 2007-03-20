@@ -73,11 +73,11 @@ swf_function::swf_function(const action_buffer* ab,
 }
 
 /*private static*/
-as_object* 
+boost::intrusive_ptr<as_object>
 swf_function::getSuper(as_object& obj)
 { 
 	// Super class prototype is : obj.__proto__.constructor.prototype 
-	as_object* proto = obj.get_prototype();
+	boost::intrusive_ptr<as_object> proto = obj.get_prototype();
 	if ( ! proto )
 	{
 #ifdef GNASH_DEBUG_GETSUPER
@@ -103,7 +103,7 @@ swf_function::getSuper(as_object& obj)
 	// 	 it is possible that the returned object is NOT the current
 	// 	 'prototype' member, as as_function caches it ?
 	//
-	as_object* ctor_obj = ctor.to_object();
+	boost::intrusive_ptr<as_object> ctor_obj = ctor.to_object();
 	if ( ! ctor_obj )
 	{
 #ifdef GNASH_DEBUG_GETSUPER
@@ -126,7 +126,7 @@ swf_function::getSuper(as_object& obj)
 		return NULL;
 	}
 
-	as_object* super = ctor_proto.to_object();
+	boost::intrusive_ptr<as_object> super = ctor_proto.to_object();
 	if ( ! super )
 	{
 #ifdef GNASH_DEBUG_GETSUPER
@@ -135,7 +135,7 @@ swf_function::getSuper(as_object& obj)
 		return NULL;
 	}
 
-	return super;
+	return super; // FIXME: return the intrusive_ptr directly !!
 
 }
 
@@ -202,8 +202,8 @@ swf_function::operator()(const fn_call& fn)
 		// Add 'super' (SWF6+ only)
 		if ( swfversion > 5 )
 		{
-			as_object* super = getSuper(*(fn.this_ptr));
-			our_env->set_local("super", super);
+			boost::intrusive_ptr<as_object> super = getSuper(*(fn.this_ptr));
+			our_env->set_local("super", as_value(super));
 		}
 
 		// Add 'arguments'
@@ -323,7 +323,7 @@ swf_function::operator()(const fn_call& fn)
 	// Execute the actions.
 	//ActionExec exec(*m_action_buffer, *our_env, m_start_pc, m_length, fn.result, m_with_stack, m_is_function2);
         as_value result;
-	ActionExec exec(*this, *our_env, &result, fn.this_ptr);
+	ActionExec exec(*this, *our_env, &result, fn.this_ptr.get());
 	exec();
 
 	our_env->popCallFrame();

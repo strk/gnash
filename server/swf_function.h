@@ -87,7 +87,7 @@ private:
 	///	  parts of it to the as_object class
 	///	  (getConstructor, for example)
 	///
-	static as_object* getSuper(as_object& obj);
+	static boost::intrusive_ptr<as_object> getSuper(as_object& obj);
 
 	/// Return an 'arguments' object.
 	//

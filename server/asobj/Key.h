@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.12 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: Key.h,v 1.13 2007/03/20 15:01:20 strk Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -111,9 +111,9 @@ public:
 
 	void set_key_up(int code);
 
-	void add_listener(as_object* listener);
+	void add_listener(boost::intrusive_ptr<as_object> listener);
 
-	void remove_listener(as_object* listener);
+	void remove_listener(boost::intrusive_ptr<as_object> listener);
 
 	int get_last_key_pressed() const;
 };

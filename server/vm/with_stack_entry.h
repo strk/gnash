@@ -53,6 +53,13 @@ public:
 	{
 	}
 
+	with_stack_entry(boost::intrusive_ptr<as_object> obj, size_t end)
+		:
+		_object(obj),
+		_block_end_pc(end)
+	{
+	}
+
 	size_t end_pc()
 	{
 		return _block_end_pc;

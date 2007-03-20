@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.21 2007/03/20 11:36:48 ann Exp $ */
+/* $Id: xml.cpp,v 1.22 2007/03/20 15:01:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -53,7 +53,7 @@ static as_object* getXMLInterface();
 
 DSOEXPORT as_value xml_new(const fn_call& fn);
 static as_value xml_load(const fn_call& fn);
-static as_value xml_set_current(const fn_call& fn);
+//static as_value xml_set_current(const fn_call& fn); // UNDEFINED
 
 static as_value xml_addrequestheader(const fn_call& fn);
 static as_value xml_appendchild(const fn_call& fn);
@@ -73,7 +73,7 @@ static as_value xml_firstchild(const fn_call& fn);
 static as_value xml_childnodes(const fn_call& fn);
 
 // These are the event handlers called for this object
-static as_value xml_ondata(const fn_call& fn);
+//static as_value xml_ondata(const fn_call& fn); // UNUSED
 static as_value xml_loaded(const fn_call& fn);
 
 // Properties
@@ -768,7 +768,7 @@ xml_load(const fn_call& fn)
 
     //GNASH_REPORT_FUNCTION;
   
-    XML *xml_obj = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> xml_obj = ensureType<XML>(fn.this_ptr);
   
     std::string filespec = fn.arg(0).to_string(); 
 
@@ -796,7 +796,7 @@ xml_load(const fn_call& fn)
     if (xml_obj->hasChildNodes() == false) {
         log_error("%s: No child nodes!\n", __FUNCTION__);
     }  
-    xml_obj->setupFrame(xml_obj, xml_obj->firstChild(), false);
+    xml_obj->setupFrame(xml_obj.get(), xml_obj->firstChild(), false);
   
 #if 1
     if (fn.this_ptr->get_member("onLoad", &method)) {
@@ -842,7 +842,7 @@ xml_onload(const fn_call& fn)
     as_value	method;
     as_value      val;
     static bool first = true;     // This event handler should only be executed once.
-    XML*	ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
   
     if ((ptr->loaded()) && (first)) {
         // env->set_variable("success", true, 0);
@@ -857,7 +857,7 @@ xml_onload(const fn_call& fn)
     
         if (fn.this_ptr->get_member("onLoad", &method)) {
             // log_msg("FIXME: Found onLoad!\n");
-	    val = call_method(method, fn.env, fn.this_ptr, 0, 0);
+	    val = call_method(method, fn.env, fn.this_ptr.get(), 0, 0);
         } else {
             log_msg("FIXME: Couldn't find onLoad!\n");
         }
@@ -867,6 +867,7 @@ xml_onload(const fn_call& fn)
 }
 
 // This is the default event handler, and is usually redefined in the SWF script
+#if 0 // UNUSED, it seems
 as_value
 xml_ondata(const fn_call& fn)
 {
@@ -876,7 +877,7 @@ xml_ondata(const fn_call& fn)
     as_value	val;
     static bool first = true;     // FIXME: ugly hack!
   
-    XML*	ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
   
     if ((ptr->loaded()) && (first)) {
         if (fn.this_ptr->get_member("onData", &method)) {
@@ -892,6 +893,7 @@ xml_ondata(const fn_call& fn)
     //fn.result->set(&val);
     return as_value(val.to_bool());
 }
+#endif // UNUSED
 
 void
 attachXMLInterface(as_object& o)
@@ -947,13 +949,13 @@ as_value
 xml_new(const fn_call& fn)
 {
     as_value      inum;
-    XML *xml_obj;
+    boost::intrusive_ptr<XML> xml_obj;
     //const char    *data;
   
     // log_msg("%s: nargs=%d\n", __FUNCTION__, fn.nargs);
   
     if (fn.nargs > 0) {
-	as_object* obj = fn.env->top(0).to_object();
+	    boost::intrusive_ptr<as_object> obj = fn.env->top(0).to_object();
 
         if (! obj ) {
             xml_obj = new XML;
@@ -961,21 +963,21 @@ xml_new(const fn_call& fn)
             tu_string datain = fn.env->top(0).to_tu_string();
             xml_obj->parseXML(datain);
             //log_msg("*** Start setting up the stack frames ***\n");
-            xml_obj->setupFrame(xml_obj, xml_obj->firstChild(), true);
+            xml_obj->setupFrame(xml_obj.get(), xml_obj->firstChild(), true);
             //xml_obj->clear();
             //delete xml_obj->firstChild();
         } else {
-            XML*	xml_obj = ensureType<XML>(obj);
+		xml_obj = boost::dynamic_pointer_cast<XML>(obj);
             //log_msg("\tCloned the XML object at %p\n", xml_obj);
             //result->set(xml_obj);
-            return as_value(xml_obj);
+            return as_value(xml_obj.get());
         }
     } else {
         xml_obj = new XML;
         //log_msg("\tCreated New XML object at %p\n", xml_obj);
     }
 
-    return as_value(xml_obj);
+    return as_value(xml_obj.get());
 }
 
 //
@@ -995,7 +997,7 @@ xml_loaded(const fn_call& fn)
 
     log_msg("%s:\n", __FUNCTION__);
     
-    XML*	ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     std::string filespec = fn.arg(0).to_string();
     //fn.result->set(ptr->loaded());
     return as_value(ptr->loaded());
@@ -1017,13 +1019,23 @@ as_value xml_appendchild(const fn_call& fn)
     GNASH_REPORT_FUNCTION;
     //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     if (fn.nargs > 0) {
-	XML *ptr = ensureType<XML>(fn.this_ptr);
-	XMLNode *xml_obj = dynamic_cast<XMLNode*>(fn.arg(0).to_object());
+
+	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr); 
+	boost::intrusive_ptr<XMLNode> xml_obj = boost::dynamic_pointer_cast<XMLNode>(fn.arg(0).to_object());
+	if ( ! xml_obj )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("First argument to XML::appendChild() is not an XMLNode");
+		);
+		return as_value();
+	}
+
 	if (xml_obj->nodeType() == XML_ELEMENT_NODE) {
-	    ptr->appendChild(xml_obj);
+	    ptr->appendChild(xml_obj.get());
 	} else {
 	    ptr->nodeValueSet(xml_obj->nodeValue());
 	}
+
     } else {
         log_msg("ERROR: no child XMLNode paramaters!\\n");
     }
@@ -1034,7 +1046,7 @@ as_value xml_clonenode(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     XMLNode   *xml_obj;
 
     if (fn.nargs > 0) {
@@ -1091,8 +1103,6 @@ as_value xml_createtextnode(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    //XML *ptr = ensureType<XML>(fn.this_ptr);
-
     XMLNode *xml_obj;
     const char *text;
 
@@ -1111,20 +1121,20 @@ as_value xml_createtextnode(const fn_call& fn)
 
 as_value xml_getbytesloaded(const fn_call& fn)
 {
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     return as_value(ptr->getBytesLoaded());
 }
 
 as_value xml_getbytestotal(const fn_call& fn)
 {
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     return as_value(ptr->getBytesTotal());
 }
 
 as_value xml_haschildnodes(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     return as_value(ptr->hasChildNodes());
 }
 
@@ -1139,6 +1149,8 @@ as_value xml_haschildnodes(const fn_call& fn)
 as_value xml_insertbefore(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
+    UNUSED(ptr);
     
 //    return as_value(ptr->getAllocated());
 //    ptr->insertBefore();
@@ -1152,12 +1164,12 @@ as_value xml_parsexml(const fn_call& fn)
     const char *text;
     as_value	method;
     as_value	val;    
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
 
     if (fn.nargs > 0) {
         text = fn.arg(0).to_string(); 
 	if (ptr->parseXML(text)) {
-	    ptr->setupFrame(ptr, ptr->firstChild(), false);  
+	    ptr->setupFrame(ptr.get(), ptr->firstChild(), false);  
 	}
     }
     
@@ -1166,7 +1178,7 @@ as_value xml_parsexml(const fn_call& fn)
         log_msg("FIXME: Found onLoad!\n");
         fn.env->set_variable("success", true); // what is this for ?
 	fn.arg(0) = true; // what is this for ?
-	val = call_method(method, fn.env, fn.this_ptr, 0, 0);
+	val = call_method(method, fn.env, fn.this_ptr.get(), 0, 0);
     } else {
         log_msg("Couldn't find onLoad event handler, setting up callback\n");
         // ptr->set_event_handler(event_id::XML_LOAD, (as_c_function_ptr)&xml_onload);
@@ -1184,7 +1196,7 @@ as_value xml_parsexml(const fn_call& fn)
 as_value xml_removenode(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     
 //    return as_value(ptr->getAllocated());
     ptr->removeNode();
@@ -1193,7 +1205,7 @@ as_value xml_removenode(const fn_call& fn)
 as_value xml_send(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     
 //    return as_value(ptr->getAllocated());
     ptr->send();
@@ -1202,7 +1214,7 @@ as_value xml_send(const fn_call& fn)
 as_value xml_sendandload(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     
 //    return as_value(ptr->getAllocated());
     ptr->sendAndLoad();
@@ -1211,7 +1223,7 @@ as_value xml_sendandload(const fn_call& fn)
 as_value xml_tostring(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
 
     // TODO: There is also the "stringify" function to be used here.
     // See above. Wot does FlashPlayer return for this call?
@@ -1226,7 +1238,7 @@ static as_value
 xml_nodename(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) {
 	const char* val = ptr->nodeName();
@@ -1247,7 +1259,7 @@ xml_nodevalue(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     
     //log_msg("xml_nodevalue called with %d args against 'this' = %p", fn.nargs, ptr);
     if ( fn.nargs == 0 ) {
@@ -1270,11 +1282,11 @@ static as_value
 xml_firstchild(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) {
 	//return as_value(ptr->firstChild());
-	return as_value(ptr);
+	return as_value(ptr.get());
     } else {
 	IF_VERBOSE_ASCODING_ERRORS(
 	    log_aserror("Tried to set read-only property XML.firstChild");
@@ -1288,11 +1300,11 @@ static as_value
 xml_childnodes(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    XML *ptr = ensureType<XML>(fn.this_ptr);
+    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) {
 	//return as_value(ptr->childNodes());
-	return as_value(ptr);
+	return as_value(ptr.get());
     } else {
 	IF_VERBOSE_ASCODING_ERRORS(
 	    log_aserror("Tried to set read-only property XML.childNodes");

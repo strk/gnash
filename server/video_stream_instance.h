@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.8 2007/02/28 17:25:26 udog Exp $
+// $Id: video_stream_instance.h,v 1.9 2007/03/20 15:01:20 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -55,15 +55,12 @@ public:
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
 	/// Set the input stream for this video
-	void setStream(NetStream* ns)
-	{
-		_ns = ns;
-	}
+	void setStream(boost::intrusive_ptr<NetStream> ns);
 
 private:
 
 	// Who owns this ? Should it be an intrusive ptr ?
-	NetStream* _ns;
+	boost::intrusive_ptr<NetStream> _ns;
 
 	embedVideoDecoder* m_decoder;
 };

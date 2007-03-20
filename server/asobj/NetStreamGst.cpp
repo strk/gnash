@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -264,7 +264,7 @@ NetStreamGst::callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*p
 void
 NetStreamGst::startPlayback(NetStreamGst* ns)
 {
-	NetConnection* nc = ns->_netCon;
+	boost::intrusive_ptr<NetConnection> nc = ns->_netCon;
 	assert(nc);
 
 	// Pass stuff from/to the NetConnection object.
@@ -423,7 +423,7 @@ NetStreamGst::readPacket(void* opaque, char* buf, int buf_size){
 
 	NetStreamGst* ns = static_cast<NetStreamGst*>(opaque);
 
-	NetConnection* nc = ns->_netCon;
+	boost::intrusive_ptr<NetConnection> nc = ns->_netCon;
 	size_t ret = nc->read(static_cast<void*>(buf), buf_size);
 	ns->inputPos += ret;
 
@@ -436,7 +436,7 @@ int
 NetStreamGst::seekMedia(void *opaque, int offset, int whence){
 
 	NetStreamGst* ns = static_cast<NetStreamGst*>(opaque);
-	NetConnection* nc = ns->_netCon;
+	boost::intrusive_ptr<NetConnection> nc = ns->_netCon;
 
 	bool ret;
 

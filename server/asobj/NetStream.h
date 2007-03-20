@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.22 2007/03/09 14:38:29 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.23 2007/03/20 15:01:20 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -33,10 +33,11 @@
 
 #include "impl.h"
 #include "video_stream_instance.h"
+#include "NetConnection.h"
 
 // Forward declarations
 namespace gnash {
-	class NetConnection;
+	//class NetConnection;
 }
 
 namespace gnash {
@@ -46,7 +47,7 @@ class NetStream : public as_object {
 
 protected:
 
-	NetConnection* _netCon;
+	boost::intrusive_ptr<NetConnection> _netCon;
 
 public:
 
@@ -66,7 +67,7 @@ public:
 
 	virtual void set_status(const char* /*code*/){}
 
-	virtual void setNetCon(NetConnection* nc)
+	virtual void setNetCon(boost::intrusive_ptr<NetConnection> nc)
 	{
 		_netCon = nc;
 	}

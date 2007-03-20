@@ -464,23 +464,34 @@ as_value::to_bool() const
 }
 	
 // Return value as an object.
-as_object*
+boost::intrusive_ptr<as_object>
 as_value::to_object() const
 {
+	typedef boost::intrusive_ptr<as_object> ptr;
+
 	switch (m_type)
 	{
 		case OBJECT:
 		case AS_FUNCTION:
-			return m_object_value;
+			return ptr(m_object_value);
 
 		case MOVIECLIP:
-			return to_sprite();
+			// FIXME: update when to_sprite will return
+			//        an intrusive_ptr directly
+			return ptr(to_sprite());
 
 		case STRING:
-			return init_string_instance(m_string_value.c_str()).release();
+			// FIXME: update when init_whatever_instance will
+			//        return an intrusive_ptr directly
+			return ptr(init_string_instance(m_string_value.c_str()).release());
 
 		case NUMBER:
-			return init_number_instance(m_number_value).release();
+			// FIXME: update when init_whatever_instance will
+			//        return an intrusive_ptr directly
+			return ptr(init_number_instance(m_number_value).release());
+
+		case BOOLEAN:
+			log_error("FIXME: boolean to Boolean conversion unimplemented yet");
 
 		default:
 			return NULL;
@@ -595,6 +606,12 @@ as_value::set_as_object(as_object* obj)
 			m_object_value->add_ref();
 		}
 	}
+}
+
+void
+as_value::set_as_object(boost::intrusive_ptr<as_object> obj)
+{
+	set_as_object(obj.get());
 }
 
 void
@@ -823,6 +840,16 @@ as_value::operator=(const as_value& v)
 
 	else if (v.m_type == AS_FUNCTION) set_as_function(v.m_object_value->to_function());
 	else assert(0);
+}
+
+as_value::as_value(boost::intrusive_ptr<as_object> obj)
+	:
+	// Initialize to non-object type here,
+	// or set_as_object will call
+	// drop_ref on undefined memory !!
+	m_type(UNDEFINED)
+{
+	set_as_object(obj);
 }
 
 } // namespace gnash

@@ -172,7 +172,7 @@ as_object::findGetterSetter(const std::string& key)
 
 /*protected*/
 void
-as_object::set_prototype(as_object* proto)
+as_object::set_prototype(boost::intrusive_ptr<as_object> proto)
 {
 	m_prototype = proto;
 }
@@ -392,7 +392,7 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 		return;
 	}
 
-	as_object* props = props_val.to_object();
+	boost::intrusive_ptr<as_object> props = props_val.to_object();
 
 	// Evan: it seems that if set_true == 0 and set_false == 0,
 	// this function acts as if the parameters were (object, null, 0x1, 0)
@@ -493,6 +493,14 @@ as_object::as_object(as_object* proto)
 {
 }
 
+as_object::as_object(boost::intrusive_ptr<as_object> proto)
+	:
+	_members(),
+	_vm(VM::get()),
+	m_prototype(proto)
+{
+}
+
 as_object::as_object(const as_object& other)
 	:
 	ref_counted(),
@@ -535,8 +543,7 @@ as_object::getOwnProperty(const std::string& name)
 as_value
 as_object::tostring_method(const fn_call& fn)
 {
-	assert(dynamic_cast<as_object*>(fn.this_ptr));
-	as_object* obj = static_cast<as_object*>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
 
 	const char* text_val = obj->get_text_value();
 	if ( text_val )
@@ -552,8 +559,7 @@ as_object::tostring_method(const fn_call& fn)
 as_value
 as_object::valueof_method(const fn_call& fn)
 {
-	assert(dynamic_cast<as_object*>(fn.this_ptr));
-	as_object* obj = static_cast<as_object*>(fn.this_ptr);
+	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
 
 	return obj->get_primitive_value();
 }

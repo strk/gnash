@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.cpp,v 1.15 2007/03/19 17:11:14 bjacques Exp $
+// $Id: video_stream_instance.cpp,v 1.16 2007/03/20 15:01:20 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -32,10 +32,9 @@ namespace gnash {
 	static as_value
 	attach_video(const fn_call& fn)
 	{
-		assert(dynamic_cast<video_stream_instance*>(fn.this_ptr));
-		video_stream_instance* video = static_cast<video_stream_instance*>(fn.this_ptr);
+		boost::intrusive_ptr<video_stream_instance> video = ensureType<video_stream_instance>(fn.this_ptr);
 	
-		if (fn.nargs != 1)
+		if (fn.nargs < 1)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 	    		log_aserror("attachVideo needs 1 arg");
@@ -43,10 +42,17 @@ namespace gnash {
 			return as_value();
 		}
 
-		NetStream* ns = dynamic_cast<NetStream*>(fn.arg(0).to_object());
+		boost::intrusive_ptr<NetStream> ns = boost::dynamic_pointer_cast<NetStream>(fn.arg(0).to_object());
 		if (ns)
 		{
 			video->setStream(ns);
+		}
+		else
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+	    		log_aserror("attachVideo(%s) first arg is not a NetStream instance.",
+				fn.arg(0).to_debug_string().c_str());
+			);
 		}
 		return as_value();
 	}
@@ -81,7 +87,7 @@ video_stream_instance::display()
 	// If this is a video from a NetStream object, retrieve a video frame from there.
 	if (_ns)
 	{
-		NetStream* nso = _ns;
+		boost::intrusive_ptr<NetStream> nso = _ns;
 
 		if (nso->playing())
 		{
@@ -122,6 +128,12 @@ video_stream_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 	geometry::Range2d<float> bounds; 
 	bounds.setWorld();
 	ranges.add(bounds);
+}
+
+void
+video_stream_instance::setStream(boost::intrusive_ptr<NetStream> ns)
+{
+	_ns = ns;
 }
 
 } // end of namespace gnash

@@ -428,7 +428,7 @@ LoadVars::sendAndLoad(const std::string& urlstr, LoadVars& target, bool post)
 as_value
 LoadVars::onLoad_getset(const fn_call& fn)
 {
-	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -448,7 +448,7 @@ LoadVars::onLoad_getset(const fn_call& fn)
 as_value
 LoadVars::checkLoads_wrapper(const fn_call& fn)
 {
-	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	ptr->checkLoads();
 	return as_value();
 }
@@ -458,7 +458,7 @@ as_value
 LoadVars::onData_getset(const fn_call& fn)
 {
 
-	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -479,7 +479,7 @@ as_value
 LoadVars::loaded_getset(const fn_call& fn)
 {
 
-	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
 	{
@@ -498,7 +498,7 @@ LoadVars::loaded_getset(const fn_call& fn)
 static as_value
 loadvars_addrequestheader(const fn_call& fn)
 {
-	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	UNUSED(ptr);
 	log_error("%s: unimplemented", __FUNCTION__);
 	return as_value(); 
@@ -507,7 +507,7 @@ loadvars_addrequestheader(const fn_call& fn)
 static as_value
 loadvars_decode(const fn_call& fn)
 {
-	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	UNUSED(ptr);
 	log_error("%s: unimplemented", __FUNCTION__);
 	return as_value(); 
@@ -516,21 +516,21 @@ loadvars_decode(const fn_call& fn)
 as_value
 LoadVars::getBytesLoaded_method(const fn_call& fn)
 {
-	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	return as_value(ptr->getBytesLoaded());
 }
 
 as_value
 LoadVars::getBytesTotal_method(const fn_call& fn)
 {
-	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	return as_value(ptr->getBytesTotal());
 }
 
 static as_value
 loadvars_load(const fn_call& fn)
 {
-	LoadVars* obj = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars> obj = ensureType<LoadVars>(fn.this_ptr);
 
 	if ( fn.nargs < 1 )
 	{
@@ -557,7 +557,7 @@ loadvars_load(const fn_call& fn)
 static as_value
 loadvars_send(const fn_call& fn)
 {
-	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	UNUSED(ptr);
 	log_error("%s: unimplemented", __FUNCTION__);
 	return as_value(); 
@@ -566,7 +566,7 @@ loadvars_send(const fn_call& fn)
 static as_value
 loadvars_sendandload(const fn_call& fn)
 {
-	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 
 	if ( fn.nargs < 2 )
 	{
@@ -585,7 +585,7 @@ loadvars_sendandload(const fn_call& fn)
 		return as_value(false);
 	}
 
-	LoadVars* target = dynamic_cast<LoadVars*>(fn.arg(1).to_object());
+	boost::intrusive_ptr<LoadVars> target = boost::dynamic_pointer_cast<LoadVars>(fn.arg(1).to_object());
 	if ( ! target )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -598,7 +598,7 @@ loadvars_sendandload(const fn_call& fn)
 	bool post = true;
 	if ( fn.nargs > 2 && fn.arg(2).to_std_string() == "GET" ) post = false;
 
-	//log_msg("LoadVars.sendAndLoad(%s, %p) called, and returning TRUE", urlstr.c_str(), target);
+	//log_msg("LoadVars.sendAndLoad(%s, %p) called, and returning TRUE", urlstr.c_str(), target.get());
 
 	ptr->sendAndLoad(urlstr, *target, post);
 	return as_value(true);
@@ -607,7 +607,7 @@ loadvars_sendandload(const fn_call& fn)
 static as_value
 loadvars_tostring(const fn_call& fn)
 {
-	LoadVars* ptr = ensureType<LoadVars>(fn.this_ptr);
+	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	UNUSED(ptr);
 	log_error("%s: unimplemented", __FUNCTION__);
 	return as_value(); 
