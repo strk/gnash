@@ -11,7 +11,7 @@
 	  for existance of functions that somehow slipped into Gnash.
 	* server/as_function.{cpp,h}: add getFunctionConstructor()
 	  public static method.
-	* server/swf_function.cpp: assing Function as the constructor
+	* server/swf_function.cpp: passing Function as the constructor
 	  property of user-defined functions.
 	* testsuite/actionscript.all/Function.as: more successes.
 	* testsuite/actionscript.all/Inheritance.as: more successes.
