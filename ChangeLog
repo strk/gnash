@@ -5,6 +5,7 @@
 	* server/swf_function.cpp: assing Function as the constructor
 	  property of user-defined functions.
 	* testsuite/actionscript.all/Function.as: more successes.
+	* testsuite/actionscript.all/Inheritance.as: more successes.
 
 2007-03-20 Sandro Santilli <strk@keybit.net>
 

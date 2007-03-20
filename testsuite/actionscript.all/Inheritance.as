@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.28 2007/03/16 16:40:17 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.29 2007/03/20 17:22:16 strk Exp $";
 
 #include "check.as"
 
@@ -264,7 +264,7 @@ check_equals(typeof(DerivedClass1.prototype.constructor), 'function');
 check_equals(typeof(DerivedClass1.constructor), 'function');
 #if OUTPUT_VERSION > 6
 xcheck(! DerivedClass1.prototype.hasOwnProperty('constructor'));
-xcheck(DerivedClass1.hasOwnProperty('constructor'));
+check(DerivedClass1.hasOwnProperty('constructor'));
 #endif
 check_equals(DerivedClass1.prototype.constructor, BaseClass1);
 
