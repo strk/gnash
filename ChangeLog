@@ -1,3 +1,9 @@
+2007-03-20 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/as_object.h: Add ensureType<classname>, which is intended to
+	replace the class-specific ensureClass functions. Suggested by Ann.
+	* server/asobj/Boolean.cpp: Switch ensureClass to ensureType.
+
 2007-03-19 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.{cpp,h}: simplify union by using

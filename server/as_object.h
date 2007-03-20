@@ -29,6 +29,8 @@
 #include "as_value.h" // for return of get_primitive_value
 #include "smart_ptr.h"
 #include "as_prop_flags.h" // for enum
+#include "GnashException.h"
+#include <sstream>
 
 #include <cmath>
 #include <utility> // for std::pair
@@ -454,6 +456,32 @@ private:
 	boost::intrusive_ptr<as_object> m_prototype;
 
 };
+
+/// Template which does a dynamic cast for as_object pointers. It throws an
+/// error if the dynamic cast fails.
+/// @param T the class to which the obj pointer should be cast.
+/// @param obj the pointer to be cast.
+/// @return If the cast succeeds, the pointer cast to the requested type.
+///         Otherwise, NULL.
+template <typename T>
+T*
+ensureType (as_object* obj)
+{
+  	T* ret = dynamic_cast<T*>(obj);
+
+	// This path is fairly unlikely, so it's a potential  __builtin_expect.
+  	if (!ret) {
+		std::ostringstream stream;
+		stream 	<< "builtin method or gettersetter for " 
+			<< typeid(T).name() << " called from "
+			<< typeid(obj).name() << " instance.";
+
+		throw ActionException(stream.str());
+        }
+        return ret;
+}
+
+
 
 } // namespace gnash
 

@@ -80,25 +80,14 @@ public:
 	
 };
 
-static boolean_as_object *
-ensureBoolean(as_object* obj)
+
+as_value boolean_tostring(const fn_call& fn)
 {
-        boolean_as_object* ret = dynamic_cast<boolean_as_object*>(obj);
-        if ( ! ret )
-        {
-                throw ActionException("builtin method or gettersetter for " \
-				      " Boolean objects called against " \
-				      " non-Boolean instance");
-        }
-        return ret;
-}
-
-as_value boolean_tostring(const fn_call& fn) {
-
 	static char* strtrue = "true";
 	static char* strfalse = "false";
 
-	boolean_as_object* boolobj = ensureBoolean(fn.this_ptr);
+	boolean_as_object* boolobj = ensureType<boolean_as_object>(fn.this_ptr);
+
 	
 	if (boolobj->val) 
 		return as_value(strtrue);
@@ -106,10 +95,12 @@ as_value boolean_tostring(const fn_call& fn) {
 		return as_value(strfalse);
 }
 
-as_value boolean_valueof(const fn_call& fn) {
-    boolean_as_object* boolobj = ensureBoolean(fn.this_ptr);
-    
-    return as_value(boolobj->val);
+
+as_value boolean_valueof(const fn_call& fn) 
+{
+	boolean_as_object* boolobj = ensureType<boolean_as_object>(fn.this_ptr);
+
+	return as_value(boolobj->val);
 }
 
 as_value
