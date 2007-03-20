@@ -1,3 +1,16 @@
+2007-03-20 Sandro Santilli <strk@keybit.net>
+
+	* server/as_function.{cpp,h}: add a constructInstance()
+	  function taking care of proper ActionScript instances
+	  initialization.
+	* server/asobj/: Boolean.cpp, Number.cpp, string.cpp
+	  (init_{boolean,number,string}_instance): use 
+	  the new as_function::constructInstance() method
+	  to correctly initialize instances.
+	* server/vm/ASHandlers.cpp (construct_object): simply
+	  forward the call to as_function::constructInstance().
+	* testsuite/actionscript.all/Function.as: more successes.
+
 2007-03-20 Antti Ajanki <antti.ajanki@iki.fi>
 
 	* gui/{kde.cpp, kdesup.h}, plugin/klash/klash_part.cpp: When

@@ -80,6 +80,26 @@ public:
 	/// Alias for operator()
 	as_value call(const fn_call& fn) { return operator()(fn); }
 
+	/// Construct an instance of this class
+	// 
+	///  Post-conditions:
+	///      - The returned object is an instance of this class.
+	///        See as_object::instanceOf
+	///  
+	/// @param env
+	///	The environment to use for stack, local variables,
+	///	registers and scope chain.
+	/// 
+	/// @param nargs
+	///	Number of arguments passed to this constructor
+	///
+	/// @param first_arg_index
+	///	Index of the as_environment stack element to use
+	///     as first argument.
+	/// 
+	boost::intrusive_ptr<as_object> constructInstance( as_environment& env,
+			unsigned nargs, unsigned first_arg_index);
+
 	/// Get this function's "prototype" member (exported interface).
 	//
 	/// This is never NULL, and created on purpose if not provided

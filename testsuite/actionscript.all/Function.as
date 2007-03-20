@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.32 2007/03/20 15:26:05 strk Exp $";
+rcsid="$Id: Function.as,v 1.33 2007/03/20 16:41:00 strk Exp $";
 
 #include "check.as"
 
@@ -452,15 +452,15 @@ note(textOutFunc);
 a = 4; // number primitive to Number object
 check_equals(typeof(a.constructor), 'function');
 #if OUTPUT_VERSION > 5
-xcheck_equals(typeof(a.__constructor__), 'function');
+check_equals(typeof(a.__constructor__), 'function');
 #if OUTPUT_VERSION == 6
 xcheck(a.hasOwnProperty('constructor'));
 #else // OUTPUT_VERSION > 6
 check(!a.hasOwnProperty('constructor'));
 #endif
-xcheck(a.hasOwnProperty('__constructor__'));
+check(a.hasOwnProperty('__constructor__'));
 check_equals(a.constructor, Number);
-xcheck_equals(a.__constructor__, Number);
+check_equals(a.__constructor__, Number);
 check(! a instanceof Number);
 check(a.constructor != Object);
 #endif
@@ -468,15 +468,15 @@ check(a.constructor != Object);
 a = "string"; // string primitive to String object
 check_equals(typeof(a.constructor), 'function');
 #if OUTPUT_VERSION > 5
-xcheck_equals(typeof(a.__constructor__), 'function');
+check_equals(typeof(a.__constructor__), 'function');
 #if OUTPUT_VERSION == 6
 xcheck(a.hasOwnProperty('constructor'));
 #else // OUTPUT_VERSION > 6
 check(!a.hasOwnProperty('constructor'));
 #endif
-xcheck(a.hasOwnProperty('__constructor__'));
+check(a.hasOwnProperty('__constructor__'));
 check_equals(a.constructor, String);
-xcheck_equals(a.__constructor__, String);
+check_equals(a.__constructor__, String);
 check(! a instanceof String);
 check(a.constructor != Object);
 #endif
@@ -484,15 +484,15 @@ check(a.constructor != Object);
 a = true; // boolean primitive to Boolean object
 check_equals(typeof(a.constructor), 'function');
 #if OUTPUT_VERSION > 5
-xcheck_equals(typeof(a.__constructor__), 'function');
+check_equals(typeof(a.__constructor__), 'function');
 #if OUTPUT_VERSION == 6
 xcheck(a.hasOwnProperty('constructor'));
 #else // OUTPUT_VERSION > 6
 check(!a.hasOwnProperty('constructor'));
 #endif
-xcheck(a.hasOwnProperty('__constructor__'));
+check(a.hasOwnProperty('__constructor__'));
 check_equals(a.constructor, Boolean);
-xcheck_equals(a.__constructor__, Boolean);
+check_equals(a.__constructor__, Boolean);
 check(! a instanceof String);
 check(a.constructor != Object);
 #endif

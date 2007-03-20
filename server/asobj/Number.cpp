@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: Number.cpp,v 1.25 2007/03/20 15:26:04 strk Exp $ */
+/* $Id: Number.cpp,v 1.26 2007/03/20 16:41:00 strk Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -275,8 +275,8 @@ number_ctor(const fn_call& fn)
 	return as_value(obj); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void number_class_init(as_object& global)
+static boost::intrusive_ptr<builtin_function> 
+getNumberConstructor()
 {
 	// This is going to be the global Number "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl=NULL;
@@ -289,6 +289,14 @@ void number_class_init(as_object& global)
 		attachNumberInterface(*cl); 
 	}
 
+	return cl;
+}
+
+// extern (used by Global.cpp)
+void number_class_init(as_object& global)
+{
+	boost::intrusive_ptr<builtin_function> cl=getNumberConstructor();
+
 	// Register _global.Number
 	global.init_member("Number", cl.get());
 
@@ -297,9 +305,11 @@ void number_class_init(as_object& global)
 boost::intrusive_ptr<as_object>
 init_number_instance(double val)
 {
-	// TODO: properly initialize the __constructor__ and constructor members
-	//       (should as_object ctor do this?)
-	return boost::intrusive_ptr<as_object>(new number_as_object(val));
+	boost::intrusive_ptr<builtin_function> cl=getNumberConstructor();
+
+	as_environment env;
+	env.push(val);
+	return cl->constructInstance(env, 1, 0);
 }
   
 } // namespace gnash

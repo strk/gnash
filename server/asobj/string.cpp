@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.22 2007/03/20 15:26:05 strk Exp $ */
+/* $Id: string.cpp,v 1.23 2007/03/20 16:41:00 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -493,8 +493,8 @@ string_ctor(const fn_call& fn)
 	return as_value(str.get());
 }
 
-// extern (used by Global.cpp)
-void string_class_init(as_object& global)
+static boost::intrusive_ptr<builtin_function>
+getStringConstructor()
 {
 	// This is going to be the global String "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
@@ -508,6 +508,15 @@ void string_class_init(as_object& global)
 		     
 	}
 
+	return cl;
+}
+
+// extern (used by Global.cpp)
+void string_class_init(as_object& global)
+{
+	// This is going to be the global String "class"/"function"
+	boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
+
 	// Register _global.String
 	global.init_member("String", cl.get());
 
@@ -516,12 +525,10 @@ void string_class_init(as_object& global)
 boost::intrusive_ptr<as_object>
 init_string_instance(const char* val)
 {
-	// TODO: properly initialize the __constructor__ and constructor members
-	//       (should as_object ctor do this?)
-
-	boost::intrusive_ptr<tu_string_as_object> obj = new tu_string_as_object();
-	if ( val ) obj->m_string = val;
-	return boost::dynamic_pointer_cast<as_object>(obj);
+	boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
+	as_environment env;
+	env.push(val);
+	return cl->constructInstance(env, 1, 0);
 }
   
 } // namespace gnash

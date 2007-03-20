@@ -116,8 +116,8 @@ boolean_ctor(const fn_call& fn)
 	return as_value(obj.get()); // will keep alive
 }
 
-// extern (used by Global.cpp)
-void boolean_class_init(as_object& global)
+static boost::intrusive_ptr<builtin_function>
+getBooleanConstructor()
 {
 	// This is going to be the global Boolean "class"/"function"
 	static boost::intrusive_ptr<builtin_function> cl;
@@ -128,8 +128,16 @@ void boolean_class_init(as_object& global)
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachBooleanInterface(*cl);
-		     
 	}
+
+	return cl;
+}
+
+// extern (used by Global.cpp)
+void boolean_class_init(as_object& global)
+{
+	// This is going to be the global Boolean "class"/"function"
+	boost::intrusive_ptr<builtin_function> cl=getBooleanConstructor();
 
 	// Register _global.Boolean
 	global.init_member("Boolean", cl.get());
@@ -139,9 +147,10 @@ void boolean_class_init(as_object& global)
 boost::intrusive_ptr<as_object>
 init_boolean_instance(bool val)
 {
-	// TODO: properly initialize the __constructor__ and constructor members
-	//       (should as_object ctor do this?)
-	return boost::intrusive_ptr<as_object>(new boolean_as_object(val));
+	boost::intrusive_ptr<builtin_function> cl = getBooleanConstructor();
+	as_environment env;
+	env.push(val);
+	return cl->constructInstance(env, 1, 0);
 }
 
 } // end of gnash namespace

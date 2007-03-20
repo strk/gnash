@@ -302,5 +302,73 @@ function_call(const fn_call& fn)
 	//log_msg("%s: tocheck \n", __FUNCTION__);
 }
 
+boost::intrusive_ptr<as_object>
+as_function::constructInstance( as_environment& env,
+			unsigned nargs, unsigned first_arg_index)
+{
+//	GNASH_REPORT_FUNCTION;
+
+	as_value new_obj;
+
+	assert(get_ref_count() > 0);
+
+        // a built-in class takes care of assigning a prototype
+	// TODO: change this
+        if ( isBuiltin() )
+	{
+
+		IF_VERBOSE_ACTION (
+		log_action("it's a built-in class");
+		);
+
+		fn_call fn(NULL, &env, nargs, first_arg_index);
+		new_obj = call(fn);
+
+		// Add a __constructor__ member to the new object, but only for SWF6 up
+		// (to be checked). NOTE that we assume the builtin constructors
+		// won't set __constructor__ to some other value...
+		if ( VM::get().getSWFVersion() > 5 )
+		{
+			boost::intrusive_ptr<as_object> newobj = new_obj.to_object();
+			assert(newobj); // we assume builtin functions do return objects !!
+			newobj->init_member("__constructor__", as_value(this));
+		}
+
+        }
+	else
+	{
+		// Set up the prototype.
+		as_value	proto;
+		// We can safaly call as_object::get_member here as member name is 
+		// a literal string in lowercase. (we should likely avoid calling
+		// get_member as a whole actually, and use a getProto() or similar
+		// method directly instead) TODO
+		bool func_has_prototype = get_member("prototype", &proto);
+		assert(func_has_prototype);
+
+		IF_VERBOSE_ACTION (
+		log_action("constructor prototype is %s", proto.to_debug_string().c_str());
+		);
+
+		// Create an empty object, with a ref to the constructor's prototype.
+		boost::intrusive_ptr<as_object> new_obj_ptr(new as_object(proto.to_object()));
+
+		// Add a __constructor__ member to the new object, but only for SWF6 up
+		// (to be checked)
+		if ( VM::get().getSWFVersion() > 5 )
+		{
+			new_obj_ptr->init_member("__constructor__", as_value(this));
+		}
+
+		new_obj.set_as_object(new_obj_ptr.get());
+
+		// Call the actual constructor function; new_obj is its 'this'.
+		// We don't need the function result.
+		call(fn_call(new_obj_ptr.get(), &env, nargs, first_arg_index));
+	}
+    
+	return new_obj.to_object();
+}
+
 } // end of gnash namespace
 

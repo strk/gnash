@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.68 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.69 2007/03/20 16:41:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -84,87 +84,13 @@ namespace SWF { // gnash::SWF
 // hides differences between builtin and actionscript-defined
 // constructors.
 //
-static as_value
-construct_object(const as_value& constructor,
+static boost::intrusive_ptr<as_object>
+construct_object(as_function* ctor_as_func,
 	as_environment& env, unsigned int nargs,
 	unsigned int first_arg_index)
 {
-//    GNASH_REPORT_FUNCTION;
-
-    as_value new_obj;
-
-    if (as_function* ctor_as_func = constructor.to_as_function())
-    {
-        // This function is being used as a constructor; make sure
-        // it has a prototype object.
-		IF_VERBOSE_ACTION (
-        log_action("Constructor is an AS_FUNCTION");
-		);
-        
-        // a built-in class takes care of assigning a prototype
-	// TODO: change this
-        if ( ctor_as_func->isBuiltin() )
-	{
-
-		IF_VERBOSE_ACTION (
-            log_action("it's a built-in class");
-		);
-
-            fn_call call(NULL, &env, nargs, first_arg_index);
-            new_obj = (*ctor_as_func)(call);
-
-            // Add a __constructor__ member to the new object, but only for SWF6 up
-	    // (to be checked). NOTE that we assume the builtin constructors
-	    // won't set __constructor__ to some other value...
-	    if ( VM::get().getSWFVersion() > 5 )
-	    {
-		    boost::intrusive_ptr<as_object> newobj = new_obj.to_object();
-		    assert(newobj); // we assume builtin functions do return objects !!
-                    newobj->init_member("__constructor__", constructor);
-            }
-
-        }
-	else
-	{
-            // Set up the prototype.
-            as_value	proto;
-	    // We can safaly call as_object::get_member here as member name is 
-	    // a literal string in lowercase. (we should likely avoid calling
-	    // get_member as a whole actually, and use a getProto() or similar
-	    // method directly instead) TODO
-            bool func_has_prototype = ctor_as_func->get_member("prototype", &proto);
-            assert(func_has_prototype);
-            
-            IF_VERBOSE_ACTION (
-                log_action("constructor prototype is %s", proto.to_debug_string().c_str());
-		);
-            
-            // Create an empty object, with a ref to the constructor's prototype.
-            boost::intrusive_ptr<as_object> new_obj_ptr(new as_object(proto.to_object()));
-
-            // Add a __constructor__ member to the new object, but only for SWF6 up
-	    // (to be checked)
-	    if ( VM::get().getSWFVersion() > 5 )
-	    {
-	    	new_obj_ptr->init_member("__constructor__", constructor);
-            }
-            
-            new_obj.set_as_object(new_obj_ptr.get());
-            
-            // Call the actual constructor function; new_obj is its 'this'.
-            // We don't need the function result.
-            call_method(constructor, &env, new_obj_ptr.get(), nargs, first_arg_index);
-        }
-    }
-    else
-    {
-	    // callers should make sure constructor is a function !
-	    // Actually, we should change this function interface
-	    // to take an as_function directly... (TODO)
-	    assert(0);
-    }
-    
-    return new_obj;
+	assert(ctor_as_func);
+	return ctor_as_func->constructInstance(env, nargs, first_arg_index);
 }
 
 
@@ -2237,8 +2163,9 @@ SWFHandlers::ActionNew(ActionExec& thread)
 
 	thread.ensureStack(nargs); // previous 2 entries popped
 
-	as_value constructor = thread.getVariable(classname); 
-	if ( ! constructor.is_function() )
+	as_value constructorval = thread.getVariable(classname); 
+	boost::intrusive_ptr<as_function> constructor = constructorval.to_as_function();
+	if ( ! constructor )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("ActionNew: "
@@ -2249,22 +2176,21 @@ SWFHandlers::ActionNew(ActionExec& thread)
 		return;
 	}
 
-	as_value new_obj = construct_object(constructor, env, nargs,
-		env.get_top_index());
+	boost::intrusive_ptr<as_object> newobj = construct_object(constructor.get(),
+			env, nargs, env.get_top_index());
 
 #ifdef USE_DEBUGGER
 	// WARNING: new_obj.to_object() can return a newly allocated
 	//          thing into the intrusive_ptr, so the debugger
 	//          will be left with a deleted object !!
 	//          Rob: we don't want to use void pointers here..
-	boost::intrusive_ptr<as_object> o = new_obj.to_object();
-	o->add_ref(); // this will leak, but at least debugger won't end up
-	              // with a dandling reference...
-        debugger.addSymbol(o.get(), classname);
+	newobj->add_ref(); // this will leak, but at least debugger won't end up
+	              	   // with a dandling reference...
+        debugger.addSymbol(newobj.get(), classname);
 #endif
 
 	env.drop(nargs);
-	env.push(new_obj);
+	env.push(as_value(newobj));
 
 }
 
@@ -2832,17 +2758,6 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 	if ( method_name.is_undefined() || method_string.empty() )
 	{
 		method_val = obj_val;
-		if ( ! method_val.is_function() )
-		{
-			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("ActionNewMethod: "
-				"method name is undefined, "
-				"and object is not a function");
-			);
-			env.drop(nargs);
-			env.push(as_value()); // should we push an object anyway ?
-			return;
-		}
 	}
 	else
 	{
@@ -2859,16 +2774,29 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 		}
 	}
 
+	boost::intrusive_ptr<as_function> method = method_val.to_as_function();
+	if ( ! method )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("ActionNewMethod: "
+			"method name is undefined, "
+			"and object is not a function");
+		);
+		env.drop(nargs);
+		env.push(as_value()); // should we push an object anyway ?
+		return;
+	}
+
 	// Construct the object
-	as_value new_obj = construct_object(method_val, env, nargs,
-			env.get_top_index());
+	boost::intrusive_ptr<as_object> new_obj = construct_object(method.get(),
+			env, nargs, env.get_top_index());
 
 	//log_msg("%s( [%d args] ) returned %s", method_val.to_string(),
 	//	nargs, new_obj.to_string());
 
 
 	env.drop(nargs);
-	env.push(new_obj);
+	env.push(as_value(new_obj));
 
 }
 
