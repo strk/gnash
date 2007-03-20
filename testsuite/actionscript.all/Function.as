@@ -20,11 +20,9 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.35 2007/03/20 18:41:19 strk Exp $";
+rcsid="$Id: Function.as,v 1.36 2007/03/20 19:13:42 strk Exp $";
 
 #include "check.as"
-
-#if 0 // REMOVEME STRK
 
 // Define a function returning 'this'.name and the given args
 function getThisName(a,b,c) { return this.name+a+b+c; }
@@ -447,7 +445,6 @@ check_equals(typeof(textOutFunc.toString), 'number');
 note(textOutFunc);
 
 
-#endif //  REMOVEME STRK
 //-----------------------------------------------------
 // Test constructor and __constructor__ properties
 //-----------------------------------------------------
