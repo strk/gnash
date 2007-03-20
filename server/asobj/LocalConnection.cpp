@@ -108,8 +108,9 @@ localconnection_new(const fn_call& /* fn */)
     localconnection_obj->init_member("connect", new builtin_function(localconnection_connect));
     localconnection_obj->init_member("domain", new builtin_function(localconnection_domain));
     localconnection_obj->init_member("send", new builtin_function(localconnection_send));
-//#ifdef ENABLE_TESTING
-#ifndef NETWORK_CONN
+#if 0
+    // Apparently these AS methods were added for testing purposes. However,
+    // they do not appear to be part of the LocalConnection AS object.
     localconnection_obj->init_member("getname",  new builtin_function(shm_getname));
     localconnection_obj->init_member("getsize",  new builtin_function(shm_getsize));
     localconnection_obj->init_member("getallocated",  new builtin_function(shm_getallocated));

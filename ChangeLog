@@ -109,8 +109,8 @@
 	* server/as_object.h: Remove the ensureType for raw pointers in favour
 	of the one for intrusive pointers; the former is now unused.
 	* server/asobj/NetStreamFfmpeg.cpp: Update for changes in ensureType.
-	* testsuite/actionscript.all/LocalConnection.as: Expect two more
-	successes.
+	* server/asobj/LocalConnection.cpp: Don't initialise Gnash-only methods
+	that were intended for debugging.
 
 2007-03-19 Sandro Santilli <strk@keybit.net>
 
