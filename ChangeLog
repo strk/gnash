@@ -1,5 +1,10 @@
 2007-03-20 Ann Barcomb <ann@lulu.com>
 
+	* server/asobj/Key.cpp, MovieClipLoader.cpp, xml.cpp, xmlnode.cpp,
+	  xmlsocket.cpp: Change casts and asserts to ensureType.
+
+2007-03-20 Ann Barcomb <ann@lulu.com>
+
 	* server/asobj/ContextMenu.cpp, Date.cpp, LoadVars.cpp, string.cpp,
 	  NetConnection.cpp, NetStream.cpp, Sound.cpp, gen-asclass.sh:
 	  Changed instances of ensureClass to use inherited ensureType.

@@ -238,8 +238,7 @@ key_add_listener(const fn_call& fn)
 	    return as_value();
 	}
 
-    key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
-    assert(ko);
+    key_as_object* ko = ensureType<key_as_object>( fn.this_ptr );
 
     ko->add_listener(listener);
     return as_value();
@@ -248,8 +247,7 @@ key_add_listener(const fn_call& fn)
 as_value	key_get_ascii(const fn_call& fn)
     // Return the ascii value of the last key pressed.
 {
-    key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
-    assert(ko);
+    key_as_object* ko = ensureType<key_as_object>( fn.this_ptr );
 
     int	code = ko->get_last_key_pressed();
     if (code < 0)
@@ -267,8 +265,7 @@ as_value	key_get_ascii(const fn_call& fn)
 as_value	key_get_code(const fn_call& fn)
     // Returns the keycode of the last key pressed.
 {
-    key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
-    assert(ko);
+    key_as_object* ko = ensureType<key_as_object>( fn.this_ptr );
 
     return as_value(ko->get_last_key_pressed());
 }
@@ -284,8 +281,7 @@ as_value	key_is_down(const fn_call& fn)
 
     int	code = (int) fn.arg(0).to_number();
 
-    key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
-    assert(ko);
+    key_as_object* ko = ensureType<key_as_object>( fn.this_ptr );
 
     return as_value(ko->is_key_down(code));
 }
@@ -314,8 +310,7 @@ as_value	key_remove_listener(const fn_call& fn)
 	    return as_value();
 	}
 
-    key_as_object*	ko = static_cast<key_as_object*>( fn.this_ptr );
-    assert(ko);
+    key_as_object* ko = ensureType<key_as_object>( fn.this_ptr );
 
     ko->remove_listener(listener);
     return as_value();

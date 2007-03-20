@@ -308,10 +308,7 @@ moviecliploader_loadclip(const fn_call& fn)
 
 	//log_msg("%s: nargs = %d\n", __FUNCTION__, fn.nargs);
 
-	MovieClipLoader* ptr = \
-		dynamic_cast<MovieClipLoader*>(fn.this_ptr);
-
-	assert(ptr);
+	MovieClipLoader* ptr = ensureType<MovieClipLoader>(fn.this_ptr);
   
 	as_value& url_arg = fn.arg(0);
 #if 0 // whatever it is, we'll need a string, the check below would only be worth
@@ -377,8 +374,7 @@ moviecliploader_getprogress(const fn_call& fn)
 {
   //log_msg("%s: nargs = %d\n", __FUNCTION__, nargs);
   
-  MovieClipLoader* ptr = dynamic_cast<MovieClipLoader*>(fn.this_ptr);
-  assert(ptr); // or warn if bogus call ?
+  MovieClipLoader* ptr = ensureType<MovieClipLoader>(fn.this_ptr);
   
   as_object *target = fn.arg(0).to_object();
   
@@ -395,8 +391,7 @@ moviecliploader_getprogress(const fn_call& fn)
 static as_value
 moviecliploader_addlistener(const fn_call& fn)
 {
-	assert(dynamic_cast<MovieClipLoader*>(fn.this_ptr));
-	MovieClipLoader* mcl = static_cast<MovieClipLoader*>(fn.this_ptr);
+	MovieClipLoader* mcl = ensureType<MovieClipLoader>(fn.this_ptr);
   
 	as_object *listener = fn.arg(0).to_object();
 	if ( ! listener )
@@ -412,8 +407,7 @@ moviecliploader_addlistener(const fn_call& fn)
 static as_value
 moviecliploader_removelistener(const fn_call& fn)
 {
-	assert(dynamic_cast<MovieClipLoader*>(fn.this_ptr));
-	MovieClipLoader* mcl = static_cast<MovieClipLoader*>(fn.this_ptr);
+	MovieClipLoader* mcl = ensureType<MovieClipLoader>(fn.this_ptr);
   
 	as_object *listener = fn.arg(0).to_object();
 	if ( ! listener )

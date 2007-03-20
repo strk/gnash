@@ -124,8 +124,7 @@ as_value localconnection_close(const fn_call& fn)
 {
 //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     
-    localconnection_as_object *ptr = (localconnection_as_object*)fn.this_ptr;
-    assert(ptr);
+    localconnection_as_object *ptr = ensureType<localconnection_as_object>(fn.this_ptr);
     
     ptr->obj.close();
     return as_value();
@@ -136,9 +135,8 @@ as_value localconnection_connect(const fn_call& fn)
 {
 //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     bool ret;
-    localconnection_as_object *ptr = (localconnection_as_object*)fn.this_ptr;
+    localconnection_as_object *ptr = ensureType<localconnection_as_object>(fn.this_ptr);
     
-    assert(ptr);
     if (fn.nargs != 0) {
         ret = ptr->obj.connect(fn.env->bottom(fn.first_arg_bottom_index).to_string());
     } else {
@@ -153,8 +151,7 @@ as_value localconnection_connect(const fn_call& fn)
 as_value localconnection_domain(const fn_call& fn)
 {
 //    log_msg("%s:\n", __PRETTY_FUNCTION__);
-    localconnection_as_object *ptr = (localconnection_as_object*)fn.this_ptr;
-    assert(ptr);
+    localconnection_as_object *ptr = ensureType<localconnection_as_object>(fn.this_ptr);
     return as_value(ptr->obj.domain().c_str());
 }
 

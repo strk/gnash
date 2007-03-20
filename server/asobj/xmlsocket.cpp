@@ -378,8 +378,7 @@ xmlsocket_connect(const fn_call& fn)
     }
     
     log_msg("%s: nargs=%d\n", __FUNCTION__, fn.nargs);
-    xmlsocket_as_object*	ptr = (xmlsocket_as_object*) (as_object*) fn.this_ptr;
-    assert(ptr);
+    xmlsocket_as_object* ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
     const std::string host = fn.env->bottom(fn.first_arg_bottom_index).to_string();
     std::string port_str = fn.env->bottom(fn.first_arg_bottom_index-1).to_string();
     double port = atof(port_str.c_str());
@@ -426,8 +425,7 @@ xmlsocket_send(const fn_call& fn)
     as_value	method;
     as_value	val;
     
-    xmlsocket_as_object*	ptr = (xmlsocket_as_object*) (as_object*) fn.this_ptr;
-    assert(ptr);
+    xmlsocket_as_object* ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
     const std::string object = fn.env->bottom( fn.first_arg_bottom_index).to_string();
     //  log_msg("%s: host=%s, port=%g\n", __FUNCTION__, host, port);
     return as_value(ptr->obj.send(object));
@@ -440,8 +438,7 @@ xmlsocket_close(const fn_call& fn)
     as_value	method;
     as_value	val;
     
-    xmlsocket_as_object*	ptr = (xmlsocket_as_object*) (as_object*) fn.this_ptr;
-    assert(ptr);
+    xmlsocket_as_object* ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
     // Since the return code from close() doesn't get used by Shockwave,
     // we don't care either.
     ptr->obj.close();
@@ -532,8 +529,7 @@ xmlsocket_event_ondata(const fn_call& fn)
     char          *messages[200];
     int           i;
     
-    xmlsocket_as_object*	ptr = (xmlsocket_as_object*)fn.this_ptr;
-    assert(ptr);
+    xmlsocket_as_object* ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
     if (ptr->obj.processingData()) {
         log_msg("Still processing data!\n");
         return as_value(false);
@@ -613,8 +609,7 @@ xmlsocket_event_connect(const fn_call& fn)
         return as_value(true);
     }
     
-    xmlsocket_as_object*	ptr = (xmlsocket_as_object*) (as_object*) fn.this_ptr;
-    assert(ptr);
+    xmlsocket_as_object* ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
     
     log_msg("%s: connected = %d\n", __FUNCTION__, ptr->obj.connected());
     if ((ptr->obj.connected()) && (first)) {

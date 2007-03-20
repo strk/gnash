@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.17 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: xmlnode.cpp,v 1.18 2007/03/20 11:36:48 ann Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -493,8 +493,7 @@ xmlnode_appendchild(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     if (fn.nargs > 0) {
-	XMLNode *ptr = (XMLNode*)fn.this_ptr;
-	assert(ptr);
+	XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
 //    log_msg("%s: %p, %d args\n", __PRETTY_FUNCTION__, ptr, fn.nargs);
 	
 	XMLNode *xml_obj = dynamic_cast<XMLNode*>(fn.arg(0).to_object());	
@@ -527,9 +526,8 @@ xmlnode_clonenode(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
-    XMLNode	*ptr = (XMLNode*)fn.this_ptr;
+    XMLNode	*ptr = ensureType<XMLNode>(fn.this_ptr);
     XMLNode   *xmlnode_obj;
-    assert(ptr);
 
     if (fn.nargs > 0) {
 	bool deep = fn.arg(0).to_bool();
@@ -547,8 +545,7 @@ static as_value
 xmlnode_insertbefore(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    XMLNode *ptr = (XMLNode*)fn.this_ptr;
-    assert(ptr);
+    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
     
 //    return as_value(ptr->obj.getAllocated());
 //    ptr->obj.insertBefore();
@@ -560,8 +557,7 @@ static as_value
 xmlnode_removenode(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    XMLNode *ptr = (XMLNode*)fn.this_ptr;
-    assert(ptr);
+    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
     
 //    return as_value(ptr->obj.getAllocated());
     ptr->removeNode();
@@ -574,8 +570,7 @@ xmlnode_tostring(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    XMLNode *ptr = (XMLNode*)fn.this_ptr;
-    assert(ptr);
+    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
     
     return as_value(ptr->toString());
 }
@@ -584,8 +579,7 @@ static as_value
 xmlnode_haschildnodes(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    XMLNode *ptr = (XMLNode*)fn.this_ptr;
-    assert(ptr);
+    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
     return as_value(ptr->hasChildNodes());
 }
 
@@ -595,8 +589,7 @@ xmlnode_nodevalue(const fn_call& fn)
 {
     //GNASH_REPORT_FUNCTION;
 
-    assert(dynamic_cast<XMLNode*>(fn.this_ptr));
-    XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
+    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
     
@@ -619,8 +612,7 @@ static as_value
 xmlnode_nodename(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    assert(dynamic_cast<XMLNode*>(fn.this_ptr));
-    XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
+    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
 
@@ -641,8 +633,7 @@ xmlnode_nodetype(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    assert(dynamic_cast<XMLNode*>(fn.this_ptr));
-    XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
+    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
 
     if ( fn.nargs == 0 ) {
 	return as_value(ptr->nodeType());
@@ -659,8 +650,7 @@ static as_value
 xmlnode_firstchild(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    assert(dynamic_cast<XMLNode*>(fn.this_ptr));
-    XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
+    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
 
@@ -686,8 +676,7 @@ static as_value
 xmlnode_lastchild(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    assert(dynamic_cast<XMLNode*>(fn.this_ptr));
-    XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
+    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
 
@@ -722,8 +711,7 @@ xmlnode_nextsibling(const fn_call& fn)
 	return rv;
     }
     
-    assert(dynamic_cast<XMLNode*>(fn.this_ptr));
-    XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
+    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
     XMLNode *node = ptr->nextSibling();
     if (node) {
 	rv = node;
@@ -747,8 +735,7 @@ xmlnode_previoussibling(const fn_call& fn)
 	return rv;
     }
 
-    assert(dynamic_cast<XMLNode*>(fn.this_ptr));
-    XMLNode *ptr = static_cast<XMLNode*>(fn.this_ptr);
+    XMLNode *ptr = ensureType<XMLNode>(fn.this_ptr);
     XMLNode *node = ptr->previousSibling();
     if (node) {
 	rv = node;
