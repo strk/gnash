@@ -1,6 +1,7 @@
 2007-03-21 Sandro Santilli <strk@keybit.net>
 
-	* testsuite/swfdec/PASSING: onload-childparent.swf passes.
+	* testsuite/swfdec/PASSING: new successes: onload-childparent.swf,
+	  registerclass-previous.swf.
 	* server/vm/ASHandlers.cpp (ActionCallFunction):
 	  When function is an object, invoke it's 'constructor';
 	  Properly set the 'this' pointer.
