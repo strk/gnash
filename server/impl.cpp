@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.100 2007/02/27 09:54:49 strk Exp $ */
+/* $Id: impl.cpp,v 1.101 2007/03/21 18:09:24 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -699,7 +699,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
 
 	// Movie is good, add to the library 
 	s_movie_library.add(cache_label, mov);
-    	log_msg("Movie %s added to library", cache_label.c_str());
+    	log_msg("Movie %s (SWF%d) added to library", cache_label.c_str(), mov->get_version());
 
 	// Now complete the load if the movie is an SWF movie
 	// 

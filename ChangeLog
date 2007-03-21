@@ -1,5 +1,7 @@
 2007-03-21 Sandro Santilli <strk@keybit.net>
 
+	* server/impl.cpp (create_library_movie): include SWF version info,
+	  at least it's now shown with a bare -v.
 	* server/vm/ASHandlers.cpp (ActionGetProperty):
 	  An empty string as target means we pick the current top
 	  of scope stack. (SWFHandlers ctor): add comments for
