@@ -3458,7 +3458,7 @@ sprite_instance::can_handle_mouse_event() const
 		
 void sprite_instance::restart()
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
     m_current_frame = 0;
 
