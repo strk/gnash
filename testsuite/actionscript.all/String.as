@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.14 2007/03/15 22:39:54 strk Exp $";
+rcsid="$Id: String.as,v 1.15 2007/03/21 16:20:57 strk Exp $";
 
 #include "check.as"
 
@@ -107,6 +107,16 @@ asm {
 check_equals( b, "iao");
 asm {
 	push "b"
+	push "boowa"
+	push "2"
+	push "-1" // size is bigger then string length,
+	          // we expect the interpreter to adjust it
+	substring
+	setvariable
+};
+check_equals( b, "oowa");
+asm {
+	push "b"
 	push "ciao"
 	push "-2" // negative base should be interpreted as 1
 	push "1" 
@@ -114,6 +124,15 @@ asm {
 	setvariable
 };
 check_equals( b, "c");
+asm {
+	push "b"
+	push "ciao"
+	push "-2" // negative base should be interpreted as 1
+	push "10" // long size reduced 
+	substring
+	setvariable
+};
+check_equals( b, "ciao");
 asm {
 	push "b"
 	push "ciao"

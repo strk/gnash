@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.70 2007/03/21 09:51:20 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.71 2007/03/21 16:20:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -823,7 +823,7 @@ SWFHandlers::ActionStringLength(ActionExec& thread)
 void
 SWFHandlers::ActionSubString(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(3); // size, base, string
 
@@ -841,19 +841,18 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 	return;
     }
 
-    int	size = int(size_val.to_number());
-    if ( size < 0 )
-    {
-    	log_warning("Negative size passed to ActionSubString, "
-		"returning undefined");
-    	env.drop(2);
-    	env.top(0).set_undefined();
-	return;
-    }
+    int size = unsigned(size_val.to_number());
 
     int	base = int(base_val.to_number());  
     int version = env.get_version();
     const tu_string& str = string_val.to_tu_string_versioned(version);
+
+    if ( size < 0 )
+    {
+    	log_warning("Negative size passed to ActionSubString, "
+		"taking as whole length");
+	size = str.length();
+    }
 
     // TODO: if 'base' or 'size' do not evaluate to numbers return 
     //       the empty string (how do we check if they evaluate ??)
@@ -2408,7 +2407,7 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
 void
 SWFHandlers::ActionNewEquals(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
 
     assert(thread.code[thread.pc] == SWF::ACTION_NEWEQUALS);

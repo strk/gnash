@@ -1,5 +1,12 @@
 2007-03-21 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionSubString): when length argument
+	  is negative take it as full string length.
+	* testsuite/actionscript.all/String.as: add tests for 'substring'
+	  action with negative length parameter.
+
+2007-03-21 Sandro Santilli <strk@keybit.net>
+
 	* server/as_function.cpp (extends): when VM version is > 5
 	  set 'prototype.__constructor__'  in addition to
 	  'prototype.constructor'
