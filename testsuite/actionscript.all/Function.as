@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.38 2007/03/21 09:51:20 strk Exp $";
+rcsid="$Id: Function.as,v 1.39 2007/03/21 14:37:20 strk Exp $";
 
 #include "check.as"
 
@@ -575,8 +575,8 @@ Email.prototype.__constructor__ = Spam;
 myMail = new Email('greetings', "you", "hello");
 check_equals(myMail.subject, 'greetings');
 #if OUTPUT_VERSION > 5
-xcheck_equals(myMail.to, 'everyone');
-xcheck_equals(myMail.message, 'enlarge yourself');
+check_equals(myMail.to, 'everyone');
+check_equals(myMail.message, 'enlarge yourself');
 #else
 check_equals(myMail.to, undefined);
 check_equals(myMail.message, undefined);

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.29 2007/03/20 17:22:16 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.30 2007/03/21 14:37:20 strk Exp $";
 
 #include "check.as"
 
@@ -252,9 +252,9 @@ asm {
 
 // One effect of 'extends' is setting up a __constructor__ member in the prototype 
 #if OUTPUT_VERSION > 5
-xcheck_equals(typeof(DerivedClass1.prototype.__constructor__), 'function');
-xcheck(DerivedClass1.prototype.hasOwnProperty('__constructor__'));
-xcheck_equals(DerivedClass1.prototype.__constructor__, BaseClass1);
+check_equals(typeof(DerivedClass1.prototype.__constructor__), 'function');
+check(DerivedClass1.prototype.hasOwnProperty('__constructor__'));
+check_equals(DerivedClass1.prototype.__constructor__, BaseClass1);
 check(DerivedClass1.prototype.__constructor__ != DerivedClass1);
 #else // SWF5 or below don't set __constructor__, it seems
 check_equals(typeof(DerivedClass1.prototype.__constructor__), 'undefined');
@@ -275,7 +275,7 @@ check_equals(obj.derivedClassCtorCalled, 1);
 check_equals(typeof(obj.__constructor__), 'function');
 check(obj.hasOwnProperty('__constructor__'));
 check_equals(obj.__constructor__, DerivedClass1);
-xcheck_equals(obj.__proto__.__constructor__, BaseClass1);
+check_equals(obj.__proto__.__constructor__, BaseClass1);
 #endif
 
 // constructor of 'super' is not automatically called

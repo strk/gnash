@@ -78,7 +78,8 @@ swf_function::swf_function(const action_buffer* ab,
 boost::intrusive_ptr<as_object>
 swf_function::getSuper(as_object& obj)
 { 
-	// Super class prototype is : obj.__proto__.constructor.prototype 
+//#define GNASH_DEBUG_GETSUPER
+	// Super class prototype is : obj.__proto__.__constructor__.prototype 
 	boost::intrusive_ptr<as_object> proto = obj.get_prototype();
 	if ( ! proto )
 	{
@@ -92,11 +93,11 @@ swf_function::getSuper(as_object& obj)
 	//       returning an as_function ?
 	//
 	as_value ctor;
-	bool ret = proto->get_member("constructor", &ctor);
+	bool ret = proto->get_member("__constructor__", &ctor);
 	if ( ! ret )
 	{
 #ifdef GNASH_DEBUG_GETSUPER
-		log_msg("Object.__proto__ %p doesn't have a constructor", proto);
+		log_msg("Object.__proto__ %p doesn't have a __constructor__", (void*)proto.get());
 #endif
 		return NULL;
 	}
@@ -109,13 +110,13 @@ swf_function::getSuper(as_object& obj)
 	if ( ! ctor_obj )
 	{
 #ifdef GNASH_DEBUG_GETSUPER
-		log_msg("Object.__proto__.constructor doesn't cast to an object");
+		log_msg("Object.__proto__.__constructor__ doesn't cast to an object");
 #endif
 		return NULL;
 	}
 
 #ifdef GNASH_DEBUG_GETSUPER
-	log_msg("ctor_obj is %p", ctor_obj);
+	log_msg("ctor_obj is %p", ctor_obj.get());
 #endif
 
 	as_value ctor_proto;
@@ -123,7 +124,7 @@ swf_function::getSuper(as_object& obj)
 	if ( ! ret )
 	{
 #ifdef GNASH_DEBUG_GETSUPER
-		log_msg("Object.__proto__.constructor %p doesn't have a prototype", ctor_obj);
+		log_msg("Object.__proto__.constructor %p doesn't have a prototype", ctor_obj.get());
 #endif
 		return NULL;
 	}
