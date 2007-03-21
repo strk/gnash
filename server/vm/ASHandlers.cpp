@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.71 2007/03/21 16:20:57 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.72 2007/03/21 17:59:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -183,28 +183,28 @@ SWFHandlers::SWFHandlers()
     vector<std::string> & property_names = get_property_names();
 
     property_names.reserve(32);
-    property_names.push_back("_x");
-    property_names.push_back("_y");
-    property_names.push_back("_xscale");
-    property_names.push_back("_yscale");
-    property_names.push_back("_currentframe");
-    property_names.push_back("_totalframes");
-    property_names.push_back("_alpha");
-    property_names.push_back("_visible");
-    property_names.push_back("_width");
-    property_names.push_back("_height");
-    property_names.push_back("_rotation");
-    property_names.push_back("_target");
-    property_names.push_back("_framesloaded");
-    property_names.push_back("_name");
-    property_names.push_back("_droptarget");
-    property_names.push_back("_url");
-    property_names.push_back("_highquality");
-    property_names.push_back("_focusrect");
-    property_names.push_back("_soundbuftime");
-    property_names.push_back("@@ mystery quality member");
-    property_names.push_back("_xmouse");
-    property_names.push_back("_ymouse");
+    property_names.push_back("_x"); // 0
+    property_names.push_back("_y"); // 1
+    property_names.push_back("_xscale"); // 2
+    property_names.push_back("_yscale"); // 3
+    property_names.push_back("_currentframe"); // 4
+    property_names.push_back("_totalframes"); // 5
+    property_names.push_back("_alpha"); // 6
+    property_names.push_back("_visible"); // 7
+    property_names.push_back("_width"); // 8
+    property_names.push_back("_height"); // 9
+    property_names.push_back("_rotation"); // 10
+    property_names.push_back("_target"); // 11
+    property_names.push_back("_framesloaded"); // 12
+    property_names.push_back("_name"); // 13
+    property_names.push_back("_droptarget"); // 14
+    property_names.push_back("_url"); // 15
+    property_names.push_back("_highquality"); // 16
+    property_names.push_back("_focusrect"); // 17
+    property_names.push_back("_soundbuftime"); // 18
+    property_names.push_back("@@ mystery quality member"); // 19 - quality: what the quality is (0, 1 or 2)
+    property_names.push_back("_xmouse"); // 20
+    property_names.push_back("_ymouse"); // 21
 
     container_type & handlers = get_handlers();
     handlers[ACTION_END] = ActionHandler(ACTION_END,
@@ -1037,7 +1037,24 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 	thread.ensureStack(2); // prop num, target
 
 	as_value& tgt_val = env.top(1);
-	character *target = env.find_target(tgt_val);
+	std::string tgt_str = tgt_val.to_std_string(&env);
+	character *target = NULL;
+	if ( tgt_str.empty() )
+	{
+		as_object* obj = thread.getTarget();
+
+		log_msg("ActionGetProperty(<empty>) called, target is %p", (void*)obj);
+
+		target = dynamic_cast<character*>(obj);
+		if ( ! target )
+		{
+			log_msg("ActionGetProperty(<empty>) called, but current target is not a character");
+		}
+	}
+	else
+	{
+		target = env.find_target(tgt_val);
+	}
 	unsigned int prop_number = (unsigned int)env.top(0).to_number();
 	if (target)
 	{
@@ -1046,6 +1063,7 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 			as_value val;
 			// TODO: check if get_propery_names() can return a string
 			//       directly.
+			assert( get_property_names().size() );
 			string propname = get_property_names()[prop_number].c_str();
 			//target->get_member(propname &val);
 			thread.getObjectMember(*target, propname, val);
