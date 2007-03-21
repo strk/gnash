@@ -1,5 +1,7 @@
 2007-03-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: add test for
+	  getproperty call w/out an explicit target.
 	* server/impl.cpp (create_library_movie): include SWF version info,
 	  at least it's now shown with a bare -v.
 	* server/vm/ASHandlers.cpp (ActionGetProperty):

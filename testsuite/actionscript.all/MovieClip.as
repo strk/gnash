@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.37 2007/03/16 12:11:48 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.38 2007/03/21 18:46:47 strk Exp $";
 
 #include "check.as"
 
@@ -322,3 +322,53 @@ this.$version = "fake version";
 check_equals(this.$version, 'fake version');
 check(delete $version);
 check_equals(typeof(this.$version), 'undefined');
+
+//------------------------------------------------
+// Test getProperty 
+//------------------------------------------------
+
+#ifdef MING_SUPPORTS_ASM_GETPROPERTY
+
+asm {
+	push "a"
+	push "" // this doesn't resolve to top of with stack
+	push 13 // _name
+	getproperty
+	setvariable
+};
+#if OUTPUT_VERSION > 5
+check_equals(a, "changed");
+#else
+check_equals(a, undefined);
+#endif
+
+asm {
+	push "b"
+	push "" // this doesn't resolve to top of with stack
+	push 11 // _target
+	getproperty
+	setvariable
+};
+check_equals(b, "/");
+
+asm {
+	push "_root"
+	push 13 // _name
+	getproperty
+	setvariable
+};
+#if OUTPUT_VERSION > 5
+check_equals(a, "changed");
+#else
+check_equals(a, undefined);
+#endif
+
+asm {
+	push "_root"
+	push 11 // _target
+	getproperty
+	setvariable
+};
+check_equals(b, "/");
+
+#endif // MING_SUPPORT_ASM_GETPROPERTY
