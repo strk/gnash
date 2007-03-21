@@ -89,7 +89,7 @@ main(int argc, char** argv)
   SWFDisplayItem_setDepth(it_red, 20); 
   SWFDisplayItem_setName(it_red, "mc_red");
   SWFDisplayItem_addAction(it_red,
-		compileSWFActionCode("note('mc_red clip load executed'); "
+		compileSWFActionCode("_root.note('mc_red clip load executed'); "
 			"_root.y1bis = 'mc_red onClipLoad called';"),
 		SWFACTION_ONLOAD);
   /* Woo, the PlaceObject tag hasn't defined an 'onLoad' function.

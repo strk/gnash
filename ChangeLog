@@ -1,3 +1,8 @@
+2007-03-21 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/action_execution_order_extend_test.c:
+	  fix calling _root.note
+	  
 2007-03-20 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac:
