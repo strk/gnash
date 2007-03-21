@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.69 2007/03/20 16:41:00 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.70 2007/03/21 09:51:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2041,20 +2041,19 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	//cerr << "At ActionCallFunction enter:"<<endl;
 	//env.dump_stack();
 
-	as_value function = env.top(0);
-	if ( ! function.is_function() )
+
+	// Let's consider it a as a string and lookup the function.
+	as_value function = thread.getVariable(env.top(0).to_std_string());
+	if ( ! function.is_object() ) 
 	{
-		// Let's consider it a as a string and lookup the function.
-                function_name = function.to_string();
-		function = thread.getVariable(function_name);
-		
-		if ( ! function.is_function() )
+		log_aserror("ActionCallFunction: %s is not an object", env.top(0).to_string());
+	}
+	else if ( ! function.is_function() ) 
+	{
+		boost::intrusive_ptr<as_object> obj = function.to_object();
+		if ( ! obj->get_member("constructor", &function) )
 		{
-			IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror("error in call_function: "
-					"'%s' is not a function",
-					function_name.c_str());
-			);
+			log_aserror("Object doensn't have a construcor");
 		}
 	}
 
@@ -2078,7 +2077,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         debugger.callStackPush(function_name);
 	debugger.matchBreakPoint(function_name, true);
 #endif
-	as_value result = call_method(function, &env, thread.getTarget(),
+	as_value result = call_method(function, &env, thread.getThisPointer(),
 				  nargs, env.get_top_index() - 2);
 
 	//log_msg("Function's result: %s", result.to_string());

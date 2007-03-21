@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.37 2007/03/20 21:48:49 strk Exp $";
+rcsid="$Id: Function.as,v 1.38 2007/03/21 09:51:20 strk Exp $";
 
 #include "check.as"
 
@@ -556,8 +556,8 @@ myMail = new Email('greetings', "you", "hello");
 check_equals(myMail.subject, 'greetings');
 
 #if OUTPUT_VERSION > 5
-xcheck_equals(myMail.to, 'you');
-xcheck_equals(myMail.message, 'hello');
+check_equals(myMail.to, 'you');
+check_equals(myMail.message, 'hello');
 #else // OUTPUT_VERSION <= 5
 // no 'super' defined for SWF5 and below, so don't expect it to be called
 check_equals(typeof(myMail.to), 'undefined');
