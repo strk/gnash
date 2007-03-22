@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.37 2007/03/22 00:30:45 strk Exp $ */
+/* $Id: as_value.h,v 1.38 2007/03/22 08:45:51 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -438,7 +438,12 @@ public:
 	as_function*	to_as_function() const;
 
 	/// Force type to number.
-	void	convert_to_number();
+	//
+	/// @param env
+	///	The environment to use for running the valueOf() method
+	///	for object values. If NULL, valueOf() won't be run.
+	///
+	void	convert_to_number(as_environment* env);
 
 	/// Force type to string.
 	void	convert_to_string();
@@ -542,20 +547,23 @@ public:
 	bool	operator==(const as_value& v) const;
 
 	bool	operator!=(const as_value& v) const;
+
+	/// @deprecated, use v.set_double(v.to_number(env) / v.to_number(env)) instead !
 	//bool	operator<(const as_value& v) const { return to_number() < v.to_number(); }
 
 	/// @deprecated, use v.set_double(v.to_number(env) + v.to_number(env)) instead !
-	void	operator+=(const as_value& v) { set_double(to_number() + v.to_number()); }
+	//void	operator+=(const as_value& v) { set_double(to_number() + v.to_number()); }
 
-	void	operator-=(const as_value& v) { set_double(to_number() - v.to_number()); }
-	void	operator*=(const as_value& v) { set_double(to_number() * v.to_number()); }
-	void	operator/=(const as_value& v) { set_double(to_number() / v.to_number()); }  // @@ check for div/0
-	void	operator&=(const as_value& v) { set_int(int(to_number()) & int(v.to_number())); }
-	void	operator|=(const as_value& v) { set_int(int(to_number()) | int(v.to_number())); }
-	void	operator^=(const as_value& v) { set_int(int(to_number()) ^ int(v.to_number())); }
-	void	shl(const as_value& v) { set_int(int(to_number()) << int(v.to_number())); }
-	void	asr(const as_value& v) { set_int(int(to_number()) >> int(v.to_number())); }
-	void	lsr(const as_value& v) { set_int((uint32_t(to_number()) >> int(v.to_number()))); }
+	/// TODO: deprecate all these !
+//	void	operator-=(const as_value& v) { set_double(to_number() - v.to_number()); }
+//	void	operator*=(const as_value& v) { set_double(to_number() * v.to_number()); }
+//	void	operator/=(const as_value& v) { set_double(to_number() / v.to_number()); }  // @@ check for div/0
+//	void	operator&=(const as_value& v) { set_int(int(to_number()) & int(v.to_number())); }
+//	void	operator|=(const as_value& v) { set_int(int(to_number()) | int(v.to_number())); }
+//	void	operator^=(const as_value& v) { set_int(int(to_number()) ^ int(v.to_number())); }
+//	void	shl(const as_value& v) { set_int(int(to_number()) << int(v.to_number())); }
+//	void	asr(const as_value& v) { set_int(int(to_number()) >> int(v.to_number())); }
+//	void	lsr(const as_value& v) { set_int((uint32_t(to_number()) >> int(v.to_number()))); }
 
 	/// Sets this value to this string plus the given string.
 	void	string_concat(const tu_string& str);

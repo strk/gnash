@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.22 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: xml.cpp,v 1.23 2007/03/22 08:45:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,6 +42,7 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 
@@ -459,7 +460,6 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
     //const char    *nodevalue;
     //AS_value      nodevalue;
     int           length;
-    as_value      inum;
     XMLNode       *childnode;
     XMLNode *xmlchildnode_obj;
     xmlattr_as_object* attr_obj;
@@ -506,6 +506,7 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
     // Process the children, if there are any
     if (length) {
         //log_msg("\tProcessing %d children nodes for %s\n", length, nodename);
+	int inum;
         inum = 0;
         for (child=0; child<length; child++) {
             // Create a new AS object for this node's children
@@ -514,15 +515,13 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
             // to be the first element of the array instead.
             if (mem) {
                 childnode = xml;
-                //obj->set_member(inum.to_string(), obj);
-                //inum += 1;
-                //childnode = xml->_children[child];
             } else {
                 childnode = xml->_children[child];
             }
             setupFrame(xmlchildnode_obj, childnode, false); // setup child node
-            obj->set_member(inum.to_string(), xmlchildnode_obj);
-            inum += 1;
+
+            obj->set_member(boost::lexical_cast<std::string>(inum), xmlchildnode_obj);
+            ++inum;
         }
     } else {
         //log_msg("\tNode %s has no children\n", nodename);

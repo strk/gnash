@@ -550,9 +550,9 @@ as_value::to_as_function() const
 
 // Force type to number.
 void
-as_value::convert_to_number()
+as_value::convert_to_number(as_environment* env)
 {
-    set_double(to_number());
+    set_double(to_number(env));
 }
 
 // Force type to string.

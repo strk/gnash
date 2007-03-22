@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.73 2007/03/22 00:30:45 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.74 2007/03/22 08:45:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -702,40 +702,60 @@ void
 SWFHandlers::ActionAdd(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(2);
-    env.top(1) += env.top(0);
-    env.drop(1);
+
+	//env.top(1) += env.top(0); //original version
+
+	as_environment& env = thread.env;
+	thread.ensureStack(2);
+	double operand1 = env.top(1).to_number(&env);
+	double operand2 = env.top(0).to_number(&env);
+	env.top(1) = operand1 + operand2;
+	env.drop(1);
 }
 
 void
 SWFHandlers::ActionSubtract(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(2);
-    env.top(1) -= env.top(0);
-    env.drop(1);
+
+	// env.top(1) -= env.top(0); //original version
+
+	as_environment& env = thread.env;
+	thread.ensureStack(2);
+	double operand1 = env.top(1).to_number(&env);
+	double operand2 = env.top(0).to_number(&env);
+	env.top(1) = operand1 - operand2;
+	env.drop(1);
 }
 
 void
 SWFHandlers::ActionMultiply(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(2);
-    env.top(1) *= env.top(0);
-    env.drop(1);
+
+	// env.top(1) *= env.top(0); //original version
+
+	as_environment& env = thread.env;
+	thread.ensureStack(2);
+	double operand1 = env.top(1).to_number(&env);
+	double operand2 = env.top(0).to_number(&env);
+	env.top(1) = operand1 * operand2;
+	env.drop(1);
 }
 
 void
 SWFHandlers::ActionDivide(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(2);
-    env.top(1) /= env.top(0);
-    env.drop(1);
+//
+	// env.top(1) /= env.top(0); //original version
+
+	as_environment& env = thread.env;
+	thread.ensureStack(2);
+	double operand1 = env.top(1).to_number(&env);
+	double operand2 = env.top(0).to_number(&env);
+	env.top(1) = operand1 / operand2;
+	env.drop(1);
 }
 
 void
@@ -755,7 +775,7 @@ SWFHandlers::ActionEqual(ActionExec& thread)
 
     // Flash4 used 1 and 0 as return from this tag
     if ( env.get_version() < 5 ) {
-      env.top(1).to_number();
+      env.top(1).to_number(&env);
     } 
 
     env.drop(1);
@@ -767,7 +787,7 @@ SWFHandlers::ActionLessThan(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(2);
-    env.top(1).set_bool(env.top(1).to_number() < env.top(0).to_number());
+    env.top(1).set_bool(env.top(1).to_number(&env) < env.top(0).to_number(&env));
     env.drop(1);
 }
 
@@ -841,9 +861,9 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 	return;
     }
 
-    int size = unsigned(size_val.to_number());
+    int size = unsigned(size_val.to_number(&env));
 
-    int	base = int(base_val.to_number());  
+    int	base = int(base_val.to_number(&env));  
     int version = env.get_version();
     const tu_string& str = string_val.to_tu_string_versioned(version);
 
@@ -926,7 +946,7 @@ SWFHandlers::ActionInt(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1);
-    env.top(0).set_int(int(floor(env.top(0).to_number())));
+    env.top(0).set_int(int(floor(env.top(0).to_number(&env))));
 }
 
 void
@@ -1055,7 +1075,7 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 	{
 		target = env.find_target(tgt_val);
 	}
-	unsigned int prop_number = (unsigned int)env.top(0).to_number();
+	unsigned int prop_number = (unsigned int)env.top(0).to_number(&env);
 	if (target)
 	{
 		if ( prop_number < get_property_names().size() )
@@ -1097,7 +1117,7 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
     thread.ensureStack(3); // prop val, prop num, target
 
     character *target = env.find_target(env.top(2));
-    unsigned int prop_number = (unsigned int)env.top(1).to_number();
+    unsigned int prop_number = (unsigned int)env.top(1).to_number(&env);
     as_value prop_val = env.top(0);
     
     if (target) {
@@ -1136,7 +1156,7 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 		si->clone_display_object(
 			env.top(2).to_std_string(),
 			env.top(1).to_std_string(),
-			(int) env.top(0).to_number());
+			(int) env.top(0).to_number(&env));
 	}
 	env.drop(3);
 }
@@ -1202,10 +1222,10 @@ SWFHandlers::ActionStartDragMovie(ActionExec& thread)
 		// It looks like coordinates of drag bounds are
 		// given as PIXELS :
 		// http://www.richsalter.btinternet.co.uk/cks1/cks1.swf
-		float y1 = PIXELS_TO_TWIPS(env.top(3).to_number());
-		float x1 = PIXELS_TO_TWIPS(env.top(4).to_number());
-		float y0 = PIXELS_TO_TWIPS(env.top(5).to_number());
-		float x0 = PIXELS_TO_TWIPS(env.top(6).to_number());
+		float y1 = PIXELS_TO_TWIPS(env.top(3).to_number(&env));
+		float x1 = PIXELS_TO_TWIPS(env.top(4).to_number(&env));
+		float y0 = PIXELS_TO_TWIPS(env.top(5).to_number(&env));
+		float x0 = PIXELS_TO_TWIPS(env.top(6).to_number(&env));
 
 		// check for swapped values
 		if ( y1 < y0 )
@@ -1327,7 +1347,7 @@ SWFHandlers::ActionRandom(ActionExec& thread)
 
 	thread.ensureStack(1);  // max
 
-	int	max = int(env.top(0).to_number());
+	int	max = int(env.top(0).to_number(&env));
 	if (max < 1) max = 1;
 	env.top(0).set_int(tu_random::next_random() % max);
 }
@@ -1356,7 +1376,7 @@ SWFHandlers::ActionChr(ActionExec& thread)
     as_environment& env = thread.env;
     thread.ensureStack(1);  
     char	buf[2];
-    buf[0] = int(env.top(0).to_number());
+    buf[0] = int(env.top(0).to_number(&env));
     buf[1] = 0;
     env.top(0).set_string(buf);
 }
@@ -2075,7 +2095,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	}
 
 	// Get number of args, modifying it if not enough values are on the stack.
-	unsigned nargs = unsigned(env.top(1).to_number());
+	unsigned nargs = unsigned(env.top(1).to_number(&env));
 	unsigned available_args = env.stack_size()-2; // 2 for func name and nargs
 	if ( available_args < nargs )
 	{
@@ -2148,14 +2168,14 @@ SWFHandlers::ActionModulo(ActionExec& thread)
     thread.ensureStack(2); // x, ,y
 
     as_value	result;
-    double	y = env.pop().to_number();
-    double	x = env.pop().to_number();
+    double	y = env.pop().to_number(&env);
+    double	x = env.pop().to_number(&env);
 //  Don't need to check for y being 0 here - if it's zero, fmod returns NaN
 //  which is what flash would do too
     result = fmod(x, y);
 //  env.top(1).set_double(fmod(env.top(1).to_bool() && env.top(0).to_bool());
 //  env.drop(1);
-//  log_error("modulo x=%f, y=%f, z=%f",x,y,result.to_number());
+//  log_error("modulo x=%f, y=%f, z=%f",x,y,result.to_number(&env));
     env.push(result);
 }
 
@@ -2175,7 +2195,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
 			classname.c_str());
 	);
 
-	unsigned nargs = unsigned(env.pop().to_number());
+	unsigned nargs = unsigned(env.pop().to_number(&env));
 
 	thread.ensureStack(nargs); // previous 2 entries popped
 
@@ -2238,7 +2258,7 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
 
     thread.ensureStack(1); // array size name
 
-    int	array_size = (int) env.pop().to_number();
+    int	array_size = (int) env.pop().to_number(&env);
     assert(array_size >= 0);
 
     thread.ensureStack((unsigned int)array_size); // array elements
@@ -2285,7 +2305,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
     //     [003]   Integer: 1
     //    SWFACTION_INITOBJECT
     
-    int nmembers = (int) env.pop().to_number();
+    int nmembers = (int) env.pop().to_number(&env);
 
     thread.ensureStack(nmembers); // members
     
@@ -2424,8 +2444,8 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
 	}
 	else 
 	{
-		double op1 = operand1.to_number();
-		double op2 = operand2.to_number();
+		double op1 = operand1.to_number(&env);
+		double op2 = operand2.to_number(&env);
 
 		if ( isnan(op1) || isnan(op2) )
 		{
@@ -2460,7 +2480,7 @@ SWFHandlers::ActionToNumber(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1); 
-    env.top(0).convert_to_number();
+    env.top(0).convert_to_number(&env);
 }
 
 void
@@ -2590,7 +2610,7 @@ SWFHandlers::ActionIncrement(ActionExec& thread)
 
     thread.ensureStack(1); 
 
-    env.top(0) += 1;
+    env.top(0).set_double(env.top(0).to_number(&env)+1);
 }
 
 void
@@ -2599,7 +2619,7 @@ SWFHandlers::ActionDecrement(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1); 
-    env.top(0) -= 1;
+    env.top(0).set_double(env.top(0).to_number(&env)-1);
 }
 
 void
@@ -2621,7 +2641,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	as_value& obj_value = env.top(1);
 
 	// Get number of args, modifying it if not enough values are on the stack.
-	unsigned nargs = unsigned(env.top(2).to_number());
+	unsigned nargs = unsigned(env.top(2).to_number(&env));
 	unsigned available_args = env.stack_size()-3; // 3 for obj, func and nargs
 	if ( available_args < nargs )
 	{
@@ -2762,7 +2782,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 	as_value obj_val = env.pop();
 
 	// Get number of args, modifying it if not enough values are on the stack.
-	unsigned nargs = unsigned(env.pop().to_number());
+	unsigned nargs = unsigned(env.pop().to_number(&env));
 	unsigned available_args = env.stack_size(); // previous 3 entries popped
 	if ( available_args < nargs )
 	{
@@ -2906,60 +2926,94 @@ void
 SWFHandlers::ActionBitwiseAnd(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(2); 
-    env.top(1) &= env.top(0);
-    env.drop(1);
+
+	as_environment& env = thread.env;
+	thread.ensureStack(2); 
+
+	double operand1 = env.top(1).to_number(&env);
+	double operand2 = env.top(0).to_number(&env);
+
+	env.top(1) = int(operand1)&int(operand2); 
+	env.drop(1);
 }
 
 void
 SWFHandlers::ActionBitwiseOr(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(2); 
-    env.top(1) |= env.top(0);
-    env.drop(1);
+	as_environment& env = thread.env;
+	thread.ensureStack(2); 
+
+	double operand1 = env.top(1).to_number(&env);
+	double operand2 = env.top(0).to_number(&env);
+
+	env.top(1) = int(operand1)|int(operand2); 
+	env.drop(1);
 }
 
 void
 SWFHandlers::ActionBitwiseXor(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(2); 
-    env.top(1) ^= env.top(0);
-    env.drop(1);
+
+	as_environment& env = thread.env;
+	thread.ensureStack(2); 
+
+	double operand1 = env.top(1).to_number(&env);
+	double operand2 = env.top(0).to_number(&env);
+
+	env.top(1) = int(operand1)^int(operand2); 
+	env.drop(1);
 }
 
 void
 SWFHandlers::ActionShiftLeft(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(2); 
-    env.top(1).asr(env.top(0));
-    env.drop(1);
+
+	// env.top(1).asr(env.top(0));
+
+	as_environment& env = thread.env;
+	thread.ensureStack(2); 
+
+	double operand1 = env.top(1).to_number(&env);
+	double operand2 = env.top(0).to_number(&env);
+
+	env.top(1) = int(operand1) >> int(operand2); 
+	env.drop(1);
 }
 
 void
 SWFHandlers::ActionShiftRight(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(2); 
-    env.top(1).lsr(env.top(0));
-    env.drop(1);
+//
+	//env.top(1).lsr(env.top(0));
+
+	as_environment& env = thread.env;
+	thread.ensureStack(2); 
+
+	double operand1 = env.top(1).to_number(&env);
+	double operand2 = env.top(0).to_number(&env);
+
+	env.top(1) = int(operand1) >> int(operand2); 
+	env.drop(1);
 }
 
 void
 SWFHandlers::ActionShiftRight2(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(2); 
-    env.top(1).lsr(env.top(0));
-    env.drop(1);
+	// env.top(1).lsr(env.top(0));
+
+	as_environment& env = thread.env;
+	thread.ensureStack(2); 
+
+	double operand1 = env.top(1).to_number(&env);
+	double operand2 = env.top(0).to_number(&env);
+
+	env.top(1) = uint32_t(operand1) >> int(operand2); 
+	env.drop(1);
 }
 
 void
@@ -2990,8 +3044,8 @@ SWFHandlers::ActionGreater(ActionExec& thread)
 	}
 	else 
 	{
-		double op1 = operand1.to_number();
-		double op2 = operand2.to_number();
+		double op1 = operand1.to_number(&env);
+		double op2 = operand2.to_number(&env);
 
 		if ( isnan(op1) || isnan(op2) )
 		{
