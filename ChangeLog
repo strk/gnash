@@ -1,5 +1,6 @@
 2007-03-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: two more successes.
 	* server/stream.{cpp,h} (read_uint): don't force return
 	  to fit in a short. Fixes a regression for 3dtris.swf.
 
