@@ -230,14 +230,6 @@ call_method(
 
 	try 
 	{
-#if 0 // C_FUNCTION values do not exist anymore !
-		if ( as_c_function_ptr func = method.to_c_function() )
-		{
-		    // It's a C function.  Call it.
-		    (*func)(call);
-		}
-		else
-#endif // C_FUNCTION values do not exist anymore !
 		if ( as_function* as_func = method.to_as_function() )
 		{
 		    // It's an ActionScript function.  Call it.
