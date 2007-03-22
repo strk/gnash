@@ -184,7 +184,7 @@ main(int argc, char** argv)
     
   SWFMovie_nextFrame(mo); /* 3rd frame */
   
-  check_equals(mo, "_root.x1", "'1+2+3+4+5+6+7+8+9+1+2+4+x+5+xx+'");
+  xcheck_equals(mo, "_root.x1", "'1+2+3+4+5+6+7+8+9+1+2+4+x+5+xx+'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 4th frame */
   
