@@ -233,8 +233,8 @@ button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 		// (this is a single bit, the other 7 bits are reserved)
 		m_menu = in->read_u8() != 0;
 
-		int	button_2_action_offset = in->read_u16();
-		int	next_action_pos = in->get_position() + button_2_action_offset - 2;
+		unsigned button_2_action_offset = in->read_u16();
+		unsigned next_action_pos = in->get_position() + button_2_action_offset - 2;
 
 		// Read button records.
 		for (;;)
@@ -254,29 +254,43 @@ button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 			}
 		}
 
-		if (button_2_action_offset > 0)
+		if ( next_action_pos >= in->get_tag_end_position() )
 		{
-			in->set_position(next_action_pos);
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror("Next Button2 actionOffset (%u) points past the end of tag", button_2_action_offset);
+			);
+			return;
+		}
 
-			// Read Button2ActionConditions
-			for (;;)
+		in->set_position(next_action_pos);
+
+		// Read Button2ActionConditions
+		for (;;)
+		{
+			unsigned next_action_offset = in->read_u16();
+			next_action_pos = in->get_position() + next_action_offset - 2;
+
+			m_button_actions.resize(m_button_actions.size() + 1);
+			m_button_actions.back().read(in, tag_type);
+
+			if (next_action_offset == 0 )
 			{
-				int	next_action_offset = in->read_u16();
-				next_action_pos = in->get_position() + next_action_offset - 2;
-
-				m_button_actions.resize(m_button_actions.size() + 1);
-				m_button_actions.back().read(in, tag_type);
-
-				if (next_action_offset == 0
-				    || in->get_position() >= in->get_tag_end_position())
-				{
-					// done.
-					break;
-				}
-
-				// seek to next action.
-				in->set_position(next_action_pos);
+				// done.
+				break;
 			}
+
+			//was: in->get_position() >= in->get_tag_end_position()
+			if ( next_action_pos >= in->get_tag_end_position() )
+			{
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror("Next action offset (%u) in Button2ActionConditions points past the end of tag",
+					next_action_offset);
+				);
+				break;
+			}
+
+			// seek to next action.
+			in->set_position(next_action_pos);
 		}
 	}
 	

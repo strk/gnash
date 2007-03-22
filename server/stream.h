@@ -29,13 +29,13 @@ namespace gnash {
 		/// Reads a bit-packed unsigned integer from the stream
 		/// and returns it.  The given bitcount determines the
 		/// number of bits to read.
-		int	read_uint(int bitcount);
+		unsigned short read_uint(unsigned short bitcount);
 
 		/// \brief
 		/// Reads a bit-packed little-endian signed integer
 		/// from the stream.  The given bitcount determines the
 		/// number of bits to read.
-		int	read_sint(int bitcount);
+		int	read_sint(unsigned short bitcount);
 
 		float	read_fixed();
 		void	align();
@@ -46,9 +46,9 @@ namespace gnash {
 		int16_t	read_s16();
 		uint32_t	read_u32();
 		int32_t	read_s32();
-		int     read_variable_count()
+		unsigned read_variable_count()
 		{
-			int count = read_u8();
+			unsigned count = read_u8();
 			if (count == 0xFF)
 				count = read_u16();
 			return count;
@@ -96,16 +96,19 @@ namespace gnash {
 		void	read_string_with_length(unsigned len, std::string& to);
 
 		/// Return our current (byte) position in the input stream.
-		int	get_position();
+		unsigned long get_position();
 
 		/// Set the file position to the given value.
-		void	set_position(int pos);
+		void	set_position(unsigned long pos);
 
 		/// Return the file position of the end of the current tag.
-		int	get_tag_end_position();
+		unsigned long get_tag_end_position();
 
 		/// Return the length of the current tag.
-		int	get_tag_length() {
+		//
+		/// should return a  'long' ?
+		///
+		unsigned get_tag_length() {
 			return _current_tag_length;
 		}
 
@@ -121,7 +124,7 @@ namespace gnash {
 		//
 		/// Note: crossing a tag boundary triggers an error,
 		/// but I'm not sure we really want this --strk;
-		void skip_bytes(unsigned int num)
+		void skip_bytes(unsigned num)
 		{
 			// there's probably a better way, but
 			// it's the interface that counts atm
@@ -136,13 +139,14 @@ namespace gnash {
 		}
 
 	private:
-		int _current_tag_length;
+		// should this be long ?
+		unsigned _current_tag_length;
 
 		tu_file*	m_input;
 		uint8_t	m_current_byte;
 		uint8_t	m_unused_bits;
 
-		std::vector<int>	m_tag_stack;	// position of end of tag
+		std::vector<unsigned long> m_tag_stack;	// position of end of tag
 	};
 
 

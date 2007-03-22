@@ -50,13 +50,13 @@ namespace gnash {
 // 	}
 
 	
-	int	stream::read_uint(int bitcount)
+	unsigned short stream::read_uint(unsigned short bitcount)
 	{
 		assert(bitcount <= 32 && bitcount >= 0);
 			
 		uint32_t	value = 0;
 
-		int	bits_needed = bitcount;
+		unsigned short bits_needed = bitcount;
 		while (bits_needed > 0)
 		{
 			if (m_unused_bits) {
@@ -93,11 +93,11 @@ namespace gnash {
 	}
 
 
-	int	stream::read_sint(int bitcount)
+	int	stream::read_sint(unsigned short bitcount)
 	{
 		assert(bitcount <= 32 && bitcount >= 0);
 
-		int32_t	value = (int32_t) read_uint(bitcount);
+		int32_t	value = int32_t(read_uint(bitcount));
 
 		// Sign extend...
 		if (value & (1 << (bitcount - 1))) {
@@ -224,20 +224,20 @@ namespace gnash {
 	}
 
 
-	int	stream::get_position()
+	unsigned long stream::get_position()
 	{
 		return m_input->get_position();
 	}
 
 
-	void	stream::set_position(int pos)
+	void	stream::set_position(unsigned long pos)
 	{
 		align();
 
 		// If we're in a tag, make sure we're not seeking outside the tag.
 		if (m_tag_stack.size() > 0)
 		{
-			int	end_pos = m_tag_stack.back();
+			unsigned long end_pos = m_tag_stack.back();
 			assert(pos <= end_pos);
 			end_pos = end_pos;	// inhibit warning
 			// @@ check start pos somehow???
@@ -248,7 +248,7 @@ namespace gnash {
 	}
 
 
-	int	stream::get_tag_end_position()
+	unsigned long stream::get_tag_end_position()
 	{
 		assert(m_tag_stack.size() > 0);
 
@@ -284,7 +284,7 @@ namespace gnash {
 	void	stream::close_tag()
 	{
 		assert(m_tag_stack.size() > 0);
-		int	end_pos = m_tag_stack.back();
+		unsigned long end_pos = m_tag_stack.back();
 		m_tag_stack.pop_back();
 		m_input->set_position(end_pos);
 

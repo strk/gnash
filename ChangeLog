@@ -1,5 +1,11 @@
 2007-03-22 Sandro Santilli <strk@keybit.net>
 
+	* server/stream.{cpp,h}: fix signedness of integers.
+	* server/parser/button_character_def.cpp (read):
+	  Survive malformation of button2 events action tags.
+
+2007-03-22 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.{h,cpp}: drop all methods transparently
 	  calling to_number w/out passing an as_environment.
 	* server/asobj/Global.cpp, server/asobj/xml.cpp,
