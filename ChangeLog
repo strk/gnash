@@ -1,3 +1,8 @@
+2007-03-22 Sandro Santilli <strk@keybit.net>
+
+	* server/stream.{cpp,h} (read_uint): don't force return
+	  to fit in a short. Fixes a regression for 3dtris.swf.
+
 2007-03-22 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/as_object.cpp: in set_member_default(), only setValue()

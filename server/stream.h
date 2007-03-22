@@ -29,7 +29,7 @@ namespace gnash {
 		/// Reads a bit-packed unsigned integer from the stream
 		/// and returns it.  The given bitcount determines the
 		/// number of bits to read.
-		unsigned short read_uint(unsigned short bitcount);
+		unsigned read_uint(unsigned short bitcount);
 
 		/// \brief
 		/// Reads a bit-packed little-endian signed integer

@@ -50,7 +50,7 @@ namespace gnash {
 // 	}
 
 	
-	unsigned short stream::read_uint(unsigned short bitcount)
+	unsigned stream::read_uint(unsigned short bitcount)
 	{
 		assert(bitcount <= 32);
 			
