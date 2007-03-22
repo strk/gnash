@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: Number.cpp,v 1.26 2007/03/20 16:41:00 strk Exp $ */
+/* $Id: Number.cpp,v 1.27 2007/03/22 13:19:04 strk Exp $ */
 
 // Implementation of ActionScript Number class.
 
@@ -284,9 +284,9 @@ getNumberConstructor()
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&number_ctor, getNumberInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachNumberInterface(*cl); 
+		// We don't want to attach Number prototype methods to the Number
+		// class itself.
+		//attachNumberInterface(*cl); 
 	}
 
 	return cl;

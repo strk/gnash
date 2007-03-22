@@ -1,5 +1,12 @@
 2007-03-22 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Number.cpp: don't attach Number interface
+	  to the Number class itself.
+	* testsuite/actionscript.all/Number.as: more tests
+	  for valueOf,toString (many still fail for SWF5).
+
+2007-03-22 Sandro Santilli <strk@keybit.net>
+
 	* server/font.cpp, server/stream.cpp, server/swf/tag_loaders.cpp:
 	  Fixed signedness warnings after stream interface update.
 

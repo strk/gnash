@@ -26,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.15 2007/03/22 00:30:45 strk Exp $";
+rcsid="$Id: Number.as,v 1.16 2007/03/22 13:19:04 strk Exp $";
 
 #include "check.as"
 
@@ -53,8 +53,13 @@ Object.prototype.toString = function() { return "fake_string"; };
 check_equals(n1.toString(), "268"); // doesn't inherit from Object
 Object.prototype.toString = backup;
 
+//------------------------------------
 // Test Number.valueOf 
+//------------------------------------
+
 check_equals(typeof(n1.valueOf), "function");
+check_equals(typeof(n1.__proto__.valueOf), "function");
+check_equals(typeof(n1.__proto__.__proto__.valueOf), "function");
 check_equals(typeof(n1.valueOf()), "number");
 check_equals(n1.valueOf(), 268);
 
@@ -234,5 +239,64 @@ check_equals((7<undefined), false);
 check_equals((7>undefined), true);
 check_equals((-7<undefined), true);
 check_equals((-7>undefined), false);
+#endif
+
+note(2+Number);
+note(Number+2);
+note(null+2);
+note(2+null);
+note(2-Number);
+note(Number-2);
+note(null-2);
+note(2-null);
+note(2*Number);
+note(Number*2);
+note(null*2);
+note(2*null);
+note(2/Number);
+note(Number/2);
+note(null/2);
+note(2/null);
+
+check_equals(typeof(Number.prototype.valueOf), 'function'); 
+check_equals(typeof(Number.prototype.toString), 'function'); 
+#if OUTPUT_VERSION > 5
+xcheck(isNaN(Number.valueOf()));
+check_equals(typeof(Number.toString), 'function');
+check_equals(typeof(Number.valueOf), 'function');
+check(!Number.hasOwnProperty('valueOf'));
+check(!Number.hasOwnProperty('toString'));
+check(!Number.__proto__.hasOwnProperty('valueOf'));
+check(!Number.__proto__.hasOwnProperty('toString'));
+check(Number.__proto__.__proto__.hasOwnProperty('valueOf'));
+check(Number.__proto__.__proto__.hasOwnProperty('toString'));
+check(Number.__proto__.__proto__ === Object.prototype);
+
+check_equals(typeof(Number.valueOf()), 'function'); // this is odd
+#else // OUTPUT_VERSION <= 5
+check(!isNaN(Number.valueOf()) );
+check_equals(typeof(Number), 'function'); 
+xcheck_equals(typeof(Number.valueOf), 'undefined'); 
+xcheck_equals(typeof(Number.__proto__), 'undefined'); 
+xcheck_equals(typeof(Number.toString), 'undefined'); 
+xcheck_equals(typeof(Function), 'undefined');
+#endif
+
+a = 1;
+check_equals(typeof(a.toString), 'function');
+check_equals(typeof(a.valueOf), 'function');
+#if OUTPUT_VERSION > 5
+check(!a.hasOwnProperty('valueOf'));
+check(a.__proto__.hasOwnProperty('valueOf'));
+check(!a.hasOwnProperty('toString'));
+#endif
+
+anum = new Number(1);
+check_equals(typeof(anum.toString), 'function');
+check_equals(typeof(anum.valueOf), 'function');
+#if OUTPUT_VERSION > 5
+check(!anum.hasOwnProperty('valueOf'));
+check(anum.__proto__.hasOwnProperty('valueOf'));
+check(!anum.hasOwnProperty('toString'));
 #endif
 
