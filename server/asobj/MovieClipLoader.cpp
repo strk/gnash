@@ -287,7 +287,7 @@ log_msg(" Listener %p doesn't have an %s event to listen for, skipped",
 			" %s function", event.c_str());
 #endif
 
-		call_method(method, fn.env, fn.this_ptr.get(), fn.nargs, fn.first_arg_bottom_index);
+		call_method(method, &fn.env(), fn.this_ptr.get(), fn.nargs, fn.offset());
 	}
 
 }
@@ -315,7 +315,7 @@ moviecliploader_loadclip(const fn_call& fn)
 #endif
 	std::string str_url = url_arg.to_string(); 
 
-	character* target = fn.env->find_target(fn.arg(1));
+	character* target = fn.env().find_target(fn.arg(1));
 	if ( ! target )
 	{
 		log_error("Could not find target %s", fn.arg(1).to_string());

@@ -116,7 +116,7 @@ dejagnu_pass(const fn_call& fn)
     assert(ptr);
     
     if (fn.nargs > 0) {
-	const char *text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+	const char *text = fn.arg(0).to_string();
 	return as_value(ptr->obj.pass(text));
     }
 }
@@ -129,7 +129,7 @@ dejagnu_fail(const fn_call& fn)
     assert(ptr);
     
     if (fn.nargs > 0) {
-	const char *text = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+	const char *text = fn.arg(0).to_string();
 	return as_value(ptr->obj.fail(text));
     }
 }

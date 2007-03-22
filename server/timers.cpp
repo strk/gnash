@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.25 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: timers.cpp,v 1.26 2007/03/22 22:37:45 bjacques Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -199,7 +199,7 @@ timer_setinterval(const fn_call& fn)
 	}
 
 	Timer timer;
-	timer.setInterval(*as_func, ms, fn.this_ptr, fn.env);
+	timer.setInterval(*as_func, ms, fn.this_ptr, &fn.env());
     
 	movie_root& root = VM::get().getRoot();
 	int id = root.add_interval_timer(timer);

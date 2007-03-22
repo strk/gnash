@@ -171,12 +171,12 @@ swf_function::operator()(const fn_call& fn)
 	as_environment*	our_env = m_env;
 	if (our_env == NULL)
 	{
-		our_env = fn.env;
+		our_env = &fn.env();
 	}
 	assert(our_env);
 
 #if 0
-	log_msg("swf_function() stack:\n"); fn.env->dump_stack();
+	log_msg("swf_function() stack:\n"); fn.env().dump_stack();
 	log_msg("  first_arg_bottom_index: %d\n", fn.first_arg_bottom_index);
 #endif
 

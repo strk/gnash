@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.20 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: Object.cpp,v 1.21 2007/03/22 22:37:46 bjacques Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -270,7 +270,7 @@ object_registerClass(const fn_call& fn)
 
 	// TODO: check to *which* definition should we ask the export
 	//       this code uses the *relative* root of current environment's target
-	movie_definition* def = fn.env->get_target()->get_root_movie()->get_movie_definition();
+	movie_definition* def = fn.env().get_target()->get_root_movie()->get_movie_definition();
 	boost::intrusive_ptr<resource> exp_res = def->get_exported_resource(symbolid.c_str());
 	if ( ! exp_res )
 	{

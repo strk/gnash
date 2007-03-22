@@ -43,19 +43,22 @@ class as_value;
 class fn_call
 {
 public:
+	/// The as_object (or a pointer derived thereof) on which this call
+	/// is taking place.
 	boost::intrusive_ptr<as_object> this_ptr;
-	as_environment* env;
-	unsigned int nargs;
-	int first_arg_bottom_index;
 
+	/// Number of arguments to this ActionScript function call.
+	const unsigned int nargs;
+
+public:
 	fn_call(as_object* this_in,
 			as_environment* env_in,
 			int nargs_in, int first_in)
 		:
 		this_ptr(this_in),
-		env(env_in),
 		nargs(nargs_in),
-		first_arg_bottom_index(first_in)
+		_env(env_in),
+		_stack_offset(first_in)
 	{
 	}
 
@@ -64,9 +67,9 @@ public:
 			int nargs_in, int first_in)
 		:
 		this_ptr(this_in),
-		env(env_in),
 		nargs(nargs_in),
-		first_arg_bottom_index(first_in)
+		_env(env_in),
+		_stack_offset(first_in)
 	{
 	}
 
@@ -74,7 +77,17 @@ public:
 	as_value& arg(unsigned int n) const
 	{
 		assert(n < nargs);
-		return env->bottom(first_arg_bottom_index - n);
+		return _env->bottom(_stack_offset - n);
+	}
+
+	int offset() const
+	{
+		return _stack_offset;
+	}
+
+	as_environment& env() const
+	{
+		return *_env;
 	}
 
 	/// Dump arguments to given output stream
@@ -87,6 +100,14 @@ public:
 		}
 	}
 
+private:
+	/// The ActionScript environment in which the function call is taking
+	/// place. This contains, among other things, the function arguments.
+	as_environment* _env;
+
+	/// The offset from the bottom of the env callstack to the first
+	/// argument to our fn_call.
+	unsigned int _stack_offset;
 };
 
 /// Signature of a builtin function callable from ActionScript

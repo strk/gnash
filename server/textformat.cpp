@@ -127,7 +127,7 @@ as_value textformat_new(const fn_call& fn)
   //
   // TODO we should handle setTextFormat as a method on TextField,
   // instead of doing this.
-  fn.env->set_variable("setTextFormat", new builtin_function(textformat_setformat));
+  fn.env().set_variable("setTextFormat", new builtin_function(textformat_setformat));
   
   return as_value(text_obj);
 }

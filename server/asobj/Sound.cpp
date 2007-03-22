@@ -284,7 +284,7 @@ sound_stop(const fn_call& fn)
 		const char* name = fn.arg(0).to_string();
 
 		// check the import.
-		movie_definition* def = fn.env->get_target()->get_root_movie()->get_movie_definition();
+		movie_definition* def = fn.env().get_target()->get_root_movie()->get_movie_definition();
 		assert(def);
 		boost::intrusive_ptr<resource> res = def->get_exported_resource(name);
 		if (res == NULL)
@@ -336,7 +336,7 @@ sound_attachsound(const fn_call& fn)
 	}
 
 	// check the import.
-	movie_definition* def = fn.env->get_target()->get_root_movie()->get_movie_definition();
+	movie_definition* def = fn.env().get_target()->get_root_movie()->get_movie_definition();
 	assert(def);
 	boost::intrusive_ptr<resource> res = def->get_exported_resource(name);
 	if (res == NULL)

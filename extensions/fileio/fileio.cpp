@@ -321,8 +321,8 @@ fileio_fopen(const fn_call& fn)
     assert(ptr);
     
     if (fn.nargs > 0) {
-	string filespec = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-	string mode = fn.env->bottom(fn.first_arg_bottom_index-1).to_string();
+	string filespec = fn.arg(0).to_string();
+	string mode = fn.arg(1).to_string();
 	return as_value(ptr->fopen(filespec, mode));
     }
 }
@@ -405,7 +405,7 @@ fileio_fwrite(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);
-    string str = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+    string str = fn.arg(0).to_string();
     return as_value(ptr->fputs(str));
 }
 
@@ -415,7 +415,7 @@ fileio_fputc(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
-    int c = (int) fn.env->bottom(fn.first_arg_bottom_index).to_number();
+    int c = (int) fn.arg(0).to_number();
     return as_value(ptr->fputc(c));
 }
 
@@ -425,7 +425,7 @@ fileio_fputs(const fn_call& fn)
     //   GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
-    string str = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+    string str = fn.arg(0).to_string();
     return as_value(ptr->fputs(str));
 }
 
@@ -434,7 +434,7 @@ as_value
 fileio_puts(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    string str = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+    string str = fn.arg(0).to_string();
     return as_value(::puts(str.c_str()));
 }
 
@@ -444,7 +444,7 @@ fileio_putchar(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
-    string x = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+    string x = fn.arg(0).to_string();
     return as_value(::putchar(x[0]));
 }
 
@@ -463,7 +463,7 @@ fileio_fseek(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
-    long c = (long) fn.env->bottom(fn.first_arg_bottom_index).to_number();
+    long c = (long) fn.arg(0).to_number();
     return as_value(ptr->fseek(c));
 }
 
@@ -483,7 +483,7 @@ fileio_unlink(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);
-    string str = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+    string str = fn.arg(0).to_string();
     return as_value(ptr->unlink(str));
 }
 
@@ -497,7 +497,7 @@ fileio_scandir(const fn_call& fn)
 
     Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
-    string str = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+    string str = fn.arg(0).to_string();
     ptr->scandir(str, fn.result);
 }
 

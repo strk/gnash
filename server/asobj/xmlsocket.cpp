@@ -379,8 +379,8 @@ xmlsocket_connect(const fn_call& fn)
     
     log_msg("%s: nargs=%d\n", __FUNCTION__, fn.nargs);
     boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
-    const std::string host = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-    std::string port_str = fn.env->bottom(fn.first_arg_bottom_index-1).to_string();
+    const std::string host = fn.arg(0).to_string();
+    std::string port_str = fn.arg(1).to_string();
     double port = atof(port_str.c_str());
     
     ptr->obj.connect(host.c_str(), static_cast<int>(port));
@@ -388,17 +388,17 @@ xmlsocket_connect(const fn_call& fn)
 #if 0 // use connect return as result
     // Push result onto stack for onConnect
     if (ret) {
-        fn.env->push(as_value(true));
+        fn.env().push(as_value(true));
     }
     else {
-        fn.env->push(as_value(false));
+        fn.env().push(as_value(false));
     }
 #endif
-    fn.env->push(as_value(true));
+    fn.env().push(as_value(true));
     if (fn.this_ptr->get_member("onConnect", &method)) {
         //    log_msg("FIXME: Found onConnect!\n");
         first = false; // what is this for ?
-        val = call_method0(method, fn.env, fn.this_ptr.get());
+        val = call_method0(method, &fn.env(), fn.this_ptr.get());
     } else {
         //ptr->set_event_handler(event_id::SOCK_CONNECT, (as_c_function_ptr)&xmlsocket_event_connect);
     }
@@ -408,11 +408,11 @@ xmlsocket_connect(const fn_call& fn)
     Timer *timer = new Timer;
     boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(
         &xmlsocket_event_ondata, NULL);
-    timer->setInterval(*ondata_handler, 50, boost::dynamic_pointer_cast<as_object>(ptr), fn.env);
+    timer->setInterval(*ondata_handler, 50, boost::dynamic_pointer_cast<as_object>(ptr), &fn.env());
     VM::get().getRoot().add_interval_timer(*timer);
 #endif
     
-    fn.env->pop();
+    fn.env().pop();
     
     return as_value(true);
 }
@@ -426,7 +426,7 @@ xmlsocket_send(const fn_call& fn)
     as_value	val;
     
     boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
-    const std::string object = fn.env->bottom( fn.first_arg_bottom_index).to_string();
+    const std::string object = fn.arg(0).to_string();
     //  log_msg("%s: host=%s, port=%g\n", __FUNCTION__, host, port);
     return as_value(ptr->obj.send(object));
 }
@@ -488,11 +488,11 @@ xmlsocket_new(const fn_call& /* fn */)
     //
     //as_c_function_ptr int_handler = (as_c_function_ptr)&timer_setinterval;
     //env->set_member("setInterval", int_handler);
-    fn.env->set_member("setInterval", timer_setinterval);
+    fn.env().set_member("setInterval", timer_setinterval);
     
     //as_c_function_ptr clr_handler = timer_clearinterval;
     // TODO:  check this, sounds suspicious
-    fn.env->set_member("clearInterval", timer_clearinterval);
+    fn.env().set_member("clearInterval", timer_clearinterval);
     
     //env->set_variable("setInterval", int_handler, 0);
     //xmlsock_obj->set_event_handler(event_id::TIMER,
@@ -549,7 +549,7 @@ xmlsocket_event_ondata(const fn_call& fn)
 //          log_msg("Got message #%d, %d bytes long at %p: %s: \n", i,
 //                  strlen(messages[i]), messages[i], messages[i]);
                 datain = messages[i];
-                //fn.env->push(datain);
+                //fn.env().push(datain);
 #ifndef USE_DMALLOC
                 //dump_memory_stats(__FUNCTION__, __LINE__, "start");
 #endif
@@ -563,7 +563,7 @@ xmlsocket_event_ondata(const fn_call& fn)
 #endif  
         //log_msg("Deleting message #%d at %p\n", i, messages[i]);
         //delete messages[i];
-        //fn.env->pop();
+        //fn.env().pop();
         datain.set_undefined();
       }
       ptr->obj.processing(false);
@@ -618,7 +618,7 @@ xmlsocket_event_connect(const fn_call& fn)
         //env->bottom(0) = true;
         
         if (fn.this_ptr->get_member("onConnect", &method)) {
-	    val = call_method0(method, fn.env, fn.this_ptr.get());
+	    val = call_method0(method, &fn.env(), fn.this_ptr.get());
         } else {
             log_msg("FIXME: Couldn't find onConnect!");
         }

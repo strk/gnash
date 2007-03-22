@@ -187,10 +187,9 @@ function_apply(const fn_call& fn)
 	// Get function body 
 	boost::intrusive_ptr<as_function> function_obj = ensureType<as_function>(fn.this_ptr);
 
-	// Copy new function call from old one, we'll modify 
-	// the copy only if needed
-	fn_call new_fn_call(fn);
-	new_fn_call.nargs=0;
+	unsigned int nargs = fn.nargs;
+	boost::intrusive_ptr<as_object> this_ptr = fn.this_ptr;
+	int offset = fn.offset();
 
 	if ( ! fn.nargs )
 	{
@@ -201,11 +200,13 @@ function_apply(const fn_call& fn)
 	else
 	{
 		// Get the object to use as 'this' reference
-		boost::intrusive_ptr<as_object> this_ptr = fn.arg(0).to_object();
-		if ( this_ptr ) new_fn_call.this_ptr = this_ptr;
-		// ... or recycle this function's call 'this' pointer
-		// (most likely the Function instance)
-		else new_fn_call.this_ptr = fn.this_ptr;
+		this_ptr = fn.arg(0).to_object();
+		if (!this_ptr )
+		{
+			// ... or recycle this function's call 'this' pointer
+			// (most likely the Function instance)
+			this_ptr = fn.this_ptr;
+		}
 
 		if ( fn.nargs > 1 )
 		// we have an 'arguments' array
@@ -256,22 +257,24 @@ function_apply(const fn_call& fn)
 			for (unsigned int i=nelems; i; i--)
 			{
 				value=arg_array->at(i-1);
-				fn.env->push_val(value);
+				fn.env().push_val(value);
 				pushed++;
 			}
 
-			new_fn_call.first_arg_bottom_index=fn.env->get_top_index();
-			new_fn_call.nargs=nelems;
+			offset = fn.env().get_top_index();
+			nargs=nelems;
 		}
 	}
 
 	call_it:
 
+	fn_call new_fn_call(this_ptr, &fn.env(), nargs, offset);
+
 	// Call the function 
 	as_value rv = function_obj->call(new_fn_call);
 
 	// Drop additional values we pushed on the stack 
-	fn.env->drop(pushed);
+	fn.env().drop(pushed);
 
         return rv;
 }
@@ -285,26 +288,29 @@ function_call(const fn_call& fn)
 
 	// Copy new function call from old one, we'll modify 
 	// the copy only if needed
-	fn_call new_fn_call(fn);
+
+	boost::intrusive_ptr<as_object> this_ptr = fn.this_ptr;
+	unsigned int nargs = fn.nargs;
+	int index = fn.offset();
 
 	if ( ! fn.nargs )
 	{
                 dbglogfile << "Function.call() with no args" << endl;
-		new_fn_call.nargs=0;
 	}
 	else
 	{
 		// Get the object to use as 'this' reference
-		boost::intrusive_ptr<as_object> this_ptr = fn.arg(0).to_object();
-		new_fn_call.this_ptr = this_ptr;
-		new_fn_call.nargs--;
-		new_fn_call.first_arg_bottom_index--;
+		this_ptr = fn.arg(0).to_object();
+		nargs--;
+		index--;
 	}
+
+	fn_call new_fn_call(this_ptr, &fn.env(), nargs, index);
 
 	// Call the function 
 	return (*function_obj)(new_fn_call);
 
-	//log_msg("at function_call exit, stack: \n"); fn.env->dump_stack();
+	//log_msg("at function_call exit, stack: \n"); fn.env().dump_stack();
 
 	//log_msg("%s: tocheck \n", __FUNCTION__);
 }

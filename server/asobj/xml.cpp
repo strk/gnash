@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.23 2007/03/22 08:45:52 strk Exp $ */
+/* $Id: xml.cpp,v 1.24 2007/03/22 22:37:46 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -800,21 +800,21 @@ xml_load(const fn_call& fn)
 #if 1
     if (fn.this_ptr->get_member("onLoad", &method)) {
         //    log_msg("FIXME: Found onLoad!\n");
-        fn.env->set_variable("success", true);
+        fn.env().set_variable("success", true);
         fn.arg(0) = true;
 #if 0
         as_c_function_ptr	func = method.to_c_function();
         if (func) {
 	    // It's a C function.  Call it.
 	    log_msg("Calling C function for onLoad\n");
-	    (*func)(fn_call(&val, xml_obj, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
+	    (*func)(fn_call(&val, xml_obj, fn.env(), fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
 	} else
 #endif
 	if (as_function* as_func = method.to_as_function()) {
 	    // It's an ActionScript function.  Call it.
 	    log_msg("Calling ActionScript function for onLoad\n");
 	    // XXX other than being assigned into, val appears to be unused.
-	    val = (*as_func)(fn_call(xml_obj, fn.env, fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
+	    val = (*as_func)(fn_call(xml_obj, &fn.env(), fn.nargs, fn.offset())); // was this_ptr instead of node
 	} else {
 	    log_error("error in call_method(): method is not a function\n");
 	}
@@ -856,7 +856,7 @@ xml_onload(const fn_call& fn)
     
         if (fn.this_ptr->get_member("onLoad", &method)) {
             // log_msg("FIXME: Found onLoad!\n");
-	    val = call_method(method, fn.env, fn.this_ptr.get(), 0, 0);
+	    val = call_method(method, &fn.env(), fn.this_ptr.get(), 0, 0);
         } else {
             log_msg("FIXME: Couldn't find onLoad!\n");
         }
@@ -882,8 +882,8 @@ xml_ondata(const fn_call& fn)
         if (fn.this_ptr->get_member("onData", &method)) {
             log_msg("FIXME: Found onData!\n");
 	    // TODO: this is suspicious (set_variable for what??)
-            fn.env->set_variable("success", true);
-	    val = call_method(method, fn.env, fn.this_ptr, 0, 0);
+            fn.env().set_variable("success", true);
+	    val = call_method(method, fn.env(), fn.this_ptr, 0, 0);
         } else {
             log_msg("FIXME: Couldn't find onData!\n");
         }
@@ -954,12 +954,12 @@ xml_new(const fn_call& fn)
     // log_msg("%s: nargs=%d\n", __FUNCTION__, fn.nargs);
   
     if (fn.nargs > 0) {
-	    boost::intrusive_ptr<as_object> obj = fn.env->top(0).to_object();
+	    boost::intrusive_ptr<as_object> obj = fn.env().top(0).to_object();
 
         if (! obj ) {
             xml_obj = new XML;
             //log_msg("\tCreated New XML object at %p\n", xml_obj);
-            tu_string datain = fn.env->top(0).to_tu_string();
+            tu_string datain = fn.env().top(0).to_tu_string();
             xml_obj->parseXML(datain);
             //log_msg("*** Start setting up the stack frames ***\n");
             xml_obj->setupFrame(xml_obj.get(), xml_obj->firstChild(), true);
@@ -1175,9 +1175,9 @@ as_value xml_parsexml(const fn_call& fn)
 #if 1
     if (fn.this_ptr->get_member("onLoad", &method)) {
         log_msg("FIXME: Found onLoad!\n");
-        fn.env->set_variable("success", true); // what is this for ?
+        fn.env().set_variable("success", true); // what is this for ?
 	fn.arg(0) = true; // what is this for ?
-	val = call_method(method, fn.env, fn.this_ptr.get(), 0, 0);
+	val = call_method(method, &fn.env(), fn.this_ptr.get(), 0, 0);
     } else {
         log_msg("Couldn't find onLoad event handler, setting up callback\n");
         // ptr->set_event_handler(event_id::XML_LOAD, (as_c_function_ptr)&xml_onload);

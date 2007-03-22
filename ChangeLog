@@ -16,6 +16,14 @@
 	server/character{.cpp, .h}, server/character_instance.cpp:
 	Use the new init_property() for read-only properties. Don't
 	check if read-only properties are being set in getters.
+	* server/vm/fn_call.h: Make fn_call more robust: rename
+	first_arg_bottom_index to _stack_offset, which I think is more
+	descriptive. Make _stack_offset and _env private properties; add
+	accessors for them. Make nargs a const property. Add doxygen
+	comments for all members.
+	* all over the place: Adjust all users of fn_call members.
+	Make sure all callers use the new accessors and that no caller
+	tries to set now-const properties.
 
 2007-03-22 Sandro Santilli <strk@keybit.net>
 

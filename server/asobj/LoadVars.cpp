@@ -616,7 +616,7 @@ loadvars_tostring(const fn_call& fn)
 static as_value
 loadvars_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<as_object> obj = new LoadVars(fn.env);
+	boost::intrusive_ptr<as_object> obj = new LoadVars(&fn.env());
 	
 	return as_value(obj.get()); // will keep alive
 }

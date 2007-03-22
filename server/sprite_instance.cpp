@@ -638,7 +638,7 @@ static as_value sprite_hit_test(const fn_call& fn)
 		case 1: // target
 		{
 			as_value& tgt_val = fn.arg(0);
-			character* target = fn.env->find_target(tgt_val);
+			character* target = fn.env().find_target(tgt_val);
 			if ( ! target )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
@@ -1117,7 +1117,7 @@ sprite_name_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		ptr->set_name(fn.arg(0).to_string(fn.env));
+		ptr->set_name(fn.arg(0).to_string(&fn.env()));
 		//IF_VERBOSE_ASCODING_ERRORS(
 		//log_aserror("Attempt to set read-only property '_name'");
 		//);

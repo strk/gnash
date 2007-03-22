@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.54 2007/03/22 08:45:52 strk Exp $ */
+/* $Id: Global.cpp,v 1.55 2007/03/22 22:37:45 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -114,7 +114,7 @@ as_global_isnan(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value( static_cast<bool>(isnan(fn.arg(0).to_number(fn.env)) ));
+    return as_value( static_cast<bool>(isnan(fn.arg(0).to_number(&fn.env())) ));
 }
 
 static as_value
@@ -122,7 +122,7 @@ as_global_isfinite(const fn_call& fn)
 {
     ASSERT_FN_ARGS_IS_1
 
-    return as_value( isfinite(fn.arg(0).to_number(fn.env)) );
+    return as_value( isfinite(fn.arg(0).to_number(&fn.env())) );
 }
 
 /// \brief Encode a string to URL-encoded format
@@ -186,8 +186,7 @@ as_global_parsefloat(const fn_call& fn)
 static as_value
 as_global_parseint(const fn_call& fn)
 {
-	as_environment* env = fn.env;
-
+    as_environment* env = &fn.env();
     // assert(fn.nargs == 2 || fn.nargs == 1);
     if (fn.nargs < 1) {
 	IF_VERBOSE_ASCODING_ERRORS(
@@ -297,8 +296,9 @@ as_global_parseint(const fn_call& fn)
 static as_value
 as_global_assetpropflags(const fn_call& fn)
 {
-    int version = fn.env->get_version();
-    as_environment* env = fn.env;
+    as_environment* env = &fn.env();
+    int version = env->get_version();
+    
 
     //log_msg("ASSetPropFlags called with %d args", fn.nargs);
 

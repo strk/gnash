@@ -302,10 +302,10 @@ mysql_connect(const fn_call& fn)
     assert(ptr);
 
     if (fn.nargs == 4) {
-	const char *host = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-	const char *db = fn.env->bottom(fn.first_arg_bottom_index-1).to_string();
-	const char *user = fn.env->bottom(fn.first_arg_bottom_index-2).to_string();
-	const char *passwd = fn.env->bottom(fn.first_arg_bottom_index-3).to_string();	
+	const char *host = fn.arg(0).to_string();
+	const char *db = fn.arg(1).to_string();
+	const char *user = fn.arg(2).to_string();
+	const char *passwd = fn.arg(3).to_string();	
 	return as_value(ptr->obj.connect(host, db, user, passwd));
     } else {
 	return as_value(false);
@@ -321,8 +321,8 @@ mysql_qetData(const fn_call& fn)
     assert(ptr);
 
     if (fn.nargs > 0) {
-	const char *sql = fn.env->bottom(fn.first_arg_bottom_index).to_string();
-	as_array_object *arr = (as_array_object *)fn.env->bottom(fn.first_arg_bottom_index-1).to_object();
+	const char *sql = fn.arg(0).to_string();
+	as_array_object *arr = (as_array_object *)fn.arg(1).to_object();
 //	std::vector< std::vector<const char *> >
 	MySQL::query_t qresult;
 #if 0
@@ -393,7 +393,7 @@ mysql_query(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
     if (fn.nargs > 0) {
-	const char *sql = fn.env->bottom(fn.first_arg_bottom_index).to_string();
+	const char *sql = fn.arg(0).to_string();
 	assert(ptr);
 	return as_value(ptr->obj.guery(sql));
     }
