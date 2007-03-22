@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.79 2007/02/27 09:54:49 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.80 2007/03/22 10:51:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -266,7 +266,7 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 
 	IF_VERBOSE_PARSE
 	(
-		log_parse("  define_bits_jpeg2_loader: charid = %d pos = 0x%x",
+		log_parse("  define_bits_jpeg2_loader: charid = %d pos = %lx",
 			character_id, in->get_position());
     	);
 
@@ -360,7 +360,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 
 	IF_VERBOSE_PARSE
 	(
-		log_parse("  define_bits_jpeg3_loader: charid = %d pos = 0x%x",
+		log_parse("  define_bits_jpeg3_loader: charid = %d pos = %lx",
 			character_id, in->get_position());
 	);
 

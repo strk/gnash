@@ -191,7 +191,7 @@ namespace gnash {
 
 		uint16_t glyph_count = in->read_u16();
 		
-		int	table_base = in->get_position();
+		unsigned long table_base = in->get_position();
 
 		// Read the glyph offsets.  Offsets
 		// are measured from the start of the
@@ -238,7 +238,7 @@ namespace gnash {
 			{for (int i = 0; i < glyph_count; i++)
 			{
 				// Seek to the start of the shape data.
-				int	new_pos = table_base + offsets[i];
+				unsigned long new_pos = table_base + offsets[i];
 
 				// It seems completely possible to
 				// have such seeks-back, see bug #16311
@@ -253,7 +253,7 @@ namespace gnash {
 				m_glyphs[i] = s;
 			}}
 
-			int	current_position = in->get_position();
+			unsigned long current_position = in->get_position();
 			if (font_code_offset + table_base != current_position)
 			{
 				// Bad offset!  Don't try to read any more.
@@ -264,7 +264,7 @@ namespace gnash {
 		else
 		{
 			// Skip the shape data.
-			int	new_pos = table_base + font_code_offset;
+			unsigned long new_pos = table_base + font_code_offset;
 			if (new_pos >= in->get_tag_end_position())
 			{
 				// No layout data!
@@ -378,7 +378,7 @@ namespace gnash {
 	// codes.
 	{
 		IF_VERBOSE_PARSE (
-		log_parse("reading code table at offset %d", in->get_position());
+		log_parse("reading code table at offset %lu", in->get_position());
 		);
 
 		assert(m_code_table.empty());

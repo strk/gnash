@@ -52,7 +52,7 @@ namespace gnash {
 	
 	unsigned short stream::read_uint(unsigned short bitcount)
 	{
-		assert(bitcount <= 32 && bitcount >= 0);
+		assert(bitcount <= 32);
 			
 		uint32_t	value = 0;
 
@@ -95,7 +95,7 @@ namespace gnash {
 
 	int	stream::read_sint(unsigned short bitcount)
 	{
-		assert(bitcount <= 32 && bitcount >= 0);
+		assert(bitcount <= 32);
 
 		int32_t	value = int32_t(read_uint(bitcount));
 
@@ -269,7 +269,7 @@ namespace gnash {
 		_current_tag_length = tag_length;
 
 		IF_VERBOSE_PARSE (
-			log_parse("SWF[%u]: tag type = %d, tag length = %d",
+			log_parse("SWF[%lu]: tag type = %d, tag length = %d",
 			get_position(), tag_type, tag_length);
 		);
 			

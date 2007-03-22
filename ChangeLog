@@ -1,5 +1,10 @@
 2007-03-22 Sandro Santilli <strk@keybit.net>
 
+	* server/font.cpp, server/stream.cpp, server/swf/tag_loaders.cpp:
+	  Fixed signedness warnings after stream interface update.
+
+2007-03-22 Sandro Santilli <strk@keybit.net>
+
 	* server/stream.{cpp,h}: fix signedness of integers.
 	* server/parser/button_character_def.cpp (read):
 	  Survive malformation of button2 events action tags.
