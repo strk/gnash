@@ -198,9 +198,16 @@ as_object::set_member_default(const std::string& key, const as_value& val )
 		try 
 		{
 			//log_msg("Found a getter/setter property for key %s", key.c_str());
-			// TODO: have setValue check for read-only property 
-			//       and warn if failed
-			prop->setValue(*this, val);
+			if (prop->isReadOnly())
+			{
+				IF_VERBOSE_ASCODING_ERRORS(
+                			log_aserror("Attempt to set read-only property '%s'",
+						    key.c_str());
+	                	);
+			} else
+			{
+				prop->setValue(*this, val);
+			}
 			return;
 		}
 		catch (ActionException& exc)
@@ -289,6 +296,34 @@ as_object::init_property(const std::string& key, as_function& getter,
 	// We shouldn't attempt to initialize a property twice, should we ?
 	assert(success);
 }
+
+void
+as_object::init_property(const std::string& key, as_function& getter)
+{
+	init_property(key, getter, getter);
+
+	as_prop_flags& flags = getOwnProperty(key)->getFlags();
+
+	// ActionScript must not change the flags of this builtin property.
+	flags.set_is_protected(true);
+
+	// Make the property read-only; that is, the default no-op handler will
+	// be triggered when ActionScript tries to set it.
+	flags.set_read_only();
+}
+
+std::string
+as_object::asPropName(std::string name)
+{
+	std::string orig = name;
+	if ( _vm.getSWFVersion() < 7 )
+	{
+		boost::to_lower(orig, _vm.getLocale());
+	}
+
+	return orig;
+}
+
 
 bool
 as_object::set_member_flags(const std::string& name,

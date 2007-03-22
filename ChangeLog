@@ -1,3 +1,16 @@
+2007-03-22 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/as_object.cpp: in set_member_default(), only setValue()
+	on properties that aren't read-only. Add an init_property()
+	method specifically for read-only properties which takes only
+	a setter. Also add a method asPropName() that converts property
+	names to lowercase, which is a very common pattern in this
+	class.
+	* server/button_character_instance.cpp,
+	server/character{.cpp, .h}, server/character_instance.cpp:
+	Use the new init_property() for read-only properties. Don't
+	check if read-only properties are being set in getters.
+
 2007-03-22 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Number.cpp: don't attach Number interface

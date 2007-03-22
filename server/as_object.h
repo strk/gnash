@@ -213,6 +213,18 @@ public:
 	void init_property(const std::string& key, as_function& getter,
 		as_function& setter);
 
+	/// \brief
+	/// Use this method for read-only properties.
+	//
+	/// This method achieves the same as the above init_property method.
+	/// Additionally, it sets the property as read-only so that a default
+	/// handler will be triggered when ActionScript attempts to set the
+	/// property.
+	/// 
+	/// The arguments are the same as the above init_property arguments,
+	/// although the setter argument is omitted.
+	void init_property(const std::string& key, as_function& getter);
+
 	/// Get a member as_value by name
 	//
 	/// The default behaviour is to call set_member_default,
@@ -400,6 +412,8 @@ public:
 	/// will do just the same
 	///
 	void set_prototype(boost::intrusive_ptr<as_object> proto);
+
+	std::string asPropName(std::string name);
 	
 	/// @{ Common ActionScript methods for characters
 	/// TODO: make protected

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.58 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: character.h,v 1.59 2007/03/22 16:56:36 bjacques Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -169,9 +169,9 @@ public:  // TODO: make protected
 
 	static as_value yscale_getset(const fn_call& fn);
 
-	static as_value xmouse_getset(const fn_call& fn);
+	static as_value xmouse_get(const fn_call& fn);
 
-	static as_value ymouse_getset(const fn_call& fn);
+	static as_value ymouse_get(const fn_call& fn);
 
 	static as_value alpha_getset(const fn_call& fn);
 

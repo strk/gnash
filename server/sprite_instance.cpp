@@ -1066,79 +1066,35 @@ movieclip_ctor(const fn_call& /* fn */)
 
 
 static as_value
-sprite_currentframe_getset(const fn_call& fn)
+sprite_currentframe_get(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		return as_value(ptr->get_current_frame() + 1);
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_currentframe'");
-		);
-	}
-
-	return as_value();
+	return as_value(ptr->get_current_frame() + 1);
 }
 
 static as_value
-sprite_totalframes_getset(const fn_call& fn)
+sprite_totalframes_get(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		return as_value(ptr->get_frame_count());
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_totalframes'");
-		);
-	}
-
-	return as_value();
+	return as_value(ptr->get_frame_count());
 }
 
 static as_value
-sprite_framesloaded_getset(const fn_call& fn)
+sprite_framesloaded_get(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		return as_value(ptr->get_loaded_frames());
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_framesloaded'");
-		);
-	}
-
-	return as_value();
+	return as_value(ptr->get_loaded_frames());
 }
 
 static as_value
-sprite_target_getset(const fn_call& fn)
+sprite_target_get(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		return as_value(ptr->getTargetPath().c_str());
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_target'");
-		);
-	}
-
-	return as_value();
+	return as_value(ptr->getTargetPath().c_str());
 }
 
 static as_value
@@ -1176,33 +1132,22 @@ sprite_droptarget_getset(const fn_call& fn)
 	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(ptr);
 
-	if ( fn.nargs == 0 ) // getter
+	static bool warned = false;
+	if ( ! warned )
 	{
-		static bool warned = false;
-		if ( ! warned )
-		{
-			log_error("FIXME: MovieClip._droptarget unimplemented");
-			warned=true;
-		}
-
-		VM& vm = VM::get();
-		if ( vm.getSWFVersion() > 5 )
-		{
-			return as_value("");
-		} 
-		else
-		{
-			return as_value();
-		}
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_droptarget'");
-		);
+		log_error("FIXME: MovieClip._droptarget unimplemented");
+		warned=true;
 	}
 
-	return as_value();
+	VM& vm = VM::get();
+	if ( vm.getSWFVersion() > 5 )
+	{
+		return as_value("");
+	} 
+	else
+	{
+		return as_value();
+	}
 }
 
 static as_value
@@ -1210,18 +1155,7 @@ sprite_url_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> ptr = ensureType<sprite_instance>(fn.this_ptr);
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		return as_value(ptr->get_movie_definition()->get_url().c_str());
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_url'");
-		);
-	}
-
-	return as_value();
+	return as_value(ptr->get_movie_definition()->get_url().c_str());
 }
 
 static as_value
@@ -1367,6 +1301,7 @@ attachMovieClipProperties(as_object& o)
 	gettersetter = new builtin_function(&character::x_getset, NULL);
 	o.init_property("_x", *gettersetter, *gettersetter);
 
+
 	gettersetter = new builtin_function(&character::y_getset, NULL);
 	o.init_property("_y", *gettersetter, *gettersetter);
 
@@ -1376,11 +1311,11 @@ attachMovieClipProperties(as_object& o)
 	gettersetter = new builtin_function(&character::yscale_getset, NULL);
 	o.init_property("_yscale", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character::xmouse_getset, NULL);
-	o.init_property("_xmouse", *gettersetter, *gettersetter);
+	gettersetter = new builtin_function(&character::xmouse_get, NULL);
+	o.init_property("_xmouse", *gettersetter);
 
-	gettersetter = new builtin_function(&character::ymouse_getset, NULL);
-	o.init_property("_ymouse", *gettersetter, *gettersetter);
+	gettersetter = new builtin_function(&character::ymouse_get, NULL);
+	o.init_property("_ymouse", *gettersetter);
 
 	gettersetter = new builtin_function(&character::alpha_getset, NULL);
 	o.init_property("_alpha", *gettersetter, *gettersetter);
@@ -1400,16 +1335,16 @@ attachMovieClipProperties(as_object& o)
 	gettersetter = new builtin_function(&character::parent_getset, NULL);
 	o.init_property("_parent", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&sprite_currentframe_getset, NULL);
+	gettersetter = new builtin_function(&sprite_currentframe_get, NULL);
 	o.init_property("_currentframe", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&sprite_totalframes_getset, NULL);
+	gettersetter = new builtin_function(&sprite_totalframes_get, NULL);
 	o.init_property("_totalframes", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&sprite_framesloaded_getset, NULL);
+	gettersetter = new builtin_function(&sprite_framesloaded_get, NULL);
 	o.init_property("_framesloaded", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&sprite_target_getset, NULL);
+	gettersetter = new builtin_function(&sprite_target_get, NULL);
 	o.init_property("_target", *gettersetter, *gettersetter);
 
 	gettersetter = new builtin_function(&sprite_name_getset, NULL);

@@ -179,11 +179,11 @@ attachButtonInterface(as_object& o)
 	gettersetter = new builtin_function(&character::yscale_getset, NULL);
 	o.init_property("_yscale", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&character::xmouse_getset, NULL);
-	o.init_property("_xmouse", *gettersetter, *gettersetter);
+	gettersetter = new builtin_function(&character::xmouse_get, NULL);
+	o.init_property("_xmouse", *gettersetter);
 
-	gettersetter = new builtin_function(&character::ymouse_getset, NULL);
-	o.init_property("_ymouse", *gettersetter, *gettersetter);
+	gettersetter = new builtin_function(&character::ymouse_get, NULL);
+	o.init_property("_ymouse", *gettersetter);
 
 	gettersetter = new builtin_function(&character::alpha_getset, NULL);
 	o.init_property("_alpha", *gettersetter, *gettersetter);

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.26 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: character.cpp,v 1.27 2007/03/22 16:56:36 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -536,63 +536,41 @@ character::yscale_getset(const fn_call& fn)
 }
 
 as_value
-character::xmouse_getset(const fn_call& fn)
+character::xmouse_get(const fn_call& fn)
 {
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		// Local coord of mouse IN PIXELS.
-		int x, y, buttons;
-		VM::get().getRoot().get_mouse_state(x, y, buttons);
+	// Local coord of mouse IN PIXELS.
+	int x, y, buttons;
+	VM::get().getRoot().get_mouse_state(x, y, buttons);
 
-		matrix m = ptr->get_world_matrix();
+	matrix m = ptr->get_world_matrix();
 
-		point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-		point b;
-			
-		m.transform_by_inverse(&b, a);
+	point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+	point b;
+		
+	m.transform_by_inverse(&b, a);
 
-		rv = as_value(TWIPS_TO_PIXELS(b.m_x));
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_xmouse'");
-		);
-	}
-	return rv;
+	return as_value(TWIPS_TO_PIXELS(b.m_x));
 }
 
 as_value
-character::ymouse_getset(const fn_call& fn)
+character::ymouse_get(const fn_call& fn)
 {
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		// Local coord of mouse IN PIXELS.
-		int x, y, buttons;
-		VM::get().getRoot().get_mouse_state(x, y, buttons);
+	// Local coord of mouse IN PIXELS.
+	int x, y, buttons;
+	VM::get().getRoot().get_mouse_state(x, y, buttons);
 
-		matrix m = ptr->get_world_matrix();
+	matrix m = ptr->get_world_matrix();
 
-		point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-		point b;
-			
-		m.transform_by_inverse(&b, a);
+	point a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
+	point b;
+		
+	m.transform_by_inverse(&b, a);
 
-		rv = as_value(TWIPS_TO_PIXELS(b.m_y));
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_ymouse'");
-		);
-	}
-	return rv;
+	return as_value(TWIPS_TO_PIXELS(b.m_y));
 }
 
 as_value
@@ -727,21 +705,13 @@ character::parent_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
+	boost::intrusive_ptr<as_object> p = ptr->get_parent();
 	as_value rv;
-	if ( fn.nargs == 0 ) // getter
+	if (p)
 	{
-		boost::intrusive_ptr<as_object> p = ptr->get_parent();
-		if ( p )
-		{
-			rv = as_value(p);
-		}
+		rv = as_value(p);
 	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Attempt to set read-only property '_parent'");
-		);
-	}
+
 	return rv;
 }
 
