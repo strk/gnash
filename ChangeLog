@@ -1,3 +1,9 @@
+2007-03-22 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all: action_execution_order_test6.c, Makefile.am.
+	  add a new testcase for passing-by MovieClip events.
+
+	  
 2007-03-22 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: comparisons-7.swf now passes.

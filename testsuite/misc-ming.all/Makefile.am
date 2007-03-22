@@ -91,6 +91,7 @@ check_PROGRAMS = \
 	action_execution_order_test3 \
 	action_execution_order_test4 \
 	action_execution_order_test5 \
+	action_execution_order_test6 \
 	loadMovieTest \
 	loadMovieTestRunner \
 	eventSoundTest1 \
@@ -120,6 +121,7 @@ check_SCRIPTS = \
 	action_execution_order_test3runner \
 	action_execution_order_test4runner \
 	action_execution_order_test5runner \
+	action_execution_order_test6runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -532,6 +534,20 @@ action_execution_order_test5runner: $(srcdir)/../generic-testrunner.sh action_ex
 	sh $< $(top_builddir) action_execution_order_test5.swf > $@
 	chmod 755 $@
 
+action_execution_order_test6_SOURCES =	\
+	action_execution_order_test6.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+action_execution_order_test6_LDADD = $(MING_LIBS)
+
+action_execution_order_test6.swf: action_execution_order_test6
+	./action_execution_order_test6 $(top_srcdir)/testsuite/media
+
+action_execution_order_test6runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test6.swf
+	sh $< $(top_builddir) action_execution_order_test6.swf > $@
+	chmod 755 $@
+	
 action_execution_order_extend_test_SOURCES =	\
 	action_execution_order_extend_test.c	\
 	ming_utils.h		\
