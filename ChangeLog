@@ -1,3 +1,15 @@
+2007-03-22 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/swfdec/PASSING: comparisons-7.swf now passes.
+	* testsuite/actionscript.all/Number.as: add tests for
+	  comparison operators (unfortunately Ming never outputs
+	  ActionGreater, but swfdec testsuite contains it).
+	* server/vm/ASHandlers.cpp (ActionNewLessThen, ActionGreater):
+	  return undefined if numeric conversion returns NaN.
+	* server/as_value.h: drop 'operator<', is not appropriate as
+	  it insists in returning a bool, while we might eventually
+	  get an undefined value.
+
 2007-03-21 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/check.as: define

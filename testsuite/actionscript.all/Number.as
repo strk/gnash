@@ -26,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.14 2007/03/16 10:52:26 strk Exp $";
+rcsid="$Id: Number.as,v 1.15 2007/03/22 00:30:45 strk Exp $";
 
 #include "check.as"
 
@@ -190,17 +190,49 @@ check_equals(2/undefined, Infinity);
 check(!isFinite(Infinity));
 check(!isFinite(2/undefined));
 
+check_equals(typeof(("string"<7)), 'undefined');
+check_equals(typeof((7<"string")), 'undefined');
+check_equals(typeof(("18"<7)), 'boolean');
+check_equals(typeof((7<"18")), 'boolean');
+check_equals(("18"<"7"), true); // string comparison
+check_equals(("18"<7), false); // numeric comparison
+check_equals((7<"18"), true); // numeric comparison
+check_equals(typeof(_root<"18"), 'undefined'); // _root is ensured to be NAN for SWF6 too
 
-note(undef);
-note(undef+undef);
-note(undef+'text');
-note('text'+undef);
-note(undef+2);
-note(2+undef);
-note(undef*2);
-note(2*undef);
-note(undef-2);
-note(2-undef);
-note(undef/2);
-note(2/undef);
-note(2/undefined);
+#if OUTPUT_VERSION > 6
+check_equals(typeof(undefined<7), 'undefined');
+check_equals(typeof(undefined>7), 'undefined');
+check_equals(typeof(undefined<-7), 'undefined');
+check_equals(typeof(undefined>-7), 'undefined');
+check_equals(typeof(7<undefined), 'undefined');
+check_equals(typeof(7>undefined), 'undefined');
+check_equals(typeof(-7<undefined), 'undefined');
+check_equals(typeof(-7>undefined), 'undefined');
+check_equals(typeof(null<7), 'undefined');
+check_equals(typeof(null>7), 'undefined');
+check_equals(typeof(null<-7), 'undefined');
+check_equals(typeof(null>-7), 'undefined');
+check_equals(typeof(7<null), 'undefined');
+check_equals(typeof(7>null), 'undefined');
+check_equals(typeof(-7<null), 'undefined');
+check_equals(typeof(-7>null), 'undefined');
+#else
+check_equals(typeof(undefined<7), 'boolean');
+check_equals(typeof(undefined>7), 'boolean');
+check_equals(typeof(undefined<-7), 'boolean');
+check_equals(typeof(undefined>-7), 'boolean');
+check_equals(typeof(7<undefined), 'boolean');
+check_equals(typeof(7>undefined), 'boolean');
+check_equals(typeof(-7<undefined), 'boolean');
+check_equals(typeof(-7>undefined), 'boolean');
+
+check_equals((undefined<7), true);
+check_equals((undefined>7), false);
+check_equals((undefined<-7), false);
+check_equals((undefined>-7), true);
+check_equals((7<undefined), false);
+check_equals((7>undefined), true);
+check_equals((-7<undefined), true);
+check_equals((-7>undefined), false);
+#endif
+

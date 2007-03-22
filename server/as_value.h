@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.36 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: as_value.h,v 1.37 2007/03/22 00:30:45 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -542,7 +542,7 @@ public:
 	bool	operator==(const as_value& v) const;
 
 	bool	operator!=(const as_value& v) const;
-	bool	operator<(const as_value& v) const { return to_number() < v.to_number(); }
+	//bool	operator<(const as_value& v) const { return to_number() < v.to_number(); }
 
 	/// @deprecated, use v.set_double(v.to_number(env) + v.to_number(env)) instead !
 	void	operator+=(const as_value& v) { set_double(to_number() + v.to_number()); }

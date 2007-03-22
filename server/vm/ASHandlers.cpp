@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.72 2007/03/21 17:59:17 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.73 2007/03/22 00:30:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -767,7 +767,7 @@ SWFHandlers::ActionLessThan(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(2);
-    env.top(1).set_bool(env.top(1) < env.top(0));
+    env.top(1).set_bool(env.top(1).to_number() < env.top(0).to_number());
     env.drop(1);
 }
 
@@ -2409,17 +2409,34 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 void
 SWFHandlers::ActionNewLessThan(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
+	//GNASH_REPORT_FUNCTION;
 
-    thread.ensureStack(2); 
+	as_environment& env = thread.env;
 
-    if ( env.top(1).is_string() ) {
-        env.top(1).set_bool(env.top(1).to_tu_string() < env.top(0).to_tu_string());
-    } else {
-        env.top(1).set_bool(env.top(1) < env.top(0));
-    }
-    env.drop(1);
+	thread.ensureStack(2); 
+
+	as_value& operand1 = env.top(1);
+	as_value& operand2 = env.top(0);
+
+	if ( operand1.is_string() && operand2.is_string() )
+	{
+		env.top(1).set_bool(operand1.to_std_string() < operand2.to_std_string());
+	}
+	else 
+	{
+		double op1 = operand1.to_number();
+		double op2 = operand2.to_number();
+
+		if ( isnan(op1) || isnan(op2) )
+		{
+			env.top(1).set_undefined();
+		}
+		else
+		{
+			env.top(1).set_bool(op1<op2);
+		}
+	}
+	env.drop(1);
 }
 
 void
@@ -2958,15 +2975,34 @@ SWFHandlers::ActionStrictEq(ActionExec& thread)
 void
 SWFHandlers::ActionGreater(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-    as_environment& env = thread.env;
-    thread.ensureStack(2); 
-    if (env.top(1).is_string()) {
-        env.top(1).set_bool(env.top(1).to_tu_string() > env.top(0).to_tu_string());
-    } else {
-        env.top(1).set_bool(env.top(1).to_number() > env.top(0).to_number());
-    }
-    env.drop(1);
+	//GNASH_REPORT_FUNCTION;
+
+	as_environment& env = thread.env;
+
+	thread.ensureStack(2); 
+
+	as_value& operand1 = env.top(1);
+	as_value& operand2 = env.top(0);
+
+	if ( operand1.is_string() && operand2.is_string() )
+	{
+		env.top(1).set_bool(operand1.to_std_string() > operand2.to_std_string());
+	}
+	else 
+	{
+		double op1 = operand1.to_number();
+		double op2 = operand2.to_number();
+
+		if ( isnan(op1) || isnan(op2) )
+		{
+			env.top(1).set_undefined();
+		}
+		else
+		{
+			env.top(1).set_bool(op1 > op2);
+		}
+	}
+	env.drop(1);
 }
 
 void
