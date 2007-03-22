@@ -141,7 +141,7 @@ PropertyList::getProperty(const std::string& key)
 std::pair<bool,bool>
 PropertyList::delProperty(const std::string& key)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 	iterator it=find(key);
 	if ( it == end() ){
 		return std::make_pair(false,false);
