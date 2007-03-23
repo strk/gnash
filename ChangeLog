@@ -1,5 +1,10 @@
 2007-03-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
+	* server/asobj/NetStreamFfmpeg.cpp: Fixed getting time when
+	  decoder isn't initialized.
+
+2007-03-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
 	* backend/sound_handler_sdl.cpp: Count videos sounds.
 	* libbase/FLVParser.{h,cpp}: Added. Our own homegrown FLV parser.
 	* libbase/LoadThread.{h,cpp}: Use auto_ptr<tu_file> instead of tu_file,

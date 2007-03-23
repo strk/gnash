@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.23 2007/03/23 00:30:10 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.24 2007/03/23 07:52:07 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -820,13 +820,13 @@ NetStreamFfmpeg::seek(double pos)
 {
 	boost::mutex::scoped_lock  lock(decoding_mutex);
 
-	long newpos;
+	long newpos = 0;
 	double timebase;
 
 	// Seek to new position
 	if (m_isFLV) {
 		newpos = m_parser->seek(static_cast<uint32_t>(pos*1000));
-	} else {
+	} else if (m_FormatCtx) {
 
 		timebase = static_cast<double>(m_FormatCtx->streams[m_video_index]->time_base.num) / static_cast<double>(m_FormatCtx->streams[m_video_index]->time_base.den);
 		newpos = static_cast<long>(pos / timebase);
@@ -835,6 +835,8 @@ NetStreamFfmpeg::seek(double pos)
 			log_warning("seeking failed");
 			return;
 		}
+	} else {
+		return;
 	}
 
 	// This is kindof hackish and ugly :-(
