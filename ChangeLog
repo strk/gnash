@@ -1,3 +1,24 @@
+2007-03-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Count videos sounds.
+	* libbase/FLVParser.{h,cpp}: Added. Our own homegrown FLV parser.
+	* libbase/LoadThread.{h,cpp}: Use auto_ptr<tu_file> instead of tu_file,
+	  and added the isPositionConfirmed() function.
+	* libbase/Makefile.am: Added FLVParser.{h,cpp}.
+	* macros/libXML.m4: A fix for when using --with-libxml-incl
+	* server/video_stream_instance.cpp: Use Advance to investigate if a new
+	  video frame is ready, and decide if the bouds should be invalidated.
+	* server/asobj/NetConnection.{h,cpp}: Pass a auto_ptr<tu_file> to 
+	  LoadThread. Always check if the loader exists before using it.
+	  Added connectParser to make it possible for the parser to access the file.
+	* server/asobj/NetStream.{h,cpp}: Implemented setBufferTime and onStatus.
+	* server/asobj/NetStreamFfmpeg.{h,cpp}: Use the new FLVParser when we
+	  play a FLV. Added more comments. Implemented setBufferTime, and made
+	  things ready for onStatus.
+	* server/asobj/NetStreamGst.{cpp,h}: Added stubs and small updates to 
+	  keep up with NetStreamFfmpeg. Some work on supporting the -r1 switch.
+	* server/asobj/SoundGst.cpp: Removed a printf.
+
 2007-03-22 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: two more successes.

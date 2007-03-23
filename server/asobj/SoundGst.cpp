@@ -263,7 +263,6 @@ SoundGst::start(int offset, int loops)
 		}
 		// start playing	
 		gst_element_set_state (pipeline, GST_STATE_PLAYING);
-printf("playback started\n");
 
 	}
 

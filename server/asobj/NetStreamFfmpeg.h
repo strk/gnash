@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.14 2007/03/09 14:38:29 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.15 2007/03/23 00:30:10 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -43,6 +43,8 @@
 #include "StreamProvider.h"	
 #include "NetStream.h" // for inheritance
 
+#include "FLVParser.h"
+
 namespace gnash {
   
 struct raw_videodata_t
@@ -58,7 +60,7 @@ struct raw_videodata_t
 
 	~raw_videodata_t()
 	{
-		delete [] m_data;
+		if (m_size > 0) delete [] m_data;
 	};
 
 	int m_stream_index;
@@ -144,12 +146,16 @@ public:
 	void pause(int mode);
 	int play(const char* source);
 	void seek(double pos);
-	void setBufferTime();
+	void setBufferTime(double time);
 	void set_status(const char* code);
 	void setNetCon(as_object* nc);
 	int64_t time();
 	long bytesLoaded();
 	long bytesTotal();
+	void advance();
+	bool newFrameReady();
+	as_function* getStatusHandler();
+	void setStatusHandler(as_function*);
 
 	// Used for ffmpeg data read and seek callbacks
 	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
@@ -194,10 +200,12 @@ private:
 	AVCodecContext *m_ACodecCtx;
 	AVStream* m_audio_stream;
 
+	// the format (mp3, avi, etc.)
 	AVFormatContext *m_FormatCtx;
 
 	AVFrame* m_Frame;
 
+	// Use for resampling audio
 	ReSampleContext *m_Resample;
 
 	boost::thread *m_thread;
@@ -206,24 +214,55 @@ private:
 	boost::mutex start_mutex;
 	boost::mutex::scoped_lock *lock;
 
+	// Are the playing loop running or not
 	volatile bool m_go;
 	unsigned int runtime;
 
+	// The image/videoframe which is given to the renderer
 	image::image_base* m_imageframe;
 
+	// The current time-position of the video
 	double m_video_clock;
 
+	// The queues of audio and video data.
 	multithread_queue <raw_videodata_t*> m_qaudio;
 	multithread_queue <raw_videodata_t*> m_qvideo;
+
+	// paused or not
 	bool m_pause;
+
+	// The time ws started playing
 	double m_start_clock;
 	raw_videodata_t* m_unqueued_data;
 
 	ByteIOContext ByteIOCxt;
-	tu_file* input;
+
+	// The position in the inputfile, only used when not playing a FLV
 	long inputPos;
-	StreamProvider streamProvider;
+
 	std::string url;
+
+	// The homegrown parser we use for FLV
+	FLVParser* m_parser;
+
+	// Are we playing a FLV?
+	bool m_isFLV;
+
+	// Are a new frame ready to be returned?
+	volatile bool m_newFrameReady;
+
+	// The size of the buffer in milliseconds
+	uint32_t m_bufferTime;
+
+	// The status message
+	std::string m_status;
+
+	// Has the status message been updated?
+	volatile bool m_statusChanged;
+
+	// The handler which is invoked on status change
+	boost::intrusive_ptr<as_function> m_statusHandler;
+
 };
 
 } // gnash namespace

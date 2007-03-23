@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.cpp,v 1.16 2007/03/20 15:01:20 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.17 2007/03/23 00:30:10 tgc Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -26,6 +26,7 @@
 #include "render.h"
 #include "Range2d.h"
 #include "builtin_function.h" // for getter/setter properties
+#include "VM.h"
 
 namespace gnash {
 
@@ -83,7 +84,6 @@ video_stream_instance::display()
 	matrix m = get_world_matrix();
 	rect bounds(0.0f, 0.0f, PIXELS_TO_TWIPS(m_def->m_width), PIXELS_TO_TWIPS(m_def->m_height));
 
-
 	// If this is a video from a NetStream object, retrieve a video frame from there.
 	if (_ns)
 	{
@@ -119,6 +119,10 @@ video_stream_instance::display()
 void
 video_stream_instance::advance(float /*delta_time*/)
 {
+	if (_ns) {
+		_ns->advance();
+		if (_ns->newFrameReady()) set_invalidated();
+	}
 }
 
 void

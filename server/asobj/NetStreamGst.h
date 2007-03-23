@@ -44,12 +44,16 @@ public:
 	void pause(int mode);
 	int play(const char* source);
 	void seek(double pos);
-	void setBufferTime();
+	void setBufferTime(double time);
 	void set_status(const char* code);
 	void setNetCon(as_object* nc);
 	int64_t time();
 	long bytesLoaded();
 	long bytesTotal();
+	void advance();
+	bool newFrameReady();
+	as_function* getStatusHandler();
+	void setStatusHandler(as_function*);
 
 	// Used for gstreamer data read and seek callbacks
 	static int readPacket(void* opaque, char* buf, int buf_size);
@@ -88,8 +92,10 @@ private:
 	GstElement *videoflip;
 	GstElement *audioconv;
 
+	// Are the playing loop running or not
 	volatile bool m_go;
 
+	// The image/videoframe which is given to the renderer
 	image::image_base* m_imageframe;
 
 	boost::thread *startThread;
@@ -101,6 +107,21 @@ private:
 	// video info
 	int videowidth;
 	int videoheight;
+
+	volatile bool m_newFrameReady;
+	
+	// The size of the buffer in milliseconds
+	uint32_t m_bufferTime;
+
+	// The status message
+	std::string m_status;
+
+	// Has the status message been updated?
+	volatile bool m_statusChanged;
+
+	// The handler which is invoked on status change
+	boost::intrusive_ptr<as_function> m_statusHandler;
+
 };
 
 } // gnash namespace

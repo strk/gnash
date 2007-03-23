@@ -76,8 +76,8 @@ NetStreamGst::NetStreamGst():
 	m_pause(false),
 	inputPos(0),
 	videowidth(0),
-	videoheight(0)
-
+	videoheight(0),
+	m_newFrameReady(false)
 {
 }
 
@@ -89,8 +89,7 @@ NetStreamGst::~NetStreamGst()
 // called from avstreamer thread
 void NetStreamGst::set_status(const char* /*code*/)
 {
-	//m_netstream_object->init_member("onStatus_Code", code);
-	//push_video_event(this);
+
 }
 
 void NetStreamGst::pause(int mode)
@@ -254,6 +253,7 @@ NetStreamGst::callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*p
 			video->m_size = copied;*/
 		} else {
 			ns->m_imageframe->update(GST_BUFFER_DATA(buffer));
+			ns->m_newFrameReady = true;
 		}
 
 	}
@@ -285,26 +285,46 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	// setup the pipeline
 	ns->pipeline = gst_pipeline_new (NULL);
 
-	// create an audio sink - use oss, alsa or...? make a commandline option?
-	// we first try atudetect, then alsa, then oss, then esd, then...?
-	// If the gstreamer adder ever gets fixed this should be connected to the
-	// adder in the soundhandler.
-#if !defined(__NetBSD__)
-	ns->audiosink = gst_element_factory_make ("autoaudiosink", NULL);
-	if (!ns->audiosink) ns->audiosink = gst_element_factory_make ("alsasink", NULL);
-	if (!ns->audiosink) ns->audiosink = gst_element_factory_make ("osssink", NULL);
-#endif
-	if (!ns->audiosink) ns->audiosink = gst_element_factory_make ("esdsink", NULL);
-
 	// Check if the creation of the gstreamer pipeline and audiosink was a succes
 	if (!ns->pipeline) {
 		gnash::log_error("The gstreamer pipeline element could not be created\n");
 		return;
 	}
-	if (!ns->audiosink) {
-		gnash::log_error("The gstreamer audiosink element could not be created\n");
+
+	// If sound is enabled we set it up
+	sound_handler* sound = get_sound_handler();
+	if (sound) {
+		// create an audio sink - use oss, alsa or...? make a commandline option?
+		// we first try autodetect, then alsa, then oss, then esd, then...?
+		// If the gstreamer adder ever gets fixed this should be connected to the
+		// adder in the soundhandler.
+#if !defined(__NetBSD__)
+		ns->audiosink = gst_element_factory_make ("autoaudiosink", NULL);
+		if (!ns->audiosink) ns->audiosink = gst_element_factory_make ("alsasink", NULL);
+		if (!ns->audiosink) ns->audiosink = gst_element_factory_make ("osssink", NULL);
+#endif
+		if (!ns->audiosink) ns->audiosink = gst_element_factory_make ("esdsink", NULL);
+
+		if (!ns->audiosink) {
+			gnash::log_error("The gstreamer audiosink element could not be created\n");
+			return;
+		}
+	} else {
+		ns->audiosink = gst_element_factory_make ("fakesink", NULL);
+	}
+
+	// setup the audio converter
+	ns->audioconv = gst_element_factory_make ("audioconvert", NULL);
+
+	// setup the volume controller
+	ns->volume = gst_element_factory_make ("volume", NULL);
+
+	if (!ns->audioconv || !ns->volume) {
+		gnash::log_error("Gstreamer audio element(s) for movie handling could not be created\n");
 		return;
 	}
+
+	gst_bin_add_many (GST_BIN (ns->pipeline),ns->audiosink, ns->audioconv, NULL);
 
 	// setup gnashnc source (our homegrown source element)
 	ns->source = gst_element_factory_make ("gnashsrc", NULL);
@@ -313,11 +333,6 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	gc->seek = NetStreamGst::seekMedia;
 	g_object_set (G_OBJECT (ns->source), "data", ns, "callbacks", gc, NULL);
 
-	// setup the audio converter
-	ns->audioconv = gst_element_factory_make ("audioconvert", NULL);
-
-	// setup the volume controller
-	ns->volume = gst_element_factory_make ("volume", NULL);
 
 	// setup the decoder with callback
 	ns->decoder = gst_element_factory_make ("decodebin", NULL);
@@ -345,21 +360,23 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	g_object_set (G_OBJECT (ns->videosink), "signal-handoffs", TRUE, "sync", TRUE, NULL);
 	g_signal_connect (ns->videosink, "handoff", G_CALLBACK (NetStreamGst::callback_output), ns);
 
-	if (!ns->source || !ns->audioconv || !ns->volume || !ns->decoder || !ns->colorspace || !ns->videocaps || !ns->videorate || !ns->videosink) {
-		gnash::log_error("Gstreamer element(s) for movie handling could not be created\n");
+	if (!ns->source || !ns->decoder || !ns->colorspace || !ns->videocaps || !ns->videorate || !ns->videosink) {
+		gnash::log_error("Gstreamer element(s) for video movie handling could not be created\n");
 		return;
 	}
 
 	// put it all in the pipeline
-	gst_bin_add_many (GST_BIN (ns->pipeline), ns->source, ns->decoder, ns->audiosink, ns->audioconv, ns->colorspace, ns->videosink, ns->videorate, ns->videocaps, ns->volume, NULL);
+	gst_bin_add_many (GST_BIN (ns->pipeline), ns->source, ns->decoder, ns->colorspace, ns->videosink, ns->videorate, ns->videocaps, ns->volume, NULL);
 
 	// link the elements
 	gst_element_link(ns->source, ns->decoder);
-	gst_element_link_many(ns->audioconv, ns->volume, ns->audiosink, NULL);
 	gst_element_link_many(ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
+
+	gst_element_link_many(ns->audioconv, ns->volume, ns->audiosink, NULL);
 	
 	// start playing	
 	gst_element_set_state (ns->pipeline, GST_STATE_PLAYING);
+
 	return;
 }
 
@@ -371,18 +388,39 @@ image::image_base* NetStreamGst::get_video()
 void
 NetStreamGst::seek(double pos)
 {
-
 	if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
 		GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(pos),
 		GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
 		log_warning("Seek failed");
 	}
+
 }
 
 void
-NetStreamGst::setBufferTime()
+NetStreamGst::setBufferTime(double time)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+	// The argument is in seconds, but we store in milliseconds
+    m_bufferTime = static_cast<uint32_t>(time*1000);
+}
+
+void
+NetStreamGst::advance()
+{
+/*	if (m_go && m_pause && !m_imageframe && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
+		set_status("NetStream.Buffer.Full");
+		m_pause = false;
+	}
+*/
+	if (m_statusChanged) {
+/*		fn_call dummy(NULL, NULL, 0, 0);
+		as_value info_asv(infoobject_new(dummy));
+		boost::intrusive_ptr<as_object> info = info_asv.to_object();
+
+		fn_call fn(this, v, 0, 0);
+
+		m_statusHandler.get()->call(fn);*/
+
+	}
 }
 
 int64_t
@@ -399,6 +437,8 @@ NetStreamGst::time()
 	ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
 
 	if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
+		pos = pos / 1000000000;
+
 		return pos;
 	} else {
 		return 0;
@@ -415,6 +455,29 @@ long
 NetStreamGst::bytesTotal()
 {
 	return _netCon->getBytesTotal();
+}
+
+bool
+NetStreamGst::newFrameReady()
+{
+	if (m_newFrameReady) {
+		m_newFrameReady = false;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+as_function* 
+NetStreamGst::getStatusHandler()
+{
+	return m_statusHandler.get();
+}
+
+void 
+NetStreamGst::setStatusHandler(as_function* handler)
+{
+	m_statusHandler = handler;
 }
 
 // Gstreamer callback function

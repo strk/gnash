@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.48 2007/02/21 19:18:45 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.49 2007/03/23 00:30:10 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -490,6 +490,8 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 	}
 	m_aux_streamer[owner] = ptr;
 
+	++soundsPlaying;
+
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
 			gnash::log_error("Unable to START SOUND: %s.", SDL_GetError());
@@ -503,6 +505,7 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 
 void	SDL_sound_handler::detach_aux_streamer(void* owner)
 {
+	--soundsPlaying;
 	m_aux_streamer.erase(owner);
 }
 
@@ -760,7 +763,10 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 			SDL_sound_handler::aux_streamer_ptr aux_streamer = it->second; //handler->m_aux_streamer[i]->ptr;
 			void* owner = it->first;
 			bool ret = (aux_streamer)(owner, buf, buffer_length);
-			if (!ret) handler->m_aux_streamer.erase(it);
+			if (!ret) {
+				handler->m_aux_streamer.erase(it);
+				handler->soundsPlaying--;
+			}
 			SDL_MixAudio(stream, buf, buffer_length, SDL_MIX_MAXVOLUME);
 
 		}

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.21 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: NetConnection.h,v 1.22 2007/03/23 00:30:10 tgc Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -25,6 +25,7 @@
 
 #include "tu_file.h"
 #include "LoadThread.h"
+#include "FLVParser.h"
 
 #include <stdexcept>
 #include <cstdio>
@@ -79,6 +80,8 @@ public:
 	///	Returns the total size of the file
 	long getBytesTotal();
 
+	/// Connects FLV parser with the LoadThread
+	bool connectParser(FLVParser* parser);
 
 private:
 
@@ -86,7 +89,7 @@ private:
 	std::string _url;
 
 	/// the as_object which owns the connection
-	as_object* _owner;
+	boost::intrusive_ptr<as_object> _owner;
 
 	/// The file/stream loader thread and interface
 	LoadThread* _loader;

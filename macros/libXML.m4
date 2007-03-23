@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: libXML.m4,v 1.28 2007/01/21 22:41:03 rsavoye Exp $
+dnl $Id: libXML.m4,v 1.29 2007/03/23 00:30:10 tgc Exp $
 
 AC_DEFUN([GNASH_PATH_LIBXML], [
   has_xml=no
@@ -22,10 +22,10 @@ AC_DEFUN([GNASH_PATH_LIBXML], [
   AC_ARG_WITH(libxml-incl, AC_HELP_STRING([--with-libxml-incl], [directory where libxml2 header is]), with_libxml_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_libxml_incl, [
     if test x"${with_libxml_incl}" != x ; then
-      if test -f ${with_libxml_incl}/xmlmemory.h ; then
+      if test -f ${with_libxml_incl}/libxml/xmlmemory.h ; then
         ac_cv_path_libxml_incl=-I`(cd ${with_libxml_incl}; pwd)`
       else
-        AC_MSG_ERROR([${with_libxml_incl} directory doesn't contain xmlmemory.h])
+        AC_MSG_ERROR([${with_libxml_incl} directory doesn't contain libxml/xmlmemory.h])
       fi
     fi
   ])

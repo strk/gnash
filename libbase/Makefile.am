@@ -21,11 +21,14 @@ EXTRA_DIST =
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
-lib_LTLIBRARIES = libgnashbase.la
+lib_LTLIBRARIES = \
+	libgnashbase.la
+	libgnashamf.la
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I.. -I$(srcdir) \
 	-I$(top_srcdir)	\
+	-I$(top_srcdir)/libamf	\
 	-I$(top_srcdir)/server	\
 	-I$(top_srcdir)/server/swf	\
 	$(PTHREAD_CFLAGS) \
@@ -96,8 +99,8 @@ libgnashbase_la_SOURCES = \
 	zlib_adapter.cpp \
 	Thread.cpp \
 	URL.cpp \
-	LoadThread.cpp
-
+	LoadThread.cpp \
+	FLVParser.cpp
 
 noinst_HEADERS = \
 	container.h \
@@ -136,7 +139,8 @@ noinst_HEADERS = \
 	zlib_adapter.h \
 	Thread.h \
 	URL.h \
-	LoadThread.h
+	LoadThread.h \
+	FLVParser.h
 
 if USE_SOUND_GST
 libgnashbase_la_SOURCES += gstgnashsrc.c embedVideoDecoderGst.cpp

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.31 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.32 2007/03/23 00:30:10 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -61,7 +61,7 @@ NetConnection::NetConnection()
 }
 
 NetConnection::~NetConnection() {
-
+	if (_loader) delete _loader;
 }
 
 /// Open a connection to stream FLV files.
@@ -95,7 +95,7 @@ bool NetConnection::openConnection(const char* char_url, as_object* owner)
 		return false;
 	}
 
-	_loader = new LoadThread(StreamProvider::getDefaultInstance().getStream(uri));
+	_loader = new LoadThread(std::auto_ptr<tu_file>(StreamProvider::getDefaultInstance().getStream(uri)));
 
 	return true;
 }
@@ -113,7 +113,7 @@ NetConnection::addToURL(const char* url)
 bool
 NetConnection::eof()
 {
-
+	if (!_loader) return true;
 	return _loader->eof();
 }
 
@@ -121,6 +121,7 @@ NetConnection::eof()
 size_t
 NetConnection::read(void *dst, size_t bytes)
 {
+	if (!_loader) return 0;
 	return _loader->read(dst, bytes);
 }
 
@@ -128,6 +129,7 @@ NetConnection::read(void *dst, size_t bytes)
 bool
 NetConnection::seek(size_t pos)
 {
+	if (!_loader) return false;
 	return _loader->seek(pos);
 
 }
@@ -136,6 +138,7 @@ NetConnection::seek(size_t pos)
 size_t
 NetConnection::tell()
 {
+	if (!_loader) return 0;
 	return _loader->tell();
 
 }
@@ -144,6 +147,7 @@ NetConnection::tell()
 long
 NetConnection::getBytesLoaded()
 {
+	if (!_loader) return 0;
 	return _loader->getBytesLoaded();
 }
 
@@ -152,9 +156,18 @@ NetConnection::getBytesLoaded()
 long
 NetConnection::getBytesTotal()
 {
+	if (!_loader) return 0;
 	return _loader->getBytesLoaded();
 }
 
+bool
+NetConnection::connectParser(FLVParser* parser)
+{
+	if (_loader == NULL) return false;
+
+	parser->setLoadThread(_loader);
+	return true;
+}
 
 /// \brief callback to instantiate a new NetConnection object.
 /// \param fn the parameters from the Flash movie

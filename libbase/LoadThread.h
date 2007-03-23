@@ -16,7 +16,10 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.h,v 1.2 2007/03/09 23:15:57 tgc Exp $
+#ifndef __LOADTHREAD_H__
+#define __LOADTHREAD_H__
+
+// $Id: LoadThread.h,v 1.3 2007/03/23 00:30:10 tgc Exp $
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp>
@@ -27,9 +30,12 @@
 /// \brief
 /// The LoadThread class can be used to download from a file
 /// or stream using a thread, without having to block.
-/// When the object is created it starts a thread which downloads
-/// from the tu_file given as an argument to the constructor, and
-/// keeps downloading until the download is complete. It is possible
+///
+/// When the object is created it starts a thread which seeks forward
+/// in the tu_file given as an argument to the constructor, which will
+/// make cause the tu_file backend to download the amount of data needed
+/// to complete the seek. This is repeated until the complete file is
+/// downloaded. It is possible
 /// for the object owner to query for data, position, loaded data,
 /// total data while downloading, without blocking. Though if there has 
 /// not been downloaded enough data to accomendate a request (seek/read)
@@ -47,7 +53,9 @@ class LoadThread
 public:
 	/// Creating the object starts the threaded loading 
 	/// of the stream/file passed as an argument.
-	LoadThread(tu_file* stream);
+	LoadThread(std::auto_ptr<tu_file> stream);
+
+	/// Stops the download if still running
 	~LoadThread();
 
 	/// Put read pointer at given position
@@ -67,7 +75,7 @@ public:
 	/// Report global position within the file
 	size_t tell();
 
-	///	Returns the number of bytes cached
+	///	Returns the number of bytes known to be accessable
 	long getBytesLoaded();
 
 	///	Returns the total size of the file
@@ -75,6 +83,9 @@ public:
 
 	/// Check if the load is completed
 	bool completed();
+
+	/// Check if given position is confirmed to be accessable
+	bool isPositionConfirmed(size_t pos);
 
 private:
 
@@ -100,3 +111,4 @@ private:
 	long _actualPosition;
 };
 
+#endif // __LOADTHREAD_H__
