@@ -1,5 +1,7 @@
 2007-03-24 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (readPlaceActions): gracely handle
+	  malformed SWF produced by some old snapshot of Ming CVS.
 	* testsuite/misc-ming.all/Makefile.am:
 	  Don't try to build tests unsupported by 
 	  the installed Ming version.

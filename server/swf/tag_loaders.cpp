@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.80 2007/03/22 10:51:49 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.81 2007/03/24 14:34:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -850,6 +850,18 @@ public:
 			}
 
 			uint32_t event_length = in->read_u32();
+			if ( in->get_tag_end_position()-in->get_position() <  event_length )
+			{
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror("swf_event::read(), "
+					"even_length = %u, but only %u bytes left "
+					"to the end of current tag."
+					" Breaking for safety.",
+					event_length, in->get_tag_end_position()-in->get_position());
+				);
+				break;
+			}
+
 			uint8 ch = key::INVALID;
 
 			if (flags & (1 << 17))	// has keypress event
