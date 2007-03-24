@@ -1,3 +1,12 @@
+2007-03-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/LoadThread.{cpp,h}: Changed so that it is possible to
+	  check if the stream is valid.
+	* server/StreamProvider.cpp: Check if local file exists before
+	  creating the tu_file.
+	* server/asobj/NetConnection.cpp: Changed to work with the
+	  LoadThread changes. Added an assert for a valid URL.
+
 2007-03-24 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (readPlaceActions): gracely handle

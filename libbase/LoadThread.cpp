@@ -16,29 +16,37 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.2 2007/03/23 00:30:10 tgc Exp $
+// $Id: LoadThread.cpp,v 1.3 2007/03/24 14:36:47 tgc Exp $
 
 #include "LoadThread.h"
 
-LoadThread::LoadThread(std::auto_ptr<tu_file> stream)
+LoadThread::LoadThread()
 	:
-	_stream(stream),
 	_bytesLoaded(0),
 	_completed(false),
 	_loadPosition(0),
 	_userPosition(0),
 	_actualPosition(0)
 {
-
-	// Start the downloading.
-	_thread.reset( new boost::thread(boost::bind(LoadThread::downloadThread, this)) );
 }
-
 
 LoadThread::~LoadThread()
 {
 	// stop the download thread if it's still runnning
 	completed();
+}
+
+bool LoadThread::setStream(std::auto_ptr<tu_file> stream)
+{
+	_stream = stream;
+	if (_stream.get() != NULL) {
+		// Start the downloading.
+		_thread.reset( new boost::thread(boost::bind(LoadThread::downloadThread, this)) );
+
+		return true;
+	} else {
+		return false;
+	}
 }
 
 bool LoadThread::seek(size_t pos)
@@ -150,5 +158,5 @@ void LoadThread::download()
 bool LoadThread::isPositionConfirmed(size_t pos)
 {
 	boost::mutex::scoped_lock lock(_mutex);
-	return (static_cast<uint32_t>(pos) <= _loadPosition);
+	return (static_cast<int32_t>(pos) <= _loadPosition);
 }

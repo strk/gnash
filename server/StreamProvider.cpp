@@ -75,7 +75,11 @@ StreamProvider::getStream(const URL& url)
 		}
 		else
 		{
-        		return new tu_file(path.c_str(), "rb");
+			FILE *newin = fopen(path.c_str(), "rb");
+			if (!newin)  { 
+				return NULL;
+			}
+			return new tu_file(newin, false);
 		}
 	}
 	else
@@ -111,7 +115,11 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 		}
 		else
 		{
-        		return new tu_file(path.c_str(), "rb");
+			FILE *newin = fopen(path.c_str(), "rb");
+			if (!newin)  { 
+				return NULL;
+			}
+			return new tu_file(newin, false);
 		}
 	}
 	else

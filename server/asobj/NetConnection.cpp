@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.32 2007/03/23 00:30:10 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.33 2007/03/24 14:36:47 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -87,7 +87,8 @@ bool NetConnection::openConnection(const char* char_url, as_object* owner)
 
 	URL uri(_url, get_base_url());
 
-	_url = uri.str().c_str();
+	_url = uri.str();
+	assert(_url.find("://")!=string::npos);
 
 	// Check if we're allowed to open url
 	if (!URLAccessManager::allow(uri)) {
@@ -95,7 +96,15 @@ bool NetConnection::openConnection(const char* char_url, as_object* owner)
 		return false;
 	}
 
-	_loader = new LoadThread(std::auto_ptr<tu_file>(StreamProvider::getDefaultInstance().getStream(uri)));
+	_loader = new LoadThread();
+	
+	if (!_loader->setStream(std::auto_ptr<tu_file>(StreamProvider::getDefaultInstance().getStream(uri)))) {
+		log_warning("Gnash could not open this url:%s", _url.c_str());
+		delete _loader;
+		return false;
+	}
+
+	log_msg("Connection etablished to movie: %s\n", _url.c_str());
 
 	return true;
 }

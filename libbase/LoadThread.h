@@ -19,7 +19,7 @@
 #ifndef __LOADTHREAD_H__
 #define __LOADTHREAD_H__
 
-// $Id: LoadThread.h,v 1.3 2007/03/23 00:30:10 tgc Exp $
+// $Id: LoadThread.h,v 1.4 2007/03/24 14:36:47 tgc Exp $
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp>
@@ -51,12 +51,15 @@ class LoadThread
 {
 
 public:
-	/// Creating the object starts the threaded loading 
-	/// of the stream/file passed as an argument.
-	LoadThread(std::auto_ptr<tu_file> stream);
+	/// Just sets up the object
+	LoadThread();
 
 	/// Stops the download if still running
 	~LoadThread();
+
+	/// Sets the stream used for the connection, and starts the download
+	/// is the stream is valid. Returns true is the stream is valid, and else false.
+	bool setStream(std::auto_ptr<tu_file> stream);
 
 	/// Put read pointer at given position
 	/// Will block if there is not enough data buffered,
