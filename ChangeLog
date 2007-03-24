@@ -1,3 +1,9 @@
+2007-03-24 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am:
+	  Don't try to build tests unsupported by 
+	  the installed Ming version.
+
 2007-03-24 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/as_function.cpp: Partially revert changes related to fn_call

@@ -761,7 +761,6 @@ TEST_CASES = \
 	DefineEditTextVariableNameTest-Runner \
 	RollOverOutTest-Runner \
 	ButtonEventsTest-Runner \
-	VarAndCharClashTest-Runner \
 	timeline_var_test-Runner \
 	root_stop_testrunner \
 	loop_test-Runner \
@@ -778,9 +777,7 @@ TEST_CASES = \
 	action_execution_order_testrunner \
 	action_execution_order_extend_testrunner \
 	simple_loop_testrunner \
-	KeyTest-Runner \
 	loadMovieTestRunner \
-	intervalTestRunner \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
 	action_execution_order_test1runner \
@@ -792,6 +789,8 @@ TEST_CASES = \
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 TEST_CASES += KeyTest-Runner \
+	VarAndCharClashTest-Runner \
+	intervalTestRunner \
 	gotoFrame2Test-Runner 
 endif
 
