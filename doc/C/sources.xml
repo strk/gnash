@@ -1160,7 +1160,8 @@
 	      used when you don't have hardware accelerated
 	      graphics. Typically most desktop machines have OpenGL
 	      support, and most embedded systems don't. OpenGl is the
-	      default when building Gnash.
+	      default when building Gnash, though the quality of AGG's
+	      rendering is currently superior to OpenGL.
 	    </para>
 	  </listitem>
 	</varlistentry>
