@@ -48,7 +48,7 @@ public:
 	boost::intrusive_ptr<as_object> this_ptr;
 
 	/// Number of arguments to this ActionScript function call.
-	const unsigned int nargs;
+	unsigned int nargs;
 
 public:
 	fn_call(as_object* this_in,
@@ -83,6 +83,11 @@ public:
 	int offset() const
 	{
 		return _stack_offset;
+	}
+
+	void set_offset(int offset)
+	{
+		_stack_offset = offset;
 	}
 
 	as_environment& env() const

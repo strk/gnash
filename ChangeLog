@@ -1,3 +1,10 @@
+2007-03-24 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/as_function.cpp: Partially revert changes related to fn_call
+	which mysteriously broke the testsuite.
+	* server/vm/fn_call.h: Make nargs non-const and add a setter for offset
+	so as_function can modify them.
+
 2007-03-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStreamFfmpeg.cpp: Fixed getting time when
