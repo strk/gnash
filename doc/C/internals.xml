@@ -47,7 +47,7 @@
       </sect4>
 
       <sect4 id="libgnashgui">
-	<title>libgnashui</title>
+	<title>libgnashgui</title>
 	
 	<para>
 	  Libgnashgui contains code for a portable GUI class that
