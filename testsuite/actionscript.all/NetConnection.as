@@ -47,27 +47,14 @@ if (tmp.connect) {
 
 // test the NetConnection::connect method
 tmp.connect();
-tmp.connect("rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv");
-
-if (tmp.geturl) {
-    xpass("NetConnection::getURL() exists");
-} else {
-    xfail("NetConnection::getURL() doesn't exist");
-}
-
-// Check the see if the URL got parsed right
-var url = tmp.geturl();
-var protocol = tmp.getprotocol();
-var host = tmp.gethost();
-var port = tmp.getport();
-var path = tmp.getpath();
-if (url == "rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv"
-	 && protocol == "rtmp"
-	 && host == "www.mediacollege.com"
-	 && path == "/flash/media-player/testclip-4sec.flv") {
-	xpass("NetConnection::connect() initialized correctly");
-} else {
+if ( ! tmp.connect("rtmp://www.mediacollege.com/flash/media-player/testclip-4sec.flv") )
+{
 	xfail("NetConnection::connect() didn't initialized correctly");
 }
+else
+{
+	xpass("NetConnection::connect() initialized correctly");
+}
+
 
 #endif // OUTPUT_VERSION >= 7

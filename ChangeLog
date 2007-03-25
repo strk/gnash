@@ -1,3 +1,9 @@
+2007-03-25 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/NetConnection.as:
+	  getURL doesn't exist, and connect returns
+	  a boolean value.
+
 2007-03-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/LoadThread.{cpp,h}: Changed so that it is possible to
