@@ -2,6 +2,8 @@
 
 	* configure.ac: reformat all "package not installed" messages
 	  to the same layout
+	* configure.ac: Fail during configure if AGG libraries not detected;
+	  AGG is no longer "experimental"
 
 2007-03-25 Sandro Santilli <strk@keybit.net>
 

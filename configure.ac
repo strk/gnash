@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.275 2007/03/25 11:55:58 martinwguy Exp $
+dnl $Id: configure.ac,v 1.276 2007/03/25 12:02:55 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -149,7 +149,7 @@ dnl fi
 
 AC_ARG_ENABLE(
  renderer,
- AC_HELP_STRING([--enable-renderer=engine], [Specify rendering engine: OpenGL, Agg (experimental) or Cairo (experimental) [[OpenGL]] ]),
+ AC_HELP_STRING([--enable-renderer=engine], [Specify rendering engine: OpenGL, Agg or Cairo (experimental) [[OpenGL]] ]),
  [case "${enableval}" in
    opengl|OpenGL) renderer=opengl ;;
    cairo|Cairo)  renderer=cairo  ;;
@@ -1393,7 +1393,7 @@ dnl      echo "          needs compatibility layer: $agg_need_compatibility_laye
       echo "               You need to have the AGG development package installed"
       echo "               to compile this project or install libagg-dev"
       echo "               (using apt-get) or agg-devel (using yum)."
-dnl    nogo=true
+      nogo=true
     fi
   else
     echo "Your installation of AGG appears to be version 2.4 or older. \
