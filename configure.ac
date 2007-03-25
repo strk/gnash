@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.276 2007/03/25 12:02:55 martinwguy Exp $
+dnl $Id: configure.ac,v 1.277 2007/03/25 12:57:20 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -54,7 +54,8 @@ AC_PROG_MAKE_SET
 
 AC_DISABLE_STATIC dnl Disable building static libs.
 
-AC_ARG_ENABLE(debugger, AC_HELP_STRING([--disable-debugger],[Disable the Flash debugger]),
+AC_ARG_ENABLE(debugger,
+  AC_HELP_STRING([--disable-debugger],[Disable the Flash debugger]),
 [case "${enableval}" in
   yes) debugger=yes ;;
   no)  debugger=no ;;
@@ -67,7 +68,8 @@ fi
 AM_CONDITIONAL(DEBUGGER, test x$debugger = xyes)
 
 dnl Write the file to disk in the plugin, if specified.
-AC_ARG_ENABLE(write, AC_HELP_STRING([--enable-write], [Makes the Mozilla plugin write the currently playing SWF movie to /tmp.]),
+AC_ARG_ENABLE(write,
+  AC_HELP_STRING([--enable-write], [Makes the Mozilla plugin write the currently playing SWF movie to /tmp.]),
 [case "${enableval}" in
   yes) write=yes ;;
   no)  write=no ;;
@@ -79,7 +81,8 @@ if test x"$write" = x"yes"; then
 fi
 
 dnl Don't build the extensions if specified.
-AC_ARG_ENABLE(extensions, AC_HELP_STRING([--enable-extensions], [Enable support for Gnash EXTENSIONS]),
+AC_ARG_ENABLE(extensions,
+  AC_HELP_STRING([--enable-extensions], [Enable support for Gnash EXTENSIONS]),
 [case "${enableval}" in
   yes) extensions=yes ;;
   no)  extensions=no ;;
@@ -89,7 +92,8 @@ esac],extensions=no)
 AM_CONDITIONAL(EXTENSIONS, test x$extensions = xyes)
 
 dnl Don't build the cygnal server if specified.
-AC_ARG_ENABLE(cygnal, AC_HELP_STRING([--disable-cygnal], [Disable support for the Cygnal server]),
+AC_ARG_ENABLE(cygnal,
+  AC_HELP_STRING([--disable-cygnal], [Disable support for the Cygnal server]),
 [case "${enableval}" in
   yes) cygnal=yes ;;
   no)  cygnal=no ;;
@@ -99,7 +103,8 @@ esac],cygnal=yes)
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
 
 dnl Fix the Intel 810 LOD bias problem
-AC_ARG_ENABLE(i810-lod-bias, AC_HELP_STRING([--enable-i810-lod-bias], [Enable fix for Intel 810 LOD bias problem]),
+AC_ARG_ENABLE(i810-lod-bias,
+  AC_HELP_STRING([--enable-i810-lod-bias], [Enable fix for Intel 810 LOD bias problem]),
 [case "${enableval}" in
   yes) i810lodbias=yes ;;
   no)  i810lodbias=no ;;
@@ -111,7 +116,8 @@ if test x$i810lodbias = xyes; then
 fi
 
 dnl Install the headers to make Gnash an SDK
-AC_ARG_ENABLE(sdkinstall, AC_HELP_STRING([--enable-sdk-install], [Enable installing the libraries and headers as an SDK]),
+AC_ARG_ENABLE(sdkinstall,
+  AC_HELP_STRING([--enable-sdk-install], [Enable installing the libraries and headers as an SDK]),
 [case "${enableval}" in
   yes) sdkinstall=yes ;;
   no)  sdkinstall=no ;;
@@ -121,16 +127,16 @@ esac], sdkinstall=no)
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
 dnl Add KFLASH support, if specified.
-AC_ARG_ENABLE(klash, AC_HELP_STRING([--disable-klash], [Disable support for Konqueror plugin]),
+AC_ARG_ENABLE(klash,
+  AC_HELP_STRING([--disable-klash], [Disable support for Konqueror plugin]),
 [case "${enableval}" in
   yes) klash=yes ;;
   no)  klash=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-klash option]) ;;
 esac],klash=yes)
 
-AC_ARG_ENABLE(
- gui,
- AC_HELP_STRING([--enable-gui=TOOLKIT], [Specify GUI toolkit: GTK, FLTK, RISCOS, FB (framebuffer), KDE or SDL[[GTK]] ]),
+AC_ARG_ENABLE(gui,
+  AC_HELP_STRING([--enable-gui=TOOLKIT], [Specify GUI toolkit: GTK, FLTK, RISCOS, FB (framebuffer), KDE or SDL[[GTK]] ]),
  [case "${enableval}" in
    gtk|GTK) gui=gtk ;;
    sdl|SDL) gui=sdl  ;;
@@ -147,9 +153,8 @@ dnl if test x"$klash" = xyes -a x"$gui" != xkde; then
 dnl   AC_MSG_ERROR([You must use the kde GUI ( --enable-gui=KDE ) if you enable klash.])
 dnl fi
 
-AC_ARG_ENABLE(
- renderer,
- AC_HELP_STRING([--enable-renderer=engine], [Specify rendering engine: OpenGL, Agg or Cairo (experimental) [[OpenGL]] ]),
+AC_ARG_ENABLE(renderer,
+  AC_HELP_STRING([--enable-renderer=engine], [Specify rendering engine: OpenGL, Agg or Cairo (experimental) [[OpenGL]] ]),
  [case "${enableval}" in
    opengl|OpenGL) renderer=opengl ;;
    cairo|Cairo)  renderer=cairo  ;;
@@ -187,8 +192,7 @@ dnl 16 bit: RGB555, RGB565
 dnl 24 bit: RGB24, BGR24
 dnl 32 bit: RGBA32, BGRA32
 pixelformat=all
-AC_ARG_WITH(
-  pixelformat,
+AC_ARG_WITH(pixelformat,
   AC_HELP_STRING([--with-pixelformat=], [Use the specified pixel format for AGG]),
   if test -n ${withval}; then
     pixelformat="${withval}"
@@ -246,8 +250,7 @@ dnl --------------------------------------------------------
 dnl  Select sound streamer
 dnl --------------------------------------------------------
 
-AC_ARG_ENABLE(
- sound,
+AC_ARG_ENABLE(sound,
  AC_HELP_STRING([--enable-sound=handler], [Enable sound support using the specified handler: SDL, GST (Gstreamer) or none (no sound) [[SDL]] ]),
  [case "${enableval}" in
    GST|gst) sound_handler=gst ;;
@@ -262,8 +265,7 @@ dnl --------------------------------------------------------
 dnl  Select mp3 decoder (only for 'sdl' sound)
 dnl --------------------------------------------------------
 
-AC_ARG_WITH(
- mp3-decoder,
+AC_ARG_WITH(mp3-decoder,
  AC_HELP_STRING([--with-mp3-decoder=DECODER], [Use the specified mp3 decoder: ffmpeg, mad (libmad) or none [[none]]]),
  [case "${withval}" in
    ffmpeg|FFMPEG) mp3_decoder=ffmpeg ;;
@@ -742,7 +744,8 @@ dnl ****************************************
 dnl *** Check for ELF visibility support ***
 dnl ****************************************
 
-AC_ARG_ENABLE([visibility], AC_HELP_STRING([--enable-visibility], [Use ELF visibility attributes]), [], [enable_visibility=no])
+AC_ARG_ENABLE([visibility],
+  AC_HELP_STRING([--enable-visibility], [Use ELF visibility attributes]), [], [enable_visibility=no])
 
 if test x"$enable_visibility" != x"no"; then
   dnl Check whether the compiler supports the visibility attribute
@@ -784,7 +787,8 @@ fi
 
 AX_GCC_ARCHFLAG(no)
 
-AC_ARG_ENABLE([strict], AC_HELP_STRING([--enable-strict],[Accept only standards compliant code (GCC only)]),
+AC_ARG_ENABLE([strict],
+  AC_HELP_STRING([--enable-strict],[Accept only standards compliant code (GCC only)]),
   [case "${enableval}" in
     yes) strict=yes ;;
     no) strict=no ;;
