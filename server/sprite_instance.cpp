@@ -2795,6 +2795,8 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 			// Mark this frame done, so we never execute these
 			// init actions again.
 			m_init_actions_executed[frame] = true;
+
+			do_actions();
 		}
 	}
 

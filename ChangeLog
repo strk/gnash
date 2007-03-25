@@ -1,3 +1,11 @@
+2007-03-25 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (execute_frame_tags):
+	  Execute init actions immediately. This might change
+	  when we get actions execution order definitively right
+	  but it's useful to commit now has a facility for keep
+	  tracking youtube missing bits.
+
 2007-03-25 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac: reformat all "package not installed" messages
