@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 dnl Copyright (C) 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
-dnl $Id: pthreads.m4,v 1.25 2007/02/11 15:45:29 strk Exp $
+dnl $Id: pthreads.m4,v 1.26 2007/03/25 15:52:15 martinwguy Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
@@ -184,6 +184,9 @@ if test x"${PTHREAD_LIBS}" = "x"; then
       AC_MSG_RESULT(yes)
     fi
   done
+  if test x"${PTHREAD_LIBS}" = "x"; then
+    AC_MSG_RESULT(not found)
+  fi
 fi
 
 dnl Various other checks:
@@ -208,11 +211,11 @@ if test "x$pthreads" = xyes; then
   fi
 
   AC_MSG_CHECKING([if more special flags are required for pthreads])
- flag=no
- case "${host_cpu}-${host_os}" in
-   *-aix* | *-freebsd* | *-darwin*) flag="-D_THREAD_SAFE";;
-   *solaris* | *-osf* | *-hpux*) flag="-D_REENTRANT";;
-   *irix*) flag="-D_SGI_MP_SOURCE";;
+  flag=no
+  case "${host_cpu}-${host_os}" in
+    *-aix* | *-freebsd* | *-darwin*) flag="-D_THREAD_SAFE";;
+    *solaris* | *-osf* | *-hpux*) flag="-D_REENTRANT";;
+    *irix*) flag="-D_SGI_MP_SOURCE";;
   esac
   AC_MSG_RESULT(${flag})
   if test "x$flag" != xno; then
