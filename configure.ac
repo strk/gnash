@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.274 2007/03/20 20:27:29 martinwguy Exp $
+dnl $Id: configure.ac,v 1.275 2007/03/25 11:55:58 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -989,9 +989,9 @@ if test x$xml != xno; then
     echo "        XML flags are: $LIBXML_CFLAGS"
     echo "        XML libs are: $LIBXML_LIBS"
   else
-    echo "        ERROR: No libxml2 development package installed!\
- To compile this project install libxml2-dev (using apt-get)\
- or libxml2-devel (using yum or rpm)."
+    echo "        ERROR: No libxml2 development package installed!"
+    echo "               To compile this project install libxml2-dev (using apt-get)"
+    echo "               or libxml2-devel (using yum or rpm)."
     nogo=true
   fi
 fi
@@ -1017,7 +1017,8 @@ if test x$kde = xyes -o x$klash = xyes; then
       echo "               Reconfigure with --disable-klash and/or"
       echo "               change to a different gui with --enable-gui=..."
       echo "               or install the KDE development environment, or"
-      echo "               install kdelibs-dev (using apt-get) or something-else (using yum)."
+      echo "               install kdelibs-dev (using apt-get) or"
+      echo "               <something-else> (using yum)."
       nogo=true
     fi
   fi
@@ -1036,7 +1037,8 @@ if test x$kde = xyes -o x$klash = xyes; then
         echo "               Reconfigure with --disable-klash and/or"
         echo "               change to a different gui with --enable-gui=..."
         echo "               or install a QT development environment, or"
-        echo "               install libqt3-mt-dev (using apt-get) or something-else (using yum)."
+        echo "               install libqt3-mt-dev (using apt-get) or"
+	echo "               <something-else> (using yum)."
       fi
       nogo=true
     fi
@@ -1052,8 +1054,9 @@ if test x"${JPEG_LIBS}" != x ; then
   echo "        JPEG libs are: $JPEG_LIBS"
 else
   echo "        ERROR: No JPEG library development package installed!"
-  echo "        You need to have the libjpeg package installed to compile, or"
-  echo "        install libjpeg-dev (using apt-get) or libjpeg-devel (using yum)."
+  echo "               You need to have the libjpeg package installed to compile, or"
+  echo "               install libjpeg-dev (using apt-get) or libjpeg-devel"
+  echo "               (using yum)."
   nogo=true
 fi
 
@@ -1065,7 +1068,7 @@ dnl     echo "        Ogg flags are: default include path"
 dnl   fi
 dnl   echo "        Ogg libs are: $OGG_LIBS"
 dnl else
-dnl   echo "ERROR: No Ogg Vorbis development package installed!"
+dnl   echo "        ERROR: No Ogg Vorbis development package installed!"
 dnl   nogo=true
 dnl fi
 
@@ -1077,7 +1080,7 @@ dnl     echo "        VORBIS flags are: default include path"
 dnl   fi
 dnl   echo "        VORBIS libs are: $VORBIS_LIBS"
 dnl else
-dnl   echo "ERROR: No VORBIS Vorbis development package installed!"
+dnl   echo "        ERROR: No VORBIS Vorbis development package installed!"
 dnl   nogo=true
 dnl fi
 
@@ -1090,10 +1093,10 @@ if test x"$opengl" = x"yes"; then
     fi
     echo "        OpenGL libs are: $OPENGL_LIBS"
     else
-      echo "ERROR: No OpenGL development package installed!\
- You need to have the libmesa development package installed\
- to compile this project or install libgl1-mesa-dev\
- (using apt-get) or xorg-x11-Mesa-libGL (using yum)."
+      echo "        ERROR: No OpenGL development package installed!"
+      echo "               You need to have the libmesa development package installed"
+      echo "               to compile this project or install libgl1-mesa-dev"
+      echo "               (using apt-get) or xorg-x11-Mesa-libGL (using yum)."
     nogo=true
   fi
 fi
@@ -1110,11 +1113,11 @@ if test x"$gui" = x"gtk" -a x"$renderer" = xopengl ; then
   else
     if test x"$gui" = x"gtk"; then
       if test x"$renderer" = x"opengl"; then
-        echo "ERROR: No GtkGLExt development package installed!\
- You need to have the GtkGLExt development package installed\
- to build the GTK gui / opengl renderer combination.\
- Try --enable-gui=sdl or --enable-renderer=cairo or install libgtkglext1-dev\
- (using apt-get) or gtkglext-devel (using yum)."
+        echo "        ERROR: No GtkGLExt development package installed!"
+        echo "               You need to have the GtkGLExt development package installed"
+        echo "               to build the GTK gui / opengl renderer combination."
+        echo "               Try --enable-gui=sdl or --enable-renderer=cairo or install libgtkglext1-dev"
+        echo "               (using apt-get) or gtkglext-devel (using yum)."
       nogo=true
       fi
     fi
@@ -1131,10 +1134,10 @@ if test x"$gui" = x"gtk"; then #{
     fi
       echo "        GTK2 libs are: $GTK2_LIBS"
   else
-    echo "ERROR: No GTK2 development package installed!\
- You need to have the GTK2 development package installed\
- to compile this project or install libgtk2.0-dev\
- (using apt-get) or gtk2-devel (using yum)."
+    echo "        ERROR: No GTK2 development package installed!"
+    echo "               You need to have the GTK2 development package installed"
+    echo "               to compile this project or install libgtk2.0-dev"
+    echo "               (using apt-get) or gtk2-devel (using yum)."
 dnl    nogo=true
   fi
 
@@ -1146,10 +1149,10 @@ dnl    nogo=true
     fi
     echo "        Pango libs are: $PANGO_LIBS"
   else
-    echo "ERROR: No Pango development package installed!\
- You need to have the Pango development package installed\
- to compile this project or install libpango1.0-dev \
- (using apt-get) or pango-devel (using yum)."
+    echo "        ERROR: No Pango development package installed!"
+    echo "               You need to have the Pango development package installed"
+    echo "               to compile this project or install libpango1.0-dev"
+    echo "               (using apt-get) or pango-devel (using yum)."
 dnl    nogo=true
   fi
 
@@ -1161,10 +1164,10 @@ dnl    nogo=true
     fi
     echo "        GLib libs are: $GLIB_LIBS"
   else
-    echo "ERROR: No GLib development package installed!\
- You need to have the GLib development package installed\
- to compile this project or install libglib2.0-dev\
- (using apt-get) or glib2-devel (using yum)."
+    echo "        ERROR: No GLib development package installed!"
+    echo "               You need to have the GLib development package installed"
+    echo "               to compile this project or install libglib2.0-dev"
+    echo "               (using apt-get) or glib2-devel (using yum)."
 dnl    nogo=true
   fi
 
@@ -1176,10 +1179,10 @@ dnl    nogo=true
     fi
       echo "        ATK libs are: $ATK_LIBS"
   else
-    echo "ERROR: No ATK development package installed!\
- You need to have the ATK development package installed\
- to compile this project or install libatk1.0-dev\
- (using apt-get) or atk-devel (using yum)."
+    echo "        ERROR: No ATK development package installed!"
+    echo "               You need to have the ATK development package installed"
+    echo "               to compile this project or install libatk1.0-dev"
+    echo "               (using apt-get) or atk-devel (using yum)."
 dnl    nogo=true
   fi
 
@@ -1194,7 +1197,7 @@ if test "$sound_handler" = "gst"; then
     fi
       echo "        Gstreamer libs are: $GSTREAMER_LIBS"
   else
-    echo "ERROR: gstreamer sound requested, but no gstreamer 0.10+ found"
+    echo "        ERROR: gstreamer sound requested, but no gstreamer 0.10+ found"
     nogo=true
   fi
 fi
@@ -1210,19 +1213,19 @@ if test "$sound_handler" = "sdl"; then
       fi
       echo "        MAD libs are: $MAD_LIBS"
     else
-      echo "ERROR: No libmad (mp3) development package installed!\
- You need to have the libmad development package installed\
- to enable mp3 decoding. You can either reconfigure using \
- --with-mp3-decoder=ffmpeg to use ffmpeg or install libmad0-dev\
- (using apt-get) or libmad (using yum)."
+      echo "        ERROR: No libmad (mp3) development package installed!"
+      echo "               You need to have the libmad development package installed"
+      echo "               to enable mp3 decoding. You can either reconfigure using"
+      echo "               --with-mp3-decoder=ffmpeg to use ffmpeg or install libmad0-dev"
+      echo "               (using apt-get) or libmad (using yum)."
       nogo=true
     fi
   else
     if test x"$mp3_decoder" = x"ffmpeg"; then
       if test x${ffmpeg_version} != xok; then
-         echo "ERROR: You have version ${ffmpeg_version} of ffmpeg installed. \
-This version of ffmpeg may not work! \
-Version 51.27.0 or newer is highly recommended"
+         echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed."
+         echo "               This version of ffmpeg may not work!"
+         echo "               Version 51.27.0 or newer is highly recommended."
         nogo=true
       fi
       if test x"$FFMPEG_LIBS" != x; then
@@ -1234,11 +1237,11 @@ Version 51.27.0 or newer is highly recommended"
         fi
           echo "        ffmpeg libs are: $FFMPEG_LIBS"
       else
-        echo "ERROR: No ffmpeg development package installed!\
- You need to have the ffmpeg development package installed\
- to enable mp3 decoding. You can either reconfigure using \
- --with-mp3-decoder=mad to use libmad or install libavcodec-dev \
- and libdts-dev (using apt-get) or <package_names_here> (using yum).".
+        echo "        ERROR: No ffmpeg development package installed!"
+        echo "               You need to have the ffmpeg development package installed"
+        echo "               to enable mp3 decoding. You can either reconfigure using"
+        echo "               --with-mp3-decoder=mad to use libmad or install libavcodec-dev"
+        echo "               and libdts-dev (using apt-get) or <package_names_here> (using yum).".
         nogo=true
       fi
     fi
@@ -1254,12 +1257,12 @@ if test "$renderer" = "cairo"; then
     fi
     echo "        Cairo libs are: $CAIRO_LIBS"
   else
-    echo "WARNING: No Cairo development package installed!\
- You need to have the Cairo development package installed\
- if you have used --enable-render=cairo to configure\
- To compile this project, install libcairo-dev\
- (using apt-get) or cairo-devel (using yum).\
- Current Cairo is only being used by developers."
+    echo "        ERROR: No Cairo development package installed!"
+    echo "               You need to have the Cairo development package installed"
+    echo "               if you have used --enable-render=cairo to configure."
+    echo "               To compile this project, install libcairo-dev"
+    echo "               (using apt-get) or cairo-devel (using yum)."
+    echo "               Currently Cairo is only being used by developers."
     nogo=true
   fi
 fi
@@ -1267,15 +1270,15 @@ fi
 if test x$gui = xfltk; then
   if test x"$FLTK2_LIBS" != x; then
     if test x"$FLTK2_CFLAGS" != x; then
-      echo "        Fltk flags are: $FLTK2_CFLAGS"
+      echo "        FLTK flags are: $FLTK2_CFLAGS"
     else
-      echo "        Fltk flags are: default include path"
+      echo "        FLTK flags are: default include path"
     fi
-      echo "        Fltk libs are: $FLTK2_LIBS"
+      echo "        FLTK libs are: $FLTK2_LIBS"
   else
-    echo "ERROR: No Fltk2 development package installed!\
- You need to have the fltk2 development package installed\
- to compile this project."
+    echo "        ERROR: No FLTK2 development package installed!"
+    echo "               There are currently no Debian or RPM packages for FLTK2;"
+    echo "		 see http://www.fltk.org to install it from source."
 dnl or install libfltk1.1-dev (using apt-get) or fltk-devel (using yum).
     nogo=true
   fi
@@ -1290,10 +1293,10 @@ if test x"$gui" = x"fltk"; then
     fi
       echo "        Xft libs are: $XFT_LIBS"
 dnl     else
-dnl       echo "ERROR: No Xft development package installed!\
-dnl  You need to have the xft development package installed\
-dnl  to compile this project or install libxft-dev \
-dnl  (using apt-get) or xft-devel (using yum)."
+dnl       echo "        ERROR: No Xft development package installed!"
+dnl       echo "               You need to have the xft development package installed"
+dnl       echo "               to compile this project or install libxft-dev "
+dnl       echo "               (using apt-get) or xft-devel (using yum)."
 dnl    nogo=true
   fi
 fi
@@ -1303,25 +1306,25 @@ if test x"$gui" = x"sdl"; then
     echo "        SDL flags are: $SDL_CFLAGS"
     echo "        SDL libs are: $SDL_LIBS"
   else
-    echo "ERROR: No SDL development package installed!\
- You need to have the SDL development package installed\
- to compile, or install libsdl1.2-dev (using apt-get)\
- or SDL-devel (using yum)."
+    echo "        ERROR: No SDL development package installed!"
+    echo "               You need to have the SDL development package installed"
+    echo "               to compile, or install libsdl1.2-dev (using apt-get)"
+    echo "               or SDL-devel (using yum)."
     nogo=true
   fi
 fi
 
 if test x"$sound_handler" = x"sdl"; then
   if test x"$SDL_LIBS" != x; then
-      echo "        SDL flags are: $SDL_CFLAGS"
-      echo "        SDL libs are: $SDL_LIBS"
+    echo "        SDL flags are: $SDL_CFLAGS"
+    echo "        SDL libs are: $SDL_LIBS"
   else
-      echo "ERROR: sdl sound requested, but no SDL development package installed!\
- You need to have the SDL development package installed\
- if you wish to have sdl-based sound support for Gnash.\
- To compile this project with SDL sound support, install\
- libsdl-1.2-dev (using apt-get) or SDL-devel (using yum).
- In alternative build with --enable-sound=gst for gstreamer use"
+    echo "        ERROR: sdl sound requested, but no SDL development package installed!"
+    echo "               You need to have the SDL development package installed"
+    echo "               if you wish to have sdl-based sound support for Gnash."
+    echo "               To compile this project with SDL sound support, install"
+    echo "               libsdl-1.2-dev (using apt-get) or SDL-devel (using yum)."
+    echo "               or configure with --enable-sound=gst to use gstreamer instead."
    nogo=true
   fi
 fi
@@ -1332,7 +1335,7 @@ dnl    echo "        Firefox flags are: $FIREFOX_CFLAGS"
 dnl    echo "        Firefox libs are: $FIREFOX_LIBS"
     echo "        Plugin will be installed in ${FIREFOX_PLUGINS}"
 dnl  else
-dnl    echo "ERROR: No Firefox or Mozilla development package installed!"
+dnl    echo "        ERROR: No Firefox or Mozilla development package installed!"
 #    nogo=true
 dnl  fi
 fi
@@ -1386,10 +1389,10 @@ if test x$renderer = xagg; then
       echo "        AGG libs are: $AGG_LIBS"
 dnl      echo "          needs compatibility layer: $agg_need_compatibility_layer"
     else
-      echo "ERROR: No AGG development package installed!\
- You need to have the AGG development package installed\
- to compile this project or install libagg-dev\
- (using apt-get) or agg-devel (using yum)."
+      echo "        ERROR: No AGG development package installed!"
+      echo "               You need to have the AGG development package installed"
+      echo "               to compile this project or install libagg-dev"
+      echo "               (using apt-get) or agg-devel (using yum)."
 dnl    nogo=true
     fi
   else
@@ -1413,11 +1416,11 @@ if test x"$BOOST_LIBS" != x; then
 	nogo=true
     fi
 else
-    echo "ERROR: No BOOST development package installed!\
- You need to have the BOOST development package installed\
- to compile, or install libboost-thread-dev and\
- libboost-date-time-dev (using apt-get) or boost-devel\
- (using yum)."
+    echo "        ERROR: No BOOST development package installed!"
+    echo "               You need to have the BOOST development package installed"
+    echo "               to compile, or install libboost-thread-dev and"
+    echo "               libboost-date-time-dev (using apt-get) or boost-devel"
+    echo "               (using yum)."
  nogo=true
 fi
 
