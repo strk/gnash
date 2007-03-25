@@ -5,6 +5,7 @@
     <title>Overview</title>
     <para>
       The typical process of building from source will involve 
+      <link linkend="gettingsource">getting the source</link>,
       <link linkend="codedepend">resolving dependencies</link>,
       <link linkend="configure">configuration</link>, 
       <link linkend="compile">compilation</link>,
@@ -23,6 +24,50 @@
     </para>  
   </sect2>
   
+  <sect2 id="gettingsource">
+    <title>Getting The Source</title>
+
+    <sect3 id="sourcereleases">
+      <title>Releases</title>
+      <para>
+	Tarballs of official releases can be found in the download area
+	of the project's GNU Savannah page at
+	<ulink type="http"
+	       url="http://savannah.gnu.org/projects/gnash">
+		    http://savannah.gnu.org/projects/gnash
+	</ulink> 
+	or under
+	<ulink type="http"
+	       url="http://ftp.gnu.org/gnu/gnash">
+		    http://ftp.gnu.org/gnu/gnash
+	</ulink> 
+      </para>
+
+    <sect3 id="sourcecvs">
+      <title>CVS Access</title>
+      <para>
+	The latest Gnash development sources are available via anonymous CVS.
+	Use the following commands to check them out
+	(just hit return when you are prompted for the password):
+	<programlisting>
+	  export CVS_RSH=ssh
+	  cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
+	</programlisting>
+	you will then be able to update your copy from the repository using
+	<programlisting>
+	  cd gnash
+	  cvs update -d
+	</programlisting>
+      </para>
+      <para>
+	If you only have access to the internet via a web proxy,
+	you will find daily snapshots of the latest CVS tree in
+	<ulink type="http"
+	       url="http://gnash.lulu.com/dev_snapshots/">
+		    http://gnash.lulu.com/dev_snapshots
+	</ulink> 
+      </para>
+
   <sect2 id="codedepend">
     <title>Code Dependencies</title>
 
