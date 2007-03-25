@@ -22,9 +22,17 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.38 2007/03/21 18:46:47 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.39 2007/03/25 09:05:58 strk Exp $";
 
 #include "check.as"
+
+#if OUTPUT_VERSION < 6
+note("WARNING: it has been reported that adobe flash player version 9 fails a few tests here.");
+note("         We belive those are actually adobe player bugs since older versions ");
+note("         of the player are reported to pass all tests. If you have another idea ");
+note("         we'd be glad to hear from you, just check the testcase source code.");
+note();
+#endif
 
 // Get a reference to a MovieClip
 var mc = _root;

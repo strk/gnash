@@ -1,5 +1,8 @@
 2007-03-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: print a warning
+	  about possible confusion created by bugs in the proprietary
+	  players.
 	* testsuite/actionscript.all/NetConnection.as:
 	  getURL doesn't exist, and connect returns
 	  a boolean value.
