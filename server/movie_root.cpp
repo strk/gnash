@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,11 +31,13 @@
 #include "render.h"
 #include "VM.h"
 #include "tu_random.h"
+#include "ExecutableCode.h"
 
 #include <iostream>
 #include <string>
 #include <typeinfo>
 #include <cassert>
+#include <boost/ptr_container/ptr_list.hpp>
 
 using namespace std;
 
@@ -477,6 +479,8 @@ movie_root::advance(float delta_time)
 
 	_movie->advance(delta_time);
 
+	processActionQueue();
+
 #ifdef GNASH_DEBUG
 	size_t curframe = _movie->get_current_frame();
 
@@ -646,6 +650,52 @@ void
 movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
 	_movie->add_invalidated_bounds(ranges, force);
+}
+
+void
+movie_root::processActionQueue()
+{
+
+#ifdef GNASH_DEBUG
+	static unsigned calls=0;
+	++calls;
+	bool actionsToProcess = !_actionQueue.empty();
+	if ( actionsToProcess ) log_msg(" Processing action queue (call %u)", calls);
+#endif
+
+	// _actionQueue may be changed due to actions (appended-to)
+	// this loop might be optimized by using an iterator
+	// and a final call to .clear() 
+	while ( ! _actionQueue.empty() )
+	{
+		ExecutableCode& code = _actionQueue.front();
+		code.execute();
+		_actionQueue.pop_front(); 
+	}
+
+	assert(_actionQueue.empty());
+
+#ifdef GNASH_DEBUG
+	if ( actionsToProcess ) log_msg(" Done processing action queue (call %u)", calls);
+#endif
+}
+
+void
+movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<sprite_instance> target)
+{
+#ifdef GNASH_DEBUG
+	log_msg("Pushed action buffer for target %s", target->getTargetPath().c_str());
+#endif
+	_actionQueue.push_back(new GlobalCode(buf, target));
+}
+
+void
+movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<sprite_instance> target)
+{
+#ifdef GNASH_DEBUG
+	log_msg("Pushed function (event hanlder?) with target %s", target->getTargetPath().c_str());
+#endif
+	_actionQueue.push_back(new FunctionCode(func, target));
 }
 
 } // namespace gnash

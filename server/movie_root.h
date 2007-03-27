@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.40 2007/02/28 17:25:26 udog Exp $ */
+/* $Id: movie_root.h,v 1.41 2007/03/27 14:52:05 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -80,9 +80,12 @@
 
 #include <vector>
 #include <set>
+#include <boost/ptr_container/ptr_list.hpp>
 
 // Forward declarations
-// none needed
+namespace gnash {
+	class ExecutableCode; // for ActionQueue
+}
 
 namespace gnash
 {
@@ -380,7 +383,20 @@ public:
 		_movie->clear_invalidated();
 	}
 
+	/// Push an executable code to the ActionQueue
+	void pushAction(const action_buffer& buf, boost::intrusive_ptr<sprite_instance> target);
+
+	/// Push a function code to the ActionQueue
+	void pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<sprite_instance> target);
+
 private:
+
+	typedef boost::ptr_list<ExecutableCode> ActionQueue;
+
+	ActionQueue _actionQueue;
+
+	/// Process all actions in the queue
+	void processActionQueue();
 
 	// TODO: use Range2d<int> ?
 	int			m_viewport_x0, m_viewport_y0;

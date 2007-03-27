@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.7 2007/02/11 06:21:29 rsavoye Exp $
+# $Id: Makefile.am,v 1.8 2007/03/27 14:52:05 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -49,6 +49,7 @@ libgnashvm_la_SOURCES = \
 noinst_HEADERS =		\
 	ASHandlers.h		\
 	ActionExec.h		\
+	ExecutableCode.h	\
 	VM.h			\
 	action.h		\
 	fn_call.h		\
