@@ -1,3 +1,8 @@
+2007-03-27 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/as_object.h: Print the passed pointer type
+	rather than the intrusive_ptr in which it is contained.
+
 2007-03-27 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Date.as:
