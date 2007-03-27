@@ -2141,6 +2141,58 @@ void sprite_instance::remove_display_object(const tu_string& name_tu)
 	}
 }
 
+void
+sprite_instance::queueEventHandler(const event_id& id)
+{
+	testInvariant();
+
+	bool called=false;
+
+	movie_root& root = VM::get().getRoot();
+
+	// First, check for built-in event handler.
+	boost::intrusive_ptr<as_function> method = get_event_handler(id).to_as_function();
+	   
+	if (method)
+	{
+		root.pushAction(method, boost::intrusive_ptr<sprite_instance>(this));
+		called=true;
+	}
+
+	// This is likely wrong, we use it as a workaround
+	// to the fact that we don't distinguish between
+	// ActionScript and SWF defined events
+	// (for example: onClipLoad vs. onLoad)
+	//
+	if (called) return;
+
+	// Check for member function.
+	// In ActionScript 2.0, event method names are CASE SENSITIVE.
+	// In ActionScript 1.0, event method names are CASE INSENSITIVE.
+	// TODO: move to get_function_name directly ?
+	std::string method_name = id.get_function_name();
+	if ( _vm.getSWFVersion() < 7 )
+	{
+		boost::to_lower(method_name, _vm.getLocale());
+	}
+
+	if (method_name.length() > 0)
+	{
+		as_value method_val;
+		if ( get_member(method_name, &method_val) )
+		{
+			method = method_val.to_as_function();
+			if ( method )
+			{
+				root.pushAction(method, boost::intrusive_ptr<sprite_instance>(this));
+			}
+		}
+	}
+
+	testInvariant();
+
+}
+
 bool
 sprite_instance::on_event(const event_id& id)
 {

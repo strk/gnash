@@ -1,5 +1,8 @@
 2007-03-27 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: add isUnloaded()
+	  method to properly skip execution of queued
+	  actions for unloaded sprites.
 	* server/vm/: Makefile.am, ExecutableCode.h:
 	  Add definition of a generic Executable Code
 	  for use as element of the global Action Queue.

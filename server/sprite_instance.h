@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.78 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.79 2007/03/27 15:02:06 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -680,8 +680,17 @@ public:
 	}
 
 	/// @} Drawing API
+	
+
+	bool isUnloaded() { return _unloaded; }
 
 private:
+
+	/// Queue event handler(s), if any.
+	void queueEventHandler(const event_id& id);
+
+	/// Set to yes when this instance has been unloaded
+	bool _unloaded;
 
 	/// Execute a single action buffer (DOACTION block)
 	void execute_action(action_buffer& ab);
