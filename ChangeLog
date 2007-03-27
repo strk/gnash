@@ -1,5 +1,10 @@
-2007-03-25 Sandro Santilli <strk@keybit.net>
+2007-03-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Date.as:
+	  Commented out a test that also fails with
+	  the proprietary player (seems related to
+	  DST, started failing when it entered in effect).
+	  Anyone willing to fix the test is welcome.
 	* server/sprite_instance.cpp (execute_frame_tags):
 	  Execute init actions immediately. This might change
 	  when we get actions execution order definitively right
