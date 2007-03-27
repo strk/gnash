@@ -1,3 +1,8 @@
+2007-03-27 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* backend/render_handler_ogl.cpp: Added anti-aliasing for polygons
+	  (i.e. fonts and such).
+
 2007-03-27 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.{cpp,h}: add isUnloaded()

@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.64 2007/03/03 13:06:14 martinwguy Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.65 2007/03/27 21:14:50 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -1355,6 +1355,11 @@ gnash::render_handler*	gnash::create_render_handler_ogl()
 
     // Do some initialisation.
 #define OVERSIZE	1.0f
+    
+    //This makes fonts look nice (actually!)
+    glEnable(GL_POLYGON_SMOOTH);
+    glEnable(GL_POINT_SMOOTH);
+    
         // Turn on alpha blending.
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
