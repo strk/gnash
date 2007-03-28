@@ -336,6 +336,8 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 	//	it->first.c_str(), it->second.c_str());
     }
 
+    // Parse querystring
+    setFlashVars(*m, URL(_url).querystring());
 
     root.set_display_viewport(0, 0, width, height);
     root.set_background_alpha(background ? 1.0f : 0.05f);

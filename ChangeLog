@@ -1,3 +1,10 @@
+2007-03-28 Sandro Santilli <strk@keybit.net>
+
+	* gui/Player.cpp (run): parse URL query string
+	  after parsing FlashVars, for proper handling precedence.
+	  NOTE that this won't work when load starts from an internal
+	  call (loadMovie, getUrl with target etc.)
+
 2007-03-27 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/render_handler_ogl.cpp: Added anti-aliasing for polygons
