@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.38 2007/03/22 08:45:51 strk Exp $ */
+/* $Id: as_value.h,v 1.39 2007/03/28 08:46:43 bjacques Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -370,6 +370,16 @@ public:
 	///	for object values. If NULL, valueOf() won't be run.
 	///
 	double	to_number(as_environment* env=NULL) const;
+
+	/// Shorthand: casts the result of to_number() to the requested number
+	/// type.
+	//
+	/// Parameter identical to that of to_number().
+	template <typename T>
+	T to_number (as_environment* env=NULL) const
+	{
+		return static_cast<T>(to_number(env));
+	}
 
 	/// Conversion to boolean.
 	//
