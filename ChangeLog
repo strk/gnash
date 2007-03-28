@@ -1,3 +1,14 @@
+2007-03-28 Sandro Santilli <strk@keybit.net>
+
+	* libbase/GnashException.h: Add ActionLimitException
+	* server/as_environment.{cpp,h}: provide callStackDepth()
+	  and cleanCallstack() methods, throw an ActionLimitException
+	  when reaching 255 call stack depth.
+	* server/vm/ActionExec.{cpp,h}: catch ActionLimitException
+	  by aborting execution of current code.
+	* server/vm/ASHandlers.cpp (ActionCallFunction): pass the
+	  environment when converting function name to string.
+
 2007-03-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_gst.cpp: Don't calculate the numbers of 

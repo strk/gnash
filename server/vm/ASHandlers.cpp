@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.74 2007/03/22 08:45:52 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.75 2007/03/28 16:24:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2078,9 +2078,8 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	//cerr << "At ActionCallFunction enter:"<<endl;
 	//env.dump_stack();
 
-
 	// Let's consider it a as a string and lookup the function.
-	as_value function = thread.getVariable(env.top(0).to_std_string());
+	as_value function = thread.getVariable(env.top(0).to_std_string(&env));
 	if ( ! function.is_object() ) 
 	{
 		log_aserror("ActionCallFunction: %s is not an object", env.top(0).to_string());

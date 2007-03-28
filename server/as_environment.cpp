@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.60 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.61 2007/03/28 16:24:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1009,6 +1009,21 @@ as_environment::padStack(size_t offset, size_t count)
 {
 	assert( offset <= m_stack.size() );
 	m_stack.insert(m_stack.begin()+offset, count, as_value());
+}
+
+void
+as_environment::pushCallFrame(as_function* func)
+{
+	const unsigned maxstacksize = 255;
+
+	if ( _localFrames.size() == maxstacksize )
+	{
+		log_warning("Max stack count reached (%u) - should abort execution",
+				maxstacksize);
+		// throw something
+		throw ActionLimitException("Call stack limit exceeded");
+	}
+	_localFrames.push_back(CallFrame(func));
 }
 
 } // end of gnash namespace

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_environment.h,v 1.42 2007/03/16 21:06:44 strk Exp $ */
+/* $Id: as_environment.h,v 1.43 2007/03/28 16:24:39 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -448,10 +448,7 @@ public:
 	/// @param func
 	///	The function being called
 	///
-	void pushCallFrame(as_function* func)
-	{
-		_localFrames.push_back(CallFrame(func));
-	}
+	void pushCallFrame(as_function* func);
 
 	/// Remove current call frame from the stack
 	//
@@ -461,6 +458,18 @@ public:
 	{
 		assert(_localFrames.size());
 		_localFrames.pop_back();
+	}
+
+	/// Return the depth of call stack
+	size_t callStackDepth()
+	{
+		return _localFrames.size();
+	}
+
+	/// Clear the call stack
+	void clearCallFrames()
+	{
+		_localFrames.clear();
 	}
 
 private:

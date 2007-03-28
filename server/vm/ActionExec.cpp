@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ActionExec.cpp,v 1.22 2007/03/06 16:05:18 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.23 2007/03/28 16:24:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -128,7 +128,7 @@ ActionExec::operator() ()
     }
 #endif
 		
-    character* original_target = env.get_target();
+    _original_target = env.get_target();
 
     _initial_stack_size = env.stack_size();
 
@@ -147,6 +147,7 @@ ActionExec::operator() ()
 	);
 #endif
 
+	try {
 	while (pc<stop_pc) {
 	    // Cleanup any expired "with" blocks.
 	    while ( ! with_stack.empty() && pc >= with_stack.back().end_pc() ) {
@@ -222,8 +223,31 @@ ActionExec::operator() ()
 	pc = next_pc;
 
     }
+
+    }
+    catch (ActionLimitException& ex)
+    {
+	    log_aserror("%s", ex.what());
+    }
     
-    env.set_target(original_target);
+    cleanupAfterRun();
+
+}
+
+/*private*/
+void
+ActionExec::cleanupAfterRun()
+{
+    assert(_original_target);
+    env.set_target(_original_target);
+    _original_target = NULL;
+
+    // check the call stack if not in a function context
+    if ( ! isFunction() && env.callStackDepth() > 0 )
+    {
+	log_warning("Call stack non-empty at end of ExecutableCode run (limits hit?)");
+	env.clearCallFrames();
+    }
 
     // check if the stack was smashed
     if ( _initial_stack_size > env.stack_size() ) {

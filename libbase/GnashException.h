@@ -90,6 +90,30 @@ public:
 
 };
 
+/// An ActionScript limit exception 
+//
+/// When this exception is thrown, current execution should
+/// be aborted, stacks and registers cleaning included.
+///
+class ActionLimitException: public GnashException
+{
+
+public:
+
+	ActionLimitException(const std::string& s)
+		:
+		GnashException(s)
+	{}
+
+	ActionLimitException()
+		:
+		GnashException("ActionScript limit hit")
+	{}
+
+	virtual ~ActionLimitException() throw() {}
+
+};
+
 } // namespace gnash
 
 #endif // def _GNASH_GNASHEXCEPTION__H

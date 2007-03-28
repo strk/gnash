@@ -43,6 +43,10 @@ class ActionExec {
 
 private: 
 
+	/// Run after a complete run, or after an run interrupted by 
+	/// a bail-out exception (ActionLimitException, for example)
+	void cleanupAfterRun();
+
 	/// the 'with' stack associated with this execution thread
 	std::vector<with_stack_entry> with_stack;
 
@@ -79,6 +83,8 @@ private:
 	boost::intrusive_ptr<as_object> _this_ptr;
 
 	size_t _initial_stack_size;
+
+	character* _original_target;
 
 	/// Warn about a stack underrun and fix it 
 	//
