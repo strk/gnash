@@ -2562,13 +2562,13 @@ void sprite_instance::set_variable(const char* path_to_var,
 {
 	if (path_to_var == NULL)
 	{
-		log_error("NULL path_to_var passed to set_variable()\n");
+		log_error("NULL path_to_var passed to set_variable()");
 		return;
 	}
 	if (new_value == NULL)
 	{
 		log_error("NULL passed to set_variable('%s',"
-			" NULL)\n", path_to_var);
+			" NULL)", path_to_var);
 		return;
 	}
 
@@ -3917,6 +3917,7 @@ sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& reques
 	{
 		const string& name = it->first;
 		const string& val = it->second;
+		log_msg("Setting variable '%s' to value '%s'", name.c_str(), val.c_str());
 		set_variable(name.c_str(), val.c_str()); // should it be set_member ?
 	}
 }
@@ -3937,6 +3938,18 @@ sprite_instance::processCompletedLoadVariableRequests()
 			processCompletedLoadVariableRequest(request);
 			it = _loadVariableRequests.erase(it);
 		}
+	}
+}
+
+void
+sprite_instance::setVariables(VariableMap& vars)
+{
+	for (VariableMap::const_iterator it=vars.begin(), itEnd=vars.end();
+		it != itEnd; ++it)
+	{
+		const string& name = it->first;
+		const string& val = it->second;
+		set_variable(name.c_str(), val.c_str());
 	}
 }
 

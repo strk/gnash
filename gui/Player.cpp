@@ -84,18 +84,12 @@ Player::setFlashVars(gnash::sprite_instance& m, const std::string& varstr)
 	gnash::sprite_instance* si = m.get_root_movie();
 	assert(si);
 
-	typedef map<string, string> maptype;
+	typedef sprite_instance::VariableMap maptype;
 
 	maptype vars;
 	URL::parse_querystring(varstr, vars);
 
-	for (maptype::const_iterator it=vars.begin(), itEnd=vars.end();
-		it != itEnd; ++it)
-	{
-		const string& name = it->first;
-		const string& val = it->second;
-		si->set_variable(name.c_str(), val.c_str());
-	}
+	si->setVariables(vars);
 }
 
 Player::Player()

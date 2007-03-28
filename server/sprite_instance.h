@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.79 2007/03/27 15:02:06 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.80 2007/03/28 08:40:44 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -683,6 +683,11 @@ public:
 	
 
 	bool isUnloaded() { return _unloaded; }
+
+	typedef std::map<std::string, std::string> VariableMap;
+
+	/// Set all variables in the given map with their corresponding values
+	void setVariables(VariableMap& vars);
 
 private:
 

@@ -1,5 +1,7 @@
 2007-03-28 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: add setVariables()
+	  method taking a std::map.
 	* gui/Player.cpp (run): parse URL query string
 	  after parsing FlashVars, for proper handling precedence.
 	  NOTE that this won't work when load starts from an internal
