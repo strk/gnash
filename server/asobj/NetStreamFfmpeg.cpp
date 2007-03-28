@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.24 2007/03/23 07:52:07 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.25 2007/03/28 16:12:08 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -263,7 +263,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	// Pass stuff from/to the NetConnection object.
 	assert(ns);
 	if ( !nc->openConnection(ns->url.c_str(), ns) ) {
-		log_warning("Gnash could not open movie url: %s", ns->url.c_str());
+		log_warning("Gnash could not open movie: %s", ns->url.c_str());
 		ns->set_status("NetStream.Buffer.StreamNotFound");
 		return;
 	}
@@ -279,7 +279,12 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 		ns->m_isFLV = true;
 
 		ns->m_parser = new FLVParser();
-		nc->connectParser(ns->m_parser);
+		if (!nc->connectParser(ns->m_parser)) {
+			ns->set_status("NetStream.Buffer.StreamNotFound");
+			log_warning("Gnash could not open movie: %s", ns->url.c_str());
+			delete ns->m_parser;
+			return;
+		}
 
 		// Init the avdecoder-decoder
 		avcodec_init();

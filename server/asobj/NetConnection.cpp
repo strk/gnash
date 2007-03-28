@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.33 2007/03/24 14:36:47 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.34 2007/03/28 16:12:08 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -61,7 +61,10 @@ NetConnection::NetConnection()
 }
 
 NetConnection::~NetConnection() {
-	if (_loader) delete _loader;
+	if (_loader) {
+		delete _loader;
+		_loader = NULL;
+	}
 }
 
 /// Open a connection to stream FLV files.
@@ -101,6 +104,7 @@ bool NetConnection::openConnection(const char* char_url, as_object* owner)
 	if (!_loader->setStream(std::auto_ptr<tu_file>(StreamProvider::getDefaultInstance().getStream(uri)))) {
 		log_warning("Gnash could not open this url:%s", _url.c_str());
 		delete _loader;
+		_loader = NULL;
 		return false;
 	}
 

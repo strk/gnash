@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.1 2007/03/23 00:30:10 tgc Exp $
+// $Id: FLVParser.cpp,v 1.2 2007/03/28 16:12:08 tgc Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -42,15 +42,45 @@ FLVParser::~FLVParser()
 	_audioFrames.clear();
 }
 
+uint16_t FLVParser::videoFrameRate()
+{
+	boost::mutex::scoped_lock lock(_mutex);
+
+	// Make sure that there are parsed some frames
+	while(_videoFrames.size() < 2 && !_parsingComplete) {
+		parseNextFrame();
+	}
+
+	if (_videoFrames.size() < 2) return 0;
+
+ 	uint32_t framedelay = _videoFrames[1]->timestamp - _videoFrames[0]->timestamp;
+	
+	return static_cast<int16_t>(1000 / framedelay);
+}
+
+
 uint32_t FLVParser::videoFrameDelay()
 {
-	if (!_video || _lastVideoFrame < 1) return 0;
+	boost::mutex::scoped_lock lock(_mutex);
+
+	// If there are no video in this FLV return 0
+	if (!_video && _lastParsedPosition > 0) return 0;
+
+	// Make sure that there are parsed some frames
+	while(_videoFrames.size() < 2 && !_parsingComplete) {
+		parseNextFrame();
+	}
+
+	// If there is no video data return 0
+	if (_videoFrames.size() == 0 || !_video || _lastVideoFrame < 1) return 0;
 
 	return _videoFrames[_lastVideoFrame]->timestamp - _videoFrames[_lastVideoFrame-1]->timestamp;
 }
 
 FLVFrame* FLVParser::nextMediaFrame()
 {
+	boost::mutex::scoped_lock lock(_mutex);
+
 	uint32_t video_size = _videoFrames.size();
 	uint32_t audio_size = _audioFrames.size();
 	
@@ -108,6 +138,8 @@ FLVFrame* FLVParser::nextMediaFrame()
 
 FLVFrame* FLVParser::nextAudioFrame()
 {
+	boost::mutex::scoped_lock lock(_mutex);
+
 	// If there are no audio in this FLV return NULL
 	if (!_audio && _lastParsedPosition > 0) return NULL;
 
@@ -117,7 +149,7 @@ FLVFrame* FLVParser::nextAudioFrame()
 	}
 
 	// If the needed frame can't be parsed (EOF reached) return NULL
-	if (_audioFrames.size() < static_cast<uint32_t>(_lastAudioFrame+1)) return NULL;
+	if (_audioFrames.size() <= static_cast<uint32_t>(_lastAudioFrame+1) || _audioFrames.size() == 0) return NULL;
 
 	_lastAudioFrame++;
 
@@ -134,6 +166,8 @@ FLVFrame* FLVParser::nextAudioFrame()
 
 FLVFrame* FLVParser::nextVideoFrame()
 {
+	boost::mutex::scoped_lock lock(_mutex);
+
 	// If there are no video in this FLV return NULL
 	if (!_video && _lastParsedPosition > 0) return NULL;
 
@@ -143,7 +177,7 @@ FLVFrame* FLVParser::nextVideoFrame()
 	}
 
 	// If the needed frame can't be parsed (EOF reached) return NULL
-	if (_videoFrames.size() < static_cast<uint32_t>(_lastVideoFrame+1)) return NULL;
+	if (_videoFrames.size() <= static_cast<uint32_t>(_lastVideoFrame+1) || _videoFrames.size() == 0) return NULL;
 
 	_lastVideoFrame++;
 
@@ -161,6 +195,7 @@ FLVFrame* FLVParser::nextVideoFrame()
 
 uint32_t FLVParser::seekAudio(uint32_t time)
 {
+
 	// Make sure that there are parsed some frames
 	while(_audioFrames.size() < 1 && !_parsingComplete) {
 		parseNextFrame();
@@ -178,7 +213,7 @@ uint32_t FLVParser::seekAudio(uint32_t time)
 	// If there are no audio greater than the given time
 	// the last audioframe is returned
 	if (_audioFrames.back()->timestamp < time) {
-		_lastVideoFrame = _audioFrames.size() - 2;
+		_lastAudioFrame = _audioFrames.size() - 2;
 		return _audioFrames.back()->timestamp;
 	}
 
@@ -227,7 +262,7 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 	// If there are no videoframe greater than the given time
 	// the last key videoframe is returned
 	FLVVideoFrame* lastFrame = _videoFrames.back();
-	uint32_t numFrames = _audioFrames.size();
+	uint32_t numFrames = _videoFrames.size();
 	if (lastFrame->timestamp < time) {
 		uint32_t lastFrameNum = numFrames -1;
 		while (lastFrame->frameType != KEY_FRAME) {
@@ -246,14 +281,14 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 
 	// Here we test if the guess was ok, and adjust if needed.
 	uint32_t bestFrame = guess;
-	uint32_t diff = abs(_audioFrames[bestFrame]->timestamp - time);
+	uint32_t diff = abs(_videoFrames[bestFrame]->timestamp - time);
 	while (true) {
-		if (bestFrame+1 < numFrames && static_cast<uint32_t>(abs(_audioFrames[bestFrame+1]->timestamp - time)) < diff) {
+		if (bestFrame+1 < numFrames && static_cast<uint32_t>(abs(_videoFrames[bestFrame+1]->timestamp - time)) < diff) {
 			bestFrame = bestFrame + 1;
-			diff = abs(_audioFrames[bestFrame+1]->timestamp - time);
-		} else if (bestFrame-1 > 0 && static_cast<uint32_t>(abs(_audioFrames[bestFrame+1]->timestamp - time)) < diff) {
+			diff = abs(_videoFrames[bestFrame+1]->timestamp - time);
+		} else if (bestFrame-1 > 0 && static_cast<uint32_t>(abs(_videoFrames[bestFrame+1]->timestamp - time)) < diff) {
 			bestFrame = bestFrame - 1;
-			diff = abs(_audioFrames[bestFrame-1]->timestamp - time);
+			diff = abs(_videoFrames[bestFrame-1]->timestamp - time);
 		} else {
 			break;
 		}
@@ -280,13 +315,15 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 	else bestFrame = rewindKeyframe;
 
 	_lastVideoFrame = bestFrame - 1;
-	return _audioFrames[bestFrame]->timestamp;
+	return _videoFrames[bestFrame]->timestamp;
 }
 
 
 
 FLVVideoInfo* FLVParser::getVideoInfo()
 {
+	boost::mutex::scoped_lock lock(_mutex);
+
 	// If there are no video in this FLV return NULL
 	if (!_video && _lastParsedPosition > 0) return NULL;
 
@@ -295,7 +332,7 @@ FLVVideoInfo* FLVParser::getVideoInfo()
 		parseNextFrame();
 	}
 
-	// If there are no audio data return NULL
+	// If there are no video data return NULL
 	if (_videoInfo == NULL) return NULL;
 
 	FLVVideoInfo* info = new FLVVideoInfo(_videoInfo->codec, _videoInfo->width, _videoInfo->height, _videoInfo->frameRate, _videoInfo->duration);
@@ -305,6 +342,8 @@ FLVVideoInfo* FLVParser::getVideoInfo()
 
 FLVAudioInfo* FLVParser::getAudioInfo()
 {
+	boost::mutex::scoped_lock lock(_mutex);
+
 	// If there are no audio in this FLV return NULL
 	if (!_audio && _lastParsedPosition > 0) return NULL;
 
@@ -323,6 +362,9 @@ FLVAudioInfo* FLVParser::getAudioInfo()
 
 bool FLVParser::isTimeLoaded(uint32_t time)
 {
+
+	boost::mutex::scoped_lock lock(_mutex);
+
 	// Parse frames until the need time is found, or EOF
 	while (!_parsingComplete && (_videoFrames.size() > 0 && _videoFrames.back()->timestamp < time) && (_audioFrames.size() > 0 && _audioFrames.back()->timestamp < time)) {
 		parseNextFrame();
@@ -341,6 +383,7 @@ bool FLVParser::isTimeLoaded(uint32_t time)
 
 uint32_t FLVParser::seek(uint32_t time)
 {
+	boost::mutex::scoped_lock lock(_mutex);
 
 	if (_video)	time = seekVideo(time);
 	if (_audio)	time = seekAudio(time);
@@ -349,7 +392,6 @@ uint32_t FLVParser::seek(uint32_t time)
 
 bool FLVParser::parseNextFrame()
 {
-
 	// Parse the header if not done already. If unsuccesfull return false.
 	if (_lastParsedPosition == 0 && !parseHeader()) return false;
 
@@ -380,7 +422,17 @@ bool FLVParser::parseNextFrame()
 		// If this is the first audioframe no info about the
 		// audio format has been noted, so we do that now
 		if (_audioInfo == NULL) {
-			_audioInfo = new FLVAudioInfo((tag[11] & 0xf0) >> 4, (tag[11] & 0x0C) >> 2, (tag[11] & 0x02) >> 1, (tag[11] & 0x01) >> 0, 0);
+			int samplerate = (tag[11] & 0x0C) >> 2;
+			if (samplerate == 0) samplerate = 5500;
+			else if (samplerate == 1) samplerate = 11000;
+			else if (samplerate == 2) samplerate = 22050;
+			else if (samplerate == 3) samplerate = 44100;
+
+			int samplesize = (tag[11] & 0x02) >> 1;
+			if (samplesize == 0) samplesize = 1;
+			else samplesize = 2;
+
+			_audioInfo = new FLVAudioInfo((tag[11] & 0xf0) >> 4, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0);
 		}
 		_lastParsedPosition += 15 + bodyLength;
 
@@ -395,9 +447,55 @@ bool FLVParser::parseNextFrame()
 		// If this is the first videoframe no info about the
 		// video format has been noted, so we do that now
 		if (_videoInfo == NULL) {
+			uint16_t codec = (tag[11] & 0x0f) >> 0;
+			// Set standard guessed size...
+			uint16_t width = 320;
+			uint16_t height = 240;
 
-			// TODO: parse the video frame header to extract info about the width and height.
-			_videoInfo = new FLVVideoInfo((tag[11] & 0x0f) >> 0, 0 /*width*/, 0 /*height*/, 0 /*frameRate*/, 0 /*duration*/);
+			// Extract the video size from the videodata header
+			if (codec == VIDEO_CODEC_H263) {
+				_lt->seek(frame->dataPosition);
+				uint8_t videohead[12];
+				_lt->read(videohead, 12);
+
+				bool sizebit1 = (videohead[3] & 0x02);
+				bool sizebit2 = (videohead[3] & 0x01);
+				bool sizebit3 = (videohead[4] & 0x80);
+
+				// First some predefined sizes
+				if (!sizebit1 && sizebit2 && !sizebit3 ) {
+					width = 352;
+					height = 288;
+				} else if (!sizebit1 && sizebit2 && sizebit3 ) {
+					width = 176;
+					height = 144;
+				} else if (sizebit1 && !sizebit2 && !sizebit3 ) {
+					width = 128;
+					height = 96;
+				} else if (sizebit1 && !sizebit2 && sizebit3 ) {
+					width = 320;
+					height = 240;
+				} else if (sizebit1 && sizebit2 && !sizebit3 ) {
+					width = 160;
+					height = 120;
+
+				// Then the custom sizes (1 byte - untested and ugly)
+				} else if (!sizebit1 && !sizebit2 && !sizebit3 ) {
+					width = (videohead[4] & 0x40) | (videohead[4] & 0x20) | (videohead[4] & 0x20) | (videohead[4] & 0x08) | (videohead[4] & 0x04) | (videohead[4] & 0x02) | (videohead[4] & 0x01) | (videohead[5] & 0x80);
+
+					height = (videohead[5] & 0x40) | (videohead[5] & 0x20) | (videohead[5] & 0x20) | (videohead[5] & 0x08) | (videohead[5] & 0x04) | (videohead[5] & 0x02) | (videohead[5] & 0x01) | (videohead[6] & 0x80);
+
+				// Then the custom sizes (2 byte - untested and ugly)
+				} else if (!sizebit1 && !sizebit2 && sizebit3 ) {
+					width = (videohead[4] & 0x40) | (videohead[4] & 0x20) | (videohead[4] & 0x20) | (videohead[4] & 0x08) | (videohead[4] & 0x04) | (videohead[4] & 0x02) | (videohead[4] & 0x01) | (videohead[5] & 0x80) | (videohead[5] & 0x40) | (videohead[5] & 0x20) | (videohead[5] & 0x20) | (videohead[5] & 0x08) | (videohead[5] & 0x04) | (videohead[5] & 0x02) | (videohead[5] & 0x01) | (videohead[6] & 0x80);
+
+					height = (videohead[6] & 0x40) | (videohead[6] & 0x20) | (videohead[6] & 0x20) | (videohead[6] & 0x08) | (videohead[6] & 0x04) | (videohead[6] & 0x02) | (videohead[6] & 0x01) | (videohead[7] & 0x80) | (videohead[7] & 0x40) | (videohead[7] & 0x20) | (videohead[7] & 0x20) | (videohead[7] & 0x08) | (videohead[7] & 0x04) | (videohead[7] & 0x02) | (videohead[7] & 0x01) | (videohead[8] & 0x80);
+				} 
+
+			}
+
+			// Create the videoinfo 
+			_videoInfo = new FLVVideoInfo(codec, width, height, 0 /*frameRate*/, 0 /*duration*/);
 		}
 		_lastParsedPosition += 15 + bodyLength;
 

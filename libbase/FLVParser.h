@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.1 2007/03/23 00:30:10 tgc Exp $
+// $Id: FLVParser.h,v 1.2 2007/03/28 16:12:08 tgc Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -25,6 +25,7 @@
 
 #include "LoadThread.h"
 #include <vector>
+#include <boost/thread/mutex.hpp>
 
 enum videoCodecType
 {
@@ -64,9 +65,9 @@ enum videoFrameType
 class FLVFrame
 {
 public:
-	int dataSize;
+	uint32_t dataSize;
 	uint8_t* data;
-	uint32_t timestamp;
+	uint64_t timestamp;
 	uint8_t tag;
 };
 
@@ -78,7 +79,7 @@ public:
 class FLVAudioInfo
 {
 public:
-	FLVAudioInfo(int codeci, int sampleRatei, int sampleSizei, bool stereoi, long durationi)
+	FLVAudioInfo(uint16_t codeci, uint16_t sampleRatei, uint16_t sampleSizei, bool stereoi, uint64_t durationi)
 		: codec(codeci),
 		sampleRate(sampleRatei),
 		sampleSize(sampleSizei),
@@ -87,11 +88,11 @@ public:
 		{
 		}
 
-	int codec;
-	int sampleRate;
-	int sampleSize;
+	uint16_t codec;
+	uint16_t sampleRate;
+	uint16_t sampleSize;
 	bool stereo;
-	long duration;
+	uint64_t duration;
 };
 
 /// \brief
@@ -102,7 +103,7 @@ public:
 class FLVVideoInfo
 {
 public:
-	FLVVideoInfo(int codeci, int widthi, int heighti, int frameRatei, long durationi)
+	FLVVideoInfo(uint16_t codeci, uint16_t widthi, uint16_t heighti, uint16_t frameRatei, uint64_t durationi)
 		: codec(codeci),
 		width(widthi),
 		height(heighti),
@@ -115,7 +116,7 @@ public:
 	uint16_t width;
 	uint16_t height;
 	uint16_t frameRate;
-	long duration;
+	uint64_t duration;
 };
 
 
@@ -124,7 +125,7 @@ class FLVVideoFrame
 public:
 	uint16_t frameType;
 	uint32_t dataSize;
-	long dataPosition;
+	uint64_t dataPosition;
 	uint32_t timestamp;
 	
 };
@@ -133,7 +134,7 @@ class FLVAudioFrame
 {
 public:
 	uint32_t dataSize;
-	long dataPosition;
+	uint64_t dataPosition;
 	uint32_t timestamp;
 	
 };
@@ -188,6 +189,9 @@ public:
 	/// videoframe in milliseconds. This is used for framerate.
 	uint32_t videoFrameDelay();
 
+	/// Returns the framerate of the video
+	uint16_t videoFrameRate();
+
 private:
 
 	/// seeks to the closest possible position the given position,
@@ -219,7 +223,7 @@ private:
 	std::vector<FLVAudioFrame*> _audioFrames;
 
 	/// The position where the parsing should continue from.
-	long _lastParsedPosition;
+	uint64_t _lastParsedPosition;
 
 	/// Whether the parsing is complete or not
 	bool _parsingComplete;
@@ -231,16 +235,19 @@ private:
 	FLVAudioInfo* _audioInfo;
 
 	/// Last audio frame returned
-	int _lastAudioFrame;
+	int32_t _lastAudioFrame;
 
 	/// Last video frame returned
-	int _lastVideoFrame;
+	int32_t _lastVideoFrame;
 
 	/// Audio stream is present
 	bool _audio;
 
 	/// Audio stream is present
 	bool _video;
+
+	/// Mutex to avoid problems with threads using the parser
+	boost::mutex _mutex;
 };
 
 #endif // __FLVPARSER_H__

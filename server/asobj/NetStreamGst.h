@@ -33,6 +33,7 @@
 #include <gst/gst.h>
 #include "image.h"
 #include "NetStream.h" // for inheritance
+#include "FLVParser.h"
 
 namespace gnash {
   
@@ -69,6 +70,9 @@ public:
 	static void startPlayback(NetStreamGst* ns);
 	static void callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 	static void callback_newpad (GstElement *decodebin, GstPad *pad, gboolean last, gpointer data);
+	static void video_callback_handoff (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
+	static void audio_callback_handoff (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
+
 private:
 
 	bool _bufferLength;
@@ -83,7 +87,6 @@ private:
 	GstElement *pipeline;
 	GstElement *audiosink;
 	GstElement *videosink;
-	GstElement *source;
 	GstElement *decoder;
 	GstElement *volume;
 	GstElement *colorspace;
@@ -91,6 +94,15 @@ private:
 	GstElement *videocaps;
 	GstElement *videoflip;
 	GstElement *audioconv;
+
+	// used only for FLV
+	GstElement *audiosource;
+	GstElement *videosource;
+	GstElement *source;
+	GstElement *videodecoder;
+	GstElement *audiodecoder;
+	GstElement *videoinputcaps;
+	GstElement *audioinputcaps;
 
 	// Are the playing loop running or not
 	volatile bool m_go;
@@ -122,6 +134,11 @@ private:
 	// The handler which is invoked on status change
 	boost::intrusive_ptr<as_function> m_statusHandler;
 
+	// Are we decoding a FLV?
+	bool m_isFLV;
+
+	// The parser for FLV
+	FLVParser* m_parser;
 };
 
 } // gnash namespace

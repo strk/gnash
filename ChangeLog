@@ -1,3 +1,16 @@
+2007-03-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_gst.cpp: Don't calculate the numbers of 
+	  buffers to feed to the pipeline, since it makes loaded sound
+	  streams stop to early.
+	* libbase/FLVParser.{h,cpp}: Made it thread-safe. Fixed a lot of
+	  bugs. Added support for extacting size of h.263 video.
+	* server/asobj/NetConnection.cpp: Set _loader to NULL after deletion.
+	* server/asobj/NetStreamFfmpeg.cpp: Corrected some error messages and
+	  error handling.
+	* server/asobj/NetStreamGst.{h,cpp}: Use our internal FLVParser
+	  when FLV is being played.
+
 2007-03-28 Sandro Santilli <strk@keybit.net>
 
 	* server/array.{cpp,h}: implement Array.splice(),

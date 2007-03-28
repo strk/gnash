@@ -62,7 +62,6 @@ NetStreamGst::NetStreamGst():
 	pipeline(NULL),
 	audiosink(NULL),
 	videosink(NULL),
-	source(NULL),
 	decoder(NULL),
 	volume(NULL),
 	colorspace(NULL),
@@ -70,6 +69,15 @@ NetStreamGst::NetStreamGst():
 	videocaps(NULL),
 	videoflip(NULL),
 	audioconv(NULL),
+
+	audiosource(NULL),
+	videosource(NULL),
+	source(NULL),
+	videodecoder(NULL),
+	audiodecoder(NULL),
+	videoinputcaps(NULL),
+	audioinputcaps(NULL),
+
 	m_go(false),
 	m_imageframe(NULL),
 	startThread(NULL),
@@ -261,6 +269,37 @@ NetStreamGst::callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*p
 }
 
 
+// The callback function which refills the audio buffer with data
+void NetStreamGst::audio_callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
+{
+	NetStreamGst* ns = static_cast<NetStreamGst*>(user_data);
+
+	FLVFrame* frame = ns->m_parser->nextAudioFrame();
+	if (!frame) return;
+
+//	if (GST_BUFFER_DATA(buffer)) delete [] GST_BUFFER_DATA(buffer);
+	GST_BUFFER_SIZE(buffer) = frame->dataSize;
+	GST_BUFFER_DATA(buffer) = frame->data;
+	GST_BUFFER_TIMESTAMP(buffer) = frame->timestamp * 1000000;
+	delete frame;
+	return;
+
+}
+
+void NetStreamGst::video_callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
+{
+	NetStreamGst* ns = static_cast<NetStreamGst*>(user_data);
+
+	FLVFrame* frame = ns->m_parser->nextVideoFrame();
+	if (!frame) return;
+
+//	if (GST_BUFFER_DATA(buffer)) delete [] GST_BUFFER_DATA(buffer);
+	GST_BUFFER_SIZE(buffer) = frame->dataSize;
+	GST_BUFFER_DATA(buffer) = frame->data;
+	GST_BUFFER_TIMESTAMP(buffer) = frame->timestamp * 1000000;
+	delete frame;
+	return;
+}
 void
 NetStreamGst::startPlayback(NetStreamGst* ns)
 {
@@ -270,17 +309,32 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	// Pass stuff from/to the NetConnection object.
 	assert(ns);
 	if ( !nc->openConnection(ns->url.c_str(), ns) ) {
-		log_warning("Gnash could not open movie url: %s", ns->url.c_str());
+		ns->set_status("NetStream.Play.StreamNotFound");
+		log_warning("Gnash could not open movie: %s", ns->url.c_str());
 		return;
 	}
 
 	ns->inputPos = 0;
 
+	uint8_t head[3];
+	if (nc->read(head,3) < 3) return;
+	nc->seek(0);
+	if (head[0] == 'F'|| head[1] == 'L' || head[2] == 'V') { 
+		ns->m_isFLV = true;
+		ns->m_parser = new FLVParser();
+		if (!nc->connectParser(ns->m_parser)) {
+			ns->set_status("NetStream.Play.StreamNotFound");
+			log_warning("Gnash could not open movie: %s", ns->url.c_str());
+			return;
+			
+		}
+	}
+
 	// init GStreamer
 	gst_init (NULL, NULL);
 
-	// setup the GnashNC plugin
-	_gst_plugin_register_static (&gnash_plugin_desc);
+	// setup the GnashNC plugin if we are not decoding FLV
+	if (!ns->m_isFLV) _gst_plugin_register_static (&gnash_plugin_desc);
 
 	// setup the pipeline
 	ns->pipeline = gst_pipeline_new (NULL);
@@ -324,33 +378,113 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 		return;
 	}
 
-	gst_bin_add_many (GST_BIN (ns->pipeline),ns->audiosink, ns->audioconv, NULL);
+	// setup gnashnc source if we are not decoding FLV (our homegrown source element)
+	if (!ns->m_isFLV) {
+		ns->source = gst_element_factory_make ("gnashsrc", NULL);
+		gnashsrc_callback* gc = new gnashsrc_callback;
+		gc->read = NetStreamGst::readPacket;
+		gc->seek = NetStreamGst::seekMedia;
+		g_object_set (G_OBJECT (ns->source), "data", ns, "callbacks", gc, NULL);
+	} else {
 
-	// setup gnashnc source (our homegrown source element)
-	ns->source = gst_element_factory_make ("gnashsrc", NULL);
-	gnashsrc_callback* gc = new gnashsrc_callback;
-	gc->read = NetStreamGst::readPacket;
-	gc->seek = NetStreamGst::seekMedia;
-	g_object_set (G_OBJECT (ns->source), "data", ns, "callbacks", gc, NULL);
+		FLVVideoInfo* videoInfo = ns->m_parser->getVideoInfo();
+		FLVAudioInfo* audioInfo = ns->m_parser->getAudioInfo();
 
+		ns->audiosource = gst_element_factory_make ("fakesrc", NULL);
+		ns->videosource = gst_element_factory_make ("fakesrc", NULL);
+		
+		// setup fake sources
+		g_object_set (G_OBJECT (ns->audiosource),
+					"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE, NULL);
+		g_object_set (G_OBJECT (ns->videosource),
+					"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE, NULL);
 
-	// setup the decoder with callback
-	ns->decoder = gst_element_factory_make ("decodebin", NULL);
-	g_signal_connect (ns->decoder, "new-decoded-pad", G_CALLBACK (NetStreamGst::callback_newpad), ns);
+		// Setup the callbacks
+		g_signal_connect (ns->audiosource, "handoff", G_CALLBACK (NetStreamGst::audio_callback_handoff), ns);
+		g_signal_connect (ns->videosource, "handoff", G_CALLBACK (NetStreamGst::video_callback_handoff), ns);
+
+		// Setup the input capsfilter
+		ns->videoinputcaps = gst_element_factory_make ("capsfilter", NULL);
+		uint32_t fps = ns->m_parser->videoFrameRate(); 
+
+		GstCaps* videonincaps;
+		if (videoInfo->codec == VIDEO_CODEC_H263) {
+			videonincaps = gst_caps_new_simple ("video/x-flash-video",
+				"width", G_TYPE_INT, videoInfo->width,
+				"height", G_TYPE_INT, videoInfo->height,
+				"framerate", GST_TYPE_FRACTION, fps, 1,
+				"flvversion", G_TYPE_INT, 1,
+				NULL);
+			ns->videodecoder = gst_element_factory_make ("ffdec_flv", NULL);
+		} else if (videoInfo->codec == VIDEO_CODEC_VP6) {
+			videonincaps = gst_caps_new_simple ("video/x-vp6-flash",
+				"width", G_TYPE_INT, 320, // We don't yet have a size extract for this codec, so we guess...
+				"height", G_TYPE_INT, 240,
+				"framerate", GST_TYPE_FRACTION, fps, 1,
+				NULL);
+			ns->videodecoder = gst_element_factory_make ("ffdec_vp6f", NULL);
+		} else if (videoInfo->codec == VIDEO_CODEC_SCREENVIDEO) {
+			videonincaps = gst_caps_new_simple ("video/x-flash-screen",
+				"width", G_TYPE_INT, 320, // We don't yet have a size extract for this codec, so we guess...
+				"height", G_TYPE_INT, 240,
+				"framerate", GST_TYPE_FRACTION, fps, 1,
+				NULL);
+			ns->videodecoder = gst_element_factory_make ("ffdec_flashsv", NULL);
+		} else {
+			assert(0);
+		}
+
+		g_object_set (G_OBJECT (ns->videoinputcaps), "caps", videonincaps, NULL);
+		gst_caps_unref (videonincaps);
+
+		if (audioInfo->codec == AUDIO_CODEC_MP3) { 
+
+			ns->audiodecoder = gst_element_factory_make ("mad", NULL);
+			if (ns->audiodecoder == NULL) {
+				ns->audiodecoder = gst_element_factory_make ("flump3dec", NULL);
+				if (ns->audiodecoder != NULL && !gst_default_registry_check_feature_version("flump3dec", 0, 10, 4)) {
+					log_warning("This version of fluendos mp3 plugin does not support flash streaming sounds, please upgrade to version 0.10.4 or higher.");
+				}
+			}
+			// Check if the element was correctly created
+			if (!ns->audiodecoder) {
+				log_error("A gstreamer mp3-decoder element could not be created! You probably need to install a mp3-decoder plugin like gstreamer0.10-mad or gstreamer0.10-fluendo-mp3.");
+				return;
+			}
+
+			// Set the info about the stream so that gstreamer knows what it is.
+			ns->audioinputcaps = gst_element_factory_make ("capsfilter", NULL);
+			GstCaps* audioincaps = gst_caps_new_simple ("audio/mpeg",
+				"mpegversion", G_TYPE_INT, 1,
+				"layer", G_TYPE_INT, 3,
+				"rate", G_TYPE_INT, audioInfo->sampleRate,
+				"channels", G_TYPE_INT, audioInfo->stereo ? 2 : 1, NULL);
+			g_object_set (G_OBJECT (ns->audioinputcaps), "caps", audioincaps, NULL);
+			gst_caps_unref (audioincaps);
+		} else {
+			assert(0);
+		}
+	}
+
+	// setup the decoder with callback, but only if we are not decoding a FLV
+	if (!ns->m_isFLV) {
+		ns->decoder = gst_element_factory_make ("decodebin", NULL);
+		g_signal_connect (ns->decoder, "new-decoded-pad", G_CALLBACK (NetStreamGst::callback_newpad), ns);
+	}
 
 	// setup the video colorspaceconverter converter
 	ns->colorspace = gst_element_factory_make ("ffmpegcolorspace", NULL);
 
 	// Setup the capsfilter which demands either YUV or RGB videoframe format
 	ns->videocaps = gst_element_factory_make ("capsfilter", NULL);
-	GstCaps* caps;
+	GstCaps* videooutcaps;
 	if (gnash::render::videoFrameFormat() == render::YUV) {
-		caps = gst_caps_new_simple ("video/x-raw-yuv", NULL);
+		videooutcaps = gst_caps_new_simple ("video/x-raw-yuv", NULL);
 	} else {
-		caps = gst_caps_new_simple ("video/x-raw-rgb", NULL);
+		videooutcaps = gst_caps_new_simple ("video/x-raw-rgb", NULL);
 	}
-	g_object_set (G_OBJECT (ns->videocaps), "caps", caps, NULL);
-	gst_caps_unref (caps);
+	g_object_set (G_OBJECT (ns->videocaps), "caps", videooutcaps, NULL);
+	gst_caps_unref (videooutcaps);
 
 	// Setup the videorate element which makes sure the frames are delivered on time.
 	ns->videorate = gst_element_factory_make ("videorate", NULL);
@@ -360,23 +494,39 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	g_object_set (G_OBJECT (ns->videosink), "signal-handoffs", TRUE, "sync", TRUE, NULL);
 	g_signal_connect (ns->videosink, "handoff", G_CALLBACK (NetStreamGst::callback_output), ns);
 
-	if (!ns->source || !ns->decoder || !ns->colorspace || !ns->videocaps || !ns->videorate || !ns->videosink) {
+	if (!ns->colorspace || !ns->videocaps || !ns->videorate || !ns->videosink) {
 		gnash::log_error("Gstreamer element(s) for video movie handling could not be created\n");
 		return;
 	}
 
-	// put it all in the pipeline
-	gst_bin_add_many (GST_BIN (ns->pipeline), ns->source, ns->decoder, ns->colorspace, ns->videosink, ns->videorate, ns->videocaps, ns->volume, NULL);
+	// put it all in the pipeline and link the elements
+	if (!ns->m_isFLV) { 
+		gst_bin_add_many (GST_BIN (ns->pipeline),ns->audiosink, ns->audioconv, NULL);
+		gst_bin_add_many (GST_BIN (ns->pipeline), ns->source, ns->decoder, ns->colorspace, 
+			ns->videosink, ns->videorate, ns->videocaps, ns->volume, NULL);
 
-	// link the elements
-	gst_element_link(ns->source, ns->decoder);
-	gst_element_link_many(ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
+		gst_element_link(ns->source, ns->decoder);
+		gst_element_link_many(ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
+		gst_element_link_many(ns->audioconv, ns->volume, ns->audiosink, NULL);
 
-	gst_element_link_many(ns->audioconv, ns->volume, ns->audiosink, NULL);
-	
+	} else {
+		gst_bin_add_many (GST_BIN (ns->pipeline), ns->videosource, ns->videoinputcaps, ns->videodecoder, ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
+		gst_bin_add_many (GST_BIN (ns->pipeline), ns->audiosource, ns->audioinputcaps, ns->audiodecoder, ns->audioconv, ns->volume, ns->audiosink, NULL);
+
+		gst_element_link_many(ns->audiosource, ns->audioinputcaps, ns->audiodecoder, ns->audioconv, ns->volume, ns->audiosink, NULL);
+		gst_element_link_many(ns->videosource, ns->videoinputcaps, ns->videodecoder, ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
+
+	}
+
 	// start playing	
-	gst_element_set_state (ns->pipeline, GST_STATE_PLAYING);
+	if (!ns->m_isFLV) {
+		gst_element_set_state (GST_ELEMENT (ns->pipeline), GST_STATE_PLAYING);
+	} else {
+		gst_element_set_state (GST_ELEMENT (ns->pipeline), GST_STATE_PAUSED);
+		ns->m_pause = true;
+	}
 
+	ns->set_status("NetStream.Play.Start");
 	return;
 }
 
@@ -388,12 +538,26 @@ image::image_base* NetStreamGst::get_video()
 void
 NetStreamGst::seek(double pos)
 {
-	if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
-		GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(pos),
-		GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
-		log_warning("Seek failed");
-	}
 
+	if (m_isFLV) {
+		uint32_t newpos = m_parser->seek(static_cast<uint32_t>(pos*1000))/1000;
+		/*if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
+			GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(newpos),
+			GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
+			log_warning("Seek failed");
+			set_status("NetStream.Seek.InvalidTime");
+			return;
+		}*/
+	} else {
+		if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
+			GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(pos),
+			GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
+			log_warning("Seek failed");
+			set_status("NetStream.Seek.InvalidTime");
+			return;
+		}
+	}
+	set_status("NetStream.Seek.Notify");
 }
 
 void
@@ -406,11 +570,12 @@ NetStreamGst::setBufferTime(double time)
 void
 NetStreamGst::advance()
 {
-/*	if (m_go && m_pause && !m_imageframe && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
+	if (m_isFLV && m_pause && m_go && !m_imageframe && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
 		set_status("NetStream.Buffer.Full");
 		m_pause = false;
+		gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
 	}
-*/
+
 	if (m_statusChanged) {
 /*		fn_call dummy(NULL, NULL, 0, 0);
 		as_value info_asv(infoobject_new(dummy));
