@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.14 2007/02/28 23:58:26 strk Exp $";
+rcsid="$Id: array.as,v 1.15 2007/03/28 14:58:30 strk Exp $";
 
 #include "check.as"
 
@@ -139,7 +139,102 @@ check_equals ( portion.toString(), "0,1,2");
 portion = concatted.slice(18);
 check_equals ( portion.toString(), "");
 
+//-------------------------------
+// Test splice
+//-------------------------------
+
+ary = [0,1,2,3,4,5];
+check_equals ( ary.toString(), "0,1,2,3,4,5" );
+
+// No args is invalid
+spliced = ary.splice();
+check_equals ( ary.toString(), "0,1,2,3,4,5" );
+check_equals ( typeof(spliced), "undefined" );
+
+// Zero and positive offset starts from the end (-1 is last)
+spliced = ary.splice(0, 1);
+check_equals ( ary.toString(), "1,2,3,4,5" );
+check_equals ( spliced.toString(), "0" );
+spliced = ary.splice(1, 1);
+check_equals ( ary.toString(), "1,3,4,5" );
+check_equals ( spliced.toString(), "2" );
+
+// Negative offset starts from the end (-1 is last)
+spliced = ary.splice(-1, 1);
+check_equals ( ary.toString(), "1,3,4" );
+check_equals ( spliced.toString(), "5" );
+spliced = ary.splice(-2, 1);
+check_equals ( ary.toString(), "1,4" );
+check_equals ( spliced.toString(), "3" );
+
+// Out-of bound zero or positive offset are taken as one-past the end
+spliced = ary.splice(2, 1);
+check_equals ( ary.toString(), "1,4" );
+check_equals ( spliced.toString(), "" );
+spliced = ary.splice(2, 10);
+check_equals ( ary.toString(), "1,4" );
+check_equals ( spliced.toString(), "" );
+
+// Out-of bound negative offset are taken as zero
+spliced = ary.splice(-20, 1);
+check_equals ( ary.toString(), "4" );
+check_equals ( spliced.toString(), "1" );
+
+// rebuild the array
+ary = [0,1,2,3,4,5,6,7,8];
+
+// Zero length doesn't change anything, and return an empty array
+spliced = ary.splice(2, 0);
+check_equals ( ary.toString(), "0,1,2,3,4,5,6,7,8" );
+check_equals ( spliced.toString(), "" );
+
+// Out of bound positive length consumes up to the end
+spliced = ary.splice(2, 100);
+check_equals ( ary.toString(), "0,1" );
+check_equals ( spliced.toString(), "2,3,4,5,6,7,8" );
+ary=spliced; // reset array
+spliced = ary.splice(-2, 100);
+check_equals ( ary.toString(), "2,3,4,5,6" );
+check_equals ( spliced.toString(), "7,8" );
+
+// Negative length are invalid
+spliced = ary.splice(0, -1);
+check_equals ( typeof(spliced), 'undefined' );
+check_equals ( ary.toString(), "2,3,4,5,6" );
+spliced = ary.splice(3, -1);
+check_equals ( typeof(spliced), 'undefined' );
+check_equals ( ary.toString(), "2,3,4,5,6" );
+spliced = ary.splice(-1, -1);
+check_equals ( typeof(spliced), 'undefined' );
+check_equals ( ary.toString(), "2,3,4,5,6" );
+spliced = ary.splice(-1, -1, "a", "b", "c");
+check_equals ( typeof(spliced), 'undefined' );
+check_equals ( ary.toString(), "2,3,4,5,6" );
+
+// Provide substitutions now
+spliced = ary.splice(1, 1, "a", "b", "c");
+check_equals ( ary.toString(), "2,a,b,c,4,5,6" );
+check_equals ( spliced.toString(), '3' );
+spliced = ary.splice(-4, 2, 8);
+check_equals ( ary.toString(), "2,a,b,8,5,6" );
+check_equals ( spliced.toString(), 'c,4' );
+
+// Insert w/out deleting anything
+spliced = ary.splice(3, 0, 10, 11, 12);
+check_equals ( ary.toString(), "2,a,b,10,11,12,8,5,6" );
+check_equals ( spliced.toString(), '' );
+
+// Use arrays as replacement
+spliced = ary.splice(0, 7, [1,2], [3,4]);
+check_equals ( ary.toString(), "1,2,3,4,5,6" );
+check_equals ( ary.length, 4 ); // don't be fooled by toString output !
+check_equals ( spliced.toString(), '2,a,b,10,11,12,8' );
+
+
+//-------------------------------
 // Test single parameter constructor, and implicitly expanding array
+//-------------------------------
+
 var c = new Array(10);
 check (a instanceOf Array);
 check_equals ( typeof(c), "object" );
@@ -159,6 +254,13 @@ check_equals(c.length, 2);
 check_equals(c[8], undefined);
 
 // $Log: array.as,v $
+// Revision 1.15  2007/03/28 14:58:30  strk
+//         * server/array.{cpp,h}: implement Array.splice(),
+//           improve toString to actually call the user-provided
+//           toString on all elements.
+//         * testsuite/actionscript.all/array.as: added testcases
+//           for Array.splice().
+//
 // Revision 1.14  2007/02/28 23:58:26  strk
 //         * testsuite/actionscript.all/: array.as, Function.as
 //           Don't expect failures when checking for missing

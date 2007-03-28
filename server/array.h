@@ -24,6 +24,7 @@
 #include "as_object.h" // for inheritance
 
 #include <deque>
+#include <vector>
 #include <memory> // for auto_ptr
 
 #include <string>
@@ -79,9 +80,17 @@ public:
 
 	void reverse();
 
-	std::string join(const std::string& separator) const;
+	/// @param env
+	///	If not-null will be used to properl invoke the toString()
+	///	method against member values.
+	///
+	std::string join(const std::string& separator, as_environment* env) const;
 
-	std::string toString() const;
+	/// @param env
+	///	If not-null will be used to properly invoke the toString()
+	///	method against member values.
+	///
+	std::string toString(as_environment* env=NULL) const;
 
 	// override from as_object
 	const char* get_text_value() const
@@ -118,6 +127,29 @@ public:
 	std::auto_ptr<as_array_object> slice(
 		unsigned int start, unsigned int one_past_end);
 
+	/// \brief
+	/// Substitute 'len' elements from 'start' with elements from
+	/// the given array.
+	//
+	/// NOTE: assertions are:
+	///
+	///	assert(len <= size()-start);
+	///	assert(start <= size());
+	///
+	/// @param start
+	///	0-index based offset of first element to replace.
+	///
+	/// @param len
+	///	Number of elements to replace.
+	///
+	/// @param replacement
+	///	The element to use as replacement
+	///
+	/// TODO: should we return by intrusive_ptr instead ?
+	///
+	std::auto_ptr<as_array_object> splice(unsigned start, unsigned len,
+			const std::vector<as_value>& replacement);
+
 	/// Sort the array, using given values comparator
 	void sort(as_function& comparator, uint8_t flags=0);
 
@@ -141,7 +173,9 @@ public:
 
 private:
 
-	std::deque<as_value> elements;
+	typedef std::deque<as_value> container;
+
+	container elements;
 
 	// this function is used internally by set_member and get_member
 	// it takes a string that is the member name of the array and returns -1

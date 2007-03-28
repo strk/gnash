@@ -1,5 +1,10 @@
 2007-03-28 Sandro Santilli <strk@keybit.net>
 
+	* server/array.{cpp,h}: implement Array.splice(),
+	  improve toString to actually call the user-provided
+	  toString on all elements.
+	* testsuite/actionscript.all/array.as: added testcases
+	  for Array.splice().
 	* testsuite/misc-ming.all/Dejagnu.c: use a larger window for traces.
 	* testsuite/misc-ming.all/: FlashVarsTest.as, FlashVarsTest.html,
 	  Makefile.am: added a test for querystring and flashparams parsing.

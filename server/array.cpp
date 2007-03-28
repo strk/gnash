@@ -41,6 +41,9 @@
 #include <algorithm>
 #include <memory> // for auto_ptr
 
+//#define GNASH_DEBUG 
+
+
 namespace gnash {
 
 static as_object* getArrayInterface();
@@ -221,7 +224,7 @@ as_array_object::reverse()
 }
 
 std::string
-as_array_object::join(const std::string& separator) const
+as_array_object::join(const std::string& separator, as_environment* env) const
 {
 	// TODO - confirm this is the right format!
 	// Reportedly, flash version 7 on linux, and Flash 8 on IE look like
@@ -240,12 +243,12 @@ as_array_object::join(const std::string& separator) const
 			itEnd=elements.end();
 
 		// print first element w/out separator prefix
-		temp += (*it++).to_string();
+		temp += (*it++).to_string(env);
 
 		// print subsequent elements with separator prefix
 		while ( it != itEnd )
 		{
-			temp += separator + (*it++).to_string();
+			temp += separator + (*it++).to_string(env);
 		}
 	}
 
@@ -263,9 +266,9 @@ as_array_object::concat(const as_array_object& other)
 }
 
 std::string
-as_array_object::toString() const
+as_array_object::toString(as_environment* env) const
 {
-	return join(",");
+	return join(",", env);
 }
 
 unsigned int
@@ -296,7 +299,9 @@ as_array_object::slice(unsigned int start, unsigned int one_past_end)
 
 	std::auto_ptr<as_array_object> newarray(new as_array_object);
 
+#ifdef GNASH_DEBUG
 	log_msg("Array.slice(%u, %u) called", start, one_past_end);
+#endif
 
 	size_t newsize = one_past_end - start;
 	newarray->elements.resize(newsize);
@@ -309,6 +314,48 @@ as_array_object::slice(unsigned int start, unsigned int one_past_end)
 
 	return newarray;
 
+}
+
+std::auto_ptr<as_array_object>
+as_array_object::splice(unsigned start, unsigned len,
+		const std::vector<as_value>& replace)
+{
+	assert(len <= size()-start);
+	assert(start <= size());
+
+#ifdef GNASH_DEBUG
+	std::stringstream ss;
+	ss << "Array.splice(" << start << ", " << len << ", ";
+	std::ostream_iterator<as_value> ostrIter(ss, "," ) ;
+	std::copy(replace.begin(), replace.end(), ostrIter);
+        ss << ") called";
+	log_msg("%s", ss.str().c_str());
+	log_msg("Current array is %s", toString().c_str());
+#endif
+
+	container::iterator itStart = elements.begin()+start;
+	container::iterator itEnd = itStart+len;
+
+	// This will be returned...
+	std::auto_ptr<as_array_object> ret(new as_array_object);
+	
+	// If something has to be removed do it and assign
+	// to the returned object
+	if ( itStart != itEnd )
+	{
+		ret->elements.assign(itStart, itEnd);
+
+		elements.erase(itStart, itEnd);
+	}
+
+	// Now insert the new stuff, if needed
+	if ( replace.size() )
+	{
+		container::iterator itStart = elements.begin()+start;
+		elements.insert(itStart, replace.begin(), replace.end());
+	}
+
+	return ret;
 }
 
 /* virtual public, overriding as_object::get_member */
@@ -461,10 +508,66 @@ static as_value
 array_splice(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
-	UNUSED(array);
 
-	log_error("FIXME: Array.splice() method not implemented yet!\n");
-	return as_value();
+#ifdef GNASH_DEBUG
+	std::stringstream ss;
+	fn.dump_args(ss);
+	log_msg("Array(%s).splice(%s) called", array->toString().c_str(), ss.str().c_str());
+#endif
+
+	if (fn.nargs < 1)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Array.splice() needs at least 1 argument, call ignored");
+		);
+		return as_value();
+	}
+
+	unsigned origlen = array->size();
+
+	//----------------
+	// Get start offset
+	//----------------
+	unsigned startoffset;
+	int start = fn.arg(0).to_number<int>(&(fn.env()));
+	if ( start < 0 ) start = array->size()+start; // start is negative, so + means -abs()
+	startoffset = iclamp(start, 0, origlen);
+#ifdef GNASH_DEBUG
+	if ( startoffset != start ) log_msg("Array.splice: start:%d became %u", start, startoffset);
+#endif
+
+	//----------------
+	// Get length
+	//----------------
+	unsigned len = 0;
+	if (fn.nargs > 1)
+	{
+		int lenval = fn.arg(1).to_number<int>(&(fn.env()));
+		if ( lenval < 0 )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Array.splice(%d,%d): negative length given, call ignored",
+				start, lenval);
+			);
+			return as_value();
+		}
+		len = iclamp(lenval, 0, origlen-startoffset);
+	}
+
+	//----------------
+	// Get replacement
+	//----------------
+	std::vector<as_value> replace;
+	for (unsigned i=2; i<fn.nargs; ++i)
+	{
+		replace.push_back(fn.arg(i));
+	}
+
+	std::auto_ptr<as_array_object> spliced ( array->splice(startoffset, len, replace) );
+
+	boost::intrusive_ptr<as_object> ret = spliced.release();
+
+	return as_value(ret);
 }
 
 static as_value
@@ -595,7 +698,7 @@ array_join(const fn_call& fn)
 	if (fn.nargs > 0)
 		separator = fn.arg(0).to_string();
 
-	std::string ret = array->join(separator);
+	std::string ret = array->join(separator, &(fn.env()));
 
 	return as_value(ret.c_str());
 }
@@ -615,7 +718,7 @@ array_to_string(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
-	std::string ret = array->toString();
+	std::string ret = array->toString(&(fn.env()));
 
 		IF_VERBOSE_ACTION
 		(
