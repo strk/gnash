@@ -34,7 +34,9 @@ CLEANFILES =  \
 EXTRA_DIST = VarAndCharClashTest.as \
 	KeyTest.as \
 	gotoFrame2Test.as \
-	DrawingApiTest.as
+	DrawingApiTest.as \
+	FlashVarsTest.as \
+	FlashVarsTest.html
 
 
 AM_CPPFLAGS = -I.. \
@@ -126,7 +128,8 @@ check_SCRIPTS = \
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 check_SCRIPTS += VarAndCharClashTest-Runner \
-	gotoFrame2Test-Runner 
+	gotoFrame2Test-Runner \
+	FlashVarsTest-Runner
 endif
 
 # TESTS = \
@@ -679,6 +682,13 @@ VarAndCharClashTest-Runner: $(srcdir)/../generic-testrunner.sh VarAndCharClashTe
 	sh $< $(top_builddir) VarAndCharClashTest.swf > $@
 	chmod 755 $@
 
+# This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
+FlashVarsTest.swf: ../Dejagnu.swf $(srcdir)/FlashVarsTest.as 
+	$(MAKESWF) -o $@ ../Dejagnu.swf $(srcdir)/FlashVarsTest.as
+FlashVarsTest-Runner: $(srcdir)/../generic-testrunner.sh FlashVarsTest.swf
+	echo "$(top_builddir)/gui/gnash -1 -r0 -v -P 'FlashVars=?a=a_in_fvars&v=v_in_fvars' 'FlashVarsTest.swf?a=a_in_qstring&q=q_in_qstring'" > $@
+	chmod 755 $@
+
 intervalTest.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/intervalTest.as 
 	$(MAKESWF) -o $@ ../Dejagnu.swf $(srcdir)/intervalTest.as
 intervalTestRunner_SOURCES = \
@@ -790,6 +800,7 @@ TEST_CASES = \
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 TEST_CASES += KeyTest-Runner \
 	VarAndCharClashTest-Runner \
+	FlashVarsTest-Runner \
 	intervalTestRunner \
 	gotoFrame2Test-Runner 
 endif

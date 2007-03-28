@@ -1,5 +1,7 @@
 2007-03-28 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: FlashVarsTest.as, FlashVarsTest.html,
+	  Makefile.am: added a test for querystring and flashparams parsing.
 	* server/sprite_instance.cpp (loadMovie):
 	  Parse the querystring given in the URL.
 
