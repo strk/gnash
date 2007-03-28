@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.47 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.48 2007/03/28 20:01:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,6 +45,24 @@ namespace gnash {
 // Forward declarations
 static as_value textfield_get_variable(const fn_call& fn);
 static as_value textfield_set_variable(const fn_call& fn);
+static as_value textfield_setTextFormat(const fn_call& fn);
+static as_value textfield_getTextFormat(const fn_call& fn);
+static as_value textfield_setNewTextFormat(const fn_call& fn);
+static as_value textfield_getNewTextFormat(const fn_call& fn);
+static as_value textfield_addListener(const fn_call& fn);
+static as_value textfield_removeListener(const fn_call& fn);
+
+static as_value textfield_getDepth(const fn_call& fn);
+static as_value textfield_getFontList(const fn_call& fn);
+static as_value textfield_removeTextField(const fn_call& fn);
+static as_value textfield_replaceSel(const fn_call& fn);
+static as_value textfield_replaceText(const fn_call& fn);
+static as_object* getTextFieldInterface();
+
+
+//
+// TextField interface functions
+//
 
 static as_value
 textfield_get_variable(const fn_call& fn)
@@ -68,15 +86,177 @@ textfield_set_variable(const fn_call& fn)
 	return as_value();
 }
 
-//
-// TextField interface functions
-//
+static as_value
+textfield_setTextFormat(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+	UNUSED(text);
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: TextField.setTextFormat() unimplemented");
+		warned = true;
+	}
+
+	return as_value();
+
+}
+
+static as_value
+textfield_addListener(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+	UNUSED(text);
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: TextField.addListener() unimplemented");
+		warned = true;
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_removeListener(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+	UNUSED(text);
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: TextField.removeListener() unimplemented");
+		warned = true;
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_setNewTextFormat(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+	UNUSED(text);
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: TextField.setNewTextFormat() unimplemented");
+		warned = true;
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_getDepth(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+	UNUSED(text);
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: TextField.getDepth() unimplemented");
+		warned = true;
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_getFontList(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+	UNUSED(text);
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: TextField.getFontList() unimplemented");
+		warned = true;
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_getNewTextFormat(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+	UNUSED(text);
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: TextField.getNewTextFormat() unimplemented");
+		warned = true;
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_getTextFormat(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+	UNUSED(text);
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: TextField.getTextFormat() unimplemented");
+		warned = true;
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_replaceSel(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+	UNUSED(text);
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: TextField.replaceSel() unimplemented");
+		warned = true;
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_replaceText(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+	UNUSED(text);
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: TextField.replaceText() unimplemented");
+		warned = true;
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_removeTextField(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
+	UNUSED(text);
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_error("FIXME: TextField.removeTextField() unimplemented");
+		warned = true;
+	}
+
+	return as_value();
+}
 
 static as_value
 textfield_ctor(const fn_call& /* fn */)
 {
-	log_msg("User tried to invoke new TextField()");
-	return as_value();
+	boost::intrusive_ptr<as_object> obj = new as_object(getTextFieldInterface());
+	return as_value(obj);
 }
 
 //
@@ -95,6 +275,34 @@ attachTextFieldInterface(as_object& o)
 	boost::intrusive_ptr<builtin_function> variable_getter(new builtin_function(&textfield_get_variable, NULL));
 	boost::intrusive_ptr<builtin_function> variable_setter(new builtin_function(&textfield_set_variable, NULL));
 	o.init_property("variable", *variable_getter, *variable_setter);
+	o.init_member("setTextFormat", new builtin_function(textfield_setTextFormat));
+	o.init_member("getTextFormat", new builtin_function(textfield_getTextFormat));
+	o.init_member("addListener", new builtin_function(textfield_addListener));
+	o.init_member("removeListener", new builtin_function(textfield_removeListener));
+	o.init_member("setNewTextFormat", new builtin_function(textfield_setNewTextFormat));
+	o.init_member("getNewTextFormat", new builtin_function(textfield_getNewTextFormat));
+	o.init_member("getNewTextFormat", new builtin_function(textfield_getNewTextFormat));
+	o.init_member("getDepth", new builtin_function(textfield_getDepth));
+	o.init_member("removeTextField", new builtin_function(textfield_removeTextField));
+	o.init_member("replaceSel", new builtin_function(textfield_replaceSel));
+	if ( target_version  < 7 ) return;
+
+	// SWF7 or higher
+	o.init_member("replaceText", new builtin_function(textfield_replaceText));
+	if ( target_version  < 8 ) return;
+
+}
+
+static void
+attachTextFieldStaticMembers(as_object& o)
+{
+	int target_version = o.getVM().getSWFVersion();
+
+	// SWF5 or higher
+	if ( target_version  < 6 ) return;
+
+	// SWF6 or higher
+	o.init_member("getFontList", new builtin_function(textfield_getFontList));
 	if ( target_version  < 7 ) return;
 
 	// SWF7 or higher
@@ -1083,6 +1291,25 @@ edit_text_character::set_variable_name(const std::string& newname)
 		_variable_name = newname;
 		_text_variable_registered = false;
 	}
+}
+
+void
+textfield_class_init(as_object& global)
+{
+	// This is going to be the global TextField "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl=NULL;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&textfield_ctor, getTextFieldInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		attachTextFieldStaticMembers(*cl);
+		     
+	}
+
+	// Register _global.MovieClip
+	global.init_member("TextField", cl.get());
 }
 
 } // namespace gnash

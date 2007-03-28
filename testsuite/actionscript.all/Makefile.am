@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.68 2007/03/10 16:44:00 strk Exp $
+# $Id: Makefile.am,v 1.69 2007/03/28 20:01:04 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -93,6 +93,7 @@ ASTESTS =			\
 	Stage.as		\
 	String.as		\
 	System.as		\
+	TextField.as		\
 	TextSnapshot.as		\
 	Video.as		\
 	Object.as		\

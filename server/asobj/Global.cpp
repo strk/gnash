@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.55 2007/03/22 22:37:45 bjacques Exp $ */
+/* $Id: Global.cpp,v 1.56 2007/03/28 20:01:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,6 +63,7 @@
 #include "timers.h"
 #include "URL.h" // for URL::encode and URL::decode (escape/unescape)
 #include "builtin_function.h"
+#include "edit_text_character.h"
 
 #include "fn_call.h"
 #include "sprite_instance.h"
@@ -397,6 +398,7 @@ Global::Global(VM& vm)
 	//-----------------------
 
 	movieclip_class_init(*this);
+	textfield_class_init(*this);
 
 	if ( vm.getSWFVersion() < 4 ) goto extscan;
 	//-----------------------

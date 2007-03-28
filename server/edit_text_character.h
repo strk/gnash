@@ -177,6 +177,9 @@ private:
 
 };
 
+/// Initialize the global TextField class
+void textfield_class_init(as_object& global);
+
 } // namespace gnash
 
 #endif // _GNASH_EDIT_TEXT_CHARACTER_H_
