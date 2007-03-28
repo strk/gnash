@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.48 2007/03/28 20:01:04 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.49 2007/03/28 20:38:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -460,16 +460,16 @@ void
 edit_text_character::add_invalidated_bounds(InvalidatedRanges& ranges, 
 	bool force)
 {
-    if (!force && !m_invalidated) return; // no need to redraw
+	if (!force && !m_invalidated) return; // no need to redraw
     
-    ranges.add(m_old_invalidated_ranges);
-		
-		rect bounds;	
-	
-    bounds.expand_to_transformed_rect(get_world_matrix(), 
+	ranges.add(m_old_invalidated_ranges);
+
+	rect bounds;	
+
+	bounds.expand_to_transformed_rect(get_world_matrix(),
     				       m_def->get_bound());
-									 
-		ranges.add(bounds.getRange());            
+
+	ranges.add(bounds.getRange());            
 }
 
 bool
@@ -891,7 +891,7 @@ edit_text_character::format_text()
 	//
 	if (_font == NULL)
 	{
-		log_error("No font for edit_text_character! [%s:%d]\n",
+		log_error("No font for edit_text_character! [%s:%d]",
 			__FILE__, __LINE__);
 		return;
 	}

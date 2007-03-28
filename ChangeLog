@@ -1,5 +1,10 @@
 2007-03-28 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (add_textfield): use edit_text_character,
+	  not simple text_character (the latter has all the ActionScript
+	  methods attached to it).
+	* server/edit_text_character.{cpp,h}: keep definition
+	  by intrusive_ptr.
 	* server/edit_text_character.{cpp,h}: add stubs
 	  for all known TextField methods.
 	* server/asobj/Global.cpp: initialize the global

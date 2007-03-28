@@ -100,7 +100,7 @@ private:
 	/// immutable definition of this object, as read
 	/// from the SWF stream. Assured to be not-NULL
 	/// by constructor. This might change in the future
-	edit_text_character_def*	m_def;
+	boost::intrusive_ptr<edit_text_character_def>	m_def;
 
 	/// bounds of dynamic text, as laid out
 	rect	m_text_bounding_box;

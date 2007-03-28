@@ -102,7 +102,7 @@ edit_text_character_def::get_font()
 		m_font = m_root_def->get_font(m_font_id);
 		if (m_font == NULL)
 		{
-			log_error("error: text style with undefined font; font_id = %d\n", m_font_id);
+			log_error("error: text style with undefined font; font_id = %d", m_font_id);
 		}
 	}
 

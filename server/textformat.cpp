@@ -118,8 +118,8 @@ as_value textformat_new(const fn_call& fn)
 {
   //log_msg("%s: args=%d\n", __FUNCTION__, nargs);
 
-  textformat_as_object*	text_obj = new textformat_as_object;
-  log_msg("\tCreated New TextFormat object at %p. Not fully implemented yet!\n", (void*)text_obj);
+  boost::intrusive_ptr<textformat_as_object> text_obj = new textformat_as_object;
+  log_warning("Created New TextFormat object at %p. Not fully implemented yet!", (void*)text_obj.get());
   
   // tulrich: this looks like it's inserting a method into our
   // caller's env.  setTextFormat is a method on TextField.  So here
@@ -127,9 +127,9 @@ as_value textformat_new(const fn_call& fn)
   //
   // TODO we should handle setTextFormat as a method on TextField,
   // instead of doing this.
-  fn.env().set_variable("setTextFormat", new builtin_function(textformat_setformat));
+  //fn.env().set_variable("setTextFormat", new builtin_function(textformat_setformat));
   
-  return as_value(text_obj);
+  return as_value(text_obj.get());
 }
 
 

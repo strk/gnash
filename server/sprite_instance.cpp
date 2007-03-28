@@ -32,7 +32,8 @@
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
 #include "as_value.h"
 #include "as_function.h"
-#include "text_character_def.h" // @@ temp hack for createTextField exp.
+//#include "text_character_def.h" // @@ temp hack for createTextField exp.
+#include "edit_text_character_def.h" // @@ temp hack for createTextField exp.
 #include "execute_tag.h"
 #include "fn_call.h"
 #include "Key.h"
@@ -2064,7 +2065,7 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
 	matrix txt_matrix;
 
 	// Do I need the smart_ptr.here ?
-	boost::intrusive_ptr<text_character_def> txt = new text_character_def(get_movie_definition());
+	boost::intrusive_ptr<edit_text_character_def> txt = new edit_text_character_def(get_movie_definition());
 	boost::intrusive_ptr<character> txt_char = txt->create_character_instance(this, 0);
 
 	txt_char->set_name(name.c_str());
