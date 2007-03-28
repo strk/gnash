@@ -223,7 +223,7 @@ public:
 	/// 
 	/// The arguments are the same as the above init_property arguments,
 	/// although the setter argument is omitted.
-	void init_property(const std::string& key, as_function& getter);
+	void init_readonly_property(const std::string& key, as_function& getter);
 
 	/// Get a member as_value by name
 	//

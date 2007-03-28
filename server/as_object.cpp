@@ -298,7 +298,7 @@ as_object::init_property(const std::string& key, as_function& getter,
 }
 
 void
-as_object::init_property(const std::string& key, as_function& getter)
+as_object::init_readonly_property(const std::string& key, as_function& getter)
 {
 	init_property(key, getter, getter);
 

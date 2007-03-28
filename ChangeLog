@@ -15,6 +15,15 @@
 
 	* server/as_value.h: Add as_value::to_number<type>(), which will
 	cast the result of to_number() to the requested number type.
+	* server/as_object{.h, .cpp}: Rename init_property(name, getter)
+	to init_readonly_property(name, getter).
+	* server/{button_character_instance.cpp, sprite_instance.cpp):
+	Update callers to use init_readonly_property.
+	* server/asobj/string.cpp: Reimplement the ActionScript String
+	class using std::string. Also change the style to Rob's
+	preffered one.
+	* testsuite/actionscript.all/String.as: Add a few more
+	testcases.
 
 2007-03-28 Sandro Santilli <strk@keybit.net>
 

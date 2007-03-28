@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.15 2007/03/21 16:20:57 strk Exp $";
+rcsid="$Id: String.as,v 1.16 2007/03/28 15:22:24 bjacques Exp $";
 
 #include "check.as"
 
@@ -32,6 +32,8 @@ check_equals ( a.charAt(1), "a" );
 check_equals ( a.charAt(2), "l" );
 check_equals ( a.charAt(3), "l" );
 check_equals ( a.charAt(4), "a" );
+isNaN ( a.charAt(-1) );
+isNaN (a.charAt(21) );
 check_equals ( a.indexOf("lawa"), 3 );
 check_equals ( a.lastIndexOf("lawa"), 8);
 check_equals ( a.indexOf("lawas"), 8 );
@@ -82,6 +84,7 @@ check_equals ( String.prototype.slice.call(a, -5, -3), undefined );
 check_equals ( a.slice(-4), "wxyz" );
 check_equals ( a.substring(5,2), "cde" );
 check_equals ( a.substring(5,7), "fg" );
+check_equals ( a.substring(3,3), "" );
 check_equals ( a.length, 26 );
 check_equals ( a.concat("sir ","william",15), "abcdefghijklmnopqrstuvwxyzsir william15");
 var b = new String("1234");

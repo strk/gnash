@@ -1,11 +1,11 @@
-// 
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.23 2007/03/20 16:41:00 strk Exp $ */
+/* $Id: string.cpp,v 1.24 2007/03/28 15:22:24 bjacques Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -23,21 +23,37 @@
 #endif
 
 #include "tu_config.h"
-#include "gstring.h"
 #include "smart_ptr.h"
 #include "fn_call.h"
-#include "as_object.h" 
+#include "as_object.h"
 #include "builtin_function.h" // need builtin_function
 #include "log.h"
 #include "array.h"
 #include "as_value.h"
 #include "GnashException.h"
+#include <boost/algorithm/string/case_conv.hpp>
+#include "VM.h"
 
-namespace gnash {
+#define ENSURE_FN_ARGS(min, max, rv)                                    \
+    if (fn.nargs < min) {                                               \
+        IF_VERBOSE_ASCODING_ERRORS(                                     \
+            log_aserror("%s needs one argument", __FUNCTION__);         \
+            )                                                           \
+         return as_value(rv);                                           \
+    }                                                                   \
+    IF_VERBOSE_ASCODING_ERRORS(                                         \
+        if (fn.nargs > max)                                             \
+            log_aserror("%s has more than one argument", __FUNCTION__); \
+    )
+
+
+
+namespace gnash
+{
 
 // Forward declarations
+
 static as_value string_get_length(const fn_call& fn);
-static as_value string_set_length(const fn_call& fn);
 static as_value string_concat(const fn_call& fn);
 static as_value string_slice(const fn_call& fn);
 static as_value string_split(const fn_call& fn);
@@ -56,479 +72,480 @@ static as_value string_ctor(const fn_call& fn);
 static void
 attachStringInterface(as_object& o)
 {
-	// TODO fill in the rest
-	o.init_member("concat", new builtin_function(string_concat));
-	o.init_member("slice", new builtin_function(string_slice));
-	o.init_member("split", new builtin_function(string_split));
-	o.init_member("lastIndexOf", new builtin_function(string_last_index_of));
-	o.init_member("substr", new builtin_function(string_sub_str));
-	o.init_member("substring", new builtin_function(string_sub_string));
-	o.init_member("indexOf", new builtin_function(string_index_of));
-	o.init_member("toString", new builtin_function(string_to_string));
-	o.init_member("fromCharCode", new builtin_function(string_from_char_code));
-	o.init_member("charAt", new builtin_function(string_char_at));
-	o.init_member("charCodeAt", new builtin_function(string_char_code_at));
-	o.init_member("toUpperCase", new builtin_function(string_to_upper_case));
-	o.init_member("toLowerCase", new builtin_function(string_to_lower_case));
-	
-	boost::intrusive_ptr<builtin_function> length_getter(new builtin_function(string_get_length));
-	boost::intrusive_ptr<builtin_function> length_setter(new builtin_function(string_set_length));
-	o.init_property("length", *length_getter, *length_setter);
+    // TODO fill in the rest
+    o.init_member("concat", new builtin_function(string_concat));
+    o.init_member("slice", new builtin_function(string_slice));
+    o.init_member("split", new builtin_function(string_split));
+    o.init_member("lastIndexOf", new builtin_function(string_last_index_of));
+    o.init_member("substr", new builtin_function(string_sub_str));
+    o.init_member("substring", new builtin_function(string_sub_string));
+    o.init_member("indexOf", new builtin_function(string_index_of));
+    o.init_member("toString", new builtin_function(string_to_string));
+    o.init_member("fromCharCode", new builtin_function(string_from_char_code));
+    o.init_member("charAt", new builtin_function(string_char_at));
+    o.init_member("charCodeAt", new builtin_function(string_char_code_at));
+    o.init_member("toUpperCase", new builtin_function(string_to_upper_case));
+    o.init_member("toLowerCase", new builtin_function(string_to_lower_case));
+
+    boost::intrusive_ptr<builtin_function> length_getter(new builtin_function(string_get_length));
+    o.init_readonly_property("length", *length_getter);
 
 }
 
 static as_object*
 getStringInterface()
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( o == NULL )
-	{
-		o = new as_object();
-		attachStringInterface(*o);
-	}
-	return o.get();
+    static boost::intrusive_ptr<as_object> o;
+
+    if ( o == NULL ) {
+        o = new as_object();
+        attachStringInterface(*o);
+    }
+
+    return o.get();
 }
 
-class tu_string_as_object : public as_object
+class string_as_object : public as_object
 {
+
 public:
-	// TODO: make private
-	tu_string m_string;
+    string_as_object()
+            :
+            as_object(getStringInterface())
+    {}
 
-	tu_string_as_object()
-		:
-		as_object(getStringInterface())
-	{
-	}
+    const char* get_text_value() const
+    {
+        return _string.c_str();
+    }
 
-	const char* get_text_value() const
-	{
-		return m_string.c_str();
-	}
+    as_value get_primitive_value() const
 
-	as_value get_primitive_value() const
-	{
-		return as_value(m_string.c_str());
-	}
+    {
+        return as_value(_string.c_str());
+    }
 
+    std::string& str()
+
+    {
+        return _string;
+    }
+
+private:
+    std::string _string;
 };
 
 static as_value
 string_get_length(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> str = ensureType<tu_string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-	return as_value(str->m_string.utf8_length());
-
-}
-
-static as_value
-string_set_length(const fn_call& /*fn*/)
-{
-	IF_VERBOSE_ASCODING_ERRORS(
-	log_aserror("String: length property is read-only");
-	);
-	return as_value();
+    return as_value(obj->str().size());
 }
 
 // all the arguments will be converted to string and concatenated
 static as_value
 string_concat(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> str = ensureType<tu_string_as_object>(fn.this_ptr);
-	tu_string this_string = str->m_string;
-	
-	int len = strlen(this_string.c_str());
-	int pos = len;
-	for (unsigned int i = 0; i < fn.nargs; i++) len += strlen(fn.arg(i).to_string());
-	
-	char *newstr = new char[len + 1];
-	memcpy(newstr, this_string.c_str(),pos); // because pos at the moments holds the strlen of this_string!
-	for (unsigned int i = 0; i < fn.nargs; i++) 
-	{
-		int len = strlen(fn.arg(i).to_string());
-		memcpy((newstr + pos),fn.arg(i).to_string(),len);
-		pos += len;
-	}
-	newstr[len] = '\0';
-	
-	tu_string returnstring(newstr);
-	delete[] newstr;	// because tu_string copies newstr
-	return as_value(returnstring);
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+
+    // Make a copy of our string.
+    std::string str = obj->str();
+
+    for (unsigned int i = 0; i < fn.nargs; i++) {
+        str += fn.arg(i).to_std_string();
+    }
+
+    return as_value(str);
+}
+
+
+static size_t
+valid_index(std::string subject, int index)
+{
+    int myIndex = index;
+
+    if (myIndex < 0) {
+        myIndex = subject.size() + myIndex;
+    }
+
+    myIndex = iclamp(myIndex, 0, subject.size());
+
+    return myIndex;
 }
 
 // 1st param: start_index, 2nd param: end_index
 static as_value
 string_slice(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> str = ensureType<tu_string_as_object>(fn.this_ptr);
-	tu_string this_string = str->m_string;
-	// Pull a slice out of this_string.
-	int	start = 0;
-	int	utf8_len = this_string.utf8_length();
-	int	end = utf8_len;
-	if (fn.nargs >= 1)
-	{
-		start = static_cast<int>(fn.arg(0).to_number());
-		if (start < 0) start = utf8_len + start;
-		start = iclamp(start, 0, utf8_len);
-	}
-	if (fn.nargs >= 2)
-	{
-		end = static_cast<int>(fn.arg(1).to_number());
-		if (end < 0) end = utf8_len + end;
-		end = iclamp(end, 0, utf8_len);
-	}
-	
-	if (end < start) {
-		IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("string.slice() called with end < start");
-		)
-		// Swap start and end, cos that's what substr does
-		swap(&start, &end);
-	}
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-	return as_value(this_string.utf8_substring(start, end));
+    // Make a copy.
+    std::string str = obj->str();
+
+    ENSURE_FN_ARGS(1, 2, str);
+
+    int start = fn.arg(0).to_number<int>();
+
+    int end = str.size();
+
+    if (fn.nargs >= 2) {
+        end = fn.arg(1).to_number<int>();
+
+        if (end < start) {
+            // Swap start and end like substring
+            swap(&start, &end);
+        }
+
+        start = valid_index(str, start);
+
+        end = valid_index(str, end) - start ;
+    } else {
+        start = valid_index(str, start);
+    }
+
+    return as_value(str.substr(start, end));
 }
 
 static as_value
 string_split(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> str = ensureType<tu_string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<string_as_object> obj =
+        ensureType<string_as_object>(fn.this_ptr);
 
-	boost::intrusive_ptr<tu_string_as_object> this_string_ptr(str); // why ??
-	
-	as_value val;
-	
-	boost::intrusive_ptr<as_array_object> array(new as_array_object());
-	
-	if (fn.nargs == 0) 
-	{
-		val.set_tu_string(this_string_ptr->m_string);
-		array->push(val);
-		
-		return as_value(array.get());
-	} else
-	{
-		tu_string this_string = this_string_ptr->m_string;
-		
-		int	utf8_len = this_string.utf8_length();
+    std::string str = obj->str();
 
-		if (strcmp("",fn.arg(0).to_string()) == 0)
-		{
-			for (int i = 0; i < utf8_len; i++) {
-				val.set_tu_string(this_string.utf8_substring(i,i+1));
-				array->push(val);
-			}
-			return as_value(array.get());
-		}
-		else 
-		{
-			const char *str = this_string.c_str();
-			const char *delimeter = fn.arg(0).to_string();
-			
-			tu_string str_tu(str);
-			tu_string delimeter_tu(str);
-			
-			int start = 0;
-			int end;
-			//int utf8_str_len = str_tu.utf8_length();
-			//int utf8_delimeter_len = delimeter_tu.utf8_length();
-			int delimeter_len = strlen(delimeter);
-			
-			const char *pstart = str;
-			const char *pend = strstr(pstart,delimeter);
-			while (pend != NULL)
-			{
-				//tu_string fromstart(pstart);
-				//tu_string fromend(pend);
-				start = tu_string::utf8_char_count(str,int(pstart-str));
-				end = start + tu_string::utf8_char_count(pstart,int(pend-pstart));
-				
-				val.set_tu_string(this_string.utf8_substring(start,end));
-				array->push(val);
-				pstart = pend + delimeter_len;
-				if (!(*pstart))
-				{
-					return as_value(array.get());
-				}
-				pend = strstr(pstart,delimeter);
-				
-			}
-			val.set_tu_string(tu_string(pstart));
-			array->push(val);
-			return as_value(array.get());
-		}
-	}
-	
+    as_value val;
+
+    boost::intrusive_ptr<as_array_object> array(new as_array_object());
+
+    if (fn.nargs == 0) {
+        val.set_std_string(str);
+        array->push(val);
+
+        return as_value(array.get());
+    }
+
+    std::string delim = fn.arg(0).to_std_string();
+
+    if (delim == "") {
+        for (unsigned i=0; i < str.size(); i++) {
+            val.set_std_string(str.substr(i, i+1));
+            array->push(val);
+        }
+
+        return as_value(array.get());
+    }
+
+    size_t max = -1;
+
+    if (fn.nargs >= 2) {
+        max = fn.arg(1).to_number<size_t>();
+    }
+
+    size_t pos = 0, prevpos = 0;
+    size_t num = 0;
+
+    while (num < max) {
+        pos = str.find(delim, pos);
+
+        if (pos != std::string::npos) {
+            val.set_std_string(str.substr(prevpos, pos - prevpos));
+            array->push(val);
+            num++;
+            prevpos = pos + delim.size();
+            pos++;
+        } else {
+            val.set_std_string(str.substr(prevpos));
+            array->push(val);
+            break;
+        }
+    }
+
+    return as_value(array.get());
 }
 
 static as_value
 string_last_index_of(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-	if (fn.nargs < 1)
-	{
-		return as_value(-1);
-	}
-	else
-	{
-		int	start_index = 0;
-		if (fn.nargs > 1)
-		{
-			start_index = static_cast<int>(fn.arg(1).to_number());
-		}
-		const char*	str = this_string_ptr->m_string.c_str();
-		const char*	p = strstr(
-			str + start_index,	// FIXME: not UTF-8 correct!
-			fn.arg(0).to_string());
-		if (p == NULL)
-		{
-			return as_value(-1);
-		}
-		
-		const char* lastocc = p;
-		while (p != NULL)
-		{
-			if (!(*p)) break;
-			p = strstr((p+1),fn.arg(0).to_string()); // FIXME: also not UTF-8 correct!
-			if (p) lastocc = p;
-		}
-		
-		return as_value(tu_string::utf8_char_count(str, int(lastocc - str)));
-	}
+    const std::string& str = obj->str();
+
+    ENSURE_FN_ARGS(1, 2, -1);
+
+    std::string toFind = fn.arg(0).to_std_string();
+
+    size_t start = str.size();
+
+    if (fn.nargs >= 2) {
+        start = fn.arg(1).to_number<size_t>();
+    }
+
+    size_t found = str.find_last_of(toFind, start);
+
+    if (found == std::string::npos) {
+        return as_value(-1);
+    }
+
+    return as_value(found-toFind.size()+1);
 }
 
 // 1st param: start_index, 2nd param: length (NOT end_index)
 static as_value
 string_sub_str(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
-	tu_string this_string = this_string_ptr->m_string;
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-	// Pull a slice out of this_string.
-	int	start = 0;
-	int	utf8_len = this_string.utf8_length();
-	int	end = utf8_len;
-	if (fn.nargs >= 1)
-	{
-		start = static_cast<int>(fn.arg(0).to_number());
-		if (start < 0) start = utf8_len + start;
-		start = iclamp(start, 0, utf8_len);
-	}
-	if (fn.nargs >= 2)
-	{
-		end = static_cast<int>(fn.arg(1).to_number()) + start;
-		end = iclamp(end, start, utf8_len);
-	}
+    // Make a copy.
+    std::string str = obj->str();
 
-	return as_value(this_string.utf8_substring(start, end));
+    ENSURE_FN_ARGS(1, 2, str);
+
+    int start = valid_index(str, fn.arg(0).to_number<int>());
+
+    int num = str.size();
+
+    if (fn.nargs >= 2) {
+        num = fn.arg(1).to_number<int>();
+    }
+
+    return as_value(str.substr(start, num));
 }
 
 // 1st param: start_index, 2nd param: end_index
+// end_index is 1-based.
 static as_value
 string_sub_string(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
-	tu_string this_string = this_string_ptr->m_string;
-	// Pull a slice out of this_string.
-	int	start = 0;
-	int	utf8_len = this_string.utf8_length();
-	int	end = utf8_len;
-	if (fn.nargs >= 1)
-	{
-		start = static_cast<int>(fn.arg(0).to_number());
-		start = iclamp(start, 0, utf8_len);
-	}
-	if (fn.nargs >= 2)
-	{
-		end = static_cast<int>(fn.arg(1).to_number());
-		end = iclamp(end, 0, utf8_len);
-	}
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-	if (end < start) swap(&start, &end);	// dumb, but that's what the docs say
+    const std::string& str = obj->str();
 
-	return as_value(this_string.utf8_substring(start, end));
+    ENSURE_FN_ARGS(1, 2, str);
+
+    int start = fn.arg(0).to_number<int>();
+
+    if (start < 0) {
+        start = 0;
+    }
+
+    if (static_cast<unsigned>(start) > str.size()) {
+        return as_value("");
+    }
+
+    int end = str.size();
+
+    if (fn.nargs >= 2) {
+        int num = fn.arg(1).to_number<int>();
+
+        if (num < 0) {
+            return as_value("");
+        }
+
+        if (num > 1 && static_cast<unsigned>(num) < str.size()) {
+            end = num;
+
+            if (end < start) {
+                IF_VERBOSE_ASCODING_ERRORS(
+                    log_aserror("string.slice() called with end < start");
+                )
+                swap(&end, &start);
+            }
+
+            end -= start;
+        }
+
+    }
+
+    return as_value(str.substr(start, end));
 }
 
 static as_value
 string_index_of(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-	if (fn.nargs < 1)
-	{
-		return as_value(-1);
-	}
-	else
-	{
-		int	start_index = 0;
-		if (fn.nargs > 1)
-		{
-			start_index = static_cast<int>(fn.arg(1).to_number());
-		}
-		const char*	str = this_string_ptr->m_string.c_str();
-		const char*	p = strstr(
-			str + start_index,	// FIXME: not UTF-8 correct!
-			fn.arg(0).to_string());
-		if (p == NULL)
-		{
-			return as_value(-1);
-		}
+    const std::string& str = obj->str();
 
-		return as_value(tu_string::utf8_char_count(str, p - str));
-	}
+    ENSURE_FN_ARGS(1, 2, -1);
+
+    std::string toFind = fn.arg(0).to_std_string();
+
+    size_t start = 0;
+
+    if (fn.nargs >= 2) {
+        start = fn.arg(1).to_number<size_t>();
+    }
+
+    size_t pos = str.find(toFind, start);
+
+    if (pos == std::string::npos) {
+        return as_value(-1);
+    }
+
+    return as_value(pos);
 }
- 
+
 static as_value
 string_from_char_code(const fn_call& fn)
 {
-	tu_string result;
+    std::string result;
 
-	for (unsigned int i = 0; i < fn.nargs; i++)
-	{
-		uint32 c = (uint32) fn.arg(i).to_number();
-		result.append_wide_char(c);
-	}
+    // isn't this function supposed to take one argument?
 
-	return as_value(result);
+    for (unsigned int i = 0; i < fn.nargs; i++) {
+        uint32_t c = fn.arg(i).to_number<uint32_t>();
+        result += c;
+    }
+
+    return as_value(result);
 }
 
 static as_value
 string_char_code_at(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
 
-	// assert(fn.nargs == 1);
-	if (fn.nargs < 1) {
-	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("string.charCodeAt needs one argument");
-		)
-	     as_value rv;
-	     rv.set_nan();
-	     return rv;	// Same as for out-of-range arg
-	}
-	IF_VERBOSE_ASCODING_ERRORS(
-	    if (fn.nargs > 1)
-		log_aserror("string.charCodeAt has more than one argument");
-	)
+    const std::string& str = obj->str();
 
-	int	index = static_cast<int>(fn.arg(0).to_number());
-	if (index >= 0 && index < this_string_ptr->m_string.utf8_length())
-	{
-		return as_value(this_string_ptr->m_string.utf8_char_at(index));
-	}
+    if (fn.nargs == 0) {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("string.charCodeAt needs one argument");
+        )
+        as_value rv;
+        rv.set_nan();
+        return rv;	// Same as for out-of-range arg
+    }
 
-	double temp = 0.0;	// This variable will let us divide by zero without a compiler warning
-	return as_value(temp/temp);	// this division by zero creates a NaN value
+    IF_VERBOSE_ASCODING_ERRORS(
+        if (fn.nargs > 1) {
+            log_aserror("string.charCodeAt has more than one argument");
+        }
+    )
+
+    size_t index = fn.arg(0).to_number<size_t>();
+
+    if (index > str.size()) {
+        as_value rv;
+        rv.set_nan();
+        return rv;
+    }
+
+    return as_value(str[index]);
 }
 
 static as_value
 string_char_at(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    std::string& str = obj->str();
 
-	// assert(fn.nargs == 1);
-	if (fn.nargs < 1) {
-	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("%s needs one argument", __FUNCTION__);
-		)
-	    return as_value("");	// Same as for out-of-range arg
-	}
-	IF_VERBOSE_ASCODING_ERRORS(
-	    if (fn.nargs > 1)
-		log_aserror("%s has more than one argument", __FUNCTION__);
-	)
+    ENSURE_FN_ARGS(1, 1, "");
 
-	int	index = static_cast<int>(fn.arg(0).to_number());
-	if (index >= 0 && index < this_string_ptr->m_string.utf8_length())
-	{
-		tu_string result;
-		result += this_string_ptr->m_string.utf8_char_at(index);
-		return as_value(result);
-	}
+    size_t index = fn.arg(0).to_number<size_t>();
 
-	double temp = 0.0;	// This variable will let us divide by zero without a compiler warning
-	return as_value(temp/temp);	// this division by zero creates a NaN value
+    if (index > str.size()) {
+        as_value rv;
+        rv.set_nan();
+        return rv;
+    }
+
+    std::string rv;
+
+    rv.push_back(str[index]);
+
+    return as_value(rv);
 }
 
 static as_value
 string_to_upper_case(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    std::string subject = obj->str();
 
-	return as_value(this_string_ptr->m_string.utf8_to_upper());
+    VM& vm = VM::get();
+
+    boost::to_upper(subject, vm.getLocale());
+
+    return as_value(subject);
 }
 
 static as_value
 string_to_lower_case(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    std::string subject = obj->str();
 
-	return as_value(this_string_ptr->m_string.utf8_to_lower());
+    VM& vm = VM::get();
+
+    boost::to_lower(subject, vm.getLocale());
+
+    return as_value(subject);
 }
 
 static as_value
 string_to_string(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> this_string_ptr = ensureType<tu_string_as_object>(fn.this_ptr);
-	return as_value(this_string_ptr->m_string);
+    boost::intrusive_ptr<string_as_object> obj = ensureType<string_as_object>(fn.this_ptr);
+    return as_value(obj->str());
 }
 
 
 static as_value
 string_ctor(const fn_call& fn)
 {
-	boost::intrusive_ptr<tu_string_as_object> str = new tu_string_as_object;
+    boost::intrusive_ptr<string_as_object> obj = new string_as_object;
 
-	if (fn.nargs > 0)
-	{
-		str->m_string = fn.arg(0).to_tu_string();
-	}
-	
-	// this shouldn't be needed
-	//attachStringInterface(*str);
+    std::string& str = obj->str();
 
-	return as_value(str.get());
+    if (fn.nargs > 0) {
+        str = fn.arg(0).to_std_string();
+    }
+
+    // this shouldn't be needed
+    //attachStringInterface(*str);
+
+    return as_value(obj.get());
 }
 
 static boost::intrusive_ptr<builtin_function>
 getStringConstructor()
 {
-	// This is going to be the global String "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+    // This is going to be the global String "class"/"function"
 
-	if ( cl == NULL )
-	{
-		cl=new builtin_function(&string_ctor, getStringInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachStringInterface(*cl);
-		     
-	}
+    static boost::intrusive_ptr<builtin_function> cl;
 
-	return cl;
+    if ( cl == NULL ) {
+        cl=new builtin_function(&string_ctor, getStringInterface());
+        // replicate all interface to class, to be able to access
+        // all methods as static functions
+        attachStringInterface(*cl);
+
+    }
+
+    return cl;
 }
 
 // extern (used by Global.cpp)
 void string_class_init(as_object& global)
 {
-	// This is going to be the global String "class"/"function"
-	boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
+    // This is going to be the global String "class"/"function"
+    boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
 
-	// Register _global.String
-	global.init_member("String", cl.get());
+    // Register _global.String
+    global.init_member("String", cl.get());
 
 }
 
 boost::intrusive_ptr<as_object>
+
 init_string_instance(const char* val)
 {
-	boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
-	as_environment env;
-	env.push(val);
-	return cl->constructInstance(env, 1, 0);
+    boost::intrusive_ptr<builtin_function> cl = getStringConstructor();
+    as_environment env;
+    env.push(val);
+    return cl->constructInstance(env, 1, 0);
 }
-  
+
 } // namespace gnash
