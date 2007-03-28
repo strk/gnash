@@ -85,7 +85,8 @@ NetStreamGst::NetStreamGst():
 	inputPos(0),
 	videowidth(0),
 	videoheight(0),
-	m_newFrameReady(false)
+	m_newFrameReady(false),
+	m_parser(NULL)
 {
 }
 
@@ -494,6 +495,18 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	g_object_set (G_OBJECT (ns->videosink), "signal-handoffs", TRUE, "sync", TRUE, NULL);
 	g_signal_connect (ns->videosink, "handoff", G_CALLBACK (NetStreamGst::callback_output), ns);
 
+	if (ns->m_isFLV) {
+		if (!ns->videodecoder || !ns->videosource || !ns->videoinputcaps || !ns->audiodecoder || !ns->audiosource || !ns->audioinputcaps) {
+			gnash::log_error("Gstreamer element(s) for video movie handling could not be created\n");
+			return;
+		}
+	} else {
+		if (!ns->decoder || !ns->source) {
+			gnash::log_error("Gstreamer element(s) for video movie handling could not be created\n");
+			return;
+		}
+	}
+
 	if (!ns->colorspace || !ns->videocaps || !ns->videorate || !ns->videosink) {
 		gnash::log_error("Gstreamer element(s) for video movie handling could not be created\n");
 		return;
@@ -538,6 +551,8 @@ image::image_base* NetStreamGst::get_video()
 void
 NetStreamGst::seek(double pos)
 {
+
+	if (!pipeline) return;
 
 	if (m_isFLV) {
 		uint32_t newpos = m_parser->seek(static_cast<uint32_t>(pos*1000))/1000;

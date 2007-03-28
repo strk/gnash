@@ -1,3 +1,8 @@
+2007-03-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStreamGst.cpp: Make sure pipeline exists before
+	  accessing it, and the same goes for the FLV parser.
+
 2007-03-28 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (add_textfield): return void.
