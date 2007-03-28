@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.39 2007/03/25 09:05:58 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.40 2007/03/28 20:52:37 strk Exp $";
 
 #include "check.as"
 
@@ -380,3 +380,17 @@ asm {
 check_equals(b, "/");
 
 #endif // MING_SUPPORT_ASM_GETPROPERTY
+
+//------------------------------------------------
+// Test createTextField
+//------------------------------------------------
+
+t = createTextField("textfieldTest", 3, 0, 100, 100, 100);
+check_equals(typeof(t), 'undefined');
+#if OUTPUT_VERSION > 5
+check_equals(typeof(textfieldTest), 'object');
+check(textfieldTest instanceof TextField);
+#else
+xcheck_equals(typeof(textfieldTest), 'movieclip');
+xcheck(textfieldTest instanceof MovieClip);
+#endif

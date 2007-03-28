@@ -32,7 +32,6 @@
 #include "MovieClipLoader.h" // @@ temp hack for loading tests
 #include "as_value.h"
 #include "as_function.h"
-//#include "text_character_def.h" // @@ temp hack for createTextField exp.
 #include "edit_text_character_def.h" // @@ temp hack for createTextField exp.
 #include "execute_tag.h"
 #include "fn_call.h"
@@ -771,9 +770,8 @@ sprite_create_text_field(const fn_call& fn)
 	boost::intrusive_ptr<character> txt = sprite->add_textfield(txt_name,
 			txt_depth, txt_x, txt_y, txt_width, txt_height);
 
-	// We should return a ref to the newly created
-	// TextField here
-	return as_value(txt.get());
+	// createTextField returns void, it seems
+	return as_value(); 
 }
 
 //getNextHighestDepth() : Number
