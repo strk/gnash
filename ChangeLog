@@ -1,3 +1,8 @@
+2007-03-28 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (loadMovie):
+	  Parse the querystring given in the URL.
+
 2007-03-28 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/as_value.h: Add as_value::to_number<type>(), which will

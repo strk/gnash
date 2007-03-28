@@ -3832,6 +3832,11 @@ sprite_instance::loadMovie(const URL& url)
 		return false;
 	}
 
+	// Parse query string
+	VariableMap vars;
+	url.parse_querystring(url.querystring(), vars);
+	extern_movie->setVariables(vars);
+
 	save_extern_movie(extern_movie.get());
 
 	const char* name = get_name().c_str();
