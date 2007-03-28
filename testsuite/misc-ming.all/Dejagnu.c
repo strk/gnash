@@ -73,7 +73,7 @@ main(int argc, char** argv)
 	 *
 	 *********************************************/
 
-	dejaclip = get_dejagnu_clip((SWFBlock)bfont, 3000, 0, 50, 600, 800);
+	dejaclip = get_dejagnu_clip((SWFBlock)bfont, 3000, 0, 50, 800, 800);
 
 	SWFMovie_add(mo, (SWFBlock)dejaclip);
 	SWFMovie_addExport(mo, (SWFBlock)dejaclip, "dejagnu");
