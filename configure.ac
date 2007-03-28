@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.277 2007/03/25 12:57:20 martinwguy Exp $
+dnl $Id: configure.ac,v 1.278 2007/03/28 23:42:19 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -48,7 +48,7 @@ dnl Get build date for helping us debugging
 BUILDDATE="`date +%Y%m%d`"
 
 dnl These are required by automake
-AM_INIT_AUTOMAKE(gnash, "cvs-$BUILDDATE")
+AM_INIT_AUTOMAKE(gnash, "cvs$BUILDDATE")
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 

@@ -39,11 +39,12 @@ libgnashbackend_LIBS =  \
 	$(NULL)
 
 AM_CPPFLAGS = -I.. \
+        -I$(srcdir) \
         -I$(top_srcdir) \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/libbase \
-        -I$(top_srcdir)/backend \
+	        -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
 	$(PTHREAD_CFLAGS) \
         $(SDL_CFLAGS) \
@@ -58,9 +59,16 @@ AM_CPPFLAGS = -I.. \
 	$(NULL)
 
 noinst_HEADERS = \
-	sound_handler.h \
 	render_handler.h \
-	render_handler_tri.h
+	render_handler_agg.h \
+	render_handler_agg_bitmap.h \
+	render_handler_agg_compat.h \
+	render_handler_agg_style.h \
+	render_handler_cairo.h \
+	render_handler_tri.h \
+	sound_handler.h \
+	sound_handler_gst.h \
+	sound_handler_sdl.h
 
 # bin_PROGRAMS = gnash
 

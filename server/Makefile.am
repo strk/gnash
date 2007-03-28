@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.107 2007/03/15 22:39:53 strk Exp $
+# $Id: Makefile.am,v 1.108 2007/03/28 23:42:19 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -156,6 +156,8 @@ libgnashserver_la_LIBADD = \
 	$(top_builddir)/server/parser/libgnashparser.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(LIBXML_LIBS) \
+	$(BOOST_LIBS) \
+	$(PTHREAD_LIBS) \
 	$(NULL)
 
 if USE_SOUND_GST

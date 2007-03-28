@@ -110,7 +110,7 @@ if grep "^AC_PROG_LIBTOOL" configure.ac >/dev/null; then
 	if test -z "$NO_LIBTOOLIZE" ; then 
 	  echo "Running libtoolize --force --ltdl --copy ..."
 	  if ${LIBTOOLIZE:-libtoolize} --force --ltdl --copy; then
-            :
+	    chmod a+w libltdl/config-h.in # Darwin needs this
           else
             echo
             echo "**Error**: libtoolize failed, do you have libltdl dev package installed?"

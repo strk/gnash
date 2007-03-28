@@ -36,6 +36,7 @@ EXTRA_DIST = VarAndCharClashTest.as \
 	gotoFrame2Test.as \
 	DrawingApiTest.as \
 	FlashVarsTest.as \
+	intervalTest.as \
 	FlashVarsTest.html
 
 
@@ -550,7 +551,7 @@ action_execution_order_test6.swf: action_execution_order_test6
 action_execution_order_test6runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test6.swf
 	sh $< $(top_builddir) action_execution_order_test6.swf > $@
 	chmod 755 $@
-	
+
 action_execution_order_extend_test_SOURCES =	\
 	action_execution_order_extend_test.c	\
 	ming_utils.h		\

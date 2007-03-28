@@ -32,11 +32,11 @@ GNASH_LIBS = \
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS = \
-	$(CURL_LIBS) \
 	$(LIBADD_DL) \
 	$(LIBLTDL) \
         $(MYSQL_LIBS) \
 	$(LIBXML_LIBS) \
+	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
@@ -70,6 +70,7 @@ endif
 
 bin_PROGRAMS = gparser gprocessor
 noinst_PROGRAMS = dumpshm
+#check_PROGRAMS = gdebug.swf
 
 gparser_SOURCES = parser.cpp
 gparser_LDADD = $(GNASH_LIBS) $(LIBLTDL) "-dlopen" self #"-dlopen"
@@ -94,3 +95,13 @@ mudflap:
 
 clean-hook:
 	-rm -f core.*
+
+#gdebug.swf: gdebug.as gdebcmds.as
+
+# Wrap a single .as tests in dejagnu_so importer.
+# At play time, if the relative url '../ming-misc.all/Dejagnu.swf' 
+# takes to the Dejagnu.swf shared library we'll get visual traces,
+# otherwise normal traces will be used.
+SUFFIXES = as swf
+.as.swf: 
+	$(MAKESWF) $(DEF_MAKESWF_FLAGS)	$(MAKESWF_FLAGS) -o $@ $<

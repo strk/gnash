@@ -25,13 +25,13 @@ DEJAGNU_SO_PATH = ../Dejagnu.swf
 DEJAGNU_SO_FINI = $(srcdir)/../actionscript.all/dejagnu_so_fini.as
 MTASC_FLAGS= -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
 
-ASTESTS =			\
-	hello.as		\
-	inheritance.as		\
-	function.as		\
- 	$(NULL)
+EXTRA_DIST = hello.as inheritance.as TestClass.as function.as hello.as
 
-EXTRA_DIST = TestClass.as
+ASTESTS = \
+	hello.as \
+	inheritance.as \
+	function.as \
+	$(NULL)
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)
 
@@ -47,7 +47,15 @@ alltests-runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_OUT)
 	$(MTASC) $(MTASC_FLAGS) -swf mtasc-$@ -main $<
 	$(MAKESWF) -o $@ $(DEJAGNU_SO_PATH) mtasc-$@  $(DEJAGNU_SO_FINI)
 
-CLEANFILES = *.swf
+CLEANFILES =  \
+	gnash-dbg.log \
+	site.exp.bak \
+	alltests-runner \
+	testrun.* \
+	*.swf \
+	*.pp \
+	*_testrunner \
+	*_Runner
 
 check-DEJAGNU: site-update $(TEST_CASES)
 	@runtest=$(RUNTEST); \

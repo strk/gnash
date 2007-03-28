@@ -15,11 +15,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.32 2007/02/14 20:41:48 tgc Exp $
+# $Id: Makefile.am,v 1.33 2007/03/28 23:42:20 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
-noinst_LTLIBRARIES = libgnashasobjs.la 
+lib_LTLIBRARIES = libgnashasobjs.la 
 
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/backend \

@@ -1,3 +1,31 @@
+2007-03-28  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* autogen.sh: Make config-h.in atfer running libtoolize so
+	Darwin builds stop failing.
+	* configure.ac: Remove dash after cvs, it confuses rpmbuild.
+	* backend/Makefile.am: List AGG headers in noinst_HEADERS.
+	* macros/agg.m4: Set ac_cv_path_agg_incl based on agg_include_dir
+	to save a few cycles.
+	* macros/pthreads.m4: Don't set any flags for pthreads on
+	Darwin. Test for the .dylib suffix too.
+	* packaging/redhat/gnash.spec: Merge in changes from Redhat.
+	* server/Makefile.am: Add BOOST and pthreads libs for cross
+	builds.
+	* server/asobj/Makefile.am: Make an installable library for
+	dynamically linking on Darwin.
+	* server/parser/Makefile.am: Make an installable library for
+	dynamically linking on Darwin.
+	* testsuite/misc-ming.all/Makefile.am: Add intervalTest.as to
+	EXTRA_DIST so distcheck passes.
+	* testsuite/misc-mtasc.all/Makefile.am: Add all .as files to
+	EXTRA_DIST so distcheck passes. Add to CLEANFILES so distcheck
+	passes. 
+	* testsuite/samples/Makefile.am: Add to CLEANFILES so distcheck
+	passes.
+	* testsuite/libbase/Makefile.am: Link in libgnashvm too.
+	* utilities/Makefile.am: Add CURLS_LIBS. Add sufix rule for for
+	build swf from as files.
+
 2007-03-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStreamGst.cpp: Make sure pipeline exists before

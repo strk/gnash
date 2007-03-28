@@ -1,6 +1,6 @@
-%define version 20070306
+%define version 20070328
 Name:           gnash
-Version:        %{version}
+Version:        cvs%{version}
 Release:        1%{?dist}
 Summary:        GNU flash movie player
 
@@ -14,18 +14,18 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-%{_target_cpu}
 
 #AutoReqProv: no
 
-BuildRequires:  libxml2 libpng libjpeg libogg
-BuildRequires:  gtk2 libX11 agg
-# BuildRequires:  boost curl
+BuildRequires:  libxml2-devel libpng-devel libjpeg-devel libogg-devel
+BuildRequires:  gtk2-devel libX11-devel agg-devel
+BuildRequires:  boost-devel curl-devel libXt-devel
 # the opengl devel packages are required by gtkglext-devel
 # monolithic Xorg
 #BuildRequires:  xorg-x11-devel
 # modular Xorg 
 #BuildRequires:  libGLU-devel libGL-devel
 #BuildRequires:  gtkglext-devel
-BuildRequires:  mysql mysqlclient14
-BuildRequires:  SDL
-BuildRequires:  kdelibs
+BuildRequires:  mysql-devel mysqlclient14-devel
+BuildRequires:  SDL-devel
+BuildRequires:  kdelibs-devel
 BuildRequires:  docbook2X
 BuildRequires:  gstreamer >= 0.10
 # BuildRequires:  scrollkeeper
@@ -34,8 +34,8 @@ BuildRequires:  gstreamer >= 0.10
 #Requires(postun): scrollkeeper
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-Requires(post): /sbin/install-info
-Requires(preun): /sbin/install-info
+#Requires(post): /sbin/install-info
+#Requires(preun): /sbin/install-info
 
 %description
 Gnash is a GNU Flash movie player that supports many SWF v7 features.
@@ -43,7 +43,7 @@ Gnash is a GNU Flash movie player that supports many SWF v7 features.
 %package plugin
 Summary:   Web-client flash movie player plugin 
 Requires:  %{name} = %{version}-%{release}
-Requires:  webclient
+Requires:  xulrunner
 Group:     Applications/Internet
 
 %description plugin
@@ -85,6 +85,9 @@ Cygnal is a streaming media server that's Flash aware.
 %endif
 %{?do_cross_compile:%define cross_compile 1}
 
+# FIXME: this ia a bad hack! Although all this does work correctly and
+# build an RPM, it's set for an geode-olpc, so the actual hardware
+# won't let us install it.
 %define cross_compile 1
 %define olpc 1
 
@@ -121,7 +124,8 @@ RPM_TARGET=i386-olpc-linux
 # build RPMs on, so we do it this way.
   %if olpc
     CROSS_OPTS="$CROSS_OPTS --disable-klash"
-    SOUND="--enable-sound=gst"	# could be sdl
+    SOUND="--enable-sound=sdl --with-mp3-decoder=mad --disable-static"
+    RENDERER="$RENDERER --with-pixelformat=RGB565"
   %endif
 %else
 # Native RPM build
@@ -134,6 +138,16 @@ RPM_TARGET=i386-olpc-linux
 # cross configuring, so we force them to be what we know is correct.
 # export CONFIG_SHELL="sh -x"
 # sh -x ./configure \
+%if %{cross_compile}
+%configure --disable-static --with-plugindir=%{_libdir}/mozilla/plugins \
+	$CROSS_OPTS \
+	$SOUND \
+	$RENDERER \
+	--disable-dependency-tracking --disable-rpath \
+	--with-plugindir=%{_libdir}/mozilla/plugins
+ 
+make %{?_smp_mflags} CXXFLAGS="-g" dumpconfig all
+%else
 ./configure \
 	--with-qtdir=$QTDIR \
 	$CROSS_OPTS \
@@ -147,6 +161,7 @@ RPM_TARGET=i386-olpc-linux
 	--with-plugindir=%{_libdir}/mozilla/plugins
 
 make CXXFLAGS="-g" dumpconfig all
+%endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -186,14 +201,13 @@ scrollkeeper-update -q || :
 %{_bindir}/gparser
 %{_bindir}/gprocessor
 %{_libdir}/libgnash*.so
-%{_libdir}/gnash/plugins/*.so
-%{_libdir}/gnash/plugins/*.la
+%{_libdir}/mozilla/plugins/*.so
 %{_libdir}/libltdl*
 %{_prefix}/include/ltdl.h
 %{_prefix}/share/gnash/GnashG.png
 %{_prefix}/share/gnash/gnash_128_96.ico
-%{_prefix}/man/man1/gnash.1*
 %if !%{cross_compile}
+%{_prefix}/man/man1/gnash.1*
 %doc doc/C/gnash.html 
 %doc %{_prefix}/share/gnash/doc/gnash/C/images
 %{_datadir}/omf/gnash/gnash-C.omf
@@ -219,11 +233,61 @@ scrollkeeper-update -q || :
 %{_bindir}/cygnal
 
 %changelog
-* Sat Mar  4 2007 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
-- update for OLPC release.
+* Sat Mar  6 2007 Rob Savoye <rob@welcomehome.org> - %{version}-%{release}
+- merge in patch from John @ Redhat.
 
-* Sat Nov  6 2006 Rob Savoye <rob@welcomehome.org> - 0.7.2-1
+* Tue Mar 06 2007 John (J5) Palmieri <johnp@redhat.com> 0.7.2.cvs20070306-1
+- update to new snapshot
+
+* Thu Feb 28 2007 John (J5) Palmieri <johnp@redhat.com> 0.7.2.cvs20070226-3
+- require xulrunner instead of webclient
+
+* Wed Feb 28 2007 John (J5) Palmieri <johnp@redhat.com> 0.7.2.cvs20070226-2
+- don't delete requires .so files
+
+* Mon Feb 26 2007 John (J5) Palmieri <johnp@redhat.com> 0.7.2.cvs20070226-1
+- cvs snapshot built for olpc
+
+* Sat Nov  7 2006 Rob Savoye <rob@welcomehome.org> - 0.7.2-2
 - update for 0.7.2 release.
+
+* Sat Nov  6 2006 Patrice Dumas <pertusus@free.fr> 0.7.2-1
+- update for 0.7.2 release.
+
+* Thu Oct 05 2006 Christian Iseli <Christian.Iseli@licr.org> 0.7.1-9
+ - rebuilt for unwind info generation, broken in gcc-4.1.1-21
+
+* Sun Sep 24 2006 Patrice Dumas <pertusus@free.fr> 0.7.1-8
+- plugin requires %%{_libdir}/mozilla/plugins. Fix (incompletly and 
+  temporarily, but there is no better solution yet) #207613
+
+* Sun Aug 27 2006 Patrice Dumas <pertusus@free.fr> - 0.7.1-7
+- add defattr for klash
+- add warnings in the description about stability
+
+* Mon Aug 21 2006 Patrice Dumas <pertusus@free.fr> - 0.7.1-6
+- remove superfluous buildrequires autoconf
+- rename last patch to gnash-plugin-tempfile-dir.patch
+- add README.fedora to plugin to explain tmpdirs
+
+* Wed Aug 16 2006 Jens Petersen <petersen@redhat.com> - 0.7.1-5
+- source qt.sh and configure --with-qtdir (Dominik Mierzejewski)
+- add plugin-tempfile-dir.patch for plugin to use a safe tempdir
+
+* Fri Jul 28 2006 Jens Petersen <petersen@redhat.com> - 0.7.1-4
+- buildrequire autotools (Michael Knox)
+
+* Fri Jun  2 2006 Patrice Dumas <pertusus@free.fr> - 0.7.1-3
+- add gnash-continue_on_info_install_error.patch to avoid
+- buildrequire libXmu-devel
+
+* Wed May 17 2006 Jens Petersen <petersen@redhat.com> - 0.7.1-2
+- configure with --disable-rpath
+- buildrequire docbook2X
+- remove devel files
+
+* Sun May  7 2006 Jens Petersen <petersen@redhat.com> - 0.7.1-1
+- update to 0.7.1 alpha release
 
 * Sat Apr  22 2006 Rob Savoye <rob@welcomehome.org> - 0.7-1
 - install the info file. Various tweaks for my system based on

@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 dnl Copyright (C) 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
-dnl $Id: pthreads.m4,v 1.26 2007/03/25 15:52:15 martinwguy Exp $
+dnl $Id: pthreads.m4,v 1.27 2007/03/28 23:42:19 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
@@ -85,6 +85,9 @@ case "${host_cpu}-${host_os}" in
   *linux*)
     pthread_flags="-pthread"
     ;;
+  *darwin*)
+    pthread_flags="none"
+    ;;
   *solaris*)
 
   dnl On Solaris (at least, for some versions), libc contains stubbed
@@ -109,7 +112,7 @@ if test x"$pthreads" = xno; then
       -*)
         AC_MSG_CHECKING([whether pthreads work with $flag])
         PTHREAD_CFLAGS="$flag"
-	PTHREAD_LIBS=""
+	      PTHREAD_LIBS=""
         ;;
 
       pth-config)
@@ -133,7 +136,7 @@ if test x"$pthreads" = xno; then
       *)
         AC_MSG_CHECKING([for the pthreads library -l$flag])
         PTHREAD_LIBS="-l$flag"
-	PTHREAD_CFLAGS=""
+	      PTHREAD_CFLAGS=""
         ;;
     esac
 
@@ -172,7 +175,7 @@ dnl Try a manual search, useful for cross-compiling
 if test x"${PTHREAD_LIBS}" = "x"; then
   AC_MSG_CHECKING([searching for pthread library])
   for i in $libslist; do
-   if test -f $i/libpthread.a -o -f $i/libpthread.so; then
+   if test -f $i/libpthread.a -o -f $i/libpthread.so -o -f $i/libpthread.dylib; then
       pthreads=yes
      if test x"$i" != x"/usr/lib"; then
        PTHREAD_LIBS="-L$i -lpthread"
