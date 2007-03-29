@@ -13,6 +13,7 @@
 #include "button_character_instance.h"
 #include "button_character_def.h"
 #include "action.h" // for as_standard_member enum
+#include "as_value.h"
 
 #include "ActionExec.h"
 #include "sprite_instance.h"
