@@ -75,7 +75,10 @@ main(int argc, char** argv)
   sh1 = make_fill_square (300, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc1, (SWFBlock)sh1);
   /* add init actions */
-  add_clip_init_actions(mc1, " _root.note('mc1.init_actions'); _root.x += '1+'; ");
+  add_clip_init_actions(mc1, " _root.note('mc1.init_actions'); "
+                             " _root.x += '1+'; " 
+                             " y = 'var_of_root'; " );
+
   /* add actions */
   add_clip_actions(mc1, " _root.note('mc1.actions');  _root.x += '7+'; ");
   SWFMovieClip_nextFrame(mc1);//1st frame
@@ -125,6 +128,7 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); /* 2nd frame */
 
   check_equals(mo, "_root.x", "'1+2+3+4+5+6+7+8+9+'");
+  check_equals(mo, "_root.y", "'var_of_root'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 3rd frame */
   
