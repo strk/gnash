@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.41 2007/03/27 14:52:05 strk Exp $ */
+/* $Id: movie_root.h,v 1.42 2007/03/29 12:37:31 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -85,6 +85,7 @@
 // Forward declarations
 namespace gnash {
 	class ExecutableCode; // for ActionQueue
+	class Stage;
 }
 
 namespace gnash
@@ -147,7 +148,28 @@ public:
 		return false;
 	}
 
+	/// Change display viewport coordinates
+	//
+	/// This currently also change the display scale
+	/// but we should instead only do it if rescaling
+	/// is allowed.
+	///
 	void set_display_viewport(int x0, int y0, int w, int h);
+
+	/// Set whether rescaling is allowed or not.
+	//
+	/// When rescaling is not allowed the Stage listeners
+	/// will get notified on any resize attempt.
+	///
+	void allowRescaling(bool v)
+	{
+		_allowRescale=v;
+	}
+
+	bool isRescalingAllowed()
+	{
+		return _allowRescale;
+	}
 
 	/// \brief
         /// The host app can use this to tell the movie when
@@ -391,6 +413,13 @@ public:
 
 private:
 
+	/// Return the current Stage object
+	//
+	/// Can return NULL if it's been deleted or not
+	/// yet initialized.
+	///
+	boost::intrusive_ptr<Stage> getStageObject();
+
 	typedef boost::ptr_list<ExecutableCode> ActionQueue;
 
 	ActionQueue _actionQueue;
@@ -453,6 +482,9 @@ private:
 	///
         bool fire_mouse_event();
 
+	/// If set to false, no rescale should be performed
+	/// when changing viewport size
+	bool _allowRescale;
 };
 
 

@@ -28,74 +28,211 @@
 #include "builtin_function.h" // need builtin_function
 #include "VM.h"
 
+#include <string>
+
 namespace gnash {
 
 as_value stage_addlistener(const fn_call& fn);
 as_value stage_removelistener(const fn_call& fn);
-as_value stage_ctor(const fn_call& fn);
+as_value stage_scalemode_getset(const fn_call& fn);
 
 static void
 attachStageInterface(as_object& o)
 {
-	if ( VM::get().getSWFVersion() > 5 )
+	if ( VM::get().getSWFVersion() < 6 ) return;
+
+	o.init_member("addListener", new builtin_function(stage_addlistener));
+	o.init_member("removeListener", new builtin_function(stage_removelistener));
+
+	boost::intrusive_ptr<builtin_function> getset(new builtin_function(stage_scalemode_getset));
+	o.init_property("scaleMode", *getset, *getset);
+}
+
+Stage::Stage()
+	:
+	_scaleMode(showAll)
+{
+	attachStageInterface(*this);
+}
+
+void
+Stage::onResize(as_environment* env)
+{
+	as_value v;
+	if ( get_member("scaleMode", &v) && v.to_std_string(env) == std::string("noScale") )
 	{
-		o.init_member("addListener", new builtin_function(stage_addlistener));
-		o.init_member("removeListener", new builtin_function(stage_removelistener));
+		notifyResize(env);
 	}
 }
 
-static as_object*
-getStageInterface()
+void
+Stage::notifyResize(as_environment* env)
 {
-	static boost::intrusive_ptr<as_object> o;
-	if ( ! o )
+	for (ListenersList::iterator it=_listeners.begin(),
+			itEnd=_listeners.end();
+			it != itEnd; ++it)
 	{
-		o = new as_object();
-		attachStageInterface(*o);
+		if ( (*it)->get_ref_count() == 1 ) it=_listeners.erase(it);
+		else notifyResize(*it, env);
 	}
-	return o.get();
 }
 
-class stage_as_object: public as_object
+/// Notify an object about an resize event
+void
+Stage::notifyResize(boost::intrusive_ptr<as_object> obj, as_environment* env)
 {
+	const std::string eventname = "onResize";
 
-public:
+	as_value method;
+	if ( ! obj->get_member(eventname, &method) ) {
+		// nothing to do
+		return;
+	}
 
-	stage_as_object()
-		:
-		as_object(getStageInterface())
-	{}
+	boost::intrusive_ptr<as_function> func = method.to_as_function();
+	if ( ! func ) return; // method is not a function
 
-	// override from as_object ?
-	//const char* get_text_value() const { return "Stage"; }
-
-	// override from as_object ?
-	//double get_numeric_value() const { return 0; }
-};
-
-as_value stage_addlistener(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
-    return as_value();
-}
-as_value stage_removelistener(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
-    return as_value();
+	func->call(fn_call(obj.get(), env, 0, 0));
 }
 
-as_value
-stage_ctor(const fn_call& /* fn */)
+void
+Stage::addListener(boost::intrusive_ptr<as_object> obj)
 {
-	boost::intrusive_ptr<as_object> obj = new stage_as_object;
-	
-	return as_value(obj.get()); // will keep alive
+	log_msg("Adding listener %p to Stage %p", obj.get(), this);
+	_listeners.push_back(obj);
+}
+
+void
+Stage::removeListener(boost::intrusive_ptr<as_object> obj)
+{
+	log_msg("Removing listener %p from Stage %p", obj.get(), this);
+	_listeners.remove(obj);
+}
+
+/// Remove listeners with a refcount == 1
+//
+/// This function should be called before marking
+/// objects to keep alive (when GC gets in effect)
+///
+void
+Stage::dropDanglingListeners()
+{
+	for (ListenersList::iterator it=_listeners.begin(),
+			itEnd=_listeners.end();
+			it != itEnd; ++it)
+	{
+		if ( (*it)->get_ref_count() == 1 ) it=_listeners.erase(it);
+	}
+}
+
+const char*
+Stage::getScaleModeString()
+{
+	static const char* modeName[] = {
+		"showAll",
+		"noScale",
+		"exactFill",
+		"noBorder" };
+
+	return modeName[_scaleMode];
+}
+
+void
+Stage::setScaleMode(ScaleMode mode)
+{
+	_scaleMode = mode;
+
+	log_msg("Scale mode set to %s", getScaleModeString());
+	if ( _scaleMode == noScale )
+	{
+		log_msg("Setting rescaling allowance to false");
+		VM::get().getRoot().allowRescaling(false);
+	}
+}
+
+as_value stage_addlistener(const fn_call& fn)
+{
+	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
+
+	if ( fn.nargs < 1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Stage.addListener() needs one argument");
+		);
+		return as_value();
+	}
+
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+	if ( ! obj )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss;
+		fn.dump_args(ss);
+		log_aserror("Invalid call to Stage.addListener(%s) : first arg doesn't cast to an object",
+			ss.str().c_str());
+		);
+		return as_value();
+	}
+
+	stage->addListener(obj);
+	return as_value();
+}
+
+as_value stage_removelistener(const fn_call& fn)
+{
+	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
+
+	if ( fn.nargs < 1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Stage.removeListener() needs one argument");
+		);
+		return as_value();
+	}
+
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+	if ( ! obj )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss;
+		fn.dump_args(ss);
+		log_aserror("Invalid call to Stage.removeListener(%s) : first arg doesn't cast to an object",
+			ss.str().c_str());
+		);
+		return as_value();
+	}
+
+	stage->removeListener(obj);
+	return as_value();
+}
+
+as_value stage_scalemode_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(stage->getScaleModeString());
+	}
+	else // setter
+	{
+		Stage::ScaleMode mode = Stage::showAll;
+
+		std::string str = fn.arg(0).to_std_string(&(fn.env()));
+		if ( str == "noScale" ) mode = Stage::noScale;
+		else if ( str == "exactFill" ) mode = Stage::exactFill;
+		else if ( str == "noBorder" ) mode = Stage::noBorder;
+
+		stage->setScaleMode(mode);
+		return as_value();
+	}
 }
 
 // extern (used by Global.cpp)
 void stage_class_init(as_object& global)
 {
 
-	static boost::intrusive_ptr<as_object> obj = new as_object();
-	attachStageInterface(*obj);
+	static boost::intrusive_ptr<as_object> obj = new Stage();
 	global.init_member("Stage", obj.get());
 
 }

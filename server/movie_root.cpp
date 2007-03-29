@@ -32,6 +32,7 @@
 #include "VM.h"
 #include "tu_random.h"
 #include "ExecutableCode.h"
+#include "Stage.h"
 
 #include <iostream>
 #include <string>
@@ -76,7 +77,8 @@ movie_root::movie_root()
 	m_on_event_load_progress_called(false),
 	m_active_input_text(NULL),
 	m_time_remainder(0.0f),
-	m_drag_state()
+	m_drag_state(),
+	_allowRescale(true)
 {
 }
 
@@ -100,6 +102,16 @@ movie_root::setRootMovie(movie_instance* movie)
 	assert(testInvariant());
 }
 
+boost::intrusive_ptr<Stage>
+movie_root::getStageObject()
+{
+	as_value v;
+	if ( ! VM::isInitialized() ) return NULL;
+	as_object* global = VM::get().getGlobal();
+	if ( ! global ) return NULL;
+	if ( ! global->get_member("Stage", &v) ) return NULL;
+	return boost::dynamic_pointer_cast<Stage>(v.to_object());
+}
 		
 void
 movie_root::set_display_viewport(int x0, int y0, int w, int h)
@@ -111,14 +123,25 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
     m_viewport_width = w;
     m_viewport_height = h;
 
-    // should we cache this ? it's immutable after all !
-    const rect& frame_size = _movie->get_frame_size();
+    	if ( _allowRescale ) // Recompute pixel scale.
+	{
+		log_msg("Rescaling allowed");
 
-    // Recompute pixel scale.
+		// should we cache this ? it's immutable after all !
+		const rect& frame_size = _movie->get_frame_size();
 
-    float	scale_x = m_viewport_width / TWIPS_TO_PIXELS(frame_size.width());
-    float	scale_y = m_viewport_height / TWIPS_TO_PIXELS(frame_size.height());
-    m_pixel_scale = fmax(scale_x, scale_y);
+		float	scale_x = m_viewport_width / TWIPS_TO_PIXELS(frame_size.width());
+		float	scale_y = m_viewport_height / TWIPS_TO_PIXELS(frame_size.height());
+		m_pixel_scale = fmax(scale_x, scale_y);
+
+	}
+	else // rescale not allowed, notify Stage (if any)
+	{
+		log_msg("Rescaling disabled");
+		boost::intrusive_ptr<Stage> stage = getStageObject();
+		// how do I get the environment from ??
+		if ( stage ) stage->onResize(NULL);
+	}
 
 	assert(testInvariant());
 }

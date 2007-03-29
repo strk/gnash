@@ -1,3 +1,17 @@
+2007-03-29 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.{cpp,h}: support for
+	  setting scaleMode (allow scaling) and
+	  notifying Stage listeners when disabled.
+	* server/asobj/Stage.{cpp,h}: rework layout,
+	  implement addListener, removeListener and
+	  scaleMode.
+	* testsuite/actionscript.all/Stage.as: add a few
+	  tests for Stage. The notification-based tests
+	  are not automatically run yet (will need a MovieTester
+	  test runner, with new interfaces to it for resize request)
+	* utilities/Makefile.am: add libgnashasobjs, now needed.
+
 2007-03-29 Ann Barcomb <ann@lulu.com>
 
 	* devtools/testsuite/tabs.t: added check for hard tabs in 

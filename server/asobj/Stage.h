@@ -23,17 +23,93 @@
 #include "config.h"
 #endif
 
-#include <memory> // for auto_ptr
+#include "as_object.h" // for inheritance
+
+#include <list>
 
 namespace gnash {
 
-class as_object;
+/// This is the Stage ActionScript object.
+//
+/// It is currently not used as it should, in particular
+/// it should control resize behaviour, while it's not.
+///
+class Stage: public as_object
+{
+
+public:
+
+	typedef enum {
+		showAll,
+		noScale,
+		exactFill,
+		noBorder
+	} ScaleMode;
+
+	Stage();
+
+	// override from as_object ?
+	//const char* get_text_value() const { return "Stage"; }
+
+	// override from as_object ?
+	//double get_numeric_value() const { return 0; }
+	
+	void addListener(boost::intrusive_ptr<as_object> obj);
+
+	void removeListener(boost::intrusive_ptr<as_object> obj);
+
+	/// Recive a resize event.
+	//
+	/// @param env
+	///	Environment to use for notifying listeners
+	///
+	void onResize(as_environment* env);
+
+	/// Set scale mode 
+	void setScaleMode(ScaleMode mode);
+
+	/// \brief
+	/// Return the string representation for current
+	/// scale mode.
+	//
+	/// Valid values are:
+	///	- showAll
+	///	- noBorder
+	///	- exactFit
+	///	- noScale
+	///
+	const char* getScaleModeString();
+
+private:
+
+	/// Notify all listeners about a resize event
+	//
+	/// @param env
+	///	Environment to use for notifying listeners
+	///
+	void notifyResize(as_environment* env);
+
+
+	/// Notify an object about an resize event
+	void notifyResize(boost::intrusive_ptr<as_object> obj, as_environment* env);
+
+	/// Remove listeners with a refcount == 1
+	//
+	/// This function should be called before marking
+	/// objects to keep alive (when GC gets in effect)
+	///
+	void dropDanglingListeners();
+
+	typedef std::list<boost::intrusive_ptr<as_object> > ListenersList;
+
+	ListenersList _listeners;
+
+	ScaleMode _scaleMode;
+};
+
 
 /// Initialize the global Stage class
 void stage_class_init(as_object& global);
-
-/// Return a Stage instance (in case the core lib needs it)
-//std::auto_ptr<as_object> init_stage_instance();
   
 } // end of gnash namespace
 

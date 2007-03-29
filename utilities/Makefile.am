@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ AUTOMAKE_OPTIONS = # dejagnu
 
 GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la
