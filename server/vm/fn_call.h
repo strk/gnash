@@ -26,6 +26,8 @@
 #endif
 
 #include "as_environment.h" // for inlines (arg)
+#include "as_object.h" // for dtor visibility by boost::intrusive_ptr
+#include "smart_ptr.h"
 
 #include <cassert> // for inlines (arg)
 #include <ostream> // for inlines (dump_args)

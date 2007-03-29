@@ -1,3 +1,8 @@
+2007-03-29 Deanna Phillips <deanna>
+
+	* server/vm/fn_call.h: include the stuff needed
+	  for proper intrusive_ptr composition.
+
 2007-03-29 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.{cpp,h} add an optional argument
