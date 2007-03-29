@@ -49,6 +49,7 @@ AM_CPPFLAGS = -I.. \
 	-I$(top_srcdir)/libgeometry \
 	-I$(top_srcdir)/testsuite \
 	$(MING_CFLAGS) \
+	-DMING_VERSION_CODE=$(MING_VERSION_CODE) \
 	$(NULL)
 
 
@@ -107,6 +108,12 @@ check_PROGRAMS += KeyTest-Runner \
 	intervalTestRunner 
 endif
 
+if MING_SUPPORTS_INIT_ACTIONS
+check_PROGRAMS += \
+	init_action_test \
+	$(NULL)
+endif
+
 check_SCRIPTS = \
 	timeline_var_test-Runner \
 	place_object_testrunner \
@@ -132,6 +139,13 @@ check_SCRIPTS += VarAndCharClashTest-Runner \
 	gotoFrame2Test-Runner \
 	FlashVarsTest-Runner
 endif
+
+if MING_SUPPORTS_INIT_ACTIONS
+check_SCRIPTS += \
+	init_action_testrunner \
+	$(NULL)
+endif
+
 
 # TESTS = \
 # 	DefineEditTextVariableNameTest-Runner 
@@ -690,6 +704,20 @@ FlashVarsTest-Runner: $(srcdir)/../generic-testrunner.sh FlashVarsTest.swf
 	echo "$(top_builddir)/gui/gnash -1 -r0 -v -P 'FlashVars=?a=a_in_fvars&v=v_in_fvars' 'FlashVarsTest.swf?a=a_in_qstring&q=q_in_qstring'" > $@
 	chmod 755 $@
 
+init_action_test_SOURCES =	\
+	init_action_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+init_action_test_LDADD = $(MING_LIBS)
+
+init_action_test.swf: init_action_test
+	./init_action_test $(top_srcdir)/testsuite/media
+
+init_action_testrunner: $(srcdir)/../generic-testrunner.sh init_action_test.swf
+	sh $< $(top_builddir) init_action_test.swf > $@
+	chmod 755 $@
+
 intervalTest.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/intervalTest.as 
 	$(MAKESWF) -o $@ ../Dejagnu.swf $(srcdir)/intervalTest.as
 intervalTestRunner_SOURCES = \
@@ -804,6 +832,12 @@ TEST_CASES += KeyTest-Runner \
 	FlashVarsTest-Runner \
 	intervalTestRunner \
 	gotoFrame2Test-Runner 
+endif
+
+if MING_SUPPORTS_INIT_ACTIONS
+TEST_CASES += \
+	init_action_testrunner \
+	$(NULL)
 endif
 
 check-DEJAGNU: site-update $(check_PROGRAMS)

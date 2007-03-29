@@ -22,6 +22,10 @@
 
 #include <ming.h>
 
+#if MING_VERSION_CODE >= 00040004
+# define MING_SUPPORTS_INIT_ACTIONS
+#endif
+
 /* Missing define to allow using older Ming releases */
 
 #ifndef SWFACTION_INIT
@@ -226,6 +230,7 @@ void add_actions(SWFMovie mo, const char* code);
 void add_clip_actions(SWFMovieClip mc, const char* code);
 
 
+#ifdef MING_SUPPORTS_INIT_ACTIONS
 /** \brief
  * Add an Init ActionScript code in the given movieclip
  *
@@ -235,7 +240,8 @@ void add_clip_actions(SWFMovieClip mc, const char* code);
  * @param code
  *   Init ActionScript code to be compiled in.
  */
-//void add_clip_init_actions(SWFMovieClip mo, const char* code);
+void add_clip_init_actions(SWFMovieClip mo, const char* code);
+#endif // MING_SUPPORTS_INIT_ACTIONS
 
 /** \brief
  *  Create an outline square shape with given offset, size and colors

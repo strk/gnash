@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.278 2007/03/28 23:42:19 rsavoye Exp $
+dnl $Id: configure.ac,v 1.279 2007/03/29 06:54:09 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -494,6 +494,8 @@ AC_PATH_MING
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
 AM_CONDITIONAL(MAKESWF_SUPPORTS_PREBUILT_CLIPS,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040002  ])
+AM_CONDITIONAL(MING_SUPPORTS_INIT_ACTIONS,
+        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040004  ])
 
 AC_ARG_WITH([swfdec_testsuite],
 	AC_HELP_STRING([--with-swfdec-testsuite],

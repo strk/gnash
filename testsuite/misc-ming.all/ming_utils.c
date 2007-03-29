@@ -289,7 +289,7 @@ add_clip_actions(SWFMovieClip mo, const char* code)
 	SWFMovieClip_add(mo, (SWFBlock)ac);
 }
 
-#if 0
+#ifdef MING_SUPPORTS_INIT_ACTIONS
 void
 add_clip_init_actions(SWFMovieClip mo, const char* code)
 {
@@ -297,7 +297,7 @@ add_clip_init_actions(SWFMovieClip mo, const char* code)
 	ac = compileSWFActionCode(code);
 	SWFMovieClip_addInitAction(mo, (SWFBlock)ac);
 }
-#endif
+#endif // MING_SUPPORTS_INIT_ACTIONS
 
 SWFAction 
 compile_actions(const char* fmt, ...)
