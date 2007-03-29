@@ -5,7 +5,7 @@
 	  flag; (m_goto_action_list): deprecated !
 	* testsuite/misc-ming.all/consecutive_goto_frame_test.c:
 	  don't expect a failure.
-	* testsuite/swfdec/PASSING: goto2.swf succeeds.
+	* testsuite/swfdec/PASSING: goto3.swf succeeds.
 
 2007-03-29 Sandro Santilli <strk@keybit.net>
 
