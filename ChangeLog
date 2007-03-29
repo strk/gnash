@@ -1,3 +1,7 @@
+2007-03-29 Markus Gothe <nietzsche@lysator.liu.se>
+
+	gui/gtk.cpp: Indent the licensing notes. 
+
 2007-03-29 Deanna Phillips <deanna>
 
 	* server/vm/fn_call.h: include the stuff needed

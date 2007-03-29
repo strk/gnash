@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.77 2007/03/08 17:58:33 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.78 2007/03/29 20:59:45 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -875,7 +875,7 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
 //                   "translator-credits", "translator-credits",
                    "logo", logo_pixbuf,
 		   "license", 
-		   "This program is free software; you can redistribute it and/or modify\n it under the terms of the GNU General Public License as published by\n the Free Software Foundation; either version 2 of the License, or\n (at your option) any later version.\n\n This program is distributed in the hope that it will be useful,\n but WITHOUT ANY WARRANTY; without even the implied warranty of\n MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n GNU General Public License for more details.\n You should have received a copy of the GNU General Public License\n along with this program; if not, write to the Free Software\n Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
+		   "This program is free software; you can redistribute it and/or modify\nit under the terms of the GNU General Public License as published by\nthe Free Software Foundation; either version 2 of the License, or\n(at your option) any later version.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\nGNU General Public License for more details.\nYou should have received a copy of the GNU General Public License\nalong with this program; if not, write to the Free Software\nFoundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA",
 		   "website", "http://www.gnu.org/software/gnash/",
                    NULL);
 }
