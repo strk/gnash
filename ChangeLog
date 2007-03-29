@@ -1,3 +1,10 @@
+2007-03-22 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all: init_action_test.c
+	  add a new testcase for DoInitAction.
+	* testsuite/misc-ming.all/ming_utils.c, ming_utils.h
+	  add a interface for adding init actions for sprites.
+	  
 2007-03-28  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* autogen.sh: Make config-h.in atfer running libtoolize so

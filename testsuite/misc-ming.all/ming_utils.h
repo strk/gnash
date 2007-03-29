@@ -227,6 +227,17 @@ void add_clip_actions(SWFMovieClip mc, const char* code);
 
 
 /** \brief
+ * Add an Init ActionScript code in the given movieclip
+ *
+ * @param mc
+ *   The SWFMovieClip to add the DO_INITACTION block to.
+ *
+ * @param code
+ *   Init ActionScript code to be compiled in.
+ */
+//void add_clip_init_actions(SWFMovieClip mo, const char* code);
+
+/** \brief
  *  Create an outline square shape with given offset, size and colors
  */
 SWFShape make_square(int x, int y, int width, int height, byte r, byte g, byte b);

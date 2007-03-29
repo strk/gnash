@@ -289,6 +289,16 @@ add_clip_actions(SWFMovieClip mo, const char* code)
 	SWFMovieClip_add(mo, (SWFBlock)ac);
 }
 
+#if 0
+void
+add_clip_init_actions(SWFMovieClip mo, const char* code)
+{
+	SWFAction ac;
+	ac = compileSWFActionCode(code);
+	SWFMovieClip_addInitAction(mo, (SWFBlock)ac);
+}
+#endif
+
 SWFAction 
 compile_actions(const char* fmt, ...)
 {
