@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.80 2007/03/28 08:40:44 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.81 2007/03/29 07:36:17 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -693,6 +693,13 @@ private:
 
 	/// Queue event handler(s), if any.
 	void queueEventHandler(const event_id& id);
+
+	/// Queue actions in the action list
+	//
+	/// The list of action will be pushed on the current
+	/// global list (see movie_root).
+	///
+	void queueActions(ActionList& action_list);
 
 	/// Set to yes when this instance has been unloaded
 	bool _unloaded;

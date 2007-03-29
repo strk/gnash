@@ -1,5 +1,7 @@
 2007-03-29 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{h,cpp} add queueActions() method.
+	* server/swf/tag_loaders.cpp: fix compiler warnings.
 	* testsuite/server/Makefile.am: link in libgnashparser for the
 	  tests that turn out to need it since rob changed it from
 	  noinst_LTLIBRARY to lib_LTLIBRARY.

@@ -2192,6 +2192,19 @@ sprite_instance::queueEventHandler(const event_id& id)
 
 }
 
+/* private */
+void
+sprite_instance::queueActions(ActionList& actions)
+{
+	movie_root& root = VM::get().getRoot();
+	for(ActionList::iterator it=actions.begin(), itEnd=actions.end();
+		       it != itEnd; ++it)
+	{
+		action_buffer* buf = *it;
+		root.pushAction(*buf, boost::intrusive_ptr<sprite_instance>(this));
+	}
+}
+
 bool
 sprite_instance::on_event(const event_id& id)
 {
