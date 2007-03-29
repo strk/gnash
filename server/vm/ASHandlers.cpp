@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.76 2007/03/29 14:29:15 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.77 2007/03/29 17:23:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2914,12 +2914,6 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 
 	enumerateObject(env, *obj);
 
-	static bool warned=false;
-	if ( ! warned )
-	{
-		log_warning("TESTING: %s", __PRETTY_FUNCTION__);
-		warned=true;
-	}
 }
 
 void
