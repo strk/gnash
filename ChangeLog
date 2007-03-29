@@ -1,5 +1,8 @@
 2007-03-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/server/Makefile.am: link in libgnashparser for the
+	  tests that turn out to need it since rob changed it from
+	  noinst_LTLIBRARY to lib_LTLIBRARY.
 	* configure.ac: provide MING_SUPPORTS_INIT_ACTIONS conditional.
 	* testsuite/misc-ming.all/ming_utils.{h,c}: provide
 	  MING_SUPPORTS_INIT_ACTIONS macro and use it to conditinally
