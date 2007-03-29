@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.78 2007/03/29 20:59:45 nihilus Exp $ */
+/* $Id: gtk.cpp,v 1.79 2007/03/29 23:55:49 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -107,7 +107,9 @@ GtkGui::init(int argc, char **argv[])
         _vbox = gtk_vbox_new(FALSE, 0);
         gtk_widget_show(_vbox);
         gtk_container_add(GTK_CONTAINER(_window), _vbox);
+#ifdef USE_MENUS
         createMenuBar();
+#endif
         gtk_box_pack_start(GTK_BOX(_vbox), _drawing_area, FALSE, FALSE, 0);
     }
 
@@ -133,7 +135,7 @@ GtkGui::createMenuBar()
     _menubar = gtk_menu_bar_new();
     gtk_widget_show(_menubar);
     gtk_box_pack_start(GTK_BOX (_vbox), _menubar, FALSE, FALSE, 0); 
-    
+
     createFileMenu(_menubar);
     createEditMenu(_menubar);
     createControlMenu(_menubar);
@@ -327,9 +329,11 @@ GtkGui::createMenu()
 //    GtkAccelGroup *accel_group = gtk_accel_group_new();;
 //    gtk_window_add_accel_group (GTK_WINDOW (_popup_menu), accel_group);
  
+#ifdef USE_MENUS
     createFileMenu(GTK_WIDGET(_popup_menu));
     createEditMenu(GTK_WIDGET(_popup_menu));
     createControlMenu(GTK_WIDGET(_popup_menu));
+#endif
     createHelpMenu(GTK_WIDGET(_popup_menu));
     
 //     GtkMenuItem *menuitem_prefs =

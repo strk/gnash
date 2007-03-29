@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.279 2007/03/29 06:54:09 strk Exp $
+dnl $Id: configure.ac,v 1.280 2007/03/29 23:55:49 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -66,6 +66,19 @@ if test x"$debugger" = x"yes"; then
   AC_DEFINE([USE_DEBUGGER], [], [Flash Debugger support])
 fi
 AM_CONDITIONAL(DEBUGGER, test x$debugger = xyes)
+
+AC_ARG_ENABLE(menus,
+  AC_HELP_STRING([--disable-menus],[Disable the GUI menus]),
+[case "${enableval}" in
+  yes) menus=yes ;;
+  no)  menus=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-menus option]) ;;
+esac],menus=yes)
+
+if test x"$menu" = x"yes"; then
+  AC_DEFINE([USE_MENU], [], [GUI Menu support])
+fi
+AM_CONDITIONAL(MENU, test x$menu = xyes)
 
 dnl Write the file to disk in the plugin, if specified.
 AC_ARG_ENABLE(write,
@@ -877,6 +890,7 @@ backend/Makefile
 utilities/Makefile
 doc/Makefile
 doc/C/Makefile
+doc/C/asspec/Makefile
 doc/Doxyfile
 testsuite/Makefile
 testsuite/libbase/Makefile

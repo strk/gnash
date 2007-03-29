@@ -1,5 +1,12 @@
 2007-03-29  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* configure.ac: Add --disable-menus since an embedded systems
+	probably won't want them.
+	* gui/gtk.cpp: Disable most of the menu items if they're
+	disabled.
+	* packaging/redhat/gnash.spec: Build with --disable-menus for the
+	OLPC. 
+
 	* doc/C/sources.xml: Fix mismatched sect tags.
 	* doc/C/asspec: new directory to hold the ActionScript
 	specification files, so as to not clutter the top level doc

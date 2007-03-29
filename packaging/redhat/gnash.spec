@@ -123,7 +123,7 @@ RPM_TARGET=i386-olpc-linux
 # targeted towards Fedora Core 6. The machine itself is too limited to
 # build RPMs on, so we do it this way.
   %if olpc
-    CROSS_OPTS="$CROSS_OPTS --disable-klash"
+    CROSS_OPTS="$CROSS_OPTS --disable-klash --disable-menus"
     SOUND="--enable-sound=sdl --with-mp3-decoder=mad --disable-static"
     RENDERER="$RENDERER --with-pixelformat=RGB565"
   %endif
