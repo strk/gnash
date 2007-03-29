@@ -609,41 +609,4 @@
 	</informaltable>
       </para>
 
-      &asaccessibility;
-      &asarray;
-      &asboolean;
-      &asbutton;
-      &ascamera;
-      &ascolor;
-      &ascontextmenu;
-      &asmath;
-      &asnetconnection;
-      &asnumber;
-      &asstring;
-      &ascustomactions;
-      &asdate;
-      &aserror;
-      &asfunction;
-      &askey;
-      &asloadvars;
-      &aslocalconnection;
-      &asmicrophone;
-      &asmouse;
-      &asmovieclip;
-      &asmoviecliploader;
-      &asnetstream;
-      &asobject;
-      &asselection;
-      &assharedobject;
-      &assound;
-      &asstage;
-      &assystem;
-      &astextfield;
-      &astextformat;
-      &astextsnapshot;
-      &asvideo;
-      &asxmlnode;
-      &asxml;
-      &asxmlsocket;
-
     </sect3>

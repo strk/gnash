@@ -19,54 +19,69 @@
 # Building a PDF using Apache FOP only works with fop-0.20.5 for now.
 include $(top_srcdir)/doc/xmldocs.make
 
-SUBDIRS = asspec
 infodir = ${prefix}/share/info
-figdir = images
-docname = gnash
+figdir = ../images
+docname = asspec
 lang = C
-omffile = gnash-C.omf
+omffile = asspec-C.omf
 entities = \
-	sources.xml \
-	internals.xml \
-	amf.xml	\
-	appendix.xml \
-	debugger.xml \
-	extensions.xml \
-	fdl-appendix.xml \
-	fileext.xml \
-	gtkext.xml \
-	mysqlext.xml \
-	object.xml \
-	opcodes.xml \
-	plugin.xml \
-	rtmp.xml
+	accessibility.xml \
+	array.xml \
+	boolean.xml \
+	button.xml \
+	camera.xml \
+	color.xml \
+	contextmenu.xml	\
+	customactions.xml \
+	date.xml \
+	error.xml \
+	function.xml \
+	key.xml	\
+	legal.xml \
+	loadvars.xml \
+	localconnection.xml \
+	math.xml \
+	microphone.xml \
+	mouse.xml \
+	movieclip.xml \
+	moviecliploader.xml \
+	netconnection.xml \
+	netstream.xml \
+	number.xml \
+	selection.xml \
+	sharedobject.xml \
+	sound.xml \
+	stage.xml \
+	string.xml \
+	system.xml \
+	textfield.xml \
+	textformat.xml \
+	textsnapshot.xml \
+	video.xml \
+	xml.xml	\
+	xmlnode.xml \
+	xmlsocket.xml
 
 xml_files = $(entities) $(docname).xml
 
-#noinst_SCRIPT = gen-doc.sh
-dist_man_MANS = gnash.1
-
-html: gnash.html actionscript.html
-pdf:  gnash.pdf actionscript.pdf
-man:  gnash.1 
-texi: gnash.texi actionscript.texi
-info: gnash.info actionscript.info
-gnash.pdf gnash.html gnash.texi: $(xml_files)
-actionscript.pdf actionscript.html actionscript.texi: actionscript.xml actionscript/main.xml actionscript/as_value.xml actionscript/new_as_class.xml
+html: asspec.html
+pdf:  asspec.pdf
+man:  asspec.1 
+texi: asspec.texi
+info: asspec.info
+asspec.pdf asspec.html asspec.texi: $(xml_files)
 
 SUFFIXES = .xml .html .texi .pdf .info .1 .fo
 
 EXTRA_DIST = \
 	$(xml_files) \
 	$(omffile) \
-	gnash.texi \
+	asspec.texi \
 	actionscript.texi \
-	gnash-man.xml \
-	actionscript.info \
-	gnash.info \
-	actionscript.html \
-	gnash.html \
-	gnash.1
+	asspec-man.xml \
+	asspec.info \
+	asspec.html \
+	asspec.1
 
 if ENABLE_FOP
 .xml.pdf:
@@ -112,51 +127,51 @@ endif
 .texi.info:
 	-$(MAKEINFO) --force $<
 
-gnash.1: gnash-man.xml
+asspec.1: asspec-man.xml
 if ENABLE_MAN
-	$(DB2X_XSLTPROC) -s man $(srcdir)/gnash-man.xml -o gnash.mxml
-	$(DB2X_MANXML) gnash.mxml
-	$(RM) gnash.mxml
+	$(DB2X_XSLTPROC) -s man $(srcdir)/asspec-man.xml -o asspec.mxml
+	$(DB2X_MANXML) asspec.mxml
+	$(RM) asspec.mxml
 else
-	touch gnash.1
+	touch asspec.1
 endif
 
 alldocs: html pdf man info
 
 lint:
-	@xmllint $(srcdir)/gnash.xml
+	@xmllint $(srcdir)/asspec.xml
 
 CLEANFILES = \
-	gnash-C.omf.out \
+	asspec-C.omf.out \
 	manpage.links  \
 	manpage.refs  \
-	gnash.tex  \
-	gnash.fo  \
-	gnash.log  \
-        gnash.texi \
-	gnash_manual_*.texi \
-	gnash.txml \
-	gnash.mxml \
+	asspec.tex  \
+	asspec.fo  \
+	asspec.log  \
+        asspec.texi \
+	asspec_manual_*.texi \
+	asspec.txml \
+	asspec.mxml \
 	omf_timestamp
 
 MAINTAINERCLEANFILES = \
-        gnash.pdf       \
-        gnash.1         \
-        gnash.info      \
-        gnash.html
+        asspec.pdf       \
+        asspec.1         \
+        asspec.info      \
+        asspec.html
 
-install-info-hook: gnash.info
+install-info-hook: asspec.info
 	test -d "$(DESTDIR)$(infodir)" || $(mkinstalldirs) "$(DESTDIR)$(infodir)"
-	$(INSTALL_DATA) $< $(DESTDIR)$(infodir)/gnash.info 
+	$(INSTALL_DATA) $< $(DESTDIR)$(infodir)/asspec.info 
 	-if (install-info --version) >/dev/null 2>&1; then \
 	  version=`install-info --version | grep -c 'GNU texinfo'`; \
 	  if test $$version -eq 0; then \
-	    install-info --menuentry="Gnash" --description="GNU Flash Player" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash.info >/dev/null 2>&1; \
+	    install-info --menuentry="Asspec" --description="GNU Flash Player" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/asspec.info >/dev/null 2>&1; \
 	  else \
-	    install-info --entry="* Gnash: (gnash). GNU Flash Player" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/gnash.info >/dev/null 2>&1; \
+	    install-info --entry="* Asspec: (asspec). GNU Flash Player" --info-dir=$(DESTDIR)$(infodir) $(DESTDIR)$(infodir)/asspec.info >/dev/null 2>&1; \
 	  fi; \
 	fi
 
 uninstall-info-hook:
-	$(RM) $(DESTDIR)$(infodir)/gnash.info
+	$(RM) $(DESTDIR)$(infodir)/asspec.info
 

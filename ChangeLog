@@ -1,3 +1,22 @@
+2007-03-29  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* doc/C/sources.xml: Fix mismatched sect tags.
+	* doc/C/asspec: new directory to hold the ActionScript
+	specification files, so as to not clutter the top level doc
+	directory.
+	* doc/C/accessibility.xml, array.xml, boolean.xml, button.xml,
+	camera.xml, color.xml, contextmenu.xml, customactions.xml, date.xml,
+	error.xml, function.xml, key.xml, loadvars.xml, localconnection.xml,
+	math.xml, microphone.xml, mouse.xml, movieclip.xml,
+	moviecliploader.xml netconnection.xml, netstream.xml, number.xml,
+	selection.xml, sharedobject.xml, sound.xml, stage.xml, string.xml,
+	system.xml, textfield.xml, textformat.xml, textsnapshot.xml, video.xml,
+	xml.xml, xmlnode.xml, xmlsocket.xml: Moved to asspec directory.
+	* doc/asspec/asspec.xml: New top level document for free
+	ActionScript specification.
+	* doc/C/gnash.xml: Remove AS Spec entities, they're now in
+	asspec.xml. Use gnash-dev instead of gnash for questions.
+
 2007-03-29 Markus Gothe <nietzsche@lysator.liu.se>
 
 	gui/gtk.cpp: Indent the licensing notes. 

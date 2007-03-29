@@ -42,6 +42,7 @@
 		    http://ftp.gnu.org/gnu/gnash
 	</ulink> 
       </para>
+    </sect3>
 
     <sect3 id="sourcecvs">
       <title>CVS Access</title>
@@ -67,6 +68,8 @@
 		    http://gnash.lulu.com/dev_snapshots
 	</ulink> 
       </para>
+    </sect3>
+  </sect2>
 
   <sect2 id="codedepend">
     <title>Code Dependencies</title>
