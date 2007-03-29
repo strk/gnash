@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: SharedObject.as,v 1.7 2007/01/11 11:56:20 strk Exp $";
+rcsid="$Id: SharedObject.as,v 1.8 2007/03/29 12:57:36 strk Exp $";
 
 #include "check.as"
 
@@ -46,7 +46,7 @@ check_equals (typeof(sharedobjectObj.clear), 'function');
 check_equals (typeof(sharedobjectObj.flush), 'function');
 
 // test the SharedObject::getlocal method
-xcheck_equals (typeof(sharedobjectObj.getLocal), 'undefined');
+check_equals (typeof(sharedobjectObj.getLocal), 'undefined');
 check_equals (typeof(SharedObject.getLocal), 'function');
 
 // test the SharedObject::getsize method

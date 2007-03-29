@@ -41,8 +41,14 @@ attachSharedObjectInterface(as_object& o)
 	// TODO: clear, flush and getSize not in SWF<6 , it seems
 	o.init_member("clear", new builtin_function(sharedobject_clear));
 	o.init_member("flush", new builtin_function(sharedobject_flush));
-	o.init_member("getLocal", new builtin_function(sharedobject_getlocal));
+	//o.init_member("getLocal", new builtin_function(sharedobject_getlocal));
 	o.init_member("getSize", new builtin_function(sharedobject_getsize));
+}
+
+static void
+attachSharedObjectStaticInterface(as_object& o)
+{
+	o.init_member("getLocal", new builtin_function(sharedobject_getlocal));
 }
 
 static as_object*
@@ -57,12 +63,12 @@ getSharedObjectInterface()
 	return o.get();
 }
 
-class sharedobject_as_object: public as_object
+class SharedObject: public as_object
 {
 
 public:
 
-	sharedobject_as_object()
+	SharedObject()
 		:
 		as_object(getSharedObjectInterface())
 	{}
@@ -74,27 +80,64 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-as_value sharedobject_clear(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
-    return as_value();
+as_value sharedobject_clear(const fn_call& fn)
+{
+	boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+	UNUSED(obj);
+
+	static bool warned=false;
+	if ( ! warned ) {
+		log_error("FIXME: %s: unimplemented", __FUNCTION__);
+		warned=true;
+	}
+	return as_value();
 }
-as_value sharedobject_flush(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
-    return as_value();
+
+as_value sharedobject_flush(const fn_call& fn)
+{
+	boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+	UNUSED(obj);
+
+	static bool warned=false;
+	if ( ! warned ) {
+		log_error("FIXME: %s: unimplemented", __FUNCTION__);
+		warned=true;
+	}
+	return as_value();
 }
-as_value sharedobject_getlocal(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
-    return as_value();
+
+as_value sharedobject_getlocal(const fn_call& /*fn*/)
+{
+	// This should return a SharedObject, and it's a static function
+
+	//boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+	//UNUSED(obj);
+
+	static bool warned=false;
+	if ( ! warned ) {
+		log_error("FIXME: %s: unimplemented", __FUNCTION__);
+		warned=true;
+	}
+	return as_value();
 }
-as_value sharedobject_getsize(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
-    return as_value();
+
+as_value sharedobject_getsize(const fn_call& fn)
+{
+	boost::intrusive_ptr<SharedObject> obj = ensureType<SharedObject>(fn.this_ptr);
+	UNUSED(obj);
+
+	static bool warned=false;
+	if ( ! warned ) {
+		log_error("FIXME: %s: unimplemented", __FUNCTION__);
+		warned=true;
+	}
+	return as_value();
 }
 
 as_value
 sharedobject_ctor(const fn_call& /* fn */)
 {
-	boost::intrusive_ptr<as_object> obj = new sharedobject_as_object;
+	boost::intrusive_ptr<as_object> obj = new SharedObject;
 	
 	return as_value(obj.get()); // will keep alive
 }
@@ -110,7 +153,7 @@ void sharedobject_class_init(as_object& global)
 		cl=new builtin_function(&sharedobject_ctor, getSharedObjectInterface());
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
-		attachSharedObjectInterface(*cl);
+		attachSharedObjectStaticInterface(*cl);
 		     
 	}
 

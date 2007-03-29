@@ -1,5 +1,9 @@
 2007-03-29 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/SharedObject.cpp: better stubs (nothing more).
+
+2007-03-29 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h}: support for
 	  setting scaleMode (allow scaling) and
 	  notifying Stage listeners when disabled.
