@@ -1,3 +1,8 @@
+2007-03-29 Ann Barcomb <ann@lulu.com>
+
+	* devtools/testsuite/tabs.t: added check for hard tabs in 
+	  C++ source.
+
 2007-03-29 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.{h,cpp} (goto_frame): push target
