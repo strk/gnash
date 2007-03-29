@@ -1568,7 +1568,7 @@ sprite_instance::sprite_instance(
 	_drawable(new DynamicShape),
 	_drawable_inst(_drawable->create_character_instance(this, 0)),
 	m_action_list(),
-	m_goto_frame_action_list(),
+	//m_goto_frame_action_list(),
 	m_play_state(PLAY),
 	m_current_frame(0),
 	m_has_looped(false),
@@ -2721,6 +2721,7 @@ void sprite_instance::advance_sprite(float delta_time)
 	//log_msg("Advancing %d newly-added (after clearing) childs of %s", newlyAdded.size(), getTargetPath().c_str());
 	newlyAdded.advance(delta_time);
 
+#if 0 // we push gotoframe actions on the global queue now
 	// goto_frame_action (for now) need be executed
 	// *after* actions in child sprites have
 	// been executed. When action execution order
@@ -2738,6 +2739,7 @@ void sprite_instance::advance_sprite(float delta_time)
 		execute_actions(m_goto_frame_action_list);
 		assert(m_goto_frame_action_list.empty());
 	}
+#endif
 	
 	// Remember current state of the DisplayList for next iteration
 	oldDisplayList = m_display_list;
@@ -3054,7 +3056,8 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	// become obsoleted and the target frame actions could be pushed
 	// directly on the preexisting m_action_list (and no need to back it up).
 	//
-	m_goto_frame_action_list = m_action_list; 
+	//m_goto_frame_action_list = m_action_list; 
+	queueActions(m_action_list);
 
 	// Restore ActionList  from backup
 	m_action_list = actionListBackup;
@@ -3788,6 +3791,7 @@ sprite_instance::unload()
 	UnloaderVisitor visitor;
 	m_display_list.visitForward(visitor);
 	on_event(event_id::UNLOAD); // if call_unload
+	_unloaded=true;
 
 }
 

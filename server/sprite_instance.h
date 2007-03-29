@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.81 2007/03/29 07:36:17 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.82 2007/03/29 08:58:58 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -748,7 +748,10 @@ private:
 	boost::intrusive_ptr<character> _drawable_inst;
 
 	ActionList	m_action_list;
-	ActionList	m_goto_frame_action_list;
+
+	// this is deprecated, we'll be pushing gotoframe target
+	// actions to the global action queue
+	//ActionList	m_goto_frame_action_list;
 
 	play_state	m_play_state;
 

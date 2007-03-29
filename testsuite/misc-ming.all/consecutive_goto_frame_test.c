@@ -97,21 +97,21 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); /* 2nd frame */
   
   /* mc_red.x has been set after playing the 1st frame, check it here */
-  add_actions(mo, " xcheck_equals(mc_red.x, 'as_in_frm1_of_mc_red'); "
+  add_actions(mo, " check_equals(mc_red.x, 'as_in_frm1_of_mc_red'); "
 		  " _root.note('frm3 of root - gotoAndStop(4)');"
                   "mc_red.x = 'as_in_frm3_of_root'; "
                   "gotoAndStop(4); ");               
   SWFMovie_nextFrame(mo); /* 3rd frame */
   
   /* mc_red.x has been set again after playing the 2nd frame, check it again */
-  add_actions(mo, " xcheck_equals(mc_red.x, 'as_in_frm2_of_mc_red'); "
+  add_actions(mo, " check_equals(mc_red.x, 'as_in_frm2_of_mc_red'); "
 		  " _root.note('frm4 of root - gotoAndStop(5)');"
                   " mc_red.x = \"as_in_frm4_of_root\"; "
                   " gotoAndStop(5); ");
   SWFMovie_nextFrame(mo); /* 4th frame */
   
   /* mc_red.x has been set again after playing the 3rd frame, check it again */
-  xcheck_equals(mo, "mc_red.x", "'as_in_frm3_of_mc_red'");
+  check_equals(mo, "mc_red.x", "'as_in_frm3_of_mc_red'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 5th frame */
 

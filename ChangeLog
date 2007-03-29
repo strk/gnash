@@ -1,5 +1,14 @@
 2007-03-29 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{h,cpp} (goto_frame): push target
+	  actions to the global list; (unload): set the _unloaded
+	  flag; (m_goto_action_list): deprecated !
+	* testsuite/misc-ming.all/consecutive_goto_frame_test.c:
+	  don't expect a failure.
+	* testsuite/swfdec/PASSING: goto2.swf succeeds.
+
+2007-03-29 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/string.cpp (string_split): fix compiler wanring
 	  and handle SWF5 case.
 	* testsuite/actionscript.all/String.as: expect less failures.
