@@ -1,11 +1,22 @@
 #!perl
 
+
+########################### NOTES ##################################
+## If you wish to change the output of this program, search for 
+## 'sub create_headerfile' and 'sub create_cppfile'.  
+##
+## To run this program, type 'gen-class.pl --help' (you may need
+## to use '/path/to/perl gen-clas.pl --help'), which will display 
+## available options.
+####################################################################
+
+
 use strict;
 use warnings;
 use Getopt::Long;
 use Pod::Usage;
 
-our $VERBOSE = 0;
+our $VERBOSE = 0;  ## default setting; can be changed by command-line option
 
 our $LICENSE = q|
 // 
@@ -42,8 +53,9 @@ sub create_headerfile {
     open ($fh, '>', $args{headerfile}) or die
         "Cannot open file '$args{headerfile}': $!\n";
     notify("Creating file '$args{headerfile}'.");
-
     print $fh $LICENSE;
+
+    ## The text between the EOFs will be printed in the header file.
     print $fh <<EOF;
 
 #ifndef __GNASH_ASOBJ_$args{up}_H__
@@ -84,10 +96,21 @@ sub create_cppfile {
     open ($fh, '>', $args{cppfile}) or die
         "Cannot open file '$args{cppfile}': $!\n";
     notify("Creating file '$args{cppfile}'.");
+    print $fh $LICENSE;
 
-    ## Create code for each method
+
+    ## Loop through the list of methods.  Generate code, stored in
+    ## $declarations, $registrations, and $implementations.  $declarations
+    ## contains the declaration code for all methods, etc.  These will
+    ## be printed later, in the section delimited with EOF.  You may
+    ## change the output of these three looped sections.
     my ($declarations, $registrations, $implementations);
     foreach my $m (@{$args{methods}}) {
+
+        ## Where you see 'qq|' and '|', read '"' and '"'.  Using the quote
+        ## operator eliminates the need to escape literal quotes.  Thus,
+        ##   qq|This is an "example".\n|  ==  "This is an \"example\".\n"
+        ## A '.' concatenates a string.
 
         $declarations .= 
           qq|\nstatic void $args{lc}_| .$m. qq|(const fn_call& fn);|;
@@ -108,7 +131,7 @@ sub create_cppfile {
 
     }
 
-    print $fh $LICENSE;
+    ## The text between the EOFs will be printed in the C++ source file.
     print $fh <<EOF;
 
 #ifdef HAVE_CONFIG_H
