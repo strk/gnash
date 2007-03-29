@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.16 2007/03/28 15:22:24 bjacques Exp $";
+rcsid="$Id: String.as,v 1.17 2007/03/29 08:44:05 strk Exp $";
 
 #include "check.as"
 
@@ -39,9 +39,24 @@ check_equals ( a.lastIndexOf("lawa"), 8);
 check_equals ( a.indexOf("lawas"), 8 );
 check_equals ( a.indexOf("hinG"), 13 );
 check_equals ( a.indexOf("hing"), -1 );
+
+//----------------------------------------
+// Check String.split
+//-----------------------------------------
+
+check_equals ( typeof(a.split), 'function' );
+check ( ! a.hasOwnProperty('split') );
+#if OUTPUT_VERSION > 5
+check ( a.__proto__.hasOwnProperty('split') );
+check ( a.__proto__ == String.prototype );
+#endif
+
 check_equals ( a.split()[0], "wallawallawashinGTON" );
 check_equals ( a.split().length, 1 );
 check ( a.split() instanceof Array );
+check_equals ( a.split("w").length, 4);
+check_equals ( a.split("  w").length, 1);
+
 #if OUTPUT_VERSION > 5
 check_equals ( a.split("")[0], "w" );
 check_equals ( a.split("")[19], "N" );
@@ -50,12 +65,14 @@ check_equals ( a.split("la")[1], "wal" );
 check_equals ( a.split("la")[2], "washinGTON" );
 check_equals ( a.split("la").length, 3 );
 #else
-xcheck_equals ( a.split("")[0], "wallawallawashinGTON" );
-xcheck_equals ( a.split("")[19], undefined );
-xcheck_equals ( a.split("la")[0], "wallawallawashinGTON" );
-xcheck_equals ( a.split("la")[1], undefined );
-xcheck_equals ( a.split("la")[2], undefined );
-xcheck_equals ( a.split("la").length, 1 );
+// empty delimiter doesn't have a special meaning in SWF5
+check_equals ( a.split("")[0], "wallawallawashinGTON" );
+check_equals ( a.split("")[19], undefined );
+// mulit-char delimiter doesn't work in SWF5
+check_equals ( a.split("la")[0], "wallawallawashinGTON" );
+check_equals ( a.split("la")[1], undefined );
+check_equals ( a.split("la")[2], undefined );
+check_equals ( a.split("la").length, 1 );
 #endif
 
 

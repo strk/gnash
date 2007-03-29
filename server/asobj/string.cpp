@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.24 2007/03/28 15:22:24 bjacques Exp $ */
+/* $Id: string.cpp,v 1.25 2007/03/29 08:44:05 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -228,8 +228,26 @@ string_split(const fn_call& fn)
 
     std::string delim = fn.arg(0).to_std_string();
 
-    if (delim == "") {
-        for (unsigned i=0; i < str.size(); i++) {
+    // SWF5 didn't support multichar or empty delimiter
+    if ( fn.env().get_version() < 6 )
+    {
+	    if ( delim.size() != 1 )
+	    {
+		    val.set_std_string(str);
+		    array->push(val);
+		    return as_value(array.get());
+	    }
+    }
+
+    size_t max = str.size();
+
+    if (fn.nargs >= 2) {
+        max = iclamp(fn.arg(1).to_number<size_t>(), 0, str.size());
+    }
+
+    //if (delim == "") {
+    if ( delim.empty() ) {
+        for (unsigned i=0; i <max; i++) {
             val.set_std_string(str.substr(i, i+1));
             array->push(val);
         }
@@ -237,11 +255,6 @@ string_split(const fn_call& fn)
         return as_value(array.get());
     }
 
-    size_t max = -1;
-
-    if (fn.nargs >= 2) {
-        max = fn.arg(1).to_number<size_t>();
-    }
 
     size_t pos = 0, prevpos = 0;
     size_t num = 0;

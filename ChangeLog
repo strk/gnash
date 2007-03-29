@@ -1,5 +1,8 @@
 2007-03-29 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/string.cpp (string_split): fix compiler wanring
+	  and handle SWF5 case.
+	* testsuite/actionscript.all/String.as: expect less failures.
 	* server/sprite_instance.{h,cpp} add queueActions() method.
 	* server/swf/tag_loaders.cpp: fix compiler warnings.
 	* testsuite/server/Makefile.am: link in libgnashparser for the
