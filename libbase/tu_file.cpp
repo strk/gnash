@@ -336,7 +336,7 @@ tu_file::tu_file(void * appdata, read_func rf, write_func wf,
 // Create a file from a standard file pointer.
 tu_file::tu_file(FILE* fp, bool autoclose=false)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
     m_data = (void *)fp;
     m_read = std_read_func;
