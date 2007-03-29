@@ -51,6 +51,7 @@ CLEANFILES = \
 MatrixTest_SOURCES = MatrixTest.cpp
 MatrixTest_LDADD = \
 	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
@@ -59,6 +60,7 @@ PropertyListTest_SOURCES = PropertyListTest.cpp
 PropertyListTest_LDADD = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/server/parser/libgnashparser.la \
+	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
@@ -67,6 +69,7 @@ GetterSetterTest_SOURCES = GetterSetterTest.cpp
 GetterSetterTest_LDADD = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/server/parser/libgnashparser.la \
+	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
@@ -74,6 +77,7 @@ GetterSetterTest_LDADD = \
 as_prop_flagsTest_SOURCES = as_prop_flagsTest.cpp
 as_prop_flagsTest_LDADD = \
 	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
@@ -81,6 +85,7 @@ as_prop_flagsTest_LDADD = \
 DisplayListTest_SOURCES = DisplayListTest.cpp
 DisplayListTest_LDADD = \
 	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/server/parser/libgnashparser.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/libbase/libgnashbase.la \

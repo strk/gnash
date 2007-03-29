@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.75 2007/03/28 16:24:39 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.76 2007/03/29 14:29:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2370,15 +2370,13 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 
 	// Get the object
 	as_value& var_name = env.top(0);
-	string var_string = var_name.to_std_string();
-	as_value variable = thread.getVariable(var_string);
-	const boost::intrusive_ptr<as_object> obj = variable.to_object();
+	string var_string = var_name.to_std_string(&env);
 
-	// The end of the enumeration, don't set top(0) *before*
-	// fetching the as_object* obj above or it will get lost
+	as_value variable = thread.getVariable(var_string);
+
 	env.top(0).set_null();
 
-	if ( ! obj )
+	if ( ! variable.is_object() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("Top of stack not an object (%s) at "
@@ -2387,6 +2385,8 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 		);
 		return;
 	}
+
+	const boost::intrusive_ptr<as_object> obj = variable.to_object();
 
 	enumerateObject(env, *obj);
 }
@@ -2900,8 +2900,7 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 	// as we copied that as_value.
 	env.top(0).set_null(); 
 
-	boost::intrusive_ptr<as_object> obj = obj_val.to_object();
-	if ( ! obj )
+	if ( ! obj_val.is_object() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("Top of stack not an object %s at ActionEnum2 "
@@ -2910,6 +2909,8 @@ SWFHandlers::ActionEnum2(ActionExec& thread)
 		);
 		return;
 	}
+
+	boost::intrusive_ptr<as_object> obj = obj_val.to_object();
 
 	enumerateObject(env, *obj);
 

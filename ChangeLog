@@ -1,5 +1,16 @@
 2007-03-29 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.{cpp,h} add an optional argument
+	  to init_property and init_readonly_proprety for setting
+	  explicit flags, use same defaults as for init_member.
+	* server/vm/ASHandlers.cpp (ActionEnum, ActionEnum2):
+	  do not convert values to objects always.
+	* testsuite/misc-mtasc.all/: Makefile.am, enum.as: 
+	  Add test for ActionEnum2.
+	* testsuite/server/Makefile.am: more linking fixes.
+
+2007-03-29 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/SharedObject.cpp: better stubs (nothing more).
 
 2007-03-29 Sandro Santilli <strk@keybit.net>

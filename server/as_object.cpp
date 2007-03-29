@@ -277,7 +277,7 @@ as_object::init_member(const std::string& key, const as_value& val, int flags)
 
 void
 as_object::init_property(const std::string& key, as_function& getter,
-		as_function& setter)
+		as_function& setter, int flags)
 {
 	bool success;
 	if ( _vm.getSWFVersion() < 7 )
@@ -286,11 +286,15 @@ as_object::init_property(const std::string& key, as_function& getter,
 		boost::to_lower(name, _vm.getLocale());
 		success = _members.addGetterSetter(name, getter, setter);
 		//log_msg("Initialized property '%s'", name.c_str());
+		// TODO: optimize this, don't scan again !
+		_members.setFlags(name, flags, 0);
 	}
 	else
 	{
 		success = _members.addGetterSetter(key, getter, setter);
 		//log_msg("Initialized property '%s'", key.c_str());
+		// TODO: optimize this, don't scan again !
+		_members.setFlags(key, flags, 0);
 	}
 
 	// We shouldn't attempt to initialize a property twice, should we ?
@@ -298,9 +302,9 @@ as_object::init_property(const std::string& key, as_function& getter,
 }
 
 void
-as_object::init_readonly_property(const std::string& key, as_function& getter)
+as_object::init_readonly_property(const std::string& key, as_function& getter, int initflags)
 {
-	init_property(key, getter, getter);
+	init_property(key, getter, getter, initflags);
 
 	as_prop_flags& flags = getOwnProperty(key)->getFlags();
 
@@ -477,7 +481,6 @@ void
 as_object::enumerateProperties(as_environment& env) const
 {
 	assert( env.top(0).is_null() );
-
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops

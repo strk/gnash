@@ -25,13 +25,15 @@ DEJAGNU_SO_PATH = ../Dejagnu.swf
 DEJAGNU_SO_FINI = $(srcdir)/../actionscript.all/dejagnu_so_fini.as
 MTASC_FLAGS= -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
 
-EXTRA_DIST = hello.as inheritance.as TestClass.as function.as hello.as
-
 ASTESTS = \
 	hello.as \
 	inheritance.as \
 	function.as \
+	enum.as \
 	$(NULL)
+
+EXTRA_DIST = $(ASTESTS) TestClass.as 
+
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)
 

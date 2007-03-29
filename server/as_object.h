@@ -210,8 +210,12 @@ public:
 	///	A function to invoke when setting this property's value.
 	///	add_ref will be called on the function.
 	///
+	/// @param flags
+	///     Flags for the new member. By default dontDelete and dontEnum.
+	///	See as_prop_flags::Flags.
+	///
 	void init_property(const std::string& key, as_function& getter,
-		as_function& setter);
+		as_function& setter, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
 
 	/// \brief
 	/// Use this method for read-only properties.
@@ -223,7 +227,9 @@ public:
 	/// 
 	/// The arguments are the same as the above init_property arguments,
 	/// although the setter argument is omitted.
-	void init_readonly_property(const std::string& key, as_function& getter);
+	///
+	void init_readonly_property(const std::string& key, as_function& getter,
+			int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
 
 	/// Get a member as_value by name
 	//
