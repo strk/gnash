@@ -98,14 +98,14 @@ Stage::notifyResize(boost::intrusive_ptr<as_object> obj, as_environment* env)
 void
 Stage::addListener(boost::intrusive_ptr<as_object> obj)
 {
-	log_msg("Adding listener %p to Stage %p", obj.get(), this);
+	//log_msg("Adding listener %p to Stage %p", obj.get(), this);
 	_listeners.push_back(obj);
 }
 
 void
 Stage::removeListener(boost::intrusive_ptr<as_object> obj)
 {
-	log_msg("Removing listener %p from Stage %p", obj.get(), this);
+	//log_msg("Removing listener %p from Stage %p", obj.get(), this);
 	_listeners.remove(obj);
 }
 
@@ -142,10 +142,10 @@ Stage::setScaleMode(ScaleMode mode)
 {
 	_scaleMode = mode;
 
-	log_msg("Scale mode set to %s", getScaleModeString());
+	//log_msg("Scale mode set to %s", getScaleModeString());
 	if ( _scaleMode == noScale )
 	{
-		log_msg("Setting rescaling allowance to false");
+		//log_msg("Setting rescaling allowance to false");
 		VM::get().getRoot().allowRescaling(false);
 	}
 }
