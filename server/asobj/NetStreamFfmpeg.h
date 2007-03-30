@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.15 2007/03/23 00:30:10 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.16 2007/03/30 13:57:27 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -60,7 +60,7 @@ struct raw_videodata_t
 
 	~raw_videodata_t()
 	{
-		if (m_size > 0) delete [] m_data;
+		if (m_data) delete [] m_data;
 	};
 
 	int m_stream_index;
@@ -156,7 +156,7 @@ public:
 	bool newFrameReady();
 	as_function* getStatusHandler();
 	void setStatusHandler(as_function*);
-
+	void setEnvironment(as_environment* env);
 	// Used for ffmpeg data read and seek callbacks
 	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
@@ -229,7 +229,7 @@ private:
 	multithread_queue <raw_videodata_t*> m_qvideo;
 
 	// paused or not
-	bool m_pause;
+	volatile bool m_pause;
 
 	// The time ws started playing
 	double m_start_clock;
@@ -254,15 +254,20 @@ private:
 	// The size of the buffer in milliseconds
 	uint32_t m_bufferTime;
 
-	// The status message
-	std::string m_status;
-
 	// Has the status message been updated?
 	volatile bool m_statusChanged;
 
 	// The handler which is invoked on status change
 	boost::intrusive_ptr<as_function> m_statusHandler;
 
+	// should we start when buffer is full?
+	bool m_start_onbuffer;
+
+	// The actionscript enviroment for the AS callbacks
+	as_environment* m_env;
+
+	// List of status messages to be processed
+	std::vector<std::string> m_status_messages;
 };
 
 } // gnash namespace

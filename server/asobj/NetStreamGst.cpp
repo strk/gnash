@@ -30,6 +30,7 @@
 #include "render.h"	
 #include "movie_root.h"
 #include "NetConnection.h"
+#include "action.h"
 
 #include "gstgnashsrc.h"
 
@@ -86,7 +87,10 @@ NetStreamGst::NetStreamGst():
 	videowidth(0),
 	videoheight(0),
 	m_newFrameReady(false),
-	m_parser(NULL)
+	m_parser(NULL),
+	m_env(NULL),
+	m_pausePlayback(false),
+	m_start_onbuffer(false)
 {
 }
 
@@ -95,10 +99,18 @@ NetStreamGst::~NetStreamGst()
 	close();
 }
 
-// called from avstreamer thread
-void NetStreamGst::set_status(const char* /*code*/)
+void NetStreamGst::set_status(const char* status)
 {
+	std::string std_status = status;
+	if (!(m_status_messages.size() > 0 && m_status_messages.back().compare(std_status) == 0)) {
+		m_status_messages.push_back(std_status);
+		m_statusChanged = true;
+	}
+}
 
+void NetStreamGst::setEnvironment(as_environment* env)
+{
+	m_env = env;
 }
 
 void NetStreamGst::pause(int mode)
@@ -111,8 +123,10 @@ void NetStreamGst::pause(int mode)
 	{
 		m_pause = (mode == 0) ? true : false;
 	}
-	if (m_pause) gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PAUSED);
-	else  gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
+	if (pipeline) {
+		if (m_pause) gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PAUSED);
+		else  gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
+	}
 }
 
 void NetStreamGst::close()
@@ -170,6 +184,7 @@ NetStreamGst::play(const char* c_url)
 
 // Callback function used by Gstreamer to to attached audio and video streams
 // detected by decoderbin to either the video out or audio out elements.
+// Only used when not playing FLV
 void
 NetStreamGst::callback_newpad (GstElement* /*decodebin*/, GstPad *pad, gboolean /*last*/, gpointer data)
 {
@@ -271,12 +286,17 @@ NetStreamGst::callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*p
 
 
 // The callback function which refills the audio buffer with data
+// Only used when playing FLV
 void NetStreamGst::audio_callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 {
 	NetStreamGst* ns = static_cast<NetStreamGst*>(user_data);
 
 	FLVFrame* frame = ns->m_parser->nextAudioFrame();
-	if (!frame) return;
+	if (!frame) {
+		ns->set_status("NetStream.Buffer.Empty");
+		ns->m_pausePlayback = true;
+		return;
+	}
 
 //	if (GST_BUFFER_DATA(buffer)) delete [] GST_BUFFER_DATA(buffer);
 	GST_BUFFER_SIZE(buffer) = frame->dataSize;
@@ -287,12 +307,18 @@ void NetStreamGst::audio_callback_handoff (GstElement * /*c*/, GstBuffer *buffer
 
 }
 
+// The callback function which refills the video buffer with data
+// Only used when playing FLV
 void NetStreamGst::video_callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 {
 	NetStreamGst* ns = static_cast<NetStreamGst*>(user_data);
 
 	FLVFrame* frame = ns->m_parser->nextVideoFrame();
-	if (!frame) return;
+	if (!frame) {
+		ns->set_status("NetStream.Buffer.Empty");
+		ns->m_pausePlayback = true;
+		return;
+	}
 
 //	if (GST_BUFFER_DATA(buffer)) delete [] GST_BUFFER_DATA(buffer);
 	GST_BUFFER_SIZE(buffer) = frame->dataSize;
@@ -301,6 +327,7 @@ void NetStreamGst::video_callback_handoff (GstElement * /*c*/, GstBuffer *buffer
 	delete frame;
 	return;
 }
+
 void
 NetStreamGst::startPlayback(NetStreamGst* ns)
 {
@@ -318,7 +345,10 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	ns->inputPos = 0;
 
 	uint8_t head[3];
-	if (nc->read(head,3) < 3) return;
+	if (nc->read(head, 3) < 3) {
+		ns->set_status("NetStream.Buffer.StreamNotFound");
+		return;
+	}
 	nc->seek(0);
 	if (head[0] == 'F'|| head[1] == 'L' || head[2] == 'V') { 
 		ns->m_isFLV = true;
@@ -417,6 +447,13 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 				"flvversion", G_TYPE_INT, 1,
 				NULL);
 			ns->videodecoder = gst_element_factory_make ("ffdec_flv", NULL);
+
+			// Check if the element was correctly created
+			if (!ns->videodecoder) {
+				log_error("A gstreamer flashvideo (h.263) decoder element could not be created! You probably need to install gst-ffmpeg.");
+				return;
+			}
+
 		} else if (videoInfo->codec == VIDEO_CODEC_VP6) {
 			videonincaps = gst_caps_new_simple ("video/x-vp6-flash",
 				"width", G_TYPE_INT, 320, // We don't yet have a size extract for this codec, so we guess...
@@ -424,6 +461,13 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 				"framerate", GST_TYPE_FRACTION, fps, 1,
 				NULL);
 			ns->videodecoder = gst_element_factory_make ("ffdec_vp6f", NULL);
+
+			// Check if the element was correctly created
+			if (!ns->videodecoder) {
+				log_error("A gstreamer flashvideo (VP6) decoder element could not be created! You probably need to install gst-ffmpeg.");
+				return;
+			}
+
 		} else if (videoInfo->codec == VIDEO_CODEC_SCREENVIDEO) {
 			videonincaps = gst_caps_new_simple ("video/x-flash-screen",
 				"width", G_TYPE_INT, 320, // We don't yet have a size extract for this codec, so we guess...
@@ -431,6 +475,13 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 				"framerate", GST_TYPE_FRACTION, fps, 1,
 				NULL);
 			ns->videodecoder = gst_element_factory_make ("ffdec_flashsv", NULL);
+
+			// Check if the element was correctly created
+			if (!ns->videodecoder) {
+				log_error("A gstreamer flashvideo (ScreenVideo) decoder element could not be created! You probably need to install gst-ffmpeg.");
+				return;
+			}
+
 		} else {
 			assert(0);
 		}
@@ -496,19 +547,19 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	g_signal_connect (ns->videosink, "handoff", G_CALLBACK (NetStreamGst::callback_output), ns);
 
 	if (ns->m_isFLV) {
-		if (!ns->videodecoder || !ns->videosource || !ns->videoinputcaps || !ns->audiodecoder || !ns->audiosource || !ns->audioinputcaps) {
-			gnash::log_error("Gstreamer element(s) for video movie handling could not be created\n");
+		if (!ns->videosource || !ns->audiosource || !ns->videoinputcaps ||  !ns->audioinputcaps) {
+			gnash::log_error("Gstreamer source element(s) for video movie handling could not be created, you proberly need to install gstreamer0.10-core for fakesrc and capsfilter support.");
 			return;
 		}
 	} else {
 		if (!ns->decoder || !ns->source) {
-			gnash::log_error("Gstreamer element(s) for video movie handling could not be created\n");
+			gnash::log_error("Gstreamer element(s) for video movie handling could not be created, you proberly need to install gstreamer0.10-base for decodebin support.");
 			return;
 		}
 	}
 
 	if (!ns->colorspace || !ns->videocaps || !ns->videorate || !ns->videosink) {
-		gnash::log_error("Gstreamer element(s) for video movie handling could not be created\n");
+		gnash::log_error("Gstreamer element(s) for video movie handling could not be created, you proberly need to install gstreamer0.10-base for ffmpegcolorspace and videorate support.");
 		return;
 	}
 
@@ -537,6 +588,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	} else {
 		gst_element_set_state (GST_ELEMENT (ns->pipeline), GST_STATE_PAUSED);
 		ns->m_pause = true;
+		ns->m_start_onbuffer = true;
 	}
 
 	ns->set_status("NetStream.Play.Start");
@@ -555,7 +607,7 @@ NetStreamGst::seek(double pos)
 	if (!pipeline) return;
 
 	if (m_isFLV) {
-		uint32_t newpos = m_parser->seek(static_cast<uint32_t>(pos*1000))/1000;
+		/*uint32_t newpos =*/ m_parser->seek(static_cast<uint32_t>(pos*1000))/1000;
 		/*if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
 			GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(newpos),
 			GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
@@ -585,21 +637,67 @@ NetStreamGst::setBufferTime(double time)
 void
 NetStreamGst::advance()
 {
-	if (m_isFLV && m_pause && m_go && !m_imageframe && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
+	// Check if we should start the playback when a certain amount is buffered
+	if (m_isFLV && m_pause && m_go && m_start_onbuffer && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
 		set_status("NetStream.Buffer.Full");
 		m_pause = false;
 		gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
 	}
 
-	if (m_statusChanged) {
-/*		fn_call dummy(NULL, NULL, 0, 0);
-		as_value info_asv(infoobject_new(dummy));
-		boost::intrusive_ptr<as_object> info = info_asv.to_object();
+	// If we're out of data, but still not done loading, pause playback,
+	// or stop if loading is complete
+	if (m_pausePlayback) {
+		m_pausePlayback = false;
 
-		fn_call fn(this, v, 0, 0);
+		if (_netCon->loadCompleted()) {
+			set_status("NetStream.Play.Stop");
+			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
+			m_go = false;
+		} else {
+			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PAUSED);
+			GstFormat fmt = GST_FORMAT_TIME;
+			int64_t pos;
+			GstStateChangeReturn ret;
+			GstState current, pending;
 
-		m_statusHandler.get()->call(fn);*/
+			ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
 
+			if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
+				pos = pos / 1000000;
+			} else {
+				pos = 0;
+			}
+			// Buffer a second before continuing
+			m_bufferTime = pos + 1000;
+			m_start_onbuffer = true;
+			m_pause = true;
+		}
+	}
+
+	// Check if there are any new status messages, and if we should
+	// pass them to a event handler
+	as_value status;
+	if (m_statusChanged && get_member(std::string("onStatus"), &status) && status.to_as_function() != NULL) {
+
+		for (int i = m_status_messages.size()-1; i >= 0; --i) {
+			boost::intrusive_ptr<as_object> o = new as_object();
+			o->init_member(std::string("code"), as_value(m_status_messages[i]), 1);
+
+			if (m_status_messages[i].find("StreamNotFound") == string::npos && m_status_messages[i].find("InvalidTime") == string::npos) {
+				o->init_member(std::string("level"), as_value("status"), as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+			} else {
+				o->init_member(std::string("level"), as_value("error"), as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+			}
+			m_env->push(o.get());
+
+			call_method0(status, m_env, this);
+
+		}
+		m_status_messages.clear();
+		m_statusChanged = false;
+	} else if (m_statusChanged) {
+		m_status_messages.clear();
+		m_statusChanged = false;
 	}
 }
 

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.22 2007/03/23 00:30:10 tgc Exp $ */
+/* $Id: NetConnection.h,v 1.23 2007/03/30 13:57:27 tgc Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -83,6 +83,8 @@ public:
 	/// Connects FLV parser with the LoadThread
 	bool connectParser(FLVParser* parser);
 
+	/// Returns whether the load is complete
+	bool loadCompleted();
 private:
 
 	/// the url of the file

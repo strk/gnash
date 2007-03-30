@@ -55,6 +55,7 @@ public:
 	bool newFrameReady();
 	as_function* getStatusHandler();
 	void setStatusHandler(as_function*);
+	void setEnvironment(as_environment* env);
 
 	// Used for gstreamer data read and seek callbacks
 	static int readPacket(void* opaque, char* buf, int buf_size);
@@ -139,6 +140,18 @@ private:
 
 	// The parser for FLV
 	FLVParser* m_parser;
+
+	// The actionscript enviroment for the AS callbacks
+	as_environment* m_env;
+
+	// On next advance() should we pause?
+	volatile bool m_pausePlayback;
+
+	// List of status messages to be processed
+	std::vector<std::string> m_status_messages;
+
+	// should we start when buffer is full?
+	bool m_start_onbuffer;
 };
 
 } // gnash namespace

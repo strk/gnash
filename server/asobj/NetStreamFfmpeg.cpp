@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.25 2007/03/28 16:12:08 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.26 2007/03/30 13:57:27 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,6 +30,7 @@
 #include "movie_root.h"
 #include "NetConnection.h"
 #include "sound_handler.h"
+#include "action.h"
 
 #if defined(_WIN32) || defined(WIN32)
 	#include <Windows.h>	// for sleep()
@@ -70,7 +71,9 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	m_isFLV(false),
 	m_newFrameReady(false),
 	m_bufferTime(100),
-	m_statusChanged(false)
+	m_statusChanged(false),
+	m_start_onbuffer(false),
+	m_env(NULL)
 {
 }
 
@@ -80,10 +83,16 @@ NetStreamFfmpeg::~NetStreamFfmpeg()
 	if (m_parser) delete m_parser;
 }
 
+void NetStreamFfmpeg::setEnvironment(as_environment* env)
+{
+	m_env = env;
+}
+
+
 // called from avstreamer thread, and a few other places... (thread safe?)
 void NetStreamFfmpeg::set_status(const char* status)
 {
-	m_status = status;
+	m_status_messages.push_back(status);
 	m_statusChanged = true;
 }
 
@@ -272,12 +281,14 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 
 	// Check if the file is a FLV, in which case we use our own parser
 	uint8_t head[3];
-	nc->read(head, 3);
+	if (nc->read(head, 3) < 3) {
+		ns->set_status("NetStream.Buffer.StreamNotFound");
+		return;
+	}
 	nc->seek(0);
 	if (head[0] == 'F' && head[1] == 'L' && head[2] == 'V') {
 		
 		ns->m_isFLV = true;
-
 		ns->m_parser = new FLVParser();
 		if (!nc->connectParser(ns->m_parser)) {
 			ns->set_status("NetStream.Buffer.StreamNotFound");
@@ -315,6 +326,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 			ns->m_VCodecCtx = avcodec_alloc_context();
 			avcodec_open(ns->m_VCodecCtx, vcodec);
 		}
+		delete videoInfo;
 
 		// Get audio info from the parser
 		FLVAudioInfo* audioInfo = ns->m_parser->getAudioInfo();
@@ -335,6 +347,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 			ns->m_ACodecCtx = avcodec_alloc_context();
 			avcodec_open(ns->m_ACodecCtx, acodec);
 		}
+		delete audioInfo;
 
 		// We just define the indexes here, they're not really used when
 		// the file format is FLV
@@ -345,6 +358,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 		if (s) s->attach_aux_streamer(audio_streamer, (void*) ns);
 
 //		ns->m_pause = false;
+		ns->m_start_onbuffer = true;
 
 		// Allocate a frame to store the decoded frame in
 		ns->m_Frame = avcodec_alloc_frame();
@@ -534,7 +548,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 			continue;
 		}
 
-		if (ns->read_frame() == false)
+		if (ns->read_frame() == false && ns->m_start_onbuffer == false)
 		{
 			if (ns->m_qvideo.size() == 0)
 			{
@@ -563,7 +577,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 			}
 			else
 			{
-				delay = int((video_clock - clock)*1000000); 
+				delay = int((video_clock - clock)*100000000); 
 			}
 
 			// Don't hog the CPU.
@@ -641,8 +655,18 @@ bool NetStreamFfmpeg::read_frame()
 	int rc;
 	if (m_isFLV) {
 		FLVFrame* frame = m_parser->nextMediaFrame();
+
 		if (frame == NULL) {
-			set_status("NetStream.Buffer.Empty");
+			if (_netCon->loadCompleted()) {
+				// Stop!
+				m_go = false;
+			} else {
+				// We pause and load and buffer a second before continuing.
+				m_pause = true;
+				m_bufferTime = static_cast<uint32_t>(m_video_clock) * 1000 + 1000;
+				set_status("NetStream.Buffer.Empty");
+				m_start_onbuffer = true;
+			}
 			return false;
 		}
 		
@@ -826,7 +850,7 @@ NetStreamFfmpeg::seek(double pos)
 	boost::mutex::scoped_lock  lock(decoding_mutex);
 
 	long newpos = 0;
-	double timebase;
+	double timebase = 0;
 
 	// Seek to new position
 	if (m_isFLV) {
@@ -900,20 +924,37 @@ NetStreamFfmpeg::setBufferTime(double time)
 void
 NetStreamFfmpeg::advance()
 {
-	if (m_go && m_pause && !m_imageframe && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
+	// Check if we should start the playback when a certain amount is buffered
+	if (m_go && m_pause && m_start_onbuffer && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
 		set_status("NetStream.Buffer.Full");
 		m_pause = false;
+		m_start_onbuffer = false;
 	}
 
-	if (m_statusChanged) {
-/*		fn_call dummy(NULL, NULL, 0, 0);
-		as_value info_asv(infoobject_new(dummy));
-		boost::intrusive_ptr<as_object> info = info_asv.to_object();
+	// Check if there are any new status messages, and if we should
+	// pass them to a event handler
+	as_value status;
+	if (m_statusChanged && get_member(std::string("onStatus"), &status) && status.to_as_function() != NULL) {
 
-		fn_call fn(this, v, 0, 0);
+		for (int i = m_status_messages.size()-1; i >= 0; --i) {
+			boost::intrusive_ptr<as_object> o = new as_object();
+			o->init_member(std::string("code"), as_value(m_status_messages[i]), 1);
 
-		m_statusHandler.get()->call(fn);*/
+			if (m_status_messages[i].find("StreamNotFound") == string::npos && m_status_messages[i].find("InvalidTime") == string::npos) {
+				o->init_member(std::string("level"), as_value("status"), as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+			} else {
+				o->init_member(std::string("level"), as_value("error"), as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+			}
+			m_env->push(o.get());
 
+			call_method0(status, m_env, this);
+
+		}
+		m_status_messages.clear();
+		m_statusChanged = false;
+	} else if (m_statusChanged) {
+		m_status_messages.clear();
+		m_statusChanged = false;
 	}
 }
 

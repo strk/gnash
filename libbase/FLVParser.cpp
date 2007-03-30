@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.2 2007/03/28 16:12:08 tgc Exp $
+// $Id: FLVParser.cpp,v 1.3 2007/03/30 13:57:26 tgc Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -83,11 +83,13 @@ FLVFrame* FLVParser::nextMediaFrame()
 
 	uint32_t video_size = _videoFrames.size();
 	uint32_t audio_size = _audioFrames.size();
-	
 
-	// Parse a media frame if any left or if needed
-	while(video_size == _videoFrames.size() && audio_size == _audioFrames.size() && !_parsingComplete) {
-		parseNextFrame();
+	if (!(audio_size <= static_cast<uint32_t>(_lastAudioFrame+1) && video_size <= static_cast<uint32_t>(_lastVideoFrame+1))) {
+
+		// Parse a media frame if any left or if needed
+		while(video_size == _videoFrames.size() && audio_size == _audioFrames.size() && !_parsingComplete) {
+			if (!parseNextFrame()) break;
+		}
 	}
 
 	// Find the next frame in the file
@@ -145,7 +147,7 @@ FLVFrame* FLVParser::nextAudioFrame()
 
 	// Make sure that there are parsed enough frames to return the need frame
 	while(_audioFrames.size() <= static_cast<uint32_t>(_lastAudioFrame+1) && !_parsingComplete) {
-		parseNextFrame();
+		if (!parseNextFrame()) break;
 	}
 
 	// If the needed frame can't be parsed (EOF reached) return NULL
@@ -173,7 +175,7 @@ FLVFrame* FLVParser::nextVideoFrame()
 
 	// Make sure that there are parsed enough frames to return the need frame
 	while(_videoFrames.size() <= static_cast<uint32_t>(_lastVideoFrame+1) && !_parsingComplete) {
-		parseNextFrame();
+		if (!parseNextFrame()) break;
 	}
 
 	// If the needed frame can't be parsed (EOF reached) return NULL
@@ -342,6 +344,7 @@ FLVVideoInfo* FLVParser::getVideoInfo()
 
 FLVAudioInfo* FLVParser::getAudioInfo()
 {
+
 	boost::mutex::scoped_lock lock(_mutex);
 
 	// If there are no audio in this FLV return NULL
@@ -362,12 +365,11 @@ FLVAudioInfo* FLVParser::getAudioInfo()
 
 bool FLVParser::isTimeLoaded(uint32_t time)
 {
-
 	boost::mutex::scoped_lock lock(_mutex);
 
 	// Parse frames until the need time is found, or EOF
-	while (!_parsingComplete && (_videoFrames.size() > 0 && _videoFrames.back()->timestamp < time) && (_audioFrames.size() > 0 && _audioFrames.back()->timestamp < time)) {
-		parseNextFrame();
+	while (!_parsingComplete && _videoFrames.size() > 0 && _videoFrames.back()->timestamp < time && _audioFrames.size() > 0 && _audioFrames.back()->timestamp < time) {
+		if (!parseNextFrame()) break;
 	}
 
 	if (_videoFrames.size() > 0 && _videoFrames.back()->timestamp >= time) {
@@ -377,6 +379,7 @@ bool FLVParser::isTimeLoaded(uint32_t time)
 	if (_audioFrames.size() > 0 && _audioFrames.back()->timestamp >= time) {
 		return true;
 	}
+
 	return false;
 
 }
@@ -510,7 +513,9 @@ bool FLVParser::parseNextFrame()
 		_lastParsedPosition += 15 + bodyLength;
 	} else {
 		_parsingComplete = true;
+		return false;
 	}
+
 	return true;
 }
 

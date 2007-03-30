@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.33 2007/03/23 00:30:10 tgc Exp $ */
+/* $Id: NetStream.cpp,v 1.34 2007/03/30 13:57:27 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -75,6 +75,7 @@ netstream_new(const fn_call& fn)
 		if ( ns )
 		{
 			netstream_obj->setNetCon(ns);
+			netstream_obj->setEnvironment(&fn.env());			
 		}
 		else
 		{
@@ -215,27 +216,6 @@ netstream_bytestotal(const fn_call& fn)
 	return as_value();
 }
 
-// Both a getter and a setter for onStatus
-static as_value
-netstream_onstatus(const fn_call& fn)
-{
-
-	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
-
-	if ( fn.nargs == 0 ) // getter
-	{
-		as_function* h = ns->getStatusHandler();
-		if ( h ) return as_value(h);
-		else return as_value();
-	}
-	else // setter
-	{
-		as_function* h = fn.arg(0).to_as_function();
-		if ( h ) ns->setStatusHandler(h);
-	}
-	return as_value();
-}
-
 void
 attachNetStreamInterface(as_object& o)
 {
@@ -260,8 +240,6 @@ attachNetStreamInterface(as_object& o)
     gettersetter = new builtin_function(&netstream_bytestotal, NULL);
     o.init_property("bytesTotal", *gettersetter, *gettersetter);
 
-    gettersetter = new builtin_function(&netstream_onstatus, NULL);
-    o.init_property("onStatus", *gettersetter, *gettersetter);
 }
 
 static as_object*

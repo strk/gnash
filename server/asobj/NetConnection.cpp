@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.34 2007/03/28 16:12:08 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.35 2007/03/30 13:57:27 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -171,6 +171,14 @@ NetConnection::getBytesTotal()
 {
 	if (!_loader) return 0;
 	return _loader->getBytesLoaded();
+}
+
+/*public*/
+bool
+NetConnection::loadCompleted()
+{
+	if (!_loader) return false;
+	return _loader->completed();
 }
 
 bool

@@ -19,7 +19,7 @@
 #ifndef __LOADTHREAD_H__
 #define __LOADTHREAD_H__
 
-// $Id: LoadThread.h,v 1.4 2007/03/24 14:36:47 tgc Exp $
+// $Id: LoadThread.h,v 1.5 2007/03/30 13:57:26 tgc Exp $
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp>
@@ -98,20 +98,42 @@ private:
 	/// The function that does the actual downloading
 	void download();
 
+	/// Fills the cache at the begining
+	void setupCache();
+
+	/// Fills the cache when needed
+	void fillCache();
+
 	/// The stream/file we want to access
 	std::auto_ptr<tu_file> _stream;
 
-	long _bytesLoaded;
-
-	bool _completed;
+	volatile bool _completed;
 
 	boost::mutex _mutex;
 
 	std::auto_ptr<boost::thread> _thread;
 	
-	long _loadPosition;
-	long _userPosition;
-	long _actualPosition;
+	volatile long _loadPosition;
+	volatile long _userPosition;
+	volatile long _actualPosition;
+
+	// Cache...
+	uint8_t* _cache;
+
+	// The fileposition where the cache start
+	volatile long _cacheStart;
+
+	// Data amount in the cache
+	volatile long _cachedData;
+
+	// Size of the cache
+	volatile long _cacheSize;
+
+	// The amount we load at one go
+	long _chunkSize;
+
+	// size of the stream
+	long _streamSize;
 };
 
 #endif // __LOADTHREAD_H__

@@ -1,3 +1,18 @@
+2007-03-30 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/FLVParser.cpp: Fixed a few bugs.
+	* libbase/LoadThread.{h,cpp}: Changed to use a cache so we avoid
+	  blocking to often when reading and loading at the same time.
+	* server/asobj/NetConnection.{h,cpp}: Added loadCompleted().
+	* server/asobj/NetStream.{h,cpp}: Added setEnvironment(), and
+	  removed the getter/setter for onStatus.
+	* server/asobj/NetStreamFfmpeg.{h,cpp}: Fixed a big mem-leak. Added
+	  setEnvironment(), and added support for status/error messages.
+	* server/asobj/NetStreamGst.{h,cpp}: Added setEnvironment(), and
+	  added support for status/error messages.
+	* testsuite/actionscript.all/NetStream.as: Corrected expected
+	  results for onStatus, and added some for onCuePoint and onMetaData.
+
 2007-03-30 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.cpp (clear_except): don't copy display list (small
