@@ -274,6 +274,14 @@ typedef enum
     ACTION_INITOBJECT              = 0x43,
 
     ACTION_TYPEOF                  = 0x44,
+
+    /// SWF5
+    ///
+    /// Pop a value from the stack. If it is a valid movieclip push
+    /// it's target back on the stack (example: _level0.sprite1.sprite2).
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_get_target
+    ///
     ACTION_TARGETPATH              = 0x45,
 
     /// SWF5

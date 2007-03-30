@@ -1,3 +1,14 @@
+2007-03-30 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.cpp (to_sprite): don't attempt to resolve
+	  the path to a sprite if this value is not a MOVIECLIP type.
+	* server/swf.h: document ACTION_TARGETPATH
+	* server/sprite_instance.{cpp,h}: implement getTarget(), have
+	  get_text_value() call getTarget() internally.
+	* server/vm/ASHandlers.cpp: Implement ActionTargetPath.
+	* testsuite/actionscript.all/: Makefile.am, targetPath.as:
+	  Test ACTION_TARGETPATH (0x45).
+
 2007-03-29  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Add --disable-menus since an embedded systems

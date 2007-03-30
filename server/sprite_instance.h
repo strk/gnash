@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.82 2007/03/29 08:58:58 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.83 2007/03/30 07:23:19 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -631,9 +631,15 @@ public:
 
 	/// Return full path to this object, in slash notation
 	//
-	/// e.g. "/_level0/sprite1/sprite2/ourSprite"
+	/// e.g. "/sprite1/sprite2/ourSprite"
 	///
 	const std::string& getTargetPath() const;
+
+	/// Return full path to this object, in dot notation
+	//
+	/// e.g. "_level0.sprite1.sprite2.ourSprite"
+	///
+	const std::string& getTarget() const;
 
 	/// Override for character::set_name to proprely update
 	/// _target and _target_dot.

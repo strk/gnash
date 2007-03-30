@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.77 2007/03/29 17:23:31 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.78 2007/03/30 07:23:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1063,12 +1063,12 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 	{
 		as_object* obj = thread.getTarget();
 
-		log_msg("ActionGetProperty(<empty>) called, target is %p", (void*)obj);
+		//log_msg("ActionGetProperty(<empty>) called, target is %p", (void*)obj);
 
 		target = dynamic_cast<character*>(obj);
 		if ( ! target )
 		{
-			log_msg("ActionGetProperty(<empty>) called, but current target is not a character");
+			log_warning("ActionGetProperty(<empty>) called, but current target is not a character");
 		}
 	}
 	else
@@ -2341,11 +2341,26 @@ SWFHandlers::ActionTypeOf(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionTargetPath(ActionExec& /*thread*/)
+SWFHandlers::ActionTargetPath(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
-//    as_environment& env = thread.env;
-    dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
+//	GNASH_REPORT_FUNCTION;
+
+	as_environment& env = thread.env;
+
+	thread.ensureStack(1);  // object
+
+	boost::intrusive_ptr<sprite_instance> sp = env.top(0).to_sprite();
+	if ( sp )
+	{
+		env.top(0).set_std_string(sp->getTarget());
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Argument to TargetPath() doesn't cast to a movieclip");
+		);
+		env.top(0).set_undefined();
+	}
 }
 
 // Push a each object's member value on the stack

@@ -3662,6 +3662,27 @@ sprite_instance::getTargetPath() const
 	return _target;
 }
 
+const std::string&
+sprite_instance::getTarget() const
+{
+	if ( ! _target_dot.empty() ) return _target_dot;
+
+	std::string levelString = "_level0"; // TODO: support real levels!
+
+	const std::string& targetPath = getTargetPath();
+	if ( targetPath == "/" ) _target_dot = levelString;
+	else
+	{
+		_target_dot = levelString + targetPath;
+		for (std::string::size_type i=0; i<_target_dot.length(); ++i)
+		{
+			if ( _target_dot[i] == '/' ) _target_dot[i] = '.';
+		}
+	}
+
+	return _target_dot;
+}
+
 /*private*/
 std::string
 sprite_instance::computeTargetPath() const
@@ -3710,22 +3731,7 @@ sprite_instance::computeTargetPath() const
 const char*
 sprite_instance::get_text_value() const
 {
-	if ( ! _target_dot.empty() ) return _target_dot.c_str();
-
-	std::string levelString = "_level0"; // TODO: support real levels!
-
-	const std::string& targetPath = getTargetPath();
-	if ( targetPath == "/" ) _target_dot = levelString;
-	else
-	{
-		_target_dot = levelString + targetPath;
-		for (std::string::size_type i=0; i<_target_dot.length(); ++i)
-		{
-			if ( _target_dot[i] == '/' ) _target_dot[i] = '.';
-		}
-	}
-
-	return _target_dot.c_str();
+	return getTarget().c_str();
 }
 
 // WARNING: THIS SNIPPET NEEDS THE CHARACTER TO BE "INSTANTIATED", which is

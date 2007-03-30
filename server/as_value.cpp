@@ -498,6 +498,8 @@ as_value::to_object() const
 sprite_instance*
 as_value::to_sprite() const
 {
+	if ( m_type != MOVIECLIP ) return NULL;
+
 	// Evaluate target everytime an attempt is made 
 	// to fetch a movieclip value.
 	sprite_instance* root = VM::get().getRoot().get_root_movie();
