@@ -20,11 +20,13 @@
  *  Test targetPath tags (0x45)
  */
 
-rcsid="$Id: targetPath.as,v 1.1 2007/03/30 07:23:19 strk Exp $";
+rcsid="$Id: targetPath.as,v 1.2 2007/03/30 07:32:28 strk Exp $";
 
 #include "check.as"
 
 check_equals(targetPath(_root), "_level0");
+
+#ifdef MING_SUPPORTS_ASM_TARGETPATH
 
 // targetPath(null)
 asm {
@@ -72,3 +74,4 @@ setvariable
 };
 check_equals(typeof(a), 'undefined');
 
+#endif // MING_SUPPORTS_ASM_TARGETPATH

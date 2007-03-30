@@ -1,5 +1,11 @@
 2007-03-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: check.as, targetPath.as:
+	  Don't use asm { targetPath } when not supported by
+	  detected Ming.
+
+2007-03-30 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.cpp (to_sprite): don't attempt to resolve
 	  the path to a sprite if this value is not a MOVIECLIP type.
 	* server/swf.h: document ACTION_TARGETPATH
