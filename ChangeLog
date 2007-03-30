@@ -1,5 +1,7 @@
 2007-03-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/NetStream.as: check that onStatus and
+	  onSeek are not special builtin-properties.
 	* server/timers.{cpp,h}: add support for passing arguments to
 	  setInterval() callbacks.
 	* testsuite/misc-ming.all/: intervalTest.as, intervalTestRunner.cpp:

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: NetStream.as,v 1.8 2007/01/12 09:35:58 strk Exp $";
+rcsid="$Id: NetStream.as,v 1.9 2007/03/30 10:35:25 strk Exp $";
 
 #include "check.as"
 
@@ -51,5 +51,17 @@ check_equals ( typeof(netstreamObj.seek), 'function' );
 check_equals ( typeof(netstreamObj.setBufferTime), 'function');
 // SWF7 up is case-sensitive !
 check_equals ( typeof(netstreamObj.setbuffertime), 'undefined');
+
+check_equals(typeof(netstreamObj.onStatus), 'undefined');
+netstreamObj.onStatus = 4;
+xcheck_equals(typeof(netstreamObj.onStatus), 'number');
+netstreamObj.onStatus = "str";
+xcheck_equals(typeof(netstreamObj.onStatus), 'string');
+
+check_equals(typeof(netstreamObj.onSeek), 'undefined');
+netstreamObj.onSeek = 4;
+check_equals(typeof(netstreamObj.onSeek), 'number');
+netstreamObj.onSeek = "str";
+check_equals(typeof(netstreamObj.onSeek), 'string');
 
 #endif // OUTPUT_VERSION >= 7
