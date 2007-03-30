@@ -1,5 +1,7 @@
 2007-03-30 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlsocket.cpp: don't attempt to send
+	  data when not connected !
 	* testsuite/misc-ming.all/Makefile.am: prepared for
 	  activation of reverse_execute_PlaceObject2_test1runner
 	  (not activated as for Zou request).

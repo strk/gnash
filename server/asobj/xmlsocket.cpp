@@ -85,20 +85,25 @@ bool
 XMLSocket::connect(const char *host, short port)
 {
     GNASH_REPORT_FUNCTION;
-    createClient(host, port);
-    _connect = true;
-    return true;
+    bool success = createClient(host, port);
+    _connect = success;
+
+    assert(!_sockfd || _connected);
+
+    return success;
 }
 
 void
 XMLSocket::close()
 {
     GNASH_REPORT_FUNCTION;
-    // Since the return code from close() doesn't get used by Shockwave,
-    // we don't care either.
-    if (_sockfd > 0) {
-        ::close(_sockfd);
-    }
+
+    closeNet();
+    // dunno why Network::closeNet() returns false always
+    // doesn't make much sense to me...
+    // Anyway, let's make sure we're clean
+    assert(!_sockfd);
+    assert(!_connected);
 }
 
 // Return true if there is data in the socket, otherwise return false.
@@ -263,10 +268,17 @@ XMLSocket::send(std::string str)
 {
     //GNASH_REPORT_FUNCTION;
     
+    if ( ! _connect )
+    {
+	assert(!_sockfd);
+        log_warning("socket not initialized at XMLSocket.send() call time");
+	return false;
+    }
+    
     str += '\0';
     int ret = write(_sockfd, str.c_str(), str.size());
     
-    //log_msg("%s: sent %d bytes, data was %s\n", __FUNCTION__, ret, str.c_str());
+    log_msg("%s: sent %d bytes, data was %s\n", __FUNCTION__, ret, str.c_str());
     if (ret == static_cast<signed int>(str.size())) {
         return true;
     } else {
