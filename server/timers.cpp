@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.26 2007/03/22 22:37:45 bjacques Exp $ */
+/* $Id: timers.cpp,v 1.27 2007/03/30 10:18:29 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -56,6 +56,19 @@ namespace gnash {
     //log_msg("_interval microseconds: %lu", _interval);
     _env = env;
     _object = this_ptr;
+    start();
+  }
+
+  void
+  Timer::setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr, as_environment *env,
+		  std::vector<as_value>& args)
+  {
+    _function = &method;
+    _interval = ms * 1000; // transform to microseconds 
+    //log_msg("_interval microseconds: %lu", _interval);
+    _env = env;
+    _object = this_ptr;
+    _args = args;
     start();
   }
 
@@ -105,7 +118,19 @@ Timer::operator() ()
     //log_msg("INTERVAL ID is %d\n", getIntervalID());
 
     as_value timer_method(_function.get());
-    as_value val = call_method(timer_method, _env, _object.get(), 0, 0);
+
+    // Push args to the as_environment stack if needed
+    for ( ArgsContainer::reverse_iterator it=_args.rbegin(), itEnd=_args.rend();
+		    it != itEnd; ++it )
+    {
+	    //log_msg("Env-pushing %s", it->to_debug_string().c_str());
+	    _env->push(*it);
+    }
+
+    size_t firstArgBottomIndex = _env->stack_size()-1; 
+
+    as_value val = call_method(timer_method, _env, _object.get(),
+		    _args.size(), firstArgBottomIndex);
 
 }
 
@@ -190,16 +215,15 @@ timer_setinterval(const fn_call& fn)
 	// Get interval time
 	int ms = int(fn.arg(timer_arg).to_number());
 
-	// TODO: parse arguments !!
-	if ( fn.nargs > timer_arg+1 )
+	// Parse arguments 
+	Timer::ArgsContainer args;
+	for (unsigned i=timer_arg+1; i<fn.nargs; ++i)
 	{
-		std::stringstream ss; fn.dump_args(ss);
-		log_error("FIXME: discarding arguments "
-				"in setInterval(%s) call", ss.str().c_str());
+		args.push_back(fn.arg(i));
 	}
 
 	Timer timer;
-	timer.setInterval(*as_func, ms, fn.this_ptr, &fn.env());
+	timer.setInterval(*as_func, ms, fn.this_ptr, &fn.env(), args);
     
 	movie_root& root = VM::get().getRoot();
 	int id = root.add_interval_timer(timer);

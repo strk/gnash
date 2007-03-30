@@ -52,9 +52,10 @@ namespace gnash {
 /// This is constructed when _global.setInterval() is called.
 /// Instances of this class will be stored in the movie_root singleton.
 ///
-/// A timer has a function to call, a context in which to call it, and
-/// interval specifying how often the function must be called.
-//
+/// A timer has a function to call, a context in which to call it, a
+/// list of arguments and an interval specifying how often the function must be
+/// called.
+///
 /// It is *not* a "smart" timer, which is
 /// it will *not* automatically execute at given intervals. Rather, it
 /// will be movie_root responsibility to execute the timer-associated
@@ -94,6 +95,31 @@ public:
       ///
       void setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr, as_environment *env);
 
+      /// Setup the Timer, enabling it.
+      //
+      /// @param method
+      ///	The function to call from execution operator.
+      ///	Will be stored in an intrusive_ptr.
+      ///
+      /// @param ms
+      ///	The number of milliseconds between expires.
+      ///
+      /// @param this_ptr
+      ///	The object to be used as 'this' pointer when calling the
+      ///	associated function. Will be stored in an intrusive_ptr.
+      ///	It is allowed to be NULL as long as fn_call is allowed
+      ///	a NULL as 'this_ptr' (we might want to change this).
+      ///
+      /// @param env
+      /// 	The environment in which the associated function will be run.
+      ///	Not sure we should provide this rather then extracting from this_ptr...
+      ///
+      /// @param args
+      /// 	The list of arguments to pass to the function being invoked.
+      ///
+      void setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr, as_environment *env,
+		      std::vector<as_value>& args);
+
       /// Clear the timer, ready for reuse
       //
       /// When a Timer is cleared, the expired() function
@@ -112,6 +138,8 @@ public:
       /// Execute associated function properly setting up context
       void operator() ();
       
+      /// Arguments list type
+      typedef std::vector<as_value> ArgsContainer;
       
 
 private:
@@ -137,6 +165,8 @@ private:
       /// how to keep this alive ?
       as_environment *_env;
 
+      /// List of arguments
+      ArgsContainer _args;
 };
   
   as_value timer_setinterval(const fn_call& fn);

@@ -1,5 +1,12 @@
 2007-03-30 Sandro Santilli <strk@keybit.net>
 
+	* server/timers.{cpp,h}: add support for passing arguments to
+	  setInterval() callbacks.
+	* testsuite/misc-ming.all/: intervalTest.as, intervalTestRunner.cpp:
+	  All tests pass now.
+
+2007-03-30 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: intervalTest.as, intervalTestRunner.cpp:
 	  Add test for setInterval() calls with additinal args (Gnash fails).
 	* server/asobj/xmlsocket.cpp: don't attempt to send

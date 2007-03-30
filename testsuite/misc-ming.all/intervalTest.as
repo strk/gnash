@@ -51,7 +51,7 @@ do_that = function() {
 };
 
 push_args = function() {
-	xcheck_equals(arguments.length, 3);
+	check_equals(arguments.length, 3);
 	clearInterval(push_interval);
 	xtrace("Pushing "+arguments.length+" args");
 	for (var i=0; i<arguments.length; i++)

@@ -113,7 +113,8 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(tmp.to_number(), 4);
 
 	root->get_member("pushed_args", &tmp);
-	xcheck_equals(tmp.to_string(), "8,9,10");
+	as_environment env; // needed for proper to_string()
+	check_equals(tmp.to_string(&env), std::string("8,9,10"));
 
 	root->get_member("test_completed", &tmp);
 	check_equals(tmp.to_number(), 1);
