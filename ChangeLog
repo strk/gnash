@@ -1,5 +1,6 @@
 2007-03-30 Sandro Santilli <strk@keybit.net>
 
+	* libbase/network.cpp: minor cleanups in debugging lines.
 	* server/asobj/xmlsocket.{cpp,h}: first pass at cleanup,
 	  fix XMLSocket.connect() to return the correct value.
 	* server/asobj/Global.cpp: initialize XMLSocket with the

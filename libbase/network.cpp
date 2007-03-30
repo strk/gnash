@@ -65,13 +65,13 @@ static const short DEFAULTPORT  = RTMP;
 
 Network::Network() : _ipaddr(INADDR_ANY), _sockfd(0), _listenfd(0), _port(0), _connected(false), _debug(false), _timeout(5)
 {
-    //log_msg("%s: \n", __PRETTY_FUNCTION__);
+    //log_msg("%s", __PRETTY_FUNCTION__);
 #ifdef HAVE_WINSOCK_H
     WORD wVersionRequested;
     WSADATA wsaData;
     wVersionRequested = MAKEWORD(1, 1);		// Windows Sockets 1.1
     if (WSAStartup( wVersionRequested, &wsaData ) != 0) {
-        printf("ERROR: could not find a usable WinSock DLL.\n");
+        log_error("Could not find a usable WinSock DLL.");
         exit(1);
     }
 #endif
@@ -80,7 +80,7 @@ Network::Network() : _ipaddr(INADDR_ANY), _sockfd(0), _listenfd(0), _port(0), _c
 
 Network::~Network() 
 {
-    //log_msg("%s: \n", __PRETTY_FUNCTION__);
+    //log_msg("%s:", __PRETTY_FUNCTION__);
 #ifdef HAVE_WINSOCK_H
     WSACleanup();
 #else
@@ -123,7 +123,7 @@ Network::createServer(short port)
     in_addr_t       nodeaddr;
 
     if (port < 1024) {
-	log_error("Can't connect to priviledged port #%d!\n", port);
+	log_error("Can't connect to priviledged port #%d!", port);
 	return false;
     }
   
@@ -146,7 +146,7 @@ Network::createServer(short port)
   
     if ((ppe = getprotobyname(DEFAULTPROTO)) == 0) {
         // error, wasn't able to get a protocol entry
-        log_msg("WARNING: unable to get protocol entry for %s\n",
+        log_warning("unable to get protocol entry for %s",
                 DEFAULTPROTO);
         return false;
     }
@@ -163,14 +163,14 @@ Network::createServer(short port)
     
     // error, wasn't able to create a socket
     if (_listenfd < 0) {
-        log_msg("unable to create socket: %s\n", strerror(errno));
+        log_warning("unable to create socket: %s", strerror(errno));
         return true;
     }
     
     on = 1;
     if (setsockopt(_listenfd, SOL_SOCKET, SO_REUSEADDR,
                    (char *)&on, sizeof(on)) < 0) {
-        log_msg("setsockopt SO_REUSEADDR failed!\n");
+        log_warning("setsockopt SO_REUSEADDR failed!");
         return false;
     }
     
@@ -180,7 +180,7 @@ Network::createServer(short port)
     while (retries < 5) {
         if (bind(_listenfd, reinterpret_cast<struct sockaddr *>(&sock_in),
                  sizeof(sock_in)) == -1) {
-            log_msg("WARNING: unable to bind to port %hd! %s\n",
+            log_warning("unable to bind to port %hd! %s",
                     port, strerror(errno));
 //                    inet_ntoa(sock_in.sin_addr), strerror(errno));
             retries++;
@@ -193,7 +193,7 @@ Network::createServer(short port)
 #endif
     
 	if (_debug) {
-	    log_msg("Server bound to service on port: %hd, %s using fd #%d\n",
+	    log_msg("Server bound to service on port: %hd, %s using fd #%d",
 		    ntohs(sock_in.sin_port), inet_ntoa(sock_in.sin_addr),
 		    _listenfd);
 	}
@@ -207,7 +207,7 @@ Network::createServer(short port)
         _port = port;
     
 #if 0
-        log_msg("Listening for net traffic on fd #%d\n", _sockfd);
+        log_msg("Listening for net traffic on fd #%d", _sockfd);
 #endif
     
         return true;
@@ -241,7 +241,7 @@ Network::newConnection(bool block)
     alen = sizeof(struct sockaddr_in);
   
 #ifdef NET_DEBUG
-    log_msg("Trying to accept net traffic on fd #%d\n", _sockfd);
+    log_msg("Trying to accept net traffic on fd #%d", _sockfd);
 #endif
   
     if (_listenfd <= 2) {
@@ -276,18 +276,18 @@ Network::newConnection(bool block)
 
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_msg("The accept() socket for fd #%d was interupted by a system call!\n", _listenfd);
+            log_msg("The accept() socket for fd #%d was interupted by a system call!", _listenfd);
         }
     
         if (ret == -1) {
-            log_msg("ERROR: The accept() socket for fd #%d never was available for writing!",
+            log_warning("The accept() socket for fd #%d never was available for writing!",
                     _listenfd);
             return false;
         }
     
         if (ret == 0) {
             if (_debug) {
-                log_msg("ERROR: The accept() socket for fd #%d timed out waiting to write!\n",
+                log_warning("The accept() socket for fd #%d timed out waiting to write!",
                         _listenfd);
             }
         }
@@ -299,12 +299,12 @@ Network::newConnection(bool block)
     _sockfd = accept(_listenfd, &newfsin, &alen);
   
     if (_sockfd < 0) {
-        log_msg("unable to accept : %s\n", strerror(errno));
+        log_warning("unable to accept : %s", strerror(errno));
         return false;
     }
 
     if (_debug) {
-	log_msg("Accepting tcp/ip connection on fd #%d\n", _sockfd);
+	log_msg("Accepting tcp/ip connection on fd #%d", _sockfd);
     }
 
     return true;
@@ -348,20 +348,20 @@ Network::createClient(const char *hostname, short port)
     struct protoent     *proto;
 
     if (port < 1024) {
-        log_error("Can't connect to priviledged port #%hd!\n", port);
+        log_error("Can't connect to priviledged port #%hd!", port);
         _connected = false;
         return false;
     }
 
-    log_msg("%s: to host %s at port %d\n", __FUNCTION__, hostname, port);
+    log_msg("%s: to host %s at port %d", __FUNCTION__, hostname, port);
   
     memset(&sock_in, 0, sizeof(struct sockaddr_in));
     memset(&thishostname, 0, MAXHOSTNAMELEN);
     if (strlen(hostname) == 0) {
         if (gethostname(thishostname, MAXHOSTNAMELEN) == 0) {
-            log_msg("The hostname for this machine is %s.\n", thishostname);
+            log_msg("The hostname for this machine is %s.", thishostname);
         } else {
-            log_msg("Couldn't get the hostname for this machine!\n");
+            log_msg("Couldn't get the hostname for this machine!");
             return false;
         }   
     }
@@ -375,7 +375,7 @@ Network::createClient(const char *hostname, short port)
 #if 0
     char ascip[32];
     inet_ntop(AF_INET, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
-    log_msg("The IP address for this client socket is %s\n", ascip);
+    log_msg("The IP address for this client socket is %s", ascip);
 #endif
 
     proto = ::getprotobyname("TCP");
@@ -383,7 +383,7 @@ Network::createClient(const char *hostname, short port)
     _sockfd = ::socket(PF_INET, SOCK_STREAM, proto->p_proto);
     if (_sockfd < 0)
         {
-            log_error("unable to create socket : %s\n", strerror(errno));
+            log_error("unable to create socket : %s", strerror(errno));
             _sockfd = -1;
             return false;
         }
@@ -405,14 +405,14 @@ Network::createClient(const char *hostname, short port)
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR)
             {
-                log_msg("The connect() socket for fd #%d was interupted by a system call!\n",
+                log_msg("The connect() socket for fd #%d was interupted by a system call!",
                         _sockfd);
                 continue;
             }
     
         if (ret == -1)
             {
-                log_msg("The connect() socket for fd #%d never was available for writing!\n",
+                log_msg("The connect() socket for fd #%d never was available for writing!",
                         _sockfd);
 #ifdef HAVE_WINSOCK_H
                 ::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
@@ -423,7 +423,7 @@ Network::createClient(const char *hostname, short port)
                 return false;
             }
         if (ret == 0) {
-            log_error("The connect() socket for fd #%d timed out waiting to write!\n",
+            log_error("The connect() socket for fd #%d timed out waiting to write!",
                       _sockfd);
             continue;
         }
@@ -431,13 +431,13 @@ Network::createClient(const char *hostname, short port)
         if (ret > 0) {
             ret = ::connect(_sockfd, reinterpret_cast<struct sockaddr *>(&sock_in), sizeof(sock_in));
             if (ret == 0) {
-                log_msg("\tport %d at IP %s for fd #%d\n", port,
+                log_msg("\tport %d at IP %s for fd #%d", port,
                         ::inet_ntoa(sock_in.sin_addr), _sockfd);
                 _connected = true;
                 return true;
             }
             if (ret == -1) {
-                log_msg("The connect() socket for fd #%d never was available for writing!\n",
+                log_msg("The connect() socket for fd #%d never was available for writing!",
                         _sockfd);
                 _sockfd = -1;      
                 return false;
@@ -447,7 +447,7 @@ Network::createClient(const char *hostname, short port)
     //  ::close(_sockfd);
     //  return false;
 
-    printf("\tConnected at port %d on IP %s for fd #%d\n", port,
+    printf("\tConnected at port %d on IP %s for fd #%d", port,
            ::inet_ntoa(sock_in.sin_addr), _sockfd);
   
 #ifndef HAVE_WINSOCK_H
@@ -494,7 +494,7 @@ Network::closeNet(int sockfd)
 #if 0
             if (shutdown(sockfd, SHUT_RDWR) < 0) {
                 if (errno != ENOTCONN) {
-                    cerr << "WARNING: Unable to shutdown socket for fd #\n"
+                    cerr << "WARNING: Unable to shutdown socket for fd #"
                          << sockfd << strerror(errno) << endl;
                 } else {
                     cerr << "The socket using fd #" << sockfd
@@ -504,14 +504,14 @@ Network::closeNet(int sockfd)
             }
 #endif 
             if (close(sockfd) < 0) {
-                log_msg("WARNING: Unable to close the socket for fd #%d\n%s\n",
+                log_warning("Unable to close the socket for fd #%d: %s",
                         sockfd, strerror(errno));
 #ifndef HAVE_WINSOCK_H
                 sleep(1);
 #endif
                 retries++;
             } else {
-                log_msg("Closed the socket on fd #%d\n", sockfd);
+                log_msg("Closed the socket on fd #%d", sockfd);
                 return true;
             }
         }
@@ -747,7 +747,7 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
         {
             dbglogfile << "took " << endtime.tv_usec - starttime.tv_usec
                        << " usec to write (" << bytes_written
-                       << " bytes)\n" << endl;
+                       << " bytes)" << endl;
         }
     }
 #endif    
