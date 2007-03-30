@@ -1,5 +1,6 @@
 2007-03-30 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Mouse.cpp: cleanups.
 	* libbase/network.cpp: minor cleanups in debugging lines.
 	* server/asobj/xmlsocket.{cpp,h}: first pass at cleanup,
 	  fix XMLSocket.connect() to return the correct value.

@@ -73,20 +73,59 @@ public:
 	//double get_numeric_value() const { return 0; }
 };
 
-as_value mouse_addlistener(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+as_value mouse_addlistener(const fn_call& fn)
+{
+    boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
+    UNUSED(obj);
+
+    static bool warned=false;
+    if ( ! warned )
+    {
+        log_warning("%s: unimplemented", __FUNCTION__);
+        warned=true;
+    }
     return as_value();
 }
-as_value mouse_hide(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+
+as_value mouse_hide(const fn_call& fn)
+{
+    boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
+    UNUSED(obj);
+
+    static bool warned=false;
+    if ( ! warned )
+    {
+        log_warning("%s: unimplemented", __FUNCTION__);
+        warned=true;
+    }
     return as_value();
 }
-as_value mouse_removelistener(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+
+as_value mouse_removelistener(const fn_call& fn)
+{
+    boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
+    UNUSED(obj);
+
+    static bool warned=false;
+    if ( ! warned )
+    {
+        log_warning("%s: unimplemented", __FUNCTION__);
+        warned=true;
+    }
     return as_value();
 }
-as_value mouse_show(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+
+as_value mouse_show(const fn_call& fn)
+{
+    boost::intrusive_ptr<mouse_as_object> obj=ensureType<mouse_as_object>(fn.this_ptr);
+    UNUSED(obj);
+
+    static bool warned=false;
+    if ( ! warned )
+    {
+        log_warning("%s: unimplemented", __FUNCTION__);
+        warned=true;
+    }
     return as_value();
 }
 
