@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.26 2007/03/30 13:57:27 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.27 2007/03/30 22:58:11 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -934,7 +934,7 @@ NetStreamFfmpeg::advance()
 	// Check if there are any new status messages, and if we should
 	// pass them to a event handler
 	as_value status;
-	if (m_statusChanged && get_member(std::string("onStatus"), &status) && status.to_as_function() != NULL) {
+	if (m_statusChanged && get_member(std::string("onStatus"), &status) && status.is_function()) {
 
 		for (int i = m_status_messages.size()-1; i >= 0; --i) {
 			boost::intrusive_ptr<as_object> o = new as_object();
@@ -945,9 +945,9 @@ NetStreamFfmpeg::advance()
 			} else {
 				o->init_member(std::string("level"), as_value("error"), as_prop_flags::dontDelete|as_prop_flags::dontEnum);
 			}
-			m_env->push(o.get());
+			m_env->push_val(as_value(o.get()));
 
-			call_method0(status, m_env, this);
+			call_method(status, m_env, this, 1, m_env->get_top_index() );
 
 		}
 		m_status_messages.clear();
