@@ -549,7 +549,7 @@ static as_value sprite_load_movie(const fn_call& fn)
 	}
 
 	sprite->loadMovie(url);
-	log_warning("MovieClip.loadMovie(%s) - TESTING ", url.str().c_str());
+	//log_warning("MovieClip.loadMovie(%s) - TESTING ", url.str().c_str());
 
 
 	//log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
