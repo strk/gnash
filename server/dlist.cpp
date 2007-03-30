@@ -486,7 +486,8 @@ DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 {
 	//GNASH_REPORT_FUNCTION;
 
-	const container_type keepchars = exclude._characters;
+	assert(&exclude != this);
+	const container_type& keepchars = exclude._characters;
 
 	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
 	{

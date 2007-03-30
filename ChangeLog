@@ -1,5 +1,8 @@
 2007-03-30 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.cpp (clear_except): don't copy display list (small
+	  typo)
+	* server/sprite_instance.cpp (ctor): initialize the _unloaded member.
 	* testsuite/actionscript.all/NetStream.as: check that onStatus and
 	  onSeek are not special builtin-properties.
 	* server/timers.{cpp,h}: add support for passing arguments to

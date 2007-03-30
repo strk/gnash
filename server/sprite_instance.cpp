@@ -1561,6 +1561,7 @@ sprite_instance::sprite_instance(
 		character* parent, int id)
 	:
 	character(parent, id),
+	_unloaded(false),
 	m_mouse_state(UP),
 	m_root(r),
 	m_display_list(),
