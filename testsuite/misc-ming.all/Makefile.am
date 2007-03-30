@@ -96,6 +96,7 @@ check_PROGRAMS = \
 	action_execution_order_test4 \
 	action_execution_order_test5 \
 	action_execution_order_test6 \
+	reverse_execute_PlaceObject2_test1 \
 	loadMovieTest \
 	loadMovieTestRunner \
 	eventSoundTest1 \
@@ -564,6 +565,20 @@ action_execution_order_test6.swf: action_execution_order_test6
 
 action_execution_order_test6runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test6.swf
 	sh $< $(top_builddir) action_execution_order_test6.swf > $@
+	chmod 755 $@
+
+reverse_execute_PlaceObject2_test1_SOURCES =	\
+	reverse_execute_PlaceObject2_test1.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+reverse_execute_PlaceObject2_test1_LDADD = $(MING_LIBS)
+
+reverse_execute_PlaceObject2_test1.swf: reverse_execute_PlaceObject2_test1
+	./reverse_execute_PlaceObject2_test1 $(top_srcdir)/testsuite/media
+
+reverse_execute_PlaceObject2_test1runner: $(srcdir)/../generic-testrunner.sh reverse_execute_PlaceObject2_test1.swf
+	sh $< $(top_builddir) reverse_execute_PlaceObject2_test1.swf > $@
 	chmod 755 $@
 
 action_execution_order_extend_test_SOURCES =	\
