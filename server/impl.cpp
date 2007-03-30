@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.101 2007/03/21 18:09:24 strk Exp $ */
+/* $Id: impl.cpp,v 1.102 2007/03/30 15:18:24 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -692,7 +692,7 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
 
 	if (mov == NULL)
 	{
-		log_error("Couldn't load library movie '%s'\n",
+		log_error("Couldn't load library movie '%s'",
 			url.str().c_str());
 		return NULL;
 	}
