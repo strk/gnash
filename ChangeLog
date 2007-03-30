@@ -1,5 +1,7 @@
 2007-03-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: intervalTest.as, intervalTestRunner.cpp:
+	  Add test for setInterval() calls with additinal args (Gnash fails).
 	* server/asobj/xmlsocket.cpp: don't attempt to send
 	  data when not connected !
 	* testsuite/misc-ming.all/Makefile.am: prepared for

@@ -46,7 +46,17 @@ do_that = function() {
 		xtrace("That interval cleared ");
 		this_interval = setInterval(do_this, 1);
 		// interval 1 is NOT reused
-		check_equals(this_interval, 3);
+		check_equals(this_interval, 4); // interval 3 is set from within do_that
+	}
+};
+
+push_args = function() {
+	xcheck_equals(arguments.length, 3);
+	clearInterval(push_interval);
+	xtrace("Pushing "+arguments.length+" args");
+	for (var i=0; i<arguments.length; i++)
+	{
+		pushed_args[i] = arguments[i];
 	}
 };
 
@@ -57,5 +67,9 @@ check_equals(this_interval, 1);
 that_counter = 0;
 that_interval  = setInterval(do_that, 1000);
 check_equals(that_interval, 2);
+
+pushed_args = new Array;
+push_interval  = setInterval(push_args, 200, 8, 9, 10);
+check_equals(push_interval, 3);
 
 stop();

@@ -112,6 +112,9 @@ main(int /*argc*/, char** /*argv*/)
 	root->get_member("that_counter", &tmp);
 	check_equals(tmp.to_number(), 4);
 
+	root->get_member("pushed_args", &tmp);
+	xcheck_equals(tmp.to_string(), "8,9,10");
+
 	root->get_member("test_completed", &tmp);
 	check_equals(tmp.to_number(), 1);
 
