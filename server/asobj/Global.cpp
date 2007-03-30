@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.56 2007/03/28 20:01:04 strk Exp $ */
+/* $Id: Global.cpp,v 1.57 2007/03/30 14:51:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -420,7 +420,7 @@ Global::Global(VM& vm)
 	color_class_init(*this);
 	selection_class_init(*this); // Selection
 	sound_class_init(*this);
-	init_member("XMLSocket", new builtin_function(xmlsocket_new));
+    xmlsocket_class_init(*this);
 	date_class_init(*this);
 	xml_class_init(*this);
 	xmlnode_class_init(*this);

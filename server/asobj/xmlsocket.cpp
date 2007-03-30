@@ -54,14 +54,42 @@
 #define MAXHOSTNAMELEN 256
 #endif
 
+#define GNASH_XMLSOCKET_DEBUG
+
 int xml_fd = 0;                 // FIXME: This file descriptor is used by
                                 // XML::checkSocket() when called from the main
                                 // processing loop. 
 
 namespace gnash {
+
+static as_value xmlsocket_connect(const fn_call& fn);
+static as_value xmlsocket_send(const fn_call& fn);
+static as_value xmlsocket_new(const fn_call& fn);
+static as_value xmlsocket_close(const fn_call& fn);
+
+// These are the event handlers called for this object
+static as_value xmlsocket_event_ondata(const fn_call& fn);
+
+static as_object* getXMLSocketInterface();
+static void attachXMLSocketInterface(as_object& o);
+
 const int SOCKET_DATA = 1;
   
 const int INBUF = 10000;
+
+class DSOLOCAL xmlsocket_as_object : public gnash::as_object
+{
+
+public:
+
+        xmlsocket_as_object()
+                :
+                as_object(getXMLSocketInterface())
+        {}
+
+        XMLSocket obj;
+};
+
   
 XMLSocket::XMLSocket()
 {
@@ -380,53 +408,50 @@ XMLSocket::checkSockets(int fd)
 as_value
 xmlsocket_connect(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
+
     as_value	method;
     as_value	val;
-    static bool first = true;     // This event handler should only be executed once.
     
-    if (!first) {
-        return as_value(true);
-    }
-    
-    log_msg("%s: nargs=%d\n", __FUNCTION__, fn.nargs);
+#ifdef GNASH_XMLSOCKET_DEBUG
+    std::stringstream ss;
+    fn.dump_args(ss);
+    log_msg("XMLSocket.connect(%s) called", ss.str().c_str());
+#endif
+
     boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
-    const std::string host = fn.arg(0).to_string();
-    std::string port_str = fn.arg(1).to_string();
-    double port = atof(port_str.c_str());
+    std::string host = fn.arg(0).to_std_string(&fn.env());
+    std::string port_str = fn.arg(1).to_std_string(&fn.env());
+    int port = atoi(port_str.c_str());
     
-    ptr->obj.connect(host.c_str(), static_cast<int>(port));
+    bool success = ptr->obj.connect(host.c_str(), port);
     
-#if 0 // use connect return as result
-    // Push result onto stack for onConnect
-    if (ret) {
-        fn.env().push(as_value(true));
+    if ( success )
+    {
+        static bool first = true;     // This event handler should only be executed once.
+        if (!first)
+        {
+            log_warning("XMLSocket.onConnect() not being called the second time (dunno why: check %s:%d)", __FILE__, __LINE__);
+        }
+        else
+        {
+            first = false;  // dont call onConnect twice (is this correct??)
+
+            if (fn.this_ptr->get_member("onConnect", &method))
+            {
+                //    log_msg("FIXME: Found onConnect!\n");
+                val = call_method0(method, &fn.env(), fn.this_ptr.get());
+            } 
+	    
+            // TODO: don't allocate on heap!
+            Timer timer;
+            boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(&xmlsocket_event_ondata, NULL);
+            timer.setInterval(*ondata_handler, 50, boost::dynamic_pointer_cast<as_object>(ptr), &fn.env());
+            VM::get().getRoot().add_interval_timer(timer);
+        }
     }
-    else {
-        fn.env().push(as_value(false));
-    }
-#endif
-    fn.env().push(as_value(true));
-    if (fn.this_ptr->get_member("onConnect", &method)) {
-        //    log_msg("FIXME: Found onConnect!\n");
-        first = false; // what is this for ?
-        val = call_method0(method, &fn.env(), fn.this_ptr.get());
-    } else {
-        //ptr->set_event_handler(event_id::SOCK_CONNECT, (as_c_function_ptr)&xmlsocket_event_connect);
-    }
-    
-#if 1
-    // TODO: don't allocate on heap!
-    Timer *timer = new Timer;
-    boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(
-        &xmlsocket_event_ondata, NULL);
-    timer->setInterval(*ondata_handler, 50, boost::dynamic_pointer_cast<as_object>(ptr), &fn.env());
-    VM::get().getRoot().add_interval_timer(*timer);
-#endif
-    
-    fn.env().pop();
-    
-    return as_value(true);
+
+    return as_value(success);
 }
 
 
@@ -458,67 +483,21 @@ xmlsocket_close(const fn_call& fn)
 }
 
 as_value
-xmlsocket_xml_new(const fn_call& fn)
+xmlsocket_new(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
-    //log_msg("%s: nargs=%d\n", __FUNCTION__, nargs);
-    
-    xml_new(fn);
-    return as_value();
-}
-
-as_value
-xmlsocket_new(const fn_call& /* fn */)
-{
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     //log_msg("%s: nargs=%d\n", __FUNCTION__, nargs);
     
     as_object*	xmlsock_obj = new xmlsocket_as_object;
-    //log_msg("\tCreated New XMLSocket object at 0x%X\n", (unsigned int)xmlsock_obj);
-    xmlsock_obj->init_member("connect",
-                             new builtin_function(xmlsocket_connect));
-    xmlsock_obj->init_member("send", new builtin_function(xmlsocket_send));
-    xmlsock_obj->init_member("close", new builtin_function(xmlsocket_close));
-    xmlsock_obj->init_member("Connected", true);
-    // swf_event*	ev = new swf_event;
-    // m_event_handlers.push_back(ev);
-    // Setup event handlers
-#if 0
-    xmlsock_obj->set_event_handler(event_id::SOCK_DATA,
-                                   (as_c_function_ptr)&xmlsocket_event_ondata);
-    xmlsock_obj->set_event_handler(event_id::SOCK_CLOSE,
-                                   (as_c_function_ptr)&xmlsocket_event_close);
-    // 							xmlsock_obj->set_event_handler(event_id::SOCK_CONNECT,
-    // 									       (as_c_function_ptr)&xmlsocket_event_connect);
-    xmlsock_obj->set_event_handler(event_id::SOCK_XML,
-                                   (as_c_function_ptr)&xmlsocket_event_xml);
+
+#ifdef GNASH_XMLSOCKET_DEBUG
+    std::stringstream ss;
+    fn.dump_args(ss);
+    log_msg("new XMLSocket(%s) called - created object at %p", ss.str().c_str(), (void*)xmlsock_obj);
+#else
+    UNUSED(fn);
 #endif
-    //periodic_events.set_event_handler(xmlsock_obj);
-    
-    
-#if 0 // TODO: setInterval and clearInterval shall be _global methods
-    //
-    //as_c_function_ptr int_handler = (as_c_function_ptr)&timer_setinterval;
-    //env->set_member("setInterval", int_handler);
-    fn.env().set_member("setInterval", timer_setinterval);
-    
-    //as_c_function_ptr clr_handler = timer_clearinterval;
-    // TODO:  check this, sounds suspicious
-    fn.env().set_member("clearInterval", timer_clearinterval);
-    
-    //env->set_variable("setInterval", int_handler, 0);
-    //xmlsock_obj->set_event_handler(event_id::TIMER,
-    //       (as_c_function_ptr)&timer_expire);
-#if 0
-    Timer *timer = new Timer;
-    as_c_function_ptr ondata_handler =
-        (as_c_function_ptr)&xmlsocket_event_ondata;
-    timer->setInterval(ondata_handler, 10);
-    timer->setObject(xmlsock_obj);
-    current_movie->add_interval_timer(timer);
-#endif
-#endif
-    
+
     return as_value(xmlsock_obj);
     
     // Tune malloc for the best performance
@@ -595,75 +574,43 @@ xmlsocket_event_ondata(const fn_call& fn)
   return as_value(true);
 }
 
-as_value
-xmlsocket_event_close(const fn_call& /* fn */)
+static as_object*
+getXMLSocketInterface()
 {
-#if 0
-  as_value* result = fn.result;
-  as_object* this_ptr = fn.this_ptr;
-  int nargs = fn.nargs;
-  int first_arg = fn.first_arg_bottom_index;
-#else
-  log_error("%s: unimplemented!\n", __FUNCTION__);
-#endif
-  return as_value();
+    static boost::intrusive_ptr<as_object> o;
+    if ( o == NULL )
+    {
+        o = new as_object();
+        attachXMLSocketInterface(*o);
+    }
+    return o.get();
 }
 
-as_value
-xmlsocket_event_connect(const fn_call& fn)
+static void
+attachXMLSocketInterface(as_object& o)
 {
-    GNASH_REPORT_FUNCTION;
-    as_value	method;
-    as_value	val;
-    static bool first = true;     // This event handler should only be executed once.
-    
-    if (!first) {
-        return as_value(true);
-    }
-    
-    boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
-    
-    log_msg("%s: connected = %d\n", __FUNCTION__, ptr->obj.connected());
-    if ((ptr->obj.connected()) && (first)) {
-        first = false;
-        //env->set_variable("success", true, 0);
-        //env->bottom(0) = true;
-        
-        if (fn.this_ptr->get_member("onConnect", &method)) {
-	    val = call_method0(method, &fn.env(), fn.this_ptr.get());
-        } else {
-            log_msg("FIXME: Couldn't find onConnect!");
-        }
-    }
-    
-    return as_value(val.to_bool()); 
-}
-as_value
-xmlsocket_event_xml(const fn_call& /* fn */)
-{
-    GNASH_REPORT_FUNCTION;
-#if 0
-    as_value* result = fn.result;
-    as_object* this_ptr = fn.this_ptr;
-    int nargs = fn.nargs;
-    int first_arg = fn.first_arg_bottom_index;
-#else
-    log_error("%s: unimplemented!\n", __FUNCTION__);
-#endif  
-    return as_value();
+    o.init_member("connect", new builtin_function(xmlsocket_connect));
+    o.init_member("send", new builtin_function(xmlsocket_send));
+    o.init_member("close", new builtin_function(xmlsocket_close));
 }
 
-static XMLSocket xs;
-
-int
-check_sockets(int x)
+// extern (used by Global.cpp)
+void xmlsocket_class_init(as_object& global)
 {
-    GNASH_REPORT_FUNCTION;
-    if (xml_fd == 0) {
-        return -1;
+//    GNASH_REPORT_FUNCTION;
+    // This is going to be the global XMLSocket "class"/"function"
+    static boost::intrusive_ptr<builtin_function> cl;
+
+    if ( cl == NULL )
+    {
+        cl=new builtin_function(&xmlsocket_new, getXMLSocketInterface());
+        // Do not replicate all interface to class !
+        //attachXMLSocketInterface(*cl);
     }
     
-    return xs.checkSockets(x);
+    // Register _global.String
+    global.init_member("XMLSocket", cl.get());
+
 }
 
 } // end of gnash namespace

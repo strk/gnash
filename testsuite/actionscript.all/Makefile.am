@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.70 2007/03/30 07:23:19 strk Exp $
+# $Id: Makefile.am,v 1.71 2007/03/30 14:51:38 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -103,6 +103,7 @@ ASTESTS =			\
 	Function.as		\
 	with.as			\
 	XML.as			\
+	XMLSocket.as	\
 	rtmp.as 		\
 	XMLNode.as		\
 	LocalConnection.as	\

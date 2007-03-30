@@ -82,27 +82,8 @@ private:
     std::vector<as_object *>  _nodes;
 };
 
+void xmlsocket_class_init(as_object& global);
 
-class DSOLOCAL xmlsocket_as_object : public gnash::as_object
-{
-public:
-    XMLSocket obj;
-};
-
-DSOEXPORT as_value xmlsocket_connect(const fn_call& fn);
-DSOEXPORT as_value xmlsocket_send(const fn_call& fn);
-DSOEXPORT as_value xmlsocket_xml_new(const fn_call& fn);
-DSOEXPORT as_value xmlsocket_new(const fn_call& fn);
-DSOEXPORT as_value xmlsocket_close(const fn_call& fn);
-
-// These are the event handlers called for this object
-DSOEXPORT as_value xmlsocket_event_ondata(const fn_call& fn);
-DSOEXPORT as_value xmlsocket_event_close(const fn_call& fn);
-DSOEXPORT as_value xmlsocket_event_connect(const fn_call& fn);
-DSOEXPORT as_value xmlsocket_event_xml(const fn_call& fn);
-
-DSOEXPORT int check_sockets(int fd);
- 
 } // end of gnash namespace
 
 
