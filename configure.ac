@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.282 2007/03/31 04:54:31 rsavoye Exp $
+dnl $Id: configure.ac,v 1.283 2007/03/31 11:02:51 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -978,6 +978,11 @@ if test x"$debugger" = x"yes"; then
   echo "        Building Flash debugger support (default). Use --disable-debugger to disable."
 else
   echo "        Building the Flash debugger is disabled."
+fi
+
+if test x"$gui" = xgtk -a x"$pixelformat" = xrgb565; then
+  echo "        WARNING: Pixel format RGB565 selected in combination with the"
+  echo "        GTK GUI. Only a hacked GTK will work (e.g. on the OLPC)."
 fi
 
 echo "        Renderer engine: "$renderer

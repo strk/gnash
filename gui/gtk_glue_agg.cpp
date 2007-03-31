@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.13 2007/02/28 17:25:25 udog Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.14 2007/03/31 11:02:51 bjacques Exp $ */
 
 #include <cstdio>
 #include <cerrno>
@@ -53,12 +53,14 @@ bool
 GtkAggGlue::init(int /*argc*/, char **/*argv*/[])
 {
     gdk_rgb_init();
-
-		// GDK's gdk_draw_rgb_image() needs 24-bit RGB data, so we initialize the
-		// AGG renderer with RGB24 and let GTK take care of the proper pixel format.
-		_bpp = 24;
-
-		return true;
+#ifdef PIXELFORMAT_RGB565
+    _bpp = 16;
+#else
+    // GDK's gdk_draw_rgb_image() needs 24-bit RGB data, so we initialize the
+    // AGG renderer with RGB24 and let GTK take care of the proper pixel format.
+    _bpp = 24;
+#endif
+    return true;
 }
 
 void
@@ -70,7 +72,13 @@ GtkAggGlue::prepDrawingArea(GtkWidget *drawing_area)
 render_handler*
 GtkAggGlue::createRenderHandler()
 {
-		_agg_renderer = create_render_handler_agg("RGB24");
+#ifdef PIXELFORMAT_RGB565
+#warning A pixel format of RGB565; you must have a (hacked) GTK which supports \
+         this format (e.g., GTK on the OLPC).
+    _agg_renderer = create_render_handler_agg("RGB565");
+#else
+    _agg_renderer = create_render_handler_agg("RGB24");
+#endif
     return _agg_renderer;
 }
 

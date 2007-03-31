@@ -1,3 +1,9 @@
+2007-03-31 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac, gui/gtk_glue_agg.cpp: Add configurable support
+	for 16-bit GTK, for use on the OLPC. Simply specifying
+	--with-pixelformat=rgb565 will activate this code.
+
 2007-03-30 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStream{Ffmpeg,Gst}.cpp: Fixed the callback
