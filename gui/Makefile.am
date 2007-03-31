@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.60 2007/03/06 18:06:13 rsavoye Exp $
+# $Id: Makefile.am,v 1.61 2007/03/31 21:16:49 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -202,7 +202,6 @@ libgnashgui_la_SOURCES = \
 libgnashgui_la_LIBADD = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/backend/libgnashbackend.la \
-	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(AM_LDFLAGS)
 
@@ -219,6 +218,7 @@ GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/server/asobj/libgnashasobjs.la \
+	$(top_builddir)/server/parser/libgnashparser.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	libgnashplayer.la
@@ -229,7 +229,6 @@ libgnashplayer_la_SOURCES = \
 libgnashplayer_la_LIBADD = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/backend/libgnashbackend.la \
-	$(top_builddir)/server/libgnashserver.la \
 	libgnashgui.la \
 	$(AM_LDFLAGS) 
 
