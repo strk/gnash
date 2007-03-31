@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.281 2007/03/31 04:52:31 rsavoye Exp $
+dnl $Id: configure.ac,v 1.282 2007/03/31 04:54:31 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -75,10 +75,10 @@ AC_ARG_ENABLE(menus,
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-menus option]) ;;
 esac],menus=yes)
 
-if test x"$menu" = x"yes"; then
-  AC_DEFINE([USE_MENU], [], [GUI Menu support])
+if test x"$menus" = x"yes"; then
+  AC_DEFINE([USE_MENUS], [], [GUI Menu support])
 fi
-AM_CONDITIONAL(MENU, test x$menus = xyes)
+AM_CONDITIONAL(MENUS, test x$menus = xyes)
 
 dnl Write the file to disk in the plugin, if specified.
 AC_ARG_ENABLE(write,
