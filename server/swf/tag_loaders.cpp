@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.82 2007/03/29 07:36:17 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.83 2007/04/01 10:23:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -251,7 +251,16 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
 
 		bitmap_character_def* ch = new bitmap_character_def(im);
 
-		m->add_bitmap_character_def(character_id, ch);
+		if ( m->get_bitmap_character_def(character_id) )
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror("DEFINEBITS: Duplicate id (%d) for bitmap character - discarding it", character_id);
+			);
+		}
+		else
+		{
+			m->add_bitmap_character_def(character_id, ch);
+		}
 	}
 
 }
@@ -288,9 +297,17 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 
     //assert(bi->get_ref_count() == 0);
 
-    bitmap_character_def* ch = new bitmap_character_def(im);
-
-    m->add_bitmap_character_def(character_id, ch);
+		if ( m->get_bitmap_character_def(character_id) )
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror("DEFINEBITSJPEG2: Duplicate id (%d) for bitmap character - discarding it", character_id);
+			);
+		}
+		else
+		{
+			bitmap_character_def* ch = new bitmap_character_def(im);
+    			m->add_bitmap_character_def(character_id, ch);
+		}
    	}
 
 }
@@ -535,12 +552,19 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 			    delete [] buffer;
 			}
 
-		    bitmap_character_def* ch = new bitmap_character_def(image);
-		    //bi = render::create_bitmap_info_rgb(image);
-		    //delete image;
+			if ( m->get_bitmap_character_def(character_id) )
+			{
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror("DEFINEBITSLOSSLESS: Duplicate id (%d) for bitmap character - discarding it", character_id);
+				);
+			}
+			else
+			{
+				bitmap_character_def* ch = new bitmap_character_def(image);
 
- 			// add image to movie, under character id.
- 			m->add_bitmap_character_def(character_id, ch);
+				// add image to movie, under character id.
+				m->add_bitmap_character_def(character_id, ch);
+			}
 		}
 	    else
 		{
