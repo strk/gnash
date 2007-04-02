@@ -26,6 +26,19 @@
 # define MING_SUPPORTS_INIT_ACTIONS
 #endif
 
+/*
+ * This is to avoid the annoying warnings
+ * coming from Ming when using the deprecated
+ * compileSWFActionCode interface.
+ * A cleaner approach is likely switch to
+ * using newSWFAction always and change the
+ * macro to make it output compileSWFActionCode
+ * when MING_VERSION_CODE < 000040004
+ */
+#if MING_VERSION_CODE >= 00040004
+# define compileSWFActionCode newSWFAction
+#endif
+
 /* Missing define to allow using older Ming releases */
 
 #ifndef SWFACTION_INIT

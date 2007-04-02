@@ -25,6 +25,7 @@
 #include <stdarg.h>
 
 void add_xtrace_function_clip(SWFMovieClip mo, SWFBlock font, int depth, int x, int y, int width, int height);
+static SWFAction get_dejagnu_actions(void);
 
 void
 add_xtrace_function_clip(SWFMovieClip mc, SWFBlock font, int depth, int x, int y, int width, int height)
@@ -157,11 +158,9 @@ make_fill_square(int x, int y, int width, int height, byte or, byte og, byte ob,
 	return sh;
 }
 
-SWFAction
+static SWFAction
 get_dejagnu_actions()
 {
-	SWFAction ac;
-
 	static const size_t BUFLEN = 4096;
 
 	char buf[BUFLEN];
@@ -295,7 +294,7 @@ add_clip_init_actions(SWFMovieClip mo, const char* code)
 {
 	SWFAction ac;
 	ac = compileSWFActionCode(code);
-	SWFMovieClip_addInitAction(mo, (SWFBlock)ac);
+	SWFMovieClip_addInitAction(mo, ac);
 }
 #endif // MING_SUPPORTS_INIT_ACTIONS
 
