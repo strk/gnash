@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.51 2007/01/31 15:24:13 bjacques Exp $ */
+/* $Id: sdl.cpp,v 1.52 2007/04/02 15:54:08 strk Exp $ */
 
 // XXXbjacques: Screw up the indentation in this file, and you're dead. And by
 //              screw up, I mean not adhering the indentation used throughout
@@ -311,7 +311,7 @@ void SDLGui::key_event(SDLKey key, bool down)
     }
     
     if (c != gnash::key::INVALID) {
-        gnash::notify_key_event(c, down);
+        notify_key_event(c, down);
     }
 }
 

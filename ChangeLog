@@ -1,5 +1,6 @@
 2007-04-02 Sandro Santilli <strk@keybit.net>
 
+	* gui/sdl.cpp (key_event): update call to notify_key_event.
 	* server/vm/ExecutableCode.h: change FunctionCode to take
 	  a generic character as target, not necessarely a sprite.
 	* server/movie_root.{cpp,h}: update pushAction() for events
