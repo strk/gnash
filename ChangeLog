@@ -1,3 +1,13 @@
+2007-04-02 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* Makefile.am, configure.ac, gui/Makefile.am, gui/gnash.cpp, gui/gtk.cpp:
+	  Changed the "--enable-sound" option to "--enable-media", and removed
+	  the "--with-mp3-decoder" option.
+	* server/asobj/NetStreamFfmpeg.cpp: Replaced a few assert(0) with
+	  warnings.
+	* server/asobj/NetStreamGst.cpp: Only create sound objects if a
+	  soundhandler is present.
+
 2007-04-02 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.{cpp,h} (place_character): call unload()

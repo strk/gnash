@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.61 2007/03/31 21:16:49 strk Exp $
+# $Id: Makefile.am,v 1.62 2007/04/02 16:46:32 tgc Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -178,8 +178,7 @@ endif
 AM_CPPFLAGS += -DPKGDATADIR=\"$(pkgdatadir)\"
 AM_CPPFLAGS += -DRENDERER_CONFIG=\"$(RENDERER_CONFIG)\"
 AM_CPPFLAGS += -DGUI_CONFIG=\"$(GUI_CONFIG)\"
-AM_CPPFLAGS += -DSOUND_CONFIG=\"$(SOUND_CONFIG)\"
-AM_CPPFLAGS += -DDECODER_CONFIG=\"$(DECODER_CONFIG)\"
+AM_CPPFLAGS += -DMEDIA_CONFIG=\"$(MEDIA_CONFIG)\"
 AM_CPPFLAGS += -DTARGET_CONFIG=\"$(target)\"
 
 dist_images_DATA = images/gnash_128_96.ico images/GnashG.png

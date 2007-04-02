@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.65 2007/03/07 15:11:24 strk Exp $
+# $Id: Makefile.am,v 1.66 2007/04/02 16:46:31 tgc Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -108,18 +108,15 @@ mudflap-check:
 
 # Set a few variables to what features we selected so we can dump it with the
 # test of the config
-if USE_SOUND_SDL
-  SOUND_OPT=sdl
-endif
 if USE_SOUND_GST
-  SOUND_OPT=gst
+  MEDIA_OPT=gst
 endif
 
 if USE_MAD_ENGINE
-  ENGINE_OPT=mad
+  MEDIA_OPT=mad
 endif
 if USE_FFMPEG_ENGINE
-  ENGINE_OPT=ffmpeg
+  MEDIA_OPT=ffmpeg
 endif
 
 if USE_GUI_GTK
@@ -252,7 +249,6 @@ endif
 	@echo "legit value"
 	@echo ""
 	@echo "Configurable options are:"
-	@echo "Sound handler: $(SOUND_OPT)"
-	@echo "MP3 decoder: $(ENGINE_OPT)"
+	@echo "Media handler: $(MEDIA_OPT)"
 	@echo "Renderer engine: $(RENDER_OPT)"
 	@echo "GUI: $(GUI_OPT)"

@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.283 2007/03/31 11:02:51 bjacques Exp $
+dnl $Id: configure.ac,v 1.284 2007/04/02 16:46:31 tgc Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -260,39 +260,20 @@ if test x$pixelformat = xall; then
 fi
 
 dnl --------------------------------------------------------
-dnl  Select sound streamer
+dnl  Select media handler
 dnl --------------------------------------------------------
 
 AC_ARG_ENABLE(sound,
- AC_HELP_STRING([--enable-sound=handler], [Enable sound support using the specified handler: SDL, GST (Gstreamer) or none (no sound) [[SDL]] ]),
+ AC_HELP_STRING([--enable-media=handler], [Enable media handling support using the specified handler: ffmpeg, mad, GST (Gstreamer) or none (no sound) [[ffmpeg]] ]),
  [case "${enableval}" in
-   GST|gst) sound_handler=gst ;;
-   sdl|SDL) sound_handler=sdl  ;;
-   no|NO|none) sound_handler=none ;;
-   *) AC_MSG_ERROR([bad value ${enableval} for --enable-sound option]) ;;
+   GST|gst) media_handler=gst ;;
+   ffmpeg|FFMPEG) media_handler=ffmpeg  ;;
+   mad|MAD) media_handler=mad  ;;
+   no|NO|none) media_handler=none ;;
+   *) AC_MSG_ERROR([bad value ${enableval} for --enable-media option]) ;;
   esac],
- [sound_handler=sdl]
+ [media_handler=ffmpeg]
 )
-
-dnl --------------------------------------------------------
-dnl  Select mp3 decoder (only for 'sdl' sound)
-dnl --------------------------------------------------------
-
-AC_ARG_WITH(mp3-decoder,
- AC_HELP_STRING([--with-mp3-decoder=DECODER], [Use the specified mp3 decoder: ffmpeg, mad (libmad) or none [[none]]]),
- [case "${withval}" in
-   ffmpeg|FFMPEG) mp3_decoder=ffmpeg ;;
-   mad|MAD) mp3_decoder=mad  ;;
-   no|none) mp3_decoder=none ;;
-   *) AC_MSG_ERROR([invalid mp3_decoder ${withval} given (accept: ffmpeg|mad)]) ;;
-  esac],
- [mp3_decoder=ffmpeg]
-)
-
-if test x"$sound_handler" != xsdl -a x"$mp3_decoder" != xnone; then
-mp3_decoder=none;
-	dnl AC_MSG_ERROR([--with-mp3-decoder is only valid with --enable-sound=sdl])
-fi
 
 dnl --------------------------------------------------------
 dnl  ...
@@ -526,7 +507,7 @@ AM_CONDITIONAL(ENABLE_MTASC, [ test x"$MTASC" != x ])
 dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
 
-if test x$gui = xsdl -o x$sound_handler = xsdl; then
+if test x$gui = xsdl -o x$media_handler = xffmpeg -o x$media_handler = xffmpeg; then
   GNASH_PATH_SDL
 fi
 
@@ -580,7 +561,7 @@ fi
 AM_CONDITIONAL(opengl, [test x$opengl = xyes])
 
 dnl Need GLIB for both GTK and GST
-if test x${gui} = "xgtk" -o x${sound_handler} = "xgst"; then
+if test x${gui} = "xgtk" -o x${media_handler} = "xgst"; then
   GNASH_PATH_GLIB
 fi
 
@@ -664,53 +645,52 @@ case "${gui}" in
   *)
 esac
 
-if test x"$mp3_decoder" = x"ffmpeg"; then
+if test x"$media_handler" = x"ffmpeg"; then
   GNASH_PATH_FFMPEG
   if test x"${ac_cv_path_ffmpeg_lib}" = x ; then
-    AC_MSG_WARN([ffmpeg specified as decoder, but it's not present, disabling sound])
-    mp3_decoder=none
-    sound_handler=none
+    AC_MSG_WARN([ffmpeg specified as decoder, but it's not present, disabling media handling])
+    media_handler=none
   fi
 fi
 
-if test x"$mp3_decoder" = x"mad"; then
+if test x"$media_handler" = x"mad"; then
   dnl Will set MAD_LIBS and MAD_CFLAGS.
   dnl Handles --with-mad-incl and --with-mad-lib
   GNASH_PKG_FIND(mad, [mad.h], [mad library], mad_copyright)
   if test x"${ac_cv_path_mad_lib}" = x ; then
-    mp3_decoder=none
-    sound_handler=none
-    AC_MSG_WARN([Libmad specified as decoder, but it's not present, disabling sound])
+    media_handler=none
+    AC_MSG_WARN([Libmad specified as decoder, but it's not present, disabling media handling])
   fi
 fi
 dnl I'm kinda lazy, get rid of this later... //Markus
-AM_CONDITIONAL(HAVE_MAD, test x$mp3_decoder = xmad)
+AM_CONDITIONAL(HAVE_MAD, test x$media_handler = xmad)
 
-AM_CONDITIONAL(USE_SOUND_GST, test x$sound_handler = xgst)
-AM_CONDITIONAL(USE_SOUND_SDL, test x$sound_handler = xsdl)
-AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x$mp3_decoder = xffmpeg)
-AM_CONDITIONAL(USE_MAD_ENGINE, test x$mp3_decoder = xmad)
+AM_CONDITIONAL(USE_SOUND_GST, test x$media_handler = xgst)
+AM_CONDITIONAL(USE_SOUND_SDL, test x$media_handler = xmad -o x$media_handler = xffmpeg)
+AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x$media_handler = xffmpeg)
+AM_CONDITIONAL(USE_MAD_ENGINE, test x$media_handler = xmad)
 
 dnl AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
 
-case "${sound_handler}" in
-  gst) AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for sound]) ;;
-  sdl) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound]) ;;
+case "${media_handler}" in
+  gst) AC_DEFINE([SOUND_GST],  [1], [Use GSTREAMER for media handling]) ;;
+  ffmpeg) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handing]) ;;
+  mad) AC_DEFINE([SOUND_SDL],  [1], [Use SDL for sound handling]) ;;
   *)
 esac
 
-case "${mp3_decoder}" in
-  ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for mp3 decoding]) ;;
-  mad)  AC_DEFINE([USE_MAD],  [1], [Use MAD for mp3 decoding]) ;;
+case "${media_handler}" in
+  ffmpeg)  AC_DEFINE([USE_FFMPEG],  [1], [Use FFMPEG for media decoding]) ;;
+  mad)  AC_DEFINE([USE_MAD],  [1], [Use MAD for media decoding]) ;;
   *)
 esac
 
-if test "$sound_handler" = "gst"; then
+if test "$media_handler" = "gst"; then
   GNASH_PKG_FIND(gstreamer, [gst/gst.h], [gstreamer library], gst_init, [0.10])
 fi
 
 dnl I'm kinda lazy, get rid of this later... //Markus
-AM_CONDITIONAL(HAVE_GST, test x$sound_handler = xgst)
+AM_CONDITIONAL(HAVE_GST, test x$media_handler = xgst)
 
 if test x$gui = xfltk; then
   GNASH_PKG_FIND(fltk2, [fltk/FL_API.h], [Fast Light Toolkit], fl_window_flush)
@@ -870,10 +850,8 @@ RENDERER_CONFIG=$renderer
 AC_SUBST(RENDERER_CONFIG)
 GUI_CONFIG=$gui
 AC_SUBST(GUI_CONFIG)
-SOUND_CONFIG=$sound_handler
-AC_SUBST(SOUND_CONFIG)
-DECODER_CONFIG=$mp3_decoder
-AC_SUBST(DECODER_CONFIG)
+MEDIA_CONFIG=$media_handler
+AC_SUBST(MEDIA_CONFIG)
 
 dnl AC_CONFIG_LINKS(doc/C/images)
 AC_CONFIG_LINKS(testsuite/libbase/gnashrc:testsuite/libbase/gnashrc.in)
@@ -987,9 +965,9 @@ fi
 
 echo "        Renderer engine: "$renderer
 echo "        GUI: "$gui
-echo "        Sound handler: "$sound_handler
-if test x"$sound_handler" = xsdl; then
-echo "        MP3 decoder: "$mp3_decoder
+echo "        Media handler: "$media_handler
+if test x"$_handler" = xffmpeg -o x"$_handler" = xmad; then
+echo "        Using SDL for sound handling"
 fi
 
 echo ""
@@ -1213,7 +1191,7 @@ dnl    nogo=true
 
 fi #}
 
-if test "$sound_handler" = "gst"; then
+if test "$media_handler" = "gst"; then
   if test x"$GSTREAMER_LIBS" != x; then
     if test x"$GSTREAMER_CFLAGS" != x; then
       echo "        Gstreamer flags are: $GSTREAMER_CFLAGS"
@@ -1222,13 +1200,12 @@ if test "$sound_handler" = "gst"; then
     fi
       echo "        Gstreamer libs are: $GSTREAMER_LIBS"
   else
-    echo "        ERROR: gstreamer sound requested, but no gstreamer 0.10+ found"
+    echo "        ERROR: gstreamer media handling requested, but no gstreamer 0.10+ found"
     nogo=true
   fi
 fi
 
-if test "$sound_handler" = "sdl"; then
-  if test x"$mp3_decoder" = x"mad"; then
+  if test x"$media_handler" = x"mad"; then
     echo "        MP3 support enabled through libmad"
     if test x"$MAD_LIBS" != x; then
       if test x"$MAD_CFLAGS" != x; then
@@ -1241,12 +1218,12 @@ if test "$sound_handler" = "sdl"; then
       echo "        ERROR: No libmad (mp3) development package installed!"
       echo "               You need to have the libmad development package installed"
       echo "               to enable mp3 decoding. You can either reconfigure using"
-      echo "               --with-mp3-decoder=ffmpeg to use ffmpeg or install libmad0-dev"
+      echo "               --media-handler=ffmpeg to use ffmpeg or install libmad0-dev"
       echo "               (using apt-get) or libmad (using yum)."
       nogo=true
     fi
   else
-    if test x"$mp3_decoder" = x"ffmpeg"; then
+    if test x"$media_handler" = x"ffmpeg"; then
       if test x${ffmpeg_version} != xok; then
          echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed."
          echo "               This version of ffmpeg may not work!"
@@ -1254,7 +1231,7 @@ if test "$sound_handler" = "sdl"; then
         nogo=true
       fi
       if test x"$FFMPEG_LIBS" != x; then
-        echo "        MP3 support enabled through ffmpeg"
+        echo "        MP3 and video support enabled through ffmpeg"
         if test x"$FFMPEG_CFLAGS" != x; then
           echo "        ffmpeg flags are: $FFMPEG_CFLAGS"
         else
@@ -1265,13 +1242,12 @@ if test "$sound_handler" = "sdl"; then
         echo "        ERROR: No ffmpeg development package installed!"
         echo "               You need to have the ffmpeg development package installed"
         echo "               to enable mp3 decoding. You can either reconfigure using"
-        echo "               --with-mp3-decoder=mad to use libmad or install libavcodec-dev"
+        echo "               --media-handler=mad to use libmad or install libavcodec-dev"
         echo "               and libdts-dev (using apt-get) or <package_names_here> (using yum).".
         nogo=true
       fi
     fi
   fi
-fi
 
 if test "$renderer" = "cairo"; then
   if test x"$CAIRO_LIBS" != x; then
@@ -1339,7 +1315,7 @@ if test x"$gui" = x"sdl"; then
   fi
 fi
 
-if test x"$sound_handler" = x"sdl"; then
+if test x"$media_handler" = x"ffmpeg" -o x"$media_handler" = x"mad"; then
   if test x"$SDL_LIBS" != x; then
     echo "        SDL flags are: $SDL_CFLAGS"
     echo "        SDL libs are: $SDL_LIBS"

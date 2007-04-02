@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.27 2007/03/30 22:58:11 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.28 2007/04/02 16:46:32 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -936,7 +936,8 @@ NetStreamFfmpeg::advance()
 	as_value status;
 	if (m_statusChanged && get_member(std::string("onStatus"), &status) && status.is_function()) {
 
-		for (int i = m_status_messages.size()-1; i >= 0; --i) {
+		int size = m_status_messages.size();
+		for (int i = 0; i < size; ++i) {
 			boost::intrusive_ptr<as_object> o = new as_object();
 			o->init_member(std::string("code"), as_value(m_status_messages[i]), 1);
 

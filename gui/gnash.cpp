@@ -134,8 +134,7 @@ static void build_options()
          << "   Target: " << TARGET_CONFIG << endl
          << "   Renderer: " << RENDERER_CONFIG
          << "   GUI: " << GUI_CONFIG
-         << "   Sound handler: " << SOUND_CONFIG
-         << "   Decoder: " << DECODER_CONFIG
+         << "   Media handler: " << MEDIA_CONFIG
          << endl;
 }
 

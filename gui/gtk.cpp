@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.80 2007/04/02 15:45:22 strk Exp $ */
+/* $Id: gtk.cpp,v 1.81 2007/04/02 16:46:32 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -856,12 +856,8 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
     comments += RENDERER_CONFIG;
     comments += "   GUI: ";
     comments += GUI_CONFIG; // gtk of course!
-    comments += "   Sound: ";
-    comments += SOUND_CONFIG;
-    if (SOUND_CONFIG != "none") {
-	comments += "   MP3 decoder: ";
-	comments += DECODER_CONFIG;
-    }
+    comments += "   Media: ";
+    comments += MEDIA_CONFIG;
     comments += ".";
 
     gtk_about_dialog_set_url_hook(NULL, NULL, NULL);

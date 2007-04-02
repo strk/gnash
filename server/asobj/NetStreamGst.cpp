@@ -483,7 +483,8 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 			}
 
 		} else {
-			assert(0);
+			log_error("Unsupported video codec");
+			return;
 		}
 
 		g_object_set (G_OBJECT (ns->videoinputcaps), "caps", videonincaps, NULL);
@@ -514,7 +515,8 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 			g_object_set (G_OBJECT (ns->audioinputcaps), "caps", audioincaps, NULL);
 			gst_caps_unref (audioincaps);
 		} else {
-			assert(0);
+			log_error("Unsupported audio codec");
+			return;
 		}
 	}
 
@@ -565,19 +567,19 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 
 	// put it all in the pipeline and link the elements
 	if (!ns->m_isFLV) { 
-		gst_bin_add_many (GST_BIN (ns->pipeline),ns->audiosink, ns->audioconv, NULL);
+		if (sound) gst_bin_add_many (GST_BIN (ns->pipeline),ns->audiosink, ns->audioconv, NULL);
 		gst_bin_add_many (GST_BIN (ns->pipeline), ns->source, ns->decoder, ns->colorspace, 
 			ns->videosink, ns->videorate, ns->videocaps, ns->volume, NULL);
 
 		gst_element_link(ns->source, ns->decoder);
 		gst_element_link_many(ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
-		gst_element_link_many(ns->audioconv, ns->volume, ns->audiosink, NULL);
+		if (sound) gst_element_link_many(ns->audioconv, ns->volume, ns->audiosink, NULL);
 
 	} else {
 		gst_bin_add_many (GST_BIN (ns->pipeline), ns->videosource, ns->videoinputcaps, ns->videodecoder, ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
-		gst_bin_add_many (GST_BIN (ns->pipeline), ns->audiosource, ns->audioinputcaps, ns->audiodecoder, ns->audioconv, ns->volume, ns->audiosink, NULL);
+		if (sound) gst_bin_add_many (GST_BIN (ns->pipeline), ns->audiosource, ns->audioinputcaps, ns->audiodecoder, ns->audioconv, ns->volume, ns->audiosink, NULL);
 
-		gst_element_link_many(ns->audiosource, ns->audioinputcaps, ns->audiodecoder, ns->audioconv, ns->volume, ns->audiosink, NULL);
+		if (sound) gst_element_link_many(ns->audiosource, ns->audioinputcaps, ns->audiodecoder, ns->audioconv, ns->volume, ns->audiosink, NULL);
 		gst_element_link_many(ns->videosource, ns->videoinputcaps, ns->videodecoder, ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
 
 	}
@@ -679,7 +681,8 @@ NetStreamGst::advance()
 	as_value status;
 	if (m_statusChanged && get_member(std::string("onStatus"), &status) && status.is_function()) {
 
-		for (int i = m_status_messages.size()-1; i >= 0; --i) {
+		int size = m_status_messages.size();
+		for (int i = 0; i < size; ++i) {
 			boost::intrusive_ptr<as_object> o = new as_object();
 			o->init_member(std::string("code"), as_value(m_status_messages[i]), 1);
 
