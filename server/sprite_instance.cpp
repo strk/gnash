@@ -3001,6 +3001,8 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	//
 	// Construct the DisplayList of the target frame
 	//
+	
+	set_invalidated();
 
 	if (target_frame_number < m_current_frame)
 	// Go backward to a previous frame
