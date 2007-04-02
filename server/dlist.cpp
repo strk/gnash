@@ -206,6 +206,7 @@ DisplayList::place_character(
 	else
 	{
 		//log_msg("place_character: replacing existing character at depth %d", depth);
+		(*it)->unload();
 		// replace existing char
 		*it = DisplayItem(ch);
 	}

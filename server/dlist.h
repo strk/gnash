@@ -55,6 +55,9 @@ public:
 	/// Place a new character in this display list
 	/// replacing any other char at the same depth.
 	//
+	/// If a character is replaced, it's unload() method
+	/// is invoked.
+	///
 	/// If applicable, the event_id::LOAD event
 	/// associated with the given character
 	/// is called as last step of addition. 
