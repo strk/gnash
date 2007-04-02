@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.59 2007/03/22 16:56:36 bjacques Exp $ */
+/* $Id: character.h,v 1.60 2007/04/02 09:12:48 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -79,6 +79,10 @@ private:
 
 	/// Used to assign a name to unnamed instances
 	static unsigned int _lastUnnamedInstanceNum;
+
+	/// Set to yes when this instance has been unloaded
+	bool _unloaded;
+
 
 protected:
 
@@ -197,6 +201,7 @@ public:
 	m_clip_depth(0),
 	m_display_callback(NULL),
 	m_display_callback_user_ptr(NULL),
+	_unloaded(false),
 	m_visible(true),
 	m_parent(parent),
 	m_invalidated(true),
@@ -647,10 +652,11 @@ public:
 	///
 	virtual void unload()
 	{
+		_unloaded = true;
 		on_event(event_id::UNLOAD);
 	}
 
-	
+	bool isUnloaded() { return _unloaded; }
 };
 
 

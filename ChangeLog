@@ -1,5 +1,13 @@
 2007-04-02 Sandro Santilli <strk@keybit.net>
 
+	* server/: character.h, sprite_instance.{cpp,h}:
+	  Moved the isUnloaded()/_unloaded logic from sprite_instance
+	  up to character.
+	* server/movie_root.{cpp,h}: remove unloaded characters
+	  from the keypress_listeners set (run at ::advance time).
+
+2007-04-02 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (goto_frame): remember to call
 	  set_invalidated() before running display list tags!
 	  (UdoG: is this correct?)

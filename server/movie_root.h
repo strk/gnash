@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.42 2007/03/29 12:37:31 strk Exp $ */
+/* $Id: movie_root.h,v 1.43 2007/04/02 09:12:48 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -412,6 +412,10 @@ public:
 	void pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<sprite_instance> target);
 
 private:
+
+	/// Remove all listeners with a ref-count of 1
+	/// (only referenced as key listeners)
+	void cleanup_keypress_listeners();
 
 	/// Return the current Stage object
 	//

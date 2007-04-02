@@ -481,6 +481,9 @@ movie_root::advance(float delta_time)
 		}
 	}
 
+	// Cleanup keypress listeners (remove unloaded characters)
+	cleanup_keypress_listeners();
+
 	// random should go continuously that:
 	// 1. after restart of the player the situation has not repeated
 	// 2. by different machines the random gave different numbers
@@ -578,8 +581,30 @@ char* movie_root::call_method_args(const char* method_name,
 	return _movie->call_method_args(method_name, method_arg_fmt, args);
 }
 
+void movie_root::cleanup_keypress_listeners()
+{
+	for (ListenerSet::iterator iter = m_keypress_listeners.begin();
+			 iter != m_keypress_listeners.end(); )
+	{
+		// TODO: handle non-character objects too !
+		character* ch = dynamic_cast<character*>(iter->get());
+		if ( ch && ch->isUnloaded() )
+		{
+			ListenerSet::iterator toremove = iter;
+			++iter;
+			//log_msg("cleanup_keypress_listeners: Removing unloaded keypress listener %p", iter->get());
+			m_keypress_listeners.erase(toremove);
+		}
+		else
+		{
+			++iter;
+		}
+	}
+}
+
 void movie_root::notify_keypress_listeners(key::code k)
 {
+	//log_msg("Notifying %u keypress listeners", m_keypress_listeners.size());
 	for (ListenerSet::iterator iter = m_keypress_listeners.begin();
 			 iter != m_keypress_listeners.end(); ++iter)
 	{
@@ -597,13 +622,22 @@ void movie_root::notify_keypress_listeners(key::code k)
 
 void movie_root::add_keypress_listener(as_object* listener)
 {
-	m_keypress_listeners.insert(listener);
+	if ( m_keypress_listeners.insert(listener).second )
+	{
+		//log_msg("Added keypress listener %p", (void*)listener);
+	}
+	else
+	{
+		//log_msg("Keypress listener %p was already in the known set", (void*)listener);
+	}
 	assert(testInvariant());
 }
 
 void movie_root::remove_keypress_listener(as_object* listener)
 {
+	//log_msg("Removing keypress listener %p - %u listeners currently ", (void*)listener, m_keypress_listeners.size());
 	m_keypress_listeners.erase(listener);
+	//log_msg("After removing keypress listener %p, %u listeners are left", (void*)listener, m_keypress_listeners.size());
 	assert(testInvariant());
 }
 

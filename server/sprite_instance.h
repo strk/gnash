@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.84 2007/04/02 06:18:41 zoulunkai Exp $ */
+/* $Id: sprite_instance.h,v 1.85 2007/04/02 09:12:48 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -693,8 +693,6 @@ public:
 	/// @} Drawing API
 	
 
-	bool isUnloaded() { return _unloaded; }
-
 	typedef std::map<std::string, std::string> VariableMap;
 
 	/// Set all variables in the given map with their corresponding values
@@ -711,9 +709,6 @@ private:
 	/// global list (see movie_root).
 	///
 	void queueActions(ActionList& action_list);
-
-	/// Set to yes when this instance has been unloaded
-	bool _unloaded;
 
 	/// Execute a single action buffer (DOACTION block)
 	void execute_action(action_buffer& ab);
