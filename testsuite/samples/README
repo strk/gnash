@@ -1,3 +1,16 @@
+= [gotoFrameOnKeyEvent.swf] =
+
+== Origin == 
+
+Produced by dongdong <dedodong@163.com> (a friend of Zou Lunkai).
+Zou asked his permission to included the movie into Gnash testsuite.
+Dongdong reported bug #18916, now closed.
+
+== Description ==
+
+Executes gotoFrame actions in response to key events.
+Expected behaviour is described by textfields, so should be intuitive.
+
 = [sound1.swf] =
 
 == Origin == 

@@ -1,5 +1,8 @@
 2007-04-02 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/samples/: gotoFrameOnKeyEvent.swf, README:
+	  Add new tests used to debug keypress listeners and
+	  goto_frame. Provided by Dongdong <dedodong@163.com>
 	* server/movie_root.cpp (notify_keypress_listeners):
 	  Skip event execution for unloaded characters
 	  (they will be removed at next ::advance call)
