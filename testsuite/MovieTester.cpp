@@ -157,13 +157,13 @@ MovieTester::depressMouseButton()
 void
 MovieTester::pressKey(key::code code)
 {
-	notify_key_event(code, true);
+	_movie_root->notify_key_event(code, true);
 }
 
 void
 MovieTester::releaseKey(key::code code)
 {
-	notify_key_event(code, false);
+	_movie_root->notify_key_event(code, false);
 }
 
 bool

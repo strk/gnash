@@ -1,5 +1,22 @@
 2007-04-02 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ExecutableCode.h: change FunctionCode to take
+	  a generic character as target, not necessarely a sprite.
+	* server/movie_root.{cpp,h}: update pushAction() for events
+	  to take a generic character, add a notify_key_event method
+	  for consistency.
+	* server/asobj/Key.cpp: notify_key_event moved to movie_root.
+	* server/gnash.h: remove notify_key_event prototype, it's now
+	  a movie_root method.
+	* gui/gtk.cpp: use gui::notify_key_event for key events.
+	* gui/gui.{cpp,h}: add notify_key_event method.
+	* server/character.{cpp,h}: move queueActionHandler from
+	  sprite_instance here.
+	* server/sprite_instance.{cpp,h}: cleanups.
+	* testsuite/MovieTester.cpp: update call to notify_key_event.
+
+2007-04-02 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/samples/: Makefile.am, gotoFrameOnKeyEvent-TestRunner.cpp:
 	  First stub at an automated test runner for gotoFrameOnKeyEvent.
 	  TODO item in comments.

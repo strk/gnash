@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.79 2007/03/29 23:55:49 rsavoye Exp $ */
+/* $Id: gtk.cpp,v 1.80 2007/04/02 15:45:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1171,7 +1171,7 @@ GtkGui::key_press_event(GtkWidget *const /*widget*/,
     gnash::key::code	c = gdk_to_gnash_key(event->keyval);
     
     if (c != gnash::key::INVALID) {
-        gnash::notify_key_event(c, true);
+        gui->notify_key_event(c, true);
     }
 
     /* Handle GUI shortcuts */
@@ -1224,15 +1224,17 @@ GtkGui::key_press_event(GtkWidget *const /*widget*/,
 gboolean
 GtkGui::key_release_event(GtkWidget *const /*widget*/,
                 GdkEventKey *const event,
-                const gpointer /*data*/)
+                const gpointer data)
 {
     GNASH_REPORT_FUNCTION;
+
+    Gui* gui = static_cast<Gui*>(data);
 
     /* Forward key event to gnash */
     gnash::key::code	c = gdk_to_gnash_key(event->keyval);
     
     if (c != gnash::key::INVALID) {
-        gnash::notify_key_event(c, false);
+        gui->notify_key_event(c, false);
     }
     
     return true;

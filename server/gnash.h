@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.88 2007/03/01 11:06:32 udog Exp $ */
+/* $Id: gnash.h,v 1.89 2007/04/02 15:45:22 strk Exp $ */
 
 /// \mainpage
 ///
@@ -587,12 +587,6 @@ enum code
 	KEYCOUNT
 };
 }	// end namespace key
-
-/// Key events are global throughout gnash.
-/// @@ Maybe someday make these local to the movie_root ?
-/// See \ref events_handling for more info
-DSOEXPORT void	notify_key_event(key::code k, bool down);
-
 
 /// Some optional helpers.
 namespace tools

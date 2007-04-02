@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.43 2007/04/02 09:12:48 strk Exp $ */
+/* $Id: movie_root.h,v 1.44 2007/04/02 15:45:22 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -57,10 +57,8 @@
 ///
 /// - bool movie_root::notify_mouse_moved(int x, int y);
 /// - bool movie_root::notify_mouse_clicked(bool mouse_pressed, int mask);
+/// - bool movie_root::notify_key_event(key::code k, bool down);
 /// 
-/// Note that the notify_key_event() method is a global function, which should
-/// likely be moved somewhere else, and that has not been fixed yet to support
-/// the new interface.
 /// 
 
 
@@ -202,6 +200,16 @@ public:
 	/// The host app can use this to tell the movie where the
 	/// user's mouse pointer is.
 	void notify_mouse_state(int x, int y, int buttons);
+
+	/// \brief
+        /// The host app can use this to tell the movie when
+        /// user pressed or released a key.
+	//
+	/// This function should return TRUE iff any action triggered
+	/// by the event requires redraw, see \ref events_handling for
+	/// more info.
+	///
+	bool notify_key_event(key::code k, bool down);
 
 	/// \brief
 	/// Use this to retrieve the last state of the mouse, as set via
@@ -409,9 +417,12 @@ public:
 	void pushAction(const action_buffer& buf, boost::intrusive_ptr<sprite_instance> target);
 
 	/// Push a function code to the ActionQueue
-	void pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<sprite_instance> target);
+	void pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<character> target);
 
 private:
+
+	/// Notify the global Key ActionScript object about a key status change
+	void notify_global_key(key::code k, bool down);
 
 	/// Remove all listeners with a ref-count of 1
 	/// (only referenced as key listeners)

@@ -316,64 +316,6 @@ as_value	key_remove_listener(const fn_call& fn)
     return as_value();
 }
 
-void	notify_key_event(key::code k, bool down)
-    // External interface for the host to report key events.
-{
-//	    GNASH_REPORT_FUNCTION;
-	    
-	// Notify keypress listeners.
-	if (down) 
-	{
-		movie_root& mroot = VM::get().getRoot();
-		mroot.notify_keypress_listeners(k);
-	}
-
-	//
-	// Notify the _global.Key object about key event
-	//
-
-
-	VM& vm = VM::get();
-	if ( vm.getSWFVersion() < 6 )
-	{
-		// _global.Key was added in SWF6
-		return;
-	}
-
-	static boost::intrusive_ptr<key_as_object> keyobject = NULL;
-	if ( ! keyobject )
-	{
-		// This isn't very performant... do we allow user override
-		// of _global.Key, btw ?
-
-		as_value kval;
-		as_object* global = VM::get().getGlobal();
-
-		std::string objName = "Key";
-		if ( vm.getSWFVersion() < 7 )
-		{
-			boost::to_lower(objName, vm.getLocale());
-		}
-		if ( global->get_member(objName, &kval) )
-		{
-			//log_msg("Found member 'Key' in _global: %s", kval.to_string());
-			boost::intrusive_ptr<as_object> obj = kval.to_object();
-			//log_msg("_global.Key to_object() : %s @ %p", typeid(*obj).name(), obj);
-			keyobject = boost::dynamic_pointer_cast<key_as_object>( obj );
-		}
-	}
-
-	if ( keyobject )
-	{
-		if (down) keyobject->set_key_down(k);
-		else keyobject->set_key_up(k);
-	}
-	else
-	{
-		log_error("gnash::notify_key_event(): _global.Key doesn't exist, or isn't the expected built-in\n");
-	}
-}
-
 void key_class_init(as_object& global)
 {
 

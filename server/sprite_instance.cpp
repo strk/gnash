@@ -69,16 +69,6 @@
 
 namespace gnash {
 
-// Define OLD_GET_MEMBER to thread "default" members within the get_member
-// override rather then by using the new 'init_property' call.
-// This will likely be removed soon, just here to track possible bugs introduced
-// by this change. In particular, the place_and_remove_instane_test is failing 
-// for '_x' property, but attachMovieTest is succeeding with the *new* layout
-// and failign with the previous.
-//
-//#define OLD_GET_MEMBER
-//
-
 //#define GNASH_DEBUG 1
 
 // Forward declarations
@@ -1061,8 +1051,6 @@ movieclip_ctor(const fn_call& /* fn */)
 	return as_value(clip.get());
 }
 
-#ifndef OLD_GET_MEMBER
-
 
 static as_value
 sprite_currentframe_get(const fn_call& fn)
@@ -1224,8 +1212,6 @@ sprite_soundbuftime_getset(const fn_call& fn)
 	}
 	return as_value();
 }
-
-#endif // ndef OLD_GET_MEMBER
 
 /// Properties (and/or methods) *inherited* by MovieClip instances
 static void
@@ -1643,240 +1629,6 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 		return true;
 	}
 
-#ifdef OLD_GET_MEMBER
-	// FIXME: use addProperty interface for these !!
-	as_standard_member std_member = get_standard_member(name);
-	switch (std_member)
-	{
-	default:
-	case M_INVALID_MEMBER:
-	    break;
-	case M_X:
-	    //if (name == "_x")
-	{
-	    matrix	m = get_matrix();
-	    val->set_double(TWIPS_TO_PIXELS(m.m_[0][2]));
-	    return true;
-	}
-	case M_Y:
-	    //else if (name == "_y")
-	{
-	    matrix	m = get_matrix();
-	    val->set_double(TWIPS_TO_PIXELS(m.m_[1][2]));
-	    return true;
-	}
-	case M_XSCALE:
-	    //else if (name == "_xscale")
-	{
-	    matrix m = get_matrix();	// @@ or get_world_matrix()?  Test this.
-	    float xscale = m.get_x_scale();
-	    val->set_double(xscale * 100);		// result in percent
-	    return true;
-	}
-	case M_YSCALE:
-	    //else if (name == "_yscale")
-	{
-	    matrix m = get_matrix();	// @@ or get_world_matrix()?  Test this.
-	    float yscale = m.get_y_scale();
-	    val->set_double(yscale * 100);		// result in percent
-	    return true;
-	}
-	case M_CURRENTFRAME:
-	    //else if (name == "_currentframe")
-	{
-	    val->set_int(m_current_frame + 1);
-	    return true;
-	}
-	case M_TOTALFRAMES:
-	    //else if (name == "_totalframes")
-	{
-	    // number of frames.  Read only.
-	    val->set_int(m_def->get_frame_count());
-	    return true;
-	}
-	case M_ALPHA:
-	    //else if (name == "_alpha")
-	{
-	    // Alpha units are in percent.
-	    val->set_double(get_cxform().m_[3][0] * 100.f);
-	    return true;
-	}
-	case M_VISIBLE:
-	    //else if (name == "_visible")
-	{
-	    val->set_bool(get_visible());
-	    return true;
-	}
-	case M_WIDTH: // _width
-	{
-	    // Verified using samples/test_rotation.swf
-	    val->set_double(TWIPS_TO_PIXELS(get_width()));
-	    return true;
-	}
-	case M_HEIGHT: // _height
-	{
-	    // Verified using samples/test_rotation.swf
-	    val->set_double(TWIPS_TO_PIXELS(get_height()));
-	    return true;
-	}
-	case M_ROTATION:
-	    //else if (name == "_rotation")
-	{
-	    // Verified against Macromedia player using samples/test_rotation.swf
-	    float	angle = get_matrix().get_rotation();
-
-	    // Result is CLOCKWISE DEGREES, [-180,180]
-	    angle *= 180.0f / float(M_PI);
-
-	    val->set_double(angle);
-	    return true;
-	}
-	case M_PARENT:
-	{
-		if (m_parent==NULL)
-		// _parent is undefined for root movies
-		{
-			return false;
-		}
-		else
-		{
-			assert(dynamic_cast<as_object*>(get_parent()));
-			val->set_as_object(static_cast<as_object*>(get_parent()));
-			return true;
-		}
-	}
-	case M_FRAMESLOADED:
-	    //else if (name == "_framesloaded")
-	{
-	    val->set_int(m_def->get_loading_frame());
-	    return true;
-	}
-
-	case M_XMOUSE:
-	    //else if (name == "_xmouse")
-	{
-	    // Local coord of mouse IN PIXELS.
-	    int	x, y, buttons;
-	    _vm.getRoot().get_mouse_state(x, y, buttons);
-
-	    matrix	m = get_world_matrix();
-
-	    point	a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-	    point	b;
-			
-	    m.transform_by_inverse(&b, a);
-
-	    val->set_double(TWIPS_TO_PIXELS(b.m_x));
-	    return true;
-	}
-
-	case M_YMOUSE:
-	    //else if (name == "_ymouse")
-	{
-	    // Local coord of mouse IN PIXELS.
-	    int	x, y, buttons;
-	    _vm.getRoot().get_mouse_state(x, y, buttons);
-
-	    matrix	m = get_world_matrix();
-
-	    point	a(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
-	    point	b;
-			
-	    m.transform_by_inverse(&b, a);
-
-	    val->set_double(TWIPS_TO_PIXELS(b.m_y));
-	    return true;
-	}
-	/// FIXME: use a contextual 'target' member
-	case M_TARGET:
-	    //else if (name == "_target")
-	{
-	    // Full path to this object; e.g. "/_level0/sprite1/sprite2/ourSprite"
-	    val->set_string(getTargetPath().c_str());
-	    return true;
-	}
-	case M_NAME:
-	    //else if (name == "_name")
-	{
-	    if ( _vm.getSWFVersion() < 6 && get_name().empty() )
-		val->set_undefined();
-	    else
-	    	val->set_string(get_name().c_str());
-
-	    return true;
-	}
-
-	case M_DROPTARGET:
-	    //else if (name == "_droptarget")
-	{
-	    // Absolute path in slash syntax where we were last dropped (?)
-	    // @@ TODO
-		static bool warned = false;
-		if ( ! warned ) {
-			log_error("FIXME: MovieClip._droptarget unimplemented");
-			warned=true;
-		}
-
-	    if ( _vm.getSWFVersion() > 5 )
-	    	val->set_string("");
-	    else
-		val->set_undefined();
-	    return true;
-	}
-	case M_URL:
-	    //else if (name == "_url")
-	{
-		// A sprite's url is the url this
-		// sprite has been "downloaded" from.
-		// If this is an ActionScript-created sprite
-		// we might use the actions creating
-		// it as defining where was it "downloaded" from.
-		//
-	    val->set_string(m_def->get_url().c_str()); 
-	    return true;
-	}
-	case M_ONROLLOVER:
-	{
-		return get_event_handler(event_id::ROLL_OVER, val);
-	}
-	case M_ONROLLOUT:
-	{
-		return get_event_handler(event_id::ROLL_OUT, val);
-	}
-	case M_HIGHQUALITY:
-	    //else if (name == "_highquality")
-	{
-	    // Whether we're in high quality mode or not.
-	    val->set_bool(true);
-	    return true;
-	}
-	case M_FOCUSRECT:
-	    //else if (name == "_focusrect")
-	{
-	    // Is a yellow rectangle visible around a focused movie clip (?)
-	    val->set_bool(false);
-	    return true;
-	}
-	case M_SOUNDBUFTIME:
-	    //else if (name == "_soundbuftime")
-	{
-	    // Number of seconds before sound starts to stream.
-	    val->set_double(0.0);
-	    return true;
-	}
-	case M_ONLOAD:
-	{
-	    if (m_as_environment.get_member(std::string(name.c_str()), val))
-		{
-		    return true;
-		}
-	    // Optimization: if no hit, don't bother looking in the display list, etc.
-	    return false;
-	}
-
-	}	// end switch
-#endif // def OLD_GET_MEMBER
-
 	// Try variables.
 	if ( m_as_environment.get_member(name, val) )
 	{
@@ -2140,58 +1892,6 @@ void sprite_instance::remove_display_object(const tu_string& name_tu)
 	}
 }
 
-void
-sprite_instance::queueEventHandler(const event_id& id)
-{
-	testInvariant();
-
-	bool called=false;
-
-	movie_root& root = VM::get().getRoot();
-
-	// First, check for built-in event handler.
-	boost::intrusive_ptr<as_function> method = get_event_handler(id).to_as_function();
-	   
-	if (method)
-	{
-		root.pushAction(method, boost::intrusive_ptr<sprite_instance>(this));
-		called=true;
-	}
-
-	// This is likely wrong, we use it as a workaround
-	// to the fact that we don't distinguish between
-	// ActionScript and SWF defined events
-	// (for example: onClipLoad vs. onLoad)
-	//
-	if (called) return;
-
-	// Check for member function.
-	// In ActionScript 2.0, event method names are CASE SENSITIVE.
-	// In ActionScript 1.0, event method names are CASE INSENSITIVE.
-	// TODO: move to get_function_name directly ?
-	std::string method_name = id.get_function_name();
-	if ( _vm.getSWFVersion() < 7 )
-	{
-		boost::to_lower(method_name, _vm.getLocale());
-	}
-
-	if (method_name.length() > 0)
-	{
-		as_value method_val;
-		if ( get_member(method_name, &method_val) )
-		{
-			method = method_val.to_as_function();
-			if ( method )
-			{
-				root.pushAction(method, boost::intrusive_ptr<sprite_instance>(this));
-			}
-		}
-	}
-
-	testInvariant();
-
-}
-
 /* private */
 void
 sprite_instance::queueActions(ActionList& actions)
@@ -2281,243 +1981,8 @@ void sprite_instance::set_member(const std::string& name,
 		const as_value& val)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_string());
+	log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_string());
 #endif
-
-#ifdef OLD_GET_MEMBER
-	as_standard_member	std_member = get_standard_member(name);
-	switch (std_member)
-	{
-		default:
-		case M_INVALID_MEMBER:
-		    break;
-		case M_X:
-		    //if (name == "_x")
-		{
-		    matrix	m = get_matrix();
-		    m.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
-		    set_matrix(m);
-
-                    transformedByScript(); // m_accept_anim_moves = false; 
-
-		    return;
-		}
-		case M_Y:
-		    //else if (name == "_y")
-		{
-		    matrix	m = get_matrix();
-		    m.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
-		    set_matrix(m);
-
-                    transformedByScript(); // m_accept_anim_moves = false; 
-
-		    return;
-		}
-		case M_XSCALE:
-		    //else if (name == "_xscale")
-		{
-		    matrix	m = get_matrix();
-
-                    double scale_percent = val.to_number();
-
-                    // Handle bogus values
-                    if (isnan(scale_percent))
-                    {
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Attempt to set _xscale to %g, refused",
-                            scale_percent);
-			);
-                        return;
-                    }
-                    else if (scale_percent < 0 )
-                    {
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Attempt to set _xscale to %g, use 0",
-                            scale_percent);
-			);
-                        scale_percent = 0;
-                    }
-
-                    // input is in percent
-		    float scale = (float)scale_percent/100.f;
-
-		    // Decompose matrix and insert the desired value.
-		    float	x_scale = scale;
-		    float	y_scale = m.get_y_scale();
-		    float	rotation = m.get_rotation();
-		    m.set_scale_rotation(x_scale, y_scale, rotation);
-
-		    set_matrix(m);
-		    transformedByScript(); // m_accept_anim_moves = false; 
-		    return;
-		}
-		case M_YSCALE:
-		    //else if (name == "_yscale")
-		{
-		    matrix	m = get_matrix();
-
-                    double scale_percent = val.to_number();
-
-                    // Handle bogus values
-                    if (isnan(scale_percent))
-                    {
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Attempt to set _yscale to %g, refused",
-                            scale_percent);
-			);
-                        return;
-                    }
-                    else if (scale_percent < 0 )
-                    {
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Attempt to set _yscale to %g, use 0",
-                            scale_percent);
-			);
-                        scale_percent = 0;
-                    }
-
-                    // input is in percent
-		    float scale = (float)scale_percent/100.f;
-
-		    // Decompose matrix and insert the desired value.
-		    float	x_scale = m.get_x_scale();
-		    float	y_scale = scale;
-		    float	rotation = m.get_rotation();
-		    m.set_scale_rotation(x_scale, y_scale, rotation);
-
-		    set_matrix(m);
-                    transformedByScript(); // m_accept_anim_moves = false; 
-		    return;
-		}
-		case M_ALPHA:
-		    //else if (name == "_alpha")
-		{
-		    // Set alpha modulate, in percent.
-		    cxform	cx = get_cxform();
-		    cx.m_[3][0] = infinite_to_fzero(val.to_number()) / 100.f;
-		    set_cxform(cx);
-                    transformedByScript(); // m_accept_anim_moves = false; 
-		    return;
-		}
-		case M_VISIBLE:
-		    //else if (name == "_visible")
-		{
-		    set_visible(val.to_bool());
-                    transformedByScript(); // m_accept_anim_moves = false; 
-		    return;
-		}
-		case M_WIDTH:
-		    //else if (name == "_width")
-		{
-		    // @@ tulrich: is parameter in world-coords or local-coords?
-		    matrix	m = get_matrix();
-		    m.m_[0][0] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
-		    float w = get_width();
-		    if (fabsf(w) > 1e-6f)
-			{
-			    m.m_[0][0] /= w;
-			}
-		    set_matrix(m);
-                    transformedByScript(); // m_accept_anim_moves = false; 
-		    return;
-		}
-		case M_HEIGHT:
-		    //else if (name == "_height")
-		{
-		    // @@ tulrich: is parameter in world-coords or local-coords?
-		    matrix	m = get_matrix();
-		    m.m_[1][1] = infinite_to_fzero(PIXELS_TO_TWIPS(val.to_number()));
-		    float h = get_width(); // FIXME: shoudln't this be get_height ??
-		    if (fabsf(h) > 1e-6f)
-			{
-			    m.m_[1][1] /= h;
-			}
-		    set_matrix(m);
-                    transformedByScript(); // m_accept_anim_moves = false; 
-		    return;
-		}
-		case M_ROTATION:
-		    //else if (name == "_rotation")
-		{
-		    matrix	m = get_matrix();
-
-		    // Decompose matrix and insert the desired value.
-		    float	x_scale = m.get_x_scale();
-		    float	y_scale = m.get_y_scale();
-		    float	rotation = (float) val.to_number() * float(M_PI) / 180.f;	// input is in degrees
-		    m.set_scale_rotation(x_scale, y_scale, rotation);
-
-		    set_matrix(m);
-                    transformedByScript(); // m_accept_anim_moves = false; 
-		    return;
-		}
-		case M_ONROLLOVER:
-		{
-			set_event_handler(event_id::ROLL_OVER, val);
-			return;
-		}
-		case M_ONROLLOUT:
-		{
-			set_event_handler(event_id::ROLL_OUT, val);
-			return;
-		}
-		case M_HIGHQUALITY:
-		    //else if (name == "_highquality")
-		{
-		    // @@ global { 0, 1, 2 }
-//				// Whether we're in high quality mode or not.
-//				val->set(true);
-		    return;
-		}
-		case M_FOCUSRECT:
-		    //else if (name == "_focusrect")
-		{
-//				// Is a yellow rectangle visible around a focused movie clip (?)
-//				val->set(false);
-		    return;
-		}
-		case M_SOUNDBUFTIME:
-		    //else if (name == "_soundbuftime")
-		{
-		    // @@ global
-//				// Number of seconds before sound starts to stream.
-//				val->set(0.0);
-		    return;
-		}
-	}	// end switch
-#endif // def OLD_GET_MEMBER
-
-#ifdef DEBUG_DYNTEXT_VARIABLES
-log_msg(" not a standard member");
-#endif
-
-
-#if 0 // we'd need a testcase for this, my "short" tests show
-      // that a textfield variable cannot be assigned to like this
-
-	// Not a built-in property.  See if we have a
-	// matching edit_text character in our display
-	// list.
-	bool text_val = val.is_string() || val.is_number();
-	if (text_val)
-	{
-			// CASE INSENSITIVE compare. 
-			// In ActionScript 2.0, this must change
-			// to CASE SENSITIVE!!!
-			character* ch = m_display_list.get_character_by_name_i( name.c_str());
-			if ( ch ) // item found
-			{
-				const char* text = val.to_string();
-				ch->set_text_value(text);
-				return;
-			}
-	}
-
-#ifdef DEBUG_DYNTEXT_VARIABLES
-	log_msg(" not a character");
-#endif
-#endif
-
 
 	// Try textfield variables
 	//
@@ -2532,24 +1997,20 @@ log_msg(" not a standard member");
 	if ( etc )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-log_msg(" it's a Text Variable!");
+		log_msg(" it's a Text Variable!");
 #endif
 		etc->set_text_value(val.to_string());
 	}
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	else
 	{
-log_msg(" it's NOT a Text Variable!");
+		log_msg(" it's NOT a Text Variable!");
 	}
 #endif
 
 	// If that didn't work call the default set_member
 	set_member_default(name, val);
 
-
-	// If that didn't work, set a variable within this environment.
-	// TODO: check if we broke anything with this!
-	//if ( ! t ) m_as_environment.set_member(name.c_str(), val);
 }
 
 const char* sprite_instance::get_variable(const char* path_to_var) const
@@ -2704,7 +2165,8 @@ void sprite_instance::advance_sprite(float delta_time)
 
 	// Call UNLOAD event of just removed chars !
 	DisplayList justRemoved = oldDisplayList;
-	justRemoved.clear_except(m_display_list, true);
+	justRemoved.clear_except(m_display_list, false); // true;
+	// No, dont' call UNLOAD event, as it should be called by remove_display_object!
 
 	// Finally, execute actions in newly added childs
 	//
@@ -2721,26 +2183,6 @@ void sprite_instance::advance_sprite(float delta_time)
 	//log_msg("Advancing %d newly-added (after clearing) childs of %s", newlyAdded.size(), getTargetPath().c_str());
 	newlyAdded.advance(delta_time);
 
-#if 0 // we push gotoframe actions on the global queue now
-	// goto_frame_action (for now) need be executed
-	// *after* actions in child sprites have
-	// been executed. When action execution order
-	// is fixed, we can move this code inside
-	// do_action, or completely drop m_goto_frame_action_list
-	// or rather push actions in goto_frame target frame
-	// directly in the m_action_list (simplest)
-	if ( ! m_goto_frame_action_list.empty() )
-	{
-		IF_VERBOSE_ACTION(
-		log_action(" Executing %u actions in "
-			"goto_frame_action_list",
-			m_goto_frame_action_list.size());
-		);
-		execute_actions(m_goto_frame_action_list);
-		assert(m_goto_frame_action_list.empty());
-	}
-#endif
-	
 	// Remember current state of the DisplayList for next iteration
 	oldDisplayList = m_display_list;
 }
@@ -2955,7 +2397,9 @@ sprite_instance::find_previous_replace_or_add_tag(int frame,
 void
 sprite_instance::goto_frame(size_t target_frame_number)
 {
-//	IF_VERBOSE_DEBUG(log_msg("sprite::goto_frame(%d)\n", target_frame_number));//xxxxx
+	log_msg("sprite %s ::goto_frame(%d) - current frame is %d",
+			getTargetPath().c_str(), target_frame_number, m_current_frame);
+	assert(! isUnloaded() );
 
 	//	target_frame_number = iclamp(target_frame_number, 0, m_def->get_frame_count() - 1);
 	// Macromedia Flash ignores goto_frame(bad_frame)

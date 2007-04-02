@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.85 2007/04/02 09:12:48 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.86 2007/04/02 15:45:22 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -699,9 +699,6 @@ public:
 	void setVariables(VariableMap& vars);
 
 private:
-
-	/// Queue event handler(s), if any.
-	void queueEventHandler(const event_id& id);
 
 	/// Queue actions in the action list
 	//

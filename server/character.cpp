@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.27 2007/03/22 16:56:36 bjacques Exp $ */
+/* $Id: character.cpp,v 1.28 2007/04/02 15:45:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,6 +30,8 @@
 #include "VM.h" // for do_mouse_drag (to be moved in movie_root)
 #include "fn_call.h" // for shared ActionScript getter-setters
 #include "GnashException.h" // for shared ActionScript getter-setters (ensure_character)
+
+#include <boost/algorithm/string/case_conv.hpp>
 
 namespace gnash
 {
@@ -746,6 +748,66 @@ character::set_event_handler(const event_id& id, const as_value& method)
 	//       mouse or keypress events.
 }
 
+void
+character::unload()
+{
+	_unloaded = true;
+	log_msg("Queuing unload event for character %p", this);
+	queueEventHandler(event_id::UNLOAD);
+	//on_event(event_id::UNLOAD);
+}
+
+void
+character::queueEventHandler(const event_id& id)
+{
+	//testInvariant();
+
+	bool called=false;
+
+	movie_root& root = VM::get().getRoot();
+
+	// First, check for built-in event handler.
+	boost::intrusive_ptr<as_function> method = get_event_handler(id).to_as_function();
+	   
+	if (method)
+	{
+		root.pushAction(method, boost::intrusive_ptr<character>(this));
+		called=true;
+	}
+
+	// This is likely wrong, we use it as a workaround
+	// to the fact that we don't distinguish between
+	// ActionScript and SWF defined events
+	// (for example: onClipLoad vs. onLoad)
+	//
+	if (called) return;
+
+	// Check for member function.
+	// In ActionScript 2.0, event method names are CASE SENSITIVE.
+	// In ActionScript 1.0, event method names are CASE INSENSITIVE.
+	// TODO: move to get_function_name directly ?
+	std::string method_name = id.get_function_name();
+	if ( _vm.getSWFVersion() < 7 )
+	{
+		boost::to_lower(method_name, _vm.getLocale());
+	}
+
+	if (method_name.length() > 0)
+	{
+		as_value method_val;
+		if ( get_member(method_name, &method_val) )
+		{
+			method = method_val.to_as_function();
+			if ( method )
+			{
+				root.pushAction(method, boost::intrusive_ptr<character>(this));
+			}
+		}
+	}
+
+	//testInvariant();
+
+}
 
 } // namespace gnash
 

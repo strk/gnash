@@ -33,12 +33,14 @@
 #include "tu_random.h"
 #include "ExecutableCode.h"
 #include "Stage.h"
+#include "Key.h"
 
 #include <iostream>
 #include <string>
 #include <typeinfo>
 #include <cassert>
 #include <boost/ptr_container/ptr_list.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 
 using namespace std;
 
@@ -157,6 +159,70 @@ movie_root::notify_mouse_moved(int x, int y)
     return fire_mouse_event();
 
 }
+
+void
+movie_root::notify_global_key(key::code k, bool down)
+{
+	VM& vm = VM::get();
+	if ( vm.getSWFVersion() < 6 )
+	{
+		// _global.Key was added in SWF6
+		return;
+	}
+
+	static boost::intrusive_ptr<key_as_object> keyobject = NULL;
+	if ( ! keyobject )
+	{
+		// This isn't very performant... do we allow user override
+		// of _global.Key, btw ?
+
+		as_value kval;
+		as_object* global = VM::get().getGlobal();
+
+		std::string objName = "Key";
+		if ( vm.getSWFVersion() < 7 )
+		{
+			boost::to_lower(objName, vm.getLocale());
+		}
+		if ( global->get_member(objName, &kval) )
+		{
+			//log_msg("Found member 'Key' in _global: %s", kval.to_string());
+			boost::intrusive_ptr<as_object> obj = kval.to_object();
+			//log_msg("_global.Key to_object() : %s @ %p", typeid(*obj).name(), obj);
+			keyobject = boost::dynamic_pointer_cast<key_as_object>( obj );
+		}
+	}
+
+	if ( keyobject )
+	{
+		if (down) keyobject->set_key_down(k);
+		else keyobject->set_key_up(k);
+	}
+	else
+	{
+		log_error("gnash::notify_key_event(): _global.Key doesn't exist, or isn't the expected built-in\n");
+	}
+}
+
+bool
+movie_root::notify_key_event(key::code k, bool down)
+{
+//	    GNASH_REPORT_FUNCTION;
+	    
+	// Notify keypress listeners.
+	if (down) notify_keypress_listeners(k);
+
+	//
+	// Notify the _global.Key object about key event
+	//
+
+	notify_global_key(k, down);
+
+	processActionQueue();
+
+	return false; // should return true if needs update ...
+}
+
 
 bool
 movie_root::notify_mouse_clicked(bool mouse_pressed, int button_mask)
@@ -583,6 +649,11 @@ char* movie_root::call_method_args(const char* method_name,
 
 void movie_root::cleanup_keypress_listeners()
 {
+#ifdef KEYPRESS_LISTENERS_DEBUG
+	size_t prevsize = m_keypress_listeners.size();
+	log_msg("Cleaning up %u keypress listeners", m_keypress_listeners.size());
+#endif
+
 	for (ListenerSet::iterator iter = m_keypress_listeners.begin();
 			 iter != m_keypress_listeners.end(); )
 	{
@@ -600,6 +671,11 @@ void movie_root::cleanup_keypress_listeners()
 			++iter;
 		}
 	}
+
+#ifdef KEYPRESS_LISTENERS_DEBUG
+	size_t currsize = m_keypress_listeners.size();
+	log_msg("Cleaned up %u listeners (from %u to %u)", prevsize-currsize, prevsize, currsize);
+#endif
 }
 
 void movie_root::notify_keypress_listeners(key::code k)
@@ -747,7 +823,7 @@ movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<sprite_ins
 }
 
 void
-movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<sprite_instance> target)
+movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<character> target)
 {
 #ifdef GNASH_DEBUG
 	log_msg("Pushed function (event hanlder?) with target %s", target->getTargetPath().c_str());

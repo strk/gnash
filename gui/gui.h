@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "tu_config.h"
 #include "rect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
+#include "gnash.h" // for gnash::key::code type
 
 #include <string>
 
@@ -167,6 +168,7 @@ public:
     //
     /// @param x The mouse coordinate X component in pixels.
     /// @param y The mouse coordinate Y component in pixels.
+    ///
     void notify_mouse_moved(int x, int y);
 
     /// Mouse notification callback to be called when the mouse is clicked.
@@ -174,7 +176,17 @@ public:
     /// @param mouse_pressed Determines whether the mouse button is being
     ///                      pressed (true) or being released (false)
     /// @param mask A binary representation of the buttons currently pressed.
+    ///
     void notify_mouse_clicked(bool mouse_pressed, int mask);
+
+    /// Key event notification to be called when a key is pressed or depressed
+    //
+    /// @param k The key code.
+    ///
+    /// @param pressed Determines whether the key is being
+    ///           pressed (true) or being released (false)
+    ///
+    void notify_key_event(gnash::key::code k, bool pressed);
 
     /// Resize the client area view and the window accordingly.
     //

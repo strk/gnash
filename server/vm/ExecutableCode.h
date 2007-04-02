@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ExecutableCode.h,v 1.1 2007/03/27 14:52:05 strk Exp $ */
+/* $Id: ExecutableCode.h,v 1.2 2007/04/02 15:45:22 strk Exp $ */
 
 #ifndef GNASH_EXECUTABLECODE_H
 #define GNASH_EXECUTABLECODE_H
@@ -81,7 +81,7 @@ class FunctionCode: public ExecutableCode {
 
 public:
 
-	FunctionCode(boost::intrusive_ptr<as_function> nFunc, boost::intrusive_ptr<sprite_instance> nTarget)
+	FunctionCode(boost::intrusive_ptr<as_function> nFunc, boost::intrusive_ptr<character> nTarget)
 		:
 		func(nFunc),
 		target(nTarget)
@@ -90,14 +90,15 @@ public:
 	virtual void execute()
 	{
 		//log_msg("Execution of FunctionCode unimplemented yet");
-		func->call(fn_call(target.get(), &(target->get_environment()), 0, 0));
+		as_environment env; env.set_target(target.get());
+		func->call(fn_call(target.get(), &env, 0, 0));
 	}
 
 private:
 
 	boost::intrusive_ptr<as_function> func;
 
-	boost::intrusive_ptr<sprite_instance> target;
+	boost::intrusive_ptr<character> target;
 };
 
 

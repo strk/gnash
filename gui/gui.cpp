@@ -276,6 +276,20 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 	}
 }
 
+void
+Gui::notify_key_event(gnash::key::code k, bool pressed) 
+{
+	movie_root* m = get_current_root();
+
+	//log_msg("mouse @ %d,%d", x, y);
+	if ( m->notify_key_event(k, pressed) )
+	{
+		// any action triggered by the
+		// event required screen refresh
+		display(m);
+	}
+}
+
 bool
 Gui::display(movie_root* m)
 {
