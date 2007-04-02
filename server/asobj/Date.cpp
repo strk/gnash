@@ -99,10 +99,6 @@
 # include <sys/time.h>
 #endif
 
-#ifndef NAN
-	#define NAN (0.0/0.0)
-#endif
-
 #ifndef trunc
 #define trunc(x) ( x < 0 ?  -(std::floor(-x)) : std::floor(x) )
 #endif

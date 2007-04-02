@@ -1,3 +1,10 @@
+2007-04-02 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/as_value{.cpp, .h}: Declare NAN in the header
+	(and fix a typo in the declaration. Use that definition
+	instead of by using 0.0 / 0.0 to avoid compiler warnings.
+	* server/asobj/{Date.cpp, Math.cpp}: Don't redefine NAN.
+
 2007-04-02 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/ming_utils.{c,h}: fix compiler warnings.

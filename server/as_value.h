@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.39 2007/03/28 08:46:43 bjacques Exp $ */
+/* $Id: as_value.h,v 1.40 2007/04/02 10:42:21 bjacques Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -43,6 +43,11 @@ class as_environment;
 #  define isfinite finite
 # endif 
 #endif 
+
+#ifndef NAN
+#       define NAN (std::numeric_limits<double>::quiet_NaN())
+#endif
+
 
 #ifndef isnan
 # define isnan(x) \
@@ -504,7 +509,7 @@ public:
 	void	set_sprite(const std::string& path);
 	void	set_sprite(const sprite_instance& sp);
 	void	set_int(int val) { set_double(val); }
-	void	set_nan() { double x = 0.0; set_double(x/x); }
+	void	set_nan() { set_double(NAN); }
 
 	/// Make this value a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
 	//

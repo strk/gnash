@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.20 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: Math.cpp,v 1.21 2007/04/02 10:42:21 bjacques Exp $ */
 
 //
 // This file implements methods of the ActionScript Math class.
@@ -39,12 +39,6 @@
 #include "GMath.h"
 #include "log.h"
 #include "builtin_function.h" 
-
-#ifndef NAN
-// This throws a warning with some compilers. If that bugs you, use
-// static double nan_zero = 0.0; and (nan_zero/nan_zero)
-# define NAN (0.0/0.0)
-#endif
 
 using namespace std;
 

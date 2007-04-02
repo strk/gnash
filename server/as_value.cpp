@@ -32,7 +32,6 @@
 #include "Boolean.h" // for automatic as_value::BOOLEAN => Boolean as object
 #include "action.h" // for call_method0
 
-#include <cmath>	// for NAN
 #include <boost/algorithm/string/case_conv.hpp>
 
 using namespace std;
@@ -42,12 +41,6 @@ using namespace std;
 #endif
 
 namespace gnash {
-
-#ifndef NAN
-//	If this makes your compiler die with div by zero,
-//	use "static double zzzero = 0.0;" and "(zzzero/zzzero)"
-#	define NAN std::numeric_limits<double>::quiet_NaN();
-#endif
 
 //
 // as_value -- ActionScript value type
