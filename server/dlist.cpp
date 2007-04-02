@@ -368,14 +368,15 @@ DisplayList::remove_display_object(uint16_t depth)
 #endif
 
 	// TODO: optimize to take by-depth order into account
-	container_type::iterator new_end = remove_if(
+	container_type::iterator it = find_if(
 			_characters.begin(),
 			_characters.end(),
 			DepthEquals(depth));
 
-	if ( new_end != _characters.end() )
+	if ( it != _characters.end() )
 	{
-		_characters.erase(new_end, _characters.end());
+		(*it)->unload();
+		_characters.erase(it);
 
 	}
 

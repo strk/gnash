@@ -126,7 +126,7 @@ public:
 
 	/// Removes the object at the specified depth.
 	//
-	/// Does *not* calls UNLOAD event 
+	/// Calls unload on the removed character.
 	///
 	void	remove_display_object(uint16_t depth);
 
