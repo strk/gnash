@@ -11,3 +11,4 @@ clip_as_button2-TestRunner
 *.bak
 site.exp
 GotoAndPlayTestRunner
+gotoFrameOnKeyEvent-TestRunner
