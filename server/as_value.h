@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.40 2007/04/02 10:42:21 bjacques Exp $ */
+/* $Id: as_value.h,v 1.41 2007/04/02 22:45:09 nihilus Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -28,6 +28,7 @@
 #include "smart_ptr.h"
 
 #include <cmath>
+#include <limits>
 #include <string>
 
 namespace gnash {
