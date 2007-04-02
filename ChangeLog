@@ -1,3 +1,9 @@
+2007-04-02 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/samples/: Makefile.am, gotoFrameOnKeyEvent-TestRunner.cpp:
+	  First stub at an automated test runner for gotoFrameOnKeyEvent.
+	  TODO item in comments.
+
 2007-04-02 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/as_value{.cpp, .h}: Declare NAN in the header
