@@ -1,3 +1,15 @@
+2007-04-02 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: fix a couple of typos.
+	* server/button_character_instance.cpp (on_event): queue
+	  events, don't execute immediately
+	* server/vm/ExecutableCode.h (GlobalCode): take a character
+	  as target.
+	* server/movie_root.{cpp,h} (pushAction): take a character
+	  as target.
+	* testsuite/samples/gotoFrameOnKeyEvent-TestRunner.cpp:
+	  unexpected success.
+
 2007-04-02 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* Makefile.am, configure.ac, gui/Makefile.am, gui/gnash.cpp, gui/gtk.cpp:

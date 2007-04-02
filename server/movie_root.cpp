@@ -444,7 +444,13 @@ movie_root::fire_mouse_event()
         _movie->get_topmost_mouse_entity(PIXELS_TO_TWIPS(m_mouse_x), PIXELS_TO_TWIPS(m_mouse_y));
     m_mouse_button_state.m_mouse_button_state_current = (m_mouse_buttons & 1);
 
-    return generate_mouse_button_events(&m_mouse_button_state);
+    bool need_redraw = generate_mouse_button_events(&m_mouse_button_state);
+
+    // FIXME: need_redraw might also depend on actual
+    //        actions execution (consider updateAfterEvent).
+    processActionQueue();
+
+    return need_redraw;
 
 }
 
@@ -814,7 +820,7 @@ movie_root::processActionQueue()
 }
 
 void
-movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<sprite_instance> target)
+movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character> target)
 {
 #ifdef GNASH_DEBUG
 	log_msg("Pushed action buffer for target %s", target->getTargetPath().c_str());

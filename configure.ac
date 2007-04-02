@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.284 2007/04/02 16:46:31 tgc Exp $
+dnl $Id: configure.ac,v 1.285 2007/04/02 17:22:29 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -263,7 +263,7 @@ dnl --------------------------------------------------------
 dnl  Select media handler
 dnl --------------------------------------------------------
 
-AC_ARG_ENABLE(sound,
+AC_ARG_ENABLE(media,
  AC_HELP_STRING([--enable-media=handler], [Enable media handling support using the specified handler: ffmpeg, mad, GST (Gstreamer) or none (no sound) [[ffmpeg]] ]),
  [case "${enableval}" in
    GST|gst) media_handler=gst ;;
@@ -507,7 +507,7 @@ AM_CONDITIONAL(ENABLE_MTASC, [ test x"$MTASC" != x ])
 dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
 
-if test x$gui = xsdl -o x$media_handler = xffmpeg -o x$media_handler = xffmpeg; then
+if test x$gui = xsdl -o x$media_handler = xffmpeg -o x$media_handler = xmad; then
   GNASH_PATH_SDL
 fi
 

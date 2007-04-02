@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ExecutableCode.h,v 1.2 2007/04/02 15:45:22 strk Exp $ */
+/* $Id: ExecutableCode.h,v 1.3 2007/04/02 17:22:29 strk Exp $ */
 
 #ifndef GNASH_EXECUTABLECODE_H
 #define GNASH_EXECUTABLECODE_H
@@ -50,7 +50,7 @@ class GlobalCode: public ExecutableCode {
 
 public:
 
-	GlobalCode(const action_buffer& nBuffer, boost::intrusive_ptr<sprite_instance> nTarget)
+	GlobalCode(const action_buffer& nBuffer, boost::intrusive_ptr<character> nTarget)
 		:
 		buffer(nBuffer),
 		target(nTarget)
@@ -65,7 +65,7 @@ public:
 		}
 		else
 		{
-			log_msg("Sprite %s unloaded, won't execute global code in it", target->getTargetPath().c_str());
+			//log_msg("Sprite %s unloaded, won't execute global code in it", target->getTargetPath().c_str());
 		}
 	}
 
@@ -73,7 +73,7 @@ private:
 
 	const action_buffer& buffer;
 
-	boost::intrusive_ptr<sprite_instance> target;
+	boost::intrusive_ptr<character> target;
 };
 
 /// Function code

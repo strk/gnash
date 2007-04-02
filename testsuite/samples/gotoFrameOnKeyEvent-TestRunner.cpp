@@ -73,7 +73,7 @@ main(int /*argc*/, char** /*argv*/)
 	// TODO: check if it is correct to wait for next ::advance before expecting gotoFrame actions
 	//       execution !!
 
-	xcheck_equals(root->get_current_frame(), 1);
+	check_equals(root->get_current_frame(), 1);
 	tester.advance();
 	check_equals(root->get_current_frame(), 1);
 

@@ -354,7 +354,8 @@ button_character_instance::on_event(const event_id& id)
 			// Matching action.
 			for (size_t j=0, je=ba.m_actions.size(); j<je; ++j)
 			{
-				parent->add_action_buffer(ba.m_actions[j]);
+				VM::get().getRoot().pushAction(*(ba.m_actions[j]), boost::intrusive_ptr<character>(this));
+				//parent->add_action_buffer(ba.m_actions[j]);
 			}
 			called = true;
 		}

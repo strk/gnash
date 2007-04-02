@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.44 2007/04/02 15:45:22 strk Exp $ */
+/* $Id: movie_root.h,v 1.45 2007/04/02 17:22:29 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -414,7 +414,7 @@ public:
 	}
 
 	/// Push an executable code to the ActionQueue
-	void pushAction(const action_buffer& buf, boost::intrusive_ptr<sprite_instance> target);
+	void pushAction(const action_buffer& buf, boost::intrusive_ptr<character> target);
 
 	/// Push a function code to the ActionQueue
 	void pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<character> target);
