@@ -2805,6 +2805,8 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 
 	assert(frame < m_def->get_frame_count());
 
+	m_is_reverse_execution = false;
+
 	if ( frame == 0 && has_looped() )
 	{
 		// Resort frame0 DisplayList as depth of
@@ -2899,6 +2901,8 @@ void sprite_instance::execute_frame_tags_reverse(size_t frame)
 	testInvariant();
 
 	assert(frame < m_def->get_frame_count());
+
+	m_is_reverse_execution = true;
 
 	const PlayList& playlist = m_def->get_playlist(frame);
 

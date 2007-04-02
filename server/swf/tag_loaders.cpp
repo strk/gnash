@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.83 2007/04/01 10:23:47 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.84 2007/04/02 06:18:41 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1111,7 +1111,7 @@ public:
 		      m_name,
 		      m_event_handlers,
 		      m_depth,
-		      false, // m_tag_type != SWF::PLACEOBJECT,	// original place_object doesn't do replacement
+		      m->is_reverse_execution(),	// place_object doesn't do replacement when not in reverse execution
 		      m_color_transform,
 		      m_matrix,
 		      m_ratio,
@@ -1191,7 +1191,7 @@ public:
 		uint32 depthid = 0;
 		if (m_place_type == PLACE || m_place_type == REPLACE)
 		{
-			int id = 0;
+			int id = -1;
 			if (m_tag_type == SWF::PLACEOBJECT)
 			{
 			    // Old-style PlaceObject; the corresponding Remove

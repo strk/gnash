@@ -1,3 +1,13 @@
+2007-04-02 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/sprite_instance.cpp, sprite_instance.h
+	add is_reverse_execution() to check if is reverse executing frame tags;
+	* server/tag_loaders.cpp
+	set "replace_if_depth_is_occupied" to true when reverse executing PlaceObject2.
+	fixed error messages with playing bombgame.swf, improved implementation of 
+	reverse execution.
+
+	  
 2007-04-01 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (define_bits_jpeg_loader,

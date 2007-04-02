@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.83 2007/03/30 07:23:19 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.84 2007/04/02 06:18:41 zoulunkai Exp $ */
 
 // Stateful live Sprite instance
 
@@ -250,7 +250,12 @@ public:
 	/// frame is 0-based
 	void execute_frame_tags_reverse(size_t frame);
 
-		
+	// return true is sprite is revserse executing frame tags
+	bool is_reverse_execution() const
+	{
+		return  m_is_reverse_execution;
+	}
+
 	execute_tag* find_previous_replace_or_add_tag(int frame,
 		int depth, int id);
 
@@ -767,6 +772,8 @@ private:
 	// true if this sprite reached the last frame and restarted
 	bool		m_has_looped;
 
+	// true if reverse executing frame tags
+	bool		m_is_reverse_execution;
 
 	// a bit-array class would be ideal for this
 	std::vector<bool>	m_init_actions_executed;
