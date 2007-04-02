@@ -611,7 +611,7 @@ void movie_root::notify_keypress_listeners(key::code k)
 		// sprite, button & input_edit_text characters
 		// TODO: invoke functions on non-characters !
 		character* ch = dynamic_cast<character*>(iter->get());
-		if ( ch )
+		if ( ch && ! ch->isUnloaded() )
 		{
 			ch->on_event(event_id(event_id::KEY_PRESS, k));
 		}

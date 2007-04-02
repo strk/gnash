@@ -1,5 +1,11 @@
 2007-04-02 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (notify_keypress_listeners):
+	  Skip event execution for unloaded characters
+	  (they will be removed at next ::advance call)
+
+2007-04-02 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.{cpp,h} (remove_display_object): call
 	  unload on removed character.
 	* server/: character.h, sprite_instance.{cpp,h}:
