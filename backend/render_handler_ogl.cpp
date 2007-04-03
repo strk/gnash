@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.66 2007/03/27 22:06:08 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.67 2007/04/03 21:46:37 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -931,7 +931,7 @@ void	hardware_resample(int bytes_per_pixel, int src_width, int src_height, uint8
 	}
 	glEnd();
 	glCopyTexImage2D(GL_TEXTURE_2D, 0, out_format, 0,0, dst_width, dst_height, 0);
-	delete temp;
+	delete[] temp;
     }
     glPopAttrib();
     glPopMatrix();

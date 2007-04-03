@@ -56,6 +56,7 @@
 2007-04-03 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/as_value.h: Include <limits> for NAN.
+	* backend/render_ogl.cpp: Fixed memory leak.
 
 2007-04-02 Sandro Santilli <strk@keybit.net>
 
