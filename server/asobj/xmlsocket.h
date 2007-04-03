@@ -40,10 +40,12 @@ public:
     bool connect(const char *host, short port);
     bool send(std::string str);
     void close();
-    
-    bool anydata(char **msgs);
-    bool anydata(int sockfd, char **msgs);
 
+    typedef std::vector<std::string> MessageList;
+
+    bool anydata(MessageList& msgs);
+    bool anydata(int sockfd, MessageList& msgs);
+    
     bool fdclosed() { return _closed; }
     bool xmlmsg() { return _xmldata; }
     
@@ -76,6 +78,7 @@ private:
     bool          _processing;
     std::vector<std::string> _messages;
     //std::vector< boost::intrusive_ptr<as_object> >  _nodes;
+
 };
 
 void xmlsocket_class_init(as_object& global);

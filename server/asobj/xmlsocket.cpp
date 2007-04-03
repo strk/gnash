@@ -50,6 +50,8 @@
 # include <sys/select.h>
 #endif
 
+#include <boost/algorithm/string/case_conv.hpp>
+
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 256
 #endif
@@ -87,7 +89,19 @@ public:
                 as_object(getXMLSocketInterface())
         {}
 
+		/// This function should be called everytime we're willing
+		/// to check if any data is available on the socket.
+		//
+		/// The method will take care of polling from the
+		/// socket and invoking any onData handler.
+		///
+		void checkForIncomingData(as_environment& env);
+
         XMLSocket obj;
+
+		/// Return the as_function with given name, converting case if needed
+		boost::intrusive_ptr<as_function> getEventHandler(const std::string& name);
+
 };
 
   
@@ -135,7 +149,7 @@ XMLSocket::close()
 
 // Return true if there is data in the socket, otherwise return false.
 bool
-XMLSocket::anydata(char **msgs)
+XMLSocket::anydata(MessageList& msgs)
 {
     //GNASH_REPORT_FUNCTION;
     assert(connected());
@@ -158,7 +172,7 @@ void XMLSocket::processing(bool x)
 }
 
 bool
-XMLSocket::anydata(int fd, char **msgs)
+XMLSocket::anydata(int fd, MessageList& msgs)
 {
     GNASH_REPORT_FUNCTION;
 
@@ -175,12 +189,9 @@ XMLSocket::anydata(int fd, char **msgs)
     
     
     if (fd <= 0) {
-	    log_msg("fd <= 0, returning false");
-	    assert(!connected());
+	log_msg("fd <= 0, returning false (timer not unregistered while socket disconnected?");
         return false;
     }
-    
-    //msgs = (char **)realloc(msgs, sizeof(char *));
     
     while (retries-- > 0) {
         FD_ZERO(&fdset);
@@ -210,7 +221,7 @@ XMLSocket::anydata(int fd, char **msgs)
         if (ret > 0) {
             log_msg("%s: There is data in the socket for fd #%d!",
                 __FUNCTION__, fd);
-            break;
+            //break;
         }
         memset(buf, 0, INBUF);
         ret = ::read(_sockfd, buf, INBUF-2);
@@ -219,7 +230,8 @@ XMLSocket::anydata(int fd, char **msgs)
         //log_msg("%s: read (%d,%d) %s\n", __FUNCTION__, buf[0], buf[1], buf);
         ptr = buf;
         // If we get a single XML message, do less work
-        if (ret == cr + 1) {
+        if (ret == cr + 1)
+		{
             adjusted_size = memadjust(ret + 1);
             packet = new char[adjusted_size];
             printf("Packet size is %d at %p\n", ret + 1, packet);
@@ -229,9 +241,7 @@ XMLSocket::anydata(int fd, char **msgs)
             if (eom) {
                 *eom = 0;
             }
-            //data.push_back(packet);
-            msgs[index] = packet;
-            msgs[index+1] = 0;
+            msgs.push_back( packet );
             printf("%d: Pushing Packet of size %d at %p\n", __LINE__, strlen(packet), packet);
             processing(false);
             return true;
@@ -273,7 +283,7 @@ XMLSocket::anydata(int fd, char **msgs)
                 }
                 //printf("Allocating new packet at %p\n", packet);
                 //data.push_back(packet);
-                msgs[index++] = packet;
+                msgs.push_back( std::string(packet) );
             } else {
                 log_error("Throwing out partial packet %s\n", packet);
             }
@@ -425,12 +435,13 @@ xmlsocket_connect(const fn_call& fn)
     // confirm this is that onConnect is invoked *after* 
     // XMLSocket.connect() returned in these cases.
     //
-    if (fn.this_ptr->get_member("onConnect", &method))
+	boost::intrusive_ptr<as_function> handler = ptr->getEventHandler("onConnect");
+    if ( handler )
     {
         log_msg("XMLSocket.connect(): calling onConnect");
         as_environment env;
         env.push(success);
-        val = call_method(method, &env, ptr.get(), 1, env.stack_size()-1); 
+        val = call_method(handler.get(), &env, ptr.get(), 1, env.stack_size()-1); 
     }
 	    
     if ( success )
@@ -503,10 +514,6 @@ xmlsocket_event_ondata(const fn_call& fn)
     
     as_value	method;
     as_value	val;
-    as_value      datain;
-    std::vector<const char *> msgs;
-    char          *messages[200];
-    int           i;
     
     boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
     if ( ! ptr->obj.connected() )
@@ -515,66 +522,8 @@ xmlsocket_event_ondata(const fn_call& fn)
 	    return as_value();
     }
 
-    if (ptr->obj.processingData()) {
-        log_msg("Still processing data!\n");
-        return as_value(false);
-    }
-    
-    memset(messages, 0, sizeof(char *)*200);
-    
-#ifndef USE_DMALLOC
-    //dump_memory_stats(__FUNCTION__, __LINE__, "memory checkpoint");
-#endif
-    
-    assert(ptr->obj.connected());
+	ptr->checkForIncomingData(fn.env());
 
-    if (ptr->obj.anydata(messages))
-    {
-        //log_msg("Got message #%d, %d bytes long at %p: %s", i,
-         //   strlen(messages[i]), messages[i], messages[i]);
-
-        if (fn.this_ptr->get_member("onData", &method))
-        {
-            //log_msg("Got %d messages from XMLsocket", msgs.size());
-            for (i=0; messages[i] != 0; i++)
-            {
-//              log_msg("Got message #%d, %d bytes long at %p: %s: \n", i,
-//                  strlen(messages[i]), messages[i], messages[i]);
-                datain = messages[i];
-                //fn.env().push(datain);
-
-#ifndef USE_DMALLOC
-                //dump_memory_stats(__FUNCTION__, __LINE__, "start");
-#endif
-                as_environment& env = fn.env();
-                env.push(datain);
-                val = call_method(method, &env, fn.this_ptr.get(), 1, 0);
-
-#ifndef USE_DMALLOC
-                //dump_memory_stats(__FUNCTION__, __LINE__, "end");
-#endif  
-                //log_msg("Deleting message #%d at %p\n", i, messages[i]);
-                //delete messages[i];
-                //fn.env().pop();
-                datain.set_undefined();
-            }
-            ptr->obj.processing(false);
-        }
-        else
-        {
-            log_error("Couldn't find onData!");
-        }
-
-        // Delete this in a batch for now so we can track memory allocation
-        for (i=0; messages[i] != 0; i++)
-        {
-            //log_msg("Deleting message #%d at %p\n", i, messages[i]);
-            delete messages[i];
-        }
-    }
-
-    //malloc_trim(0);
-  
     return as_value();
 }
 
@@ -615,6 +564,74 @@ void xmlsocket_class_init(as_object& global)
     // Register _global.String
     global.init_member("XMLSocket", cl.get());
 
+}
+
+boost::intrusive_ptr<as_function>
+xmlsocket_as_object::getEventHandler(const std::string& name)
+{
+		boost::intrusive_ptr<as_function> ret;
+
+		std::string key=name;
+		VM& vm = VM::get();
+		if ( vm.getSWFVersion() < 7 ) boost::to_lower(key, vm.getLocale());
+
+		as_value tmp;
+		if ( ! get_member(key, &tmp) ) return ret;
+		ret = tmp.to_as_function();
+		return ret;
+}
+
+void
+xmlsocket_as_object::checkForIncomingData(as_environment& env)
+{
+    assert(obj.connected());
+
+    if (obj.processingData()) {
+        log_msg("Still processing data!");
+    }
+    
+#ifndef USE_DMALLOC
+    //dump_memory_stats(__FUNCTION__, __LINE__, "memory checkpoint");
+#endif
+
+    std::vector<std::string > msgs;
+    if (obj.anydata(msgs))
+    {
+        log_msg("Got %u messages: ", msgs.size());
+		for (size_t i=0; i<msgs.size(); ++i)
+		{
+        	log_msg(" Message %u: %s ", i, msgs[i].c_str());
+		}
+
+		boost::intrusive_ptr<as_function> onDataHandler = getEventHandler("onData");
+        if ( onDataHandler )
+        {
+            //log_msg("Got %d messages from XMLsocket", msgs.size());
+            for (XMLSocket::MessageList::iterator it=msgs.begin(),
+							itEnd=msgs.end();
+			    it != itEnd; ++it)
+            {
+				std::string& s = *it;
+				as_value datain( s );
+
+#ifndef USE_DMALLOC
+                //dump_memory_stats(__FUNCTION__, __LINE__, "start");
+#endif
+                env.push(datain);
+                call_method(as_value(onDataHandler.get()), &env, this, 1, env.stack_size()-1);
+
+#ifndef USE_DMALLOC
+                //dump_memory_stats(__FUNCTION__, __LINE__, "end");
+#endif  
+            }
+            obj.processing(false);
+        }
+        else
+        {
+            log_error("Couldn't find onData!");
+        }
+
+    }
 }
 
 } // end of gnash namespace
