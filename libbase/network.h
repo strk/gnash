@@ -43,6 +43,8 @@
 #include "impl.h"
 #endif
 
+#include <cassert>
+
 namespace gnash {
 
 // Define the ports for the RTMP protocols
