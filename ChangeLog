@@ -455,6 +455,7 @@
 	  to the same layout
 	* configure.ac: Fail during configure if AGG libraries not detected;
 	  AGG is no longer "experimental"
+	* configure.ac: Regularise layout of AC_ARG_*
 
 2007-03-25 Sandro Santilli <strk@keybit.net>
 
