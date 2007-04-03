@@ -1,5 +1,8 @@
 2007-04-03 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp: extend tag is not in testing
+	  stage anymore, be more explicit about targetPath() arg
+	  not casting to an object.
 	* server/movie_root.{cpp,h}: limit the number of interval
 	  timers to 255.
 	* server/asobj/xmlsocket.{cpp,h}: more cleanups and fix for

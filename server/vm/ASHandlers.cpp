@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.79 2007/04/03 16:13:07 bjacques Exp $ */
+/* $Id: ASHandlers.cpp,v 1.80 2007/04/03 16:33:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2357,7 +2357,8 @@ SWFHandlers::ActionTargetPath(ActionExec& thread)
 	else
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Argument to TargetPath() doesn't cast to a movieclip");
+		log_aserror("Argument to TargetPath(%s) doesn't cast to a movieclip",
+			env.top(0).to_debug_string().c_str());
 		);
 		env.top(0).set_undefined();
 	}
@@ -3111,7 +3112,7 @@ SWFHandlers::ActionExtends(ActionExec& thread)
 
 	sub->extends(*super);
 
-	dbglogfile << __PRETTY_FUNCTION__ << ": testing!" << endl;
+	//dbglogfile << __PRETTY_FUNCTION__ << ": testing!" << endl;
 }
 
 void
