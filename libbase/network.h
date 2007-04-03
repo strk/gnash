@@ -101,20 +101,27 @@ public:
     void toggleDebug(bool val);
     
     bool send(const char *str);
-    //#ifdef ENABLE_TESTING 
+
     // Accessors for testing
-    bool connected()            { return _connected; };
-    int getFileFd()             { return _sockfd; };
-    int getListenFd()           { return _listenfd; };
-    short getPort()             { return _port; };
-    std::string getURL()        { return _url; }
-    std::string getProtocol()   { return _protocol; }
-    std::string getHost()       { return _host; }
-    std::string getPortStr()    { return _portstr; }
-    std::string getPath()       { return _path; }
-    int getTimeout()            { return _timeout; }
-    //#endif
-    Network &operator = (Network &net);
+    bool connected()           
+    {
+        assert ( ( _connected && _sockfd > 0 ) || ( ! _connected && _sockfd <= 0 ) );
+        return _connected;
+    };
+
+    int getFileFd() const { return _sockfd; };
+    int getListenFd() const { return _listenfd; };
+    short getPort() const { return _port; };
+    const std::string& getURL() const { return _url; }
+    const std::string& getProtocol() const  { return _protocol; }
+    const std::string& getHost() const { return _host; }
+    const std::string& getPortStr() const { return _portstr; }
+    const std::string& getPath() const { return _path; }
+    int getTimeout() const { return _timeout; }
+
+    // Network is not copiable !
+    //Network &operator = (Network &net) {}
+
  protected:
     in_addr_t   _ipaddr;
     int         _sockfd;

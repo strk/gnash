@@ -63,7 +63,15 @@ static const short DEFAULTPORT  = RTMP;
 #define INADDR_NONE  0xffffffff
 #endif
 
-Network::Network() : _ipaddr(INADDR_ANY), _sockfd(0), _listenfd(0), _port(0), _connected(false), _debug(false), _timeout(5)
+Network::Network()
+	:
+	_ipaddr(INADDR_ANY),
+	_sockfd(0),
+	_listenfd(0),
+	_port(0),
+	_connected(false),
+	_debug(false),
+	_timeout(5)
 {
     //log_msg("%s", __PRETTY_FUNCTION__);
 #ifdef HAVE_WINSOCK_H
@@ -86,17 +94,6 @@ Network::~Network()
 #else
     closeNet();
 #endif
-}
-
-Network &
-Network::operator = (Network &net)
-{
-    _sockfd = net.getFileFd();
-    _port = net.getPort();
-    _host = net.getHost();
-    _connected = net.connected();
-    _timeout = net.getTimeout();
-    return *this;
 }
 
 // Description: Create a tcp/ip network server. This creates a server
@@ -347,6 +344,8 @@ Network::createClient(const char *hostname, short port)
     char                thishostname[MAXHOSTNAMELEN];
     struct protoent     *proto;
 
+    assert( ! connected() );
+
     if (port < 1024) {
         log_error("Can't connect to priviledged port #%hd!", port);
         _connected = false;
@@ -434,12 +433,14 @@ Network::createClient(const char *hostname, short port)
                 log_msg("\tport %d at IP %s for fd #%d", port,
                         ::inet_ntoa(sock_in.sin_addr), _sockfd);
                 _connected = true;
+                assert(_sockfd > 0);
                 return true;
             }
             if (ret == -1) {
                 log_msg("The connect() socket for fd #%d never was available for writing!",
                         _sockfd);
                 _sockfd = -1;      
+                assert(!_connected);
                 return false;
             }
         }
@@ -455,6 +456,7 @@ Network::createClient(const char *hostname, short port)
 #endif
 
     _connected = true;
+    assert(_sockfd > 0);
     return true;
 }
 

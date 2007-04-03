@@ -43,7 +43,7 @@ public:
     
     bool anydata(char **msgs);
     bool anydata(int sockfd, char **msgs);
-    bool connected() { return _connect; };
+
     bool fdclosed() { return _closed; }
     bool xmlmsg() { return _xmldata; }
     
@@ -62,24 +62,20 @@ public:
     void onXML(std::string);
     
     // These handle the array of XML nodes
-    void push(as_object *obj);
-    void clear();
-    int  count();
+    //void push(as_object *obj) { _nodes.push_back(obj); }
+    //void clear() { _nodes.clear(); }
+    //int  count() { return _nodes.size(); }
     
     int checkSockets(void);
     int checkSockets(int x);
     
 private:
-    std::string	_host;
-    short         _port;
-    int           _sockfd;
     bool          _data;
     bool          _xmldata;
     bool          _closed;
-    bool          _connect;
     bool          _processing;
     std::vector<std::string> _messages;
-    std::vector<as_object *>  _nodes;
+    //std::vector< boost::intrusive_ptr<as_object> >  _nodes;
 };
 
 void xmlsocket_class_init(as_object& global);
