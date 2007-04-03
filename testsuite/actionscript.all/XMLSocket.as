@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XMLSocket.as,v 1.1 2007/03/30 14:51:38 strk Exp $";
+rcsid="$Id: XMLSocket.as,v 1.2 2007/04/03 14:07:22 strk Exp $";
 
 #include "check.as"
 
@@ -49,3 +49,56 @@ check_equals(socketObj.__proto__, XMLSocket.prototype);
 check( ! socketObj.hasOwnProperty('connect') );
 check( ! socketObj.hasOwnProperty('close') );
 check( ! socketObj.hasOwnProperty('send') );
+
+socketObj.secret = 4;
+
+socketObj.onConnect = function(success) {
+	check_equals(this.secret, 4);
+	if ( success )
+	{
+		note("XMLSocket.onConnect(success) called");
+	}
+	else
+	{
+		note("XMLSocket.onConnect(failure) called");
+	}
+};
+
+socketObj.onData = function(src) {
+	check_equals(this.secret, 4);
+	note("XMLSocket.onData("+src+") called with "+arguments.length);
+};
+
+socketObj.onClose = function() {
+	check_equals(this.secret, 4);
+	note("XMLSocket.onClose() called with "+arguments.length);
+};
+
+host = 'localhost';
+port = 3660;
+ret = socketObj.connect(host, port);
+if (ret) {
+	note("XMLSocket.connect("+host+", "+port+") returned true");
+} else {
+	note("XMLSocket.connect("+host+", "+port+") returned false");
+}
+
+#if 0 // disabled reconnect to avoid closing the socket prematurely
+host = null;
+port = 3660;
+ret = socketObj.connect(host, port);
+if (ret) {
+	note("XMLSocket.connect("+host+", "+port+") returned true");
+} else {
+	note("XMLSocket.connect("+host+", "+port+") returned false");
+}
+
+host = 'localhost';
+port = 3661;
+ret = socketObj.connect(host, port);
+if (ret) {
+	note("XMLSocket.connect("+host+", "+port+") returned true");
+} else {
+	note("XMLSocket.connect("+host+", "+port+") returned false");
+}
+#endif

@@ -1,5 +1,7 @@
 2007-04-03 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/XMLSocket.as: some more
+	  testing.
 	* server/sprite_instance.{cpp,h}: split the
 	  DisplayList reset code from execute_frame_tags()
 	  to a resetDisplayList() method.
