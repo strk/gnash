@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.26 2007/04/03 08:04:46 strk Exp $ */
+/* $Id: xml.cpp,v 1.27 2007/04/03 12:34:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -59,39 +59,23 @@ namespace gnash {
 
 static as_object* getXMLInterface();
 
-// Callback function for xmlReadIO
+// Callback functions for xmlReadIO
 static int closeTuFile (void * context);
-// Callback function for xmlReadIO
 static int readFromTuFile (void * context, char * buffer, int len);
 
 DSOEXPORT as_value xml_new(const fn_call& fn);
 static as_value xml_load(const fn_call& fn);
-//static as_value xml_set_current(const fn_call& fn); // UNDEFINED
-
 static as_value xml_addrequestheader(const fn_call& fn);
-static as_value xml_appendchild(const fn_call& fn);
-static as_value xml_clonenode(const fn_call& fn);
 static as_value xml_createelement(const fn_call& fn);
 static as_value xml_createtextnode(const fn_call& fn);
 static as_value xml_getbytesloaded(const fn_call& fn);
 static as_value xml_getbytestotal(const fn_call& fn);
-static as_value xml_haschildnodes(const fn_call& fn);
-static as_value xml_insertbefore(const fn_call& fn);
 static as_value xml_parsexml(const fn_call& fn);
-static as_value xml_removenode(const fn_call& fn);
 static as_value xml_send(const fn_call& fn);
 static as_value xml_sendandload(const fn_call& fn);
-static as_value xml_tostring(const fn_call& fn);
-static as_value xml_firstchild(const fn_call& fn);
-static as_value xml_childnodes(const fn_call& fn);
 
 // These are the event handlers called for this object
-//static as_value xml_ondata(const fn_call& fn); // UNUSED
 static as_value xml_loaded(const fn_call& fn);
-
-// Properties
-static as_value xml_nodename(const fn_call& fn);
-static as_value xml_nodevalue(const fn_call& fn);
 
 static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 #ifdef USE_DEBUGGER
@@ -100,10 +84,8 @@ static Debugger& debugger = Debugger::getDefaultInstance();
 
 XML::XML() 
     :
-    as_object(getXMLInterface()),
+    XMLNode(getXMLInterface()),
     _loaded(false), 
-    _nodename(0),
-    _nodes(0),
     _bytes_loaded(0),
     _bytes_total(0)
 {
@@ -118,10 +100,8 @@ XML::XML()
 // Parse the ASCII XML string into memory
 XML::XML(tu_string xml_in)
     :
-    as_object(getXMLInterface()),
+    XMLNode(getXMLInterface()),
     _loaded(false), 
-    _nodename(0),
-    _nodes(0),
     _bytes_loaded(0),
     _bytes_total(0)
 {
@@ -129,17 +109,13 @@ XML::XML(tu_string xml_in)
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_msg("Creating XML data at %p \n", this);
 #endif
-    //log_msg("%s: %p \n", __FUNCTION__, this);
-    //memset(&_nodes, 0, sizeof(XMLNode));
     parseXML(xml_in);
 }
 
 XML::XML(struct node * /* childNode */)
     :
-    as_object(getXMLInterface()),
+    XMLNode(getXMLInterface()),
     _loaded(false), 
-    _nodename(0),
-    _nodes(0),
     _bytes_loaded(0),
     _bytes_total(0)
 {
@@ -156,59 +132,9 @@ XML::~XML()
     GNASH_REPORT_FUNCTION;
     
 #ifdef DEBUG_MEMORY_ALLOCATION
-    if (this->_nodes) {
-        log_msg("\tDeleting XML top level node %s at %p \n", this->_nodes->_name, this);
-    } else {
-        log_msg("\tDeleting XML top level node at %p \n", this);
-    }
+    log_msg("\tDeleting XML top level node at %p", this);
 #endif
   
-    //log_msg("%s: %p \n", __FUNCTION__, this);
-    delete _nodes;
-}
-
-const char *
-XML::nodeName()
-{
-    printf("%s: XML %p _nodes at %p\n", __PRETTY_FUNCTION__, (void*)this, (void*)_nodes);
-    if (_nodes) {
-	return _nodes->nodeName();
-    }
-    return "undefined";
-}
-
-const char *
-XML::nodeValue()
-{
-    printf("%s: XML _nodes at %p\n", __PRETTY_FUNCTION__, (void*)_nodes);
-    if (_nodes) {
-	return _nodes->nodeValue();
-    }
-    return "undefined";
-}
-
-void
-XML::nodeNameSet(const char * /*name */)
-{
-    if (!_nodes) {
-	_nodes = new XMLNode;
-	printf("%s: New XML %p _nodes at %p\n", __PRETTY_FUNCTION__, (void*)this, (void*)_nodes);
-    }
-    //  _nodes->nodeNameSet(name);
-    printf("%s: XML %p _name at %p, %s\n", __PRETTY_FUNCTION__, (void*)this,
-	   _nodes->nodeName(), _nodes->nodeName() );
-}
-
-void
-XML::nodeValueSet(const char * /* value */)
-{
-    if (!_nodes) {
-	_nodes = new XMLNode;
-	printf("%s: New XML _nodes at %p\n", __PRETTY_FUNCTION__, (void*)_nodes);
-    }
-  
-    //  _nodes->nodeValueSet(value);
-    printf("%s: XML _nodes at %p\n", __PRETTY_FUNCTION__, (void*)_nodes);
 }
 
 void
@@ -264,25 +190,23 @@ XML::onCloseEvent()
     call_method(method, &env, this, 0, 0);
 }
 
-XMLNode*
-XML::extractNode(xmlNodePtr node, bool mem)
+void
+XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
 {
     xmlAttrPtr attr;
     xmlNodePtr childnode;
     xmlChar *ptr = NULL;
-    XMLNode *element, *child;
+    boost::intrusive_ptr<XMLNode> child;
     int len;
 
-    element = new XMLNode;
-            
 //    log_msg("Created new element for %s at %p\n", node->name, element);
-    memset(element, 0, sizeof (XMLNode));
 
 //    log_msg("%s: extracting node %s\n", __FUNCTION__, node->name);
 
     // See if we have any Attributes (properties)
     attr = node->properties;
-    while (attr != NULL) {
+    while (attr != NULL)
+    {
         //log_msg("extractNode %s has property %s, value is %s\n",
         //          node->name, attr->name, attr->children->content);
         XMLAttr *attrib = new XMLAttr;
@@ -296,15 +220,15 @@ XML::extractNode(xmlNodePtr node, bool mem)
         strcpy(attrib->_value, reinterpret_cast<const char *>(attr->children->content));
         //log_msg("\tPushing attribute %s for element %s has value %s\n",
         //        attr->name, node->name, attr->children->content);
-        element->_attributes.push_back(attrib);
+        element._attributes.push_back(attrib);
         attr = attr->next;
     }
 
     len = memadjust(strlen(reinterpret_cast<const char *>(node->name))+1);
-    element->_name = (char *)new char[len];
-    memset(element->_name, 0, len);
-    strcpy(element->_name, reinterpret_cast<const char *>(node->name));
-    //element->_name = reinterpret_cast<const char *>(node->name);
+    element._name = (char *)new char[len];
+    memset(element._name, 0, len);
+    strcpy(element._name, reinterpret_cast<const char *>(node->name));
+    //element._name = reinterpret_cast<const char *>(node->name);
     if (node->children) {
         //ptr = node->children->content;
         ptr = xmlNodeGetContent(node->children);
@@ -315,9 +239,9 @@ XML::extractNode(xmlNodePtr node, bool mem)
                 } else {
                     //log_msg("extractChildNode from text for %s has contents %s\n", node->name, ptr);
                     len = memadjust(strlen(reinterpret_cast<const char *>(ptr))+1);
-                    element->_value = (char *)new char[len];
-                    memset(element->_value, 0, len);
-                    strcpy(element->_value, reinterpret_cast<const char *>(ptr));
+                    element._value = (char *)new char[len];
+                    memset(element._value, 0, len);
+                    strcpy(element._value, reinterpret_cast<const char *>(ptr));
                     //element->_value = reinterpret_cast<const char *>(ptr);
                 }
             }
@@ -328,22 +252,17 @@ XML::extractNode(xmlNodePtr node, bool mem)
     // See if we have any data (content)
     childnode = node->children;
 
-    while (childnode != NULL) {
-        if (childnode->type == XML_ELEMENT_NODE) {
-//            log_msg("\t\t extracting node %s\n", childnode->name);
-            child = extractNode(childnode, mem);
-            //if (child->_value.get_type() != as_value::UNDEFINED) {
-//             if (child->_value != 0) {
-//                 log_msg("\tPushing childNode %s, value %s on element %s\n", child->_name, child->_value, element->_name);
-//             } else {
-//                 log_msg("\tPushing childNode %s on element %s\n", child->_name, element->_name);
-//             }
-            element->_children.push_back(child);
+    while (childnode != NULL)
+    {
+        if (childnode->type == XML_ELEMENT_NODE)
+        {
+            child = new XMLNode();
+            extractNode(*child, childnode, mem);
+            element._children.push_back(child);
         }
         childnode = childnode->next;
     }
 
-    return element;
 }
 
 // Read in an XML document from the specified source
@@ -360,8 +279,11 @@ XML::parseDoc(xmlDocPtr document, bool mem)
 
     cur = xmlDocGetRootElement(document);
   
-    if (cur != NULL) {
-        _nodes = extractNode(cur, mem);
+    if (cur != NULL)
+    {
+        boost::intrusive_ptr<XMLNode> child = new XMLNode();
+        extractNode(*child, cur, mem);
+        _children.push_back(child);
     }  
 
     _loaded = true;
@@ -452,16 +374,6 @@ XML::load(const URL& url)
 }
 
 
-vector<XMLNode *>
-XML::childNodes() 
-{
-    if (_nodes) {
-	return _nodes->_children;
-    } else {
-	return static_cast< vector<XMLNode*> >(0);
-    }
-}
-
 bool
 XML::onLoad()
 {
@@ -470,20 +382,14 @@ XML::onLoad()
     return(_loaded);
 }
 
-XMLNode *
-XML::operator [] (int x) {
-    log_msg("%s:\n", __FUNCTION__);
-
-    return _nodes->_children[x];
-}
-
 void
 XML::cleanupStackFrames(XMLNode * /* xml */)
 {
     GNASH_REPORT_FUNCTION;
 }
 
-as_object *
+#if 0
+void
 XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -502,8 +408,6 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
   
     // Get the data for this node
     nodename   = xml->_name;
-    //nodename   = xml->_name.c_str();
-    //nodevalue  = xml->_value;
     length     = xml->length();
 
     // Set these members in the top level object passed in. This are used
@@ -512,24 +416,17 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
     // childNodes.
     //obj->set_member("nodeName", nodename); // use the getter/setter !
     obj->set_member("length", length); // FIXME: use a getter/setter !
-    if (xml->_value != 0) {
-        //obj->set_member("nodeValue", xml->_value); // use the getter/setter !
-        //log_msg("\tnodevalue for %s is: %s\n", nodename, xml->_value);
-    } else {
-        // obj->set_member("nodeValue", as_value::UNDEFINED); // use the getter/setter !
-    }
 
     // Process the attributes, if any
-    if (xml->_attributes.size() == 0) {
+    if (xml->_attributes.size() == 0)
+    {
         //log_msg("\t\tNo attributes for node %s, created empty object at %p\n", nodename, attr_obj);
-//     log_msg("\t\tNo attributes for node %s\n", nodename);
-    } else {
+    }
+    else
+    {
         attr_obj = new xmlattr_as_object;
         for (i=0; i<xml->_attributes.size(); i++) {
             attr_obj->set_member(xml->_attributes[i]->_name, xml->_attributes[i]->_value);
-// 	    log_msg("\t\tAdding attribute as member %s, value is %s to node %s (%p)\n",
-// 		    xml->_attributes[i]->_name,
-// 		    xml->_attributes[i]->_value, nodename, static_cast<void*>(obj) );
         }
         obj->set_member("attributes", attr_obj);
     }
@@ -538,9 +435,10 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
     //obj->set_member("attributes", attr_obj);
 
     // Process the children, if there are any
-    if (length) {
+    if (length)
+    {
         //log_msg("\tProcessing %d children nodes for %s\n", length, nodename);
-	int inum;
+        int inum;
         inum = 0;
         for (child=0; child<length; child++) {
             // Create a new AS object for this node's children
@@ -557,12 +455,14 @@ XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
             obj->set_member(boost::lexical_cast<std::string>(inum), xmlchildnode_obj);
             ++inum;
         }
-    } else {
+    }
+    else
+    {
         //log_msg("\tNode %s has no children\n", nodename);
     }  
 
-    return obj;
 }
+#endif
 
 
 /// \brief add or change the HTTP Request header
@@ -581,98 +481,6 @@ XML::addRequestHeader(const char * /* name */, const char * /* value */)
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-/// \brief append a node the the XML object
-///
-/// Method; appends the specified node to the XML object's child
-/// list. This method operates directly on the node referenced by the
-/// childNode parameter; it does not append a copy of the node. If the
-/// node to be appended already exists in another tree structure,
-/// appending the node to the new location will remove it from its
-/// current location. If the childNode parameter refers to a node that
-/// already exists in another XML tree structure, the appended child
-/// node is placed in the new tree structure after it is removed from
-/// its existing parent node. 
-void
-XML::appendChild(XMLNode *node)
-{
-    GNASH_REPORT_FUNCTION;
-    
-    if (!_nodes) {
-	_nodes = new XMLNode;
-    }
-    _nodes->_children.push_back(node);
-//    log_msg("%s: %p at _nodes at %p\n", __PRETTY_FUNCTION__, this, _nodes);
-//    dbglogfile << node->_name << endl;
-}
-
-/// \brief copy a node
-///
-/// Method; constructs and returns a new XML node of the same type,
-/// name, value, and attributes as the specified XML object. If deep
-/// is set to true, all child nodes are recursively cloned, resulting
-/// in an exact copy of the original object's document tree. 
-XMLNode &
-XML::cloneNode(XMLNode &newnode, bool deep)
-{
-    GNASH_REPORT_FUNCTION;
-    log_msg("%s: deep is %d\n", __PRETTY_FUNCTION__, deep);
-
-    if (_nodes && deep) {
-	newnode = _nodes;
-//     } else {
-// 	newnode.nodeNameSet((char *)_nodes->nodeName());
-// 	newnode.nodeValueSet((char *)_nodes->nodeValue());    
-    }
-
-    log_msg("%s:partially unimplemented \n", __PRETTY_FUNCTION__);
-
-    return newnode;
-}
-
-# if 0
-/// \brief create a new XML element
-///
-/// Method; creates a new XML element with the name specified in the
-/// parameter. The new element initially has no parent, no children,
-/// and no siblings. The method returns a reference to the newly
-/// created XML object that represents the element. This method and
-/// the XML.createTextNode() method are the constructor methods for
-/// creating nodes for an XML object. 
-XMLNode *
-XML::createElement(const char * /* name */)
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-    return (XMLNode*)0;
-}
-
-/// \brief Create a new XML node
-/// 
-/// Method; creates a new XML text node with the specified text. The
-/// new node initially has no parent, and text nodes cannot have
-/// children or siblings. This method returns a reference to the XML
-/// object that represents the new text node. This method and the
-/// XML.createElement() method are the constructor methods for
-/// creating nodes for an XML object.
-XMLNode *
-XML::createTextNode(const char * /* name */)
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-    return (XMLNode*)0;
-}
-#endif
-
-/// \brief insert a node before a node
-///
-/// Method; inserts a new child node into the XML object's child
-/// list, before the beforeNode node. If the beforeNode parameter is
-/// undefined or null, the node is added using the appendChild()
-/// method. If beforeNode is not a child of my_xml, the insertion
-/// fails.
-void
-XML::insertBefore(XMLNode * /* newnode */, XMLNode * /* node */)
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-}
 
 void
 XML::load()
@@ -684,14 +492,6 @@ void
 XML::parseXML()
 {
     log_msg("%s: unimplemented \n", __FUNCTION__);
-}
-
-/// \brief removes the specified XML object from its parent. Also
-/// deletes all descendants of the node.
-void
-XML::removeNode()
-{
-    log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
 void
@@ -706,85 +506,6 @@ XML::sendAndLoad()
     log_msg("%s:unimplemented \n", __FUNCTION__);
 }
 
-const char *
-XML::toString()
-{
-    GNASH_REPORT_FUNCTION;
-    if (_nodes) {
-	stringstream xmlout;
-	return stringify(_nodes, &xmlout);
-    }
-    return NULL;
-}
-
-const char *
-XML::stringify(XMLNode *xml, stringstream *xmlout)
-{
-//    GNASH_REPORT_FUNCTION;
-    const char    *nodename = xml->nodeName();
-    const char    *nodevalue = xml->nodeValue();
-//    stringstream xmlout;
-//     string str;
-
-//    log_msg("%s: processing for object %s <%p>\n", __PRETTY_FUNCTION__, nodename, (void*)xml);
-  
-    if (nodename) {
-	*xmlout << "<" << nodename;
-//       str = "<";
-//       str += nodename;
-     }
-    
-    if (nodevalue) {
-	*xmlout << nodevalue;
-//  	str += nodevalue;
-    }
-
-    // Process the attributes, if any
-    vector<XMLAttr *>::iterator ita;
-    for (ita = xml->_attributes.begin(); ita != xml->_attributes.end(); ita++) {
-//	log_msg("Found One child !!!! %p\n", (void*)*ita);
-//	cerr << "<" << (*it)->nodeName() << ">" << endl;
-	XMLAttr *xa = *ita;
-// 	log_msg("\t\tAdding attribute as member %s, value is %s to node %s",
-// 		nodename, xa->_name, xa->_value);
-	*xmlout << " " << xa->_name << "=\"" << xa->_value << "\"";
-// 	str += " ";
-// 	str += xa->_name;
-// 	str += "=\"";
-// 	str += xa->_value;
-// 	str += "\"";
-    }
-    
-    if (nodename) {
-	*xmlout << ">";		// closing symbol for this tag
-// 	str += ">";
-    }
-
-//    int length = xml->_children.size();
-//    log_msg("\tProcessing %d children nodes for %s", length, nodename);
-    
-    vector<XMLNode *>::iterator itx;
-    for (itx = _nodes->_children.begin(); itx != _nodes->_children.end(); ++itx) {
-//	log_msg("Found One XML child !!!! %s <%p>\n", (*itx)->nodeName(), (void*)*itx);
-//	cerr << "<" << (*it)->nodeName() << ">" << endl;
-	XMLNode *x = *itx;
-	*xmlout << x->toString();
-//	str +=  x->stringify(x);
-    }
-    
-    if (nodename) {
-	*xmlout << "</" << nodename << ">";
-//      str += "</";
-//      str += nodename;
-
-//      str += ">";
-    }
-
-//    const char *xxx = xmlout->str().c_str();
-//    cerr << "XMLOUT XML= " << xxx << endl;
-    return xmlout->str().c_str();
-//    return str.c_str();
-}
 
 //
 // Callbacks. These are the wrappers for the C++ functions so they'll work as
@@ -826,23 +547,18 @@ attachXMLInterface(as_object& o)
     o.init_member("loaded", new builtin_function(xml_loaded));
 	
     o.init_member("addRequestHeader", new builtin_function(xml_addrequestheader));
-    o.init_member("appendChild", new builtin_function(xml_appendchild));
-    o.init_member("cloneNode", new builtin_function(xml_clonenode));
     o.init_member("createElement", new builtin_function(xml_createelement));
     o.init_member("createTextNode", new builtin_function(xml_createtextnode));
     o.init_member("getBytesLoaded", new builtin_function(xml_getbytesloaded));
     o.init_member("getBytesTotal", new builtin_function(xml_getbytestotal));
-    o.init_member("hasChildNodes", new builtin_function(xml_haschildnodes));
-    o.init_member("insertBefore", new builtin_function(xml_insertbefore));
     o.init_member("load", new builtin_function(xml_load));
     o.init_member("parseXML", new builtin_function(xml_parsexml));
-    o.init_member("removeNode", new builtin_function(xml_removenode));
     o.init_member("send", new builtin_function(xml_send));
     o.init_member("sendAndLoad", new builtin_function(xml_sendandload));
-    o.init_member("toString", new builtin_function(xml_tostring));
 
     // Properties
 
+#if 0
     boost::intrusive_ptr<builtin_function> gettersetter;
 
     gettersetter = new builtin_function(&xml_nodename, NULL);
@@ -854,17 +570,23 @@ attachXMLInterface(as_object& o)
     gettersetter = new builtin_function(&xml_firstchild, NULL);
     o.init_property("firstChild", *gettersetter, *gettersetter);
 
+    gettersetter = new builtin_function(&xml_lastchild, NULL);
+    o.init_property("lastChild", *gettersetter, *gettersetter);
+
     gettersetter = new builtin_function(&xml_childnodes, NULL);
     o.init_property("childNodes", *gettersetter, *gettersetter);
+#endif
+
 }
 
 static as_object*
 getXMLInterface()
 {
     static boost::intrusive_ptr<as_object> o;
-    if ( o == NULL ) {
-	o = new as_object();
-	attachXMLInterface(*o);
+    if ( o == NULL )
+    {
+        o = new as_object(getXMLNodeInterface());
+        attachXMLInterface(*o);
     }
     return o.get();
 }
@@ -878,28 +600,19 @@ xml_new(const fn_call& fn)
   
     // log_msg("%s: nargs=%d\n", __FUNCTION__, fn.nargs);
   
-    if (fn.nargs > 0) {
+    if (fn.nargs > 0 && fn.arg(0).is_object() )
+    {
 	    boost::intrusive_ptr<as_object> obj = fn.env().top(0).to_object();
-
-        if (! obj ) {
-            xml_obj = new XML;
-            //log_msg("\tCreated New XML object at %p\n", xml_obj);
-            tu_string datain = fn.env().top(0).to_tu_string();
-            xml_obj->parseXML(datain);
-            //log_msg("*** Start setting up the stack frames ***\n");
-            xml_obj->setupFrame(xml_obj.get(), xml_obj->firstChild(), true);
-            //xml_obj->clear();
-            //delete xml_obj->firstChild();
-        } else {
-		xml_obj = boost::dynamic_pointer_cast<XML>(obj);
-            //log_msg("\tCloned the XML object at %p\n", xml_obj);
-            //result->set(xml_obj);
-            return as_value(xml_obj.get());
+        xml_obj = boost::dynamic_pointer_cast<XML>(obj);
+        if ( xml_obj )
+        {
+            log_msg("\tCloned the XML object at %p\n", xml_obj.get());
+            return as_value(xml_obj->cloneNode(true).get());
         }
-    } else {
-        xml_obj = new XML;
-        //log_msg("\tCreated New XML object at %p\n", xml_obj);
     }
+
+    xml_obj = new XML;
+    //log_msg("\tCreated New XML object at %p\n", xml_obj);
 
     return as_value(xml_obj.get());
 }
@@ -936,52 +649,6 @@ as_value xml_addrequestheader(const fn_call& fn)
 //    return as_value(ptr->getAllocated());
 //    ptr->addRequestHeader();
     log_msg("%s:unimplemented \n", __FUNCTION__);
-    return as_value();
-}
-as_value xml_appendchild(const fn_call& fn)
-{
-    GNASH_REPORT_FUNCTION;
-    //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
-    if (fn.nargs > 0) {
-
-	boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr); 
-	boost::intrusive_ptr<XMLNode> xml_obj = boost::dynamic_pointer_cast<XMLNode>(fn.arg(0).to_object());
-	if ( ! xml_obj )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("First argument to XML::appendChild() is not an XMLNode");
-		);
-		return as_value();
-	}
-
-	if (xml_obj->nodeType() == XML_ELEMENT_NODE) {
-	    ptr->appendChild(xml_obj.get());
-	} else {
-	    ptr->nodeValueSet(xml_obj->nodeValue());
-	}
-
-    } else {
-        log_msg("ERROR: no child XMLNode paramaters!\\n");
-    }
-    return as_value();
-}
-
-as_value xml_clonenode(const fn_call& fn)
-{
-    GNASH_REPORT_FUNCTION;
-//    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-    XMLNode   *xml_obj;
-
-    if (fn.nargs > 0) {
-	bool deep = fn.arg(0).to_bool(); 
-	xml_obj = new XMLNode;
-	ptr->cloneNode(*xml_obj, deep);
-	return as_value(xml_obj);
-    } else {
-        log_msg("ERROR: no Depth paramater!\n");
-    }
-
     return as_value();
 }
 
@@ -1055,33 +722,6 @@ as_value xml_getbytestotal(const fn_call& fn)
     return as_value(ptr->getBytesTotal());
 }
 
-as_value xml_haschildnodes(const fn_call& fn)
-{
-    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-    return as_value(ptr->hasChildNodes());
-}
-
-/// \brief insert a node before a node
-///
-/// Method; inserts a new child node into the XML object's child
-/// list, before the beforeNode node. If the beforeNode parameter is
-/// undefined or null, the node is added using the appendChild()
-/// method. If beforeNode is not a child of my_xml, the insertion
-/// fails.
-
-as_value xml_insertbefore(const fn_call& fn)
-{
-    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-    UNUSED(ptr);
-    
-//    return as_value(ptr->getAllocated());
-//    ptr->insertBefore();
-    log_msg("%s:unimplemented \n", __FUNCTION__);
-    return as_value();
-}
-
 as_value xml_parsexml(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
@@ -1090,11 +730,13 @@ as_value xml_parsexml(const fn_call& fn)
     as_value	val;    
     boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
 
-    if (fn.nargs > 0) {
+    if (fn.nargs > 0)
+    {
         text = fn.arg(0).to_string(); 
-	if (ptr->parseXML(text)) {
-	    ptr->setupFrame(ptr.get(), ptr->firstChild(), false);  
-	}
+	    if (ptr->parseXML(text))
+        {
+	        //ptr->setupFrame(ptr.get(), ptr->firstChild().get(), false);
+	    }
     }
     
     return as_value();
@@ -1103,15 +745,6 @@ as_value xml_parsexml(const fn_call& fn)
 /// \brief removes the specified XML object from its parent. Also
 /// deletes all descendants of the node.
     
-as_value xml_removenode(const fn_call& fn)
-{
-    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-    
-//    return as_value(ptr->getAllocated());
-    ptr->removeNode();
-    return as_value();
-}
 as_value xml_send(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
@@ -1121,105 +754,15 @@ as_value xml_send(const fn_call& fn)
     ptr->send();
     return as_value();
 }
-as_value xml_sendandload(const fn_call& fn)
+
+static as_value
+xml_sendandload(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
     
 //    return as_value(ptr->getAllocated());
     ptr->sendAndLoad();
-    return as_value();
-}
-as_value xml_tostring(const fn_call& fn)
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-
-    // TODO: There is also the "stringify" function to be used here.
-    // See above. Wot does FlashPlayer return for this call?
-
-    string str = ptr->toString();
-//     cerr << "AAAAHHHHH: " << str << endl;
-    return as_value(str.c_str());
-}
-
-// Both a getter and a setter for nodeName
-static as_value
-xml_nodename(const fn_call& fn)
-{
-//    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) {
-	const char* val = ptr->nodeName();
-	if ( val ) {
-	    return as_value(val);
-	} else {
-	    return as_value();
-	}
-    } else {
-	ptr->nodeNameSet(fn.arg(0).to_string());
-    }
-    return as_value();
-}
-
-// Both a getter and a setter for nodeValue
-static as_value
-xml_nodevalue(const fn_call& fn)
-{
-//    GNASH_REPORT_FUNCTION;
-
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-    
-    //log_msg("xml_nodevalue called with %d args against 'this' = %p", fn.nargs, ptr);
-    if ( fn.nargs == 0 ) {
-	//log_msg("  nodeValue() returns '%s'", ptr->nodeValue());
-	const char* val = ptr->nodeValue();
-	if ( val ) {
-	    return as_value(val);
-	} else {
-	    return as_value();
-	}
-    } else {
-	//log_msg(" arg(0) == '%s'", fn.arg(0).to_string());
-	ptr->nodeValueSet(fn.arg(0).to_string());
-    }
-    return as_value();
-}
-
-// Both a getter and a (do-nothing) setter for firstChild
-static as_value
-xml_firstchild(const fn_call& fn)
-{
-    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) {
-	//return as_value(ptr->firstChild());
-	return as_value(ptr.get());
-    } else {
-	IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("Tried to set read-only property XML.firstChild");
-	    );
-    }
-    return as_value();
-}
-
-// Both a getter and a (do-nothing) setter for childNodes
-static as_value
-xml_childnodes(const fn_call& fn)
-{
-    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-
-    if ( fn.nargs == 0 ) {
-	//return as_value(ptr->childNodes());
-	return as_value(ptr.get());
-    } else {
-	IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("Tried to set read-only property XML.childNodes");
-	    );
-    }
     return as_value();
 }
 

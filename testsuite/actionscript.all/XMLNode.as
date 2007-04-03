@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XMLNode.as,v 1.9 2007/02/15 04:05:41 rsavoye Exp $";
+rcsid="$Id: XMLNode.as,v 1.10 2007/04/03 12:34:43 strk Exp $";
 
 #include "dejagnu.as"
 
@@ -77,9 +77,9 @@ node2.appendChild(textnode2);
 node1.appendChild(node2);
 check_equals(node1.hasChildNodes(), true);
 
-check_equals(node1.firstChild.nodeValue, "second text node");
-check_equals(node1.lastChild.nodeValue, "second text node");
-xcheck_equals(node2.lastChild, "null"); // FIXME
+check_equals(node1.firstChild.nodeValue, "first text node");
+check_equals(typeof(node1.lastChild.nodeValue), 'null');
+xcheck_equals(node2.lastChild.toString(), "second text node"); 
 
 var node3 = doc.createElement("node3");
 var textnode3 = doc.createTextNode("third text node");
@@ -91,16 +91,16 @@ trace("===========================================");
 
 // trace(node1.firstChild.nodeValue);
 // trace(node1.lastChild.nodeValue);
-check_equals(node1.firstChild.nodeValue, "second text node");
-check_equals(node1.lastChild.nodeValue, "third text node");
+check_equals(node1.firstChild.nodeValue, "first text node");
+check_equals(typeof(node1.lastChild.nodeValue), 'null');
 
 trace(node1.lastChild.previousSibling);
 trace(node1.firstChild.nextSibling);
 
-check_equals(node1.firstChild.nodeName, "node2");
+check_equals(typeof(node1.firstChild.nodeName), "null");
 check_equals(node1.lastChild.nodeName, "node3");
 
-xcheck_equals(node2.previousSibling.nodeValue, "second text node");
+check_equals(node2.previousSibling.nodeValue, "first text node");
 
 // TODO: test removeNode, insertNode
 

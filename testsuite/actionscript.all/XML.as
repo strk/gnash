@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.18 2007/04/03 08:04:46 strk Exp $";
+rcsid="$Id: XML.as,v 1.19 2007/04/03 12:34:43 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -28,7 +28,47 @@ rcsid="$Id: XML.as,v 1.18 2007/04/03 08:04:46 strk Exp $";
 var existtests = true;
 
 check(XML);
+
+#if OUTPUT_VERSION >= 6
+check(! XML.prototype.hasOwnProperty("appendChild") );
+check(! XML.prototype.hasOwnProperty("cloneNode") );
+check(! XML.prototype.hasOwnProperty("hasChildNodes") );
+check(! XML.prototype.hasOwnProperty("insertBefore") );
+check(! XML.prototype.hasOwnProperty("removeNode") );
+check(! XML.prototype.hasOwnProperty("cloneNode") );
+check(! XML.prototype.hasOwnProperty("toString") );
+check(! XML.prototype.hasOwnProperty("length") );
+check(XML.prototype.hasOwnProperty("createElement") );
+check(XML.prototype.hasOwnProperty("addRequestHeader") );
+check(XML.prototype.hasOwnProperty("createTextNode") );
+check(XML.prototype.hasOwnProperty("getBytesLoaded") );
+check(XML.prototype.hasOwnProperty("getBytesTotal") );
+check(XML.prototype.hasOwnProperty("load") );
+check(XML.prototype.hasOwnProperty("parseXML") );
+check(XML.prototype.hasOwnProperty("send") );
+check(XML.prototype.hasOwnProperty("sendAndLoad") );
+
+check(XMLNode.prototype.hasOwnProperty("appendChild") );
+check(XMLNode.prototype.hasOwnProperty("cloneNode") );
+check(XMLNode.prototype.hasOwnProperty("hasChildNodes") );
+check(XMLNode.prototype.hasOwnProperty("insertBefore") );
+check(XMLNode.prototype.hasOwnProperty("removeNode") );
+check(XMLNode.prototype.hasOwnProperty("toString") );
+check(XMLNode.prototype.hasOwnProperty("cloneNode") );
+check(! XMLNode.prototype.hasOwnProperty("length") );
+check(! XMLNode.prototype.hasOwnProperty("createElement") );
+check(! XMLNode.prototype.hasOwnProperty("addRequestHeader") );
+check(! XMLNode.prototype.hasOwnProperty("createTextNode") );
+check(! XMLNode.prototype.hasOwnProperty("getBytesLoaded") );
+check(! XMLNode.prototype.hasOwnProperty("getBytesTotal") );
+check(! XMLNode.prototype.hasOwnProperty("load") );
+check(! XMLNode.prototype.hasOwnProperty("parseXML") );
+check(! XMLNode.prototype.hasOwnProperty("send") );
+check(! XMLNode.prototype.hasOwnProperty("sendAndLoad") );
+#endif
+
 var tmp = new XML();
+check(! tmp.hasOwnProperty("length"));
 
 // test the XML constuctor
 if (tmp) {
@@ -202,12 +242,17 @@ check(XML);
 check_equals( typeof(tmp.parseXML), 'function');
 // parseXML doesn't return anything
 tmp.parseXML(xml_in);
-
-if (tmp.firstChild.nodeName == "TOPNODE") {
-    pass("XML::parseXML() works");
-} else {
-    fail("XML::parseXML() doesn't work");
-}
+check_equals(typeof(tmp.firstChild), 'object');
+note("Parsed XML: "+tmp.toString());
+check(XML.prototype instanceof XMLNode);
+check(tmp instanceof XML);
+check(tmp instanceof XMLNode);
+check(tmp.firstChild instanceof XMLNode);
+check_equals(typeof(tmp.nodeName), 'null');
+check_equals(typeof(tmp.nodeValue), 'null');
+check_equals(typeof(tmp.length), 'undefined');
+check_equals(tmp.firstChild.nodeName, "TOPNODE");
+check_equals(typeof(tmp.firstChild.length), 'undefined');
 
 if (tmp.hasChildNodes() == true) {
     pass("XML::hasChildNodes() works");
@@ -241,10 +286,10 @@ var element1 = myXML.createElement("element1");
 check(element1.nodeName == "element1");
 
 var element2 = myXML.createElement("element2");
-check(element2.nodeName == "element2");
+check_equals(element2.nodeName, "element2");
 
 var element3 = myXML.createElement("element3");
-check(element3.nodeName == "element3");
+check_equals(element3.nodeName, "element3");
 
 check(myXML.createTextNode);
 
@@ -256,13 +301,21 @@ var textNode2 = myXML.createTextNode("textNode2 String value");
 check(textNode2.nodeValue == "textNode2 String value");
 
 // place the new nodes into the XML tree
-element2.appendChild(textNode1);
-xcheck_equals(element2.nodeValue, null);
-xcheck_equals(element2.lastChild.nodeValue, "textNode1 String value");
+check(!element2.hasChildNodes());
+ret = element2.appendChild(textNode1);
+check_equals(typeof(ret), 'undefined');
+check(element2.hasChildNodes());
+
+check_equals(element2.nodeValue, null);
+check_equals(typeof(element2.lastChild), 'object');
+check_equals(element2.lastChild.nodeValue, "textNode1 String value");
+element2.lastChild = 4;
+check_equals(typeof(element2.lastChild), 'object');
 
 element3.appendChild(textNode2);
-xcheck_equals(element3.nodeValue, null); 
-xcheck_equals(element3.lastChild.nodeValue, "textNode2 String value");
+check_equals(element3.nodeValue, null); 
+check_equals(typeof(element3.lastChild), 'object');
+check_equals(element3.lastChild.nodeValue, "textNode2 String value");
 
 // place the new nodes into the XML tree
 doc.appendChild(element1);
@@ -322,7 +375,7 @@ myxml.onLoad = function(success)
 	note("myxml.toString(): "+myxml.toString());
 	xcheck_equals(typeof(myxml.attributes), 'object');
 	check(myxml.hasChildNodes());
-	xcheck_equals(myxml.nodeName, null);
+	check_equals(myxml.nodeName, null);
 };
 myxml.load( MEDIA(gnash.xml) );
 

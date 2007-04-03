@@ -50,7 +50,7 @@ class fn_call;
 class URL;
 
 /// XML class and ActionScript object
-class DSOLOCAL XML : public as_object
+class DSOLOCAL XML : public XMLNode
 {
 public:
 
@@ -62,6 +62,7 @@ public:
     // Methods
     // This is the base method used by both parseXML() and load().
     bool parseDoc(xmlDocPtr document, bool mem);
+
     // Parses an XML document into the specified XML object tree.
     bool parseXML(tu_string xml_in);
 
@@ -69,85 +70,42 @@ public:
     // the XML object) from a URL.
     bool load(const URL& url);
 
-
     // An event handler that returns a
     bool onLoad();
+
     // Boolean value indicating whether
     // the XML object was successfully
     // loaded with XML.load() or
     // XML.sendAndLoad().
 
-    // Appends a node to the end of the specified object's child list.
-    void appendChild(XMLNode *node);
-    
     bool loaded()    { return _loaded; }
     
-    XMLNode *firstChild() {
-        return _nodes;
-        //return _node_data[0];
-    }
-    
-    void clear() {
-        delete _nodes;
-    }
+    void clear() {}
   
-    std::vector<XMLNode *> childNodes();
-  
-    const char *stringify(XMLNode *xml, std::stringstream *str);
-    //  Returns true if the specified node has child nodes; otherwise, returns false.
-    bool hasChildNodes() {
-	if (_nodes) {
-	    if (_nodes->_children.size()) {
-		return true;
-	    } 
-	}
-	return false;
-    }
-    
-    XMLNode *extractNode(xmlNodePtr node, bool mem);
     XMLNode *processNode(xmlTextReaderPtr reader, XMLNode *node);
 
     void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
 //    void  setupStackFrames(gnash::as_object *xml, gnash::as_environment *env);
+
     void  cleanupStackFrames( XMLNode *data);
-    as_object *setupFrame(gnash::as_object *xml, XMLNode *data, bool src);
-  
-    const char *nodeNameGet()    { return _nodename; }
-    const char *nodeName();
-    const char *nodeValue();
-    void nodeNameSet(const char *name);
-    void nodeValueSet(const char *value);
-    int length()                 { return _nodes->length(); }
-  
+
     // These 6 have to 
     void addRequestHeader(const char *name, const char *value);
-    XMLNode &cloneNode(XMLNode &newnode, bool deep);
+
     XMLNode *createElement(const char *name);
+
     XMLNode *createTextNode(const char *name);
-    void insertBefore(XMLNode *newnode, XMLNode *node);
 
     void load();
+
     void parseXML();
-    void removeNode();
+
     void send();
+
     void sendAndLoad();
-    const char *toString();
 
     int getBytesLoaded()         { return _bytes_loaded; };
     int getBytesTotal()          { return _bytes_total; };
-
-    XMLNode *operator [] (int x);
-#if 0
-    XMLNode *operator = (XMLNode &node) {
-        gnash::log_msg("%s: copy element %s\n", __PRETTY_FUNCTION__, node._name);
-	//        _nodes = node.;
-    }
-
-#endif
-    XML *operator = (XMLNode *node) {
-        _nodes = node;    
-        return this;
-    }
 
 private:
     xmlDocPtr _doc;
@@ -155,25 +113,12 @@ private:
     
     // Properties
     bool _loaded;
-    const char  *_nodename;
-    XMLNode     *_nodes;
 
-    int         _bytes_loaded;
-    int         _bytes_total;
+    size_t      _bytes_loaded;
+ 
+    size_t      _bytes_total;
     
-    bool        _contentType;	// TODO Should be String
-    bool        _attributes;
-    bool        _childNodes;
-    bool        _xmlDecl;	// TODO Should be String
-    bool        _docTypeDecl;	// TODO Should be String
-    bool        _ignoreWhite;
-    bool        _lastChild;
-    bool        _nextSibling;
-    bool        _nodeType;
-    bool        _nodeValue;
-    bool        _parentNode;
     bool        _status;	// TODO Should be Number
-    bool        _previousSibling;
 
     /// Trigger the onLoad event, if any
     void onLoadEvent(bool success);
@@ -181,6 +126,16 @@ private:
     /// Trigger the onClose event, if any
     void onCloseEvent();
   
+    /// Initialize an XMLNode from an xmlNodePtr
+    //
+    /// @param element
+    ///     The XMLNode to initialize.
+    ///
+    void extractNode(XMLNode& element, xmlNodePtr node, bool mem);
+
+    void setupFrame(gnash::as_object *xml, XMLNode *data, bool src);
+  
+
 };
 
 
