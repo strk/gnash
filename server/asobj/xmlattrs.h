@@ -47,28 +47,39 @@ namespace gnash {
 /// XML Attribute class
 class DSOLOCAL XMLAttr {
 public:
-    XMLAttr();
-    ~XMLAttr();
+
+    XMLAttr()
+    {}
+
+    XMLAttr(const std::string& name, const std::string& value)
+            :
+            _name(name),
+            _value(value)
+    {}
+
+    ~XMLAttr()
+    {}
   
-    // why don't we use std::strings here ?
-    // code would be much simpler and safer!
-    char                *_name;
-    char                *_value;
-    xmlAttributeType    _type;
-    
-    XMLAttr *operator = (XMLAttr node) {
-        log_msg("\t\tCopying XMLAttr object at %p\n", (void*)this);
-    
-        _name = new char[strlen(node._name)+2];
-        memset(_name, 0, strlen(node._name)+2);
-        strcpy(_name, node._name);
+#if 0
+    XMLAttr& operator = (const XMLAttr& node)
+    {
+        _name = node._name;
+        _value = node._value;
 
-        _value = new char[strlen(node._value)+2];
-        memset(_value, 0, strlen(node._value)+2);
-        strcpy(_value, node._value);
-
-        return this;
+        return *this;
     }
+#endif
+
+    const std::string& name() const { return _name; }
+
+    const std::string& value() const { return _value; }
+
+private:
+
+    std::string _name;
+    std::string _value;
+    xmlAttributeType _type;
+    
 };
 
 /// XML Attribute ActionScript Object

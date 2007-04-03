@@ -90,8 +90,7 @@ public:
     
     typedef std::vector< boost::intrusive_ptr<XMLNode> > ChildList;
 
-    // Change this !! We want a managed thing, maybe also shared ?
-    typedef std::vector< XMLAttr* > AttribList;
+    typedef std::vector< XMLAttr > AttribList;
 
     ChildList& childNodes() { return _children; }
 

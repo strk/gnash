@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.20 2007/04/03 12:34:43 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.21 2007/04/03 13:22:24 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -138,13 +138,10 @@ XMLNode::~XMLNode()
 	}
     }
 
-    for (i=0; i<_attributes.size(); i++) {
-	if (_attributes[i]->_name) {
-	    delete [] _attributes[i]->_name;
-	}
-	if (_attributes[i]->_value) {
-	    delete [] _attributes[i]->_value;
-	}
+    for (i=0; i<_attributes.size(); i++)
+    {
+            // shouldn't we delete attributes here ??
+            // TODO: plug this leak somehow !!
     }
 
     _children.clear();
@@ -348,13 +345,12 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
     xmlout << "<" << nodename;
     
     // Process the attributes, if any
-    vector<XMLAttr *>::const_iterator ita;
+    AttribList::const_iterator ita;
     for (ita = xml._attributes.begin(); ita != xml._attributes.end(); ita++)
     {
-	    const XMLAttr *xa = *ita;
-// 	    log_msg("\t\tAdding attribute as member %s, value is %s to node %s",
-// 		    nodename, xa->_name, xa->_value);
-        xmlout << " " << xa->_name << "=\"" << xa->_value << "\"";
+	    const XMLAttr& xa = *ita;
+        // TODO: replace with XMLAttr::operator<<
+        xmlout << " " << xa.name() << "=\"" << xa.value() << "\"";
     }
 
     xmlout << ">";		// closing symbol for this tag
@@ -661,8 +657,19 @@ xmlnode_attributes(const fn_call& fn)
 
     if ( fn.nargs == 0 )
 	{
-		log_error("FIXME: XMLNode.attributes not implemented yet");
-		return as_value(); 
+        XMLNode::AttribList& attrs = ptr->attributes();
+		boost::intrusive_ptr<as_object> ret = new as_object();
+		for (XMLNode::AttribList::const_iterator it=attrs.begin(),
+                        itEnd=attrs.end();
+                it != itEnd; ++it)
+		{
+                const XMLAttr& at = *it;
+                const std::string& name = at.name();
+                const std::string& val = at.value();
+                ret->init_member(name, val);
+		}
+		//log_error("FIXME: XMLNode.attributes not implemented yet");
+		return as_value(ret); 
     }
 	else
 	{

@@ -1,5 +1,16 @@
 2007-04-03 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlattrs.{cpp,h}: use std::string
+	  for name and value, access trough members, initialize
+	  trought contructor.
+	* server/asobj/xmlnode.{cpp,h}: keep XMLAttr by value,
+	  not by pointer; implement the 'attributes' getter.
+	* server/asobj/xml.cpp: update XMLAttr uses.
+	* testsuite/actionscript.all/XML.as: more tests, less failures.
+	* testsuite/media/gnash.xml: add a tag attribute.
+
+2007-04-03 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xml.{cpp,h}: have XML be a subclass
 	  of XMLNode. Many cleanups.
 	* server/asobj/xmlnode.{cpp,h}: many cleanups.

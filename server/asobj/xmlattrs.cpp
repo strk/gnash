@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlattrs.cpp,v 1.2 2007/01/09 15:14:20 rsavoye Exp $ */
+/* $Id: xmlattrs.cpp,v 1.3 2007/04/03 13:22:23 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,28 +49,6 @@ namespace gnash {
   
 //std::vector<as_object *> _xmlobjs;    // FIXME: hack alert
 
-XMLAttr::XMLAttr()
-{
-#ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg("\t\tCreating XMLAttr data at %p \n", this);
-#endif
-    _name = 0;
-    _value = 0;
-}
-
-XMLAttr::~XMLAttr()
-{
-#ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg("\t\tDeleting XMLAttr data %s at %p \n", this->_name, this);
-#endif
-    //log_msg("%s: %p \n", __FUNCTION__, this);
-    if (_name) {
-        delete _name;
-    }
-    if (_value) {
-        delete _value;
-    }  
-}  
 
 } // end of gnash namespace
 

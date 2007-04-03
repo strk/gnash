@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.27 2007/04/03 12:34:43 strk Exp $ */
+/* $Id: xml.cpp,v 1.28 2007/04/03 13:22:23 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -209,15 +209,21 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
     {
         //log_msg("extractNode %s has property %s, value is %s\n",
         //          node->name, attr->name, attr->children->content);
-        XMLAttr *attrib = new XMLAttr;
+        XMLAttr attrib(reinterpret_cast<const char*>(attr->name),
+			reinterpret_cast<const char*>(attr->children->content));
+
+#if 0
         len = memadjust(strlen(reinterpret_cast<const char *>(attr->name))+1);
         attrib->_name = (char *)new char[len];
         memset(attrib->_name, 0, len);
         strcpy(attrib->_name, reinterpret_cast<const char *>(attr->name));
+
         len = memadjust(strlen(reinterpret_cast<const char *>(attr->children->content))+1);
         attrib->_value = (char *)new char[len];
         memset(attrib->_value, 0, len);
         strcpy(attrib->_value, reinterpret_cast<const char *>(attr->children->content));
+#endif
+
         //log_msg("\tPushing attribute %s for element %s has value %s\n",
         //        attr->name, node->name, attr->children->content);
         element._attributes.push_back(attrib);

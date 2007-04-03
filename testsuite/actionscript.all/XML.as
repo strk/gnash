@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.19 2007/04/03 12:34:43 strk Exp $";
+rcsid="$Id: XML.as,v 1.20 2007/04/03 13:22:24 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -373,9 +373,16 @@ myxml.onLoad = function(success)
 	note("gnash.xml successfully loaded");
 	note("myxml status is "+myxml.status);
 	note("myxml.toString(): "+myxml.toString());
-	xcheck_equals(typeof(myxml.attributes), 'object');
+	check_equals(typeof(myxml.attributes), 'object');
+	xcheck(! myxml.attributes instanceof Object);
+	xcheck_equals(typeof(myxml.attributes.__proto__), 'undefined');
+
 	check(myxml.hasChildNodes());
 	check_equals(myxml.nodeName, null);
+
+    topnode = myxml.firstChild;
+	check_equals(topnode.nodeName, 'XML');
+	check_equals(topnode.attributes.attr1, 'attr1 value');
 };
 myxml.load( MEDIA(gnash.xml) );
 
