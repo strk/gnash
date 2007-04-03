@@ -1,5 +1,7 @@
 2007-04-03 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: limit the number of interval
+	  timers to 255.
 	* server/asobj/xmlsocket.{cpp,h}: more cleanups and fix for
 	  polling from the socket.
 	* libbase/network.{cpp,h}: do not allow assignment, cleanup

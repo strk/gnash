@@ -512,6 +512,10 @@ movie_root::add_interval_timer(const Timer& timer)
 	assert(testInvariant());
 			
 	int id = _intervalTimers.size()+1;
+	if ( _intervalTimers.size() >= 255 )
+	{
+		log_error("FIXME: %u timers currently active, won't add another one", _intervalTimers.size());
+	}
 
 	// TODO: find first NULL element in vector for reuse ?
 	_intervalTimers.push_back(timer);
