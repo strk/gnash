@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.50 2007/04/03 16:13:07 bjacques Exp $ */
+/* $Id: edit_text_character.cpp,v 1.51 2007/04/03 17:21:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1047,12 +1047,38 @@ edit_text_character::format_text()
 			continue;
 		}
 
+		if (code == 9) // tab (ASCII HT)
+		{
+			int index = _font->get_glyph_index(32); // ascii SPACE
+			if ( index == -1 )
+			{
+				log_warning("%s -- missing glyph for space char (needed for TAB)."
+					    " Make sure character shapes for font %s are being exported "
+					    "into your SWF file!",
+					    __PRETTY_FUNCTION__,
+					    _font->get_name());
+			}
+			else
+			{
+				text_glyph_record::glyph_entry	ge;
+				ge.m_glyph_index = index;
+				ge.m_glyph_advance = scale * _font->get_advance(index);
+
+				const int tabstop=8;
+				rec.m_glyphs.insert(rec.m_glyphs.end(), tabstop, ge);
+				x += ge.m_glyph_advance*tabstop;
+			}
+			goto after_x_advance;
+		}
+
 		// Remember where word breaks occur.
 		if (code == 32)
 		{
 			last_space_glyph = rec.m_glyphs.size();
 		}
 
+		{ // need a sub-scope to avoid the 'goto' in TAB handling to cross
+		  // initialization of the 'index' variable
 		int index = _font->get_glyph_index((uint16_t) code);
 		if (index == -1)
 		{
@@ -1082,8 +1108,10 @@ edit_text_character::format_text()
 		rec.m_glyphs.push_back(ge);
 
 		x += ge.m_glyph_advance;
-
+		}
 		
+after_x_advance:
+
 		if (x >= m_def->width() - m_def->get_right_margin() - WIDTH_FUDGE)
 		{
 			// Whoops, we just exceeded the box width. 
