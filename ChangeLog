@@ -1,5 +1,6 @@
 2007-04-03 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.h (add_init_action): fix typo.
 	* testsuite/actionscript.all/XML.as: a few more tests.
 	* testsuite/media/gnash.xml: new data file for testing.
 	* server/asobj/xml.{cpp,h}: allow reading XML from

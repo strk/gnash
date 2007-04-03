@@ -459,7 +459,7 @@ public:
 	void	add_init_action(execute_tag* e)
 	{
 	    assert(e);
-	    assert(_frames_loaded < m_playlist.size());
+	    assert(_frames_loaded < m_init_action_list.size());
 	    m_init_action_list[_frames_loaded].push_back(e);
 	}
 
