@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.17 2007/02/13 19:36:34 rsavoye Exp $";
+rcsid="$Id: XML.as,v 1.18 2007/04/03 08:04:46 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -257,10 +257,12 @@ check(textNode2.nodeValue == "textNode2 String value");
 
 // place the new nodes into the XML tree
 element2.appendChild(textNode1);
-check(element2.nodeValue == "textNode1 String value");
+xcheck_equals(element2.nodeValue, null);
+xcheck_equals(element2.lastChild.nodeValue, "textNode1 String value");
 
 element3.appendChild(textNode2);
-check(element3.nodeValue == "textNode2 String value");
+xcheck_equals(element3.nodeValue, null); 
+xcheck_equals(element3.lastChild.nodeValue, "textNode2 String value");
 
 // place the new nodes into the XML tree
 doc.appendChild(element1);
@@ -301,5 +303,28 @@ trace(doc.toString());
 // }
 // #endif
 
+
+//--------------------------------------------------------------------
+// Test loading an XML locally
+//--------------------------------------------------------------------
+
+myxml = new XML;
+myxml.onLoad = function(success)
+{
+	note("myxml.onLoad("+success+") called");
+	if ( ! success )
+	{
+		note("No success loading gnash.xml");
+		return;
+	}
+	note("gnash.xml successfully loaded");
+	note("myxml status is "+myxml.status);
+	note("myxml.toString(): "+myxml.toString());
+	xcheck_equals(typeof(myxml.attributes), 'object');
+	check(myxml.hasChildNodes());
+	xcheck_equals(myxml.nodeName, null);
+};
+myxml.load( MEDIA(gnash.xml) );
+
 // We're done
-totals();
+//totals();

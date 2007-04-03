@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.25 2007/04/03 07:30:17 strk Exp $ */
+/* $Id: xml.cpp,v 1.26 2007/04/03 08:04:46 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,6 +35,7 @@
 #include "URLAccessManager.h"
 #include "tu_file.h"
 #include "URL.h"
+#include "VM.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -47,6 +48,7 @@
 #include <sstream>
 #include <vector>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 #include <memory>
 
 using namespace std;
@@ -209,46 +211,57 @@ XML::nodeValueSet(const char * /* value */)
     printf("%s: XML _nodes at %p\n", __PRETTY_FUNCTION__, (void*)_nodes);
 }
 
-// Dispatch event handler(s), if any.
-bool
-XML::on_event(const event_id& /* id */)
-{
-    GNASH_REPORT_FUNCTION;
-    
-    // Keep m_as_environment alive during any method calls!
-    //  boost::intrusive_ptr<as_object_interface>	this_ptr(this);
-  
-#if 0
-    // First, check for built-in event handler.
-    as_value	method;
-    if (get_event_handler(event_id(id), &method)) {
-        call_method0(method, &m_as_environment, this);
-        return true;
-    }
-  
-    // Check for member function.
-    // In ActionScript 2.0, event method names are CASE SENSITIVE.
-    // In ActionScript 1.0, event method names are CASE INSENSITIVE.
-    const tu_string&	method_name = id.get_function_name();
-    if (method_name.length() > 0) {
-        as_value	method;
-        if (get_member(method_name, &method)) {
-            call_method0(method, &m_as_environment, this);
-            return true;
-        }
-    }
-#endif
-    return false;
-}
-
 void
-XML::on_event_load()
+XML::onLoadEvent(bool success)
 {
     // Do the events that (appear to) happen as the movie
     // loads.  frame1 tags and actions are executed (even
     // before advance() is called).  Then the onLoad event
     // is triggered.
-    on_event(event_id::LOAD);
+
+    // In ActionScript 2.0, event method names are CASE SENSITIVE.
+    // In ActionScript 1.0, event method names are CASE INSENSITIVE.
+    // TODO: move to get_function_name directly ?
+    std::string method_name = "onLoad";
+    if ( _vm.getSWFVersion() < 7 )
+        boost::to_lower(method_name, _vm.getLocale());
+
+    if ( method_name.empty() ) return;
+
+    as_value	method;
+    if ( ! get_member(method_name, &method) ) return;
+    if ( method.is_undefined() ) return;
+    if ( ! method.is_function() ) return;
+
+    as_environment env; // how to set target here ??
+    env.push(as_value(success));
+    call_method(method, &env, this, 1, env.stack_size()-1);
+}
+
+void
+XML::onCloseEvent()
+{
+    // Do the events that (appear to) happen as the movie
+    // loads.  frame1 tags and actions are executed (even
+    // before advance() is called).  Then the onLoad event
+    // is triggered.
+
+    // In ActionScript 2.0, event method names are CASE SENSITIVE.
+    // In ActionScript 1.0, event method names are CASE INSENSITIVE.
+    // TODO: move to get_function_name directly ?
+    std::string method_name = "onClose";
+    if ( _vm.getSWFVersion() < 7 )
+        boost::to_lower(method_name, _vm.getLocale());
+
+    if ( method_name.empty() ) return;
+
+    as_value	method;
+    if ( ! get_member(method_name, &method) ) return;
+    if ( method.is_undefined() ) return;
+    if ( ! method.is_function() ) return;
+
+    as_environment env; // how to set target here ??
+    call_method(method, &env, this, 0, 0);
 }
 
 XMLNode*
@@ -409,6 +422,7 @@ XML::load(const URL& url)
     if ( ! str.get() ) 
     {
         log_error("Can't load XML file: %s (security?)", url.str().c_str());
+        onLoadEvent(false);
         return false;
     }
 
@@ -421,6 +435,7 @@ XML::load(const URL& url)
 
     if (_doc == 0) {
         log_error("Can't read XML file (IO): %s!", url.str().c_str());
+        onLoadEvent(false);
         return false;
     }
 
@@ -430,6 +445,9 @@ XML::load(const URL& url)
     xmlCleanupParser();
     xmlFreeDoc(_doc);
     xmlMemoryDump();
+
+    onLoadEvent(true);
+
     return true;
 }
 
@@ -797,105 +815,9 @@ xml_load(const fn_call& fn)
         return rv;
     }
     
-    //env->bottom(first_arg) = ret;
-    //  struct node *first_node = ptr->firstChildGet();
-  
-    //const char *name = ptr->nodeNameGet();
-
-    if (xml_obj->hasChildNodes() == false) {
-        log_error("%s: No child nodes!\n", __FUNCTION__);
-    }  
-    xml_obj->setupFrame(xml_obj.get(), xml_obj->firstChild(), false);
-  
-    if (fn.this_ptr->get_member("onLoad", &method))
-    {
-        //    log_msg("FIXME: Found onLoad!\n");
-        fn.env().set_variable("success", true);
-        fn.arg(0) = true;
-	    if (as_function* as_func = method.to_as_function())
-        {
-	        // It's an ActionScript function.  Call it.
-	        log_msg("Calling ActionScript function for XML.onLoad");
-	        // XXX other than being assigned into, val appears to be unused.
-	        val = (*as_func)(fn_call(xml_obj, &fn.env(), fn.nargs, fn.offset())); // was this_ptr instead of node
-	    }
-        else
-        {
-	        log_error("error in call_method(): method is not a function\n");
-	    }
-    }
-    else
-    {
-        //log_msg("Couldn't find onLoad event handler, setting up callback");
-        // ptr->set_event_handler(event_id::XML_LOAD, (as_c_function_ptr)&xml_onload);
-    }
-
     rv = true;
     return rv;
 }
-
-// This executes the event handler for XML::XML_LOAD if it's been defined,
-// and the XML file has loaded sucessfully.
-as_value
-xml_onload(const fn_call& fn)
-{
-    //log_msg("%s:\n", __FUNCTION__);
-    
-    as_value	method;
-    as_value      val;
-    static bool first = true;     // This event handler should only be executed once.
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-  
-    if ((ptr->loaded()) && (first)) {
-        // env->set_variable("success", true, 0);
-        //as_value bo(true);
-        //env->push_val(bo);
-
-        first = false;
-        log_msg("The XML file has been loaded successfully!\n");
-        // ptr->on_event(event_id::XML_LOAD);
-        //env->set_variable("success", true, 0);
-        //env->bottom(0) = true;
-    
-        if (fn.this_ptr->get_member("onLoad", &method)) {
-            // log_msg("FIXME: Found onLoad!\n");
-	    val = call_method(method, &fn.env(), fn.this_ptr.get(), 0, 0);
-        } else {
-            log_msg("FIXME: Couldn't find onLoad!\n");
-        }
-    }
-      
-    return as_value(val.to_bool());
-}
-
-// This is the default event handler, and is usually redefined in the SWF script
-#if 0 // UNUSED, it seems
-as_value
-xml_ondata(const fn_call& fn)
-{
-    log_msg("%s:\n", __FUNCTION__);
-    
-    as_value	method;
-    as_value	val;
-    static bool first = true;     // FIXME: ugly hack!
-  
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-  
-    if ((ptr->loaded()) && (first)) {
-        if (fn.this_ptr->get_member("onData", &method)) {
-            log_msg("FIXME: Found onData!\n");
-	    // TODO: this is suspicious (set_variable for what??)
-            fn.env().set_variable("success", true);
-	    val = call_method(method, fn.env(), fn.this_ptr, 0, 0);
-        } else {
-            log_msg("FIXME: Couldn't find onData!\n");
-        }
-    }
-
-    //fn.result->set(&val);
-    return as_value(val.to_bool());
-}
-#endif // UNUSED
 
 void
 attachXMLInterface(as_object& o)
@@ -1175,21 +1097,7 @@ as_value xml_parsexml(const fn_call& fn)
 	}
     }
     
-#if 1
-    if (fn.this_ptr->get_member("onLoad", &method)) {
-        log_msg("FIXME: Found onLoad!\n");
-        fn.env().set_variable("success", true); // what is this for ?
-	fn.arg(0) = true; // what is this for ?
-	val = call_method(method, &fn.env(), fn.this_ptr.get(), 0, 0);
-    } else {
-        log_msg("Couldn't find onLoad event handler, setting up callback\n");
-        // ptr->set_event_handler(event_id::XML_LOAD, (as_c_function_ptr)&xml_onload);
-    }
-#else
-    
-#endif
     return as_value();
-//    return as_value(ptr->getAllocated());
 }
 
 /// \brief removes the specified XML object from its parent. Also

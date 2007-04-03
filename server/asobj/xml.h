@@ -80,8 +80,6 @@ public:
     // Appends a node to the end of the specified object's child list.
     void appendChild(XMLNode *node);
     
-    virtual bool on_event(const gnash::event_id& id);
-    virtual void	on_event_load();
     bool loaded()    { return _loaded; }
     
     XMLNode *firstChild() {
@@ -138,17 +136,6 @@ public:
     int getBytesLoaded()         { return _bytes_loaded; };
     int getBytesTotal()          { return _bytes_total; };
 
-    virtual void	on_xml_event(const gnash::event_id& id)
-    {
-    	on_event(id);
-    }
-  
-    // Special event handler; 
-    void	on_event_close()
-    {
-    	on_event(gnash::event_id::SOCK_CLOSE);
-    }
-  
     XMLNode *operator [] (int x);
 #if 0
     XMLNode *operator = (XMLNode &node) {
@@ -188,6 +175,12 @@ private:
     bool        _status;	// TODO Should be Number
     bool        _previousSibling;
 
+    /// Trigger the onLoad event, if any
+    void onLoadEvent(bool success);
+
+    /// Trigger the onClose event, if any
+    void onCloseEvent();
+  
 };
 
 
