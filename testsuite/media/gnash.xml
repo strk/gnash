@@ -1,0 +1,13 @@
+<XML>
+<elem1>
+	<elem1_1>
+	Elem 1.1 content
+	</elem1_1>
+	<elem1_2>
+	Elem 1.2 content
+	</elem1_2>
+</elem1>
+<elem2>
+Elem 2 content
+</elem2>
+</XML>
