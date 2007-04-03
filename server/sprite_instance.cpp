@@ -2405,9 +2405,12 @@ sprite_instance::find_previous_replace_or_add_tag(int frame,
 void
 sprite_instance::goto_frame(size_t target_frame_number)
 {
+#ifdef DEBUG_GOTOFRAME
 	log_msg("sprite %s ::goto_frame(" SIZET_FMT ") - current frame is "
 		SIZET_FMT,
 		getTargetPath().c_str(), target_frame_number, m_current_frame);
+#endif
+
 	assert(! isUnloaded() );
 
 	//	target_frame_number = iclamp(target_frame_number, 0, m_def->get_frame_count() - 1);
