@@ -1,5 +1,7 @@
 2007-04-03 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ming_utils.c: embed a glyph for 
+	  the TAB character in our font.
 	* server/vm/ASHandlers.cpp: extend tag is not in testing
 	  stage anymore, be more explicit about targetPath() arg
 	  not casting to an object.

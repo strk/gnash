@@ -27,12 +27,13 @@
 void add_xtrace_function_clip(SWFMovieClip mo, SWFBlock font, int depth, int x, int y, int width, int height);
 static SWFAction get_dejagnu_actions(void);
 
+static const char* asciichars = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{};:.>,</?'\"\\|`~\t";
+
 void
 add_xtrace_function_clip(SWFMovieClip mc, SWFBlock font, int depth, int x, int y, int width, int height)
 {
 	SWFTextField tf;
 	SWFDisplayItem it;
-	const char* asciichars = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{};:.>,</?'\"\\|`~";
 
 	tf = newSWFTextField();
 
@@ -87,7 +88,6 @@ add_xtrace_function(SWFMovie mo, SWFBlock font, int depth, int x, int y, int wid
 {
 	SWFTextField tf;
 	SWFDisplayItem it;
-	const char* asciichars = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+[]{};:.>,</?'\"\\|`~";
 
 	tf = newSWFTextField();
 
