@@ -355,8 +355,8 @@ private:
 
 		IF_VERBOSE_PARSE(
 		  log_parse("morph: "
-			  "startShape(paths:%u, edges:%u), "
-			  "endShape(paths:%u, edges:%u)",
+			  "startShape(paths:" SIZET_FMT ", edges:%u), "
+			  "endShape(paths:" SIZET_FMT ", edges:%u)",
 			  m_shape1->m_paths.size(), edges_count1,
 			  m_shape2->m_paths.size(), edges_count2);
 		);
@@ -368,8 +368,8 @@ private:
 		if ( m_shape1->m_paths.size() != m_shape2->m_paths.size() )
 		{
 			log_swferror("Different number of paths "
-				"in start (%u) and end (%u) shapes "
-				"of a morph",
+				"in start (" SIZET_FMT ") and end (" SIZET_FMT
+				") shapes of a morph",
 				m_shape1->m_paths.size(),
 				m_shape2->m_paths.size());
 		}

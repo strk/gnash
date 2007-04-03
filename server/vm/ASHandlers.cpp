@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.78 2007/03/30 07:23:19 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.79 2007/04/03 16:13:07 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1657,11 +1657,11 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		IF_VERBOSE_ACTION (
 		if ( type == pushDict8 || type == pushDict16 )
 		{
-			log_action("\t%d) type=%s (%d), value=%s", count, pushType[type], id, env.top(0).to_debug_string().c_str());
+			log_action("\t" SIZET_FMT ") type=%s (%d), value=%s", count, pushType[type], id, env.top(0).to_debug_string().c_str());
 		}
 		else
 		{
-			log_action("\t%d) type=%s, value=%s", count, pushType[type], env.top(0).to_debug_string().c_str());
+			log_action("\t" SIZET_FMT ") type=%s, value=%s", count, pushType[type], env.top(0).to_debug_string().c_str());
 		}
 		++count;
 		);
@@ -3191,8 +3191,8 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 		IF_VERBOSE_MALFORMED_SWF(
 			log_swferror("function2 code len (%u) "
 				"overflows DOACTION tag boundaries "
-				"(DOACTION tag len=%u, "
-				"function2 code offset=%u). "
+				"(DOACTION tag len=" SIZET_FMT
+				", function2 code offset=" SIZET_FMT "). "
 				"Forcing code len to eat the whole buffer "
 				"(would this work?).",
 				code_size, actionbuf_size, thread.next_pc);

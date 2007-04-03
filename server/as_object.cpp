@@ -389,7 +389,7 @@ as_object::prototypeOf(as_object& instance)
 void
 as_object::dump_members() 
 {
-	log_msg("%d Members of object %p follow",
+	log_msg(SIZET_FMT " members of object %p follow",
 		_members.size(), (const void*)this);
 	_members.dump(*this);
 }

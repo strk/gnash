@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.49 2007/03/28 20:38:35 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.50 2007/04/03 16:13:07 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -926,6 +926,12 @@ edit_text_character::format_text()
 
 			_font = newfont;
 		}
+		else
+		{
+			log_error("Current font has no glyphs and I couldn't"
+				  " find another font with glyphs... :(");
+		}
+
 	}
 
 

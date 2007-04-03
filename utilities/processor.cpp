@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: processor.cpp,v 1.53 2007/03/15 22:39:54 strk Exp $ */
+/* $Id: processor.cpp,v 1.54 2007/04/03 16:13:07 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -344,7 +344,7 @@ play_movie(const char* filename)
 	++nadvances;
 	if ( limit_advances && nadvances >= limit_advances)
 	{
-		printf("exiting after %d advances\n", nadvances);
+		printf("exiting after " SIZET_FMT " advances\n", nadvances);
 		break;
 	}
 
@@ -355,7 +355,8 @@ play_movie(const char* filename)
 	{
 		if ( allowed_end_hits && ++end_hitcount >= allowed_end_hits )
 		{
-			printf("exiting after %d times last frame was reached\n", end_hitcount);
+			printf("exiting after " SIZET_FMT 
+			       " times last frame was reached\n", end_hitcount);
 	    		break;
 		}
 	}

@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.28 2007/03/19 17:11:14 bjacques Exp $ */
+/* $Id: amf.cpp,v 1.29 2007/04/03 16:13:07 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -279,7 +279,7 @@ AMF::readElement(void *in)
 /// characters, but for now we just leave them as standard multibyte
 /// characters.
 void *
-AMF::encodeElement(astype_e type, void *in, int nbytes)
+AMF::encodeElement(astype_e type, const void *in, int nbytes)
 {
     GNASH_REPORT_FUNCTION;
 

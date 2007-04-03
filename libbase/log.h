@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.h,v 1.42 2007/02/21 20:22:59 strk Exp $ */
+/* $Id: log.h,v 1.43 2007/04/03 16:13:07 bjacques Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -33,14 +33,6 @@
 #define DEFAULT_LOGFILE "gnash-dbg.log"
 #define TIMESTAMP_LENGTH 24             // timestamp length
 #define TIMESTAMP_FORMAT "%Y-%m-%d %H:%M:%S     " // timestamp format
-
-#if SIZEOF_SIZE_T == SIZEOF_INT // try "int" first
-  #define SIZET_FMT "%d"
-#elif SIZEOF_SIZE_T == SIZEOF_LONG
-  #define SIZET_FMT "%ld"
-#elif SIZEOF_SIZE_T == SIZEOF_SHORT
-  #define SIZET_FMT "%hd"
-#endif
 
 namespace gnash {
 

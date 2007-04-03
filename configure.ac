@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.285 2007/04/02 17:22:29 strk Exp $
+dnl $Id: configure.ac,v 1.286 2007/04/03 16:13:07 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -53,6 +53,28 @@ AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
 AC_DISABLE_STATIC dnl Disable building static libs.
+
+
+save_CFLAGS="$CFLAGS";
+CFLAGS="$CFLAGS -Werror -Wformat";
+
+AC_TRY_COMPILE([#include <stdio.h>], [
+  size_t num = 0;
+  printf("%d", num); ],
+  AC_DEFINE(SIZET_FMT, ["%d"], [size_t printf modifier is d])
+)
+AC_TRY_COMPILE([#include <stdio.h>], [
+  size_t num = 0;
+  printf("%u", num); ],
+  AC_DEFINE(SIZET_FMT, ["%u"], [size_t printf modifier is u])
+)
+AC_TRY_COMPILE([#include <stdio.h>], [
+  size_t num = 0;
+  printf("%lu", num); ],
+  AC_DEFINE(SIZET_FMT, ["%lu"], [size_t printf modifier is lu])
+)
+
+CFLAGS="$save_CFLAGS";
 
 AC_ARG_ENABLE(debugger,
   AC_HELP_STRING([--disable-debugger],[Disable the Flash debugger]),

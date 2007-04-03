@@ -923,7 +923,7 @@ parse_tag:
 	if ( ! m_playlist[_frames_loaded].empty() || ! m_init_action_list[_frames_loaded].empty() )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("%d action blocks and %d init action blocks are NOT followed by"
+		log_swferror(SIZET_FMT " action blocks and " SIZET_FMT " init action blocks are NOT followed by"
 			" a SHOWFRAME tag",
 			m_playlist[_frames_loaded].size(),
 			m_init_action_list[_frames_loaded].size());
@@ -1062,8 +1062,8 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 		if ( loading_frame >= m_frame_count )
 		{
 			log_msg("At end of stream, still no '%s' symbol found "
-				"in m_exports (%u entries in it, follow)",
-				symbol.c_str(), m_exports.size());
+				"in m_exports (" SIZET_FMT " entries in it, "
+				"follow)", symbol.c_str(), m_exports.size());
 			return res;
 		}
 

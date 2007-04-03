@@ -179,13 +179,13 @@ public:
     void *swapBytes(void *word, int size);
 
     // encode an element
-    void *encodeElement(astype_e type, void *in, int nbytes);
+    void *encodeElement(astype_e type, const void *in, int nbytes);
     // encode a string
     void *encodeString(char *str)  {
         return encodeElement (STRING, str, strlen(str));
     };
     void *encodeString(std::string &str) {
-        return encodeElement (STRING, (void *)str.c_str(), str.size());
+        return encodeElement (STRING, static_cast<const void *>(str.c_str()), str.size());
     };
     // encode a 64 bit number
     void *encodeNumber(amfnum_t num)  {

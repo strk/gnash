@@ -686,7 +686,8 @@ void movie_root::cleanup_keypress_listeners()
 
 void movie_root::notify_keypress_listeners(key::code k)
 {
-	log_msg("Notifying %u keypress listeners", m_keypress_listeners.size());
+	log_msg("Notifying " SIZET_FMT " keypress listeners", 
+		m_keypress_listeners.size());
 	for (ListenerSet::iterator iter = m_keypress_listeners.begin();
 			 iter != m_keypress_listeners.end(); ++iter)
 	{

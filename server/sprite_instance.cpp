@@ -1693,8 +1693,8 @@ void sprite_instance::do_actions()
 	testInvariant();
 
 	IF_VERBOSE_ACTION(
-		log_action("Executing %u actions in frame %u/%u"
-			" of sprite %s",
+		log_action("Executing " SIZET_FMT " actions in frame %u/"
+			SIZET_FMT " of sprite %s",
 			m_action_list.size(),
 			m_current_frame+1,
 			m_def->get_frame_count(), getTargetPath().c_str());
@@ -2405,8 +2405,9 @@ sprite_instance::find_previous_replace_or_add_tag(int frame,
 void
 sprite_instance::goto_frame(size_t target_frame_number)
 {
-	log_msg("sprite %s ::goto_frame(%d) - current frame is %d",
-			getTargetPath().c_str(), target_frame_number, m_current_frame);
+	log_msg("sprite %s ::goto_frame(" SIZET_FMT ") - current frame is "
+		SIZET_FMT,
+		getTargetPath().c_str(), target_frame_number, m_current_frame);
 	assert(! isUnloaded() );
 
 	//	target_frame_number = iclamp(target_frame_number, 0, m_def->get_frame_count() - 1);
