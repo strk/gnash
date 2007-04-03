@@ -47,6 +47,7 @@ namespace gnash {
 
 // Forward declarations
 class fn_call;
+class URL;
 
 /// XML class and ActionScript object
 class DSOLOCAL XML : public as_object
@@ -63,9 +64,11 @@ public:
     bool parseDoc(xmlDocPtr document, bool mem);
     // Parses an XML document into the specified XML object tree.
     bool parseXML(tu_string xml_in);
+
     // Loads a document (specified by
-    bool load(const char *filespec);
     // the XML object) from a URL.
+    bool load(const URL& url);
+
 
     // An event handler that returns a
     bool onLoad();

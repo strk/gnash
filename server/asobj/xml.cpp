@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.24 2007/03/22 22:37:46 bjacques Exp $ */
+/* $Id: xml.cpp,v 1.25 2007/04/03 07:30:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,6 +31,10 @@
 #include "xml.h"
 #include "builtin_function.h"
 #include "debugger.h"
+#include "StreamProvider.h"
+#include "URLAccessManager.h"
+#include "tu_file.h"
+#include "URL.h"
 
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
@@ -43,6 +47,7 @@
 #include <sstream>
 #include <vector>
 #include <boost/lexical_cast.hpp>
+#include <memory>
 
 using namespace std;
 
@@ -51,6 +56,11 @@ namespace gnash {
 //#define DEBUG_MEMORY_ALLOCATION 1
 
 static as_object* getXMLInterface();
+
+// Callback function for xmlReadIO
+static int closeTuFile (void * context);
+// Callback function for xmlReadIO
+static int readFromTuFile (void * context, char * buffer, int len);
 
 DSOEXPORT as_value xml_new(const fn_call& fn);
 static as_value xml_load(const fn_call& fn);
@@ -389,27 +399,33 @@ XML::parseXML(tu_string xml_in)
 // This reads in an XML file from disk and parses into into a memory resident
 // tree which can be walked through later.
 bool
-XML::load(const char *filespec)
+XML::load(const URL& url)
 {
 //    GNASH_REPORT_FUNCTION;
-    struct stat stats;
-    log_msg("Load disk XML file: %s\n", filespec);
   
     //log_msg("%s: mem is %d\n", __FUNCTION__, mem);
 
-    // See if the file exists
-    if (stat(filespec, &stats) == 0) {
-        _bytes_total = stats.st_size;
-        _bytes_loaded = stats.st_size; // FIXME: this should probably
-                                       // be set later on after the
-                                       // file is loaded
-    }
-    xmlInitParser();
-    _doc = xmlParseFile(filespec);
-    if (_doc == 0) {
-        log_error("Can't load XML file: %s!\n", filespec);
+    std::auto_ptr<tu_file> str ( StreamProvider::getDefaultInstance().getStream(url) );
+    if ( ! str.get() ) 
+    {
+        log_error("Can't load XML file: %s (security?)", url.str().c_str());
         return false;
     }
+
+    log_msg("Load XML file from url: %s", url.str().c_str());
+
+    xmlInitParser();
+
+    _doc = xmlReadIO(readFromTuFile, closeTuFile, str.get(), url.str().c_str(), NULL, 0);
+    _bytes_total = str->get_size();
+
+    if (_doc == 0) {
+        log_error("Can't read XML file (IO): %s!", url.str().c_str());
+        return false;
+    }
+
+    _bytes_loaded = _bytes_total;
+
     parseDoc(_doc, false);
     xmlCleanupParser();
     xmlFreeDoc(_doc);
@@ -763,7 +779,6 @@ xml_load(const fn_call& fn)
     as_value	val;
     as_value	rv = false;
     bool          ret;
-    struct stat   stats;
 
     //GNASH_REPORT_FUNCTION;
   
@@ -771,16 +786,11 @@ xml_load(const fn_call& fn)
   
     std::string filespec = fn.arg(0).to_string(); 
 
-    // If the file doesn't exist, don't try to do anything.
-    if (stat(filespec.c_str(), &stats) < 0) {
-        fprintf(stderr, "ERROR: doesn't exist.%s\n", filespec.c_str());
-	rv = false;
-        return rv;
-    }
-  
+    URL url(filespec, get_base_url());
+
     // Set the argument to the function event handler based on whether the load
     // was successful or failed.
-    ret = xml_obj->load(filespec.c_str());
+    ret = xml_obj->load(url);
     rv = ret;
 
     if (ret == false) {
@@ -797,35 +807,28 @@ xml_load(const fn_call& fn)
     }  
     xml_obj->setupFrame(xml_obj.get(), xml_obj->firstChild(), false);
   
-#if 1
-    if (fn.this_ptr->get_member("onLoad", &method)) {
+    if (fn.this_ptr->get_member("onLoad", &method))
+    {
         //    log_msg("FIXME: Found onLoad!\n");
         fn.env().set_variable("success", true);
         fn.arg(0) = true;
-#if 0
-        as_c_function_ptr	func = method.to_c_function();
-        if (func) {
-	    // It's a C function.  Call it.
-	    log_msg("Calling C function for onLoad\n");
-	    (*func)(fn_call(&val, xml_obj, fn.env(), fn.nargs, fn.first_arg_bottom_index)); // was this_ptr instead of node
-	} else
-#endif
-	if (as_function* as_func = method.to_as_function()) {
-	    // It's an ActionScript function.  Call it.
-	    log_msg("Calling ActionScript function for onLoad\n");
-	    // XXX other than being assigned into, val appears to be unused.
-	    val = (*as_func)(fn_call(xml_obj, &fn.env(), fn.nargs, fn.offset())); // was this_ptr instead of node
-	} else {
-	    log_error("error in call_method(): method is not a function\n");
-	}
-    } else {
-        log_msg("Couldn't find onLoad event handler, setting up callback\n");
+	    if (as_function* as_func = method.to_as_function())
+        {
+	        // It's an ActionScript function.  Call it.
+	        log_msg("Calling ActionScript function for XML.onLoad");
+	        // XXX other than being assigned into, val appears to be unused.
+	        val = (*as_func)(fn_call(xml_obj, &fn.env(), fn.nargs, fn.offset())); // was this_ptr instead of node
+	    }
+        else
+        {
+	        log_error("error in call_method(): method is not a function\n");
+	    }
+    }
+    else
+    {
+        //log_msg("Couldn't find onLoad event handler, setting up callback");
         // ptr->set_event_handler(event_id::XML_LOAD, (as_c_function_ptr)&xml_onload);
     }
-#else
-    xml_obj->set_event_handler(event_id::XML_LOAD, &xml_onload);
-
-#endif
 
     rv = true;
     return rv;
@@ -1335,6 +1338,26 @@ void xml_class_init(as_object& global)
     // Register _global.String
     global.init_member("XML", cl.get());
 
+}
+
+// Callback function for xmlReadIO
+static int
+readFromTuFile (void * context, char * buffer, int len)
+{
+        tu_file* str = static_cast<tu_file*>(context);
+        size_t read = str->read_bytes(buffer, len);
+        if ( str->get_error() ) return -1;
+        else return read;
+}
+
+// Callback function for xmlReadIO
+static int
+closeTuFile (void * /*context*/)
+{
+        // nothing to do, the tu_file destructor will close
+        //tu_file* str = static_cast<tu_file*>(context);
+        //str->close();
+        return 0; // no error
 }
 
 } // end of gnash namespace

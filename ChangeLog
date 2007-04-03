@@ -1,3 +1,8 @@
+2007-04-03 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/xml.{cpp,h}: allow reading XML from
+	  a network stream (untested).
+
 2007-04-03 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/as_value.h: Include <limits> for NAN.
