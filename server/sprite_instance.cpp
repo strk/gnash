@@ -2238,6 +2238,38 @@ sprite_instance::execute_action(action_buffer& ab)
 	//env.set_local_frame_top(local_stack_top);
 }
 
+void
+sprite_instance::resetDisplayList()
+{
+	// Resort frame0 DisplayList as depth of
+	// characters in it might have been
+	// externally changed.
+	_frame0_chars.sort();
+
+	// Add script objects in current DisplayList
+	std::vector<character*> charsToAdd; 
+	std::vector<character*> charsToKeep; 
+	ScriptObjectsFinder scriptObjFinder(charsToAdd, charsToKeep);
+	m_display_list.visitForward(scriptObjFinder);
+
+	// Remove characters which have been removed
+	_frame0_chars.clear_except(charsToKeep);
+
+	// NOTE: script objects are *not* allowed to replace depths
+	//       of static objects (change second argument to switch)
+	_frame0_chars.addAll(charsToAdd, false);
+	
+	if ( ! (m_display_list == _frame0_chars) )
+	{
+
+		// Set this character as invalidated *before*
+		// actually updating the displaylist !
+		set_invalidated();
+
+		m_display_list = _frame0_chars;			
+	};
+}
+
 // 0-based frame number !
 void
 sprite_instance::execute_frame_tags(size_t frame, int typeflags)
@@ -2250,32 +2282,8 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 
 	if ( frame == 0 && has_looped() )
 	{
-		// Resort frame0 DisplayList as depth of
-		// characters in it might have been
-		// externally changed.
-		_frame0_chars.sort();
+		resetDisplayList();
 
-		// Add script objects in current DisplayList
-		std::vector<character*> charsToAdd; 
-		std::vector<character*> charsToKeep; 
-		ScriptObjectsFinder scriptObjFinder(charsToAdd, charsToKeep);
-		m_display_list.visitForward(scriptObjFinder);
-
-		// Remove characters which have been removed
-		_frame0_chars.clear_except(charsToKeep);
-
-		// NOTE: script objects are *not* allowed to replace depths
-		//       of static objects (change second argument to switch)
-		_frame0_chars.addAll(charsToAdd, false);
-		
-		if ( ! (m_display_list == _frame0_chars) ) {
-	
-			// Set this character as invalidated *before*
-			// actually updating the displaylist !
-			set_invalidated();
-	
-			m_display_list = _frame0_chars;			
-		};
 	}
 
 	// Execute this frame's init actions, if necessary.

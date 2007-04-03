@@ -1,5 +1,11 @@
 2007-04-03 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: split the
+	  DisplayList reset code from execute_frame_tags()
+	  to a resetDisplayList() method.
+
+2007-04-03 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xmlattrs.{cpp,h}: use std::string
 	  for name and value, access trough members, initialize
 	  trought contructor.

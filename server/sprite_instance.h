@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.86 2007/04/02 15:45:22 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.87 2007/04/03 13:43:32 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -699,6 +699,12 @@ public:
 	void setVariables(VariableMap& vars);
 
 private:
+
+	/// Reset the DisplayList for proper loop-back or goto_frame
+	//
+	/// The DisplayList is cleared by all but dynamic characters
+	///
+	void resetDisplayList();
 
 	/// Queue actions in the action list
 	//
