@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.32 2007/04/04 10:32:42 strk Exp $ */
+/* $Id: xml.cpp,v 1.33 2007/04/04 14:22:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -58,6 +58,8 @@ namespace gnash {
 //#define DEBUG_MEMORY_ALLOCATION 1
 
 static as_object* getXMLInterface();
+static void attachXMLInterface(as_object& o);
+static void attachXMLProperties(as_object& o);
 
 // Callback functions for xmlReadIO
 static int closeTuFile (void * context);
@@ -74,9 +76,6 @@ static as_value xml_parsexml(const fn_call& fn);
 static as_value xml_send(const fn_call& fn);
 static as_value xml_sendandload(const fn_call& fn);
 
-// These are the event handlers called for this object
-static as_value xml_loaded(const fn_call& fn);
-
 static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 #ifdef USE_DEBUGGER
 static Debugger& debugger = Debugger::getDefaultInstance();
@@ -85,15 +84,17 @@ static Debugger& debugger = Debugger::getDefaultInstance();
 XML::XML() 
     :
     XMLNode(getXMLInterface()),
-    _loaded(false), 
+    _loaded(-1), 
     _bytes_loaded(0),
-    _bytes_total(0)
+    _bytes_total(0),
+    _status(sOK)
 {
     //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_msg("Creating XML data at %p \n", this);
 #endif
     //log_msg("%s: %p \n", __FUNCTION__, this);
+    attachXMLProperties(*this);
 }
 
 
@@ -101,9 +102,10 @@ XML::XML()
 XML::XML(const std::string& xml_in)
     :
     XMLNode(getXMLInterface()),
-    _loaded(false), 
+    _loaded(-1), 
     _bytes_loaded(0),
-    _bytes_total(0)
+    _bytes_total(0),
+    _status(sOK)
 {
     //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -115,9 +117,10 @@ XML::XML(const std::string& xml_in)
 XML::XML(struct node * /* childNode */)
     :
     XMLNode(getXMLInterface()),
-    _loaded(false), 
+    _loaded(-1), 
     _bytes_loaded(0),
-    _bytes_total(0)
+    _bytes_total(0),
+    _status(sOK)
 {
     GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -126,6 +129,39 @@ XML::XML(struct node * /* childNode */)
     //log_msg("%s: %p \n", __FUNCTION__, this);
 }
 
+bool
+XML::get_member(const std::string& name, as_value *val)
+{
+        if ( name == "status" ) 
+        {
+                val->set_int(_status);
+                return true;
+        }
+        else if ( name == "loaded" )
+        {
+                if ( _loaded < 0 ) val->set_undefined();
+                else val->set_bool(_loaded);
+                return true;
+        }
+
+        return get_member_default(name, val);
+}
+
+void
+XML::set_member(const std::string& name, const as_value& val)
+{
+        if ( name == "status" ) return;
+        else if ( name == "loaded" )
+        {
+                bool b = val.to_bool();
+		log_msg("set_member 'loaded' (%s) became boolean %d", val.to_debug_string().c_str(), b);
+                if ( b ) _loaded = 1;
+                else _loaded = 0;
+                return;
+        }
+
+        set_member_default(name, val);
+}
 
 XML::~XML()
 {
@@ -356,13 +392,18 @@ XML::load(const URL& url)
 
     log_msg("Load XML file from url: %s", url.str().c_str());
 
-    xmlInitParser();
+    initParser();
 
-    _doc = xmlReadIO(readFromTuFile, closeTuFile, str.get(), url.str().c_str(), NULL, 0);
+    /// see: http://xmlsoft.org/html/libxml-parser.html#xmlParserOption
+    int options = XML_PARSE_RECOVER | XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
+    _doc = xmlReadIO(readFromTuFile, closeTuFile, str.get(), url.str().c_str(), NULL, options);
     _bytes_total = str->get_size();
 
-    if (_doc == 0) {
-        log_error("Can't read XML file (IO): %s!", url.str().c_str());
+    if (_doc == 0)
+    {
+        xmlErrorPtr err = xmlGetLastError();
+        log_error("Can't read XML file %s (%s)!", url.str().c_str(), err->message);
+        _loaded = 0;
         onLoadEvent(false);
         return false;
     }
@@ -373,7 +414,7 @@ XML::load(const URL& url)
     xmlCleanupParser();
     xmlFreeDoc(_doc);
     xmlMemoryDump();
-    _loaded = true;
+    _loaded = 1;
 
     onLoadEvent(true);
 
@@ -470,12 +511,17 @@ xml_load(const fn_call& fn)
     return rv;
 }
 
-void
+static void
+attachXMLProperties(as_object& /*o*/)
+{
+    // if we use a proper member here hasOwnProperty() would return true
+    // but we want it to return false instead. See XML.as
+    //o.init_member("status", as_value(XML::sOK));
+}
+
+static void
 attachXMLInterface(as_object& o)
 {
-    // FIXME: this doesn't appear to exist in the MM player, should it ?
-    o.init_member("loaded", new builtin_function(xml_loaded));
-	
     o.init_member("addRequestHeader", new builtin_function(xml_addrequestheader));
     o.init_member("createElement", new builtin_function(xml_createelement));
     o.init_member("createTextNode", new builtin_function(xml_createtextnode));
@@ -547,25 +593,6 @@ xml_new(const fn_call& fn)
 // SWF Property of this class. These are "accessors" into the private data
 // of the class.
 //
-
-// determines whether the document-loading process initiated by the XML.load()
-// call has completed. If the process completes successfully, the method
-// returns true; otherwise, it returns false.
-as_value
-xml_loaded(const fn_call& fn)
-{
-    GNASH_REPORT_FUNCTION;
-    as_value	method;
-    as_value	val;
-
-    log_msg("%s:\n", __FUNCTION__);
-    
-    boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-    std::string filespec = fn.arg(0).to_string();
-    //fn.result->set(ptr->loaded());
-    return as_value(ptr->loaded());
-}
-
 
 as_value xml_addrequestheader(const fn_call& fn)
 {
@@ -715,11 +742,9 @@ void xml_class_init(as_object& global)
     // This is going to be the global XML "class"/"function"
     static boost::intrusive_ptr<builtin_function> cl;
 
-    if ( cl == NULL ) {
-	cl=new builtin_function(&xml_new, getXMLInterface());
-	// replicate all interface to class, to be able to access
-	// all methods as static functions
-	attachXMLInterface(*cl);
+    if ( cl == NULL )
+    {
+        cl=new builtin_function(&xml_new, getXMLInterface());
     }
     
     // Register _global.String
@@ -746,6 +771,38 @@ closeTuFile (void * /*context*/)
         //str->close();
         return 0; // no error
 }
+
+#if 0 // not time for this (yet)
+static
+void _xmlErrorHandler(void* ctx, const char* fmt, ...)
+{
+    va_list ap;
+    static const unsigned long BUFFER_SIZE = 128;
+    char tmp[BUFFER_SIZE];
+
+    va_start (ap, fmt);
+    vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
+    tmp[BUFFER_SIZE-1] = '\0';
+
+    log_warning("XML parser: %s", tmp);
+    
+    va_end (ap);    
+}
+#endif // disabled
+
+void
+XML::initParser()
+{
+    static bool initialized = false;
+    if ( ! initialized )
+    {
+        xmlInitParser();
+        //xmlGenericErrorFunc func = _xmlErrorHandler;
+        //initGenericErrorDefaultFunc(&func);
+        initialized = true;
+    }
+}
+
 
 } // end of gnash namespace
 

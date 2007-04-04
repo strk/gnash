@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.21 2007/04/04 09:02:10 strk Exp $";
+rcsid="$Id: XML.as,v 1.22 2007/04/04 14:22:11 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -38,6 +38,8 @@ check(! XML.prototype.hasOwnProperty("removeNode") );
 check(! XML.prototype.hasOwnProperty("cloneNode") );
 check(! XML.prototype.hasOwnProperty("toString") );
 check(! XML.prototype.hasOwnProperty("length") );
+check(! XML.prototype.hasOwnProperty("status"));
+check(! XML.prototype.hasOwnProperty("loaded"));
 check(XML.prototype.hasOwnProperty("createElement") );
 check(XML.prototype.hasOwnProperty("addRequestHeader") );
 check(XML.prototype.hasOwnProperty("createTextNode") );
@@ -47,6 +49,16 @@ check(XML.prototype.hasOwnProperty("load") );
 check(XML.prototype.hasOwnProperty("parseXML") );
 check(XML.prototype.hasOwnProperty("send") );
 check(XML.prototype.hasOwnProperty("sendAndLoad") );
+
+check(!XML.hasOwnProperty("createElement") );
+check(!XML.hasOwnProperty("addRequestHeader") );
+check(!XML.hasOwnProperty("createTextNode") );
+check(!XML.hasOwnProperty("getBytesLoaded") );
+check(!XML.hasOwnProperty("getBytesTotal") );
+check(!XML.hasOwnProperty("load") );
+check(!XML.hasOwnProperty("parseXML") );
+check(!XML.hasOwnProperty("send") );
+check(!XML.hasOwnProperty("sendAndLoad") );
 
 check(XMLNode.prototype.hasOwnProperty("appendChild") );
 check(XMLNode.prototype.hasOwnProperty("cloneNode") );
@@ -65,10 +77,36 @@ check(! XMLNode.prototype.hasOwnProperty("load") );
 check(! XMLNode.prototype.hasOwnProperty("parseXML") );
 check(! XMLNode.prototype.hasOwnProperty("send") );
 check(! XMLNode.prototype.hasOwnProperty("sendAndLoad") );
+check(! XMLNode.prototype.hasOwnProperty("status"));
+check(! XMLNode.prototype.hasOwnProperty("loaded"));
+
+check(! XMLNode.hasOwnProperty("appendChild") );
+check(! XMLNode.hasOwnProperty("cloneNode") );
+check(! XMLNode.hasOwnProperty("hasChildNodes") );
+check(! XMLNode.hasOwnProperty("insertBefore") );
+check(! XMLNode.hasOwnProperty("removeNode") );
+check(! XMLNode.hasOwnProperty("toString") );
+check(! XMLNode.hasOwnProperty("cloneNode") );
 #endif
 
 var tmp = new XML();
+check_equals(typeof(tmp.length), 'undefined');
 check(! tmp.hasOwnProperty("length"));
+
+check_equals(typeof(tmp.status), 'number');
+check(! tmp.hasOwnProperty("status"));
+
+check_equals(typeof(tmp.loaded), 'undefined');
+check(! tmp.hasOwnProperty("loaded"));
+
+tmp.loaded = 5;
+check_equals(typeof(tmp.loaded), 'boolean');
+check(tmp.loaded);
+tmp.loaded = 0;
+check_equals(typeof(tmp.loaded), 'boolean');
+check(!tmp.loaded);
+check(! tmp.hasOwnProperty("loaded"));
+
 
 // test the XML constuctor
 if (tmp) {
@@ -198,19 +236,36 @@ var xml_in = "<TOPNODE><SUBNODE1><SUBSUBNODE1>sub sub1 node data 1</SUBSUBNODE1>
 check(XML);
 
 check(XML);
-tmp.onLoad = function (success) {
-    if (success) {
-        with (tmp.firstChild) {
-            trace("FIXME: firstChild found: " + nodeName);
+tmp.checkParsed = function ()
+{
+	note("tmp.checkParsed called");
+	check(this.hasChildNodes());
+	check(this.childNodes instanceof Array);
+	check_equals(this.firstChild, this.lastChild);
+	check_equals(typeof(this.childNodes.length), 'number');
+	check_equals(this.childNodes.length, 1);
+	check_equals(this.childNodes[0], this.firstChild);
+	check_equals(this.childNodes[0], this.lastChild);
+#if OUTPUT_VERSION > 5
+	check(this.childNodes.hasOwnProperty('length'));
+	check(this.childNodes[0] === this.firstChild);
+	check(this.childNodes[0] === this.lastChild);
+#endif
+
+    // childNodes is a read-only property !
+    this.childNodes = 5;
+	check(this.childNodes instanceof Array);
+
+        with (this.firstChild) {
+            //trace("FIXME: firstChild found: " + nodeName);
             if (nodeName == 'TOPNODE') {
-                trace("FIXME: topnode found: "+ childNodes.length);
+                //trace("FIXME: topnode found: "+ childNodes.length);
                 childa = 0;
                 while (childa < childNodes.length) {
-                    trace("FIXME: children found");
+                    //trace("FIXME: children found");
                     check(childNodes[childa] != undefined);
                     with (childNodes[childa]) {
                         if (nodeName == 'SUBNODE1') {
-                            trace("FIXME: subnode1 found");
                             childb = 0;
                             while (childb < childNodes.length) {
                                 with (childNodes[childb]) {
@@ -235,15 +290,19 @@ note("Set _global.child1 to "+_global.child1);
                 }
             }
         }
-    }
 };
-check(XML);
 
 check_equals( typeof(tmp.parseXML), 'function');
+check(tmp.childNodes instanceOf Array);
+check_equals(tmp.childNodes.length, 0);
+
 // parseXML doesn't return anything
-tmp.parseXML(xml_in);
-check_equals(typeof(tmp.firstChild), 'object');
-note("Parsed XML: "+tmp.toString());
+ret = tmp.parseXML(xml_in);
+check_equals(typeof(ret), 'undefined');
+
+tmp.checkParsed(); // onLoad won't be called
+//note("Parsed XML: "+tmp.toString());
+check_equals(tmp.toString(), xml_in);
 check(XML.prototype instanceof XMLNode);
 check(tmp instanceof XML);
 check(tmp instanceof XMLNode);
@@ -365,14 +424,44 @@ myxml = new XML;
 myxml.onLoad = function(success)
 {
 	note("myxml.onLoad("+success+") called");
+
+	check_equals(typeof(myxml.status), 'number');
+	check_equals(typeof(myxml.loaded), 'boolean');
+#if OUTPUT_VERSION >= 6
+	check(! myxml.hasOwnProperty('status'));
+	check(! myxml.hasOwnProperty('loaded'));
+#endif // OUTPUT_VERSION >= 6
+
 	if ( ! success )
 	{
 		note("No success loading gnash.xml");
+		check_equals(myxml.status, 0);
+		check(! myxml.loaded);
 		return;
 	}
 	note("gnash.xml successfully loaded");
 	note("myxml status is "+myxml.status);
-	note("myxml.toString(): "+myxml.toString());
+
+	check_equals(myxml.status, 0);
+	check(myxml.loaded);
+
+	// Check 'loaded' and 'status' to be "overridable"
+
+	var loaded_backup = myxml.loaded;
+	myxml.loaded = 'a string';
+	check_equals(typeof(myxml.loaded), 'boolean');
+	myxml.loaded = ! loaded_backup;
+	check(myxml.loaded != loaded_backup);
+	myxml.loaded = loaded_backup;
+
+	var status_backup = myxml.status;
+	myxml.status = 'a string';
+	check_equals(typeof(myxml.status), 'number');
+	xcheck(myxml.status != status_backup);
+	myxml.status = status_backup;
+
+
+	//note("myxml.toString(): "+myxml.toString());
 	check_equals(typeof(myxml.attributes), 'object');
 	xcheck(! myxml.attributes instanceof Object);
 	xcheck_equals(typeof(myxml.attributes.__proto__), 'undefined');
@@ -380,11 +469,31 @@ myxml.onLoad = function(success)
 	check(myxml.hasChildNodes());
 	check_equals(myxml.nodeName, null);
 
-    topnode = myxml.firstChild;
+	topnode = myxml.firstChild;
 	check_equals(topnode.nodeName, 'XML');
 	check_equals(topnode.attributes.attr1, 'attr1 value');
 };
-myxml.load( MEDIA(gnash.xml) );
+check_equals(typeof(myxml.status), 'number');
+#if OUTPUT_VERSION < 7
+xcheck_equals(typeof(myxml.STATUS), 'number');
+#endif // OUTPUT_VERSION < 7
+check_equals(typeof(myxml.__proto__.status), 'undefined');
+check_equals(typeof(myxml.loaded), 'undefined');
+#if OUTPUT_VERSION >= 6
+check(!myxml.hasOwnProperty('status'));
+check(!myxml.hasOwnProperty('loaded'));
+#endif // OUTPUT_VERSION >= 6
+ret = myxml.load( MEDIA(gnash.xml) );
+
+check_equals(typeof(myxml.loaded), 'boolean');
+#if OUTPUT_VERSION < 7
+xcheck_equals(typeof(myxml.LOADED), 'boolean');
+#endif // OUTPUT_VERSION < 7
+xcheck(! myxml.loaded ); // is really loaded in a background thread
+
+xcheck_equals(myxml.loaded, false ); // is really loaded in a background thread
+note("myxml.loaded = "+myxml.loaded);
+note("myxml.load() returned "+ret);
 
 // We're done
 //totals();

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XMLNode.as,v 1.10 2007/04/03 12:34:43 strk Exp $";
+rcsid="$Id: XMLNode.as,v 1.11 2007/04/04 14:22:11 strk Exp $";
 
 #include "dejagnu.as"
 
@@ -79,7 +79,7 @@ check_equals(node1.hasChildNodes(), true);
 
 check_equals(node1.firstChild.nodeValue, "first text node");
 check_equals(typeof(node1.lastChild.nodeValue), 'null');
-xcheck_equals(node2.lastChild.toString(), "second text node"); 
+check_equals(node2.lastChild.toString(), "second text node"); 
 
 var node3 = doc.createElement("node3");
 var textnode3 = doc.createTextNode("third text node");

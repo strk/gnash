@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.24 2007/04/04 10:32:42 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.25 2007/04/04 14:22:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -458,8 +458,8 @@ getXMLNodeInterface()
 {
     static boost::intrusive_ptr<as_object> o;
     if ( o == NULL ) {
-	o = new as_object();
-	attachXMLNodeInterface(*o);
+        o = new as_object();
+        attachXMLNodeInterface(*o);
     }
     return o.get();
 }
@@ -823,11 +823,9 @@ void xmlnode_class_init(as_object& global)
     // This is going to be the global XMLNode "class"/"function"
     static boost::intrusive_ptr<builtin_function> cl;
 
-    if ( cl == NULL ) {
-	cl=new builtin_function(&xmlnode_new, getXMLNodeInterface());
-	// replicate all interface to class, to be able to access
-	// all methods as static functions
-	attachXMLNodeInterface(*cl);	     
+    if ( cl == NULL )
+    {
+        cl=new builtin_function(&xmlnode_new, getXMLNodeInterface());
     }
 
     // Register _global.String

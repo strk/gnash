@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -54,11 +54,58 @@ class DSOLOCAL XML : public XMLNode
 {
 public:
 
+    typedef enum {
+
+            /// Parsing was successful
+            sOK = 0,
+
+            /// Unterminated CDATA section
+            sECDATA = -2,
+
+            /// Unterminated XML declaration
+            sEXMLDECL = -3,
+
+            /// Unterminated DOCTYPE declaration
+            sEDOCTYPEDECL = -4,
+
+            /// Unterminated comment
+            sECOMM = -5,
+
+            /// Malformed XML element structure
+            sESTRUCT = -6,
+
+            /// Out of memory
+            sEMEM = -7,
+
+            /// Unterminated attribute value
+            sEATTR = -8,
+
+            /// Missing close tag (orphaned open tag)
+            sEOPENTAG = -9,
+
+            /// Missing start tag (orphaned close tag)
+            sECLOSETAG = -10
+
+    } Status;
+
+
     XML();
     XML(const std::string& xml_in);
     XML(struct node * childNode);
     virtual ~XML();
   
+    /// This is overridden to provide the 'status' and 'loaded' members,
+    /// which are NOT proper properties !
+    /// See actionscript.all/XML.as
+    ///
+    bool get_member(const std::string& name, as_value *val);
+
+    /// This is overridden to provide the 'status' and 'loaded' members,
+    /// which are NOT proper properties !
+    /// See actionscript.all/XML.as
+    ///
+	void set_member(const std::string& name, const as_value& val );
+
     // Methods
     // This is the base method used by both parseXML() and load().
     bool parseDoc(xmlDocPtr document, bool mem);
@@ -111,14 +158,16 @@ private:
     xmlDocPtr _doc;
     xmlNodePtr _firstChild;
     
-    // Properties
-    bool _loaded;
+    // -1 if never asked to load anything
+    //  0 if asked to load but not yet loaded (or failure)
+    //  1 if successfully loaded
+    int _loaded;
 
     size_t      _bytes_loaded;
  
     size_t      _bytes_total;
     
-    bool        _status;	// TODO Should be Number
+    Status      _status;	
 
     /// Trigger the onLoad event, if any
     void onLoadEvent(bool success);
@@ -135,7 +184,12 @@ private:
 
     void setupFrame(gnash::as_object *xml, XMLNode *data, bool src);
   
+private:
 
+    /// Initialize the libxml2 parser
+    void initParser();
+
+    //static void _xmlErrorHandler(void *ctx, const char* fmt, ...);
 };
 
 

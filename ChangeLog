@@ -1,5 +1,14 @@
 2007-04-04 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlnode.cpp: don't attacy XMLNode interface
+	  to XMLNode instances.
+	* server/asobj/xml.{h,cpp}: override get_member and set_member
+	  to handled non-proper properties 'loaded' and 'status'
+	* testsuite/actionscript.all/XMLNode.as: less failures
+	* testsuite/actionscript.all/XML.as: more tests !
+
+2007-04-04 Sandro Santilli <strk@keybit.net>
+
 	* server/array.{cpp,h}: const-corrected push and unshift
 	  methods.
 	* server/asobj/xmlnode.cpp: implement childNodes getter/setter.
