@@ -176,13 +176,13 @@ as_array_object::index_requested(const std::string& name)
 }
 
 void
-as_array_object::push(as_value& val)
+as_array_object::push(const as_value& val)
 {
 	elements.push_back(val);
 }
 
 void
-as_array_object::unshift(as_value& val)
+as_array_object::unshift(const as_value& val)
 {
 	elements.push_front(val);
 }

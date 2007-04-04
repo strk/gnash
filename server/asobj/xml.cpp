@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.31 2007/04/04 09:02:10 strk Exp $ */
+/* $Id: xml.cpp,v 1.32 2007/04/04 10:32:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -395,83 +395,6 @@ XML::cleanupStackFrames(XMLNode * /* xml */)
     GNASH_REPORT_FUNCTION;
 }
 
-#if 0
-void
-XML::setupFrame(as_object *obj, XMLNode *xml, bool mem)
-{
-//    GNASH_REPORT_FUNCTION;
-    
-    int		 child;
-    unsigned int i;
-    const char    *nodename;
-    //const char    *nodevalue;
-    //AS_value      nodevalue;
-    int           length;
-    XMLNode       *childnode;
-    XMLNode *xmlchildnode_obj;
-    xmlattr_as_object* attr_obj;
-
-    //log_msg("\t%s: processing node %s for object %p, mem is %d\n", __FUNCTION__, xml->_name, obj, mem);
-  
-    // Get the data for this node
-    nodename   = xml->_name;
-    length     = xml->length();
-
-    // Set these members in the top level object passed in. This are used
-    // primarily by the disk based XML parser, where at least in all my current
-    // test cases this is referenced with firstChild first, then nodeName and
-    // childNodes.
-    //obj->set_member("nodeName", nodename); // use the getter/setter !
-    obj->set_member("length", length); // FIXME: use a getter/setter !
-
-    // Process the attributes, if any
-    if (xml->_attributes.size() == 0)
-    {
-        //log_msg("\t\tNo attributes for node %s, created empty object at %p\n", nodename, attr_obj);
-    }
-    else
-    {
-        attr_obj = new xmlattr_as_object;
-        for (i=0; i<xml->_attributes.size(); i++) {
-            attr_obj->set_member(xml->_attributes[i]->_name, xml->_attributes[i]->_value);
-        }
-        obj->set_member("attributes", attr_obj);
-    }
-
-    //xml->_attributes.resize(0);
-    //obj->set_member("attributes", attr_obj);
-
-    // Process the children, if there are any
-    if (length)
-    {
-        //log_msg("\tProcessing %d children nodes for %s\n", length, nodename);
-        int inum;
-        inum = 0;
-        for (child=0; child<length; child++) {
-            // Create a new AS object for this node's children
-            xmlchildnode_obj = new XMLNode;
-            // When parsing XML from memory, the test movies I have expect the firstChild
-            // to be the first element of the array instead.
-            if (mem) {
-                childnode = xml;
-            } else {
-                childnode = xml->_children[child];
-            }
-            setupFrame(xmlchildnode_obj, childnode, false); // setup child node
-
-            obj->set_member(boost::lexical_cast<std::string>(inum), xmlchildnode_obj);
-            ++inum;
-        }
-    }
-    else
-    {
-        //log_msg("\tNode %s has no children\n", nodename);
-    }  
-
-}
-#endif
-
-
 /// \brief add or change the HTTP Request header
 ///
 /// Method; adds or changes HTTP request headers (such as Content-Type
@@ -742,18 +665,14 @@ as_value xml_getbytestotal(const fn_call& fn)
 as_value xml_parsexml(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    const char *text;
     as_value	method;
     as_value	val;    
     boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
 
     if (fn.nargs > 0)
     {
-        text = fn.arg(0).to_string(); 
-	    if (ptr->parseXML(text))
-        {
-	        //ptr->setupFrame(ptr.get(), ptr->firstChild().get(), false);
-	    }
+        std::string text = fn.arg(0).to_std_string(&(fn.env()));
+        ptr->parseXML(text);
     }
     
     return as_value();

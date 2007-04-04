@@ -14,37 +14,36 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.23 2007/04/04 09:02:10 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.24 2007/04/04 10:32:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <vector>
 #include "log.h"
 #include "tu_config.h"
 #include "fn_call.h"
 #include "builtin_function.h"
-
-//#define DEBUG_MEMORY_ALLOCATION 1
-
+#include "array.h" // for childNodes
 #include "xmlnode.h"
-
-#ifdef DEBUG_MEMORY_ALLOCATION
 #include "log.h"
-#endif
 
-#include <unistd.h>
 #include <string>
 #include <sstream>
+#include <vector>
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
 #include <libxml/xmlreader.h>
 
+
 using namespace std;
+
+//#define DEBUG_MEMORY_ALLOCATION 1
 
 namespace gnash {
 
@@ -63,6 +62,7 @@ static as_value xmlnode_firstchild(const fn_call& fn);
 static as_value xmlnode_lastchild(const fn_call& fn);
 static as_value xmlnode_nextsibling(const fn_call& fn);
 static as_value xmlnode_previoussibling(const fn_call& fn);
+static as_value xmlnode_childNodes(const fn_call& fn);
 as_object* getXMLNodeInterface();
 
 static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
@@ -414,7 +414,8 @@ attachXMLNodeInterface(as_object& o)
     o.init_property("attributes", *gettersetter, *gettersetter);
 
     // These two return an array of objects
-    o.init_member("childNodes", as_value(""));
+    gettersetter = new builtin_function(xmlnode_childNodes, NULL);
+    o.init_property("childNodes", *gettersetter, *gettersetter);
 
     /// \fn MLNode::firstChild
     /// \brief XMLNode::firstChild property
@@ -784,6 +785,35 @@ xmlnode_previoussibling(const fn_call& fn)
 	rv = node;
     }
     return rv;
+}
+
+// Both a getter and a (do-nothing) setter for childNodes
+static as_value
+xmlnode_childNodes(const fn_call& fn)
+{
+//    GNASH_REPORT_FUNCTION;
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
+    boost::intrusive_ptr<as_array_object> ary = new as_array_object();
+
+    if ( fn.nargs )  // setter
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+	    log_aserror("Tried to set read-only property XMLNode.childNodes");
+	    );
+        return as_value();
+    }
+
+    typedef XMLNode::ChildList ChildList;
+
+    ChildList& child = ptr->childNodes();
+    for ( ChildList::const_iterator it=child.begin(), itEnd=child.end();
+                    it != itEnd; ++it )
+    {
+            boost::intrusive_ptr<XMLNode> node = *it;
+            ary->push(as_value(node.get()));
+    }
+
+    return as_value(ary.get());
 }
 
 // extern (used by Global.cpp)

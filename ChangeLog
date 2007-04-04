@@ -1,5 +1,12 @@
 2007-04-04 Sandro Santilli <strk@keybit.net>
 
+	* server/array.{cpp,h}: const-corrected push and unshift
+	  methods.
+	* server/asobj/xmlnode.cpp: implement childNodes getter/setter.
+	* server/asobj/xml.cpp: cleanups.
+
+2007-04-04 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/Makefile.am: enable
 	  reverse_execute_PlaceObject2_test1runner in 'check' rule.
 	* server/array.cpp: use a getter/setter for the 'length' property.

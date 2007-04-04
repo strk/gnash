@@ -68,9 +68,9 @@ public:
 
 	as_array_object(const as_array_object& other);
 
-	void push(as_value& val);
+	void push(const as_value& val);
 
-	void unshift(as_value& val);
+	void unshift(const as_value& val);
 
 	as_value shift();
 
