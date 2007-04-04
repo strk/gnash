@@ -71,10 +71,13 @@ static as_value xmlsocket_new(const fn_call& fn);
 static as_value xmlsocket_close(const fn_call& fn);
 
 // These are the event handlers called for this object
-static as_value xmlsocket_event_ondata(const fn_call& fn);
+static as_value xmlsocket_inputChecker(const fn_call& fn);
+
+static as_value xmlsocket_onData(const fn_call& fn);
 
 static as_object* getXMLSocketInterface();
 static void attachXMLSocketInterface(as_object& o);
+static void attachXMLSocketProperties(as_object& o);
 
 const int SOCKET_DATA = 1;
   
@@ -88,7 +91,9 @@ public:
         xmlsocket_as_object()
                 :
                 as_object(getXMLSocketInterface())
-        {}
+        {
+            attachXMLSocketProperties(*this);
+        }
 
 		/// This function should be called everytime we're willing
 		/// to check if any data is available on the socket.
@@ -457,7 +462,7 @@ xmlsocket_connect(const fn_call& fn)
         log_warning("Setting up timer for calling XMLSocket.onData()");
 
         Timer timer;
-        boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(&xmlsocket_event_ondata, NULL);
+        boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(&xmlsocket_inputChecker, NULL);
         unsigned interval = 50; // just make sure it's expired at every frame iteration (20 FPS used here)
         timer.setInterval(*ondata_handler, interval, boost::dynamic_pointer_cast<as_object>(ptr), &fn.env());
         VM::get().getRoot().add_interval_timer(timer);
@@ -513,26 +518,70 @@ xmlsocket_new(const fn_call& fn)
 
 
 as_value
-xmlsocket_event_ondata(const fn_call& fn)
+xmlsocket_inputChecker(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
 
-    //log_msg("doing nothing as this function is completely broken");
-    //return as_value();
-    
     as_value	method;
     as_value	val;
     
     boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
     if ( ! ptr->obj.connected() )
     {
-	    log_warning("XMLSocket not connected at xmlsocket_event_ondata call");
-	    return as_value();
+        log_warning("XMLSocket not connected at xmlsocket_inputChecker call");
+        return as_value();
     }
 
-	ptr->checkForIncomingData(fn.env());
+    ptr->checkForIncomingData(fn.env());
 
     return as_value();
+}
+
+as_value
+xmlsocket_onData(const fn_call& fn)
+{
+    GNASH_REPORT_FUNCTION;
+
+    as_value	method;
+    as_value	val;
+    
+    boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
+
+    boost::intrusive_ptr<as_function> onXMLEvent = ptr->getEventHandler("onXML");
+    if ( ! onXMLEvent )
+    {
+            log_msg("Builtin XMLSocket.onData doing nothing as no "
+                            "onXML event is defined on XMLSocket %p",
+                            (void*)ptr.get());
+            return as_value();
+    }
+
+    if ( fn.nargs < 1 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror("Builtin XMLSocket.onData() needs an argument");
+        );
+        return as_value();
+    }
+
+    as_environment& env = fn.env();
+    std::string xmlin = fn.arg(0).to_std_string(&env);
+
+    if ( xmlin.empty() )
+    {
+            log_error("Builtin XMLSocket.onData() called with an argument "
+                            "that resolves to the empty string: %s",
+                            fn.arg(0).to_debug_string().c_str());
+            return as_value();
+    }
+
+    boost::intrusive_ptr<as_object> xml = new XML(xmlin);
+
+    env.push(xml);
+    call_method(as_value(onXMLEvent.get()), &env, ptr.get(), 1, env.stack_size()-1);
+    return as_value();
+
+
 }
 
 static as_object*
@@ -553,6 +602,12 @@ attachXMLSocketInterface(as_object& o)
     o.init_member("connect", new builtin_function(xmlsocket_connect));
     o.init_member("send", new builtin_function(xmlsocket_send));
     o.init_member("close", new builtin_function(xmlsocket_close));
+}
+
+static void
+attachXMLSocketProperties(as_object& o)
+{
+    o.init_member("onData", new builtin_function(xmlsocket_onData));
 }
 
 // extern (used by Global.cpp)

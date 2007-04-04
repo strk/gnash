@@ -55,7 +55,7 @@ class DSOLOCAL XML : public XMLNode
 public:
 
     XML();
-    XML(tu_string xml_in);
+    XML(const std::string& xml_in);
     XML(struct node * childNode);
     virtual ~XML();
   
@@ -64,7 +64,7 @@ public:
     bool parseDoc(xmlDocPtr document, bool mem);
 
     // Parses an XML document into the specified XML object tree.
-    bool parseXML(tu_string xml_in);
+    bool parseXML(const std::string& xml_in);
 
     // Loads a document (specified by
     // the XML object) from a URL.

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.28 2007/04/03 13:22:23 strk Exp $ */
+/* $Id: xml.cpp,v 1.29 2007/04/04 07:53:28 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -98,7 +98,7 @@ XML::XML()
 
 
 // Parse the ASCII XML string into memory
-XML::XML(tu_string xml_in)
+XML::XML(const std::string& xml_in)
     :
     XMLNode(getXMLInterface()),
     _loaded(false), 
@@ -299,14 +299,14 @@ XML::parseDoc(xmlDocPtr document, bool mem)
 // This reads in an XML file from disk and parses into into a memory resident
 // tree which can be walked through later.
 bool
-XML::parseXML(tu_string xml_in)
+XML::parseXML(const std::string& xml_in)
 {
     GNASH_REPORT_FUNCTION;
 
-    log_msg("Parse XML from memory: %s\n", xml_in.c_str());
+    log_msg("Parse XML from memory: %s", xml_in.c_str());
 
-    if (xml_in.size() == 0) {
-        log_error("XML data is empty!\n");
+    if (xml_in.empty()) {
+        log_error("XML data is empty!");
         return false;
     }
 

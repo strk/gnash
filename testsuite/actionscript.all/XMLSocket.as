@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XMLSocket.as,v 1.3 2007/04/03 17:39:42 strk Exp $";
+rcsid="$Id: XMLSocket.as,v 1.4 2007/04/04 07:53:28 strk Exp $";
 
 #include "check.as"
 
@@ -45,9 +45,9 @@ check(XMLSocket.prototype.hasOwnProperty('send'));
 socketObj = new XMLSocket;
 
 // The default onData handler calls onXML after parsing the code
-xcheck_equals(typeof(socketObj.onData), 'function');
+check_equals(typeof(socketObj.onData), 'function');
 #if OUTPUT_VERSION >= 6
-xcheck(socketObj.hasOwnProperty('onData'));
+check(socketObj.hasOwnProperty('onData'));
 #endif
 
 check_equals(typeof(socketObj), 'object');
@@ -70,11 +70,12 @@ socketObj.onConnect = function(success) {
 	}
 };
 
-#if 1 // the default onData calls onXML
+#if 0 // the default onData calls onXML
 socketObj.onData = function(src) {
 	check_equals(this.secret, 4);
 	check_equals(typeof(src), 'string');
 	note("XMLSocket.onData("+src+") called with "+arguments.length+" args");
+    this.onXML(new XML(src));
 };
 #endif
 
@@ -83,6 +84,7 @@ socketObj.onXML = function(x) {
 	check_equals(arguments.length, 1);
 	check(x instanceof XML);
 	note("XMLSocket.onXML() called with a "+typeof(arguments[0])+" as arg");
+    note("Parsed XML: "+x.toString());
 };
 
 socketObj.onClose = function() {

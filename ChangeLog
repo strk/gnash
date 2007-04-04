@@ -1,5 +1,9 @@
 2007-04-04 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xml.{cpp,h}: tu_string => std::string
+	* server/asobj/xmlsocket.cpp: provide a builtin onData
+	  event handler to XMLSocket instances.
+	* testsuite/actionscript.all/XMLSocket.as: more successes.
 	* server/URLAccessManager.{cpp,h}: add allowHost interface.
 	* server/asobj/xmlsocket.cpp (connect): check host security.
 
