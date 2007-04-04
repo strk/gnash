@@ -839,6 +839,7 @@ TEST_CASES = \
 	action_execution_order_test3runner \
 	action_execution_order_test4runner \
 	action_execution_order_test5runner \
+	reverse_execute_PlaceObject2_test1runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS

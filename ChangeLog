@@ -1,3 +1,10 @@
+2007-04-04 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am: enable
+	  reverse_execute_PlaceObject2_test1runner in 'check' rule.
+	* server/array.cpp: use a getter/setter for the 'length' property.
+	* testsuite/actionscript.all/array.as: another success.
+
 2007-04-04 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/reverse_execute_PlaceObject2_test1.c
