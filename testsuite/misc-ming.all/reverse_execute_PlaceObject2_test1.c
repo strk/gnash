@@ -34,7 +34,7 @@
 #include "ming_utils.h"
 
 #define OUTPUT_VERSION 6
-#define OUTPUT_FILENAME "reverse_execute_PLACEOBJECT2_test1.swf"
+#define OUTPUT_FILENAME "reverse_execute_PlaceObject2_test1.swf"
 
 
 int
