@@ -661,12 +661,12 @@ xmlsocket_as_object::checkForIncomingData(as_environment& env)
     if (obj.anydata(msgs))
     {
         log_msg("Got %u messages: ", msgs.size());
-		for (size_t i=0; i<msgs.size(); ++i)
-		{
-        	log_msg(" Message %u: %s ", i, msgs[i].c_str());
-		}
+        for (size_t i=0; i<msgs.size(); ++i)
+        {
+            log_msg(" Message %u: %s ", i, msgs[i].c_str());
+        }
 
-		boost::intrusive_ptr<as_function> onDataHandler = getEventHandler("onData");
+        boost::intrusive_ptr<as_function> onDataHandler = getEventHandler("onData");
         if ( onDataHandler )
         {
             //log_msg("Got %d messages from XMLsocket", msgs.size());
