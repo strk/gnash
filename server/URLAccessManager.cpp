@@ -268,6 +268,21 @@ host_check(const std::string& host)
 }
 
 bool
+allowHost(const std::string& host, short port)
+{
+	return allowHost(host);
+}
+
+bool
+allowHost(const std::string& host)
+{
+	if (host.size() == 0) {
+		return true;
+	}
+	return host_check(host);
+}
+
+bool
 allow(const URL& url)
 {
 	// We might reintroduce use of an AccessPolicy cache

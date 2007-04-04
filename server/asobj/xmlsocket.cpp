@@ -27,6 +27,7 @@
 #include "sprite_instance.h"
 #include "VM.h"
 #include "builtin_function.h" // for setting timer, should likely avoid that..
+#include "URLAccessManager.h"
 
 #include "log.h"
 
@@ -126,6 +127,13 @@ bool
 XMLSocket::connect(const char *host, short port)
 {
     GNASH_REPORT_FUNCTION;
+
+    if ( ! URLAccessManager::allowHost(host, port) )
+    {
+	    return false;
+    }
+	    
+
     bool success = createClient(host, port);
 
     assert( success || ! connected() );

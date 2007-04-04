@@ -1,4 +1,9 @@
-2007-04-02 Zou Lunkai <zoulunkai@gmail.com>
+2007-04-04 Sandro Santilli <strk@keybit.net>
+
+	* server/URLAccessManager.{cpp,h}: add allowHost interface.
+	* server/asobj/xmlsocket.cpp (connect): check host security.
+
+2007-04-03 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/sprite_instance.cpp
 	first attempt to deprecate reverse execution of frame tags

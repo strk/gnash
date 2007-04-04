@@ -20,6 +20,8 @@
 #ifndef _GNASH_URLACCESSMANAGER_H
 #define _GNASH_URLACCESSMANAGER_H
 
+#include <string>
+
 // Forward declarations
 namespace gnash {
 	class URL;
@@ -36,6 +38,10 @@ namespace URLAccessManager {
 /// Will use rc file for whitelist/blacklist.
 ///
 bool allow(const URL& url);
+
+bool allowHost(const std::string& str);
+
+bool allowHost(const std::string& str, short port);
 
 } // AccessManager
 
