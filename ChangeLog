@@ -1,3 +1,8 @@
+2007-04-04 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/reverse_execute_PlaceObject2_test1.c
+	ensure that total() is called at the last step.
+	
 2007-04-04 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/array.as: more tests added.
@@ -23,7 +28,7 @@
 	* server/URLAccessManager.{cpp,h}: add allowHost interface.
 	* server/asobj/xmlsocket.cpp (connect): check host security.
 
-2007-04-03 Zou Lunkai <zoulunkai@gmail.com>
+2007-04-04 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/sprite_instance.cpp
 	first attempt to deprecate reverse execution of frame tags

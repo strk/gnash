@@ -34,7 +34,7 @@
 #include "ming_utils.h"
 
 #define OUTPUT_VERSION 6
-#define OUTPUT_FILENAME "reverse_execute_PlaceObject2_test1.swf"
+#define OUTPUT_FILENAME "reverse_execute_PLACEOBJECT2_test1.swf"
 
 
 int
@@ -72,7 +72,7 @@ main(int argc, char** argv)
   SWFDisplayItem_setDepth(it, 10); 
   SWFDisplayItem_setName(it, "mc"); 
   SWFMovie_nextFrame(mo); /* 1st frame */
-
+ 
   SWFDisplayItem_move(it, 300.0, 300.0);
   check_equals(mo, "_root.mc._x", "300");
   SWFMovie_nextFrame(mo); /* 2nd frame */
@@ -85,10 +85,13 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); /* 4th frame */
 
   SWFDisplayItem_remove(it);
-  add_actions(mo, " gotoAndPlay(3); ");
-  add_actions(mo, " _root.totals(); stop(); ");
+  add_actions(mo, " if(stopflag != 1)  gotoAndPlay(3);  stopflag = 1; ");
   SWFMovie_nextFrame(mo); /* 5th frame */
 
+	//checks 
+	add_actions(mo, " _root.totals(); stop(); ");
+	SWFMovie_nextFrame(mo); /* 6th frame */
+	
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);
