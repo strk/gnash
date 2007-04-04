@@ -5,15 +5,51 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.15 2007/03/28 14:58:30 strk Exp $";
+rcsid="$Id: array.as,v 1.16 2007/04/04 09:22:30 strk Exp $";
 
 #include "check.as"
+
+check_equals(typeof(Array), 'function');
+check_equals(typeof(Array.prototype), 'object');
+check_equals(typeof(Array.prototype.concat), 'function');
+check_equals(typeof(Array.prototype.join), 'function');
+check_equals(typeof(Array.prototype.pop), 'function');
+
+check_equals(typeof(Array.prototype.push), 'function');
+check_equals(typeof(Array.prototype.reverse), 'function');
+check_equals(typeof(Array.prototype.shift), 'function');
+check_equals(typeof(Array.prototype.slice), 'function');
+check_equals(typeof(Array.prototype.sort), 'function');
+check_equals(typeof(Array.prototype.sortOn), 'function');
+check_equals(typeof(Array.prototype.splice), 'function');
+check_equals(typeof(Array.prototype.unshift), 'function');
+check_equals(typeof(Array.prototype.toString), 'function');
+check_equals(typeof(Array.prototype.length), 'undefined');
+#if OUTPUT_VERSION >= 6
+check(Array.prototype.hasOwnProperty('concat'));
+check(Array.prototype.hasOwnProperty('join'));
+check(Array.prototype.hasOwnProperty('pop'));
+check(Array.prototype.hasOwnProperty('push'));
+check(Array.prototype.hasOwnProperty('reverse'));
+check(Array.prototype.hasOwnProperty('shift'));
+check(Array.prototype.hasOwnProperty('slice'));
+check(Array.prototype.hasOwnProperty('sort'));
+check(Array.prototype.hasOwnProperty('sortOn'));
+check(Array.prototype.hasOwnProperty('splice'));
+check(Array.prototype.hasOwnProperty('unshift'));
+check(Array.prototype.hasOwnProperty('toString'));
+check(!Array.prototype.hasOwnProperty('length'));
+#endif // OUTPUT_VERSION >= 6
 
 var a;
 var popped;
 a=[551,"asdf",12];
 
 check (a instanceOf Array);
+check_equals(a.length, 3);
+#if OUTPUT_VERSION >= 6
+xcheck(a.hasOwnProperty('length'));
+#endif
 
 b=[];
 b.push(551,"asdf",12);
@@ -254,6 +290,9 @@ check_equals(c.length, 2);
 check_equals(c[8], undefined);
 
 // $Log: array.as,v $
+// Revision 1.16  2007/04/04 09:22:30  strk
+// * testsuite/actionscript.all/array.as: more tests added.
+//
 // Revision 1.15  2007/03/28 14:58:30  strk
 //         * server/array.{cpp,h}: implement Array.splice(),
 //           improve toString to actually call the user-provided

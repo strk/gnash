@@ -1,5 +1,6 @@
 2007-04-04 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/array.as: more tests added.
 	* server/asobj/xml.cpp: remove debugging lines, return undefined
 	  from getBytesLoaded,getBytesTotal if the XML was not loaded.
 	* server/asobj/xmlnode.cpp: remove debugging lines.
