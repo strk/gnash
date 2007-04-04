@@ -187,7 +187,7 @@ void XMLSocket::processing(bool x)
 bool
 XMLSocket::anydata(int fd, MessageList& msgs)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
     fd_set                fdset;
     struct timeval        tval;
@@ -227,14 +227,13 @@ XMLSocket::anydata(int fd, MessageList& msgs)
             return false;
         }
         if (ret == 0) {
-            log_msg("%s: There is no data in the socket for fd #%d!",
-                __FUNCTION__, fd);
+            //log_msg("%s: There is no data in the socket for fd #%d!",
+            //   __FUNCTION__, fd);
             return false;
         }
         if (ret > 0) {
-            log_msg("%s: There is data in the socket for fd #%d!",
-                __FUNCTION__, fd);
-            //break;
+            //log_msg("%s: There is data in the socket for fd #%d!",
+            //    __FUNCTION__, fd);
         }
         memset(buf, 0, INBUF);
         ret = ::read(_sockfd, buf, INBUF-2);
@@ -520,7 +519,7 @@ xmlsocket_new(const fn_call& fn)
 as_value
 xmlsocket_inputChecker(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
     as_value	method;
     as_value	val;
