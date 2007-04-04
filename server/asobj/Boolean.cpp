@@ -83,16 +83,13 @@ public:
 
 as_value boolean_tostring(const fn_call& fn)
 {
-	static char* strtrue = "true";
-	static char* strfalse = "false";
-
 	boost::intrusive_ptr<boolean_as_object> boolobj = ensureType<boolean_as_object>(fn.this_ptr);
 
 	
 	if (boolobj->val) 
-		return as_value(strtrue);
+		return as_value("true");
 	else
-		return as_value(strfalse);
+		return as_value("false");
 }
 
 

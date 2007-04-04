@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ActionExec.cpp,v 1.24 2007/03/30 07:34:15 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.25 2007/04/04 20:30:45 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -261,7 +261,7 @@ ActionExec::cleanupAfterRun()
     } else if ( _initial_stack_size < env.stack_size() ) {
 	// We can argue this would be an "size-optimized" SWF instead...
 	IF_VERBOSE_MALFORMED_SWF(
-	    log_warning("%u elements left on the stack after block execution. "
+	    log_warning(SIZET_FMT " elements left on the stack after block execution. "
 		    "Cleaning up.", env.stack_size()-_initial_stack_size);
 	    );
 	env.drop(env.stack_size()-_initial_stack_size);

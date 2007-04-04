@@ -254,7 +254,7 @@ XMLSocket::anydata(int fd, MessageList& msgs)
                 *eom = 0;
             }
             msgs.push_back( packet );
-            printf("%d: Pushing Packet of size %d at %p\n", __LINE__, strlen(packet), packet);
+            printf("%d: Pushing Packet of size " SIZET_FMT " at %p\n", __LINE__, strlen(packet), packet);
             processing(false);
             return true;
         }

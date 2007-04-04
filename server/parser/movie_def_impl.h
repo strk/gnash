@@ -450,8 +450,9 @@ public:
 	void	add_execute_tag(execute_tag* e)
 	{
 	    assert(e);
-	    if (_frames_loaded < m_playlist.size());
-	    m_playlist[_frames_loaded].push_back(e);
+	    if (_frames_loaded < m_playlist.size()) {
+	      m_playlist[_frames_loaded].push_back(e);
+	    }
 	}
 
 	/// Need to execute the given tag before entering the

@@ -477,7 +477,7 @@ Gui::loops()
 }
 
 void
-Gui::setInvalidatedRegion(const rect& bounds)
+Gui::setInvalidatedRegion(const rect& /*bounds*/)
 {
 }
 

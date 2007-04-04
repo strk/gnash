@@ -1693,8 +1693,8 @@ void sprite_instance::do_actions()
 	testInvariant();
 
 	IF_VERBOSE_ACTION(
-		log_action("Executing " SIZET_FMT " actions in frame %u/"
-			SIZET_FMT " of sprite %s",
+		log_action("Executing " SIZET_FMT " actions in frame " SIZET_FMT
+			"/" SIZET_FMT " of sprite %s",
 			m_action_list.size(),
 			m_current_frame+1,
 			m_def->get_frame_count(), getTargetPath().c_str());

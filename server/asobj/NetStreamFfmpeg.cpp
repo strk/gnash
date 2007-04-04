@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.28 2007/04/02 16:46:32 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.29 2007/04/04 20:30:45 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -425,7 +425,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	ns->m_video_index = -1;
 	ns->m_audio_index = -1;
 	//assert(ns->m_FormatCtx->nb_streams >= 0); useless assert. 
-	for (unsigned int i = 0; i < ns->m_FormatCtx->nb_streams; i++)
+	for (int i = 0; i < ns->m_FormatCtx->nb_streams; i++)
 	{
 		AVCodecContext* enc = ns->m_FormatCtx->streams[i]->codec; 
 

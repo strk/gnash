@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.29 2007/04/03 16:13:07 bjacques Exp $ */
+/* $Id: amf.cpp,v 1.30 2007/04/04 20:30:45 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -349,7 +349,7 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
     switch (type) {
         // Encode the data as a 64 bit, big-endian, numeric value
       case NUMBER:
-          x = out = (char *)new char[pktsize];
+          x = out = new char[pktsize];
           memset(x, 0, pktsize);
           *x++ = (char)AMF::NUMBER;
           memcpy(&num, in, AMF_NUMBER_SIZE);
@@ -358,15 +358,15 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
           break;
       case BOOLEAN:
           // Encode a boolean value. 0 for false, 1 for true
-          out = (char *)new char[pktsize];
+          out = new char[pktsize];
           x = out;    
           *x++ = (char)AMF::BOOLEAN;
-          *x = *(char *)in;
+          *x = *static_cast<const char *>(in);
           break;
       case STRING:
           // Encode a string value. The data follows a 2 byte length
           // field. (which must be big-endian)
-          x = out = (char *)new char[pktsize];
+          x = out = new char[pktsize];
           memset(x, 0, pktsize);
           *x++ = AMF::STRING;
           num = nbytes;
@@ -385,7 +385,7 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
           log_msg("Null unimplemented\n");
           break;
       case UNDEFINED:
-          x = out = (char *)new char[pktsize];
+          x = out = new char[pktsize];
           memset(x, 0, pktsize);
           *x++ = AMF::UNDEFINED;
           num = nbytes;
@@ -408,10 +408,10 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
           break;
           // Encode the date as a 64 bit, big-endian, numeric value
       case DATE:
-          x = out = (char *)new char[pktsize];
+          x = out = new char[pktsize];
           memset(x, 0, pktsize);
           *x++ = AMF::DATE;
-          num = *(amfnum_t *)in;
+          num = *static_cast<const amfnum_t*>(in);
           swapBytes(&num, 8);
           memcpy(x, &num, 8);
           break;
@@ -427,7 +427,7 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
       case XML_OBJECT:
           // Encode an XML object. The data follows a 4 byte length
           // field. (which must be big-endian)
-          x = out = (char *)new char[pktsize];
+          x = out = new char[pktsize];
           memset(x, 0, pktsize);
           *x++ = AMF::STRING;
           num = nbytes;
@@ -699,7 +699,7 @@ AMF::extractString(const char *in)
 {
     GNASH_REPORT_FUNCTION;
     char *buf = NULL;
-    char *x = const_cast<char *>(in);
+    char *x = const_cast<char*>(in);
     short length;
     
     if (*x == AMF::STRING) {
@@ -1160,11 +1160,13 @@ AMF::extractVariable(amf_element_t *el, unsigned char *in)
     
     switch (type) {
       case NUMBER:
+        {
           memcpy(buffer, tmpptr, AMF_NUMBER_SIZE);
           swapBytes(buffer, AMF_NUMBER_SIZE);
-          el->data = new unsigned char[AMF_NUMBER_SIZE+1];
-	  memset((void *)el->data, 0, AMF_NUMBER_SIZE+1);
-          memcpy((void *)el->data, buffer, AMF_NUMBER_SIZE);
+          unsigned char* tmp = new unsigned char[AMF_NUMBER_SIZE+1];
+          memset(tmp, 0, AMF_NUMBER_SIZE+1);
+          memcpy(tmp, buffer, AMF_NUMBER_SIZE);
+          el->data = tmp;
           unsigned char hexint[AMF_NUMBER_SIZE*3];
           hexify((unsigned char *)hexint, (unsigned char *)buffer,
 		 AMF_NUMBER_SIZE, false);
@@ -1173,14 +1175,18 @@ AMF::extractVariable(amf_element_t *el, unsigned char *in)
 //          amfnum_t *num = extractNumber(tmpptr);
           tmpptr += 8;
           break;
+        }
       case BOOLEAN:
+        {
 //          int value = *tmpptr;
-          el->data = new unsigned char[1];
-	  memcpy((void *)el->data, tmpptr, 1); 
+          unsigned char* tmp = new unsigned char[1];
+          memcpy(tmp, tmpptr, 1); 
+          el->data = tmp;
 	  dbglogfile << "Boolean \"" << el->name.c_str() << "\" is: "
 		     << ( (*tmpptr == 0) ? "true" :"false") << endl;
 	  tmpptr += 1;
 	  break;
+        }
       case STRING:
 	  length = ntohs((*(const short *)tmpptr) & 0xffff);
           tmpptr += sizeof(short);

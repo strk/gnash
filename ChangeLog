@@ -1,3 +1,23 @@
+2007-04-04 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/gui.cpp, backend/render_handler_agg_style.h,
+	server/{swf/DefineFontAlignZonesTag.cpp, textformat.cpp}: 
+	Comment out unused variables. 
+	* libamf/amf.cpp: Remove unneeded casts. Replace some
+	C-style casts by C++-style ones. Don't modify const type;
+	instead, use a temporary (el->data).
+	* server/{movie_root.cpp, shm.cpp, sprite_instance.cpp,
+	          vm/ActionExec.cpp, asobj/xmlsocket.cpp}: More
+	use of SIZET_FMT.
+	* server/{Boolean.cpp, Date.cpp}: Don't assign string
+	literals to character pointers, which will soon be
+	deprecated by GCC. Instead, use array declarations.
+	* server/asobj/{NetStreamFfmpeg.cpp, SoundFfmpeg.cpp}:
+	Don't compare unsigned with signed ints.
+	* server/asobj/xml.cpp: Comment out include that is used
+	by commented out code.
+	* server/parser/movie_def_impl.h: Fix typo.
+
 2007-04-04 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/xml.cpp: fix parsing of text nodes

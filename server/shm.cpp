@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: shm.cpp,v 1.29 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: shm.cpp,v 1.30 2007/04/04 20:30:45 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -101,7 +101,7 @@ Shm::attach(char const *filespec, bool nuke)
     filespec = absfilespec.c_str();
     strncpy(_filespec, absfilespec.c_str(), MAX_SHM_NAME_SIZE);
     if (static_cast<int>(absfilespec.size()) > MAX_SHM_NAME_SIZE) {
-	log_error("Shared Memory segment name is %d bytes too long!\n",
+	log_error("Shared Memory segment name is " SIZET_FMT " bytes too long!\n",
 		  absfilespec.size() - MAX_SHM_NAME_SIZE);
     }    
     

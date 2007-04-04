@@ -1041,9 +1041,9 @@ utc_proto(seconds)
 
 static as_value date_tostring(const fn_call& fn) {
 	char buffer[40]; // 32 chars + slop
-	char* monthname[12] =
+	char monthname[][12] =
 		{"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-	char* dayweekname[7] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+	char dayweekname[][7] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 
 	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 	

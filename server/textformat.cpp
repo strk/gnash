@@ -114,7 +114,7 @@ text_format::getTextFormat (int start, int end)
 }
 #endif
 
-as_value textformat_new(const fn_call& fn)
+as_value textformat_new(const fn_call& /* fn */)
 {
   //log_msg("%s: args=%d\n", __FUNCTION__, nargs);
 

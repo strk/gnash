@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: DefineFontAlignZonesTag.cpp,v 1.1 2007/02/21 13:22:37 strk Exp $ */
+/* $Id: DefineFontAlignZonesTag.cpp,v 1.2 2007/04/04 20:30:45 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,7 +31,8 @@ namespace gnash {
 namespace SWF {
 namespace tag_loaders {
 
-DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& m, stream& in)
+DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /* m */, 
+	stream& /* in */)
 {
 }
 

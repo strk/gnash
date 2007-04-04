@@ -631,12 +631,12 @@ public:
   {
   }
 
-  bool is_solid(unsigned style) const
+  bool is_solid(unsigned /*style*/) const
   {
     return true;
   }
   
-  const agg::gray8& color(unsigned style) const 
+  const agg::gray8& color(unsigned /*style*/) const 
   {
     return m_color;
   }

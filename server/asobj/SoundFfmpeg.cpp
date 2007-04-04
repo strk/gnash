@@ -148,7 +148,7 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 	// Find the first audio stream
 	so->audioIndex = -1;
 
-	for (unsigned int i = 0; i < so->formatCtx->nb_streams; i++)
+	for (int i = 0; i < so->formatCtx->nb_streams; i++)
 	{
 		AVCodecContext* enc = so->formatCtx->streams[i]->codec; 
 
