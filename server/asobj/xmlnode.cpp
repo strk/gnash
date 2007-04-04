@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.21 2007/04/03 13:22:24 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.22 2007/04/04 08:46:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -336,44 +336,50 @@ void
 XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout) 
 {
 //    GNASH_REPORT_FUNCTION;
-    const char    *nodevalue = xml.nodeValue();
-    const char    *nodename = xml.nodeName();
-    
+    const char* nodevalue = xml.nodeValue();
+    const char* nodename = xml.nodeName();
+
+
 //    log_msg("%s: processing for object %s <%p>\n", __PRETTY_FUNCTION__, nodename, xml);
 
+    log_msg("Stringifying node %p with name %s, value %s, %u attributes and %u childs",
+                    (void*)&xml, nodename, nodevalue, xml._attributes.size(), xml._children.size());
+
     // Create the beginning of the tag
-    xmlout << "<" << nodename;
-    
-    // Process the attributes, if any
-    AttribList::const_iterator ita;
-    for (ita = xml._attributes.begin(); ita != xml._attributes.end(); ita++)
+    if (nodename)
     {
-	    const XMLAttr& xa = *ita;
-        // TODO: replace with XMLAttr::operator<<
-        xmlout << " " << xa.name() << "=\"" << xa.value() << "\"";
+        xmlout << "<" << nodename;
+    
+        // Process the attributes, if any
+        AttribList::const_iterator ita;
+        for (ita = xml._attributes.begin(); ita != xml._attributes.end(); ita++)
+        {
+            const XMLAttr& xa = *ita;
+            // TODO: replace with XMLAttr::operator<<
+            xmlout << " " << xa.name() << "=\"" << xa.value() << "\"";
+        }
+
+        xmlout << ">";
     }
 
-    xmlout << ">";		// closing symbol for this tag
-    
-    if (nodevalue) {
-	xmlout << nodevalue;
-	xmlout << "</" << nodename << ">";
+    // Node value first, then childs
+    if ( nodevalue )
+    {
+	    xmlout << nodevalue;
     }
 
-//    int length = xml->_children.size();
-//    log_msg("\tProcessing %d children nodes for %s", length, nodename);
-    
+    // Childs, after node value.
     ChildList::const_iterator itx;
     for (itx = xml._children.begin(); itx != xml._children.end(); itx++)
     {
-//	    log_msg("Found One XMLNode child !!!! %s <%p>\n", (*itx)->nodeName(), (void*)*itx);
-//	    cerr << "<" << (*it)->nodeName() << ">" << endl;
+//      log_msg("Found One XMLNode child !!!! %s <%p>\n", (*itx)->nodeName(), (void*)*itx);
+//      cerr << "<" << (*it)->nodeName() << ">" << endl;
         (*itx)->toString(xmlout);
-        //x->toString(xmlout);
     }
 
-    if (!nodevalue)
+    if (nodename)
     {
+	    assert(nodename);
 	    xmlout << "</" << nodename << ">";
     }
 
@@ -566,12 +572,13 @@ xmlnode_removenode(const fn_call& fn)
 static as_value
 xmlnode_tostring(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     
     std::stringstream ss;
     ptr->toString(ss);
+    log_msg("Stringstream: %s", ss.str().c_str());
 
     return as_value(ss.str());
 }

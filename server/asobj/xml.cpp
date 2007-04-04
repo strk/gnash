@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.29 2007/04/04 07:53:28 strk Exp $ */
+/* $Id: xml.cpp,v 1.30 2007/04/04 08:46:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -106,9 +106,9 @@ XML::XML(const std::string& xml_in)
     _bytes_total(0)
 {
     GNASH_REPORT_FUNCTION;
-#ifdef DEBUG_MEMORY_ALLOCATION
+//#ifdef DEBUG_MEMORY_ALLOCATION
     log_msg("Creating XML data at %p \n", this);
-#endif
+//#endif
     parseXML(xml_in);
 }
 
@@ -279,7 +279,7 @@ XML::parseDoc(xmlDocPtr document, bool mem)
     xmlNodePtr cur;
 
     if (document == 0) {
-        log_error("Can't load XML file!\n");
+        log_error("Can't load XML file!");
         return false;
     }
 
@@ -291,6 +291,8 @@ XML::parseDoc(xmlDocPtr document, bool mem)
         extractNode(*child, cur, mem);
         _children.push_back(child);
     }  
+
+    log_msg("parseDoc: %u childrens for XML %p after parsing", _children.size(), (void*)this);
 
     _loaded = true;
     return true;
@@ -606,14 +608,31 @@ xml_new(const fn_call& fn)
   
     // log_msg("%s: nargs=%d\n", __FUNCTION__, fn.nargs);
   
-    if (fn.nargs > 0 && fn.arg(0).is_object() )
+    if ( fn.nargs > 0 )
     {
-	    boost::intrusive_ptr<as_object> obj = fn.env().top(0).to_object();
-        xml_obj = boost::dynamic_pointer_cast<XML>(obj);
-        if ( xml_obj )
+        if ( fn.arg(0).is_object() )
         {
-            log_msg("\tCloned the XML object at %p\n", xml_obj.get());
-            return as_value(xml_obj->cloneNode(true).get());
+            boost::intrusive_ptr<as_object> obj = fn.env().top(0).to_object();
+            xml_obj = boost::dynamic_pointer_cast<XML>(obj);
+            if ( xml_obj )
+            {
+                log_msg("\tCloned the XML object at %p\n", xml_obj.get());
+                return as_value(xml_obj->cloneNode(true).get());
+            }
+        }
+
+        std::string xml_in = fn.arg(0).to_std_string();
+        if ( xml_in.empty() )
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror("First arg given to XML constructor (%s) evaluates to the empty string",
+                    fn.arg(0).to_debug_string().c_str());
+            );
+        }
+        else
+        {
+            xml_obj = new XML(xml_in);
+            return as_value(xml_obj.get());
         }
     }
 

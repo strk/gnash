@@ -1,5 +1,12 @@
 2007-04-04 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlnode.cpp (stringify): stop feeding NULL 
+	  pointers to output operators !
+	* server/asobj/xml.cpp (xml_new): support a string as first
+	  argument to constructor.
+
+2007-04-04 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xml.{cpp,h}: tu_string => std::string
 	* server/asobj/xmlsocket.cpp: provide a builtin onData
 	  event handler to XMLSocket instances.
