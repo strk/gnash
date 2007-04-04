@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.16 2007/04/04 09:22:30 strk Exp $";
+rcsid="$Id: array.as,v 1.17 2007/04/04 09:49:43 strk Exp $";
 
 #include "check.as"
 
@@ -48,7 +48,7 @@ a=[551,"asdf",12];
 check (a instanceOf Array);
 check_equals(a.length, 3);
 #if OUTPUT_VERSION >= 6
-xcheck(a.hasOwnProperty('length'));
+check(a.hasOwnProperty('length'));
 #endif
 
 b=[];
@@ -290,6 +290,10 @@ check_equals(c.length, 2);
 check_equals(c[8], undefined);
 
 // $Log: array.as,v $
+// Revision 1.17  2007/04/04 09:49:43  strk
+//         * server/array.cpp: use a getter/setter for the 'length' property.
+//         * testsuite/actionscript.all/array.as: another success.
+//
 // Revision 1.16  2007/04/04 09:22:30  strk
 // * testsuite/actionscript.all/array.as: more tests added.
 //

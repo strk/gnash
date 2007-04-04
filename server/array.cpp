@@ -47,6 +47,8 @@
 namespace gnash {
 
 static as_object* getArrayInterface();
+static void attachArrayProperties(as_object& proto);
+static void attachArrayInterface(as_object& proto);
 
 // Default as_value strict weak comparator (string based)
 class AsValueLessThen
@@ -143,7 +145,8 @@ as_array_object::as_array_object()
 	as_object(getArrayInterface()), // pass Array inheritance
 	elements(0)
 {
-    //log_action("%s : %p\n", __FUNCTION__, (void*)this);
+	//log_action("%s : %p\n", __FUNCTION__, (void*)this);
+	attachArrayProperties(*this);
 }
 
 as_array_object::as_array_object(const as_array_object& other)
@@ -362,12 +365,6 @@ as_array_object::splice(unsigned start, unsigned len,
 bool
 as_array_object::get_member(const std::string& name, as_value *val)
 {
-	if ( name == "length" ) 
-	{
-		val->set_double((double)size());
-		return true;
-	}
-
 	// an index has been requested
 	int index = index_requested(name);
 	if ( index >= 0 && (unsigned int)index < elements.size() )
@@ -390,13 +387,6 @@ void
 as_array_object::set_member(const std::string& name,
 		const as_value& val )
 {
-	if ( name == "length" ) 
-	{
-		//log_warning("Attempt to assign to Array.length - ignored");
-		resize(unsigned(val.to_number()));
-		return;
-	}
-
 	int index = index_requested(name);
 
 	// if we were sent a valid array index and not a normal member
@@ -824,6 +814,22 @@ array_slice(const fn_call& fn)
 
 }
 
+static as_value
+array_length(const fn_call& fn)
+{
+	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
+
+	if ( fn.nargs ) // setter
+	{
+		array->resize(unsigned(fn.arg(0).to_number(&(fn.env()))));
+		return as_value();
+	}
+	else // getter
+	{
+		return as_value(array->size());
+	}
+}
+
 as_value
 array_new(const fn_call& fn)
 {
@@ -831,8 +837,7 @@ array_new(const fn_call& fn)
 		log_action("array_new called, nargs = %d", fn.nargs);
 	);
 
-	//boost::intrusive_ptr<as_array_object>	ao = new as_array_object;
-	as_array_object* ao = new as_array_object;
+	boost::intrusive_ptr<as_array_object>	ao = new as_array_object;
 
 	if (fn.nargs == 0)
 	{
@@ -862,20 +867,25 @@ array_new(const fn_call& fn)
 	}
 
 	IF_VERBOSE_ACTION (
-		log_action("array_new setting object %p in result", (void*)ao);
+		log_action("array_new setting object %p in result", (void*)ao.get());
 	);
 
-	//return as_value(ao.get());
-	return as_value(ao);
+	return as_value(ao.get());
+	//return as_value(ao);
+}
+
+static void
+attachArrayProperties(as_object& proto)
+{
+	boost::intrusive_ptr<builtin_function> gettersetter;
+
+	gettersetter = new builtin_function(&array_length, NULL);
+	proto.init_property("length", *gettersetter, *gettersetter);
 }
 
 static void
 attachArrayInterface(as_object& proto)
 {
-	// we don't need an explicit member here,
-	// we will be handling 'length' requests
-	// within overridden get_member()
-	//proto->init_member("length", &array_length);
 
 	proto.init_member("join", new builtin_function(array_join));
 	proto.init_member("concat", new builtin_function(array_concat));
