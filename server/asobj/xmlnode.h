@@ -47,10 +47,55 @@
 
 namespace gnash {  
  
-/// XML Node 
+/// XMLNode  ActionScript class
+//
+/// This is the base class for the XML ActionScript class
+///
 class DSOLOCAL XMLNode : public gnash::as_object
 {
 public:
+
+
+    typedef enum {
+
+        /// Element
+        tElement = 1,
+
+        /// Attribute
+        tAttribute = 2,
+
+        /// Text
+        tText = 3,
+
+        /// CDATA section 
+        tCdata = 4,
+
+        /// Entity reference
+        tEntityRef = 5,
+        
+        /// Entity
+        tEntity = 6,
+        
+        /// Processing instruction
+        tProcInstr = 7,
+                
+        /// Comment
+        tComment = 8,
+
+        /// Document
+        tDocument = 9,
+
+        /// Document type
+        tDocType = 10,
+
+        /// Document fragment
+        tDocFgarment = 11,
+
+        /// Notation
+        tNotation = 12
+
+    } NodeType;
+
     XMLNode();
 
     // This constructor is used by the XML class
@@ -61,25 +106,27 @@ public:
 
     size_t length() const { return _children.size(); }
 
-    const char* nodeName() const { return _name; }
+    const std::string& nodeName() const { return _name; }
 
-    const char* nodeValue() const { return _value; }
+    const std::string& nodeValue() const { return _value; }
 
-    int nodeType();
-    void nodeTypeSet(xmlElementType type) {
+    /// Get the type of an XML Node.
+    NodeType nodeType() const { return _type; }
+
+    /// Set the type of an XML Node.
+    void nodeTypeSet(NodeType type)
+    {
 	    _type = type;
     }
 
-    //    char *valueGet();
-  
     /// Set name of this node, but only if it doesn't have a name yet
     //
     /// TODO: check if this is the correct behaviour
     ///
-    void nodeNameSet(const char *name);
+    void nodeNameSet(const std::string& name) { _name = name; }
 
     /// Set value of this node, overriding any previous value
-    void nodeValueSet(const char *value);
+    void nodeValueSet(const std::string& value) { _value = value; }
     //  nodeType 	XML.nodeType
 
     ///  Returns true if the specified node has child nodes; otherwise, returns false.
@@ -172,13 +219,6 @@ public:
 
     void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
 
-
-    // why don't we use std::strings here ?
-    // code would be much simpler and safer!
-    char                *_name;
-    char                *_value;
-
-    xmlElementType      _type;
     XMLNode		*_parent;
     ChildList		_children;
     AttribList      _attributes;
@@ -186,6 +226,12 @@ public:
 private:
 
     // TODO: make a lot more things private !
+
+    std::string _name;
+
+    std::string _value;
+
+    NodeType     _type;
 
     static void stringify(const XMLNode& xml, std::ostream& xmlout);
 

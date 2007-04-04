@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.23 2007/04/04 14:33:32 strk Exp $";
+rcsid="$Id: XML.as,v 1.24 2007/04/04 15:47:22 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -252,43 +252,90 @@ tmp.checkParsed = function ()
 	check(this.childNodes[0] === this.lastChild);
 #endif
 
-    // childNodes is a read-only property !
-    this.childNodes = 5;
+	// childNodes is a read-only property !
+	this.childNodes = 5;
 	check(this.childNodes instanceof Array);
 
-        with (this.firstChild) {
-            //trace("FIXME: firstChild found: " + nodeName);
-            if (nodeName == 'TOPNODE') {
-                //trace("FIXME: topnode found: "+ childNodes.length);
-                childa = 0;
-                while (childa < childNodes.length) {
-                    //trace("FIXME: children found");
-                    check(childNodes[childa] != undefined);
-                    with (childNodes[childa]) {
-                        if (nodeName == 'SUBNODE1') {
-                            childb = 0;
-                            while (childb < childNodes.length) {
-                                with (childNodes[childb]) {
-                                    if (nodeName == 'SUBSUBNODE1') {
-                                        _global.child1 = firstChild.nodeValue;
-note("Set _global.child1 to "+_global.child1);
-                                    } else {
-                                        if (nodeName == 'SUBNODE2') {
-                                            _global.child2 = firstChild.nodeValue;
-                                        } else {
-                                            if (nodeName == 'SUBSUBNODE1') {
-                                                _global.child3 = firstChild.nodeValue;
-                                            }
-                                        }
-                                    }
-                                }
-                                ++childb;
-                            }
-                        }
-                    }
-                    ++childa;
-                }
-            }
+        with (this.firstChild)
+	{
+		check_equals(nodeName, 'TOPNODE');
+		check_equals(typeof(nodeValue), 'null');
+
+		// Check that nodeValue is overridable
+		nodeValue = 4;
+		check_equals(typeof(nodeValue), 'string');
+		check_equals(nodeValue, '4');
+
+		check_equals(nodeType, 1); // element
+		check_equals(childNodes.length, 2);
+
+		with (firstChild)
+		{
+			check_equals(nodeName, 'SUBNODE1');
+			check_equals(typeof(nodeValue), 'null');
+			check_equals(nodeType, 1); // element
+			check_equals(childNodes.length, 2);
+			with (firstChild)
+			{
+				check_equals(nodeName, 'SUBSUBNODE1');
+				check_equals(typeof(nodeValue), 'null');
+				check_equals(nodeType, 1); // element
+				check_equals(childNodes.length, 1);
+				with (firstChild)
+				{
+					check_equals(typeof(nodeName), 'null')
+					check_equals(nodeValue, 'sub sub1 node data 1')
+					check_equals(nodeType, 3); // text
+				}
+			}
+			with (lastChild)
+			{
+				check_equals(nodeName, 'SUBSUBNODE2');
+				check_equals(typeof(nodeValue), 'null');
+				check_equals(nodeType, 1); // element
+				check_equals(childNodes.length, 1);
+				with (firstChild)
+				{
+					check_equals(typeof(nodeName), 'null')
+					check_equals(nodeValue, 'sub sub1 node data 2')
+					check_equals(nodeType, 3); // text
+				}
+			}
+		}
+
+		with (lastChild)
+		{
+			check_equals(nodeName, 'SUBNODE2');
+			check_equals(typeof(nodeValue), 'null');
+			check_equals(nodeType, 1); // element
+			check_equals(childNodes.length, 2);
+			with (firstChild)
+			{
+				check_equals(nodeName, 'SUBSUBNODE1');
+				check_equals(typeof(nodeValue), 'null');
+				check_equals(nodeType, 1); // element
+				check_equals(childNodes.length, 1);
+				with (firstChild)
+				{
+					check_equals(typeof(nodeName), 'null')
+					check_equals(nodeValue, 'sub sub2 node data 1')
+					check_equals(nodeType, 3); // text
+				}
+			}
+			with (lastChild)
+			{
+				check_equals(nodeName, 'SUBSUBNODE2');
+				check_equals(typeof(nodeValue), 'null');
+				check_equals(nodeType, 1); // element
+				check_equals(childNodes.length, 1);
+				with (firstChild)
+				{
+					check_equals(typeof(nodeName), 'null')
+					check_equals(nodeValue, 'sub sub2 node data 2')
+					check_equals(nodeType, 3); // text
+				}
+			}
+		}
         }
 };
 
@@ -457,7 +504,8 @@ myxml.onLoad = function(success)
 	var status_backup = myxml.status;
 	myxml.status = 'a string';
 	check_equals(typeof(myxml.status), 'number');
-	xcheck(myxml.status != status_backup);
+	check(myxml.status != status_backup);
+	note("myxml.status is == "+myxml.status+" after being set to 'a string'");
 	myxml.status = status_backup;
 
 

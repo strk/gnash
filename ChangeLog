@@ -1,5 +1,13 @@
 2007-04-04 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xml.cpp: fix parsing of text nodes
+	* server/asobj/xmlnode.{cpp,h}: use std::string, not
+	  C strings for name and value. Add an enum for NodeType.
+	* testsuite/actionscript.all/XML.as: more tests for
+	  the memory-parsed XML.
+
+2007-04-04 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xmlnode.cpp: don't attacy XMLNode interface
 	  to XMLNode instances.
 	* server/asobj/xml.{h,cpp}: override get_member and set_member

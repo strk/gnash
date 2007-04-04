@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.25 2007/04/04 14:22:11 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.26 2007/04/04 15:47:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -73,10 +73,8 @@ static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 XMLNode::XMLNode()
     :
     as_object(getXMLNodeInterface()),
-    _name(0),
-    _value(0),
-    _type(XML_ELEMENT_NODE),
-    _parent(0)
+    _parent(0),
+    _type(tElement)
 {
     //log_msg("%s: %p \n", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -87,10 +85,8 @@ XMLNode::XMLNode()
 XMLNode::XMLNode(as_object* overridden_interface)
     :
     as_object(overridden_interface),
-    _name(0),
-    _value(0),
-    _type(XML_ELEMENT_NODE),
-    _parent(0)
+    _parent(0),
+    _type(tElement)
 {
     //log_msg("%s: %p \n", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
@@ -101,10 +97,10 @@ XMLNode::XMLNode(as_object* overridden_interface)
 XMLNode::XMLNode(const XMLNode& tpl, bool deep)
     :
     as_object(getXMLNodeInterface()),
+    _parent(tpl._parent),
     _name(tpl._name),
     _value(tpl._value),
-    _type(tpl._type),
-    _parent(tpl._parent)
+    _type(tpl._type)
 {
     if ( ! deep )
     {
@@ -123,37 +119,11 @@ XMLNode::XMLNode(const XMLNode& tpl, bool deep)
 
 XMLNode::~XMLNode()
 {
-    unsigned int i;
     //log_msg("%s: %p \n", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg("\tDeleting XMLNode data %s at %p\n", this->_name, this);
+    log_msg("\tDeleting XMLNode data %s at %p", this->_name.c_str(), this);
 #endif
   
-    for (i=0; i<_children.size(); i++) {
-	if (_children[i]->_name) {
-	    delete [] _children[i]->_name;
-	}
-	if (_children[i]->_value) {
-	    delete [] _children[i]->_value;
-	}
-    }
-
-    for (i=0; i<_attributes.size(); i++)
-    {
-            // shouldn't we delete attributes here ??
-            // TODO: plug this leak somehow !!
-    }
-
-    _children.clear();
-    _attributes.clear();
-
-    if (_name) {
-        delete [] _name;
-    }
-    if (_value) {
-        delete [] _value;
-    }
-    //  _value.set_undefined();
 }
 
 bool
@@ -186,54 +156,6 @@ XMLNode::lastChild()
 	return _children.back();
 }
 
-void
-XMLNode::nodeNameSet(const char *name)
-{
-    int len = strlen(name) + 1;
- 
-    if (!_name) {
-	_name = (char *)new char[len];
-	memset(_name, 0, len);
-	strcpy(_name, name);
-    }
-}
-
-void
-XMLNode::nodeValueSet(const char *value)
-{
-    int len = strlen(value) + 1;
- 
-    // Should we use std::string here ?
-    delete [] _value;
-    _value = new char[len];
-    memset(_value, 0, len);
-    strcpy(_value, value);
-}
-
-/// \brief Get the type of an XML Node.
-///
-
-/// Read-only property; a nodeType value, either 1 for an XML element
-/// or 3 for a text node. The nodeType is a numeric value from the
-/// NodeType enumeration in the W3C DOM Level 1 recommendation:
-/// www.w3.org/TR/1998/REC-DOM-Level-1-19981001/level-one-core.html.
-/// The following table lists the values.
-int
-XMLNode::nodeType() 
-{
-    switch (_type) {
-      case XML_TEXT_NODE:
-	  return 3;
-	  break;
-      case XML_ELEMENT_NODE:
-	  return 1;
-	  break;
-      default:
-	  return 0;
-    }
-    // you should never get here
-    return -1;
-}
 
 void
 XMLNode::appendChild(boost::intrusive_ptr<XMLNode> node)
@@ -336,8 +258,9 @@ void
 XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout) 
 {
 //    GNASH_REPORT_FUNCTION;
-    const char* nodevalue = xml.nodeValue();
-    const char* nodename = xml.nodeName();
+    const std::string& nodevalue = xml.nodeValue();
+    const std::string& nodename = xml.nodeName();
+    NodeType type = xml.nodeType();
 
 
 //    log_msg("%s: processing for object %s <%p>\n", __PRETTY_FUNCTION__, nodename, xml);
@@ -348,7 +271,7 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
 #endif
 
     // Create the beginning of the tag
-    if (nodename)
+    if ( nodename.size() )
     {
         xmlout << "<" << nodename;
     
@@ -365,7 +288,7 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
     }
 
     // Node value first, then childs
-    if ( nodevalue )
+    if ( type == tText )
     {
 	    xmlout << nodevalue;
     }
@@ -374,17 +297,15 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
     ChildList::const_iterator itx;
     for (itx = xml._children.begin(); itx != xml._children.end(); itx++)
     {
-//      log_msg("Found One XMLNode child !!!! %s <%p>\n", (*itx)->nodeName(), (void*)*itx);
+//      log_msg("Found One XMLNode child !!!! %s <%p>\n", (*itx)->nodeName().c_str(), (void*)*itx);
 //      cerr << "<" << (*it)->nodeName() << ">" << endl;
         (*itx)->toString(xmlout);
     }
 
-    if (nodename)
+    if ( nodename.size() )
     {
-	    assert(nodename);
 	    xmlout << "</" << nodename << ">";
     }
-
 }
 
 void
@@ -470,12 +391,13 @@ xmlnode_new(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     
     XMLNode *xml_obj = new XMLNode;
-    if ( fn.nargs > 0 )	{
-	xml_obj->nodeTypeSet(static_cast<xmlElementType>(
-				 static_cast<int>(fn.arg(0).to_number())));
-	if (fn.nargs > 1)	{
-	    xml_obj->nodeValueSet(fn.arg(1).to_string());
-	}
+    if ( fn.nargs > 0 )
+    {
+        xml_obj->nodeTypeSet(XMLNode::NodeType(int(fn.arg(0).to_number())));
+        if (fn.nargs > 1)
+        {
+            xml_obj->nodeValueSet(fn.arg(1).to_std_string(&(fn.env())));
+        }
     }
     
     return as_value(xml_obj);
@@ -508,30 +430,6 @@ xmlnode_appendchild(const fn_call& fn)
 	ptr->appendChild(xml_obj);
 	return as_value(); // undefined
 
-#if 0
-	if (xml_obj->nodeType() == XML_ELEMENT_NODE) {
-	    ptr->appendChild(xml_obj.get());
-	} else {
-	    ptr->nodeValueSet(xml_obj->nodeValue());
-	}
-	
-//    log_msg("%s: %p \n", __PRETTY_FUNCTION__, xml_obj);
-	int length = ptr->length();
-	if (length > 0) {
-	    XMLNode *ass = xml_obj->previousSibling(); // or is it 'ptr' ??
-// FIXME: This shouldn't always be NULL
-// 	log_msg("%s: ASS is %p, length is %d\n", __PRETTY_FUNCTION__,
-// 		ass, length);
-	    ptr->set_member("previousSibling", ass); // FIXME: don't do this, rely on getter/setter
-//  	ptr->set_member("nextSibling", xml_obj->obj.nextSibling(ptr->obj.length()));
-	}
-	// The last child in the list is always the one we just appended
-	ptr->set_member("lastChild", xml_obj.get()); // FIXME: don't do this, rely on getter/setter
-    } else {
-        log_msg("ERROR: no child XMLNode paramaters!\\n");
-    }
-    return as_value();
-#endif
 }
 
 static as_value
@@ -607,14 +505,14 @@ xmlnode_nodevalue(const fn_call& fn)
     //log_msg("xmlnode_nodevalue called with %d args against 'this' = %p", fn.nargs, ptr);
     if ( fn.nargs == 0 )
     {
-	    //log_msg("  nodeValue() returns '%s'", ptr->nodeValue());
-        const char* val = ptr->nodeValue();
-        if ( val ) rv = val;
+	    //log_msg("  nodeValue() returns '%s'", ptr->nodeValue().c_str());
+        const std::string& val = ptr->nodeValue();
+        if ( ! val.empty() ) rv = val;
     }
     else
     {
         //log_msg(" arg(0) == '%s'", fn.arg(0).to_string());
-        ptr->nodeValueSet(fn.arg(0).to_string());
+        ptr->nodeValueSet(fn.arg(0).to_std_string(&(fn.env())));
     }
     return rv;
 }
@@ -629,8 +527,8 @@ xmlnode_nodename(const fn_call& fn)
     rv.set_null();
 
     if ( fn.nargs == 0 ) {
-        const char* val = ptr->nodeName();
-        if ( val ) rv = val;
+        const std::string& val = ptr->nodeName();
+        if ( ! val.empty() ) rv = val;
     }
     else
     {

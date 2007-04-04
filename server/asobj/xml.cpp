@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.33 2007/04/04 14:22:11 strk Exp $ */
+/* $Id: xml.cpp,v 1.34 2007/04/04 15:47:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -150,7 +150,11 @@ XML::get_member(const std::string& name, as_value *val)
 void
 XML::set_member(const std::string& name, const as_value& val)
 {
-        if ( name == "status" ) return;
+        if ( name == "status" )
+	{
+		_status = XML::Status(val.to_number());
+		return;
+	}
         else if ( name == "loaded" )
         {
                 bool b = val.to_bool();
@@ -230,10 +234,8 @@ void
 XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
 {
     xmlAttrPtr attr;
-    xmlNodePtr childnode;
     xmlChar *ptr = NULL;
     boost::intrusive_ptr<XMLNode> child;
-    int len;
 
 //    log_msg("Created new element for %s at %p\n", node->name, element);
 
@@ -248,60 +250,47 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
         XMLAttr attrib(reinterpret_cast<const char*>(attr->name),
 			reinterpret_cast<const char*>(attr->children->content));
 
-#if 0
-        len = memadjust(strlen(reinterpret_cast<const char *>(attr->name))+1);
-        attrib->_name = (char *)new char[len];
-        memset(attrib->_name, 0, len);
-        strcpy(attrib->_name, reinterpret_cast<const char *>(attr->name));
-
-        len = memadjust(strlen(reinterpret_cast<const char *>(attr->children->content))+1);
-        attrib->_value = (char *)new char[len];
-        memset(attrib->_value, 0, len);
-        strcpy(attrib->_value, reinterpret_cast<const char *>(attr->children->content));
-#endif
-
         //log_msg("\tPushing attribute %s for element %s has value %s\n",
         //        attr->name, node->name, attr->children->content);
         element._attributes.push_back(attrib);
         attr = attr->next;
     }
 
-    len = memadjust(strlen(reinterpret_cast<const char *>(node->name))+1);
-    element._name = (char *)new char[len];
-    memset(element._name, 0, len);
-    strcpy(element._name, reinterpret_cast<const char *>(node->name));
-    //element._name = reinterpret_cast<const char *>(node->name);
-    if (node->children) {
-        //ptr = node->children->content;
-        ptr = xmlNodeGetContent(node->children);
-        if (ptr != NULL) {
-            if ((strchr((const char *)ptr, '\n') == 0) && (ptr[0] != 0)) {
-                if (node->children->content == NULL) {
-                    //log_msg("Node %s has no contents\n", node->name);
-                } else {
-                    //log_msg("extractChildNode from text for %s has contents %s\n", node->name, ptr);
-                    len = memadjust(strlen(reinterpret_cast<const char *>(ptr))+1);
-                    element._value = (char *)new char[len];
-                    memset(element._value, 0, len);
-                    strcpy(element._value, reinterpret_cast<const char *>(ptr));
-                    //element->_value = reinterpret_cast<const char *>(ptr);
-                }
-            }
-            xmlFree(ptr);
-        }
-    }
-    
-    // See if we have any data (content)
-    childnode = node->children;
-
-    while (childnode != NULL)
+    if (node->type == XML_ELEMENT_NODE)
     {
-        if (childnode->type == XML_ELEMENT_NODE)
-        {
-            child = new XMLNode();
-            extractNode(*child, childnode, mem);
-            element._children.push_back(child);
-        }
+            element.nodeTypeSet(tElement);
+
+            std::string name(reinterpret_cast<const char*>(node->name));
+            element.nodeNameSet(name);
+    }
+    else if ( node->type == XML_TEXT_NODE )
+    {
+            element.nodeTypeSet(tText);
+
+            ptr = xmlNodeGetContent(node);
+            if (ptr != NULL)
+            {
+                if ((strchr((const char *)ptr, '\n') == 0) && (ptr[0] != 0))
+                {
+                    if (node->content)
+                    {
+                        log_msg("extractChildNode from text for %s has contents %s\n", node->name, ptr);
+                        std::string val(reinterpret_cast<const char*>(ptr));
+                        element.nodeValueSet(val);
+                    }
+                }
+                xmlFree(ptr);
+            }
+    }
+
+    // See if we have any data (content)
+    xmlNodePtr childnode = node->children;
+
+    while (childnode)
+    {
+        child = new XMLNode();
+        extractNode(*child, childnode, mem);
+        element._children.push_back(child);
         childnode = childnode->next;
     }
 
@@ -614,7 +603,8 @@ as_value xml_addrequestheader(const fn_call& fn)
 /// the XML.createTextNode() method are the constructor methods for
 /// creating nodes for an XML object. 
 
-as_value xml_createelement(const fn_call& fn)
+static as_value
+xml_createelement(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -623,7 +613,7 @@ as_value xml_createelement(const fn_call& fn)
 	XMLNode *xml_obj = new XMLNode();
 //	cerr << "create new child XMLNode is at " << (void *)xml_obj << endl;
 	xml_obj->nodeNameSet(text);
-	xml_obj->nodeTypeSet(XML_ELEMENT_NODE);
+	xml_obj->nodeTypeSet(XMLNode::tText);
 //	ptr->set_member(text, xml_obj); // FIXME: use a getter/setter !
 	// no return code from this method
 	return as_value(xml_obj);
@@ -643,7 +633,8 @@ as_value xml_createelement(const fn_call& fn)
 /// XML.createElement() method are the constructor methods for
 /// creating nodes for an XML object.
 
-as_value xml_createtextnode(const fn_call& fn)
+as_value
+xml_createtextnode(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
 
@@ -654,7 +645,7 @@ as_value xml_createtextnode(const fn_call& fn)
 	text = fn.arg(0).to_string(); 
 	xml_obj = new XMLNode;
 	xml_obj->nodeValueSet(text);
-	xml_obj->nodeTypeSet(XML_TEXT_NODE);
+	xml_obj->nodeTypeSet(XMLNode::tText);
 	return as_value(xml_obj);
 //	log_msg("%s: xml obj is %p\n", __PRETTY_FUNCTION__, xml_obj);
     } else {
