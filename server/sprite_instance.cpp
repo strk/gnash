@@ -2462,10 +2462,10 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	if (target_frame_number < m_current_frame)
 	// Go backward to a previous frame
 	{
-		for (size_t f = m_current_frame; f>target_frame_number; --f)
+		resetDisplayList();
+		for (size_t f = 0; f<target_frame_number; f++)
 		{
-			// CHECK: will this execute "state" tags only ?
-			execute_frame_tags_reverse(f);
+			execute_frame_tags(f, TAG_DLIST);
 		}
 	}
 	else
