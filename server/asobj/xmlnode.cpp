@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.22 2007/04/04 08:46:42 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.23 2007/04/04 09:02:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -169,9 +169,9 @@ XMLNode::hasChildNodes()
 boost::intrusive_ptr<XMLNode>
 XMLNode::firstChild()
 {
-    GNASH_REPORT_FUNCTION;
-	if ( _children.empty() ) return NULL;
-	return _children.front();
+    //GNASH_REPORT_FUNCTION;
+    if ( _children.empty() ) return NULL;
+    return _children.front();
 }
 
 boost::intrusive_ptr<XMLNode>
@@ -342,8 +342,10 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
 
 //    log_msg("%s: processing for object %s <%p>\n", __PRETTY_FUNCTION__, nodename, xml);
 
+#ifdef GNASH_DEBUG
     log_msg("Stringifying node %p with name %s, value %s, %u attributes and %u childs",
                     (void*)&xml, nodename, nodevalue, xml._attributes.size(), xml._children.size());
+#endif
 
     // Create the beginning of the tag
     if (nodename)
@@ -572,13 +574,13 @@ xmlnode_removenode(const fn_call& fn)
 static as_value
 xmlnode_tostring(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     
     std::stringstream ss;
     ptr->toString(ss);
-    log_msg("Stringstream: %s", ss.str().c_str());
+    //log_msg("Stringstream: %s", ss.str().c_str());
 
     return as_value(ss.str());
 }

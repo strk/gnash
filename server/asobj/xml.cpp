@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.30 2007/04/04 08:46:42 strk Exp $ */
+/* $Id: xml.cpp,v 1.31 2007/04/04 09:02:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -89,7 +89,7 @@ XML::XML()
     _bytes_loaded(0),
     _bytes_total(0)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_msg("Creating XML data at %p \n", this);
 #endif
@@ -105,10 +105,10 @@ XML::XML(const std::string& xml_in)
     _bytes_loaded(0),
     _bytes_total(0)
 {
-    GNASH_REPORT_FUNCTION;
-//#ifdef DEBUG_MEMORY_ALLOCATION
+    //GNASH_REPORT_FUNCTION;
+#ifdef DEBUG_MEMORY_ALLOCATION
     log_msg("Creating XML data at %p \n", this);
-//#endif
+#endif
     parseXML(xml_in);
 }
 
@@ -275,7 +275,8 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
 bool
 XML::parseDoc(xmlDocPtr document, bool mem)
 {
-    GNASH_REPORT_FUNCTION;  
+    //GNASH_REPORT_FUNCTION;  
+
     xmlNodePtr cur;
 
     if (document == 0) {
@@ -292,9 +293,6 @@ XML::parseDoc(xmlDocPtr document, bool mem)
         _children.push_back(child);
     }  
 
-    log_msg("parseDoc: %u childrens for XML %p after parsing", _children.size(), (void*)this);
-
-    _loaded = true;
     return true;
 }
 
@@ -303,9 +301,9 @@ XML::parseDoc(xmlDocPtr document, bool mem)
 bool
 XML::parseXML(const std::string& xml_in)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
-    log_msg("Parse XML from memory: %s", xml_in.c_str());
+    //log_msg("Parse XML from memory: %s", xml_in.c_str());
 
     if (xml_in.empty()) {
         log_error("XML data is empty!");
@@ -316,7 +314,7 @@ XML::parseXML(const std::string& xml_in)
     //dump_memory_stats(__FUNCTION__, __LINE__, "before xmlParseMemory");
 #endif
 
-    _bytes_total = _bytes_loaded = xml_in.size();
+    //_bytes_total = _bytes_loaded = xml_in.size();
     
     bool ret=true;
 
@@ -375,6 +373,7 @@ XML::load(const URL& url)
     xmlCleanupParser();
     xmlFreeDoc(_doc);
     xmlMemoryDump();
+    _loaded = true;
 
     onLoadEvent(true);
 
@@ -564,27 +563,6 @@ attachXMLInterface(as_object& o)
     o.init_member("send", new builtin_function(xml_send));
     o.init_member("sendAndLoad", new builtin_function(xml_sendandload));
 
-    // Properties
-
-#if 0
-    boost::intrusive_ptr<builtin_function> gettersetter;
-
-    gettersetter = new builtin_function(&xml_nodename, NULL);
-    o.init_property("nodeName", *gettersetter, *gettersetter);
-
-    gettersetter = new builtin_function(&xml_nodevalue, NULL);
-    o.init_property("nodeValue", *gettersetter, *gettersetter);
-
-    gettersetter = new builtin_function(&xml_firstchild, NULL);
-    o.init_property("firstChild", *gettersetter, *gettersetter);
-
-    gettersetter = new builtin_function(&xml_lastchild, NULL);
-    o.init_property("lastChild", *gettersetter, *gettersetter);
-
-    gettersetter = new builtin_function(&xml_childnodes, NULL);
-    o.init_property("childNodes", *gettersetter, *gettersetter);
-#endif
-
 }
 
 static as_object*
@@ -738,13 +716,27 @@ as_value xml_createtextnode(const fn_call& fn)
 as_value xml_getbytesloaded(const fn_call& fn)
 {
     boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-    return as_value(ptr->getBytesLoaded());
+    if ( ptr->loaded() )
+	{
+		return as_value(ptr->getBytesLoaded());
+    }
+	else
+	{
+		return as_value();
+    }
 }
 
 as_value xml_getbytestotal(const fn_call& fn)
 {
     boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
-    return as_value(ptr->getBytesTotal());
+    if ( ptr->loaded() )
+	{
+		return as_value(ptr->getBytesTotal());
+	}
+	else
+	{
+		return as_value();
+	}
 }
 
 as_value xml_parsexml(const fn_call& fn)

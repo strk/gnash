@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.20 2007/04/03 13:22:24 strk Exp $";
+rcsid="$Id: XML.as,v 1.21 2007/04/04 09:02:10 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -265,8 +265,8 @@ if (tmp.hasChildNodes() == true) {
 // Since we didn't *load* the XML, but we
 // just *parsed* it, expect getBytesLoaded 
 // and getBytesTotal to return undefined
-xcheck_equals(tmp.getBytesLoaded(), undefined);
-xcheck_equals(tmp.getBytesTotal(), undefined);
+check_equals(tmp.getBytesLoaded(), undefined);
+check_equals(tmp.getBytesTotal(), undefined);
 
 if (tmp.getBytesLoaded() == tmp.getBytesTotal()) {
     pass("bytes count are the same");

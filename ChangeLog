@@ -1,5 +1,13 @@
 2007-04-04 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xml.cpp: remove debugging lines, return undefined
+	  from getBytesLoaded,getBytesTotal if the XML was not loaded.
+	* server/asobj/xmlnode.cpp: remove debugging lines.
+	* testsuite/actionscript.all/XML.as: all current tests pass now
+	  (but we need more tests);
+
+2007-04-04 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/xmlnode.cpp (stringify): stop feeding NULL 
 	  pointers to output operators !
 	* server/asobj/xml.cpp (xml_new): support a string as first
