@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.22 2007/04/04 14:22:11 strk Exp $";
+rcsid="$Id: XML.as,v 1.23 2007/04/04 14:33:32 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -475,8 +475,10 @@ myxml.onLoad = function(success)
 };
 check_equals(typeof(myxml.status), 'number');
 #if OUTPUT_VERSION < 7
-xcheck_equals(typeof(myxml.STATUS), 'number');
-#endif // OUTPUT_VERSION < 7
+check_equals(typeof(myxml.STATUS), 'number');
+#else // OUTPUT_VERSION >= 7
+check_equals(typeof(myxml.STATUS), 'undefined');
+#endif // OUTPUT_VERSION >= 7
 check_equals(typeof(myxml.__proto__.status), 'undefined');
 check_equals(typeof(myxml.loaded), 'undefined');
 #if OUTPUT_VERSION >= 6
@@ -487,8 +489,10 @@ ret = myxml.load( MEDIA(gnash.xml) );
 
 check_equals(typeof(myxml.loaded), 'boolean');
 #if OUTPUT_VERSION < 7
-xcheck_equals(typeof(myxml.LOADED), 'boolean');
-#endif // OUTPUT_VERSION < 7
+check_equals(typeof(myxml.LOADED), 'boolean');
+#else // OUTPUT_VERSION >= 7
+check_equals(typeof(myxml.LOADED), 'undefined');
+#endif // OUTPUT_VERSION >= 7
 xcheck(! myxml.loaded ); // is really loaded in a background thread
 
 xcheck_equals(myxml.loaded, false ); // is really loaded in a background thread
