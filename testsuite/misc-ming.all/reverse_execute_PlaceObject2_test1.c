@@ -19,6 +19,9 @@
 /*
  * Zou Lunkai, zoulunkai@gmail.com
  *
+ * This file was intended to test reverse execution of frame tags. 
+ * However, the concept of reverse execution may be deprecated someday.
+ *
  * frame1: place mc
  * frame2: move mc to (300, 300)
  * frame3: do nothing
