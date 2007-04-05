@@ -29,7 +29,7 @@
  * 3rd frm of _root:
  *    place mc1 and  mc2;
  * 4th frm of _root:
- *    stop and do checks
+ *    record the order of all triggered events and goto the 10th frame
  * 5th frm of _root
  *    gotoAndPlay(4);
  *    remove mc1 and mc2; 
@@ -41,7 +41,9 @@
  *    remove mc3;
  * 9th frm of _root
  *    gotoAndPlay(5);
- *  
+ * 10th frm of _root
+ *    stop and check
+ *
  * expected actions order:
  * At frame2 go forward to frame9:
  *   mc1.Construct 
@@ -184,8 +186,7 @@ main(int argc, char** argv)
     
   SWFMovie_nextFrame(mo); /* 3rd frame */
   
-  xcheck_equals(mo, "_root.x1", "'1+2+3+4+5+6+7+8+9+1+2+4+x+5+xx+'");
-  add_actions(mo, " _root.totals(); stop(); ");
+  add_actions(mo, " if(flag == 1) { _root.check_result = _root.x1; gotoAndStop(10); } ");
   SWFMovie_nextFrame(mo); /* 4th frame */
   
   add_actions(mo, " gotoAndPlay(4); ");
@@ -223,9 +224,12 @@ main(int argc, char** argv)
   SWFDisplayItem_remove(it3); 
   SWFMovie_nextFrame(mo); /* 8th frame */
   
-  add_actions(mo, " gotoAndPlay(5); ");
+  add_actions(mo, " gotoAndPlay(5); flag = 1;");
   SWFMovie_nextFrame(mo); /* 9th frame */
   
+  xcheck_equals(mo, "_root.check_result", "'1+2+3+4+5+6+7+8+9+1+2+4+x+5+xx+'");
+  add_actions(mo, " _root.totals(); stop(); ");
+  SWFMovie_nextFrame(mo); /* 10th frame */
   
   //Output movie
   puts("Saving " OUTPUT_FILENAME );

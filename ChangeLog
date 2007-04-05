@@ -1,3 +1,12 @@
+2007-04-05 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all: reverse_execute_PlaceObject2_test2.c
+	another testcase for reverse execution of frame tags. 
+	* testsuite/misc-ming.all/reverse_execute_PlaceObject2_test1.c
+	add notes that reverse execution is likely to be deprecated.
+	* testsuite/misc-ming.all/action_execution_order_test6.c
+	do checks and stop movie at the last frame.
+	
 2007-04-04 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/asobj/TextFormat.{cpp,h} - Added stub for class TextFormat.
