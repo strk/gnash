@@ -168,6 +168,8 @@ get_dejagnu_actions()
 		"TestState = function() {\n"
 		" this.passed = 0;\n"
 		" this.failed = 0;\n"
+		" this.xpassed = 0;\n"
+		" this.xfailed = 0;\n"
 		" this.untest = 0;\n"
 		" this.unresolve = 0;\n"
 		"};\n"
