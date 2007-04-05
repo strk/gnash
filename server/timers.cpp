@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.27 2007/03/30 10:18:29 strk Exp $ */
+/* $Id: timers.cpp,v 1.28 2007/04/05 07:31:28 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -37,8 +37,7 @@ namespace gnash {
   Timer::Timer() :
       _interval(0),
       _start(0),
-      _object(0),
-      _env(0)
+      _object(0)
   {
   }
   
@@ -49,24 +48,22 @@ namespace gnash {
   
 
   void
-  Timer::setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr, as_environment *env)
+  Timer::setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr)
   {
     _function = &method;
     _interval = ms * 1000; // transform to microseconds 
     //log_msg("_interval microseconds: %lu", _interval);
-    _env = env;
     _object = this_ptr;
     start();
   }
 
   void
-  Timer::setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr, as_environment *env,
+  Timer::setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr, 
 		  std::vector<as_value>& args)
   {
     _function = &method;
     _interval = ms * 1000; // transform to microseconds 
     //log_msg("_interval microseconds: %lu", _interval);
-    _env = env;
     _object = this_ptr;
     _args = args;
     start();
@@ -119,17 +116,19 @@ Timer::operator() ()
 
     as_value timer_method(_function.get());
 
+    as_environment env;
+
     // Push args to the as_environment stack if needed
     for ( ArgsContainer::reverse_iterator it=_args.rbegin(), itEnd=_args.rend();
 		    it != itEnd; ++it )
     {
 	    //log_msg("Env-pushing %s", it->to_debug_string().c_str());
-	    _env->push(*it);
+	    env.push(*it);
     }
 
-    size_t firstArgBottomIndex = _env->stack_size()-1; 
+    size_t firstArgBottomIndex = env.stack_size()-1; 
 
-    as_value val = call_method(timer_method, _env, _object.get(),
+    as_value val = call_method(timer_method, &env, _object.get(),
 		    _args.size(), firstArgBottomIndex);
 
 }
@@ -223,7 +222,7 @@ timer_setinterval(const fn_call& fn)
 	}
 
 	Timer timer;
-	timer.setInterval(*as_func, ms, fn.this_ptr, &fn.env(), args);
+	timer.setInterval(*as_func, ms, fn.this_ptr, args);
     
 	movie_root& root = VM::get().getRoot();
 	int id = root.add_interval_timer(timer);

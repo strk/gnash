@@ -89,11 +89,7 @@ public:
       ///	It is allowed to be NULL as long as fn_call is allowed
       ///	a NULL as 'this_ptr' (we might want to change this).
       ///
-      /// @param env
-      /// 	The environment in which the associated function will be run.
-      ///	Not sure we should provide this rather then extracting from this_ptr...
-      ///
-      void setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr, as_environment *env);
+      void setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr);
 
       /// Setup the Timer, enabling it.
       //
@@ -110,14 +106,10 @@ public:
       ///	It is allowed to be NULL as long as fn_call is allowed
       ///	a NULL as 'this_ptr' (we might want to change this).
       ///
-      /// @param env
-      /// 	The environment in which the associated function will be run.
-      ///	Not sure we should provide this rather then extracting from this_ptr...
-      ///
       /// @param args
       /// 	The list of arguments to pass to the function being invoked.
       ///
-      void setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr, as_environment *env,
+      void setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr, 
 		      std::vector<as_value>& args);
 
       /// Clear the timer, ready for reuse
@@ -161,9 +153,6 @@ private:
 
       /// Context for the function call. Will be used as 'this' pointer.
       boost::intrusive_ptr<as_object> _object;
-
-      /// how to keep this alive ?
-      as_environment *_env;
 
       /// List of arguments
       ArgsContainer _args;

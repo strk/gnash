@@ -1,5 +1,11 @@
 2007-04-05 Sandro Santilli <strk@keybit.net>
 
+	* server/timers.{cpp,h}: drop the as_environment member
+	  for Timers as we can't ensure it will be kept alive.
+	  We'll use a newly created environment for calling
+	  the timer function.
+	* server/asobj/: LoadVars.cpp, xmlsocket.cpp: update use of
+	  timers.
 	* server/as_environment.cpp (find_object_dotsyntax): 
 	  more verbose debugging for cases in which a dot-syntax
 	  path contains non-object members.
