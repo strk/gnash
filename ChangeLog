@@ -1,5 +1,8 @@
 2007-04-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: enabled run of
+	  reverse_execute_PlaceObject2_test2runner and
+	  action_execution_order_test6runner.
 	* testsuite/misc-ming.all/ming_utils.c (get_dejagnu_actions):
 	  property initialize the xpassed and xfailed counters.
 

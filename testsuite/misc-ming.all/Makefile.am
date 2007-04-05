@@ -97,6 +97,7 @@ check_PROGRAMS = \
 	action_execution_order_test5 \
 	action_execution_order_test6 \
 	reverse_execute_PlaceObject2_test1 \
+	reverse_execute_PlaceObject2_test2 \
 	loadMovieTest \
 	loadMovieTestRunner \
 	eventSoundTest1 \
@@ -133,6 +134,8 @@ check_SCRIPTS = \
 	action_execution_order_test4runner \
 	action_execution_order_test5runner \
 	action_execution_order_test6runner \
+	reverse_execute_PlaceObject2_test1runner \
+	reverse_execute_PlaceObject2_test2runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -581,6 +584,20 @@ reverse_execute_PlaceObject2_test1runner: $(srcdir)/../generic-testrunner.sh rev
 	sh $< $(top_builddir) reverse_execute_PlaceObject2_test1.swf > $@
 	chmod 755 $@
 
+reverse_execute_PlaceObject2_test2_SOURCES =	\
+	reverse_execute_PlaceObject2_test2.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+reverse_execute_PlaceObject2_test2_LDADD = $(MING_LIBS)
+
+reverse_execute_PlaceObject2_test2.swf: reverse_execute_PlaceObject2_test2
+	./reverse_execute_PlaceObject2_test2 $(top_srcdir)/testsuite/media
+
+reverse_execute_PlaceObject2_test2runner: $(srcdir)/../generic-testrunner.sh reverse_execute_PlaceObject2_test2.swf
+	sh $< $(top_builddir) reverse_execute_PlaceObject2_test2.swf > $@
+	chmod 755 $@
+
 action_execution_order_extend_test_SOURCES =	\
 	action_execution_order_extend_test.c	\
 	ming_utils.h		\
@@ -839,7 +856,9 @@ TEST_CASES = \
 	action_execution_order_test3runner \
 	action_execution_order_test4runner \
 	action_execution_order_test5runner \
+	action_execution_order_test6runner \
 	reverse_execute_PlaceObject2_test1runner \
+	reverse_execute_PlaceObject2_test2runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
