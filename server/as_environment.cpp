@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.63 2007/04/05 13:36:28 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.64 2007/04/05 14:59:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -638,7 +638,10 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 		// Try _global, but only at first iteration...
 		if ( depth > 0 ) 
 		{
-			log_msg("Member %s for object %p not found", subpart.c_str(), env);
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Member %s for object %p not found (dotsyntax). Path was %s.",
+				subpart.c_str(), env, path.c_str());
+			);
 			return NULL;
 		}
 
@@ -655,9 +658,9 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 	// Debugging only:
 	if ( ! tmp.is_object() ) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Member %s for object %p found but doesn't cast to an as_object during "
-			"evaluation of target path %s",
-			subpart.c_str(), env, path.c_str());
+		log_aserror("Member %s of object %p doesn't cast to an Object (%s) "
+			"evaluating target path %s (dotsyntax)",
+			subpart.c_str(), env, tmp.to_debug_string().c_str(), path.c_str());
 		);
 		return NULL;
 	}
@@ -781,7 +784,8 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 			if ( depth > 0 ) 
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror("Member %s for object %p not found", subpart.c_str(), env);
+				log_aserror("Member %s for object %p not found (slashsytax). Path was %s",
+					subpart.c_str(), env, path.c_str());
 				);
 				return NULL;
 			}
@@ -798,7 +802,11 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 
 		// Debugging only:
 		if ( ! tmp.is_object() ) {
-			log_msg("Member %s for object %p found but doesn't cast to an as_object", subpart.c_str(), env);
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Member %s of object %p doesn't cast to an Object (%s) "
+				"evaluating target path %s (slashsyntax)",
+				subpart.c_str(), env, tmp.to_debug_string().c_str(), path.c_str());
+				);
 			return NULL;
 		}
 
