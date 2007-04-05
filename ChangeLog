@@ -1,5 +1,9 @@
 2007-04-05 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionRemoveClip): properly parse
+	  the given argument rather then assuming that it refers to
+	  a child of the current target movie. (fixes the softreference
+	  tests).
 	* testsuite/actionscript.all/MovieClip.as: add softreference
 	  test (MovieClip values kept by absolute _target).
 	* testsuite/actionscript.all/MovieClip.as: fix couple of stack

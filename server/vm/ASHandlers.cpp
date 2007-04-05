@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.81 2007/04/05 11:16:11 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.82 2007/04/05 19:33:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1169,12 +1169,34 @@ SWFHandlers::ActionRemoveClip(ActionExec& thread)
 
 	thread.ensureStack(1); 
 
-	sprite_instance* tgt = env.get_target()->to_movie();
-	assert(tgt);
+	std::string path = env.pop().to_std_string();
 
-	// strk: why not using pop() ?
-	tgt->remove_display_object(env.top(0).to_tu_string());
-	env.drop(1);
+	character* ch = env.find_target(path);
+	if ( ! ch )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Path given to removeMovieClip(%s) doesn't point to a character",
+			path.c_str());
+		);
+		return;
+	}
+
+	sprite_instance* sprite = ch->to_movie();
+	if ( ! sprite )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Path given to removeMovieClip(%s) is not a sprite",
+			path.c_str());
+		);
+		return;
+	}
+
+	sprite_instance* parent = dynamic_cast<sprite_instance*>(sprite->get_parent());
+	if (parent)
+	{
+		parent->remove_display_object(sprite->get_depth(), 0);
+	}
+
 }
 
 /// \brief Trace messages from the Flash movie using trace();

@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.42 2007/04/05 17:40:39 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.43 2007/04/05 19:33:54 strk Exp $";
 
 #include "check.as"
 
@@ -275,24 +275,29 @@ check_equals(mc5._parent, mc4);
 
 //--------------------------------------------------------------------------
 // Test "soft" references
-// See: // http://thread.gmane.org/gmane.comp.web.flashcoders.devel/84030
+// See http://thread.gmane.org/gmane.comp.web.flashcoders.devel/84030
 //--------------------------------------------------------------------------
 
 #if OUTPUT_VERSION >= 6
+
 softref = _root.createEmptyMovieClip("hardref", 60);
 check_equals(typeof(hardref), 'movieclip');
 check_equals(typeof(softref), 'movieclip');
 softref.member = 1;
 check_equals(typeof(softref.member), 'number');
 check_equals(softref.member, 1);
-removeMovieClip(hardref); // use the _global removeMovieClip !
-xcheck_equals(typeof(hardref), 'undefined');
+removeMovieClip(hardref); // using ActionRemoveClip (0x25)
+//_global.removeMovieClip(softref); // using the _global removeMovieClip 
+//hardref.removeMovieClip(); // using the sprite's removeMovieClip 
+//softref.removeMovieClip(); // use the softref's removeMovieClip 
+check_equals(typeof(hardref), 'undefined');
 check_equals(typeof(softref), 'movieclip');
-xcheck_equals(typeof(softref.member), 'undefined');
-_root.createEmptyMovieClip("hardref", 60);
+check_equals(typeof(softref.member), 'undefined');
+_root.createEmptyMovieClip("hardref", 61);
 hardref.member = 2;
 check_equals(typeof(softref.member), 'number');
 check_equals(softref.member, 2);
+
 #endif // OUTPUT_VERSION >= 6
 
 //----------------------------------------------
