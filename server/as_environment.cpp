@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.62 2007/04/05 07:17:34 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.63 2007/04/05 13:36:28 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -645,7 +645,7 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 		if ( ! VM::get().getGlobal()->get_member(subpart.c_str(), &tmp) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Element '%s' of variable '%s' not found in object %p nor in _global",
+			log_aserror("Element '%s' of variable '%s' not found in object %p nor in _global (dotsyntax)",
 				subpart.c_str(), path.c_str(), env);
 			);
 			return NULL;
@@ -789,7 +789,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 			if ( ! VM::get().getGlobal()->get_member(subpart.c_str(), &tmp) )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror("Element '%s' of variable '%s' not found in object %p nor in _global",
+				log_aserror("Element '%s' of variable '%s' not found in object %p nor in _global (slashsyntax)",
 					subpart.c_str(), path.c_str(), env);
 				);
 				return NULL;
