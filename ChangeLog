@@ -1,5 +1,7 @@
 2007-04-05 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: fix couple of stack
+	  underruns.
 	* server/sprite_instance.{cpp,h} (get_frame_number):
 	  Changed signature to report invalid frame specifications;
 	  simplified and clened implementation of Zou Lunkai.
