@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.41 2007/04/05 15:03:50 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.42 2007/04/05 17:40:39 strk Exp $";
 
 #include "check.as"
 
@@ -221,6 +221,10 @@ check(mc._x != undefined);
 check(mc._xmouse != undefined);
 check(mc._xscale != undefined);
 
+//----------------------------------------------
+// Test createEmptyMovieClip
+//----------------------------------------------
+
 #if OUTPUT_VERSION >= 6
 // Test movieclip creation
 var mc2 = createEmptyMovieClip("mc2_mc", 50, 0, 0, 0);
@@ -268,6 +272,28 @@ var mc5 = mc4.createEmptyMovieClip("mc5_mc", 60);
 check_equals(mc5._target, "/mc4_mc/mc5_mc");
 check_equals(mc5._parent, mc4);
 #endif
+
+//--------------------------------------------------------------------------
+// Test "soft" references
+// See: // http://thread.gmane.org/gmane.comp.web.flashcoders.devel/84030
+//--------------------------------------------------------------------------
+
+#if OUTPUT_VERSION >= 6
+softref = _root.createEmptyMovieClip("hardref", 60);
+check_equals(typeof(hardref), 'movieclip');
+check_equals(typeof(softref), 'movieclip');
+softref.member = 1;
+check_equals(typeof(softref.member), 'number');
+check_equals(softref.member, 1);
+removeMovieClip(hardref); // use the _global removeMovieClip !
+xcheck_equals(typeof(hardref), 'undefined');
+check_equals(typeof(softref), 'movieclip');
+xcheck_equals(typeof(softref.member), 'undefined');
+_root.createEmptyMovieClip("hardref", 60);
+hardref.member = 2;
+check_equals(typeof(softref.member), 'number');
+check_equals(softref.member, 2);
+#endif // OUTPUT_VERSION >= 6
 
 //----------------------------------------------
 // Test timeline variables
