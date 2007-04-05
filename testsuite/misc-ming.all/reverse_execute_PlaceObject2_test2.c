@@ -63,6 +63,7 @@ main(int argc, char** argv)
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+  add_actions(mo, " _root.x1 = ''; _root.x2 = ''; ");
   SWFMovie_nextFrame(mo); /* 1st frame */
 
   
@@ -75,6 +76,14 @@ main(int argc, char** argv)
   SWFDisplayItem it;
   it = SWFMovie_add(mo, (SWFBlock)mc);  
   SWFDisplayItem_setDepth(it, 10); 
+  
+  SWFDisplayItem_addAction(it,
+    compileSWFActionCode(" _root.x1 += 'onLoad+'; "),
+    SWFACTION_ONLOAD);
+  SWFDisplayItem_addAction(it,
+    compileSWFActionCode(" _root.x2 += 'onUnload+'; "),
+    SWFACTION_UNLOAD);
+    
   SWFDisplayItem_setName(it, "mc"); 
   check_equals(mo, "_root.mc._x", "0");
   SWFMovie_nextFrame(mo); /* 2nd frame */
@@ -95,6 +104,8 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); /* 6th frame */
 
   //checks 
+  check_equals(mo, "_root.x1", "'onLoad+onLoad+'" );
+  check_equals(mo, "_root.x2", "'onUnload+onUnload+'" );
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 7th frame */
   
