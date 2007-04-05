@@ -1,3 +1,9 @@
+2007-04-05 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.cpp (find_object_dotsyntax): 
+	  more verbose debugging for cases in which a dot-syntax
+	  path contains non-object members.
+
 2007-04-05 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all: reverse_execute_PlaceObject2_test2.c

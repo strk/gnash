@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.61 2007/03/28 16:24:39 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.62 2007/04/05 07:17:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -655,7 +655,9 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 	// Debugging only:
 	if ( ! tmp.is_object() ) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Member %s for object %p found but doesn't cast to an as_object", subpart.c_str(), env);
+		log_aserror("Member %s for object %p found but doesn't cast to an as_object during "
+			"evaluation of target path %s",
+			subpart.c_str(), env, path.c_str());
 		);
 		return NULL;
 	}
