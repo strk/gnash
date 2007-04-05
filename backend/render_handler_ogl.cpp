@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.67 2007/04/03 21:46:37 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.68 2007/04/05 01:28:40 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -29,7 +29,7 @@ using namespace gnash;
 // 1 = hardware (experimental, should be fast, somewhat buggy)
 // 2 = fast software bilinear (default)
 // 3 = use image::resample(), slow software resampling
-#define RESAMPLE_METHOD 2
+#define RESAMPLE_METHOD 1
 
 
 // Determines whether to generate mipmaps for smoother rendering of

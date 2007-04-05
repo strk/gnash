@@ -1,3 +1,7 @@
+2007-04-04 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* server/asobj/TextFormat.{cpp,h} - Added stub for class TextFormat.
+
 2007-04-04 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/gui.cpp, backend/render_handler_agg_style.h,
