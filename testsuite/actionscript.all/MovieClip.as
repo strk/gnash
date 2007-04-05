@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.40 2007/03/28 20:52:37 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.41 2007/04/05 15:03:50 strk Exp $";
 
 #include "check.as"
 
@@ -360,6 +360,7 @@ asm {
 check_equals(b, "/");
 
 asm {
+	push "a"
 	push "_root"
 	push 13 // _name
 	getproperty
@@ -372,6 +373,7 @@ check_equals(a, undefined);
 #endif
 
 asm {
+	push "b"
 	push "_root"
 	push 11 // _target
 	getproperty
