@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.80 2007/04/03 16:33:14 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.81 2007/04/05 11:16:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1438,7 +1438,7 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 
 	// env.top(0) contains frame specification,
 	// evaluated as for ActionGotoExpression
-	as_value& framespec = env.top(0);
+	as_value framespec = env.pop();
 	
 	character* target = env.get_target();
 	sprite_instance* target_sprite = target->to_movie();
@@ -1446,11 +1446,20 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 	{
 		log_error("environment target is not a sprite_instance "
 			"while executing ActionWaitForFrameExpression");
-		env.drop(1);
 		return;
 	}
 
-	size_t framenum = target_sprite->get_frame_number(framespec);
+	size_t framenum;
+        if ( ! target_sprite->get_frame_number(framespec, framenum) )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Frame spec found on stack "
+			"at ActionWaitForFrame doesn't evaluate "
+		        "to a valid frame: %s",
+			framespec.to_debug_string().c_str());
+		);
+		return;
+	}
 
 #ifdef REALLY_WAIT_ON_WAIT_FOR_FRAME
 	target_sprite->get_movie_definition()->ensure_frame_loaded(framenum);
@@ -1465,8 +1474,6 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 		thread.skip_actions(skip);
 	}
 
-	env.drop(1);
-	
 	//dbglogfile << __PRETTY_FUNCTION__ << ": testing" << endl;
 }
 
@@ -1999,7 +2006,18 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 
 	as_value expression = env.pop();
 
-	size_t frame_number = target->get_frame_number(expression);
+	size_t frame_number;
+	if ( ! target->get_frame_number(expression, frame_number) )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Frame spec found on stack "
+			"at ActionGotoExpression doesn't evaluate "
+		        "to a valid frame: %s",
+			expression.to_debug_string().c_str());
+		);
+		return;
+	}
+
 	target->goto_frame(frame_number);
 	target->set_play_state(state);
 		  

@@ -1706,27 +1706,28 @@ void sprite_instance::do_actions()
 	testInvariant();
 }
 
-size_t
-sprite_instance::get_frame_number(const as_value& frame_spec) const
+bool
+sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 {
+	//GNASH_REPORT_FUNCTION;
 	size_t frame_number;
 
-	// Figure out what frame to call.
-	if (frame_spec.is_string())
+	as_environment* env = const_cast<as_environment*>(&m_as_environment);
+
+	double num =  frame_spec.to_number(env);
+
+	// TODO: check if a frame labeled "0" or "-3" or "Infinite"
+	//       takes precedence over the numerical value.
+	if ( isnan(num) )
 	{
-		if (m_def->get_labeled_frame(frame_spec.to_string(), &frame_number) == false)
-		{
-			// Try converting to integer.
-			frame_number = (size_t)frame_spec.to_number();
-		}
-	}
-	else
-	{
-		// convert from 1-based to 0-based
-		frame_number = (size_t) frame_spec.to_number() - 1;
+		return m_def->get_labeled_frame(frame_spec.to_string(env), &frameno);
 	}
 
-	return frame_number;
+	// TODO: are we sure we shouldn't check for frames labeled with negative numbers ?
+	if ( num < 1 ) return false;
+
+	frameno = iclamp(num, 1, m_def->get_frame_count())-1;
+	return true;
 }
 
 /// Execute the actions for the specified frame. 
@@ -1735,13 +1736,12 @@ sprite_instance::get_frame_number(const as_value& frame_spec) const
 ///
 void sprite_instance::call_frame_actions(const as_value& frame_spec)
 {
-	size_t	frame_number = get_frame_number(frame_spec);
-
-	if (frame_number >= m_def->get_frame_count())
+	size_t frame_number;
+	if ( ! get_frame_number(frame_spec, frame_number) )
 	{
 		// No dice.
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("call_frame('%s') -- unknown frame", frame_spec.to_string());
+		log_aserror("call_frame('%s') -- invalid frame", frame_spec.to_debug_string().c_str());
 		);
 		return;
 	}

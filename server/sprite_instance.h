@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.87 2007/04/03 13:43:32 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.88 2007/04/05 11:16:11 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -277,11 +277,27 @@ public:
 	///
 	void	goto_frame(size_t target_frame_number);
 
-	/// \brief
-	/// Parse frame spec and return frame number.
-	/// Frame spec can either be a number of a string (label)
+	/// Parse frame spec and return a 0-based frame number.
+	//
+	/// If frame spec cannot be converted to !NAN number
+	/// it will be converted to a string and considered a
+	/// frame label (returns false if referring to an
+	/// unknwown label).
 	///
-	size_t get_frame_number(const as_value& frame_spec) const;
+	/// If frame spec can be converted to a non-zero positive
+	/// integer it will be "clamped" to the valid range.
+	///
+	/// @param frame_spec
+	///	The frame specification.
+	///
+	/// @param frameno
+	///	The evaluated frame number (0-based)
+	///
+	/// @return
+	///	True if the frame_spec could be resolved to a frame number.
+	///	False if the frame_spec was invalid.
+	///
+	bool get_frame_number(const as_value& frame_spec, size_t& frameno) const;
 
 
 	/// Look up the labeled frame, and jump to it.

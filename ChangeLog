@@ -1,5 +1,13 @@
 2007-04-05 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h} (get_frame_number):
+	  Changed signature to report invalid frame specifications;
+	  simplified and clened implementation of Zou Lunkai.
+	* server/vm/ASHandlers.cpp: updated calls to get_frame_number.
+	* testsuite/swfdec/PASSING: gotoframe.swf now passes.
+
+2007-04-05 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/Makefile.am: enabled run of
 	  reverse_execute_PlaceObject2_test2runner and
 	  action_execution_order_test6runner.
