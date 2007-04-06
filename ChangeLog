@@ -1,5 +1,9 @@
 2007-04-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test.c:
+	  Add a new interesting (failing) test showing that static characters
+	  and dynamic characters use a completely different range
+	  of depths !!
 	* server/sprite_instance.cpp (sprite_get_depth): only convert
 	  depths to negative values for static clips.
 	* testsuite/actionscript.all/MovieClip.as: add a couple of

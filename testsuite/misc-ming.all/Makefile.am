@@ -77,6 +77,7 @@ check_PROGRAMS = \
 	move_object_test \
 	place_and_remove_object_test \
 	place_and_remove_object_insane_test \
+	displaylist_depths_test \
 	attachMovieTest \
 	attachMovieTestRunner \
 	attachMovieLoopingTest \
@@ -136,6 +137,7 @@ check_SCRIPTS = \
 	action_execution_order_test6runner \
 	reverse_execute_PlaceObject2_test1runner \
 	reverse_execute_PlaceObject2_test2runner \
+	displaylist_depths_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -352,6 +354,20 @@ place_and_remove_object_insane_test.swf: place_and_remove_object_insane_test
 
 place_and_remove_object_insane_testrunner: $(srcdir)/../generic-testrunner.sh place_and_remove_object_insane_test.swf
 	sh $< -r5 $(top_builddir) place_and_remove_object_insane_test.swf > $@
+	chmod 755 $@
+
+displaylist_depths_test_SOURCES =	\
+	displaylist_depths_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+displaylist_depths_test_LDADD = $(MING_LIBS)
+
+displaylist_depths_test.swf: displaylist_depths_test
+	./displaylist_depths_test $(top_srcdir)/testsuite/media
+
+displaylist_depths_testrunner: $(srcdir)/../generic-testrunner.sh displaylist_depths_test.swf
+	sh $< -r5 $(top_builddir) displaylist_depths_test.swf > $@
 	chmod 755 $@
 
 attachMovieTest_SOURCES =	\
@@ -859,6 +875,7 @@ TEST_CASES = \
 	action_execution_order_test6runner \
 	reverse_execute_PlaceObject2_test1runner \
 	reverse_execute_PlaceObject2_test2runner \
+	displaylist_depths_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
