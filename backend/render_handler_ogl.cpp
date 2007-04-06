@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.68 2007/04/05 01:28:40 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.69 2007/04/07 00:12:01 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -31,15 +31,6 @@ using namespace gnash;
 // 3 = use image::resample(), slow software resampling
 #define RESAMPLE_METHOD 1
 
-
-// Determines whether to generate mipmaps for smoother rendering of
-// minified textures.  It actually tends to look OK to not use
-// mipmaps, though it is potentially a performance hit if you use big
-// textures.
-//
-// TODO: need to code mipmap LOD bias adjustment, to keep mipmaps from
-// looking too blurry.  (Also applies to text rendering.)
-#define GENERATE_MIPMAPS 0
 
 // bitmap_info_ogl declaration
 class bitmap_info_ogl : public gnash::bitmap_info
@@ -886,7 +877,12 @@ else {
 
 // bitmap_info_ogl implementation
 
+/*
 
+Markus: A. A. I still miss you and the easter 2006, you know.
+	A. J. I miss you too, but you'll probably not read this code ever... :/
+
+*/
 
 void	hardware_resample(int bytes_per_pixel, int src_width, int src_height, uint8* src_data, int dst_width, int dst_height)
 // Code from Alex Streit
@@ -938,29 +934,6 @@ void	hardware_resample(int bytes_per_pixel, int src_width, int src_height, uint8
     glPopMatrix();
 }
 
-
-void	generate_mipmaps(unsigned int internal_format, unsigned int input_format, int bytes_per_pixel, image::image_base* im)
-// DESTRUCTIVELY generate mipmaps of the given image.  The image data
-// and width/height of im are munged in this process.
-{
-//    GNASH_REPORT_FUNCTION;
-    int	level = 1;
-    while (im->m_width > 1 || im->m_height > 1)
-	{
-	    if (bytes_per_pixel == 3)
-		{
-		    image::make_next_miplevel((image::rgb*) im);
-		}
-	    else
-		{
-		    image::make_next_miplevel((image::rgba*) im);
-		}
-
-	    glTexImage2D(GL_TEXTURE_2D, level, internal_format, im->m_width, im->m_height, 0,
-			 input_format, GL_UNSIGNED_BYTE, im->m_data);
-	    level++;
-	}
-}
 
 
 void	software_resample(
@@ -1035,19 +1008,6 @@ void	software_resample(
 			    psrc += 3;
 			}
 		}
-
-#ifdef DEBUG_WRITE_TEXTURES_TO_PPM
-	    static int s_image_sequence = 0;
-	    char temp[256];
-	    snprintf(temp, 256, "image%d.ppm", s_image_sequence++);
-	    FILE* f = fopen(temp, "wb");
-	    if (f)
-		{
-		    fprintf(f, "P6\n# test code\n%d %d\n255\n", dst_width, dst_height);
-		    fwrite(rescaled, dst_width * dst_height * 3, 1, f);
-		    fclose(f);
-		}
-#endif
 	}
     else
 	{
@@ -1081,12 +1041,6 @@ void	software_resample(
 	}
 
     glTexImage2D(GL_TEXTURE_2D, 0, internal_format, dst_width, dst_height, 0, input_format, GL_UNSIGNED_BYTE, rescaled);
-
-#if GENERATE_MIPMAPS
-    // Build mipmaps.
-    image::image_base	im(rescaled, dst_width, dst_height, dst_width * bytes_per_pixel);
-    generate_mipmaps(internal_format, input_format, bytes_per_pixel, &im);
-#endif // GENERATE_MIPMAPS
 
     delete [] rescaled;
 }
@@ -1124,11 +1078,7 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 		case image::image_base::RGB:
 		{
 
-#if GENERATE_MIPMAPS
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-#else
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-#endif
 
 			int	w = 1; while (w < im->m_width) { w <<= 1; }
 			int	h = 1; while (h < im->m_height) { h <<= 1; }
@@ -1165,9 +1115,6 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 					im, 0, 0, (float) im->m_width, (float) im->m_height);
 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, rescaled->m_data);
-	#if GENERATE_MIPMAPS
-			generate_mipmaps(GL_RGB, GL_RGB, 3, rescaled);
-	#endif // GENERATE_MIPMAPS
 
 			delete rescaled;
 				}
@@ -1177,9 +1124,6 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 			{
 				// Use original image directly.
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, im->m_data);
-#if GENERATE_MIPMAPS
-				generate_mipmaps(GL_RGB, GL_RGB, 3, im);
-#endif // GENERATE_MIPMAPS
 			}
 
 			break;
@@ -1187,11 +1131,7 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 		case image::image_base::RGBA:
 		{
 
-#if GENERATE_MIPMAPS
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-#else
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-#endif
 
 			int	w = 1; while (w < im->m_width) { w <<= 1; }
 			int	h = 1; while (h < im->m_height) { h <<= 1; }
@@ -1228,9 +1168,6 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 					im, 0, 0, (float) im->m_width, (float) im->m_height);
 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, rescaled->m_data);
-#if GENERATE_MIPMAPS
-			generate_mipmaps(GL_RGBA, GL_RGBA, 4, rescaled);
-#endif // GENERATE_MIPMAPS
 
 			delete rescaled;
 				}
@@ -1240,9 +1177,6 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 			{
 				// Use original image directly.
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, im->m_data);
-#if GENERATE_MIPMAPS
-				generate_mipmaps(GL_RGBA, GL_RGBA, 4, im);
-#endif // GENERATE_MIPMAPS
 			}
 
 			break;

@@ -1,3 +1,8 @@
+2007-04-08 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* backend/render_handler_ogl.cpp: Removed mipsmaps code, due to
+	  major clean up and rewrite (since it's not used).
+
 2007-04-07 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/NetStreamFfmpeg{.cpp, .h}: Fix a deadlock on non-glibc
