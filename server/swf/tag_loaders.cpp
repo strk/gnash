@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.84 2007/04/02 06:18:41 zoulunkai Exp $ */
+/* $Id: tag_loaders.cpp,v 1.85 2007/04/06 11:43:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -777,9 +777,9 @@ public:
     matrix	m_matrix;
     bool	m_has_matrix;
     bool	m_has_cxform;
-    uint16_t	m_depth;
+    int		m_depth;
     uint16_t	m_character_id;
-    uint16_t 	m_clip_depth;
+    int 	m_clip_depth;
     enum place_type {
 	PLACE,
 	MOVE,
@@ -819,13 +819,13 @@ public:
 	{
 		// Original place_object tag; very simple.
 		m_character_id = in->read_u16();
-		m_depth = in->read_u16();
+		m_depth = in->read_u16()+character::staticDepthOffset;
 		m_matrix.read(in);
 
 		IF_VERBOSE_PARSE
 		(
 			log_parse("  char_id = %d", m_character_id);
-			log_parse("  depth = %d", m_depth);
+			log_parse("  depth = %d (%d)", m_depth, m_depth-character::staticDepthOffset);
 			m_matrix.print();
 		);
 
@@ -1000,11 +1000,11 @@ public:
 		bool	has_char = in->read_uint(1) ? true : false;
 		bool	flag_move = in->read_uint(1) ? true : false;
 
-		m_depth = in->read_u16();
+		m_depth = in->read_u16()+character::staticDepthOffset;
 
 		IF_VERBOSE_PARSE
 		(
-		    log_parse("  depth = %d", m_depth);
+                    log_parse("  depth = %d (%d)", m_depth, m_depth-character::staticDepthOffset);
 		);
 
 		if (has_char)
@@ -1053,9 +1053,9 @@ public:
 
 		if (has_clip_bracket)
 		{
-			m_clip_depth = in->read_u16(); 
+			m_clip_depth = in->read_u16()+character::staticDepthOffset; 
 			IF_VERBOSE_PARSE (
-				log_parse("  clip_depth = %d", m_clip_depth);
+				log_parse("  clip_depth = %d (%d)", m_clip_depth, m_clip_depth-character::staticDepthOffset);
 			);
 		}
 
@@ -1284,7 +1284,7 @@ public:
 		    // object per depth.
 		    m_id = in->read_u16();
 		}
-	    m_depth = in->read_u16();
+	    m_depth = in->read_u16()+character::staticDepthOffset;
 	}
 
     virtual void	execute(sprite_instance* m)

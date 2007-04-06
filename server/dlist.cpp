@@ -101,7 +101,7 @@ public:
 int
 DisplayList::getNextHighestDepth() const
 {
-	unsigned int nexthighestdepth=0;
+	int nexthighestdepth=0;
 	for (const_iterator it = _characters.begin(),
 			itEnd = _characters.end();
 		it != itEnd; ++it)
@@ -109,7 +109,7 @@ DisplayList::getNextHighestDepth() const
 		character* ch = it->get();
 		assert(ch); // is this really needed ?
 
-		unsigned int chdepth = ch->get_depth();
+		int chdepth = ch->get_depth();
 		if ( chdepth >= nexthighestdepth )
 		{
 			nexthighestdepth = chdepth+1;
@@ -172,11 +172,11 @@ DisplayList::get_character_by_name_i(const std::string& name)
 void
 DisplayList::place_character(
 	character* ch, 
-	uint16_t depth,
+	int depth,
 	const cxform& color_xform, 
 	const matrix& mat, 
 	float ratio,
-	uint16_t clip_depth)
+	int clip_depth)
 {
 //	GNASH_REPORT_FUNCTION;
 	//IF_VERBOSE_DEBUG(log_msg("dl::add(%d, '%s')\n", depth, ch->get_name()));//xxxxx
@@ -185,7 +185,6 @@ DisplayList::place_character(
 	//dump(std::cout);
 
 	assert(ch);
-	
 	ch->set_invalidated();
 	ch->set_depth(depth);
 	ch->set_cxform(color_xform);
@@ -247,13 +246,13 @@ DisplayList::addAll(std::vector<character*>& chars, bool replace)
 void
 DisplayList::replace_character(
 	character* ch,
-	uint16_t depth,
+	int depth,
 	bool use_cxform,
 	const cxform& color_xform,
 	bool use_matrix,
 	const matrix& mat,
 	float ratio,
-	uint16_t clip_depth)
+	int clip_depth)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -314,13 +313,13 @@ DisplayList::replace_character(
 // the specified depth.
 void
 DisplayList::move_display_object(
-	uint16_t depth,
+	int depth,
 	bool use_cxform,
 	const cxform& color_xform,
 	bool use_matrix,
 	const matrix& mat,
 	float ratio,
-	uint16_t /* clip_depth */)
+	int /* clip_depth */)
 {
 	//GNASH_REPORT_FUNCTION;
 	//IF_VERBOSE_DEBUG(log_msg("dl::move(%d)\n", depth));//xxxxx
@@ -336,6 +335,7 @@ DisplayList::move_display_object(
 		return;
 	}
 
+	// TODO: is sign of depth related to accepting anim moves ?
 	if (ch->get_accept_anim_moves() == false)
 	{
 		// This character is rejecting anim moves.  This happens after it
@@ -357,7 +357,7 @@ DisplayList::move_display_object(
 	
 // Removes the object at the specified depth.
 void
-DisplayList::remove_display_object(uint16_t depth)
+DisplayList::remove_display_object(int depth)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -423,7 +423,7 @@ void DisplayList::swap_characters(character* ch1, character* ch2)
 	}
 }
 	
-void DisplayList::clear_unaffected(std::vector<uint16>& affected_depths, bool call_unload)
+void DisplayList::clear_unaffected(std::vector<int>& affected_depths, bool call_unload)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -632,11 +632,6 @@ DisplayList::display()
 			continue;
 		}
 
-		if (ch->get_clip_depth() > 0)
-		{
-//				log_msg("depth %i, clip_depth %i\n", dobj.m_depth, dobj.m_clip_depth);
-		}
-
 		// check whether a previous mask should be disabled
 		if (masked)
 		{
@@ -658,11 +653,6 @@ DisplayList::display()
 		
 		ch->display();
 
-		if (ch->get_clip_depth() > 0)
-		{
-//				log_msg("object drawn\n");
-		}
-		
 		// if this object should have become a mask,
 		// inform the renderer that it now has all
 		// information about it

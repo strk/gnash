@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.88 2007/04/05 11:16:11 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.89 2007/04/06 11:43:44 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -357,12 +357,12 @@ public:
 		uint16_t character_id,
 		const char* name,
 		const SWFEventsVector& event_handlers,
-		uint16_t depth,
+		int depth,
 		bool replace_if_depth_is_occupied,
 		const cxform& color_transform,
 		const matrix& matrix,
 		float ratio,
-		uint16_t clip_depth);
+		int clip_depth);
 
 	/// Attach the given character instance to current display list
 	//
@@ -375,7 +375,7 @@ public:
 	/// @return true on success, false on failure
 	///	FIXME: currently never returns false !
 	///
-	bool attachCharacter(character& newch, uint16_t depth);
+	bool attachCharacter(character& newch, int depth);
 
 	/// Construct this instance as an ActionScript object.
 	//
@@ -401,13 +401,13 @@ public:
 	/// Updates the transform properties of the object at
 	/// the specified depth.
 	void	move_display_object(
-			uint16_t depth,
+			int depth,
 			bool use_cxform,
 			const cxform& color_xform,
 			bool use_matrix,
 			const matrix& mat,
 			float ratio,
-			uint16_t clip_depth)
+			int clip_depth)
 	{
 	    m_display_list.move_display_object(depth, use_cxform, color_xform, use_matrix, mat, ratio, clip_depth);
 	}
@@ -416,25 +416,25 @@ public:
 	void	replace_display_object(
 			uint16_t character_id,
 			const char* name,
-			uint16_t depth,
+			int depth,
 			bool use_cxform,
 			const cxform& color_transform,
 			bool use_matrix,
 			const matrix& mat,
 			float ratio,
-			uint16_t clip_depth);
+			int clip_depth);
 
 
 	void	replace_display_object(
 			character* ch,
 			const char* name,
-			uint16_t depth,
+			int depth,
 			bool use_cxform,
 			const cxform& color_transform,
 			bool use_matrix,
 			const matrix& mat,
 			float ratio,
-			uint16_t clip_depth);
+			int clip_depth);
 
 
 	/// \brief
@@ -443,7 +443,7 @@ public:
 	/// NOTE: the id parameter is unused, but currently
 	/// required to avoid break of inheritance from movie.h
 	///
-	void	remove_display_object(uint16_t depth, int /* id */)
+	void	remove_display_object(int depth, int /* id */)
 	{
 	    set_invalidated();
 	    m_display_list.remove_display_object(depth);
@@ -536,7 +536,7 @@ public:
 	/// Duplicate the object with the specified name
 	/// and add it with a new name  at a new depth.
 	void clone_display_object(const std::string& name,
-		const std::string& newname, uint16_t depth);
+		const std::string& newname, int depth);
 
 	/// Remove the object with the specified name.
 	//
@@ -858,9 +858,9 @@ private:
 
 protected:
 
-	void place_character(character* ch, uint16_t depth,
+	void place_character(character* ch, int depth,
 			const cxform& color_transform, const matrix& mat,
-			float ratio, uint16_t clip_depth)
+			float ratio, int clip_depth)
 	{
 		m_display_list.place_character(ch, depth, color_transform, mat, ratio, clip_depth);
 	}

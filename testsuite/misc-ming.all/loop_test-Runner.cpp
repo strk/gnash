@@ -70,11 +70,11 @@ main(int /*argc*/, char** /*argv*/)
 
 	const character* movieClip1 = tester.findDisplayItemByName(*root, "movieClip1");
 	check(movieClip1);
-	check_equals(movieClip1->get_depth(), 1);
+	check_equals(movieClip1->get_depth(), 1+character::staticDepthOffset);
 
 	const character* movieClip2 = tester.findDisplayItemByName(*root, "movieClip2");
 	check(movieClip2);
-	check_equals(movieClip2->get_depth(), 2);
+	check_equals(movieClip2->get_depth(), 2+character::staticDepthOffset);
 
 	// Advance to frame 27
 	for (int i=root->get_current_frame(); i<28; ++i) {
@@ -85,8 +85,8 @@ main(int /*argc*/, char** /*argv*/)
 	// change the characters depth
 	tester.advance();
 	check_equals(root->get_current_frame(), 29);
-	check_equals(movieClip1->get_depth(), 2);
-	check_equals(movieClip2->get_depth(), 1);
+	check_equals(movieClip1->get_depth(), 2+character::staticDepthOffset);
+	check_equals(movieClip2->get_depth(), 1+character::staticDepthOffset);
 
 	// Now keep advancing until last frame is reached
 	// (29, as framecount is 0-based)
@@ -95,8 +95,8 @@ main(int /*argc*/, char** /*argv*/)
 	}
 
 	check_equals(root->get_current_frame(), 29);
-	check_equals(movieClip1->get_depth(), 2);
-	check_equals(movieClip2->get_depth(), 1);
+	check_equals(movieClip1->get_depth(), 2+character::staticDepthOffset);
+	check_equals(movieClip2->get_depth(), 1+character::staticDepthOffset);
 
 
 	// Next advance will make the movie restart
@@ -104,8 +104,8 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 0);
 
 	// We expect the depth to be kept on restart
-	check_equals(movieClip1->get_depth(), 2);
-	check_equals(movieClip2->get_depth(), 1);
+	check_equals(movieClip1->get_depth(), 2+character::staticDepthOffset);
+	check_equals(movieClip2->get_depth(), 1+character::staticDepthOffset);
 
 	// ... until next SwapDepth ...
 
@@ -113,19 +113,19 @@ main(int /*argc*/, char** /*argv*/)
 		tester.advance();
 	}
 
-	check_equals(movieClip1->get_depth(), 2);
-	check_equals(movieClip2->get_depth(), 1);
+	check_equals(movieClip1->get_depth(), 2+character::staticDepthOffset);
+	check_equals(movieClip2->get_depth(), 1+character::staticDepthOffset);
 
 	// we expect depths to be swapped again 
 	tester.advance();
 	check_equals(root->get_current_frame(), 29);
-	check_equals(movieClip1->get_depth(), 1);
-	check_equals(movieClip2->get_depth(), 2);
+	check_equals(movieClip1->get_depth(), 1+character::staticDepthOffset);
+	check_equals(movieClip2->get_depth(), 2+character::staticDepthOffset);
 
 	// .. and the new deptsh to be kept at restart
 	tester.advance();
 	check_equals(root->get_current_frame(), 0);
-	check_equals(movieClip1->get_depth(), 1);
-	check_equals(movieClip2->get_depth(), 2);
+	check_equals(movieClip1->get_depth(), 1+character::staticDepthOffset);
+	check_equals(movieClip2->get_depth(), 2+character::staticDepthOffset);
 }
 

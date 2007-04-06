@@ -1,5 +1,5 @@
 /* 
- *   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+ *   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ main(int /*argc*/, char** /*argv*/)
 	// used to get members
 	as_value tmp;
 
-	const character* loaded = tester.findDisplayItemByDepth(*root, 8);
+	const character* loaded = tester.findDisplayItemByDepth(*root, 0); // depends on getNextHighestDepth
 	check(loaded);
 	check_equals(loaded->get_parent(), root);
 
@@ -72,7 +72,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(loaded->get_height(), 2056);
 	check_equals(loaded->get_width(), 2056);
 
-	const character* text = tester.findDisplayItemByDepth(*root, 7);
+	const character* text = tester.findDisplayItemByDepth(*root, 7+character::staticDepthOffset);
 	check(text);
 	
 	check_equals(string(text->get_text_value()), "50");

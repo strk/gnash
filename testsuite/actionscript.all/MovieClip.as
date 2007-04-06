@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.45 2007/04/06 09:27:25 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.46 2007/04/06 11:43:44 strk Exp $";
 
 #include "check.as"
 
@@ -140,7 +140,7 @@ check(mc.duplicateMovieClip);
     check_equals(mc.hitArea, undefined);
     check_equals(mc.menu, undefined);
 
-    xcheck_equals(mc.getNextHighestDepth(), 0);
+    check_equals(mc.getNextHighestDepth(), 0);
 #else
     check_equals(mc.getNextHighestDepth(), undefined);
 #endif

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.61 2007/04/02 15:45:22 strk Exp $ */
+/* $Id: character.h,v 1.62 2007/04/06 11:43:44 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -66,13 +66,13 @@ public:
 
 private:
 
-	int		m_id;
+	int	m_id;
 
-	int		m_depth;
+	int	m_depth;
 	cxform	m_color_transform;
 	matrix	m_matrix;
 	float	m_ratio;
-	uint16_t	m_clip_depth;
+	int	m_clip_depth;
 	Events _event_handlers;
 	void	(*m_display_callback)(void*);
 	void*	m_display_callback_user_ptr;
@@ -193,10 +193,20 @@ public:  // TODO: make protected
 
 public:
 
+    /// This is the amount substracted from displaylist tag defined depths.
+    /// Character placed by tags (vs. characters instantiated by ActionScript)
+    /// always have negative depths by effect of this offset.
+    //
+    /// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
+    ///
+    /// See: http://www.senocular.com/flash/tutorials/depths/?page=2
+    ///
+    static const int staticDepthOffset = -16384;
+
     character(character* parent, int id)
 	:
 	m_id(id),
-	m_depth(-1),
+	m_depth(0),
 	m_ratio(0.0f),
 	m_clip_depth(0),
 	m_display_callback(NULL),
@@ -264,8 +274,9 @@ public:
       if (f!=m_ratio) set_invalidated(); 
       m_ratio = f;       
     }
-    uint16_t	get_clip_depth() const { return m_clip_depth; }
-    void	set_clip_depth(uint16_t d) { m_clip_depth = d; }
+
+    int get_clip_depth() const { return m_clip_depth; }
+    void set_clip_depth(int d) { m_clip_depth = d; }
 
     virtual void set_name(const char* name) { _name = name; }
 
@@ -473,6 +484,7 @@ public:
 	///
 	void setDynamic() {
 		_dynamicallyCreated = true;
+		//assert(get_depth() > 0);
 	}
 
 	/// \brief

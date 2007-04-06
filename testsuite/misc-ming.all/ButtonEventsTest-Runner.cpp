@@ -120,7 +120,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	const character* mc1 = tester.findDisplayItemByName(*root, "square1");
 	check(mc1);
-	check_equals(mc1->get_depth(), 2);
+	check_equals(mc1->get_depth(), 2+character::staticDepthOffset);
 
 	const character* text = tester.findDisplayItemByName(*root, "textfield");
 	check(text);
@@ -139,8 +139,8 @@ main(int /*argc*/, char** /*argv*/)
 
 	for (size_t fno=0; fno<root->get_frame_count(); fno++)
 	{
-		const character* square_back = tester.findDisplayItemByDepth(*root, 1);
-		const character* square_front = tester.findDisplayItemByDepth(*root, 3);
+		const character* square_back = tester.findDisplayItemByDepth(*root, 1+character::staticDepthOffset);
+		const character* square_front = tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset);
 
 		switch (fno)
 		{

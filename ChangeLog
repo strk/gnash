@@ -1,5 +1,22 @@
 2007-04-06 Sandro Santilli <strk@keybit.net>
 
+	* server/: character.h, dlist.{cpp,h}, sprite_instance.{cpp,h}:
+	  Character instance depth is a _signed_ value !
+	  Add a character::staticDepthOffset constant to use for converting
+	  displaylist tag defined depths to negative values.
+	* server/swf/tag_loaders.cpp: convert displaylist tag defined depths
+	  to negative values by adding character::staticDepthOffset
+	* testsuite/misc-ming.all/: ButtonEventsTest-Runner.cpp,
+	  testsuite/samples/clip_as_button2-TestRunner.cpp,
+	  testsuite/movies.all/gravity_embedded-TestRunner.cpp:
+	  loop_test-Runner.cpp, simple_loop_testrunner.cpp: fix the
+	  test runners to take staticDepthOffset into account.
+	* testsuite/actionscript.all/MovieClip.as: getNextHighestDepth()
+	  test now succeeds.
+
+
+2007-04-06 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test.c:
 	  Add a new interesting (failing) test showing that static characters
 	  and dynamic characters use a completely different range

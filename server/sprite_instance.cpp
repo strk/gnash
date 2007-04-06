@@ -184,8 +184,8 @@ static as_value sprite_attach_movie(const fn_call& fn)
 
 	std::string newname = fn.arg(1).to_std_string();
 
-	// should we support negative depths ?
-	uint16_t depth_val = uint16_t(fn.arg(2).to_number());
+	// should we support negative depths ? YES !
+	int depth_val = uint16_t(fn.arg(2).to_number());
 
 	boost::intrusive_ptr<character> newch = exported_movie->create_character_instance(sprite.get(), depth_val);
 	assert( dynamic_cast<sprite_instance*>(newch.get()) );
@@ -279,13 +279,6 @@ static as_value sprite_get_depth(const fn_call& fn)
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
 	int n = sprite->get_depth();
-
-	if ( ! sprite->isDynamic() )
-	{
-		// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
-		//n = - (n+16383-1);
-		n += -16384; 
-	}
 
 	return as_value(n);
 }
@@ -776,7 +769,7 @@ sprite_getNextHighestDepth(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
-	unsigned int nextdepth = sprite->getNextHighestDepth();
+	int nextdepth = sprite->getNextHighestDepth();
 	return as_value(static_cast<double>(nextdepth));
 }
 
@@ -1858,7 +1851,7 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
 }
 
 void sprite_instance::clone_display_object(const std::string& name,
-	const std::string& newname, uint16_t depth)
+	const std::string& newname, int depth)
 {
 //            GNASH_REPORT_FUNCTION;
 
@@ -2600,7 +2593,7 @@ void sprite_instance::swap_characters(character* ch1, character* ch2)
 }
 
 bool
-sprite_instance::attachCharacter(character& newch, uint16_t depth)
+sprite_instance::attachCharacter(character& newch, int depth)
 {
 
 	// place_character() will set depth on newch
@@ -2620,10 +2613,10 @@ sprite_instance::add_display_object(
 		uint16_t character_id,
 		const char* name,
 		const std::vector<swf_event*>& event_handlers,
-		uint16_t depth, 
+		int depth, 
 		bool replace_if_depth_is_occupied,
 		const cxform& color_transform, const matrix& matrix,
-		float ratio, uint16_t clip_depth)
+		float ratio, int clip_depth)
 {
 //	    GNASH_REPORT_FUNCTION;
 	assert(m_def != NULL);
@@ -2702,13 +2695,13 @@ void
 sprite_instance::replace_display_object(
 		uint16_t character_id,
 		const char* name,
-		uint16_t depth,
+		int depth,
 		bool use_cxform,
 		const cxform& color_transform,
 		bool use_matrix,
 		const matrix& mat,
 		float ratio,
-		uint16_t clip_depth)
+		int clip_depth)
 {
 	assert(m_def != NULL);
 	// log_msg("%s: character %s, id is %d", __FUNCTION__, name, character_id); // FIXME: debugging crap
@@ -2735,13 +2728,13 @@ sprite_instance::replace_display_object(
 void sprite_instance::replace_display_object(
 		character* ch,
 		const char* name,
-		uint16_t depth,
+		int depth,
 		bool use_cxform,
 		const cxform& color_transform,
 		bool use_matrix,
 		const matrix& mat,
 		float ratio,
-		uint16_t clip_depth)
+		int clip_depth)
 {
     //printf("%s: character %s, id is %d\n", __FUNCTION__, name, ch->get_id()); // FIXME:
 
@@ -3328,13 +3321,13 @@ sprite_instance::loadMovie(const URL& url)
 	save_extern_movie(extern_movie.get());
 
 	const char* name = get_name().c_str();
-	uint16_t depth = get_depth();
+	int depth = get_depth();
 	bool use_cxform = false;
 	cxform color_transform = get_cxform();
 	bool use_matrix = false;
 	matrix mat = get_matrix();
 	float ratio = get_ratio();
-	uint16_t clip_depth = get_clip_depth();
+	int clip_depth = get_clip_depth();
 	//character* new_movie = extern_movie->get_root_movie();
 
 	// Get a pointer to our own parent 

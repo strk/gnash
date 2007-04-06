@@ -87,11 +87,11 @@ public:
 	///
 	void	place_character(
 		character* ch,
-		uint16_t depth,
+		int depth,
 		const cxform& color_xform,
 		const matrix& mat,
 		float ratio,
-		uint16_t clip_depth);
+		int clip_depth);
 
 	/// \brief
 	/// Puts a new character at the specified depth, replacing any
@@ -106,32 +106,32 @@ public:
 	///
 	void replace_character(
 		character* ch,
-		uint16_t depth,
+		int depth,
 		bool use_cxform,
 		const cxform& color_xform,
 		bool use_matrix,
 		const matrix& mat,
 		float ratio,
-		uint16_t clip_depth);
+		int clip_depth);
 
 	void swap_characters(character* ch, character* ch2);
 
 	/// Updates the transform properties of the object at
 	/// the specified depth.
 	void	move_display_object(
-		uint16_t depth,
+		int depth,
 		bool use_cxform,
 		const cxform& color_xform,
 		bool use_matrix,
 		const matrix& mat,
 		float ratio,
-		uint16_t clip_depth);
+		int clip_depth);
 
 	/// Removes the object at the specified depth.
 	//
 	/// Calls unload on the removed character.
 	///
-	void	remove_display_object(uint16_t depth);
+	void	remove_display_object(int depth);
 
 	/// Clear the display list.
 	//
@@ -207,7 +207,7 @@ public:
 	///	If true, UNLOAD event will be invoked on the characters being
 	///	removed. False by default.
 	///
-	void clear_unaffected(std::vector<uint16>& affected_depths, bool call_unload=false);
+	void clear_unaffected(std::vector<int>& affected_depths, bool call_unload=false);
 
 	/// Just an alias for clear()
 	void reset() {
@@ -332,10 +332,7 @@ DisplayList::visitForward(V& visitor)
 		it != itEnd; ++it)
 	{
 		DisplayItem& di = *it;
-		if ( ! visitor(di.get()) )
-		{
-			break;
-		}
+		if ( ! visitor(di.get()) ) break;
 	}
 }
 
@@ -348,26 +345,7 @@ DisplayList::visitBackward(V& visitor)
 		it != itEnd; ++it)
 	{
 		DisplayItem& di = *it;
-
-		//if ( ! di.get() ) continue;
-
-		if ( ! visitor(di.get()) )
-		{
-			break;
-
-// The following logic must be implemented in the VISITOR,
-// not in the visiting function !!
-// (Vitaly, did you mean to do this in the MouseEntityFinder?)
-#if 0
-			// Can so happens that the uppermost depth contains shape
-			// and under it the button lays
-			// therefore we skip empty(no events) depth
-			if (di->can_handle_mouse_event())
-			{
-				break;
-			}
-#endif
-		}
+		if ( ! visitor(di.get()) ) break;
 	}
 }
 

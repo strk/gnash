@@ -70,7 +70,7 @@ main(int /*argc*/, char** /*argv*/)
 	string msg_botleft = "big movie clip pressed";
 	string msg_botright = "small movie clip pressed";
 
-	const character* text = tester.findDisplayItemByDepth(*root, 3);
+	const character* text = tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset);
 	check(text);
 	check_equals(string(text->get_text_value()), msg_empty);
 	check(!tester.isMouseOverMouseEntity());
