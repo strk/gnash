@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.46 2007/04/06 11:43:44 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.47 2007/04/06 15:53:24 strk Exp $";
 
 #include "check.as"
 
@@ -279,6 +279,11 @@ check_equals(mc5._parent, mc4);
 // See http://thread.gmane.org/gmane.comp.web.flashcoders.devel/84030
 //--------------------------------------------------------------------------
 
+// There's no such think as a _global.removeMovieClip
+// What is referred to the "global" function does actually
+// resolve to an ActionRemoveClip tag (0.25)
+check_equals(typeof(_global.removeMovieClip), 'undefined');
+
 #if OUTPUT_VERSION >= 6
 
 softref = _root.createEmptyMovieClip("hardref", 60);
@@ -287,10 +292,13 @@ check_equals(typeof(softref), 'movieclip');
 softref.member = 1;
 check_equals(typeof(softref.member), 'number');
 check_equals(softref.member, 1);
+#if OUTPUT_VERSION > 6
 removeMovieClip(hardref); // using ActionRemoveClip (0x25)
-//_global.removeMovieClip(softref); // using the _global removeMovieClip 
-//hardref.removeMovieClip(); // using the sprite's removeMovieClip 
+#else
+// just to test another way, ActionRemoveClip in SWF6 will work as well
+hardref.removeMovieClip(); // using the sprite's removeMovieClip 
 //softref.removeMovieClip(); // use the softref's removeMovieClip 
+#endif
 check_equals(typeof(hardref), 'undefined');
 check_equals(typeof(softref), 'movieclip');
 check_equals(typeof(softref.member), 'undefined');

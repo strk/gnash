@@ -1,5 +1,8 @@
 2007-04-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: test both
+	  ActionRemoveClip and MovieClip.removeMovieClip; also
+	  tests that there's no such think as a _global.removeMovieClip.
 	* testsuite/misc-ming.all/displaylist_depths_test.c:
 	  Add a bunch of new tests about removing from protected
 	  depth ranges and using swapDepth to move between ranges.
