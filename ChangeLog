@@ -1,5 +1,11 @@
 2007-04-06 Sandro Santilli <strk@keybit.net>
 
+	* server/character.cpp: stop notifying unload event queuing
+	* server/asobj/NetStreamGst.cpp: warn only once about fluendos
+	  plugin being too old.
+
+2007-04-06 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (ScriptObjectFinder): 
 	  use character depth to tell wheter objects have to
 	  be considered "script" objects or not. Fixes the

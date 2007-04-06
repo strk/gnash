@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.28 2007/04/02 15:45:22 strk Exp $ */
+/* $Id: character.cpp,v 1.29 2007/04/06 19:56:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -752,7 +752,7 @@ void
 character::unload()
 {
 	_unloaded = true;
-	log_msg("Queuing unload event for character %p", this);
+	//log_msg("Queuing unload event for character %p", this);
 	queueEventHandler(event_id::UNLOAD);
 	//on_event(event_id::UNLOAD);
 }

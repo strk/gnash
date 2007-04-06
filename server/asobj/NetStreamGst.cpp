@@ -495,8 +495,14 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 			ns->audiodecoder = gst_element_factory_make ("mad", NULL);
 			if (ns->audiodecoder == NULL) {
 				ns->audiodecoder = gst_element_factory_make ("flump3dec", NULL);
-				if (ns->audiodecoder != NULL && !gst_default_registry_check_feature_version("flump3dec", 0, 10, 4)) {
+				if (ns->audiodecoder != NULL && !gst_default_registry_check_feature_version("flump3dec", 0, 10, 4))
+				{
+					static bool warned = false;
+					if ( ! warned )
+					{
 					log_warning("This version of fluendos mp3 plugin does not support flash streaming sounds, please upgrade to version 0.10.4 or higher.");
+					warned=true;
+					}
 				}
 			}
 			// Check if the element was correctly created
