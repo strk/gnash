@@ -1,4 +1,4 @@
-/* $Id: AUTHORS,v 1.3 2006/10/30 10:31:54 nihilus Exp $ */
+/* $Id: AUTHORS,v 1.4 2007/04/06 16:31:36 strk Exp $ */
 
 The maintainer of Gnash is:
 --------------------------
@@ -8,13 +8,12 @@ Rob Savoye <rob@senecass.com>
 Developers:
 -----------
 
-Sandro Santilli
-Bastiaan Jacques
-Vitaly Alexeev
-Tomas Groth
-Udo Giacomozzi
-Markus Gothe 
-Hannes Mayr
+Sandro Santilli <strk@keybit.net>
+Bastiaan Jacques <bastiaan@bjacques.org>
+Tomas Groth <tomasgroth@yahoo.dk>
+Udo Giacomozzi <udo.gnu@nova-sys.net>
+Markus Gothe <nietzsche@lysator.liu.se>
+Hannes Mayr <hannes.mayr@indunet.it>
 
 Plus a host of other contributors (see ChangeLog).
 
