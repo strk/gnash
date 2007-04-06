@@ -229,7 +229,7 @@ main(int argc, char** argv)
 	SWFMovie_nextFrame(mo);        
 
 	// TODO:
-	// - test the MovieClip and global version of removeMovieClip !
+	// - test the MovieClip version of removeMovieClip !
 
 	//Output movie
 	puts("Saving " OUTPUT_FILENAME );
