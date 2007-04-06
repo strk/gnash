@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.44 2007/04/06 09:23:20 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.45 2007/04/06 09:27:25 strk Exp $";
 
 #include "check.as"
 
@@ -440,6 +440,9 @@ xcheck(textfieldTest instanceof MovieClip);
 // is statically defined, if it's not we'll raise a 
 // warning about it.
 
+// getDepth was not available as of SWF5
+#if OUTPUT_VERSION > 5
+
 static_clip_name = "__shared_assets";
 static_clip = eval(static_clip_name);
 if ( typeof(static_clip) == 'movieclip' )
@@ -451,3 +454,5 @@ else
 	note("There is not '"+static_clip_name+"' clip statically-defined, so we could not test getDepth() against it");
 
 }
+
+#endif // OUTPUT_VERSION > 5
