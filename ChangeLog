@@ -1,3 +1,11 @@
+2007-04-06 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (sprite_get_depth): only convert
+	  depths to negative values for static clips.
+	* testsuite/actionscript.all/MovieClip.as: add a couple of
+	  tests for getDepth() invoked against dynamic and static
+	  clips.
+
 2007-04-05  John Gilmore  <bug-gnu-gettext@gnu.org>
 
 	Internationalize gnash.  Phase 1: use gettextize, update config files.

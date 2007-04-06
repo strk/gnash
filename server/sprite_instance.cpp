@@ -280,8 +280,14 @@ static as_value sprite_get_depth(const fn_call& fn)
 
 	int n = sprite->get_depth();
 
-	// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
-	return as_value( - (n + 16383 - 1));
+	if ( ! sprite->isDynamic() )
+	{
+		// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
+		//n = - (n+16383-1);
+		n += -16384; 
+	}
+
+	return as_value(n);
 }
 
 //swapDepths(target:Object) : Void
@@ -1710,7 +1716,6 @@ bool
 sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 {
 	//GNASH_REPORT_FUNCTION;
-	size_t frame_number;
 
 	as_environment* env = const_cast<as_environment*>(&m_as_environment);
 
@@ -1726,7 +1731,7 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 	// TODO: are we sure we shouldn't check for frames labeled with negative numbers ?
 	if ( num < 1 ) return false;
 
-	frameno = iclamp(num, 1, m_def->get_frame_count())-1;
+	frameno = iclamp(int(num), 1, m_def->get_frame_count())-1;
 	return true;
 }
 

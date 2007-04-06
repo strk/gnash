@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.43 2007/04/05 19:33:54 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.44 2007/04/06 09:23:20 strk Exp $";
 
 #include "check.as"
 
@@ -86,36 +86,36 @@ check(mc.duplicateMovieClip);
 #endif
 
 #if OUTPUT_VERSION >= 6
-	check(mc.beginFill);
-	check(mc.beginGradientFill);
-        check(mc.clear);
-	check(mc.createEmptyMovieClip);
-	check(mc.createTextField);
-	check(mc.curveTo);
-	check(mc.lineStyle);
-	check(mc.lineTo);
-	check(mc.moveTo);
-	check(mc.attachAudio);
-	check(mc.endFill);
-	check(mc.getDepth);
-	check(mc.getURL);
-	check(mc.gotoAndPlay);
-	check(mc.gotoAndStop);
-	check(mc.hitTest);
-	check(mc.nextFrame != undefined);
-	check(mc.play != undefined);
-	check(mc.prevFrame != undefined);
-	check(mc.stop != undefined);
-	check(mc.swapDepths != undefined);
+	check_equals(typeof(mc.beginFill), 'function');
+	check_equals(typeof(mc.beginGradientFill), 'function');
+        check_equals(typeof(mc.clear), 'function');
+	check_equals(typeof(mc.createEmptyMovieClip), 'function');
+	check_equals(typeof(mc.createTextField), 'function');
+	check_equals(typeof(mc.curveTo), 'function');
+	check_equals(typeof(mc.lineStyle), 'function');
+	check_equals(typeof(mc.lineTo), 'function');
+	check_equals(typeof(mc.moveTo), 'function');
+	check_equals(typeof(mc.attachAudio), 'function');
+	check_equals(typeof(mc.endFill), 'function');
+	check_equals(typeof(mc.getDepth), 'function');
+	check_equals(typeof(mc.getURL), 'function');
+	check_equals(typeof(mc.gotoAndPlay), 'function');
+	check_equals(typeof(mc.gotoAndStop), 'function');
+	check_equals(typeof(mc.hitTest), 'function');
+	check_equals(typeof(mc.nextFrame), 'function');
+	check_equals(typeof(mc.play), 'function');
+	check_equals(typeof(mc.prevFrame), 'function');
+	check_equals(typeof(mc.stop), 'function');
+	check_equals(typeof(mc.swapDepths), 'function');
 
 	// These two seem unavailable
 	// when targetting SWF > 6
 #if OUTPUT_VERSION > 6
-	check_equals(mc.loadMovie, undefined);
-	check_equals(mc.removeMovieClip, undefined);
+	check_equals(typeof(mc.loadMovie), 'undefined');
+	check_equals(typeof(mc.removeMovieClip), 'undefined');
 #else
-	check(mc.loadMovie);
-	check(mc.removeMovieClip);
+	check_equals(typeof(mc.loadMovie), 'function');
+	check_equals(typeof(mc.removeMovieClip), 'function');
 #endif
 
 #endif // OUTPUT_VERSION >= 6
@@ -236,6 +236,7 @@ check_equals(mc2.getBytesTotal(), 0);
 
 var mc3 = createEmptyMovieClip("mc3_mc", 50);
 check(mc3 != undefined);
+check_equals(mc3.getDepth(), 50);
 
 // By default useHandCursor is false in SWF5 and true in later versions
 #if OUTPUT_VERSION < 6
@@ -427,3 +428,26 @@ check(textfieldTest instanceof TextField);
 xcheck_equals(typeof(textfieldTest), 'movieclip');
 xcheck(textfieldTest instanceof MovieClip);
 #endif
+
+//----------------------------------------------
+// Test getDepth
+//----------------------------------------------
+
+// A getDepth call against a script-created clip
+// is already tested in the createEmptyMovieClip test
+// section. Here we try to test it against a statically
+// defined movie. We hope that the 'dejagnu' clip
+// is statically defined, if it's not we'll raise a 
+// warning about it.
+
+static_clip_name = "__shared_assets";
+static_clip = eval(static_clip_name);
+if ( typeof(static_clip) == 'movieclip' )
+{
+	check_equals(static_clip.getDepth(), -16383);
+}
+else
+{
+	note("There is not '"+static_clip_name+"' clip statically-defined, so we could not test getDepth() against it");
+
+}
