@@ -1,5 +1,10 @@
 2007-04-06 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (ScriptObjectFinder): 
+	  use character depth to tell wheter objects have to
+	  be considered "script" objects or not. Fixes the
+	  all.swf regression and doesn't change our testsuite
+	  results.
 	* testsuite/actionscript.all/MovieClip.as: test both
 	  ActionRemoveClip and MovieClip.removeMovieClip; also
 	  tests that there's no such think as a _global.removeMovieClip.

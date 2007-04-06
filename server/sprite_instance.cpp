@@ -1488,7 +1488,7 @@ public:
 /// A DisplayList visitor used to extract script characters
 //
 /// Script characters are characters created or transformed
-/// by ActionScript
+/// by ActionScript. 
 ///
 class ScriptObjectsFinder {
 	std::vector<character*>& _dynamicChars;
@@ -1506,36 +1506,15 @@ public:
 		// TODO: Are script-transformed object to be kept ?
 		//       Need a testcase for this
 		//if ( ! ch->get_accept_anim_moves() )
-		if ( ch->isDynamic() )
+		//if ( ch->isDynamic() )
+		int depth = ch->get_depth();
+		if ( depth < -16384 || depth >= 0 )
 		{
 			_dynamicChars.push_back(ch);
 		}
 		else
 		{
 			_staticChars.push_back(ch);
-		}
-		return true; // keep scanning
-	}
-};
-
-/// A DisplayList visitor used to extract static characters
-//
-/// Static characters are characters instantiaced trough display-list SWF tags
-///
-class StaticObjectsFinder {
-	std::vector<character*>& _chars;
-public:
-	StaticObjectsFinder(std::vector<character*>& chars)
-		:
-		_chars(chars)
-	{}
-
-	bool operator() (character* ch) 
-	{
-		//if ( ch->get_accept_anim_moves() )
-		if ( ! ch->isDynamic() )
-		{
-			_chars.push_back(ch);
 		}
 		return true; // keep scanning
 	}
@@ -2273,16 +2252,16 @@ sprite_instance::execute_action(action_buffer& ab)
 void
 sprite_instance::resetDisplayList()
 {
-	// Resort frame0 DisplayList as depth of
-	// characters in it might have been
-	// externally changed.
-	_frame0_chars.sort();
-
 	// Add script objects in current DisplayList
 	std::vector<character*> charsToAdd; 
 	std::vector<character*> charsToKeep; 
 	ScriptObjectsFinder scriptObjFinder(charsToAdd, charsToKeep);
 	m_display_list.visitForward(scriptObjFinder);
+
+	// Resort frame0 DisplayList as depth of
+	// characters in it might have been
+	// externally changed.
+	_frame0_chars.sort();
 
 	// Remove characters which have been removed
 	_frame0_chars.clear_except(charsToKeep);
