@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.16 2007/03/30 13:57:27 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.17 2007/04/06 22:16:36 bjacques Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -211,8 +211,6 @@ private:
 	boost::thread *m_thread;
 	boost::thread *startThread;
 	boost::mutex decoding_mutex;
-	boost::mutex start_mutex;
-	boost::mutex::scoped_lock *lock;
 
 	// Are the playing loop running or not
 	volatile bool m_go;

@@ -1,3 +1,10 @@
+2007-04-07 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/NetStreamFfmpeg{.cpp, .h}: Fix a deadlock on non-glibc
+	platforms by waiting for a thread rather than hoping for a
+	certain execution order (which is fundamentally incompatible with
+	threads).
+
 2007-04-06 Sandro Santilli <strk@keybit.net>
 
 	* server/character.cpp: stop notifying unload event queuing

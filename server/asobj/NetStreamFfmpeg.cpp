@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.29 2007/04/04 20:30:45 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.30 2007/04/06 22:16:36 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -246,9 +246,6 @@ NetStreamFfmpeg::play(const char* c_url)
 		// To avoid blocking while connecting, we use a thread.
 		startThread = new boost::thread(boost::bind(NetStreamFfmpeg::startPlayback, this));
 
-		// This lock prevents the decoding from starting before the Connection
-		// and decoder is ready.
-		lock = new boost::mutex::scoped_lock(start_mutex);
 	} else {
 		// We need to restart the audio
 		sound_handler* s = get_sound_handler();
@@ -364,7 +361,6 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 		ns->m_Frame = avcodec_alloc_frame();
 
 		// By deleting this lock we allow the av_streamer-thread to start its work
-		delete ns->lock;
 		return;
 	}
 
@@ -514,16 +510,17 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 
 	ns->m_pause = false;
 	
-	// By deleting this lock we allow the av_streamer-thread to start its work
-	delete ns->lock;
 	return;
 }
 
 // decoder thread
 void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
-
-	boost::mutex::scoped_lock  lock(ns->start_mutex);
+	// Wait for startThread to finish.
+	// XXX if this method is to start right after startThread finishes, why is this
+	//     method not called directly by startThread, instead of having its own
+	//     execution thread?
+	ns->startThread->join();
 
 	// This should only happen if close() is called before setup is complete
 	if (!ns->m_go) return;
