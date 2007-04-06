@@ -43,6 +43,8 @@ AM_LDFLAGS = \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
+localedir = $(datadir)/locale
+
 #AM_CPPFLAGS = # -Wall
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)	\
@@ -51,6 +53,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/server/vm \
+        -DLOCALEDIR=\"$(localedir)\" \
 	$(BOOST_CFLAGS) \
         $(LIBXML_CFLAGS) \
         $(MYSQL_CFLAGS) \

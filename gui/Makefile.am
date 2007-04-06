@@ -1,6 +1,6 @@
 ## Process this file with automake to generate Makefile.in
 # 
-#   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,9 +17,10 @@
 
 # 
 
-# $Id: Makefile.am,v 1.62 2007/04/02 16:46:32 tgc Exp $
+# $Id: Makefile.am,v 1.63 2007/04/06 07:58:15 jgilmore Exp $
 
 AUTOMAKE_OPTIONS = 
+localedir = $(datadir)/locale
 
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir) \
@@ -30,6 +31,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
+        -DLOCALEDIR=\"$(localedir)\" \
         $(LIBXML_CFLAGS) \
         $(SDL_CFLAGS) \
         $(DMALLOC_CFLAGS) \

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: dumpshm.cpp,v 1.9 2006/11/19 17:39:01 nihilus Exp $ */
+/* $Id: dumpshm.cpp,v 1.10 2007/04/06 07:58:16 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,6 +63,7 @@ extern "C"{
 #include "log.h"
 #include "rc.h"
 #include "shm.h"
+#include "gnash.h"
 
 using namespace std;
 using namespace gnash;
@@ -95,6 +96,11 @@ main(int argc, char *argv[])
 // #else
 //     strstream             *shmnames;
 // #endif
+
+    // Enable native language support, i.e. internationalization
+    setlocale (LC_MESSAGES, "");
+    bindtextdomain (PACKAGE, LOCALEDIR);
+    textdomain (PACKAGE);
 
     /* This initializes the DBG_MSG macros */ 
     while ((c = getopt (argc, argv, "hdnl:if")) != -1) {
@@ -197,8 +203,8 @@ main(int argc, char *argv[])
                 }
             }
         } else {
-            cout << "Sorry, we can only list the files on systems with";
-            cout << "with disk based shared memory" << endl;
+            cout << _("Sorry, we can only list the files on systems with"
+		      " disk based shared memory") << endl;
         }
         exit(0);
     }
@@ -206,14 +212,14 @@ main(int argc, char *argv[])
     //Destroy shared memory segments
     if (nuke) {
         if (filespec.size() == 0) {
-            cout << "No name specified, nuking everything..." << endl;
+            cout << _("No name specified, nuking everything...") << endl;
             for (i=0; entry>0; i++) {
                 entry = readdir(library_dir);
                 if (entry != NULL) {
                     tmpname = "/"; // prefix a / so shm_unlink can
                                    // use the correct path
                     tmpname += entry->d_name;
-                    cout << "Removing segment: " << tmpname << endl;
+                    cout << _("Removing segment: ") << tmpname << endl;
 #ifdef HAVE_SHM_UNLINK
                     shm_unlink(tmpname.c_str());
 #endif
@@ -221,7 +227,7 @@ main(int argc, char *argv[])
             }
             exit(0);
         } else {
-            cout << "Nuking the shared memory segment " << filespec << endl;
+            cout << _("Nuking the shared memory segment ") << filespec << endl;
 #ifdef HAVE_SHM_UNLINK 
            shm_unlink(filespec.c_str());
 #endif
@@ -247,7 +253,7 @@ main(int argc, char *argv[])
     
     if (!in.eof()) {
          if (!in.read(reinterpret_cast<char*>(&shmptr), sizeof(Shm))) {
-             cerr << "ERROR: couldn't read!" << endl;
+             cerr << _("ERROR: couldn't read!") << endl;
              exit(1);
          }
          dump_ctrl(&shmptr);
@@ -278,15 +284,15 @@ main(int argc, char *argv[])
 static void
 usage (void)
 {
-    cerr << "This program dumps the internal data of a shared memory segment"
+    cerr << _("This program dumps the internal data of a shared memory segment")
          << endl;
-    cerr << "Usage: dumpmem [hdsanlif] filename" << endl;
-    cerr << "-h\tHelp" << endl;
-    cerr << "-d\tDump data" << endl;
-    cerr << "-n [optional name]\tNuke everything" << endl;
-    cerr << "-l\tLength of segment" << endl;
-    cerr << "-i\tList segments" << endl;
-    cerr << "-f\tForce to use builtin names for nuke" << endl;
+    cerr << _("Usage: dumpmem [hdsanlif] filename") << endl;
+    cerr << _("-h\tHelp") << endl;
+    cerr << _("-d\tDump data") << endl;
+    cerr << _("-n [optional name]\tNuke everything") << endl;
+    cerr << _("-l\tLength of segment") << endl;
+    cerr << _("-i\tList segments") << endl;
+    cerr << _("-f\tForce to use builtin names for nuke") << endl;
     exit (-1);
 }
 
@@ -298,11 +304,11 @@ void dump_ctrl(void *inmem)
 {
     Shm *ptr = static_cast<Shm *>(inmem);
     
-    cerr << "\tBase address of this segment: "
+    cerr << _("\tBase address of this segment: ")
          << static_cast<void *>(ptr->getAddr()) << endl;
-    cerr << "\tFilespec: " << ptr->getName() << endl;
-    cerr << "\t# Bytes allocated: " << ptr->getAllocated() << endl;
-    cerr << "\tTotal # of bytes: " << ptr->getSize() << endl;
+    cerr << _("\tFilespec: ") << ptr->getName() << endl;
+    cerr << _("\t# Bytes allocated: ") << ptr->getAllocated() << endl;
+    cerr << _("\tTotal # of bytes: ") << ptr->getSize() << endl;
 }
 
 

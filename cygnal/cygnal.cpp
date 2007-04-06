@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: cygnal.cpp,v 1.6 2007/02/05 20:13:05 nihilus Exp $ */
+/* $Id: cygnal.cpp,v 1.7 2007/04/06 07:58:15 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -51,6 +51,10 @@ extern "C"{
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#ifdef ENABLE_NLS
+#include <locale.h>
+#endif
 
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
@@ -106,6 +110,11 @@ static int port_offset = 0;
 int
 main(int argc, char *argv[])
 {
+    // Initialize national language support
+    setlocale (LC_MESSAGES, "");
+    bindtextdomain (PACKAGE, LOCALEDIR);
+    textdomain (PACKAGE);
+
     // scan for the two main long GNU options
     int c;
     for (c=0; c<argc; c++) {

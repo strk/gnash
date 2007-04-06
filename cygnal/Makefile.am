@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-# $Id: Makefile.am,v 1.4 2007/03/06 18:06:13 rsavoye Exp $
+# $Id: Makefile.am,v 1.5 2007/04/06 07:58:15 jgilmore Exp $
 
 ## Process this file with automake to generate Makefile.in
 
@@ -36,11 +36,14 @@ AM_LDFLAGS = \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS)
 
+localedir = $(datadir)/locale
+
 INCLUDES = -I.. \
         -I$(top_srcdir)	\
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server \
+        -DLOCALEDIR=\"$(localedir)\" \
         $(LIBXML_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(CURL_CFLAGS) \

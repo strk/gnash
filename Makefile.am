@@ -1,5 +1,5 @@
 # 
-#   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.66 2007/04/02 16:46:31 tgc Exp $
+# $Id: Makefile.am,v 1.67 2007/04/06 07:58:15 jgilmore Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -32,6 +32,7 @@ STD_DIRS = \
 	utilities \
 	gui \
 	testsuite \
+	po \
 	$(NULL)
 
 if PLUGIN
@@ -62,7 +63,7 @@ man_MANS = doc/gnash.1
 
 DIST_SUBDIRS = $(STD_DIRS) doc plugin cygnal extensions
 
-EXTRA_DIST= $(man_MANS) macros/incllist macros/libslist
+EXTRA_DIST= config.rpath $(man_MANS) macros/incllist macros/libslist
 #EXTRA_DIST = macros
 # if HTTP
 # SUBDIRS += net $(STD_DIRS)

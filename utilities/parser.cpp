@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: parser.cpp,v 1.35 2007/02/06 23:06:18 rsavoye Exp $ */
+/* $Id: parser.cpp,v 1.36 2007/04/06 07:58:16 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -135,7 +135,7 @@ struct matrix
     static void write()
 	{
 	    ident++;
-	    log_msg("has_scale = %d, has_rotate = %d\n", has_scale, has_rotate);
+	    log_msg(_("has_scale = %d, has_rotate = %d\n"), has_scale, has_rotate);
 	    log_msg("| %4.4f %4.4f %4.4f |\n", m_[0][0], m_[0][1], TWIPS_TO_PIXELS(m_[0][2]));
 	    log_msg("| %4.4f %4.4f %4.4f |\n", m_[1][0], m_[1][1], TWIPS_TO_PIXELS(m_[1][2]));
 	    ident--;
@@ -160,8 +160,8 @@ struct rect
     static void write()
 	{
 	    ident++;
-	    log_msg("x_min: %i, x_max: %i,	width: %i twips, %4.0f pixels\n", x_min, x_max, x_max - x_min, TWIPS_TO_PIXELS(x_max - x_min));
-	    log_msg("y_min: %i, y_max: %i, height: %i twips, %4.0f pixels\n", y_min, y_max, y_max - y_min, TWIPS_TO_PIXELS(y_max - y_min));
+	    log_msg(_("x_min: %i, x_max: %i,	width: %i twips, %4.0f pixels\n"), x_min, x_max, x_max - x_min, TWIPS_TO_PIXELS(x_max - x_min));
+	    log_msg(_("y_min: %i, y_max: %i, height: %i twips, %4.0f pixels\n"), y_min, y_max, y_max - y_min, TWIPS_TO_PIXELS(y_max - y_min));
 	    ident--;
 	}
 };
@@ -182,7 +182,7 @@ struct rgb
     static void write()
 	{
 	    ident++;
-	    log_msg("rgb: %d %d %d \n", m_r, m_g, m_b);
+	    log_msg(_("rgb: %d %d %d \n"), m_r, m_g, m_b);
 	    ident--;
 	}
 };
@@ -203,7 +203,7 @@ struct rgba
     static void write()
 	{
 	    ident++;
-	    log_msg("rgba: %d %d %d %d\n", m_r, m_g, m_b, m_a);
+	    log_msg(_("rgba: %d %d %d %d\n"), m_r, m_g, m_b, m_a);
 	    ident--;
 	}
 };
@@ -276,8 +276,8 @@ struct cxform
     static void write()
 	{
 	    ident++;
-	    log_msg("cxform:\n");
-	    log_msg("has_add = %d, has_mult = %d\n", has_add, has_mult);
+	    log_msg(_("cxform:\n"));
+	    log_msg(_("has_add = %d, has_mult = %d\n"), has_add, has_mult);
 	    log_msg("| %4.4f %4.4f |\n", m_[0][0], m_[0][1]);
 	    log_msg("| %4.4f %4.4f |\n", m_[1][0], m_[1][1]);
 	    log_msg("| %4.4f %4.4f |\n", m_[2][0], m_[2][1]);
@@ -295,7 +295,7 @@ void parse_end_movie(stream* /* input */, int tag_type)
     assert(tag_type == 0);
     ident--;
     log_msg("\n");
-    log_msg("Movie ended\n\n");
+    log_msg(_("Movie ended\n\n"));
 }
 
 // tag 1
@@ -605,6 +605,12 @@ int
 main(int argc, char *argv[])
 {
     int c;
+
+    // Enable native language support, i.e. internationalization
+    setlocale (LC_MESSAGES, "");
+    bindtextdomain (PACKAGE, LOCALEDIR);
+    textdomain (PACKAGE);
+
     // scan for the two main standard GNU options
     for (c = 0; c < argc; c++) {
 	if (strcmp("--help", argv[c]) == 0) {

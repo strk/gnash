@@ -1,3 +1,39 @@
+2007-04-05  John Gilmore  <bug-gnu-gettext@gnu.org>
+
+	Internationalize gnash.  Phase 1: use gettextize, update config files.
+
+	* macros/{codeset.m4, gettext.m4, glibc2.m4, glibc21.m4,
+	  iconv.m4, intdiv0.m4, intmax.m4, inttypes.m4, inttypes_h.m4,
+	  inttypes-pri.m4, isc-posix.m4, lcmessage.m4, lib-ld.m4,
+	  lib-link.m4, lib-prefix.m4, longdouble.m4, longlong.m4, nls.m4,
+	  po.m4, printf-posix.m4, progtest.m4, signed.m4, size_max.m4,
+	  stdint_h.m4, uintmax_t.m4, ulonglong.m4, wchar_t.m4, wint_t.m4,
+	  xsize.m4}: New files, from gettext-0.14.6.
+	* po: New directory for translated messages (Portable Object files)
+	* po/{Makefile.in.in, boldquot.sed, en@boldquot.header,
+	  en@quot.header, insert-header.sin, quot.sed,
+	  remove-potcdate.sin, Rules-quot}: New files, from gettext-0.14.6.
+	* ABOUT-NLS, config.rpath: New files, from gettext-0.14.6.
+	* libbase/gettext.h:  New file, from gettext-0.14.6.
+	* server/gnash.h: Include "gettext.h" for NLS.
+	* po/Makevars: New file: settings for gnash's message translation.
+	* po/POTFILES.in: New file: source files with translatable strings.
+	* po/LINGUAS: New file: languages we have translations for.
+	* Makefile.am (EXTRA_DIST): Add config.rpath.
+	  (STD_DIRS): Add po.
+	* configure.ac (AC_OUTPUT): Add po/Makefile.in.
+	  (AM_GNU_GETTEXT):  Add, to configure gettext support.
+	* cygnal/Makefile.am (localedir, INCLUDES),
+	  gui/Makefile.am (localedir, INCLUDES),
+	  utilities/Makefile.am (localedir, INCLUDES):  Define LOCALEDIR.
+	* cygnal/cygnal.cpp (main), gui/gnash.cpp (main), 
+	  utilities/{dumpshm,parser,processor}.cpp (main):
+	  Set locale and initialize gettext upon startup.
+	* utilities/{dumpshm,parser,processor}.cpp:  Flag strings with _
+	  for translation, for testing.
+	* po/gnash.pot:  Message string catalog for testing.
+	* po/es.po:  Spanish-language message string catalog for testing.
+
 2007-04-05 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/asobj/Date.cpp

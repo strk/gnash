@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: processor.cpp,v 1.54 2007/04/03 16:13:07 bjacques Exp $ */
+/* $Id: processor.cpp,v 1.55 2007/04/06 07:58:16 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -133,6 +133,12 @@ int
 main(int argc, char *argv[])
 {
     assert(tu_types_validate());
+
+    // Enable native language support, i.e. internationalization
+    setlocale (LC_MESSAGES, "");
+    bindtextdomain (PACKAGE, LOCALEDIR);
+    textdomain (PACKAGE);
+
     int c;
 
     // scan for the two main standard GNU options

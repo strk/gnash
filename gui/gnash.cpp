@@ -43,6 +43,10 @@ extern "C"{
 #include <string>
 #include <iostream>
 
+#ifdef ENABLE_NLS
+#include <locale.h>
+#endif
+
 //using namespace gnash; // for dbglogfile
 
 using namespace std;
@@ -327,6 +331,11 @@ int
 main(int argc, char *argv[])
 {
 	gnash::Player player;
+
+	// Enable native language support, i.e. internationalization
+	setlocale (LC_MESSAGES, "");
+	bindtextdomain (PACKAGE, LOCALEDIR);
+	textdomain (PACKAGE);
 
 	rcfile.loadFiles();
 
