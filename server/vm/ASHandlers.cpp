@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.82 2007/04/05 19:33:54 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.83 2007/04/06 15:36:05 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1164,7 +1164,7 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 void
 SWFHandlers::ActionRemoveClip(ActionExec& thread)
 {
-//	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
 	thread.ensureStack(1); 
@@ -1191,12 +1191,7 @@ SWFHandlers::ActionRemoveClip(ActionExec& thread)
 		return;
 	}
 
-	sprite_instance* parent = dynamic_cast<sprite_instance*>(sprite->get_parent());
-	if (parent)
-	{
-		parent->remove_display_object(sprite->get_depth(), 0);
-	}
-
+	sprite->removeMovieClip();
 }
 
 /// \brief Trace messages from the Flash movie using trace();

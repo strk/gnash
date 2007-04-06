@@ -1,5 +1,18 @@
 2007-04-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/displaylist_depths_test.c:
+	  Add a bunch of new tests about removing from protected
+	  depth ranges and using swapDepth to move between ranges.
+	* server/sprite_instance.{h,cpp}: Add a removeMovieClip
+	  public method for common use by ActionRemoveClip tag,
+	  global removeMovieClip function and MovieClip.removeMovieClip
+	  method; fix swapDepths to accept a depth as argument;
+	  fix removeMovieClip to check for allowed depth bounds.
+	* server/vm/ASHandlers.cpp (ActionRemoveClip): use the new
+	  sprite_instance::removeMovieClip method.
+
+2007-04-06 Sandro Santilli <strk@keybit.net>
+
 	* server/: character.h, dlist.{cpp,h}, sprite_instance.{cpp,h}:
 	  Character instance depth is a _signed_ value !
 	  Add a character::staticDepthOffset constant to use for converting

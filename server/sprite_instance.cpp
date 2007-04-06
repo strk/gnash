@@ -130,12 +130,7 @@ static as_value sprite_stop(const fn_call& fn)
 static as_value sprite_remove_movieclip(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
-
-	sprite_instance* parent = dynamic_cast<sprite_instance*>(sprite->get_parent());
-	if (parent)
-	{
-		parent->remove_display_object(sprite->get_depth(), 0);
-	}
+	sprite->removeMovieClip();
 	return as_value();
 }
 
@@ -286,69 +281,108 @@ static as_value sprite_get_depth(const fn_call& fn)
 //swapDepths(target:Object) : Void
 static as_value sprite_swap_depths(const fn_call& fn)
 {
-	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
-	
+	typedef boost::intrusive_ptr<sprite_instance> SpritePtr;
+	typedef boost::intrusive_ptr<character> CharPtr;
+
+	SpritePtr sprite = ensureType<sprite_instance>(fn.this_ptr);
+	int this_depth = sprite->get_depth();
+
+	// Lower bound of source depth below which swapDepth has no effect
+	static const int lowerDepthBound = -16384;
+
 	as_value rv;
+
 	if (fn.nargs < 1)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("swapDepths needs one arg");
+		log_aserror("%s.swapDepths() needs one arg.", sprite->getTarget().c_str());
 		);
 		return rv;
 	}
 
-	boost::intrusive_ptr<character> target = NULL;
-	if (fn.arg(0).is_object() )
+	if ( this_depth < lowerDepthBound )
 	{
-		target = boost::dynamic_pointer_cast<character>(fn.arg(0).to_object());
+		IF_VERBOSE_ASCODING_ERRORS(
+		stringstream ss; fn.dump_args(ss);
+		log_aserror("%s.swapDepths(%s) : won't swap a clip below depth %d (%d).",
+			sprite->getTarget().c_str(), ss.str().c_str(), lowerDepthBound, this_depth);
+		);
+		return rv;
 	}
-	else if (fn.arg(0).is_number() )
-	{
-		// Macromedia Flash help says: depth starts at -16383 (0x3FFF)
-		int target_depth = int(fn.arg(0).to_number()) + 16383 + 1;
 
-		boost::intrusive_ptr<sprite_instance> parent = dynamic_cast<sprite_instance*>(sprite->get_parent());
-		if ( parent )
+
+	SpritePtr this_parent = dynamic_cast<sprite_instance*>(sprite->get_parent());
+	if ( ! this_parent )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		stringstream ss; fn.dump_args(ss);
+		log_aserror("%s.swapDepths(%s): this sprite has no parent, "
+			"swapping depth of root ?",
+			sprite->getTarget().c_str(),
+			ss.str().c_str());
+		);
+		return rv;
+	}
+	
+
+	CharPtr target = NULL;
+	int target_depth = 0;
+
+	// sprite.swapDepth(sprite)
+	if ( SpritePtr target_sprite = fn.arg(0).to_sprite() )
+	{
+		if ( sprite == target_sprite )
 		{
-			target = parent->get_character_at_depth(target_depth);
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("%s.swapDepths(%s): invalid call, swapping to self?",
+				sprite->getTarget().c_str(), target_sprite->getTarget().c_str());
+			);
+			return rv;
 		}
+
+		SpritePtr target_parent = dynamic_cast<sprite_instance*>(sprite->get_parent());
+		if ( this_parent != target_parent )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("%s.swapDepths(%s): invalid call, the two characters don't have the same parent",
+				sprite->getTarget().c_str(), target_sprite->getTarget().c_str());
+			);
+			return rv;
+		}
+
+		target_depth = target_sprite->get_depth();
+		target = boost::dynamic_pointer_cast<character>(target_sprite);
 	}
 	else
 	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("swapDepths has received invalid arg\n");
-    		);
-		return rv;
-	}
-
-	if (sprite == NULL || target == NULL)
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("It is impossible to swap NULL character");
-		);
-		return rv;
-	}
-
-	if (sprite->get_parent() == target->get_parent() && sprite->get_parent() != NULL)
-	{
-		int target_depth = target->get_depth();
-		target->set_depth(sprite->get_depth());
-		sprite->set_depth(target_depth);
-
-		boost::intrusive_ptr<sprite_instance> parent = dynamic_cast<sprite_instance*>(sprite->get_parent());
-		if ( parent )
+		// sprite.swapDepth(depth)
+		double td = fn.arg(0).to_number(&(fn.env()));
+		if ( isnan(td) )
 		{
-			parent->swap_characters(sprite.get(), target.get());
+			IF_VERBOSE_ASCODING_ERRORS(
+			stringstream ss; fn.dump_args(ss);
+			log_aserror("%s.swapDepths(%s): first argument invalid "
+				"(neither a sprite nor a number).",
+				sprite->getTarget().c_str(),
+				ss.str().c_str());
+			);
+			return rv;
 		}
+
+		// TODO : check other kind of validities ?
+
+		target_depth = int(td);
+		target = this_parent->get_character_at_depth(target_depth);
 	}
-	else
+
+	sprite->set_depth(target_depth);
+	if ( target )
 	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Can't swap depth of MovieClips "
-			"with different parents");
-		);
+		target->set_depth(this_depth);
+		this_parent->swap_characters(sprite.get(), target.get());
 	}
 	return rv;
+
 }
 
 // TODO: wrap the functionality in a sprite_instance method
@@ -3437,6 +3471,35 @@ sprite_instance::setVariables(VariableMap& vars)
 		const string& val = it->second;
 		set_variable(name.c_str(), val.c_str());
 	}
+}
+
+void
+sprite_instance::removeMovieClip()
+{
+	int depth = get_depth();
+	if ( depth < 0 || depth > 1048575 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("removeMovieClip(%s): sprite depth (%d) out of the "
+			"'dynamic' zone [0..1048575], won't remove",
+			getTarget().c_str(), depth);
+		);
+		return;
+	}
+
+	sprite_instance* parent = dynamic_cast<sprite_instance*>(get_parent());
+	if (parent)
+	{
+		// second argument is arbitrary, see comments above
+		// the function declaration in sprite_instance.h
+		parent->remove_display_object(depth, 0);
+	}
+	else
+	{
+		// I guess this can only happen if someone uses _root.swapDepth([0..1048575])
+		log_error("Can't remove sprite %s as it has no parent!", getTarget().c_str());
+	}
+
 }
 
 } // namespace gnash

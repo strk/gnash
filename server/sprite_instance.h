@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.89 2007/04/06 11:43:44 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.90 2007/04/06 15:36:05 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -665,6 +665,30 @@ public:
 	/// Override for character::set_name to proprely update
 	/// _target and _target_dot.
 	virtual void set_name(const char* name);
+
+	/// Remove this sprite from the stage.
+	//
+	/// This function is intended to be called by 
+	/// effect of a removeMovieClip() ActionScript call
+	/// and implements the checks required for this specific
+	/// case.
+	///
+	/// Callers are:
+	///	- The ActionRemoveClip tag handler.
+	///	- The global removeMovieClip(target) function.
+	///	- The MovieClip.removeMovieClip() method.
+	///
+	/// The removal will not occur if the depth of this
+	/// characters is not in the "dynamic" range [0..1048575]
+	/// as described at the following URL:
+	/// 
+	///	http://www.senocular.com/flash/tutorials/depths/?page=2
+	///
+	/// A testcases for this behaviour can be found in 
+	///
+	///	testsuite/misc-ming.all/displaylist_depths_test.swf
+	///
+	void removeMovieClip();
 
 	/// @{ Drawing API
 	
