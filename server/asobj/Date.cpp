@@ -179,7 +179,7 @@ _gmtime_r(time_t *t, struct tm *tm)
 {
 #if USE_UTCCONV
 	double msec;
-	utctime(*t * 1000.0, &tm, &msec);
+	utctime(*t * 1000.0, tm, &msec);
 #else
 	struct tm *tmp;
 	tmp = gmtime(t);
