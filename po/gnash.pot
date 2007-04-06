@@ -1,0 +1,126 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: bug-gnash@gnu.org\n"
+"POT-Creation-Date: 2007-04-05 20:53-0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: John Gilmore <gnu@gnash-translation.toad.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: utilities/dumpshm.cpp:200
+msgid ""
+"Sorry, we can only list the files on systems with disk based shared memory"
+msgstr ""
+
+#: utilities/dumpshm.cpp:209
+msgid "No name specified, nuking everything..."
+msgstr ""
+
+#: utilities/dumpshm.cpp:216
+msgid "Removing segment: "
+msgstr ""
+
+#: utilities/dumpshm.cpp:224
+msgid "Nuking the shared memory segment "
+msgstr ""
+
+#: utilities/dumpshm.cpp:250
+msgid "ERROR: couldn't read!"
+msgstr ""
+
+#: utilities/dumpshm.cpp:281
+msgid "This program dumps the internal data of a shared memory segment"
+msgstr ""
+
+#: utilities/dumpshm.cpp:283
+msgid "Usage: dumpmem [hdsanlif] filename"
+msgstr ""
+
+#: utilities/dumpshm.cpp:284
+msgid "-h\tHelp"
+msgstr ""
+
+#: utilities/dumpshm.cpp:285
+msgid "-d\tDump data"
+msgstr ""
+
+#: utilities/dumpshm.cpp:286
+msgid "-n [optional name]\tNuke everything"
+msgstr ""
+
+#: utilities/dumpshm.cpp:287
+msgid "-l\tLength of segment"
+msgstr ""
+
+#: utilities/dumpshm.cpp:288
+msgid "-i\tList segments"
+msgstr ""
+
+#: utilities/dumpshm.cpp:289
+msgid "-f\tForce to use builtin names for nuke"
+msgstr ""
+
+#: utilities/dumpshm.cpp:301
+msgid "\tBase address of this segment: "
+msgstr ""
+
+#: utilities/dumpshm.cpp:303
+msgid "\tFilespec: "
+msgstr ""
+
+#: utilities/dumpshm.cpp:304
+msgid "\t# Bytes allocated: "
+msgstr ""
+
+#: utilities/dumpshm.cpp:305
+msgid "\tTotal # of bytes: "
+msgstr ""
+
+#: utilities/parser.cpp:138
+#, c-format
+msgid "has_scale = %d, has_rotate = %d\n"
+msgstr ""
+
+#: utilities/parser.cpp:163
+#, c-format
+msgid "x_min: %i, x_max: %i,\twidth: %i twips, %4.0f pixels\n"
+msgstr ""
+
+#: utilities/parser.cpp:164
+#, c-format
+msgid "y_min: %i, y_max: %i, height: %i twips, %4.0f pixels\n"
+msgstr ""
+
+#: utilities/parser.cpp:185
+#, c-format
+msgid "rgb: %d %d %d \n"
+msgstr ""
+
+#: utilities/parser.cpp:206
+#, c-format
+msgid "rgba: %d %d %d %d\n"
+msgstr ""
+
+#: utilities/parser.cpp:279
+msgid "cxform:\n"
+msgstr ""
+
+#: utilities/parser.cpp:280
+#, c-format
+msgid "has_add = %d, has_mult = %d\n"
+msgstr ""
+
+#: utilities/parser.cpp:298
+msgid ""
+"Movie ended\n"
+"\n"
+msgstr ""

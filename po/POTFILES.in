@@ -1,0 +1,4 @@
+# List of source files which contain translatable strings.
+utilities/dumpshm.cpp
+utilities/parser.cpp
+utilities/processor.cpp
