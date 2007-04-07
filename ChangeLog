@@ -1,4 +1,10 @@
-2007-04-08 Markus Gothe <nietzsche@lysator.liu.se>
+2007-04-07 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionCallMethod): stop warning
+	  about ActionCallMethod arg being not a function (seems
+	  to be common behaviour for invoking constructors).
+
+2007-04-07 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* backend/render_handler_ogl.cpp: Removed mipsmaps code, due to
 	  major clean up and rewrite (since it's not used).

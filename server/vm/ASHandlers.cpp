@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.83 2007/04/06 15:36:05 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.84 2007/04/07 11:32:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2730,9 +2730,11 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 				return;
 			}
 
+#ifdef GNASH_DEBUG
 			log_warning("Function object given to ActionCallMethod"
 				       " is not a function, will try to use"
 				       " its 'constructor' member");
+#endif
 
 			// TODO: all this crap should go into an as_object::getConstructor instead
 			as_value ctor;
