@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.31 2007/04/07 11:55:50 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.32 2007/04/07 12:38:32 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -259,6 +259,105 @@ NetStreamFfmpeg::play(const char* c_url)
 	return 0;
 }
 
+/// Finds a decoder, allocates a context and initializes it.
+//
+/// @param codec_id the codec ID to find
+/// @return the initialized context, or NULL on failure. The caller is 
+///         responsible for deallocating!
+static AVCodecContext*
+initContext(enum CodecID codec_id)
+{
+
+	AVCodec* codec = avcodec_find_decoder(codec_id);
+	if (!codec) {
+		log_error("libavcodec couldn't find decoder.");
+		return NULL;
+	}
+
+	AVCodecContext * context = avcodec_alloc_context();
+	if (!context) {
+		log_error("libavcodec couldn't allocate context.");
+		return NULL;
+	}
+
+	int rv = avcodec_open(context, codec);
+	if (rv < 0) {
+		avcodec_close(context);
+		log_error("libavcodec failed to initialize codec.");
+		return NULL;
+	}
+
+	return context;
+}
+
+/// Gets video info from the parser and initializes the codec.
+//
+/// @param parser the parser to use to get video information.
+/// @return the initialized context, or NULL on failure. The caller
+///         is responsible for deallocating this pointer.
+static AVCodecContext* 
+initFlvVideo(FLVParser* parser)
+{
+	// Get video info from the parser
+	std::auto_ptr<FLVVideoInfo> videoInfo( parser->getVideoInfo() );
+	if (!videoInfo.get()) {
+		return NULL;
+	}
+
+	enum CodecID codec_id;
+
+	// Find the decoder and init the parser
+	switch(videoInfo->codec) {
+		case VIDEO_CODEC_H263:
+			codec_id = CODEC_ID_FLV1;
+			break;
+#ifdef FFMPEG_VP6
+		case VIDEO_CODEC_VP6:
+			codec_id = CODEC_ID_VP6F;
+			break;
+#endif
+		case VIDEO_CODEC_SCREENVIDEO:
+			codec_id = CODEC_ID_FLASHSV;
+			break;
+		default:
+			log_error("Unsupported video codec");
+			return NULL;
+	}
+
+	return initContext(codec_id);
+}
+
+
+/// Like initFlvVideo, but for audio.
+static AVCodecContext*
+initFlvAudio(FLVParser* parser)
+{
+	// Get audio info from the parser
+	std::auto_ptr<FLVAudioInfo> audioInfo( parser->getAudioInfo() );
+	if (!audioInfo.get()) {
+		return NULL;
+	}
+
+	enum CodecID codec_id;
+
+	switch(audioInfo->codec) {
+		case AUDIO_CODEC_RAW:
+			codec_id = CODEC_ID_PCM_U16LE;
+			break;
+		case AUDIO_CODEC_ADPCM:
+			codec_id = CODEC_ID_ADPCM_SWF;
+			break;
+		case AUDIO_CODEC_MP3:
+			codec_id = CODEC_ID_MP3;
+			break;
+		default:
+			log_error("Unsupported audio codec");
+			return NULL;
+	}
+
+	return initContext(codec_id);
+}
+
 void
 NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 {
@@ -277,14 +376,13 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	ns->inputPos = 0;
 
 	// Check if the file is a FLV, in which case we use our own parser
-	uint8_t head[3];
+	char head[4] = {0, 0, 0, 0};
 	if (nc->read(head, 3) < 3) {
 		ns->set_status("NetStream.Buffer.StreamNotFound");
 		return;
 	}
 	nc->seek(0);
-	if (head[0] == 'F' && head[1] == 'L' && head[2] == 'V') {
-		
+	if (std::string(head) == "FLV") {
 		ns->m_isFLV = true;
 		ns->m_parser = new FLVParser();
 		if (!nc->connectParser(ns->m_parser)) {
@@ -298,53 +396,17 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 		avcodec_init();
 		avcodec_register_all();
 
-		// Get video info from the parser
-		FLVVideoInfo* videoInfo = ns->m_parser->getVideoInfo();
-		if (videoInfo != NULL) {
-			// Find the decoder and init the parser
-			AVCodec* vcodec;
-			if (videoInfo->codec == VIDEO_CODEC_H263) {
-				vcodec = avcodec_find_decoder(CODEC_ID_FLV1);
-#ifdef FFMPEG_VP6
-			} else if (videoInfo->codec == VIDEO_CODEC_VP6) {
-				vcodec = avcodec_find_decoder(CODEC_ID_VP6F);
-#endif
-			} else if (videoInfo->codec == VIDEO_CODEC_SCREENVIDEO) {
-				vcodec = avcodec_find_decoder(CODEC_ID_FLASHSV);
-			} else {
-				log_error("Unsupported video codec");
-				return;
-			}
-
-			if (vcodec == NULL) {
-				return;
-			}
-
-			ns->m_VCodecCtx = avcodec_alloc_context();
-			avcodec_open(ns->m_VCodecCtx, vcodec);
+		ns->m_VCodecCtx = initFlvVideo(ns->m_parser);
+		if (!ns->m_VCodecCtx) {
+			log_msg("Failed to initialize video codec.");
+			return;
 		}
-		delete videoInfo;
 
-		// Get audio info from the parser
-		FLVAudioInfo* audioInfo = ns->m_parser->getAudioInfo();
-		if (audioInfo != NULL) {
-
-			AVCodec* acodec;
-			if (audioInfo->codec == AUDIO_CODEC_RAW) {
-				acodec = avcodec_find_decoder(CODEC_ID_PCM_U16LE);
-			} else if (audioInfo->codec == AUDIO_CODEC_ADPCM) {
-				acodec = avcodec_find_decoder(CODEC_ID_ADPCM_SWF);
-			} else if (audioInfo->codec == AUDIO_CODEC_MP3) {
-				acodec = avcodec_find_decoder(CODEC_ID_MP3);
-			} else {
-				log_error("Unsupported audio codec");
-				return;
-			}
-
-			ns->m_ACodecCtx = avcodec_alloc_context();
-			avcodec_open(ns->m_ACodecCtx, acodec);
+		ns->m_ACodecCtx = initFlvAudio(ns->m_parser);
+		if (!ns->m_ACodecCtx) {
+			log_msg("Failed to initialize audio codec.");
+			return;
 		}
-		delete audioInfo;
 
 		// We just define the indexes here, they're not really used when
 		// the file format is FLV
@@ -360,7 +422,6 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 		// Allocate a frame to store the decoded frame in
 		ns->m_Frame = avcodec_alloc_frame();
 
-		// By deleting this lock we allow the av_streamer-thread to start its work
 		return;
 	}
 
@@ -509,8 +570,6 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	}
 
 	ns->m_pause = false;
-	
-	return;
 }
 
 // decoder thread

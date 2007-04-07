@@ -29,7 +29,8 @@
 	* server/NetStreamFfmpeg{.cpp, .h}: Fix a deadlock on non-glibc
 	platforms by waiting for a thread rather than hoping for a
 	certain execution order (which is fundamentally incompatible with
-	threads).
+	threads). Cleanup: modularise some code and use string comparison
+	rather than char-by-char comparison.
 
 2007-04-06 Sandro Santilli <strk@keybit.net>
 
