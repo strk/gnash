@@ -53,8 +53,6 @@ public:
 	long bytesTotal();
 	void advance();
 	bool newFrameReady();
-	as_function* getStatusHandler();
-	void setStatusHandler(as_function*);
 	void setEnvironment(as_environment* env);
 
 	// Used for gstreamer data read and seek callbacks
@@ -112,6 +110,7 @@ private:
 	image::image_base* m_imageframe;
 
 	boost::thread *startThread;
+	boost::mutex image_mutex;
 	bool m_pause;
 
 	long inputPos;

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.35 2007/03/30 13:57:27 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.36 2007/04/07 11:55:50 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -108,7 +108,7 @@ bool NetConnection::openConnection(const char* char_url, as_object* owner)
 		return false;
 	}
 
-	log_msg("Connection etablished to movie: %s\n", _url.c_str());
+	log_msg("Connection etablished to movie: %s", _url.c_str());
 
 	return true;
 }

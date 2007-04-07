@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.25 2007/03/30 13:57:27 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.26 2007/04/07 11:55:50 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -88,10 +88,6 @@ public:
 	virtual void advance(){}
 
 	virtual bool newFrameReady() { return false; }
-
-	virtual as_function* getStatusHandler() { return NULL; }
-
-	virtual void setStatusHandler(as_function*) { }
 
 	virtual void setEnvironment(as_environment* /*env*/) { };
 };

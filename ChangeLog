@@ -1,3 +1,18 @@
+2007-04-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* packaging/redhat/gnash.spec: Use --enable-media instead of
+	  --enable-sound.
+	* server/video_stream_instance.cpp: Delete the image once displayed.
+	* server/asobj/NetStream.h: Removed the obsolete getter/setters
+	  for onStatus.
+	* server/asobj/NetStreamFfmpeg.{h,cpp}: Removed the obsolete 
+	  getter/setters for onStatus. Made get_video() threadsafe.
+	  Removed \n from log/error messages.
+	* server/asobj/NetStreamGst.{cpp,h}: Removed the obsolete 
+	  getter/setters for onStatus. Made get_video() threadsafe.
+	  Removed \n from log/error messages.
+	* server/asobj/NetConnection.cpp: Removed \n from log/error messages.
+
 2007-04-07 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (ActionCallMethod): stop warning

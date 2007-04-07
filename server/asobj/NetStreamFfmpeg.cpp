@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.30 2007/04/06 22:16:36 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.31 2007/04/07 11:55:50 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -561,6 +561,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 
 			if (clock >= video_clock)
 			{
+				boost::mutex::scoped_lock lock(ns->image_mutex);
 				int videoFrameFormat = gnash::render::videoFrameFormat();
 				if (videoFrameFormat == render::YUV) {
 					static_cast<image::yuv*>(ns->m_imageframe)->update(video->m_data);
@@ -643,7 +644,7 @@ bool NetStreamFfmpeg::read_frame()
 		}
 		else
 		{
-			log_warning("read_frame: not audio & video stream\n");
+			log_warning("read_frame: not audio & video stream");
 		}
 		return true;
 	}
@@ -838,7 +839,22 @@ bool NetStreamFfmpeg::read_frame()
 
 image::image_base* NetStreamFfmpeg::get_video()
 {
-	return m_imageframe;
+	boost::mutex::scoped_lock lock(image_mutex);
+
+	if (!m_imageframe) return NULL;
+
+	image::image_base* ret_image;
+	int videoFrameFormat = gnash::render::videoFrameFormat();
+	if (videoFrameFormat == render::YUV) {
+		ret_image = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
+	} else if (videoFrameFormat == render::RGB) {
+		ret_image = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
+	} else {
+		return NULL;
+	}
+
+	ret_image->update(m_imageframe->m_data);
+	return ret_image;
 }
 
 void
@@ -994,19 +1010,6 @@ NetStreamFfmpeg::newFrameReady()
 		return false;
 	}
 }
-
-as_function* 
-NetStreamFfmpeg::getStatusHandler()
-{
-	return m_statusHandler.get();
-}
-
-void 
-NetStreamFfmpeg::setStatusHandler(as_function* handler)
-{
-	m_statusHandler = handler;
-}
-
 
 } // gnash namespcae
 

@@ -227,6 +227,8 @@ NetStreamGst::callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*p
 
 	NetStreamGst* ns = static_cast<NetStreamGst*>(user_data);
 
+	boost::mutex::scoped_lock lock(ns->image_mutex);
+
 	// If the video size has not yet been detected, detect them
 	if (ns->videowidth == 0 && ns->videoheight == 0) {
 		GstPad* videopad = gst_element_get_pad (ns->colorspace, "src");
@@ -372,7 +374,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 
 	// Check if the creation of the gstreamer pipeline and audiosink was a succes
 	if (!ns->pipeline) {
-		gnash::log_error("The gstreamer pipeline element could not be created\n");
+		gnash::log_error("The gstreamer pipeline element could not be created");
 		return;
 	}
 
@@ -391,7 +393,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 		if (!ns->audiosink) ns->audiosink = gst_element_factory_make ("esdsink", NULL);
 
 		if (!ns->audiosink) {
-			gnash::log_error("The gstreamer audiosink element could not be created\n");
+			gnash::log_error("The gstreamer audiosink element could not be created");
 			return;
 		}
 	} else {
@@ -405,7 +407,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	ns->volume = gst_element_factory_make ("volume", NULL);
 
 	if (!ns->audioconv || !ns->volume) {
-		gnash::log_error("Gstreamer audio element(s) for movie handling could not be created\n");
+		gnash::log_error("Gstreamer audio element(s) for movie handling could not be created");
 		return;
 	}
 
@@ -605,7 +607,22 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 
 image::image_base* NetStreamGst::get_video()
 {
-	return m_imageframe;
+	boost::mutex::scoped_lock lock(image_mutex);
+
+	if (!m_imageframe) return NULL;
+
+	image::image_base* ret_image;
+	int videoFrameFormat = gnash::render::videoFrameFormat();
+	if (videoFrameFormat == render::YUV) {
+		ret_image = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
+	} else if (videoFrameFormat == render::RGB) {
+		ret_image = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
+	} else {
+		return NULL;
+	}
+
+	ret_image->update(m_imageframe->m_data);
+	return ret_image;
 }
 
 void
@@ -754,18 +771,6 @@ NetStreamGst::newFrameReady()
 	} else {
 		return false;
 	}
-}
-
-as_function* 
-NetStreamGst::getStatusHandler()
-{
-	return m_statusHandler.get();
-}
-
-void 
-NetStreamGst::setStatusHandler(as_function* handler)
-{
-	m_statusHandler = handler;
 }
 
 // Gstreamer callback function

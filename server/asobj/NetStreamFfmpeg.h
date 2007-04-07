@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.17 2007/04/06 22:16:36 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.18 2007/04/07 11:55:50 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -154,9 +154,8 @@ public:
 	long bytesTotal();
 	void advance();
 	bool newFrameReady();
-	as_function* getStatusHandler();
-	void setStatusHandler(as_function*);
 	void setEnvironment(as_environment* env);
+
 	// Used for ffmpeg data read and seek callbacks
 	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
@@ -211,6 +210,7 @@ private:
 	boost::thread *m_thread;
 	boost::thread *startThread;
 	boost::mutex decoding_mutex;
+	boost::mutex image_mutex;
 
 	// Are the playing loop running or not
 	volatile bool m_go;

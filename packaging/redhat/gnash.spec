@@ -115,22 +115,22 @@ RPM_TARGET=i386-olpc-linux
   CROSS_OPTS="--build=%{_host} --host=$RPM_TARGET --target=$RPM_TARGET"
   RENDERER="--enable-renderer=agg"		# could be opengl
   %ifarch arm
-    SOUND="--disable-sound --disable-plugin --disable-klash"
+    SOUND="--disable-media --disable-plugin --disable-klash"
   %else
-    SOUND="--enable-sound=gst"			# could also be sdl
+    SOUND="--enable-media=gst"			# could also be sdl
   %endif
 # The OLPC is a weird case, it's basically an i386-linux toolchain
 # targeted towards Fedora Core 6. The machine itself is too limited to
 # build RPMs on, so we do it this way.
   %if olpc
     CROSS_OPTS="$CROSS_OPTS --disable-klash --disable-menus"
-    SOUND="--enable-sound=sdl --with-mp3-decoder=mad --disable-static"
+    SOUND="--enable-media=mad --disable-static"
     RENDERER="$RENDERER --with-pixelformat=RGB565"
   %endif
 %else
 # Native RPM build
   CROSS_OPTS="--enable-ghelp --enable-docbook"
-  SOUND="--enable-sound=sdl --with-mp3-decoder=ffmpeg"
+  SOUND="--enable-media=ffmpeg"
   RENDERER=""
 %endif
 

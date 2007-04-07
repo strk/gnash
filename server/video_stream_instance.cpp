@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.cpp,v 1.17 2007/03/23 00:30:10 tgc Exp $
+// $Id: video_stream_instance.cpp,v 1.18 2007/04/07 11:55:50 tgc Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -109,6 +109,7 @@ video_stream_instance::display()
 		if (i)
 		{
 			gnash::render::drawVideoFrame(i, &m, &bounds);
+			delete i;
 		} else {
 			log_warning("An error occured while decoding video frame.");
 		}
