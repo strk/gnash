@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.32 2007/04/07 12:38:32 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.33 2007/04/07 12:50:04 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -905,9 +905,9 @@ image::image_base* NetStreamFfmpeg::get_video()
 	image::image_base* ret_image;
 	int videoFrameFormat = gnash::render::videoFrameFormat();
 	if (videoFrameFormat == render::YUV) {
-		ret_image = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
+		ret_image = new image::yuv(m_imageframe->m_width, m_imageframe->m_height);
 	} else if (videoFrameFormat == render::RGB) {
-		ret_image = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
+		ret_image = new image::rgb(m_imageframe->m_width, m_imageframe->m_height);
 	} else {
 		return NULL;
 	}

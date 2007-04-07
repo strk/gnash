@@ -1,5 +1,10 @@
 2007-04-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
+	* server/asobj/NetStream{Ffmpeg,Gst}.cpp: Use the m_imageframe's
+	  size to determine the size of the returned frame.
+
+2007-04-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
 	* packaging/redhat/gnash.spec: Use --enable-media instead of
 	  --enable-sound.
 	* server/video_stream_instance.cpp: Delete the image once displayed.

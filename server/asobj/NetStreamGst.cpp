@@ -614,9 +614,9 @@ image::image_base* NetStreamGst::get_video()
 	image::image_base* ret_image;
 	int videoFrameFormat = gnash::render::videoFrameFormat();
 	if (videoFrameFormat == render::YUV) {
-		ret_image = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
+		ret_image = new image::yuv(m_imageframe->m_width, m_imageframe->m_height);
 	} else if (videoFrameFormat == render::RGB) {
-		ret_image = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
+		ret_image = new image::rgb(m_imageframe->m_width, m_imageframe->m_height);
 	} else {
 		return NULL;
 	}
