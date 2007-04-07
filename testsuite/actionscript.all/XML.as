@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.24 2007/04/04 15:47:22 strk Exp $";
+rcsid="$Id: XML.as,v 1.25 2007/04/07 15:27:16 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -260,6 +260,8 @@ tmp.checkParsed = function ()
 	{
 		check_equals(nodeName, 'TOPNODE');
 		check_equals(typeof(nodeValue), 'null');
+		check_equals(typeof(nextSibling), 'null');
+		check_equals(typeof(previousSibling), 'null');
 
 		// Check that nodeValue is overridable
 		nodeValue = 4;
@@ -273,6 +275,11 @@ tmp.checkParsed = function ()
 		{
 			check_equals(nodeName, 'SUBNODE1');
 			check_equals(typeof(nodeValue), 'null');
+
+			check_equals(typeof(nextSibling), 'object');
+			check_equals(nextSibling.nodeName, 'SUBNODE2');
+			check_equals(typeof(previousSibling), 'null');
+
 			check_equals(nodeType, 1); // element
 			check_equals(childNodes.length, 2);
 			with (firstChild)
@@ -280,6 +287,9 @@ tmp.checkParsed = function ()
 				check_equals(nodeName, 'SUBSUBNODE1');
 				check_equals(typeof(nodeValue), 'null');
 				check_equals(nodeType, 1); // element
+				check_equals(typeof(nextSibling), 'object');
+				check_equals(nextSibling.nodeName, 'SUBSUBNODE2');
+				check_equals(typeof(previousSibling), 'null');
 				check_equals(childNodes.length, 1);
 				with (firstChild)
 				{
@@ -293,6 +303,9 @@ tmp.checkParsed = function ()
 				check_equals(nodeName, 'SUBSUBNODE2');
 				check_equals(typeof(nodeValue), 'null');
 				check_equals(nodeType, 1); // element
+				check_equals(typeof(nextSibling), 'null');
+				check_equals(typeof(previousSibling), 'object');
+				check_equals(previousSibling.nodeName, 'SUBSUBNODE1');
 				check_equals(childNodes.length, 1);
 				with (firstChild)
 				{
@@ -308,6 +321,11 @@ tmp.checkParsed = function ()
 			check_equals(nodeName, 'SUBNODE2');
 			check_equals(typeof(nodeValue), 'null');
 			check_equals(nodeType, 1); // element
+
+			check_equals(typeof(nextSibling), 'null');
+			check_equals(typeof(previousSibling), 'object');
+			check_equals(previousSibling.nodeName, 'SUBNODE1');
+
 			check_equals(childNodes.length, 2);
 			with (firstChild)
 			{

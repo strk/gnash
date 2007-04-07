@@ -199,7 +199,7 @@ public:
     void appendChild(boost::intrusive_ptr<XMLNode> childNode);
 
     void setParent(XMLNode *node) { _parent = node; };
-    XMLNode *getParent() { return _parent; };
+    XMLNode *getParent() { return _parent.get(); };
 
     /// Insert a node before a node
     //
@@ -219,7 +219,7 @@ public:
 
     void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
 
-    XMLNode		*_parent;
+    boost::intrusive_ptr<XMLNode> _parent;
     ChildList		_children;
     AttribList      _attributes;
 

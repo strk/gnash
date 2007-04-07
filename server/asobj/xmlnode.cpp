@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.26 2007/04/04 15:47:22 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.27 2007/04/07 15:27:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -129,9 +129,9 @@ XMLNode::~XMLNode()
 bool
 XMLNode::hasChildNodes()
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     if (_children.size()) {
-	return true;
+        return true;
     }
     return false;
 }
@@ -147,7 +147,7 @@ XMLNode::firstChild()
 boost::intrusive_ptr<XMLNode>
 XMLNode::lastChild()
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 	if ( _children.empty() )
 	{
 			log_msg("XMLNode %p has no childrens", (void*)this);
@@ -203,7 +203,7 @@ XMLNode::removeNode()
 XMLNode *
 XMLNode::previousSibling()
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
     if ( ! _parent) return NULL;
  	if (_parent->_children.size() <= 1) return NULL;
@@ -226,10 +226,18 @@ XMLNode::previousSibling()
 XMLNode *
 XMLNode::nextSibling()
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
-    if ( ! _parent) return NULL;
- 	if (_parent->_children.size() <= 1) return NULL;
+    if ( ! _parent)
+    {
+            //log_msg("Node %p has no parent, returning NULL", this);
+            return NULL;
+    }
+    if (_parent->_children.size() <= 1)
+    {
+            //log_msg("Node %p parent has only this node, returning NULL", this);
+            return NULL;
+    }
 
     XMLNode *previous_node = NULL;
     ChildList::reverse_iterator itx;
@@ -237,7 +245,7 @@ XMLNode::nextSibling()
     {
         if (itx->get() == this)
         {
-            // log_msg("Found the next XMLNode child !!!! %s <%p>\n", (*itx)->nodeName(), (void*)*itx);
+            //log_msg("Found the next XMLNode child !!!! %s <%p>", (*itx)->nodeName().c_str(), (void*)itx->get());
 		    return previous_node;
 		}
 		previous_node = itx->get();
@@ -618,7 +626,7 @@ xmlnode_firstchild(const fn_call& fn)
 static as_value
 xmlnode_lastchild(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
@@ -641,7 +649,7 @@ xmlnode_lastchild(const fn_call& fn)
 static as_value
 xmlnode_nextsibling(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     as_value rv;
     rv.set_null();
 
@@ -650,7 +658,7 @@ xmlnode_nextsibling(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror("Tried to set read-only property XMLNode.nextSibling");
         );
-	return rv;
+        return rv;
     }
     
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
@@ -665,7 +673,7 @@ xmlnode_nextsibling(const fn_call& fn)
 static as_value
 xmlnode_previoussibling(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     as_value rv;
     rv.set_null();
 
@@ -674,7 +682,7 @@ xmlnode_previoussibling(const fn_call& fn)
         IF_VERBOSE_ASCODING_ERRORS(
         log_aserror("Tried to set read-only property XMLNode.previousSibling");
         );
-	return rv;
+        return rv;
     }
 
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);

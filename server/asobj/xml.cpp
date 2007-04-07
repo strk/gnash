@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.35 2007/04/04 20:30:45 bjacques Exp $ */
+/* $Id: xml.cpp,v 1.36 2007/04/07 15:27:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -274,7 +274,7 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
                 {
                     if (node->content)
                     {
-                        log_msg("extractChildNode from text for %s has contents %s\n", node->name, ptr);
+                        //log_msg("extractChildNode from text for %s has contents '%s'", node->name, ptr);
                         std::string val(reinterpret_cast<const char*>(ptr));
                         element.nodeValueSet(val);
                     }
@@ -289,11 +289,11 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
     while (childnode)
     {
         child = new XMLNode();
+        child->setParent(&element);
         extractNode(*child, childnode, mem);
         element._children.push_back(child);
         childnode = childnode->next;
     }
-
 }
 
 // Read in an XML document from the specified source
@@ -314,6 +314,7 @@ XML::parseDoc(xmlDocPtr document, bool mem)
     if (cur != NULL)
     {
         boost::intrusive_ptr<XMLNode> child = new XMLNode();
+        child->setParent(this);
         extractNode(*child, cur, mem);
         _children.push_back(child);
     }  

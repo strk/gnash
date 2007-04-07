@@ -1,3 +1,11 @@
+2007-04-07 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/xml.cpp (extractNode, parseDoc): properly setup
+	  the node parent.
+	* server/asobj/xmlnode.{cpp,h}: keep parent by intrusive_ptr.
+	* testsuite/actionscript.all/XML.as: add tests for
+	  nextSibling and previousSibling
+
 2007-04-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStream{Ffmpeg,Gst}.cpp: Use the m_imageframe's
