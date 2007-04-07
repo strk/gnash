@@ -6,7 +6,7 @@
 // A render_handler that uses SDL & OpenGL
 
 
-/* $Id: render_handler_ogl.cpp,v 1.69 2007/04/07 00:12:01 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.70 2007/04/07 12:08:17 nihilus Exp $ */
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -29,7 +29,7 @@ using namespace gnash;
 // 1 = hardware (experimental, should be fast, somewhat buggy)
 // 2 = fast software bilinear (default)
 // 3 = use image::resample(), slow software resampling
-#define RESAMPLE_METHOD 1
+#define RESAMPLE_METHOD 2
 
 
 // bitmap_info_ogl declaration
