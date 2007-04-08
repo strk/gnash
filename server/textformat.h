@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-//
+// $Id: textformat.h,v 1.14 2007/04/08 15:00:12 nihilus Exp $
 //
 
 #ifndef __TEXTFORMAT_H__

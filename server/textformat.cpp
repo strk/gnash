@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-//
+// $Id: textformat.cpp,v 1.23 2007/04/08 15:00:12 nihilus Exp $
 //
 
 #include "log.h"
