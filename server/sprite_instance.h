@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.90 2007/04/06 15:36:05 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.91 2007/04/08 08:37:07 zoulunkai Exp $ */
 
 // Stateful live Sprite instance
 
@@ -279,13 +279,10 @@ public:
 
 	/// Parse frame spec and return a 0-based frame number.
 	//
-	/// If frame spec cannot be converted to !NAN number
+	/// If frame spec cannot be converted to !NAN and !Infinity number
 	/// it will be converted to a string and considered a
 	/// frame label (returns false if referring to an
 	/// unknwown label).
-	///
-	/// If frame spec can be converted to a non-zero positive
-	/// integer it will be "clamped" to the valid range.
 	///
 	/// @param frame_spec
 	///	The frame specification.

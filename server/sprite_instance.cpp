@@ -1725,11 +1725,11 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 
 	as_environment* env = const_cast<as_environment*>(&m_as_environment);
 
-	double num =  frame_spec.to_number(env);
+	as_value str(frame_spec.to_std_string(env));
 
-	// TODO: check if a frame labeled "0" or "-3" or "Infinite"
-	//       takes precedence over the numerical value.
-	if ( isnan(num) )
+	double num =  str.to_number(env);
+
+	if ( isnan(num) || isinf(num))
 	{
 		return m_def->get_labeled_frame(frame_spec.to_string(env), &frameno);
 	}
@@ -1737,7 +1737,10 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 	// TODO: are we sure we shouldn't check for frames labeled with negative numbers ?
 	if ( num < 1 ) return false;
 
-	frameno = iclamp(int(num), 1, m_def->get_frame_count())-1;
+	// all frame numbers >= 0 are valid, but a valid frame number may still
+	// reference a non-exist frame(eg. frameno > total_frames).
+	frameno = num - 1;
+
 	return true;
 }
 
@@ -2424,15 +2427,20 @@ sprite_instance::goto_frame(size_t target_frame_number)
 
 	assert(! isUnloaded() );
 
-	//	target_frame_number = iclamp(target_frame_number, 0, m_def->get_frame_count() - 1);
-	// Macromedia Flash ignores goto_frame(bad_frame)
-	if (target_frame_number > m_def->get_frame_count() - 1 ||
-			target_frame_number == m_current_frame)	// to prevent infinitive recursion
+	// goto_frame stops by default.
+	// ActionGotoFrame tells the movieClip to go to the target frame 
+	// and stop at that frame. 
+	set_play_state(STOP);
+
+	if(target_frame_number == m_current_frame)
 	{
-		//FIXME: Don't set play state to STOP, just return will be more correct. 
-		//  m_current_frame will be incremented in next advance_sprite, so I think 
-		//  there will be no 'infinitive recursion' (Zou)
-		set_play_state(STOP);
+		// don't push actions
+		return;
+	}
+	if(target_frame_number > m_def->get_frame_count() - 1)
+	{
+		m_current_frame = m_def->get_frame_count() - 1;
+		// don't push actions
 		return;
 	}
 
@@ -2513,10 +2521,6 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	//  current frame should also be executed(Zou)
 	m_current_frame = target_frame_number;      
 
-	// goto_frame stops by default.
-	// Zou: ActionGotoFrame tells the movieClip to go to the target frame 
-	//  and stop at that frame. 
-	set_play_state(STOP);
 
 	// After entering to advance_sprite() m_current_frame points to frame
 	// that already is executed. 
