@@ -2,6 +2,8 @@ package Gnash::Utils;
 
 use strict;
 use warnings;
+use Regexp::Common qw/comment delimited/;
+
 use Exporter 'import';
 our @EXPORT_OK = qw/
     clean 
@@ -15,10 +17,8 @@ sub clean {
     return 
       clean_cpp_comment(
         clean_c_comment(
-          clean_single_quoted_string(
-            clean_double_quoted_string(
-              $_[0]
-            )
+          clean_quoted_string(
+            $_[0]
           )
         )
       );
@@ -26,27 +26,35 @@ sub clean {
 
 sub clean_cpp_comment {
     my $string = shift;
-    $string =~ s{ // .* }{}gx;
+    while ($string =~ /$RE{comment}{'C++'}{-keep}/) {
+        my $matched = $1;
+        (my $newlines = $matched) =~ s/[^\n]//;
+        $string =~ s/$RE{comment}{'C++'}/$newlines/;
+    }
     return $string;
 }
 
 sub clean_c_comment {
     my $string = shift;
-    $string =~ s{ /\* .*? \*/ }{}gsx;
+    while ($string =~ /$RE{comment}{C}{-keep}/) {
+        my $matched = $1;
+        (my $newlines = $matched) =~ s/[^\n]//;
+        $string =~ s/$RE{comment}{C}/$newlines/;
+    }
     return $string;
 }
 
-sub clean_single_quoted_string {
+sub clean_quoted_string {
     my $string = shift;
-    $string =~ s{ (?: ' (?: \\\\ | \\' | [^'] )* ' ) }{}gsx;
+ 
+    while ($string =~ /$RE{delimited}{-delim=>q{"'}}{-keep}/) {
+        my $matched = $1;
+        (my $newlines = $matched) =~ s/[^\n]//;
+        $string =~ s/$RE{delimited}{-delim=>q{"'}}/$newlines/;
+    }
     return $string;
 }
 
-sub clean_double_quoted_string {
-    my $string = shift;
-    $string =~ s{ (?: " (?: \\\\ | \\" | [^"] )* " ) }{}gsx;
-    return $string;
-}
 
 1;
 
@@ -76,8 +84,8 @@ All functions may be optionally imported.
 
 =item clean($source)
 
-This function calls C<clean_double_quoted_string>, 
-C<clean_single_quoted_string>, C<clean_c_comment>, and C<clean_cpp_comment>
+This function calls C<clean_quoted_string>, 
+C<clean_c_comment>, and C<clean_cpp_comment>
 and returns a string.  It expects to receive the entire contents of a source
 file.
 
@@ -103,22 +111,12 @@ string.  For example,
 becomes:
     return 1;
 
-=item clean_single_quoted_string($source)
+=item clean_quoted_string($source)
 
-This routine will remove single quoted strings.  It expects to receive the
+This routine will remove quoted strings.  It expects to receive the
 entire source code and will return the modified code as a string.  For
 instance,
     return 'hello world';
-
-becomes
-    return ;
-
-=item clean_double_quoted_string($source)
-
-This routine will remove double quoted strings.  It expects to receive the
-entire source code and will return the modified code as a string.  For
-instance,
-    return "hello world";
 
 becomes
     return ;

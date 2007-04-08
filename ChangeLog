@@ -2,6 +2,8 @@
 
 	* devtools/testsuite/c_casts.t: added this test at Bastiaan's
 	  request.
+	* devtools/lib/Gnash/Utils.pm: fix bug which caused wrong line
+	  numbers to be reported.
 
 2007-04-08 Zou Lunkai <zoulunkai@gmail.com>
 
