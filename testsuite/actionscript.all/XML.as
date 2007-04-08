@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.25 2007/04/07 15:27:16 strk Exp $";
+rcsid="$Id: XML.as,v 1.26 2007/04/08 08:06:58 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -40,6 +40,7 @@ check(! XML.prototype.hasOwnProperty("toString") );
 check(! XML.prototype.hasOwnProperty("length") );
 check(! XML.prototype.hasOwnProperty("status"));
 check(! XML.prototype.hasOwnProperty("loaded"));
+check(! XML.prototype.hasOwnProperty("attributes"));
 check(XML.prototype.hasOwnProperty("createElement") );
 check(XML.prototype.hasOwnProperty("addRequestHeader") );
 check(XML.prototype.hasOwnProperty("createTextNode") );
@@ -67,6 +68,7 @@ check(XMLNode.prototype.hasOwnProperty("insertBefore") );
 check(XMLNode.prototype.hasOwnProperty("removeNode") );
 check(XMLNode.prototype.hasOwnProperty("toString") );
 check(XMLNode.prototype.hasOwnProperty("cloneNode") );
+check(XMLNode.prototype.hasOwnProperty("attributes") );
 check(! XMLNode.prototype.hasOwnProperty("length") );
 check(! XMLNode.prototype.hasOwnProperty("createElement") );
 check(! XMLNode.prototype.hasOwnProperty("addRequestHeader") );
@@ -232,7 +234,8 @@ check(XML);
 // 	fail("XML::load() doesn't work");
 // }
 check(XML);
-var xml_in = "<TOPNODE><SUBNODE1><SUBSUBNODE1>sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub1 node data 2</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
+// Use escaped " instead of ' so that it matches the return value of toString()
+var xml_in = "<TOPNODE tna1=\"tna1val\" tna2=\"tna2val\" tna3=\"tna3val\"><SUBNODE1 sna1=\"sna1val\" sna2=\"sna2val\"><SUBSUBNODE1 ssna1=\"ssna1val\" ssna2=\"ssna2val\">sub sub1 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub1 node data 2</SUBSUBNODE2></SUBNODE1><SUBNODE2><SUBSUBNODE1>sub sub2 node data 1</SUBSUBNODE1><SUBSUBNODE2>sub sub2 node data 2</SUBSUBNODE2></SUBNODE2></TOPNODE>";
 check(XML);
 
 check(XML);
@@ -246,6 +249,7 @@ tmp.checkParsed = function ()
 	check_equals(this.childNodes.length, 1);
 	check_equals(this.childNodes[0], this.firstChild);
 	check_equals(this.childNodes[0], this.lastChild);
+
 #if OUTPUT_VERSION > 5
 	check(this.childNodes.hasOwnProperty('length'));
 	check(this.childNodes[0] === this.firstChild);
@@ -262,6 +266,10 @@ tmp.checkParsed = function ()
 		check_equals(typeof(nodeValue), 'null');
 		check_equals(typeof(nextSibling), 'null');
 		check_equals(typeof(previousSibling), 'null');
+
+		check_equals(typeof(attributes), 'object');
+		check_equals(attributes.tna1, 'tna1val');
+		check_equals(attributes.tna2, 'tna2val');
 
 		// Check that nodeValue is overridable
 		nodeValue = 4;
@@ -280,6 +288,10 @@ tmp.checkParsed = function ()
 			check_equals(nextSibling.nodeName, 'SUBNODE2');
 			check_equals(typeof(previousSibling), 'null');
 
+			check_equals(typeof(attributes), 'object');
+			check_equals(attributes.sna1, 'sna1val');
+			check_equals(attributes.sna2, 'sna2val');
+
 			check_equals(nodeType, 1); // element
 			check_equals(childNodes.length, 2);
 			with (firstChild)
@@ -290,6 +302,9 @@ tmp.checkParsed = function ()
 				check_equals(typeof(nextSibling), 'object');
 				check_equals(nextSibling.nodeName, 'SUBSUBNODE2');
 				check_equals(typeof(previousSibling), 'null');
+				check_equals(typeof(attributes), 'object');
+				check_equals(attributes.ssna1, 'ssna1val');
+				check_equals(attributes.ssna2, 'ssna2val');
 				check_equals(childNodes.length, 1);
 				with (firstChild)
 				{
