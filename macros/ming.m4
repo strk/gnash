@@ -99,7 +99,7 @@ AC_DEFUN([AC_PATH_MING], [
     AC_ARG_WITH(ming_lib, AC_HELP_STRING([--with-ming-lib], [directory where ming library is]), with_ming_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_ming_lib, [
       if test x"${with_ming_lib}" != x ; then
-        if test -f ${with_ming_lib}/libming.a -o -f ${with_ming_lib}/libming.so; then
+        if test -f ${with_ming_lib}/libming.a -o -f ${with_ming_lib}/libming.${shlibext}; then
 	  ac_cv_path_ming_lib=`(cd ${with_ming_lib}; pwd)`
         else
           AC_MSG_ERROR([${with_ming_lib} directory doesn't contain libming.])
@@ -110,7 +110,7 @@ AC_DEFUN([AC_PATH_MING], [
     dnl If the header doesn't exist, there is no point looking for the library.
     if test x"${ac_cv_path_ming_incl}" != x; then
       for i in $libslist; do
-      	if test -f $i/libming.a -o -f $i/libming.so; then
+      	if test -f $i/libming.a -o -f $i/libming.${shlibext}; then
       	  if test x"$i" != x"/usr/lib"; then
       	    ac_cv_path_ming_lib="-L$i -lming"
       	    break

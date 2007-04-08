@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: libXML.m4,v 1.29 2007/03/23 00:30:10 tgc Exp $
+dnl $Id: libXML.m4,v 1.30 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_LIBXML], [
   has_xml=no
@@ -32,7 +32,7 @@ AC_DEFUN([GNASH_PATH_LIBXML], [
 
   if test x"${ac_cv_path_libxml_incl}" = x; then
     AC_PATH_PROG(XML2_CONFIG, xml2-config, ,[${pathlist}])
-    if test "x$XML2_CONFIG" != "x" ; then
+    if test "x$XML2_CONFIG" != "x"  -a x"${darwin}" = xno ; then
       if test "x$XML2_CFLAGS" = "x" ; then
         ac_cv_path_libxml_incl=`$XML2_CONFIG --cflags`
       fi
@@ -70,16 +70,15 @@ AC_DEFUN([GNASH_PATH_LIBXML], [
   AC_ARG_WITH(libxml_lib, AC_HELP_STRING([--with-libxml-lib], [directory where libxml2 library is]), with_libxml_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_libxml_lib, [
     if test x"${with_libxml_lib}" != x ; then
-      if test -f ${with_libxml_libs}/libxml2.a -o -f ${with_libxml_lib}/libxml2.so; then
+      if test -f ${with_libxml_libs}/libxml2.a -o -f ${with_libxml_lib}/libxml2.${shlibext}; then
         ac_cv_path_libxml_lib="-L`(cd ${with_libxml_lib}; pwd)` -lxml2"
       fi
     fi
   ])
-
   AC_MSG_CHECKING([for libxml library])
   if test x"${ac_cv_path_libxml_lib}" = x ; then
     for i in $libslist; do
-      if test -f $i/libxml2.a -o -f $i/libxml2.so; then
+      if test -f $i/libxml2.a -o -f $i/libxml2.${shlibext}; then
         if test x"$i" != x"/usr/lib"; then
           ac_cv_path_libxml_lib="-L$i -lxml2"
           break

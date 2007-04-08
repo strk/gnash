@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: kde.m4,v 1.28 2007/03/20 20:27:29 martinwguy Exp $
+dnl $Id: kde.m4,v 1.29 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_KDE],
 [
@@ -76,7 +76,7 @@ dnl   # KDE_LIBS =  -lkdeui -lkdecore -lkdeprint -L/usr/lib/qt-3.3/lib -lqt-mt
   AC_ARG_WITH(kde_lib, AC_HELP_STRING([--with-kde-lib], [directory where kde libraries are]), with_kde_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_kde_lib, [
     if test x"${with_kde_lib}" != x ; then
-      if test -f ${with_kde_lib}/libkdeui.a -o -f ${with_kde_lib}/kdeui.so; then
+      if test -f ${with_kde_lib}/libkdeui.a -o -f ${with_kde_lib}/kdeui.${shlibext}; then
 	      ac_cv_path_kde_lib="-L`(cd ${with_kde_lib}; pwd)`"
       else
 	      AC_MSG_ERROR([${with_kde_lib} directory doesn't contain kde libraries.])
@@ -89,7 +89,7 @@ dnl   # KDE_LIBS =  -lkdeui -lkdecore -lkdeprint -L/usr/lib/qt-3.3/lib -lqt-mt
     topdir=""
     libslist="${kde_prefix}/lib ${libslist}"
     for i in $libslist ; do
-      if test -f $i/libkdeui.a -o -f $i/libkdeui.so ; then
+      if test -f $i/libkdeui.a -o -f $i/libkdeui.${shlibext} ; then
         topdir=$i
         AC_MSG_RESULT(${topdir}/libkdeui)
 	      if test x"$i" != x"/usr/lib"; then
@@ -106,7 +106,7 @@ dnl   # KDE_LIBS =  -lkdeui -lkdecore -lkdeprint -L/usr/lib/qt-3.3/lib -lqt-mt
   dnl Look for the kdecore library, which is required
   if test x"${ac_cv_path_kde_lib}" != x; then
     AC_MSG_CHECKING([for kdecore library])
-    if test -f ${topdir}/libkdecore.a -o -f ${topdir}/libkdecore.so; then
+    if test -f ${topdir}/libkdecore.a -o -f ${topdir}/libkdecore.${shlibext}; then
       ac_cv_path_kde_lib="${ac_cv_path_kde_lib} -lkdecore"
       AC_MSG_RESULT(${topdir}/libkdecore)
     else
@@ -116,7 +116,7 @@ dnl   # KDE_LIBS =  -lkdeui -lkdecore -lkdeprint -L/usr/lib/qt-3.3/lib -lqt-mt
     dnl Look for the kdeprint library, which is required
     AC_MSG_CHECKING([for kdeprint library])
     if test x"${libkdeprint}" = x; then
-      if test -f ${topdir}/libkdeprint.a -o -f ${topdir}/libkdeprint.so; then
+      if test -f ${topdir}/libkdeprint.a -o -f ${topdir}/libkdeprint.${shlibext}; then
         ac_cv_path_kde_lib="${ac_cv_path_kde_lib} -lkdeprint"
         AC_MSG_RESULT(${topdir}/libkdeprint)
       else
@@ -219,7 +219,7 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
   AC_ARG_WITH(qt_lib, AC_HELP_STRING([--with-qt-lib], [directory where qt libraries are]), with_qt_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_qt_lib, [
     if test x"${with_qt_lib}" != x ; then
-      if test -f ${with_qt_lib}/libqt-mt.q -o -f ${with_qt_lib}/libqt-mt.so; then
+      if test -f ${with_qt_lib}/libqt-mt.q -o -f ${with_qt_lib}/libqt-mt.${shlibext}; then
 	      ac_cv_path_qt_lib="-L`(cd ${with_qt_lib}; pwd)` -lqt-mt"
       else
 	      AC_MSG_ERROR([${with_qt_lib} directory doesn't contain qt libraries.])
@@ -229,7 +229,7 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
 
   if test x"${ac_cv_path_qt_lib}" = x; then
     AC_MSG_CHECKING([for qt library])
-    if test -f ${gnash_qt_topdir}/lib/libqt-mt.a -o -f ${gnash_qt_topdir}/lib/libqt-mt.so ; then
+    if test -f ${gnash_qt_topdir}/lib/libqt-mt.a -o -f ${gnash_qt_topdir}/lib/libqt-mt.${shlibext} ; then
       ac_cv_path_qt_lib="-L${gnash_qt_topdir}/lib -lqt-mt"
     fi
     if test x"${ac_cv_path_qt_lib}" != x; then

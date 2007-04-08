@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 dnl Copyright (C) 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
-dnl $Id: pthreads.m4,v 1.27 2007/03/28 23:42:19 rsavoye Exp $
+dnl $Id: pthreads.m4,v 1.28 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
@@ -175,7 +175,7 @@ dnl Try a manual search, useful for cross-compiling
 if test x"${PTHREAD_LIBS}" = "x"; then
   AC_MSG_CHECKING([searching for pthread library])
   for i in $libslist; do
-   if test -f $i/libpthread.a -o -f $i/libpthread.so -o -f $i/libpthread.dylib; then
+   if test -f $i/libpthread.a -o -f $i/libpthread.${shlibext} -o -f $i/libpthread.dylib; then
       pthreads=yes
      if test x"$i" != x"/usr/lib"; then
        PTHREAD_LIBS="-L$i -lpthread"

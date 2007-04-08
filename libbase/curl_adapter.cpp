@@ -16,7 +16,7 @@
 
 // 
 
-/* $Id: curl_adapter.cpp,v 1.24 2007/03/09 14:38:29 tgc Exp $ */
+/* $Id: curl_adapter.cpp,v 1.25 2007/04/08 23:06:17 rsavoye Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -24,10 +24,6 @@
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
-
-#ifdef HAVE_CURL_CURL_H
-# define HAVE_LIBCURL 1
 #endif
 
 #include "curl_adapter.h"
@@ -47,7 +43,7 @@ using namespace std;
 // define this if you want seeks back to be reported (on stderr)
 //#define GNASH_CURL_WARN_SEEKSBACK 1
 
-#ifndef HAVE_LIBCURL
+#ifndef USE_CURL
 
 // Stubs, in case client doesn't want to link to zlib.
 namespace curl_adapter
@@ -60,7 +56,7 @@ tu_file* make_stream(const char * /*url */)
 }
 
 
-#else // def HAVE_LIBCURL
+#else // def USE_CURL
 
 
 #include <stdexcept>
@@ -666,7 +662,7 @@ make_stream(const char* url, const std::string& postdata)
 
 } // namespace curl_adapter
 
-#endif // def HAVE_LIBCURL
+#endif // def USE_CURL
 
 
 // Local Variables:

@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl: $Id: gtkglext.m4,v 1.33 2007/01/09 00:43:43 rsavoye Exp $
+dnl: $Id: gtkglext.m4,v 1.34 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [
@@ -99,7 +99,7 @@ dnl Look for the library
 AC_ARG_WITH(glext_lib, AC_HELP_STRING([--with-glext-lib], [directory where gtkglext library is]), with_glext_lib=${withval})
 AC_CACHE_VAL(ac_cv_path_glext_lib,[
 if test x"${with_glext_lib}" != x ; then
-	if test -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.a -o -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.so; then
+	if test -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.a -o -f ${with_glext_lib}/libgtkglext-x11-${gnash_glext_version}.${shlibext}; then
 		ac_cv_path_glext_lib=-L`(cd ${with_glext_lib}; pwd)`
 	else
 		AC_MSG_ERROR([${with_glext_lib} directory doesnt contain libgtkglext-x11-${gnash_glext_version}.[a|so]])
@@ -115,14 +115,14 @@ ac_cv_path_glext_incl_config=""
 if test x"${ac_cv_path_glext_lib}" = x; then
 	AC_CHECK_LIB(gtkglext-x11-${gnash_glext_version}, gtk_gl_init, [ac_cv_path_glext_lib="-lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"],[
 	for i in $libslist; do
-		if test -f $i/libgtkglext-x11-${gnash_glext_version}.a -o -f $i/libgtkglext-x11-${gnash_glext_version}.so; then
+		if test -f $i/libgtkglext-x11-${gnash_glext_version}.a -o -f $i/libgtkglext-x11-${gnash_glext_version}.${shlibext}; then
 		ac_cv_path_glext_incl_config="-I$i/gtkglext-${gnash_glext_version}/include"
 			if test x"$i" != x"/usr/lib"; then
 				ac_cv_path_glext_lib="-L$i -lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"
 				break
 			fi
 		else
-			if test -f $i/libgtkglext-x11-${gnash_glext_version}.a -o -f $i/libgtkglext-x11-${gnash_glext_version}.so; then
+			if test -f $i/libgtkglext-x11-${gnash_glext_version}.a -o -f $i/libgtkglext-x11-${gnash_glext_version}.${shlibext}; then
 				ac_cv_path_glext_lib="-L$i/${gnash_glext_topdir} -lgtkglext-x11-${gnash_glext_version} -lgdkglext-x11-${gnash_glext_version}"
 				break
 			fi

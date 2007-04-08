@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.36 2007/03/11 05:53:20 rsavoye Exp $
+dnl $Id: boost.m4,v 1.37 2007/04/08 23:06:17 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -99,7 +99,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
     AC_MSG_CHECKING([for Boost's thread libraries])
     for i in $libslist; do
       for libname in ${boostnames}; do
-    	  if test -f $i/lib${libname}.a -o -f $i/lib${libname}.so; then
+    	  if test -f $i/lib${libname}.a -o -f $i/lib${libname}.${shlibext}; then
     	    if test x"$i" != x"/usr/lib"; then
             ac_cv_path_boost_lib="-L$i -l${libname}"
             break
@@ -116,7 +116,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
     AC_MSG_RESULT(${ac_cv_path_boost_lib})
   else
     for k in ${boostnames}; do
-      if test -f ${ac_cv_path_boost_lib}/lib${k}.a -o -f ${ac_cv_path_boost_lib}/lib${k}.so; then
+      if test -f ${ac_cv_path_boost_lib}/lib${k}.a -o -f ${ac_cv_path_boost_lib}/lib${k}.${shlibext}; then
         if test x"${ac_cv_path_boost_lib}" != x"/usr/lib"; then
 	        ac_cv_path_boost_lib="L${ac_cv_path_boost_lib} -l${k}"
         else
@@ -140,7 +140,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
         break;
       fi
       for libname in ${boostnames}; do
-    	  if test -f $i/lib${libname}.a -o -f $i/lib${libname}.so; then
+    	  if test -f $i/lib${libname}.a -o -f $i/lib${libname}.${shlibext}; then
           boost_date_time=yes
    	      ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${libname}"
           break;
@@ -150,8 +150,8 @@ AC_DEFUN([GNASH_PATH_BOOST],
     AC_MSG_RESULT(${ac_cv_path_boost_lib})
   fi
 
+  dnl we don't want any boost libraries in LIBS, we prefer to keep it seperate.
   AC_LANG_POP(C++)  
-  dnl we don't want any boost libraries in LIBS, we prefer to kep it seperate.
   LIBS="$save_LIBS"
 
   BOOST_CFLAGS="$ac_cv_path_boost_incl"
@@ -160,7 +160,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   BOOST_LIBS="$ac_cv_path_boost_lib" 
   AC_SUBST(BOOST_LIBS)
 
-  AM_CONDITIONAL(HAVE_BOOST, [test x${boost_date_time} = xyes])
+dnl  AM_CONDITIONAL(HAVE_BOOST, [test x${boost_date_time} = xyes])
 ])
 
 # Local Variables:

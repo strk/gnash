@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: cygnal.cpp,v 1.7 2007/04/06 07:58:15 jgilmore Exp $ */
+/* $Id: cygnal.cpp,v 1.8 2007/04/08 23:06:16 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -51,6 +51,7 @@ extern "C"{
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <libintl.h>
 
 #ifdef ENABLE_NLS
 #include <locale.h>

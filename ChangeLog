@@ -1,9 +1,30 @@
+2007-04-08  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/agg.m4, boost.m4, curl.m4, ffmpeg.m4, firefox.m4,
+	glib.m4, gnashpkgtool.m4, gtk2.m4, gtkglext.m4, jpeg.m4, kde.m4,
+	libXML.m4, ming.m4, mysql.m4, opengl.m4, pango.m4, pthreads.m4,
+	sdl.m4, x11.m4: Use ${shlibext} instead of .so to be more
+	portable.
+	* macros/ffmpeg.m4: Look for avutil after avformat, as there is a
+	dependancy on the order on some systems.
+	* macros/x11.m4: Reverse the logic, we *do* want to look for the X11
+	librsaries if the X11 headers are found earlier.
+	* testsuite/samples/Makefile.am: Add GotoAndPlayTestRunner to CLEANFILES.
+	* configure.ac: Improve openbsd host test. Test for Darwin libtool
+	vs ar. Reset AR if it's the Darwin libtool. Set FL_MUTEX to 0 if
+	lf_flmutext_register isn't found.
+	* cygnal/cygnal.cpp: Include libintl.h.
+	* libbase/curl_adapter.cpp: Use USE_CURL consistantly instead of
+	HAVE_CURL and HAVE_CURL_CURL.
+	* libbase/noseek_fd_adapter.cpp: Remove HAVE_STDIN_CURL_H test.
+	* libbase/rc.cpp: Include cctype.
+	* macros/incllist, libslist: Add Darwin Developer SDK directories.
+	
 2007-04-08 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamFfmpeg{.cpp, .h}: Only use a single
 	thread (rather than two extra threads) for decoding. Plug a
 	memory leak (ByteIOCxt.buffer). Modularise some more code.
-
 
 2007-04-08 Ann Barcomb <ann@lulu.com>
 

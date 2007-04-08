@@ -16,7 +16,7 @@
 
 // 
 
-/* $Id: noseek_fd_adapter.cpp,v 1.14 2007/03/09 14:38:29 tgc Exp $ */
+/* $Id: noseek_fd_adapter.cpp,v 1.15 2007/04/08 23:06:17 rsavoye Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -24,10 +24,6 @@
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
-
-#ifdef HAVE_STDIN_CURL_H
-# define HAVE_LIBCURL 1
 #endif
 
 #include "noseek_fd_adapter.h"

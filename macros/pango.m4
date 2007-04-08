@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: pango.m4,v 1.23 2007/01/09 00:43:43 rsavoye Exp $
+dnl $Id: pango.m4,v 1.24 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_PANGO],
 [
@@ -80,7 +80,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   AC_ARG_WITH(pango_lib, AC_HELP_STRING([--with-pango-lib], [directory where pango library is]), with_pango_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_pango_lib,[
     if test x"${with_pango_lib}" != x ; then
-      if test -f ${with_pango_lib}/libpangopango-x11-${gnash_pango_version}.a -o -f ${with_pango_lib}/libpangopango-x11-${gnash_pango_version}.so; then
+      if test -f ${with_pango_lib}/libpangopango-x11-${gnash_pango_version}.a -o -f ${with_pango_lib}/libpangopango-x11-${gnash_pango_version}.${shlibext}; then
 	ac_cv_path_pango_lib=-L`(cd ${with_pango_lib}; pwd)`
       else
 	AC_MSG_ERROR([${with_pango_lib} directory doesn't contain libpangopango.])
@@ -96,7 +96,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
 
   if test x"${ac_cv_path_pango_lib}" = x; then
     for i in $libslist; do
-      if test -f $i/libpango-${gnash_pango_version}.a -o -f $i/libpango-${gnash_pango_version}.so; then
+      if test -f $i/libpango-${gnash_pango_version}.a -o -f $i/libpango-${gnash_pango_version}.${shlibext}; then
         if test x"$i" != x"/usr/lib"; then
 	  ac_cv_path_pango_lib="-L$i -lpango-${gnash_pango_version}"
 	  break

@@ -148,7 +148,7 @@ dnl -DMOZ_X11=1 is all that's really needed
         FIREFOX_DEFS=`${mconfig} --defines java plugin`
 dnl   if we don't have a path for the plugin by now, pick a default one
         if test x"${FIREFOX_PLUGINS}" = "x" ; then
-	   FIREFOX_PLUGINS=`echo ${FIREFOX_LIBS} | sed -e 's:-L\(@<:@^ @:>@*\) .*$:\1:' -e  's:^-L::'`/plugins
+	        FIREFOX_PLUGINS=`echo ${FIREFOX_LIBS} | sed -e 's:-L\(@<:@^ @:>@*\) .*$:\1:' -e  's:^-L::'`/plugins
         fi
       fi
     fi

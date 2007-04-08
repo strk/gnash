@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.33 2007/03/06 18:06:13 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.34 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -107,7 +107,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
   AC_ARG_WITH(ffmpeg_lib, AC_HELP_STRING([--with-ffmpeg-lib], [directory where ffmpeg libraries are]), with_ffmpeg_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_ffmpeg_lib, [
     if test x"${with_ffmpeg_lib}" != x ; then
-      if test -f ${with_ffmpeg_lib}/libavcodec.a -o -f ${with_ffmpeg_lib}/libavcodec.so; then
+      if test -f ${with_ffmpeg_lib}/libavcodec.a -o -f ${with_ffmpeg_lib}/libavcodec.${shlibext}; then
 	      ac_cv_path_ffmpeg_lib="-L`(cd ${with_ffmpeg_lib}; pwd)`"
       else
 	      AC_MSG_ERROR([${with_ffmpeg_lib} directory doesn't contain ffmpeg libraries.])
@@ -128,7 +128,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
     AC_MSG_CHECKING([for libavcodec library])
     topdir=""
     for i in $libslist; do
-      if test -f $i/libavcodec.a -o -f $i/libavcodec.so; then
+      if test -f $i/libavcodec.a -o -f $i/libavcodec.${shlibext}; then
         topdir=$i
         AC_MSG_RESULT(${topdir}/libavcodec)
 	      if test x"$i" != x"/usr/lib"; then
@@ -137,7 +137,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
         else
 	        ac_cv_path_ffmpeg_lib="-lavcodec"
 	        break
-        fi
+       fi
       fi
     done
 
@@ -163,7 +163,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
       libdts=""
     fi
     if test x"${libdts}" = x; then
-      if test -f ${topdir}/libdts.a -o -f ${topdir}/libdts.so; then
+      if test -f ${topdir}/libdts.a -o -f ${topdir}/libdts.${shlibext}; then
         ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldts"
         AC_MSG_RESULT(${topdir}/libdts)
       else
@@ -177,28 +177,6 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
       ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libdts}"      
     fi
 	
-    dnl Look for the AVUTIL library, which is required on some systems.
-    AC_MSG_CHECKING([for libavutil library])
-    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
-      $PKG_CONFIG --exists libavutil && libavutil=`$PKG_CONFIG --libs libavutil`
-    else
-      libavutil=""
-    fi
-    if test x"${libavutil}" = x; then
-      if test -f ${topdir}/libavutil.a -o -f ${topdir}/libavutil.so; then
-        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"
-        AC_MSG_RESULT(${topdir}/libavutil)
-      else
-        AC_MSG_RESULT(no)
-        if test x${cross_compiling} = xno; then
-           AC_CHECK_LIB(avutil, av_log, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"])
-        fi
-      fi
-    else
-      AC_MSG_RESULT(${libavutil})
-      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavutil}"
-    fi
-	
     dnl Look for the VORBISENC library, which is required on some systems.
     AC_MSG_CHECKING([for libvorbisenc library])
     if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
@@ -207,7 +185,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
       libvorbisenc=""
     fi
     if test x"${libvorbisenc}" = x; then
-      if test -f ${topdir}/libvorbisenc.a -o -f ${topdir}/libvorbisenc.so; then
+      if test -f ${topdir}/libvorbisenc.a -o -f ${topdir}/libvorbisenc.${shlibext}; then
         ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lvorbisenc"
         AC_MSG_RESULT(${topdir}/libvorbisenc)
       else
@@ -229,7 +207,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
       libavformat=""
     fi
     if test x"${libavformat}" = x; then
-      if test -f ${topdir}/libavformat.a -o -f ${topdir}/libavformat.so; then
+      if test -f ${topdir}/libavformat.a -o -f ${topdir}/libavformat.${shlibext}; then
         ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavformat" 
         AC_MSG_RESULT(${topdir}/libavformat)
       else
@@ -243,7 +221,29 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
       ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavformat}"      
     fi
 
-     dnl Look for the THEORA library, which is required on some systems.
+    dnl Look for the AVUTIL library, which is required on some systems.
+    AC_MSG_CHECKING([for libavutil library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
+      $PKG_CONFIG --exists libavutil && libavutil=`$PKG_CONFIG --libs libavutil`
+    else
+      libavutil=""
+    fi
+    if test x"${libavutil}" = x; then
+      if test -f ${topdir}/libavutil.a -o -f ${topdir}/libavutil.${shlibext}; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"
+        AC_MSG_RESULT(${topdir}/libavutil)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+           AC_CHECK_LIB(avutil, av_log, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavutil"])
+        fi
+      fi
+    else
+      AC_MSG_RESULT(${libavutil})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavutil}"
+    fi
+	
+    dnl Look for the THEORA library, which is required on some systems.
     AC_MSG_CHECKING([for libtheora library])
     if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
       $PKG_CONFIG --exists theora && libtheora=`$PKG_CONFIG --libs theora`
@@ -251,7 +251,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
       libtheora=""
     fi
     if test x"${libtheora}" = x; then
-      if test -f ${topdir}/libtheora.a -o -f ${topdir}/libtheora.so; then
+      if test -f ${topdir}/libtheora.a -o -f ${topdir}/libtheora.${shlibext}; then
         ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ltheora"
         AC_MSG_RESULT(${topdir}/libtheora)
       else
@@ -273,7 +273,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
       libtdc=""
     fi
     if test x"${libdc}" = x; then
-      if test -f ${topdir}/libdc1394.a -o -f ${topdir}/libdc1394.so; then
+      if test -f ${topdir}/libdc1394.a -o -f ${topdir}/libdc1394.${shlibext}; then
         ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -ldc1394"
         AC_MSG_RESULT(${topdir}/libdc1394)
       else

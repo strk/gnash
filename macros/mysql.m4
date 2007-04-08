@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: mysql.m4,v 1.3 2007/03/06 18:06:13 rsavoye Exp $
+dnl $Id: mysql.m4,v 1.4 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_MYSQL],
 [
@@ -65,7 +65,7 @@ AC_DEFUN([GNASH_PATH_MYSQL],
   AC_ARG_WITH(mysql-lib, AC_HELP_STRING([--with-mysql-lib], [directory where mysql libraries are]), with_mysql_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_mysql_lib,[
     if test x"${with_mysql_lib}" != x ; then
-      if test -f ${with_mysql_lib}/libmysqlclient.a -o -f ${with_mysql_lib}/libmysqlclient.so; then
+      if test -f ${with_mysql_lib}/libmysqlclient.a -o -f ${with_mysql_lib}/libmysqlclient.${shlibext}; then
 	ac_cv_path_mysql_lib="-L`(cd ${with_mysql_lib}; pwd)`"
       else
 	AC_MSG_ERROR([${with_mysql_lib} directory doesn't contain mysql libraries.])
@@ -84,7 +84,7 @@ AC_DEFUN([GNASH_PATH_MYSQL],
 
     AC_CHECK_LIB(mysqlclient, mysql_init, [ac_cv_path_mysql_lib="-lmysqlclient"], [
       for i in $libslist; do
-	if test -f $i/libmysqlclient.a -o -f $i/libmysqlclient.so; then
+	if test -f $i/libmysqlclient.a -o -f $i/libmysqlclient.${shlibext}; then
           topdir=$i
 	  if test x"$i" != x"/usr/lib"; then
 	    ac_cv_path_mysql_lib="-L$i -lmysqlclient"

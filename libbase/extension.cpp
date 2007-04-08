@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.7 2007/01/10 00:09:56 strk Exp $ */
+/* $Id: extension.cpp,v 1.8 2007/04/08 23:06:17 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,6 +36,7 @@
 #include <cstring>
 #include <iostream>
 #include <sys/types.h>
+
 #include "log.h"
 #include "sharedlib.h"
 #include "extension.h"

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.h,v 1.43 2007/04/03 16:13:07 bjacques Exp $ */
+/* $Id: log.h,v 1.44 2007/04/08 23:06:17 rsavoye Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -24,7 +24,7 @@
 #endif
 
 #include "rc.h" // for IF_VERBOSE_* implementation
-#include "tu_config.h"
+//#include "tu_config.h"
 
 #include <fstream>
 #include <sstream>

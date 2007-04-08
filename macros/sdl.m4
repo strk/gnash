@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: sdl.m4,v 1.38 2007/01/21 22:41:03 rsavoye Exp $
+dnl $Id: sdl.m4,v 1.39 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_SDL], [
   has_sdl=no
@@ -94,10 +94,10 @@ AC_DEFUN([GNASH_PATH_SDL], [
 dnl  AC_MSG_CHECKING([for sdl library])
   AC_CACHE_VAL(ac_cv_path_sdl_lib, [
     if test x"${with_sdl_lib}" != x ; then
-      if test -f ${with_sdl_lib}/libSDL.a -o -f ${with_sdl_lib}/libSDL.so; then
+      if test -f ${with_sdl_lib}/libSDL.a -o -f ${with_sdl_lib}/libSDL.${shlibext}; then
         ac_cv_path_sdl_lib="-L`(cd ${with_sdl_lib}; pwd)` -lSDL"
       else
-        if test -f ${with_sdl_lib}/libSDL-1.1.a -o -f ${with_sdl_lib}/libSDL-1.1.so; then
+        if test -f ${with_sdl_lib}/libSDL-1.1.a -o -f ${with_sdl_lib}/libSDL-1.1.${shlibext}; then
           ac_cv_path_sdl_lib="-L`(cd ${with_sdl_lib}; pwd)` -lSDL"
         else
           AC_MSG_ERROR([${with_sdl_lib} directory doesn't contain libSDL])
@@ -118,7 +118,7 @@ dnl  AC_MSG_CHECKING([for sdl library])
   
   if test x"${ac_cv_path_sdl_lib}" = x ; then
     for i in $libslist; do
-      if test -f $i/libSDL.a -o -f $i/libSDL.so; then
+      if test -f $i/libSDL.a -o -f $i/libSDL.${shlibext}; then
         if test x"$i" != x"/usr/lib"; then
           ac_cv_path_sdl_lib="-L$i -lSDL"
           dnl AC_MSG_RESULT(${ac_cv_path_sdl_lib})
@@ -130,7 +130,7 @@ dnl  AC_MSG_CHECKING([for sdl library])
           break
         fi
       else
-        if test -f $i/libSDL-1.1.a -o -f $i/libSDL-1.1.so; then
+        if test -f $i/libSDL-1.1.a -o -f $i/libSDL-1.1.${shlibext}; then
           if test x"$i" != x"/usr/lib"; then
             ac_cv_path_sdl_lib="-L$i -lSDL-1.1"
             dnl AC_MSG_RESULT(${ac_cv_path_sdl_lib})

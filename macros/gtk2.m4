@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: gtk2.m4,v 1.39 2007/01/21 22:41:02 rsavoye Exp $
+dnl $Id: gtk2.m4,v 1.40 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -63,8 +63,9 @@ AC_DEFUN([GNASH_PATH_GTK2],
   fi
   if test x"${ac_cv_path_gtk2_incl}" = x; then
     AC_CHECK_HEADERS(gtk/gtk.h)
-  else
     AC_MSG_RESULT($ac_cv_path_gtk2_incl)
+  else
+    AC_MSG_WARN([not sure])
   fi
 
   dnl Look for the library
@@ -74,14 +75,14 @@ AC_DEFUN([GNASH_PATH_GTK2],
 
     AC_CACHE_VAL(ac_cv_path_gtk2_lib,[
     if test x"${with_gtk2_lib}" != x ; then
-      if test -f ${with_gtk2_lib}/libgtk-x11-2.0.so; then
+      if test -f ${with_gtk2_lib}/libgtk-x11-2.0.${shlibext}; then
         if test -f ${with_gtk2_lib}/libgdk-x11-2.0; then
         	ac_cv_path_gtk2_lib=-I`(cd ${with_gtk2_lib}; pwd)`
         else
         	AC_MSG_ERROR([${with_gtk2_lib} directory doesn't contain libgdk-x11-2.0])
         fi
       else
-      	AC_MSG_ERROR([${with_gtk2_lib} directory doesn't contain libgtk-x11-2.0.so])
+      	AC_MSG_ERROR([${with_gtk2_lib} directory doesn't contain libgtk-x11-2.0.${shlibext}])
       fi
     fi
   ])
@@ -97,7 +98,7 @@ dnl the library.
   AC_MSG_CHECKING([for libgtk2 library])
   if test x"${ac_cv_path_gtk2_incl}" != x -a x"${ac_cv_path_gtk2_lib}" = x; then
     for i in $libslist; do
-      if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.so; then
+      if test -f $i/libgtk-x11-2.0.a -o -f $i/libgtk-x11-2.0.${shlibext}; then
         if test x"$i" != x"/usr/lib"; then
           ac_cv_path_gtk2_lib="-L$i -lgtk-x11-2.0 -lgdk-x11-2.0 -lgobject-2.0 -lgmodule-2.0"
           break

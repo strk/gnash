@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sharedlib.cpp,v 1.14 2007/01/10 00:09:56 strk Exp $ */
+/* $Id: sharedlib.cpp,v 1.15 2007/04/08 23:06:17 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -224,7 +224,7 @@ SharedLib::getInitEntry (const char *symbol)
     run  = lt_dlsym (_dlhandle, symbol);
     
     if (run == NULL) {
-        dbglogfile << "Couldn't find symbol: " << symbol << endl;
+        dbglogfile << " Couldn't find symbol: " << symbol << endl;
         return NULL;
     } else {
         dbglogfile << "Found symbol " << symbol << " @ " << (void *)run << endl;
@@ -249,7 +249,7 @@ SharedLib::getDllSymbol(const char *symbol)
     Markus: 'Id est NULL.'
     */
     if (run == NULL) {
-        dbglogfile << "Couldn't find symbol: " << symbol << endl;
+        dbglogfile << " Couldn't find symbol: " << symbol << endl;
         return NULL;
     } else {
         dbglogfile << "Found symbol " << symbol << " @ " << (void *)run << endl;

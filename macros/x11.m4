@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: x11.m4,v 1.3 2007/01/26 19:41:41 rsavoye Exp $
+dnl $Id: x11.m4,v 1.4 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_X11],
 [
@@ -61,6 +61,7 @@ AC_DEFUN([GNASH_PATH_X11],
 
     AC_MSG_RESULT(${ac_cv_path_x11_incl})
 
+
     if test x"${ac_cv_path_x11_incl}" != x ; then
       X11_CFLAGS="${ac_cv_path_x11_incl}"
       AC_MSG_RESULT(${ac_cv_path_x11_incl})
@@ -72,7 +73,7 @@ AC_DEFUN([GNASH_PATH_X11],
     AC_ARG_WITH(x11_lib, AC_HELP_STRING([--with-x11-lib], [directory where x11 library is]), with_x11_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_x11_lib,[
       if test x"${with_x11_lib}" != x ; then
-        if test -f ${with_x11_lib}/libX11.a -o -f ${with_x11_lib}/libX11.so; then
+        if test -f ${with_x11_lib}/libX11.a -o -f ${with_x11_lib}/libX11.${shlibext}; then
 	        ac_cv_path_x11_lib=`(cd ${with_x11_lib}; pwd)`
         else
 	        AC_MSG_ERROR([${with_x11_lib} directory doesn't contain libx11.])
@@ -81,11 +82,11 @@ AC_DEFUN([GNASH_PATH_X11],
     ])
 
     dnl If the header doesn't exist, there is no point looking for the library.
-    if test x"${ac_cv_path_x11_incl}" = x; then
+    if test x"${ac_cv_path_x11_incl}" != x; then
       AC_MSG_CHECKING([for X11 library])
       for i in $libslist; do
-	      if test -f $i/libX11.a -o -f $i/libX11.so; then
-          if test -f $i/libXinerama.a -o -f $i/libXinerama.so; then
+	      if test -f $i/libX11.a -o -f $i/libX11.${shlibext}; then
+          if test -f $i/libXinerama.a -o -f $i/libXinerama.${shlibext}; then
             ac_cv_path_x11_lib="-lXinerama"
           fi
 	        if test x"$i" != x"/usr/lib"; then

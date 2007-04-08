@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.39 2007/03/06 18:06:13 rsavoye Exp $
+dnl $Id: gnashpkgtool.m4,v 1.40 2007/04/08 23:06:17 rsavoye Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
@@ -163,7 +163,7 @@ if test x"${$1}" = x"yes"; then
 	AC_CACHE_VAL(ac_cv_path_$1_lib,[
 	if test x"${with_$1_lib}" != x ; then
 		AC_MSG_CHECKING([for lib$1 library in specified directory])
-		if test -f ${with_$1_lib}/lib$name.a -o -f ${with_$1_lib}/lib$name.so; then
+		if test -f ${with_$1_lib}/lib$name.a -o -f ${with_$1_lib}/lib$name.${shlibext}; then
 			tmp=`(cd ${with_$1_lib}; pwd)`
 			ac_cv_path_$1_lib="-L${tmp} -l$name"
 			AC_MSG_RESULT([yes])
@@ -190,8 +190,8 @@ if test x"${$1}" = x"yes"; then
 		ac_save_LIBS=$LIBS
 		LIBS=""
 		for i in $libslist; do
-			if test -f $i/lib$1.a -o -f $i/lib$1.so; then
-				if test -f "$i/lib$1.a" -o -f "$i/lib$1.so"; then
+			if test -f $i/lib$1.a -o -f $i/lib$1.${shlibext}; then
+				if test -f "$i/lib$1.a" -o -f "$i/lib$1.${shlibext}"; then
 					if test x"$i" != x"/usr/lib"; then
 						ac_cv_path_$1_lib="-L$i -l$1 $5"
 						break
@@ -201,7 +201,7 @@ if test x"${$1}" = x"yes"; then
 					fi
 				fi
 			else
-				if test -f "$i/lib$name.a" -o -f "$i/lib$name.so"; then
+				if test -f "$i/lib$name.a" -o -f "$i/lib$name.${shlibext}"; then
 					if test x"$i" != x"/usr/lib"; then
 						ac_cv_path_$1_lib="-L$i -l$name $5"
 						break

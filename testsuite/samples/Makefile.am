@@ -21,9 +21,8 @@ AUTOMAKE_OPTIONS = dejagnu
 CLEANFILES =  \
       gnash-dbg.log \
       site.exp.bak \
-      testrun.sum \
-      testrun.log
-
+      testrun.* \
+      GotoAndPlayTestRunner
 
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)		\

@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: curl.m4,v 1.14 2007/03/06 18:06:13 rsavoye Exp $
+dnl $Id: curl.m4,v 1.15 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_CURL],
 [
@@ -23,9 +23,9 @@ AC_DEFUN([GNASH_PATH_CURL],
     AC_CACHE_VAL(ac_cv_path_curl_incl,[
     if test x"${with_curl_incl}" != x ; then
       if test -f ${with_curl_incl}/curl/curl.h ; then
-	ac_cv_path_curl_incl=`(cd ${with_curl_incl}; pwd)`
+	      ac_cv_path_curl_incl=`(cd ${with_curl_incl}; pwd)`
       else
-	AC_MSG_ERROR([${with_curl_incl} directory doesn't contain curl/curl.h])
+	      AC_MSG_ERROR([${with_curl_incl} directory doesn't contain curl/curl.h])
       fi
     fi
   ])
@@ -59,6 +59,10 @@ AC_DEFUN([GNASH_PATH_CURL],
       done
     fi
 
+    if test x"${ac_cv_path_curl_incl}" = x ; then
+      AC_CHECK_HEADERS(curl/curl.h)
+    fi
+
     if test x"${ac_cv_path_curl_incl}" != x ; then
       AC_MSG_RESULT(yes)
     else
@@ -77,23 +81,25 @@ AC_DEFUN([GNASH_PATH_CURL],
   AC_ARG_WITH(curl_lib, AC_HELP_STRING([--with-curl-lib], [directory where curl library is]), with_curl_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_curl_lib,[
     if test x"${with_curl_lib}" != x ; then # {
-      if test -f ${with_curl_lib}/libcurl.a -o -f ${with_curl_lib}/libcurl.so; then # {
- ac_cv_path_curl_lib="-L`(cd ${with_curl_lib}; pwd)`"
+      if test -f ${with_curl_lib}/libcurl.a -o -f ${with_curl_lib}/libcurl.${shlibext}; then # {
+        ac_cv_path_curl_lib="-L`(cd ${with_curl_lib}; pwd)`"
       else # }{
- AC_MSG_ERROR([${with_curl_lib} directory doesn't contain libcurl.])
+        AC_MSG_ERROR([${with_curl_lib} directory doesn't contain libcurl.])
       fi # }
     fi # }
   ])
 
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_curl_lib}" = x; then # {
-
-    if test x"${curlconfig}" != "x"; then # {
-      ac_cv_path_curl_lib=`${curlconfig} --libs`
+    if test x"${curlconfig}" != "x" -a x"${darwin}" = xno; then # {
+      dnl curl-config gives us way to many libraries, which create nasty linking
+      dnl dependancy issue, so we strip them off here. The real dependencies are
+      dnl are taken care of by other config tests.
+      ac_cv_path_curl_lib=`${curlconfig} --libs | sed -e 's/lcurl.*/lcurl/'`
     else # }{
       AC_MSG_CHECKING([for libcurl library])
       for i in $libslist; do # {
-        if test -f $i/libcurl.a -o -f $i/libcurl.so; then # {
+        if test -f $i/libcurl.a -o -f $i/libcurl.${shlibext}; then # {
           if test x"$i" != x"/usr/lib"; then # {
             ac_cv_path_curl_lib="-L$i -lcurl"
             AC_MSG_RESULT(${ac_cv_path_curl_lib})
@@ -119,36 +125,6 @@ AC_DEFUN([GNASH_PATH_CURL],
     CURL_LIBS="${ac_cv_path_curl_lib}"
   else
     CURL_LIBS=""
-  fi
-
-  dnl
-  dnl Call AC_CHECK_HEADERS here to
-  dnl get HAVE_* macros automatically defined
-  dnl
-  dnl NOTE: we need additional CFLAGS for things to work
-  dnl       (stuff included by gstreamer header)
-  dnl
-
-  ac_save_CFLAGS="$CFLAGS"
-  ac_save_CPPFLAGS="$CPPFLAGS"
-  CFLAGS="$CFLAGS $CURL_CFLAGS"
-  CPPFLAGS="$CPPFLAGS $CURL_CFLAGS"
-  AC_CHECK_HEADERS(curl/curl.h)
-  CFLAGS="$ac_save_CFLAGS"
-  CPPFLAGS="$ac_save_CPPFLAGS"
-
-  dnl
-  dnl Call AC_CHECK_LIB here to
-  dnl make sure curl actually works
-  dnl
-
-  ac_save_LIBS="$LIBS"
-  LIBS="$LIBS $CURL_LIBS"
-  AC_CHECK_LIB(curl, curl_global_init, [curl_lib_ok="yes"],[curl_lib_ok="no"])
-  LIBS="$ac_save_LIBS"
-
-  if test x"${curl_lib_ok}" = xno; then
-     CURL_LIBS=""
   fi
 
   AM_CONDITIONAL(CURL, [test -n "$CURL_LIBS"])

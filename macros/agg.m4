@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: agg.m4,v 1.25 2007/03/28 23:42:19 rsavoye Exp $
+dnl $Id: agg.m4,v 1.26 2007/04/08 23:06:17 rsavoye Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
@@ -75,7 +75,7 @@ AC_DEFUN([GNASH_PATH_AGG],
   AC_ARG_WITH(agg_lib, AC_HELP_STRING([--with-agg-lib], [directory where AGG libraries are]), with_agg_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_agg_lib,[
     if test x"${with_agg_lib}" != x ; then
-      if test -f ${with_agg_lib}/libagg.a -o -f ${with_agg_lib}/libagg.so; then
+      if test -f ${with_agg_lib}/libagg.a -o -f ${with_agg_lib}/libagg.${shlibext}; then
       	ac_cv_path_agg_lib="-L`(cd ${with_agg_lib}; pwd)`"
       else
       	AC_MSG_ERROR([${with_agg_lib} directory doesn't contain AGG libraries.])
@@ -94,7 +94,7 @@ AC_DEFUN([GNASH_PATH_AGG],
   AC_LANG_PUSH(C++)
   if test x"${ac_cv_path_agg_lib}" = x; then
     for i in $libslist; do
-      if test -f $i/libagg.a -o -f $i/libagg.so; then
+      if test -f $i/libagg.a -o -f $i/libagg.${shlibext}; then
       	if test x"$i" != x"/usr/lib"; then
       	  ac_cv_path_agg_lib="-L$i"
       	  break

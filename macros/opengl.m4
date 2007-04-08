@@ -14,114 +14,100 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: opengl.m4,v 1.29 2007/03/06 18:06:13 rsavoye Exp $
+dnl $Id: opengl.m4,v 1.30 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_OPENGL],
 [
-dnl   AC_ARG_ENABLE(opengl, [  --disable-opengl        Disable support for OpenGL],
-dnl   [case "${enableval}" in
-dnl     yes) opengl=no  ;;
-dnl     no)  opengl=yes ;;
-dnl     *)   AC_MSG_ERROR([bad value ${enableval} for disable-opengl option]) ;;
-dnl   esac], opengl=yes)
   opengl=yes
   if test x"$opengl" = x"yes"; then
     dnl Look for the headers.
     AC_ARG_WITH(opengl_includes, AC_HELP_STRING([--with-opengl-includes], [directory where OpenGL headers are]), with_opengl_includes=${withval})
     AC_CACHE_VAL(ac_cv_path_opengl_includes,[
-    if test x"${with_opengl_includes}" != x ; then
-      if test -f ${with_opengl_includes}/GL/gl.h -a -f ${with_opengl_includes}/GL/glu.h ; then
-        ac_cv_path_opengl_includes=`(cd ${with_opengl_includes}; pwd)`
-      else
-        AC_MSG_ERROR([${with_opengl_includes} directory doesn't contain GL/gl.h])
+      if test x"${with_opengl_includes}" != x ; then
+        if test -f ${with_opengl_includes}/GL/gl.h -a -f ${with_opengl_includes}/GL/glu.h ; then
+          ac_cv_path_opengl_includes=`(cd ${with_opengl_includes}; pwd)`
+        else
+          AC_MSG_ERROR([${with_opengl_includes} directory doesn't contain GL/gl.h])
+        fi
       fi
-    fi])
+    ])
 
     dnl If the include path hasn't been specified, go look for it.
     if test x"${ac_cv_path_opengl_includes}" = x; then
-      AC_CHECK_HEADERS(GL/gl.h, [ac_cv_path_opengl_includes=""],[
-      if test x"${ac_cv_path_opengl_includes}" = x; then
-        AC_MSG_CHECKING([for OpenGL headers])
-        newincllist="${incllist} /usr/X11R6/include"
-
-        for i in $newincllist; do
-          if test -f $i/GL/gl.h; then
-            if test x"$i" != x"/usr/include"; then
-              ac_cv_path_opengl_includes="-I$i"
-              break
-            else
-              ac_cv_path_opengl_includes=""
-              break
-            fi
-	    if test -f $i/GL/glu.h; then
-	      AC_MSG_WARN([GL/glu.h not installed!])
-	    fi
+      AC_MSG_CHECKING([for OpenGL headers])
+      for i in $incllist; do
+        if test -f $i/GL/gl.h; then
+          if test x"$i" != x"/usr/include"; then
+            ac_cv_path_opengl_includes="-I$i"
+            break
+          else
+            ac_cv_path_opengl_includes="default"
+            break
           fi
-        done
-      fi])
-    else
-      AC_MSG_RESULT(-I${ac_cv_path_opengl_includes})
-      if test x"${ac_cv_path_opengl_includes}" != x"/usr/include"; then
-        ac_cv_path_opengl_includes="-I${ac_cv_path_opengl_includes}"
-       else
-        ac_cv_path_opengl_includes=""
-      fi
+	        if test -f $i/GL/glu.h; then
+	          AC_MSG_WARN([GL/glu.h not installed!])
+	        fi
+        fi
+      done
     fi
 
-    if test x"${ac_cv_path_opengl_includes}" != x ; then
+    if test x"${ac_cv_path_opengl_includes}" = x; then
+      AC_CHECK_HEADERS([GL/gl.h], [ac_cv_path_opengl_includes=""])
+    fi
+
+    if test x"${ac_cv_path_opengl_includes}" != x -a x"${ac_cv_path_opengl_includes}" != x"default"; then
       OPENGL_CFLAGS="${ac_cv_path_opengl_includes}"
-      AC_MSG_RESULT(${ac_cv_path_opengl_includes})
     else
       OPENGL_CFLAGS=""
     fi
+    AC_MSG_RESULT(${ac_cv_path_opengl_includes})
 
     dnl Look for the libraries.
     AC_ARG_WITH(opengl_lib, AC_HELP_STRING([--with-opengl-lib], [directory where OpenGL libraries are]), with_opengl_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_opengl_lib,[
-    if test x"${with_opengl_lib}" != x ; then
-      if test -f ${with_opengl_lib}/libGL.a -o -f ${with_opengl_lib}/libGL.so; then
-        ac_cv_path_opengl_lib="-L`(cd ${with_opengl_lib}; pwd)` -lGL -lGLU"
-      else
-        if test -f ${with_opengl_lib}/libopengl32.a -o; then
-          ac_cv_path_opengl_lib="-L`(cd ${with_opengl_lib}; pwd) -lopengl32 -lglu32`"
-          AC_MSG_ERROR([${with_opengl_lib} directory doesn't contain libGL.])
+      if test x"${with_opengl_lib}" != x ; then
+        if test -f ${with_opengl_lib}/libGL.a -o -f ${with_opengl_lib}/libGL.${shlibext}; then
+          ac_cv_path_opengl_lib="-L`(cd ${with_opengl_lib}; pwd)` -lGL -lGLU"
+        else
+          if test -f ${with_opengl_lib}/libopengl32.a -o; then
+            ac_cv_path_opengl_lib="-L`(cd ${with_opengl_lib}; pwd) -lopengl32 -lglu32`"
+            AC_MSG_ERROR([${with_opengl_lib} directory doesn't contain libGL.])
+          fi
         fi
       fi
-    fi
     ])
 
     if test x"${ac_cv_path_opengl_lib}" = x; then
-      AC_CHECK_LIB(GL, glBegin, [ac_cv_path_opengl_lib="-lGL -lGLU"],[
-        newliblist="${libslist} /usr/X11R6/lib /usr/lib/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib /usr/lib64/opengl/xorg-x11/lib64  /opt/mesa/lib64 /opt/mesa/lib .. ../.."
-        for i in $newliblist; do
-          if test -f $i/libGLU.a -o -f $i/libGLU.so; then
-            if test x"$i" != x"/usr/lib"; then
-              ac_cv_path_opengl_lib="-L$i -lGL -lGLU"
-              break
-	    else
-              ac_cv_path_opengl_lib="-lGL -lGLU"
-	    fi
-          else
-	    if test -f $i/libopengl32.a; then
-	      ac_cv_path_opengl_lib="-L$i -lopengl32 -lglu32"
-	      break
-	    else
-	      ac_cv_path_opengl_lib="-lopengl32 -lglu32"
-	    fi
-          fi
-          if test -f $i/libGLU.a -o -f $i/libGLU.so; then
-	    AC_MSG_WARN([libGLU not installed!])
-	  fi
-        done])
-    else
-      if test -f ${ac_cv_path_opengl_lib}/libGLU.a -o -f ${ac_cv_path_opengl_lib}/libGLU.so; then
-        if test x"${ac_cv_path_opengl_lib}" != x"/usr/lib"; then
-          ac_cv_path_opengl_lib="-L${ac_cv_path_opengl_lib} -lGL -lGLU"
-         else
-          ac_cv_path_opengl_lib="-lGL -lGLU"
+      for i in $libslist; do
+        if test -f $i/libGL.${shlibext} -o -f $i/libGL.a; then
+          if test x"$i" != x"/usr/lib"; then
+            ac_cv_path_opengl_lib="-L$i -lGL"
+            break
+	        else
+            ac_cv_path_opengl_lib="-lGL"
+            break
+	        fi
         fi
+      done
+      if test x"${ac_cv_path_opengl_lib}" != x; then
+        if test -f $i/libGLU.${shlibext} -o -f $i/libGLU.a; then
+          ac_cv_path_opengl_lib="${ac_cv_path_opengl_lib} -lGLU"
+        else
+          AC_WARN([No GLU library found!])
+        fi
+      else                      dnl nothing found, check for the win32 names
+        for i in $newliblist; do
+          if test -f $i/libopengl32.${shlibext} -o -f $i/libopengl32.a; then
+            ac_cv_path_opengl_lib="-L$i -lopengl32 =lopenglu32"
+            break
+          fi
+        done
       fi
-    fi
+    fi                          dnl end of if ac_cv_path_opengl_lib
+  fi                            dnl end of if $opengl
+
+  if test x"${ac_cv_path_opengl_lib}" = x; then
+    AC_CHECK_LIB([GL], [glBegin], [ac_cv_path_opengl_lib="-lGL -lGLU"])
   fi
 
   if test x"${ac_cv_path_opengl_lib}" != x ; then

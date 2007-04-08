@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.287 2007/04/06 07:58:15 jgilmore Exp $
+dnl $Id: configure.ac,v 1.288 2007/04/08 23:06:16 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -33,7 +33,7 @@ case "${host}" in
   powerpc-apple-darwin*)
     AC_DEFINE([__powerpc64__], [], [this is a 64 bit powerpc])
     ;;
-  i386-*-openbsd*)
+  i[34567]86-*-openbsd*)
     openbsd_os=openbsd
     ;;
   *64-*-openbsd*)
@@ -299,7 +299,7 @@ AC_ARG_ENABLE(media,
 )
 
 dnl --------------------------------------------------------
-dnl  ...
+dnl Figure out development tool stuff
 dnl --------------------------------------------------------
 
 AC_PROG_CC
@@ -307,6 +307,34 @@ AC_PROG_CXX
 AC_EXEEXT
 AC_PROG_INSTALL
 AM_COMPILER_LIB
+
+dnl Darwin uses libtool instead of ar to produce libraries. We determine which one
+dnl we have here now. For some reason on Darwin, we don't get the
+dnl count from grep via stdin correctly. Writing a temp file does the
+dnl trick, so although it's ugly, that's what we gotta do...
+AC_MSG_CHECKING([Checking which type of library archiver we have])
+rm -f .tmp
+libtool > .tmp 2>&1
+archiver=`grep -c dynamic .tmp 2>&1`
+rm -f .tmp
+if test $archiver -eq 1; then
+  if test "$enable_shared" = no; then
+    AR="libtool -static"
+  else
+    AR="libtool -dynamic"
+    CXXFLAGS="${CXXFLAGS} -dynamic"
+    export MACOSX_DEPLOYMENT_TARGET="10.3"
+  fi
+  AR_FLAGS="-o"
+  darwin=yes
+else
+  AR="ar"
+  AR_FLAGS="cvu"
+  darwin=no
+fi
+AC_MSG_RESULT([${AR}])
+AC_SUBST(AR)
+AC_SUBST(AR_FLAGS)
 
 dnl When cross compiling, limit the search directories cause otherwise
 dnl we may get the host headers or libraries by accident. These values
@@ -739,8 +767,10 @@ GNASH_PATH_CURL
 AC_LIBTOOL_DLOPEN
 dnl AC_LIBLTDL_CONVENIENCE
 AC_LIBLTDL_INSTALLABLE
+LTVERSION_VERSION
 AC_PROG_LIBTOOL
-AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]))
+AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]),
+                                        AC_DEFINE(LT_DLMUTEX, 0, [doesn't have lt_dlmutex_register]) )
 
 DLOPEN="-dlopen"
 DLPREOPEN="-dlpreopen"

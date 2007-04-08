@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: jpeg.m4,v 1.22 2007/01/09 00:43:43 rsavoye Exp $
+dnl $Id: jpeg.m4,v 1.23 2007/04/08 23:06:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_JPEG],
 [
@@ -72,7 +72,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
     AC_ARG_WITH(jpeg_lib, AC_HELP_STRING([--with-jpeg-lib], [directory where jpeg library is]), with_jpeg_lib=${withval})
     AC_CACHE_VAL(ac_cv_path_jpeg_lib,[
       if test x"${with_jpeg_lib}" != x ; then
-        if test -f ${with_jpeg_lib}/libjpeg.a -o -f ${with_jpeg_lib}/libjpeg.so; then
+        if test -f ${with_jpeg_lib}/libjpeg.a -o -f ${with_jpeg_lib}/libjpeg.${shlibext}; then
 	  ac_cv_path_jpeg_lib=`(cd ${with_jpeg_lib}; pwd)`
         else
 	  AC_MSG_ERROR([${with_jpeg_lib} directory doesn't contain libjpeg.])
@@ -84,7 +84,7 @@ AC_DEFUN([GNASH_PATH_JPEG],
     if test x"${ac_cv_path_jpeg_incl}" = x; then
       AC_MSG_CHECKING([for libjpeg library])
       for i in $libslist; do
-	      if test -f $i/libjpeg.a -o -f $i/libjpeg.so; then
+	      if test -f $i/libjpeg.a -o -f $i/libjpeg.${shlibext}; then
 	        if test x"$i" != x"/usr/lib"; then
 	          ac_cv_path_jpeg_lib="-L$i"
 	          break
