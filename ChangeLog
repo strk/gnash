@@ -1,10 +1,10 @@
 2007-04-08 Zou Lunkai <zoulunkai@gmail.com>
 
-	* testsuite/misc-ming.all:get_frame_number_test.c
-	new testcase for get_frame_number() and goto_frame().
-	*server/sprite_instance.h, sprite_instance.cpp
-	update implementation of get_frame_number() and goto_frame(),
-	fix the above the testcase.
+	* testsuite/misc-ming.all/get_frame_number_test.c:
+	  new testcase for get_frame_number() and goto_frame().
+	* server/sprite_instance.{cpp,h}
+	  update implementation of get_frame_number() and goto_frame(),
+	  fix the above the testcase.
 	
 2007-04-08 Sandro Santilli <strk@keybit.net>
 
