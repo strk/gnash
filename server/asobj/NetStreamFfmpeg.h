@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.18 2007/04/07 11:55:50 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.19 2007/04/08 15:23:43 bjacques Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -207,8 +207,7 @@ private:
 	// Use for resampling audio
 	ReSampleContext *m_Resample;
 
-	boost::thread *m_thread;
-	boost::thread *startThread;
+	boost::thread* _decodeThread;
 	boost::mutex decoding_mutex;
 	boost::mutex image_mutex;
 

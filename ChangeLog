@@ -1,3 +1,10 @@
+2007-04-08 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStreamFfmpeg{.cpp, .h}: Only use a single
+	thread (rather than two extra threads) for decoding. Plug a
+	memory leak (ByteIOCxt.buffer). Modularise some more code.
+
+
 2007-04-08 Ann Barcomb <ann@lulu.com>
 
 	* devtools/testsuite/c_casts.t: added this test at Bastiaan's

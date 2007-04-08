@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.33 2007/04/07 12:50:04 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.34 2007/04/08 15:23:43 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,6 +31,7 @@
 #include "NetConnection.h"
 #include "sound_handler.h"
 #include "action.h"
+#include <boost/scoped_array.hpp>
 
 #if defined(_WIN32) || defined(WIN32)
 	#include <Windows.h>	// for sleep()
@@ -58,8 +59,7 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	m_Frame(NULL),
 	m_Resample(NULL),
 
-	m_thread(NULL),
-	startThread(NULL),
+	_decodeThread(NULL),
 
 	m_go(false),
 	m_imageframe(NULL),
@@ -75,12 +75,14 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	m_start_onbuffer(false),
 	m_env(NULL)
 {
+
+	ByteIOCxt.buffer = NULL;
 }
 
 NetStreamFfmpeg::~NetStreamFfmpeg()
 {
 	close();
-	if (m_parser) delete m_parser;
+	delete m_parser;
 }
 
 void NetStreamFfmpeg::setEnvironment(as_environment* env)
@@ -116,12 +118,9 @@ void NetStreamFfmpeg::close()
 		// terminate thread
 		m_go = false;
 
-		startThread->join();
-		delete startThread;
-
 		// wait till thread is complete before main continues
-		m_thread->join();
-		delete m_thread;
+		_decodeThread->join();
+		delete _decodeThread;
 
 	}
 
@@ -166,6 +165,8 @@ void NetStreamFfmpeg::close()
 		delete m_qaudio.front();
 		m_qaudio.pop();
 	}
+
+	delete [] ByteIOCxt.buffer;
 
 }
 
@@ -242,19 +243,8 @@ NetStreamFfmpeg::play(const char* c_url)
 	m_go = true;
 	m_pause = true;
 
-	if (!m_parser && !m_FormatCtx) {
-		// To avoid blocking while connecting, we use a thread.
-		startThread = new boost::thread(boost::bind(NetStreamFfmpeg::startPlayback, this));
-
-	} else {
-		// We need to restart the audio
-		sound_handler* s = get_sound_handler();
-		if (s) s->attach_aux_streamer(audio_streamer, (void*) this);
-
-	}
-
 	// This starts the decoding thread
-	m_thread = new boost::thread(boost::bind(NetStreamFfmpeg::av_streamer, this)); 
+	_decodeThread = new boost::thread(boost::bind(NetStreamFfmpeg::av_streamer, this)); 
 
 	return 0;
 }
@@ -358,6 +348,31 @@ initFlvAudio(FLVParser* parser)
 	return initContext(codec_id);
 }
 
+
+/// Probe the stream and try to figure out what the format is.
+//
+/// @param ns the netstream to use for reading
+/// @return a pointer to the AVInputFormat structure containing
+///         information about the input format, or NULL.
+static AVInputFormat*
+probeStream(NetStreamFfmpeg* ns)
+{
+	boost::scoped_array<uint8_t> buffer(new uint8_t[2048]);
+
+	// Probe the file to detect the format
+	AVProbeData probe_data;
+	probe_data.filename = "";
+	probe_data.buf = buffer.get();
+	probe_data.buf_size = 2048;
+
+	if (ns->readPacket(ns, probe_data.buf, probe_data.buf_size) < 1){
+ 		log_warning("Gnash could not read from movie url.");
+ 		return NULL;
+	}
+
+	return av_probe_input_format(&probe_data, 1);
+}
+
 void
 NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 {
@@ -429,25 +444,14 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	// This registers all available file formats and codecs 
 	// with the library so they will be used automatically when
 	// a file with the corresponding format/codec is opened
-
+	// XXX should we call avcodec_init() first?
 	av_register_all();
 
-	// Open video file
-
-	// Probe the file to detect the format
-	AVProbeData probe_data, *pd = &probe_data;
-	pd->filename = "";
-	pd->buf = new uint8_t[2048];
-	pd->buf_size = 2048;
-
-	if (readPacket(ns, pd->buf, pd->buf_size) < 1){
- 		log_warning("Gnash could not read from movie url: %s", ns->url.c_str());
- 		delete[] pd->buf;
- 		return;
+	AVInputFormat* inputFmt = probeStream(ns);
+	if (!inputFmt) {
+		log_error("Couldn't determine stream input format from URL %s", ns->url.c_str());
+		return;
 	}
-
-	AVInputFormat* inputFmt = av_probe_input_format(pd, 1);
-	delete[] pd->buf;
 
 	// After the format probe, reset to the beginning of the file.
 	nc->seek(0);
@@ -575,11 +579,16 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 // decoder thread
 void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
-	// Wait for startThread to finish.
-	// XXX if this method is to start right after startThread finishes, why is this
-	//     method not called directly by startThread, instead of having its own
-	//     execution thread?
-	ns->startThread->join();
+
+	if (!ns->m_parser && !ns->m_FormatCtx) {
+		startPlayback(ns);
+	} else {
+		// We need to restart the audio
+		sound_handler* s = get_sound_handler();
+		if (s) {
+			s->attach_aux_streamer(audio_streamer, ns);
+		}
+	}
 
 	// This should only happen if close() is called before setup is complete
 	if (!ns->m_go) return;
@@ -784,7 +793,7 @@ bool NetStreamFfmpeg::read_frame()
 			int got = 0;
 			avcodec_decode_video(m_VCodecCtx, m_Frame, &got, packet.data, packet.size);
 			if (got) {
-				uint8_t *buffer = NULL;
+				boost::scoped_array<uint8_t> buffer;
 
 				int videoFrameFormat = gnash::render::videoFrameFormat();
 				if (m_imageframe == NULL) {
@@ -806,8 +815,8 @@ bool NetStreamFfmpeg::read_frame()
 				} else if (videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
 					AVFrame* frameRGB = avcodec_alloc_frame();
 					unsigned int numBytes = avpicture_get_size(PIX_FMT_RGB24, m_VCodecCtx->width, m_VCodecCtx->height);
-					buffer = new uint8_t[numBytes];
-					avpicture_fill((AVPicture *)frameRGB, buffer, PIX_FMT_RGB24, m_VCodecCtx->width, m_VCodecCtx->height);
+					buffer.reset(new uint8_t[numBytes]);
+					avpicture_fill((AVPicture *)frameRGB, buffer.get(), PIX_FMT_RGB24, m_VCodecCtx->width, m_VCodecCtx->height);
 					img_convert((AVPicture*) frameRGB, PIX_FMT_RGB24, (AVPicture*) m_Frame, m_VCodecCtx->pix_fmt, m_VCodecCtx->width, m_VCodecCtx->height);
 					av_free(m_Frame);
 					m_Frame = frameRGB;
@@ -880,7 +889,6 @@ bool NetStreamFfmpeg::read_frame()
 						}
 					}
 				}
-				delete [] buffer;
 
 				m_unqueued_data = m_qvideo.push(video) ? NULL : video;
 			}
