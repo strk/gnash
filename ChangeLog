@@ -1,5 +1,7 @@
 2007-04-09 Sandro Santilli <strk@keybit.net>
 
+	* libbase/embedVideoDecoderFfmpeg.cpp: add missing avcodec.h
+	  include for definition of CODEC_ID_VP6F.
 	* testsuite/misc-ming.all/Makefile.am: activated
 	  get_frame_number test.
 

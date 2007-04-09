@@ -14,11 +14,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderFfmpeg.cpp,v 1.4 2007/02/19 21:45:41 tgc Exp $
+// $Id: embedVideoDecoderFfmpeg.cpp,v 1.5 2007/04/09 10:09:40 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#include "avcodec.h"
 
 #ifdef USE_FFMPEG
 
