@@ -104,6 +104,7 @@ check_PROGRAMS = \
 	eventSoundTest1 \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
+	get_frame_number_test \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -138,6 +139,7 @@ check_SCRIPTS = \
 	reverse_execute_PlaceObject2_test1runner \
 	reverse_execute_PlaceObject2_test2runner \
 	displaylist_depths_testrunner \
+	get_frame_number_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -368,6 +370,20 @@ displaylist_depths_test.swf: displaylist_depths_test
 
 displaylist_depths_testrunner: $(srcdir)/../generic-testrunner.sh displaylist_depths_test.swf
 	sh $< -r5 $(top_builddir) displaylist_depths_test.swf > $@
+	chmod 755 $@
+
+get_frame_number_test_SOURCES =	\
+	get_frame_number_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+get_frame_number_test_LDADD = $(MING_LIBS)
+
+get_frame_number_test.swf: get_frame_number_test
+	./get_frame_number_test $(top_srcdir)/testsuite/media
+
+get_frame_number_testrunner: $(srcdir)/../generic-testrunner.sh get_frame_number_test.swf
+	sh $< -r5 $(top_builddir) get_frame_number_test.swf > $@
 	chmod 755 $@
 
 attachMovieTest_SOURCES =	\

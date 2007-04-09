@@ -1,3 +1,8 @@
+2007-04-09 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am: activated
+	  get_frame_number test.
+
 2007-04-08  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/agg.m4, boost.m4, curl.m4, ffmpeg.m4, firefox.m4,
