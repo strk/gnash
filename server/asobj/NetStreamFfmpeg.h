@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.20 2007/04/10 20:24:23 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.21 2007/04/10 21:31:00 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -152,9 +152,11 @@ public:
 	
 	bool init(AVCodecContext* ctx)
 	{
-		if (!_context && (ctx->sample_rate != 44100 && ctx->channels != 2)) {
-			_context = audio_resample_init(2,  ctx->channels,
-				44100, ctx->sample_rate);
+		if (ctx->sample_rate != 44100 && ctx->channels != 2) {
+			if (!_context) {
+				_context = audio_resample_init(2,  ctx->channels, 
+					44100, ctx->sample_rate);
+ 			}
 			return true;
 		}
 		return false;

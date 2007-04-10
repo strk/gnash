@@ -1,3 +1,8 @@
+2007-04-10 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStreamFfmpeg.h: Fixed a bug in the 
+	  AudioResampler, which made it only resample the first time.
+
 2007-04-10 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* cygnal/http.cpp cygnal/stream.cpp: Added 'return true'-stubs, closes
