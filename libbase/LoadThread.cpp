@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.5 2007/04/03 16:45:02 strk Exp $
+// $Id: LoadThread.cpp,v 1.6 2007/04/10 23:11:31 bjacques Exp $
 
 #include "LoadThread.h"
 
@@ -245,14 +245,34 @@ void LoadThread::fillCache()
 
 	if (_loadPosition != _actualPosition) _stream->set_position(_loadPosition);
 
-	int ret = _stream->read_bytes(_cache+_cachedData, _chunkSize);
+	int ret;
+	if (_cachedData + _chunkSize > _cacheSize) {
+		ret = _stream->read_bytes(_cache + _cachedData, _cacheSize - _cachedData);
 
-	if (ret != _chunkSize) {
-		_completed = true;
+		_cachedData += ret;
+		if (ret != _cacheSize - _cachedData) {
+			_completed = true;
+		} else {
+			_stream->set_position(_loadPosition + _chunkSize);
+			long pos = _stream->get_position();
+			if (pos != _loadPosition + _chunkSize) {
+				_completed = true;
+			}
+			ret += pos - (_loadPosition + _chunkSize);
+		}
+		
+	} else {
+		ret = _stream->read_bytes(_cache + _cachedData, _chunkSize);
+		if (ret != _chunkSize) {
+			_completed = true;
+		}
+		_cachedData += ret;
+
 	}
-	_cachedData += ret;
+
 	_loadPosition = _loadPosition + ret;
 	_actualPosition = _loadPosition;
+
 }
 
 void LoadThread::download()

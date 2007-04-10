@@ -12,6 +12,8 @@
 
 	* server/asobj/NetStreamFfmpeg.h: Fixed a bug in the 
 	  AudioResampler, which made it only resample the first time.
+	* libbase/LoadThread.cpp: Handle the case where the cache is
+	filled and we have yet more data to load.
 
 2007-04-10 Markus Gothe <nietzsche@lysator.liu.se>
 
