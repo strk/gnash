@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.19 2007/04/08 15:23:43 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.20 2007/04/10 20:24:23 bjacques Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -138,6 +138,38 @@ class multithread_queue
 		std::queue < T > m_queue;
 };
 
+
+class AudioResampler
+{
+public:
+	AudioResampler() : _context(NULL) {}
+	~AudioResampler()
+	{ 
+		if(_context) {
+			audio_resample_close (_context);
+		}
+	}
+	
+	bool init(AVCodecContext* ctx)
+	{
+		if (!_context && (ctx->sample_rate != 44100 && ctx->channels != 2)) {
+			_context = audio_resample_init(2,  ctx->channels,
+				44100, ctx->sample_rate);
+			return true;
+		}
+		return false;
+	}
+	
+	int resample(int16_t* input, int16_t* output, int samples)
+	{
+		return audio_resample (_context, output, input, samples);
+	}
+	
+
+private:
+	ReSampleContext* _context;
+};
+
 class NetStreamFfmpeg: public NetStream {
 public:
 	NetStreamFfmpeg();
@@ -205,7 +237,7 @@ private:
 	AVFrame* m_Frame;
 
 	// Use for resampling audio
-	ReSampleContext *m_Resample;
+	AudioResampler _resampler;
 
 	boost::thread* _decodeThread;
 	boost::mutex decoding_mutex;

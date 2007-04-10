@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.34 2007/04/08 15:23:43 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.35 2007/04/10 20:24:23 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,7 +42,7 @@
 
 // Used to free data in the AVPackets we create our self
 static void avpacket_destruct(AVPacket* av) {
-	delete av->data;
+	delete [] av->data;
 }
 
 
@@ -57,7 +57,6 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	m_ACodecCtx(NULL),
 	m_FormatCtx(NULL),
 	m_Frame(NULL),
-	m_Resample(NULL),
 
 	_decodeThread(NULL),
 
@@ -146,10 +145,6 @@ void NetStreamFfmpeg::close()
 		m_FormatCtx->iformat->flags = AVFMT_NOFILE;
 		av_close_input_file(m_FormatCtx);
 		m_FormatCtx = NULL;
-	}
-
-	if (m_Resample) {
-		audio_resample_close (m_Resample);
 	}
 
 	if (m_imageframe) delete m_imageframe;
@@ -576,6 +571,30 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	ns->m_pause = false;
 }
 
+
+/// Copy RGB data from a source raw_videodata_t to a destination image::rgb.
+/// @param dst the destination image::rgb, which must already be initialized
+///            with a buffer of size of at least src.m_size.
+/// @param src the source raw_videodata_t to copy data from. The m_size member
+///            of this structure must be initialized.
+/// @param width the width, in bytes, of a row of video data.
+static void
+rgbcopy(image::rgb* dst, raw_videodata_t* src, int width)
+{
+	assert(src->m_size <= dst->m_width * dst->m_height * 3);
+
+	uint8_t* dstptr = dst->m_data;
+
+	uint8_t* srcptr = src->m_data;
+	uint8_t* srcend = src->m_data + src->m_size;
+
+	while (srcptr < srcend) {
+		memcpy(dstptr, srcptr, width);
+		dstptr += dst->m_pitch;
+		srcptr += width;
+	}
+}
+
 // decoder thread
 void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
@@ -632,9 +651,12 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 				boost::mutex::scoped_lock lock(ns->image_mutex);
 				int videoFrameFormat = gnash::render::videoFrameFormat();
 				if (videoFrameFormat == render::YUV) {
+					// XXX m_imageframe might be a byte aligned buffer, while video is not!
 					static_cast<image::yuv*>(ns->m_imageframe)->update(video->m_data);
 				} else if (videoFrameFormat == render::RGB) {
-					ns->m_imageframe->update(video->m_data);
+
+					image::rgb* imgframe = static_cast<image::rgb*>(ns->m_imageframe);
+					rgbcopy(imgframe, video, ns->m_VCodecCtx->width * 3);
 				}
 				ns->m_qvideo.pop();
 				delete video;
@@ -755,9 +777,11 @@ bool NetStreamFfmpeg::read_frame()
 		if (packet.stream_index == m_audio_index && get_sound_handler())
 		{
 			int frame_size;
-			uint8_t* ptr = new uint8_t[(AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2];
+			unsigned int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
+
+			uint8_t* ptr = new uint8_t[bufsize];
 #ifdef FFMPEG_AUDIO2
-			frame_size = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
+			frame_size = bufsize;
 			if (avcodec_decode_audio2(m_ACodecCtx, (int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
 #else
 			if (avcodec_decode_audio(m_ACodecCtx, (int16_t*) ptr, &frame_size, packet.data, packet.size) >= 0)
@@ -766,25 +790,28 @@ bool NetStreamFfmpeg::read_frame()
 
 				bool stereo = m_ACodecCtx->channels > 1 ? true : false;
 				int samples = stereo ? frame_size >> 2 : frame_size >> 1;
-
-				// Resampeling using ffmpegs (libavcodecs) resampler
-				if (!m_Resample) {
-					// arguments: (output channels, input channels, output rate, input rate)
-					m_Resample = audio_resample_init (2, m_ACodecCtx->channels, 44100, m_ACodecCtx->sample_rate);
+				
+				if (_resampler.init(m_ACodecCtx)){
+					// Resampling is needed.
+					
+					uint8_t* output = new uint8_t[bufsize];
+					
+					samples = _resampler.resample(reinterpret_cast<int16_t*>(ptr), 
+									 reinterpret_cast<int16_t*>(output), 
+									 samples);
+					delete [] ptr;
+					ptr = reinterpret_cast<uint8_t*>(output);
 				}
-				// The size of this is a guess, we don't know yet... Lets hope it's big enough
-				int16_t* output_data = new int16_t[frame_size * 2];
-				samples = audio_resample (m_Resample, output_data, (int16_t*)ptr, samples);
-
-				raw_videodata_t* raw = new raw_videodata_t;
-				raw->m_data = (uint8_t*) output_data;
+				
+			  	raw_videodata_t* raw = new raw_videodata_t;
+				
+				raw->m_data = ptr;
 				raw->m_ptr = raw->m_data;
 				raw->m_size = samples * 2 * 2; // 2 for stereo and 2 for samplesize = 2 bytes
 				raw->m_stream_index = m_audio_index;
 
 				m_unqueued_data = m_qaudio.push(raw) ? NULL : raw;
 			}
-			delete[] ptr;
 		}
 		else
 		if (packet.stream_index == m_video_index)
@@ -881,13 +908,21 @@ bool NetStreamFfmpeg::read_frame()
 					}
 					video->m_size = copied;
 				} else if (videoFrameFormat == render::RGB) {
-					for(int line = 0; line < m_VCodecCtx->height; line++)
-					{
-						for(int byte = 0; byte < (m_VCodecCtx->width*3); byte++)
-						{
-							video->m_data[byte + (line*m_VCodecCtx->width*3)] = (unsigned char) *(m_Frame->data[0]+(line*m_Frame->linesize[0])+byte);
-						}
+
+					uint8_t* srcptr = m_Frame->data[0];
+					uint8_t* srcend = m_Frame->data[0] + m_Frame->linesize[0] * m_VCodecCtx->height;
+					uint8_t* dstptr = video->m_data;
+					unsigned int srcwidth = m_VCodecCtx->width * 3;
+
+					video->m_size = 0;
+
+					while (srcptr < srcend) {
+						memcpy(dstptr, srcptr, srcwidth);
+						srcptr += m_Frame->linesize[0];
+						dstptr += srcwidth;
+						video->m_size += srcwidth;
 					}
+
 				}
 
 				m_unqueued_data = m_qvideo.push(video) ? NULL : video;

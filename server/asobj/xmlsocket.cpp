@@ -659,10 +659,10 @@ xmlsocket_as_object::checkForIncomingData(as_environment& env)
     std::vector<std::string > msgs;
     if (obj.anydata(msgs))
     {
-        log_msg("Got %u messages: ", msgs.size());
+        log_msg("Got " SIZET_FMT " messages: ", msgs.size());
         for (size_t i=0; i<msgs.size(); ++i)
         {
-            log_msg(" Message %u: %s ", i, msgs[i].c_str());
+            log_msg(" Message " SIZET_FMT " : %s ", i, msgs[i].c_str());
         }
 
         boost::intrusive_ptr<as_function> onDataHandler = getEventHandler("onData");

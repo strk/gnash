@@ -1,3 +1,13 @@
+2007-04-10 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: Don't call delete on a
+	new[]-allocated pointer. Don't try to copy a byte-aligned
+	data buffer into a "flat" one, and vice versa. Add a helper
+	class called AudioResampler, which will do audio resampling
+	if necessary.
+	* server/xmlsocket.cpp: Use SIZET_FMT.
+	* libbase/image.cpp: Document update().
+
 2007-04-10  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Test the host to see if we're on a Darwin machine.
