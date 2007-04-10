@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.34 2007/04/08 23:06:17 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.35 2007/04/10 09:14:48 strk Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -22,10 +22,10 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   AC_ARG_WITH(ffmpeg_incl, AC_HELP_STRING([--with-ffmpeg-incl], [directory where ffmpeg headers are]), with_ffmpeg_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_ffmpeg_incl,[
     if test x"${with_ffmpeg_incl}" != x ; then
-      if test -f ${with_ffmpeg_incl}/avcodec.h ; then
+      if test -f ${with_ffmpeg_incl}/ffmpeg/avcodec.h ; then
         ac_cv_path_ffmpeg_incl="-I`(cd ${with_ffmpeg_incl}; pwd)`"
       else
-        AC_MSG_ERROR([${with_ffmpeg_incl} directory doesn't contain any headers])
+        AC_MSG_ERROR([${with_ffmpeg_incl} directory doesn't contain the ffmpeg/avcodec.h header])
       fi
     fi
   ])

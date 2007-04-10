@@ -1,3 +1,9 @@
+2007-04-10 Sandro Santilli <strk@keybit.net>
+
+	* macros/ffmpeg.m4: fix --with-ffmpeg-incl to look for
+	  avcodec.h under the 'ffmpeg' subdir (this is assumed
+	  to exist in Gnash source code).
+
 2007-04-10 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/parser/shape_character_def.cpp:
