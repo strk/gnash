@@ -28,6 +28,8 @@ GNASH_LIBS = \
 	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/server/parser/libgnashparser.la \
+	$(top_builddir)/server/parser/libgnashparser.la \
+	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la
 
@@ -38,6 +40,7 @@ AM_LDFLAGS = \
 	$(LIBLTDL) \
         $(MYSQL_LIBS) \
 	$(LIBXML_LIBS) \
+	$(FFMPEG_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \

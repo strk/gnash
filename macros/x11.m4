@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: x11.m4,v 1.4 2007/04/08 23:06:17 rsavoye Exp $
+dnl $Id: x11.m4,v 1.5 2007/04/10 18:18:46 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_X11],
 [
@@ -42,7 +42,8 @@ AC_DEFUN([GNASH_PATH_X11],
     dnl If the path hasn't been specified, go look for it.
     if test x"${ac_cv_path_x11_incl}" = x; then
       AC_MSG_CHECKING([for X11 headers])
-      for i in $incllist; do
+      newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/include ${incllist}"
+      for i in $newlist; do
       	if test -f $i/X11/X.h; then
       	  if test x"$i" != x"/usr/include"; then
       	    ac_cv_path_x11_incl="-I$i"
@@ -84,22 +85,28 @@ AC_DEFUN([GNASH_PATH_X11],
     dnl If the header doesn't exist, there is no point looking for the library.
     if test x"${ac_cv_path_x11_incl}" != x; then
       AC_MSG_CHECKING([for X11 library])
-      for i in $libslist; do
+      newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/X11R6/lib ${libslist}"
+      for i in $newlist; do
 	      if test -f $i/libX11.a -o -f $i/libX11.${shlibext}; then
+	        ac_cv_path_x11_lib="-L$i -lX11"
           if test -f $i/libXinerama.a -o -f $i/libXinerama.${shlibext}; then
-            ac_cv_path_x11_lib="-lXinerama"
+            ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXinerama"
           fi
-	        if test x"$i" != x"/usr/lib"; then
-	          ac_cv_path_x11_lib="-L$i -lX11 ${ac_cv_path_x11_lib}"
-	          break
-          else
-	          ac_cv_path_x11_lib="-lX11 ${ac_cv_path_x11_lib}"
-	          break
-	        fi
+          if test -f $i/libXext.a -o -f $i/libXext.${shlibext}; then
+            ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXext"
+          fi
           AC_MSG_RESULT(yes)
+          break
         fi
       done
     fi
+
+   for i in $newlist; do
+     if test -f $i/libXplugin.a -o -f $i/libXplugin.${shlibext}; then
+       ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -L$i -lXplugin"
+       break
+     fi
+    done
 
     if test x"${ac_cv_path_x11_lib}" = x; then
       AC_CHECK_LIB(X11, x11_mem_init, [ac_cv_path_x11_lib=""])

@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.289 2007/04/10 15:48:39 strk Exp $
+dnl $Id: configure.ac,v 1.290 2007/04/10 18:18:45 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -32,6 +32,9 @@ dnl Some things you can only do by looking at the platform name.
 case "${host}" in
   powerpc-apple-darwin*)
     AC_DEFINE([__powerpc64__], [], [this is a 64 bit powerpc])
+    ;;
+  i[34567]86-apple-darwin*)
+    darwin=yes
     ;;
   i[34567]86-*-openbsd*)
     openbsd_os=openbsd
@@ -312,29 +315,24 @@ dnl Darwin uses libtool instead of ar to produce libraries. We determine which o
 dnl we have here now. For some reason on Darwin, we don't get the
 dnl count from grep via stdin correctly. Writing a temp file does the
 dnl trick, so although it's ugly, that's what we gotta do...
-dnl BOGUS dnl AC_MSG_CHECKING([Checking which type of library archiver we have])
-dnl BOGUS dnl rm -f .tmp
-dnl BOGUS dnl libtool > .tmp 2>&1
-dnl BOGUS dnl archiver=`grep -c dynamic .tmp 2>&1`
-dnl BOGUS dnl rm -f .tmp
-dnl BOGUS dnl if test $archiver -eq 1; then
-dnl BOGUS dnl   if test "$enable_shared" = no; then
-dnl BOGUS dnl     AR="libtool -static"
-dnl BOGUS dnl   else
-dnl BOGUS dnl     AR="libtool -dynamic"
-dnl BOGUS dnl     CXXFLAGS="${CXXFLAGS} -dynamic"
-dnl BOGUS dnl     export MACOSX_DEPLOYMENT_TARGET="10.3"
-dnl BOGUS dnl   fi
-dnl BOGUS dnl   AR_FLAGS="-o"
-dnl BOGUS dnl   darwin=yes
-dnl BOGUS dnl else
-dnl BOGUS dnl   AR="ar"
-dnl BOGUS dnl   AR_FLAGS="cvu"
-dnl BOGUS dnl   darwin=no
-dnl BOGUS dnl fi
-dnl BOGUS dnl AC_MSG_RESULT([${AR}])
-dnl BOGUS dnl AC_SUBST(AR)
-dnl BOGUS dnl AC_SUBST(AR_FLAGS)
+AC_MSG_CHECKING([Checking which type of library archiver we have])
+rm -f .tmp
+libtool > .tmp 2>&1
+archiver=`grep -c dynamic .tmp 2>&1`
+rm -f .tmp
+if test $archiver -eq 1; then
+dnl   if test "$enable_shared" = no; then
+dnl     AR="libtool -static"
+dnl   else
+dnl     AR="libtool -dynamic"
+dnl     CXXFLAGS="${CXXFLAGS} -dynamic"
+   export MACOSX_DEPLOYMENT_TARGET="10.3"
+dnl   fi
+dnl   AR_FLAGS="-o"
+   darwin=yes
+else
+   darwin=no
+fi
 
 dnl When cross compiling, limit the search directories cause otherwise
 dnl we may get the host headers or libraries by accident. These values

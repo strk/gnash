@@ -15,16 +15,18 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: netstats.cpp,v 1.2 2007/01/03 01:52:06 nihilus Exp $ */
+/* $Id: netstats.cpp,v 1.3 2007/04/10 18:18:45 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
+#include <boost/date_time/date.hpp>
 #include "netstats.h"
 #include "log.h"
 
 using namespace gnash;
+using namespace boost::posix_time;
 
 namespace cygnal {
 

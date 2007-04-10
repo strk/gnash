@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: opengl.m4,v 1.30 2007/04/08 23:06:17 rsavoye Exp $
+dnl $Id: opengl.m4,v 1.31 2007/04/10 18:18:46 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_OPENGL],
 [
@@ -33,22 +33,32 @@ AC_DEFUN([GNASH_PATH_OPENGL],
     ])
 
     dnl If the include path hasn't been specified, go look for it.
-    if test x"${ac_cv_path_opengl_includes}" = x; then
-      AC_MSG_CHECKING([for OpenGL headers])
-      for i in $incllist; do
-        if test -f $i/GL/gl.h; then
-          if test x"$i" != x"/usr/include"; then
-            ac_cv_path_opengl_includes="-I$i"
-            break
-          else
-            ac_cv_path_opengl_includes="default"
-            break
+    if test x"${darwin}" = xyes; then
+      ac_cv_path_opengl_includes="-framework Carbon -framework ApplicationServices -framework OpenGL -framework AGL -I/System/Library/Frameworks/OpenGL.framework/Headers"
+    else
+      notsgigl=no
+      if test x"${ac_cv_path_opengl_includes}" = x; then
+        AC_MSG_CHECKING([for OpenGL headers])
+        newlist="/System/Library/Frameworks/OpenGL.framework/Headers ${incllist}"
+        for i in $newlist; do
+          if test -f $i/GL/gl.h -o -f $i/OpenGL.h; then
+            if test -f $i/OpenGL.h; then
+              notsgigl=yes
+              AC_DEFINE(NOT_SGI_GL, [1], [Is not based on the SGI GL])
+            fi
+            if test x"$i" != x"/usr/include"; then
+              ac_cv_path_opengl_includes="-I$i"
+              break
+            else
+              ac_cv_path_opengl_includes="default"
+              break
+            fi
+	          if test -f $i/GL/glu.h; then
+	            AC_MSG_WARN([GL/glu.h not installed!])
+	          fi
           fi
-	        if test -f $i/GL/glu.h; then
-	          AC_MSG_WARN([GL/glu.h not installed!])
-	        fi
-        fi
-      done
+        done
+      fi
     fi
 
     if test x"${ac_cv_path_opengl_includes}" = x; then
@@ -77,33 +87,38 @@ AC_DEFUN([GNASH_PATH_OPENGL],
       fi
     ])
 
-    if test x"${ac_cv_path_opengl_lib}" = x; then
-      for i in $libslist; do
-        if test -f $i/libGL.${shlibext} -o -f $i/libGL.a; then
-          if test x"$i" != x"/usr/lib"; then
-            ac_cv_path_opengl_lib="-L$i -lGL"
-            break
-	        else
-            ac_cv_path_opengl_lib="-lGL"
-            break
-	        fi
-        fi
-      done
-      if test x"${ac_cv_path_opengl_lib}" != x; then
-        if test -f $i/libGLU.${shlibext} -o -f $i/libGLU.a; then
-          ac_cv_path_opengl_lib="${ac_cv_path_opengl_lib} -lGLU"
-        else
-          AC_WARN([No GLU library found!])
-        fi
-      else                      dnl nothing found, check for the win32 names
-        for i in $newliblist; do
-          if test -f $i/libopengl32.${shlibext} -o -f $i/libopengl32.a; then
-            ac_cv_path_opengl_lib="-L$i -lopengl32 =lopenglu32"
-            break
+    if test x"${darwin}" = xyes; then
+      ac_cv_path_opengl_lib="framework Carbon -framework ApplicationServices -framework OpenGL -framework AGL"
+    else
+      if test x"${ac_cv_path_opengl_lib}" = x; then
+        newlist="/System/Library/Frameworks/OpenGL.framework/Libraries ${libslist}"
+        for i in $newlist; do
+          if test -f $i/libGL.${shlibext} -o -f $i/libGL.a; then
+            if test x"$i" != x"/usr/lib"; then
+              ac_cv_path_opengl_lib="-L$i -lGL"
+              break
+	          else
+              ac_cv_path_opengl_lib="-lGL"
+              break
+	          fi
           fi
         done
-      fi
-    fi                          dnl end of if ac_cv_path_opengl_lib
+        if test x"${ac_cv_path_opengl_lib}" != x; then
+          if test -f $i/libGLU.${shlibext} -o -f $i/libGLU.a; then
+            ac_cv_path_opengl_lib="${ac_cv_path_opengl_lib} -lGLU"
+          else
+            AC_WARN([No GLU library found!])
+          fi
+        else                      dnl nothing found, check for the win32 names
+          for i in $newliblist; do
+            if test -f $i/libopengl32.${shlibext} -o -f $i/libopengl32.a; then
+              ac_cv_path_opengl_lib="-L$i -lopengl32 =lopenglu32"
+              break
+            fi
+          done
+        fi
+      fi                        dnl end of if ac_cv_path_opengl_lib
+    fi                          dnl end of if darwin
   fi                            dnl end of if $opengl
 
   if test x"${ac_cv_path_opengl_lib}" = x; then

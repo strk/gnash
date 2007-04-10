@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.63 2007/04/06 07:58:15 jgilmore Exp $
+# $Id: Makefile.am,v 1.64 2007/04/10 18:18:45 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -63,6 +63,7 @@ GTK_LIBS =  \
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 AM_LDFLAGS =  \
 	$(LIBLTDL) \
+	$(FFMPEG_LIBS) \
 	$(CURL_LIBS) \
 	$(LIBXML_LIBS) \
 	$(BOOST_LIBS) \
@@ -123,7 +124,7 @@ endif
 if USE_GUI_GTK
   AM_LDFLAGS += $(CAIRO_LIBS)
   GTK_SRCS = gtk.cpp gtksup.h gtk_glue.h $(GTK_CAIRO_SRCS) $(GTK_OPENGL_SRCS) $(GTK_AGG_SRCS) 
-  AM_LDFLAGS += $(GTK_LIBS) 
+  AM_LDFLAGS += $(GTK_LIBS) $(X11_LIBS)
   AM_CPPFLAGS += $(GTK_CFLAGS)
 else
  GTK_SRCS = 
@@ -218,6 +219,7 @@ GNASH_LIBS = \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
+	$(top_builddir)/server/parser/libgnashparser.la \
 	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/server/parser/libgnashparser.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \

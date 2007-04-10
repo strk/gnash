@@ -5,8 +5,14 @@
 
 // A render_handler that uses SDL & OpenGL
 
+/* $Id: render_handler_ogl.cpp,v 1.71 2007/04/10 18:18:45 rsavoye Exp $ */
 
-/* $Id: render_handler_ogl.cpp,v 1.70 2007/04/07 12:08:17 nihilus Exp $ */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <cstring>
+#include <cmath>
 
 //#include "gnash.h"
 #include "render_handler.h"
@@ -14,14 +20,34 @@
 #include "types.h"
 #include "image.h"
 #include "utility.h"
-#include "tu_opengl_includes.h"
-
-#include <cstring>
-#include <cmath>
 
 #if defined(_WIN32) || defined(WIN32)
-	#include <Windows.h>
+#  include <Windows.h>
 #endif
+
+#ifdef NOT_SGI_GL
+#include <AGL/agl.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#include <OpenGL/glext.h>
+#else
+# include <GL/gl.h>
+# include <GL/glx.h>
+# include <GL/glu.h>
+# ifndef APIENTRY
+#  define APIENTRY
+# endif
+#endif
+
+#if !defined(WIN32) || defined(GUI_GTK)
+# define GL_GLEXT_PROTOTYPES
+# include <GL/gl.h>
+# include <GL/glx.h>
+# include <GL/glu.h>
+# ifndef APIENTRY
+#  define APIENTRY
+# endif
+#endif // no WIN32 or OSX
 
 using namespace gnash;
 

@@ -1,3 +1,23 @@
+2007-04-10  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Test the host to see if we're on a Darwin machine.
+	* backend/render_handler_ogl.cpp: Build with the native Darwin
+	port of OpenGL.
+	* cygnal/netstats.cpp: Include date.hpp.
+	* gui/Makefile.am: Add FFMPEG_LIBS for cross compiling.
+	* macros/incllist, incllist: Don't search for Darwin specific
+	paths, we're correctly using the -framework flag to GCC now.
+	* macros/opengl.m4: For Darwin, use the OpenGL and AGL frameworks
+	instead of include or linker paths.
+	* macros/x11.m4: Find all the right include paths. Look for
+	libXplugin too, which is Darwin specific, and in a weird place.
+	* server/StreamProvider.cpp: Remove bogus USE_CURL setting.
+	* server/StreamProvider.h: Include config.h.
+	* server/asobj/Makefile.am: Use FFMPEG_CFLAGS too.
+	* server/parser/Makefile.am: Use FFMPEG_CFLAGS too.
+	* server/vm/Makefile.am:  Use FFMPEG_CFLAGS too.
+	* utilities/Makefile.am: Add FFMPEG_LIBS.
+	
 2007-04-10 Sandro Santilli <strk@keybit.net>
 
 	* libbase/log.h: allow switching off any VERBOSITY overhead
