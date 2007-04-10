@@ -1,5 +1,7 @@
 2007-04-10 Sandro Santilli <strk@keybit.net>
 
+	* libbase/log.h: allow switching off any VERBOSITY overhead
+	  by using -DVERBOSE_WHAT=0.
 	* server/as_environment.{cpp,h}: add the concept
 	  of a default target to support setTarget() calls
 	  (null target spec meaning will to reset the target

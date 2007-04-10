@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.h,v 1.44 2007/04/08 23:06:17 rsavoye Exp $ */
+/* $Id: log.h,v 1.45 2007/04/10 18:06:37 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -187,39 +187,47 @@ DSOEXPORT void log_swferror(const char* fmt, ...);
 DSOEXPORT void log_aserror(const char* fmt, ...);
 #endif
 
-// Undefine this to completely remove parse debugging at compile-time
+// Define to 0 to completely remove parse debugging at compile-time
+#ifndef VERBOSE_PARSE
 #define VERBOSE_PARSE 1
+#endif
 
-// Undefine this to completely remove action debugging at compile-time
+// Define to 0 to completely remove action debugging at compile-time
+#ifndef VERBOSE_ACTION
 #define VERBOSE_ACTION 1
+#endif
 
-// Undefine this to remove ActionScript errors verbosity at compile-time
+// Define to 0 to remove ActionScript errors verbosity at compile-time
+#ifndef VERBOSE_ASCODING_ERRORS
 #define VERBOSE_ASCODING_ERRORS  1
+#endif
 
-// Undefine this to remove invalid SWF verbosity at compile-time
+// Define to 0 this to remove invalid SWF verbosity at compile-time
+#ifndef VERBOSE_MALFORMED_SWF
 #define VERBOSE_MALFORMED_SWF 1
+#endif
 
 
-#ifdef VERBOSE_PARSE
+#if VERBOSE_PARSE
 #define IF_VERBOSE_PARSE(x) do { if ( LogFile::getDefaultInstance().getParserDump() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_PARSE(x)
 #endif
 
-#ifdef VERBOSE_ACTION
+#if VERBOSE_ACTION
 #define IF_VERBOSE_ACTION(x) do { if ( LogFile::getDefaultInstance().getActionDump() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_ACTION(x)
 #endif
 
-#ifdef VERBOSE_ASCODING_ERRORS
+#if VERBOSE_ASCODING_ERRORS
 // TODO: check if it's worth to check verbosity level too...
 #define IF_VERBOSE_ASCODING_ERRORS(x) { if ( RcInitFile::getDefaultInstance().showASCodingErrors() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_ASCODING_ERRORS(x)
 #endif
 
-#ifdef VERBOSE_MALFORMED_SWF
+#if VERBOSE_MALFORMED_SWF
 // TODO: check if it's worth to check verbosity level too... 
 #define IF_VERBOSE_MALFORMED_SWF(x) { if ( RcInitFile::getDefaultInstance().showMalformedSWFErrors() ) { x; } } while (0);
 #else
