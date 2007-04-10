@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.7 2007/02/28 23:05:58 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.8 2007/04/10 14:17:15 strk Exp $";
 
 #include "check.as"
 
@@ -295,6 +295,22 @@ asm {
         setvariable
 };
 check_equals(checkpoint, 7);
+
+//-----------------------------------------------------------------------
+// Check 'invalid:Number'
+//-----------------------------------------------------------------------
+
+asm {
+	push 'invalid:Number'
+	push '8'
+	setvariable
+        push 'checkpoint'
+	push 'invalid:Number'
+	getvariable
+        setvariable
+};
+check_equals(typeof(checkpoint), 'undefined');
+check_equals(typeof(invalid), 'undefined');
 
 //-----------------------------------------------------------------------
 // TODO: try use of 'with' stack

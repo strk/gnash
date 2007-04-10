@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.cpp,v 1.44 2007/02/21 20:22:58 strk Exp $ */
+/* $Id: log.cpp,v 1.45 2007/04/10 14:17:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -740,11 +740,11 @@ LogFile::operator << (std::ostream & (&)(std::ostream &))
     scoped_lock lock(io_mutex);
     if (_trace) {
 	if (_verbose) {
-	    cout << "\r" << endl;
+	    cout << endl;
 	}
     } else {
 	if (_verbose) {
-	    cout << "\r" << endl;
+	    cout << endl;
 	}
     }
     

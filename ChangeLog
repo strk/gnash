@@ -1,5 +1,8 @@
 2007-04-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/getvariable.as: add test for
+	  literal 'invalid:Number' variable name.
+	* libbase/log.cpp: stop adding CR to debugging output !!
 	* server/stream.cpp (open_tag): print tag offsets as start
 	  of the tag (including header). This is to match offsets
 	  as printed by Ming's listswf for comparision purposes.
