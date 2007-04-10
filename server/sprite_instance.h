@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.91 2007/04/08 08:37:07 zoulunkai Exp $ */
+/* $Id: sprite_instance.h,v 1.92 2007/04/10 15:48:39 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -298,7 +298,7 @@ public:
 
 
 	/// Look up the labeled frame, and jump to it.
-	bool goto_labeled_frame(const char* label);
+	bool goto_labeled_frame(const std::string& label);
 
 		
 	/// Display (render?) this Sprite/MovieClip, unless invisible

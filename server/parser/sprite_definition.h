@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -98,7 +98,8 @@ private:
 	std::vector<PlayList> m_playlist;
 
 	// stores 0-based frame #'s
-	stringi_hash<size_t> m_named_frames;
+	typedef std::map<std::string, size_t> NamedFrameMap;
+	NamedFrameMap m_named_frames;
 
 	size_t m_frame_count;
 
@@ -212,16 +213,16 @@ private:
 
 	
 	/// Overridden just for complaining  about malformed SWF
-	virtual void export_resource(const tu_string& /*symbol*/,
+	virtual void export_resource(const std::string& /*symbol*/,
 			resource* /*res*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
-		log_warning("can't export from sprite! Malformed SWF?");
+		log_swferror("Can't export from sprite!");
 		);
 	}
 
 	/// Delegate call to associated root movie
-	virtual boost::intrusive_ptr<resource> get_exported_resource(const tu_string& sym)
+	virtual boost::intrusive_ptr<resource> get_exported_resource(const std::string& sym)
 	{
 		return m_movie_def->get_exported_resource(sym);
 	}
@@ -281,13 +282,10 @@ private:
 	}
 
 	// See dox in movie_definition.h
-	virtual void	add_frame_name(const char* name);
+	virtual void	add_frame_name(const std::string& name);
 
 	// See dox in movie_definition
-	bool	get_labeled_frame(const char* label, size_t* frame_number)
-	{
-	    return m_named_frames.get(label, frame_number);
-	}
+	bool get_labeled_frame(const std::string& label, size_t& frame_number);
 
 	/// frame_number is 0-based
 	const PlayList& get_playlist(size_t frame_number)

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 200, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -267,23 +267,23 @@ bool movie_def_impl::in_import_table(int character_id)
     return false;
 }
 
-void movie_def_impl::visit_imported_movies(import_visitor* visitor)
+void movie_def_impl::visit_imported_movies(import_visitor& visitor)
 {
-    stringi_hash<bool>	visited;	// ugh!
+    // don't call the visitor twice for a single URL
+    std::set<std::string> visited;
 
     for (size_t i = 0, n = m_imports.size(); i < n; i++)
+    {
+        const import_info& inf = m_imports[i];
+        if (visited.insert(inf.m_source_url).second)
         {
-            const import_info&	inf = m_imports[i];
-            if (visited.find(inf.m_source_url) == visited.end())
-                {
-                    // Call back the visitor.
-                    visitor->visit(inf.m_source_url.c_str());
-                    visited[inf.m_source_url] = true;
-                }
+            // Call back the visitor.
+            visitor.visit(inf.m_source_url);
         }
+    }
 }
 
-void movie_def_impl::resolve_import(const char* source_url, movie_definition* source_movie)
+void movie_def_impl::resolve_import(const std::string& source_url, movie_definition* source_movie)
 {
 
     // Iterate in reverse, since we remove stuff along the way.
@@ -298,8 +298,8 @@ void movie_def_impl::resolve_import(const char* source_url, movie_definition* so
 
                     if (res == NULL)
                         {
-                            log_error("import error: resource '%s' is not exported from movie '%s'\n",
-                                      inf.m_symbol.c_str(), source_url);
+                            log_error("import error: resource '%s' is not exported from movie '%s'",
+                                      inf.m_symbol.c_str(), source_url.c_str());
                         }
                     else if (font* f = res->cast_to_font())
                         {
@@ -315,8 +315,8 @@ void movie_def_impl::resolve_import(const char* source_url, movie_definition* so
                         }
                     else
                         {
-                            log_error("import error: resource '%s' from movie '%s' has unknown type\n",
-                                      inf.m_symbol.c_str(), source_url);
+                            log_error("import error: resource '%s' from movie '%s' has unknown type",
+                                      inf.m_symbol.c_str(), source_url.c_str());
                         }
 
                     if (imported)
@@ -344,7 +344,7 @@ movie_def_impl::get_character_def(int character_id)
     // make sure character_id is resolved
     if (in_import_table(character_id))
         {
-            log_error("get_character_def(): character_id %d is still waiting to be imported\n",
+            log_error("get_character_def(): character_id %d is still waiting to be imported",
                       character_id);
         }
 #endif // not NDEBUG
@@ -357,7 +357,7 @@ movie_def_impl::get_character_def(int character_id)
 void movie_def_impl::add_font(int font_id, font* f)
 {
     assert(f);
-    m_fonts.add(font_id, f);
+    m_fonts.insert(make_pair(font_id, boost::intrusive_ptr<font>(f)));
 }
 
 font* movie_def_impl::get_font(int font_id)
@@ -366,23 +366,23 @@ font* movie_def_impl::get_font(int font_id)
     // make sure font_id is resolved
     if (in_import_table(font_id))
         {
-            log_error("get_font(): font_id %d is still waiting to be imported\n",
+            log_error("get_font(): font_id %d is still waiting to be imported",
                       font_id);
         }
 #endif // not NDEBUG
 
-    boost::intrusive_ptr<font>	f;
-    m_fonts.get(font_id, &f);
-    assert(f == NULL || f->get_ref_count() > 1);
+    FontMap::iterator it = m_fonts.find(font_id);
+    if ( it == m_fonts.end() ) return NULL;
+    boost::intrusive_ptr<font> f = it->second;
+    assert(f->get_ref_count() > 1);
     return f.get();
 }
 
 bitmap_character_def* movie_def_impl::get_bitmap_character_def(int character_id)
 {
-    boost::intrusive_ptr<bitmap_character_def>	ch;
-    m_bitmap_characters.get(character_id, &ch);
-    assert(ch == NULL || ch->get_ref_count() > 1);
-    return ch.get();
+    BitmapMap::iterator it = m_bitmap_characters.find(character_id);
+    if ( it == m_bitmap_characters.end() ) return NULL;
+    else return it->second.get(); 
 }
 
 void
@@ -391,7 +391,8 @@ movie_def_impl::add_bitmap_character_def(int character_id,
 {
     assert(ch);
     //log_msg("Add bitmap character %d", character_id);
-    m_bitmap_characters.add(character_id, ch);
+    //m_bitmap_characters.add(character_id, ch);
+    m_bitmap_characters.insert(make_pair(character_id, boost::intrusive_ptr<bitmap_character_def>(ch)));
 
 	// we can *NOT* generate bitmap_info until
 	// a renderer is present
@@ -400,9 +401,12 @@ movie_def_impl::add_bitmap_character_def(int character_id,
 
 sound_sample* movie_def_impl::get_sound_sample(int character_id)
 {
-    boost::intrusive_ptr<sound_sample>	ch;
-    m_sound_samples.get(character_id, &ch);
-    assert(ch == NULL || ch->get_ref_count() > 1);
+    SoundSampleMap::iterator it = m_sound_samples.find(character_id);
+    if ( it == m_sound_samples.end() ) return NULL;
+
+    boost::intrusive_ptr<sound_sample> ch = it->second;
+    assert(ch->get_ref_count() > 1);
+
     return ch.get();
 }
 
@@ -410,7 +414,8 @@ void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
 {
     assert(sam);
 	log_msg("Add sound sample %d", character_id);
-    m_sound_samples.add(character_id, sam);
+    m_sound_samples.insert(make_pair(character_id,
+            boost::intrusive_ptr<sound_sample>(sam)));
 }
 
 // Read header and assign url
@@ -582,9 +587,8 @@ void movie_def_impl::get_owned_fonts(std::vector<font*>* fonts)
 
     std::vector<int>	font_ids;
 
-    for (hash<int, boost::intrusive_ptr<font> >::iterator it = m_fonts.begin();
-         it != m_fonts.end();
-         ++it)
+    for (FontMap::iterator it = m_fonts.begin(), itEnd=m_fonts.end();
+         it != itEnd; ++it)
         {
             font*	f = it->second.get();
             if (f->get_owning_movie() == this)
@@ -977,7 +981,7 @@ movie_def_impl::incrementLoadedFrames()
 }
 
 void
-movie_def_impl::export_resource(const tu_string& symbol, resource* res)
+movie_def_impl::export_resource(const std::string& symbol, resource* res)
 {
 	// FIXME: m_exports access should be protected by a mutex
 
@@ -987,7 +991,7 @@ movie_def_impl::export_resource(const tu_string& symbol, resource* res)
 
 
 boost::intrusive_ptr<resource>
-movie_def_impl::get_exported_resource(const tu_string& symbol)
+movie_def_impl::get_exported_resource(const std::string& symbol)
 {
 	boost::intrusive_ptr<resource> res;
 
@@ -1021,10 +1025,8 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 	for (;;)
 	{
 		// FIXME: make m_exports access thread-safe
-		if ( m_exports.get(symbol, &res) )
-		{
-			return res;
-		}
+        ExportMap::iterator it = m_exports.find(symbol);
+        if ( it != m_exports.end() ) return it->second;
 
 		size_t new_loading_frame = get_loading_frame();
 
@@ -1081,17 +1083,20 @@ movie_def_impl::get_exported_resource(const tu_string& symbol)
 }
 
 void
-movie_def_impl::add_frame_name(const char* name)
+movie_def_impl::add_frame_name(const std::string& n)
 {
 	//log_msg("labelframe: frame %d, name %s", _frames_loaded, name);
 	assert(_frames_loaded < m_frame_count);
+    m_named_frames[n] = _frames_loaded;
+}
 
-    tu_string	n = name;
-
-		if (m_named_frames.get(n, NULL) == false)	// frame should not already have a name (?)
-		{
-	    m_named_frames.add(n, _frames_loaded);	// stores 0-based frame #
-		}
+bool
+movie_def_impl::get_labeled_frame(const std::string& label, size_t& frame_number)
+{
+    NamedFrameMap::iterator it = m_named_frames.find(label);
+    if ( it == m_named_frames.end() ) return false;
+    frame_number = it->second;
+    return true;
 }
 
 

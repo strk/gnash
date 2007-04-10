@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.85 2007/04/06 11:43:44 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.86 2007/04/10 15:48:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1396,16 +1396,16 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 	    if (font* f = m->get_font(id))
 		{
 		    // Expose this font for export.
-		    m->export_resource(tu_string(symbol_name), f);
+		    m->export_resource(symbol_name, f);
 		}
 	    else if (character_def* ch = m->get_character_def(id))
 		{
 		    // Expose this movie/button/whatever for export.
-		    m->export_resource(tu_string(symbol_name), ch);
+		    m->export_resource(symbol_name, ch);
 		}
 	    else if (sound_sample* ch = m->get_sound_sample(id))
 		{
-		    m->export_resource(tu_string(symbol_name), ch);
+		    m->export_resource(symbol_name, ch);
 		}
 	    else
 		{

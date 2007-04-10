@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -157,23 +157,20 @@ sprite_definition::read(stream* in)
 
 /*virtual*/
 void
-sprite_definition::add_frame_name(const char* name)
+sprite_definition::add_frame_name(const std::string& name)
 {
 	//log_msg("labelframe: frame %d, name %s", m_loading_frame, name);
-	assert((int)m_loading_frame >= 0 && m_loading_frame < m_frame_count);
+	assert(m_loading_frame < m_frame_count);
+    m_named_frames[name] = m_loading_frame;
+}
 
-	tu_string n = name;
-	size_t currently_assigned = 0;
-	if (m_named_frames.get(n, &currently_assigned) == true)
-	{
-		log_error("add_frame_name(" SIZET_FMT ", '%s') -- frame name "
-			"already assigned to frame " SIZET_FMT "; overriding\n",
-			m_loading_frame,
-			name, currently_assigned);
-	}
-
-	// stores 0-based frame #
-	m_named_frames[n] = m_loading_frame;
+bool
+sprite_definition::get_labeled_frame(const std::string& label, size_t& frame_number)
+{
+    NamedFrameMap::iterator it = m_named_frames.find(label);
+    if ( it == m_named_frames.end() ) return false;
+    frame_number = it->second;
+    return true;
 }
 
 sprite_definition::sprite_definition(movie_definition* m, stream* in)

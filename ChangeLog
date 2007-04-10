@@ -1,3 +1,14 @@
+2007-04-10 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/: movie_definition.h, movie_def_impl.{cpp,h},
+	  sprite_definition.{cpp,h}: stop using TU legacy hashes
+	  and strings: use std::string instead of C strings, use
+	  references instead of pointers in a few places.
+	* server/sprite_instance.{cpp,h}: use std::string instead
+	  of C strings for frame labels, update other uses of changed
+	  interfaces of parser.
+	* server/swf/tag_loaders.cpp: update uses of changed interfaces
+	  of parser.
 
 2007-04-10 Sandro Santilli <strk@keybit.net>
 

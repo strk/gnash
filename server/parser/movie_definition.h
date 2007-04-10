@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -161,15 +161,16 @@ public:
 	/// Call visit_imported_movies() to retrieve a list of
 	/// names of movies imported into this movie.
 	//
-	/// visitor->visit() will be called back with the name
+	/// visitor.visit() will be called back with the name
 	/// of each imported movie.
+	///
 	class import_visitor
 	{
 	public:
 	    virtual ~import_visitor() {}
-	    virtual void	visit(const char* imported_movie_filename) = 0;
+	    virtual void visit(const std::string& imported_movie_filename) = 0;
 	};
-	virtual void visit_imported_movies(import_visitor* /*visitor*/) {}
+	virtual void visit_imported_movies(import_visitor& /*visitor*/) {}
 	
 	/// Call this to resolve an import of the given movie.
 	//
@@ -180,7 +181,7 @@ public:
 	///
 	/// @see add_import
 	///
-	virtual void resolve_import(const char* /*name*/,
+	virtual void resolve_import(const std::string& /*name*/,
 			movie_definition* /*def*/) {}
 	
 	//
@@ -249,7 +250,7 @@ public:
 	/// @return NULL if the label doesn't correspond to an exported
 	///         resource. This is the default behaviour.
 	///
-	virtual boost::intrusive_ptr<resource>	get_exported_resource(const tu_string& /*symbol*/)
+	virtual boost::intrusive_ptr<resource>	get_exported_resource(const std::string& /*symbol*/)
 	{
 		return NULL;
 	}
@@ -286,7 +287,7 @@ public:
 	///
 	/// @return true if a frame with that label was found, false otherwise
 	///
-	virtual bool get_labeled_frame(const char* /*label*/, size_t* /*frame_number*/)
+	virtual bool get_labeled_frame(const std::string& /*label*/, size_t& /*frame_number*/)
 	{
 		return false;
 	}
@@ -347,10 +348,12 @@ public:
 	/// Labels the frame currently being loaded with the given name. 
 	//
 	/// A copy of the name string is made and kept in this object.
+    /// In case of multiple frames with the same name, the last added
+    /// will be the one referenced by that name.
 	///
 	/// The default implementation is a no-op.
 	///
-	virtual void add_frame_name(const char* /*name*/)
+	virtual void add_frame_name(const std::string& /*name*/)
 	{
 	}
 
@@ -453,15 +456,16 @@ public:
 		return -1;
 	}
 
-	/// \brief
-	/// Mark the given resource as "exported" with the given
-	/// linkage name.
+	/// Mark the given resource as "exported" with the given linkage name.
 	//
+    /// Note that any previously exported resource with the same linkage 
+    /// name will become unreachable (export override).
+    ///
 	/// @see get_exported_resource
 	///
 	/// The default implementation is a no-op
 	///
-	virtual void export_resource(const tu_string& /*symbol*/,
+	virtual void export_resource(const std::string& /*symbol*/,
 			resource* /*res*/)
 	{
 	}
@@ -481,8 +485,8 @@ public:
 	///
 	/// The default implementation is a no-op.
 	///
-	virtual void add_import(const char* /*source_url*/,
-			int /*id*/, const char* /*symbol_name*/)
+	virtual void add_import(const std::string& /*source_url*/,
+			int /*id*/, const std::string& /*symbol_name*/)
 	{
 	}
 

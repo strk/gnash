@@ -1731,7 +1731,7 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 
 	if ( isnan(num) || isinf(num))
 	{
-		return m_def->get_labeled_frame(frame_spec.to_string(env), &frameno);
+		return m_def->get_labeled_frame(frame_spec.to_std_string(env), frameno);
 	}
 
 	// TODO: are we sure we shouldn't check for frames labeled with negative numbers ?
@@ -1739,7 +1739,7 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 
 	// all frame numbers >= 0 are valid, but a valid frame number may still
 	// reference a non-exist frame(eg. frameno > total_frames).
-	frameno = num - 1;
+	frameno = size_t(num) - 1;
 
 	return true;
 }
@@ -2541,22 +2541,20 @@ sprite_instance::goto_frame(size_t target_frame_number)
 
 }
 
-bool sprite_instance::goto_labeled_frame(const char* label)
+bool sprite_instance::goto_labeled_frame(const std::string& label)
 {
 	size_t target_frame;
-	if (m_def->get_labeled_frame(label, &target_frame))
+	if (m_def->get_labeled_frame(label, target_frame))
 	{
 		goto_frame(target_frame);
 		return true;
 	}
-	else
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("sprite_instance::goto_labeled_frame('%s') "
-			"unknown label", label);
-		);
-		return false;
-	}
+
+    IF_VERBOSE_MALFORMED_SWF(
+    log_swferror("sprite_instance::goto_labeled_frame('%s') "
+			"unknown label", label.c_str());
+    );
+    return false;
 }
 
 void sprite_instance::display()

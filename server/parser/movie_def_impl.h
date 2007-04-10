@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -64,9 +64,9 @@ class import_info
 private:
     friend class movie_def_impl;
 
-    tu_string	m_source_url;
+    std::string	m_source_url;
     int	        m_character_id;
-    tu_string	m_symbol;
+    std::string	m_symbol;
 
     import_info()
 	:
@@ -74,7 +74,7 @@ private:
 	{
 	}
 
-    import_info(const char* source, int id, const char* symbol)
+    import_info(const std::string& source, int id, const std::string& symbol)
 	:
 	m_source_url(source),
 	m_character_id(id),
@@ -134,7 +134,6 @@ public:
 	/// It contains pairs of 'int' and 'boost::intrusive_ptr<character_def>'
 	///
 	typedef std::map< int, boost::intrusive_ptr<character_def> > container;
-	//typedef hash< int, boost::intrusive_ptr<character_def> >container;
 
 	typedef container::iterator iterator;
 
@@ -184,14 +183,18 @@ class movie_def_impl : public movie_definition
 private:
 	/// Characters Dictionary
 	CharacterDictionary	_dictionary;
-	//hash<int, boost::intrusive_ptr<character_def> >		m_characters;
 
 	/// Tags loader table
 	SWF::TagLoadersTable& _tag_loaders;
 
-	hash<int, boost::intrusive_ptr<font> >	 		m_fonts;
-	hash<int, boost::intrusive_ptr<bitmap_character_def> >	m_bitmap_characters;
-	hash<int, boost::intrusive_ptr<sound_sample> >		m_sound_samples;
+	typedef std::map<int, boost::intrusive_ptr<font> > FontMap;
+	FontMap m_fonts;
+
+	typedef std::map<int, boost::intrusive_ptr<bitmap_character_def> > BitmapMap;
+	BitmapMap m_bitmap_characters;
+
+	typedef std::map<int, boost::intrusive_ptr<sound_sample> > SoundSampleMap;
+	SoundSampleMap m_sound_samples;
 
 	/// A list of movie control events for each frame.
 	std::vector<PlayList> m_playlist;
@@ -200,9 +203,11 @@ private:
 	std::vector<PlayList> m_init_action_list;
 
 	/// 0-based frame #'s
-	stringi_hash<size_t> m_named_frames;
+	typedef std::map<std::string, size_t> NamedFrameMap;
+	NamedFrameMap m_named_frames;
 
-	stringi_hash<boost::intrusive_ptr<resource> > m_exports;
+	typedef std::map<std::string, boost::intrusive_ptr<resource> > ExportMap;
+	ExportMap m_exports;
 
 	/// Items we import.
 	std::vector<import_info> m_imports;
@@ -379,7 +384,7 @@ public:
 	}
 
 	// See docs in movie_definition.h
-	virtual void export_resource(const tu_string& symbol,
+	virtual void export_resource(const std::string& symbol,
 			resource* res);
 
 	/// Get the named exported resource, if we expose it.
@@ -387,13 +392,12 @@ public:
 	/// @return NULL if the label doesn't correspond to an exported
 	///         resource, or if a timeout occurs while scanning the movie.
 	///
-	virtual boost::intrusive_ptr<resource> get_exported_resource(const tu_string& symbol);
+	virtual boost::intrusive_ptr<resource> get_exported_resource(const std::string& symbol);
 
 	// see docs in movie_definition.h
-	virtual void add_import(const char* source_url, int id, const char* symbol)
+	virtual void add_import(const std::string& source_url, int id, const std::string& symbol)
 	{
 	    assert(in_import_table(id) == false);
-
 	    m_imports.push_back(import_info(source_url, id, symbol));
 	}
 
@@ -401,12 +405,13 @@ public:
 	/// character_id is listed in the import table.
 	bool in_import_table(int character_id);
 
+	/// \brief
 	/// Calls back the visitor for each movie that we
 	/// import symbols from.
-	virtual void visit_imported_movies(import_visitor* visitor);
+	virtual void visit_imported_movies(import_visitor& visitor);
 
-	// see docs in movie_definition.h
-	virtual void resolve_import(const char* source_url,
+	// See docs in movie_definition.h
+	virtual void resolve_import(const std::string& source_url,
 		movie_definition* source_movie);
 
 	void add_character(int character_id, character_def* c);
@@ -419,10 +424,8 @@ public:
 	character_def*	get_character_def(int character_id);
 
 	// See dox in movie_definition
-	bool get_labeled_frame(const char* label, size_t* frame_number)
-	{
-		return m_named_frames.get(label, frame_number);
-	}
+	//
+	bool get_labeled_frame(const std::string& label, size_t& frame_number);
 
 	void	add_font(int font_id, font* f);
 
@@ -465,7 +468,7 @@ public:
 	}
 
 	// See dox in movie_definition.h
-	void add_frame_name(const char* name);
+	void add_frame_name(const std::string& name);
 
 	/// Set an input object for later loading DefineBits
 	/// images (JPEG images without the table info).
