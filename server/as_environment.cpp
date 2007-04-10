@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.65 2007/04/10 17:12:36 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.66 2007/04/10 17:41:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1034,6 +1034,14 @@ as_environment::pushCallFrame(as_function* func)
 		throw ActionLimitException("Call stack limit exceeded");
 	}
 	_localFrames.push_back(CallFrame(func));
+}
+
+void
+as_environment::set_target(character* target)
+{
+	assert(target);
+	if ( ! m_target ) _original_target = target;
+	m_target = target;
 }
 
 } // end of gnash namespace

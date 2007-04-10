@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.84 2007/04/07 11:32:35 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.85 2007/04/10 17:41:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1885,15 +1885,14 @@ SWFHandlers::CommonSetTarget(as_environment& env, const string& target_name)
 {
 	character *new_target;
     
-	// if the string is blank, we set target to the root movie
-	// TODO - double check this is correct?
-	if ( target_name.empty() ) {
-		new_target = env.find_target(string("/"));
-	} else {
-		as_value target_val = env.get_variable(target_name);
-		new_target = target_val.to_sprite();
+	// if the string is blank, we reset the target to its original value
+	if ( target_name.empty() )
+	{
+		env.reset_target();
+		return;
 	}
 
+	new_target = env.find_target(target_name);
 	if (new_target == NULL)
 	{
 		IF_VERBOSE_ASCODING_ERRORS (

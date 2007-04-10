@@ -1,5 +1,17 @@
 2007-04-10 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.{cpp,h}: add the concept
+	  of a default target to support setTarget() calls
+	  (null target spec meaning will to reset the target
+	   to its original value).
+	* server/vm/ASHandlers.cpp (CommonSetTarget):
+	  When target specification is an empty string
+	  reset the target to its original value.
+	  Use find_target rather then find_object to avoid
+	  variables and character names clashes.
+
+2007-04-10 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/movie_def_impl.cpp (read_all_swf): at
 	  end of parsing, check consistency of number of frames 
 	  advertised in header and number of frames read from the

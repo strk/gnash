@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_environment.h,v 1.43 2007/03/28 16:24:39 strk Exp $ */
+/* $Id: as_environment.h,v 1.44 2007/04/10 17:41:42 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -74,7 +74,10 @@ public:
 	}
 
 	character* get_target() { return m_target; }
-	void set_target(character* target) { m_target = target; }
+	void set_target(character* target);
+
+	// Reset target to its original value
+	void reset_target() { m_target = _original_target; }
 
 	/// @{ Stack access/manipulation
 
@@ -485,6 +488,9 @@ private:
 
 	/// Movie target. 
 	character* m_target;
+
+	/// Movie target. 
+	character* _original_target;
 
 	/// Given a variable name, set its value (no support for path)
 	void set_variable_raw(const std::string& path, const as_value& val,
