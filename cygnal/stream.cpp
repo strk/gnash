@@ -281,6 +281,7 @@ Stream::preview(const char *filespec, int frames) {
     GNASH_REPORT_FUNCTION;
 
     _state = PREVIEW;
+    return true; // Default to true    
 }
 
 // Stream a series of thumbnails
@@ -289,6 +290,7 @@ Stream::thumbnail(const char *filespec, int quantity) {
     GNASH_REPORT_FUNCTION;
     
     _state = THUMBNAIL;
+    return true; // Default to true
 }
 
 // Pause the stream
@@ -297,6 +299,7 @@ Stream::pause(int frame) {
     GNASH_REPORT_FUNCTION;
     
     _state = PAUSE;
+    return true; // Default to true
 }
 
 // Seek within the stream
@@ -305,6 +308,7 @@ Stream::seek(int frame) {
     GNASH_REPORT_FUNCTION;
     
     _state = SEEK;
+    return true; // Default to true    
 }
 
 // Upload a stream into a sandbox
@@ -313,6 +317,7 @@ Stream::upload(const char *filespec) {
     GNASH_REPORT_FUNCTION;
     
     _state = UPLOAD;
+    return true; // Default to true
 }
 
 // Stream a single "real-time" source.
@@ -320,6 +325,7 @@ bool Stream::multicast(const char *filespec) {
     GNASH_REPORT_FUNCTION;
     
     _state = MULTICAST;
+    return true; // Default to true    
 }
 
 } // end of cygnal namespace

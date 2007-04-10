@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: http.cpp,v 1.5 2007/01/03 01:52:06 nihilus Exp $ */
+/* $Id: http.cpp,v 1.6 2007/04/10 21:10:56 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -130,7 +130,8 @@ HTTP::sendGetReply(int filesize)
         dbglogfile << "Sent GET Reply: " << reply << endl;
     } else {
         dbglogfile << "Couldn't send GET Reply" << endl;
-    }    
+    }
+    return true; // Default to true
 }
 
 // bool
