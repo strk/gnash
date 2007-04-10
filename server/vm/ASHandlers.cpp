@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.85 2007/04/10 17:41:42 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.86 2007/04/10 21:44:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1141,23 +1141,36 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
 void
 SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 {
-//    GNASH_REPORT_FUNCTION;
+	GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
 	thread.ensureStack(3); 
 
-	sprite_instance* si = env.get_target()->to_movie();
-	if ( ! si )
+	int depth = int(env.top(0).to_number(&env))+character::staticDepthOffset;
+	std::string newname = env.top(1).to_std_string(&env);
+	std::string path = env.top(2).to_std_string(&env);
+
+	character* ch = env.find_target(path);
+	if ( ! ch )
 	{
-		log_error("environment target is not a sprite_instance while executing ActionDuplicateClip");
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Path given to duplicateMovieClip(%s) doesn't point to a character",
+			path.c_str());
+		);
+		return;
 	}
-	else
+
+	boost::intrusive_ptr<sprite_instance> sprite = ch->to_movie();
+	if ( ! sprite )
 	{
-		si->clone_display_object(
-			env.top(2).to_std_string(),
-			env.top(1).to_std_string(),
-			(int) env.top(0).to_number(&env));
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Path given to duplicateMovieClip(%s) is not a sprite",
+			path.c_str());
+		);
+		return;
 	}
+
+	sprite->duplicateMovieClip(newname, depth);
 	env.drop(3);
 }
 

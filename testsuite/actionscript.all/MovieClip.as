@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.47 2007/04/06 15:53:24 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.48 2007/04/10 21:44:14 strk Exp $";
 
 #include "check.as"
 
@@ -307,6 +307,24 @@ hardref.member = 2;
 check_equals(typeof(softref.member), 'number');
 check_equals(softref.member, 2);
 
+#endif // OUTPUT_VERSION >= 6
+
+//----------------------------------------------
+// Test duplicateMovieClip
+//----------------------------------------------
+#if OUTPUT_VERSION >= 6
+_root.createEmptyMovieClip("original", 61);
+_root.original.createEmptyMovieClip("child1", 1);
+_root.original._x = 100;
+check_equals(typeof(_root.original), 'movieclip');
+check_equals(typeof(_root.original.child1), 'movieclip');
+check_equals(_root.original._x, 100);
+
+duplicateMovieClip(_root.original, "copy1", 63);
+check_equals(typeof(_root.copy1), 'movieclip');
+check_equals(typeof(_root.copy1.child1), 'undefined');
+check_equals(_root.copy1.getDepth(), 63);
+check_equals(_root.copy1._x, 100);
 #endif // OUTPUT_VERSION >= 6
 
 //----------------------------------------------

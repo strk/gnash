@@ -1,3 +1,13 @@
+2007-04-10 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.{cpp,h}: add duplicateMovieClip method
+	  for use by MovieClip.duplicateMovieClip and ActionDuplicateClip.
+	* server/vm/ASHandlers.cpp (ActionDuplicateClip): use the new
+	  sprite_instance::duplicateMovieClip method fixing a bogus assumption
+	  about the parent to duplicate into.
+	* testsuite/actionscript.all/MovieClip.as: add small test for
+	  ActionDuplicateClip.
+
 2007-04-10 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStreamFfmpeg.h: Fixed a bug in the 

@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.92 2007/04/10 15:48:39 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.93 2007/04/10 21:44:14 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -530,11 +530,23 @@ public:
 	// delegates to movie_root 
 	virtual void stop_drag();
 
-	/// Duplicate the object with the specified name
-	/// and add it with a new name  at a new depth.
-	void clone_display_object(const std::string& name,
-		const std::string& newname, int depth);
-
+	/// Duplicate this sprite in its timeline
+	//
+	/// Add the new character at a the given depth to this sprite
+	/// parent displaylist.
+	///
+	/// NOTE: the call will fail for the root movie (no parent).
+	/// NOTE2: any character at the given target depth will be
+	///        replaced by the new character
+	/// NOTE3: event handlers will also be copied
+	///
+	/// @param init_object
+	///	If not null, will be used to copy properties over.
+	///
+	boost::intrusive_ptr<sprite_instance> duplicateMovieClip(
+		const std::string& newname,
+		int newdepth, as_object* init_object=NULL);
+		
 	/// Remove the object with the specified name.
 	//
 	/// @@ what happens if the we have multiple objects
@@ -736,6 +748,11 @@ public:
 	void setVariables(VariableMap& vars);
 
 private:
+
+	/// Duplicate the object with the specified name
+	/// and add it with a new name  at a new depth.
+	void clone_display_object(const std::string& name,
+		const std::string& newname, int depth);
 
 	/// Reset the DisplayList for proper loop-back or goto_frame
 	//

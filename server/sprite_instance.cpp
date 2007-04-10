@@ -396,59 +396,28 @@ static as_value sprite_duplicate_movieclip(const fn_call& fn)
 	if (fn.nargs < 2)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("duplicateMovieClip needs 2 or 3 args\n");
+		log_aserror("MovieClip.duplicateMovieClip() needs 2 or 3 args");
 	    	);
 		return as_value();
 	}
 
-	// strk question: Would a call to 
-	//   sprite->get_movie_defition()->create_instance()
-	//   and an add_display_object taking a character_instance
-	//   instead of a character *id* be more appropriate ?
-	//   (sounds more general)
+	std::string newname = fn.arg(0).to_std_string(&(fn.env()));
+	int depth = int(fn.arg(1).to_number());
 
-	// Copy event handlers from sprite
-	// We should not copy 'm_action_buffer' since the 'm_method' already contains it
-	std::vector<swf_event*>	event_handlers;
-	const std::map<event_id, as_value>& sprite_events = sprite->get_event_handlers();
-	typedef std::map<event_id, as_value>::const_iterator event_iterator;
-	for (event_iterator it = sprite_events.begin(),
-		itEnd = sprite_events.end();
-		it != itEnd; ++it )
+	boost::intrusive_ptr<sprite_instance> ch;
+
+	// Copy members from initObject
+	if (fn.nargs == 3)
 	{
-		swf_event* e = new swf_event; // FIXME: who will delete this ?
-		e->m_event = it->first;
-		e->m_method = it->second;
-		event_handlers.push_back(e);
+		boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object();
+		ch = sprite->duplicateMovieClip(newname, depth, initObject.get());
+	}
+	else
+	{
+		ch = sprite->duplicateMovieClip(newname, depth);
 	}
 
-	character* parent = sprite->get_parent();
-	sprite_instance* parent_sprite = parent ? parent->to_movie() : NULL;
-	character* ch = NULL;
-	if (parent_sprite)
-	{
-		ch = parent_sprite->add_display_object(
-			sprite->get_id(),
-			fn.arg(0).to_string(),
-			event_handlers,
-			int(fn.arg(1).to_number()),
-			true, // replace if depth is occupied (to drop)
-			sprite->get_cxform(),
-			sprite->get_matrix(),
-			sprite->get_ratio(),
-			sprite->get_clip_depth());
-
-		ch->setDynamic();
-
-		// Copy members from initObject
-		if (fn.nargs == 3 && ch)
-		{
-			boost::intrusive_ptr<as_object> initObject = fn.arg(2).to_object();
-			if ( initObject ) ch->copyProperties(*initObject);
-		}
-
-	}
-	return as_value(ch);
+	return as_value(ch.get());
 }
 
 static as_value sprite_goto_and_play(const fn_call& fn)
@@ -1866,6 +1835,58 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
 	return txt_char;
 }
 
+boost::intrusive_ptr<sprite_instance> 
+sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
+		as_object* initObject)
+{
+	character* parent_ch = get_parent();
+	if ( ! parent_ch )
+	{
+		log_error("Can't clone root the movie");
+		return NULL;
+	}
+	sprite_instance* parent = parent_ch->to_movie();
+	if ( ! parent )
+	{
+		log_error("%s parent is not a sprite, can't clone", getTarget().c_str());
+		return NULL;
+	}
+
+	boost::intrusive_ptr<sprite_instance> newsprite = new sprite_instance(m_def.get(),
+			m_root, parent, get_id());
+	newsprite->set_name(newname.c_str());
+
+	newsprite->setDynamic();
+
+	if ( initObject ) newsprite->copyProperties(*initObject);
+	//else newsprite->copyProperties(*this);
+
+
+	// Copy event handlers from sprite
+	// We should not copy 'm_action_buffer' since the 'm_method' already contains it
+	const std::map<event_id, as_value>& sprite_events = get_event_handlers();
+	typedef std::map<event_id, as_value>::const_iterator event_iterator;
+	for (event_iterator it = sprite_events.begin(),
+		itEnd = sprite_events.end();
+		it != itEnd; ++it )
+	{
+		swf_event* e = new swf_event; // FIXME: who will delete this ?
+		e->m_event = it->first;
+		e->m_method = it->second;
+		e->attach_to(newsprite.get());
+	}
+
+	parent->m_display_list.place_character(
+		newsprite.get(),
+		depth,
+		get_cxform(),
+		get_matrix(),
+		get_ratio(),
+		get_clip_depth());
+	
+	return newsprite;
+}
+
 void sprite_instance::clone_display_object(const std::string& name,
 	const std::string& newname, int depth)
 {
@@ -1889,6 +1910,11 @@ void sprite_instance::clone_display_object(const std::string& name,
 	    // @@ TODO need to duplicate ch's event handlers, and presumably other members?
 	    // Probably should make a character::clone() function to handle this.
 	}
+    else
+    {
+	    log_error("clone_display_object(%s, %s, %d): could not find a character named %s to clone",
+			    name.c_str(), newname.c_str(), depth, name.c_str());
+    }
 }
 
 void sprite_instance::remove_display_object(const tu_string& name_tu)
@@ -2719,7 +2745,7 @@ sprite_instance::replace_display_object(
 		int clip_depth)
 {
 	assert(m_def != NULL);
-	// log_msg("%s: character %s, id is %d", __FUNCTION__, name, character_id); // FIXME: debugging crap
+	//log_msg("%s: character %s, id is %d, depth is %d", __FUNCTION__, name, character_id, depth); // FIXME: debugging crap
 
 	character_def*	cdef = m_def->get_character_def(character_id);
 	if (cdef == NULL)
