@@ -32,6 +32,9 @@
 	if necessary.
 	* server/xmlsocket.cpp: Use SIZET_FMT.
 	* libbase/image.cpp: Document update().
+	* libbase/image.h: Define a virtual destructor for the image_base
+	class so deriving classes will have their destructors called
+	when we decide to delete them. Fixes a _big_ memory leak.
 
 2007-04-10  Rob Savoye  <rob@bertha.welcomehome.org>
 

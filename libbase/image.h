@@ -42,6 +42,7 @@ namespace image
 
 		image_base(uint8_t* data, int width, int height, int pitch, id_image type);
 		void update(uint8_t* data);
+		virtual ~image_base() {}
 	};
 
 	/// 24-bit RGB image.  Packed data, red byte first (RGBRGB...)
@@ -86,7 +87,7 @@ public:
 	enum {Y, U, V, T, NB_TEXS};
 
 	yuv(int w, int h);
-	~yuv();
+	~yuv() {}
 	void update(uint8_t* data);
 	unsigned int video_nlpo2(unsigned int x) const;
 	int size() const;
