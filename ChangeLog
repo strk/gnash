@@ -1,5 +1,11 @@
 2007-04-10 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlnode.{h,cpp}: fix appendChild to properly
+	  move the node; implement insertBefore and removeNode; fix
+	  cloneNode to respect not copy childs if not deep; implement
+	  parentNode gettersetter.
+	* testsuite/actionscript.all/XML.as: add tests for insertBefore,
+	  appendNode, cloneNode, removeNode and parentNode.
 	* macros/ffmpeg.m4: fix --with-ffmpeg-incl to look for
 	  avcodec.h under the 'ffmpeg' subdir (this is assumed
 	  to exist in Gnash source code).

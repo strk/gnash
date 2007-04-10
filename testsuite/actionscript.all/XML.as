@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.26 2007/04/08 08:06:58 strk Exp $";
+rcsid="$Id: XML.as,v 1.27 2007/04/10 10:46:19 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -69,6 +69,7 @@ check(XMLNode.prototype.hasOwnProperty("removeNode") );
 check(XMLNode.prototype.hasOwnProperty("toString") );
 check(XMLNode.prototype.hasOwnProperty("cloneNode") );
 check(XMLNode.prototype.hasOwnProperty("attributes") );
+check(XMLNode.prototype.hasOwnProperty("parentNode") );
 check(! XMLNode.prototype.hasOwnProperty("length") );
 check(! XMLNode.prototype.hasOwnProperty("createElement") );
 check(! XMLNode.prototype.hasOwnProperty("addRequestHeader") );
@@ -91,7 +92,12 @@ check(! XMLNode.hasOwnProperty("toString") );
 check(! XMLNode.hasOwnProperty("cloneNode") );
 #endif
 
+check(XML.prototype instanceof XMLNode);
+
 var tmp = new XML();
+check(tmp instanceof XML);
+check(tmp instanceof XMLNode);
+
 check_equals(typeof(tmp.length), 'undefined');
 check(! tmp.hasOwnProperty("length"));
 
@@ -242,9 +248,20 @@ check(XML);
 tmp.checkParsed = function ()
 {
 	note("tmp.checkParsed called");
+
+	// Since we didn't *load* the XML, but we
+	// just *parsed* it, expect getBytesLoaded 
+	// and getBytesTotal to return undefined
+	check_equals(this.getBytesLoaded(), undefined);
+	check_equals(this.getBytesTotal(), undefined);
+
 	check(this.hasChildNodes());
+	check_equals(typeof(this.nodeName), 'null');
+	check_equals(typeof(this.nodeValue), 'null');
 	check(this.childNodes instanceof Array);
 	check_equals(this.firstChild, this.lastChild);
+	check(this.firstChild instanceof XMLNode);
+	check_equals(typeof(this.length), 'undefined');
 	check_equals(typeof(this.childNodes.length), 'number');
 	check_equals(this.childNodes.length, 1);
 	check_equals(this.childNodes[0], this.firstChild);
@@ -383,38 +400,98 @@ check_equals(typeof(ret), 'undefined');
 tmp.checkParsed(); // onLoad won't be called
 //note("Parsed XML: "+tmp.toString());
 check_equals(tmp.toString(), xml_in);
-check(XML.prototype instanceof XMLNode);
-check(tmp instanceof XML);
-check(tmp instanceof XMLNode);
-check(tmp.firstChild instanceof XMLNode);
-check_equals(typeof(tmp.nodeName), 'null');
-check_equals(typeof(tmp.nodeValue), 'null');
-check_equals(typeof(tmp.length), 'undefined');
-check_equals(tmp.firstChild.nodeName, "TOPNODE");
-check_equals(typeof(tmp.firstChild.length), 'undefined');
 
-if (tmp.hasChildNodes() == true) {
-    pass("XML::hasChildNodes() works");
-} else {
-    fail("XML::hasChildNodes() doesn't work");
-}
-// note(tmp.getBytesLoaded());
-// note(tmp.getBytesTotal());
+//------------------------------------------------
+// Test XML editing
+//------------------------------------------------
+xml1 = new XML("<X1T><X1C1></X1C1><X1C2></X1C2></X1T>");
+xml2 = new XML("<X2T><X2C1></X2C1><X2C2></X2C2></X2T>");
+check_equals(xml1.childNodes.length, 1);
+check_equals(xml1.firstChild.childNodes.length, 2);
+check_equals(xml2.childNodes.length, 1);
+check_equals(xml2.firstChild.childNodes.length, 2);
 
-// Since we didn't *load* the XML, but we
-// just *parsed* it, expect getBytesLoaded 
-// and getBytesTotal to return undefined
-check_equals(tmp.getBytesLoaded(), undefined);
-check_equals(tmp.getBytesTotal(), undefined);
+// Now move X1C1 to X2T
+movingchild = xml2.firstChild.lastChild;
 
-if (tmp.getBytesLoaded() == tmp.getBytesTotal()) {
-    pass("bytes count are the same");
-} else {
-    fail("bytes counts are not the same");
-}
+check_equals(movingchild.parentNode, xml2.firstChild);
+check(movingchild.parentNode != xml1.firstChild);
+xml1.firstChild.appendChild(movingchild);
+check_equals(movingchild.parentNode, xml1.firstChild);
+check(movingchild.parentNode != xml2.firstChild);
+
+check_equals(xml1.firstChild.childNodes.length, 3);
+check_equals(xml1.firstChild.childNodes[0].nodeName, "X1C1");
+check_equals(xml1.firstChild.childNodes[1].nodeName, "X1C2");
+check_equals(xml1.firstChild.childNodes[2].nodeName, "X2C2");
+
+check_equals(xml2.firstChild.childNodes.length, 1); // firstChild has been moved
+check_equals(xml2.firstChild.childNodes[0].nodeName, "X2C1");
+
+// Now insert X2C1 from xml2 before X1C2 in xml1
+xml1.firstChild.insertBefore(
+	xml2.firstChild.lastChild, // what to insert
+	xml1.firstChild.childNodes[1] // before what to insert it
+);
+check_equals(xml1.firstChild.childNodes.length, 4);
+check_equals(xml1.firstChild.childNodes[0].nodeName, "X1C1");
+check_equals(xml1.firstChild.childNodes[1].nodeName, "X2C1");
+check_equals(xml1.firstChild.childNodes[2].nodeName, "X1C2");
+check_equals(xml1.firstChild.childNodes[3].nodeName, "X2C2");
+
+// XMLNode.removeNode
+check_equals(xml2.firstChild.childNodes.length, 0); // lastChild has been moved
+xml2.firstChild.removeNode();
+check_equals(xml2.childNodes.length, 0); // it's only child has been dropped
+
+x1c1_node = xml1.firstChild.childNodes[0];
+x2c1_node = xml1.firstChild.childNodes[1];
+check_equals(x1c1_node.nodeName, "X1C1");
+check_equals(x1c1_node.nextSibling, x2c1_node);
+check_equals(x2c1_node.nodeName, "X2C1");
+check_equals(x2c1_node.previousSibling, x1c1_node);
+xml1.firstChild.removeNode(); // removeNode removes all childrens !!
+check_equals(xml1.childNodes.length, 0);
+// so these become orphaned (no parent)
+check_equals(x1c1_node.nodeName, "X1C1");
+check_equals(x1c1_node.nextSibling(), null);
+check_equals(x2c1_node.nodeName, "X2C1");
+check_equals(x2c1_node.previousSibling(), null);
+
+xml1.appendChild(x1c1_node);
+xml1.appendChild(x2c1_node);
+check_equals(x1c1_node.nextSibling, x2c1_node);
+check_equals(x2c1_node.previousSibling, x1c1_node);
+
+check_equals(xml1.childNodes.length, 2);
+x1c1_node.appendChild(x2c1_node);
+check_equals(xml1.childNodes.length, 1);
+check_equals(xml1.firstChild.lastChild.nodeName, 'X2C1');
+
+src_node = xml1.firstChild;
+cln_node = src_node.cloneNode(); // ! deep
+deepcln_node = src_node.cloneNode(true); // deep
+
+check_equals(src_node.childNodes.length, 1);
+check_equals(cln_node.childNodes.length, 0); // non-deep clone doesn't clone childs !
+check_equals(deepcln_node.childNodes.length, 1);
+
+check_equals(src_node.firstChild.nodeName, 'X2C1');
+check_equals(deepcln_node.firstChild.nodeName, 'X2C1');
+src_node.firstChild.nodeName = 'X2C1_modified';
+check_equals(src_node.firstChild.nodeName, 'X2C1_modified');
+check_equals(deepcln_node.firstChild.nodeName, 'X2C1');
+
+check_equals(deepcln_node.parentNode, null);
+deepcln_node.parentNode = src_node;
+check_equals(deepcln_node.parentNode, null);
 
 
-check(XML);
+
+//------------------------------------------------
+// Other tests..
+//------------------------------------------------
+
 myXML = new XML();
 check(myXML != undefined);
 check(myXML.createElement);

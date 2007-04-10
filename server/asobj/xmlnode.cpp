@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.27 2007/04/07 15:27:16 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.28 2007/04/10 10:46:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,6 +63,7 @@ static as_value xmlnode_lastchild(const fn_call& fn);
 static as_value xmlnode_nextsibling(const fn_call& fn);
 static as_value xmlnode_previoussibling(const fn_call& fn);
 static as_value xmlnode_childNodes(const fn_call& fn);
+static as_value xmlnode_parentNode(const fn_call& fn);
 as_object* getXMLNodeInterface();
 
 static LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
@@ -97,16 +98,13 @@ XMLNode::XMLNode(as_object* overridden_interface)
 XMLNode::XMLNode(const XMLNode& tpl, bool deep)
     :
     as_object(getXMLNodeInterface()),
-    _parent(tpl._parent),
+    _parent(0), // _parent is never implicitly copied
     _name(tpl._name),
     _value(tpl._value),
     _type(tpl._type)
 {
-    if ( ! deep )
-    {
-            _children = tpl._children;
-    }
-    else // deep copy
+    // only clone childs if in deep mode
+    if ( deep ) 
     {
         const ChildList& from=tpl._children;
         for (ChildList::const_iterator it=from.begin(), itEnd=from.end();
@@ -160,13 +158,16 @@ XMLNode::lastChild()
 void
 XMLNode::appendChild(boost::intrusive_ptr<XMLNode> node)
 {
-    if (node)
-	{
-		node->setParent(this);
-		_children.push_back(node);
+    assert (node);
+
+    boost::intrusive_ptr<XMLNode> oldparent = node->getParent();
+    node->setParent(this);
+    _children.push_back(node);
+    if ( oldparent ) {
+        oldparent->_children.remove(node);
     }
 
-//    log_msg("%s: partially unimplemented\n", __PRETTY_FUNCTION__);
+//  log_msg("%s: partially unimplemented\n", __PRETTY_FUNCTION__);
 }
 
 boost::intrusive_ptr<XMLNode> 
@@ -180,24 +181,45 @@ XMLNode::cloneNode(bool deep)
     return newnode;
 }
 
-/// \brief insert a node before a node
-///
-/// Method; inserts a new child node into the XML object's child
-/// list, before the beforeNode node. If the beforeNode parameter is
-/// undefined or null, the node is added using the appendChild()
-/// method. If beforeNode is not a child of my_xml, the insertion
-/// fails.
 void
-XMLNode::insertBefore(XMLNode * /* newnode */, XMLNode * /* node */)
+XMLNode::insertBefore(boost::intrusive_ptr<XMLNode> newnode, boost::intrusive_ptr<XMLNode> pos)
 {
+    // find iterator for positional parameter
     log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+
+    ChildList::iterator it = find(_children.begin(), _children.end(), pos);
+    if ( it == _children.end() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror("XMLNode.insertBefore(): positional parameter is not a child of this node");
+        );
+        return;
+    }
+
+    _children.insert(it, newnode);
+    boost::intrusive_ptr<XMLNode> oldparent = newnode->getParent();
+    newnode->setParent(this);
+    if ( oldparent )
+    {
+        oldparent->_children.remove(newnode);
+    }
 }
+
 /// \brief removes the specified XML object from its parent. Also
 /// deletes all descendants of the node.
 void
 XMLNode::removeNode()
 {
-    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+    assert(get_ref_count() > 1);
+    boost::intrusive_ptr<XMLNode> oldparent = getParent();
+    if ( oldparent )
+    {
+        oldparent->_children.remove(this);
+    }
+    _children.clear();
+    _attributes.clear();
+    _parent = NULL;
+    assert(get_ref_count() > 0);
 }
 
 XMLNode *
@@ -377,7 +399,8 @@ attachXMLNodeInterface(as_object& o)
     gettersetter = new builtin_function(&xmlnode_previoussibling, NULL);
     o.init_property("previousSibling", *gettersetter, *gettersetter);
 
-    o.init_member("parentNode",  as_value().set_null());
+    gettersetter = new builtin_function(&xmlnode_parentNode, NULL);
+    o.init_property("parentNode",  *gettersetter, *gettersetter);
 
 }
 
@@ -459,6 +482,40 @@ xmlnode_insertbefore(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
+
+	if ( fn.nargs < 2 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+		log_aserror("XMLNode.insertBefore(%s) needs at least two argument", ss.str().c_str());
+		);
+		return as_value();
+	}
+
+	boost::intrusive_ptr<XMLNode> newnode = boost::dynamic_pointer_cast<XMLNode>(fn.arg(0).to_object());
+	if ( ! newnode )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+		log_aserror("First argument to XMLNode.insertBefore(%s) is not an XMLNode",
+                ss.str().c_str());
+		);
+		return as_value();
+	}
+
+	boost::intrusive_ptr<XMLNode> pos = boost::dynamic_pointer_cast<XMLNode>(fn.arg(1).to_object());
+	if ( ! pos )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+        std::stringstream ss; fn.dump_args(ss);
+		log_aserror("Second argument to XMLNode.insertBefore(%s) is not an XMLNode",
+                ss.str().c_str());
+		);
+		return as_value();
+	}
+
+    ptr->insertBefore(newnode, pos);
+    return as_value();
     
 //    return as_value(ptr->obj.getAllocated());
 //    ptr->obj.insertBefore();
@@ -472,7 +529,6 @@ xmlnode_removenode(const fn_call& fn)
     GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     
-//    return as_value(ptr->obj.getAllocated());
     ptr->removeNode();
     return as_value();
 }
@@ -687,6 +743,30 @@ xmlnode_previoussibling(const fn_call& fn)
 
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     XMLNode *node = ptr->previousSibling();
+    if (node) {
+	rv = node;
+    }
+    return rv;
+}
+
+// Both a getter and a (do-nothing) setter for parentNode
+static as_value
+xmlnode_parentNode(const fn_call& fn)
+{
+    //GNASH_REPORT_FUNCTION;
+    as_value rv;
+    rv.set_null();
+
+    if ( fn.nargs != 0 )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror("Tried to set read-only property XMLNode.parentNode");
+        );
+        return rv;
+    }
+
+    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
+    XMLNode *node = ptr->getParent();
     if (node) {
 	rv = node;
     }

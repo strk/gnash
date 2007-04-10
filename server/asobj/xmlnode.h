@@ -28,9 +28,6 @@
 #include "tu_config.h"
 
 //#define DEBUG_MEMORY_ALLOCATION 1
-#include <vector>
-#include <string>
-#include <sstream>
 
 #include "action.h"
 #include "impl.h"
@@ -44,6 +41,11 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/xmlreader.h>
+
+#include <list>
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace gnash {  
  
@@ -135,20 +137,14 @@ public:
     boost::intrusive_ptr<XMLNode> firstChild();
     boost::intrusive_ptr<XMLNode> lastChild();
     
-    typedef std::vector< boost::intrusive_ptr<XMLNode> > ChildList;
+    // Use a list for quick erasing
+    typedef std::list< boost::intrusive_ptr<XMLNode> > ChildList;
 
     typedef std::vector< XMLAttr > AttribList;
 
     ChildList& childNodes() { return _children; }
 
     AttribList& attributes() { return _attributes; }
-    
-    boost::intrusive_ptr<XMLNode> operator [] (int x)
-    {
-        log_msg("%s: get element %d", __PRETTY_FUNCTION__, x);
-        
-        return _children[x];
-    }
     
     XMLNode& operator = (XMLNode &node) {
         gnash::log_msg("%s: \n", __PRETTY_FUNCTION__);
@@ -208,18 +204,35 @@ public:
     /// undefined or null, the node is added using the appendChild()
     /// method. If beforeNode is not a child of my_xml, the insertion
     /// fails.
-    void insertBefore(XMLNode *newnode, XMLNode *node);
+    ///
+    /// @param newnoe
+    ///     The node to insert, moving from its current tree
+    ///
+    /// @param beforeWhich
+    ///     The node before which to insert the new one.
+    ///     Must be a child of this XMLNode or the operation will fail.
+    ///
+    void insertBefore(boost::intrusive_ptr<XMLNode> newnode, boost::intrusive_ptr<XMLNode> pos);
 
     /// Removes the specified XML object from its parent.
     //
     /// Also deletes all descendants of the node.
+    /// Make sure to keep an intrusive_ptr against
+    /// this instance during operation or the ref-counting
+    /// management might destroy it.
+    ///
     void removeNode();
 
     void toString(std::ostream& str) const;
 
     void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
 
+    // We might turn this back to a dumb pointer, as long
+    // as we'll make sure in the XMLNode destructor and
+    // any child cleaning interface to set child parent
+    // to NULL
     boost::intrusive_ptr<XMLNode> _parent;
+
     ChildList		_children;
     AttribList      _attributes;
 
