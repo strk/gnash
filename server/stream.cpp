@@ -259,6 +259,10 @@ namespace gnash {
 	SWF::tag_type stream::open_tag()
 	{
 		align();
+
+		// for debugging
+		unsigned long offset=get_position();
+
 		int	tag_header = read_u16();
 		int	tag_type = tag_header >> 6;
 		int	tag_length = tag_header & 0x3F;
@@ -270,7 +274,7 @@ namespace gnash {
 
 		IF_VERBOSE_PARSE (
 			log_parse("SWF[%lu]: tag type = %d, tag length = %d",
-			get_position(), tag_type, tag_length);
+			offset, tag_type, tag_length);
 		);
 			
 		// Remember where the end of the tag is, so we can

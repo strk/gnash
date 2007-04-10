@@ -1,5 +1,8 @@
 2007-04-10 Sandro Santilli <strk@keybit.net>
 
+	* server/stream.cpp (open_tag): print tag offsets as start
+	  of the tag (including header). This is to match offsets
+	  as printed by Ming's listswf for comparision purposes.
 	* server/asobj/xmlnode.{h,cpp}: fix appendChild to properly
 	  move the node; implement insertBefore and removeNode; fix
 	  cloneNode to respect not copy childs if not deep; implement
