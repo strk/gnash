@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: tag_loaders.cpp,v 1.86 2007/04/10 15:48:39 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.87 2007/04/10 21:09:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1002,62 +1002,25 @@ public:
 
 		m_depth = in->read_u16()+character::staticDepthOffset;
 
-		IF_VERBOSE_PARSE
-		(
-                    log_parse("  depth = %d (%d)", m_depth, m_depth-character::staticDepthOffset);
-		);
-
-		if (has_char)
-		{
-			m_character_id = in->read_u16();
-			IF_VERBOSE_PARSE (
-				log_parse("  char id = %d", m_character_id);
-			);
-		}
+		if (has_char) m_character_id = in->read_u16();
 
 		if (has_matrix)
 		{
 			m_has_matrix = true;
 			m_matrix.read(in);
-			IF_VERBOSE_PARSE (
-				log_parse("  mat:");
-				m_matrix.print();
-			);
 		}
 
 		if (has_cxform)
 		{
 			m_has_cxform = true;
 			m_color_transform.read_rgba(in);
-			IF_VERBOSE_PARSE (
-				log_parse("  cxform:");
-				m_color_transform.print();
-			);
 		}
 				
-		if (has_ratio)
-		{
-			m_ratio = (float)in->read_u16() / (float)65535;
-			IF_VERBOSE_PARSE (
-				log_parse("  ratio: %f", m_ratio);
-			);
-		}
-				
-		if (has_name)
-		{
-			m_name = in->read_string();
-			IF_VERBOSE_PARSE (
-				log_parse("  name = %s", m_name ? m_name : "<null>");
-			);
-		}
+		if (has_ratio) m_ratio = (float)in->read_u16() / (float)65535;
 
-		if (has_clip_bracket)
-		{
-			m_clip_depth = in->read_u16()+character::staticDepthOffset; 
-			IF_VERBOSE_PARSE (
-				log_parse("  clip_depth = %d (%d)", m_clip_depth, m_clip_depth-character::staticDepthOffset);
-			);
-		}
+		if (has_name) m_name = in->read_string();
+
+		if (has_clip_bracket) m_clip_depth = in->read_u16()+character::staticDepthOffset; 
 
 		if (has_actions)
 		{
@@ -1080,6 +1043,27 @@ public:
 			// Put m_character at m_depth.
 			m_place_type = PLACE;
 		}
+
+		IF_VERBOSE_PARSE (
+			log_parse("  PLACEOBJECT2: depth = %d (%d)", m_depth, m_depth-character::staticDepthOffset);
+			if ( has_char ) log_parse("  char id = %d", m_character_id);
+			if ( has_matrix ) 
+			{
+				log_parse("  mat:");
+				m_matrix.print();
+			}
+			if ( has_cxform )
+			{
+				log_parse("  cxform:");
+				m_color_transform.print();
+			}
+			if ( has_ratio ) log_parse("  ratio: %f", m_ratio);
+			if ( has_name ) log_parse("  name = %s", m_name ? m_name : "<null>");
+			if ( has_clip_bracket ) log_parse("  clip_depth = %d (%d)", m_clip_depth, m_clip_depth-character::staticDepthOffset);
+			log_parse(" m_place_type: %d", m_place_type);
+		);
+				
+
                                 
 		//log_msg("place object at depth %i", m_depth);
 	}

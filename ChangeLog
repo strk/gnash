@@ -1,3 +1,8 @@
+2007-04-10 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loaders.cpp (readPlaceObject2): reduce
+	  calls to IF_VERBOSE_PARSE.
+
 2007-04-10 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: Don't call delete on a
