@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.26 2007/03/28 23:42:20 rsavoye Exp $
+# $Id: Makefile.am,v 1.27 2007/04/10 14:41:12 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -41,7 +41,7 @@ AM_CPPFLAGS = \
 	$(GSTREAMER_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
-        $(BOOST_CFLAGS)
+        $(BOOST_CFLAGS) 
 
 libgnashparser_la_SOURCES = \
 	action_buffer.cpp \
@@ -83,6 +83,10 @@ libgnashparser_la_LDFLAGS = \
 
 if USE_SOUND_GST
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
+endif
+
+if USE_FFMPEG_ENGINE
+AM_CPPFLAGS += $(FFMPEG_CFLAGS)
 endif
 
 # Rebuild with GCC 4.x Mudflap support
