@@ -1,5 +1,15 @@
 2007-04-10 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.cpp (read_all_swf): at
+	  end of parsing, check consistency of number of frames 
+	  advertised in header and number of frames read from the
+	  stream. Update total frame count if needed and properly
+	  wake up any frame reached condition waiters.
+	* server/movie_instance.cpp (advance) check return from
+	  ensure_frame_loaded.
+
+2007-04-10 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/: movie_definition.h, movie_def_impl.{cpp,h},
 	  sprite_definition.{cpp,h}: stop using TU legacy hashes
 	  and strings: use std::string instead of C strings, use

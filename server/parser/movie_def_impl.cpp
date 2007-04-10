@@ -559,7 +559,7 @@ bool
 movie_def_impl::ensure_frame_loaded(size_t framenum)
 {
 #ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD 
-	assert ( framenum <= _frames_loaded );
+	return ( framenum <= _frames_loaded );
 #endif
 
 	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
@@ -574,7 +574,7 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 
         //log_msg("Condition reached (_frames_loaded=%u)", _frames_loaded);
 
-	return true;
+	return ( framenum <= _frames_loaded );
 }
 
 
@@ -932,6 +932,18 @@ parse_tag:
 			m_playlist[_frames_loaded].size(),
 			m_init_action_list[_frames_loaded].size());
 		);
+	}
+
+	if ( m_frame_count > _frames_loaded )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror(SIZET_FMT " frames advertised in header, but only " SIZET_FMT " SHOWFRAME tags "
+			"found in stream. Updating total frames count", m_frame_count, _frames_loaded);
+		);
+		boost::mutex::scoped_lock lock(_frames_loaded_mutex);
+		m_frame_count = _frames_loaded;
+		// Notify any thread waiting on frame reached condition
+		_frame_reached_condition.notify_all();
 	}
 
 }

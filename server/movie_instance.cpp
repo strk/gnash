@@ -65,8 +65,11 @@ movie_instance::advance(float delta_time)
 	// We do this inside advance_root to make sure
 	// it's only for a root sprite (not a sprite defined
 	// by DefineSprite!)
-	_def->ensure_frame_loaded(min(get_current_frame()+2,
-		get_frame_count()));
+	size_t nextframe = min(get_current_frame()+2, get_frame_count());
+	if ( !_def->ensure_frame_loaded(nextframe) )
+	{
+		log_error("Frame " SIZET_FMT " never loaded", nextframe);
+	}
 
 	if (m_on_event_load_called == false)
 	{
