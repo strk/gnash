@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.64 2007/04/05 14:59:11 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.65 2007/04/10 17:12:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -436,7 +436,7 @@ as_environment::find_target(const as_value& val) const
 	}
 	else if ( val.is_string() )
 	{
-		return find_target(std::string(val.to_string()));
+		return find_target(val.to_std_string());
 	}
 	else
 	{
