@@ -6,7 +6,7 @@
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
 
-/* $Id: shape_character_def.cpp,v 1.13 2007/02/19 11:08:22 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.14 2007/04/10 03:12:04 zoulunkai Exp $ */
 
 #include "shape_character_def.h"
 
@@ -57,7 +57,7 @@ read_fill_styles(std::vector<fill_style>& styles, stream* in,
 {
 
 	// Get the count.
-	uint8_t fill_style_count = in->read_u8();
+	uint16_t fill_style_count = in->read_u8();
 	if (tag_type > 2)
 	{
 		if (fill_style_count == 0xFF)
@@ -72,7 +72,7 @@ read_fill_styles(std::vector<fill_style>& styles, stream* in,
 
 	// Read the styles. 
 	styles.reserve(styles.size()+fill_style_count);
-	for (uint8_t i = 0; i < fill_style_count; ++i)
+	for (uint16_t i = 0; i < fill_style_count; ++i)
 	{
 		// TODO: add a fill_style constructor directly
 		//       reading from stream
