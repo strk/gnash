@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.62 2007/04/06 11:43:44 strk Exp $ */
+/* $Id: character.h,v 1.63 2007/04/11 08:55:05 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -85,6 +85,16 @@ private:
 
 
 protected:
+
+	const Events& get_event_handlers() const
+	{
+	    return _event_handlers;
+	}
+	
+	void set_event_handlers(const Events& copyfrom) 
+	{
+		_event_handlers = copyfrom;
+	}
 
 	/// Used to assign a name to unnamed instances
 	static std::string getNextUnnamedInstanceName();
@@ -536,12 +546,6 @@ public:
 	/// does all the work.
 	///
 	virtual void get_mouse_state(int& x, int& y, int& buttons);
-	
-	// TODO : make protected
-	const std::map<event_id, as_value>& get_event_handlers() const
-	{
-	    return _event_handlers;
-	}
 
 	/// These have been moved down from movie.h to remove that file
 	/// from the inheritance chain. It is probably still a misdesign

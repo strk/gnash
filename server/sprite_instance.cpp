@@ -1861,20 +1861,9 @@ sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
 	if ( initObject ) newsprite->copyProperties(*initObject);
 	//else newsprite->copyProperties(*this);
 
-
 	// Copy event handlers from sprite
 	// We should not copy 'm_action_buffer' since the 'm_method' already contains it
-	const std::map<event_id, as_value>& sprite_events = get_event_handlers();
-	typedef std::map<event_id, as_value>::const_iterator event_iterator;
-	for (event_iterator it = sprite_events.begin(),
-		itEnd = sprite_events.end();
-		it != itEnd; ++it )
-	{
-		swf_event* e = new swf_event; // FIXME: who will delete this ?
-		e->m_event = it->first;
-		e->m_method = it->second;
-		e->attach_to(newsprite.get());
-	}
+	newsprite->set_event_handlers(get_event_handlers());
 
 	parent->m_display_list.place_character(
 		newsprite.get(),

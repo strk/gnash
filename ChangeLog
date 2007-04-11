@@ -1,5 +1,12 @@
 2007-04-11 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h: add protected set_event_handlers(), turn
+	  get_event_handelrs into a protected member.
+	* server/sprite_instance.cpp (duplicateMovieClip): simplified copying
+	  of event handlers.
+
+2007-04-11 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/ming_utils.h: define newSWFAction
 	  to compileSWFActionCode when using older Ming versions.
 	  Now we can use them interxchangeably (the newer newSWFAction
