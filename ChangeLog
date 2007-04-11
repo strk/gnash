@@ -1,3 +1,9 @@
+2007-04-11 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/displaylist_depths_test.c:
+	  Add tests for duplicateMovieClip, _width and cloning
+	  static event handlers.
+
 2007-04-11 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/as_environment.cpp:

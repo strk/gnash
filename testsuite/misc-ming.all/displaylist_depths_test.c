@@ -49,13 +49,29 @@ add_dynamic_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width
 			" lineTo(%d, %d);"
 			" lineTo(%d, %d);"
 			" endFill();"
+			"}"
+			"%s.createEmptyMovieClip('child', 1);"
+			"with (%s.child) {"
+			" lineStyle(3, 0x000000, 100);"	
+			" moveTo(%d, %d);"
+			" lineTo(%d, %d);"
+			" lineTo(%d, %d);"
+			" lineTo(%d, %d);"
+			" lineTo(%d, %d);"
 			"}",
 			name, depth, name,
 			x, y,
 			x, y+height,
 			x+width, y+height,
 			x+width, y,
-			x, y);
+			x, y,
+			name, name,
+			x+5, y+5,
+			x+5, y+height-5,
+			x+width-5, y+height-5,
+			x+width-5, y+5,
+			x+5, y+5
+			);
 
 	SWFMovie_add(mo, (SWFBlock)ac);
 }
@@ -64,18 +80,30 @@ void
 add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height)
 {
 	SWFShape sh;
-	SWFMovieClip mc;
+	SWFMovieClip mc, mc2;
 	SWFDisplayItem it;
 
-	sh = make_fill_square (x, y, width, height, 255, 0, 0, 255, 0, 0);
+	sh = make_fill_square (-(width/2), -(height/2), width, height, 255, 0, 0, 255, 0, 0);
 	mc = newSWFMovieClip();
 	SWFMovieClip_add(mc, (SWFBlock)sh);
+
+	sh = make_square (-(width/2)+5, -(height/2)+5, width-10, height-10, 0, 0, 0);
+	mc2 = newSWFMovieClip(); // child
+	SWFMovieClip_add(mc2, (SWFBlock)sh);
+	SWFMovieClip_nextFrame(mc2);
+
+	it = SWFMovieClip_add(mc, (SWFBlock)mc2);
+	SWFDisplayItem_setName(it, "child");
 	SWFMovieClip_nextFrame(mc);
+
 	it = SWFMovie_add(mo, (SWFBlock)mc);
 	SWFDisplayItem_setDepth(it, depth); 
+	SWFDisplayItem_moveTo(it, x, y); 
+	//SWFDisplayItem_moveTo(it, -(width/2), -(height/2)); 
 	SWFDisplayItem_setName(it, name);
+	SWFDisplayItem_addAction(it, newSWFAction("this._rotation+=2;"), SWFACTION_ENTERFRAME);
 
-	SWFMovie_add(mo, (SWFBlock)mc);
+	//SWFMovie_add(mo, (SWFBlock)mc);
 }
 
 
@@ -84,6 +112,7 @@ main(int argc, char** argv)
 {
 	SWFMovie mo;
 	SWFMovieClip dejagnuclip;
+	int i;
 
 	const char *srcdir=".";
 	if ( argc>1 ) 
@@ -159,7 +188,96 @@ main(int argc, char** argv)
 	check_equals(mo, "typeof(staticmc0)", "'movieclip'");
 	check_equals(mo, "staticmc0.getDepth()", "-16384"); // converted at negative depth !
 
-	SWFMovie_nextFrame(mo); 
+	for (i=0; i<10; ++i) SWFMovie_nextFrame(mo); 
+
+	// Duplicate all sprites
+	add_actions(mo,
+		"duplicateMovieClip(staticmc, 'staticmc_dup', 2000); staticmc_dup._x += 300;"
+		"duplicateMovieClip(dynamicmc, 'dynamicmc_dup', -2001); dynamicmc_dup._x += 300;"
+		"duplicateMovieClip(dynamicmc_2000, 'dynamicmc_2000_dup', 2002); dynamicmc_2000_dup._x += 300;"
+		"duplicateMovieClip(dynamicmc_30000, 'dynamicmc_30000_dup', 2003); dynamicmc_30000_dup._x += 300;"
+		"duplicateMovieClip(dynamicmc0, 'dynamicmc0_dup', -2004); dynamicmc0_dup._x += 300;"
+		"duplicateMovieClip(dynamicmc1048575, 'dynamicmc1048575_dup', -2005); dynamicmc1048575_dup._x += 300;"
+		"duplicateMovieClip(dynamicmc1048576, 'dynamicmc1048576_dup', 2006); dynamicmc1048576_dup._x += 300;"
+		"duplicateMovieClip(dynamicmc2130690045, 'dynamicmc2130690045_dup', 2007); dynamicmc2130690045_dup._x += 300;"
+		// This is just to test that the next placement on depth 2008 will override it
+		"duplicateMovieClip(staticmc0, 'staticmc0_dup_fake', -2008);"
+		"duplicateMovieClip(staticmc0, 'staticmc0_dup', -2008); staticmc0_dup._x += 300;");
+
+	// Check that all depths have been duplicated 
+	check_equals(mo, "typeof(staticmc_dup)", "'movieclip'");
+	check_equals(mo, "staticmc_dup.getDepth()", "2000"); 
+	check_equals(mo, "typeof(dynamicmc_dup)", "'movieclip'");
+	check_equals(mo, "dynamicmc_dup.getDepth()", "-2001");
+	check_equals(mo, "typeof(dynamicmc_2000_dup)", "'movieclip'");
+	check_equals(mo, "dynamicmc_2000_dup.getDepth()", "2002");
+	check_equals(mo, "typeof(dynamicmc_30000_dup)", "'movieclip'");
+	check_equals(mo, "dynamicmc_30000_dup.getDepth()", "2003");
+	check_equals(mo, "typeof(dynamicmc0_dup)", "'movieclip'");
+	check_equals(mo, "dynamicmc0_dup.getDepth()", "-2004");
+	check_equals(mo, "typeof(dynamicmc1048575_dup)", "'movieclip'");
+	check_equals(mo, "dynamicmc1048575_dup.getDepth()", "-2005");
+	check_equals(mo, "typeof(dynamicmc1048576_dup)", "'movieclip'");
+	check_equals(mo, "dynamicmc1048576_dup.getDepth()", "2006");
+	check_equals(mo, "typeof(dynamicmc2130690045_dup)", "'movieclip'");
+	check_equals(mo, "dynamicmc2130690045_dup.getDepth()", "2007");
+	check_equals(mo, "typeof(staticmc0_dup_fake)", "'undefined'");
+	check_equals(mo, "typeof(staticmc0_dup)", "'movieclip'");
+	check_equals(mo, "staticmc0_dup.getDepth()", "-2008"); 
+
+	// Check that duplicated stuff got also drawing api duplication
+	// And (but only for the static case) child duplication
+
+	check_equals(mo, "staticmc_dup._width", "staticmc._width"); 
+	xcheck_equals(mo, "parseInt(staticmc_dup._width/10)", "7"); 
+	check_equals(mo, "typeof(staticmc.child)", "'movieclip'"); 
+	check_equals(mo, "typeof(staticmc_dup.child)", "'movieclip'"); 
+
+	// Note that dynamicmc_dup is at negative depth
+	check_equals(mo, "dynamicmc_dup._width", "dynamicmc._width"); 
+	xcheck_equals(mo, "parseInt(dynamicmc_dup._width/10)", "6"); 
+	check_equals(mo, "typeof(dynamicmc.child)", "'movieclip'"); 
+	check_equals(mo, "typeof(dynamicmc_dup.child)", "'undefined'"); 
+
+	check_equals(mo, "dynamicmc_2000_dup._width", "dynamicmc_2000._width"); 
+	xcheck_equals(mo, "parseInt(dynamicmc_2000_dup._width/10)", "6"); 
+	check_equals(mo, "typeof(dynamicmc_2000.child)", "'movieclip'"); 
+	check_equals(mo, "typeof(dynamicmc_2000_dup.child)", "'undefined'"); 
+
+	check_equals(mo, "dynamicmc_30000_dup._width", "dynamicmc_30000._width"); 
+	xcheck_equals(mo, "parseInt(dynamicmc_30000_dup._width/10)", "6"); 
+	check_equals(mo, "typeof(dynamicmc_30000.child)", "'movieclip'"); 
+	check_equals(mo, "typeof(dynamicmc_30000_dup.child)", "'undefined'"); 
+
+	// Note that dynamicmc0_dup is at negative depth
+	check_equals(mo, "dynamicmc0_dup._width", "dynamicmc0._width"); 
+	xcheck_equals(mo, "parseInt(dynamicmc0_dup._width/10)", "6"); 
+	check_equals(mo, "typeof(dynamicmc0.child)", "'movieclip'"); 
+	check_equals(mo, "typeof(dynamicmc0_dup.child)", "'undefined'"); 
+
+	// Note that dynamicmc1048575_dup is at negative depth
+	check_equals(mo, "dynamicmc1048575_dup._width", "dynamicmc1048575._width"); 
+	xcheck_equals(mo, "parseInt(dynamicmc1048575_dup._width/10)", "6"); 
+	check_equals(mo, "typeof(dynamicmc1048575.child)", "'movieclip'"); 
+	check_equals(mo, "typeof(dynamicmc1048575_dup.child)", "'undefined'"); 
+
+	check_equals(mo, "dynamicmc1048576_dup._width", "dynamicmc1048576._width"); 
+	xcheck_equals(mo, "parseInt(dynamicmc1048576._width/10)", "6"); 
+	check_equals(mo, "typeof(dynamicmc1048576.child)", "'movieclip'"); 
+	check_equals(mo, "typeof(dynamicmc1048576_dup.child)", "'undefined'"); 
+
+	check_equals(mo, "dynamicmc2130690045_dup._width", "dynamicmc2130690045._width"); 
+	xcheck_equals(mo, "parseInt(dynamicmc2130690045._width/10)", "6"); 
+	check_equals(mo, "typeof(dynamicmc2130690045.child)", "'movieclip'"); 
+	check_equals(mo, "typeof(dynamicmc2130690045_dup.child)", "'undefined'"); 
+
+	// Note that staticmc0_dup is at negative depth
+	check_equals(mo, "staticmc0_dup._width", "staticmc0._width"); 
+	xcheck_equals(mo, "parseInt(staticmc0._width/10)", "7"); 
+	check_equals(mo, "typeof(staticmc0.child)", "'movieclip'"); 
+	check_equals(mo, "typeof(staticmc0_dup.child)", "'movieclip'"); 
+
+	for (i=0; i<10; ++i) SWFMovie_nextFrame(mo); 
 
 	// Try removing all characters
 	add_actions(mo, "removeMovieClip(staticmc);"
@@ -171,6 +289,15 @@ main(int argc, char** argv)
 			"removeMovieClip(dynamicmc1048576);"
 			"removeMovieClip(dynamicmc2130690045);"
 			"removeMovieClip(staticmc0);"
+			"removeMovieClip(staticmc_dup);"
+			"removeMovieClip(dynamicmc_dup);"
+			"removeMovieClip(dynamicmc_2000_dup);"
+			"removeMovieClip(dynamicmc_30000_dup);"
+			"removeMovieClip(dynamicmc0_dup);"
+			"removeMovieClip(dynamicmc1048575_dup);"
+			"removeMovieClip(dynamicmc1048576_dup);"
+			"removeMovieClip(dynamicmc2130690045_dup);"
+			"removeMovieClip(staticmc0_dup);"
 			);
 
 	// Check what gets removed and what not
@@ -183,6 +310,17 @@ main(int argc, char** argv)
 	check_equals(mo, "typeof(dynamicmc1048576)", "'movieclip'"); // clip in "reserved" zone not removed
 	check_equals(mo, "typeof(dynamicmc2130690045)", "'movieclip'"); // clip in "reserved" zone not removed
 	check_equals(mo, "typeof(staticmc0)", "'movieclip'");
+
+	// These are duplicated clips
+	check_equals(mo, "typeof(staticmc_dup)", "'undefined'");
+	check_equals(mo, "typeof(dynamicmc_dup)", "'movieclip'");
+	check_equals(mo, "typeof(dynamicmc_2000_dup)", "'undefined'"); 
+	check_equals(mo, "typeof(dynamicmc_30000_dup)", "'undefined'"); 
+	check_equals(mo, "typeof(dynamicmc0_dup)", "'movieclip'");
+	check_equals(mo, "typeof(dynamicmc1048575_dup)", "'movieclip'");
+	check_equals(mo, "typeof(dynamicmc1048576_dup)", "'undefined'"); 
+	check_equals(mo, "typeof(dynamicmc2130690045_dup)", "'undefined'"); 
+	check_equals(mo, "typeof(staticmc0_dup)", "'movieclip'");
 
 	SWFMovie_nextFrame(mo);
 
