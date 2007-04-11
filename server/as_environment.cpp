@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.66 2007/04/10 17:41:42 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.67 2007/04/11 05:04:14 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -399,14 +399,6 @@ as_environment::parse_path(const std::string& var_path,
     // Var.
     var = &var_path[colon_index + 1];
     
-    // Path.
-    if (colon_index > 0) {
-	if (var_path[colon_index - 1] == '/') {
-	    // Trim off the extraneous trailing slash.
-	    colon_index--;
-	}
-    }
-
     // @@ could be better. 
     path = var_path;
     path.resize(colon_index);
