@@ -106,11 +106,11 @@ FltkGui::handle(int event)
         return true;
       case MOVE:
       {
-        if (!_xid && event_y() < _menu_height) {
+        if (!_xid && event_y() < static_cast<int>(_menu_height)) {
           return Window::handle(event);
         }
-        int x = event_x() / _xscale;
-        int y = (event_y() - _menu_height) / _yscale;
+        int x = static_cast<int>(event_x() / _xscale);
+        int y = static_cast<int>((event_y() - _menu_height) / _yscale);
         notify_mouse_moved(x, y);
         return Window::handle(event);;
       }
@@ -173,7 +173,7 @@ FltkGui::handleKey(unsigned key)
 
     for (int i = 0; table[i].fltkKey; i++) {
         if (key == table[i].fltkKey) {
-            gnash::notify_key_event(table[i].gnashKey, true);
+            notify_key_event(table[i].gnashKey, true);
             break;
         }
     }
@@ -188,7 +188,7 @@ FltkGui::run()
 }
 
 bool
-FltkGui::init(int argc, char **argv[])
+FltkGui::init(int /* argc */, char *** /*argv */)
 {
 
     return true;
@@ -250,7 +250,7 @@ FltkGui::createWindow(const char* title, int width, int height)
 }
 
 
-static void menu_fltk_open_file()
+static void fltk_menu_open_file(Widget*, void*)
 {
     const char *newfile = fltk::file_chooser("Open File", "*.swf", NULL);
     if (!newfile) {
@@ -260,7 +260,7 @@ static void menu_fltk_open_file()
     // menu_open_file()..
 }
 
-static void menu_fltk_save_file_as()
+static void fltk_menu_save_file_as(Widget*, void*)
 {
     const char* savefile = file_chooser("Save File as", NULL, NULL);
     if (!savefile) {
@@ -270,9 +270,9 @@ static void menu_fltk_save_file_as()
     // menu_save_file();
 }
 
-static void full(Widget*, void* ptr)
+static void fltk_menu_fullscreen(Widget*, void* ptr)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     static bool fullscreen = false;
     static Rectangle oldBounds;
@@ -289,17 +289,87 @@ static void full(Widget*, void* ptr)
 }
 
 
+static void
+fltk_menu_quit(Widget*, void* ptr)
+{
+    FltkGui* gui = static_cast<FltkGui*>(ptr);
+    gui->menu_quit();
+}
+
+static void
+fltk_menu_play(Widget*, void* ptr)
+{
+    FltkGui* gui = static_cast<FltkGui*>(ptr);
+    gui->menu_play();
+}
+
+static void
+fltk_menu_pause(Widget*, void* ptr)
+{
+    FltkGui* gui = static_cast<FltkGui*>(ptr);
+    gui->menu_pause();
+}
+
+static void
+fltk_menu_stop(Widget*, void* ptr)
+{
+    FltkGui* gui = static_cast<FltkGui*>(ptr);
+    gui->menu_stop();
+}
+
+static void
+fltk_menu_restart(Widget*, void* ptr)
+{
+    FltkGui* gui = static_cast<FltkGui*>(ptr);
+    gui->menu_restart();
+}
+
+static void
+fltk_menu_step_forward(Widget*, void* ptr)
+{
+    FltkGui* gui = static_cast<FltkGui*>(ptr);
+    gui->menu_step_forward();
+}
+
+
+static void
+fltk_menu_step_backward(Widget*, void* ptr)
+{
+    FltkGui* gui = static_cast<FltkGui*>(ptr);
+    gui->menu_step_backward();
+}
+
+static void
+fltk_menu_jump_forward(Widget*, void* ptr)
+{
+    FltkGui* gui = static_cast<FltkGui*>(ptr);
+    gui->menu_jump_forward();
+}
+
+static void
+fltk_menu_jump_backward(Widget*, void* ptr)
+{
+    FltkGui* gui = static_cast<FltkGui*>(ptr);
+    gui->menu_jump_backward();
+}
+
+static void
+fltk_menu_toggle_sound(Widget*, void* ptr)
+{
+    FltkGui* gui = static_cast<FltkGui*>(ptr);
+    gui->menu_toggle_sound();
+}
+
 void
 FltkGui::addMenuItems()
 {
-
-#define callback_cast(ptr) reinterpret_cast<Callback*>(ptr)
     ItemGroup* file = new ItemGroup("File");
+
+
     file->begin();
-    new Item("Open",                    0, callback_cast(menu_fltk_open_file));
-    new Item("Save as",                 0, callback_cast(menu_fltk_save_file_as));
-    //new Item("Save as..."               0, callback_cast(menu_fltk_save_as));
-    new Item("Quit",                    0, callback_cast(menu_quit));
+    new Item("Open",                    0, fltk_menu_open_file);
+    new Item("Save as",                 0, fltk_menu_save_file_as);
+    new Item("Quit",                    0, fltk_menu_quit, this);
     file->end();
 
     ItemGroup* edit = new ItemGroup("Edit");
@@ -310,28 +380,26 @@ FltkGui::addMenuItems()
     ItemGroup* view = new ItemGroup("View");
     view->begin();
     new Item("Double size");
-    new Item("Fullscreen",              0, callback_cast(full), this);
+    new Item("Fullscreen",              0, fltk_menu_fullscreen, this);
     view->end();
 
     ItemGroup* movie_ctrl = new ItemGroup("Movie control");
     movie_ctrl->begin();
-    new Item("Play Movie",              0, callback_cast(menu_play));
-    new Item("Pause Movie",             0, callback_cast(menu_pause));
-    new Item("Stop Movie",              0, callback_cast(menu_stop));
-    new Item("Restart Movie",           0, callback_cast(menu_restart));
-    new Item("Step Forward Frame",      0, callback_cast(menu_step_forward));
-    new Item("Step Backward Frame",     0, callback_cast(menu_step_backward));
-    new Item("Jump Forward 10 Frames",  0, callback_cast(menu_jump_forward));
-    new Item("Jump Backward 10 Frames", 0, callback_cast(menu_jump_backward));
-    new Item("Toggle Sound",            0, callback_cast(menu_toggle_sound));
+    new Item("Play Movie",              0, fltk_menu_play, this);
+    new Item("Pause Movie",             0, fltk_menu_pause, this);
+    new Item("Stop Movie",              0, fltk_menu_stop, this);
+    new Item("Restart Movie",           0, fltk_menu_restart, this);
+    new Item("Step Forward Frame",      0, fltk_menu_step_forward, this);
+    new Item("Step Backward Frame",     0, fltk_menu_step_backward, this);
+    new Item("Jump Forward 10 Frames",  0, fltk_menu_jump_forward, this);
+    new Item("Jump Backward 10 Frames", 0, fltk_menu_jump_backward, this);
+    new Item("Toggle Sound",            0, fltk_menu_toggle_sound, this);
     movie_ctrl->end();
 
     ItemGroup* help = new ItemGroup("Help");
     help->begin();
     new Item("About");
     help->end();
-
-#undef callback_cast
 }
 
 
@@ -405,7 +473,7 @@ FltkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
     _drawbounds_vec.clear();
 
-    for (int rno=0; rno<ranges.size(); rno++) {
+    for (size_t rno=0; rno<ranges.size(); rno++) {
 
       geometry::Range2d<int> bounds = Intersection(
       _renderer->world_to_pixel(ranges.getRange(rno)),
@@ -421,8 +489,6 @@ FltkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
     }
 }
-
-
 
 // end of namespace
 }

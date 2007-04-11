@@ -51,6 +51,8 @@
 	video definition for image buffer size (since we don't yet do proper
 	scaling, that is a bad idea); fixes bug #19511. Also, cut off the
 	video image if it extends beyond the width of our buffer.
+	* gui/fltk.cpp: Fix compilation by adding statics for GUI methods
+	that became nonstatic. Also fix some warnings.
 
 2007-04-11 Sandro Santilli <strk@keybit.net>
 
