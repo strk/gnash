@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.51 2007/04/11 14:20:21 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.52 2007/04/11 17:10:12 strk Exp $";
 
 #include "check.as"
 
@@ -519,3 +519,89 @@ else
 }
 
 #endif // OUTPUT_VERSION > 5
+
+
+//----------------------------------------------
+// Test _width, _height and getBounds
+//----------------------------------------------
+
+#if OUTPUT_VERSION >= 6
+
+createEmptyMovieClip("container", 5);
+container.createEmptyMovieClip("draw", 5);
+draw = container.draw;
+
+check_equals(draw._width, 0);
+check_equals(draw._height, 0);
+b = draw.getBounds();
+check_equals(typeof(b), 'object');
+check_equals(typeof(b.xMin), 'number');
+check_equals(typeof(b.xMax), 'number');
+check_equals(typeof(b.yMin), 'number');
+check_equals(typeof(b.yMax), 'number');
+xcheck_equals(b.xMin, 6710886.35);
+xcheck_equals(b.xMax, 6710886.35);
+xcheck_equals(b.yMin, 6710886.35);
+xcheck_equals(b.yMax, 6710886.35);
+
+with (draw)
+{
+	lineStyle(0, 0x000000);
+	moveTo(10, 10);
+	lineTo(10, 30);
+	lineTo(20, 30);
+	lineTo(20, 10);
+	lineTo(10, 10);
+}
+xcheck_equals(draw._width, 10);
+xcheck_equals(draw._height, 20);
+b = draw.getBounds();
+xcheck_equals(b.xMin, 10);
+xcheck_equals(b.xMax, 20);
+xcheck_equals(b.yMin, 10);
+xcheck_equals(b.yMax, 30);
+
+draw._rotation = 90;
+xcheck_equals(draw._width, 20);
+xcheck_equals(draw._height, 10);
+b = draw.getBounds();
+xcheck_equals(b.xMin, 10);
+xcheck_equals(b.xMax, 20);
+xcheck_equals(b.yMin, 10);
+xcheck_equals(b.yMax, 30);
+b = draw.getBounds(container);
+xcheck_equals(b.xMin, -30);
+xcheck_equals(b.xMax, -10);
+xcheck_equals(b.yMin, 10);
+xcheck_equals(b.yMax, 20);
+
+draw._visible = false;
+xcheck_equals(draw._width, 20);
+xcheck_equals(draw._height, 10);
+
+draw._xscale = 200;
+xcheck_equals(draw._width, 20);
+xcheck_equals(draw._height, 20);
+
+draw._rotation = 0;
+xcheck_equals(draw._width, 20);
+xcheck_equals(draw._height, 20);
+
+draw._visible = true;
+draw._xscale = 100;
+xcheck_equals(draw._width, 10);
+xcheck_equals(draw._height, 20);
+
+draw._yscale = 50;
+xcheck_equals(draw._width, 10);
+xcheck_equals(draw._height, 10);
+xcheck_equals(container._width, 10);
+xcheck_equals(container._height, 10);
+
+container._xscale = 800;
+xcheck_equals(draw._width, 10);
+xcheck_equals(draw._height, 10);
+xcheck_equals(container._width, 80);
+xcheck_equals(container._height, 10);
+
+#endif // OUTPUT_VERSION >= 6
