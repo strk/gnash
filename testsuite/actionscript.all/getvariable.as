@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.9 2007/04/11 05:42:25 zoulunkai Exp $";
+rcsid="$Id: getvariable.as,v 1.10 2007/04/11 07:31:53 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -316,7 +316,7 @@ check_equals(typeof(invalid), 'undefined');
 //-----------------------------------------------------------------------
 // Check 'path and var'
 //-----------------------------------------------------------------------
-func = function () 
+function func_obj() 
 { 
 	var xx = 1;
 	asm {	
@@ -328,6 +328,7 @@ func = function ()
 	check_equals(_root.xx, 2);
 };
 
+func = new func_obj();
 func();
 
 
