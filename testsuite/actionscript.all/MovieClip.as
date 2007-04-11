@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.48 2007/04/10 21:44:14 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.49 2007/04/11 08:08:26 strk Exp $";
 
 #include "check.as"
 
@@ -316,13 +316,19 @@ check_equals(softref.member, 2);
 _root.createEmptyMovieClip("original", 61);
 _root.original.createEmptyMovieClip("child1", 1);
 _root.original._x = 100;
+_root.original.onEnterFrame = function() { };
+_root.original.onRollOver = function() { };
 check_equals(typeof(_root.original), 'movieclip');
 check_equals(typeof(_root.original.child1), 'movieclip');
 check_equals(_root.original._x, 100);
+check_equals(typeof(_root.original.onEnterFrame), 'function');
+check_equals(typeof(_root.original.onRollOver), 'function');
 
 duplicateMovieClip(_root.original, "copy1", 63);
 check_equals(typeof(_root.copy1), 'movieclip');
 check_equals(typeof(_root.copy1.child1), 'undefined');
+check_equals(typeof(_root.copy1.onEnterFrame), 'undefined');
+xcheck_equals(typeof(_root.copy1.onRollOver), 'undefined');
 check_equals(_root.copy1.getDepth(), 63);
 check_equals(_root.copy1._x, 100);
 #endif // OUTPUT_VERSION >= 6
