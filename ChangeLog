@@ -1,3 +1,8 @@
+2007-04-11 Ann Barcomb <ann@lulu.com>
+
+	* testsuite/actionscript.all/gen-index-wiki.sh doc/C/sources.xml:
+	  Changed all references of 'gnash.lulu.com' to 'www.gnashdev.org'.
+
 2007-04-11 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libbase/FLVParser.cpp: Append 8 "zero" bytes to the end of the frame

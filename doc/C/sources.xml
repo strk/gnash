@@ -64,8 +64,8 @@
 	If you only have access to the internet via a web proxy,
 	you will find daily snapshots of the latest CVS tree in
 	<ulink type="http"
-	       url="http://gnash.lulu.com/dev_snapshots/">
-		    http://gnash.lulu.com/dev_snapshots
+	       url="http://www.gnashdev.org/dev_snapshots/">
+		    http://www.gnashdev.org/dev_snapshots
 	</ulink> 
       </para>
     </sect3>
