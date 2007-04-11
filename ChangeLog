@@ -43,6 +43,10 @@
 	This adds NULL-termination, which is also expected by FFMPEG.
 	* server/asobj/NetStreamFfmpeg.cpp: Initialize certain members to safe
 	defaults so they will not be read in their uninitialised states.
+	* backend/render_handler_agg.cpp: Stop relying on bounds passed from
+	video definition for image buffer size (since we don't yet do proper
+	scaling, that is a bad idea); fixes bug #19511. Also, cut off the
+	video image if it extends beyond the width of our buffer.
 
 2007-04-11 Sandro Santilli <strk@keybit.net>
 

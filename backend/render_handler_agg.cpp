@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.68 2007/03/07 11:03:42 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.69 2007/04/11 14:54:26 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -440,7 +440,7 @@ public:
 	  point a;
 	  mat->transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
 
-    int xpos = (int)round( TWIPS_TO_PIXELS(a.m_x) );
+	  int xpos = (int)round( TWIPS_TO_PIXELS(a.m_x) );
 	  int ypos = (int)round( TWIPS_TO_PIXELS(a.m_y) );
 
 	  // TODO: handle this by only blitting part of the source RGB image.
@@ -454,13 +454,17 @@ public:
 	  int bytes_per_pixel = 3;		
 	  image::rgb* frame = static_cast<image::rgb*>(baseframe);
 
-	  // Note that image::rgb* allocates a buffer with extra padding
-	  // for performance purposes. Therefore, we need to use the
-	  // actual image size so we don't copy padding bytes to the Agg
-	  // buffer.
-	  int frame_width = (int)TWIPS_TO_PIXELS(bounds->width()) * bytes_per_pixel;
+	  unsigned int frame_width = frame->m_width * bytes_per_pixel;
+
+	  if (frame_width + xpos * bytes_per_pixel  > m_rbuf.width() * bytes_per_pixel) {
+	    // the movie was placed too far to the right. let's cut it off at
+	    // the far right corner. (This is also how "that other player"
+	    // handles it, I'm told.)
+	    frame_width = (m_rbuf.width() * bytes_per_pixel - xpos * bytes_per_pixel);
+	  }
+
 	  unsigned char* rgbbuf_ptr = frame->m_data;
-	  unsigned char* rgbbuf_end = rgbbuf_ptr + frame_width *
+	  unsigned char* rgbbuf_end = rgbbuf_ptr + frame->m_pitch *
 				      frame->m_height;
 	
 	  unsigned char* aggbuf_ptr = memaddr;
@@ -471,7 +475,7 @@ public:
 	  // Move xpos pixels to the right.
 	  aggbuf_ptr += xpos * bytes_per_pixel;		
 
-	  while(rgbbuf_ptr <= rgbbuf_end && aggbuf_ptr <= aggbuf_end) {
+	  while(rgbbuf_ptr < rgbbuf_end && aggbuf_ptr < aggbuf_end) {
     	    memcpy(aggbuf_ptr, rgbbuf_ptr, frame_width);
 	    aggbuf_ptr += m_rbuf.stride();
 	    rgbbuf_ptr += frame->m_pitch; 
