@@ -1,5 +1,9 @@
 2007-04-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ming_utils.h: define newSWFAction
+	  to compileSWFActionCode when using older Ming versions.
+	  Now we can use them interxchangeably (the newer newSWFAction
+	  has to be preferred though).
 	* testsuite/actionscript.all/MovieClip.as: add tests
 	  showing that user-defined event handlers must be handled
 	  differently then placeobject-defined ones. At least

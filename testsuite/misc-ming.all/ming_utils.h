@@ -37,6 +37,8 @@
  */
 #if MING_VERSION_CODE >= 00040004
 # define compileSWFActionCode newSWFAction
+#else
+# define newSWFAction compileSWFActionCode
 #endif
 
 /* Missing define to allow using older Ming releases */
