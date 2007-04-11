@@ -3,7 +3,8 @@
 	* testsuite/actionscript.all/MovieClip.as: add tests
 	  showing that user-defined event handlers must be handled
 	  differently then placeobject-defined ones. At least
-	  for the sake of duplicating movieclips.
+	  for the sake of duplicating movieclips; add
+	  MovieClip.duplicateMovieClip test.
 	* testsuite/misc-ming.all/displaylist_depths_test.c:
 	  Add tests for duplicateMovieClip, _width and cloning
 	  static event handlers.

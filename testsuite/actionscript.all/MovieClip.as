@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.49 2007/04/11 08:08:26 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.50 2007/04/11 08:39:30 strk Exp $";
 
 #include "check.as"
 
@@ -331,6 +331,17 @@ check_equals(typeof(_root.copy1.onEnterFrame), 'undefined');
 xcheck_equals(typeof(_root.copy1.onRollOver), 'undefined');
 check_equals(_root.copy1.getDepth(), 63);
 check_equals(_root.copy1._x, 100);
+
+#if OUTPUT_VERSION == 6
+// SWF7 and higher removed duplicateMovieClip method of MovieClip class
+_root.original.duplicateMovieClip("copy2", 64);
+check_equals(typeof(_root.copy2), 'movieclip');
+check_equals(typeof(_root.copy2.child1), 'undefined');
+check_equals(typeof(_root.copy2.onEnterFrame), 'undefined');
+xcheck_equals(typeof(_root.copy2.onRollOver), 'undefined');
+check_equals(_root.copy2.getDepth(), 64);
+check_equals(_root.copy2._x, 100);
+#endif // OUTPUT_VERSION = 6
 #endif // OUTPUT_VERSION >= 6
 
 //----------------------------------------------
