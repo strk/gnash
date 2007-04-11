@@ -1,3 +1,11 @@
+2007-04-11 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/FLVParser.cpp: Append 8 "zero" bytes to the end of the frame
+	buffer to prevent decoders from going past the end of our frame buffer.
+	This adds NULL-termination, which is also expected by FFMPEG.
+	* server/asobj/NetStreamFfmpeg.cpp: Initialize certain members to safe
+	defaults so they will not be read in their uninitialised states.
+
 2007-04-11 Sandro Santilli <strk@keybit.net>
 
 	* server/character.h: add protected set_event_handlers(), turn

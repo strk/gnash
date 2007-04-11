@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.35 2007/04/10 20:24:23 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.36 2007/04/11 13:03:45 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -581,7 +581,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 static void
 rgbcopy(image::rgb* dst, raw_videodata_t* src, int width)
 {
-	assert(src->m_size <= dst->m_width * dst->m_height * 3);
+	assert(src->m_size <= static_cast<uint32_t>(dst->m_width * dst->m_height * 3));
 
 	uint8_t* dstptr = dst->m_data;
 
@@ -766,7 +766,8 @@ bool NetStreamFfmpeg::read_frame()
 		packet.destruct = avpacket_destruct;
 		packet.size = frame->dataSize;
 		packet.data = frame->data;
-		packet.pts = static_cast<int64_t>(frame->timestamp);
+		// FIXME: is this the right value for packet.dts?
+		packet.pts = packet.dts = static_cast<int64_t>(frame->timestamp);
 		rc = 0;
 	} else {
 		rc = av_read_frame(m_FormatCtx, &packet);
@@ -859,6 +860,7 @@ bool NetStreamFfmpeg::read_frame()
 
 				video->m_ptr = video->m_data;
 				video->m_stream_index = m_video_index;
+				video->m_pts = 0;
 
 				// set presentation timestamp
 				if (packet.dts != static_cast<signed long>(AV_NOPTS_VALUE))
