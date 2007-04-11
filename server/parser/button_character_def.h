@@ -14,7 +14,7 @@
 #include "sound_definition.h"
 #include "rect.h" // for get_bound
 #include "matrix.h" // for composition
-#include "gnash.h" // for class cxform :(
+#include "cxform.h" // for composition
 
 #ifndef UNUSED
 #define UNUSED(x) ((x) = (x))
@@ -23,6 +23,7 @@
 // Forward declarations
 namespace gnash {
 	class sprite_instance;
+	class action_buffer;
 }
 
 namespace gnash {

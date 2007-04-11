@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.29 2007/04/06 19:56:16 strk Exp $ */
+/* $Id: character.cpp,v 1.30 2007/04/11 14:20:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,6 +30,7 @@
 #include "VM.h" // for do_mouse_drag (to be moved in movie_root)
 #include "fn_call.h" // for shared ActionScript getter-setters
 #include "GnashException.h" // for shared ActionScript getter-setters (ensure_character)
+#include "ExecutableCode.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
 
@@ -234,160 +235,6 @@ character::set_child_invalidated()
 // Shared ActionScript getter-setters
 //
 //---------------------------------------------------------------------
-
-as_value
-character::onrollover_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		rv = ptr->get_event_handler(event_id::ROLL_OVER);
-	}
-	else // setter
-	{
-		ptr->set_event_handler(event_id::ROLL_OVER, fn.arg(0));
-	}
-	return rv;
-
-}
-
-as_value
-character::onrollout_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		rv = ptr->get_event_handler(event_id::ROLL_OUT);
-	}
-	else // setter
-	{
-		ptr->set_event_handler(event_id::ROLL_OUT, fn.arg(0));
-	}
-	return rv;
-}
-
-as_value
-character::onpress_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		rv = ptr->get_event_handler(event_id::PRESS);
-	}
-	else // setter
-	{
-		ptr->set_event_handler(event_id::PRESS, fn.arg(0));
-	}
-	return rv;
-}
-
-as_value
-character::onrelease_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		rv = ptr->get_event_handler(event_id::RELEASE);
-	}
-	else // setter
-	{
-		ptr->set_event_handler(event_id::RELEASE, fn.arg(0));
-	}
-	return rv;
-}
-
-as_value
-character::onreleaseoutside_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		rv = ptr->get_event_handler(event_id::RELEASE_OUTSIDE);
-	}
-	else // setter
-	{
-		ptr->set_event_handler(event_id::RELEASE_OUTSIDE, fn.arg(0));
-	}
-	return rv;
-}
-
-as_value
-character::onmouseup_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		rv = ptr->get_event_handler(event_id::MOUSE_UP);
-	}
-	else // setter
-	{
-		ptr->set_event_handler(event_id::MOUSE_UP, fn.arg(0));
-	}
-	return rv;
-}
-
-as_value
-character::onmousedown_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		rv = ptr->get_event_handler(event_id::MOUSE_DOWN);
-	}
-	else // setter
-	{
-		ptr->set_event_handler(event_id::MOUSE_DOWN, fn.arg(0));
-	}
-	return rv;
-}
-
-as_value
-character::onmousemove_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		rv = ptr->get_event_handler(event_id::MOUSE_MOVE);
-	}
-	else // setter
-	{
-		ptr->set_event_handler(event_id::MOUSE_MOVE, fn.arg(0));
-	}
-	return rv;
-}
-
-as_value
-character::onload_getset(const fn_call& fn)
-{
-	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
-
-	as_value rv;
-	if ( fn.nargs == 0 ) // getter
-	{
-		rv = ptr->get_event_handler(event_id::LOAD);
-	}
-	else // setter
-	{
-		ptr->set_event_handler(event_id::LOAD, fn.arg(0));
-	}
-	return rv;
-}
 
 as_value
 character::x_getset(const fn_call& fn)
@@ -718,34 +565,68 @@ character::parent_getset(const fn_call& fn)
 }
 
 void
-character::set_event_handler(const event_id& id, const as_value& method)
+character::set_event_handlers(const Events& copyfrom)
 {
-	_event_handlers[id] = method;
+	for (Events::const_iterator it=copyfrom.begin(), itE=copyfrom.end();
+			it != itE; ++it)
+	{
+		const event_id& ev = it->first;
+		const BufferList& bufs = it->second;
+		for (size_t i=0; i<bufs.size(); ++i)
+		{
+			const action_buffer* buf = bufs[i];
+			assert(buf);
+			add_event_handler(ev, *buf);
+		}	
+	}
+}
+
+void
+character::add_event_handler(const event_id& id, const action_buffer& code)
+{
+	_event_handlers[id].push_back(&code);
 
 	//log_msg("Setting handler for event %s", id.get_function_name().c_str());
 
 	// Set the character as a listener iff the
 	// kind of event is a KEY or MOUSE one 
-	if ( method.is_function() )
+	switch (id.m_id)
 	{
-		switch (id.m_id)
-		{
-			case event_id::KEY_PRESS:
-				has_keypress_event();
-				break;
-			case event_id::MOUSE_UP:
-			case event_id::MOUSE_DOWN:
-			case event_id::MOUSE_MOVE:
-	//log_msg("Registering character as having mouse events");
-				has_mouse_event();
-				break;
-			default:
-				break;
-		}
+		case event_id::KEY_PRESS:
+			has_keypress_event();
+			break;
+		case event_id::MOUSE_UP:
+		case event_id::MOUSE_DOWN:
+		case event_id::MOUSE_MOVE:
+			//log_msg("Registering character as having mouse events");
+			has_mouse_event();
+			break;
+		default:
+			break;
 	}
+
 	// todo: drop the character as a listener
 	//       if it gets no valid handlers for
 	//       mouse or keypress events.
+}
+
+std::auto_ptr<ExecutableCode>
+character::get_event_handler(const event_id& id) const
+{
+	std::auto_ptr<ExecutableCode> handler;
+
+	Events::const_iterator it = _event_handlers.find(id);
+	if ( it == _event_handlers.end() ) return handler;
+
+	assert(get_ref_count() > 0);
+	boost::intrusive_ptr<character> this_ptr = const_cast<character*>(this);
+
+	handler.reset( new EventCode(this_ptr, it->second) );
+	return handler;
+}
+
+character::~character()
+{
 }
 
 void
@@ -760,18 +641,14 @@ character::unload()
 void
 character::queueEventHandler(const event_id& id)
 {
-	//testInvariant();
-
 	bool called=false;
 
 	movie_root& root = VM::get().getRoot();
 
-	// First, check for built-in event handler.
-	boost::intrusive_ptr<as_function> method = get_event_handler(id).to_as_function();
-	   
-	if (method)
+	std::auto_ptr<ExecutableCode> code ( get_event_handler(id) );
+	if ( code.get() )
 	{
-		root.pushAction(method, boost::intrusive_ptr<character>(this));
+		root.pushAction(code);
 		called=true;
 	}
 
@@ -780,34 +657,39 @@ character::queueEventHandler(const event_id& id)
 	// ActionScript and SWF defined events
 	// (for example: onClipLoad vs. onLoad)
 	//
-	if (called) return;
+	//if (called) return;
 
 	// Check for member function.
-	// In ActionScript 2.0, event method names are CASE SENSITIVE.
-	// In ActionScript 1.0, event method names are CASE INSENSITIVE.
-	// TODO: move to get_function_name directly ?
-	std::string method_name = id.get_function_name();
+	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(id.get_function_name());
+	if ( method )
+	{
+		root.pushAction(method, boost::intrusive_ptr<character>(this));
+	}
+
+}
+
+boost::intrusive_ptr<as_function>
+character::getUserDefinedEventHandler(const std::string& name) const
+{
+	std::string method_name = name;
 	if ( _vm.getSWFVersion() < 7 )
 	{
 		boost::to_lower(method_name, _vm.getLocale());
 	}
 
-	if (method_name.length() > 0)
+	as_value tmp;
+
+	boost::intrusive_ptr<as_function> func;
+
+	// const cast is needed due to getter/setter members possibly
+	// modifying this object even when only get !
+	if ( const_cast<character*>(this)->get_member(method_name, &tmp) )
 	{
-		as_value method_val;
-		if ( get_member(method_name, &method_val) )
-		{
-			method = method_val.to_as_function();
-			if ( method )
-			{
-				root.pushAction(method, boost::intrusive_ptr<character>(this));
-			}
-		}
+		func = tmp.to_as_function();
 	}
-
-	//testInvariant();
-
+	return func;
 }
+
 
 } // namespace gnash
 

@@ -825,6 +825,12 @@ movie_root::processActionQueue()
 }
 
 void
+movie_root::pushAction(std::auto_ptr<ExecutableCode> code)
+{
+	_actionQueue.push_back(code->clone());
+}
+
+void
 movie_root::pushAction(const action_buffer& buf, boost::intrusive_ptr<character> target)
 {
 #ifdef GNASH_DEBUG

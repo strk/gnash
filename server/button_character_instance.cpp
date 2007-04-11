@@ -22,6 +22,7 @@
 #include "builtin_function.h"
 #include "fn_call.h" // for shared ActionScript getter-setters
 #include "GnashException.h" // for shared ActionScript getter-setters
+#include "ExecutableCode.h"
 
 /** \page buttons Buttons and mouse behaviour
 
@@ -204,6 +205,7 @@ attachButtonInterface(as_object& o)
 	gettersetter = new builtin_function(&character::parent_getset, NULL);
 	o.init_property("_parent", *gettersetter, *gettersetter);
 
+#if 0
 	gettersetter = new builtin_function(&character::onrollover_getset, NULL);
 	o.init_property("onRollOver", *gettersetter, *gettersetter);
 
@@ -221,6 +223,7 @@ attachButtonInterface(as_object& o)
 
 	gettersetter = new builtin_function(&character::onload_getset, NULL);
 	o.init_property("onLoad", *gettersetter, *gettersetter);
+#endif
 
 	//--
 
@@ -303,7 +306,6 @@ button_character_instance::enabled_getset(const fn_call& fn)
 bool
 button_character_instance::on_event(const event_id& id)
 {
-
 #if 0
 	if (id.m_id != event_id::KEY_PRESS)
 	{
@@ -613,10 +615,10 @@ button_character_instance::on_button_event(const event_id& event)
 	}
 
 	// check for built-in event handler.
-	as_value method = get_event_handler(event);
-	if ( ! method.is_undefined() )
+	std::auto_ptr<ExecutableCode> code ( get_event_handler(event) );
+	if ( code.get() )
 	{
-		call_method0(method, &(get_environment()), this);
+		code->execute();
 	}
 	else
 	{
@@ -625,7 +627,11 @@ button_character_instance::on_button_event(const event_id& event)
 
 
 	// Call conventional attached method.
-	// @@ TODO
+	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(event.get_function_name());
+	if ( method )
+	{
+		call_method0(as_value(method.get()), &(get_environment()), this);
+	}
 }
 
 void 

@@ -102,6 +102,7 @@ add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width,
 	//SWFDisplayItem_moveTo(it, -(width/2), -(height/2)); 
 	SWFDisplayItem_setName(it, name);
 	SWFDisplayItem_addAction(it, newSWFAction("this._rotation+=2;"), SWFACTION_ENTERFRAME);
+	SWFDisplayItem_addAction(it, newSWFAction("this._y+=5;"), SWFACTION_ENTERFRAME);
 
 	//SWFMovie_add(mo, (SWFBlock)mc);
 }

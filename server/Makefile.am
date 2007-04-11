@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.108 2007/03/28 23:42:19 rsavoye Exp $
+# $Id: Makefile.am,v 1.109 2007/04/11 14:20:20 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -57,6 +57,7 @@ libgnashserver_la_SOURCES = \
 	as_object.cpp \
 	as_value.cpp \
 	character.cpp \
+	cxform.cpp \
 	DynamicShape.cpp	\
 	edit_text_character.cpp \
 	generic_character.cpp \
@@ -69,6 +70,7 @@ libgnashserver_la_SOURCES = \
 	swf/TagLoadersTable.cpp	\
 	swf/tag_loaders.cpp \
 	swf/DefineFontAlignZonesTag.cpp \
+	swf/PlaceObject2Tag.cpp \
 	swf_function.cpp \
 	video_stream_instance.cpp \
 	StreamProvider.cpp \
@@ -110,6 +112,7 @@ noinst_HEADERS = \
 	builtin_function.h \
 	button_character_instance.h \
 	character.h \
+	cxform.h \
 	debugger.h \
 	DynamicShape.h	\
 	dlist.h	\
@@ -140,6 +143,7 @@ noinst_HEADERS = \
 	swf/TagLoadersTable.h \
 	swf/tag_loaders.h \
 	swf/DefineFontAlignZonesTag.h \
+	swf/PlaceObject2Tag.h \
 	swf_event.h \
 	swf_function.h \
 	tesselate.h \

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ExecutableCode.h,v 1.3 2007/04/02 17:22:29 strk Exp $ */
+/* $Id: ExecutableCode.h,v 1.4 2007/04/11 14:20:21 strk Exp $ */
 
 #ifndef GNASH_EXECUTABLECODE_H
 #define GNASH_EXECUTABLECODE_H
@@ -42,6 +42,8 @@ public:
 
 	virtual void execute()=0;
 
+	virtual ExecutableCode* clone() const=0;
+
 	virtual ~ExecutableCode() {}
 };
 
@@ -55,6 +57,11 @@ public:
 		buffer(nBuffer),
 		target(nTarget)
 	{}
+
+	ExecutableCode* clone() const
+	{
+		return new GlobalCode(*this);
+	}
 
 	virtual void execute()
 	{
@@ -76,6 +83,66 @@ private:
 	boost::intrusive_ptr<character> target;
 };
 
+/// Event code 
+class EventCode: public ExecutableCode {
+
+public:
+
+	typedef vector<const action_buffer*> BufferList;
+
+	EventCode(boost::intrusive_ptr<character> nTarget)
+		:
+		_target(nTarget)
+	{}
+
+	EventCode(boost::intrusive_ptr<character> nTarget, const BufferList& buffers)
+		:
+		_target(nTarget),
+		_buffers(buffers)
+	{}
+
+
+	ExecutableCode* clone() const
+	{
+		return new EventCode(*this);
+	}
+
+	/// Add an action buffer to this event handler
+	//
+	/// @param buffer
+	///	An action buffer to execute. Externally owned
+	///	and not copied, so make sure it's kept
+	///	alive for the whole EventCode lifetime.
+	///
+	void addAction(const action_buffer& buffer)
+	{
+		_buffers.push_back(&buffer);
+	}
+
+	virtual void execute()
+	{
+		// We do want to call the onUnload event handler !!
+		//if ( _target->isUnloaded() )
+		//{
+			//log_msg("Sprite %s unloaded, won't execute global code in it", target->getTargetPath().c_str());
+		//	return;
+		//}
+		for (BufferList::iterator it=_buffers.begin(), itEnd=_buffers.end();
+				it != itEnd; ++it)
+		{
+			ActionExec exec(*(*it), _target->get_environment());
+			exec();
+		}
+	}
+
+private:
+
+	boost::intrusive_ptr<character> _target;
+
+	BufferList _buffers;
+
+};
+
 /// Function code
 class FunctionCode: public ExecutableCode {
 
@@ -87,9 +154,13 @@ public:
 		target(nTarget)
 	{}
 
+	ExecutableCode* clone() const
+	{
+		return new FunctionCode(*this);
+	}
+
 	virtual void execute()
 	{
-		//log_msg("Execution of FunctionCode unimplemented yet");
 		as_environment env; env.set_target(target.get());
 		func->call(fn_call(target.get(), &env, 0, 0));
 	}

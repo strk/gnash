@@ -108,6 +108,11 @@ public:
 			|| (m_key_code != key::INVALID && (m_id == KEY_PRESS)));
 	}
 
+	void setKeyCode(unsigned char key)
+	{
+		m_key_code = key;
+	}
+
 	bool	operator==(const event_id& id) const { return m_id == id.m_id && m_key_code == id.m_key_code; }
 
 	bool operator< (const event_id& id) const

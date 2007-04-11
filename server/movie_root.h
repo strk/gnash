@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.46 2007/04/03 16:32:05 strk Exp $ */
+/* $Id: movie_root.h,v 1.47 2007/04/11 14:20:20 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -413,6 +413,9 @@ public:
 	void clear_invalidated() {
 		_movie->clear_invalidated();
 	}
+
+	/// Push an executable code to the ActionQueue
+	void pushAction(std::auto_ptr<ExecutableCode> code);
 
 	/// Push an executable code to the ActionQueue
 	void pushAction(const action_buffer& buf, boost::intrusive_ptr<character> target);

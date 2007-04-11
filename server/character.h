@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.63 2007/04/11 08:55:05 strk Exp $ */
+/* $Id: character.h,v 1.64 2007/04/11 14:20:20 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -35,6 +35,7 @@
 #include "as_object.h" // for inheritance
 #include "rect.h" // for composition (invalidated bounds)
 #include "matrix.h" // for composition
+#include "cxform.h" // for composition
 #include "log.h"
 #include "snappingrange.h"
 
@@ -48,6 +49,7 @@
 namespace gnash {
 	class sprite_instance;
 	class movie_instance;
+	class ExecutableCode;
 }
 
 namespace gnash {
@@ -62,7 +64,9 @@ class character : public as_object
 
 public:
 
-	typedef std::map<event_id, as_value> Events;
+	// action_buffer is externally owned
+	typedef std::vector<const action_buffer*> BufferList;
+	typedef std::map<event_id, BufferList> Events;
 
 private:
 
@@ -73,7 +77,7 @@ private:
 	matrix	m_matrix;
 	float	m_ratio;
 	int	m_clip_depth;
-	Events _event_handlers;
+	Events  _event_handlers;
 	void	(*m_display_callback)(void*);
 	void*	m_display_callback_user_ptr;
 
@@ -90,11 +94,21 @@ protected:
 	{
 	    return _event_handlers;
 	}
+
+	/// Return a user defined event handler, if any
+	//
+	/// @param name
+	/// 	Function name to fetch. It will be converted to 
+	///	lowercase if current VM has been initialized against
+	///	an SWF version inferior to 7.
+	///
+	/// @return
+	///	A function if a member with the given name exists and
+	///	casts to an as_function. A NULL pointer otherwise.
+	///
+	boost::intrusive_ptr<as_function> getUserDefinedEventHandler(const std::string& name) const;
 	
-	void set_event_handlers(const Events& copyfrom) 
-	{
-		_event_handlers = copyfrom;
-	}
+	void set_event_handlers(const Events& copyfrom);
 
 	/// Used to assign a name to unnamed instances
 	static std::string getNextUnnamedInstanceName();
@@ -157,6 +171,7 @@ protected:
 
 public:  // TODO: make protected
 
+#if 0
 	static as_value onrollover_getset(const fn_call& fn);
 
 	static as_value onrollout_getset(const fn_call& fn);
@@ -174,6 +189,7 @@ public:  // TODO: make protected
 	static as_value onmousedown_getset(const fn_call& fn);
 
 	static as_value onmousemove_getset(const fn_call& fn);
+#endif
 
 	static as_value x_getset(const fn_call& fn);
 
@@ -212,6 +228,8 @@ public:
     /// See: http://www.senocular.com/flash/tutorials/depths/?page=2
     ///
     static const int staticDepthOffset = -16384;
+
+    ~character();
 
     character(character* parent, int id)
 	:
@@ -323,7 +341,7 @@ public:
 	/// Maps from our local space into normal color space.
 	virtual cxform	get_world_cxform() const;
 
-	/// Get a built-in function handler for the given event
+	/// Get the built-in function handlers code for the given event
 	//
 	/// NOTE: this function is only for getting statically-defined
 	///       event handlers, which are the ones attached to a character
@@ -331,13 +349,7 @@ public:
 	///       to properly fetch any user-defined event handler, which 
 	///       are the ones attached to a character with ActionScript code.
 	///
-	as_value get_event_handler(const event_id& id) const
-	{
-		std::map<event_id, as_value>::const_iterator it = \
-			_event_handlers.find(id);
-		if ( it == _event_handlers.end() ) return as_value();
-		return it->second;
-	}
+	std::auto_ptr<ExecutableCode> get_event_handler(const event_id& id) const;
 
 	/// Set a built-in function handler for the given event
 	//
@@ -351,10 +363,14 @@ public:
 	///       are the ones attached to a character with ActionScript code.
 	///
 	/// @param id
+	///	The event triggering the handler.
 	///
-	/// @param method
+	/// @param code
+	///	An action buffer to execute when given event is triggered.
+	///	The buffer is externally owned (not copied), make sure it
+	///	is kept alive for the whole lifetime of this character.
 	///
-	void set_event_handler(const event_id& id, const as_value& method);
+	void add_event_handler(const event_id& id, const action_buffer& code);
 
 	/// \brief
 	/// Call this when a character get equipped

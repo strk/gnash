@@ -33,6 +33,10 @@
 #include <iosfwd>
 
 namespace gnash {
+	class cxform;
+}
+
+namespace gnash {
 
 /// A DisplayItem is simply a character object 
 typedef boost::intrusive_ptr<character> DisplayItem;

@@ -51,6 +51,7 @@
 #include "StreamProvider.h"
 #include "URLAccessManager.h" // for loadVariables
 #include "LoadVariablesThread.h" 
+#include "ExecutableCode.h"
 
 #include <vector>
 #include <string>
@@ -1352,6 +1353,7 @@ attachMovieClipProperties(as_object& o)
 	gettersetter = new builtin_function(&sprite_soundbuftime_getset, NULL);
 	o.init_property("_soundbuftime", *gettersetter, *gettersetter);
 
+#if 0
 	gettersetter = new builtin_function(&character::onrollover_getset, NULL);
 	o.init_property("onRollOver", *gettersetter, *gettersetter);
 
@@ -1369,6 +1371,7 @@ attachMovieClipProperties(as_object& o)
 
 	gettersetter = new builtin_function(&character::onmousemove_getset, NULL);
 	o.init_property("onMouseMove", *gettersetter, *gettersetter);
+#endif
 
 }
 
@@ -1943,12 +1946,11 @@ sprite_instance::on_event(const event_id& id)
 			
 	// First, check for built-in event handler.
 	{
-		as_value	method = get_event_handler(id);
-                   
-		if (!method.is_undefined())
+		std::auto_ptr<ExecutableCode> code ( get_event_handler(id) );
+		if ( code.get() )
 		{
 			// Dispatch.
-			call_method0(method, &m_as_environment, this);
+			code->execute();
 
 			called = true;
 			// Fall through and call the function also, if it's defined!
@@ -1967,23 +1969,13 @@ sprite_instance::on_event(const event_id& id)
 
 	// Check for member function.
 	{
-		// In ActionScript 2.0, event method names are CASE SENSITIVE.
-		// In ActionScript 1.0, event method names are CASE INSENSITIVE.
-		// TODO: move to get_function_name directly ?
-		std::string method_name = id.get_function_name();
-		if ( _vm.getSWFVersion() < 7 )
-		{
-			boost::to_lower(method_name, _vm.getLocale());
-		}
+		boost::intrusive_ptr<as_function> method = 
+			getUserDefinedEventHandler(id.get_function_name());
 
-		if (method_name.length() > 0)
+		if ( method )
 		{
-			as_value	method;
-			if (get_member(method_name, &method) && ! method.is_undefined() )
-			{
-				call_method0(method, &m_as_environment, this);
-				called = true;
-			}
+			call_method0(as_value(method.get()), &m_as_environment, this);
+			called = true;
 		}
 	}
 
@@ -2012,6 +2004,11 @@ void sprite_instance::set_member(const std::string& name,
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_string());
 #endif
+
+	if ( val.is_function() )
+	{
+		checkForKeyPressOrMouseEvent(name);
+	}
 
 	// Try textfield variables
 	//
@@ -2706,7 +2703,9 @@ sprite_instance::add_display_object(
 	// Attach event handlers (if any).
 	for (size_t i = 0, n = event_handlers.size(); i < n; i++)
 	{
-		event_handlers[i]->attach_to(ch.get());
+		swf_event* ev = event_handlers[i];
+		ch->add_event_handler(ev->event(), ev->action());
+		//event_handlers[i]->attach_to(*ch);
 	}
 
 	m_display_list.place_character(
@@ -2891,8 +2890,6 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 bool
 sprite_instance::can_handle_mouse_event() const
 {
-	as_value dummy;
-
 	// Event handlers that qualify as mouse event handlers.
 	static const event_id EH[] =
 	{
@@ -2903,45 +2900,20 @@ sprite_instance::can_handle_mouse_event() const
 		event_id(event_id::ROLL_OUT),
 		event_id(event_id::DRAG_OVER),
 		event_id(event_id::DRAG_OUT),
-		// MOUSE_{DOWN,UP,MOVE} are handled
-		// differently, in that they are called
-		// reguardles of mouse position
-		// See has_mouse_event
-		//event_id(event_id::MOUSE_DOWN),
-		//event_id(event_id::MOUSE_UP)
-		//event_id(event_id::MOUSE_MOVE)
 	};
 
-	int swfversion =  _vm.getSWFVersion();
 	for (unsigned int i = 0; i < ARRAYSIZE(EH); i++)
 	{
 		const event_id &event = EH[i];
 
 		// Check event handlers
-		dummy = get_event_handler(event.id());
-		if (!dummy.is_undefined())
+		if ( get_event_handler(event.id()).get() )
 		{
 			return true;
 		}
 
 		// Check user-defined event handlers
-		// TODO: check if it's possible to actually
-		//       have an hard-coded handler and a user-defined
-		//       one. If this is not the case we should add
-		//       gettersetter memebers for all these handlers.
-		//
-		std::string fname = event.get_function_name();
-		if ( swfversion < 7 )
-		{
-			// TODO: have event.get_function_name()
-			//       return an SWF-contextual string  instead!
-			boost::to_lower(fname, _vm.getLocale());
-		}
-
-		// The const_cast is needed because get_member, due to
-		// possible "getter" methods executing stuff, is a non-const
-		// function. We take the "risk" here...
-		if (const_cast<sprite_instance*>(this)->get_member(fname, &dummy))
+		if ( getUserDefinedEventHandler(event.get_function_name()) )
 		{
 			return true;
 		}
@@ -3301,28 +3273,6 @@ sprite_instance::set_name(const char* name)
 	_target_dot.clear();
 }
 
-/* private static */
-bool
-sprite_instance::sameEvents(const Events& eventsMap, const SWFEventsVector& eventsVect)
-{
-	size_t n = eventsVect.size();
-	if (eventsMap.size() != n) return false;
-
-	for (size_t i = 0; i < n; i++)
-	{
-		Events::const_iterator it = eventsMap.find(eventsVect[i]->m_event);
-
-		if ( it == eventsMap.end() ) return false;
-
-		as_value result = it->second;
-		// compare actionscipt in event
-		if (eventsVect[i]->m_method != result) return false;
-	}
-
-	return true;
-	
-}
-
 bool
 sprite_instance::loadMovie(const URL& url)
 {
@@ -3497,5 +3447,33 @@ sprite_instance::removeMovieClip()
 	}
 
 }
+
+void
+sprite_instance::checkForKeyPressOrMouseEvent(const std::string& name)
+{
+	// short-cut
+	if ( name.size() < 9 ) return;
+
+	// TODO: don't use strcmp/strcasecmp, we're a C++ application after all !
+
+	typedef int (*cmp_t) (const char*, const char*);
+	cmp_t cmp = strcmp;
+	if ( _vm.getSWFVersion() < 7 ) cmp = strcasecmp;
+
+	const char* ptr = name.c_str();
+
+	if ( ! cmp(ptr, "onkeypress") )
+	{
+		has_keypress_event();
+	}
+	else if ( ! cmp(ptr, "onMouseDown")
+		|| ! cmp(ptr, "onMouseUp") 
+		|| ! cmp(ptr, "onMouseMove") )
+	{
+		has_mouse_event();
+	}
+
+}
+
 
 } // namespace gnash

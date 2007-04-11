@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.93 2007/04/10 21:44:14 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.94 2007/04/11 14:20:20 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -749,6 +749,17 @@ public:
 
 private:
 
+	/// \brief
+	/// Call has_keypress_event() or has_mouse_event()
+	/// if the given string correspond to an event handler
+	/// for which registering as a listener of Mouse or Key is needed
+	//
+	///
+	/// @param name
+	///	Member name. 
+	///
+	void checkForKeyPressOrMouseEvent(const std::string& name);
+
 	/// Duplicate the object with the specified name
 	/// and add it with a new name  at a new depth.
 	void clone_display_object(const std::string& name,
@@ -877,15 +888,6 @@ private:
 
 	/// Build the _target member recursive on parent
 	std::string computeTargetPath() const;
-
-	/// Compare two events sets 
-	//
-	/// @return 
-	///	true if the two sets contain the same values, false otherwise.
-	///	Note that in the eventsMap, only the value is compared, and
-	///	the key is discarded.
-	///
-	static bool sameEvents(const Events& eventsMap, const SWFEventsVector& eventsVect);
 
 	/// The DisplayList resulting by execution of tags in first frame.
 	//

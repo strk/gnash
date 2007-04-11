@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.90 2007/04/06 07:58:16 jgilmore Exp $ */
+/* $Id: gnash.h,v 1.91 2007/04/11 14:20:20 strk Exp $ */
 
 /// \mainpage
 ///
@@ -432,52 +432,6 @@ public:
 	bool operator==(const point& p) const { return m_x == p.m_x && m_y == p.m_y; }
 
 	bool	bitwise_equal(const point& p) const;
-};
-
-
-/// Color transform type, used by render handler
-class DSOEXPORT cxform
-{
-public:
-    /// [RGBA][multiply, add]
-    float	m_[4][2];
-    
-    /// Initialize to the identity color transform (no transform)
-    cxform();
-    
-    /// Concatenate c's transform onto ours. 
-    //
-    /// When transforming colors, c's transform is applied
-    /// first, then ours.
-    ///
-    void concatenate(const cxform& c);
-    
-    /// Apply our transform to the given color; return the result.
-    rgba transform(const rgba in) const;
-    
-    /// Faster transform() method for loops (avoids creation of rgba object)
-    void transform(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const;    
-    
-    /// Read RGB from the SWF input stream.
-    void read_rgb(stream* in);
-    
-    /// Read RGBA from the SWF input stream.
-    void read_rgba(stream* in);
-    
-    /// Force component values to be in range.
-    void clamp();
-    
-    /// Debug log.
-    void print() const;
-    
-    /// Returns true when the cxform equals identity (no transform)
-    bool is_identity() const;
-    
-    /// Returns true when the cxform leads to alpha == 0
-    bool is_invisible() const;
-    
-    /// The identity color transform (no transform)
-    static cxform	identity;
 };
 
 

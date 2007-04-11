@@ -95,7 +95,7 @@ main(int argc, char** argv)
   /* Woo, the PlaceObject tag hasn't defined an 'onLoad' function.
 		 maybe just pushed something to the action list???
 	*/
-  xcheck_equals(mo, "typeOf(_root.mc_red.onLoad)", "'undefined'");
+  check_equals(mo, "typeOf(_root.mc_red.onLoad)", "'undefined'");
   add_actions(mo, " note('as in frame2 of root'); var x1 = \"as_in_root\"; ");
   add_actions(mo, " _root.mc_red.onLoad = function () \
                    { \
@@ -157,8 +157,8 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); /* 4th frame */
   
   /* mc_red onload is only called IFF onClipEvent(load) is also defined! */
-  check_equals(mo, "_root.y1", "'mc_red onLoad called'");
-  xcheck_equals(mo, "_root.y1bis", "'mc_red onClipLoad called'");
+  xcheck_equals(mo, "_root.y1", "'mc_red onLoad called'");
+  check_equals(mo, "_root.y1bis", "'mc_red onClipLoad called'");
   /* actions in main timeline is executed *after* mc_red.onEnterFrame */
   check_equals(mo, "_root.y2", "'as_in_root'");
   /* actions in main timeline is executed *before* mc_red.onUnload in

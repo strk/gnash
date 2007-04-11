@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.h,v 1.42 2007/02/27 09:10:20 strk Exp $ */
+/* $Id: impl.h,v 1.43 2007/04/11 14:20:20 strk Exp $ */
 
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
@@ -30,6 +30,7 @@
 #include "tu_config.h"
 
 #include "gnash.h"
+#include "cxform.h" // for composition of display_info
 #include "types.h"
 #include "container.h"
 #include "utility.h"

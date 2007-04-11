@@ -1,3 +1,36 @@
+2007-04-11 Sandro Santilli <strk@keybit.net>
+
+	* server/: Makefile.am, gnash.h, types.cpp, cxform.{cpp,h},
+	  swf/PlaceObject2Tag.{cpp,h}, swf/tag_loaders.cpp:
+	  Extract PlaceObject2Tag from tag_loaders
+	  and cxform from gnash.h and types.cpp.
+	* server/character.{cpp,h}: add getUserDefinedEventHandler
+	  function, change static event handlers function to allow
+	  for multiple handlers for the same event.
+	* server/vm/ExecutableCode.h: add EventCode class.
+	* server/swf_event.h: drop the 'function' member, provide better
+	  members protection.
+	* testsuite/actionscript.all/MovieClip.as: add tests for
+	  user defined events not being proper properties.
+	* testsuite/actionscript.all/dejagnu_so_init.as: delete the
+	  user-defined onEnterFrame when finished with it.
+	* server/execute_tag.h: add missing include.
+	* server/event_id.h: add setKeyCode method, for better protection.
+	* server/button_character_instance.cpp (on_button_event): look for
+	  user-defined event handlers.
+	* server/dlist.{cpp,h}, server/impl.h,
+	  server/parser/shape_character_def.h,
+	  server/parser/button_character_def.h:
+	  Update after addition of new files
+	* testsuite/misc-ming.all/action_execution_order_extend_test.c:
+	  Two unexpected successes, one unexpected failures (due to scrabling
+	  of event handling).
+	* server/movie_root.{cpp,h}: add pushAction(ExecutableCode).
+	* server/sprite_instance.{cpp,h}: stop using gettersetter for event
+	  handlers
+	* testsuite/misc-ming.all/displaylist_depths_test.c: test that
+	  event handlers need to be duplicated too.
+
 2007-04-11 Ann Barcomb <ann@lulu.com>
 
 	* testsuite/actionscript.all/gen-index-wiki.sh doc/C/sources.xml:

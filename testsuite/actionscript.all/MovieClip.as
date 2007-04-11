@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.50 2007/04/11 08:39:30 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.51 2007/04/11 14:20:21 strk Exp $";
 
 #include "check.as"
 
@@ -165,6 +165,26 @@ check_equals(mc.onRollOut, undefined);
 check_equals(mc.onRollOver, undefined);
 check_equals(mc.onSetFocus, undefined);
 check_equals(mc.onUnload, undefined);
+#if OUTPUT_VERSION >=6
+check(! mc.hasOwnProperty('onData'));
+check(! mc.hasOwnProperty('onDragOut'));
+check(! mc.hasOwnProperty('onDragOver'));
+check(! mc.hasOwnProperty('onEnterFrame')); 
+check(! mc.hasOwnProperty('onKeyDown'));
+check(! mc.hasOwnProperty('onKeyUp'));
+check(! mc.hasOwnProperty('onKillFocus'));
+check(! mc.hasOwnProperty('onLoad'));
+check(! mc.hasOwnProperty('onMouseDown'));
+check(! mc.hasOwnProperty('onMouseMove'));
+check(! mc.hasOwnProperty('onMouseUp'));
+check(! mc.hasOwnProperty('onPress'));
+check(! mc.hasOwnProperty('onRelease'));
+check(! mc.hasOwnProperty('onReleaseOutside'));
+check(! mc.hasOwnProperty('onRollOut'));
+check(! mc.hasOwnProperty('onRollOver'));
+check(! mc.hasOwnProperty('onSetFocus'));
+check(! mc.hasOwnProperty('onUnload'));
+#endif
 
 // Check property existance
 
@@ -328,7 +348,7 @@ duplicateMovieClip(_root.original, "copy1", 63);
 check_equals(typeof(_root.copy1), 'movieclip');
 check_equals(typeof(_root.copy1.child1), 'undefined');
 check_equals(typeof(_root.copy1.onEnterFrame), 'undefined');
-xcheck_equals(typeof(_root.copy1.onRollOver), 'undefined');
+check_equals(typeof(_root.copy1.onRollOver), 'undefined');
 check_equals(_root.copy1.getDepth(), 63);
 check_equals(_root.copy1._x, 100);
 
@@ -338,7 +358,7 @@ _root.original.duplicateMovieClip("copy2", 64);
 check_equals(typeof(_root.copy2), 'movieclip');
 check_equals(typeof(_root.copy2.child1), 'undefined');
 check_equals(typeof(_root.copy2.onEnterFrame), 'undefined');
-xcheck_equals(typeof(_root.copy2.onRollOver), 'undefined');
+check_equals(typeof(_root.copy2.onRollOver), 'undefined');
 check_equals(_root.copy2.getDepth(), 64);
 check_equals(_root.copy2._x, 100);
 #endif // OUTPUT_VERSION = 6

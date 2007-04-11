@@ -41,6 +41,7 @@ checkIt = function() {
 		clearInterval(_dejagnu_checker_interval);
 #ifdef USE_FRAMELOOP
 		onEnterFrame = undefined;
+		delete onEnterFrame;
 #endif
 
 		// setup some dejagnu wrappers

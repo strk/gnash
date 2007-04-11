@@ -485,10 +485,10 @@ event_id::get_function_name() const
 		"onPress",		 // PRESS
 		"onRelease",		 // RELEASE
 		"onRelease_Outside",	 // RELEASE_OUTSIDE
-		"onRoll_Over",		 // ROLL_OVER
-		"onRoll_Out",		 // ROLL_OUT
-		"onDrag_Over",		 // DRAG_OVER
-		"onDrag_Out",		 // DRAG_OUT
+		"onRollOver",		 // ROLL_OVER
+		"onRollOut",		 // ROLL_OUT
+		"onDragOver",		 // DRAG_OVER
+		"onDragOut",		 // DRAG_OUT
 		"onKeyPress",		 // KEY_PRESS
 		"onInitialize",		 // INITIALIZE
 
