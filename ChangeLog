@@ -1,3 +1,9 @@
+2007-04-11 Ann Barcomb <ann@lulu.com>
+
+	* devtools/lib/Gnash/Distribution.pm: made it more
+	  difficult to mistakenly use the wrong root distribution
+	  directory.
+
 2007-04-11 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/MovieClip.as: add some tests

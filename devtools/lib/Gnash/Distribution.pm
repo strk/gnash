@@ -11,20 +11,21 @@ use File::Find;
 my $dist;
 
 sub new {
-    my( $class ) = @_;
+    my $class = shift;
 
     return $dist if defined $dist;
     my $self = bless {}, $class;
-    return $self->_initialize;
+    return $self->_initialize(@_);
 }
 
 {
     no warnings 'File::Find';
     my @found_files;
     sub _initialize {
-        my( $self ) = @_;
+        my $self = shift;
 
-        my $dist = $Bin.'/../..';
+        my $dist = $_[0] || $Bin.'/../..';
+        $self->{_distribution_root} = $dist; 
         _croak(undef, 
           "Failed to find distribution root; did you move the test directory?"
         ) unless (-d $dist);
@@ -51,6 +52,11 @@ sub new {
        push @found_files, $File::Find::name;
    }
 
+}
+
+sub distribution_root {
+    my $self = shift;
+    return $self->{_distribution_root};
 }
 
 sub _croak {
@@ -238,18 +244,31 @@ requested.
 
 In order to find files, it works on the assumption that it will be used
 by files in the directory devtools/testsuite, which will be located within
-the Gnash top-level checkout directory.
+the Gnash top-level checkout directory.  You may also explicitly specify
+a distribution root at construction.
 
 =head1 METHODS
 
 =over 4
 
-=item new()
+=item new([DISTRIBUTION_ROOT])
 
 The constructor will search the file system as described above, then
 create a list of all files in the top-level checkout directory or in
 nested directories.  It will throw an exception if the distribution
 root is not found.
+
+You may optionally supply your own distribution root, using a full
+path.
+
+=item distribution_root()
+
+Returns the full path of the directory this library considers to be
+your distribution root.  All files under that directory will be 
+considered for inclusion in the lists returned by the next two methods.
+
+Use this method if you want to ensure that you are operating on the
+correct directory (for example if you are writing a one-off script).
 
 =item get_cpp_language_files()
 
