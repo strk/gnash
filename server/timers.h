@@ -143,10 +143,10 @@ private:
       void start();
 
       /// Number of microseconds between expirations 
-      uint64 _interval;
+      uint64_t _interval;
 
       /// Number of microseconds since epoch at Timer start
-      uint64 _start;
+      uint64_t _start;
 
       /// The associated function, stored in an intrusive pointer
       boost::intrusive_ptr<as_function> _function;

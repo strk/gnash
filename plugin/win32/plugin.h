@@ -43,7 +43,7 @@ class nsPluginInstance : public nsPluginInstanceBase
 	NPBool isInitialized();
 	NPError SetWindow(NPP instance, NPWindow* window);
 	NPError NewStream(NPMIMEType type, NPStream * stream,
-                            NPBool seekable, uint16 * stype);
+                            NPBool seekable, uint16_t * stype);
 	NPError DestroyStream(NPStream * stream, NPError reason);
 
 	// locals

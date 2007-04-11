@@ -137,7 +137,7 @@ NPBool nsPluginInstance::init(NPWindow* aWindow)
 }
 
 NPError nsPluginInstance::NewStream(NPMIMEType type, NPStream * stream,
-                            NPBool seekable, uint16 * stype)
+                            NPBool seekable, uint16_t * stype)
 {
 //	dbglogfile << "NewStream" << stream->url << endl;
 	return NPERR_NO_ERROR;
@@ -282,9 +282,9 @@ void nsPluginInstance::main_loop()
 		return;
 	}
 
-	uint64	start_ticks = 0;
+	uint64_t	start_ticks = 0;
 	start_ticks = tu_timer::get_ticks();
-	uint64	last_ticks = start_ticks;
+	uint64_t	last_ticks = start_ticks;
 
 	float	scale = 1.0f;
 	bool	background = true;
@@ -301,7 +301,7 @@ void nsPluginInstance::main_loop()
 		gnash::set_current_root(m);
 		gnash::delete_unused_root();
 	
-		uint64	ticks;
+		uint64_t	ticks;
 		ticks = tu_timer::get_ticks();
 		int	delta_ticks = tu_timer::get_ticks() - last_ticks;
 		float	delta_t = delta_ticks / 1000.f;

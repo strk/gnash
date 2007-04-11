@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.1 2007/04/11 14:20:21 strk Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.2 2007/04/11 17:54:22 bjacques Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -31,7 +31,7 @@
 #include "swf.h" // for tag_type definition
 #include "matrix.h" // for composition
 #include "cxform.h" // for composition 
-#include "tu_types.h" // for uint16_t, uint32 etc. definition 
+#include "tu_types.h" // for uint16_t, uint32_t etc. definition 
 
 //#include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>
@@ -122,7 +122,7 @@ private:
 
 	void execute_state_reverse(sprite_instance* m, int frame);
     
-	uint32	get_depth_id_of_replace_or_add_tag() const;
+	uint32_t	get_depth_id_of_replace_or_add_tag() const;
 };
 
 } // namespace gnash::SWF::tag_loaders

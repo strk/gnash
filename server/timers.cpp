@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.28 2007/04/05 07:31:28 strk Exp $ */
+/* $Id: timers.cpp,v 1.29 2007/04/11 17:54:21 bjacques Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -89,7 +89,7 @@ Timer::expired()
 {
 	if (_start)
 	{
-		uint64 now = tu_timer::get_profile_ticks();
+		uint64_t now = tu_timer::get_profile_ticks();
 		//log_msg("now: %lu", now);
 		assert(now > _start);
 

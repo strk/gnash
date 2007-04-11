@@ -58,7 +58,7 @@ public:
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
 
 	static void setupDecoder(SoundFfmpeg* so);
-	static bool getAudio(void *owner, uint8 *stream, int len);
+	static bool getAudio(void *owner, uint8_t *stream, int len);
 private:
 
 	// audio

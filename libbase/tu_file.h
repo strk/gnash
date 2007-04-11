@@ -87,16 +87,16 @@ public:
     // Returns number of bytes copied.
     int	copy_bytes(tu_file* in, int bytes);
     
-    uint64	read_le64();
+    uint64_t	read_le64();
     uint32_t 	read_le32();
     uint16_t 	read_le16();
-    uint64 	read_be64();
+    uint64_t 	read_be64();
     uint32_t 	read_be32();
     uint16_t 	read_be16();
-    void 	write_le64(uint64 u);
+    void 	write_le64(uint64_t u);
     void 	write_le32(uint32_t u);
     void 	write_le16(uint16_t u);
-    void	write_be64(uint64 u);
+    void	write_be64(uint64_t u);
     void 	write_be32(uint32_t u);
     void 	write_be16(uint16_t u);
     
@@ -146,8 +146,8 @@ public:
     
     
 private:
-    uint64	read64() {
-	uint64 u;
+    uint64_t	read64() {
+	uint64_t u;
 	m_read(&u, 8, m_data);
 	return u;
     }
@@ -167,7 +167,7 @@ private:
 	return u;
     }
     
-    void	write64(uint64 u) {
+    void	write64(uint64_t u) {
 	m_write(&u, 8, m_data);
     }
     void	write32(uint32_t u) {
@@ -201,29 +201,29 @@ private:
 
 
 #if _TU_LITTLE_ENDIAN_
-inline uint64	tu_file::read_le64() { return read64(); }
+inline uint64_t	tu_file::read_le64() { return read64(); }
 inline uint32_t	tu_file::read_le32() { return read32(); }
 inline uint16_t	tu_file::read_le16() { return read16(); }
-inline uint64	tu_file::read_be64() { return swap64(read64()); }
+inline uint64_t	tu_file::read_be64() { return swap64(read64()); }
 inline uint32_t	tu_file::read_be32() { return swap32(read32()); }
 inline uint16_t	tu_file::read_be16() { return swap16(read16()); }
-inline void	tu_file::write_le64(uint64 u) { write64(u); }
+inline void	tu_file::write_le64(uint64_t u) { write64(u); }
 inline void	tu_file::write_le32(uint32_t u) { write32(u); }
 inline void	tu_file::write_le16(uint16_t u) { write16(u); }
-inline void	tu_file::write_be64(uint64 u) { write64(swap64(u)); }
+inline void	tu_file::write_be64(uint64_t u) { write64(swap64(u)); }
 inline void	tu_file::write_be32(uint32_t u) { write32(swap32(u)); }
 inline void	tu_file::write_be16(uint16_t u) { write16(swap16(u)); }
 #else // not _TU_LITTLE_ENDIAN_
-inline uint64	tu_file::read_le64() { return swap64(read64()); }
+inline uint64_t	tu_file::read_le64() { return swap64(read64()); }
 inline uint32_t	tu_file::read_le32() { return swap32(read32()); }
 inline uint16_t	tu_file::read_le16() { return swap16(read16()); }
-inline uint64	tu_file::read_be64() { return read64(); }
+inline uint64_t	tu_file::read_be64() { return read64(); }
 inline uint32_t	tu_file::read_be32() { return read32(); }
 inline uint16_t	tu_file::read_be16() { return read16(); }
-inline void	tu_file::write_le64(uint64 u) { write64(swap64(u)); }
+inline void	tu_file::write_le64(uint64_t u) { write64(swap64(u)); }
 inline void	tu_file::write_le32(uint32_t u) { write32(swap32(u)); }
 inline void	tu_file::write_le16(uint16_t u) { write16(swap16(u)); }
-inline void	tu_file::write_be64(uint64 u) { write64(u); }
+inline void	tu_file::write_be64(uint64_t u) { write64(u); }
 inline void	tu_file::write_be32(uint32_t u) { write32(u); }
 inline void	tu_file::write_be16(uint16_t u) { write16(u); }
 #endif	// not _TU_LITTLE_ENDIAN_
@@ -262,7 +262,7 @@ inline void		tu_file::write_double64(double value)
 {
     union {
 	double	d;
-	uint64	l;
+	uint64_t	l;
     } u;
     compiler_assert(sizeof(u) == sizeof(u.l));
     
@@ -276,7 +276,7 @@ inline double	tu_file::read_double64()
 {
     union {
 	double	d;
-	uint64	l;
+	uint64_t	l;
     } u;
     compiler_assert(sizeof(u) == sizeof(u.l));
     

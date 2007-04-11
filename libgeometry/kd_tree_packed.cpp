@@ -124,7 +124,7 @@ void	kd_tree_packed::node_chunk::ray_test(
 
 struct kd_face
 {
-	uint16	m_vi[3];	// vert indices
+	uint16_t	m_vi[3];	// vert indices
 
 //	void	local_assert() { compiler_assert(sizeof(struct kd_face) == 6); }
 };
@@ -132,14 +132,14 @@ struct kd_face
 
 struct kd_leaf
 {
-	uint8	m_flags;	// low two bits == 0b11
-	uint8	m_face_count;
+	uint8_t	m_flags;	// low two bits == 0b11
+	uint8_t	m_face_count;
 
 	kd_face*	get_face(int index)
 	{
 		assert(index >= 0 && index < m_face_count);
 
-		return (kd_face*) (((uint8*) this) + sizeof(struct kd_leaf) + sizeof(kd_face) * index);
+		return (kd_face*) (((uint8_t*) this) + sizeof(struct kd_leaf) + sizeof(kd_face) * index);
 	}
 
 //	void	local_assert() { compiler_assert(sizeof(struct kd_leaf) == 2); }
@@ -162,7 +162,7 @@ struct kd_leaf
 class kd_node
 {
 public:
-	uint8	m_flags[4];
+	uint8_t	m_flags[4];
 	// low two bits == axis, if axis == 3 then this is leaf.
 	// 0x04 is set if the neg child is present.
 	// 0x08 is set if the pos child is present
@@ -183,7 +183,7 @@ public:
 		if (has_neg_child())
 		{
 			// Neg child follows immediately.
-			return (kd_node*) (((uint8*) this) + sizeof(kd_node));
+			return (kd_node*) (((uint8_t*) this) + sizeof(kd_node));
 		}
 		else return NULL;
 	}
@@ -195,7 +195,7 @@ public:
 			unsigned int offset = (m_flags[1]) + (m_flags[2] << 8) + (m_flags[3] << 16);
 			assert(offset >= sizeof(kd_node));	// sanity check
 
-			return (kd_node*) (((uint8*) this) + offset);
+			return (kd_node*) (((uint8_t*) this) + offset);
 		}
 		else return NULL;
 	}

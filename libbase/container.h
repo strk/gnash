@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: container.h,v 1.51 2007/02/12 01:32:46 nihilus Exp $ */
+/* $Id: container.h,v 1.52 2007/04/11 17:54:21 bjacques Exp $ */
 
 #ifndef __CONTAINER_H__
 #define __CONTAINER_H__
@@ -736,14 +736,14 @@ public:
 		resize(str.size());
 		strcpy(get_buffer(), str.get_buffer());
 	}
-	tu_string(const uint32* wide_char_str)
+	tu_string(const uint32_t* wide_char_str)
 	{
 		m_local.m_size = 1;
 		m_local.m_buffer[0] = '\0';
 
 		*this = wide_char_str;
 	}
-	tu_string(const uint16* wide_char_str)
+	tu_string(const uint16_t* wide_char_str)
 	{
 		m_local.m_size = 1;
 		m_local.m_buffer[0] = '\0';
@@ -850,8 +850,8 @@ public:
 	}
 
 	// Append wide char.  Both versions of wide char.
-	void	append_wide_char(uint16 ch);
-	void	append_wide_char(uint32 ch);
+	void	append_wide_char(uint16_t ch);
+	void	append_wide_char(uint32_t ch);
 
 	void	operator+=(const tu_string& str)
 	{
@@ -901,8 +901,8 @@ public:
 	//
 	// Could add operator= overloads, but maybe it's better to
 	// keep this very explicit.
-	static void	encode_utf8_from_wchar(tu_string* result, const uint32* wstr);
-	static void	encode_utf8_from_wchar(tu_string* result, const uint16* wstr);
+	static void	encode_utf8_from_wchar(tu_string* result, const uint32_t* wstr);
+	static void	encode_utf8_from_wchar(tu_string* result, const uint16_t* wstr);
 
 	// Utility: case-insensitive string compare.  stricmp() is not
 	// ANSI or POSIX, doesn't seem to appear in Linux.
@@ -910,7 +910,7 @@ public:
 
 	// Return the Unicode char at the specified character
 	// position.  index is in UTF-8 chars, NOT bytes.
-	uint32	utf8_char_at(int index) const;
+	uint32_t	utf8_char_at(int index) const;
 
 	// Return the string in this container as all upper case letters
 	tu_string utf8_to_upper() const;

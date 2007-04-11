@@ -24,7 +24,7 @@
 // code, see the FIST web page at:
 // http://www.cosy.sbg.ac.at/~held/projects/triang/triang.html
 
-/* $Id: triangulate_impl.h,v 1.21 2006/10/12 14:05:42 nihilus Exp $ */
+/* $Id: triangulate_impl.h,v 1.22 2007/04/11 17:54:21 bjacques Exp $ */
 
 #include "utility.h"
 #include "triangulate.h"
@@ -37,7 +37,7 @@
 #include "tu_timer.h"
 #endif // PROFILE_TRIANGULATE
 
-// Template this whole thing on coord_t, so sint16 and float versions
+// Template this whole thing on coord_t, so int16_t and float versions
 // can easily reuse the code.
 //
 // These templates are instantiated in triangulate_<type>.cpp files.
@@ -72,10 +72,10 @@ inline double	determinant_float(const vec2<float>& a, const vec2<float>& b, cons
 }
 
 
-inline sint64	determinant_sint32(const vec2<sint32>& a, const vec2<sint32>& b, const vec2<sint32>& c)
+inline int64_t	determinant_sint32(const vec2<int32_t>& a, const vec2<int32_t>& b, const vec2<int32_t>& c)
 {
-	return (sint64(b.x) - sint64(a.x)) * (sint64(c.y) - sint64(a.y))
-		- (sint64(b.y) - sint64(a.y)) * (sint64(c.x) - sint64(a.x));
+	return (int64_t(b.x) - int64_t(a.x)) * (int64_t(c.y) - int64_t(a.y))
+		- (int64_t(b.y) - int64_t(a.y)) * (int64_t(c.x) - int64_t(a.x));
 }
 
 
@@ -101,10 +101,10 @@ inline int	vertex_left_test(const vec2<float>& a, const vec2<float>& b, const ve
 
 
 template<>
-inline int	vertex_left_test(const vec2<sint32>& a, const vec2<sint32>& b, const vec2<sint32>& c)
-// Specialize for vec2<sint32>
+inline int	vertex_left_test(const vec2<int32_t>& a, const vec2<int32_t>& b, const vec2<int32_t>& c)
+// Specialize for vec2<int32_t>
 {
-	sint64	det = determinant_sint32(a, b, c);
+	int64_t	det = determinant_sint32(a, b, c);
 	if (det > 0) return 1;
 	else if (det < 0) return -1;
 	else return 0;
@@ -298,10 +298,10 @@ inline bool	edges_intersect_sub(const std::vector<poly_vert<float> >& sorted_ver
 
 
 template<>
-inline bool	edges_intersect_sub(const std::vector<poly_vert<sint32> >& sorted_verts, int e0v0i, int e0v1i, int e1v0i, int e1v1i)
+inline bool	edges_intersect_sub(const std::vector<poly_vert<int32_t> >& sorted_verts, int e0v0i, int e0v1i, int e1v0i, int e1v1i)
 // Return true if edge (e0v0,e0v1) intersects (e1v0,e1v1).
 //
-// Specialized for sint32
+// Specialized for int32_t
 {
 	// If e1v0,e1v1 are on opposite sides of e0, and e0v0,e0v1 are
 	// on opposite sides of e1, then the segments cross.  These
@@ -312,10 +312,10 @@ inline bool	edges_intersect_sub(const std::vector<poly_vert<sint32> >& sorted_ve
 	//
 	// If only one is degenerate, our tests are still OK.
 
-	const vec2<sint32>&	e0v0 = sorted_verts[e0v0i].m_v;
-	const vec2<sint32>&	e0v1 = sorted_verts[e0v1i].m_v;
-	const vec2<sint32>&	e1v0 = sorted_verts[e1v0i].m_v;
-	const vec2<sint32>&	e1v1 = sorted_verts[e1v1i].m_v;
+	const vec2<int32_t>&	e0v0 = sorted_verts[e0v0i].m_v;
+	const vec2<int32_t>&	e0v1 = sorted_verts[e0v1i].m_v;
+	const vec2<int32_t>&	e1v0 = sorted_verts[e1v0i].m_v;
+	const vec2<int32_t>&	e1v1 = sorted_verts[e1v1i].m_v;
 
 	if (e0v0.x == e0v1.x && e0v0.y == e0v1.y)
 	{
@@ -330,8 +330,8 @@ inline bool	edges_intersect_sub(const std::vector<poly_vert<sint32> >& sorted_ve
 	}
 
 	// See if e1 crosses line of e0.
-	sint64	det10 = determinant_sint32(e0v0, e0v1, e1v0);
-	sint64	det11 = determinant_sint32(e0v0, e0v1, e1v1);
+	int64_t	det10 = determinant_sint32(e0v0, e0v1, e1v0);
+	int64_t	det11 = determinant_sint32(e0v0, e0v1, e1v1);
 
 	// Note: we do > 0, which means a vertex on a line counts as
 	// intersecting.  In general, if one vert is on the other
@@ -346,8 +346,8 @@ inline bool	edges_intersect_sub(const std::vector<poly_vert<sint32> >& sorted_ve
 	}
 
 	// See if e0 crosses line of e1.
-	sint64	det00 = determinant_sint32(e1v0, e1v1, e0v0);
-	sint64	det01 = determinant_sint32(e1v0, e1v1, e0v1);
+	int64_t	det00 = determinant_sint32(e1v0, e1v1, e0v0);
+	int64_t	det01 = determinant_sint32(e1v0, e1v1, e0v1);
 
 	if (det00 * det01 > 0)
 	{
@@ -2222,7 +2222,7 @@ static void compute_triangulation(
 	}
 
 #ifdef PROFILE_TRIANGULATE
-	uint64	start_ticks = tu_timer::get_profile_ticks();
+	uint64_t	start_ticks = tu_timer::get_profile_ticks();
 #endif // PROFILE_TRIANGULATE
 
 	// Local generator, for some parts of the algo that need random numbers.
@@ -2244,7 +2244,7 @@ static void compute_triangulation(
 	}
 
 #ifdef PROFILE_TRIANGULATE
-	uint64	join_ticks = tu_timer::get_profile_ticks();
+	uint64_t	join_ticks = tu_timer::get_profile_ticks();
 	fprintf(stderr, "join poly = %1.6f sec\n", tu_timer::profile_ticks_to_seconds(join_ticks - start_ticks));
 #endif // PROFILE_TRIANGULATE
 
@@ -2377,7 +2377,7 @@ static void compute_triangulation(
 	}
 	
 #ifdef PROFILE_TRIANGULATE
-	uint64	clip_ticks = tu_timer::get_profile_ticks();
+	uint64_t	clip_ticks = tu_timer::get_profile_ticks();
 	fprintf(stderr, "clip poly = %1.6f sec\n", tu_timer::profile_ticks_to_seconds(clip_ticks - join_ticks));
 	fprintf(stderr, "total for poly = %1.6f sec\n", tu_timer::profile_ticks_to_seconds(clip_ticks - start_ticks));
 	fprintf(stderr, "vert count = %d, verts clipped / sec = %f\n",

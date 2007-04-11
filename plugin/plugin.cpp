@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.73 2007/03/07 19:06:12 bjacques Exp $ */
+/* $Id: plugin.cpp,v 1.74 2007/04/11 17:54:21 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -437,7 +437,7 @@ nsPluginInstance::DestroyStream(NPStream * /* stream */, NPError /* reason */)
 }
 
 /// \brief Return how many bytes we can read into the buffer
-int32
+int32_t
 nsPluginInstance::WriteReady(NPStream * /* stream */ )
 {
 #if 0
@@ -449,8 +449,8 @@ nsPluginInstance::WriteReady(NPStream * /* stream */ )
 /// \brief Read the data stream from Mozilla/Firefox
 ///
 /// For now we read the bytes and write them to a disk file.
-int32
-nsPluginInstance::Write(NPStream * /* stream */, int32 /* offset */, int32 len,
+int32_t
+nsPluginInstance::Write(NPStream * /* stream */, int32_t /* offset */, int32_t len,
                         void * buffer)
 {
 #if 0

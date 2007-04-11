@@ -7,7 +7,7 @@
 //
 // Instantiate our templated algo from triangulate_inst.h
 
-/* $Id: triangulate_sint32.cpp,v 1.5 2007/02/10 18:33:03 nihilus Exp $ */
+/* $Id: triangulate_sint32.cpp,v 1.6 2007/04/11 17:54:21 bjacques Exp $ */
 
 #include "triangulate_impl.h"
 
@@ -15,14 +15,14 @@ using namespace std;
 
 namespace triangulate
 {
-	// Version using sint32 coords
+	// Version using int32_t coords
 	void	compute(
-		std::vector<sint32>* result,	// trilist
+		std::vector<int32_t>* result,	// trilist
 		int path_count,
-		const std::vector<sint32> paths[],
+		const std::vector<int32_t> paths[],
 		int debug_halt_step /* = -1 */,
-		std::vector<sint32>* debug_remaining_loop /* = NULL */)
+		std::vector<int32_t>* debug_remaining_loop /* = NULL */)
 	{
-		compute_triangulation<sint32>(result, path_count, paths, debug_halt_step, debug_remaining_loop);
+		compute_triangulation<int32_t>(result, path_count, paths, debug_halt_step, debug_remaining_loop);
 	}
 }

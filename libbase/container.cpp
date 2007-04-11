@@ -17,18 +17,18 @@
 #include "utf8.h"
 #include "tu_random.h"
 
-void tu_string::append_wide_char(uint16 c)
+void tu_string::append_wide_char(uint16_t c)
 {
 	char buf[8];
 	int index = 0;
-	utf8::encode_unicode_character(buf, &index, (uint32) c);
+	utf8::encode_unicode_character(buf, &index, (uint32_t) c);
 	buf[index] = '\0';
 
 	*this += buf;
 }
 
 
-void tu_string::append_wide_char(uint32 c)
+void tu_string::append_wide_char(uint32_t c)
 {
 	char buf[8];
 	int index = 0;
@@ -160,15 +160,15 @@ template<class char_type>
 	assert(result->length() == (int) strlen(result->c_str()));
 }
 
-void tu_string::encode_utf8_from_wchar(tu_string* result, const uint32* wstr)
+void tu_string::encode_utf8_from_wchar(tu_string* result, const uint32_t* wstr)
 {
-	encode_utf8_from_wchar_generic<uint32>(result, wstr);
+	encode_utf8_from_wchar_generic<uint32_t>(result, wstr);
 }
 
 
-void tu_string::encode_utf8_from_wchar(tu_string* result, const uint16* wstr)
+void tu_string::encode_utf8_from_wchar(tu_string* result, const uint16_t* wstr)
 {
-	encode_utf8_from_wchar_generic<uint16>(result, wstr);
+	encode_utf8_from_wchar_generic<uint16_t>(result, wstr);
 }
 
 
@@ -178,10 +178,10 @@ void tu_string::encode_utf8_from_wchar(tu_string* result, const uint16* wstr)
 }
 
 
-uint32	tu_string::utf8_char_at(int index) const
+uint32_t	tu_string::utf8_char_at(int index) const
 {
 	const char*	buf = get_buffer();
-	uint32	c;
+	uint32_t	c;
 
 	do
 	{
@@ -207,7 +207,7 @@ tu_string	tu_string::utf8_to_upper() const
 	tu_string str;
 	for (;;)
 	{
-		uint32 c = utf8::decode_next_unicode_character(&buf);
+		uint32_t c = utf8::decode_next_unicode_character(&buf);
           
 		if (c == 0)
 		{
@@ -227,7 +227,7 @@ tu_string	tu_string::utf8_to_lower() const
 	tu_string str;
 	for (;;)
 	{
-		uint32 c = utf8::decode_next_unicode_character(&buf);
+		uint32_t c = utf8::decode_next_unicode_character(&buf);
     
 		if (c == 0) {
 			// We've hit the end of the string; don't go further.
@@ -247,7 +247,7 @@ tu_string	tu_string::utf8_to_lower() const
 
 	while (p - buf < buflen)
 	{
-		uint32	c = utf8::decode_next_unicode_character(&p);
+		uint32_t	c = utf8::decode_next_unicode_character(&p);
 		if (c == 0)
 		{
 			break;
@@ -282,7 +282,7 @@ tu_string	tu_string::utf8_substring(int start, int end) const
 			start_pointer = p;
 		}
 
-		uint32	c = utf8::decode_next_unicode_character(&p);
+		uint32_t	c = utf8::decode_next_unicode_character(&p);
 		index++;
 
 		if (index == end)
@@ -424,23 +424,23 @@ void	test_hash_speed()
 // still 33% slower in my tests.
 
 // // tu's hash
-#define HASH hash<uint32, uint32 >
+#define HASH hash<uint32_t, uint32_t >
 #define HASH_ADD(h, k, v) h.add(k, v)
 
 // STL's hash
-//#define HASH __gnu_cxx::hash_map<uint32, uint32>
-//#define HASH std::hash_map<uint32, uint32>
+//#define HASH __gnu_cxx::hash_map<uint32_t, uint32_t>
+//#define HASH std::hash_map<uint32_t, uint32_t>
 //#define HASH_ADD(h, k, v) h[k] = v
 
 // STL's map
-//#define HASH std::map<uint32, uint32>
+//#define HASH std::map<uint32_t, uint32_t>
 //#define HASH_ADD(h, k, v) h[k] = v
 
 //	const int	SIZE = 10000000;
 	const int	SIZE = 1000000;
 
 	// Make an array of random numbers.
-	std::vector<uint32>	numbers;
+	std::vector<uint32_t>	numbers;
 	numbers.resize(SIZE);
 
 	for (int i = 0, n = numbers.size(); i < n; i++)

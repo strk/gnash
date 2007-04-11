@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.2 2007/02/27 09:54:48 strk Exp $ */
+/* $Id: sound_handler.h,v 1.3 2007/04/11 17:54:21 bjacques Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -52,7 +52,7 @@ class DSOEXPORT sound_handler
 {
 public:
 
-	typedef bool (*aux_streamer_ptr)(void *udata, uint8 *stream, int len);
+	typedef bool (*aux_streamer_ptr)(void *udata, uint8_t *stream, int len);
 
 	struct sound_envelope
 	{

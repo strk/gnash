@@ -17,11 +17,11 @@ bool	tu_types_validate()
 	if (sizeof(uint8_t) != 1
 		|| sizeof(uint16_t) != 2
 		|| sizeof(uint32_t) != 4
-		|| sizeof(uint64) != 8
+		|| sizeof(uint64_t) != 8
 		|| sizeof(int8_t) != 1
 		|| sizeof(int16_t) != 2
 		|| sizeof(int32_t) != 4
-		|| sizeof(sint64) != 8)
+		|| sizeof(int64_t) != 8)
 	{
 		// No good.
 		assert(0);

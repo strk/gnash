@@ -64,6 +64,7 @@
 	video image if it extends beyond the width of our buffer.
 	* gui/fltk.cpp: Fix compilation by adding statics for GUI methods
 	that became nonstatic. Also fix some warnings.
+	* all over the place: Replace SDL integer type names by standard ones.
 
 2007-04-11 Sandro Santilli <strk@keybit.net>
 

@@ -5,7 +5,7 @@
 
 // A render_handler that uses SDL & OpenGL
 
-/* $Id: render_handler_ogl.cpp,v 1.71 2007/04/10 18:18:45 rsavoye Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.72 2007/04/11 17:54:21 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -910,7 +910,7 @@ Markus: A. A. I still miss you and the easter 2006, you know.
 
 */
 
-void	hardware_resample(int bytes_per_pixel, int src_width, int src_height, uint8* src_data, int dst_width, int dst_height)
+void	hardware_resample(int bytes_per_pixel, int src_width, int src_height, uint8_t* src_data, int dst_width, int dst_height)
 // Code from Alex Streit
 //
 // Sets the current texture to a resampled/expanded version of the
@@ -967,7 +967,7 @@ void	software_resample(
     int src_width,
     int src_height,
     int src_pitch,
-    uint8* src_data,
+    uint8_t* src_data,
     int dst_width,
     int dst_height)
 // Code from Alex Streit

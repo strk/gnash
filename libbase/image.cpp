@@ -424,7 +424,7 @@ namespace image
 
 		for (int y = 0; y < im->m_height; y++)
 		{
-			uint8*	p = scanline(im, y);
+			uint8_t*	p = scanline(im, y);
 			for (int x = 0; x < im->m_width; x++)
 			{
 				out->write_byte(p[x * 4]);

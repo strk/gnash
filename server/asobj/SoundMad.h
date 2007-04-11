@@ -50,7 +50,7 @@ public:
 	unsigned int getPosition();
 
 	static void setupDecoder(SoundMad* so);
-	static bool getAudio(void *owner, uint8 *stream, int len);
+	static bool getAudio(void *owner, uint8_t *stream, int len);
 private:
 
 	long inputPos;

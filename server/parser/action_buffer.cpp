@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: action_buffer.cpp,v 1.14 2007/02/28 09:46:48 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.15 2007/04/11 17:54:21 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -114,7 +114,7 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     // Actual processing.
     size_t i = start_pc;
     uint16_t length = uint16_t(read_int16(i+1));
-    uint16 count = uint16_t(read_int16(i+3)); 
+    uint16_t count = uint16_t(read_int16(i+3)); 
     i += 2;
     
 //log_msg("Start at %d, stop at %d, length read was %d, count read was %d", start_pc, stop_pc, length, count);
@@ -280,7 +280,7 @@ disasm(const unsigned char* instruction_data)
 		    // wacky format: 45670123
 		    union {
 			double	d;
-			uint64	i;
+			uint64_t	i;
 			struct {
 			    uint32_t	lo;
 			    uint32_t	hi;
@@ -295,7 +295,7 @@ disasm(const unsigned char* instruction_data)
 		    
 		    dbglogfile << "(double) " << u.d << endl;
 		} else if (type == 7) {
-		    // int32
+		    // int32_t
 		    int32_t	val = instruction_data[3 + i]
 			| (instruction_data[3 + i + 1] << 8)
 			| (instruction_data[3 + i + 2] << 16)
@@ -352,7 +352,7 @@ disasm(const unsigned char* instruction_data)
 		       << " arg_count = " << arg_count
 		       << " reg_count = " << reg_count << endl;
 	    
-	    uint16	flags = (instruction_data[3 + i]) | (instruction_data[3 + i + 1] << 8);
+	    uint16_t	flags = (instruction_data[3 + i]) | (instruction_data[3 + i + 1] << 8);
 	    i += 2;
 	    
 	    // @@ What is the difference between "super" and "_parent"?
@@ -435,7 +435,7 @@ action_buffer::read_double_wacky(size_t pc) const
 	// wacky format: 45670123
 	union {
 		double	d;
-		uint64	i;
+		uint64_t	i;
 		struct {
 			uint32_t	lo;
 			uint32_t	hi;

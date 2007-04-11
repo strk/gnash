@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.36 2007/04/11 13:03:45 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.37 2007/04/11 17:54:21 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -684,7 +684,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 }
 
 // audio callback is running in sound handler thread
-bool NetStreamFfmpeg::audio_streamer(void *owner, uint8 *stream, int len)
+bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 {
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(owner);
 

@@ -15,19 +15,19 @@
 #include <Mmsystem.h>
 
 
-uint64 tu_timer::get_ticks()
+uint64_t tu_timer::get_ticks()
 {
 	return timeGetTime();
 }
 
 
-double tu_timer::ticks_to_seconds(uint64 ticks)
+double tu_timer::ticks_to_seconds(uint64_t ticks)
 {
 	return ticks * (1.0f / 1000.f);
 }
 
 
-uint64	tu_timer::get_profile_ticks()
+uint64_t	tu_timer::get_profile_ticks()
 {
 	// @@ use rdtsc?
 
@@ -38,7 +38,7 @@ uint64	tu_timer::get_profile_ticks()
 }
 
 
-double	tu_timer::profile_ticks_to_seconds(uint64 ticks)
+double	tu_timer::profile_ticks_to_seconds(uint64_t ticks)
 {
 	LARGE_INTEGER	freq;
 	QueryPerformanceFrequency(&freq);
@@ -59,19 +59,19 @@ double	tu_timer::profile_ticks_to_seconds(uint64 ticks)
 // The profile ticks implementation is just fine for a normal timer.
 
 
-uint64 tu_timer::get_ticks()
+uint64_t tu_timer::get_ticks()
 {
 	return get_profile_ticks();
 }
 
 
-double tu_timer::ticks_to_seconds(uint64 ticks)
+double tu_timer::ticks_to_seconds(uint64_t ticks)
 {
 	return profile_ticks_to_seconds(ticks);
 }
 
 
-uint64	tu_timer::get_profile_ticks()
+uint64_t	tu_timer::get_profile_ticks()
 {
 	// @@ TODO prefer rdtsc when available?
 
@@ -80,14 +80,14 @@ uint64	tu_timer::get_profile_ticks()
 	
 	gettimeofday(&tv, 0);
 
-	uint64 result = tv.tv_sec * 1000000;
+	uint64_t result = tv.tv_sec * 1000000;
 	result += tv.tv_usec;
 	
 	return result;
 }
 
 
-double	tu_timer::profile_ticks_to_seconds(uint64 ticks)
+double	tu_timer::profile_ticks_to_seconds(uint64_t ticks)
 {
 	// ticks is microseconds.  Convert to seconds.
 	return ticks / 1000000.0;

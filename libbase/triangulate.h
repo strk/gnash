@@ -37,19 +37,19 @@ namespace triangulate
 
 	// Version using short coords
 	void	compute(
-		std::vector<sint16>* results,	// indexed trilist
+		std::vector<int16_t>* results,	// indexed trilist
 		int path_count,
-		const std::vector<sint16> paths[],
+		const std::vector<int16_t> paths[],
 		int debug_halt_step = -1,
-		std::vector<sint16>* debug_remaining_loop = NULL);
+		std::vector<int16_t>* debug_remaining_loop = NULL);
 
 	// Version using int coords
 	void	compute(
-		std::vector<sint32>* results,	// indexed trilist
+		std::vector<int32_t>* results,	// indexed trilist
 		int path_count,
-		const std::vector<sint32> paths[],
+		const std::vector<int32_t> paths[],
 		int debug_halt_step = -1,
-		std::vector<sint32>* debug_remaining_loop = NULL);
+		std::vector<int32_t>* debug_remaining_loop = NULL);
 }
 
 

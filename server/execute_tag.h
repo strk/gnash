@@ -25,7 +25,7 @@
 #include "config.h"
 #endif
 
-#include "tu_types.h" // for uint32 typedef
+#include "tu_types.h" // for uint32_t typedef
 
 #include <cstdarg>
 #include <cassert>
@@ -92,7 +92,7 @@ public:
 	//
 	/// The default implementation returns 0
 	///
-	virtual uint32	get_depth_id_of_replace_or_add_tag() const
+	virtual uint32_t	get_depth_id_of_replace_or_add_tag() const
 	{
 		return 0;
 	}

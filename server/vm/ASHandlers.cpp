@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.86 2007/04/10 21:44:14 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.87 2007/04/11 17:54:22 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -634,7 +634,7 @@ SWFHandlers::ActionWaitForFrame(ActionExec& thread)
 	// skip the specified number of actions.
 	//
 	unsigned int framenum = code.read_int16(thread.pc+3);
-	uint8 skip = code[thread.pc+5];
+	uint8_t skip = code[thread.pc+5];
 
 	character* target = env.get_target();
 	sprite_instance* target_sprite = target->to_movie();
@@ -1464,7 +1464,7 @@ SWFHandlers::ActionWaitForFrameExpression(ActionExec& thread)
 	thread.ensureStack(1); // expression
 
 	// how many actions to skip if frame has not been loaded
-	uint8 skip = code[thread.pc+3];
+	uint8_t skip = code[thread.pc+3];
 
 	// env.top(0) contains frame specification,
 	// evaluated as for ActionGotoExpression
@@ -1534,7 +1534,7 @@ SWFHandlers::ActionPushData(ActionExec& thread)
 		"register",	// 4
 		"bool",		// 5
 		"double",	// 6
-		"int32",	// 7
+		"int32_t",	// 7
 		"dict8",	// 8
 		"dict16"	// 9
 	};
@@ -3203,7 +3203,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	//cerr << " nargs:" << nargs << endl;
 
 	// Get the count of local registers used by this function.
-	uint8 register_count = code[i];
+	uint8_t register_count = code[i];
 	i++;
 
 	//cerr << " nregisters:" << nargs << endl;
@@ -3211,7 +3211,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	func->set_local_register_count(register_count);
 
 	// Flags, for controlling register assignment of implicit args.
-	uint16	flags = code.read_int16(i);
+	uint16_t	flags = code.read_int16(i);
 	i += 2;
 
 	func->set_function2_flags(flags);
@@ -3219,7 +3219,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	// Get the register assignments and names of the arguments.
 	for (unsigned n = 0; n < nargs; n++)
 	{
-		uint8 arg_register = code[i];
+		uint8_t arg_register = code[i];
 		++i;
 	
 		// @@ security: watch out for possible missing terminator here!

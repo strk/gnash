@@ -16,8 +16,8 @@ namespace tu_timer
 {
 	// General-purpose wall-clock timer.  May not be hi-res enough
 	// for profiling.
-	uint64 get_ticks();
-	double ticks_to_seconds(uint64 ticks);
+	uint64_t get_ticks();
+	double ticks_to_seconds(uint64_t ticks);
 	
 	// Hi-res timer for CPU profiling.
 
@@ -26,10 +26,10 @@ namespace tu_timer
 	// operation, and pass the difference to
 	// profile_ticks_to_seconds() to find out how long the
 	// operation took.
-	DSOEXPORT uint64	get_profile_ticks();
+	DSOEXPORT uint64_t	get_profile_ticks();
 
 	// Convert a hi-res ticks value into seconds.
-	DSOEXPORT double	profile_ticks_to_seconds(uint64 profile_ticks);
+	DSOEXPORT double	profile_ticks_to_seconds(uint64_t profile_ticks);
 }
 
 

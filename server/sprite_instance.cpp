@@ -2410,7 +2410,7 @@ execute_tag*
 sprite_instance::find_previous_replace_or_add_tag(int frame,
 		int depth, int id)
 {
-	uint32 depth_id = ((depth & 0x0FFFF) << 16) | (id & 0x0FFFF);
+	uint32_t depth_id = ((depth & 0x0FFFF) << 16) | (id & 0x0FFFF);
 
 	for (int f = frame - 1; f >= 0; f--)
 	{

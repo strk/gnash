@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: PlaceObject2Tag.cpp,v 1.1 2007/04/11 14:20:21 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.2 2007/04/11 17:54:22 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -104,7 +104,7 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 			break;
 		}
 
-		uint8 ch = key::INVALID;
+		uint8_t ch = key::INVALID;
 
 		if (flags & (1 << 17))	// has keypress event
 		{
@@ -385,10 +385,10 @@ PlaceObject2Tag::execute_state_reverse(sprite_instance* m, int frame)
     }
 }
 
-uint32
+uint32_t
 PlaceObject2Tag::get_depth_id_of_replace_or_add_tag() const
 {
-	uint32 depthid = 0;
+	uint32_t depthid = 0;
 	if (m_place_type == PLACE || m_place_type == REPLACE)
 	{
 		int id = -1;

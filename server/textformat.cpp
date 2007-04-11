@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: textformat.cpp,v 1.23 2007/04/08 15:00:12 nihilus Exp $
+// $Id: textformat.cpp,v 1.24 2007/04/11 17:54:21 bjacques Exp $
 //
 
 #include "log.h"
@@ -185,7 +185,7 @@ as_value textformat_setformat(const fn_call& fn)
 
   if (obj->get_member("color", &method)) {
     //log_msg("Color exists and is set to %f\n", method.to_number());
-    obj->obj.colorSet((uint32)method.to_number());
+    obj->obj.colorSet((uint32_t)method.to_number());
   }
 
   if (obj->get_member("indent", &method)) {

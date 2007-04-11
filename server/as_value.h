@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.41 2007/04/02 22:45:09 nihilus Exp $ */
+/* $Id: as_value.h,v 1.42 2007/04/11 17:54:21 bjacques Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -167,12 +167,12 @@ public:
 		// continues to work.
 
 #if (WCHAR_MAX != MAXINT)
-		tu_string::encode_utf8_from_wchar(&m_string_value, (const uint16 *)wstr);
+		tu_string::encode_utf8_from_wchar(&m_string_value, (const uint16_t *)wstr);
 #else
 # if (WCHAR_MAX != MAXSHORT)
 # error "Can't determine the size of wchar_t"
 # else
-		tu_string::encode_utf8_from_wchar(&m_string_value, (const uint32 *)wstr);
+		tu_string::encode_utf8_from_wchar(&m_string_value, (const uint32_t *)wstr);
 # endif
 #endif
 	}
