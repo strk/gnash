@@ -1,3 +1,7 @@
+2007-04-11 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/cxform.h: include required inttypes.h
+		
 2007-04-11 Sandro Santilli <strk@keybit.net>
 
 	* server/: Makefile.am, gnash.h, types.cpp, cxform.{cpp,h},

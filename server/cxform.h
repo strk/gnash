@@ -22,6 +22,7 @@
 #endif
 
 #include "tu_config.h" // for DSOEXPORT
+#include <inttypes.h> // for uint8_t
 
 #include <iosfwd>
 
