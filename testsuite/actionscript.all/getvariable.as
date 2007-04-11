@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.8 2007/04/10 14:17:15 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.9 2007/04/11 05:42:25 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -311,6 +311,25 @@ asm {
 };
 check_equals(typeof(checkpoint), 'undefined');
 check_equals(typeof(invalid), 'undefined');
+
+
+//-----------------------------------------------------------------------
+// Check 'path and var'
+//-----------------------------------------------------------------------
+func = function () 
+{ 
+	var xx = 1;
+	asm {	
+		push '/:xx'
+		push '2'
+		setvariable
+	};
+	check_equals(xx, 1);
+	check_equals(_root.xx, 2);
+};
+
+func();
+
 
 //-----------------------------------------------------------------------
 // TODO: try use of 'with' stack

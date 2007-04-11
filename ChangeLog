@@ -2,6 +2,8 @@
 
 	* server/as_environment.cpp:
 	  don't trim of the last "/" in parse_path(), fix parsing path in format "/:x".
+	* testsuite/actionscript.all/getvariable.as:
+	  add tests
 	  
 2007-04-10 Sandro Santilli <strk@keybit.net>
 
