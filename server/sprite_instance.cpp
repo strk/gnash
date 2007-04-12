@@ -1914,6 +1914,9 @@ sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
 	// We should not copy 'm_action_buffer' since the 'm_method' already contains it
 	newsprite->set_event_handlers(get_event_handlers());
 
+	// Copy drawable
+	newsprite->_drawable = new DynamicShape(*_drawable);
+
 	parent->m_display_list.place_character(
 		newsprite.get(),
 		depth,

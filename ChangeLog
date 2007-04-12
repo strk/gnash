@@ -1,5 +1,12 @@
 2007-04-12 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (duplicateMovieClip): 
+	  Duplicate also the drawable.
+	* testsuite/misc-ming.all/displaylist_depths_test.c:
+	  More successes.
+
+2007-04-12 Sandro Santilli <strk@keybit.net>
+
 	* server/matrix.{cpp,h}: add transform and transform_by_inverse
 	  for Range2d<float> type.
 	* server/character.h: add a getBounds() virutual method.
