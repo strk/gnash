@@ -1,3 +1,8 @@
+2007-04-11 Bastiaan Jacques
+
+	* server/asobj/string.cpp: from_char_code: create a wide string
+	in case the user tries to create one.
+
 2007-04-11 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/sprite_instance.cpp: uint32 -> uint32_t.
@@ -10,20 +15,20 @@
 2007-04-11 Antti Ajanki <antti.ajanki@iki.fi>
 	
 	*  gui/gtk.cpp gui/gtksup.h gui/gui.cpp gui/gui.h
-    	*  gui/kde.cpp gui/kde_glue.h gui/kdesup.h
-	*  moves the handling of GUI shortcuts (Crtl+R for restarting the 
-	   movie, Ctrl+Q for quiting, etc.) form GtkGui to base class Gui. 
-	   This way all GUIs can inherit the same code instead of having 
-	   to duplicate it.
-           adds keyboard handling for the KdeGui using this new interface. 
-           Currently KdeGui has no support for keyboard input. 
+	*  gui/kde.cpp gui/kde_glue.h gui/kdesup.h:
+	moves the handling of GUI shortcuts (Crtl+R for restarting the 
+	movie, Ctrl+Q for quiting, etc.) form GtkGui to base class Gui. 
+	This way all GUIs can inherit the same code instead of having 
+	to duplicate it.
+	adds keyboard handling for the KdeGui using this new interface.
+	Currently KdeGui has no support for keyboard input. 
 
-	    The destructor of KdeGlue deletes _drawing_area object even though 
-            it is not owned by KdeGlue. The _drawing_area is actually the 
-            _qwidget object from KdeGui and is (correctly) deleted at the 
-            destructor of 
-            KdeGui. This double-free error causes a segfault when closing 
-            Gnash. 
+	The destructor of KdeGlue deletes _drawing_area object even though 
+	it is not owned by KdeGlue. The _drawing_area is actually the 
+	_qwidget object from KdeGui and is (correctly) deleted at the 
+	destructor of 
+	KdeGui. This double-free error causes a segfault when closing 
+	Gnash. 
 
 2007-04-11 Sandro Santilli <strk@keybit.net>
 
@@ -107,6 +112,7 @@
 	* gui/fltk.cpp: Fix compilation by adding statics for GUI methods
 	that became nonstatic. Also fix some warnings.
 	* all over the place: Replace SDL integer type names by standard ones.
+	Thanks to Ann for writing a Perl script to do search-and-replace.
 
 2007-04-11 Sandro Santilli <strk@keybit.net>
 

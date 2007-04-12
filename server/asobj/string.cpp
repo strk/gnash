@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.25 2007/03/29 08:44:05 strk Exp $ */
+/* $Id: string.cpp,v 1.26 2007/04/12 07:09:06 bjacques Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -403,16 +403,16 @@ string_index_of(const fn_call& fn)
 static as_value
 string_from_char_code(const fn_call& fn)
 {
-    std::string result;
+    std::wstring result;
 
     // isn't this function supposed to take one argument?
 
     for (unsigned int i = 0; i < fn.nargs; i++) {
-        uint32_t c = fn.arg(i).to_number<uint32_t>();
+        wchar_t c = fn.arg(i).to_number<wchar_t>();
         result += c;
     }
 
-    return as_value(result);
+    return as_value(result.c_str());
 }
 
 static as_value

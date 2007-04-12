@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.84 2007/04/12 07:02:15 nihilus Exp $ */
+/* $Id: gtk.cpp,v 1.85 2007/04/12 07:09:06 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1403,3 +1403,4 @@ GtkGui::createControlMenu(GtkWidget *obj)
 }
 
 } // end of namespace gnash
+
