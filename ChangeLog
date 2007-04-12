@@ -1,5 +1,7 @@
 2007-04-12 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/string.cpp (fromCharCode): revert bastiaan change
+	  breaking existing tests.
 	* server/character.{cpp,h}: add set_x_scale and set_y_scale
 	  methods to reduce code messing with matrices. Changed
 	  {x,y}scale_getset and {width,height}_getset to use 
