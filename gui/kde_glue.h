@@ -18,7 +18,7 @@
 //
 
 
-/* $Id: kde_glue.h,v 1.6 2006/10/29 18:34:10 rsavoye Exp $ */
+/* $Id: kde_glue.h,v 1.7 2007/04/12 06:51:04 nihilus Exp $ */
 
 #include "gnash.h"
 
@@ -30,7 +30,7 @@ namespace gnash
 class KdeGlue
 {
   public:
-    virtual ~KdeGlue() { delete _drawing_area; }
+    virtual ~KdeGlue() { };
     virtual bool init(int argc, char **argv[]) = 0;
 
     virtual void prepDrawingArea(QWidget *drawing_area) = 0;
