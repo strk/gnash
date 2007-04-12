@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.65 2007/04/12 09:14:36 strk Exp $ */
+/* $Id: character.h,v 1.66 2007/04/12 11:35:30 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -399,17 +399,25 @@ public:
     virtual void	display() {}
 
     	/// Returns local, untransformed height of this character in TWIPS
-	virtual float	get_height() const
+	//
+	/// Use getBounds() if you need more then simply the height.
+	///
+	float get_height() const
 	{
-		log_error("a character class didn't override get_height: %s", typeid(*this).name());
+		geometry::Range2d<float> bounds = getBounds();
+		if ( bounds.isFinite() ) return bounds.height();
     		return 0;
 	}
 
     	/// Returns local, untransformed width of this character in TWIPS
-	virtual float	get_width() const
+	//
+	/// Use getBounds() if you need more then simply the width.
+	///
+	float get_width() const
 	{
-		log_error("a character class didn't override get_width: %s", typeid(*this).name());
-		return 0;
+		geometry::Range2d<float> bounds = getBounds();
+		if ( bounds.isFinite() ) return bounds.width();
+    		return 0;
 	}
 
     	/// Returns local, untransformed bounds of this character in TWIPS

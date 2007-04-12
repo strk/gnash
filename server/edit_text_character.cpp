@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.51 2007/04/03 17:21:38 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.52 2007/04/12 11:35:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1289,32 +1289,6 @@ edit_text_character::registerTextVariable()
 	sprite->set_textfield_variable(varname, this);
 
 	_text_variable_registered=true;
-}
-
-float
-edit_text_character::get_height() const
-{
-	// @@ TODO should implement this in
-	// character and inherit into both here and sprite_instance
-	rect	transformed_rect;
-	transformed_rect.enclose_transformed_rect(get_world_matrix(), m_def->get_bounds());
-	return transformed_rect.height();
-
-	log_error("%s: not implmented yet", __PRETTY_FUNCTION__);
-	return 0;
-}
-
-float
-edit_text_character::get_width() const
-{
-	// @@ TODO should implement this in
-	// character and inherit into both here and sprite_instance
-	rect	transformed_rect;
-	transformed_rect.enclose_transformed_rect(get_world_matrix(), m_def->get_bounds());
-	return transformed_rect.width();
-
-	log_error("%s: not implmented yet", __PRETTY_FUNCTION__);
-	return 0;
 }
 
 void

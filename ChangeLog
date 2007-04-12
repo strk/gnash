@@ -1,5 +1,15 @@
 2007-04-12 Sandro Santilli <strk@keybit.net>
 
+	* server/: button_character_instance.{cpp,h},
+	  character.{cpp,h}, edit_text_character.{cpp,h},
+	  generic_character.h, sprite_instance.{cpp,h}:
+	  get_width() and get_height() made non-virtual
+	  methods using getBounds() internally.
+	  Fixed _width, _height, _xscale, _yscale and _rotation
+	  getter/setter to call valueOf when available.
+
+2007-04-12 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (duplicateMovieClip): 
 	  Duplicate also the drawable.
 	* testsuite/misc-ming.all/displaylist_depths_test.c:

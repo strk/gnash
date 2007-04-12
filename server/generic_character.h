@@ -70,22 +70,6 @@ public:
 	    do_display_callback();
 	}
 
-    // @@ tulrich: these are used for finding bounds; TODO
-    // need to do this using enclose_transformed_rect(),
-    // not by scaling the local height/width!
-
-	virtual float	get_height() const
-	{
-		// Verified using samples/test_rotation.swf
-		return m_def->get_height_local();
-	}
-
-	virtual float	get_width() const
-	{
-		// Verified using samples/test_rotation.swf
-		return m_def->get_width_local();
-	}
-
 	geometry::Range2d<float> getBounds() const
 	{
 		return m_def->get_bound().getRange();

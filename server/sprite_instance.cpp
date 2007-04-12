@@ -1463,48 +1463,6 @@ public:
 	}
 };
 
-/// A DisplayList visitor used to compute its overall height.
-//
-/// TODO: this seems bogus actually, as it will just return
-///       the height of the tallest character in the list !!
-///
-class HeightFinder {
-public:
-	float _h;
-	HeightFinder(): _h(0) {}
-	void operator() (character* ch)
-	{
-		float ch_h = ch->get_height();
-		if (ch_h > _h) {
-			_h = ch_h;
-		}
-	}
-	float getHeight() {
-		return _h;
-	}
-};
-
-/// A DisplayList visitor used to compute its overall width.
-//
-/// TODO: this seems bogus actually, as it will just return
-///       the width of the widest character in the list !!
-///
-class WidthFinder {
-public:
-	float _w;
-	WidthFinder(): _w(0) {}
-	void operator() (character* ch) 
-	{
-		float ch_w = ch->get_width();
-		if (ch_w > _w) {
-			_w = ch_w;
-		}
-	}
-	float getWidth() {
-		return _w;
-	}
-};
-
 /// A DisplayList visitor used to extract script characters
 //
 /// Script characters are characters created or transformed
@@ -2997,40 +2955,6 @@ void sprite_instance::restart()
     // Construct the sprite again
     construct();
 
-}
-
-float sprite_instance::get_height() const
-{
-	// TODO: FIXME: this whole thing is bogus,
-	//       we should extract the actual bounds
-	//       and return their height
-
-	HeightFinder f;
-	// the const_cast is just to avoid defining a const version
-	// of DisplayList::visitForward, HeightFinder will NOT
-	// modify the DisplayList elements in any way
-	const_cast<DisplayList&>(m_display_list).visitAll(f);
-	float h = f.getHeight();
-	float hd = _drawable->get_height_local();
-	if ( hd > h ) h = hd;
-	return h;
-}
-
-float sprite_instance::get_width() const
-{
-	// TODO: FIXME: this whole thing is bogus,
-	//       we should extract the actual bounds
-	//       and return their width
-
-	WidthFinder f;
-	// the const_cast is just to avoid defining a const version
-	// of DisplayList::visitForward, WidthFinder will NOT
-	// modify the DisplayList elements in any way
-	const_cast<DisplayList&>(m_display_list).visitAll(f);
-	float w = f.getWidth(); 
-	float wd = _drawable->get_width_local();
-	if ( wd > w ) w = wd;
-	return w;
 }
 
 character*

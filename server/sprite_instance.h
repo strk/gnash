@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.95 2007/04/12 09:14:36 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.96 2007/04/12 11:35:30 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -135,10 +135,6 @@ public:
         movie_definition* get_movie_definition() {
                 return m_def.get();
         }
-
-	float get_width() const;
-
-	float get_height() const;
 
 	/// Get the composite bounds of all component drawing elements
 	geometry::Range2d<float> getBounds() const;

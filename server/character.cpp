@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.31 2007/04/12 09:14:36 strk Exp $ */
+/* $Id: character.cpp,v 1.32 2007/04/12 11:35:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -250,7 +250,7 @@ character::x_getset(const fn_call& fn)
 	else // setter
 	{
 		matrix m = ptr->get_matrix();
-		m.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
+		m.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number(&(fn.env()))));
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -272,7 +272,7 @@ character::y_getset(const fn_call& fn)
 	else // setter
 	{
 		matrix m = ptr->get_matrix();
-		m.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
+		m.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number(&(fn.env()))));
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -296,7 +296,7 @@ character::xscale_getset(const fn_call& fn)
 	{
 		matrix m = ptr->get_matrix();
 
-		double scale_percent = fn.arg(0).to_number();
+		double scale_percent = fn.arg(0).to_number(&(fn.env()));
 
 		// Handle bogus values
 		if (isnan(scale_percent))
@@ -348,7 +348,7 @@ character::yscale_getset(const fn_call& fn)
 	{
 		matrix m = ptr->get_matrix();
 
-		double scale_percent = fn.arg(0).to_number();
+		double scale_percent = fn.arg(0).to_number(&(fn.env()));
 
 		// Handle bogus values
 		if (isnan(scale_percent))
@@ -468,11 +468,13 @@ character::width_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
+	// Bounds are used for both getter and setter
+	geometry::Range2d<float> bounds = ptr->getBounds();
+
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
 		float w = 0;
-		geometry::Range2d<float> bounds = ptr->getBounds();
 		if ( bounds.isFinite() )
 		{
 			matrix m = ptr->get_matrix();
@@ -484,14 +486,13 @@ character::width_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		// @@ tulrich: is parameter in world-coords or local-coords?
 		matrix m = ptr->get_matrix();
-		m.m_[0][0] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
-		float w = ptr->get_width();
-		if (fabsf(w) > 1e-6f)
-		{
-			m.m_[0][0] /= w;
-		}
+
+		double newwidth = fn.arg(0).to_number(&(fn.env()));
+		m.m_[0][0] = infinite_to_fzero(PIXELS_TO_TWIPS(newwidth));
+
+		if ( bounds.isFinite() ) m.m_[0][0] /= bounds.width();
+
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -503,11 +504,13 @@ character::height_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
 
+	// Bounds are used for both getter and setter
+	geometry::Range2d<float> bounds = ptr->getBounds();
+
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
 		float h = 0;
-		geometry::Range2d<float> bounds = ptr->getBounds();
 		if ( bounds.isFinite() )
 		{
 			matrix m = ptr->get_matrix();
@@ -519,14 +522,13 @@ character::height_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		// @@ tulrich: is parameter in world-coords or local-coords?
 		matrix m = ptr->get_matrix();
-		m.m_[1][1] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
-		float h = ptr->get_height(); 
-		if (fabsf(h) > 1e-6f)
-		{
-			m.m_[1][1] /= h;
-		}
+
+		double newheight = fn.arg(0).to_number(&(fn.env()));
+		m.m_[1][1] = infinite_to_fzero(PIXELS_TO_TWIPS(newheight));
+
+		if ( bounds.isFinite() ) m.m_[1][1] /= bounds.height();
+
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -558,7 +560,7 @@ character::rotation_getset(const fn_call& fn)
 		float x_scale = m.get_x_scale();
 		float y_scale = m.get_y_scale();
 		// input is in degrees
-		float rotation = (float) fn.arg(0).to_number() * float(M_PI) / 180.f;
+		float rotation = (float) fn.arg(0).to_number(&(fn.env())) * float(M_PI) / 180.f;
 		m.set_scale_rotation(x_scale, y_scale, rotation);
 
 		ptr->set_matrix(m);

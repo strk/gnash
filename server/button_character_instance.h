@@ -20,7 +20,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.18 2007/04/12 09:14:36 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.19 2007/04/12 11:35:30 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -134,14 +134,6 @@ public:
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 	
-
-	// not sure if we need to override this one.
-	//virtual const char*	get_text_value() const { return NULL; }	// edit_text_character overrides this
-	
-	virtual float get_width() const;
-
-	virtual float get_height() const;
-
 	geometry::Range2d<float> getBounds() const;
 	
 	static as_value enabled_getset(const fn_call& fn);

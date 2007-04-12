@@ -91,9 +91,6 @@ public:
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 
-	virtual float	get_height() const;
-	virtual float	get_width() const;
-
 	geometry::Range2d<float> getBounds() const
 	{
 		return m_def->get_bounds().getRange();

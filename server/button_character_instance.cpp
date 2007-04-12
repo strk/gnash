@@ -790,46 +790,6 @@ button_character_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 
 }
 
-float
-button_character_instance::get_width() const
-{
-	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
-	{
-		button_record&	rec = m_def->m_button_records[i];
-		if (m_record_character[i] == NULL)
-		{
-			continue;
-		}
-		if ((m_mouse_state == UP && rec.m_up)
-		    || (m_mouse_state == DOWN && rec.m_down)
-		    || (m_mouse_state == OVER && rec.m_over))
-		{
-			return m_record_character[i]->get_width();
-		}
-	}
-	return 0.0;
-}
-
-float
-button_character_instance::get_height() const
-{
-	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
-	{
-		button_record&	rec = m_def->m_button_records[i];
-		if (m_record_character[i] == NULL)
-		{
-			continue;
-		}
-		if ((m_mouse_state == UP && rec.m_up)
-		    || (m_mouse_state == DOWN && rec.m_down)
-		    || (m_mouse_state == OVER && rec.m_over))
-		{
-			return m_record_character[i]->get_height();
-		}
-	}
-	return 0.0;
-}
-
 geometry::Range2d<float>
 button_character_instance::getBounds() const
 {
