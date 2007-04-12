@@ -1,7 +1,7 @@
 2007-04-11 Stephan Peijnik <sp@gnu.org>
 
 	* gui/gtk.cpp: Changed Copyright years from 2005-2007 -> 2005, 2006,
-	  2007
+	  2007. Fixed 'acces'-typo -> 'access'.
 
 2007-04-11 Antti Ajanki <antti.ajanki@iki.fi>
 	

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.83 2007/04/12 06:58:27 nihilus Exp $ */
+/* $Id: gtk.cpp,v 1.84 2007/04/12 07:02:15 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -636,7 +636,7 @@ GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data
     gtk_widget_show (table4);
     gtk_container_add (GTK_CONTAINER (alignment2), table4);
     
-    label13 = gtk_label_new ("Allow remote acces from: ");
+    label13 = gtk_label_new ("Allow remote access from: ");
     gtk_widget_show (label13);
     gtk_table_attach (GTK_TABLE (table4), label13, 0, 1, 0, 1,
                       (GtkAttachOptions) (GTK_FILL),
