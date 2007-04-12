@@ -7,6 +7,8 @@
 
 	* server/asobj/string.cpp: from_char_code: create a wide string
 	in case the user tries to create one.
+	* gui: Reverted Antti's patches, because they appear to be
+	lacking some changes in the gnash::key namespace. Fixes build.
 
 2007-04-11 Markus Gothe <nietzsche@lysator.liu.se>
 

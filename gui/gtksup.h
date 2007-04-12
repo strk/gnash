@@ -158,7 +158,6 @@ class DSOEXPORT GtkGui : public Gui
 #endif
 
     static gnash::key::code gdk_to_gnash_key(guint key);
-    static int gdk_to_gnash_modifier(int state);
     static void             open_file(GtkWidget* dialog, gpointer data);
 
 };

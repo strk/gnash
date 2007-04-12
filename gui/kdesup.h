@@ -70,8 +70,6 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent( QMouseEvent * );
     void mouseMoveEvent(QMouseEvent *event);
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
     void timerEvent(QTimerEvent *);
     void resizeEvent(QResizeEvent *event);
 public slots:
@@ -104,16 +102,12 @@ public:
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
-    virtual void handleKeyEvent(QKeyEvent *event, bool down);
  private:
     QApplication*  _qapp;
     qwidget*       _qwidget;
     KdeOpenGLGlue  _glue;    
 
     QTimer        *_timer;
-
-    gnash::key::code qtToGnashKey(QKeyEvent *event);
-    int qtToGnashModifier(Qt::ButtonState state);
 };
 
 // end of namespace gnash 

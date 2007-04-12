@@ -182,11 +182,11 @@ public:
     /// Key event notification to be called when a key is pressed or depressed
     //
     /// @param k The key code.
-    /// @param modifier Modifier key identifiers from gnash::key::modifier ORed together
+    ///
     /// @param pressed Determines whether the key is being
     ///           pressed (true) or being released (false)
     ///
-    void notify_key_event(gnash::key::code k, int modifier, bool pressed);
+    void notify_key_event(gnash::key::code k, bool pressed);
 
     /// Resize the client area view and the window accordingly.
     //

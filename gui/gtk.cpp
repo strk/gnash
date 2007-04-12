@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.85 2007/04/12 07:09:06 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.86 2007/04/12 09:04:01 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1154,24 +1154,6 @@ GtkGui::gdk_to_gnash_key(guint key)
     return c;
 }
 
-int
-GtkGui::gdk_to_gnash_modifier(int state)
-{
-    int modifier = gnash::key::MOD_NONE;
-
-    if (state & GDK_SHIFT_MASK) {
-      modifier = modifier | gnash::key::MOD_SHIFT;
-    }
-    if (state & GDK_CONTROL_MASK) {
-      modifier = modifier | gnash::key::MOD_CONTROL;
-    }
-    if (state & GDK_MOD1_MASK) {
-      modifier = modifier | gnash::key::MOD_ALT;
-    }
-
-    return modifier;
-}
-
 gboolean
 GtkGui::key_press_event(GtkWidget *const /*widget*/,
                 GdkEventKey *const event,
@@ -1183,10 +1165,52 @@ GtkGui::key_press_event(GtkWidget *const /*widget*/,
 
     /* Forward key event to gnash */
     gnash::key::code	c = gdk_to_gnash_key(event->keyval);
-    int mod = gdk_to_gnash_modifier(event->state);
     
     if (c != gnash::key::INVALID) {
-        gui->notify_key_event(c, mod, true);
+        gui->notify_key_event(c, true);
+    }
+
+    /* Handle GUI shortcuts */
+    if (event->length <= 0) {
+        return true;
+    }
+    unsigned int key = gdk_unicode_to_keyval(event->keyval);
+    if (event->state == GDK_SHIFT_MASK) {
+        dbglogfile << "Got Shift-key: " << key << endl;
+    }
+    if (event->state == GDK_CONTROL_MASK) {
+        dbglogfile << "Got Control-key: " << key << endl;
+        switch(key) {
+          case 'r':
+              gui->menu_restart();
+              break;
+          case 'p':
+              gui->menu_pause();
+              break;
+          case 'q':
+          case 'w':
+              gui->menu_quit();
+              break;
+          default:
+              break;
+        }
+    } else {
+#if 0
+        dbglogfile << "Got key: '" << (char) key
+                   << "' its name is: " << gdk_keyval_name(key)
+                   << " it's value is: " << (int)key
+                   << " hwkeycode: " << event->hardware_keycode << endl;
+#endif
+        switch (key) {
+          case '[':
+              menuitem_step_forward_callback(NULL, NULL);
+              break;
+          case ']':
+              menuitem_step_backward_callback(NULL, NULL);
+              break;
+          default:
+              break;
+        }
     }
         
     return true;
@@ -1204,10 +1228,9 @@ GtkGui::key_release_event(GtkWidget *const /*widget*/,
 
     /* Forward key event to gnash */
     gnash::key::code	c = gdk_to_gnash_key(event->keyval);
-    int mod = gdk_to_gnash_modifier(event->state);
     
     if (c != gnash::key::INVALID) {
-        gui->notify_key_event(c, mod, false);
+        gui->notify_key_event(c, false);
     }
     
     return true;

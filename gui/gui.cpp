@@ -277,45 +277,16 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 }
 
 void
-Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed) 
+Gui::notify_key_event(gnash::key::code k, bool pressed) 
 {
 	movie_root* m = get_current_root();
 
+	//log_msg("mouse @ %d,%d", x, y);
 	if ( m->notify_key_event(k, pressed) )
 	{
 		// any action triggered by the
 		// event required screen refresh
 		display(m);
-	}
-
-	/* Handle GUI shortcuts */
-	if (!pressed) return;
-	if (modifier & gnash::key::MOD_CONTROL) {
-		switch(k) {
-		case gnash::key::R:
-			menu_restart();
-			break;
-		case gnash::key::P:
-			menu_pause();
-			break;
-		case gnash::key::Q:
-		case gnash::key::W:
-			menu_quit();
-			break;
-		default:
-			break;
-		}
-	} else {
-		switch (k) {
-		case gnash::key::LEFT_BRACKET:
-			menu_step_forward();
-			break;
-		case gnash::key::RIGHT_BRACKET:
-			menu_step_backward();
-			break;
-		default:
-			break;
-		}
 	}
 }
 
