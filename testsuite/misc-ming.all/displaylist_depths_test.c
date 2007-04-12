@@ -235,40 +235,40 @@ main(int argc, char** argv)
 	check_equals(mo, "typeof(staticmc_dup.child)", "'movieclip'"); 
 
 	// Note that dynamicmc_dup is at negative depth
-	check_equals(mo, "dynamicmc_dup._width", "dynamicmc._width"); 
+	xcheck_equals(mo, "dynamicmc_dup._width", "dynamicmc._width"); 
 	xcheck_equals(mo, "parseInt(dynamicmc_dup._width/10)", "6"); 
 	check_equals(mo, "typeof(dynamicmc.child)", "'movieclip'"); 
 	check_equals(mo, "typeof(dynamicmc_dup.child)", "'undefined'"); 
 
-	check_equals(mo, "dynamicmc_2000_dup._width", "dynamicmc_2000._width"); 
+	xcheck_equals(mo, "dynamicmc_2000_dup._width", "dynamicmc_2000._width"); 
 	xcheck_equals(mo, "parseInt(dynamicmc_2000_dup._width/10)", "6"); 
 	check_equals(mo, "typeof(dynamicmc_2000.child)", "'movieclip'"); 
 	check_equals(mo, "typeof(dynamicmc_2000_dup.child)", "'undefined'"); 
 
-	check_equals(mo, "dynamicmc_30000_dup._width", "dynamicmc_30000._width"); 
+	xcheck_equals(mo, "dynamicmc_30000_dup._width", "dynamicmc_30000._width"); 
 	xcheck_equals(mo, "parseInt(dynamicmc_30000_dup._width/10)", "6"); 
 	check_equals(mo, "typeof(dynamicmc_30000.child)", "'movieclip'"); 
 	check_equals(mo, "typeof(dynamicmc_30000_dup.child)", "'undefined'"); 
 
 	// Note that dynamicmc0_dup is at negative depth
-	check_equals(mo, "dynamicmc0_dup._width", "dynamicmc0._width"); 
+	xcheck_equals(mo, "dynamicmc0_dup._width", "dynamicmc0._width"); 
 	xcheck_equals(mo, "parseInt(dynamicmc0_dup._width/10)", "6"); 
 	check_equals(mo, "typeof(dynamicmc0.child)", "'movieclip'"); 
 	check_equals(mo, "typeof(dynamicmc0_dup.child)", "'undefined'"); 
 
 	// Note that dynamicmc1048575_dup is at negative depth
-	check_equals(mo, "dynamicmc1048575_dup._width", "dynamicmc1048575._width"); 
+	xcheck_equals(mo, "dynamicmc1048575_dup._width", "dynamicmc1048575._width"); 
 	xcheck_equals(mo, "parseInt(dynamicmc1048575_dup._width/10)", "6"); 
 	check_equals(mo, "typeof(dynamicmc1048575.child)", "'movieclip'"); 
 	check_equals(mo, "typeof(dynamicmc1048575_dup.child)", "'undefined'"); 
 
-	check_equals(mo, "dynamicmc1048576_dup._width", "dynamicmc1048576._width"); 
-	xcheck_equals(mo, "parseInt(dynamicmc1048576._width/10)", "6"); 
+	xcheck_equals(mo, "dynamicmc1048576_dup._width", "dynamicmc1048576._width"); 
+	check_equals(mo, "parseInt(dynamicmc1048576._width/10)", "6"); 
 	check_equals(mo, "typeof(dynamicmc1048576.child)", "'movieclip'"); 
 	check_equals(mo, "typeof(dynamicmc1048576_dup.child)", "'undefined'"); 
 
-	check_equals(mo, "dynamicmc2130690045_dup._width", "dynamicmc2130690045._width"); 
-	xcheck_equals(mo, "parseInt(dynamicmc2130690045._width/10)", "6"); 
+	xcheck_equals(mo, "dynamicmc2130690045_dup._width", "dynamicmc2130690045._width"); 
+	check_equals(mo, "parseInt(dynamicmc2130690045._width/10)", "6"); 
 	check_equals(mo, "typeof(dynamicmc2130690045.child)", "'movieclip'"); 
 	check_equals(mo, "typeof(dynamicmc2130690045_dup.child)", "'undefined'"); 
 

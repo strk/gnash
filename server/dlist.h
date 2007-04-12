@@ -269,6 +269,17 @@ public:
 	template <class V>
 	inline void visitBackward(V& visitor);
 
+	/// \brief 
+	/// Visit each and all character in the list.
+	//
+	/// Scan happens in arbitrary order, if order is
+	/// important use visitBackward or visitForward
+	///
+	/// The visitor functor will receive a character pointer,
+	/// it's return value is not used so can return void.
+	template <class V>
+	inline void visitAll(V& visitor);
+
 	/// dump list to given output stream (debugging)
 	void dump(std::ostream& os) const;
 
@@ -350,6 +361,18 @@ DisplayList::visitBackward(V& visitor)
 	{
 		DisplayItem& di = *it;
 		if ( ! visitor(di.get()) ) break;
+	}
+}
+
+template <class V>
+void
+DisplayList::visitAll(V& visitor)
+{
+	for (iterator it = _characters.begin(),
+			itEnd = _characters.end();
+		it != itEnd; ++it)
+	{
+		visitor(it->get());
 	}
 }
 

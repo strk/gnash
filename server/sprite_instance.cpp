@@ -25,7 +25,6 @@
 
 #include "log.h" 
 #include "action.h" // for call_method_parsed (call_method_args)
-//#include "gnash.h"
 #include "render.h"  // for bounds_in_clipping_area()
 #include "sprite_instance.h"
 #include "movie_definition.h"
@@ -1422,13 +1421,12 @@ class HeightFinder {
 public:
 	float _h;
 	HeightFinder(): _h(0) {}
-	bool operator() (character* ch)
+	void operator() (character* ch)
 	{
 		float ch_h = ch->get_height();
 		if (ch_h > _h) {
 			_h = ch_h;
 		}
-		return true; // keep scanning
 	}
 	float getHeight() {
 		return _h;
@@ -1444,13 +1442,12 @@ class WidthFinder {
 public:
 	float _w;
 	WidthFinder(): _w(0) {}
-	bool operator() (character* ch) 
+	void operator() (character* ch) 
 	{
 		float ch_w = ch->get_width();
 		if (ch_w > _w) {
 			_w = ch_w;
 		}
-		return true; // keep scanning
 	}
 	float getWidth() {
 		return _w;
@@ -1473,7 +1470,7 @@ public:
 		_staticChars(staticChars)
 	{}
 
-	bool operator() (character* ch) 
+	void operator() (character* ch) 
 	{
 		// TODO: Are script-transformed object to be kept ?
 		//       Need a testcase for this
@@ -1488,7 +1485,6 @@ public:
 		{
 			_staticChars.push_back(ch);
 		}
-		return true; // keep scanning
 	}
 };
 
@@ -1505,10 +1501,9 @@ public:
 		_chars(chars)
 	{}
 
-	bool operator() (character* ch) 
+	void operator() (character* ch) 
 	{
 		_chars.push_back(ch);
-		return true; // keep scanning
 	}
 };
 
@@ -2271,7 +2266,7 @@ sprite_instance::resetDisplayList()
 	std::vector<character*> charsToAdd; 
 	std::vector<character*> charsToKeep; 
 	ScriptObjectsFinder scriptObjFinder(charsToAdd, charsToKeep);
-	m_display_list.visitForward(scriptObjFinder);
+	m_display_list.visitAll(scriptObjFinder);
 
 	// Resort frame0 DisplayList as depth of
 	// characters in it might have been
@@ -2410,7 +2405,7 @@ execute_tag*
 sprite_instance::find_previous_replace_or_add_tag(int frame,
 		int depth, int id)
 {
-	uint32_t depth_id = ((depth & 0x0FFFF) << 16) | (id & 0x0FFFF);
+	uint32 depth_id = ((depth & 0x0FFFF) << 16) | (id & 0x0FFFF);
 
 	for (int f = frame - 1; f >= 0; f--)
 	{
@@ -2952,22 +2947,36 @@ void sprite_instance::restart()
 
 float sprite_instance::get_height() const
 {
+	// TODO: FIXME: this whole thing is bogus,
+	//       we should extract the actual bounds
+	//       and return their height
+
 	HeightFinder f;
 	// the const_cast is just to avoid defining a const version
 	// of DisplayList::visitForward, HeightFinder will NOT
 	// modify the DisplayList elements in any way
-	const_cast<DisplayList&>(m_display_list).visitForward(f);
-	return f.getHeight(); 
+	const_cast<DisplayList&>(m_display_list).visitAll(f);
+	float h = f.getHeight();
+	float hd = _drawable->get_height_local();
+	if ( hd > h ) h = hd;
+	return h;
 }
 
 float sprite_instance::get_width() const
 {
+	// TODO: FIXME: this whole thing is bogus,
+	//       we should extract the actual bounds
+	//       and return their width
+
 	WidthFinder f;
 	// the const_cast is just to avoid defining a const version
 	// of DisplayList::visitForward, WidthFinder will NOT
 	// modify the DisplayList elements in any way
-	const_cast<DisplayList&>(m_display_list).visitForward(f);
-	return f.getWidth(); 
+	const_cast<DisplayList&>(m_display_list).visitAll(f);
+	float w = f.getWidth(); 
+	float wd = _drawable->get_width_local();
+	if ( wd > w ) w = wd;
+	return w;
 }
 
 character*

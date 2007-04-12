@@ -1,3 +1,18 @@
+2007-04-11 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/shape_character_def.cpp (compute_bound):
+	  skip anchor point of empty paths; include both control
+	  and anchor point of any edge.
+	* server/dlist.h: add a visitAll() method for unconditional
+	  full scan.
+	* server/sprite_instance.cpp: optimize WidthFinder, HeightFinder,
+	  ScriptObjectFinder and CharacterExtractor to return void
+	  (can be used by visitAll); (get_width, get_height): include
+	  scan of DrawingAPI canvas.
+	* testsuite/actionscript.all/MovieClip.as, 
+	  testsuite/misc-ming.all/displaylist_depths_test.c:
+	  few more successes.
+
 2007-04-11 Ann Barcomb <ann@lulu.com>
 
 	* devtools/lib/Gnash/Distribution.pm: made it more

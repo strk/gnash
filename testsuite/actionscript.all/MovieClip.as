@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.52 2007/04/11 17:10:12 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.53 2007/04/12 05:37:33 strk Exp $";
 
 #include "check.as"
 
@@ -59,23 +59,6 @@ check(mc.getBytesTotal);
 check(mc.getBounds);
 check(mc.globalToLocal);
 check_equals(typeOf(mc.unloadMovie), 'function');
-
-
-//
-// Test getBounds (simple test)
-//
-var bounds = mc.getBounds();
-check_equals(typeof(bounds), "object");
-// Checking for real values would be a bit hard
-// atm, as the loaded Dejagnu.swf file might
-// write stuff all around thus making bounds
-// change often... we'll check it later, with
-// a user defined movieclip (more control over
-// it's bounds)
-check(bounds.xMin != undefined);
-check(bounds.yMin != undefined);
-check(bounds.xMax != undefined);
-check(bounds.yMax != undefined);
 
 // This seems unavailable
 // when targetting SWF > 6
@@ -539,6 +522,7 @@ check_equals(typeof(b.xMin), 'number');
 check_equals(typeof(b.xMax), 'number');
 check_equals(typeof(b.yMin), 'number');
 check_equals(typeof(b.yMax), 'number');
+// Returned number is (2^28/2)-1 twips : any ringing bell ?
 xcheck_equals(b.xMin, 6710886.35);
 xcheck_equals(b.xMax, 6710886.35);
 xcheck_equals(b.yMin, 6710886.35);
@@ -553,8 +537,8 @@ with (draw)
 	lineTo(20, 10);
 	lineTo(10, 10);
 }
-xcheck_equals(draw._width, 10);
-xcheck_equals(draw._height, 20);
+check_equals(draw._width, 10);
+check_equals(draw._height, 20);
 b = draw.getBounds();
 xcheck_equals(b.xMin, 10);
 xcheck_equals(b.xMax, 20);
@@ -581,25 +565,25 @@ xcheck_equals(draw._height, 10);
 
 draw._xscale = 200;
 xcheck_equals(draw._width, 20);
-xcheck_equals(draw._height, 20);
+check_equals(draw._height, 20);
 
 draw._rotation = 0;
 xcheck_equals(draw._width, 20);
-xcheck_equals(draw._height, 20);
+check_equals(draw._height, 20);
 
 draw._visible = true;
 draw._xscale = 100;
-xcheck_equals(draw._width, 10);
-xcheck_equals(draw._height, 20);
+check_equals(draw._width, 10);
+check_equals(draw._height, 20);
 
 draw._yscale = 50;
-xcheck_equals(draw._width, 10);
+check_equals(draw._width, 10);
 xcheck_equals(draw._height, 10);
-xcheck_equals(container._width, 10);
+check_equals(container._width, 10);
 xcheck_equals(container._height, 10);
 
 container._xscale = 800;
-xcheck_equals(draw._width, 10);
+check_equals(draw._width, 10);
 xcheck_equals(draw._height, 10);
 xcheck_equals(container._width, 80);
 xcheck_equals(container._height, 10);
