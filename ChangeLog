@@ -1,3 +1,7 @@
+2007-04-11 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* server/sprite_instance.cpp: uint32 -> uint32_t.
+
 2007-04-11 Stephan Peijnik <sp@gnu.org>
 
 	* gui/gtk.cpp: Changed Copyright years from 2005-2007 -> 2005, 2006,
