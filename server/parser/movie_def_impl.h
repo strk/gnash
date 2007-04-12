@@ -35,10 +35,9 @@
 #include <map> // for CharacterDictionary
 #include <string>
 #include <memory> // for auto_ptr
-#include <boost/thread/mutex.hpp>
+#include <boost/thread/thread.hpp>
 #include <boost/thread/condition.hpp>
 
-#include <pthread.h>
 //
 // Forward declarations
 namespace gnash {
@@ -113,8 +112,8 @@ private:
 
 	movie_def_impl& _movie_def;
 
-	pthread_mutex_t _mutex;
-	pthread_t _thread;
+	mutable boost::mutex _mutex;
+	boost::thread* _thread;
 
 	/// Entry point for the actual thread
 	static void *execute(void* arg);

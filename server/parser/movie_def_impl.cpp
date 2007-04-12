@@ -37,14 +37,12 @@
 #include "GnashException.h" // for parser exception
 #include "execute_tag.h"
 #include "sound_definition.h" // for sound_sample
+#include <boost/bind.hpp> 
 
 #include <memory>
 #include <string>
 #include <unistd.h> 
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
 
 // Increment this when the cache data format changes.
 #define CACHE_FILE_VERSION 4
@@ -74,47 +72,32 @@ namespace gnash
 MovieLoader::MovieLoader(movie_def_impl& md)
 	:
 	_movie_def(md)
-#ifndef WIN32
-	,_thread(0)
-#endif
+	,_thread(NULL)
 {
-#ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	pthread_mutex_init(&_mutex, NULL);
-#endif
-
-#ifdef WIN32
-	_thread.p = 0;
-#endif
 }
 
 MovieLoader::~MovieLoader()
 {
-#ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
-	if ( pthread_mutex_destroy(&_mutex) != 0 )
-	{
-		log_error("Error destroying MovieLoader mutex");
-	}
-#endif
 }
 
 bool
 MovieLoader::started() const
 {
-#ifdef WIN32
-	return _thread.p != NULL;
-#else
-	return _thread != 0;
-#endif
+	boost::mutex::scoped_lock lock(_mutex);
+
+	return _thread != NULL;
 }
 
 bool
 MovieLoader::isSelfThread() const
 {
-#ifdef WIN32
-	return _thread.p == pthread_self().p;
-#else
-	return pthread_self() == _thread;
-#endif
+	boost::mutex::scoped_lock lock(_mutex);
+
+	if (!_thread) {
+		return false;
+	}
+	boost::thread this_thread;
+	return this_thread == *_thread;
 }
 
 void*
@@ -123,12 +106,6 @@ MovieLoader::execute(void* arg)
 	movie_def_impl* md = static_cast<movie_def_impl*>(arg);
 	md->read_all_swf();
 
-	// maybe this frees all resources and that's bad !
-	//pthread_exit(NULL);
-	
-	/* Better to cancel yourself methinks: 'man 3p pthread_cancel' */
-	pthread_cancel(pthread_self());
-        pthread_testcancel();
 	return NULL;
 }
 
@@ -139,12 +116,13 @@ MovieLoader::start()
 	// don't start MovieLoader thread !
 	assert(0);
 #endif
-	if ( pthread_create(&_thread, NULL, execute, &_movie_def) )
-	{
-		return false;
-	}
+	// We have two sanity checks, started() and isSelfThread() which rely
+	// on boost::thread() returning before they are executed. Therefore,
+	// we must employ locking.
+	// Those tests do seem a bit redundant, though...
+	boost::mutex::scoped_lock lock(_mutex);
 
-	// should set some mutexes ?
+	_thread = new boost::thread(boost::bind(execute, &_movie_def));
 
 	return true;
 }
