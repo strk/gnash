@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.66 2007/04/12 11:35:30 strk Exp $ */
+/* $Id: character.h,v 1.67 2007/04/12 16:29:14 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -192,28 +192,40 @@ public:  // TODO: make protected
 	static as_value onmousemove_getset(const fn_call& fn);
 #endif
 
+	/// Getter-setter for _x
 	static as_value x_getset(const fn_call& fn);
 
+	/// Getter-setter for _y
 	static as_value y_getset(const fn_call& fn);
 
+	/// Getter-setter for _xscale
 	static as_value xscale_getset(const fn_call& fn);
 
+	/// Getter-setter for _yscale
 	static as_value yscale_getset(const fn_call& fn);
 
+	/// Getter-setter for _xmouse
 	static as_value xmouse_get(const fn_call& fn);
 
+	/// Getter-setter for _ymouse
 	static as_value ymouse_get(const fn_call& fn);
 
+	/// Getter-setter for _alpha
 	static as_value alpha_getset(const fn_call& fn);
 
+	/// Getter-setter for _visible
 	static as_value visible_getset(const fn_call& fn);
 
+	/// Getter-setter for _width
 	static as_value width_getset(const fn_call& fn);
 
+	/// Getter-setter for _height
 	static as_value height_getset(const fn_call& fn);
 
+	/// Getter-setter for _rotation
 	static as_value rotation_getset(const fn_call& fn);
 
+	/// Getter-setter for _parent 
 	static as_value parent_getset(const fn_call& fn);
 
 	/// @} Common ActionScript getter-setters for characters
@@ -290,6 +302,22 @@ public:
 	      m_matrix = m;
 	    }
 	}
+
+    /// Set the xscale value of current matrix
+    //
+    /// This is used when setting either _xscale or _width.
+    /// See xscale_getset and width_getset
+    ///
+    void set_x_scale(float factor);
+
+    /// Set the yscale value of current matrix
+    //
+    ///
+    /// This is used when setting either _yscale or _height
+    /// See xscale_getset and width_getset
+    ///
+    void set_y_scale(float factor);
+
     const cxform&	get_cxform() const { return m_color_transform; }
     void	set_cxform(const cxform& cx) 
     { 

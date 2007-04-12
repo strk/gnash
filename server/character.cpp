@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.32 2007/04/12 11:35:30 strk Exp $ */
+/* $Id: character.cpp,v 1.33 2007/04/12 16:29:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -318,15 +318,7 @@ character::xscale_getset(const fn_call& fn)
 
 		// input is in percent
 		float scale = (float)scale_percent/100.f;
-
-		// Decompose matrix and insert the desired value.
-		float x_scale = scale;
-		float y_scale = m.get_y_scale();
-		float rotation = m.get_rotation();
-		m.set_scale_rotation(x_scale, y_scale, rotation);
-
-		ptr->set_matrix(m);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
+		ptr->set_x_scale(scale);
 	}
 	return rv;
 
@@ -370,15 +362,7 @@ character::yscale_getset(const fn_call& fn)
 
 		// input is in percent
 		float scale = (float)scale_percent/100.f;
-
-		// Decompose matrix and insert the desired value.
-		float x_scale = m.get_x_scale();
-		float y_scale = scale;
-		float rotation = m.get_rotation();
-		m.set_scale_rotation(x_scale, y_scale, rotation);
-
-		ptr->set_matrix(m);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
+		ptr->set_y_scale(scale);
 	}
 	return rv;
 
@@ -486,15 +470,24 @@ character::width_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		matrix m = ptr->get_matrix();
+		if ( ! bounds.isFinite() )
+		{
+			log_error("FIXME: can't set _width on character with null or world bounds");
+			return rv;
+		}
 
-		double newwidth = fn.arg(0).to_number(&(fn.env()));
-		m.m_[0][0] = infinite_to_fzero(PIXELS_TO_TWIPS(newwidth));
+		double oldwidth = bounds.width();
+		assert(oldwidth>0);
 
-		if ( bounds.isFinite() ) m.m_[0][0] /= bounds.width();
+		double newwidth = PIXELS_TO_TWIPS(fn.arg(0).to_number(&(fn.env())));
+		if ( newwidth <= 0 )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Setting _width=%g ?", newwidth/20);
+			);
+		}
 
-		ptr->set_matrix(m);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
+		ptr->set_x_scale(newwidth/oldwidth);
 	}
 	return rv;
 }
@@ -522,16 +515,26 @@ character::height_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		matrix m = ptr->get_matrix();
+		if ( ! bounds.isFinite() )
+		{
+			log_error("FIXME: can't set _height on character with null or world bounds");
+			return rv;
+		}
 
-		double newheight = fn.arg(0).to_number(&(fn.env()));
-		m.m_[1][1] = infinite_to_fzero(PIXELS_TO_TWIPS(newheight));
+		double oldheight = bounds.height();
+		assert(oldheight>0);
 
-		if ( bounds.isFinite() ) m.m_[1][1] /= bounds.height();
+		double newheight = PIXELS_TO_TWIPS(fn.arg(0).to_number(&(fn.env())));
+		if ( newheight <= 0 )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Setting _height=%g ?", newheight/20);
+			);
+		}
 
-		ptr->set_matrix(m);
-		ptr->transformedByScript(); // m_accept_anim_moves = false; 
+		ptr->set_y_scale(newheight/oldheight);
 	}
+
 	return rv;
 }
 
@@ -710,6 +713,33 @@ character::getUserDefinedEventHandler(const std::string& name) const
 	return func;
 }
 
+void
+character::set_x_scale(float x_scale)
+{
+	matrix m = get_matrix();
+
+	// Decompose matrix and insert the desired value.
+	float y_scale = m.get_y_scale();
+	float rotation = m.get_rotation();
+	m.set_scale_rotation(x_scale, y_scale, rotation);
+
+	set_matrix(m);
+	transformedByScript(); // m_accept_anim_moves = false; 
+}
+
+void
+character::set_y_scale(float y_scale)
+{
+	matrix m = get_matrix();
+
+	// Decompose matrix and insert the desired value.
+	float x_scale = m.get_x_scale();
+	float rotation = m.get_rotation();
+	m.set_scale_rotation(x_scale, y_scale, rotation);
+
+	set_matrix(m);
+	transformedByScript(); // m_accept_anim_moves = false; 
+}
 
 } // namespace gnash
 

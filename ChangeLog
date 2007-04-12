@@ -1,5 +1,15 @@
 2007-04-12 Sandro Santilli <strk@keybit.net>
 
+	* server/character.{cpp,h}: add set_x_scale and set_y_scale
+	  methods to reduce code messing with matrices. Changed
+	  {x,y}scale_getset and {width,height}_getset to use 
+	  these two new functions.
+	* testsuite/server/MatrixTest.cpp: add a few tests for
+	  set_scale_rotation. I'm not sure the tests are correct
+	  thought, I'd like to hear from Martin about that.
+
+2007-04-12 Sandro Santilli <strk@keybit.net>
+
 	* server/: button_character_instance.{cpp,h},
 	  character.{cpp,h}, edit_text_character.{cpp,h},
 	  generic_character.h, sprite_instance.{cpp,h}:

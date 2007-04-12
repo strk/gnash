@@ -28,6 +28,32 @@
 using namespace std;
 using namespace gnash;
 
+// for double comparison
+struct D {
+	double _d;
+	double _t; // tolerance
+
+	D(double d) : _d(d), _t(1e-6) {}
+
+	// Set tolerance
+	D(double d, double t) : _d(d), _t(t) {}
+
+	// Return true if the difference between the two
+	// doubles is below the minimum tolerance defined for the two
+	bool operator==(const D& d)
+	{
+		double tol = std::min(_t, d._t);
+		double delta = fabs(_d - d._d);
+		bool ret = delta < tol;
+		//cout << "D " << _d << "operator==(const D " << d._d <<") returning " << ret << " (delta is " << delta << ") " << endl;
+		return ret;
+	}
+};
+std::ostream& operator<<(std::ostream& os, const D& d)
+{
+	return os << d._d << " [tol: " << d._t << "]";
+}
+
 int
 main(int /*argc*/, char** /*argv*/)
 {
@@ -50,5 +76,37 @@ main(int /*argc*/, char** /*argv*/)
 	invert.set_inverse(identity);
 	check_equals(invert, matrix::identity);
 
+	// Try setting and getting some values
+	matrix m1;
+	m1.set_scale_rotation(1, 3, 0);
+	check_equals(m1.get_x_scale(), 1);
+	check_equals(m1.get_y_scale(), 3);
+	check_equals(m1.get_rotation(), 0);
+	check(!m1.does_flip());
+
+	m1.set_scale_rotation(1.5, 2.5, 0);
+	check_equals(D(m1.get_x_scale()), 1.5);
+	check_equals(D(m1.get_y_scale()), 2.5);
+	check_equals(D(m1.get_rotation()), 0);
+
+	m1.set_scale_rotation(34, 4, 0);
+	check_equals(D(m1.get_x_scale()), 34);
+	check_equals(D(m1.get_y_scale()), 4);
+	check_equals(D(m1.get_rotation()), 0);
+
+	m1.set_scale_rotation(1, 1, 2);
+	check_equals(D(m1.get_x_scale()), 1);
+	check_equals(D(m1.get_y_scale()), 1);
+	check_equals(D(m1.get_rotation()), 2);
+
+	m1.set_scale_rotation(2, 1, 2);
+	xcheck_equals(D(m1.get_x_scale()), 2);
+	xcheck_equals(D(m1.get_y_scale()), 1);
+	check_equals(D(m1.get_rotation()), 2);
+
+	m1.set_scale_rotation(1, 2, 2);
+	xcheck_equals(D(m1.get_x_scale()), 1);
+	xcheck_equals(D(m1.get_y_scale()), 2);
+	check_equals(D(m1.get_rotation()), 2);
 }
 
