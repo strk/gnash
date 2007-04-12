@@ -1,7 +1,23 @@
-// button.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// 
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+// 
+//
+//
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
@@ -812,6 +828,26 @@ button_character_instance::get_height() const
 		}
 	}
 	return 0.0;
+}
+
+geometry::Range2d<float>
+button_character_instance::getBounds() const
+{
+	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	{
+		button_record&	rec = m_def->m_button_records[i];
+		if (m_record_character[i] == NULL)
+		{
+			continue;
+		}
+		if ((m_mouse_state == UP && rec.m_up)
+		    || (m_mouse_state == DOWN && rec.m_down)
+		    || (m_mouse_state == OVER && rec.m_over))
+		{
+			return m_record_character[i]->getBounds();
+		}
+	}
+	return geometry::Range2d<float>(geometry::nullRange);
 }
 
 character*

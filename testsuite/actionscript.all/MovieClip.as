@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.53 2007/04/12 05:37:33 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.54 2007/04/12 09:14:36 strk Exp $";
 
 #include "check.as"
 
@@ -523,10 +523,10 @@ check_equals(typeof(b.xMax), 'number');
 check_equals(typeof(b.yMin), 'number');
 check_equals(typeof(b.yMax), 'number');
 // Returned number is (2^28/2)-1 twips : any ringing bell ?
-xcheck_equals(b.xMin, 6710886.35);
-xcheck_equals(b.xMax, 6710886.35);
-xcheck_equals(b.yMin, 6710886.35);
-xcheck_equals(b.yMax, 6710886.35);
+check_equals(b.xMin, 6710886.35);
+check_equals(b.xMax, 6710886.35);
+check_equals(b.yMin, 6710886.35);
+check_equals(b.yMax, 6710886.35);
 
 with (draw)
 {
@@ -540,52 +540,177 @@ with (draw)
 check_equals(draw._width, 10);
 check_equals(draw._height, 20);
 b = draw.getBounds();
-xcheck_equals(b.xMin, 10);
-xcheck_equals(b.xMax, 20);
-xcheck_equals(b.yMin, 10);
-xcheck_equals(b.yMax, 30);
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 10);
+check_equals(b.yMax, 30);
+b = draw.getBounds(container);
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 10);
+check_equals(b.yMax, 30);
+
+draw._x += 20;
+b = draw.getBounds();
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+b = draw.getBounds(container);
+check_equals(b.xMin, 30);
+check_equals(b.xMax, 40);
+container._x -= 20;
+b = draw.getBounds();
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+b = draw.getBounds(container);
+check_equals(b.xMin, 30);
+check_equals(b.xMax, 40);
+check_equals(b.yMin, 10);
+check_equals(b.yMax, 30);
+check_equals(draw._width, 10); 
+check_equals(draw._height, 20);
+b = draw.getBounds(_root);
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+draw._x -= 20;
+container._x += 20;
 
 draw._rotation = 90;
-xcheck_equals(draw._width, 20);
-xcheck_equals(draw._height, 10);
-b = draw.getBounds();
-xcheck_equals(b.xMin, 10);
-xcheck_equals(b.xMax, 20);
-xcheck_equals(b.yMin, 10);
-xcheck_equals(b.yMax, 30);
-b = draw.getBounds(container);
-xcheck_equals(b.xMin, -30);
+check_equals(draw._width, 20); 
+xcheck_equals(draw._height, 10); 
+b = draw.getBounds(); // these are local, untransformed
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 10);
+check_equals(b.yMax, 30);
+b = draw.getBounds(container); // these are transformed by container draw matrix
+check_equals(b.xMin, -30);
 xcheck_equals(b.xMax, -10);
 xcheck_equals(b.yMin, 10);
 xcheck_equals(b.yMax, 20);
 
 draw._visible = false;
-xcheck_equals(draw._width, 20);
+check_equals(draw._width, 20);
 xcheck_equals(draw._height, 10);
+b = draw.getBounds(); // these are local, untransformed
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 10);
+check_equals(b.yMax, 30);
+b = draw.getBounds(container); // these are transformed by container draw matrix
+check_equals(b.xMin, -30);
+xcheck_equals(b.xMax, -10);
+xcheck_equals(b.yMin, 10);
+xcheck_equals(b.yMax, 20);
 
 draw._xscale = 200;
-xcheck_equals(draw._width, 20);
-check_equals(draw._height, 20);
+check_equals(draw._width, 20);
+xcheck_equals(draw._height, 20);
 
 draw._rotation = 0;
 xcheck_equals(draw._width, 20);
-check_equals(draw._height, 20);
+xcheck_equals(draw._height, 20);
 
 draw._visible = true;
 draw._xscale = 100;
 check_equals(draw._width, 10);
-check_equals(draw._height, 20);
+xcheck_equals(draw._height, 20);
 
 draw._yscale = 50;
 check_equals(draw._width, 10);
-xcheck_equals(draw._height, 10);
+check_equals(draw._height, 10);
 check_equals(container._width, 10);
-xcheck_equals(container._height, 10);
+check_equals(container._height, 10);
 
 container._xscale = 800;
 check_equals(draw._width, 10);
-xcheck_equals(draw._height, 10);
-xcheck_equals(container._width, 80);
-xcheck_equals(container._height, 10);
+check_equals(draw._height, 10);
+check_equals(container._width, 80);
+check_equals(container._height, 10);
+b = draw.getBounds(); // these are local, untransformed
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 10);
+check_equals(b.yMax, 30);
+b = draw.getBounds(container); // these are transformed by container draw matrix
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 5);
+check_equals(b.yMax, 15);
+
+container._xscale = 100;
+container._yscale = 100;
+draw._yscale = 100;
+draw._xscale = 100;
+b = draw.getBounds(container); // these are transformed by container draw matrix
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 10);
+check_equals(b.yMax, 30);
+container.createEmptyMovieClip("draw2", 6);
+draw = container.draw2;
+with (draw)
+{
+	lineStyle(0, 0x000000);
+	moveTo(60, 20);
+	lineTo(60, 40);
+	lineTo(80, 40);
+	lineTo(80, 20);
+	lineTo(60, 20);
+}
+
+b = container.draw.getBounds(container); 
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 10);
+check_equals(b.yMax, 30);
+b = container.draw.getBounds(); 
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 20);
+check_equals(b.yMin, 10);
+check_equals(b.yMax, 30);
+b = container.draw2.getBounds(container); 
+check_equals(b.xMin, 60);
+check_equals(b.xMax, 80);
+check_equals(b.yMin, 20);
+check_equals(b.yMax, 40);
+b = container.draw2.getBounds(container.draw);
+check_equals(b.xMin, 60);
+check_equals(b.xMax, 80);
+check_equals(b.yMin, 20);
+check_equals(b.yMax, 40);
+b = container.draw2.getBounds(invalid);
+check_equals(typeof(b), 'undefined');
+b = container.draw2.getBounds(__shared_assets);
+check_equals(b.xMin, 60);
+check_equals(b.xMax, 80);
+check_equals(b.yMin, 20);
+check_equals(b.yMax, 40);
+
+b = container.draw2.getBounds(); 
+check_equals(b.xMin, 60);
+check_equals(b.xMax, 80);
+check_equals(b.yMin, 20);
+check_equals(b.yMax, 40);
+b = container.getBounds(); 
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 80);
+check_equals(b.yMin, 10);
+check_equals(b.yMax, 40);
+
+container.draw2._x += 20;
+b = container.getBounds(); 
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 100);
+check_equals(b.yMin, 10);
+check_equals(b.yMax, 40);
+check_equals(container._width, 90);
+check_equals(container._height, 30);
+
+container.draw2._xscale = 200;
+b = container.getBounds(); 
+check_equals(b.xMin, 10);
+check_equals(b.xMax, 180);
+check_equals(b.yMin, 10);
+check_equals(b.yMax, 40);
 
 #endif // OUTPUT_VERSION >= 6

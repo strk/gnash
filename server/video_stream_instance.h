@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.9 2007/03/20 15:01:20 strk Exp $
+// $Id: video_stream_instance.h,v 1.10 2007/04/12 09:14:36 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -48,6 +48,11 @@ public:
 			character* parent, int id);
 
 	~video_stream_instance();
+
+	geometry::Range2d<float> getBounds() const
+	{
+		return m_def->get_bound().getRange();
+	}
 
 	virtual void	advance(float delta_time);
 	void	display();

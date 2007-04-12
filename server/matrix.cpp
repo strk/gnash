@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.7 2007/02/12 12:26:13 nihilus Exp $ 
+// $Id: matrix.cpp,v 1.8 2007/04/12 09:14:36 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -218,6 +218,29 @@ matrix::transform(point* result, const point& p) const
 }
 
 void
+matrix::transform(geometry::Range2d<float>& r) const
+{
+	if ( ! r.isFinite() ) return;
+
+	float xmin = r.getMinX();
+	float xmax = r.getMaxX();
+	float ymin = r.getMinY();
+	float ymax = r.getMaxY();
+
+	xmin = m_[0][0] * xmin + m_[0][1] * ymin + m_[0][2];
+	ymin = m_[1][0] * xmin + m_[1][1] * ymin + m_[1][2];
+
+	xmax = m_[0][0] * xmax + m_[0][1] * ymax + m_[0][2];
+	ymax = m_[1][0] * xmax + m_[1][1] * ymax + m_[1][2];
+
+	// Rotation can swap the max/min coordinates
+	if ( xmax < xmin ) std::swap(xmin, xmax);
+	if ( ymax < ymin ) std::swap(ymin, ymax);
+
+	r.setTo(xmin, ymin, xmax, ymax);
+}
+
+void
 matrix::transform_vector(point* result, const point& v) const
 // Transform vector 'v' by our matrix. Doesn't apply translation.
 // Put the result in *result.
@@ -236,6 +259,15 @@ matrix::transform_by_inverse(point* result, const point& p) const
 	matrix	m;
 	m.set_inverse(*this);
 	m.transform(result, p);
+}
+
+void
+matrix::transform_by_inverse(geometry::Range2d<float>& r) const
+{
+	// @@ TODO optimize this!
+	matrix	m;
+	m.set_inverse(*this);
+	m.transform(r);
 }
 
 

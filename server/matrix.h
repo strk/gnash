@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.h,v 1.4 2006/11/02 14:00:55 udog Exp $ 
+// $Id: matrix.h,v 1.5 2007/04/12 09:14:36 strk Exp $ 
 //
 
 #ifndef GNASH_MATRIX_H
@@ -29,13 +29,19 @@
 #endif
 
 #include "tu_config.h" // for DSOEXPORT
+#include "Range2d.h" // for transforming Range2d<float>
 
 #include <iosfwd>
 
+// Forward declarations
+namespace gnash {
+	class point;
+	class stream;
+}
+
+
 namespace gnash {
 
-class point;
-class stream;
 
 /// Matrix type, used by render handler.
 //
@@ -129,6 +135,19 @@ public:
 	/// Put result in *result.
 	///
 	void	transform_by_inverse(point* result, const point& p) const;
+
+	/// Transform Range2d<float> 'r' by our matrix. 
+	//
+	/// NULL and WORLD ranges are untouched.
+	///
+	void	transform(geometry::Range2d<float>& r) const;
+
+	/// Transform Range2d<float> 'r' by the inverse our matrix. 
+	//
+	/// NULL and WORLD ranges are untouched.
+	///
+	void	transform_by_inverse(geometry::Range2d<float>& r) const;
+
 
 	/// Set this matrix to the inverse of the given matrix.
 	void	set_inverse(const matrix& m);

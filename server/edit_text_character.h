@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@
 #include "edit_text_character_def.h" // for inlines
 #include "styles.h" // for fill_style and line_style
 #include "text.h" // for text_glyph_record
+#include "Range2d.h"
+#include "rect.h" // for inlines
 
 
 // Forward declarations
@@ -91,6 +93,11 @@ public:
 
 	virtual float	get_height() const;
 	virtual float	get_width() const;
+
+	geometry::Range2d<float> getBounds() const
+	{
+		return m_def->get_bounds().getRange();
+	}
 
 private:
 

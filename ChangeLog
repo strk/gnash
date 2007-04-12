@@ -1,3 +1,20 @@
+2007-04-12 Sandro Santilli <strk@keybit.net>
+
+	* server/matrix.{cpp,h}: add transform and transform_by_inverse
+	  for Range2d<float> type.
+	* server/character.h: add a getBounds() virutual method.
+	* server/: generic_character.h, button_character_instance.{cpp,h},
+	  edit_text_character.h, video_stream_instance.h:
+	  Implement getBounds.
+	* server/character.cpp: fix width_getset and height_getset
+	  to use the new getBounds interface.
+	* server/sprite_instance.{cpp,h}: implement getBounds;
+	  implement MovieClip.getBounds.
+	* testsuite/actionscript.all/MovieClip.as: more tests for
+	  getBounds, more successes.
+	* testsuite/swfdec/PASSING: height2.swf and height3.swf tests
+	  now succeed.
+
 2007-04-12 Mathew Cucuzella <kookjr@gmail.com>
 
 	* doc/C/internals.xml plugin.xml: Fix typos in documentation

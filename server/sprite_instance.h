@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.94 2007/04/11 14:20:20 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.95 2007/04/12 09:14:36 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -35,6 +35,7 @@
 #include "as_environment.h" // for composition
 #include "DynamicShape.h" // for composition
 //#include "LoadVariablesThread.h" // for composition
+#include "Range2d.h"
 
 #include <vector>
 #include <list>
@@ -138,6 +139,9 @@ public:
 	float get_width() const;
 
 	float get_height() const;
+
+	/// Get the composite bounds of all component drawing elements
+	geometry::Range2d<float> getBounds() const;
 
 	size_t get_current_frame() const
 	{

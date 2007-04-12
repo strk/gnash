@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.64 2007/04/11 14:20:20 strk Exp $ */
+/* $Id: character.h,v 1.65 2007/04/12 09:14:36 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -38,6 +38,7 @@
 #include "cxform.h" // for composition
 #include "log.h"
 #include "snappingrange.h"
+#include "Range2d.h"
 
 #include <map>
 #include <cstdarg>
@@ -409,6 +410,21 @@ public:
 	{
 		log_error("a character class didn't override get_width: %s", typeid(*this).name());
 		return 0;
+	}
+
+    	/// Returns local, untransformed bounds of this character in TWIPS
+	//
+	/// The default implementation prints an error and returns a NULL rect.
+	///
+	/// Container characters (sprite and buttons) return the composite
+	/// bounds of all their childrens, appropriaterly transformed with
+	/// their local matrix.
+	///
+	virtual geometry::Range2d<float> getBounds() const
+	{
+		log_error("FIXME: character %s did not override the getBounds() method",
+				typeid(*this).name());
+		return geometry::Range2d<float>(geometry::nullRange);
 	}
 
 	/// Return the "relative" root of this character

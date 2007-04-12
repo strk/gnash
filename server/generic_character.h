@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -84,6 +84,11 @@ public:
 	{
 		// Verified using samples/test_rotation.swf
 		return m_def->get_width_local();
+	}
+
+	geometry::Range2d<float> getBounds() const
+	{
+		return m_def->get_bound().getRange();
 	}
 
 	virtual character* get_topmost_mouse_entity(float x, float y);

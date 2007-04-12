@@ -798,20 +798,54 @@ sprite_getBounds(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 
-	boost::intrusive_ptr<as_object> target;
+
+	geometry::Range2d<float> bounds  = sprite->getBounds();
+
 	if ( fn.nargs > 0 )
 	{
-		target = fn.arg(0).to_object();
+		boost::intrusive_ptr<sprite_instance> target = fn.arg(0).to_sprite();
+		if ( ! target )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("MovieClip.getBounds(%s) : invalid call, first arg must be a sprite",
+				fn.arg(0).to_debug_string().c_str());
+			);
+			return as_value();
+		}
+
+		matrix tgtwmat = target->get_world_matrix();
+		matrix srcwmat = sprite->get_world_matrix();
+		// TODO: fixme, we should likely use the world matrixes for a straight and inverse transform
+		matrix invtgtwmat; invtgtwmat.set_inverse(tgtwmat);
+		matrix m = srcwmat;
+		m.concatenate(invtgtwmat);
+
+		//m.transform(bounds);
+		//tgtwmat.transform_by_inverse(bounds);
+		std::stringstream ss;
+
+		ss << "Local bounds: " << bounds << endl;
+		srcwmat.transform(bounds);
+		ss << "src-w-transformed bounds: " << bounds << "(srcwmat is " << srcwmat << ")" << endl;
+		tgtwmat.transform_by_inverse(bounds);
+		ss << "tgt-w-invtransfor bounds: " << bounds << "(tgtwmat is " << tgtwmat << ")" << endl;
+		log_msg("%s", ss.str().c_str());
+		log_error("FIXME: MovieClip.getBounds(%s) broken", fn.arg(0).to_debug_string().c_str());
 	}
 
-	// TODO: implement 'Range2d<float> character::getBounds(character* ref=NULL)'
-	UNUSED(sprite);
-	geometry::Range2d<float> bounds(0, 0, 0, 0); //  = sprite->getBounds(target.get());
+	// Magic numbers here... dunno why
+	double xMin = 6710886.35;
+	double yMin = 6710886.35;
+	double xMax = 6710886.35;
+	double yMax = 6710886.35;
 
-	double xMin = bounds.getMinX();
-	double yMin = bounds.getMinY();
-	double xMax = bounds.getMaxX();
-	double yMax = bounds.getMaxY();
+	if ( bounds.isFinite() )
+	{
+		xMin = bounds.getMinX()/20;
+		yMin = bounds.getMinY()/20;
+		xMax = bounds.getMaxX()/20;
+		yMax = bounds.getMaxY()/20;
+	}
 
 	boost::intrusive_ptr<as_object> bounds_obj(new as_object());
 	bounds_obj->init_member("xMin", as_value(xMin));
@@ -823,7 +857,7 @@ sprite_getBounds(const fn_call& fn)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.getBounds() not implemented yet (just stubbed)");
+		log_error("FIXME: MovieClip.getBounds() TESTING");
 		warned=true;
 	}
 
@@ -1411,6 +1445,23 @@ movieclip_class_init(as_object& global)
 // sprite_instance helper classes
 //------------------------------------------------
 
+/// A DisplayList visitor used to compute its overall bounds.
+//
+class BoundsFinder {
+public:
+	geometry::Range2d<float>& _bounds;
+	BoundsFinder(geometry::Range2d<float>& b)
+		:
+		_bounds(b)
+	{}
+	void operator() (character* ch)
+	{
+		geometry::Range2d<float> chb = ch->getBounds();
+		matrix m = ch->get_matrix();
+		m.transform(chb);
+		_bounds.expandTo(chb);
+	}
+};
 
 /// A DisplayList visitor used to compute its overall height.
 //
@@ -3484,5 +3535,17 @@ sprite_instance::checkForKeyPressOrMouseEvent(const std::string& name)
 
 }
 
+geometry::Range2d<float>
+sprite_instance::getBounds() const
+{
+	typedef geometry::Range2d<float> Range;
+
+	Range bounds;
+	BoundsFinder f(bounds);
+	const_cast<DisplayList&>(m_display_list).visitAll(f);
+	Range drawableBounds = _drawable->get_bound().getRange();
+	bounds.expandTo(drawableBounds);
+	return bounds;
+}
 
 } // namespace gnash

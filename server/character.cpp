@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.30 2007/04/11 14:20:20 strk Exp $ */
+/* $Id: character.cpp,v 1.31 2007/04/12 09:14:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -471,7 +471,16 @@ character::width_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		rv = as_value(TWIPS_TO_PIXELS(ptr->get_width()));
+		float w = 0;
+		geometry::Range2d<float> bounds = ptr->getBounds();
+		if ( bounds.isFinite() )
+		{
+			matrix m = ptr->get_matrix();
+			m.transform(bounds);
+			assert(bounds.isFinite());
+			w = TWIPS_TO_PIXELS(int(bounds.width()));
+		}
+		rv = as_value(w);
 	}
 	else // setter
 	{
@@ -497,14 +506,23 @@ character::height_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		rv = as_value(TWIPS_TO_PIXELS(ptr->get_height()));
+		float h = 0;
+		geometry::Range2d<float> bounds = ptr->getBounds();
+		if ( bounds.isFinite() )
+		{
+			matrix m = ptr->get_matrix();
+			m.transform(bounds);
+			assert(bounds.isFinite());
+			h = TWIPS_TO_PIXELS(int(bounds.height()));
+		}
+		rv = as_value(h);
 	}
 	else // setter
 	{
 		// @@ tulrich: is parameter in world-coords or local-coords?
 		matrix m = ptr->get_matrix();
 		m.m_[1][1] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number()));
-		float h = ptr->get_height(); // WARNING: was get_width originally, sounds as a bug
+		float h = ptr->get_height(); 
 		if (fabsf(h) > 1e-6f)
 		{
 			m.m_[1][1] /= h;
