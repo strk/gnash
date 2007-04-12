@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.82 2007/04/12 06:51:04 nihilus Exp $ */
+/* $Id: gtk.cpp,v 1.83 2007/04/12 06:58:27 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -867,7 +867,7 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
     		   NULL,
                    "name", "GNASH flash movie player", 
                    "version", VERSION,
-                   "copyright", "(C) 2005-2007 The Free Software Foundation",
+                   "copyright", "Copyright (C) 2005, 2006, 2007 The Free Software Foundation",
 	           "comments", comments.c_str(),
                    "authors", authors,
                    "documenters", documentors,

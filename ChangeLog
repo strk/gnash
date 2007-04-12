@@ -1,3 +1,8 @@
+2007-04-11 Stephan Peijnik <sp@gnu.org>
+
+	* gui/gtk.cpp: Changed Copyright years from 2005-2007 -> 2005, 2006,
+	  2007
+
 2007-04-11 Antti Ajanki <antti.ajanki@iki.fi>
 	
 	*  gui/gtk.cpp gui/gtksup.h gui/gui.cpp gui/gui.h
