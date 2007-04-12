@@ -1,4 +1,9 @@
-2007-04-11 Bastiaan Jacques
+2007-04-12 Mathew Cucuzella <kookjr@gmail.com>
+
+	* doc/C/internals.xml plugin.xml: Fix typos in documentation
+          (patch #5820).
+
+2007-04-11 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/string.cpp: from_char_code: create a wide string
 	in case the user tries to create one.

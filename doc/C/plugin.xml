@@ -31,7 +31,7 @@
       The lower layer is a C based API which is used by Firefox to
       initialize and destroy a plugin. This is so a plugin can be
       portable across multiple systems, since C++ emphasis is not portable
-      between most C++ compilers. This where most of the behind the
+      between most C++ compilers. This is where most of the behind the
       scenes work is done in a plugin. For Gnash, the sources this
       lower layer are in <emphasis>plugin/mozilla-sdk</emphasis>. They were
       added to the Gnash source tree so it wouldn't be necessary to
@@ -307,7 +307,7 @@
     </para>
     
     <para>
-      The <emphasis>The GLX Context</emphasis> is maintained one per
+      The <emphasis>GLX Context</emphasis> is maintained one per
       instantiation of the plugin for a web page. If there are more
       than one Flash movie, there is more than one GLX Context. A GLX
       context can be created by using <emphasis>glXCreateContext()</emphasis>,
