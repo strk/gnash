@@ -48,11 +48,6 @@
 #include <typeinfo> 
 #include <string>
 
-#if !defined(_WIN32) && !defined(WIN32)
-# include <pthread.h> 
-#endif
-
-
 using namespace gnash;
 using namespace SWF;
 

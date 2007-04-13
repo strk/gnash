@@ -20,10 +20,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 #include "movie_root.h"
 #include "log.h"
 #include "sprite_instance.h"

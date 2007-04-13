@@ -268,7 +268,7 @@ host_check(const std::string& host)
 }
 
 bool
-allowHost(const std::string& host, short port)
+allowHost(const std::string& host, short /* port */)
 {
 	return allowHost(host);
 }

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: action_buffer.cpp,v 1.15 2007/04/11 17:54:21 bjacques Exp $ */
+/* $Id: action_buffer.cpp,v 1.16 2007/04/13 07:35:56 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,10 +28,6 @@
 #include "as_environment.h"
 
 #include <typeinfo> 
-
-#if !defined(_WIN32) && !defined(WIN32)
-# include <pthread.h> 
-#endif
 
 #include <string>
 

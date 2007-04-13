@@ -60,13 +60,6 @@
 #include <algorithm> // for for_each
 #include <boost/algorithm/string/case_conv.hpp>
 
-// This needs to be included first for NetBSD systems or we get a weird
-// problem with pthread_t being defined too many times if we use any
-// STL containers.
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
-#endif
-
 namespace gnash {
 
 //#define GNASH_DEBUG 1

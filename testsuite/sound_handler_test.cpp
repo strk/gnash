@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: sound_handler_test.cpp,v 1.2 2007/02/21 14:51:01 tgc Exp $
+// $Id: sound_handler_test.cpp,v 1.3 2007/04/13 07:35:57 bjacques Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -24,7 +24,6 @@
 #include "sound_handler_test.h"
 
 #include "log.h"
-#include <pthread.h>
 #include <cmath>
 #include <vector>
 

@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.cpp,v 1.30 2007/03/03 13:05:27 martinwguy Exp $ */
+/* $Id: shape.cpp,v 1.31 2007/04/13 07:35:55 bjacques Exp $ */
 
 #include "shape.h"
 
@@ -118,7 +118,7 @@ bool	path::point_test(float x, float y)
     if (m_edges.size() <= 0) {
 	return false;
     }
-
+#if 0
     // This test makes no sense: m_fill0 is unsigned and "1-based" -martin
     if (m_fill0 < 0) {
 	// No interior fill.
@@ -137,6 +137,7 @@ bool	path::point_test(float x, float y)
 	// group.
 	return false;
     }
+#endif
     
     // Shoot a horizontal ray from (x,y) to the right, and
     // count the number of edge crossings.  An even number

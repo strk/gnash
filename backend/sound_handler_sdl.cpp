@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.49 2007/03/23 00:30:10 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.50 2007/04/13 07:35:55 bjacques Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,7 +27,6 @@
 #include "sound_handler_sdl.h"
 
 #include "log.h"
-#include <pthread.h>
 #include <cmath>
 #include <vector>
 #include <SDL.h>

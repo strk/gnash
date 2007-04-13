@@ -14,17 +14,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: impl.cpp,v 1.102 2007/03/30 15:18:24 strk Exp $ */
+/* $Id: impl.cpp,v 1.103 2007/04/13 07:35:55 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
-
-// This needs to be included first for NetBSD systems or we get a weird
-// problem with pthread_t being defined too many times if we use any
-// STL containers.
-#ifdef HAVE_PTHREADS
-#include <pthread.h>
 #endif
 
 #include "tu_file.h"

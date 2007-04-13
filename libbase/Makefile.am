@@ -97,7 +97,6 @@ libgnashbase_la_SOURCES = \
 	curl_adapter.cpp \
 	noseek_fd_adapter.cpp \
 	zlib_adapter.cpp \
-	Thread.cpp \
 	URL.cpp \
 	LoadThread.cpp \
 	FLVParser.cpp
@@ -137,7 +136,6 @@ noinst_HEADERS = \
 	curl_adapter.h \
 	noseek_fd_adapter.h \
 	zlib_adapter.h \
-	Thread.h \
 	URL.h \
 	LoadThread.h \
 	FLVParser.h
