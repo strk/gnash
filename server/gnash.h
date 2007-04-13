@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.91 2007/04/11 14:20:20 strk Exp $ */
+/* $Id: gnash.h,v 1.92 2007/04/13 09:15:54 bjacques Exp $ */
 
 /// \mainpage
 ///
@@ -544,6 +544,13 @@ enum code
 	QUOTE = 222,
 
 	KEYCOUNT
+};
+enum modifier
+{
+    MOD_NONE = 0,
+    MOD_SHIFT = 1,
+    MOD_CONTROL = 2,
+    MOD_ALT = 4
 };
 }	// end namespace key
 

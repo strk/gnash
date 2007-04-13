@@ -149,6 +149,102 @@ KdeGui::setupEvents()
   return true;
 }
 
+gnash::key::code
+KdeGui::qtToGnashKey(QKeyEvent *event)
+{
+    gnash::key::code c = gnash::key::INVALID;
+    int key = event->key();
+    
+    if (key >= Qt::Key_0 && key <= Qt::Key_9) {
+      if (event->state() & Qt::Keypad)
+          c = (gnash::key::code) ((key - Qt::Key_0) + gnash::key::KP_0);
+      else
+          c = (gnash::key::code) ((key - Qt::Key_0) + gnash::key::_0);
+    } else if (key >= Qt::Key_A && key <= Qt::Key_Z) {
+        c = (gnash::key::code) ((key - Qt::Key_A) + gnash::key::A);
+    } else if (key >= Qt::Key_F1 && key <= Qt::Key_F15) {
+        c = (gnash::key::code) ((key - Qt::Key_F1) + gnash::key::F1);
+    } else {
+        // many keys don't correlate, so just use a look-up table.
+        struct {
+            int               qt;
+            gnash::key::code  gs;
+        } table[] = {
+            { Qt::Key_Backspace, gnash::key::BACKSPACE },
+            { Qt::Key_Tab, gnash::key::TAB },
+            { Qt::Key_Clear, gnash::key::CLEAR },
+            { Qt::Key_Return, gnash::key::ENTER },
+            { Qt::Key_Enter, gnash::key::ENTER },
+
+            { Qt::Key_Shift, gnash::key::SHIFT },
+            { Qt::Key_Control, gnash::key::CONTROL },
+            { Qt::Key_Alt, gnash::key::ALT },
+            { Qt::Key_CapsLock, gnash::key::CAPSLOCK },
+
+            { Qt::Key_Escape, gnash::key::ESCAPE },
+            { Qt::Key_Space, gnash::key::SPACE },
+
+            { Qt::Key_Next, gnash::key::PGDN },
+            { Qt::Key_Prior, gnash::key::PGUP },
+            { Qt::Key_Home, gnash::key::HOME },
+            { Qt::Key_End, gnash::key::END },
+            { Qt::Key_Left, gnash::key::LEFT },
+            { Qt::Key_Up, gnash::key::UP },
+            { Qt::Key_Right, gnash::key::RIGHT },
+            { Qt::Key_Down, gnash::key::DOWN },
+            { Qt::Key_Insert, gnash::key::INSERT },
+            { Qt::Key_Delete, gnash::key::DELETEKEY },
+
+            { Qt::Key_Help, gnash::key::HELP },
+            { Qt::Key_NumLock, gnash::key::NUM_LOCK },
+            { Qt::Key_Semicolon, gnash::key::SEMICOLON },
+            { Qt::Key_Equal, gnash::key::EQUALS },
+            { Qt::Key_Minus, gnash::key::MINUS },
+            { Qt::Key_Slash, gnash::key::SLASH },
+            { Qt::Key_BracketLeft, gnash::key::LEFT_BRACKET },
+            { Qt::Key_Backslash, gnash::key::BACKSLASH },
+            { Qt::Key_BracketRight, gnash::key::RIGHT_BRACKET },
+            { Qt::Key_QuoteDbl, gnash::key::QUOTE },
+            { 0, gnash::key::INVALID }
+        };
+        
+        for (int i = 0; table[i].qt != 0; i++) {
+            if (key == table[i].qt) {
+                c = table[i].gs;
+                break;
+            }
+        }
+    }
+    
+    return c;
+}
+
+int
+KdeGui::qtToGnashModifier(Qt::ButtonState state)
+{
+    int modifier = gnash::key::MOD_NONE;
+
+    if (state & Qt::ShiftButton) {
+        modifier = modifier | gnash::key::MOD_SHIFT;
+    }
+    if (state & Qt::ControlButton) {
+        modifier = modifier | gnash::key::MOD_CONTROL;
+    }
+    if (state & Qt::AltButton) {
+       modifier = modifier | gnash::key::MOD_ALT;
+    }
+
+    return modifier;
+}
+
+void
+KdeGui::handleKeyEvent(QKeyEvent *event, bool down)
+{
+    gnash::key::code c = qtToGnashKey(event);
+    int mod = qtToGnashModifier(event->state());
+    notify_key_event(c, mod, down);
+}
+
 
 /// \brief restart the movie from the beginning
 void
@@ -259,6 +355,7 @@ qwidget::qwidget(KdeGui* godfather)
     _godfather = godfather;
 
     setMouseTracking(true);  
+    setFocusPolicy(QWidget::StrongFocus);
 }
 
 void 
@@ -292,6 +389,17 @@ qwidget::mouseReleaseEvent(QMouseEvent *event)
     _godfather->notify_mouse_clicked(false, 1);
 }
 
+void
+qwidget::keyPressEvent(QKeyEvent *event)
+{
+    _godfather->handleKeyEvent(event, true);
+}
+
+void
+qwidget::keyReleaseEvent(QKeyEvent *event)
+{
+    _godfather->handleKeyEvent(event, false);
+}
 
 void
 qwidget::resizeEvent(QResizeEvent *event)

@@ -11,6 +11,9 @@
 	it is used in another DSO.
 	* all over the place: Remove all inclusions of pthread.h,
 	because we're no longer directly using pthreads.
+	* server/gnash.h, gui: version two of Antti Ajanki's GUI
+	patches, this time the whole thing.
+	* libbase/container.h: Remove the last pthread.h include.
 
 2007-04-12 Sandro Santilli <strk@keybit.net>
 
