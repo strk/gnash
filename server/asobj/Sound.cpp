@@ -488,14 +488,7 @@ as_value
 sound_duration(const fn_call& fn)
 {
 	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
-	if ( fn.nargs == 0 ) {
-		return as_value(so->getDuration());
-    } else {
-		IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Tried to set read-only property Sound.duration");
-		);
-    }
-	return as_value();
+	return as_value(so->getDuration());
 }
 
 as_value
@@ -514,14 +507,8 @@ as_value
 sound_position(const fn_call& fn)
 {
 	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
-	if ( fn.nargs == 0 ) {
-		return as_value(so->getPosition());
-    } else {
-		IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Tried to set read-only property Sound.position");
-		);
-    }
-	return as_value();
+
+	return as_value(so->getPosition());
 }
 
 void
@@ -546,13 +533,13 @@ attachSoundInterface(as_object& o)
 	boost::intrusive_ptr<builtin_function> gettersetter;
 
 	gettersetter = new builtin_function(&sound_duration, NULL);
-	o.init_property("duration", *gettersetter, *gettersetter);
+	o.init_readonly_property("duration", *gettersetter);
 
 	gettersetter = new builtin_function(&sound_ID3, NULL);
 	o.init_property("ID3", *gettersetter, *gettersetter);
 
 	gettersetter = new builtin_function(&sound_position, NULL);
-	o.init_property("position", *gettersetter, *gettersetter);
+	o.init_readonly_property("position", *gettersetter);
 
 }
 

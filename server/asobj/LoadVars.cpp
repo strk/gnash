@@ -177,7 +177,7 @@ private:
 
 	static as_value checkLoads_wrapper(const fn_call& fn);
 
-	static as_value loaded_getset(const fn_call& fn);
+	static as_value loaded_get(const fn_call& fn);
 
 	static as_value onData_getset(const fn_call& fn);
 
@@ -286,8 +286,8 @@ LoadVars::attachLoadVarsInterface(as_object& o)
 	gettersetter = new builtin_function(&LoadVars::onData_getset, NULL);
 	o.init_property("onData", *gettersetter, *gettersetter);
 
-	gettersetter = new builtin_function(&LoadVars::loaded_getset, NULL);
-	o.init_property("loaded", *gettersetter, *gettersetter);
+	gettersetter = new builtin_function(&LoadVars::loaded_get, NULL);
+	o.init_readonly_property("loaded", *gettersetter);
 }
 
 as_object*
@@ -476,24 +476,13 @@ LoadVars::onData_getset(const fn_call& fn)
 
 /* private static */
 as_value
-LoadVars::loaded_getset(const fn_call& fn)
+LoadVars::loaded_get(const fn_call& fn)
 {
 
 	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		return as_value(ptr->loaded() > 0);
-	}
-	else // setter
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-			log_msg("Tried to set LoadVars.loaded, which is a read-only property");
-		);
-		return as_value();
-	}
+	return as_value(ptr->loaded() > 0);
 }
-
 
 static as_value
 loadvars_addrequestheader(const fn_call& fn)

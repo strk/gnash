@@ -1,3 +1,16 @@
+2007-04-14 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/{Loadvars,NetStream,Sound,xmlnode}.cpp: Use
+	init_readonly_property for read-only properties.
+	* server/parser/movie_def_impl.{cpp,h}: Since we're not using
+	pthreads, there is no need to have our thread function
+	match a specfic pattern; use one that fits our design.
+	* testsuite/actionscript.all/check.as: Don't prepend # where
+	it is not needed to avoid choking gcc3's C preprocessor.
+	* testsuite/libamf.all/{test_number,test_string}.cpp,
+	* testsuite/misc.ming.all/{intervalTestRunner,
+	loadMovieTestRunner}: Add needed includes for OpenBSD.
+
 2007-04-12 Sandro Santilli <strk@keybit.net>
 
 	* server/matrix.{h,cpp}: fix conceptual bug in Range2d transform

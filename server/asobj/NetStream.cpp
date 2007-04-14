@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.34 2007/03/30 13:57:27 tgc Exp $ */
+/* $Id: NetStream.cpp,v 1.35 2007/04/14 15:53:17 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -163,17 +163,7 @@ netstream_time(const fn_call& fn)
 
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	if ( fn.nargs == 0 )
-	{
-		return as_value(static_cast<double>(ns->time()));
-	}
-	else
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Tried to set read-only property NetStream.time");
-		);
-	}
-	return as_value();
+	return as_value(static_cast<double>(ns->time()));
 }
 
 // Both a getter and a (do-nothing) setter for bytesLoaded
@@ -183,17 +173,7 @@ netstream_bytesloaded(const fn_call& fn)
 
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	if ( fn.nargs == 0 )
-	{
-		return as_value(int(ns->bytesLoaded()));
-	}
-	else
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Tried to set read-only property NetStream.bytesLoaded");
-		);
-	}
-	return as_value();
+	return as_value(int(ns->bytesLoaded()));
 }
 
 // Both a getter and a (do-nothing) setter for bytesTotal
@@ -203,17 +183,7 @@ netstream_bytestotal(const fn_call& fn)
 
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	if ( fn.nargs == 0 )
-	{
-		return as_value(int(ns->bytesTotal()));
-	}
-	else
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Tried to set read-only property NetStream.bytesTotal");
-		);
-	}
-	return as_value();
+	return as_value(int(ns->bytesTotal()));
 }
 
 void
@@ -232,13 +202,13 @@ attachNetStreamInterface(as_object& o)
     boost::intrusive_ptr<builtin_function> gettersetter;
 
     gettersetter = new builtin_function(&netstream_time, NULL);
-    o.init_property("time", *gettersetter, *gettersetter);
+    o.init_readonly_property("time", *gettersetter);
 
     gettersetter = new builtin_function(&netstream_bytesloaded, NULL);
-    o.init_property("bytesLoaded", *gettersetter, *gettersetter);
+    o.init_readonly_property("bytesLoaded", *gettersetter);
 
     gettersetter = new builtin_function(&netstream_bytestotal, NULL);
-    o.init_property("bytesTotal", *gettersetter, *gettersetter);
+    o.init_readonly_property("bytesTotal", *gettersetter);
 
 }
 

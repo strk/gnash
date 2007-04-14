@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.28 2007/04/10 10:46:19 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.29 2007/04/14 15:53:17 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -359,14 +359,14 @@ attachXMLNodeInterface(as_object& o)
     o.init_property("nodeName", *gettersetter, *gettersetter);
 
     gettersetter = new builtin_function(&xmlnode_nodetype, NULL);
-    o.init_property("nodeType", *gettersetter, *gettersetter);
+    o.init_readonly_property("nodeType", *gettersetter);
 
     gettersetter = new builtin_function(&xmlnode_attributes, NULL);
-    o.init_property("attributes", *gettersetter, *gettersetter);
+    o.init_readonly_property("attributes", *gettersetter);
 
     // These two return an array of objects
     gettersetter = new builtin_function(xmlnode_childNodes, NULL);
-    o.init_property("childNodes", *gettersetter, *gettersetter);
+    o.init_readonly_property("childNodes", *gettersetter);
 
     /// \fn MLNode::firstChild
     /// \brief XMLNode::firstChild property
@@ -379,7 +379,7 @@ attachXMLNodeInterface(as_object& o)
     /// manipulate child nodes; use the appendChild(), insertBefore(),
     /// and removeNode() methods to manipulate child nodes. 
     gettersetter = new builtin_function(&xmlnode_firstchild, NULL);
-    o.init_property("firstChild", *gettersetter, *gettersetter);
+    o.init_readonly_property("firstChild", *gettersetter);
 
     /// \fn MLNode::lastChild
     /// \brief XMLNode::lastChild property 
@@ -391,16 +391,16 @@ attachXMLNodeInterface(as_object& o)
     /// insertBefore(), and removeNode() methods to manipulate child
     /// nodes.
     gettersetter = new builtin_function(&xmlnode_lastchild, NULL);
-    o.init_property("lastChild", *gettersetter, *gettersetter);
+    o.init_readonly_property("lastChild", *gettersetter);
 
     gettersetter = new builtin_function(&xmlnode_nextsibling, NULL);
-    o.init_property("nextSibling", *gettersetter, *gettersetter);
+    o.init_readonly_property("nextSibling", *gettersetter);
 
     gettersetter = new builtin_function(&xmlnode_previoussibling, NULL);
-    o.init_property("previousSibling", *gettersetter, *gettersetter);
+    o.init_readonly_property("previousSibling", *gettersetter);
 
     gettersetter = new builtin_function(&xmlnode_parentNode, NULL);
-    o.init_property("parentNode",  *gettersetter, *gettersetter);
+    o.init_readonly_property("parentNode", *gettersetter);
 
 }
 
@@ -609,14 +609,7 @@ xmlnode_nodetype(const fn_call& fn)
     
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
-    if ( fn.nargs == 0 ) {
-	return as_value(ptr->nodeType());
-    } else {
-	IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("Tried to set read-only property XMLNode.nodeType");
-	    );
-    }
-    return as_value();
+    return as_value(ptr->nodeType());
 }
 
 // Both a getter and a (do-nothing) setter for attributes
@@ -627,29 +620,18 @@ xmlnode_attributes(const fn_call& fn)
     
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
-    if ( fn.nargs == 0 )
-	{
-        XMLNode::AttribList& attrs = ptr->attributes();
-		boost::intrusive_ptr<as_object> ret = new as_object();
-		for (XMLNode::AttribList::const_iterator it=attrs.begin(),
-                        itEnd=attrs.end();
-                it != itEnd; ++it)
-		{
-                const XMLAttr& at = *it;
-                const std::string& name = at.name();
-                const std::string& val = at.value();
-                ret->init_member(name, val);
-		}
-		//log_error("FIXME: XMLNode.attributes not implemented yet");
-		return as_value(ret); 
+    XMLNode::AttribList& attrs = ptr->attributes();
+    boost::intrusive_ptr<as_object> ret = new as_object();
+    for (XMLNode::AttribList::const_iterator it=attrs.begin(),
+         itEnd=attrs.end(); it != itEnd; ++it) {
+
+         const XMLAttr& at = *it;
+         const std::string& name = at.name();
+         const std::string& val = at.value();
+         ret->init_member(name, val);
     }
-	else
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("Tried to set read-only property XMLNode.attributes");
-	    );
-    }
-    return as_value();
+
+    return as_value(ret); 
 }
 
 // Both a getter and a (do-nothing) setter for firstChild
@@ -661,18 +643,9 @@ xmlnode_firstchild(const fn_call& fn)
     as_value rv;
     rv.set_null();
 
-    if ( fn.nargs == 0 )
-    {
-        boost::intrusive_ptr<XMLNode> node = ptr->firstChild();
-        if (node) {
-		    rv = node.get();
-	    }
-    }
-    else
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("Tried to set read-only property XMLNode.firstChild");
-	    );
+    boost::intrusive_ptr<XMLNode> node = ptr->firstChild();
+    if (node) {
+       rv = node.get();
     }
 
     return rv;
@@ -686,14 +659,6 @@ xmlnode_lastchild(const fn_call& fn)
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     as_value rv;
     rv.set_null();
-
-    if ( fn.nargs != 0 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("Tried to set read-only property XMLNode.lastChild");
-	    );
-        return rv;
-    } 
 
     boost::intrusive_ptr<XMLNode> node = ptr->lastChild();
     if (node) rv = node.get();
@@ -709,14 +674,6 @@ xmlnode_nextsibling(const fn_call& fn)
     as_value rv;
     rv.set_null();
 
-    if ( fn.nargs != 0 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("Tried to set read-only property XMLNode.nextSibling");
-        );
-        return rv;
-    }
-    
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     XMLNode *node = ptr->nextSibling();
     if (node) {
@@ -732,14 +689,6 @@ xmlnode_previoussibling(const fn_call& fn)
     //GNASH_REPORT_FUNCTION;
     as_value rv;
     rv.set_null();
-
-    if ( fn.nargs != 0 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("Tried to set read-only property XMLNode.previousSibling");
-        );
-        return rv;
-    }
 
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     XMLNode *node = ptr->previousSibling();
@@ -757,14 +706,6 @@ xmlnode_parentNode(const fn_call& fn)
     as_value rv;
     rv.set_null();
 
-    if ( fn.nargs != 0 )
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("Tried to set read-only property XMLNode.parentNode");
-        );
-        return rv;
-    }
-
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     XMLNode *node = ptr->getParent();
     if (node) {
@@ -780,14 +721,6 @@ xmlnode_childNodes(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     boost::intrusive_ptr<as_array_object> ary = new as_array_object();
-
-    if ( fn.nargs )  // setter
-    {
-        IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("Tried to set read-only property XMLNode.childNodes");
-	    );
-        return as_value();
-    }
 
     typedef XMLNode::ChildList ChildList;
 

@@ -116,7 +116,7 @@ private:
 	boost::thread* _thread;
 
 	/// Entry point for the actual thread
-	static void *execute(void* arg);
+	static void execute(movie_def_impl* md);
 };
 
 /// The Characters dictionary associated with each SWF file.

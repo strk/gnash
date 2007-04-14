@@ -20,7 +20,7 @@
 
 #ifdef HAVE_DEJAGNU_H
 
-#include <netinet/in.h>
+//#include <netinet/in.h>
 #include <string>
 #include <sys/types.h>
 #include <unistd.h>

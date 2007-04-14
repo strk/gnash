@@ -100,13 +100,10 @@ MovieLoader::isSelfThread() const
 	return this_thread == *_thread;
 }
 
-void*
-MovieLoader::execute(void* arg)
+void
+MovieLoader::execute(movie_def_impl* md)
 {
-	movie_def_impl* md = static_cast<movie_def_impl*>(arg);
 	md->read_all_swf();
-
-	return NULL;
 }
 
 bool
