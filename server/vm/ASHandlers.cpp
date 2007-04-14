@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.87 2007/04/11 17:54:22 bjacques Exp $ */
+/* $Id: ASHandlers.cpp,v 1.88 2007/04/14 17:33:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1141,7 +1141,7 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
 void
 SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
 	thread.ensureStack(3); 
