@@ -1,3 +1,16 @@
+2007-04-15 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClip.as,
+	  testsuite/misc-ming.all/matrix_test.c,
+	  testsuite/server/MatrixTest.cpp: more successes
+	  after Eric patch ! A few more tests added in
+	  matrix_test.c too, and more will be needed.
+
+2007-04-15 Eric Hughes <eh@narthex.us>
+
+	* server/matrix.cpp (get_x_scale, get_y_scale): fixed implementations
+	  to match the interpretation of matrix used in set_scale_rotation.
+
 2007-04-14 Sandro Santilli <strk@keybit.net>
 
 	* server/character.cpp (height_getset, width_getset): round

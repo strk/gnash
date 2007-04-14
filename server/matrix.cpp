@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.10 2007/04/14 14:38:28 strk Exp $ 
+// $Id: matrix.cpp,v 1.11 2007/04/14 22:23:05 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -343,8 +343,13 @@ matrix::get_max_scale() const
 	// @@ not 100% sure what the heck I'm doing here.  I
 	// think this is roughly what I want; take the max
 	// length of the two basis vectors.
-	float	basis0_length2 = m_[0][0] * m_[0][0] + m_[0][1] * m_[0][1];
-	float	basis1_length2 = m_[1][0] * m_[1][0] + m_[1][1] * m_[1][1];
+
+	//float	basis0_length2 = m_[0][0] * m_[0][0] + m_[0][1] * m_[0][1];
+	float	basis0_length2 = m_[0][0] * m_[0][0] + m_[1][0] * m_[1][0];
+
+	//float	basis1_length2 = m_[1][0] * m_[1][0] + m_[1][1] * m_[1][1];
+	float	basis1_length2 = m_[0][1] * m_[0][1] + m_[1][1] * m_[1][1];
+
 	float	max_length2 = fmax(basis0_length2, basis1_length2);
 	return sqrtf(max_length2);
 }
@@ -352,7 +357,9 @@ matrix::get_max_scale() const
 float
 matrix::get_x_scale() const
 {
-	float	scale = sqrtf(m_[0][0] * m_[0][0] + m_[0][1] * m_[0][1]);
+	// Scale is applied before rotation, must match implementation
+	// in set_scale_rotation
+	float	scale = sqrtf(m_[0][0] * m_[0][0] + m_[1][0] * m_[1][0]);
 
 	// Are we turned inside out?
 	if (get_determinant() < 0.f)
@@ -366,7 +373,9 @@ matrix::get_x_scale() const
 float
 matrix::get_y_scale() const
 {
-	return sqrtf(m_[1][1] * m_[1][1] + m_[1][0] * m_[1][0]);
+	// Scale is applied before rotation, must match implementation
+	// in set_scale_rotation
+	return sqrtf(m_[1][1] * m_[1][1] + m_[0][1] * m_[0][1]);
 }
 
 float

@@ -100,13 +100,13 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(D(m1.get_rotation()), 2);
 
 	m1.set_scale_rotation(2, 1, 2);
-	xcheck_equals(D(m1.get_x_scale()), 2);
-	xcheck_equals(D(m1.get_y_scale()), 1);
+	check_equals(D(m1.get_x_scale()), 2);
+	check_equals(D(m1.get_y_scale()), 1);
 	check_equals(D(m1.get_rotation()), 2);
 
 	m1.set_scale_rotation(1, 2, 2);
-	xcheck_equals(D(m1.get_x_scale()), 1);
-	xcheck_equals(D(m1.get_y_scale()), 2);
+	check_equals(D(m1.get_x_scale()), 1);
+	check_equals(D(m1.get_y_scale()), 2);
 	check_equals(D(m1.get_rotation()), 2);
 }
 

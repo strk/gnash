@@ -122,8 +122,23 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._width", "85");
 	check_equals(mo, "staticmc._height", "85");
 
+	SWFMovie_nextFrame(mo);        
+
+	SWFDisplayItem_scale(it, 2, 3);
+
+	check_equals(mo, "staticmc._x", "50");
+	check_equals(mo, "staticmc._y", "300");
+	check_equals(mo, "Math.round(staticmc._xscale)", "200");
+	check_equals(mo, "Math.round(staticmc._yscale)", "300");
+	check_equals(mo, "staticmc._rotation", "45");
+	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
+	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-56.25,193.75 156.25,406.25'");
+	check_equals(mo, "staticmc._width", "212.5");
+	check_equals(mo, "staticmc._height", "212.5");
+
 	// TODO:
-	// - test mixing rotation and scale !
+	// - test more rotations and scales (corner cases too!)
+	// - test 'skew' (since Ming supports it)
 
 
 

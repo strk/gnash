@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.57 2007/04/14 16:27:22 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.58 2007/04/14 22:23:05 strk Exp $";
 
 #include "check.as"
 
@@ -607,13 +607,13 @@ check_equals(draw._width, 20);
 check_equals(draw._height, 20);
 
 draw._rotation = 0;
-xcheck_equals(draw._width, 20);
-xcheck_equals(draw._height, 20);
+check_equals(draw._width, 20);
+check_equals(draw._height, 20);
 
 draw._visible = true;
 draw._xscale = 100;
 check_equals(draw._width, 10);
-xcheck_equals(draw._height, 20);
+check_equals(draw._height, 20);
 
 draw._yscale = 50;
 check_equals(draw._width, 10);
