@@ -230,7 +230,7 @@ main(int argc, char** argv)
 	// And (but only for the static case) child duplication
 
 	check_equals(mo, "staticmc_dup._width", "staticmc._width"); 
-	xcheck_equals(mo, "parseInt(staticmc_dup._width/10)", "7"); 
+	check_equals(mo, "parseInt(staticmc_dup._width/10)", "7"); 
 	check_equals(mo, "typeof(staticmc.child)", "'movieclip'"); 
 	check_equals(mo, "typeof(staticmc_dup.child)", "'movieclip'"); 
 
@@ -274,7 +274,7 @@ main(int argc, char** argv)
 
 	// Note that staticmc0_dup is at negative depth
 	check_equals(mo, "staticmc0_dup._width", "staticmc0._width"); 
-	xcheck_equals(mo, "parseInt(staticmc0._width/10)", "7"); 
+	check_equals(mo, "parseInt(staticmc0._width/10)", "7"); 
 	check_equals(mo, "typeof(staticmc0.child)", "'movieclip'"); 
 	check_equals(mo, "typeof(staticmc0_dup.child)", "'movieclip'"); 
 

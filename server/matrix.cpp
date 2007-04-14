@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.9 2007/04/14 13:28:32 strk Exp $ 
+// $Id: matrix.cpp,v 1.10 2007/04/14 14:38:28 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -218,6 +218,16 @@ matrix::transform(point* result, const point& p) const
 }
 
 void
+matrix::transform(point& p) const
+// Transform point 'p' by our matrix.
+{
+	float nx = m_[0][0] * p.m_x + m_[0][1] * p.m_y + m_[0][2];
+	float ny = m_[1][0] * p.m_x + m_[1][1] * p.m_y + m_[1][2];
+	p.m_x = nx;
+	p.m_y = ny;
+}
+
+void
 matrix::transform(geometry::Range2d<float>& r) const
 {
 	if ( ! r.isFinite() ) return;
@@ -227,17 +237,20 @@ matrix::transform(geometry::Range2d<float>& r) const
 	float ymin = r.getMinY();
 	float ymax = r.getMaxY();
 
-	float n_xmin = m_[0][0] * xmin + m_[0][1] * ymin + m_[0][2];
-	float n_ymin = m_[1][0] * xmin + m_[1][1] * ymin + m_[1][2];
+        point p0(xmin, ymin);
+        point p1(xmin, ymax);
+        point p2(xmax, ymax);
+        point p3(xmax, ymin);
 
-	float n_xmax = m_[0][0] * xmax + m_[0][1] * ymax + m_[0][2];
-	float n_ymax = m_[1][0] * xmax + m_[1][1] * ymax + m_[1][2];
+        transform(p0);
+        transform(p1);
+        transform(p2);
+        transform(p3);
 
-	// Rotation can swap the max/min coordinates
-	if ( n_xmax < n_xmin ) std::swap(n_xmin, n_xmax);
-	if ( n_ymax < n_ymin ) std::swap(n_ymin, n_ymax);
-
-	r.setTo(n_xmin, n_ymin, n_xmax, n_ymax);
+        r.setTo(p0.m_x, p0.m_y);
+        r.expandTo(p1.m_x, p1.m_y);
+        r.expandTo(p2.m_x, p2.m_y);
+        r.expandTo(p3.m_x, p3.m_y);
 }
 
 void

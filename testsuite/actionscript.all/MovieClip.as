@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.55 2007/04/14 13:28:32 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.56 2007/04/14 14:38:29 strk Exp $";
 
 #include "check.as"
 
@@ -576,7 +576,7 @@ container._x += 20;
 
 draw._rotation = 90;
 check_equals(draw._width, 20); 
-xcheck_equals(draw._height, 10); 
+check_equals(draw._height, 10); 
 b = draw.getBounds(); // these are local, untransformed
 check_equals(b.xMin, 10);
 check_equals(b.xMax, 20);
@@ -586,11 +586,11 @@ b = draw.getBounds(container); // these are transformed by container draw matrix
 check_equals(b.xMin, -30);
 xcheck_equals(b.xMax, -10);
 xcheck_equals(b.yMin, 10);
-xcheck_equals(b.yMax, 20);
+check_equals(b.yMax, 20);
 
 draw._visible = false;
 check_equals(draw._width, 20);
-xcheck_equals(draw._height, 10);
+check_equals(draw._height, 10);
 b = draw.getBounds(); // these are local, untransformed
 check_equals(b.xMin, 10);
 check_equals(b.xMax, 20);
@@ -600,7 +600,7 @@ b = draw.getBounds(container); // these are transformed by container draw matrix
 check_equals(b.xMin, -30);
 xcheck_equals(b.xMax, -10);
 xcheck_equals(b.yMin, 10);
-xcheck_equals(b.yMax, 20);
+check_equals(b.yMax, 20);
 
 draw._xscale = 200;
 check_equals(draw._width, 20);

@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.h,v 1.5 2007/04/12 09:14:36 strk Exp $ 
+// $Id: matrix.h,v 1.6 2007/04/14 14:38:28 strk Exp $ 
 //
 
 #ifndef GNASH_MATRIX_H
@@ -123,6 +123,9 @@ public:
 	/// Put the result in *result.
 	///
 	void	transform(point* result, const point& p) const;
+
+	/// Transform point 'p' by our matrix. 
+	void	transform(point& p) const;
 
 	/// Transform vector 'v' by our matrix. Doesn't apply translation.
 	//

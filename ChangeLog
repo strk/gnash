@@ -1,9 +1,9 @@
 2007-04-12 Sandro Santilli <strk@keybit.net>
 
-	* server/matrix.cpp: fix conceptual bug in Range2d transform
+	* server/matrix.{h,cpp}: fix conceptual bug in Range2d transform
 	  function.
-	* testsuite/actionscript.all/MovieClip.as: one unexpected
-	  success when fetching _height.
+	* testsuite/misc-ming.all/displaylist_depths_test.c,
+	  testsuite/actionscript.all/MovieClip.as: more successes.
 
 2007-04-12 Bastiaan Jacques <bastiaan@bjacques.org>
 
