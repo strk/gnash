@@ -26,7 +26,7 @@ abs_builddir=$(shell cd $(top_builddir)/testsuite/misc-ming.all; pwd)
 if ENABLE_MING
 
 CLEANFILES =  \
-    gnash-dbg.log \
+	gnash-dbg.log \
 	site.exp.bak \
 	testrun.sum \
 	testrun.log
@@ -51,7 +51,6 @@ AM_CPPFLAGS = -I.. \
 	$(MING_CFLAGS) \
 	-DMING_VERSION_CODE=$(MING_VERSION_CODE) \
 	$(NULL)
-
 
 check_PROGRAMS = \
 	ButtonEventsTest \
@@ -86,6 +85,7 @@ check_PROGRAMS = \
 	registerClassTestRunner \
 	goto_frame_test \
 	consecutive_goto_frame_test \
+	matrix_test \
 	multi_doactions_and_goto_frame_test \
 	simple_loop_test \
 	simple_loop_testrunner \
@@ -140,6 +140,7 @@ check_SCRIPTS = \
 	reverse_execute_PlaceObject2_test2runner \
 	displaylist_depths_testrunner \
 	get_frame_number_testrunner \
+	matrix_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -370,6 +371,20 @@ displaylist_depths_test.swf: displaylist_depths_test
 
 displaylist_depths_testrunner: $(srcdir)/../generic-testrunner.sh displaylist_depths_test.swf
 	sh $< -r5 $(top_builddir) displaylist_depths_test.swf > $@
+	chmod 755 $@
+
+matrix_test_SOURCES =	\
+	matrix_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+matrix_test_LDADD = $(MING_LIBS)
+
+matrix_test.swf: matrix_test
+	./matrix_test $(top_srcdir)/testsuite/media
+
+matrix_testrunner: $(srcdir)/../generic-testrunner.sh matrix_test.swf
+	sh $< -r5 $(top_builddir) matrix_test.swf > $@
 	chmod 755 $@
 
 get_frame_number_test_SOURCES =	\
@@ -892,6 +907,7 @@ TEST_CASES = \
 	reverse_execute_PlaceObject2_test1runner \
 	reverse_execute_PlaceObject2_test2runner \
 	displaylist_depths_testrunner \
+	matrix_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS

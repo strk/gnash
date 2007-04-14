@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.33 2007/04/12 16:29:14 strk Exp $ */
+/* $Id: character.cpp,v 1.34 2007/04/14 18:19:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -458,13 +458,13 @@ character::width_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		float w = 0;
+		double w = 0;
 		if ( bounds.isFinite() )
 		{
 			matrix m = ptr->get_matrix();
 			m.transform(bounds);
 			assert(bounds.isFinite());
-			w = TWIPS_TO_PIXELS(int(bounds.width()));
+			w = TWIPS_TO_PIXELS(rint(bounds.width()));
 		}
 		rv = as_value(w);
 	}
@@ -503,13 +503,13 @@ character::height_getset(const fn_call& fn)
 	as_value rv;
 	if ( fn.nargs == 0 ) // getter
 	{
-		float h = 0;
+		double h = 0;
 		if ( bounds.isFinite() )
 		{
 			matrix m = ptr->get_matrix();
 			m.transform(bounds);
 			assert(bounds.isFinite());
-			h = TWIPS_TO_PIXELS(int(bounds.height()));
+			h = TWIPS_TO_PIXELS(rint(bounds.height()));
 		}
 		rv = as_value(h);
 	}

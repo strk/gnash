@@ -1,5 +1,14 @@
 2007-04-14 Sandro Santilli <strk@keybit.net>
 
+	* server/character.cpp (height_getset, width_getset): round
+	  width and heights to nearest integer twip.
+	* testsuite/swfdec/PASSING: height4.swf succeeds.
+	* testsuite/misc-ming.all: Makefile.am, matrix_test.c: new test
+	  for statically-defined matrix interpretation (just started, needs
+	  many more tests).
+	  
+2007-04-14 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (sprite_getBounds): round bounds
 	  to twips.
 	* testsuite/actionscript.all/MovieClip.as: more successes.
