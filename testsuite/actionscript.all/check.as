@@ -67,21 +67,21 @@
 //
 //   getUrl( MEDIA(green.swf) );
 //
-#define MEDIA(x) MEDIADIR + "/" + x
+#define MEDIA(x) MEDIADIR + "/" + #x
 
 //
 // Use check(<expression>)
 //
 #define check(expr)  \
-	if ( expr ) pass_check(expr + \
+	if ( expr ) pass_check(#expr + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
-	else fail_check(expr + \
+	else fail_check(#expr + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 
 #define xcheck(expr)  \
-        if ( expr ) xpass_check(expr + \
+        if ( expr ) xpass_check(#expr + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
-        else xfail_check(expr + \
+        else xfail_check(#expr + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 
 //
@@ -89,17 +89,17 @@
 //
 #define check_equals(obt, exp)  \
 	if ( obt == exp ) pass_check( \
-		obt + " == " + exp + \
+		#obt + " == " + #exp + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
-	else fail_check("expected: " + exp + \
+	else fail_check("expected: " + #exp + \
 		" obtained: " + obt + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 
 #define xcheck_equals(obt, exp)  \
         if ( obt == exp ) xpass_check( \
-                obt + " == " + exp + \
+                #obt + " == " + #exp + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
-        else xfail_check("expected: " + exp + \
+        else xfail_check("expected: " + #exp + \
                 " obtained: " + obt + \
 		" [" + __FILE__ + ":" + __LINE__ + "]" ); \
 

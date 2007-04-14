@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.56 2007/04/14 14:38:29 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.57 2007/04/14 16:27:22 strk Exp $";
 
 #include "check.as"
 
@@ -584,8 +584,8 @@ check_equals(b.yMin, 10);
 check_equals(b.yMax, 30);
 b = draw.getBounds(container); // these are transformed by container draw matrix
 check_equals(b.xMin, -30);
-xcheck_equals(b.xMax, -10);
-xcheck_equals(b.yMin, 10);
+check_equals(b.xMax, -10);
+check_equals(b.yMin, 10);
 check_equals(b.yMax, 20);
 
 draw._visible = false;
@@ -598,8 +598,8 @@ check_equals(b.yMin, 10);
 check_equals(b.yMax, 30);
 b = draw.getBounds(container); // these are transformed by container draw matrix
 check_equals(b.xMin, -30);
-xcheck_equals(b.xMax, -10);
-xcheck_equals(b.yMin, 10);
+check_equals(b.xMax, -10);
+check_equals(b.yMin, 10);
 check_equals(b.yMax, 20);
 
 draw._xscale = 200;

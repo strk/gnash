@@ -815,15 +815,15 @@ sprite_getBounds(const fn_call& fn)
 
 		//m.transform(bounds);
 		//tgtwmat.transform_by_inverse(bounds);
-		std::stringstream ss;
+		//std::stringstream ss;
 
-		ss << "Local bounds: " << bounds << endl;
+		//ss << "Local bounds: " << bounds << endl;
 		srcwmat.transform(bounds);
-		ss << "src-w-transformed bounds: " << bounds << "(srcwmat is " << srcwmat << ")" << endl;
+		//ss << "src-w-transformed bounds: " << bounds << "(srcwmat is " << srcwmat << ")" << endl;
 		tgtwmat.transform_by_inverse(bounds);
-		ss << "tgt-w-invtransfor bounds: " << bounds << "(tgtwmat is " << tgtwmat << ")" << endl;
-		log_msg("%s", ss.str().c_str());
-		log_error("FIXME: MovieClip.getBounds(%s) broken", fn.arg(0).to_debug_string().c_str());
+		//ss << "tgt-w-invtransfor bounds: " << bounds << "(tgtwmat is " << tgtwmat << ")" << endl;
+		//log_msg("%s", ss.str().c_str());
+		log_error("FIXME: MovieClip.getBounds(%s) TESTING", fn.arg(0).to_debug_string().c_str());
 	}
 
 	// Magic numbers here... dunno why
@@ -834,10 +834,11 @@ sprite_getBounds(const fn_call& fn)
 
 	if ( bounds.isFinite() )
 	{
-		xMin = bounds.getMinX()/20;
-		yMin = bounds.getMinY()/20;
-		xMax = bounds.getMaxX()/20;
-		yMax = bounds.getMaxY()/20;
+		// Round to the twip
+		xMin = int(rint(bounds.getMinX())) / 20.0f;
+		yMin = int(rint(bounds.getMinY())) / 20.0f;
+		xMax = int(rint(bounds.getMaxX())) / 20.0f;
+		yMax = int(rint(bounds.getMaxY())) / 20.0f;
 	}
 
 	boost::intrusive_ptr<as_object> bounds_obj(new as_object());
@@ -845,14 +846,6 @@ sprite_getBounds(const fn_call& fn)
 	bounds_obj->init_member("yMin", as_value(yMin));
 	bounds_obj->init_member("xMax", as_value(xMax));
 	bounds_obj->init_member("yMax", as_value(yMax));
-
-	// xMin, xMax, yMin, and yMax
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_error("FIXME: MovieClip.getBounds() TESTING");
-		warned=true;
-	}
 
 	return as_value(bounds_obj.get());
 }

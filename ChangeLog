@@ -1,3 +1,11 @@
+2007-04-14 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (sprite_getBounds): round bounds
+	  to twips.
+	* testsuite/actionscript.all/MovieClip.as: more successes.
+	* testsuite/actionscript.all/check.as: Revert bastiaan patch,
+	  changing semantic of most tests.
+
 2007-04-14 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/{Loadvars,NetStream,Sound,xmlnode}.cpp: Use
@@ -8,11 +16,13 @@
 	* testsuite/actionscript.all/check.as: Don't prepend # where
 	it is not needed to avoid choking gcc3's C preprocessor.
 	* testsuite/libamf.all/{test_number,test_string}.cpp,
-	* testsuite/misc.ming.all/{intervalTestRunner,
+	testsuite/misc.ming.all/{intervalTestRunner,
 	loadMovieTestRunner}: Add needed includes for OpenBSD.
 
-2007-04-12 Sandro Santilli <strk@keybit.net>
+2007-04-14 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (sprite_getBounds): round bounds
+	  to twips.
 	* server/matrix.{h,cpp}: fix conceptual bug in Range2d transform
 	  function.
 	* testsuite/misc-ming.all/displaylist_depths_test.c,
