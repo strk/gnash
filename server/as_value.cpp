@@ -393,7 +393,7 @@ as_value::to_bool_v5() const
 			{
 				double num = to_number();
 				bool ret = num && ! isnan(num);
-				log_msg("m_string_value: %s, to_number: %g, to_bool: %d", m_string_value.c_str(), num, ret);
+				//log_msg("m_string_value: %s, to_number: %g, to_bool: %d", m_string_value.c_str(), num, ret);
 				return ret;
 			}
 		}
@@ -427,7 +427,7 @@ as_value::to_bool_v6() const
 			{
 				double num = to_number();
 				bool ret = num && ! isnan(num);
-				log_msg("m_string_value: %s, to_number: %g, to_bool: %d", m_string_value.c_str(), num, ret);
+				//log_msg("m_string_value: %s, to_number: %g, to_bool: %d", m_string_value.c_str(), num, ret);
 				return ret;
 			}
 		}
