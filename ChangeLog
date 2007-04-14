@@ -1,3 +1,10 @@
+2007-04-12 Sandro Santilli <strk@keybit.net>
+
+	* server/matrix.cpp: fix conceptual bug in Range2d transform
+	  function.
+	* testsuite/actionscript.all/MovieClip.as: one unexpected
+	  success when fetching _height.
+
 2007-04-12 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/parser/movie_def_impl.{cpp,h}: Replace pthread usage

@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.8 2007/04/12 09:14:36 strk Exp $ 
+// $Id: matrix.cpp,v 1.9 2007/04/14 13:28:32 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -227,17 +227,17 @@ matrix::transform(geometry::Range2d<float>& r) const
 	float ymin = r.getMinY();
 	float ymax = r.getMaxY();
 
-	xmin = m_[0][0] * xmin + m_[0][1] * ymin + m_[0][2];
-	ymin = m_[1][0] * xmin + m_[1][1] * ymin + m_[1][2];
+	float n_xmin = m_[0][0] * xmin + m_[0][1] * ymin + m_[0][2];
+	float n_ymin = m_[1][0] * xmin + m_[1][1] * ymin + m_[1][2];
 
-	xmax = m_[0][0] * xmax + m_[0][1] * ymax + m_[0][2];
-	ymax = m_[1][0] * xmax + m_[1][1] * ymax + m_[1][2];
+	float n_xmax = m_[0][0] * xmax + m_[0][1] * ymax + m_[0][2];
+	float n_ymax = m_[1][0] * xmax + m_[1][1] * ymax + m_[1][2];
 
 	// Rotation can swap the max/min coordinates
-	if ( xmax < xmin ) std::swap(xmin, xmax);
-	if ( ymax < ymin ) std::swap(ymin, ymax);
+	if ( n_xmax < n_xmin ) std::swap(n_xmin, n_xmax);
+	if ( n_ymax < n_ymin ) std::swap(n_ymin, n_ymax);
 
-	r.setTo(xmin, ymin, xmax, ymax);
+	r.setTo(n_xmin, n_ymin, n_xmax, n_ymax);
 }
 
 void
