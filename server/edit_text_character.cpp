@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.54 2007/04/15 15:27:03 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.55 2007/04/15 18:50:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -449,7 +449,10 @@ edit_text_character::display()
 	// m_x_offset and m_y_offset memebers in glyph records.
 	// Anyway, see bug #17954 for a testcase.
 	matrix m;
-	m.set_translation(def_bounds.get_x_min(), def_bounds.get_y_min());
+	if ( ! def_bounds.is_null() && ! def_bounds.is_world() )
+	{
+		m.set_translation(def_bounds.get_x_min(), def_bounds.get_y_min());
+	}
 	display_glyph_records(m, this, m_text_glyph_records,
 			      m_def->get_root_def());
 
