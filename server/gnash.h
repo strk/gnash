@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.92 2007/04/13 09:15:54 bjacques Exp $ */
+/* $Id: gnash.h,v 1.93 2007/04/15 10:52:09 bjacques Exp $ */
 
 /// \mainpage
 ///
@@ -61,8 +61,6 @@ namespace image { class image_base; class rgb; class rgba; }
 
 // forward decl
 namespace jpeg { class input; }
-class tu_string;
-class tu_stringi;
 
 namespace gnash {
 // Forward declarations.

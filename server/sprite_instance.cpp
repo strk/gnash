@@ -206,7 +206,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 			IF_VERBOSE_MALFORMED_SWF(
 			log_aserror("Fourth argument of attachMovie "
 				"doesn't cast to an object (%s)",
-				fn.arg(3).to_string());
+				fn.arg(3).to_string().c_str());
 			);
 		}
 	}
@@ -258,7 +258,7 @@ static as_value sprite_create_empty_movieclip(const fn_call& fn)
 		}
 	}
 
-	character* ch = sprite->add_empty_movieclip(fn.arg(0).to_string(), int(fn.arg(1).to_number()));
+	character* ch = sprite->add_empty_movieclip(fn.arg(0).to_string().c_str(), int(fn.arg(1).to_number()));
 	return as_value(ch);
 }
 
@@ -628,7 +628,7 @@ static as_value sprite_hit_test(const fn_call& fn)
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror("Can't find hitTest target %s",
-					tgt_val.to_string());
+					tgt_val.to_string().c_str());
 				);
 				return as_value();
 			}
@@ -1126,7 +1126,7 @@ sprite_name_getset(const fn_call& fn)
 	}
 	else // setter
 	{
-		ptr->set_name(fn.arg(0).to_string(&fn.env()));
+		ptr->set_name(fn.arg(0).to_string(&fn.env()).c_str());
 		//IF_VERBOSE_ASCODING_ERRORS(
 		//log_aserror("Attempt to set read-only property '_name'");
 		//);
@@ -1902,13 +1902,11 @@ void sprite_instance::clone_display_object(const std::string& name,
     }
 }
 
-void sprite_instance::remove_display_object(const tu_string& name_tu)
+void sprite_instance::remove_display_object(const std::string& name)
 {
 //	    GNASH_REPORT_FUNCTION;
 
-	std::string name(name_tu.c_str());
-
-	character* ch = m_display_list.get_character_by_name(name);
+	character* ch = m_display_list.get_character_by_name(name.c_str());
 	if (ch)
 	{
 	    // @@ TODO: should only remove movies that were created via clone_display_object --
@@ -1995,7 +1993,7 @@ void sprite_instance::set_member(const std::string& name,
 		const as_value& val)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-	log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_string());
+log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_string().c_str());
 #endif
 
 	if ( val.is_function() )
@@ -2018,7 +2016,7 @@ void sprite_instance::set_member(const std::string& name,
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_msg(" it's a Text Variable!");
 #endif
-		etc->set_text_value(val.to_string());
+		etc->set_text_value(val.to_string().c_str());
 	}
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	else
@@ -2046,7 +2044,7 @@ const char* sprite_instance::get_variable(const char* path_to_var) const
 
     val = m_as_environment.get_variable(path);
 
-    return val.to_string();	// ack!
+    return val.to_string().c_str();	// ack!
 }
 
 void sprite_instance::set_variable(const char* path_to_var,

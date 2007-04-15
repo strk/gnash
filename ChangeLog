@@ -1,3 +1,12 @@
+2007-04-15 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/container.{cpp,h}: Remove tu_string{,i}.
+	* server/as_value.{cpp,h}: Replace tu_string with std::string.
+	Remove wide string code that was both unused and inherently
+	broken.
+	* all over the place: Update to match changes in as_value.h.
+	Also, eliminate tu_string usage entirely.
+
 2007-04-15 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/MovieClip.as,

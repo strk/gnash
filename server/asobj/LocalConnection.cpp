@@ -139,7 +139,7 @@ as_value localconnection_connect(const fn_call& fn)
     boost::intrusive_ptr<localconnection_as_object> ptr = ensureType<localconnection_as_object>(fn.this_ptr);
     
     if (fn.nargs != 0) {
-        ret = ptr->obj.connect(fn.arg(0).to_string());
+        ret = ptr->obj.connect(fn.arg(0).to_string().c_str());
     } else {
         log_msg("ERROR: No connection name specified to LocalConnection.connect()!\n");
         ret = ptr->obj.connect("localhost"); // FIXME: This should probably

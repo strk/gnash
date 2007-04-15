@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: textformat.cpp,v 1.24 2007/04/11 17:54:21 bjacques Exp $
+// $Id: textformat.cpp,v 1.25 2007/04/15 10:52:09 bjacques Exp $
 //
 
 #include "log.h"
@@ -195,7 +195,7 @@ as_value textformat_setformat(const fn_call& fn)
 
   if (obj->get_member("align", &method)) {
     //log_msg("Align exists and is set to %s\n", method.to_string());
-    const char* align = method.to_string();
+    const char* align = method.to_string().c_str();
     if ( align ) obj->obj.alignSet(align);
   }
 

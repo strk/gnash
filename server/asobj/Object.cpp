@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.21 2007/03/22 22:37:46 bjacques Exp $ */
+/* $Id: Object.cpp,v 1.22 2007/04/15 10:52:09 bjacques Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -323,7 +323,7 @@ object_hasOwnProperty(const fn_call& fn)
 	if ( arg.is_undefined() || propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Invalid call to Object.hasOwnProperty('%s')", arg.to_string());
+		log_aserror("Invalid call to Object.hasOwnProperty('%s')", arg.to_string().c_str());
 		);
 		return as_value();
 	}
@@ -346,7 +346,7 @@ object_isPropertyEnumerable(const fn_call& fn)
 	if ( arg.is_undefined() || propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Invalid call to Object.isPropertyEnumerable('%s')", arg.to_string());
+		log_aserror("Invalid call to Object.isPropertyEnumerable('%s')", arg.to_string().c_str());
 		);
 		return as_value();
 	}

@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.35 2007/04/14 15:53:17 bjacques Exp $ */
+/* $Id: NetStream.cpp,v 1.36 2007/04/15 10:52:09 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -83,7 +83,7 @@ netstream_new(const fn_call& fn)
 				log_aserror("First argument "
 					"to NetStream constructor "
 					"doesn't cast to a NetConnection (%s)",
-					fn.arg(0).to_string());
+					fn.arg(0).to_string().c_str());
 			);
 		}
 	}
@@ -124,7 +124,7 @@ static as_value netstream_play(const fn_call& fn)
 		return as_value();
 	}
 
-	if (ns->play(fn.arg(0).to_string()) != 0)
+	if (ns->play(fn.arg(0).to_string().c_str()) != 0)
 	{
 		ns->close();
 	};

@@ -13,9 +13,7 @@
 
 #include "tu_config.h"
 #include "utility.h"
-
-class tu_string;
-
+#include <string>
 
 class membuf
 {
@@ -23,7 +21,7 @@ public:
 	membuf();
 	membuf(const void* data, int size);
 	membuf(const membuf& buf);
-	membuf(const tu_string& str);
+	membuf(const std::string& str);
 	~membuf();
 
 	// Construct a read-only membuf that points at the given data,
@@ -44,7 +42,7 @@ public:
 	bool append(const void* data, int size);
 	bool append(const membuf& buf);
 	// We do not append the terminating '\0'.
-	bool append(const tu_string& str);
+	bool append(const std::string& str);
 
 private:
 	int m_size;

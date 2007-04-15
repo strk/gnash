@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.36 2007/04/07 15:27:16 strk Exp $ */
+/* $Id: xml.cpp,v 1.37 2007/04/15 10:52:09 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -610,7 +610,7 @@ xml_createelement(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     
     if (fn.nargs > 0) {
-        const char *text = fn.arg(0).to_string();
+        const char *text = fn.arg(0).to_string().c_str();
 	XMLNode *xml_obj = new XMLNode();
 //	cerr << "create new child XMLNode is at " << (void *)xml_obj << endl;
 	xml_obj->nodeNameSet(text);
@@ -643,7 +643,7 @@ xml_createtextnode(const fn_call& fn)
     const char *text;
 
     if (fn.nargs > 0) {
-	text = fn.arg(0).to_string(); 
+	text = fn.arg(0).to_string().c_str(); 
 	xml_obj = new XMLNode;
 	xml_obj->nodeValueSet(text);
 	xml_obj->nodeTypeSet(XMLNode::tText);

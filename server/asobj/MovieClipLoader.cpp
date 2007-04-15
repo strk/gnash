@@ -142,7 +142,7 @@ private:
 	Listeners _listeners;
 	bool          _started;
 	bool          _completed;
-	tu_string     _filespec;
+	std::string     _filespec;
 	int           _progress;
 	bool          _error;
 	struct mcl    _mcl;
@@ -318,7 +318,7 @@ moviecliploader_loadclip(const fn_call& fn)
 	character* target = fn.env().find_target(fn.arg(1));
 	if ( ! target )
 	{
-		log_error("Could not find target %s", fn.arg(1).to_string());
+		log_error("Could not find target %s", fn.arg(1).to_string().c_str());
 		return as_value(false);
 	}
 	sprite_instance* sprite = dynamic_cast<sprite_instance*>(target);

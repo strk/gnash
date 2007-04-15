@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.42 2007/04/11 17:54:21 bjacques Exp $ */
+/* $Id: as_value.h,v 1.43 2007/04/15 10:52:09 bjacques Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -139,42 +139,6 @@ public:
 		m_string_value(str.c_str()),
 		m_number_value(0.0)
 	{
-	}
-
-	/// Construct a STRING value
-	as_value(const wchar_t* wstr)
-		:
-		m_type(STRING),
-		m_string_value(""),
-		m_number_value(0.0)
-	{
-		// Encode the string value as UTF-8.
-		//
-		// Is this dumb?  Alternatives:
-		//
-		// 1. store a tu_wstring instead of tu_string?
-		// Bloats typical ASCII strings, needs a
-		// tu_wstring type, and conversion back the
-		// other way to interface with char[].
-		// 
-		// 2. store a tu_wstring as a union with
-		// tu_string?  Extra complexity.
-		//
-		// 3. ??
-		//
-		// Storing UTF-8 seems like a pretty decent
-		// way to do it.  Everything else just
-		// continues to work.
-
-#if (WCHAR_MAX != MAXINT)
-		tu_string::encode_utf8_from_wchar(&m_string_value, (const uint16_t *)wstr);
-#else
-# if (WCHAR_MAX != MAXSHORT)
-# error "Can't determine the size of wchar_t"
-# else
-		tu_string::encode_utf8_from_wchar(&m_string_value, (const uint32_t *)wstr);
-# endif
-#endif
 	}
 
 	/// Construct a BOOLEAN value
@@ -311,28 +275,13 @@ public:
 		return m_type == OBJECT || m_type == AS_FUNCTION || m_type == MOVIECLIP;
 	}
 
-	/// Get a C string representation of this value.
-	//
-	/// @param env
-	///	The environment to use for running the toString() method
-	///	for object values. If NULL, toString() won't be run.
-	///
-	const char*	to_string(as_environment* env=NULL) const;
-
-	/// Get a tu_string representation for this value.
-	//
-	/// @param env
-	///	The environment to use for running the toString() method
-	///	for object values. If NULL, toString() won't be run.
-	///
-	const tu_string&	to_tu_string(as_environment* env=NULL) const;
-
 	/// Get a std::string representation for this value.
 	//
 	/// @param env
 	///	The environment to use for running the toString() method
 	///	for object values. If NULL, toString() won't be run.
 	///
+	const std::string& to_string(as_environment* env=NULL) const;
 	std::string to_std_string(as_environment* env=NULL) const;
 
 	std::string to_debug_string() const;
@@ -348,9 +297,9 @@ public:
 	///
 	std::string to_std_string_versioned(int version, as_environment* env=NULL) const;
 
-	/// Get a tu_string representation for this value.
+	/// Get a string representation for this value.
 	//
-	/// This differs from to_tu_string() in that returned
+	/// This differs from to_string() in that returned
 	/// representation will depend on version of the SWF
 	/// source. 
 	/// @@ shouldn't this be the default ?
@@ -359,15 +308,7 @@ public:
 	///	The environment to use for running the toString() method
 	///	for object values. If NULL, toString() won't be run.
 	///
-	const tu_string&	to_tu_string_versioned(int version, as_environment* env=NULL) const;
-
-	/// Calls to_tu_string() returning a cast to tu_stringi
-	//
-	/// @param env
-	///	The environment to use for running the toString() method
-	///	for object values. If NULL, toString() won't be run.
-	///
-	const tu_stringi&	to_tu_stringi(as_environment* env=NULL) const;
+	const std::string&	to_string_versioned(int version, as_environment* env=NULL) const;
 
 	/// Conversion to number 
 	//
@@ -472,7 +413,7 @@ public:
 	///	The environment to use for running the toString() method
 	///	for object values. If NULL, toString() won't be run.
 	///
-	/// @see to_tu_string_versionioned
+	/// @see to_string_versionioned
 	///
 	void	convert_to_string_versioned(int version, as_environment* env=NULL);
 
@@ -480,7 +421,7 @@ public:
 	// in preference to generic overloaded set().  You are
 	// more likely to get a warning/error if misused.
 
-	void	set_tu_string(const tu_string& str) {
+	void	set_string(const std::string& str) {
           drop_refs();
           m_type = STRING;
           m_string_value = str;
@@ -582,9 +523,7 @@ public:
 //	void	lsr(const as_value& v) { set_int((uint32_t(to_number()) >> int(v.to_number()))); }
 
 	/// Sets this value to this string plus the given string.
-	void	string_concat(const tu_string& str);
-
-	//tu_string* get_mutable_tu_string() { assert(m_type == STRING); return &m_string_value; }
+	void	string_concat(const std::string& str);
 
 private:
 
@@ -598,8 +537,7 @@ private:
 
 	type	m_type;
 
-	// TODO: switch to std::string
-	mutable tu_string	m_string_value;
+	mutable std::string	m_string_value;
 
 	union
 	{

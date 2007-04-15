@@ -436,8 +436,8 @@ const char*	call_method_parsed(
     env->drop(nargs);
 
     // Return pointer to static string for return value.
-    static tu_string	s_retval;
-    s_retval = result.to_tu_string();
+    static std::string	s_retval;
+    s_retval = result.to_string();
     return s_retval.c_str();
 }
 

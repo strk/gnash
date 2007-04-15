@@ -465,8 +465,6 @@ protected:
         /// The derived class should not override this method,
         /// but instead implement its own gettersetter properties.
 	///
-	/// TODO: take a std::string rather then a tu_stringi
-	///
 	/// @parame name
 	///     Name of the property.
 	///	Case insensitive up to SWF6,

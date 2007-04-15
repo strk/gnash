@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.88 2007/04/14 17:33:16 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.89 2007/04/15 10:52:09 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -826,7 +826,7 @@ SWFHandlers::ActionStringEq(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(2);
-    env.top(1).set_bool(env.top(1).to_tu_string() == env.top(0).to_tu_string());
+    env.top(1).set_bool(env.top(1).to_string() == env.top(0).to_string());
     env.drop(1);    
 }
 
@@ -837,7 +837,7 @@ SWFHandlers::ActionStringLength(ActionExec& thread)
     as_environment& env = thread.env;
     thread.ensureStack(1);
     int version = env.get_version();
-    env.top(0).set_int(env.top(0).to_tu_string_versioned(version).utf8_length());
+    env.top(0).set_int(env.top(0).to_string_versioned(version).size());
 }
 
 void
@@ -865,7 +865,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 
     int	base = int(base_val.to_number(&env));  
     int version = env.get_version();
-    const tu_string& str = string_val.to_tu_string_versioned(version);
+    const std::string& str = string_val.to_string_versioned(version);
 
     if ( size < 0 )
     {
@@ -923,11 +923,11 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     //size = imin(str.length() - base, size);
 
     // TODO: unsafe: use string::substr instead !
-    tu_string	new_string = str.c_str() + base;
+    std::string	new_string = str.c_str() + base; // XXX
     new_string.resize(size);
     
     env.drop(2);
-    env.top(0).set_tu_string(new_string);
+    env.top(0).set_string(new_string);
 }
 
 void
@@ -958,7 +958,7 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 	thread.ensureStack(1); // variable name
 
 	as_value& top_value = env.top(0);
-	const char* ptr = top_value.to_string();
+	const char* ptr = top_value.to_string().c_str();
 	if ( ! ptr )
 	{
 		top_value.set_undefined();
@@ -979,7 +979,7 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 		} else {
 			log_action("-- get var: %s=%s at %p",
 				var_string.c_str(),
-				top_value.to_tu_string().c_str(),
+				top_value.to_string().c_str(),
 				(void*)obj.get());
 		}
 	);
@@ -998,7 +998,7 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	// stack must be contain at least two items
 	thread.ensureStack(2); 
 
-	assert(env.top(1).to_string());
+	assert(env.top(1).to_string().c_str());
         string name = env.top(1).to_std_string();
 	thread.setVariable(name, env.top(0));
 
@@ -1027,7 +1027,7 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 	//Vitaly: env.drop(1) remove object on which refers const char * target_name
 	//strk: shouldn't we use env.pop() instead ? No (see above comment)
 	//const char * target_name = env.top(0).to_string();
-	assert(env.top(0).to_string());
+	assert(env.top(0).to_string().c_str());
 	string target_name = env.top(0).to_string();
 	env.drop(1); // pop the target name off the stack
 
@@ -1044,7 +1044,7 @@ SWFHandlers::ActionStringConcat(ActionExec& thread)
 
     int version = env.get_version();
     env.top(1).convert_to_string_versioned(version);
-    env.top(1).string_concat(env.top(0).to_tu_string_versioned(version));
+    env.top(1).string_concat(env.top(0).to_string_versioned(version));
     env.drop(1);
 }
 
@@ -1305,7 +1305,7 @@ SWFHandlers::ActionStringCompare(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(2); 
-    env.top(1).set_bool(env.top(1).to_tu_string() < env.top(0).to_tu_string());
+    env.top(1).set_bool(env.top(1).to_string() < env.top(0).to_string());
 }
 
 void
@@ -1772,7 +1772,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	const char* target_string = NULL;
 	if ( ! target.is_undefined() && ! target.is_null() )
 	{
-		target_string = target.to_string(&env);
+		target_string = target.to_string(&env).c_str();
 	}
 
 	// If the url starts with "FSCommand:", then this is
@@ -1942,7 +1942,7 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 	}
 	else
 	{
-		const char* url = url_val.to_string();
+		const char* url = url_val.to_string().c_str();
 		CommonGetUrl(env, env.top(0), url, method);
 	}
 		  
@@ -2109,7 +2109,7 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
     thread.setLocalVariable(varname.to_std_string(), value);
 
     IF_VERBOSE_ACTION (
-    log_action("-- set local var: %s = %s", varname.to_string(), value.to_debug_string().c_str());
+    log_action("-- set local var: %s = %s", varname.to_string().c_str(), value.to_debug_string().c_str());
     );
 }
 
@@ -2129,7 +2129,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	as_value function = thread.getVariable(env.top(0).to_std_string(&env));
 	if ( ! function.is_object() ) 
 	{
-		log_aserror("ActionCallFunction: %s is not an object", env.top(0).to_string());
+		log_aserror("ActionCallFunction: %s is not an object", env.top(0).to_string().c_str());
 	}
 	else if ( ! function.is_function() ) 
 	{
@@ -2473,7 +2473,7 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
     	int version = env.get_version();
         // modify env.top(1)
         v2.convert_to_string_versioned(version, &env);
-        v2.string_concat(v1.to_tu_string_versioned(version, &env));
+        v2.string_concat(v1.to_string_versioned(version, &env));
     }
     else
     {
@@ -2606,8 +2606,8 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
     
     // Special case: String has a member "length"
     // @@ FIXME: we shouldn't have all this "special" cases --strk;
-    if (target.is_string() && member_name.to_tu_stringi() == "length") {
-        int len = target.to_tu_string_versioned(version).utf8_length();
+    if (target.is_string() && member_name.to_string_versioned(version) == "length") {
+        int len = target.to_string_versioned(version).size();
         env.top(1).set_int(len); 
     } else {
         if ( ! thread.getObjectMember(*obj, member_name.to_std_string(), env.top(1)) )
@@ -3124,7 +3124,7 @@ SWFHandlers::ActionStringGreater(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(2); 
-    env.top(1).set_bool(env.top(1).to_tu_string() > env.top(0).to_tu_string());
+    env.top(1).set_bool(env.top(1).to_string() > env.top(0).to_string());
     env.drop(1);
 }
 

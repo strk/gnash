@@ -18,7 +18,7 @@
 
 // Implementation of the Global ActionScript Object
 
-/* $Id: Global.cpp,v 1.57 2007/03/30 14:51:38 strk Exp $ */
+/* $Id: Global.cpp,v 1.58 2007/04/15 10:52:09 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -104,7 +104,7 @@ as_global_trace(const fn_call& fn)
     //
     // @@ Nothing needs special treatment,
     //    as_value::to_string() will take care of everything
-    const char* arg0 = fn.arg(0).to_string();
+    const char* arg0 = fn.arg(0).to_string().c_str();
     log_trace("%s", arg0);
     return as_value();
 }
@@ -175,7 +175,7 @@ as_global_parsefloat(const fn_call& fn)
     as_value rv;
 
     // sscanf will handle the whitespace / unneeded characters etc. automatically
-    if (1 == sscanf(fn.arg(0).to_string(), "%f", &result))
+    if (1 == sscanf(fn.arg(0).to_string().c_str(), "%f", &result))
 	rv = double(result);
     else
 	// if sscanf didn't find anything, return NaN
@@ -206,9 +206,9 @@ as_global_parseint(const fn_call& fn)
 
     // Set up some variables
     const string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    char *input_buffer = new char[strlen(fn.arg(0).to_string())+1];
+    char *input_buffer = new char[fn.arg(0).to_string().size()+1];
     char *input = input_buffer;
-    strcpy(input,fn.arg(0).to_string());
+    strcpy(input,fn.arg(0).to_string().c_str());
     int base;
     bool bNegative;
 
@@ -328,7 +328,7 @@ as_global_assetpropflags(const fn_call& fn)
     {
 		log_warning("Invalid call to ASSetPropFlags: "
 			"object argument is not an object: %s",
-			fn.arg(0).to_string());
+			fn.arg(0).to_string().c_str());
 		return as_value();
     }
 

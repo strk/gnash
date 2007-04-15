@@ -210,7 +210,7 @@ PropertyList::dump(as_object& this_ptr)
 	for ( const_iterator it=begin(), itEnd=end(); it != itEnd; ++it )
 	{
 		log_msg("  %s: %s", it->first.c_str(),
-			it->second->getValue(this_ptr).to_string());
+			it->second->getValue(this_ptr).to_string().c_str());
 	}
 }
 

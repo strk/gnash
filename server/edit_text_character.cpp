@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.52 2007/04/12 11:35:30 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.53 2007/04/15 10:52:09 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -666,7 +666,7 @@ edit_text_character::set_member(const std::string& name,
 		//if (name == "text")
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
-		set_text_value(val.to_tu_string_versioned(version).c_str());
+		set_text_value(val.to_string_versioned(version).c_str());
 		return;
 	}
 	case M_X:
@@ -1276,7 +1276,7 @@ edit_text_character::registerTextVariable()
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_msg("target sprite (%p) does have a member named %s", (void*)sprite, varname);
 #endif
-		set_text_value(val.to_string());
+		set_text_value(val.to_string().c_str());
 	}
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	else

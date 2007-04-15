@@ -33,6 +33,7 @@
 #include <string>
 #include <algorithm>
 #include <memory> // for auto_ptr
+#include <boost/algorithm/string/case_conv.hpp>
 
 //#define GNASH_DEBUG 
 
@@ -49,7 +50,7 @@ class AsValueLessThen
 public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
-		return ( a.to_tu_string() < b.to_tu_string() );
+		return a.to_string().compare(b.to_string()) < 0;
 	}
 };
 
@@ -59,7 +60,7 @@ class AsValueLessThenDesc
 public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
-		return ( a.to_string() > b.to_string() );
+		return a.to_string().compare(b.to_string()) > 0;
 	}
 };
 
@@ -69,7 +70,12 @@ class AsValueLessThenNoCase
 public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
-		return ( a.to_tu_stringi() < b.to_tu_stringi() );
+		using namespace boost::algorithm;
+
+		std::string strA = to_upper_copy(a.to_string());
+		std::string strB = to_upper_copy(b.to_string());
+
+		return strA.compare(strB) < 0;
 	}
 };
 
@@ -79,7 +85,12 @@ class AsValueLessThenDescNoCase
 public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
-		return ( a.to_tu_stringi() > b.to_tu_stringi() );
+		using namespace boost::algorithm;
+
+		std::string strA = to_upper_copy(a.to_string());
+		std::string strB = to_upper_copy(b.to_string());
+
+		return strA.compare(strB) > 0;
 	}
 };
 
@@ -632,7 +643,7 @@ array_pop(const fn_call& fn)
 
 	IF_VERBOSE_ACTION (
 	log_action("calling array pop, result:%s, new array size:%d",
-		rv.to_string(), array->size());
+		rv.to_string().c_str(), array->size());
 	);
         return rv;
 }
@@ -648,7 +659,7 @@ array_shift(const fn_call& fn)
 
 	IF_VERBOSE_ACTION (
 	log_action("calling array shift, result:%s, new array size:%d",
-		rv.to_string(), array->size());
+		rv.to_string().c_str(), array->size());
 	);
 	return rv;
 }
@@ -665,7 +676,7 @@ array_reverse(const fn_call& fn)
 
 	IF_VERBOSE_ACTION (
 	log_action("called array reverse, result:%s, new array size:%d",
-		rv.to_string(), array->size());
+		rv.to_string().c_str(), array->size());
 	);
 	return rv;
 }
@@ -846,7 +857,7 @@ array_new(const fn_call& fn)
 		for (int i = 0; i < int(fn.arg(0).to_number()); i++)
 		{
 			index_number.set_int(i);
-			ao->set_member(index_number.to_string(), null_value);
+			ao->set_member(index_number.to_string().c_str(), null_value);
 		}
 	}
 	else

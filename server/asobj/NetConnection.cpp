@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.cpp,v 1.36 2007/04/07 11:55:50 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.37 2007/04/15 10:52:09 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -212,7 +212,7 @@ netconnection_connect(const fn_call& fn)
 	boost::intrusive_ptr<NetConnection> ptr = ensureType<NetConnection>(fn.this_ptr); 
     
 	if (fn.nargs > 0) {
-		ptr->addToURL(fn.arg(0).to_string());
+		ptr->addToURL(fn.arg(0).to_string().c_str());
 	}
 	return as_value();
 }

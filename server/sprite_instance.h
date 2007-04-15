@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.96 2007/04/12 11:35:30 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.97 2007/04/15 10:52:09 bjacques Exp $ */
 
 // Stateful live Sprite instance
 
@@ -551,7 +551,7 @@ public:
 	//
 	/// @@ what happens if the we have multiple objects
 	///    with the same name ?
-	void remove_display_object(const tu_string& name);
+	void remove_display_object(const std::string& name);
 
 	/// Dispatch event handler(s), if any.
 	virtual bool	on_event(const event_id& id);

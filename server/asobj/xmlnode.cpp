@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.29 2007/04/14 15:53:17 bjacques Exp $ */
+/* $Id: xmlnode.cpp,v 1.30 2007/04/15 10:52:09 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -596,7 +596,7 @@ xmlnode_nodename(const fn_call& fn)
     }
     else
     {
-        ptr->nodeNameSet(fn.arg(0).to_string());
+	ptr->nodeNameSet(fn.arg(0).to_string().c_str());
     }
     return rv;
 }

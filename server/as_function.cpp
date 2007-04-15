@@ -246,7 +246,7 @@ function_apply(const fn_call& fn)
 						" (expected array)"
 						" - considering as call with no args",
 						fn.arg(1).typeOf(),
-						fn.arg(1).to_string());
+						fn.arg(1).to_string().c_str());
 				);
 				goto call_it;
 			}

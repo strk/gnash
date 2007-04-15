@@ -281,7 +281,7 @@ sound_stop(const fn_call& fn)
 	int si = -1;
 
 	if (fn.nargs > 0) {
-		const char* name = fn.arg(0).to_string();
+		const char* name = fn.arg(0).to_string().c_str();
 
 		// check the import.
 		movie_definition* def = fn.env().get_target()->get_root_movie()->get_movie_definition();
@@ -327,7 +327,7 @@ sound_attachsound(const fn_call& fn)
 
 	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
 
-    const char* name = fn.arg(0).to_string();
+    const char* name = fn.arg(0).to_string().c_str();
     if (!name) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror("attachSound need a non-null argument");

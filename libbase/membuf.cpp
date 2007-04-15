@@ -65,7 +65,7 @@ membuf::membuf(const membuf& buf)
 }
 
 
-membuf::membuf(const tu_string& str)
+membuf::membuf(const std::string& str)
 	:
 	m_size(0),
 	m_capacity(0),
@@ -152,7 +152,7 @@ bool membuf::append(const membuf& buf)
 }
 
 
-bool membuf::append(const tu_string& str)
+bool membuf::append(const std::string& str)
 {
 	return append(str.c_str(), str.length());
 }

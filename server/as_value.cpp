@@ -66,32 +66,15 @@ as_value::as_value(as_function* func)
     }
 }
 
-
-// Conversion to string.
-const char
-*as_value::to_string(as_environment* env) const
-{
-    return to_tu_string(env).c_str();
-}
-
-
 std::string
 as_value::to_std_string(as_environment* env) const
 {
-    const char* c = to_string(env);
-    assert(c);
-    return std::string(c);
+    return to_string(env);
 }
 
-const tu_stringi
-&as_value::to_tu_stringi(as_environment* env) const
-{
-    return reinterpret_cast<const tu_stringi&>(to_tu_string(env));
-}
-
-// Conversion to const tu_string&.
-const tu_string&
-as_value::to_tu_string(as_environment* env) const
+// Conversion to const std::string&.
+const std::string&
+as_value::to_string(as_environment* env) const
 {
 	switch (m_type)
 	{
@@ -214,9 +197,9 @@ as_value::to_tu_string(as_environment* env) const
     return m_string_value;
 }
 
-// Conversion to const tu_string&.
-const tu_string
-&as_value::to_tu_string_versioned(int version, as_environment* env) const
+// Conversion to const std::string&.
+const std::string&
+as_value::to_string_versioned(int version, as_environment* env) const
 {
     if (m_type == UNDEFINED) {
 	// Version-dependent behavior.
@@ -228,14 +211,14 @@ const tu_string
 	return m_string_value;
     }
 		
-    return to_tu_string(env);
+    return to_string(env);
 }
 
 // Version-based Conversion to std::string
 std::string
 as_value::to_std_string_versioned(int version, as_environment* env) const
 {
-	return std::string(to_tu_string_versioned(version, env).c_str());
+	return to_string_versioned(version, env);
 }
 
 // Conversion to primitive value.
@@ -554,7 +537,7 @@ as_value::convert_to_number(as_environment* env)
 void
 as_value::convert_to_string()
 {
-    to_tu_string();	// init our string data.
+    to_string();	// init our string data.
     m_type = STRING;	// force type.
 }
 
@@ -563,7 +546,7 @@ void
 as_value::convert_to_string_versioned(int version, as_environment* env)
     // Force type to string.
 {
-    to_tu_string_versioned(version, env); // init our string data.
+    to_string_versioned(version, env); // init our string data.
     m_type = STRING;	// force type.
 }
 
@@ -633,7 +616,7 @@ as_value::operator==(const as_value& v) const
     }
     else if (m_type == STRING)
     {
-	return m_string_value == v.to_tu_string();
+	return m_string_value == v.to_string();
     }
     else if (m_type == NUMBER)
     {
@@ -677,7 +660,7 @@ as_value::equals(const as_value& v, as_environment* env) const
     }
     else if (m_type == STRING)
     {
-	return m_string_value == v.to_tu_string(env);
+	return m_string_value == v.to_string(env);
     }
     else if (m_type == NUMBER)
     {
@@ -718,9 +701,9 @@ as_value::operator!=(const as_value& v) const
 	
 // Sets *this to this string plus the given string.
 void
-as_value::string_concat(const tu_string& str)
+as_value::string_concat(const std::string& str)
 {
-    to_tu_string();	// make sure our m_string_value is initialized
+    to_string();	// make sure our m_string_value is initialized
     m_type = STRING;
     m_string_value += str;
 }
@@ -785,7 +768,6 @@ as_value::strictly_equals(const as_value& v) const
 std::string
 as_value::to_debug_string() const
 {
-	std::string ret;
 	char buf[512];
 
 	switch (m_type)
@@ -804,14 +786,15 @@ as_value::to_debug_string() const
 			sprintf(buf, "[function:%p]", m_object_value);
 			return buf;
 		case STRING:
-			ret = "[string:" + std::string(m_string_value.c_str()) + std::string("]");
-			return ret;
+			return "[string:" + m_string_value + "]";
 		case NUMBER:
-			sprintf(buf, "[number:%g]", m_number_value);
-			return buf;
+		{
+			std::stringstream stream;
+			stream << m_number_value;
+			return "[number:" + stream.str() + "]";
+		}
 		case MOVIECLIP:
-			sprintf(buf, "[movieclip:%s]", m_string_value.c_str());
-			return buf;
+			return "[movieclip:" + m_string_value + "]";
 		default:
 			assert(0);
 	}
@@ -823,7 +806,7 @@ as_value::operator=(const as_value& v)
 	if (v.m_type == UNDEFINED) set_undefined();
 	else if (v.m_type == NULLTYPE) set_null();
 	else if (v.m_type == BOOLEAN) set_bool(v.m_boolean_value);
-	else if (v.m_type == STRING) set_tu_string(v.m_string_value);
+	else if (v.m_type == STRING) set_string(v.m_string_value);
 	else if (v.m_type == NUMBER) set_double(v.m_number_value);
 	else if (v.m_type == OBJECT) set_as_object(v.m_object_value);
 
