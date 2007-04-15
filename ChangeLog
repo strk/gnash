@@ -1,3 +1,12 @@
+2007-04-15 Sandro Santilli <strk@keybit.net>
+
+	* server/matrix.{cpp,h}: provided setters for canonical 
+	  parameters.
+	* server/character.cpp: avoid direct access to matrix members.
+	* server/sprite_instance.cpp: avoid direct acces to matrix members.
+	* server/vm/ASHandlers.cpp: fix signedness compiler warnings.
+	* testsuite/server/MatrixTest.cpp: add tests for scale concatenation.
+
 2007-04-15 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libbase/container.{cpp,h}: Remove tu_string{,i}.

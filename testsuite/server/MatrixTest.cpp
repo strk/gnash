@@ -69,6 +69,8 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(identity.get_x_scale(), 1);
 	check_equals(identity.get_y_scale(), 1);
 	check_equals(identity.get_rotation(), 0);
+	check_equals(identity.get_x_translation(), 0);
+	check_equals(identity.get_y_translation(), 0);
 	check( ! identity.does_flip() );
 
 	// The inverse of identity is still the identity
@@ -76,37 +78,99 @@ main(int /*argc*/, char** /*argv*/)
 	invert.set_inverse(identity);
 	check_equals(invert, matrix::identity);
 
-	// Try setting and getting some values
+	//---------------------------------------------
+	// Test canonic parameter setting and getting
+	//---------------------------------------------
+
 	matrix m1;
 	m1.set_scale_rotation(1, 3, 0);
 	check_equals(m1.get_x_scale(), 1);
 	check_equals(m1.get_y_scale(), 3);
 	check_equals(m1.get_rotation(), 0);
+	check_equals(m1.get_x_translation(), 0);
+	check_equals(m1.get_y_translation(), 0);
 	check(!m1.does_flip());
 
-	m1.set_scale_rotation(1.5, 2.5, 0);
+	m1.set_scale(1.5, 2.5);
 	check_equals(D(m1.get_x_scale()), 1.5);
 	check_equals(D(m1.get_y_scale()), 2.5);
 	check_equals(D(m1.get_rotation()), 0);
+	check_equals(m1.get_x_translation(), 0);
+	check_equals(m1.get_y_translation(), 0);
 
-	m1.set_scale_rotation(34, 4, 0);
+	m1.set_scale(34, 4);
 	check_equals(D(m1.get_x_scale()), 34);
 	check_equals(D(m1.get_y_scale()), 4);
 	check_equals(D(m1.get_rotation()), 0);
+	check_equals(m1.get_x_translation(), 0);
+	check_equals(m1.get_y_translation(), 0);
 
 	m1.set_scale_rotation(1, 1, 2);
 	check_equals(D(m1.get_x_scale()), 1);
 	check_equals(D(m1.get_y_scale()), 1);
 	check_equals(D(m1.get_rotation()), 2);
+	check_equals(m1.get_x_translation(), 0);
+	check_equals(m1.get_y_translation(), 0);
 
-	m1.set_scale_rotation(2, 1, 2);
+	m1.set_x_scale(2);
 	check_equals(D(m1.get_x_scale()), 2);
 	check_equals(D(m1.get_y_scale()), 1);
 	check_equals(D(m1.get_rotation()), 2);
+	check_equals(m1.get_x_translation(), 0);
+	check_equals(m1.get_y_translation(), 0);
 
-	m1.set_scale_rotation(1, 2, 2);
+	m1.set_scale(1, 2);
 	check_equals(D(m1.get_x_scale()), 1);
 	check_equals(D(m1.get_y_scale()), 2);
 	check_equals(D(m1.get_rotation()), 2);
+	check_equals(m1.get_x_translation(), 0);
+	check_equals(m1.get_y_translation(), 0);
+
+	m1.set_rotation(0);
+	check_equals(D(m1.get_x_scale()), 1);
+	check_equals(D(m1.get_y_scale()), 2);
+	check_equals(D(m1.get_rotation()), 0);
+	check_equals(m1.get_x_translation(), 0);
+	check_equals(m1.get_y_translation(), 0);
+
+	m1.set_translation(5, 6);
+	check_equals(D(m1.get_x_scale()), 1);
+	check_equals(D(m1.get_y_scale()), 2);
+	check_equals(D(m1.get_rotation()), 0);
+	check_equals(m1.get_x_translation(), 5);
+	check_equals(m1.get_y_translation(), 6);
+
+	m1.set_rotation(2);
+	check_equals(D(m1.get_x_scale()), 1);
+	check_equals(D(m1.get_y_scale()), 2);
+	check_equals(D(m1.get_rotation()), 2);
+	check_equals(m1.get_x_translation(), 5);
+	check_equals(m1.get_y_translation(), 6);
+
+	//---------------------------------------------
+	// Test concatenation
+	//---------------------------------------------
+
+	m1.concatenate_scale(2);
+	check_equals(D(m1.get_x_scale()), 2);
+	check_equals(D(m1.get_y_scale()), 4);
+	check_equals(D(m1.get_rotation()), 2);
+	check_equals(m1.get_x_translation(), 5);
+	check_equals(m1.get_y_translation(), 6);
+
+	m1.concatenate_scales(3, 3);
+	check_equals(D(m1.get_x_scale()), 6);
+	check_equals(D(m1.get_y_scale()), 12);
+	check_equals(D(m1.get_rotation()), 2);
+	check_equals(m1.get_x_translation(), 5);
+	check_equals(m1.get_y_translation(), 6);
+
+	m1.concatenate_scales(2, 1);
+	check_equals(D(m1.get_x_scale()), 12);
+	check_equals(D(m1.get_y_scale()), 12);
+	check_equals(D(m1.get_rotation()), 2);
+	check_equals(m1.get_x_translation(), 5);
+	check_equals(m1.get_y_translation(), 6);
+
 }
 

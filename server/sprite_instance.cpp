@@ -1794,22 +1794,20 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
 	boost::intrusive_ptr<edit_text_character_def> txt = new edit_text_character_def(get_movie_definition());
 	boost::intrusive_ptr<character> txt_char = txt->create_character_instance(this, 0);
 
+	// TODO: where to write width and height info ?
+	UNUSED(width);
+	UNUSED(height);
+
+	// Give name and mark as dynamic
 	txt_char->set_name(name.c_str());
 	txt_char->setDynamic();
 
-	// Here we should set the proper matrix using x,y width and height
-
-	// set _x
-	txt_matrix.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(x));
-	// set _y
-	txt_matrix.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(y));
-	// set _width
-	txt_matrix.m_[0][0] = infinite_to_fzero(PIXELS_TO_TWIPS(width));
-	// set _height
-	txt_matrix.m_[1][1] = infinite_to_fzero(PIXELS_TO_TWIPS(height));
+	// Set _x and _y
+	txt_matrix.set_translation(
+			infinite_to_fzero(PIXELS_TO_TWIPS(x)),
+			infinite_to_fzero(PIXELS_TO_TWIPS(y)));
 
 	// Here we add the character to the displayList.
-
 	m_display_list.place_character(
 		txt_char.get(),
 		depth,

@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.h,v 1.6 2007/04/14 14:38:28 strk Exp $ 
+// $Id: matrix.h,v 1.7 2007/04/15 14:31:19 strk Exp $ 
 //
 
 #ifndef GNASH_MATRIX_H
@@ -103,7 +103,7 @@ public:
 	///
 	void	concatenate_scale(float s);
 
-  /// Just like concatenate_scale() but with different scales for x/y 
+	/// Just like concatenate_scale() but with different scales for x/y 
 	void	concatenate_scales(float x, float y);
 
 	/// Set this matrix to a blend of m1 and m2, parameterized by t.
@@ -111,6 +111,36 @@ public:
 
 	/// Set the scale & rotation part of the matrix. angle in radians.
 	void	set_scale_rotation(float x_scale, float y_scale, float rotation);
+
+	/// Set the scale part of the matrix, will keep current rotation
+	void	set_scale(float x_scale, float y_scale);
+
+	/// Set the X scale part of the matrix, will keep current rotation and Y scale
+	void	set_x_scale(float scale);
+
+	/// Set the Y scale part of the matrix, will keep current rotation and X scale
+	void	set_y_scale(float scale);
+
+	/// Set the rotation part of the matrix, will keep current scale
+	void	set_rotation(float rotation);
+
+	/// Set x translation
+	void set_x_translation(float x)
+	{
+		m_[0][2] = x;
+	}
+
+	/// Set y translation
+	void set_y_translation(float y)
+	{
+		m_[1][2] = y;
+	}
+
+	void set_translation(float x, float y)
+	{
+		m_[0][2] = x;
+		m_[1][2] = y;
+	}
 
 	/// Initialize from the SWF input stream.
 	void	read(stream* in);
@@ -126,6 +156,9 @@ public:
 
 	/// Transform point 'p' by our matrix. 
 	void	transform(point& p) const;
+
+	/// Transform point 'x,y' by our matrix. 
+	void	transform(float& x, float& y) const;
 
 	/// Transform vector 'v' by our matrix. Doesn't apply translation.
 	//
@@ -176,6 +209,18 @@ public:
 
 	/// return our rotation component (in radians)
 	float	get_rotation() const;
+
+	/// return the canonical x translation
+	float	get_x_translation() const
+	{
+		return m_[0][2];
+	}
+
+	/// return the canonical y translation
+	float	get_y_translation() const
+	{
+		return m_[1][2];
+	}
 
 public: // must be switched to private
 

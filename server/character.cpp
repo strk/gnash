@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.cpp,v 1.34 2007/04/14 18:19:49 strk Exp $ */
+/* $Id: character.cpp,v 1.35 2007/04/15 14:31:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -88,8 +88,7 @@ character::do_mouse_drag()
 		    // Place our origin so that it coincides with the mouse coords
 		    // in our parent frame.
 		    matrix	local = get_matrix();
-		    local.m_[0][2] = parent_mouse.m_x;
-		    local.m_[1][2] = parent_mouse.m_y;
+		    local.set_translation( parent_mouse.m_x, parent_mouse.m_y );
 		    set_matrix(local);
 		}
 		else
@@ -245,16 +244,17 @@ character::x_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		matrix m = ptr->get_matrix();
-		rv = as_value(TWIPS_TO_PIXELS(m.m_[0][2]));
+		rv = as_value(TWIPS_TO_PIXELS(m.get_x_translation()));
 	}
 	else // setter
 	{
+		double newx = fn.arg(0).to_number(&(fn.env()));
 		matrix m = ptr->get_matrix();
-		m.m_[0][2] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number(&(fn.env()))));
+		m.set_x_translation(infinite_to_fzero(PIXELS_TO_TWIPS(newx)));
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
-	return rv;;
+	return rv;
 
 }
 
@@ -267,12 +267,13 @@ character::y_getset(const fn_call& fn)
 	if ( fn.nargs == 0 ) // getter
 	{
 		matrix m = ptr->get_matrix();
-		rv = as_value(TWIPS_TO_PIXELS(m.m_[1][2]));
+		rv = as_value(TWIPS_TO_PIXELS(m.get_y_translation()));
 	}
 	else // setter
 	{
+		double newy = fn.arg(0).to_number(&(fn.env()));
 		matrix m = ptr->get_matrix();
-		m.m_[1][2] = infinite_to_fzero(PIXELS_TO_TWIPS(fn.arg(0).to_number(&(fn.env()))));
+		m.set_y_translation(infinite_to_fzero(PIXELS_TO_TWIPS(newy)));
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
 	}
@@ -559,12 +560,9 @@ character::rotation_getset(const fn_call& fn)
 		// @@ tulrich: is parameter in world-coords or local-coords?
 		matrix m = ptr->get_matrix();
 
-		// Decompose matrix and insert the desired value.
-		float x_scale = m.get_x_scale();
-		float y_scale = m.get_y_scale();
 		// input is in degrees
 		float rotation = (float) fn.arg(0).to_number(&(fn.env())) * float(M_PI) / 180.f;
-		m.set_scale_rotation(x_scale, y_scale, rotation);
+		m.set_rotation(rotation);
 
 		ptr->set_matrix(m);
 		ptr->transformedByScript(); // m_accept_anim_moves = false; 
@@ -718,10 +716,7 @@ character::set_x_scale(float x_scale)
 {
 	matrix m = get_matrix();
 
-	// Decompose matrix and insert the desired value.
-	float y_scale = m.get_y_scale();
-	float rotation = m.get_rotation();
-	m.set_scale_rotation(x_scale, y_scale, rotation);
+	m.set_x_scale(x_scale);
 
 	set_matrix(m);
 	transformedByScript(); // m_accept_anim_moves = false; 
@@ -732,10 +727,7 @@ character::set_y_scale(float y_scale)
 {
 	matrix m = get_matrix();
 
-	// Decompose matrix and insert the desired value.
-	float x_scale = m.get_x_scale();
-	float rotation = m.get_rotation();
-	m.set_scale_rotation(x_scale, y_scale, rotation);
+	m.set_y_scale(y_scale);
 
 	set_matrix(m);
 	transformedByScript(); // m_accept_anim_moves = false; 

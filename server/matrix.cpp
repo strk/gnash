@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.11 2007/04/14 22:23:05 strk Exp $ 
+// $Id: matrix.cpp,v 1.12 2007/04/15 14:31:19 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -131,10 +131,16 @@ void
 matrix::concatenate_scales(float x, float y)
 // Just like concatenate_scale() but with different scales for x/y
 {
+	matrix m2; m2.set_scale_rotation(x, y, 0);
+	concatenate(m2);
+
+#if 0 // the code below only works when x and y scales are equal,
+      // see testsuite/server/MatrixTest.cpp
 	m_[0][0] *= infinite_to_fzero(x);
 	m_[0][1] *= infinite_to_fzero(x);
 	m_[1][0] *= infinite_to_fzero(y);
 	m_[1][1] *= infinite_to_fzero(y);
+#endif
 }
 
 void
@@ -161,6 +167,37 @@ matrix::set_scale_rotation(float x_scale, float y_scale, float angle)
 	m_[0][1] = infinite_to_fzero(y_scale * -sin_angle);
 	m_[1][0] = infinite_to_fzero(x_scale * sin_angle);
 	m_[1][1] = infinite_to_fzero(y_scale * cos_angle);
+}
+
+void
+matrix::set_x_scale(float xscale)
+{
+	float rotation = get_rotation();
+	float yscale = get_y_scale();
+	set_scale_rotation(xscale, yscale, rotation);
+}
+
+void
+matrix::set_y_scale(float yscale)
+{
+	float rotation = get_rotation();
+	float xscale = get_x_scale();
+	set_scale_rotation(xscale, yscale, rotation);
+}
+
+void
+matrix::set_scale(float xscale, float yscale)
+{
+	float rotation = get_rotation();
+	set_scale_rotation(xscale, yscale, rotation);
+}
+
+void
+matrix::set_rotation(float rotation)
+{
+	float xscale = get_x_scale();
+	float yscale = get_y_scale();
+	set_scale_rotation(xscale, yscale, rotation);
 }
 
 
@@ -221,10 +258,17 @@ void
 matrix::transform(point& p) const
 // Transform point 'p' by our matrix.
 {
-	float nx = m_[0][0] * p.m_x + m_[0][1] * p.m_y + m_[0][2];
-	float ny = m_[1][0] * p.m_x + m_[1][1] * p.m_y + m_[1][2];
-	p.m_x = nx;
-	p.m_y = ny;
+	transform(p.m_x, p.m_y);
+}
+
+void
+matrix::transform(float& x, float& y) const
+// Transform point 'x,y' by our matrix.
+{
+	float nx = m_[0][0] * x + m_[0][1] * y + m_[0][2];
+	float ny = m_[1][0] * x + m_[1][1] * y + m_[1][2];
+	x = nx;
+	y = ny;
 }
 
 void

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.89 2007/04/15 10:52:09 bjacques Exp $ */
+/* $Id: ASHandlers.cpp,v 1.90 2007/04/15 14:31:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -886,7 +886,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 	base=1;
     }
 
-    else if ( base > str.length() )
+    else if ( unsigned(base) > str.length() )
     {
 	IF_VERBOSE_ASCODING_ERRORS (
     	log_aserror("base goes beyond input string in ActionSubString, "
@@ -900,7 +900,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     // Base is 1-based, we'll use 0-based from now on...
     base -= 1;
 
-    if ( base+size > str.length() )
+    if ( unsigned(base+size) > str.length() )
     {
 	IF_VERBOSE_ASCODING_ERRORS (
     	log_aserror("base+size goes beyond input string in ActionSubString, "
@@ -911,7 +911,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 
 
     assert(base >= 0);
-    assert(base < str.length() );
+    assert(unsigned(base) < str.length() );
     assert(size >= 0);
 
     //log_msg("string: %s, size: %d, base: %d", str.c_str(), size, base);
