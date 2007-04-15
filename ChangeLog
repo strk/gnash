@@ -1,5 +1,9 @@
 2007-04-15 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (display): move text glyphs
+	  so to be inside bounds defined for the textfield character.
+	  Fixes bug #17954. This is likely not the cleanest way to
+	  do this, see comments.
 	* server/matrix.{cpp,h}: provided setters for canonical 
 	  parameters.
 	* server/character.cpp: avoid direct access to matrix members.
