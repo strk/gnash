@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.11 2007/04/16 13:02:49 strk Exp $";
+rcsid="$Id: getvariable.as,v 1.12 2007/04/16 16:47:30 strk Exp $";
 
 #include "check.as"
 
@@ -333,6 +333,8 @@ func();
 
 //---------------------------------------------------------------------
 // Check scope of function called trough a path
+// nothing to do with GetVariable, but I didnt' feel like adding another
+// file for testing this.. it's still related to tags and variable names
 //---------------------------------------------------------------------
 
 num = 7;
@@ -347,8 +349,44 @@ asm {
 	callfunction
         setvariable
 };
-xcheck_equals(checkpoint, 5);
+check_equals(checkpoint, 5);
 
+o2 = new Object;
+o2.m = new Object;
+o2.m.func = func;
+o2.num = 3;
+o2.m.num = 4;
+with (o2.m) {
+asm {
+        push 'checkpoint'
+	push 0
+	push 'func'
+	callfunction
+        setvariable
+};
+};
+check_equals(checkpoint, 4);
+
+_global.func = func;
+_global.num = 9;
+asm {
+        push 'checkpoint'
+	push 0
+	push 'func'
+	callfunction
+        setvariable
+};
+check_equals(checkpoint, 7);
+
+this["o2.m.func"] = function() { return 19; };
+asm {
+        push 'checkpoint'
+	push 0
+	push 'o2.m.func'
+	callfunction
+        setvariable
+};
+check_equals(checkpoint, 4);
 
 //-----------------------------------------------------------------------
 // TODO: try use of 'with' stack

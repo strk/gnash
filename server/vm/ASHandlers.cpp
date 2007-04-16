@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.94 2007/04/16 11:19:48 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.95 2007/04/16 16:47:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2166,7 +2166,16 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	//env.dump_stack();
 
 	// Let's consider it a as a string and lookup the function.
-	as_value function = thread.getVariable(env.top(0).to_string(&env));
+        const std::string& funcname = env.top(0).to_string(&env);
+
+        as_value function;
+
+        as_object* this_ptr = thread.getThisPointer();
+        if ( ! env.parse_path(funcname, &this_ptr, function) )
+        {
+                function = thread.getVariable(funcname);
+        }
+
 	if ( ! function.is_object() ) 
 	{
 		log_aserror("ActionCallFunction: %s is not an object", env.top(0).to_string(&env).c_str());
@@ -2200,7 +2209,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         debugger.callStackPush(function_name);
 	debugger.matchBreakPoint(function_name, true);
 #endif
-	as_value result = call_method(function, &env, thread.getThisPointer(),
+	as_value result = call_method(function, &env, this_ptr,
 				  nargs, env.get_top_index() - 2);
 
 	//log_msg("Function's result: %s", result.to_string(&env));

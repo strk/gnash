@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.67 2007/04/11 05:04:14 zoulunkai Exp $ */
+/* $Id: as_environment.cpp,v 1.68 2007/04/16 16:47:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -406,6 +406,22 @@ as_environment::parse_path(const std::string& var_path,
 //log_msg(" path=%s var=%s", path.c_str(), var.c_str());
 
     return true;
+}
+
+bool
+as_environment::parse_path(const std::string& var_path,
+		as_object** target, as_value& val)
+{
+	string path;
+	string var;
+	bool is_slash_based;
+	if( ! parse_path(var_path, path, var, &is_slash_based) ) return false;
+        as_object* target_ptr = is_slash_based ? find_object_slashsyntax(path) : find_object_dotsyntax(path); 
+	if ( ! target_ptr ) return false;
+
+	target_ptr->get_member(var, &val);
+	*target = target_ptr;
+	return true;
 }
 
 character*

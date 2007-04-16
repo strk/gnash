@@ -1,5 +1,16 @@
 2007-04-16 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.{cpp,h}: add a parse_path method to
+	  return an actual object when the given parameter is actually
+	  a path.
+	* server/vm/ASHandlers.cpp (ActionCallFunction): set 'this'
+	  pointer to the object containing the function if the function
+	  name is a path. Fixes bug #18698.
+	* testsuite/actionscript.all/getvariable.as: success in
+	  callFunction(path.to_function), a few more tests of that kind.
+
+2007-04-16 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/getvariable.as: check 'this' pointer when
 	  calling a function trough a path.
 	* testsuite/server/Makefile.am: add libgnashamf.la to GNASH libs.

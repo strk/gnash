@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_environment.h,v 1.44 2007/04/10 17:41:42 strk Exp $ */
+/* $Id: as_environment.h,v 1.45 2007/04/16 16:47:29 strk Exp $ */
 
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
@@ -415,6 +415,28 @@ public:
 	static bool parse_path(const std::string& var_path, std::string& path,
 		std::string& var, bool* is_slash_based=NULL);
 
+	/// \brief
+	/// Try to parse a string as a variable path
+	//
+	/// Variable paths come in the form:
+	///
+	/// 	/path/to/some/sprite/:varname
+	///
+	/// (or same thing, without the last '/')
+	///
+	/// or
+	///	path.to.some.var
+	///
+	/// If there's no dot nor comma, or if the 'path' part
+	/// does not resolve to an object, this function returns false.
+	/// Otherwise, true is returned and 'target' and 'val'
+	/// parameters are appropriaterly set.
+	///
+	/// Note that if the parser variable name doesn't exist in the found
+	/// target, the 'val' will be undefined, but no other way to tell whether
+	/// the variable existed or not from the caller...
+	///
+	bool parse_path(const std::string& var_path, as_object** target, as_value& val);
 
 	/// The variables container (case-insensitive)
 	typedef std::map<std::string, as_value, StringNoCaseLessThen> Variables;
