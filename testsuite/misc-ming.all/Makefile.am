@@ -105,6 +105,7 @@ check_PROGRAMS = \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
 	get_frame_number_test \
+	frame_label_test \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -140,6 +141,7 @@ check_SCRIPTS = \
 	reverse_execute_PlaceObject2_test2runner \
 	displaylist_depths_testrunner \
 	get_frame_number_testrunner \
+	frame_label_testrunner \
 	matrix_testrunner \
 	$(NULL)
 
@@ -399,6 +401,20 @@ get_frame_number_test.swf: get_frame_number_test
 
 get_frame_number_testrunner: $(srcdir)/../generic-testrunner.sh get_frame_number_test.swf
 	sh $< -r5 $(top_builddir) get_frame_number_test.swf > $@
+	chmod 755 $@
+
+frame_label_test_SOURCES =	\
+	frame_label_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+frame_label_test_LDADD = $(MING_LIBS)
+
+frame_label_test.swf: frame_label_test
+	./frame_label_test $(top_srcdir)/testsuite/media
+
+frame_label_testrunner: $(srcdir)/../generic-testrunner.sh frame_label_test.swf
+	sh $< -r5 $(top_builddir) frame_label_test.swf > $@
 	chmod 755 $@
 
 attachMovieTest_SOURCES =	\
@@ -908,6 +924,8 @@ TEST_CASES = \
 	reverse_execute_PlaceObject2_test2runner \
 	displaylist_depths_testrunner \
 	matrix_testrunner \
+	get_frame_number_testrunner \
+	frame_label_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS

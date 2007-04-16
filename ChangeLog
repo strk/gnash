@@ -1,3 +1,8 @@
+2007-04-16 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am:
+	  Activated get_frame_number and frame_label_test.
+
 2007-04-16 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/frame_label_test.c:
@@ -5,8 +10,7 @@
 	* server/sprite_instance.cpp:
 	  update call_frame_actions();
 	* server/vm/ASHandlers.cpp:
-		properly process frame label in ActionCallFrame() and ActionGotoExpression().
-
+	  properly process frame label in ActionCallFrame() and ActionGotoExpression().
 	  
 2007-04-15 Sandro Santilli <strk@keybit.net>
 
