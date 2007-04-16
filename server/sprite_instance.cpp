@@ -1691,7 +1691,7 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 
 	double num =  str.to_number(env);
 
-	if ( isnan(num) || isinf(num))
+	if ( ! isfinite(num) || int(num) != num )
 	{
 		return m_def->get_labeled_frame(frame_spec.to_std_string(env), frameno);
 	}

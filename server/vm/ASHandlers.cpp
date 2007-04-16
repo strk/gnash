@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.93 2007/04/16 07:37:08 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.94 2007/04/16 11:19:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2059,7 +2059,10 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 	{
 		target = env.find_target(target_path);
 	}
-	else
+
+	if ( ! target ) // 4.11 would make parse_path above return true, 
+	                // we should check if a sprite named '4' is supposed to work
+	                // in that case 
 	{
 		target = env.get_target();
 		frame_var = target_frame;

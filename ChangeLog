@@ -1,3 +1,11 @@
+2007-04-16 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (get_frame_number): check frame labels
+	  also when convertion to number gives a non-integer value.
+	* server/vm/ASHandlers.cpp (ActionGotoExpression): don't pretend
+	  any path-looking string is necessarely a path, it can still be
+	  a floating number or a frame label.
+
 2007-04-16  John Gilmore  <gnu@quiet.toad.com>
 
 	* libbase/log.h: Update documentation for log_* functions; rename
