@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: debugger.h,v 1.9 2007/03/15 22:39:53 strk Exp $ */
+/* $Id: debugger.h,v 1.10 2007/04/16 07:37:08 strk Exp $ */
 
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
@@ -102,7 +102,7 @@ public:
     /// Are there any watchpoints set ?
     int anyWatchPoints() { return _watchpoints.size(); };
     /// Does the variable name match any watchpoints ?
-    bool matchWatchPoint(std::string &var, watch_state_e state);
+    bool matchWatchPoint(const std::string &var, watch_state_e state);
     
     /// Are there any breakpoints set ?
     int anyBreakPoints() { return _breakpoints.size(); };

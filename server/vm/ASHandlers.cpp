@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.92 2007/04/16 07:10:45 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.93 2007/04/16 07:37:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -994,8 +994,7 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	// stack must be contain at least two items
 	thread.ensureStack(2); 
 
-	assert(env.top(1).to_string(&env).c_str());
-        string name = env.top(1).to_string(&env);
+        const string& name = env.top(1).to_string(&env);
 	thread.setVariable(name, env.top(0));
 
         IF_VERBOSE_ACTION (
@@ -1020,14 +1019,11 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 
 	thread.ensureStack(1);  // target name
 
-	//Vitaly: env.drop(1) remove object on which refers const char * target_name
-	//strk: shouldn't we use env.pop() instead ? No (see above comment)
-	//const char * target_name = env.top(0).to_string(&env);
-	assert(env.top(0).to_string(&env).c_str());
-	string target_name = env.top(0).to_string(&env);
-	env.drop(1); // pop the target name off the stack
+	const string& target_name = env.top(0).to_string(&env);
 
 	CommonSetTarget(env, target_name);
+
+	env.drop(1); // pop the target name off the stack
 }
 
 void
@@ -1995,11 +1991,11 @@ SWFHandlers::ActionCallFrame(ActionExec& thread)
 
 	thread.ensureStack(1); // frame spec
 
-	string target_frame = env.top(0).to_string(&env);
+	const string& target_frame = env.top(0).to_string(&env);
 	string target_path;
 	string frame_var;
 	
-	character * target;
+	character * target = NULL;
 	if( env.parse_path(target_frame, target_path, frame_var) )
 	{
 		target = env.find_target(target_path);
@@ -2010,7 +2006,7 @@ SWFHandlers::ActionCallFrame(ActionExec& thread)
 		target = env.get_target();
 	}
 	
-	sprite_instance *target_sprite = target->to_movie();
+	sprite_instance *target_sprite = target ? target->to_movie() : NULL;
 	if(target_sprite)
 	{
 		target_sprite->call_frame_actions(frame_var);
@@ -2117,12 +2113,8 @@ SWFHandlers::ActionDelete(ActionExec& thread)
 		return;
 	}
 
-	as_value var = env.pop();
-
-	bool ret = thread.delVariable(var.to_string(&env));
-	env.push(as_value(ret));
-
-	return;
+	// What's the difference between this and ActionDelete2 ??
+	env.top(0) = thread.delVariable(env.top(0).to_string(&env));
 }
 
 void
@@ -2147,13 +2139,15 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
     as_environment& env = thread.env;
     thread.ensureStack(2); // value, var
 
-    as_value value = env.pop();
-    as_value varname = env.pop();
+    as_value& value = env.top(0);
+    as_value& varname = env.top(1);
     thread.setLocalVariable(varname.to_string(&env), value);
 
     IF_VERBOSE_ACTION (
     log_action("-- set local var: %s = %s", varname.to_string(&env).c_str(), value.to_debug_string().c_str());
     );
+
+    env.drop(2);
 }
 
 void
@@ -2169,7 +2163,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	//env.dump_stack();
 
 	// Let's consider it a as a string and lookup the function.
-	as_value function = thread.getVariable(env.top(0).to_std_string(&env));
+	as_value function = thread.getVariable(env.top(0).to_string(&env));
 	if ( ! function.is_object() ) 
 	{
 		log_aserror("ActionCallFunction: %s is not an object", env.top(0).to_string(&env).c_str());
@@ -2277,7 +2271,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
 	thread.ensureStack(2); // classname, nargs
 
 	as_value val = env.pop();
-	string classname = val.to_string(&env);;
+	const string& classname = val.to_string(&env);
 
 	IF_VERBOSE_ACTION (
 		log_action("---new object: %s",
@@ -2397,16 +2391,17 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
     
     int nmembers = (int) env.pop().to_number(&env);
 
-    thread.ensureStack(nmembers); // members
+    thread.ensureStack(nmembers*2); // name, value for each member
     
     boost::intrusive_ptr<as_object> new_obj_ptr(init_object_instance().release()); 
     
     // Set provided members
     for (int i=0; i<nmembers; ++i) {
-        as_value member_value = env.pop();
-	string member_name = env.pop().to_string(&env);
+        as_value member_value = env.top(0);
+	string member_name = env.top(1).to_string(&env);
         //new_obj_ptr->set_member(member_name, member_value);
 	thread.setObjectMember(*new_obj_ptr, member_name, member_value);
+	env.drop(2);
     }
     
     // @@ TODO

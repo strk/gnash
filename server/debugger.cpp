@@ -505,7 +505,7 @@ Debugger::dumpWatchPoints()
 }
 
 bool
-Debugger::matchWatchPoint(std::string &var, watch_state_e state)
+Debugger::matchWatchPoint(const std::string &var, watch_state_e state)
 {
 //    GNASH_REPORT_FUNCTION;
     std::map<std::string, watch_state_e>::const_iterator it;
