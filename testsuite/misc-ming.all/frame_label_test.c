@@ -56,7 +56,7 @@ main(int argc, char** argv)
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  add_actions(mo, "x1=0; x2=0; x3=0; x4=0; x5=0; x6=0;");
+  add_actions(mo, "x1=0; x2=0; x3=0; x4=0; x5=0; x6=0; x7=0; x8=0;");
   SWFMovie_nextFrame(mo); /* 1st frame of _root */
 
   
@@ -99,6 +99,12 @@ main(int argc, char** argv)
   add_clip_actions(mc1, "_root.x6 = 'mc1_frame6'; stop(); ");
   SWFMovieClip_labelFrame(mc1, "frame6");
   SWFMovieClip_nextFrame(mc1); 
+  add_clip_actions(mc1, "_root.x7 = 'mc1_frame7'; stop(); ");
+  SWFMovieClip_labelFrame(mc1, "frame7");
+  SWFMovieClip_nextFrame(mc1); 
+  add_clip_actions(mc1, "_root.x8 = 'mc1_frame8'; stop(); ");
+  SWFMovieClip_labelFrame(mc1, "frame8");
+  SWFMovieClip_nextFrame(mc1); 
   
     
   /* place _root.mc1 */
@@ -114,8 +120,11 @@ main(int argc, char** argv)
                   " lable = '/mc1/mc11/:frame4'; "
                   " gotoAndPlay(lable); "           //GotoExpression
                   " lable = '/mc1/mc11/:5'; "
-                  " gotoAndPlay(lable); "           
-                  " callFrame('/mc1/mc11/:frame6'); " );      
+                  " gotoAndPlay(lable); "           //GotoExpression
+                  " callFrame('/mc1/mc11/:frame6'); "
+                  " callFrame('mc1:7'); "
+                  " callFrame('mc1/:frame8'); ");      
+                  
   SWFMovie_nextFrame(mo); /* 3rd frame of _root */
    
 
@@ -124,10 +133,16 @@ main(int argc, char** argv)
   check_equals(mo, "_root.x1", "'mc11_frame4'");
   check_equals(mo, "_root.x2", "'mc11_frame5'");
   check_equals(mo, "_root.x3", "'mc11_frame6'");
+  check_equals(mo, "_root.x7", "'mc1_frame7'");
+  check_equals(mo, "_root.x8", "'mc1_frame8'");
   /* seems that GotoLabel does not support target_path */
   check_equals(mo, "_root.x4", "0");
   check_equals(mo, "_root.x5", "0");
   check_equals(mo, "_root.x6", "0");
+  add_actions(mo, " callFrame('/:1'); ");
+  check_equals(mo, "_root.x1", "0");
+  check_equals(mo, "_root.x2", "0");
+  check_equals(mo, "_root.x3", "0");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 4th frame of _root */
   
