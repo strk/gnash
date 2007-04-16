@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: getvariable.as,v 1.10 2007/04/11 07:31:53 zoulunkai Exp $";
+rcsid="$Id: getvariable.as,v 1.11 2007/04/16 13:02:49 strk Exp $";
 
 #include "check.as"
 
@@ -330,6 +330,24 @@ function func_obj()
 
 func = new func_obj();
 func();
+
+//---------------------------------------------------------------------
+// Check scope of function called trough a path
+//---------------------------------------------------------------------
+
+num = 7;
+func = function() { return this.num; };
+o = new Object;
+o.func = func;
+o.num = 5;
+asm {
+        push 'checkpoint'
+	push 0
+	push '_root.o.func'
+	callfunction
+        setvariable
+};
+xcheck_equals(checkpoint, 5);
 
 
 //-----------------------------------------------------------------------

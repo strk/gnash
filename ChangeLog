@@ -1,5 +1,7 @@
 2007-04-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/getvariable.as: check 'this' pointer when
+	  calling a function trough a path.
 	* testsuite/server/Makefile.am: add libgnashamf.la to GNASH libs.
 	* testsuite/generic-testrunner.sh, doc/C/internals.xml:
 	  Add -f switch to specify the maximum number of frame advancements.
