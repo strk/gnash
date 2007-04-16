@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.90 2007/04/15 14:31:19 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.91 2007/04/16 01:02:17 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -576,9 +576,7 @@ SWFHandlers::ActionGotoFrame(ActionExec& thread)
 	sprite_instance* tgt = env.get_target()->to_movie();
 	assert(tgt);
 
-	// 0-based already?
-	//// Convert from 1-based to 0-based
-	//frame--;
+	// frame number within this tag is hard-coded and 0-based
 	tgt->goto_frame(frame);
 }
 
@@ -1984,15 +1982,39 @@ SWFHandlers::ActionBranchIfTrue(ActionExec& thread)
 void
 SWFHandlers::ActionCallFrame(ActionExec& thread)
 {
-        GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
 	thread.ensureStack(1); // frame spec
 
-	// Note: no extra data in this instruction!
-	sprite_instance* tgt = env.get_target()->to_movie();
-	assert(tgt);
-	tgt->call_frame_actions(env.top(0));
+	string target_frame = env.top(0).to_std_string();
+	string target_path;
+	string frame_var;
+	
+	character * target;
+	if( env.parse_path(target_frame, target_path, frame_var) )
+	{
+		target = env.find_target(target_path);
+	}
+	else
+	{
+		frame_var = target_frame;
+		target = env.get_target();
+	}
+	
+	sprite_instance *target_sprite = target->to_movie();
+	if(target_sprite)
+	{
+		target_sprite->call_frame_actions(frame_var);
+	}
+	else
+	{
+		log_aserror(
+			"Couldn't find target_sprite \"%s\" in ActionCallFrame!"
+			" target frame actions will not be called...",
+			target_path.c_str());
+	}
+
 	env.drop(1);
 }
 
@@ -2008,7 +2030,6 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 	const action_buffer& code = thread.code;
 	size_t pc = thread.pc;
 
-    //dbglogfile << __PRETTY_FUNCTION__ << ": unimplemented!" << endl;
 
 	// From Alexi's SWF ref:
 	//
@@ -2025,31 +2046,45 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 	unsigned char play_flag = code[pc + 3];
 	sprite_instance::play_state state = play_flag ? sprite_instance::PLAY : sprite_instance::STOP;
 		  
-	sprite_instance* target = env.get_target()->to_movie();
-	if ( ! target )
+	string target_frame = env.pop().to_std_string();
+	string target_path;
+	string frame_var;
+	
+	character * target;
+	if( env.parse_path(target_frame, target_path, frame_var) )
 	{
-		log_error("environment target is not a sprite_instance while executing ActionGotoExpression");
-		env.drop(1);
-		return;
+		target = env.find_target(target_path);
 	}
-
-	as_value expression = env.pop();
-
-	size_t frame_number;
-	if ( ! target->get_frame_number(expression, frame_number) )
+	else
 	{
-		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Frame spec found on stack "
-			"at ActionGotoExpression doesn't evaluate "
+		target = env.get_target();
+		frame_var = target_frame;
+	}
+	
+	sprite_instance *target_sprite = target->to_movie();
+	if(target_sprite)
+	{
+		size_t frame_number;
+		if ( ! target_sprite->get_frame_number(frame_var, frame_number) )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Frame spec found on stack "
+				"at ActionGotoExpression doesn't evaluate "
 		        "to a valid frame: %s",
-			expression.to_debug_string().c_str());
-		);
-		return;
+				target_frame.c_str());
+			);
+			return;
+		}
+		target_sprite->goto_frame(frame_number);
+		target_sprite->set_play_state(state);
 	}
-
-	target->goto_frame(frame_number);
-	target->set_play_state(state);
-		  
+	else
+	{
+		log_aserror(
+			"Couldn't find target_sprite \"%s\" in ActionGotoExpression!"
+			" will not goto taget_frame...",
+			target_frame.c_str());
+	}		  
 }
 
 
