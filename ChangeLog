@@ -1,5 +1,10 @@
 2007-04-16 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp: always pass an as_environment pointer
+	  when converting as_value to a string, use to_string rather 
+	  then to_std_string() when a reference is enough; (ActionDuplicateClip): 
+	  properly cleanup the stack on error; (ActionGotoFrameExpression):
+	  properly handle unknown target.
 	* testsuite/misc-ming.all/Makefile.am:
 	  Activated get_frame_number and frame_label_test.
 

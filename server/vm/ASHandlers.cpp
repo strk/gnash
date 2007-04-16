@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.91 2007/04/16 01:02:17 zoulunkai Exp $ */
+/* $Id: ASHandlers.cpp,v 1.92 2007/04/16 07:10:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -824,7 +824,7 @@ SWFHandlers::ActionStringEq(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(2);
-    env.top(1).set_bool(env.top(1).to_string() == env.top(0).to_string());
+    env.top(1).set_bool(env.top(1).to_string(&env) == env.top(0).to_string(&env));
     env.drop(1);    
 }
 
@@ -956,14 +956,12 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 	thread.ensureStack(1); // variable name
 
 	as_value& top_value = env.top(0);
-	const char* ptr = top_value.to_string().c_str();
-	if ( ! ptr )
+	string var_string = top_value.to_string(&env);
+	if ( var_string.empty() )
 	{
 		top_value.set_undefined();
 		return;
 	}
-
-	string var_string(ptr);
 
 	top_value = thread.getVariable(var_string);
 
@@ -977,7 +975,7 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 		} else {
 			log_action("-- get var: %s=%s at %p",
 				var_string.c_str(),
-				top_value.to_string().c_str(),
+				top_value.to_string(&env).c_str(),
 				(void*)obj.get());
 		}
 	);
@@ -996,8 +994,8 @@ SWFHandlers::ActionSetVariable(ActionExec& thread)
 	// stack must be contain at least two items
 	thread.ensureStack(2); 
 
-	assert(env.top(1).to_string().c_str());
-        string name = env.top(1).to_std_string();
+	assert(env.top(1).to_string(&env).c_str());
+        string name = env.top(1).to_string(&env);
 	thread.setVariable(name, env.top(0));
 
         IF_VERBOSE_ACTION (
@@ -1024,9 +1022,9 @@ SWFHandlers::ActionSetTargetExpression(ActionExec& thread)
 
 	//Vitaly: env.drop(1) remove object on which refers const char * target_name
 	//strk: shouldn't we use env.pop() instead ? No (see above comment)
-	//const char * target_name = env.top(0).to_string();
-	assert(env.top(0).to_string().c_str());
-	string target_name = env.top(0).to_string();
+	//const char * target_name = env.top(0).to_string(&env);
+	assert(env.top(0).to_string(&env).c_str());
+	string target_name = env.top(0).to_string(&env);
 	env.drop(1); // pop the target name off the stack
 
 	CommonSetTarget(env, target_name);
@@ -1145,8 +1143,8 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 	thread.ensureStack(3); 
 
 	int depth = int(env.top(0).to_number(&env))+character::staticDepthOffset;
-	std::string newname = env.top(1).to_std_string(&env);
-	std::string path = env.top(2).to_std_string(&env);
+	const std::string& newname = env.top(1).to_string(&env);
+	const std::string& path = env.top(2).to_string(&env);
 
 	character* ch = env.find_target(path);
 	if ( ! ch )
@@ -1155,6 +1153,7 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 		log_aserror("Path given to duplicateMovieClip(%s) doesn't point to a character",
 			path.c_str());
 		);
+		env.drop(3);
 		return;
 	}
 
@@ -1165,6 +1164,7 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 		log_aserror("Path given to duplicateMovieClip(%s) is not a sprite",
 			path.c_str());
 		);
+		env.drop(3);
 		return;
 	}
 
@@ -1180,7 +1180,7 @@ SWFHandlers::ActionRemoveClip(ActionExec& thread)
 
 	thread.ensureStack(1); 
 
-	std::string path = env.pop().to_std_string();
+	std::string path = env.pop().to_string(&env);
 
 	character* ch = env.find_target(path);
 	if ( ! ch )
@@ -1303,7 +1303,7 @@ SWFHandlers::ActionStringCompare(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(2); 
-    env.top(1).set_bool(env.top(1).to_string() < env.top(0).to_string());
+    env.top(1).set_bool(env.top(1).to_string(&env) < env.top(0).to_string(&env));
 }
 
 void
@@ -1394,7 +1394,15 @@ SWFHandlers::ActionOrd(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1);  
-    env.top(0).set_int(env.top(0).to_string()[0]);
+    string str = env.top(0).to_string(&env);
+    if ( str.empty() )
+    {
+    	env.top(0).set_undefined();
+    }
+    else
+    {
+    	env.top(0).set_int(str.c_str()[0]);
+    }
 }
 
 void
@@ -1767,10 +1775,10 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		sendVarsMethod=0;
 	}
 
-	const char* target_string = NULL;
+	string target_string;
 	if ( ! target.is_undefined() && ! target.is_null() )
 	{
-		target_string = target.to_string(&env).c_str();
+		target_string = target.to_string(&env);
 	}
 
 	// If the url starts with "FSCommand:", then this is
@@ -1780,7 +1788,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		if (s_fscommand_handler)
 		{
 			// Call into the app.
-			(*s_fscommand_handler)(env.get_target()->get_root_movie(), url_c + 10, target_string);
+			(*s_fscommand_handler)(env.get_target()->get_root_movie(), url_c + 10, target_string.c_str());
 		}
 
 		return;
@@ -1815,7 +1823,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	const URL& baseurl = get_base_url();
 	URL url(url_s, baseurl);
 
-	log_msg("get url: target=%s, url=%s (%s)", target_string,
+	log_msg("get url: target=%s, url=%s (%s)", target_string.c_str(),
 		url.str().c_str(), url_c);
 
 	if ( loadTargetFlag )
@@ -1824,7 +1832,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		if ( ! target_ch )
 		{
 			log_error("get url: target %s not found",
-				target_string);
+				target_string.c_str());
 			return;
 		}
 
@@ -1832,7 +1840,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		if ( ! target_movie ) 
 		{
 			log_error("get url: target %s is not a sprite",
-				target_string);
+				target_string.c_str());
 			return;
 		}
 
@@ -1840,7 +1848,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		{
 			log_msg("getURL2 loadVariable");
 
-			//log_warning("Unhandled GetUrl2 loadVariable flag. loadTargetFlag=%d, target=%s (%s)", loadTargetFlag, target.typeOf(), target.to_string());
+			//log_warning("Unhandled GetUrl2 loadVariable flag. loadTargetFlag=%d, target=%s (%s)", loadTargetFlag, target.typeOf(), target.to_string(&env).c_str());
 			target_movie->loadVariables(url, sendVarsMethod);
 		}
 		else
@@ -1877,9 +1885,9 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		string command = "firefox -remote \"openurl(";
 		command += url.str();
 #if 0 // target testing
-		if ( target_string )
+		if ( ! target_string.empty() )
 		{
-			command += ", " + string(target_string);
+			command += ", " + target_string;
 		}
 #endif
 		command += ")\"";
@@ -1940,8 +1948,8 @@ SWFHandlers::ActionGetUrl2(ActionExec& thread)
 	}
 	else
 	{
-		const char* url = url_val.to_string().c_str();
-		CommonGetUrl(env, env.top(0), url, method);
+		const string& url = url_val.to_string(&env);
+		CommonGetUrl(env, env.top(0), url.c_str(), method);
 	}
 		  
 	env.drop(2);
@@ -1987,7 +1995,7 @@ SWFHandlers::ActionCallFrame(ActionExec& thread)
 
 	thread.ensureStack(1); // frame spec
 
-	string target_frame = env.top(0).to_std_string();
+	string target_frame = env.top(0).to_string(&env);
 	string target_path;
 	string frame_var;
 	
@@ -2046,11 +2054,11 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 	unsigned char play_flag = code[pc + 3];
 	sprite_instance::play_state state = play_flag ? sprite_instance::PLAY : sprite_instance::STOP;
 		  
-	string target_frame = env.pop().to_std_string();
+	string target_frame = env.pop().to_string(&env);
 	string target_path;
 	string frame_var;
 	
-	character * target;
+	character * target = NULL;
 	if( env.parse_path(target_frame, target_path, frame_var) )
 	{
 		target = env.find_target(target_path);
@@ -2061,7 +2069,7 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 		frame_var = target_frame;
 	}
 	
-	sprite_instance *target_sprite = target->to_movie();
+	sprite_instance *target_sprite = target ? target->to_movie() : NULL;
 	if(target_sprite)
 	{
 		size_t frame_number;
@@ -2111,7 +2119,7 @@ SWFHandlers::ActionDelete(ActionExec& thread)
 
 	as_value var = env.pop();
 
-	bool ret = thread.delVariable(var.to_std_string());
+	bool ret = thread.delVariable(var.to_string(&env));
 	env.push(as_value(ret));
 
 	return;
@@ -2129,7 +2137,7 @@ SWFHandlers::ActionDelete2(ActionExec& thread)
 	thread.ensureStack(1); // var
 
 	// See bug #18482, this works fine now (assuming the bug report is correct)
-	env.top(0) = thread.delVariable(env.top(0).to_std_string());
+	env.top(0) = thread.delVariable(env.top(0).to_string(&env));
 }
 
 void
@@ -2141,10 +2149,10 @@ SWFHandlers::ActionVarEquals(ActionExec& thread)
 
     as_value value = env.pop();
     as_value varname = env.pop();
-    thread.setLocalVariable(varname.to_std_string(), value);
+    thread.setLocalVariable(varname.to_string(&env), value);
 
     IF_VERBOSE_ACTION (
-    log_action("-- set local var: %s = %s", varname.to_string().c_str(), value.to_debug_string().c_str());
+    log_action("-- set local var: %s = %s", varname.to_string(&env).c_str(), value.to_debug_string().c_str());
     );
 }
 
@@ -2164,7 +2172,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	as_value function = thread.getVariable(env.top(0).to_std_string(&env));
 	if ( ! function.is_object() ) 
 	{
-		log_aserror("ActionCallFunction: %s is not an object", env.top(0).to_string().c_str());
+		log_aserror("ActionCallFunction: %s is not an object", env.top(0).to_string(&env).c_str());
 	}
 	else if ( ! function.is_function() ) 
 	{
@@ -2198,7 +2206,7 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	as_value result = call_method(function, &env, thread.getThisPointer(),
 				  nargs, env.get_top_index() - 2);
 
-	//log_msg("Function's result: %s", result.to_string());
+	//log_msg("Function's result: %s", result.to_string(&env));
     
 	env.drop(nargs + 1);
 	env.top(0) = result;
@@ -2228,7 +2236,7 @@ SWFHandlers::ActionReturn(ActionExec& thread)
 	env.drop(1);
 
 #ifdef USE_DEBUGGER
-//        cerr << "Returning from function: " << env.top(0).to_string() << endl;
+//        cerr << "Returning from function: " << env.top(0).to_string(&env) << endl;
         debugger.callStackPop();
 #endif
 
@@ -2269,7 +2277,7 @@ SWFHandlers::ActionNew(ActionExec& thread)
 	thread.ensureStack(2); // classname, nargs
 
 	as_value val = env.pop();
-	string classname = val.to_std_string();;
+	string classname = val.to_string(&env);;
 
 	IF_VERBOSE_ACTION (
 		log_action("---new object: %s",
@@ -2317,7 +2325,7 @@ SWFHandlers::ActionVar(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1); // var name
-    string varname = env.top(0).to_std_string();
+    const string& varname = env.top(0).to_string(&env);
     if ( thread.isFunction() )
     {
        env.declare_local(varname);
@@ -2357,9 +2365,10 @@ SWFHandlers::ActionInitArray(ActionExec& thread)
     as_value	index_number;
     for (int i = 0; i < array_size; i++) {
         // @@ TODO a set_member that takes an int or as_value?
+	// @@ TODO: don'e use as_value for converting a number to a string !!
         index_number.set_int(i);
-        //ao->set_member(index_number.to_string(), env.pop());
-        thread.setObjectMember(*ao, index_number.to_std_string(), env.pop());
+        //ao->set_member(index_number.to_string(&env), env.pop());
+        thread.setObjectMember(*ao, index_number.to_string(&env), env.pop());
     }
     
     env.push(result);
@@ -2395,7 +2404,7 @@ SWFHandlers::ActionInitObject(ActionExec& thread)
     // Set provided members
     for (int i=0; i<nmembers; ++i) {
         as_value member_value = env.pop();
-	string member_name = env.pop().to_std_string();
+	string member_name = env.pop().to_string(&env);
         //new_obj_ptr->set_member(member_name, member_value);
 	thread.setObjectMember(*new_obj_ptr, member_name, member_value);
     }
@@ -2500,7 +2509,7 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
     as_value& v1 = env.top(0);
     as_value& v2 = env.top(1);
 
-    //log_msg("ActionNewAdd(%s[%s],%s[%s]) called", v1.typeOf(), v1.to_string(), v2.typeOf(), v2.to_string());
+    //log_msg("ActionNewAdd(%s, %s) called", v1.to_debug_string().c_str(), v2.to_debug_string().c_str());
 
 
     if (v1.is_string() || v2.is_string() )
@@ -2537,7 +2546,7 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
 
 	if ( operand1.is_string() && operand2.is_string() )
 	{
-		env.top(1).set_bool(operand1.to_std_string() < operand2.to_std_string());
+		env.top(1).set_bool(operand1.to_string(&env) < operand2.to_string(&env));
 	}
 	else 
 	{
@@ -2628,7 +2637,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
     if (!obj) {
 //         IF_VERBOSE_DEBUG(log_msg("getMember called against "
 //                                  "a value that does not cast "
-//                                  "to an as_object: %s", target.to_string()));
+//                                  "to an as_object: %s", target.to_string(&env).c_str()));
         env.top(1).set_undefined();
         env.drop(1);
         return;
@@ -2645,7 +2654,7 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
         int len = target.to_string_versioned(version).size();
         env.top(1).set_int(len); 
     } else {
-        if ( ! thread.getObjectMember(*obj, member_name.to_std_string(), env.top(1)) )
+        if ( ! thread.getObjectMember(*obj, member_name.to_string(&env), env.top(1)) )
 	{
             env.top(1).set_undefined();
         }
@@ -2670,7 +2679,7 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
 	thread.ensureStack(3); // value, member, object
 
 	boost::intrusive_ptr<as_object> obj = env.top(2).to_object();
-	string member_name = env.top(1).to_std_string();
+	const string& member_name = env.top(1).to_string(&env);
 	const as_value& member_value = env.top(0);
 
 	if (obj)
@@ -2757,7 +2766,7 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	log_action(" method nargs: %d", nargs);
 	);
 
-	string method_string = method_name.to_std_string();
+	string method_string = method_name.to_string(&env);
 	as_value method_val;
 	boost::intrusive_ptr<as_object> obj = obj_value.to_object(); 
 	if ( method_name.is_undefined() || method_string.empty() )
@@ -2842,8 +2851,8 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 //	// IT IS NOT GUARANTEE WE DO HAVE A METHOD NAME HERE !
 	if ( ! method_name.is_undefined() )
 	{
-		debugger.callStackPush(method_name.to_std_string());
-		debugger.matchBreakPoint(method_name.to_std_string(), true);
+		debugger.callStackPush(method_name.to_string(&env));
+		debugger.matchBreakPoint(method_name.to_string(&env), true);
 	}
 	else
 	{
@@ -2905,7 +2914,7 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 		return;
 	}
 
-	string method_string = method_name.to_std_string();
+	string method_string = method_name.to_string(&env);
 	as_value method_val;
 	if ( method_name.is_undefined() || method_string.empty() )
 	{
@@ -2943,8 +2952,8 @@ SWFHandlers::ActionNewMethod(ActionExec& thread)
 	boost::intrusive_ptr<as_object> new_obj = construct_object(method.get(),
 			env, nargs, env.get_top_index());
 
-	//log_msg("%s( [%d args] ) returned %s", method_val.to_string(),
-	//	nargs, new_obj.to_string());
+	//log_msg("%s( [%d args] ) returned %s", method_val.to_string(&env),
+	//	nargs, new_obj.to_string(&env));
 
 
 	env.drop(nargs);
@@ -3134,7 +3143,7 @@ SWFHandlers::ActionGreater(ActionExec& thread)
 
 	if ( operand1.is_string() && operand2.is_string() )
 	{
-		env.top(1).set_bool(operand1.to_std_string() > operand2.to_std_string());
+		env.top(1).set_bool(operand1.to_string(&env) > operand2.to_string(&env));
 	}
 	else 
 	{
@@ -3159,7 +3168,7 @@ SWFHandlers::ActionStringGreater(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(2); 
-    env.top(1).set_bool(env.top(1).to_string() > env.top(0).to_string());
+    env.top(1).set_bool(env.top(1).to_string(&env) > env.top(0).to_string(&env));
     env.drop(1);
 }
 
