@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 
 //
 
-/* $Id: as_environment.cpp,v 1.68 2007/04/16 16:47:29 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.69 2007/04/16 18:23:05 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -444,7 +444,7 @@ as_environment::find_target(const as_value& val) const
 	}
 	else if ( val.is_string() )
 	{
-		return find_target(val.to_std_string());
+		return find_target(val.to_string());
 	}
 	else
 	{

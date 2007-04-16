@@ -66,11 +66,13 @@ as_value::as_value(as_function* func)
     }
 }
 
+#if 0
 std::string
 as_value::to_std_string(as_environment* env) const
 {
     return to_string(env);
 }
+#endif
 
 // Conversion to const std::string&.
 const std::string&

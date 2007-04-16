@@ -1,5 +1,21 @@
 2007-04-16 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.cpp, server/as_value.cpp,
+	server/as_value.h, server/debugger.cpp, server/debugger.h,
+	server/edit_text_character.cpp, server/movie_root.h,
+	server/sprite_instance.cpp, server/sprite_instance.h,
+	server/timers.cpp, server/asobj/LoadVars.cpp,
+	server/asobj/Object.cpp, server/asobj/Sound.cpp,
+	server/asobj/Sound.h, server/asobj/Stage.cpp,
+	server/asobj/string.cpp, server/asobj/xml.cpp,
+	server/asobj/xmlnode.cpp, server/asobj/xmlsocket.cpp,
+	server/vm/ASHandlers.cpp, testsuite/server/GetterSetterTest.cpp:
+	 Drop as_value::to_std_string() - update all callers.
+	 Deprecated sprite_instance::get_variable.
+	 Cost-corrected debugger interfaces.
+
+2007-04-16 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.{cpp,h}: add a parse_path method to
 	  return an actual object when the given parameter is actually
 	  a path.

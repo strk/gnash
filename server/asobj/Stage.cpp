@@ -59,7 +59,7 @@ void
 Stage::onResize(as_environment* env)
 {
 	as_value v;
-	if ( get_member("scaleMode", &v) && v.to_std_string(env) == std::string("noScale") )
+	if ( get_member("scaleMode", &v) && v.to_string(env) == "noScale" )
 	{
 		notifyResize(env);
 	}
@@ -218,7 +218,7 @@ as_value stage_scalemode_getset(const fn_call& fn)
 	{
 		Stage::ScaleMode mode = Stage::showAll;
 
-		std::string str = fn.arg(0).to_std_string(&(fn.env()));
+		const std::string& str = fn.arg(0).to_string(&(fn.env()));
 		if ( str == "noScale" ) mode = Stage::noScale;
 		else if ( str == "exactFill" ) mode = Stage::exactFill;
 		else if ( str == "noBorder" ) mode = Stage::noBorder;

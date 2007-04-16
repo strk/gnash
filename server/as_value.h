@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.43 2007/04/15 10:52:09 bjacques Exp $ */
+/* $Id: as_value.h,v 1.44 2007/04/16 18:23:05 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -282,7 +282,7 @@ public:
 	///	for object values. If NULL, toString() won't be run.
 	///
 	const std::string& to_string(as_environment* env=NULL) const;
-	std::string to_std_string(as_environment* env=NULL) const;
+	//std::string to_std_string(as_environment* env=NULL) const;
 
 	std::string to_debug_string() const;
 

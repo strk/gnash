@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.97 2007/04/15 10:52:09 bjacques Exp $ */
+/* $Id: sprite_instance.h,v 1.98 2007/04/16 18:23:06 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -502,11 +502,10 @@ public:
 		const char* new_value);
 
 	/// Set the named variable to the wide value
+	//
+	/// TODO: check if worth deprecating
 	virtual void set_variable(const char* path_to_var,
 		const wchar_t* new_value);
-
-	/// Returns address to static buffer. NOT THREAD SAFE!
-	virtual const char* get_variable(const char* path_to_var) const;
 
 	// See dox in as_object.h
 	bool get_member(const std::string& name, as_value* val);

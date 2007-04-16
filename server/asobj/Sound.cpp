@@ -71,7 +71,7 @@ Sound::~Sound() {
 
 
 void
-Sound::attachSound(int si, const char* name)
+Sound::attachSound(int si, const std::string& name)
 {
 	soundId = si;
 	soundName = name;
@@ -281,7 +281,7 @@ sound_stop(const fn_call& fn)
 	int si = -1;
 
 	if (fn.nargs > 0) {
-		const char* name = fn.arg(0).to_string().c_str();
+		const std::string& name = fn.arg(0).to_string(&(fn.env()));
 
 		// check the import.
 		movie_definition* def = fn.env().get_target()->get_root_movie()->get_movie_definition();
@@ -290,7 +290,7 @@ sound_stop(const fn_call& fn)
 		if (res == NULL)
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-		    log_swferror("import error: resource '%s' is not exported", name);
+		    log_swferror("import error: resource '%s' is not exported", name.c_str());
 		    	);
 		    return as_value();
 		}
@@ -327,10 +327,10 @@ sound_attachsound(const fn_call& fn)
 
 	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
 
-    const char* name = fn.arg(0).to_string().c_str();
-    if (!name) {
+    const std::string& name = fn.arg(0).to_string(&(fn.env()));
+    if (name.empty()) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("attachSound need a non-null argument");
+		log_aserror("attachSound need a non-empty string");
 		);
 		return as_value();
 	}
@@ -342,7 +342,7 @@ sound_attachsound(const fn_call& fn)
 	if (res == NULL)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("import error: resource '%s' is not exported", name);
+		log_swferror("import error: resource '%s' is not exported", name.c_str());
 			);
 		return as_value();
 	}
@@ -437,7 +437,7 @@ sound_loadsound(const fn_call& fn)
 	}
 
 	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
-	so->loadSound(fn.arg(0).to_std_string(), fn.arg(1).to_bool());
+	so->loadSound(fn.arg(0).to_string(&(fn.env())), fn.arg(1).to_bool());
 
 	return as_value();
 }

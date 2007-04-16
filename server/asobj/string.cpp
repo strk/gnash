@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.27 2007/04/12 16:31:41 strk Exp $ */
+/* $Id: string.cpp,v 1.28 2007/04/16 18:23:06 strk Exp $ */
 
 // Implementation of ActionScript String class.
 
@@ -153,7 +153,7 @@ string_concat(const fn_call& fn)
     std::string str = obj->str();
 
     for (unsigned int i = 0; i < fn.nargs; i++) {
-        str += fn.arg(i).to_std_string();
+        str += fn.arg(i).to_string(&(fn.env()));
     }
 
     return as_value(str);
@@ -226,7 +226,7 @@ string_split(const fn_call& fn)
         return as_value(array.get());
     }
 
-    std::string delim = fn.arg(0).to_std_string();
+    const std::string& delim = fn.arg(0).to_string(&(fn.env()));
 
     // SWF5 didn't support multichar or empty delimiter
     if ( fn.env().get_version() < 6 )
@@ -287,7 +287,7 @@ string_last_index_of(const fn_call& fn)
 
     ENSURE_FN_ARGS(1, 2, -1);
 
-    std::string toFind = fn.arg(0).to_std_string();
+    const std::string& toFind = fn.arg(0).to_string(&(fn.env()));
 
     size_t start = str.size();
 
@@ -383,7 +383,7 @@ string_index_of(const fn_call& fn)
 
     ENSURE_FN_ARGS(1, 2, -1);
 
-    std::string toFind = fn.arg(0).to_std_string();
+    const std::string& toFind = fn.arg(0).to_string(&(fn.env()));
 
     size_t start = 0;
 
@@ -513,7 +513,7 @@ string_ctor(const fn_call& fn)
     std::string& str = obj->str();
 
     if (fn.nargs > 0) {
-        str = fn.arg(0).to_std_string();
+        str = fn.arg(0).to_string(&(fn.env()));
     }
 
     // this shouldn't be needed

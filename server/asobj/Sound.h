@@ -40,7 +40,7 @@ class Sound : public as_object {
 public:
 	Sound();
 	~Sound();
-	virtual void attachSound(int si, const char* name);
+	virtual void attachSound(int si, const std::string& name);
 	virtual void getBytesLoaded();
 	virtual void getBytesTotal();
 	virtual void getPan();

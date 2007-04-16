@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.37 2007/04/15 10:52:09 bjacques Exp $ */
+/* $Id: xml.cpp,v 1.38 2007/04/16 18:23:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -484,7 +484,7 @@ xml_load(const fn_call& fn)
   
     boost::intrusive_ptr<XML> xml_obj = ensureType<XML>(fn.this_ptr);
   
-    std::string filespec = fn.arg(0).to_string(); 
+    const std::string& filespec = fn.arg(0).to_string(&(fn.env()));
 
     URL url(filespec, get_base_url());
 
@@ -558,7 +558,7 @@ xml_new(const fn_call& fn)
             }
         }
 
-        std::string xml_in = fn.arg(0).to_std_string();
+        const std::string& xml_in = fn.arg(0).to_string(&(fn.env()));
         if ( xml_in.empty() )
         {
             IF_VERBOSE_ASCODING_ERRORS(
@@ -610,7 +610,7 @@ xml_createelement(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     
     if (fn.nargs > 0) {
-        const char *text = fn.arg(0).to_string().c_str();
+        const std::string& text = fn.arg(0).to_string(&(fn.env()));
 	XMLNode *xml_obj = new XMLNode();
 //	cerr << "create new child XMLNode is at " << (void *)xml_obj << endl;
 	xml_obj->nodeNameSet(text);
@@ -640,10 +640,9 @@ xml_createtextnode(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
 
     XMLNode *xml_obj;
-    const char *text;
 
     if (fn.nargs > 0) {
-	text = fn.arg(0).to_string().c_str(); 
+	const std::string& text = fn.arg(0).to_string(&(fn.env()));
 	xml_obj = new XMLNode;
 	xml_obj->nodeValueSet(text);
 	xml_obj->nodeTypeSet(XMLNode::tText);
@@ -690,7 +689,7 @@ as_value xml_parsexml(const fn_call& fn)
 
     if (fn.nargs > 0)
     {
-        std::string text = fn.arg(0).to_std_string(&(fn.env()));
+        const std::string& text = fn.arg(0).to_string(&(fn.env()));
         ptr->parseXML(text);
     }
     

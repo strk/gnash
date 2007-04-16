@@ -145,7 +145,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	}
 
 	// Get exported resource 
-	std::string id_name = fn.arg(0).to_std_string();
+	const std::string& id_name = fn.arg(0).to_string(&fn.env());
 
 	boost::intrusive_ptr<resource> exported = sprite->get_movie_definition()->get_exported_resource(id_name.c_str());
 	if ( exported == NULL )
@@ -170,7 +170,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 		return rv;
 	}
 
-	std::string newname = fn.arg(1).to_std_string();
+	const std::string& newname = fn.arg(1).to_string(&fn.env());
 
 	// should we support negative depths ? YES !
 	int depth_val = uint16_t(fn.arg(2).to_number());
@@ -394,7 +394,7 @@ static as_value sprite_duplicate_movieclip(const fn_call& fn)
 		return as_value();
 	}
 
-	std::string newname = fn.arg(0).to_std_string(&(fn.env()));
+	const std::string& newname = fn.arg(0).to_string(&fn.env());
 	int depth = int(fn.arg(1).to_number());
 
 	boost::intrusive_ptr<sprite_instance> ch;
@@ -510,7 +510,7 @@ static as_value sprite_load_movie(const fn_call& fn)
 		return as_value();
 	}
 
-	std::string urlstr = fn.arg(0).to_std_string();
+	const std::string& urlstr = fn.arg(0).to_string(&fn.env());
 	if (urlstr.empty())
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -558,7 +558,7 @@ static as_value sprite_load_variables(const fn_call& fn)
 		return as_value();
 	}
 
-	std::string urlstr = fn.arg(0).to_std_string();
+	const std::string& urlstr = fn.arg(0).to_string(&fn.env());
 	if (urlstr.empty())
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -577,7 +577,7 @@ static as_value sprite_load_variables(const fn_call& fn)
 
 	if (fn.nargs > 1)
 	{
-		std::string methodstring = fn.arg(1).to_std_string();
+		const std::string& methodstring = fn.arg(1).to_string(&fn.env());
 		// Should we be case-insensitive in comparing these ?
 		if ( methodstring == "GET" ) method = 1;
 		else if ( methodstring == "POST" ) method = 2;
@@ -1687,13 +1687,13 @@ sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) c
 
 	as_environment* env = const_cast<as_environment*>(&m_as_environment);
 
-	as_value str(frame_spec.to_std_string(env));
+	as_value str(frame_spec.to_string(env));
 
 	double num =  str.to_number(env);
 
 	if ( ! isfinite(num) || int(num) != num )
 	{
-		return m_def->get_labeled_frame(frame_spec.to_std_string(env), frameno);
+		return m_def->get_labeled_frame(frame_spec.to_string(env), frameno);
 	}
 
 	// TODO: are we sure we shouldn't check for frames labeled with negative numbers ?
@@ -1988,7 +1988,7 @@ void sprite_instance::set_member(const std::string& name,
 		const as_value& val)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_string().c_str());
+log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_debug_string().c_str());
 #endif
 
 	if ( val.is_function() )
@@ -2011,7 +2011,8 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 #ifdef DEBUG_DYNTEXT_VARIABLES
 		log_msg(" it's a Text Variable!");
 #endif
-		etc->set_text_value(val.to_string().c_str());
+		as_environment* env = const_cast<as_environment*>(&m_as_environment);
+		etc->set_text_value(val.to_string(env).c_str());
 	}
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	else
@@ -2023,23 +2024,6 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_stri
 	// If that didn't work call the default set_member
 	set_member_default(name, val);
 
-}
-
-const char* sprite_instance::get_variable(const char* path_to_var) const
-{
-    assert(m_parent == NULL);	// should only be called on the root movie.
-
-    std::string path(path_to_var);
-
-    // NOTE: this is static so that the string
-    // value won't go away after we return!!!
-    // It'll go away during the next call to this
-    // function though!!!  NOT THREAD SAFE!
-    static as_value	val;
-
-    val = m_as_environment.get_variable(path);
-
-    return val.to_string().c_str();	// ack!
 }
 
 void sprite_instance::set_variable(const char* path_to_var,

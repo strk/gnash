@@ -464,7 +464,7 @@ Debugger::matchBreakPoint(const std::string &func, bool state)
 }
 
 void
-Debugger::setWatchPoint(std::string &var, watch_state_e state)
+Debugger::setWatchPoint(const std::string &var, watch_state_e state)
 {
 //    GNASH_REPORT_FUNCTION;
     _watchpoints[var] = state;
@@ -472,7 +472,7 @@ Debugger::setWatchPoint(std::string &var, watch_state_e state)
 }
 
 void
-Debugger::removeWatchPoint(std::string &var)
+Debugger::removeWatchPoint(const std::string &var)
 {
 //    GNASH_REPORT_FUNCTION;
     
@@ -578,7 +578,7 @@ Debugger::dumpStackFrame(as_environment &env)
 // 		    cerr << name << " ";
 // 		}
 // 	    }
-            cerr << env.m_stack[i].to_string();
+            cerr << env.m_stack[i].to_debug_string();
 	    if (val.is_object()) {
 		boost::intrusive_ptr<as_object> o = val.to_object();
 		string name = lookupSymbol(o.get());
@@ -629,21 +629,21 @@ Debugger::dumpGlobalRegisters(as_environment &env)
     dbglogfile << "Global Registers Dump:" << endl;
     for (unsigned int i=0; i<4; ++i) {
 	ss << "\treg #" << i << ": \"";
-	ss << env.global_register(i).to_std_string() << "\"" << endl;
+	ss << env.global_register(i).to_debug_string() << "\"" << endl;
     }
     cerr << ss.str().c_str() << endl;
 }
 
     // Change the value of a local variable
 void
-Debugger::changeLocalVariable(std::string &var, as_value &val)
+Debugger::changeLocalVariable(const std::string &var, as_value &val)
 {
 //    GNASH_REPORT_FUNCTION;
     changeLocalVariable(*_env, var, val);
 }
 
 void
-Debugger::changeLocalVariable(as_environment &env, std::string &var, as_value &val)
+Debugger::changeLocalVariable(as_environment &env, const std::string &var, as_value &val)
 {
 //    GNASH_REPORT_FUNCTION;
     env.set_local(var, val);

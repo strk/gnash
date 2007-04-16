@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: debugger.h,v 1.10 2007/04/16 07:37:08 strk Exp $ */
+/* $Id: debugger.h,v 1.11 2007/04/16 18:23:05 strk Exp $ */
 
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
@@ -58,8 +58,8 @@ public:
 
     /// Set a watchpoint of a variable. Gnash stops and generates a
     /// command prompt when there is a match.
-    void setWatchPoint(std::string &var, watch_state_e state);
-    void removeWatchPoint(std::string &var);
+    void setWatchPoint(const std::string &var, watch_state_e state);
+    void removeWatchPoint(const std::string &var);
     void dumpWatchPoints();
 
     /// What to do when we've hit a breakpoint
@@ -118,8 +118,8 @@ public:
     void changeStackValue(as_environment &env, int index, as_value &val);
     
     // Change the value of a local variable
-    void changeLocalVariable(std::string &var, as_value &val);
-    void changeLocalVariable(as_environment &env, std::string &var, as_value &val);
+    void changeLocalVariable(const std::string &var, as_value &val);
+    void changeLocalVariable(as_environment &env, const std::string &var, as_value &val);
     
     // Change the value of a local variable
     void changeLocalRegister(unsigned index, as_value &val);

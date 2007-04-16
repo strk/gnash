@@ -529,7 +529,7 @@ loadvars_load(const fn_call& fn)
 		return as_value(false);
 	}
 
-	std::string urlstr = fn.arg(0).to_std_string();
+	const std::string& urlstr = fn.arg(0).to_string();
 	if ( urlstr.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -565,7 +565,7 @@ loadvars_sendandload(const fn_call& fn)
 		return as_value(false);
 	}
 
-	std::string urlstr = fn.arg(0).to_std_string();
+	const std::string& urlstr = fn.arg(0).to_string();
 	if ( urlstr.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -585,7 +585,7 @@ loadvars_sendandload(const fn_call& fn)
 
 	// Post by default, override by ActionScript third argument
 	bool post = true;
-	if ( fn.nargs > 2 && fn.arg(2).to_std_string() == "GET" ) post = false;
+	if ( fn.nargs > 2 && fn.arg(2).to_string() == "GET" ) post = false;
 
 	//log_msg("LoadVars.sendAndLoad(%s, %p) called, and returning TRUE", urlstr.c_str(), target.get());
 

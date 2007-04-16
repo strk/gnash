@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ASHandlers.cpp,v 1.95 2007/04/16 16:47:30 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.96 2007/04/16 18:23:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1049,7 +1049,7 @@ SWFHandlers::ActionGetProperty(ActionExec& thread)
 	thread.ensureStack(2); // prop num, target
 
 	as_value& tgt_val = env.top(1);
-	std::string tgt_str = tgt_val.to_std_string(&env);
+	std::string tgt_str = tgt_val.to_string(&env);
 	character *target = NULL;
 	if ( tgt_str.empty() )
 	{
@@ -1210,8 +1210,8 @@ SWFHandlers::ActionTrace(ActionExec& thread)
 
     thread.ensureStack(1); 
 
-    //std::string val = env.pop().to_std_string_versioned(VM::get().getSWFVersion(), &env);
-    std::string val = env.pop().to_std_string(&env);
+    //std::string val = env.pop().to_string_versioned(VM::get().getSWFVersion(), &env);
+    std::string val = env.pop().to_string(&env);
     log_trace(val.c_str());
 }
 
@@ -2484,7 +2484,7 @@ SWFHandlers::ActionEnumerate(ActionExec& thread)
 
 	// Get the object
 	as_value& var_name = env.top(0);
-	string var_string = var_name.to_std_string(&env);
+	string var_string = var_name.to_string(&env);
 
 	as_value variable = thread.getVariable(var_string);
 

@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: edit_text_character.cpp,v 1.55 2007/04/15 18:50:29 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.56 2007/04/16 18:23:05 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -79,7 +79,7 @@ textfield_set_variable(const fn_call& fn)
 	boost::intrusive_ptr<edit_text_character> text = ensureType<edit_text_character>(fn.this_ptr);
 
 	assert ( fn.nargs > 0 );
-	std::string newname = fn.arg(0).to_std_string();
+	const std::string& newname = fn.arg(0).to_string(&fn.env());
 
 	text->set_variable_name(newname);
 

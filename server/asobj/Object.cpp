@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: Object.cpp,v 1.22 2007/04/15 10:52:09 bjacques Exp $ */
+/* $Id: Object.cpp,v 1.23 2007/04/16 18:23:06 strk Exp $ */
 
 // Implementation of ActionScript Object class.
 
@@ -182,7 +182,7 @@ object_addproperty(const fn_call& fn)
 		}
 	}
 
-	std::string propname = fn.arg(0).to_string();
+	const std::string& propname = fn.arg(0).to_string(&(fn.env()));
 	if ( propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -246,7 +246,7 @@ object_registerClass(const fn_call& fn)
 		}
 	}
 
-	std::string symbolid = fn.arg(0).to_std_string();
+	const std::string& symbolid = fn.arg(0).to_string(&(fn.env()));
 	if ( symbolid.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
@@ -319,11 +319,11 @@ object_hasOwnProperty(const fn_call& fn)
 		return as_value();
 	}
 	as_value& arg = fn.arg(0);
-	std::string propname = arg.to_std_string();
+	const std::string& propname = arg.to_string(&(fn.env()));
 	if ( arg.is_undefined() || propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Invalid call to Object.hasOwnProperty('%s')", arg.to_string().c_str());
+		log_aserror("Invalid call to Object.hasOwnProperty('%s')", arg.to_debug_string().c_str());
 		);
 		return as_value();
 	}
@@ -342,11 +342,11 @@ object_isPropertyEnumerable(const fn_call& fn)
 		return as_value();
 	}
 	as_value& arg = fn.arg(0);
-	std::string propname = arg.to_std_string();
+	const std::string& propname = arg.to_string(&(fn.env()));
 	if ( arg.is_undefined() || propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Invalid call to Object.isPropertyEnumerable('%s')", arg.to_string().c_str());
+		log_aserror("Invalid call to Object.isPropertyEnumerable('%s')", arg.to_debug_string().c_str());
 		);
 		return as_value();
 	}

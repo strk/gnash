@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.47 2007/04/11 14:20:20 strk Exp $ */
+/* $Id: movie_root.h,v 1.48 2007/04/16 18:23:05 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -346,12 +346,6 @@ public:
 			const wchar_t* new_value)
 	{
 		_movie->set_variable(path_to_var, new_value);
-	}
-
-	/// Delegate to wrapped movie_instance
-	const char* get_variable(const char* path_to_var) const
-	{
-		return _movie->get_variable(path_to_var);
 	}
 
 	/// For ActionScript interfacing convenience.

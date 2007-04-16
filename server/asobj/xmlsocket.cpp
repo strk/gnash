@@ -435,7 +435,7 @@ xmlsocket_connect(const fn_call& fn)
     }
     
     as_value hostval = fn.arg(0);
-    std::string host = hostval.to_std_string(&fn.env());
+    const std::string& host = hostval.to_string(&fn.env());
     int port = int(fn.arg(1).to_number(&fn.env()));
     
     bool success = ptr->obj.connect(host.c_str(), port);
@@ -479,7 +479,7 @@ xmlsocket_send(const fn_call& fn)
     GNASH_REPORT_FUNCTION;
     
     boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
-    std::string object = fn.arg(0).to_std_string(&fn.env());
+    const std::string& object = fn.arg(0).to_string(&fn.env());
     //  log_msg("%s: host=%s, port=%g\n", __FUNCTION__, host, port);
     return as_value(ptr->obj.send(object));
 }
@@ -564,7 +564,7 @@ xmlsocket_onData(const fn_call& fn)
     }
 
     as_environment& env = fn.env();
-    std::string xmlin = fn.arg(0).to_std_string(&env);
+    const std::string& xmlin = fn.arg(0).to_string(&env);
 
     if ( xmlin.empty() )
     {

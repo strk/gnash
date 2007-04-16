@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.29 2007/04/11 17:54:21 bjacques Exp $ */
+/* $Id: timers.cpp,v 1.30 2007/04/16 18:23:06 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -170,7 +170,7 @@ timer_setinterval(const fn_call& fn)
 	if ( ! as_func )
 	{
 		as_value method;
-		std::string method_name = fn.arg(1).to_std_string();
+		const std::string& method_name = fn.arg(1).to_string(&fn.env());
 		if ( ! obj->get_member(method_name, &method) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
