@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.h,v 1.45 2007/04/10 18:06:37 strk Exp $ */
+/* $Id: log.h,v 1.46 2007/04/16 09:08:38 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -163,29 +163,80 @@ private:
 DSOEXPORT unsigned char *hexify(unsigned char *p, const unsigned char *s, int length, bool ascii);
 
 #ifdef __GNUC__
-DSOEXPORT void log_msg(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-DSOEXPORT void log_error(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-DSOEXPORT void log_warning(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-DSOEXPORT void log_trace(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-DSOEXPORT void log_debug(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-DSOEXPORT void log_action(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-DSOEXPORT void log_parse(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-DSOEXPORT void log_security(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-DSOEXPORT void log_swferror(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-DSOEXPORT void log_aserror(const char* fmt, ...) __attribute__((format (printf, 1, 2)));
-#else
-// Printf-style interfaces.
-DSOEXPORT void log_msg(const char* fmt, ...);
-DSOEXPORT void log_error(const char* fmt, ...);
-DSOEXPORT void log_warning(const char* fmt, ...);
-DSOEXPORT void log_trace(const char* fmt, ...);
-DSOEXPORT void log_debug(const char* fmt, ...);
-DSOEXPORT void log_action(const char* fmt, ...);
-DSOEXPORT void log_parse(const char* fmt, ...);
-DSOEXPORT void log_security(const char* fmt, ...);
-DSOEXPORT void log_swferror(const char* fmt, ...);
-DSOEXPORT void log_aserror(const char* fmt, ...);
+#define GNUC_LOG_ATTRS __attribute__((format (printf, 1, 2)))
 #endif
+
+/// Log a generic message. This is usually used for debugging, so I guess
+/// should be log_debug instead.
+//
+DSOEXPORT void log_msg(const char* fmt, ...) GNUC_LOG_ATTRS;
+
+/// Log a error
+//
+/// Errors have to be used to warn user about missing Gnash features.
+///
+/// NOTE: it has to be decided what difference this makes with
+///       log_warning...
+///
+DSOEXPORT void log_error(const char* fmt, ...) GNUC_LOG_ATTRS;
+
+/// Log a warning
+//
+/// Warnings have to be used to warn user about missing Gnash features.
+///
+/// NOTE: it has to be decided what difference this makes with
+///       log_error...
+///
+DSOEXPORT void log_warning(const char* fmt, ...) GNUC_LOG_ATTRS;
+
+/// Use only for explicit user traces
+//
+/// Current users are Global.cpp for _global.trace() and
+/// ASHandlers.cpp for ActionTrace
+///
+DSOEXPORT void log_trace(const char* fmt, ...) GNUC_LOG_ATTRS;
+
+/// Log debug info (unused! deprecated?)
+DSOEXPORT void log_debug(const char* fmt, ...) GNUC_LOG_ATTRS;
+
+/// Log action execution info
+//
+/// Wrap all calls to this function (and other related statements)
+/// into an IF_VERBOSE_ACTION macro, so to allow completely
+/// removing all the overhead at compile time and reduce it
+/// at runtime.
+///
+DSOEXPORT void log_action(const char* fmt, ...) GNUC_LOG_ATTRS;
+
+/// Log parsing information
+//
+/// Wrap all calls to this function (and other related statements)
+/// into an IF_VERBOSE_PARSE macro, so to allow completely
+/// removing all the overhead at compile time and reduce it
+/// at runtime.
+///
+DSOEXPORT void log_parse(const char* fmt, ...) GNUC_LOG_ATTRS;
+
+/// Log security information
+DSOEXPORT void log_security(const char* fmt, ...) GNUC_LOG_ATTRS;
+
+/// Log a malformed SWF error
+//
+/// Wrap all calls to this function (and other related statements)
+/// into an IF_VERBOSE_MALFORMED_SWF macro, so to allow completely
+/// removing all the overhead at compile time and reduce it
+/// at runtime.
+///
+DSOEXPORT void log_swferror(const char* fmt, ...) GNUC_LOG_ATTRS;
+
+/// Log an ActionScript error
+//
+/// Wrap all calls to this function (and other related statements)
+/// into an IF_VERBOSE_ASCODING_ERRORS macro, so to allow completely
+/// removing all the overhead at compile time and reduce it
+/// at runtime.
+///
+DSOEXPORT void log_aserror(const char* fmt, ...) GNUC_LOG_ATTRS;
 
 // Define to 0 to completely remove parse debugging at compile-time
 #ifndef VERBOSE_PARSE
