@@ -64,7 +64,10 @@ main(int argc, char** argv)
   SWFMovie_labelFrame(mo, "aa");
   SWFMovie_nextFrame(mo); /* 4th frame*/
   
-  check_equals(mo, "_currentframe", "5");
+  SWFMovie_labelFrame(mo, "4.8");
+  SWFMovie_nextFrame(mo); /* 5th frame*/
+  
+  check_equals(mo, "_currentframe", "6");
   add_actions(mo, " gotoAndStop('8'); ");         // ActionGotoLabel
   check_equals(mo, "_currentframe", "2");
   add_actions(mo, " gotoAndStop('xxxxxxxx'); ");  // ActionGotoLabel
@@ -78,9 +81,15 @@ main(int argc, char** argv)
   check_equals(mo, "_currentframe", "2");
   add_actions(mo, " x = -1; "
                   " gotoAndStop(x); ");         // ActionGotoExpression
-  check_equals(mo, "_currentframe", "2");             
-  add_actions(mo, " gotoAndStop(6); ");         // ActionGotoFrame
-  SWFMovie_nextFrame(mo); /* 5th frame */
+  check_equals(mo, "_currentframe", "2");  
+  add_actions(mo, " x = 4.8; "  // valid frame label                   
+                  " gotoAndStop(x); ");         // ActionGotoExpression  
+  xcheck_equals(mo, "_currentframe", "5");          
+  add_actions(mo, " x = 6.1; "  // invalid frame number                   
+                  " gotoAndStop(x); ");         // ActionGotoExpression  
+  xcheck_equals(mo, "_currentframe", "5"); 
+  add_actions(mo, " gotoAndStop(7); ");         // ActionGotoFrame
+  SWFMovie_nextFrame(mo); /* 6th frame */
   
   add_actions(mo, "function func1() {}"
                   "func1.prototype.toString = function() { return '8'; };"
@@ -93,11 +102,17 @@ main(int argc, char** argv)
                   "function func3() {}"
                   "func3.prototype.toString = function() { return '8'; }; "
                   "func3.prototype.valueOf = function() { return 8;};"
-                  "x3 = new func3();" );
+                  "x3 = new func3();" 
+                  
+                  "function func4() {}"
+                  "func4.prototype.toString = function() { return '4.8'; }; "
+                  "func4.prototype.valueOf = function() { return '4.8';};"
+                  "x4 = new func4();");
                   
                   
   add_actions(mo, " x = '8'; gotoAndStop(x); ");     // ActionGotoExpression
-  check_equals(mo, "_currentframe", "6");
+  /* reach the last frame */
+  check_equals(mo, "_currentframe", "7");
   
   add_actions(mo, " x = '8a'; gotoAndStop(x); ");    // ActionGotoExpression
   check_equals(mo, "_currentframe", "3");
@@ -106,20 +121,25 @@ main(int argc, char** argv)
   check_equals(mo, "_currentframe", "4");
   
   add_actions(mo, " gotoAndStop(x1); ");             // ActionGotoExpression
-  /* reach the last frame */
-  check_equals(mo, "_currentframe", "6"); 
+  /* reach the last frame, toString invoked */
+  check_equals(mo, "_currentframe", "7"); 
   
   /* reset _currentframe to 1 */
   add_actions(mo, " gotoAndStop(1); ");  
+  
   add_actions(mo, " gotoAndStop(x2); ");             // ActionGotoExpression
   check_equals(mo, "_currentframe", "1"); 
   
   add_actions(mo, " gotoAndStop(x3); ");             // ActionGotoExpression
   /* reach the last frame */
-  check_equals(mo, "_currentframe", "6");
+  check_equals(mo, "_currentframe", "7");
+  
+  add_actions(mo, " gotoAndStop(x4); ");             // ActionGotoExpression
+  /* "4.8" is a valid frame label, toString() invoked */
+  xcheck_equals(mo, "_currentframe", "5");
   
   add_actions(mo, " _root.totals(); stop(); ");
-  SWFMovie_nextFrame(mo); /* 6th frame */
+  SWFMovie_nextFrame(mo); /* 7th frame */
 
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
