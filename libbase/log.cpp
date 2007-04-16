@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.cpp,v 1.45 2007/04/10 14:17:15 strk Exp $ */
+/* $Id: log.cpp,v 1.46 2007/04/16 10:26:59 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -136,7 +136,7 @@ ostream& datetimestamp(ostream& x) {
     return x << buf;
 }
 
-// This is a bit of a hack. We impleemnt wrappers for the old
+// This is a bit of a hack. We implement wrappers for the old
 // functions so we don't have to change files everywhere, but get the
 // new behaviours, like logging to disk.
 // THIS IS DANGEROUS AS TIME OF INITIALIZATION IS UNPREDICTABLE,
@@ -151,7 +151,7 @@ LogFile::getDefaultInstance()
 	return o;
 }
 
-// Printf-style informational log.
+// Printf-style log for debugging info.
 void
 log_msg(const char* fmt, ...)
 {
@@ -272,7 +272,7 @@ log_error(const char* fmt, ...)
 }
 
 void
-log_warning(const char* fmt, ...)
+log_unimpl(const char* fmt, ...)
 {
     LogFile& dbglogfile = LogFile::getDefaultInstance();
 
@@ -283,7 +283,7 @@ log_warning(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
     
-    dbglogfile << "WARNING: " << tmp << endl;
+    dbglogfile << "ERROR: Unimplemented: " << tmp << endl;
     
     va_end (ap);    
 }

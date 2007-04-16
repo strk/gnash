@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.h,v 1.46 2007/04/16 09:08:38 strk Exp $ */
+/* $Id: log.h,v 1.47 2007/04/16 10:26:59 jgilmore Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -22,6 +22,11 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+// Support compilation with (or without) native language support
+#include "gettext.h"	// for internationalization (GNU gettext)
+#define	_(String) gettext (String)
+#define N_(String) gettext_noop (String)
 
 #include "rc.h" // for IF_VERBOSE_* implementation
 //#include "tu_config.h"
@@ -166,28 +171,33 @@ DSOEXPORT unsigned char *hexify(unsigned char *p, const unsigned char *s, int le
 #define GNUC_LOG_ATTRS __attribute__((format (printf, 1, 2)))
 #endif
 
-/// Log a generic message. This is usually used for debugging, so I guess
-/// should be log_debug instead.
+/// Log a generic message
 //
+/// This is usually used for debugging, so most
+/// such calls should be in comments, unless you're actively debugging
+/// that piece of code right now.
+///
 DSOEXPORT void log_msg(const char* fmt, ...) GNUC_LOG_ATTRS;
 
-/// Log a error
+/// Log a runtime error
 //
-/// Errors have to be used to warn user about missing Gnash features.
-///
-/// NOTE: it has to be decided what difference this makes with
-///       log_warning...
+/// Runtime errors, such as un-openable files, un-allocatable memory,
+/// etc, are logged (for convenience of the user or debugger) this way.
+/// This function is not used to report coding errors; use log_aserror
+/// or log_swferror for that.
 ///
 DSOEXPORT void log_error(const char* fmt, ...) GNUC_LOG_ATTRS;
 
-/// Log a warning
+// Temporary expedient til the other source files are converted.  --gnu
+#define log_warning	log_unimpl
+
+/// Log a message about unimplemented features.
 //
-/// Warnings have to be used to warn user about missing Gnash features.
+/// This function must be used to warn user about missing Gnash features.
+/// We expect all calls to this function to disappear over time, as we
+/// implement those features of Flash.
 ///
-/// NOTE: it has to be decided what difference this makes with
-///       log_error...
-///
-DSOEXPORT void log_warning(const char* fmt, ...) GNUC_LOG_ATTRS;
+DSOEXPORT void log_unimpl(const char* fmt, ...) GNUC_LOG_ATTRS;
 
 /// Use only for explicit user traces
 //
@@ -196,7 +206,10 @@ DSOEXPORT void log_warning(const char* fmt, ...) GNUC_LOG_ATTRS;
 ///
 DSOEXPORT void log_trace(const char* fmt, ...) GNUC_LOG_ATTRS;
 
-/// Log debug info (unused! deprecated?)
+/// Log debug info
+//
+/// Used for function entry/exit tracing.
+///
 DSOEXPORT void log_debug(const char* fmt, ...) GNUC_LOG_ATTRS;
 
 /// Log action execution info
@@ -222,6 +235,9 @@ DSOEXPORT void log_security(const char* fmt, ...) GNUC_LOG_ATTRS;
 
 /// Log a malformed SWF error
 //
+/// This indicates an error in how the binary SWF file was constructed, i.e.
+/// probably a bug in the tools used to build the SWF file.
+///
 /// Wrap all calls to this function (and other related statements)
 /// into an IF_VERBOSE_MALFORMED_SWF macro, so to allow completely
 /// removing all the overhead at compile time and reduce it
@@ -231,12 +247,17 @@ DSOEXPORT void log_swferror(const char* fmt, ...) GNUC_LOG_ATTRS;
 
 /// Log an ActionScript error
 //
+/// This indicates an error by the programmer who wrote the ActionScript
+/// code, such as too few or too many arguments to a function.
+///
 /// Wrap all calls to this function (and other related statements)
 /// into an IF_VERBOSE_ASCODING_ERRORS macro, so to allow completely
 /// removing all the overhead at compile time and reduce it
 /// at runtime.
 ///
 DSOEXPORT void log_aserror(const char* fmt, ...) GNUC_LOG_ATTRS;
+
+
 
 // Define to 0 to completely remove parse debugging at compile-time
 #ifndef VERBOSE_PARSE
@@ -289,7 +310,7 @@ class DSOEXPORT __Host_Function_Report__ {
 public:
     const char *func;
 
-    // Only print function tracing messages when tmultiplewo -v
+    // Only print function tracing messages when multiple -v
     // options have been supplied. 
     __Host_Function_Report__(void) {
 	log_debug("entering");

@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.93 2007/04/15 10:52:09 bjacques Exp $ */
+/* $Id: gnash.h,v 1.94 2007/04/16 10:26:59 jgilmore Exp $ */
 
 /// \mainpage
 ///
@@ -38,11 +38,6 @@
 #include <string>	// for movie_definition* create_movie(std::auto_ptr<tu_file> in, const std::string& url);
 
 #include "as_value.h" // FIXME: for as_c_function_ptr typedef (register_component)
-
-// Support compilation with (or without) native language support
-#include "gettext.h"	// for internationalization (GNU gettext)
-#define	_(String) gettext (String)
-#define N_(String) gettext_noop (String)
 
 // FIXME: The local usage of these constants should probably be renamed in this
 // file because they conflict with definitions in the system header files. Luckily

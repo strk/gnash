@@ -1,3 +1,11 @@
+2007-04-16  John Gilmore  <gnu@quiet.toad.com>
+
+	* libbase/log.h: Update documentation for log_* functions; rename
+	  log_warning to log_unimpl (with temporary #define for a few days);
+	  move gettext and _ definitions from gnash.h to log.h.
+	* libbase/log.cpp:  Update log_* functions as above.
+	* server/gnash.h:  Move gettext and _ to log.h.
+
 2007-04-16 Sandro Santilli <strk@keybit.net>
 
 	* libbase/log.h: draft documentation for the log_* functions.
