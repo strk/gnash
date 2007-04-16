@@ -1,5 +1,7 @@
 2007-04-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/matrix_test.c: add test for skewX() matrix
+	  (failures are just precision-related).
 	* server/debugger.{cpp,h}: (matchWatchPoint) const-corrected
 	* server/vm/ASHandlers.cpp: always pass an as_environment pointer
 	  when converting as_value to a string, use to_string rather 
