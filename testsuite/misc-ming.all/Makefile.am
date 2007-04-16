@@ -400,7 +400,7 @@ get_frame_number_test.swf: get_frame_number_test
 	./get_frame_number_test $(top_srcdir)/testsuite/media
 
 get_frame_number_testrunner: $(srcdir)/../generic-testrunner.sh get_frame_number_test.swf
-	sh $< -r5 $(top_builddir) get_frame_number_test.swf > $@
+	sh $< -f20 $(top_builddir) get_frame_number_test.swf > $@
 	chmod 755 $@
 
 frame_label_test_SOURCES =	\

@@ -1,5 +1,12 @@
 2007-04-16 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/server/Makefile.am: add libgnashamf.la to GNASH libs.
+	* testsuite/generic-testrunner.sh, doc/C/internals.xml:
+	  Add -f switch to specify the maximum number of frame advancements.
+	* testsuite/misc-ming.all/Makefile.am: update
+	  get_frame_number_testrunner to advance at most 20 times.
+	* testsuite/misc-ming.all/get_frame_number_test.c: no more failures
+	  expected.
 	* server/sprite_instance.cpp (get_frame_number): check frame labels
 	  also when convertion to number gives a non-integer value.
 	* server/vm/ASHandlers.cpp (ActionGotoExpression): don't pretend

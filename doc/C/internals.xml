@@ -1031,6 +1031,18 @@ MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
 	</programlisting>
 	</para>
 
+	<para>
+	In case your test movie stops before the last frame, or you want to control the
+	exact number of times to call the frame advancement routine, you can use the 
+	-f switch to control that.
+	<programlisting>
+MyTest-Runner: $(srcdir)/../generic-testrunner.sh MyTest.swf
+        sh $(srcdir)/../generic-testrunner.sh -f10 $(top_builddir) MyTest.swf > $@
+        chmod +x $@
+	</programlisting>
+	When both -f and -r are given, the first exit condition reached will take effect.
+	</para>
+
 	</sect4>
 	
 	<sect4 id="writing_movie_testers">

@@ -18,11 +18,13 @@
 # 
 
 runs=1
+advances=0
 
-while getopts r: name; do
+while getopts r:f: name; do
 	case $name in
 		r) runs="$OPTARG" ;;
-		?) echo "Usage: $0 [-r <runs>] <swf> ..." >&2;
+		f) advances="$OPTARG" ;;
+		?) echo "Usage: $0 [-r <runs>] [-f <advances>] <swf> ..." >&2;
 		   exit 1;;
 	esac
 done
@@ -36,6 +38,6 @@ cat << EOF
 #!/bin/sh
 for t in ${testfiles}; do
 	echo "NOTE: Running test \${t}"
-	${top_builddir}/utilities/gprocessor -r${runs} -v \${t} || echo "FAILED: gprocessor returned an error while playing '\${t}'"
+	${top_builddir}/utilities/gprocessor -r${runs} -f${advances} -v \${t} || echo "FAILED: gprocessor returned an error while playing '\${t}'"
 done
 EOF

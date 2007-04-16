@@ -84,10 +84,10 @@ main(int argc, char** argv)
   check_equals(mo, "_currentframe", "2");  
   add_actions(mo, " x = 4.8; "  // valid frame label                   
                   " gotoAndStop(x); ");         // ActionGotoExpression  
-  xcheck_equals(mo, "_currentframe", "5");          
+  check_equals(mo, "_currentframe", "5");          
   add_actions(mo, " x = 6.1; "  // invalid frame number                   
                   " gotoAndStop(x); ");         // ActionGotoExpression  
-  xcheck_equals(mo, "_currentframe", "5"); 
+  check_equals(mo, "_currentframe", "5"); 
   add_actions(mo, " gotoAndStop(7); ");         // ActionGotoFrame
   SWFMovie_nextFrame(mo); /* 6th frame */
   
@@ -136,7 +136,7 @@ main(int argc, char** argv)
   
   add_actions(mo, " gotoAndStop(x4); ");             // ActionGotoExpression
   /* "4.8" is a valid frame label, toString() invoked */
-  xcheck_equals(mo, "_currentframe", "5");
+  check_equals(mo, "_currentframe", "5");
   
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 7th frame */
