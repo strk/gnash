@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xml.cpp,v 1.38 2007/04/16 18:23:06 strk Exp $ */
+/* $Id: xml.cpp,v 1.39 2007/04/17 10:38:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -380,13 +380,23 @@ XML::load(const URL& url)
         return false;
     }
 
-    log_msg("Load XML file from url: %s", url.str().c_str());
+    log_msg("Loading XML file from url: '%s'", url.str().c_str());
 
     initParser();
 
     /// see: http://xmlsoft.org/html/libxml-parser.html#xmlParserOption
     int options = XML_PARSE_RECOVER | XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
     _doc = xmlReadIO(readFromTuFile, closeTuFile, str.get(), url.str().c_str(), NULL, options);
+    if ( str->get_error() )
+    {
+	xmlFreeDoc(_doc);
+        _doc = 0;
+        log_error("Can't read XML file %s (stream error %d)!", url.str().c_str(), str->get_error());
+        _loaded = 0;
+        onLoadEvent(false);
+        return false;
+    }
+
     _bytes_total = str->get_size();
 
     if (_doc == 0)

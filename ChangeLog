@@ -1,3 +1,15 @@
+2007-04-17 Sandro Santilli <strk@keybit.net>
+
+	* libbase/: tu_file.{cpp,h}, curl_adapter.cpp, zlib_adapter.cpp,
+	  noseek_fd_adapter.cpp:
+	  Add another callback for getting stream error. First pass at
+	  documenting the tu_file interfaces (needs more work).
+	  Updated implementations to provide the new error getter.
+	* server/asobj/xml.cpp (XML::load): check stream status after
+	  call to xmlReadIO. The libxml2 function seems immune to 
+	  stream errors, but we can handle them and avoid parsing
+	  anything if a stream error occurs (404 will be a stream error).
+
 2007-04-17 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg: Replaced drawVideoFrame() to use AGG

@@ -16,7 +16,7 @@
 
 // 
 
-/* $Id: curl_adapter.cpp,v 1.25 2007/04/08 23:06:17 rsavoye Exp $ */
+/* $Id: curl_adapter.cpp,v 1.26 2007/04/17 10:38:16 strk Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -112,6 +112,11 @@ public:
 	/// Return true if EOF has been reached
 	bool eof();
 
+	/// Return the error condition of current stream
+	int err() const {
+		return _error;
+	}
+
 	/// Report global position within the file
 	size_t tell();
 
@@ -147,6 +152,13 @@ private:
 
 	// transfer in progress
 	int _running;
+
+	// stream error 
+	// 0 on no error.
+	// Example of errors would be:
+	//	404 - file not found
+	//	timeout occurred
+	int _error;
 
 	// Post data. Empty if no POST has been requested
 	std::string _postdata;
@@ -257,6 +269,16 @@ CurlStreamFile::fill_cache(off_t size)
 			throw gnash::GnashException(curl_multi_strerror(mcode));
 		}
 
+                long code;
+                curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
+                if ( code == 404 ) // file not found!
+                {
+                        gnash::log_warning("404 response from url %s", _url.c_str());
+                        _error = TU_FILE_OPEN_ERROR;
+			_running = false;
+                        return;
+                }
+
 		// we already have that much data
 		fstat(_cachefd, &statbuf);
 		if ( statbuf.st_size >= size ) 
@@ -289,6 +311,7 @@ CurlStreamFile::init(const std::string& url)
 
 	_url = url;
 	_running = 1;
+	_error = 0;
 
 	_cached = -1;
 
@@ -413,13 +436,14 @@ CurlStreamFile::~CurlStreamFile()
 size_t
 CurlStreamFile::read(void *dst, size_t bytes)
 {
-	if ( eof() ) return 0;
+	if ( eof() || _error ) return 0;
 
 #ifdef GNASH_CURL_VERBOSE
 	fprintf(stderr, "read(%d) called\n", bytes);
 #endif
 
 	fill_cache(tell()+bytes);
+	if ( _error ) return 0; // error can be set by fill_cache
 
 #ifdef GNASH_CURL_VERBOSE
 	printInfo();
@@ -469,6 +493,7 @@ CurlStreamFile::seek(size_t pos)
 #endif
 
 	fill_cache(pos);
+	if ( _error ) return false; // error can be set by fill_cache
 
 	if ( fseek(_cache, pos, SEEK_SET) == -1 ) {
 		fprintf(stderr, "Warning: fseek failed\n");
@@ -495,6 +520,16 @@ CurlStreamFile::seek_to_end()
 		{
 			throw gnash::GnashException(curl_multi_strerror(mcode));
 		}
+
+                long code;
+                curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
+                if ( code == 404 ) // file not found!
+                {
+                        gnash::log_warning("404 response from url %s", _url.c_str());
+                        _error = TU_FILE_OPEN_ERROR;
+			_running = false;
+                        return false;
+                }
 	}
 
 	if ( fseek(_cache, 0, SEEK_END) == -1 ) {
@@ -536,6 +571,13 @@ read(void* dst, int bytes, void* appdata)
 {
 	CurlStreamFile* stream = (CurlStreamFile*) appdata;
 	return stream->read(dst, bytes);
+}
+
+static int
+err(void* appdata)
+{
+	CurlStreamFile* stream = (CurlStreamFile*) appdata;
+	return stream->err();
 }
 
 static bool
@@ -625,6 +667,7 @@ make_stream(const char* url)
 		seek_to_end, // seek_to_end
 		tell, // tell
 		eof, // get eof
+		err, // get error
 		get_stream_size, // size of stream 
 		close);
 }
@@ -656,6 +699,7 @@ make_stream(const char* url, const std::string& postdata)
 		seek_to_end, // seek_to_end
 		tell, // tell
 		eof, // get eof
+		err, // get error
 		get_stream_size, // size of stream 
 		close);
 }

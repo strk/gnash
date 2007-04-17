@@ -16,7 +16,7 @@
 
 // 
 
-/* $Id: noseek_fd_adapter.cpp,v 1.15 2007/04/08 23:06:17 rsavoye Exp $ */
+/* $Id: noseek_fd_adapter.cpp,v 1.16 2007/04/17 10:38:16 strk Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -92,6 +92,9 @@ public:
 
 	/// Return true if EOF has been reached
 	bool eof();
+
+	/// Return zero if everything is fine (?)
+	int err() { return 0; }
 
 	/// Report global position within the file
 	size_t tell();
@@ -420,6 +423,14 @@ eof(void* appdata)
 }
 
 static int
+err(void* appdata)
+{
+	NoSeekFile* stream = (NoSeekFile*) appdata;
+	if ( ! stream ) return TU_FILE_OPEN_ERROR;
+	return stream->err();
+}
+
+static int
 write(const void* /*src*/, int /*bytes*/, void* /*appdata*/)
 {
 	assert(0); // not supported
@@ -485,6 +496,7 @@ make_stream(int fd, const char* cachefilename)
 		seek_to_end, // seek_to_end
 		tell, // tell
 		eof, // get eof
+		err, // get error
 		NULL, // get stream size
 		close);
 }

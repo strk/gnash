@@ -290,6 +290,12 @@ namespace zlib_adapter
 		return inf->m_at_eof;
 	}
 
+	inline int inflate_get_err(void* appdata)
+	{
+		inflater_impl*	inf = (inflater_impl*) appdata;
+		return inf->m_error;
+	}
+
 	inline int inflate_close(void* appdata)
 	{
 		inflater_impl*	inf = (inflater_impl*) appdata;
@@ -322,6 +328,7 @@ namespace zlib_adapter
 				inflate_seek_to_end,
 				inflate_tell,
 				inflate_get_eof,
+				inflate_get_err,
 				NULL, // get stream size
 				inflate_close)
 			);

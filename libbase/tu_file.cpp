@@ -87,6 +87,14 @@ std_get_eof_func(void *appdata)
     }
 }
 
+static int
+std_get_err_func(void *appdata)
+// Return true if we're at EOF.
+{
+    if ( ! appdata ) return TU_FILE_OPEN_ERROR;
+    return (ferror((FILE*) appdata));
+}
+
 static long
 std_get_stream_size_func(void *appdata)
 // Return -1 on failure, or the size
@@ -286,6 +294,14 @@ mem_get_eof_func(void* appdata)
     return buf->m_position >= buf->m_.size();
 }
 
+static int
+mem_get_err_func(void* appdata)
+// Return true if we're positioned at the end of the buffer.
+{
+    filebuf* buf = (filebuf*) appdata;
+    return buf->is_valid();
+}
+
 static long
 mem_get_stream_size(void* appdata)
 // Return the file size, or -1 on failure.
@@ -319,7 +335,7 @@ static int mem_close_func(void* appdata)
 // Create a file using the custom callbacks.
 tu_file::tu_file(void * appdata, read_func rf, write_func wf,
 		 seek_func sf, seek_to_end_func ef, tell_func tf,
-		 get_eof_func gef, get_stream_size_func gss, close_func cf)
+		 get_eof_func gef, get_err_func ger, get_stream_size_func gss, close_func cf)
 {
     m_data = appdata;
     m_read = rf;
@@ -328,9 +344,9 @@ tu_file::tu_file(void * appdata, read_func rf, write_func wf,
     m_seek_to_end = ef;
     m_tell = tf;
     m_get_eof = gef;
+    m_get_err = ger;
     m_get_stream_size = gss;
     m_close = cf;
-    m_error = TU_FILE_NO_ERROR;
 }
 
 // Create a file from a standard file pointer.
@@ -345,39 +361,27 @@ tu_file::tu_file(FILE* fp, bool autoclose=false)
     m_seek_to_end = std_seek_to_end_func;
     m_tell = std_tell_func;
     m_get_eof = std_get_eof_func;
+    m_get_err = std_get_err_func;
     m_get_stream_size = std_get_stream_size_func;
     m_close = autoclose ? std_close_func : NULL;
-    m_error = TU_FILE_NO_ERROR;
 }
 
 // Create a file from the given name and the given mode.
 tu_file::tu_file(const char * name, const char * mode)
 {
-    GNASH_REPORT_RETURN;
+	GNASH_REPORT_RETURN;
 
-    m_data = fopen(name, mode);
+	m_data = fopen(name, mode);
     
-    if (m_data) {
 	m_read = std_read_func;
 	m_write = std_write_func;
 	m_seek = std_seek_func;
 	m_seek_to_end = std_seek_to_end_func;
 	m_tell = std_tell_func;
 	m_get_eof = std_get_eof_func;
-    m_get_stream_size = std_get_stream_size_func;
+	m_get_err = std_get_err_func;
+	m_get_stream_size = std_get_stream_size_func;
 	m_close = std_close_func;
-	m_error = TU_FILE_NO_ERROR;
-    } else {
-	m_read = NULL;
-	m_write = NULL;
-	m_seek = NULL;
-	m_seek_to_end = NULL;
-	m_tell = NULL;
-	m_get_eof = NULL;
-    m_get_stream_size = NULL;
-	m_close = NULL;
-	m_error = TU_FILE_OPEN_ERROR;
-    }
 }
 
 tu_file::tu_file(memory_buffer_enum /* m */)
@@ -391,9 +395,9 @@ tu_file::tu_file(memory_buffer_enum /* m */)
     m_seek_to_end = mem_seek_to_end_func;
     m_tell = mem_tell_func;
     m_get_eof = mem_get_eof_func;
+    m_get_err = mem_get_err_func;
     m_get_stream_size = mem_get_stream_size;
     m_close = mem_close_func;
-    m_error = TU_FILE_NO_ERROR;
 }
 
 
@@ -408,9 +412,9 @@ tu_file::tu_file(memory_buffer_enum /* m */, int size, void* data)
     m_seek_to_end = mem_seek_to_end_func;
     m_tell = mem_tell_func;
     m_get_eof = mem_get_eof_func;
+    m_get_err = mem_get_err_func;
     m_get_stream_size = mem_get_stream_size;
     m_close = mem_close_func;
-    m_error = TU_FILE_NO_ERROR;
 }
 
 tu_file::~tu_file()
@@ -423,7 +427,7 @@ void
 tu_file::close() 
 // Close this file.
 { 
-    if (m_close) {
+    if (m_close && m_data) {
 	m_close(m_data);
     }
     m_data = NULL; 
