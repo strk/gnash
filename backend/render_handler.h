@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.31 2007/04/17 08:32:42 udog Exp $ */
+/* $Id: render_handler.h,v 1.32 2007/04/17 09:00:26 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -196,14 +196,15 @@ class render_cache_object
 class DSOEXPORT render_cache_manager
 {
 public:
-  //Virtual dtor, removes compiler warning.
-  virtual ~render_cache_manager(){}
-  /// Clears the cache completely (necessary for runtime shapes / drawing API)
-  virtual void clear() 
-  {
-    // TODO: Make this abstract to force real implementation!!
-    // nop
-  } 
+	//Virtual dtor, removes compiler warning.
+	virtual ~render_cache_manager(){}
+
+	/// Clears the cache completely (necessary for runtime shapes / drawing API)
+	virtual void clear() 
+	{
+		// TODO: Make this abstract to force real implementation!!
+		// nop
+	} 
 };
 
 
@@ -259,34 +260,36 @@ public:
 	/// Returns the format the current renderer wants videoframes in.
 	virtual int videoFrameFormat() = 0;
 	
-	/** \brief Draws a video frame. 
-	  *
-	  * The frame has already been decoded and is available in the format
-	  * specified by videoFrameFormat().	  
-	  *     	  
-	  * @param baseframe The RGB or YUV video buffer frame.
-	  *
-	  * @param mat The matrix with world coordinates used to retrieve the x
-	  *   and y coordinate of the video object. The scaling of the matrix only
-	  *   refers to the Flash instance, *not* to the video inside that instance.
-	  *   When a video object is placed on the stage and the loaded video is
-	  *   smaller, then the matrix is still an "identity matrix". However, if
-	  *   the video object is scaled via ActionScript, for example, then the
-	  *   matrix will change. This means the renderer has to find the correct
-	  *   scaling for the video inside the bounds.                             	  
-	  *
-	  * @param bounds The minX/minY fields of this rect are always zero. 
-	  *   The width and height determine the size of the Flash video instance
-	  *   on the stage (in TWIPS) prior to matrix transformations.         
-	  */
+	/// Draws a video frame. 
+	//
+	/// The frame has already been decoded and is available in the format
+	/// specified by videoFrameFormat().	  
+	///     	  
+	/// @param baseframe The RGB or YUV video buffer frame.
+	///
+	/// @param mat The matrix with world coordinates used to retrieve the x
+	///   and y coordinate of the video object. The scaling of the matrix only
+	///   refers to the Flash instance, *not* to the video inside that instance.
+	///   When a video object is placed on the stage and the loaded video is
+	///   smaller, then the matrix is still an "identity matrix". However, if
+	///   the video object is scaled via ActionScript, for example, then the
+	///   matrix will change. This means the renderer has to find the correct
+	///   scaling for the video inside the bounds.                             	  
+	///
+	/// @param bounds The minX/minY fields of this rect are always zero. 
+	///   The width and height determine the size of the Flash video instance
+	///   on the stage (in TWIPS) prior to matrix transformations.         
+	///
 	virtual void drawVideoFrame(image::image_base* frame, const matrix* mat, const rect* bounds) = 0;
 
-	/// Sets the update region (called prior to begin_display). The renderer 
+	/// Sets the update region (called prior to begin_display).
+	//
+	/// The renderer 
 	/// might do clipping and leave the region outside these bounds unchanged,
 	/// but he is allowed to change them if that makes sense. After rendering
 	/// a frame the area outside the invalidated region can be undefined and 
 	/// is not used. 
-	//
+	///
 	/// It is not required for all renderers.
 	/// Parameters are world coordinates (TWIPS).
 	///
@@ -300,12 +303,13 @@ public:
 		// implementation is optional    
 	}
 	
-  /// Converts world coordinates to pixel coordinates
-  virtual geometry::Range2d<int> world_to_pixel(const rect& worldbounds) = 0;
+	/// Converts world coordinates to pixel coordinates
+	virtual geometry::Range2d<int> world_to_pixel(const rect& worldbounds) = 0;
   
-  virtual geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& worldbounds) {
-  	if ((worldbounds.isNull() || worldbounds.isWorld())) 	
-  		return worldbounds;
+	virtual geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& worldbounds)
+	{
+  		if ((worldbounds.isNull() || worldbounds.isWorld())) 	
+  			return worldbounds;
 
 		return world_to_pixel(rect(worldbounds.getMinX(), worldbounds.getMinY(),
 		                           worldbounds.getMaxX(), worldbounds.getMaxY()));  
@@ -334,21 +338,21 @@ public:
 	//
 	/// Can be used to draw empty boxes and cursors.
 	virtual void	draw_line_strip(const void* coords, int vertex_count,
-    const rgba color) = 0;
+			const rgba color) = 0;
     
-  /// Draw a simple, solid filled polygon (no outline).
-  //
-  /// This can't be used for 
-  /// Flash shapes but is intended for internal drawings like bounding boxes 
-  /// (editable text fields) and similar. The polygon should not contain 
-  /// self-intersections. If you do not wish a outline or a fill, then simply 
-  /// set the alpha value to zero.
-  ///
-  /// The polygon need NOT be closed (ie: this function will automatically
-  /// add an additional vertex to close it.
-  ///
-  virtual void  draw_poly(const point* corners, size_t corner_count, 
-    const rgba fill, const rgba outline) = 0;
+	/// Draw a simple, solid filled polygon (no outline).
+	//
+	/// This can't be used for 
+	/// Flash shapes but is intended for internal drawings like bounding boxes 
+	/// (editable text fields) and similar. The polygon should not contain 
+	/// self-intersections. If you do not wish a outline or a fill, then simply 
+	/// set the alpha value to zero.
+	///
+	/// The polygon need NOT be closed (ie: this function will automatically
+	/// add an additional vertex to close it.
+	///
+	virtual void  draw_poly(const point* corners, size_t corner_count, 
+		const rgba fill, const rgba outline) = 0;
     
 		
 	/// Set line and fill styles for mesh & line_strip rendering.
@@ -386,144 +390,149 @@ public:
 	/// character instance.
 	///
 	virtual void draw_shape_character(shape_character_def *def, 
-    character *inst) {
-    
-    // check if the character needs to be rendered at all
-    rect cur_bounds;
-    
-    cur_bounds.expand_to_transformed_rect(inst->get_world_matrix(), 
-			def->get_bound());
-			
-		if (!bounds_in_clipping_area(cur_bounds)) {
-		  return; // no need to draw
-		}
-		
-    
-    // TODO: I don't like that there is a draw_shape_character() version with
-    // arbitrary fill and line styles as this may break caching...
-  
-    // render the character
-    draw_shape_character(def, 
-      inst->get_world_matrix(), 
-      inst->get_world_cxform(),
-      inst->get_parent()->get_pixel_scale(),
-      def->get_fill_styles(),
-      def->get_line_styles());
+		character *inst)
+	{
 
-  }
-  
-  /// \brief
-  /// Checks if the given bounds are (partially) in the current drawing clipping
-  /// area.
-  //
-  /// A render handler implementing invalidated bounds should implement
-  /// this method to avoid rendering of characters that are not visible anyway.
-  /// By default this method always returns true, which will ensure correct
-  /// rendering. If possible, it should be re-implemented by the renderer 
-  /// handler for better performance.
-  /// 'bounds' contains TWIPS coordinates.
-  ///
-  /// TODO: Take a Range2d<T> rather then a gnash::rect ?
-  ///       Would T==int be good ? TWIPS as integer types ?
-  ///
-  /// See also gnash::renderer::bounds_in_clipping_area
-  ///
-  virtual bool bounds_in_clipping_area(const rect& bounds) {
-    return bounds_in_clipping_area(bounds.getRange());
-  }
-  
-  virtual bool bounds_in_clipping_area(const InvalidatedRanges& ranges) {
-  	for (unsigned int rno=0; rno<ranges.size(); rno++) 
-  		if (bounds_in_clipping_area(ranges.getRange(rno)))
-  			return true;
-  			
-  	return false;
+		// check if the character needs to be rendered at all
+		rect cur_bounds;
+
+		cur_bounds.expand_to_transformed_rect(inst->get_world_matrix(), 
+				def->get_bound());
+				
+		if (!bounds_in_clipping_area(cur_bounds))
+		{
+			  return; // no need to draw
+		}
+			
+
+		// TODO: I don't like that there is a draw_shape_character() version with
+		// arbitrary fill and line styles as this may break caching...
+
+		// render the character
+		draw_shape_character(def, 
+		inst->get_world_matrix(), 
+		inst->get_world_cxform(),
+		inst->get_parent()->get_pixel_scale(),
+		def->get_fill_styles(),
+		def->get_line_styles());
+
 	}
   
-  virtual bool bounds_in_clipping_area(const geometry::Range2d<float>& /*bounds*/) {
-    return true;
-  }
+	/// \brief
+	/// Checks if the given bounds are (partially) in the current drawing clipping
+	/// area.
+	//
+	/// A render handler implementing invalidated bounds should implement
+	/// this method to avoid rendering of characters that are not visible anyway.
+	/// By default this method always returns true, which will ensure correct
+	/// rendering. If possible, it should be re-implemented by the renderer 
+	/// handler for better performance.
+	/// 'bounds' contains TWIPS coordinates.
+	///
+	/// TODO: Take a Range2d<T> rather then a gnash::rect ?
+	///       Would T==int be good ? TWIPS as integer types ?
+	///
+	/// See also gnash::renderer::bounds_in_clipping_area
+	///
+	virtual bool bounds_in_clipping_area(const rect& bounds) {
+		return bounds_in_clipping_area(bounds.getRange());
+	}
+  
+	virtual bool bounds_in_clipping_area(const InvalidatedRanges& ranges)
+	{
+		for (unsigned int rno=0; rno<ranges.size(); rno++) 
+		{
+			if (bounds_in_clipping_area(ranges.getRange(rno)))
+				return true;
+		}
+  			
+		return false;
+	}
+  
+	virtual bool bounds_in_clipping_area(const geometry::Range2d<float>& /*bounds*/) {
+		return true;
+	}
 
-  /// \brief
-  /// Draws the given character definition with the given transformations and
-  /// styles. 
+	/// \brief
+	/// Draws the given character definition with the given transformations and
+	/// styles. 
 	virtual void draw_shape_character(shape_character_def *def, 
-    const matrix& mat,
-    const cxform& cx,
-    float pixel_scale,
-    const std::vector<fill_style>& fill_styles,
-    const std::vector<line_style>& line_styles) = 0;
+		const matrix& mat,
+		const cxform& cx,
+		float pixel_scale,
+		const std::vector<fill_style>& fill_styles,
+		const std::vector<line_style>& line_styles) = 0;
     
-  /// \brief
-  /// Draws a glyph (font character).
-  //
-  /// Glyphs are defined just like shape characters with the difference that
-  /// they do not have any fill or line styles.
-  /// Instead, the shape must be drawn using the given color (solid fill). 
-  /// 
-  /// @param def
-  ///
-  /// @param mat
-  ///
-  /// @param color
-  ///
-  /// @param pixel_scale
-  ///
-  virtual void draw_glyph(shape_character_def *def,
-    const matrix& mat,
-    rgba color,
-    float pixel_scale) = 0;
+	/// \brief
+	/// Draws a glyph (font character).
+	//
+	/// Glyphs are defined just like shape characters with the difference that
+	/// they do not have any fill or line styles.
+	/// Instead, the shape must be drawn using the given color (solid fill). 
+	/// 
+	/// @param def
+	///
+	/// @param mat
+	///
+	/// @param color
+	///
+	/// @param pixel_scale
+	///
+	virtual void draw_glyph(shape_character_def *def, const matrix& mat,
+		rgba color, float pixel_scale) = 0;
     
-  /// The render handler can choose if it wishes to use textured glyphs 
-  /// (pre-computed bitmaps which are used for small text sizes) or if 
-  /// draw_glyph() should be used in any case. When glyph textures are not
-  /// desired, then draw_bitmap() is never called in the *current* version.  
-  virtual bool allow_glyph_textures() = 0;
+	/// The render handler can choose if it wishes to use textured glyphs 
+	/// (pre-computed bitmaps which are used for small text sizes) or if 
+	/// draw_glyph() should be used in any case. When glyph textures are not
+	/// desired, then draw_bitmap() is never called in the *current* version.  
+	virtual bool allow_glyph_textures() = 0;
     
     
-  /// This function returns the color at any position in the stage. It is used
-  /// for automatic testing only, it should not be used for anything else!
-  /// world_x and world_y are world coordinates (twips) and the color of the
-  /// nearest pixel is returned.
-  virtual void get_pixel(rgba& /*color_return*/, float /*world_x*/, 
-    float /*world_y*/) {
-    
-    log_msg("get_pixel() not implemented for this renderer");
-    assert(0);    
-    
-  }
+	/// This function returns the color at any position in the stage. It is used
+	/// for automatic testing only, it should not be used for anything else!
+	/// world_x and world_y are world coordinates (twips) and the color of the
+	/// nearest pixel is returned.
+	virtual void get_pixel(rgba& /*color_return*/, float /*world_x*/, 
+		float /*world_y*/)
+	{
 
-  /// Sets the x/y scale for the movie  
-  virtual void set_scale(float /*xscale*/, float /*yscale*/) {
-    // nop
-  }
+		log_msg("get_pixel() not implemented for this renderer");
+		assert(0);    
 
-  virtual void get_scale(point& /*scale*/) {
-  }
+	}
+
+	/// Sets the x/y scale for the movie  
+	virtual void set_scale(float /*xscale*/, float /*yscale*/) {
+		// nop
+	}
+
+	virtual void get_scale(point& /*scale*/) {
+	}
     
 protected:
 
-  // Cached fill style list with just one entry used for font rendering
-  std::vector<fill_style>	m_single_fill_styles;
-  
-  // Dummy line styles list without entries (do not add anything!!)
-  std::vector<line_style>	m_dummy_line_styles;
-  
-  // Dummy, neutral color transformation (do not change!!)
-  cxform m_neutral_cxform;
-  
-  // Sets m_single_fill_styles to one solid fill with the given color 
-  void need_single_fill_style(const rgba& color){
-  
-    if (m_single_fill_styles.size() == 0) {  
-      fill_style dummy;
-    
-      m_single_fill_styles.push_back(dummy);
-    }
-    
-    m_single_fill_styles[0].set_color(color);
-  
-  } //need_single_fill_style
+	/// Cached fill style list with just one entry used for font rendering
+	std::vector<fill_style>	m_single_fill_styles;
+
+	/// Dummy line styles list without entries (do not add anything!!)
+	std::vector<line_style>	m_dummy_line_styles;
+
+	/// Dummy, neutral color transformation (do not change!!)
+	cxform m_neutral_cxform;
+
+	/// Sets m_single_fill_styles to one solid fill with the given color 
+	void need_single_fill_style(const rgba& color)
+	{
+
+		if (m_single_fill_styles.size() == 0)
+		{	
+			fill_style dummy;
+			m_single_fill_styles.push_back(dummy);
+		}
+
+		m_single_fill_styles[0].set_color(color);
+
+	} 
 
 }; // class render_handler
 
