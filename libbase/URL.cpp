@@ -170,7 +170,8 @@ URL::normalize_path(std::string& path)
 			prev = curr;
 
 			if ( comp == "" || comp == "." ) continue;
-			if ( comp == ".." ) components.pop_back();
+			if ( comp == ".." && components.size() )
+				 components.pop_back();
 			else components.push_back(comp);
 		}
 	}

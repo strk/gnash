@@ -150,6 +150,10 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals (u17.str() , "file:///test?.swf" );
 	check_equals (u17.querystring() , "" );
 
+	// Test that this doesn't crash.
+	URL u18("file:///loadMovieTest.swf");
+	URL u19("file://../../test.swf", u18);
+
 
 	// Test query_string parsing
 	map<string, string> qs;

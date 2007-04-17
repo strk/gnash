@@ -1,3 +1,10 @@
+2004-04-17 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/URL.cpp: Don't attempt to remove an item from the vector
+	of strings if the vector is empty.
+	* testsuite/libbase/URLTest.cpp: Add a test which shouldn't crash
+	anymore.
+
 2007-04-17 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg_style.h: Added DEBUG_LIMIT_COLOR_ALPHA 
