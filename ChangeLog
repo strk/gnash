@@ -1,3 +1,7 @@
+2007-04-17 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg_style.h: Added DEBUG_LIMIT_COLOR_ALPHA 
+	
 2007-04-17 Sandro Santilli <strk@keybit.net>
 
 	* gui/sdl.cpp (key_event): update call to notify_key_event

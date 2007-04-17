@@ -24,7 +24,13 @@
 
 
 // TODO: Instead of re-creating AGG fill styles again and again, they should
-// be cached somewhere. 
+// be cached somewhere.
+
+
+// Enable this DEFINE to limit the alpha value of all colors to 50% at most.
+// This works only with solid and gradient fills (not bitmaps) and is used
+// for debugging hidden characters.
+//#define DEBUG_LIMIT_COLOR_ALPHA 
 
 
 using namespace gnash;
@@ -62,6 +68,10 @@ public:
   agg_style_solid(const agg::rgba8 color) {
     m_is_solid = true;
     m_color = color;
+    
+#ifdef DEBUG_LIMIT_COLOR_ALPHA
+    m_color.a = m_color.a>127 ? 127 : m_color.a;
+#endif    
   }
 
   void generate_span(agg::rgba8* /*span*/, int /*x*/, int /*y*/, unsigned /*len*/)
@@ -211,6 +221,10 @@ public:
     
       const gradient_record gr = fs.get_color_stop(i); 
       rgba trans_color = m_cx.transform(gr.m_color);
+      
+#ifdef DEBUG_LIMIT_COLOR_ALPHA
+      trans_color.m_a = trans_color.m_a>127 ? 127 : trans_color.m_a;
+#endif    
       
       m_gradient_lut.add_color(gr.m_ratio/255.0, agg::rgba8_pre(trans_color.m_r, 
         trans_color.m_g, trans_color.m_b, trans_color.m_a));
