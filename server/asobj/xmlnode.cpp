@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.31 2007/04/16 18:23:06 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.32 2007/04/17 12:58:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -121,7 +121,6 @@ XMLNode::~XMLNode()
 #ifdef DEBUG_MEMORY_ALLOCATION
     log_msg("\tDeleting XMLNode data %s at %p", this->_name.c_str(), this);
 #endif
-  
 }
 
 bool
@@ -173,8 +172,8 @@ XMLNode::appendChild(boost::intrusive_ptr<XMLNode> node)
 boost::intrusive_ptr<XMLNode> 
 XMLNode::cloneNode(bool deep)
 {
-    GNASH_REPORT_FUNCTION;
-    log_msg("%s: deep is %d\n", __PRETTY_FUNCTION__, deep);
+    //GNASH_REPORT_FUNCTION;
+    //log_msg("%s: deep is %d", __PRETTY_FUNCTION__, deep);
 
     boost::intrusive_ptr<XMLNode> newnode = new XMLNode(*this, deep);
 
@@ -185,8 +184,6 @@ void
 XMLNode::insertBefore(boost::intrusive_ptr<XMLNode> newnode, boost::intrusive_ptr<XMLNode> pos)
 {
     // find iterator for positional parameter
-    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
-
     ChildList::iterator it = find(_children.begin(), _children.end(), pos);
     if ( it == _children.end() )
     {
@@ -216,8 +213,6 @@ XMLNode::removeNode()
     {
         oldparent->_children.remove(this);
     }
-    _children.clear();
-    _attributes.clear();
     _parent = NULL;
     assert(get_ref_count() > 0);
 }
@@ -466,7 +461,7 @@ xmlnode_appendchild(const fn_call& fn)
 static as_value
 xmlnode_clonenode(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 //    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
@@ -480,13 +475,13 @@ xmlnode_clonenode(const fn_call& fn)
 static as_value
 xmlnode_insertbefore(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
-    boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
+	//GNASH_REPORT_FUNCTION;
+	boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
 	if ( fn.nargs < 2 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
+		std::stringstream ss; fn.dump_args(ss);
 		log_aserror("XMLNode.insertBefore(%s) needs at least two argument", ss.str().c_str());
 		);
 		return as_value();
@@ -496,7 +491,7 @@ xmlnode_insertbefore(const fn_call& fn)
 	if ( ! newnode )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-        std::stringstream ss; fn.dump_args(ss);
+		std::stringstream ss; fn.dump_args(ss);
 		log_aserror("First argument to XMLNode.insertBefore(%s) is not an XMLNode",
                 ss.str().c_str());
 		);
@@ -526,7 +521,7 @@ xmlnode_insertbefore(const fn_call& fn)
 static as_value
 xmlnode_removenode(const fn_call& fn)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
     
     ptr->removeNode();

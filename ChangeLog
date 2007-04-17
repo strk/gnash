@@ -1,5 +1,13 @@
 2007-04-17 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/XML.as: add test
+	  showing that removeNode doesn't recurse to
+	  childrens.
+	* server/asobj/xmlnode.{cpp,h}: fix removeNode
+	  to not delete all childrens.
+
+2007-04-17 Sandro Santilli <strk@keybit.net>
+
 	* libbase/: tu_file.{cpp,h}, curl_adapter.cpp, zlib_adapter.cpp,
 	  noseek_fd_adapter.cpp:
 	  Add another callback for getting stream error. First pass at

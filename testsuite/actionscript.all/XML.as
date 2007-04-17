@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.27 2007/04/10 10:46:19 strk Exp $";
+rcsid="$Id: XML.as,v 1.28 2007/04/17 12:58:20 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -487,6 +487,18 @@ deepcln_node.parentNode = src_node;
 check_equals(deepcln_node.parentNode, null);
 
 
+xml1 = new XML("<X1T><X1C1><X1C1C1></X1C1C1></X1C1><X1C2></X1C2></X1T>");
+check_equals(xml1.firstChild.childNodes.length, 2);
+fc = xml1.firstChild.firstChild;
+check_equals(fc.nodeName, 'X1C1');
+check_equals(fc.childNodes.length, 1);
+check_equals(fc.parentNode, xml1.firstChild);
+fc.removeNode(); // removes xml1.firstChild.firstChil (X1C1)
+check_equals(xml1.firstChild.childNodes.length, 1);
+check_equals(fc.parentNode, null);
+check_equals(fc.nodeName, 'X1C1');
+check_equals(fc.childNodes.length, 1); // childs of the removed child are still alive !
+check_equals(fc.childNodes[0].parentNode, fc); // and still point to the removed child !
 
 //------------------------------------------------
 // Other tests..

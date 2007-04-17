@@ -225,7 +225,7 @@ public:
 
     void toString(std::ostream& str) const;
 
-    void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
+    //void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
 
     // We might turn this back to a dumb pointer, as long
     // as we'll make sure in the XMLNode destructor and
@@ -233,7 +233,7 @@ public:
     // to NULL
     boost::intrusive_ptr<XMLNode> _parent;
 
-    ChildList		_children;
+    ChildList       _children;
     AttribList      _attributes;
 
 private:
