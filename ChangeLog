@@ -1,5 +1,7 @@
 2007-04-17 Sandro Santilli <strk@keybit.net>
 
+	* gui/sdl.cpp (key_event): update call to notify_key_event
+	  to provide no modifiers always (bogus, but at least compiles).
 	* testsuite/actionscript.all/XML.as: add test
 	  showing that removeNode doesn't recurse to
 	  childrens.
