@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.30 2007/03/01 11:06:32 udog Exp $ */
+/* $Id: render_handler.h,v 1.31 2007/04/17 08:32:42 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -259,7 +259,26 @@ public:
 	/// Returns the format the current renderer wants videoframes in.
 	virtual int videoFrameFormat() = 0;
 	
-	/// Draws the video frames
+	/** \brief Draws a video frame. 
+	  *
+	  * The frame has already been decoded and is available in the format
+	  * specified by videoFrameFormat().	  
+	  *     	  
+	  * @param baseframe The RGB or YUV video buffer frame.
+	  *
+	  * @param mat The matrix with world coordinates used to retrieve the x
+	  *   and y coordinate of the video object. The scaling of the matrix only
+	  *   refers to the Flash instance, *not* to the video inside that instance.
+	  *   When a video object is placed on the stage and the loaded video is
+	  *   smaller, then the matrix is still an "identity matrix". However, if
+	  *   the video object is scaled via ActionScript, for example, then the
+	  *   matrix will change. This means the renderer has to find the correct
+	  *   scaling for the video inside the bounds.                             	  
+	  *
+	  * @param bounds The minX/minY fields of this rect are always zero. 
+	  *   The width and height determine the size of the Flash video instance
+	  *   on the stage (in TWIPS) prior to matrix transformations.         
+	  */
 	virtual void drawVideoFrame(image::image_base* frame, const matrix* mat, const rect* bounds) = 0;
 
 	/// Sets the update region (called prior to begin_display). The renderer 
