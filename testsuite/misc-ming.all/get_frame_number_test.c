@@ -77,18 +77,18 @@ main(int argc, char** argv)
   add_actions(mo, " gotoAndStop(Infinity); ");    // ActionGotoExpression
   check_equals(mo, "_currentframe", "2");
   add_actions(mo, " x = 0; "
-                  " gotoAndStop(x); ");         // ActionGotoExpression
+                  " gotoAndStop(x); ");    // ActionGotoExpression
   check_equals(mo, "_currentframe", "2");
   add_actions(mo, " x = -1; "
-                  " gotoAndStop(x); ");         // ActionGotoExpression
+                  " gotoAndStop(x); ");    // ActionGotoExpression
   check_equals(mo, "_currentframe", "2");  
   add_actions(mo, " x = 4.8; "  // valid frame label                   
-                  " gotoAndStop(x); ");         // ActionGotoExpression  
+                  " gotoAndStop(x); ");    // ActionGotoExpression  
   check_equals(mo, "_currentframe", "5");          
   add_actions(mo, " x = 6.1; "  // invalid frame number                   
-                  " gotoAndStop(x); ");         // ActionGotoExpression  
+                  " gotoAndStop(x); ");    // ActionGotoExpression  
   check_equals(mo, "_currentframe", "5"); 
-  add_actions(mo, " gotoAndStop(7); ");         // ActionGotoFrame
+  add_actions(mo, " gotoAndStop(7); ");    // ActionGotoFrame
   SWFMovie_nextFrame(mo); /* 6th frame */
   
   add_actions(mo, "function func1() {}"
@@ -107,37 +107,65 @@ main(int argc, char** argv)
                   "function func4() {}"
                   "func4.prototype.toString = function() { return '4.8'; }; "
                   "func4.prototype.valueOf = function() { return '4.8';};"
-                  "x4 = new func4();");
+                  "x4 = new func4();"
+                  
+                  "x5 = new Number(3);"
+                  "Number.prototype.toString =  function () { return '4'; }; "
+                  
+                  "x6 = new String('3');"
+                  "String.prototype.toString =  function () { return '4'; }; " );
                   
                   
-  add_actions(mo, " x = '8'; gotoAndStop(x); ");     // ActionGotoExpression
+  add_actions(mo, " x = '8'; gotoAndStop(x); ");  // ActionGotoExpression
   /* reach the last frame */
   check_equals(mo, "_currentframe", "7");
   
-  add_actions(mo, " x = '8a'; gotoAndStop(x); ");    // ActionGotoExpression
+  add_actions(mo, " x = '8a'; gotoAndStop(x); ");  // ActionGotoExpression
   check_equals(mo, "_currentframe", "3");
   
-  add_actions(mo, " x = 'aa'; gotoAndStop(x); ");    // ActionGotoExpression
+  add_actions(mo, " x = 'aa'; gotoAndStop(x); ");  // ActionGotoExpression
   check_equals(mo, "_currentframe", "4");
   
-  add_actions(mo, " gotoAndStop(x1); ");             // ActionGotoExpression
-  /* reach the last frame, toString invoked */
+  add_actions(mo, " gotoAndStop(x1); ");  // ActionGotoExpression
+  /* reach the last frame, toString() invoked */
   check_equals(mo, "_currentframe", "7"); 
   
   /* reset _currentframe to 1 */
   add_actions(mo, " gotoAndStop(1); ");  
   
-  add_actions(mo, " gotoAndStop(x2); ");             // ActionGotoExpression
+  add_actions(mo, " gotoAndStop(x2); ");  // ActionGotoExpression
   check_equals(mo, "_currentframe", "1"); 
   
-  add_actions(mo, " gotoAndStop(x3); ");             // ActionGotoExpression
-  /* reach the last frame */
+  add_actions(mo, " gotoAndStop(x3); ");  // ActionGotoExpression
+  /* reach the last frame, toString() invoked */
   check_equals(mo, "_currentframe", "7");
   
-  add_actions(mo, " gotoAndStop(x4); ");             // ActionGotoExpression
+  add_actions(mo, " gotoAndStop(x4); ");  // ActionGotoExpression
   /* "4.8" is a valid frame label, toString() invoked */
   check_equals(mo, "_currentframe", "5");
   
+  check_equals(mo, "_root.x5", "3");
+  check_equals(mo, "_root.x5.toString()", "'4'");
+  check_equals(mo, "_root.x5.toString()", "4");
+  add_actions(mo, " gotoAndStop(x5); ");  // ActionGotoExpression
+  /* toString() invoked again for Number Object */
+  check_equals(mo, "_currentframe", "4");
+  
+  /* reset _currentframe to 1 */
+  add_actions(mo, " gotoAndStop(1); "); 
+  
+  check_equals(mo, "_root.x6", "'3'");
+  check_equals(mo, "_root.x6.toString()", "'4'");
+  check_equals(mo, "_root.x6.toString()", "4");
+  add_actions(mo, " gotoAndStop(x6); ");  // ActionGotoExpression
+  /* toString() not invoked for String Object ??? */
+  xcheck_equals(mo, "_currentframe", "3");
+  
+  /* This ensure the movie stop at the last frame,
+   * and the actions in last frame will not be pushed again 
+   */
+  add_actions(mo, " gotoAndStop(10000); ");  // ActionGotoFrame
+  check_equals(mo, "_currentframe", "7");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 7th frame */
 
