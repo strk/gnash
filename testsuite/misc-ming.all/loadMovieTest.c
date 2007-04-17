@@ -120,11 +120,12 @@ main(int argc, char** argv)
 	sprintf(file_offspring, "%s/offspring.jpg", srcdir);
 
 	/*
-	 * Test urls with and w/out 'file://' prefix.
 	 * Test both jpeg and swf loading.
+	 * NOTE: testing of urls with and w/out 'file://' prefix
+	 *       disabled to reduce test complexity.
 	 */
-	sprintf(url_lynch, "file://%s/lynch.swf", srcdir);
-	sprintf(url_green, "file://%s/green.jpg", srcdir);
+	sprintf(url_lynch, "%s/lynch.swf", srcdir);
+	sprintf(url_green, "%s/green.jpg", srcdir);
 	sprintf(url_offspring, "%s/offspring.swf", srcdir);
 
 

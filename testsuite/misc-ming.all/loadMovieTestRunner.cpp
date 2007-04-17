@@ -38,7 +38,6 @@ using namespace std;
 int
 main(int /*argc*/, char** /*argv*/)
 {
-return 0;
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 

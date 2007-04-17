@@ -1,3 +1,11 @@
+2007-04-17 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/loadMovieTest.c: stop prepending
+	  'file://' to srcdir as it might be relative and file://
+	  should not be used with relative uris.
+	* testsuite/misc-ming.all/loadMovieTestRunner.cpp:
+	  Don't cheat, run the test !
+
 2004-04-17 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libbase/URL.cpp: Don't attempt to remove an item from the vector
