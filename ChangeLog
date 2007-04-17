@@ -2,6 +2,8 @@
 
 	* testsuite/misc-ming.all/get_frame_number_test.c:
 	  more tests.
+	* testsuite/misc-ming.all/path_format_test.c:
+	  testcase to verify valid path format
 	  
 2007-04-16 Sandro Santilli <strk@keybit.net>
 
