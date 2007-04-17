@@ -1,3 +1,9 @@
+2007-04-17 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg: Replaced drawVideoFrame() to use AGG
+	  functions, implemented nearest neighbor transformations, 
+	  implemented masked video playback
+	  
 2007-04-17 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/get_frame_number_test.c:

@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.69 2007/04/11 14:54:26 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.70 2007/04/17 09:19:31 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -64,7 +64,7 @@ Status
   
   caching             NONE IMPLEMENTED
   
-  video               NOT IMPLEMENTED, only stubs
+  video               COMPLETE
   
   Currently the renderer should be able to render everything correctly,
   except videos.
@@ -422,66 +422,137 @@ public:
 		return RGB;
 	}
 	
-	/** \brief Draws the video frames
-	  * This implementation blits (copies) the RGB buffer provided by the caller
-	  * directly into the Agg render buffer.
-	  *
-	  * @param baseframe The RGB video buffer frame.
-	  *
-	  * @param mat The matrix with world coordinates used to retrieve the x
-	  * and y coordinate of the video object.
-	  *
-	  * @param bounds the width and height fields of this rect are used to
-	  * determine the width and height of the RGB image to be drawn. The x and y
-	  * members of this field are ignored.
-	  */
-   void drawVideoFrame(image::image_base* baseframe, const matrix* mat, const rect* bounds)
-	{
-	  point a;
-	  mat->transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
 
-	  int xpos = (int)round( TWIPS_TO_PIXELS(a.m_x) );
-	  int ypos = (int)round( TWIPS_TO_PIXELS(a.m_y) );
+  void drawVideoFrame(image::image_base* baseframe, const matrix* mat, const rect* bounds) {
+  
+    // NOTE: Assuming that the source image is RGB 8:8:8
+    
+    // TODO: Currently only nearest-neighbor scaling is implemented here, since
+    // it's the fastest and Flash apparently uses this method most of the time.
+    // It would be easy to add other scaling methods (bilinear, bicubic, 
+    // whatever), but we'd need some way to tell the renderer the desired
+    // quality.
+    
+    // TODO: Test this with a rotated video. Maybe the image accessor
+    // will insert some ugly pixels (even if I don't think so) - Udo
 
-	  // TODO: handle this by only blitting part of the source RGB image.
-	  if (xpos < 0) {
-	    xpos = 0;
-	  }
-	  if (ypos < 0) {
-    	    ypos = 0;
-	  }
-	
-	  int bytes_per_pixel = 3;		
-	  image::rgb* frame = static_cast<image::rgb*>(baseframe);
+    // TODO: keep heavy instances alive accross frames for performance!
+    
+    // TODO: Maybe implement specialization for 1:1 scaled videos
+    
+      
+    typedef agg::pixfmt_rgb24_pre baseformat;
+    //typedef agg::renderer_base<baseformat> renderer_base_pre;
+  
+    image::rgb* frame = static_cast<image::rgb*>(baseframe);
+    
+    // compute video scaling relative to video obejct size
+    double vscaleX = TWIPS_TO_PIXELS(bounds->width())  / frame->m_width;
+    double vscaleY = TWIPS_TO_PIXELS(bounds->height()) / frame->m_height;
+    
+    // convert Gnash matrix to AGG matrix and scale down to pixel coordinates
+    // while we're at it 
+    agg::trans_affine img_mtx(
+      mat->m_[0][0]*20.0*vscaleX, mat->m_[1][0], 
+      mat->m_[0][1],              mat->m_[1][1]*20.0*vscaleY, 
+      mat->m_[0][2],              mat->m_[1][2]
+    );
+    
+    // apply global movie scaling
+    img_mtx *= agg::trans_affine_scaling((xscale+yscale) * 0.5);
+    
+    // invert matrix since this is used for the image source
+    img_mtx.invert();
+    
+    // span allocator is used to apply the matrix
+    agg::span_allocator<agg::rgba8> sa;
+        
+    typedef agg::span_interpolator_linear<> interpolator_type;
+    interpolator_type interpolator(img_mtx);
+    
+    // clipping image accessor is used to avoid repeating of the image
+    typedef agg::image_accessor_clip<baseformat> img_source_type;
+    
+    // rendering buffer is used to access the frame pixels here        
+    agg::rendering_buffer img_buf(frame->m_data, frame->m_width, frame->m_height,
+      frame->m_width*3);
+         
+    baseformat img_pixf(img_buf);
+    
+    // The second parameter passed to the constructor is the color (R,G,B,A) 
+    // used for pixels outside the source image (ie. when the movie aspect 
+    // ratio does not match the video instance). 
+    img_source_type img_src(img_pixf, agg::rgba_pre(255,0,0,0));
+    
+    // renderer base for the stage buffer (not the frame image!)
+    renderer_base rbase(*m_pixf);
+        
+    // nearest neighbor method for scaling
+    typedef agg::span_image_filter_rgb_nn<img_source_type, interpolator_type>
+      span_gen_type;
+    span_gen_type sg(img_src, interpolator);
+      
+    typedef agg::rasterizer_scanline_aa<> ras_type;
+    ras_type ras;
+    
+    // make a path for the video outline
+ 		point a, b, c, d;
+		mat->transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
+		mat->transform(&b, point(bounds->get_x_max(), bounds->get_y_min()));
+		mat->transform(&c, point(bounds->get_x_max(), bounds->get_y_max()));
+		mat->transform(&d, point(bounds->get_x_min(), bounds->get_y_max()));
+    
+    agg::path_storage path;
+    path.move_to(a.m_x*xscale, a.m_y*yscale);
+    path.line_to(b.m_x*xscale, b.m_y*yscale);
+    path.line_to(c.m_x*xscale, c.m_y*yscale);
+    path.line_to(d.m_x*xscale, d.m_y*yscale);
+    path.line_to(a.m_x*xscale, a.m_y*yscale);
 
-	  unsigned int frame_width = frame->m_width * bytes_per_pixel;
+    if (m_alpha_mask.empty()) {
+    
+      // No mask active
 
-	  if (frame_width + xpos * bytes_per_pixel  > m_rbuf.width() * bytes_per_pixel) {
-	    // the movie was placed too far to the right. let's cut it off at
-	    // the far right corner. (This is also how "that other player"
-	    // handles it, I'm told.)
-	    frame_width = (m_rbuf.width() * bytes_per_pixel - xpos * bytes_per_pixel);
-	  }
-
-	  unsigned char* rgbbuf_ptr = frame->m_data;
-	  unsigned char* rgbbuf_end = rgbbuf_ptr + frame->m_pitch *
-				      frame->m_height;
-	
-	  unsigned char* aggbuf_ptr = memaddr;
-	  unsigned char* aggbuf_end = memaddr + memsize;  
-	
-	  // Skip the first ypos rows.
-	  aggbuf_ptr += ypos * m_rbuf.stride();
-	  // Move xpos pixels to the right.
-	  aggbuf_ptr += xpos * bytes_per_pixel;		
-
-	  while(rgbbuf_ptr < rgbbuf_end && aggbuf_ptr < aggbuf_end) {
-    	    memcpy(aggbuf_ptr, rgbbuf_ptr, frame_width);
-	    aggbuf_ptr += m_rbuf.stride();
-	    rgbbuf_ptr += frame->m_pitch; 
-	  }
-	}
-
+      agg::scanline_u8 sl;
+  
+      for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {    
+      
+        const geometry::Range2d<int>& cbounds = _clipbounds[cno];
+        apply_clip_box<ras_type> (ras, cbounds);
+  
+        // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
+        // path), so there should be no problem with multiple clipbounds.      
+        ras.add_path(path);			
+  			   
+        agg::render_scanlines_aa(ras, sl, rbase, sa, sg);
+      }
+      
+    } else {
+    
+      // Mask is active!
+      
+      // **** UNTESTED!!! ****
+      
+      typedef agg::scanline_u8_am<agg::alpha_mask_gray8> scanline_type;
+      scanline_type sl(m_alpha_mask.back()->get_amask());
+  
+      for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {    
+      
+        const geometry::Range2d<int>& cbounds = _clipbounds[cno];
+        apply_clip_box<ras_type> (ras, cbounds);
+  
+        // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
+        // path), so there should be no problem with multiple clipbounds.      
+        ras.add_path(path);			
+  			   
+        agg::render_scanlines_aa(ras, sl, rbase, sa, sg);
+      }
+      
+    
+    } // if alpha mask
+    
+  } // drawVideoFrame
+  
 
   // Constructor
   render_handler_agg(int bits_per_pixel)
