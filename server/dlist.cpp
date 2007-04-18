@@ -1,3 +1,4 @@
+// dlist.cpp:  Display lists, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,11 +11,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-//
-// 
 //
 
 #include "dlist.h"
@@ -122,7 +122,7 @@ character*
 DisplayList::get_character_at_depth(int depth)
 {
 	//GNASH_REPORT_FUNCTION;
-	//dump(std::cout);
+	//dump();
 
 	for (iterator it = _characters.begin(),
 			itEnd = _characters.end();
@@ -179,10 +179,10 @@ DisplayList::place_character(
 	int clip_depth)
 {
 //	GNASH_REPORT_FUNCTION;
-	//IF_VERBOSE_DEBUG(log_msg("dl::add(%d, '%s')\n", depth, ch->get_name()));//xxxxx
+	//log_msg(_("dl::add(%d, '%s')"), depth, ch->get_name());
 
-	//log_msg("Before adding, list is:");
-	//dump(std::cout);
+	//log_msg(_("Before adding, list is:"));
+	//dump();
 
 	assert(ch);
 	ch->set_invalidated();
@@ -198,13 +198,13 @@ DisplayList::place_character(
 
 	if ( it == _characters.end() || (*it)->get_depth() != depth )
 	{
-		//log_msg("place_character: new character at depth %d", depth);
+		//log_msg(_("place_character: new character at depth %d"), depth);
 		// add the new char
 		_characters.insert(it, DisplayItem(ch));
 	}
 	else
 	{
-		//log_msg("place_character: replacing existing character at depth %d", depth);
+		//log_msg(_("place_character: replacing existing character at depth %d"), depth);
 		(*it)->unload();
 		// replace existing char
 		*it = DisplayItem(ch);
@@ -275,8 +275,8 @@ DisplayList::replace_character(
 
 		// Error, no existing object found at depth.
 //		IF_VERBOSE_DEBUG(
-//			log_msg("dl::replace_display_object()"
-//				" no obj at depth %d\n", depth)
+//			log_msg(_("dl::replace_display_object()"
+//				" no obj at depth %d"), depth)
 //		);
 
 		// add the new char
@@ -322,14 +322,15 @@ DisplayList::move_display_object(
 	int /* clip_depth */)
 {
 	//GNASH_REPORT_FUNCTION;
-	//IF_VERBOSE_DEBUG(log_msg("dl::move(%d)\n", depth));//xxxxx
+	//IF_VERBOSE_DEBUG(log_msg(_("dl::move(%d)"), depth));
 
 	character* ch = get_character_at_depth(depth);
 	if ( ! ch )
 	{
+		// FIXME, should this be log_aserror?
 		IF_VERBOSE_MALFORMED_SWF(
-		log_warning("move_display_object() -- "
-			"can't find object at depth %d",
+		log_swferror(_("move_display_object() -- "
+			"can't find object at depth %d"),
 			depth);
 		);
 		return;
@@ -361,8 +362,8 @@ DisplayList::remove_display_object(int depth)
 {
 	//GNASH_REPORT_FUNCTION;
 
-	//log_msg("Before removing, list is:");
-	//dump(std::cout);
+	//log_msg(_("Before removing, list is:"));
+	//dump();
 
 #ifndef NDEBUG
 	container_type::size_type size = _characters.size();
@@ -385,8 +386,8 @@ DisplayList::remove_display_object(int depth)
 	assert(size >= _characters.size());
 #endif
 
-	//log_msg("Done removing, list is:");
-	//dump(std::cout);
+	//log_msg(_("Done removing, list is:"));
+	//dump();
 }
 	
 	
@@ -585,7 +586,7 @@ DisplayList::advance(float delta_time)
 
 //		if (_characters.size() != size)
 //		{
-//			log_error("gnash bug: dlist size changed due to character actions, bailing on update!\n");
+//			log_error(_("gnash bug: dlist size changed due to character actions, bailing on update"));
 //			break;
 //		}
 
@@ -612,7 +613,7 @@ DisplayList::display()
 	bool masked = false;
 	int highest_masked_layer = 0;
 	
-	//log_msg("number of objects to be drawn %i\n", m_display_object_array.size());
+	//log_msg(_("number of objects to be drawn %d"), m_display_object_array.size());
 	
 	for( iterator it = _characters.begin(),
 			endIt = _characters.end();
@@ -637,7 +638,7 @@ DisplayList::display()
 		{
 			if (ch->get_depth() > highest_masked_layer)
 			{
-//					log_msg("disabled mask before drawing depth %i\n", ch->get_depth());
+//					log_msg(_("disabled mask before drawing depth %d"), ch->get_depth());
 				masked = false;
 				// turn off mask
 				render::disable_mask();
@@ -647,7 +648,7 @@ DisplayList::display()
 		// check whether this object should become mask
 		if (ch->get_clip_depth() > 0)
 		{
-			//log_msg("begin submit mask\n");
+			//log_msg(_("begin submit mask"));
 			render::begin_submit_mask();
 		}
 		
@@ -658,7 +659,7 @@ DisplayList::display()
 		// information about it
 		if (ch->get_clip_depth() > 0)
 		{
-			//log_msg("end submit mask\n");
+			//log_msg(_("end submit mask"));
 			render::end_submit_mask();
 			highest_masked_layer = ch->get_clip_depth();
 			masked = true;
@@ -676,7 +677,7 @@ DisplayList::display()
 
 /*public*/
 void
-DisplayList::dump(std::ostream& os) const
+DisplayList::dump() const
 {
 	int num=0;
 	for( const_iterator it = _characters.begin(),
@@ -684,11 +685,9 @@ DisplayList::dump(std::ostream& os) const
 		it != endIt; ++it)
 	{
 		const DisplayItem& dobj = *it;
-		os << "Item " << num << " at depth " << dobj->get_depth()
-			<< " (char id " << dobj->get_id()
-			<< ", name " << dobj->get_name()
-			<< ", type " << typeid(*dobj).name()
-			<< ")" << std::endl;
+		log_msg(_("Item %d at depth %d (char id %d, name %s, type %s"),
+			num, dobj->get_depth(), dobj->get_id(),
+			dobj->get_name().c_str(), typeid(*dobj).name());
 		num++;
 	}
 }

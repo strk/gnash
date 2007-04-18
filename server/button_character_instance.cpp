@@ -1,3 +1,4 @@
+// button_character_instance.cpp:  Mouse-sensitive buttons, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,16 +11,11 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
-// 
-//
-//
-
-
-// SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -325,7 +321,7 @@ button_character_instance::on_event(const event_id& id)
 #if 0
 	if (id.m_id != event_id::KEY_PRESS)
 	{
-		log_warning("Unsupported event for button instance: %s", id.get_function_name().c_str());
+		log_warning(_("Unsupported event for button instance: %s"), id.get_function_name().c_str());
 		return false;
 	}
 #endif
@@ -530,7 +526,7 @@ button_character_instance::on_button_event(const event_id& event)
 
 	default:
 		//assert(0);	// missed a case?
-		log_error("Unhandled button event %s", event.get_function_name().c_str());
+		log_error(_("Unhandled button event %s"), event.get_function_name().c_str());
 		break;
 	};
 	
@@ -620,8 +616,8 @@ button_character_instance::on_button_event(const event_id& event)
 				action_buffer* ab = m_def->m_button_actions[i].m_actions[j];
 				assert(ab);
 				IF_VERBOSE_ACTION(
-					log_action("Executing actions for "
-						"button condition %d\n", c);
+					log_action(_("Executing actions for "
+						"button condition %d"), c);
 				);
 				ActionExec exec(*ab, get_environment());
 				exec();
@@ -638,7 +634,7 @@ button_character_instance::on_button_event(const event_id& event)
 	}
 	else
 	{
-		//log_warning("No handler for event: %s", event.get_function_name().c_str());
+		//log_warning(_("No handler for event: %s"), event.get_function_name().c_str());
 	}
 
 

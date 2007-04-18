@@ -1,3 +1,4 @@
+// as_value.cpp:  ActionScript values, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,10 +11,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 //
 
 #ifdef HAVE_CONFIG_H
@@ -168,12 +169,12 @@ as_value::to_string(as_environment* env) const
 					}
 					else
 					{
-						log_msg("call_method0(%s) did not return a string", methodname.c_str());
+						log_msg(_("call_method0(%s) did not return a string"), methodname.c_str());
 					}
 				}
 				else
 				{
-					log_msg("get_member(%s) returned false", methodname.c_str());
+					log_msg(_("get_member(%s) returned false"), methodname.c_str());
 				}
 			}
 			if ( ! gotValidToStringResult )
@@ -295,7 +296,7 @@ as_value::to_number(as_environment* env) const
 			//
 			// Arrays and Movieclips should return NaN.
 
-			//log_msg("OBJECT to number conversion, env is %p", env);
+			//log_msg(_("OBJECT to number conversion, env is %p"), env);
 
 			as_object* obj = m_object_value; 
 			bool gotValidValueOfResult = false;
@@ -314,12 +315,12 @@ as_value::to_number(as_environment* env) const
 					}
 					else
 					{
-						log_msg("call_method0(%s) did not return a number", methodname.c_str());
+						log_msg(_("call_method0(%s) did not return a number"), methodname.c_str());
 					}
 				}
 				else
 				{
-					log_msg("get_member(%s) returned false", methodname.c_str());
+					log_msg(_("get_member(%s) returned false"), methodname.c_str());
 				}
 			}
 			if ( ! gotValidValueOfResult )
@@ -378,7 +379,7 @@ as_value::to_bool_v5() const
 			{
 				double num = to_number();
 				bool ret = num && ! isnan(num);
-				//log_msg("m_string_value: %s, to_number: %g, to_bool: %d", m_string_value.c_str(), num, ret);
+				//log_msg(_("m_string_value: %s, to_number: %g, to_bool: %d"), m_string_value.c_str(), num, ret);
 				return ret;
 			}
 		}
@@ -412,7 +413,7 @@ as_value::to_bool_v6() const
 			{
 				double num = to_number();
 				bool ret = num && ! isnan(num);
-				//log_msg("m_string_value: %s, to_number: %g, to_bool: %d", m_string_value.c_str(), num, ret);
+				//log_msg(_("m_string_value: %s, to_number: %g, to_bool: %d"), m_string_value.c_str(), num, ret);
 				return ret;
 			}
 		}
@@ -486,8 +487,8 @@ as_value::to_sprite() const
 	character* target = env.find_target(std::string(m_string_value.c_str()));
 	if ( ! target )
 	{
-		log_warning("MovieClip value is a dangling reference: "
-				"target '%s' not found (should set to NULL?)",
+		log_error(_("MovieClip value is a dangling reference: "
+				"target '%s' not found (should set to NULL?)"),
 				m_string_value.c_str());
 		return NULL;
 	}

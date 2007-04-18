@@ -1,3 +1,4 @@
+// gui.cpp:  Top level GUI for flash player, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,11 +11,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -136,8 +136,8 @@ Gui::resize_view(int width, int height)
 	}
 	else
 	{
-		log_warning("Resize request received while there's still"
-			" no movie loaded, can't correctly set movie scale");
+		//log_msg(_("Resize request received while there's still"
+		//	" no movie loaded, can't correctly set movie scale"));
 	}
 	
 	// trigger redraw
@@ -147,8 +147,7 @@ Gui::resize_view(int width, int height)
 	_width = width;
 	_height = height;
 	_validbounds.setTo(0, 0, _width, _height);
-	//log_msg("new size (in twips) is: %dx%d", _width*20, _height*20); 
-
+	//log_msg(_("new size (in twips) is: %dx%d"), _width*20, _height*20); 
 }
 
 void
@@ -246,7 +245,7 @@ Gui::notify_mouse_moved(int x, int y)
 {
 	movie_root* m = get_current_root();
 
-	//log_msg("mouse @ %d,%d", x, y);
+	//log_msg(_("mouse @ %d,%d"), x, y);
 	if ( m->notify_mouse_moved(x, y) )
 	{
 		// any action triggered by the
@@ -458,7 +457,7 @@ Gui::advance_movie(Gui* gui)
 	m->get_movie_definition()->ensure_frame_loaded(tot_frames);
 	m->goto_frame(cur_frame+1);
     	m->set_play_state(gnash::sprite_instance::PLAY);
-	log_msg("Frame %d", m->get_current_frame());
+	log_msg(_("Frame %d"), m->get_current_frame());
 #endif
 
 	gui->display(m);

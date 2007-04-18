@@ -1,5 +1,6 @@
+// StreamProvider.cpp:  ActionScript file: or http: stream reader, for Gnash.
 // 
-//   Copyright (C) 2005, 2006. 2007 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,9 +11,11 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -85,7 +88,8 @@ StreamProvider::getStream(const URL& url)
 			return NULL;
 		}
 #else
-		log_error("Unsupported network connections");
+		log_error(_("Unsupported network connection %s"),
+				 url.str().c_str());
 		return NULL;
 #endif
 	}
@@ -98,7 +102,7 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 
 	if (url.protocol() == "file")
 	{
-		log_warning("POST data discarded while getting a stream from non-http uri");
+		log_error(_("POST data discarded while getting a stream from file: uri"));
 		std::string path = url.path();
 		if ( path == "-" )
 		{
@@ -125,7 +129,8 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 			return NULL;
 		}
 #else
-		log_error("Unsupported network connections");
+		log_error(_("Unsupported network connection %s"),
+				url.str().c_str();
 		return NULL;
 #endif
 	}

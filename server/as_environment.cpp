@@ -1,3 +1,4 @@
+// as_environment.cpp:  Variable, Sprite, and Movie locators, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,13 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 //
 
-/* $Id: as_environment.cpp,v 1.69 2007/04/16 18:23:05 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.70 2007/04/18 09:35:42 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -47,7 +48,7 @@ as_environment::get_variable(const std::string& varname,
     // Path lookup rigamarole.
     std::string	path;
     std::string	var;
-    //log_msg("get_variable(%s)", varname.c_str());
+    //log_msg(_("get_variable(%s)"), varname.c_str());
     bool is_slash_based;
     if (parse_path(varname, path, var, &is_slash_based)) {
 	//as_value target_val = get_variable_raw(path, with_stack);
@@ -64,7 +65,7 @@ as_environment::get_variable(const std::string& varname,
 	} else {
 
 	    IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("find_object%s(\"%s\") [ varname = '%s' - current target = '%s' ] failed",
+	    log_aserror(_("find_object%s(\"%s\") [ varname = '%s' - current target = '%s' ] failed"),
 			    is_slash_based ? "_slashsyntax" : "_dotsyntax",
 			    path.c_str(),
 			    varname.c_str(),
@@ -75,9 +76,9 @@ as_environment::get_variable(const std::string& varname,
 	    as_value tmp = get_variable_raw(path, with_stack);
 	    if ( ! tmp.is_undefined() )
 	    {
-#ifdef DEBUG_GET_VARIABLE
-		    log_msg("But get_variable_raw(%s, <with_stack>) succeeded!", path.c_str());
-#endif
+	    IF_VERBOSE_ASCODING_ERRORS(
+		    log_aserror(_("...but get_variable_raw(%s, <with_stack>) succeeded!"), path.c_str());
+	    )
 	    }
 	    return as_value();
 	}
@@ -151,8 +152,9 @@ as_environment::get_variable_raw(
     }
     
     // Fallback.
+    // FIXME, should this be log_error?  or log_swferror?
 	IF_VERBOSE_ACTION (
-    log_action("get_variable_raw(\"%s\" failed, returning UNDEFINED.)",
+    log_action(_("get_variable_raw(\"%s\") failed, returning UNDEFINED"),
 	       varname.c_str());
 	);
 
@@ -229,10 +231,10 @@ as_environment::set_variable(
     as_object* target = m_target;
     std::string	path;
     std::string	var;
-    //log_msg("set_variable(%s, %s)", varname.c_str(), val.to_debug_string().c_str());
+    //log_msg(_("set_variable(%s, %s)"), varname.c_str(), val.to_debug_string().c_str());
     bool is_slash_based;
     if (parse_path(varname, path, var, &is_slash_based)) {
-    	//log_msg("Variable '%s' parsed into path='%s', var='%s'", varname.c_str(), path.c_str(), var.c_str());
+    	//log_msg(_("Variable '%s' parsed into path='%s', var='%s'"), varname.c_str(), path.c_str(), var.c_str());
 	//target = find_target(path);
         target = is_slash_based ? find_object_slashsyntax(path) : find_object_dotsyntax(path); 
 	if (target)
@@ -242,7 +244,7 @@ as_environment::set_variable(
 	else
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Path target '%s' not found while setting %s=%s",
+		log_aserror(_("Path target '%s' not found while setting %s=%s"),
 			path.c_str(), varname.c_str(), val.to_debug_string().c_str());
 		);
 	}
@@ -366,7 +368,7 @@ bool
 as_environment::parse_path(const std::string& var_path,
 		std::string& path, std::string& var, bool* is_slash_based) 
 {
-//log_msg("parse_path(%s)", var_path.c_str());
+//log_msg(_("parse_path(%s)"), var_path.c_str());
     // Search for colon.
     int	colon_index = 0;
     int	var_path_length = var_path.length();
@@ -389,7 +391,7 @@ as_environment::parse_path(const std::string& var_path,
 	    }
 	}
 	if (colon_index < 0) {
-//log_msg(" no colon index");
+//log_msg(_(" no colon index"));
 	    return false;
 	}
     }
@@ -403,7 +405,7 @@ as_environment::parse_path(const std::string& var_path,
     path = var_path;
     path.resize(colon_index);
     
-//log_msg(" path=%s var=%s", path.c_str(), var.c_str());
+//log_msg(_(" path=%s var=%s"), path.c_str(), var.c_str());
 
     return true;
 }
@@ -439,7 +441,7 @@ as_environment::find_target(const as_value& val) const
 		assert (obj);
 		character* s=dynamic_cast<character*>(obj.get());
 		assert(s->get_ref_count() > 1); // or the intrusive_ptr above going out-of-scope will kill it
-		//log_msg("find_target is a character, returning it");
+		//log_msg(_("find_target is a character, returning it"));
 		return s; // might be NULL
 	}
 	else if ( val.is_string() )
@@ -450,8 +452,8 @@ as_environment::find_target(const as_value& val) const
 	{
 		// TODO: should we *force* string conversion above instead ?
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("as_environment::find_target: '%s': "
-			"invalid path; neither string nor object",
+		log_aserror(_("as_environment::find_target: '%s': "
+			"invalid path; neither string nor object"),
 			val.to_debug_string().c_str() );
 		);
 		return NULL;
@@ -506,12 +508,12 @@ character*
 as_environment::find_target(const std::string& path) const
 {
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("find_target(%s) called", path.c_str());
+	log_msg(_("find_target(%s) called"), path.c_str());
 #endif
 
     if (path.length() <= 0) {
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("Returning m_target (empty path)");
+	log_msg(_("Returning m_target (empty path)"));
 #endif
 	return m_target;
     }
@@ -528,14 +530,14 @@ as_environment::find_target(const std::string& path) const
 	// Absolute path.  Start at the root.
 	env = env->get_root_movie();
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("Absolute path, start at the root (%p)", (void*)env);
+	log_msg(_("Absolute path, start at the root (%p)"), (void*)env);
 #endif
 	p++;
     }
     
     if (*p == '\0') {
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("Null path, returning m_target");
+	log_msg(_("Null path, returning m_target"));
 #endif
 	return env;
     }
@@ -546,7 +548,7 @@ as_environment::find_target(const std::string& path) const
 	subpart = p;
 	if (next_slash == p) {
             IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("invalid path '%s'", path.c_str());
+	    log_aserror(_("invalid path '%s'"), path.c_str());
 	    );
 	    return NULL;
 	    //break;
@@ -559,13 +561,13 @@ as_environment::find_target(const std::string& path) const
 	if ( subpart.empty() )
 	{
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("No more subparts, env is %p", (void*)env);
+	log_msg(_("No more subparts, env is %p"), (void*)env);
 #endif
 		break;
 	}
 
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("Invoking get_relative_target(%s) on object %p (%s)", subpart.c_str(), (void *)env, env->get_name().c_str());
+	log_msg(_("Invoking get_relative_target(%s) on object %p (%s)"), subpart.c_str(), (void *)env, env->get_name().c_str());
 #endif
 	env = env->get_relative_target(subpart);
 	//@@   _level0 --> root, .. --> parent, . --> this, other == character
@@ -583,12 +585,12 @@ as_object*
 as_environment::find_object_dotsyntax(const std::string& path) const
 {
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("find_object_dotsyntax(%s) called", path.c_str());
+	log_msg(_("find_object_dotsyntax(%s) called"), path.c_str());
 #endif
 
     if (path.length() <= 0) {
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("Returning m_target (empty path)");
+	log_msg(_("Returning m_target (empty path)"));
 #endif
 	return m_target;
     }
@@ -601,7 +603,7 @@ as_environment::find_object_dotsyntax(const std::string& path) const
     
     if ( path.empty() ) {
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("Null path, returning m_target");
+	log_msg(_("Null path, returning m_target"));
 #endif
 	return env;
     }
@@ -614,7 +616,7 @@ as_environment::find_object_dotsyntax(const std::string& path) const
     	std::string subpart = p;
 	if (next_dot == p) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("invalid path '%s'", path.c_str());
+	    log_aserror(_("invalid path '%s'"), path.c_str());
 	    );
 	    return NULL; // TODO: check me
 	    //break;
@@ -624,20 +626,20 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 	}
 
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("Subpart ==  %s", subpart.c_str());
+	log_msg(_("Subpart ==  %s"), subpart.c_str());
 #endif
 	
 	// No more components to scan
 	if ( subpart.empty() )
 	{
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("No more subparts, env is %p", (void*)env);
+	log_msg(_("No more subparts, env is %p"), (void*)env);
 #endif
 		break;
 	}
 
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("Invoking get_member(%s) on object %p", subpart.c_str(), (void *)env);
+	log_msg(_("Invoking get_member(%s) on object %p"), subpart.c_str(), (void *)env);
 #endif
 	as_value tmp;
 	// TODO: make sure sprite_instances know about ".."
@@ -647,7 +649,7 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 		if ( depth > 0 ) 
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Member %s for object %p not found (dotsyntax). Path was %s.",
+			log_aserror(_("Member %s for object %p not found (dotsyntax).  Path was %s"),
 				subpart.c_str(), env, path.c_str());
 			);
 			return NULL;
@@ -656,7 +658,7 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 		if ( ! VM::get().getGlobal()->get_member(subpart.c_str(), &tmp) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Element '%s' of variable '%s' not found in object %p nor in _global (dotsyntax)",
+			log_aserror(_("Element '%s' of variable '%s' not found in object %p nor in _global (dotsyntax)"),
 				subpart.c_str(), path.c_str(), env);
 			);
 			return NULL;
@@ -666,8 +668,8 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 	// Debugging only:
 	if ( ! tmp.is_object() ) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Member %s of object %p doesn't cast to an Object (%s) "
-			"evaluating target path %s (dotsyntax)",
+		log_aserror(_("Member %s of object %p doesn't cast to an Object (%s) "
+			"evaluating target path %s (dotsyntax)"),
 			subpart.c_str(), env, tmp.to_debug_string().c_str(), path.c_str());
 		);
 		return NULL;
@@ -693,12 +695,12 @@ as_object*
 as_environment::find_object_slashsyntax(const std::string& path) const
 {
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("find_object_slashsyntax(%s) called", path.c_str());
+	log_msg(_("find_object_slashsyntax(%s) called"), path.c_str());
 #endif
 
     if (path.length() <= 0) {
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("Returning m_target (empty path)");
+	log_msg(_("Returning m_target (empty path)"));
 #endif
 	return m_target;
     }
@@ -716,14 +718,14 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 	// TODO: should this be VM::get().getRoot().get_root_movie() ?
 	env = m_target->get_root_movie();
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("Absolute path, start at the root (%p)", (void*)env);
+	log_msg(_("Absolute path, start at the root (%p)"), (void*)env);
 #endif
 	p++;
     }
     
     if (*p == '\0') {
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("Null path, returning m_target");
+	log_msg(_("Null path, returning m_target"));
 #endif
 	return env;
     }
@@ -735,7 +737,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 	subpart = p;
 	if (next_slash == p) {
             IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("invalid path '%s'", path.c_str());
+	    log_aserror(_("invalid path '%s'"), path.c_str());
 	    );
 	    return NULL; // TODO: check me
 	    //break;
@@ -745,14 +747,14 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 	}
 
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("Subpart ==  %s", subpart.c_str());
+	log_msg(_("Subpart ==  %s"), subpart.c_str());
 #endif
 	
 	// No more components to scan
 	if ( subpart.empty() )
 	{
 #ifdef DEBUG_TARGET_FINDING 
-	log_msg("No more subparts, env is %p", (void*)env);
+	log_msg(_("No more subparts, env is %p"), (void*)env);
 #endif
 		break;
 	}
@@ -762,7 +764,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 		character* ch = dynamic_cast<character*>(env);
 		if ( ! ch ) {
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("'..' element in path '%s' follows a non-character object %p",
+			log_aserror(_("'..' element in path '%s' follows a non-character object %p"),
 					path.c_str(), env);
 			);
 			return NULL;
@@ -771,7 +773,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 		if ( ! env ) // root movie doesn't have a parent
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("'..' in path '%s' follows a character with no parent (%s : %p) (root is %p)",
+			log_aserror(_("'..' in path '%s' follows a character with no parent (%s : %p) (root is %p)"),
 					path.c_str(), ch->get_text_value(), ch, VM::get().getRoot().get_root_movie());
 			);
 			// if we override env, getvariable.as fails [line 57]
@@ -782,7 +784,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 	{
 
 #ifdef DEBUG_TARGET_FINDING 
-		log_msg("Invoking get_member(%s) on object %p", subpart.c_str(), (void *)env);
+		log_msg(_("Invoking get_member(%s) on object %p"), subpart.c_str(), (void *)env);
 #endif
 		as_value tmp;
 		// TODO: make sure sprite_instances know about ".."
@@ -792,7 +794,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 			if ( depth > 0 ) 
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror("Member %s for object %p not found (slashsytax). Path was %s",
+				log_aserror(_("Member %s for object %p not found (slashsyntax). Path was %s"),
 					subpart.c_str(), env, path.c_str());
 				);
 				return NULL;
@@ -801,7 +803,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 			if ( ! VM::get().getGlobal()->get_member(subpart.c_str(), &tmp) )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror("Element '%s' of variable '%s' not found in object %p nor in _global (slashsyntax)",
+				log_aserror(_("Element '%s' of variable '%s' not found in object %p nor in _global (slashsyntax)"),
 					subpart.c_str(), path.c_str(), env);
 				);
 				return NULL;
@@ -811,8 +813,8 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 		// Debugging only:
 		if ( ! tmp.is_object() ) {
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Member %s of object %p doesn't cast to an Object (%s) "
-				"evaluating target path %s (slashsyntax)",
+			log_aserror(_("Member %s of object %p doesn't cast to an Object (%s) "
+				"evaluating target path %s (slashsyntax)"),
 				subpart.c_str(), env, tmp.to_debug_string().c_str(), path.c_str());
 				);
 			return NULL;
@@ -1036,7 +1038,7 @@ as_environment::pushCallFrame(as_function* func)
 
 	if ( _localFrames.size() == maxstacksize )
 	{
-		log_warning("Max stack count reached (%u) - should abort execution",
+		log_error(_("Max stack count reached (%u) - should abort execution"),
 				maxstacksize);
 		// throw something
 		throw ActionLimitException("Call stack limit exceeded");

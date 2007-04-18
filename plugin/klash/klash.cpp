@@ -1,5 +1,6 @@
+// klash.cpp:  KDE flash player plugin, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,11 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: klash.cpp,v 1.26 2007/01/23 22:50:32 martinwguy Exp $ */
+/* $Id: klash.cpp,v 1.27 2007/04/18 09:35:41 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -95,15 +98,15 @@ public:
         create (embed);
         qwidget = this;
         qmenu = new QPopupMenu(this);
-        qmenu->insertItem("Play Movie", this, SLOT(menuitem_play_callback()));
-        qmenu->insertItem("Pause Movie", this, SLOT(menuitem_pause_callback()));
-        qmenu->insertItem("Stop Movie", this, SLOT(menuitem_stop_callback()));
-        qmenu->insertItem("Restart Movie", this, SLOT(menuitem_restart_callback()));
-        qmenu->insertItem("Step Forward", this, SLOT(menuitem_step_forward_callback()));
-        qmenu->insertItem("Step Backward", this, SLOT( menuitem_step_backward_callback()));
-        qmenu->insertItem("Jump Forward", this, SLOT(menuitem_jump_forward_callback()));
-        qmenu->insertItem("Jump Backward", this, SLOT(menuitem_jump_backward_callback()));
-        qmenu->insertItem("Quit Gnash", this, SLOT(menuitem_quit_callback()));
+        qmenu->insertItem(_("Play Movie"), this, SLOT(menuitem_play_callback()));
+        qmenu->insertItem(_("Pause Movie"), this, SLOT(menuitem_pause_callback()));
+        qmenu->insertItem(_("Stop Movie"), this, SLOT(menuitem_stop_callback()));
+        qmenu->insertItem(_("Restart Movie"), this, SLOT(menuitem_restart_callback()));
+        qmenu->insertItem(_("Step Forward"), this, SLOT(menuitem_step_forward_callback()));
+        qmenu->insertItem(_("Step Backward"), this, SLOT( menuitem_step_backward_callback()));
+        qmenu->insertItem(_("Jump Forward"), this, SLOT(menuitem_jump_forward_callback()));
+        qmenu->insertItem(_("Jump Backward"), this, SLOT(menuitem_jump_backward_callback()));
+        qmenu->insertItem(_("Quit Gnash"), this, SLOT(menuitem_quit_callback()));
         
 //        qmenu->insertItem("&About", this, SLOT(about()), CTRL+Key_H);
     }
@@ -141,8 +144,8 @@ EmbedWidget::contextMenuEvent(QContextMenuEvent*)
 
 void EmbedWidget::about()
 {
-    QMessageBox::about( this, "Klash",
-                        "The Gnash Flash player for KDE.\n");
+    QMessageBox::about( this, _("Klash"),
+                        _("The Gnash Flash player for KDE.\n"));
 }
 
 void 
@@ -303,7 +306,7 @@ main(int argc, char *argv[])
     
     if (rcfile.getTimerDelay() > 0) {
         delay = rcfile.getTimerDelay();
-        dbglogfile << "Timer delay set to " << delay << "milliseconds" << endl;
+        log_msg (_("Timer delay set to %d milliseconds"), delay);
     }
 
     while ((c = getopt (argc, argv, "hvaps:cd:m:x:r:t:b:1wj:k:u:")) != -1) {
@@ -313,11 +316,11 @@ main(int argc, char *argv[])
 	      break;
 	  case 'v':
               dbglogfile.setVerbosity();
-	      dbglogfile << "Verbose output turned on" << endl;
+	      log_msg (_("Verbose output turned on"));
 	      break;
 	  case 'w':
               dbglogfile.setWriteDisk(true);
-	      dbglogfile << "Logging to disk enabled." << endl;
+	      log_msg (_("Logging to disk enabled."));
 	      break;
 	  case 'a':
 	      dbglogfile.setActionDump(true);              
@@ -336,15 +339,15 @@ main(int argc, char *argv[])
               break;
           case 'u':
               url = optarg;
-              dbglogfile << "Setting root URL to: " << width << endl;
+              log_msg(_("Setting root URL to: %s"), url);
               break;
           case 'j':
               width = strtol(optarg, NULL, 0);
-              dbglogfile << "Setting width to: " << width << endl;
+              log_msg (_("Setting width to: %d", width);
               break;
           case 'k':
               height = strtol(optarg, NULL, 0);
-              dbglogfile << "Setting height to: " << height << endl;
+              log_msg (_("Setting height to: %d", height);
               break;
           case 'x':
               windowid = strtol(optarg, NULL, 0);
@@ -374,9 +377,9 @@ main(int argc, char *argv[])
                     do_sound = false;
                     break;
                 default:
-                    cerr << "-r must be followed by 0, 1 or 2 (" << 
-                        render_arg << " is invalid" << endl;
-                    
+                    log_error (
+		        _("-r must be followed by 0, 1 or 2 (%d is invalid)"),
+                        render_arg);
                     break;
               };
               break;
@@ -393,7 +396,7 @@ main(int argc, char *argv[])
     while (optind < argc) {
         // Some options set variables, like ip=127.0.0.1
         if (strchr(argv[optind], '=')) {
-            dbglogfile << "Got variable option on command line!" << endl;
+            log_error (_("Got variable option on command line!");
         } else {
             infiles.push_back(argv[optind]);
         }
@@ -408,7 +411,7 @@ main(int argc, char *argv[])
 
     // No file names were supplied
     if (infiles.size() == 0) {
-	printf("no input files\n");
+	printf(_("No input files"));
 	usage();
 	exit(1);
     }
@@ -442,7 +445,7 @@ main(int argc, char *argv[])
     gnash::get_movie_info(URL(infiles[0]), &movie_version, &movie_width,
                           &movie_height, &movie_fps, NULL, NULL);
     if (movie_version == 0) {
-        fprintf(stderr, "error: can't get info about %s\n", infiles[0]);
+        fprintf(stderr, _("error: can't get info about %s\n"), infiles[0]);
         exit(1);
     }
 
@@ -502,12 +505,12 @@ main(int argc, char *argv[])
     // Load the actual movie.
     gnash::movie_definition*	md = gnash::create_library_movie(URL(infiles[0]));
     if (md == NULL) {
-        fprintf(stderr, "error: can't create a movie from '%s'\n", infiles[0]);
+        fprintf(stderr, _("error: can't create a movie from '%s'\n"), infiles[0]);
         exit(1);
     }
     gnash::sprite_instance* m = create_library_movie_inst(md);
     if (m == NULL) {
-        fprintf(stderr, "error: can't create movie instance\n");
+        fprintf(stderr, _("error: can't create movie instance\n"));
         exit(1);
     }
     gnash::set_current_root(m);
@@ -653,20 +656,20 @@ main(int argc, char *argv[])
 void
 version_and_copyright()
 {
-    printf (
+    printf (_(
 "Gnash " VERSION "\n"
-"Copyright (C) 2006 Free Software Foundation, Inc.\n"
+"Copyright (C) 2006, 2007 Free Software Foundation, Inc.\n"
 "Gnash comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute copies of Gnash under the terms of the GNU General\n"
 "Public License.  For more information, see the file named COPYING.\n"
-	);
+	));
 }
 
 
 void
 usage()
 {
-    printf(
+    printf("%s%s%s", _(
         "usage: gnash [options] movie_file.swf\n"
         "\n"
         "Plays a SWF (Shockwave Flash) movie\n"
@@ -678,7 +681,7 @@ usage()
         "  -d num      Number of milliseconds to delay in main loop\n"
         "  -v          Be verbose; i.e. print log messages to stdout\n"
         "  -va         Be verbose about movie Actions\n"
-        "  -vp         Be verbose about parsing the movie\n"
+        "  -vp         Be verbose about parsing the movie\n"), _(
         "  -m <bias>   Specify the texture LOD bias (float, default is -1)\n"
         "  -x <ID>     X11 Window ID for display\n"
         "  -w          Produce the disk based debug log\n"
@@ -689,7 +692,7 @@ usage()
         "  -t <sec>    Timeout and exit after the specified number of seconds\n"
         "  -b <bits>   Bit depth of output window (16 or 32, default is 16)\n"
         "  --version   Print gnash's version number and exit\n"
-        "\n"
+        "\n"), _(
         "keys:\n"
         "  CTRL-Q, CTRL-W, ESC   Quit/Exit\n"
         "  CTRL-P          Toggle Pause\n"
@@ -701,5 +704,5 @@ usage()
 //        "  CTRL-G          Debug.  Test the get_variable() function\n"
 //        "  CTRL-M          Debug.  Test the call_method() function\n"
         "  CTRL-B          Toggle background color\n"
-        );
+        ));
 }

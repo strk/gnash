@@ -1,3 +1,4 @@
+// as_object.cpp:  ActionScript Object class and its properties, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -62,7 +63,7 @@ public:
 	///
 	void operator() (const std::string& name, const as_value& val)
 	{
-		//log_msg("Setting member '%s' to value '%s'", name.c_str(), val.to_string());
+		//log_msg(_("Setting member '%s' to value '%s'"), name.c_str(), val.to_string());
 		_tgt.set_member(name, val);
 	}
 };
@@ -94,7 +95,7 @@ as_object::get_member_default(const std::string& name, as_value* val)
 {
 	assert(val);
 
-	//log_msg("Getting member %s (SWF version:%d)", name.c_str(), vm.getSWFVersion());
+	//log_msg(_("Getting member %s (SWF version:%d)"), name.c_str(), vm.getSWFVersion());
 
 	// TODO: inspect wheter it is possible to make __proto__ a
 	//       getter/setter property instead, to take this into account
@@ -117,7 +118,7 @@ as_object::get_member_default(const std::string& name, as_value* val)
 	}
 	catch (ActionException& exc)
 	{
-		log_warning("%s", exc.what());
+		log_error(_("Caught exception: %s"), exc.what());
 		return false;
 	}
 	
@@ -181,9 +182,9 @@ void
 as_object::set_member_default(const std::string& key, const as_value& val )
 {
 
-	//log_msg("set_member_default( %s ) ", key.c_str() );
+	//log_msg(_("set_member_default(%s)"), key.c_str());
 
-	// TODO: make __proto__ a getter/setter ?
+	// TODO: make __proto__ a getter/setter?
 	if (key == "__proto__") 
 	{
 		set_prototype(val.to_object());
@@ -197,11 +198,11 @@ as_object::set_member_default(const std::string& key, const as_value& val )
 	{
 		try 
 		{
-			//log_msg("Found a getter/setter property for key %s", key.c_str());
+			//log_msg(_("Found a getter/setter property for key %s"), key.c_str());
 			if (prop->isReadOnly())
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
-                			log_aserror("Attempt to set read-only property '%s'",
+                			log_aserror(_("Attempt to set read-only property '%s'"),
 						    key.c_str());
 	                	);
 			} else
@@ -212,18 +213,18 @@ as_object::set_member_default(const std::string& key, const as_value& val )
 		}
 		catch (ActionException& exc)
 		{
-			log_warning("%s: %s. Will create a new member.", key.c_str(), exc.what());
+			log_msg(_("%s: Exception %s.  Will create a new member"), key.c_str(), exc.what());
 		}
 	}
 
-	//log_msg("Found NO getter/setter property for key %s", key.c_str());
+	//log_msg(_("Found no getter/setter property for key %s"), key.c_str());
 
 	// No getter/setter property found, so set (or create) a
 	// SimpleProperty (if possible)
 	if ( ! _members.setValue(key, val, *this) )
 	{
-		log_warning("Attempt to set Read-Only property ``%s''"
-			" on object ``%p''",
+		log_error(_("Attempt to set read-only property ``%s''"
+			" on object ``%p''"),
 			key.c_str(), (void*)this);
 	}
 
@@ -233,8 +234,7 @@ void
 as_object::init_member(const std::string& key, const as_value& val, int flags)
 {
 
-	//log_msg("Setting member %s (SWF version:%d)", key.c_str(), vm.getSWFVersion());
-	//log_msg("Found NO getter/setter property for key %s", key.c_str());
+	//log_msg(_("Setting member %s (SWF version:%d)"), key.c_str(), vm.getSWFVersion());
 
 	VM& vm = _vm;
 
@@ -246,8 +246,8 @@ as_object::init_member(const std::string& key, const as_value& val, int flags)
 		// Set (or create) a SimpleProperty 
 		if ( ! _members.setValue(keylower, val, *this) )
 		{
-			log_error("Attempt to initialize Read-Only property ``%s''"
-				" (%s) on object ``%p''",
+			log_error(_("Attempt to initialize read-only property ``%s''"
+				" (%s) on object ``%p''"),
 				keylower.c_str(), key.c_str(), (void*)this);
 			// We shouldn't attempt to initialize a member twice, should we ?
 			assert(0);
@@ -260,8 +260,8 @@ as_object::init_member(const std::string& key, const as_value& val, int flags)
 		// Set (or create) a SimpleProperty 
 		if ( ! _members.setValue(key, val, *this) )
 		{
-			log_error("Attempt to initialize Read-Only property ``%s''"
-				" on object ``%p''",
+			log_error(_("Attempt to initialize read-only property ``%s''"
+				" on object ``%p''"),
 				key.c_str(), (void*)this);
 			// We shouldn't attempt to initialize a member twice, should we ?
 			assert(0);
@@ -285,14 +285,14 @@ as_object::init_property(const std::string& key, as_function& getter,
 		std::string name = key;
 		boost::to_lower(name, _vm.getLocale());
 		success = _members.addGetterSetter(name, getter, setter);
-		//log_msg("Initialized property '%s'", name.c_str());
+		//log_msg(_("Initialized property '%s'"), name.c_str());
 		// TODO: optimize this, don't scan again !
 		_members.setFlags(name, flags, 0);
 	}
 	else
 	{
 		success = _members.addGetterSetter(key, getter, setter);
-		//log_msg("Initialized property '%s'", key.c_str());
+		//log_msg(_("Initialized property '%s'"), key.c_str());
 		// TODO: optimize this, don't scan again !
 		_members.setFlags(key, flags, 0);
 	}
@@ -359,7 +359,7 @@ as_object::instanceOf(as_function* ctor)
 
 	// See actionscript.all/Inheritance.as for a way to trigger this
 	IF_VERBOSE_ASCODING_ERRORS(
-	if ( obj ) log_aserror("Circular inheritance chain detected during instanceOf call");
+	if ( obj ) log_aserror(_("Circular inheritance chain detected during instanceOf call"));
 	);
 
 	return false;
@@ -380,7 +380,7 @@ as_object::prototypeOf(as_object& instance)
 
 	// See actionscript.all/Inheritance.as for a way to trigger this
 	IF_VERBOSE_ASCODING_ERRORS(
-	if ( obj ) log_aserror("Circular inheritance chain detected during isPrototypeOf call");
+	if ( obj ) log_aserror(_("Circular inheritance chain detected during isPrototypeOf call"));
 	);
 
 	return false;
@@ -389,7 +389,7 @@ as_object::prototypeOf(as_object& instance)
 void
 as_object::dump_members() 
 {
-	log_msg(SIZET_FMT " members of object %p follow",
+	log_msg(_(SIZET_FMT " members of object %p follow"),
 		_members.size(), (const void*)this);
 	_members.dump(*this);
 }
@@ -417,9 +417,9 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 			// set_member_flags will take care of case conversion
 			if ( ! set_member_flags(prop.c_str(), set_true, set_false) )
 			{
-				log_warning("Can't set propflags on object "
+				log_error(_("Can't set propflags on object "
 					"property %s "
-					"(either not found or protected)",
+					"(either not found or protected)"),
 					prop.c_str());
 			}
 
@@ -495,7 +495,7 @@ as_object::enumerateProperties(as_environment& env) const
 
 	// This happens always since top object in hierarchy
 	// is always Object, which in turn derives from itself
-	//if ( obj ) log_warning("prototype loop during Enumeration");
+	//if ( obj ) log_error(_("prototype loop during Enumeration"));
 }
 
 void
@@ -606,9 +606,8 @@ as_object*
 as_object::get_prototype()
 {
 	if ( m_prototype ) return m_prototype.get();
-	//log_msg("as_object::get_prototype(): Hit top of inheritance chain");
+	//log_msg(_("as_object::get_prototype(): Hit top of inheritance chain"));
 	return getObjectInterface();
 }
 
 } // end of gnash namespace
-

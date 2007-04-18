@@ -1,3 +1,4 @@
+// Player.cpp:  Top level flash player, for gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,12 +11,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-
-// 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -185,7 +184,7 @@ Player::init_sound()
 #elif defined(SOUND_GST)
         _sound_handler.reset( gnash::create_sound_handler_gst() );
 #else
-        log_error("Sound requested but no sound support compiled in");
+        log_error(_("Sound requested but no sound support compiled in"));
         return;
 #endif
         
@@ -326,7 +325,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 	}
 
 	// too much noise...
-        //log_warning("Unused parameter %s = %s",
+        //log_warning(_("Unused parameter %s = %s"),
 	//	it->first.c_str(), it->second.c_str());
     }
 
@@ -362,6 +361,5 @@ void
 Player::fs_callback(gnash::sprite_instance* movie, const char* command, const char* args)
 // For handling notification callbacks from ActionScript.
 {
-    log_msg("fs_callback(%p): %s %s'", (void*)movie, command, args);
+    log_msg(_("fs_callback(%p): %s %s"), (void*)movie, command, args);
 }
-

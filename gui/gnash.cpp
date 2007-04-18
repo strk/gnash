@@ -1,5 +1,6 @@
+// gnash.cpp:  Main routine for top-level flash player, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,17 +11,18 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
+//
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "Player.h"
-#include "log.h" // for dbglogfile (I hate this)
+#include "log.h"
 #include "rc.h" // for use of rcfile
 #include "debugger.h"
 
@@ -67,35 +69,43 @@ gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 static void
 usage()
 {
-    printf(
+    printf("%s%s%s%s%s%s%s%s", _(
         "usage: gnash [options] movie_file.swf\n"
         "\n"
         "Plays a SWF (Shockwave Flash) movie\n"
         "options:\n"
-        "\n"
+        "\n"), _(
         "  -h, --help  Print this info.\n"
         "  -s <factor> Scale the movie up/down by the specified factor\n"
         "  -c          Produce a core file instead of letting SDL trap it\n"
         "  -d num      Number of milliseconds to delay in main loop\n"
         "  -v          Be verbose; i.e. print log messages to stdout\n"
+		),
 #if VERBOSE_ACTION
-        "  -va         Be verbose about movie Actions\n"
+      _("  -va         Be verbose about movie Actions\n"),
+#else
+	"",
 #endif
 #if VERBOSE_PARSE
-        "  -vp         Be verbose about parsing the movie\n"
+      _("  -vp         Be verbose about parsing the movie\n"),
+#else
+	"",
 #endif
+		  _(
         "  -m <bias>   Specify the texture LOD bias (float, default is -1.0)\n"
         "  -x <ID>     X11 Window ID for display\n"
         "  -w          Produce the disk based debug log\n"
 	"  -j <width>  Set window width\n"
 	"  -k <height> Set window height\n"
         "  -1          Play once; exit when/if movie reaches the last frame\n"
+		), _(
         "  -g          Turn on the Flash debugger\n"
         "  -r <0|1|2|3>\n"
 	"              0 disables both rendering & sound (good for batch tests)\n"
         "              1 enables rendering & disables sound\n"
         "              2 enables sound & disables rendering\n"
         "              3 enables both rendering & sound (default)\n"
+		), _(
         "  -t <sec>    Timeout and exit after the specified number of seconds\n"
         "  -b <bits>   Bit depth of output window (16 or 32, default is 16)\n"
         "  -u <url>    Set \"real\" url of the movie\n"
@@ -104,6 +114,7 @@ usage()
 	"              (used to resolve relative urls, defaults to movie url)\n"
         "  -P <param>  Set parameter (ie. \"FlashVars=A=1&b=2\")\n"
         "  --version   Print gnash's version number and exit\n"
+		), _(
         "\n"
         "keys:\n"
         "  CTRL-Q, CTRL-W, ESC   Quit/Exit\n"
@@ -111,35 +122,35 @@ usage()
         "  CTRL-R          Restart the movie\n"
         "  CTRL-[ or kp-   Step back one frame\n"
         "  CTRL-] or kp+   Step forward one frame\n"
+        "  CTRL-B          Toggle background color\n"
 #if 0
         "  CTRL-A          Toggle antialiasing (doesn't work)\n"
         "  CTRL-T          Debug.  Test the set_variable() function\n"
         "  CTRL-G          Debug.  Test the get_variable() function\n"
         "  CTRL-M          Debug.  Test the call_method() function\n"
 #endif
-        "  CTRL-B          Toggle background color\n"
-        );
+        ));
 }
 
 static void version_and_copyright()
 {
-    printf (
+    printf (_(
 "Gnash " VERSION "\n"
 "Copyright (C) 2005-2007 Free Software Foundation, Inc.\n"
 "Gnash comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute copies of Gnash under the terms of the GNU General\n"
 "Public License.  For more information, see the file named COPYING.\n"
-	);
+	));
 }
+
 
 static void build_options()
 {
-    cout << "Build options " << VERSION << endl
-         << "   Target: " << TARGET_CONFIG << endl
-         << "   Renderer: " << RENDERER_CONFIG
-         << "   GUI: " << GUI_CONFIG
-         << "   Media handler: " << MEDIA_CONFIG
-         << endl;
+    printf (_("Build options %s\n"
+              "   Target: %s\n"
+              "   Renderer: %s   GUI: %s   Media handler: %s\n"),
+		VERSION, TARGET_CONFIG, RENDERER_CONFIG, GUI_CONFIG,
+		MEDIA_CONFIG);
 }
 
 
@@ -176,24 +187,24 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               exit(0);
 	  case 'v':
               dbglogfile.setVerbosity();
-	      dbglogfile << "Verbose output turned on" << std::endl;
+	      log_msg (_("Verbose output turned on"));
 	      break;
 	  case 'w':
               dbglogfile.setWriteDisk(true);
-	      dbglogfile << "Logging to disk enabled." << std::endl;
+	      log_msg (_("Logging to disk enabled"));
 	      break;
 	  case 'a':
 #if VERBOSE_ACTION
 	      dbglogfile.setActionDump(true); //gnash::set_verbose_action(true);
 #else
-              dbglogfile << "Verbose actions disabled at compile time" << std::endl;
+              log_error (_("No verbose actions; disabled at compile time"));
 #endif
 	      break;
 	  case 'p':
 #if VERBOSE_PARSE
 	      dbglogfile.setParserDump(true); // gnash::set_verbose_parse(true);
 #else
-              dbglogfile << "Verbose parsing disabled at compile time" << std::endl;
+              log_error (_("No verbose parsing; disabled at compile time"));
 #endif
 	      break;
           case 's':
@@ -204,32 +215,32 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               break;
           case 'u':
               url = optarg;
-              dbglogfile << "Setting root URL to: " << url << std::endl;
+              log_msg (_("Setting root URL to %s"), url);
               break;
           case 'U':
 	  {
 		const char* baseurl = optarg;
 		player.setBaseUrl(baseurl);
-		dbglogfile << "Setting base URL to: " << baseurl << std::endl;
+		log_msg (_("Setting base URL to %s"), baseurl);
 		break;
 	  }
           case 'j':
               player.setWidth ( strtol(optarg, NULL, 0) );
-              dbglogfile << "Setting width to: " << player.getWidth() << std::endl;
+              log_msg (_("Setting width to %d"), player.getWidth());
               break;
           case 'g':
 #ifdef USE_DEBUGGER
-              dbglogfile << "Setting debugger ON" << std::endl;
+              log_msg (_("Setting debugger ON"));
               debugger.enabled(true);
 //              debugger.startServer(&debugger);
               debugger.console();
 #else
-              dbglogfile << "WARNING: The debugger has been disabled at configuration time" << std::endl;
+              log_error (_("No debugger; disabled at compile time"));
 #endif
               break;
           case 'k':
               player.setHeight ( strtol(optarg, NULL, 0) );
-              dbglogfile << "Setting height to: " << player.getHeight() << std::endl;
+              log_msg (_("Setting height to %d"), player.getHeight());
               break;
           case 'x':
 	      called_by_plugin=true;
@@ -265,8 +276,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     player.setDoSound(true);
                     break;
                 default:
-                    cerr << "-r must be followed by 0, 1, 2 or 3 (" << 
-                        render_arg << ") is invalid" << std::endl;
+                    log_error (_("-r must be followed by 0, 1, 2 or 3 "
+			"(%ld is invalid)"), render_arg);
                     break;
               }
               break;
@@ -300,7 +311,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     }
 
     if ( ! specified_rendering_flag ) {
-	gnash::log_msg("no rendering flags specified, using rcfile");
+	log_msg (_("No rendering flags specified, using rcfile"));
         if ( called_by_plugin ) {
             player.setDoSound( rcfile.usePluginSound() );
         } else {
@@ -314,7 +325,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 #if 0 // Options setting variables should use the getopt style!
       // Some options set variables, like ip=127.0.0.1
       if (argc > 2 && strchr(argv[optind], '=')) {
-	  dbglogfile << "Got variable option on command line!" << std::endl;
+	  log_error (_("Got variable option (%s) on command line"),
+			 argv[optind]);
       } else {
 #endif
 	  infile = argv[optind];
@@ -351,4 +363,3 @@ main(int argc, char *argv[])
 
 	return player.run(argc, argv, infile, url);
 }
-

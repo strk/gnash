@@ -1,4 +1,4 @@
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.50 2007/04/13 07:35:55 bjacques Exp $
+// $Id: sound_handler_sdl.cpp,v 1.51 2007/04/18 09:35:41 jgilmore Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -73,7 +73,7 @@ int	SDL_sound_handler::create_sound(
 
 	sound_data *sounddata = new sound_data;
 	if (!sounddata) {
-		gnash::log_error("could not allocate memory for sounddata !");
+		gnash::log_error(_("could not allocate memory for sound data"));
 		return -1;
 	}
 
@@ -96,7 +96,7 @@ int	SDL_sound_handler::create_sound(
 		if (data_bytes > 0) {
 			convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 1, sample_rate, stereo);
 			if (!adjusted_data) {
-				gnash::log_error("Some kind of error with raw sound data.");
+				gnash::log_error(_("Some kind of error occurred with raw sound data"));
 				return -1;
 			}
 			sounddata->data_size = adjusted_size;
@@ -109,7 +109,7 @@ int	SDL_sound_handler::create_sound(
 		if (data_bytes > 0) {
 			convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 2, sample_rate, stereo);
 			if (!adjusted_data) {
-				gnash::log_error("Some kind of error with adpcm sound data.");
+				gnash::log_error(_("Some kind of error occurred with adpcm sound data"));
 				return -1;
 			}
 			sounddata->data_size = adjusted_size;
@@ -118,24 +118,24 @@ int	SDL_sound_handler::create_sound(
 		break;
 
 	case FORMAT_MP3:
-	//case FORMAT_VORBIS:
 #ifndef USE_FFMPEG
 #ifndef USE_MAD
-		gnash::log_warning("gnash has not been compiled to handle mp3 audio.");
+		gnash::log_error(_("gnash has not been compiled to handle mp3 audio"));
 		return -1;
 #endif
 #endif
 		sounddata->data = new Uint8[data_bytes];
 		if (!sounddata->data) {
-			gnash::log_error("could not allocate space for data in soundhandler.");
+			gnash::log_error(_("could not allocate space for data in sound handler"));
 			return -1;
 		}
 		memcpy(sounddata->data, data, data_bytes);
 
 		break;
+	//case FORMAT_VORBIS:
 	default:
 		// Unhandled format.
-		gnash::log_error("unknown format sound requested; gnash does not handle it.");
+		gnash::log_error(_("unknown sound format %d requested; gnash does not handle it"), (int)format);
 		return -1; // Unhandled format, set to NULL.
 	}
 
@@ -167,7 +167,7 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 
 		convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 2, sounddata->sample_rate, sounddata->stereo);
 		if (!adjusted_data || adjusted_size < 1) {
-			gnash::log_error("Some kind of error with resampling sound data.");
+			gnash::log_error(_("Some kind of error with resampling sound data"));
 			return -1;
 		}
 		adjusted_data = static_cast<int16_t*>(data);
@@ -212,7 +212,7 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 		}
 
 	} else {
-		gnash::log_error("Behavior for this audio codec is unknown. Please send this SWF to the developers!");
+		gnash::log_error(_("Behavior for this audio codec %d is unknown.  Please send this SWF to the developers"), (int)(sounddata->format));
 	}
 
 	return start_size;
@@ -273,7 +273,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 		sound->parser = av_parser_init(CODEC_ID_MP3);
 
 		if (!sound->codec) {
-			gnash::log_error("Your FFMPEG can't decode MP3?!");
+			gnash::log_error(_("Your FFMPEG can't decode MP3?!"));
 			return;
 		}
 
@@ -301,7 +301,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
-			gnash::log_error("Unable to START SOUND: %s.", SDL_GetError());
+			gnash::log_error(_("Unable to start SDL sound: %s"), SDL_GetError());
 			return;
 		}
 		soundOpened = true;
@@ -493,7 +493,7 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 
 	if (!soundOpened) {
 		if (SDL_OpenAudio(&audioSpec, NULL) < 0 ) {
-			gnash::log_error("Unable to START SOUND: %s.", SDL_GetError());
+			gnash::log_error(_("Unable to start aux SDL sound: %s"), SDL_GetError());
 			return;
 		}
 		soundOpened = true;
@@ -726,7 +726,7 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 {
 	if ( buffer_length_in < 0 )
 	{
-		gnash::log_error("Negative buffer length in sdl_audio_callback (%d)", buffer_length_in);
+		gnash::log_error(_("Negative buffer length in sdl_audio_callback (%d)"), buffer_length_in);
 		return;
 	}
 
@@ -843,7 +843,7 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 #endif
 
 						if (bytes_decoded < 0 || tmp < 0 || outsize < 0) {
-							gnash::log_error("Error while decoding MP3-stream. Upgrading ffmpeg/libavcodec might fix this issue.");
+							gnash::log_error(_("Error while decoding MP3-stream.  Upgrading ffmpeg/libavcodec might fix this issue."));
 							// Setting data position to data size will get the sound removed
 							// from the active sound list later on.
 							sound->position = sound->data_size;
@@ -873,7 +873,7 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 						// Error handling is done by relooping (max. 8 times) and just hooping that it will work...
 						if (loops > 8) break;
 						if (ret == -1 && sound->stream.error != MAD_ERROR_BUFLEN && MAD_RECOVERABLE(sound->stream.error)) {
-							gnash::log_warning("Recoverable error while decoding MP3-stream, MAD error: %s", mad_stream_errorstr (&sound->stream));
+							gnash::log_error(_("Recoverable error while decoding MP3-stream, MAD error: %s"), mad_stream_errorstr (&sound->stream));
 							continue;
 						}
 						
@@ -881,7 +881,7 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 					}
 
 					if (ret == -1 && sound->stream.error != MAD_ERROR_BUFLEN) {
-						gnash::log_error("Unrecoverable error while decoding MP3-stream, MAD error: %s", mad_stream_errorstr (&sound->stream));
+						gnash::log_error(_("Unrecoverable error while decoding MP3-stream, MAD error: %s"), mad_stream_errorstr (&sound->stream));
 						sound->position = sound->data_size;
 						continue;
 					} else if (ret == -1 && sound->stream.error == MAD_ERROR_BUFLEN) {
@@ -938,7 +938,7 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 
 						// Hopefully this wont happen
 						if (!adjusted_data) {
-							gnash::log_warning("Error in sound sample convertion");
+							gnash::log_error(_("Error in sound sample conversion"));
 							continue;
 						}
 

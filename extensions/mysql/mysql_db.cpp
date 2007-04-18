@@ -1,5 +1,6 @@
+// mysql_db.cpp:  MySQL database interface ActionScript objects, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,6 +11,7 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -181,12 +183,12 @@ MySQL::connect(const char* host, const char* dbname, const char* user, const cha
     disconnect();
     
     if ((_db = mysql_init(NULL)) == NULL ) {
-	log_error("Couldn't initialize Database!");
+	log_error(_("Couldn't initialize database"));
 	return false;
     }
     
     if (mysql_real_connect(_db, host, user, passwd, dbname, 0, NULL, 0) == NULL) {
-	log_error("Couldn't connect to Database!");
+	log_error(_("Couldn't connect to database"));
 	return false;
     }
     
@@ -212,16 +214,15 @@ MySQL::guery(MYSQL *db, const char *sql)
       case CR_SERVER_LOST:
       case CR_COMMANDS_OUT_OF_SYNC:
       case CR_SERVER_GONE_ERROR:
-	  dbglogfile << "MySQL connection error: " << mysql_error(_db) << endl;
+	  log_error (_("MySQL connection error: %s"), mysql_error(_db));
 	  // Try to reconnect to the database
 // 	  closeDB();
 // 	  openDB();
 	  break;
       case -1:
       case CR_UNKNOWN_ERROR:
-	  dbglogfile << "MySQL error on query for:\n\t " <<
-	      mysql_error(_db) << endl;
-	  dbglogfile << "Query was: " << sql << endl;
+	  log_error (_("MySQL error on query for:\n\t%s\nQuery was: %s"),
+		     mysql_error(_db), sql); 
 	  return false;
 	  break;            
        default:
@@ -240,16 +241,15 @@ MySQL::getData(const char *sql, query_t &qresult)
       case CR_SERVER_LOST:
       case CR_COMMANDS_OUT_OF_SYNC:
       case CR_SERVER_GONE_ERROR:
-	  dbglogfile << "MySQL connection error: " << mysql_error(_db) << endl;
+	  log_error(_("MySQL connection error: %s", mysql_error(_db));
 	  // Try to reconnect to the database
 // 	  closeDB();
 // 	  openDB();
 	  break;
       case -1:
       case CR_UNKNOWN_ERROR:
-	  dbglogfile << "MySQL error on query for:\n\t " <<
-	      mysql_error(_db) << endl;
-	  dbglogfile << "Query was: " << sql << endl;
+	  log_error (_("MySQL error on query for:\n\t%s\nQuery was: %s"),
+		     mysql_error(_db), sql); 
 //	  return false;
 	  break;            
 //       default:
@@ -262,7 +262,7 @@ MySQL::getData(const char *sql, query_t &qresult)
 #if 0
     for (size_t i=0; i<mysql_num_fields(_result); i++) {
 	MYSQL_FIELD *fields = mysql_fetch_fields(_result);
-	log_msg("Field name is: %s: ", fields->name);
+	log_msg(_("Field name is: %s: "), fields->name);
     }
 #endif
     

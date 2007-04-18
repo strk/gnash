@@ -1,3 +1,4 @@
+// character.cpp:  ActionScript Character class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,15 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 // 
-//
-//
 
-/* $Id: character.cpp,v 1.35 2007/04/15 14:31:19 strk Exp $ */
+/* $Id: character.cpp,v 1.36 2007/04/18 09:35:42 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -93,11 +92,11 @@ character::do_mouse_drag()
 		}
 		else
 		{
-			// Implement relative drag...
+			// FIXME: Implement relative drag...
 			static bool warned_relative_drag = false;
 			if ( ! warned_relative_drag )
 			{
-				log_warning("FIXME: Relative drag unsupported");
+				log_unimpl(_("Relative drag"));
 		    		warned_relative_drag = true;
 		    	}
 		}
@@ -161,12 +160,12 @@ character::get_relative_target_common(const std::string& name)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			// AS code trying to access something before the root
-			log_warning("ActionScript code trying to reference"
-				" an unexistent parent with '..' "
-				" (an unexistent parent probably only "
+			log_warning(_("ActionScript code trying to reference"
+				" a nonexistent parent with '..' "
+				" (a nonexistent parent probably only "
 				"occurs in the root MovieClip)."
 				" Returning a reference to top parent "
-				"(probably the root clip).");
+				"(probably the root clip)."));
 			);
 			//parent = this;
 			assert(this == get_root_movie());
@@ -303,7 +302,7 @@ character::xscale_getset(const fn_call& fn)
 		if (isnan(scale_percent))
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Attempt to set _xscale to %g, refused",
+			log_aserror(_("Attempt to set _xscale to %g, refused"),
                             scale_percent);
 			);
                         return as_value();
@@ -311,7 +310,7 @@ character::xscale_getset(const fn_call& fn)
 		else if (scale_percent < 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Attempt to set _xscale to %g, use 0",
+			log_aserror(_("Attempt to set _xscale to %g, use 0"),
                             scale_percent);
 			);
                         scale_percent = 0;
@@ -347,7 +346,7 @@ character::yscale_getset(const fn_call& fn)
 		if (isnan(scale_percent))
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Attempt to set _yscale to %g, refused",
+			log_aserror(_("Attempt to set _yscale to %g, refused"),
                             scale_percent);
 			);
                         return as_value();
@@ -355,7 +354,7 @@ character::yscale_getset(const fn_call& fn)
 		else if (scale_percent < 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Attempt to set _yscale to %g, use 0",
+			log_aserror(_("Attempt to set _yscale to %g, use 0"),
                             scale_percent);
 			);
                         scale_percent = 0;
@@ -473,7 +472,7 @@ character::width_getset(const fn_call& fn)
 	{
 		if ( ! bounds.isFinite() )
 		{
-			log_error("FIXME: can't set _width on character with null or world bounds");
+			log_unimpl(_("FIXME: can't set _width on character with null or world bounds"));
 			return rv;
 		}
 
@@ -484,7 +483,7 @@ character::width_getset(const fn_call& fn)
 		if ( newwidth <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Setting _width=%g ?", newwidth/20);
+			log_aserror(_("Setting _width=%g"), newwidth/20);
 			);
 		}
 
@@ -518,7 +517,7 @@ character::height_getset(const fn_call& fn)
 	{
 		if ( ! bounds.isFinite() )
 		{
-			log_error("FIXME: can't set _height on character with null or world bounds");
+			log_unimpl(_("FIXME: can't set _height on character with null or world bounds"));
 			return rv;
 		}
 
@@ -529,7 +528,7 @@ character::height_getset(const fn_call& fn)
 		if ( newheight <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Setting _height=%g ?", newheight/20);
+			log_aserror(_("Setting _height=%g"), newheight/20);
 			);
 		}
 
@@ -607,7 +606,7 @@ character::add_event_handler(const event_id& id, const action_buffer& code)
 {
 	_event_handlers[id].push_back(&code);
 
-	//log_msg("Setting handler for event %s", id.get_function_name().c_str());
+	//log_msg(_("Setting handler for event %s"), id.get_function_name().c_str());
 
 	// Set the character as a listener iff the
 	// kind of event is a KEY or MOUSE one 
@@ -619,7 +618,7 @@ character::add_event_handler(const event_id& id, const action_buffer& code)
 		case event_id::MOUSE_UP:
 		case event_id::MOUSE_DOWN:
 		case event_id::MOUSE_MOVE:
-			//log_msg("Registering character as having mouse events");
+			//log_msg(_("Registering character as having mouse events"));
 			has_mouse_event();
 			break;
 		default:
@@ -654,7 +653,7 @@ void
 character::unload()
 {
 	_unloaded = true;
-	//log_msg("Queuing unload event for character %p", this);
+	//log_msg(_("Queuing unload event for character %p"), this);
 	queueEventHandler(event_id::UNLOAD);
 	//on_event(event_id::UNLOAD);
 }

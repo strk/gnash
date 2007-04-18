@@ -1,4 +1,5 @@
-// 
+// edit_text_character.cpp:  User-editable text regions, for Gnash.
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
@@ -10,12 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-
-/* $Id: edit_text_character.cpp,v 1.56 2007/04/16 18:23:05 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.57 2007/04/18 09:35:42 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -94,7 +96,7 @@ textfield_setTextFormat(const fn_call& fn)
 
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: TextField.setTextFormat() unimplemented");
+		log_unimpl("TextField.setTextFormat()");
 		warned = true;
 	}
 
@@ -110,7 +112,7 @@ textfield_addListener(const fn_call& fn)
 
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: TextField.addListener() unimplemented");
+		log_unimpl("TextField.addListener()");
 		warned = true;
 	}
 
@@ -125,7 +127,7 @@ textfield_removeListener(const fn_call& fn)
 
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: TextField.removeListener() unimplemented");
+		log_unimpl("TextField.removeListener()");
 		warned = true;
 	}
 
@@ -140,7 +142,7 @@ textfield_setNewTextFormat(const fn_call& fn)
 
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: TextField.setNewTextFormat() unimplemented");
+		log_unimpl("TextField.setNewTextFormat()");
 		warned = true;
 	}
 
@@ -155,7 +157,7 @@ textfield_getDepth(const fn_call& fn)
 
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: TextField.getDepth() unimplemented");
+		log_unimpl("TextField.getDepth()");
 		warned = true;
 	}
 
@@ -170,7 +172,7 @@ textfield_getFontList(const fn_call& fn)
 
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: TextField.getFontList() unimplemented");
+		log_unimpl("TextField.getFontList()");
 		warned = true;
 	}
 
@@ -185,7 +187,7 @@ textfield_getNewTextFormat(const fn_call& fn)
 
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: TextField.getNewTextFormat() unimplemented");
+		log_unimpl("TextField.getNewTextFormat()");
 		warned = true;
 	}
 
@@ -200,7 +202,7 @@ textfield_getTextFormat(const fn_call& fn)
 
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: TextField.getTextFormat() unimplemented");
+		log_unimpl("TextField.getTextFormat()");
 		warned = true;
 	}
 
@@ -215,7 +217,7 @@ textfield_replaceSel(const fn_call& fn)
 
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: TextField.replaceSel() unimplemented");
+		log_unimpl("TextField.replaceSel()");
 		warned = true;
 	}
 
@@ -230,7 +232,7 @@ textfield_replaceText(const fn_call& fn)
 
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: TextField.replaceText() unimplemented");
+		log_unimpl("TextField.replaceText()");
 		warned = true;
 	}
 
@@ -245,7 +247,7 @@ textfield_removeTextField(const fn_call& fn)
 
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: TextField.removeTextField() unimplemented");
+		log_unimpl("TextField.removeTextField()");
 		warned = true;
 	}
 
@@ -637,7 +639,7 @@ edit_text_character::set_text_value(const char* new_text_cstr)
 
 	format_text();
 
-	//log_msg("Text set to %s", new_text.c_str());
+	//log_msg(_("Text set to %s"), new_text.c_str());
 
 }
 
@@ -842,9 +844,9 @@ edit_text_character::align_line(
 	//assert(extra_space >= 0.0f);
 	if (extra_space <= 0.0f)
 	{
-		log_warning("TextField text doesn't fit in it's boundaries");
-		log_warning(" m_def->width() == %g", m_def->width());
-		log_warning(" m_def->get_right_margin() == %d", m_def->get_right_margin());
+		log_error(_("TextField text doesn't fit in its boundaries: "
+			    "width %g, margin %d"),
+			    m_def->width(), m_def->get_right_margin());
 		return 0.0f;
 	}
 
@@ -901,7 +903,7 @@ edit_text_character::format_text()
 	//
 	if (_font == NULL)
 	{
-		log_error("No font for edit_text_character! [%s:%d]",
+		log_error(_("No font for edit_text_character! [%s:%d]"),
 			__FILE__, __LINE__);
 		return;
 	}
@@ -929,7 +931,8 @@ edit_text_character::format_text()
 
 		if (_font != newfont)
 		{
-			log_error("error: substituting font!  font '%s' has no glyphs, using font '%s'\n",
+			log_error(_("substituting font!  font '%s' has "
+				  "no glyphs, using font '%s'"),
 				  fontlib::get_font_name(_font),
 				  fontlib::get_font_name(newfont)
 			);
@@ -938,8 +941,8 @@ edit_text_character::format_text()
 		}
 		else
 		{
-			log_error("Current font has no glyphs and I couldn't"
-				  " find another font with glyphs... :(");
+			log_error(_("Current font has no glyphs and I couldn't"
+				  " find another font with glyphs... :("));
 		}
 
 	}
@@ -1062,11 +1065,13 @@ edit_text_character::format_text()
 			int index = _font->get_glyph_index(32); // ascii SPACE
 			if ( index == -1 )
 			{
-				log_warning("%s -- missing glyph for space char (needed for TAB)."
+				IF_VERBOSE_MALFORMED_SWF (
+				  log_error(_("%s -- missing glyph for space char (needed for TAB). "
 					    " Make sure character shapes for font %s are being exported "
-					    "into your SWF file!",
+					    "into your SWF file."),
 					    __PRETTY_FUNCTION__,
 					    _font->get_name());
+				);
 			}
 			else
 			{
@@ -1090,27 +1095,29 @@ edit_text_character::format_text()
 		{ // need a sub-scope to avoid the 'goto' in TAB handling to cross
 		  // initialization of the 'index' variable
 		int index = _font->get_glyph_index((uint16_t) code);
-		if (index == -1)
-		{
-			// error -- missing glyph!
-			
-			// Log an error, but don't log too many times.
-			static int	s_log_count = 0;
-			if (s_log_count < 10)
-			{
-				s_log_count++;
-				log_warning("%s -- missing glyph for char %d."
-					    " Make sure character shapes for font %s are being exported "
-					    "into your SWF file!",
-					    __PRETTY_FUNCTION__,
-					    code,
-					    _font->get_name()
-				);
-			}
+		IF_VERBOSE_MALFORMED_SWF (
+		    if (index == -1)
+		    {
+			    // error -- missing glyph!
+			    
+			    // Log an error, but don't log too many times.
+			    static int	s_log_count = 0;
+			    if (s_log_count < 10)
+			    {
+				    s_log_count++;
+				    log_swferror(_("%s -- missing glyph for char %d. "
+						" Make sure character shapes for font %s are being exported "
+						"into your SWF file"),
+						__PRETTY_FUNCTION__,
+						code,
+						_font->get_name()
+				    );
+			    }
 
-			// Drop through and use index == -1; this will display
-			// using the empty-box glyph
-		}
+			    // Drop through and use index == -1; this will display
+			    // using the empty-box glyph
+		    }
+		);
 		text_glyph_record::glyph_entry	ge;
 		ge.m_glyph_index = index;
 		ge.m_glyph_advance = scale * _font->get_advance(index);
@@ -1132,7 +1139,7 @@ after_x_advance:
 				static bool warned=false;
 				if ( ! warned )
 				{
-					log_warning("FIXME: implement no word wrap");
+					log_unimpl("edit_text_character: no word wrap");
 					warned=true;
 				}
 			}
@@ -1217,7 +1224,7 @@ edit_text_character::registerTextVariable()
 	if ( _text_variable_registered )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg(" registerTextVariable() no-op call (alread registered)");
+		log_msg(_("registerTextVariable() no-op call (already registered)"));
 #endif
 		return;
 	}
@@ -1225,7 +1232,7 @@ edit_text_character::registerTextVariable()
 	if ( _variable_name.empty() )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg(" string is empty, consider as registered");
+		log_msg(_("string is empty, consider as registered"));
 #endif
 		_text_variable_registered=true;
 		return;
@@ -1241,7 +1248,7 @@ edit_text_character::registerTextVariable()
 	const char* varname = var_str.c_str();
 
 #ifdef DEBUG_DYNTEXT_VARIABLES
-	log_msg(" VariableName: %s", var_str.c_str());
+	log_msg(_("VariableName: %s"), var_str.c_str());
 #endif
 
 	as_environment& env = get_environment();
@@ -1256,7 +1263,7 @@ edit_text_character::registerTextVariable()
 	if ( as_environment::parse_path(varname, path, var) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg("Variable text Path: %s, Var: %s", path.c_str(), var.c_str());
+		log_msg(_("Variable text Path: %s, Var: %s"), path.c_str(), var.c_str());
 #endif
 		// find target for the path component
 		// we use our parent's environment for this
@@ -1269,7 +1276,7 @@ edit_text_character::registerTextVariable()
 	if ( ! target )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-			log_warning("VariableName associated to text field refer to an unknown target (%s). It is possible that the character will be instantiated later in the SWF stream. Gnash will try to register again on next access.", path.c_str());
+			log_swferror(_("VariableName associated to text field refer to an unknown target (%s). It is possible that the character will be instantiated later in the SWF stream. Gnash will try to register again on next access."), path.c_str());
 		);
 		return;
 	}
@@ -1284,14 +1291,14 @@ edit_text_character::registerTextVariable()
 	if ( sprite->get_member(varname, &val) )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg("target sprite (%p) does have a member named %s", (void*)sprite, varname);
+		log_msg(_("target sprite (%p) does have a member named %s"), (void*)sprite, varname);
 #endif
 		set_text_value(val.to_string().c_str());
 	}
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	else
 	{
-		log_msg("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)", (void*)sprite, varname);
+		log_msg(_("target sprite (%p) does NOT have a member named %s (no problem, we'll add it)"), (void*)sprite, varname);
 	}
 #endif
 

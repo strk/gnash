@@ -1,3 +1,4 @@
+// fill_style.cpp:  Graphical region filling styles, for Gnash.
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
@@ -10,12 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
-
 
 #include "fill_style.h"
 #include "impl.h"
@@ -127,7 +129,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         if ( ! num_gradients )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("num gradients 0");
+			log_swferror(_("num gradients 0"));
 		);
 		return;
 	}
@@ -136,7 +138,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 	                         // and we don't have this limitation anyway
         {
             // see: http://sswf.sourceforge.net/SWFalexref.html#swf_gradient
-            log_warning("Unexpected num gradients (%d), expected 1 to 8",
+            log_error(_("Unexpected num gradients (%d), expected 1 to 8"),
                     num_gradients);
         }			
 
@@ -185,13 +187,13 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 		static bool warned_about_invalid_char=false;
 		if ( ! warned_about_invalid_char )
 		{
-			log_swferror("Bitmap fill specifies '%d' as associated"
+			log_swferror(_("Bitmap fill specifies '%d' as associated"
 				" bitmap character id,"
 				" but that character is not found"
 				" in the Characters Dictionary."
 				" It seems common to find such "
 				" malformed SWF, so we'll only warn once "
-				"about this.",
+				"about this."),
 				bitmap_char_id);
 			warned_about_invalid_char=true;
 		}
@@ -211,7 +213,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
     }
     else
     {
-        log_error("Unsupported fill style type: 0x%X", m_type);
+        log_unimpl("Unsupported fill style type: 0x%X", m_type);
         // This is a fatal error, we'll be leaving the stream
         // read pointer in an unknown position.
         throw ParserException("Unsupported fill style (Malformed SWF?)");
@@ -241,7 +243,7 @@ fill_style::get_bitmap_info() const
    return need_gradient_bitmap();
    
   } else {
-    log_msg("Unknown fill style");
+    log_error(_("Unknown fill style %d"), m_type);
     assert(0);
   }  
 }
@@ -277,11 +279,10 @@ fill_style::sample_gradient(uint8_t ratio) const
 			static bool warned=false;
 			if ( ! warned ) {
 			log_swferror(
-				"First gradient in a fill_style "
+				_("First gradient in a fill_style "
 				"have position==%d (expected 0)."
 				" This seems to be common, so will"
-				" warn only once."
-				,
+				" warn only once."),
 			        m_gradients[0].m_ratio);
 			warned=true;
 			}
@@ -314,8 +315,8 @@ fill_style::sample_gradient(uint8_t ratio) const
 			// have the same ratio. This would be a malformed SWF.
 			IF_VERBOSE_MALFORMED_SWF(
 				log_swferror(
-					"two gradients in a fill_style "
-					"have the same position/ratio: %d",
+					_("two gradients in a fill_style "
+					"have the same position/ratio: %d"),
 					gr0.m_ratio);
 			);
 		}

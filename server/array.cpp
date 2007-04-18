@@ -1,3 +1,4 @@
+// array.cpp:  ActionScript array class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,12 +11,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
 #ifdef HAVE_CONFIG_H
@@ -149,7 +148,9 @@ as_array_object::as_array_object()
 	as_object(getArrayInterface()), // pass Array inheritance
 	elements(0)
 {
-	//log_action("%s : %p\n", __FUNCTION__, (void*)this);
+	//IF_VERBOSE_ACTION (
+	//log_action("%s: %p", __FUNCTION__, (void*)this);
+	//)
 	attachArrayProperties(*this);
 }
 
@@ -158,14 +159,16 @@ as_array_object::as_array_object(const as_array_object& other)
 	as_object(other),
 	elements(other.elements)
 {
-    //log_action("%s : %p\n", __FUNCTION__, (void*)this);
+    //IF_VERBOSE_ACTION (
+    //log_action("%s: %p", __FUNCTION__, (void*)this);
+    //)
 }
 
 int
 as_array_object::index_requested(const std::string& name)
 {
 	as_value temp;
-	temp.set_string(name.c_str());
+	temp.set_string(name);
 	double value = temp.to_number();
 
 	// if we were sent a string that can't convert like "asdf", it returns as NaN. -1 means invalid index
@@ -197,7 +200,7 @@ as_array_object::pop()
 	// If the array is empty, report an error and return undefined!
 	if (elements.size() <= 0)
 	{
-	    log_warning("tried to pop element from back of empty array, returning undef!\n");
+	    log_error(_("tried to pop element from back of empty array, returning undef"));
 		return as_value(); // undefined
 	}
 
@@ -213,7 +216,7 @@ as_array_object::shift()
 	// If the array is empty, report an error and return undefined!
 	if (elements.size() <= 0)
 	{
-		log_warning("tried to shift element from front of empty array, returning undef!\n");
+		log_error(_("tried to shift element from front of empty array, returning undef"));
 		return as_value(); // undefined
 	}
 
@@ -307,7 +310,7 @@ as_array_object::slice(unsigned int start, unsigned int one_past_end)
 	std::auto_ptr<as_array_object> newarray(new as_array_object);
 
 #ifdef GNASH_DEBUG
-	log_msg("Array.slice(%u, %u) called", start, one_past_end);
+	log_msg(_("Array.slice(%u, %u) called"), start, one_past_end);
 #endif
 
 	size_t newsize = one_past_end - start;
@@ -337,7 +340,7 @@ as_array_object::splice(unsigned start, unsigned len,
 	std::copy(replace.begin(), replace.end(), ostrIter);
         ss << ") called";
 	log_msg("%s", ss.str().c_str());
-	log_msg("Current array is %s", toString().c_str());
+	log_msg(_("Current array is %s"), toString().c_str());
 #endif
 
 	container::iterator itStart = elements.begin()+start;
@@ -415,7 +418,7 @@ std::auto_ptr<as_array_object>
 as_array_object::sorted_indexes(uint8_t flags)
 {
 	assert(flags & as_array_object::fReturnIndexedArray);
-	log_error("Array.sorted_index() method not implemented yet!\n");
+	log_unimpl("Array.sorted_index");
 	return std::auto_ptr<as_array_object>(NULL);
 }
 
@@ -434,43 +437,43 @@ as_array_object::sort(uint8_t flags)
 	switch ( flags )
 	{
 		case 0: // default sorting
-			//log_msg("Default sorting");
+			//log_msg(_("Default sorting"));
 			std::sort(elements.begin(), elements.end(),
 				AsValueLessThen());
 			break;
 
 		case as_array_object::fDescending:
-			//log_msg("Default descending");
+			//log_msg(_("Default descending"));
 			std::sort(elements.begin(), elements.end(),
 				AsValueLessThenDesc());
 			break;
 
 		case as_array_object::fCaseInsensitive: 
-			//log_msg("case insensitive");
+			//log_msg(_("case insensitive"));
 			std::sort(elements.begin(), elements.end(),
 				AsValueLessThenNoCase());
 			break;
 
 		case as_array_object::fCaseInsensitive | as_array_object::fDescending:
-			//log_msg("case insensitive descending");
+			//log_msg(_("case insensitive descending"));
 			std::sort(elements.begin(), elements.end(),
 				AsValueLessThenDescNoCase());
 			break;
 
 		case as_array_object::fNumeric: 
-			//log_msg("numeric");
+			//log_msg(_("numeric"));
 			std::sort(elements.begin(), elements.end(),
 				AsValueLessThenNumeric());
 			break;
 
 		case as_array_object::fNumeric | as_array_object::fDescending:
-			//log_msg("numeric descending");
+			//log_msg(_("numeric descending"));
 			std::sort(elements.begin(), elements.end(),
 				AsValueLessThenDescNumeric());
 			break;
 
 		default:
-			log_error("Unhandled sort flags: %d (0x%X)", flags, flags);
+			log_error(_("Unhandled sort flags: %d (0x%X)"), flags, flags);
 			break;
 	}
 
@@ -480,7 +483,7 @@ as_array_object::sort(uint8_t flags)
 	// to either use std::sort or std::uniq or similar
 	if ( do_unique )
 	{
-		log_msg("Should unique now");
+		log_unimpl(_("array.sort with unique flag"));
 	}
 }
 
@@ -506,13 +509,13 @@ array_splice(const fn_call& fn)
 #ifdef GNASH_DEBUG
 	std::stringstream ss;
 	fn.dump_args(ss);
-	log_msg("Array(%s).splice(%s) called", array->toString().c_str(), ss.str().c_str());
+	log_msg(_("Array(%s).splice(%s) called"), array->toString().c_str(), ss.str().c_str());
 #endif
 
 	if (fn.nargs < 1)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Array.splice() needs at least 1 argument, call ignored");
+		log_aserror(_("Array.splice() needs at least 1 argument, call ignored"));
 		);
 		return as_value();
 	}
@@ -527,7 +530,8 @@ array_splice(const fn_call& fn)
 	if ( start < 0 ) start = array->size()+start; // start is negative, so + means -abs()
 	startoffset = iclamp(start, 0, origlen);
 #ifdef GNASH_DEBUG
-	if ( startoffset != start ) log_msg("Array.splice: start:%d became %u", start, startoffset);
+	if ( startoffset != start )
+		log_msg(_("Array.splice: start:%d became %u"), start, startoffset);
 #endif
 
 	//----------------
@@ -540,7 +544,7 @@ array_splice(const fn_call& fn)
 		if ( lenval < 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Array.splice(%d,%d): negative length given, call ignored",
+			log_aserror(_("Array.splice(%d,%d): negative length given, call ignored"),
 				start, lenval);
 			);
 			return as_value();
@@ -581,7 +585,7 @@ array_sort(const fn_call& fn)
 	}
 	else
 	{
-		log_error("Array.sort(comparator) method not implemented!\n");
+		log_unimpl("Array.sort(comparator)");
 		return as_value();
 	}
 
@@ -596,7 +600,7 @@ array_sortOn(const fn_call& fn)
 	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 	UNUSED(array);
 
-	log_error("FIXME: Array.sortOn() method not implemented yet!");
+	log_unimpl("Array.sortOn()");
 	return as_value();
 }
 
@@ -607,7 +611,7 @@ array_push(const fn_call& fn)
 	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 		IF_VERBOSE_ACTION (
-	log_action("calling array push, pushing %d values onto back of array",fn.nargs);
+	log_action(_("calling array push, pushing %d values onto back of array"),fn.nargs);
 		);
 
 	for (unsigned int i=0;i<fn.nargs;i++)
@@ -623,7 +627,7 @@ array_unshift(const fn_call& fn)
 	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
 		IF_VERBOSE_ACTION (
-	log_action("calling array unshift, pushing %d values onto front of array",fn.nargs);
+	log_action(_("calling array unshift, pushing %d values onto front of array"), fn.nargs);
 		);
 
 	for (int i=fn.nargs-1; i>=0; i--)
@@ -642,7 +646,7 @@ array_pop(const fn_call& fn)
 	as_value rv = array->pop();
 
 	IF_VERBOSE_ACTION (
-	log_action("calling array pop, result:%s, new array size:%d",
+	log_action(_("calling array pop, result:%s, new array size:%d"),
 		rv.to_string().c_str(), array->size());
 	);
         return rv;
@@ -658,7 +662,7 @@ array_shift(const fn_call& fn)
 	as_value rv = array->shift();
 
 	IF_VERBOSE_ACTION (
-	log_action("calling array shift, result:%s, new array size:%d",
+	log_action(_("calling array shift, result:%s, new array size:%d"),
 		rv.to_string().c_str(), array->size());
 	);
 	return rv;
@@ -675,7 +679,7 @@ array_reverse(const fn_call& fn)
 	as_value rv(array.get()); 
 
 	IF_VERBOSE_ACTION (
-	log_action("called array reverse, result:%s, new array size:%d",
+	log_action(_("called array reverse, result:%s, new array size:%d"),
 		rv.to_string().c_str(), array->size());
 	);
 	return rv;
@@ -716,10 +720,10 @@ array_to_string(const fn_call& fn)
 
 		IF_VERBOSE_ACTION
 		(
-	log_action("array_to_string called, nargs = %d, "
-			"this_ptr = %p",
+	log_action(_("array_to_string called, nargs = %d, "
+			"this_ptr = %p"),
 			fn.nargs, (void*)fn.this_ptr.get());
-	log_action("to_string result is: %s", ret.c_str());
+	log_action(_("to_string result is: %s"), ret.c_str());
 		);
 
 	return as_value(ret.c_str());
@@ -768,9 +772,9 @@ array_slice(const fn_call& fn)
 	if (fn.nargs > 2)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_warning("More than 2 arguments sent to slice, "
-			"and I don't know what to do with them!\n"
-			"Ignoring them as we continue...\n");
+		log_aserror(_("More than 2 arguments to Array.slice, "
+			"and I don't know what to do with them.  "
+			"Ignoring them"));
 		);
 	}
 
@@ -838,7 +842,7 @@ as_value
 array_new(const fn_call& fn)
 {
 	IF_VERBOSE_ACTION (
-		log_action("array_new called, nargs = %d", fn.nargs);
+		log_action(_("array_new called, nargs = %d"), fn.nargs);
 	);
 
 	boost::intrusive_ptr<as_array_object>	ao = new as_array_object;
@@ -871,7 +875,7 @@ array_new(const fn_call& fn)
 	}
 
 	IF_VERBOSE_ACTION (
-		log_action("array_new setting object %p in result", (void*)ao.get());
+		log_action(_("array_new setting object %p in result"), (void*)ao.get());
 	);
 
 	return as_value(ao.get());

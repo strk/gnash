@@ -1,5 +1,6 @@
+// plugin.cpp:  Windows "win32" flash player Mozilla plugin, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,12 +11,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
 #define NO_NSPR_10_SUPPORT
@@ -257,10 +256,10 @@ void nsPluginInstance::main_loop()
 	gnash::get_movie_info(URL(getFilename()), &movie_version, &movie_width, &movie_height, &movie_fps, NULL, NULL);
 	if (movie_version == 0)
 	{
-		dbglogfile << "error: can't get info about " << getFilename() << endl;
+		log_error (_("can't get info about %s"), getFilename());
     return;
 	}
-	log_msg("Movie %s: width is %d, height is %d, version is %d\n", getFilename(),
+	log_msg(_("Movie %s: width is %d, height is %d, version is %d\n"), getFilename(),
 	movie_width, movie_height, movie_version);
 
 	// new thread must have own movie instance
@@ -270,7 +269,7 @@ void nsPluginInstance::main_loop()
 	gnash::movie_definition*	md = gnash::create_movie(URL(getFilename()));
 	if (md == NULL)
 	{
-		dbglogfile << "error: can't create a movie from " << getFilename() << endl;
+		log_error (_("can't create a movie from %s"), getFilename());
 		return;
 	}
 
@@ -278,7 +277,7 @@ void nsPluginInstance::main_loop()
 	gnash::movie_interface*	m = md->create_instance();
 	if (m == NULL)
 	{
-		dbglogfile << "error: can't create movie instance" << endl;
+		log_error (_("can't create movie instance"));
 		return;
 	}
 
@@ -346,8 +345,8 @@ void nsPluginInstance::main_loop()
 		// nsPluginInstance::shut() has been called for this instance.
 		if (getShutdown())
 		{
-			dbglogfile << "player: Shutting down as requested..." << endl;
-	    break;
+			log_msg (_("player: Shutting down as requested..."));
+		        break;
 		}
 	
 		PR_Unlock(s_player);

@@ -1,3 +1,79 @@
+2007-04-18  John Gilmore  <gnu@quiet.toad.com>
+
+	* Internationalization, phase 2.
+	
+	* These modules have had their printed messages passed through
+	  _(...).  Those messages have also been cleaned up, thusly:
+	    *  Stray \n's removed
+	    *  Exclamation points and periods removed at ends of messages
+	    *  Typos corrected, and English language wording adjusted.
+	    *  Misplaced UPPER CASE shouting removed.
+	    *  Many complaints about unknown types, values, etc, now include
+	       the offending value, for ease of remote diagnosis.
+	    *  C++-style << printouts converted to log_xxx calls.
+	    *  Direct accesses to dbglogfile converted to log_xxx calls.
+	  These changes should also make the messages easier to	translate.
+	* Commented-out messages were also cleaned up as above.
+	* Many modules have also had log_warning calls changed to
+	  log_error, log_aserror, log_swferror, or log_unimp, according to
+	  the documentation checked in earlier by strk and gnu.
+	  IF_VERBOSE_xxx macros were inserted around some calls that
+	  lacked them.
+	* Header comments (at the top of the file) added or adjusted, to
+	  describe each file in its initial line, and to correct whitespace
+	  in the copyright notices.
+	
+	* The list of files affected by the above changes:
+	  backend/sound_handler_sdl.cpp
+	  extensions/mysql/mysql_db.cpp
+	  gui/Player.cpp
+	  gui/gnash.cpp
+	  gui/gui.cpp
+	  plugin/klash/klash.cpp
+	  plugin/win32/plugin.cpp
+	  server/PropertyList.cpp
+	  server/StreamProvider.cpp
+	  server/array.cpp
+	  server/as_environment.cpp
+	  server/as_function.cpp
+	  server/as_object.cpp
+	  server/as_value.cpp
+	  server/button_character_instance.cpp
+	  server/character.cpp
+	  server/dlist.cpp
+	  server/edit_text_character.cpp
+	  server/fill_style.cpp
+	  server/font.cpp
+	  server/generic_character.cpp
+	  server/impl.cpp
+	  
+	* 2007 copyright notices were inserted in:
+	  backend/sound_handler_sdl.cpp
+	  extensions/mysql/mysql_db.cpp
+	  gui/gnash.cpp
+	  plugin/klash/klash.cpp
+	  plugin/win32/plugin.cpp
+	  server/generic_character.cpp
+	
+	* New 2006, 2007 Free Software Foundation copyrights applied (to
+	  formerly public domain code):
+	  server/font.cpp
+	 
+	* backend/sound_handler_sdl.cpp: Move stray FORMAT_VORBIS comment.
+	* gui/gui.cpp: Commented out "Resize request when no movie" error
+	  that appears every time gnash is run.
+	* plugins/klash/klash.cpp:  Translated pop-up menu items, about-box,
+	  and updated copyright notice printed by --version and --help.
+	* server/array.cpp (as_array_object::index_requested):  Avoid
+	  c_str accessor when converting string to number.
+	* server/dlist.{h,cpp}:  Change API of DisplayList::dump debug
+	  function, so it can use log_xxx functions.
+	
+	I'm sure that I've missed some messages that ought to get 
+	translated (with _(...)).  Those will be fixed over time.
+	All new messages should be created with _(...) so they can
+	be translated.
+
 2007-04-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/loadMovieTest.c: add

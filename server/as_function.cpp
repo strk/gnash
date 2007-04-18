@@ -1,3 +1,4 @@
+// as_function.cpp:  ActionScript Functions, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,13 +11,11 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 // 
-//
-//
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -94,7 +93,7 @@ static as_value
 function_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> func = new as_object(getFunctionPrototype());
-	//log_msg("User tried to invoke new Function()");
+	//log_msg(_("User tried to invoke new Function()"));
 	return as_value(func.get());
 }
 
@@ -146,8 +145,8 @@ as_function::getPrototype()
 	get_member("prototype", &proto);
 	if ( proto.to_object() != _properties.get() )
 	{
-		log_warning("Exported interface of function %p "
-				"has been overwritten (from %p to %p)!",
+		log_warning(_("Exported interface of function %p "
+				"has been overwritten (from %p to %p)"),
 				this, _properties.get(),
 				(void*)proto.to_object().get());
 		_properties = proto.to_object();
@@ -195,7 +194,7 @@ function_apply(const fn_call& fn)
 	if ( ! fn.nargs )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror ("Function.apply() called with no args");
+		log_aserror (_("Function.apply() called with no args"));
 		);
 	}
 	else
@@ -215,10 +214,10 @@ function_apply(const fn_call& fn)
 			IF_VERBOSE_ASCODING_ERRORS(
 				if ( fn.nargs > 2 )
 				{
-					log_aserror("Function.apply() got %d"
+					log_aserror(_("Function.apply() got %d"
 						" args, expected at most 2"
 						" -- discarding the ones in"
-						" excess",
+						" excess"),
 						fn.nargs);
 				}
 			);
@@ -227,9 +226,9 @@ function_apply(const fn_call& fn)
 			if ( ! arg1 )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
-					log_aserror("Second arg of Function.apply"
+					log_aserror(_("Second arg of Function.apply"
 						" is %s (expected array)"
-						" - considering as call with no args",
+						" - considering as call with no args"),
 						fn.arg(1).to_debug_string().c_str());
 				);
 				goto call_it;
@@ -241,10 +240,10 @@ function_apply(const fn_call& fn)
 			if ( ! arg_array )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
-					log_aserror("Second arg of Function.apply"
+					log_aserror(_("Second arg of Function.apply"
 						" is of type %s, with value %s"
 						" (expected array)"
-						" - considering as call with no args",
+						" - considering as call with no args"),
 						fn.arg(1).typeOf(),
 						fn.arg(1).to_string().c_str());
 				);
@@ -253,7 +252,7 @@ function_apply(const fn_call& fn)
 
 			unsigned int nelems = arg_array->size();
 
-			//log_error("Function.apply(this_ref, array[%d])\n", nelems);
+			//log_error(_("Function.apply(this_ref, array[%d])\n"), nelems);
 			as_value index, value;
 			for (unsigned int i=nelems; i; i--)
 			{
@@ -306,9 +305,9 @@ function_call(const fn_call& fn)
 	// Call the function 
 	return (*function_obj)(new_fn_call);
 
-	//log_msg("at function_call exit, stack: \n"); fn.env->dump_stack();
+	//log_msg(_("at function_call exit, stack: \n")); fn.env->dump_stack();
 
-	//log_msg("%s: tocheck \n", __FUNCTION__);
+	//log_msg(_("%s: tocheck \n"), __FUNCTION__);
 }
 
 boost::intrusive_ptr<as_object>
@@ -329,7 +328,7 @@ as_function::constructInstance( as_environment& env,
 	{
 
 		IF_VERBOSE_ACTION (
-		log_action("it's a built-in class");
+		log_action(_("it's a built-in class"));
 		);
 
 		fn_call fn(NULL, &env, nargs, first_arg_index);
@@ -362,7 +361,7 @@ as_function::constructInstance( as_environment& env,
 		assert(func_has_prototype);
 
 		IF_VERBOSE_ACTION (
-		log_action("constructor prototype is %s", proto.to_debug_string().c_str());
+		log_action(_("constructor prototype is %s"), proto.to_debug_string().c_str());
 		);
 
 		// Create an empty object, with a ref to the constructor's prototype.

@@ -1,3 +1,4 @@
+// PropertyList.cpp:  ActionScript property lists, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,12 +11,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
 #ifdef HAVE_CONFIG_H
@@ -70,7 +69,7 @@ PropertyList::getValue(const std::string& key, as_value& val,
 
 	val=found->second->getValue(this_ptr);
 
-	//log_msg("Property %s found, assigning to return (%s)", key.c_str(), val.to_string());
+	//log_msg(_("Property %s found, value is (%s)"), key.c_str(), val.to_string());
 
 	return true;
 }
@@ -91,11 +90,11 @@ PropertyList::setValue(const std::string& key, const as_value& val,
 
 	if ( prop->isReadOnly() )
 	{
-		log_warning("Property %s is read-only, not setting it", key.c_str());
+		log_error(_("Property %s is read-only, not setting it to %s"), key.c_str(), val.to_string().c_str());
 		return false;
 	}
 
-	//log_msg("Property %s set to value %s", key.c_str(), val.to_string());
+	//log_msg(_("Property %s set to value %s"), key.c_str(), val.to_string());
 	prop->setValue(this_ptr, val);
 	return true;
 }

@@ -1,10 +1,25 @@
-// font.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// font.cpp:  ActionScript font handling, for Gnash.
+// 
+//   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
+/* $Id: font.cpp,v 1.28 2007/04/18 09:35:42 jgilmore Exp $ */
 
-// A font type for gnash.
-
+// Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
 #include "font.h"
 #include "stream.h"
@@ -121,7 +136,7 @@ namespace gnash {
 	void font::readDefineFont(stream* in, movie_definition* m)
 	{
 		IF_VERBOSE_PARSE (
-		log_parse("reading DefineFont");
+		log_parse(_("reading DefineFont"));
 		);
 
 		int	table_base = in->get_position();
@@ -171,7 +186,7 @@ namespace gnash {
 	void font::readDefineFont2_or_3(stream* in, movie_definition* m)
 	{
 		IF_VERBOSE_PARSE (
-		log_parse("reading DefineFont2 or DefineFont3");
+		log_parse(_("reading DefineFont2 or DefineFont3"));
 		);
 
 		bool	has_layout = (in->read_uint(1) != 0);
@@ -184,7 +199,7 @@ namespace gnash {
 		m_is_bold = (in->read_uint(1) != 0);
 		uint8_t	reserved = in->read_u8();
 
-		// Inhibit warning.
+		// Inhibit compiler warning.
 		reserved = reserved;
 
 		m_name = in->read_string_with_length();
@@ -206,7 +221,7 @@ namespace gnash {
 				uint32_t off = in->read_u32();	
 
 				IF_VERBOSE_PARSE (
-				log_parse("Glyph %d at offset %u", i, off);
+				log_parse(_("Glyph %d at offset %u"), i, off);
 				);
 
 				offsets.push_back(off);
@@ -221,7 +236,7 @@ namespace gnash {
 				uint16_t off = in->read_u16();	
 
 				IF_VERBOSE_PARSE (
-				log_parse("Glyph %d at offset %u", i, off);
+				log_parse(_("Glyph %d at offset %u"), i, off);
 				);
 
 				offsets.push_back(off);
@@ -257,7 +272,7 @@ namespace gnash {
 			if (font_code_offset + table_base != current_position)
 			{
 				// Bad offset!  Don't try to read any more.
-				log_warning("Bad offset in DefineFont2!");
+				log_error(_("Bad offset in DefineFont2"));
 				return;
 			}
 		}
@@ -324,7 +339,7 @@ namespace gnash {
 	// later using the character pair as the key.
 	if ( ! m_kerning_pairs.insert(std::make_pair(k, adjustment)).second )
 	{
-		log_warning("Repeated kerning pair found - ignoring\n");
+		log_error(_("Repeated kerning pair found - ignoring"));
 	}
 
 			}
@@ -346,10 +361,9 @@ namespace gnash {
 			// See: SWFalexref/SWFalexref.html#tag_definefont2
 			static bool warned = false;
 			if ( ! warned ) {
-				log_warning("DefineFontInfo2 partially implemented");
+				log_unimpl(_("DefineFontInfo2 partially implemented"));
 				warned = true;
 			}
-
 		}
 
 		delete [] m_name;
@@ -378,7 +392,7 @@ namespace gnash {
 	// codes.
 	{
 		IF_VERBOSE_PARSE (
-		log_parse("reading code table at offset %lu", in->get_position());
+		log_parse(_("reading code table at offset %lu"), in->get_position());
 		);
 
 		assert(m_code_table.empty());
@@ -412,14 +426,14 @@ namespace gnash {
 		{
 			int glyph_index = it->second;
 #if 0
-			log_msg("get_glyph_index(%u) returning %d",
+			log_msg(_("get_glyph_index(%u) returning %d"),
 				code, glyph_index);
 #endif
 			return glyph_index;
 		}
 
 #if 0
-		log_msg("get_glyph_index(%u) returning -1", code);
+		log_msg(_("get_glyph_index(%u) returning -1"), code);
 #endif
 		return -1;
 	}
@@ -439,7 +453,7 @@ namespace gnash {
 			if (s_logged == false)
 			{
 				s_logged = true;
-				log_error("empty advance table in font %s\n", get_name());
+				log_error(_("empty advance table in font %s"), get_name());
 			}
 			return 0;
 		}
@@ -506,8 +520,8 @@ namespace gnash {
 		int	n = in->read_le32();
 		if (n != m_glyphs.size())
 		{
-			log_error("error reading cache file in font::input_cached_data() "
-				  "glyph count mismatch.\n");
+			log_error(_("error reading cache file in font::input_cached_data(): "
+				  "glyph count mismatch"));
 			in->go_to_end();	// ensure that no more data will be read from this stream.
 			return;
 		}

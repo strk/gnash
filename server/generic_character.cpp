@@ -1,5 +1,6 @@
+// generic_character.cpp:  Mouse/Character handling, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,15 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
-/* $Id: generic_character.cpp,v 1.4 2007/02/28 17:25:26 udog Exp $ */
+/* $Id: generic_character.cpp,v 1.5 2007/04/18 09:35:42 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,7 +45,7 @@ generic_character::add_invalidated_bounds(InvalidatedRanges& ranges,
 void
 generic_character::enclose_own_bounds(rect *) const
 {
-	log_error("generic_character::enclose_own_bounds unimplemented");
+	log_unimpl("generic_character::enclose_own_bounds");
 	assert(0); // TO BE IMPLEMENTED!!!!!
 }
 
