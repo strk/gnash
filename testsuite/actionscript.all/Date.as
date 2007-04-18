@@ -1,4 +1,4 @@
-/N/ 
+// 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.21 2007/04/18 13:47:24 martinwguy Exp $";
+rcsid="$Id: Date.as,v 1.22 2007/04/18 15:03:06 strk Exp $";
 
 #include "check.as"
 
@@ -119,7 +119,7 @@ check_equals (d.setyear, undefined);
 check_equals (d.tostring, undefined);
 check_equals (Date.utc, undefined);
 
-#endif
+#endif // OUTPUT_VERSION > 6
 
 // Some values we will use to test things
     var zero = 0.0;
