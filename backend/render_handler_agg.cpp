@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.71 2007/04/17 09:20:41 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.72 2007/04/18 17:04:56 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -809,7 +809,7 @@ public:
     // could be implemented, but is not used
 	}
 
-    void begin_submit_mask()
+  void begin_submit_mask()
 	{
 	  // Set flag so that rendering of shapes is simplified (only solid fill) 
     m_drawing_mask = true;
@@ -1876,10 +1876,10 @@ public:
 		return false;
   }
 
-  void get_pixel(rgba& color_return, float world_x, float world_y) {
-    int x, y;
-    
-    world_to_pixel(x, y, world_x, world_y);
+  bool getPixel(rgba& color_return, int x, int y) {
+  
+    if ((x<0) || (y<0) || (x>=xres) || (y=yres))
+      return false;
 
     agg::rgba8 color = m_pixf->pixel(x, y);    
     
@@ -1888,6 +1888,7 @@ public:
     color_return.m_b = color.b;
     color_return.m_a = color.a;
     
+    return true;
   }
   
   void set_scale(float new_xscale, float new_yscale) {

@@ -1,3 +1,11 @@
+2007-04-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler.h: renamed get_pixel() to getPixel() and
+	  changed from void to bool return value
+	* backend/render_handler.h, backend/render_handler_agg.cpp: 
+	  implemented getAveragePixel()
+       
+	
 2007-04-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/MovieTester.h: add click() method.

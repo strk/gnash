@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.32 2007/04/17 09:00:26 strk Exp $ */
+/* $Id: render_handler.h,v 1.33 2007/04/18 17:04:56 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -488,19 +488,71 @@ public:
 	virtual bool allow_glyph_textures() = 0;
     
     
-	/// This function returns the color at any position in the stage. It is used
-	/// for automatic testing only, it should not be used for anything else!
-	/// world_x and world_y are world coordinates (twips) and the color of the
-	/// nearest pixel is returned.
-	virtual void get_pixel(rgba& /*color_return*/, float /*world_x*/, 
-		float /*world_y*/)
-	{
+  /// This function returns the color at any position in the stage. It is used
+  /// for automatic testing only, it should not be used for anything else!
+  /// x and y are pixel coordinates (<0 won't make any sense) and the color of 
+  /// the nearest pixel is returned.
+  /// The function returns false when the coordinates are outside the 
+  /// main frame buffer.
+  virtual bool getPixel(rgba& /*color_return*/, int /*x*/, int /*y*/)
+  {
 
-		log_msg("get_pixel() not implemented for this renderer");
-		assert(0);    
+    log_msg("getPixel() not implemented for this renderer");
+    assert(0);    
+    return false; // avoid compiler warning    
+  }
+  
+  
+  /// Returns the average RGB color for a square block on the stage. The 
+  /// width and height of the block is defined by "radius" and x/y refer
+  /// to the center of the block. radius==1 equals getPixel() and radius==0
+  /// is illegal. For even "radius" values, the center point is not exactly
+  /// defined. 
+  /// The function returns false when at least one pixel of the block was
+  /// outside the main frame buffer. In that case the value in color_return
+  /// is undefined.
+  /// This implementation is provided for simplicity. Renderers should
+  /// implement a specialized version for better performance.
+  virtual bool getAveragePixel(rgba& color_return, int x, int y, 
+    unsigned int radius)
+  {
+  
+    assert(radius>0); 
+  
+    // optimization:
+    if (radius==1)
+      return getPixel(color_return, x, y);
+  
+    unsigned int r=0, g=0, b=0, a=0;
+    
+    x -= radius/2;
+    y -= radius/2;
+    
+    int xe = x+radius-1;
+    int ye = y+radius-1;
 
-	}
-
+    rgba pixel;
+    
+    for (int yp=y; yp<ye; yp++)
+    for (int xp=x; xp<xe; xp++)
+    {
+      if (!getPixel(pixel, xp, yp))
+        return false;
+        
+      r += pixel.m_r;      
+      g += pixel.m_g;      
+      b += pixel.m_b;      
+      a += pixel.m_a;      
+    }
+    
+    int pcount = radius*radius; 
+    color_return.m_r = r / pcount; 
+    color_return.m_g = g / pcount; 
+    color_return.m_b = b / pcount; 
+    color_return.m_a = a / pcount; 
+    
+    return true;
+  }
 	/// Sets the x/y scale for the movie  
 	virtual void set_scale(float /*xscale*/, float /*yscale*/) {
 		// nop
