@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.73 2007/04/18 17:06:42 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.74 2007/04/18 17:07:34 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -264,21 +264,21 @@ public:
   
   void clear(const geometry::Range2d<int>& region)
   {
-	  if (region.isNull()) return;
-	  assert ( region.isFinite() );
+    if (region.isNull()) return;
+    assert ( region.isFinite() );
 
-	  const agg::gray8 black(0);
-	  	  
-	  // region can't be world as it should be intersected with 
-	  // the visible rect
-	  assert (! region.isWorld() );
+    const agg::gray8 black(0);
+        
+    // region can't be world as it should be intersected with 
+    // the visible rect
+    assert (! region.isWorld() );
 
-	  unsigned int left=region.getMinX();
-	  unsigned int width=region.width()+1;
+    unsigned int left=region.getMinX();
+    unsigned int width=region.width()+1;
 
-	  const unsigned int max_y = region.getMaxY();
+    const unsigned int max_y = region.getMaxY();
           for (unsigned int y=region.getMinY(); y<=max_y; y++) 
-	  {
+    {
        m_pixf.copy_hline(left, y, width, black);
     }
   }
@@ -325,12 +325,12 @@ private:
   typedef agg::conv_stroke< agg::conv_curve< agg::path_storage > > stroke_type;
   
   // TODO: Change these!!
-	unsigned char *memaddr;
-	int	memsize;
-	int xres;
-	int yres;
-	int bpp; 	// bits per pixel
-	double xscale, yscale;
+  unsigned char *memaddr;
+  int memsize;
+  int xres;
+  int yres;
+  int bpp;  // bits per pixel
+  double xscale, yscale;
 
 
 public:
@@ -338,90 +338,90 @@ public:
   //int              m_view_height;
 
   // Enable/disable antialiasing.
-  bool	m_enable_antialias;
+  bool  m_enable_antialias;
 
   // Output size.
-  float	m_display_width;
-  float	m_display_height;
+  float m_display_width;
+  float m_display_height;
 
-  gnash::matrix	m_current_matrix;
-  gnash::cxform	m_current_cxform;
+  gnash::matrix m_current_matrix;
+  gnash::cxform m_current_cxform;
 
   void set_antialiased(bool enable) {
     // enable=false *forces* all bitmaps to be rendered in low quality
-		m_enable_antialias = enable;
+    m_enable_antialias = enable;
   }
 
   // Style state.
   enum style_index
   {
-  	LEFT_STYLE = 0,
-  	RIGHT_STYLE,
-  	LINE_STYLE,
-  	STYLE_COUNT
+    LEFT_STYLE = 0,
+    RIGHT_STYLE,
+    LINE_STYLE,
+    STYLE_COUNT
   };
 
 
-  gnash::bitmap_info*	create_bitmap_info_rgb(image::rgb* im)
-	// Given an image, returns a pointer to a bitmap_info class
-	// that can later be passed to fill_styleX_bitmap(), to set a
-	// bitmap fill style.
-	{	   
-	  return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (im->m_width, im->m_height,
+  gnash::bitmap_info* create_bitmap_info_rgb(image::rgb* im)
+  // Given an image, returns a pointer to a bitmap_info class
+  // that can later be passed to fill_styleX_bitmap(), to set a
+  // bitmap fill style.
+  {    
+    return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (im->m_width, im->m_height,
       im->m_pitch, im->m_data, 24);
     assert(0); 
-	}
+  }
 
 
-  gnash::bitmap_info*	create_bitmap_info_rgba(image::rgba* im)
-	// Given an image, returns a pointer to a bitmap_info class
-	// that can later be passed to fill_style_bitmap(), to set a
-	// bitmap fill style.
-	//
-	// This version takes an image with an alpha channel.
-	{
-	  return new agg_bitmap_info<agg::pixfmt_rgba32_pre> (im->m_width, im->m_height,
+  gnash::bitmap_info* create_bitmap_info_rgba(image::rgba* im)
+  // Given an image, returns a pointer to a bitmap_info class
+  // that can later be passed to fill_style_bitmap(), to set a
+  // bitmap fill style.
+  //
+  // This version takes an image with an alpha channel.
+  {
+    return new agg_bitmap_info<agg::pixfmt_rgba32_pre> (im->m_width, im->m_height,
       im->m_pitch, im->m_data, 32); 
-	}
+  }
 
 
-  gnash::bitmap_info*	create_bitmap_info_empty()
-	// Create a placeholder bitmap_info.  Used when
-	// DO_NOT_LOAD_BITMAPS is set; then later on the host program
-	// can use movie_definition::get_bitmap_info_count() and
-	// movie_definition::get_bitmap_info() to stuff precomputed
-	// textures into these bitmap infos.
-	{
-	  // bitmaps currently not supported! - return dummy for fontlib
-	  unsigned char dummy=0;
-	  return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (0, 0, 0, &dummy, 24);
-	}
+  gnash::bitmap_info* create_bitmap_info_empty()
+  // Create a placeholder bitmap_info.  Used when
+  // DO_NOT_LOAD_BITMAPS is set; then later on the host program
+  // can use movie_definition::get_bitmap_info_count() and
+  // movie_definition::get_bitmap_info() to stuff precomputed
+  // textures into these bitmap infos.
+  {
+    // bitmaps currently not supported! - return dummy for fontlib
+    unsigned char dummy=0;
+    return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (0, 0, 0, &dummy, 24);
+  }
 
-  gnash::bitmap_info*	create_bitmap_info_alpha(int /*w*/, int /*h*/, uint8_t* /*data*/)
-	// Create a bitmap_info so that it contains an alpha texture
-	// with the given data (1 byte per texel).
-	{
-	  //return new agg_bitmap_info<agg::pixfmt_gray8> (w, h, w, data, 8);
+  gnash::bitmap_info* create_bitmap_info_alpha(int /*w*/, int /*h*/, uint8_t* /*data*/)
+  // Create a bitmap_info so that it contains an alpha texture
+  // with the given data (1 byte per texel).
+  {
+    //return new agg_bitmap_info<agg::pixfmt_gray8> (w, h, w, data, 8);
 
-	  // where is this used, anyway??
-	  log_msg("create_bitmap_info_alpha() currently not supported");
-	  
-	  return new bitmap_info();
-	}
+    // where is this used, anyway??
+    log_msg("create_bitmap_info_alpha() currently not supported");
+    
+    return new bitmap_info();
+  }
 
 
-  void	delete_bitmap_info(gnash::bitmap_info* bi)
-	// Delete the given bitmap info class.
-	{
-		free(bi);
-	}
-	
-	
- 	// Returns the format the current renderer wants videoframes in.
-	int videoFrameFormat() {
-		return RGB;
-	}
-	
+  void  delete_bitmap_info(gnash::bitmap_info* bi)
+  // Delete the given bitmap info class.
+  {
+    free(bi);
+  }
+  
+  
+  // Returns the format the current renderer wants videoframes in.
+  int videoFrameFormat() {
+    return RGB;
+  }
+  
 
   void drawVideoFrame(image::image_base* baseframe, const matrix* mat, const rect* bounds) {
   
@@ -495,11 +495,11 @@ public:
     ras_type ras;
     
     // make a path for the video outline
- 		point a, b, c, d;
-		mat->transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
-		mat->transform(&b, point(bounds->get_x_max(), bounds->get_y_min()));
-		mat->transform(&c, point(bounds->get_x_max(), bounds->get_y_max()));
-		mat->transform(&d, point(bounds->get_x_min(), bounds->get_y_max()));
+    point a, b, c, d;
+    mat->transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
+    mat->transform(&b, point(bounds->get_x_max(), bounds->get_y_min()));
+    mat->transform(&c, point(bounds->get_x_max(), bounds->get_y_max()));
+    mat->transform(&d, point(bounds->get_x_min(), bounds->get_y_max()));
     
     agg::path_storage path;
     path.move_to(a.m_x*xscale, a.m_y*yscale);
@@ -521,8 +521,8 @@ public:
   
         // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
         // path), so there should be no problem with multiple clipbounds.      
-        ras.add_path(path);			
-  			   
+        ras.add_path(path);     
+           
         agg::render_scanlines_aa(ras, sl, rbase, sa, sg);
       }
       
@@ -542,8 +542,8 @@ public:
   
         // <Udo>: AFAIK add_path() rewinds the vertex list (clears previous
         // path), so there should be no problem with multiple clipbounds.      
-        ras.add_path(path);			
-  			   
+        ras.add_path(path);     
+           
         agg::render_scanlines_aa(ras, sl, rbase, sa, sg);
       }
       
@@ -568,7 +568,7 @@ public:
       m_pixf(NULL),
       m_drawing_mask(false)
   {
-  }  	
+  }   
 
   // Destructor
   ~render_handler_agg()
@@ -577,7 +577,7 @@ public:
     // as that check is already implemented
     // in the 'delete' statement
     // if (m_pixf != NULL)
-  	  delete m_pixf;    // TODO: is this correct??
+      delete m_pixf;    // TODO: is this correct??
   }
 
   /// Initializes the rendering buffer. The memory pointed by "mem" is not
@@ -590,21 +590,21 @@ public:
         assert(x > 0);
         assert(y > 0);
 
-  	memaddr = mem;
-  	memsize	= size;
-  	xres 		= x;
-  	yres 		= y;
-  	
+    memaddr = mem;
+    memsize = size;
+    xres    = x;
+    yres    = y;
+    
         // don't need to check m_pixf != NULL
         // as that check is already implemented
         // in the 'delete' statement
-  	//if (m_pixf != NULL)
-  	  delete m_pixf;    // TODO: is this correct??
+    //if (m_pixf != NULL)
+      delete m_pixf;    // TODO: is this correct??
 
     int row_size = xres*((bpp+7)/8);
     m_rbuf.attach(memaddr, xres, yres, row_size);
 
-    // allocate pixel format accessor  	
+    // allocate pixel format accessor   
     m_pixf = new PixelFormat(m_rbuf);
     //m_rbase = new renderer_base(*m_pixf);  --> does not work!!??
     
@@ -614,31 +614,31 @@ public:
   
 
   void begin_display(
-	gnash::rgba background_color,
-	int /*viewport_x0*/, int /*viewport_y0*/,
-	int /*viewport_width*/, int /*viewport_height*/,
-	float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
-	// Set up to render a full frame from a movie and fills the
-	// background.	Sets up necessary transforms, to scale the
-	// movie to fit within the given dimensions.  Call
-	// end_display() when you're done.
-	//
-	// The rectangle (viewport_x0, viewport_y0, viewport_x0 +
-	// viewport_width, viewport_y0 + viewport_height) defines the
-	// window coordinates taken up by the movie.
-	//
-	// The rectangle (x0, y0, x1, y1) defines the pixel
-	// coordinates of the movie that correspond to the viewport
-	// bounds.
-	{
-	  assert(m_pixf != NULL);
+  gnash::rgba background_color,
+  int /*viewport_x0*/, int /*viewport_y0*/,
+  int /*viewport_width*/, int /*viewport_height*/,
+  float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
+  // Set up to render a full frame from a movie and fills the
+  // background.  Sets up necessary transforms, to scale the
+  // movie to fit within the given dimensions.  Call
+  // end_display() when you're done.
+  //
+  // The rectangle (viewport_x0, viewport_y0, viewport_x0 +
+  // viewport_width, viewport_y0 + viewport_height) defines the
+  // window coordinates taken up by the movie.
+  //
+  // The rectangle (x0, y0, x1, y1) defines the pixel
+  // coordinates of the movie that correspond to the viewport
+  // bounds.
+  {
+    assert(m_pixf != NULL);
 
-	  // clear the stage using the background color
-	  for (unsigned int i=0; i<_clipbounds.size(); i++) 
+    // clear the stage using the background color
+    for (unsigned int i=0; i<_clipbounds.size(); i++) 
       clear_framebuffer(_clipbounds[i], agg::rgba8_pre(background_color.m_r,
-  		  background_color.m_g, background_color.m_b,
-  		  background_color.m_a));
-    	  
+        background_color.m_g, background_color.m_b,
+        background_color.m_a));
+        
     // calculate final pixel scale
     /*double scaleX, scaleY;
     scaleX = (double)xres / (double)viewport_width / 20.0;  // 20=TWIPS
@@ -647,34 +647,34 @@ public:
     
     // reset status variables
     m_drawing_mask = false;
-	}
-	
-	/// renderer_base.clear() does no clipping which clears the whole framebuffer
-	/// even if we update just a small portion of the screen. The result would be
-	/// still correct, but slower. 
+  }
+  
+  /// renderer_base.clear() does no clipping which clears the whole framebuffer
+  /// even if we update just a small portion of the screen. The result would be
+  /// still correct, but slower. 
   /// This function clears only a certain portion of the screen, while /not/ 
   /// being notably slower for a fullscreen clear. 
-	void clear_framebuffer(const geometry::Range2d<int>& region,
-		    agg::rgba8 color)
-	{
-			assert(region.isFinite());
-			
-			// add 1 to width since we have still to draw a pixel when 
-			// getMinX==getMaxX			
-			unsigned int width=region.width()+1;
-			
-			// <Udo> Note: We don't need to check for width/height anymore because
-			// Range2d will take care that getMinX <= getMaxX and it's okay when
-			// region.width()==0 because in that case getMinX==getMaxX and we have
-			// still a pixel to draw. 
+  void clear_framebuffer(const geometry::Range2d<int>& region,
+        agg::rgba8 color)
+  {
+      assert(region.isFinite());
+      
+      // add 1 to width since we have still to draw a pixel when 
+      // getMinX==getMaxX     
+      unsigned int width=region.width()+1;
+      
+      // <Udo> Note: We don't need to check for width/height anymore because
+      // Range2d will take care that getMinX <= getMaxX and it's okay when
+      // region.width()==0 because in that case getMinX==getMaxX and we have
+      // still a pixel to draw. 
 
-	    unsigned int left=region.getMinX();
+      unsigned int left=region.getMinX();
 
-	    for (unsigned int y=region.getMinY(), maxy=region.getMaxY();
-		    y<=maxy; ++y) 
-	    {
-				m_pixf->copy_hline(left, y, width, color);
-	    }
+      for (unsigned int y=region.getMinY(), maxy=region.getMaxY();
+        y<=maxy; ++y) 
+      {
+        m_pixf->copy_hline(left, y, width, color);
+      }
   }
 
   bool allow_glyph_textures() {
@@ -682,70 +682,70 @@ public:
     return false; 
   }
 
-  void	end_display()
-	// Clean up after rendering a frame.  Client program is still
-	// responsible for calling glSwapBuffers() or whatever.
-	{
-	
-	  if (m_drawing_mask) 
-	    log_msg("warning: rendering ended while drawing a mask");
-	    
-	  while (! m_alpha_mask.empty()) {
-	    log_msg("warning: rendering ended while masks were still active");
-      disable_mask();	     
-	  }
-	
+  void  end_display()
+  // Clean up after rendering a frame.  Client program is still
+  // responsible for calling glSwapBuffers() or whatever.
+  {
+  
+    if (m_drawing_mask) 
+      log_msg("warning: rendering ended while drawing a mask");
+      
+    while (! m_alpha_mask.empty()) {
+      log_msg("warning: rendering ended while masks were still active");
+      disable_mask();      
+    }
+  
     // nothing to do
-	}
+  }
 
-  void	set_matrix(const gnash::matrix& m)
-	// Set the current transform for mesh & line-strip rendering.
-	{
-    // used only for drawing line strips...	   
-	  m_current_matrix = m;
-	}
+  void  set_matrix(const gnash::matrix& m)
+  // Set the current transform for mesh & line-strip rendering.
+  {
+    // used only for drawing line strips...    
+    m_current_matrix = m;
+  }
 
-  void	set_cxform(const gnash::cxform& cx)
-	// Set the current color transform for mesh & line-strip rendering.
-	{
-    // used only for drawing line strips...	   
+  void  set_cxform(const gnash::cxform& cx)
+  // Set the current color transform for mesh & line-strip rendering.
+  {
+    // used only for drawing line strips...    
     m_current_cxform = cx;
-	}
+  }
 
-  static void	apply_matrix(const gnash::matrix& /*m*/)
-	// add user space transformation
-	{
+  static void apply_matrix(const gnash::matrix& /*m*/)
+  // add user space transformation
+  {
     // TODO: what's the use for this, anyway?? 
     log_msg("apply_matrix(); called - NOT IMPLEMENTED");
-	}
+  }
 
-  static void	apply_color(const gnash::rgba& /*c*/)
-	// Set the given color.
-	{
+  static void apply_color(const gnash::rgba& /*c*/)
+  // Set the given color.
+  {
     // TODO: what's the use for this, anyway?? 
     log_msg("apply_color(); called - NOT IMPLEMENTED");
-	}
+  }
 
 
-	template <class ras_type>
-	void apply_clip_box(ras_type& ras, 
-		const geometry::Range2d<int>& bounds)
-	{
-		assert(bounds.isFinite());
-		ras.clip_box(
-			(double)bounds.getMinX(),
-			(double)bounds.getMinY(),
-			(double)bounds.getMaxX()+1,
-			(double)bounds.getMaxY()+1);  
-	}
+  template <class ras_type>
+  void apply_clip_box(ras_type& ras, 
+    const geometry::Range2d<int>& bounds)
+  {
+    assert(bounds.isFinite());
+    ras.clip_box(
+      (double)bounds.getMinX(),
+      (double)bounds.getMinY(),
+      (double)bounds.getMaxX()+1,
+      (double)bounds.getMaxY()+1);  
+  }
 
 
-  void	draw_line_strip(const void* coords, int vertex_count, const rgba color)
-	// Draw the line strip formed by the sequence of points.
-	{
-	  assert(m_pixf != NULL);
-	  
-	  if ( _clipbounds.size()==0 ) return;
+  void  draw_line_strip(const void* coords, int vertex_count, const rgba color)
+  // Draw the line strip formed by the sequence of points.
+  {
+    assert(m_pixf != NULL);
+    
+    if ( _clipbounds.size()==0 ) return;
 
     point pnt;
     
@@ -753,65 +753,65 @@ public:
     
     typedef agg::rasterizer_scanline_aa<> ras_type;
 
-  	ras_type ras;
-  	agg::scanline_p8 sl;
-  	agg::renderer_scanline_aa_solid<
-    	agg::renderer_base<PixelFormat> > ren_sl(rbase);
-    	
-		for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
-		
-			const geometry::Range2d<int>& bounds = _clipbounds[cno];
-						
-			apply_clip_box<ras_type> (ras, bounds);
-			   	
-	    agg::path_storage path;
-	    agg::conv_stroke<agg::path_storage> stroke(path);
-	    stroke.width(1);
-	    stroke.line_cap(agg::round_cap);
-	    stroke.line_join(agg::round_join);
-	    path.remove_all(); // Not obligatory in this case
-	
-	    const int16_t *vertex = static_cast<const int16_t*>(coords);
-	    
-	    m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
-	  	path.move_to(pnt.m_x * xscale, pnt.m_y * yscale);
-	
-	    for (vertex += 2;  vertex_count > 1;  vertex_count--, vertex += 2) {
-	      m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
-	    	path.line_to(pnt.m_x * xscale, pnt.m_y * yscale);
-	    }
-			// The vectorial pipeline
-	  	ras.add_path(stroke);
-	
-	  	// Set the color and render the scanlines
-	  	ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
-	
-  	
-	  	agg::render_scanlines(ras, sl, ren_sl);
-	  }
+    ras_type ras;
+    agg::scanline_p8 sl;
+    agg::renderer_scanline_aa_solid<
+      agg::renderer_base<PixelFormat> > ren_sl(rbase);
+      
+    for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+    
+      const geometry::Range2d<int>& bounds = _clipbounds[cno];
+            
+      apply_clip_box<ras_type> (ras, bounds);
+          
+      agg::path_storage path;
+      agg::conv_stroke<agg::path_storage> stroke(path);
+      stroke.width(1);
+      stroke.line_cap(agg::round_cap);
+      stroke.line_join(agg::round_join);
+      path.remove_all(); // Not obligatory in this case
+  
+      const int16_t *vertex = static_cast<const int16_t*>(coords);
+      
+      m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
+      path.move_to(pnt.m_x * xscale, pnt.m_y * yscale);
+  
+      for (vertex += 2;  vertex_count > 1;  vertex_count--, vertex += 2) {
+        m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
+        path.line_to(pnt.m_x * xscale, pnt.m_y * yscale);
+      }
+      // The vectorial pipeline
+      ras.add_path(stroke);
+  
+      // Set the color and render the scanlines
+      ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
+  
+    
+      agg::render_scanlines(ras, sl, ren_sl);
+    }
 
-	} // draw_line_strip
+  } // draw_line_strip
 
 
-  void	draw_bitmap(
-	const gnash::matrix& /*m*/,
-	const gnash::bitmap_info* /*bi*/,
-	const gnash::rect& /*coords*/,
-	const gnash::rect& /*uv_coords*/,
-	gnash::rgba /*color*/)
-	// Draw a rectangle textured with the given bitmap, with the
-	// given color.	 Apply given transform; ignore any currently
-	// set transforms.
-	//
-	// Intended for textured glyph rendering.
-	{
+  void  draw_bitmap(
+  const gnash::matrix& /*m*/,
+  const gnash::bitmap_info* /*bi*/,
+  const gnash::rect& /*coords*/,
+  const gnash::rect& /*uv_coords*/,
+  gnash::rgba /*color*/)
+  // Draw a rectangle textured with the given bitmap, with the
+  // given color.  Apply given transform; ignore any currently
+  // set transforms.
+  //
+  // Intended for textured glyph rendering.
+  {
     log_msg("  draw_bitmap NOT IMPLEMENTED\n");
     // could be implemented, but is not used
-	}
+  }
 
   void begin_submit_mask()
-	{
-	  // Set flag so that rendering of shapes is simplified (only solid fill) 
+  {
+    // Set flag so that rendering of shapes is simplified (only solid fill) 
     m_drawing_mask = true;
     
     agg_alpha_mask* new_mask = new agg_alpha_mask(xres, yres);
@@ -821,20 +821,20 @@ public:
     
     m_alpha_mask.push_back(new_mask);
     
-	}
+  }
 
   void end_submit_mask()
-	{
+  {
     m_drawing_mask = false;
-	}
+  }
 
   void disable_mask()
-	{
-	    assert( ! m_alpha_mask.empty() );
-	    delete m_alpha_mask.back();
-	    m_alpha_mask.pop_back();
-	}
-	
+  {
+      assert( ! m_alpha_mask.empty() );
+      delete m_alpha_mask.back();
+      m_alpha_mask.pop_back();
+  }
+  
 
 
 
@@ -870,9 +870,9 @@ public:
       
     // draw the shape
     if (m_drawing_mask)
-			draw_mask_shape(paths, false);
+      draw_mask_shape(paths, false);
     else
-			draw_shape(-1, paths, agg_paths, sh, false);
+      draw_shape(-1, paths, agg_paths, sh, false);
     
     // NOTE: Do not use even-odd filling rule for glyphs!
     
@@ -881,68 +881,68 @@ public:
   }
 
 
-	/// Fills _clipbounds_selected with pointers to _clipbounds members who
-	/// intersect with the given character (transformed by mat). This avoids
-	/// rendering of characters outside a particular clipping range.
-	/// "_clipbounds_selected" is used by draw_shape() and draw_outline() and
-	/// *must* be initialized prior to using those function.
-	void select_clipbounds(const shape_character_def *def, const matrix& mat) {
-	
-		_clipbounds_selected.clear();
-		_clipbounds_selected.reserve(_clipbounds.size());
-		
-		rect ch_bounds = def->get_bound();
+  /// Fills _clipbounds_selected with pointers to _clipbounds members who
+  /// intersect with the given character (transformed by mat). This avoids
+  /// rendering of characters outside a particular clipping range.
+  /// "_clipbounds_selected" is used by draw_shape() and draw_outline() and
+  /// *must* be initialized prior to using those function.
+  void select_clipbounds(const shape_character_def *def, const matrix& mat) {
+  
+    _clipbounds_selected.clear();
+    _clipbounds_selected.reserve(_clipbounds.size());
+    
+    rect ch_bounds = def->get_bound();
 
-		if (ch_bounds.is_null()) {
-			log_msg("warning: select_clipbounds encountered a character definition "
-				"with null bounds");
-			return;
-		}		
+    if (ch_bounds.is_null()) {
+      log_msg("warning: select_clipbounds encountered a character definition "
+        "with null bounds");
+      return;
+    }   
 
-		rect bounds;		
-		bounds.set_null();
-		bounds.expand_to_transformed_rect(mat, ch_bounds);
-		bounds.scale_x(xscale);
-		bounds.scale_y(yscale);
-		
-		const geometry::Range2d<float>& range_float = bounds.getRange();
-		
-		assert(range_float.isFinite());
-		
-		geometry::Range2d<int> range_int(
-		  (int) range_float.getMinX(),
-		  (int) range_float.getMinY(),
-		  (int) range_float.getMaxX(),
-		  (int) range_float.getMaxY()
-		);
-		
-		
-		int count = _clipbounds.size();
-		for (int cno=0; cno<count; cno++) {
-					
-			if (_clipbounds[cno].intersects(bounds.getRange())) 
-				_clipbounds_selected.push_back(&_clipbounds[cno]);
+    rect bounds;    
+    bounds.set_null();
+    bounds.expand_to_transformed_rect(mat, ch_bounds);
+    bounds.scale_x(xscale);
+    bounds.scale_y(yscale);
+    
+    const geometry::Range2d<float>& range_float = bounds.getRange();
+    
+    assert(range_float.isFinite());
+    
+    geometry::Range2d<int> range_int(
+      (int) range_float.getMinX(),
+      (int) range_float.getMinY(),
+      (int) range_float.getMaxX(),
+      (int) range_float.getMaxY()
+    );
+    
+    
+    int count = _clipbounds.size();
+    for (int cno=0; cno<count; cno++) {
+          
+      if (_clipbounds[cno].intersects(bounds.getRange())) 
+        _clipbounds_selected.push_back(&_clipbounds[cno]);
 
-		}
-	
-		/*	
-		printf("Selected %d out of %d bounds.\n", _clipbounds_selected.size(),
-			_clipbounds.size());
-		*/
-	}
-	
-	void select_all_clipbounds() {
-	
-		if (_clipbounds_selected.size() == _clipbounds.size()) 
-			return; // already all selected
-	
-		_clipbounds_selected.clear();
-		_clipbounds_selected.resize(_clipbounds.size());
-		
-		int count = _clipbounds.size();
-		for (int cno=0; cno<count; cno++) 
-			_clipbounds_selected[cno] = &_clipbounds[cno];
-	}
+    }
+  
+    /*  
+    printf("Selected %d out of %d bounds.\n", _clipbounds_selected.size(),
+      _clipbounds.size());
+    */
+  }
+  
+  void select_all_clipbounds() {
+  
+    if (_clipbounds_selected.size() == _clipbounds.size()) 
+      return; // already all selected
+  
+    _clipbounds_selected.clear();
+    _clipbounds_selected.resize(_clipbounds.size());
+    
+    int count = _clipbounds.size();
+    for (int cno=0; cno<count; cno++) 
+      _clipbounds_selected[cno] = &_clipbounds[cno];
+  }
 
   void draw_shape_character(shape_character_def *def, 
     const matrix& mat,
@@ -956,22 +956,22 @@ public:
     analyze_paths(def->get_paths(), have_shape, have_outline);
 
     if (!have_shape && !have_outline) 
-			return; // invisible character
+      return; // invisible character
 
     std::vector< path > paths;
     std::vector< agg::path_storage > agg_paths;
     std::vector< agg::path_storage > agg_paths_rounded;
     apply_matrix_to_path(def->get_paths(), paths, mat);
     if (have_shape)
-    	build_agg_paths(agg_paths, paths);
-    	
+      build_agg_paths(agg_paths, paths);
+      
     // <Udo>: not sure if the anchor points of the *shape* edges should be
     // rounded too...
     
     if (have_outline) {
-	    agg_paths_rounded.reserve(agg_paths.size());
-	    build_agg_paths_rounded(agg_paths_rounded, paths);
-	  }
+      agg_paths_rounded.reserve(agg_paths.size());
+      build_agg_paths_rounded(agg_paths_rounded, paths);
+    }
     
     if (m_drawing_mask) {
       
@@ -980,33 +980,33 @@ public:
     
     } else {
     
-    	// select ranges
-    	select_clipbounds(def, mat);
-    	
-    	if (_clipbounds_selected.empty()) {
-	    	log_msg("warning: AGG renderer skipping a whole character");
-	    	return; // nothing to draw!?
-			}
+      // select ranges
+      select_clipbounds(def, mat);
+      
+      if (_clipbounds_selected.empty()) {
+        log_msg("warning: AGG renderer skipping a whole character");
+        return; // nothing to draw!?
+      }
     
-    	// prepare fill styles
-    	agg_style_handler sh;
-    	if (have_shape)
-    		build_agg_styles(sh, fill_styles, mat, cx);
-    	
-    	/*
-    	// prepare strokes
-    	std::vector<stroke_type*> strokes;
-    	build_agg_strokes(strokes, agg_paths, paths, line_styles, mat);
-    	*/
+      // prepare fill styles
+      agg_style_handler sh;
+      if (have_shape)
+        build_agg_styles(sh, fill_styles, mat, cx);
+      
+      /*
+      // prepare strokes
+      std::vector<stroke_type*> strokes;
+      build_agg_strokes(strokes, agg_paths, paths, line_styles, mat);
+      */
       
       // We need to separate sub-shapes during rendering. 
       const int subshape_count=count_sub_shapes(paths);
       
       for (int subshape=0; subshape<subshape_count; subshape++) {
-				if (have_shape)
-        	draw_shape(subshape, paths, agg_paths, sh, true);    
-				if (have_outline)      
-        	draw_outlines(subshape, paths, agg_paths_rounded, line_styles, cx, mat);
+        if (have_shape)
+          draw_shape(subshape, paths, agg_paths, sh, true);    
+        if (have_outline)      
+          draw_outlines(subshape, paths, agg_paths_rounded, line_styles, cx, mat);
       }
       
     } // if not drawing mask
@@ -1018,33 +1018,33 @@ public:
   
   
   /// Analyzes a set of paths to detect real presence of fills and/or outlines
-	/// TODO: This should be something the character tells us and should be 
-	/// cached. 
+  /// TODO: This should be something the character tells us and should be 
+  /// cached. 
   void analyze_paths(const std::vector<path> &paths, bool& have_shape,
-		bool& have_outline) {
-		
-		have_shape=false;
-		have_outline=false;
-		
-		int pcount = paths.size();
-		
-		for (int pno=0; pno<pcount; pno++) {
-		
-			const path &the_path = paths[pno];
-		
-			if ((the_path.m_fill0>0) || (the_path.m_fill1>0)) {
-				have_shape=true;
-				if (have_outline) return; // have both
-			}
-		
-			if (the_path.m_line>0) {
-				have_outline=true;
-				if (have_shape) return; // have both
-			}
-		
-		}
-		
-	}
+    bool& have_outline) {
+    
+    have_shape=false;
+    have_outline=false;
+    
+    int pcount = paths.size();
+    
+    for (int pno=0; pno<pcount; pno++) {
+    
+      const path &the_path = paths[pno];
+    
+      if ((the_path.m_fill0>0) || (the_path.m_fill1>0)) {
+        have_shape=true;
+        if (have_outline) return; // have both
+      }
+    
+      if (the_path.m_line>0) {
+        have_outline=true;
+        if (have_shape) return; // have both
+      }
+    
+    }
+    
+  }
 
 
   /// Takes a path and translates it using the given matrix. The new path
@@ -1123,144 +1123,144 @@ public:
   
   /// Transposes Gnash paths to AGG paths, which can be used for both outlines
   /// and shapes. Subshapes are ignored (ie. all paths are converted). Converts 
-	/// TWIPS to pixels on the fly.
+  /// TWIPS to pixels on the fly.
   void build_agg_paths(std::vector<agg::path_storage>& dest, const std::vector<path>& paths) {
-	  
-	  int pcount = paths.size();
+    
+    int pcount = paths.size();
 
-		dest.resize(pcount);	  
-	  
-	  for (int pno=0; pno<pcount; pno++) {
-	  	
-	  	const gnash::path& this_path = paths[pno];
-			agg::path_storage& new_path = dest[pno];
-			
-			new_path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
-			
-			int ecount = this_path.m_edges.size();
-			
-			for (int eno=0; eno<ecount; eno++) {
-				
-				const edge& this_edge = this_path.m_edges[eno];
-				
+    dest.resize(pcount);    
+    
+    for (int pno=0; pno<pcount; pno++) {
+      
+      const gnash::path& this_path = paths[pno];
+      agg::path_storage& new_path = dest[pno];
+      
+      new_path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
+      
+      int ecount = this_path.m_edges.size();
+      
+      for (int eno=0; eno<ecount; eno++) {
+        
+        const edge& this_edge = this_path.m_edges[eno];
+        
         if (this_edge.is_straight())
           new_path.line_to(this_edge.m_ax*xscale, this_edge.m_ay*yscale);
         else
           new_path.curve3(this_edge.m_cx*xscale, this_edge.m_cy*yscale,
                       this_edge.m_ax*xscale, this_edge.m_ay*yscale);
-				
-				
-			}
-		
-		}
-	  
-	} //build_agg_paths
-	
-	
-	// Version of build_agg_paths that uses rounded coordinates.
-	// This is used for outlines which are aligned to the pixel grid to avoid
-	// anti-aliasing problems (a perfect horizontal line being drawn over two
-	// lines and looking blurry). The proprietary player does this too.  
-	// Remember the middle of a pixel is at .5 / .5 (at it's subpixel center).
-	//
-	// TODO:
-	// For "correct" results alignment should be done only in these cases:
-	//   - the line is straight and pure horizontal or vertical
-	//   - the line width on screen is 1.0
-	// However this leads to awful rounded rectangles, but the MM player 
-	// does it that way... :(
-	// BTW, most probably this is for speed reasons (those lines are most
-	// probably implemented without anti-aliasing calculations, like a 
-	// Bresenham line). 
-	void build_agg_paths_rounded(std::vector<agg::path_storage>& dest, 
-		const std::vector<path>& paths) {
-	
-	  
-	  int pcount = paths.size();
+        
+        
+      }
+    
+    }
+    
+  } //build_agg_paths
+  
+  
+  // Version of build_agg_paths that uses rounded coordinates.
+  // This is used for outlines which are aligned to the pixel grid to avoid
+  // anti-aliasing problems (a perfect horizontal line being drawn over two
+  // lines and looking blurry). The proprietary player does this too.  
+  // Remember the middle of a pixel is at .5 / .5 (at it's subpixel center).
+  //
+  // TODO:
+  // For "correct" results alignment should be done only in these cases:
+  //   - the line is straight and pure horizontal or vertical
+  //   - the line width on screen is 1.0
+  // However this leads to awful rounded rectangles, but the MM player 
+  // does it that way... :(
+  // BTW, most probably this is for speed reasons (those lines are most
+  // probably implemented without anti-aliasing calculations, like a 
+  // Bresenham line). 
+  void build_agg_paths_rounded(std::vector<agg::path_storage>& dest, 
+    const std::vector<path>& paths) {
+  
+    
+    int pcount = paths.size();
 
-		dest.resize(pcount);	  
-	  
-	  for (int pno=0; pno<pcount; pno++) {
-	  	
-	  	const gnash::path& this_path = paths[pno];
-			agg::path_storage& new_path = dest[pno];
-			
-			new_path.move_to(round(this_path.m_ax*xscale)+0.5f, 
-				round(this_path.m_ay*yscale)+0.5f);
-			
-			int ecount = this_path.m_edges.size();
-			
-			for (int eno=0; eno<ecount; eno++) {
-				
-				const edge& this_edge = this_path.m_edges[eno];
-				
+    dest.resize(pcount);    
+    
+    for (int pno=0; pno<pcount; pno++) {
+      
+      const gnash::path& this_path = paths[pno];
+      agg::path_storage& new_path = dest[pno];
+      
+      new_path.move_to(round(this_path.m_ax*xscale)+0.5f, 
+        round(this_path.m_ay*yscale)+0.5f);
+      
+      int ecount = this_path.m_edges.size();
+      
+      for (int eno=0; eno<ecount; eno++) {
+        
+        const edge& this_edge = this_path.m_edges[eno];
+        
         if (this_edge.is_straight())
           new_path.line_to(round(this_edge.m_ax*xscale)+0.5f, 
-						round(this_edge.m_ay*yscale)+0.5f);
+            round(this_edge.m_ay*yscale)+0.5f);
         else
           new_path.curve3(round(this_edge.m_cx*xscale)+0.5f, 
-						round(this_edge.m_cy*yscale)+0.5f,
+            round(this_edge.m_cy*yscale)+0.5f,
             round(this_edge.m_ax*xscale)+0.5f, 
-						round(this_edge.m_ay*yscale)+0.5f);
-				
-				
-			}
-		
-		}
-	  		
-	} //build_agg_paths_rounded
-	
-	
-	// Builds vector strokes for paths
-	// WARNING 1 : This is not used and will probably be removed soon.
-	// WARNING 2 : Strokes vector returns pointers which are never freed.
-	void build_agg_strokes(std::vector<stroke_type*>& dest, 
-	  std::vector<agg::path_storage>& agg_paths,
-	  const std::vector<path> &paths,
-		const std::vector<line_style> &line_styles,
-		const matrix& linestyle_matrix) {
-		
-		assert(0); // should not be used currently
-	  
-	  int pcount=paths.size(); 
-	  dest.resize(pcount);
-	  
+            round(this_edge.m_ay*yscale)+0.5f);
+        
+        
+      }
+    
+    }
+        
+  } //build_agg_paths_rounded
+  
+  
+  // Builds vector strokes for paths
+  // WARNING 1 : This is not used and will probably be removed soon.
+  // WARNING 2 : Strokes vector returns pointers which are never freed.
+  void build_agg_strokes(std::vector<stroke_type*>& dest, 
+    std::vector<agg::path_storage>& agg_paths,
+    const std::vector<path> &paths,
+    const std::vector<line_style> &line_styles,
+    const matrix& linestyle_matrix) {
+    
+    assert(0); // should not be used currently
+    
+    int pcount=paths.size(); 
+    dest.resize(pcount);
+    
     // use avg between x and y scale
     const float stroke_scale = 
       (linestyle_matrix.get_x_scale() + linestyle_matrix.get_y_scale()) / 2.0f
-      * (xscale+yscale)/2.0f;	  
-	  
-	  for (int pno=0; pno<pcount; pno++) {
-	  	  	
-	  	agg::conv_curve<agg::path_storage> curve(agg_paths[pno]);
-	  	stroke_type* this_stroke = new stroke_type(curve);
-	  	
-	  	const gnash::path &this_path_gnash = paths[pno];
-			 
+      * (xscale+yscale)/2.0f;   
+    
+    for (int pno=0; pno<pcount; pno++) {
+          
+      agg::conv_curve<agg::path_storage> curve(agg_paths[pno]);
+      stroke_type* this_stroke = new stroke_type(curve);
+      
+      const gnash::path &this_path_gnash = paths[pno];
+       
       const line_style& lstyle = line_styles[this_path_gnash.m_line-1];
-	        
+          
       int width = lstyle.get_width();
       if (width==1)
         this_stroke->width(1);
       else
         this_stroke->width(width*stroke_scale);
-			 
-			this_stroke->attach(curve);
-			this_stroke->line_cap(agg::round_cap);
-			this_stroke->line_join(agg::round_join);
-			
-			dest[pno] = this_stroke;
-		
-		}
-	  
-	}
-	
-	// Initializes the internal styles class for AGG renderer
-	void build_agg_styles(agg_style_handler& sh, 
-	  const std::vector<fill_style>& fill_styles,
-		const matrix& fillstyle_matrix,
-		const cxform& cx) {
-	  
+       
+      this_stroke->attach(curve);
+      this_stroke->line_cap(agg::round_cap);
+      this_stroke->line_join(agg::round_join);
+      
+      dest[pno] = this_stroke;
+    
+    }
+    
+  }
+  
+  // Initializes the internal styles class for AGG renderer
+  void build_agg_styles(agg_style_handler& sh, 
+    const std::vector<fill_style>& fill_styles,
+    const matrix& fillstyle_matrix,
+    const cxform& cx) {
+    
     int fcount = fill_styles.size();
     for (int fno=0; fno<fcount; fno++) {
     
@@ -1325,8 +1325,8 @@ public:
       } // switch
         
     } // for
-	  
-	} //build_agg_styles
+    
+  } //build_agg_styles
   
 
   /// Draws the given path using the given fill style and color transform.
@@ -1335,9 +1335,9 @@ public:
   /// Note the paths have already been transformed by the matrix and 
   /// 'subshape_id' defines which sub-shape should be drawn (-1 means all 
   /// subshapes).
-	/// Note the *coordinates* in "paths" are not used because they are 
-	/// already prepared in agg_paths. The (nearly ambiguous) "path" parameter
-	/// is used to access other properties like fill styles and subshapes.   
+  /// Note the *coordinates* in "paths" are not used because they are 
+  /// already prepared in agg_paths. The (nearly ambiguous) "path" parameter
+  /// is used to access other properties like fill styles and subshapes.   
   void draw_shape(int subshape_id, const std::vector<path> &paths,
     const std::vector<agg::path_storage>& agg_paths,  
     agg_style_handler& sh, int even_odd) {
@@ -1351,7 +1351,7 @@ public:
       scanline_type sl;
       
       draw_shape_impl<scanline_type> (subshape_id, paths, agg_paths, 
-			  sh, even_odd, sl);
+        sh, even_odd, sl);
         
     } else {
     
@@ -1362,7 +1362,7 @@ public:
       scanline_type sl(m_alpha_mask.back()->get_amask());
       
       draw_shape_impl<scanline_type> (subshape_id, paths, agg_paths, 
-			  sh, even_odd, sl);
+        sh, even_odd, sl);
         
     }
     
@@ -1373,7 +1373,7 @@ public:
   /// much faster.  
   template <class scanline_type>
   void draw_shape_impl(int subshape_id, const std::vector<path> &paths,
-  	const std::vector<agg::path_storage>& agg_paths,
+    const std::vector<agg::path_storage>& agg_paths,
     agg_style_handler& sh, int even_odd, scanline_type& sl) {
     /*
     Fortunately, AGG provides a rasterizer that fits perfectly to the flash
@@ -1384,11 +1384,11 @@ public:
     Thank to Maxim Shemanarev for providing us such a great tool with AGG...
     */
     
-	  assert(m_pixf != NULL);
-	  
-	  assert(!m_drawing_mask);
-	  
-	  if ( _clipbounds.size()==0 ) return;
+    assert(m_pixf != NULL);
+    
+    assert(!m_drawing_mask);
+    
+    if ( _clipbounds.size()==0 ) return;
 
     // Gnash stuff 
     int pno;
@@ -1410,53 +1410,53 @@ public:
       rasc.filling_rule(agg::fill_non_zero);
       
     
-		for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
-		
-			const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
-			
-			apply_clip_box<ras_type> (rasc, *bounds);
-			
-			int current_subshape=0;
-	      
-	    // push paths to AGG
-	    pcount = paths.size();
-	
-	    for (pno=0; pno<pcount; pno++) {
-	    
-	    	const gnash::path &this_path_gnash = paths[pno];
-	      agg::path_storage &this_path_agg = 
-				  const_cast<agg::path_storage&>(agg_paths[pno]);
-	      agg::conv_curve< agg::path_storage > curve(this_path_agg);	      
-	    	
-	    	if (this_path_gnash.m_new_shape)
-	    		current_subshape++;
-	    		
-	    	if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
-	    		// Skip this path as it is not part of the requested sub-shape.
-	    		continue;
-				}
-				
-				if ((this_path_gnash.m_fill0==0) && (this_path_gnash.m_fill1==0)) {
-				  // Skip this path as it contains no fill style
-				  continue;
-				} 
-	    		      
-	      
-	      // Tell the rasterizer which styles the following path will use.
-	      // The good thing is, that it already supports two fill styles out of
-	      // the box. 
-	      // Flash uses value "0" for "no fill", whereas AGG uses "-1" for that. 
-	      rasc.styles(this_path_gnash.m_fill0-1, this_path_gnash.m_fill1-1);
-	      	      
-	      // add path to the compound rasterizer
-	      rasc.add_path(curve);
-	    
-	    }
-	    //log_msg("%d edges\n", edge_count);
-	    
-				    	
-	    agg::render_scanlines_compound_layered(rasc, sl, rbase, alloc, sh);
-	  }
+    for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
+    
+      const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
+      
+      apply_clip_box<ras_type> (rasc, *bounds);
+      
+      int current_subshape=0;
+        
+      // push paths to AGG
+      pcount = paths.size();
+  
+      for (pno=0; pno<pcount; pno++) {
+      
+        const gnash::path &this_path_gnash = paths[pno];
+        agg::path_storage &this_path_agg = 
+          const_cast<agg::path_storage&>(agg_paths[pno]);
+        agg::conv_curve< agg::path_storage > curve(this_path_agg);        
+        
+        if (this_path_gnash.m_new_shape)
+          current_subshape++;
+          
+        if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
+          // Skip this path as it is not part of the requested sub-shape.
+          continue;
+        }
+        
+        if ((this_path_gnash.m_fill0==0) && (this_path_gnash.m_fill1==0)) {
+          // Skip this path as it contains no fill style
+          continue;
+        } 
+                
+        
+        // Tell the rasterizer which styles the following path will use.
+        // The good thing is, that it already supports two fill styles out of
+        // the box. 
+        // Flash uses value "0" for "no fill", whereas AGG uses "-1" for that. 
+        rasc.styles(this_path_gnash.m_fill0-1, this_path_gnash.m_fill1-1);
+                
+        // add path to the compound rasterizer
+        rasc.add_path(curve);
+      
+      }
+      //log_msg("%d edges\n", edge_count);
+      
+              
+      agg::render_scanlines_compound_layered(rasc, sl, rbase, alloc, sh);
+    }
     
   } // draw_shape_impl
 
@@ -1582,7 +1582,7 @@ public:
 
   /// Just like draw_shapes() except that it draws an outline.
   void draw_outlines(int subshape_id, const std::vector<path> &paths,
-  	const std::vector<agg::path_storage>& agg_paths,
+    const std::vector<agg::path_storage>& agg_paths,
     const std::vector<line_style> &line_styles, const cxform& cx,
     const matrix& linestyle_matrix) {
     
@@ -1595,7 +1595,7 @@ public:
       scanline_type sl;
       
       draw_outlines_impl<scanline_type> (subshape_id, paths, agg_paths, 
-			  line_styles, cx, linestyle_matrix, sl);
+        line_styles, cx, linestyle_matrix, sl);
         
     } else {
     
@@ -1606,7 +1606,7 @@ public:
       scanline_type sl(m_alpha_mask.back()->get_amask());
       
       draw_outlines_impl<scanline_type> (subshape_id, paths, agg_paths,
-			  line_styles, cx, linestyle_matrix, sl);
+        line_styles, cx, linestyle_matrix, sl);
         
     }
     
@@ -1620,9 +1620,9 @@ public:
     const std::vector<line_style> &line_styles, const cxform& cx, 
     const matrix& linestyle_matrix, scanline_type& sl) {
     
-	  assert(m_pixf != NULL);
-	  
-	  if (m_drawing_mask)    // Flash ignores lines in mask /definitions/
+    assert(m_pixf != NULL);
+    
+    if (m_drawing_mask)    // Flash ignores lines in mask /definitions/
       return;    
     
     if ( _clipbounds.size()==0 ) return;
@@ -1648,59 +1648,59 @@ public:
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase); // solid fills
       
-		
-		for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
-		
-			const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
-			   	
-			apply_clip_box<ras_type> (ras, *bounds);
-			
-			int current_subshape=0;
+    
+    for (unsigned int cno=0; cno<_clipbounds_selected.size(); cno++) {
+    
+      const geometry::Range2d<int>* bounds = _clipbounds_selected[cno];
+          
+      apply_clip_box<ras_type> (ras, *bounds);
+      
+      int current_subshape=0;
 
-	    pcount = paths.size();   
-	    for (pno=0; pno<pcount; pno++) {
-	      
-	      const gnash::path& this_path_gnash = paths[pno];
-	      agg::path_storage &this_path_agg = 
-				  const_cast<agg::path_storage&>(agg_paths[pno]);
-	      
-	    	if (this_path_gnash.m_new_shape)
-	    		current_subshape++;
-	    		
-	    	if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
-	    		// Skip this path as it is not part of the requested sub-shape.
-	    		continue;
-				}
-				
-				if (this_path_gnash.m_line==0) {
-				  // Skip this path as it contains no line style
-				  continue;
-				} 
-	      
-	      agg::conv_curve< agg::path_storage > curve(this_path_agg); // to render curves
-		    agg::conv_stroke< agg::conv_curve < agg::path_storage > > 
-		      stroke(curve);  // to get an outline
-	      
-	      const line_style& lstyle = line_styles[this_path_gnash.m_line-1];
-		      
-	      int width = lstyle.get_width();
-	      if (width==1)
-	        stroke.width(1);
-	      else
-	        stroke.width(std::max(1.0f, width*stroke_scale));
-	        
-	      stroke.line_cap(agg::round_cap);	      
-	      stroke.line_join(agg::round_join); 
-	      	      
-	      ras.reset();
-	      ras.add_path(stroke);
-	      
-	      rgba color = cx.transform(lstyle.get_color());
-	      ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));	      
-					    	
-	      agg::render_scanlines(ras, sl, ren_sl);
-	      
-	    }
+      pcount = paths.size();   
+      for (pno=0; pno<pcount; pno++) {
+        
+        const gnash::path& this_path_gnash = paths[pno];
+        agg::path_storage &this_path_agg = 
+          const_cast<agg::path_storage&>(agg_paths[pno]);
+        
+        if (this_path_gnash.m_new_shape)
+          current_subshape++;
+          
+        if ((subshape_id>=0) && (current_subshape!=subshape_id)) {
+          // Skip this path as it is not part of the requested sub-shape.
+          continue;
+        }
+        
+        if (this_path_gnash.m_line==0) {
+          // Skip this path as it contains no line style
+          continue;
+        } 
+        
+        agg::conv_curve< agg::path_storage > curve(this_path_agg); // to render curves
+        agg::conv_stroke< agg::conv_curve < agg::path_storage > > 
+          stroke(curve);  // to get an outline
+        
+        const line_style& lstyle = line_styles[this_path_gnash.m_line-1];
+          
+        int width = lstyle.get_width();
+        if (width==1)
+          stroke.width(1);
+        else
+          stroke.width(std::max(1.0f, width*stroke_scale));
+          
+        stroke.line_cap(agg::round_cap);        
+        stroke.line_join(agg::round_join); 
+                
+        ras.reset();
+        ras.add_path(stroke);
+        
+        rgba color = cx.transform(lstyle.get_color());
+        ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));       
+                
+        agg::render_scanlines(ras, sl, ren_sl);
+        
+      }
     
     
     }
@@ -1713,7 +1713,7 @@ public:
   void  draw_poly(const point* corners, size_t corner_count, const rgba fill, 
     const rgba outline) {
     
-	  assert(m_pixf != NULL);
+    assert(m_pixf != NULL);
 
     if (corner_count<1) return;
     
@@ -1728,69 +1728,69 @@ public:
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase);
 
-		for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
-		
-			const geometry::Range2d<int>& bounds = _clipbounds[cno];
-			   
-			apply_clip_box<ras_type> (ras, bounds);	
+    for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+    
+      const geometry::Range2d<int>& bounds = _clipbounds[cno];
+         
+      apply_clip_box<ras_type> (ras, bounds); 
 
-	        // TODO: what do do if _clipbox.isNull() or _clipbox.isWorld() ?
-		//       currently an assertion will fail when get{Min,Max}{X,Y}
-		//       are called below
-	
-	    agg::path_storage path;
-	    point pnt, origin;
-	    
-	    // Note: The coordinates are rounded and 0.5 is added to snap them to the 
-	    // center of the pixel. This avoids blurring caused by anti-aliasing.
-	    
-	    m_current_matrix.transform(&origin, 
-	      point(trunc(corners[0].m_x), trunc(corners[0].m_y)));
-	    path.move_to(trunc(origin.m_x*xscale)+0.5, trunc(origin.m_y*yscale)+0.5);
-	    
-	    for (unsigned int i=1; i<corner_count; i++) {
-	    
-	      m_current_matrix.transform(&pnt, point(corners[i].m_x, corners[i].m_y));
-	        
-	      path.line_to(trunc(pnt.m_x*xscale)+0.5, trunc(pnt.m_y*yscale)+0.5);
-	    }
-	    
-	    // close polygon
-	    path.line_to(trunc(origin.m_x*xscale)+0.5, trunc(origin.m_y*yscale)+0.5);
-	    
-	    // fill polygon
-	    if (fill.m_a>0) {
-	      ras.add_path(path);
-	      ren_sl.color(agg::rgba8_pre(fill.m_r, fill.m_g, fill.m_b, fill.m_a));
-	      
-	      agg::render_scanlines(ras, sl, ren_sl);
-	    }
-	    
-	    // draw outline
-	    if (outline.m_a>0) {
-	      agg::conv_stroke<agg::path_storage> stroke(path);
-	      
-	      stroke.width(1);
-	      
-	      ren_sl.color(agg::rgba8_pre(outline.m_r, outline.m_g, outline.m_b, outline.m_a));
-	      
-	      ras.add_path(stroke);
-	      
-				agg::render_scanlines(ras, sl, ren_sl);
-			}
+          // TODO: what do do if _clipbox.isNull() or _clipbox.isWorld() ?
+    //       currently an assertion will fail when get{Min,Max}{X,Y}
+    //       are called below
+  
+      agg::path_storage path;
+      point pnt, origin;
+      
+      // Note: The coordinates are rounded and 0.5 is added to snap them to the 
+      // center of the pixel. This avoids blurring caused by anti-aliasing.
+      
+      m_current_matrix.transform(&origin, 
+        point(trunc(corners[0].m_x), trunc(corners[0].m_y)));
+      path.move_to(trunc(origin.m_x*xscale)+0.5, trunc(origin.m_y*yscale)+0.5);
+      
+      for (unsigned int i=1; i<corner_count; i++) {
+      
+        m_current_matrix.transform(&pnt, point(corners[i].m_x, corners[i].m_y));
+          
+        path.line_to(trunc(pnt.m_x*xscale)+0.5, trunc(pnt.m_y*yscale)+0.5);
+      }
+      
+      // close polygon
+      path.line_to(trunc(origin.m_x*xscale)+0.5, trunc(origin.m_y*yscale)+0.5);
+      
+      // fill polygon
+      if (fill.m_a>0) {
+        ras.add_path(path);
+        ren_sl.color(agg::rgba8_pre(fill.m_r, fill.m_g, fill.m_b, fill.m_a));
+        
+        agg::render_scanlines(ras, sl, ren_sl);
+      }
+      
+      // draw outline
+      if (outline.m_a>0) {
+        agg::conv_stroke<agg::path_storage> stroke(path);
+        
+        stroke.width(1);
+        
+        ren_sl.color(agg::rgba8_pre(outline.m_r, outline.m_g, outline.m_b, outline.m_a));
+        
+        ras.add_path(stroke);
+        
+        agg::render_scanlines(ras, sl, ren_sl);
+      }
     }
     
   }
                       
   
   inline void world_to_pixel(int& x, int& y,
-	  float world_x, float world_y)
+    float world_x, float world_y)
   {
         // negative pixels seems ok here... we don't 
-	// clip to valid range, use world_to_pixel(rect&)
-	// and Intersect() against valid range instead.
-	x = (int)(world_x * xscale);
-	y = (int)(world_y * yscale);
+  // clip to valid range, use world_to_pixel(rect&)
+  // and Intersect() against valid range instead.
+  x = (int)(world_x * xscale);
+  y = (int)(world_y * yscale);
   }
 
   geometry::Range2d<int> world_to_pixel(const rect& wb)
@@ -1810,70 +1810,70 @@ public:
   
   geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& wb)
   {
-  	if (wb.isNull() || wb.isWorld()) return wb;
-  	
-  	int xmin, ymin, xmax, ymax;
+    if (wb.isNull() || wb.isWorld()) return wb;
+    
+    int xmin, ymin, xmax, ymax;
 
     world_to_pixel(xmin, ymin, wb.getMinX(), wb.getMinY());
     world_to_pixel(xmax, ymax, wb.getMaxX(), wb.getMaxY());
 
     return geometry::Range2d<int>(xmin, ymin, xmax, ymax);
-	}
+  }
   
-	virtual void set_invalidated_region(const rect& bounds) {
-	
-		// NOTE: Both single and multi ranges are supported by AGG renderer.
-		
-		InvalidatedRanges ranges;
-		ranges.add(bounds.getRange());
-		set_invalidated_regions(ranges);
+  virtual void set_invalidated_region(const rect& bounds) {
+  
+    // NOTE: Both single and multi ranges are supported by AGG renderer.
+    
+    InvalidatedRanges ranges;
+    ranges.add(bounds.getRange());
+    set_invalidated_regions(ranges);
   
   }
-	  
-	virtual void set_invalidated_regions(const InvalidatedRanges& ranges) {
-		using gnash::geometry::Range2d;
-		
-		int count=0;
+    
+  virtual void set_invalidated_regions(const InvalidatedRanges& ranges) {
+    using gnash::geometry::Range2d;
+    
+    int count=0;
 
-		_clipbounds_selected.clear();
-		_clipbounds.clear();    
+    _clipbounds_selected.clear();
+    _clipbounds.clear();    
 
     // TODO: cache 'visiblerect' and maintain in sync with
     //       xres/yres.
     Range2d<int> visiblerect(0, 0, xres-1, yres-1);
-		
-		for (int rno=0; rno<ranges.size(); rno++) {
-		
-			const Range2d<float>& range = ranges.getRange(rno);
+    
+    for (int rno=0; rno<ranges.size(); rno++) {
+    
+      const Range2d<float>& range = ranges.getRange(rno);
 
-	    Range2d<int> pixbounds = world_to_pixel(range);
-	    
-	    geometry::Range2d<int> bounds = Intersection(pixbounds, visiblerect);
-	    
-	    if (bounds.isNull()) continue; // out of screen
-	    
-	    assert(bounds.isFinite());
-	    
-	    _clipbounds.push_back(bounds);
-	    
-	    count++;
-	  }
-	  //log_msg("%d inv. bounds in frame", count);
-	  
-	}
+      Range2d<int> pixbounds = world_to_pixel(range);
+      
+      geometry::Range2d<int> bounds = Intersection(pixbounds, visiblerect);
+      
+      if (bounds.isNull()) continue; // out of screen
+      
+      assert(bounds.isFinite());
+      
+      _clipbounds.push_back(bounds);
+      
+      count++;
+    }
+    //log_msg("%d inv. bounds in frame", count);
+    
+  }
   
   
   virtual bool bounds_in_clipping_area(const geometry::Range2d<float>& bounds) {    
     
-		using gnash::geometry::Range2d;
-	
-		Range2d<int> pixbounds = world_to_pixel(bounds);
-		
-		for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {  
-			if (Intersect(pixbounds, _clipbounds[cno]))
-				return true;
-		}
-		return false;
+    using gnash::geometry::Range2d;
+  
+    Range2d<int> pixbounds = world_to_pixel(bounds);
+    
+    for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {  
+      if (Intersect(pixbounds, _clipbounds[cno]))
+        return true;
+    }
+    return false;
   }
 
   bool getPixel(rgba& color_return, int x, int y) {
@@ -1929,56 +1929,56 @@ private:  // private variables
   
   // Alpha mask stack
   std::vector< agg_alpha_mask* > m_alpha_mask;
-};	// end class render_handler_agg
+};  // end class render_handler_agg
 
 
 
 
 // TODO: Replace "pixelformat" with a enum!
 
-DSOEXPORT render_handler_agg_base*	create_render_handler_agg(char *pixelformat)
+DSOEXPORT render_handler_agg_base*  create_render_handler_agg(char *pixelformat)
 {
 
   log_msg("framebuffer pixel format is %s", pixelformat);
   
 #ifdef PIXELFORMAT_RGB555  
   if (!strcmp(pixelformat, "RGB555"))
-	  return new render_handler_agg<agg::pixfmt_rgb555_pre> (16); // yep, 16!
-	
-	else
-#endif	 
+    return new render_handler_agg<agg::pixfmt_rgb555_pre> (16); // yep, 16!
+  
+  else
+#endif   
 #ifdef PIXELFORMAT_RGB565  
-	if (!strcmp(pixelformat, "RGB565") || !strcmp(pixelformat, "RGBA16"))
-	  return new render_handler_agg<agg::pixfmt_rgb565_pre> (16);	
-	else 
-#endif	 
+  if (!strcmp(pixelformat, "RGB565") || !strcmp(pixelformat, "RGBA16"))
+    return new render_handler_agg<agg::pixfmt_rgb565_pre> (16); 
+  else 
+#endif   
 #ifdef PIXELFORMAT_RGB24  
-	if (!strcmp(pixelformat, "RGB24"))
-	  return new render_handler_agg<agg::pixfmt_rgb24_pre> (24);		
-	else 
-#endif	 
+  if (!strcmp(pixelformat, "RGB24"))
+    return new render_handler_agg<agg::pixfmt_rgb24_pre> (24);    
+  else 
+#endif   
 #ifdef PIXELFORMAT_BGR24  
-	if (!strcmp(pixelformat, "BGR24"))
-	  return new render_handler_agg<agg::pixfmt_bgr24_pre> (24);
-	else 
-#endif	 
+  if (!strcmp(pixelformat, "BGR24"))
+    return new render_handler_agg<agg::pixfmt_bgr24_pre> (24);
+  else 
+#endif   
 #ifdef PIXELFORMAT_RGBA32 
   if (!strcmp(pixelformat, "RGBA32"))
-	  return new render_handler_agg<agg::pixfmt_rgba32_pre> (32);
-	else 
-#endif	 
+    return new render_handler_agg<agg::pixfmt_rgba32_pre> (32);
+  else 
+#endif   
 #ifdef PIXELFORMAT_BGRA32  
-	if (!strcmp(pixelformat, "BGRA32"))
-	  return new render_handler_agg<agg::pixfmt_bgra32_pre> (32);
-	  	  
-	else 
+  if (!strcmp(pixelformat, "BGRA32"))
+    return new render_handler_agg<agg::pixfmt_bgra32_pre> (32);
+        
+  else 
 #endif
-	{
-		log_error("Unknown pixelformat: %s\n", pixelformat);
-		assert(0);
-	}
-	
-	return NULL; // avoid compiler warning
+  {
+    log_error("Unknown pixelformat: %s\n", pixelformat);
+    assert(0);
+  }
+  
+  return NULL; // avoid compiler warning
 }
 
 } // end of namespace gnash
