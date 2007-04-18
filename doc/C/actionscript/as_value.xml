@@ -70,10 +70,6 @@
           about which methods are available for the
           <emphasis>as_value</emphasis> object.
         </para>
-        <para>
-          Note that the <emphasis>tu_string</emphasis> and related
-          methods are deprecated.
-        </para>
       </sect2>
 
     </sect1>

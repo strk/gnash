@@ -30,6 +30,8 @@
 	* server/swf/tag_loaders.cpp: Reformat bizarre indentation caused
 	  by someone editing with hard tabs set to 4.
 	* server/asobj/Date.cpp: Fix signed/unsigned compiler warning.
+	* libbase/container.h, doc/C/actionscript/as_value.xml:
+	  Expunge the last references to tu_string.
 
 2007-04-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
 

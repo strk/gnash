@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: container.h,v 1.54 2007/04/15 10:52:09 bjacques Exp $ */
+/* $Id: container.h,v 1.55 2007/04/18 17:39:15 martinwguy Exp $ */
 
 #ifndef __CONTAINER_H__
 #define __CONTAINER_H__
@@ -674,23 +674,6 @@ public:
 #endif	//GNUC
 
 } // namespace gnash
-
-// // tu_string is a subset of std::string, for the most part
-// class tu_string : public std::string
-// {
-// public:
-// 	tu_string(const char* str) : std::string(str) {}
-// 	tu_string() : std::string() {}
-// 	tu_string(const tu_string& str) : std::string(str) {}
-
-// 	int	length() const { return (int) std::string::length(); }
-// };
-
-
-// template<class U>
-// class string_hash : public hash<tu_string, U, std::hash<std::string> >
-// {
-// };
 
 
 //
