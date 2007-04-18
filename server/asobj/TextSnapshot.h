@@ -1,4 +1,4 @@
-// 
+//
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
@@ -34,7 +34,7 @@ void textsnapshot_class_init(as_object& global);
 
 /// Return a TextSnapshot instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_textsnapshot_instance();
-  
+
 } // end of gnash namespace
 
 // __GNASH_ASOBJ_TEXTSNAPSHOT_H__

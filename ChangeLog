@@ -180,6 +180,7 @@
 	  log_msg about initializing properties.
         * server/asobj/gen-asclass.{pl,sh}:  Use log_unimpl in generated code.
 	  Improve whitespace, and generate header line describing the file.
+	* server/asobj/TextSnapshot.cpp:  Fix whitespace to test gen-asclass.
 	* text_character_def.cpp:  Remove commented-out includes.
 	* FLVParser.{cpp,h}:  Fix compiler warning (signed/unsigned).
 	
