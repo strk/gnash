@@ -12,6 +12,9 @@
 2007-04-18 Martin Guy <martinwguy@yahoo.it>
 
 	* server/asobj/NetStreamFfmpeg.cpp: Fix compile-breaking typo.
+	* server/swf/tag_loaders.cpp: Reformat bizarre indentation caused
+	  by someone editing with hard tabs set to 4.
+	* server/asobj/Date.cpp: Fix signed/unsigned compiler warning.
 
 2007-04-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
 

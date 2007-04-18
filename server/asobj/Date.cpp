@@ -1289,7 +1289,7 @@ static as_value date_utc(const fn_call& fn) {
 // plus (or minus) infinity if positive (or negative) infinites are present,
 // NAN is there are NANs present, or a mixture of positive and negative infs.
 static double
-rogue_date_args(const fn_call& fn, int maxargs) {
+rogue_date_args(const fn_call& fn, unsigned maxargs) {
 	// Two flags: Did we find any +Infinity (or -Infinity) values in the
 	// argument list? If so, "infinity" must be set to the kind that we
 	// found.
