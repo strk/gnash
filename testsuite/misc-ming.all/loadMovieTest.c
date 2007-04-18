@@ -43,6 +43,12 @@
 #define OUTPUT_FILENAME "loadMovieTest.swf"
 
 void add_clip(SWFMovie mo, char* file, char* name, char* url, int x, int y);
+void add_button(SWFMovie mo, int x, int y, const char* label, SWFAction ac);
+void add_coverart(SWFMovie mo, int x, int y);
+SWFTextField get_label(const char* label, SWFFont font);
+
+
+const char* mediadir=".";
 
 void
 add_clip(SWFMovie mo, char* file, char* name,
@@ -51,7 +57,7 @@ add_clip(SWFMovie mo, char* file, char* name,
 	FILE *fd;
 	SWFJpegBitmap bm;
 	SWFShape sh;
-	SWFMovieClip mc, mct;
+	SWFMovieClip mc;
 	SWFDisplayItem it;
 	SWFAction ac;
 	char action[1024];
@@ -77,11 +83,62 @@ add_clip(SWFMovie mo, char* file, char* name,
 %s.onPress = function () { \
 	coverart.loadMovie('%s'); \
 }; \
-", name, url, url);
+", name, url);
 
 	ac = compileSWFActionCode(action);
 
 	SWFMovie_add(mo, (SWFBlock)ac);
+}
+
+void
+add_coverart(SWFMovie mo, int x, int y)
+{
+	SWFShape sh_coverart;
+	SWFFillStyle fstyle;
+	SWFMovieClip mc_coverart;
+	SWFDisplayItem it;
+
+	sh_coverart = newSWFShape();
+	fstyle = SWFShape_addSolidFillStyle(sh_coverart, 0,0,0,255);
+	SWFShape_setRightFillStyle(sh_coverart, fstyle);
+	SWFShape_movePenTo(sh_coverart, 170, 170);
+	SWFShape_drawLine(sh_coverart, -170, 0);
+	SWFShape_drawLine(sh_coverart, 0, -170);
+	SWFShape_drawLine(sh_coverart, 170, 0);
+	SWFShape_drawLine(sh_coverart, 0, 170);
+
+	mc_coverart = newSWFMovieClip();
+	SWFMovieClip_add(mc_coverart, (SWFBlock)sh_coverart);
+	SWFMovieClip_nextFrame(mc_coverart); /* showFrame */
+	it = SWFMovie_add(mo, (SWFBlock)mc_coverart);
+	SWFDisplayItem_setName(it, "coverart"); 
+	SWFDisplayItem_moveTo(it, x, y);
+}
+
+SWFTextField
+get_label(const char* label, SWFFont font)
+{
+	SWFTextField tf = newSWFTextField();
+	SWFTextField_setFont(tf, (void*)font);
+	SWFTextField_addChars(tf, " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345689:.,/\\#@?!");
+	SWFTextField_addString(tf, label);
+	return tf;
+}
+
+void
+add_button(SWFMovie mo, int x, int y, const char* label, SWFAction ac)
+{
+	SWFMovieClip btnclip = newSWFMovieClip();
+	SWFFont font = get_default_font(mediadir);
+	SWFDisplayItem it;
+	SWFTextField tf = get_label(label, font);
+
+	SWFMovieClip_add(btnclip, (SWFBlock)tf);
+	SWFMovieClip_nextFrame(btnclip);
+
+	it = SWFMovie_add(mo, (SWFBlock)btnclip);
+	SWFDisplayItem_moveTo(it, x, y);
+	SWFDisplayItem_addAction(it, ac, SWFACTION_PRESS);
 }
 
 int
@@ -95,12 +152,6 @@ main(int argc, char** argv)
 	char url_lynch[256];
 	char url_green[256];
 	char url_offspring[256];
-	const char *srcdir=".";
-	SWFShape sh_coverart;
-	SWFMovieClip mc_coverart;
-	SWFFillStyle fstyle;
-	SWFDisplayItem it;
-	SWFAction ac;
 
 	/*********************************************
 	 *
@@ -108,25 +159,25 @@ main(int argc, char** argv)
 	 *
 	 *********************************************/
 
-	if ( argc>1 ) srcdir=argv[1];
+	if ( argc>1 ) mediadir=argv[1];
 	else
 	{
 		fprintf(stderr, "Usage: %s <mediadir>\n", argv[0]);
 		return 1;
 	}
 
-	sprintf(file_lynch, "%s/lynch.jpg", srcdir);
-	sprintf(file_green, "%s/green.jpg", srcdir);
-	sprintf(file_offspring, "%s/offspring.jpg", srcdir);
+	sprintf(file_lynch, "%s/lynch.jpg", mediadir);
+	sprintf(file_green, "%s/green.jpg", mediadir);
+	sprintf(file_offspring, "%s/offspring.jpg", mediadir);
 
 	/*
 	 * Test both jpeg and swf loading.
 	 * NOTE: testing of urls with and w/out 'file://' prefix
 	 *       disabled to reduce test complexity.
 	 */
-	sprintf(url_lynch, "%s/lynch.swf", srcdir);
-	sprintf(url_green, "%s/green.jpg", srcdir);
-	sprintf(url_offspring, "%s/offspring.swf", srcdir);
+	sprintf(url_lynch, "%s/lynch.swf", mediadir);
+	sprintf(url_green, "%s/green.jpg", mediadir);
+	sprintf(url_offspring, "%s/offspring.swf", mediadir);
 
 
 	puts("Setting things up");
@@ -146,7 +197,7 @@ main(int argc, char** argv)
 	 *
 	 *****************************************************/
 
-	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
+	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(mediadir), 10, 0, 0, 800, 600);
 	//it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 	//SWFDisplayItem_moveTo(it, 0, 200);
 	//SWFMovie_nextFrame(mo); 
@@ -166,6 +217,38 @@ main(int argc, char** argv)
 	/* Add the OFFSPRING  clip */
 	add_clip(mo, file_offspring, "offspring", url_offspring, 400, 0);
 
+	/* Add the "shaker" button */
+	add_button(mo, 50, 200, "Scribble", newSWFAction(
+				//" for (i=0; i<96; ++i) {"
+				" depth=++_root.coverart.lastdepth;"
+				" id=depth-1;"
+				" _root.coverart.createEmptyMovieClip('child'+id, depth); "
+				" width = 170;"
+				" height = 170;"
+				" size=10;"
+				" with (_root.coverart['child'+id]) {"
+				"   lineStyle(2, 0xFF0000, 100);"
+				"   moveTo(0, 0); "
+				"   lineTo(size, 0); "
+				"   lineTo(size, size); "
+				"   lineTo(0, size); "
+				"   lineTo(0, 0); "
+				"   _x = (size*id)%width;"
+				"   _y = (parseInt(id*size/width)*size)%height;"
+				" }"
+				//"}"
+				));
+
+	add_button(mo, 50, 220, "Clear", newSWFAction(
+				" art=_root.coverart;"
+				" for (i=0; i<art.lastdepth; ++i) {"
+				"  art['child'+i].clear();"
+				//"  art.removeMovieClip('child'+i);" // doesn't work !
+				" }"
+				" art.lastdepth=0;"
+				" art.clear(); "
+				));
+
 	/*****************************************************
 	 *
 	 * Add the coverart clip
@@ -174,21 +257,7 @@ main(int argc, char** argv)
 
 	puts("Adding coverart");
 
-	sh_coverart = newSWFShape();
-	fstyle = SWFShape_addSolidFillStyle(sh_coverart, 0,0,0,255);
-	SWFShape_setRightFillStyle(sh_coverart, fstyle);
-	SWFShape_movePenTo(sh_coverart, 170, 170);
-	SWFShape_drawLine(sh_coverart, -170, 0);
-	SWFShape_drawLine(sh_coverart, 0, -170);
-	SWFShape_drawLine(sh_coverart, 170, 0);
-	SWFShape_drawLine(sh_coverart, 0, 170);
-
-	mc_coverart = newSWFMovieClip();
-	SWFMovieClip_add(mc_coverart, (SWFBlock)sh_coverart);
-	SWFMovieClip_nextFrame(mc_coverart); /* showFrame */
-	it = SWFMovie_add(mo, (SWFBlock)mc_coverart);
-	SWFDisplayItem_setName(it, "coverart"); 
-	SWFDisplayItem_moveTo(it, 500, 200);
+	add_coverart(mo, 500, 200);
 
 	add_actions(mo, "stop();");
 	SWFMovie_nextFrame(mo); /* showFrame */

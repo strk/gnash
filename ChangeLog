@@ -1,5 +1,9 @@
 2007-04-18 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/loadMovieTest.c: add
+	  a couple of "buttons" to scribble on and clear
+	  the loaded movies. Checks for this in the 
+	  test runner should follow.
 	* server/BitmapMovieInstance.h:
 	  Override restart() to avoid cleaning up
 	  the displaylist (since no frame tags will
