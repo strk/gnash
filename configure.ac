@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.290 2007/04/10 18:18:45 rsavoye Exp $
+dnl $Id: configure.ac,v 1.291 2007/04/18 13:47:24 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -488,12 +488,56 @@ fi
 AC_LANG_POP(C++)
 AC_REPLACE_FUNCS(getopt)
 
-AC_CHECK_FUNCS(sysconf)
-AC_CHECK_FUNCS(shmget shmat shmdt mmap)
+dnl Date portability stuff, used in server/asobj/Date.cpp
 AC_CHECK_FUNCS(gettimeofday)
 AC_CHECK_FUNCS(ftime)
 AC_CHECK_FUNCS(tzset)
 AC_CHECK_FUNCS(localtime_r)
+
+AC_CACHE_CHECK([whether struct tm has tm_gmtoff], ac_cv_tm_gmtoff, [
+        AC_TRY_LINK([
+/* ctime(1) says "The glibc version of struct tm has additional fields
+ * defined  when _BSD_SOURCE was set before including <time.h>"
+ * In practice, you don't need to define it yourself (tested on glibc-2.2.1 
+ * and 2.3.6) but if you *do* define it yourself, it makes *all* functions
+ * favour BSD-like behaviour over of GNU/POSIX, which seems dangerous.
+ */
+// #define _BSD_SOURCE 1
+#include <time.h>
+], 
+                [ struct tm tm; long l = tm.tm_gmtoff; ], 
+                [ ac_cv_tm_gmtoff="yes" ],
+                [ ac_cv_tm_gmtoff="no" ]
+        )
+])
+if test "x$ac_cv_tm_gmtoff" = "xyes" ; then
+        AC_DEFINE(HAVE_TM_GMTOFF, [1], [struct tm has member tm_gmtoff])
+fi
+
+AC_CACHE_CHECK([whether timezone is a long], ac_cv_long_timezone, [
+        AC_TRY_LINK([
+/* On Linux/glibc, tzset(3) says "extern long timezone;" (seconds West of GMT)
+ * but on BSD char *timezone(int,int) is a function returning a string name.
+ * The BSD function timegm() may be the equivalent, but this should
+ * not be necessary because on BSD the code should use tm.tm_gmtoff instead
+ * (use of long timezone is a fallback strategy for when tm_gmtoff exists not).
+ */
+#include <stdio.h>
+#include <time.h>
+extern long timezone;
+], 
+                [ printf("%ld", timezone); ], 
+                [ ac_cv_long_timezone="yes" ],
+                [ ac_cv_long_timezone="no" ]
+        )
+])
+if test "x$ac_cv_long_timezone" = "xyes" ; then
+        AC_DEFINE(HAVE_LONG_TIMEZONE, [1], [extern timezone is a long integer, not a function])
+fi
+
+
+AC_CHECK_FUNCS(sysconf)
+AC_CHECK_FUNCS(shmget shmat shmdt mmap)
 AC_CHECK_FUNCS(memmove)
 AC_CHECK_FUNCS(strlcpy, AC_DEFINE(HAVE_STRLCPY_PROTO, [1],[Define if you have the strlcpy prototype]))
 AC_CHECK_FUNCS(strlcat, AC_DEFINE(HAVE_STRLCAT_PROTO, [1],[Define if you have the strlcat prototype]))

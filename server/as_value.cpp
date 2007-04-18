@@ -259,25 +259,31 @@ as_value::to_number(as_environment* env) const
 			// @@ Moock says the rule here is: if the
 			// string is a valid float literal, then it
 			// gets converted; otherwise it is set to NaN.
-			//
-			// Also, "Infinity", "-Infinity", and "NaN"
-			// are recognized by strtod() but not by Flash Player.
 			char* tail=0;
 			m_number_value = strtod(m_string_value.c_str(), &tail);
+			// Detect failure by "tail" still being at the start of
+			// the string or there being extra junk after the
+			// converted characters.
 			if ( tail == m_string_value.c_str() || *tail != 0 )
 			{
 				// Failed conversion to Number.
 				m_number_value = NAN;
 			}
+
+			// "Infinity" and "-Infinity" are recognized by strtod()
+			// but Flash Player returns NaN for them.
+			if ( isinf(m_number_value) ) {
+				m_number_value = NAN;
+			}
+
 			return m_number_value;
 		}
 
 		case NULLTYPE:
 		case UNDEFINED:
 			// Evan: from my tests
-			// Martin: I tried var foo = new Number(null) and got NaN
-			if ( swfversion >= 7 ) return std::numeric_limits<double>::quiet_NaN();
-			else return 0;
+			// Martin: FlashPlayer6 gives 0; FP9 gives NaN.
+			return ( swfversion >= 7 ? NAN : 0 );
 
 		case BOOLEAN:
 			// Evan: from my tests
@@ -288,8 +294,7 @@ as_value::to_number(as_environment* env) const
 			return m_number_value;
 
 		case OBJECT:
-		case AS_FUNCTION:
-		{
+		    {
 			// @@ Moock says the result here should be
 			// "the return value of the object's valueOf()
 			// method".
@@ -299,7 +304,6 @@ as_value::to_number(as_environment* env) const
 			//log_msg(_("OBJECT to number conversion, env is %p"), env);
 
 			as_object* obj = m_object_value; 
-			bool gotValidValueOfResult = false;
 			if ( env )
 			{
 				std::string methodname = "valueOf";
@@ -310,7 +314,6 @@ as_value::to_number(as_environment* env) const
 					as_value ret = call_method0(method, env, obj);
 					if ( ret.is_number() )
 					{
-						gotValidValueOfResult=true;
 						return ret.m_number_value;
 					}
 					else
@@ -323,11 +326,14 @@ as_value::to_number(as_environment* env) const
 					log_msg(_("get_member(%s) returned false"), methodname.c_str());
 				}
 			}
-			if ( ! gotValidValueOfResult )
-			{
-				return obj->get_numeric_value(); 
-			}
-		}
+			return obj->get_numeric_value(); 
+		    }
+
+		case AS_FUNCTION:
+			// This used to be the same case as AS_OBJECT,
+			// but empirically "new String(_root.createTextField)"
+			// or any other function returns NAN.
+			return NAN;
 
 		case MOVIECLIP:
 			// This is tested, no valueOf is going
@@ -339,6 +345,7 @@ as_value::to_number(as_environment* env) const
 			// every GUI's movie canvas shrinks to size 0x0. No idea why.
 			return NAN; // 0.0;
 	}
+	/* NOTREACHED */
 }
 
 // Conversion to boolean for SWF7 and up

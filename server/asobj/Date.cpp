@@ -22,10 +22,6 @@
 // Implements methods of the ActionScript "Date" class for Gnash
 //
 // TODO:
-//	implement static method Date.UTC
-//	Make Date constructor treat years <100 as after (or before) 1900.
-//	Check whether Date.TimezoneOffset just returns geographical timezone
-//	or if it also includes DST in force at the specified moment.
 //	What does Flash setTime() do/return if you hand it 0 parameters?
 //
 // BUGS:
@@ -36,19 +32,16 @@
 //	this is not worth doing unless we also implement full-range localtime
 //	operations too.
 //
-//	If day=31 and you setYear() to April, or if you change Feb 29 from a
-//	leap year to a non-leap year, the date should "wrap" into the next
-//	month; our current code does not modify the date at all.
-//
-//	If setMonth is called with one parameter, the new month has fewer
-//	days than the old and the old day is beyond the end of the new month,
-//	the day-of-month should be set to the last day of the requested month
-//	(our current code wraps it into the first days of the following month).
+//	We probably get negative datestamps (1901-1969) wrong sometimes but
+//	don't really care that much.
 //
 // FEATURES:
 //	Flash Player does not seem to respect TZ or the zoneinfo database;
 //	It changes to/from daylight saving time according to its own rules.
 //	We use the operating system's localtime routines.
+//
+//	Flash player does bizarre things for some argument combinations,
+//	returning datestamps of /6.*e+19  We don't bother doing this...
 //
 // It may be useful to convert this to use libboost's date_time stuff
 // http://www.boost.org/doc/html/date_time.html
@@ -71,15 +64,15 @@
 //        static function main(mc) {
 //		var now = new Date();
 //		var s:String;
-//               _root.createTextField("tf",0,0,0,320,200);
 //		s = now.toString();	// or whatever
-//		trace(s);			// output in gnash -v
+//              _root.createTextField("tf",0,0,0,320,200);
 //              _root.tf.text = now.toString(); // output in flash player
+//		trace(s);			// output in gnash -v
 //        }
 // }
 // in test.as, compile with
 //	mtasc -swf test.swf -main -header 320:200:10 test.as
-// and open test.swf in the commercial Flash Player.
+// and get someone to open test.swf for you in the commercial Flash Player.
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -108,19 +101,21 @@
 // Declaration for replacement timezone functions
 // In the absence of gettimeofday() we use ftime() to get milliseconds,
 // but not for timezone offset bcos ftime's TZ stuff is unreliable.
-// For that we use tzset()/timezone if it is available
-// However, ftime() is the only reliable way to get the timezone offset.
+// For that we use tzset()/timezone if it is available.
 
-#if HAVE_FTIME
-# include <sys/timeb.h>		// for ftime()
+// The structure of these ifdefs mimics the structure of the code below
+// where these things are used if available.
+
+#if !defined(HAVE_GETTIMEOFDAY) || (!defined(HAVE_TM_GMTOFF) && !defined(HAVE_TZSET))
+# if HAVE_FTIME
+#  include <sys/timeb.h>		// for ftime()
+# endif
 #endif
 
-// Is broken on BSD where timezone(int,int) is a function (!)
-// See comment at line 497 for a better implementation
-#undef HAVE_TZSET	
-
-#if HAVE_TZSET
-extern long timezone;		// for tzset()/timezone
+#if !defined(HAVE_TM_GMTOFF)
+# if HAVE_LONG_TIMEZONE
+extern long timezone;		// for tzset()/long timezone;
+# endif
 #endif
 
 namespace gnash {
@@ -141,6 +136,11 @@ namespace gnash {
 // forward declarations
 static void utctime(double tim, struct tm *tmp, double *msecp);
 static double mkutctime(struct tm *tmp, double msec);
+static void local_date_to_tm_msec(double value, struct tm &tm, double &msec);
+static void utc_date_to_tm_msec(double value, struct tm &tm, double &msec);
+static double local_tm_msec_to_date(struct tm &tm, double &msec);
+static double utc_tm_msec_to_date(struct tm &tm, double &msec);
+static double rogue_date_args(const fn_call& fn, int maxargs);
 #endif
 
 // Select functions to implement _localtime_r and _gmtime_r
@@ -345,6 +345,7 @@ private:
 //
 /// The constructor has three forms: 0 args, 1 arg and 2-7 args.
 /// new Date() sets the Date to the current time of day
+/// new Date(undefined[,*]) does the same.
 /// new Date(timeValue:Number) sets the date to a number of milliseconds since
 ///	1 Jan 1970 UTC
 /// new Date(year, month[,date[,hour[,minute[,second[,millisecond]]]]])
@@ -364,8 +365,20 @@ date_new(const fn_call& fn)
 
 	date_as_object *date = new date_as_object;
 
+	// Reject all date specifications containing Infinities and NaNs.
+	// The commercial player does different things according to which
+	// args are NaNs or Infinities:
+	// for now, we just use rogue_date_args' algorithm
+	{
+		double foo;
+		if ((foo = rogue_date_args(fn, 7)) != 0.0) {
+			date->value = foo;
+			return as_value(date);
+		}
+	}
+
 	// TODO: move this to date_as_object constructor
-	if (fn.nargs < 1) {
+	if (fn.nargs < 1 || fn.arg(0).is_undefined()) {
 		// Set from system clock
 #ifdef HAVE_GETTIMEOFDAY
 		struct timeval tv;
@@ -373,11 +386,14 @@ date_new(const fn_call& fn)
 
 		gettimeofday(&tv,&tz);
 		date->value = (double)tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
-#else
+#elif HAVE_FTIME
 		struct timeb tb;
 		
 		ftime (&tb);
 		date->value = (double)tb.time * 1000.0 + tb.millitm;
+#else
+		// Poo! Use old time() to get seconds only
+		date->value = time((time_t *) 0) * 1000.0;
 #endif
 	} else if (fn.nargs == 1) {
 		// Set the value in milliseconds since 1970 UTC
@@ -523,19 +539,31 @@ date_get_proto(date_getutcseconds,  gmtime, tm_sec)
 // date_getutcmilliseconds is implemented by date_getmilliseconds.
 
 
-// Return number of minutes east of GMT, also used in toString()
+// Return the difference between UTC and localtime+DST for a given date/time
+// as the number of minutes east of GMT.
 
-// Yet another implementation option is suggested by localtime(3):
-// "The glibc version of struct tm has additional fields
-// long tm_gmtoff;           /* Seconds east of UTC */
-// defined when _BSD_SOURCE was set before including <time.h>"
-
-static int minutes_east_of_gmt()
+static int minutes_east_of_gmt(struct tm &tm)
 {
-#if HAVE_TZSET
+#if HAVE_TM_GMTOFF
+	// tm_gmtoff is in seconds east of GMT; convert to minutes.
+	return((int) (tm.tm_gmtoff / 60));
+#else
+	// Find the geographical system timezone offset and add an hour if
+	// DST applies to the date.
+	// To get it really right I guess we should call both gmtime()
+	// and localtime() and look at the difference.
+	//
+	// The range of standard time is GMT-11 to GMT+14.
+	// The most extreme with DST is Chatham Island GMT+12:45 +1DST
+
+	int minutes_east;
+
+	// Find out system timezone offset...
+
+# if defined(HAVE_TZSET) && defined(HAVE_LONG_TIMEZONE)
 	tzset();
-	return(-timezone/60); // timezone is seconds west of GMT
-#elif HAVE_FTIME
+	minutes_east = -timezone/60; // timezone is seconds west of GMT
+# elif HAVE_FTIME
 	// ftime(3): "These days the contents of the timezone and dstflag
 	// fields are undefined."
 	// In practice, timezone is -120 in Italy when it should be -60.
@@ -543,8 +571,8 @@ static int minutes_east_of_gmt()
 		
 	ftime (&tb);
 	// tb.timezone is number of minutes west of GMT
-	return(-tb.timezone);
-#elif HAVE_GETTIMEOFDAY
+	minutes_east = -tb.timezone;
+# elif HAVE_GETTIMEOFDAY
 	// gettimeofday(3):
 	// "The use of the timezone structure is obsolete; the tz argument
 	// should normally be specified as NULL. The tz_dsttime field has
@@ -554,17 +582,54 @@ static int minutes_east_of_gmt()
 	struct timeval tv;
 	struct timezone tz;
 	gettimeofday(&tv,&tz);
-	return(-tz.tz_minuteswest);
-#else
-	return(0);	// No idea.
-#endif
+	minutes_east = -tz.tz_minuteswest;
+# else
+	minutes_east = 0;	// No idea.
+# endif
+
+	// ...and adjust by one hour if DST was in force at that time.
+	//
+	// According to http://www.timeanddate.com/time/, the only place that
+	// uses DST != +1 hour is Lord Howe Island with half an hour. Tough.
+
+	if (tm.tm_isdst == 0) {
+		// DST exists and is not in effect
+	} else if (tm.tm_isdst > 0) {
+		// DST exists and was in effect
+		minutes_east += 60;
+	} else {
+		// tm_isdst is negative: cannot get TZ info.
+		// Convert and print in UTC instead.
+		log_error("Cannot get timezone information");
+		minutes_east = 0;
+	}
+
+	return minutes_east;
+#endif // HAVE_TM_OFFSET
 }
 
-/// \brief Date.getTimezoneOffset
-/// returns the difference between localtime and UTC.
 
-static as_value date_gettimezoneoffset(const fn_call& /* fn */) {
-	return as_value(minutes_east_of_gmt());
+/// \brief Date.getTimezoneOffset
+/// returns the difference between localtime and UTC that was in effect at the
+/// time specified by a Date object, according to local timezone and DST.
+/// For example, if you are in GMT+0100, the offset is -60
+
+static as_value date_gettimezoneoffset(const fn_call& fn) {
+	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
+	struct tm tm;
+	double msec;
+
+	if (fn.nargs > 0) {
+	    IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("Date.getTimezoneOffset was called with parameters");
+	    )
+	}
+
+	// Turn Flash datestamp into tm structure...
+	local_date_to_tm_msec(date->value, tm, msec);
+
+	// ...and figure out the timezone/DST offset from that.
+	return as_value(-minutes_east_of_gmt(tm));
 }
 
 
@@ -574,11 +639,10 @@ static as_value date_gettimezoneoffset(const fn_call& /* fn */) {
 
 /// \brief Date.setTime
 /// sets a Date in milliseconds after January 1, 1970 00:00 UTC.
-/// Returns value is the same aqs the paramemeter.
+/// The return value is the same as the parameter.
 static as_value date_settime(const fn_call& fn) {
 	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
-	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Date.setTime needs one argument"));
@@ -617,13 +681,13 @@ static as_value date_settime(const fn_call& fn) {
 // Two low-level functions to convert between datestamps and time structures
 // whose contents are in local time
 
-// convert flash datestamp (number of milliseconds since the epoch as a double)
+// convert flash datestamp (number of milliseconds since the epoch)
 // to time structure and remaining milliseconds expressed in localtime.
 static void
-local_date_to_tm_msec(date_as_object& date, struct tm &tm, double &msec)
+local_date_to_tm_msec(double value, struct tm &tm, double &msec)
 {
-	time_t t = (time_t)(date.value / 1000.0);
-	msec = std::fmod(date.value, 1000.0);
+	time_t t = (time_t)(value / 1000.0);
+	msec = std::fmod(value, 1000.0);
 	_localtime_r(&t, &tm);	// break out date/time elements
 }
 
@@ -645,24 +709,24 @@ local_tm_msec_to_date(struct tm &tm, double &msec)
 	}
 }
 
-// Two low-level functions to convert between datestamps and time structures
-// whose contents are in UTC
+// Two low-level functions to convert between Flash datestamps
+// and time structures whose contents are in UTC
 //
 // gmtime() will split it for us, but mktime() only works in localtime.
 
 static void
-utc_date_to_tm_msec(date_as_object& date, struct tm &tm, double &msec)
+utc_date_to_tm_msec(double value, struct tm &tm, double &msec)
 {
 #if USE_UTCCONV
-	utctime(date.value, &tm, &msec);
+	utctime(value, &tm, &msec);
 #else
-	time_t t = (time_t)(date.value / 1000.0);
-	msec = std::fmod(date.value, 1000.0);
+	time_t t = (time_t)(value / 1000.0);
+	msec = std::fmod(value, 1000.0);
 	_gmtime_r(&t, &tm);
 #endif
 }
 
-// Until we find the correct algorithm, we can use mktime which, by
+// Until we find a better algorithm, we can use mktime which, by
 // experiment, seems to flip timezone at midnight, not at 2 in the morning,
 // so we use that to do year/month/day and put the unadjusted hours/mins/secs
 // in by hand. It's probably not right but it'll do for the moment.
@@ -701,9 +765,9 @@ static void
 date_to_tm_msec(date_as_object& date, struct tm &tm, double &msec, bool utc)
 {
     if (utc)
-	utc_date_to_tm_msec(date, tm, msec);
+	utc_date_to_tm_msec(date.value, tm, msec);
     else
-	local_date_to_tm_msec(date, tm, msec);
+	local_date_to_tm_msec(date.value, tm, msec);
 }
 
 //
@@ -747,11 +811,13 @@ date_to_tm_msec(date_as_object& date, struct tm &tm, double &msec, bool utc)
 static as_value _date_setfullyear(const fn_call& fn, bool utc) {
 	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
-	// assert(fn.nargs >= 1 && fn.nargs <= 3);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Date.setFullYear needs one argument"));
 	    )
+	    date->value = NAN;
+	} else if (rogue_date_args(fn, 3) != 0.0) {
+	    date->value = NAN;
 	} else {
 	    struct tm tm; double msec;
 
@@ -794,22 +860,28 @@ static as_value date_setyear(const fn_call& fn) {
 	    IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Date.setYear needs one argument"));
 	    )
+	    date->value = NAN;
+	} else if (rogue_date_args(fn, 3) != 0.0) {
+	    date->value = NAN;
 	} else {
 	    struct tm tm; double msec;
 
 	    date_to_tm_msec(*date, tm, msec, false);
 	    tm.tm_year = (int) fn.arg(0).to_number();
-	    if (tm.tm_year < 100) tm.tm_year += 1900;
+	    // tm_year is number of eyars since 1900, so if they gave a
+	    // full year spec, we must adjust it.
+	    if (tm.tm_year >= 100) tm.tm_year -= 1900;
+
 	    if (fn.nargs >= 2)
-		    tm.tm_mon = (int) fn.arg(1).to_number();
+		tm.tm_mon = (int) fn.arg(1).to_number();
 	    if (fn.nargs >= 3)
-		    tm.tm_mday = (int) fn.arg(2).to_number();
+		tm.tm_mday = (int) fn.arg(2).to_number();
 	    if (fn.nargs > 3) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror(_("Date.setYear was called with more than three arguments"));
 		)
 	    }
-	    tm_msec_to_date(tm, msec, *date, false);
+	    tm_msec_to_date(tm, msec, *date, false); // utc=false: use localtime
 	}
 	return as_value(date->value);
 }
@@ -822,6 +894,12 @@ static as_value date_setyear(const fn_call& fn) {
 /// the day should be set to the last day of the specified month.
 /// This implementation currently wraps it into the next month, which is wrong.
 
+// If no arguments are given or if an invalid type is given,
+// the commercial player sets the month to January in the same year.
+// Only if the second parameter is present and has a non-numeric value,
+// the result is NAN.
+// We do not do the same cos it's a bugger to code.
+
 static as_value _date_setmonth(const fn_call& fn, bool utc) {
 	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
 
@@ -830,13 +908,31 @@ static as_value _date_setmonth(const fn_call& fn, bool utc) {
 	    IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Date.setMonth needs one argument"));
 	    )
+	    date->value = NAN;
+	} else if (rogue_date_args(fn, 2) != 0.0) {
+	    date->value = NAN;
 	} else {
 	    struct tm tm; double msec;
+	    double monthvalue; // result from to_number()
 
 	    date_to_tm_msec(*date, tm, msec, utc);
-	    tm.tm_mon = (int) fn.arg(0).to_number();
-	    if (fn.nargs >= 2)
-		    tm.tm_mday = (int) fn.arg(2).to_number();
+
+	    // It seems odd, but FlashPlayer takes all bad month values to mean
+	    // January.
+	    monthvalue =  fn.arg(0).to_number();
+	    if (isnan(monthvalue) || isinf(monthvalue)) monthvalue = 0.0;
+	    tm.tm_mon = (int) monthvalue;
+
+	    // If the day-of-month value is invalid instead, the result is NAN.
+	    if (fn.nargs >= 2) {
+		double mdayvalue = fn.arg(1).to_number();
+		if (isnan(mdayvalue) || isinf(mdayvalue)) {
+		    date->value = NAN;
+		    return as_value(date->value);
+		} else {
+		    tm.tm_mday = (int) mdayvalue;
+		}
+	    }
 	    if (fn.nargs > 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror(_("Date.setMonth was called with more than three arguments"));
@@ -860,6 +956,9 @@ static as_value _date_setdate(const fn_call& fn, bool utc) {
 	    IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Date.setDate needs one argument"));
 	    )
+	    date->value = NAN;	// Is what FlashPlayer sets
+	} else if (rogue_date_args(fn, 1) != 0.0) {
+	    date->value = NAN;
 	} else {
 		struct tm tm; double msec;
 
@@ -895,6 +994,9 @@ static as_value _date_sethours(const fn_call& fn, bool utc) {
 	    IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Date.setHours needs one argument"));
 	    )
+	    date->value = NAN;	// Is what FlashPlayer sets
+	} else if (rogue_date_args(fn, 4) != 0.0) {
+	    date->value = NAN;
 	} else {
 	    struct tm tm; double msec;
 
@@ -932,6 +1034,10 @@ static as_value _date_setminutes(const fn_call& fn, bool utc) {
 	    IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Date.setMinutes needs one argument"));
 	    )
+	    date->value = NAN;	// FlashPlayer instead leaves the date set to
+				// a random value such as 9th December 2077 BC
+	} else if (rogue_date_args(fn, 3) != 0.0) {
+	    date->value = NAN;
 	} else {
 	    struct tm tm; double msec;
 
@@ -965,6 +1071,9 @@ static as_value _date_setseconds(const fn_call& fn, bool utc) {
 	    IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Date.setSeconds needs one argument"));
 	    )
+	    date->value = NAN;	// Same as commercial player
+	} else if (rogue_date_args(fn, 2) != 0.0) {
+	    date->value = NAN;
 	} else {
 	    // We *could* set seconds [and milliseconds] without breaking the
 	    // structure out and reasembling it. We do it the same way as the
@@ -981,6 +1090,8 @@ static as_value _date_setseconds(const fn_call& fn, bool utc) {
 		    log_aserror(_("Date.setMinutes was called with more than three arguments"));
 		)
 	    }
+	    // This is both setSeconds and setUTCSeconds.
+	    // Use utc to avoid needless worrying about timezones.
 	    tm_msec_to_date(tm, msec, *date, utc);
 	}
 	return as_value(date->value);
@@ -994,9 +1105,12 @@ static as_value date_setmilliseconds(const fn_call& fn) {
 	    IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Date.setMilliseconds needs one argument"));
 	    )
+	    date->value = NAN;
+	} else if (rogue_date_args(fn, 1) != 0.0) {
+	    date->value = NAN;
 	} else {
 	    // Zero the milliseconds and set them from the argument.
-	    date->value = std::fmod(date->value, 1000.0) + (int) fn.arg(0).to_number();
+	    date->value = date->value - std::fmod(date->value, 1000.0) + (int) fn.arg(0).to_number();
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
 		    log_aserror(_("Date.setMilliseconds was called with more than one argument"));
@@ -1047,39 +1161,28 @@ static as_value date_tostring(const fn_call& fn) {
 	char dayweekname[][7] = {"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 
 	boost::intrusive_ptr<date_as_object> date = ensureType<date_as_object>(fn.this_ptr);
-	
-	time_t t = (time_t) (date->value / 1000.0);
-	struct tm tm;
-	int tzhours, tzminutes;
 
-	_localtime_r(&t, &tm);
+	/// NAN and infinities all print as "Invalid Date"
+	if (isnan(date->value) || isinf(date->value)) {
+		strcpy(buffer, "Invalid Date");
+		return as_value((char *)&buffer);
+	}
+
+	// The date value split out to year, month, day, hour etc and millisecs
+	struct tm tm;
+	double msec;
+	// Time zone offset (including DST) as hours and minutes east of GMT
+	int tzhours, tzminutes;	
+
+	local_date_to_tm_msec(date->value, tm, msec);
 
 	// At the meridian we need to print "GMT+0100" when Daylight Saving
 	// Time is in force, "GMT+0000" when it isn't, and other values for
 	// other places around the globe when DST is/isn't in force there.
-	//
-	// For now, just take time East of GMT and add an hour if DST is
-	// active. To get it right I guess we should call both gmtime()
-	// and localtime() and look at the difference.
-	//
-	// According to http://www.timeanddate.com/time/, the only place that
-	// uses DST != +1 hour is Lord Howe Island with half an hour. Tough.
 
-	tzhours = (tzminutes = minutes_east_of_gmt()) / 60, tzminutes %= 60;
-
-	if (tm.tm_isdst == 0) {
-		// DST exists and is not in effect
-	} else if (tm.tm_isdst > 0) {
-		// DST exists and is in effect
-		tzhours++;
-		// The range of standard time is GMT-11 to GMT+14.
-		// The most extreme with DST is Chatham Island GMT+12:45 +1DST
-	} else {
-		// tm_isdst is negative: cannot get TZ info.
-		// Convert and print in UTC instead.
-		_gmtime_r(&t, &tm);
-		tzhours = tzminutes = 0;
-	}
+	// Split offset into hours and minutes
+	tzminutes = minutes_east_of_gmt(tm);
+	tzhours = tzminutes / 60, tzminutes %= 60;
 
 	// If timezone is negative, both hours and minutes will be negative
 	// but for the purpose of printing a string, only the hour needs to
@@ -1113,11 +1216,19 @@ static as_value date_tostring(const fn_call& fn) {
 // This probably doesn't handle exceptional cases such as NaNs and infinities
 // the same as the commercial player. What that does is:
 // - if any argument is NaN, the result is NaN
-// - if one or more arguments are +Infinity, the result is +Infinity
-// - if one or more arguments are -Infinity, the result is -Infinity
-// - if both +Infinity and -Infinity are present in the args, result is NaN.
+// - if one or more of the optional arguments are +Infinity,
+//	the result is +Infinity
+// - if one or more of the optional arguments are -Infinity,
+//	the result is -Infinity
+// - if both +Infinity and -Infinity are present in the optional args,
+//	or if one of the first two arguments is not numeric (including Inf),
+//	the result is NaN.
+// Actually, given a first parameter of Infinity,-Infinity or NAN,
+// it returns -6.77681005679712e+19 but that's just crazy.
+//
+// We test for < 2 parameters and return undefined, but given any other
+// non-numeric arguments we give NAN.
 
-static double rogue_date_args(const fn_call& fn);	// Forward decl
 
 static as_value date_utc(const fn_call& fn) {
 	struct tm tm;	// Date structure for values down to seconds
@@ -1128,13 +1239,13 @@ static as_value date_utc(const fn_call& fn) {
 	    IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Date.UTC needs one argument"));
 	    )
-	    return as_value();
+	    return as_value();	// undefined
 	}
 
 	// Check for presence of NaNs and Infinities in the arguments 
 	// and return the appropriate value if so.
-	if ( (result = rogue_date_args(fn)) != 0.0) {
-		return as_value(result);
+	if ( (result = rogue_date_args(fn, 7)) != 0.0) {
+		return as_value(NAN);
 	}
 
 	// Preset default values
@@ -1174,9 +1285,11 @@ static as_value date_utc(const fn_call& fn) {
 }
 
 // Auxillary function checks for Infinities and NaN in a function's args and
-// returns 0.0 if there are none, 
+// returns 0.0 if there are none,
+// plus (or minus) infinity if positive (or negative) infinites are present,
+// NAN is there are NANs present, or a mixture of positive and negative infs.
 static double
-rogue_date_args(const fn_call& fn) {
+rogue_date_args(const fn_call& fn, int maxargs) {
 	// Two flags: Did we find any +Infinity (or -Infinity) values in the
 	// argument list? If so, "infinity" must be set to the kind that we
 	// found.
@@ -1185,7 +1298,10 @@ rogue_date_args(const fn_call& fn) {
 	double infinity = 0.0;	// The kind of infinity we found.
 				// 0.0 == none yet.
 
-	for (unsigned int i = 0; i < fn.nargs; i++) {
+	// Only check the present parameters, up to the stated maximum number
+	if (fn.nargs < maxargs) maxargs = fn.nargs;
+
+	for (unsigned int i = 0; i < maxargs; i++) {
 		double arg = fn.arg(i).to_number();
 
 		if (isnan(arg)) return(NAN);

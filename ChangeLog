@@ -1,3 +1,18 @@
+2007-04-18 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac: Introduce HAVE_LONG_TIMEZONE if extern long timezone
+	  exists
+	* doc/C/asspec/date.xml: first draft
+	* server/asobj/Date.cpp: Complete its implementation
+	* server/asobj/Global.cpp: Use definitions of NAN and INFINITY from	
+	  as_value.h
+	* server/as_value.h: add definition for INFINITY, as for NAN
+	* server/as_value.cpp: Reject accidental "Infinity" and "-Infinity"
+	  string-to-number conversions (should give NaN);
+	  Use NAN from as_value.h;
+	  Conversion of an AS function to a number gives NaN, not 0.
+	* testsuite/actionscript.all/Date.as: Add extensive constructor tests
+
 2007-04-18 Sandro Santilli <strk@keybit.net>
 
 	* server/matrix.{cpp,h}: add transform_by_inverse(point&).

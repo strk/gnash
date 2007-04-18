@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.59 2007/04/18 11:00:29 jgilmore Exp $ */
+/* $Id: Global.cpp,v 1.60 2007/04/18 13:47:24 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -435,13 +435,11 @@ Global::Global(VM& vm)
 	init_member("isNaN", new builtin_function(as_global_isnan));
 	init_member("isFinite", new builtin_function(as_global_isfinite));
 
-	// NaN should only be in _global since SWF6, but this is just because
-	// SWF5 or lower did not have a "_global" reference at all, most likely
-	init_member("NaN", as_value(std::numeric_limits<double>::quiet_NaN()));
-
-	// Infinity should only be in _global since SWF6, but this is just because
-	// SWF5 or lower did not have a "_global" reference at all, most likely
-	init_member("Infinity", as_value(std::numeric_limits<double>::infinity()));
+	// NaN and Infinity should only be in _global since SWF6,
+	// but this is just because SWF5 or lower did not have a "_global"
+	// reference at all, most likely.
+	init_member("NaN", as_value(NAN));
+	init_member("Infinity", as_value(INFINITY));
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------

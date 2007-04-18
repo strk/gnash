@@ -1,4 +1,4 @@
-// 
+/N/ 
 //   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.20 2007/03/27 09:05:23 strk Exp $";
+rcsid="$Id: Date.as,v 1.21 2007/04/18 13:47:24 martinwguy Exp $";
 
 #include "check.as"
 
@@ -32,12 +32,12 @@ check (Date);
 // returning 2147483647 instead of the correct value.
 check_equals (Date.UTC(2000,0,1).valueOf(), 946684800000.0);
 
-// test the Date constructor.
+// test the Date constructor exists.
 // This specific value is used below to check conversion back to year/mon/day etc
 var d = new Date(70,1,2,3,4,5,6);
-check (d);
+check (d != undefined);
 
-// test methods existance
+// test methods' existence
 check (d.getDate != undefined);
 check (d.getDay != undefined);
 check (d.getFullYear != undefined);
@@ -121,105 +121,323 @@ check_equals (Date.utc, undefined);
 
 #endif
 
-// var d = new Date(70,1,2,3,4,5,6);	// See above
-trace ("Testing random d");
-check_equals (d.getFullYear(), 1970);
-check_equals (d.getYear(), 70);
-check_equals (d.getMonth(), 1);
-check_equals (d.getDate(), 2);
-check_equals (d.getHours(), 3);
-check_equals (d.getMinutes(), 4);
-check_equals (d.getSeconds(), 5);
-check_equals (d.getMilliseconds(), 6);
+// Some values we will use to test things
+    var zero = 0.0;
+    var plusinfinity = 1.0/zero;
+    var minusinfinity = -1.0/zero;
+    var notanumber = zero/zero;
 
-// Test decoding methods
-// Check the epoch, 1 Jan 1970
-trace ("Testing 1 Jan 1970 UTC");
-check_equals (d.setTime(0), 0);
-check_equals (d.getTime(), 0);
-check_equals (d.getUTCFullYear(), 1970);
-check_equals (d.getUTCMonth(), 0);
-check_equals (d.getUTCDate(), 1);
-check_equals (d.getUTCDay(), 4);	// It was a Thursday
-check_equals (d.getUTCHours(), 0);
-check_equals (d.getUTCMinutes(), 0);
-check_equals (d.getUTCSeconds(), 0);
-check_equals (d.getUTCMilliseconds(), 0);
-check_equals (d.valueOf(), 0);
+// Check Date constructor in its many forms,
+// (also uses valueOf() and toString() methods)
 
-trace ("Testing 1 Jan 2000 UTC");
-d.setUTCFullYear(2000, 0, 1);
-d.setUTCHours(0, 0, 0);
-check_equals (d.getUTCFullYear(), 2000);
-check_equals (d.getUTCMonth(), 0);
-check_equals (d.getUTCDate(), 1);
-check_equals (d.getUTCDay(), 6);	// It was a Saturday
-check_equals (d.getUTCHours(), 0);
-check_equals (d.getUTCMinutes(), 0);
-check_equals (d.getUTCSeconds(), 0);
-check_equals (d.getUTCMilliseconds(), 0);
-check_equals (d.valueOf(), 946684800000.0);	// Same as flashplayer gives
+// Constructor with no args sets current localtime
+    var d = new Date();
+	check (d != undefined);
+	// Check it's a valid number after 1 April 2007
+	check (d.valueOf() > 1175385600000.0)
+	// and before Jan 1 2037 00:00:00
+	check (d.valueOf() < 2114380800000.0)
 
-trace ("Testing 1 Jul 2000 UTC");
-d.setUTCFullYear(2000, 6, 1);
-d.setUTCHours(0, 0, 0);
-check_equals (d.getUTCFullYear(), 2000);
-check_equals (d.getUTCMonth(), 6);
-check_equals (d.getUTCDate(), 1);
-check_equals (d.getUTCDay(), 6);	// It was a Saturday
-check_equals (d.getUTCHours(), 0);
-check_equals (d.getUTCMinutes(), 0);
-check_equals (d.getUTCSeconds(), 0);
-check_equals (d.getUTCMilliseconds(), 0);
-check_equals (d.valueOf(), 962409600000.0);	// Same as flashplayer gives
+// Constructor with first arg == undefined also sets current localtime
+    var d2 = new Date(undefined);
+	check (d2 != undefined);
+	check (d2.valueOf() >= d.valueOf());
+// that shouldn't have taken more than five seconds!
+	check (d2.valueOf() < d.valueOf() + 5000);
+    delete d2;
 
-trace ("Testing 1 Jan 2000 localtime");
-// The many-argument version of the Date constructor sets the d in localtime
+// One numeric argument sets milliseconds since 1970 UTC
+    delete d; var d = new Date(0);
+	// Check UTC "get" methods too
+	check_equals(d.valueOf(), 0);
+	check_equals(d.getTime(), 0);
+	check_equals(d.getUTCFullYear(), 1970);
+	check_equals(d.getUTCMonth(), 0);
+	check_equals(d.getUTCDate(), 1);
+	check_equals(d.getUTCDay(), 4);	// It was a Thursday
+	check_equals(d.getUTCHours(), 0);
+	check_equals(d.getUTCMinutes(), 0);
+	check_equals(d.getUTCSeconds(), 0);
+	check_equals(d.getUTCMilliseconds(), 0);
+// Check other convertible types
+// Booleans convert to 0 and 1
+    var foo = true; delete d; var d = new Date(foo);
+	check_equals(d.valueOf(), 1);
+    foo = false; delete d; var d = new Date(foo);
+	check_equals(d.valueOf(), 0);
+// Numeric strings
+    foo = "12345"; delete d; var d = new Date(foo);
+	check_equals(d.valueOf(), 12345.0);
+    foo = "12345.0"; delete d; var d = new Date(foo);
+	check_equals(d.valueOf(), 12345.0);
+    foo = "12345.5"; delete d; var d = new Date(foo);
+	check_equals(d.valueOf(), 12345.5);	// Sets fractions of msec ok?
+    foo = "-12345"; delete d; var d = new Date(foo);
+	check_equals(d.valueOf(), -12345.0);
+// Bad numeric values
+	// NAN
+    delete d; var d = new Date(notanumber);
+	check_equals(d.valueOf().toString(), "NaN");
+	check_equals(d.toString(), "Invalid Date");
+	// Infinity
+    delete d; var d = new Date(plusinfinity);
+	check_equals(d.valueOf().toString(), "Infinity");
+	check_equals(d.toString(), "Invalid Date");
+	// -Infinity
+    delete d; var d = new Date(minusinfinity);
+	check_equals(d.valueOf().toString(), "-Infinity");
+	check_equals(d.toString(), "Invalid Date");
+// Bogus values: non-numeric strings
+	foo = "bones"; delete d; var d = new Date(foo);
+	check_equals(d.valueOf().toString(), "NaN");
+	foo = "1234X"; delete d; var d = new Date(foo);
+	check_equals(d.valueOf().toString(), "NaN");
+// Bogus types: a function
+	foo = d.valueOf; var d2 = new Date(foo);
+	check_equals(d2.valueOf().toString(), "NaN");
+	delete d2;
+
+// Constructor with two numeric args means year and month in localtime.
+// Now we check the localtime decoding methods too.
+// Negative year means <1900; 0-99 means 1900-1999; 100- means 100-)
+// Month is 0-11. month>11 increments year; month<0 decrements year.
+    delete d; var d = new Date(70,0);	// 1 Jan 1970 00:00:00 localtime
+	check_equals(d.getYear(), 70);
+	check_equals(d.getFullYear(), 1970);
+	check_equals(d.getMonth(), 0);
+	check_equals(d.getDate(), 1);
+	check_equals(d.getDay(), 4);	// It was a Thursday
+	check_equals(d.getHours(), 0);
+	check_equals(d.getMinutes(), 0);
+	check_equals(d.getSeconds(), 0);
+	check_equals(d.getMilliseconds(), 0);
+// Check four-figure version - should be the same.
+    var d2 = new Date(1970,0); check_equals(d.valueOf(), d2.valueOf());
+// Check four-figure version and non-zero month
+    delete d; var d = new Date(2000,3);	// 1 April 2000 00:00:00 localtime
+	check_equals(d.getYear(), 100);
+	check_equals(d.getFullYear(), 2000);
+	check_equals(d.getMonth(), 3);
+	check_equals(d.getDate(), 1);
+	check_equals(d.getDay(), 6);	// It was a Saturday
+	check_equals(d.getHours(), 0);
+	check_equals(d.getMinutes(), 0);
+	check_equals(d.getSeconds(), 0);
+	check_equals(d.getMilliseconds(), 0);
+// Check month overflow/underflow
+    delete d; var d = new Date(2000,12);
+	check_equals(d.getFullYear(), 2001);
+	check_equals(d.getMonth(), 0);
+    delete d; var d = new Date(2000,-18);
+	check_equals(d.getFullYear(), 1998);
+	check_equals(d.getMonth(), 6);
+// Bad numeric value handling: year is an invalid number with >1 arg
+// The commercial player for these first three cases gives
+// -6.77681005679712e+19  Tue Jan -719527 00:00:00 GMT+0000
+// but that doesn't seem worth emulating...
+    delete d; var d = new Date(notanumber,0);
+	check_equals(d.valueOf().toString(), "NaN");
+    delete d; var d = new Date(plusinfinity,0);
+	check_equals(d.valueOf().toString(), "Infinity");
+    delete d; var d = new Date(minusinfinity,0);
+	check_equals(d.valueOf().toString(), "-Infinity");
+// Bad numeric value handling: month is an invalid number
+    delete d; var d = new Date(0,notanumber);
+	check_equals(d.valueOf().toString(), "NaN");
+    delete d; var d = new Date(0,plusinfinity);
+	check_equals(d.valueOf().toString(), "Infinity");
+    delete d; var d = new Date(0,minusinfinity);
+	check_equals(d.valueOf().toString(), "-Infinity");
+
+// Constructor with three numeric args means year month day-of-month
+    delete d; var d = new Date(2000,0,1); // 1 Jan 2000 00:00:00 localtime
+	check_equals(d.getFullYear(), 2000);
+	check_equals(d.getMonth(), 0);
+	check_equals(d.getDate(), 1);
+// Check day-of-month overflow/underflow
+    delete d; var d = new Date(2000,0,32); // 32 Jan -> 1 Feb
+	check_equals(d.getFullYear(), 2000);
+	check_equals(d.getMonth(), 1);
+	check_equals(d.getDate(), 1);
+    delete d; var d = new Date(2000,1,0); // 0 Feb -> 31 Jan
+	check_equals(d.getFullYear(), 2000);
+	check_equals(d.getMonth(), 0);
+	check_equals(d.getDate(), 31);
+    delete d; var d = new Date(2000,0,-6); // -6 Jan 2000 -> 25 Dec 1999
+	check_equals(d.getFullYear(), 1999);
+	check_equals(d.getMonth(), 11);
+	check_equals(d.getDate(), 25);
+// Bad numeric value handling when day-of-month is an invalid number
+// A bad month always returns NaN but a bad d-o-m returns the infinities.
+    delete d; var d = new Date(2000,0,notanumber);
+	check_equals(d.valueOf().toString(), "NaN");
+    delete d; var d = new Date(2000,0,plusinfinity);
+	check_equals(d.valueOf().toString(), "Infinity");
+    delete d; var d = new Date(2000,0,minusinfinity);
+	check_equals(d.valueOf().toString(), "-Infinity");
+    // Check bad string value
+    foo = "bones"; delete d; var d = new Date(2000,0,foo);
+	check_equals(d.valueOf().toString(), "NaN");
+
+// Constructor with four numeric args means year month day-of-month hour
+    delete d; var d = new Date(2000,0,1,12);
+	check_equals(d.getHours(), 12);
+	check_equals(d.getMinutes(), 0);
+	check_equals(d.getSeconds(), 0);
+	check_equals(d.getMilliseconds(), 0);
+    // Check that fractional parts of hours are ignored
+    delete d; var d = new Date(2000,0,1,12.5);
+	check_equals(d.getHours(), 12);
+	check_equals(d.getMinutes(), 0);
+    // Check hours overflow/underflow
+    delete d; var d = new Date(2000,0,1,25);
+	check_equals(d.getDate(), 2);
+	check_equals(d.getHours(), 1);
+    // Bad hours, like bad d-o-m, return infinites.
+    delete d; var d = new Date(2000,0,1,notanumber);
+	check_equals(d.valueOf().toString(), "NaN");
+    delete d; var d = new Date(2000,0,1,plusinfinity);
+	check_equals(d.valueOf().toString(), "Infinity");
+    delete d; var d = new Date(2000,0,1,minusinfinity);
+	check_equals(d.valueOf().toString(), "-Infinity");
+    // Check bad string value
+    foo = "bones"; delete d; var d = new Date(2000,0,1,foo);
+	check_equals(d.valueOf().toString(), "NaN");
+
+// Constructor with five numeric args means year month day-of-month hour min
+    delete d; var d = new Date(2000,0,1,12,30);
+	check_equals(d.getHours(), 12);
+	check_equals(d.getMinutes(), 30);
+	check_equals(d.getSeconds(), 0);
+	check_equals(d.getMilliseconds(), 0);
+    // Check minute overflow/underflow
+    delete d; var d = new Date(2000,0,1,12,70);
+	check_equals(d.getHours(), 13);
+	check_equals(d.getMinutes(), 10);
+	check_equals(d.getSeconds(), 0);
+    delete d; var d = new Date(2000,0,1,12,-120);
+	check_equals(d.getHours(), 10);
+	check_equals(d.getMinutes(), 0);
+	check_equals(d.getSeconds(), 0);
+    // Infinite minutes return infinites.
+    delete d; var d = new Date(2000,0,1,0,notanumber);
+	check_equals(d.valueOf().toString(), "NaN");
+    delete d; var d = new Date(2000,0,1,0,plusinfinity);
+	check_equals(d.valueOf().toString(), "Infinity");
+    delete d; var d = new Date(2000,0,1,0,minusinfinity);
+	check_equals(d.valueOf().toString(), "-Infinity");
+    // Check bad string value
+    foo = "bones"; delete d; var d = new Date(2000,0,1,0,foo);
+	check_equals(d.valueOf().toString(), "NaN");
+
+// Constructor with six numeric args means year month d-of-m hour min sec
+// Check UTC seconds here too since it should be the same.
+    delete d; var d = new Date(2000,0,1,0,0,45);
+	check_equals(d.getHours(), 0);
+	check_equals(d.getMinutes(), 0);
+	check_equals(d.getSeconds(), 45);
+	check_equals(d.getUTCSeconds(), 45);
+	check_equals(d.getMilliseconds(), 0);
+    // Check second overflow/underflow
+    delete d; var d = new Date(2000,0,1,12,0,70);
+	check_equals(d.getHours(), 12);
+	check_equals(d.getMinutes(), 1);
+	check_equals(d.getSeconds(), 10);
+    delete d; var d = new Date(2000,0,1,12,0,-120);
+	check_equals(d.getHours(), 11);
+	check_equals(d.getMinutes(), 58);
+	check_equals(d.getSeconds(), 0);
+    // Infinite seconds return infinites.
+    delete d; var d = new Date(2000,0,1,0,0,notanumber);
+	check_equals(d.valueOf().toString(), "NaN");
+    delete d; var d = new Date(2000,0,1,0,0,plusinfinity);
+	check_equals(d.valueOf().toString(), "Infinity");
+    delete d; var d = new Date(2000,0,1,0,0,minusinfinity);
+	check_equals(d.valueOf().toString(), "-Infinity");
+    // Check bad string value
+    foo = "bones"; delete d; var d = new Date(2000,0,1,0,0,foo);
+	check_equals(d.valueOf().toString(), "NaN");
+
+// Constructor with seven numeric args means year month dom hour min sec msec
+// Check UTC milliseconds here too since it should be the same.
+    delete d; var d = new Date(2000,0,1,0,0,0,500);
+	check_equals(d.getHours(), 0);
+	check_equals(d.getMinutes(), 0);
+	check_equals(d.getSeconds(), 0);
+	check_equals(d.getMilliseconds(), 500);
+	check_equals(d.getUTCMilliseconds(), 500);
+    // Fractions of milliseconds are ignored here
+    delete d; var d = new Date(2000,0,1,0,0,0,500.5);
+	check_equals(d.getMilliseconds(), 500.0);
+    // Check millisecond overflow/underflow
+    delete d; var d = new Date(2000,0,1,12,0,0,1000);
+	check_equals(d.getMinutes(), 0);
+	check_equals(d.getSeconds(), 1);
+	check_equals(d.getMilliseconds(), 0);
+    delete d; var d = new Date(2000,0,1,12,0,0,-120000);
+	check_equals(d.getHours(), 11);
+	check_equals(d.getMinutes(), 58);
+	check_equals(d.getSeconds(), 0);
+    // Infinite milliseconds return infinites.
+    delete d; var d = new Date(2000,0,1,0,0,0,notanumber);
+	check_equals(d.valueOf().toString(), "NaN");
+    delete d; var d = new Date(2000,0,1,0,0,0,plusinfinity);
+	check_equals(d.valueOf().toString(), "Infinity");
+    delete d; var d = new Date(2000,0,1,0,0,0,minusinfinity);
+	check_equals(d.valueOf().toString(), "-Infinity");
+    // Check bad string value
+    foo = "bones"; delete d; var d = new Date(2000,0,1,0,0,0,foo);
+	check_equals(d.valueOf().toString(), "NaN");
+    // Finally, check that a millisecond is enough to overflow/underflow a year
+    delete d; var d = new Date(1999,11,31,23,59,59,1001);
+	check_equals(d.getFullYear(), 2000);
+	check_equals(d.getMonth(), 0);
+	check_equals(d.getDate(), 1);
+	check_equals(d.getMinutes(), 0);
+	check_equals(d.getSeconds(), 0);
+	check_equals(d.getMilliseconds(), 1);
+    delete d; var d = new Date(2000,0,1,0,0,0,-1);
+	check_equals(d.getFullYear(), 1999);
+	check_equals(d.getMonth(), 11);
+	check_equals(d.getDate(), 31);
+	check_equals(d.getMinutes(), 59);
+	check_equals(d.getSeconds(), 59);
+	check_equals(d.getMilliseconds(), 999);
+// If a mixture of infinities and/or NaNs are present the result is NaN.
+    delete d; var d = new Date(2000,0,1,plusinfinity,minusinfinity,0,0);
+	check_equals(d.valueOf().toString(), "NaN");
+
+// It's hard to test TimezoneOffset because the values will be different
+// depending upon where geographically you run the tests.
+// We do what we can without knowing where we are!
+
+// Set midnight local time, adjust for tzoffset
+// and this should give us midnight UTC.
+//
+// If we are in GMT+1 then TimezoneOffset is -60.
+// If we set midnight localtime in the GMT+1 zone,
+// that is 23:00 the day before in UTC (because in GMT+1 clock times happen
+// an hour earlier than they do in "real" time).
+// Thus to set UTC to midnight we need to subtract the TimezoneOffset.
 delete d;
 var d = new Date(2000, 0, 1, 0, 0, 0, 0);
-check_equals (d.getFullYear(), 2000);
-check_equals (d.getYear(), 100);
-check_equals (d.getMonth(), 0);
-check_equals (d.getDate(), 1);
-check_equals (d.getDay(), 6);	// It was a Saturday
-check_equals (d.getHours(), 0);
-check_equals (d.getMinutes(), 0);
-check_equals (d.getSeconds(), 0);
-check_equals (d.getMilliseconds(), 0);
+d.setTime(d.getTime() - (60000 * d.getTimezoneOffset()));
+check_equals (d.getUTCHours(), 0);
 
-trace ("Testing 1 Jul 2000 localtime");
-// The many-argument version of the Date constructor sets the d in localtime
-delete d;
-var d = new Date(2000, 6, 1, 0, 0, 0, 0);
-check_equals (d.getFullYear(), 2000);
-check_equals (d.getYear(), 100);
-check_equals (d.getMonth(), 6);
-check_equals (d.getDate(), 1);
-check_equals (d.getDay(), 6);	// It was a Saturday
-check_equals (d.getHours(), 0);
-check_equals (d.getMinutes(), 0);
-check_equals (d.getSeconds(), 0);
-check_equals (d.getMilliseconds(), 0);
+// Try the same thing in July to get one with DST and one without
+d = new Date(2000, 6, 1, 0, 0, 0, 0);
+d.setTime(d.getTime() - (60000 * d.getTimezoneOffset()));
+check_equals (d.getUTCHours(), 0);
 
-// Test TimezoneOffset and local hours by setting a d to the 1 Jan 2000 UTC
-// offset by the tzoffset so that localtime should be 00:00 or 01:00
-// (according to whether DST is active or not)
 
-trace ("Testing timezone offset");
-var tzoffset = new Number(d.getTimezoneOffset());	// in mins east of GMT
-trace("timezone offset = " + tzoffset.toString());
-d.setUTCFullYear(2000, 0, 1);
-d.setUTCHours(0, 0, 0, 0);
-d.setTime(d.getTime() - (60000*tzoffset));
-note("d.getHours(): "+d.getHours());
-check (d.getHours() >= 0);
-//check (d.getHours() <= 1);
-
-// Test behaviour when you set the time during DST then change the d to
-// a non-DST d.
+// Test behaviour when you set the time during DST then change
+// to a non-DST date.
 // setUTCHours should preserve the time of day in UTC;
 // setHours should preserve the time of day in localtime.
-trace ("Testing hour when setting d into/out of DST");
+//
+// We assume that January/December and June/July will have different DST values
+
+trace ("Testing hour when setting date into/out of DST");
 d.setUTCFullYear(2000, 0, 1);
 d.setUTCHours(0, 0, 0, 0);
 d.setUTCMonth(6);

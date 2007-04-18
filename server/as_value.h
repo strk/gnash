@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.44 2007/04/16 18:23:05 strk Exp $ */
+/* $Id: as_value.h,v 1.45 2007/04/18 13:47:24 martinwguy Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -47,6 +47,10 @@ class as_environment;
 
 #ifndef NAN
 #       define NAN (std::numeric_limits<double>::quiet_NaN())
+#endif
+
+#ifndef INFINITY
+#       define INFINITY (std::numeric_limits<double>::infinity());
 #endif
 
 
