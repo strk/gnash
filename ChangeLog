@@ -9,6 +9,8 @@
 
 	* testsuite/misc-ming.all/Makefile.am:
 	  activate testcast path_format_test.c
+	* testsuite/misc-ming.all/duplicate_movie_clip_test.c
+	  new testcase for duplicateMovieClip().
 	  
 2007-04-17 Sandro Santilli <strk@keybit.net>
 

@@ -107,6 +107,7 @@ check_PROGRAMS = \
 	get_frame_number_test \
 	frame_label_test \
 	path_format_test \
+	duplicate_movie_clip_test \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -144,6 +145,7 @@ check_SCRIPTS = \
 	get_frame_number_testrunner \
 	frame_label_testrunner \
 	path_format_testrunner \
+	duplicate_movie_clip_testrunner \
 	matrix_testrunner \
 	$(NULL)
 
@@ -433,6 +435,20 @@ path_format_testrunner: $(srcdir)/../generic-testrunner.sh path_format_test.swf
 	sh $< -r5 $(top_builddir) path_format_test.swf > $@
 	chmod 755 $@
 
+duplicate_movie_clip_test_SOURCES =	\
+	duplicate_movie_clip_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+duplicate_movie_clip_test_LDADD = $(MING_LIBS)
+
+duplicate_movie_clip_test.swf: duplicate_movie_clip_test
+	./duplicate_movie_clip_test $(top_srcdir)/testsuite/media
+
+duplicate_movie_clip_testrunner: $(srcdir)/../generic-testrunner.sh duplicate_movie_clip_test.swf
+	sh $< -r5 $(top_builddir) duplicate_movie_clip_test.swf > $@
+	chmod 755 $@
+	
 attachMovieTest_SOURCES =	\
 	attachMovieTest.c	\
 	ming_utils.h		\
@@ -943,6 +959,7 @@ TEST_CASES = \
 	get_frame_number_testrunner \
 	frame_label_testrunner \
 	path_format_testrunner \
+	duplicate_movie_clip_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
