@@ -94,6 +94,13 @@ public:
 	/// Notify mouse button was depressed
 	void depressMouseButton();
 
+	/// Simulate a mouse click (press and depress mouse button)
+	void click()
+	{
+		pressMouseButton();
+		depressMouseButton();
+	}
+
 	/// Notify key press
 	//
 	/// See key codes in namespace gnash::key (gnash.h)

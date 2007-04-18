@@ -35,6 +35,41 @@
 using namespace gnash;
 using namespace std;
 
+std::auto_ptr<MovieTester> tester;
+boost::intrusive_ptr<sprite_instance> root;
+
+sprite_instance*
+getCoverArt()
+{
+	character* coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
+	sprite_instance* coverart = coverartch->to_movie();
+
+	//log_msg("Coverart is %p, displaylist is:", coverart);
+	//coverart->getDisplayList().dump();
+
+	return coverart;
+}
+
+void
+checkScribbling()
+{
+	sprite_instance* coverart = getCoverArt();
+
+	size_t initial_child_count = coverart->getDisplayList().size();
+
+	tester->movePointerTo(73, 204); // the "Scribble" button
+	check(tester->isMouseOverMouseEntity());
+	for (int i=1; i<=5; ++i) {
+		tester->click();
+		check_equals(coverart->getDisplayList().size(), initial_child_count+i);
+	}
+
+	tester->movePointerTo(59, 225); // the "clear" button
+	check(tester->isMouseOverMouseEntity());
+	tester->click();
+	check_equals(coverart->getDisplayList().size(), initial_child_count);
+}
+
 int
 main(int /*argc*/, char** /*argv*/)
 {
@@ -42,7 +77,7 @@ main(int /*argc*/, char** /*argv*/)
 	dbglogfile.setVerbosity(1);
 
 	string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
-	MovieTester tester(filename);
+	tester.reset(new MovieTester(filename));
 
 	URL baseURL(filename);
 	URL mediaURL(MEDIADIR"/");
@@ -52,64 +87,63 @@ main(int /*argc*/, char** /*argv*/)
 	std::string url;
 
 
-	sprite_instance* root = tester.getRootMovie();
-	assert(root);
+	root = tester->getRootMovie();
+	assert(root.get());
 
 	check_equals(root->get_frame_count(), 1);
 	check_equals(root->get_current_frame(), 0);
 
-	tester.advance();
+	tester->advance();
 	check_equals(root->get_current_frame(), 0);
 
 	// Verify that 'coverart' exists and is empty
-	character* coverartch = const_cast<character*>(tester.findDisplayItemByName(*root, "coverart"));
+	character* coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
 	sprite_instance* coverart = coverartch->to_movie();
 	check(coverart);
 	url = coverart->get_movie_definition()->get_url();
 	check_equals(coverart->get_movie_definition()->get_url(), baseURL.str());
 
+	// Check scribbling on the empty canvas
+	checkScribbling();
+
 	// Click on the first (lynch)
-	tester.movePointerTo(80, 80);
-	check(tester.isMouseOverMouseEntity());
-	tester.pressMouseButton();
+	tester->movePointerTo(80, 80);
+	check(tester->isMouseOverMouseEntity());
+	tester->pressMouseButton();
 	sleep(1); // give it some time...
-	coverartch = const_cast<character*>(tester.findDisplayItemByName(*root, "coverart"));
+	coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
 	check(coverart != coverartch->to_movie());
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_movie_definition()->get_url(), lynchURL.str());
-	tester.depressMouseButton();
+	tester->depressMouseButton();
+
+	// Check scribbling on the lynch
+	checkScribbling();
 
 	// Click on the second (green)
-	tester.movePointerTo(280, 80);
-	check(tester.isMouseOverMouseEntity());
-	tester.pressMouseButton();
-	tester.depressMouseButton();
+	tester->movePointerTo(280, 80);
+	check(tester->isMouseOverMouseEntity());
+	tester->click();
 	sleep(1); // give it some time...
-	coverartch = const_cast<character*>(tester.findDisplayItemByName(*root, "coverart"));
+	coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_movie_definition()->get_url(), greenURL.str());
 	// TODO: find a way to test if the jpeg is really displayed
 	//       (like turn it into a mouse-event-handling char and use isMouseOverActiveEntity ?)
 
+	// Check scribbling on the jpeg
+	checkScribbling();
+
 	// Click on the third (offspring)
-	tester.movePointerTo(480, 80);
-	check(tester.isMouseOverMouseEntity());
-	tester.pressMouseButton();
-	tester.depressMouseButton();
+	tester->movePointerTo(480, 80);
+	check(tester->isMouseOverMouseEntity());
+	tester->click();
 	sleep(1); // give it some time to load
-	coverartch = const_cast<character*>(tester.findDisplayItemByName(*root, "coverart"));
+	coverartch = const_cast<character*>(tester->findDisplayItemByName(*root, "coverart"));
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_movie_definition()->get_url(), offspringURL.str());
 
-	//---------------------------------------------------
-	// Now check that the active movieclip "buttons" work
-	//---------------------------------------------------
-
-	tester.movePointerTo(73, 204); // the "Scribble" button
-	check(tester.isMouseOverMouseEntity());
-
-	tester.movePointerTo(63, 227); // the "clear" button
-	check(tester.isMouseOverMouseEntity());
-
+	// Check scribbling on the offspring
+	checkScribbling();
 }
 

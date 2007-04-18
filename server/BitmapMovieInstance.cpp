@@ -45,7 +45,7 @@ BitmapMovieInstance::BitmapMovieInstance(BitmapMovieDefinition* def)
 	assert(chdef);
 	boost::intrusive_ptr<character> ch = chdef->create_character_instance(this, 1);
 	//log_msg("Created char in BitmapMovieInstance is a %s", typeid(*ch).name());
-	int depth = 1;
+	int depth = 1+character::staticDepthOffset;
 	place_character(ch.get(), depth, cxform(), mat, 1.0, 0);
 }
 

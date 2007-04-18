@@ -1,3 +1,14 @@
+2007-04-18 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/MovieTester.h: add click() method.
+	* server/BitmapMovieInstance.cpp: place the
+	  bitmap character in the "static depth" zone
+	  to forbid removal (might still be not enough).
+	* testsuite/misc-ming.all/loadMovieTest.c: have
+	  the clear button remove the clips, not just clear them
+	* testsuite/misc-ming.all/loadMovieTestRunner.cpp:
+	  check use of the 'scribble' and 'clear' buttons.
+
 2007-04-18 Martin Guy <martinwguy@yahoo.it>
 
 	* server/asobj/NetStreamFfmpeg.cpp: Fix compile-breaking typo.
