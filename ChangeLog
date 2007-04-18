@@ -1,3 +1,8 @@
+2007-04-18 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/Makefile.am:
+	  activate testcast path_format_test.c
+	  
 2007-04-17 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/loadMovieTest.c: stop prepending

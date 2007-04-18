@@ -106,6 +106,7 @@ check_PROGRAMS = \
 	DrawingApiTestRunner \
 	get_frame_number_test \
 	frame_label_test \
+	path_format_test \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -142,6 +143,7 @@ check_SCRIPTS = \
 	displaylist_depths_testrunner \
 	get_frame_number_testrunner \
 	frame_label_testrunner \
+	path_format_testrunner \
 	matrix_testrunner \
 	$(NULL)
 
@@ -415,6 +417,20 @@ frame_label_test.swf: frame_label_test
 
 frame_label_testrunner: $(srcdir)/../generic-testrunner.sh frame_label_test.swf
 	sh $< -r5 $(top_builddir) frame_label_test.swf > $@
+	chmod 755 $@
+
+path_format_test_SOURCES =	\
+	path_format_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+path_format_test_LDADD = $(MING_LIBS)
+
+path_format_test.swf: path_format_test
+	./path_format_test $(top_srcdir)/testsuite/media
+
+path_format_testrunner: $(srcdir)/../generic-testrunner.sh path_format_test.swf
+	sh $< -r5 $(top_builddir) path_format_test.swf > $@
 	chmod 755 $@
 
 attachMovieTest_SOURCES =	\
@@ -926,6 +942,7 @@ TEST_CASES = \
 	matrix_testrunner \
 	get_frame_number_testrunner \
 	frame_label_testrunner \
+	path_format_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
