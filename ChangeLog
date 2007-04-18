@@ -34,6 +34,7 @@
 	* server/asobj/Date.cpp: Fix signed/unsigned compiler warning.
 	* libbase/container.h, doc/C/actionscript/as_value.xml:
 	  Expunge the last references to tu_string.
+	* libbase/tu_file.h: Purge endian dependence, add \brief to methods.
 
 2007-04-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
 

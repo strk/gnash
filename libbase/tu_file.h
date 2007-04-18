@@ -104,107 +104,83 @@ public:
     int	copy_bytes(tu_file* in, int bytes);
     
 
-    /// \brief
+    /// \brief Read a 32-bit word from a little-endian stream.
+    ///	returning it as a native-endian word.
+    //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    uint64_t	read_le64();
+    uint32_t 	read_le32() {
+	// read8() is uint8_t, so no masks with 0xff are required.
+	uint32_t result = read8();
+	result |= read8() << 8;
+	result |= read8() << 16;
+	result |= read8() << 24;
+	return(result);
+    }
+	
+    /// \brief Read a 16-bit word from a little-endian stream.
+    //
+    /// TODO: define what happens when the stream
+    ///       is in error condition, see get_error().
+    ///
+    uint16_t 	read_le16() {
+	uint16_t result = read8();
+	result |= read8() << 8;
+	return(result);
+    }
 
-    /// \brief
+    /// \brief Write a 32-bit word to a little-endian stream.
+    //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    uint32_t 	read_le32();
+    void 	write_le32(uint32_t u) {
+	write8((uint8_t)u);
+	write8((uint8_t)(u>>8));
+	write8((uint8_t)(u>>16));
+	write8((uint8_t)(u>>24));
+    }
 
-    /// \brief
+    /// \brief Write a 16-bit word to a little-endian stream.
+    //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
-    uint16_t 	read_le16();
-
-    /// \brief
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
-    ///
-    uint64_t 	read_be64();
-
-    /// \brief
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
-    ///
-    uint32_t 	read_be32();
-
-    /// \brief
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
-    ///
-    uint16_t 	read_be16();
-
-    /// \brief
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
-    ///
-    void 	write_le64(uint64_t u);
-
-    /// \brief
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
-    ///
-    void 	write_le32(uint32_t u);
-
-    /// \brief
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
-    ///
-    void 	write_le16(uint16_t u);
-
-    /// \brief
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
-    ///
-    void	write_be64(uint64_t u);
-
-    /// \brief
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
-    ///
-    void 	write_be32(uint32_t u);
-
-    /// \brief
-    /// TODO: define what happens when the stream
-    ///       is in error condition, see get_error().
-    ///
-    void 	write_be16(uint16_t u);
+    void 	write_le16(uint16_t u) {
+	write8((uint8_t)u);
+	write8((uint8_t)(u>>8));
+    }
     
-    /// Read a single byte from the stream
+    /// \brief Read a single byte from the stream
     //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
     uint8_t 	read_byte() { return read8(); }
 
-    /// write a single byte to the stream
+    /// \brief write a single byte to the stream
     //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
     void	write_byte(uint8_t u) { write8(u); }
     
-    /// Read the given number of bytes from the stream
+    /// \brief Read the given number of bytes from the stream
     //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
     int 	read_bytes(void* dst, int num) { return m_read(dst, num, m_data); }
 
-    /// Write the given number of bytes to the stream
+    /// \brief Write the given number of bytes to the stream
     //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
     ///
     int 	write_bytes(const void* src, int num) { return m_write(src, num, m_data); }
     
-    /// Write a 0-terminated string.
+    /// \brief Write a 0-terminated string to a stream.
     //
     /// TODO: define what happens when the stream
     ///       is in error condition, see get_error().
@@ -226,34 +202,25 @@ public:
     ///
     int	read_string(char* dst, int max_length);
     
-    /// \brief
+    /// \brief Write a 32-bit float to a stream.
+    //
     /// TODO: define what to return when the stream
     ///       is in error condition, see get_error().
     void	write_float32(float value);
 
-    /// \brief
-    /// TODO: define what to return when the stream
-    ///       is in error condition, see get_error().
-    void	write_double64(double value);
-
-    /// \brief
+    /// \brief Read a 32-bit float from a stream.
     /// TODO: define what to return when the stream
     ///       is in error condition, see get_error().
     float	read_float32();
 
-    /// \brief
-    /// TODO: define what to return when the stream
-    ///       is in error condition, see get_error().
-    double	read_double64();
-    
-    /// Return current stream position
+    /// \brief Return current stream position
     //
     /// TODO: define what to return when the stream
     ///       is in error condition, see get_error().
     ///
     int	get_position() const { return m_tell(m_data); }
 
-    /// Seek to the specified position
+    /// \brief Seek to the specified position
     //
     /// 
     /// TODO: define what happens when an error occurs, or
@@ -261,20 +228,20 @@ public:
     ///
     void 	set_position(int p) { m_seek(p, m_data); }
 
-    /// Seek to the end of the stream
+    /// \brief Seek to the end of the stream
     //
     /// TODO: define what happens when an error occurs
     ///
     void	go_to_end() { m_seek_to_end(m_data); }
 
-    /// Return true if the end of the stream has been reached.
+    /// \brief Return true if the end of the stream has been reached.
     //
     /// TODO: define what to return when in error condition
     /// see get_error().
     ///
     bool	get_eof() { return m_get_eof(m_data); }
     
-    /// Return non-zero if the stream is in an error state
+    /// \brief Return non-zero if the stream is in an error state
     //
     /// When the stream is in an error state there's nothing
     /// you can do about it, just delete it and log the error.
@@ -285,13 +252,13 @@ public:
     int	get_error() { return m_get_err(m_data); }
     
 
-	// get the size of the stream
-	int get_size() { return m_get_stream_size(m_data); }
+    /// \brief Get the size of the stream
+    int get_size() { return m_get_stream_size(m_data); }
 
-    // printf-style convenience function.
+    // \brief printf-style convenience function.
     int	printf(const char* fmt, ...);
     
-    // UNSAFE back door, for testing only.
+    // \brief UNSAFE back door, for testing only.
     void*	get_app_data_DEBUG() { return m_data; }
     
     
@@ -350,37 +317,10 @@ private:
 //
 
 
-#if _TU_LITTLE_ENDIAN_
-inline uint64_t	tu_file::read_le64() { return read64(); }
-inline uint32_t	tu_file::read_le32() { return read32(); }
-inline uint16_t	tu_file::read_le16() { return read16(); }
-inline uint64_t	tu_file::read_be64() { return swap64(read64()); }
-inline uint32_t	tu_file::read_be32() { return swap32(read32()); }
-inline uint16_t	tu_file::read_be16() { return swap16(read16()); }
-inline void	tu_file::write_le64(uint64_t u) { write64(u); }
-inline void	tu_file::write_le32(uint32_t u) { write32(u); }
-inline void	tu_file::write_le16(uint16_t u) { write16(u); }
-inline void	tu_file::write_be64(uint64_t u) { write64(swap64(u)); }
-inline void	tu_file::write_be32(uint32_t u) { write32(swap32(u)); }
-inline void	tu_file::write_be16(uint16_t u) { write16(swap16(u)); }
-#else // not _TU_LITTLE_ENDIAN_
-inline uint64_t	tu_file::read_le64() { return swap64(read64()); }
-inline uint32_t	tu_file::read_le32() { return swap32(read32()); }
-inline uint16_t	tu_file::read_le16() { return swap16(read16()); }
-inline uint64_t	tu_file::read_be64() { return read64(); }
-inline uint32_t	tu_file::read_be32() { return read32(); }
-inline uint16_t	tu_file::read_be16() { return read16(); }
-inline void	tu_file::write_le64(uint64_t u) { write64(swap64(u)); }
-inline void	tu_file::write_le32(uint32_t u) { write32(swap32(u)); }
-inline void	tu_file::write_le16(uint16_t u) { write16(swap16(u)); }
-inline void	tu_file::write_be64(uint64_t u) { write64(u); }
-inline void	tu_file::write_be32(uint32_t u) { write32(u); }
-inline void	tu_file::write_be16(uint16_t u) { write16(u); }
-#endif	// not _TU_LITTLE_ENDIAN_
-
-
+/// \brief Write a 32-bit float to a stream in little-endian order.
+/// @@ This currently relies on host FP format being the same as the Flash one
+/// (presumably IEEE 754).
 inline void	tu_file::write_float32(float value)
-// Write a 32-bit little-endian float to this file.
 {
     union alias {
 	float	f;
@@ -393,6 +333,9 @@ inline void	tu_file::write_float32(float value)
 }
 
 
+/// \brief Read a 32-bit float from a little-endian stream.
+/// @@ This currently relies on host FP format being the same as the Flash one
+/// (presumably IEEE 754).
 inline float	tu_file::read_float32()
 // Read a 32-bit little-endian float from this file.
 {
@@ -405,35 +348,6 @@ inline float	tu_file::read_float32()
     u.i = read_le32();
     return u.f;
 }
-
-#if 0
-inline void		tu_file::write_double64(double value)
-// Write a 64-bit little-endian double to this file.
-{
-    union {
-	double	d;
-	uint64_t	l;
-    } u;
-    compiler_assert(sizeof(u) == sizeof(u.l));
-    
-    u.d = value;
-    write_le64(u.l);
-}
-
-
-inline double	tu_file::read_double64()
-// Read a little-endian 64-bit double from this file.
-{
-    union {
-	double	d;
-	uint64_t	l;
-    } u;
-    compiler_assert(sizeof(u) == sizeof(u.l));
-    
-    u.l = read_le64();
-    return u.d;
-}
-#endif
 
 #endif // TU_FILE_H
 
