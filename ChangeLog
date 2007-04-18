@@ -36,6 +36,7 @@
 	  Expunge the last references to tu_string.
 	* libbase/tu_file.h: Purge endian dependence, add \brief to methods.
 	* backend/sound_handler_sdl.cpp: Remove commented-out stuff
+	* server/swf/tag_loaders.cpp: Remove commented-out stuff
 
 2007-04-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
 

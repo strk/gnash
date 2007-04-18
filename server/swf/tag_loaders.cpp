@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.90 2007/04/18 16:19:56 martinwguy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.91 2007/04/18 21:05:15 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1388,9 +1388,7 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
     // discard garbage data
-    //int	garbage = in->read_u32();
     in->skip_bytes(4);
-
 
     // If we don't have a sound_handler registered stop here
     if (!handler) return;
