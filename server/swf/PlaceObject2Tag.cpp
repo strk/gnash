@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: PlaceObject2Tag.cpp,v 1.2 2007/04/11 17:54:22 bjacques Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.3 2007/04/18 13:57:25 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -229,7 +229,10 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
 
 	if (has_name) m_name = in->read_string();
 
-	if (has_clip_bracket) m_clip_depth = in->read_u16()+character::staticDepthOffset; 
+	if (has_clip_bracket) 
+		m_clip_depth = in->read_u16()+character::staticDepthOffset;
+	else 
+		m_clip_depth = character::noClipDepthValue; 
 
 	if (has_actions)
 	{

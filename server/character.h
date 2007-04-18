@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.68 2007/04/18 13:24:44 strk Exp $ */
+/* $Id: character.h,v 1.69 2007/04/18 13:57:25 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -241,6 +241,11 @@ public:
     /// See: http://www.senocular.com/flash/tutorials/depths/?page=2
     ///
     static const int staticDepthOffset = -16384;
+    
+    /// This value is used for m_clip_depth when the value has no meaning, ie.
+    /// the character is not a mask. Depths below -16384 are illegal, so this
+    /// value should not collide with real depths.  
+    static const int noClipDepthValue = -1000000;
 
     ~character();
 
@@ -332,8 +337,21 @@ public:
       m_ratio = f;       
     }
 
+    /// Returns the clipping depth (if any) of this character. The parameter is 
+    /// tells us to use the character as a mask for all the objects contained 
+    /// in the display list from m_depth to m_clipping_depth inclusive.
+    /// 
+    /// The value returned by get_clip_depth() is only valid when isMask()
+    /// returns true!
+    ///  
     int get_clip_depth() const { return m_clip_depth; }
     void set_clip_depth(int d) { m_clip_depth = d; }
+    
+    /// Returns true when the character (and it's childs) are used as a mask
+    /// for other characters. isMask() does *not* return true when one of it's
+    /// parents is a mask and the character itself is not.
+    ///   
+    bool isMask() const { return m_clip_depth!=noClipDepthValue; }
 
     virtual void set_name(const char* name) { _name = name; }
 

@@ -1,3 +1,8 @@
+2007-04-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/character.h, server/dlist.cpp, server/swf/PlaceObject2Tag.cpp:
+	  make masks work again, introduce isMask()   
+		
 2007-04-18 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac: Introduce HAVE_LONG_TIMEZONE if extern long timezone
