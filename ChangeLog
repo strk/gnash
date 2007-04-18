@@ -1,3 +1,10 @@
+2007-04-18 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/MovieTester.{cpp,h}:
+	  Added interfaces for testing pixel values.
+	  Next step would be actually initializing
+	  a renderer during testing (if requested, maybe?)
+
 2007-04-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler.h: renamed get_pixel() to getPixel() and

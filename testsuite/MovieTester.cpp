@@ -29,6 +29,8 @@
 #include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
 #include "VM.h" // for initialization
 #include "sound_handler_test.h" // for creating the "test" sound handler
+#include "render.h" // for get_render_handler
+#include "types.h" // for rgba class
 
 #include <cstdio>
 #include <string>
@@ -139,7 +141,22 @@ MovieTester::findDisplayItemByDepth(const sprite_instance& mc,
 void
 MovieTester::movePointerTo(int x, int y)
 {
+	_x = x;
+	_y = y;
 	_movie_root->notify_mouse_moved(x, y);
+}
+
+FuzzyPixel
+MovieTester::getAveragePixel(unsigned radius, int tolerance) const
+{
+	render_handler* rend = get_render_handler();
+	assert(rend);
+	rgba color;
+	if ( ! rend->getAveragePixel(color, _x, _y, radius) )
+	{
+		return FuzzyPixel();
+	}
+	return FuzzyPixel(color, tolerance);
 }
 
 void
@@ -207,6 +224,26 @@ int
 MovieTester::soundsStopped()
 {
 	return _sound_handler.get()->test_times_stopped_all();
+}
+
+bool
+FuzzyPixel::operator==(const FuzzyPixel& o) const
+{
+	// Intolerant FuzzyPixels never succeed in comparison
+	if ( _tol < 0 || o._tol < 0 ) return false;
+
+	int tol=std::max(_tol, o._tol);
+	if ( ! fuzzyEqual(_col.m_r, o._col.m_r, tol) ) return false;
+	if ( ! fuzzyEqual(_col.m_g, o._col.m_g, tol) ) return false;
+	if ( ! fuzzyEqual(_col.m_b, o._col.m_b, tol) ) return false;
+	if ( ! fuzzyEqual(_col.m_a, o._col.m_a, tol) ) return false;
+	return true;
+}
+
+std::ostream&
+operator<< (std::ostream& o, const FuzzyPixel& p)
+{
+	return o << "FuzzyPixel(" << p._col.toString() << ") [tol:" << p._tol << "]";
 }
 
 } // namespace gnash
