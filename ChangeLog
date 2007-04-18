@@ -1,5 +1,7 @@
 2007-04-18 Sandro Santilli <strk@keybit.net>
 
+	* server/BitmapMovieInstance.cpp: make sure
+	  the bitmap character is not considered a mask (sic).
 	* testsuite/MovieTester.{cpp,h}:
 	  Added interfaces for testing pixel values.
 	  Next step would be actually initializing
