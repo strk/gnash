@@ -1,3 +1,4 @@
+// Object.cpp:  Implementation of ActionScript Object class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,17 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
-/* $Id: Object.cpp,v 1.23 2007/04/16 18:23:06 strk Exp $ */
-
-// Implementation of ActionScript Object class.
+/* $Id: Object.cpp,v 1.24 2007/04/18 11:00:30 jgilmore Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -124,7 +121,9 @@ object_ctor(const fn_call& fn)
 	}
 	else
 	{
-		log_error("Too many args to Object constructor");
+		IF_VERBOSE_ASCODING_ERRORS (
+		log_aserror(_("Too many args to Object constructor"));
+		)
 		new_obj = new object_as_object();
 	}
 
@@ -169,8 +168,8 @@ object_addproperty(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss;
 		fn.dump_args(ss);
-		log_aserror("Invalid call to Object.addProperty(%s) - "
-			"expected 3 arguments (<name>, <getter>, <setter>).",
+		log_aserror(_("Invalid call to Object.addProperty(%s) - "
+			"expected 3 arguments (<name>, <getter>, <setter>)"),
 		       	ss.str().c_str());
 		);
 
@@ -186,8 +185,8 @@ object_addproperty(const fn_call& fn)
 	if ( propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Invalid call to Object.addProperty() - "
-			"empty property name");
+		log_aserror(_("Invalid call to Object.addProperty() - "
+			"empty property name"));
 		);
 		return as_value(false);
 	}
@@ -196,8 +195,8 @@ object_addproperty(const fn_call& fn)
 	if ( ! getter )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Invalid call to Object.addProperty() - "
-			"getter is not an AS function");
+		log_aserror(_("Invalid call to Object.addProperty() - "
+			"getter is not an AS function"));
 		);
 		return as_value(false);
 	}
@@ -206,8 +205,8 @@ object_addproperty(const fn_call& fn)
 	if ( ! setter )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Invalid call to Object.addProperty() - "
-			"setter is not an AS function");
+		log_aserror(_("Invalid call to Object.addProperty() - "
+			"setter is not an AS function"));
 		);
 		return as_value(false);
 	}
@@ -218,7 +217,7 @@ object_addproperty(const fn_call& fn)
 	
 	bool result = obj->add_property(propname, *getter, *setter);
 
-	//log_warning("Object.addProperty(): testing");
+	//log_msg("Object.addProperty(): testing");
 	return as_value(result);
 }
 
@@ -233,8 +232,8 @@ object_registerClass(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss;
 		fn.dump_args(ss);
-		log_aserror("Invalid call to Object.registerClass(%s) - "
-			"expected 2 arguments (<symbol>, <constructor>).",
+		log_aserror(_("Invalid call to Object.registerClass(%s) - "
+			"expected 2 arguments (<symbol>, <constructor>)"),
 			ss.str().c_str());
 		);
 
@@ -250,8 +249,8 @@ object_registerClass(const fn_call& fn)
 	if ( symbolid.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Invalid call to Object.registerClass() - "
-			"empty symbol id");
+		log_aserror(_("Invalid call to Object.registerClass() - "
+			"empty symbol id"));
 		);
 		return as_value(false);
 	}
@@ -260,8 +259,8 @@ object_registerClass(const fn_call& fn)
 	if ( ! theclass )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Invalid call to Object.registerClass() - "
-			"class is not a function");
+		log_aserror(_("Invalid call to Object.registerClass() - "
+			"class is not a function"));
 		);
 		return as_value(false);
 	}
@@ -275,8 +274,8 @@ object_registerClass(const fn_call& fn)
 	if ( ! exp_res )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Object.registerClass(%s, %s): "
-			"can't find exported symbol",
+		log_aserror(_("Object.registerClass(%s, %s): "
+			"can't find exported symbol"),
 			symbolid.c_str(), 
 			typeid(theclass).name());
 		);
@@ -293,9 +292,9 @@ object_registerClass(const fn_call& fn)
 	if ( ! exp_clipdef )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Object.registerClass(%s, %s): "
+		log_aserror(_("Object.registerClass(%s, %s): "
 			"exported symbol is not a MovieClip symbol "
-			"(sprite_definition), but a %s",
+			"(sprite_definition), but a %s"),
 			symbolid.c_str(), 
 			typeid(theclass).name(),
 			typeid(*exp_res).name());
@@ -314,7 +313,7 @@ object_hasOwnProperty(const fn_call& fn)
 	if ( fn.nargs < 1 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Object.hasOwnProperty() requires one arg");
+		log_aserror(_("Object.hasOwnProperty() requires one arg"));
 		);
 		return as_value();
 	}
@@ -323,7 +322,7 @@ object_hasOwnProperty(const fn_call& fn)
 	if ( arg.is_undefined() || propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Invalid call to Object.hasOwnProperty('%s')", arg.to_debug_string().c_str());
+		log_aserror(_("Invalid call to Object.hasOwnProperty('%s')"), arg.to_debug_string().c_str());
 		);
 		return as_value();
 	}
@@ -337,7 +336,7 @@ object_isPropertyEnumerable(const fn_call& fn)
 	if ( fn.nargs < 1 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Object.isPropertyEnumerable() requires one arg");
+		log_aserror(_("Object.isPropertyEnumerable() requires one arg"));
 		);
 		return as_value();
 	}
@@ -346,7 +345,7 @@ object_isPropertyEnumerable(const fn_call& fn)
 	if ( arg.is_undefined() || propname.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Invalid call to Object.isPropertyEnumerable('%s')", arg.to_debug_string().c_str());
+		log_aserror(_("Invalid call to Object.isPropertyEnumerable('%s')"), arg.to_debug_string().c_str());
 		);
 		return as_value();
 	}
@@ -367,7 +366,7 @@ object_isPrototypeOf(const fn_call& fn)
 	if ( fn.nargs < 1 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Object.isPrototypeOf() requires one arg");
+		log_aserror(_("Object.isPrototypeOf() requires one arg"));
 		);
 		return as_value(false); 
 	}
@@ -376,7 +375,7 @@ object_isPrototypeOf(const fn_call& fn)
 	if ( ! obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("First arg to Object.isPrototypeOf(%s) is not an object", fn.arg(0).to_debug_string().c_str());
+		log_aserror(_("First arg to Object.isPrototypeOf(%s) is not an object"), fn.arg(0).to_debug_string().c_str());
 		);
 		return as_value(false);
 	}
@@ -390,7 +389,7 @@ object_watch(const fn_call&)
 {
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: %s unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned=true;
 	}
 	return as_value();
@@ -401,7 +400,7 @@ object_unwatch(const fn_call&)
 {
 	static bool warned = false;
 	if ( ! warned ) {
-		log_error("FIXME: %s unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned=true;
 	}
 	return as_value();

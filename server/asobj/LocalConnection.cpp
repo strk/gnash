@@ -1,3 +1,4 @@
+// LocalConnection.cpp:  Connect two SWF movies & send objects, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,12 +11,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
 #ifdef HAVE_CONFIG_H
@@ -95,7 +94,7 @@ LocalConnection::domain(void)
 void
 LocalConnection::send()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 }
 
 /// \brief Instantiate a new LocalConnection object within a flash movie
@@ -141,7 +140,7 @@ as_value localconnection_connect(const fn_call& fn)
     if (fn.nargs != 0) {
         ret = ptr->obj.connect(fn.arg(0).to_string().c_str());
     } else {
-        log_msg("ERROR: No connection name specified to LocalConnection.connect()!\n");
+        log_error(_("No connection name specified to LocalConnection.connect()"));
         ret = ptr->obj.connect("localhost"); // FIXME: This should probably
                                        // fail instead
     }
@@ -159,9 +158,8 @@ as_value localconnection_domain(const fn_call& fn)
 // \brief The callback for LocalConnection::send()
 as_value localconnection_send(const fn_call& /*fn*/)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 
 } // end of gnash namespace
-

@@ -1,3 +1,4 @@
+// video_stream_instance.cpp:  Draw individual video frames, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,12 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 // 
-// $Id: video_stream_instance.cpp,v 1.19 2007/04/07 12:25:57 tgc Exp $
+
+// $Id: video_stream_instance.cpp,v 1.20 2007/04/18 11:00:29 jgilmore Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -38,7 +40,7 @@ namespace gnash {
 		if (fn.nargs < 1)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-	    		log_aserror("attachVideo needs 1 arg");
+	    		log_aserror(_("attachVideo needs 1 arg"));
 			);
 			return as_value();
 		}
@@ -51,7 +53,7 @@ namespace gnash {
 		else
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-	    		log_aserror("attachVideo(%s) first arg is not a NetStream instance.",
+	    		log_aserror(_("attachVideo(%s) first arg is not a NetStream instance"),
 				fn.arg(0).to_debug_string().c_str());
 			);
 		}
@@ -111,7 +113,7 @@ video_stream_instance::display()
 		{
 			gnash::render::drawVideoFrame(i, &m, &bounds);
 		} else {
-			log_warning("An error occured while decoding video frame.");
+			log_error(_("An error occured while decoding video frame"));
 		}
 
 	}
@@ -142,4 +144,3 @@ video_stream_instance::setStream(boost::intrusive_ptr<NetStream> ns)
 }
 
 } // end of namespace gnash
-

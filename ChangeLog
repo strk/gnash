@@ -1,4 +1,4 @@
-2007-04-18  John Gilmore  <gnu@quiet.toad.com>
+2007-04-18  John Gilmore  <gnu@toad.com>
 
 	* Internationalization, phase 2.
 	
@@ -12,9 +12,10 @@
 	       the offending value, for ease of remote diagnosis.
 	    *  C++-style << printouts converted to log_xxx calls.
 	    *  Direct accesses to dbglogfile converted to log_xxx calls.
+	    *  Function name debug prints converted to GNASH_REPORT_FUNCTION.
 	  These changes should also make the messages easier to	translate.
 	* Commented-out messages were also cleaned up as above.
-	* Many modules have also had log_warning calls changed to
+	* Many modules have also had log_warning calls changed to log_msg,
 	  log_error, log_aserror, log_swferror, or log_unimp, according to
 	  the documentation checked in earlier by strk and gnu.
 	  IF_VERBOSE_xxx macros were inserted around some calls that
@@ -41,12 +42,38 @@
 	  server/button_character_instance.cpp
 	  server/character.cpp
 	  server/dlist.cpp
+	  server/dlist.h
 	  server/edit_text_character.cpp
 	  server/fill_style.cpp
 	  server/font.cpp
 	  server/generic_character.cpp
 	  server/impl.cpp
-	  
+	  server/sprite_instance.cpp
+	  server/text.cpp
+	  server/textformat.cpp
+	  server/video_stream_instance.cpp
+	  server/asobj/Camera.cpp
+	  server/asobj/Color.cpp
+	  server/asobj/ContextMenu.cpp
+	  server/asobj/CustomActions.cpp
+	  server/asobj/Date.cpp
+	  server/asobj/Error.cpp
+	  server/asobj/Global.cpp
+	  server/asobj/Key.cpp
+	  server/asobj/LoadVars.cpp
+	  server/asobj/LocalConnection.cpp
+	  server/asobj/Microphone.cpp
+	  server/asobj/Mouse.cpp
+	  server/asobj/MovieClipLoader.cpp
+	  server/asobj/NetConnection.cpp
+	  server/asobj/NetStream.cpp
+	  server/asobj/NetStreamFfmpeg.cpp
+	  server/asobj/NetStreamGst.cpp
+	  server/asobj/Number.cpp
+	  server/asobj/Object.cpp
+	  server/asobj/Selection.cpp
+	  server/asobj/SharedObject.cpp
+	
 	* 2007 copyright notices were inserted in:
 	  backend/sound_handler_sdl.cpp
 	  extensions/mysql/mysql_db.cpp
@@ -58,6 +85,7 @@
 	* New 2006, 2007 Free Software Foundation copyrights applied (to
 	  formerly public domain code):
 	  server/font.cpp
+	  server/text.cpp
 	 
 	* backend/sound_handler_sdl.cpp: Move stray FORMAT_VORBIS comment.
 	* gui/gui.cpp: Commented out "Resize request when no movie" error
@@ -68,6 +96,8 @@
 	  c_str accessor when converting string to number.
 	* server/dlist.{h,cpp}:  Change API of DisplayList::dump debug
 	  function, so it can use log_xxx functions.
+	* server/sprite_instance.cpp (sprite_attach_movie):  Comment out
+	  log_msg about initializing properties.
 	
 	I'm sure that I've missed some messages that ought to get 
 	translated (with _(...)).  Those will be fixed over time.
@@ -190,7 +220,7 @@
 	  any path-looking string is necessarely a path, it can still be
 	  a floating number or a frame label.
 
-2007-04-16  John Gilmore  <gnu@quiet.toad.com>
+2007-04-16  John Gilmore  <gnu@toad.com>
 
 	* libbase/log.h: Update documentation for log_* functions; rename
 	  log_warning to log_unimpl (with temporary #define for a few days);
@@ -1997,7 +2027,7 @@
 	* server/sprite_instance.cpp (get_text_value): remove the trailing
 	  dot from name of top-level movies.
 
-2007-03-12  John Gilmore  <gnu@quiet.toad.com>
+2007-03-12  John Gilmore  <gnu@toad.com>
 
 	* configure.ac:  Suggest agg-2.5 rather than 2.4 if
 	agg_gradient_lut.h is missing.

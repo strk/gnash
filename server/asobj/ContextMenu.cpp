@@ -1,3 +1,4 @@
+// ContextMenu.cpp:  ActionScript ContextMenu class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -129,7 +130,7 @@ ContextMenu::copy_method(const fn_call& fn)
 {
 	boost::intrusive_ptr<ContextMenu> ptr = ensureType<ContextMenu>(fn.this_ptr);
 	UNUSED(ptr);
-	log_warning("%s: unimplemented", __FUNCTION__);
+	log_unimpl (__FUNCTION__);
 	return as_value();
 }
 
@@ -139,7 +140,7 @@ ContextMenu::hideBuiltInItems_method(const fn_call& fn)
 {
 	boost::intrusive_ptr<ContextMenu> ptr = ensureType<ContextMenu>(fn.this_ptr);
 	UNUSED(ptr);
-	log_warning("%s: unimplemented", __FUNCTION__);
+	log_unimpl (__FUNCTION__);
 	return as_value();
 }
 
@@ -185,4 +186,3 @@ void contextmenu_class_init(as_object& global)
 
 
 } // end of gnash namespace
-

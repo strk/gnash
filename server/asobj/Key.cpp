@@ -1,3 +1,4 @@
+// Key.cpp:  ActionScript "Key" class (keyboards), for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -43,37 +44,37 @@ Key::~Key() {
 void
 Key::addListener()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 }
 
 void
 Key::getAscii()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 }
 
 void
 Key::getCode()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 }
 
 void
 Key::isDown()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 }
 
 void
 Key::isToggled()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 }
 
 void
 Key::removeListener()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 }
 as_value
 key_new(const fn_call& /* fn */)
@@ -227,14 +228,14 @@ key_add_listener(const fn_call& fn)
 {
     if (fn.nargs < 1)
 	{
-	    log_error("key_add_listener needs one argument (the listener object)\n");
+	    log_error(_("key_add_listener needs one argument (the listener object)"));
 	    return as_value();
 	}
 
     boost::intrusive_ptr<as_object> listener = fn.arg(0).to_object();
     if (listener == NULL)
 	{
-	    log_error("key_add_listener passed a NULL object; ignored\n");
+	    log_error(_("key_add_listener passed a NULL object; ignored"));
 	    return as_value();
 	}
 
@@ -275,7 +276,7 @@ as_value	key_is_down(const fn_call& fn)
 {
     if (fn.nargs < 1)
 	{
-	    log_error("key_is_down needs one argument (the key code)\n");
+	    log_error(_("key_is_down needs one argument (the key code)"));
 	    return as_value();
 	}
 
@@ -299,14 +300,14 @@ as_value	key_remove_listener(const fn_call& fn)
 {
     if (fn.nargs < 1)
 	{
-	    log_error("key_remove_listener needs one argument (the listener object)\n");
+	    log_error(_("key_remove_listener needs one argument (the listener object)"));
 	    return as_value();
 	}
 
     boost::intrusive_ptr<as_object> listener = fn.arg(0).to_object();
     if (listener == NULL)
 	{
-	    log_error("key_remove_listener passed a NULL object; ignored\n");
+	    log_error(_("key_remove_listener passed a NULL object; ignored"));
 	    return as_value();
 	}
 

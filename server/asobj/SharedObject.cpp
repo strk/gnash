@@ -1,3 +1,4 @@
+// SharedObject.cpp:  ActionScript "SharedObject" class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -87,7 +88,7 @@ as_value sharedobject_clear(const fn_call& fn)
 
 	static bool warned=false;
 	if ( ! warned ) {
-		log_error("FIXME: %s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned=true;
 	}
 	return as_value();
@@ -100,7 +101,7 @@ as_value sharedobject_flush(const fn_call& fn)
 
 	static bool warned=false;
 	if ( ! warned ) {
-		log_error("FIXME: %s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned=true;
 	}
 	return as_value();
@@ -115,7 +116,7 @@ as_value sharedobject_getlocal(const fn_call& /*fn*/)
 
 	static bool warned=false;
 	if ( ! warned ) {
-		log_error("FIXME: %s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned=true;
 	}
 	return as_value();
@@ -128,7 +129,7 @@ as_value sharedobject_getsize(const fn_call& fn)
 
 	static bool warned=false;
 	if ( ! warned ) {
-		log_error("FIXME: %s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned=true;
 	}
 	return as_value();
@@ -162,6 +163,4 @@ void sharedobject_class_init(as_object& global)
 
 }
 
-
 } // end of gnash namespace
-

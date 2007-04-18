@@ -1,3 +1,4 @@
+// Number.cpp:  ActionScript Number class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,13 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: Number.cpp,v 1.27 2007/03/22 13:19:04 strk Exp $ */
-
-// Implementation of ActionScript Number class.
+/* $Id: Number.cpp,v 1.28 2007/04/18 11:00:30 jgilmore Exp $ */
 
 #include "log.h"
 #include "tu_config.h"
@@ -217,7 +218,7 @@ number_val_to_str(double _val, char *_str)
 			
 			sprintf(_str, "%.15g", _val * 10.0);
 			if ((cp = strchr(_str, '.')) == NULL || cp[1] != '0') {
-				log_error("Internal error: Cannot find \".0\" in %s for %.15g\n", _str, _val);
+				log_error(_("Internal error: Cannot find \".0\" in %s for %.15g"), _str, _val);
 				// Just give it to them raw instead
 				sprintf(_str, "%.15g", _val);
 			} else {

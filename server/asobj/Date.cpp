@@ -1,3 +1,4 @@
+// Date.cpp:  ActionScript class for date and time, for Gnash.
 // 
 //	Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -5,16 +6,16 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
+//
 
 // Date.cpp
 //
@@ -396,7 +397,7 @@ date_new(const fn_call& fn)
 		switch (fn.nargs) {
 		default:
 		    IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("Date constructor called with more than 7 arguments");
+			log_aserror(_("Date constructor called with more than 7 arguments"));
 		    )
 		case 7:
 			// fractions of milliseconds are ignored
@@ -423,7 +424,7 @@ date_new(const fn_call& fn)
 		utcsecs = _mktime(&tm);	// convert from local time
 		if (utcsecs == -1) {
 			// mktime could not represent the time
-			log_error("Date() failed to initialise from arguments");
+			log_error(_("Date() failed to initialise from arguments"));
 			date->value = 0;	// or undefined?
 		} else {
 			date->value = (double)utcsecs * 1000.0 + millisecs;
@@ -580,14 +581,14 @@ static as_value date_settime(const fn_call& fn) {
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.setTime needs one argument");
+		log_aserror(_("Date.setTime needs one argument"));
 	    )
 	} else
 		date->value = fn.arg(0).to_number();
 
 	if (fn.nargs > 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.setTime was called with more than one argument");
+		log_aserror(_("Date.setTime was called with more than one argument"));
 	    )
 	}
 
@@ -637,7 +638,7 @@ local_tm_msec_to_date(struct tm &tm, double &msec)
 	if (t == (time_t)(-1)) {
 		// If mktime fails to reconstruct the date, return bogus value;
 		// Not sure when/how this can happen. Values outside POSIX time?
-		log_error("Failed to set a date.\n");
+		log_error(_("Failed to set a date."));
 		return(NAN);
 	} else {
 		return(t * 1000.0 + msec);
@@ -674,7 +675,7 @@ utc_tm_msec_to_date(struct tm &tm, double &msec)
 #else
 	time_t t = mktime(&tm);
 	if (t == (time_t)(-1)) {
-	    log_error("utc_tm_msec_to_date failed to convert a date");
+	    log_error(_("utc_tm_msec_to_date failed to convert a date"));
 	} else {
 	    // Knock out the H:M:S part of t and replace with UTC time-of-day
 	    t = t - (t % 86400) + tm.tm_sec + 60 * (tm.tm_min + 60 * tm.tm_hour);
@@ -749,7 +750,7 @@ static as_value _date_setfullyear(const fn_call& fn, bool utc) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 3);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.setFullYear needs one argument");
+		log_aserror(_("Date.setFullYear needs one argument"));
 	    )
 	} else {
 	    struct tm tm; double msec;
@@ -762,7 +763,7 @@ static as_value _date_setfullyear(const fn_call& fn, bool utc) {
 		    tm.tm_mday = (int) fn.arg(2).to_number();
 	    if (fn.nargs > 3) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror("Date.setFullYear was called with more than three arguments");
+		    log_aserror(_("Date.setFullYear was called with more than three arguments"));
 		)
 	    }
 	    tm_msec_to_date(tm, msec, *date, utc);
@@ -791,7 +792,7 @@ static as_value date_setyear(const fn_call& fn) {
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.setYear needs one argument");
+		log_aserror(_("Date.setYear needs one argument"));
 	    )
 	} else {
 	    struct tm tm; double msec;
@@ -805,7 +806,7 @@ static as_value date_setyear(const fn_call& fn) {
 		    tm.tm_mday = (int) fn.arg(2).to_number();
 	    if (fn.nargs > 3) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror("Date.setYear was called with more than three arguments");
+		    log_aserror(_("Date.setYear was called with more than three arguments"));
 		)
 	    }
 	    tm_msec_to_date(tm, msec, *date, false);
@@ -827,7 +828,7 @@ static as_value _date_setmonth(const fn_call& fn, bool utc) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.setMonth needs one argument");
+		log_aserror(_("Date.setMonth needs one argument"));
 	    )
 	} else {
 	    struct tm tm; double msec;
@@ -838,7 +839,7 @@ static as_value _date_setmonth(const fn_call& fn, bool utc) {
 		    tm.tm_mday = (int) fn.arg(2).to_number();
 	    if (fn.nargs > 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror("Date.setMonth was called with more than three arguments");
+		    log_aserror(_("Date.setMonth was called with more than three arguments"));
 		)
 	    }
 	    tm_msec_to_date(tm, msec, *date, utc);
@@ -857,7 +858,7 @@ static as_value _date_setdate(const fn_call& fn, bool utc) {
 
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.setDate needs one argument");
+		log_aserror(_("Date.setDate needs one argument"));
 	    )
 	} else {
 		struct tm tm; double msec;
@@ -868,7 +869,7 @@ static as_value _date_setdate(const fn_call& fn, bool utc) {
 	}
 	if (fn.nargs > 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.setDate was called with more than one argument");
+		log_aserror(_("Date.setDate was called with more than one argument"));
 	    )
 	}
 	return as_value(date->value);
@@ -892,7 +893,7 @@ static as_value _date_sethours(const fn_call& fn, bool utc) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 4);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.setHours needs one argument");
+		log_aserror(_("Date.setHours needs one argument"));
 	    )
 	} else {
 	    struct tm tm; double msec;
@@ -907,7 +908,7 @@ static as_value _date_sethours(const fn_call& fn, bool utc) {
 		    msec = (int) fn.arg(3).to_number();
 	    if (fn.nargs > 4) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror("Date.setHours was called with more than four arguments");
+		    log_aserror(_("Date.setHours was called with more than four arguments"));
 		)
 	    }
 	    tm_msec_to_date(tm, msec, *date, utc);
@@ -929,7 +930,7 @@ static as_value _date_setminutes(const fn_call& fn, bool utc) {
 	//assert(fn.nargs >= 1 && fn.nargs <= 3);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.setMinutes needs one argument");
+		log_aserror(_("Date.setMinutes needs one argument"));
 	    )
 	} else {
 	    struct tm tm; double msec;
@@ -942,7 +943,7 @@ static as_value _date_setminutes(const fn_call& fn, bool utc) {
 		    msec = (int) fn.arg(2).to_number();
 	    if (fn.nargs > 3) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror("Date.setMinutes was called with more than three arguments");
+		    log_aserror(_("Date.setMinutes was called with more than three arguments"));
 		)
 	    }
 	    tm_msec_to_date(tm, msec, *date, utc);
@@ -962,7 +963,7 @@ static as_value _date_setseconds(const fn_call& fn, bool utc) {
 	// assert(fn.nargs >= 1 && fn.nargs <= 2);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.setSeconds needs one argument");
+		log_aserror(_("Date.setSeconds needs one argument"));
 	    )
 	} else {
 	    // We *could* set seconds [and milliseconds] without breaking the
@@ -977,7 +978,7 @@ static as_value _date_setseconds(const fn_call& fn, bool utc) {
 		    msec = (int) fn.arg(1).to_number();
 	    if (fn.nargs > 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror("Date.setMinutes was called with more than three arguments");
+		    log_aserror(_("Date.setMinutes was called with more than three arguments"));
 		)
 	    }
 	    tm_msec_to_date(tm, msec, *date, utc);
@@ -991,14 +992,14 @@ static as_value date_setmilliseconds(const fn_call& fn) {
 	// assert(fn.nargs == 1);
 	if (fn.nargs < 1) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.setMilliseconds needs one argument");
+		log_aserror(_("Date.setMilliseconds needs one argument"));
 	    )
 	} else {
 	    // Zero the milliseconds and set them from the argument.
 	    date->value = std::fmod(date->value, 1000.0) + (int) fn.arg(0).to_number();
 	    if (fn.nargs > 1) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror("Date.setMilliseconds was called with more than one argument");
+		    log_aserror(_("Date.setMilliseconds was called with more than one argument"));
 		)
 	    }
 	}
@@ -1125,7 +1126,7 @@ static as_value date_utc(const fn_call& fn) {
 
 	if (fn.nargs < 2) {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.UTC needs one argument");
+		log_aserror(_("Date.UTC needs one argument"));
 	    )
 	    return as_value();
 	}
@@ -1145,7 +1146,7 @@ static as_value date_utc(const fn_call& fn) {
 	switch (fn.nargs) {
 	default:	// More than 7
 	    IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Date.UTC was called with more than 7 arguments");
+		log_aserror(_("Date.UTC was called with more than 7 arguments"));
 	    )
 	case 7:
 	    // millisecs is double, but fractions of millisecs are ignored.

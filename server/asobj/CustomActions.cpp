@@ -1,3 +1,4 @@
+// CustomActions.cpp:  ActionScript CustomActions class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -74,19 +75,19 @@ public:
 };
 
 as_value customactions_get(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value customactions_install(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value customactions_list(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value customactions_uninstall(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 

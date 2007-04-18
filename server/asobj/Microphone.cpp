@@ -1,3 +1,4 @@
+// Microphone.cpp:  ActionScript "Microphone" input class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -76,23 +77,23 @@ public:
 };
 
 as_value microphone_get(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value microphone_setgain(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value microphone_setrate(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value microphone_setsilencelevel(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value microphone_setuseechosuppression(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 
@@ -126,4 +127,3 @@ void microphone_class_init(as_object& global)
 
 
 } // end of gnash namespace
-

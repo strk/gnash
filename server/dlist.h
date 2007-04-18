@@ -1,3 +1,4 @@
+// dlist.h:  Display list definitions, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,18 +11,14 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
-// 
-//
-
-
 
 #ifndef GNASH_DLIST_H
 #define GNASH_DLIST_H
-
 
 #include "container.h"
 #include "types.h"
@@ -45,7 +42,7 @@ typedef boost::intrusive_ptr<character> DisplayItem;
 //
 /// Any sprite_instance has an associated DisplayList
 /// that may change from frame to frame due to control
-/// tags instructing when to add or remove characthers
+/// tags instructing when to add or remove characters
 /// from the stage.
 ///
 class DisplayList {
@@ -280,8 +277,8 @@ public:
 	template <class V>
 	inline void visitAll(V& visitor);
 
-	/// dump list to given output stream (debugging)
-	void dump(std::ostream& os) const;
+	/// dump list to logfile/stderr
+	void dump() const;
 
   /// Like character_instance::add_invalidated_bounds() this method calls the
   /// method with the same name of all childs.	

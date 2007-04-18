@@ -1,3 +1,4 @@
+// Global.cpp:  Global ActionScript class setup, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -5,20 +6,18 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// Implementation of the Global ActionScript Object
-
-/* $Id: Global.cpp,v 1.58 2007/04/15 10:52:09 bjacques Exp $ */
+/* $Id: Global.cpp,v 1.59 2007/04/18 11:00:29 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -78,13 +77,13 @@
 #define ASSERT_FN_ARGS_IS_1						\
     if (fn.nargs < 1) {							\
 	IF_VERBOSE_ASCODING_ERRORS(					\
-            log_aserror("%s needs one argument", __FUNCTION__);		\
+            log_aserror(_("%s needs one argument"), __FUNCTION__);		\
             )								\
          return as_value();							\
     }									\
     IF_VERBOSE_ASCODING_ERRORS(						\
 	if (fn.nargs > 1)						\
-            log_aserror("%s has more than one argument", __FUNCTION__);	\
+            log_aserror(_("%s has more than one argument"), __FUNCTION__);	\
     )
 
 using namespace std;
@@ -191,13 +190,13 @@ as_global_parseint(const fn_call& fn)
     // assert(fn.nargs == 2 || fn.nargs == 1);
     if (fn.nargs < 1) {
 	IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("%s needs at least one argument", __FUNCTION__);
+            log_aserror(_("%s needs at least one argument"), __FUNCTION__);
             )
          return as_value();
     }
     IF_VERBOSE_ASCODING_ERRORS(
 	if (fn.nargs > 2)
-            log_aserror("%s has more than two arguments", __FUNCTION__);
+            log_aserror(_("%s has more than two arguments"), __FUNCTION__);
     )
 
     // Make sure our argument is the correct type
@@ -301,7 +300,7 @@ as_global_assetpropflags(const fn_call& fn)
     int version = env->get_version();
     
 
-    //log_msg("ASSetPropFlags called with %d args", fn.nargs);
+    //log_msg(_("ASSetPropFlags called with %d args"), fn.nargs);
 
     // Check the arguments
     // assert(fn.nargs == 3 || fn.nargs == 4);
@@ -309,15 +308,15 @@ as_global_assetpropflags(const fn_call& fn)
 
     if (fn.nargs < 3) {
 	IF_VERBOSE_ASCODING_ERRORS(	
-            log_aserror("%s needs at least three arguments", __FUNCTION__);
+            log_aserror(_("%s needs at least three arguments"), __FUNCTION__);
             )
          return as_value();
     }
     IF_VERBOSE_ASCODING_ERRORS(
 	if (fn.nargs > 4)
-            log_aserror("%s has more than four arguments", __FUNCTION__);
+            log_aserror(_("%s has more than four arguments"), __FUNCTION__);
 	if (version == 5 && fn.nargs == 4)
-            log_aserror("%s has four arguments in a SWF version 5 movie", __FUNCTION__);
+            log_aserror(_("%s has four arguments in a SWF version 5 movie"), __FUNCTION__);
     )
 		
     // ASSetPropFlags(obj, props, n, allowFalse=false)
@@ -326,8 +325,8 @@ as_global_assetpropflags(const fn_call& fn)
     boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
     if ( ! obj )
     {
-		log_warning("Invalid call to ASSetPropFlags: "
-			"object argument is not an object: %s",
+		log_error(_("Invalid call to ASSetPropFlags: "
+			"object argument is not an object: %s"),
 			fn.arg(0).to_string().c_str());
 		return as_value();
     }

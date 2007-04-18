@@ -1,3 +1,4 @@
+// Camera.cpp:  ActionScript class for video cameras, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -74,19 +75,19 @@ public:
 };
 
 as_value camera_get(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value camera_setmode(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value camera_setmotionlevel(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value camera_setquality(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 
     return as_value();
 }
@@ -121,4 +122,3 @@ void camera_class_init(as_object& global)
 
 
 } // end of gnash namespace
-

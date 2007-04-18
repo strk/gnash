@@ -1,10 +1,25 @@
-// text.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// text.cpp:  Implementation of ActionScript text tags, for Gnash.
+// 
+//   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
+/* $Id: text.cpp,v 1.29 2007/04/18 11:00:29 jgilmore Exp $ */
 
-// Code for the text tags.
-
+// Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
 #include "utf8.h"
 #include "utility.h"
@@ -32,7 +47,7 @@ namespace gnash {
 			if (m_font == NULL)
 			{
 				IF_VERBOSE_MALFORMED_SWF(
-	log_warning("text style references unknown font (id = %d)\n",
+	log_error(_("text style references unknown font (id = %d)"),
 		m_font_id);
 				);
 			}
@@ -135,9 +150,8 @@ namespace gnash {
 
 				if (index == -1)
 				{
-					// Invalid glyph; render it as an empty box.
 #ifdef GNASH_DEBUG_TEXT_RENDERING
-log_msg("invalid glyph, render as an empty box");
+log_error(_("invalid glyph, render as an empty box"));
 #endif
 					render::set_matrix(mat);
 
@@ -164,7 +178,7 @@ log_msg("invalid glyph, render as an empty box");
 					    && (use_glyph_textures || glyph == NULL))
 					{
 #ifdef GNASH_DEBUG_TEXT_RENDERING
-log_msg("render glyph using draw_glyph");
+log_msg(_("render glyph using draw_glyph"));
 #endif
 						fontlib::draw_glyph(mat, tg, transformed_color, nominal_glyph_height);
 					}
@@ -175,7 +189,7 @@ log_msg("render glyph using draw_glyph");
 						if (glyph)
 						{
 #ifdef GNASH_DEBUG_TEXT_RENDERING
-log_msg("render glyph using filled outline (?) actually draw_glyph()");
+log_msg(_("render glyph using filled outline (?) actually draw_glyph()"));
 #endif
 
 							gnash::render::draw_glyph(glyph, mat, transformed_color, pixel_scale);
@@ -195,4 +209,3 @@ log_msg("render glyph using filled outline (?) actually draw_glyph()");
 // mode: C++
 // indent-tabs-mode: t
 // End:
-

@@ -1,3 +1,4 @@
+// Error.cpp:  ActionScript "Error" class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -70,7 +71,7 @@ public:
 };
 
 as_value error_tostring(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 

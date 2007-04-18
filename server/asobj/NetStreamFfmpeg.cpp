@@ -1,3 +1,4 @@
+// NetStreamFfmpeg.cpp:  Network streaming for FFMPEG video library, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,11 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.37 2007/04/11 17:54:21 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.38 2007/04/18 11:00:30 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -224,7 +227,7 @@ NetStreamFfmpeg::play(const char* c_url)
 	if ( ! _netCon )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("No NetConnection associated with this NetStream, won't play");
+		log_aserror(_("No NetConnection associated with this NetStream, won't play"));
 		);
 		return 0;
 	}
@@ -255,20 +258,20 @@ initContext(enum CodecID codec_id)
 
 	AVCodec* codec = avcodec_find_decoder(codec_id);
 	if (!codec) {
-		log_error("libavcodec couldn't find decoder.");
+		log_error(_("libavcodec couldn't find decoder"));
 		return NULL;
 	}
 
 	AVCodecContext * context = avcodec_alloc_context();
 	if (!context) {
-		log_error("libavcodec couldn't allocate context.");
+		log_error(_("libavcodec couldn't allocate context"));
 		return NULL;
 	}
 
 	int rv = avcodec_open(context, codec);
 	if (rv < 0) {
 		avcodec_close(context);
-		log_error("libavcodec failed to initialize codec.");
+		log_error(_("libavcodec failed to initialize codec"));
 		return NULL;
 	}
 
@@ -305,7 +308,7 @@ initFlvVideo(FLVParser* parser)
 			codec_id = CODEC_ID_FLASHSV;
 			break;
 		default:
-			log_error("Unsupported video codec");
+			log_error(_("Unsupported video codec %d"), (int) videoInfo->codec);
 			return NULL;
 	}
 
@@ -336,7 +339,7 @@ initFlvAudio(FLVParser* parser)
 			codec_id = CODEC_ID_MP3;
 			break;
 		default:
-			log_error("Unsupported audio codec");
+			log_error(_("Unsupported audio codec %d"), (int)audioInfo->codec);
 			return NULL;
 	}
 
@@ -361,7 +364,7 @@ probeStream(NetStreamFfmpeg* ns)
 	probe_data.buf_size = 2048;
 
 	if (ns->readPacket(ns, probe_data.buf, probe_data.buf_size) < 1){
- 		log_warning("Gnash could not read from movie url.");
+ 		log_error(_("Gnash could not read from movie url"));
  		return NULL;
 	}
 
@@ -378,7 +381,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	// Pass stuff from/to the NetConnection object.
 	assert(ns);
 	if ( !nc->openConnection(ns->url.c_str(), ns) ) {
-		log_warning("Gnash could not open movie: %s", ns->url.c_str());
+		log_error(_("Gnash could not open movie: %s"), ns->url.c_str());
 		ns->set_status("NetStream.Buffer.StreamNotFound");
 		return;
 	}
@@ -397,7 +400,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 		ns->m_parser = new FLVParser();
 		if (!nc->connectParser(ns->m_parser)) {
 			ns->set_status("NetStream.Buffer.StreamNotFound");
-			log_warning("Gnash could not open movie: %s", ns->url.c_str());
+			log_error(_("Gnash could not open FLV movie: %s"), ns->url.c_str());
 			delete ns->m_parser;
 			return;
 		}
@@ -408,13 +411,13 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 
 		ns->m_VCodecCtx = initFlvVideo(ns->m_parser);
 		if (!ns->m_VCodecCtx) {
-			log_msg("Failed to initialize video codec.");
+			log_msg(_("Failed to initialize FLV video codec"));
 			return;
 		}
 
 		ns->m_ACodecCtx = initFlvAudio(ns->m_parser);
 		if (!ns->m_ACodecCtx) {
-			log_msg("Failed to initialize audio codec.");
+			log_msg(_("Failed to initialize FLV audio codec"));
 			return;
 		}
 
@@ -444,7 +447,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 
 	AVInputFormat* inputFmt = probeStream(ns);
 	if (!inputFmt) {
-		log_error("Couldn't determine stream input format from URL %s", ns->url.c_str());
+		log_error(_("Couldn't determine stream input format from URL %s"), ns->url.c_str());
 		return;
 	}
 
@@ -460,7 +463,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 
 	// Open the stream. the 4th argument is the filename, which we ignore.
 	if(av_open_input_stream(&ns->m_FormatCtx, &ns->ByteIOCxt, "", inputFmt, NULL) < 0){
-		log_error("Couldn't open file '%s' for decoding", ns->url.c_str());
+		log_error(_("Couldn't open file '%s' for decoding"), ns->url.c_str());
 		ns->set_status("NetStream.Play.StreamNotFound");
 		return;
 	}
@@ -470,7 +473,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	int ret = av_find_stream_info(ns->m_FormatCtx);
 	if (ret < 0)
 	{
-		log_error("Couldn't find stream information from '%s', error code: %d", ns->url.c_str(), ret);
+		log_error(_("Couldn't find stream information from '%s', error code: %d"), ns->url.c_str(), ret);
 		return;
 	}
 
@@ -509,7 +512,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 
 	if (ns->m_video_index < 0)
 	{
-		log_error("Didn't find a video stream from '%s'", ns->url.c_str());
+		log_error(_("Didn't find a video stream from '%s'"), ns->url.c_str());
 		return;
 	}
 
@@ -521,14 +524,16 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	if (pCodec == NULL)
 	{
 		ns->m_VCodecCtx = NULL;
-		log_error("Decoder not found");
+		log_error(_("Video decoder %d not found"), 
+			ns->m_VCodecCtx->codec_id);
 		return;
 	}
 
 	// Open codec
 	if (avcodec_open(ns->m_VCodecCtx, pCodec) < 0)
 	{
-		log_error("Could not open codec");
+		log_error(_("Could not open codec %d"),
+			ns->m_VCodecCtx->codec_id);
 	}
 
 	// Allocate a frame to store the decoded frame in
@@ -553,14 +558,16 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 		AVCodec* pACodec = avcodec_find_decoder(ns->m_ACodecCtx->codec_id);
 	    if(pACodec == NULL)
 		{
-			log_error("No available AUDIO decoder to process MPEG file: '%s'", ns->url.c_str());
+			log_error(_("No available audio decoder %d to process MPEG file: '%s'"), 
+				ns->m_ACodecCtx->codec_id, ns->url.c_str());
 			return;
 		}
         
 		// Open codec
 		if (avcodec_open(ns->m_ACodecCtx, pACodec) < 0)
 		{
-			log_error("Could not open AUDIO codec");
+			log_error(_("Could not open audio codec %d for %s"));
+				ns->m_ACodecCtx->codec_id, ns->url.c_str());
 			return;
 		}
 
@@ -734,7 +741,7 @@ bool NetStreamFfmpeg::read_frame()
 		}
 		else
 		{
-			log_warning("read_frame: not audio & video stream");
+			log_error(_("read_frame: not audio & video stream"));
 		}
 		return true;
 	}
@@ -934,7 +941,7 @@ bool NetStreamFfmpeg::read_frame()
 	}
 	else
 	{
-		log_warning("Problems decoding frame");
+		log_error(_("Problems decoding frame"));
 		return false;
 	}
 
@@ -978,7 +985,7 @@ NetStreamFfmpeg::seek(double pos)
 		newpos = static_cast<long>(pos / timebase);
 		
 		if (av_seek_frame(m_FormatCtx, m_video_index, newpos, 0) < 0) {
-			log_warning("seeking failed");
+			log_error(_("%s: seeking failed"), __FUNCTION__);
 			return;
 		}
 	} else {

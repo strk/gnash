@@ -1,3 +1,4 @@
+// textformat.cpp:  ActionScript text formatting decorators, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,13 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
 // 
-// $Id: textformat.cpp,v 1.25 2007/04/15 10:52:09 bjacques Exp $
-//
+
+// $Id: textformat.cpp,v 1.26 2007/04/18 11:00:29 jgilmore Exp $
 
 #include "log.h"
 #include "textformat.h"
@@ -40,7 +41,7 @@ namespace gnash {
       _tab_stops(-1),
       _target(-1)
 {
-  //log_msg("%s: \n", __FUNCTION__);
+  //log_msg("%s:", __FUNCTION__);
 }
 
 text_format::~text_format()
@@ -52,7 +53,7 @@ text_format::~text_format()
 text_format *
 text_format::operator = (text_format &format)
 {
-  log_msg("%s: \n", __FUNCTION__);
+  GNASH_REPORT_FUNCTION;
 
   _underline = format._underline;
   _bold = format._bold;
@@ -79,47 +80,48 @@ text_format::operator = (text_format &format)
 void
 text_format::setTextFormat (text_format& /*format*/)
 {
-  //log_msg("%s: \n", __FUNCTION__);
+  //GNASH_REPORT_FUNCTION;
 }
 
 void
 text_format::setTextFormat (int /*index*/, text_format& /*format*/)
 {
-  //log_msg("%s: \n", __FUNCTION__);
+  //GNASH_REPORT_FUNCTION;
 }
 
 void
 text_format::setTextFormat (int /*start*/, int /*end*/, text_format& /*format*/)
 {
-  //log_msg("%s: \n", __FUNCTION__);
+  //GNASH_REPORT_FUNCTION;
 }
 
 #if 0
 text_format &
 text_format::getTextFormat ()
 {
-  log_msg("%s: \n", __FUNCTION__);
+  GNASH_REPORT_FUNCTION;
 }
 
 text_format &
 text_format::getTextFormat (int index)
 {
-  log_msg("%s: \n", __FUNCTION__);
+  GNASH_REPORT_FUNCTION;
 }
 
 text_format &
 text_format::getTextFormat (int start, int end)
 {
-  log_msg("%s: \n", __FUNCTION__);
+  GNASH_REPORT_FUNCTION;
 }
 #endif
 
 as_value textformat_new(const fn_call& /* fn */)
 {
-  //log_msg("%s: args=%d\n", __FUNCTION__, nargs);
+  //GNASH_REPORT_FUNCTION;
+  //log_msg(_("%s: args=%d"), __FUNCTION__, nargs);
 
   boost::intrusive_ptr<textformat_as_object> text_obj = new textformat_as_object;
-  log_warning("Created New TextFormat object at %p. Not fully implemented yet!", (void*)text_obj.get());
+  log_unimpl(_("Created New TextFormat object at %p.  Not fully implemented yet"), (void*)text_obj.get());
   
   // tulrich: this looks like it's inserting a method into our
   // caller's env.  setTextFormat is a method on TextField.  So here
@@ -136,7 +138,7 @@ as_value textformat_new(const fn_call& /* fn */)
 as_value textformat_setformat(const fn_call& fn)
 {
   as_value	method;
-  //log_msg("%s: args=%d at %p\n", __FUNCTION__, nargs, this_ptr);
+  //log_msg(_("%s: args=%d at %p"), __FUNCTION__, nargs, this_ptr);
 
   boost::intrusive_ptr<textformat_as_object> ptr = ensureType<textformat_as_object>(fn.this_ptr);
   //double start = fn.arg(0).to_number();
@@ -145,7 +147,7 @@ as_value textformat_setformat(const fn_call& fn)
   if ( fn.nargs < 3 )
   {
     IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror("TextFormat.setFormat() needs at least 3 arguments - ...me thinks");
+    log_aserror(_("TextFormat.setFormat() needs at least 3 arguments - ...me thinks"));
     );
     return as_value();
   }
@@ -154,73 +156,73 @@ as_value textformat_setformat(const fn_call& fn)
   if ( ! obj )
   {
     IF_VERBOSE_ASCODING_ERRORS(
-    log_aserror("Argument 3 given to TextFormat.setFormat() is not a TextFormat object - ... should it?");
+    log_aserror(_("Argument 3 given to TextFormat.setFormat() is not a TextFormat object - ... should it be?"));
     );
     return as_value();
   }
   assert(obj);
 
-  //log_msg("Change from %f for %f characters for object at %p\n", start, end, obj);
+  //log_msg(_("Change from %f for %f characters for object at %p"), start, end, obj);
 
   // Check for the flags that could be set
   if (obj->get_member("underline", &method)) {
-    //log_msg("Underline exists and is set to %d\n", method.to_bool());
+    //log_msg(_("Underline exists and is set to %d"), method.to_bool());
     obj->obj.underlinedSet(method.to_bool());
   }
   
   if (obj->get_member("italic", &method)) {
-    //log_msg("Italic exists and is set to %d\n", method.to_bool());
+    //log_msg(_("Italic exists and is set to %d"), method.to_bool());
     obj->obj.italicedSet(method.to_bool());
   }
   
   if (obj->get_member("bold", &method)) {
-    //log_msg("Bold exists and is set to %d\n", method.to_bool());
+    //log_msg(_("Bold exists and is set to %d"), method.to_bool());
     obj->obj.boldSet(method.to_bool());
   }
   
   if (obj->get_member("bullet", &method)) {
-    //log_msg("Bullet exists and is set to %d\n", method.to_bool());
+    //log_msg(_("Bullet exists and is set to %d"), method.to_bool());
     obj->obj.bulletSet(method.to_bool());
   }
 
   if (obj->get_member("color", &method)) {
-    //log_msg("Color exists and is set to %f\n", method.to_number());
+    //log_msg(_("Color exists and is set to %f", method.to_number());
     obj->obj.colorSet((uint32_t)method.to_number());
   }
 
   if (obj->get_member("indent", &method)) {
-    //log_msg("Indent exists and is set to %f\n", method.to_number());
+    //log_msg(_("Indent exists and is set to %f"), method.to_number());
     obj->obj.indentSet(float(method.to_number()));
   }
 
   if (obj->get_member("align", &method)) {
-    //log_msg("Align exists and is set to %s\n", method.to_string());
+    //log_msg(_("Align exists and is set to %s"), method.to_string());
     const char* align = method.to_string().c_str();
     if ( align ) obj->obj.alignSet(align);
   }
 
   if (obj->get_member("blockIndent", &method)) {
-    //log_msg("BlockIndent exists and is set to %f\n", method.to_number());
+    //log_msg(_("BlockIndent exists and is set to %f"), method.to_number());
     obj->obj.blockIndentSet(float(method.to_number()));
   }
   
   if (obj->get_member("leading", &method)) {
-    //log_msg("Leading exists and is set to %f\n", method.to_number());
+    //log_msg(_("Leading exists and is set to %f"), method.to_number());
     obj->obj.leadingSet(float(method.to_number()));
   }
   
   if (obj->get_member("leftMargin", &method)) {
-    //log_msg("LeftMargin exists and is set to %f\n", method.to_number());
+    //log_msg(_("LeftMargin exists and is set to %f"), method.to_number());
     obj->obj.leftMarginSet(float(method.to_number()));
   }
   
   if (obj->get_member("RightMargin", &method)) {
-    //log_msg("RightMargin exists and is set to %f\n", method.to_number());
+    //log_msg(_("RightMargin exists and is set to %f"), method.to_number());
     obj->obj.rightMarginSet(float(method.to_number()));
   }
   
   if (obj->get_member("size", &method)) {
-    //log_msg("Size exists and is set to %f\n", method.to_number());
+    //log_msg(_("Size exists and is set to %f"), method.to_number());
     obj->obj.sizeSet(float(method.to_number()));
   }
   
@@ -232,7 +234,7 @@ as_value textformat_setformat(const fn_call& fn)
   void
   textformat_getformat(gnash::as_value* result, gnash::as_object_interface* this_ptr, gnash::as_environment* env, int nargs, int first_arg)
 {
-  log_msg("%s: args=%d unfinished implementation\n", __FUNCTION__, nargs);
+  log_unimpl(_("%s: args=%d unfinished implementation"), __FUNCTION__, nargs);
   textformat_as_object*	ptr = (textformat_as_object*)this_ptr;
   assert(ptr);
   double start = env->bottom(first_arg).to_number();

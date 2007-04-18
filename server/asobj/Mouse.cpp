@@ -1,3 +1,4 @@
+// Mouse.cpp:  ActionScript "Mouse" input device class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -81,7 +82,7 @@ as_value mouse_addlistener(const fn_call& fn)
     static bool warned=false;
     if ( ! warned )
     {
-        log_warning("%s: unimplemented", __FUNCTION__);
+        log_unimpl (__FUNCTION__);
         warned=true;
     }
     return as_value();
@@ -95,7 +96,7 @@ as_value mouse_hide(const fn_call& fn)
     static bool warned=false;
     if ( ! warned )
     {
-        log_warning("%s: unimplemented", __FUNCTION__);
+        log_unimpl (__FUNCTION__);
         warned=true;
     }
     return as_value();
@@ -109,7 +110,7 @@ as_value mouse_removelistener(const fn_call& fn)
     static bool warned=false;
     if ( ! warned )
     {
-        log_warning("%s: unimplemented", __FUNCTION__);
+        log_unimpl (__FUNCTION__);
         warned=true;
     }
     return as_value();
@@ -123,7 +124,7 @@ as_value mouse_show(const fn_call& fn)
     static bool warned=false;
     if ( ! warned )
     {
-        log_warning("%s: unimplemented", __FUNCTION__);
+        log_unimpl (__FUNCTION__);
         warned=true;
     }
     return as_value();
@@ -159,4 +160,3 @@ void mouse_class_init(as_object& global)
 
 
 } // end of gnash namespace
-

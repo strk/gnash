@@ -1,3 +1,4 @@
+// NetStream.cpp:  ActionScript class for streaming audio/video, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,12 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.36 2007/04/15 10:52:09 bjacques Exp $ */
+/* $Id: NetStream.cpp,v 1.37 2007/04/18 11:00:30 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -80,9 +82,9 @@ netstream_new(const fn_call& fn)
 		else
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror("First argument "
+				log_aserror(_("First argument "
 					"to NetStream constructor "
-					"doesn't cast to a NetConnection (%s)",
+					"doesn't cast to a NetConnection (%s)"),
 					fn.arg(0).to_string().c_str());
 			);
 		}
@@ -119,7 +121,7 @@ static as_value netstream_play(const fn_call& fn)
 	if (fn.nargs < 1)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("NetStream play needs args");
+		log_aserror(_("NetStream play needs args"));
 		);
 		return as_value();
 	}
@@ -248,4 +250,3 @@ void netstream_class_init(as_object& global)
 }
 
 } // end of gnash namespace
-

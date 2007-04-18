@@ -1,3 +1,4 @@
+// NetStreamGst.cpp:  Audio/video output via Gstreamer library, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,11 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $id$ */
+/* $Id: NetStreamGst.cpp,v 1.24 2007/04/18 11:00:30 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -160,11 +163,11 @@ NetStreamGst::play(const char* c_url)
 		return 0;
 	}
 
-	// Does it have an associated NetConnectoin ?
+	// Does it have an associated NetConnection?
 	if ( ! _netCon )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("No NetConnection associated with this NetStream, won't play");
+		log_aserror(_("No NetConnection associated with this NetStream, won't play"));
 		);
 		return 0;
 	}
@@ -340,7 +343,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	assert(ns);
 	if ( !nc->openConnection(ns->url.c_str(), ns) ) {
 		ns->set_status("NetStream.Play.StreamNotFound");
-		log_warning("Gnash could not open movie: %s", ns->url.c_str());
+		log_warning(_("Gnash could not open movie: %s"), ns->url.c_str());
 		return;
 	}
 
@@ -357,7 +360,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 		ns->m_parser = new FLVParser();
 		if (!nc->connectParser(ns->m_parser)) {
 			ns->set_status("NetStream.Play.StreamNotFound");
-			log_warning("Gnash could not open movie: %s", ns->url.c_str());
+			log_error(_("Gnash could not open movie: %s"), ns->url.c_str());
 			return;
 			
 		}
@@ -374,7 +377,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 
 	// Check if the creation of the gstreamer pipeline and audiosink was a succes
 	if (!ns->pipeline) {
-		gnash::log_error("The gstreamer pipeline element could not be created");
+		gnash::log_error(_("The gstreamer pipeline element could not be created"));
 		return;
 	}
 
@@ -393,7 +396,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 		if (!ns->audiosink) ns->audiosink = gst_element_factory_make ("esdsink", NULL);
 
 		if (!ns->audiosink) {
-			gnash::log_error("The gstreamer audiosink element could not be created");
+			log_error(_("The gstreamer audiosink element could not be created"));
 			return;
 		}
 	} else {
@@ -407,7 +410,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	ns->volume = gst_element_factory_make ("volume", NULL);
 
 	if (!ns->audioconv || !ns->volume) {
-		gnash::log_error("Gstreamer audio element(s) for movie handling could not be created");
+		log_error(_("Gstreamer audio element(s) for movie handling could not be created"));
 		return;
 	}
 
@@ -452,7 +455,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 
 			// Check if the element was correctly created
 			if (!ns->videodecoder) {
-				log_error("A gstreamer flashvideo (h.263) decoder element could not be created! You probably need to install gst-ffmpeg.");
+				log_error(_("A gstreamer flashvideo (h.263) decoder element could not be created.  You probably need to install gst-ffmpeg."));
 				return;
 			}
 
@@ -466,7 +469,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 
 			// Check if the element was correctly created
 			if (!ns->videodecoder) {
-				log_error("A gstreamer flashvideo (VP6) decoder element could not be created! You probably need to install gst-ffmpeg.");
+				log_error(_("A gstreamer flashvideo (VP6) decoder element could not be created! You probably need to install gst-ffmpeg."));
 				return;
 			}
 
@@ -480,12 +483,13 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 
 			// Check if the element was correctly created
 			if (!ns->videodecoder) {
-				log_error("A gstreamer flashvideo (ScreenVideo) decoder element could not be created! You probably need to install gst-ffmpeg.");
+				log_error(_("A gstreamer flashvideo (ScreenVideo) decoder element could not be created! You probably need to install gst-ffmpeg."));
 				return;
 			}
 
 		} else {
-			log_error("Unsupported video codec");
+			log_error(_("Unsupported video codec %d"),
+				  videoInfo->codec);
 			return;
 		}
 
@@ -502,14 +506,14 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 					static bool warned = false;
 					if ( ! warned )
 					{
-					log_warning("This version of fluendos mp3 plugin does not support flash streaming sounds, please upgrade to version 0.10.4 or higher.");
+					log_error(_("This version of Fluendo's mp3 plugin does not support flash streaming sounds, please upgrade to version 0.10.4 or higher."));
 					warned=true;
 					}
 				}
 			}
 			// Check if the element was correctly created
 			if (!ns->audiodecoder) {
-				log_error("A gstreamer mp3-decoder element could not be created! You probably need to install a mp3-decoder plugin like gstreamer0.10-mad or gstreamer0.10-fluendo-mp3.");
+				log_error(_("A gstreamer mp3-decoder element could not be created! You probably need to install a mp3-decoder plugin like gstreamer0.10-mad or gstreamer0.10-fluendo-mp3."));
 				return;
 			}
 
@@ -523,7 +527,8 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 			g_object_set (G_OBJECT (ns->audioinputcaps), "caps", audioincaps, NULL);
 			gst_caps_unref (audioincaps);
 		} else {
-			log_error("Unsupported audio codec");
+			log_error(_("Unsupported audio codec %d"),
+				  audioInfo->codec);
 			return;
 		}
 	}
@@ -558,18 +563,18 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 
 	if (ns->m_isFLV) {
 		if (!ns->videosource || !ns->audiosource || !ns->videoinputcaps ||  !ns->audioinputcaps) {
-			gnash::log_error("Gstreamer source element(s) for video movie handling could not be created, you proberly need to install gstreamer0.10-core for fakesrc and capsfilter support.");
+			log_error(_("Gstreamer source element(s) for video movie handling could not be created, you probably need to install gstreamer0.10-core for fakesrc and capsfilter support."));
 			return;
 		}
 	} else {
 		if (!ns->decoder || !ns->source) {
-			gnash::log_error("Gstreamer element(s) for video movie handling could not be created, you proberly need to install gstreamer0.10-base for decodebin support.");
+			log_error(_("Gstreamer element(s) for video movie handling could not be created, you probably need to install gstreamer0.10-base for decodebin support."));
 			return;
 		}
 	}
 
 	if (!ns->colorspace || !ns->videocaps || !ns->videorate || !ns->videosink) {
-		gnash::log_error("Gstreamer element(s) for video movie handling could not be created, you proberly need to install gstreamer0.10-base for ffmpegcolorspace and videorate support.");
+		log_error(_("Gstreamer element(s) for video movie handling could not be created, you probably need to install gstreamer0.10-base for ffmpegcolorspace and videorate support."));
 		return;
 	}
 
@@ -636,7 +641,7 @@ NetStreamGst::seek(double pos)
 		/*if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
 			GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(newpos),
 			GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
-			log_warning("Seek failed");
+			log_error("Gstreamer seek failed");
 			set_status("NetStream.Seek.InvalidTime");
 			return;
 		}*/
@@ -644,7 +649,7 @@ NetStreamGst::seek(double pos)
 		if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
 			GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(pos),
 			GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
-			log_warning("Seek failed");
+			log_error("Gstreamer seek failed");
 			set_status("NetStream.Seek.InvalidTime");
 			return;
 		}

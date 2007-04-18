@@ -1,3 +1,4 @@
+// LoadVars.cpp:  ActionScript "LoadVars" class (HTTP variables), for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -489,7 +490,7 @@ loadvars_addrequestheader(const fn_call& fn)
 {
 	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	UNUSED(ptr);
-	log_error("%s: unimplemented", __FUNCTION__);
+	log_unimpl (__FUNCTION__);
 	return as_value(); 
 }
 
@@ -498,7 +499,7 @@ loadvars_decode(const fn_call& fn)
 {
 	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	UNUSED(ptr);
-	log_error("%s: unimplemented", __FUNCTION__);
+	log_unimpl (__FUNCTION__);
 	return as_value(); 
 }
 
@@ -524,7 +525,7 @@ loadvars_load(const fn_call& fn)
 	if ( fn.nargs < 1 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("LoadVars.load() requires at least one argument");
+		log_aserror(_("LoadVars.load() requires at least one argument"));
 		);
 		return as_value(false);
 	}
@@ -533,7 +534,7 @@ loadvars_load(const fn_call& fn)
 	if ( urlstr.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("LoadVars.load(): invalid empty url ");
+		log_aserror(_("LoadVars.load(): invalid empty url"));
 		);
 		return as_value(false);
 	}
@@ -548,7 +549,7 @@ loadvars_send(const fn_call& fn)
 {
 	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	UNUSED(ptr);
-	log_error("%s: unimplemented", __FUNCTION__);
+	log_unimpl (__FUNCTION__);
 	return as_value(); 
 }
 
@@ -560,7 +561,7 @@ loadvars_sendandload(const fn_call& fn)
 	if ( fn.nargs < 2 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("LoadVars.sendAndLoad() requires at least two arguments");
+		log_aserror(_("LoadVars.sendAndLoad() requires at least two arguments"));
 		);
 		return as_value(false);
 	}
@@ -569,7 +570,7 @@ loadvars_sendandload(const fn_call& fn)
 	if ( urlstr.empty() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("LoadVars.sendAndLoad(): invalid empty url ");
+		log_aserror(_("LoadVars.sendAndLoad(): invalid empty url"));
 		);
 		return as_value(false);
 	}
@@ -578,7 +579,7 @@ loadvars_sendandload(const fn_call& fn)
 	if ( ! target )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("LoadVars.sendAndLoad(): invalid target (must be a LoadVars object)");
+		log_aserror(_("LoadVars.sendAndLoad(): invalid target (must be a LoadVars object)"));
 		);
 		return as_value(false);
 	}
@@ -598,7 +599,7 @@ loadvars_tostring(const fn_call& fn)
 {
 	boost::intrusive_ptr<LoadVars> ptr = ensureType<LoadVars>(fn.this_ptr);
 	UNUSED(ptr);
-	log_error("%s: unimplemented", __FUNCTION__);
+	log_unimpl (__FUNCTION__);
 	return as_value(); 
 }
 
@@ -633,4 +634,3 @@ loadvars_class_init(as_object& global)
 
 
 } // end of gnash namespace
-

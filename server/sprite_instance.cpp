@@ -1,3 +1,4 @@
+// sprite_instance.cpp:  Stateful live Sprite instance, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,14 +11,11 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
 //
-
-// Stateful live Sprite instance
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -137,8 +135,8 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	if (fn.nargs < 3 || fn.nargs > 4)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("attachMovie called with wrong number of arguments"
-			" expected 3 to 4, got (%d) - returning undefined",
+		log_aserror(_("attachMovie called with wrong number of arguments"
+			" expected 3 to 4, got (%d) - returning undefined"),
 			fn.nargs);
 		);
 		return rv;
@@ -151,8 +149,8 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	if ( exported == NULL )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("attachMovie: '%s': no such exported resource - "
-			"returning undefined",
+		log_aserror(_("attachMovie: '%s': no such exported resource - "
+			"returning undefined"),
 			id_name.c_str());
 		);
 		return rv; 
@@ -161,9 +159,9 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	if ( ! exported_movie )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("attachMovie: exported resource '%s' "
+		log_aserror(_("attachMovie: exported resource '%s' "
 			"is not a movie definition (%s) -- "
-			"returning undefined",
+			"returning undefined"),
 			id_name.c_str(),
 			typeid(*(exported.get())).name());
 		);
@@ -185,7 +183,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	// place_character() will set depth on newch
 	if ( ! sprite->attachCharacter(*newch, depth_val) )
 	{
-		log_error("Could not attach character at depth %d", depth_val);
+		log_error(_("Could not attach character at depth %d"), depth_val);
 		return rv;
 	}
 
@@ -196,7 +194,7 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	if (fn.nargs > 3 ) {
 		boost::intrusive_ptr<as_object> initObject = fn.arg(3).to_object();
 		if ( initObject ) {
-			log_msg("Initializing properties from object");
+			//log_msg(_("Initializing properties from object"));
 			newch->copyProperties(*initObject);
 		} else {
 			// This is actually a valid thing to do,
@@ -204,8 +202,8 @@ static as_value sprite_attach_movie(const fn_call& fn)
 			// initializing the properties in this
 			// case.
 			IF_VERBOSE_MALFORMED_SWF(
-			log_aserror("Fourth argument of attachMovie "
-				"doesn't cast to an object (%s)",
+			log_aserror(_("Fourth argument of attachMovie "
+				"doesn't cast to an object (%s)"),
 				fn.arg(3).to_string().c_str());
 			);
 		}
@@ -223,8 +221,7 @@ static as_value sprite_attach_audio(const fn_call& fn)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.attachAudio() unimplemented -- "
-			"returning undefined");
+		log_unimpl("MovieClip.attachAudio()");
 		warned=true;
 	}
 	return as_value();
@@ -240,9 +237,9 @@ static as_value sprite_create_empty_movieclip(const fn_call& fn)
 		if (fn.nargs < 2)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror("createEmptyMovieClip needs "
+				log_aserror(_("createEmptyMovieClip needs "
 					"2 args, but %d given,"
-					" returning undefined.",
+					" returning undefined"),
 					fn.nargs);
 			);
 			return as_value();
@@ -250,9 +247,9 @@ static as_value sprite_create_empty_movieclip(const fn_call& fn)
 		else
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror("createEmptyMovieClip takes "
+				log_aserror(_("createEmptyMovieClip takes "
 					"2 args, but %d given, discarding"
-					" the one in excess.",
+					" the excess"),
 					fn.nargs);
 			)
 		}
@@ -288,7 +285,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
 	if (fn.nargs < 1)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("%s.swapDepths() needs one arg.", sprite->getTarget().c_str());
+		log_aserror(_("%s.swapDepths() needs one arg"), sprite->getTarget().c_str());
 		);
 		return rv;
 	}
@@ -297,7 +294,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		stringstream ss; fn.dump_args(ss);
-		log_aserror("%s.swapDepths(%s) : won't swap a clip below depth %d (%d).",
+		log_aserror(_("%s.swapDepths(%s): won't swap a clip below depth %d (%d)"),
 			sprite->getTarget().c_str(), ss.str().c_str(), lowerDepthBound, this_depth);
 		);
 		return rv;
@@ -309,8 +306,8 @@ static as_value sprite_swap_depths(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		stringstream ss; fn.dump_args(ss);
-		log_aserror("%s.swapDepths(%s): this sprite has no parent, "
-			"swapping depth of root ?",
+		log_aserror(_("%s.swapDepths(%s): this sprite has no parent, "
+			"swapping depth of root?"),
 			sprite->getTarget().c_str(),
 			ss.str().c_str());
 		);
@@ -327,7 +324,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
 		if ( sprite == target_sprite )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("%s.swapDepths(%s): invalid call, swapping to self?",
+			log_aserror(_("%s.swapDepths(%s): invalid call, swapping to self?"),
 				sprite->getTarget().c_str(), target_sprite->getTarget().c_str());
 			);
 			return rv;
@@ -337,7 +334,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
 		if ( this_parent != target_parent )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("%s.swapDepths(%s): invalid call, the two characters don't have the same parent",
+			log_aserror(_("%s.swapDepths(%s): invalid call, the two characters don't have the same parent"),
 				sprite->getTarget().c_str(), target_sprite->getTarget().c_str());
 			);
 			return rv;
@@ -354,8 +351,8 @@ static as_value sprite_swap_depths(const fn_call& fn)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			stringstream ss; fn.dump_args(ss);
-			log_aserror("%s.swapDepths(%s): first argument invalid "
-				"(neither a sprite nor a number).",
+			log_aserror(_("%s.swapDepths(%s): first argument invalid "
+				"(neither a sprite nor a number)"),
 				sprite->getTarget().c_str(),
 				ss.str().c_str());
 			);
@@ -389,7 +386,7 @@ static as_value sprite_duplicate_movieclip(const fn_call& fn)
 	if (fn.nargs < 2)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("MovieClip.duplicateMovieClip() needs 2 or 3 args");
+		log_aserror(_("MovieClip.duplicateMovieClip() needs 2 or 3 args"));
 	    	);
 		return as_value();
 	}
@@ -420,7 +417,7 @@ static as_value sprite_goto_and_play(const fn_call& fn)
 	if (fn.nargs < 1)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("sprite_goto_and_play needs one arg");
+		log_aserror(_("sprite_goto_and_play needs one arg"));
 		);
 		return as_value();
 	}
@@ -439,7 +436,7 @@ static as_value sprite_goto_and_stop(const fn_call& fn)
 	if (fn.nargs < 1)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("sprite_goto_and_stop needs one arg");
+		log_aserror(_("sprite_goto_and_stop needs one arg"));
 		);
 		return as_value();
 	}
@@ -503,8 +500,8 @@ static as_value sprite_load_movie(const fn_call& fn)
 	if (fn.nargs < 1) // url
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg("Invalid call to MovieClip.loadMove(), "
-			"expected 1 or 2 args, got %d - returning undefined",
+		log_aserror(_("MovieClip.loadMovie() "
+			"expected 1 or 2 args, got %d - returning undefined"),
 			fn.nargs);
 		);
 		return as_value();
@@ -515,9 +512,9 @@ static as_value sprite_load_movie(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_msg("First argument passed to MovieClip.loadMove(%s) "
+		log_msg(_("First argument of MovieClip.loadMovie(%s) "
 			"evaluates to an empty string - "
-			"returning undefined",
+			"returning undefined"),
 			ss.str().c_str());
 		);
 		return as_value();
@@ -528,16 +525,16 @@ static as_value sprite_load_movie(const fn_call& fn)
 	if (fn.nargs > 1)
 	{
 		// TODO: implement support for second argument
-		log_error("FIXME: second argument of MovieClip.loadMovie(%s, <variables>) "
-			"will be discarded (unsupported)", urlstr.c_str());
+		log_unimpl(_("second argument of MovieClip.loadMovie(%s, <variables>) "
+			"will be discarded"), urlstr.c_str());
 		//return;
 	}
 
 	sprite->loadMovie(url);
-	//log_warning("MovieClip.loadMovie(%s) - TESTING ", url.str().c_str());
+	//log_msg("MovieClip.loadMovie(%s) - TESTING ", url.str().c_str());
 
 
-	//log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
+	//log_unimp("%s", __PRETTY_FUNCTION__);
 	//moviecliploader_loadclip(fn);
 	return as_value();
 }
@@ -551,8 +548,8 @@ static as_value sprite_load_variables(const fn_call& fn)
 	if (fn.nargs < 1) // url
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg("Invalid call to MovieClip.loadVariables(), "
-			"expected 1 or 2 args, got %d - returning undefined",
+		log_msg(_("MovieClip.loadVariables() "
+			"expected 1 or 2 args, got %d - returning undefined"),
 			fn.nargs);
 		);
 		return as_value();
@@ -563,9 +560,9 @@ static as_value sprite_load_variables(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_msg("First argument passed to MovieClip.loadVariables(%s) "
+		log_msg(_("First argument passed to MovieClip.loadVariables(%s) "
 			"evaluates to an empty string - "
-			"returning undefined",
+			"returning undefined"),
 			ss.str().c_str());
 		);
 		return as_value();
@@ -584,10 +581,10 @@ static as_value sprite_load_variables(const fn_call& fn)
 	}
 
 	sprite->loadVariables(url, method);
-	log_warning("MovieClip.loadVariables(%s) - TESTING ", url.str().c_str());
+	log_msg("MovieClip.loadVariables(%s) - TESTING ", url.str().c_str());
 
 
-	//log_error("FIXME: %s not implemented yet", __PRETTY_FUNCTION__);
+	//log_unimpl(__PRETTY_FUNCTION__);
 	//moviecliploader_loadclip(fn);
 	return as_value();
 }
@@ -603,7 +600,7 @@ static as_value sprite_unload_movie(const fn_call& fn)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.unloadMovie() not implemented yet");
+		log_unimpl("MovieClip.unloadMovie()");
 		warned=true;
 	}
 	return as_value();
@@ -627,13 +624,13 @@ static as_value sprite_hit_test(const fn_call& fn)
 			if ( ! target )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror("Can't find hitTest target %s",
+				log_aserror(_("Can't find hitTest target %s"),
 					tgt_val.to_string().c_str());
 				);
 				return as_value();
 			}
 			if ( ! warned_1_arg ) {
-				log_error("FIXME: hitTest(target) unimplemented");
+				log_unimpl("hitTest(target)");
 				warned_1_arg=true;
 			}
 			break;
@@ -644,8 +641,7 @@ static as_value sprite_hit_test(const fn_call& fn)
 			double x = fn.arg(0).to_number();
 			double y = fn.arg(1).to_number();
 			if ( ! warned_2_arg ) {
-				log_error("FIXME: hitTest(%g,%g) unimplemented",
-				x,y);
+				log_unimpl("hitTest(%g,%g)", x,y);
 				warned_2_arg=true;
 			}
 			break;
@@ -657,8 +653,7 @@ static as_value sprite_hit_test(const fn_call& fn)
 			double y = fn.arg(1).to_number();
 			bool shapeFlag = fn.arg(2).to_bool();
 			if ( ! warned_3_arg ) {
-				log_error("FIXME: hitTest(%g,%g,%d) unimplemented",
-					x,y,shapeFlag);
+				log_unimpl("hitTest(%g,%g,%d)", x,y,shapeFlag);
 				warned_3_arg=true;
 			}
 			break;
@@ -667,7 +662,7 @@ static as_value sprite_hit_test(const fn_call& fn)
 		default:
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-				log_aserror("hitTest() called with %u args.",
+				log_aserror(_("hitTest() called with %u args"),
 					fn.nargs);
 			);
 			break;
@@ -686,8 +681,8 @@ sprite_create_text_field(const fn_call& fn)
 	if (fn.nargs != 6) // name, depth, x, y, width, height
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg("createTextField called with %d args, "
-			"expected 6 - returning undefined", fn.nargs);
+		log_msg(_("createTextField called with %d args, "
+			"expected 6 - returning undefined"), fn.nargs);
 		);
 		return as_value();
 	}
@@ -695,8 +690,8 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(0).is_string() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg("First argument of createTextField is not a string"
-			" - returning undefined");
+		log_msg(_("First argument of createTextField is not a string"
+			" - returning undefined"));
 		);
 		return as_value();
 	}
@@ -705,8 +700,8 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(1).is_number() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg("Second argument of createTextField is not a number"
-			" - returning undefined");
+		log_msg(_("Second argument of createTextField is not a number"
+			" - returning undefined"));
 		);
 		return as_value();
 	}
@@ -715,8 +710,8 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(2).is_number() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg("Third argument of createTextField is not a number"
-			" - returning undefined");
+		log_msg(_("Third argument of createTextField is not a number"
+			" - returning undefined"));
 		);
 		return as_value();
 	}
@@ -725,8 +720,8 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(3).is_number() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg("Fourth argument of createTextField is not a number"
-			" - returning undefined");
+		log_msg(_("Fourth argument of createTextField is not a number"
+			" - returning undefined"));
 		);
 		return as_value();
 	}
@@ -735,8 +730,8 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(4).is_number() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg("Fifth argument of createTextField is not a number"
-			" - returning undefined");
+		log_msg(_("Fifth argument of createTextField is not a number"
+			" - returning undefined"));
 		);
 		return as_value();
 	}
@@ -745,8 +740,8 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(5).is_number() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg("Fifth argument of createTextField is not a number"
-			" - returning undefined");
+		log_msg(_("Fifth argument of createTextField is not a number"
+			" - returning undefined"));
 		);
 		return as_value();
 	}
@@ -779,7 +774,7 @@ sprite_getURL(const fn_call& fn)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.getURL() not implemented yet");
+		log_unimpl("MovieClip.getURL()");
 		warned=true;
 	}
 	return as_value();
@@ -800,7 +795,7 @@ sprite_getBounds(const fn_call& fn)
 		if ( ! target )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("MovieClip.getBounds(%s) : invalid call, first arg must be a sprite",
+			log_aserror(_("MovieClip.getBounds(%s): invalid call, first arg must be a sprite"),
 				fn.arg(0).to_debug_string().c_str());
 			);
 			return as_value();
@@ -823,7 +818,7 @@ sprite_getBounds(const fn_call& fn)
 		tgtwmat.transform_by_inverse(bounds);
 		//ss << "tgt-w-invtransfor bounds: " << bounds << "(tgtwmat is " << tgtwmat << ")" << endl;
 		//log_msg("%s", ss.str().c_str());
-		log_error("FIXME: MovieClip.getBounds(%s) TESTING", fn.arg(0).to_debug_string().c_str());
+		log_msg("FIXME: MovieClip.getBounds(%s) TESTING", fn.arg(0).to_debug_string().c_str());
 	}
 
 	// Magic numbers here... dunno why
@@ -859,7 +854,7 @@ sprite_globalToLocal(const fn_call& fn)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.globalToLocal() not implemented yet");
+		log_unimpl("MovieClip.globalToLocal()");
 		warned=true;
 	}
 	return as_value();
@@ -881,7 +876,7 @@ sprite_lineTo(const fn_call& fn)
 	if ( fn.nargs < 2 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("MovieClip.lineTo() takes two args");
+			log_aserror(_("MovieClip.lineTo() takes two args"));
 		);
 		return as_value();
 	}
@@ -902,7 +897,7 @@ sprite_moveTo(const fn_call& fn)
 	if ( fn.nargs < 2 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("MovieClip.moveTo() takes two args");
+			log_aserror(_("MovieClip.moveTo() takes two args"));
 		);
 		return as_value();
 	}
@@ -965,7 +960,7 @@ sprite_curveTo(const fn_call& fn)
 	if ( fn.nargs < 4 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("MovieClip.curveTo() takes four args");
+			log_aserror(_("MovieClip.curveTo() takes four args"));
 		);
 		return as_value();
 	}
@@ -1026,7 +1021,7 @@ sprite_beginGradientFill(const fn_call& fn)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.beginGradientFill() not implemented yet");
+		log_unimpl("MovieClip.beginGradientFill()");
 		warned=true;
 	}
 	return as_value();
@@ -1043,7 +1038,7 @@ sprite_startDrag(const fn_call& fn)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.startDrag() not implemented yet");
+		log_unimpl("MovieClip.startDrag()");
 		warned=true;
 	}
 	return as_value();
@@ -1059,7 +1054,7 @@ sprite_stopDrag(const fn_call& fn)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip.stopDrag() not implemented yet");
+		log_unimpl("MovieClip.stopDrag()");
 		warned=true;
 	}
 	return as_value();
@@ -1128,7 +1123,7 @@ sprite_name_getset(const fn_call& fn)
 	{
 		ptr->set_name(fn.arg(0).to_string(&fn.env()).c_str());
 		//IF_VERBOSE_ASCODING_ERRORS(
-		//log_aserror("Attempt to set read-only property '_name'");
+		//log_aserror(_("Attempt to set read-only property '_name'"));
 		//);
 	}
 
@@ -1144,7 +1139,7 @@ sprite_droptarget_getset(const fn_call& fn)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: MovieClip._droptarget unimplemented");
+		log_unimpl("MovieClip._droptarget");
 		warned=true;
 	}
 
@@ -1182,7 +1177,7 @@ sprite_highquality_getset(const fn_call& fn)
 	{
 		static bool warned=false;
 		if ( ! warned ) {
-			log_warning("MovieClip._highquality setting is unsupported");
+			log_unimpl("MovieClip._highquality setting");
 			warned = true;
 		}
 	}
@@ -1206,7 +1201,7 @@ sprite_focusrect_getset(const fn_call& fn)
 	{
 		static bool warned=false;
 		if ( ! warned ) {
-			log_warning("MovieClip._focusrect setting is unsupported");
+			log_unimpl("MovieClip._focusrect setting");
 			warned = true;
 		}
 	}
@@ -1228,7 +1223,7 @@ sprite_soundbuftime_getset(const fn_call& fn)
 	{
 		static bool warned=false;
 		if ( ! warned ) {
-			log_warning("MovieClip._soundbuftime setting is unsupported");
+			log_unimpl("MovieClip._soundbuftime setting");
 			warned = true;
 		}
 	}
@@ -1627,11 +1622,11 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 		IF_VERBOSE_ASCODING_ERRORS(
 		if (  m_display_list.get_character_by_name_i(name) )
 		{
-			log_aserror("A sprite member (%s) clashes with "
+			log_aserror(_("A sprite member (%s) clashes with "
 					"the name of an existing character "
-					"in its display list! "
+					"in its display list.  "
 					"The member will hide the "
-					"character.", name.c_str());
+					"character"), name.c_str());
 		}
 		);
 #endif
@@ -1667,8 +1662,8 @@ void sprite_instance::do_actions()
 	testInvariant();
 
 	IF_VERBOSE_ACTION(
-		log_action("Executing " SIZET_FMT " actions in frame " SIZET_FMT
-			"/" SIZET_FMT " of sprite %s",
+		log_action(_("Executing " SIZET_FMT " actions in frame " SIZET_FMT
+			"/" SIZET_FMT " of sprite %s"),
 			m_action_list.size(),
 			m_current_frame+1,
 			m_def->get_frame_count(), getTargetPath().c_str());
@@ -1717,7 +1712,8 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 	{
 		// No dice.
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("call_frame('%s') -- invalid frame", frame_spec.to_debug_string().c_str());
+		log_aserror(_("call_frame('%s') -- invalid frame"),
+			    frame_spec.to_debug_string().c_str());
 		);
 		return;
 	}
@@ -1816,7 +1812,7 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("FIXME: %s unfinished", __PRETTY_FUNCTION__);
+		log_unimpl("%s unfinished", __PRETTY_FUNCTION__);
 		warned = true;
 	}
 
@@ -1830,13 +1826,13 @@ sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
 	character* parent_ch = get_parent();
 	if ( ! parent_ch )
 	{
-		log_error("Can't clone root the movie");
+		log_error(_("Can't clone root of the movie"));
 		return NULL;
 	}
 	sprite_instance* parent = parent_ch->to_movie();
 	if ( ! parent )
 	{
-		log_error("%s parent is not a sprite, can't clone", getTarget().c_str());
+		log_error(_("%s parent is not a sprite, can't clone"), getTarget().c_str());
 		return NULL;
 	}
 
@@ -1892,7 +1888,7 @@ void sprite_instance::clone_display_object(const std::string& name,
 	}
     else
     {
-	    log_error("clone_display_object(%s, %s, %d): could not find a character named %s to clone",
+	    log_error(_("clone_display_object(%s, %s, %d): could not find a character named %s to clone"),
 			    name.c_str(), newname.c_str(), depth, name.c_str());
     }
 }
@@ -1988,7 +1984,7 @@ void sprite_instance::set_member(const std::string& name,
 		const as_value& val)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_debug_string().c_str());
+log_msg(_("sprite[%p]::set_member(%s, %s)"), (void*)this, name.c_str(), val.to_debug_string().c_str());
 #endif
 
 	if ( val.is_function() )
@@ -2009,7 +2005,7 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_debu
 	if ( etc )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg(" it's a Text Variable!");
+		log_msg(_("it's a Text Variable"));
 #endif
 		as_environment* env = const_cast<as_environment*>(&m_as_environment);
 		etc->set_text_value(val.to_string(env).c_str());
@@ -2017,7 +2013,7 @@ log_msg("sprite[%p]::set_member(%s, %s)", (void*)this, name.c_str(), val.to_debu
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	else
 	{
-		log_msg(" it's NOT a Text Variable!");
+		log_msg(_("it's NOT a Text Variable"));
 	}
 #endif
 
@@ -2031,13 +2027,13 @@ void sprite_instance::set_variable(const char* path_to_var,
 {
 	if (path_to_var == NULL)
 	{
-		log_error("NULL path_to_var passed to set_variable()");
+		log_error(_("NULL path_to_var passed to set_variable()"));
 		return;
 	}
 	if (new_value == NULL)
 	{
-		log_error("NULL passed to set_variable('%s',"
-			" NULL)", path_to_var);
+		log_error(_("NULL passed to set_variable('%s',"
+			" NULL)"), path_to_var);
 		return;
 	}
 
@@ -2057,12 +2053,12 @@ void sprite_instance::set_variable(const char* path_to_var,
 
 	    if (path_to_var == NULL)
 		{
-		    log_error("NULL path_to_var passed to set_variable()\n");
+		    log_error(_("NULL path_to_var passed to set_variable()"));
 		    return;
 		}
 	    if (new_value == NULL)
 		{
-		    log_error("NULL passed to set_variable('%s', NULL)\n", path_to_var);
+		    log_error(_("NULL passed to set_variable('%s', NULL)"), path_to_var);
 		    return;
 		}
 
@@ -2090,8 +2086,8 @@ void sprite_instance::advance_sprite(float delta_time)
 #ifdef GNASH_DEBUG
 	size_t frame_count = m_def->get_frame_count();
 
-	log_msg("sprite '%s' ::advance_sprite is at frame %u/%u "
-		"- onload called: %d - oldDIsplayList has %d elements",
+	log_msg(_("sprite '%s' ::advance_sprite is at frame %u/%u "
+		"- onload called: %d - oldDIsplayList has %d elements"),
 		getTargetPath().c_str(), m_current_frame,
 		frame_count, m_on_event_load_called, oldDisplayList.size());
 #endif
@@ -2100,7 +2096,7 @@ void sprite_instance::advance_sprite(float delta_time)
 	if (m_play_state == PLAY)
 	{
 #ifdef GNASH_DEBUG
-		log_msg("sprite_instance::advance_sprite we're in PLAY mode");
+		log_msg(_("sprite_instance::advance_sprite we're in PLAY mode"));
 #endif
 
 		int prev_frame = m_current_frame;
@@ -2108,11 +2104,11 @@ void sprite_instance::advance_sprite(float delta_time)
 		if (m_on_event_load_called)
 		{
 #ifdef GNASH_DEBUG
-			log_msg(" on_event_load called, incrementing");
+			log_msg(_("on_event_load called, incrementing"));
 #endif
 			increment_frame_and_check_for_loop();
 #ifdef GNASH_DEBUG
-			log_msg(" after increment we are at frame %u/%u", m_current_frame, frame_count);
+			log_msg(_("after increment we are at frame %u/%u"), m_current_frame, frame_count);
 #endif
 		}
 
@@ -2126,7 +2122,7 @@ void sprite_instance::advance_sprite(float delta_time)
 #ifdef GNASH_DEBUG
 	else
 	{
-		log_msg("sprite_instance::advance_sprite we're in STOP mode");
+		log_msg(_("sprite_instance::advance_sprite we're in STOP mode"));
 		// shouldn't we execute frame tags anyway when in STOP mode ?
 		//execute_frame_tags(m_current_frame);
 	}
@@ -2151,12 +2147,12 @@ void sprite_instance::advance_sprite(float delta_time)
 	//
 	DisplayList stillAlive = oldDisplayList;
 	stillAlive.clear_except(m_display_list, false);
-	//log_msg("Advancing %d pre-existing childs of %s", stillAlive.size(), getTargetPath().c_str());
+	//log_msg(_("Advancing %d pre-existing children of %s"), stillAlive.size(), getTargetPath().c_str());
 	stillAlive.advance(delta_time);
 	
 	// Now execute actions on this timeline, after actions
 	// in old childs timelines have been executed.
-	//log_msg("Executing actions in %s timeline", getTargetPath().c_str());
+	//log_msg(_("Executing actions in %s timeline"), getTargetPath().c_str());
 	do_actions();
 
 	// Call UNLOAD event of just removed chars !
@@ -2174,9 +2170,9 @@ void sprite_instance::advance_sprite(float delta_time)
 	// we're simply doing internal work here...
 	//
 	DisplayList newlyAdded = m_display_list;
-	//log_msg("%s has %d current childs and %d old childs", getTargetPath().c_str(), m_display_list.size(), oldDisplayList.size());
+	//log_msg(_("%s has %d current children and %d old children"), getTargetPath().c_str(), m_display_list.size(), oldDisplayList.size());
 	newlyAdded.clear(oldDisplayList, false);
-	//log_msg("Advancing %d newly-added (after clearing) childs of %s", newlyAdded.size(), getTargetPath().c_str());
+	//log_msg(_("Advancing %d newly-added (after clearing) children of %s"), newlyAdded.size(), getTargetPath().c_str());
 	newlyAdded.advance(delta_time);
 
 	// Remember current state of the DisplayList for next iteration
@@ -2193,7 +2189,7 @@ void sprite_instance::advance(float delta_time)
 	if (m_on_event_load_called == false)
 	{
 #ifdef GNASH_DEBUG
-		log_msg("Calling ONLOAD event");
+		log_msg(_("Calling ONLOAD event"));
 #endif
 		on_event(event_id::LOAD);	// clip onload
 
@@ -2293,10 +2289,10 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 
 			IF_VERBOSE_ACTION(
 				// Use 1-based frame numbers
-				log_action("Executing " SIZET_FMT 
+				log_action(_("Executing " SIZET_FMT 
 					" *init* tags in frame " SIZET_FMT
-					"/" SIZET_FMT
-				        " of sprite %s", init_actions->size(),
+					"/" SIZET_FMT " of sprite %s"),
+					init_actions->size(),
 					frame+1, get_frame_count(),
 					getTargetPath().c_str());
 			);
@@ -2318,8 +2314,8 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 
 	IF_VERBOSE_ACTION(
 		// Use 1-based frame numbers
-		log_action("Executing " SIZET_FMT " tags in frame "
-			SIZET_FMT "/" SIZET_FMT " of sprite %s",
+		log_action(_("Executing " SIZET_FMT " tags in frame "
+			SIZET_FMT "/" SIZET_FMT " of sprite %s"),
 			playlist.size(), frame+1, get_frame_count(),
 			getTargetPath().c_str());
 	);
@@ -2402,8 +2398,8 @@ void
 sprite_instance::goto_frame(size_t target_frame_number)
 {
 #ifdef DEBUG_GOTOFRAME
-	log_msg("sprite %s ::goto_frame(" SIZET_FMT ") - current frame is "
-		SIZET_FMT,
+	log_msg(_("sprite %s ::goto_frame(" SIZET_FMT ") - current frame is "
+		SIZET_FMT),
 		getTargetPath().c_str(), target_frame_number, m_current_frame);
 #endif
 
@@ -2442,10 +2438,10 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	if ( target_frame_number >= loaded_frames )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror("GotoFrame(" SIZET_FMT ") targets a yet "
+			log_aserror(_("GotoFrame(" SIZET_FMT ") targets a yet "
 				"to be loaded frame (" SIZET_FMT ") loaded). "
 				"We'll wait for it but a more correct form "
-				"is explicitly using WaitForFrame instead.",
+				"is explicitly using WaitForFrame instead"),
 				target_frame_number+1,
 				loaded_frames);
 
@@ -2533,8 +2529,8 @@ bool sprite_instance::goto_labeled_frame(const std::string& label)
 	}
 
     IF_VERBOSE_MALFORMED_SWF(
-    log_swferror("sprite_instance::goto_labeled_frame('%s') "
-			"unknown label", label.c_str());
+    log_swferror(_("sprite_instance::goto_labeled_frame('%s') "
+			"unknown label"), label.c_str());
     );
     return false;
 }
@@ -2622,8 +2618,8 @@ sprite_instance::add_display_object(
 	if (cdef == NULL)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("sprite_instance::add_display_object(): "
-				"unknown cid = %d", character_id);
+			log_swferror(_("sprite_instance::add_display_object(): "
+				"unknown cid = %d"), character_id);
 		);
 		return NULL;
 	}
@@ -2703,13 +2699,13 @@ sprite_instance::replace_display_object(
 		int clip_depth)
 {
 	assert(m_def != NULL);
-	//log_msg("%s: character %s, id is %d, depth is %d", __FUNCTION__, name, character_id, depth); // FIXME: debugging crap
+	//log_msg(_("%s: character %s, id is %d, depth is %d"), __FUNCTION__, name, character_id, depth); // FIXME: debugging crap
 
 	character_def*	cdef = m_def->get_character_def(character_id);
 	if (cdef == NULL)
 	{
-		log_error("sprite::replace_display_object(): "
-			"unknown cid = %d", character_id);
+		log_error(_("sprite::replace_display_object(): "
+			"unknown cid = %d"), character_id);
 		return;
 	}
 	assert(cdef);
@@ -2782,7 +2778,7 @@ void sprite_instance::increment_frame_and_check_for_loop()
 	}
 
 #if 0 // debugging
-	log_msg("Frame %u/%u, bytes %u/%u",
+	log_msg(_("Frame %u/%u, bytes %u/%u"),
 		m_current_frame, frame_count,
 		get_bytes_loaded(), get_bytes_total());
 #endif
@@ -2925,7 +2921,7 @@ sprite_instance::get_character(int /* character_id */)
 {
 	//return m_def->get_character_def(character_id);
 	// @@ TODO -- look through our dlist for a match
-	log_msg("FIXME: %s doesn't even check for a char",
+	log_unimpl(_("%s doesn't even check for a char"),
 		__PRETTY_FUNCTION__);
 	return NULL;
 }
@@ -3153,7 +3149,7 @@ void
 sprite_instance::construct()
 {
 #ifdef GNASH_DEBUG
-	log_msg("Constructing sprite '%s'", getTargetPath().c_str());
+	log_msg(_("Constructing sprite '%s'"), getTargetPath().c_str());
 #endif
 
 	// We *might* avoid this, but better safe then sorry
@@ -3181,7 +3177,7 @@ sprite_instance::construct()
 	if ( ! def ) return;
 
 	as_function* ctor = def->getRegisteredClass();
-	//log_msg("Attached sprite's registered class is %p", (void*)ctor); 
+	//log_msg(_("Attached sprite's registered class is %p"), (void*)ctor); 
 
 	// TODO: builtin constructors are different from user-defined ones
 	// we should likely change that. See also vm/ASHandlers.cpp (construct_object)
@@ -3191,7 +3187,7 @@ sprite_instance::construct()
 		as_object* proto = ctor->getPrototype();
 		set_prototype(proto);
 
-		//log_msg("Calling the user-defined constructor against this sprite_instance");
+		//log_msg(_("Calling the user-defined constructor against this sprite_instance"));
 		fn_call call(this, &(get_environment()), 0, 0);
 
 		// we don't use the constructor return (should we?)
@@ -3203,7 +3199,7 @@ void
 sprite_instance::unload()
 {
 #ifdef GNASH_DEBUG
-	log_msg("Unloading sprite '%s'", getTargetPath().c_str());
+	log_msg(_("Unloading sprite '%s'"), getTargetPath().c_str());
 #endif
 
 	UnloaderVisitor visitor;
@@ -3229,7 +3225,7 @@ sprite_instance::loadMovie(const URL& url)
 	boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
 	if (md == NULL)
 	{
-		log_error("can't create movie_definition for %s",
+		log_error(_("can't create movie_definition for %s"),
 			url.str().c_str());
 		return false;
 	}
@@ -3238,8 +3234,8 @@ sprite_instance::loadMovie(const URL& url)
 	extern_movie = md->create_movie_instance();
 	if (extern_movie == NULL)
 	{
-		log_error("can't create extern movie_instance "
-			"for %s", url.str().c_str());
+		log_error(_("can't create extern movie_instance "
+			"for %s"), url.str().c_str());
 		return false;
 	}
 
@@ -3308,12 +3304,12 @@ sprite_instance::loadVariables(const URL& url, short sendVarsMethod)
 
 	if ( sendVarsMethod )
 	{
-		log_error("FIXME: MovieClip.loadVariables() with GET/POST unimplemented yet - won't append vars for now");
+		log_unimpl(_("MovieClip.loadVariables() with GET/POST won't append vars for now"));
 	}
 
 	_loadVariableRequests.push_back(new LoadVariablesThread(url));
 	_loadVariableRequests.back().process();
-	//log_msg(SIZET_FMT " loadVariables requests pending", _loadVariableRequests.size());
+	//log_msg(_(SIZET_FMT " loadVariables requests pending"), _loadVariableRequests.size());
 
 }
 
@@ -3333,7 +3329,7 @@ sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& reques
 	{
 		const string& name = it->first;
 		const string& val = it->second;
-		log_msg("Setting variable '%s' to value '%s'", name.c_str(), val.c_str());
+		log_msg(_("Setting variable '%s' to value '%s'"), name.c_str(), val.c_str());
 		set_variable(name.c_str(), val.c_str()); // should it be set_member ?
 	}
 }
@@ -3376,8 +3372,8 @@ sprite_instance::removeMovieClip()
 	if ( depth < 0 || depth > 1048575 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("removeMovieClip(%s): sprite depth (%d) out of the "
-			"'dynamic' zone [0..1048575], won't remove",
+		log_aserror(_("removeMovieClip(%s): sprite depth (%d) out of the "
+			"'dynamic' zone [0..1048575], won't remove"),
 			getTarget().c_str(), depth);
 		);
 		return;
@@ -3393,7 +3389,7 @@ sprite_instance::removeMovieClip()
 	else
 	{
 		// I guess this can only happen if someone uses _root.swapDepth([0..1048575])
-		log_error("Can't remove sprite %s as it has no parent!", getTarget().c_str());
+		log_error(_("Can't remove sprite %s as it has no parent"), getTarget().c_str());
 	}
 
 }

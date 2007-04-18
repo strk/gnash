@@ -1,3 +1,4 @@
+// Color.cpp:  ActionScript class for colors, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -78,7 +79,7 @@ as_value color_getrgb(const fn_call& /*fn*/)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 	return as_value();
@@ -89,7 +90,7 @@ as_value color_gettransform(const fn_call& /*fn*/)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 	return as_value();
@@ -100,7 +101,7 @@ as_value color_setrgb(const fn_call& /*fn*/)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 	return as_value();
@@ -111,7 +112,7 @@ as_value color_settransform(const fn_call& /*fn*/)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 	return as_value();
@@ -147,4 +148,3 @@ void color_class_init(as_object& global)
 
 
 } // end of gnash namespace
-

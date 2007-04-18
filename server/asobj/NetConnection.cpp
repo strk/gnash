@@ -1,3 +1,4 @@
+// NetConnection.cpp:  Open local connections for FLV files or URLs.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,11 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: NetConnection.cpp,v 1.37 2007/04/15 10:52:09 bjacques Exp $ */
+/* $Id: NetConnection.cpp,v 1.38 2007/04/18 11:00:29 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,10 +37,6 @@
 #include "URL.h"
 
 using namespace std;
-
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
 
 namespace gnash {
 
@@ -95,20 +94,20 @@ bool NetConnection::openConnection(const char* char_url, as_object* owner)
 
 	// Check if we're allowed to open url
 	if (!URLAccessManager::allow(uri)) {
-		log_warning("Gnash is not allowed to open this url.");
+		log_security(_("Gnash is not allowed to open this url: %s"), _url.c_str());
 		return false;
 	}
 
 	_loader = new LoadThread();
 	
 	if (!_loader->setStream(std::auto_ptr<tu_file>(StreamProvider::getDefaultInstance().getStream(uri)))) {
-		log_warning("Gnash could not open this url:%s", _url.c_str());
+		log_error(_("Gnash could not open this url: %s"), _url.c_str());
 		delete _loader;
 		_loader = NULL;
 		return false;
 	}
 
-	log_msg("Connection etablished to movie: %s", _url.c_str());
+	log_msg(_("Connection etablished to movie: %s"), _url.c_str());
 
 	return true;
 }
