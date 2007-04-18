@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.45 2007/04/18 13:47:24 martinwguy Exp $ */
+/* $Id: as_value.h,v 1.46 2007/04/18 14:40:00 bjacques Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -50,7 +50,7 @@ class as_environment;
 #endif
 
 #ifndef INFINITY
-#       define INFINITY (std::numeric_limits<double>::infinity());
+#       define INFINITY (std::numeric_limits<double>::infinity())
 #endif
 
 
