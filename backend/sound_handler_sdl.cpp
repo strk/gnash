@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.51 2007/04/18 09:35:41 jgilmore Exp $
+// $Id: sound_handler_sdl.cpp,v 1.52 2007/04/18 20:56:39 martinwguy Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -520,17 +520,6 @@ void SDL_sound_handler::convert_raw_data(
 // input data to the SDL output format (SAMPLE_RATE,
 // stereo, 16-bit native endianness)
 {
-// 		// xxxxx debug pass-thru
-// 		{
-// 			int	output_sample_count = sample_count * (stereo ? 2 : 1);
-// 			int16_t*	out_data = new int16_t[output_sample_count];
-// 			*adjusted_data = out_data;
-// 			*adjusted_size = output_sample_count * 2;	// 2 bytes per sample
-// 			memcpy(out_data, data, *adjusted_size);
-// 			return;
-// 		}
-// 		// xxxxx
-
 	bool m_stereo = (audioSpec.channels == 2 ? true : false);
 	int m_sample_rate = audioSpec.freq;
 
@@ -540,7 +529,7 @@ void SDL_sound_handler::convert_raw_data(
 		sample_rate >>= 1;
 	}
 
-		// simple hack to lose half the samples to get mono from stereo
+	// simple hack to lose half the samples to get mono from stereo
 	if ( stereo && !m_stereo)
 	{
 		sample_rate <<= 1;
@@ -559,7 +548,6 @@ void SDL_sound_handler::convert_raw_data(
 		dup = m_sample_rate / sample_rate;
 	}
 
-//	int	output_sample_count = (sample_count * dup) / inc;
 	int	output_sample_count = (sample_count * dup * (stereo ? 2 : 1)) / inc;
 
 	int16_t*	out_data = new int16_t[output_sample_count];
