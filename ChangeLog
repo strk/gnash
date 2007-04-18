@@ -1,3 +1,7 @@
+2007-04-18 Sandro Santilli <strk@keybit.net>
+
+	* server/matrix.{cpp,h}: add transform_by_inverse(point&).
+
 2007-04-18  John Gilmore  <gnu@toad.com>
 
 	* Internationalization, phase 2.

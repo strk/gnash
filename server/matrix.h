@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.h,v 1.7 2007/04/15 14:31:19 strk Exp $ 
+// $Id: matrix.h,v 1.8 2007/04/18 12:39:18 strk Exp $ 
 //
 
 #ifndef GNASH_MATRIX_H
@@ -156,6 +156,9 @@ public:
 
 	/// Transform point 'p' by our matrix. 
 	void	transform(point& p) const;
+
+	/// Transform point 'p' by the inverse of our matrix. 
+	void	transform_by_inverse(point& p) const;
 
 	/// Transform point 'x,y' by our matrix. 
 	void	transform(float& x, float& y) const;

@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.12 2007/04/15 14:31:19 strk Exp $ 
+// $Id: matrix.cpp,v 1.13 2007/04/18 12:39:18 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -316,6 +316,16 @@ matrix::transform_by_inverse(point* result, const point& p) const
 	matrix	m;
 	m.set_inverse(*this);
 	m.transform(result, p);
+}
+
+void
+matrix::transform_by_inverse(point& p) const
+// Transform point 'p' by the inverse of our matrix.  
+{
+	// @@ TODO optimize this!
+	matrix	m;
+	m.set_inverse(*this);
+	m.transform(p);
 }
 
 void
