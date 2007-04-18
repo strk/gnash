@@ -1,3 +1,4 @@
+// System.cpp:  ActionScript "System" class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,12 +11,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
-//
 //
 
 #ifdef HAVE_CONFIG_H
@@ -41,31 +40,31 @@ System::~System() {
 void
 System::security_allowDomain()
 {
-    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+    log_unimpl (__PRETTY_FUNCTION__);
 }
 
 void
 System::security_allowInsecureDomain()
 {
-    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+    log_unimpl (__PRETTY_FUNCTION__);
 }
 
 void
 System::security_loadPolicyFile()
 {
-    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+    log_unimpl (__PRETTY_FUNCTION__);
 }
 
 void
 System::setClipboard()
 {
-    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+    log_unimpl (__PRETTY_FUNCTION__);
 }
 
 void
 System::showSettings()
 {
-    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+    log_unimpl (__PRETTY_FUNCTION__);
 }
 
 #endif
@@ -137,27 +136,27 @@ system_new(const fn_call& /* fn */)
 }
 
 as_value system_security_allowdomain(const fn_call& /*fn*/) {
-    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+    log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
 }
 
 as_value system_security_allowinsecuredomain(const fn_call& /*fn*/) {
-    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+    log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
 }
 
 as_value system_security_loadpolicyfile(const fn_call& /*fn*/) {
-    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+    log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
 }
 
 as_value system_setclipboard(const fn_call& /*fn*/) {
-    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+    log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
 }
 
 as_value system_showsettings(const fn_call& /*fn*/) {
-    log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+    log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
 }
 
@@ -171,6 +170,4 @@ system_class_init(as_object& global)
 	global.init_member("System", obj.get());
 }
 
-
-} // end of gnaash namespace
-
+} // end of gnash namespace

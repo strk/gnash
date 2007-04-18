@@ -1,5 +1,6 @@
+// action_buffer.cpp:  holds actions for later execution, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,11 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: action_buffer.cpp,v 1.16 2007/04/13 07:35:56 bjacques Exp $ */
+/* $Id: action_buffer.cpp,v 1.17 2007/04/18 14:07:32 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -99,8 +102,8 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     }
     
     if (m_decl_dict_processed_at != -1)	{
-	log_warning("process_decl_dict(" SIZET_FMT ", " SIZET_FMT "): decl_dict was already processed at %d. "
-		"Skipping (or maybe we should append, or replace?).",
+	log_msg(_("process_decl_dict(" SIZET_FMT ", " SIZET_FMT "): decl_dict was already processed at %d. "
+		"Skipping (or maybe we should append, or replace?)."),
 		  start_pc, stop_pc, m_decl_dict_processed_at);
 	return;
     }
@@ -113,7 +116,7 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
     uint16_t count = uint16_t(read_int16(i+3)); 
     i += 2;
     
-//log_msg("Start at %d, stop at %d, length read was %d, count read was %d", start_pc, stop_pc, length, count);
+//log_msg(_("Start at %d, stop at %d, length read was %d, count read was %d"), start_pc, stop_pc, length, count);
 
     assert(start_pc + 3 + length == stop_pc);
     
@@ -127,7 +130,7 @@ action_buffer::process_decl_dict(size_t start_pc, size_t stop_pc) const
 	while (m_buffer[3 + i]) {
 	    // safety check.
 	    if (i >= stop_pc) {
-		log_error("action buffer dict length exceeded\n");
+		log_error(_("action buffer dict length exceeded"));
 		
 		// Jam something into the remaining (invalid) entries.
 		while (ct < count) {
@@ -449,7 +452,6 @@ action_buffer::read_double_wacky(size_t pc) const
 }
 
 }
-
 
 // Local Variables:
 // mode: C++

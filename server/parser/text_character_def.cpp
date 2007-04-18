@@ -1,24 +1,15 @@
-// text.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// text_character_def.cpp:  Read text character definitions, for Gnash.
+
+// Derived from text.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
 
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
 // Code for the text tags.
 
-
-//#include "utf8.h"
-//#include "utility.h"
-//#include "impl.h"
-//#include "shape.h"
-//#include "shape_character_def.h"
 #include "stream.h"
 #include "log.h"
-//#include "font.h"
-//#include "fontlib.h"
-//#include "render.h"
-//#include "textformat.h"
 #include "text_character_def.h"
-//#include "movie_definition.h"
 
 namespace gnash {
 
@@ -35,7 +26,7 @@ void text_character_def::read(stream* in, int tag_type,
 	int	advance_bits = in->read_u8();
 
 	IF_VERBOSE_PARSE(
-	log_parse("begin text records");
+	log_parse(_("begin text records"));
 	);
 
 	bool	last_record_was_style_change = false;
@@ -49,7 +40,7 @@ void text_character_def::read(stream* in, int tag_type,
 		{
 			// This is the end of the text records.
 			IF_VERBOSE_PARSE(
-			log_parse("end text records");
+			log_parse(_("end text records"));
 			);
 			break;
 		}
@@ -68,7 +59,7 @@ void text_character_def::read(stream* in, int tag_type,
 			bool	has_x_offset = (first_byte >> 0) & 1;
 
 			IF_VERBOSE_PARSE(
-			log_parse("  text style change");
+			log_parse(_("  text style change"));
 			);
 
 			if (has_font)
@@ -77,7 +68,7 @@ void text_character_def::read(stream* in, int tag_type,
 				style.m_font_id = font_id;
 				style.resolve_font(m);
 				IF_VERBOSE_PARSE(
-				log_parse("  has_font: font id = %d", font_id);
+				log_parse(_("  has_font: font id = %d"), font_id);
 				);
 			}
 			if (has_color)
@@ -92,7 +83,7 @@ void text_character_def::read(stream* in, int tag_type,
 					style.m_color.read_rgba(in);
 				}
 				IF_VERBOSE_PARSE(
-				log_parse("  has_color");
+				log_parse(_("  has_color"));
 				);
 			}
 			if (has_x_offset)
@@ -100,7 +91,7 @@ void text_character_def::read(stream* in, int tag_type,
 				style.m_has_x_offset = true;
 				style.m_x_offset = in->read_s16();
 				IF_VERBOSE_PARSE(
-				log_parse("  has_x_offset = %g", style.m_x_offset);
+				log_parse(_("  has_x_offset = %g"), style.m_x_offset);
 				);
 			}
 			else
@@ -113,7 +104,7 @@ void text_character_def::read(stream* in, int tag_type,
 				style.m_has_y_offset = true;
 				style.m_y_offset = in->read_s16();
 				IF_VERBOSE_PARSE(
-				log_parse("  has_y_offset = %g", style.m_y_offset);
+				log_parse(_("  has_y_offset = %g"), style.m_y_offset);
 				);
 			}
 			else
@@ -125,7 +116,7 @@ void text_character_def::read(stream* in, int tag_type,
 			{
 				style.m_text_height = in->read_u16();
 				IF_VERBOSE_PARSE(
-				log_parse("  text_height = %g", style.m_text_height);
+				log_parse(_("  text_height = %g"), style.m_text_height);
 				);
 			}
 		}
@@ -148,7 +139,7 @@ void text_character_def::read(stream* in, int tag_type,
 			m_text_glyph_records.back().read(in, glyph_count, glyph_bits, advance_bits);
 
 			IF_VERBOSE_PARSE(
-			log_parse("  glyph_records: count = %d", glyph_count);
+			log_parse(_("  glyph_records: count = %d"), glyph_count);
 			);
 		}
 	}
@@ -161,7 +152,4 @@ void text_character_def::display(character* inst)
 		m_text_glyph_records, m_root_def);
 }
 
-
 }	// end namespace gnash
-
-

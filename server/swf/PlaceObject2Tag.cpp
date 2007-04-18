@@ -1,20 +1,23 @@
-// 
+// PlaceObject2Tag.cpp:  for Gnash.
+//
 //   Copyright (C) 2007 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: PlaceObject2Tag.cpp,v 1.3 2007/04/18 13:57:25 udog Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.4 2007/04/18 14:07:33 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,8 +44,8 @@ PlaceObject2Tag::readPlaceObject(stream* in)
 
 	IF_VERBOSE_PARSE
 	(
-		log_parse("  char_id = %d", m_character_id);
-		log_parse("  depth = %d (%d)", m_depth, m_depth-character::staticDepthOffset);
+		log_parse(_("  char_id = %d"), m_character_id);
+		log_parse(_("  depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
 		m_matrix.print();
 	);
 
@@ -52,7 +55,7 @@ PlaceObject2Tag::readPlaceObject(stream* in)
 
 		IF_VERBOSE_PARSE
 		(
-			log_parse("  cxform:");
+			log_parse(_("  cxform:"));
 			m_color_transform.print();
 		);
 
@@ -74,7 +77,7 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 	UNUSED(all_flags);
 
 	IF_VERBOSE_PARSE (
-		log_parse("  actions: flags = 0x%X", all_flags);
+		log_parse(_("  actions: flags = 0x%X"), all_flags);
 	);
 
 	// Read swf_events.
@@ -95,10 +98,10 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 		if ( in->get_tag_end_position()-in->get_position() <  event_length )
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("swf_event::read(), "
+			log_swferror(_("swf_event::read(), "
 				"even_length = %u, but only %lu bytes left "
 				"to the end of current tag."
-				" Breaking for safety.",
+				" Breaking for safety."),
 				event_length, in->get_tag_end_position()-in->get_position());
 			);
 			break;
@@ -120,10 +123,10 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 		if (readlen > event_length)
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("swf_event::read(), "
+			log_swferror(_("swf_event::read(), "
 				"event_length = %d, "
 				"but read " SIZET_FMT
-				". Breaking for safety.",
+				". Breaking for safety."),
 				event_length, readlen);
 			);
 			// or should we just continue here ?
@@ -132,10 +135,10 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 		else if ( readlen < event_length )
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("swf_event::read(), "
+			log_swferror(_("swf_event::read(), "
 				"event_length = %d, "
-				"but read " SIZET_FMT 
-				". Skipping excessive bytes.",
+				"but read " SIZET_FMT
+				". Skipping excessive bytes."),
 				event_length, readlen);
 			);
 			in->skip_bytes(event_length - readlen);
@@ -171,7 +174,7 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 		if ((pow(2.0, int( sizeof(s_code_bits) / sizeof(s_code_bits[0]) )) - 1) < flags)
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x", flags);
+			log_swferror(_("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x"), flags);
 			);
 		}
 
@@ -224,15 +227,15 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
 		m_has_cxform = true;
 		m_color_transform.read_rgba(in);
 	}
-			
+
 	if (has_ratio) m_ratio = (float)in->read_u16() / (float)65535;
 
 	if (has_name) m_name = in->read_string();
 
-	if (has_clip_bracket) 
+	if (has_clip_bracket)
 		m_clip_depth = in->read_u16()+character::staticDepthOffset;
-	else 
-		m_clip_depth = character::noClipDepthValue; 
+	else
+		m_clip_depth = character::noClipDepthValue;
 
 	if (has_actions)
 	{
@@ -257,26 +260,24 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
 	}
 
 	IF_VERBOSE_PARSE (
-		log_parse("  PLACEOBJECT2: depth = %d (%d)", m_depth, m_depth-character::staticDepthOffset);
-		if ( has_char ) log_parse("  char id = %d", m_character_id);
-		if ( has_matrix ) 
+		log_parse(_("  PLACEOBJECT2: depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
+		if ( has_char ) log_parse(_("  char id = %d"), m_character_id);
+		if ( has_matrix )
 		{
-			log_parse("  mat:");
+			log_parse(_("  mat:"));
 			m_matrix.print();
 		}
 		if ( has_cxform )
 		{
-			log_parse("  cxform:");
+			log_parse(_("  cxform:"));
 			m_color_transform.print();
 		}
-		if ( has_ratio ) log_parse("  ratio: %f", m_ratio);
-		if ( has_name ) log_parse("  name = %s", m_name ? m_name : "<null>");
-		if ( has_clip_bracket ) log_parse("  clip_depth = %d (%d)", m_clip_depth, m_clip_depth-character::staticDepthOffset);
-		log_parse(" m_place_type: %d", m_place_type);
+		if ( has_ratio ) log_parse(_("  ratio: %f"), m_ratio);
+		if ( has_name ) log_parse(_("  name = %s"), m_name ? m_name : "<null>");
+		if ( has_clip_bracket ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-character::staticDepthOffset);
+		log_parse(_(" m_place_type: %d"), m_place_type);
 	);
-			
 
-			
 	//log_msg("place object at depth %i", m_depth);
 }
 
@@ -314,7 +315,7 @@ PlaceObject2Tag::execute(sprite_instance* m)
 	      m_ratio,
 	      m_clip_depth);
 	  break;
-	  
+
       case MOVE:
 	  m->move_display_object(
 	      m_depth,
@@ -325,7 +326,7 @@ PlaceObject2Tag::execute(sprite_instance* m)
 	      m_ratio,
 	      m_clip_depth);
 	  break;
-	  
+
       case REPLACE:
 	  m->replace_display_object(
 	      m_character_id,
@@ -359,7 +360,7 @@ PlaceObject2Tag::execute_state_reverse(sprite_instance* m, int frame)
 	  // reverse of add is remove
 	  m->remove_display_object(m_depth, m_tag_type == 4 ? m_character_id : -1);
 	  break;
-	  
+
       case MOVE:
 	  // reverse of move is move
 	  m->move_display_object(
@@ -371,7 +372,7 @@ PlaceObject2Tag::execute_state_reverse(sprite_instance* m, int frame)
 	      m_ratio,
 	      m_clip_depth);
 	  break;
-	  
+
       case REPLACE:
       {
 	  // reverse of replace is to re-add the previous object.
@@ -379,9 +380,9 @@ PlaceObject2Tag::execute_state_reverse(sprite_instance* m, int frame)
 	  if (last_add) {
 	      last_add->execute_state(m);
 	  } else {
-	      log_error("reverse REPLACE can't find previous replace or add tag(%d, %d)",
+	      log_error(_("reverse REPLACE can't find previous replace or add tag(%d, %d)"),
 			frame, m_depth);
-	      
+
 	  }
 	  break;
       }

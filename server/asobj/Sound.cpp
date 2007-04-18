@@ -1,3 +1,4 @@
+// Sound.cpp:  ActionScript Sound output stub class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -5,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -83,7 +84,7 @@ Sound::getBytesLoaded()
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 }
@@ -94,7 +95,7 @@ Sound::getBytesTotal()
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 }
@@ -105,7 +106,7 @@ Sound::getPan()
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 }
@@ -116,7 +117,7 @@ Sound::getTransform()
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 }
@@ -136,10 +137,10 @@ Sound::getVolume()
 void
 Sound::loadSound(std::string file, bool /*streaming*/)
 {
-	log_msg("%s is still testing!!", __FUNCTION__);
+	log_msg(_("%s is still testing!"), __FUNCTION__);
 
 	if (connection) {
-		log_warning("This sound already has a connection?? (We try to handle this by deleting the old one...)");
+		log_error(_("%s: This sound already has a connection?  (We try to handle this by deleting the old one...)"), __FUNCTION__);
 		delete connection;
 	}
 	externalURL = file;
@@ -154,7 +155,7 @@ Sound::setPan()
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 }
@@ -165,7 +166,7 @@ Sound::setTransform()
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 }
@@ -213,7 +214,7 @@ Sound::getDuration()
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: only works when ffmpeg, gstreamer or libmad is enabled", __FUNCTION__);
+		log_error(_("%s: only works when ffmpeg, gstreamer or libmad is enabled"), __FUNCTION__);
 		warned = true;
 	}
 	return 0;
@@ -225,7 +226,7 @@ Sound::getPosition()
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_error("%s: only works when ffmpeg, gstreamer or libmad is enabled", __FUNCTION__);
+		log_error(_("%s: only works when ffmpeg, gstreamer or libmad is enabled"), __FUNCTION__);
 		warned = true;
 	}
 	return 0;
@@ -252,7 +253,9 @@ sound_new(const fn_call& /* fn */)
 as_value
 sound_start(const fn_call& fn)
 {
-	log_action("-- start sound");
+	IF_VERBOSE_ACTION (
+	log_action(_("-- start sound"));
+	)
 	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
 	int loop = 0;
 	int secondOffset = 0;
@@ -275,7 +278,9 @@ sound_start(const fn_call& fn)
 as_value
 sound_stop(const fn_call& fn)
 {
-	log_action("-- stop sound ");
+	IF_VERBOSE_ACTION (
+	log_action(_("-- stop sound "));
+	)
 	boost::intrusive_ptr<Sound> so = ensureType<Sound>(fn.this_ptr);
 
 	int si = -1;
@@ -290,7 +295,7 @@ sound_stop(const fn_call& fn)
 		if (res == NULL)
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-		    log_swferror("import error: resource '%s' is not exported", name.c_str());
+		    log_swferror(_("import error: resource '%s' is not exported"), name.c_str());
 		    	);
 		    return as_value();
 		}
@@ -304,7 +309,7 @@ sound_stop(const fn_call& fn)
 		}
 		else
 		{
-		    log_error("sound sample is NULL (doesn't cast to sound_sample)");
+		    log_error(_("sound sample is NULL (doesn't cast to sound_sample)"));
 		    return as_value();
 		}
 
@@ -316,11 +321,13 @@ sound_stop(const fn_call& fn)
 as_value
 sound_attachsound(const fn_call& fn)
 {
-    log_action("-- attach sound");
+    IF_VERBOSE_ACTION (
+    log_action(_("-- attach sound"));
+    )
     if (fn.nargs < 1)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("attach sound needs one argument");
+	    log_aserror(_("attach sound needs one argument"));
 	    	);
 	    return as_value();
 	}
@@ -330,7 +337,7 @@ sound_attachsound(const fn_call& fn)
     const std::string& name = fn.arg(0).to_string(&(fn.env()));
     if (name.empty()) {
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("attachSound need a non-empty string");
+		log_aserror(_("attachSound needs a non-empty string"));
 		);
 		return as_value();
 	}
@@ -342,7 +349,7 @@ sound_attachsound(const fn_call& fn)
 	if (res == NULL)
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("import error: resource '%s' is not exported", name.c_str());
+		log_swferror(_("import error: resource '%s' is not exported"), name.c_str());
 			);
 		return as_value();
 	}
@@ -356,7 +363,7 @@ sound_attachsound(const fn_call& fn)
 	}
 	else
 	{
-		log_error("sound sample is NULL (doesn't cast to sound_sample)");
+		log_error(_("sound sample is NULL (doesn't cast to sound_sample)"));
 		return as_value();
 	}
 
@@ -372,7 +379,7 @@ sound_getbytesloaded(const fn_call& /*fn*/)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 	return as_value();
@@ -384,7 +391,7 @@ sound_getbytestotal(const fn_call& /*fn*/)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 	return as_value();
@@ -396,7 +403,7 @@ sound_getpan(const fn_call& /*fn*/)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 	return as_value();
@@ -408,7 +415,7 @@ sound_gettransform(const fn_call& /*fn*/)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 	return as_value();
@@ -431,7 +438,7 @@ sound_loadsound(const fn_call& fn)
 {
 	if (fn.nargs != 2) {
 		IF_VERBOSE_ASCODING_ERRORS(
-	    log_aserror("loadSound needs 2 arguments!");
+	    log_aserror(_("loadSound needs 2 arguments"));
 	    	);
 	    return as_value();		
 	}
@@ -448,7 +455,7 @@ sound_setpan(const fn_call& /*fn*/)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 	return as_value();
@@ -460,7 +467,7 @@ sound_settransform(const fn_call& /*fn*/)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 	return as_value();
@@ -472,7 +479,7 @@ sound_setvolume(const fn_call& fn)
 	if (fn.nargs < 1)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("set volume of sound needs one argument");
+		log_aserror(_("set volume of sound needs one argument"));
 		);
 		return as_value();
 	}
@@ -497,7 +504,7 @@ sound_ID3(const fn_call& /*fn*/)
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_warning("%s: unimplemented", __FUNCTION__);
+		log_unimpl (__FUNCTION__);
 		warned = true;
 	}
 	return as_value();
@@ -579,4 +586,3 @@ void sound_class_init(as_object& global)
 }
 
 } // end of gnash namespace
-

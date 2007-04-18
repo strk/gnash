@@ -1,3 +1,4 @@
+// xmlsocket.cpp:  Network socket for XML-encoded information, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -13,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -173,14 +175,14 @@ XMLSocket::anydata(MessageList& msgs)
 bool XMLSocket::processingData()
 {
     //GNASH_REPORT_FUNCTION;
-    //printf("%s: processing flags is is %d\n", __FUNCTION__, _processing);
+    //log_msg(_("%s: processing flag is %d"), __FUNCTION__, _processing);
     return _processing;
 }
 
 void XMLSocket::processing(bool x)
 {
     GNASH_REPORT_FUNCTION;
-    //printf("%s: set processing flag to %d\n", __FUNCTION__, x);
+    //log_msg(_("%s: set processing flag to %d"), __FUNCTION__, x);
     _processing = x;
 }
 
@@ -202,7 +204,7 @@ XMLSocket::anydata(int fd, MessageList& msgs)
     
     
     if (fd <= 0) {
-	log_msg("fd <= 0, returning false (timer not unregistered while socket disconnected?");
+	log_error(_("%s: fd <= 0, returning false (timer not unregistered while socket disconnected?"), __FUNCTION__);
         return false;
     }
     
@@ -217,36 +219,36 @@ XMLSocket::anydata(int fd, MessageList& msgs)
         
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_msg("The socket for fd #%d was interupted by a system call!",
+            log_msg(_("The socket for fd #%d was interupted by a system call"),
                     fd);
             continue;
         }
         if (ret == -1) {
-            log_error("%s: The socket for fd #%d never was available!",
+            log_error(_("%s: The socket for fd #%d never was available"),
                 __FUNCTION__, fd);
             return false;
         }
         if (ret == 0) {
-            //log_msg("%s: There is no data in the socket for fd #%d!",
+            //log_msg(_("%s: There is no data in the socket for fd #%d"),
             //   __FUNCTION__, fd);
             return false;
         }
         if (ret > 0) {
-            //log_msg("%s: There is data in the socket for fd #%d!",
+            //log_msg(_("%s: There is data in the socket for fd #%d"),
             //    __FUNCTION__, fd);
         }
         memset(buf, 0, INBUF);
         ret = ::read(_sockfd, buf, INBUF-2);
         cr = strlen(buf);
-        log_msg("%s: read %d bytes, first msg terminates at %d\n", __FUNCTION__, ret, cr);
-        //log_msg("%s: read (%d,%d) %s\n", __FUNCTION__, buf[0], buf[1], buf);
+        log_msg(_("%s: read %d bytes, first msg terminates at %d"), __FUNCTION__, ret, cr);
+        //log_msg(_("%s: read (%d,%d) %s"), __FUNCTION__, buf[0], buf[1], buf);
         ptr = buf;
         // If we get a single XML message, do less work
         if (ret == cr + 1)
 		{
             adjusted_size = memadjust(ret + 1);
             packet = new char[adjusted_size];
-            printf("Packet size is %d at %p\n", ret + 1, packet);
+            log_msg(_("Packet size is %d at %p"), ret + 1, packet);
             memset(packet, 0, adjusted_size);
             strcpy(packet, ptr);
             eom = strrchr(packet, '\n'); // drop the CR off the end if there is one
@@ -254,7 +256,7 @@ XMLSocket::anydata(int fd, MessageList& msgs)
                 *eom = 0;
             }
             msgs.push_back( packet );
-            printf("%d: Pushing Packet of size " SIZET_FMT " at %p\n", __LINE__, strlen(packet), packet);
+            log_msg(_("%d: Pushing Packet of size " SIZET_FMT " at %p"), __LINE__, strlen(packet), packet);
             processing(false);
             return true;
         }
@@ -264,8 +266,8 @@ XMLSocket::anydata(int fd, MessageList& msgs)
         while (strchr(ptr, '\n') > 0) {
             if (leftover) {
                 processing(false);
-                //printf("%s: The remainder is: \"%s\"\n", __FUNCTION__, leftover);
-                //printf("%s: The rest of the message is: \"%s\"\n", __FUNCTION__, ptr);
+                //log_msg(_("%s: The remainder is: \"%s\""), __FUNCTION__, leftover);
+                //log_msg(_("%s: The rest of the message is: \"%s\""), __FUNCTION__, ptr);
                 adjusted_size = memadjust(cr + strlen(leftover) + 1);
                 packet = new char[adjusted_size];
                 memset(packet, 0, adjusted_size);
@@ -275,7 +277,7 @@ XMLSocket::anydata(int fd, MessageList& msgs)
                 if (eom) {
                     *eom = 0;
                 }
-                //printf("%s: The whole message is: \"%s\"\n", __FUNCTION__, packet);
+                //log_msg(_("%s: The whole message is: \"%s\""), __FUNCTION__, packet);
                 ptr = strchr(ptr, '\n') + 2; // messages are delimited by a "\n\0"
                 delete leftover;
                 leftover = 0;
@@ -287,20 +289,20 @@ XMLSocket::anydata(int fd, MessageList& msgs)
                 ptr += cr + 1;
             } // end of if remainder
             if (*packet == '<') {
-                //printf("%d: Pushing Packet #%d of size %d at %p: %s\n", __LINE__,
+                //log_msg(_("%d: Pushing Packet #%d of size %d at %p: %s"), __LINE__,
                 //       data.size(), strlen(packet), packet, packet);
                 eom = strrchr(packet, '\n'); // drop the CR off the end there is one
                 if (eom) {
                     *eom = 0;
                 }
-                //printf("Allocating new packet at %p\n", packet);
+                //log_msg(_("Allocating new packet at %p"), packet);
                 //data.push_back(packet);
                 msgs.push_back( std::string(packet) );
             } else {
-                log_error("Throwing out partial packet %s\n", packet);
+                log_error(_("Throwing out partial packet %s"), packet);
             }
             
-            //log_msg("%d messages in array now\n", data.size());
+            //log_msg(_("%d messages in array now"), data.size());
             cr = strlen(ptr);
         } // end of while (cr)
         
@@ -308,11 +310,11 @@ XMLSocket::anydata(int fd, MessageList& msgs)
             leftover = new char[strlen(ptr) + 1];
             strcpy(leftover, ptr);
             processing(true);
-            //printf("%s: Adding remainder: \"%s\"\n", __FUNCTION__, leftover);
+            //log_msg(_("%s: Adding remainder: \"%s\""), __FUNCTION__, leftover);
         }
         
         processing(false);
-        printf("Returning %d messages\n", index);
+        log_msg(_("%s: Returning %d messages"), __FUNCTION__, index);
         return true;
         
     } // end of while (retires)
@@ -327,14 +329,14 @@ XMLSocket::send(std::string str)
     
     if ( ! connected() )
     {
+        log_error(_("%s: socket not initialized"), __FUNCTION__);
 	assert(!_sockfd);
-        log_warning("socket not initialized at XMLSocket.send() call time");
 	return false;
     }
     
     int ret = write(_sockfd, str.c_str(), str.size());
     
-    log_msg("%s: sent %d bytes, data was %s\n", __FUNCTION__, ret, str.c_str());
+    log_msg(_("%s: sent %d bytes, data was %s"), __FUNCTION__, ret, str.c_str());
     if (ret == static_cast<signed int>(str.size())) {
         return true;
     } else {
@@ -394,19 +396,19 @@ XMLSocket::checkSockets(int fd)
     
     // If interupted by a system call, try again
     if (ret == -1 && errno == EINTR) {
-        log_msg("%s: The socket for fd #%d was interupted by a system call in this thread!",
+        log_msg(_("%s: The socket for fd #%d was interupted by a system call in this thread"),
                 __FUNCTION__, fd);
     }
     if (ret == -1) {
-        log_error("%s: The socket for fd #%d never was available!",
+        log_error(_("%s: The socket for fd #%d never was available"),
             __FUNCTION__, fd);
     }
     if (ret == 0) {
-        log_msg("%s: There is no data in the socket for fd #%d!",
+        log_msg(_("%s: There is no data in the socket for fd #%d"),
             __FUNCTION__, fd);
     }
     if (ret > 0) {
-        log_msg("%s: There is data in the socket for fd #%d!",
+        log_msg(_("%s: There is data in the socket for fd #%d"),
             __FUNCTION__, fd);
     }
     
@@ -424,14 +426,14 @@ xmlsocket_connect(const fn_call& fn)
 #ifdef GNASH_XMLSOCKET_DEBUG
     std::stringstream ss;
     fn.dump_args(ss);
-    log_msg("XMLSocket.connect(%s) called", ss.str().c_str());
+    log_msg(_("XMLSocket.connect(%s) called"), ss.str().c_str());
 #endif
 
     boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
 
     if (ptr->obj.connected())
     {
-        log_warning("XMLSocket.connect() called while already connected, ignored");
+        log_error(_("XMLSocket.connect() called while already connected, ignored"));
     }
     
     as_value hostval = fn.arg(0);
@@ -450,7 +452,7 @@ xmlsocket_connect(const fn_call& fn)
 	boost::intrusive_ptr<as_function> handler = ptr->getEventHandler("onConnect");
     if ( handler )
     {
-        log_msg("XMLSocket.connect(): calling onConnect");
+        log_msg(_("XMLSocket.connect(): calling onConnect"));
         as_environment env;
         env.push(success);
         val = call_method(handler.get(), &env, ptr.get(), 1, env.stack_size()-1); 
@@ -458,7 +460,7 @@ xmlsocket_connect(const fn_call& fn)
 	    
     if ( success )
     {
-        log_warning("Setting up timer for calling XMLSocket.onData()");
+        log_msg(_("Setting up timer for calling XMLSocket.onData()"));
 
         Timer timer;
         boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(&xmlsocket_inputChecker, NULL);
@@ -466,7 +468,7 @@ xmlsocket_connect(const fn_call& fn)
         timer.setInterval(*ondata_handler, interval, boost::dynamic_pointer_cast<as_object>(ptr));
         VM::get().getRoot().add_interval_timer(timer);
 
-        log_warning("Timer set");
+        log_msg(_("Timer set"));
     }
 
     return as_value(success);
@@ -480,7 +482,7 @@ xmlsocket_send(const fn_call& fn)
     
     boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
     const std::string& object = fn.arg(0).to_string(&fn.env());
-    //  log_msg("%s: host=%s, port=%g\n", __FUNCTION__, host, port);
+    //  log_msg(_("%s: host=%s, port=%g"), __FUNCTION__, host, port);
     return as_value(ptr->obj.send(object));
 }
 
@@ -500,14 +502,14 @@ as_value
 xmlsocket_new(const fn_call& fn)
 {
     //GNASH_REPORT_FUNCTION;
-    //log_msg("%s: nargs=%d\n", __FUNCTION__, nargs);
+    //log_msg(_("%s: nargs=%d"), __FUNCTION__, nargs);
     
     boost::intrusive_ptr<as_object> xmlsock_obj = new xmlsocket_as_object;
 
 #ifdef GNASH_XMLSOCKET_DEBUG
     std::stringstream ss;
     fn.dump_args(ss);
-    log_msg("new XMLSocket(%s) called - created object at %p", ss.str().c_str(), (void*)xmlsock_obj.get());
+    log_msg(_("new XMLSocket(%s) called - created object at %p"), ss.str().c_str(), (void*)xmlsock_obj.get());
 #else
     UNUSED(fn);
 #endif
@@ -527,7 +529,7 @@ xmlsocket_inputChecker(const fn_call& fn)
     boost::intrusive_ptr<xmlsocket_as_object> ptr = ensureType<xmlsocket_as_object>(fn.this_ptr);
     if ( ! ptr->obj.connected() )
     {
-        log_warning("XMLSocket not connected at xmlsocket_inputChecker call");
+        log_error(_("%s: not connected"), __FUNCTION__);
         return as_value();
     }
 
@@ -549,8 +551,8 @@ xmlsocket_onData(const fn_call& fn)
     boost::intrusive_ptr<as_function> onXMLEvent = ptr->getEventHandler("onXML");
     if ( ! onXMLEvent )
     {
-            log_msg("Builtin XMLSocket.onData doing nothing as no "
-                            "onXML event is defined on XMLSocket %p",
+            log_msg(_("Builtin XMLSocket.onData doing nothing as no "
+                            "onXML event is defined on XMLSocket %p"),
                             (void*)ptr.get());
             return as_value();
     }
@@ -558,7 +560,7 @@ xmlsocket_onData(const fn_call& fn)
     if ( fn.nargs < 1 )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("Builtin XMLSocket.onData() needs an argument");
+        log_aserror(_("Builtin XMLSocket.onData() needs an argument"));
         );
         return as_value();
     }
@@ -568,8 +570,8 @@ xmlsocket_onData(const fn_call& fn)
 
     if ( xmlin.empty() )
     {
-            log_error("Builtin XMLSocket.onData() called with an argument "
-                            "that resolves to the empty string: %s",
+            log_error(_("Builtin XMLSocket.onData() called with an argument "
+                            "that resolves to the empty string: %s"),
                             fn.arg(0).to_debug_string().c_str());
             return as_value();
     }
@@ -619,7 +621,7 @@ void xmlsocket_class_init(as_object& global)
     if ( cl == NULL )
     {
         cl=new builtin_function(&xmlsocket_new, getXMLSocketInterface());
-        // Do not replicate all interface to class !
+        // Do not replicate all interface to class!
         //attachXMLSocketInterface(*cl);
     }
     
@@ -649,7 +651,7 @@ xmlsocket_as_object::checkForIncomingData(as_environment& env)
     assert(obj.connected());
 
     if (obj.processingData()) {
-        log_msg("Still processing data!");
+        log_msg(_("Still processing data"));
     }
     
 #ifndef USE_DMALLOC
@@ -659,16 +661,16 @@ xmlsocket_as_object::checkForIncomingData(as_environment& env)
     std::vector<std::string > msgs;
     if (obj.anydata(msgs))
     {
-        log_msg("Got " SIZET_FMT " messages: ", msgs.size());
+        log_msg(_("Got " SIZET_FMT " messages: "), msgs.size());
         for (size_t i=0; i<msgs.size(); ++i)
         {
-            log_msg(" Message " SIZET_FMT " : %s ", i, msgs[i].c_str());
+            log_msg(_(" Message " SIZET_FMT " : %s "), i, msgs[i].c_str());
         }
 
         boost::intrusive_ptr<as_function> onDataHandler = getEventHandler("onData");
         if ( onDataHandler )
         {
-            //log_msg("Got %d messages from XMLsocket", msgs.size());
+            //log_msg(_("Got %d messages from XMLsocket"), msgs.size());
             for (XMLSocket::MessageList::iterator it=msgs.begin(),
 							itEnd=msgs.end();
 			    it != itEnd; ++it)
@@ -690,7 +692,7 @@ xmlsocket_as_object::checkForIncomingData(as_environment& env)
         }
         else
         {
-            log_error("Couldn't find onData!");
+            log_error(_("%s: Couldn't find onData"), __FUNCTION__);
         }
 
     }

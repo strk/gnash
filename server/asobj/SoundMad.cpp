@@ -1,3 +1,4 @@
+// SoundMad.cpp:  Play sounds using libmad (MP3 audio decoder), for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -5,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -79,7 +80,7 @@ SoundMad::setupDecoder(SoundMad* so)
 	// Pass stuff from/to the NetConnection object.
 	assert(so);
 	if ( !nc->openConnection(so->externalURL.c_str(), so) ) {
-		log_warning("Gnash could not open audio url: %s", so->externalURL.c_str());
+		log_error(_("Gnash could not open audio url: %s"), so->externalURL.c_str());
 		delete so->lock;
 		return;
 	}
@@ -116,7 +117,7 @@ SoundMad::setupDecoder(SoundMad* so)
 		// Error handling is done by relooping (max. 8 times) and just hooping that it will work...
 		if (loops > 8) break;
 		if (ret == -1 && so->stream.error != MAD_ERROR_BUFLEN && MAD_RECOVERABLE(so->stream.error)) {
-			log_warning("Recoverable error while decoding MP3, MAD error: %s", mad_stream_errorstr (&so->stream));
+			log_error(_("Recoverable error while decoding MP3, MAD error: %s"), mad_stream_errorstr (&so->stream));
 			continue;
 		}
 		break;
@@ -203,7 +204,7 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 					// Error handling is done by relooping (max. 8 times) and just hooping that it will work...
 					if (loops > 8) break;
 					if (ret == -1 && so->stream.error != MAD_ERROR_BUFLEN && MAD_RECOVERABLE(so->stream.error)) {
-						log_warning("Recoverable error while decoding MP3, MAD error: %s", mad_stream_errorstr (&so->stream));
+						log_error(_("Recoverable error while decoding MP3, MAD error: %s"), mad_stream_errorstr (&so->stream));
 						continue;
 					}
 					
@@ -211,7 +212,7 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 				}
 
 				if (ret == -1 && so->stream.error != MAD_ERROR_BUFLEN) {
-					log_error("Unrecoverable error while decoding MP3, MAD error: %s", mad_stream_errorstr (&so->stream));
+					log_error(_("Unrecoverable error while decoding MP3, MAD error: %s"), mad_stream_errorstr (&so->stream));
 					bufSize = 0;
 					loop = false;
 				} else if (ret == -1 && so->stream.error == MAD_ERROR_BUFLEN) {
@@ -266,9 +267,9 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 					s->convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 
 							so->frame.header.samplerate, so->frame.header.mode);
 
-					// Hopefully this wont happen
+					// Hopefully this won't happen
 					if (!adjusted_data) {
-						log_warning("Error in sound sample convertion");
+						log_error(_("Error in sound sample convertion"));
 						continue;
 					}
 
@@ -347,7 +348,7 @@ SoundMad::loadSound(std::string file, bool streaming)
 	remainingLoops = 0;
 
 	if (connection) {
-		log_warning("This sound already has a connection?? (We try to handle this by deleting the old one...)\n");
+		log_error(_("This sound already has a connection?  (We try to handle this by deleting the old one...)"));
 		delete connection;
 	}
 	externalURL = file;
@@ -436,4 +437,3 @@ SoundMad::getPosition()
 }
 
 } // end of gnash namespace
-

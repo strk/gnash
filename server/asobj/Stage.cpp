@@ -1,3 +1,4 @@
+// Stage.cpp:  All the world is one, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -157,7 +158,7 @@ as_value stage_addlistener(const fn_call& fn)
 	if ( fn.nargs < 1 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Stage.addListener() needs one argument");
+		log_aserror(_("Stage.addListener() needs one argument"));
 		);
 		return as_value();
 	}
@@ -168,7 +169,7 @@ as_value stage_addlistener(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss;
 		fn.dump_args(ss);
-		log_aserror("Invalid call to Stage.addListener(%s) : first arg doesn't cast to an object",
+		log_aserror(_("Invalid call to Stage.addListener(%s) : first arg doesn't cast to an object"),
 			ss.str().c_str());
 		);
 		return as_value();
@@ -185,7 +186,7 @@ as_value stage_removelistener(const fn_call& fn)
 	if ( fn.nargs < 1 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("Stage.removeListener() needs one argument");
+		log_aserror(_("Stage.removeListener() needs one argument"));
 		);
 		return as_value();
 	}
@@ -196,7 +197,7 @@ as_value stage_removelistener(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss;
 		fn.dump_args(ss);
-		log_aserror("Invalid call to Stage.removeListener(%s) : first arg doesn't cast to an object",
+		log_aserror(_("Invalid call to Stage.removeListener(%s) : first arg doesn't cast to an object"),
 			ss.str().c_str());
 		);
 		return as_value();
@@ -231,12 +232,8 @@ as_value stage_scalemode_getset(const fn_call& fn)
 // extern (used by Global.cpp)
 void stage_class_init(as_object& global)
 {
-
 	static boost::intrusive_ptr<as_object> obj = new Stage();
 	global.init_member("Stage", obj.get());
-
 }
 
-
 } // end of gnash namespace
-

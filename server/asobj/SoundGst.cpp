@@ -1,3 +1,4 @@
+// SoundGst.cpp:  Produce sound for gnash, via Gstreamer library.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -5,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -104,7 +105,7 @@ SoundGst::seekMedia(void *opaque, int offset, int whence){
 void
 SoundGst::callback_newpad (GstElement* /*decodebin*/, GstPad *pad, gboolean /*last*/, gpointer data)
 {
-printf("new pad found\n");
+	log_msg(_("%s: new pad found"), __FUNCTION__);
 	SoundGst* so = static_cast<SoundGst*>(data);
 	GstCaps *caps;
 	GstStructure *str;
@@ -118,14 +119,14 @@ printf("new pad found\n");
 	if (g_strrstr (gst_structure_get_name (str), "audio")) {
 		// link'n'play
 		gst_pad_link (pad, audiopad);
-printf("new pad connected\n");
+		log_msg(_("%s: new pad connected"), __FUNCTION__);
 	} else {
 		gst_object_unref (audiopad);
-		log_warning("Non-audio data found in file %s\n", so->externalURL.c_str());
+		log_error(_("%s: Non-audio data found in file %s"), __FUNCTION__,
+				so->externalURL.c_str());
 	}
 	gst_caps_unref (caps);
 	return;
-
 }
 
 void
@@ -138,7 +139,7 @@ SoundGst::setupDecoder(SoundGst* so)
 	// Pass stuff from/to the NetConnection object.
 	assert(so);
 	if ( !nc->openConnection(so->externalURL.c_str(), so) ) {
-		log_warning("Gnash could not open audio url: %s", so->externalURL.c_str());
+		log_error(_("could not open audio url: %s"), so->externalURL.c_str());
 		delete so->lock;
 		return;
 	}
@@ -167,11 +168,11 @@ SoundGst::setupDecoder(SoundGst* so)
 
 	// Check if the creation of the gstreamer pipeline and audiosink was a succes
 	if (!so->pipeline) {
-		gnash::log_error("The gstreamer pipeline element could not be created\n");
+		gnash::log_error(_("Could not create gstreamer pipeline element"));
 		return;
 	}
 	if (!so->audiosink) {
-		gnash::log_error("The gstreamer audiosink element could not be created\n");
+		gnash::log_error(_("Could not create gstreamer audiosink element"));
 		return;
 	}
 
@@ -194,7 +195,7 @@ SoundGst::setupDecoder(SoundGst* so)
 
 
 	if (!so->source || !so->audioconv || !so->volume || !so->decoder) {
-		gnash::log_error("Gstreamer element(s) for movie handling could not be created\n");
+		gnash::log_error(_("Could not create Gstreamer element(s) for movie handling"));
 		return;
 	}
 
@@ -225,7 +226,7 @@ SoundGst::loadSound(std::string file, bool streaming)
 	remainingLoops = 0;
 
 	if (connection) {
-		log_warning("This sound already has a connection?? (We try to handle this by deleting the old one...)\n");
+		log_error(_("%s: This sound already has a connection?  (We try to handle this by deleting the old one...)"), __FUNCTION__);
 		delete connection;
 	}
 	externalURL = file;
@@ -253,7 +254,8 @@ SoundGst::start(int offset, int loops)
 			if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
 				GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(offset),
 				GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
-				log_warning("seeking to offset failed\n");
+				log_error(_("%s: seeking to offset failed"), 
+					__FUNCTION__);
 			}
 
 		}
@@ -330,4 +332,3 @@ SoundGst::getPosition()
 }
 
 } // end of gnash namespace
-

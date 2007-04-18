@@ -1,20 +1,23 @@
-// 
+// DefineFontAlignZonesTag.cpp:  for Gnash.
+//
 //   Copyright (C) 2007 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: DefineFontAlignZonesTag.cpp,v 1.2 2007/04/04 20:30:45 bjacques Exp $ */
+/* $Id: DefineFontAlignZonesTag.cpp,v 1.3 2007/04/18 14:07:33 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,7 +34,7 @@ namespace gnash {
 namespace SWF {
 namespace tag_loaders {
 
-DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /* m */, 
+DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /* m */,
 	stream& /* in */)
 {
 }
@@ -47,7 +50,7 @@ DefineFontAlignZonesTag::loader(stream* in, tag_type tag, movie_definition* m)
 	if ( ! referencedFont )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("DefineFontAlignZones tag references an undefined font %d", ref);
+		log_swferror(_("DefineFontAlignZones tag references an undefined font %d"), ref);
 		);
 		in->skip_to_tag_end();
 		return;
@@ -61,11 +64,11 @@ DefineFontAlignZonesTag::loader(stream* in, tag_type tag, movie_definition* m)
 	// 	- register the tag with the referencedFont
 
 	IF_VERBOSE_PARSE (
-	log_parse("  DefinFontAlignZones: font=%d, flags=%d", ref, flags);
+	log_parse(_("  DefinFontAlignZones: font=%d, flags=%d"), ref, flags);
 	);
 
 	in->skip_to_tag_end();
-	log_error("FIXME: DefineFontAlignZoneTag unfinished ");
+	log_error(_("FIXME: DefineFontAlignZoneTag unfinished"));
 
 
 }

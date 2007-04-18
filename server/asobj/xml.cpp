@@ -1,3 +1,4 @@
+// xml.cpp:  XML markup language support, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,11 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: xml.cpp,v 1.39 2007/04/17 10:38:16 strk Exp $ */
+/* $Id: xml.cpp,v 1.40 2007/04/18 14:07:32 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -91,9 +94,9 @@ XML::XML()
 {
     //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg("Creating XML data at %p \n", this);
+    log_msg(_("Creating XML data at %p"), this);
 #endif
-    //log_msg("%s: %p \n", __FUNCTION__, this);
+    //log_msg("%s: %p", __FUNCTION__, this);
     attachXMLProperties(*this);
 }
 
@@ -109,7 +112,7 @@ XML::XML(const std::string& xml_in)
 {
     //GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg("Creating XML data at %p \n", this);
+    log_msg(_("Creating XML data at %p"), this);
 #endif
     parseXML(xml_in);
 }
@@ -124,9 +127,9 @@ XML::XML(struct node * /* childNode */)
 {
     GNASH_REPORT_FUNCTION;
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg("\tCreating XML data at %p \n", this);
+    log_msg(_("\tCreating XML data at %p"), this);
 #endif
-    //log_msg("%s: %p \n", __FUNCTION__, this);
+    //log_msg("%s: %p", __FUNCTION__, this);
 }
 
 bool
@@ -158,7 +161,7 @@ XML::set_member(const std::string& name, const as_value& val)
         else if ( name == "loaded" )
         {
                 bool b = val.to_bool();
-		log_msg("set_member 'loaded' (%s) became boolean %d", val.to_debug_string().c_str(), b);
+		log_msg(_("set_member 'loaded' (%s) became boolean %d"), val.to_debug_string().c_str(), b);
                 if ( b ) _loaded = 1;
                 else _loaded = 0;
                 return;
@@ -172,7 +175,7 @@ XML::~XML()
     GNASH_REPORT_FUNCTION;
     
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg("\tDeleting XML top level node at %p", this);
+    log_msg(_("\tDeleting XML top level node at %p"), this);
 #endif
   
 }
@@ -237,20 +240,20 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
     xmlChar *ptr = NULL;
     boost::intrusive_ptr<XMLNode> child;
 
-//    log_msg("Created new element for %s at %p\n", node->name, element);
+//    log_msg(_("Created new element for %s at %p"), node->name, element);
 
-//    log_msg("%s: extracting node %s\n", __FUNCTION__, node->name);
+//    log_msg(_("%s: extracting node %s"), __FUNCTION__, node->name);
 
     // See if we have any Attributes (properties)
     attr = node->properties;
     while (attr != NULL)
     {
-        //log_msg("extractNode %s has property %s, value is %s\n",
+        //log_msg(_("extractNode %s has property %s, value is %s"),
         //          node->name, attr->name, attr->children->content);
         XMLAttr attrib(reinterpret_cast<const char*>(attr->name),
 			reinterpret_cast<const char*>(attr->children->content));
 
-        //log_msg("\tPushing attribute %s for element %s has value %s\n",
+        //log_msg(_("\tPushing attribute %s for element %s has value %s"),
         //        attr->name, node->name, attr->children->content);
         element._attributes.push_back(attrib);
         attr = attr->next;
@@ -274,7 +277,7 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
                 {
                     if (node->content)
                     {
-                        //log_msg("extractChildNode from text for %s has contents '%s'", node->name, ptr);
+                        //log_msg(_("extractChildNode from text for %s has contents '%s'"), node->name, ptr);
                         std::string val(reinterpret_cast<const char*>(ptr));
                         element.nodeValueSet(val);
                     }
@@ -305,7 +308,7 @@ XML::parseDoc(xmlDocPtr document, bool mem)
     xmlNodePtr cur;
 
     if (document == 0) {
-        log_error("Can't load XML file!");
+        log_error(_("Can't load XML file"));
         return false;
     }
 
@@ -329,10 +332,10 @@ XML::parseXML(const std::string& xml_in)
 {
     //GNASH_REPORT_FUNCTION;
 
-    //log_msg("Parse XML from memory: %s", xml_in.c_str());
+    //log_msg(_("Parse XML from memory: %s"), xml_in.c_str());
 
     if (xml_in.empty()) {
-        log_error("XML data is empty!");
+        log_error(_("XML data is empty"));
         return false;
     }
 
@@ -347,7 +350,7 @@ XML::parseXML(const std::string& xml_in)
     xmlInitParser();
     _doc = xmlParseMemory(xml_in.c_str(), xml_in.size());
     if (_doc == 0) {
-        log_error("Can't parse XML data!\n");
+        log_error(_("Can't parse XML data"));
         return false;
     }
     ret = parseDoc(_doc, true);
@@ -370,17 +373,17 @@ XML::load(const URL& url)
 {
 //    GNASH_REPORT_FUNCTION;
   
-    //log_msg("%s: mem is %d\n", __FUNCTION__, mem);
+    //log_msg(_("%s: mem is %d"), __FUNCTION__, mem);
 
     std::auto_ptr<tu_file> str ( StreamProvider::getDefaultInstance().getStream(url) );
     if ( ! str.get() ) 
     {
-        log_error("Can't load XML file: %s (security?)", url.str().c_str());
+        log_error(_("Can't load XML file: %s (security?)"), url.str().c_str());
         onLoadEvent(false);
         return false;
     }
 
-    log_msg("Loading XML file from url: '%s'", url.str().c_str());
+    log_msg(_("Loading XML file from url: '%s'"), url.str().c_str());
 
     initParser();
 
@@ -391,7 +394,7 @@ XML::load(const URL& url)
     {
 	xmlFreeDoc(_doc);
         _doc = 0;
-        log_error("Can't read XML file %s (stream error %d)!", url.str().c_str(), str->get_error());
+        log_error(_("Can't read XML file %s (stream error %d)"), url.str().c_str(), str->get_error());
         _loaded = 0;
         onLoadEvent(false);
         return false;
@@ -402,7 +405,7 @@ XML::load(const URL& url)
     if (_doc == 0)
     {
         xmlErrorPtr err = xmlGetLastError();
-        log_error("Can't read XML file %s (%s)!", url.str().c_str(), err->message);
+        log_error(_("Can't read XML file %s (%s)"), url.str().c_str(), err->message);
         _loaded = 0;
         onLoadEvent(false);
         return false;
@@ -425,7 +428,7 @@ XML::load(const URL& url)
 bool
 XML::onLoad()
 {
-    log_msg("%s: FIXME: onLoad Default event handler\n", __FUNCTION__);
+    log_msg(_("%s: FIXME: onLoad Default event handler"), __FUNCTION__);
 
     return(_loaded);
 }
@@ -449,32 +452,32 @@ XML::cleanupStackFrames(XMLNode * /* xml */)
 void
 XML::addRequestHeader(const char * /* name */, const char * /* value */)
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 }
 
 
 void
 XML::load()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 }
 
 void
 XML::parseXML()
 {
-    log_msg("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 }
 
 void
 XML::send()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 }
 
 void
 XML::sendAndLoad()
 {
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
 }
 
 
@@ -553,7 +556,7 @@ xml_new(const fn_call& fn)
     boost::intrusive_ptr<XML> xml_obj;
     //const char    *data;
   
-    // log_msg("%s: nargs=%d\n", __FUNCTION__, fn.nargs);
+    // log_msg(_("%s: nargs=%d"), __FUNCTION__, fn.nargs);
   
     if ( fn.nargs > 0 )
     {
@@ -563,7 +566,7 @@ xml_new(const fn_call& fn)
             xml_obj = boost::dynamic_pointer_cast<XML>(obj);
             if ( xml_obj )
             {
-                log_msg("\tCloned the XML object at %p\n", xml_obj.get());
+                log_msg(_("\tCloned the XML object at %p"), xml_obj.get());
                 return as_value(xml_obj->cloneNode(true).get());
             }
         }
@@ -572,7 +575,7 @@ xml_new(const fn_call& fn)
         if ( xml_in.empty() )
         {
             IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("First arg given to XML constructor (%s) evaluates to the empty string",
+            log_aserror(_("First arg given to XML constructor (%s) evaluates to the empty string"),
                     fn.arg(0).to_debug_string().c_str());
             );
         }
@@ -584,7 +587,7 @@ xml_new(const fn_call& fn)
     }
 
     xml_obj = new XML;
-    //log_msg("\tCreated New XML object at %p\n", xml_obj);
+    //log_msg(_("\tCreated New XML object at %p"), xml_obj);
 
     return as_value(xml_obj.get());
 }
@@ -597,11 +600,11 @@ xml_new(const fn_call& fn)
 as_value xml_addrequestheader(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
+    log_msg(_("%s: %d args"), __PRETTY_FUNCTION__, fn.nargs);
     
 //    return as_value(ptr->getAllocated());
 //    ptr->addRequestHeader();
-    log_msg("%s:unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 
@@ -630,7 +633,7 @@ xml_createelement(const fn_call& fn)
 	return as_value(xml_obj);
 	
     } else {
-        log_msg("ERROR: no text for element creation!\n");
+        log_error(_("no text for element creation"));
     }
     return as_value();
 }
@@ -657,9 +660,9 @@ xml_createtextnode(const fn_call& fn)
 	xml_obj->nodeValueSet(text);
 	xml_obj->nodeTypeSet(XMLNode::tText);
 	return as_value(xml_obj);
-//	log_msg("%s: xml obj is %p\n", __PRETTY_FUNCTION__, xml_obj);
+//	log_msg(_("%s: xml obj is %p"), __PRETTY_FUNCTION__, xml_obj);
     } else {
-	log_msg("ERROR: no text for text node creation!\n");
+	log_error(_("no text for text node creation"));
     }
     return as_value();
 }
@@ -785,7 +788,7 @@ void _xmlErrorHandler(void* ctx, const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-    log_warning("XML parser: %s", tmp);
+    log_error(_("XML parser: %s"), tmp);
     
     va_end (ap);    
 }

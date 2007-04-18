@@ -1,10 +1,25 @@
-// -- Thatcher Ulrich <tu@tulrich.com> 2003
+// button_character_def.cpp:  Mouse-sensitive SWF buttons, for Gnash.
+//
+//   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
+/* $Id: button_character_def.cpp,v 1.11 2007/04/18 14:07:32 jgilmore Exp $ */
 
-// SWF buttons.  Mouse-sensitive update/display, actions, etc.
-
+// Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
 #include "button_character_def.h"
 #include "button_character_instance.h" // for create_character_instance()
@@ -40,7 +55,7 @@ void	button_action::read(stream* in, int tag_type)
 	}
 
 	IF_VERBOSE_PARSE (
-	log_parse("-- actions in button\n"); // @@ need more info about which actions
+	log_parse(_("-- actions in button\n")); // @@ need more info about which actions
 	);
 
 	// Read actions.
@@ -81,12 +96,12 @@ button_record::read(stream* in, int tag_type,
 	// definition, we print an error, but keep parsing.
 	if ( ! m_character_def )
 	{
-		log_error("button record refer to "
+		log_error(_("button record refer to "
 			"character with id %d, which is not found "
-			"in the chars dictionary", m_character_id);
+			"in the chars dictionary"), m_character_id);
 	}
 
-	m_button_layer = in->read_u16(); 
+	m_button_layer = in->read_u16();
 	m_button_matrix.read(in);
 
 	if (tag_type == 34)
@@ -167,7 +182,7 @@ void
 button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 // Initialize from the given stream.
 {
-	// Character ID has been read already 
+	// Character ID has been read already
 
 	assert(
 		tag_type == SWF::DEFINEBUTTON		// 7
@@ -178,7 +193,7 @@ button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 	if (tag_type == SWF::DEFINEBUTTON)
 	{
 		// Old button tag.
-			
+
 		// Read button character records.
 		for (;;)
 		{
@@ -207,7 +222,7 @@ button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 		assert(m_sound == NULL);	// redefinition button sound is error
 		m_sound = new button_sound_def();
 		IF_VERBOSE_PARSE(
-		log_parse("button sound options: ");
+		log_parse(_("button sound options: "));
 		);
 		for (int i = 0; i < 4; i++)
 		{
@@ -257,7 +272,7 @@ button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 		if ( next_action_pos >= in->get_tag_end_position() )
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("Next Button2 actionOffset (%u) points past the end of tag", button_2_action_offset);
+			log_swferror(_("Next Button2 actionOffset (%u) points past the end of tag"), button_2_action_offset);
 			);
 			return;
 		}
@@ -283,7 +298,7 @@ button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 			if ( next_action_pos >= in->get_tag_end_position() )
 			{
 				IF_VERBOSE_MALFORMED_SWF(
-				log_swferror("Next action offset (%u) in Button2ActionConditions points past the end of tag",
+				log_swferror(_("Next action offset (%u) in Button2ActionConditions points past the end of tag"),
 					next_action_offset);
 				);
 				break;
@@ -293,17 +308,17 @@ button_character_definition::read(stream* in, int tag_type, movie_definition* m)
 			in->set_position(next_action_pos);
 		}
 	}
-	
-	
+
+
 	// detect min/max layer number
 	m_min_layer=0;
 	m_max_layer=0;
 	for (unsigned int i=0; i<m_button_records.size(); i++)
 	{
 	  int this_layer = m_button_records[i].m_button_layer;
-	  
+
 	  if ((i==0) || (this_layer < m_min_layer))  m_min_layer=this_layer;
-	  if ((i==0) || (this_layer > m_max_layer))  m_max_layer=this_layer;	  
+	  if ((i==0) || (this_layer > m_max_layer))  m_max_layer=this_layer;
   }
 }
 
@@ -318,10 +333,9 @@ button_character_definition::create_character_instance(
 
 }
 
-
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
+// c-basic-offset: 8
 // tab-width: 8
 // indent-tabs-mode: t
 // End:

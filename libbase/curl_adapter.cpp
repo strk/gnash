@@ -1,22 +1,23 @@
-// 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
-// 
+// curl_adapter.cpp:  Interface to libcurl to read HTTP streams, for Gnash.
+//
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-// 
-
-/* $Id: curl_adapter.cpp,v 1.26 2007/04/17 10:38:16 strk Exp $ */
+/* $Id: curl_adapter.cpp,v 1.27 2007/04/18 14:07:33 jgilmore Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -78,7 +79,7 @@ namespace curl_adapter
 /***********************************************************************
  *
  *  CurlStreamFile definition
- * 
+ *
  **********************************************************************/
 
 class CurlStreamFile
@@ -153,7 +154,7 @@ private:
 	// transfer in progress
 	int _running;
 
-	// stream error 
+	// stream error
 	// 0 on no error.
 	// Example of errors would be:
 	//	404 - file not found
@@ -176,8 +177,8 @@ private:
 	void printInfo();
 
 	// Callback for libcurl, will be called
-	// by fill_cache() and will call cache() 
-	static size_t recv(void *buf, size_t  size, 
+	// by fill_cache() and will call cache()
+	static size_t recv(void *buf, size_t  size,
 		size_t  nmemb, void *userp);
 
 
@@ -186,7 +187,7 @@ private:
 /***********************************************************************
  *
  *  CurlStreamFile implementation
- * 
+ *
  **********************************************************************/
 
 // Ensure libcurl is initialized
@@ -202,7 +203,7 @@ static void ensure_libcurl_initialized()
 
 /*static private*/
 size_t
-CurlStreamFile::recv(void *buf, size_t  size,  size_t  nmemb, 
+CurlStreamFile::recv(void *buf, size_t  size,  size_t  nmemb,
 	void *userp)
 {
 #ifdef GNASH_CURL_VERBOSE
@@ -213,7 +214,7 @@ CurlStreamFile::recv(void *buf, size_t  size,  size_t  nmemb,
 	return stream->cache(buf, size*nmemb);
 }
 
-	
+
 /*private*/
 size_t
 CurlStreamFile::cache(void *from, size_t sz)
@@ -228,7 +229,7 @@ CurlStreamFile::cache(void *from, size_t sz)
 	if ( wrote < 1 )
 	{
 		char errmsg[256];
-	
+
 		snprintf(errmsg, 255,
 			"writing to cache file: requested " SIZET_FMT ", wrote " SIZET_FMT " (%s)",
 			sz, wrote, strerror(errno));
@@ -273,7 +274,7 @@ CurlStreamFile::fill_cache(off_t size)
                 curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
                 if ( code == 404 ) // file not found!
                 {
-                        gnash::log_warning("404 response from url %s", _url.c_str());
+                        gnash::log_error(_("404 response from url %s"), _url.c_str());
                         _error = TU_FILE_OPEN_ERROR;
 			_running = false;
                         return;
@@ -281,7 +282,7 @@ CurlStreamFile::fill_cache(off_t size)
 
 		// we already have that much data
 		fstat(_cachefd, &statbuf);
-		if ( statbuf.st_size >= size ) 
+		if ( statbuf.st_size >= size )
 		{
 #ifdef GNASH_CURL_VERBOSE
 			fprintf(stderr,
@@ -386,7 +387,7 @@ CurlStreamFile::CurlStreamFile(const std::string& url)
 {
 	init(url);
 
-	// CURLMcode ret = 
+	// CURLMcode ret =
 	CURLMcode mcode = curl_multi_add_handle(_mhandle, _handle);
 	if ( mcode != CURLM_OK ) {
 		throw gnash::GnashException(curl_multi_strerror(mcode));
@@ -458,7 +459,7 @@ bool
 CurlStreamFile::eof()
 {
 	bool ret = ( ! _running && feof(_cache) );
-	
+
 #ifdef GNASH_CURL_VERBOSE
 	fprintf(stderr, "eof() returning %d\n", ret);
 #endif
@@ -515,7 +516,7 @@ CurlStreamFile::seek_to_end()
 		{
 			mcode=curl_multi_perform(_mhandle, &_running);
 		} while ( mcode == CURLM_CALL_MULTI_PERFORM );
-		
+
 		if ( mcode != CURLM_OK )
 		{
 			throw gnash::GnashException(curl_multi_strerror(mcode));
@@ -525,7 +526,7 @@ CurlStreamFile::seek_to_end()
                 curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
                 if ( code == 404 ) // file not found!
                 {
-                        gnash::log_warning("404 response from url %s", _url.c_str());
+                        gnash::log_error(_("404 response from url %s"), _url.c_str());
                         _error = TU_FILE_OPEN_ERROR;
 			_running = false;
                         return false;
@@ -561,7 +562,7 @@ CurlStreamFile::get_stream_size()
 /***********************************************************************
  *
  * Adapter calls
- * 
+ *
  **********************************************************************/
 
 
@@ -668,7 +669,7 @@ make_stream(const char* url)
 		tell, // tell
 		eof, // get eof
 		err, // get error
-		get_stream_size, // size of stream 
+		get_stream_size, // size of stream
 		close);
 }
 
@@ -700,14 +701,13 @@ make_stream(const char* url, const std::string& postdata)
 		tell, // tell
 		eof, // get eof
 		err, // get error
-		get_stream_size, // size of stream 
+		get_stream_size, // size of stream
 		close);
 }
 
 } // namespace curl_adapter
 
 #endif // def USE_CURL
-
 
 // Local Variables:
 // mode: C++

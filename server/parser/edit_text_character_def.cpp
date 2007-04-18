@@ -1,10 +1,25 @@
-// text.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// edit_text_character_def.cpp:  Text tags, for Gnash.
+//
+//   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
+/* $Id: edit_text_character_def.cpp,v 1.8 2007/04/18 14:07:32 jgilmore Exp $ */
 
-// Code for the text tags.
-
+// Based on the public domain text.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
 #include "stream.h"
 #include "log.h"
@@ -94,7 +109,7 @@ edit_text_character_def::read(stream* in, int tag_type,
 }
 
 const font*
-edit_text_character_def::get_font() 
+edit_text_character_def::get_font()
 {
 	if (m_font == NULL)
 	{
@@ -102,7 +117,7 @@ edit_text_character_def::get_font()
 		m_font = m_root_def->get_font(m_font_id);
 		if (m_font == NULL)
 		{
-			log_error("error: text style with undefined font; font_id = %d", m_font_id);
+			log_error(_("error: text style with undefined font; font_id = %d"), m_font_id);
 		}
 	}
 
@@ -131,7 +146,7 @@ edit_text_character_def::create_character_instance(character* parent,
 	// care of updating this TextField text when assigned to
 	// and to retrive this TextField text when extracted value from.
 	//
-	// The DefineEditTextVariableNameTest.swf file under 
+	// The DefineEditTextVariableNameTest.swf file under
 	// testsuite/misc-ming.all gives an idea of the problem
 	// (in particular it shows a case in which VariableName is
 	// outside of TextField timeline/scope)
@@ -141,12 +156,9 @@ edit_text_character_def::create_character_instance(character* parent,
 	return ch;
 }
 
-
 } // namespace gnash
-
 
 // Local Variables:
 // mode: C++
 // indent-tabs-mode: t
 // End:
-

@@ -1,18 +1,21 @@
-// 
+// network.cpp:  TCP/IP support, for Gnash.
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -73,22 +76,22 @@ Network::Network()
 	_debug(false),
 	_timeout(5)
 {
-    //log_msg("%s", __PRETTY_FUNCTION__);
+    //GNASH_REPORT_FUNCTION;
 #ifdef HAVE_WINSOCK_H
     WORD wVersionRequested;
     WSADATA wsaData;
     wVersionRequested = MAKEWORD(1, 1);		// Windows Sockets 1.1
     if (WSAStartup( wVersionRequested, &wsaData ) != 0) {
-        log_error("Could not find a usable WinSock DLL.");
+        log_error(_("Could not find a usable WinSock DLL"));
         exit(1);
     }
 #endif
 
 }
 
-Network::~Network() 
+Network::~Network()
 {
-    //log_msg("%s:", __PRETTY_FUNCTION__);
+    //GNASH_REPORT_FUNCTION;
 #ifdef HAVE_WINSOCK_H
     WSACleanup();
 #else
@@ -104,15 +107,16 @@ bool
 Network::createServer(void)
 {
 //    GNASH_REPORT_FUNCTION;
-    
+
     return createServer(DEFAULTPORT);
 }
 
+// FIXME: Should also support IPv6 (AF_INET6)
 bool
 Network::createServer(short port)
 {
 //    GNASH_REPORT_FUNCTION;
-    
+
     struct protoent *ppe;
     struct sockaddr_in sock_in;
     int             on, type;
@@ -120,10 +124,10 @@ Network::createServer(short port)
     in_addr_t       nodeaddr;
 
     if (port < 1024) {
-	log_error("Can't connect to priviledged port #%d!", port);
+	log_error(_("Can't connect to privileged port #%d"), port);
 	return false;
     }
-  
+
     const struct hostent *host = gethostbyname("localhost");
     struct in_addr *thisaddr = reinterpret_cast<struct in_addr *>(host->h_addr_list[0]);
     _ipaddr = thisaddr->s_addr;
@@ -136,77 +140,67 @@ Network::createServer(short port)
     // Accept incoming connections on any IP number
     sock_in.sin_addr.s_addr = INADDR_ANY;
 #endif
-    
+
     _ipaddr = sock_in.sin_addr.s_addr;
     sock_in.sin_family = AF_INET;
     sock_in.sin_port = htons(port);
-  
+
     if ((ppe = getprotobyname(DEFAULTPROTO)) == 0) {
-        // error, wasn't able to get a protocol entry
-        log_warning("unable to get protocol entry for %s",
+        log_error(_("unable to get protocol entry for %s"),
                 DEFAULTPROTO);
         return false;
     }
-    
+
     // set protocol type
     if (DEFAULTPROTO == "udp") {
         type = SOCK_DGRAM;
     } else {
         type = SOCK_STREAM;
     }
-    
+
     // Get a file descriptor for this socket connection
     _listenfd = socket(PF_INET, type, ppe->p_proto);
-    
+
     // error, wasn't able to create a socket
     if (_listenfd < 0) {
-        log_warning("unable to create socket: %s", strerror(errno));
+        log_error(_("unable to create socket: %s"), strerror(errno));
         return true;
     }
-    
+
     on = 1;
     if (setsockopt(_listenfd, SOL_SOCKET, SO_REUSEADDR,
                    (char *)&on, sizeof(on)) < 0) {
-        log_warning("setsockopt SO_REUSEADDR failed!");
+        log_error(_("setsockopt SO_REUSEADDR failed"));
         return false;
     }
-    
+
     retries = 0;
-    
+
     nodeaddr = inet_lnaof(*thisaddr);
     while (retries < 5) {
         if (bind(_listenfd, reinterpret_cast<struct sockaddr *>(&sock_in),
                  sizeof(sock_in)) == -1) {
-            log_warning("unable to bind to port %hd! %s",
+            log_error(_("unable to bind to port %hd: %s"),
                     port, strerror(errno));
 //                    inet_ntoa(sock_in.sin_addr), strerror(errno));
             retries++;
         }
 
-#if 0
-        char                ascip[32];
-        inet_ntop(AF_INET, &_ipaddr, ascip, INET_ADDRSTRLEN);
-        log_msg("Host Name is %s, IP is %s", host->h_name, ascip);
-#endif
-    
 	if (_debug) {
-	    log_msg("Server bound to service on port: %hd, %s using fd #%d",
-		    ntohs(sock_in.sin_port), inet_ntoa(sock_in.sin_addr),
+		char  ascip[INET_ADDRSTRLEN];
+		inet_ntop(sock_in.sin_family, &_ipaddr, ascip, INET_ADDRSTRLEN);
+	    log_msg(_("Server bound to service on %s, port %hd, using fd %d"),
+		    ascip, ntohs(sock_in.sin_port),
 		    _listenfd);
 	}
-        
+
         if (type == SOCK_STREAM && listen(_listenfd, 5) < 0) {
-            log_msg("ERROR: unable to listen on port: %hd: %s ",
+            log_error(_("unable to listen on port: %hd: %s "),
                 port, strerror(errno));
             return false;
         }
 
         _port = port;
-    
-#if 0
-        log_msg("Listening for net traffic on fd #%d", _sockfd);
-#endif
-    
         return true;
     }
     return false;
@@ -219,7 +213,7 @@ bool
 Network::newConnection(void)
 {
 //    GNASH_REPORT_FUNCTION;
-    
+
     return newConnection(true);
 }
 
@@ -227,24 +221,24 @@ bool
 Network::newConnection(bool block)
 {
 //    GNASH_REPORT_FUNCTION;
-    
+
     struct sockaddr	newfsin;
     socklen_t		alen;
     int			ret;
     struct timeval        tval;
     fd_set                fdset;
     int                   retries = 3;
-  
+
     alen = sizeof(struct sockaddr_in);
-  
+
 #ifdef NET_DEBUG
-    log_msg("Trying to accept net traffic on fd #%d", _sockfd);
+    log_msg(_("Trying to accept net traffic on fd %d"), _sockfd);
 #endif
-  
+
     if (_listenfd <= 2) {
         return false;
     }
-  
+
     while (retries--) {
         // We use select to wait for the read file descriptor to be
         // active, which means there is a client waiting to connect.
@@ -254,37 +248,37 @@ Network::newConnection(bool block)
 //             FD_SET(fileno(stdin), &fdset);
 //         }
         FD_SET(_listenfd, &fdset);
-    
+
         // Reset the timeout value, since select modifies it on return. To
         // block, set the timeout to zero.
         tval.tv_sec = 1;
         tval.tv_usec = 0;
-    
+
         if (block) {
             ret = select(_listenfd+1, &fdset, NULL, NULL, NULL);
         } else {
             ret = select(_listenfd+1, &fdset, NULL, NULL, &tval);
         }
-    
+
         if (FD_ISSET(0, &fdset)) {
-            log_msg("There is data at the console for stdin!");
+            log_msg(_("There is data at the console for stdin"));
             return true;
         }
 
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            log_msg("The accept() socket for fd #%d was interupted by a system call!", _listenfd);
+            log_msg(_("The accept() socket for fd %d was interupted by a system call"), _listenfd);
         }
-    
+
         if (ret == -1) {
-            log_warning("The accept() socket for fd #%d never was available for writing!",
+            log_msg(_("The accept() socket for fd %d never was available for writing"),
                     _listenfd);
             return false;
         }
-    
+
         if (ret == 0) {
             if (_debug) {
-                log_warning("The accept() socket for fd #%d timed out waiting to write!",
+                log_msg(_("The accept() socket for fd %d timed out waiting to write"),
                         _listenfd);
             }
         }
@@ -294,14 +288,14 @@ Network::newConnection(bool block)
     fcntl(_listenfd, F_SETFL, O_NONBLOCK); // Don't let accept() block
 #endif
     _sockfd = accept(_listenfd, &newfsin, &alen);
-  
+
     if (_sockfd < 0) {
-        log_warning("unable to accept : %s", strerror(errno));
+        log_error(_("unable to accept: %s"), strerror(errno));
         return false;
     }
 
     if (_debug) {
-	log_msg("Accepting tcp/ip connection on fd #%d", _sockfd);
+	log_msg(_("Accepting tcp/ip connection on fd %d"), _sockfd);
     }
 
     return true;
@@ -312,14 +306,14 @@ bool
 Network::createClient(void)
 {
     GNASH_REPORT_FUNCTION;
-    
+
     return createClient("localhost", RTMP);
 }
 bool
 Network::createClient(short /* port */)
 {
     GNASH_REPORT_FUNCTION;
-    
+
     return false;
 }
 
@@ -327,15 +321,15 @@ bool
 Network::createClient(const char *hostname)
 {
     GNASH_REPORT_FUNCTION;
-    
-    return createClient(hostname, RTMP);        
+
+    return createClient(hostname, RTMP);
 }
-    
+
 bool
 Network::createClient(const char *hostname, short port)
 {
     GNASH_REPORT_FUNCTION;
-    
+
     struct sockaddr_in  sock_in;
     fd_set              fdset;
     struct timeval      tval;
@@ -347,22 +341,22 @@ Network::createClient(const char *hostname, short port)
     assert( ! connected() );
 
     if (port < 1024) {
-        log_error("Can't connect to priviledged port #%hd!", port);
+        log_error(_("Can't connect to privileged port %hd"), port);
         _connected = false;
         return false;
     }
 
-    log_msg("%s: to host %s at port %d", __FUNCTION__, hostname, port);
-  
+    log_msg(_("%s: to host %s at port %d"), __FUNCTION__, hostname, port);
+
     memset(&sock_in, 0, sizeof(struct sockaddr_in));
     memset(&thishostname, 0, MAXHOSTNAMELEN);
     if (strlen(hostname) == 0) {
         if (gethostname(thishostname, MAXHOSTNAMELEN) == 0) {
-            log_msg("The hostname for this machine is %s.", thishostname);
+            log_msg(_("The hostname for this machine is %s"), thishostname);
         } else {
-            log_msg("Couldn't get the hostname for this machine!");
+            log_msg(_("Couldn't get the hostname for this machine"));
             return false;
-        }   
+        }
     }
     const struct hostent *hent = ::gethostbyname(hostname);
     if (hent > 0) {
@@ -372,9 +366,9 @@ Network::createClient(const char *hostname, short port)
     sock_in.sin_port = ntohs(static_cast<short>(port));
 
 #if 0
-    char ascip[32];
-    inet_ntop(AF_INET, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
-    log_msg("The IP address for this client socket is %s", ascip);
+    char ascip[INET_ADDRSTRLEN];
+    inet_ntop(sock_in.sin_family, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
+    log_msg(_("The IP address for this client socket is %s"), ascip);
 #endif
 
     proto = ::getprotobyname("TCP");
@@ -382,7 +376,7 @@ Network::createClient(const char *hostname, short port)
     _sockfd = ::socket(PF_INET, SOCK_STREAM, proto->p_proto);
     if (_sockfd < 0)
         {
-            log_error("unable to create socket : %s", strerror(errno));
+            log_error(_("unable to create socket : %s"), strerror(errno));
             _sockfd = -1;
             return false;
         }
@@ -393,36 +387,36 @@ Network::createClient(const char *hostname, short port)
         // active, which means there is a client waiting to connect.
         FD_ZERO(&fdset);
         FD_SET(_sockfd, &fdset);
-    
+
         // Reset the timeout value, since select modifies it on return. To
         // block, set the timeout to zero.
         tval.tv_sec = 5;
         tval.tv_usec = 0;
-    
+
         ret = ::select(_sockfd+1, &fdset, NULL, NULL, &tval);
 
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR)
             {
-                log_msg("The connect() socket for fd #%d was interupted by a system call!",
+                log_msg(_("The connect() socket for fd %d was interupted by a system call"),
                         _sockfd);
                 continue;
             }
-    
+
         if (ret == -1)
             {
-                log_msg("The connect() socket for fd #%d never was available for writing!",
+                log_msg(_("The connect() socket for fd %d never was available for writing"),
                         _sockfd);
 #ifdef HAVE_WINSOCK_H
                 ::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
 #else
                 ::shutdown(_sockfd, SHUT_RDWR);
 #endif
-                _sockfd = -1;      
+                _sockfd = -1;
                 return false;
             }
         if (ret == 0) {
-            log_error("The connect() socket for fd #%d timed out waiting to write!",
+            log_error(_("The connect() socket for fd %d timed out waiting to write"),
                       _sockfd);
             continue;
         }
@@ -430,16 +424,18 @@ Network::createClient(const char *hostname, short port)
         if (ret > 0) {
             ret = ::connect(_sockfd, reinterpret_cast<struct sockaddr *>(&sock_in), sizeof(sock_in));
             if (ret == 0) {
-                log_msg("\tport %d at IP %s for fd #%d", port,
-                        ::inet_ntoa(sock_in.sin_addr), _sockfd);
+		char ascip[INET_ADDRSTRLEN];
+		inet_ntop(sock_in.sin_family, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
+                log_msg(_("\tport %d at IP %s for fd %d"), port,
+                        ascip, _sockfd);
                 _connected = true;
                 assert(_sockfd > 0);
                 return true;
             }
             if (ret == -1) {
-                log_msg("The connect() socket for fd #%d never was available for writing!",
+                log_error(_("The connect() socket for fd %d never was available for writing"),
                         _sockfd);
-                _sockfd = -1;      
+                _sockfd = -1;
                 assert(!_connected);
                 return false;
             }
@@ -450,7 +446,7 @@ Network::createClient(const char *hostname, short port)
 
     printf("\tConnected at port %d on IP %s for fd #%d", port,
            ::inet_ntoa(sock_in.sin_addr), _sockfd);
-  
+
 #ifndef HAVE_WINSOCK_H
     fcntl(_sockfd, F_SETFL, O_NONBLOCK);
 #endif
@@ -462,15 +458,15 @@ Network::createClient(const char *hostname, short port)
 
 bool
 Network::closeNet()
-{  
+{
 //    GNASH_REPORT_FUNCTION;
-    
+
     if (_sockfd > 0) {
         closeNet(_sockfd);
         _sockfd = 0;
-        _connected = false;        
+        _connected = false;
     }
-  
+
     return false;
 }
 
@@ -478,9 +474,9 @@ bool
 Network::closeNet(int sockfd)
 {
 //    GNASH_REPORT_FUNCTION;
-    
+
     int retries = 0;
-    
+
     // If we can't close the socket, other processes must be
     // locked on it, so we wait a second, and try again. After a
     // few tries, we give up, cause there must be something
@@ -489,7 +485,7 @@ Network::closeNet(int sockfd)
     if (sockfd <= 0) {
         return true;
     }
-  
+
     while (retries < 3) {
         if (sockfd) {
             // Shutdown the socket connection
@@ -504,33 +500,33 @@ Network::closeNet(int sockfd)
                     return true;
                 }
             }
-#endif 
+#endif
             if (close(sockfd) < 0) {
-                log_warning("Unable to close the socket for fd #%d: %s",
+                log_error(_("Unable to close the socket for fd %d: %s"),
                         sockfd, strerror(errno));
 #ifndef HAVE_WINSOCK_H
                 sleep(1);
 #endif
                 retries++;
             } else {
-                log_msg("Closed the socket on fd #%d", sockfd);
+                log_msg(_("Closed the socket on fd %d"), sockfd);
                 return true;
             }
         }
-    } 
+    }
     return false;
 }
 // Description: Close an open socket connection.
 bool
 Network::closeConnection(void)
 {
-    GNASH_REPORT_FUNCTION;    
+    GNASH_REPORT_FUNCTION;
 
     closeConnection(_sockfd);
     _sockfd = 0;
     _listenfd = 0;
     _connected = false;
-  
+
     return false;
 }
 
@@ -538,12 +534,12 @@ bool
 Network::closeConnection(int fd)
 {
     GNASH_REPORT_FUNCTION;
-    
+
     if (fd > 0) {
         ::close(fd);
 //        closeNet(fd);
     }
-  
+
     return false;
 }
 
@@ -584,7 +580,7 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
     if (fd) {
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
-	
+
         if (timeout < 0) {
 	    tval.tv_sec = 5;
 	    tval.tv_usec = 0;
@@ -592,32 +588,32 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
         } else {
 	    ret = select(fd+1, &fdset, NULL, NULL, NULL);
 	}
-        
+
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
             dbglogfile << "The socket for fd #" << fd
                        << " we interupted by a system call!" << endl;
         }
-        
+
         if (ret == -1) {
             dbglogfile << "The socket for fd #" << fd
                        << " never was available for reading!" << endl;
             return -1;
         }
-        
+
         if (ret == 0) {
             dbglogfile << "The socket for fd #" << fd
                 << " timed out waiting to read!" << endl;
             return -1;
         }
-    
+
         ret = read(fd, buffer, nbytes);
 	if (_debug) {
 	    dbglogfile << "read " << ret << " bytes from fd #"
 		       << fd << endl;
 	}
     }
-    
+
     return ret;
 
 }
@@ -678,7 +674,7 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
     if (fd) {
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
-        
+
         // Reset the timeout value, since select modifies it on return
         if (timeout <= 0) {
             timeout = 5;
@@ -686,23 +682,23 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
         tval.tv_sec = timeout;
         tval.tv_usec = 0;
         ret = select(fd+1, NULL, &fdset, NULL, &tval);
-        
+
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
             dbglogfile << "The socket for fd #" << fd
                 << " we interupted by a system call!" << endl;
         }
-        
+
         if (ret == -1) {
             dbglogfile << "The socket for fd #" << fd
                 << " never was available for writing!" << endl;
         }
-        
+
         if (ret == 0) {
             dbglogfile << "The socket for fd #" << fd
                 << " timed out waiting to write!" << endl;
         }
-        
+
         ret = write(fd, bufptr, nbytes);
 
         if (ret == 0) {
@@ -732,7 +728,7 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
 		}
                 return ret;
             }
-            
+
             if (ret == 0) {
                 dbglogfile << "Wrote 0 bytes to fd #" << fd << endl;
             }
@@ -752,7 +748,7 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
                        << " bytes)" << endl;
         }
     }
-#endif    
+#endif
 
     return ret;
 }

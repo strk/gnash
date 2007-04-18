@@ -1,20 +1,23 @@
-// 
+// log.cpp:  Message logging functions, for gnash.
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: log.cpp,v 1.46 2007/04/16 10:26:59 jgilmore Exp $ */
+/* $Id: log.cpp,v 1.47 2007/04/18 14:07:33 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -59,7 +62,7 @@ using namespace std;
 
 namespace gnash {
 
-// static data to be hared amongst all classes.
+// static data to be shared amongst all classes.
 ofstream LogFile::_console;
 int LogFile::_verbose = 0;
 bool LogFile::_actiondump = false;
@@ -99,15 +102,16 @@ hexify(unsigned char *p, const unsigned char *s, int length, bool ascii) {
     return p1;
 }
 
+// FIXME: localize these, so they print local regional timestamps.
 ostream&
 timestamp(ostream& x) {
     time_t t;
     char buf[10];
-    
+
     memset (buf, '0', 10);        // this terminates the string
     time (&t);                    // get the current time
     strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
-    
+
     return x << buf << ": ";
 }
 
@@ -116,23 +120,23 @@ string
 timestamp() {
     time_t t;
     char buf[10];
-    
+
     memset (buf, '0', 10);        // this terminates the string
     time (&t);                    // get the current time
     strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
     string sbuf = buf;
-    
+
     return sbuf;
 }
 
 ostream& datetimestamp(ostream& x) {
     time_t t;
     char buf[20];
-    
+
     memset (buf, '0', 20);        // this terminates the string
     time (&t);                    // get the current time
     strftime (buf, sizeof(buf), "%Y-%m-%d %H:%M:%S ", localtime (&t));
-    
+
     return x << buf;
 }
 
@@ -159,13 +163,13 @@ log_msg(const char* fmt, ...)
 
     va_list ap;
     char tmp[BUFFER_SIZE];
-    
+
     va_start (ap, fmt);
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
     dbglogfile << tmp << endl;
-    
+
     va_end (ap);
 }
 
@@ -176,14 +180,13 @@ log_trace(const char* fmt, ...)
 
     va_list ap;
     char tmp[BUFFER_SIZE];
-    
+
     va_start (ap, fmt);
-    //vsprintf (tmp, fmt, ap);
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
-    
-    dbglogfile << "TRACE: " << tmp << endl;
-    
+
+    dbglogfile << _("TRACE: ") << tmp << endl;
+
     va_end (ap);
 }
 
@@ -194,14 +197,18 @@ log_debug(const char* fmt, ...)
 
     va_list ap;
     char tmp[BUFFER_SIZE];
-    
+
     va_start (ap, fmt);
-    //vsprintf (tmp, fmt, ap);
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
-    
-    dbglogfile << "DEBUG: " << tmp << endl;
-    
+
+    // We don't translate DEBUG: because code below here looks for it
+    // in the output of const char strings.  If we translated it, both
+    // its type would change (to non-const char string) and the letters would
+    // change to the local language.  Could perhaps be fixed more cleanly
+    // later...
+    dbglogfile << N_("DEBUG: ") << tmp << endl;
+
     va_end (ap);
 }
 
@@ -249,8 +256,8 @@ log_parse(const char* fmt, ...)
     tmp[BUFFER_SIZE-1] = '\0';
 
     dbglogfile << tmp << endl;
-    
-    va_end (ap);    
+
+    va_end (ap);
 }
 
 // Printf-style error log.
@@ -266,9 +273,9 @@ log_error(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile << "ERROR: " << tmp << endl;
-    
-    va_end (ap);    
+    dbglogfile << _("ERROR: ") << tmp << endl;
+
+    va_end (ap);
 }
 
 void
@@ -278,14 +285,14 @@ log_unimpl(const char* fmt, ...)
 
     va_list ap;
     char tmp[BUFFER_SIZE];
-    
+
     va_start (ap, fmt);
     vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
-    
-    dbglogfile << "ERROR: Unimplemented: " << tmp << endl;
-    
-    va_end (ap);    
+
+    dbglogfile << _("ERROR: Unimplemented: ") << tmp << endl;
+
+    va_end (ap);
 }
 
 void
@@ -295,14 +302,14 @@ log_security(const char* fmt, ...)
 
     va_list ap;
     char tmp[BUFFER_SIZE];
-    
+
     va_start (ap, fmt);
     vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
-    
-    dbglogfile << "SECURITY: " << tmp << endl;
-    
-    va_end (ap);    
+
+    dbglogfile << _("SECURITY: ") << tmp << endl;
+
+    va_end (ap);
 }
 
 void
@@ -312,14 +319,14 @@ log_swferror(const char* fmt, ...)
 
     va_list ap;
     char tmp[BUFFER_SIZE];
-    
+
     va_start (ap, fmt);
     vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
-    
-    dbglogfile << "MALFORMED SWF: " << tmp << endl;
-    
-    va_end (ap);    
+
+    dbglogfile << _("MALFORMED SWF: ") << tmp << endl;
+
+    va_end (ap);
 }
 
 void
@@ -329,14 +336,14 @@ log_aserror(const char* fmt, ...)
 
     va_list ap;
     char tmp[BUFFER_SIZE];
-    
+
     va_start (ap, fmt);
     vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
-    
-    dbglogfile << "ACTIONSCRIPT ERROR: " << tmp << endl;
-    
-    va_end (ap);    
+
+    dbglogfile << _("ACTIONSCRIPT ERROR: ") << tmp << endl;
+
+    va_end (ap);
 }
 
 const char *
@@ -352,7 +359,7 @@ LogFile::LogFile (void): _state(OPEN),
 			 _trace(false)
 {
     string loadfile;
-    
+
 // Flip this ifdef to have the default files be stored in /tmp instead
 // of in the users home directory.
 #if 0
@@ -373,13 +380,13 @@ LogFile::LogFile (void): _state(OPEN),
     loadfile = DEFAULT_LOGFILE;
 # endif
 #endif
-    
-    _outstream.open (loadfile.c_str(), ios::out); 
+
+    _outstream.open (loadfile.c_str(), ios::out);
     _filespec = loadfile;
     _state = OPEN;
 }
 
-LogFile::LogFile (const char *filespec): _stamp(true), _write(true) 
+LogFile::LogFile (const char *filespec): _stamp(true), _write(true)
 {
     if (_state == OPEN) {
 	_outstream.close ();
@@ -397,12 +404,12 @@ LogFile::openLog (const char *filespec)
     if (_state == OPEN) {
 	_outstream.close ();
     }
-    
+
     _outstream.open (filespec, ios::out);
     _state = OPEN;
-  
+
   // LogFile::outstream << "Opened " << filespec << endl;
-  
+
   return true;
 }
 
@@ -415,7 +422,7 @@ LogFile::closeLog (void)
         _outstream.close();
     }
     _state = CLOSED;
-    
+
     return true;
 }
 
@@ -431,7 +438,7 @@ LogFile::removeLog (void)
     unlink(_filespec.c_str());
     _filespec.clear();
     _logentry.clear();
-    
+
     return true;
 }
 
@@ -447,9 +454,9 @@ LogFile::operator << (char x)
     if (_write) {
 	_outstream << x;
     }
-    
+
     _state = INPROGRESS;
-    
+
   return *this;
 }
 
@@ -465,9 +472,9 @@ LogFile::operator << (long x)
     if (_write) {
 	_outstream << x;
     }
-    
+
     _state = INPROGRESS;
-    
+
   return *this;
 }
 
@@ -479,13 +486,13 @@ LogFile::operator << (unsigned int x)
     if (_verbose) {
 	cout << x;
     }
-    
+
     if (_write) {
 	_outstream << x;
     }
-    
+
     _state = INPROGRESS;
-  
+
     return *this;
 }
 
@@ -510,7 +517,7 @@ LogFile::operator << (unsigned long x)
 /// \brief print a float
 LogFile&
 LogFile::operator << (float x)
-{ 
+{
     scoped_lock lock(io_mutex);
     if (_verbose > 0) {
 	cout << x;
@@ -519,7 +526,7 @@ LogFile::operator << (float x)
     if (_write) {
 	_outstream << x;
     }
-    
+
     _state = INPROGRESS;
 
   return *this;
@@ -533,12 +540,12 @@ LogFile::operator << (double &x)
     if (_verbose) {
 	cout << x;
     }
-    
+
     if (_write) {
 	_outstream << x;
-    }  
+    }
     _state = INPROGRESS;
-    
+
     return *this;
 }
 
@@ -546,15 +553,15 @@ LogFile::operator << (double &x)
 LogFile&
 LogFile::operator << (int x)
 {
-    
+
     if (_verbose) {
 	cout << x;
     }
-    
+
     if (_write) {
 	_outstream << x;
     }
-    
+
     _state = INPROGRESS;
 
     return *this;
@@ -564,35 +571,35 @@ LogFile::operator << (int x)
 LogFile&
 LogFile::operator << (void *ptr)
 {
-    scoped_lock lock(io_mutex);    
+    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << ptr;
     }
-    
+
     if (_write) {
 	_outstream << ptr;
     }
-    
+
     _state = INPROGRESS;
 
     return *this;
 }
 
 /// \brief print an STL string
-LogFile& 
+LogFile&
 LogFile::operator << (const std::string &s)
 {
     scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << s;
     }
-    
+
     if (_write) {
 	_outstream << s;
     }
-    
+
     _state = INPROGRESS;
-    
+
     return *this;
 }
 
@@ -603,36 +610,38 @@ LogFile::operator << (const std::string &s)
 /// function calls. We always want these to be logged to the disk
 /// file, but optionally printed to the terminal window.
 ///
-/// Since the traceing functions use varargs, they always become a
+/// Since the tracing functions use varargs, they always become a
 /// const char * string after processing the arguments. That means we
 /// can look for the keyword to determine what to do.
-LogFile& 
+LogFile&
 LogFile::operator << (const char *str)
 {
     string c(str);
-    
+
     _logentry = timestamp();
     _logentry += ": ";
 
     // See if we have the TRACE keyword
-    if (strstr(str, "DEBUG:")) {
+    if (strstr(str, N_("DEBUG: "))) {
 	_trace = true;
-    }	  
+    }
 
+    scoped_lock lock(io_mutex);
+
+#if 0  // Fixed the callers!
     // Since the log_* functions are wrappers for the older API used
     // for logging, we have to strip the CR off the end otr we get
     // blanks lines as the previous implementation required a CR, and
     // now we don't.
     int len = c.length();
-
-    scoped_lock lock(io_mutex);
     if (len > 0) {
 	if (c[len-1] == '\n') {
 	    //c[len-1] = 0;
 	    c.resize(len-1);
 	}
     }
-    
+#endif
+
     if (_stamp == true && (_state == IDLE || _state == OPEN)) {
 	_state = INPROGRESS;
 	if (_trace) {
@@ -662,11 +671,11 @@ LogFile::operator << (const char *str)
 	}
     }
     _logentry += c;
-    
+
     return *this;
 }
 
-LogFile& 
+LogFile&
 LogFile::operator << (unsigned char const *c)
 {
     _logentry = timestamp();
@@ -675,7 +684,7 @@ LogFile::operator << (unsigned char const *c)
     if (c == -0) {
       return *this;
     }
-    
+
     scoped_lock lock(io_mutex);
     if (_stamp == true && (_state == IDLE || _state == OPEN)) {
 	_state = INPROGRESS;
@@ -694,23 +703,23 @@ LogFile::operator << (unsigned char const *c)
 	}
     }
     _logentry += (const char*)c;
-    
+
     return *this;
 }
 
 #if 0
 /// \brief print an XML char *
-LogFile& 
+LogFile&
 LogFile::operator << (const xmlChar *c)
 {
-    scoped_lock lock(io_mutex);    
+    scoped_lock lock(io_mutex);
     _logentry = timestamp();
     _logentry += ": ";
 
     if (c == -0) {
       return *this;
     }
-    
+
     if (_stamp == true && (_state == IDLE || _state == OPEN)) {
 	_state = INPROGRESS;
 	if (_verbose) {
@@ -728,7 +737,7 @@ LogFile::operator << (const xmlChar *c)
 	}
     }
     _logentry += (const char*)c;
-    
+
     return *this;
 }
 #endif
@@ -747,15 +756,15 @@ LogFile::operator << (std::ostream & (&)(std::ostream &))
 	    cout << endl;
 	}
     }
-    
+
     if (_write) {
 	_outstream << endl;;
 	_outstream.flush();
     }
-    
+
     _state = IDLE;
     _trace = false;
-    
+
     return *this;
 }
 

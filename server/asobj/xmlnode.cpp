@@ -1,3 +1,4 @@
+// xmlnode.cpp:  ActionScript "XMLNode" class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -14,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.32 2007/04/17 12:58:20 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.33 2007/04/18 14:07:32 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -77,9 +78,9 @@ XMLNode::XMLNode()
     _parent(0),
     _type(tElement)
 {
-    //log_msg("%s: %p \n", __PRETTY_FUNCTION__, this);
+    //log_msg("%s: %p", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg("\tCreating XMLNode data at %p \n", this);
+    log_msg(_("\tCreating XMLNode data at %p"), this);
 #endif
 }
 
@@ -89,9 +90,9 @@ XMLNode::XMLNode(as_object* overridden_interface)
     _parent(0),
     _type(tElement)
 {
-    //log_msg("%s: %p \n", __PRETTY_FUNCTION__, this);
+    //log_msg("%s: %p", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg("\tCreating XMLNode data at %p \n", this);
+    log_msg(_("\tCreating XMLNode data at %p"), this);
 #endif
 }
 
@@ -103,7 +104,7 @@ XMLNode::XMLNode(const XMLNode& tpl, bool deep)
     _value(tpl._value),
     _type(tpl._type)
 {
-    // only clone childs if in deep mode
+    // only clone children if in deep mode
     if ( deep ) 
     {
         const ChildList& from=tpl._children;
@@ -117,9 +118,9 @@ XMLNode::XMLNode(const XMLNode& tpl, bool deep)
 
 XMLNode::~XMLNode()
 {
-    //log_msg("%s: %p \n", __PRETTY_FUNCTION__, this);
+    //log_msg("%s: %p", __PRETTY_FUNCTION__, this);
 #ifdef DEBUG_MEMORY_ALLOCATION
-    log_msg("\tDeleting XMLNode data %s at %p", this->_name.c_str(), this);
+    log_msg(_("\tDeleting XMLNode data %s at %p"), this->_name.c_str(), this);
 #endif
 }
 
@@ -147,7 +148,7 @@ XMLNode::lastChild()
 	//GNASH_REPORT_FUNCTION;
 	if ( _children.empty() )
 	{
-			log_msg("XMLNode %p has no childrens", (void*)this);
+			log_msg(_("XMLNode %p has no children"), (void*)this);
 			return NULL;
 	}
 	return _children.back();
@@ -166,14 +167,14 @@ XMLNode::appendChild(boost::intrusive_ptr<XMLNode> node)
         oldparent->_children.remove(node);
     }
 
-//  log_msg("%s: partially unimplemented\n", __PRETTY_FUNCTION__);
+//  log_unimpl("%s: partially unimplemented", __PRETTY_FUNCTION__);
 }
 
 boost::intrusive_ptr<XMLNode> 
 XMLNode::cloneNode(bool deep)
 {
     //GNASH_REPORT_FUNCTION;
-    //log_msg("%s: deep is %d", __PRETTY_FUNCTION__, deep);
+    //log_msg(_("%s: deep is %d"), __PRETTY_FUNCTION__, deep);
 
     boost::intrusive_ptr<XMLNode> newnode = new XMLNode(*this, deep);
 
@@ -188,7 +189,7 @@ XMLNode::insertBefore(boost::intrusive_ptr<XMLNode> newnode, boost::intrusive_pt
     if ( it == _children.end() )
     {
         IF_VERBOSE_ASCODING_ERRORS(
-        log_aserror("XMLNode.insertBefore(): positional parameter is not a child of this node");
+        log_aserror(_("XMLNode.insertBefore(): positional parameter is not a child of this node"));
         );
         return;
     }
@@ -231,7 +232,7 @@ XMLNode::previousSibling()
     {
         if (itx->get() == this)
         {
-            // log_msg("Found the previous XMLNode child !!!! %s <%p>\n", (*itx)->nodeName(), (void*)*itx);
+            // log_msg("Found the previous XMLNode child !!!! %s <%p>", (*itx)->nodeName(), (void*)*itx);
 		    return previous_node;
 		}
 		previous_node = itx->get();
@@ -288,10 +289,10 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
     NodeType type = xml.nodeType();
 
 
-//    log_msg("%s: processing for object %s <%p>\n", __PRETTY_FUNCTION__, nodename, xml);
+//    log_msg("%s: processing for object %s <%p>", __PRETTY_FUNCTION__, nodename, xml);
 
 #ifdef GNASH_DEBUG
-    log_msg("Stringifying node %p with name %s, value %s, %u attributes and %u childs",
+    log_msg(_("Stringifying node %p with name %s, value %s, %u attributes and %u children"),
                     (void*)&xml, nodename, nodevalue, xml._attributes.size(), xml._children.size());
 #endif
 
@@ -312,7 +313,7 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
         xmlout << ">";
     }
 
-    // Node value first, then childs
+    // Node value first, then children
     if ( type == tText )
     {
 	    xmlout << nodevalue;
@@ -322,7 +323,7 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
     ChildList::const_iterator itx;
     for (itx = xml._children.begin(); itx != xml._children.end(); itx++)
     {
-//      log_msg("Found One XMLNode child !!!! %s <%p>\n", (*itx)->nodeName().c_str(), (void*)*itx);
+//      log_msg(_("Found One XMLNode child.  %s <%p>"), (*itx)->nodeName().c_str(), (void*)*itx);
 //      cerr << "<" << (*it)->nodeName() << ">" << endl;
         (*itx)->toString(xmlout);
     }
@@ -439,7 +440,7 @@ xmlnode_appendchild(const fn_call& fn)
 	if ( ! fn.nargs )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("XMLNode::appendChild() needs at least one argument");
+		log_aserror(_("XMLNode::appendChild() needs at least one argument"));
 		);
 		return as_value();
 	}
@@ -448,7 +449,7 @@ xmlnode_appendchild(const fn_call& fn)
 	if ( ! xml_obj )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_aserror("First argument to XMLNode::appendChild() is not an XMLNode");
+		log_aserror(_("First argument to XMLNode::appendChild() is not an XMLNode"));
 		);
 		return as_value();
 	}
@@ -462,7 +463,7 @@ static as_value
 xmlnode_clonenode(const fn_call& fn)
 {
     //GNASH_REPORT_FUNCTION;
-//    log_msg("%s: %d args\n", __PRETTY_FUNCTION__, fn.nargs);
+//    log_msg("%s: %d args", __PRETTY_FUNCTION__, fn.nargs);
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
     bool deep = false;
@@ -482,7 +483,7 @@ xmlnode_insertbefore(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror("XMLNode.insertBefore(%s) needs at least two argument", ss.str().c_str());
+		log_aserror(_("XMLNode.insertBefore(%s) needs at least two argument"), ss.str().c_str());
 		);
 		return as_value();
 	}
@@ -492,7 +493,7 @@ xmlnode_insertbefore(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_aserror("First argument to XMLNode.insertBefore(%s) is not an XMLNode",
+		log_aserror(_("First argument to XMLNode.insertBefore(%s) is not an XMLNode"),
                 ss.str().c_str());
 		);
 		return as_value();
@@ -503,7 +504,7 @@ xmlnode_insertbefore(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
         std::stringstream ss; fn.dump_args(ss);
-		log_aserror("Second argument to XMLNode.insertBefore(%s) is not an XMLNode",
+		log_aserror(_("Second argument to XMLNode.insertBefore(%s) is not an XMLNode"),
                 ss.str().c_str());
 		);
 		return as_value();
@@ -514,7 +515,7 @@ xmlnode_insertbefore(const fn_call& fn)
     
 //    return as_value(ptr->obj.getAllocated());
 //    ptr->obj.insertBefore();
-    log_msg("%s:unimplemented \n", __PRETTY_FUNCTION__);
+    log_unimpl (__PRETTY_FUNCTION__);
     return as_value();
 }
 

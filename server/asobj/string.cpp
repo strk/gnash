@@ -1,3 +1,4 @@
+// string.cpp:  ActionScript "String" class, for Gnash.
 //
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -14,9 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.28 2007/04/16 18:23:06 strk Exp $ */
-
-// Implementation of ActionScript String class.
+/* $Id: string.cpp,v 1.29 2007/04/18 14:07:32 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,13 +36,13 @@
 #define ENSURE_FN_ARGS(min, max, rv)                                    \
     if (fn.nargs < min) {                                               \
         IF_VERBOSE_ASCODING_ERRORS(                                     \
-            log_aserror("%s needs one argument", __FUNCTION__);         \
+            log_aserror(_("%s needs one argument"), __FUNCTION__);         \
             )                                                           \
          return as_value(rv);                                           \
     }                                                                   \
     IF_VERBOSE_ASCODING_ERRORS(                                         \
         if (fn.nargs > max)                                             \
-            log_aserror("%s has more than one argument", __FUNCTION__); \
+            log_aserror(_("%s has more than one argument"), __FUNCTION__); \
     )
 
 
@@ -361,7 +360,7 @@ string_sub_string(const fn_call& fn)
 
             if (end < start) {
                 IF_VERBOSE_ASCODING_ERRORS(
-                    log_aserror("string.slice() called with end < start");
+                    log_aserror(_("string.slice() called with end < start"));
                 )
                 swap(&end, &start);
             }
@@ -424,7 +423,7 @@ string_char_code_at(const fn_call& fn)
 
     if (fn.nargs == 0) {
         IF_VERBOSE_ASCODING_ERRORS(
-            log_aserror("string.charCodeAt needs one argument");
+            log_aserror(_("string.charCodeAt needs one argument"));
         )
         as_value rv;
         rv.set_nan();
@@ -433,7 +432,7 @@ string_char_code_at(const fn_call& fn)
 
     IF_VERBOSE_ASCODING_ERRORS(
         if (fn.nargs > 1) {
-            log_aserror("string.charCodeAt has more than one argument");
+            log_aserror(_("string.charCodeAt has more than one argument"));
         }
     )
 

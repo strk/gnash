@@ -1,4 +1,5 @@
-// 
+// TextSnapshot.cpp:  ActionScript "TextSnapshot" class, for Gnash.
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
@@ -85,35 +86,35 @@ public:
 };
 
 as_value textsnapshot_findtext(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value textsnapshot_getcount(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value textsnapshot_getselected(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value textsnapshot_getselectedtext(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value textsnapshot_gettext(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value textsnapshot_hittesttextnearpos(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value textsnapshot_setselectcolor(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value textsnapshot_setselected(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 
@@ -121,7 +122,7 @@ as_value
 textsnapshot_ctor(const fn_call& /* fn */)
 {
 	boost::intrusive_ptr<as_object> obj = new textsnapshot_as_object;
-	
+
 	return as_value(obj.get()); // will keep alive
 }
 
@@ -137,14 +138,10 @@ void textsnapshot_class_init(as_object& global)
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachTextSnapshotInterface(*cl);
-		     
 	}
 
 	// Register _global.TextSnapshot
 	global.init_member("TextSnapshot", cl.get());
-
 }
 
-
 } // end of gnash namespace
-

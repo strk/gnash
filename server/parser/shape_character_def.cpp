@@ -1,12 +1,27 @@
-// shape.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// shape_character_def.cpp:  Quadratic bezier outline shapes, for Gnash.
+//
+//   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
+/* $Id: shape_character_def.cpp,v 1.16 2007/04/18 14:07:32 jgilmore Exp $ */
 
-// Quadratic bezier outline shapes, the basis for most SWF rendering.
+// Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
-
-/* $Id: shape_character_def.cpp,v 1.15 2007/04/12 05:37:33 strk Exp $ */
+// Quadratic bezier outline shapes are the basis for most SWF rendering.
 
 #include "shape_character_def.h"
 
@@ -67,10 +82,10 @@ read_fill_styles(std::vector<fill_style>& styles, stream* in,
 	}
 
 	IF_VERBOSE_PARSE (
-		log_parse("  read_fill_styles: count = %u", fill_style_count);
+		log_parse(_("  read_fill_styles: count = %u"), fill_style_count);
 	);
 
-	// Read the styles. 
+	// Read the styles.
 	styles.reserve(styles.size()+fill_style_count);
 	for (uint16_t i = 0; i < fill_style_count; ++i)
 	{
@@ -79,7 +94,7 @@ read_fill_styles(std::vector<fill_style>& styles, stream* in,
 		fill_style fs;
 		try
 		{
-			fs.read(in, tag_type, m); 
+			fs.read(in, tag_type, m);
 			styles.push_back(fs);
 		}
 		catch (ParserException& e)
@@ -99,10 +114,10 @@ read_line_styles(std::vector<line_style>& styles, stream* in, int tag_type)
 {
     // Get the count.
     int	line_style_count = in->read_u8();
-    
+
 		IF_VERBOSE_PARSE
 		(
-    log_parse("  read_line_styles: count = %d", line_style_count);
+    log_parse(_("  read_line_styles: count = %d"), line_style_count);
     		);
 
     // @@ does the 0xFF flag apply to all tag types?
@@ -112,7 +127,7 @@ read_line_styles(std::vector<line_style>& styles, stream* in, int tag_type)
 	line_style_count = in->read_u16();
 		IF_VERBOSE_PARSE
 		(
-	log_parse("  read_line_styles: count2 = %d", line_style_count);
+	log_parse(_("  read_line_styles: count2 = %d"), line_style_count);
 		);
     }
     // }
@@ -162,7 +177,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		IF_VERBOSE_PARSE
 		(
 		 std::string b = m_bound.toString();
-    log_parse("  bound rect: %s", b.c_str()); 
+    log_parse(_("  bound rect: %s"), b.c_str());
     		);
 
 	read_fill_styles(m_fill_styles, in, tag_type, m);
@@ -174,7 +189,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 
 		IF_VERBOSE_PARSE
 		(
-    log_parse("  shape_character_def read: nfillbits = %d, nlinebits = %d", num_fill_bits, num_line_bits);
+    log_parse(_("  shape_character_def read: nfillbits = %d, nlinebits = %d"), num_fill_bits, num_line_bits);
     		);
 
     // These are state variables that keep the
@@ -230,8 +245,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 
 		IF_VERBOSE_PARSE
 		(
-		if (SHAPE_LOG) 
-		    log_parse("  shape_character read: moveto %4g %4g", x, y);
+		if (SHAPE_LOG)
+		    log_parse(_("  shape_character read: moveto %4g %4g"), x, y);
 		);
 	    }
 	    if ((flags & 0x02) && num_fill_bits > 0) {
@@ -246,14 +261,14 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += fill_base;
 		}
-		current_path.setLeftFill(style); 
+		current_path.setLeftFill(style);
 		IF_VERBOSE_PARSE
 		(
 		if (SHAPE_LOG) {
-		    log_parse("  shape_character read: fill0 (left) = %d", current_path.getLeftFill());
+		    log_parse(_("  shape_character read: fill0 (left) = %d"), current_path.getLeftFill());
 		}
 		);
-		
+
 	    }
 	    if ((flags & 0x04) && num_fill_bits > 0) {
 		// fill_style_1_change = 1;
@@ -270,7 +285,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		current_path.setRightFill(style); // getRightFill() = style;
 		IF_VERBOSE_PARSE (
 		if (SHAPE_LOG) {
-		    log_parse("  shape_character read: fill1 (right) = %d", current_path.getRightFill());
+		    log_parse(_("  shape_character read: fill1 (right) = %d"), current_path.getRightFill());
 		}
 		);
 	    }
@@ -290,7 +305,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		IF_VERBOSE_PARSE (
 		if (SHAPE_LOG)
 		{
-		    log_parse("  shape_character_read: line = %d", current_path.getLineStyle());
+		    log_parse(_("  shape_character_read: line = %d"), current_path.getLineStyle());
 		}
 		);
 	    }
@@ -301,7 +316,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		assert(tag_type >= 22);
 
 		IF_VERBOSE_PARSE (
-		log_parse("  shape_character read: more fill styles");
+		log_parse(_("  shape_character read: more fill styles"));
 		);
 
 		// Store the current path if any.
@@ -337,7 +352,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		IF_VERBOSE_PARSE (
 		if (SHAPE_LOG)
 		{
-		    log_parse("  shape_character read: curved edge   = %4g %4g - %4g %4g - %4g %4g", x, y, cx, cy, ax, ay);
+		    log_parse(_("  shape_character read: curved edge   = %4g %4g - %4g %4g - %4g %4g"), x, y, cx, cy, ax, ay);
 		}
 		);
 
@@ -368,7 +383,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		IF_VERBOSE_PARSE (
 		if (SHAPE_LOG)
 		{
-		    log_parse("  shape_character_read: straight edge = %4g %4g - %4g %4g", x, y, x + dx, y + dy);
+		    log_parse(_("  shape_character_read: straight edge = %4g %4g - %4g %4g"), x, y, x + dx, y + dy);
 		}
 		);
 
@@ -387,10 +402,10 @@ void	shape_character_def::display(character* inst)
 {
 //    GNASH_REPORT_FUNCTION;
 
-  
+
   gnash::render::draw_shape_character(this, inst);
-  
-  
+
+
 /*
     matrix	mat = inst->get_world_matrix();
     cxform	cx = inst->get_world_cxform();
@@ -559,7 +574,7 @@ void	shape_character_def::display(
   shape_character_def* this_non_const = const_cast<shape_character_def*>(this);
 
   render_handler* renderer = get_render_handler();
-  renderer->draw_shape_character(this_non_const, mat, cx, pixel_scale, 
+  renderer->draw_shape_character(this_non_const, mat, cx, pixel_scale,
     fill_styles, line_styles);
 }
 
@@ -663,7 +678,6 @@ void	shape_character_def::input_cached_data(tu_file* in)
 }
 
 }	// end namespace gnash
-
 
 // Local Variables:
 // mode: C++

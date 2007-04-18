@@ -1,4 +1,5 @@
-// 
+// FLVParser.h:  Flash Video file format parser, for Gnash.
+//
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
@@ -16,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.2 2007/03/28 16:12:08 tgc Exp $
+// $Id: FLVParser.h,v 1.3 2007/04/18 14:07:33 jgilmore Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -61,7 +62,7 @@ enum videoFrameType
 
 /// \brief
 /// The FLVFrame class contains a video or audio frame, its size, its
-/// timestamp, 
+/// timestamp,
 class FLVFrame
 {
 public:
@@ -75,7 +76,7 @@ public:
 /// The FLVAudioInfo class contains information about the audiostream
 /// in the FLV being parsed. The information stored is codec-type,
 /// samplerate, samplesize, stereo and duration.
-/// timestamp, 
+/// timestamp,
 class FLVAudioInfo
 {
 public:
@@ -99,7 +100,7 @@ public:
 /// The FLVVideoInfo class contains information about the videostream
 /// in the FLV being parsed. The information stored is codec-type,
 /// width, height, framerate and duration.
-/// timestamp, 
+/// timestamp,
 class FLVVideoInfo
 {
 public:
@@ -127,7 +128,7 @@ public:
 	uint32_t dataSize;
 	uint64_t dataPosition;
 	uint32_t timestamp;
-	
+
 };
 
 class FLVAudioFrame
@@ -136,12 +137,12 @@ public:
 	uint32_t dataSize;
 	uint64_t dataPosition;
 	uint32_t timestamp;
-	
+
 };
 
 /// \brief
 /// The FLVParser class parses a FLV file, and can return
-/// video or audio frames for a specific time, or just 
+/// video or audio frames for a specific time, or just
 /// get the next in the timeline.
 
 class FLVParser
@@ -235,10 +236,10 @@ private:
 	FLVAudioInfo* _audioInfo;
 
 	/// Last audio frame returned
-	int32_t _lastAudioFrame;
+	uint32_t _lastAudioFrame;
 
 	/// Last video frame returned
-	int32_t _lastVideoFrame;
+	uint32_t _lastVideoFrame;
 
 	/// Audio stream is present
 	bool _audio;

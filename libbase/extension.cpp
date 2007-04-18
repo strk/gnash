@@ -1,5 +1,6 @@
+// extension.cpp:  Read and enable plug-in extensions to Flash, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.8 2007/04/08 23:06:17 rsavoye Exp $ */
+/* $Id: extension.cpp,v 1.9 2007/04/18 14:07:33 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -61,8 +62,6 @@
 
 using namespace std;
 namespace gnash {
-
-LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 Extension::Extension() 
 {
@@ -122,7 +121,7 @@ Extension::scanAndLoad(as_object &obj)
     vector<string>::iterator it;
     for (it = _modules.begin(); it != _modules.end(); it++) {
         mod = *(it);
-        dbglogfile << "Loading module: " << mod.c_str() << endl;
+        log_msg(_("Loading module: %s"), mod.c_str());
         SharedLib sl;
         initModule(mod.c_str(), obj);
     }   
@@ -138,7 +137,7 @@ Extension::initModule(const char *module, as_object &obj)
     SharedLib *sl;
     string symbol;
 
-    dbglogfile << "Initializing module: \"" << module << "\"" << endl;
+    log_msg(_("Initializing module: \"%s\""), module);
     
     symbol = module;
     if (_plugins[module] == 0) {
@@ -155,7 +154,7 @@ Extension::initModule(const char *module, as_object &obj)
     if (symptr) {    
         symptr(obj);
     } else {
-        log_warning("Couldn't get class_init symbol!");
+        log_error(_("Couldn't get class_init symbol"));
     }
     
     return true;
@@ -190,11 +189,11 @@ Extension::scanDir(const char *dirlist)
     }
     
     while (dir) {
-        dbglogfile << "Scanning directory \"" << dir << "\" for plugins." << endl;
+        log_msg(_("Scanning directory \"%s\" for plugins"), dir);
         DIR *library_dir = opendir(dir);
 
         if (library_dir == NULL) {
-            dbglogfile << "Can't open directory " << dir << endl;
+            log_error(_("Can't open directory %s"), dir);
             return false;
         }
         
@@ -216,7 +215,7 @@ Extension::scanDir(const char *dirlist)
             }
             
             *(strrchr(entry->d_name, '.')) = 0;
-            dbglogfile << "Gnash Plugin name: " << entry->d_name << endl;
+            log_msg(_("Gnash Plugin name: %s"), entry->d_name);
             _modules.push_back(entry->d_name);
             
         }

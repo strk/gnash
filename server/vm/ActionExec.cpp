@@ -1,20 +1,23 @@
-// 
+// ActionExec.cpp:  ActionScript execution, for Gnash.
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: ActionExec.cpp,v 1.26 2007/04/13 07:35:56 bjacques Exp $ */
+/* $Id: ActionExec.cpp,v 1.27 2007/04/18 14:07:33 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -22,7 +25,7 @@
 
 #include "ActionExec.h"
 #include "action_buffer.h"
-#include "swf_function.h" 
+#include "swf_function.h"
 #include "log.h"
 #include "VM.h"
 #include "GnashException.h"
@@ -32,7 +35,7 @@
 #include "as_environment.h"
 #include "debugger.h"
 
-#include <typeinfo> 
+#include <typeinfo>
 #include <boost/algorithm/string/case_conv.hpp>
 
 #include <sstream>
@@ -80,12 +83,12 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 	code(func.getActionBuffer()),
 	pc(func.getStartPC()),
 	stop_pc(pc+func.getLength()),
-	next_pc(pc), 
+	next_pc(pc),
 	env(newEnv),
 	retval(nRetVal)
 {
 	//GNASH_REPORT_FUNCTION;
-    
+
 	// See comment in header
 	if ( env.get_version() > 5 ) {
 	    _with_stack_limit = 15;
@@ -130,10 +133,10 @@ ActionExec::operator() ()
 
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
-        	log_action("at ActionExec operator() start, pc=" SIZET_FMT
+        	log_action(_("at ActionExec operator() start, pc=" SIZET_FMT
 		           ", stop_pc=" SIZET_FMT ", code.size=" SIZET_FMT
-			   ".", pc, 
-			   stop_pc, code.size());
+			   "."),
+			    pc, stop_pc, code.size());
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
@@ -150,17 +153,18 @@ ActionExec::operator() ()
 		// Drop last stack element
 		with_stack.pop_back();
 	    }
-	    
+
 	// Get the opcode.
 	uint8_t action_id = code[pc];
 
 	IF_VERBOSE_ACTION (
+		// FIXME, avoid direct dbglogfile access, use log_action
 		dbglogfile << std::endl << "PC:" << pc << " - EX: ";
 		code.log_disasm(pc);
 	);
 
 	// Set default next_pc offset, control flow action handlers
-	// will be able to reset it. 
+	// will be able to reset it.
 	if ((action_id & 0x80) == 0) {
 		// action with no extra data
 		next_pc = pc+1;
@@ -171,17 +175,15 @@ ActionExec::operator() ()
 		if ( next_pc > stop_pc )
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			std::stringstream ss;
-			ss << "Length " << length << " (" << (int)length << ") of action tag"
-				<< " id " << (unsigned)action_id
-				<< " at pc " << pc
-				<< " overflows actions buffer size "
-				<< stop_pc;
-			//throw ActionException(ss.str());;
-			log_swferror("%s", ss.str().c_str());
+			log_swferror(_("Length %u (%d) of action tag"
+			  " id %u at pc " SIZET_FMT
+		          " overflows actions buffer size " SIZET_FMT),
+			  length, (int)length, (unsigned)action_id, pc,
+			  stop_pc);
 			);
+			//throw ActionException(ss.str());;
 			// Give this action handler a chance anyway.
-			// Maybe it will be able to do something about 
+			// Maybe it will be able to do something about
 			// this anyway..
 		}
 	}
@@ -189,7 +191,8 @@ ActionExec::operator() ()
 	// Do we still need this ?
 	if ( action_id == SWF::ACTION_END ) {
 		// this would turn into an assertion (next_pc==stop_pc)
-		//		log_msg("At ACTION_END next_pc=%d, stop_pc=%d", next_pc, stop_pc);
+		//		log_msg(_("At ACTION_END next_pc=" SIZET_FMT
+		//		  ", stop_pc=" SIZET_FMT), next_pc, stop_pc);
 		break;
 	}
 
@@ -205,7 +208,7 @@ ActionExec::operator() ()
 	
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
-		log_action( " After execution, PC is " SIZET_FMT ".", pc);
+		log_action(_(" After execution, PC is " SIZET_FMT "."), pc);
 		stringstream ss;
 		env.dump_stack(ss);
 		env.dump_global_registers(ss);
@@ -223,9 +226,11 @@ ActionExec::operator() ()
     }
     catch (ActionLimitException& ex)
     {
+	    IF_VERBOSE_ASCODING_ERRORS (
 	    log_aserror("%s", ex.what());
+	    )
     }
-    
+
     cleanupAfterRun();
 
 }
@@ -241,15 +246,15 @@ ActionExec::cleanupAfterRun()
     // check the call stack if not in a function context
     if ( ! isFunction() && env.callStackDepth() > 0 )
     {
-	log_warning("Call stack non-empty at end of ExecutableCode run (limits hit?)");
+	log_error(_("Call stack non-empty at end of ExecutableCode run (limits hit?)"));
 	env.clearCallFrames();
     }
 
     // check if the stack was smashed
     if ( _initial_stack_size > env.stack_size() ) {
-	log_warning("Stack smashed (ActionScript compiler bug?)."
+	log_error(_("Stack smashed (ActionScript compiler bug?)."
 		    "Fixing by pushing undefined values to the missing slots, "
-		    " but don't expect things to work afterwards.");
+		    " but don't expect things to work afterwards"));
 	size_t missing = _initial_stack_size - env.stack_size();
 	for (size_t i=0; i<missing; ++i) {
 	    env.push(as_value());
@@ -257,8 +262,8 @@ ActionExec::cleanupAfterRun()
     } else if ( _initial_stack_size < env.stack_size() ) {
 	// We can argue this would be an "size-optimized" SWF instead...
 	IF_VERBOSE_MALFORMED_SWF(
-	    log_warning(SIZET_FMT " elements left on the stack after block execution. "
-		    "Cleaning up.", env.stack_size()-_initial_stack_size);
+	    log_swferror(_(SIZET_FMT " elements left on the stack after block execution.  "
+		    "Cleaning up"), env.stack_size()-_initial_stack_size);
 	    );
 	env.drop(env.stack_size()-_initial_stack_size);
     }
@@ -274,21 +279,23 @@ ActionExec::skip_actions(size_t offset)
 	    // we need to check at every iteration because
 	    // an action can be longer then a single byte
 	    if ( next_pc >= stop_pc ) {
-		log_error("End of DoAction block hit while skipping "
-			  SIZET_FMT " action tags (pc:" SIZET_FMT 
-			  ", stop_pc:" SIZET_FMT ") - Mallformed SWF ?"
-			  "(WaitForFrame, probably)", offset, next_pc,
+		IF_VERBOSE_MALFORMED_SWF (
+		log_swferror(_("End of DoAction block hit while skipping "
+			  SIZET_FMT " action tags (pc:" SIZET_FMT
+			  ", stop_pc:" SIZET_FMT ") "
+			  "(WaitForFrame, probably)"), offset, next_pc,
 			  stop_pc);
+		)
 		next_pc = stop_pc;
 		return;
 	    }
 #endif
-	    
+
 	    // Get the opcode.
 	    uint8_t action_id = code[next_pc];
-	    
+
 	    // Set default next_pc offset, control flow action handlers
-	    // will be able to reset it. 
+	    // will be able to reset it.
 	    if ((action_id & 0x80) == 0) {
 		// action with no extra data
 		next_pc++;
@@ -298,7 +305,7 @@ ActionExec::skip_actions(size_t offset)
 		assert( length >= 0 );
 		next_pc += length + 3;
 	    }
-	    
+
 	    //pc = next_pc;
 	}
 }
@@ -309,10 +316,10 @@ ActionExec::pushWithEntry(const with_stack_entry& entry)
 	// See comment in header about _with_stack_limit
 	IF_VERBOSE_ASCODING_ERRORS (
 	if (with_stack.size() >= _with_stack_limit) {
-	    log_aserror("'With' stack depth (" SIZET_FMT ") "
+	    log_aserror(_("'With' stack depth (" SIZET_FMT ") "
 			"exceeds the allowed limit for current SWF "
 			"target version (" SIZET_FMT " for version %d)."
-			" Don't expect this movie to work with all players.",
+			" Don't expect this movie to work with all players."),
 			with_stack.size()+1, _with_stack_limit,
 			env.get_version());
 	}
@@ -416,14 +423,15 @@ ActionExec::fixStackUnderrun(size_t required)
 	size_t slots_left = env.stack_size() - _initial_stack_size;
 	size_t missing = required-slots_left;
 
-	//IF_VERBOSE_ASCODING_ERRORS(
-	log_warning("Stack underrun: " SIZET_FMT " elements required, "
+	// FIXME, the IF_VERBOSE used to be commented out.  strk, know why?
+	IF_VERBOSE_ASCODING_ERRORS(
+	log_aserror(_("Stack underrun: " SIZET_FMT " elements required, "
 		SIZET_FMT "/" SIZET_FMT " available. "
 		"Fixing by inserting " SIZET_FMT " undefined values on the"
-		" missing slots.",
+		" missing slots."),
 		required, _initial_stack_size, env.stack_size(),
 		missing);
-	//);
+	);
 
 	env.padStack(_initial_stack_size, missing);
 }

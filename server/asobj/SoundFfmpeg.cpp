@@ -1,3 +1,4 @@
+// SoundFfmpeg.cpp:  Gnash sound output via FFMPEG library.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -5,12 +6,12 @@
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -88,7 +89,8 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 	// Pass stuff from/to the NetConnection object.
 	assert(so);
 	if ( !nc->openConnection(so->externalURL.c_str(), so) ) {
-		log_warning("Gnash could not open audio url: %s", so->externalURL.c_str());
+		log_error(_("%s could not open audio url: %s"), 
+				__FUNCTION__, so->externalURL.c_str());
 		delete so->lock;
 		return;
 	}
@@ -110,7 +112,8 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 	pd->buf_size = 2048;
 
 	if (readPacket(so, pd->buf, pd->buf_size) < 1){
- 		log_warning("Gnash could not read from audio url: %s", so->externalURL.c_str());
+ 		log_error(_("%s: could not read from audio url: %s"), 
+				__FUNCTION__, so->externalURL.c_str());
  		delete[] pd->buf;
  		delete so->lock;
  		return;
@@ -130,7 +133,7 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 
 	// Open the stream. the 4th argument is the filename, which we ignore.
 	if(av_open_input_stream(&so->formatCtx, &so->ByteIOCxt, "", inputFmt, NULL) < 0){
-		log_error("Couldn't open file '%s' for decoding", so->externalURL.c_str());
+		log_error(_("Couldn't open file '%s' for decoding"), so->externalURL.c_str());
 		delete so->lock;
 		return;
 	}
@@ -140,7 +143,7 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 	int ret = av_find_stream_info(so->formatCtx);
 	if (ret < 0)
 	{
-		log_error("Couldn't find stream information from '%s', error code: %d", so->externalURL.c_str(), ret);
+		log_error(_("Couldn't find stream information from '%s', error code: %d"), so->externalURL.c_str(), ret);
 		delete so->lock;
 		return;
 	}
@@ -166,14 +169,16 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 			case CODEC_TYPE_DATA:
 			case CODEC_TYPE_SUBTITLE:
 			case CODEC_TYPE_UNKNOWN:
-				log_warning("Non-audio data found in file %s\n", so->externalURL.c_str());
+				log_error(_("Non-audio data (type %d) found in file %s"),
+				   enc->codec_type, so->externalURL.c_str());
+		
 				break;
 		}
 	}
 
 	if (so->audioIndex < 0)
 	{
-		log_error("Didn't find a audio stream from '%s'", so->externalURL.c_str());
+		log_error(_("Didn't find a audio stream from '%s'"), so->externalURL.c_str());
 		return;
 	}
 
@@ -184,7 +189,8 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 	AVCodec* pACodec = avcodec_find_decoder(so->audioCodecCtx->codec_id);
     if(pACodec == NULL)
 	{
-		log_error("No available AUDIO decoder to process file: '%s'", so->externalURL.c_str());
+		log_error(_("No available audio decoder %d to process file: '%s'"),
+		   so->audioCodecCtx->codec_id, so->externalURL.c_str());
 		delete so->lock;
 		return;
 	}
@@ -192,7 +198,8 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 	// Open codec
 	if (avcodec_open(so->audioCodecCtx, pACodec) < 0)
 	{
-		log_error("Could not open AUDIO codec");
+		log_error(_("Could not open audio codec %d for %s"),
+		   so->audioCodecCtx->codec_id, so->externalURL.c_str());
 		delete so->lock;
 		return;
 	}
@@ -310,7 +317,7 @@ bool SoundFfmpeg::getAudio(void* owner, uint8_t* stream, int len)
 
 				// Seek to begining of file
 				if (av_seek_frame(so->formatCtx, so->audioIndex, 0, 0) < 0) {
-					log_warning("seeking to start of file (for looping) failed\n");
+					log_error(_("seeking to start of file (for looping) failed"));
 					so->remainingLoops = 0;
 				}
 			} else {
@@ -362,7 +369,7 @@ SoundFfmpeg::loadSound(std::string file, bool streaming)
 	remainingLoops = 0;
 
 	if (connection) {
-		log_warning("This sound already has a connection?? (We try to handle this by deleting the old one...)\n");
+		log_error(_("This sound already has a connection.  (We try to handle this by deleting the old one...)"));
 		delete connection;
 	}
 	externalURL = file;
@@ -392,7 +399,8 @@ SoundFfmpeg::start(int offset, int loops)
 			long newpos = (long)(offset / timebase);
 
 			if (av_seek_frame(formatCtx, audioIndex, newpos, 0) < 0) {
-				log_warning("seeking to offset failed\n");
+				log_error(_("%s: seeking to offset failed"),
+					__FUNCTION__);
 			}
 		}
 		// Save how many loops to do
@@ -459,4 +467,3 @@ SoundFfmpeg::getPosition()
 }
 
 } // end of gnash namespace
-

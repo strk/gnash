@@ -1,18 +1,21 @@
-// 
+// action.cpp:  ActionScript execution, for Gnash.
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,7 +48,7 @@
 #include "xmlsocket.h"
 
 
-#include <typeinfo> 
+#include <typeinfo>
 #include <string>
 
 using namespace gnash;
@@ -134,7 +137,7 @@ attach_extern_movie(const char* c_url,
 	boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
 	if (md == NULL)
 	{
-	    log_error("can't create movie_definition for %s\n", url.str().c_str());
+	    log_error(_("can't create movie_definition for %s"), url.str().c_str());
 	    return;
 	}
 
@@ -146,7 +149,7 @@ attach_extern_movie(const char* c_url,
 		extern_movie = create_library_movie_inst(md.get());
 		if (extern_movie == NULL)
 		{
-			log_error("can't create extern root sprite for %s\n", url.str().c_str());
+			log_error(_("can't create extern root sprite for %s"), url.str().c_str());
 			return;
 		}
 
@@ -163,12 +166,12 @@ attach_extern_movie(const char* c_url,
 		extern_movie = md->create_instance();
 		if (extern_movie == NULL)
 		{
-			log_error("can't create extern sprite for %s\n", url.str().c_str());
+			log_error(_("can't create extern sprite for %s"), url.str().c_str());
 			return;
 		}
-      
+
 		save_extern_movie(extern_movie.get());
-      
+
 		const character* tar = (const character*)target;
 		const char* name = tar->get_name().c_str();
 		uint16_t depth = tar->get_depth();
@@ -189,7 +192,7 @@ attach_extern_movie(const char* c_url,
 
 		sprite_instance* parent_sprite = parent->to_movie();
 		assert(parent_sprite);
-       
+
 	    parent_sprite->replace_display_object(
 		newsprite.get(),
 		name,
@@ -216,14 +219,14 @@ call_method(
     int first_arg_bottom_index)
     // first_arg_bottom_index is the stack index, from the bottom,
     // of the first argument.
-    // Subsequent arguments are at *lower* indices. 
+    // Subsequent arguments are at *lower* indices.
     // E.g. if first_arg_bottom_index = 7, then arg1 is at env->bottom(7),
     // arg2 is at env->bottom(6), etc.
 {
 	as_value val;
 	fn_call call(this_ptr, env, nargs, first_arg_bottom_index);
 
-	try 
+	try
 	{
 		if ( as_function* as_func = method.to_as_function() )
 		{
@@ -232,7 +235,7 @@ call_method(
 		}
 		else
 		{
-			throw ActionException("Attempt to call a value which is neither a C nor an ActionScript function");
+			throw ActionException(_("Attempt to call a value which is neither a C nor an ActionScript function"));
 		}
 	}
 	catch (ActionException& ex)
@@ -254,7 +257,7 @@ as_value	call_method0(
 {
     return call_method(method, env, this_ptr, 0, env->get_top_index() + 1);
 }
-		
+
 const char*	call_method_parsed(
     as_environment* env,
     as_object* this_ptr,
@@ -264,7 +267,7 @@ const char*	call_method_parsed(
     // Printf-like vararg interface for calling ActionScript.
     // Handy for external binding.
 {
-    log_msg("FIXME(%d): %s\n", __LINE__, __FUNCTION__);
+    log_msg(_("FIXME(%d): %s"), __LINE__, __FUNCTION__);
 
 #if 0
     static const int	BUFSIZE = 1000;
@@ -383,7 +386,7 @@ const char*	call_method_parsed(
 				}
 			    else
 				{
-				    log_error("call_method_parsed('%s','%s') -- invalid fmt '%%l%c'\n",
+				    log_error(_("call_method_parsed('%s','%s') -- invalid fmt '%%l%c'"),
 					      method_name,
 					      method_arg_fmt,
 					      c);
@@ -392,7 +395,7 @@ const char*	call_method_parsed(
 		    else
 			{
 			    // Invalid fmt, warn.
-			    log_error("call_method_parsed('%s','%s') -- invalid fmt '%%%c'\n",
+			    log_error(_("call_method_parsed('%s','%s') -- invalid fmt '%%%c'"),
 				      method_name,
 				      method_arg_fmt,
 				      c);
@@ -408,7 +411,7 @@ const char*	call_method_parsed(
 		    else
 			{
 			    // Invalid arg; warn.
-			    log_error("call_method_parsed('%s','%s') -- invalid char '%c'\n",
+			    log_error(_("call_method_parsed('%s','%s') -- invalid char '%c'"),
 				      method_name,
 				      method_arg_fmt,
 				      c);
@@ -444,7 +447,7 @@ const char*	call_method_parsed(
 void
 movie_load()
 {
-    log_action("-- start movie");
+    log_action(_("-- start movie"));
 }
 
 //
@@ -455,10 +458,10 @@ movie_load()
 as_value
 event_test(const fn_call& /*fn*/)
 {
-    log_msg("FIXME: %s\n", __FUNCTION__);
+    log_msg(_("FIXME: %s"), __FUNCTION__);
     return as_value();
 }
-	
+
 
 //
 // global init
@@ -555,7 +558,7 @@ get_standard_member(const std::string& name)
 	if (!s_inited)
 	{
 		s_inited = true;
-	
+
 		// worth reserving ?
 		//membersMap.resize(int(AS_STANDARD_MEMBER_COUNT));
 
@@ -588,7 +591,7 @@ get_standard_member(const std::string& name)
 		membersMap["onRollOver"] = M_ONROLLOVER;
 		membersMap["onRollOut"] = M_ONROLLOUT;
 	}
-    
+
 	as_standard_member result;
 	maptype::const_iterator it = membersMap.find(name);
 	if ( it == membersMap.end() )
@@ -597,13 +600,11 @@ get_standard_member(const std::string& name)
 	} else {
 		result = it->second;
 	}
-	    
+
 	return result;
 }
 
-
 } // end of namespace gnash
-
 
 // Local Variables:
 // mode: C++

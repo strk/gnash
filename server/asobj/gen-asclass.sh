@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# 
+#
 #   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 #
 #   This program is free software; you can redistribute it and/or modify
@@ -33,7 +33,7 @@ fi
 
 asname=$1
 lowname=`echo ${asname} | tr '[A-Z]' '[a-z]'`
-upname=`echo ${asname}  | tr '[a-z]' '[A-Z]'` 
+upname=`echo ${asname}  | tr '[a-z]' '[A-Z]'`
 outname=${asname}.h
 srcname=${asname}.cpp
 
@@ -65,7 +65,8 @@ props=`echo ${props} | sed -e s/${asname}\\\\.//g`
 #
 rm -f ${outname}
 cat <<EOF>>${outname}
-// 
+// ${outname}:  ActionScript "${asname}" class, for Gnash.
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
@@ -101,21 +102,20 @@ void ${lowname}_class_init(as_object& global);
 
 /// Return a ${asname} instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_${lowname}_instance();
-  
+
 } // end of gnash namespace
 
 // __GNASH_ASOBJ_${upname}_H__
 #endif
-
 EOF
-
 ##############################################################
 # now generate the source file
 #
 
 # start with the header part
 cat <<EOF>>${srcname}
-// 
+// ${srcname}:  ActionScript "${asname}" class, for Gnash.
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
@@ -149,7 +149,7 @@ namespace gnash {
 
 EOF
 for i in $methods; do
-# DO NOT CONVERT CASE, SWF7+ is case-sensitive 
+# DO NOT CONVERT CASE, SWF7+ is case-sensitive
 newi=`echo $i | sed -e 's/)//g'` # | tr '[A-Z]' '[a-z]'
 cat <<EOF>>${srcname}
 static void ${lowname}_${newi}const fn_call& fn);
@@ -164,10 +164,10 @@ attach${asname}Interface(as_object& o)
 EOF
 # now process the methods
 for i in $methods; do
-    # DO NOT CONVERT CASE, SWF7+ is case-sensitive 
+    # DO NOT CONVERT CASE, SWF7+ is case-sensitive
     newi=`echo $i | sed -e 's/()//g'` # | tr '[A-Z]' '[a-z]'
     cat <<EOF>>${srcname}
-	o.init_member("${newi}", new builtin_function(${lowname}_${newi}));
+    o.init_member("${newi}", new builtin_function(${lowname}_${newi}));
 EOF
 done
 cat <<EOF>>${srcname}
@@ -204,15 +204,16 @@ public:
 
 EOF
 for i in $methods; do
-# DO NOT CONVERT CASE, SWF7+ is case-sensitive 
+# DO NOT CONVERT CASE, SWF7+ is case-sensitive
 newi=`echo $i | sed -e 's/)//g'` # | tr '[A-Z]' '[a-z]'
 cat <<EOF>>${srcname}
+
 static as_value
 ${lowname}_${newi}const fn_call& fn)
 {
 	${lowname}_as_object* ptr = ensureType<${lowname}_as_object>(fn.this_ptr);
 	UNUSED(ptr);
-	log_warning("%s: unimplemented", __FUNCTION__);
+	log_unimpl (__FUNCTION__);
 	return as_value();
 }
 EOF
@@ -224,7 +225,7 @@ as_value
 ${lowname}_ctor(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj = new ${lowname}_as_object;
-	
+
 	return as_value(obj.get()); // will keep alive
 }
 
@@ -240,17 +241,11 @@ void ${lowname}_class_init(as_object& global)
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attach${asname}Interface(*cl);
-		     
 	}
 
 	// Register _global.${asname}
 	global.init_member("${asname}", cl.get());
-
 }
 
-
 } // end of gnash namespace
-
 EOF
-
-

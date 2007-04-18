@@ -2,11 +2,11 @@
 
 
 ########################### NOTES ##################################
-## If you wish to change the output of this program, search for 
-## 'sub create_headerfile' and 'sub create_cppfile'.  
+## If you wish to change the output of this program, search for
+## 'sub create_headerfile' and 'sub create_cppfile'.
 ##
 ## To run this program, type 'gen-class.pl --help' (you may need
-## to use '/path/to/perl gen-clas.pl --help'), which will display 
+## to use '/path/to/perl gen-clas.pl --help'), which will display
 ## available options.
 ####################################################################
 
@@ -18,9 +18,8 @@ use Pod::Usage;
 
 our $VERBOSE = 0;  ## default setting; can be changed by command-line option
 
-our $LICENSE = q|
-// 
-// Copyright (C) | . (join ', ', (2005..((localtime)[5]+1900))) .
+our $LICENSE = q|//
+//   Copyright (C) | . (join ', ', (2005..((localtime)[5]+1900))) .
 q| Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
@@ -53,6 +52,9 @@ sub create_headerfile {
     open ($fh, '>', $args{headerfile}) or die
         "Cannot open file '$args{headerfile}': $!\n";
     notify("Creating file '$args{headerfile}'.");
+    print $fh <<EOF;
+// $args{headerfile}:  ActionScript "$args{class}" class, for Gnash.
+EOF
     print $fh $LICENSE;
 
     ## The text between the EOFs will be printed in the header file.
@@ -76,12 +78,11 @@ void $args{lc}_class_init(as_object& global);
 
 /// Return a $args{class} instance (in case the core lib needs it)
 //std::auto_ptr<as_object> init_$args{lc}_instance();
-  
+
 } // end of gnash namespace
 
 // __GNASH_ASOBJ_$args{up}_H__
 #endif
-
 EOF
 
     close $fh;
@@ -96,6 +97,9 @@ sub create_cppfile {
     open ($fh, '>', $args{cppfile}) or die
         "Cannot open file '$args{cppfile}': $!\n";
     notify("Creating file '$args{cppfile}'.");
+    print $fh <<EOF;
+// $args{cppfile}:  ActionScript "$args{class}" class, for Gnash.
+EOF
     print $fh $LICENSE;
 
 
@@ -112,20 +116,20 @@ sub create_cppfile {
         ##   qq|This is an "example".\n|  ==  "This is an \"example\".\n"
         ## A '.' concatenates a string.
 
-        $declarations .= 
+        $declarations .=
           qq|\nstatic void $args{lc}_| .$m. qq|(const fn_call& fn);|;
 
-        $registrations .= 
+        $registrations .=
           qq|\n    o.init_member("$m", new builtin_function($args{lc}_$m));|;
 
         $implementations .=
-          qq|static as_value\n$args{lc}_| .$m. 
-          qq|(const fn_call& fn) 
-{   
-        $args{lc}_as_object* ptr = ensureType<$args{lc}_as_object>(fn.this_ptr);  
-        UNUSED(ptr);
-        log_warning("%s: unimplemented", __FUNCTION__);
-        return as_value();
+          qq|\nstatic as_value\n$args{lc}_| .$m.
+          qq|(const fn_call& fn)
+{
+	$args{lc}_as_object* ptr = ensureType<$args{lc}_as_object>(fn.this_ptr);
+	UNUSED(ptr);
+	log_unimpl (__FUNCTION__);
+	return as_value();
 }
 |;
 
@@ -152,9 +156,7 @@ void $args{lc}_ctor(const fn_call& fn);
 
 static void
 attach$args{class}Interface(as_object& o)
-{
-$registrations
-
+{$registrations
 }
 
 static as_object*
@@ -187,12 +189,11 @@ public:
 };
 
 $implementations
-
 as_value
 $args{lc}_ctor(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj = new $args{lc}_as_object;
-	
+
 	return as_value(obj.get()); // will keep alive
 }
 
@@ -208,16 +209,13 @@ void $args{lc}_class_init(as_object& global)
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attach$args{class}Interface(*cl);
-		     
 	}
 
 	// Register _global.$args{class}
 	global.init_member("$args{class}", cl.get());
-
 }
 
 } // end of gnash namespace
-
 EOF
 
     close $fh;
@@ -240,7 +238,7 @@ sub accept_arguments {
     );
 
     ## Class is a required argument
-    pod2usage(-verbose => 0), exit if ($args{help} || !$args{class}); 
+    pod2usage(-verbose => 0), exit if ($args{help} || !$args{class});
     delete $args{help};
 
     ## Output files should not already exist.
@@ -268,7 +266,7 @@ sub process_arguments {
 
     ## Find our methods and properties
     %args = (%args, %{parse_notefile(%args)});
- 
+
     ## Add some extra variables we'll use often
     $args{lc} = lc($args{class});
     $args{up} = uc($args{class});
@@ -340,7 +338,7 @@ This required argument specifies the name of the class you wish to create.
 
 =item --notes <filename>
 
-This allows you to specify the 'notes' where method names and (static) 
+This allows you to specify the 'notes' where method names and (static)
 properties are specified.  By default, the file is F<../../doc/C/NOTES>,
 but if you wish to create a custom class, you should create your own version
 of this file following the same format.
@@ -352,7 +350,7 @@ will be overwritten.
 
 =item --verbose
 
-This is an optional argument.  If you enable it, the script will 
+This is an optional argument.  If you enable it, the script will
 inform you of its progress.
 
 =back

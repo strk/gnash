@@ -1,18 +1,21 @@
-// 
-//   Copyright (C) 2005, 200, 2007 Free Software Foundation, Inc.
-// 
+// movie_def_impl.cpp:  Load in Movie definitions, for Gnash.
+//
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,11 +40,11 @@
 #include "GnashException.h" // for parser exception
 #include "execute_tag.h"
 #include "sound_definition.h" // for sound_sample
-#include <boost/bind.hpp> 
+#include <boost/bind.hpp>
 
 #include <memory>
 #include <string>
-#include <unistd.h> 
+#include <unistd.h>
 
 
 // Increment this when the cache data format changes.
@@ -52,14 +55,14 @@
 #define FRAMELOAD_CHUNK 0
 
 // Debug frames load
-#undef DEBUG_FRAMES_LOAD 
+#undef DEBUG_FRAMES_LOAD
 
 // Define this this to load movies using a separate thread
 // (undef and it will fully load a movie before starting to play it)
 #define LOAD_MOVIES_IN_A_SEPARATE_THREAD 1
 
 // Debug threads locking
-#undef DEBUG_THREADS_LOCKING 
+#undef DEBUG_THREADS_LOCKING
 
 #if defined(_WIN32) || defined(WIN32)
 #	include <windows.h>
@@ -127,6 +130,7 @@ MovieLoader::start()
 //
 // some utility stuff
 //
+// FIXME, this needs work now that log_msg always ends with a newline.
 
 void	dump_tag_bytes(stream* in)
     // Log the contents of the current tag, in hex.
@@ -143,7 +147,7 @@ void	dump_tag_bytes(stream* in)
             if (c < 32) c = '.';
             if (c > 127) c = '.';
             row_buf[row_count] = c;
-				
+
             row_count++;
             if (row_count >= ROW_BYTES)
                 {
@@ -215,7 +219,7 @@ movie_def_impl::~movie_def_impl()
                     delete m_playlist[i][j];
                 }
         }}
-	
+
     // Release init action data.
     {for (size_t i = m_init_action_list.size() - 1; i != static_cast<size_t>(-1); i--) //Optimized
         {
@@ -224,7 +228,7 @@ movie_def_impl::~movie_def_impl()
                     delete m_init_action_list[i][j];
                 }
         }}
-		
+
 	// It's supposed to be cleaned up in read()
 	// TODO: join with loader thread instead ?
 	//assert(m_jpeg_in.get() == NULL);
@@ -273,7 +277,7 @@ void movie_def_impl::resolve_import(const std::string& source_url, movie_definit
 
                     if (res == NULL)
                         {
-                            log_error("import error: resource '%s' is not exported from movie '%s'",
+                            log_error(_("import error: resource '%s' is not exported from movie '%s'"),
                                       inf.m_symbol.c_str(), source_url.c_str());
                         }
                     else if (font* f = res->cast_to_font())
@@ -290,7 +294,7 @@ void movie_def_impl::resolve_import(const std::string& source_url, movie_definit
                         }
                     else
                         {
-                            log_error("import error: resource '%s' from movie '%s' has unknown type",
+                            log_error(_("import error: resource '%s' from movie '%s' has unknown type"),
                                       inf.m_symbol.c_str(), source_url.c_str());
                         }
 
@@ -319,7 +323,7 @@ movie_def_impl::get_character_def(int character_id)
     // make sure character_id is resolved
     if (in_import_table(character_id))
         {
-            log_error("get_character_def(): character_id %d is still waiting to be imported",
+            log_error(_("get_character_def(): character_id %d is still waiting to be imported"),
                       character_id);
         }
 #endif // not NDEBUG
@@ -341,7 +345,7 @@ font* movie_def_impl::get_font(int font_id)
     // make sure font_id is resolved
     if (in_import_table(font_id))
         {
-            log_error("get_font(): font_id %d is still waiting to be imported",
+            log_error(_("get_font(): font_id %d is still waiting to be imported"),
                       font_id);
         }
 #endif // not NDEBUG
@@ -357,7 +361,7 @@ bitmap_character_def* movie_def_impl::get_bitmap_character_def(int character_id)
 {
     BitmapMap::iterator it = m_bitmap_characters.find(character_id);
     if ( it == m_bitmap_characters.end() ) return NULL;
-    else return it->second.get(); 
+    else return it->second.get();
 }
 
 void
@@ -365,7 +369,7 @@ movie_def_impl::add_bitmap_character_def(int character_id,
 		bitmap_character_def* ch)
 {
     assert(ch);
-    //log_msg("Add bitmap character %d", character_id);
+    //log_msg(_("Add bitmap character %d"), character_id);
     //m_bitmap_characters.add(character_id, ch);
     m_bitmap_characters.insert(make_pair(character_id, boost::intrusive_ptr<bitmap_character_def>(ch)));
 
@@ -388,7 +392,7 @@ sound_sample* movie_def_impl::get_sound_sample(int character_id)
 void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
 {
     assert(sam);
-	log_msg("Add sound sample %d", character_id);
+	log_msg(_("Add sound sample %d"), character_id);
     m_sound_samples.insert(make_pair(character_id,
             boost::intrusive_ptr<sound_sample>(sam)));
 }
@@ -400,7 +404,7 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 
 	_in = in;
 
-	// we only read a movie once 
+	// we only read a movie once
 	assert(_str.get() == NULL);
 
 	if ( url == "" ) _url = "<anonymous>";
@@ -416,33 +420,33 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 		&& (header & 0x0FFFFFF) != 0x00535743)
         {
 		// ERROR
-		log_error("gnash::movie_def_impl::read() -- "
-			"file does not start with a SWF header!\n");
+		log_error(_("gnash::movie_def_impl::read() -- "
+			"file does not start with a SWF header"));
 		return false;
         }
 	bool	compressed = (header & 255) == 'C';
-    
+
 	IF_VERBOSE_PARSE(
-		log_parse("version = %d, file_length = %d",
+		log_parse(_("version = %d, file_length = %d"),
 			m_version, m_file_length);
 	);
 
 	if ( m_version > 7 )
 	{
-		log_warning("SWF%d is not fully supported, trying anyway "
-			"but don't expect it to work", m_version);
+		log_unimpl(_("SWF%d is not fully supported, trying anyway "
+			"but don't expect it to work"), m_version);
 	}
 
 	if (compressed)
         {
 #if TU_CONFIG_LINK_TO_ZLIB == 0
-		log_error("movie_def_impl::read(): unable to read "
-			"zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0");
+		log_error(_("movie_def_impl::read(): unable to read "
+			"zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0"));
 		return false;
 #endif
 
 		IF_VERBOSE_PARSE(
-			log_parse("file is compressed.");
+			log_parse(_("file is compressed"));
 		);
 
 		// Uncompress the input as we read it.
@@ -459,10 +463,10 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 	m_frame_count = _str->read_u16();
 
 	/* Markus: Probably this is better anyways */
-	
+
 	// TODO: This seems dangerous, check closely
 	if(m_frame_count == 0) m_frame_count++;
-	
+
 	// Allocate 1 more then the expected slots
 	// for actions, to make handling malformed SWF easier.
 	m_playlist.resize(m_frame_count+1);
@@ -470,7 +474,7 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 
 	IF_VERBOSE_PARSE(
 		m_frame_size.print();
-		log_parse("frame rate = %f, frames = " SIZET_FMT,
+		log_parse(_("frame rate = %f, frames = " SIZET_FMT),
 			m_frame_rate, m_frame_count);
 	);
 
@@ -498,7 +502,7 @@ movie_def_impl::completeLoad()
 	// Start the loading frame
 	if ( ! _loader.start() )
 	{
-		log_error("Could not start loading thread");
+		log_error(_("Could not start loading thread"));
 		return false;
 	}
 
@@ -533,7 +537,7 @@ movie_def_impl::read(std::auto_ptr<tu_file> in, const std::string& url)
 bool
 movie_def_impl::ensure_frame_loaded(size_t framenum)
 {
-#ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD 
+#ifndef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 	return ( framenum <= _frames_loaded );
 #endif
 
@@ -542,12 +546,12 @@ movie_def_impl::ensure_frame_loaded(size_t framenum)
 	if ( framenum <= _frames_loaded ) return true;
 
 	_waiting_for_frame = framenum;
-        //log_msg("Waiting for frame %u to be loaded", framenum);
+        //log_msg(_("Waiting for frame %u to be loaded"), framenum);
 
-	// TODO: return false on timeout 
+	// TODO: return false on timeout
 	_frame_reached_condition.wait(lock);
 
-        //log_msg("Condition reached (_frames_loaded=%u)", _frames_loaded);
+        //log_msg(_("Condition reached (_frames_loaded=%u)"), _frames_loaded);
 
 	return ( framenum <= _frames_loaded );
 }
@@ -626,7 +630,7 @@ movie_def_impl::output_cached_data(tu_file* out, const cache_options& options)
 		out->write_le16(it->first);
 		it->second->output_cached_data(out, options);
 	}
-			
+
 #if 0
 	for (hash<int, boost::intrusive_ptr<character_def> >::iterator it = m_characters.begin();
           it != m_characters.end();
@@ -650,13 +654,13 @@ movie_def_impl::input_cached_data(tu_file* in)
     in->read_bytes(header, 4);
     if (header[0] != 'g' || header[1] != 's' || header[2] != 'c')
         {
-            log_error("cache file does not have the correct format; skipping\n");
+            log_error(_("cache file does not have the correct format; skipping"));
             return;
         }
     else if (header[3] != CACHE_FILE_VERSION)
         {
             log_error(
-                "cached data is version %d, but we require version %d; skipping\n",
+                _("cached data is version %d, but we require version %d; skipping"),
                 int(header[3]), CACHE_FILE_VERSION);
             return;
         }
@@ -671,12 +675,12 @@ movie_def_impl::input_cached_data(tu_file* in)
         {
             if (in->get_error() != TU_FILE_NO_ERROR)
                 {
-                    log_error("error reading cache file (characters); skipping\n");
+                    log_error(_("error reading cache file (characters); skipping"));
                     return;
                 }
             if (in->get_eof())
                 {
-                    log_error("unexpected eof reading cache file (characters); skipping\n");
+                    log_error(_("unexpected eof reading cache file (characters); skipping"));
                     return;
                 }
 
@@ -691,8 +695,8 @@ movie_def_impl::input_cached_data(tu_file* in)
                 }
             else
                 {
-                    log_error("sync error in cache file (reading characters)!  "
-                              "Skipping rest of cache data.\n");
+                    log_error(_("sync error in cache file (reading characters).  "
+                              "Skipping rest of cache data."));
                     return;
                 }
         }
@@ -725,7 +729,7 @@ CharacterDictionary::dump_chars() const
 	for ( const_iterator it=begin(), endIt=end();
 		it != endIt; ++it )
 	{
-		log_msg("Character %d @ %p", it->first, static_cast<void*>(it->second.get()));
+		log_msg(_("Character %d @ %p"), it->first, static_cast<void*>(it->second.get()));
 		//character_def* cdef = it->second;
 	}
 }
@@ -737,7 +741,7 @@ CharacterDictionary::get_character(int id)
 	if ( it == _map.end() )
 	{
 		IF_VERBOSE_PARSE(
-		log_parse("Could not find char %d, dump is:", id);
+		log_parse(_("Could not find char %d, dump is:"), id);
 		dump_chars();
 		);
 		return boost::intrusive_ptr<character_def>();
@@ -748,7 +752,7 @@ CharacterDictionary::get_character(int id)
 void
 CharacterDictionary::add_character(int id, boost::intrusive_ptr<character_def> c)
 {
-	//log_msg("CharacterDictionary: add char %d", id);
+	//log_msg(_("CharacterDictionary: add char %d"), id);
 	_map[id] = c;
 	//dump_chars();
 }
@@ -768,19 +772,19 @@ movie_def_impl::load_next_frame_chunk()
 	size_t nextframe = lastloaded+1;
 
 #if FRAMELOAD_CHUNK
-	nextframe += FRAMELOAD_CHUNK; // load in chunks of 10 frames 
+	nextframe += FRAMELOAD_CHUNK; // load in chunks of 10 frames
 	if ( nextframe > framecount ) nextframe = framecount;
 #endif
-	//log_msg("Framecount: %u, Lastloaded: %u", framecount, lastloaded);
+	//log_msg(_("Framecount: %u, Lastloaded: %u"), framecount, lastloaded);
 	if ( nextframe <= framecount )
 	{
 #ifdef DEBUG_FRAMES_LOAD // debugging
-		log_msg("Ensure load of frame %u/%u (last loaded is: %u)",
+		log_msg(_("Ensure load of frame %u/%u (last loaded is: %u)"),
 			nextframe, framecount, lastloaded);
 #endif
 		if ( ! ensure_frame_loaded(nextframe) )
 		{
-			log_error("Could not advance to frame " SIZET_FMT "!",
+			log_error(_("Could not advance to frame " SIZET_FMT),
 				nextframe);
 			// these kind of errors should be handled by callers
 			assert(0);
@@ -789,7 +793,7 @@ movie_def_impl::load_next_frame_chunk()
 #ifdef DEBUG_FRAMES_LOAD
 	else
 	{
-		log_msg("No more frames to load. Framecount: %u, Lastloaded: %u, next to load: %u", framecount, lastloaded, nextframe);
+		log_msg(_("No more frames to load. Framecount: %u, Lastloaded: %u, next to load: %u"), framecount, lastloaded, nextframe);
 	}
 #endif
 }
@@ -799,7 +803,7 @@ movie_def_impl::read_all_swf()
 {
 	assert(_str.get() != NULL);
 
-#ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD 
+#ifdef LOAD_MOVIES_IN_A_SEPARATE_THREAD
 	assert( _loader.isSelfThread() );
 	assert( _loader.started() );
 #else
@@ -814,8 +818,8 @@ movie_def_impl::read_all_swf()
 	//size_t it=0;
 	while ( (uint32_t) str.get_position() < _swf_end_pos )
 	{
-	
-		//log_msg("Loading thread iteration %u", it++);
+
+		//log_msg(_("Loading thread iteration %u"), it++);
 
 		SWF::tag_type tag_type = str.open_tag();
 
@@ -845,9 +849,9 @@ parse_tag:
 				if ( tag_type != SWF::END )
 				{
 					IF_VERBOSE_MALFORMED_SWF(
-					log_swferror("last expected SHOWFRAME "
+					log_swferror(_("last expected SHOWFRAME "
 						"in SWF stream '%s' isn't "
-						"followed by an END (%d).",
+						"followed by an END (%d)."),
 						get_url().c_str(), tag_type);
 					);
 				}
@@ -864,12 +868,12 @@ parse_tag:
 		else
 		{
 			// no tag loader for this tag type.
-			log_error("*** no tag loader for type %d (movie)",
+			log_error(_("*** no tag loader for type %d (movie)"),
 				tag_type);
 			IF_VERBOSE_PARSE(
 				dump_tag_bytes(&str);
 			);
-		} 
+		}
 
 		str.close_tag();
 
@@ -877,15 +881,17 @@ parse_tag:
 
 		if (tag_type == SWF::END)
                 {
+		    IF_VERBOSE_MALFORMED_SWF(
 			if ((unsigned int) str.get_position() != _swf_end_pos)
                         {
 				// Safety break, so we don't read past
 				// the end of the  movie.
-				log_warning("hit stream-end tag, "
+				log_swferror(_("Hit stream-end tag, "
 					"but not at the advertised SWF end; "
-					"stopping for safety.");
+					"stopping for safety."));
 				break;
 			}
+		    )
 		}
 	}
 
@@ -896,14 +902,14 @@ parse_tag:
 		//        Also, we should probably call _loader.unlock()
 		//        and make sure any wait_for_frame call is
 		//        released (condition set and false result)
-		log_error("Parsing exception: %s", e.what());
+		log_error(_("Parsing exception: %s"), e.what());
 	}
 
 	if ( ! m_playlist[_frames_loaded].empty() || ! m_init_action_list[_frames_loaded].empty() )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(SIZET_FMT " action blocks and " SIZET_FMT " init action blocks are NOT followed by"
-			" a SHOWFRAME tag",
+		log_swferror(_(SIZET_FMT " action blocks and " SIZET_FMT " init action blocks are NOT followed by"
+			" a SHOWFRAME tag"),
 			m_playlist[_frames_loaded].size(),
 			m_init_action_list[_frames_loaded].size());
 		);
@@ -912,15 +918,14 @@ parse_tag:
 	if ( m_frame_count > _frames_loaded )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(SIZET_FMT " frames advertised in header, but only " SIZET_FMT " SHOWFRAME tags "
-			"found in stream. Updating total frames count", m_frame_count, _frames_loaded);
+		log_swferror(_(SIZET_FMT " frames advertised in header, but only " SIZET_FMT " SHOWFRAME tags "
+			"found in stream. Updating total frames count"), m_frame_count, _frames_loaded);
 		);
 		boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 		m_frame_count = _frames_loaded;
 		// Notify any thread waiting on frame reached condition
 		_frame_reached_condition.notify_all();
 	}
-
 }
 
 size_t
@@ -939,11 +944,11 @@ movie_def_impl::incrementLoadedFrames()
 	if ( _frames_loaded > m_frame_count )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("number of SHOWFRAME tags "
+			log_swferror(_("number of SHOWFRAME tags "
 				"in SWF stream '%s' (" SIZET_FMT
 				") exceeds "
 				"the advertised number in header ("
-			        SIZET_FMT ").",
+			        SIZET_FMT ")."),
 				get_url().c_str(), _frames_loaded,
 				m_frame_count);
 		);
@@ -952,7 +957,7 @@ movie_def_impl::incrementLoadedFrames()
 	}
 
 #ifdef DEBUG_FRAMES_LOAD
-	log_msg("Loaded frame %u/%u",
+	log_msg(_("Loaded frame %u/%u"),
 		_frames_loaded, m_frame_count);
 #endif
 
@@ -964,7 +969,6 @@ movie_def_impl::incrementLoadedFrames()
 		// See: http://boost.org/doc/html/condition.html
 		_frame_reached_condition.notify_all();
 	}
-
 }
 
 void
@@ -983,7 +987,7 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 	boost::intrusive_ptr<resource> res;
 
 #ifdef DEBUG_EXPORTS
-	log_msg("get_exported_resource called, frame count=%u", m_frame_count);
+	log_msg(_("get_exported_resource called, frame count=%u"), m_frame_count);
 #endif
 
 	// Don't call get_exported_resource() from this movie loader
@@ -997,7 +1001,7 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 	// to a circular import chain:
 	//
 	// 	A imports B imports A
-	// 
+	//
 
 	// Sleep 1/2 of a second between checks
 	// NOTE: make sure the nap is enough time for
@@ -1019,8 +1023,8 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 
 		if ( new_loading_frame != loading_frame )
 		{
-			log_msg("frame load advancement (from "
-				SIZET_FMT " to " SIZET_FMT ")",
+			log_msg(_("frame load advancement (from "
+				SIZET_FMT " to " SIZET_FMT ")"),
 				loading_frame, new_loading_frame);
 			loading_frame = new_loading_frame;
 			timeout = def_timeout;
@@ -1029,12 +1033,12 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 		{
 			if ( ! timeout-- )
 			{
-				log_warning("No frame progress in movie %s "
+				log_error(_("No frame progress in movie %s "
 					"after %lu milliseconds "
 					"(%lu microseconds = %lu iterations), "
 					"giving up on "
 					"get_exported_resource(%s): "
-					"circular IMPORTS?",
+					"circular IMPORTS?"),
 					get_url().c_str(),
 					(def_timeout*naptime)/1000,
 					def_timeout*naptime,
@@ -1043,23 +1047,23 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 				return res;
 			}
 
-			log_warning("no frame progress at iteration %lu", timeout);
+			log_error(_("no frame progress at iteration %lu"), timeout);
 
 			continue; // not worth checking
 		}
 
 		if ( loading_frame >= m_frame_count )
 		{
-			log_msg("At end of stream, still no '%s' symbol found "
+			log_error(_("At end of stream, still no '%s' symbol found "
 				"in m_exports (" SIZET_FMT " entries in it, "
-				"follow)", symbol.c_str(), m_exports.size());
+				"follow)"), symbol.c_str(), m_exports.size());
 			return res;
 		}
 
 #ifdef DEBUG_EXPORTS
-		log_msg("We haven't finished loading (loading frame %u), "
+		log_msg(_("We haven't finished loading (loading frame %u), "
 			"and m_exports.get returned no entries, "
-			"sleeping a bit and trying again",
+			"sleeping a bit and trying again"),
 			get_loading_frame());
 #endif
 
@@ -1072,7 +1076,7 @@ movie_def_impl::get_exported_resource(const std::string& symbol)
 void
 movie_def_impl::add_frame_name(const std::string& n)
 {
-	//log_msg("labelframe: frame %d, name %s", _frames_loaded, name);
+	//log_msg(_("labelframe: frame %d, name %s"), _frames_loaded, name);
 	assert(_frames_loaded < m_frame_count);
     m_named_frames[n] = _frames_loaded;
 }
@@ -1086,6 +1090,4 @@ movie_def_impl::get_labeled_frame(const std::string& label, size_t& frame_number
     return true;
 }
 
-
 } // namespace gnash
-

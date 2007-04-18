@@ -1,3 +1,4 @@
+// Video.cpp:  ActionScript "Video" class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -70,11 +71,11 @@ public:
 };
 
 as_value video_attachvideo(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 as_value video_clear(const fn_call& /*fn*/) {
-    log_warning("%s: unimplemented \n", __FUNCTION__);
+    log_unimpl (__FUNCTION__);
     return as_value();
 }
 
@@ -98,14 +99,10 @@ void video_class_init(as_object& global)
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachVideoInterface(*cl);
-		     
 	}
 
 	// Register _global.Video
 	global.init_member("Video", cl.get());
-
 }
 
-
 } // end of gnash namespace
-

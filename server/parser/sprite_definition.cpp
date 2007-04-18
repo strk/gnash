@@ -1,20 +1,20 @@
-// 
+// sprite_definition.cpp:  for Gnash.
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -39,7 +39,7 @@ sprite_definition::create_character_instance(character* parent,
 		int id)
 {
 #ifdef DEBUG_REGISTER_CLASS
-	log_msg("Instanciating sprite_def %p", (void*)this);
+	log_msg(_("Instantiating sprite_def %p"), (void*)this);
 #endif
 	sprite_instance* si = new sprite_instance(this,
 		parent->get_root(), parent, id);
@@ -78,7 +78,7 @@ sprite_definition::read(stream* in)
 	m_playlist.resize(m_frame_count);
 
 		IF_VERBOSE_PARSE (
-	log_parse("  frames = " SIZET_FMT, m_frame_count);
+	log_parse(_("  frames = " SIZET_FMT), m_frame_count);
 		);
 
 	m_loading_frame = 0;
@@ -89,11 +89,13 @@ sprite_definition::read(stream* in)
 
 		SWF::TagLoadersTable::loader_function lf = NULL;
 
+		IF_VERBOSE_MALFORMED_SWF(
 		if (tag_type == SWF::DEFINESPRITE)
 		{
-			log_error("DefineSprite tag inside sprite "
-				"definition - Malformed SWF!");
+			log_swferror(_("DefineSprite tag inside sprite "
+				"definition"));
 		}
+		);
 
 		if (tag_type == SWF::SHOWFRAME)
 		{
@@ -101,9 +103,9 @@ sprite_definition::read(stream* in)
 		    	++m_loading_frame;
 
 			IF_VERBOSE_PARSE (
-				log_parse("  show_frame "
+				log_parse(_("  show_frame "
 					SIZET_FMT "/" SIZET_FMT
-					" (sprite)",
+					" (sprite)"),
 					m_loading_frame,
 					m_frame_count);
 		    	);
@@ -116,10 +118,10 @@ sprite_definition::read(stream* in)
 				while ( in->open_tag() != SWF::END )
 				{
 					IF_VERBOSE_MALFORMED_SWF(
-					log_warning("last SHOWFRAME of a "
+					log_swferror(_("last SHOWFRAME of a "
 						"DEFINESPRITE tag "
 						"isn't followed by an END."
-						" Seeking to next END tag.");
+						" Seeking to next END tag."));
 					);
 					in->close_tag();
 				}
@@ -136,7 +138,8 @@ sprite_definition::read(stream* in)
 		else
 		{
 			// no tag loader for this tag type.
-                    log_error("*** no tag loader for type %d (sprite)",
+			// FIXME, should this be a log_swferror instead?
+                    log_error(_("*** no tag loader for type %d (sprite)"),
                               tag_type);
 		}
 
@@ -144,7 +147,7 @@ sprite_definition::read(stream* in)
 	}
 
 		IF_VERBOSE_PARSE (
-	log_parse("  -- sprite END --");
+	log_parse(_("  -- sprite END --"));
 		);
 }
 
@@ -152,7 +155,7 @@ sprite_definition::read(stream* in)
 void
 sprite_definition::add_frame_name(const std::string& name)
 {
-	//log_msg("labelframe: frame %d, name %s", m_loading_frame, name);
+	//log_msg(_("labelframe: frame %d, name %s"), m_loading_frame, name);
 	assert(m_loading_frame < m_frame_count);
     m_named_frames[name] = m_loading_frame;
 }
@@ -169,7 +172,7 @@ sprite_definition::get_labeled_frame(const std::string& label, size_t& frame_num
 sprite_definition::sprite_definition(movie_definition* m, stream* in)
 	:
 	// FIXME: use a class-static TagLoadersTable for sprite_definition
-	_tag_loaders(SWF::TagLoadersTable::getInstance()), 
+	_tag_loaders(SWF::TagLoadersTable::getInstance()),
 	m_movie_def(m),
 	m_frame_count(0),
 	m_loading_frame(0),
@@ -202,12 +205,11 @@ sprite_definition::registerClass(as_function* the_class)
 {
 	registeredClass = the_class;
 #ifdef DEBUG_REGISTER_CLASS
-	log_msg("Registered class %p for sprite_def %p", (void*)registeredClass.get(), (void*)this);
+	log_msg(_("Registered class %p for sprite_def %p"), (void*)registeredClass.get(), (void*)this);
 	as_object* proto = registeredClass->getPrototype();
-	log_msg(" Exported interface: ");
+	log_msg(_(" Exported interface: "));
 	proto->dump_members();
 #endif
 }
-
 
 } // namespace gnash

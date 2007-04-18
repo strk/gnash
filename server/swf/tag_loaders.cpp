@@ -1,20 +1,23 @@
-// 
+// tag_loaders.cpp:  for Gnash.
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: tag_loaders.cpp,v 1.88 2007/04/11 14:20:21 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.89 2007/04/18 14:07:33 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,7 +48,7 @@
 #include "swf.h"
 #include "swf/TagLoadersTable.h"
 #include "generic_character.h"
-#include "text_character_def.h" 
+#include "text_character_def.h"
 #include "edit_text_character_def.h"
 #include "execute_tag.h" // for do_action inheritance (DOACTION tag loader)
 #include "URL.h"
@@ -136,13 +139,13 @@ frame_label_loader(stream* in, tag_type tag, movie_definition* m)
 	{
 		if ( end_tag == curr_pos + 1 )
 		{
-	log_warning("FIXME: anchor-labeled frame not supported");
+	log_unimpl(_("anchor-labeled frame not supported"));
 		}
 		else
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-	log_swferror("frame_label_loader end position " SIZET_FMT ", "
-			"read up to " SIZET_FMT,
+	log_swferror(_("frame_label_loader end position " SIZET_FMT ", "
+			"read up to " SIZET_FMT),
 			end_tag, curr_pos);
 			);
 		}
@@ -176,7 +179,7 @@ public:
 
 		IF_VERBOSE_PARSE
 		(
-	    log_parse("  set_background_color: (%d %d %d)",
+	    log_parse(_("  set_background_color: (%d %d %d)"),
 		      m_color.m_r, m_color.m_g, m_color.m_b);
 		);
 	}
@@ -205,7 +208,7 @@ jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
 
 	IF_VERBOSE_PARSE
 	(
-    log_parse("  jpeg_tables_loader");
+    log_parse(_("  jpeg_tables_loader"));
     	);
 
 #if TU_CONFIG_LINK_TO_JPEGLIB
@@ -243,7 +246,7 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
 	    //bi = render::create_bitmap_info_rgb(im);
 	    //delete im;
 #else
-	    log_error("gnash is not linked to jpeglib -- can't load jpeg image data!");
+	    log_error(_("gnash is not linked to jpeglib -- can't load jpeg image data"));
 	    return;
 #endif
 
@@ -255,7 +258,7 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
 		if ( m->get_bitmap_character_def(character_id) )
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("DEFINEBITS: Duplicate id (%d) for bitmap character - discarding it", character_id);
+			log_swferror(_("DEFINEBITS: Duplicate id (%d) for bitmap character - discarding it"), character_id);
 			);
 		}
 		else
@@ -271,19 +274,19 @@ void
 define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINEBITSJPEG2); // 21
-		
+
     uint16_t	character_id = in->read_u16();
 
 	IF_VERBOSE_PARSE
 	(
-		log_parse("  define_bits_jpeg2_loader: charid = %d pos = %lx",
+		log_parse(_("  define_bits_jpeg2_loader: charid = %d pos = %lx"),
 			character_id, in->get_position());
     	);
 
     //
     // Read the image data.
     //
-		
+
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
 	{
 	    //bitmap_info*	bi = NULL;
@@ -292,7 +295,7 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 	    //bi = render::create_bitmap_info_rgb(im);
 	    //delete im;
 #else
-	    log_error("gnash is not linked to jpeglib -- can't load jpeg image data!");
+	    log_error(_("gnash is not linked to jpeglib -- can't load jpeg image data"));
 	    return;
 #endif
 
@@ -301,7 +304,7 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 		if ( m->get_bitmap_character_def(character_id) )
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("DEFINEBITSJPEG2: Duplicate id (%d) for bitmap character - discarding it", character_id);
+			log_swferror(_("DEFINEBITSJPEG2: Duplicate id (%d) for bitmap character - discarding it"), character_id);
 			);
 		}
 		else
@@ -338,7 +341,7 @@ void inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
 
     int err = inflateInit(&d_stream);
     if (err != Z_OK) {
-	log_error("inflate_wrapper() inflateInit() returned %d", err);
+	log_error(_("inflate_wrapper() inflateInit() returned %d"), err);
 	return;
     }
 
@@ -354,14 +357,14 @@ void inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
 	if (err == Z_STREAM_END) break;
 	if (err != Z_OK)
 	    {
-		log_error("inflate_wrapper() inflate() returned %d", err);
+		log_error(_("inflate_wrapper() inflate() returned %d"), err);
 	    }
     }
 
     err = inflateEnd(&d_stream);
     if (err != Z_OK)
 	{
-	    log_error("inflate_wrapper() inflateEnd() return %d", err);
+	    log_error(_("inflate_wrapper() inflateEnd() return %d"), err);
 	}
 }
 #endif // TU_CONFIG_LINK_TO_ZLIB
@@ -378,7 +381,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 
 	IF_VERBOSE_PARSE
 	(
-		log_parse("  define_bits_jpeg3_loader: charid = %d pos = %lx",
+		log_parse(_("  define_bits_jpeg3_loader: charid = %d pos = %lx"),
 			character_id, in->get_position());
 	);
 
@@ -389,13 +392,13 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 	{
 
 #if TU_CONFIG_LINK_TO_JPEGLIB == 0 || TU_CONFIG_LINK_TO_ZLIB == 0
-	    log_error("gnash is not linked to jpeglib/zlib -- can't load jpeg/zipped image data!");
+	    log_error(_("gnash is not linked to jpeglib/zlib -- can't load jpeg/zipped image data"));
 	    return;
 #else
 	    //
 	    // Read the image data.
 	    //
-	    		
+
 	    // Read rgb data.
 	    std::auto_ptr<image::rgba> im( image::read_swf_jpeg3(in->get_underlying_stream()) );
 
@@ -437,8 +440,8 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 
 	IF_VERBOSE_PARSE
 	(
-		log_parse("  defbitslossless2: tag = %d, id = %d, "
-			"fmt = %d, w = %d, h = %d",
+		log_parse(_("  defbitslossless2: tag = %d, id = %d, "
+			"fmt = %d, w = %d, h = %d"),
 			tag,
 			character_id,
 			bitmap_format,
@@ -450,7 +453,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
 	{
 #if TU_CONFIG_LINK_TO_ZLIB == 0
-	    log_error("gnash is not linked to zlib -- can't load zipped image data!");
+	    log_error(_("gnash is not linked to zlib -- can't load zipped image data"));
 	    return;
 #else
 	    if (tag == SWF::DEFINELOSSLESS) // 20
@@ -502,7 +505,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 
 			    inflate_wrapper(in->get_underlying_stream(), buffer, buffer_bytes);
 			    assert(in->get_position() <= in->get_tag_end_position());
-			
+
 			    for (int j = 0; j < height; j++)
 				{
 				    uint8_t*	image_in_row = buffer + j * pitch;
@@ -510,14 +513,14 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 				    for (int i = 0; i < width; i++)
 					{
 					    uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
-					
+
 					    // @@ How is the data packed???  I'm just guessing here that it's 565!
 					    image_out_row[i * 3 + 0] = (pixel >> 8) & 0xF8;	// red
 					    image_out_row[i * 3 + 1] = (pixel >> 3) & 0xFC;	// green
 					    image_out_row[i * 3 + 2] = (pixel << 3) & 0xF8;	// blue
 					}
 				}
-			
+
 			    delete [] buffer;
 			}
 		    else if (bitmap_format == 5)
@@ -531,7 +534,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 
 			    inflate_wrapper(in->get_underlying_stream(), buffer, buffer_bytes);
 			    assert(in->get_position() <= in->get_tag_end_position());
-			
+
 			    // Need to re-arrange ARGB into RGB.
 			    for (int j = 0; j < height; j++)
 				{
@@ -556,7 +559,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 			if ( m->get_bitmap_character_def(character_id) )
 			{
 				IF_VERBOSE_MALFORMED_SWF(
-				log_swferror("DEFINEBITSLOSSLESS: Duplicate id (%d) for bitmap character - discarding it", character_id);
+				log_swferror(_("DEFINEBITSLOSSLESS: Duplicate id (%d) for bitmap character - discarding it"), character_id);
 				);
 			}
 			else
@@ -619,7 +622,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 
 			    inflate_wrapper(in->get_underlying_stream(), buffer, buffer_bytes);
 			    assert(in->get_position() <= in->get_tag_end_position());
-			
+
 			    for (int j = 0; j < height; j++)
 				{
 				    uint8_t*	image_in_row = buffer + j * pitch;
@@ -627,7 +630,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 				    for (int i = 0; i < width; i++)
 					{
 					    uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
-					
+
 					    // @@ How is the data packed???  I'm just guessing here that it's 565!
 					    image_out_row[i * 4 + 0] = 255;			// alpha
 					    image_out_row[i * 4 + 1] = (pixel >> 8) & 0xF8;	// red
@@ -635,7 +638,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 					    image_out_row[i * 4 + 3] = (pixel << 3) & 0xF8;	// blue
 					}
 				}
-			
+
 			    delete [] buffer;
 			}
 		    else if (bitmap_format == 5)
@@ -644,7 +647,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 
 			    inflate_wrapper(in->get_underlying_stream(), image->m_data, width * height * 4);
 			    assert(in->get_position() <= in->get_tag_end_position());
-			
+
 			    // Need to re-arrange ARGB into RGBA.
 			    for (int j = 0; j < height; j++)
 				{
@@ -686,7 +689,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 void
 fixme_loader(stream* /*in*/, tag_type tag, movie_definition* /*m*/)
 {
-    log_error("  FIXME: tagtype = %d", tag);
+    log_unimpl(_("  FIXME: tagtype = %d"), tag);
 }
 
 void define_shape_loader(stream* in, tag_type tag, movie_definition* m)
@@ -698,7 +701,7 @@ void define_shape_loader(stream* in, tag_type tag, movie_definition* m)
     uint16_t	character_id = in->read_u16();
 		IF_VERBOSE_PARSE
 		(
-    log_parse("  shape_loader: id = %d", character_id);
+    log_parse(_("  shape_loader: id = %d"), character_id);
     		);
 
     shape_character_def*	ch = new shape_character_def;
@@ -714,7 +717,7 @@ void define_shape_morph_loader(stream* in, tag_type tag, movie_definition* m)
 
 		IF_VERBOSE_PARSE
 		(
-    log_parse("  shape_morph_loader: id = %d", character_id);
+    log_parse(_("  shape_morph_loader: id = %d"), character_id);
     		);
 
     morph2_character_def* morph = new morph2_character_def;
@@ -733,7 +736,7 @@ void	define_font_loader(stream* in, tag_type tag, movie_definition* m)
     assert(tag == SWF::DEFINEFONT || tag == SWF::DEFINEFONT2 || tag == SWF::DEFINEFONT3 ); // 10 || 48 || 75
 
     uint16_t	font_id = in->read_u16();
-		
+
     font*	f = new font;
     f->read(in, tag, m);
 
@@ -752,7 +755,7 @@ void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
 	assert(tag == SWF::DEFINEFONTINFO || tag == SWF::DEFINEFONTINFO2);
 
 	uint16_t font_id = in->read_u16();
-		
+
 	font* f = m->get_font(font_id);
 	if (f)
 	{
@@ -761,12 +764,12 @@ void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
 	else
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("define_font_info_loader: "
-			"can't find font w/ id %d", font_id);
+		log_swferror(_("define_font_info_loader: "
+			"can't find font w/ id %d"), font_id);
 		);
 	}
 }
-	
+
 void
 place_object_2_loader(stream* in, tag_type tag, movie_definition* m)
 {
@@ -774,7 +777,7 @@ place_object_2_loader(stream* in, tag_type tag, movie_definition* m)
 
     IF_VERBOSE_PARSE
     (
-    log_parse("  place_object_2");
+    log_parse(_("  place_object_2"));
     );
 
     // TODO: who owns and is going to remove this tag ?
@@ -789,12 +792,12 @@ void
 sprite_loader(stream* in, tag_type tag, movie_definition* m)
 {
 	assert(tag == SWF::DEFINESPRITE); // 39 - DefineSprite
-                
+
 	int	character_id = in->read_u16();
 
 		IF_VERBOSE_PARSE
 		(
-	log_parse("  sprite:  char id = %d", character_id);
+	log_parse(_("  sprite:  char id = %d"), character_id);
 		);
 
 	// A DEFINESPRITE tag as part of a DEFINESPRITE
@@ -802,7 +805,7 @@ sprite_loader(stream* in, tag_type tag, movie_definition* m)
 	if ( ! dynamic_cast<movie_def_impl*>(m) )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("nested DEFINESPRITE tags");
+		log_swferror(_("nested DEFINESPRITE tags"));
 		);
 	}
 
@@ -828,9 +831,9 @@ void	end_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 }
 
 
-/// SWF Tag RemoveObject2 (28) 
+/// SWF Tag RemoveObject2 (28)
 class remove_object_2 : public execute_tag
-{   
+{
 public:
     int	m_depth, m_id;
     remove_object_2() : m_depth(-1), m_id(-1) {}
@@ -869,9 +872,9 @@ public:
 		}
 	    else
 		{
-		    log_error("reverse REMOVE can't find previous replace or add tag(%d, %d)",
+		    log_error(_("reverse REMOVE can't find previous replace or add tag(%d, %d)"),
 			      frame, m_depth);
-					
+
 		}
 	}
 
@@ -888,7 +891,7 @@ void	remove_object_2_loader(stream* in, tag_type tag, movie_definition* m)
 
 		IF_VERBOSE_PARSE
 		(
-    log_parse("  remove_object_2(%d)", t->m_depth);
+    log_parse(_("  remove_object_2(%d)"), t->m_depth);
     		);
 
     m->add_execute_tag(t);
@@ -919,7 +922,7 @@ void	button_character_loader(stream* in, tag_type tag, movie_definition* m)
 
 		IF_VERBOSE_PARSE
 		(
-    log_parse("  button character loader: char_id = %d", character_id);
+    log_parse(_("  button character loader: char_id = %d"), character_id);
     		);
 
     button_character_definition*	ch = new button_character_definition;
@@ -943,7 +946,7 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 
 		IF_VERBOSE_PARSE
 		(
-    log_parse("  export: count = %d", count);
+    log_parse(_("  export: count = %d"), count);
     		);
 
     // Read the exports.
@@ -952,7 +955,7 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 	    uint16_t	id = in->read_u16();
 	    char*	symbol_name = in->read_string();
 		IF_VERBOSE_PARSE (
-	    log_parse("  export: id = %d, name = %s", id, symbol_name);
+	    log_parse(_("  export: id = %d, name = %s"), id, symbol_name);
 		);
 
 	    if (font* f = m->get_font(id))
@@ -971,8 +974,8 @@ void	export_loader(stream* in, tag_type tag, movie_definition* m)
 		}
 	    else
 		{
-		    log_warning("don't know how to export resource '%s' "
-                              "with id %d (can't find that id)",
+		    log_error(_("don't know how to export resource '%s' "
+                              "with id %d (can't find that id)"),
 			      symbol_name, id);
 		}
 
@@ -1008,8 +1011,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 
 	IF_VERBOSE_PARSE
 	(
-	log_parse("  import: version = %u, source_url = %s (%s), count = %d", import_version, abs_url.str().c_str(), source_url, count);
-	//log_parse("  import: version = %u, source_url = %s (%s), count = %d", import_version, abs_url.str().c_str(), source_url, count);
+	log_parse(_("  import: version = %u, source_url = %s (%s), count = %d"), import_version, abs_url.str().c_str(), source_url, count);
 	);
 
 
@@ -1021,13 +1023,13 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 		try {
 			source_movie = create_library_movie(abs_url);
 		} catch (gnash::GnashException& e) {
-			log_error("%s", e.what());
+			log_error(_("Exception: %s"), e.what());
 			source_movie = NULL;
 		}
 		if (source_movie == NULL)
 		{
 		    // Give up on imports.
-		    log_error("can't import movie from url %s", abs_url.str().c_str());
+		    log_error(_("can't import movie from url %s"), abs_url.str().c_str());
 		    return;
 		}
 
@@ -1036,7 +1038,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 		if (source_movie == m)
 		{
 		    IF_VERBOSE_MALFORMED_SWF(
-		    log_swferror("Movie attempts to import symbols from itself.");
+		    log_swferror(_("Movie attempts to import symbols from itself."));
 		    );
 		    return;
 		}
@@ -1049,9 +1051,9 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 	    char*	symbol_name = in->read_string();
 		IF_VERBOSE_PARSE
 		(
-	    log_parse("  import: id = %d, name = %s", id, symbol_name);
+	    log_parse(_("  import: id = %d, name = %s"), id, symbol_name);
 	    	);
-	    
+
 	    if (s_no_recurse_while_loading)
 		{
 		    m->add_import(source_url, id, symbol_name);
@@ -1065,7 +1067,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 		    boost::intrusive_ptr<resource> res = source_movie->get_exported_resource(symbol_name);
 		    if (res == NULL)
 			{
-			    log_warning("import error: could not find resource '%s' in movie '%s'",
+			    log_error(_("import error: could not find resource '%s' in movie '%s'"),
 				      symbol_name, source_url);
 			}
 		    else if (font* f = res->cast_to_font())
@@ -1080,7 +1082,7 @@ void	import_loader(stream* in, tag_type tag, movie_definition* m)
 			}
 		    else
 			{
-			    log_error("import error: resource '%s' from movie '%s' has unknown type",
+			    log_error(_("import error: resource '%s' from movie '%s' has unknown type"),
 				      symbol_name, source_url);
 			}
 		}
@@ -1101,7 +1103,7 @@ void	define_edit_text_loader(stream* in, tag_type tag, movie_definition* m)
 	edit_text_character_def* ch = new edit_text_character_def(m);
 		IF_VERBOSE_PARSE
 		(
-	log_parse("edit_text_char, id = %d", character_id);
+	log_parse(_("edit_text_char, id = %d"), character_id);
 		);
 	ch->read(in, tag, m);
 
@@ -1115,11 +1117,11 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
 	assert(tag == SWF::DEFINETEXT || tag == SWF::DEFINETEXT2);
 
 	uint16_t	character_id = in->read_u16();
-	
+
 	text_character_def* ch = new text_character_def(m);
 		IF_VERBOSE_PARSE
 		(
-	log_parse("text_character, id = %d", character_id);
+	log_parse(_("text_character, id = %d"), character_id);
 		);
 	ch->read(in, tag, m);
 
@@ -1140,18 +1142,18 @@ do_action_loader(stream* in, tag_type tag, movie_definition* m)
 {
 		IF_VERBOSE_PARSE
 		(
-    log_parse("tag %d: do_action_loader", tag);
-    log_parse("-- actions in frame " SIZET_FMT,
+    log_parse(_("tag %d: do_action_loader"), tag);
+    log_parse(_("-- actions in frame " SIZET_FMT),
 	       m->get_loading_frame());
 		);
-    
+
     assert(in);
     assert(tag == SWF::DOACTION); // 12
     assert(m);
-    
+
     do_action*	da = new do_action;
     da->read(in);
-    
+
     m->add_execute_tag(da);
 }
 
@@ -1166,8 +1168,8 @@ do_init_action_loader(stream* in, tag_type tag, movie_definition* m)
 
 		IF_VERBOSE_PARSE
 		(
-	log_parse("  tag %d: do_init_action_loader", tag);
-	log_parse("  -- init actions for sprite %d",
+	log_parse(_("  tag %d: do_init_action_loader"), tag);
+	log_parse(_("  -- init actions for sprite %d"),
 		   sprite_character_id);
 		);
 
@@ -1201,14 +1203,14 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	IF_VERBOSE_PARSE
 	(
-		log_parse("define sound: ch=%d, format=%d, "
-			"rate=%d, 16=%d, stereo=%d, ct=%d",
+		log_parse(_("define sound: ch=%d, format=%d, "
+			"rate=%d, 16=%d, stereo=%d, ct=%d"),
 			character_id, int(format), sample_rate,
 			int(sample_16bit), int(stereo), sample_count);
 	);
 
 	// If we have a sound_handler, ask it to init this sound.
-	
+
 	if (handler)
 	{
 		int	data_bytes = 0;
@@ -1217,7 +1219,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		if (! (sample_rate >= 0 && sample_rate <= 3))
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("Bad sample rate read from SWF header.");
+			log_swferror(_("Bad sound sample rate %d read from SWF header"), sample_rate);
 			);
                 	return;
 		}
@@ -1257,7 +1259,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 				format = sound_handler::FORMAT_NATIVE16;
 			}
 		}
-		
+
 		int	handler_id = handler->create_sound(
 			data,
 			data_bytes,
@@ -1277,9 +1279,9 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	else
 	{
 		// is this nice to do?
-		log_warning("There is not sound handler currently active, "
+		log_error(_("There is no sound handler currently active, "
 			"so character with id %d will NOT be added to "
-			"the dictionary.",
+			"the dictionary"),
 			character_id);
 	}
 }
@@ -1303,7 +1305,7 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 		IF_VERBOSE_PARSE
 		(
-		log_parse("start_sound tag: id=%d, stop = %d, loop ct = %d",
+		log_parse(_("start_sound tag: id=%d, stop = %d, loop ct = %d"),
 			  sound_id, int(sst->m_stop_playback), sst->m_loop_count);
 		);
 	}
@@ -1312,11 +1314,11 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		if (handler)
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror("start_sound_loader: sound_id %d is not defined", sound_id);
+			log_swferror(_("start_sound_loader: sound_id %d is not defined"), sound_id);
 			);
 		}
 	}
-	
+
 }
 
 // Load a SoundStreamHead(2) tag.
@@ -1332,11 +1334,11 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	if (!handler) return;
 
 	// FIXME:
-	// no character id for soundstreams... so we make one up... 
+	// no character id for soundstreams... so we make one up...
 	// This only works if there is only one stream in the movie...
 	// The right way to do it is to make seperate structures for streams
 	// in movie_def_impl.
-	
+
 	// extract garbage data
 	int	garbage = in->read_uint(8);
 
@@ -1344,10 +1346,10 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
 	bool	sample_16bit = in->read_uint(1) ? true : false;
 	bool	stereo = in->read_uint(1) ? true : false;
-	
+
 	// checks if this is a new streams header or just one in the row
 	if (format == 0 && sample_rate == 0 && !sample_16bit && !stereo) return;
-	
+
 	int	sample_count = in->read_u32();
 	if (format == 2) garbage = in->read_uint(16);
 
@@ -1355,7 +1357,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 
 		IF_VERBOSE_PARSE
 		(
-	log_parse("sound stream head: format=%d, rate=%d, 16=%d, stereo=%d, ct=%d",
+	log_parse(_("sound stream head: format=%d, rate=%d, 16=%d, stereo=%d, ct=%d"),
 		  int(format), sample_rate, int(sample_16bit), int(stereo), sample_count);
 		);
 
@@ -1365,7 +1367,8 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	if (! (sample_rate >= 0 && sample_rate <= 3))
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("Bad sample rate read from SWF header.");
+		log_swferror(_("Bad sound sample rate %d read from SWF header"),
+				sample_rate);
 		);
 		return;
 	}
@@ -1416,7 +1419,7 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 	int format = 0;
 	bool stereo = true;
 	int sample_count = -1;
-	
+
 	handler->get_info(handle_id, &format, &stereo);
 
 	if (format == sound_handler::FORMAT_ADPCM)
@@ -1437,7 +1440,7 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 		}
 
 	} else {
-	
+
 		for (int i = 0; i < data_bytes; i++)
 		{
 			data[i] = in->read_u8();
@@ -1525,20 +1528,20 @@ file_attributes_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 
 	IF_VERBOSE_PARSE
 	(
-		log_parse("  file attributes: has_metadata=%s use_network=%s",
-			flags.has_metadata ? "true" : "false",
-			flags.use_network ? "true" : "false")
+		log_parse(_("  file attributes: has_metadata=%s use_network=%s"),
+			flags.has_metadata ? _("true") : _("false"),
+			flags.use_network ? _("true") : _("false"))
 	);
 
 	if ( ! flags.use_network )
 	{
-		log_warning("FileAttributes tag in the SWF requests that "
+		log_warning(_("FileAttributes tag in the SWF requests that "
 			"network access is not granted to this movie "
-			"(or application?). Anyway Gnash won't care "
-			"use white/black listing in your .gnashrc instead");
+			"(or application?). Anyway Gnash won't care; "
+			"use white/black listing in your .gnashrc instead"));
 	}
 
-	// TODO: attach info to movie_definition 
+	// TODO: attach info to movie_definition
 
 }
 
@@ -1551,10 +1554,10 @@ metadata_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 	char* metadata = in->read_string();
 
 	IF_VERBOSE_PARSE (
-		log_parse("  metadata = [[\n%s\n]]", metadata);
+		log_parse(_("  metadata = [[\n%s\n]]"), metadata);
 	);
 
-	log_warning("METADATA tag parsed but unused");
+	log_unimpl(_("METADATA tag unused: %s"), metadata);
 
 	// TODO: attach to movie_definition instead
 	//       (should we parse the XML maybe?)
@@ -1572,10 +1575,10 @@ serialnumber_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 	in->read_string_with_length(in->get_tag_length(), serial);
 
 	IF_VERBOSE_PARSE (
-		log_parse("  serialnumber = [[\n%s\n]]", serial.c_str());
+		log_parse(_("  serialnumber = [[\n%s\n]]"), serial.c_str());
 	);
 
-	log_msg("SERIALNUMBER: %s", serial.c_str());
+	log_msg(_("SERIALNUMBER: %s"), serial.c_str());
 
 	// attach to movie_definition ?
 

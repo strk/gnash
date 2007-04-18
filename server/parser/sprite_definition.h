@@ -1,20 +1,20 @@
-// 
+// sprite_definition.h:  Holds immutable data for a sprite, for Gnash.
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
 //
 
 #ifndef GNASH_SPRITE_DEFINITION_H
@@ -57,7 +57,7 @@ public:
 	/// @param in
 	///	The stream associated with the sprite. It is assumed
 	///	to be already positioned right before the frame count
-	///         
+	///
 	sprite_definition(movie_definition* m, stream* in);
 
 	/// Destructor, releases playlist data
@@ -66,7 +66,7 @@ public:
 	/// Register a class to this definition.
 	//
 	/// New instances of this symbol will get the given class
-	/// interface. 
+	/// interface.
 	///
 	/// @param the_class
 	///	The class constructor to associate with
@@ -156,8 +156,7 @@ private:
 	virtual void add_font(int /*id*/, font* /*ch*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
-		log_warning("add_font tag appears in sprite tags! "
-			"Malformed SWF?\n");
+		log_swferror(_("add_font tag appears in sprite tags"));
 		);
 	}
 
@@ -178,8 +177,7 @@ private:
 			bitmap_character_def* /*ch*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
-		log_warning("add_bitmap_character_def appears in sprite tags!"
-			" Malformed SWF?");
+		log_swferror(_("add_bitmap_character_def appears in sprite tags"));
 		);
 	}
 
@@ -193,13 +191,12 @@ private:
 	virtual void add_sound_sample(int /*id*/, sound_sample* /*sam*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
-		log_warning("add sam appears in sprite tags!"
-			" Malformed SWF?");
+		log_swferror(_("add sam appears in sprite tags"));
 		);
 	}
 
 	/// Delegate call to associated root movie
-	virtual void set_loading_sound_stream_id(int id) 
+	virtual void set_loading_sound_stream_id(int id)
 	{
 		m_movie_def->set_loading_sound_stream_id(id);
 
@@ -207,17 +204,17 @@ private:
 
 	/// Delegate call to associated root movie, or return -1
 	virtual int get_loading_sound_stream_id()
-	{ 
+	{
 		return m_movie_def->get_loading_sound_stream_id();
 	}
 
-	
+
 	/// Overridden just for complaining  about malformed SWF
 	virtual void export_resource(const std::string& /*symbol*/,
 			resource* /*res*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
-		log_swferror("Can't export from sprite!");
+		log_swferror(_("Can't export from sprite"));
 		);
 	}
 
@@ -246,8 +243,7 @@ private:
 	virtual void add_character(int /*id*/, character_def* /*ch*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
-		log_warning("add_character tag appears in sprite tags!"
-				" Maformed SWF?");
+		log_swferror(_("add_character tag appears in sprite tags"));
 		);
 	}
 
@@ -272,12 +268,12 @@ private:
 	}
 
 	/// Overridden just for complaining  about malformed SWF
-	// 
+	//
 	/// Sprite def's should not have do_init_action tags in them!  (@@ correct?)
 	virtual void	add_init_action(execute_tag* /*c*/)
 	{
 		IF_VERBOSE_MALFORMED_SWF (
-		log_warning("sprite_definition::add_init_action called!  Ignored. (Malformed SWF?)\n");
+		log_swferror(_("sprite_definition::add_init_action called!  Ignored"));
 		);
 	}
 
@@ -305,17 +301,17 @@ private:
 	}
 
 	/// \brief
-	/// Ensure framenum frames of this sprite 
+	/// Ensure framenum frames of this sprite
 	/// have been loaded.
 	///
 	virtual bool ensure_frame_loaded(size_t framenum)
 	{
-		// TODO: return false on timeout 
+		// TODO: return false on timeout
 		while ( m_loading_frame < framenum )
 		{
-			log_msg("sprite_definition: "
+			log_msg(_("sprite_definition: "
 				"loading of frame " SIZET_FMT " requested "
-				"(we are at " SIZET_FMT "/" SIZET_FMT ")",
+				"(we are at " SIZET_FMT "/" SIZET_FMT ")"),
 				framenum, m_loading_frame, m_frame_count);
 			// Could this ever happen ?
 			assert(0);
@@ -326,7 +322,7 @@ private:
 	virtual void load_next_frame_chunk()
 	{
 		/// We load full sprite definitions at once, so
-		/// this function is a no-op. 
+		/// this function is a no-op.
 	}
 
 	/// Return the top-level movie definition
@@ -341,7 +337,7 @@ private:
     // get_bound() is currently only used by generic_character which normally
     // is used only shape character definitions. See character_def.h to learn
     // why it is virtual anyway.
-    assert(0); // should not be called  
+    assert(0); // should not be called
 		static rect unused;
 		return unused;
   }
@@ -354,7 +350,7 @@ private:
 	/// interface.
 	///
 	boost::intrusive_ptr<as_function> registeredClass;
-			
+
 };
 
 

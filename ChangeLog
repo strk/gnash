@@ -51,6 +51,7 @@
 	       the offending value, for ease of remote diagnosis.
 	    *  C++-style << printouts converted to log_xxx calls.
 	    *  Direct accesses to dbglogfile converted to log_xxx calls.
+	    *  printf converted to log_xxx calls.
 	    *  Function name debug prints converted to GNASH_REPORT_FUNCTION.
 	  These changes should also make the messages easier to	translate.
 	* Commented-out messages were also cleaned up as above.
@@ -61,7 +62,7 @@
 	  lacked them.
 	* Header comments (at the top of the file) added or adjusted, to
 	  describe each file in its initial line, and to correct whitespace
-	  in the copyright notices.
+	  in the copyright notices.  Eliminate trailing spaces and tabs.
 	
 	* The list of files affected by the above changes:
 	  backend/sound_handler_sdl.cpp
@@ -112,6 +113,40 @@
 	  server/asobj/Object.cpp
 	  server/asobj/Selection.cpp
 	  server/asobj/SharedObject.cpp
+	  server/asobj/Sound.cpp
+	  server/asobj/SoundFfmpeg.cpp
+	  server/asobj/SoundGst.cpp
+	  server/asobj/SoundMad.cpp
+	  server/asobj/Stage.cpp	
+	  server/asobj/System.cpp	
+	  server/asobj/TextSnapshot.cpp	
+	  server/asobj/Video.cpp	
+	  server/asobj/gen-asclass.pl
+	  server/asobj/gen-asclass.sh
+	  server/asobj/string.cpp
+	  server/asobj/xml.cpp
+	  server/asobj/xmlnode.cpp
+	  server/asobj/xmlsocket.cpp
+	  server/parser/BitmapMovieDefinition.cpp
+	  server/parser/action_buffer.cpp
+	  server/parser/button_character_def.cpp
+	  server/parser/edit_text_character_def.cpp
+	  server/parser/morph2_character_def.cpp
+	  server/parser/movie_def_impl.cpp
+	  server/parser/shape_character_def.cpp
+	  server/parser/sprite_definition.cpp
+	  server/parser/sprite_definition.h
+	  server/parser/text_character_def.cpp
+	  server/swf/DefineFontAlignZonesTag.cpp	
+	  server/swf/PlaceObject2Tag.cpp
+	  server/swf/tag_loaders.cpp
+	  server/vm/ASHandlers.cpp
+	  server/vm/ActionExec.cpp
+	  server/vm/action.cpp
+          libbase/curl_adapter.cpp
+	  libbase/extension.cpp
+	  libbase/log.cpp
+	  libbase/network.cpp
 	
 	* 2007 copyright notices were inserted in:
 	  backend/sound_handler_sdl.cpp
@@ -120,11 +155,17 @@
 	  plugin/klash/klash.cpp
 	  plugin/win32/plugin.cpp
 	  server/generic_character.cpp
+          libbase/curl_adapter.cpp
 	
 	* New 2006, 2007 Free Software Foundation copyrights applied (to
 	  formerly public domain code):
 	  server/font.cpp
 	  server/text.cpp
+	  server/parser/button_character_def.cpp
+	  server/parser/edit_text_character_def.cpp
+	  server/parser/morph2_character_def.cpp
+	  server/parser/movie_def_impl.cpp
+	  server/parser/shape_character_def.cpp
 	 
 	* backend/sound_handler_sdl.cpp: Move stray FORMAT_VORBIS comment.
 	* gui/gui.cpp: Commented out "Resize request when no movie" error
@@ -137,6 +178,10 @@
 	  function, so it can use log_xxx functions.
 	* server/sprite_instance.cpp (sprite_attach_movie):  Comment out
 	  log_msg about initializing properties.
+        * server/asobj/gen-asclass.{pl,sh}:  Use log_unimpl in generated code.
+	  Improve whitespace, and generate header line describing the file.
+	* text_character_def.cpp:  Remove commented-out includes.
+	* FLVParser.{cpp,h}:  Fix compiler warning (signed/unsigned).
 	
 	I'm sure that I've missed some messages that ought to get 
 	translated (with _(...)).  Those will be fixed over time.

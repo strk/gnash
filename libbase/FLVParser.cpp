@@ -1,4 +1,5 @@
-// 
+// FLVParser.cpp:  Flash Video file parser, for Gnash.
+//
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
@@ -16,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.4 2007/04/11 13:03:45 bjacques Exp $
+// $Id: FLVParser.cpp,v 1.5 2007/04/18 14:07:33 jgilmore Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -54,7 +55,7 @@ uint16_t FLVParser::videoFrameRate()
 	if (_videoFrames.size() < 2) return 0;
 
  	uint32_t framedelay = _videoFrames[1]->timestamp - _videoFrames[0]->timestamp;
-	
+
 	return static_cast<int16_t>(1000 / framedelay);
 }
 
@@ -125,7 +126,7 @@ FLVFrame* FLVParser::nextMediaFrame()
 
 		frame->tag = 8;
 		return frame;
-	
+
 	} else {
 		_lastVideoFrame++;
 
@@ -213,7 +214,7 @@ uint32_t FLVParser::seekAudio(uint32_t time)
 
 	// If there is no audio data return NULL
 	if (_audioFrames.size() == 0) return 0;
- 
+
 	// Make sure that there are parsed some enough frames
 	// to get the right frame.
 	while(_audioFrames.back()->timestamp < time && !_parsingComplete) {
@@ -262,7 +263,7 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 
 	// If there is no video data return NULL
 	if (_videoFrames.size() == 0) return 0;
- 
+
 	// Make sure that there are parsed some enough frames
 	// to get the right frame.
 	while(_videoFrames.back()->timestamp < time && !_parsingComplete) {
@@ -429,7 +430,7 @@ bool FLVParser::parseNextFrame()
 		frame->timestamp = timestamp;
 		frame->dataPosition = _lt->tell();
 		_audioFrames.push_back(frame);
-		
+
 		// If this is the first audioframe no info about the
 		// audio format has been noted, so we do that now
 		if (_audioInfo == NULL) {
@@ -454,7 +455,7 @@ bool FLVParser::parseNextFrame()
 		frame->dataPosition = _lt->tell();
 		frame->frameType = (tag[11] & 0xf0) >> 4;
 		_videoFrames.push_back(frame);
-		
+
 		// If this is the first videoframe no info about the
 		// video format has been noted, so we do that now
 		if (_videoInfo == NULL) {
@@ -501,11 +502,11 @@ bool FLVParser::parseNextFrame()
 					width = (videohead[4] & 0x40) | (videohead[4] & 0x20) | (videohead[4] & 0x20) | (videohead[4] & 0x08) | (videohead[4] & 0x04) | (videohead[4] & 0x02) | (videohead[4] & 0x01) | (videohead[5] & 0x80) | (videohead[5] & 0x40) | (videohead[5] & 0x20) | (videohead[5] & 0x20) | (videohead[5] & 0x08) | (videohead[5] & 0x04) | (videohead[5] & 0x02) | (videohead[5] & 0x01) | (videohead[6] & 0x80);
 
 					height = (videohead[6] & 0x40) | (videohead[6] & 0x20) | (videohead[6] & 0x20) | (videohead[6] & 0x08) | (videohead[6] & 0x04) | (videohead[6] & 0x02) | (videohead[6] & 0x01) | (videohead[7] & 0x80) | (videohead[7] & 0x40) | (videohead[7] & 0x20) | (videohead[7] & 0x20) | (videohead[7] & 0x08) | (videohead[7] & 0x04) | (videohead[7] & 0x02) | (videohead[7] & 0x01) | (videohead[8] & 0x80);
-				} 
+				}
 
 			}
 
-			// Create the videoinfo 
+			// Create the videoinfo
 			_videoInfo = new FLVVideoInfo(codec, width, height, 0 /*frameRate*/, 0 /*duration*/);
 		}
 		_lastParsedPosition += 15 + bodyLength;
@@ -531,7 +532,7 @@ bool FLVParser::parseHeader()
 {
 	// seek to the begining of the file
 	_lt->seek(0);
-	
+
 	// Read the header
 	uint8_t header[9];
 	_lt->read(header, 9);

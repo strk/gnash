@@ -1,14 +1,31 @@
-// morph2.cpp
-// -- Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003, Vitalij Alexeev <tishka92@mail.ru> 2004.
+// morph2_character_def.cpp:   Load and render morphing shapes, for Gnash.
+//
+//   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
+/* $Id: morph2_character_def.cpp,v 1.7 2007/04/18 14:07:32 jgilmore Exp $ */
 
-// Loading and rendering of morphing shapes using gnash_shape.
+// Based on the public domain morph2.cpp of:
+// Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,
+// Vitalij Alexeev <tishka92@mail.ru> 2004.
 
 #include "morph2_character_def.h"
 #include "stream.h"
-#include "render.h"     
+#include "render.h"
 #include "movie_definition.h"
 #include "bitmap_character_def.h"
 #include "sprite_instance.h"
@@ -58,7 +75,7 @@ public:
 		return ret;
 	}
 
-	/// Compute total number of edges 
+	/// Compute total number of edges
 	static size_t computeNumberOfEdges(const std::vector<path>& paths)
 	{
 		size_t count=0;
@@ -98,7 +115,7 @@ private:
 	void	morph2_character_def::display(character* inst)
 	{
 //		GNASH_REPORT_FUNCTION;
-		
+
 		unsigned int i;
 		float ratio = inst->get_ratio(); //m_ratio;
 
@@ -128,8 +145,8 @@ private:
 			ls.m_color.set_lerp(ls1.get_color(), ls2.get_color(), ratio);
 		}
 
-		// This is used for cases in which number 
-		// of paths in start shape and end shape are not 
+		// This is used for cases in which number
+		// of paths in start shape and end shape are not
 		// the same.
 		path empty_path;
 		edge empty_edge;
@@ -141,7 +158,7 @@ private:
 		for (i=0; i < m_paths.size(); i++)
 		{
 			path& p = m_paths[i];
-			const path& p1 = i < paths1.size() ? paths1[i] : empty_path; 
+			const path& p1 = i < paths1.size() ? paths1[i] : empty_path;
 			const path& p2 = n < paths2.size() ? paths2[n] : empty_path;
 
 			float new_ax = flerp(p1.m_ax, p2.m_ax, ratio);
@@ -152,10 +169,10 @@ private:
  			// @@ hack.
 			if (p.getLeftFill() == 0 && p.getRightFill() == 0)
 			{
-				if (m_shape1->get_fill_styles().size() > 0) p.setLeftFill(1); 
+				if (m_shape1->get_fill_styles().size() > 0) p.setLeftFill(1);
 			}
-      
-      
+
+
 			//  edges;
 			size_t len = p1.size();
 			p.m_edges.resize(len);
@@ -177,7 +194,7 @@ private:
 				}
 			}
 		}
-    
+
 //  display
 
     {
@@ -193,12 +210,12 @@ private:
 			delete m_mesh;
 			m_last_ratio = ratio;
 			m_mesh = new mesh_set(this, max_error * 0.75f);
-		}	
+		}
   	m_mesh->display(mat, cx, m_fill_styles, m_line_styles);
 */
 	}
 
-  
+
 	void	morph2_character_def::read(stream* in, int tag_type, bool with_style, movie_definition* md)
 	{
 		assert(tag_type == SWF::DEFINEMORPHSHAPE);
@@ -223,7 +240,7 @@ private:
 			fs2.m_type = fs1.m_type;
 
 			IF_VERBOSE_PARSE(
-			  log_parse("morph fill style type = 0x%X",
+			  log_parse(_("morph fill style type = 0x%X"),
 			    fs1.m_type);
 			);
 
@@ -233,9 +250,9 @@ private:
 				fs2.m_color.read_rgba(in);
 
 				IF_VERBOSE_PARSE(
-				  log_parse("morph fill style begin color: ");
+				  log_parse(_("morph fill style begin color: "));
 				  fs1.m_color.print();
-				  log_parse("morph fill style end color: ");
+				  log_parse(_("morph fill style end color: "));
 				  fs2.m_color.print();
 				);
 			}
@@ -283,7 +300,7 @@ private:
 				}
 
 				IF_VERBOSE_PARSE(
-				  log_parse("morph fsr: num_gradients = %d",
+				  log_parse(_("morph fsr: num_gradients = %d"),
 				    num_gradients);
 				);
 
@@ -299,7 +316,7 @@ private:
 
 				int	bitmap_char_id = in->read_u16();
 				IF_VERBOSE_PARSE(
-				  log_parse("morph fsr bitmap_char = %d",
+				  log_parse(_("morph fsr bitmap_char = %d"),
 				    bitmap_char_id);
 				);
 
@@ -367,17 +384,17 @@ private:
 
 		if ( m_shape1->m_paths.size() != m_shape2->m_paths.size() )
 		{
-			log_swferror("Different number of paths "
+			log_swferror(_("Different number of paths "
 				"in start (" SIZET_FMT ") and end (" SIZET_FMT
-				") shapes of a morph",
+				") shapes of a morph"),
 				m_shape1->m_paths.size(),
 				m_shape2->m_paths.size());
 		}
 		else if ( edges_count1 != edges_count2 )
 		{
-			log_swferror("Different number of edges "
+			log_swferror(_("Different number of edges "
 				"in start (%u) and end (%u) shapes "
-				"of a morph",
+				"of a morph"),
 				edges_count1, edges_count1);
 		}
 
@@ -386,11 +403,9 @@ private:
 	}
 }
 
-
-
 // Local Variables:
 // mode: C++
-// c-basic-offset: 8 
+// c-basic-offset: 8
 // tab-width: 8
 // indent-tabs-mode: t
 // End:

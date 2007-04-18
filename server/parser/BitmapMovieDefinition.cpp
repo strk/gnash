@@ -1,3 +1,4 @@
+// BitmapMovieDefinition.cpp:  , for Gnash.
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
@@ -10,11 +11,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-// 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -61,7 +61,7 @@ BitmapMovieDefinition::getShapeDef()
 	float w = _framesize.width()/20;
 	float h = _framesize.height()/20;
 
-	log_msg("Creating a shape_definition wrapping a %g x %g bitmap", w, h);
+	log_msg(_("Creating a shape_definition wrapping a %g x %g bitmap"), w, h);
 
 	path bmPath(w, h, fillLeft, 0, 0);
 	bmPath.drawLineTo(w, 0);
