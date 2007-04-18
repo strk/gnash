@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: BitmapMovieInstance.h,v 1.2 2007/02/14 09:03:53 strk Exp $ */
+/* $Id: BitmapMovieInstance.h,v 1.3 2007/04/18 07:17:11 strk Exp $ */
 
 #ifndef GNASH_BITMAPMOVIEINSTANCE_H
 #define GNASH_BITMAPMOVIEINSTANCE_H
@@ -47,6 +47,16 @@ public:
 	BitmapMovieInstance(BitmapMovieDefinition* def); 
 
 	virtual ~BitmapMovieInstance() {}
+
+	/// Do nothing on restart. Especially don't trash the DisplayList 
+	//
+	/// TODO: this is needed due to the implementation detail of 
+	///       using the DisplayList to store our bitmap-filled
+	///       shape. Using the _drawable instead, or overriding
+	///       ::display to simply display our definition is likely
+	///	  the best way to go instead (we'd also reuse the same
+	///       bitmap info rather then creating new instances..)
+	void restart() {}
 
 };
 

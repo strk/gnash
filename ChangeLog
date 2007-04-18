@@ -1,3 +1,10 @@
+2007-04-18 Sandro Santilli <strk@keybit.net>
+
+	* server/BitmapMovieInstance.h:
+	  Override restart() to avoid cleaning up
+	  the displaylist (since no frame tags will
+	  recreate it).
+
 2007-04-18 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/Makefile.am:
