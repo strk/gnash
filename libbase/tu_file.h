@@ -112,10 +112,10 @@ public:
     ///
     uint32_t 	read_le32() {
 	// read8() is uint8_t, so no masks with 0xff are required.
-	uint32_t result = read8();
-	result |= read8() << 8;
-	result |= read8() << 16;
-	result |= read8() << 24;
+	uint32_t result = (uint32_t)read8();
+	result |= (uint32_t)read8() << 8;
+	result |= (uint32_t)read8() << 16;
+	result |= (uint32_t)read8() << 24;
 	return(result);
     }
 	
@@ -125,8 +125,8 @@ public:
     ///       is in error condition, see get_error().
     ///
     uint16_t 	read_le16() {
-	uint16_t result = read8();
-	result |= read8() << 8;
+	uint16_t result = (uint16_t)read8();
+	result |= (uint16_t)read8() << 8;
 	return(result);
     }
 
