@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.30 2007/04/04 20:30:45 bjacques Exp $ */
+/* $Id: amf.cpp,v 1.31 2007/04/18 17:27:02 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -163,7 +163,7 @@ AMF::parseAMF(char *in)
     while (*x != OBJECT_END) {
         x = readElement(x);
     }
-		return true;
+    return true;
 }
 
 char *
@@ -996,14 +996,6 @@ AMF::parseBody()
 
     return parseBody(_amf_data, _total_size);
 }
-
-// int
-// AMF::parseBody(unsigned char *in, int bytes)
-// {
-//     GNASH_REPORT_FUNCTION;
-
-//     parseBody(in, _total_size);
-// }
 
 int
 AMF::parseBody(unsigned char *in, int bytes)
