@@ -140,7 +140,7 @@ static void local_date_to_tm_msec(double value, struct tm &tm, double &msec);
 static void utc_date_to_tm_msec(double value, struct tm &tm, double &msec);
 static double local_tm_msec_to_date(struct tm &tm, double &msec);
 static double utc_tm_msec_to_date(struct tm &tm, double &msec);
-static double rogue_date_args(const fn_call& fn, int maxargs);
+static double rogue_date_args(const fn_call& fn, unsigned maxargs);
 #endif
 
 // Select functions to implement _localtime_r and _gmtime_r
