@@ -1,6 +1,21 @@
 2007-04-18 Sandro Santilli <strk@keybit.net>
 
 	* server/matrix.{cpp,h}: add transform_by_inverse(point&).
+	* server/character.h: add pointInBounds, pointInShape() and
+	  pointInVisibleShape() new methods; document
+	  get_topmost_mouse_entity.
+	* server/edit_text_character.{h,cpp}: implement pointInShape.
+	* server/generic_character.{h,cpp}: implement pointInShape.
+	* server/sprite_instance.{h,cpp}: implement pointInShape
+	  and pointInVisibleShape; fix get_topmost_mouse_entity
+	  implementation.
+	* server/parser/character_def.h: document point_test_local.
+	* testsuite/misc-ming.all/duplicate_movie_clip_test.c: don't 
+	  expect a failure.
+	* testsuite/misc-ming.all/loadMovieTestRunner.cpp: add two
+	  small tests checking that the new two small buttons
+	  are clickable. Needs more tests actually clicking those
+	  buttons.
 
 2007-04-18  John Gilmore  <gnu@toad.com>
 

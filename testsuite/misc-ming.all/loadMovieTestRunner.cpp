@@ -101,5 +101,15 @@ main(int /*argc*/, char** /*argv*/)
 	coverart = coverartch->to_movie();
 	check_equals(coverart->get_movie_definition()->get_url(), offspringURL.str());
 
+	//---------------------------------------------------
+	// Now check that the active movieclip "buttons" work
+	//---------------------------------------------------
+
+	tester.movePointerTo(73, 204); // the "Scribble" button
+	check(tester.isMouseOverMouseEntity());
+
+	tester.movePointerTo(63, 227); // the "clear" button
+	check(tester.isMouseOverMouseEntity());
+
 }
 

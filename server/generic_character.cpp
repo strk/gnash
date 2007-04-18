@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: generic_character.cpp,v 1.5 2007/04/18 09:35:42 jgilmore Exp $ */
+/* $Id: generic_character.cpp,v 1.6 2007/04/18 13:24:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -47,6 +47,15 @@ generic_character::enclose_own_bounds(rect *) const
 {
 	log_unimpl("generic_character::enclose_own_bounds");
 	assert(0); // TO BE IMPLEMENTED!!!!!
+}
+
+bool
+generic_character::pointInShape(float x, float y) const
+{
+	matrix wm = get_world_matrix();
+	point lp(x, y);
+	wm.transform_by_inverse(lp);
+	return m_def->point_test_local(lp.m_x, lp.m_y);
 }
 
 character*

@@ -76,7 +76,7 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(mc.onLoad)", "'function'");
   check_equals(mo, "mc.getDepth()", "-16374");
   check_equals(mo, "dup.prop1", "undefined");  // user defined property will not be duplicated
-  xcheck_equals(mo, "typeof(dup.onLoad)", "'undefined'"); //user defined event will not be duplicated
+  check_equals(mo, "typeof(dup.onLoad)", "'undefined'"); //user defined event will not be duplicated
   check_equals(mo, "dup.getDepth()", "1");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); 

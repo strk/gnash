@@ -52,15 +52,17 @@ public:
 
 	~edit_text_character();
 
-	virtual bool can_handle_mouse_event() const { return true; }
-	virtual character* get_topmost_mouse_entity(float x, float y);
+	// TODO: should this return !m_def->get_no_select() ?
+	bool can_handle_mouse_event() const { return true; }
+
+	character* get_topmost_mouse_entity(float x, float y);
 	
-	virtual bool wantsInstanceName()
+	bool wantsInstanceName()
 	{
 		return true; // text fields can be referenced 
 	}	
 		
-	virtual bool on_event(const event_id& id);	
+	bool on_event(const event_id& id);	
 
 	const char* get_variable_name() const
 	{
@@ -76,10 +78,10 @@ public:
 	void set_variable_name(const std::string& newname);
 
 	/// Set our text to the given string.
-	virtual void	set_text_value(const char* new_text);
+	void	set_text_value(const char* new_text);
 
  	/// Return value of our text.
-	virtual const char* get_text_value() const;
+	const char* get_text_value() const;
 
 	/// We have a "text" member.
 	void set_member(const std::string& name, const as_value& val);
@@ -95,6 +97,9 @@ public:
 	{
 		return m_def->get_bounds().getRange();
 	}
+
+	// See dox in character.h
+	bool pointInShape(float x, float y) const;
 
 private:
 

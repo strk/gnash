@@ -77,6 +77,9 @@ public:
 
 	virtual character* get_topmost_mouse_entity(float x, float y);
 
+	// See dox in character.h
+	virtual bool pointInShape(float x, float y) const;
+
 	/// \brief
 	/// Return the character definition from which this
 	/// instance derive. 

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.67 2007/04/12 16:29:14 strk Exp $ */
+/* $Id: character.h,v 1.68 2007/04/18 13:24:44 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -463,6 +463,50 @@ public:
 		return geometry::Range2d<float>(geometry::nullRange);
 	}
 
+	/// Return true if the given point falls in this character's bounds
+	//
+	/// Point coordinates are in world TWIPS
+	///
+	bool pointInBounds(float x, float y) const
+	{
+		geometry::Range2d<float> bounds = getBounds();
+		matrix wm = get_world_matrix();
+		wm.transform(bounds);
+		return bounds.contains(x, y);
+	}
+
+	/// Return true if the given point falls in this character's shape
+	//
+	/// Point coordinates are in world TWIPS
+	///
+	/// The default implementation warns about a missing
+	/// override and invokes pointInBounds().
+	///
+	///
+	virtual bool pointInShape(float x, float y) const
+	{
+		log_error("Character %s did not override pointInShape() - using pointInBounds() instead", typeid(*this).name());
+		return pointInBounds(x, y);
+	}
+
+	/// Return true if the given point falls in this character's visible shape
+	//
+	/// Point coordinates are in world TWIPS
+	///
+	/// The default implementation returns false if the character is
+	/// not visible, calling pointInBounds() otherwise.
+	///
+	/// Note that this is good for simple characters but needs
+	/// to be overridden for characters with childs. When a
+	/// character has childs it must take into account the case
+	/// in which some childs are visible and some are not.
+	///
+	virtual bool pointInVisibleShape(float x, float y) const
+	{
+		if ( get_visible() ) return pointInShape(x, y);
+		else return false;
+	}
+
 	/// Return the "relative" root of this character
 	//
 	/// The "relative" is the movie_instance created by
@@ -581,10 +625,13 @@ public:
 	}
 
 
+    // TODO: why is this virtual ??
     virtual void	set_visible(bool visible) {
       if (m_visible!=visible) set_invalidated();  
       m_visible = visible;      
     }
+
+    // TODO: why is this virtual ??
     virtual bool	get_visible() const { return m_visible; }
 
     virtual void	set_display_callback(void (*callback)(void*), void* user_ptr)
@@ -647,6 +694,30 @@ public:
 		on_event(id);
 	}
 
+	/// \brief
+	/// Return the topmost entity covering the given point
+	/// and enabled to receive mouse events.
+	//
+	/// Return NULL if no "active" entity is found under the pointer.
+	///
+	/// Coordinates of the point are given in parent's coordinate space.
+	/// This means that in order to convert the point to the local coordinate
+	/// space you need to apply an inverse transformation using this
+	/// character matrix. Example:
+	///
+	///	point p(x,y);
+	///	get_matrix().transform_by_inverse(p);
+	///	-- p is now in local coordinates
+	///
+	/// Don't blame me for this mess, I'm just trying to document the existing
+	/// functions ... --strk
+	///
+	/// @param x
+	/// 	X ordinate of the pointer, in parent's coordinate space.
+	///
+	/// @param y
+	/// 	Y ordinate of the pointer, in parent's coordiante space.
+	///
 	virtual character* get_topmost_mouse_entity(float /* x */, float /* y */)
 	{
 		return NULL;

@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.98 2007/04/16 18:23:06 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.99 2007/04/18 13:24:44 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -138,6 +138,12 @@ public:
 
 	/// Get the composite bounds of all component drawing elements
 	geometry::Range2d<float> getBounds() const;
+
+	// See dox in character.h
+	bool pointInShape(float x, float y) const;
+
+	// See dox in character.h
+	bool pointInVisibleShape(float x, float y) const;
 
 	size_t get_current_frame() const
 	{

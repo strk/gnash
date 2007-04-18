@@ -2820,6 +2820,90 @@ public:
 		
 };
 
+/// Find the first character whose shape contain the point
+//
+/// Point coordinates in world TWIPS
+///
+class ShapeContainerFinder {
+
+	bool _found;
+	float _x;
+	float _y;
+
+public:
+
+	ShapeContainerFinder(float x, float y)
+		:
+		_found(false),
+		_x(x),
+		_y(y)
+	{}
+
+	bool operator() (character* ch)
+	{
+		if ( ch->pointInShape(_x, _y) )
+		{
+			_found = true;
+			return false;
+		}
+		else return true;
+	}
+
+	bool hitFound() { return _found; }
+		
+};
+
+/// Find the first visible character whose shape contain the point
+//
+/// Point coordinates in world TWIPS
+///
+class VisibleShapeContainerFinder {
+
+	bool _found;
+	float _x;
+	float _y;
+
+public:
+
+	VisibleShapeContainerFinder(float x, float y)
+		:
+		_found(false),
+		_x(x),
+		_y(y)
+	{}
+
+	bool operator() (character* ch)
+	{
+		if ( ch->get_visible() && ch->pointInShape(_x, _y) )
+		{
+			_found = true;
+			return false;
+		}
+		else return true;
+	}
+
+	bool hitFound() { return _found; }
+		
+};
+
+bool
+sprite_instance::pointInShape(float x, float y) const
+{
+	ShapeContainerFinder finder(x, y);
+	const_cast<DisplayList&>(m_display_list).visitBackward(finder);
+	if ( finder.hitFound() ) return true;
+	return _drawable_inst->pointInShape(x, y); 
+}
+
+bool
+sprite_instance::pointInVisibleShape(float x, float y) const
+{
+	VisibleShapeContainerFinder finder(x, y);
+	const_cast<DisplayList&>(m_display_list).visitBackward(finder);
+	if ( finder.hitFound() ) return true;
+	return _drawable_inst->pointInVisibleShape(x, y); 
+}
+
 character*
 sprite_instance::get_topmost_mouse_entity(float x, float y)
 {
@@ -2829,6 +2913,18 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 	{
 		return NULL;
 	}
+
+	if ( can_handle_mouse_event() )
+	{
+		// point is in parent's space,
+		// we need to convert it in world space
+		matrix parent_world_matrix = get_parent()->get_world_matrix();
+		point wp(x,y);
+		parent_world_matrix.transform(wp);
+		if ( pointInVisibleShape(wp.m_x, wp.m_y) ) return this;
+		else return NULL;
+	}
+
 
 	matrix	m = get_matrix();
 	point	p;
@@ -2842,15 +2938,7 @@ sprite_instance::get_topmost_mouse_entity(float x, float y)
 		ch = _drawable_inst->get_topmost_mouse_entity(p.m_x, p.m_y);
 	}
 
-	if ( ch && can_handle_mouse_event() )
-	{
-		return this;
-	}
-	else
-	{
-		return ch; // might be NULL
-	}
-
+	return ch; // might be NULL
 }
 
 bool

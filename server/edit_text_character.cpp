@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.57 2007/04/18 09:35:42 jgilmore Exp $ */
+/* $Id: edit_text_character.cpp,v 1.58 2007/04/18 13:24:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -593,11 +593,14 @@ edit_text_character::on_event(const event_id& id)
 character*
 edit_text_character::get_topmost_mouse_entity(float x, float y)
 {
+	//log_msg("get_topmost_mouse_entity called on edit_text_character %p, labeled '%s'", (void*)this, get_text_value());
+
 	if (get_visible() == false)
 	{
 		return NULL;
 	}
 	
+	// shouldn't this be !can_handle_mouse_event() instead ?
 	if (m_def->get_no_select())
 	{
 		// not selectable, so don't catch mouse events!
@@ -609,7 +612,7 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
 	point	p;
 	m.transform_by_inverse(&p, point(x, y));
 
-	const rect def_bounds = m_def->get_bounds();
+	const rect& def_bounds = m_def->get_bounds();
 	if (def_bounds.point_test(p.m_x, p.m_y))
 	{
 		return this;
@@ -1335,6 +1338,16 @@ textfield_class_init(as_object& global)
 
 	// Register _global.MovieClip
 	global.init_member("TextField", cl.get());
+}
+
+bool
+edit_text_character::pointInShape(float x, float y) const
+{
+	matrix wm = get_world_matrix();
+	point lp(x, y);
+	wm.transform_by_inverse(lp);
+	const rect& def_bounds = m_def->get_bounds();
+	return def_bounds.point_test(lp.m_x, lp.m_y);
 }
 
 } // namespace gnash

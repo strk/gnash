@@ -66,6 +66,10 @@ public:
 	{
 	}
 
+    	/// Return true if the specified point is on the interior of our shape.
+	//
+	/// Point coordinates are local coords (TWIPS)
+	///
 	virtual bool point_test_local(float /*x*/, float /*y*/)
 	{
 		return false;
