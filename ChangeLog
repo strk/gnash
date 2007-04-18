@@ -1,3 +1,7 @@
+2007-04-18 Martin Guy <martinwguy@yahoo.it>
+
+	* server/asobj/NetStreamFfmpeg.cpp: Fix compile-breaking typo.
+
 2007-04-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/character.h, server/dlist.cpp, server/swf/PlaceObject2Tag.cpp:
@@ -6,7 +10,7 @@
 2007-04-18 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac: Introduce HAVE_LONG_TIMEZONE if extern long timezone
-	  exists
+	  exists, and HAVE_TM_GMTOFF if struct tm has member tm_gmtoff.
 	* doc/C/asspec/date.xml: first draft
 	* server/asobj/Date.cpp: Complete its implementation
 	* server/asobj/Global.cpp: Use definitions of NAN and INFINITY from	

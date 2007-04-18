@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.38 2007/04/18 11:00:30 jgilmore Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.39 2007/04/18 14:39:19 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -566,7 +566,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 		// Open codec
 		if (avcodec_open(ns->m_ACodecCtx, pACodec) < 0)
 		{
-			log_error(_("Could not open audio codec %d for %s"));
+			log_error(_("Could not open audio codec %d for %s"),
 				ns->m_ACodecCtx->codec_id, ns->url.c_str());
 			return;
 		}
