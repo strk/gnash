@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.72 2007/04/18 17:04:56 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.73 2007/04/18 17:06:42 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1878,7 +1878,7 @@ public:
 
   bool getPixel(rgba& color_return, int x, int y) {
   
-    if ((x<0) || (y<0) || (x>=xres) || (y=yres))
+    if ((x<0) || (y<0) || (x>=xres) || (y>=yres))
       return false;
 
     agg::rgba8 color = m_pixf->pixel(x, y);    
