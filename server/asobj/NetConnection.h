@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.24 2007/04/19 07:25:00 zoulunkai Exp $ */
+/* $Id: NetConnection.h,v 1.25 2007/04/19 07:40:21 zoulunkai Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -41,9 +41,6 @@
 #include "fn_call.h"
 
 // Forward declarations
-
-class FLVParser; 
-
 namespace gnash {
 	//class NetStream;
 }
