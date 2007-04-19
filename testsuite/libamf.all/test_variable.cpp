@@ -68,9 +68,8 @@ const char *astype_str[] = {
 int
 main(int argc, char *argv[])
 {
-    bool dump = false;
     char buffer[300];
-    int c, retries = 3;
+    int c;
 
     memset(buffer, 0, 300);
     
@@ -99,8 +98,6 @@ main(int argc, char *argv[])
     AMF amf_obj;
     int fd, ret;
     unsigned char buf[AMF_PACKET_SIZE+1];
-    unsigned char *tmpptr;
-    short length;
     AMF::amf_element_t el;
 
     // First see if we can read variables. This file is produced by
@@ -187,7 +184,6 @@ main(int argc, char *argv[])
     }
     
     amfnum_t bignum = 0x388340L;
-    char *numptr = (char *)&bignum;
     out = (char *)amf_obj.encodeVariable("audioCodecs", bignum);
     if ((out[1] == 11)
         && (out[2] == 'a')

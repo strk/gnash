@@ -74,7 +74,8 @@ int
 main(int argc, char** argv)
 {
 	SWFMovie mo;
-	SWFMovieClip mc, dejagnuclip;
+	SWFMovieClip mc;
+	// SWFMovieClip dejagnuclip;
 	SWFShape  sh1,sh2;
 	SWFAction ac1, ac2;
 	int i;

@@ -68,9 +68,8 @@ const char *astype_str[] = {
 int
 main(int argc, char *argv[])
 {
-    bool dump = false;
     char buffer[300];
-    int c, retries = 3;
+    int c;
 
     memset(buffer, 0, 300);
     
@@ -100,7 +99,6 @@ main(int argc, char *argv[])
     int fd, ret;
     unsigned char buf[AMF_PACKET_SIZE+1];
     unsigned char *tmpptr;
-    short length;
     AMF::amf_element_t el;
 
     // First see if we can read strings. This file is produced by

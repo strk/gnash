@@ -19,6 +19,10 @@
 
 	* testsuite/actionscript.all/Date.as: Change case-[in]dependent
 	  method existence detection strategy to see if it fixes v5 testrun.
+	* testsuite/libamf.all/test_{object,variable}.cpp,
+	  testsuite/misc-ming.all/{PlaceObject2Test,root_stop_test}.c,
+	  testsuite/misc-ming.all/action_execution_order_test6.c:
+	  Drop/comment unused variables.
 
 2007-04-19 Sandro Santilli <strk@keybit.net>
 
