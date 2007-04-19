@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.60 2007/04/19 18:58:45 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.61 2007/04/19 20:16:14 strk Exp $";
 
 #include "check.as"
 
@@ -286,6 +286,12 @@ check_equals(typeof(mc5), 'movieclip');
 // gah.. our "soft references" are bogus :(
 xcheck_equals(mc4._target, "/changed");
 xcheck_equals(mc5._target, "/changed/mc5_mc");
+xcheck_equals(mc4.toString(), "[object Object]");
+xcheck_equals(mc5.toString(), "[object Object]");
+check_equals(changed._target, "/changed");
+check_equals(changed.mc5_mc._target, "/changed/mc5_mc");
+xcheck_equals(changed.toString(), "[object Object]");
+xcheck_equals(changed.mc5_mc.toString(), "[object Object]");
 #endif
 
 //--------------------------------------------------------------------------
