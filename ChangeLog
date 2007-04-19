@@ -1,3 +1,10 @@
+2007-04-19 Martin Guy <martinwguy@yahoo.it>
+
+	* server/{as_value.{h,cpp},edit_text_character.cpp,{vm/ASHandlers.cpp}:
+	  Always do version-dependent conversion to string, and move version
+	  detection for this to a single point in the lowest level.
+	  This also eliminates all *_versioned() string methods.
+
 2007-04-19 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/string.cpp: add valueOf own property to String

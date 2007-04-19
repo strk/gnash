@@ -67,14 +67,6 @@ as_value::as_value(as_function* func)
     }
 }
 
-#if 0
-std::string
-as_value::to_std_string(as_environment* env) const
-{
-    return to_string(env);
-}
-#endif
-
 // Conversion to const std::string&.
 const std::string&
 as_value::to_string(as_environment* env) const
@@ -120,16 +112,15 @@ as_value::to_string(as_environment* env) const
 			break;
 
 		case UNDEFINED: 
+			// Behavior depends on file version.
+			// In version 7+, it's "undefined",
+			// in versions 6-, it's "".
 
-			// Behavior depends on file version.  In
-			// version 7+, it's "undefined", in versions
-			// 6-, it's "".
-			//
-			// We'll go with the v7 behavior by default,
-			// and conditionalize via _versioned()
-			// functions.
-			m_string_value = "undefined";
-
+			if (VM::get().getSWFVersion() <= 6) {
+			    m_string_value = "";
+			} else {
+			    m_string_value = "undefined";
+			}
 			break;
 
 		case NULLTYPE:
@@ -200,30 +191,6 @@ as_value::to_string(as_environment* env) const
     }
     
     return m_string_value;
-}
-
-// Conversion to const std::string&.
-const std::string&
-as_value::to_string_versioned(int version, as_environment* env) const
-{
-    if (m_type == UNDEFINED) {
-	// Version-dependent behavior.
-	if (version <= 6) {
-	    m_string_value = "";
-	} else {
-	    m_string_value = "undefined";
-	}
-	return m_string_value;
-    }
-		
-    return to_string(env);
-}
-
-// Version-based Conversion to std::string
-std::string
-as_value::to_std_string_versioned(int version, as_environment* env) const
-{
-	return to_string_versioned(version, env);
 }
 
 // Conversion to primitive value.
@@ -367,9 +334,9 @@ as_value::to_number(as_environment* env) const
 bool
 as_value::to_bool_v7() const
 {
-	    switch (m_type)
-	    {
-		case  STRING:
+	switch (m_type)
+	{
+		case STRING:
 			return m_string_value != "";
 		case NUMBER:
 			return m_number_value && ! isnan(m_number_value);
@@ -391,9 +358,9 @@ as_value::to_bool_v7() const
 bool
 as_value::to_bool_v5() const
 {
-	    switch (m_type)
-	    {
-		case  STRING:
+	switch (m_type)
+	{
+		case STRING:
 		{
 			if (m_string_value == "false") return false;
 			else if (m_string_value == "true") return true;
@@ -425,9 +392,9 @@ as_value::to_bool_v5() const
 bool
 as_value::to_bool_v6() const
 {
-	    switch (m_type)
-	    {
-		case  STRING:
+	switch (m_type)
+	{
+		case STRING:
 		{
 			if (m_string_value == "false") return false;
 			else if (m_string_value == "true") return true;
@@ -544,7 +511,6 @@ as_function*
 as_value::to_as_function() const
 {
     if (m_type == AS_FUNCTION) {
-	// OK.
 	return m_object_value->to_function();
     } else {
 	return NULL;
@@ -560,21 +526,11 @@ as_value::convert_to_number(as_environment* env)
 
 // Force type to string.
 void
-as_value::convert_to_string()
+as_value::convert_to_string(as_environment* env)
 {
-    to_string();	// init our string data.
+    to_string(env);	// init our string data.
     m_type = STRING;	// force type.
 }
-
-
-void
-as_value::convert_to_string_versioned(int version, as_environment* env)
-    // Force type to string.
-{
-    to_string_versioned(version, env); // init our string data.
-    m_type = STRING;	// force type.
-}
-
 
 void
 as_value::set_as_object(as_object* obj)
