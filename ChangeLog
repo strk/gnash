@@ -4,6 +4,8 @@
 	  Always do version-dependent conversion to string, and move version
 	  detection for this to a single point in the lowest level.
 	  This also eliminates all *_versioned() string methods.
+	* testsuite/actionscript.all/Date.as: Change case-[in]dependent
+	  method existence detection strategy to see if it fixes v5 testrun.
 
 2007-04-19 Sandro Santilli <strk@keybit.net>
 

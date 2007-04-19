@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.22 2007/04/18 15:03:06 strk Exp $";
+rcsid="$Id: Date.as,v 1.23 2007/04/19 12:33:46 martinwguy Exp $";
 
 #include "check.as"
 
@@ -35,51 +35,50 @@ check_equals (Date.UTC(2000,0,1).valueOf(), 946684800000.0);
 // test the Date constructor exists.
 // This specific value is used below to check conversion back to year/mon/day etc
 var d = new Date(70,1,2,3,4,5,6);
-check (d != undefined);
+check (d);
 
 // test methods' existence
-check (d.getDate != undefined);
-check (d.getDay != undefined);
-check (d.getFullYear != undefined);
-check (d.getHours != undefined);
-check (d.getMilliseconds != undefined);
-check (d.getMinutes != undefined);
-check (d.getMonth != undefined);
-check (d.getSeconds != undefined);
-check (d.getTime != undefined);
-check (d.getTimezoneOffset != undefined);
-check (d.getUTCDate != undefined);
-check (d.getUTCDay != undefined);
-check (d.getUTCFullYear != undefined);
-check (d.getUTCHours != undefined);
-check (d.getUTCMilliseconds != undefined);
-check (d.getUTCMinutes != undefined);
-check (d.getUTCMonth != undefined);
-check (d.getUTCSeconds != undefined);
-check (d.getYear != undefined);
-check (d.setDate != undefined);
-check (d.setFullYear != undefined);
-check (d.setHours != undefined);
-check (d.setMilliseconds != undefined);
-check (d.setMinutes != undefined);
-check (d.setMonth != undefined);
-check (d.setSeconds != undefined);
-check (d.setTime != undefined);
-check (d.setUTCDate != undefined);
-check (d.setUTCFullYear != undefined);
-check (d.setUTCHours != undefined);
-check (d.setUTCMilliseconds != undefined);
-check (d.setUTCMinutes != undefined);
-check (d.setUTCMonth != undefined);
-check (d.setUTCSeconds != undefined);
-check (d.setYear != undefined);
-check (d.toString != undefined);
+check (d.getDate);
+check (d.getDay);
+check (d.getFullYear);
+check (d.getHours);
+check (d.getMilliseconds);
+check (d.getMinutes);
+check (d.getMonth);
+check (d.getSeconds);
+check (d.getTime);
+check (d.getTimezoneOffset);
+check (d.getUTCDate);
+check (d.getUTCDay);
+check (d.getUTCFullYear);
+check (d.getUTCHours);
+check (d.getUTCMilliseconds);
+check (d.getUTCMinutes);
+check (d.getUTCMonth);
+check (d.getUTCSeconds);
+check (d.getYear);
+check (d.setDate);
+check (d.setFullYear);
+check (d.setHours);
+check (d.setMilliseconds);
+check (d.setMinutes);
+check (d.setMonth);
+check (d.setSeconds);
+check (d.setTime);
+check (d.setUTCDate);
+check (d.setUTCFullYear);
+check (d.setUTCHours);
+check (d.setUTCMilliseconds);
+check (d.setUTCMinutes);
+check (d.setUTCMonth);
+check (d.setUTCSeconds);
+check (d.setYear);
+check (d.toString);
 // UTC is a static method present from v5
 check_equals (d.UTC, undefined);
-check (Date.UTC != undefined);
+check (Date.UTC);
 
 #if OUTPUT_VERSION > 6
-
 // From SWF 7 up methods are case-sensitive !
 check_equals (d.getdate, undefined);
 check_equals (d.getday, undefined);
@@ -118,7 +117,44 @@ check_equals (d.setUTCseconds, undefined);
 check_equals (d.setyear, undefined);
 check_equals (d.tostring, undefined);
 check_equals (Date.utc, undefined);
-
+#else
+check (d.getdate);
+check (d.getday);
+check (d.getfullYear);
+check (d.gethours);
+check (d.getmilliseconds);
+check (d.getminutes);
+check (d.getmonth);
+check (d.getseconds);
+check (d.gettime);
+check (d.gettimezoneOffset);
+check (d.getUTCdate);
+check (d.getUTCday);
+check (d.getUTCfullYear);
+check (d.getUTChours);
+check (d.getUTCmilliseconds);
+check (d.getUTCminutes);
+check (d.getUTCmonth);
+check (d.getUTCseconds);
+check (d.getyear);
+check (d.setdate);
+check (d.setfullYear);
+check (d.sethours);
+check (d.setmilliseconds);
+check (d.setminutes);
+check (d.setmonth);
+check (d.setseconds);
+check (d.settime);
+check (d.setUTCdate);
+check (d.setUTCfullYear);
+check (d.setUTChours);
+check (d.setUTCmilliseconds);
+check (d.setUTCminutes);
+check (d.setUTCmonth);
+check (d.setUTCseconds);
+check (d.setyear);
+check (d.tostring);
+check (Date.utc);
 #endif // OUTPUT_VERSION > 6
 
 // Some values we will use to test things
