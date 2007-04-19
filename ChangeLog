@@ -6,6 +6,8 @@
 	  drop SDL integer types 
 	* server/cxform.h
 	  replace inttypes.h with tu_types.h, hopefully more portable
+	* server/vm/action.cpp
+	  type definition, get rid of compiler warning
 	  
 2007-04-18 Sandro Santilli <strk@keybit.net>
 

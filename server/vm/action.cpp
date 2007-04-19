@@ -550,7 +550,7 @@ event_id::is_mouse_event() const
 as_standard_member
 get_standard_member(const std::string& name)
 {
-	typedef std::map< std::string, as_standard_member>	maptype;
+	typedef std::map< std::string, as_standard_member, StringNoCaseLessThen>  maptype; 
 
 	static bool s_inited = false;
 	static std::map< std::string, as_standard_member, StringNoCaseLessThen> membersMap;
