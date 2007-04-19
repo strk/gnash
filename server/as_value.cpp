@@ -624,7 +624,7 @@ as_value::set_as_function(as_function* func)
 bool
 as_value::equals(const as_value& v, as_environment* env) const
 {
-    log_msg("equals(%s, %s) called", to_debug_string().c_str(), v.to_debug_string().c_str());
+    //log_msg("equals(%s, %s) called", to_debug_string().c_str(), v.to_debug_string().c_str());
 
     bool this_nulltype = (m_type == UNDEFINED || m_type == NULLTYPE);
     bool v_nulltype = (v.get_type() == UNDEFINED || v.get_type() == NULLTYPE);

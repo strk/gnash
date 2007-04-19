@@ -1,7 +1,9 @@
 2007-04-19 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (equals): comment out debugging line.
 	* testsuite/actionscript.all/MovieClip.as: check that
 	  changing a _parent._name changes own _target.
+	  WARNING: our soft references are bogus !!
 
 2007-04-19 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
