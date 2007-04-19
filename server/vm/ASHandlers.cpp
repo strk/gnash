@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.98 2007/04/19 12:06:56 martinwguy Exp $ */
+/* $Id: ASHandlers.cpp,v 1.99 2007/04/19 14:25:41 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -840,7 +840,8 @@ SWFHandlers::ActionStringLength(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1);
-    env.top(0).set_int(env.top(0).to_string().size());
+    int version = env.get_version();
+    env.top(0).set_int(env.top(0).to_string_versioned(version).size());
 }
 
 void
@@ -867,7 +868,8 @@ SWFHandlers::ActionSubString(ActionExec& thread)
     int size = unsigned(size_val.to_number(&env));
 
     int	base = int(base_val.to_number(&env));
-    const std::string& str = string_val.to_string();
+    int version = env.get_version();
+    const std::string& str = string_val.to_string_versioned(version);
 
     if ( size < 0 )
     {
@@ -1038,8 +1040,9 @@ SWFHandlers::ActionStringConcat(ActionExec& thread)
 
     thread.ensureStack(2); // two strings
 
-    env.top(1).convert_to_string(&env);
-    env.top(1).string_concat(env.top(0).to_string());
+    int version = env.get_version();
+    env.top(1).convert_to_string_versioned(version);
+    env.top(1).string_concat(env.top(0).to_string_versioned(version));
     env.drop(1);
 }
 
@@ -1215,6 +1218,7 @@ SWFHandlers::ActionTrace(ActionExec& thread)
 
     thread.ensureStack(1);
 
+    //std::string val = env.pop().to_string_versioned(VM::get().getSWFVersion(), &env);
     std::string val = env.pop().to_string(&env);
     log_trace(val.c_str());
 }
@@ -2532,11 +2536,13 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 
     //log_msg(_("ActionNewAdd(%s, %s) called"), v1.to_debug_string().c_str(), v2.to_debug_string().c_str());
 
+
     if (v1.is_string() || v2.is_string() )
     {
+    	int version = env.get_version();
         // modify env.top(1)
-        v2.convert_to_string(&env);
-        v2.string_concat(v1.to_string());
+        v2.convert_to_string_versioned(version, &env);
+        v2.string_concat(v1.to_string_versioned(version, &env));
     }
     else
     {
@@ -2614,7 +2620,8 @@ SWFHandlers::ActionToString(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1);
-    env.top(0).convert_to_string(&env);
+    int version = env.get_version();
+    env.top(0).convert_to_string_versioned(version);
 }
 
 void
@@ -2645,6 +2652,9 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
 
     thread.ensureStack(2); // member name, target
 
+    // Some corner case behaviors depend on the SWF file version.
+    int version = env.get_version();
+
     as_value member_name = env.top(0);
     as_value target = env.top(1);
 
@@ -2665,8 +2675,8 @@ SWFHandlers::ActionGetMember(ActionExec& thread)
 
     // Special case: String has a member "length"
     // @@ FIXME: we shouldn't have all this "special" cases --strk;
-    if (target.is_string() && member_name.to_string() == "length") {
-        int len = target.to_string().size();
+    if (target.is_string() && member_name.to_string_versioned(version) == "length") {
+        int len = target.to_string_versioned(version).size();
         env.top(1).set_int(len);
     } else {
         if ( ! thread.getObjectMember(*obj, member_name.to_string(&env), env.top(1)) )
@@ -2752,6 +2762,9 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	as_environment& env = thread.env;
 
 	thread.ensureStack(3);  // method_name, obj, nargs
+
+	// Some corner case behaviors depend on the SWF file version.
+	//int version = env.get_version();
 
 	// Get name function of the method
 	as_value& method_name = env.top(0);

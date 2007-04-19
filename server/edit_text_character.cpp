@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.59 2007/04/19 12:06:56 martinwguy Exp $ */
+/* $Id: edit_text_character.cpp,v 1.60 2007/04/19 14:25:40 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -680,7 +680,8 @@ edit_text_character::set_member(const std::string& name,
 	case M_TEXT:
 		//if (name == "text")
 	{
-		set_text_value(val.to_string().c_str());
+		int version = get_parent()->get_movie_definition()->get_version();
+		set_text_value(val.to_string_versioned(version).c_str());
 		return;
 	}
 	case M_X:

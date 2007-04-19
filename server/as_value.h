@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.48 2007/04/19 12:06:56 martinwguy Exp $ */
+/* $Id: as_value.h,v 1.49 2007/04/19 14:25:40 martinwguy Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -289,6 +289,30 @@ public:
 
 	std::string to_debug_string() const;
 
+	/// Get a version-dependent std::string representation for this value.
+	//
+	/// @param version
+	///	The SWF version to be compatible with.
+	///
+	/// @param env
+	///	The environment to use for running the toString() method
+	///	for object values. If NULL, toString() won't be run.
+	///
+	std::string to_std_string_versioned(int version, as_environment* env=NULL) const;
+
+	/// Get a string representation for this value.
+	//
+	/// This differs from to_string() in that returned
+	/// representation will depend on version of the SWF
+	/// source. 
+	/// @@ shouldn't this be the default ?
+	///
+	/// @param env
+	///	The environment to use for running the toString() method
+	///	for object values. If NULL, toString() won't be run.
+	///
+	const std::string&	to_string_versioned(int version, as_environment* env=NULL) const;
+
 	/// Conversion to number 
 	//
 	/// @param env
@@ -382,8 +406,20 @@ public:
 	void	convert_to_number(as_environment* env);
 
 	/// Force type to string.
-	void	convert_to_string(as_environment* env);
+	void	convert_to_string();
     
+	/// Force type to string.
+	//
+	/// uses swf-version-aware converter
+	///
+	/// @param env
+	///	The environment to use for running the toString() method
+	///	for object values. If NULL, toString() won't be run.
+	///
+	/// @see to_string_versionioned
+	///
+	void	convert_to_string_versioned(int version, as_environment* env=NULL);
+
 	// These set_*()'s are more type-safe; should be used
 	// in preference to generic overloaded set().  You are
 	// more likely to get a warning/error if misused.
