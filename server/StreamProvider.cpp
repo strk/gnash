@@ -130,7 +130,7 @@ StreamProvider::getStream(const URL& url, const std::string& postdata)
 		}
 #else
 		log_error(_("Unsupported network connection %s"),
-				url.str().c_str();
+				url.str().c_str());
 		return NULL;
 #endif
 	}
