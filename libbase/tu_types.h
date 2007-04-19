@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: tu_types.h,v 1.33 2007/04/11 17:54:21 bjacques Exp $ */
+/* $Id: tu_types.h,v 1.34 2007/04/19 05:23:30 zoulunkai Exp $ */
 
 #ifndef TU_TYPES_H
 #define TU_TYPES_H
@@ -30,15 +30,15 @@
 #include "tu_config.h"
 
 #if defined(_WIN32) || defined(WIN32)
-#include <sdl_stdinc.h>	
-//typedef unsigned char uint8_t;
-//typedef char int8_t;
-//typedef unsigned short int uint16_t;
-//typedef short int int16_t;
-//typedef unsigned int uint32_t;
-//typedef int int32_t;
-//typedef unsigned __int64 uint64_t;
-//typedef __int64 int64_t;
+//#include <sdl_stdinc.h>	
+typedef unsigned char uint8_t;
+typedef signed char int8_t;
+typedef unsigned short int uint16_t;
+typedef signed short int int16_t;
+typedef unsigned int uint32_t;
+typedef signed int int32_t;
+typedef unsigned __int64 uint64_t;
+typedef __int64 int64_t;
 # define __PRETTY_FUNCTION__ __FUNCDNAME__
 # define BYTE_ORDER SDL_BYTEORDER
 #else

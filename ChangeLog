@@ -1,3 +1,12 @@
+2007-04-19 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/duplicate_movie_clip_test.c
+	  more tests.
+	* libbase/tu_types.h
+	  drop SDL integer types 
+	* server/cxform.h
+	  replace inttypes.h with tu_types.h, hopefully more portable
+	  
 2007-04-18 Sandro Santilli <strk@keybit.net>
 
 	* server/BitmapMovieInstance.cpp: make sure

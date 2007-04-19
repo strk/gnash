@@ -31,8 +31,8 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip  mc, dejagnuclip;
-  SWFDisplayItem it;
+  SWFMovieClip  mc1, mc2, dejagnuclip;
+  SWFDisplayItem it1, it2;
   SWFShape  sh_red;
 
   const char *srcdir=".";
@@ -52,36 +52,77 @@ main(int argc, char** argv)
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   add_actions(mo, "x1=0; x2=0; x3=0;");
-  SWFMovie_nextFrame(mo); 
+  SWFMovie_nextFrame(mo);  /* 1st frame */
 
   
-  mc = newSWFMovieClip();
+  mc1 = newSWFMovieClip();
   sh_red = make_fill_square (100, 300, 60, 60, 255, 0, 0, 255, 0, 0);
-  SWFMovieClip_add(mc, (SWFBlock)sh_red);  
-  add_clip_actions(mc, "stop();");
-  SWFMovieClip_nextFrame(mc);
+  SWFMovieClip_add(mc1, (SWFBlock)sh_red);  
+  add_clip_actions(mc1, "stop();");
+  SWFMovieClip_nextFrame(mc1);
 
+  mc2 = newSWFMovieClip();
+  sh_red = make_fill_square (100, 200, 60, 60, 255, 0, 0, 255, 0, 0);
+  SWFMovieClip_add(mc2, (SWFBlock)sh_red);  
+  add_clip_actions(mc2, "stop();");
+  SWFMovieClip_nextFrame(mc2);
 
-  it = SWFMovie_add(mo, (SWFBlock)mc); 
-  SWFDisplayItem_setDepth(it, 10); 
-  SWFDisplayItem_setName(it, "mc"); 
+  it1 = SWFMovie_add(mo, (SWFBlock)mc1); 
+  SWFDisplayItem_setDepth(it1, 10); 
+  SWFDisplayItem_setName(it1, "mc1"); 
+
+  it2 = SWFMovie_add(mo, (SWFBlock)mc2); 
+  SWFDisplayItem_setDepth(it2, 20); 
+  SWFDisplayItem_setName(it2, "mc2"); 
+  SWFDisplayItem_addAction(it2,
+    compileSWFActionCode(" _root.note('onClipLoad triggered'); "
+                         " _root.x1 = _root.x1 + 1; "),
+    SWFACTION_ONLOAD);  
+  SWFDisplayItem_addAction(it2,
+    compileSWFActionCode(" _root.note('onClipEnterFrame triggered'); "
+                         " _root.x2 = _root.x2 + 1; "),
+    SWFACTION_ENTERFRAME);  
+  SWFDisplayItem_addAction(it2,
+    compileSWFActionCode(" _root.note('onClipUnload triggered'); "
+                         " _root.x3 = _root.x3 + 1; "),
+    SWFACTION_UNLOAD); 
+
+  add_actions(mo, " mc1.onLoad = function () {}; "
+                  " mc1.prop1 = 10; "
+                  " duplicateMovieClip('mc1', 'dup1', 1); "
+                  " mc2.onLoad = function () {}; "
+                  " duplicateMovieClip('mc2', 'dup2', 2); " );
+  SWFMovie_nextFrame(mo); /* 2nd frame */
   
-  add_actions(mo, " mc.onLoad = function () {};"
-                  " mc.prop1 = 10; "
-                  " duplicateMovieClip('mc', 'dup', 1); ");
-  SWFMovie_nextFrame(mo); 
   
+  check_equals(mo, "mc1.prop1", "10");
+  check_equals(mo, "typeof(mc1.onLoad)", "'function'");
+  check_equals(mo, "mc1.getDepth()", "-16374");
+  /* user defined property will not be duplicated */
+  check_equals(mo, "dup1.prop1", "undefined");  
+  /* user defined event will not be duplicated */
+  check_equals(mo, "typeof(dup1.onLoad)", "'undefined'"); 
+  check_equals(mo, "dup1.getDepth()", "1");
+  /* check user defined onLoad */
+  check_equals(mo, "typeof(mc2.onLoad)", "'function'");
+  /* onClipEvent does not define a function */
+  check_equals(mo, "typeof(mc2.onEnterFrame)", "'undefined'");
+  /* user defined event will not be duplicated */
+  check_equals(mo, "typeof(dup2.onLoad)", "'undefined'"); 
+  check_equals(mo, "_root.x1", "2");
+  check_equals(mo, "_root.x2", "2");
+  SWFMovie_nextFrame(mo); /* 3rd frame */
   
-  check_equals(mo, "mc.prop1", "10");
-  check_equals(mo, "typeof(mc.onLoad)", "'function'");
-  check_equals(mo, "mc.getDepth()", "-16374");
-  check_equals(mo, "dup.prop1", "undefined");  // user defined property will not be duplicated
-  check_equals(mo, "typeof(dup.onLoad)", "'undefined'"); //user defined event will not be duplicated
-  check_equals(mo, "dup.getDepth()", "1");
+  SWFDisplayItem_remove(it1);
+  SWFDisplayItem_remove(it2);
+  add_actions(mo, " dup2.removeMovieClip(); ");
+  SWFMovie_nextFrame(mo); /* 4th frame */
+
+  check_equals(mo, "_root.x1", "2");
+  check_equals(mo, "_root.x2", "3");
+  check_equals(mo, "_root.x3", "2");  
   add_actions(mo, " _root.totals(); stop(); ");
-  SWFMovie_nextFrame(mo); 
-  
-  
+  SWFMovie_nextFrame(mo); /* 5th frame */
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);
