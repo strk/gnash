@@ -8,6 +8,8 @@
 	  replace inttypes.h with tu_types.h, hopefully more portable
 	* server/vm/action.cpp
 	  type definition, get rid of compiler warning
+	* server/asobj/NetConnection.h
+	  add a forward declarations, quite the compiler
 	  
 2007-04-18 Sandro Santilli <strk@keybit.net>
 
