@@ -116,7 +116,7 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._y", "300");
 	check_equals(mo, "Math.round(staticmc._xscale)", "100");
 	check_equals(mo, "Math.round(staticmc._yscale)", "100");
-	check_equals(mo, "parseInt(staticmc._rotation*100)", "4500"); // tolerate an error of 1/100
+	check_equals(mo, "Math.round(staticmc._rotation*100)", "4500");
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'7.5,257.5 92.5,342.5'");
 	check_equals(mo, "staticmc._width", "85");
@@ -130,7 +130,7 @@ main(int argc, char** argv)
 	check_equals(mo, "staticmc._y", "300");
 	check_equals(mo, "Math.round(staticmc._xscale)", "200");
 	check_equals(mo, "Math.round(staticmc._yscale)", "300");
-	check_equals(mo, "parseInt(staticmc._rotation*100)", "4500"); // tolerate an error of 1/100
+	check_equals(mo, "Math.round(staticmc._rotation*100)", "4500");
 	check_equals(mo, "printBounds(staticmc.getBounds())", "'-30.05,-30.05 30.05,30.05'");
 	check_equals(mo, "printBounds(staticmc.getBounds(_root))", "'-56.25,193.75 156.25,406.25'");
 	check_equals(mo, "staticmc._width", "212.5");
