@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.58 2007/04/14 22:23:05 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.59 2007/04/19 18:44:52 strk Exp $";
 
 #include "check.as"
 
@@ -274,6 +274,9 @@ check_equals(mc4._parent, _root);
 check_equals(mc4._target, "/mc4_mc");
 var mc5 = mc4.createEmptyMovieClip("mc5_mc", 60);
 check_equals(mc5._target, "/mc4_mc/mc5_mc");
+mc4._name = 'changed'; 
+check_equals(mc4._target, "/changed");
+check_equals(mc5._target, "/changed/mc5_mc");
 check_equals(mc5._parent, mc4);
 #endif
 

@@ -1,3 +1,8 @@
+2007-04-19 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClip.as: check that
+	  changing a _parent._name changes own _target.
+
 2007-04-19 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/character.{h,cpp}, server/sprite_instance.{h,cpp}: 
