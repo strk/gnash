@@ -40,9 +40,8 @@ static TestState runtest;
 int
 main(int argc, char *argv[])
 {
-    bool dump = false;
     char buffer[300];
-    int c, retries = 3;
+    int c;
 
     memset(buffer, 0, 300);
     
