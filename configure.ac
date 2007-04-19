@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.291 2007/04/18 13:47:24 martinwguy Exp $
+dnl $Id: configure.ac,v 1.292 2007/04/19 14:39:13 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -76,6 +76,11 @@ AC_TRY_COMPILE([#include <stdio.h>], [
   size_t num = 0;
   printf("%lu", num); ],
   AC_DEFINE(SIZET_FMT, ["%lu"], [size_t printf modifier is lu])
+)
+AC_TRY_COMPILE([#include <stdio.h>], [
+  size_t num = 0;
+  printf("%ld", num); ],
+  AC_DEFINE(SIZET_FMT, ["%ld"], [size_t printf modifier is ld])
 )
 
 CFLAGS="$save_CFLAGS";
@@ -403,7 +408,6 @@ esac
 dnl AC_PATH_XTRA
 GNASH_PATH_X11
 
-AC_CHECK_HEADERS(dejagnu.h)
 AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)
@@ -567,6 +571,7 @@ AC_LANG_POP(C++)
 dnl AC_CHECK_LIB(c, mremap)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
+GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
 dnl if we're not building the extensions, then the _FLAGS and _LIBS settings
 dnl found in these tests are blank. This way they can be used in

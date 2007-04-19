@@ -1,3 +1,10 @@
+2007-04-19 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac: Some platforms apparently define SIZET_FMT as
+	signed long; add a test for it. Also, use gnashpkgtool.m4 to
+	look for dejagnu.h as it is not guaranteed to be in the default
+	compiler search path, especially on non-GNU platforms.
+
 2007-04-19 Martin Guy <martinwguy@yahoo.it>
 
 	* testsuite/actionscript.all/Date.as: Change case-[in]dependent
