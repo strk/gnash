@@ -1,3 +1,8 @@
+2007-04-19 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* testsuite/libamf.all/test_*.cpp: added dummy main() function
+	  for the case when HAVE_DEJAGNU_H is not set	
+
 2007-04-19 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* configure.ac: Some platforms apparently define SIZET_FMT as
@@ -55,7 +60,6 @@
 	  changed from void to bool return value
 	* backend/render_handler.h, backend/render_handler_agg.cpp: 
 	  implemented getAveragePixel()
-       
 	
 2007-04-18 Sandro Santilli <strk@keybit.net>
 

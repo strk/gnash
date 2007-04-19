@@ -468,4 +468,12 @@ usage (void)
     exit (-1);
 }
 
+#else
+
+int
+main(int /*argc*/, char /* *argv[]*/)
+{
+  // nop
+  return 0;  
+}
 #endif
