@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.46 2007/04/18 14:40:00 bjacques Exp $ */
+/* $Id: as_value.h,v 1.47 2007/04/19 10:27:09 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -286,7 +286,6 @@ public:
 	///	for object values. If NULL, toString() won't be run.
 	///
 	const std::string& to_string(as_environment* env=NULL) const;
-	//std::string to_std_string(as_environment* env=NULL) const;
 
 	std::string to_debug_string() const;
 
@@ -442,19 +441,25 @@ public:
           m_type = STRING;
           m_string_value = str;
         }
+
 	void	set_double(double val) {
           drop_refs();
           m_type = NUMBER;
           m_number_value = val;
         }
+
 	void	set_bool(bool val) {
           drop_refs();
           m_type = BOOLEAN;
           m_boolean_value = val;
         }
+
 	void	set_sprite(const std::string& path);
+
 	void	set_sprite(const sprite_instance& sp);
+
 	void	set_int(int val) { set_double(val); }
+
 	void	set_nan() { set_double(NAN); }
 
 	/// Make this value a NULL, OBJECT, MOVIECLIP or AS_FUNCTION value
@@ -479,6 +484,23 @@ public:
 	///
 	as_value& set_null() { drop_refs(); m_type = NULLTYPE; return *this; }
 
+	/// Equality operator, follows strict equality semantic
+	//
+	/// See strictly_equals
+	///
+	bool operator==(const as_value& v) const
+	{
+		return strictly_equals(v);
+	}
+
+	/// Inequality operator, follows strict inequality semantic
+	//
+	/// See strictly_equals
+	///
+	bool operator!=(const as_value& v) const {
+		return ! ( *this  == v );
+	}
+
 	void	operator=(const as_value& v);
 
 	bool	is_undefined() const { return (m_type == UNDEFINED); }
@@ -489,8 +511,6 @@ public:
 	//
 	/// Strict equality is defined as the two values being of the
 	/// same type and the same value.
-	///
-	/// TODO: check what makes two MOVIECLIP values strictly equal
 	///
 	bool strictly_equals(const as_value& v) const;
 
@@ -504,32 +524,16 @@ public:
 	///
 	bool equals(const as_value& v, as_environment* env=NULL) const;
 
-	/// @deprecated use equals() instead
-	bool	operator==(const as_value& v) const;
-
-	bool	operator!=(const as_value& v) const;
-
-	/// @deprecated, use v.set_double(v.to_number(env) / v.to_number(env)) instead !
-	//bool	operator<(const as_value& v) const { return to_number() < v.to_number(); }
-
-	/// @deprecated, use v.set_double(v.to_number(env) + v.to_number(env)) instead !
-	//void	operator+=(const as_value& v) { set_double(to_number() + v.to_number()); }
-
-	/// TODO: deprecate all these !
-//	void	operator-=(const as_value& v) { set_double(to_number() - v.to_number()); }
-//	void	operator*=(const as_value& v) { set_double(to_number() * v.to_number()); }
-//	void	operator/=(const as_value& v) { set_double(to_number() / v.to_number()); }  // @@ check for div/0
-//	void	operator&=(const as_value& v) { set_int(int(to_number()) & int(v.to_number())); }
-//	void	operator|=(const as_value& v) { set_int(int(to_number()) | int(v.to_number())); }
-//	void	operator^=(const as_value& v) { set_int(int(to_number()) ^ int(v.to_number())); }
-//	void	shl(const as_value& v) { set_int(int(to_number()) << int(v.to_number())); }
-//	void	asr(const as_value& v) { set_int(int(to_number()) >> int(v.to_number())); }
-//	void	lsr(const as_value& v) { set_int((uint32_t(to_number()) >> int(v.to_number()))); }
-
 	/// Sets this value to this string plus the given string.
 	void	string_concat(const std::string& str);
 
 private:
+
+	/// Compare values of the same type
+	//
+	/// NOTE: will abort if values are not of the same type!
+	///
+	bool equalsSameType(const as_value& v) const;
 
 	// TODO: make private. The rationale is that callers of this functions
 	//       should use is_WHAT() instead, or changes in the available

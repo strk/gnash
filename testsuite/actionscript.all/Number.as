@@ -26,9 +26,11 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.16 2007/03/22 13:19:04 strk Exp $";
+rcsid="$Id: Number.as,v 1.17 2007/04/19 10:27:10 strk Exp $";
 
 #include "check.as"
+
+#if 0 // REMOVEME STRK
 
 var n1=new Number(268);
 
@@ -300,3 +302,74 @@ check(anum.__proto__.hasOwnProperty('valueOf'));
 check(!anum.hasOwnProperty('toString'));
 #endif
 
+#endif // REMOVEME STRK
+
+//-----------------------------------------------------------
+// Check conversion to number
+//-----------------------------------------------------------
+
+asm { push 'val',4 tonumber setvariable };
+check_equals(val, 4);
+
+asm { push 'val',null tonumber setvariable };
+#if OUTPUT_VERSION < 7
+ check_equals(val, 0);
+ check(!isNaN(val));
+#else
+ check(isNaN(val));
+#endif
+
+asm { push 'val',undefined tonumber setvariable };
+#if OUTPUT_VERSION < 7
+ check_equals(val, 0);
+ check(!isNaN(val));
+#else
+ check(isNaN(val));
+#endif
+
+asm { push 'val','10' tonumber setvariable };
+check_equals(val, 10);
+
+asm { push 'val','3e2' tonumber setvariable };
+check_equals(val, 300);
+
+asm { push 'val','2E1' tonumber setvariable };
+check_equals(val, 20);
+
+asm { push 'val','2p' tonumber setvariable };
+check(isNaN(val));
+
+asm { push 'val','NaN' tonumber setvariable };
+check(isNaN(val));
+
+asm { push 'val','Infinity' tonumber setvariable };
+check(val != Infinity);
+check(isNaN(val));
+
+asm { push 'val','-Infinity' tonumber setvariable };
+check(val != Infinity);
+check(isNaN(val));
+
+obj = new Object();
+asm { push 'val','obj' getvariable tonumber setvariable };
+check(isNaN(val));
+
+obj = new Object(); obj.valueOf = function() { return 7; };
+asm { push 'val','obj' getvariable tonumber setvariable };
+check_equals(val, 7); 
+
+obj = function() {}; 
+asm { push 'val','obj' getvariable tonumber setvariable };
+#if OUTPUT_VERSION > 5
+check(isNaN(val));
+#else
+check(!isNaN(val));
+check_equals(typeof(val), 'number');
+check_equals(val, 0);
+check_equals(0, val);
+#endif
+
+obj = function() {}; obj.valueOf = function() { return 9; };
+asm { push 'val','obj' getvariable tonumber setvariable };
+check_equals(val, 9); 
+check_equals(9, val); 

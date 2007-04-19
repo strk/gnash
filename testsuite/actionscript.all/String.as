@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.17 2007/03/29 08:44:05 strk Exp $";
+rcsid="$Id: String.as,v 1.18 2007/04/19 10:27:10 strk Exp $";
 
 #include "check.as"
 
@@ -250,8 +250,18 @@ check_equals(typeof(c.toString), 'undefined');
 check_equals(b+c, "two[type Object]");
 
 stringObject = new String("1234");
+check_equals(typeof(stringObject.valueOf), 'function');
+check_equals(stringObject.valueOf, String.prototype.valueOf);
+
+#if OUTPUT_VERSION > 5
+check(stringObject.valueOf != Object.prototype.valueOf);
+check(String.prototype.hasOwnProperty('valueOf'));
+#endif
+
+check_equals(typeof(stringObject.valueOf()), 'string');
 check_equals(stringObject, "1234");
 check_equals(stringObject, 1234);
+check_equals(1234, stringObject);
 numberObject = new Number(1234);
 #if OUTPUT_VERSION >= 6
 check(stringObject != numberObject);

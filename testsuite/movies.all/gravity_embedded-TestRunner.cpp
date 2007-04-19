@@ -67,7 +67,7 @@ main(int /*argc*/, char** /*argv*/)
 	// we need a const_cast as get_member *might* eventually
 	// change the character (fetching _x shouldn't change it though)
 	check(const_cast<character*>(loaded)->get_member("_xscale", &tmp));
-	check_equals(tmp, as_value("50"));
+	check_equals(tmp, as_value(50));
 
 	check_equals(loaded->get_height(), 2056);
 	check_equals(loaded->get_width(), 2056);

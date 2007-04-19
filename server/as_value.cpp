@@ -169,7 +169,9 @@ as_value::to_string(as_environment* env) const
 					}
 					else
 					{
-						log_msg(_("call_method0(%s) did not return a string"), methodname.c_str());
+						log_msg(_("[object %p].%s() did not return a string: %s"),
+								(void*)obj, methodname.c_str(),
+								ret.to_debug_string().c_str());
 					}
 				}
 				else
@@ -294,6 +296,7 @@ as_value::to_number(as_environment* env) const
 			return m_number_value;
 
 		case OBJECT:
+		case AS_FUNCTION:
 		    {
 			// @@ Moock says the result here should be
 			// "the return value of the object's valueOf()
@@ -318,7 +321,17 @@ as_value::to_number(as_environment* env) const
 					}
 					else
 					{
-						log_msg(_("call_method0(%s) did not return a number"), methodname.c_str());
+						log_msg(_("[object %p].%s() did not return a number: %s"),
+								(void*)obj, methodname.c_str(),
+								ret.to_debug_string().c_str());
+						if ( m_type == AS_FUNCTION && swfversion < 6 )
+						{
+							return 0;
+						}
+						else
+						{
+							return NAN;
+						}
 					}
 				}
 				else
@@ -329,11 +342,13 @@ as_value::to_number(as_environment* env) const
 			return obj->get_numeric_value(); 
 		    }
 
+#if 0
 		case AS_FUNCTION:
 			// This used to be the same case as AS_OBJECT,
 			// but empirically "new String(_root.createTextField)"
 			// or any other function returns NAN.
 			return NAN;
+#endif
 
 		case MOVIECLIP:
 			// This is tested, no valueOf is going
@@ -614,99 +629,63 @@ as_value::set_as_function(as_function* func)
     }
 }
 
-// Return true if operands are equal.
-bool
-as_value::operator==(const as_value& v) const
-{
-    bool this_nulltype = (m_type == UNDEFINED || m_type == NULLTYPE);
-    bool v_nulltype = (v.get_type() == UNDEFINED || v.get_type() == NULLTYPE);
-    if (this_nulltype || v_nulltype)
-    {
-	return this_nulltype == v_nulltype;
-    }
-    else if (m_type == STRING)
-    {
-	return m_string_value == v.to_string();
-    }
-    else if (m_type == NUMBER)
-    {
-	return m_number_value == v.to_number();
-    }
-    else if (m_type == BOOLEAN)
-    {
-	return m_boolean_value == v.to_bool();
-
-    }
-    else if (is_object())
-    {
-    	if ( v.is_object() )
-	{
-		// compare by reference
-		return to_object() == v.to_object();
-	}
-	else
-	{
-		// convert this value to a primitive and recurse
-		as_value v2 = to_primitive();
-		if ( v2.is_object() ) return false;
-		else return v2 == v;
-		//return to_primitive() == v;
-	}
-    }
-    else
-    {
-	assert(0);
-    }
-}
-
 bool
 as_value::equals(const as_value& v, as_environment* env) const
 {
+    log_msg("equals(%s, %s) called", to_debug_string().c_str(), v.to_debug_string().c_str());
+
     bool this_nulltype = (m_type == UNDEFINED || m_type == NULLTYPE);
     bool v_nulltype = (v.get_type() == UNDEFINED || v.get_type() == NULLTYPE);
     if (this_nulltype || v_nulltype)
     {
 	return this_nulltype == v_nulltype;
     }
+
+    /// Compare to same type
+    if ( m_type == v.m_type ) return equalsSameType(v);
+
     else if (m_type == STRING)
     {
 	return m_string_value == v.to_string(env);
     }
-    else if (m_type == NUMBER)
+    else if (m_type == NUMBER && v.m_type == STRING)
     {
-	return m_number_value == v.to_number();
+	return equalsSameType(v.to_number(env)); // m_number_value == v.to_number(env);
+	//return m_number_value == v.to_number(env);
+    }
+    else if (v.m_type == NUMBER && m_type == STRING)
+    {
+	return v.equalsSameType(to_number(env)); // m_number_value == v.to_number(env);
+	//return v.m_number_value == to_number(env);
     }
     else if (m_type == BOOLEAN)
     {
 	return m_boolean_value == v.to_bool();
 
     }
+
     else if (is_object())
     {
-    	if ( v.is_object() )
-	{
-		// compare by reference
-		return to_object() == v.to_object();
-	}
-	else
-	{
-		// convert this value to a primitive and recurse
-		as_value v2 = to_primitive(); // TODO: should forward environment ?
-		if ( v2.is_object() ) return false;
-		else return v2.equals(v, env);
-	}
+    	assert ( ! v.is_object() );
+	// convert this value to a primitive and recurse
+	as_value v2 = to_primitive(); // TODO: should forward environment ?
+	if ( v2.is_object() ) return false;
+	else return v2.equals(v, env);
     }
+
+    else if (v.is_object())
+    {
+    	assert ( ! is_object() );
+	// convert this value to a primitive and recurse
+	as_value v2 = v.to_primitive(); // TODO: should forward environment ?
+	if ( v2.is_object() ) return false;
+	else return equals(v2, env);
+    }
+
     else
     {
 	assert(0);
     }
-}
-	
-// Return true if operands are not equal.
-bool
-as_value::operator!=(const as_value& v) const
-{
-    return ! (*this == v);
 }
 	
 // Sets *this to this string plus the given string.
@@ -765,14 +744,51 @@ as_value::typeOf() const
 	}
 }
 
+/*private*/
+bool
+as_value::equalsSameType(const as_value& v) const
+{
+	assert(m_type == v.m_type);
+	switch (m_type)
+	{
+		case UNDEFINED:
+		case NULLTYPE:
+			return true;
+
+		case OBJECT:
+		case AS_FUNCTION:
+			return m_object_value == v.m_object_value;
+
+		case BOOLEAN:
+			return m_boolean_value == v.m_boolean_value;
+
+		case STRING:
+		case MOVIECLIP:
+			return m_string_value == v.m_string_value;
+
+		case NUMBER:
+		{
+			double a = m_number_value;
+			double b = v.m_number_value;
+
+			// Nan != NaN
+			if ( isnan(a) || isnan(b) ) return false;
+
+			// -0.0 == 0.0
+			if ( (a == -0 && b == 0) || (a == 0 && b == -0) ) return true;
+
+			return a == b;
+		}
+
+	}
+	assert(0);
+}
+
 bool
 as_value::strictly_equals(const as_value& v) const
 {
 	if ( m_type != v.m_type ) return false;
-
-	// using operator== here might not the
-	// right thing, we should try to break it.
-	return *this == v;
+	return equalsSameType(v);
 }
 
 std::string

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.22 2007/03/15 22:39:54 strk Exp $";
+rcsid="$Id: Global.as,v 1.23 2007/04/19 10:27:09 strk Exp $";
 
 #include "check.as"
 
@@ -43,6 +43,10 @@ xcheck_equals(typeof(_global.toString), 'undefined');
 check_equals ( typeof(_global.parseInt), 'undefined' );
 #endif
 
+check_equals(typeof(isNaN), 'function');
+#if OUTPUT_VERSION > 5
+xcheck(!_global.hasOwnProperty('isNaN'));
+#endif
 
 // Test parseInt
 check ( parseInt('45b') == 45 );

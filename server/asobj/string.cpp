@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.29 2007/04/18 14:07:32 jgilmore Exp $ */
+/* $Id: string.cpp,v 1.30 2007/04/19 10:27:09 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -85,6 +85,7 @@ attachStringInterface(as_object& o)
     o.init_member("charCodeAt", new builtin_function(string_char_code_at));
     o.init_member("toUpperCase", new builtin_function(string_to_upper_case));
     o.init_member("toLowerCase", new builtin_function(string_to_lower_case));
+    o.init_member("valueOf", new builtin_function(as_object::tostring_method));
 
     boost::intrusive_ptr<builtin_function> length_getter(new builtin_function(string_get_length));
     o.init_readonly_property("length", *length_getter);

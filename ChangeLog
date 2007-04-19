@@ -1,3 +1,22 @@
+2007-04-19 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/string.cpp: add valueOf own property to String
+	  prototype.
+	* server/as_value.{h,cpp}: add equalsSameType() function;
+	  fix bugs in to_number for function values (version-sensitive it
+	  seems); modify equality and inequality operators to follow
+	  strict equality semantic.
+	* testsuite/movies.all/gravity_embed-TestRunner.cpp: be aware when
+	  comparing as_value types, comparisons are strict now!
+	* testsuite/swfdec/PASSING: divide-7.swf and object-math-7.swf now
+	  succeed.
+	* testsuite/actionscript.all/Global.as: small test for isNaN
+	  availability
+	* testsuite/actionscript.all/Number.as: tests for
+	  convertion-to-number.
+	* testsuite/actionscript.all/String.as: test valueOf being a property
+	  of String.prototype.
+
 2007-04-19 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/duplicate_movie_clip_test.c
