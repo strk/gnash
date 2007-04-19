@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.99 2007/04/18 13:24:44 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.100 2007/04/19 17:41:36 udog Exp $ */
 
 // Stateful live Sprite instance
 
@@ -125,9 +125,6 @@ public:
 	/// specified at contruction time
 	///
 	virtual sprite_instance* get_root_movie();
-
-	// override from as_object
-	virtual const char* get_text_value() const;
 
 	/// \brief
 	/// Return the sprite_definition (or movie_definition)
@@ -664,18 +661,6 @@ public:
 	/// Get the current m_sound_stream_id
 	virtual int get_sound_stream_id() { return m_sound_stream_id;}
 
-	/// Return full path to this object, in slash notation
-	//
-	/// e.g. "/sprite1/sprite2/ourSprite"
-	///
-	const std::string& getTargetPath() const;
-
-	/// Return full path to this object, in dot notation
-	//
-	/// e.g. "_level0.sprite1.sprite2.ourSprite"
-	///
-	const std::string& getTarget() const;
-
 	/// Override for character::set_name to proprely update
 	/// _target and _target_dot.
 	virtual void set_name(const char* name);
@@ -880,19 +865,6 @@ private:
 	/// soundid for current playing stream. If no stream set to -1
 	int m_sound_stream_id;
 
-	/// The full path to this object, in slash notation
-	//
-	/// It is computed on-demand by the getTargetPath()
-	/// method. Can not compute it at construction time
-	/// becase the set_name() method can be used to
-	/// change an instance name (should we forbid that, btw?)
-	mutable std::string _target;
-
-	/// The full path to this object, in dot notation
-	mutable std::string _target_dot;
-
-	/// Build the _target member recursive on parent
-	std::string computeTargetPath() const;
 
 	/// The DisplayList resulting by execution of tags in first frame.
 	//

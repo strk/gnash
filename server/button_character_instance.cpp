@@ -216,6 +216,10 @@ attachButtonInterface(as_object& o)
 
 	gettersetter = new builtin_function(&character::parent_getset, NULL);
 	o.init_property("_parent", *gettersetter, *gettersetter);
+	
+	gettersetter = new builtin_function(&character::target_getset, NULL);
+	o.init_property("_target", *gettersetter, *gettersetter);
+	
 
 #if 0
 	gettersetter = new builtin_function(&character::onrollover_getset, NULL);

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.69 2007/04/18 13:57:25 udog Exp $ */
+/* $Id: character.h,v 1.70 2007/04/19 17:41:35 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -88,6 +88,8 @@ private:
 	/// Set to yes when this instance has been unloaded
 	bool _unloaded;
 
+	/// Build the _target member recursive on parent
+	std::string computeTargetPath() const;
 
 protected:
 
@@ -227,6 +229,9 @@ public:  // TODO: make protected
 
 	/// Getter-setter for _parent 
 	static as_value parent_getset(const fn_call& fn);
+
+	/// Getter-setter for _target 
+	static as_value target_getset(const fn_call& fn);
 
 	/// @} Common ActionScript getter-setters for characters
 
@@ -829,6 +834,24 @@ public:
 	virtual void unload();
 
 	bool isUnloaded() { return _unloaded; }
+	
+public:
+
+	/// Return full path to this object, in slash notation
+	//
+	/// e.g. "/sprite1/sprite2/ourSprite"
+	///
+	const std::string getTargetPath() const;
+
+	/// Return full path to this object, in dot notation
+	//
+	/// e.g. "_level0.sprite1.sprite2.ourSprite"
+	///
+	const std::string getTarget() const;
+	
+  // override from as_object
+	virtual const char* get_text_value() const;	
+	
 };
 
 

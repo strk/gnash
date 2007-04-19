@@ -1,3 +1,12 @@
+2007-04-19 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/character.{h,cpp}, server/sprite_instance.{h,cpp}: 
+	  moved getTarget(), getTargetPath(),
+	  get_text_value() to character class so that button instances
+	  can deal with "targets" too.
+	* server/character.{h,cpp}: implemented "_target" getter-setter	  
+	* server/button_character_instance.cpp: added _target getter-setter 
+	
 2007-04-19 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Number.as:

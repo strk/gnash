@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.36 2007/04/18 09:35:42 jgilmore Exp $ */
+/* $Id: character.cpp,v 1.37 2007/04/19 17:41:35 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -580,8 +580,15 @@ character::parent_getset(const fn_call& fn)
 	{
 		rv = as_value(p);
 	}
-
 	return rv;
+}
+
+as_value
+character::target_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<character> ptr = ensureType<character>(fn.this_ptr);
+
+	return as_value(ptr->getTargetPath());
 }
 
 void
@@ -731,6 +738,96 @@ character::set_y_scale(float y_scale)
 	set_matrix(m);
 	transformedByScript(); // m_accept_anim_moves = false; 
 }
+
+
+/*private*/
+std::string
+character::computeTargetPath() const
+{
+
+	// TODO: check what happens when this character
+	//       is a movie_instance loaded into another
+	//       running movie.
+	
+	typedef std::vector<std::string> Path;
+	Path path;
+
+	// Build parents stack
+	const character* ch = this;
+	for (;;)
+	{
+		const character* parent = ch->get_parent();
+
+		// Don't push the _root name on the stack
+		if ( ! parent )
+		{
+			// it is completely legal to set root's _name
+			//assert(ch->get_name().empty());
+			break;
+		}
+
+		path.push_back(ch->get_name());
+		ch = parent;
+	} 
+
+	if ( path.empty() ) return "/";
+
+	// Build the target string from the parents stack
+	std::string target;
+	for ( Path::reverse_iterator
+			it=path.rbegin(), itEnd=path.rend();
+			it != itEnd;
+			++it )
+	{
+		target += "/" + *it; 
+	}
+
+	return target;
+}
+
+/*public*/
+const std::string
+character::getTargetPath() const
+{
+
+  // TODO: maybe cache computed target?
+
+	return computeTargetPath();
+}
+
+
+/*public*/
+const std::string
+character::getTarget() const
+{
+
+  // TODO: maybe cache computed target?
+
+	std::string target_dot;
+
+	std::string levelString = "_level0"; // TODO: support real levels!
+
+	const std::string& targetPath = getTargetPath();
+	if ( targetPath == "/" ) target_dot = levelString;
+	else
+	{
+		target_dot = levelString + targetPath;
+		for (std::string::size_type i=0; i<target_dot.length(); ++i)
+		{
+			if ( target_dot[i] == '/' ) target_dot[i] = '.';
+		}
+	}
+
+	return target_dot;
+}
+
+/*public*/
+const char*
+character::get_text_value() const
+{
+	return getTarget().c_str();
+}
+
 
 } // namespace gnash
 

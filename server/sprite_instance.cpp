@@ -1533,7 +1533,6 @@ sprite_instance::sprite_instance(
 	m_has_mouse_event(false),
 	_text_variables(),
 	m_sound_stream_id(-1),
-	_target(), // don't initialize now, as parent can be assigned later
 	m_def(def),
 	m_on_event_load_called(false)
 {
@@ -3001,6 +3000,9 @@ void sprite_instance::restart()
 
     // Construct the sprite again
     construct();
+    
+    // re-assign standard properties
+    attachMovieClipProperties(*this);
 
 }
 
@@ -3142,93 +3144,6 @@ sprite_instance::call_method_args(const char* method_name,
 		method_name, method_arg_fmt, args);
 }
 
-const std::string&
-sprite_instance::getTargetPath() const
-{
-	if ( _target.empty() ) _target = computeTargetPath();
-	else
-	{
-		// What if set_name() is called *after*
-		// we computed the _target string ?
-		// let's check this... the design doesn't
-		// take the problem into account..
-		assert (_target == computeTargetPath() );
-	}
-
-	return _target;
-}
-
-const std::string&
-sprite_instance::getTarget() const
-{
-	if ( ! _target_dot.empty() ) return _target_dot;
-
-	std::string levelString = "_level0"; // TODO: support real levels!
-
-	const std::string& targetPath = getTargetPath();
-	if ( targetPath == "/" ) _target_dot = levelString;
-	else
-	{
-		_target_dot = levelString + targetPath;
-		for (std::string::size_type i=0; i<_target_dot.length(); ++i)
-		{
-			if ( _target_dot[i] == '/' ) _target_dot[i] = '.';
-		}
-	}
-
-	return _target_dot;
-}
-
-/*private*/
-std::string
-sprite_instance::computeTargetPath() const
-{
-
-	// TODO: check what happens when this character
-	//       is a movie_instance loaded into another
-	//       running movie.
-
-	typedef std::vector<std::string> Path;
-	Path path;
-
-	// Build parents stack
-	const character* ch = this;
-	for (;;)
-	{
-		const character* parent = ch->get_parent();
-
-		// Don't push the _root name on the stack
-		if ( ! parent )
-		{
-			// it is completely legal to set root's _name
-			//assert(ch->get_name().empty());
-			break;
-		}
-
-		path.push_back(ch->get_name());
-		ch = parent;
-	} 
-
-	if ( path.empty() ) return "/";
-
-	// Build the target string from the parents stack
-	std::string target;
-	for ( Path::reverse_iterator
-			it=path.rbegin(), itEnd=path.rend();
-			it != itEnd;
-			++it )
-	{
-		target += "/" + *it; 
-	}
-
-	return target;
-}
-
-const char*
-sprite_instance::get_text_value() const
-{
-	return getTarget().c_str();
-}
 
 // WARNING: THIS SNIPPET NEEDS THE CHARACTER TO BE "INSTANTIATED", which is
 //          it's target path needs to exist, or any as_value for it will be
@@ -3301,10 +3216,6 @@ sprite_instance::set_name(const char* name)
 {
 	_name = name;
 
-	// Reset these so they get computed next
-	// time someone request them.
-	_target.clear();
-	_target_dot.clear();
 }
 
 bool
