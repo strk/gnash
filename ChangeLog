@@ -1,3 +1,9 @@
+2007-04-19 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Number.as:
+	  Re-enabled a big block of tests accidentally left
+	  cut out. Expect less failures also ! :)
+
 2007-04-19 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/misc-ming.all/matrix_test.c: use Math.round() to

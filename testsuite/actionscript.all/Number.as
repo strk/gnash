@@ -26,11 +26,9 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.17 2007/04/19 10:27:10 strk Exp $";
+rcsid="$Id: Number.as,v 1.18 2007/04/19 16:57:15 strk Exp $";
 
 #include "check.as"
-
-#if 0 // REMOVEME STRK
 
 var n1=new Number(268);
 
@@ -170,8 +168,8 @@ check(isNaN(this));
 this.valueOf = function() { return 5; };
 check(isNaN(this));
 o = new Object;
-xcheck(isNaN(o));
-xcheck(isNaN(0+o));
+check(isNaN(o));
+check(isNaN(0+o));
 o.valueOf = function() { return 3; };
 check_equals(0+o, 3);
 check_equals(0+"string", "0string");
@@ -179,7 +177,7 @@ check_equals(0+"string", "0string");
 #if OUTPUT_VERSION < 6
 check(!isNaN(2+Number));
 #else
-xcheck(isNaN(2+Number));
+check(isNaN(2+Number));
 #endif
 
 #if OUTPUT_VERSION >= 7
@@ -263,7 +261,7 @@ note(2/null);
 check_equals(typeof(Number.prototype.valueOf), 'function'); 
 check_equals(typeof(Number.prototype.toString), 'function'); 
 #if OUTPUT_VERSION > 5
-xcheck(isNaN(Number.valueOf()));
+check(isNaN(Number.valueOf()));
 check_equals(typeof(Number.toString), 'function');
 check_equals(typeof(Number.valueOf), 'function');
 check(!Number.hasOwnProperty('valueOf'));
@@ -301,8 +299,6 @@ check(!anum.hasOwnProperty('valueOf'));
 check(anum.__proto__.hasOwnProperty('valueOf'));
 check(!anum.hasOwnProperty('toString'));
 #endif
-
-#endif // REMOVEME STRK
 
 //-----------------------------------------------------------
 // Check conversion to number
