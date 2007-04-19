@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.61 2007/04/19 20:16:14 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.62 2007/04/19 20:50:36 strk Exp $";
 
 #include "check.as"
 
@@ -312,6 +312,7 @@ check_equals(typeof(softref), 'movieclip');
 softref.member = 1;
 check_equals(typeof(softref.member), 'number');
 check_equals(softref.member, 1);
+check_equals(softref._target, "/hardref");
 #if OUTPUT_VERSION > 6
 removeMovieClip(hardref); // using ActionRemoveClip (0x25)
 #else
@@ -322,6 +323,7 @@ hardref.removeMovieClip(); // using the sprite's removeMovieClip
 check_equals(typeof(hardref), 'undefined');
 check_equals(typeof(softref), 'movieclip');
 check_equals(typeof(softref.member), 'undefined');
+check_equals(typeof(softref._target), 'undefined');
 _root.createEmptyMovieClip("hardref", 61);
 hardref.member = 2;
 check_equals(typeof(softref.member), 'number');
