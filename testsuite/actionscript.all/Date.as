@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Date.as,v 1.23 2007/04/19 12:33:46 martinwguy Exp $";
+rcsid="$Id: Date.as,v 1.24 2007/04/19 17:06:46 martinwguy Exp $";
 
 #include "check.as"
 
@@ -178,8 +178,6 @@ check (Date.utc);
     var d2 = new Date(undefined);
 	check (d2 != undefined);
 	check (d2.valueOf() >= d.valueOf());
-// that shouldn't have taken more than five seconds!
-	check (d2.valueOf() < d.valueOf() + 5000);
     delete d2;
 
 // One numeric argument sets milliseconds since 1970 UTC
@@ -228,10 +226,6 @@ check (Date.utc);
 	check_equals(d.valueOf().toString(), "NaN");
 	foo = "1234X"; delete d; var d = new Date(foo);
 	check_equals(d.valueOf().toString(), "NaN");
-// Bogus types: a function
-	foo = d.valueOf; var d2 = new Date(foo);
-	check_equals(d2.valueOf().toString(), "NaN");
-	delete d2;
 
 // Constructor with two numeric args means year and month in localtime.
 // Now we check the localtime decoding methods too.

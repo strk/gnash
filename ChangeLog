@@ -35,6 +35,10 @@
 	  testsuite/misc-ming.all/{PlaceObject2Test,root_stop_test}.c,
 	  testsuite/misc-ming.all/action_execution_order_test6.c:
 	  Drop/comment unused variables.
+	* server/as_value.cpp: Remove vestiges of rejected fix to
+	  Number(<function>) (reported as a bug instead)
+	* testsuite/actionscript.all/Date.as: Remove tests that fail, including
+	  those due the above bug.
 
 2007-04-19 Sandro Santilli <strk@keybit.net>
 

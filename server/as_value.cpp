@@ -342,14 +342,6 @@ as_value::to_number(as_environment* env) const
 			return obj->get_numeric_value(); 
 		    }
 
-#if 0
-		case AS_FUNCTION:
-			// This used to be the same case as AS_OBJECT,
-			// but empirically "new String(_root.createTextField)"
-			// or any other function returns NAN.
-			return NAN;
-#endif
-
 		case MOVIECLIP:
 			// This is tested, no valueOf is going
 			// to be invoked for movieclips.
