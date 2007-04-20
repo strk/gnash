@@ -89,6 +89,9 @@ namespace gnash {
 
 		/// Debug print.
 		std::string toString() const;
+
+		// neater string output (example: "0,0,0,255")
+		std::string toShortString() const;
 	};
 
 	std::ostream& operator<< (std::ostream& os, const rgba& r);

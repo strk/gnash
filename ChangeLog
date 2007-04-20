@@ -1,5 +1,6 @@
 2007-04-20 Sandro Santilli <strk@keybit.net>
 
+	* server/types.{cpp,h}: add toShortString, for neater output.
 	* libgeometry/snappingrange.h: add output operator.
 	* server/debugger.cpp, server/parser/action_buffer.cpp,
 	  server/vm/ActionExec.cpp: don't force creation of the

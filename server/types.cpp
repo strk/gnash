@@ -83,6 +83,17 @@ namespace gnash {
 		ss << *this;
 		return ss.str();
 	}
+
+	std::string rgba::toShortString() const
+	// For debugging.
+	{
+		std::stringstream ss;
+		ss << (unsigned)m_r << ","
+			<< (unsigned)m_g << ","
+			<< (unsigned)m_b << ","
+			<< (unsigned)m_a;
+		return ss.str();
+	}
 	
 	void	rgba::set_lerp(const rgba& a, const rgba& b, float f)
 	{
