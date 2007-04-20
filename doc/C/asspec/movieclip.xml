@@ -422,6 +422,22 @@
 	  <term>_name</term>
 	  <listitem>
 	    <para>
+		This is a read-write property of MovieClip objects.
+		Changing the _name property of a MovieClip also changes it's _target
+		and the _target of any child.
+	    </para>
+	    <para>
+		Dynamically-created clips are always created with a name, while for statically
+		defined one this is optional in the SWF, but will be syntetized by the player
+		if missing. TODO: check if _name reflects the syntetized naming (_instancex).
+		For the root movie syntetization doesn't happen and the _name property
+		is the empty string for SWF6 and higher or null for SWF5 and lower.
+	    </para>
+	    <para>
+		Valid values for _name are: ....
+	    </para>
+	    <para>
+		NOTE: mm player7 and player9 differ on typeof(_root._name) on startup.
 	    </para>
 	  </listitem>
 	</varlistentry>

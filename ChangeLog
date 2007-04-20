@@ -1,5 +1,8 @@
 2007-04-20 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/asspec/movieclip.xml:
+	  Dumped a bit of info about _name. Hopefully Ann will give it some
+	  formatting.
 	* testsuite/misc-ming.all/: Makefile.am, ButtonEventsTest-Runner.cpp:
 	  Allow execution of the test runner from a foreign dir.
 
