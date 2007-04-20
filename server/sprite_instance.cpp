@@ -2453,6 +2453,17 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	// Construct the DisplayList of the target frame
 	//
 	
+  // TODO:
+  // <UdoG> current design is sub-optimal because it causes unnecessary 
+  // redraw. Consider a static graphic that stays at it's position all
+  // the time. When looping betwen two frames 
+  //  gotoAndPlay(_currentframe-1);
+  // then resetDisplayList() will remove that character and 
+  // execute_frame_tags() will insert it again. So the next 
+  // set_invalidated() call (which currently *is* correct) will cause
+  // redraw of the whole sprite even if it doesn't change visually
+  // at all.
+	
 	set_invalidated();
 
 	if (target_frame_number < m_current_frame)
