@@ -30,18 +30,18 @@
 #include <string> 
 #include <boost/shared_ptr.hpp>
 
-#define check_pixel(radius, color, tolerance) \
+#define check_pixel(x, y, radius, color, tolerance) \
 	{\
 		std::stringstream ss; \
 		ss << "[" << __FILE__ << ":" << __LINE__ << "]"; \
-		tester.checkPixel(radius, color, tolerance, ss.str(), false); \
+		tester.checkPixel(x, y, radius, color, tolerance, ss.str(), false); \
 	}
 
-#define xcheck_pixel(radius, color, tolerance) \
+#define xcheck_pixel(x, y, radius, color, tolerance) \
 	{\
 		std::stringstream ss; \
 		ss << "[" << __FILE__ << ":" << __LINE__ << "]"; \
-		tester.checkPixel(radius, color, tolerance, ss.str(), true); \
+		tester.checkPixel(x, y, radius, color, tolerance, ss.str(), true); \
 	}
 
 // Forward declarations
@@ -143,6 +143,14 @@ public:
 	///
 	/// This method will test any built renderer.
 	///
+	/// @param x
+	///	The x coordinate of the point being the center
+	///	of the circle you want to compute the average color of.
+	///
+	/// @param y
+	///	The y coordinate of the point being the center
+	///	of the circle you want to compute the average color of.
+	///
 	/// @param radius
 	///	Radius defining the average zone used.
 	///	1 means a single pixel.
@@ -160,7 +168,8 @@ public:
 	/// @param expectFailure
 	///	Set to true if a failure is expected. Defaults to false.
 	///
-	void checkPixel(unsigned radius, const rgba& color, short unsigned tolerance, const std::string& label, bool expectFailure=false) const;
+	void checkPixel(int x, int y, unsigned radius, const rgba& color,
+			short unsigned tolerance, const std::string& label, bool expectFailure=false) const;
 
 	/// Notify mouse button was pressed
 	void pressMouseButton();
@@ -169,11 +178,7 @@ public:
 	void depressMouseButton();
 
 	/// Simulate a mouse click (press and depress mouse button)
-	void click()
-	{
-		pressMouseButton();
-		depressMouseButton();
-	}
+	void click();
 
 	/// Notify key press
 	//

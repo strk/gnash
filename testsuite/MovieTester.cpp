@@ -136,7 +136,7 @@ MovieTester::render()
 	_movie_root->add_invalidated_bounds(_invalidatedBounds, false);
 
 #ifdef SHOW_INVALIDATED_BOUNDS_ON_ADVANCE
-	cout << "frame " << _movie->get_current_frame() << ") Invalidated bounds " << _invalidatedBounds;
+	cout << "frame " << _movie->get_current_frame() << ") Invalidated bounds " << _invalidatedBounds << endl;
 #endif
 
 	// Force full redraw by using a WORLD invalidated ranges
@@ -201,11 +201,11 @@ MovieTester::movePointerTo(int x, int y)
 {
 	_x = x;
 	_y = y;
-	_movie_root->notify_mouse_moved(x, y);
+	if ( _movie_root->notify_mouse_moved(x, y) ) render();
 }
 
 void
-MovieTester::checkPixel(unsigned radius, const rgba& color,
+MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 		short unsigned tolerance, const std::string& label, bool expectFailure) const
 {
 	FuzzyPixel exp(color, tolerance);
@@ -221,12 +221,12 @@ MovieTester::checkPixel(unsigned radius, const rgba& color,
 
 		std::stringstream ss;
 		ss << rend.getName() <<" ";
-		ss << "pix:" << _x << "," << _y <<" ";
+		ss << "pix:" << x << "," << y <<" ";
 
 		rgba obt_col;
 
-	        if ( ! rend.getRenderer().getAveragePixel(obt_col, _x, _y, radius) )
-	        //if ( ! rend.getRenderer().getPixel(obt_col, _x, _y) )
+	        if ( ! rend.getRenderer().getAveragePixel(obt_col, x, y, radius) )
+	        //if ( ! rend.getRenderer().getPixel(obt_col, x, y) )
 		{
 			ss << " is out of rendering buffer";
 			log_msg("%sFAILED: %s (%s)", X,
@@ -260,25 +260,47 @@ MovieTester::checkPixel(unsigned radius, const rgba& color,
 void
 MovieTester::pressMouseButton()
 {
-	_movie_root->notify_mouse_clicked(true, 1);
+	if ( _movie_root->notify_mouse_clicked(true, 1) )
+	{
+		render();
+	}
 }
 
 void
 MovieTester::depressMouseButton()
 {
-	_movie_root->notify_mouse_clicked(false, 1);
+	if ( _movie_root->notify_mouse_clicked(false, 1) )
+	{
+		render();
+	}
+}
+
+void
+MovieTester::click()
+{
+	int wantRedraw = 0;
+	if ( _movie_root->notify_mouse_clicked(true, 1) ) ++wantRedraw;
+	if ( _movie_root->notify_mouse_clicked(false, 1) ) ++wantRedraw;
+
+	if ( wantRedraw ) render();
 }
 
 void
 MovieTester::pressKey(key::code code)
 {
-	_movie_root->notify_key_event(code, true);
+	if ( _movie_root->notify_key_event(code, true) )
+	{
+		render();
+	}
 }
 
 void
 MovieTester::releaseKey(key::code code)
 {
-	_movie_root->notify_key_event(code, false);
+	if ( _movie_root->notify_key_event(code, false) )
+	{
+		render();
+	}
 }
 
 bool
