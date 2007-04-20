@@ -1,19 +1,20 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR Free Software Foundation, Inc.
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# French translation of GNU Gnash.
+# Copyright (C) 2007 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gnash package.
 #
-#, fuzzy
+# Robert-André Mauchin <zebob.m@gmail.com>, 2007.
+#
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: gnash cvs20070419\n"
 "Report-Msgid-Bugs-To: bug-gnash@gnu.org\n"
 "POT-Creation-Date: 2007-04-20 00:11-0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2007-04-19 11:00+0200\n"
+"Last-Translator: Robert-André Mauchin <zebob.m@gmail.com>\n"
+"Language-Team: GNOME French Team <gnomefr@traduc.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: backend/sound_handler_sdl.cpp:76
@@ -3318,8 +3319,9 @@ msgid "  depth = %d (%d)"
 msgstr ""
 
 #: server/swf/PlaceObject2Tag.cpp:58 server/swf/PlaceObject2Tag.cpp:272
+#, fuzzy
 msgid "  cxform:"
-msgstr ""
+msgstr "cxform :\n"
 
 #: server/swf/PlaceObject2Tag.cpp:80
 #, c-format
@@ -4341,107 +4343,112 @@ msgstr ""
 msgid ""
 "Sorry, we can only list the files on systems with disk based shared memory"
 msgstr ""
+"Désolé, nous pouvons uniquement lister les fichiers sur les systèmes "
+"possédant de la mémoire partagée basée sur le disque"
 
 #: utilities/dumpshm.cpp:215
 msgid "No name specified, nuking everything..."
-msgstr ""
+msgstr "Aucun nom indiqué, destruction de l'ensemble..."
 
 #: utilities/dumpshm.cpp:222
 msgid "Removing segment: "
-msgstr ""
+msgstr "Supression du segment :"
 
 #: utilities/dumpshm.cpp:230
 msgid "Nuking the shared memory segment "
-msgstr ""
+msgstr "Destruction du segment de mémoire partagée"
 
 #: utilities/dumpshm.cpp:256
 msgid "ERROR: couldn't read!"
-msgstr ""
+msgstr "Erreur : lecture impossible !"
 
 #: utilities/dumpshm.cpp:287
 msgid "This program dumps the internal data of a shared memory segment"
 msgstr ""
+"Ce programme vide les données internes d'un segment de mémoire partagée"
 
 #: utilities/dumpshm.cpp:289
 msgid "Usage: dumpmem [hdsanlif] filename"
-msgstr ""
+msgstr "utilisation : dumpmem [hdsanlif] nom_de_fichier"
 
 #: utilities/dumpshm.cpp:290
 msgid "-h\tHelp"
-msgstr ""
+msgstr "-h\tAide"
 
 #: utilities/dumpshm.cpp:291
 msgid "-d\tDump data"
-msgstr ""
+msgstr "-d\tVidage des données"
 
 #: utilities/dumpshm.cpp:292
 msgid "-n [optional name]\tNuke everything"
-msgstr ""
+msgstr "-n [optional name]\tDestruction de l'ensemble"
 
 #: utilities/dumpshm.cpp:293
 msgid "-l\tLength of segment"
-msgstr ""
+msgstr "-l\tLongueur du segment"
 
 #: utilities/dumpshm.cpp:294
 msgid "-i\tList segments"
-msgstr ""
+msgstr "-i\tLister les segments"
 
 #: utilities/dumpshm.cpp:295
 msgid "-f\tForce to use builtin names for nuke"
-msgstr ""
+msgstr "-f\tForcer l'usage des noms incorporés pour la destruction"
 
 #: utilities/dumpshm.cpp:307
 msgid "\tBase address of this segment: "
-msgstr ""
+msgstr "\tAdresse de base de ce segment : "
 
 #: utilities/dumpshm.cpp:309
 msgid "\tFilespec: "
-msgstr ""
+msgstr "\tSpec du fichier : "
 
 #: utilities/dumpshm.cpp:310
 msgid "\t# Bytes allocated: "
-msgstr ""
+msgstr "\t# Octets alloués : "
 
 #: utilities/dumpshm.cpp:311
 msgid "\tTotal # of bytes: "
-msgstr ""
+msgstr "\t# d'octets totaux : "
 
 #: utilities/parser.cpp:138
 #, c-format
 msgid "has_scale = %d, has_rotate = %d\n"
-msgstr ""
+msgstr "has_scale = %d, has_rotate = %d\n"
 
 #: utilities/parser.cpp:163
 #, c-format
 msgid "x_min: %i, x_max: %i,\twidth: %i twips, %4.0f pixels\n"
-msgstr ""
+msgstr "x_min : %i, x_max : %i,\tlargeur : %i twips, %4.0f pixels\n"
 
 #: utilities/parser.cpp:164
 #, c-format
 msgid "y_min: %i, y_max: %i, height: %i twips, %4.0f pixels\n"
-msgstr ""
+msgstr "y_min : %i, y_max : %i, hauteur : %i twips, %4.0f pixels\n"
 
 #: utilities/parser.cpp:185
 #, c-format
 msgid "rgb: %d %d %d \n"
-msgstr ""
+msgstr "rvb : %d %d %d \n"
 
 #: utilities/parser.cpp:206
 #, c-format
 msgid "rgba: %d %d %d %d\n"
-msgstr ""
+msgstr "rvba : %d %d %d %d\n"
 
 #: utilities/parser.cpp:279
 msgid "cxform:\n"
-msgstr ""
+msgstr "cxform :\n"
 
 #: utilities/parser.cpp:280
 #, c-format
 msgid "has_add = %d, has_mult = %d\n"
-msgstr ""
+msgstr "has_add = %d, has_mult = %d\n"
 
 #: utilities/parser.cpp:298
 msgid ""
 "Movie ended\n"
 "\n"
 msgstr ""
+"Film terminé\n"
+"\n"
