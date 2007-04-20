@@ -1,3 +1,8 @@
+2007-04-20 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler.h (getAveragePixel):
+	  fix computation of max x/y values.
+
 2007-04-20 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/FuzzyPixel.h: const-correctness

@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.36 2007/04/20 11:25:58 strk Exp $ */
+/* $Id: render_handler.h,v 1.37 2007/04/20 14:35:44 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -528,8 +528,8 @@ public:
     x -= radius/2;
     y -= radius/2;
     
-    int xe = x+radius-1;
-    int ye = y+radius-1;
+    int xe = x+radius;
+    int ye = y+radius;
 
     rgba pixel;
     
