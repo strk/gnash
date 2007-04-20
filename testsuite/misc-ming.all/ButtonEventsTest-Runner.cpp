@@ -34,8 +34,13 @@ using namespace gnash;
 using namespace std;
 
 void
-test_mouse_activity(MovieTester& tester, const character* text, const character* text2)
+test_mouse_activity(MovieTester& tester, const character* text, const character* text2, bool covered)
 {
+	rgba red(255,0,0,255);
+	rgba covered_red(127,126,0,255); // red, covered by 50% black
+	rgba yellow(255,255,0,255);
+	rgba green(0,255,0,255);
+
 	// roll over the middle of the square, this should change
 	// the textfield value.
 	tester.movePointerTo(60, 60);
@@ -43,7 +48,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	check_equals(string(text2->get_text_value()), string("RollOver"));
 	check(tester.isMouseOverMouseEntity());
 	// check that pixel @ 60,60 is yellow !
-	xcheck_pixel(2, rgba(255,255,0,255), 2);
+	xcheck_pixel(2, yellow, 2);
 
 	// press the mouse button, this should change
 	// the textfield value.
@@ -52,7 +57,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	check_equals(string(text2->get_text_value()), string("Press"));
 	check(tester.isMouseOverMouseEntity());
 	// check that pixel @ 60,60 is green !
-	xcheck_pixel(2, rgba(0,255,0,255), 2);
+	xcheck_pixel(2, green, 2);
 
 	// depress the mouse button, this should change
 	// the textfield value.
@@ -61,7 +66,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	check_equals(string(text2->get_text_value()), string("Release"));
 	check(tester.isMouseOverMouseEntity());
 	// check that pixel @ 60,60 is yellow !
-	xcheck_pixel(2, rgba(255,255,0,255), 2);
+	xcheck_pixel(2, yellow, 2);
 
 	// roll off the square, this should change
 	// the textfield value.
@@ -71,7 +76,11 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	check(!tester.isMouseOverMouseEntity());
 	// check that pixel @ 60,60 is red !
 	tester.movePointerTo(60, 60);
-	xcheck_pixel(2, rgba(255,0,0,255), 2);
+	if ( covered ) {
+		check_pixel(2, covered_red, 2);
+	} else {
+		check_pixel(2, red, 2);
+	}
 	tester.movePointerTo(39, 60); // get back
 
 	// press the mouse button, this should not change anything
@@ -82,7 +91,11 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	check(!tester.isMouseOverMouseEntity());
 	// check that pixel @ 60,60 is red !
 	tester.movePointerTo(60, 60);
-	xcheck_pixel(2, rgba(255,0,0,255), 2);
+	if ( covered ) {
+		check_pixel(2, covered_red, 2);
+	} else {
+		check_pixel(2, red, 2);
+	}
 	tester.movePointerTo(39, 60); // get back
 
 	// depress the mouse button, this should not change anything
@@ -93,7 +106,11 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	check(!tester.isMouseOverMouseEntity());
 	// check that pixel @ 60,60 is red !
 	tester.movePointerTo(60, 60);
-	xcheck_pixel(2, rgba(255,0,0,255), 2);
+	if ( covered ) {
+		check_pixel(2, covered_red, 2);
+	} else {
+		check_pixel(2, red, 2);
+	}
 
 	// Now press the mouse inside and release outside
 	tester.movePointerTo(60, 60); // should be there already
@@ -101,7 +118,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	check_equals(string(text2->get_text_value()), string("RollOver"));
 	check(tester.isMouseOverMouseEntity());
 	// check that pixel @ 60,60 is yellow !
-	xcheck_pixel(2, rgba(255,255,0,255), 2);
+	xcheck_pixel(2, yellow, 2);
 	
 	tester.pressMouseButton();
 	check_equals(string(text->get_text_value()), string("MouseDown"));
@@ -176,7 +193,7 @@ main(int /*argc*/, char** /*argv*/)
 		check_equals(root->get_current_frame(), fno);
 
 		info (("testing mouse activity in frame %d", root->get_current_frame()));
-		test_mouse_activity(tester, text, text2);
+		test_mouse_activity(tester, text, text2, square_front!=NULL);
 
 		// TODO: test key presses !
 		//       They seem NOT to trigger immediate redraw

@@ -1,3 +1,15 @@
+2007-04-20 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/MovieTester.{cpp,h} (advance): advance
+	  first, *then* render. Cache invalidated bound to
+	  avoid loosing them.
+	* testsuite/misc-ming.all/attachMovieTestRunner.cpp:
+	  Add renderer tests.
+	* testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp:
+	  Take the covering clip in consideration while testing
+	  the renderer - there are a few xfailed that I'd like
+	  to fix.
+
 2007-04-20 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler.h (getAveragePixel):
