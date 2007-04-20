@@ -16,7 +16,8 @@
 
 2007-04-20 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
-	* backend/render_handler.h: Prototype for initTestBuffer() 
+	* backend/render_handler.h: Prototype for initTestBuffer()
+	* backend/render_handler_agg.{cpp,h}: implement initTestBuffer() 
 		
 2007-04-20 Sandro Santilli <strk@keybit.net>
 

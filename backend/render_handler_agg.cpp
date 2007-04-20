@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.74 2007/04/18 17:07:34 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.75 2007/04/20 11:51:23 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1900,6 +1900,10 @@ public:
     scale.m_x = PIXELS_TO_TWIPS(xscale);
     scale.m_y = PIXELS_TO_TWIPS(yscale);
   }
+  
+  virtual unsigned int getBytesPerPixel() {
+    return bpp/8;
+  }  
   
 private:  // private methods  
 

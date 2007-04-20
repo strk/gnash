@@ -21,18 +21,39 @@
 
 #ifndef BACKEND_RENDER_HANDLER_AGG_H
 #define BACKEND_RENDER_HANDLER_AGG_H
-
+#include <stdio.h>
 namespace gnash {
 
 // Base class to shield GUIs from AGG's pixelformat classes 
 class render_handler_agg_base : public render_handler
 {
+private:
+
+  unsigned char *_testBuffer; // buffer used by initTestBuffer() only
+  
 public:
-  // these methods need to be accessed from outside:
-  virtual void init_buffer(unsigned char *mem, int size, int x, int y)=0;  
+  
+  render_handler_agg_base() : _testBuffer(0) { }  
 
   // virtual classes should have virtual destructors
   virtual ~render_handler_agg_base() {}
+  
+  // these methods need to be accessed from outside:
+  virtual void init_buffer(unsigned char *mem, int size, int x, int y)=0;
+
+  virtual unsigned int getBytesPerPixel()=0;
+  
+  virtual bool initTestBuffer(unsigned width, unsigned height) {
+    int size = width * height * getBytesPerPixel();
+    
+    _testBuffer	= static_cast<unsigned char *>( realloc(_testBuffer, size) );
+    
+    init_buffer(_testBuffer, size, width, height);
+    
+    return true;
+  }
+  
+  
 };
 
 
