@@ -31,6 +31,8 @@
 #include "sound_handler_test.h" // for creating the "test" sound handler
 #include "render.h" // for get_render_handler
 #include "types.h" // for rgba class
+#include "FuzzyPixel.h"
+#include "render_handler_agg.h"
 
 #include <cstdio>
 #include <string>
@@ -73,6 +75,13 @@ MovieTester::MovieTester(const std::string& url)
 	gnash::set_sound_handler(_sound_handler.get());
 
 	_movie_root = &(VM::init(*_movie_def).getRoot());
+
+	// Initialize viewport size with the one advertised in the header
+	_width = unsigned(_movie_def->get_width_pixels());
+	_height = unsigned(_movie_def->get_height_pixels());
+
+	// Initialize the testing renderers
+	initTestingRenderers();
 
 	// Now complete load of the movie
 	_movie_def->completeLoad();
@@ -146,17 +155,10 @@ MovieTester::movePointerTo(int x, int y)
 	_movie_root->notify_mouse_moved(x, y);
 }
 
-FuzzyPixel
-MovieTester::getAveragePixel(unsigned radius, int tolerance) const
+void
+MovieTester::checkPixel(unsigned radius, const rgba& color, int tolerance) const
 {
-	render_handler* rend = get_render_handler();
-	assert(rend);
-	rgba color;
-	if ( ! rend->getAveragePixel(color, _x, _y, radius) )
-	{
-		return FuzzyPixel();
-	}
-	return FuzzyPixel(color, tolerance);
+	log_msg("XFAILED: pixel checking not implemented yet.");
 }
 
 void
@@ -226,24 +228,45 @@ MovieTester::soundsStopped()
 	return _sound_handler.get()->test_times_stopped_all();
 }
 
-bool
-FuzzyPixel::operator==(const FuzzyPixel& o) const
+void
+MovieTester::initTestingRenderers()
 {
-	// Intolerant FuzzyPixels never succeed in comparison
-	if ( _tol < 0 || o._tol < 0 ) return false;
+	std::auto_ptr<render_handler> handler;
 
-	int tol=std::max(_tol, o._tol);
-	if ( ! fuzzyEqual(_col.m_r, o._col.m_r, tol) ) return false;
-	if ( ! fuzzyEqual(_col.m_g, o._col.m_g, tol) ) return false;
-	if ( ! fuzzyEqual(_col.m_b, o._col.m_b, tol) ) return false;
-	if ( ! fuzzyEqual(_col.m_a, o._col.m_a, tol) ) return false;
-	return true;
+	// Initialize AGG
+	handler.reset( create_render_handler_agg("RGB24") );
+	assert(handler.get());
+	addTestingRenderer(handler, "AGG_RGB24");
 }
 
-std::ostream&
-operator<< (std::ostream& o, const FuzzyPixel& p)
+void
+MovieTester::addTestingRenderer(std::auto_ptr<render_handler> h, const std::string& name)
 {
-	return o << "FuzzyPixel(" << p._col.toString() << ") [tol:" << p._tol << "]";
+	// TODO: init the buffer before pushing, and do not add to the table
+	//       if the renderer is not capable of doing so !!
+
+	cout << "UNTESTED: render handler " << name
+		<< " doesn't support in-memory rendering "
+		<< "(not true, but we need to add interfaces "
+		<< "for this in the base render_handler class)"
+		<< endl;
+
+	// h->initTestBuffer(_width, _height);
+	//_testingRenderers.push_back(TestingRendererPtr(new TestingRenderer(h, name)));
 }
+
+FuzzyPixel
+TestingRenderer::getAveragePixel(int x, int y, unsigned radius, unsigned tolerance) const
+{
+	render_handler* rend = get_render_handler();
+	assert(rend);
+	rgba color;
+	if ( ! rend->getAveragePixel(color, x, y, radius) )
+	{
+		return FuzzyPixel();
+	}
+	return FuzzyPixel(color, tolerance);
+}
+
 
 } // namespace gnash

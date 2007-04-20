@@ -26,7 +26,8 @@
 #include "types.h" // for rgba class
 
 #include <memory> // for auto_ptr
-#include <string> // for auto_ptr
+#include <string> 
+#include <boost/shared_ptr.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -34,96 +35,55 @@ namespace gnash {
 	class movie_root;
 	class sprite_instance;
 	class character;
+	class FuzzyPixel;
 }
 
 namespace gnash {
 
-/// An utility class used to compare rgba values with a given tolerance
-class FuzzyPixel
+/// A table of built renderers
+//
+///
+class TestingRenderer
 {
 
 public:
 
-	friend std::ostream& operator<< (std::ostream& o, const FuzzyPixel& p);
-
-	/// Construct a black, alpha 0 FuzzyPixel with NO tolerance.
-	//
-	/// No tolerance means that any comparison will fail
-	///
-	FuzzyPixel()
+	TestingRenderer(std::auto_ptr<render_handler> renderer, const std::string& name)
 		:
-		_col(0,0,0,0),
-		_tol(0)
-	{
-	}
+		_name(name),
+		_renderer(renderer)
+	{}
 
-	/// Construct a FuzzyPixel with given color and tolerance
-	//
-	/// @param color
-	///	The color value
-	///
-	/// @param tolerance
-	///	The tolerance to use in comparisons
-	///
-	FuzzyPixel(rgba& color, int tolerance=0)
-		:
-		_col(color),
-		_tol(tolerance)
-	{
-	}
+	const std::string& getName() const { return _name; }
 
-	/// Construct a FuzzyPixel with given values
-	//
-	/// @param r
-	///	The red value.
+        /// Get the average pixel under the mouse pointer
+        //
+        /// @param x
+	///	X coordinate, in pixels
 	///
-	/// @param g
-	///	The green value.
+        /// @param x
+	///	Y coordinate, in pixels
 	///
-	/// @param b
-	///	The blue value.
-	///
-	/// @param a
-	///	The alpha value.
-	///
-	FuzzyPixel(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
-		:
-		_col(r, g, b, a),
-		_tol(0)
-	{
-	}
-
-	/// Set the tolerance to use in comparisons
-	//
-	/// @param tol
-	///	The tolerance to use in comparisons
-	///
-	void setTolerance(int tol)
-	{
-		_tol = tol;
-	}
-
-	/// Compare two FuzzyPixel using the tolerance of the most tolerant of the two
-	//
-	/// Note that if any of the two operands has 0 tolerance, any equality
-	/// comparison will fail.
-	///
-	bool operator==(const FuzzyPixel& other) const;
-
-	// Return true if a and b are below a given tolerance
-	static bool fuzzyEqual(int a, int b, int tol)
-	{
-		return abs(a-b) <= tol;
-	}
+        /// @param radius
+        ///     Radius defining the average zone used.
+        ///     1 means a single pixel.
+        ///     Behaviour of passing 0 is undefined.
+        ///
+        /// @param tolerance
+        ///     The tolerance value to use for the returned FuzzyPixel.
+        ///
+        /// Note that if current pointer is outside of the rendered region
+        /// an intollerant FuzzyPixel is returned.
+        ///
+        FuzzyPixel getAveragePixel(int x, int y, unsigned radius, unsigned tolerance) const;
 
 private:
 
-	rgba _col;
-
-	// tolerance value
-	int _tol;
-
+	std::string _name;
+	std::auto_ptr<render_handler> _renderer;
 };
+
+typedef boost::shared_ptr<TestingRenderer> TestingRendererPtr;
 
 /// An utility class for testing movie playback
 //
@@ -138,6 +98,11 @@ class MovieTester
 public:
 	/// Fully load the movie at the specified location
 	/// and create an instance of it.
+	/// Also, initialize any built renderer capable of in-memory
+	/// rendering to allow testing of it.
+	/// The renderer(s) will be initialized with a memory
+	/// buffer with the size found in the SWF header
+	///
 	MovieTester(const std::string& filespec);
 
 	/// Advance the movie by one frame
@@ -176,20 +141,23 @@ public:
 	///
 	void movePointerTo(int x, int y);
 
-	/// Get the average pixel under the mouse pointer
+	/// Check color of the average pixel under the mouse pointer 
 	//
+	///
+	/// This method will test any built renderer.
+	///
 	/// @param radius
 	///	Radius defining the average zone used.
 	///	1 means a single pixel.
 	///	Behaviour of passing 0 is undefined.
 	///
+	/// @param color
+	///	The color we expect to find under the pointer.
+	///
 	/// @param tolerance
-	///	The tolerance value to use for the returned FuzzyPixel.
+	///	The tolerated difference of any r,g,b,a values
 	///
-	/// Note that if current pointer is outside of the rendered region
-	/// an intollerant FuzzyPixel is returned.
-	///
-	FuzzyPixel getAveragePixel(unsigned radius, int tolerance) const;
+	void checkPixel(unsigned radius, const rgba& color, int tolerance) const;
 
 	/// Notify mouse button was pressed
 	void pressMouseButton();
@@ -229,6 +197,12 @@ public:
 
 private:
 
+	/// Initialize testing renderers
+	void initTestingRenderers();
+
+	/// Add a testing renderer to the list, initializing it with current viewport size
+	void addTestingRenderer(std::auto_ptr<render_handler> h, const std::string& name);
+
 	gnash::movie_root* _movie_root;
 
 	gnash::movie_definition* _movie_def;
@@ -237,9 +211,23 @@ private:
 
 	std::auto_ptr<TEST_sound_handler> _sound_handler;
 
+	/// Current pointer position - X ordinate
 	int _x;
 
+	/// Current pointer position - Y ordinate
 	int _y;
+
+	/// Current viewport width
+	unsigned _width;
+
+	/// Current viewport height
+	unsigned _height;
+
+	/// I'd use ptr_list here, but trying not to spread
+	/// boost 1.33 requirement for the moment.
+	/// Still, I'd like to simplify things...
+	/// is shared_ptr fine ?
+	std::vector< TestingRendererPtr > _testingRenderers;
 };
 
 } // namespace gnash

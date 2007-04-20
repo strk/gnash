@@ -25,6 +25,8 @@ check_LTLIBRARIES = libtestsuite.la
 libtestsuite_la_SOURCES = \
 	MovieTester.h \
 	MovieTester.cpp \
+	FuzzyPixel.cpp \
+	FuzzyPixel.h \
 	sound_handler_test.h \
 	sound_handler_test.cpp \
 	$(NULL)

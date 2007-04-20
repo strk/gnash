@@ -1,5 +1,12 @@
 2007-04-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/: Makefile.am, FuzzyPixel.{cpp,h}, 
+	  MovieTester.{cpp,h}: framework for renderers
+	  testing, needs changes in render_handler to complete.
+	  See task #6785.
+
+2007-04-20 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/masks_test.c: draft masks test.
 	* doc/C/asspec/movieclip.xml:
 	  Dumped a bit of info about _name. Hopefully Ann will give it some
