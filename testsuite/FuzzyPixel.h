@@ -70,7 +70,7 @@ public:
 	/// @param tolerance
 	///	The tolerance to use in comparisons.
 	///
-	FuzzyPixel(rgba& color, short unsigned tolerance=0)
+	FuzzyPixel(const rgba& color, short unsigned tolerance=0)
 		:
 		_col(color),
 		// From short unsigned to signed we hopefully never swap sign.

@@ -43,7 +43,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	check_equals(string(text2->get_text_value()), string("RollOver"));
 	check(tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is yellow !
-	//tester.checkPixel(2, rgba(0,0,0,255), 1);
+	xcheck_pixel(2, rgba(255,255,0,255), 2);
 
 	// press the mouse button, this should change
 	// the textfield value.

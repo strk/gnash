@@ -1,5 +1,15 @@
 2007-04-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/FuzzyPixel.h: const-correctness
+	* testsuite/MovieTester.{cpp,h}: prepared for working
+	  with all render handlers, implemented support for
+	  a single one (AGG only for now); provided 
+	  check_pixel and xcheck_pixel macros.
+	* testsuite/misc-ming.all/ButtonEventsTest-Runner.cpp:
+	  Test pixel checker (doesn't work).
+
+2007-04-20 Sandro Santilli <strk@keybit.net>
+
 	* server/types.{cpp,h}: add toShortString, for neater output.
 	* libgeometry/snappingrange.h: add output operator.
 	* server/debugger.cpp, server/parser/action_buffer.cpp,

@@ -32,6 +32,8 @@
 #include "render.h" // for get_render_handler
 #include "types.h" // for rgba class
 #include "FuzzyPixel.h"
+#include "render.h"
+#include "render_handler.h"
 #include "render_handler_agg.h"
 
 #include <cstdio>
@@ -101,8 +103,13 @@ MovieTester::MovieTester(const std::string& url)
 }
 
 void
-MovieTester::advance() 
+MovieTester::render(render_handler& h, InvalidatedRanges& invalidated_regions) 
 {
+	set_render_handler(&h);
+
+	invalidated_regions.setWorld(); // testing
+	h.set_invalidated_regions(invalidated_regions);
+
 	// We call display here to simulate effect of a real run.
 	//
 	// What we're particularly interested about is 
@@ -119,6 +126,27 @@ MovieTester::advance()
 	// real runs as close as possible, by calling display().
 	//
 	_movie_root->display();
+}
+
+void
+MovieTester::render() 
+{
+	InvalidatedRanges ranges;
+	_movie_root->add_invalidated_bounds(ranges, false);
+	cout << "Invalidated ranges before any advance: " << ranges << endl;
+
+	for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
+				it != itE; ++it)
+	{
+		TestingRenderer& rend = *(*it);
+		render(rend.getRenderer(), ranges);
+	}
+}
+
+void
+MovieTester::advance() 
+{
+	render();
 
 	_movie_root->advance(1.0);
 #ifdef SHOW_INVALIDATED_BOUNDS_ON_ADVANCE
@@ -156,9 +184,55 @@ MovieTester::movePointerTo(int x, int y)
 }
 
 void
-MovieTester::checkPixel(unsigned radius, const rgba& color, int tolerance) const
+MovieTester::checkPixel(unsigned radius, const rgba& color,
+		short unsigned tolerance, const std::string& label, bool expectFailure) const
 {
-	log_msg("XFAILED: pixel checking not implemented yet.");
+	FuzzyPixel exp(color, tolerance);
+	const char* X="";
+	if ( expectFailure ) X="X";
+
+	//cout <<"BINGO: X is '"<< X<<"'"<<endl;
+
+	for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
+				it != itE; ++it)
+	{
+		const TestingRenderer& rend = *(*it);
+
+		std::stringstream ss;
+		ss << rend.getName() <<" ";
+		ss << "pix:" << _x << "," << _y <<" ";
+
+		rgba obt_col;
+
+	        if ( ! rend.getRenderer().getAveragePixel(obt_col, _x, _y, radius) )
+		{
+			ss << " is out of rendering buffer";
+			log_msg("%sFAILED: %s (%s)", X,
+					ss.str().c_str(),
+					label.c_str()
+					);
+		}
+
+	        ss << "exp:" << color.toShortString() << " ";
+	        ss << "obt:" << obt_col.toShortString() << " ";
+	        ss << "tol:" << tolerance;
+
+		FuzzyPixel obt(obt_col, tolerance);
+		if (exp ==  obt)
+		{
+			log_msg("%sPASSED: %s %s", X,
+					ss.str().c_str(),
+					label.c_str()
+					);
+		}
+		else
+		{
+			log_msg("%sFAILED: %s %s", X,
+					ss.str().c_str(),
+					label.c_str()
+					);
+		}
+	}
 }
 
 void
@@ -233,40 +307,49 @@ MovieTester::initTestingRenderers()
 {
 	std::auto_ptr<render_handler> handler;
 
+	// TODO: add support for testing multiple renderers
+	// This is tricky as requires changes in the core lib
+
+#ifdef RENDERER_AGG
 	// Initialize AGG
 	handler.reset( create_render_handler_agg("RGB24") );
 	assert(handler.get());
 	addTestingRenderer(handler, "AGG_RGB24");
+#endif
+
+#ifdef RENDERER_CAIRO
+	// Initialize Cairo
+#endif
+
+#ifdef RENDERER_OPENGL
+	// Initialize opengl renderer
+#endif
 }
 
 void
 MovieTester::addTestingRenderer(std::auto_ptr<render_handler> h, const std::string& name)
 {
-	// TODO: init the buffer before pushing, and do not add to the table
-	//       if the renderer is not capable of doing so !!
-
-	cout << "UNTESTED: render handler " << name
-		<< " doesn't support in-memory rendering "
-		<< "(not true, but we need to add interfaces "
-		<< "for this in the base render_handler class)"
-		<< endl;
-
-	// h->initTestBuffer(_width, _height);
-	//_testingRenderers.push_back(TestingRendererPtr(new TestingRenderer(h, name)));
-}
-
-FuzzyPixel
-TestingRenderer::getAveragePixel(int x, int y, unsigned radius, unsigned tolerance) const
-{
-	render_handler* rend = get_render_handler();
-	assert(rend);
-	rgba color;
-	if ( ! rend->getAveragePixel(color, x, y, radius) )
+	if ( ! h->initTestBuffer(_width, _height) )
 	{
-		return FuzzyPixel();
+		cout << "UNTESTED: render handler " << name
+			<< " doesn't support in-memory rendering "
+			<< endl;
+		return;
 	}
-	return FuzzyPixel(color, tolerance);
-}
 
+	// TODO: make the core lib support this
+	if ( ! _testingRenderers.empty() )
+	{
+		cout << "UNTESTED: can't test render handler " << name
+			<< " because gnash core lib is unable to support testing of "
+			<< "multiple renderers from a single process "
+			<< "and we're already testing render handler "
+			<< _testingRenderers.front()->getName()
+			<< endl;
+		return;
+	}
+
+	_testingRenderers.push_back(TestingRendererPtr(new TestingRenderer(h, name)));
+}
 
 } // namespace gnash

@@ -24,10 +24,25 @@
 #include "gnash.h" // for namespace key
 #include "sound_handler_test.h" // for creating the "test" sound handler
 #include "types.h" // for rgba class
+#include "render_handler.h" // for dtor visibility by auto_ptr
 
 #include <memory> // for auto_ptr
 #include <string> 
 #include <boost/shared_ptr.hpp>
+
+#define check_pixel(radius, color, tolerance) \
+	{\
+		std::stringstream ss; \
+		ss << "[" << __FILE__ << ":" << __LINE__ << "]"; \
+		tester.checkPixel(2, rgba(0,0,0,255), 1, ss.str(), false); \
+	}
+
+#define xcheck_pixel(radius, color, tolerance) \
+	{\
+		std::stringstream ss; \
+		ss << "[" << __FILE__ << ":" << __LINE__ << "]"; \
+		tester.checkPixel(2, rgba(0,0,0,255), 1, ss.str(), true); \
+	}
 
 // Forward declarations
 namespace gnash {
@@ -56,26 +71,8 @@ public:
 
 	const std::string& getName() const { return _name; }
 
-        /// Get the average pixel under the mouse pointer
-        //
-        /// @param x
-	///	X coordinate, in pixels
-	///
-        /// @param x
-	///	Y coordinate, in pixels
-	///
-        /// @param radius
-        ///     Radius defining the average zone used.
-        ///     1 means a single pixel.
-        ///     Behaviour of passing 0 is undefined.
-        ///
-        /// @param tolerance
-        ///     The tolerance value to use for the returned FuzzyPixel.
-        ///
-        /// Note that if current pointer is outside of the rendered region
-        /// an intollerant FuzzyPixel is returned.
-        ///
-        FuzzyPixel getAveragePixel(int x, int y, unsigned radius, unsigned tolerance) const;
+	/// Return the underlying render handler
+	render_handler& getRenderer() const { return *_renderer; }
 
 private:
 
@@ -157,7 +154,13 @@ public:
 	/// @param tolerance
 	///	The tolerated difference of any r,g,b,a values
 	///
-	void checkPixel(unsigned radius, const rgba& color, int tolerance) const;
+	/// @param label
+	///	A label to use in test results.
+	///
+	/// @param expectFailure
+	///	Set to true if a failure is expected. Defaults to false.
+	///
+	void checkPixel(unsigned radius, const rgba& color, short unsigned tolerance, const std::string& label, bool expectFailure=false) const;
 
 	/// Notify mouse button was pressed
 	void pressMouseButton();
@@ -200,6 +203,23 @@ private:
 	/// Initialize testing renderers
 	void initTestingRenderers();
 
+	/// Render the current movie to all testing renderers
+	//
+	/// This function calls movie_root::display internally
+	///
+	void render();
+
+	/// Render the current movie to a specific testing renderer
+	//
+	/// @param renderer
+	///	The renderer to draw to. It will be temporarly set as
+	///	the global renderer in the gnash core lib.
+	///
+	/// @param invalidated
+	///	The invalidated ranges as computed by the core lib.
+	///
+	void render(render_handler& renderer, InvalidatedRanges& invalidated);
+
 	/// Add a testing renderer to the list, initializing it with current viewport size
 	void addTestingRenderer(std::auto_ptr<render_handler> h, const std::string& name);
 
@@ -227,6 +247,8 @@ private:
 	/// boost 1.33 requirement for the moment.
 	/// Still, I'd like to simplify things...
 	/// is shared_ptr fine ?
+	typedef std::vector< TestingRendererPtr > TRenderers;
+
 	std::vector< TestingRendererPtr > _testingRenderers;
 };
 
