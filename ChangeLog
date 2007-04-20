@@ -10,6 +10,9 @@
 	* po/gnash.pot:  Update to include current gettext-able messages.
 	* po/{es,fr}.po:  First few languages that have a few translations.
 	* po/LINGUAS:  Add es and fr (with only a few translations in each).
+	* README:  Gettext program is now a required prerequisite for clean
+	  builds of gnash.  (We use the msgfmt program for compiling
+	  translations.)
 
 2007-04-20 Udo Giacomozzi <udo.gnu@nova-sys.net>
 

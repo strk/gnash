@@ -1,4 +1,4 @@
-$Id: README,v 1.25 2007/01/29 23:21:01 martinwguy Exp $
+$Id: README,v 1.26 2007/04/20 11:41:26 jgilmore Exp $
 
 		    Gnash: the GNU Flash Player
 
@@ -113,7 +113,9 @@ dependent packages: OpenGL(libMesa), SDL.
 The GTK support is more developed and featureful, while the SDL
 support has less dependancies on other packages.
 
-Other required packages are libxml2, libpng and libjpeg.
+Other required packages are libxml2, libpng, libjpeg, and gettext.
+If gettext is missing, gnash will compile, but you'll get errors when
+trying to build or install its message translations in the po/ directory.
 
 At this time the sound support is experimental until the new sound
 support is completed. This will support both Gstreamer and
