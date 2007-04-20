@@ -1,3 +1,8 @@
+2007-04-20 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: Makefile.am, ButtonEventsTest-Runner.cpp:
+	  Allow execution of the test runner from a foreign dir.
+
 2007-04-20 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/actionscript.all/MovieLip.as

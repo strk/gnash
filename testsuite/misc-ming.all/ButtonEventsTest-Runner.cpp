@@ -43,6 +43,7 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 	check_equals(string(text2->get_text_value()), string("RollOver"));
 	check(tester.isMouseOverMouseEntity());
 	// TODO: check that pixel @ 60,60 is yellow !
+	//tester.checkPixel(2, rgba(0,0,0,255), 1);
 
 	// press the mouse button, this should change
 	// the textfield value.
@@ -106,7 +107,8 @@ test_mouse_activity(MovieTester& tester, const character* text, const character*
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	string filename = INPUT_FILENAME;
+	//string filename = INPUT_FILENAME;
+	string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
 	MovieTester tester(filename);
 
 	std::string idleString = "Idle";

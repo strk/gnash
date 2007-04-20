@@ -77,6 +77,7 @@ check_PROGRAMS = \
 	place_and_remove_object_test \
 	place_and_remove_object_insane_test \
 	displaylist_depths_test \
+	masks_test \
 	attachMovieTest \
 	attachMovieTestRunner \
 	attachMovieLoopingTest \
@@ -147,6 +148,7 @@ check_SCRIPTS = \
 	path_format_testrunner \
 	duplicate_movie_clip_testrunner \
 	matrix_testrunner \
+	masks_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -377,6 +379,20 @@ displaylist_depths_test.swf: displaylist_depths_test
 
 displaylist_depths_testrunner: $(srcdir)/../generic-testrunner.sh displaylist_depths_test.swf
 	sh $< -r5 $(top_builddir) displaylist_depths_test.swf > $@
+	chmod 755 $@
+
+masks_test_SOURCES =	\
+	masks_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+masks_test_LDADD = $(MING_LIBS)
+
+masks_test.swf: masks_test
+	./masks_test $(top_srcdir)/testsuite/media
+
+masks_testrunner: $(srcdir)/../generic-testrunner.sh masks_test.swf
+	sh $< -r5 $(top_builddir) masks_test.swf > $@
 	chmod 755 $@
 
 matrix_test_SOURCES =	\
@@ -781,6 +797,9 @@ ButtonEventsTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	ButtonEventsTest.swf	\
 	$(NULL)
+ButtonEventsTest_Runner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
 
 loadMovieTest_SOURCES =	\
 	loadMovieTest.c	\
@@ -960,6 +979,7 @@ TEST_CASES = \
 	frame_label_testrunner \
 	path_format_testrunner \
 	duplicate_movie_clip_testrunner \
+	masks_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
