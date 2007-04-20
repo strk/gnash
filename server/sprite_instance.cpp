@@ -1772,7 +1772,7 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 		color_transform,
 		matrix,
 		0.0f,
-		0); 
+		character::noClipDepthValue); 
 
 	return sprite;
 }
@@ -1806,7 +1806,7 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
 		cxform(),
 		txt_matrix,
 		0.0f,
-		0);
+		character::noClipDepthValue);
 
 	static bool warned = false;
 	if ( ! warned )
@@ -2606,7 +2606,7 @@ sprite_instance::attachCharacter(character& newch, int depth)
 		cxform(),
 		matrix(),
 		1.0,
-		0);
+		character::noClipDepthValue);
 
 	return true; // FIXME: check return from place_character above ?
 }

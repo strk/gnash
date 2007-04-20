@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.70 2007/04/19 17:41:35 udog Exp $ */
+/* $Id: character.h,v 1.71 2007/04/20 15:03:24 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -259,7 +259,7 @@ public:
 	m_id(id),
 	m_depth(0),
 	m_ratio(0.0f),
-	m_clip_depth(0),
+	m_clip_depth(noClipDepthValue),
 	m_display_callback(NULL),
 	m_display_callback_user_ptr(NULL),
 	_unloaded(false),

@@ -2,6 +2,9 @@
 
 	* backend/render_handler.h (getAveragePixel):
 	  fix computation of max x/y values.
+	* server/character.h: character are not masks by default
+	* server/character.h, server/sprite_instance.cpp: when placing
+	  new characters, disable clip_depth (zero is a valid depth)  	
 
 2007-04-20 Sandro Santilli <strk@keybit.net>
 
