@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.34 2007/04/20 09:43:16 udog Exp $ */
+/* $Id: render_handler.h,v 1.35 2007/04/20 09:49:14 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -555,19 +555,26 @@ public:
   }
   
   
+  /// \brief
+  /// Initializes the renderer for off-screen rendering used by the  
+  /// testsuite.
+  ///
   /// This is a special function used for testcases ONLY. It is used by
   /// MovieTester to prepare the renderer for off-screen rendering 
   /// without any GUI. The renderer is responsible to do all required
   /// steps so that rendering is possible after the call. This may mean
   /// that the renderer allocates memory for the given stage size.
-  /// "width" and "height" are the desired size of the stage in pixels.
   /// 
   /// The function returns false when the renderer is not able to do
   /// off-screen rendering (default).
   ///
   /// Note the function may be called again afterwards, resizing the stage.
   /// Any number of calls to this function is possible and the renderer
-  /// is responsible resize any buffer instead of wasting memory. 
+  /// is responsible to resize any buffer instead of wasting memory. 
+  ///
+  /// @param width stage width in pixels
+  ///
+  /// @param height stage height in pixels
   virtual bool initTestBuffer(unsigned width, unsigned height) {
     return false;
   }
