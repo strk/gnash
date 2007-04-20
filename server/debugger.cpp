@@ -36,7 +36,6 @@
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
-const gnash::SWF::SWFHandlers& ash = gnash::SWF::SWFHandlers::instance();
 }
 
 using namespace std;
@@ -331,6 +330,8 @@ Debugger::dissasemble(const unsigned char *data)
     string str;
     unsigned char num[10];
     memset(num, 0, 10);
+
+    const gnash::SWF::SWFHandlers& ash = gnash::SWF::SWFHandlers::instance();
 
     if (_pc == 0) {
     }

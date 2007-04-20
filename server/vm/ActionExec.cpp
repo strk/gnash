@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.27 2007/04/18 14:07:33 jgilmore Exp $ */
+/* $Id: ActionExec.cpp,v 1.28 2007/04/20 12:13:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -59,7 +59,6 @@ using std::stringstream;
 
 namespace gnash {
 
-static const SWFHandlers& ash = SWFHandlers::instance();
 static LogFile& dbglogfile = LogFile::getDefaultInstance();
 #ifdef USE_DEBUGGER
 static Debugger& debugger = Debugger::getDefaultInstance();
@@ -126,6 +125,8 @@ ActionExec::operator() ()
 	periodic_events.poll_event_handlers(&env);
     }
 #endif
+
+    static const SWFHandlers& ash = SWFHandlers::instance();
 		
     _original_target = env.get_target();
 

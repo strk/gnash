@@ -1,5 +1,9 @@
 2007-04-20 Sandro Santilli <strk@keybit.net>
 
+	* server/debugger.cpp, server/parser/action_buffer.cpp,
+	  server/vm/ActionExec.cpp: don't force creation of the
+	  SWFHandlers singleton too early, this hopefully means
+	  at time of initialization the VM version will be known.
 	* backend/render_handler.h: remove unused parameter warnings.
 	  [  I'm afraid this will confuse doxygen :(  ]
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.17 2007/04/18 14:07:32 jgilmore Exp $ */
+/* $Id: action_buffer.cpp,v 1.18 2007/04/20 12:13:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -39,7 +39,6 @@ using std::endl;
 
 namespace {
 gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-const gnash::SWF::SWFHandlers& ash = gnash::SWF::SWFHandlers::instance();
 }
 
 namespace gnash {
@@ -191,6 +190,8 @@ disasm(const unsigned char* instruction_data)
 {    
 
     using namespace gnash::SWF;
+
+    const gnash::SWF::SWFHandlers& ash = gnash::SWF::SWFHandlers::instance();
 
     as_arg_t fmt = ARG_HEX;
     action_type	action_id = (action_type)instruction_data[0];
