@@ -107,7 +107,6 @@ MovieTester::render(render_handler& h, InvalidatedRanges& invalidated_regions)
 {
 	set_render_handler(&h);
 
-	invalidated_regions.setWorld(); // testing
 	h.set_invalidated_regions(invalidated_regions);
 
 	// We call display here to simulate effect of a real run.
@@ -131,9 +130,18 @@ MovieTester::render(render_handler& h, InvalidatedRanges& invalidated_regions)
 void
 MovieTester::render() 
 {
-	InvalidatedRanges ranges;
-	_movie_root->add_invalidated_bounds(ranges, false);
-	cout << "Invalidated ranges before any advance: " << ranges << endl;
+	// Get invalidated ranges and cache them
+	_invalidatedBounds.setNull();
+
+	_movie_root->add_invalidated_bounds(_invalidatedBounds, false);
+
+#ifdef SHOW_INVALIDATED_BOUNDS_ON_ADVANCE
+	cout << "frame " << _movie->get_current_frame() << ") Invalidated bounds " << _invalidatedBounds;
+#endif
+
+	// Force full redraw by using a WORLD invalidated ranges
+	InvalidatedRanges ranges = _invalidatedBounds; // copy the cache, so we don't accidentally modify it ...
+	ranges.setWorld(); // TESTING !! TODO: make this a parameter
 
 	for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
 				it != itE; ++it)
@@ -141,21 +149,34 @@ MovieTester::render()
 		TestingRenderer& rend = *(*it);
 		render(rend.getRenderer(), ranges);
 	}
+	
+	if ( _testingRenderers.empty() )
+	{
+		// Make sure display is called in any case 
+		//
+		// What we're particularly interested about is 
+		// proper computation of invalidated bounds, which
+		// needs clear_invalidated() to be called.
+		// display() will call clear_invalidated() on characters
+		// actually modified so we're fine with that.
+		//
+		// Directly calling _movie->clear_invalidated() here
+		// also work currently, as invalidating the topmost
+		// movie will force recomputation of all invalidated
+		// bounds. Still, possible future changes might 
+		// introduce differences, so better to reproduce
+		// real runs as close as possible, by calling display().
+		//
+		_movie_root->display();
+	}
 }
 
 void
 MovieTester::advance() 
 {
-	render();
-
 	_movie_root->advance(1.0);
-#ifdef SHOW_INVALIDATED_BOUNDS_ON_ADVANCE
-	geometry::Range2d<float> invalidatedbounds = getInvalidatedBounds();
-	std::stringstream ss;
-	ss << "frame " << _movie->get_current_frame() << ") Invalidated bounds " << invalidatedbounds;
-	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-	dbglogfile << ss.str().c_str() << std::endl;
-#endif
+
+	render();
 
 }
 
@@ -191,7 +212,7 @@ MovieTester::checkPixel(unsigned radius, const rgba& color,
 	const char* X="";
 	if ( expectFailure ) X="X";
 
-	//cout <<"BINGO: X is '"<< X<<"'"<<endl;
+	cout <<"chekPixel(" << color << ") called" << endl;
 
 	for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
 				it != itE; ++it)
@@ -205,6 +226,7 @@ MovieTester::checkPixel(unsigned radius, const rgba& color,
 		rgba obt_col;
 
 	        if ( ! rend.getRenderer().getAveragePixel(obt_col, _x, _y, radius) )
+	        //if ( ! rend.getRenderer().getPixel(obt_col, _x, _y) )
 		{
 			ss << " is out of rendering buffer";
 			log_msg("%sFAILED: %s (%s)", X,
@@ -274,11 +296,11 @@ MovieTester::getInvalidatedBounds() const
 	assert(ret.is_null());
 	
 	// TODO: Support multiple bounds in testsuite
-	//_movie_root->get_invalidated_bounds(&ret, false);
-	InvalidatedRanges ranges;
-	_movie_root->add_invalidated_bounds(ranges, false);
+	////_movie_root->get_invalidated_bounds(&ret, false);
+	//InvalidatedRanges ranges;
+	//_movie_root->add_invalidated_bounds(ranges, false);
 
-	Range2d<float> range = ranges.getFullArea();
+	Range2d<float> range = _invalidatedBounds.getFullArea();
 
 	// scale by 1/20 (twips to pixels)
 	range.scale(1.0/20);

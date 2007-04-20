@@ -34,14 +34,14 @@
 	{\
 		std::stringstream ss; \
 		ss << "[" << __FILE__ << ":" << __LINE__ << "]"; \
-		tester.checkPixel(2, rgba(0,0,0,255), 1, ss.str(), false); \
+		tester.checkPixel(radius, color, tolerance, ss.str(), false); \
 	}
 
 #define xcheck_pixel(radius, color, tolerance) \
 	{\
 		std::stringstream ss; \
 		ss << "[" << __FILE__ << ":" << __LINE__ << "]"; \
-		tester.checkPixel(2, rgba(0,0,0,255), 1, ss.str(), true); \
+		tester.checkPixel(radius, color, tolerance, ss.str(), true); \
 	}
 
 // Forward declarations
@@ -242,6 +242,12 @@ private:
 
 	/// Current viewport height
 	unsigned _height;
+
+	/// Invalidated bounds of the movie after last
+	/// advance call. They are cached here so we
+	/// can safely call ::display w/out wiping this
+	/// information out.
+	InvalidatedRanges _invalidatedBounds;
 
 	/// I'd use ptr_list here, but trying not to spread
 	/// boost 1.33 requirement for the moment.

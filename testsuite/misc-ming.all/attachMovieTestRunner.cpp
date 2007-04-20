@@ -58,6 +58,8 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.movePointerTo(30, 30);
 	check(!tester.isMouseOverMouseEntity());
+	// check that the pixel under the mouse is white
+	check_pixel(2, rgba(255,255,255,255), 2);
 
 	tester.advance();
 
@@ -68,8 +70,13 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.movePointerTo(30, 30);
 	check(tester.isMouseOverMouseEntity());
+	// check that the pixel under the mouse is red
+	check_pixel(2, rgba(255,0,0,255), 2);
+
 	tester.movePointerTo(100, 30);
 	check(!tester.isMouseOverMouseEntity());
+	// check that the pixel under the mouse is white
+	check_pixel(2, rgba(255,255,255,255), 2);
 
 	root->get_member("mousedown", &tmp);
 	check(tmp.is_undefined());
@@ -99,8 +106,13 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.movePointerTo(100, 30);
 	check(tester.isMouseOverMouseEntity());
+	// check that the pixel under the mouse is red
+	check_pixel(2, rgba(255,0,0,255), 2);
+
 	tester.movePointerTo(170, 30);
 	check(!tester.isMouseOverMouseEntity());
+	// check that the pixel under the mouse is white
+	check_pixel(2, rgba(255,255,255,255), 2);
 
 	tester.advance();
 
@@ -111,8 +123,13 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.movePointerTo(170, 30);
 	check(tester.isMouseOverMouseEntity());
+	// check that the pixel under the mouse is red
+	check_pixel(2, rgba(255,0,0,255), 2);
+
 	tester.movePointerTo(240, 30);
 	check(!tester.isMouseOverMouseEntity());
+	// check that the pixel under the mouse is white
+	check_pixel(2, rgba(255,255,255,255), 2);
 
 	tester.advance();
 
@@ -123,9 +140,13 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.movePointerTo(240, 30);
 	check(tester.isMouseOverMouseEntity());
+	// check that the pixel under the mouse is red
+	check_pixel(2, rgba(255,0,0,255), 2);
 
 	tester.movePointerTo(340, 30);
 	check(! tester.isMouseOverMouseEntity());
+	// check that the pixel under the mouse is white
+	check_pixel(2, rgba(255,255,255,255), 2);
 
 	// Note that we are *not* on an active entity !
 	tester.pressMouseButton();
