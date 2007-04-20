@@ -30,6 +30,19 @@
 namespace gnash {
 
 /// An utility class used to compare rgba values with a given tolerance
+//
+/// This is simply a wrapper around an rgba value, with an associated
+/// tolerance used when comparing with another FuzzyPixel.
+///
+/// Currently (but we might change this in the future), the tolerance is
+/// used to compare red, green, blue and alpha values.
+///
+/// A negative tolerance may be used to mark the FuzzyPixel as
+/// an "invalid" one, which is a FuzzyPixel that will never be equal
+/// to any other. Intollerant FuzzyPixel.
+///
+/// See operator== for more info.
+///
 class FuzzyPixel
 {
 
@@ -37,14 +50,15 @@ public:
 
 	friend std::ostream& operator<< (std::ostream& o, const FuzzyPixel& p);
 
-	/// Construct a black, alpha 0 FuzzyPixel with NO tolerance.
+	/// Construct an Intollerant FuzzyPixel.
 	//
-	/// No tolerance means that any comparison will fail
+	/// Intollerant means that any comparison will fail.
+	/// Actual value of the pixel doesn't make much sense.
 	///
 	FuzzyPixel()
 		:
 		_col(0,0,0,0),
-		_tol(0)
+		_tol(-1)
 	{
 	}
 
@@ -54,17 +68,21 @@ public:
 	///	The color value
 	///
 	/// @param tolerance
-	///	The tolerance to use in comparisons
+	///	The tolerance to use in comparisons.
 	///
-	FuzzyPixel(rgba& color, int tolerance=0)
+	FuzzyPixel(rgba& color, short unsigned tolerance=0)
 		:
 		_col(color),
-		_tol(tolerance)
+		// From short unsigned to signed we hopefully never swap sign.
+		// Use the default constructor to build intolerant fuzzy pixels.
+		_tol(int(tolerance))
 	{
 	}
 
-	/// Construct a FuzzyPixel with given values
+	/// Construct a FuzzyPixel with given values and 0 tolerance.
 	//
+	/// Use setTolerance to modify the tolerance value.
+	///
 	/// @param r
 	///	The red value.
 	///
@@ -87,21 +105,29 @@ public:
 	/// Set the tolerance to use in comparisons
 	//
 	/// @param tol
-	///	The tolerance to use in comparisons
+	///	The tolerance to use in comparisons.
 	///
-	void setTolerance(int tol)
+	void setTolerance(unsigned short tol)
 	{
-		_tol = tol;
+		_tol = int(tol);
+	}
+
+	/// Make this fuzzy pixel intolerant
+	void setIntolerant()
+	{
+		_tol = -1;
 	}
 
 	/// Compare two FuzzyPixel using the tolerance of the most tolerant of the two
 	//
-	/// Note that if any of the two operands has 0 tolerance, any equality
+	/// Note that if any of the two operands is intolerant, any equality
 	/// comparison will fail.
+	///
+	/// See default constructor and setIntolerant for more info.
 	///
 	bool operator==(const FuzzyPixel& other) const;
 
-	// Return true if a and b are below a given tolerance
+	/// Return true if a and b are below a given tolerance
 	static bool fuzzyEqual(int a, int b, int tol)
 	{
 		return abs(a-b) <= tol;
@@ -109,6 +135,7 @@ public:
 
 private:
 
+	// actual color 
 	rgba _col;
 
 	// tolerance value
