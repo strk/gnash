@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.63 2007/04/19 21:08:31 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.64 2007/04/20 06:58:25 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -190,7 +190,7 @@ check(mc._currentframe != undefined);
 check_equals(mc._droptarget, "");
 check_equals(typeof(mc._droptarget), "string");
 #else
-check_equals(mc._droptarget, undefined);
+check_equals(mc._droptarget, "");
 #endif
 
 check(mc._focusrect != undefined);
@@ -209,7 +209,7 @@ mc._name = "changed";
 check_equals(typeof(mc._name), "string");
 check_equals(typeof(mc), "movieclip");
 #else
-check_equals(mc._name, undefined);
+check_equals(mc._name, "");
 #endif
 
 check(mc._parent == undefined);
