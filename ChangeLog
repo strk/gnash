@@ -1,5 +1,6 @@
 2007-04-20 Sandro Santilli <strk@keybit.net>
 
+	* libgeometry/snappingrange.h: add output operator.
 	* server/debugger.cpp, server/parser/action_buffer.cpp,
 	  server/vm/ActionExec.cpp: don't force creation of the
 	  SWFHandlers singleton too early, this hopefully means

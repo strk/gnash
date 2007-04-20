@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.13 2007/03/06 15:23:38 udog Exp $
+// $Id: snappingrange.h,v 1.14 2007/04/20 13:11:58 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -70,6 +70,9 @@ public:
 	typedef geometry::Range2d<T> RangeType;
 	typedef std::vector<RangeType> RangeList; // TODO: list might be more appropriate
 	typedef typename RangeList::size_type size_type;	
+
+	template <typename U>
+	friend std::ostream& operator<< (std::ostream& os, SnappingRanges2d<U>& r);
 	
 	/// distance (horizontally *plus* vertically) below ranges are snapped
 	/// You should initialize this when single_mode=false! 
@@ -357,6 +360,18 @@ private:
 /// Standard snapping 2d ranges type for invalidated bounds calculation  
 typedef SnappingRanges2d<float> InvalidatedRanges;
 
+template <class T>
+std::ostream& operator<< (std::ostream& os, SnappingRanges2d<T>& r)
+{
+	for (typename SnappingRanges2d<T>::RangeList::const_iterator
+		it = r._ranges.begin(), itEnd = r._ranges.end();
+		it != itEnd; ++it)
+	{
+		if ( it != r._ranges.begin() ) os << ", ";
+		os << *it;
+	}
+	return os;
+}
 
 } //namespace gnash
 
