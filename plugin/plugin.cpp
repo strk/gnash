@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.74 2007/04/11 17:54:21 bjacques Exp $ */
+/* $Id: plugin.cpp,v 1.75 2007/04/21 07:05:41 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -524,6 +524,22 @@ nsPluginInstance::startProc(Window win)
     if (ret == -1) {
       cout << "ERROR: dup2() failed: " << strerror(errno) << endl;
     }
+
+    // Close all of the browser's file descriptors that we just 
+    // inherited (including pipefd[0] that we just dup'd to fd 0).
+    // Experiments show seventy or eighty file descriptors open in
+    // typical cases.  Rather than close all the thousands of possible file
+    // descriptors, we start after stderr and keep closing higher numbers
+    // until we encounter ten fd's in a row that
+    // aren't open.  This will tend to close most fd's in most programms.
+    int numfailed = 0, closed = 0;
+    int anfd = fileno(stderr)+1;
+    for ( ; numfailed < 10; anfd++) {
+	ret = close (anfd);
+	if (ret < 0) numfailed++;
+	else         { numfailed = 0; closed++; }
+    }
+    cout << "Closed " << closed << "files." <<endl;
 
     // setup the command line
 
