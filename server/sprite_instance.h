@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.100 2007/04/19 17:41:36 udog Exp $ */
+/* $Id: sprite_instance.h,v 1.101 2007/04/21 21:07:40 strk Exp $ */
 
 // Stateful live Sprite instance
 
@@ -41,7 +41,6 @@
 #include <list>
 #include <map>
 #include <string>
-#include <boost/ptr_container/ptr_list.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -739,6 +738,17 @@ public:
 
 private:
 
+	/// Forbid copy
+	sprite_instance(const sprite_instance&)
+		:
+		character(NULL, 0)
+	{
+		assert(0);
+	}
+
+	/// Forbid assignment
+	sprite_instance& operator=(const sprite_instance&) { assert(0); return *this; }
+
 	/// \brief
 	/// Call has_keypress_event() or has_mouse_event()
 	/// if the given string correspond to an event handler
@@ -909,7 +919,7 @@ protected:
 	bool m_on_event_load_called;
 
 	/// List of loadVariables requests
-	typedef boost::ptr_list<LoadVariablesThread> LoadVariablesThreads;
+	typedef std::list<LoadVariablesThread*> LoadVariablesThreads;
 
 	/// List of active loadVariable requests 
 	//

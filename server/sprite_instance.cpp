@@ -1566,6 +1566,12 @@ sprite_instance::~sprite_instance()
 	}
 
 	m_display_list.clear();
+
+	for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
+			it != _loadVariableRequests.end(); ++it)
+	{
+		delete *it;
+	}
 }
 
 character* sprite_instance::get_character_at_depth(int depth)
@@ -3318,7 +3324,7 @@ sprite_instance::loadVariables(const URL& url, short sendVarsMethod)
 	}
 
 	_loadVariableRequests.push_back(new LoadVariablesThread(url));
-	_loadVariableRequests.back().process();
+	_loadVariableRequests.back()->process();
 	//log_msg(_(SIZET_FMT " loadVariables requests pending"), _loadVariableRequests.size());
 
 }
@@ -3354,7 +3360,7 @@ sprite_instance::processCompletedLoadVariableRequests()
 	for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
 			it != _loadVariableRequests.end(); ++it)
 	{
-		LoadVariablesThread& request = *it;
+		LoadVariablesThread& request = *(*it);
 		if ( request.completed() )
 		{
 			processCompletedLoadVariableRequest(request);

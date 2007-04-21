@@ -1,3 +1,9 @@
+2007-04-21 Sandro Santilli <strk@keybit.net>
+
+	* server/: movie_root.{cpp,h}, sprite_instance.{cpp,h},
+	  asobj/LoadVars.cpp: nuke ptr_list use so that boost 1.32
+	  (version in Debian stable) is still usable.
+
 2007-04-21  John Gilmore  <gnu@toad.com>
 
 	* plugin/plugin.cpp:  In the child process, before executing

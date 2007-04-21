@@ -35,7 +35,6 @@
 #include <string>
 #include <typeinfo>
 #include <cassert>
-#include <boost/ptr_container/ptr_list.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
 
 using namespace std;
@@ -82,6 +81,12 @@ movie_root::movie_root()
 
 movie_root::~movie_root()
 {
+	for (ActionQueue::iterator it=_actionQueue.begin(),
+			itE=_actionQueue.end();
+			it != itE; ++it)
+	{
+		delete *it;
+	}
 	assert(testInvariant());
 }
 
@@ -808,7 +813,7 @@ movie_root::processActionQueue()
 	// and a final call to .clear() 
 	while ( ! _actionQueue.empty() )
 	{
-		ExecutableCode& code = _actionQueue.front();
+		ExecutableCode& code = *(_actionQueue.front());
 		code.execute();
 		_actionQueue.pop_front(); 
 	}
@@ -823,7 +828,7 @@ movie_root::processActionQueue()
 void
 movie_root::pushAction(std::auto_ptr<ExecutableCode> code)
 {
-	_actionQueue.push_back(code->clone());
+	_actionQueue.push_back(code.release());
 }
 
 void

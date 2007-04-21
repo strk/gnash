@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.48 2007/04/16 18:23:05 strk Exp $ */
+/* $Id: movie_root.h,v 1.49 2007/04/21 21:07:40 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -77,8 +77,8 @@
 #include "timers.h" // for composition
 
 #include <vector>
+#include <list>
 #include <set>
-#include <boost/ptr_container/ptr_list.hpp>
 
 // Forward declarations
 namespace gnash {
@@ -419,6 +419,12 @@ public:
 
 private:
 
+	/// Forbid copy 
+	movie_root(const movie_root& ) { assert(0); }
+
+	/// Forbid assignment
+	movie_root& operator=(const movie_root& ) { assert(0); return *this; }
+
 	/// Notify the global Key ActionScript object about a key status change
 	void notify_global_key(key::code k, bool down);
 
@@ -433,7 +439,7 @@ private:
 	///
 	boost::intrusive_ptr<Stage> getStageObject();
 
-	typedef boost::ptr_list<ExecutableCode> ActionQueue;
+	typedef std::list<ExecutableCode*> ActionQueue;
 
 	ActionQueue _actionQueue;
 

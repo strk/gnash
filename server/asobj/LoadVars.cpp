@@ -122,6 +122,15 @@ public:
 
 private:
 
+	/// Forbid copy
+	LoadVars(const LoadVars&)
+		:
+		as_object()
+	{ assert(0); }
+
+	/// Forbid assignment
+	LoadVars& operator=(const LoadVars&) { assert(0); return *this; }
+
 	/// Return enumerable property pairs in url-encoded form
 	//
 	/// TODO: move up to as_object and make public,
@@ -199,8 +208,8 @@ private:
 	size_t _bytesLoaded;
 
 	/// List of load requests
-	//typedef std::list<LoadVariablesThread> LoadVariablesThreads;
-	typedef boost::ptr_list<LoadVariablesThread> LoadVariablesThreads;
+	typedef std::list<LoadVariablesThread*> LoadVariablesThreads;
+	//typedef boost::ptr_list<LoadVariablesThread> LoadVariablesThreads;
 
 	/// Load requests queue
 	//
@@ -240,15 +249,20 @@ LoadVars::LoadVars(as_environment* env)
 LoadVars::~LoadVars()
 {
 	//log_msg("Deleting LoadVars %p", this);
+	for ( LoadVariablesThreads::iterator i=_loadRequests.begin(), e=_loadRequests.end();
+			i!=e; ++i)
+	{
+		delete *i;
+	}
 }
 
 void
 LoadVars::checkLoads()
 {
 	/// Process a completed load if any
-	if ( isLoading() && _currentLoad->completed() )
+	if ( isLoading() && (*_currentLoad)->completed() )
 	{
-		processLoaded(*_currentLoad);
+		processLoaded(*(*_currentLoad));
 		_loadRequests.pop_front();
 		_currentLoad = _loadRequests.end();
 	}
@@ -258,7 +272,7 @@ LoadVars::checkLoads()
 		if ( ! _loadRequests.empty() )
 		{
 			_currentLoad = _loadRequests.begin();
-			_currentLoad->process();
+			(*_currentLoad)->process();
 		}
 		else
 		{
