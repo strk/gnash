@@ -109,6 +109,7 @@ check_PROGRAMS = \
 	frame_label_test \
 	path_format_test \
 	duplicate_movie_clip_test \
+	masks_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -148,7 +149,6 @@ check_SCRIPTS = \
 	path_format_testrunner \
 	duplicate_movie_clip_testrunner \
 	matrix_testrunner \
-	masks_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -391,9 +391,19 @@ masks_test_LDADD = $(MING_LIBS)
 masks_test.swf: masks_test
 	./masks_test $(top_srcdir)/testsuite/media
 
-masks_testrunner: $(srcdir)/../generic-testrunner.sh masks_test.swf
-	sh $< -r5 $(top_builddir) masks_test.swf > $@
-	chmod 755 $@
+masks_testrunner_SOURCES = \
+	masks_testrunner.cpp \
+	$(NULL)
+masks_testrunner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+masks_testrunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+masks_testrunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	masks_test.swf      \
+	$(NULL)
 
 matrix_test_SOURCES =	\
 	matrix_test.c	\

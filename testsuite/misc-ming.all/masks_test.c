@@ -33,68 +33,47 @@
 #define OUTPUT_VERSION 6
 #define OUTPUT_FILENAME "masks_test.swf"
 
-void add_dynamic_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height);
-void add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height);
+void add_dynamic_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height, int r, int g, int b);
+void add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height, int r, int g, int b);
 void add_static_mask(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height, int masklevel);
 
 void
-add_dynamic_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height)
+add_dynamic_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height, int r, int g, int b)
 {
 	SWFAction ac = compile_actions("createEmptyMovieClip('%s', %d);"
 			"with (%s) {"
-			" lineStyle(1, 0x000000, 100);"	
-			" beginFill(0x00FF00, 100);"
+			//" lineStyle(1, 0x000000, 100);"	
+			" beginFill(0x%2.2X%2.2X%2.2X, 100);"
 			" moveTo(%d, %d);"
 			" lineTo(%d, %d);"
 			" lineTo(%d, %d);"
 			" lineTo(%d, %d);"
 			" lineTo(%d, %d);"
 			" endFill();"
-			"}"
-			"%s.createEmptyMovieClip('child', 1);"
-			"with (%s.child) {"
-			" lineStyle(3, 0x000000, 100);"	
-			" moveTo(%d, %d);"
-			" lineTo(%d, %d);"
-			" lineTo(%d, %d);"
-			" lineTo(%d, %d);"
-			" lineTo(%d, %d);"
 			"}",
 			name, depth, name,
+			r,g,b,
 			x, y,
 			x, y+height,
 			x+width, y+height,
 			x+width, y,
-			x, y,
-			name, name,
-			x+5, y+5,
-			x+5, y+height-5,
-			x+width-5, y+height-5,
-			x+width-5, y+5,
-			x+5, y+5
+			x, y
 			);
 
 	SWFMovie_add(mo, (SWFBlock)ac);
 }
 
 void
-add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height)
+add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height, int r, int g, int b)
 {
 	SWFShape sh;
 	SWFMovieClip mc, mc2;
 	SWFDisplayItem it;
 
-	sh = make_fill_square (-(width/2), -(height/2), width, height, 255, 0, 0, 255, 0, 0);
+	sh = make_fill_square (0, 0, width, height, r, g, b, r, g, b);
 	mc = newSWFMovieClip();
 	SWFMovieClip_add(mc, (SWFBlock)sh);
 
-	sh = make_square (-(width/2)+5, -(height/2)+5, width-10, height-10, 0, 0, 0);
-	mc2 = newSWFMovieClip(); // child
-	SWFMovieClip_add(mc2, (SWFBlock)sh);
-	SWFMovieClip_nextFrame(mc2);
-
-	it = SWFMovieClip_add(mc, (SWFBlock)mc2);
-	SWFDisplayItem_setName(it, "child");
 	SWFMovieClip_nextFrame(mc);
 
 	it = SWFMovie_add(mo, (SWFBlock)mc);
@@ -143,7 +122,7 @@ main(int argc, char** argv)
 	Ming_init();
 	mo = newSWFMovieWithVersion(OUTPUT_VERSION);
 	SWFMovie_setDimension(mo, 800, 600);
-	SWFMovie_setRate (mo, 1);
+	SWFMovie_setRate (mo, 0.3);
 
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
 	it = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
@@ -155,14 +134,14 @@ main(int argc, char** argv)
 	// this one seems to confuse the MM player
 	//add_static_mask(mo, "mask1", 1, 0, 150, 200, 100, 20);
 
-	add_static_mc(mo, "staticmc2", 2, 0, 200, 60, 60);
-	add_static_mc(mo, "staticmc3", 3, 30, 200, 60, 60);
-	add_static_mc(mo, "staticmc4", 4, 200, 200, 60, 60);
-	add_static_mc(mo, "staticmc5", 5, 230, 200, 60, 60);
-	add_dynamic_mc(mo, "dynamicmc2", 12, 0, 300, 60, 60);
-	add_dynamic_mc(mo, "dynamicmc3", 13, 30, 300, 60, 60);
-	add_dynamic_mc(mo, "dynamicmc4", 14, 200, 300, 60, 60);
-	add_dynamic_mc(mo, "dynamicmc5", 15, 230, 300, 60, 60);
+	add_static_mc(mo, "staticmc2", 2, 0, 200, 60, 60, 255, 0, 0);
+	add_static_mc(mo, "staticmc3", 3, 30, 200, 60, 60, 255, 255, 0);
+	add_static_mc(mo, "staticmc4", 4, 200, 200, 60, 60, 0, 255, 0);
+	add_static_mc(mo, "staticmc5", 5, 230, 200, 60, 60, 0, 255, 255);
+	add_dynamic_mc(mo, "dynamicmc2", 12, 0, 300, 60, 60, 0, 0, 255);
+	add_dynamic_mc(mo, "dynamicmc3", 13, 30, 300, 60, 60, 255, 0, 255);
+	add_dynamic_mc(mo, "dynamicmc4", 14, 200, 300, 60, 60, 0, 128, 0);
+	add_dynamic_mc(mo, "dynamicmc5", 15, 230, 300, 60, 60, 0, 128, 255);
 
 
 	check_equals(mo, "staticmc2.getDepth()", "-16382");

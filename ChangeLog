@@ -1,5 +1,9 @@
 2007-04-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, masks_test.c,
+	  masks_testrunner.cpp: Add a MovieTester based test runner
+	  for the masks_test movie. Shows a bug in either the renderer
+	  or in the core preventing rendering of dynamic clips.
 	* libgeometry/snappingrange.h: add unconditional visitor; add
 	  cast operator; add contains(Range2d); add scale(factor).
 	* testsuite/MovieTester.{cpp,h}: add a getInvalidatedRanges function;
