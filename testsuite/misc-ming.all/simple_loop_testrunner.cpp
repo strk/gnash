@@ -66,7 +66,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->getDisplayList().size(), 1);
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
 	invalidated = tester.getInvalidatedBounds();
-	check( invalidated.intersects(Bounds(0, 0, 60, 60)) );
+	check( invalidated.contains(Bounds(0, 0, 60, 60)) );
 
 	tester.advance(); // FRAME 3/4
 	
@@ -76,7 +76,7 @@ main(int /*argc*/, char** /*argv*/)
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
 	check( tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset) );
 	invalidated = tester.getInvalidatedBounds();
-	check( invalidated.intersects(Bounds(60, 0, 120, 60)) );
+	check( invalidated.contains(Bounds(60, 0, 120, 60)) );
 
 	tester.advance(); // FRAME 4/4
 	
@@ -87,7 +87,7 @@ main(int /*argc*/, char** /*argv*/)
 	check( tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset) );
 	check( tester.findDisplayItemByDepth(*root, 4+character::staticDepthOffset) );
 	invalidated = tester.getInvalidatedBounds();
-	check( invalidated.intersects(Bounds(120, 0, 180, 60)) );
+	check( invalidated.contains(Bounds(120, 0, 180, 60)) );
 
 	tester.advance(); // FRAME 1/4 (loop back)
 	
@@ -95,7 +95,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 0);
 	invalidated = tester.getInvalidatedBounds();
-	check( invalidated.intersects(Bounds(0, 0, 180, 60)) );
+	check( invalidated.contains(Bounds(0, 0, 180, 60)) );
 
 	tester.advance(); // FRAME 2/4
 	
@@ -104,7 +104,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->getDisplayList().size(), 1);
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
 	invalidated = tester.getInvalidatedBounds();
-	check( invalidated.intersects(Bounds(0, 0, 60, 60)) );
+	check( invalidated.contains(Bounds(0, 0, 60, 60)) );
 
 	tester.advance(); // FRAME 3/4
 	
@@ -114,7 +114,7 @@ main(int /*argc*/, char** /*argv*/)
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
 	check( tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset) );
 	invalidated = tester.getInvalidatedBounds();
-	check( invalidated.intersects(Bounds(60, 0, 120, 60)) );
+	check( invalidated.contains(Bounds(60, 0, 120, 60)) );
 
 	tester.advance(); // FRAME 4/4
 	
@@ -125,7 +125,7 @@ main(int /*argc*/, char** /*argv*/)
 	check( tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset) );
 	check( tester.findDisplayItemByDepth(*root, 4+character::staticDepthOffset) );
 	invalidated = tester.getInvalidatedBounds();
-	check( invalidated.intersects(Bounds(120, 0, 180, 60)) );
+	check( invalidated.contains(Bounds(120, 0, 180, 60)) );
 
 }
 

@@ -1,3 +1,8 @@
+2007-04-23 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/simple_loop_testrunner.cpp: 
+	  Use contains, not intersects, when testing invalidated bounds.
+
 2007-04-23 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/event_handler_scope_test.c
