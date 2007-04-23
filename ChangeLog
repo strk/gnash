@@ -1,5 +1,13 @@
 2007-04-23 Sandro Santilli <strk@keybit.net>
 
+	* server/DynamicShape.cpp (moveTo): do not reset current
+	  fill style on move. Fixes some of the tests in DrawingApiTest.swf
+	  and masks_test.swf.
+	* testsuite/misc-ming.all/: DrawingApiTestRunner.cpp,
+	  masks_testrunner.cpp: some more successes.
+
+2007-04-23 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: DrawingApiTest.as,
 	  DrawingApiTestRunner.cpp: add rendering tests.
 	  Add a drawing in which move() is called after beginFill()

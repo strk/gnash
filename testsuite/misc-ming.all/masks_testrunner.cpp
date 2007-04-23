@@ -1,5 +1,5 @@
 /* 
- *   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+ *   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -108,14 +108,14 @@ main(int /*argc*/, char** /*argv*/)
 	xcheck_pixel(14,331, 2, blue, 2);
 	// 48,331 = violet (blue behind)
 	check( invalidated.contains(48, 331) );
-	xcheck_pixel(48,331, 2, violet, 2);
+	check_pixel(48,331, 2, violet, 2);
 	// 80,331 = violet
 	check( invalidated.contains(80, 331) );
-	xcheck_pixel(80,331, 2, violet, 2);
+	check_pixel(80,331, 2, violet, 2);
 
 	// 214,331 = dark_green
 	check( invalidated.contains(214, 331) );
-	xcheck_pixel(214,331, 2, dark_green, 2);
+	check_pixel(214,331, 2, dark_green, 2);
 	// 248,331 = light_blue (dark_green behind)
 	check( invalidated.contains(248, 331) );
 	xcheck_pixel(248,331, 2, light_blue, 2);

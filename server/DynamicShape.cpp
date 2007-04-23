@@ -16,7 +16,7 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.4 2007/02/19 22:51:50 strk Exp $ */
+/* $Id: DynamicShape.cpp,v 1.5 2007/04/23 13:45:18 strk Exp $ */
 
 #include "DynamicShape.h"
 
@@ -90,9 +90,13 @@ void
 DynamicShape::startNewPath()
 {
 	// Close any pending filled style
-	endFill();
+	// The DrawingApiTest.swf file shows we should NOT
+	// necessarely end the current fill when starting a new one.
+	//endFill();
 
-	path newPath(_x, _y, _currfill, _currfill, _currline);
+	// A quick test shows that *left* always work fine !
+	// More than that, using a *right* fill seems to break the tests !
+	path newPath(_x, _y, _currfill, 0, _currline);
 	add_path(newPath);
 }
 

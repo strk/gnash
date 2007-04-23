@@ -82,21 +82,21 @@ main(int /*argc*/, char** /*argv*/)
 	// Inside violet fill
 	tester.movePointerTo(250, 112);
 	check(tester.isMouseOverMouseEntity());
-	xcheck_pixel(250, 112, 2, violet, 1);
+	check_pixel(250, 112, 2, violet, 1);
 
 	// Inside red "thick" line
 	tester.movePointerTo(146, 146);
-	xcheck(tester.isMouseOverMouseEntity());
+	check(tester.isMouseOverMouseEntity());
 	xcheck_pixel(146, 146, 2, red, 2);
 
 	// Inside the yellow line
 	tester.movePointerTo(270, 232);
-	xcheck(tester.isMouseOverMouseEntity());
+	check(tester.isMouseOverMouseEntity());
 	xcheck_pixel(270, 232, 2, yellow, 2);
 
 	// Inside the black vertical line
 	tester.movePointerTo(82, 127);
-	xcheck(tester.isMouseOverMouseEntity());
+	check(tester.isMouseOverMouseEntity());
 	check_pixel(82, 127, 2, black, 2);
 
 }
