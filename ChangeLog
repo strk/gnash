@@ -1,5 +1,11 @@
 2007-04-23 Sandro Santilli <strk@keybit.net>
 
+	* server/: gnash.h, types.cpp: add point::distance() and
+	  squaredDistance()
+	* testsuite/server/: Makefile.am, PointTest.cpp: point tests.
+
+2007-04-23 Sandro Santilli <strk@keybit.net>
+
 	* server/cxform.{cpp,h}: add output operator and toString method.
 	* server/DynamicShape.cpp (moveTo): do not reset current
 	  fill style on move. Fixes some of the tests in DrawingApiTest.swf

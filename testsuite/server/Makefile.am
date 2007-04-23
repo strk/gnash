@@ -34,6 +34,7 @@ AM_CPPFLAGS = -I.. \
 
 check_PROGRAMS = \
 	MatrixTest \
+	PointTest \
 	PropertyListTest \
 	GetterSetterTest \
 	as_prop_flagsTest \
@@ -59,6 +60,11 @@ GNASH_LIBS = \
 
 MatrixTest_SOURCES = MatrixTest.cpp
 MatrixTest_LDADD = \
+	$(GNASH_LIBS) \
+	$(NULL)
+
+PointTest_SOURCES = PointTest.cpp
+PointTest_LDADD = \
 	$(GNASH_LIBS) \
 	$(NULL)
 

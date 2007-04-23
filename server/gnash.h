@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: gnash.h,v 1.94 2007/04/16 10:26:59 jgilmore Exp $ */
+/* $Id: gnash.h,v 1.95 2007/04/23 16:40:08 strk Exp $ */
 
 /// \mainpage
 ///
@@ -423,6 +423,12 @@ public:
 		}
 
 	bool operator==(const point& p) const { return m_x == p.m_x && m_y == p.m_y; }
+
+	/// Return the square of the distance between this and other point.
+	float squareDistance(const point& other) const;
+
+	/// Return the distance between this and other point.
+	float distance(const point& other) const;
 
 	bool	bitwise_equal(const point& p) const;
 };
