@@ -61,6 +61,15 @@ with (a)
 	lineTo(230, 100);
 	endFill();
 
+	// clockwise, move after beginFill
+	lineStyle(1, 0x00FF00);
+	beginFill(0xFF00FF, 100);
+	moveTo(260, 100);
+	lineTo(260, 120);
+	lineTo(240, 120);
+	lineTo(240, 100);
+	lineTo(260, 100);
+	endFill();
 }
 
 // Make the MovieClip "active" (grabbing mouse events)

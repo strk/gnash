@@ -1,5 +1,12 @@
 2007-04-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: DrawingApiTest.as,
+	  DrawingApiTestRunner.cpp: add rendering tests.
+	  Add a drawing in which move() is called after beginFill()
+	  to confirm the fill is not reset after move().
+
+2007-04-23 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am, masks_test.c,
 	  masks_testrunner.cpp: Add a MovieTester based test runner
 	  for the masks_test movie. Shows a bug in either the renderer

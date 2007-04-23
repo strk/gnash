@@ -50,25 +50,54 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.advance();
 
+	rgba white(255, 255, 255, 255);
+	rgba blue(0, 0, 255, 255);
+	rgba cyan(0, 255, 255, 255);
+	rgba green(0, 255, 0, 255);
+	rgba red(255, 0, 0, 255);
+	rgba yellow(255, 255, 0, 255);
+	rgba black(0, 0, 0, 255);
+	rgba violet(255, 0, 255, 255);
+
 	// Out of any drawing
 	tester.movePointerTo(50, 50);
 	check(!tester.isMouseOverMouseEntity());
+	check_pixel(50, 50, 2, white, 1);
 
 	// Inside bottom-left blue fill
 	tester.movePointerTo(60, 215);
 	check(tester.isMouseOverMouseEntity());
+	check_pixel(60, 215, 2, blue, 1);
 
 	// Inside cyan clockwise fill
 	tester.movePointerTo(190, 112);
 	check(tester.isMouseOverMouseEntity());
+	check_pixel(190, 112, 2, cyan, 1);
 
 	// Inside green counterclockwise fill
 	tester.movePointerTo(220, 112);
 	check(tester.isMouseOverMouseEntity());
+	check_pixel(220, 112, 2, green, 1);
+
+	// Inside violet fill
+	tester.movePointerTo(250, 112);
+	check(tester.isMouseOverMouseEntity());
+	xcheck_pixel(250, 112, 2, violet, 1);
 
 	// Inside red "thick" line
 	tester.movePointerTo(146, 146);
 	xcheck(tester.isMouseOverMouseEntity());
+	xcheck_pixel(146, 146, 2, red, 2);
+
+	// Inside the yellow line
+	tester.movePointerTo(270, 232);
+	xcheck(tester.isMouseOverMouseEntity());
+	xcheck_pixel(270, 232, 2, yellow, 2);
+
+	// Inside the black vertical line
+	tester.movePointerTo(82, 127);
+	xcheck(tester.isMouseOverMouseEntity());
+	check_pixel(82, 127, 2, black, 2);
 
 }
 
