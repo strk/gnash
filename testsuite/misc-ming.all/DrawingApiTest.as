@@ -22,6 +22,11 @@ with (a)
 	moveTo(100, 100);
 	lineTo(200, 200);
 
+	// The hairlined horizontal black line
+	lineStyle(0, 0x000000, 100);
+	moveTo(220, 180);
+	lineTo(280, 180);
+
 	moveTo(100, 200);
 	lineStyle(5, 0xFF00FF, 50);
 	lineTo(200, 250);
