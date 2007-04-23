@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.cpp,v 1.31 2007/04/13 07:35:55 bjacques Exp $ */
+/* $Id: shape.cpp,v 1.32 2007/04/23 18:09:54 strk Exp $ */
 
 #include "shape.h"
 
@@ -62,6 +62,48 @@ void	edge::tesselate_curve() const
 	{
 		tesselate::add_curve_segment(m_cx, m_cy, m_ax, m_ay);
 	}
+}
+
+float
+edge::distancePtSeg(const point& pt, const point& A, const point& B)
+{
+	float square = squareDistancePtSeg(pt, A, B);
+	return sqrt(square);
+}
+
+float
+edge::squareDistancePtSeg(const point& p, const point& A, const point& B)
+{
+	float dx = B.m_x - A.m_x;
+	float dy = B.m_y - A.m_y;
+
+        /* if start==end, then use pt distance */
+        if ( dx == 0 && dy == 0 ) return p.squareDistance(A); 
+
+	float pdx = p.m_x - A.m_x;
+	float pdy = p.m_y - A.m_y;
+
+        float u = (pdx * dx + pdy * dy) / (dx*dx + dy*dy);
+
+        if (u<0)
+	{
+		cout << "R was < 0 " << endl;
+		return p.squareDistance(A); 
+	}
+
+        if (u>1)
+	{
+		cout << "R was > 1 " << endl;
+		return p.squareDistance(B);
+	}
+
+	point px;
+	px.m_x = A.m_x + u * (B.m_x - A.m_x);
+	px.m_y = A.m_y + u * (B.m_y - A.m_y);
+
+	cout << "R was between 0 and 1, u is " << u << " px : " << px.m_x << "," << px.m_y << endl;
+
+	return p.squareDistance(px);
 }
 
 

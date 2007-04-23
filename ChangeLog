@@ -1,5 +1,12 @@
 2007-04-23 Sandro Santilli <strk@keybit.net>
 
+	* server/shape.{cpp,h}: add primitive distance functions
+	  for point-segment
+	* testsuite/server/: Makefile.am, EdgeTest.cpp: add tests 
+	  for point-segment distance.
+
+2007-04-23 Sandro Santilli <strk@keybit.net>
+
 	* server/: gnash.h, types.cpp: add point::distance() and
 	  squaredDistance()
 	* testsuite/server/: Makefile.am, PointTest.cpp: point tests.

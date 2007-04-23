@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.19 2007/02/19 10:41:57 strk Exp $ */
+/* $Id: shape.h,v 1.20 2007/04/23 18:09:54 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -33,6 +33,12 @@ namespace gnash {
 		edge(float cx, float cy, float ax, float ay);
 		void	tesselate_curve() const;
 		bool	is_straight() const;
+
+		/// Return squared distance between point pt and segment A-B
+		static float squareDistancePtSeg(const point& pt, const point& A, const point& B);
+
+		/// Return distance between point pt and segment A-B
+		static float distancePtSeg(const point& pt, const point& A, const point& B);
 		
 	//private:
 		// *quadratic* bezier: point = p0 * t^2 + p1 * 2t(1-t) + p2 * (1-t)^2
