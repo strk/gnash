@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.15 2007/04/20 14:14:50 strk Exp $
+// $Id: snappingrange.h,v 1.16 2007/04/23 09:29:53 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -32,6 +32,7 @@ using namespace gnash;
 
 namespace gnash {
 
+namespace geometry {
 
 /// \brief
 /// Snapping range class. Can hold a number of 2D ranges and combines 
@@ -357,9 +358,6 @@ private:
 	
 }; //class SnappingRanges2d
 
-/// Standard snapping 2d ranges type for invalidated bounds calculation  
-typedef SnappingRanges2d<float> InvalidatedRanges;
-
 template <class T>
 std::ostream& operator<< (std::ostream& os, SnappingRanges2d<T>& r)
 {
@@ -375,6 +373,12 @@ std::ostream& operator<< (std::ostream& os, SnappingRanges2d<T>& r)
 	}
 	return os;
 }
+
+} //namespace gnash.geometry
+
+/// Standard snapping 2d ranges type for invalidated bounds calculation  
+typedef geometry::SnappingRanges2d<float> InvalidatedRanges;
+
 
 } //namespace gnash
 

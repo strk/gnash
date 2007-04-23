@@ -1,5 +1,8 @@
 2007-04-23 Sandro Santilli <strk@keybit.net>
 
+	* libgeometry/snappingrange.h: define the SnappingRanges2d<> in
+	  the gnash::geometry namespace. Keep InvalidatedBounds in the
+	  gnash namespace, for simplicity.
 	* testsuite/misc-ming.all/simple_loop_testrunner.cpp: 
 	  Use contains, not intersects, when testing invalidated bounds.
 
