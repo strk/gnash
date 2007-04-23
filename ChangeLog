@@ -1,5 +1,6 @@
 2007-04-23 Sandro Santilli <strk@keybit.net>
 
+	* server/cxform.{cpp,h}: add output operator and toString method.
 	* server/DynamicShape.cpp (moveTo): do not reset current
 	  fill style on move. Fixes some of the tests in DrawingApiTest.swf
 	  and masks_test.swf.

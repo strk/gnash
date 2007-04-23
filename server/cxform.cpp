@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: cxform.cpp,v 1.1 2007/04/11 14:20:20 strk Exp $ 
+// $Id: cxform.cpp,v 1.2 2007/04/23 14:37:52 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -160,6 +160,24 @@ void	cxform::print() const
 	log_parse("| %4.4f %4.4f|", m_[1][0], m_[1][1]);
 	log_parse("| %4.4f %4.4f|", m_[2][0], m_[2][1]);
 	log_parse("| %4.4f %4.4f|", m_[3][0], m_[3][1]);
+}
+
+std::string
+cxform::toString() const
+{
+	std::stringstream ss;
+	ss << *this;
+	return ss.str();
+}
+
+std::ostream&
+operator<< (std::ostream& os, const cxform& cx) 
+{
+	os << "r: *" << cx.m_[0][0] << " +" << cx.m_[0][1] << ", ";
+	os << "|g: *" << cx.m_[1][0] << " +" << cx.m_[1][1] << ", ";
+	os << "|b: *" << cx.m_[2][0] << " +" << cx.m_[2][1] << ", ";
+	os << "|a: *" << cx.m_[3][0] << " +" << cx.m_[3][1];
+	return os;
 }
 
 bool	cxform::is_identity() const

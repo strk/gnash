@@ -37,6 +37,9 @@ namespace gnash {
 class DSOEXPORT cxform
 {
 public:
+
+    friend std::ostream& operator<< (std::ostream& os, const cxform& cx);
+
     /// [RGBA][multiply, add]
     float	m_[4][2];
     
@@ -76,6 +79,8 @@ public:
     
     /// The identity color transform (no transform)
     static cxform	identity;
+
+    std::string toString() const;
 };
 
 
