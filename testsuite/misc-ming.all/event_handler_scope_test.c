@@ -31,8 +31,8 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip  mc2, dejagnuclip;
-  SWFDisplayItem  it2;
+  SWFMovieClip  mc, dejagnuclip;
+  SWFDisplayItem  it;
   SWFShape  sh_red;
 
   const char *srcdir=".";
@@ -55,44 +55,44 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo);  /* 1st frame */
 
   
-  mc2 = newSWFMovieClip();
+  mc = newSWFMovieClip();
   sh_red = make_fill_square (100, 200, 60, 60, 255, 0, 0, 255, 0, 0);
-  SWFMovieClip_add(mc2, (SWFBlock)sh_red);  
-  SWFMovieClip_nextFrame(mc2); //frame1
-  SWFMovieClip_nextFrame(mc2); //frame2
-  add_clip_actions(mc2, " if (scope_test == 1); scope_test = 2; stop();");
-  SWFMovieClip_nextFrame(mc2); //frame3
+  SWFMovieClip_add(mc, (SWFBlock)sh_red);  
+  SWFMovieClip_nextFrame(mc); //frame1
+  SWFMovieClip_nextFrame(mc); //frame2
+  add_clip_actions(mc, " if (scope_test == 1); scope_test = 2; stop();");
+  SWFMovieClip_nextFrame(mc); //frame3
 
-  it2 = SWFMovie_add(mo, (SWFBlock)mc2); 
-  SWFDisplayItem_setDepth(it2, 20); 
-  SWFDisplayItem_setName(it2, "mc2"); 
+  it = SWFMovie_add(mo, (SWFBlock)mc); 
+  SWFDisplayItem_setDepth(it, 20); 
+  SWFDisplayItem_setName(it, "mc"); 
   /* Define onClipEnterFrame */
-  SWFDisplayItem_addAction(it2,
+  SWFDisplayItem_addAction(it,
     compileSWFActionCode(" _root.note('onClipEnterFrame triggered'); "
                          " var scope_test = 1; "), // Define mc.scope_test
     SWFACTION_ENTERFRAME);  
   /* Define onEnterFrame */
-  add_actions(mo, " mc2.onEnterFrame = function () "
+  add_actions(mo, " mc.onEnterFrame = function () "
                   " { _root.note('user defined onEnterFrame called'); "
                   "   scope_test = 3; "          // Define _root.scope_test 
                   " var scope_test = 4; }; " );  // Define a local var
   
   check_equals(mo, "_root.scope_test", "undefined");
-  check_equals(mo, "_root.mc2.scope_test", "undefined");
+  check_equals(mo, "_root.mc.scope_test", "undefined");
   SWFMovie_nextFrame(mo); /* 2nd frame */
   
-  check_equals(mo, "_root.mc2.scope_test", "1");
+  check_equals(mo, "_root.mc.scope_test", "1");
   check_equals(mo, "_root.scope_test", "3");
   SWFMovie_nextFrame(mo); /* 3rd frame */
   
-  check_equals(mo, "_root.mc2.scope_test", "2");
+  check_equals(mo, "_root.mc.scope_test", "2");
   SWFMovie_nextFrame(mo); /* 4th frame */
   
   check_equals(mo, "_root.scope_test", "3");
   SWFMovie_nextFrame(mo); /* 5th frame */
   
-  SWFDisplayItem_remove(it2);
-  check_equals(mo, "_root.mc2.scope_test", "undefined");
+  SWFDisplayItem_remove(it);
+  check_equals(mo, "_root.mc.scope_test", "undefined");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 6th frame */
   //Output movie
