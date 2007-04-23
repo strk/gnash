@@ -17,28 +17,41 @@ with (a)
 {
 	clear();
 
+#if 1
 	// The thick red line
 	lineStyle(20, 0xFF0000, 100);
 	moveTo(100, 100);
 	lineTo(200, 200);
+#endif
 
 	// The hairlined horizontal black line
 	lineStyle(0, 0x000000, 100);
 	moveTo(220, 180);
 	lineTo(280, 180);
+#if 1
 
+	// The violet line
 	moveTo(100, 200);
 	lineStyle(5, 0xFF00FF, 50);
 	lineTo(200, 250);
+
+	// The yellow line
 	lineStyle(10, 0xFFFF00, 100);
 	lineTo(400, 200);
+
+	// The green curve
 	lineStyle(8, 0x00FF00, 100);
 	curveTo(400, 120, 300, 100);
+
+	// Transparent line
 	lineStyle();
 	lineTo(80, 100);
+
+	// The black thick vertical line
 	lineStyle(20);
 	lineTo(80, 150);
 
+	// The ugly blue-fill red-stroke thingy
 	moveTo(80, 180);
 	lineStyle(2, 0xFF0000);
 	beginFill(0x0000FF, 100);
@@ -78,6 +91,7 @@ with (a)
 	lineTo(240, 100);
 	lineTo(260, 100);
 	endFill();
+#endif
 }
 
 // Make the MovieClip "active" (grabbing mouse events)

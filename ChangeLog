@@ -1,5 +1,19 @@
 2007-04-23 Sandro Santilli <strk@keybit.net>
 
+	* server/DynamicShape.{h,cpp} (lineStyle): add a line style even
+	  if it is for specifying a thickness of 0 (hairline);
+	  add a resetLineStyle() function for dropping any style.
+	* server/sprite_instance.{cpp,h}: add resetLineStyle() for
+	  drawing api.
+	* server/parser/shape_character_def.cpp (point_test_local):
+	  Use a tolerance of a single twip distance when detecting
+	  collision of hairlined strokes.
+	* testsuite/misc-ming.all/DrawingApiTest.as: add more comments, and
+	  an hairlined line.
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: more tests.
+
+2007-04-23 Sandro Santilli <strk@keybit.net>
+
 	* server/shape.{cpp,h}: add path::withinSquareDistance.
 	* server/types.cpp (point::distance): return 0 for 0 squaredDistance
 	  (not 1).

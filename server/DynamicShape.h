@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: DynamicShape.h,v 1.2 2007/02/19 21:40:32 strk Exp $ */
+/* $Id: DynamicShape.h,v 1.3 2007/04/23 20:05:20 strk Exp $ */
 
 #ifndef GNASH_DYNAMIC_SHAPE_H
 #define GNASH_DYNAMIC_SHAPE_H
@@ -57,8 +57,11 @@ public:
 	/// Close an existing filled path, if any.
 	void endFill();
 
-	/// Set current line style
+	/// Set current line style and start a new path.
 	void lineStyle(uint16_t thickness, const rgba& color);
+
+	/// Reset line style to no style and start a new path.
+	void resetLineStyle();
 
 	/// \brief
 	/// Add a fill style, possibly reusing an existing

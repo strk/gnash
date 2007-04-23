@@ -16,7 +16,7 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.5 2007/04/23 13:45:18 strk Exp $ */
+/* $Id: DynamicShape.cpp,v 1.6 2007/04/23 20:05:20 strk Exp $ */
 
 #include "DynamicShape.h"
 
@@ -114,13 +114,15 @@ DynamicShape::finalize()
 void
 DynamicShape::lineStyle(uint16_t thickness, const rgba& color)
 {
-	if ( thickness ) {
-		line_style style(thickness, color);
-		_currline = add_line_style(style);
-	} else {
-		_currline = 0;
-	}
+	line_style style(thickness, color);
+	_currline = add_line_style(style);
+	startNewPath();
+}
 
+void
+DynamicShape::resetLineStyle()
+{
+	_currline = 0;
 	startNewPath();
 }
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.17 2007/04/23 19:19:30 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.18 2007/04/23 20:05:20 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -622,9 +622,19 @@ bool	shape_character_def::point_test_local(float x, float y)
 		assert(m_line_styles.size() >= pth.m_line);
 		line_style& ls = m_line_styles[pth.m_line-1];
 		int thickness = ls.get_width();
-		//cout << "Thickness of line is " << thickness << endl;
-		float dist = thickness/2;
-		if ( pth.withinSquareDistance(pt, dist*dist) ) return true;
+		float sqdist;
+		if ( thickness == 0 )
+		{
+			// hairline has always a tolerance of a single twip
+			sqdist = 1;
+		}
+		else
+		{
+			float dist = thickness/2;
+			sqdist = dist*dist;
+		}
+		//cout << "Thickness of line is " << thickness << " squared is " << sqdist << endl;
+		if ( pth.withinSquareDistance(pt, sqdist) ) return true;
 	}
 
 	if (pth.point_test(x, y)) return true;

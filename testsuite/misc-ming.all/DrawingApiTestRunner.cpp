@@ -94,6 +94,16 @@ main(int /*argc*/, char** /*argv*/)
 	check(tester.isMouseOverMouseEntity());
 	xcheck_pixel(250, 180, 1, black, 2);
 
+	// Over the transparent line (244,100)
+	tester.movePointerTo(244, 100);
+	xcheck(!tester.isMouseOverMouseEntity());
+	xcheck_pixel(244, 100, 2, white, 2);
+
+	// Over the violet line (146,225)
+	tester.movePointerTo(146, 225);
+	check(tester.isMouseOverMouseEntity());
+	xcheck_pixel(146, 225, 1, violet, 2);
+
 	// Inside the yellow line
 	tester.movePointerTo(270, 232);
 	check(tester.isMouseOverMouseEntity());
