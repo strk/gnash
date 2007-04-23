@@ -38,6 +38,7 @@ using namespace std;
 int
 main(int /*argc*/, char** /*argv*/)
 {
+	typedef gnash::geometry::SnappingRanges2d<int> Ranges;
 	typedef gnash::geometry::Range2d<int> Bounds;
 
 	string filename = string(TGTDIR) + string("/") + string(INPUT_FILENAME);
@@ -46,7 +47,7 @@ main(int /*argc*/, char** /*argv*/)
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 
-	Bounds invalidated;
+	Ranges invalidated;
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
@@ -56,7 +57,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 0); // no chars
-	invalidated = tester.getInvalidatedBounds();
+	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.isNull() );
 
 	tester.advance(); // FRAME 2/4
@@ -65,7 +66,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 1);
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
-	invalidated = tester.getInvalidatedBounds();
+	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(0, 0, 60, 60)) );
 
 	tester.advance(); // FRAME 3/4
@@ -75,7 +76,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->getDisplayList().size(), 2);
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
 	check( tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset) );
-	invalidated = tester.getInvalidatedBounds();
+	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(60, 0, 120, 60)) );
 
 	tester.advance(); // FRAME 4/4
@@ -86,7 +87,7 @@ main(int /*argc*/, char** /*argv*/)
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
 	check( tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset) );
 	check( tester.findDisplayItemByDepth(*root, 4+character::staticDepthOffset) );
-	invalidated = tester.getInvalidatedBounds();
+	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(120, 0, 180, 60)) );
 
 	tester.advance(); // FRAME 1/4 (loop back)
@@ -94,7 +95,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_play_state(), sprite_instance::PLAY);
 	check_equals(root->get_current_frame(), 0);
 	check_equals(root->getDisplayList().size(), 0);
-	invalidated = tester.getInvalidatedBounds();
+	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(0, 0, 180, 60)) );
 
 	tester.advance(); // FRAME 2/4
@@ -103,7 +104,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_current_frame(), 1);
 	check_equals(root->getDisplayList().size(), 1);
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
-	invalidated = tester.getInvalidatedBounds();
+	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(0, 0, 60, 60)) );
 
 	tester.advance(); // FRAME 3/4
@@ -113,7 +114,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->getDisplayList().size(), 2);
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
 	check( tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset) );
-	invalidated = tester.getInvalidatedBounds();
+	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(60, 0, 120, 60)) );
 
 	tester.advance(); // FRAME 4/4
@@ -124,7 +125,7 @@ main(int /*argc*/, char** /*argv*/)
 	check( tester.findDisplayItemByDepth(*root, 2+character::staticDepthOffset) );
 	check( tester.findDisplayItemByDepth(*root, 3+character::staticDepthOffset) );
 	check( tester.findDisplayItemByDepth(*root, 4+character::staticDepthOffset) );
-	invalidated = tester.getInvalidatedBounds();
+	invalidated = tester.getInvalidatedRanges();
 	check( invalidated.contains(Bounds(120, 0, 180, 60)) );
 
 }

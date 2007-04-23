@@ -105,11 +105,11 @@ public:
 	/// Advance the movie by one frame
 	void advance();
 
-	/// Return the invalidated bounds in PIXELS
+	/// Return the invalidated ranges in PIXELS
 	//
 	/// This is to debug/test partial rendering
 	///
-	geometry::Range2d<int> getInvalidatedBounds() const;
+	geometry::SnappingRanges2d<int> getInvalidatedRanges() const;
 
 	/// Find a character in the display list of a sprite by name.
 	//

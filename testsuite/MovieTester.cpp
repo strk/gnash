@@ -309,28 +309,20 @@ MovieTester::isMouseOverMouseEntity()
 	return _movie_root->isMouseOverActiveEntity();
 }
 
-geometry::Range2d<int>
-MovieTester::getInvalidatedBounds() const
+geometry::SnappingRanges2d<int>
+MovieTester::getInvalidatedRanges() const
 {
 	using namespace gnash::geometry;
 
-	rect ret;
-	assert(ret.is_null());
-	
-	// TODO: Support multiple bounds in testsuite
-	////_movie_root->get_invalidated_bounds(&ret, false);
-	//InvalidatedRanges ranges;
-	//_movie_root->add_invalidated_bounds(ranges, false);
-
-	Range2d<float> range = _invalidatedBounds.getFullArea();
+	SnappingRanges2d<float> ranges = _invalidatedBounds;
 
 	// scale by 1/20 (twips to pixels)
-	range.scale(1.0/20);
+	ranges.scale(1.0/20);
 
 	// Convert to integer range.
-	Range2d<int> pixrange(range);
+	SnappingRanges2d<int> pixranges(ranges);
 
-	return pixrange;
+	return pixranges;
 	
 }
 

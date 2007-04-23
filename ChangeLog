@@ -1,5 +1,16 @@
 2007-04-23 Sandro Santilli <strk@keybit.net>
 
+	* libgeometry/snappingrange.h: add unconditional visitor; add
+	  cast operator; add contains(Range2d); add scale(factor).
+	* testsuite/MovieTester.{cpp,h}: add a getInvalidatedRanges function;
+	  drop getInvalidatedBounds one.
+	* testsuite/libgeometry/snappingrangetest.cpp: test contains(Range)
+	  and cast to int.
+	* testsuite/misc-ming.all/simple_loop_testrunner.cpp: update
+	  to use the new getInvalidatedRanges.
+
+2007-04-23 Sandro Santilli <strk@keybit.net>
+
 	* libgeometry/snappingrange.h: define the SnappingRanges2d<> in
 	  the gnash::geometry namespace. Keep InvalidatedBounds in the
 	  gnash namespace, for simplicity.

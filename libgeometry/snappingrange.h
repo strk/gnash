@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.16 2007/04/23 09:29:53 strk Exp $
+// $Id: snappingrange.h,v 1.17 2007/04/23 10:19:47 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -89,6 +89,26 @@ public:
 		_combine_counter(0)
 	{
 	}
+
+	/// Templated copy constructor, for casting between range types
+	template <typename U>
+	SnappingRanges2d(const SnappingRanges2d<U>& from)
+	{
+		if ( from.isWorld() ) {
+			setWorld();
+		} else if ( from.isNull() ) {
+			setNull();
+		} else {
+			// TODO: use visitor pattern !
+			unsigned rcount = from.size();
+			for (unsigned int rno=0; rno<rcount; rno++)
+			{
+				Range2d<U> r = from.getRange(rno);
+				RangeType rc(r);
+				add(rc);
+			}
+		}
+	}
 	
 	/// Add a Range to the set, merging when possible and appropriate
 	void add(const RangeType& range) {
@@ -145,6 +165,20 @@ public:
 		
 		for (unsigned int rno=0; rno<rcount; rno++)
 			_ranges[rno].growBy(amount);
+			
+		combine_ranges_lazy();
+	}
+
+	/// Scale all ranges by the specified factor
+	void scale(float factor) {
+	
+		if (isWorld() || isNull()) 
+			return;
+		
+		unsigned rcount = _ranges.size();
+		
+		for (unsigned int rno=0; rno<rcount; rno++)
+			_ranges[rno].scale(factor);
 			
 		combine_ranges_lazy();
 	}
@@ -264,22 +298,14 @@ public:
 	}
 	
 	/// Returns the range at the specified index
+	//
+	/// TODO: return by reference ?
+	///
 	RangeType getRange(unsigned int index) const {
 		finalize();
 		assert(index<size());
 		
 		return _ranges[index];
-		
-		/*
-		RangeList::iterator iter = _ranges.begin();
-		
-		while (index>0) {
-			index--;
-			iter++;
-		}
-		
-		return *iter;
-		*/		
 	}
 	
 	/// Return a range that surrounds *all* added ranges. This is used mainly
@@ -310,6 +336,19 @@ public:
 		return false;
 	
 	}
+
+	/// Returns true if any of the ranges contains the range
+	bool contains(RangeType r) const {
+	
+		finalize();
+	
+		for (unsigned rno=0, rcount=_ranges.size(); rno<rcount; rno++) 
+		if (_ranges[rno].contains(r))
+			return true;
+			
+		return false;
+	
+	}
 	
 	
 	/// Visit the current Ranges set
@@ -333,6 +372,25 @@ public:
 			{
 				break;
 			}
+		}
+	}
+
+	/// Visit the current Ranges set
+	//
+	/// Visitor functor will be invoked inconditionally
+	/// for each RangeType in the current set.
+	/// 
+	/// The visitor functor will receive a RangeType reference.
+	///
+	template <class V>
+	inline void visitAll(V& visitor) const
+	{
+		for (typename RangeList::const_iterator
+			it = _ranges.begin(), itEnd = _ranges.end();
+			it != itEnd;
+			++it)
+		{
+			visitor(*it);
 		}
 	}
 	

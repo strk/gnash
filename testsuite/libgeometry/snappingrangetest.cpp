@@ -150,6 +150,13 @@ main(int /*argc*/, char** /*argv*/)
 	check( ! irrSnap.contains(495,  25) );
 	check( ! irrSnap.contains( 15, 495) );
 	check( ! irrSnap.contains(495, 495) );
+
+	check( irrSnap.contains(horiz) );
+	check( irrSnap.contains(vert) );
+
+	SnappingRanges2d<int> irrIntSnap(irrSnap);
+	check( irrSnap.contains(Range2d<int>(horiz)) );
+	check( irrSnap.contains(Range2d<int>(vert)) );
 	
 	 
 }
