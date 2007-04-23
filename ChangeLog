@@ -1,3 +1,8 @@
+2007-04-23 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/event_handler_scope_test.c
+	  testcase for scope in event handlers
+	  
 2007-04-21 Sandro Santilli <strk@keybit.net>
 
 	* server/: movie_root.{cpp,h}, sprite_instance.{cpp,h},
