@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.20 2007/04/23 18:09:54 strk Exp $ */
+/* $Id: shape.h,v 1.21 2007/04/23 19:19:30 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -235,6 +235,13 @@ namespace gnash {
 		/// Close this path with a straight line, if not already closed
 		void close();
 
+		/// return true if the given point is withing the given squared distance
+		//
+		/// NOTE: if the path is empty, false is returned.
+		///
+		bool withinSquareDistance(const point& p, float dist);
+
+
 	//private:
 
 		/// Left fill style index (1-based)
@@ -254,6 +261,7 @@ namespace gnash {
 
 		/// ?
 		bool m_new_shape;
+
 	};
 
 	/// For holding a pre-tesselated shape.

@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.cpp,v 1.32 2007/04/23 18:09:54 strk Exp $ */
+/* $Id: shape.cpp,v 1.33 2007/04/23 19:19:30 strk Exp $ */
 
 #include "shape.h"
 
@@ -87,13 +87,13 @@ edge::squareDistancePtSeg(const point& p, const point& A, const point& B)
 
         if (u<0)
 	{
-		cout << "R was < 0 " << endl;
+		//cout << "R was < 0 " << endl;
 		return p.squareDistance(A); 
 	}
 
         if (u>1)
 	{
-		cout << "R was > 1 " << endl;
+		//cout << "R was > 1 " << endl;
 		return p.squareDistance(B);
 	}
 
@@ -101,7 +101,7 @@ edge::squareDistancePtSeg(const point& p, const point& A, const point& B)
 	px.m_x = A.m_x + u * (B.m_x - A.m_x);
 	px.m_y = A.m_y + u * (B.m_y - A.m_y);
 
-	cout << "R was between 0 and 1, u is " << u << " px : " << px.m_x << "," << px.m_y << endl;
+	//cout << "R was between 0 and 1, u is " << u << " px : " << px.m_x << "," << px.m_y << endl;
 
 	return p.squareDistance(px);
 }
@@ -157,30 +157,11 @@ bool	path::point_test(float x, float y)
     // Point-in-shape test.  Return true if the query point is on the filled
     // interior of this shape.
 {
-    if (m_edges.size() <= 0) {
-	return false;
-    }
-#if 0
-    // This test makes no sense: m_fill0 is unsigned and "1-based" -martin
-    if (m_fill0 < 0) {
-	// No interior fill.
-	
-	// @@ This isn't quite right due to some paths
-	// doing double-duty with both fill0 and fill1
-	// styles.
-	
-	// TODO: get rid of this stupid fill0/fill1
-	// business -- a path should always be
-	// counterclockwise and have one fill.  For
-	// input paths with fill1, generate a separate
-	// reversed path with fill set to fill1.
-	// Group all paths with the same fill into a
-	// path group; do the point_test on the whole
-	// group.
-	return false;
-    }
-#endif
-    
+    if ( m_edges.empty() ) return false;
+
+    // No fill, nothing more to check.
+    if (m_fill0 == 0 && m_fill1 == 0) return false;
+
     // Shoot a horizontal ray from (x,y) to the right, and
     // count the number of edge crossings.  An even number
     // of crossings means the point is outside; an odd
@@ -352,6 +333,29 @@ path::close()
 		edge newedge(m_ax, m_ay, m_ax, m_ay);
 		m_edges.push_back(newedge);
 	}
+}
+
+bool
+path::withinSquareDistance(const point& p, float dist)
+{
+	size_t nedges = m_edges.size();
+
+	if ( ! nedges ) return false;
+
+	// TODO: FIXME: we're not considering the control
+	//       point at all so the check will only work
+	//       for straight lines
+
+	point px(m_ax, m_ay);
+	for (size_t i=0; i<nedges; ++i)
+	{
+		const edge& e = m_edges[i];
+		point np(e.m_ax, e.m_ay);
+		float d = edge::squareDistancePtSeg(p, px, np);
+		if ( d < dist ) return true;
+	}
+
+	return false;
 }
 
 // Utility.

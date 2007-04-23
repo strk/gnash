@@ -1,5 +1,16 @@
 2007-04-23 Sandro Santilli <strk@keybit.net>
 
+	* server/shape.{cpp,h}: add path::withinSquareDistance.
+	* server/types.cpp (point::distance): return 0 for 0 squaredDistance
+	  (not 1).
+	* server/parser/shape_character_def.cpp (point_test_local):
+	  test for point falling in the shape stroke, taking thickness
+	  in consideration.
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: more
+	  tests.
+
+2007-04-23 Sandro Santilli <strk@keybit.net>
+
 	* server/shape.{cpp,h}: add primitive distance functions
 	  for point-segment
 	* testsuite/server/: Makefile.am, EdgeTest.cpp: add tests 

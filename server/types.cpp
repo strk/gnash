@@ -46,7 +46,9 @@ namespace gnash {
 
 	float point::distance(const point& other) const
 	{
-		return sqrt(squareDistance(other));
+		float sd = squareDistance(other);
+		if ( ! sd ) return sd;
+		else return sqrt(squareDistance(other));
 	}
 
 

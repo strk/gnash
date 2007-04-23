@@ -99,5 +99,14 @@ main(int /*argc*/, char** /*argv*/)
 	check(tester.isMouseOverMouseEntity());
 	check_pixel(82, 127, 2, black, 2);
 
+	// In the middle of an imaginary line between
+	// first and last point of the green curve
+	tester.movePointerTo(355, 156);
+	xcheck(!tester.isMouseOverMouseEntity()); // fails due to edge::withinSquareDistance bug
+	check_pixel(355, 156, 2, white, 2);
+
+	tester.movePointerTo(376, 139);
+	xcheck(tester.isMouseOverMouseEntity()); // fails due to edge::withinSquareDistance bug
+	xcheck_pixel(376, 139, 2, green, 2); // fails due to bug in AGG
 }
 

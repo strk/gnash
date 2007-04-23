@@ -16,9 +16,12 @@ createEmptyMovieClip("a", 10);
 with (a)
 {
 	clear();
+
+	// The thick red line
 	lineStyle(20, 0xFF0000, 100);
 	moveTo(100, 100);
 	lineTo(200, 200);
+
 	moveTo(100, 200);
 	lineStyle(5, 0xFF00FF, 50);
 	lineTo(200, 250);

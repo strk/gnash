@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.16 2007/04/18 14:07:32 jgilmore Exp $ */
+/* $Id: shape_character_def.cpp,v 1.17 2007/04/23 19:19:30 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -607,12 +607,27 @@ bool	shape_character_def::point_test_local(float x, float y)
 	return false;
     }
 
+    point pt(x, y);
+
     // Try each of the paths.
-    for (unsigned int i = 0; i < m_paths.size(); i++) {
-	if (m_paths[i].point_test(x, y))
-	    {
-		return true;
-	    }
+    for (unsigned int i = 0; i < m_paths.size(); i++)
+    {
+	path& pth = m_paths[i];
+
+	if ( pth.m_edges.empty() ) continue;
+
+	// If it has 
+	if ( pth.m_line != 0 )
+	{
+		assert(m_line_styles.size() >= pth.m_line);
+		line_style& ls = m_line_styles[pth.m_line-1];
+		int thickness = ls.get_width();
+		//cout << "Thickness of line is " << thickness << endl;
+		float dist = thickness/2;
+		if ( pth.withinSquareDistance(pt, dist*dist) ) return true;
+	}
+
+	if (pth.point_test(x, y)) return true;
     }
 
     return false;
