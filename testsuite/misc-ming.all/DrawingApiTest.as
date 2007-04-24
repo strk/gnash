@@ -17,18 +17,15 @@ with (a)
 {
 	clear();
 
-#if 1
 	// The thick red line
 	lineStyle(20, 0xFF0000, 100);
 	moveTo(100, 100);
 	lineTo(200, 200);
-#endif
 
 	// The hairlined horizontal black line
 	lineStyle(0, 0x000000, 100);
 	moveTo(220, 180);
 	lineTo(280, 180);
-#if 1
 
 	// The violet line
 	moveTo(100, 200);
@@ -91,7 +88,6 @@ with (a)
 	lineTo(240, 100);
 	lineTo(260, 100);
 	endFill();
-#endif
 }
 
 // Make the MovieClip "active" (grabbing mouse events)
