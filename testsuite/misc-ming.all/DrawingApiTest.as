@@ -125,9 +125,35 @@ with (a)
 	lineStyle(8, 0x000000);
 	beginFill(0x00FF00, 100);
 	drawCircle(a, 330, 160, 35);
+	endFill();
 }
 
 // Make the MovieClip "active" (grabbing mouse events)
 // This allows testing of fill styles and "thick" lines
 a.onRollOver = function() {};
+
+frameno = 0;
+a.createEmptyMovieClip("b", 2);
+a.onEnterFrame = function()
+{
+	if ( ++frameno > 8 )
+	{
+		//this.clear();
+		frameno = 0;
+		ret = delete this.onEnterFrame;
+		if ( ret ) {
+			trace("PASSED: delete this.onEnterFrame returned "+ret);
+		} else {
+			trace("FAILED: delete this.onEnterFrame returned "+ret);
+		}
+	}
+	else
+	{
+		this.b.clear();
+		this.b.lineStyle(2, 0xFF0000);
+		this.b.beginFill(0xFFFF00, 100);
+		drawCircle(this.b, (50*frameno), 280, 10);
+		this.b.endFill();
+	}
+};
 

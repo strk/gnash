@@ -142,5 +142,10 @@ main(int /*argc*/, char** /*argv*/)
 	tester.movePointerTo(363, 174);
 	xcheck(tester.isMouseOverMouseEntity());  // fails due to edge::withinSquareDistance bug
 	check_pixel(363, 174, 2, black, 2); 
+
+	// TODO: check invalidated bounds and drawing on advance !
+	//       there should be a yellow-fill, red-stroke circle moving from bottom-left to bottom-right
+	//       for 8 advancements.
+	for (int i=0; i<10; ++i) tester.advance();
 }
 

@@ -1,5 +1,12 @@
 2007-04-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, DrawingApiTest.as,
+	  DrawingApiTestRunner.cpp: Prepared a test for invalidated
+	  bounds checking. Gnash clearly fails, but no actual automated
+	  tests added to the test runner yet.
+
+2007-04-24 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ActionExec.{cpp,h}: add delObjectMember() method.
 	* server/vm/ASHandlers.cpp (ActionDelete): hopefully fixed -
 	  at least as far as we can tell...

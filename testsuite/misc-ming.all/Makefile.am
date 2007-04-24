@@ -966,7 +966,7 @@ gotoFrame2Test-Runner: $(srcdir)/../generic-testrunner.sh gotoFrame2Test.swf
 
 
 DrawingApiTest.swf: $(srcdir)/DrawingApiTest.as 
-	$(MAKESWF) -o $@ $(srcdir)/DrawingApiTest.as
+	$(MAKESWF) -r2 -o $@ $(srcdir)/DrawingApiTest.as
 
 DrawingApiTestRunner_SOURCES = \
 	DrawingApiTestRunner.cpp \
