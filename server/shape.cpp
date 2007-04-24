@@ -187,8 +187,8 @@ bool	path::point_test(float x, float y) const
 	    // See if (x0,y0)-(x1,y1) crosses (x,y)-(infinity,y)
 	    
 	    // Does the segment straddle the horizontal ray?
-	    bool cross_up = (y0 < y && y1 >= y);
-	    bool cross_down = (!cross_up) && (y0 > y && y1 <= y);
+	    bool cross_up = (y0 < y && y1 > y);
+	    bool cross_down = (!cross_up) && (y0 > y && y1 < y);
 	    if (cross_up || cross_down)	{
 		// Straddles.
 		

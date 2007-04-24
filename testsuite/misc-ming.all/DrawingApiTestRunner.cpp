@@ -97,7 +97,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// Over the transparent line (150,100)
 	tester.movePointerTo(150, 100);
-	xcheck(!tester.isMouseOverMouseEntity()); // fails due to shape_character_def::point_test_local bug 
+	check(!tester.isMouseOverMouseEntity()); 
 	check_pixel(150, 100, 2, white, 2); 
 
 	// Over the violet line (146,225)

@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.22 2007/04/24 09:20:15 strk Exp $ */
+/* $Id: shape.h,v 1.23 2007/04/24 10:01:46 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -110,6 +110,10 @@ namespace gnash {
 		//
 		/// Return true if the query point is on the filled
 		/// interior of this shape.
+		///
+		/// Note that boundaries are NOT checked (a point of the boundary
+		/// will return false here).
+		/// Use withinSquareDistance() for boundary checking.
 		///
 		/// Return false if this path has no associated fill.
 		///
