@@ -68,7 +68,7 @@ with (a)
 	endFill();
 	lineTo(50, 150);
 
-	// clockwise
+	// The clockwise blue-stroke, cyan-fill square
 	moveTo(200, 100);
 	lineStyle(1, 0x00FF00);
 	beginFill(0x00FFFF, 100);
@@ -78,7 +78,7 @@ with (a)
 	lineTo(200, 100);
 	endFill();
 
-	// counter-clockwise
+	// The counter-clockwise cyan-stroke, green-fill square
 	moveTo(230, 100);
 	lineStyle(1, 0x00FFFF);
 	beginFill(0x00FF00, 50);
@@ -88,7 +88,7 @@ with (a)
 	lineTo(230, 100);
 	endFill();
 
-	// clockwise, move after beginFill
+	// The clockwise green-stroke, violet-fill square, with move after beginFill
 	lineStyle(1, 0x00FF00);
 	beginFill(0xFF00FF, 100);
 	moveTo(260, 100);
