@@ -1,3 +1,15 @@
+2007-04-24  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* configure.ac: Remove --enable-extension. Add --with-extensions=
+	that takes a comma delimited list of extension so you can seclect
+	with ones you want to build.
+	* Makefile.am: Always add the extensions directory.
+	* extensions/Makefile.am: Use new conditionals to select builds
+	directories.
+	* cygnal/cygnal.cpp: Include posix_time.hpp.
+	* extensions/fileio/fileio.cpp: Use intrusive pointers instead of
+	explicit pointers.
+
 2007-04-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* libgeometry/Range2d.h: added expandToCircle()

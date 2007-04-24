@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.292 2007/04/19 14:39:13 bjacques Exp $
+dnl $Id: configure.ac,v 1.293 2007/04/24 17:52:47 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -70,7 +70,7 @@ AC_TRY_COMPILE([#include <stdio.h>], [
 AC_TRY_COMPILE([#include <stdio.h>], [
   size_t num = 0;
   printf("%u", num); ],
-  AC_DEFINE(SIZET_FMT, ["%u"], [size_t printf modifier is u])
+   AC_DEFINE(SIZET_FMT, ["%u"], [size_t printf modifier is u])
 )
 AC_TRY_COMPILE([#include <stdio.h>], [
   size_t num = 0;
@@ -84,6 +84,8 @@ AC_TRY_COMPILE([#include <stdio.h>], [
 )
 
 CFLAGS="$save_CFLAGS";
+
+AC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval})
 
 AC_ARG_ENABLE(debugger,
   AC_HELP_STRING([--disable-debugger],[Disable the Flash debugger]),
@@ -123,17 +125,6 @@ esac],write=no)
 if test x"$write" = x"yes"; then
   AC_DEFINE([WRITE_FILE], [], [Write files while streaming])
 fi
-
-dnl Don't build the extensions if specified.
-AC_ARG_ENABLE(extensions,
-  AC_HELP_STRING([--enable-extensions], [Enable support for Gnash EXTENSIONS]),
-[case "${enableval}" in
-  yes) extensions=yes ;;
-  no)  extensions=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for enable-extensions option]) ;;
-esac],extensions=no)
-
-AM_CONDITIONAL(EXTENSIONS, test x$extensions = xyes)
 
 dnl Don't build the cygnal server if specified.
 AC_ARG_ENABLE(cygnal,
@@ -307,6 +298,71 @@ AC_ARG_ENABLE(media,
 )
 
 dnl --------------------------------------------------------
+dnl Figure out which extensions to build.
+dnl --------------------------------------------------------
+
+extensions_list=
+ext_dejagnu=no
+ext_mysql=no
+ext_fileio=no
+ext_gtk=no
+ext_all=no
+AC_ARG_WITH(extensions,
+  AC_HELP_STRING([--with-extensions=], [Specify which extensions to build]),
+  if test -n ${withval}; then
+    extlist="${withval}"
+    withval=`echo ${withval} | tr '\054' ' ' `
+  fi
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+    extensions_list="${extensions_list} ${val}"
+    [case "${val}" in
+      dejagnu|DEJAGNU|dj|DJ)
+        AC_DEFINE(USE_DEJAGNU_EXT, [1], [Build the DejaGnu extension])
+        AC_MSG_NOTICE([Adding DejaGnu extension])
+        ext_dejagnu=yes
+        ;;
+      mysql|MYSQL|sql|SQL)
+        AC_DEFINE(USE_MYSQL_EXT, [1], [Build the MySQL extension])
+        AC_MSG_NOTICE([Adding MySql extension])
+        ext_mysql=yes
+        ;;
+      fileio|FILEIO|io|IO)
+        AC_DEFINE(USE_FILEIO_EXT, [1], [Build the FileIO extension])
+        AC_MSG_NOTICE([Adding FileIO extension])
+        ext_fileio=yes
+        ;;
+      gtk|GTK|gtk2|GTK2)
+        AC_DEFINE(USE_GTK_EXT, [1], [Build the FileIO extension])
+        ext_gtk=yes
+        ;;
+      all|ALL)
+        AC_DEFINE(USE_GTK_EXT, [1], [Build the FileIO extension])
+        ext_dejagnu=yes
+        ext_mysql=yes
+        ext_fileio=yes
+        ext_gtk=yes
+        ext_all=yes
+        ;;
+      *) AC_MSG_ERROR([invalid extension specified: ${withval} given (accept: MYSQL|DEJAGNU|FILEIO|GTK|ALL)])
+         ;;
+      esac]
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test x$val = x$withval; then
+      break;
+    fi
+  done
+)
+
+AM_CONDITIONAL(BUILD_DEJAGNU_EXT, [ test x$ext_dejagnu = xyes ])
+AM_CONDITIONAL(BUILD_FILEIO_EXT, [ test x$ext_fileio = xyes ])
+AM_CONDITIONAL(BUILD_MYSQL_EXT, [ test x$ext_mysql = xyes ])
+AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
+if test x$ext_mysql = xyes; then
+  GNASH_PATH_MYSQL
+fi
+
+dnl --------------------------------------------------------
 dnl Figure out development tool stuff
 dnl --------------------------------------------------------
 
@@ -348,8 +404,8 @@ dnl options to configure.
 if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([Configuring Gnash for cross compilation])
   export pkgroot=`$CXX -print-search-dirs | grep "install:" | sed -e 's/install: //' -e 's:/lib/gcc/.*::'`
-  export incllist="${pkgroot}/${host_alias}/include ${pkgroot}/include"
-  export libslist="${pkgroot}/${host_alias}/lib ${pkgroot}/lib64 ${pkgroot}/lib32 ${pkgroot}/lib"
+  export incllist="${with_top_level}/include ${pkgroot}/${host_alias}/include ${pkgroot}/include"
+  export libslist="${with_top_level}/lib ${pkgroot}/${host_alias}/lib ${pkgroot}/lib64 ${pkgroot}/lib32 ${pkgroot}/lib"
   export pathlist="${pkgroot}/${host_alias}/bin:${pkgroot}/bin"
   LDFLAGS="${LDFLAGS} -Wl,--as-needed"
   plugin=no
@@ -547,6 +603,7 @@ AC_CHECK_FUNCS(strlcpy, AC_DEFINE(HAVE_STRLCPY_PROTO, [1],[Define if you have th
 AC_CHECK_FUNCS(strlcat, AC_DEFINE(HAVE_STRLCAT_PROTO, [1],[Define if you have the strlcat prototype]))
 dnl Look for Win32 networking stuff
 AC_CHECK_HEADERS(winsock.h)
+AC_CHECK_HEADERS(winsock2.h)
 AC_CHECK_HEADERS(sys/endian.h)
 AC_CHECK_HEADERS(machine/endian.h)
 AC_CHECK_HEADERS(endian.h)
@@ -572,15 +629,6 @@ dnl AC_CHECK_LIB(c, mremap)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
-
-dnl if we're not building the extensions, then the _FLAGS and _LIBS settings
-dnl found in these tests are blank. This way they can be used in
-dnl Makefiles, but won't add bloat to the Makefiles.
-if test x$extensions = xyes; then
-  GNASH_PATH_MYSQL
-  AC_DEFINE(USE_EXTENSIONS, [], [Defined if you enable building the exetensions])
-fi
-AM_CONDITIONAL(ENABLE_MYSQL, [ test x"$mysql" = xyes ])
 
 AC_PATH_MING
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
@@ -1041,11 +1089,11 @@ else
   echo "        GNOME help disabled (default). Use --enable-ghelp to enable."
 fi
 
-if test x"$extensions" = x"yes"; then
-  echo "        Building extensions enabled (default). Use --disable-extensions to disable."
-else
-  echo "        Building Gnash extensions disabled."
-fi
+dnl if test x"$extensions" = x"yes"; then
+dnl   echo "        Building extensions enabled (default). Use --disable-extensions to disable."
+dnl else
+dnl   echo "        Building Gnash extensions disabled."
+dnl fi
 
 if test x"$cygnal" = x"yes"; then
   echo "        Building Cygnal media server enabled (default). Use --disable-cygnal to disable."
@@ -1059,9 +1107,17 @@ else
   echo "        Building the Flash debugger is disabled."
 fi
 
+if test x"$with-top_level" != x; then
+  echo "        Top level for cross compiling support files is: $with_top_level"
+fi
+
 if test x"$gui" = xgtk -a x"$pixelformat" = xrgb565; then
   echo "        WARNING: Pixel format RGB565 selected in combination with the"
   echo "        GTK GUI. Only a hacked GTK will work (e.g. on the OLPC)."
+fi
+
+if test x"$extensions_list" != x; then
+  echo "        Building extensions: ${extensions_list}"
 fi
 
 echo "        Renderer engine: "$renderer
@@ -1100,7 +1156,7 @@ if test x$xml != xno; then
   fi
 fi
 
-if test x$extensions = xyes; then
+if test x$ext_mysql = xyes; then
   if test x$mysql != xno; then
     if test x"$MYSQL_LIBS" != x; then
       echo "        MYSQL flags are: $MYSQC_CFLAGS"
@@ -1564,17 +1620,21 @@ else
  to play compressed SWF (most of them from version 6 up). "
 fi
 
-if test x$extensions = xyes; then
+if test x$ext_mysql = xyes; then
   if test x$mysql != xno; then
     if test x"$MYSQL_LIBS" != x; then
       echo "        MYSQL flags are: $MYSQC_CFLAGS"
       echo "        MYSQL libs are: $MYSQL_LIBS"
     else
       echo "        ERROR: No MySQL development package is installed."
-      echo "               Either reconfigure with --disable-extensions, or install"
+      echo "               Either reconfigure with --with-extensions=mysql, or install"
       echo "               libmysqlclient-dev (using apt-get) or something-else (using yum)"
     fi
   fi
+fi
+
+if test x$cross_compiling = xyes; then
+  AC_MSG_NOTICE([This build is setup for cross compiling])
 fi
 
 # If anything critical is missing, don't bother to continue

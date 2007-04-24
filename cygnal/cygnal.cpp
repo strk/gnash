@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: cygnal.cpp,v 1.8 2007/04/08 23:06:16 rsavoye Exp $ */
+/* $Id: cygnal.cpp,v 1.9 2007/04/24 17:52:47 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -56,6 +56,8 @@ extern "C"{
 #ifdef ENABLE_NLS
 #include <locale.h>
 #endif
+
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>

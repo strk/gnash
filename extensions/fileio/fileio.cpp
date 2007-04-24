@@ -317,7 +317,7 @@ as_value
 fileio_fopen(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio *)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);
     
     if (fn.nargs > 0) {
@@ -331,7 +331,7 @@ as_value
 fileio_fclose(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio *)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);
     
     return as_value(ptr->fclose());
@@ -341,7 +341,7 @@ as_value
 fileio_fread(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);
 		
 		string str;
@@ -357,7 +357,7 @@ as_value
 fileio_fgetc(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);
     int i = ptr->fgetc();
     char *c = reinterpret_cast<char *>(&i);
@@ -368,7 +368,7 @@ as_value
 fileio_fgets(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);
     string str; 
     str = ptr->fgets(str);
@@ -379,7 +379,7 @@ as_value
 fileio_gets(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);    
     char buf[BUFSIZE];
     memset(buf, 0, BUFSIZE);
@@ -392,7 +392,7 @@ as_value
 fileio_getchar(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);
     int i = ::getchar();
     char *c = reinterpret_cast<char *>(&i);
@@ -403,7 +403,7 @@ as_value
 fileio_fwrite(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);
     string str = fn.arg(0).to_string();
     return as_value(ptr->fputs(str));
@@ -413,7 +413,7 @@ as_value
 fileio_fputc(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);    
     int c = (int) fn.arg(0).to_number();
     return as_value(ptr->fputc(c));
@@ -423,7 +423,7 @@ as_value
 fileio_fputs(const fn_call& fn)
 {
     //   GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);    
     string str = fn.arg(0).to_string();
     return as_value(ptr->fputs(str));
@@ -442,7 +442,7 @@ as_value
 fileio_putchar(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);    
     string x = fn.arg(0).to_string();
     return as_value(::putchar(x[0]));
@@ -452,7 +452,7 @@ as_value
 fileio_fflush(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);    
     return as_value(ptr->fflush());
 }
@@ -461,7 +461,7 @@ as_value
 fileio_fseek(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);    
     long c = (long) fn.arg(0).to_number();
     return as_value(ptr->fseek(c));
@@ -471,7 +471,7 @@ as_value
 fileio_ftell(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);
     int i = ptr->ftell();
     return as_value(i);
@@ -481,7 +481,7 @@ as_value
 fileio_unlink(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    Fileio *ptr = (Fileio*)fn.this_ptr;
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);
     string str = fn.arg(0).to_string();
     return as_value(ptr->unlink(str));
@@ -494,11 +494,13 @@ fileio_scandir(const fn_call& fn)
 
 		// TODO: Check optional second parameter and sort array if it's true
 		// or missing.
+    boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
 
-    Fileio *ptr = (Fileio*)fn.this_ptr;
     assert(ptr);    
     string str = fn.arg(0).to_string();
-    ptr->scandir(str, fn.result);
+    as_value val;
+    ptr->scandir(str, &val);
+    return val;
 }
 
 std::auto_ptr<as_object>

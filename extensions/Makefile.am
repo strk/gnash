@@ -18,9 +18,27 @@
 AUTOMAKE_OPTIONS = 
 
 # Don't try to build the MySQL extension unless MySQL is actually installed.
-if ENABLE_MYSQL
-MYSQL_DIR = mysql
+OTHER_DIRS =
+if BUILD_MYSQL_EXT
+OTHER_DIRS += mysql
 endif
 
-DISTSUBDIRS = dejagnu fileio mysql gtk2
-SUBDIRS = dejagnu fileio $(MYSQL_DIR)
+if BUILD_DEJAGNU_EXT
+OTHER_DIRS += dejagnu
+endif
+
+if BUILD_FILEIO_EXT
+OTHER_DIRS += fileio
+endif
+
+if USE_GUI_FLTK
+OTHER_DIRS += fltk2
+endif
+
+if BUILD_GTK_EXT
+if USE_GUI_GTK
+OTHER_DIRS += gtk2
+endif
+endif
+DIST_SUBDIRS = dejagnu fileio mysql gtk2
+SUBDIRS = $(OTHER_DIRS)

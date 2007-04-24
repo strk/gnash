@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.67 2007/04/06 07:58:15 jgilmore Exp $
+# $Id: Makefile.am,v 1.68 2007/04/24 17:52:47 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -53,9 +53,7 @@ if CYGNAL
 CYGNAL_DIRS = cygnal
 endif
 
-if EXTENSIONS
 EXTEND_DIRS = extensions
-endif
 
 SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS) $(EXTEND_DIRS) $(CYGNAL_DIRS)
 
@@ -205,7 +203,7 @@ if HAVE_DMALLOC
 	@echo "	DMALLOC_CFLAGS is $(DMALLOC_CFLAGS)"
 	@echo "	DMALLOC_LIBS is $(DMALLOC_LIBS)"
 endif
-if EXTENSIONS
+if BUILD_MYSQL_EXT
 	@echo "MYSQL_CFLAGS is $(MYSQL_CFLAGS)"
 	@echo "MYSQL_LIBS is $(MYSQL_LIBS)"
 endif
