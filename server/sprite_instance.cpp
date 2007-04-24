@@ -49,6 +49,7 @@
 #include "URLAccessManager.h" // for loadVariables
 #include "LoadVariablesThread.h" 
 #include "ExecutableCode.h"
+#include "gnash.h" // for point class !
 
 #include <vector>
 #include <string>
@@ -849,30 +850,139 @@ static as_value
 sprite_globalToLocal(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
-	UNUSED(sprite);
+
+	as_value ret;
+
+	if ( fn.nargs < 1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("MovieClip.globalToLocal() takes one arg"));
+		);
+		return ret;
+	}
+
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+	if ( ! obj )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("MovieClip.globalToLocal(%s): "
+				"first argument doesn't cast to an object"),
+			fn.arg(0).to_debug_string().c_str());
+		);
+		return ret;
+	}
+
+	as_value tmp;
+	float x = 0;
+	float y = 0;
+
+	if ( ! obj->get_member("x", &tmp) )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("MovieClip.globalToLocal(%s): "
+				"object parameter doesn't have an 'x' member"),
+			fn.arg(0).to_debug_string().c_str());
+		);
+		return ret;
+	}
+	x = PIXELS_TO_TWIPS(tmp.to_number(&fn.env()));
+
+	if ( ! obj->get_member("y", &tmp) )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("MovieClip.globalToLocal(%s): "
+				"object parameter doesn't have an 'y' member"),
+			fn.arg(0).to_debug_string().c_str());
+		);
+		return ret;
+	}
+	y = PIXELS_TO_TWIPS(tmp.to_number(&fn.env()));
+
+	point pt(x, y);
+	matrix world_mat = sprite->get_world_matrix();
+	world_mat.transform_by_inverse(pt);
+
+	obj->set_member("x", TWIPS_TO_PIXELS(round(pt.m_x)));
+	obj->set_member("y", TWIPS_TO_PIXELS(round(pt.m_y)));
 
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_unimpl("MovieClip.globalToLocal()");
+		log_msg("MovieClip.globalToLocal() TESTING");
 		warned=true;
 	}
-	return as_value();
+
+	return ret;
 }
 
 static as_value
 sprite_localToGlobal(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
-	UNUSED(sprite);
+
+	as_value ret;
+
+	if ( fn.nargs < 1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("MovieClip.localToGlobal() takes one arg"));
+		);
+		return ret;
+	}
+
+	boost::intrusive_ptr<as_object> obj = fn.arg(0).to_object();
+	if ( ! obj )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("MovieClip.localToGlobal(%s): "
+				"first argument doesn't cast to an object"),
+			fn.arg(0).to_debug_string().c_str());
+		);
+		return ret;
+	}
+
+	as_value tmp;
+	float x = 0;
+	float y = 0;
+
+	if ( ! obj->get_member("x", &tmp) )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("MovieClip.localToGlobal(%s): "
+				"object parameter doesn't have an 'x' member"),
+			fn.arg(0).to_debug_string().c_str());
+		);
+		return ret;
+	}
+	x = PIXELS_TO_TWIPS(tmp.to_number(&fn.env()));
+
+	if ( ! obj->get_member("y", &tmp) )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("MovieClip.localToGlobal(%s): "
+				"object parameter doesn't have an 'y' member"),
+			fn.arg(0).to_debug_string().c_str());
+		);
+		return ret;
+	}
+	y = PIXELS_TO_TWIPS(tmp.to_number(&fn.env()));
+
+	point pt(x, y);
+	matrix world_mat = sprite->get_world_matrix();
+	world_mat.transform(pt);
+
+	obj->set_member("x", TWIPS_TO_PIXELS(round(pt.m_x)));
+	obj->set_member("y", TWIPS_TO_PIXELS(round(pt.m_y)));
 
 	static bool warned = false;
 	if ( ! warned )
 	{
-		log_unimpl("MovieClip.localToGlobal()");
+		log_msg("MovieClip.localToGlobal() TESTING");
 		warned=true;
 	}
-	return as_value();
+
+	return ret;
+
 }
 
 static as_value

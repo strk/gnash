@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.66 2007/04/24 21:11:18 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.67 2007/04/24 21:49:37 strk Exp $";
 
 #include "check.as"
 
@@ -741,3 +741,114 @@ check_equals(b.yMin, 10);
 check_equals(b.yMax, 40);
 
 #endif // OUTPUT_VERSION >= 6
+
+//----------------------------------------------
+// Test localToGlobal and globalToLocal
+//----------------------------------------------
+
+static_clip_name = "__shared_assets";
+static_clip = __shared_assets;
+if ( typeof(static_clip) == 'movieclip' )
+{
+	o = {x:0, y:0};
+	static_clip.localToGlobal(o);
+	check_equals(o.x, 0);
+	check_equals(o.y, 0);
+	static_clip.globalToLocal(o);
+	check_equals(o.x, 0);
+	check_equals(o.y, 0);
+
+	static_clip._x += 50;
+	static_clip._y -= 30;
+
+	o = {x:0, y:0};
+	static_clip.localToGlobal(o);
+	check_equals(o.x, 50);
+	check_equals(o.y, -30);
+	static_clip.globalToLocal(o);
+	check_equals(o.x, 0);
+	check_equals(o.y, 0);
+
+	o = {x:1, y:1};
+	static_clip.localToGlobal(o);
+	check_equals(o.x, 51);
+	check_equals(o.y, -29);
+	static_clip.globalToLocal(o);
+	check_equals(o.x, 1);
+	check_equals(o.y, 1);
+
+	static_clip._xscale *= 2;
+	static_clip._yscale *= 0.5;
+
+	o = {x:0, y:0};
+	static_clip.localToGlobal(o);
+	check_equals(o.x, 50);
+	check_equals(o.y, -30);
+	static_clip.globalToLocal(o);
+	check_equals(o.x, 0);
+	check_equals(o.y, 0);
+
+	o = {x:2, y:2};
+	static_clip.localToGlobal(o);
+	check_equals(o.x, 54);
+	check_equals(o.y, -29);
+	static_clip.globalToLocal(o);
+	check_equals(o.x, 2);
+	check_equals(o.y, 2);
+
+	static_clip._rotation = 90;
+
+	o = {x:0, y:0};
+	static_clip.localToGlobal(o);
+	check_equals(o.x, 50);
+	check_equals(o.y, -30);
+	static_clip.globalToLocal(o);
+	check_equals(o.x, 0);
+	check_equals(o.y, 0);
+
+	o = {x:2, y:2};
+	static_clip.localToGlobal(o);
+	check_equals(o.x, 49);
+	check_equals(o.y, -26);
+	static_clip.globalToLocal(o);
+	check_equals(o.x, 2);
+	check_equals(o.y, 2);
+
+	// omit the 'y' member (invalid call)
+	o = {x:2};
+	static_clip.localToGlobal(o);
+	check_equals(o.x, 2);
+	check_equals(typeof(o.y), 'undefined');
+	static_clip.globalToLocal(o);
+	check_equals(o.x, 2);
+	check_equals(typeof(o.y), 'undefined');
+
+	// Upper case
+	o = {X:2, Y:2};
+	static_clip.localToGlobal(o);
+#if OUTPUT_VERSION < 7
+	check_equals(o.X, 49);
+	check_equals(o.Y, -26);
+#else // OUTPUT_VERSION >= 7
+	check_equals(o.X, 2);
+	check_equals(o.Y, 2);
+	check_equals(typeof(o.x), 'undefined');
+	check_equals(typeof(o.y), 'undefined');
+#endif
+	static_clip.globalToLocal(o);
+	check_equals(o.X, 2);
+	check_equals(o.Y, 2);
+
+	static_clip._rotation = 0;
+	static_clip._x -= 50;
+	static_clip._y += 30;
+	static_clip._xscale *= 0.5;
+	static_clip._yscale *= 2;
+
+	// TODO: try with x/y being getter-setter of the localToGlobal and globalToLocal parameter
+}
+else
+{
+	note("There is not '"+static_clip_name+"' clip statically-defined, so we could not test localToGlobal() and globalToLocal() against it");
+
+}
