@@ -77,7 +77,6 @@ EXTRA_DIST = \
 	$(xml_files) \
 	$(omffile) \
 	asspec.texi \
-	actionscript.texi \
 	asspec-man.xml \
 	asspec.info \
 	asspec.html \
