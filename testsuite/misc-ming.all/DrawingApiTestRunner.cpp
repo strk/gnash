@@ -70,6 +70,13 @@ main(int /*argc*/, char** /*argv*/)
 	check(tester.isMouseOverMouseEntity());
 	check_pixel(60, 215, 2, blue, 1);
 
+	// Inside bottom-left blue fill but in the 
+	// curve internal to check if the point_test
+	// works for filled curves
+	tester.movePointerTo(40, 205);
+	check(tester.isMouseOverMouseEntity());
+	check_pixel(40, 205, 2, blue, 1);
+
 	// Inside cyan clockwise fill
 	tester.movePointerTo(190, 112);
 	check(tester.isMouseOverMouseEntity());
@@ -117,12 +124,23 @@ main(int /*argc*/, char** /*argv*/)
 
 	// In the middle of an imaginary line between
 	// first and last point of the green curve
-	tester.movePointerTo(355, 156);
+	tester.movePointerTo(376, 180);
 	xcheck(!tester.isMouseOverMouseEntity()); // fails due to edge::withinSquareDistance bug
-	check_pixel(355, 156, 2, white, 2);
+	check_pixel(376, 180, 2, white, 2);
 
+	// Over the green curve
 	tester.movePointerTo(376, 139);
 	xcheck(tester.isMouseOverMouseEntity()); // fails due to edge::withinSquareDistance bug
 	check_pixel(376, 139, 2, green, 2); // fails due to bug in AGG
+
+	// Over the center of the green circle fill
+	tester.movePointerTo(330, 160);
+	check(tester.isMouseOverMouseEntity()); 
+	check_pixel(330, 160, 2, green, 2); 
+
+	// Over the boundary of the green circle fill
+	tester.movePointerTo(363, 174);
+	xcheck(tester.isMouseOverMouseEntity());  // fails due to edge::withinSquareDistance bug
+	check_pixel(363, 174, 2, black, 2); 
 }
 

@@ -1,5 +1,11 @@
 2007-04-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: DrawingApiTest.as,
+	  DrawingApiTestRunner.cpp: Add a circle drawing and
+	  test for collision detection of curved fills.
+
+2007-04-24 Sandro Santilli <strk@keybit.net>
+
 	* server/shape.{cpp,h} (point_test): only check for the
 	  "interior" of the shape, forget its boundaries.
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: one

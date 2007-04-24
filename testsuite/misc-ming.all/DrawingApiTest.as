@@ -22,6 +22,29 @@ thick.valueOf = function() { return 20; };
 halftransparent = new Object();
 halftransparent.valueOf = function() { return 50; };
 
+// Draw a circle with given center and radius
+// Uses 8 curves to approximate the circle
+drawCircle = function (where, x, y, rad)
+{
+        var ctl = Math.sin(24*Math.PI/180)*rad;
+        var cos = Math.cos(45*Math.PI/180)*rad;
+        var sin = Math.sin(45*Math.PI/180)*rad;
+
+        with (where)
+        {
+                moveTo(x, y-rad);
+                curveTo(x+ctl, y-rad, x+cos, y-sin);
+                curveTo(x+rad, y-ctl, x+rad, y);
+                curveTo(x+rad, y+ctl, x+cos, y+sin);
+                curveTo(x+ctl, y+rad, x, y+rad);
+                curveTo(x-ctl, y+rad, x-cos, y+sin);
+                curveTo(x-rad, y+ctl, x-rad, y);
+                curveTo(x-rad, y-ctl, x-cos, y-sin);
+                curveTo(x-ctl, y-rad, x, y-rad);
+        }
+};
+
+
 with (a)
 {
 	clear();
@@ -97,6 +120,11 @@ with (a)
 	lineTo(240, 100);
 	lineTo(260, 100);
 	endFill();
+
+	// The green circle
+	lineStyle(8, 0x000000);
+	beginFill(0x00FF00, 100);
+	drawCircle(a, 330, 160, 35);
 }
 
 // Make the MovieClip "active" (grabbing mouse events)
