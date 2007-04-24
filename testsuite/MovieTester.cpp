@@ -212,7 +212,7 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 	const char* X="";
 	if ( expectFailure ) X="X";
 
-	cout <<"chekPixel(" << color << ") called" << endl;
+	//cout <<"chekPixel(" << color << ") called" << endl;
 
 	for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
 				it != itE; ++it)
