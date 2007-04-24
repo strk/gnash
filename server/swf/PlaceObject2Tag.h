@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.2 2007/04/11 17:54:22 bjacques Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.3 2007/04/24 06:54:06 zoulunkai Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -99,6 +99,7 @@ private:
 	int		m_depth;
 	uint16_t	m_character_id;
 	int 	m_clip_depth;
+	uint32_t all_event_flags; 
 
 	enum place_type
 	{

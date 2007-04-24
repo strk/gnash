@@ -109,7 +109,10 @@ check_PROGRAMS = \
 	frame_label_test \
 	path_format_test \
 	duplicate_movie_clip_test \
+  event_handler_scope_test \
 	masks_testrunner \
+  key_event_test \
+	key_event_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -148,6 +151,7 @@ check_SCRIPTS = \
 	frame_label_testrunner \
 	path_format_testrunner \
 	duplicate_movie_clip_testrunner \
+  event_handler_scope_testrunner \
 	matrix_testrunner \
 	$(NULL)
 
@@ -308,6 +312,32 @@ loop_test_Runner_CXXFLAGS = \
 	$(NULL)
 loop_test_Runner_DEPENDENCIES = \
 	loop_test.swf \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+
+
+key_event_test_SOURCES =	\
+	key_event_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+key_event_test_LDADD = $(MING_LIBS)
+
+key_event_test.swf: key_event_test
+	./key_event_test $(top_srcdir)/testsuite/media
+
+key_event_testrunner_SOURCES = \
+	key_event_testrunner.cpp \
+	$(NULL)
+key_event_testrunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+key_event_testrunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+key_event_testrunner_DEPENDENCIES = \
+	key_event_test.swf \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
@@ -474,7 +504,22 @@ duplicate_movie_clip_test.swf: duplicate_movie_clip_test
 duplicate_movie_clip_testrunner: $(srcdir)/../generic-testrunner.sh duplicate_movie_clip_test.swf
 	sh $< -r5 $(top_builddir) duplicate_movie_clip_test.swf > $@
 	chmod 755 $@
-	
+
+
+event_handler_scope_test_SOURCES =	\
+	event_handler_scope_test.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+event_handler_scope_test_LDADD = $(MING_LIBS)
+
+event_handler_scope_test.swf: event_handler_scope_test
+	./event_handler_scope_test $(top_srcdir)/testsuite/media
+
+event_handler_scope_testrunner: $(srcdir)/../generic-testrunner.sh event_handler_scope_test.swf
+	sh $< -r5 $(top_builddir) event_handler_scope_test.swf > $@
+	chmod 755 $@
+		
 attachMovieTest_SOURCES =	\
 	attachMovieTest.c	\
 	ming_utils.h		\
@@ -989,7 +1034,9 @@ TEST_CASES = \
 	frame_label_testrunner \
 	path_format_testrunner \
 	duplicate_movie_clip_testrunner \
+  event_handler_scope_testrunner \
 	masks_testrunner \
+	key_event_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS

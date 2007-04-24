@@ -58,7 +58,7 @@ main(int argc, char** argv)
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  add_actions(mo, "x1=0; x2=0; x3=0; x=0; x5=0; x6=0; ");
+  add_actions(mo, "x1=0; x2=0; x3=0; x4=0; x5=0; x6=0; ");
   SWFMovie_nextFrame(mo);  /* 1st frame */
 
   

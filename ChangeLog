@@ -1,3 +1,12 @@
+2007-04-24 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/Makefile.am
+	  activate testcases committed yestoday
+	* testsuite/misc-ming.all/key_event_test.c
+	  fix a typo
+	* server/swf/PlaceObject2Tag.{h,cpp}
+		minor clean up, keep the "all_event_flags" for future use.
+	  
 2007-04-23 Sandro Santilli <strk@keybit.net>
 
 	* server/DynamicShape.{h,cpp} (lineStyle): add a line style even

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.4 2007/04/18 14:07:33 jgilmore Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.5 2007/04/24 06:54:06 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -69,15 +69,12 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 
 	uint16_t reserved = in->read_u16();
 	assert(reserved == 0);	// must be 0
-
+	
 	// The logical 'or' of all the following handlers.
-	// I don't think we care about this...
-	uint32_t all_flags = (movie_version >= 6) ?
-		in->read_u32() : in->read_u16();
-	UNUSED(all_flags);
+	all_event_flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
 
 	IF_VERBOSE_PARSE (
-		log_parse(_("  actions: flags = 0x%X"), all_flags);
+		log_parse(_("  actions: flags = 0x%X"), all_event_flags);
 	);
 
 	// Read swf_events.
@@ -88,9 +85,8 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 
 		uint32_t flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();
 
-		if (flags == 0)
+		if (flags == 0) // no other events
 		{
-			// Done with events.
 			break;
 		}
 
@@ -109,7 +105,7 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 
 		uint8_t ch = key::INVALID;
 
-		if (flags & (1 << 17))	// has keypress event
+		if (flags & (1 << 17))	// has KeyPress event
 		{
 			ch = in->read_u8();
 			event_length--;
@@ -145,7 +141,8 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 		}
 
 		// 13 bits reserved, 19 bits used
-		static const event_id s_code_bits[19] =
+		const int total_known_events = 19;
+		static const event_id s_code_bits[total_known_events] =
 		{
 			event_id::LOAD,
 			event_id::ENTER_FRAME,
@@ -171,22 +168,23 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 		};
 
 		// Let's see if the event flag we received is for an event that we know of
-		if ((pow(2.0, int( sizeof(s_code_bits) / sizeof(s_code_bits[0]) )) - 1) < flags)
+
+		//check if all unused bits are zero!
+		if( !(flags & (1 << total_known_events)) )
 		{
 			IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x"), flags);
 			);
 		}
 
-		for (int i = 0, mask = 1; i < int(sizeof(s_code_bits)/sizeof(s_code_bits[0])); i++, mask <<= 1)
+		for (int i = 0, mask = 1; i < total_known_events; i++, mask <<= 1)
 		{
 			if (flags & mask)
 			{
 				std::auto_ptr<swf_event> ev ( new swf_event(s_code_bits[i], action) );
 				//log_action("---- actions for event %s", ev->event().get_function_name().c_str());
 
-				// hack
-				if (i == 17)	// has keypress event ?
+				if (i == 17)	// has KeyPress event
 				{
 					ev->event().setKeyCode(ch);
 				}
@@ -194,7 +192,7 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 				m_event_handlers.push_back(ev.release());
 			}
 		}
-	}
+	} //end of for(;;)
 }
 
 // read SWF::PLACEOBJECT2
