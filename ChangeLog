@@ -1,3 +1,10 @@
+2007-04-24 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ActionExec.{cpp,h}: add delObjectMember() method.
+	* server/vm/ASHandlers.cpp (ActionDelete): hopefully fixed -
+	  at least as far as we can tell...
+	* testsuite/actionscript.all/delete.as: more tests for ActionDelete.
+
 2007-04-24  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* configure.ac: Remove --enable-extension. Add --with-extensions=

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.99 2007/04/19 14:25:41 martinwguy Exp $ */
+/* $Id: ASHandlers.cpp,v 1.100 2007/04/24 20:38:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2112,32 +2112,39 @@ SWFHandlers::ActionGotoExpression(ActionExec& thread)
 void
 SWFHandlers::ActionDelete(ActionExec& thread)
 {
-//	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
 
 	assert(thread.code[thread.pc] == SWF::ACTION_DELETE); // 0x3A
 
-	size_t stacksize = env.stack_size();
+	thread.ensureStack(2); // obj, member
 
-	if ( stacksize < 1 )
+	// TODO: some parameter checking ?
+	const std::string& propname = env.top(0).to_string(&env);
+	boost::intrusive_ptr<as_object> obj = env.top(1).to_object();
+
+	if ( ! obj )
 	{
-		IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("No elements on the stack "
-				"at ActionDelete (0x3A). "
-				"Returning FALSE."));
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("delete %s.%s : first element is not an object",
+			env.top(1).to_debug_string().c_str(),
+			env.top(0).to_debug_string().c_str());
 		);
-		env.push(as_value(false));
+		env.top(1).set_bool(false);
+		env.drop(1);
 		return;
 	}
 
-	// What's the difference between this and ActionDelete2 ??
-	env.top(0) = thread.delVariable(env.top(0).to_string(&env));
+	env.top(1).set_bool(thread.delObjectMember(*obj, propname));
+
+	env.drop(1);
+
 }
 
 void
 SWFHandlers::ActionDelete2(ActionExec& thread)
 {
-//	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
 	as_environment& env = thread.env;
 

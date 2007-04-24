@@ -1,4 +1,4 @@
-rcsid="$Id: delete.as,v 1.9 2007/03/15 22:39:54 strk Exp $";
+rcsid="$Id: delete.as,v 1.10 2007/04/24 20:38:26 strk Exp $";
 
 #include "check.as"
 
@@ -57,3 +57,17 @@ check_equals(func.prototype.appended_value, 4);
 check(!delete func.prototype);
 check_equals(typeof(func.prototype), 'object');
 check_equals(func.prototype.appended_value, 4);
+
+//
+// Deleting an object's member
+//
+
+obj = new Object;
+obj.a = 1;
+check_equals(obj.a, 1);
+check(delete obj.a);
+check_equals(typeof(obj.a), 'undefined');
+check(!delete obj.a);
+check(!delete unexistent.a);
+
+// TODO: try other malformed ActionDelete calls

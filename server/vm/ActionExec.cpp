@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.28 2007/04/20 12:13:34 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.29 2007/04/24 20:38:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -340,6 +340,21 @@ ActionExec::delVariable(const std::string& name)
 	}
 	
 	return env.del_variable_raw(namei, with_stack);
+}
+
+bool
+ActionExec::delObjectMember(as_object& obj, const std::string& name)
+{
+	VM& vm = VM::get();
+
+	std::string namei = name;
+
+	if ( vm.getSWFVersion() < 7 ) {
+	    boost::to_lower(namei, vm.getLocale());
+	} 
+
+	std::pair<bool,bool> ret = obj.delProperty(namei);
+	return ret.second;
 }
 
 void
