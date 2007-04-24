@@ -31,10 +31,6 @@ if BUILD_FILEIO_EXT
 OTHER_DIRS += fileio
 endif
 
-if USE_GUI_FLTK
-OTHER_DIRS += fltk2
-endif
-
 if BUILD_GTK_EXT
 if USE_GUI_GTK
 OTHER_DIRS += gtk2
