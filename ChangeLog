@@ -1,3 +1,10 @@
+2007-04-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* libgeometry/Range2d.h: added expandToCircle()
+	* server/rect.h: added expand_to_circle()
+	* server/parser/shape_character_def.cpp: corrected compute_bound()
+	  to respect outline widths
+	    	
 2007-04-24 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: DrawingApiTest.as,

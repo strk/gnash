@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.13 2007/02/28 22:53:24 strk Exp $ */
+/* $Id: Range2d.h,v 1.14 2007/04/24 12:01:54 udog Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H
@@ -329,6 +329,24 @@ public:
 			_xmax = std::max(_xmax, x);
 			_ymax = std::max(_ymax, y);
 		}
+
+		return *this;
+	}
+
+	/// Expand this Range2d to enclose the given circle.
+	//
+	/// @return a reference to this instance
+	///
+	Range2d<T>& expandToCircle(T x, T y, T radius)
+	{
+		// A WORLD range already enclose every point
+		if ( isWorld() ) return *this;
+
+        expandTo(x-radius, y);
+        expandTo(x+radius, y);
+
+        expandTo(x, y-radius);
+        expandTo(x, y+radius);
 
 		return *this;
 	}

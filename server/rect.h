@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.16 2006/12/06 12:48:51 strk Exp $ */
+/* $Id: rect.h,v 1.17 2007/04/24 12:01:55 udog Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -112,6 +112,12 @@ public:
 	void	expand_to_point(float x, float y)
 	{
 		_range.expandTo(x, y);
+	}
+	
+	/// Expand this rectangle to enclose the given circle.
+	void	expand_to_circle(float x, float y, float radius)
+	{
+		_range.expandToCircle(x, y, radius);
 	}
 
 	/// Set ourself to bound the given point
