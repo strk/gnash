@@ -1,27 +1,33 @@
-// shape.cpp	-- Thatcher Ulrich <tu@tulrich.com> 2003
+// shape.cpp:  shape path, edge and meshes
+// 
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
-
-// Quadratic bezier outline shapes, the basis for most SWF rendering.
-
-/* $Id: shape.cpp,v 1.33 2007/04/23 19:19:30 strk Exp $ */
 
 #include "shape.h"
 
-#include "impl.h"
-//#include "log.h"
-#include "render.h"
-#include "stream.h"
+#include "tu_file.h"
 #include "tesselate.h"
-#include "movie_definition.h" // TODO: check if really needed
-#include "bitmap_character_def.h"
-
 
 #include "hash_wrapper.h"
 #include "tu_file.h"
 
 #include <cfloat>
+#include <map>
 
 
 namespace gnash {
@@ -613,21 +619,38 @@ m_error_tolerance(error_tolerance)
 	mesh_set*	m;	// the mesh_set that receives trapezoids.
 
 	// strips-in-progress.
-	hash_wrapper<int, tri_stripper*>	m_strips;
+	typedef std::map<int, tri_stripper*> StripsMap;
+	//typedef hash_wrapper<int, tri_stripper*> StripsMap; 
+	StripsMap m_strips;
 
 	collect_traps(mesh_set* set) : m(set) {}
-	virtual ~collect_traps() {}
+
+	~collect_traps()
+	{
+		// Delete any unflushed strip
+		for (StripsMap::const_iterator it = m_strips.begin();
+			it != m_strips.end(); ++it)
+		{
+		    tri_stripper* s = it->second;
+		    delete s;
+		}
+	}
 
 	// Overrides from trapezoid_accepter
-	virtual void	accept_trapezoid(int style, const tesselate::trapezoid& tr)
+	void	accept_trapezoid(int style, const tesselate::trapezoid& tr)
 	    {
 		// Add trapezoid to appropriate stripper.
 
-		tri_stripper*	s = NULL;
-		m_strips.get(style, &s);
-		if (s == NULL) {
-		    s = new tri_stripper;
-		    m_strips.add(style, s);
+		StripsMap::iterator it = m_strips.find(style);
+		tri_stripper* s = NULL;
+		if ( it == m_strips.end() )
+		{
+			s = new tri_stripper;
+			m_strips[style] = s;
+		}
+		else
+		{
+			s = it->second;
 		}
 
 		s->add_trapezoid(
@@ -637,24 +660,26 @@ m_error_tolerance(error_tolerance)
 		    point(tr.m_rx1, tr.m_y1));
 	    }
 
-	virtual void	accept_line_strip(int style, const point coords[], int coord_count)
 	    // Remember this line strip in our mesh set.
+	void	accept_line_strip(int style, const point coords[], int coord_count)
 	    {
 		m->add_line_strip(style, coords, coord_count);
 	    }
 
-	void	flush() const
 	    // Push our strips into the mesh set.
+	void	flush() 
 	    {
-		for (hash_wrapper<int, tri_stripper*>::const_iterator it = m_strips.begin();
+		for (StripsMap::const_iterator it = m_strips.begin();
 		     it != m_strips.end();
-		     ++it) {
+		     ++it)
+		{
 		    // Push strip into m.
-		    tri_stripper*	s = it->second;
+		    tri_stripper* s = it->second;
 		    s->flush(m, it->first);
 					
 		    delete s;
 		}
+		m_strips.clear();
 	    }
     };
     collect_traps	accepter(this);

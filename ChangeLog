@@ -1,3 +1,8 @@
+2007-04-24 Sandro Santilli <strk@keybit.net>
+
+	* server/shape.cpp: substitute hash_wrapper with std::map,
+	  cleanups.
+
 2007-04-24 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/Makefile.am
