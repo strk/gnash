@@ -616,6 +616,8 @@ static as_value sprite_hit_test(const fn_call& fn)
 	static bool warned_2_arg = false;
 	static bool warned_3_arg = false;
 
+	as_environment& env = fn.env();
+
 	switch (fn.nargs)
 	{
 		case 1: // target
@@ -626,38 +628,55 @@ static as_value sprite_hit_test(const fn_call& fn)
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror(_("Can't find hitTest target %s"),
-					tgt_val.to_string().c_str());
+					tgt_val.to_debug_string().c_str());
 				);
 				return as_value();
 			}
+
+			geometry::Range2d<float> thisbounds = sprite->getBounds();
+			matrix thismat = sprite->get_world_matrix();
+			thismat.transform(thisbounds);
+
+			geometry::Range2d<float> tgtbounds = target->getBounds();
+			matrix tgtmat = target->get_world_matrix();
+			tgtmat.transform(tgtbounds);
+
 			if ( ! warned_1_arg ) {
-				log_unimpl("hitTest(target)");
+				log_warning("MovieClip.hitTest(%s) TESTING", tgt_val.to_debug_string().c_str());
 				warned_1_arg=true;
 			}
+
+			return thisbounds.intersects(tgtbounds);
+
 			break;
 		}
 
 		case 2: // x, y
 		{
-			double x = fn.arg(0).to_number();
-			double y = fn.arg(1).to_number();
+			float x = PIXELS_TO_TWIPS(fn.arg(0).to_number(&env));
+			float y = PIXELS_TO_TWIPS(fn.arg(1).to_number(&env));
+
 			if ( ! warned_2_arg ) {
-				log_unimpl("hitTest(%g,%g)", x,y);
+				log_warning("MovieClip.hitTest(%g,%g) TESTING", x,y);
 				warned_2_arg=true;
 			}
-			break;
+
+			return sprite->pointInBounds(x, y);
 		}
 
 		case 3: // x, y, shapeFlag
 		{
-			double x = fn.arg(0).to_number();
-			double y = fn.arg(1).to_number();
+			double x = PIXELS_TO_TWIPS(fn.arg(0).to_number(&env));
+			double y = PIXELS_TO_TWIPS(fn.arg(1).to_number(&env));
 			bool shapeFlag = fn.arg(2).to_bool();
+
 			if ( ! warned_3_arg ) {
-				log_unimpl("hitTest(%g,%g,%d)", x,y,shapeFlag);
+				log_msg("MovieClip.hitTest(%g,%g,%d) TESTING", x,y,shapeFlag);
 				warned_3_arg=true;
 			}
-			break;
+
+			if ( ! shapeFlag ) return sprite->pointInBounds(x, y);
+			else return sprite->pointInVisibleShape(x, y);
 		}
 
 		default:
