@@ -928,20 +928,20 @@ sprite_lineStyle(const fn_call& fn)
 		return as_value();
 	}
 
-	thickness = uint16_t(PIXELS_TO_TWIPS(uint16_t(fclamp(fn.arg(0).to_number(), 0, 255))));
+	thickness = uint16_t(PIXELS_TO_TWIPS(uint16_t(fclamp(fn.arg(0).to_number(&fn.env()), 0, 255))));
 
 	if ( fn.nargs > 1 )
 	{
 		// 2^24 is the max here
-		uint32_t rgbval = uint32_t(fclamp(fn.arg(1).to_number(), 0, 16777216));
+		uint32_t rgbval = uint32_t(fclamp(fn.arg(1).to_number(&fn.env()), 0, 16777216));
 		r = uint8_t( (rgbval&0xFF0000) >> 16);
 		g = uint8_t( (rgbval&0x00FF00) >> 8);
 		b = uint8_t( (rgbval&0x0000FF) );
 
 		if ( fn.nargs > 2 )
 		{
-			float alphaval = fclamp(fn.arg(2).to_number(), 0, 255);
-			a = uint8_t(alphaval);
+			float alphaval = fclamp(fn.arg(2).to_number(&fn.env()), 0, 100);
+			a = uint8_t( 255 * (alphaval/100) );
 		}
 	}
 

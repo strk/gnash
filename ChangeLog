@@ -1,5 +1,13 @@
 2007-04-24 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (sprite_lineStyle): alpha value is given
+	  in percent, always pass the env to number converters.
+	* testsuite/misc-ming.all/DrawingApiTest.as: add test checking that
+	  valueOf is invoked on arguments.
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: more successes.
+
+2007-04-24 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (on_event): call user-defined function
 	  even if clip-events have been found.
 	* testsuite/misc-ming.all/action_execution_order_extend_test.c:

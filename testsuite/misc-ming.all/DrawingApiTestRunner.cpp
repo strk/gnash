@@ -58,6 +58,7 @@ main(int /*argc*/, char** /*argv*/)
 	rgba yellow(255, 255, 0, 255);
 	rgba black(0, 0, 0, 255);
 	rgba violet(255, 0, 255, 255);
+	rgba halftrans_violet(255, 128, 255, 255);
 
 	// Out of any drawing
 	tester.movePointerTo(50, 50);
@@ -87,27 +88,27 @@ main(int /*argc*/, char** /*argv*/)
 	// Inside red "thick" line
 	tester.movePointerTo(146, 146);
 	check(tester.isMouseOverMouseEntity());
-	xcheck_pixel(146, 146, 2, red, 2);
+	check_pixel(146, 146, 2, red, 2);
 
 	// Over the black "hairlined" line
 	tester.movePointerTo(250, 180);
 	check(tester.isMouseOverMouseEntity());
-	xcheck_pixel(250, 180, 1, black, 2);
+	check_pixel(250, 180, 1, black, 2);
 
-	// Over the transparent line (244,100)
-	tester.movePointerTo(244, 100);
-	xcheck(!tester.isMouseOverMouseEntity());
-	xcheck_pixel(244, 100, 2, white, 2);
+	// Over the transparent line (150,100)
+	tester.movePointerTo(150, 100);
+	xcheck(!tester.isMouseOverMouseEntity()); // fails due to shape_character_def::point_test_local bug 
+	check_pixel(150, 100, 2, white, 2); 
 
 	// Over the violet line (146,225)
 	tester.movePointerTo(146, 225);
 	check(tester.isMouseOverMouseEntity());
-	xcheck_pixel(146, 225, 1, violet, 2);
+	check_pixel(146, 225, 1, halftrans_violet, 2);
 
 	// Inside the yellow line
 	tester.movePointerTo(270, 232);
 	check(tester.isMouseOverMouseEntity());
-	xcheck_pixel(270, 232, 2, yellow, 2);
+	check_pixel(270, 232, 2, yellow, 2);
 
 	// Inside the black vertical line
 	tester.movePointerTo(82, 127);
@@ -122,6 +123,6 @@ main(int /*argc*/, char** /*argv*/)
 
 	tester.movePointerTo(376, 139);
 	xcheck(tester.isMouseOverMouseEntity()); // fails due to edge::withinSquareDistance bug
-	xcheck_pixel(376, 139, 2, green, 2); // fails due to bug in AGG
+	check_pixel(376, 139, 2, green, 2); // fails due to bug in AGG
 }
 

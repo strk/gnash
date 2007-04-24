@@ -13,12 +13,21 @@ createEmptyMovieClip("a", 10);
 // ... or on a statically-created one
 //a = _root;
 
+red = new Object();
+red.valueOf = function() { return 0xFF0000; };
+
+thick = new Object();
+thick.valueOf = function() { return 20; };
+
+halftransparent = new Object();
+halftransparent.valueOf = function() { return 50; };
+
 with (a)
 {
 	clear();
 
 	// The thick red line
-	lineStyle(20, 0xFF0000, 100);
+	lineStyle(thick, red, 100);
 	moveTo(100, 100);
 	lineTo(200, 200);
 
@@ -29,7 +38,7 @@ with (a)
 
 	// The violet line
 	moveTo(100, 200);
-	lineStyle(5, 0xFF00FF, 50);
+	lineStyle(5, 0xFF00FF, halftransparent);
 	lineTo(200, 250);
 
 	// The yellow line
