@@ -4,6 +4,8 @@
 	* server/rect.h: added expand_to_circle()
 	* server/parser/shape_character_def.cpp: corrected compute_bound()
 	  to respect outline widths
+	* testsuite/libgeometry/Range2dTest.cpp: added test for 
+	  expandToCircle()
 	    	
 2007-04-24 Sandro Santilli <strk@keybit.net>
 

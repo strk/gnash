@@ -68,6 +68,15 @@ main(int /*argc*/, char** /*argv*/)
 	check( fIntRange1 != nullIntRange1 );
 
 	//
+	// Test expandToCircle()
+	//
+	
+	Range2d<float> circleRange;
+    circleRange.expandToCircle(50.0, 100.0, 10.0);
+    check_equals( circleRange, Range2d<float>(40.0, 90.0, 60.0, 110.0));  
+
+
+	//
 	// Test growBy()
 	//
 
