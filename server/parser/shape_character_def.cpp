@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.18 2007/04/23 20:05:20 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.19 2007/04/24 10:05:55 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -607,16 +607,20 @@ bool	shape_character_def::point_test_local(float x, float y)
 	return false;
     }
 
+    size_t npaths = m_paths.size();
+    
+    if ( ! npaths ) return false;
+    
     point pt(x, y);
 
     // Try each of the paths.
-    for (unsigned int i = 0; i < m_paths.size(); i++)
+    for (size_t i = 0; i < npaths; ++i)
     {
-	path& pth = m_paths[i];
+	const path& pth = m_paths[i];
 
-	if ( pth.m_edges.empty() ) continue;
+	if ( pth.empty() ) continue;
 
-	// If it has 
+	// If it has a line style, check for strokes there
 	if ( pth.m_line != 0 )
 	{
 		assert(m_line_styles.size() >= pth.m_line);
@@ -637,6 +641,7 @@ bool	shape_character_def::point_test_local(float x, float y)
 		if ( pth.withinSquareDistance(pt, sqdist) ) return true;
 	}
 
+	// Check for point in polygon (if filled - but that test is in point_test itself)
 	if (pth.point_test(x, y)) return true;
     }
 
