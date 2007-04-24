@@ -861,6 +861,36 @@ sprite_globalToLocal(const fn_call& fn)
 }
 
 static as_value
+sprite_localToGlobal(const fn_call& fn)
+{
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
+	UNUSED(sprite);
+
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_unimpl("MovieClip.localToGlobal()");
+		warned=true;
+	}
+	return as_value();
+}
+
+static as_value
+sprite_setMask(const fn_call& fn)
+{
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
+	UNUSED(sprite);
+
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_unimpl("MovieClip.setMask()");
+		warned=true;
+	}
+	return as_value();
+}
+
+static as_value
 sprite_endFill(const fn_call& fn)
 {
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
@@ -1262,9 +1292,11 @@ attachMovieClipInterface(as_object& o)
 	o.init_member("getURL", new builtin_function(sprite_getURL));
 	o.init_member("getBounds", new builtin_function(sprite_getBounds));
 	o.init_member("globalToLocal", new builtin_function(sprite_globalToLocal));
+	o.init_member("localToGlobal", new builtin_function(sprite_localToGlobal));
 	if ( target_version  < 6 ) return;
 
 	// SWF6 or higher
+	o.init_member("setMask", new builtin_function(sprite_setMask));
 	o.init_member("beginFill", new builtin_function(sprite_beginFill));
 	o.init_member("beginGradientFill", new builtin_function(sprite_beginGradientFill));
 	o.init_member("clear", new builtin_function(sprite_clear));

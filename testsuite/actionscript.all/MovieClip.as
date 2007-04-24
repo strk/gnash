@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.65 2007/04/20 10:03:12 zoulunkai Exp $";
+rcsid="$Id: MovieClip.as,v 1.66 2007/04/24 21:11:18 strk Exp $";
 
 #include "check.as"
 
@@ -53,12 +53,13 @@ check_equals(typeof(mc._width), "number");
 // Check methods existance
 
 // SWF5 or higher
-check(mc.attachMovie);
-check(mc.getBytesLoaded);
-check(mc.getBytesTotal);
-check(mc.getBounds);
-check(mc.globalToLocal);
-check_equals(typeOf(mc.unloadMovie), 'function');
+check_equals(typeof(mc.attachMovie), 'function');
+check_equals(typeof(mc.getBytesLoaded), 'function');
+check_equals(typeof(mc.getBytesTotal), 'function');
+check_equals(typeof(mc.getBounds), 'function');
+check_equals(typeof(mc.globalToLocal), 'function');
+check_equals(typeof(mc.localToGlobal), 'function');
+check_equals(typeof(mc.unloadMovie), 'function');
 
 // This seems unavailable
 // when targetting SWF > 6
@@ -69,6 +70,7 @@ check(mc.duplicateMovieClip);
 #endif
 
 #if OUTPUT_VERSION >= 6
+	check_equals(typeof(mc.setMask), 'function');
 	check_equals(typeof(mc.beginFill), 'function');
 	check_equals(typeof(mc.beginGradientFill), 'function');
         check_equals(typeof(mc.clear), 'function');
@@ -112,8 +114,6 @@ check(mc.duplicateMovieClip);
     // maybe we should just NOT use the _root for this ?
     //check(mc.loadVariables != undefined);
 
-    xcheck(mc.localToGlobal);
-    xcheck(mc.setMask);
     check(mc.startDrag);
     check(mc.stopDrag);
     xcheck(mc.enabled);
