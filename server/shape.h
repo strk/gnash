@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.21 2007/04/23 19:19:30 strk Exp $ */
+/* $Id: shape.h,v 1.22 2007/04/24 09:20:15 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -106,7 +106,18 @@ namespace gnash {
 			return is_empty();
 		}
 
-		bool	point_test(float x, float y);
+		/// Point-in-shape test. 
+		//
+		/// Return true if the query point is on the filled
+		/// interior of this shape.
+		///
+		/// Return false if this path has no associated fill.
+		///
+		/// WARNING: often a filled shape is composed by multiple
+		///          paths. we probably fail in those cases.
+		///
+		///
+		bool	point_test(float x, float y) const;
 
 		/// Push the path into the tesselator.
 		void	tesselate() const;
@@ -239,7 +250,7 @@ namespace gnash {
 		//
 		/// NOTE: if the path is empty, false is returned.
 		///
-		bool withinSquareDistance(const point& p, float dist);
+		bool withinSquareDistance(const point& p, float dist) const;
 
 
 	//private:

@@ -159,9 +159,7 @@ bool	path::is_empty() const
 }
 
 
-bool	path::point_test(float x, float y)
-    // Point-in-shape test.  Return true if the query point is on the filled
-    // interior of this shape.
+bool	path::point_test(float x, float y) const
 {
     if ( m_edges.empty() ) return false;
 
@@ -342,7 +340,7 @@ path::close()
 }
 
 bool
-path::withinSquareDistance(const point& p, float dist)
+path::withinSquareDistance(const point& p, float dist) const
 {
 	size_t nedges = m_edges.size();
 

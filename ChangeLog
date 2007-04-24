@@ -1,5 +1,7 @@
 2007-04-24 Sandro Santilli <strk@keybit.net>
 
+	* server/shape.{cpp,h}: const-corrected point_test and
+	  wihinSquareDistance();
 	* server/sprite_instance.cpp (sprite_lineStyle): alpha value is given
 	  in percent, always pass the env to number converters.
 	* testsuite/misc-ming.all/DrawingApiTest.as: add test checking that
