@@ -1,5 +1,12 @@
 2007-04-24 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (on_event): call user-defined function
+	  even if clip-events have been found.
+	* testsuite/misc-ming.all/action_execution_order_extend_test.c:
+	  one more success.
+	* testsuite/swfdec/PASSING: event-order.swf now succeeds.
+	* testsuite/swfdec/gen_run_swfdec_testsuite.sh: match full lines
+	  in the PASSING file, to avoid partial mathes.
 	* server/shape.cpp: substitute hash_wrapper with std::map,
 	  cleanups.
 

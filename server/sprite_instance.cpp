@@ -1933,7 +1933,7 @@ sprite_instance::on_event(const event_id& id)
 
 	bool called = false;
 			
-	// First, check for built-in event handler.
+	// First, check for clip event handler.
 	{
 		std::auto_ptr<ExecutableCode> code ( get_event_handler(id) );
 		if ( code.get() )
@@ -1942,19 +1942,10 @@ sprite_instance::on_event(const event_id& id)
 			code->execute();
 
 			called = true;
-			// Fall through and call the function also, if it's defined!
-			// (@@ Seems to be the behavior for mouse events; not tested & verified for
-			// every event type.)
 		}
 	}
 
-	// If we called a built-in event handler
-	// we stop here. If we don't do this,
-	// MOUSE_UP, MOUSE_DOWN and MOUSE_MOVE will
-	// be called twice !
-	// Don't know if this is generally valid for every
-	// kind of event, but we do have testcases for this one...
-	if ( called ) return true;
+	// Fall through and call the function also, if it's defined!
 
 	// Check for member function.
 	{
