@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.32 2007/04/25 11:29:12 martinwguy Exp $ */
+/* $Id: amf.cpp,v 1.33 2007/04/25 12:26:07 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -164,8 +164,6 @@ AMF::swapBytes(void *word, int size)
 	c=x[3]; x[3]=x[4]; x[4]=c;
 	break;
       }
-    default:
-	assert(0);
     }
 
     return word;
