@@ -1,3 +1,10 @@
+2007-04-25 Sandro Santilli <strk@keybit.net>
+
+	* doc/C/asspec/date.xml: fixed typos preventing the asspec
+	  from building.
+	* doc/C/asspec/movieclip.xml: add brief doc and conformancy
+	  for localToGlobal(), globalToLocal() and hitTest() methods.
+
 2007-04-25 Martin Guy <martinwguy@yahoo.it>
 
 	* ChangeLog,server/debugger.{cpp,h},server/vm/ActionExec.cpp:

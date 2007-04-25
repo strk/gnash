@@ -328,6 +328,7 @@
 		If no parameters are given, or if the parameter cannot
 		be converted to a number, the Date's value is set to
 		NotANumber. Any extra parameters are ignored.
+	    </para>
 	  </listitem>
 	</varlistentry>
 
@@ -444,6 +445,7 @@
 	    <para>
 		If no parameters are supplied, or if the parameter cannot be
 		converted to a number, the Date's value is set to NotANumber.
+	    </para>
 	  </listitem>
 	</varlistentry>
 

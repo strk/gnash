@@ -163,10 +163,13 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>globalToLocal()</term>
+	  <term>globalToLocal(obj)</term>
 	  <listitem>
-	    <para>
-	    </para>
+		<para>
+		Take members 'x', and 'y' in the object 'obj' and transform them from global to local coordinate space.
+		If the parameter doesn't cast to an object, or the object doesn't contain both 'x' and 'y', the call is invalid 
+		and nothing is modified.
+		</para>
 	  </listitem>
 	</varlistentry>
 
@@ -187,9 +190,13 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>hitTest()</term>
+	  <term>hitTest(target)</term>
+	  <term>hitTest(x,y)</term>
+	  <term>hitTest(x,y,shapeFlag)</term>
 	  <listitem>
 	    <para>
+		In the first form, check for the bounding boxes of this and target characters to intersect.
+		In the second and third form, check if the given point is inside the bounding box or the visible shape of this character; shapeFlag (false) in the 2 args version says wheter actual shape or just bounds has to be checked.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -227,9 +234,12 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>localToGlobal()</term>
+	  <term>localToGlobal(obj)</term>
 	  <listitem>
 	    <para>
+		Take members 'x', and 'y' in the object 'obj' and transform them from local to global coordinate space.
+		If the parameter doesn't cast to an object, or the object doesn't contain both 'x' and 'y', the call is invalid 
+		and nothing is modified.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -964,7 +974,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested in Gnash.
 		</para>
 	      </entry>
 	    </row>
@@ -994,7 +1004,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested in Gnash.
 		</para>
 	      </entry>
 	    </row>
@@ -1044,7 +1054,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested in Gnash.
 		</para>
 	      </entry>
 	    </row>
