@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.31 2007/04/18 17:27:02 martinwguy Exp $ */
+/* $Id: amf.cpp,v 1.32 2007/04/25 11:29:12 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -114,40 +114,59 @@ AMF::~AMF()
 
 /// \brief Swap bytes from big to little endian.
 ///
-/// All Numberic values for AMF files are 64bit big endian, so we have
+/// All Numeric values for AMF files are big endian, so we have
 /// to swap the bytes to be little endian for most machines. Don't do
-/// anything if we happend to be on a big-endian machine.
+/// anything if we happen to be on a big-endian machine.
+///
+/// Returns its first parameter, pointing to the (maybe-byte-swapped) data.
 void *
 AMF::swapBytes(void *word, int size)
 {
-#if    __BYTE_ORDER == __LITTLE_ENDIAN
-    unsigned char       c;
-    unsigned short      s;
-    unsigned long       l;
-    char *x = static_cast<char *>(word);
+    union {
+	uint16_t s;
+	struct {
+	    uint8_t c0;
+	    uint8_t c1;
+	} c;
+    } u;
+	   
+    u.s = 1;
+    if (u.c.c0 == 0) {
+	// Big-endian machine: do nothing
+        return word;
+    }
+
+    // Little-endian machine: byte-swap the word
+
+    // A conveniently-typed pointer to the source data
+    unsigned char *x = static_cast<unsigned char *>(word);
 
     switch (size) {
-      case 2: // swap two bytes
-          c = *x;
-          *x = *(x+1);
-          *(x+1) = c;
-          break;
-      case 4: // swap two shorts (2-byte words)
-          s = *(unsigned short *)x;
-          *(unsigned short *)x = *((unsigned short *)x + 1);
-          *((unsigned short *)x + 1) = s;
-          swapBytes((char *)x, 2);
-          swapBytes((char *)((unsigned short *)x+1), 2);
-          break;
-      case 8: // swap two longs (4-bytes words)
-          l = *(unsigned long *)x;
-          *(unsigned long *)x = *((unsigned long *)x + 1);
-          *((unsigned long *)x + 1) = l;
-          swapBytes((char *)x, 4);
-          swapBytes((char *)((unsigned long *)x+1), 4);
-          break;
+    case 2: // 16-bit integer
+      {
+	unsigned char c;
+	c=x[0]; x[0]=x[1]; x[1]=c;
+	break;
+      }
+    case 4: // 32-bit integer
+      {
+	unsigned char c;
+	c=x[0]; x[0]=x[3]; x[3]=c;
+	c=x[1]; x[1]=x[2]; x[2]=c;
+	break;
+      }
+    case 8: // 64-bit integer
+      {
+	unsigned char c;
+	c=x[0]; x[0]=x[7]; x[7]=c;
+	c=x[1]; x[1]=x[6]; x[6]=c;
+	c=x[2]; x[2]=x[5]; x[5]=c;
+	c=x[3]; x[3]=x[4]; x[4]=c;
+	break;
+      }
+    default:
+	assert(0);
     }
-#endif
 
     return word;
 }
@@ -166,6 +185,8 @@ AMF::parseAMF(char *in)
     return true;
 }
 
+// @@ I don't believe this works, since it only advances x over the
+// @@ object's metafields (length etc), but not over its contents. -martin
 char *
 AMF::readElement(void *in)
 {
@@ -184,6 +205,7 @@ AMF::readElement(void *in)
     x++;                        // skip the type byte
     switch (type) {
       case NUMBER:
+	  // AMF numbers are 64-bit big-endian integers.
           num = *(amfnum_t *)swapBytes(x+1, 8);
           log_msg("Number is " AMFNUM_F, num);
           break;
@@ -254,6 +276,9 @@ AMF::readElement(void *in)
           break;
       case TYPED_OBJECT:
           log_msg("TypedObject is unimplemented\n");
+          break;
+      default:
+          log_msg("Warning: Unknown AMF element type %d\n", type);
           break;
     }
     

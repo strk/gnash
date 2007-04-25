@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.18 2007/04/20 12:13:34 strk Exp $ */
+/* $Id: action_buffer.cpp,v 1.19 2007/04/25 11:29:12 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,6 +42,10 @@ gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 }
 
 namespace gnash {
+
+// Forward declarations
+static float convert_float_little(const void *p);
+static double convert_double_wacky(const void *p);
 
 action_buffer::action_buffer()
     :
@@ -251,17 +255,9 @@ disasm(const unsigned char* instruction_data)
 		    dbglogfile << "\t\"" << str.c_str() << "\"" << endl;
 		} else if (type == 1) {
 		    // float (little-endian)
-		    union {
-			float	f;
-			uint32_t	i;
-		    } u;
-		    compiler_assert(sizeof(u) == sizeof(u.i));
-		    
-		    memcpy(&u.i, instruction_data + 3 + i, 4);
-		    u.i = swap_le32(u.i);
+		    float f = convert_float_little(instruction_data + 3 + i);
 		    i += 4;
-		    
-		    dbglogfile << "(float) " << u.f << endl;
+		    dbglogfile << "(float) " << f << endl;
 		} else if (type == 2) {
 		    dbglogfile << "NULL" << endl;
 		} else if (type == 3) {
@@ -276,24 +272,10 @@ disasm(const unsigned char* instruction_data)
 		    i++;
 		    dbglogfile << "bool(" << bool_val << ")" << endl;
 		} else if (type == 6) {
-		    // double
-		    // wacky format: 45670123
-		    union {
-			double	d;
-			uint64_t	i;
-			struct {
-			    uint32_t	lo;
-			    uint32_t	hi;
-			} sub;
-		    } u;
-		    compiler_assert(sizeof(u) == sizeof(u.i));
-		    
-		    memcpy(&u.sub.hi, instruction_data + 3 + i, 4);
-		    memcpy(&u.sub.lo, instruction_data + 3 + i + 4, 4);
-		    u.i = swap_le64(u.i);
+		    // double in wacky format: 45670123
+		    double d = convert_double_wacky(instruction_data + 3 + i);
 		    i += 8;
-		    
-		    dbglogfile << "(double) " << u.d << endl;
+		    dbglogfile << "(double) " << d << endl;
 		} else if (type == 7) {
 		    // int32_t
 		    int32_t	val = instruction_data[3 + i]
@@ -414,42 +396,148 @@ action_buffer::log_disasm(size_t pc) const
 	disasm(instruction_data);
 }
 
+// Endian conversion routines.
+//
+// Flash format stores integers as little-endian,
+// floats as little-endian IEEE754,
+// and doubles as little-endian IEEE754 with the two 32-bit words swapped over.
+//
+// We detect endianness at runtime.
+// It looks hairy but the cost is small (one assignment, one switch),
+// and it is less of a maintenance/portability nightmare.
+// It also allows us to detect three existing variants instead of two and
+// to reject incompatible (non-IEEE754) floating point formats (VAX etc).
+// For these we would need to interpret the IEEE bitvalues explicitly.
+
+// Read a little-endian 32-bit float from m_buffer[pc]
+// and return it as a host-endian float.
+static float
+convert_float_little(const void *p)
+{
+	// Hairy union for endian detection and munging
+	union {
+		float	f;
+		uint32_t i;
+		struct {	// for endian detection
+			uint16_t s0;
+			uint16_t s1;
+		} s;
+		struct {	// for byte-swapping
+			uint8_t c0;
+			uint8_t c1;
+			uint8_t c2;
+			uint8_t c3;
+		} c;
+	} u;
+
+	u.f = 1.0;
+	switch (u.s.s0) {
+	case 0x0000:	// little-endian host
+		memcpy(&u.i, p, 4);
+		break;
+	case 0x3f80:	// big-endian host
+	    {
+		const uint8_t *cp = (const uint8_t *) p;
+		u.c.c0 = cp[3];
+		u.c.c1 = cp[2];
+		u.c.c2 = cp[1];
+		u.c.c3 = cp[0];
+	    }
+	    break;
+	default:
+	    log_error(_("Native floating point format not recognised"));
+	    assert(0);
+	}
+	
+	return u.f;
+}
+
+// Read a 64-bit double from memory, stored in word-swapped little-endian
+// format and return it as a host-endian double.
+// "Wacky format" is 45670123.
+static double
+convert_double_wacky(const void *p)
+{
+	const uint8_t *cp = (const uint8_t *)p;	// Handy uchar version
+	union {
+		double	d;
+		uint64_t	i;
+		struct {
+			uint32_t l0;
+			uint32_t l1;
+		} l;
+		struct {
+			uint16_t s0;
+			uint16_t s1;
+			uint16_t s2;
+			uint16_t s3;
+		} s;
+		struct {
+			uint8_t c0;
+			uint8_t c1;
+			uint8_t c2;
+			uint8_t c3;
+			uint8_t c4;
+			uint8_t c5;
+			uint8_t c6;
+			uint8_t c7;
+		} c;
+	} u;
+
+	compiler_assert(sizeof(u) == sizeof(u.i));
+
+	// Detect endianness of doubles by storing a value that is
+	// exactly representable and that has different values in the
+	// four 16-bit words.
+	// 0x11223344 is represented as 0x41b1 2233 4400 0000 (bigendian)
+	u.d = (double) 0x11223344;
+	switch (u.s.s0) {
+	case 0x0000:	// pure little-endian host: swap words only.
+		memcpy(&u.l.l1, cp, 4);
+		memcpy(&u.l.l0, cp + 4, 4);
+		break;
+	case 0x41b1:	// pure big-endian host: swap contents of 32-bit words
+		u.c.c0 = cp[3];
+		u.c.c1 = cp[2];
+		u.c.c2 = cp[1];
+		u.c.c3 = cp[0];
+		u.c.c4 = cp[7];
+		u.c.c5 = cp[6];
+		u.c.c6 = cp[5];
+		u.c.c7 = cp[4];
+		break;
+	case 0x2233:	// word-swapped little-endian host (PDP / ARM FPA)
+			// is the same as wacky format.
+		memcpy(&u.i, cp, 8);
+		break;
+	case 0x4400:	// word-swapped big-endian host: does this exist?
+		u.c.c0 = cp[7];
+		u.c.c1 = cp[6];
+		u.c.c2 = cp[5];
+		u.c.c3 = cp[4];
+		u.c.c4 = cp[3];
+		u.c.c5 = cp[2];
+		u.c.c6 = cp[1];
+		u.c.c7 = cp[0];
+		break;
+	default:
+		log_error(_("Native double floating point format not recognised"));
+		assert(0);
+	}
+
+	return u.d;
+}
 
 float
 action_buffer::read_float_little(size_t pc) const
 {
-	union {
-		float	f;
-		uint32_t	i;
-	} u;
-	compiler_assert(sizeof(u) == sizeof(u.i));
-	memcpy(&u.i, &m_buffer[pc], 4);
-	u.i = swap_le32(u.i);
-	return u.f;
+	return(convert_float_little(&m_buffer[pc]));
 }
 
 double
 action_buffer::read_double_wacky(size_t pc) const
 {
-	// double
-	// wacky format: 45670123
-	union {
-		double	d;
-		uint64_t	i;
-		struct {
-			uint32_t	lo;
-			uint32_t	hi;
-		} sub;
-	} u;
-
-	compiler_assert(sizeof(u) == sizeof(u.i));
-
-	// this works, but is pretty dirty
-	memcpy(&u.sub.hi, &m_buffer[pc], 4);
-	memcpy(&u.sub.lo, &m_buffer[pc + 4], 4);
-	u.i = swap_le64(u.i);
-
-	return u.d;
+	return(convert_double_wacky(&m_buffer[pc]));
 }
 
 }

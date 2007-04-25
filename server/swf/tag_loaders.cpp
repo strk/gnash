@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.91 2007/04/18 21:05:15 martinwguy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.92 2007/04/25 11:29:12 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1176,6 +1176,9 @@ do_init_action_loader(stream* in, tag_type tag, movie_definition* m)
 // Sound
 //
 
+// @@ There are two sets of code to decode/expand/byteswap audio here.
+// @@ There should be one (search for ADPCM).
+
 // Load a DefineSound tag.
 void
 define_sound_loader(stream* in, tag_type tag, movie_definition* m)
@@ -1235,19 +1238,37 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		    data[i] = in->read_u8();
 		}
 
+		// Samples are always little-endian.
 		// Swap bytes on behalf of the host, to make it easier for the handler.
 		// @@ I'm assuming this is a good idea?	 Most sound handlers will prefer native endianness?
 		if (format == sound_handler::FORMAT_UNCOMPRESSED
 		    && sample_16bit)
 		{
-#ifndef _TU_LITTLE_ENDIAN_
-		    // Swap sample bytes to get big-endian format.
-		    for (int i = 0; i < data_bytes - 1; i += 2)
-		    {
-			swap(&data[i], &data[i+1]);
+		    // Runtime detection of host endianness costs almost
+		    // nothing and is less of a continual maintenance headache
+		    // than attempting compile-time detection.
+		    union u {
+		    	uint16_t s;
+			struct {
+			    uint8_t c0;
+			    uint8_t c1;
+			} c;
+		    } u;
+		    u.s = 0x0001;
+		    switch (u.c.c0) {
+		    case 0x01:	// Little-endian host: sample is already native.
+			break;
+		    case 0x00:  // Big-endian host
+		        // Swap sample bytes to get big-endian format.
+		        for (int i = 0; i < data_bytes - 1; i += 2)
+		        {
+			    swap(&data[i], &data[i+1]);
+		        }
+			break;
+		    default:	// Impossible
+			log_error(_("Host endianness not detected in define-sound_loader"));
+			assert(0);
 		    }
-#endif // not _TU_LITTLE_ENDIAN_
-
 		    format = sound_handler::FORMAT_NATIVE16;
 		}
 	    }
@@ -1435,6 +1456,10 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
 	// Swap bytes on behalf of the host, to make it easier for the handler.
 	// @@ I'm assuming this is a good idea?	 Most sound handlers will prefer native endianness?
+	// I dunno why this is commented-out, but if you want to re-enable it,
+	// recode it with the same runtime endian order detection as above.
+	// Or, better, unify the two routines as there is a lot of duplicated
+	// code here.
 	/*if (format == sound_handler::FORMAT_UNCOMPRESSED && sample_16bit)
 	{
 #ifndef _TU_LITTLE_ENDIAN_
