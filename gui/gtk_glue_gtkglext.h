@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: gtk_glue_gtkglext.h,v 1.7 2006/10/29 18:34:10 rsavoye Exp $ */
+/* $Id: gtk_glue_gtkglext.h,v 1.8 2007/04/25 12:36:44 martinwguy Exp $ */
 
 #include "gtk_glue.h"
 
@@ -47,7 +47,7 @@ class GtkGlExtGlue : public GtkGlue
     void prepDrawingArea(GtkWidget *drawing_area);
     render_handler* createRenderHandler();
     void render();
-    void render(int minx, int miny, int maxx, int maxy) { render(); };
+    void render(int /*minx*/, int /*miny*/, int /*maxx*/, int /*maxy*/) { render(); };
     void configure(GtkWidget *const widget, GdkEventConfigure *const event);
   private:
     GdkGLConfig *_glconfig;
