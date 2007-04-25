@@ -26,6 +26,7 @@ DEF_MAKESWF_FLAGS = -I $(top_srcdir)/testsuite/actionscript.all
 INCLUDES = -I$(srcdir)  \
 	-I$(top_srcdir)/libbase \
 	-I$(top_srcdir)/libgeometry \
+	-I$(top_srcdir)/gui \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/server/vm \
 	-I$(top_srcdir)/server/parser \
@@ -63,19 +64,18 @@ gtkext_la_SOURCES = gtkext.cpp gtkext.h
 gtkext_la_LDFLAGS = -module -avoid-version # -no-undefined
 gtkext_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) $(AM_LDFLAGS)
 
-
-check_PROGRAMS = hello
+# check_PROGRAMS = hello
 CLEANFILES = \
 	gnash-dbg.log\
 	hello.swf.frame0.pp \
 	hello.swf \
 	logfile
 
+# hello: hello.swf
+# 	../../utilities/gprocessor hello.swf
 
-hello: hello.swf
-	../../utilities/gprocessor hello.swf
-
-hello.swf: hello.as
+# noinst_SCRIPTS = hello.as
+# hello.swf: hello.as
 
 SUFFIXES = as swf
 .as.swf: 
