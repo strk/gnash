@@ -2,8 +2,8 @@
 
 	* doc/C/asspec/date.xml: fixed typos preventing the asspec
 	  from building.
-	* doc/C/asspec/movieclip.xml: add brief doc and conformancy
-	  for localToGlobal(), globalToLocal() and hitTest() methods.
+	* doc/C/asspec/movieclip.xml: add docs and conformancy for
+	  a few methods.
 
 2007-04-25 Martin Guy <martinwguy@yahoo.it>
 

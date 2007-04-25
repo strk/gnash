@@ -27,9 +27,11 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>beginFill()</term>
+	  <term>beginFill([rgba])</term>
 	  <listitem>
 	    <para>
+		Set fill color for subsequent drawing. The value is interpreted as a 32bit integer composed of red (highest byte), green, blue and 
+		alpha (lowest byte). If first argument is missing the fill color will be black with alpha 255.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -46,14 +48,20 @@
 	  <term>clear()</term>
 	  <listitem>
 	    <para>
+		Clear all dynamic drawing on this MovieClip.
 	    </para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term>createEmptyMovieClip()</term>
+	  <term>createEmptyMovieClip(name, depth)</term>
 	  <listitem>
 	    <para>
+		Create an empty movieclip and place it in this clip displaylist at the given depth.
+		Return a reference to the created clip.
+		If called with less the two arguments the method returns undefined and no action is taken.
+		TOCHECK: what if a character with the given name already exist ?
+		TOCHECK: what if a character at the given depth already exist ?
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -67,17 +75,26 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>curveTo()</term>
+	  <term>curveTo(cx, cy, ax, ay)</term>
 	  <listitem>
 	    <para>
+		Draw a quadratic bezier curve with current linestyle and current fill from current pen position to the anchor point ax,ay using control point cx, cy. If any argument is missing nothing is drawn. The function always returns undefined.
 	    </para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term>duplicateMovieClip()</term>
+	  <term>duplicateMovieClip(newname, newdepth, [initObject])</term>
 	  <listitem>
 	    <para>
+		Make a clone of this MovieClip and place it in this MovieClip parent's DisplayList.
+		If given a third argument, it will be taken as an object to use for initializing properties
+		of the clone.
+		Return the cloned object.
+		An absolute root movieclip (_levelx) can not be duplicated, if attempted, no action is taken and undefined is returned.
+		TOCHECK: what if a character with the given name already exists in parent's display list ?
+		TOCHECK: what if a character at the given depth already exists in parent's display list ?
+		TODO: add info about what does it mean to 'clone' (what's cloned and what not).
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -86,14 +103,20 @@
 	  <term>endFill()</term>
 	  <listitem>
 	    <para>
+		Reset any fill information. Next drawing calls will not be filled.
+		If a fill was in effect (see beginFill and beginGradientFill) the current path is closed so that
+		last point equals the first point of the filled shape.
 	    </para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term>getBounds()</term>
+	  <term>getBounds([target])</term>
 	  <listitem>
 	    <para>
+		Returns an object  with members 'xMin', 'yMin', 'xMax' and 'yMax' representing the bounding box of this MovieClip.
+		When called with no args the bounding box is in local coordinate space.
+		When given an character as first argument, the bounding box is in the given character's coordinate space.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -118,6 +141,8 @@
 	  <term>getDepth()</term>
 	  <listitem>
 	    <para>
+		Return the depth on this character in its parent DisplayList.
+		TOCHECK: what's returned when called against a character with no parent (_levelx) ?
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -134,6 +159,9 @@
 	  <term>getNextHighestDepth()</term>
 	  <listitem>
 	    <para>
+		Return the next available depth for placing a new character in this MovieClip displaylist.
+		TOCHECK: if depths 1 and 3 are occupied, returns 4, not 2 , right ?
+		NOTE: this function always return a number >= 0, negative depths are never returned.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -142,6 +170,7 @@
 	  <term>getSWFVersion()</term>
 	  <listitem>
 	    <para>
+		TOCHECK : I don't think there's such a function ... 
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -203,16 +232,27 @@
 
 	<varlistentry>
 	  <term>lineStyle()</term>
+	  <term>lineStyle(thickness, [color])</term>
 	  <listitem>
 	    <para>
+		In the first form (no args) it will reset all line style info so that next drawing will have a transparent drawing.
+		Note that by 'transparent' is not intended 0-alpha as no color transformation will be able to augment the alpha value.
+		The line is simply always invisible instead.
+	    </para>
+	    <para>
+		In the second form, set thickness and color of strokes for subsequent drawing.
+		If color is omitted, it defaults to black with 255 alpha.
+		If thickness is zero the line will always be an 'hariline', which is always displaied with the
+		same width at any scale. Other thickness will be in pixels and scale togheter with the MovieClip itself.
 	    </para>
 	  </listitem>
 	</varlistentry>
 
 	<varlistentry>
-	  <term>lineTo()</term>
+	  <term>lineTo(x, y)</term>
 	  <listitem>
 	    <para>
+		Draw a straight line from current position to point x,y using current styles.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -804,7 +844,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested.
 		</para>
 	      </entry>
 	    </row>
@@ -824,7 +864,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested.
 		</para>
 	      </entry>
 	    </row>
@@ -834,7 +874,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested. Needs more tests for corner cases (ie: depth occupied or name existing).
 		</para>
 	      </entry>
 	    </row>
@@ -854,7 +894,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested.
 		</para>
 	      </entry>
 	    </row>
@@ -864,7 +904,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested. Needs more testing.
 		</para>
 	      </entry>
 	    </row>
@@ -874,7 +914,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested.
 		</para>
 	      </entry>
 	    </row>
@@ -884,7 +924,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested.
 		</para>
 	      </entry>
 	    </row>
@@ -914,7 +954,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested.
 		</para>
 	      </entry>
 	    </row>
@@ -934,7 +974,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested. Needs more tests.
 		</para>
 	      </entry>
 	    </row>
@@ -1014,7 +1054,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested.
 		</para>
 	      </entry>
 	    </row>
@@ -1024,7 +1064,7 @@
 	      </entry>
 	      <entry valign="top" align="center">
 		<para>
-		  This method has an unknown status.
+		  Implemented and tested.
 		</para>
 	      </entry>
 	    </row>
