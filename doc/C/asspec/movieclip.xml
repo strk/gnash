@@ -196,7 +196,7 @@
 	  <listitem>
 	    <para>
 		In the first form, check for the bounding boxes of this and target characters to intersect.
-		In the second and third form, check if the given point is inside the bounding box or the visible shape of this character; shapeFlag (false) in the 2 args version says wheter actual shape or just bounds has to be checked.
+		In the second and third form, check if the given point is inside the bounding box or the visible shape of this character; shapeFlag (false) in the 2 args version says wheter actual shape or just bounds has to be checked; coordinates values are in Stage coordinate space.
 	    </para>
 	  </listitem>
 	</varlistentry>
