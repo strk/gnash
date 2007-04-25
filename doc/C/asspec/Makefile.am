@@ -77,10 +77,8 @@ EXTRA_DIST = \
 	$(xml_files) \
 	$(omffile) \
 	asspec.texi \
-	asspec-man.xml \
 	asspec.info \
-	asspec.html \
-	asspec.1
+	asspec.html
 
 if ENABLE_FOP
 .xml.pdf:
