@@ -3,7 +3,7 @@
 // This source code has been donated to the Public Domain.  Do
 // whatever you want with it.
 
-// Basic swapping stuff and endian-dependent code.
+// Basic swapping stuff
 
 #ifndef TU_SWAP_H
 #define TU_SWAP_H
