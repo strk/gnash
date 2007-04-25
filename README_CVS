@@ -1,0 +1,22 @@
+$Id: README_CVS,v 1.1 2007/04/25 17:29:30 strk Exp $
+
+Using Gnash CVS repository.
+
+Building gnash from CVS requires the following additional packages:
+
+	- automake (version?)
+	- autoheader (version?)
+	- aclocal (version?)
+	- autoconf (version?)
+	- intltool (version?)
+	- xml-i18n-toolize (version?)
+	- libtool (version?)
+	- glib-gettextize (version?)
+	- libltdl (version?)
+
+All the above tools are used by the ./autogen.sh script, which you'd run
+to setup the build scripts as they are distributed.
+If anything is missing, autogen.sh should tell you.
+
+Once ./autogen.sh completes successfully you can go on with normal
+instructions found in the README file.

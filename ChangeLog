@@ -1,5 +1,6 @@
 2007-04-25 Sandro Santilli <strk@keybit.net>
 
+	* README_CVS: some info for CVS users.
 	* doc/C/asspec/date.xml: fixed typos preventing the asspec
 	  from building.
 	* doc/C/asspec/movieclip.xml: add docs and conformancy for
