@@ -1,3 +1,8 @@
+2007-04-25 Martin Guy <martinwguy@yahoo.it>
+
+	* ChangeLog,server/debugger.{cpp,h},server/vm/ActionExec.cpp:
+	  spello dissasemble -> disassemble
+
 2007-04-24 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (sprite_hit_test): implement
@@ -39,6 +44,7 @@
 	* extensions/fileio/fileio.cpp: Use intrusive pointers instead of
 	explicit pointers.
 
+>>>>>>> 1.2990
 2007-04-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* libgeometry/Range2d.h: added expandToCircle()
@@ -4473,13 +4479,13 @@
 
 2007-02-06 Sandro Santilli <strk@keybit.net>
 
-	* server/debugger.{h,cpp}: (dissasemble): first argument
+	* server/debugger.{h,cpp}: (disassemble): first argument
 	  can safely be passed as a 'const' pointer.
 	* server/parser/action_buffer.h: added get_buffer() to
 	  return an unsugned char.
 	* server/vm/ActionExec.cpp (operator()): use
 	  action_buffer::get_buffer() to fetch an appropriate argument
-	  for Debugger::dissasemble.
+	  for Debugger::disassemble.
 
 2007-02-06 Martin Guy <martinwguy@yahoo.it>
 
@@ -15568,7 +15574,7 @@ STRCASECMP
 	reduce the chance of name collision. Use the new library names to
 	link.
 	
-	* server/action.cpp: Add missing opcodes to dissasembler table,a
+	* server/action.cpp: Add missing opcodes to disassembler table,a
 	and rename the unsupported ones to have a "_fixme" attached when
 	printing debug information.
 	* backend/Makefile.am (AM_LDFLAGS): Add $(X_LIBS) so we can link

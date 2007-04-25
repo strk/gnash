@@ -52,7 +52,7 @@
       <term>t</term>
       <listitem>
 	<para>
-	  Toggle Trace Mode on or off. Trace mode prints a dissasemble
+	  Toggle Trace Mode on or off. Trace mode prints a disassemble
 	  for each opcode as it executes in a similar fashion to the
 	  <emphasis>-va</emphasis> option.
 	</para>

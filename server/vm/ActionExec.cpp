@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.29 2007/04/24 20:38:26 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.30 2007/04/25 06:58:57 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -203,7 +203,7 @@ ActionExec::operator() ()
  	debugger.setFramePointer(code.getFramePointer(pc));
  	debugger.setEnvStack(&env);
 	if (debugger.isTracing()) {
-	    debugger.dissasemble();
+	    debugger.disassemble();
 	}
 #endif
 	

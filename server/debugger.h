@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: debugger.h,v 1.11 2007/04/16 18:23:05 strk Exp $ */
+/* $Id: debugger.h,v 1.12 2007/04/25 06:58:56 martinwguy Exp $ */
 
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
@@ -48,8 +48,8 @@ public:
 
     void dumpMovieInfo();
 
-    void dissasemble(const unsigned char *data);
-    void dissasemble();
+    void disassemble(const unsigned char *data);
+    void disassemble();
     void setBreakPoint(const std::string &var, bool enabled);
     void removeBreakPoint(const std::string &var);
     void dumpBreakPoints();

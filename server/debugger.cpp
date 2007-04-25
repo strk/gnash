@@ -194,7 +194,7 @@ Debugger::console(as_environment &env)
 	      cin >> var;
 	      switch (var[0]) {
 		case 'd':
-		    this->dissasemble();
+		    this->disassemble();
 		  break;
 		case 'i':
 		    this->dumpMovieInfo();
@@ -314,14 +314,14 @@ Debugger::dumpMovieInfo()
 }
 
 void
-Debugger::dissasemble()
+Debugger::disassemble()
 {
 //    GNASH_REPORT_FUNCTION;
-    this->dissasemble(_pc);
+    this->disassemble(_pc);
 }
 
 void
-Debugger::dissasemble(const unsigned char *data)
+Debugger::disassemble(const unsigned char *data)
 {
 //    GNASH_REPORT_FUNCTION;
     as_arg_t fmt = ARG_HEX;
