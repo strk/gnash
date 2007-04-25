@@ -2,6 +2,9 @@
 
 	* ChangeLog,server/debugger.{cpp,h},server/vm/ActionExec.cpp:
 	  spello dissasemble -> disassemble
+	* macros/lib-ld.m4(removed),macros/lib-link.m4:
+	  remove repeated test for GNU ld (libtool does this).
+	  Closes bug #19623
 
 2007-04-24 Sandro Santilli <strk@keybit.net>
 
