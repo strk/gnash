@@ -1,3 +1,9 @@
+2007-04-25  John Gilmore  <gnu@toad.com>
+
+	* README, README_CVS:  Improve configuration instructions.
+	  More work is needed to make it match the code.
+	* po/.cvsignore:  Ignore all generated .gmo files.
+
 2007-04-25 Sandro Santilli <strk@keybit.net>
 
 	* README_CVS: some info for CVS users.
