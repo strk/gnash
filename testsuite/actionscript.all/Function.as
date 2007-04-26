@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.45 2007/04/26 17:06:11 strk Exp $";
+rcsid="$Id: Function.as,v 1.46 2007/04/26 20:47:33 strk Exp $";
 
 #include "check.as"
 
@@ -352,7 +352,7 @@ check_equals(this.a, "a_in_root");
 //----------------------------------------------------------
 
 // this is to be called argsChecker(1,2,3)
-function argsChecker()
+function argsChecker(a, b, c, d, e, f, g)
 {
 	check_equals(typeof(arguments), 'object');
 	check(arguments instanceOf Array);
@@ -364,8 +364,12 @@ function argsChecker()
 	check_equals(arguments[1], 2);
 	check_equals(arguments[2], 3);
 	check_equals(arguments[3], undefined);
+	check_equals(d, undefined);
 	arguments[3] = 3;
 	check_equals(arguments[3], 3);
+	// Changing a member of the 'arguments' object doesn't change
+	// the corresponding named parameter, contrary to ECMA262 specs.
+	check(d != 3);
 	arguments[0] = 'zero';
 	check_equals(arguments[0], 'zero');
 	arguments.length = 10;

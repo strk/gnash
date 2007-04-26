@@ -1,5 +1,12 @@
 2007-04-26 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Function.as: add a test
+	  showing an incompatibility of flash with ECMA262 when
+	  it comes to the 'arguments' object in functions activation
+	  object.
+
+2007-04-26 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.cpp (equals): compare m_object_value when both 
 	  operatns are either functions or objects.
 	* server/as_environment.{cpp,h} (get_variable, get_variable_raw,
