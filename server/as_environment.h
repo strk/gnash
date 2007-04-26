@@ -23,6 +23,7 @@
 
 #include "as_value.h" // for composition (vector + frame_slot)
 #include "StringPredicates.h" // for Variables 
+#include "as_object.h"
 
 #include <map> // for composition (Variables)
 #include <string> // for frame_slot name
@@ -46,6 +47,7 @@ public:
 	/// Stack of as_values in this environment
 	std::vector<as_value>	m_stack;
 
+#if 0
 	/// For local vars.  Use empty names to separate frames.
 	class frame_slot
 	{
@@ -64,6 +66,7 @@ public:
 		{
 		}
 	};
+#endif
 
 	as_environment()
 		:
@@ -248,13 +251,7 @@ public:
 	/// doesn't exist yet, since it's faster than set_local();
 	/// e.g. when setting up args for a function.
 	///
-	void add_local(const std::string& varname, const as_value& val)
-	{
-		assert(varname.length() > 0);	// null varnames are invalid!
-		assert(_localFrames.size());
-		LocalVars& locals = _localFrames.back().locals;
-		locals.push_back(frame_slot(varname, val));
-	}
+	void add_local(const std::string& varname, const as_value& val);
 
 	/// Create the specified local var if it doesn't exist already.
 	void	declare_local(const std::string& varname);
@@ -432,16 +429,14 @@ public:
 	typedef std::map<std::string, as_value, StringNoCaseLessThen> Variables;
 
 	/// The locals container 
-	typedef std::vector<frame_slot>	LocalVars;
+	//typedef std::vector<frame_slot>	LocalVars;
+	typedef boost::intrusive_ptr<as_object> LocalVars;
 
 	typedef std::vector<as_value> Registers;
 
 	struct CallFrame
 	{
-		CallFrame(as_function* funcPtr)
-			:
-			func(funcPtr)
-		{}
+		CallFrame(as_function* funcPtr);
 
 		/// function use this 
 		LocalVars locals;
@@ -537,9 +532,9 @@ private:
 	///
 	/// @return true if the variable was found, false otherwise
 	///
-	bool findLocal(const std::string& varname, frame_slot& ret, bool descend=false);
+	bool findLocal(const std::string& varname, as_value& ret, bool descend=false);
 
-	bool findLocal(const std::string& varname, frame_slot& ret, bool descend=false) const
+	bool findLocal(const std::string& varname, as_value& ret, bool descend=false) const
 	{
 		return const_cast<as_environment*>(this)->findLocal(varname, ret, descend);
 	}
@@ -555,7 +550,7 @@ private:
 	///
 	/// @return true if the variable was found, false otherwise
 	///
-	static bool findLocal(LocalVars& locals, const std::string& name, frame_slot& ret);
+	static bool findLocal(LocalVars& locals, const std::string& name, as_value& ret);
 
 	/// Delete a local variable
 	//
@@ -566,7 +561,7 @@ private:
 	///	If true the seek don't stop at current call frame, but
 	///	descends in upper frames. By default it is false.
 	///
-	/// @return true if the variable was found, false otherwise
+	/// @return true if the variable was found and deleted, false otherwise
 	///
 	bool delLocal(const std::string& varname, bool descend=false);
 
