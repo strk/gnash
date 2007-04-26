@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.42 2007/04/26 10:17:56 strk Exp $";
+rcsid="$Id: Function.as,v 1.43 2007/04/26 13:44:07 strk Exp $";
 
 #include "check.as"
 
@@ -630,6 +630,16 @@ with(o) {
 
 function testInFunctionContext(o)
 {
+	var localGetThis = function() { return this; };
+	ret = localGetThis();
+	xcheck_equals(typeof(ret), 'object');
+#if OUTPUT_VERSION < 6
+	xcheck(ret == testInFunctionContext);
+#else
+	check(ret != testInFunctionContext);
+#endif
+	xcheck(ret != this);
+
 	with(o) {
 		// see bug #19704
 		ret = getThis();

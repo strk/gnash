@@ -1,5 +1,7 @@
 2007-04-26 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Function.as: test for 'this' in
+	  local function.
 	* server/as_environment.{cpp,h}: refactor local variables
 	  so they are stored into a proper object. Will help introducing
 	  a VariableRef class that associates a Property to an as_object.
