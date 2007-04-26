@@ -29,7 +29,6 @@
 #include "tu_random.h"
 #include "ExecutableCode.h"
 #include "Stage.h"
-#include "Key.h"
 
 #include <iostream>
 #include <string>
@@ -161,14 +160,16 @@ movie_root::notify_mouse_moved(int x, int y)
 
 }
 
-void
+
+
+key_as_object *
 movie_root::notify_global_key(key::code k, bool down)
 {
 	VM& vm = VM::get();
 	if ( vm.getSWFVersion() < 6 )
 	{
 		// _global.Key was added in SWF6
-		return;
+		return NULL; 
 	}
 
 	static boost::intrusive_ptr<key_as_object> keyobject = NULL;
@@ -203,22 +204,34 @@ movie_root::notify_global_key(key::code k, bool down)
 	{
 		log_error("gnash::notify_key_event(): _global.Key doesn't exist, or isn't the expected built-in\n");
 	}
+
+	return keyobject.get();
 }
 
 bool
 movie_root::notify_key_event(key::code k, bool down)
 {
-//	    GNASH_REPORT_FUNCTION;
-	    
-	// Notify keypress listeners.
-	if (down) notify_keypress_listeners(k);
+//GNASH_REPORT_FUNCTION;
 
 	//
-	// Notify the _global.Key object about key event
+	// First of all, notify the _global.Key object about key event
 	//
+	key_as_object * global_key = notify_global_key(k, down);
 
-	notify_global_key(k, down);
+	// Notify key listeners.
+	notify_key_listeners(k, down);
 
+	if(global_key)
+	{
+		if(down)
+		{
+			global_key->notify_listeners(event_id::KEY_DOWN);
+			global_key->notify_listeners(event_id::KEY_PRESS);
+		}
+		else
+			global_key->notify_listeners(event_id::KEY_UP);
+	}
+	
 	processActionQueue();
 
 	return false; // should return true if needs update ...
@@ -558,8 +571,8 @@ movie_root::advance(float delta_time)
 		}
 	}
 
-	// Cleanup keypress listeners (remove unloaded characters)
-	cleanup_keypress_listeners();
+	// Cleanup key listeners (remove unloaded characters)
+	cleanup_key_listeners();
 
 	// random should go continuously that:
 	// 1. after restart of the player the situation has not repeated
@@ -658,15 +671,15 @@ char* movie_root::call_method_args(const char* method_name,
 	return _movie->call_method_args(method_name, method_arg_fmt, args);
 }
 
-void movie_root::cleanup_keypress_listeners()
+void movie_root::cleanup_key_listeners()
 {
-#ifdef KEYPRESS_LISTENERS_DEBUG
-	size_t prevsize = m_keypress_listeners.size();
-	log_msg("Cleaning up %u keypress listeners", m_keypress_listeners.size());
+#ifdef KEY_LISTENERS_DEBUG
+	size_t prevsize = m_key_listeners.size();
+	log_msg("Cleaning up %u key listeners", m_key_listeners.size());
 #endif
 
-	for (ListenerSet::iterator iter = m_keypress_listeners.begin();
-			 iter != m_keypress_listeners.end(); )
+	for (ListenerSet::iterator iter = m_key_listeners.begin();
+			 iter != m_key_listeners.end(); )
 	{
 		// TODO: handle non-character objects too !
 		character* ch = dynamic_cast<character*>(iter->get());
@@ -674,8 +687,8 @@ void movie_root::cleanup_keypress_listeners()
 		{
 			ListenerSet::iterator toremove = iter;
 			++iter;
-			//log_msg("cleanup_keypress_listeners: Removing unloaded keypress listener %p", iter->get());
-			m_keypress_listeners.erase(toremove);
+			//log_msg("cleanup_key_listeners: Removing unloaded key listener %p", iter->get());
+			m_key_listeners.erase(toremove);
 		}
 		else
 		{
@@ -683,49 +696,57 @@ void movie_root::cleanup_keypress_listeners()
 		}
 	}
 
-#ifdef KEYPRESS_LISTENERS_DEBUG
-	size_t currsize = m_keypress_listeners.size();
+#ifdef key_LISTENERS_DEBUG
+	size_t currsize = m_key_listeners.size();
 	log_msg("Cleaned up %u listeners (from %u to %u)", prevsize-currsize, prevsize, currsize);
 #endif
 }
 
-void movie_root::notify_keypress_listeners(key::code k)
+void movie_root::notify_key_listeners(key::code k, bool down)
 {
 	log_msg("Notifying " SIZET_FMT " keypress listeners", 
-		m_keypress_listeners.size());
-	for (ListenerSet::iterator iter = m_keypress_listeners.begin();
-			 iter != m_keypress_listeners.end(); ++iter)
+		m_key_listeners.size());
+
+	for (ListenerSet::iterator iter = m_key_listeners.begin();
+			 iter != m_key_listeners.end(); ++iter)
 	{
 		// sprite, button & input_edit_text characters
 		// TODO: invoke functions on non-characters !
 		character* ch = dynamic_cast<character*>(iter->get());
 		if ( ch && ! ch->isUnloaded() )
 		{
-			ch->on_event(event_id(event_id::KEY_PRESS, k));
+			if(down)
+			{
+				// key code for KEY_DOWN and KEY_UP should be invalid
+				ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID)); 
+				ch->on_event(event_id(event_id::KEY_PRESS, k));
+			}
+			else
+				ch->on_event(event_id(event_id::KEY_UP, key::INVALID));   
 		}
 	}
 
 	assert(testInvariant());
 }
 
-void movie_root::add_keypress_listener(as_object* listener)
+void movie_root::add_key_listener(as_object* listener)
 {
-	if ( m_keypress_listeners.insert(listener).second )
+	if ( m_key_listeners.insert(listener).second )
 	{
-		//log_msg("Added keypress listener %p", (void*)listener);
+		//log_msg("Added key listener %p", (void*)listener);
 	}
 	else
 	{
-		//log_msg("Keypress listener %p was already in the known set", (void*)listener);
+		//log_msg("key listener %p was already in the known set", (void*)listener);
 	}
 	assert(testInvariant());
 }
 
-void movie_root::remove_keypress_listener(as_object* listener)
+void movie_root::remove_key_listener(as_object* listener)
 {
-	//log_msg("Removing keypress listener %p - %u listeners currently ", (void*)listener, m_keypress_listeners.size());
-	m_keypress_listeners.erase(listener);
-	//log_msg("After removing keypress listener %p, %u listeners are left", (void*)listener, m_keypress_listeners.size());
+	//log_msg("Removing key listener %p - %u listeners currently ", (void*)listener, m_key_listeners.size());
+	m_key_listeners.erase(listener);
+	//log_msg("After removing key listener %p, %u listeners are left", (void*)listener, m_key_listeners.size());
 	assert(testInvariant());
 }
 

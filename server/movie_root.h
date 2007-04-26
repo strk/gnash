@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.49 2007/04/21 21:07:40 strk Exp $ */
+/* $Id: movie_root.h,v 1.50 2007/04/26 11:04:56 zoulunkai Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -75,6 +75,7 @@
 #include "drag_state.h" // for composition
 #include "sprite_instance.h" // for inlines
 #include "timers.h" // for composition
+#include "asobj/Key.h"
 
 #include <vector>
 #include <list>
@@ -376,9 +377,9 @@ public:
 			callback, user_ptr);
 	}
 
-	DSOEXPORT void notify_keypress_listeners(key::code k);
-	void add_keypress_listener(as_object* listener);
-	void remove_keypress_listener(as_object* listener);
+	DSOEXPORT void notify_key_listeners(key::code k, bool down);
+	void add_key_listener(as_object* listener);
+	void remove_key_listener(as_object* listener);
 
 	DSOEXPORT void notify_mouse_listeners(const event_id& event);
 	void add_mouse_listener(as_object* listener);
@@ -426,11 +427,11 @@ private:
 	movie_root& operator=(const movie_root& ) { assert(0); return *this; }
 
 	/// Notify the global Key ActionScript object about a key status change
-	void notify_global_key(key::code k, bool down);
+	key_as_object * notify_global_key(key::code k, bool down);
 
 	/// Remove all listeners with a ref-count of 1
 	/// (only referenced as key listeners)
-	void cleanup_keypress_listeners();
+	void cleanup_key_listeners();
 
 	/// Return the current Stage object
 	//
@@ -475,8 +476,8 @@ private:
 	/// A set of as_objects kept by intrusive_ptr
 	typedef std::set< boost::intrusive_ptr<as_object> > ListenerSet;
 
-	/// Objects listening for keypress events
-	ListenerSet m_keypress_listeners;
+	/// Objects listening for key events
+	ListenerSet m_key_listeners;
 
 	/// Objects listening for mouse events (down,up,move)
 	ListenerSet m_mouse_listeners;
