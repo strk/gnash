@@ -528,7 +528,6 @@ event_id::is_mouse_event() const
 {
 	switch (m_id)
 	{
-		case event_id::KEY_PRESS :
 		case event_id::PRESS:
 		case event_id::RELEASE:
 		case event_id::RELEASE_OUTSIDE:
@@ -538,6 +537,20 @@ event_id::is_mouse_event() const
 		case event_id::ROLL_OUT:
 		case event_id::DRAG_OVER:
 		case event_id::DRAG_OUT:
+			return true;
+		default:
+			return false;
+	}
+}
+
+bool
+event_id::is_key_event() const
+{
+	switch (m_id)
+	{
+		case event_id::KEY_DOWN:
+		case event_id::KEY_PRESS :
+		case event_id::KEY_UP:
 			return true;
 		default:
 			return false;

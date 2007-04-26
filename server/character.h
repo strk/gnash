@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.72 2007/04/26 07:00:29 strk Exp $ */
+/* $Id: character.h,v 1.73 2007/04/26 10:56:50 zoulunkai Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -405,7 +405,7 @@ public:
 
 	/// Set a built-in function handler for the given event
 	//
-	/// Mark the character as having mouse or keypress event
+	/// Mark the character as having mouse or Key event
 	/// handlers if this is the case.
 	///
 	/// NOTE: this function is only for registering statically-defined
@@ -426,14 +426,14 @@ public:
 
 	/// \brief
 	/// Call this when a character get equipped
-	/// with a keypress event handler
+	/// with a Key event handler
 	//
 	/// TODO: provide a function to *unset*
 	///       the flag. This should happen
-	///       when keypress event handler is
+	///       when Key event handler is
 	///       set to undefined or equivalent..
 	///
-	virtual void has_keypress_event() {}
+	virtual void has_key_event() {}
 
 	/// \brief
 	/// Call this when a character get equipped

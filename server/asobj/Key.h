@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.13 2007/03/20 15:01:20 strk Exp $ */
+/* $Id: Key.h,v 1.14 2007/04/26 10:56:50 zoulunkai Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -28,6 +28,7 @@
 #include "tu_config.h"
 #include "as_object.h" // for inheritance
 #include "fn_call.h"
+#include "Event_id.h"
 #include "gnash.h" // for gnash::key namespace
 
 #ifdef WIN32
@@ -99,8 +100,6 @@ private:
 	std::vector<boost::intrusive_ptr<as_object> >	m_listeners;
 	int	m_last_key_pressed;
 
-	void notify_listeners(const std::string& funcname);
-
 public:
 
 	key_as_object();
@@ -110,6 +109,8 @@ public:
 	void set_key_down(int code);
 
 	void set_key_up(int code);
+
+	void notify_listeners(const event_id key_event_type);
 
 	void add_listener(boost::intrusive_ptr<as_object> listener);
 

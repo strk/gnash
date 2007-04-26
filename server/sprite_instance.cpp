@@ -1692,7 +1692,7 @@ sprite_instance::sprite_instance(
 	m_has_looped(false),
 	m_init_actions_executed(),
 	m_as_environment(),
-	m_has_keypress_event(false),
+	m_has_key_event(false),
 	m_has_mouse_event(false),
 	_text_variables(),
 	m_sound_stream_id(-1),
@@ -1718,9 +1718,9 @@ sprite_instance::sprite_instance(
 sprite_instance::~sprite_instance()
 {
 
-	if (m_has_keypress_event)
+	if (m_has_key_event)
 	{
-		_vm.getRoot().remove_keypress_listener(this);
+		_vm.getRoot().remove_key_listener(this);
 	}
 
 	if (m_has_mouse_event)
@@ -2109,6 +2109,7 @@ sprite_instance::on_event(const event_id& id)
 	// Fall through and call the function also, if it's defined!
 
 	// Check for member function.
+	if( ! id.is_key_event ())
 	{
 		boost::intrusive_ptr<as_function> method = 
 			getUserDefinedEventHandler(id.get_function_name());
@@ -2148,7 +2149,7 @@ log_msg(_("sprite[%p]::set_member(%s, %s)"), (void*)this, name.c_str(), val.to_d
 
 	if ( val.is_function() )
 	{
-		checkForKeyPressOrMouseEvent(name);
+		checkForKeyOrMouseEvent(name);
 	}
 
 	// Try textfield variables
@@ -2352,9 +2353,9 @@ void sprite_instance::advance(float delta_time)
 #endif
 		on_event(event_id::LOAD);	// clip onload
 
-		if (m_has_keypress_event)
+		if (m_has_key_event)
 		{
-			_vm.getRoot().add_keypress_listener(this);
+			_vm.getRoot().add_key_listener(this);
 		}
 		// Mouse events listening is done in has_mouse_event directly.
 		// This shows to work better for attachMovieTest.swf,
@@ -3565,7 +3566,7 @@ sprite_instance::removeMovieClip()
 }
 
 void
-sprite_instance::checkForKeyPressOrMouseEvent(const std::string& name)
+sprite_instance::checkForKeyOrMouseEvent(const std::string& name)
 {
 	// short-cut
 	if ( name.size() < 9 ) return;
@@ -3578,9 +3579,11 @@ sprite_instance::checkForKeyPressOrMouseEvent(const std::string& name)
 
 	const char* ptr = name.c_str();
 
-	if ( ! cmp(ptr, "onkeypress") )
+	if ( ! cmp(ptr, "onKeyDown") 
+		|| ! cmp(ptr, "onKeypress") 
+		|| ! cmp(ptr, "onKeyUp"))
 	{
-		has_keypress_event();
+		has_key_event();
 	}
 	else if ( ! cmp(ptr, "onMouseDown")
 		|| ! cmp(ptr, "onMouseUp") 

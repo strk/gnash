@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.38 2007/04/26 07:00:29 strk Exp $ */
+/* $Id: character.cpp,v 1.39 2007/04/26 10:56:50 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -619,8 +619,10 @@ character::add_event_handler(const event_id& id, const action_buffer& code)
 	// kind of event is a KEY or MOUSE one 
 	switch (id.m_id)
 	{
+		case event_id::KEY_DOWN:  
 		case event_id::KEY_PRESS:
-			has_keypress_event();
+		case event_id::KEY_UP:    
+			has_key_event();
 			break;
 		case event_id::MOUSE_UP:
 		case event_id::MOUSE_DOWN:
@@ -634,7 +636,7 @@ character::add_event_handler(const event_id& id, const action_buffer& code)
 
 	// todo: drop the character as a listener
 	//       if it gets no valid handlers for
-	//       mouse or keypress events.
+	//       mouse or Key events.
 }
 
 std::auto_ptr<ExecutableCode>

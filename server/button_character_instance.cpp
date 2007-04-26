@@ -263,12 +263,12 @@ button_character_instance::button_character_instance(
 
 	attachButtonInterface(*this);
 
-	// check up presence KeyPress events
+	// check up presence Key events
 	for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
 	{
 		if (m_def->m_button_actions[i].m_conditions & 0xFE00)	// check up on CondKeyPress: UB[7]
 		{
-			_vm.getRoot().add_keypress_listener(this);
+			_vm.getRoot().add_key_listener(this);
 			break;
 		}
 	}
@@ -277,7 +277,7 @@ button_character_instance::button_character_instance(
 
 button_character_instance::~button_character_instance()
 {
-	_vm.getRoot().remove_keypress_listener(this);
+	_vm.getRoot().remove_key_listener(this);
 }
 
 
@@ -317,7 +317,7 @@ button_character_instance::enabled_getset(const fn_call& fn)
 
 
 
-// called from keypress listener only
+// called from Key listener only
 // (the above line is wrong, it's also called with onConstruct, for instance)
 bool
 button_character_instance::on_event(const event_id& id)

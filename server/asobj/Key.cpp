@@ -121,54 +121,44 @@ key_as_object::is_key_down(int code)
 void
 key_as_object::set_key_down(int code)
 {
-	    if (code < 0 || code >= key::KEYCOUNT) return;
+	if (code < 0 || code >= key::KEYCOUNT) return;
 
-	    m_last_key_pressed = code;
+	m_last_key_pressed = code;
 
-	    int	byte_index = code >> 3;
-	    int	bit_index = code - (byte_index << 3);
-	    int	mask = 1 << bit_index;
+	int	byte_index = code >> 3;
+	int	bit_index = code - (byte_index << 3);
+	int	mask = 1 << bit_index;
 
-	    assert(byte_index >= 0 && byte_index < int(sizeof(m_keymap)/sizeof(m_keymap[0])));
+	assert(byte_index >= 0 && byte_index < int(sizeof(m_keymap)/sizeof(m_keymap[0])));
 
-	    m_keymap[byte_index] |= mask;
-
-	std::string funcname = event_id(event_id::KEY_DOWN).get_function_name();
-	VM& vm = VM::get();
-	if ( vm.getSWFVersion() < 7 )
-	{
-		boost::to_lower(funcname, vm.getLocale());
-	}
-	notify_listeners(funcname);
+	m_keymap[byte_index] |= mask;
 }
-
 
 void
 key_as_object::set_key_up(int code)
 {
-	    if (code < 0 || code >= key::KEYCOUNT) return;
+    if (code < 0 || code >= key::KEYCOUNT) return;
 
-	    int	byte_index = code >> 3;
-	    int	bit_index = code - (byte_index << 3);
-	    int	mask = 1 << bit_index;
+    int	byte_index = code >> 3;
+    int	bit_index = code - (byte_index << 3);
+    int	mask = 1 << bit_index;
 
-	    assert(byte_index >= 0 && byte_index < int(sizeof(m_keymap)/sizeof(m_keymap[0])));
+    assert(byte_index >= 0 && byte_index < int(sizeof(m_keymap)/sizeof(m_keymap[0])));
 
-	    m_keymap[byte_index] &= ~mask;
+    m_keymap[byte_index] &= ~mask;
+}
 
-	std::string funcname = event_id(event_id::KEY_UP).get_function_name();
+void 
+key_as_object::notify_listeners(const event_id key_event_type)
+{
+	
+	std::string funcname = key_event_type.get_function_name();
 	VM& vm = VM::get();
 	if ( vm.getSWFVersion() < 7 )
 	{
 		boost::to_lower(funcname, vm.getLocale());
 	}
-	notify_listeners(funcname);
-}
 
-// TODO: take a std::string
-void
-key_as_object::notify_listeners(const std::string& funcname)
-{
     // Notify listeners.
     for (std::vector<boost::intrusive_ptr<as_object> >::iterator iter = m_listeners.begin();
          iter != m_listeners.end(); ++iter) {

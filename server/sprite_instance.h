@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.102 2007/04/23 20:05:20 strk Exp $ */
+/* $Id: sprite_instance.h,v 1.103 2007/04/26 10:56:50 zoulunkai Exp $ */
 
 // Stateful live Sprite instance
 
@@ -113,8 +113,8 @@ public:
 		TAG_DLIST  = 1<<1
 	};
 
-	virtual void has_keypress_event() {
-		m_has_keypress_event = true;
+	virtual void has_key_event() {
+		m_has_key_event = true;
 	}
 
 	virtual void has_mouse_event();
@@ -755,7 +755,7 @@ private:
 	sprite_instance& operator=(const sprite_instance&) { assert(0); return *this; }
 
 	/// \brief
-	/// Call has_keypress_event() or has_mouse_event()
+	/// Call has_key_event() or has_mouse_event()
 	/// if the given string correspond to an event handler
 	/// for which registering as a listener of Mouse or Key is needed
 	//
@@ -763,7 +763,7 @@ private:
 	/// @param name
 	///	Member name. 
 	///
-	void checkForKeyPressOrMouseEvent(const std::string& name);
+	void checkForKeyOrMouseEvent(const std::string& name);
 
 	/// Duplicate the object with the specified name
 	/// and add it with a new name  at a new depth.
@@ -852,7 +852,8 @@ private:
 	/// Increment m_current_frame, and take care of looping.
 	void increment_frame_and_check_for_loop();
 
-	bool m_has_keypress_event;
+	/// key events are: KEY_DOWN, KEY_PRESS, KEY_UP
+	bool m_has_key_event;
 
 	bool m_has_mouse_event;
 
