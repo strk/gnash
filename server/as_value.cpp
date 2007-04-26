@@ -670,8 +670,8 @@ as_value::equals(const as_value& v, as_environment* env) const
     	assert ( ! (v.m_type == OBJECT || v.m_type == AS_FUNCTION) );
 	// convert this value to a primitive and recurse
 	if ( ! env ) return false;
-	as_value v2 = to_primitive(*env); // TODO: should forward environment ?
-	if ( v2.m_type == m_type ) return false; // no conversion 
+	as_value v2 = to_primitive(*env); 
+	if ( v2.m_type == OBJECT || v2.m_type == AS_FUNCTION ) return false; // no valid conversion 
 	else return v2.equals(v, env);
     }
 
@@ -680,8 +680,8 @@ as_value::equals(const as_value& v, as_environment* env) const
     	assert ( ! (m_type == OBJECT || m_type == AS_FUNCTION) );
 	// convert this value to a primitive and recurse
 	if ( ! env ) return false;
-	as_value v2 = v.to_primitive(*env); // TODO: should forward environment ?
-	if ( v2.m_type == v.m_type ) return false; // no conversion 
+	as_value v2 = v.to_primitive(*env); 
+	if ( v2.m_type == OBJECT || v2.m_type == AS_FUNCTION ) return false; // no valid conversion 
 	else return equals(v2, env);
     }
 
