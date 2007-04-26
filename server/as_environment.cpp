@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.72 2007/04/26 13:34:00 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.73 2007/04/26 16:26:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -106,13 +106,6 @@ as_environment::get_variable_raw(
 
     as_value	val;
 
-    // Check locals for getting them
-    //as_environment::frame_slot slot;
-    if ( findLocal(varname, val, true) ) // do we really want to descend here ??
-    {
-	return val;
-    }
-
     // Check the with-stack.
     for (size_t i = with_stack.size(); i > 0; --i) {
         // const_cast needed due to non-const as_object::get_member 
@@ -122,6 +115,14 @@ as_environment::get_variable_raw(
 	    return val;
 	}
     }
+
+    // Check locals for getting them
+    //as_environment::frame_slot slot;
+    if ( findLocal(varname, val, true) ) // do we really want to descend here ??
+    {
+	return val;
+    }
+
 
     // Check target members.
     if (m_target->get_member(varname.c_str(), &val)) {
