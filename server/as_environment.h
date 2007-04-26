@@ -14,8 +14,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_environment.h,v 1.45 2007/04/16 16:47:29 strk Exp $ */
-
 #ifndef GNASH_AS_ENVIRONMENT_H
 #define GNASH_AS_ENVIRONMENT_H
 
@@ -109,7 +107,7 @@ public:
 
 	/// Get stack value at the given distance from bottom.
 	//
-	/// bottom(0) is actual stack top
+	/// bottom(stack_size()-1) is actual stack top
 	///
 	as_value& bottom(size_t index)
 	{
@@ -150,14 +148,6 @@ public:
 	///	TODO: should be case-insensitive up to SWF6.
 	///
 	as_value get_variable(const std::string& varname) const;
-
-	/// Return the (possibly UNDEFINED) value of the named variable.
-	//
-	/// @param varname 
-	///	Variable name. Can not contain path elements.
-	///	TODO: should be case-insensitive up to SWF6.
-	///
-	as_value get_variable_raw(const std::string& varname) const;
 
 	/// \brief
 	/// Delete a variable, w/out support for the path, using
@@ -513,6 +503,14 @@ private:
 
 	/// Movie target. 
 	character* _original_target;
+
+	/// Return the (possibly UNDEFINED) value of the named variable.
+	//
+	/// @param varname 
+	///	Variable name. Can not contain path elements.
+	///	TODO: should be case-insensitive up to SWF6.
+	///
+	as_value get_variable_raw(const std::string& varname) const;
 
 	/// Given a variable name, set its value (no support for path)
 	void set_variable_raw(const std::string& path, const as_value& val,

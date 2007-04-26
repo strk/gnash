@@ -1,5 +1,11 @@
 2007-04-26 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.h, server/movie_root.h,
+	  server/sprite_instance.h, server/vm/action.cpp:
+	  Remove some unused code, remove Id tags from headers.
+
+2007-04-26 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/key_event_testrunner.cpp: no more
 	  failures expected (thanks kai).
 	* server/as_value.cpp (to_primitive): fix missing return

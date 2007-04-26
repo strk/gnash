@@ -17,7 +17,6 @@
 // 
 //
 
-/* $Id: sprite_instance.h,v 1.103 2007/04/26 10:56:50 zoulunkai Exp $ */
 
 // Stateful live Sprite instance
 
@@ -597,24 +596,6 @@ public:
 	/// Call a method with a list of arguments
 	virtual const char* call_method_args(const char* method_name,
 		const char* method_arg_fmt, va_list args);
-
-	virtual void	attach_display_callback(
-		const char* path_to_object,
-		void (*callback)(void*), void* user_ptr)
-	{
-//                  GNASH_REPORT_FUNCTION;
-	  
-		// should only be called on the root movie.
-		assert(m_parent == NULL);
-
-		as_value obj = m_as_environment.get_variable(std::string(path_to_object));
-		boost::intrusive_ptr<as_object> as_obj = obj.to_object();
-		boost::intrusive_ptr<character> ch = boost::dynamic_pointer_cast<character>(as_obj);
-		if (ch)
-		{
-			ch->set_display_callback(callback, user_ptr);
-		}
-	}
 
 	// inherited from character class, see dox in character.h
 	as_environment& get_environment() {

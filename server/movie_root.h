@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.50 2007/04/26 11:04:56 zoulunkai Exp $ */
+/* $Id: movie_root.h,v 1.51 2007/04/26 12:31:44 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -366,16 +366,6 @@ public:
 
 	void * get_userdata() { return m_userdata; }
 	void set_userdata(void * ud ) { m_userdata = ud;  }
-
-	/// Delegate to wrapped movie_instance
-	void attach_display_callback(
-			const char* path_to_object,
-			void (*callback)(void* user_ptr),
-			void* user_ptr)
-	{
-		_movie->attach_display_callback(path_to_object,
-			callback, user_ptr);
-	}
 
 	DSOEXPORT void notify_key_listeners(key::code k, bool down);
 	void add_key_listener(as_object* listener);

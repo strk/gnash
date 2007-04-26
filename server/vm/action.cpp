@@ -258,91 +258,16 @@ as_value	call_method0(
     return call_method(method, env, this_ptr, 0, env->get_top_index() + 1);
 }
 
+// Printf-like vararg interface for calling ActionScript.
+// Handy for external binding.
 const char*	call_method_parsed(
     as_environment* env,
     as_object* this_ptr,
     const char* method_name,
     const char* method_arg_fmt,
     va_list args)
-    // Printf-like vararg interface for calling ActionScript.
-    // Handy for external binding.
 {
     log_msg(_("FIXME(%d): %s"), __LINE__, __FUNCTION__);
-
-#if 0
-    static const int	BUFSIZE = 1000;
-    char	buffer[BUFSIZE];
-    std::vector<const char*>	tokens;
-
-    // Brutal crap parsing.  Basically null out any
-    // delimiter characters, so that the method name and
-    // args sit in the buffer as null-terminated C
-    // strings.  Leave an intial ' character as the first
-    // char in a string argument.
-    // Don't verify parens or matching quotes or anything.
-    {
-	strncpy(buffer, method_call, BUFSIZE);
-	buffer[BUFSIZE - 1] = '\0';
-	char*	p = buffer;
-
-	char	in_quote = 0;
-	bool	in_arg = false;
-	for (;; p++)
-	    {
-		char	c = *p;
-		if (c == 0)
-		    {
-			// End of string.
-			break;
-		    }
-		else if (c == in_quote)
-		    {
-			// End of quotation.
-			assert(in_arg);
-			*p = 0;
-			in_quote = 0;
-			in_arg = false;
-		    }
-		else if (in_arg)
-		    {
-			if (in_quote == 0)
-			    {
-				if (c == ')' || c == '(' || c == ',' || c == ' ')
-				    {
-					// End of arg.
-					*p = 0;
-					in_arg = false;
-				    }
-			    }
-		    }
-		else
-		    {
-			// Not in arg.  Watch for start of arg.
-			assert(in_quote == 0);
-			if (c == '\'' || c == '\"')
-			    {
-				// Start of quote.
-				in_quote = c;
-				in_arg = true;
-				*p = '\'';	// ' at the start of the arg, so later we know this is a string.
-				tokens.push_back(p);
-			    }
-			else if (c == ' ' || c == ',')
-			    {
-				// Non-arg junk, null it out.
-				*p = 0;
-			    }
-			else
-			    {
-				// Must be the start of a numeric arg.
-				in_arg = true;
-				tokens.push_back(p);
-			    }
-		    }
-	    }
-    }
-#endif // 0
-
 
     // Parse va_list args
     int	starting_index = env->get_top_index();
