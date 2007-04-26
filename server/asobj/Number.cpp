@@ -1,4 +1,4 @@
-// Number.cpp:  ActionScript Number class, for Gnash.
+/*/ Number.cpp:  ActionScript Number class, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Number.cpp,v 1.28 2007/04/18 11:00:30 jgilmore Exp $ */
+/* $Id: Number.cpp,v 1.29 2007/04/26 07:00:29 strk Exp $ */
 
 #include "log.h"
 #include "tu_config.h"
@@ -103,7 +103,7 @@ public:
 	}
 
 	// override from as_object
-	const char* get_text_value() const
+	std::string get_text_value() const
 	{
 		number_val_to_str(_val, _str);
 		return _str;

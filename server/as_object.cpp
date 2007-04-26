@@ -583,8 +583,8 @@ as_object::tostring_method(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> obj = fn.this_ptr;
 
-	const char* text_val = obj->get_text_value();
-	if ( text_val )
+	std::string text_val = obj->get_text_value();
+	if ( ! text_val.empty() ) // TODO: check if still possible
 	{
 		return as_value(text_val);
 	}

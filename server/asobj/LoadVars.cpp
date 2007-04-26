@@ -102,7 +102,7 @@ public:
 	static void attachLoadVarsInterface(as_object& o);
 
 	// override from as_object ?
-	//const char* get_text_value() const { return "LoadVars"; }
+	//std::string get_text_value() const { return "LoadVars"; }
 
 	// override from as_object ?
 	//double get_numeric_value() const { return 0; }

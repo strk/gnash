@@ -1,3 +1,21 @@
+2007-04-26 Sandro Santilli <strk@keybit.net>
+
+	* server/array.h, server/as_environment.cpp, server/as_function.h,
+	  server/as_object.cpp, server/as_object.h, server/character.cpp,
+	  server/character.h, server/edit_text_character.cpp,
+	  server/edit_text_character.h, server/asobj/Boolean.cpp,
+	  server/asobj/Color.cpp, server/asobj/ContextMenu.cpp,
+	  server/asobj/CustomActions.cpp, server/asobj/Error.cpp,
+	  server/asobj/LoadVars.cpp, server/asobj/Microphone.cpp,
+	  server/asobj/Mouse.cpp, server/asobj/Number.cpp,
+	  server/asobj/Selection.cpp, server/asobj/SharedObject.cpp,
+	  server/asobj/Stage.h, server/asobj/TextSnapshot.cpp,
+	  server/asobj/Video.cpp, server/asobj/gen-asclass.pl,
+	  server/asobj/gen-asclass.sh, server/asobj/string.cpp,
+	  testsuite/server/GetterSetterTest.cpp:
+	  Changed get_text_value interface to return by std::string
+	  value. Closes bug #19695.
+	
 2007-04-25  John Gilmore  <gnu@toad.com>
 
 	* README, README_CVS:  Improve configuration instructions.

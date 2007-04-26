@@ -76,7 +76,7 @@ public:
 	{}
 
 	// override from as_object ?
-	//const char* get_text_value() const { return "Selection"; }
+	//std::string get_text_value() const { return "Selection"; }
 
 	// override from as_object ?
 	//double get_numeric_value() const { return 0; }

@@ -42,7 +42,7 @@ static as_value getter(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_object> o = fn.this_ptr;
 	assert(fn.nargs == 0);
-	const char* txt = o->get_text_value();
+	std::string txt = o->get_text_value();
 	return as_value(txt);
 }
 
@@ -67,7 +67,8 @@ struct test_object: public as_object {
 
 	const string& getText() const { return textval; }
 
-	const char* get_text_value() const { return textval.c_str(); }
+	std::string get_text_value() const { return textval; }
+
 	void set_member(const std::string& , const as_value& val )
 	{
 		textval = val.to_string();

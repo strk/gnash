@@ -58,7 +58,7 @@ public:
 	static void registerConstructor(as_object& global);
 
 	// override from as_object ?
-	//const char* get_text_value() const { return "ContextMenu"; }
+	//std::string get_text_value() const { return "ContextMenu"; }
 
 	// override from as_object ?
 	//double get_numeric_value() const { return 0; }

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.30 2007/04/19 10:27:09 strk Exp $ */
+/* $Id: string.cpp,v 1.31 2007/04/26 07:00:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -114,15 +114,15 @@ public:
             as_object(getStringInterface())
     {}
 
-    const char* get_text_value() const
+    std::string get_text_value() const
     {
-        return _string.c_str();
+        return _string;
     }
 
     as_value get_primitive_value() const
 
     {
-        return as_value(_string.c_str());
+        return as_value(_string);
     }
 
     std::string& str()

@@ -81,7 +81,7 @@ public:
 	void	set_text_value(const char* new_text);
 
  	/// Return value of our text.
-	const char* get_text_value() const;
+	std::string get_text_value() const;
 
 	/// We have a "text" member.
 	void set_member(const std::string& name, const as_value& val);

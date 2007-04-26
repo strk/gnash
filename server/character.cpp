@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.37 2007/04/19 17:41:35 udog Exp $ */
+/* $Id: character.cpp,v 1.38 2007/04/26 07:00:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -786,7 +786,7 @@ character::computeTargetPath() const
 }
 
 /*public*/
-const std::string
+std::string
 character::getTargetPath() const
 {
 
@@ -797,7 +797,7 @@ character::getTargetPath() const
 
 
 /*public*/
-const std::string
+std::string
 character::getTarget() const
 {
 
@@ -822,10 +822,10 @@ character::getTarget() const
 }
 
 /*public*/
-const char*
+std::string
 character::get_text_value() const
 {
-	return getTarget().c_str();
+	return getTarget();
 }
 
 

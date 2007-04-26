@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -93,10 +93,9 @@ public:
 	std::string toString(as_environment* env=NULL) const;
 
 	// override from as_object
-	const char* get_text_value() const
+	std::string get_text_value() const
 	{
-		_strval = toString();
-		return _strval.c_str();
+		return toString();
 	}
 
 	unsigned int size() const;
@@ -181,10 +180,6 @@ private:
 	// it takes a string that is the member name of the array and returns -1
 	// if the string does not refer to an index, or an appropriate int if the string does refer to an index
 	int index_requested(const std::string& name);
-
-	// Required due to dumb as_object::get_text_value()
-	// method returning by 'const' char *
-	mutable std::string _strval;
 
 };
 

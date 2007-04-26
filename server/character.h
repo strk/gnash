@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.71 2007/04/20 15:03:24 udog Exp $ */
+/* $Id: character.h,v 1.72 2007/04/26 07:00:29 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -841,16 +841,16 @@ public:
 	//
 	/// e.g. "/sprite1/sprite2/ourSprite"
 	///
-	const std::string getTargetPath() const;
+	std::string getTargetPath() const;
 
 	/// Return full path to this object, in dot notation
 	//
 	/// e.g. "_level0.sprite1.sprite2.ourSprite"
 	///
-	const std::string getTarget() const;
+	std::string getTarget() const;
 	
   // override from as_object
-	virtual const char* get_text_value() const;	
+	virtual std::string get_text_value() const;	
 	
 };
 

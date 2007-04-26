@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.70 2007/04/18 09:35:42 jgilmore Exp $ */
+/* $Id: as_environment.cpp,v 1.71 2007/04/26 07:00:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -69,7 +69,7 @@ as_environment::get_variable(const std::string& varname,
 			    is_slash_based ? "_slashsyntax" : "_dotsyntax",
 			    path.c_str(),
 			    varname.c_str(),
-			    m_target->get_text_value()
+			    m_target->get_text_value().c_str()
 			    );
 	    );
 
@@ -774,7 +774,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("'..' in path '%s' follows a character with no parent (%s : %p) (root is %p)"),
-					path.c_str(), ch->get_text_value(), ch, VM::get().getRoot().get_root_movie());
+					path.c_str(), ch->get_text_value().c_str(), ch, VM::get().getRoot().get_root_movie());
 			);
 			// if we override env, getvariable.as fails [line 57]
 			//env = ch;

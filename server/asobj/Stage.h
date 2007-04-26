@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ public:
 	Stage();
 
 	// override from as_object ?
-	//const char* get_text_value() const { return "Stage"; }
+	//std::string get_text_value() const { return "Stage"; }
 
 	// override from as_object ?
 	//double get_numeric_value() const { return 0; }

@@ -123,7 +123,7 @@ public:
 	virtual ~as_object() {}
 	
 	/// Return a text representation for this object
-	virtual const char* get_text_value() const { return "[object Object]"; }
+	virtual std::string get_text_value() const { return "[object Object]"; }
 
 	/// Return the numeric value of this object
 	//
@@ -131,8 +131,8 @@ public:
 	/// to a number, override for a more performant implementation
 	///
 	virtual double get_numeric_value() const {
-		const char* txt = get_text_value();
-		if ( txt ) return atof(get_text_value());
+		std::string txt = get_text_value();
+		if ( ! txt.empty() ) return atof(txt.c_str());
 		else return 0; 
 	}
 

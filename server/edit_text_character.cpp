@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.60 2007/04/19 14:25:40 martinwguy Exp $ */
+/* $Id: edit_text_character.cpp,v 1.61 2007/04/26 07:00:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -593,7 +593,7 @@ edit_text_character::on_event(const event_id& id)
 character*
 edit_text_character::get_topmost_mouse_entity(float x, float y)
 {
-	//log_msg("get_topmost_mouse_entity called on edit_text_character %p, labeled '%s'", (void*)this, get_text_value());
+	//log_msg("get_topmost_mouse_entity called on edit_text_character %p, labeled '%s'", (void*)this, get_text_value().c_str());
 
 	if (get_visible() == false)
 	{
@@ -646,7 +646,7 @@ edit_text_character::set_text_value(const char* new_text_cstr)
 
 }
 
-const char*
+std::string
 edit_text_character::get_text_value() const
 {
 	// we need the const_cast here because registerTextVariable
@@ -657,7 +657,7 @@ edit_text_character::get_text_value() const
 	// with a pre-existing value.
 	const_cast<edit_text_character*>(this)->registerTextVariable();
 
-	return _text.c_str();
+	return _text;
 }
 
 void
