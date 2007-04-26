@@ -102,10 +102,13 @@ public:
 		m_id(id),
 		m_key_code((unsigned char) c)
 	{
-		// For the button key events, you must supply a keycode.
-		// Otherwise, don't.
-		assert((m_key_code == key::INVALID && (m_id != KEY_PRESS))
-			|| (m_key_code != key::INVALID && (m_id == KEY_PRESS)));
+		// you must supply a key code for KEY_PRESS event
+		// 
+		// we do have a testcase with m_id == KEY_PRESS, and m_key_code==0(KEY_INVALID)
+		// see key_event_test.swf(produced by Ming)
+		// 
+		//assert((m_key_code == key::INVALID && (m_id != KEY_PRESS))
+		//	|| (m_key_code != key::INVALID && (m_id == KEY_PRESS)));
 	}
 
 	void setKeyCode(unsigned char key)
@@ -133,6 +136,10 @@ public:
 	/// Return true if this is a mouse event
 	/// (triggerable with a mouse activity)
 	bool is_mouse_event() const;
+  
+  /// \brief
+	/// Return true if this is a key event
+	bool is_key_event() const;
 
 	id_code id() const { return m_id; }
 };
