@@ -175,8 +175,12 @@ public:
 	/// @param with_stack
 	///	The Scope stack to use for lookups.
 	///
+	/// @param retTarget
+	///	If not NULL, the pointer will be set to the actual object containing the
+	///	found variable (if found).
+	///
 	as_value get_variable(const std::string& varname,
-		const ScopeStack& with_stack) const;
+		const ScopeStack& with_stack, as_object** retTarget=NULL) const;
 
 	/// \brief
 	/// Given a path to variable, set its value.
@@ -512,8 +516,13 @@ private:
 		const ScopeStack& with_stack);
 
 	/// Same of the above, but no support for path.
+	///
+	/// @param retTarget
+	///	If not NULL, the pointer will be set to the actual object containing the
+	///	found variable (if found).
+	///
 	as_value get_variable_raw(const std::string& varname,
-		const ScopeStack& with_stack) const;
+		const ScopeStack& with_stack, as_object** retTarget=NULL) const;
 
 
 	/// \brief
@@ -530,13 +539,17 @@ private:
 	///	If true the seek don't stop at current call frame, but
 	///	descends in upper frames. By default it is false.
 	///
+	/// @param retTarget
+	///	If not NULL, the pointer will be set to the actual object containing the
+	///	found variable (if found).
+	///
 	/// @return true if the variable was found, false otherwise
 	///
-	bool findLocal(const std::string& varname, as_value& ret, bool descend=false);
+	bool findLocal(const std::string& varname, as_value& ret, bool descend, as_object** retTarget=NULL);
 
-	bool findLocal(const std::string& varname, as_value& ret, bool descend=false) const
+	bool findLocal(const std::string& varname, as_value& ret, bool descend, as_object** retTarget=NULL) const
 	{
-		return const_cast<as_environment*>(this)->findLocal(varname, ret, descend);
+		return const_cast<as_environment*>(this)->findLocal(varname, ret, descend, retTarget);
 	}
 
 	/// Find a variable in the given LocalVars

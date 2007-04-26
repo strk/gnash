@@ -641,7 +641,7 @@ as_value::equals(const as_value& v, as_environment* env) const
     bool v_obj_or_func = (v.m_type == OBJECT || v.m_type == AS_FUNCTION);
 
     /// Compare to same type
-    if ( obj_or_func && v_obj_or_func ) return equalsSameType(v);
+    if ( obj_or_func && v_obj_or_func ) return m_object_value == v.m_object_value;
     if ( m_type == v.m_type ) return equalsSameType(v);
 
     else if (m_type == STRING)

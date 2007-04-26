@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.30 2007/04/25 06:58:57 martinwguy Exp $ */
+/* $Id: ActionExec.cpp,v 1.31 2007/04/26 17:06:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -380,6 +380,19 @@ ActionExec::getVariable(const std::string& name)
 	}
 	
 	return env.get_variable(namei, getWithStack());
+}
+
+as_value
+ActionExec::getVariable(const std::string& name, as_object** target)
+{
+	VM& vm = VM::get();
+
+	std::string namei = name;
+	if ( vm.getSWFVersion() < 7 ) {
+	    boost::to_lower(namei, vm.getLocale());
+	}
+	
+	return env.get_variable(namei, getWithStack(), target);
 }
 
 void

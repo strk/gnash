@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.73 2007/04/26 16:26:01 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.74 2007/04/26 17:06:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,7 +45,7 @@ namespace gnash {
 // Return the value of the given var, if it's defined.
 as_value
 as_environment::get_variable(const std::string& varname,
-		const ScopeStack& with_stack) const
+		const ScopeStack& with_stack, as_object** retTarget) const
 {
     // Path lookup rigamarole.
     std::string	path;
@@ -63,6 +63,7 @@ as_environment::get_variable(const std::string& varname,
 	if (target) {
 	    as_value	val;
 	    target->get_member(var.c_str(), &val);
+	    if ( retTarget ) *retTarget = target;
 	    return val;
 	} else {
 
@@ -75,7 +76,7 @@ as_environment::get_variable(const std::string& varname,
 			    );
 	    );
 
-	    as_value tmp = get_variable_raw(path, with_stack);
+	    as_value tmp = get_variable_raw(path, with_stack, retTarget);
 	    if ( ! tmp.is_undefined() )
 	    {
 	    IF_VERBOSE_ASCODING_ERRORS(
@@ -85,7 +86,7 @@ as_environment::get_variable(const std::string& varname,
 	    return as_value();
 	}
     } else {
-	return get_variable_raw(varname, with_stack);
+	return get_variable_raw(varname, with_stack, retTarget);
     }
 }
 
@@ -99,7 +100,7 @@ as_environment::get_variable(const std::string& varname) const
 as_value
 as_environment::get_variable_raw(
     const std::string& varname,
-    const ScopeStack& with_stack) const
+    const ScopeStack& with_stack, as_object** retTarget) const
     // varname must be a plain variable name; no path parsing.
 {
     assert(strchr(varname.c_str(), ':') == NULL);
@@ -112,13 +113,14 @@ as_environment::get_variable_raw(
 	as_object* obj = const_cast<as_object*>(with_stack[i-1].object());
 	if (obj && obj->get_member(varname.c_str(), &val)) {
 	    // Found the var in this context.
+	    if ( retTarget ) *retTarget = obj;
 	    return val;
 	}
     }
 
     // Check locals for getting them
     //as_environment::frame_slot slot;
-    if ( findLocal(varname, val, true) ) // do we really want to descend here ??
+    if ( findLocal(varname, val, true, retTarget) ) // do we really want to descend here ??
     {
 	return val;
     }
@@ -126,17 +128,20 @@ as_environment::get_variable_raw(
 
     // Check target members.
     if (m_target->get_member(varname.c_str(), &val)) {
+	if ( retTarget ) *retTarget = m_target;
 	return val;
     }
 
     // Looking for "this"?
     if (varname == "this") {
 	val.set_as_object(m_target);
+	if ( retTarget ) *retTarget = NULL; // correct ??
 	return val;
     }
 
     // Check built-in constants.
     if (varname == "_root" || varname == "_level0") {
+	if ( retTarget ) *retTarget = NULL; // correct ??
 	return as_value(m_target->get_root_movie());
     }
 
@@ -146,11 +151,13 @@ as_environment::get_variable_raw(
     if ( vm.getSWFVersion() > 5 && varname == "_global" )
     {
 	// The "_global" ref was added in SWF6
+	if ( retTarget ) *retTarget = NULL; // correct ??
 	return as_value(global);
     }
 
     if (global->get_member(varname.c_str(), &val))
     {
+	if ( retTarget ) *retTarget = global;
 	return val;
     }
     
@@ -922,10 +929,18 @@ as_environment::dump_global_registers(std::ostream& out) const
 
 /*private*/
 bool
-as_environment::findLocal(const std::string& varname, as_value& ret, bool descend)
+as_environment::findLocal(const std::string& varname, as_value& ret, bool descend, as_object** retTarget)
 {
 	if ( _localFrames.empty() ) return false;
-	if ( ! descend ) return findLocal(_localFrames.back().locals, varname, ret);
+	if ( ! descend )
+	{
+		if ( findLocal(_localFrames.back().locals, varname, ret) )
+		{
+			if ( retTarget ) *retTarget = _localFrames.back().locals.get();
+			return true;
+		}
+		return false;
+	}
 
 	for (CallStack::reverse_iterator it=_localFrames.rbegin(),
 			itEnd=_localFrames.rend();
@@ -935,6 +950,7 @@ as_environment::findLocal(const std::string& varname, as_value& ret, bool descen
 		LocalVars& locals = it->locals;
 		if ( findLocal(locals, varname, ret) )
 		{
+			if ( retTarget ) *retTarget = locals.get();
 			return true;
 		}
 	}

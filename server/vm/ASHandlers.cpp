@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.100 2007/04/24 20:38:26 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.101 2007/04/26 17:06:10 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2194,7 +2194,8 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
         as_object* this_ptr = thread.getThisPointer();
         if ( ! env.parse_path(funcname, &this_ptr, function) )
         {
-                function = thread.getVariable(funcname);
+                //function = thread.getVariable(funcname);
+                function = thread.getVariable(funcname, &this_ptr);
         }
 
 	if ( ! function.is_object() )
@@ -2205,7 +2206,9 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	}
 	else if ( ! function.is_function() )
 	{
+		// Calling super ? 
 		boost::intrusive_ptr<as_object> obj = function.to_object();
+        	this_ptr = thread.getThisPointer();
 		if ( ! obj->get_member("constructor", &function) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS (

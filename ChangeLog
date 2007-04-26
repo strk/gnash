@@ -1,5 +1,19 @@
 2007-04-26 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (equals): compare m_object_value when both 
+	  operatns are either functions or objects.
+	* server/as_environment.{cpp,h} (get_variable, get_variable_raw,
+	  findLocal): accept an additional argument to return the target
+	  object the variable was found in.
+	* server/vm/ActionExec.{cpp,h}: provide an additional getVariable
+	  method accepting an as_object pointer to return the target object
+	  a variable was found in.
+	* server/vm/ASHandlers.cpp (ActionCallFunction): set the 'this'
+	  pointer to the object found to contain the function.
+	* testsuite/actionscript.all/Function.as: more successes.
+
+2007-04-26 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.cpp (get_variable_raw): elements of 
 	  the 'with' stack take precedence over locals.
 	  See test in Function.as.

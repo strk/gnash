@@ -267,6 +267,20 @@ public:
 	///
 	as_value getVariable(const std::string& name);
 
+	/// Get a named variable, seeking for it in the with stack if any.
+	//
+	/// @param name
+	///	Name of the variable. Supports slash and dot syntax.
+	///	Name is converted to lowercase if SWF version is < 7.
+	///
+	/// @param target
+	///	An output parameter, will be set to point to the object
+	///	containing any found variable.
+	///	The pointer may be set to NULL if the variable was not 
+	///	found or it belongs to no object (absolute references, for instance).
+	///
+	as_value getVariable(const std::string& name, as_object** target);
+
 	/// Set an object's member.
 	//
 	/// @param obj
