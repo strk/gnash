@@ -633,7 +633,11 @@ as_value::equals(const as_value& v, as_environment* env) const
 	return this_nulltype == v_nulltype;
     }
 
+    bool obj_or_func = (m_type == OBJECT || m_type == AS_FUNCTION);
+    bool v_obj_or_func = (v.m_type == OBJECT || v.m_type == AS_FUNCTION);
+
     /// Compare to same type
+    if ( obj_or_func && v_obj_or_func ) return equalsSameType(v);
     if ( m_type == v.m_type ) return equalsSameType(v);
 
     else if (m_type == STRING)
@@ -653,7 +657,16 @@ as_value::equals(const as_value& v, as_environment* env) const
     else if (m_type == BOOLEAN)
     {
 	return m_boolean_value == v.to_bool();
+    }
 
+    else if (m_type == MOVIECLIP || v.m_type == MOVIECLIP)
+    {
+        // if both are movieclips they should be compared by same value
+	// (see top of this function).
+	// In any other case we always return false.
+	// TODO: check if it's allowed that the primitive value
+	//       of an object is a movieclip (maybe with an ActionScript hack...)
+        return false;
     }
 
     else if (is_object())

@@ -1,5 +1,11 @@
 2007-04-26 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (equals): don't abort on object==movieclip !
+	* testsuite/actionscript.all/Function.as: add more tests 'this'
+	  reference in 'with' and 'function' scope (see bug #19704).
+
+2007-04-26 Sandro Santilli <strk@keybit.net>
+
 	* server/array.h, server/as_environment.cpp, server/as_function.h,
 	  server/as_object.cpp, server/as_object.h, server/character.cpp,
 	  server/character.h, server/edit_text_character.cpp,

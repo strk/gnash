@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.39 2007/03/21 14:37:20 strk Exp $";
+rcsid="$Id: Function.as,v 1.40 2007/04/26 09:53:01 strk Exp $";
 
 #include "check.as"
 
@@ -581,3 +581,61 @@ check_equals(myMail.message, 'enlarge yourself');
 check_equals(myMail.to, undefined);
 check_equals(myMail.message, undefined);
 #endif
+
+//-----------------------------------------------------
+// Test the 'this' reference
+//-----------------------------------------------------
+
+getThis = function() { return this; };
+
+check_equals(getThis(), this);
+
+o = new Object;
+o.getThis = getThis;
+check_equals(o.getThis(), o);
+
+o.sub = new Object;
+o.sub.getThis = getThis;
+
+ret = o.sub.getThis();
+check_equals(typeof(ret), 'object');
+check_equals(ret, o.sub);
+
+
+with(o) {
+	with(sub) {
+		ret = getThis();
+		check_equals(typeof(ret), 'object');
+		check_equals(ret, o.sub);
+	}
+
+	ret = getThis();
+	check_equals(typeof(ret), 'object');
+	check_equals(ret, o);
+
+	ret = sub.getThis();
+	check_equals(typeof(ret), 'object');
+	check_equals(ret, sub);
+}
+
+check(delete o.sub.getThis);
+
+with(o) {
+	with (sub) {
+		ret = getThis();
+		check_equals(typeof(ret), 'object');
+		xcheck_equals(getThis(), o);
+	}
+}
+
+function testInFunctionContext(o)
+{
+	with(o) {
+		// see bug #19704
+		ret = getThis();
+		xcheck_equals(typeof(ret), 'object');
+		xcheck_equals(ret, o);
+	}
+}
+
+testInFunctionContext(o);
