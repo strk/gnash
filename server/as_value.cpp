@@ -245,10 +245,8 @@ as_value::to_primitive(as_environment& env) const
 			log_msg(_("get_member(%s) returned false"), methodname.c_str());
 		}
 	}
-	else
-	{
-		return *this;
-	}
+
+	return *this;
 
 }
 
