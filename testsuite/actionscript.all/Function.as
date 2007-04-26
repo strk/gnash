@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.41 2007/04/26 09:55:56 strk Exp $";
+rcsid="$Id: Function.as,v 1.42 2007/04/26 10:17:56 strk Exp $";
 
 #include "check.as"
 
@@ -642,4 +642,5 @@ testInFunctionContext(o);
 
 // Quick test to verify that a movieclip is never equal to an object, despite it's primitive value
 o = new Object(); o.valueOf = function() { return _root; };
-xcheck_equals(_root, o);
+check_equals(_root, o);
+check_equals(o, _root);

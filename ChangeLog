@@ -1,5 +1,13 @@
 2007-04-26 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.{cpp,h}: to_primitive() made private, and had
+	  calling any user-defined valueOf for objects; (equals): only
+	  return false when to_primitive() returns the same type we were 
+	  already.
+	* testsuite/actionscript.all/Function.as: two more successes.
+
+2007-04-26 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.cpp (equals): don't abort on object==movieclip !
 	* testsuite/actionscript.all/Function.as: add more tests 'this'
 	  reference in 'with' and 'function' scope (see bug #19704).

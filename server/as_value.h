@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.49 2007/04/19 14:25:40 martinwguy Exp $ */
+/* $Id: as_value.h,v 1.50 2007/04/26 10:17:56 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -358,12 +358,6 @@ public:
 	///
 	bool	to_bool_v5() const;
 
-	/// Return value as a primitive type
-	//
-	/// Primitive types are: undefined, null, boolean, string, number.
-	/// See ECMA-2.6.2 (section 4.3.2).
-	as_value to_primitive() const;
-
 	/// Return value as an object, converting primitive values as needed.
 	//
 	/// Make sure you don't break the intrusive_ptr chain
@@ -528,6 +522,16 @@ public:
 	void	string_concat(const std::string& str);
 
 private:
+
+	/// Return value as a primitive type
+	//
+	/// Primitive types are: undefined, null, boolean, string, number.
+	/// See ECMA-2.6.2 (section 4.3.2).
+	///
+	/// @param env
+	/// 	The environment to use for calling the valueOf method.
+	///
+	as_value to_primitive(as_environment& env) const;
 
 	/// Compare values of the same type
 	//

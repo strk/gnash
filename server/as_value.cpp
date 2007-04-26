@@ -228,20 +228,26 @@ as_value::to_std_string_versioned(int version, as_environment* env) const
 
 // Conversion to primitive value.
 as_value
-as_value::to_primitive() const
+as_value::to_primitive(as_environment& env) const
 {
-	switch (m_type)
+	if ( m_type == OBJECT || m_type == AS_FUNCTION )
 	{
-		case OBJECT:
-		case AS_FUNCTION:
-			return m_object_value->get_primitive_value();
-		case UNDEFINED:
-		case NULLTYPE:
-		case BOOLEAN:
-		case STRING:
-		case NUMBER:
-		default:
-			return *this;
+		as_object* obj = m_object_value;
+		std::string methodname = "valueOf";
+		lowercase_if_needed(methodname);
+		as_value method;
+		if ( obj->get_member(methodname, &method) )
+		{
+			return call_method0(method, &env, obj);
+		}
+		else
+		{
+			log_msg(_("get_member(%s) returned false"), methodname.c_str());
+		}
+	}
+	else
+	{
+		return *this;
 	}
 
 }
@@ -659,38 +665,27 @@ as_value::equals(const as_value& v, as_environment* env) const
 	return m_boolean_value == v.to_bool();
     }
 
-    else if (m_type == MOVIECLIP || v.m_type == MOVIECLIP)
+    else if (m_type == OBJECT || m_type == AS_FUNCTION)
     {
-        // if both are movieclips they should be compared by same value
-	// (see top of this function).
-	// In any other case we always return false.
-	// TODO: check if it's allowed that the primitive value
-	//       of an object is a movieclip (maybe with an ActionScript hack...)
-        return false;
-    }
-
-    else if (is_object())
-    {
-    	assert ( ! v.is_object() );
+    	assert ( ! (v.m_type == OBJECT || v.m_type == AS_FUNCTION) );
 	// convert this value to a primitive and recurse
-	as_value v2 = to_primitive(); // TODO: should forward environment ?
-	if ( v2.is_object() ) return false;
+	if ( ! env ) return false;
+	as_value v2 = to_primitive(*env); // TODO: should forward environment ?
+	if ( v2.m_type == m_type ) return false; // no conversion 
 	else return v2.equals(v, env);
     }
 
-    else if (v.is_object())
+    else if (v.m_type == OBJECT || v.m_type == AS_FUNCTION)
     {
-    	assert ( ! is_object() );
+    	assert ( ! (m_type == OBJECT || m_type == AS_FUNCTION) );
 	// convert this value to a primitive and recurse
-	as_value v2 = v.to_primitive(); // TODO: should forward environment ?
-	if ( v2.is_object() ) return false;
+	if ( ! env ) return false;
+	as_value v2 = v.to_primitive(*env); // TODO: should forward environment ?
+	if ( v2.m_type == v.m_type ) return false; // no conversion 
 	else return equals(v2, env);
     }
 
-    else
-    {
-	assert(0);
-    }
+    return false;
 }
 	
 // Sets *this to this string plus the given string.
