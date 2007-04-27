@@ -19,6 +19,8 @@
 AUTOMAKE_OPTIONS = dejagnu
 
 if ENABLE_MTASC
+
+# NOTE: 0.4.0.beta3 is required for prebuilt-clip to work !!
 if ENABLE_MING
 
 DEJAGNU_SO_PATH = ../Dejagnu.swf
