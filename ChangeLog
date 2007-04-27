@@ -1,3 +1,7 @@
+2007-04-27 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac: Add verbose text for missing gstreamer-dev help
+
 2007-04-27 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-mtasc.all/README: some info about the MTASC

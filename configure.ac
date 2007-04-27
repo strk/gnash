@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.294 2007/04/27 01:07:57 rsavoye Exp $
+dnl $Id: configure.ac,v 1.295 2007/04/27 18:17:16 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1360,6 +1360,10 @@ if test "$media_handler" = "gst"; then
       echo "        Gstreamer libs are: $GSTREAMER_LIBS"
   else
     echo "        ERROR: gstreamer media handling requested, but no gstreamer 0.10+ found"
+    echo "               You need to have the gstreamer development package installed"
+    echo "               to compile this project. You can either reconfigure using"
+    echo "               --media-handler=ffmpeg or install libgstreamer0.10-dev"
+    echo "               (using apt-get) or <something similar> (using yum)."
     nogo=true
   fi
 fi
