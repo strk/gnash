@@ -125,7 +125,7 @@ libgnashbackend_la_SOURCES = \
 	$(RENDER_SOURCES) \
 	$(SOUND_SOURCES)
 
-libgnashbackend_la_LDFLAGS = -avoid-version
+libgnashbackend_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.28 2007/04/10 18:18:45 rsavoye Exp $
+# $Id: Makefile.am,v 1.29 2007/04/27 01:08:51 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -78,9 +78,7 @@ noinst_HEADERS = \
 libgnashparser_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la 
 
-libgnashparser_la_LDFLAGS = \
-	-avoid-version \
-	$(BOOST_LIBS)
+libgnashparser_la_LDFLAGS = $(BOOST_LIBS) -release $(VERSION) -no-undefined -export-dynamic
 
 if USE_SOUND_GST
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS)

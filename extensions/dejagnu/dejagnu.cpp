@@ -66,7 +66,7 @@ getInterface()
 }
 
 static as_value
-dejagnu_ctor(const fn_call& fn)
+dejagnu_ctor(const fn_call& /* fn */)
 {
 //    GNASH_REPORT_FUNCTION;
     dejagnu_as_object* obj = new dejagnu_as_object();
@@ -112,12 +112,11 @@ as_value
 dejagnu_pass(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    dejagnu_as_object *ptr = (dejagnu_as_object*)fn.this_ptr;
-    assert(ptr);
+    boost::intrusive_ptr<dejagnu_as_object> ptr = ensureType<dejagnu_as_object>(fn.this_ptr);
     
     if (fn.nargs > 0) {
-	const char *text = fn.arg(0).to_string();
-	return as_value(ptr->obj.pass(text));
+	string text = fn.arg(0).to_string();
+	return as_value(ptr->obj.pass(text.c_str()));
     }
 }
 
@@ -125,12 +124,11 @@ as_value
 dejagnu_fail(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    dejagnu_as_object *ptr = (dejagnu_as_object*)fn.this_ptr;
-    assert(ptr);
+    boost::intrusive_ptr<dejagnu_as_object> ptr = ensureType<dejagnu_as_object>(fn.this_ptr);
     
     if (fn.nargs > 0) {
-	const char *text = fn.arg(0).to_string();
-	return as_value(ptr->obj.fail(text));
+	string text = fn.arg(0).to_string();
+	return as_value(ptr->obj.fail(text.c_str()));
     }
 }
 
@@ -138,8 +136,7 @@ as_value
 dejagnu_totals(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    dejagnu_as_object *ptr = (dejagnu_as_object*)fn.this_ptr;
-    assert(ptr);
+    boost::intrusive_ptr<dejagnu_as_object> ptr = ensureType<dejagnu_as_object>(fn.this_ptr);
     
     ptr->obj.totals();
     return as_value(true);

@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.34 2007/04/10 18:18:46 rsavoye Exp $
+# $Id: Makefile.am,v 1.35 2007/04/27 01:08:50 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -137,7 +137,7 @@ AM_CPPFLAGS += $(MAD_CFLAGS)
 libgnashasobjs_la_LIBADD += $(MAD_LIBS)
 endif
 
-libgnashasobjs_la_LDFLAGS = -avoid-version
+libgnashasobjs_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

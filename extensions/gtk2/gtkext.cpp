@@ -37,6 +37,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "debugger.h"
 #include "gtkext.h"
+//#include "Player.h"
 
 using namespace std;
 
@@ -47,6 +48,7 @@ static LogFile& dbglogfile = LogFile::getDefaultInstance();
 #ifdef USE_DEBUGGER
 static Debugger& debugger = Debugger::getDefaultInstance();
 #endif
+//Player& player = Player::getDefaultInstance();
 
 // prototypes for the callbacks required by Gnash
 as_value gtkext_window_new(const fn_call& fn);
@@ -93,7 +95,7 @@ generic_callback(GtkWidget *widget, gpointer data)
     // FIXME: Delete events don't seem to pass in data in a form we
     // can access it. So for now we just hack in a quit, since we know
     // we're done, we hope...
-    if (*event == NULL) {
+    if (*event == 0) {
 	gtk_main_quit();
 	return;
     } else {
@@ -105,9 +107,10 @@ generic_callback(GtkWidget *widget, gpointer data)
     env.push_val(handler.to_object());
     env.push(event);
     env.push(handler.to_string());
+    as_object obj = val.to_object();
 
     // Call the AS function defined in the source file using this extension
-    (*as_func)(fn_call(&val, handler.to_object(), &env, 2, 2));
+    (*as_func)(fn_call(&obj, &env, 2, 2));
 }
 
 static void
@@ -164,6 +167,9 @@ void
 GtkExt::window_new()
 {
     GNASH_REPORT_FUNCTION;
+//    std::auto_ptr<Gui> ggg = player.getGuiHandle();
+//    player.getGuiHandle();
+//    gui.getWindow();
     _window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 }
 
@@ -202,8 +208,7 @@ GtkExt::main()
 as_value gtkext_window_new(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
-    assert(ptr);
+    boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
 
     GtkExt *obj = new GtkExt;
     obj->window_new();
@@ -215,12 +220,11 @@ as_value gtkext_window_new(const fn_call& fn)
 as_value gtkext_signal_connect(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
-    assert(ptr);
+    boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
 
     if (fn.nargs > 0) {
-	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object());
-	string name = fn.arg(1).to_std_string();
+	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object().get());
+	string name = fn.arg(1).to_string();
 	as_value func = fn.arg(2).to_as_function();
 	int data = fn.arg(3).to_number();
 
@@ -239,11 +243,10 @@ as_value gtkext_container_set_border_width(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
-    assert(ptr);
+    boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
     
     if (fn.nargs > 0) {
-	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object());
+	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object().get());
 	int width = fn.arg(1).to_number();
 	window->container_set_border_width(width);
 	dbglogfile << "set container border width to " << width << " !" << endl;
@@ -256,13 +259,12 @@ as_value gtkext_container_set_border_width(const fn_call& fn)
 as_value gtkext_button_new_with_label(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
-    assert(ptr);
+    boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
     
     if (fn.nargs > 0) {
-	const char *label = fn.arg(0).to_string();
+	string label = fn.arg(0).to_string();
 	GtkExt *obj = new GtkExt;
-	obj->button_new_with_label(label);
+	obj->button_new_with_label(label.c_str());
 	return as_value(obj);
     }
     return as_value();
@@ -281,15 +283,14 @@ as_value gtkext_button_new_with_label(const fn_call& fn)
 as_value gtkext_signal_connect_swapped(const fn_call& fn)
 {
     GNASH_REPORT_FUNCTION;
-    GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
-    assert(ptr);
-    
+    boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
 
     if (fn.nargs > 0) {
-	GtkExt *parent = dynamic_cast<GtkExt *>(fn.arg(0).to_object());
+	GtkExt *parent = dynamic_cast<GtkExt *>(fn.arg(0).to_object().get());
 	string name = (fn.arg(1).to_string());
-	GtkExt *child = dynamic_cast<GtkExt *>(fn.arg(3).to_object());
-	as_value *callback = dynamic_cast<as_value *>(fn.arg(2).to_object());
+	GtkExt *child = dynamic_cast<GtkExt *>(fn.arg(3).to_object().get());
+// currently unused
+//	as_value *callback = dynamic_cast<as_value *>(fn.arg(2).to_object());
 
 	// FIXME: This seems to cause an Gobject warning
 	g_signal_connect_swapped (G_OBJECT (child->getWindow()), name.c_str(),
@@ -303,12 +304,11 @@ as_value gtkext_signal_connect_swapped(const fn_call& fn)
 as_value gtkext_container_add(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
-    assert(ptr);
+    boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
     
     if (fn.nargs > 0) {
-	GtkExt *parent = dynamic_cast<GtkExt *>(fn.arg(0).to_object());
-	GtkExt *child = dynamic_cast<GtkExt *>(fn.arg(1).to_object());
+	GtkExt *parent = dynamic_cast<GtkExt *>(fn.arg(0).to_object().get());
+	GtkExt *child = dynamic_cast<GtkExt *>(fn.arg(1).to_object().get());
 	gtk_container_add (GTK_CONTAINER (parent->getWindow()), child->getWindow());
 	return as_value(true);
     }
@@ -318,11 +318,10 @@ as_value gtkext_container_add(const fn_call& fn)
 as_value gtkext_widget_show(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
-    assert(ptr);
+    boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
      
     if (fn.nargs > 0) {
-	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object());
+	GtkExt *window = dynamic_cast<GtkExt *>(fn.arg(0).to_object().get());
 	gtk_widget_show(window->getWindow());
     }
     return as_value();
@@ -332,8 +331,7 @@ as_value gtkext_widget_show(const fn_call& fn)
 as_value gtkext_main(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkExt *ptr = dynamic_cast<GtkExt *>(fn.this_ptr);
-    assert(ptr);
+    boost::intrusive_ptr<GtkExt> ptr = ensureType<GtkExt>(fn.this_ptr);
 
     gtk_main();
     return as_value();
@@ -354,8 +352,8 @@ extern "C" {
 	static boost::intrusive_ptr<builtin_function> cl;
 	if (cl == NULL) {
 	    cl = new builtin_function(&gtkext_ctor, getInterface());
-// 	    // replicate all interface to class, to be able to access
-// 	    // all methods as static functions
+ 	    // replicate all interface to class, to be able to access
+ 	    // all methods as static functions
  	    attachInterface(cl.get());
 	}
 	

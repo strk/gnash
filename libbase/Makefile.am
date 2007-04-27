@@ -108,6 +108,7 @@ noinst_HEADERS = \
 	extension.h \
 	embedVideoDecoder.h \
 	GnashException.h \
+	gettext.h \
 	grid_index.h \
 	image.h	\
 	jpeg.h \
@@ -156,7 +157,7 @@ endif
 
 
 # libgnashbase_la_LDFLAGS = -export-dynamic
-libgnashbase_la_LDFLAGS = -avoid-version
+libgnashbase_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
 
 # We use our own rule to build the demo so it isn't built by default.
 # Since it doesn't contain a main() routine, we only try to compile,

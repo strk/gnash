@@ -16,6 +16,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <cstdarg>
 
 #include <mysql/errmsg.h>
@@ -241,7 +245,7 @@ MySQL::getData(const char *sql, query_t &qresult)
       case CR_SERVER_LOST:
       case CR_COMMANDS_OUT_OF_SYNC:
       case CR_SERVER_GONE_ERROR:
-	  log_error(_("MySQL connection error: %s", mysql_error(_db));
+	  log_error(_("MySQL connection error: %s"), mysql_error(_db));
 	  // Try to reconnect to the database
 // 	  closeDB();
 // 	  openDB();
@@ -298,15 +302,15 @@ mysql_connect(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
-    assert(ptr);
+    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
 
     if (fn.nargs == 4) {
-	const char *host = fn.arg(0).to_string();
-	const char *db = fn.arg(1).to_string();
-	const char *user = fn.arg(2).to_string();
-	const char *passwd = fn.arg(3).to_string();	
-	return as_value(ptr->obj.connect(host, db, user, passwd));
+	string host = fn.arg(0).to_string();
+	string db = fn.arg(1).to_string();
+	string user = fn.arg(2).to_string();
+	string passwd = fn.arg(3).to_string();	
+	return as_value(ptr->obj.connect(host.c_str(), db.c_str(),
+					 user.c_str(), passwd.c_str()));
     } else {
 	return as_value(false);
     }
@@ -317,12 +321,11 @@ mysql_qetData(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
-    assert(ptr);
+    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
 
     if (fn.nargs > 0) {
-	const char *sql = fn.arg(0).to_string();
-	as_array_object *arr = (as_array_object *)fn.arg(1).to_object();
+	string sql = fn.arg(0).to_string();
+	as_array_object *arr = (as_array_object *)fn.arg(1).to_object().get();
 //	std::vector< std::vector<const char *> >
 	MySQL::query_t qresult;
 #if 0
@@ -348,8 +351,7 @@ as_value
 mysql_free(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
-    assert(ptr);
+    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
     ptr->obj.free_result();
     return as_value(true);
 }
@@ -358,8 +360,7 @@ as_value
 mysql_fields(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
-    assert(ptr);
+    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
     return as_value(ptr->obj.num_fields());
 }
 
@@ -368,7 +369,7 @@ mysql_fetch(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
     if (fn.nargs > 0) {
-	mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
+	boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
 	assert(ptr);
 	MYSQL_ROW res = ptr->obj.fetch_row();
 	as_value aaa = *res;       
@@ -382,8 +383,7 @@ as_value
 mysql_store(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
-    assert(ptr);
+    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
     return as_value(ptr->obj.store_result());
 }
 
@@ -391,11 +391,10 @@ as_value
 mysql_query(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
-    mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
+    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
     if (fn.nargs > 0) {
-	const char *sql = fn.arg(0).to_string();
-	assert(ptr);
-	return as_value(ptr->obj.guery(sql));
+	string sql = fn.arg(0).to_string();
+	return as_value(ptr->obj.guery(sql.c_str()));
     }
 }
 
@@ -404,8 +403,7 @@ mysql_disconnect(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    mysql_as_object *ptr = (mysql_as_object*)fn.this_ptr;
-    assert(ptr);
+    boost::intrusive_ptr<mysql_as_object> ptr = ensureType<mysql_as_object>(fn.this_ptr);
     return as_value(ptr->obj.disconnect());
 }
 

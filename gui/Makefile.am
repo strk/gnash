@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.64 2007/04/10 18:18:45 rsavoye Exp $
+# $Id: Makefile.am,v 1.65 2007/04/27 01:08:50 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -224,7 +224,8 @@ GNASH_LIBS = \
 	$(top_builddir)/server/parser/libgnashparser.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \
 	$(top_builddir)/libbase/libgnashbase.la \
-	libgnashplayer.la
+	libgnashplayer.la \
+	libgnashgui.la
 
 libgnashplayer_la_SOURCES = \
 	Player.cpp Player.h
@@ -237,7 +238,7 @@ libgnashplayer_la_LIBADD = \
 
 gnash_SOURCES = gnash.cpp 
 # export our symbols so they can be used by Gnash plugins
-gnash_LDFLAGS = -export-dynamic
+gnash_LDFLAGS = -no-undefined -export-dynamic
 gnash_DEPENDENCIES = $(GNASH_LIBS)
 gnash_LDADD = \
 	$(MYSQL_LIBS) \
@@ -274,8 +275,8 @@ klash.moc: $(srcdir)/kdesup.h
 #guitest_SOURCES = guitest.cpp #fltk.cpp #fltksup.h fltksupp.h gnash.cpp gtk.cpp 
 #	gtksup.h gui.cpp gui.h menu.cpp menu.h sdl.cpp sdlsup.h [21~sdlsupp.h
 #guitest_LDADD = $(gnash_LDADD)
-libgnashplayer_la_LDFLAGS = -avoid-version
-libgnashgui_la_LDFLAGS = -avoid-version
+libgnashplayer_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
+libgnashgui_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
