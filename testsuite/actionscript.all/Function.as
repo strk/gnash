@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.47 2007/04/27 16:09:01 strk Exp $";
+rcsid="$Id: Function.as,v 1.48 2007/04/27 16:47:10 strk Exp $";
 
 #include "check.as"
 
@@ -319,6 +319,24 @@ result2 = inner_func("a");  // should return "hello"
   // fails in the SWF6+ section above...
   check_equals ( result2, undefined );
 
+#endif
+
+function bla (num)
+{
+	bla = function ()
+	{
+		return num;
+	};
+	return num;
+}
+
+check_equals(typeof(bla), 'function');
+check_equals(bla(42), 42);
+check_equals(typeof(bla), 'function');
+#if OUTPUT_VERSION < 6
+check_equals(typeof(bla(43)), 'undefined');
+#else
+check_equals(bla(43), 42);
 #endif
 
 //----------------------------------------------------------

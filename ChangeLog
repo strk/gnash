@@ -2,6 +2,8 @@
 
 	* testsuite/actionscript.all/Global.as: check that _global._global
 	  is undefined.
+	* testsuite/actionscript.all/Function.as: add another test for
+	  nested functions and scope chain.
 
 2007-04-27 Sandro Santilli <strk@keybit.net>
 
