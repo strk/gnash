@@ -216,5 +216,12 @@ main(int /*argc*/, char** /*argv*/)
 
 	check(!finSnap2.contains(finSnap1));
 	check(finSnap1.contains(finSnap2));
+
+	SnappingRanges2d<int> finSnap3;
+	finSnap3.add(Range2d<int>(38,268, 112,292));
+	SnappingRanges2d<int> finSnap4;
+	finSnap4.add(Range2d<int>(40,273, 108,287));
+
+	check(finSnap3.contains(finSnap4));
 }
 
