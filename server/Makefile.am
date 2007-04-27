@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.110 2007/04/27 01:08:51 rsavoye Exp $
+# $Id: Makefile.am,v 1.111 2007/04/28 00:04:26 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -175,7 +175,7 @@ libgnashserver_la_SOURCES += debugger.cpp
 endif
 
 #libserver_la_LIBDADD =  #@DL_LIB@  # $(LIBLTDL)
-libgnashserver_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
+libgnashserver_la_LDFLAGS = -release $(VERSION) -export-dynamic #-no-undefined 
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

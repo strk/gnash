@@ -173,7 +173,7 @@ FltkGui::handleKey(unsigned key)
 
     for (int i = 0; table[i].fltkKey; i++) {
         if (key == table[i].fltkKey) {
-            notify_key_event(table[i].gnashKey, true);
+            notify_key_event((gnash::key::code)table[i].gnashKey, true);
             break;
         }
     }

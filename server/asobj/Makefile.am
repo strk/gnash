@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.35 2007/04/27 01:08:50 rsavoye Exp $
+# $Id: Makefile.am,v 1.36 2007/04/28 00:04:26 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -117,7 +117,9 @@ noinst_HEADERS = \
 
 libgnashasobjs_la_LIBADD = \
 	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/libbase/libgnashbase.la
+	$(top_builddir)/libgeometry/libgnashgeo.la \
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(LIBXML_LIBS)
 
 if USE_FFMPEG_ENGINE
 libgnashasobjs_la_SOURCES += NetStreamFfmpeg.cpp SoundFfmpeg.cpp
@@ -137,7 +139,7 @@ AM_CPPFLAGS += $(MAD_CFLAGS)
 libgnashasobjs_la_LIBADD += $(MAD_LIBS)
 endif
 
-libgnashasobjs_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
+libgnashasobjs_la_LDFLAGS = -release $(VERSION) #-no-undefined -export-dynamic
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

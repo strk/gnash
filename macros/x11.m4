@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: x11.m4,v 1.5 2007/04/10 18:18:46 rsavoye Exp $
+dnl $Id: x11.m4,v 1.6 2007/04/28 00:04:26 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_X11],
 [
@@ -94,6 +94,12 @@ AC_DEFUN([GNASH_PATH_X11],
           fi
           if test -f $i/libXext.a -o -f $i/libXext.${shlibext}; then
             ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXext"
+          fi
+          if test -f $i/libSM.a -o -f $i/libSM.${shlibext}; then
+            ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lSM"
+          fi
+          if test -f $i/libICE.a -o -f $i/libICE.${shlibext}; then
+            ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lICE"
           fi
           AC_MSG_RESULT(yes)
           break

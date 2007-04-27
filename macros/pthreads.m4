@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 dnl Copyright (C) 2006 Steven G. Johnson <stevenj@alum.mit.edu>.
-dnl $Id: pthreads.m4,v 1.28 2007/04/08 23:06:17 rsavoye Exp $
+dnl $Id: pthreads.m4,v 1.29 2007/04/28 00:04:26 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_PTHREADS],
 [
@@ -87,6 +87,9 @@ case "${host_cpu}-${host_os}" in
     ;;
   *darwin*)
     pthread_flags="none"
+    ;;
+  *mingw*)
+    pthread_flags="-mthreads"
     ;;
   *solaris*)
 

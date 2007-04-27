@@ -1,3 +1,25 @@
+2007-04-26  Rob Savoye  <rob@pawnee.welcomehome.org>
+
+	* gui/fltk.cpp: Cast the key::code so it compiles on Darwin.
+	* macros/agg.m4: Don't inherit the -rpath setting fropm
+	pkg-config, it screws up the linux on Darwin.
+	* macros/incllist, libslist: Look in $with_top_level for support
+	packages no in the $prefix path.
+	* macros/pthreads.m4: Add -mthreads for mingw32.
+	* macros/x11.m4: If X11 is found, also add libSM and libICE if
+	they are found to resolve dependencies on Darwin.
+	* server/Makefile.am: Remove -no-undefined as it cause dependency
+	problems on Darwin.
+	* server/vm/Makefile.am: Remove -no-undefined as it causes
+	inter-library dependency problems on Darwin.
+	* server/parser/Makefile.am: Remove -no-undefined as it causes
+	inter-library dependency problems on Darwin.
+	* server/asobjsMakefile.am: Remove -no-undefined as it causes
+	inter-library dependency problems on Darwin. Add libgeo to the
+	link line.
+	* server/vm/VM.cpp: Don't use the gnash:: namespace with setting
+	the global singleton, it won't compile on Darwin.
+
 2007-04-27 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/PlaceObject2Tag.cpp (readPlaceActions): fix check for

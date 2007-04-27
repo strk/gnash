@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.29 2007/04/27 01:08:51 rsavoye Exp $
+# $Id: Makefile.am,v 1.30 2007/04/28 00:04:26 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -76,9 +76,11 @@ noinst_HEADERS = \
 	video_stream_def.h
 
 libgnashparser_la_LIBADD = \
-	$(top_builddir)/libbase/libgnashbase.la 
+	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libgeometry/libgnashgeo.la \
+	$(top_builddir)/libbase/libgnashbase.la
 
-libgnashparser_la_LDFLAGS = $(BOOST_LIBS) -release $(VERSION) -no-undefined -export-dynamic
+libgnashparser_la_LDFLAGS = $(BOOST_LIBS) -release $(VERSION) -export-dynamic #-no-undefined 
 
 if USE_SOUND_GST
 AM_CPPFLAGS += $(GSTREAMER_CFLAGS)

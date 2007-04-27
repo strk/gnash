@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,9 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-
-/* $Id: VM.cpp,v 1.5 2007/03/15 22:39:54 strk Exp $ */
+/* $Id: VM.cpp,v 1.6 2007/04/28 00:04:26 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -50,7 +48,7 @@ VM::init(movie_definition& movie)
 	assert(inst.get()); // or an invalid movie_definition was given
 	_singleton->setRoot(inst.release()); // transfer ownership
 
-	_singleton->setGlobal(new gnash::Global(*_singleton));
+	_singleton->setGlobal(new Global(*_singleton));
 	assert(_singleton->getGlobal());
 
 	return *_singleton;

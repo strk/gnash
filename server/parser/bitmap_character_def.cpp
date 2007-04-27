@@ -22,7 +22,6 @@
 #endif
 
 #include "bitmap_character_def.h"
-//#include "bitmap_character_instance.h"
 #include "gnash.h" // for bitmap_info
 #include "render.h"
 
