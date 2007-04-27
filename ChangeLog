@@ -1,5 +1,12 @@
 2007-04-27 Sandro Santilli <strk@keybit.net>
 
+	* libgeometry/snappingrange.h: add contains(SnappingRange2d) method;
+	  fixed contains(Range2d) to take a const ref rather then a value.
+	* testsuite/libgeometry/snappingrangetest.cpp: add tests for
+	  contains(SnappingRange2d).
+
+2007-04-27 Sandro Santilli <strk@keybit.net>
+
 	* gui/gui.cpp: add a DEBUG_MOUSE_COORDINATES define, for making
 	  writing test runners easier.
 	* testsuite/swfdec/swfdec_gnash_tester: use the .trace.org files when

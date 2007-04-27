@@ -55,6 +55,7 @@ main(int /*argc*/, char** /*argv*/)
 	//
 	// Test world range no-op additions
 	//
+
 	Range2d<float> someRange(10.1,20.2,30.3,40.4);
 	worldSnap1.add(someRange);
 	check( ! worldSnap1.isNull() );
@@ -129,6 +130,7 @@ main(int /*argc*/, char** /*argv*/)
 	//
 	// Test irregular ranges (should not snap)
 	//
+
 	Range2d<float> horiz (10, 10, 500, 20); 
 	Range2d<float> vert (290, 22, 300, 500);
 	SnappingRanges2d<float> irrSnap;
@@ -159,5 +161,60 @@ main(int /*argc*/, char** /*argv*/)
 	check( irrSnap.contains(Range2d<int>(vert)) );
 	
 	 
+	//
+	// Test ranges containment
+	//
+
+	Range2d<float> nullRange1;
+	SnappingRanges2d<float> nullSnap2;
+	SnappingRanges2d<float> nullSnap3;
+
+	check( ! nullSnap2.contains(nullRange1) );
+	check( ! nullSnap2.contains(nullSnap3) );
+	// null rangeset don't contain themselves
+	check( ! nullSnap2.contains(nullSnap2) );
+
+	Range2d<float> worldRange2(worldRange);
+	SnappingRanges2d<float> worldSnap2; worldSnap2.setWorld();
+
+	check( ! nullSnap2.contains(worldRange2) );
+	check( ! nullSnap2.contains(worldSnap2) );
+	check( worldSnap2.contains(worldRange2) );
+	check( worldSnap2.contains(worldSnap2) );
+	check( ! worldSnap2.contains(nullRange1) );
+	check( ! worldSnap2.contains(nullSnap2) );
+
+	// TODO: test with finite ranges
+
+	SnappingRanges2d<float> finSnap1;
+	SnappingRanges2d<float> finSnap2;
+
+	check(!finSnap2.contains(finSnap1));
+	check(!finSnap1.contains(finSnap2));
+
+	finSnap1.add(Range2d<float>(0, 0, 10, 10));
+
+	check(!finSnap2.contains(finSnap1));
+	check(!finSnap1.contains(finSnap2));
+
+	finSnap2.add(Range2d<float>(90, 90, 180, 180));
+
+	check(!finSnap2.contains(finSnap1));
+	check(!finSnap1.contains(finSnap2));
+
+	finSnap1.add(Range2d<float>(30, 30, 80, 80));
+
+	check(!finSnap2.contains(finSnap1));
+	check(!finSnap1.contains(finSnap2));
+
+	finSnap2.add(Range2d<float>(2, 2, 8, 8));
+
+	check(!finSnap2.contains(finSnap1));
+	check(!finSnap1.contains(finSnap2));
+
+	finSnap1.add(Range2d<float>(85, 85, 185, 185));
+
+	check(!finSnap2.contains(finSnap1));
+	check(finSnap1.contains(finSnap2));
 }
 

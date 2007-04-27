@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.17 2007/04/23 10:19:47 strk Exp $
+// $Id: snappingrange.h,v 1.18 2007/04/27 12:13:37 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -338,7 +338,11 @@ public:
 	}
 
 	/// Returns true if any of the ranges contains the range
-	bool contains(RangeType r) const {
+	//
+	/// Note that a NULL range is not contained in any range and
+	/// a WORLD range is onluy contained in another WORLD range.
+	///
+	bool contains(const RangeType& r) const {
 	
 		finalize();
 	
@@ -347,6 +351,46 @@ public:
 			return true;
 			
 		return false;
+	
+	}
+
+	/// \brief
+	/// Returns true if all ranges in the given SnappingRanges2d 
+	/// are contained in at least one of the ranges composing this
+	/// one.
+	///
+	/// Note that a NULL range is not contained in any range and
+	/// a WORLD range is onluy contained in another WORLD range.
+	///
+	bool contains(const SnappingRanges2d<T>& o) const
+	{
+	
+		finalize();
+		// o.finalize(); // should I finalize the other range too ?
+
+		// Null range set doesn't contain and isn't contained by anything
+		if ( isNull() ) return false;
+		if ( o.isNull() ) return false;
+
+		// World range contains everything (except null ranges)
+		if ( isWorld() ) return true;
+
+		// This snappingrange is neither NULL nor WORLD
+		// The other can still be WORLD, but in that case the
+		// first iteration would return false
+		//
+		/// TODO: use a visitor !
+		///
+		for (unsigned rno=0, rcount=o.size(); rno<rcount; rno++) 
+		{
+			RangeType r = o.getRange(rno);
+			if ( ! contains(r) )
+			{
+				return false;
+			}
+		}
+			
+		return true;
 	
 	}
 	
