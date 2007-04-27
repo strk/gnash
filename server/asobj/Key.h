@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.15 2007/04/26 11:18:03 zoulunkai Exp $ */
+/* $Id: Key.h,v 1.16 2007/04/27 07:05:08 zoulunkai Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -96,7 +96,8 @@ class DSOEXPORT key_as_object : public as_object
 {
 
 private:
-	uint8_t	m_keymap[key::KEYCOUNT / 8 + 1];	// bit-array
+	/// bit-array for recording the unreleased keys
+	uint8_t	m_unreleased_keys[key::KEYCOUNT / 8 + 1];	
 	std::vector<boost::intrusive_ptr<as_object> >	m_listeners;
 	int	m_last_key_pressed;
 
@@ -109,7 +110,9 @@ public:
 	void set_key_down(int code);
 
 	void set_key_up(int code);
-
+	
+	/// responsible for user defined key events handlers only;
+	/// take over both characters and non-characters object.
 	void notify_listeners(const event_id key_event_type);
 
 	void add_listener(boost::intrusive_ptr<as_object> listener);

@@ -218,9 +218,12 @@ movie_root::notify_key_event(key::code k, bool down)
 	//
 	key_as_object * global_key = notify_global_key(k, down);
 
-	// Notify key listeners.
+	// Notify character key listeners.
 	notify_key_listeners(k, down);
-
+	
+	// Notify both character and non-character Key listeners
+	//	for user defined handerlers.
+	// FIXME: this may violates the event order
 	if(global_key)
 	{
 		if(down)
@@ -696,7 +699,7 @@ void movie_root::cleanup_key_listeners()
 		}
 	}
 
-#ifdef key_LISTENERS_DEBUG
+#ifdef KEY_LISTENERS_DEBUG
 	size_t currsize = m_key_listeners.size();
 	log_msg("Cleaned up %u listeners (from %u to %u)", prevsize-currsize, prevsize, currsize);
 #endif
@@ -717,7 +720,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 		{
 			if(down)
 			{
-				// key code for KEY_DOWN and KEY_UP should be invalid
+				// KEY_UP and KEY_DOWN events are unrelated to any key!
 				ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID)); 
 				ch->on_event(event_id(event_id::KEY_PRESS, k));
 			}

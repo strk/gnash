@@ -3578,9 +3578,9 @@ sprite_instance::checkForKeyOrMouseEvent(const std::string& name)
 	if ( _vm.getSWFVersion() < 7 ) cmp = strcasecmp;
 
 	const char* ptr = name.c_str();
-
+	
+	// AFAIK, there is no user defined "onKeyPress" event handler!
 	if ( ! cmp(ptr, "onKeyDown") 
-		|| ! cmp(ptr, "onKeypress") 
 		|| ! cmp(ptr, "onKeyUp"))
 	{
 		has_key_event();

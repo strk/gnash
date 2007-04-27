@@ -1,3 +1,14 @@
+2007-04-27 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/asobj/Key.{cpp,h}:
+	  cleanups; don't invoke user defined onKeyPress(), it's just a 
+	  normal function.
+	* server/movie_root.cpp.h, server/sprite_instance.cpp:
+		cleanups and add some comments. don't set m_has_key_event when there 
+		is a user defined onKeyPress() function.
+	* testsuite/misc-ming.all/key_event_testrunner.cpp:	  
+		more tests.
+	  
 2007-04-26  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* Makefile.am: Add po to EXTRA_DIST.

@@ -94,28 +94,28 @@ key_as_object::key_as_object()
 	:
 	m_last_key_pressed(0)
 {
-    memset(m_keymap, 0, sizeof(m_keymap));
+    memset(m_unreleased_keys, 0, sizeof(m_unreleased_keys));
 }
 
 bool
 key_as_object::is_key_down(int code)
 {
-	    if (code < 0 || code >= key::KEYCOUNT) return false;
+	if (code < 0 || code >= key::KEYCOUNT) return false;
 
-	    int	byte_index = code >> 3;
-	    int	bit_index = code - (byte_index << 3);
-	    int	mask = 1 << bit_index;
+	int	byte_index = code >> 3;
+	int	bit_index = code - (byte_index << 3);
+	int	mask = 1 << bit_index;
 
-	    assert(byte_index >= 0 && byte_index < int(sizeof(m_keymap)/sizeof(m_keymap[0])));
+	assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
 
-	    if (m_keymap[byte_index] & mask)
-		{
-		    return true;
-		}
-	    else
-		{
-		    return false;
-		}
+	if (m_unreleased_keys[byte_index] & mask)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void
@@ -129,9 +129,9 @@ key_as_object::set_key_down(int code)
 	int	bit_index = code - (byte_index << 3);
 	int	mask = 1 << bit_index;
 
-	assert(byte_index >= 0 && byte_index < int(sizeof(m_keymap)/sizeof(m_keymap[0])));
+	assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
 
-	m_keymap[byte_index] |= mask;
+	m_unreleased_keys[byte_index] |= mask;
 }
 
 void
@@ -143,9 +143,9 @@ key_as_object::set_key_up(int code)
     int	bit_index = code - (byte_index << 3);
     int	mask = 1 << bit_index;
 
-    assert(byte_index >= 0 && byte_index < int(sizeof(m_keymap)/sizeof(m_keymap[0])));
+    assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
 
-    m_keymap[byte_index] &= ~mask;
+    m_unreleased_keys[byte_index] &= ~mask;
 }
 
 void 
@@ -153,6 +153,10 @@ key_as_object::notify_listeners(const event_id key_event_type)
 {
 	
 	std::string funcname = key_event_type.get_function_name();
+	// There is no user defined "onKeyPress" event handler
+	if( ( funcname != "onKeyDown") && (funcname != "onKeyUp") )
+		return;
+
 	VM& vm = VM::get();
 	if ( vm.getSWFVersion() < 7 )
 	{
@@ -236,7 +240,8 @@ key_add_listener(const fn_call& fn)
 }
 
 as_value	key_get_ascii(const fn_call& fn)
-    // Return the ascii value of the last key pressed.
+// Return the ascii value of the last key pressed.
+/// FIXME: return the ascii number(not string) of the last pressed key!
 {
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 

@@ -69,7 +69,7 @@ main(int /*argc*/, char** /*argv*/)
   check(root->get_member("x2", &tmp));
   check_equals(tmp.to_number(), key::A);
 
-  // check that user defined onKeyUp/KeyDown are not triggered
+  // check that user defined onKeyUp/KeyDown were not triggered
   check(root->get_member("x4", &tmp));
   check_equals(tmp.to_number(), 0);
   check(root->get_member("x5", &tmp));
@@ -83,7 +83,7 @@ main(int /*argc*/, char** /*argv*/)
   check_equals(root->get_current_frame(), 30); // the 31th frame
   check_equals(root->get_play_state(), sprite_instance::STOP);
 
-  // press key 'B' and checks
+  // press key 'C' and checks
   tester.pressKey(key::C);
   tester.releaseKey(key::C);
 
@@ -98,4 +98,14 @@ main(int /*argc*/, char** /*argv*/)
   check_equals(tmp.to_string(), "C");
   check(root->get_member("x5", &tmp));
   check_equals(tmp.to_number(), key::C);
+  	
+  // check that user onClipKeyPress and user defined onKeyPress were not triggered
+  // onClipKeyPress was not triggered because the event handler binds a invalid key code
+  check(root->get_member("x3", &tmp));
+  check_equals(tmp.to_number(), 0);
+  // onKeyPress was not triggered because I think there is no user defined
+  // KeyPress event handler at all( the defined onKeyPress is just a normal function).
+  check(root->get_member("x6", &tmp));
+  check_equals(tmp.to_number(), 0);
+  
 }
