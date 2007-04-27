@@ -1,5 +1,14 @@
 2007-04-27 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.{cpp,h}: add a static doubleToString(double) function
+	  moved here from a static in Number.cpp, given its good quality.
+	* server/asobj/Number.cpp: use as_value::doubleToString() for
+	  returning text value. Drop the string representation cache, no
+	  more needed.
+	* testsuite/swfdec/PASSING: double.swf now succeeds
+
+2007-04-27 Sandro Santilli <strk@keybit.net>
+
 	* libbase/triangulate_impl.h: include config.h.
 	* libbase/network.{cpp,h}: (writeNet): take a const string ref, not a
 	  copy.

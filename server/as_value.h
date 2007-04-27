@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.50 2007/04/26 10:17:56 strk Exp $ */
+/* $Id: as_value.h,v 1.51 2007/04/27 08:46:46 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -185,6 +185,7 @@ public:
 	{
 	}
 
+	/// Construct a NUMBER value
 	as_value(long val)
 		:
 		m_type(NUMBER),
@@ -192,6 +193,7 @@ public:
 	{
 	}
 	
+	/// Construct a NUMBER value
 	as_value(unsigned long val)
 		:
 		m_type(NUMBER),
@@ -216,12 +218,19 @@ public:
 		set_as_object(obj);
 	}
 
+	/// Construct an NULL, MOVIECLIP, AS_FUNCTION or OBJECT value
 	as_value(boost::intrusive_ptr<as_object> obj);
 
 	/// Construct a NULL or AS_FUNCTION value
 	as_value(as_function* func);
 
 	~as_value() { drop_refs(); }
+
+	/// Convert numeric value to string value, following ECMA-262 specification
+	//
+	/// TODO: move here some of the good comments found in the function definition.
+	///
+	static std::string doubleToString(double val);
 
 	/// Drop any ref counts we have.
 	//
