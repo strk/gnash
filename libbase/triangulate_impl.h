@@ -24,7 +24,11 @@
 // code, see the FIST web page at:
 // http://www.cosy.sbg.ac.at/~held/projects/triang/triang.html
 
-/* $Id: triangulate_impl.h,v 1.22 2007/04/11 17:54:21 bjacques Exp $ */
+/* $Id: triangulate_impl.h,v 1.23 2007/04/27 07:51:33 strk Exp $ */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "utility.h"
 #include "triangulate.h"

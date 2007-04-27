@@ -1,5 +1,6 @@
 2007-04-27 Sandro Santilli <strk@keybit.net>
 
+	* libbase/triangulate_impl.h: include config.h.
 	* libbase/network.{cpp,h}: (writeNet): take a const string ref, not a
 	  copy.
 	* cygnal/: http.cpp, netstats.cpp, statistics.cpp, stream.cpp:
