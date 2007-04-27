@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.87 2007/04/13 09:15:54 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.88 2007/04/27 21:30:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1177,7 +1177,7 @@ GtkGui::key_press_event(GtkWidget *const /*widget*/,
                 GdkEventKey *const event,
                 const gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
     Gui* gui = static_cast<Gui*>(data);
 
@@ -1198,7 +1198,7 @@ GtkGui::key_release_event(GtkWidget *const /*widget*/,
                 GdkEventKey *const event,
                 const gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
     Gui* gui = static_cast<Gui*>(data);
 
@@ -1219,7 +1219,7 @@ GtkGui::button_press_event(GtkWidget *const /*widget*/,
                            GdkEventButton *const event,
                            const gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     Gui *obj = static_cast<Gui *>(data);
 
     int	mask = 1 << (event->button - 1);
@@ -1232,7 +1232,7 @@ GtkGui::button_release_event(GtkWidget * const /*widget*/,
                              GdkEventButton * const event,
                              const gpointer data)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     Gui *obj = static_cast<Gui *>(data);
 
     int	mask = 1 << (event->button - 1);
