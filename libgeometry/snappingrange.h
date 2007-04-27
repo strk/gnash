@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.18 2007/04/27 12:13:37 strk Exp $
+// $Id: snappingrange.h,v 1.19 2007/04/27 12:42:31 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -73,7 +73,7 @@ public:
 	typedef typename RangeList::size_type size_type;	
 
 	template <typename U>
-	friend std::ostream& operator<< (std::ostream& os, SnappingRanges2d<U>& r);
+	friend std::ostream& operator<< (std::ostream& os, const SnappingRanges2d<U>& r);
 	
 	/// distance (horizontally *plus* vertically) below ranges are snapped
 	/// You should initialize this when single_mode=false! 
@@ -461,7 +461,7 @@ private:
 }; //class SnappingRanges2d
 
 template <class T>
-std::ostream& operator<< (std::ostream& os, SnappingRanges2d<T>& r)
+std::ostream& operator<< (std::ostream& os, const SnappingRanges2d<T>& r)
 {
 	if ( r.isNull() ) return os << "NULL";
 	if ( r.isWorld() ) return os << "WORLD";
