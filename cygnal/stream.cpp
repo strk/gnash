@@ -153,10 +153,12 @@ Stream::open(const char *filespec) {
 }
 
 bool
-Stream::open(const char *filespec, int netfd) {
+Stream::open(const char *filespec, int /*netfd*/)
+{
     GNASH_REPORT_FUNCTION;
 
-    struct stat stats;
+    //struct stat stats;
+    // TODO: should we use the 'netfd' passed as parameter instead ?
     return open(filespec, _netfd, _statistics);
 }
 
@@ -255,7 +257,7 @@ Stream::play(int netfd) {
         }
     }
 
-    int blocksize = 8192;
+    //int blocksize = 8192;
     int nbytes = 0;
     Network net;
 //    while ((_seekptr - _dataptr) >= 0) {
@@ -277,7 +279,7 @@ Stream::play(int netfd) {
 
 // Stream a preview, instead of the full movie.
 bool
-Stream::preview(const char *filespec, int frames) {
+Stream::preview(const char* /*filespec*/, int /*frames*/) {
     GNASH_REPORT_FUNCTION;
 
     _state = PREVIEW;
@@ -286,7 +288,7 @@ Stream::preview(const char *filespec, int frames) {
 
 // Stream a series of thumbnails
 bool
-Stream::thumbnail(const char *filespec, int quantity) {
+Stream::thumbnail(const char* /*filespec*/, int /*quantity*/) {
     GNASH_REPORT_FUNCTION;
     
     _state = THUMBNAIL;
@@ -295,7 +297,7 @@ Stream::thumbnail(const char *filespec, int quantity) {
 
 // Pause the stream
 bool
-Stream::pause(int frame) {
+Stream::pause(int /*frame*/) {
     GNASH_REPORT_FUNCTION;
     
     _state = PAUSE;
@@ -304,7 +306,7 @@ Stream::pause(int frame) {
 
 // Seek within the stream
 bool
-Stream::seek(int frame) {
+Stream::seek(int /*frame*/) {
     GNASH_REPORT_FUNCTION;
     
     _state = SEEK;
@@ -313,7 +315,7 @@ Stream::seek(int frame) {
 
 // Upload a stream into a sandbox
 bool
-Stream::upload(const char *filespec) {
+Stream::upload(const char* /*filespec*/) {
     GNASH_REPORT_FUNCTION;
     
     _state = UPLOAD;
@@ -321,7 +323,7 @@ Stream::upload(const char *filespec) {
 }
 
 // Stream a single "real-time" source.
-bool Stream::multicast(const char *filespec) {
+bool Stream::multicast(const char* /*filespec*/) {
     GNASH_REPORT_FUNCTION;
     
     _state = MULTICAST;

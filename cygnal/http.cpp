@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: http.cpp,v 1.6 2007/04/10 21:10:56 nihilus Exp $ */
+/* $Id: http.cpp,v 1.7 2007/04/27 07:49:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -57,17 +57,19 @@ HTTP::~HTTP()
 }
 
 HTTP &
-HTTP::operator = (HTTP &obj)
+HTTP::operator = (HTTP& /*obj*/)
 {
     GNASH_REPORT_FUNCTION;
 //    this = obj;
+    // TODO: FIXME !
+    return *this; 
 }
 
 string
-HTTP::waitForGetRequest(Network &net)
+HTTP::waitForGetRequest(Network& /*net*/)
 {
     GNASH_REPORT_FUNCTION;
-    
+    return ""; // TODO: FIXME !
 }
 
 string
@@ -126,10 +128,13 @@ HTTP::sendGetReply(int filesize)
     char *length = strstr(reply, " XX");
     sprintf(length, " %d", filesize);
     
-    if (writeNet(reply, strlen(reply)) == strlen(reply)) {
+    int ret = writeNet(reply, strlen(reply));
+
+    if (ret >= 0 && (unsigned)ret == strlen(reply)) {
         dbglogfile << "Sent GET Reply: " << reply << endl;
     } else {
-        dbglogfile << "Couldn't send GET Reply" << endl;
+        dbglogfile << "Couldn't send GET Reply, writeNet returned " << ret << endl;
+	// TODO: FIXME: shouldn't we return false here ?
     }
     return true; // Default to true
 }

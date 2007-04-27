@@ -80,7 +80,7 @@ Statistics::~Statistics() {
 
 float
 Statistics::getFPS() {
-    
+	return 0.0; // TODO: FIXME !
 }
 
 int

@@ -1,3 +1,10 @@
+2007-04-27 Sandro Santilli <strk@keybit.net>
+
+	* libbase/network.{cpp,h}: (writeNet): take a const string ref, not a
+	  copy.
+	* cygnal/: http.cpp, netstats.cpp, statistics.cpp, stream.cpp:
+	  Hush compiler.
+
 2007-04-27 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/asobj/Key.{cpp,h}:

@@ -82,7 +82,7 @@ public:
     int readNet(int fd, char *buffer, int nbytes, int timeout);
     
     // Write to the connection
-    int writeNet(std::string buffer);
+    int writeNet(const std::string& buffer);
     int writeNet(char const *buffer);
     int writeNet(char const *buffer, int nbytes);
     int writeNet(const unsigned char *buffer, int nbytes);

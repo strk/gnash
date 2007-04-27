@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: netstats.cpp,v 1.3 2007/04/10 18:18:45 rsavoye Exp $ */
+/* $Id: netstats.cpp,v 1.4 2007/04/27 07:49:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -61,6 +61,7 @@ NetStats::operator = (NetStats &stats) {
     _bytes = stats.getBytes();
     _codec = stats.getCodec();
     _type = stats.getFileType();
+    return *this;
 }
 
 } // end of cygnal namespace

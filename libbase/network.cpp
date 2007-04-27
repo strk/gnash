@@ -620,7 +620,7 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
 
 // Write to the connection
 int
-Network::writeNet(std::string buffer)
+Network::writeNet(const std::string& buffer)
 {
     return writeNet(buffer.c_str(), buffer.size());
 }
