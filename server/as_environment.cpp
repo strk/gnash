@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.74 2007/04/26 17:06:10 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.75 2007/04/27 16:09:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,7 +45,7 @@ namespace gnash {
 // Return the value of the given var, if it's defined.
 as_value
 as_environment::get_variable(const std::string& varname,
-		const ScopeStack& with_stack, as_object** retTarget) const
+		const ScopeStack& scopeStack, as_object** retTarget) const
 {
     // Path lookup rigamarole.
     std::string	path;
@@ -53,11 +53,11 @@ as_environment::get_variable(const std::string& varname,
     //log_msg(_("get_variable(%s)"), varname.c_str());
     bool is_slash_based;
     if (parse_path(varname, path, var, &is_slash_based)) {
-	//as_value target_val = get_variable_raw(path, with_stack);
+	//as_value target_val = get_variable_raw(path, scopeStack);
         //as_object* target = target_val.to_object();
 	// TODO: let find_target return generic as_objects, or use 'with' stack,
 	//       see player2.swf or bug #18758 (strip.swf)
-	// @@ TODO: should we use with_stack here too ?
+	// @@ TODO: should we use scopeStack here too ?
         as_object* target = is_slash_based ? find_object_slashsyntax(path) : find_object_dotsyntax(path); 
 
 	if (target) {
@@ -76,31 +76,31 @@ as_environment::get_variable(const std::string& varname,
 			    );
 	    );
 
-	    as_value tmp = get_variable_raw(path, with_stack, retTarget);
+	    as_value tmp = get_variable_raw(path, scopeStack, retTarget);
 	    if ( ! tmp.is_undefined() )
 	    {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(_("...but get_variable_raw(%s, <with_stack>) succeeded!"), path.c_str());
+		    log_aserror(_("...but get_variable_raw(%s, <scopeStack>) succeeded!"), path.c_str());
 	    )
 	    }
 	    return as_value();
 	}
     } else {
-	return get_variable_raw(varname, with_stack, retTarget);
+	return get_variable_raw(varname, scopeStack, retTarget);
     }
 }
 
 as_value
 as_environment::get_variable(const std::string& varname) const
 {
-	static ScopeStack empty_with_stack;
-	return get_variable(varname, empty_with_stack);
+	static ScopeStack empty_scopeStack;
+	return get_variable(varname, empty_scopeStack);
 }
 
 as_value
 as_environment::get_variable_raw(
     const std::string& varname,
-    const ScopeStack& with_stack, as_object** retTarget) const
+    const ScopeStack& scopeStack, as_object** retTarget) const
     // varname must be a plain variable name; no path parsing.
 {
     assert(strchr(varname.c_str(), ':') == NULL);
@@ -108,9 +108,9 @@ as_environment::get_variable_raw(
     as_value	val;
 
     // Check the with-stack.
-    for (size_t i = with_stack.size(); i > 0; --i) {
+    for (size_t i = scopeStack.size(); i > 0; --i) {
         // const_cast needed due to non-const as_object::get_member 
-	as_object* obj = const_cast<as_object*>(with_stack[i-1].object());
+	as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
 	if (obj && obj->get_member(varname.c_str(), &val)) {
 	    // Found the var in this context.
 	    if ( retTarget ) *retTarget = obj;
@@ -174,7 +174,7 @@ as_environment::get_variable_raw(
 bool
 as_environment::del_variable_raw(
     const std::string& varname,
-    const ScopeStack& with_stack) 
+    const ScopeStack& scopeStack) 
     // varname must be a plain variable name; no path parsing.
 {
 	assert(strchr(varname.c_str(), ':') == NULL);
@@ -184,10 +184,10 @@ as_environment::del_variable_raw(
 	as_value	val;
 
 	// Check the with-stack.
-	for (size_t i = with_stack.size(); i > 0; --i)
+	for (size_t i = scopeStack.size(); i > 0; --i)
 	{
 		// const_cast needed due to non-const as_object::get_member 
-		as_object* obj = const_cast<as_object*>(with_stack[i-1].object());
+		as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
 		if (obj)
 		{
 			std::pair<bool,bool> ret = obj->delProperty(varname);
@@ -221,8 +221,8 @@ as_environment::del_variable_raw(
 as_value
 as_environment::get_variable_raw(const std::string& varname) const
 {
-	static ScopeStack empty_with_stack;
-	return get_variable_raw(varname, empty_with_stack);
+	static ScopeStack empty_scopeStack;
+	return get_variable_raw(varname, empty_scopeStack);
 }
 
 // Given a path to variable, set its value.
@@ -230,7 +230,7 @@ void
 as_environment::set_variable(
     const std::string& varname,
     const as_value& val,
-    const ScopeStack& with_stack)
+    const ScopeStack& scopeStack)
 {
 	IF_VERBOSE_ACTION (
     log_action("-------------- %s = %s",
@@ -259,7 +259,7 @@ as_environment::set_variable(
 		);
 	}
     } else {
-	set_variable_raw(varname, val, with_stack);
+	set_variable_raw(varname, val, scopeStack);
     }
 }
 
@@ -268,8 +268,8 @@ as_environment::set_variable(
 		const std::string& varname,
 		const as_value& val)
 {
-	static ScopeStack empty_with_stack;
-	set_variable(varname, val, empty_with_stack);
+	static ScopeStack empty_scopeStack;
+	set_variable(varname, val, empty_scopeStack);
 }
 
 // No path rigamarole.
@@ -277,7 +277,7 @@ void
 as_environment::set_variable_raw(
     const std::string& varname,
     const as_value& val,
-    const ScopeStack& with_stack)
+    const ScopeStack& scopeStack)
 {
 
 	// Check locals for setting them
@@ -287,10 +287,10 @@ as_environment::set_variable_raw(
 	}
 
 	// Check the with-stack.
-	for (size_t i = with_stack.size(); i > 0; --i)
+	for (size_t i = scopeStack.size(); i > 0; --i)
 	{
 		// const_cast needed due to non-const as_object::get_member 
-		as_object* obj = const_cast<as_object*>(with_stack[i-1].object());
+		as_object* obj = const_cast<as_object*>(scopeStack[i-1].get());
 		as_value	dummy;
 		if (obj && obj->get_member(varname.c_str(), &dummy)) {
 		    // This object has the member; so set it here.
@@ -308,8 +308,8 @@ as_environment::set_variable_raw(
 		const std::string& varname,
 		const as_value& val)
 {
-	static ScopeStack empty_with_stack;
-	set_variable_raw(varname, val, empty_with_stack);
+	static ScopeStack empty_scopeStack;
+	set_variable_raw(varname, val, empty_scopeStack);
 }
 
 // Set/initialize the value of the local variable.

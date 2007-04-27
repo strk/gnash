@@ -43,12 +43,29 @@ class ActionExec {
 
 private: 
 
+	/// Returns 'with' stack associated with this execution thread
+	// 
+	/// If you need to modify it, use the pushWithEntry() function.
+	///
+	/// TODO: deprecate this
+	///
+	const std::vector<with_stack_entry>& getWithStack() const
+	{
+		return with_stack;
+	}
+
+
 	/// Run after a complete run, or after an run interrupted by 
 	/// a bail-out exception (ActionLimitException, for example)
 	void cleanupAfterRun();
 
 	/// the 'with' stack associated with this execution thread
 	std::vector<with_stack_entry> with_stack;
+
+	typedef as_environment::ScopeStack ScopeStack;
+
+	/// the scope stack associated with this execution thread
+	ScopeStack _scopeStack;
 
 	/// Limit of with stack
 	//
@@ -178,13 +195,13 @@ public:
 	/// Get the current 'this' pointer, for use in function calls
 	as_object* getThisPointer() { return _function_var ? _this_ptr.get() : getTarget(); }
 
-	/// Returns 'with' stack associated with this execution thread
-	// 
-	/// If you need to modify it, use the pushWithEntry() function.
+	/// Returns the scope stack associated with this execution thread
+	//
+	/// TODO: return by const ref instead
 	///
-	const std::vector<with_stack_entry>& getWithStack() const
+	const ScopeStack& getScopeStack() const
 	{
-		return with_stack;
+		return _scopeStack;
 	}
 
 	/// Return the maximum allowed 'with' stack limit.

@@ -45,13 +45,13 @@ swf_function::~swf_function()
 
 swf_function::swf_function(const action_buffer* ab,
 			as_environment* env,
-			size_t start, const std::vector<with_stack_entry>& with_stack)
+			size_t start, const ScopeStack& scopeStack)
 	:
 	as_function(NULL),
 	//ctor(0),
 	m_action_buffer(ab),
 	m_env(env),
-	m_with_stack(with_stack),
+	_scopeStack(scopeStack),
 	m_start_pc(start),
 	m_length(0),
 	m_is_function2(false),
@@ -169,6 +169,7 @@ swf_function::operator()(const fn_call& fn)
 {
 
 	as_environment*	our_env = m_env;
+	assert(our_env);
 	if (our_env == NULL)
 	{
 		our_env = &fn.env();

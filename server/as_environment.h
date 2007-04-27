@@ -34,7 +34,7 @@ namespace gnash {
 
 // Forward declarations
 class character;
-class with_stack_entry;
+//class with_stack_entry;
 
 /// ActionScript execution environment.
 class as_environment
@@ -42,31 +42,11 @@ class as_environment
 public:
 
 	/// A stack of objects used for variables/members lookup
-	typedef std::vector<with_stack_entry> ScopeStack;
+	//typedef std::vector<with_stack_entry> ScopeStack;
+	typedef std::vector< boost::intrusive_ptr<as_object> > ScopeStack;
 
 	/// Stack of as_values in this environment
 	std::vector<as_value>	m_stack;
-
-#if 0
-	/// For local vars.  Use empty names to separate frames.
-	class frame_slot
-	{
-	public:
-		std::string	m_name;
-		as_value	m_value;
-
-		frame_slot()
-		{
-		}
-
-		frame_slot(const std::string& name, const as_value& val)
-			:
-			m_name(name),
-			m_value(val)
-		{
-		}
-	};
-#endif
 
 	as_environment()
 		:
@@ -160,11 +140,11 @@ public:
 	///	Variable name. Can not contain path elements.
 	///	TODO: should be case-insensitive up to SWF6.
 	///
-	/// @param with_stack
+	/// @param scopeStack
 	///	The Scope stack to use for lookups.
 	///
 	bool del_variable_raw(const std::string& varname,
-			const ScopeStack& with_stack);
+			const ScopeStack& scopeStack);
 
 	/// Return the (possibly UNDEFINED) value of the named var.
 	//
@@ -172,7 +152,7 @@ public:
 	///	Variable name. Can contain path elements.
 	///	TODO: should be case-insensitive up to SWF6.
 	///
-	/// @param with_stack
+	/// @param scopeStack
 	///	The Scope stack to use for lookups.
 	///
 	/// @param retTarget
@@ -180,7 +160,7 @@ public:
 	///	found variable (if found).
 	///
 	as_value get_variable(const std::string& varname,
-		const ScopeStack& with_stack, as_object** retTarget=NULL) const;
+		const ScopeStack& scopeStack, as_object** retTarget=NULL) const;
 
 	/// \brief
 	/// Given a path to variable, set its value.
@@ -227,11 +207,11 @@ public:
 	/// @param val
 	///	The value to assign to the variable.
 	///
-	/// @param with_stack
+	/// @param scopeStack
 	///	The Scope stack to use for lookups.
 	///
 	void set_variable(const std::string& path, const as_value& val,
-		const ScopeStack& with_stack);
+		const ScopeStack& scopeStack);
 
 	/// Set/initialize the value of the local variable.
 	//
@@ -474,6 +454,14 @@ public:
 		_localFrames.pop_back();
 	}
 
+	/// Get top element of the call stack
+	//
+	CallFrame& topCallFrame()
+	{
+		assert(_localFrames.size());
+		return _localFrames.back();
+	}
+
 	/// Return the depth of call stack
 	size_t callStackDepth()
 	{
@@ -513,7 +501,7 @@ private:
 
 	/// Given a variable name, set its value (no support for path)
 	void set_variable_raw(const std::string& path, const as_value& val,
-		const ScopeStack& with_stack);
+		const ScopeStack& scopeStack);
 
 	/// Same of the above, but no support for path.
 	///
@@ -522,7 +510,7 @@ private:
 	///	found variable (if found).
 	///
 	as_value get_variable_raw(const std::string& varname,
-		const ScopeStack& with_stack, as_object** retTarget=NULL) const;
+		const ScopeStack& scopeStack, as_object** retTarget=NULL) const;
 
 
 	/// \brief

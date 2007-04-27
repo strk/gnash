@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.101 2007/04/26 17:06:10 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.102 2007/04/27 16:09:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3263,7 +3263,7 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	// contains name and args, while next tag is first tag
 	// of the function body.
 	swf_function* func = new swf_function(
-		&code, &env, thread.next_pc, thread.getWithStack());
+		&code, &env, thread.next_pc, thread.getScopeStack());
 
 	func->set_is_function2();
 
@@ -3384,12 +3384,6 @@ SWFHandlers::ActionWith(ActionExec& thread)
 	thread.ensureStack(1);  // the object
 	boost::intrusive_ptr<as_object> with_obj = env.pop().to_object();
 
-	const vector<with_stack_entry>& with_stack = thread.getWithStack();
-	IF_VERBOSE_ACTION (
-	log_action(_("-------------- with block start: stack size is " SIZET_FMT),
-		   with_stack.size());
-	);
-
 	++pc; // skip tag code
 
 	int tag_length = code.read_int16(pc); // read tag len (should be 2)
@@ -3421,11 +3415,6 @@ SWFHandlers::ActionWith(ActionExec& thread)
 	if ( ! thread.pushWithEntry(with_stack_entry(with_obj, block_end)) )
 	{
 		// skip the full block
-		// FIXME, is this a log_aserror?
-		log_error(_("With-block skipped"
-			" (with stack size exceeds limit of "
-			SIZET_FMT " elements)"),
-			thread.getWithStackLimit());
 		thread.next_pc += block_length;
 	}
 
@@ -3449,7 +3438,7 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 	// contains name and args, while next tag is first tag
 	// of the function body.
 	swf_function* func = new swf_function(
-		&code, &env, thread.next_pc, thread.getWithStack());
+		&code, &env, thread.next_pc, thread.getScopeStack());
 
 	size_t i = thread.pc + 3;
 

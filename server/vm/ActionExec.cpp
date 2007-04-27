@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.31 2007/04/26 17:06:10 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.32 2007/04/27 16:09:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -73,7 +73,8 @@ void	register_fscommand_callback(fscommand_callback handler)
 
 ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_value* nRetVal, as_object* this_ptr)
 	:
-	with_stack(func.getWithStack()),
+	with_stack(),
+	_scopeStack(func.getScopeStack()),
 	// See comment in header
 	_with_stack_limit(7),
 	_function_var(func.isFunction2() ? 2 : 1),
@@ -92,11 +93,23 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 	if ( env.get_version() > 5 ) {
 	    _with_stack_limit = 15;
 	}
+
+	// SWF version 6 and higher pushes the activation object to the scope stack
+	if ( env.get_version() > 5 )
+	{
+		// We assume that the swf_function () operator already initialized its environment
+		// so that it's activation object is now in the top element of the CallFrame stack
+		//
+		as_environment::CallFrame& topFrame = newEnv.topCallFrame();
+		assert(topFrame.func == &func);
+		_scopeStack.push_back(topFrame.locals);
+	}
 }
 
 ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
 	:
 	with_stack(),
+	_scopeStack(), // TODO: initialize the scope stack somehow
 	_with_stack_limit(7),
 	_function_var(0),
 	_func(NULL),
@@ -152,7 +165,9 @@ ActionExec::operator() ()
 	    // Cleanup any expired "with" blocks.
 	    while ( ! with_stack.empty() && pc >= with_stack.back().end_pc() ) {
 		// Drop last stack element
+		assert(with_stack.back().object() == _scopeStack.back().get());
 		with_stack.pop_back();
+		_scopeStack.pop_back(); // hopefully nothing gets after the 'with' stack.
 	    }
 
 	// Get the opcode.
@@ -315,18 +330,21 @@ bool
 ActionExec::pushWithEntry(const with_stack_entry& entry)
 {
 	// See comment in header about _with_stack_limit
-	IF_VERBOSE_ASCODING_ERRORS (
-	if (with_stack.size() >= _with_stack_limit) {
+	if (with_stack.size() >= _with_stack_limit)
+	{
+	    IF_VERBOSE_ASCODING_ERRORS (
 	    log_aserror(_("'With' stack depth (" SIZET_FMT ") "
 			"exceeds the allowed limit for current SWF "
 			"target version (" SIZET_FMT " for version %d)."
 			" Don't expect this movie to work with all players."),
 			with_stack.size()+1, _with_stack_limit,
 			env.get_version());
+	    );
+	    return false;
 	}
-	);
 	
 	with_stack.push_back(entry);
+	_scopeStack.push_back(const_cast<as_object*>(entry.object()));
 	return true;
 }
 
@@ -339,7 +357,7 @@ ActionExec::delVariable(const std::string& name)
 	    boost::to_lower(namei, vm.getLocale());
 	}
 	
-	return env.del_variable_raw(namei, with_stack);
+	return env.del_variable_raw(namei, getScopeStack());
 }
 
 bool
@@ -366,7 +384,7 @@ ActionExec::setVariable(const std::string& name, const as_value& val)
 	    boost::to_lower(namei, vm.getLocale());
 	}
 	
-	return env.set_variable(namei, val, getWithStack());
+	return env.set_variable(namei, val, getScopeStack());
 }
 
 as_value
@@ -379,7 +397,7 @@ ActionExec::getVariable(const std::string& name)
 	    boost::to_lower(namei, vm.getLocale());
 	}
 	
-	return env.get_variable(namei, getWithStack());
+	return env.get_variable(namei, getScopeStack());
 }
 
 as_value
@@ -392,7 +410,7 @@ ActionExec::getVariable(const std::string& name, as_object** target)
 	    boost::to_lower(namei, vm.getLocale());
 	}
 	
-	return env.get_variable(namei, getWithStack(), target);
+	return env.get_variable(namei, getScopeStack(), target);
 }
 
 void

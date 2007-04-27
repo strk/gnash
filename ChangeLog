@@ -1,5 +1,21 @@
 2007-04-27 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.{cpp,h}: changed the ScopeChain
+	  typedef to be just a vector of as_objects.
+	* server/swf_function.{cpp,h}: take a vector of as_objects
+	  as ScopeChain, rather then with_entry vector...
+	* server/vm/ActionExec.{cpp,h}: only expose the ScopeChain,
+	  not the 'with' stack. When constructed for a function, push
+	  the function's activation object to the ScopeChain.
+	* server/vm/ASHandlers.cpp: update calls to ActionExec and
+	  swf_function when it comes to setting the ScopeChain.
+	* testsuite/actionscript.all/Function.as: the scope chain test kai
+	  added now succeeds.
+	* testsuite/swfdec/PASSING: function-scope-6.swf and function-scope-7.swf
+	  now succeed.
+
+2007-04-27 Sandro Santilli <strk@keybit.net>
+
 	* libgeometry/snappingrange.h: add contains(SnappingRange2d) method;
 	  fixed contains(Range2d) to take a const ref rather then a value.
 	* testsuite/libgeometry/snappingrangetest.cpp: add tests for

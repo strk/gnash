@@ -23,7 +23,8 @@
 
 #include "impl.h"
 #include "as_function.h" // for inheritance
-#include "with_stack_entry.h" // for composition (vector element)
+#include "as_object.h" // for composition (vector element)
+//#include "with_stack_entry.h" // for composition (vector element)
 
 #include <cassert>
 #include <string>
@@ -49,8 +50,10 @@ private:
 	/// @@ might need some kind of ref count here, but beware cycles
 	as_environment*	m_env;
 
-	/// initial with-stack on function entry.
-	std::vector<with_stack_entry>	m_with_stack;
+	typedef std::vector< boost::intrusive_ptr<as_object> > ScopeStack;
+
+	/// Scope stack on function definition.
+	ScopeStack _scopeStack;
 
 	/// \brief
 	/// Offset within the action_buffer where
@@ -175,11 +178,11 @@ public:
 	swf_function(const action_buffer* ab,
 		as_environment* env,
 		size_t start,
-		const std::vector<with_stack_entry>& with_stack);
+		const ScopeStack& with_stack);
 
-	const std::vector<with_stack_entry>& getWithStack() const
+	const ScopeStack& getScopeStack() const
 	{
-		return m_with_stack;
+		return _scopeStack;
 	}
 
 	const action_buffer& getActionBuffer() const

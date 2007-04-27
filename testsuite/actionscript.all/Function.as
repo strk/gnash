@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.46 2007/04/26 20:47:33 strk Exp $";
+rcsid="$Id: Function.as,v 1.47 2007/04/27 16:09:01 strk Exp $";
 
 #include "check.as"
 
@@ -309,7 +309,7 @@ result2 = inner_func("a");  // should return "hello"
   check_equals ( result1, "hello" );
 
   // Gnash fails here, we want this fixed!
-  xcheck_equals ( result2, "hello" );
+  check_equals ( result2, "hello" );
 
 #else // SWF5 or lower seems unable to work with nested functions
 
