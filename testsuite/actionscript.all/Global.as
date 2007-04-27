@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.23 2007/04/19 10:27:09 strk Exp $";
+rcsid="$Id: Global.as,v 1.24 2007/04/27 16:43:09 strk Exp $";
 
 #include "check.as"
 
@@ -35,6 +35,7 @@ check_equals(typeof(this.__proto__._global), 'undefined');
 
 // odd stuff.. not every value of type 'object' is an instance of Object :!!
 check_equals(typeof(_global), 'object');
+check_equals(typeof(_global._global), 'undefined');
 xcheck( ! _global instanceof Object );
 xcheck_equals( typeof(_global.__proto__), 'undefined' );
 xcheck_equals(typeof(_global.toString), 'undefined');

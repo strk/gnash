@@ -1,5 +1,10 @@
 2007-04-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Global.as: check that _global._global
+	  is undefined.
+
+2007-04-27 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.{cpp,h}: changed the ScopeChain
 	  typedef to be just a vector of as_objects.
 	* server/swf_function.{cpp,h}: take a vector of as_objects
