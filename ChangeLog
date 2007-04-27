@@ -1,5 +1,12 @@
 2007-04-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/swfdec_gnash_tester: use the .trace.org files when
+	  avaiable, as in that case it means that the .trace are just swfdec
+	  results (Ben is cheating !)
+	* testsuite/swfdec/PASSING: double.swf fails again.
+
+2007-04-27 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.{cpp,h}: add a static doubleToString(double) function
 	  moved here from a static in Number.cpp, given its good quality.
 	* server/asobj/Number.cpp: use as_value::doubleToString() for

@@ -12,13 +12,23 @@ echo "Using gprocessor ${GPROCESSOR}"
 
 in="$1"
 out=`basename "${in}"`.trace-gnash
+use_orig=0
 exp="${in}.trace"
+if [ -e "${in}.trace.org" ]; then
+	exp="${in}.trace.org"
+	use_orig=1
+fi
 
 ${GPROCESSOR} -r10 -f11 -v "$in"  | grep TRACE | sed 's/.*TRACE: //' | fromdos > $out
 if test "$?" != 0; then
 	echo "gprocessor returned an error"
 	exit 1
 else
-	diff -u3 "$exp" "$out"
-	exit $?
+	if [ "$use_orig" != 0 ]; then
+		awk 'BEGIN {body=0;} { if (body) { print $0} else if (/^$/) {body=1} }' "$exp" | diff -u3 - "$out"
+		exit $?
+	else
+		diff -u3 "$exp" "$out"
+		exit $?
+	fi
 fi
