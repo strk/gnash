@@ -1,5 +1,7 @@
 2007-04-27 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp: add a DEBUG_MOUSE_COORDINATES define, for making
+	  writing test runners easier.
 	* testsuite/swfdec/swfdec_gnash_tester: use the .trace.org files when
 	  avaiable, as in that case it means that the .trace are just swfdec
 	  results (Ben is cheating !)

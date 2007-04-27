@@ -46,7 +46,7 @@
 /// debug the GUI part, however (see if blitting the region works), then you 
 /// probably won't define this.
 #ifdef ENABLE_REGION_UPDATES_DEBUGGING 
-//#define REGION_UPDATES_DEBUGGING_FULL_REDRAW 1
+#define REGION_UPDATES_DEBUGGING_FULL_REDRAW 1
 #endif 
 
 #ifdef ENABLE_REGION_UPDATES_DEBUGGING
@@ -55,6 +55,10 @@
 #else
 #define IF_DEBUG_REGION_UPDATES(x) 
 #endif
+
+// Define this to have gnash print the mouse pointer coordinates
+// as the mouse moves
+//#define DEBUG_MOUSE_COORDINATES 1
 
 namespace gnash {
 
@@ -245,7 +249,9 @@ Gui::notify_mouse_moved(int x, int y)
 {
 	movie_root* m = get_current_root();
 
-	//log_msg(_("mouse @ %d,%d"), x, y);
+#ifdef DEBUG_MOUSE_COORDINATES
+	log_msg(_("mouse @ %d,%d"), x, y);
+#endif
 	if ( m->notify_mouse_moved(x, y) )
 	{
 		// any action triggered by the
