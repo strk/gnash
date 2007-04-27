@@ -1,5 +1,7 @@
 2007-04-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-mtasc.all/README: some info about the MTASC
+	  testing framework.
 	* testsuite/actionscript.all/Global.as: check that _global._global
 	  is undefined.
 	* testsuite/actionscript.all/Function.as: add another test for
