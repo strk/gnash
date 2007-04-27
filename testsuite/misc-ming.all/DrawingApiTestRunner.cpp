@@ -31,7 +31,23 @@
 #include <cassert>
 
 using namespace gnash;
+using namespace gnash::geometry;
 using namespace std;
+
+/// Return a Range2d<int> defining the square inscribed in a circle
+//
+/// @param radius
+///	Radius in pixels
+///
+Range2d<int>
+inscribedRect(int x, int y, int radius)
+{
+	Range2d<int> ret;
+	float halfside = ((float)radius * sqrt(2))/2;
+	ret.expandTo(int(round(x-halfside)), int(round(y-halfside)));
+	ret.expandTo(int(round(x+halfside)), int(round(y+halfside)));
+	return ret;
+}
 
 int
 main(int /*argc*/, char** /*argv*/)
@@ -48,7 +64,7 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(root->get_frame_count(), 1);
 	check_equals(root->get_current_frame(), 0);
 
-	tester.advance();
+	//tester.advance();
 
 	rgba white(255, 255, 255, 255);
 	rgba blue(0, 0, 255, 255);
@@ -143,9 +159,174 @@ main(int /*argc*/, char** /*argv*/)
 	xcheck(tester.isMouseOverMouseEntity());  // fails due to edge::withinSquareDistance bug
 	check_pixel(363, 174, 2, black, 2); 
 
-	// TODO: check invalidated bounds and drawing on advance !
-	//       there should be a yellow-fill, red-stroke circle moving from bottom-left to bottom-right
-	//       for 8 advancements.
-	for (int i=0; i<10; ++i) tester.advance();
+	// Check that nothing is drawin in the bottom line
+	check_pixel(47, 280, 10, white, 2); 
+	check_pixel(101, 280, 10, white, 2); 
+	check_pixel(151, 280, 10, white, 2); 
+	check_pixel(201, 280, 10, white, 2); 
+	check_pixel(250, 280, 10, white, 2); 
+	check_pixel(303, 280, 10, white, 2); 
+	check_pixel(351, 280, 10, white, 2); 
+	check_pixel(400, 280, 10, white, 2); 
+
+	tester.advance();
+
+	// TODO: check bounds of the child, and hitTest
+
+	// Check that the invalidated bounds to contain the first circle bounds
+	check(tester.getInvalidatedRanges().contains(inscribedRect(47, 280, 10)));
+
+	// Check that first circle has been drawn
+	check_pixel(47, 280, 3, yellow, 2); 
+	check_pixel(101, 280, 10, white, 2); 
+	check_pixel(151, 280, 10, white, 2); 
+	check_pixel(201, 280, 10, white, 2); 
+	check_pixel(250, 280, 10, white, 2); 
+	check_pixel(303, 280, 10, white, 2); 
+	check_pixel(351, 280, 10, white, 2); 
+	check_pixel(400, 280, 10, white, 2); 
+
+	tester.advance();
+
+	// TODO: check bounds of the child, and hitTest
+
+	// Check invalidated bounds to contain the first and second circle bounds
+	check(tester.getInvalidatedRanges().contains(inscribedRect(47, 280, 10)));
+	check(tester.getInvalidatedRanges().contains(inscribedRect(101, 280, 10)));
+
+	// Check that only the second circle is visible
+	check_pixel(47, 280, 10, white, 2); 
+	check_pixel(101, 280, 3, yellow, 2); 
+	check_pixel(151, 280, 10, white, 2); 
+	check_pixel(201, 280, 10, white, 2); 
+	check_pixel(250, 280, 10, white, 2); 
+	check_pixel(303, 280, 10, white, 2); 
+	check_pixel(351, 280, 10, white, 2); 
+	check_pixel(400, 280, 10, white, 2); 
+
+	tester.advance();
+
+	// TODO: check bounds of the child, and hitTest
+
+	// Check invalidated bounds to contain the second and third circle bounds
+	check(tester.getInvalidatedRanges().contains(inscribedRect(101, 280, 10)));
+	check(tester.getInvalidatedRanges().contains(inscribedRect(151, 280, 10)));
+
+	// Check that only the third circle is visible
+	check_pixel(47, 280, 10, white, 2); 
+	check_pixel(101, 280, 10, white, 2); 
+	check_pixel(151, 280, 3, yellow, 2); 
+	check_pixel(201, 280, 10, white, 2); 
+	check_pixel(250, 280, 10, white, 2); 
+	check_pixel(303, 280, 10, white, 2); 
+	check_pixel(351, 280, 10, white, 2); 
+	check_pixel(400, 280, 10, white, 2); 
+
+	tester.advance();
+
+	// TODO: check bounds of the child, and hitTest
+
+	// Check invalidated bounds to contain the third and fourth circle bounds
+	check(tester.getInvalidatedRanges().contains(inscribedRect(151, 280, 10)));
+	check(tester.getInvalidatedRanges().contains(inscribedRect(201, 280, 10)));
+
+	// Check that only the fourth circle is visible
+	check_pixel(47, 280, 10, white, 2); 
+	check_pixel(101, 280, 10, white, 2); 
+	check_pixel(151, 280, 10, white, 2); 
+	check_pixel(201, 280, 3, yellow, 2); 
+	check_pixel(250, 280, 10, white, 2); 
+	check_pixel(303, 280, 10, white, 2); 
+	check_pixel(351, 280, 10, white, 2); 
+	check_pixel(400, 280, 10, white, 2); 
+
+	tester.advance();
+
+	// TODO: check bounds of the child, and hitTest
+
+	// Check invalidated bounds to contain the fourth and fifth circle bounds
+	check(tester.getInvalidatedRanges().contains(inscribedRect(201, 280, 10)));
+	check(tester.getInvalidatedRanges().contains(inscribedRect(250, 280, 10)));
+
+	// Check that only the fifth circle is visible
+	check_pixel(47, 280, 10, white, 2); 
+	check_pixel(101, 280, 10, white, 2); 
+	check_pixel(151, 280, 10, white, 2); 
+	check_pixel(201, 280, 10, white, 2); 
+	check_pixel(250, 280, 3, yellow, 2); 
+	check_pixel(303, 280, 10, white, 2); 
+	check_pixel(351, 280, 10, white, 2); 
+	check_pixel(400, 280, 10, white, 2); 
+
+	tester.advance();
+
+	// TODO: check bounds of the child, and hitTest
+
+	// Check invalidated bounds to contain the fifth and sixth circle bounds
+	check(tester.getInvalidatedRanges().contains(inscribedRect(250, 280, 10)));
+	check(tester.getInvalidatedRanges().contains(inscribedRect(303, 280, 10)));
+
+	// Check that only the sixth circle is visible
+	check_pixel(47, 280, 10, white, 2); 
+	check_pixel(101, 280, 10, white, 2); 
+	check_pixel(151, 280, 10, white, 2); 
+	check_pixel(201, 280, 10, white, 2); 
+	check_pixel(250, 280, 10, white, 2); 
+	check_pixel(303, 280, 3, yellow, 2); 
+	check_pixel(351, 280, 10, white, 2); 
+	check_pixel(400, 280, 10, white, 2); 
+
+	tester.advance();
+
+	// TODO: check bounds of the child, and hitTest
+
+	// Check invalidated bounds to contain the sixth and seventh circle bounds
+	check(tester.getInvalidatedRanges().contains(inscribedRect(303, 280, 10)));
+	check(tester.getInvalidatedRanges().contains(inscribedRect(351, 280, 10)));
+
+	// Check that only the seventh circle is visible
+	check_pixel(47, 280, 10, white, 2); 
+	check_pixel(101, 280, 10, white, 2); 
+	check_pixel(151, 280, 10, white, 2); 
+	check_pixel(201, 280, 10, white, 2); 
+	check_pixel(250, 280, 10, white, 2); 
+	check_pixel(303, 280, 10, white, 2); 
+	check_pixel(351, 280, 3, yellow, 2); 
+	check_pixel(400, 280, 10, white, 2); 
+
+	tester.advance();
+
+	// TODO: check bounds of the child, and hitTest
+
+	// Check invalidated bounds to contain the seventh and eighth circle bounds
+	check(tester.getInvalidatedRanges().contains(inscribedRect(351, 280, 10)));
+	check(tester.getInvalidatedRanges().contains(inscribedRect(400, 280, 10)));
+
+	// Check that only the eighth circle is visible
+	check_pixel(47, 280, 10, white, 2); 
+	check_pixel(101, 280, 10, white, 2); 
+	check_pixel(151, 280, 10, white, 2); 
+	check_pixel(201, 280, 10, white, 2); 
+	check_pixel(250, 280, 10, white, 2); 
+	check_pixel(303, 280, 10, white, 2); 
+	check_pixel(351, 280, 10, white, 2); 
+	check_pixel(400, 280, 3, yellow, 2); 
+
+	tester.advance();
+
+	// TODO: check bounds of the child, and hitTest
+
+	// Check that no bounds have been invalidated 
+	check(tester.getInvalidatedRanges().isNull());
+
+	// Check that only the eighth circle is visible
+	check_pixel(47, 280, 10, white, 2); 
+	check_pixel(101, 280, 10, white, 2); 
+	check_pixel(151, 280, 10, white, 2); 
+	check_pixel(201, 280, 10, white, 2); 
+	check_pixel(250, 280, 10, white, 2); 
+	check_pixel(303, 280, 10, white, 2); 
+	check_pixel(351, 280, 10, white, 2); 
+	check_pixel(400, 280, 3, yellow, 2); 
 }
 

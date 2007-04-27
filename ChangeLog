@@ -4,6 +4,8 @@
 	  fixed contains(Range2d) to take a const ref rather then a value.
 	* testsuite/libgeometry/snappingrangetest.cpp: add tests for
 	  contains(SnappingRange2d).
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: add test for
+	  renderer and invalidated bounds.
 
 2007-04-27 Sandro Santilli <strk@keybit.net>
 
