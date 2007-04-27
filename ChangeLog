@@ -1,3 +1,10 @@
+2007-04-27 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/PlaceObject2Tag.cpp (readPlaceActions): fix check for
+	  all reserved bits being zero (removed an annoying false malformed
+	  swf error).
+	* gui/gtk.cpp: comment out function tracing for key and mouse events.
+
 2007-04-27 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac: Add verbose text for missing gstreamer-dev help

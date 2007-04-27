@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.5 2007/04/24 06:54:06 zoulunkai Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.6 2007/04/27 21:43:41 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -170,7 +170,8 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 		// Let's see if the event flag we received is for an event that we know of
 
 		//check if all unused bits are zero!
-		if( !(flags & (1 << total_known_events)) )
+		//if( !(flags & (1 << total_known_events)) )
+		if( flags >> total_known_events ) 
 		{
 			IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("swf_event::read() -- unknown / unhandled event type received, flags = 0x%x"), flags);
