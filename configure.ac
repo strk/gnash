@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.293 2007/04/24 17:52:47 rsavoye Exp $
+dnl $Id: configure.ac,v 1.294 2007/04/27 01:07:57 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -58,6 +58,8 @@ AC_PROG_MAKE_SET
 AC_DISABLE_STATIC dnl Disable building static libs.
 
 AM_GNU_GETTEXT([external])
+AM_CONDITIONAL(HAS_GETTEXT, test x$ac_cv_path_XGETTEXT != x)
+dnl AM_GNU_GETTEXT_VERSION(0.15)
 
 save_CFLAGS="$CFLAGS";
 CFLAGS="$CFLAGS -Werror -Wformat";
@@ -1005,7 +1007,7 @@ dnl AC_CONFIG_LINKS(doc/C/images)
 AC_CONFIG_LINKS(testsuite/libbase/gnashrc:testsuite/libbase/gnashrc.in)
 
 AC_OUTPUT(Makefile
-po/Makefile.in
+po/Makefile
 libbase/Makefile
 libgeometry/Makefile
 server/Makefile

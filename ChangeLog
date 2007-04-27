@@ -1,3 +1,31 @@
+2007-04-26  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* Makefile.am: Add po to EXTRA_DIST.
+	* configure.ac: Set a conditional for gettext. Build po/Makefile
+	now.
+	* libbase/Makefile.am: Build all libraries with a release number,
+	and add --export-dynamic and -no-undefined. Add gettext.h.
+	* backend/Makefile.am: Build all libraries with a release number,
+	and add --export-dynamic and -no-undefined.
+	* server/Makefile.am: Build all libraries with a release number,
+	and add --export-dynamic and -no-undefined.
+	* libgeometry/Makefile.am: Build all libraries with a release
+	number, and add --export-dynamic and -no-undefined.
+	* server/vm/Makefile.am: Build all libraries with a release
+	number, and add --export-dynamic and -no-undefined.
+	* server/parser/Makefile.am: Build all libraries with a release
+	number, and add --export-dynamic and -no-undefined.
+	* server/asobjs/Makefile.am: Build all libraries with a release
+	number, and add --export-dynamic and -no-undefined.
+	* extensions/dejagnu/dejagnu.cpp: Use instrusive pointers instead
+	of hard pointers for handlers.
+	* extensions/fileio/fileio.cpp: Use instrusive pointers instead
+	of hard pointers for handlers.
+	* extensions/mysql/mysql_db.cpp: Use instrusive pointers instead
+	of hard pointers for handlers.
+	* extensions/gtk2/gtkext.cpp: Use instrusive pointers instead
+	of hard pointers for handlers.
+	
 2007-04-26 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Function.as: add a test
