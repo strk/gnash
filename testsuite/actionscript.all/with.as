@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.9 2007/03/06 10:16:04 strk Exp $";
+rcsid="$Id: with.as,v 1.10 2007/04/28 08:03:08 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -124,3 +124,82 @@ with(obj1)
 
 with(_root) { ; }
 // not aborting is enough to pass this test
+
+
+
+//---------------------------------------------------------
+// tests how "with" affect the serch path(ScopeChain).
+//---------------------------------------------------------
+
+a = 100;
+b = 100;
+_root.createEmptyMovieClip("mc1", 3);
+mc1.a = 1;
+mc1.b = 1;
+mc1.x = 3;
+_root.createEmptyMovieClip("mc2", 4);
+mc2.a = 2;
+mc2.b = 2;
+mc2.y = 3;
+
+with(mc1)
+{
+	check_equals(a, 1);
+}
+with(mc2)
+{
+	check_equals(a, 2);
+}
+
+with(mc1)
+{
+	with(mc2)
+	{
+		check_equals(a, 2);
+		check_equals(b, 2);
+		check_equals(x, 3);
+		check_equals(y, 3);
+	}
+}
+
+with(mc2)
+{
+	with(mc1)
+	{
+		check_equals(a, 1);
+		check_equals(b, 1);
+		check_equals(x, 3);
+		check_equals(y, 3);
+	}
+}
+
+function f_a()
+{
+	return a;
+}
+
+function f_b()
+{
+	return b;
+}
+
+function f_x()
+{
+	return x;
+}
+
+function f_y()
+{
+	return y;
+}
+
+with(mc1)
+{
+	with(mc2)
+	{
+		check_equals(f_a(), 100); 
+		check_equals(f_b(), 100); 
+		check_equals(typeof(f_x()), 'undefined'); 
+		check_equals(typeof(f_y()), 'undefined'); 
+	}
+}
