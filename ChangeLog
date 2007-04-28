@@ -1,5 +1,7 @@
 2007-04-28 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionWith): skip with() blocks
+	  given a parameter not casting to an object.
 	* testsuite/actionscript.all/with.as: 
 	  Add tests explaining why the tests in previous
 	  commit are failing in SWF5 version.

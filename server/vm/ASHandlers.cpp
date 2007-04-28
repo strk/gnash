@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.102 2007/04/27 16:09:01 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.103 2007/04/28 17:05:53 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3382,7 +3382,8 @@ SWFHandlers::ActionWith(ActionExec& thread)
 	assert( code[pc] == SWF::ACTION_WITH );
 
 	thread.ensureStack(1);  // the object
-	boost::intrusive_ptr<as_object> with_obj = env.pop().to_object();
+	as_value with_obj_val = env.pop().to_object();
+	boost::intrusive_ptr<as_object> with_obj = with_obj_val.to_object();
 
 	++pc; // skip tag code
 
@@ -3408,6 +3409,17 @@ SWFHandlers::ActionWith(ActionExec& thread)
 
 	// now we should be on the first action of the 'with' body
 	assert(thread.next_pc == pc);
+
+	if ( ! with_obj )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("with(%s) : first argument doesn't cast to an object!"),
+			with_obj_val.to_debug_string().c_str());
+		);
+		// skip the full block
+		thread.next_pc += block_length;
+		return;
+	}
 
 	// where does the 'with' block ends ?
 	unsigned block_end = thread.next_pc + block_length;
