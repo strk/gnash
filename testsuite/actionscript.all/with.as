@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: with.as,v 1.10 2007/04/28 08:03:08 zoulunkai Exp $";
+rcsid="$Id: with.as,v 1.11 2007/04/28 16:56:54 strk Exp $";
 
 #include "check.as"
 
@@ -125,6 +125,25 @@ with(obj1)
 with(_root) { ; }
 // not aborting is enough to pass this test
 
+//---------------------------------------------------------
+// Test with(undefined) with(null) with(3) with("string")
+//---------------------------------------------------------
+
+checkpoint = 1;
+
+with(null) { _root.checkpoint = 2; }
+check_equals(checkpoint, 1);
+
+with(undefined) { _root.checkpoint = 3; }
+check_equals(checkpoint, 1);
+
+with(4) { _root.checkpoint = 3; __proto__.checkpoint = 'three'; }
+check_equals(checkpoint, 3);
+check_equals(Number.prototype.checkpoint, 'three');
+
+with('string') { _root.checkpoint = 4; __proto__.checkpoint = 'four'; }
+check_equals(checkpoint, 4);
+check_equals(String.prototype.checkpoint, 'four');
 
 
 //---------------------------------------------------------

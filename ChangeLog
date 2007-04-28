@@ -1,7 +1,13 @@
+2007-04-28 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/with.as: 
+	  Add tests explaining why the tests in previous
+	  commit are failing in SWF5 version.
+
 2007-04-28 Zou Lunkai <zoulunkai@gmail.com>
 
-	*	testsuite/actionscript.all/with.as:
-		add more tests
+	* testsuite/actionscript.all/with.as:
+	  add more tests
 
 2007-04-28 Sandro Santilli <strk@keybit.net>
 
