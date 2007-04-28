@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.6 2007/04/27 21:43:41 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.7 2007/04/28 04:54:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -169,8 +169,7 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 
 		// Let's see if the event flag we received is for an event that we know of
 
-		//check if all unused bits are zero!
-		//if( !(flags & (1 << total_known_events)) )
+		// Integrity check: all reserved bits should be zero
 		if( flags >> total_known_events ) 
 		{
 			IF_VERBOSE_MALFORMED_SWF(
