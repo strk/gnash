@@ -1,4 +1,11 @@
-2007-04-26  Rob Savoye  <rob@pawnee.welcomehome.org>
+2007-04-28 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.{cpp,h}: stop descending
+	  the CallStack looking into the callers locals!
+	* testsuite/actionscript.all/Function.as: success
+	  with SWF5 and (missing) scope chain.
+
+2007-04-27  Rob Savoye  <rob@pawnee.welcomehome.org>
 
 	* gui/fltk.cpp: Cast the key::code so it compiles on Darwin.
 	* macros/agg.m4: Don't inherit the -rpath setting fropm

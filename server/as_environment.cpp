@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.75 2007/04/27 16:09:00 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.76 2007/04/28 07:22:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -120,7 +120,7 @@ as_environment::get_variable_raw(
 
     // Check locals for getting them
     //as_environment::frame_slot slot;
-    if ( findLocal(varname, val, true, retTarget) ) // do we really want to descend here ??
+    if ( findLocal(varname, val, retTarget) ) 
     {
 	return val;
     }
@@ -281,7 +281,8 @@ as_environment::set_variable_raw(
 {
 
 	// Check locals for setting them
-	if ( setLocal(varname, val, true) )
+	// TODO: check if local variable takes precedence over 'with' scope when setting
+	if ( setLocal(varname, val) )
 	{
 		return;
 	}
@@ -321,10 +322,7 @@ as_environment::set_local(const std::string& varname, const as_value& val)
 	assert(_localFrames.size());
 
 	// Is it in the current frame already?
-	// TODO: should we descend to upper frames ?
-	//       (probably not as we want to update it)
-	//as_environment::frame_slot slot;
-	if ( setLocal(varname, val, false) )
+	if ( setLocal(varname, val) )
 	{
 		return;
 	}
@@ -343,12 +341,8 @@ as_environment::set_local(const std::string& varname, const as_value& val)
 void
 as_environment::declare_local(const std::string& varname)
 {
-	// TODO: should we descend to upper frames ?
-	//       (probably not as we want to declare it)
-	//as_environment::frame_slot slot;
-
 	as_value tmp;
-	if ( ! findLocal(varname, tmp, false) )
+	if ( ! findLocal(varname, tmp) )
 	{
 		// Not in frame; create a new local var.
 		assert(_localFrames.size());
@@ -929,30 +923,13 @@ as_environment::dump_global_registers(std::ostream& out) const
 
 /*private*/
 bool
-as_environment::findLocal(const std::string& varname, as_value& ret, bool descend, as_object** retTarget)
+as_environment::findLocal(const std::string& varname, as_value& ret, as_object** retTarget)
 {
 	if ( _localFrames.empty() ) return false;
-	if ( ! descend )
+	if ( findLocal(_localFrames.back().locals, varname, ret) )
 	{
-		if ( findLocal(_localFrames.back().locals, varname, ret) )
-		{
-			if ( retTarget ) *retTarget = _localFrames.back().locals.get();
-			return true;
-		}
-		return false;
-	}
-
-	for (CallStack::reverse_iterator it=_localFrames.rbegin(),
-			itEnd=_localFrames.rend();
-			it != itEnd;
-			++it)
-	{
-		LocalVars& locals = it->locals;
-		if ( findLocal(locals, varname, ret) )
-		{
-			if ( retTarget ) *retTarget = locals.get();
-			return true;
-		}
+		if ( retTarget ) *retTarget = _localFrames.back().locals.get();
+		return true;
 	}
 	return false;
 }
@@ -962,18 +939,6 @@ bool
 as_environment::findLocal(LocalVars& locals, const std::string& name, as_value& ret)
 {
 	return locals->get_member(name, &ret);
-#if 0
-	for (size_t i=0; i<locals.size(); ++i)
-	{
-		const as_environment::frame_slot& slot = locals[i];
-		if (slot.m_name == name)
-		{
-			ret = slot;
-			return true;
-		}
-	}
-	return false;
-#endif
 }
 
 /* static private */
@@ -981,60 +946,22 @@ bool
 as_environment::delLocal(LocalVars& locals, const std::string& varname)
 {
 	return locals->delProperty(varname).second;
-#if 0
-	for (size_t i=0; i<locals.size(); ++i)
-	{
-		const as_environment::frame_slot& slot = locals[i];
-		if (slot.m_name == varname)
-		{
-			locals.erase(locals.begin()+i);
-			return true;
-		}
-	}
-	return false;
-#endif
 }
 
 /* private */
 bool
-as_environment::delLocal(const std::string& varname, bool descend)
+as_environment::delLocal(const std::string& varname)
 {
 	if ( _localFrames.empty() ) return false;
-	if ( ! descend ) return delLocal(_localFrames.back().locals, varname);
-
-	for (CallStack::reverse_iterator it=_localFrames.rbegin(),
-			itEnd=_localFrames.rend();
-			it != itEnd;
-			++it)
-	{
-		LocalVars& locals = it->locals;
-		if ( delLocal(locals, varname) )
-		{
-			return true;
-		}
-	}
-	return false;
+	return delLocal(_localFrames.back().locals, varname);
 }
 
 /* private */
 bool
-as_environment::setLocal(const std::string& varname, const as_value& val, bool descend)
+as_environment::setLocal(const std::string& varname, const as_value& val)
 {
 	if ( _localFrames.empty() ) return false;
-	if ( ! descend ) return setLocal(_localFrames.back().locals, varname, val);
-
-	for (CallStack::reverse_iterator it=_localFrames.rbegin(),
-			itEnd=_localFrames.rend();
-			it != itEnd;
-			++it)
-	{
-		LocalVars& locals = it->locals;
-		if ( setLocal(locals, varname, val) )
-		{
-			return true;
-		}
-	}
-	return false;
+	return setLocal(_localFrames.back().locals, varname, val);
 }
 
 /* static private */
@@ -1046,18 +973,6 @@ as_environment::setLocal(LocalVars& locals,
 	if ( ! prop ) return false;
 	prop->setValue(*locals, val);
 	return true;
-#if 0
-	for (size_t i=0; i<locals.size(); ++i)
-	{
-		as_environment::frame_slot& slot = locals[i];
-		if (slot.m_name == varname)
-		{
-			slot.m_value = val;
-			return true;
-		}
-	}
-	return false;
-#endif
 }
 
 

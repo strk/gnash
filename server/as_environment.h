@@ -523,21 +523,17 @@ private:
 	///	If a variable is found it's assigned to this parameter.
 	///	Untouched if the variable is not found.
 	///
-	/// @param descend
-	///	If true the seek don't stop at current call frame, but
-	///	descends in upper frames. By default it is false.
-	///
 	/// @param retTarget
 	///	If not NULL, the pointer will be set to the actual object containing the
 	///	found variable (if found).
 	///
 	/// @return true if the variable was found, false otherwise
 	///
-	bool findLocal(const std::string& varname, as_value& ret, bool descend, as_object** retTarget=NULL);
+	bool findLocal(const std::string& varname, as_value& ret, as_object** retTarget=NULL);
 
-	bool findLocal(const std::string& varname, as_value& ret, bool descend, as_object** retTarget=NULL) const
+	bool findLocal(const std::string& varname, as_value& ret, as_object** retTarget=NULL) const
 	{
-		return const_cast<as_environment*>(this)->findLocal(varname, ret, descend, retTarget);
+		return const_cast<as_environment*>(this)->findLocal(varname, ret, retTarget);
 	}
 
 	/// Find a variable in the given LocalVars
@@ -558,13 +554,9 @@ private:
 	/// @param varname
 	///	Name of the local variable
 	///
-	/// @param descend
-	///	If true the seek don't stop at current call frame, but
-	///	descends in upper frames. By default it is false.
-	///
 	/// @return true if the variable was found and deleted, false otherwise
 	///
-	bool delLocal(const std::string& varname, bool descend=false);
+	bool delLocal(const std::string& varname);
 
 	/// Delete a variable from the given LocalVars
 	//
@@ -583,13 +575,9 @@ private:
 	/// @param val
 	///	Value to assign to the variable
 	///
-	/// @param descend
-	///	If true the seek don't stop at current call frame, but
-	///	descends in upper frames. By default it is false.
-	///
 	/// @return true if the variable was found, false otherwise
 	///
-	bool setLocal(const std::string& varname, const as_value& val, bool descend=false);
+	bool setLocal(const std::string& varname, const as_value& val);
 
 	/// Set a variable from the given LocalVars, if it exists.
 	//
