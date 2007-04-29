@@ -1,5 +1,7 @@
 2007-04-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, DrawingApiTest.as: add
+	  tests for hitTest (not automatically run, but works fine so far).
 	* server/button_character_instance.{cpp,h}: implement pointInShape().
 
 2007-04-28 Sandro Santilli <strk@keybit.net>

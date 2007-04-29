@@ -157,3 +157,38 @@ a.onEnterFrame = function()
 	}
 };
 
+createEmptyMovieClip("cursor", 3);
+with(cursor)
+{
+	lineStyle(2, 0xFF0000);
+	beginFill(0xFF0000, 100);
+	drawCircle(_root.cursor, 0, 0, 10);
+	onMouseMove = function()
+	{
+		_x = _root._xmouse;
+		_y = _root._ymouse;
+
+		// Bounding box check
+		if ( hitTest(_root.a) ) {
+			_alpha=50;
+		} else {
+			_alpha=100;
+		}
+
+		// Bounding box check with circle center
+		if ( _root.a.hitTest(_x, _y) ) {
+			_root.a._alpha=50;
+		} else {
+			_root.a._alpha=100;
+		}
+
+		// Shape check with circle center
+		if ( _root.a.hitTest(_x, _y, true) ) {
+			_xscale=50;
+			_yscale=50;
+		} else {
+			_xscale=100;
+			_yscale=100;
+		}
+	};
+}
