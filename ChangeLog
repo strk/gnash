@@ -1,3 +1,7 @@
+2007-04-29 Sandro Santilli <strk@keybit.net>
+
+	* server/button_character_instance.{cpp,h}: implement pointInShape().
+
 2007-04-28 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (ActionWith): skip with() blocks

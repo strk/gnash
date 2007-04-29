@@ -804,10 +804,34 @@ button_character_instance::getBounds() const
 		    || (m_mouse_state == DOWN && rec.m_down)
 		    || (m_mouse_state == OVER && rec.m_over))
 		{
+			// TODO: should we consider having multiple characters
+			//       for a single state ?
 			return m_record_character[i]->getBounds();
 		}
 	}
 	return geometry::Range2d<float>(geometry::nullRange);
+}
+
+bool
+button_character_instance::pointInShape(float x, float y) const
+{
+	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	{
+		button_record&	rec = m_def->m_button_records[i];
+		if (m_record_character[i] == NULL)
+		{
+			continue;
+		}
+		if ((m_mouse_state == UP && rec.m_up)
+		    || (m_mouse_state == DOWN && rec.m_down)
+		    || (m_mouse_state == OVER && rec.m_over))
+		{
+			// TODO: should we consider having multiple characters
+			//       for a single state ?
+			return m_record_character[i]->pointInShape(x, y);
+		}
+	}
+	return false; // no shape
 }
 
 character*

@@ -20,7 +20,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.19 2007/04/12 11:35:30 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.20 2007/04/29 14:08:44 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -136,6 +136,9 @@ public:
 	
 	geometry::Range2d<float> getBounds() const;
 	
+	// See dox in character.h
+	bool pointInShape(float x, float y) const;
+
 	static as_value enabled_getset(const fn_call& fn);
 	
 	bool get_enabled();
