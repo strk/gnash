@@ -157,6 +157,7 @@ a.onEnterFrame = function()
 	}
 };
 
+#if 0
 createEmptyMovieClip("cursor", 3);
 with(cursor)
 {
@@ -192,3 +193,4 @@ with(cursor)
 		}
 	};
 }
+#endif
