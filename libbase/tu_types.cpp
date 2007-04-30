@@ -28,25 +28,6 @@ bool	tu_types_validate()
 		return false;
 	}
 
-	// Endian checks.
-	char* buf = "1234";
-
-#ifdef _TU_LITTLE_ENDIAN_
-	if (*(uint32_t*) buf != 0x34333231)
-	{
-		// No good.
-		assert(0);
-		return false;
-	}
-#else	// not _TU_LITTLE_ENDIAN_
-	if (*(uint32_t*) buf != 0x31323334)
-	{
-		// No good.
-		assert(0);
-		return false;
-	}
-#endif	// not _TU_LITTLE_ENDIAN_
-
 	// Checks passed.
 	return true;
 }

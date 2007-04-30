@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.296 2007/04/30 16:42:56 strk Exp $
+dnl $Id: configure.ac,v 1.297 2007/04/30 17:27:39 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -606,9 +606,6 @@ AC_CHECK_FUNCS(strlcat, AC_DEFINE(HAVE_STRLCAT_PROTO, [1],[Define if you have th
 dnl Look for Win32 networking stuff
 AC_CHECK_HEADERS(winsock.h)
 AC_CHECK_HEADERS(winsock2.h)
-AC_CHECK_HEADERS(sys/endian.h)
-AC_CHECK_HEADERS(machine/endian.h)
-AC_CHECK_HEADERS(endian.h)
 AC_CHECK_FUNCS(socket)
 AC_CHECK_FUNCS(CreateFileMappingA)
 

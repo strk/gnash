@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: tu_types.h,v 1.34 2007/04/19 05:23:30 zoulunkai Exp $ */
+/* $Id: tu_types.h,v 1.35 2007/04/30 17:27:39 martinwguy Exp $ */
 
 #ifndef TU_TYPES_H
 #define TU_TYPES_H
@@ -40,7 +40,6 @@ typedef signed int int32_t;
 typedef unsigned __int64 uint64_t;
 typedef __int64 int64_t;
 # define __PRETTY_FUNCTION__ __FUNCDNAME__
-# define BYTE_ORDER SDL_BYTEORDER
 #else
 # include <inttypes.h>
 
@@ -59,25 +58,6 @@ typedef __int64 int64_t;
 #endif
 
 #endif
-
-#ifndef BYTE_ORDER
-#ifdef HAVE_ENDIAN_H
-	#include <endian.h>
-#elif HAVE_SYS_ENDIAN_H
-	#include <sys/endian.h>
-#elif HAVE_MACHINE_ENDIAN_H
-	#include <machine/endian.h>
-#endif
-#  ifndef BYTE_ORDER
-#    error BYTE_ORDER not defined by endian.h. :(
-#  endif // BYTE_ORDER
-#endif // BYTE_ORDER
-
-#if ((BYTE_ORDER == LITTLE_ENDIAN) || (BYTE_ORDER == __LITTLE_ENDIAN) || (BYTE_ORDER == _LITTLE_ENDIAN))
-#	define _TU_LITTLE_ENDIAN_ 1
-#else
-#	undef _TU_LITTLE_ENDIAN_
-#endif //BYTE_ORDER == SDL_LIL_ENDIAN
 
 // A function to run some validation checks.
 DSOEXPORT bool	tu_types_validate();
