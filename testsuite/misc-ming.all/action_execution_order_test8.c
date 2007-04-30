@@ -52,15 +52,20 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); /* 1st frame */
 
+  add_actions(mo, " _root.note('root frame '+_root._currentframe);");
   add_actions(mo, " if(check == 1) gotoAndPlay(4); ");
   SWFMovie_nextFrame(mo); /* 2nd frame */
   
+  add_actions(mo, " _root.note('root frame '+_root._currentframe);");
   add_actions(mo, " check = 1; gotoAndPlay(2); ");
   SWFMovie_nextFrame(mo); /* 3rd frame */
   
   
-  mc1 = newSWFMovieClip();
-  add_clip_actions(mc1, " _root.gotoAndStop(6);"
+  mc1 = newSWFMovieClip(); // will only exist in frame4
+  add_clip_actions(mc2, " _root.note('mc1 frame '+this._currentframe);");
+  add_clip_actions(mc1, " _root.note('about to invoke _root.gotoAndStop(6)');"
+  			" _root.gotoAndStop(6);"
+		        " _root.note('mc1 actions still running after _root.gotoAndStop(6), _root is '+_root);"
                         " _root.x = 100; " );
   SWFMovieClip_nextFrame(mc1);
   
@@ -68,6 +73,7 @@ main(int argc, char** argv)
   it1 = SWFMovie_add(mo, (SWFBlock)mc1);  
   SWFDisplayItem_setDepth(it1, 3); 
   SWFDisplayItem_setName(it1, "mc1"); 
+  add_actions(mo, " _root.note('root frame '+_root._currentframe);");
   check_equals(mo, "typeof(_root.x)", "'undefined'");
   add_actions(mo, " _root.x = 200; ");
   SWFMovie_nextFrame(mo); /* 4th frame */
@@ -77,6 +83,7 @@ main(int argc, char** argv)
   
   mc2 = newSWFMovieClip();
   // these actions are expected to be skipped with SWF version higher then 4
+  add_clip_actions(mc2, " _root.note('mc2 frame '+this._currentframe);");
   add_clip_actions(mc2, " _root.note(' your player version is lower than  5');"
                         " _root.note(' Or your player is bogus'); "
                         " fail = 0; "
@@ -86,13 +93,16 @@ main(int argc, char** argv)
   SWFDisplayItem_setDepth(it2, 3); 
   SWFDisplayItem_setName(it2, "mc2"); 
   SWFMovieClip_nextFrame(mc2);
+  add_actions(mo, " _root.note('root frame '+_root._currentframe);");
   add_actions(mo, " stop(); ");  
    
   SWFMovie_nextFrame(mo); /* 5th frame */
 
   SWFDisplayItem_remove(it2);
   check_equals(mo, "_root.x", "200");
+  add_actions(mo, " _root.note('root frame '+_root._currentframe);");
   add_actions(mo, " _root.totals(); stop(); ");
+
   SWFMovie_nextFrame(mo); /* 6th frame */
   //Output movie
   puts("Saving " OUTPUT_FILENAME );

@@ -1,5 +1,7 @@
 2007-04-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/action_execution_order_test8.c: add
+	  more output trying to understand the problem better.
 	* server/parser/shape_character_def.cpp (compute_bounds): harline
 	  strokes don't add anything to the bounds (no need to expand to
 	  circle, same as for hidden strokes).
