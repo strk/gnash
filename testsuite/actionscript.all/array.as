@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.17 2007/04/04 09:49:43 strk Exp $";
+rcsid="$Id: array.as,v 1.18 2007/04/30 16:57:40 strk Exp $";
 
 #include "check.as"
 
@@ -289,52 +289,28 @@ c.length = 2;
 check_equals(c.length, 2);
 check_equals(c[8], undefined);
 
-// $Log: array.as,v $
-// Revision 1.17  2007/04/04 09:49:43  strk
-//         * server/array.cpp: use a getter/setter for the 'length' property.
-//         * testsuite/actionscript.all/array.as: another success.
-//
-// Revision 1.16  2007/04/04 09:22:30  strk
-// * testsuite/actionscript.all/array.as: more tests added.
-//
-// Revision 1.15  2007/03/28 14:58:30  strk
-//         * server/array.{cpp,h}: implement Array.splice(),
-//           improve toString to actually call the user-provided
-//           toString on all elements.
-//         * testsuite/actionscript.all/array.as: added testcases
-//           for Array.splice().
-//
-// Revision 1.14  2007/02/28 23:58:26  strk
-//         * testsuite/actionscript.all/: array.as, Function.as
-//           Don't expect failures when checking for missing
-//           apply/call in SWF5.
-//         * server/as_function.cpp (getFunctionPrototype):
-//           Don't register 'apply' and 'call' members if
-//           SWF < 6; use builtin_function when registering them.
-//         * testsuite/actionscript.all/String.as:
-//           Add test for 'substring' with base == length;
-//           Fix test for SWF5 (no Function.call or Function.apply
-//           there)
-//         * server/vm/ASHandlers.cpp (ActionSubString):
-// 	  fix case in which base is == length.
-//
-// Revision 1.13  2007/02/28 13:00:05  strk
-//         * server/array.cpp: use builtin_method for builtin
-//           methods :) ensure the 'this' pointer passed
-//           to builtin methods is valid.
-//         * testsuite/actionscript.all/array.as:
-//           Add test for calling Array builtin functions
-//           using FUnction.call.
-//
-// Revision 1.12  2007/02/28 07:41:27  strk
-//         * server/array.{cpp,h}: allow resize trough
-//           setting the 'length' property.
-//         * testsuite/actionscript.all/array.as: test
-//           that arrays 'length' is settable.
-//
-// Revision 1.11  2006/11/21 10:53:08  strk
-//         * server/array.h: documented ::slice function
-//         * server/array.cpp: more fixes.
-//         * testsuite/actionscript.all/array.as: added some tests for
-//           invalid calls to Array.slice()
-//
+//-------------------------------
+// Test deleting an array element
+//-------------------------------
+
+var c = new Array(10,20,30);
+check_equals ( c.length, 3 );
+check_equals(c[0], 10);
+check_equals(c[1], 20);
+check_equals(c[2], 30);
+#if OUTPUT_VERSION > 5
+xcheck(c.hasOwnProperty('0'));
+xcheck(c.hasOwnProperty('1'));
+xcheck(c.hasOwnProperty('2'));
+#endif
+xcheck(delete c[1]);
+check_equals ( c.length, 3 );
+check_equals(c[0], 10);
+xcheck_equals(typeof(c[1]), 'undefined');
+check_equals(c[2], 30);
+#if OUTPUT_VERSION > 5
+xcheck(c.hasOwnProperty('0'));
+check(!c.hasOwnProperty('1'));
+xcheck(c.hasOwnProperty('2'));
+#endif
+

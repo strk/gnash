@@ -1,5 +1,8 @@
 2007-04-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/array.as: add test for deleting an
+	  array element, and for array indexes being proper properties
+	  (fails in gnash).
 	* configure.ac: if ffmpeg version doesn't match the required one
 	  set media handling to none.
 	* testsuite/misc-ming.all/action_execution_order_test8.c: add
