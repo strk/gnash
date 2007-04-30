@@ -2,6 +2,8 @@
 
 	* testsuite/misc-ming.all/action_execution_order_test7.c:
 	  a simple and normal one that we should pass.
+	* testsuite/misc-ming.all/action_execution_order_test8.c:
+		another one for execution order.
 	  
 2007-04-29 Sandro Santilli <strk@keybit.net>
 
