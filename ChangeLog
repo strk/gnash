@@ -1,3 +1,8 @@
+2007-04-30 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am: 
+	  Activated action_execution_order_test{7,8}.
+
 2007-04-30 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/action_execution_order_test7.c:

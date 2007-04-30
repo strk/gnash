@@ -98,6 +98,8 @@ check_PROGRAMS = \
 	action_execution_order_test4 \
 	action_execution_order_test5 \
 	action_execution_order_test6 \
+	action_execution_order_test7 \
+	action_execution_order_test8 \
 	reverse_execute_PlaceObject2_test1 \
 	reverse_execute_PlaceObject2_test2 \
 	loadMovieTest \
@@ -144,6 +146,8 @@ check_SCRIPTS = \
 	action_execution_order_test4runner \
 	action_execution_order_test5runner \
 	action_execution_order_test6runner \
+	action_execution_order_test7runner \
+	action_execution_order_test8runner \
 	reverse_execute_PlaceObject2_test1runner \
 	reverse_execute_PlaceObject2_test2runner \
 	displaylist_depths_testrunner \
@@ -736,6 +740,34 @@ action_execution_order_test6runner: $(srcdir)/../generic-testrunner.sh action_ex
 	sh $< $(top_builddir) action_execution_order_test6.swf > $@
 	chmod 755 $@
 
+action_execution_order_test7_SOURCES =	\
+	action_execution_order_test7.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+action_execution_order_test7_LDADD = $(MING_LIBS)
+
+action_execution_order_test7.swf: action_execution_order_test7
+	./action_execution_order_test7 $(top_srcdir)/testsuite/media
+
+action_execution_order_test7runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test7.swf
+	sh $< $(top_builddir) action_execution_order_test7.swf > $@
+	chmod 755 $@
+
+action_execution_order_test8_SOURCES =	\
+	action_execution_order_test8.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+action_execution_order_test8_LDADD = $(MING_LIBS)
+
+action_execution_order_test8.swf: action_execution_order_test8
+	./action_execution_order_test8 $(top_srcdir)/testsuite/media
+
+action_execution_order_test8runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test8.swf
+	sh $< -f8 $(top_builddir) action_execution_order_test8.swf > $@
+	chmod 755 $@
+
 reverse_execute_PlaceObject2_test1_SOURCES =	\
 	reverse_execute_PlaceObject2_test1.c	\
 	ming_utils.h		\
@@ -1026,6 +1058,8 @@ TEST_CASES = \
 	action_execution_order_test4runner \
 	action_execution_order_test5runner \
 	action_execution_order_test6runner \
+	action_execution_order_test7runner \
+	action_execution_order_test8runner \
 	reverse_execute_PlaceObject2_test1runner \
 	reverse_execute_PlaceObject2_test2runner \
 	displaylist_depths_testrunner \
