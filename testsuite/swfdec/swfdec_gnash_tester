@@ -19,7 +19,7 @@ if [ -e "${in}.trace.org" ]; then
 	use_orig=1
 fi
 
-${GPROCESSOR} -r10 -f11 -v "$in"  | grep TRACE | sed 's/.*TRACE: //' | fromdos > $out
+${GPROCESSOR} -r11 -f11 -v "$in"  | grep TRACE | sed 's/.*TRACE: //' | fromdos > $out
 if test "$?" != 0; then
 	echo "gprocessor returned an error"
 	exit 1
