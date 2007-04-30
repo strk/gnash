@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.295 2007/04/27 18:17:16 martinwguy Exp $
+dnl $Id: configure.ac,v 1.296 2007/04/30 16:42:56 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -795,8 +795,8 @@ esac
 
 if test x"$media_handler" = x"ffmpeg"; then
   GNASH_PATH_FFMPEG
-  if test x"${ac_cv_path_ffmpeg_lib}" = x ; then
-    AC_MSG_WARN([ffmpeg specified as decoder, but it's not present, disabling media handling])
+  if test x"${ac_cv_path_ffmpeg_lib}" = x -o x${ffmpeg_version} != xok; then
+    AC_MSG_WARN([ffmpeg specified as decoder, but it's not present or it's version is too old, disabling media handling])
     media_handler=none
   fi
 fi

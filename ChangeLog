@@ -1,5 +1,7 @@
 2007-04-30 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: if ffmpeg version doesn't match the required one
+	  set media handling to none.
 	* testsuite/misc-ming.all/action_execution_order_test8.c: add
 	  more output trying to understand the problem better.
 	* server/parser/shape_character_def.cpp (compute_bounds): harline
