@@ -175,8 +175,6 @@ public:
     AMF(int size);
     ~AMF();
     size_t size() { return _total_size; };
-    // Swap the bytes for Little Endian machines
-    void *swapBytes(void *word, int size);
 
     // encode an element
     void *encodeElement(astype_e type, const void *in, int nbytes);

@@ -1,3 +1,10 @@
+2007-04-27 Martin Guy <martinwguy@yahoo.it>
+
+	* libbase/tu_types.{h,cpp}, server/swf/tag_loaders.cpp:
+	  Eliminate remnants of _TU_LITTLE_ENDIAN_
+	* configure.ac: Drop now-redundant endian header detection
+	* libamf/amf.{h,cpp}: swapBytes is now file-local and uses libboost
+
 2007-04-30 Sandro Santilli <strk@keybit.net>
 
 	* autogen.sh: only process configure.ac in root dir and under libltdl,
