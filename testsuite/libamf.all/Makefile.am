@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.2 2007/03/16 19:35:12 rsavoye Exp $
+# $Id: Makefile.am,v 1.3 2007/04/30 19:53:31 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -61,8 +61,8 @@ mudflap:
 	@echo "Rebuilding with GCC Mudflap support"
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
 
-clean-hook:
-	-rm -f core.*
+clean-local:
+	-rm -f core.* site.exp.bak testrun.sum testrun.log
 
 TEST_DRIVERS = ../simple.exp
 

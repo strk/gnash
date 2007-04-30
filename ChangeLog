@@ -1,5 +1,7 @@
 2007-04-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libamf.all/Makefile.am: proper clean rule.
+	* testsuite/misc-ming.all/Makefile.am: proper clean rule.
 	* doc/C/Makefile.am: distribute actionscript.xml and related
 	  files.
 

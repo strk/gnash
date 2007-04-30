@@ -1026,7 +1026,7 @@ Dejagnu.swf: Dejagnu
 	./Dejagnu $(top_srcdir)/testsuite/media
 
 clean-local: 
-	-rm *.swf media
+	-rm *.swf media *.pp *unner
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
