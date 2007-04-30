@@ -1,3 +1,8 @@
+2007-04-30 Sandro Santilli <strk@keybit.net>
+
+	* doc/C/Makefile.am: distribute actionscript.xml and related
+	  files.
+
 2007-04-30 Martin Guy <martinwguy@yahoo.it>
 
 	* backend/sound_handler_sdl.cpp: Fix volume scaling in 8->16 bit

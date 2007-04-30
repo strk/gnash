@@ -39,9 +39,12 @@ entities = \
 	object.xml \
 	opcodes.xml \
 	plugin.xml \
-	rtmp.xml
+	rtmp.xml \
+	actionscript/main.xml \
+	actionscript/as_value.xml \
+	actionscript/new_as_class.xml
 
-xml_files = $(entities) $(docname).xml
+xml_files = $(entities) $(docname).xml actionscript.xml
 
 #noinst_SCRIPT = gen-doc.sh
 dist_man_MANS = gnash.1
