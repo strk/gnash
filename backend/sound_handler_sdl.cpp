@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.52 2007/04/18 20:56:39 martinwguy Exp $
+// $Id: sound_handler_sdl.cpp,v 1.53 2007/04/30 19:13:03 martinwguy Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -160,8 +160,9 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 	sound_data* sounddata = m_sound_data[handle_id];
 
 	// Handling of the sound data
-	if (sounddata->format == FORMAT_NATIVE16)
-	{
+	switch (sounddata->format) {
+	case FORMAT_NATIVE16:
+	    {
 		int16_t*	adjusted_data = 0;
 		int	adjusted_size = 0;
 
@@ -191,8 +192,11 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 			sound->position = sounddata->data_size;
 			sound->set_raw_data(sounddata->data);
 		}
-	} else if (sounddata->format == FORMAT_MP3) {
+	    }
+	    break;
 
+	case FORMAT_MP3:
+	    {
 		// Reallocate the required memory.
 		Uint8* tmp_data = new Uint8[data_bytes + sounddata->data_size];
 		memcpy(tmp_data, sounddata->data, sounddata->data_size);
@@ -211,7 +215,10 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 			sound->data_size = sounddata->data_size;
 		}
 
-	} else {
+	    }
+	    break;
+
+	default:
 		gnash::log_error(_("Behavior for this audio codec %d is unknown.  Please send this SWF to the developers"), (int)(sounddata->format));
 	}
 
@@ -556,14 +563,14 @@ void SDL_sound_handler::convert_raw_data(
 
 	if (sample_size == 1)
 	{
-		// Expand from 8 bit to 16 bit.
+		// Expand from 8 bit unsigned to 16 bit signed.
 		uint8_t*	in = (uint8_t*) data;
 		for (int i = 0; i < output_sample_count; i += dup)
 		{
 			uint8_t	val = *in;
 			for (int j = 0; j < dup; j++)
 			{
-				*out_data++ = (int(val) - 128);
+				*out_data++ = (int(val) - 128) * 256 ;
 			}
 			in += inc;
 		}

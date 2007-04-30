@@ -1,3 +1,9 @@
+2007-04-30 Martin Guy <martinwguy@yahoo.it>
+
+	* backend/sound_handler_sdl.cpp: Fix volume scaling in 8->16 bit
+	  raw data conversion (closes bug #19747)
+	  and convert cascaded ifs to a case.
+
 2007-04-30 Sandro Santilli <strk@keybit.net>
 
 	* Makefile.am: don't put 'po' in EXTRA_DIST, as it's already
