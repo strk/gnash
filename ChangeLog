@@ -1,5 +1,6 @@
 2007-04-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/samples/Makefile.am: distribute gotoFrameOnKeyEvent.swf.
 	* testsuite/actionscript.all/array.as: add test for deleting an
 	  array element, and for array indexes being proper properties
 	  (fails in gnash).
