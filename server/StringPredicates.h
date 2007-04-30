@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: StringPredicates.h,v 1.5 2007/04/10 18:18:45 rsavoye Exp $ */
+/* $Id: StringPredicates.h,v 1.6 2007/04/30 18:33:23 strk Exp $ */
 
 #ifndef GNASH_STRINGPREDICATES_H
 #define GNASH_STRINGPREDICATES_H
@@ -25,6 +25,7 @@
 #endif
 
 #include <string> 
+#include <cctype> // for toupper,tolower
 
 #include <cassert> // for inlines
 
