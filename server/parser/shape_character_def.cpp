@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.20 2007/04/24 12:01:55 udog Exp $ */
+/* $Id: shape_character_def.cpp,v 1.21 2007/04/30 13:03:31 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -673,30 +673,36 @@ void	shape_character_def::compute_bound(rect* r) const
 
         size_t nedges = p.m_edges.size();
         if ( ! nedges ) continue;
-        
-        if (p.m_line==0) {
 
-            r->expand_to_point(p.m_ax, p.m_ay);
-            for (unsigned int j = 0; j<nedges; j++)
-            {
-                r->expand_to_point(p.m_edges[j].m_ax, p.m_edges[j].m_ay);
+        if (p.m_line)
+	{
+		unsigned thickness=m_line_styles[p.m_line-1].get_width();
+		if ( thickness ) // hairlines don't add any bound
+		{
+			// NOTE: Half of thickness would be enough (and correct) for
+			// radius, but that would not match how Flash calculates the
+			// bounds using the drawing API.                        
+			float radius = thickness;
+
+			r->expand_to_circle(p.m_ax, p.m_ay, radius);
+			for (unsigned int j = 0; j<nedges; j++)
+			{
+				r->expand_to_circle(p.m_edges[j].m_ax, p.m_edges[j].m_ay, radius);
+				r->expand_to_circle(p.m_edges[j].m_cx, p.m_edges[j].m_cy, radius);
+			}
+
+			continue;
+		}
+	}
+
+	assert(p.m_line==0 || m_line_styles[p.m_line-1].get_width()==0);
+
+	r->expand_to_point(p.m_ax, p.m_ay);
+	for (unsigned int j = 0; j<nedges; j++)
+	{
+		r->expand_to_point(p.m_edges[j].m_ax, p.m_edges[j].m_ay);
                 r->expand_to_point(p.m_edges[j].m_cx, p.m_edges[j].m_cy);
-            }
-            
-        } else {        
-            
-            // NOTE: Half of get_width() would be enough (and correct) for
-            // radius, but that would not match how Flash calculates the
-            // bounds using the drawing API.                        
-            float radius = m_line_styles[p.m_line-1].get_width();
-            
-            r->expand_to_circle(p.m_ax, p.m_ay, radius);
-            for (unsigned int j = 0; j<nedges; j++)
-            {
-                r->expand_to_circle(p.m_edges[j].m_ax, p.m_edges[j].m_ay, radius);
-                r->expand_to_circle(p.m_edges[j].m_cx, p.m_edges[j].m_cy, radius);
-            }
-        }
+	}
     }
 }
 
