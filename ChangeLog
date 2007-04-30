@@ -1,5 +1,8 @@
 2007-04-27 Martin Guy <martinwguy@yahoo.it>
 
+	* po/Makefile.am: don't update the .po files on every .gmo
+	  production. Produce the .gmo in the build tree, not in the
+	  source tree.
 	* libbase/tu_types.{h,cpp}, server/swf/tag_loaders.cpp:
 	  Eliminate remnants of _TU_LITTLE_ENDIAN_
 	* configure.ac: Drop now-redundant endian header detection

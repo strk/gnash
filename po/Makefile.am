@@ -48,11 +48,11 @@ update-po: gnash.pot
 	done
 	touch update-po
 
-$(gmofiles): update-po
+$(gmofiles): #update-po
 
 SUFFIXES = .po .gmo
 .po.gmo:
-	msgfmt --statistics --directory=$(srcdir) -o $*.gmo $*.po
+	msgfmt --statistics --directory=$(srcdir) -o $*.gmo $(@:%.gmo=$(srcdir)/%.po) 
 else
 $(gmofiles): force
 	@for i in $(gmofiles); do \
