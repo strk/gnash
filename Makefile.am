@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.69 2007/04/27 01:06:57 rsavoye Exp $
+# $Id: Makefile.am,v 1.70 2007/04/30 18:53:25 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -61,7 +61,7 @@ man_MANS = doc/gnash.1
 
 DIST_SUBDIRS = $(STD_DIRS) doc plugin cygnal extensions
 
-EXTRA_DIST= config.rpath $(man_MANS) macros/incllist macros/libslist po
+EXTRA_DIST = config.rpath $(man_MANS) macros/incllist macros/libslist 
 
 noinst_HEADERS = compatibility_include.h
 

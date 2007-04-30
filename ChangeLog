@@ -1,5 +1,7 @@
 2007-04-30 Sandro Santilli <strk@keybit.net>
 
+	* Makefile.am: don't put 'po' in EXTRA_DIST, as it's already
+	  in SUBDIRS.
 	* server/StringPredicates.h: include cctype.
 	  See: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=417210.
 	* po/Makefile.am: don't update the .po files on every .gmo
