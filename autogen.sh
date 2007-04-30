@@ -119,7 +119,8 @@ if grep "^AC_PROG_LIBTOOL" configure.ac >/dev/null; then
 	fi
 fi
 
-for coin in `find $srcdir -name CVS -prune -o -name configure.ac -print`
+#for coin in `find $srcdir -name CVS -prune -o -name configure.ac -print`
+for coin in configure.ac libltdl/configure.ac
 do 
   dr=`dirname $coin`
   if test -f $dr/NO-AUTO-GEN; then

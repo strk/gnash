@@ -1,5 +1,7 @@
 2007-04-30 Sandro Santilli <strk@keybit.net>
 
+	* autogen.sh: only process configure.ac in root dir and under libltdl,
+	  running a find annoingly descends in just generated dist dirs.
 	* testsuite/samples/Makefile.am: distribute gotoFrameOnKeyEvent.swf.
 	* testsuite/actionscript.all/array.as: add test for deleting an
 	  array element, and for array indexes being proper properties
