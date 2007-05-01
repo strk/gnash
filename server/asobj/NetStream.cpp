@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.37 2007/04/18 11:00:30 jgilmore Exp $ */
+/* $Id: NetStream.cpp,v 1.38 2007/05/01 20:33:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,6 +35,7 @@
 #include "builtin_function.h"
 #include "GnashException.h"
 #include "NetConnection.h"
+#include "action.h" // for call_method
 
 #include "movie_root.h"
 
@@ -52,7 +53,8 @@ static as_object* getNetStreamInterface();
 NetStream::NetStream()
 	:
 	as_object(getNetStreamInterface()),
-	_netCon(NULL)
+	_netCon(NULL),
+	m_env(NULL)
 {
 }
 
@@ -248,5 +250,59 @@ void netstream_class_init(as_object& global)
 	global.init_member("NetStream", cl.get());
 
 }
+
+void
+NetStream::processStatusNotifications()
+{
+	boost::mutex::scoped_lock lock(statusMutex);
+
+	// TODO: check for System.onStatus too !
+	size_t size = m_status_messages.size();
+	as_value status;
+	if (size && get_member("onStatus", &status) && status.is_function())
+	{
+		log_debug("Processing %d status notifications", size);
+
+		for (size_t i = 0; i < size; ++i)
+		{
+			log_debug(" Invoking onStatus(%s)", m_status_messages[i].c_str());
+
+			// TODO: optimize by reusing the same as_object ?
+			boost::intrusive_ptr<as_object> o = new as_object();
+			o->init_member("code", as_value(m_status_messages[i]), 1);
+
+			if (m_status_messages[i].find("StreamNotFound") == string::npos && m_status_messages[i].find("InvalidTime") == string::npos)
+			{
+				o->init_member("level", as_value("status"), as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+			}
+			else
+			{
+				o->init_member("level", as_value("error"), as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+			}
+
+			m_env->push_val(as_value(o.get()));
+			call_method(status, m_env, this, 1, m_env->get_top_index() );
+		}
+	}
+
+	m_status_messages.clear();
+}
+
+void
+NetStream::setStatus(const std::string& status)
+{
+	// TODO: make thread safe !! protect by a mutex, and use the mutex from status invoker
+	boost::mutex::scoped_lock lock(statusMutex);
+
+	if (m_status_messages.size() && m_status_messages.back() == status)
+	{
+		// status unchanged
+		return;
+	}
+
+	m_status_messages.push_back(status);
+}
+
+
 
 } // end of gnash namespace

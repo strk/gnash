@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.26 2007/04/07 11:55:50 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.27 2007/05/01 20:33:27 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -49,6 +49,43 @@ protected:
 
 	boost::intrusive_ptr<NetConnection> _netCon;
 
+	// List of status messages to be processed
+	std::vector<std::string> m_status_messages;
+
+	/// Mutex protecting m_status_messages
+	boost::mutex statusMutex;
+
+	/// Set stream status.
+	//
+	/// Valid statuses are:
+	///
+	/// Status level:
+	///  - NetStream.Buffer.Empty
+	///  - NetStream.Buffer.Full
+	///  - NetStream.Buffer.Flush
+	///  - NetStream.Play.Start
+	///  - NetStream.Play.Stop 
+	///  - NetStream.Seek.Notify 
+	///
+	/// Error level:
+	///  - NetStream.Play.StreamNotFound
+	///  - NetStream.Seek.InvalidTime
+	///
+	/// TODO: use an enum !
+	///
+	void setStatus(const std::string& /*code*/);
+
+	/// \brief
+	/// Call any onStatus event handler passing it
+	/// any queued status change, see m_status_messages
+	//
+	/// TODO: move up to NetStream ?
+	///
+	void processStatusNotifications();
+
+	// The actionscript enviroment for the AS callbacks
+	as_environment* m_env;
+
 public:
 
 	NetStream();
@@ -64,8 +101,6 @@ public:
 	virtual void seek(double /*pos*/){}
 
 	virtual void setBufferTime(double /*time*/){}
-
-	virtual void set_status(const char* /*code*/){}
 
 	virtual void setNetCon(boost::intrusive_ptr<NetConnection> nc)
 	{
@@ -89,7 +124,11 @@ public:
 
 	virtual bool newFrameReady() { return false; }
 
-	virtual void setEnvironment(as_environment* /*env*/) { };
+	void setEnvironment(as_environment* env)
+	{
+		assert(env);
+		m_env = env;
+	}
 };
 
 

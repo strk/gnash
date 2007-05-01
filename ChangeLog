@@ -1,5 +1,11 @@
 2007-05-01 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: NetStream.{cpp,h}, NetStreamFfmpeg.{cpp,h},
+	  NetStreamGst.{cpp,h}: move all onStatus handling to base class
+	  and made thread safe.
+
+2007-05-01 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.h: add getWidth() and getHeight()
 	* server/asobj/Stage.{cpp,h}: implement Stage.width and
 	  Stage.height.

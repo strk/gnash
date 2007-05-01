@@ -46,14 +46,12 @@ public:
 	int play(const char* source);
 	void seek(double pos);
 	void setBufferTime(double time);
-	void set_status(const char* code);
 	void setNetCon(as_object* nc);
 	int64_t time();
 	long bytesLoaded();
 	long bytesTotal();
 	void advance();
 	bool newFrameReady();
-	void setEnvironment(as_environment* env);
 
 	// Used for gstreamer data read and seek callbacks
 	static int readPacket(void* opaque, char* buf, int buf_size);
@@ -128,9 +126,6 @@ private:
 	// The status message
 	std::string m_status;
 
-	// Has the status message been updated?
-	volatile bool m_statusChanged;
-
 	// The handler which is invoked on status change
 	boost::intrusive_ptr<as_function> m_statusHandler;
 
@@ -140,17 +135,12 @@ private:
 	// The parser for FLV
 	FLVParser* m_parser;
 
-	// The actionscript enviroment for the AS callbacks
-	as_environment* m_env;
-
 	// On next advance() should we pause?
 	volatile bool m_pausePlayback;
 
-	// List of status messages to be processed
-	std::vector<std::string> m_status_messages;
-
 	// should we start when buffer is full?
 	bool m_start_onbuffer;
+
 };
 
 } // gnash namespace

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.22 2007/04/11 17:54:21 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.23 2007/05/01 20:33:27 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -181,14 +181,12 @@ public:
 	int play(const char* source);
 	void seek(double pos);
 	void setBufferTime(double time);
-	void set_status(const char* code);
 	void setNetCon(as_object* nc);
 	int64_t time();
 	long bytesLoaded();
 	long bytesTotal();
 	void advance();
 	bool newFrameReady();
-	void setEnvironment(as_environment* env);
 
 	// Used for ffmpeg data read and seek callbacks
 	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
@@ -285,20 +283,12 @@ private:
 	// The size of the buffer in milliseconds
 	uint32_t m_bufferTime;
 
-	// Has the status message been updated?
-	volatile bool m_statusChanged;
-
 	// The handler which is invoked on status change
 	boost::intrusive_ptr<as_function> m_statusHandler;
 
 	// should we start when buffer is full?
 	bool m_start_onbuffer;
 
-	// The actionscript enviroment for the AS callbacks
-	as_environment* m_env;
-
-	// List of status messages to be processed
-	std::vector<std::string> m_status_messages;
 };
 
 } // gnash namespace
