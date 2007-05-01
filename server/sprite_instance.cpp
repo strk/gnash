@@ -2631,7 +2631,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	// Go backward to a previous frame
 	{
 		resetDisplayList();
-		for (size_t f = 0; f<target_frame_number; f++)
+		for (size_t f = 0; f<=target_frame_number; f++)
 		{
 			execute_frame_tags(f, TAG_DLIST);
 		}
@@ -2643,7 +2643,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 		assert(target_frame_number > m_current_frame);
 
 		// Construct the DisplayList of the target frame
-		for (size_t f = m_current_frame+1; f<target_frame_number; ++f)
+		for (size_t f = m_current_frame+1; f<=target_frame_number; ++f)
 		{
 			// Second argument requests that only "DisplayList" tags
 			// are executed. This means NO actions will be
@@ -2663,7 +2663,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 
 	// Get the actions of target frame.(We don't have a direct way to
 	// do this, so use execute_frame_tags instead).
-	execute_frame_tags(target_frame_number, TAG_ACTION|TAG_DLIST);
+	execute_frame_tags(target_frame_number, TAG_ACTION);
 
 	//FIXME: set m_current_frame to the target frame;
 	//  I think it's too early to do it here! Later actions in the 
