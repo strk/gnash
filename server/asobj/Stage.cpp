@@ -107,17 +107,13 @@ Stage::notifyResize(boost::intrusive_ptr<as_object> obj, as_environment* env)
 unsigned
 Stage::getWidth() const
 {
-	log_warning("Stage::getWidth() testing");
 	return VM::get().getRoot().getWidth();
-	//return 0;
 }
 
 unsigned
 Stage::getHeight() const
 {
-	log_warning("Stage::getHeight() testing");
 	return VM::get().getRoot().getHeight();
-	//return 0;
 }
 
 void
