@@ -65,6 +65,12 @@ public:
 	///
 	void onResize(as_environment* env);
 
+	/// Get current stage width, in pixels
+	unsigned getWidth() const;
+
+	/// Get current stage height, in pixels
+	unsigned getHeight() const;
+
 	/// Set scale mode 
 	void setScaleMode(ScaleMode mode);
 

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Stage.as,v 1.9 2007/03/29 12:37:31 strk Exp $";
+rcsid="$Id: Stage.as,v 1.10 2007/05/01 18:02:52 strk Exp $";
 
 #include "check.as"
 
@@ -40,7 +40,9 @@ check_equals (typeof(Stage.removeListener), 'function');
 
 listener = new Object;
 listener.onResize = function() {
-	_root.note("Resize event received, args to handler: "+arguments.length);
+	_root.note("Resize event received, args to handler: "+arguments.length+" Stage.width="+Stage.width+", Stage.height="+Stage.height);
+	Stage.height = 1;
+	check(Stage.height != 1);
 	// If we delete the Stage object, events won't arrive anymore, but
 	// the precedent setting of 'scaleMode' will persist !!
 	//delete Stage;

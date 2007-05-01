@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.51 2007/04/26 12:31:44 strk Exp $ */
+/* $Id: movie_root.h,v 1.52 2007/05/01 18:02:51 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -154,6 +154,18 @@ public:
 	/// is allowed.
 	///
 	void set_display_viewport(int x0, int y0, int w, int h);
+
+	/// Get current viewport width, in pixels
+	unsigned getWidth() const
+	{
+		return m_viewport_width;
+	}
+
+	/// Get current viewport height, in pixels
+	unsigned getHeight() const
+	{
+		return m_viewport_height;
+	}
 
 	/// Set whether rescaling is allowed or not.
 	//
@@ -439,6 +451,8 @@ private:
 
 	// TODO: use Range2d<int> ?
 	int			m_viewport_x0, m_viewport_y0;
+
+	/// Width and height of viewport, in pixels
 	int			m_viewport_width, m_viewport_height;
 
 	float			m_pixel_scale;

@@ -1,3 +1,11 @@
+2007-05-01 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.h: add getWidth() and getHeight()
+	* server/asobj/Stage.{cpp,h}: implement Stage.width and
+	  Stage.height.
+	* testsuite/actionscript.all/Stage.as: small test for
+	  Stage.width and Stage.height (not automated)
+
 2007-04-30 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/swfdec_gnash_tester: allow 11 loop-backs.

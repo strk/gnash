@@ -36,6 +36,8 @@ namespace gnash {
 as_value stage_addlistener(const fn_call& fn);
 as_value stage_removelistener(const fn_call& fn);
 as_value stage_scalemode_getset(const fn_call& fn);
+as_value stage_width_getset(const fn_call& fn);
+as_value stage_height_getset(const fn_call& fn);
 
 static void
 attachStageInterface(as_object& o)
@@ -47,6 +49,12 @@ attachStageInterface(as_object& o)
 
 	boost::intrusive_ptr<builtin_function> getset(new builtin_function(stage_scalemode_getset));
 	o.init_property("scaleMode", *getset, *getset);
+
+	getset = new builtin_function(stage_width_getset);
+	o.init_property("width", *getset, *getset);
+
+	getset = new builtin_function(stage_height_getset);
+	o.init_property("height", *getset, *getset);
 }
 
 Stage::Stage()
@@ -94,6 +102,22 @@ Stage::notifyResize(boost::intrusive_ptr<as_object> obj, as_environment* env)
 	if ( ! func ) return; // method is not a function
 
 	func->call(fn_call(obj.get(), env, 0, 0));
+}
+
+unsigned
+Stage::getWidth() const
+{
+	log_warning("Stage::getWidth() testing");
+	return VM::get().getRoot().getWidth();
+	//return 0;
+}
+
+unsigned
+Stage::getHeight() const
+{
+	log_warning("Stage::getHeight() testing");
+	return VM::get().getRoot().getHeight();
+	//return 0;
 }
 
 void
@@ -225,6 +249,42 @@ as_value stage_scalemode_getset(const fn_call& fn)
 		else if ( str == "noBorder" ) mode = Stage::noBorder;
 
 		stage->setScaleMode(mode);
+		return as_value();
+	}
+}
+
+as_value
+stage_width_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(stage->getWidth());
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Stage.width is a read-only property!"));
+		);
+		return as_value();
+	}
+}
+
+as_value
+stage_height_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<Stage> stage = ensureType<Stage>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(stage->getHeight());
+	}
+	else // setter
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Stage.height is a read-only property!"));
+		);
 		return as_value();
 	}
 }
