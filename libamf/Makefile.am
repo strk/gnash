@@ -15,16 +15,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.22 2007/04/27 01:08:50 rsavoye Exp $
+# $Id: Makefile.am,v 1.23 2007/05/01 22:00:35 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
-#AM_CXXFLAGS =  $(CXXFLAGS) $(SDL_CFLAGS) $(AM_CPPFLAGS)
-#AM_CPPFLAGS = 
 AM_LDFLAGS = \
 	$(top_builddir)/libbase/libgnashbase.la
-
-# AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
 
 lib_LTLIBRARIES = libgnashamf.la
 libgnashamf_la_SOURCES = amf.cpp rtmp.cpp
@@ -34,6 +30,7 @@ libgnashamf_la_LDFLAGS =  -release $(VERSION) -export-dynamic -no-undefined
 AM_CPPFLAGS = -I.. -I$(srcdir) \
 	-I$(top_srcdir)/server \
 	-I$(top_srcdir)/libbase \
+	$(BOOST_CFLAGS) \
         $(LIBXML_CFLAGS)
 
 noinst_HEADERS = amfutf8.h amf.h rtmp.h protocol.h

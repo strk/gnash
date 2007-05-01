@@ -1,3 +1,7 @@
+2007-05-01  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* libamf/Makefile.am: Add BOOST_CFLAGS so we can find endian.hpp.
+
 2007-05-01 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/: NetStream.{cpp,h}, NetStreamFfmpeg.{cpp,h},
