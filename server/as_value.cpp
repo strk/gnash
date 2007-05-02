@@ -711,6 +711,7 @@ as_value::typeOf() const
 
 		default:
 			assert(0);
+			return NULL;
 	}
 }
 
@@ -752,6 +753,7 @@ as_value::equalsSameType(const as_value& v) const
 
 	}
 	assert(0);
+	return false;
 }
 
 bool
@@ -793,6 +795,7 @@ as_value::to_debug_string() const
 			return "[movieclip:" + m_string_value + "]";
 		default:
 			assert(0);
+			return NULL;
 	}
 }
 
