@@ -35,6 +35,7 @@
 # include <windows.h>
 # include <sys/stat.h>
 # include <io.h>
+# include <ws2tcpip.h>
 #else
 # include <sys/time.h>
 # include <unistd.h>
@@ -187,9 +188,10 @@ Network::createServer(short port)
         }
 
 	if (_debug) {
-		char  ascip[INET_ADDRSTRLEN];
-		inet_ntop(sock_in.sin_family, &_ipaddr, ascip, INET_ADDRSTRLEN);
-	    log_msg(_("Server bound to service on %s, port %hd, using fd %d"),
+//		char  ascip[INET_ADDRSTRLEN];
+//		inet_ntop(sock_in.sin_family, &_ipaddr, ascip, INET_ADDRSTRLEN);
+		char *ascip = ::inet_ntoa(sock_in.sin_addr);
+		log_msg(_("Server bound to service on %s, port %hd, using fd %d"),
 		    ascip, ntohs(sock_in.sin_port),
 		    _listenfd);
 	}
@@ -424,8 +426,9 @@ Network::createClient(const char *hostname, short port)
         if (ret > 0) {
             ret = ::connect(_sockfd, reinterpret_cast<struct sockaddr *>(&sock_in), sizeof(sock_in));
             if (ret == 0) {
-		char ascip[INET_ADDRSTRLEN];
-		inet_ntop(sock_in.sin_family, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
+		char *ascip = ::inet_ntoa(sock_in.sin_addr);
+// 		char ascip[INET_ADDRSTRLEN];
+// 		inet_ntop(sock_in.sin_family, &sock_in.sin_addr.s_addr, ascip, INET_ADDRSTRLEN);
                 log_msg(_("\tport %d at IP %s for fd %d"), port,
                         ascip, _sockfd);
                 _connected = true;

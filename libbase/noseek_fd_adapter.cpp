@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,13 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-
-/* $Id: noseek_fd_adapter.cpp,v 1.16 2007/04/17 10:38:16 strk Exp $ */
-
-#if defined(_WIN32) || defined(WIN32)
-#define snprintf _snprintf
-#endif
+/* $Id: noseek_fd_adapter.cpp,v 1.17 2007/05/02 16:24:12 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

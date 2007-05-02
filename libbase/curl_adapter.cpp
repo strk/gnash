@@ -17,11 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.29 2007/05/02 13:37:15 strk Exp $ */
-
-#if defined(_WIN32) || defined(WIN32)
-#define snprintf _snprintf
-#endif
+/* $Id: curl_adapter.cpp,v 1.30 2007/05/02 16:24:12 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

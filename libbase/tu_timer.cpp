@@ -12,7 +12,7 @@
 #if defined(_WIN32) || defined(WIN32)
 
 #include <windows.h>
-#include <Mmsystem.h>
+#include <mmsystem.h>
 
 
 uint64_t tu_timer::get_ticks()

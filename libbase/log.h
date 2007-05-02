@@ -14,13 +14,17 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.h,v 1.48 2007/05/02 07:34:34 strk Exp $ */
+/* $Id: log.h,v 1.49 2007/05/02 16:24:12 rsavoye Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
+#endif
+
+#ifdef HAVE_WINSOCK2_H
+# include <io.h>
 #endif
 
 // Support compilation with (or without) native language support

@@ -1,3 +1,17 @@
+2007-05-02  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* libbase/curl_adapter.cpp: Don't redefine snprintf() for win32.
+	* libbase/noseek_fd_adapter.cpp: Don't redefine snprintf() for
+	win32.
+	* libbase/log.h: Include io.h for win32.
+	* libbase/network.cpp: Use inet_ntoa() instead of the newer
+	inet_ntop(). Include ws2tcpip.h for win32.
+	* libbase/tu_timer.cpp: Use lowercase mmsystem.h.
+	* libbase/tu_types.h: Don't use __FUNCDNAME__ to redefine
+	__PRETTY_FUNCTION__for all win32 builds.
+	* macros/boost.m4: Remove extraneous boost directory when
+	searching for header files.
+
 2007-05-02 Sandro Santilli <strk@keybit.net>
 
 	* libbase/curl_adapter.cpp (fill_cache): stop uselessly calling

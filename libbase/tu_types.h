@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: tu_types.h,v 1.35 2007/04/30 17:27:39 martinwguy Exp $ */
+/* $Id: tu_types.h,v 1.36 2007/05/02 16:24:12 rsavoye Exp $ */
 
 #ifndef TU_TYPES_H
 #define TU_TYPES_H
@@ -39,7 +39,6 @@ typedef unsigned int uint32_t;
 typedef signed int int32_t;
 typedef unsigned __int64 uint64_t;
 typedef __int64 int64_t;
-# define __PRETTY_FUNCTION__ __FUNCDNAME__
 #else
 # include <inttypes.h>
 
