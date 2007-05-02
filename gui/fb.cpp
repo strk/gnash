@@ -88,7 +88,7 @@ void profile() {
 int terminate_request=false;  // global scope to avoid GUI access
 
 /// Called on CTRL-C and alike
-void terminate_signal(int signo) {
+void terminate_signal(int /*signo*/) {
   terminate_request=true;
 }
 
@@ -378,7 +378,7 @@ void FBGui::renderBuffer()
     var_screeninfo.xres * pixel_size;
     
     
-  for (int bno=0; bno < _drawbounds.size(); bno++) {
+  for (unsigned int bno=0; bno < _drawbounds.size(); bno++) {
 	
 		geometry::Range2d<int>& bounds = _drawbounds[bno];
 		
@@ -455,7 +455,7 @@ void FBGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
 	_drawbounds.clear();
 		
-	for (int rno=0; rno<ranges.size(); rno++) {
+	for (unsigned int rno=0; rno<ranges.size(); rno++) {
 	
 		geometry::Range2d<int> bounds = Intersection(
 	    _renderer->world_to_pixel(ranges.getRange(rno)),
@@ -671,7 +671,7 @@ bool FBGui::init_mouse()
     return false;
   }
   
-  unsigned char buf[10], byte;
+  unsigned char buf[10];
 
   if (fcntl(input_fd, F_SETFL, fcntl(input_fd, F_GETFL) | O_NONBLOCK)<0) {
     log_error("Could not set non-blocking mode for touchpad device: %s", strerror(errno));
@@ -733,8 +733,8 @@ void FBGui::check_mouse()
     */
     
     
-    new_x = ((new_x*1.0) - 355) / (1702 - 355) * 1536 + 256;
-    new_y = ((new_y*1.0) - 482) / (1771 - 482) * 1536 + 256;
+    new_x = (int)(((double)new_x - 355) / (1702 - 355) * 1536 + 256);
+    new_y = (int)(((double)new_y - 482) / (1771 - 482) * 1536 + 256);
     
     
     new_x = new_x * m_stage_width / 2048;
