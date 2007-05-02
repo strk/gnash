@@ -1,5 +1,7 @@
 2007-05-02 Sandro Santilli <strk@keybit.net>
 
+	* libbase/curl_adapter.cpp (fill_cache): stop uselessly calling
+	  fstat().
 	* libbase/log.cpp: call the logfile singletone getter only once.
 	* libbase/image.{cpp,h}: move documentation of the update() method
 	  from cpp to h file. This is the most time-expensive routine in 

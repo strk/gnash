@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.27 2007/04/18 14:07:33 jgilmore Exp $ */
+/* $Id: curl_adapter.cpp,v 1.28 2007/05/02 13:13:48 strk Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -165,7 +165,7 @@ private:
 	std::string _postdata;
 
 	// Current size of cached data
-	long _cached;
+	long unsigned _cached;
 
 	// Attempt at filling the cache up to the given size.
 	// Will call libcurl routines to fetch data.
@@ -255,8 +255,6 @@ CurlStreamFile::fill_cache(off_t size)
 	fprintf(stderr, "fill_cache(%d) called\n", size);
 #endif
 
-	struct stat statbuf;
-
 	CURLMcode mcode;
 	while (_running)
 	{
@@ -281,8 +279,7 @@ CurlStreamFile::fill_cache(off_t size)
                 }
 
 		// we already have that much data
-		fstat(_cachefd, &statbuf);
-		if ( statbuf.st_size >= size )
+		if ( _cached >= size )
 		{
 #ifdef GNASH_CURL_VERBOSE
 			fprintf(stderr,
@@ -314,7 +311,7 @@ CurlStreamFile::init(const std::string& url)
 	_running = 1;
 	_error = 0;
 
-	_cached = -1;
+	_cached = 0;
 
 	_handle = curl_easy_init();
 	_mhandle = curl_multi_init();
