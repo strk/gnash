@@ -150,9 +150,13 @@ main(int /*argc*/, char** /*argv*/)
 		Range2d<float>(-1, 3, 10, 5).scale(3, .5),
 		Range2d<float>(-3, 1.5, 30, 2.5) );
 
+	check_equals( // tolerate 1/1000 floating point drift
+		round(Range2d<float>(0, 0, 40, 80).scale(1.2, 1.0/20).width()*1000)/1000,
+		48);
+
 	check_equals(
-		Range2d<float>(0, 0, 40, 80).scale(1.2, 1.0/20),
-		Range2d<float>(0, 0, 48, 4) );
+		Range2d<float>(0, 0, 40, 80).scale(1.2, 1.0/20).height(),
+		4);
 
 	//
 	// Test range Union 

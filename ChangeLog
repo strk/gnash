@@ -1,3 +1,8 @@
+2007-05-02 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/libgeometry/Range2dTest.cpp: tolerate some floating
+	  point drift.
+
 2007-05-02 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/Makefile.am: Get sure we link against gettext if found.
