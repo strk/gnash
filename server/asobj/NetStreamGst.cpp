@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.25 2007/05/01 20:33:27 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.26 2007/05/02 07:34:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -328,7 +328,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	assert(ns);
 	if ( !nc->openConnection(ns->url.c_str(), ns) ) {
 		ns->setStatus("NetStream.Play.StreamNotFound");
-		log_warning(_("Gnash could not open movie: %s"), ns->url.c_str());
+		log_debug(_("Gnash could not open movie: %s"), ns->url.c_str());
 		return;
 	}
 
@@ -345,7 +345,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 		ns->m_parser = new FLVParser();
 		if (!nc->connectParser(ns->m_parser)) {
 			ns->setStatus("NetStream.Play.StreamNotFound");
-			log_error(_("Gnash could not open movie: %s"), ns->url.c_str());
+			log_debug(_("Gnash could not open movie: %s"), ns->url.c_str());
 			return;
 			
 		}

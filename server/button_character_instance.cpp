@@ -322,13 +322,6 @@ button_character_instance::enabled_getset(const fn_call& fn)
 bool
 button_character_instance::on_event(const event_id& id)
 {
-#if 0
-	if (id.m_id != event_id::KEY_PRESS)
-	{
-		log_warning(_("Unsupported event for button instance: %s"), id.get_function_name().c_str());
-		return false;
-	}
-#endif
 
 	static const event_id s_key[32] =
 	{
@@ -638,7 +631,7 @@ button_character_instance::on_button_event(const event_id& event)
 	}
 	else
 	{
-		//log_warning(_("No handler for event: %s"), event.get_function_name().c_str());
+		//log_debug(_("No handler for event: %s"), event.get_function_name().c_str());
 	}
 
 

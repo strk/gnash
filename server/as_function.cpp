@@ -145,7 +145,7 @@ as_function::getPrototype()
 	get_member("prototype", &proto);
 	if ( proto.to_object() != _properties.get() )
 	{
-		log_warning(_("Exported interface of function %p "
+		log_debug(_("Exported interface of function %p "
 				"has been overwritten (from %p to %p)"),
 				this, _properties.get(),
 				(void*)proto.to_object().get());

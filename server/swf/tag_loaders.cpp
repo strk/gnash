@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.92 2007/04/25 11:29:12 martinwguy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.93 2007/05/02 07:34:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1545,7 +1545,7 @@ file_attributes_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 
     if ( ! flags.use_network )
     {
-	log_warning(_("FileAttributes tag in the SWF requests that "
+	log_unimpl(_("FileAttributes tag in the SWF requests that "
 		    "network access is not granted to this movie "
 		    "(or application?). Anyway Gnash won't care; "
 		    "use white/black listing in your .gnashrc instead"));

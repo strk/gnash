@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.39 2007/04/26 10:56:50 zoulunkai Exp $ */
+/* $Id: character.cpp,v 1.40 2007/05/02 07:34:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -160,7 +160,7 @@ character::get_relative_target_common(const std::string& name)
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			// AS code trying to access something before the root
-			log_warning(_("ActionScript code trying to reference"
+			log_aserror(_("ActionScript code trying to reference"
 				" a nonexistent parent with '..' "
 				" (a nonexistent parent probably only "
 				"occurs in the root MovieClip)."

@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.35 2007/04/13 07:35:55 bjacques Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.36 2007/05/02 07:34:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -322,8 +322,10 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 		gst_element->decoder = gst_element_factory_make ("mad", NULL);
 		if (gst_element->decoder == NULL) {
 			gst_element->decoder = gst_element_factory_make ("flump3dec", NULL);
-			if (gst_element->decoder != NULL && !gst_default_registry_check_feature_version("flump3dec", 0, 10, 4)) {
-				gnash::log_warning("This version of fluendos mp3 plugin does not support flash streaming sounds, please upgrade to version 0.10.4 or higher.");
+			if (gst_element->decoder != NULL && !gst_default_registry_check_feature_version("flump3dec", 0, 10, 4))
+			{
+				// I keep getting these messages even if I hear sound... too much paranoia ?
+				gnash::log_debug("This version of fluendos mp3 plugin does not support flash streaming sounds, please upgrade to version 0.10.4 or higher.");
 			}
 		}
 		// Check if the element was correctly created

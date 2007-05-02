@@ -1,5 +1,13 @@
 2007-05-02 Sandro Santilli <strk@keybit.net>
 
+	* backend/sound_handler_gst.cpp, gui/Player.cpp, libamf/amf.cpp,
+	  libbase/log.h, server/as_function.cpp, server/swf/tag_loaders.cpp,
+	  server/button_character_instance.cpp, server/character.cpp,
+	  server/sprite_instance.cpp, server/asobj/NetStreamGst.cpp:
+	  Drop log_warning, till we find a semantic for it.
+
+2007-05-02 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (sprite_getBounds): remove TESTING
 	  warning, I'm pretty confident about this function now.
 

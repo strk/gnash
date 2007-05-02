@@ -642,7 +642,7 @@ static as_value sprite_hit_test(const fn_call& fn)
 			tgtmat.transform(tgtbounds);
 
 			if ( ! warned_1_arg ) {
-				log_warning("MovieClip.hitTest(%s) TESTING", tgt_val.to_debug_string().c_str());
+				log_debug("MovieClip.hitTest(%s) TESTING", tgt_val.to_debug_string().c_str());
 				warned_1_arg=true;
 			}
 
@@ -657,7 +657,7 @@ static as_value sprite_hit_test(const fn_call& fn)
 			float y = PIXELS_TO_TWIPS(fn.arg(1).to_number(&env));
 
 			if ( ! warned_2_arg ) {
-				log_warning("MovieClip.hitTest(%g,%g) TESTING", x,y);
+				log_debug("MovieClip.hitTest(%g,%g) TESTING", x,y);
 				warned_2_arg=true;
 			}
 

@@ -325,7 +325,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 	}
 
 	// too much noise...
-        //log_warning(_("Unused parameter %s = %s"),
+        //log_debug(_("Unused parameter %s = %s"),
 	//	it->first.c_str(), it->second.c_str());
     }
 

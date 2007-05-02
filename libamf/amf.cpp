@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.34 2007/04/30 17:24:14 martinwguy Exp $ */
+/* $Id: amf.cpp,v 1.35 2007/05/02 07:34:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -727,7 +727,7 @@ AMF::extractString(const char *in)
         memset(buf, 0, length+1);
         memcpy(buf, x, length);
     } else {
-        log_warning("Tried to extract AMF string from non String object!");
+        log_error("Tried to extract AMF string from non String object!");
     }
     
     return buf;
@@ -746,7 +746,7 @@ AMF::extractNumber(const char *in)
         memcpy(num, x, AMF_NUMBER_SIZE);
         swapBytes(num, AMF_NUMBER_SIZE);
     } else {
-        log_warning("Tried to extract AMF Number from non Number object!");
+        log_error("Tried to extract AMF Number from non Number object!");
     }
 
     return num;
