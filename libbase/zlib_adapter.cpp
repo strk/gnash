@@ -14,7 +14,7 @@
 #include <memory>
 
 
-#if !TU_CONFIG_LINK_TO_ZLIB
+#ifndef HAVE_ZLIB_H
 
 
 // Stubs, in case client doesn't want to link to zlib.
@@ -33,7 +33,7 @@ namespace zlib_adapter
 }
 
 
-#else // TU_CONFIG_LINK_TO_ZLIB
+#else // HAVE_ZLIB_H
 
 
 #include <zlib.h>
@@ -339,7 +339,7 @@ namespace zlib_adapter
 	// tu_file*	make_deflater(tu_file* out) { ... }
 }
 
-#endif // TU_CONFIG_LINK_TO_ZLIB
+#endif // HAVE_ZLIB_H
 
 
 // Local Variables:

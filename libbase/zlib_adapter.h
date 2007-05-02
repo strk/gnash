@@ -19,7 +19,7 @@ class tu_file;
 namespace zlib_adapter
 {
 	// NOTE: these functions will return NULL if
-	// TU_CONFIG_LINK_TO_ZLIB is set to 0.
+	// HAVE_ZLIB_H is not defined
 
 	/// \brief
 	/// Returns a read-only tu_file stream that inflates the remaining

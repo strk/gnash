@@ -439,19 +439,18 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 
 	if (compressed)
         {
-#if TU_CONFIG_LINK_TO_ZLIB == 0
+#ifndef HAVE_ZLIB_H
 		log_error(_("movie_def_impl::read(): unable to read "
-			"zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0"));
+			"zipped SWF data; gnash was compiled without zlib support"));
 		return false;
-#endif
-
+#else
 		IF_VERBOSE_PARSE(
 			log_parse(_("file is compressed"));
 		);
 
 		// Uncompress the input as we read it.
 		_in = zlib_adapter::make_inflater(_in);
-
+#endif
         }
 
 	assert(_in.get());

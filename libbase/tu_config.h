@@ -35,17 +35,6 @@
 #define tu_error_exit(error_code, error_message) { fprintf(stderr, error_message); std::exit(error_code); }
 #endif
 
-// define TU_CONFIG_LINK_TO_ZLIB to 0 to exclude zlib code from your
-// build.  Be aware of what you're doing -- it may break features that
-// you need!
-#ifndef TU_CONFIG_LINK_TO_ZLIB
-# ifdef HAVE_ZLIB_H
-#  define TU_CONFIG_LINK_TO_ZLIB 1
-# else
-#  define TU_CONFIG_LINK_TO_ZLIB 0
-# endif
-#endif
-
 // define TU_CONFIG_LINK_TO_LIBPNG to 0 to exclude libpng code from
 // your build.  Be aware of what you're doing -- it may break
 // features!

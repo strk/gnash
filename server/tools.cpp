@@ -15,11 +15,6 @@
 #include "types.h"
 
 
-#if TU_CONFIG_LINK_TO_ZLIB
-//#include <zlib.h>	// for compress()
-#endif // TU_CONFIG_LINK_TO_ZLIB
-
-
 namespace gnash {
 namespace tools {
 	// This struct tracks an input stream.  When you call
@@ -119,31 +114,6 @@ namespace tools {
 		};
 		out->write_bytes(compressed_data, COMP_SIZE);
 
-// Here's some code to compute that at run-time.
-#if 0
-#ifdef TU_CONFIG_LINK_TO_ZLIB
-		int	buffer_bytes = 4;	// width * height * bytes/pix
-		unsigned char	buffer[4] = { 0, 0, 0, 0 };
-
-		static const int	COMPBUFSIZE = 200;
-		unsigned char	compressed_buffer[COMPBUFSIZE];
-
-		// Deflate our little dummy bitmap.
-		unsigned long	compressed_size = COMPBUFSIZE;
-		int err = compress(compressed_buffer, &compressed_size, buffer, sizeof(buffer));
-		if (err != Z_OK)
-		{
-			assert(0);	// There's no good reason for this to fail.
-			log_error("write_placeholder_bitmap(): compress() failed.\n");
-		}
-		else
-		{
-			// Dump the compressed data into the output.
-			out->write_bytes(compressed_buffer, compressed_size);
-		}
-#endif // TU_CONFIG_LINK_TO_ZLIB
-#endif // 0
-
 		// Write the actual tag size in the slot at the beginning.
 		int	end_pos = out->get_position();
 		int	size = end_pos - tag_size_pos - 4;
@@ -183,11 +153,10 @@ int	gnash::tools::process_swf(tu_file* swf_out, tu_file* in, const process_optio
 	tu_file*	original_in = NULL;
 	if (compressed)
 	{
-#if TU_CONFIG_LINK_TO_ZLIB == 0
+#ifndef HAVE_ZLIB_H
 		log_error("gnash can't read zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0!\n");
 		return -1;
-#endif
-
+#else
 		IF_VERBOSE_PARSE(log_msg("file is compressed."));
 		original_in = in;
 
@@ -198,6 +167,7 @@ int	gnash::tools::process_swf(tu_file* swf_out, tu_file* in, const process_optio
 		// it's not included in the compressed
 		// stream length.
 		file_end_pos = file_length - 8;
+#endif
 	}
 
 	stream	str(in);

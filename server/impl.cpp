@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.104 2007/04/18 09:35:42 jgilmore Exp $ */
+/* $Id: impl.cpp,v 1.105 2007/05/02 18:19:02 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -275,10 +275,10 @@ void	get_movie_info(
     
     tu_file*	original_in = NULL;
     if (compressed) {
-#if TU_CONFIG_LINK_TO_ZLIB == 0
-	log_error(_("get_movie_info(): can't read zipped SWF data; TU_CONFIG_LINK_TO_ZLIB is 0"));
+#ifndef HAVE_ZLIB_H
+	log_error(_("get_movie_info(): can't read zipped SWF data; gnash was compiled without zlib support"));
 	return;
-#endif
+#else
 	original_in = in;
 	
 	// Uncompress the input as we read it.
@@ -288,6 +288,7 @@ void	get_movie_info(
 	// it's not included in the compressed
 	// stream length.
 	file_length -= 8;
+#endif
     }
     
     stream	str(in);

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.95 2007/05/02 17:11:42 martinwguy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.96 2007/05/02 18:19:02 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -57,7 +57,7 @@
 #include "sound_definition.h"
 #include "PlaceObject2Tag.h"
 
-#if TU_CONFIG_LINK_TO_ZLIB
+#ifdef HAVE_ZLIB_H
 #include <zlib.h>
 #endif
 
@@ -304,7 +304,7 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 }
 
 
-#if TU_CONFIG_LINK_TO_ZLIB
+#ifdef HAVE_ZLIB_H
 void inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
     // Wrapper function -- uses Zlib to uncompress in_bytes worth
     // of data from the input file into buffer_bytes worth of data
@@ -354,7 +354,7 @@ void inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
 	    log_error(_("inflate_wrapper() inflateEnd() return %d"), err);
     }
 }
-#endif // TU_CONFIG_LINK_TO_ZLIB
+#endif // HAVE_ZLIB_H
 
 
 // loads a define_bits_jpeg3 tag. This is a jpeg file with an alpha
@@ -378,7 +378,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
     {
 
-#if TU_CONFIG_LINK_TO_ZLIB == 0
+#ifndef HAVE_ZLIB_H
 	log_error(_("gnash is not linked to zlib -- can't load jpeg3 image data"));
 	return;
 #else
@@ -434,7 +434,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
     //bitmap_info*	bi = NULL;
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
     {
-#if TU_CONFIG_LINK_TO_ZLIB == 0
+#ifndef HAVE_ZLIB_H
 	log_error(_("gnash is not linked to zlib -- can't load zipped image data"));
 	return;
 #else
@@ -654,7 +654,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 	    // add image to movie, under character id.
 	    m->add_bitmap_character_def(character_id, ch);
 	}
-#endif // TU_CONFIG_LINK_TO_ZLIB
+#endif // HAVE_ZLIB_H
 
 #if 0
     assert(bi->get_ref_count() == 0);

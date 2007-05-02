@@ -32,8 +32,13 @@
 	* gui/fb.cpp: Fix compiler warnings
 	* libbase/tu_config.h,server/swf/tag_loaders.cpp: Allow compilation
 	  without zlib, auto-switching TU_CONFIG_LINK_TO_ZLIB on HAVE_ZLIB_H
-	  (works with agg-fb; gtk etc require zlib in their own right)
+	  (works with renderer=agg/opengl, gui=fb/sdl, media=gst/mad/none;
+	  gtk/kde, cairo, ffmpeg require zlib in their own right)
 	* configure.ac: Reformat messages
+	* libbase/tu_config.h,libbase/zlib_adapter.{cpp,h},server/tools.cpp,
+	  server/{impl.cpp,parser/movie_def_impl.cpp,swf/tag_loaders.cpp},
+	  compatibility_include.h: eliminate TU_CONFIG_LINK_TO_ZLIB;
+	  use HAVE_ZLIB_H directly.
 
 2007-05-02 Sandro Santilli <strk@keybit.net>
 
