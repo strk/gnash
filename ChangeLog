@@ -49,6 +49,10 @@
 	  if the library is not found.
 	* server/asobj/SoundMad.cpp: Fix compiler warnings.
 	* gui/sdl.cpp: Regularize bizarre indentation
+	* gui/sdl.cpp: A closer hack at making movies run at correct speed.
+	  Before: always at 100 frames per second + cpu time.
+	  After: Still not perfect: in non-interactive movie, visuals are a
+	  fraction of a second ahead of MP3 soundtrack.
 
 2007-05-02 Sandro Santilli <strk@keybit.net>
 

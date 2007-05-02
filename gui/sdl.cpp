@@ -14,7 +14,10 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: sdl.cpp,v 1.54 2007/05/02 21:41:04 martinwguy Exp $ */
+// 
+//
+
+/* $Id: sdl.cpp,v 1.55 2007/05/02 21:56:49 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -65,6 +68,8 @@ SDLGui::run()
     int y_old = -1;
     int button_state_old = -1;
 
+    Uint32 movie_time = 0;// SDL_GetTicks(); // what time it should be in the movie
+
     SDL_Event   event;
     while (true)
     {
@@ -73,15 +78,8 @@ SDLGui::run()
             break;
         }
 
-        Uint32 start_tick = SDL_GetTicks();
-
-        while (true)
+        while (SDL_PollEvent(&event))
         {
-            if (SDL_PollEvent(&event) == 0)
-            {
-                break;
-            }
-
             switch (event.type)
             {
             case SDL_MOUSEMOTION:
@@ -91,6 +89,7 @@ SDLGui::run()
                 y_old = event.motion.y;
                 notify_mouse_moved((int) (x_old / _xscale), (int) (y_old / _yscale));
                 break;
+
             case SDL_MOUSEBUTTONDOWN:
             case SDL_MOUSEBUTTONUP:
             {
@@ -136,15 +135,15 @@ SDLGui::run()
             }
         }
 
+        // Wait until real time catches up with movie time.
+        int delay = movie_time - SDL_GetTicks();
+        if (delay > 0)
+        {
+            SDL_Delay(delay);
+        }
+
         Gui::advance_movie(this);
-
-//      int delay = _interval - (SDL_GetTicks() - start_tick);
-//      if (delay < 0)
-//      {
-//          delay = 0;
-//      }
-        SDL_Delay(10);
-
+        movie_time += _interval;        // Time next frame should be displayed
     }
     return false;
 }
@@ -300,7 +299,7 @@ void SDLGui::key_event(SDLKey key, bool down)
             }
         }
     }
-    
+
     if (c != gnash::key::INVALID) {
         // 0 should be any modifier instead..
         // see Gui::notify_key_event in gui.h
@@ -323,3 +322,4 @@ SDLGui::expose_event()
 
 
 } // namespace gnash
+
