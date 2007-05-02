@@ -137,7 +137,7 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 {
 	SoundMad* so = static_cast<SoundMad*>(owner);
 
-	int pos = 0;
+	unsigned int pos = 0;
 
 	// First use the data left over from last time
 	if (so->leftOverSize > 0) {
@@ -171,8 +171,6 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 	int orgBufSize = bufSize;
 
 	bool loop = true;
-	int outputsamples = 0;
-
 	uint8_t* ptr = new uint8_t[8192];
 
 	bool ret = true;

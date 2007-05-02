@@ -40,6 +40,10 @@
 	  compatibility_include.h: eliminate TU_CONFIG_LINK_TO_ZLIB;
 	  use HAVE_ZLIB_H directly.
 	* configure.ac: Suggest packages to install when zlib-dev is missing
+	* configure.ac,macros/ffmpeg.m4: Fix quotation in ffmpeg detection and
+	  skip version checking to avoid syntax errors during "configure"
+	  if the library is not found.
+	* server/asobj/SoundMad.cpp: Fix compiler warnings.
 
 2007-05-02 Sandro Santilli <strk@keybit.net>
 
