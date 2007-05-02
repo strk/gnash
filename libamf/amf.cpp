@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.35 2007/05/02 07:34:34 strk Exp $ */
+/* $Id: amf.cpp,v 1.36 2007/05/02 14:18:05 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,8 +35,6 @@
 #include "log.h"
 #include "amf.h"
 #include "amfutf8.h"
-
-#include <boost/detail/endian.hpp>
 
 using namespace std;
 using namespace gnash;
@@ -122,10 +120,20 @@ AMF::~AMF()
 static void *
 swapBytes(void *word, int size)
 {
-#ifdef BOOST_BIG_ENDIAN
-    // Big-endian machine: do nothing
-#else
-# ifdef BOOST_LITTLE_ENDIAN
+    union {
+	uint16_t s;
+	struct {
+	    uint8_t c0;
+	    uint8_t c1;
+	} c;
+    } u;
+	   
+    u.s = 1;
+    if (u.c.c0 == 0) {
+	// Big-endian machine: do nothing
+	return word;
+    }
+
     // Little-endian machine: byte-swap the word
 
     // A conveniently-typed pointer to the source data
@@ -155,10 +163,6 @@ swapBytes(void *word, int size)
 	break;
       }
     }
-# else
-#  error "Unsupported host endianness"
-# endif
-#endif
 
     return word;
 }

@@ -14,6 +14,7 @@
 	* libbase/tu_config.h,libbase/jpeg.cpp,server/swf/tag_loaders.cpp,
 	  compatibility_include.h: Having jpeglib is compulsory, so
 	  remove TU_CONFIG_LINK_TO_JPEGLIB
+	* Revert attempt to use endian.hpp. It broke someone's build. QED.
 
 2007-05-02 Sandro Santilli <strk@keybit.net>
 
