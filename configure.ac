@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.298 2007/05/02 17:32:47 martinwguy Exp $
+dnl $Id: configure.ac,v 1.299 2007/05/02 18:31:51 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1619,6 +1619,7 @@ else
   echo "        WARNING: You need to have the zlib development packages installed"
   echo "                 to play compressed SWF (most of them from version 6 up)"
   echo "                 and to display some kinds of JPEG files."
+    echo "               Install zlib1g-dev (using apt-get) or zlib-dev (using yum)."
 fi
 
 if test x$ext_mysql = xyes; then

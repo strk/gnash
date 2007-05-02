@@ -39,6 +39,7 @@
 	  server/{impl.cpp,parser/movie_def_impl.cpp,swf/tag_loaders.cpp},
 	  compatibility_include.h: eliminate TU_CONFIG_LINK_TO_ZLIB;
 	  use HAVE_ZLIB_H directly.
+	* configure.ac: Suggest packages to install when zlib-dev is missing
 
 2007-05-02 Sandro Santilli <strk@keybit.net>
 
