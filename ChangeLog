@@ -10,6 +10,17 @@
 
 2007-05-02  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* po/Makefile.am: We don't need $(srcdir) since we're specifing
+	the directory.
+	* server/asobj/Makefile.am: Make libgnashasobjs a a convienience
+	library. 
+	* server/parser/Makefile.am: Make libgnashparser a a convienience
+	library. 
+	* server/vm/Makefile.am: Make libgnashvm a a convienience
+	library. 
+	* utilities/Makefile.am: Don't link in all the other libraries.
+	* gui/Makefile.am: Don't link in all the other libraries.
+
 	* libbase/curl_adapter.cpp: Don't redefine snprintf() for win32.
 	* libbase/noseek_fd_adapter.cpp: Don't redefine snprintf() for
 	win32.

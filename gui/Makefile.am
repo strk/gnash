@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.65 2007/04/27 01:08:50 rsavoye Exp $
+# $Id: Makefile.am,v 1.66 2007/05/03 00:43:25 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -218,10 +218,6 @@ GNASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/server/vm/libgnashvm.la \
-	$(top_builddir)/server/parser/libgnashparser.la \
-	$(top_builddir)/server/asobj/libgnashasobjs.la \
-	$(top_builddir)/server/parser/libgnashparser.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	libgnashplayer.la \

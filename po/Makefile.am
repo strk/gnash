@@ -52,7 +52,7 @@ $(gmofiles): #update-po
 
 SUFFIXES = .po .gmo
 .po.gmo:
-	msgfmt --statistics --directory=$(srcdir) -o $*.gmo $(@:%.gmo=$(srcdir)/%.po) 
+	msgfmt --statistics --directory=$(srcdir) -o $*.gmo $(@:%.gmo=%.po) 
 else
 $(gmofiles): force
 	@for i in $(gmofiles); do \

@@ -15,11 +15,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.30 2007/04/28 00:04:26 rsavoye Exp $
+# $Id: Makefile.am,v 1.31 2007/05/03 00:43:25 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
-lib_LTLIBRARIES = libgnashparser.la 
+noinst_LTLIBRARIES = libgnashparser.la 
 
 # Only enable if we're configured with --enable-mp3
 #
