@@ -1,3 +1,7 @@
+2007-05-02 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libbase/Makefile.am: Get sure we link against gettext if found.
+
 2007-05-02  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* libbase/curl_adapter.cpp: Don't redefine snprintf() for win32.
