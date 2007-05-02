@@ -14,11 +14,11 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.35 2007/04/10 09:14:48 strk Exp $
+dnl $Id: ffmpeg.m4,v 1.36 2007/05/02 19:33:06 martinwguy Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
-  dnl Lool for the header
+  dnl Look for the header
   AC_ARG_WITH(ffmpeg_incl, AC_HELP_STRING([--with-ffmpeg-incl], [directory where ffmpeg headers are]), with_ffmpeg_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_ffmpeg_incl,[
     if test x"${with_ffmpeg_incl}" != x ; then
@@ -62,39 +62,43 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       fi
   fi
 
-  dnl We need LIBAVCODEC VERSION of at least 51.29.0 to get avcodec_decode_audio2
+dnl We need LIBAVCODEC VERSION of at least 51.29.0 to get avcodec_decode_audio2
 dnl   AC_PATH_PROG(FFMPEG, ffmpeg, ,[${pathlist}])
 dnl   if test "x$FFMPEG" = "x" ; then
 dnl     ffmpeg_version=`$FFMPEG uglyhack 2>&1 | grep "libavcodec version" | cut -d ' ' -f 5 | tr -d '.'`
-dnl     if test $ffmpeg -lt 51290; then
+dnl     if test "$ffmpeg_version" -lt 51290; then
 dnl       AC_MSG_ERROR([])
 dnl     fi
 dnl   fi
 
-  ffmpeg_num_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | sed -e "s%[[^0-9]]%%g"`
-  ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | sed -e "s%[[^0-9.]]%%g"`
+  # Check avcodec version number, if it was found
+  if test x"${topdir}" != x; then
+    ffmpeg_num_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | sed -e "s%[[^0-9]]%%g"`
+    ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | sed -e "s%[[^0-9.]]%%g"`
 
-  if test x"${ffmpeg_version}" = x ; then
-    ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${topdir}/avcodec.h | sed -e "s%[[^0-9.]]%%g"`
-    ffmpeg_num_version=`$EGREP "define LIBAVCODEC_BUILD " ${topdir}/avcodec.h | sed -e "s%[[^0-9]]%%g"`
-  fi
+    if test x"${ffmpeg_version}" = x ; then
+      ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${topdir}/avcodec.h | sed -e "s%[[^0-9.]]%%g"`
+      ffmpeg_num_version=`$EGREP "define LIBAVCODEC_BUILD " ${topdir}/avcodec.h | sed -e "s%[[^0-9]]%%g"`
+    fi
 
 dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes], [avfound=no])
-  if test $ffmpeg_num_version -lt 51110; then
-    AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required])
-    ffmpeg_version=
-  else
-    ffmpeg_version=ok
-  fi
+  
+    if test "$ffmpeg_num_version" -lt 51110; then
+      AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required])
+      ffmpeg_version=
+    else
+      ffmpeg_version=ok
+    fi
 
-  if test $ffmpeg_num_version -gt 51280; then
-    AC_DEFINE(FFMPEG_AUDIO2, 1, [Define if avcodec_decode_audio2 can be used.])
-  fi
+    if test "$ffmpeg_num_version" -gt 51280; then
+      AC_DEFINE(FFMPEG_AUDIO2, 1, [Define if avcodec_decode_audio2 can be used.])
+    fi
 
-  if test $ffmpeg_num_version -lt 51270; then
-    AC_MSG_WARN([This version of ffmpeg/libavcodec is not able to play VP6 encoded video!])
-  else
-    AC_DEFINE(FFMPEG_VP6, 1, [Define if ffmpeg can play VP6.])
+    if test "$ffmpeg_num_version" -lt 51270; then
+      AC_MSG_WARN([This version of ffmpeg/libavcodec is not able to play VP6 encoded video!])
+    else
+      AC_DEFINE(FFMPEG_VP6, 1, [Define if ffmpeg can play VP6.])
+    fi
   fi
 
   if test x"${ac_cv_path_ffmpeg_incl}" != x ; then
@@ -116,7 +120,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
   ])
 
   dnl Try with pkg-config
-  if test x${cross_compiling} = xno; then
+  if test x"${cross_compiling}" = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" = x; then
       $PKG_CONFIG --exists libavcodec && libavcodec=`$PKG_CONFIG --libs libavcodec`
     fi

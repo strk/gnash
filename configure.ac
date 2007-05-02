@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.299 2007/05/02 18:31:51 martinwguy Exp $
+dnl $Id: configure.ac,v 1.300 2007/05/02 19:33:06 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -652,7 +652,7 @@ AM_CONDITIONAL(ENABLE_MTASC, [ test x"$MTASC" != x ])
 dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
 
-if test x$gui = xsdl -o x$media_handler = xffmpeg -o x$media_handler = xmad; then
+if test x"$gui" = xsdl -o x"$media_handler" = xffmpeg -o x"$media_handler" = xmad; then
   GNASH_PATH_SDL
 fi
 
@@ -792,7 +792,7 @@ esac
 
 if test x"$media_handler" = x"ffmpeg"; then
   GNASH_PATH_FFMPEG
-  if test x"${ac_cv_path_ffmpeg_lib}" = x -o x${ffmpeg_version} != xok; then
+  if test x"${ac_cv_path_ffmpeg_lib}" = x -o x"${ffmpeg_version}" != xok; then
     AC_MSG_WARN([ffmpeg specified as decoder, but it's not present or it's version is too old, disabling media handling])
     media_handler=none
   fi
@@ -808,12 +808,12 @@ if test x"$media_handler" = x"mad"; then
   fi
 fi
 dnl I'm kinda lazy, get rid of this later... //Markus
-AM_CONDITIONAL(HAVE_MAD, test x$media_handler = xmad)
+AM_CONDITIONAL(HAVE_MAD, test x"$media_handler" = xmad)
 
 AM_CONDITIONAL(USE_SOUND_GST, test x$media_handler = xgst)
-AM_CONDITIONAL(USE_SOUND_SDL, test x$media_handler = xmad -o x$media_handler = xffmpeg)
-AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x$media_handler = xffmpeg)
-AM_CONDITIONAL(USE_MAD_ENGINE, test x$media_handler = xmad)
+AM_CONDITIONAL(USE_SOUND_SDL, test x"$media_handler" = xmad -o x"$media_handler" = xffmpeg)
+AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$media_handler" = xffmpeg)
+AM_CONDITIONAL(USE_MAD_ENGINE, test x"$media_handler" = xmad)
 
 dnl AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
 
@@ -1112,7 +1112,7 @@ fi
 
 if test x"$gui" = xgtk -a x"$pixelformat" = xrgb565; then
   echo "        WARNING: Pixel format RGB565 selected in combination with the"
-  echo "        GTK GUI. Only a hacked GTK will work (e.g. on the OLPC)."
+  echo "                 GTK GUI. Only a hacked GTK will work (e.g. on the OLPC)."
 fi
 
 if test x"$extensions_list" != x; then
@@ -1122,7 +1122,7 @@ fi
 echo "        Renderer engine: "$renderer
 echo "        GUI: "$gui
 echo "        Media handler: "$media_handler
-if test x"$_handler" = xffmpeg -o x"$_handler" = xmad; then
+if test x"$media_handler" = xffmpeg -o x"$media_handler" = xmad; then
 echo "        Using SDL for sound handling"
 fi
 
@@ -1359,8 +1359,8 @@ if test "$media_handler" = "gst"; then
     echo "        ERROR: gstreamer media handling requested, but no gstreamer 0.10+ found"
     echo "               You need to have the gstreamer development package installed"
     echo "               to compile this project. You can either reconfigure using"
-    echo "               --media-handler=ffmpeg or install libgstreamer0.10-dev"
-    echo "               (using apt-get) or <something similar> (using yum)."
+    echo "               --media-handler=ffmpeg or =mad or install libgstreamer0.10-dev"
+    echo "               (using apt-get) or gstreamer-devel (using yum)."
     nogo=true
   fi
 fi
@@ -1384,7 +1384,7 @@ fi
     fi
   else
     if test x"$media_handler" = x"ffmpeg"; then
-      if test x${ffmpeg_version} != xok; then
+      if test x"${ffmpeg_version}" != xok; then
          echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed."
          echo "               This version of ffmpeg may not work!"
          echo "               Version 51.27.0 or newer is highly recommended."
@@ -1393,13 +1393,13 @@ fi
       if test x"$FFMPEG_LIBS" != x; then
         echo "        MP3 and video support enabled through ffmpeg"
         if test x"$FFMPEG_CFLAGS" != x; then
-          echo "        ffmpeg flags are: $FFMPEG_CFLAGS"
+          echo "        FFMPEG flags are: $FFMPEG_CFLAGS"
         else
-          echo "        ffmpeg flags are: default include path"
+          echo "        FFMPEG flags are: default include path"
         fi
-          echo "        ffmpeg libs are: $FFMPEG_LIBS"
+          echo "        FFMPEG libs are: $FFMPEG_LIBS"
       else
-        echo "        ERROR: No ffmpeg development package installed!"
+        echo "        ERROR: No FFMPEG development package installed!"
         echo "               You need to have the ffmpeg development package installed"
         echo "               to enable mp3 decoding. You can either reconfigure using"
         echo "               --media-handler=mad to use libmad or install libavcodec-dev"
