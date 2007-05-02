@@ -30,6 +30,9 @@
 	  remove TU_CONFIG_LINK_TO_JPEGLIB
 	* Revert attempt to use endian.hpp. It broke someone's build. QED.
 	* gui/fb.cpp: Fix compiler warnings
+	* libbase/tu_config.h,server/swf/tag_loaders.cpp: Allow compilation
+	  without zlib, auto-switching TU_CONFIG_LINK_TO_ZLIB on HAVE_ZLIB_H
+	  (works with agg-fb; gtk etc require zlib in their own right)
 
 2007-05-02 Sandro Santilli <strk@keybit.net>
 

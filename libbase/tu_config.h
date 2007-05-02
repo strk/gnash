@@ -39,7 +39,11 @@
 // build.  Be aware of what you're doing -- it may break features that
 // you need!
 #ifndef TU_CONFIG_LINK_TO_ZLIB
-#define TU_CONFIG_LINK_TO_ZLIB 1
+# ifdef HAVE_ZLIB_H
+#  define TU_CONFIG_LINK_TO_ZLIB 1
+# else
+#  define TU_CONFIG_LINK_TO_ZLIB 0
+# endif
 #endif
 
 // define TU_CONFIG_LINK_TO_LIBPNG to 0 to exclude libpng code from

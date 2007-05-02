@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.94 2007/05/02 10:30:09 martinwguy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.95 2007/05/02 17:11:42 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -57,7 +57,9 @@
 #include "sound_definition.h"
 #include "PlaceObject2Tag.h"
 
+#if TU_CONFIG_LINK_TO_ZLIB
 #include <zlib.h>
+#endif
 
 namespace gnash {
 
