@@ -19,7 +19,7 @@
 #ifndef __LOADTHREAD_H__
 #define __LOADTHREAD_H__
 
-// $Id: LoadThread.h,v 1.5 2007/03/30 13:57:26 tgc Exp $
+// $Id: LoadThread.h,v 1.6 2007/05/02 12:11:31 strk Exp $
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp>
@@ -88,7 +88,10 @@ public:
 	bool completed();
 
 	/// Check if given position is confirmed to be accessable
-	bool isPositionConfirmed(size_t pos);
+	bool isPositionConfirmed(size_t pos) const
+	{
+		return (static_cast<int32_t>(pos) <= _loadPosition);
+	}
 
 private:
 

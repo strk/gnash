@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.6 2007/04/10 23:11:31 bjacques Exp $
+// $Id: LoadThread.cpp,v 1.7 2007/05/02 12:11:31 strk Exp $
 
 #include "LoadThread.h"
 
@@ -294,7 +294,3 @@ void LoadThread::download()
 	_actualPosition = pos;
 }
 
-bool LoadThread::isPositionConfirmed(size_t pos)
-{
-	return (static_cast<int32_t>(pos) <= _loadPosition);
-}
