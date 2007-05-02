@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.47 2007/04/18 14:07:33 jgilmore Exp $ */
+/* $Id: log.cpp,v 1.48 2007/05/02 12:39:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -155,12 +155,14 @@ LogFile::getDefaultInstance()
 	return o;
 }
 
+namespace {
+    LogFile& dbglogfile = LogFile::getDefaultInstance();
+};
+
 // Printf-style log for debugging info.
 void
 log_msg(const char* fmt, ...)
 {
-    LogFile& dbglogfile = LogFile::getDefaultInstance();
-
     va_list ap;
     char tmp[BUFFER_SIZE];
 
@@ -176,7 +178,6 @@ log_msg(const char* fmt, ...)
 void
 log_trace(const char* fmt, ...)
 {
-    LogFile& dbglogfile = LogFile::getDefaultInstance();
 
     va_list ap;
     char tmp[BUFFER_SIZE];
@@ -193,7 +194,6 @@ log_trace(const char* fmt, ...)
 void
 log_debug(const char* fmt, ...)
 {
-    LogFile& dbglogfile = LogFile::getDefaultInstance();
 
     va_list ap;
     char tmp[BUFFER_SIZE];
@@ -215,14 +215,6 @@ log_debug(const char* fmt, ...)
 void
 log_action(const char* fmt, ...)
 {
-    LogFile& dbglogfile = LogFile::getDefaultInstance();
-#if 0 // callers shoudl always use IF_VERBOSE_ACTION
-    if ( ! dbglogfile.getActionDump() )
-    {
-        return;
-    }
-#endif
-
     va_list ap;
     char tmp[BUFFER_SIZE];
 
@@ -239,14 +231,6 @@ log_action(const char* fmt, ...)
 void
 log_parse(const char* fmt, ...)
 {
-    LogFile& dbglogfile = LogFile::getDefaultInstance();
-
-#if 0 // callers should always use IF_VERBOSE_PARSE
-    if ( ! dbglogfile.getParserDump() )
-    {
-        return;
-    }
-#endif
 
     va_list ap;
     char tmp[BUFFER_SIZE];
@@ -264,8 +248,6 @@ log_parse(const char* fmt, ...)
 void
 log_error(const char* fmt, ...)
 {
-    LogFile& dbglogfile = LogFile::getDefaultInstance();
-
     va_list ap;
     char tmp[BUFFER_SIZE];
 
@@ -281,8 +263,6 @@ log_error(const char* fmt, ...)
 void
 log_unimpl(const char* fmt, ...)
 {
-    LogFile& dbglogfile = LogFile::getDefaultInstance();
-
     va_list ap;
     char tmp[BUFFER_SIZE];
 
@@ -298,8 +278,6 @@ log_unimpl(const char* fmt, ...)
 void
 log_security(const char* fmt, ...)
 {
-    LogFile& dbglogfile = LogFile::getDefaultInstance();
-
     va_list ap;
     char tmp[BUFFER_SIZE];
 
@@ -315,8 +293,6 @@ log_security(const char* fmt, ...)
 void
 log_swferror(const char* fmt, ...)
 {
-    LogFile& dbglogfile = LogFile::getDefaultInstance();
-
     va_list ap;
     char tmp[BUFFER_SIZE];
 
@@ -332,8 +308,6 @@ log_swferror(const char* fmt, ...)
 void
 log_aserror(const char* fmt, ...)
 {
-    LogFile& dbglogfile = LogFile::getDefaultInstance();
-
     va_list ap;
     char tmp[BUFFER_SIZE];
 
