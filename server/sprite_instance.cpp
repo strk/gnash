@@ -823,22 +823,13 @@ sprite_getBounds(const fn_call& fn)
 
 		matrix tgtwmat = target->get_world_matrix();
 		matrix srcwmat = sprite->get_world_matrix();
-		// TODO: fixme, we should likely use the world matrixes for a straight and inverse transform
 		matrix invtgtwmat; invtgtwmat.set_inverse(tgtwmat);
 		matrix m = srcwmat;
 		m.concatenate(invtgtwmat);
 
-		//m.transform(bounds);
-		//tgtwmat.transform_by_inverse(bounds);
-		//std::stringstream ss;
 
-		//ss << "Local bounds: " << bounds << endl;
 		srcwmat.transform(bounds);
-		//ss << "src-w-transformed bounds: " << bounds << "(srcwmat is " << srcwmat << ")" << endl;
 		tgtwmat.transform_by_inverse(bounds);
-		//ss << "tgt-w-invtransfor bounds: " << bounds << "(tgtwmat is " << tgtwmat << ")" << endl;
-		//log_msg("%s", ss.str().c_str());
-		log_msg("FIXME: MovieClip.getBounds(%s) TESTING", fn.arg(0).to_debug_string().c_str());
 	}
 
 	// Magic numbers here... dunno why

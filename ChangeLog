@@ -1,3 +1,8 @@
+2007-05-02 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (sprite_getBounds): remove TESTING
+	  warning, I'm pretty confident about this function now.
+
 2007-05-01  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* libamf/Makefile.am: Add BOOST_CFLAGS so we can find endian.hpp.
