@@ -33,6 +33,7 @@
 	* libbase/tu_config.h,server/swf/tag_loaders.cpp: Allow compilation
 	  without zlib, auto-switching TU_CONFIG_LINK_TO_ZLIB on HAVE_ZLIB_H
 	  (works with agg-fb; gtk etc require zlib in their own right)
+	* configure.ac: Reformat messages
 
 2007-05-02 Sandro Santilli <strk@keybit.net>
 

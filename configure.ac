@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.297 2007/04/30 17:27:39 martinwguy Exp $
+dnl $Id: configure.ac,v 1.298 2007/05/02 17:32:47 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1570,10 +1570,10 @@ if test x"$BOOST_LIBS" != x; then
 	echo "        BOOST libs are: $BOOST_LIBS"
     else
 	# They have some boost libs but no date_time and want to compile cygnal.
-	echo "ERROR: No BOOST date_time package installed!\
- You also need to have the BOOST date_time development package installed\
- to compile cygnal, or install libboost-date-time-dev (using apt-get)\
- or --disable-cygnal."
+	echo "        ERROR: No BOOST date_time package installed!"
+	echo "        You also need to have the BOOST date_time development package installed"
+	echo "        to compile cygnal, or install libboost-date-time-dev (using apt-get)"
+	echo "        or --disable-cygnal."
 	nogo=true
     fi
 else
@@ -1591,10 +1591,9 @@ if test x"$MING_LIBS" != x; then
     echo "        MING libs are $MING_LIBS"
     echo "        MAKESWF is $MAKESWF"
 else
-    echo "Warning:\
- You need to have the Ming development and utilities packages installed\
- to run most of the tests in Gnash testsuite. Some of the tests will be\
- run anyway."
+    echo "        WARNING: You need to have the Ming development and utilities packages"
+    echo "                 installed to run most of the tests in Gnash testsuite."
+    echo "                 (Some of the tests can still be run anyway)."
 fi
 
 if test x"$SWFDEC_TESTSUITE" != x; then
@@ -1605,9 +1604,8 @@ if test x"$MTASC" != x; then
     echo "        MTASC is $MTASC"
     echo "        MTASC CLASSPATH is $MTASC_CLASSPATH"
 else
-    echo "Warning:\
- You need to have the MTASC compiler packages installed\
- to run some of the tests in Gnash testsuite."
+    echo "        WARNING: You need to have the MTASC compiler packages installed"
+    echo "                 to run some of the tests in Gnash testsuite."
 fi
 
 if test x"$Z_LIBS" != x; then
@@ -1618,9 +1616,9 @@ if test x"$Z_LIBS" != x; then
   fi
   echo "        Z libs are: $Z_LIBS"
 else
-  echo "Warning:\
- You need to have the zlib development packages installed\
- to play compressed SWF (most of them from version 6 up). "
+  echo "        WARNING: You need to have the zlib development packages installed"
+  echo "                 to play compressed SWF (most of them from version 6 up)"
+  echo "                 and to display some kinds of JPEG files."
 fi
 
 if test x$ext_mysql = xyes; then
