@@ -14,14 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-
-/* $Id: sdl.cpp,v 1.53 2007/04/17 13:34:23 strk Exp $ */
-
-// XXXbjacques: Screw up the indentation in this file, and you're dead. And by
-//              screw up, I mean not adhering the indentation used throughout
-//              the file in your patch.
+/* $Id: sdl.cpp,v 1.54 2007/05/02 21:41:04 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,16 +23,16 @@
 #include <cstdio>
 
 #if defined(_WIN32) || defined(WIN32)
-	#include "getopt_win32.h"
+# include "getopt_win32.h"
 #else
 extern "C"{
-#include <unistd.h>
-#ifdef HAVE_GETOPT_H
-	#include <getopt.h>
-#endif
-#ifndef __GNUC__
+# include <unistd.h>
+# ifdef HAVE_GETOPT_H
+#  include <getopt.h>
+# endif
+# ifndef __GNUC__
 	extern int getopt(int, char *const *, const char *);
-#endif
+# endif
 }
 #endif // Win32
 
@@ -67,95 +60,93 @@ SDLGui::~SDLGui()
 bool
 SDLGui::run()
 {
-	GNASH_REPORT_FUNCTION;
-	int x_old = -1;
-	int y_old = -1;
-	int button_state_old = -1;
+    GNASH_REPORT_FUNCTION;
+    int x_old = -1;
+    int y_old = -1;
+    int button_state_old = -1;
 
-	SDL_Event	event;
-	while (true)
-	{
-
-		if (_timeout && SDL_GetTicks() >= _timeout)
-		{
-			break;
-		}
-
-		Uint32 start_tick = SDL_GetTicks();
-
-		while (true)
-		{
-			if (SDL_PollEvent(&event) == 0)
-			{
-				break;
-			}
-
-			switch (event.type)
-			{
-          case SDL_MOUSEMOTION:
-            // SDL can generate MOUSEMOTION events even without mouse movement
-            if (event.motion.x == x_old && event.motion.y == y_old) { break; }
-            x_old = event.motion.x;
-            y_old = event.motion.y;
-            notify_mouse_moved((int) (x_old / _xscale), (int) (y_old / _yscale));
+    SDL_Event   event;
+    while (true)
+    {
+        if (_timeout && SDL_GetTicks() >= _timeout)
+        {
             break;
-          case SDL_MOUSEBUTTONDOWN:
-          case SDL_MOUSEBUTTONUP:
-          {
-            int	mask = 1 << (event.button.button - 1);
-            if (event.button.state == SDL_PRESSED) {
-                // multiple events will be fired while the mouse is held down
-                // we are interested only in a change in the mouse state:
-                if (event.button.button == button_state_old) { break; }
-                notify_mouse_clicked(true, mask);
-                button_state_old = event.button.button;
-            } else {
-                notify_mouse_clicked(false, mask);
-                button_state_old = -1;
+        }
+
+        Uint32 start_tick = SDL_GetTicks();
+
+        while (true)
+        {
+            if (SDL_PollEvent(&event) == 0)
+            {
+                break;
             }
-            break;
-          }
-          case SDL_KEYDOWN:
-					{
-						if (event.key.keysym.sym == SDLK_ESCAPE)
-						{
-							return true;
-						}
-            key_event(event.key.keysym.sym, true);
-						break;
-					}
-          case SDL_KEYUP:
-					{
-            SDLKey	key = event.key.keysym.sym;
-            key_event(key, false);	     
-						break;
-					}
 
-          case SDL_VIDEORESIZE:
-		resize_event();
-		break;
+            switch (event.type)
+            {
+            case SDL_MOUSEMOTION:
+                // SDL can generate MOUSEMOTION events even without mouse movement
+                if (event.motion.x == x_old && event.motion.y == y_old) { break; }
+                x_old = event.motion.x;
+                y_old = event.motion.y;
+                notify_mouse_moved((int) (x_old / _xscale), (int) (y_old / _yscale));
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+            case SDL_MOUSEBUTTONUP:
+            {
+                int     mask = 1 << (event.button.button - 1);
+                if (event.button.state == SDL_PRESSED) {
+                    // multiple events will be fired while the mouse is held down
+                    // we are interested only in a change in the mouse state:
+                    if (event.button.button == button_state_old) { break; }
+                    notify_mouse_clicked(true, mask);
+                    button_state_old = event.button.button;
+                } else {
+                    notify_mouse_clicked(false, mask);
+                    button_state_old = -1;
+                }
+                break;
+            }
+            case SDL_KEYDOWN:
+            {
+                if (event.key.keysym.sym == SDLK_ESCAPE)
+                {
+                    return true;
+                }
+                key_event(event.key.keysym.sym, true);
+                break;
+            }
+            case SDL_KEYUP:
+            {
+                SDLKey  key = event.key.keysym.sym;
+                key_event(key, false);       
+                break;
+            }
+            case SDL_VIDEORESIZE:
+                resize_event();
+                break;
 
-          case SDL_VIDEOEXPOSE:
-		expose_event();
-		break;
+            case SDL_VIDEOEXPOSE:
+                expose_event();
+                break;
 
-          case SDL_QUIT:
-            return true;
-          break;
-			}
-		}
+            case SDL_QUIT:
+                return true;
+                break;
+            }
+        }
 
-		Gui::advance_movie(this);
+        Gui::advance_movie(this);
 
-//		int delay = _interval - (SDL_GetTicks() - start_tick);
-//		if (delay < 0)
-//		{
-//			delay = 0;
-//		}
-		SDL_Delay(10);
+//      int delay = _interval - (SDL_GetTicks() - start_tick);
+//      if (delay < 0)
+//      {
+//          delay = 0;
+//      }
+        SDL_Delay(10);
 
-	}
-	return false;
+    }
+    return false;
 }
 
 
@@ -172,24 +163,24 @@ SDLGui::init(int argc, char **argv[])
 
     int c;
     while ((c = getopt (argc, *argv, "m:c")) != -1) {
-      switch (c) {
+        switch (c) {
         case 'c':
-          disableCoreTrap();
-      }
+            disableCoreTrap();
+        }
     }
 
     if (_xid) {
-      char SDL_windowhack[32];
-      sprintf (SDL_windowhack,"SDL_WINDOWID=%ld", _xid);
-      putenv (SDL_windowhack);
+        char SDL_windowhack[32];
+        sprintf (SDL_windowhack,"SDL_WINDOWID=%ld", _xid);
+        putenv (SDL_windowhack);
     }
 
     // Initialize the SDL subsystems we're using. Linux
     // and Darwin use Pthreads for SDL threads, Win32
     // doesn't. Otherwise the SDL event loop just polls.
     if (SDL_Init(SDL_INIT_VIDEO)) {
-      fprintf(stderr, "Unable to init SDL: %s\n", SDL_GetError());
-      exit(1);
+        fprintf(stderr, "Unable to init SDL: %s\n", SDL_GetError());
+        exit(1);
     }
 
     atexit(SDL_Quit);
@@ -214,11 +205,11 @@ SDLGui::createWindow(const char *title, int width, int height)
     uint32_t sdl_flags = 0;
 
     if (!_core_trap) {
-      sdl_flags |= SDL_INIT_NOPARACHUTE;
+        sdl_flags |= SDL_INIT_NOPARACHUTE;
     }
 
     if (_xid) {
-      sdl_flags |= SDL_NOFRAME;
+        sdl_flags |= SDL_NOFRAME;
     }
 
     _glue.prepDrawingArea(_width, _height, sdl_flags);
@@ -233,7 +224,7 @@ SDLGui::createWindow(const char *title, int width, int height)
 void
 SDLGui::disableCoreTrap()
 {
-  _core_trap = false;
+    _core_trap = false;
 }
 
 void
@@ -267,21 +258,21 @@ SDLGui::setupEvents()
 void SDLGui::key_event(SDLKey key, bool down)
 // For forwarding SDL key events.
 {
-    gnash::key::code	c(gnash::key::INVALID);
+    gnash::key::code c(gnash::key::INVALID);
     
-    if (key >= SDLK_0 && key <= SDLK_9)	{
+    if (key >= SDLK_0 && key <= SDLK_9) {
         c = (gnash::key::code) ((key - SDLK_0) + gnash::key::_0);
-	} else if (key >= SDLK_a && key <= SDLK_z) {
+    } else if (key >= SDLK_a && key <= SDLK_z) {
         c = (gnash::key::code) ((key - SDLK_a) + gnash::key::A);
-    } else if (key >= SDLK_F1 && key <= SDLK_F15)	{
+    } else if (key >= SDLK_F1 && key <= SDLK_F15) {
         c = (gnash::key::code) ((key - SDLK_F1) + gnash::key::F1);
     } else if (key >= SDLK_KP0 && key <= SDLK_KP9) {
         c = (gnash::key::code) ((key - SDLK_KP0) + gnash::key::KP_0);
     } else {
         // many keys don't correlate, so just use a look-up table.
         struct {
-            SDLKey	sdlk;
-            gnash::key::code	gs;
+            SDLKey sdlk;
+            gnash::key::code gs;
         } table[] = {
             { SDLK_SPACE, gnash::key::SPACE },
             { SDLK_PAGEDOWN, gnash::key::PGDN },
@@ -311,8 +302,8 @@ void SDLGui::key_event(SDLKey key, bool down)
     }
     
     if (c != gnash::key::INVALID) {
-	// 0 should be any modifier instead..
-	// see Gui::notify_key_event in gui.h
+        // 0 should be any modifier instead..
+        // see Gui::notify_key_event in gui.h
         notify_key_event(c, 0, down);
     }
 }
@@ -320,16 +311,15 @@ void SDLGui::key_event(SDLKey key, bool down)
 void
 SDLGui::resize_event()
 {
-	log_msg("got resize_event ");
+    log_msg("got resize_event ");
 }
 
 void
 SDLGui::expose_event()
 {
-	// TODO: implement and use setInvalidatedRegion instead?
-	renderBuffer();
+    // TODO: implement and use setInvalidatedRegion instead?
+    renderBuffer();
 }
 
 
 } // namespace gnash
-

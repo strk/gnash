@@ -48,6 +48,7 @@
 	  skip version checking to avoid syntax errors during "configure"
 	  if the library is not found.
 	* server/asobj/SoundMad.cpp: Fix compiler warnings.
+	* gui/sdl.cpp: Regularize bizarre indentation
 
 2007-05-02 Sandro Santilli <strk@keybit.net>
 
