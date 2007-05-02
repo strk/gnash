@@ -27,10 +27,9 @@
 // Some optional gameswf configuration.
 //
 
-// For disabling zlib and jpeg functionality; you may be able to use
+// For disabling zlib functionality; you may be able to use
 // this in final builds of gameswf, if you preprocess all your SWF
 // content to make unpacked formats.
-// #define TU_CONFIG_LINK_TO_JPEGLIB 0
 // #define TU_CONFIG_LINK_TO_ZLIB 0
 
 // For enabling XML/XMLSocket functionality in gameswf, using GNOME

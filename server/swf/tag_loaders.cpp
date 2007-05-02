@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.93 2007/05/02 07:34:35 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.94 2007/05/02 10:30:09 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -211,12 +211,10 @@ jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
 	log_parse(_("  jpeg_tables_loader"));
     );
 
-#if TU_CONFIG_LINK_TO_JPEGLIB
     std::auto_ptr<jpeg::input> j_in(jpeg::input::create_swf_jpeg2_header_only(in->get_underlying_stream()));
     assert(j_in.get());
 
     m->set_jpeg_loader(j_in);
-#endif // TU_CONFIG_LINK_TO_JPEGLIB
 }
 
 
@@ -237,7 +235,6 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
     {
 	//bitmap_info*	bi = NULL;
-#if TU_CONFIG_LINK_TO_JPEGLIB
 	jpeg::input*	j_in = m->get_jpeg_loader();
 	assert(j_in);
 	j_in->discard_partial_buffer();
@@ -245,11 +242,6 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
 	std::auto_ptr<image::rgb> im ( image::read_swf_jpeg2_with_tables(j_in) );
 	//bi = render::create_bitmap_info_rgb(im);
 	//delete im;
-#else
-	log_error(_("gnash is not linked to jpeglib -- can't load jpeg image data"));
-	return;
-#endif
-
 
 	//assert(im->get_ref_count() == 0);
 
@@ -289,14 +281,9 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
     {
 	//bitmap_info*	bi = NULL;
-#if TU_CONFIG_LINK_TO_JPEGLIB
 	std::auto_ptr<image::rgb> im ( image::read_jpeg(in->get_underlying_stream()) );
 	//bi = render::create_bitmap_info_rgb(im);
 	//delete im;
-#else
-	log_error(_("gnash is not linked to jpeglib -- can't load jpeg image data"));
-	return;
-#endif
 
 	//assert(bi->get_ref_count() == 0);
 
@@ -389,8 +376,8 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
     if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
     {
 
-#if TU_CONFIG_LINK_TO_JPEGLIB == 0 || TU_CONFIG_LINK_TO_ZLIB == 0
-	log_error(_("gnash is not linked to jpeglib/zlib -- can't load jpeg/zipped image data"));
+#if TU_CONFIG_LINK_TO_ZLIB == 0
+	log_error(_("gnash is not linked to zlib -- can't load jpeg3 image data"));
 	return;
 #else
 	//
@@ -1462,7 +1449,7 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 	// code here.
 	/*if (format == sound_handler::FORMAT_UNCOMPRESSED && sample_16bit)
 	{
-#ifndef _TU_LITTLE_ENDIAN_
+#ifndef (?(*!(_TU_LITTLE_ENDIAN_ has gone. Use <boost/detail/endian.hpp>
 	    // Swap sample bytes to get big-endian format.
 	    for (int i = 0; i < data_bytes - 1; i += 2)
 	    {

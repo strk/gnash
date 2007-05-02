@@ -35,14 +35,6 @@
 #define tu_error_exit(error_code, error_message) { fprintf(stderr, error_message); std::exit(error_code); }
 #endif
 
-
-// define TU_CONFIG_LINK_TO_JPEGLIB to 0 to exclude jpeg code from
-// your build.  Be aware of what you're doing -- it may break
-// features!
-#ifndef TU_CONFIG_LINK_TO_JPEGLIB
-#define TU_CONFIG_LINK_TO_JPEGLIB 1
-#endif
-
 // define TU_CONFIG_LINK_TO_ZLIB to 0 to exclude zlib code from your
 // build.  Be aware of what you're doing -- it may break features that
 // you need!

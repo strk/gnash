@@ -12,8 +12,6 @@
 #include "tu_file.h"
 #include <cstdio>
 
-#if TU_CONFIG_LINK_TO_JPEGLIB
-
 extern "C" {
 #undef HAVE_STDLIB_H
 #include <jpeglib.h>
@@ -538,32 +536,6 @@ namespace jpeg
 	// Default constructor.
 	output::~output() {}
 }
-
-
-#else // not TU_CONFIG_LINK_TO_JPEGLIB
-
-
-namespace jpeg
-{
-	/*static*/ input* input::create(tu_file* in)
-	{
-		return NULL;
-	}
-
-	/*static*/ input* input::create_swf_jpeg2_header_only(tu_file* in)
-	{
-		return NULL;
-	}
-
-	/*static*/ output* output::create(tu_file* out, int width, int height, int quality)
-	{
-		return NULL;
-	}
-
-}
-
-
-#endif // not TU_CONFIG_LINK_TO_JPEGLIB
 
 
 // Local Variables:
