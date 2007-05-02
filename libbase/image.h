@@ -41,7 +41,17 @@ namespace image
 		int	m_pitch;	// byte offset from one row to the next
 
 		image_base(uint8_t* data, int width, int height, int pitch, id_image type);
+
+		/// Copy image data from a buffer.
+		//
+		/// Note that this buffer MUST have the same m_pitch, or unexpected things
+		/// will happen. In general, it is only safe to copy from another image_base
+		/// (or derivative thereof) or unexpected things will happen. 
+		///
+		/// @param data buffer to copy data from.
+		///
 		void update(uint8_t* data);
+
 		virtual ~image_base() {}
 	};
 

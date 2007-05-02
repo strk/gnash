@@ -29,13 +29,6 @@ namespace image
 	{
 	}
 
-	/// Copy image data from a buffer.
-	//
-	/// Note that this buffer MUST have the same m_pitch, or unexpected things
-	/// will happen. In general, it is only safe to copy from another image_base
-	/// (or derivative thereof) or unexpected things will happen. 
-	///
-	/// @param data buffer to copy data from.
 	void image_base::update(uint8_t* data)
 	{
 		memcpy(m_data, data, m_pitch * m_height);
