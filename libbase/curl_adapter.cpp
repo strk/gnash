@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.28 2007/05/02 13:13:48 strk Exp $ */
+/* $Id: curl_adapter.cpp,v 1.29 2007/05/02 13:37:15 strk Exp $ */
 
 #if defined(_WIN32) || defined(WIN32)
 #define snprintf _snprintf
@@ -256,7 +256,7 @@ CurlStreamFile::fill_cache(off_t size)
 #endif
 
 	CURLMcode mcode;
-	while (_running)
+	while (_cached < size && _running)
 	{
 		do
 		{
@@ -268,29 +268,18 @@ CurlStreamFile::fill_cache(off_t size)
 			throw gnash::GnashException(curl_multi_strerror(mcode));
 		}
 
-                long code;
-                curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
-                if ( code == 404 ) // file not found!
-                {
-                        gnash::log_error(_("404 response from url %s"), _url.c_str());
-                        _error = TU_FILE_OPEN_ERROR;
-			_running = false;
-                        return;
-                }
-
-		// we already have that much data
-		if ( _cached >= size )
-		{
-#ifdef GNASH_CURL_VERBOSE
-			fprintf(stderr,
-				" big enough (%d), returning\n",
-				statbuf.st_size);
-#endif
-			return;
-		}
-
-
 	}
+
+	// TODO: check for 404 only once !
+        long code;
+        curl_easy_getinfo(_handle, CURLINFO_RESPONSE_CODE, &code);
+        if ( code == 404 ) // file not found!
+        {
+		gnash::log_error(_("404 response from url %s"), _url.c_str());
+		_error = TU_FILE_OPEN_ERROR;
+		_running = false;
+        }
+
 
 }
 
