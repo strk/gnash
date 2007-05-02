@@ -33,6 +33,9 @@ libtestsuite_la_SOURCES = \
 libtestsuite_la_LIBADD = \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
+        $(top_builddir)/server/vm/libgnashvm.la \
+        $(top_builddir)/server/asobj/libgnashasobjs.la \
+        $(top_builddir)/server/parser/libgnashparser.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(NULL)
 libtestsuite_la_CXXFLAGS = \

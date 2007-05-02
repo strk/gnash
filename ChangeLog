@@ -1,5 +1,6 @@
 2007-05-02 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/Makefile.am: explicitly list other gnash libs.
 	* testsuite/libgeometry/Range2dTest.cpp: tolerate some floating
 	  point drift.
 
