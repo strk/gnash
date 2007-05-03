@@ -1,3 +1,12 @@
+2007-05-03 Andrew Guertin <bugzilla@dolphinling.net>
+
+	* backend/: sound_handler.h, sound_handler_gst.cpp,
+	  sound_handler_sdl.cpp: Makes Nellymoser not an "unknown" format in
+	  the error message, just unsupported, Makes GST's unknown format
+	  error message better (copied SDL's), Adds an assertion that
+	  ADPCM and UNCOMPRESSED should never be passed to the sound
+	  handler, Adds a comment to sound_handler.h
+
 2007-05-02 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/Makefile.am: explicitly list other gnash libs.

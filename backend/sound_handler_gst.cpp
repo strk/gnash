@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.36 2007/05/02 07:34:34 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.37 2007/05/03 06:00:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -131,9 +131,21 @@ int	GST_sound_handler::create_sound(
 		memcpy(sounddata->data, data, data_bytes);
 
 		break;
+
+	case FORMAT_ADPCM:
+	case FORMAT_UNCOMPRESSED:
+		// These should have been converted to FORMAT_NATIVE16
+		gnash::log_error("Sound data format not properly converted");
+		assert(0);
+		break;
+
+	case FORMAT_NELLYMOSER:
+		gnash::log_unimpl("Nellymoser sound format requested, gnash does not handle it.");
+		return -1;
+
 	default:
 		// Unhandled format.
-		gnash::log_error("unknown format sound requested; this demo does not handle it.");
+		gnash::log_error(_("unknown sound format %d requested; gnash does not handle it"), (int)format);
 		return -1; // Unhandled format, set to NULL.
 	}
 

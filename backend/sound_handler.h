@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.3 2007/04/11 17:54:21 bjacques Exp $ */
+/* $Id: sound_handler.h,v 1.4 2007/05/03 06:00:15 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -66,7 +66,7 @@ public:
 		FORMAT_RAW = 0,		// unspecified format.  Useful for 8-bit sounds???
 		FORMAT_ADPCM = 1,	// gnash doesn't pass this through; it uncompresses and sends FORMAT_NATIVE16
 		FORMAT_MP3 = 2,
-		FORMAT_UNCOMPRESSED = 3,	// 16 bits/sample, little-endian
+		FORMAT_UNCOMPRESSED = 3,	// 16 bits/sample, little-endian; passed through as FORMAT_NATIVE16
 		FORMAT_NELLYMOSER = 6,	// Mystery proprietary format; see nellymoser.com
 				
 		// gnash tries to convert data to this format when possible:
