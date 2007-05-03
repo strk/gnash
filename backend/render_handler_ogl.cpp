@@ -5,7 +5,7 @@
 
 // A render_handler that uses SDL & OpenGL
 
-/* $Id: render_handler_ogl.cpp,v 1.72 2007/04/11 17:54:21 bjacques Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.73 2007/05/03 23:47:21 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -25,7 +25,7 @@
 #  include <Windows.h>
 #endif
 
-#ifdef NOT_SGI_GL
+#if defined(NOT_SGI_GL) || defined(__APPLE_CC__)
 #include <AGL/agl.h>
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
@@ -39,6 +39,7 @@
 # endif
 #endif
 
+/*
 #if !defined(WIN32) || defined(GUI_GTK)
 # define GL_GLEXT_PROTOTYPES
 # include <GL/gl.h>
@@ -48,6 +49,7 @@
 #  define APIENTRY
 # endif
 #endif // no WIN32 or OSX
+*/
 
 using namespace gnash;
 
@@ -1245,6 +1247,8 @@ inline bool opengl_accessible()
 {
 #if defined(_WIN32) || defined(WIN32)
 	return wglGetCurrentContext() != 0;
+#elif defined(__APPLE_CC__)
+	return aglGetCurrentContext() != 0;
 #else
 	return glXGetCurrentContext() != 0;
 #endif
