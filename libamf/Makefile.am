@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.23 2007/05/01 22:00:35 rsavoye Exp $
+# $Id: Makefile.am,v 1.24 2007/05/03 23:05:08 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -24,7 +24,7 @@ AM_LDFLAGS = \
 
 lib_LTLIBRARIES = libgnashamf.la
 libgnashamf_la_SOURCES = amf.cpp rtmp.cpp
-libgnashamf_la_LDFLAGS =  -release $(VERSION) -export-dynamic -no-undefined 
+libgnashamf_la_LDFLAGS =  -release $(VERSION) -export-dynamic -no-undefined ${AM_LDFLAGS} 
 # noinst_HEADERS = amf.h amfutf8.h
 
 AM_CPPFLAGS = -I.. -I$(srcdir) \
