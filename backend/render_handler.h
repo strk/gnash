@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.37 2007/04/20 14:35:44 strk Exp $ */
+/* $Id: render_handler.h,v 1.38 2007/05/03 10:43:57 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -265,7 +265,8 @@ public:
 	/// The frame has already been decoded and is available in the format
 	/// specified by videoFrameFormat().	  
 	///     	  
-	/// @param baseframe The RGB or YUV video buffer frame.
+	/// @param frame The RGB or YUV video buffer frame.
+	///   Ownership of the buffer is left to the caller.
 	///
 	/// @param mat The matrix with world coordinates used to retrieve the x
 	///   and y coordinate of the video object. The scaling of the matrix only
