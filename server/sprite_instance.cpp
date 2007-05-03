@@ -1926,6 +1926,10 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 	sprite->set_name(name);
 	sprite->setDynamic();
 
+	// TODO: only call set_invalidated if this character actually overrides
+	//       an existing one !
+	set_invalidated();
+
 	m_display_list.place_character(
 		sprite,
 		depth,

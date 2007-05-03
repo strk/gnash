@@ -1,5 +1,8 @@
 2007-05-03 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (add_empty_movieclip):
+	  call set_invalidated as the newly added character might
+	  replace a previously existing one. See bug #19683.
 	* server/video_stream_instance.{cpp,h},
 	  server/parser/video_stream_def.{cpp,h}:
 	  Encode ownership of embedded videodecoder by using std::auto_ptr,
