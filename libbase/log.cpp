@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.48 2007/05/02 12:39:08 strk Exp $ */
+/* $Id: log.cpp,v 1.49 2007/05/04 00:11:24 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -157,7 +157,7 @@ LogFile::getDefaultInstance()
 
 namespace {
     LogFile& dbglogfile = LogFile::getDefaultInstance();
-};
+}
 
 // Printf-style log for debugging info.
 void
