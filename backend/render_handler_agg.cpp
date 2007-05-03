@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.76 2007/05/03 08:11:34 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.77 2007/05/03 10:07:44 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1068,7 +1068,6 @@ public:
       path &the_path = paths_out[pno];     
       point oldpnt(the_path.m_ax, the_path.m_ay);
       point newpnt;
-       
       mat.transform(&newpnt, oldpnt);
       the_path.m_ax = newpnt.m_x;    
       the_path.m_ay = newpnt.m_y;
@@ -1230,7 +1229,9 @@ public:
     
     // use avg between x and y scale
     const float stroke_scale = 
-      (linestyle_matrix.get_x_scale() + linestyle_matrix.get_y_scale()) / 2.0f
+      (fabsf(linestyle_matrix.get_x_scale()) + 
+       fabsf(linestyle_matrix.get_y_scale()))
+       / 2.0f
       * (xscale+yscale)/2.0f;   
     
     for (int pno=0; pno<pcount; pno++) {
@@ -1639,8 +1640,10 @@ public:
     int pcount;
     
     // use avg between x and y scale
-    const float stroke_scale = 
-      (linestyle_matrix.get_x_scale() + linestyle_matrix.get_y_scale()) / 2.0f
+    const float stroke_scale =
+      (fabsf(linestyle_matrix.get_x_scale()) + 
+       fabsf(linestyle_matrix.get_y_scale())) 
+      / 2.0f
       * (xscale+yscale)/2.0f;
     
     

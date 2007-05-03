@@ -4,6 +4,8 @@
 	  bounds (not Null) 	
 	* server/character.cpp: negative scaling values are legal (related to 
 	  bug #18874, but not fixing it) 	
+	* backend/render_handler_agg.cpp: use absolute scaling values when
+	  calculating stroke width, fixes 18874  	
 
 2007-05-03 Andrew Guertin <bugzilla@dolphinling.net>
 
