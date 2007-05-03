@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.75 2007/04/20 11:51:23 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.76 2007/05/03 08:11:34 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -607,6 +607,9 @@ public:
     // allocate pixel format accessor   
     m_pixf = new PixelFormat(m_rbuf);
     //m_rbase = new renderer_base(*m_pixf);  --> does not work!!??
+    
+    // by default allow drawing everywhere
+    set_invalidated_region_world();
     
     log_msg("initialized AGG buffer <%p>, %d bytes, %dx%d, rowsize is %d bytes", 
       mem, size, x, y, row_size);
@@ -1818,6 +1821,12 @@ public:
     world_to_pixel(xmax, ymax, wb.getMaxX(), wb.getMaxY());
 
     return geometry::Range2d<int>(xmin, ymin, xmax, ymax);
+  }
+  
+  void set_invalidated_region_world() {
+    InvalidatedRanges ranges;
+    ranges.setWorld();
+    set_invalidated_regions(ranges);
   }
   
   virtual void set_invalidated_region(const rect& bounds) {
