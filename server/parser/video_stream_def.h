@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.4 2007/02/09 16:40:42 tgc Exp $
+// $Id: video_stream_def.h,v 1.5 2007/05/03 15:41:06 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -45,14 +45,30 @@ public:
 
 	character* create_character_instance(character* parent, int id);
 	void	read(stream* in, SWF::tag_type tag, movie_definition* m);
+
+	// TODO: return a rect 0,0,m_width,m_height
 	const rect&	get_bound() const	{
 		return m_unused_rect;
 	}
 
-	embedVideoDecoder* get_decoder();
+	/// Return a newly created embedded-video decoder
+	//
+	/// The type of decoder returned currently depends
+	/// on compile-time defines (FFMPG/GST/none)
+	///
+	/// The returned decoder will be initialized with
+	/// data kept as member of this class
+	/// (width/height/codec_id/videoFrameFormat)
+	/// Note that videoFrameFormat is fetched from the
+	/// current renderer.
+	///
+	/// This function *never* returns a NULL pointer.
+	///
+	std::auto_ptr<embedVideoDecoder> get_decoder();
 
 	void get_frame_data(int frameNum, uint8_t** data, int* size);
 
+	// TODO: make private
 	uint16_t m_width;
 	uint16_t m_height;
 

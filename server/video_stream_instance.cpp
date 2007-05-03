@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.20 2007/04/18 11:00:29 jgilmore Exp $
+// $Id: video_stream_instance.cpp,v 1.21 2007/05/03 15:41:06 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -60,24 +60,21 @@ namespace gnash {
 		return as_value();
 	}
 
-	video_stream_instance::video_stream_instance(
-		video_stream_definition* def, character* parent, int id)
+video_stream_instance::video_stream_instance(video_stream_definition* def,
+		character* parent, int id)
 	:
 	character(parent, id),
 	m_def(def),
 	m_video_source(NULL),
-	_ns(NULL)
-//	m_source(NULL)
+	_ns(NULL),
+	m_decoder(m_def->get_decoder()) // should abort if m_def is null
 {
-	assert(m_def);
 	// FIXME: use new layout
 	init_member("attachVideo", new builtin_function(attach_video));
-	m_decoder = m_def->get_decoder();
 }
 
 video_stream_instance::~video_stream_instance()
 {
-	delete m_decoder;
 }
 
 void
@@ -102,7 +99,7 @@ video_stream_instance::display()
 		}
 
 	// If this is a video from a VideoFrame tag, retrieve a video frame from there.
-	} else if (m_decoder) {
+	} else if (m_decoder.get()) {
 		uint8_t* data = 0;
 		int size = 0;
 		int current_frame = get_parent()->to_movie()->get_current_frame();

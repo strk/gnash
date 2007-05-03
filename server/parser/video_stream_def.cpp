@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.5 2007/02/09 16:40:42 tgc Exp $
+// $Id: video_stream_def.cpp,v 1.6 2007/05/03 15:41:06 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -88,19 +88,21 @@ video_stream_definition::create_character_instance(character* parent, int id)
 	return ch;
 }
 
-embedVideoDecoder*
-video_stream_definition::get_decoder(){
+std::auto_ptr<embedVideoDecoder>
+video_stream_definition::get_decoder()
+{
 
-	if (m_num_frames == 0) return NULL;
+	std::auto_ptr<embedVideoDecoder> decoder;
 
-	embedVideoDecoder* decoder;
+	if (m_num_frames == 0) return decoder;
+
 
 #ifdef USE_FFMPEG
-	decoder = new embedVideoDecoderFfmpeg();
+	decoder.reset( new embedVideoDecoderFfmpeg() );
 #elif defined(SOUND_GST)
-	decoder = new embedVideoDecoderGst();
+	decoder.reset( new embedVideoDecoderGst() );
 #else
-	decoder = new embedVideoDecoder();
+	decoder.reset( new embedVideoDecoder() );
 #endif
 
 	decoder->createDecoder(
