@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.40 2007/05/02 07:34:35 strk Exp $ */
+/* $Id: character.cpp,v 1.41 2007/05/03 09:54:45 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -307,14 +307,6 @@ character::xscale_getset(const fn_call& fn)
 			);
                         return as_value();
 		}
-		else if (scale_percent < 0 )
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set _xscale to %g, use 0"),
-                            scale_percent);
-			);
-                        scale_percent = 0;
-		}
 
 		// input is in percent
 		float scale = (float)scale_percent/100.f;
@@ -350,14 +342,6 @@ character::yscale_getset(const fn_call& fn)
                             scale_percent);
 			);
                         return as_value();
-		}
-		else if (scale_percent < 0 )
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Attempt to set _yscale to %g, use 0"),
-                            scale_percent);
-			);
-                        scale_percent = 0;
 		}
 
 		// input is in percent
