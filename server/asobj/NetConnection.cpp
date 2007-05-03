@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.38 2007/04/18 11:00:29 jgilmore Exp $ */
+/* $Id: NetConnection.cpp,v 1.39 2007/05/03 14:50:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -169,7 +169,7 @@ long
 NetConnection::getBytesTotal()
 {
 	if (!_loader) return 0;
-	return _loader->getBytesLoaded();
+	return _loader->getBytesTotal();
 }
 
 /*public*/

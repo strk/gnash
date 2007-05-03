@@ -1,3 +1,8 @@
+2007-05-03 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetConnection.cpp (getBytesTotal): return total bytes,
+	  not "loaded" bytes... - fixes YouTube buffering bar.
+
 2007-05-03 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: by default use world invalidated
