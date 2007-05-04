@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.38 2007/05/02 16:24:12 rsavoye Exp $
+dnl $Id: boost.m4,v 1.39 2007/05/04 21:53:46 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -52,7 +52,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
         if test -f ${j}/detail/lightweight_mutex.hpp; then
           gnash_boost_topdir=`basename $j`
           gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`
-          ac_cv_path_boost_incl="-I$j"
+          ac_cv_path_boost_incl="-I$i"
           break
         fi
       done

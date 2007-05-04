@@ -1,3 +1,7 @@
+2007-05-03 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* macros/boost.m4: Fixed a bug in GNASH_BOOST_PATH.
+
 2007-05-03 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetConnection.{cpp,h}: change openConnection interface
