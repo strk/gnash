@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.41 2007/05/04 20:42:42 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.42 2007/05/04 21:18:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,16 +63,8 @@ NetConnection::~NetConnection()
 {
 }
 
-/// Open a connection to stream FLV files.
-//
-/// \param arg is the URL
-/// \return true on success, false on error.
-/// \note Older Flash movies can only take a NULL value as
-/// the parameter, which therefor only connects to the localhost using
-/// RTMP. Newer Flash movies have a parameter to connect which is a
-/// URL string like rtmp://foobar.com/videos/bar.flv
 /*public*/
-bool NetConnection::openConnection(const char* char_url, as_object* owner)
+bool NetConnection::openConnection(const std::string& url, as_object* owner)
 {
 
 	// if already running there is no need to setup things again
@@ -86,7 +78,7 @@ bool NetConnection::openConnection(const char* char_url, as_object* owner)
 	if (_url.size() > 0) {
 		_url += "/";
 	}
-	_url += char_url;
+	_url += url;
 
 	URL uri(_url, get_base_url());
 

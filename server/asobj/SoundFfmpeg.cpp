@@ -88,7 +88,7 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 
 	// Pass stuff from/to the NetConnection object.
 	assert(so);
-	if ( !nc->openConnection(so->externalURL.c_str(), so) ) {
+	if ( !nc->openConnection(so->externalURL, so) ) {
 		log_error(_("%s could not open audio url: %s"), 
 				__FUNCTION__, so->externalURL.c_str());
 		delete so->lock;

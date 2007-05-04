@@ -1,5 +1,14 @@
 2007-05-03 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetConnection.{cpp,h}: change openConnection interface
+	  to take url by ref (not by pointer). Stubbed documentation of the
+	  method (needs more info).
+	* server/asobj/: NetStreamFfmpeg.cpp, NetStreamGst.cpp, Sound.cpp,
+	  SoundFfmpeg.cpp, SoundGst.cpp, SoundMad.cpp:
+	  Updated calls to openConnection.
+
+2007-05-03 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetConnection.{cpp,h}: keep _loader by auto_ptr, some
 	  comments and interfaces cleanup.
 	* server/asobj/: NetStreamFfmpeg.cpp, NetStreamGst.cpp: update calls

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.27 2007/05/04 20:42:42 strk Exp $ */
+/* $Id: NetConnection.h,v 1.28 2007/05/04 21:18:07 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -53,8 +53,22 @@ public:
 	NetConnection();
 	~NetConnection();
 
-	/// Opens the connection to char_url
-	bool openConnection(const char* char_url, as_object* owner);
+	/// Open a connection to stream FLV files.
+	//
+	/// @param url
+	///	An url portion to append to the base url (???)
+	///
+	/// @param owner 
+	///     ???
+	///
+	/// @return true on success, false on error.
+	///
+	/// @note Older Flash movies can only take a NULL value as
+	/// the parameter, which therefor only connects to the localhost using
+	/// RTMP. Newer Flash movies have a parameter to connect which is a
+	/// URL string like rtmp://foobar.com/videos/bar.flv
+	///
+	bool openConnection(const std::string& url, as_object* owner);
 
 	/// Put read pointer at given position
 	bool seek(size_t pos);
