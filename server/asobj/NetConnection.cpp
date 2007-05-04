@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.40 2007/05/04 20:28:35 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.41 2007/05/04 20:42:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -54,16 +54,13 @@ NetConnection::NetConnection()
 	as_object(getNetConnectionInterface()),
 	_url(),
 	_owner(NULL),
-	_loader(NULL)
+	_loader()
 {
 	attachProperties();
 }
 
-NetConnection::~NetConnection() {
-	if (_loader) {
-		delete _loader;
-		_loader = NULL;
-	}
+NetConnection::~NetConnection()
+{
 }
 
 /// Open a connection to stream FLV files.
@@ -79,7 +76,11 @@ bool NetConnection::openConnection(const char* char_url, as_object* owner)
 {
 
 	// if already running there is no need to setup things again
-	if (_loader) return true;
+	if (_loader.get())
+	{
+		log_error("NetConnection::openConnection() called when already connected to a stream. Should we close the old stream and open a new one?.");
+		return true;
+	}
 
 	_owner = owner;
 	if (_url.size() > 0) {
@@ -98,12 +99,11 @@ bool NetConnection::openConnection(const char* char_url, as_object* owner)
 		return false;
 	}
 
-	_loader = new LoadThread();
+	_loader.reset( new LoadThread() );
 	
 	if (!_loader->setStream(std::auto_ptr<tu_file>(StreamProvider::getDefaultInstance().getStream(uri)))) {
 		log_error(_("Gnash could not open this url: %s"), _url.c_str());
-		delete _loader;
-		_loader = NULL;
+		_loader.reset();
 		return false;
 	}
 
@@ -117,7 +117,7 @@ void
 NetConnection::addToURL(const std::string& url)
 {
 	// What is this ? It is NOT documented in the header !!
-	if (url == "null" || url == "NULL") return;
+	//if (url == "null" || url == "NULL") return;
 
 	_url += url;
 }
@@ -126,7 +126,7 @@ NetConnection::addToURL(const std::string& url)
 bool
 NetConnection::eof()
 {
-	if (!_loader) return true;
+	if (!_loader.get()) return true; // @@ correct ?
 	return _loader->eof();
 }
 
@@ -134,7 +134,7 @@ NetConnection::eof()
 size_t
 NetConnection::read(void *dst, size_t bytes)
 {
-	if (!_loader) return 0;
+	if (!_loader.get()) return 0; // @@ correct ?
 	return _loader->read(dst, bytes);
 }
 
@@ -142,25 +142,23 @@ NetConnection::read(void *dst, size_t bytes)
 bool
 NetConnection::seek(size_t pos)
 {
-	if (!_loader) return false;
+	if (!_loader.get()) return false; // @@ correct ?
 	return _loader->seek(pos);
-
 }
 
 /*public*/
 size_t
 NetConnection::tell()
 {
-	if (!_loader) return 0;
+	if (!_loader.get()) return 0; // @@ correct ?
 	return _loader->tell();
-
 }
 
 /*public*/
 long
 NetConnection::getBytesLoaded()
 {
-	if (!_loader) return 0;
+	if (!_loader.get()) return 0; // @@ correct ?
 	return _loader->getBytesLoaded();
 }
 
@@ -169,7 +167,7 @@ NetConnection::getBytesLoaded()
 long
 NetConnection::getBytesTotal()
 {
-	if (!_loader) return 0;
+	if (!_loader.get()) return 0; // @@ correct ?
 	return _loader->getBytesTotal();
 }
 
@@ -177,16 +175,16 @@ NetConnection::getBytesTotal()
 bool
 NetConnection::loadCompleted()
 {
-	if (!_loader) return false;
+	if ( !_loader.get() ) return false; // @@ correct ?
 	return _loader->completed();
 }
 
 bool
-NetConnection::connectParser(FLVParser* parser)
+NetConnection::connectParser(FLVParser& parser)
 {
-	if (_loader == NULL) return false;
+	if (!_loader.get()) return false;
 
-	parser->setLoadThread(_loader);
+	parser.setLoadThread(_loader.get());
 	return true;
 }
 

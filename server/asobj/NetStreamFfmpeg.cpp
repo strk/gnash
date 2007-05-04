@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.42 2007/05/04 15:21:00 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.43 2007/05/04 20:42:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -382,8 +382,8 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	nc->seek(0);
 	if (std::string(head) == "FLV") {
 		ns->m_isFLV = true;
-		ns->m_parser = new FLVParser();
-		if (!nc->connectParser(ns->m_parser)) {
+		ns->m_parser = new FLVParser(); // TODO: define ownership, use auto_ptr !
+		if (!nc->connectParser(*(ns->m_parser))) {
 			ns->setStatus(streamNotFound);
 			log_error(_("Gnash could not open FLV movie: %s"), ns->url.c_str());
 			delete ns->m_parser;

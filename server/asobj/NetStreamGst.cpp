@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.27 2007/05/04 15:21:00 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.28 2007/05/04 20:42:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -342,8 +342,8 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	nc->seek(0);
 	if (head[0] == 'F'|| head[1] == 'L' || head[2] == 'V') { 
 		ns->m_isFLV = true;
-		ns->m_parser = new FLVParser();
-		if (!nc->connectParser(ns->m_parser)) {
+		ns->m_parser = new FLVParser(); // TODO: define ownership, use auto_ptr !
+		if (!nc->connectParser(*(ns->m_parser))) {
 			ns->setStatus(streamNotFound);
 			log_debug(_("Gnash could not open movie: %s"), ns->url.c_str());
 			return;

@@ -1,5 +1,12 @@
 2007-05-03 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetConnection.{cpp,h}: keep _loader by auto_ptr, some
+	  comments and interfaces cleanup.
+	* server/asobj/: NetStreamFfmpeg.cpp, NetStreamGst.cpp: update calls
+	  to connectParser(), now taking by ref.
+
+2007-05-03 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetConnection.{cpp,h}: Yay, another ActionScript class
 	  layout version. As a side effect stubbed missing properties and
 	  methods of the class + cleanups in the connect() method.

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.26 2007/05/04 20:28:35 strk Exp $ */
+/* $Id: NetConnection.h,v 1.27 2007/05/04 20:42:42 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -78,7 +78,7 @@ public:
 	long getBytesTotal();
 
 	/// Connects FLV parser with the LoadThread
-	bool connectParser(FLVParser* parser);
+	bool connectParser(FLVParser& parser);
 
 	/// Returns whether the load is complete
 	bool loadCompleted();
@@ -98,7 +98,7 @@ private:
 	boost::intrusive_ptr<as_object> _owner;
 
 	/// The file/stream loader thread and interface
-	LoadThread* _loader;
+	std::auto_ptr<LoadThread> _loader;
 
 	/// Attach ActionScript instance properties
 	void attachProperties();
