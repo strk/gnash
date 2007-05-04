@@ -1,5 +1,7 @@
 2007-05-03 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp: Add RENDER_ONE_FRAME_EVERY macro to skip
+	  rendering of a given fraction of movie frames (for debugging).
 	* server/video_stream_instance.cpp (display): call
 	  clear_invalidated().
 

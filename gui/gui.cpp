@@ -60,6 +60,10 @@
 // as the mouse moves
 //#define DEBUG_MOUSE_COORDINATES 1
 
+
+// Define this to N for only rendering 1/N frames
+//#define RENDER_ONE_FRAME_EVERY 50
+
 namespace gnash {
 
 Gui::Gui() :
@@ -466,7 +470,17 @@ Gui::advance_movie(Gui* gui)
 	log_msg(_("Frame %d"), m->get_current_frame());
 #endif
 
+
+#if RENDER_ONE_FRAME_EVERY 
+	static unsigned call=0;
+	if ( ++call % RENDER_ONE_FRAME_EVERY == 0 )
+	{
+		call=0;
+		gui->display(m);
+	} 
+#else
 	gui->display(m);
+#endif
 	
 	if ( ! gui->loops() )
 	{
