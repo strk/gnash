@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.41 2007/05/04 12:00:51 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.42 2007/05/04 15:21:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -367,7 +367,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	assert(ns);
 	if ( !nc->openConnection(ns->url.c_str(), ns) ) {
 		log_error(_("Gnash could not open movie: %s"), ns->url.c_str());
-		ns->setStatus("NetStream.Buffer.StreamNotFound");
+		ns->setStatus(streamNotFound);
 		return;
 	}
 
@@ -376,7 +376,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	// Check if the file is a FLV, in which case we use our own parser
 	char head[4] = {0, 0, 0, 0};
 	if (nc->read(head, 3) < 3) {
-		ns->setStatus("NetStream.Buffer.StreamNotFound");
+		ns->setStatus(streamNotFound);
 		return;
 	}
 	nc->seek(0);
@@ -384,7 +384,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 		ns->m_isFLV = true;
 		ns->m_parser = new FLVParser();
 		if (!nc->connectParser(ns->m_parser)) {
-			ns->setStatus("NetStream.Buffer.StreamNotFound");
+			ns->setStatus(streamNotFound);
 			log_error(_("Gnash could not open FLV movie: %s"), ns->url.c_str());
 			delete ns->m_parser;
 			return;
@@ -449,7 +449,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	// Open the stream. the 4th argument is the filename, which we ignore.
 	if(av_open_input_stream(&ns->m_FormatCtx, &ns->ByteIOCxt, "", inputFmt, NULL) < 0){
 		log_error(_("Couldn't open file '%s' for decoding"), ns->url.c_str());
-		ns->setStatus("NetStream.Play.StreamNotFound");
+		ns->setStatus(streamNotFound);
 		return;
 	}
 
@@ -604,7 +604,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 	// This should only happen if close() is called before setup is complete
 	if (!ns->m_go) return;
 
-	ns->setStatus("NetStream.Play.Start");
+	ns->setStatus(playStart);
 
 	raw_videodata_t* video = NULL;
 
@@ -671,7 +671,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 		}
 	}
 	ns->m_go = false;
-	ns->setStatus("NetStream.Play.Stop");
+	ns->setStatus(playStop);
 
 }
 
@@ -744,7 +744,7 @@ bool NetStreamFfmpeg::read_frame()
 				// We pause and load and buffer a second before continuing.
 				m_pause = true;
 				m_bufferTime = static_cast<uint32_t>(m_video_clock) * 1000 + 1000;
-				setStatus("NetStream.Buffer.Empty");
+				setStatus(bufferEmpty);
 				m_start_onbuffer = true;
 			}
 			return false;
@@ -1035,7 +1035,7 @@ NetStreamFfmpeg::advance()
 {
 	// Check if we should start the playback when a certain amount is buffered
 	if (m_go && m_pause && m_start_onbuffer && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
-		setStatus("NetStream.Buffer.Full");
+		setStatus(bufferFull);
 		m_pause = false;
 		m_start_onbuffer = false;
 	}

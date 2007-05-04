@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.26 2007/05/02 07:34:35 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.27 2007/05/04 15:21:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -283,7 +283,7 @@ void NetStreamGst::audio_callback_handoff (GstElement * /*c*/, GstBuffer *buffer
 
 	FLVFrame* frame = ns->m_parser->nextAudioFrame();
 	if (!frame) {
-		ns->setStatus("NetStream.Buffer.Empty");
+		ns->setStatus(bufferEmpty);
 		ns->m_pausePlayback = true;
 		return;
 	}
@@ -305,7 +305,7 @@ void NetStreamGst::video_callback_handoff (GstElement * /*c*/, GstBuffer *buffer
 
 	FLVFrame* frame = ns->m_parser->nextVideoFrame();
 	if (!frame) {
-		ns->setStatus("NetStream.Buffer.Empty");
+		ns->setStatus(bufferEmpty);
 		ns->m_pausePlayback = true;
 		return;
 	}
@@ -327,7 +327,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	// Pass stuff from/to the NetConnection object.
 	assert(ns);
 	if ( !nc->openConnection(ns->url.c_str(), ns) ) {
-		ns->setStatus("NetStream.Play.StreamNotFound");
+		ns->setStatus(streamNotFound);
 		log_debug(_("Gnash could not open movie: %s"), ns->url.c_str());
 		return;
 	}
@@ -336,7 +336,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 
 	uint8_t head[3];
 	if (nc->read(head, 3) < 3) {
-		ns->setStatus("NetStream.Buffer.StreamNotFound");
+		ns->setStatus(streamNotFound);
 		return;
 	}
 	nc->seek(0);
@@ -344,7 +344,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 		ns->m_isFLV = true;
 		ns->m_parser = new FLVParser();
 		if (!nc->connectParser(ns->m_parser)) {
-			ns->setStatus("NetStream.Play.StreamNotFound");
+			ns->setStatus(streamNotFound);
 			log_debug(_("Gnash could not open movie: %s"), ns->url.c_str());
 			return;
 			
@@ -591,7 +591,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 		ns->m_start_onbuffer = true;
 	}
 
-	ns->setStatus("NetStream.Play.Start");
+	ns->setStatus(playStart);
 	return;
 }
 
@@ -627,7 +627,7 @@ NetStreamGst::seek(double pos)
 			GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(newpos),
 			GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
 			log_error("Gstreamer seek failed");
-			setStatus("NetStream.Seek.InvalidTime");
+			setStatus(invalidTime);
 			return;
 		}*/
 	} else {
@@ -635,11 +635,11 @@ NetStreamGst::seek(double pos)
 			GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(pos),
 			GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
 			log_error("Gstreamer seek failed");
-			setStatus("NetStream.Seek.InvalidTime");
+			setStatus(invalidTime);
 			return;
 		}
 	}
-	setStatus("NetStream.Seek.Notify");
+	setStatus(seekNotify);
 }
 
 void
@@ -654,7 +654,7 @@ NetStreamGst::advance()
 {
 	// Check if we should start the playback when a certain amount is buffered
 	if (m_isFLV && m_pause && m_go && m_start_onbuffer && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
-		setStatus("NetStream.Buffer.Full");
+		setStatus(bufferFull);
 		m_pause = false;
 		gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
 	}
@@ -665,7 +665,7 @@ NetStreamGst::advance()
 		m_pausePlayback = false;
 
 		if (_netCon->loadCompleted()) {
-			setStatus("NetStream.Play.Stop");
+			setStatus(playStop);
 			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
 			m_go = false;
 		} else {

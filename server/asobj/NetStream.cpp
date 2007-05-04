@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.38 2007/05/01 20:33:27 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.39 2007/05/04 15:21:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -54,7 +54,8 @@ NetStream::NetStream()
 	:
 	as_object(getNetStreamInterface()),
 	_netCon(NULL),
-	m_env(NULL)
+	m_env(NULL),
+	_lastStatus(invalidStatus)
 {
 }
 
@@ -254,55 +255,97 @@ void netstream_class_init(as_object& global)
 void
 NetStream::processStatusNotifications()
 {
+	// Get an exclusive lock so any notification from loader thread will wait
 	boost::mutex::scoped_lock lock(statusMutex);
 
-	// TODO: check for System.onStatus too !
-	size_t size = m_status_messages.size();
-	as_value status;
-	if (size && get_member("onStatus", &status) && status.is_function())
-	{
-		log_debug("Processing %d status notifications", size);
+	// No queued statuses to notify ...
+	if ( _statusQueue.empty() ) return;
 
-		for (size_t i = 0; i < size; ++i)
+	// TODO: check for System.onStatus too ! use a private getStatusHandler() method for this.
+	as_value status;
+	if ( get_member("onStatus", &status) && status.is_function())
+	{
+		log_debug("Processing %d status notifications", _statusQueue.size());
+
+		for (StatusQueue::iterator it=_statusQueue.begin(), itE=_statusQueue.end(); it!=itE; ++it)
 		{
-			log_debug(" Invoking onStatus(%s)", m_status_messages[i].c_str());
+			StatusCode code = *it; 
+
+			log_debug(" Invoking onStatus(%s)", getStatusCodeInfo(code).first);
 
 			// TODO: optimize by reusing the same as_object ?
-			boost::intrusive_ptr<as_object> o = new as_object();
-			o->init_member("code", as_value(m_status_messages[i]), 1);
-
-			if (m_status_messages[i].find("StreamNotFound") == string::npos && m_status_messages[i].find("InvalidTime") == string::npos)
-			{
-				o->init_member("level", as_value("status"), as_prop_flags::dontDelete|as_prop_flags::dontEnum);
-			}
-			else
-			{
-				o->init_member("level", as_value("error"), as_prop_flags::dontDelete|as_prop_flags::dontEnum);
-			}
+			boost::intrusive_ptr<as_object> o = getStatusObject(code);
 
 			m_env->push_val(as_value(o.get()));
 			call_method(status, m_env, this, 1, m_env->get_top_index() );
 		}
+
 	}
 
-	m_status_messages.clear();
+	_statusQueue.clear();
+
 }
 
 void
-NetStream::setStatus(const std::string& status)
+NetStream::setStatus(StatusCode status)
 {
-	// TODO: make thread safe !! protect by a mutex, and use the mutex from status invoker
+	// status unchanged
+	if ( _lastStatus == status) return;
+
+	// Get a lock to avoid messing with statuses while processing them
 	boost::mutex::scoped_lock lock(statusMutex);
 
-	if (m_status_messages.size() && m_status_messages.back() == status)
-	{
-		// status unchanged
-		return;
-	}
-
-	m_status_messages.push_back(status);
+	_lastStatus = status;
+	_statusQueue.push_back(status);
 }
 
+std::pair<const char*, const char*>
+NetStream::getStatusCodeInfo(StatusCode code)
+{
+	switch (code)
+	{
+	
+		case bufferEmpty:
+			return make_pair("NetStream.Buffer.Empty", "status");
+
+		case bufferFull:
+			return make_pair("NetStream.Buffer.Full", "status");
+
+		case bufferFlush:
+			return make_pair("NetStream.Buffer.Flush", "status");
+
+		case playStart:
+			return make_pair("NetStream.Play.Start", "status");
+
+		case playStop:
+			return make_pair("NetStream.Play.Stop", "status");
+
+		case seekNotify:
+			return make_pair("NetStream.Seek.Notify", "status");
+
+		case streamNotFound:
+			return make_pair("NetStream.Play.StreamNotFound", "error");
+
+		case invalidTime:
+			return make_pair("NetStream.Seek.InvalidTime", "error");
+
+		default:
+			return make_pair("","");
+	}
+}
+
+boost::intrusive_ptr<as_object>
+NetStream::getStatusObject(StatusCode code)
+{
+	// code, level
+	std::pair<const char*, const char*> info = getStatusCodeInfo(code);
+
+	boost::intrusive_ptr<as_object> o = new as_object();
+	o->init_member("code",  info.first,  1);
+	o->init_member("level", info.second, as_prop_flags::dontDelete|as_prop_flags::dontEnum);
+
+	return o;
+}
 
 
 } // end of gnash namespace

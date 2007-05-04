@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.27 2007/05/01 20:33:27 strk Exp $ */
+/*  $Id: NetStream.h,v 1.28 2007/05/04 15:21:00 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -46,14 +46,39 @@ namespace gnash {
 class NetStream : public as_object {
 
 protected:
+	
+	/// Status codes used for notifications
+	enum StatusCode {
+	
+		// Internal status, not a valid ActionScript value
+		invalidStatus,
+
+		/// NetStream.Buffer.Empty (level: status)
+		bufferEmpty,
+
+		/// NetStream.Buffer.Full (level: status)
+		bufferFull,
+
+		/// NetStream.Buffer.Flush (level: status)
+		bufferFlush,
+
+		/// NetStream.Play.Start (level: status)
+		playStart,
+
+		/// NetStream.Play.Stop  (level: status)
+		playStop,
+
+		/// NetStream.Seek.Notify  (level: status)
+		seekNotify,
+
+		/// NetStream.Play.StreamNotFound (level: error)
+		streamNotFound,
+
+		/// NetStream.Seek.InvalidTime (level: error)
+		invalidTime
+	};
 
 	boost::intrusive_ptr<NetConnection> _netCon;
-
-	// List of status messages to be processed
-	std::vector<std::string> m_status_messages;
-
-	/// Mutex protecting m_status_messages
-	boost::mutex statusMutex;
 
 	/// Set stream status.
 	//
@@ -71,16 +96,12 @@ protected:
 	///  - NetStream.Play.StreamNotFound
 	///  - NetStream.Seek.InvalidTime
 	///
-	/// TODO: use an enum !
-	///
-	void setStatus(const std::string& /*code*/);
+	void setStatus(StatusCode code);
 
 	/// \brief
 	/// Call any onStatus event handler passing it
-	/// any queued status change, see m_status_messages
+	/// any queued status change, see _statusQueue
 	//
-	/// TODO: move up to NetStream ?
-	///
 	void processStatusNotifications();
 
 	// The actionscript enviroment for the AS callbacks
@@ -129,6 +150,31 @@ public:
 		assert(env);
 		m_env = env;
 	}
+
+private:
+
+	typedef std::vector<StatusCode> StatusQueue;
+
+	/// List of status messages to be processed
+	StatusQueue _statusQueue;
+
+	/// Mutex protecting _statusQueue
+	boost::mutex statusMutex;
+
+	/// Last status code (to avoid consecutively notifying the same event)
+	StatusCode _lastStatus;
+
+	/// Get 'status' (first) and 'level' (second) strings for given status code
+	//
+	/// The two members of the pair are ensured to be not-NULL
+	/// Any invalid code, out of bound or explicitly invalid (invalidCode) 
+	/// returns two empty C strings.
+	///
+	std::pair<const char*, const char*> getStatusCodeInfo(StatusCode code);
+
+	/// Return a newly allocated information object for the given status
+	boost::intrusive_ptr<as_object> getStatusObject(StatusCode code);
+
 };
 
 
