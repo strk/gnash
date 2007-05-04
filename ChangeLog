@@ -1,5 +1,8 @@
 2007-05-03 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Makefile.am, server/parser/Makefile.am,
+	  server/vm/Makefile.am: -release makes no sense for
+	  convenience libraries.
 	* testsuite/misc-ming.all/DrawingApiTest.as: reintroduced
 	  visual hitTest checks (not automated yet). This time
 	  they don't break the exising test.

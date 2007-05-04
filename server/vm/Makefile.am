@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.12 2007/05/03 00:43:25 rsavoye Exp $
+# $Id: Makefile.am,v 1.13 2007/05/04 09:40:25 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -60,7 +60,7 @@ noinst_HEADERS =		\
 libgnashvm_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la 
 
-libgnashvm_la_LDFLAGS = -release $(VERSION) -export-dynamic # -no-undefined 
+libgnashvm_la_LDFLAGS = -export-dynamic # -release $(VERSION) -no-undefined 
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
