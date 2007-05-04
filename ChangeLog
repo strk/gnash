@@ -2,6 +2,7 @@
 
 	* macros/boost.m4: Fixed a bug in GNASH_BOOST_PATH.
 	* server/asobj/SoundFfmpeg.h: Build on OS X.
+	* backend/sound_handler_sdl.h: Build on OS X.
 
 2007-05-03 Sandro Santilli <strk@keybit.net>
 
