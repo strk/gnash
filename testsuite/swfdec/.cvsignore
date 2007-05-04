@@ -7,3 +7,4 @@ testrun.log
 *.trace-gnash
 *.log
 run_swfdec_testsuite
+gmon.out

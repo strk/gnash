@@ -8,3 +8,4 @@ site.exp
 testrun.log
 testrun.sum
 snappingrangetest
+gmon.out

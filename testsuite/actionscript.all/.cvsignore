@@ -18,3 +18,4 @@ gnash-dbg.log
 site.exp
 testrun.log
 testrun.sum
+gmon.out

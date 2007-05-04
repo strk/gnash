@@ -8,3 +8,4 @@ site.exp
 *.pp
 testrun.*
 alltests-runner
+gmon.out

@@ -10,3 +10,4 @@ test_string
 test_variable
 testrun.log
 testrun.sum
+gmon.out

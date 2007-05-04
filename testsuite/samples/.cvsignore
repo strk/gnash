@@ -12,3 +12,4 @@ clip_as_button2-TestRunner
 site.exp
 GotoAndPlayTestRunner
 gotoFrameOnKeyEvent-TestRunner
+gmon.out
