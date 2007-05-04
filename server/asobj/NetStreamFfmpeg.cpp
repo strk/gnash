@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.40 2007/05/01 20:33:27 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.41 2007/05/04 12:00:51 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -135,7 +135,7 @@ void NetStreamFfmpeg::close()
 		m_FormatCtx = NULL;
 	}
 
-	if (m_imageframe) delete m_imageframe;
+	delete m_imageframe;
 
 	while (m_qvideo.size() > 0)
 	{
