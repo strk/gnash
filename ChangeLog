@@ -1,3 +1,8 @@
+2007-05-03 Sandro Santilli <strk@keybit.net>
+
+	* server/video_stream_instance.cpp (display): call
+	  clear_invalidated().
+
 2007-05-03 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/video_stream_instance.cpp: implemented proper 

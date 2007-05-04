@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.22 2007/05/04 11:30:10 udog Exp $
+// $Id: video_stream_instance.cpp,v 1.23 2007/05/04 12:16:07 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -114,6 +114,9 @@ video_stream_instance::display()
 		}
 
 	}
+
+	clear_invalidated();
+	//do_display_callback(); <-- are we still relying on this ?
 }
 
 void
