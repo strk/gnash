@@ -2,6 +2,7 @@ Makefile
 Makefile.in
 .deps
 .libs
+gmon.out
 gnash-dbg.log
 site.exp
 testrun.log
@@ -11,3 +12,5 @@ MatrixTest
 PropertyListTest
 as_prop_flagsTest
 DisplayListTest
+EdgeTest
+PointTest
