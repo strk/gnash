@@ -1,5 +1,8 @@
 2007-05-03 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: rewording of ffmpeg warnings. Shows a bug in ffmpeg.m4
+	  failing to detect version and thus failing to accept it when
+	  passed explicit --with-ffmpeg-incl and --with-ffmpeg-lib.
 	* server/asobj/: NetStream.{cpp,h},
 	  NetStreamFfmpeg.cpp, NetStreamGst.cpp:
 	  Use an enum for status codes, avoid notifying multiple
