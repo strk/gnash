@@ -157,40 +157,99 @@ a.onEnterFrame = function()
 	}
 };
 
-#if 0
-createEmptyMovieClip("cursor", 3);
+createEmptyMovieClip("hitdetector", 3);
+hitdetector.createEmptyMovieClip("shapeshape", 1);
+with(hitdetector.shapeshape)
+{
+	lineStyle(2, 0x000000);
+	beginFill(0xFFFF00, 100);
+	drawCircle(hitdetector.shapeshape, 0, 0, 20);
+	endFill();
+}
+
+hitdetector.createEmptyMovieClip("bboxpoint", 2);
+with(hitdetector.bboxpoint)
+{
+	lineStyle(2, 0x000000);
+	beginFill(0xFFFF00, 100);
+	drawCircle(hitdetector.bboxpoint, 0, 0, 20);
+	endFill();
+	_x = 60;
+}
+
+hitdetector.createEmptyMovieClip("shapepoint", 3);
+with(hitdetector.shapepoint)
+{
+	lineStyle(2, 0x000000);
+	beginFill(0xFFFF00, 100);
+	drawCircle(hitdetector.shapepoint, 0, 0, 20);
+	endFill();
+	_x = 120;
+}
+
+hitdetector._y = 350;
+
+
+createEmptyMovieClip("cursor", 12);
 with(cursor)
 {
-	lineStyle(2, 0xFF0000);
+	lineStyle(2, 0x000000);
 	beginFill(0xFF0000, 100);
 	drawCircle(_root.cursor, 0, 0, 10);
-	onMouseMove = function()
+	endFill();
+	onEnterFrame = function()
 	{
+		hd = _root.hitdetector;
+
+#if 0 // don't move the controls for now...
+		with(hd)
+		{
+			if ( typeof(xshift) == 'undefined' )
+			{
+				xshift = 1;
+			}
+			else if ( xshift > 0 && _x >= 300 )
+			{
+				xshift = -1;
+			}
+			else if ( xshift < 0 && _x == 0 )
+			{
+				xshift = 1;
+			}
+
+			_x += xshift;
+		}
+#endif
+
+
 		_x = _root._xmouse;
 		_y = _root._ymouse;
 
 		// Bounding box check
 		if ( hitTest(_root.a) ) {
-			_alpha=50;
+			hd.shapeshape._xscale=150;
+			hd.shapeshape._yscale=150;
 		} else {
-			_alpha=100;
+			hd.shapeshape._xscale=100;
+			hd.shapeshape._yscale=100;
 		}
 
 		// Bounding box check with circle center
 		if ( _root.a.hitTest(_x, _y) ) {
-			_root.a._alpha=50;
+			hd.bboxpoint._xscale=150;
+			hd.bboxpoint._yscale=150;
 		} else {
-			_root.a._alpha=100;
+			hd.bboxpoint._xscale=100;
+			hd.bboxpoint._yscale=100;
 		}
 
 		// Shape check with circle center
 		if ( _root.a.hitTest(_x, _y, true) ) {
-			_xscale=50;
-			_yscale=50;
+			hd.shapepoint._xscale=150;
+			hd.shapepoint._yscale=150;
 		} else {
-			_xscale=100;
-			_yscale=100;
+			hd.shapepoint._xscale=100;
+			hd.shapepoint._yscale=100;
 		}
 	};
 }
-#endif
