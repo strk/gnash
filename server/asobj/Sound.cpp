@@ -146,7 +146,7 @@ Sound::loadSound(std::string file, bool /*streaming*/)
 	externalURL = file;
 
 	connection = new NetConnection();
-	connection->openConnection(externalURL, this);
+	connection->openConnection(externalURL);
 }
 
 void

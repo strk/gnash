@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.44 2007/05/04 21:18:07 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.45 2007/05/04 21:40:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -365,7 +365,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 
 	// Pass stuff from/to the NetConnection object.
 	assert(ns);
-	if ( !nc->openConnection(ns->url, ns) ) {
+	if ( !nc->openConnection(ns->url) ) {
 		log_error(_("Gnash could not open movie: %s"), ns->url.c_str());
 		ns->setStatus(streamNotFound);
 		return;

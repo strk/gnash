@@ -1,8 +1,8 @@
 2007-05-03 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetConnection.{cpp,h}: change openConnection interface
-	  to take url by ref (not by pointer). Stubbed documentation of the
-	  method (needs more info).
+	  to take url by ref (not by pointer) and nothing else (drop owner
+	  arg). Stubbed documentation of the method (needs more info).
 	* server/asobj/: NetStreamFfmpeg.cpp, NetStreamGst.cpp, Sound.cpp,
 	  SoundFfmpeg.cpp, SoundGst.cpp, SoundMad.cpp:
 	  Updated calls to openConnection.

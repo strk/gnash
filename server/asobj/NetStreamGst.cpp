@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.29 2007/05/04 21:18:07 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.30 2007/05/04 21:40:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -326,7 +326,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 
 	// Pass stuff from/to the NetConnection object.
 	assert(ns);
-	if ( !nc->openConnection(ns->url, ns) ) {
+	if ( !nc->openConnection(ns->url) ) {
 		ns->setStatus(streamNotFound);
 		log_debug(_("Gnash could not open movie: %s"), ns->url.c_str());
 		return;

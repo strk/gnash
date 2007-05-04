@@ -138,7 +138,7 @@ SoundGst::setupDecoder(SoundGst* so)
 
 	// Pass stuff from/to the NetConnection object.
 	assert(so);
-	if ( !nc->openConnection(so->externalURL, so) ) {
+	if ( !nc->openConnection(so->externalURL) ) {
 		log_error(_("could not open audio url: %s"), so->externalURL.c_str());
 		delete so->lock;
 		return;

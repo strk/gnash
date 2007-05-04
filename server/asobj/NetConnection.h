@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.28 2007/05/04 21:18:07 strk Exp $ */
+/* $Id: NetConnection.h,v 1.29 2007/05/04 21:40:50 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -58,9 +58,6 @@ public:
 	/// @param url
 	///	An url portion to append to the base url (???)
 	///
-	/// @param owner 
-	///     ???
-	///
 	/// @return true on success, false on error.
 	///
 	/// @note Older Flash movies can only take a NULL value as
@@ -68,7 +65,7 @@ public:
 	/// RTMP. Newer Flash movies have a parameter to connect which is a
 	/// URL string like rtmp://foobar.com/videos/bar.flv
 	///
-	bool openConnection(const std::string& url, as_object* owner);
+	bool openConnection(const std::string& url);
 
 	/// Put read pointer at given position
 	bool seek(size_t pos);

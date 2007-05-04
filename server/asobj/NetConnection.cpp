@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.42 2007/05/04 21:18:07 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.43 2007/05/04 21:40:50 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -53,7 +53,6 @@ NetConnection::NetConnection()
 	:
 	as_object(getNetConnectionInterface()),
 	_url(),
-	_owner(NULL),
 	_loader()
 {
 	attachProperties();
@@ -64,7 +63,7 @@ NetConnection::~NetConnection()
 }
 
 /*public*/
-bool NetConnection::openConnection(const std::string& url, as_object* owner)
+bool NetConnection::openConnection(const std::string& url)
 {
 
 	// if already running there is no need to setup things again
@@ -74,7 +73,6 @@ bool NetConnection::openConnection(const std::string& url, as_object* owner)
 		return true;
 	}
 
-	_owner = owner;
 	if (_url.size() > 0) {
 		_url += "/";
 	}
