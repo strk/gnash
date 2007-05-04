@@ -328,5 +328,8 @@ main(int /*argc*/, char** /*argv*/)
 	check_pixel(303, 280, 10, white, 2); 
 	check_pixel(351, 280, 10, white, 2); 
 	check_pixel(400, 280, 3, yellow, 2); 
+
+	// TODO: check hitdetector bounds and reactions on mouse
+	//       movement !
 }
 
