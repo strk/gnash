@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.21 2007/05/03 15:41:06 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.22 2007/05/04 11:30:10 udog Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -127,11 +127,22 @@ video_stream_instance::advance(float /*delta_time*/)
 
 void
 video_stream_instance::add_invalidated_bounds(InvalidatedRanges& ranges, 
-	bool /*force*/)
-{
-	geometry::Range2d<float> bounds; 
-	bounds.setWorld();
-	ranges.add(bounds);
+	bool force)
+{	
+	if (!force && !m_invalidated) return; // no need to redraw
+    
+	ranges.add(m_old_invalidated_ranges);
+	
+	// NOTE: do not use m_def->get_bounds()
+
+  rect def_bounds(0.0f, 0.0f, 
+    PIXELS_TO_TWIPS(m_def->m_width), PIXELS_TO_TWIPS(m_def->m_height));
+    
+	rect bounds;	
+
+	bounds.expand_to_transformed_rect(get_world_matrix(), def_bounds);
+	
+	ranges.add(bounds.getRange());            
 }
 
 void
