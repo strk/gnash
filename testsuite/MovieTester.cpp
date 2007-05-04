@@ -50,6 +50,8 @@
 namespace gnash {
 
 MovieTester::MovieTester(const std::string& url)
+	:
+	_forceRedraw(true)
 {
 	if ( url == "-" )
 	{
@@ -128,6 +130,13 @@ MovieTester::render(render_handler& h, InvalidatedRanges& invalidated_regions)
 }
 
 void
+MovieTester::redraw()
+{
+	_forceRedraw=true;
+	render();
+}
+
+void
 MovieTester::render() 
 {
 	// Get invalidated ranges and cache them
@@ -140,8 +149,12 @@ MovieTester::render()
 #endif
 
 	// Force full redraw by using a WORLD invalidated ranges
-	InvalidatedRanges ranges = _invalidatedBounds; // copy the cache, so we don't accidentally modify it ...
-	ranges.setWorld(); // TESTING !! TODO: make this a parameter
+	InvalidatedRanges ranges = _invalidatedBounds; 
+	if ( _forceRedraw )
+	{
+		ranges.setWorld(); // set to world if asked a full redraw
+		_forceRedraw = false; // reset to no forced redraw
+	}
 
 	for (TRenderers::const_iterator it=_testingRenderers.begin(), itE=_testingRenderers.end();
 				it != itE; ++it)

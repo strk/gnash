@@ -105,6 +105,13 @@ public:
 	/// Advance the movie by one frame
 	void advance();
 
+	/// Fully redraw of current frame
+	//
+	/// This function forces complete redraw in all testing
+	/// renderers.
+	///
+	void redraw();
+
 	/// Return the invalidated ranges in PIXELS
 	//
 	/// This is to debug/test partial rendering
@@ -261,6 +268,10 @@ private:
 	typedef std::vector< TestingRendererPtr > TRenderers;
 
 	std::vector< TestingRendererPtr > _testingRenderers;
+
+	// When true, pass world invalidated ranges
+	// to the renderer(s) at ::render time.
+	bool _forceRedraw;
 };
 
 } // namespace gnash
