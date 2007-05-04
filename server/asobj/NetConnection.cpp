@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.39 2007/05/03 14:50:51 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.40 2007/05/04 20:28:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,8 +41,7 @@ using namespace std;
 namespace gnash {
 
 static as_value netconnection_new(const fn_call& fn);
-static as_value netconnection_connect(const fn_call& fn);
-static as_object* getNetConnectionInterface();
+//static as_object* getNetConnectionInterface();
 
 /// \class NetConnection
 /// \brief Opens a local connection through which you can play
@@ -57,6 +56,7 @@ NetConnection::NetConnection()
 	_owner(NULL),
 	_loader(NULL)
 {
+	attachProperties();
 }
 
 NetConnection::~NetConnection() {
@@ -114,11 +114,12 @@ bool NetConnection::openConnection(const char* char_url, as_object* owner)
 
 /*public*/
 void
-NetConnection::addToURL(const char* url)
+NetConnection::addToURL(const std::string& url)
 {
-	if (strcmp(url, "null") != 0 && strcmp(url, "NULL") != 0) {
-		_url += url;
-	}
+	// What is this ? It is NOT documented in the header !!
+	if (url == "null" || url == "NULL") return;
+
+	_url += url;
 }
 
 /*public*/
@@ -203,44 +204,153 @@ netconnection_new(const fn_call& /* fn */)
 	return as_value(netconnection_obj);
 }
 
-static as_value
-netconnection_connect(const fn_call& fn)
+as_value
+NetConnection::connect_method(const fn_call& fn)
 {
 	GNASH_REPORT_FUNCTION;
 
 	boost::intrusive_ptr<NetConnection> ptr = ensureType<NetConnection>(fn.this_ptr); 
     
-	if (fn.nargs > 0) {
-		ptr->addToURL(fn.arg(0).to_string().c_str());
+	if (fn.nargs < 1)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("NetConnection.connect(): needs at least one argument"));
+		);
+		return as_value(false);
 	}
+
+	as_value& url_val = fn.arg(0);
+
+	// Check first arg for validity 
+	if ( url_val.is_null() || url_val.is_undefined() )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror(_("NetConnection.connect(%s): invalid first arg"), ss.str().c_str());
+		);
+		return as_value(false);
+	}
+
+	/// .. TODO: checkme ... addToURL ?? shoudnl't we attempt a connection ??
+	ptr->addToURL(url_val.to_string(&fn.env()));
+
+	if ( fn.nargs > 1 )
+	{
+		std::stringstream ss; fn.dump_args(ss);
+		log_unimpl("NetConnection.connect(%s): args after the first are not supported", ss.str().c_str());
+	}
+
+
+	// TODO: FIXME: should return true *or false* for RTMP connections
+	return as_value(true);
+}
+
+as_value
+NetConnection::addHeader_method(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetConnection> ptr = ensureType<NetConnection>(fn.this_ptr); 
+	UNUSED(ptr);
+
+	log_unimpl("NetConnection.addHeader()");
 	return as_value();
 }
 
-void
-attachNetConnectionInterface(as_object& o)
+as_value
+NetConnection::call_method(const fn_call& fn)
 {
+	boost::intrusive_ptr<NetConnection> ptr = ensureType<NetConnection>(fn.this_ptr); 
+	UNUSED(ptr);
 
-	o.init_member("connect", new builtin_function(netconnection_connect));
+	log_unimpl("NetConnection.call()");
+	return as_value();
+}
+
+as_value
+NetConnection::close_method(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetConnection> ptr = ensureType<NetConnection>(fn.this_ptr); 
+	UNUSED(ptr);
+
+	log_unimpl("NetConnection.close()");
+	return as_value();
+}
+
+as_value
+NetConnection::isConnected_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetConnection> ptr = ensureType<NetConnection>(fn.this_ptr); 
+	UNUSED(ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		log_unimpl("NetConnection.isConnected get");
+		return as_value();
+	}
+	else // setter
+	{
+		log_unimpl("NetConnection.isConnected set");
+		return as_value();
+	}
+}
+
+as_value
+NetConnection::uri_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetConnection> ptr = ensureType<NetConnection>(fn.this_ptr); 
+	UNUSED(ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		log_unimpl("NetConnection.uri get");
+		return as_value();
+	}
+	else // setter
+	{
+		log_unimpl("NetConnection.uri set");
+		return as_value();
+	}
 
 }
 
-static as_object*
-getNetConnectionInterface()
+void
+NetConnection::attachNetConnectionInterface(as_object& o)
+{
+	o.init_member("connect", new builtin_function(NetConnection::connect_method));
+	o.init_member("addHeader", new builtin_function(NetConnection::addHeader_method));
+	o.init_member("call", new builtin_function(NetConnection::call_method));
+	o.init_member("close", new builtin_function(NetConnection::close_method));
+
+}
+
+void
+NetConnection::attachProperties()
+{
+	boost::intrusive_ptr<builtin_function> gettersetter;
+
+	gettersetter = new builtin_function(NetConnection::isConnected_getset, NULL);
+	init_property("isConnected", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(NetConnection::uri_getset, NULL);
+	init_property("uri", *gettersetter, *gettersetter);
+
+}
+
+as_object*
+NetConnection::getNetConnectionInterface()
 {
 
 	static boost::intrusive_ptr<as_object> o;
 	if ( o == NULL )
 	{
 		o = new as_object();
-		attachNetConnectionInterface(*o);
+		NetConnection::attachNetConnectionInterface(*o);
 	}
 
 	return o.get();
 }
 
-
-// extern (used by Global.cpp)
-void netconnection_class_init(as_object& global)
+void
+NetConnection::registerConstructor(as_object& global)
 {
 
 	// This is going to be the global NetConnection "class"/"function"
@@ -251,13 +361,20 @@ void netconnection_class_init(as_object& global)
 		cl=new builtin_function(&netconnection_new, getNetConnectionInterface());
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
-		attachNetConnectionInterface(*cl);
+		// TODO: this is probably wrong !
+		NetConnection::attachNetConnectionInterface(*cl);
 		     
 	}
 
 	// Register _global.String
 	global.init_member("NetConnection", cl.get());
 
+}
+
+// extern (used by Global.cpp)
+void netconnection_class_init(as_object& global)
+{
+	NetConnection::registerConstructor(global);
 }
 
 

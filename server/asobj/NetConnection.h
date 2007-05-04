@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.25 2007/04/19 07:40:21 zoulunkai Exp $ */
+/* $Id: NetConnection.h,v 1.26 2007/05/04 20:28:35 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -71,9 +71,6 @@ public:
 	/// Report global position within the file
 	size_t tell();
 
-	/// Extend the URL to be used for playing
-	void addToURL(const char* url);
-
 	///	Returns the number of bytes cached
 	long getBytesLoaded();
 
@@ -85,7 +82,14 @@ public:
 
 	/// Returns whether the load is complete
 	bool loadCompleted();
+
+	/// Register the "NetConnection" constructor to the given global object
+	static void registerConstructor(as_object& global);
+
 private:
+
+	/// Extend the URL to be used for playing
+	void addToURL(const std::string& url);
 
 	/// the url of the file
 	std::string _url;
@@ -95,6 +99,34 @@ private:
 
 	/// The file/stream loader thread and interface
 	LoadThread* _loader;
+
+	/// Attach ActionScript instance properties
+	void attachProperties();
+
+	/// Attach ActionScript class interface
+	static void attachNetConnectionInterface(as_object& o);
+
+	/// Get ActionScript class interface
+	static as_object* getNetConnectionInterface();
+
+	/// NetConnection.isConnected ActionScript Property
+	static as_value isConnected_getset(const fn_call& fn);
+
+	/// NetConnection.uri ActionScript Property
+	static as_value uri_getset(const fn_call& fn);
+
+	/// NetConnection.connect() ActionScript Method
+	static as_value connect_method(const fn_call& fn);
+
+	/// NetConnection.close() ActionScript Method
+	static as_value close_method(const fn_call& fn);
+
+	/// NetConnection.call() ActionScript Method
+	static as_value call_method(const fn_call& fn);
+
+	/// NetConnection.addHeader() ActionScript Method
+	static as_value addHeader_method(const fn_call& fn);
+
 };
 
 void netconnection_class_init(as_object& global);
