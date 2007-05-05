@@ -1,5 +1,11 @@
 2007-05-04 Sandro Santilli <strk@keybit.net>
 
+	* libbase/FLVParser.h (FLVVideoFrame): add isKeyFrame() method;
+	  use typedefs for video and audio frame containers.
+	* libbase/FLVParser.cpp: use isKeyFrame(), easier to read.
+
+2007-05-04 Sandro Santilli <strk@keybit.net>
+
 	* libbase/FLVParser.cpp (seekAudio, seekVideo): fixed seeking and
 	  hopefully made a bit more readable. The computed values are
 	  now printed for further debugging. They seem correct to me, but

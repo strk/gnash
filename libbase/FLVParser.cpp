@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.6 2007/05/05 15:44:22 strk Exp $
+// $Id: FLVParser.cpp,v 1.7 2007/05/05 15:52:50 strk Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -277,14 +277,16 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 	// the last key videoframe is returned
 	FLVVideoFrame* lastFrame = _videoFrames.back();
 	uint32_t numFrames = _videoFrames.size();
-	if (lastFrame->timestamp < time) {
-		uint32_t lastFrameNum = numFrames -1;
-		while (lastFrame->frameType != KEY_FRAME) {
+	if (lastFrame->timestamp < time)
+	{
+		size_t lastFrameNum = numFrames -1;
+		while (! lastFrame->isKeyFrame() )
+		{
 			lastFrameNum--;
 			lastFrame = _videoFrames[lastFrameNum];
 		}
 
-		_lastVideoFrame = lastFrameNum-1;
+		_lastVideoFrame = lastFrameNum-1; // Why -1 ?
 		return lastFrame->timestamp;
 
 	}
@@ -326,20 +328,22 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 
 	// Find closest backward keyframe  
 	size_t rewindKeyframe = bestFrame;
-	while (rewindKeyframe && _videoFrames[rewindKeyframe]->frameType != KEY_FRAME) {
+	while ( rewindKeyframe && ! _videoFrames[rewindKeyframe]->isKeyFrame() )
+	{
 		rewindKeyframe--;
 	}
 
 	// Find closest forward keyframe 
-	uint32_t forwardKeyframe = bestFrame;
-	uint32_t size = _videoFrames.size();
-	while (size > forwardKeyframe+1 && _videoFrames[forwardKeyframe]->frameType != KEY_FRAME) {
+	size_t forwardKeyframe = bestFrame;
+	size_t size = _videoFrames.size();
+	while (size > forwardKeyframe+1 && ! _videoFrames[forwardKeyframe]->isKeyFrame() )
+	{
 		forwardKeyframe++;
 	}
 
 	// We can't ensure we were able to find a key frame *after* the best position
 	// in that case we just use any previous keyframe instead..
-	if ( _videoFrames[forwardKeyframe]->frameType != KEY_FRAME )
+	if ( ! _videoFrames[forwardKeyframe]->isKeyFrame() )
 	{
 		bestFrame = rewindKeyframe;
 	}
@@ -355,7 +359,7 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 	gnash::log_debug("Seek (video): " SIZET_FMT "/" SIZET_FMT " (%u/%u)", bestFrame, numFrames, _videoFrames[bestFrame]->timestamp, time);
 
 	_lastVideoFrame = bestFrame;
-	assert(_videoFrames[_lastVideoFrame]->frameType == KEY_FRAME);
+	assert( _videoFrames[_lastVideoFrame]->isKeyFrame() );
 	return _videoFrames[_lastVideoFrame]->timestamp;
 }
 

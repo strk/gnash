@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.3 2007/04/18 14:07:33 jgilmore Exp $
+// $Id: FLVParser.h,v 1.4 2007/05/05 15:52:50 strk Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -129,6 +129,12 @@ public:
 	uint64_t dataPosition;
 	uint32_t timestamp;
 
+	/// Return true if this video frame is a key frame
+	bool isKeyFrame() const
+	{
+		return frameType == KEY_FRAME;
+	}
+
 };
 
 class FLVAudioFrame
@@ -217,11 +223,15 @@ private:
 	/// The interface to the file
 	LoadThread* _lt;
 
+	typedef std::vector<FLVVideoFrame*> VideoFrames;
+
 	/// list of videoframes, does no contain the frame data.
-	std::vector<FLVVideoFrame*> _videoFrames;
+	VideoFrames _videoFrames;
+
+	typedef std::vector<FLVAudioFrame*> AudioFrames;
 
 	/// list of audioframes, does no contain the frame data.
-	std::vector<FLVAudioFrame*> _audioFrames;
+	AudioFrames _audioFrames;
 
 	/// The position where the parsing should continue from.
 	uint64_t _lastParsedPosition;
