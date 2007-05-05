@@ -53,7 +53,7 @@ if ( ! tmp.connect("rtmp://www.mediacollege.com/flash/media-player/testclip-4sec
 }
 else
 {
-	xpass("NetConnection::connect() initialized correctly");
+	pass("NetConnection::connect() initialized correctly");
 }
 
 

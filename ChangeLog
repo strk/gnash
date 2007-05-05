@@ -1,5 +1,9 @@
 2007-05-04 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/NetConnection.as: unexpected success..
+
+2007-05-04 Sandro Santilli <strk@keybit.net>
+
 	* libbase/FLVParser.h (FLVVideoFrame): add isKeyFrame() method;
 	  use typedefs for video and audio frame containers.
 	* libbase/FLVParser.cpp: use isKeyFrame(), easier to read.
