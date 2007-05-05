@@ -1,5 +1,9 @@
 2007-05-04 Sandro Santilli <strk@keybit.net>
 
+	* libbase/FLVParser.cpp (seekAudio, seekVideo): fixed seeking and
+	  hopefully made a bit more readable. The computed values are
+	  now printed for further debugging. They seem correct to me, but
+	  it seems they are not correctly used.
 	* server/asobj/: NetStream.{cpp,h}, NetStreamFfmpeg.{cpp,h},
 	  NetStreamGst.{cpp,h}: change play() method to take a std::string
 	  ref instead of a char*; always pass environment when casting args

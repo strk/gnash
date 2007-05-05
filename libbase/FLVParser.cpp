@@ -17,10 +17,11 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.5 2007/04/18 14:07:33 jgilmore Exp $
+// $Id: FLVParser.cpp,v 1.6 2007/05/05 15:44:22 strk Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
+#include "log.h"
 
 FLVParser::FLVParser()
 	:
@@ -223,32 +224,34 @@ uint32_t FLVParser::seekAudio(uint32_t time)
 
 	// If there are no audio greater than the given time
 	// the last audioframe is returned
-	if (_audioFrames.back()->timestamp < time) {
+	FLVAudioFrame* lastFrame = _audioFrames.back();
+	if (lastFrame->timestamp < time) {
 		_lastAudioFrame = _audioFrames.size() - 2;
-		return _audioFrames.back()->timestamp;
+		return lastFrame->timestamp;
 	}
 
 	// We try to guess where in the vector the audioframe
 	// with the correct timestamp is
-	uint32_t numFrames = _audioFrames.size();
-	uint32_t guess = _audioFrames[numFrames-1]->timestamp / numFrames * time;
+	size_t numFrames = _audioFrames.size();
+	double tpf = lastFrame->timestamp / numFrames; // time per frame
+	size_t guess = size_t(time / tpf);
 
 	// Here we test if the guess was ok, and adjust if needed.
-	uint32_t bestFrame = guess;
-	uint32_t diff = abs(_audioFrames[bestFrame]->timestamp - time);
-	while (true) {
-		if (bestFrame+1 < numFrames && static_cast<uint32_t>(abs(_audioFrames[bestFrame+1]->timestamp - time)) < diff) {
-			bestFrame = bestFrame + 1;
-			diff = abs(_audioFrames[bestFrame+1]->timestamp - time);
-		} else if (bestFrame-1 > 0 && static_cast<uint32_t>(abs(_audioFrames[bestFrame+1]->timestamp - time)) < diff) {
-			bestFrame = bestFrame - 1;
-			diff = abs(_audioFrames[bestFrame-1]->timestamp - time);
-		} else {
-			break;
-		}
+	size_t bestFrame = iclamp(guess, 0, _audioFrames.size()-1);
+
+	// Here we test if the guess was ok, and adjust if needed.
+	long diff = _audioFrames[bestFrame]->timestamp - time;
+	if ( diff > 0 ) // our guess was too long
+	{
+		while ( bestFrame > 0 && _audioFrames[bestFrame-1]->timestamp > time ) --bestFrame;
+	}
+	else // our guess was too short
+	{
+		while ( bestFrame < _audioFrames.size()-1 && _audioFrames[bestFrame+1]->timestamp < time ) ++bestFrame;
 	}
 
-	_lastAudioFrame = bestFrame -1;
+	gnash::log_debug("Seek (audio): " SIZET_FMT "/" SIZET_FMT " (%u/%u)", bestFrame, numFrames, _audioFrames[bestFrame]->timestamp, time);
+	_lastAudioFrame = bestFrame;
 	return _audioFrames[bestFrame]->timestamp;
 
 }
@@ -288,45 +291,72 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 
 	// We try to guess where in the vector the videoframe
 	// with the correct timestamp is
-	uint32_t guess = lastFrame->timestamp / numFrames * time;
+	double tpf = lastFrame->timestamp / numFrames; // time per frame
+	size_t guess = size_t(time / tpf);
+
+	size_t bestFrame = iclamp(guess, 0, _videoFrames.size()-1);
 
 	// Here we test if the guess was ok, and adjust if needed.
-	uint32_t bestFrame = guess;
+	long diff = _videoFrames[bestFrame]->timestamp - time;
+	if ( diff > 0 ) // our guess was too long
+	{
+		while ( bestFrame > 0 && _videoFrames[bestFrame-1]->timestamp > time ) --bestFrame;
+	}
+	else // our guess was too short
+	{
+		while ( bestFrame < _videoFrames.size()-1 && _videoFrames[bestFrame+1]->timestamp < time ) ++bestFrame;
+	}
+
+#if 0
 	uint32_t diff = abs(_videoFrames[bestFrame]->timestamp - time);
-	while (true) {
+	while (true)
+	{
 		if (bestFrame+1 < numFrames && static_cast<uint32_t>(abs(_videoFrames[bestFrame+1]->timestamp - time)) < diff) {
-			bestFrame = bestFrame + 1;
 			diff = abs(_videoFrames[bestFrame+1]->timestamp - time);
-		} else if (bestFrame-1 > 0 && static_cast<uint32_t>(abs(_videoFrames[bestFrame+1]->timestamp - time)) < diff) {
-			bestFrame = bestFrame - 1;
+			bestFrame = bestFrame + 1;
+		} else if (bestFrame > 0 && static_cast<uint32_t>(abs(_videoFrames[bestFrame-1]->timestamp - time)) < diff) {
 			diff = abs(_videoFrames[bestFrame-1]->timestamp - time);
+			bestFrame = bestFrame - 1;
 		} else {
 			break;
 		}
 	}
+#endif
 
-	uint32_t rewindKeyframe = bestFrame;
-	uint32_t forwardKeyframe = bestFrame;
 
-	// Rewind to the lastest keyframe
-	while (_videoFrames[rewindKeyframe]->frameType != KEY_FRAME) {
+	// Find closest backward keyframe  
+	size_t rewindKeyframe = bestFrame;
+	while (rewindKeyframe && _videoFrames[rewindKeyframe]->frameType != KEY_FRAME) {
 		rewindKeyframe--;
 	}
 
-	// Forward to the next keyframe
+	// Find closest forward keyframe 
+	uint32_t forwardKeyframe = bestFrame;
 	uint32_t size = _videoFrames.size();
-	while (size > forwardKeyframe && _videoFrames[forwardKeyframe]->frameType != KEY_FRAME) {
+	while (size > forwardKeyframe+1 && _videoFrames[forwardKeyframe]->frameType != KEY_FRAME) {
 		forwardKeyframe++;
 	}
 
-	int32_t forwardDiff = _videoFrames[forwardKeyframe]->timestamp - time;
-	int32_t rewindDiff = time - _videoFrames[rewindKeyframe]->timestamp;
+	// We can't ensure we were able to find a key frame *after* the best position
+	// in that case we just use any previous keyframe instead..
+	if ( _videoFrames[forwardKeyframe]->frameType != KEY_FRAME )
+	{
+		bestFrame = rewindKeyframe;
+	}
+	else
+	{
+		int32_t forwardDiff = _videoFrames[forwardKeyframe]->timestamp - time;
+		int32_t rewindDiff = time - _videoFrames[rewindKeyframe]->timestamp;
 
-	if (forwardDiff < rewindDiff) bestFrame = forwardKeyframe;
-	else bestFrame = rewindKeyframe;
+		if (forwardDiff < rewindDiff) bestFrame = forwardKeyframe;
+		else bestFrame = rewindKeyframe;
+	}
 
-	_lastVideoFrame = bestFrame - 1;
-	return _videoFrames[bestFrame]->timestamp;
+	gnash::log_debug("Seek (video): " SIZET_FMT "/" SIZET_FMT " (%u/%u)", bestFrame, numFrames, _videoFrames[bestFrame]->timestamp, time);
+
+	_lastVideoFrame = bestFrame;
+	assert(_videoFrames[_lastVideoFrame]->frameType == KEY_FRAME);
+	return _videoFrames[_lastVideoFrame]->timestamp;
 }
 
 
