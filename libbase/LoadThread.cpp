@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.7 2007/05/02 12:11:31 strk Exp $
+// $Id: LoadThread.cpp,v 1.8 2007/05/05 12:21:13 strk Exp $
 
 #include "LoadThread.h"
 
@@ -172,7 +172,11 @@ size_t LoadThread::read(void *dst, size_t bytes)
 	memcpy(dst, _cache + (_userPosition - newcachestart), newret);
 	_userPosition += newret;
 	_actualPosition = newcachestart + _cachedData;
-	if (newcachestart + _cachedData > _loadPosition) _loadPosition = _actualPosition;
+	if (newcachestart + _cachedData > _loadPosition)
+	{
+		_loadPosition = _actualPosition;
+		assert(_loadPosition <= _streamSize);
+	}
 	return newret;
 }
 
@@ -278,19 +282,27 @@ void LoadThread::fillCache()
 void LoadThread::download()
 {
 	if (_loadPosition >= _streamSize) {
+		_loadPosition = _streamSize;
 		_completed = true;
 		return;
 	}
 
 	boost::mutex::scoped_lock lock(_mutex);
 
-	_stream->set_position(_loadPosition + _chunkSize);
+	long nextpos = _loadPosition + _chunkSize;
+	if ( nextpos > _streamSize ) nextpos = _streamSize;
+	_stream->set_position(nextpos);
 
 	long pos = _stream->get_position();
+	assert(pos != -1); // TODO: unhandled error !
+
+	assert(pos == nextpos);
 	if (pos != _loadPosition + _chunkSize) {
 		_completed = true;
 	}
+
 	_loadPosition = pos;
+	assert(_loadPosition <= _streamSize);
 	_actualPosition = pos;
 }
 

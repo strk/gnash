@@ -12,6 +12,10 @@
 #include "membuf.h"
 #include "log.h"
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 //
 // tu_file functions using FILE
 //
@@ -19,6 +23,16 @@
 using namespace gnash;
 
 namespace gnash {
+
+static int std_read_func(void* dst, int bytes, void* appdata);
+static int std_write_func(const void* src, int bytes, void* appdata);
+static int std_seek_func(int pos, void *appdata);
+static int std_seek_to_end_func(void *appdata);
+static int std_tell_func(void *appdata);
+static bool std_get_eof_func(void *appdata);
+static int std_get_err_func(void *appdata);
+static long std_get_stream_size_func(void *appdata);
+
 static int
 std_read_func(void* dst, int bytes, void* appdata) 
 // Return the number of bytes actually read.  EOF or an error would
@@ -45,6 +59,10 @@ std_seek_func(int pos, void *appdata)
 // Return 0 on success, or TU_FILE_SEEK_ERROR on failure.
 {
     assert(appdata);
+
+    // TODO: I guess we don't want to allow seeking after stream size, do we ?
+    assert(pos <= std_get_stream_size_func(appdata));
+
     clearerr((FILE*) appdata);	// make sure EOF flag is cleared.
     int	result = fseek((FILE*)appdata, pos, SEEK_SET);
     if (result == EOF) {
@@ -72,7 +90,14 @@ std_tell_func(void *appdata)
 // Return the file position, or -1 on failure.
 {
     assert(appdata);
-    return ftell((FILE*)appdata);
+    FILE* f = static_cast<FILE*>(appdata);
+
+    //if ( feof(f) )
+    assert ( ! feof(f) );
+
+    int ret = ftell(f);
+    assert(ret <= std_get_stream_size_func(appdata));
+    return ret;
 }
 
 static bool
@@ -100,13 +125,16 @@ std_get_stream_size_func(void *appdata)
 // Return -1 on failure, or the size
 {
     assert(appdata);
-    int	org_pos = ftell((FILE*)appdata);
 
-	fseek((FILE*)appdata, 0, SEEK_END);
-	int ret = ftell((FILE*)appdata);
+    FILE* f = static_cast<FILE*>(appdata);
 
-	fseek((FILE*)appdata, org_pos, SEEK_SET);
-	return ret;
+    struct stat statbuf;
+    if ( -1 == fstat(fileno(f), &statbuf) )
+    {
+	    log_error("Could not fstat file");
+	    return 0;
+    }
+    return statbuf.st_size;
 }
 
 
