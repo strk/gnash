@@ -157,7 +157,9 @@ main(int /*argc*/, char** /*argv*/)
 	check_equals(string(text2->get_text_value()), idleString);
 	check_equals(string(text3->get_text_value()), idleString);
 	check(!tester.isMouseOverMouseEntity());
-	// TODO: check that pixel @ 60,60 is red !
+	// check that pixel @ 60,60 is red !
+	rgba red(255,0,0,255);
+	check_pixel(60, 60, 2, red, 2);
 
 	for (size_t fno=0; fno<root->get_frame_count(); fno++)
 	{
