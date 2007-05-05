@@ -1,5 +1,12 @@
 2007-05-04 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: NetStream.{cpp,h}, NetStreamFfmpeg.{cpp,h},
+	  NetStreamGst.{cpp,h}: change play() method to take a std::string
+	  ref instead of a char*; always pass environment when casting args
+	  to numbers or strings.
+
+2007-05-04 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStream.cpp: stubbed missing methods and
 	  properties.
 	* libbase/tu_file.cpp (std_get_stream_size_func): use fstat to 

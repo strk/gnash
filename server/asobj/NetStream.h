@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.28 2007/05/04 15:21:00 strk Exp $ */
+/*  $Id: NetStream.h,v 1.29 2007/05/05 13:31:44 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -117,7 +117,7 @@ public:
 
 	virtual void pause(int /*mode*/){}
 
-	virtual int play(const char* /*source*/){ log_error("FFMPEG or Gstreamer is needed to play video"); return 0; }
+	virtual int play(const std::string& /*source*/){ log_error("FFMPEG or Gstreamer is needed to play video"); return 0; }
 
 	virtual void seek(double /*pos*/){}
 

@@ -43,7 +43,7 @@ public:
 	~NetStreamGst();
 	void close();
 	void pause(int mode);
-	int play(const char* source);
+	int play(const std::string& source);
 	void seek(double pos);
 	void setBufferTime(double time);
 	void setNetCon(as_object* nc);

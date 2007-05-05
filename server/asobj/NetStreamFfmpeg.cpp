@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.45 2007/05/04 21:40:50 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.46 2007/05/05 13:31:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -198,7 +198,7 @@ NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
 }
 
 int
-NetStreamFfmpeg::play(const char* c_url)
+NetStreamFfmpeg::play(const std::string& c_url)
 {
 
 	// Is it already playing ?

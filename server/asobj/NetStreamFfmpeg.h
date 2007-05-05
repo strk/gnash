@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.23 2007/05/01 20:33:27 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.24 2007/05/05 13:31:44 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -178,7 +178,7 @@ public:
 	~NetStreamFfmpeg();
 	void close();
 	void pause(int mode);
-	int play(const char* source);
+	int play(const std::string& source);
 	void seek(double pos);
 	void setBufferTime(double time);
 	void setNetCon(as_object* nc);

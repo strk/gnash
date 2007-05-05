@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.30 2007/05/04 21:40:50 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.31 2007/05/05 13:31:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -135,7 +135,7 @@ void NetStreamGst::close()
 
 
 int
-NetStreamGst::play(const char* c_url)
+NetStreamGst::play(const std::string& c_url)
 {
 
 	// Is it already playing ?

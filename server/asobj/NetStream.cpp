@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.41 2007/05/05 13:20:36 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.42 2007/05/05 13:31:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -96,7 +96,7 @@ netstream_new(const fn_call& fn)
 				log_aserror(_("First argument "
 					"to NetStream constructor "
 					"doesn't cast to a NetConnection (%s)"),
-					fn.arg(0).to_string().c_str());
+					fn.arg(0).to_debug_string().c_str());
 			);
 		}
 	}
@@ -137,7 +137,7 @@ static as_value netstream_play(const fn_call& fn)
 		return as_value();
 	}
 
-	if (ns->play(fn.arg(0).to_string().c_str()) != 0)
+	if (ns->play(fn.arg(0).to_string(&fn.env())) != 0)
 	{
 		ns->close();
 	};
@@ -150,19 +150,24 @@ static as_value netstream_seek(const fn_call& fn) {
 	double time = 0;
 	if (fn.nargs > 0)
 	{
-		time = fn.arg(0).to_number();
+		time = fn.arg(0).to_number(&fn.env());
 	}
 	ns->seek(time);
 
 	return as_value();
 }
-static as_value netstream_setbuffertime(const fn_call& fn) {
+
+static as_value netstream_setbuffertime(const fn_call& fn)
+{
+
+	//GNASH_REPORT_FUNCTION;
+
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
 	double time = 0;
 	if (fn.nargs > 0)
 	{
-		time = fn.arg(0).to_number();
+		time = fn.arg(0).to_number(&fn.env());
 	}
 	ns->setBufferTime(time);
 
@@ -227,10 +232,12 @@ static as_value netstream_send(const fn_call& fn)
 static as_value
 netstream_time(const fn_call& fn)
 {
+	//GNASH_REPORT_FUNCTION;
 
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	return as_value(static_cast<double>(ns->time()));
+	assert(fn.nargs == 0); // we're a getter
+	return as_value(double(ns->time()));
 }
 
 // Both a getter and a (do-nothing) setter for bytesLoaded
