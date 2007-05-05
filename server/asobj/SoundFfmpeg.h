@@ -26,7 +26,7 @@
 #ifndef __STDC_CONSTANT_MACROS
 #define __STDC_CONSTANT_MACROS
 #endif
-#include "log.h""
+#include "log.h"
 #include "Sound.h" // for inheritance
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp> 
