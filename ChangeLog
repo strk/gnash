@@ -1,6 +1,6 @@
 2007-05-04 Markus Gothe <nietzsche@lysator.liu.se>
 
-	* backend/render_handler_aqua.{cpp,h}: Initial creation.
+	* gui/aqua.cpp: Initial creation.
 
 2007-05-04 Markus Gothe <nietzsche@lysator.liu.se>
 
