@@ -1,5 +1,7 @@
 2007-05-04 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/samples/clip_as_button2-TestRunner.cpp: add pixel
+	  color checking.
 	* testsuite/actionscript.all/NetConnection.as: unexpected success..
 
 2007-05-04 Sandro Santilli <strk@keybit.net>
