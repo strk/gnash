@@ -1,4 +1,8 @@
-2007-05-03 Markus Gothe <nietzsche@lysator.liu.se>
+2007-05-04 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* backend/render_handler_aqua.{cpp,h}: Initial creation.
+
+2007-05-04 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/boost.m4: Fixed a bug in GNASH_BOOST_PATH.
 	* server/asobj/SoundFfmpeg.h: Build on OS X.
