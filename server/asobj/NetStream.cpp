@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.40 2007/05/05 13:16:09 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.41 2007/05/05 13:20:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -237,20 +237,20 @@ netstream_time(const fn_call& fn)
 static as_value
 netstream_bytesloaded(const fn_call& fn)
 {
-
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	return as_value(int(ns->bytesLoaded()));
+	long ret = ns->bytesLoaded();
+	return as_value(ret);
 }
 
 // Both a getter and a (do-nothing) setter for bytesTotal
 static as_value
 netstream_bytestotal(const fn_call& fn)
 {
-
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	return as_value(int(ns->bytesTotal()));
+	long ret = ns->bytesTotal();
+	return as_value(ret);
 }
 
 // Both a getter and a (do-nothing) setter for currentFPS
