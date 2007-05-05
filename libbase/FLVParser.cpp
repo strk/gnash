@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.7 2007/05/05 15:52:50 strk Exp $
+// $Id: FLVParser.cpp,v 1.8 2007/05/05 16:19:18 strk Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -86,7 +86,8 @@ FLVFrame* FLVParser::nextMediaFrame()
 	uint32_t video_size = _videoFrames.size();
 	uint32_t audio_size = _audioFrames.size();
 
-	if (!(audio_size <= static_cast<uint32_t>(_lastAudioFrame+1) && video_size <= static_cast<uint32_t>(_lastVideoFrame+1))) {
+	if ( ! (audio_size <= _lastAudioFrame+1 && video_size <= _lastVideoFrame+1) )
+	{
 
 		// Parse a media frame if any left or if needed
 		while(video_size == _videoFrames.size() && audio_size == _audioFrames.size() && !_parsingComplete) {
@@ -156,12 +157,12 @@ FLVFrame* FLVParser::nextAudioFrame()
 	if (!_audio && _lastParsedPosition > 0) return NULL;
 
 	// Make sure that there are parsed enough frames to return the need frame
-	while(_audioFrames.size() <= static_cast<uint32_t>(_lastAudioFrame+1) && !_parsingComplete) {
+	while(_audioFrames.size() <= _lastAudioFrame+1 && !_parsingComplete) {
 		if (!parseNextFrame()) break;
 	}
 
 	// If the needed frame can't be parsed (EOF reached) return NULL
-	if (_audioFrames.size() <= static_cast<uint32_t>(_lastAudioFrame+1) || _audioFrames.size() == 0) return NULL;
+	if (_audioFrames.size() <= _lastAudioFrame+1 || _audioFrames.size() == 0) return NULL;
 
 	_lastAudioFrame++;
 
@@ -181,15 +182,24 @@ FLVFrame* FLVParser::nextVideoFrame()
 	boost::mutex::scoped_lock lock(_mutex);
 
 	// If there are no video in this FLV return NULL
-	if (!_video && _lastParsedPosition > 0) return NULL;
+	if (!_video && _lastParsedPosition > 0)
+	{
+		//gnash::log_debug("no video, or lastParserPosition > 0");
+		return NULL;
+	}
 
 	// Make sure that there are parsed enough frames to return the need frame
-	while(_videoFrames.size() <= static_cast<uint32_t>(_lastVideoFrame+1) && !_parsingComplete) {
+	while(_videoFrames.size() <= static_cast<uint32_t>(_lastVideoFrame+1) && !_parsingComplete)
+	{
 		if (!parseNextFrame()) break;
 	}
 
 	// If the needed frame can't be parsed (EOF reached) return NULL
-	if (_videoFrames.size() <= static_cast<uint32_t>(_lastVideoFrame+1) || _videoFrames.size() == 0) return NULL;
+	if (_videoFrames.size() <= _lastVideoFrame+1 || _videoFrames.size() == 0)
+	{
+		//gnash::log_debug("The needed frame (%d) can't be parsed (EOF reached)", _lastVideoFrame);
+		return NULL;
+	}
 
 	_lastVideoFrame++;
 
