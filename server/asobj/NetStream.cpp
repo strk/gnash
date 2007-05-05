@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.39 2007/05/04 15:21:00 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.40 2007/05/05 13:16:09 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -48,6 +48,14 @@ static as_value netstream_play(const fn_call& fn);
 static as_value netstream_seek(const fn_call& fn);
 static as_value netstream_setbuffertime(const fn_call& fn);
 static as_value netstream_time(const fn_call& fn);
+
+static as_value netstream_attachAudio(const fn_call& fn);
+static as_value netstream_attachVideo(const fn_call& fn);
+static as_value netstream_publish(const fn_call& fn);
+static as_value netstream_receiveAudio(const fn_call& fn);
+static as_value netstream_receiveVideo(const fn_call& fn);
+static as_value netstream_send(const fn_call& fn);
+
 static as_object* getNetStreamInterface();
 
 NetStream::NetStream()
@@ -161,6 +169,60 @@ static as_value netstream_setbuffertime(const fn_call& fn) {
 	return as_value();
 }
 
+static as_value netstream_attachAudio(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	UNUSED(ns);
+
+	log_unimpl("NetStream.attachAudio");
+	return as_value();
+}
+
+static as_value netstream_attachVideo(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	UNUSED(ns);
+
+	log_unimpl("NetStream.attachVideo");
+	return as_value();
+}
+
+static as_value netstream_publish(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	UNUSED(ns);
+
+	log_unimpl("NetStream.publish");
+	return as_value();
+}
+
+static as_value netstream_receiveAudio(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	UNUSED(ns);
+
+	log_unimpl("NetStream.receiveAudio");
+	return as_value();
+}
+
+static as_value netstream_receiveVideo(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	UNUSED(ns);
+
+	log_unimpl("NetStream.receiveVideo");
+	return as_value();
+}
+
+static as_value netstream_send(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+	UNUSED(ns);
+
+	log_unimpl("NetStream.send");
+	return as_value();
+}
+
 // Both a getter and a (do-nothing) setter for time
 static as_value
 netstream_time(const fn_call& fn)
@@ -191,6 +253,78 @@ netstream_bytestotal(const fn_call& fn)
 	return as_value(int(ns->bytesTotal()));
 }
 
+// Both a getter and a (do-nothing) setter for currentFPS
+static as_value
+netstream_currentFPS(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		log_unimpl("NetStream.currentFPS get");
+		return as_value();
+	}
+	else // setter
+	{
+		log_unimpl("NetStream.currentFPS set");
+		return as_value();
+	}
+}
+
+// Both a getter and a (do-nothing) setter for bufferLength
+static as_value
+netstream_bufferLength(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		log_unimpl("NetStream.bufferLength get");
+		return as_value();
+	}
+	else // setter
+	{
+		log_unimpl("NetStream.bufferLength set");
+		return as_value();
+	}
+}
+
+// Both a getter and a (do-nothing) setter for bufferTime
+static as_value
+netstream_bufferTime(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		log_unimpl("NetStream.bufferTime get");
+		return as_value();
+	}
+	else // setter
+	{
+		log_unimpl("NetStream.bufferTime set");
+		return as_value();
+	}
+}
+
+// Both a getter and a (do-nothing) setter for liveDelay
+static as_value
+netstream_liveDelay(const fn_call& fn)
+{
+	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		log_unimpl("NetStream.liveDelay get");
+		return as_value();
+	}
+	else // setter
+	{
+		log_unimpl("NetStream.liveDelay set");
+		return as_value();
+	}
+}
+
 void
 attachNetStreamInterface(as_object& o)
 {
@@ -201,19 +335,38 @@ attachNetStreamInterface(as_object& o)
 	o.init_member("seek", new builtin_function(netstream_seek));
 	o.init_member("setBufferTime", new builtin_function(netstream_setbuffertime));
 
+	o.init_member("attachAudio", new builtin_function(netstream_attachAudio));
+	o.init_member("attachVideo", new builtin_function(netstream_attachVideo));
+	o.init_member("publish", new builtin_function(netstream_publish));
+	o.init_member("receiveAudio", new builtin_function(netstream_receiveAudio));
+	o.init_member("receiveVideo", new builtin_function(netstream_receiveVideo));
+	o.init_member("send", new builtin_function(netstream_send));
 
-    // Properties
+	// Properties
+	// TODO: attach to each instance rather then to the class ? check it ..
 
-    boost::intrusive_ptr<builtin_function> gettersetter;
+	boost::intrusive_ptr<builtin_function> gettersetter;
 
-    gettersetter = new builtin_function(&netstream_time, NULL);
-    o.init_readonly_property("time", *gettersetter);
+	gettersetter = new builtin_function(&netstream_time, NULL);
+	o.init_readonly_property("time", *gettersetter);
 
-    gettersetter = new builtin_function(&netstream_bytesloaded, NULL);
-    o.init_readonly_property("bytesLoaded", *gettersetter);
+	gettersetter = new builtin_function(&netstream_bytesloaded, NULL);
+	o.init_readonly_property("bytesLoaded", *gettersetter);
 
-    gettersetter = new builtin_function(&netstream_bytestotal, NULL);
-    o.init_readonly_property("bytesTotal", *gettersetter);
+	gettersetter = new builtin_function(&netstream_bytestotal, NULL);
+	o.init_readonly_property("bytesTotal", *gettersetter);
+
+	gettersetter = new builtin_function(&netstream_currentFPS, NULL);
+	o.init_readonly_property("currentFPS", *gettersetter);
+
+	gettersetter = new builtin_function(&netstream_bufferLength, NULL);
+	o.init_readonly_property("bufferLength", *gettersetter);
+
+	gettersetter = new builtin_function(&netstream_bufferTime, NULL);
+	o.init_readonly_property("bufferTime", *gettersetter);
+
+	gettersetter = new builtin_function(&netstream_liveDelay, NULL);
+	o.init_readonly_property("liveDelay", *gettersetter);
 
 }
 

@@ -1,5 +1,7 @@
 2007-05-04 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStream.cpp: stubbed missing methods and
+	  properties.
 	* libbase/tu_file.cpp (std_get_stream_size_func): use fstat to 
 	  get stream size. (other funx for filesystem access): add some assertions
 	  to prevent seeking past the end of the stream.
