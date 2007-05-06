@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
 
 // 
 //
+
+/* $Id: sdlsup.h,v 1.20 2007/05/06 22:13:51 nihilus Exp $ */
 
 #ifndef __SDLSUP_H__
 #define __SDLSUP_H__
