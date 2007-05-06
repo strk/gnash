@@ -1,5 +1,11 @@
 2007-05-06 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
+	* libbase/LoadThread.cpp: Delete the thread after use so we don't
+	  try to join it again. Fixes bug #19811.
+	* server/asobj/NetStreamGst.cpp: Fixed pausing and play, bug #19797.
+
+2007-05-06 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
 	* server/sprite_instance.cpp: Stop all sounds when restarting 
 	  a movie, fixes bug #19568.
 	* server/asobj/NetStreamFfmpeg.cpp: Fixed return time.

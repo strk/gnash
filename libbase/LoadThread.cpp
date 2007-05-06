@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.8 2007/05/05 12:21:13 strk Exp $
+// $Id: LoadThread.cpp,v 1.9 2007/05/06 20:03:55 tgc Exp $
 
 #include "LoadThread.h"
 
@@ -209,6 +209,7 @@ bool LoadThread::completed()
 	if (  _completed && _thread.get() )
 	{
 		_thread->join();
+		_thread.reset(NULL);
 	}
 
 	return _completed;

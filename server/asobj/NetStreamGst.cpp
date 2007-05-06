@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.32 2007/05/06 15:48:14 tgc Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.33 2007/05/06 20:03:55 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -667,6 +667,7 @@ NetStreamGst::advance()
 	// Check if we should start the playback when a certain amount is buffered
 	if (m_isFLV && m_pause && m_go && m_start_onbuffer && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
 		setStatus(bufferFull);
+		m_start_onbuffer = false;
 		m_pause = false;
 		gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
 	}
