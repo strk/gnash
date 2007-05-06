@@ -4,6 +4,9 @@
 	  a movie, fixes bug #19568.
 	* server/asobj/NetStreamFfmpeg.cpp: Fixed return time.
 	* server/asobj/NetStreamFfmpeg.h: Added a comment.
+	* server/asobj/NetStreamGst.cpp: Moved gst-init to the
+	  contructor, fixes bug #19795. Only create audio/video elements
+	  if needed.
 
 2007-05-04 Sandro Santilli <strk@keybit.net>
 
