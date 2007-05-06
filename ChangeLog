@@ -1,3 +1,10 @@
+2007-05-06 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/sprite_instance.cpp: Stop all sounds when restarting 
+	  a movie, fixes bug #19568.
+	* server/asobj/NetStreamFfmpeg.cpp: Fixed return time.
+	* server/asobj/NetStreamFfmpeg.h: Added a comment.
+
 2007-05-04 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/samples/clip_as_button2-TestRunner.cpp: add pixel

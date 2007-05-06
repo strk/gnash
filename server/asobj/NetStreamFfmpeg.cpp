@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.46 2007/05/05 13:31:44 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.47 2007/05/06 13:35:37 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1053,7 +1053,7 @@ NetStreamFfmpeg::time()
 		double time = (double)m_FormatCtx->streams[0]->time_base.num / (double)m_FormatCtx->streams[0]->time_base.den * (double)m_FormatCtx->streams[0]->cur_dts;
 		return static_cast<int64_t>(time);
 	} else if (m_isFLV) {
-		return static_cast<int64_t>(m_video_clock / 1000);
+		return static_cast<int64_t>(m_video_clock);
 	} else {
 		return 0;
 	}

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.24 2007/05/05 13:31:44 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.25 2007/05/06 13:35:37 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -101,10 +101,11 @@ class multithread_queue
 		{
 			bool rc = false;
 			boost::mutex::scoped_lock lock(_mutex);
-			// So.. if there are 20 items in the queue...
-			// disregard the next item? WTF?
 
-			if (m_queue.size() < 20)	// hack
+			// We only keep max 20 items in the queue.
+			// If it's "full" the item must wait, see calls
+			// to this function in read_frame() to see how it is done.
+			if (m_queue.size() < 20)
 			{
 				m_queue.push(member);
 				rc = true;

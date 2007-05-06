@@ -3151,6 +3151,10 @@ void sprite_instance::restart()
     m_has_looped = false;
     m_play_state = PLAY;
 
+	// Stop all sounds
+	sound_handler* sh = get_sound_handler();
+	if (sh != NULL) sh->stop_all_sounds();
+
     // We're about to reset the displayList,
     // so take note of the current bounds
     // for the renderer to know what to 
