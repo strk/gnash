@@ -17,4 +17,75 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.2 2007/05/06 22:13:51 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.3 2007/05/06 22:43:17 nihilus Exp $ */
+
+#include <CoreServices/CoreServices.h>
+
+void MyInit( void );
+void MyTimerProc( TMTaskPtr tmTaskPtr );
+
+Boolean gQuitFlag = false;
+int gCount = 0;
+
+TimerUPP gMyTimerProc = NULL;
+
+int main( int argc, char *argv[])
+{
+    MyInit();
+
+    while ( false == gQuitFlag ) {
+        ;
+    }
+
+    DisposeTimerUPP( gMyTimerProc );
+
+    return 0;
+}
+ 
+void MyTimerProc( TMTaskPtr tmTaskPtr )
+{
+    DateTimeRec localDateTime;
+    
+    GetTime( &localDateTime );
+
+    printf( "MyTimerProc at %d:%d:%d\n", localDateTime.hour, localDateTime.minute, localDateTime.second );
+
+    gCount++;
+
+    if ( gCount > 4 )
+    {
+        gQuitFlag = true;
+    }
+    else
+    {
+        PrimeTimeTask( ( QElemPtr )tmTaskPtr, 1000 );
+    }
+}
+
+void MyInit( void )
+{
+    struct TMTask myTask;
+    OSErr err = 0;
+
+    gMyTimerProc = NewTimerUPP( MyTimerProc );
+
+    if ( gMyTimerProc != NULL )
+    {
+        myTask.qLink = NULL;
+        myTask.qType = 0;
+        myTask.tmAddr = gMyTimerProc;
+        myTask.tmCount = 0;
+        myTask.tmWakeUp = 0;
+        myTask.tmReserved = 0;
+        
+        err = InstallTimeTask( ( QElemPtr )&myTask );
+        
+        if ( err == noErr )
+            PrimeTimeTask( ( QElemPtr )&myTask, 1000 );
+        else {
+            DisposeTimerUPP( gMyTimerProc );
+            gMyTimerProc = NULL;
+            gQuitFlag = true;
+        }
+    }
+}

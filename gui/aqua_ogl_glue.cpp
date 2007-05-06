@@ -17,4 +17,6 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.cpp,v 1.1 2007/05/06 22:13:51 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.cpp,v 1.2 2007/05/06 22:43:17 nihilus Exp $ */
+
+apa

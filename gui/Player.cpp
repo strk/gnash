@@ -28,6 +28,9 @@
 # elif defined(GUI_SDL)
 #  include "sdlsup.h"
 #  define GUI_CLASS SDLGui
+# elif defined(GUI_AQUA)
+#  include "aquasup.h"
+#  define GUI_CLASS AquaGui
 # elif defined(GUI_RISCOS)
 #  include "riscossup.h"
 #  define GUI_CLASS RiscosGui

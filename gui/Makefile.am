@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.66 2007/05/03 00:43:25 rsavoye Exp $
+# $Id: Makefile.am,v 1.67 2007/05/06 22:43:17 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -78,6 +78,9 @@ if USE_GUI_GTK
   AM_CPPFLAGS += $(GLEXT_CFLAGS)
   GTK_OPENGL_SRCS = gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h
 endif # USE_GUI_GTK
+if USE_GUI_AQUA
+  AQUA_OPENGL_SRCS = aqua_ogl_glue.cpp aqua_ogl_glue.h
+endif # USE_GUI_AQUA
 if USE_GUI_SDL
   SDL_OPENGL_SRCS = sdl_ogl_glue.cpp sdl_ogl_glue.h
 endif # USE_GUI_SDL
@@ -135,6 +138,12 @@ if USE_GUI_RISCOS
  AM_LDFLAGS += -lOSLib32
 else
  RISCS_SRCS =
+endif
+
+if USE_GUI_AQUA
+ AQUA_SRCS = aqua.cpp auqasup.h aqua_glue.h $(AQUA_OPENGL_SRCS)
+else
+ AQUA_SRCS =
 endif
 
 if USE_GUI_SDL
@@ -196,6 +205,7 @@ libgnashgui_la_SOURCES = \
 	$(GTK2_SRCS) \
 	$(KDE_SRCS) \
 	$(FB_SRCS) \
+	$(AQUA_SRCS) \	
 	$(RISCOS_SRCS) \
 	gui.cpp gui.h \
 	NullGui.cpp \
