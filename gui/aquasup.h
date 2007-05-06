@@ -17,4 +17,26 @@
 // 
 //
 
-/* $Id: aquasup.h,v 1.1 2007/05/06 22:13:51 nihilus Exp $ */
+/* $Id: aquasup.h,v 1.2 2007/05/06 23:39:42 nihilus Exp $ */
+
+#ifndef __AQUASUP_H__
+#define __AQUASUP_H__
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <vector>
+
+#include "gui.h"
+
+namespace gnash {
+
+class AquaGui : public Gui
+{
+
+};
+
+}
+
+#endif

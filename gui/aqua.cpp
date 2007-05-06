@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.4 2007/05/06 23:05:02 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.5 2007/05/06 23:39:42 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,6 +30,12 @@
 #include "movie_root.h"
 
 #include "render_handler.h"
-#include "render_handler_ogl.h"
 
 #include <Carbon/Carbon.h>
+
+namespace gnash {
+	
+
+
+
+}
