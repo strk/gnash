@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.301 2007/05/04 17:05:37 strk Exp $
+dnl $Id: configure.ac,v 1.302 2007/05/06 22:57:35 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -173,10 +173,11 @@ AC_ARG_ENABLE(klash,
 esac],klash=yes)
 
 AC_ARG_ENABLE(gui,
-  AC_HELP_STRING([--enable-gui=TOOLKIT], [Specify GUI toolkit: GTK, FLTK, RISCOS, FB (framebuffer), KDE or SDL[[GTK]] ]),
+  AC_HELP_STRING([--enable-gui=TOOLKIT], [Specify GUI toolkit: GTK, FLTK, RISCOS, AQUA (OS X), FB (framebuffer), KDE or SDL[[GTK]] ]),
  [case "${enableval}" in
    gtk|GTK) gui=gtk ;;
    sdl|SDL) gui=sdl  ;;
+   aqua|AQUA) gui=aqua  ;;
    kde|KDE) gui=kde  ;;
    fb|FB) gui=fb  ;;
    fltk|FLTK) gui=fltk  ;;
@@ -775,6 +776,7 @@ fi
 AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
 AM_CONDITIONAL(USE_GUI_GTK, test x$gui = xgtk)
 AM_CONDITIONAL(USE_GUI_SDL, test x$gui = xsdl)
+AM_CONDITIONAL(USE_GUI_AQUA, test x$gui = xaqua)
 AM_CONDITIONAL(USE_GUI_KDE, test x$gui = xkde)
 AM_CONDITIONAL(USE_GUI_FLTK, test x$gui = xfltk)
 AM_CONDITIONAL(USE_GUI_FB, test x$gui = xfb)
@@ -783,6 +785,7 @@ AM_CONDITIONAL(USE_GUI_RISCOS, test x$gui = xriscos)
 case "${gui}" in
   gtk)  AC_DEFINE([GUI_GTK],  [1], [Use GTK gui toolkit]) ;;
   sdl)  AC_DEFINE([GUI_SDL],  [1], [Use SDL gui toolkit]) ;;
+  aqua)  AC_DEFINE([GUI_AQUA],[1], [Use AQUA (OS X) gui toolkit]) ;;
   kde)  AC_DEFINE([GUI_KDE],  [1], [Use KDE gui toolkit]) ;;
   fltk) AC_DEFINE([GUI_FLTK], [1], [Use FLTK gui toolkit]) ;;
   fb) AC_DEFINE([GUI_FB], [1], [Use Framebuffer, no gui toolkit]) ;;
