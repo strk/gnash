@@ -17,75 +17,19 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.3 2007/05/06 22:43:17 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.4 2007/05/06 23:05:02 nihilus Exp $ */
 
-#include <CoreServices/CoreServices.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-void MyInit( void );
-void MyTimerProc( TMTaskPtr tmTaskPtr );
+#include "gnash.h"
+#include "gui.h"
+#include "aquasup.h"
+#include "log.h"
+#include "movie_root.h"
 
-Boolean gQuitFlag = false;
-int gCount = 0;
+#include "render_handler.h"
+#include "render_handler_ogl.h"
 
-TimerUPP gMyTimerProc = NULL;
-
-int main( int argc, char *argv[])
-{
-    MyInit();
-
-    while ( false == gQuitFlag ) {
-        ;
-    }
-
-    DisposeTimerUPP( gMyTimerProc );
-
-    return 0;
-}
- 
-void MyTimerProc( TMTaskPtr tmTaskPtr )
-{
-    DateTimeRec localDateTime;
-    
-    GetTime( &localDateTime );
-
-    printf( "MyTimerProc at %d:%d:%d\n", localDateTime.hour, localDateTime.minute, localDateTime.second );
-
-    gCount++;
-
-    if ( gCount > 4 )
-    {
-        gQuitFlag = true;
-    }
-    else
-    {
-        PrimeTimeTask( ( QElemPtr )tmTaskPtr, 1000 );
-    }
-}
-
-void MyInit( void )
-{
-    struct TMTask myTask;
-    OSErr err = 0;
-
-    gMyTimerProc = NewTimerUPP( MyTimerProc );
-
-    if ( gMyTimerProc != NULL )
-    {
-        myTask.qLink = NULL;
-        myTask.qType = 0;
-        myTask.tmAddr = gMyTimerProc;
-        myTask.tmCount = 0;
-        myTask.tmWakeUp = 0;
-        myTask.tmReserved = 0;
-        
-        err = InstallTimeTask( ( QElemPtr )&myTask );
-        
-        if ( err == noErr )
-            PrimeTimeTask( ( QElemPtr )&myTask, 1000 );
-        else {
-            DisposeTimerUPP( gMyTimerProc );
-            gMyTimerProc = NULL;
-            gQuitFlag = true;
-        }
-    }
-}
+#include <Carbon/Carbon.h>
