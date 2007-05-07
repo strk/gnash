@@ -218,7 +218,7 @@
       </para>
       <para>
 	To install a binary package using apt-get (on Debian based
-	systems), install ffmpeg-dev. For RPM or Yum based
+	systems), install libavformat-dev. For RPM or Yum based
 	systems, install the libffmpeg-devel package. Version 0.10 or
 	greater will be required.
       </para>
