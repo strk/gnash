@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.67 2007/05/06 22:43:17 nihilus Exp $
+# $Id: Makefile.am,v 1.68 2007/05/07 14:26:07 martinwguy Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -205,7 +205,7 @@ libgnashgui_la_SOURCES = \
 	$(GTK2_SRCS) \
 	$(KDE_SRCS) \
 	$(FB_SRCS) \
-	$(AQUA_SRCS) \	
+	$(AQUA_SRCS) \
 	$(RISCOS_SRCS) \
 	gui.cpp gui.h \
 	NullGui.cpp \
