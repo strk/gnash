@@ -1,5 +1,11 @@
 2007-05-07 Sandro Santilli <strk@keybit.net>
 
+	* libbase/curl_adapter.cpp (fill_cache): avoid aggressive polling by
+	  taking naps between iterations. "Smart" sleep times are taken
+	  in consideration so we can tweak them.
+
+2007-05-07 Sandro Santilli <strk@keybit.net>
+
 	* libbase/LoadThread.{cpp,h}: Make thread usage a compile-time
 	  configuration. Temporarely defaults to NOT using thread till
 	  we fix bug #19811 and general CPU hogs during loading.

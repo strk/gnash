@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.30 2007/05/02 16:24:12 rsavoye Exp $ */
+/* $Id: curl_adapter.cpp,v 1.31 2007/05/07 09:33:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,6 +32,7 @@
 #include <map>
 #include <iostream>
 #include <string>
+#include <unistd.h> // for usleep
 
 using namespace std;
 
@@ -124,6 +125,14 @@ public:
 	bool seek_to_end();
 
 	/// Returns the size of the stream
+	//
+	/// If size of the stream is unknown, 0 is returned.
+	/// In that case you might try calling this function
+	/// again after filling the cache a bit...
+	///
+	/// Another approach might be filling the cache ourselves
+	/// aiming at obtaining a useful value.
+	///
 	long get_stream_size();
 
 private:
@@ -163,9 +172,15 @@ private:
 	// Current size of cached data
 	long unsigned _cached;
 
+	/// Total stream size.
+	//
+	/// This will be 0 until known
+	///
+	long unsigned _size;
+
 	// Attempt at filling the cache up to the given size.
 	// Will call libcurl routines to fetch data.
-	void fill_cache(off_t size);
+	void fill_cache(long unsigned size);
 
 	// Append sz bytes to the cache
 	size_t cache(void *from, size_t sz);
@@ -245,13 +260,31 @@ CurlStreamFile::cache(void *from, size_t sz)
 
 /*private*/
 void
-CurlStreamFile::fill_cache(off_t size)
+CurlStreamFile::fill_cache(long unsigned size)
 {
 #ifdef GNASH_CURL_VERBOSE
 	fprintf(stderr, "fill_cache(%d) called\n", size);
 #endif
 
+// Disable this when you're convinced the sleeping mechanism is satisfactory
+#define VERBOSE_POLLING_LOOP 1
+
+#if VERBOSE_POLLING_LOOP
+	long unsigned fetchRequested = size-_cached;
+#endif
+
+	// These are the minimum and maximum times in microseconds
+	// to nap between curl_multi_perform calls if the amount
+	// of data requested haven't arrived yet.
+	// 
+	const long unsigned minSleep =  500000; // half second
+	const long unsigned maxSleep = 1000000; // one second
+
 	CURLMcode mcode;
+#if VERBOSE_POLLING_LOOP
+	long unsigned lastCached = _cached;
+#endif
+	long unsigned sleepTime = minSleep;
 	while (_cached < size && _running)
 	{
 		do
@@ -263,6 +296,26 @@ CurlStreamFile::fill_cache(off_t size)
 		{
 			throw gnash::GnashException(curl_multi_strerror(mcode));
 		}
+
+		// done...
+		if ( _cached >= size || ! _running ) break;
+
+		// In order to avoid overusing the CPU we take a nap if we didn't
+		// reach the requested position.
+
+#if VERBOSE_POLLING_LOOP
+		long unsigned fetched = _cached - lastCached;
+
+		fprintf(stderr, "CurlStreamFile %p: Fetched: %lu (%lu/%lu total) - requested %lu (%lu total) - sleeping %lu milliseconds\n",
+				this, fetched, _cached, get_stream_size(), fetchRequested, size, sleepTime/1000);
+		lastCached = _cached;
+#endif
+
+		usleep(sleepTime);
+
+		// If we'll need to sleep again we'll sleep more next time...
+		// Up to a max (maxSleep)
+		sleepTime = std::min(sleepTime*2, maxSleep);
 
 	}
 
@@ -297,6 +350,7 @@ CurlStreamFile::init(const std::string& url)
 	_error = 0;
 
 	_cached = 0;
+	_size = 0;
 
 	_handle = curl_easy_init();
 	_mhandle = curl_multi_init();
@@ -528,16 +582,18 @@ CurlStreamFile::seek_to_end()
 long
 CurlStreamFile::get_stream_size()
 {
-	double size;
-	curl_easy_getinfo(_handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &size);
-
-	int ret = static_cast<long>(size);
+	if ( ! _size )
+	{
+		double size;
+		CURLcode ret = curl_easy_getinfo(_handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD, &size);
+		if ( ret == CURLE_OK ) _size = int(size);
+	}
 
 #ifdef GNASH_CURL_VERBOSE
-	fprintf(stderr, "get_stream_size() returning %ld\n", ret);
+	fprintf(stderr, "get_stream_size() returning %lu\n", _size);
 #endif
 
-	return ret;
+	return _size;
 
 }
 
