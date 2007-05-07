@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.48 2007/05/07 16:43:27 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.49 2007/05/07 23:15:44 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -72,7 +72,6 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	m_parser(NULL),
 	m_isFLV(false),
 	m_newFrameReady(false),
-	m_bufferTime(100),
 	m_start_onbuffer(false)
 {
 
@@ -1027,13 +1026,6 @@ NetStreamFfmpeg::seek(double pos)
 		m_qaudio.pop();
 	}
 
-}
-
-void
-NetStreamFfmpeg::setBufferTime(double time)
-{
-	// The argument is in seconds, but we store in milliseconds
-    m_bufferTime = static_cast<uint32_t>(time*1000);
 }
 
 void

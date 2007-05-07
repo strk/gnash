@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.42 2007/05/05 13:31:44 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.43 2007/05/07 23:15:44 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,7 +63,8 @@ NetStream::NetStream()
 	as_object(getNetStreamInterface()),
 	_netCon(NULL),
 	m_env(NULL),
-	_lastStatus(invalidStatus)
+	_lastStatus(invalidStatus),
+	m_bufferTime(100)
 {
 }
 
@@ -302,16 +303,8 @@ netstream_bufferTime(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	if ( fn.nargs == 0 ) // getter
-	{
-		log_unimpl("NetStream.bufferTime get");
-		return as_value();
-	}
-	else // setter
-	{
-		log_unimpl("NetStream.bufferTime set");
-		return as_value();
-	}
+	uint32_t ret = ns->bufferTime();
+	return as_value(ret);
 }
 
 // Both a getter and a (do-nothing) setter for liveDelay
@@ -457,6 +450,20 @@ NetStream::setStatus(StatusCode status)
 
 	_lastStatus = status;
 	_statusQueue.push_back(status);
+}
+
+void
+NetStream::setBufferTime(double time)
+{
+	// The argument is in seconds, but we store in milliseconds
+    m_bufferTime = static_cast<uint32_t>(time*1000);
+}
+
+uint32_t
+NetStream::bufferTime()
+{
+	// The argument is in seconds, but we store in milliseconds
+    return (m_bufferTime/1000);
 }
 
 std::pair<const char*, const char*>

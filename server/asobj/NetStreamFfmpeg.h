@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.25 2007/05/06 13:35:37 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.26 2007/05/07 23:15:44 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -181,8 +181,6 @@ public:
 	void pause(int mode);
 	int play(const std::string& source);
 	void seek(double pos);
-	void setBufferTime(double time);
-	void setNetCon(as_object* nc);
 	int64_t time();
 	long bytesLoaded();
 	long bytesTotal();
@@ -280,9 +278,6 @@ private:
 
 	// Are a new frame ready to be returned?
 	volatile bool m_newFrameReady;
-
-	// The size of the buffer in milliseconds
-	uint32_t m_bufferTime;
 
 	// The handler which is invoked on status change
 	boost::intrusive_ptr<as_function> m_statusHandler;

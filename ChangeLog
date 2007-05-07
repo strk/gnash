@@ -1,5 +1,17 @@
 2007-05-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
+	* libbase/FLVParser.cpp: When seeking to 0 just go to
+	  the first frames.
+	* server/asobj/NetStream.{h,cpp}: Moved setBufferTime() to
+	  the base class, implemented bufferTime().
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: Moved setBufferTime()
+	  to the base class.
+	* server/asobj/NetStreamGst.{cpp,h}: Moved setBufferTime() to
+	  the base class. tried to improve seeking by using an offset
+	  to avoid telling gstreamer about the seek.
+
+2007-05-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
 	* server/asobj/NetStream{Ffmpeg,Gst}.cpp: After playback stops,
 	  make it possible to restart video by seeking to 0 and setting
 	  pause to false.

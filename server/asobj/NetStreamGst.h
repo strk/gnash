@@ -45,8 +45,6 @@ public:
 	void pause(int mode);
 	int play(const std::string& source);
 	void seek(double pos);
-	void setBufferTime(double time);
-	void setNetCon(as_object* nc);
 	int64_t time();
 	long bytesLoaded();
 	long bytesTotal();
@@ -119,9 +117,8 @@ private:
 	int videoheight;
 
 	volatile bool m_newFrameReady;
-	
-	// The size of the buffer in milliseconds
-	uint32_t m_bufferTime;
+
+	volatile long m_clock_offset;
 
 	// The status message
 	std::string m_status;

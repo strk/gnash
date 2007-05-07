@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.29 2007/05/05 13:31:44 strk Exp $ */
+/*  $Id: NetStream.h,v 1.30 2007/05/07 23:15:44 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -107,6 +107,9 @@ protected:
 	// The actionscript enviroment for the AS callbacks
 	as_environment* m_env;
 
+	// The size of the buffer in milliseconds
+	uint32_t m_bufferTime;
+
 public:
 
 	NetStream();
@@ -120,8 +123,6 @@ public:
 	virtual int play(const std::string& /*source*/){ log_error("FFMPEG or Gstreamer is needed to play video"); return 0; }
 
 	virtual void seek(double /*pos*/){}
-
-	virtual void setBufferTime(double /*time*/){}
 
 	virtual void setNetCon(boost::intrusive_ptr<NetConnection> nc)
 	{
@@ -150,6 +151,10 @@ public:
 		assert(env);
 		m_env = env;
 	}
+
+	void setBufferTime(double time);
+
+	uint32_t bufferTime();
 
 private:
 

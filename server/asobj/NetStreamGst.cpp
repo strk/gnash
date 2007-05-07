@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.34 2007/05/07 16:43:27 tgc Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.35 2007/05/07 23:15:44 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -90,6 +90,7 @@ NetStreamGst::NetStreamGst():
 	videowidth(0),
 	videoheight(0),
 	m_newFrameReady(false),
+	m_clock_offset(0),
 	m_parser(NULL),
 	m_pausePlayback(false),
 	m_start_onbuffer(false)
@@ -299,7 +300,7 @@ void NetStreamGst::audio_callback_handoff (GstElement * /*c*/, GstBuffer *buffer
 //	if (GST_BUFFER_DATA(buffer)) delete [] GST_BUFFER_DATA(buffer);
 	GST_BUFFER_SIZE(buffer) = frame->dataSize;
 	GST_BUFFER_DATA(buffer) = frame->data;
-	GST_BUFFER_TIMESTAMP(buffer) = frame->timestamp * 1000000;
+	GST_BUFFER_TIMESTAMP(buffer) = (frame->timestamp + ns->m_clock_offset) * GST_MSECOND;
 	delete frame;
 	return;
 
@@ -321,7 +322,7 @@ void NetStreamGst::video_callback_handoff (GstElement * /*c*/, GstBuffer *buffer
 //	if (GST_BUFFER_DATA(buffer)) delete [] GST_BUFFER_DATA(buffer);
 	GST_BUFFER_SIZE(buffer) = frame->dataSize;
 	GST_BUFFER_DATA(buffer) = frame->data;
-	GST_BUFFER_TIMESTAMP(buffer) = frame->timestamp * 1000000;
+	GST_BUFFER_TIMESTAMP(buffer) = (frame->timestamp + ns->m_clock_offset) * GST_MSECOND;
 	delete frame;
 	return;
 }
@@ -641,14 +642,13 @@ NetStreamGst::seek(double pos)
 	if (!pipeline) return;
 
 	if (m_isFLV) {
-		/*uint32_t newpos =*/ m_parser->seek(static_cast<uint32_t>(pos*1000))/1000;
-		/*if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
-			GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(newpos),
-			GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
-			log_error("Gstreamer seek failed");
-			setStatus(invalidTime);
-			return;
-		}*/
+		uint32_t newpos = m_parser->seek(static_cast<uint32_t>(pos*1000));
+		GstClock* clock = GST_ELEMENT_CLOCK(pipeline);
+		uint64_t currenttime = gst_clock_get_time (clock);
+		gst_object_unref(clock);
+		
+		m_clock_offset = (currenttime / GST_MSECOND) - newpos;
+
 	} else {
 		if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
 			GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(pos),
@@ -659,13 +659,6 @@ NetStreamGst::seek(double pos)
 		}
 	}
 	setStatus(seekNotify);
-}
-
-void
-NetStreamGst::setBufferTime(double time)
-{
-	// The argument is in seconds, but we store in milliseconds
-    m_bufferTime = static_cast<uint32_t>(time*1000);
 }
 
 void
@@ -687,6 +680,7 @@ NetStreamGst::advance()
 			setStatus(playStop);
 			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
 			m_go = false;
+			m_clock_offset = 0;
 		} else {
 			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PAUSED);
 			GstFormat fmt = GST_FORMAT_TIME;
@@ -729,7 +723,7 @@ NetStreamGst::time()
 	if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
 		pos = pos / 1000000000;
 
-		return pos;
+		return pos - m_clock_offset/1000;
 	} else {
 		return 0;
 	}

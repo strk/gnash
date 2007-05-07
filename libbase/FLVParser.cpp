@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.8 2007/05/05 16:19:18 strk Exp $
+// $Id: FLVParser.cpp,v 1.9 2007/05/07 23:15:44 tgc Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -440,6 +440,11 @@ bool FLVParser::isTimeLoaded(uint32_t time)
 uint32_t FLVParser::seek(uint32_t time)
 {
 	boost::mutex::scoped_lock lock(_mutex);
+
+	if (time == 0) {
+		if (_video) _lastVideoFrame = -1;
+		if (_audio) _lastAudioFrame = -1;
+	}
 
 	if (_video)	time = seekVideo(time);
 	if (_audio)	time = seekAudio(time);
