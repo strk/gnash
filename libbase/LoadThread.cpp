@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.9 2007/05/06 20:03:55 tgc Exp $
+// $Id: LoadThread.cpp,v 1.10 2007/05/07 07:25:06 strk Exp $
 
 #include "LoadThread.h"
 
@@ -48,7 +48,11 @@ bool LoadThread::setStream(std::auto_ptr<tu_file> stream)
 	if (_stream.get() != NULL) {
 		// Start the downloading.
 		setupCache();
+#ifdef THREADED_LOADS
 		_thread.reset( new boost::thread(boost::bind(LoadThread::downloadThread, this)) );
+#else
+		downloadThread(this);
+#endif
 
 		return true;
 	} else {
@@ -103,7 +107,9 @@ size_t LoadThread::read(void *dst, size_t bytes)
 	// so we now either load more data into the cache, or completely
 	// replace the content.
 
+#ifdef THREADED_LOADS
 	boost::mutex::scoped_lock lock(_mutex);
+#endif
 
 	// If the new data can fit in the cache we just load it into it
 	if (_cacheStart <= _userPosition && static_cast<long>(bytes) + _userPosition < _cacheStart + _cacheSize) {
@@ -205,19 +211,23 @@ long LoadThread::getBytesTotal()
 
 bool LoadThread::completed()
 {
+#ifdef THREADED_LOADS
 	boost::mutex::scoped_lock lock(_mutex);
 	if (  _completed && _thread.get() )
 	{
 		_thread->join();
 		_thread.reset(NULL);
 	}
+#endif
 
 	return _completed;
 }
 
 void LoadThread::setupCache()
 {
+#ifdef THREADED_LOADS
 	boost::mutex::scoped_lock lock(_mutex);
+#endif
 
 	_cache = new uint8_t[1024*500];
 	_cacheSize = 1024*500;
@@ -246,7 +256,9 @@ void LoadThread::fillCache()
 		return;
 	}
 
+#ifdef THREADED_LOADS
 	boost::mutex::scoped_lock lock(_mutex);
+#endif
 
 	if (_loadPosition != _actualPosition) _stream->set_position(_loadPosition);
 
@@ -288,7 +300,9 @@ void LoadThread::download()
 		return;
 	}
 
+#ifdef THREADED_LOADS
 	boost::mutex::scoped_lock lock(_mutex);
+#endif
 
 	long nextpos = _loadPosition + _chunkSize;
 	if ( nextpos > _streamSize ) nextpos = _streamSize;

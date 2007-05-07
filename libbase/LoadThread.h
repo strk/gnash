@@ -19,13 +19,19 @@
 #ifndef __LOADTHREAD_H__
 #define __LOADTHREAD_H__
 
-// $Id: LoadThread.h,v 1.6 2007/05/02 12:11:31 strk Exp $
+
+#include "tu_file.h"
+
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp>
 
-#include "tu_file.h"
 #include <memory>
+
+// Undefine this to NOT use a thread for loading
+// This is useful for debugging.
+//#define THREADED_LOADS 1
+
 
 /// \brief
 /// The LoadThread class can be used to download from a file
@@ -112,9 +118,11 @@ private:
 
 	volatile bool _completed;
 
+#ifdef THREADED_LOADS
 	boost::mutex _mutex;
 
 	std::auto_ptr<boost::thread> _thread;
+#endif
 	
 	volatile long _loadPosition;
 	volatile long _userPosition;
