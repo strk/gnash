@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.47 2007/05/06 13:35:37 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.48 2007/05/07 16:43:27 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -95,6 +95,12 @@ void NetStreamFfmpeg::pause(int mode)
 	{
 		m_pause = (mode == 0) ? true : false;
 	}
+	if (!m_pause && !m_go) { 
+		setStatus(playStart);
+		m_go = true;
+		_decodeThread = new boost::thread(boost::bind(NetStreamFfmpeg::av_streamer, this)); 
+	}
+
 }
 
 void NetStreamFfmpeg::close()

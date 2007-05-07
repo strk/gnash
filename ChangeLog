@@ -1,3 +1,9 @@
+2007-05-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStream{Ffmpeg,Gst}.cpp: After playback stops,
+	  make it possible to restart video by seeking to 0 and setting
+	  pause to false.
+
 2007-05-07 Martin Guy <martinwguy@yahoo.it>
 
 	* backend/sound_handler.h: Fix commentary about RAW and UNCOMPRESSED

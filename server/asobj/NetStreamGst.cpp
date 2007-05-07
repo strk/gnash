@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.33 2007/05/06 20:03:55 tgc Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.34 2007/05/07 16:43:27 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -113,8 +113,15 @@ void NetStreamGst::pause(int mode)
 		m_pause = (mode == 0) ? true : false;
 	}
 	if (pipeline) {
-		if (m_pause) gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PAUSED);
-		else  gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
+		if (m_pause) { 
+			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PAUSED);
+		} else {
+			if (!m_go) { 
+				setStatus(playStart);
+				m_go = true;
+			}
+			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
+		}
 	}
 }
 
@@ -676,7 +683,6 @@ NetStreamGst::advance()
 	// or stop if loading is complete
 	if (m_pausePlayback) {
 		m_pausePlayback = false;
-
 		if (_netCon->loadCompleted()) {
 			setStatus(playStop);
 			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
