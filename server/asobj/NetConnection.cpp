@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.43 2007/05/04 21:40:50 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.44 2007/05/07 11:51:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -88,6 +88,8 @@ bool NetConnection::openConnection(const std::string& url)
 		log_security(_("Gnash is not allowed to open this url: %s"), _url.c_str());
 		return false;
 	}
+
+	log_msg(_("Connecting to movie: %s"), _url.c_str());
 
 	_loader.reset( new LoadThread() );
 	

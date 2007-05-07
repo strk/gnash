@@ -1,5 +1,8 @@
 2007-05-07 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetConnection.cpp (openConnect): print FLV url before
+	  setting loader stream so that it's visible before full download in
+	  case threading is disabled.
 	* libbase/log.h: fully qualify __Host_Function_Report__ so
 	  GNASH_REPORT_FUNCTION can be used by classes outside of 'gnash'
 	  namespace.
