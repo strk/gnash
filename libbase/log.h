@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.h,v 1.49 2007/05/02 16:24:12 rsavoye Exp $ */
+/* $Id: log.h,v 1.50 2007/05/07 10:29:39 strk Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -343,7 +343,7 @@ public:
 
 #if defined(__cplusplus) && defined(__GNUC__)
 #define GNASH_REPORT_FUNCTION   \
-    __Host_Function_Report__ __host_function_report__( __PRETTY_FUNCTION__)
+	gnash::__Host_Function_Report__ __host_function_report__( __PRETTY_FUNCTION__)
 #define GNASH_REPORT_RETURN
 #else
 #define GNASH_REPORT_FUNCTION \
