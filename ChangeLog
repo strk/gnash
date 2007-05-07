@@ -1,3 +1,8 @@
+2007-05-03 Martin Guy <martinwguy@yahoo.it>
+
+	* backend/sound_handler.h: Fix commentary about RAW and UNCOMPRESSED
+	  formats.
+
 2007-05-07 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetConnection.cpp (openConnect): print FLV url before
