@@ -1,7 +1,11 @@
-2007-05-03 Martin Guy <martinwguy@yahoo.it>
+2007-05-07 Martin Guy <martinwguy@yahoo.it>
 
 	* backend/sound_handler.h: Fix commentary about RAW and UNCOMPRESSED
 	  formats.
+	* configure.ac: Make absence of ffmpeg or libmad libraries a fatal error
+	  when they are selected, instead of quietly turning media handling off.
+	* configure.ac: Fix names of Debian packages required for ffmpeg.
+	* configure.ac: Fix logic of missing ffmpeg library reporting code.
 
 2007-05-07 Sandro Santilli <strk@keybit.net>
 

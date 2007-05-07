@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.302 2007/05/06 22:57:35 nihilus Exp $
+dnl $Id: configure.ac,v 1.303 2007/05/07 14:49:48 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -796,13 +796,8 @@ esac
 if test x"$media_handler" = x"ffmpeg"; then
   GNASH_PATH_FFMPEG
   if test x"${ac_cv_path_ffmpeg_lib}" = x; then
-    AC_MSG_WARN([ffmpeg specified as decoder but could not be found, disabling media handling])
-    media_handler=none
-  else
-    if test x"${ffmpeg_version}" != xok; then
-      AC_MSG_WARN([ffmpeg specified as decoder but it's detected version (${ffmpeg_version}) is too old, disabling media handling])
-      media_handler=none
-    fi
+    AC_MSG_WARN([ffmpeg was specified as the media decoder but its library could not be found])
+    # configure will abort during final checks
   fi
 fi
 
@@ -811,10 +806,11 @@ if test x"$media_handler" = x"mad"; then
   dnl Handles --with-mad-incl and --with-mad-lib
   GNASH_PKG_FIND(mad, [mad.h], [mad library], mad_copyright)
   if test x"${ac_cv_path_mad_lib}" = x ; then
-    media_handler=none
-    AC_MSG_WARN([Libmad specified as decoder, but it's not present, disabling media handling])
+    AC_MSG_WARN([Libmad was specified as the media decoder, but it could not be found])
+    # configure will abort during final checks
   fi
 fi
+
 dnl I'm kinda lazy, get rid of this later... //Markus
 AM_CONDITIONAL(HAVE_MAD, test x"$media_handler" = xmad)
 
@@ -1392,26 +1388,27 @@ fi
     fi
   else
     if test x"$media_handler" = x"ffmpeg"; then
-      if test x"${ffmpeg_version}" != xok; then
-         echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed."
-         echo "               This version of ffmpeg may not work!"
-         echo "               Version 51.27.0 or newer is highly recommended."
-        nogo=true
-      fi
       if test x"$FFMPEG_LIBS" != x; then
         echo "        MP3 and video support enabled through ffmpeg"
-        if test x"$FFMPEG_CFLAGS" != x; then
-          echo "        FFMPEG flags are: $FFMPEG_CFLAGS"
-        else
-          echo "        FFMPEG flags are: default include path"
-        fi
+        if test x"${ffmpeg_version}" != xok; then
+          echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed."
+          echo "               This version of ffmpeg may not work!"
+          echo "               Version 51.27.0 or newer is highly recommended."
+	  nogo=true
+	else
+          if test x"$FFMPEG_CFLAGS" != x; then
+            echo "        FFMPEG flags are: $FFMPEG_CFLAGS"
+          else
+            echo "        FFMPEG flags are: default include path"
+          fi
           echo "        FFMPEG libs are: $FFMPEG_LIBS"
+	fi
       else
         echo "        ERROR: No FFMPEG development package installed!"
         echo "               You need to have the ffmpeg development package installed"
         echo "               to enable mp3 decoding. You can either reconfigure using"
-        echo "               --media-handler=mad to use libmad or install libavcodec-dev"
-        echo "               and libdts-dev (using apt-get) or <package_names_here> (using yum).".
+        echo "               --media-handler=mad to use libmad or install libavformat-dev"
+        echo "               (using apt-get) or <package_names_here> (using yum)."
         nogo=true
       fi
     fi
