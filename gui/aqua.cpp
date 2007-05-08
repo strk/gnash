@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.5 2007/05/06 23:39:42 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.6 2007/05/08 21:28:18 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,7 +35,20 @@
 
 namespace gnash {
 	
+AquaGui::AquaGui()
+: Gui() 
+{
 
+}
 
+AquaGui::AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth)
+	: Gui(xid, scale, loop, depth)
+{
+}
+
+AquaGui::~AquaGui()
+{
+	
+}
 
 }

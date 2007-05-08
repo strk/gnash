@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: aquasup.h,v 1.2 2007/05/06 23:39:42 nihilus Exp $ */
+/* $Id: aquasup.h,v 1.3 2007/05/08 21:28:18 nihilus Exp $ */
 
 #ifndef __AQUASUP_H__
 #define __AQUASUP_H__
@@ -34,7 +34,37 @@ namespace gnash {
 
 class AquaGui : public Gui
 {
+	private:
+	
+    std::vector< geometry::Range2d<int> > _drawbounds;
 
+    int m_stage_width;
+    int m_stage_height;
+
+	/// For 8 bit (palette / LUT) modes, sets a grayscale palette.
+	//
+	/// This GUI currently does not support palette modes. 
+	///
+  	bool set_grayscale_lut8();
+  	
+  	bool initialize_renderer();
+  	
+  	int valid_x(int x);
+  	int valid_y(int y);
+  	  	
+	public:
+		AquaGui();
+		AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+    virtual ~AquaGui();
+    virtual bool init(int argc, char ***argv);
+    virtual bool createWindow(const char* title, int width, int height);
+    virtual bool run();
+    virtual bool createMenu();
+    virtual bool setupEvents();
+    virtual void renderBuffer();
+    virtual void setInterval(unsigned int interval);
+    virtual void setTimeout(unsigned int timeout);
+    
 };
 
 }
