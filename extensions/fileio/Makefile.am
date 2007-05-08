@@ -37,7 +37,6 @@ INCLUDES = -I$(srcdir)  \
 
 AM_LDFLAGS =  \
 	$(top_builddir)/libbase/libgnashbase.la \
-	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(PTHREAD_LIBS) \
@@ -62,7 +61,7 @@ install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
 	$(RM) $(DESTDIR)$(pluginsdir)/*.a 
 
 test: $(srcdir)/../../testsuite/generic-testrunner.sh test.swf
-	sh $< $(top_builddir) test.swf > $@
+	GNASH_PLUGINS=$(PWD) sh $< $(top_builddir) test.swf > $@
 	chmod +x $@
 
 test.swf: test.as

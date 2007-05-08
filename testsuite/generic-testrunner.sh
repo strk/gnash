@@ -34,8 +34,16 @@ top_builddir=$1
 shift
 testfiles=$@
 
+echo "#!/bin/sh"
+echo
+
+echo "# Environment"
+env | grep GNASH | while read; do
+	echo "export ${REPLY}"
+done
+
 cat << EOF
-#!/bin/sh
+
 for t in ${testfiles}; do
 	echo "NOTE: Running test \${t}"
 	${top_builddir}/utilities/gprocessor -r${runs} -f${advances} -v \${t} || echo "FAILED: gprocessor returned an error while playing '\${t}'"

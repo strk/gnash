@@ -1,5 +1,10 @@
 2007-05-08 Sandro Santilli <strk@keybit.net>
 
+	* extensions/fileio/Makefile.am: export GNASH_PLUGINS to the buil tree
+	  when running the test program.
+	* testsuite/generic-testrunner.sh: export any GNASH variable in the
+	  environment, so to allow generic test runners to specify a plugin
+	  dir, and eventually a GNASHRC file (when we add support for it).
 	* Makefile.am (dumpconfig): add info about which extensions are being
 	  built (if not null extensions are scanned, would be better to 
 	  just report wheter extensions are buil or not instead..)
