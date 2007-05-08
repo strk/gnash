@@ -14,16 +14,23 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.36 2007/05/02 19:33:06 martinwguy Exp $
+dnl $Id: ffmpeg.m4,v 1.37 2007/05/08 07:10:19 strk Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
+
+  dnl Backup LIBS and CFLAGS vars, we'll add user-specified dirs there
+  backupLIBS="$LIBS"
+  backupCFLAGS="$CFLAGS"
+
   dnl Look for the header
   AC_ARG_WITH(ffmpeg_incl, AC_HELP_STRING([--with-ffmpeg-incl], [directory where ffmpeg headers are]), with_ffmpeg_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_ffmpeg_incl,[
     if test x"${with_ffmpeg_incl}" != x ; then
       if test -f ${with_ffmpeg_incl}/ffmpeg/avcodec.h ; then
         ac_cv_path_ffmpeg_incl="-I`(cd ${with_ffmpeg_incl}; pwd)`"
+        avcodec_h="${with_ffmpeg_incl}/ffmpeg/avcodec.h"
+        CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
       else
         AC_MSG_ERROR([${with_ffmpeg_incl} directory doesn't contain the ffmpeg/avcodec.h header])
       fi
@@ -33,8 +40,12 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   AC_MSG_CHECKING([for ffmpeg header])
   if test x${cross_compiling} = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
-      $PKG_CONFIG --exists libavcodec && ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec`
+      if $PKG_CONFIG --exists libavcodec; then
+         ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec`
+         CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
+      fi
       topdir=`$PKG_CONFIG --cflags-only-I libavcodec | sed -e 's:-I::g' | sed -e 's:.* /:/:' -e 's: ::g'`
+      avcodec_h="$topdir/avcodec.h"
     fi
   fi
 
@@ -43,7 +54,9 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     for i in $incllist; do
       if test -f $i/ffmpeg/avcodec.h; then
         ac_cv_path_ffmpeg_incl="-I$i/ffmpeg"
+        CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
         topdir=$i
+	avcodec_h="$i/ffmpeg/avcodec.h"
         break
       fi
     done
@@ -72,16 +85,21 @@ dnl     fi
 dnl   fi
 
   # Check avcodec version number, if it was found
-  if test x"${topdir}" != x; then
-    ffmpeg_num_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | sed -e "s%[[^0-9]]%%g"`
-    ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${topdir}/avcodec.h | sed -e "s%[[^0-9.]]%%g"`
+  if test x"${avcodec_h}" != x; then
+
+    AC_MSG_CHECKING([for ffmpeg version])
+
+    ffmpeg_num_version=`$EGREP "define LIBAVCODEC_VERSION " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
+    ffmpeg_version=`$EGREP "define LIBAVCODEC_VERSION " ${avcodec_h} | sed -e "s%[[^0-9.]]%%g"`
 
     if test x"${ffmpeg_version}" = x ; then
-      ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${topdir}/avcodec.h | sed -e "s%[[^0-9.]]%%g"`
-      ffmpeg_num_version=`$EGREP "define LIBAVCODEC_BUILD " ${topdir}/avcodec.h | sed -e "s%[[^0-9]]%%g"`
+      ffmpeg_version=`$EGREP "define LIBAVCODEC_BUILD " ${avcodec_h} | sed -e "s%[[^0-9.]]%%g"`
+      ffmpeg_num_version=`$EGREP "define LIBAVCODEC_BUILD " ${avcodec_h} | sed -e "s%[[^0-9]]%%g"`
     fi
 
-dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes], [avfound=no])
+    AC_MSG_RESULT($ffmpeg_num_version)
+
+dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfound=no])
   
     if test "$ffmpeg_num_version" -lt 51110; then
       AC_MSG_WARN([Wrong ffmpeg/libavcodec version! 51.11.0 or greater required])
@@ -99,6 +117,9 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
     else
       AC_DEFINE(FFMPEG_VP6, 1, [Define if ffmpeg can play VP6.])
     fi
+  else
+    AC_MSG_WARN([Could not check ffmpeg version (dunno where avcodec.h is)])
+    ffmpeg_version=ok # trust the user-specified dir
   fi
 
   if test x"${ac_cv_path_ffmpeg_incl}" != x ; then
@@ -113,6 +134,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
     if test x"${with_ffmpeg_lib}" != x ; then
       if test -f ${with_ffmpeg_lib}/libavcodec.a -o -f ${with_ffmpeg_lib}/libavcodec.${shlibext}; then
 	      ac_cv_path_ffmpeg_lib="-L`(cd ${with_ffmpeg_lib}; pwd)`"
+              LIBS="${ac_cv_path_ffmpeg_lib} $LIBS"
       else
 	      AC_MSG_ERROR([${with_ffmpeg_lib} directory doesn't contain ffmpeg libraries.])
       fi
@@ -127,7 +149,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
   fi
 
   if test x"${libavcodec}" != x; then
-    ac_cv_path_ffmpeg_lib="${libavcodec}"
+    ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libavcodec}"
   else
     AC_MSG_CHECKING([for libavcodec library])
     topdir=""
@@ -136,10 +158,10 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
         topdir=$i
         AC_MSG_RESULT(${topdir}/libavcodec)
 	      if test x"$i" != x"/usr/lib"; then
-	        ac_cv_path_ffmpeg_lib="-L$i -lavcodec"
+	        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -L$i -lavcodec"
        	  break
         else
-	        ac_cv_path_ffmpeg_lib="-lavcodec"
+	        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavcodec"
 	        break
        fi
       fi
@@ -149,7 +171,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
       AC_MSG_RESULT(no)
       if test x${cross_compiling} = xno; then
         dnl avcodec_decode_audio2 starts 51.29.0
-        AC_CHECK_LIB(avcodec, ff_eval, [ac_cv_path_ffmpeg_lib="-lavcodec"])
+        AC_CHECK_LIB(avcodec, ff_eval, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lavcodec"])
       fi
     fi
   fi
@@ -300,6 +322,9 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${topdir}/avcodec.h, [avfound=yes],
 
   AC_SUBST(FFMPEG_CFLAGS)  
   AC_SUBST(FFMPEG_LIBS)
+
+  LIBS="$backupLIBS"
+  CFLAGS="$backupCFLAGS"
 ])
 
 # Local Variables:
