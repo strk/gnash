@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.77 2007/05/03 10:07:44 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.78 2007/05/08 17:05:53 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -176,7 +176,7 @@ AGG ressources
 #endif
 
 #ifndef round
-#define round rint
+#define round(x) rint(x+0.5f)
 #endif
 
 using namespace gnash;
@@ -963,18 +963,12 @@ public:
 
     std::vector< path > paths;
     std::vector< agg::path_storage > agg_paths;
-    std::vector< agg::path_storage > agg_paths_rounded;
     apply_matrix_to_path(def->get_paths(), paths, mat);
-    if (have_shape)
+    if (have_outline)
+      build_agg_paths_rounded(agg_paths, paths);
+    else
       build_agg_paths(agg_paths, paths);
       
-    // <Udo>: not sure if the anchor points of the *shape* edges should be
-    // rounded too...
-    
-    if (have_outline) {
-      agg_paths_rounded.reserve(agg_paths.size());
-      build_agg_paths_rounded(agg_paths_rounded, paths);
-    }
     
     if (m_drawing_mask) {
       
@@ -1009,7 +1003,7 @@ public:
         if (have_shape)
           draw_shape(subshape, paths, agg_paths, sh, true);    
         if (have_outline)      
-          draw_outlines(subshape, paths, agg_paths_rounded, line_styles, cx, mat);
+          draw_outlines(subshape, paths, agg_paths, line_styles, cx, mat);
       }
       
     } // if not drawing mask
@@ -1165,15 +1159,11 @@ public:
   // lines and looking blurry). The proprietary player does this too.  
   // Remember the middle of a pixel is at .5 / .5 (at it's subpixel center).
   //
-  // TODO:
-  // For "correct" results alignment should be done only in these cases:
-  //   - the line is straight and pure horizontal or vertical
-  //   - the line width on screen is 1.0
-  // However this leads to awful rounded rectangles, but the MM player 
-  // does it that way... :(
-  // BTW, most probably this is for speed reasons (those lines are most
-  // probably implemented without anti-aliasing calculations, like a 
-  // Bresenham line). 
+  // Not all points are aligned, only those lines that:
+  //   - are straight
+  //   - are pure horizontal or vertical
+  // Also, single segments of a path may be aligned or not depending on 
+  // the segment properties (this matches MM player behaviour)  
   void build_agg_paths_rounded(std::vector<agg::path_storage>& dest, 
     const std::vector<path>& paths) {
   
@@ -1187,8 +1177,10 @@ public:
       const gnash::path& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
       
-      new_path.move_to(round(this_path.m_ax*xscale)+0.5f, 
-        round(this_path.m_ay*yscale)+0.5f);
+      float prev_ax = this_path.m_ax*xscale;
+      float prev_ay = this_path.m_ay*yscale;  
+      bool prev_align_x = true;
+      bool prev_align_y = true;
       
       int ecount = this_path.m_edges.size();
       
@@ -1196,17 +1188,87 @@ public:
         
         const edge& this_edge = this_path.m_edges[eno];
         
-        if (this_edge.is_straight())
-          new_path.line_to(round(this_edge.m_ax*xscale)+0.5f, 
-            round(this_edge.m_ay*yscale)+0.5f);
-        else
-          new_path.curve3(round(this_edge.m_cx*xscale)+0.5f, 
-            round(this_edge.m_cy*yscale)+0.5f,
-            round(this_edge.m_ax*xscale)+0.5f, 
-            round(this_edge.m_ay*yscale)+0.5f);
+        float this_ax = this_edge.m_ax*xscale;  
+        float this_ay = this_edge.m_ay*yscale;  
         
+        if (this_edge.is_straight()) {
         
-      }
+          // candidate for alignment?
+          bool align_x = prev_ax == this_ax;
+          bool align_y = prev_ay == this_ay;
+          
+          if (align_x) 
+            this_ax = round(this_ax) - 0.5f;
+          
+          if (align_y)
+            this_ay = round(this_ay) - 0.5f;
+          
+          // first line?
+          if (eno==0) {
+          
+            if (align_x) 
+              prev_ax = round(prev_ax) - 0.5f;
+              
+            if (align_y)
+              prev_ay = round(prev_ay) - 0.5f;
+              
+            new_path.move_to(prev_ax, prev_ay);
+            
+          } else {
+          
+            // not the first line, but the previous anchor point
+            // might belong to a curve and thus may not be aligned.
+            // We need to have both anchors of this new line to be
+            // aligned, so it may be neccesary to add a line
+            if ((align_x && !prev_align_x) || (align_y && !prev_align_y)) {
+            
+              if (align_x) 
+                prev_ax = round(prev_ax) - 0.5f;
+                
+              if (align_y)
+                prev_ay = round(prev_ay) - 0.5f;
+                
+              new_path.line_to(prev_ax, prev_ay);
+              
+            }
+            
+            // TODO: (minor flaw) Flash player never aligns anchor points
+            // of curves, even if they are attached to straight vertical
+            // or horizontal lines. It can be seen easily with rounded
+            // rectangles, where the curves are never aligned and all 
+            // straight lines are. AGG backend will align the curve anchor
+            // point that follows the straight line. It's not a big problem
+            // but it's not exact...
+          
+          }
+        
+          new_path.line_to(this_ax, this_ay);
+          
+          prev_align_x = align_x;
+          prev_align_y = align_y;  
+          
+          
+        } else {
+          
+          // first line?
+          if (eno==0) 
+            new_path.move_to(prev_ax, prev_ay);
+        
+          // never align curves!
+          new_path.curve3(this_edge.m_cx*xscale, 
+            this_edge.m_cy*yscale,
+            this_ax, 
+            this_ay);
+            
+          prev_align_x = false;
+          prev_align_y = false;  
+            
+        }
+        
+        prev_ax = this_ax;
+        prev_ay = this_ay;    
+        
+      } //for
     
     }
         
