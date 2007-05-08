@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.43 2007/05/07 23:15:44 tgc Exp $ */
+/* $Id: NetStream.cpp,v 1.44 2007/05/08 06:46:24 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,8 +63,8 @@ NetStream::NetStream()
 	as_object(getNetStreamInterface()),
 	_netCon(NULL),
 	m_env(NULL),
-	_lastStatus(invalidStatus),
-	m_bufferTime(100)
+	m_bufferTime(100),
+	_lastStatus(invalidStatus)
 {
 }
 

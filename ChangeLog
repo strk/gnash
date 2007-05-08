@@ -1,5 +1,6 @@
 2007-05-07 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStream.cpp (fix members initialization order).
 	* server/asobj/NetStreamGst.{cpp,h}: Make start thread
 	  use a compile-time option. Defaults to true for now,
 	  but worth disabling for better testing (btw: why do
