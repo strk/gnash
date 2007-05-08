@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.78 2007/05/08 17:05:53 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.79 2007/05/08 17:38:06 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -963,10 +963,17 @@ public:
 
     std::vector< path > paths;
     std::vector< agg::path_storage > agg_paths;
+    std::vector< agg::path_storage > agg_paths_rounded;
+    
     apply_matrix_to_path(def->get_paths(), paths, mat);
+    
+    // Flash only aligns outlines. Probably this is done at rendering
+    // level.
+    
     if (have_outline)
-      build_agg_paths_rounded(agg_paths, paths);
-    else
+      build_agg_paths_rounded(agg_paths_rounded, paths);
+    
+    if (have_shape)
       build_agg_paths(agg_paths, paths);
       
     
@@ -1003,7 +1010,7 @@ public:
         if (have_shape)
           draw_shape(subshape, paths, agg_paths, sh, true);    
         if (have_outline)      
-          draw_outlines(subshape, paths, agg_paths, line_styles, cx, mat);
+          draw_outlines(subshape, paths, agg_paths_rounded, line_styles, cx, mat);
       }
       
     } // if not drawing mask
