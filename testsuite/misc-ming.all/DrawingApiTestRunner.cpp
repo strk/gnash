@@ -73,6 +73,7 @@ main(int /*argc*/, char** /*argv*/)
 	rgba red(255, 0, 0, 255);
 	rgba yellow(255, 255, 0, 255);
 	rgba black(0, 0, 0, 255);
+	rgba gray(127, 127, 127, 255);
 	rgba violet(255, 0, 255, 255);
 	rgba halftrans_violet(255, 128, 255, 255);
 
@@ -116,17 +117,26 @@ main(int /*argc*/, char** /*argv*/)
 	// Over the black "hairlined" line
 	tester.movePointerTo(250, 180);
 	check(tester.isMouseOverMouseEntity());
-	check_pixel(250, 180, 1, black, 2);
+	// The line used to be rendered at Y=180.
+	// After pixel hinting was touched (see bug #19775)
+	// it moved to Y=179. Since isMouseOverMouseEntity()
+	// would return false for 250,180 we're going to
+	// tolerate the drift of one pixel for the line.
+	// This will accept both 179 and 180 as valid positions
+	// for the line. In the future we might add test for 
+	// exact placement using a more focused testcase.
+	// See bug #19828 for more info about this change.
+	check_pixel(250, 180, 2, gray, 2);
 
 	// Over the transparent line (150,100)
 	tester.movePointerTo(150, 100);
 	check(!tester.isMouseOverMouseEntity()); 
 	check_pixel(150, 100, 2, white, 2); 
 
-	// Over the violet line (146,225)
-	tester.movePointerTo(146, 225);
+	// Over the violet line (146,224)
+	tester.movePointerTo(146, 224);
 	check(tester.isMouseOverMouseEntity());
-	check_pixel(146, 225, 1, halftrans_violet, 2);
+	check_pixel(146, 224, 1, halftrans_violet, 2);
 
 	// Inside the yellow line
 	tester.movePointerTo(270, 232);

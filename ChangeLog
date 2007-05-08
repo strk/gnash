@@ -1,5 +1,10 @@
 2007-05-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: tolerate
+	  a 1-pixel Y drift for the harilined black line, as introduced
+	  by latest "pixel hinting" "fix" in AGG (see bug #19775);
+	  Also, changed checked point for the diagonal violet line for
+	  the same reason. See bug #19828 for more info.
 	* extensions/dejagnu/Makefile.am, extensions/gtk2/Makefile.am,
 	  extensions/mysql/Makefile.am: remove other direct references
 	  to convenience libraries.
