@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.9 2007/04/18 14:07:33 jgilmore Exp $ */
+/* $Id: extension.cpp,v 1.10 2007/05/08 21:14:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -77,6 +77,7 @@ Extension::Extension()
         _pluginsdir = env;
     }
 
+    log_msg("Plugins path: %s", _pluginsdir);
     lt_dlsetsearchpath(_pluginsdir);
 }
 

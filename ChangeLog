@@ -1,5 +1,6 @@
 2007-05-08 Sandro Santilli <strk@keybit.net>
 
+	* libbase/extension.cpp: print plugins path.
 	* extensions/fileio/Makefile.am: export GNASH_PLUGINS to the buil tree
 	  when running the test program.
 	* testsuite/generic-testrunner.sh: export any GNASH variable in the
