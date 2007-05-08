@@ -1,5 +1,8 @@
 2007-05-08 Sandro Santilli <strk@keybit.net>
 
+	* extensions/dejagnu/Makefile.am, extensions/gtk2/Makefile.am,
+	  extensions/mysql/Makefile.am: remove other direct references
+	  to convenience libraries.
 	* testsuite/Makefile.am, testsuite/server/Makefile.am:
 	  Do not explicitly link convenience libraries under the server/
 	  dir. Fixes bug #19821.
