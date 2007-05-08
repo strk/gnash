@@ -52,9 +52,6 @@ CLEANFILES = \
 
 GNASH_LIBS = \
 	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/server/parser/libgnashparser.la \
-	$(top_builddir)/server/asobj/libgnashasobjs.la \
-	$(top_builddir)/server/vm/libgnashvm.la \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(NULL)

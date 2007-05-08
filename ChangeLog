@@ -1,5 +1,8 @@
 2007-05-08 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/Makefile.am, testsuite/server/Makefile.am:
+	  Do not explicitly link convenience libraries under the server/
+	  dir. Fixes bug #19821.
 	* libbase/extension.cpp: print plugins path.
 	* extensions/fileio/Makefile.am: export GNASH_PLUGINS to the buil tree
 	  when running the test program.
