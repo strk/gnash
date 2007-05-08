@@ -35,6 +35,14 @@
 #include "NetStream.h" // for inheritance
 #include "FLVParser.h"
 
+/// Define DISABLE_START_THREAD to avoid using threads 
+///
+/// TODO: use a globally-defined thread-disabling routine
+///       when available
+///
+//#define DISABLE_START_THREAD
+
+
 namespace gnash {
   
 class NetStreamGst: public NetStream {
@@ -105,8 +113,12 @@ private:
 	// The image/videoframe which is given to the renderer
 	image::image_base* m_imageframe;
 
-	boost::thread *startThread;
 	boost::mutex image_mutex;
+
+#ifndef DISABLE_START_THREAD
+	boost::thread *startThread;
+#endif
+
 	bool m_pause;
 
 	long inputPos;

@@ -1,3 +1,10 @@
+2007-05-07 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStreamGst.{cpp,h}: Make start thread
+	  use a compile-time option. Defaults to true for now,
+	  but worth disabling for better testing (btw: why do
+	  we need a "start" thread and a "continue" thread?)
+
 2007-05-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/FLVParser.cpp: When seeking to 0 just go to

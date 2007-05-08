@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.35 2007/05/07 23:15:44 tgc Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.36 2007/05/08 06:43:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -84,7 +84,9 @@ NetStreamGst::NetStreamGst():
 
 	m_go(false),
 	m_imageframe(NULL),
+#ifndef DISABLE_START_THREAD
 	startThread(NULL),
+#endif
 	m_pause(false),
 	inputPos(0),
 	videowidth(0),
@@ -131,8 +133,10 @@ void NetStreamGst::close()
 	if (m_go)
 	{
 		m_go = false;
+#ifndef DISABLE_START_THREAD
 		startThread->join();
 		delete startThread;
+#endif
 	}
 
 	gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
@@ -174,7 +178,11 @@ NetStreamGst::play(const std::string& c_url)
 	m_go = true;
 
 	// To avoid blocking while connecting, we use a thread.
+#ifndef DISABLE_START_THREAD
 	startThread = new boost::thread(boost::bind(NetStreamGst::startPlayback, this));
+#else
+	startPlayback(this);
+#endif
 	return 0;
 }
 
