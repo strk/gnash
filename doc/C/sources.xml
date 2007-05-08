@@ -85,7 +85,7 @@
     <sect3 id="opengl">
       <title>OpenGL</title>
       <para>
-	Gnash uses OpenGL for rendering the images. OpenGL is a 3D
+	Gnash can use OpenGL for rendering the images. OpenGL is a 3D
 	graphics package which supports hardware acceleration. You can
 	get the free version of OpenGL at this link: 
 	<ulink type="http"
@@ -103,10 +103,9 @@
     <sect3 id="agg">
       <title>AGG</title>
       <para>
-	AGG is the AntiGrain low-level 2D graphics library used
-	instead of OpenGL on embedded systems. This can be used on the
-	desktop as well, but its primary purpose is to run without
-	OpenGL.
+	AGG is the AntiGrain low-level 2D graphics library that can be used
+	instead of OpenGL. Unlike OpenGL, AGG does all rendering in software
+	without requiring that much floating point calculation.
       </para>
       <para>
 	To install a binary package using apt-get (on Debian based
@@ -118,8 +117,9 @@
     <sect3 id="gtkglext">
       <title>GtkGlExt</title>
       <para>
-	GtkGlExt is an optional package used instead of SDL. Gtk
-	enables better integration with Firefox, as well as better
+	GtkGlExt is an optional package used to link the gtk GUI to the
+	opengl renderer.
+	Gtk enables better integration with Firefox, as well as better
 	event handling and higher level GUI constructs like menus and
 	dialog boxes.
       </para>
@@ -1115,13 +1115,16 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>--with-mp3-decoder=ffmpeg|mad</term>
+	  <term>--enable-media=ffmpeg|mad|gst</term>
 	  <listitem>
 	    <para>
-	      Specified the MP3 decoder to use with sdl sound handler.
+	      Select the specified media decoder and sound engine.
+	      FFMPEG and MAD use the SDL sound engine; GST uses its own.
               Mixing this with --enable-sound=gst is invalid. Using
-	      <emphasis>mad</emphasis> is the default decoder.
+	      <emphasis>ffmpeg</emphasis> is the default decoder.
 	    </para>
+	    <para>
+	      You should only select one media decoder.
 	  </listitem>
 	</varlistentry>
 
@@ -1175,12 +1178,12 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>--enable-sound=gst|sdl</term>
+	  <term>--disable-shared</term>
 	  <listitem>
 	    <para>
-	      Enable support for the a sound handing system. Currently
-	      only <emphasis>sdl</emphasis> works sufficiently. This
-	      is enabled by default when building Gnash.
+	      Enable installing the shared libraries and headers.
+	      Note that the extensions mechanism may not work if shared
+	      libraries are disabled.
 	    </para>
 	  </listitem>
 	</varlistentry>
