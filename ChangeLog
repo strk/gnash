@@ -1,9 +1,17 @@
+2007-05-08 Sandro Santilli <strk@keybit.net>
+
+	* Makefile.am (dumpconfig): add info about which extensions are being
+	  built (if not null extensions are scanned, would be better to 
+	  just report wheter extensions are buil or not instead..)
+	* configure.ac: define USE_EXTENSIONS if build of any extension is
+	  enabled.
+
 2007-05-08 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: Fix vector alignment ("pixel
 	  hinting"). Fixes bug #19775. 
 
-2007-05-07 Sandro Santilli <strk@keybit.net>
+2007-05-08 Sandro Santilli <strk@keybit.net>
 
 	* libbase/LoadThread.h: threading enabled by default.
 	* macros/ffmpeg.m4: set LIBS and CFLAGS to the detected or provided

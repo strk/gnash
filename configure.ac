@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.303 2007/05/07 14:49:48 martinwguy Exp $
+dnl $Id: configure.ac,v 1.304 2007/05/08 19:31:21 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -316,6 +316,7 @@ AC_ARG_WITH(extensions,
     extlist="${withval}"
     withval=`echo ${withval} | tr '\054' ' ' `
   fi
+  nextensions=0
   while test -n "${withval}" ; do
     val=`echo ${withval} | cut -d ' ' -f 1`
     extensions_list="${extensions_list} ${val}"
@@ -324,28 +325,33 @@ AC_ARG_WITH(extensions,
         AC_DEFINE(USE_DEJAGNU_EXT, [1], [Build the DejaGnu extension])
         AC_MSG_NOTICE([Adding DejaGnu extension])
         ext_dejagnu=yes
+        nextensions=$((nextensions+1))
         ;;
       mysql|MYSQL|sql|SQL)
         AC_DEFINE(USE_MYSQL_EXT, [1], [Build the MySQL extension])
         AC_MSG_NOTICE([Adding MySql extension])
         ext_mysql=yes
+        nextensions=$((nextensions+1))
         ;;
       fileio|FILEIO|io|IO)
         AC_DEFINE(USE_FILEIO_EXT, [1], [Build the FileIO extension])
         AC_MSG_NOTICE([Adding FileIO extension])
         ext_fileio=yes
+        nextensions=$((nextensions+1))
         ;;
       gtk|GTK|gtk2|GTK2)
-        AC_DEFINE(USE_GTK_EXT, [1], [Build the FileIO extension])
+        AC_DEFINE(USE_GTK_EXT, [1], [Build the GTK extension])
         ext_gtk=yes
+        nextensions=$((nextensions+1))
         ;;
       all|ALL)
-        AC_DEFINE(USE_GTK_EXT, [1], [Build the FileIO extension])
+        AC_DEFINE(USE_GTK_EXT, [1], [Build all the extensions])
         ext_dejagnu=yes
         ext_mysql=yes
         ext_fileio=yes
         ext_gtk=yes
         ext_all=yes
+        nextensions=5
         ;;
       *) AC_MSG_ERROR([invalid extension specified: ${withval} given (accept: MYSQL|DEJAGNU|FILEIO|GTK|ALL)])
          ;;
@@ -355,6 +361,11 @@ AC_ARG_WITH(extensions,
       break;
     fi
   done
+  if test "${nextensions}" -gt 0; then
+        AC_DEFINE(USE_EXTENSIONS, [1], [Use extensions])
+  fi
+  EXTENSIONS_LIST="$extensions_list"
+  AC_SUBST(EXTENSIONS_LIST)
 )
 
 AM_CONDITIONAL(BUILD_DEJAGNU_EXT, [ test x$ext_dejagnu = xyes ])

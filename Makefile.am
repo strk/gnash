@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.70 2007/04/30 18:53:25 strk Exp $
+# $Id: Makefile.am,v 1.71 2007/05/08 19:31:21 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -218,11 +218,11 @@ if ENABLE_MING
 	@echo "	MAKESWF $(MAKESWF) "
 endif
 if ENABLE_MTASC
-	@echo " MTASC $(MTASC)"
-	@echo " MTASC CLASSPATH $(MTASC_CLASSPATH)"
+	@echo "	MTASC $(MTASC)"
+	@echo "	MTASC CLASSPATH $(MTASC_CLASSPATH)"
 endif
 if ENABLE_SWFDEC_TESTSUITE
-	@echo " SWFDEC_TESTSUITE $(SWFDEC_TESTSUITE)"
+	@echo "	SWFDEC_TESTSUITE $(SWFDEC_TESTSUITE)"
 endif
 	@echo "Graphics support..."	
 	@echo "	CAIRO_CFLAGS is $(CAIRO_CFLAGS)"
@@ -245,3 +245,4 @@ endif
 	@echo "Media handler: $(MEDIA_OPT)"
 	@echo "Renderer engine: $(RENDER_OPT)"
 	@echo "GUI: $(GUI_OPT)"
+	@echo "Extensions: $(EXTENSIONS_LIST)"
