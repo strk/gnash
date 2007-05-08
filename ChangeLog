@@ -1,5 +1,6 @@
 2007-05-07 Sandro Santilli <strk@keybit.net>
 
+	* libbase/LoadThread.h: threading enabled by default.
 	* macros/ffmpeg.m4: set LIBS and CFLAGS to the detected or provided
 	  values for the macro lifetime, so to more easily find any dependent
 	  lib in custom dirs; do not discard user-provided libdir; be more

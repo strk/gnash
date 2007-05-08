@@ -30,7 +30,7 @@
 
 // Undefine this to NOT use a thread for loading
 // This is useful for debugging.
-//#define THREADED_LOADS 1
+#define THREADED_LOADS 1
 
 
 /// \brief
