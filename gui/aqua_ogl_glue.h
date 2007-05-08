@@ -17,4 +17,30 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.h,v 1.1 2007/05/06 22:13:51 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.h,v 1.2 2007/05/08 21:55:32 nihilus Exp $ */
+
+#include "aqua_glue.h"
+
+using namespace std;
+
+namespace gnash
+{
+
+class AquaOglGlue : public AquaGlue
+{
+  public:
+    AquaOglGlue();
+    virtual ~AquaOglGlue();
+
+    bool init(int argc, char ***argv);
+    render_handler* createRenderHandler( int depth);
+    bool prepDrawingArea(int width, int height, uint32_t aqua_flags);
+    void render();
+  private:
+  
+#ifdef FIX_I810_LOD_BIAS
+    float _tex_lod_bias;
+#endif
+};
+
+}

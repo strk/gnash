@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: aquasup.h,v 1.3 2007/05/08 21:28:18 nihilus Exp $ */
+/* $Id: aquasup.h,v 1.4 2007/05/08 21:55:32 nihilus Exp $ */
 
 #ifndef __AQUASUP_H__
 #define __AQUASUP_H__
@@ -30,6 +30,10 @@
 
 #include "gui.h"
 
+#if defined(RENDERER_OPENGL)
+#include "aqua_ogl_glue.h"
+#endif
+
 namespace gnash {
 
 class AquaGui : public Gui
@@ -40,18 +44,16 @@ class AquaGui : public Gui
 
     int m_stage_width;
     int m_stage_height;
-
-	/// For 8 bit (palette / LUT) modes, sets a grayscale palette.
-	//
-	/// This GUI currently does not support palette modes. 
-	///
-  	bool set_grayscale_lut8();
-  	
-  	bool initialize_renderer();
   	
   	int valid_x(int x);
   	int valid_y(int y);
-  	  	
+  	
+  	unsigned int	_timeout;
+
+#if defined(RENDERER_OPENGL)
+    AquaOglGlue		_glue;
+#endif
+	  	
 	public:
 		AquaGui();
 		AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth);

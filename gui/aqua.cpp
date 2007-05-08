@@ -17,11 +17,19 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.6 2007/05/08 21:28:18 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.7 2007/05/08 21:55:32 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+extern "C"{
+#include <unistd.h>
+#ifdef HAVE_GETOPT_H
+	#include <getopt.h>
+#endif
+//	extern int getopt(int, char *const *, const char *);
+}
 
 #include "gnash.h"
 #include "gui.h"
@@ -49,6 +57,42 @@ AquaGui::AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 AquaGui::~AquaGui()
 {
 	
+}
+
+void AquaGui::renderBuffer()
+{
+    //GNASH_REPORT_FUNCTION;
+
+    _glue.render();
+}
+
+bool AquaGui::init(int /*argc*/, char *** /*argv*/) /* Self-explainatory */
+{
+	return true;
+}
+
+void AquaGui::setTimeout(unsigned int timeout)
+{
+    _timeout = timeout;
+}
+
+void AquaGui::key_event(int key, bool down)
+{
+}
+
+bool AquaGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/)
+{
+	return true;
+}
+
+bool AquaGui::createMenu()
+{ 
+	return true;
+}
+
+bool AquaGui::setupEvents()
+{
+	return true;
 }
 
 }

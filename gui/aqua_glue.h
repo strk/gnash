@@ -17,4 +17,24 @@
 // 
 //
 
-/* $Id: aqua_glue.h,v 1.1 2007/05/06 22:13:51 nihilus Exp $ */
+/* $Id: aqua_glue.h,v 1.2 2007/05/08 21:55:32 nihilus Exp $ */
+
+#include "gnash.h"
+
+namespace gnash
+{
+
+class AquaGlue
+{
+  public:
+    virtual ~AquaGlue() { }
+    virtual bool init(int argc, char **argv[]) = 0;
+
+    virtual bool prepDrawingArea(int width, int height) = 0;
+    virtual render_handler* createRenderHandler(int depth) = 0;
+    virtual void render() = 0;
+  protected:
+    int _bpp;
+};
+
+}
