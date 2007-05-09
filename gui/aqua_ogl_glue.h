@@ -17,7 +17,10 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.h,v 1.2 2007/05/08 21:55:32 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.h,v 1.3 2007/05/09 20:28:57 nihilus Exp $ */
+
+#ifndef AQUA_OGL_GLUE_H
+#define AQUA_OGL_GLUE_H
 
 #include "aqua_glue.h"
 
@@ -34,13 +37,11 @@ class AquaOglGlue : public AquaGlue
 
     bool init(int argc, char ***argv);
     render_handler* createRenderHandler( int depth);
-    bool prepDrawingArea(int width, int height, uint32_t aqua_flags);
+    bool prepDrawingArea(int width, int height);
     void render();
   private:
-  
-#ifdef FIX_I810_LOD_BIAS
-    float _tex_lod_bias;
-#endif
 };
 
 }
+
+#endif /* AQUA_OGL_GLUE_H */

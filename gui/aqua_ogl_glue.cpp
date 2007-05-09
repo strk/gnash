@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.cpp,v 1.4 2007/05/08 21:55:32 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.cpp,v 1.5 2007/05/09 20:28:57 nihilus Exp $ */
 
 
 #include "aqua_ogl_glue.h"
@@ -33,56 +33,35 @@ namespace gnash
 {
 
 AquaOglGlue::AquaOglGlue()
-#ifdef FIX_I810_LOD_BIAS
-  : _tex_lod_bias(-1.2f)
-#endif
 {
 //    GNASH_REPORT_FUNCTION;
 }
 
-SdlOglGlue::~SdlOglGlue()
+AquaOglGlue::~AquaOglGlue()
 {
 //    GNASH_REPORT_FUNCTION;
 
 }
 
-bool
-#ifdef FIX_I810_LOD_BIAS
-AquaOglGlue::init(int argc, char** argv[])
-#else
-AquaOglGlue::init(int, char***)
-#endif
+bool AquaOglGlue::init(int, char***)
 {
 //    GNASH_REPORT_FUNCTION;
-#ifdef FIX_I810_LOD_BIAS
-    int c = getopt (argc, *argv, "m:");
-    if (c == 'm') {
-      _tex_lod_bias = (float) atof(optarg);
-    }
-#endif
 
     return true;
 }
 
 
-render_handler*
-AquaOglGlue::createRenderHandler(int depth)
+render_handler* AquaOglGlue::createRenderHandler(int depth)
 {
 //    GNASH_REPORT_FUNCTION;
 
     _bpp = depth;
-
     render_handler* renderer = create_render_handler_ogl();
-
-#ifdef FIX_I810_LOD_BIAS
-    glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
-#endif
 
     return renderer;
 }
 
-bool
-SdlOglGlue::prepDrawingArea(int width, int height, uint32_t aqua_flags)
+bool AquaOglGlue::prepDrawingArea(int width, int height)
 {
     if (_bpp == 16) {
       // 16-bit color, surface creation is likely to succeed.
@@ -128,10 +107,6 @@ SdlOglGlue::prepDrawingArea(int width, int height, uint32_t aqua_flags)
     glDisable(GL_LIGHTING);
     glPushAttrib (GL_ALL_ATTRIB_BITS);         
 
-#  ifdef FIX_I810_LOD_BIAS
-    glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
-#  endif
-
     return true;
 }
 
@@ -141,7 +116,5 @@ AquaOglGlue::render()
 //    GNASH_REPORT_FUNCTION;
     //SDL_GL_SwapBuffers();
 }
-
-
 
 } // namespace gnash

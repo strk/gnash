@@ -17,7 +17,10 @@
 // 
 //
 
-/* $Id: aqua_glue.h,v 1.2 2007/05/08 21:55:32 nihilus Exp $ */
+/* $Id: aqua_glue.h,v 1.3 2007/05/09 20:28:57 nihilus Exp $ */
+
+#ifndef AQUA_GLUE_H
+#define AQUA_GLUE_H
 
 #include "gnash.h"
 
@@ -38,3 +41,5 @@ class AquaGlue
 };
 
 }
+
+#endif /* AQUA_GLUE_H */

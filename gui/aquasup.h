@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: aquasup.h,v 1.4 2007/05/08 21:55:32 nihilus Exp $ */
+/* $Id: aquasup.h,v 1.5 2007/05/09 20:28:57 nihilus Exp $ */
 
 #ifndef __AQUASUP_H__
 #define __AQUASUP_H__
@@ -47,7 +47,7 @@ class AquaGui : public Gui
   	
   	int valid_x(int x);
   	int valid_y(int y);
-  	
+  	void key_event(int key, bool down);
   	unsigned int	_timeout;
 
 #if defined(RENDERER_OPENGL)
@@ -66,7 +66,6 @@ class AquaGui : public Gui
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
-    
 };
 
 }
