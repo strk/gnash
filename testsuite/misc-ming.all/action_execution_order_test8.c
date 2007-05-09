@@ -62,7 +62,6 @@ main(int argc, char** argv)
   
   
   mc1 = newSWFMovieClip(); // will only exist in frame4
-  add_clip_actions(mc2, " _root.note('mc1 frame '+this._currentframe);");
   add_clip_actions(mc1, " _root.note('about to invoke _root.gotoAndStop(6)');"
   			" _root.gotoAndStop(6);"
 		        " _root.note('mc1 actions still running after _root.gotoAndStop(6), _root is '+_root);"
