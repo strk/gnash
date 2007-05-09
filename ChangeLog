@@ -1,3 +1,9 @@
+2007-05-09 Sandro Santilli <strk@keybit.net>
+
+	* macros/ming.m4: redirect stderr to /dev/null when using
+	  passing the beta version to printf (would complain if
+	  the version has no beta component). Closes bug #19826.
+
 2007-05-09 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/static_vs_dynamic1.c, static_vs_dynamic12.c:
