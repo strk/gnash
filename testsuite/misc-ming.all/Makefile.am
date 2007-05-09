@@ -432,7 +432,7 @@ displaylist_depths_test2.swf: displaylist_depths_test2
 	./displaylist_depths_test2 $(top_srcdir)/testsuite/media
 
 displaylist_depths_test2runner: $(srcdir)/../generic-testrunner.sh displaylist_depths_test2.swf
-	sh $< -r5 $(top_builddir) displaylist_depths_test2.swf > $@
+	sh $< -f20 $(top_builddir) displaylist_depths_test2.swf > $@
 	chmod 755 $@
 
 masks_test_SOURCES =	\
