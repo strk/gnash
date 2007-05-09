@@ -1,5 +1,10 @@
 2007-05-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.cpp (initTestingRenderers): try initializing
+	  an AGG renderer for *each* known pixel format.
+	* backend/render_handler_agg.{cpp,h} (create_render_handler_agg):
+	  Take pixelformat by *const* pointer, do NOT abort when the given
+	  pixelformat is unsupported, just return NULL.
 	* testsuite/misc-ming.all/action_execution_order_test8.c:
 	  Added description as reported on bug #19727.
 	* testsuite/misc-ming.all/static_vs_dynamic2.c:

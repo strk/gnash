@@ -58,8 +58,12 @@ public:
 
 
 /// Create a render handler 
+//
+/// If the given pixelformat is unsupported, or any other error
+/// occurs, NULL is returned.
+///
 DSOEXPORT render_handler_agg_base*
-  create_render_handler_agg(char *pixelformat);
+  create_render_handler_agg(const char *pixelformat);
 
 } // namespace gnash
 

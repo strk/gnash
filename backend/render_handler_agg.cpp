@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.79 2007/05/08 17:38:06 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.80 2007/05/09 09:54:44 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -2021,7 +2021,7 @@ private:  // private variables
 
 // TODO: Replace "pixelformat" with a enum!
 
-DSOEXPORT render_handler_agg_base*  create_render_handler_agg(char *pixelformat)
+DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelformat)
 {
 
   log_msg("framebuffer pixel format is %s", pixelformat);
@@ -2060,7 +2060,8 @@ DSOEXPORT render_handler_agg_base*  create_render_handler_agg(char *pixelformat)
 #endif
   {
     log_error("Unknown pixelformat: %s\n", pixelformat);
-    assert(0);
+    return NULL;
+    //assert(0);
   }
   
   return NULL; // avoid compiler warning

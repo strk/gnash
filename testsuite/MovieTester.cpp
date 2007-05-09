@@ -361,10 +361,29 @@ MovieTester::initTestingRenderers()
 
 #ifdef RENDERER_AGG
 	// Initialize AGG
-	handler.reset( create_render_handler_agg("RGB24") );
-	assert(handler.get());
-	addTestingRenderer(handler, "AGG_RGB24");
-#endif
+	static const char* aggPixelFormats[] = {
+		"RGB555", "RGB565", "RGBA16",
+		"RGB24", "BGR24", "RGBA32", "BGRA32"
+	};
+
+	for (unsigned i=0; i<sizeof(aggPixelFormats)/sizeof(*aggPixelFormats); ++i)
+	{
+		const char* pixelFormat = aggPixelFormats[i];
+		std::string name = "AGG_"+string(pixelFormat);
+
+		handler.reset( create_render_handler_agg(pixelFormat) );
+		if ( handler.get() )
+		{
+			//log_msg("Renderer %s initialized", name.c_str());
+			cout << "Renderer " << name << " initialized" << endl;
+			addTestingRenderer(handler, name); 
+		}
+		else
+		{
+			cout << "Renderer " << name << " not supported" << endl;
+		}
+	}
+#endif // RENDERER_AGG
 
 #ifdef RENDERER_CAIRO
 	// Initialize Cairo
