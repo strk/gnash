@@ -43,7 +43,7 @@ Range2d<int>
 inscribedRect(int x, int y, int radius)
 {
 	Range2d<int> ret;
-	float halfside = ((float)radius * sqrt(2))/2;
+	float halfside = ((float)radius * sqrt(2.0f))/2.0f;
 	ret.expandTo(int(round(x-halfside)), int(round(y-halfside)));
 	ret.expandTo(int(round(x+halfside)), int(round(y+halfside)));
 	return ret;
