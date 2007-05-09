@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.71 2007/03/30 14:51:38 strk Exp $
+# $Id: Makefile.am,v 1.72 2007/05/09 15:53:46 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -42,7 +42,7 @@ base_RUNNERS = \
 
 check_SCRIPTS = \
 	$(base_RUNNERS) \
-	$(quickcheck_RUNNERS)
+	$(NULL)
 
 # We don't need  --tool anymore
 #RUNTESTDEFAULTFLAGS = swf_exists.exp
