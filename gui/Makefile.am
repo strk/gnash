@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.68 2007/05/07 14:26:07 martinwguy Exp $
+# $Id: Makefile.am,v 1.69 2007/05/09 08:56:48 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -141,7 +141,7 @@ else
 endif
 
 if USE_GUI_AQUA
- AQUA_SRCS = aqua.cpp auqasup.h aqua_glue.h $(AQUA_OPENGL_SRCS)
+ AQUA_SRCS = aqua.cpp aquasup.h aqua_glue.h $(AQUA_OPENGL_SRCS)
 else
  AQUA_SRCS =
 endif
