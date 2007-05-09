@@ -1,5 +1,6 @@
 2007-05-09 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: drop unneeded LTVERSION_VERSION macro call.
 	* gui/: fltk.cpp, gtk.cpp, sdl.cpp:
 	  Check if createRenderHandler of the glue returns
 	  NULL, and return false in that case.
