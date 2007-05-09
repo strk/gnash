@@ -1,3 +1,8 @@
+2007-05-09 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/static_vs_dynamic1.c, static_vs_dynamic12.c:
+	  test what we discussed yestoday.
+	  
 2007-05-08 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: tolerate
