@@ -1,5 +1,11 @@
 2007-05-09 Sandro Santilli <strk@keybit.net>
 
+	* gui/: fltk.cpp, gtk.cpp, sdl.cpp:
+	  Check if createRenderHandler of the glue returns
+	  NULL, and return false in that case.
+
+2007-05-09 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/MovieTester.cpp (initTestingRenderers): try initializing
 	  an AGG renderer for *each* known pixel format.
 	* backend/render_handler_agg.{cpp,h} (create_render_handler_agg):

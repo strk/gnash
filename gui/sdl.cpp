@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sdl.cpp,v 1.55 2007/05/02 21:56:49 martinwguy Exp $ */
+/* $Id: sdl.cpp,v 1.56 2007/05/09 10:19:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -189,6 +189,7 @@ SDLGui::init(int argc, char **argv[])
     _glue.init(argc, argv);
 
     _renderer = _glue.createRenderHandler(_depth);
+    if ( ! _renderer ) return false;
 
     return true;
 }

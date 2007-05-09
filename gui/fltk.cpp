@@ -237,6 +237,7 @@ FltkGui::createWindow(const char* title, int width, int height)
     end();
 
     _renderer = _glue->createRenderHandler();
+    if ( ! _renderer ) return false;
     set_render_handler(_renderer);
 
     _glue->initBuffer(width, height);

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: gtk.cpp,v 1.88 2007/04/27 21:30:48 strk Exp $ */
+/* $Id: gtk.cpp,v 1.89 2007/05/09 10:19:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -123,6 +123,7 @@ GtkGui::init(int argc, char **argv[])
 #endif
 
     _renderer = glue.createRenderHandler();
+    if ( ! _renderer ) return false;
     set_render_handler(_renderer);
 
     return true;
