@@ -1,5 +1,9 @@
 2007-05-09 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/action_execution_order_test8.c:
+	  Added description as reported on bug #19727.
+	* testsuite/misc-ming.all/static_vs_dynamic2.c:
+	  Moved description of the test on top.
 	* gui/Makefile.am: fixed typo preventing 'dist' to work.
 	* testsuite/misc-ming.all/action_execution_order_test8.c:
 	  Fixed access to uninitialized memory (segfault).

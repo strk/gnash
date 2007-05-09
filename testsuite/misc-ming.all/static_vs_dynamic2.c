@@ -16,6 +16,17 @@
  *
  */ 
 
+/*
+ * create(by tag) "mc1" in static depth;
+ * create(by AS) "dup" in dynamic depth;
+ * swap them;
+ * try to move and remove the character in static depth;
+ *
+ * TODO: add test for REPLACE.
+ * Question: how to REPLACE a character?
+ */
+  
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <ming.h>
@@ -52,15 +63,6 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); 
 
-  /* create(by tag) "mc1" in static depth;
-   * create(by AS) "dup" in dynamic depth;
-   * swap them;
-   * try to move and remove the character in static depth;
-   *
-   * TODO: add test for REPLACE.
-   * Question: how to REPLACE a character?
-  */
-  
   mc1 = newSWFMovieClip();
   sh = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc1, (SWFBlock)sh);  
