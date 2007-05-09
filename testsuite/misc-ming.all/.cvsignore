@@ -28,3 +28,5 @@ eventSoundTest1
 reverse_execute_PlaceObject2_test1
 reverse_execute_PlaceObject2_test2
 gmon.out
+static_vs_dynamic1
+static_vs_dynamic2

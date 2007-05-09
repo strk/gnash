@@ -111,10 +111,12 @@ check_PROGRAMS = \
 	frame_label_test \
 	path_format_test \
 	duplicate_movie_clip_test \
-  event_handler_scope_test \
+	event_handler_scope_test \
 	masks_testrunner \
-  key_event_test \
+	key_event_test \
 	key_event_testrunner \
+	static_vs_dynamic1 \
+	static_vs_dynamic2 \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -155,8 +157,10 @@ check_SCRIPTS = \
 	frame_label_testrunner \
 	path_format_testrunner \
 	duplicate_movie_clip_testrunner \
-  event_handler_scope_testrunner \
+	event_handler_scope_testrunner \
 	matrix_testrunner \
+	static_vs_dynamic1_testrunner \
+	static_vs_dynamic2_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -1015,6 +1019,37 @@ DrawingApiTestRunner_DEPENDENCIES = \
 	DrawingApiTest.swf	\
 	$(NULL)
 
+
+static_vs_dynamic1_SOURCES = \
+	static_vs_dynamic1.c \
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+
+static_vs_dynamic1_LDADD = $(MING_LIBS)
+
+static_vs_dynamic1.swf: static_vs_dynamic1
+	./static_vs_dynamic1 $(srcdir)/../media
+
+static_vs_dynamic1_testrunner: $(srcdir)/../generic-testrunner.sh static_vs_dynamic1.swf
+	sh $< $(top_builddir) static_vs_dynamic1.swf > $@
+	chmod 755 $@
+
+static_vs_dynamic2_SOURCES = \
+	static_vs_dynamic2.c \
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+
+static_vs_dynamic2_LDADD = $(MING_LIBS)
+
+static_vs_dynamic2.swf: static_vs_dynamic2
+	./static_vs_dynamic2 $(srcdir)/../media
+
+static_vs_dynamic2_testrunner: $(srcdir)/../generic-testrunner.sh static_vs_dynamic2.swf
+	sh $< $(top_builddir) static_vs_dynamic2.swf > $@
+	chmod 755 $@
+
 Dejagnu_SOURCES =	\
 	Dejagnu.c	\
 	ming_utils.h				\
@@ -1068,9 +1103,11 @@ TEST_CASES = \
 	frame_label_testrunner \
 	path_format_testrunner \
 	duplicate_movie_clip_testrunner \
-  event_handler_scope_testrunner \
+	event_handler_scope_testrunner \
 	masks_testrunner \
 	key_event_testrunner \
+	static_vs_dynamic1_testrunner \
+	static_vs_dynamic2_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS

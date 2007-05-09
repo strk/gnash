@@ -75,7 +75,7 @@ main(int argc, char** argv)
                   "} else {"                      // loopback
                   " check_equals(typeof(mc1), 'movieclip');"
                   " check_equals(typeof(mc2), 'undefined');"
-                  " xcheck_equals(typeof(dup1), 'undefined');"
+                  " check_equals(typeof(dup1), 'undefined');"
                   " check_equals(typeof(dup2), 'movieclip');"
                   "}" );
   SWFMovie_nextFrame(mo); 
