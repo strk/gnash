@@ -30,26 +30,29 @@
 namespace gnash
 {
 
+// TODO: Document this class !!
 class Fileio : public as_object {
 public:
     Fileio();
     ~Fileio();
-    bool fopen(std::string &filespec, std::string &mode);
+
+    bool fopen(const std::string &filespec, const std::string &mode);
+
     int fread(std::string &str);
     int fgetc();
     std::string &fgets(std::string &str);
     
-    int fwrite(std::string &str);
+    int fwrite(const std::string &str);
     bool fputc(int c);
-    bool fputs(std::string &str);
+    bool fputs(const std::string &str);
     int fclose();
     int fflush();
     void rewind();
     int fseek(long offset);
     int fseek(long offset, int whence);
     long ftell();
-    bool unlink(std::string &filespec);
-    void scandir(const string dir, as_value* result);
+    bool unlink(const std::string &filespec);
+    void scandir(const std::string& dir, as_value* result);
 private:
     FILE        *_stream;
     std::string _filespec;

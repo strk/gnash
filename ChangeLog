@@ -1,5 +1,10 @@
 2007-05-09 Sandro Santilli <strk@keybit.net>
 
+	* extensions/fileio/fileio.{cpp,h}: don't forget to setup
+	  the FileIO exported interface; Fix some const-correctness
+	  for the class methods; have seek() return the correct value;
+	  cast arguments to the expected type. Needs more love, but
+	  I won't give it *now* :)
 	* configure.ac: drop unneeded LTVERSION_VERSION macro call.
 	* gui/: fltk.cpp, gtk.cpp, sdl.cpp:
 	  Check if createRenderHandler of the glue returns

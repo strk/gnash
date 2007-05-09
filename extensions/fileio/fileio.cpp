@@ -70,31 +70,31 @@ as_value fileio_scandir(const fn_call& fn);
 LogFile& dbglogfile = LogFile::getDefaultInstance();
 
 static void
-attachInterface(as_object *obj)
+attachInterface(as_object& obj)
 {
 //    GNASH_REPORT_FUNCTION;
 
-    obj->init_member("fopen", new builtin_function(fileio_fopen));
-    obj->init_member("fread", new builtin_function(fileio_fread));
-    obj->init_member("fgetc", new builtin_function(fileio_fgetc));
-    obj->init_member("fgets", new builtin_function(fileio_fgets));
-    obj->init_member("gets", new builtin_function(fileio_fgets));
-    obj->init_member("getchar", new builtin_function(fileio_getchar));
+    obj.init_member("fopen", new builtin_function(fileio_fopen));
+    obj.init_member("fread", new builtin_function(fileio_fread));
+    obj.init_member("fgetc", new builtin_function(fileio_fgetc));
+    obj.init_member("fgets", new builtin_function(fileio_fgets));
+    obj.init_member("gets", new builtin_function(fileio_fgets));
+    obj.init_member("getchar", new builtin_function(fileio_getchar));
 
-    obj->init_member("fwrite", new builtin_function(fileio_fwrite));
-    obj->init_member("fputc", new builtin_function(fileio_fputc));
-    obj->init_member("fputs", new builtin_function(fileio_fputs));
-    obj->init_member("puts", new builtin_function(fileio_puts));
-    obj->init_member("putchar", new builtin_function(fileio_putchar));
+    obj.init_member("fwrite", new builtin_function(fileio_fwrite));
+    obj.init_member("fputc", new builtin_function(fileio_fputc));
+    obj.init_member("fputs", new builtin_function(fileio_fputs));
+    obj.init_member("puts", new builtin_function(fileio_puts));
+    obj.init_member("putchar", new builtin_function(fileio_putchar));
     
-    obj->init_member("fflush", new builtin_function(fileio_fflush));
-    obj->init_member("fseek", new builtin_function(fileio_fseek));
-    obj->init_member("ftell", new builtin_function(fileio_ftell));
-    obj->init_member("fclose", new builtin_function(fileio_fclose));
+    obj.init_member("fflush", new builtin_function(fileio_fflush));
+    obj.init_member("fseek", new builtin_function(fileio_fseek));
+    obj.init_member("ftell", new builtin_function(fileio_ftell));
+    obj.init_member("fclose", new builtin_function(fileio_fclose));
     
-    obj->init_member("unlink", new builtin_function(fileio_unlink));
+    obj.init_member("unlink", new builtin_function(fileio_unlink));
     
-    obj->init_member("scandir", new builtin_function(fileio_scandir));
+    obj.init_member("scandir", new builtin_function(fileio_scandir));
 }
 
 static as_object*
@@ -104,6 +104,7 @@ getInterface()
     static boost::intrusive_ptr<as_object> o;
     if (o == NULL) {
 	o = new as_object();
+	attachInterface(*o);
     }
     return o.get();
 }
@@ -114,13 +115,22 @@ fileio_ctor(const fn_call& fn)
 //    GNASH_REPORT_FUNCTION;
     Fileio * obj = new Fileio();
 
-    attachInterface(obj);
+    if ( fn.nargs > 0 )
+    {
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("new FileIO(%s): all arguments discarded", ss.str().c_str());
+		);
+    }
+
     return as_value(obj); // will keep alive
 }
 
 
 Fileio::Fileio()
-    : _stream(0)
+    :
+    as_object(getInterface()),
+    _stream(0)
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -155,7 +165,7 @@ Fileio::fseek(long offset)
 {
 //    GNASH_REPORT_FUNCTION;
     if (_stream) {
-        ::fseek(_stream, offset, SEEK_SET);
+        return ::fseek(_stream, offset, SEEK_SET);
     }
     return -1;
 }
@@ -181,7 +191,7 @@ Fileio::ftell()
 }
 
 bool
-Fileio::fopen(string &filespec, string &mode)
+Fileio::fopen(const string &filespec, const string &mode)
 {
 //    GNASH_REPORT_FUNCTION;
     _stream = ::fopen(filespec.c_str(), mode.c_str());
@@ -233,7 +243,7 @@ Fileio::fgets(std::string &str)
 }
 
 int
-Fileio::fwrite(string &str)
+Fileio::fwrite(const string &str)
 {
 //    GNASH_REPORT_FUNCTION;
     return ::fwrite(str.c_str(), str.size(), 1, _stream);
@@ -253,7 +263,7 @@ Fileio::fputc(int c)
 }
 
 bool
-Fileio::fputs(string &str)
+Fileio::fputs(const string &str)
 {
 //    GNASH_REPORT_FUNCTION;
     if (_stream) {
@@ -277,14 +287,14 @@ Fileio::fclose()
 }
 
 bool
-Fileio::unlink(std::string &filespec)
+Fileio::unlink(const std::string &filespec)
 {
 //    GNASH_REPORT_FUNCTION;
 		return ::unlink(filespec.c_str()) >= 0;		
 }
 
 void
-Fileio::scandir(const string dir, as_value* result) 
+Fileio::scandir(const std::string& dir, as_value* result) 
 {
 
 	struct dirent **namelist;
@@ -320,11 +330,19 @@ fileio_fopen(const fn_call& fn)
     boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
     assert(ptr);
     
-    if (fn.nargs > 0) {
-	string filespec = fn.arg(0).to_string();
-	string mode = fn.arg(1).to_string();
-	return as_value(ptr->fopen(filespec, mode));
+    if (fn.nargs < 2)
+    {
+		IF_VERBOSE_ASCODING_ERRORS(
+		std::stringstream ss; fn.dump_args(ss);
+		log_aserror("FileIO.fopen(%s): need two arguments", ss.str().c_str());
+		);
+		return as_value(false);
     }
+
+    string filespec = fn.arg(0).to_string(&fn.env());
+    string mode = fn.arg(1).to_string(&fn.env());
+    return as_value(ptr->fopen(filespec, mode));
+
 }
 
 as_value
@@ -424,8 +442,8 @@ fileio_fputs(const fn_call& fn)
 {
     //   GNASH_REPORT_FUNCTION;
     boost::intrusive_ptr<Fileio> ptr = ensureType<Fileio>(fn.this_ptr);
-    assert(ptr);    
-    string str = fn.arg(0).to_string();
+
+    string str = fn.arg(0).to_string(&fn.env());
     return as_value(ptr->fputs(str));
 }
 
@@ -520,7 +538,7 @@ extern "C" {
 	    cl = new builtin_function(&fileio_ctor, getInterface());
 // 	    // replicate all interface to class, to be able to access
 // 	    // all methods as static functions
- 	    attachInterface(cl.get());
+ 	    //attachInterface(*cl);
 	}
 	
 	VM& vm = VM::get(); // cache this ?
