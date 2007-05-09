@@ -17,7 +17,22 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.14 2007/03/31 11:02:51 bjacques Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.15 2007/05/09 14:13:04 udog Exp $ */
+
+
+/*
+
+TODO: Support MIT-SHM to push image data more quickly on screen, avoiding
+overhead by X Server IPC.
+
+References:
+  http://en.wikipedia.org/wiki/MIT-SHM
+  http://www.xfree86.org/current/mit-shm.html
+
+Also worth checking:
+  http://en.wikipedia.org/wiki/X_video_extension
+*/
+
 
 #include <cstdio>
 #include <cerrno>
