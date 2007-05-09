@@ -1,3 +1,13 @@
+2007-05-09 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test2.c:
+	  New test showing the effects of a swapDepth moving a static
+	  instance to the dynamic zone when jumping back to a frame in which
+	  the char is supposed to be at it's original depth.
+	  Incredibly, Gnash passes all tests, except a couple which are due
+	  to the way we implemented "soft references" and that makes it
+	  hard to test for actual existance of the old instance.
+
 2007-05-09 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: fix ambiguous 
