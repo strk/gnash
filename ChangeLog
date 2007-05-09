@@ -1,3 +1,8 @@
+2007-05-09 Andrew Guertin <bugzilla@dolphinling.net>
+
+	* macros/ming.m4: cleaner fix for #19826 (don't redirect
+	  stderr...)
+
 2007-05-09 Sandro Santilli <strk@keybit.net>
 
 	* macros/ming.m4: redirect stderr to /dev/null when using
