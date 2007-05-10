@@ -1,5 +1,11 @@
 2007-05-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test4.c:
+	  new scenario for Timeline Control (see wiki for more details).
+	  NOTE: Gnash fails this one !!
+
+2007-05-10 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/anaylse-results.sh: print an header before the actual
 	  results; don't limit depth of search for summary files.
 	* Makefile.am, add an anal rule to run the test results analyzer.
