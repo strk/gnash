@@ -137,9 +137,22 @@ public:
 	/// (triggerable with a mouse activity)
 	bool is_mouse_event() const;
   
-  /// \brief
 	/// Return true if this is a key event
 	bool is_key_event() const;
+
+	/// Return true if this is a button-like event
+	//
+	/// Button-like events are: PRESS, RELEASE, RELEASE_OUTSIDE,
+	///                         ROLL_OVER, ROLL_OUT,
+	///                         DRAG_OVER, DRAG_OUT,
+	///                         KEY_PRESS
+	///
+	/// TODO: check if we need anything more
+	///       The way to test is using the 'enabled'
+	///       property to see which ones are disabled
+	///       by setting it to false.
+	///
+	bool is_button_event() const;
 
 	id_code id() const { return m_id; }
 };

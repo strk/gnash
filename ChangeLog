@@ -1,5 +1,14 @@
 2007-05-10 Sandro Santilli <strk@keybit.net>
 
+	* server/event_id.h, server/vm/action.cpp: add
+	  event_id::is_button_event() method
+	* server/sprite_instance.{cpp,h}: add isEnabled() method,
+	  (on_event): don't react to button events if not enabled.
+	* testsuite/misc-ming.all: ButtonEventsTest-Runner.cpp,
+	  ButtonEventsTest.c: add test for Button.enable flag.
+
+2007-05-10 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/MovieClip.as: more and better tests for
 	  MovieClip.enabled.
 	* server/sprite_instance.cpp (attachMovieClipInterface): initialize

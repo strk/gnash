@@ -256,6 +256,18 @@ main(int argc, char **argv)
 
 	/*****************************************************
 	 *
+	 * On third frame, add a shape at higher depth 
+	 *
+	 *****************************************************/
+
+	{
+
+		add_actions(mo, "square1.button.enabled = false;");
+		SWFMovie_nextFrame(mo); /* showFrame */
+	}
+
+	/*****************************************************
+	 *
 	 * Save it...
 	 *
 	 *****************************************************/

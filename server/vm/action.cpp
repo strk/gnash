@@ -482,6 +482,25 @@ event_id::is_key_event() const
 	}
 }
 
+bool
+event_id::is_button_event() const
+{
+	switch (m_id)
+	{
+		case event_id::PRESS:
+		case event_id::RELEASE :
+		case event_id::RELEASE_OUTSIDE:
+		case event_id::ROLL_OVER:
+		case event_id::ROLL_OUT:
+		case event_id::DRAG_OVER:
+		case event_id::DRAG_OUT:
+		case event_id::KEY_PRESS:
+			return true;
+		default:
+			return false;
+	}
+}
+
 // Standard member lookup.
 // TODO: move to character.h ?
 // TODO: case-insensitive search ?

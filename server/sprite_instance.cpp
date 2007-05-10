@@ -2135,6 +2135,13 @@ sprite_instance::on_event(const event_id& id)
 {
 	testInvariant();
 
+	if ( id.is_button_event() && ! isEnabled() )
+	{
+		log_debug("Sprite %s ignored button-like event %s as not 'enabled'",
+			getTarget().c_str(), id.get_function_name().c_str());
+		return false;
+	}
+
 	bool called = false;
 			
 	// First, check for clip event handler.
@@ -3652,6 +3659,16 @@ sprite_instance::getBounds() const
 	Range drawableBounds = _drawable->get_bound().getRange();
 	bounds.expandTo(drawableBounds);
 	return bounds;
+}
+
+bool
+sprite_instance::isEnabled() const
+{
+	as_value enabled;
+	// const_cast needed due to get_member being non-const due to the 
+	// possibility that a getter-setter would actually modify us ...
+	const_cast<sprite_instance*>(this)->get_member("enabled", &enabled);
+	return enabled.to_bool();
 }
 
 } // namespace gnash

@@ -739,6 +739,18 @@ public:
 
 private:
 
+	/// \brief
+	/// Return value of the 'enabled' property, casted to a boolean value.
+	/// True if not found (undefined to bool evaluates to false).
+	//
+	/// When a MovieClip is "disabled", its handlers of button-like events 
+	/// are disabled, and automatic tab ordering won't include it.
+	///
+	/// See event_id::is_button_event().
+	///
+	bool isEnabled() const;
+
+
 	/// Forbid copy
 	sprite_instance(const sprite_instance&)
 		:
