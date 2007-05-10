@@ -14,7 +14,15 @@ total_xfail=0;
 total_xpass=0;
 total_unresolved=0;
 
-for dir in `find . -maxdepth 1 -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
+echo
+echo "[Test Results Summary]"
+echo
+
+# TODO1: always find in top-level dir instead (taking a parameter) ?
+# TODO2: increment -maxdepth in case we add subdirs to our testsuites ?
+
+#for dir in `find . -maxdepth 1 -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
+for dir in `find . -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
     if test ! -f "${dir}/testrun.sum" ; then
 	continue
     fi

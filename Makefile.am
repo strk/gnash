@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.71 2007/05/08 19:31:21 strk Exp $
+# $Id: Makefile.am,v 1.72 2007/05/10 15:50:20 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -246,3 +246,9 @@ endif
 	@echo "Renderer engine: $(RENDER_OPT)"
 	@echo "GUI: $(GUI_OPT)"
 	@echo "Extensions: $(EXTENSIONS_LIST)"
+
+check: check-recursive anal
+
+anal testreport checksum:
+	$(srcdir)/testsuite/anaylse-results.sh
+

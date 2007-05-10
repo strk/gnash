@@ -45,9 +45,6 @@ libtestsuite_la_CXXFLAGS = \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 
-check: check-recursive
-	$(srcdir)/anaylse-results.sh
-
 if ENABLE_MING
 
 .PHONY: Dejagnu.swf

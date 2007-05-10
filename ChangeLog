@@ -1,5 +1,15 @@
 2007-05-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/anaylse-results.sh: print an header before the actual
+	  results; don't limit depth of search for summary files.
+	* Makefile.am, add an anal rule to run the test results analyzer.
+	  Run the analyzer at end of 'make check', so the report doesn't
+	  scroll-up.
+	* testsuite/Makefile.am: don't run the analyzer from testsuite/ dir
+	  as it would miss some tests in upper directories.
+
+2007-05-10 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test2.c,
 	  displaylist_depths_test3.c: Cleanup comments for test2 and add
 	  new scenario for Timeline Control (see wiki for more details).
