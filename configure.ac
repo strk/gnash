@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.305 2007/05/09 10:25:13 strk Exp $
+dnl $Id: configure.ac,v 1.306 2007/05/10 08:08:43 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -806,20 +806,20 @@ esac
 
 if test x"$media_handler" = x"ffmpeg"; then
   GNASH_PATH_FFMPEG
-  if test x"${ac_cv_path_ffmpeg_lib}" = x; then
-    AC_MSG_WARN([ffmpeg was specified as the media decoder but its library could not be found])
-    # configure will abort during final checks
-  fi
+  # If the library is not found, this will be reported and nogo'd at the end.
+  # if test x"${ac_cv_path_ffmpeg_lib}" = x; then
+  #   AC_MSG_WARN([ffmpeg was specified as the media decoder but its library could not be found])
+  # fi
 fi
 
 if test x"$media_handler" = x"mad"; then
   dnl Will set MAD_LIBS and MAD_CFLAGS.
   dnl Handles --with-mad-incl and --with-mad-lib
   GNASH_PKG_FIND(mad, [mad.h], [mad library], mad_copyright)
-  if test x"${ac_cv_path_mad_lib}" = x ; then
-    AC_MSG_WARN([Libmad was specified as the media decoder, but it could not be found])
-    # configure will abort during final checks
-  fi
+  # If the library is not found, this will be reported and nogo'd at the end.
+  # if test x"${ac_cv_path_mad_lib}" = x ; then
+  #   AC_MSG_WARN([Libmad was specified as the media decoder, but it could not be found])
+  # fi
 fi
 
 dnl I'm kinda lazy, get rid of this later... //Markus

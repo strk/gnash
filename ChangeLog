@@ -1,3 +1,8 @@
+2007-05-10 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac: Don't warn about ffmpeg/mad absence during tests;
+	  they are checked and nogoed at the end.
+
 2007-05-09 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test2.c:
