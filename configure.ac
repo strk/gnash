@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.307 2007/05/10 11:36:14 martinwguy Exp $
+dnl $Id: configure.ac,v 1.308 2007/05/10 12:20:42 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1605,7 +1605,6 @@ if test x"$MING_LIBS" != x; then
 else
     echo "        WARNING: You need to have the Ming development and utilities packages"
     echo "                 installed to run most of the tests in Gnash testsuite."
-    echo "                 (Some of the tests can still be run anyway)."
 fi
 
 if test x"$SWFDEC_TESTSUITE" != x; then
