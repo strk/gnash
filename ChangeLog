@@ -33,6 +33,7 @@
 
 	* configure.ac: Don't warn about ffmpeg/mad absence during tests;
 	  they are checked and nogoed at the end.
+	* configure.ac: Don't report SDL FLAGS and help message twice.
 
 2007-05-09 Sandro Santilli <strk@keybit.net>
 

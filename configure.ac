@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.306 2007/05/10 08:08:43 martinwguy Exp $
+dnl $Id: configure.ac,v 1.307 2007/05/10 11:36:14 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1478,7 +1478,13 @@ dnl    nogo=true
   fi
 fi
 
-if test x"$gui" = x"sdl"; then
+# See whether SDL is required
+need_sdl=false
+test x"$gui" = x"sdl"			&& need_sdl=true
+test x"$media_handler" = x"ffmpeg"	&& need_sdl=true
+test x"$media_handler" = x"mad"		&& need_sdl=true
+
+if $need_sdl; then
   if test x"$SDL_LIBS" != x; then
     echo "        SDL flags are: $SDL_CFLAGS"
     echo "        SDL libs are: $SDL_LIBS"
@@ -1487,24 +1493,14 @@ if test x"$gui" = x"sdl"; then
     echo "               You need to have the SDL development package installed"
     echo "               to compile, or install libsdl1.2-dev (using apt-get)"
     echo "               or SDL-devel (using yum)."
+    [ x"$gui" == x"sdl" ] &&
+	echo "               Or you can select a different GUI with --enable-gui= "
+    [ x"$media_handler" = x"ffmpeg" -o x"$media_handler" = x"mad" ] &&
+	echo "               or use --enable-media=gst"
     nogo=true
   fi
 fi
-
-if test x"$media_handler" = x"ffmpeg" -o x"$media_handler" = x"mad"; then
-  if test x"$SDL_LIBS" != x; then
-    echo "        SDL flags are: $SDL_CFLAGS"
-    echo "        SDL libs are: $SDL_LIBS"
-  else
-    echo "        ERROR: sdl sound requested, but no SDL development package installed!"
-    echo "               You need to have the SDL development package installed"
-    echo "               if you wish to have sdl-based sound support for Gnash."
-    echo "               To compile this project with SDL sound support, install"
-    echo "               libsdl-1.2-dev (using apt-get) or SDL-devel (using yum)."
-    echo "               or configure with --enable-sound=gst to use gstreamer instead."
-   nogo=true
-  fi
-fi
+unset need_sdl
 
 if test x"$plugin" = x"yes"; then
 dnl  if test x"$FIREFOX_CFLAGS" != x; then
