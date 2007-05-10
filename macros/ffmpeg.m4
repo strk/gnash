@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.37 2007/05/08 07:10:19 strk Exp $
+dnl $Id: ffmpeg.m4,v 1.38 2007/05/10 12:14:14 martinwguy Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -45,7 +45,10 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
          CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
       fi
       topdir=`$PKG_CONFIG --cflags-only-I libavcodec | sed -e 's:-I::g' | sed -e 's:.* /:/:' -e 's: ::g'`
-      avcodec_h="$topdir/avcodec.h"
+      # Gets "" if not installed
+      if test x"$topdir" != x; then
+	avcodec_h="$topdir/avcodec.h"
+      fi
     fi
   fi
 

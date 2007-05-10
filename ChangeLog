@@ -34,6 +34,7 @@
 	* configure.ac: Don't warn about ffmpeg/mad absence during tests;
 	  they are checked and nogoed at the end.
 	* configure.ac: Don't report SDL FLAGS and help message twice.
+	* macros/ffmpeg.m4: Avoid spurious syntax errors when avcodec not found
 
 2007-05-09 Sandro Santilli <strk@keybit.net>
 
