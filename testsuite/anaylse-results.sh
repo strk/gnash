@@ -31,7 +31,7 @@ for dir in `find . -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
     noxfail=`grep -c "^XFAIL: " ${dir}/testrun.sum`
     noxpass=`grep -c "^XPASS: " ${dir}/testrun.sum`
     nounresolved=`grep -c "^UNRESOLVED: " ${dir}/testrun.sum`
-    echo -n "Test suite $dir had these results: "
+    echo -n "Test suite $dir: "
     if test $nofail -gt 0; then
 	echo -n " $nofail real failures"
 	total_fail=`expr $total_fail + $nofail`
@@ -77,6 +77,8 @@ fi
 if test ${total_xfail} -gt 0; then
     echo "	Total expected failures: ${total_xfail}"
 fi
+
+echo
 
 #
 # Look for regressions
