@@ -20,19 +20,37 @@
  * Sandro Santilli, strk@keybit.net
  *
  * Test how swapDepth affects DisplayList refresh on gotoAndPlay(current-X).
- * A character is placed at depth 3 (-16381) and moved to the right for a couple of frames
- * using PlaceObject2 tag.
- * After that, the placed instance is moved from depth -16381 to depth 10 (dynamic zone)
- * and a jump-back is issued to the frame containing the right-shift static transform.
- *
- * Expected behaviour is that the gotoFrame() reconstructs the DisplayList so that
- * depth -16381 is taken by the character and transformed exactly as specified by
- * PlaceObject2 tag. This is a *new* instance, altought it uses the same name as the 
- * old one. The old one (now at depth 10) is still there, visible, but can not be
- * accessible by ActionScript anymore as it's name has been overridden by the
- * reconstructed instance.
  *
  * run as ./displaylist_depths_test2
+ *
+ * Timeline:
+ * 
+ *   Frame  | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+ *  --------+---+---+---+---+---+---+---+
+ *   Event  |   | P |   | M | M | S | J |
+ * 
+ *  P = place (by PlaceObject2)
+ *  M = move (matrix transform by PlaceObject2)
+ *  S = swapDepth
+ *  J = jump
+ * 
+ * Description:
+ * 
+ *  frame2: character placed at depth -16381 at position (10,200)
+ *  frame4: position of instance at depth -16381 shifted to the right (50,200)
+ *  frame5: position of instance at depth -16381 shifted to the right (100,200)
+ *  frame6: depth of instance changed to 10 (dynamic zone) and stop.
+ *  frame7: jump back to frame 4
+ * 
+ * Expected behaviour on jump back:
+ * 
+ *  Before the jump we have a single instance at depth 10 and position 100,200.
+ *  After the jump we have two instances:
+ *         - one at depth 10 and position 100,200
+ *           (the same we had before, with its state intact)
+ *         - another at depth -16381 and position 20,300
+ *           (newly created and placed accordingly to the PlaceObject2 tag on frame4)
+ * 
  */
 
 #include "ming_utils.h"
