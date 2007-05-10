@@ -41,6 +41,10 @@ using namespace std;
 #	define snprintf _snprintf
 #endif
 
+// Undefine this to keep MOVIECLIP values by pointer
+// rather then by "target" ref.
+#define MOVIECLIP_AS_SOFTREF
+
 namespace gnash {
 
 //
@@ -464,18 +468,40 @@ as_value::to_object() const
 	}
 }
 
+/* static private */
+sprite_instance*
+as_value::find_sprite_by_target(const std::string& tgtstr)
+{
+	// Evaluate target everytime an attempt is made 
+	// to fetch a movieclip value.
+	sprite_instance* root = VM::get().getRoot().get_root_movie();
+	as_environment& env = root->get_environment();
+	character* target = env.find_target(tgtstr);
+	if ( ! target ) return NULL;
+	return target->to_movie();
+}
+
 sprite_instance*
 as_value::to_sprite() const
 {
 	if ( m_type != MOVIECLIP ) return NULL;
 
+#ifndef MOVIECLIP_AS_SOFTREF
+	sprite_instance* sp = m_object_value->to_movie();
+	if ( ! sp ) return NULL;
+	if ( sp->isUnloaded() )
+	{
+		log_error(_("MovieClip value is a dangling reference: "
+				"target %s was unloaded (should set to NULL?)"),
+				sp->getTarget().c_str());
+		return NULL; 
+	}
+	return sp;
+#else
 	// Evaluate target everytime an attempt is made 
 	// to fetch a movieclip value.
-	sprite_instance* root = VM::get().getRoot().get_root_movie();
-	as_environment& env = root->get_environment();
-	// TODO: simplify next statement when m_string_value will become a std::string
-	character* target = env.find_target(std::string(m_string_value.c_str()));
-	if ( ! target )
+	sprite_instance* sp = find_sprite_by_target(m_string_value);
+	if ( ! sp )
 	{
 		log_error(_("MovieClip value is a dangling reference: "
 				"target '%s' not found (should set to NULL?)"),
@@ -484,8 +510,9 @@ as_value::to_sprite() const
 	}
 	else
 	{
-		return target->to_movie();
+		return sp;
 	}
+#endif
 }
 
 void
@@ -493,8 +520,11 @@ as_value::set_sprite(const sprite_instance& sprite)
 {
 	drop_refs();
 	m_type = MOVIECLIP;
-	// TODO: simplify next statement when m_string_value will become a std::string
+#ifndef MOVIECLIP_AS_SOFTREF
+	m_object_value = const_cast<sprite_instance*>(&sprite);
+#else
 	m_string_value = sprite.get_text_value();
+#endif
 }
 
 void
@@ -502,8 +532,14 @@ as_value::set_sprite(const std::string& path)
 {
 	drop_refs();
 	m_type = MOVIECLIP;
+#ifndef MOVIECLIP_AS_SOFTREF
+	sprite_instance* sp = find_sprite_by_target(path);
+	if ( ! sp ) set_null();
+	else set_sprite(*sp);
+#else
 	// TODO: simplify next statement when m_string_value will become a std::string
 	m_string_value = path.c_str();
+#endif
 }
 
 // Return value as an ActionScript function.  Returns NULL if value is
@@ -809,8 +845,14 @@ as_value::operator=(const as_value& v)
 	else if (v.m_type == NUMBER) set_double(v.m_number_value);
 	else if (v.m_type == OBJECT) set_as_object(v.m_object_value);
 
-	//TODO: don't use c_str() when m_string_value will be a std::string
-	else if (v.m_type == MOVIECLIP) set_sprite(v.m_string_value.c_str());
+	else if (v.m_type == MOVIECLIP)
+	{
+#ifndef MOVIECLIP_AS_SOFTREF
+		set_sprite(*(v.to_sprite()));
+#else
+		set_sprite(v.m_string_value);
+#endif
+	}
 
 	else if (v.m_type == AS_FUNCTION) set_as_function(v.m_object_value->to_function());
 	else assert(0);

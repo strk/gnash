@@ -1,3 +1,12 @@
+2007-05-10 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.{cpp,h}: encoding of movieclip values
+	  by target path made optional, to help future attempts
+	  at changing it, due to conceptual bug found in it running
+	  the displaylist_depths_test2.swf testcase. The default is
+	  no change. Undefine MOVIECLIP_AS_SOFTREF to keep them by
+	  pointer (still fails some testcases so not enabled).
+
 2007-05-10 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac: Don't warn about ffmpeg/mad absence during tests;

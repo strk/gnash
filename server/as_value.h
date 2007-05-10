@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.51 2007/04/27 08:46:46 strk Exp $ */
+/* $Id: as_value.h,v 1.52 2007/05/10 08:18:48 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -457,8 +457,6 @@ public:
           m_boolean_value = val;
         }
 
-	void	set_sprite(const std::string& path);
-
 	void	set_sprite(const sprite_instance& sp);
 
 	void	set_int(int val) { set_double(val); }
@@ -531,6 +529,11 @@ public:
 	void	string_concat(const std::string& str);
 
 private:
+
+	static sprite_instance* find_sprite_by_target(const std::string& target);
+
+	void	set_sprite(const std::string& path);
+
 
 	/// Return value as a primitive type
 	//
