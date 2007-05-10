@@ -1,5 +1,11 @@
 2007-05-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/displaylist_depths_test2.c: target
+	  SWF7, use getInstanceAtDepth() to verify Gnash succeeds the
+	  test, despite the fact it's "soft references" implementation 
+	  is bogus (thanks to zou for the tip!). We might still want a
+	  MovieTester based runner to check for rendering in any case,
+	  but less urgent...
 	* server/sprite_instance.{cpp,h}: Implemented
 	  MovieClip.getInstanceAtDepth() and MovieClip.getSWFVersion();
 	  stubbed MovieClip.getTextSnapshot().

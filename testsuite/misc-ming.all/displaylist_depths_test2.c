@@ -41,7 +41,8 @@
 #include <stdio.h>
 #include <ming.h>
 
-#define OUTPUT_VERSION 6
+// We need version 7 to use getInstanceAtDepth()
+#define OUTPUT_VERSION 7
 #define OUTPUT_FILENAME "displaylist_depths_test2.swf"
 
 SWFDisplayItem add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height);
@@ -63,7 +64,17 @@ add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width,
 	SWFDisplayItem_setDepth(it, depth); 
 	SWFDisplayItem_moveTo(it, x, y); 
 	SWFDisplayItem_setName(it, name);
-	SWFDisplayItem_addAction(it, newSWFAction("_root.note(this+' onClipConstruct'); _root.depth3constructed++;"), SWFACTION_CONSTRUCT);
+	SWFDisplayItem_addAction(it, newSWFAction(
+			"_root.note(this+' onClipConstruct');"
+			" _root.check_equals(typeof(_root), 'movieclip');"
+		        " if ( isNaN(_root.depth3Constructed) ) {"
+			"	_root.depth3Constructed=1; "
+			" 	_root.note('_root.depth3Constructed set to '+_root.depth3Constructed);"
+			" } else {"
+			"	_root.depth3Constructed++;"
+			" 	_root.note('_root.depth3Constructed set to '+_root.depth3Constructed);"
+			" }"
+			), SWFACTION_CONSTRUCT);
 
 	return it;
 }
@@ -162,9 +173,13 @@ main(int argc, char** argv)
 		"xcheck_equals(dynRef.myThing, 'guess');"
 		"xcheck_equals(dynRef.getDepth(), 10);" 
 
+		// Luckly we can query for depth chars with getInstanceAtDepth
+		"check_equals(typeof(getInstanceAtDepth(-16381)), 'movieclip');"
+		"check_equals(typeof(getInstanceAtDepth(10)), 'movieclip');"
+
 		"check_equals(static3.getDepth(), -16381);" 
 		"check_equals(static3._x, 50);" 
-		"check_equals(depth3constructed, 2);" 
+		"check_equals(depth3Constructed, 2);" 
 		"totals();"
 		);
 	SWFMovie_nextFrame(mo); 
