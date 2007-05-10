@@ -43,7 +43,7 @@
  * Expected behaviour on jump back:
  * 
  *  Before the jump we have a single instance at depth -16381 and position 100,200.
- *  After the jump we have the same instances at depth -16381, repositioned at 20,200.
+ *  After the jump we have the same instances at depth -16381, repositioned at 50,200.
  *  A single instance has been constructed in total.
  *  Soft references to the instance created before the jump-back still point to the same instance.
  * 
