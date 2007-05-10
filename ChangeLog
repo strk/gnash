@@ -1,5 +1,13 @@
 2007-05-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: more and better tests for
+	  MovieClip.enabled.
+	* server/sprite_instance.cpp (attachMovieClipInterface): initialize
+	  an 'enabled' property in MovieClip.prototype (fixes old and new
+	  tests for it in MovieClip.as); 
+
+2007-05-10 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/displaylist_depths_test2.c: target
 	  SWF7, use getInstanceAtDepth() to verify Gnash succeeds the
 	  test, despite the fact it's "soft references" implementation 

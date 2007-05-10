@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.68 2007/05/10 09:26:56 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.69 2007/05/10 10:08:32 strk Exp $";
 
 #include "check.as"
 
@@ -62,6 +62,29 @@ check_equals(typeof(mc.localToGlobal), 'function');
 check_equals(typeof(mc.unloadMovie), 'function');
 check_equals(typeof(mc.getSWFVersion), 'function');
 check_equals(mc.getSWFVersion(), OUTPUT_VERSION);
+
+check_equals(typeof(mc.enabled), 'boolean');
+#if OUTPUT_VERSION >= 6
+check(!mc.hasOwnProperty('enabled'));
+check(mc.__proto__.hasOwnProperty('enabled'));
+#endif
+check_equals(mc.enabled, true);
+mc.enabled = false;
+check_equals(typeof(mc.enabled), 'boolean');
+check_equals(mc.enabled, false);
+mc.enabled = 'a string';
+check_equals(typeof(mc.enabled), 'string');
+check_equals(mc.enabled, 'a string');
+mc.enabled = 56.5;
+check_equals(typeof(mc.enabled), 'number');
+check_equals(mc.enabled, 56.5);
+check(delete mc.enabled);
+check_equals(typeof(mc.enabled), 'boolean');
+check_equals(mc.enabled, true);
+mc.__proto__.enabled = 'a string';
+check_equals(typeof(mc.enabled), 'string'); // yes, we can set to arbitrary values
+check_equals(mc.enabled, 'a string'); // yes, we can set to arbitrary values
+mc.__proto__.enabled = true; // better keep as it was initially, who knows what it would do...
 
 // This seems unavailable
 // when targetting SWF > 6
@@ -119,8 +142,6 @@ check(mc.duplicateMovieClip);
     // can't confirm this works !
     // maybe we should just NOT use the _root for this ?
     //check(mc.loadVariables != undefined);
-
-    xcheck(mc.enabled);
 
     // maybe this is the start condition...
     check_equals(mc.focusEnabled, undefined);
@@ -466,6 +487,7 @@ asm {
 #if OUTPUT_VERSION > 5
 check_equals(a, "changed");
 #else
+// this check fails with Adobe Flash Player 9
 check_equals(a, undefined);
 #endif
 
@@ -488,6 +510,7 @@ asm {
 #if OUTPUT_VERSION > 5
 check_equals(a, "changed");
 #else
+// this check fails with Adobe Flash Player 9
 check_equals(a, undefined);
 #endif
 

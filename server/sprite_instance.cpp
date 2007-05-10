@@ -1458,6 +1458,8 @@ attachMovieClipInterface(as_object& o)
 	o.init_member("globalToLocal", new builtin_function(sprite_globalToLocal));
 	o.init_member("localToGlobal", new builtin_function(sprite_localToGlobal));
 	o.init_member("getSWFVersion", new builtin_function(sprite_getSWFVersion));
+	o.init_member("enabled", true); // see MovieClip.as testcase
+
 	if ( target_version  < 6 ) return;
 
 	// SWF6 or higher
@@ -1500,10 +1502,9 @@ attachMovieClipProperties(as_object& o)
 	//
 	// Properties (TODO: move to appropriate SWF version section)
 	//
-
+	
 	gettersetter = new builtin_function(&character::x_getset, NULL);
 	o.init_property("_x", *gettersetter, *gettersetter);
-
 
 	gettersetter = new builtin_function(&character::y_getset, NULL);
 	o.init_property("_y", *gettersetter, *gettersetter);
