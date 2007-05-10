@@ -55,6 +55,8 @@ AM_CPPFLAGS = -I.. \
 check_PROGRAMS = \
 	ButtonEventsTest \
 	ButtonEventsTest-Runner \
+	SpriteButtonEventsTest \
+	SpriteButtonEventsTest-Runner \
 	DefineEditTextTest \
 	DefineEditTextVariableNameTest \
 	DefineEditTextVariableNameTest-Runner \
@@ -908,6 +910,28 @@ ButtonEventsTest_Runner_CXXFLAGS = \
 	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
 
+SpriteButtonEventsTest_SOURCES =	\
+	SpriteButtonEventsTest.c	\
+	ming_utils.h	\
+	ming_utils.c	\
+	$(NULL)
+SpriteButtonEventsTest_LDADD = $(MING_LIBS)
+SpriteButtonEventsTest.swf: SpriteButtonEventsTest
+	./SpriteButtonEventsTest $(top_srcdir)/testsuite/media
+SpriteButtonEventsTest_Runner_SOURCES = \
+	SpriteButtonEventsTest-Runner.cpp \
+	$(NULL)
+SpriteButtonEventsTest_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+SpriteButtonEventsTest_Runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	SpriteButtonEventsTest.swf	\
+	$(NULL)
+SpriteButtonEventsTest_Runner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
 loadMovieTest_SOURCES =	\
 	loadMovieTest.c	\
 	ming_utils.h	\
@@ -1084,6 +1108,7 @@ TEST_CASES = \
 	DefineEditTextVariableNameTest-Runner \
 	RollOverOutTest-Runner \
 	ButtonEventsTest-Runner \
+	SpriteButtonEventsTest-Runner \
 	timeline_var_test-Runner \
 	root_stop_testrunner \
 	loop_test-Runner \

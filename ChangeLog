@@ -1,5 +1,12 @@
 2007-05-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am,
+	  SpriteButtonEventsTest-Runner.cpp, SpriteButtonEventsTest.c:
+	  Produced a MovieClip versio of the ButtonEventTest.swf movie.
+	  Seems to work fine, test automated.
+
+2007-05-10 Sandro Santilli <strk@keybit.net>
+
 	* server/event_id.h, server/vm/action.cpp: add
 	  event_id::is_button_event() method
 	* server/sprite_instance.{cpp,h}: add isEnabled() method,
