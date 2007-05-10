@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.67 2007/04/24 21:49:37 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.68 2007/05/10 09:26:56 strk Exp $";
 
 #include "check.as"
 
@@ -60,6 +60,8 @@ check_equals(typeof(mc.getBounds), 'function');
 check_equals(typeof(mc.globalToLocal), 'function');
 check_equals(typeof(mc.localToGlobal), 'function');
 check_equals(typeof(mc.unloadMovie), 'function');
+check_equals(typeof(mc.getSWFVersion), 'function');
+check_equals(mc.getSWFVersion(), OUTPUT_VERSION);
 
 // This seems unavailable
 // when targetting SWF > 6
@@ -92,6 +94,9 @@ check(mc.duplicateMovieClip);
 	check_equals(typeof(mc.prevFrame), 'function');
 	check_equals(typeof(mc.stop), 'function');
 	check_equals(typeof(mc.swapDepths), 'function');
+    	check_equals(typeof(mc.startDrag), 'function');
+    	check_equals(typeof(mc.stopDrag), 'function');
+	check_equals(typeof(mc.getTextSnapshot), 'function');
 
 	// These two seem unavailable
 	// when targetting SWF > 6
@@ -106,16 +111,15 @@ check(mc.duplicateMovieClip);
 #endif // OUTPUT_VERSION >= 6
 
 #if OUTPUT_VERSION >= 7
-    xcheck(mc.getInstanceAtDepth != undefined);
-    xcheck(mc.getSWFVersion != undefined);
-    xcheck(mc.getTextSnapshot != undefined);
+
+    check_equals(typeof(mc.getInstanceAtDepth), 'function');
+    check( MovieClip.prototype.hasOwnProperty('getInstanceAtDepth') );
+    check( ! mc.hasOwnProperty('getInstanceAtDepth') );
 
     // can't confirm this works !
     // maybe we should just NOT use the _root for this ?
     //check(mc.loadVariables != undefined);
 
-    check(mc.startDrag);
-    check(mc.stopDrag);
     xcheck(mc.enabled);
 
     // maybe this is the start condition...
@@ -190,7 +194,7 @@ check(mc._currentframe != undefined);
 check_equals(mc._droptarget, "");
 check_equals(typeof(mc._droptarget), "string");
 #else
-//WARNING: we have player succeeds on this, and also player fails on this
+//WARNING: we have player 9 succeeds on this, and also player 7 fails on this
 // don't know which one to trust.
 xcheck_equals(mc._droptarget, "");
 #endif
@@ -211,7 +215,7 @@ mc._name = "changed";
 check_equals(typeof(mc._name), "string");
 check_equals(typeof(mc), "movieclip");
 #else
-//WARNING: we have player succeeds on this, and also player fails on this
+//WARNING: we have player 9 succeeds on this, and also player 7 fails on this
 // don't know which one to trust.
 xcheck_equals(mc._name, "");
 #endif
@@ -241,9 +245,17 @@ check_equals(mc2_mc.getBytesTotal(), 0);
 check_equals(mc2.getBytesLoaded(), 0);
 check_equals(mc2.getBytesTotal(), 0);
 
+#if OUTPUT_VERSION > 6
+check_equals(getInstanceAtDepth(50), mc2);
+#endif
+
 var mc3 = createEmptyMovieClip("mc3_mc", 50);
 check(mc3 != undefined);
 check_equals(mc3.getDepth(), 50);
+
+#if OUTPUT_VERSION > 6
+check_equals(getInstanceAtDepth(50), mc3);
+#endif
 
 // By default useHandCursor is false in SWF5 and true in later versions
 #if OUTPUT_VERSION < 6
@@ -322,7 +334,9 @@ check_equals(typeof(softref.member), 'number');
 check_equals(softref.member, 1);
 check_equals(softref._target, "/hardref");
 #if OUTPUT_VERSION > 6
+check_equals(getInstanceAtDepth(60), hardref);
 removeMovieClip(hardref); // using ActionRemoveClip (0x25)
+check_equals(getInstanceAtDepth(60), undefined);
 #else
 // just to test another way, ActionRemoveClip in SWF6 will work as well
 hardref.removeMovieClip(); // using the sprite's removeMovieClip 
@@ -852,3 +866,25 @@ else
 	note("There is not '"+static_clip_name+"' clip statically-defined, so we could not test localToGlobal() and globalToLocal() against it");
 
 }
+
+//---------------------------------------------------------------------
+// TODO: Test getInstanceAtDepth
+//       (tested somehow above, but I mean a well-focused test here)
+//---------------------------------------------------------------------
+
+#if OUTPUT_VERSION >= 7
+
+check_equals(typeof(getInstanceAtDepth(-6)), 'undefined');
+check_equals(typeof(getInstanceAtDepth()), 'undefined');
+createEmptyMovieClip("tt2", -6);
+check_equals(typeof(getInstanceAtDepth(-6)), 'movieclip');
+o = new Object; o.valueOf = function() { return -6; };
+check_equals(typeof(getInstanceAtDepth(o)), 'movieclip');
+check_equals(getInstanceAtDepth(o), tt2);
+check_equals(getInstanceAtDepth(-6.7), tt2);
+check_equals(getInstanceAtDepth(-6.2), tt2);
+
+// what if we point to a non-sprite instance ? is it still considered a "movieclip" ?
+
+#endif // OUTPUT_VERSION >= 7
+

@@ -1,5 +1,13 @@
 2007-05-10 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: Implemented
+	  MovieClip.getInstanceAtDepth() and MovieClip.getSWFVersion();
+	  stubbed MovieClip.getTextSnapshot().
+	* testsuite/actionscript.all/MovieClip.as: tested
+	  MovieClip.getSWFVersion() and MovieClip.getInstanceAtDepth().
+
+2007-05-10 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.{cpp,h}: encoding of movieclip values
 	  by target path made optional, to help future attempts
 	  at changing it, due to conceptual bug found in it running

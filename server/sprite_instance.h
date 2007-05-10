@@ -131,6 +131,15 @@ public:
                 return m_def.get();
         }
 
+	/// \brief
+	/// Return version of the SWF definition of this instance
+	/// as been parsed from.
+	//
+        int getSWFVersion()
+	{
+                return m_def->get_version();
+        }
+
 	/// Get the composite bounds of all component drawing elements
 	geometry::Range2d<float> getBounds() const;
 
@@ -306,7 +315,13 @@ public:
 	void	display();
 
 	void swap_characters(character* ch1, character* ch2);
+
+	/// Return the character at given depth in our DisplayList.
+	//
+	/// @return NULL if the specified depth is available (no chars there)
+	///
 	character* get_character_at_depth(int depth);
+
 	character* add_empty_movieclip(const char* name, int depth);
 
 	boost::intrusive_ptr<character> add_textfield(const std::string& name,

@@ -784,6 +784,26 @@ sprite_getNextHighestDepth(const fn_call& fn)
 	return as_value(static_cast<double>(nextdepth));
 }
 
+//getInstanceAtDepth(depth:Number) : MovieClip
+static as_value
+sprite_getInstanceAtDepth(const fn_call& fn)
+{
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
+
+	if ( fn.nargs < 1 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("MovieClip.getInstanceAtDepth(): missing depth argument");
+		);
+		return as_value();
+	}
+
+	int depth = fn.arg(0).to_number<int>(&fn.env());
+	boost::intrusive_ptr<character> ch = sprite->get_character_at_depth(depth);
+	if ( ! ch ) return as_value(); // we want 'undefined', not 'null'
+	return as_value(ch.get());
+}
+
 // getURL(url:String, [window:String], [method:String]) : Void
 static as_value
 sprite_getURL(const fn_call& fn)
@@ -795,6 +815,30 @@ sprite_getURL(const fn_call& fn)
 	if ( ! warned )
 	{
 		log_unimpl("MovieClip.getURL()");
+		warned=true;
+	}
+	return as_value();
+}
+
+// getSWFVersion() : Number
+static as_value
+sprite_getSWFVersion(const fn_call& fn)
+{
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
+
+	return as_value(sprite->getSWFVersion());
+}
+
+// getTextSnapshot() : TextSnapshot
+static as_value
+sprite_getTextSnapshot(const fn_call& fn)
+{
+	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
+
+	static bool warned = false;
+	if ( ! warned )
+	{
+		log_unimpl("MovieClip.getTextSnapshot()");
 		warned=true;
 	}
 	return as_value();
@@ -1413,6 +1457,7 @@ attachMovieClipInterface(as_object& o)
 	o.init_member("getBounds", new builtin_function(sprite_getBounds));
 	o.init_member("globalToLocal", new builtin_function(sprite_globalToLocal));
 	o.init_member("localToGlobal", new builtin_function(sprite_localToGlobal));
+	o.init_member("getSWFVersion", new builtin_function(sprite_getSWFVersion));
 	if ( target_version  < 6 ) return;
 
 	// SWF6 or higher
@@ -1429,10 +1474,12 @@ attachMovieClipInterface(as_object& o)
 	o.init_member("createTextField", new builtin_function(sprite_create_text_field));
 	o.init_member("getDepth", new builtin_function(sprite_get_depth));
 	o.init_member("createEmptyMovieClip", new builtin_function(sprite_create_empty_movieclip));
+	o.init_member("getTextSnapshot", new builtin_function(sprite_getTextSnapshot));
 	if ( target_version  < 7 ) return;
 
 	// SWF7 or higher
 	o.init_member("getNextHighestDepth", new builtin_function(sprite_getNextHighestDepth));
+	o.init_member("getInstanceAtDepth", new builtin_function(sprite_getInstanceAtDepth));
 	if ( target_version  < 8 ) return;
 
 	// TODO: many more methods, see MovieClip class ...
