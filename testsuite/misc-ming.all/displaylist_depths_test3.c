@@ -21,7 +21,7 @@
  *
  * Test how swapDepth affects DisplayList refresh on gotoAndPlay(current-X).
  *
- * run as ./displaylist_depths_test2
+ * run as ./displaylist_depths_test3
  *
  * Timeline:
  * 
@@ -39,18 +39,15 @@
  *  frame2: character placed at depth -16381 at position (10,200)
  *  frame4: position of instance at depth -16381 shifted to the right (50,200)
  *  frame5: position of instance at depth -16381 shifted to the right (100,200)
- *  frame6: depth of instance changed to 10 (dynamic zone) and stop.
+ *  frame6: depth of instance changed to -10 (static zone) and stop.
  *  frame7: jump back to frame 4
  * 
  * Expected behaviour on jump back:
  * 
- *  Before the jump we have a single instance at depth 10 and position 100,200.
- *  After the jump we have two instances:
- *         - one at depth 10 and position 100,200
- *           (the same we had before, with its state intact)
- *         - another at depth -16381 and position 20,200
- *           (newly created and placed accordingly to the PlaceObject2 tag on frame4)
+ *  Before the jump we have a single instance at depth -10 and position 100,200.
+ *  After the jump we have a single instances at depth -16381 and position 20,200.
  *  Two distinct instances have been constructed in total.
+ *  Soft references to the old instance created before the jump-back now point to the new instance.
  * 
  */
 
@@ -62,7 +59,7 @@
 
 // We need version 7 to use getInstanceAtDepth()
 #define OUTPUT_VERSION 7
-#define OUTPUT_FILENAME "displaylist_depths_test2.swf"
+#define OUTPUT_FILENAME "displaylist_depths_test3.swf"
 
 SWFDisplayItem add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height);
 
@@ -158,8 +155,8 @@ main(int argc, char** argv)
 
 	// Frame 6: change depth character at depth 3 to depth 10 (dynamic zone)
 	add_actions(mo,
-		"static3.swapDepths(10);"
-		"check_equals(static3.getDepth(), 10);" 
+		"static3.swapDepths(-10);"
+		"check_equals(static3.getDepth(), -10);" 
 		"static3._rotation = 45;"
 		"check_equals(static3.myThing, 'guess');"
 		);
@@ -177,22 +174,21 @@ main(int argc, char** argv)
 		// this repopulates depth -16381 with a *new* instance 
 		"gotoAndStop(4);"
 
-		// static3 doesn't refer to the dynamic object anymore !
+		// Static3 doesn't refer to the moved object anymore !
 		"check_equals(typeof(static3.myThing), 'undefined');"
 
-		// but the reference still does !!
-		// Gnash fails here due to it's implementation of "soft references"
-		// ... argh ...
-		// TODO: use a MovieTester based test runner to check for actual
-		//       existance of the old (dynamicized) instance by looking
-		//       at the real DisplayList and at the rendered buffer
-		//
-		"xcheck_equals(dynRef.myThing, 'guess');"
-		"xcheck_equals(dynRef.getDepth(), 10);" 
+		// And neither the reference does !!
+		"check_equals(typeof(dynRef.myThing), 'undefined');"
 
-		// Luckly we can query for depth chars with getInstanceAtDepth
+		//  ... Rather, the reference now points to the newly created instance !!
+		//  (see http://www.gnashdev.org/wiki/index.php/SoftReferences)
+		"check_equals(typeof(dynRef), 'movieclip');"
+		"check_equals(dynRef._x, 50);"
+		"check_equals(dynRef, static3);"
+
+		// We can verify nothing is at depth -10 with getInstanceAtDepth
 		"check_equals(typeof(getInstanceAtDepth(-16381)), 'movieclip');"
-		"check_equals(typeof(getInstanceAtDepth(10)), 'movieclip');"
+		"check_equals(typeof(getInstanceAtDepth(-10)), 'undefined');"
 
 		"check_equals(static3.getDepth(), -16381);" 
 		"check_equals(static3._x, 50);" 

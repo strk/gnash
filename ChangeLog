@@ -1,5 +1,11 @@
 2007-05-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test2.c,
+	  displaylist_depths_test3.c: Cleanup comments for test2 and add
+	  new scenario for Timeline Control (see wiki for more details).
+
+2007-05-10 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am,
 	  SpriteButtonEventsTest-Runner.cpp, SpriteButtonEventsTest.c:
 	  Produced a MovieClip versio of the ButtonEventTest.swf movie.
