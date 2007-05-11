@@ -25,6 +25,10 @@
       couple of the files, even with swap enabled and optimisation turned off.
     </para>
     <para>
+      At present the Gnash source is about 16 MB to extracted and configured
+      and requires a total of about 100 megabytes to compile it.
+    </para>
+    <para>
       Continue reading for detailed step-by-step instructions 
       of the entire procedure.
     </para>  
