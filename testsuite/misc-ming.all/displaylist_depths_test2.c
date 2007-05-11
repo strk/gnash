@@ -27,12 +27,13 @@
  * 
  *   Frame  | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
  *  --------+---+---+---+---+---+---+---+
- *   Event  |   | P |   | M | M | S | J |
+ *   Event  |   | P |   | T*| T | M | J |
  * 
  *  P = place (by PlaceObject2)
- *  M = move (matrix transform by PlaceObject2)
- *  S = swapDepth
+ *  T = transform matrix (by PlaceObject2)
+ *  M = move to another depth (by swapDepth)
  *  J = jump
+ *  * = jump target
  * 
  * Description:
  * 

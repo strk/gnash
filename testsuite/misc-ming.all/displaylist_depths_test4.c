@@ -27,11 +27,12 @@
  * 
  *   Frame  | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
  *  --------+---+---+---+---+---+---+---+
- *   Event  |   | P |   | M | M |   | J |
+ *   Event  |   | P |   | T*| T |   | J |
  * 
  *  P = place (by PlaceObject2)
- *  M = move (matrix transform by PlaceObject2)
+ *  T = transform matrix (by PlaceObject2)
  *  J = jump
+ *  * = jump target
  * 
  * Description:
  * 
