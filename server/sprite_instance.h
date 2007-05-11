@@ -327,8 +327,27 @@ public:
 	boost::intrusive_ptr<character> add_textfield(const std::string& name,
 			int depth, float x, float y, float width, float height);
 
-	/// Add an object to the DisplayList. 
+	/// Place a character or mask to the DisplayList (make a timeline instance) 
 	//
+	/// This method instantiates the given character definition (character_id)
+	/// and places it on the stage at the given depth using the specified
+	/// parameters for name, position, color, ratio(?) and clipping depth (if any).
+	///
+	/// If the specified depth is already occupied by an instance of the same
+	/// character (character_id), the existing instance will be transformed using
+	/// move_display_object() instead.
+	///
+	/// If the specified depth is already occupied by an instance of a different
+	/// character (including any dynamically-created instance), the behaviour is
+	/// controlled by the replace_if_depth_is_occupied parameter. If false, this
+	/// call will result in a no-op. If true, the previously existing character
+	/// will be replaced by the new one, with unload() method invoked on the
+	/// removed character.
+	///
+	/// Any successful new placement triggers invokation of the newly created
+	/// instance's LOAD event.
+	///
+	///
 	/// @param character_id
 	///	The ID of the character to be added.
 	///	It will be seeked in the CharacterDictionary
@@ -345,10 +364,10 @@ public:
 	///	The depth to assign to the newly created instance.
 	///
 	/// @param replace_if_depth_is_occupied
-	///	If true, any existing character at the given depth will be
-	///	replaced by the new one. If false, the presence of a character
-	///	at the target depth will make this call a no-op, and NULL
-	///	will be returned.
+	///	This parameter control behaviour in case an existing instance is found at
+	///	the given depth but is NOT an instance of the given character_id.
+	///	In this case: if this paremeter is true, the old instance will be replaced by
+	///	the new one, otherwise nothing happens and this function returns NULL.
 	///
 	/// @param color_transform
 	///	The color transform to apply to the newly created instance.
@@ -359,6 +378,10 @@ public:
 	/// @param ratio
 	///
 	/// @param clip_depth
+	///	If != character::noClipDepthValue, mark the created instance
+	///	as a clipping layer. The shape of the placed character will be
+	///	used as a mask for all higher depths up to this value.
+	///	TODO: assert(clip_depth > depth) ?
 	///
 	/// @return 
 	///	A pointer to the character being added or NULL
