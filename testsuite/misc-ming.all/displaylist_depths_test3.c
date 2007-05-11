@@ -163,7 +163,7 @@ main(int argc, char** argv)
 		);
 	SWFMovie_nextFrame(mo); 
 
-	// Frame 7: go to frame 3 
+	// Frame 7: go to frame 4
 	add_actions(mo,
 
 		"check_equals(static3.myThing, 'guess');"
