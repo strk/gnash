@@ -46,8 +46,9 @@
  * Expected behaviour:
  * 
  *  Depth swapping in frame2 have NO effect. In particular doesn't prevent subsequent static transformations to apply.
- *  Before the jump we have a single instance at depth -16381 and position 10,200.
- *  After the jump we have the same instances at depth -16381, and still positioned at 10,200.
+ *  In frame 4 the instance is positioned at 50,200
+ *  In frame 5 and 6 the instance is positioned at 200,200
+ *  After the jump we have the same instances at depth -16381, and still positioned at 200,200.
  *  A single instance has been constructed in total.
  *   
  */
