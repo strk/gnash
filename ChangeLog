@@ -1,5 +1,7 @@
 2007-05-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/displaylist_depths_test7.c: fix missing
+	  failure "expectance" and associated comment.
 	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test8.c:
 	  New case: "Jumping backward to the start of a character's lifetime
 	  after dynamic transformation"
