@@ -1,5 +1,7 @@
 2007-05-11 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.h (move_display_object): document the call to
+	  accept_anim_move().
 	* testsuite/misc-ming.all/displaylist_depths_test7.c: fix missing
 	  failure "expectance" and associated comment.
 	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test8.c:

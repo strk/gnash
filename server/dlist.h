@@ -140,8 +140,12 @@ public:
 	///
 	void swapDepths(character* ch, int depth);
 
-	/// Updates the transform properties of the object at
-	/// the specified depth.
+	/// \brief
+	/// Updates the transform properties of the object at the
+	/// specified depth, unless its get_accept_anim_moves() returns false.
+	//
+	///  See character::get_accept_anim_moves()
+	///
 	void	move_display_object(
 		int depth,
 		bool use_cxform,
