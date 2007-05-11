@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.39 2007/05/04 21:53:46 nihilus Exp $
+dnl $Id: boost.m4,v 1.40 2007/05/11 16:16:33 martinwguy Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -93,62 +93,33 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl version compiled with GCC instead of the native
   dnl compiler. Finally look for the library without any qualitfying
   dnl attributes.
-  boostnames="boost_thread-gcc-mt boost_thread-mt boost_thread boost_thread-gcc"
-  version_suffix=`echo ${gnash_boost_version} | tr '_' '.'`
-  if test x"${ac_cv_path_boost_lib}" = x; then
-    AC_MSG_CHECKING([for Boost's thread libraries])
-    for i in $libslist; do
-      for libname in ${boostnames}; do
-    	  if test -f $i/lib${libname}.a -o -f $i/lib${libname}.${shlibext}; then
-    	    if test x"$i" != x"/usr/lib"; then
-            ac_cv_path_boost_lib="-L$i -l${libname}"
-            break
-          else
-    	      ac_cv_path_boost_lib="-l${libname}"
-            break
-          fi
-        fi
-      done
-      if test x"${ac_cv_path_boost_lib}" != x ; then 
-        break; 
-      fi        
-    done
-    AC_MSG_RESULT(${ac_cv_path_boost_lib})
-  else
-    for k in ${boostnames}; do
-      if test -f ${ac_cv_path_boost_lib}/lib${k}.a -o -f ${ac_cv_path_boost_lib}/lib${k}.${shlibext}; then
-        if test x"${ac_cv_path_boost_lib}" != x"/usr/lib"; then
-	        ac_cv_path_boost_lib="L${ac_cv_path_boost_lib} -l${k}"
-        else
-          ac_cv_path_boost_lib="-l${k}"
-        fi
-      fi
-    done
-  fi
-  if test x"${ac_cv_path_boost_lib}" = x; then
-    AC_SEARCH_LIBS(cleanup_slots, ${boostnames}, [ac_cv_path_boost_lib="${LIBS}"])
-  fi
-
-  dnl The naming convention is the same as for threads. -mt is the
-  dnl preferance, followed by -gcc-mt, followed by -gcc.
-  boostnames="boost_date_time-gcc-mt boost_date_time-mt boost_date_time-gcc boost_date_time-mt boost_date_time"
+  boost_datenames="boost_date_time-gcc-mt boost_date_time-mt boost_date_time-gcc boost_date_time-mt boost_date_time"
+  boost_threadnames="boost_thread-gcc-mt boost_thread-mt boost_thread boost_thread-gcc"
   boost_date_time=no
-  if test x"${ac_cv_path_boost_lib}" != x; then
-    AC_MSG_CHECKING([for Boost's date time libraries])
-    for i in $libslist; do
-      if test x${boost_date_time} = xyes; then
+  boost_thread=no
+  AC_MSG_CHECKING([for Boost libraries])
+  for i in $libslist; do
+    if test x${boost_date_time} = xyes && test x${boost_thread} = xyes; then
+      break;
+    fi
+    for libname in ${boost_datenames}; do
+      # ${shlibext}* allows .so to work where .so symlink is not installed
+      if test -f $i/lib${libname}.a -o -f $i/lib${libname}.${shlibext}*; then
+        boost_date_time=yes
+        ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${libname}"
         break;
       fi
-      for libname in ${boostnames}; do
-    	  if test -f $i/lib${libname}.a -o -f $i/lib${libname}.${shlibext}; then
-          boost_date_time=yes
-   	      ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${libname}"
-          break;
-        fi
-      done
     done
-    AC_MSG_RESULT(${ac_cv_path_boost_lib})
-  fi
+    for libname in ${boost_threadnames}; do
+      # ${shlibext}* allows .so to work where .so symlink is not installed
+      if test -f $i/lib${libname}.a -o -f $i/lib${libname}.${shlibext}*; then
+        boost_thread=yes
+        ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${libname}"
+        break;
+      fi
+    done
+  done
+  AC_MSG_RESULT(${ac_cv_path_boost_lib})
 
   dnl we don't want any boost libraries in LIBS, we prefer to keep it seperate.
   AC_LANG_POP(C++)  
@@ -160,7 +131,9 @@ AC_DEFUN([GNASH_PATH_BOOST],
   BOOST_LIBS="$ac_cv_path_boost_lib" 
   AC_SUBST(BOOST_LIBS)
 
-dnl  AM_CONDITIONAL(HAVE_BOOST, [test x${boost_date_time} = xyes])
+  # This isn't right: you don't need boot date-time installed unless u build
+  # cygnal, and it is sometimes a separate package from Boost core and thread.
+  AM_CONDITIONAL(HAVE_BOOST, [test x${boost_date_time} = xyes && test x${boost_thread} - xyes])
 ])
 
 # Local Variables:
