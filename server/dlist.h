@@ -135,6 +135,8 @@ public:
 	///	The new depth to assign to the given character.
 	///	If occupied by another character, the target character
 	///	will get the current depth of the first.
+	///	If target depth equals the current depth of character, an
+	///	assertion fails, as I think the caller should check this instead.
 	///
 	void swapDepths(character* ch, int depth);
 

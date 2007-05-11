@@ -1,5 +1,15 @@
 2007-05-11 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.{cpp,h} (swapDepths): abort if target depth
+	  equals depth of source character.
+	* server/sprite_instance.cpp (sprite_swap_depths): raise
+	  a debugging message and skip any depths swap if target depth
+	  equals depth of source character.
+	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test7.c:
+	  New scenario testing that swapDepth(currentdepth) has no effect.
+
+2007-05-11 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/displaylist_depths_test6.c:
 	  Jump to frame 5, to avoid a failure and success of
 	  the same test in two different points in time, and *stop* there

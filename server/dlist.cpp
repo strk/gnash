@@ -417,6 +417,8 @@ void
 DisplayList::swapDepths(character* ch1, int newdepth)
 {
 
+	assert(ch1->get_depth() != newdepth);
+
 	container_type::iterator it1 = find(_characters.begin(), _characters.end(), ch1);
 
 	// upper bound ...

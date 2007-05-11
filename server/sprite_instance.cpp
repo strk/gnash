@@ -359,10 +359,27 @@ static as_value sprite_swap_depths(const fn_call& fn)
 			return rv;
 		}
 
+		target_depth = int(td);
+
+		// Check we're not swapping the our own depth so
+		// to avoid unecessary bounds invalidation and immunizing
+		// the instance from subsequent PlaceObjec tags attempting
+		// to transform it.
+		if ( sprite->get_depth() == target_depth )
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			stringstream ss; fn.dump_args(ss);
+			log_aserror(_("%s.swapDepths(%s): ignored, character already at depth %d"),
+				sprite->getTarget().c_str(),
+				ss.str().c_str(), target_depth);
+			);
+			return rv;
+		}
+
+
 		// TODO : check other kind of validities ?
 
-		target_depth = int(td);
-		//target = this_parent->get_character_at_depth(target_depth);
+
 	}
 
 	this_parent->swapDepths(sprite.get(), target_depth);
