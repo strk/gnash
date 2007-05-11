@@ -15,121 +15,98 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: x11.m4,v 1.6 2007/04/28 00:04:26 rsavoye Exp $
+dnl $Id: x11.m4,v 1.7 2007/05/11 14:20:00 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_X11],
 [
-  AC_ARG_ENABLE(x11, AC_HELP_STRING([--disable-x11], [Disable support for X11]),
-  [case "${enableval}" in
-    yes) x11=yes ;;
-    no)  x11=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for enable-x11 option]) ;;
-  esac], x11=yes)
-
-  if test x"$x11" = x"yes"; then
   dnl Look for the header
-    AC_ARG_WITH(x11_incl, AC_HELP_STRING([--with-x11-incl], [Directory where x11 header is]), with_x11_incl=${withval})
-    AC_CACHE_VAL(ac_cv_path_x11_incl, [
-      if test x"${with_x11_incl}" != x ; then
-        if test -f ${with_x11_incl}/X11/X.h ; then
-	        ac_cv_path_x11_incl=-I`(cd ${with_x11_incl}; pwd)`
-        else
-	        AC_MSG_ERROR([${with_x11_incl} directory doesn't contain X.h])
-        fi
+  AC_ARG_WITH(x11_incl, AC_HELP_STRING([--with-x11-incl], [Directory where x11 header is]), with_x11_incl=${withval})
+  AC_CACHE_VAL(ac_cv_path_x11_incl, [
+    if test x"${with_x11_incl}" != x ; then
+      if test -f ${with_x11_incl}/X11/X.h ; then
+       ac_cv_path_x11_incl=-I`(cd ${with_x11_incl}; pwd)`
+      else
+       AC_MSG_ERROR([${with_x11_incl} directory doesn't contain X.h])
       fi
-    ])
-
-    dnl If the path hasn't been specified, go look for it.
-    if test x"${ac_cv_path_x11_incl}" = x; then
-      AC_MSG_CHECKING([for X11 headers])
-      newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/include ${incllist}"
-      for i in $newlist; do
-      	if test -f $i/X11/X.h; then
-      	  if test x"$i" != x"/usr/include"; then
-      	    ac_cv_path_x11_incl="-I$i"
-      	    break
-          else
-      	    ac_cv_path_x11_incl=""
-      	    break
-      	  fi
-      	fi
-      done
     fi
+  ])
 
-    if test x"${ac_cv_path_x11_incl}" = x; then
-      AC_CHECK_HEADERS(X11/X.h, [ac_cv_path_x11_incl=""])
-    fi
-
-    AC_MSG_RESULT(${ac_cv_path_x11_incl})
-
-
-    if test x"${ac_cv_path_x11_incl}" != x ; then
-      X11_CFLAGS="${ac_cv_path_x11_incl}"
-      AC_MSG_RESULT(${ac_cv_path_x11_incl})
-    else
-      X11_CFLAGS=""
-    fi
-
-    dnl Look for the library
-    AC_ARG_WITH(x11_lib, AC_HELP_STRING([--with-x11-lib], [directory where x11 library is]), with_x11_lib=${withval})
-    AC_CACHE_VAL(ac_cv_path_x11_lib,[
-      if test x"${with_x11_lib}" != x ; then
-        if test -f ${with_x11_lib}/libX11.a -o -f ${with_x11_lib}/libX11.${shlibext}; then
-	        ac_cv_path_x11_lib=`(cd ${with_x11_lib}; pwd)`
-        else
-	        AC_MSG_ERROR([${with_x11_lib} directory doesn't contain libx11.])
-        fi
-      fi
-    ])
-
-    dnl If the header doesn't exist, there is no point looking for the library.
-    if test x"${ac_cv_path_x11_incl}" != x; then
-      AC_MSG_CHECKING([for X11 library])
-      newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/X11R6/lib ${libslist}"
-      for i in $newlist; do
-	      if test -f $i/libX11.a -o -f $i/libX11.${shlibext}; then
-	        ac_cv_path_x11_lib="-L$i -lX11"
-          if test -f $i/libXinerama.a -o -f $i/libXinerama.${shlibext}; then
-            ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXinerama"
-          fi
-          if test -f $i/libXext.a -o -f $i/libXext.${shlibext}; then
-            ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXext"
-          fi
-          if test -f $i/libSM.a -o -f $i/libSM.${shlibext}; then
-            ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lSM"
-          fi
-          if test -f $i/libICE.a -o -f $i/libICE.${shlibext}; then
-            ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lICE"
-          fi
-          AC_MSG_RESULT(yes)
-          break
-        fi
-      done
-    fi
-
-   for i in $newlist; do
-     if test -f $i/libXplugin.a -o -f $i/libXplugin.${shlibext}; then
-       ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -L$i -lXplugin"
-       break
-     fi
+  dnl If the path hasn't been specified, go look for it.
+  if test x"${ac_cv_path_x11_incl}" = x; then
+    newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/include ${incllist}"
+    for i in $newlist; do
+    	if test -f $i/X11/X.h; then
+  	    ac_cv_path_x11_incl="-I$i"
+    	fi
     done
-
-    if test x"${ac_cv_path_x11_lib}" = x; then
-      AC_CHECK_LIB(X11, x11_mem_init, [ac_cv_path_x11_lib=""])
-      AC_MSG_RESULT(${ac_cv_path_x11_lib})
-    fi
-
-    if test x"${ac_cv_path_x11_lib}" != x ; then
-      X11_LIBS="${ac_cv_path_x11_lib}"
-    else
-      X11_LIBS=""
-    fi
   fi
 
-  if test x"${ac_cv_path_x11_lib}" != x ; then
-      X11_LIBS="${ac_cv_path_x11_lib}"
+  if test x"${ac_cv_path_x11_incl}" = x; then
+    AC_CHECK_HEADERS(X11/X.h, [ac_cv_path_x11_incl=""])
+  fi
+
+  AC_MSG_CHECKING([for X11 headers])
+  if test x"${ac_cv_path_x11_incl}" != x ; then
+    X11_CFLAGS="${ac_cv_path_x11_incl}"
+    AC_MSG_RESULT(${ac_cv_path_x11_incl})
   else
-      X11_LIBS="-lX11"
+    X11_CFLAGS=""
+    AC_MSG_RESULT(none)
+  fi
+
+  dnl Look for the library
+  AC_ARG_WITH(x11_lib, AC_HELP_STRING([--with-x11-lib], [directory where x11 library is]), with_x11_lib=${withval})
+  AC_CACHE_VAL(ac_cv_path_x11_lib,[
+    if test x"${with_x11_lib}" != x ; then
+      if test -f ${with_x11_lib}/libX11.a -o -f ${with_x11_lib}/libX11.${shlibext}; then
+       ac_cv_path_x11_lib=`(cd ${with_x11_lib}; pwd)`
+      else
+       AC_MSG_ERROR([${with_x11_lib} directory doesn't contain libx11.])
+      fi
+    fi
+  ])
+
+  dnl If the header doesn't exist, there is no point looking for the library.
+  if test x"${ac_cv_path_x11_incl}" != x; then
+    newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/X11R6/lib ${libslist}"
+    for i in $newlist; do
+     if test -f $i/libX11.a -o -f $i/libX11.${shlibext}; then
+       ac_cv_path_x11_lib="-L$i -lX11"
+        if test -f $i/libXinerama.a -o -f $i/libXinerama.${shlibext}; then
+          ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXinerama"
+        fi
+        if test -f $i/libXext.a -o -f $i/libXext.${shlibext}; then
+          ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXext"
+        fi
+        if test -f $i/libSM.a -o -f $i/libSM.${shlibext}; then
+          ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lSM"
+        fi
+        if test -f $i/libICE.a -o -f $i/libICE.${shlibext}; then
+          ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lICE"
+        fi
+        break
+      fi
+    done
+  fi
+
+  for i in $newlist; do
+    if test -f $i/libXplugin.a -o -f $i/libXplugin.${shlibext}; then
+      ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -L$i -lXplugin"
+      break
+    fi
+  done
+
+  if test x"${ac_cv_path_x11_lib}" = x; then
+    AC_CHECK_LIB(X11, x11_mem_init, [ac_cv_path_x11_lib=""])
+  fi
+
+  AC_MSG_CHECKING([for X11 library])
+  if test x"${ac_cv_path_x11_lib}" != x ; then
+    X11_LIBS="${ac_cv_path_x11_lib}"
+    AC_MSG_RESULT(${ac_cv_path_x11_lib})
+  else
+    X11_LIBS=""
+    AC_MSG_RESULT(none)
   fi
 
   AM_CONDITIONAL(HAVE_X11, [test x$x11 = xyes])

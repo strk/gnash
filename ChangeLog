@@ -1,3 +1,8 @@
+2007-05-11  Rob Savoye  <rob@ute.welcomehome.org>
+
+	* macros/curl.m4, sdl.m4: Drop extraneous results.
+	* macros/x11.m4: Remove --enable test, remove extraneous results.
+
 2007-05-11 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.h (move_display_object): document the call to

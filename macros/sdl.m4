@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: sdl.m4,v 1.39 2007/04/08 23:06:17 rsavoye Exp $
+dnl $Id: sdl.m4,v 1.40 2007/05/11 14:20:00 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_SDL], [
   has_sdl=no
@@ -75,7 +75,6 @@ AC_DEFUN([GNASH_PATH_SDL], [
       done
     done
   fi
-  AC_MSG_RESULT(${ac_cv_path_sdl_incl})
  
   SDL_CFLAGS=""
   if test x"${ac_cv_path_sdl_incl}" = x ; then

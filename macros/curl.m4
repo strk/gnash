@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: curl.m4,v 1.15 2007/04/08 23:06:17 rsavoye Exp $
+dnl $Id: curl.m4,v 1.16 2007/05/11 14:20:00 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_CURL],
 [
@@ -46,8 +46,6 @@ AC_DEFUN([GNASH_PATH_CURL],
 
   dnl If the path hasn't been specified, go look for it.
   if test x"${ac_cv_path_curl_incl}" = x; then
-
-    AC_MSG_CHECKING([for libcurl header])
     if test x"${curlconfig}" != "x"; then
       ac_cv_path_curl_incl=`${curlconfig} --cflags`
     else
@@ -63,6 +61,7 @@ AC_DEFUN([GNASH_PATH_CURL],
       AC_CHECK_HEADERS(curl/curl.h)
     fi
 
+    AC_MSG_CHECKING([for libcurl header])
     if test x"${ac_cv_path_curl_incl}" != x ; then
       AC_MSG_RESULT(yes)
     else
