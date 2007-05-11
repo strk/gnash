@@ -43,8 +43,9 @@
  *  frame5: try to transform the character to the right (200,200)
  *  frame7: jump back to frame 4
  * 
- * Expected behaviour on jump back:
+ * Expected behaviour:
  * 
+ *  After depth swapping in frame2, even if final depth is the same as the original one, static transformations in frame4 and frame5 have no effect.
  *  Before the jump we have a single instance at depth -16381 and position 10,200.
  *  After the jump we have the same instances at depth -16381, and still positioned at 10,200.
  *  A single instance has been constructed in total.
