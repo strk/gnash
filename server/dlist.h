@@ -115,7 +115,28 @@ public:
 		float ratio,
 		int clip_depth);
 
-	void swap_characters(character* ch, character* ch2);
+	/// \brief
+	/// Change depth of the given characters in the list,
+	/// swapping with any existing character at target depth.
+	//
+	/// List ordering will be maintained by this function.
+	///
+	/// Any character affected by this operation (none on invalid call,
+	/// 1 if new depth is not occupied, 2 otherwise) will be:
+	///	- bounds invalidated (see character::set_invalidated)
+	///	- marked as script-transformed (see character::transformedByScript)
+	/// 
+	/// @param ch
+	///	The character to apply depth swapping to.
+	///	If not found in the list, an error is raised
+	///	and no other action is taken.
+	///
+	/// @param depth
+	///	The new depth to assign to the given character.
+	///	If occupied by another character, the target character
+	///	will get the current depth of the first.
+	///
+	void swapDepths(character* ch, int depth);
 
 	/// Updates the transform properties of the object at
 	/// the specified depth.

@@ -314,7 +314,14 @@ public:
 	/// Display (render?) this Sprite/MovieClip, unless invisible
 	void	display();
 
-	void swap_characters(character* ch1, character* ch2);
+	/// Swap depth of the given characters in the DisplayList
+	//
+	/// See DisplayList::swapDepths for more info
+	///
+	void swapDepths(character* ch1, int newdepth)
+	{
+		m_display_list.swapDepths(ch1, newdepth);
+	}
 
 	/// Return the character at given depth in our DisplayList.
 	//

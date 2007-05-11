@@ -269,7 +269,7 @@ static as_value sprite_get_depth(const fn_call& fn)
 	return as_value(n);
 }
 
-//swapDepths(target:Object) : Void
+//swapDepths(target:Object|target:Number) : Void
 static as_value sprite_swap_depths(const fn_call& fn)
 {
 	typedef boost::intrusive_ptr<sprite_instance> SpritePtr;
@@ -277,9 +277,6 @@ static as_value sprite_swap_depths(const fn_call& fn)
 
 	SpritePtr sprite = ensureType<sprite_instance>(fn.this_ptr);
 	int this_depth = sprite->get_depth();
-
-	// Lower bound of source depth below which swapDepth has no effect
-	static const int lowerDepthBound = -16384;
 
 	as_value rv;
 
@@ -291,12 +288,13 @@ static as_value sprite_swap_depths(const fn_call& fn)
 		return rv;
 	}
 
-	if ( this_depth < lowerDepthBound )
+	// Lower bound of source depth below which swapDepth has no effect (below Timeline/static zone)
+	if ( this_depth < character::staticDepthOffset )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		stringstream ss; fn.dump_args(ss);
 		log_aserror(_("%s.swapDepths(%s): won't swap a clip below depth %d (%d)"),
-			sprite->getTarget().c_str(), ss.str().c_str(), lowerDepthBound, this_depth);
+			sprite->getTarget().c_str(), ss.str().c_str(), character::staticDepthOffset, this_depth);
 		);
 		return rv;
 	}
@@ -316,7 +314,7 @@ static as_value sprite_swap_depths(const fn_call& fn)
 	}
 	
 
-	CharPtr target = NULL;
+	//CharPtr target = NULL;
 	int target_depth = 0;
 
 	// sprite.swapDepth(sprite)
@@ -342,11 +340,12 @@ static as_value sprite_swap_depths(const fn_call& fn)
 		}
 
 		target_depth = target_sprite->get_depth();
-		target = boost::dynamic_pointer_cast<character>(target_sprite);
+		//target = boost::dynamic_pointer_cast<character>(target_sprite);
 	}
+
+	// sprite.swapDepth(depth)
 	else
 	{
-		// sprite.swapDepth(depth)
 		double td = fn.arg(0).to_number(&(fn.env()));
 		if ( isnan(td) )
 		{
@@ -363,15 +362,11 @@ static as_value sprite_swap_depths(const fn_call& fn)
 		// TODO : check other kind of validities ?
 
 		target_depth = int(td);
-		target = this_parent->get_character_at_depth(target_depth);
+		//target = this_parent->get_character_at_depth(target_depth);
 	}
 
-	sprite->set_depth(target_depth);
-	if ( target )
-	{
-		target->set_depth(this_depth);
-		this_parent->swap_characters(sprite.get(), target.get());
-	}
+	this_parent->swapDepths(sprite.get(), target_depth);
+
 	return rv;
 
 }
@@ -2796,14 +2791,6 @@ void sprite_instance::display()
 	clear_invalidated();
 	  
 	do_display_callback();
-}
-
-void sprite_instance::swap_characters(character* ch1, character* ch2)
-{
-	ch1->set_invalidated();
-	ch2->set_invalidated();
-
-	m_display_list.swap_characters(ch1, ch2);	
 }
 
 bool

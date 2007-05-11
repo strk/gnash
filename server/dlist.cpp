@@ -413,15 +413,71 @@ DisplayList::clear(bool call_unload)
 	_characters.clear();
 }
 
-void DisplayList::swap_characters(character* ch1, character* ch2)
+void
+DisplayList::swapDepths(character* ch1, int newdepth)
 {
-	container_type::iterator it1 = find(_characters.begin(), _characters.end(), ch1);
-	container_type::iterator it2 = find(_characters.begin(), _characters.end(), ch2);
 
-	if (it1 != _characters.end() && it2 != _characters.end())
+	container_type::iterator it1 = find(_characters.begin(), _characters.end(), ch1);
+
+	// upper bound ...
+	container_type::iterator it2 = find_if(_characters.begin(), _characters.end(),
+			DepthGreaterOrEqual(newdepth));
+
+	if ( it1 == _characters.end() )
 	{
+		log_error("First argument to DisplayList::swapDepth() is NOT a character in the list. Call ignored.");
+		return;
+	}
+
+	DisplayItem ch2 = *it2;
+
+	// Found another character at the given depth
+	if ( ch2->get_depth() == newdepth )
+	{
+		int srcdepth = ch1->get_depth();
+
+		ch2->set_depth(srcdepth);
+
+		// TODO: we're not actually invalidated ourselves, rather our parent is...
+		//       UdoG ? Want to verify this ?
+		ch2->set_invalidated();
+
+		// We won't accept static transforms after a depth swap.
+		// See displaylist_depths_test6.swf for more info.
+		ch2->transformedByScript();
+
 		iter_swap(it1, it2);
 	}
+
+	// No character found at the given depth
+	else
+	{
+		// Move the character to the new position
+		// NOTE: insert *before* erasing, in case the list is
+		//       the only referer of the ref-counted character
+		_characters.insert(it2, ch1);
+		_characters.erase(it1);
+	}
+
+	// don't change depth before the iter_swap case above, as
+	// we'll need it to assign to the new character
+	ch1->set_depth(newdepth);
+
+	// TODO: we're not actually invalidated ourselves, rather our parent is...
+	//       UdoG ? Want to verify this ?
+	ch1->set_invalidated();
+
+	// We won't accept static transforms after a depth swap.
+	// See displaylist_depths_test6.swf for more info.
+	ch1->transformedByScript();
+
+#ifndef NDEBUG
+	// TODO: make this a testInvariant() method for DisplayList
+	DisplayList sorted = *this;
+	sorted.sort();
+	assert(*this == sorted); // check we didn't screw up ordering
+#endif
+
 }
 	
 void DisplayList::clear_unaffected(std::vector<int>& affected_depths, bool call_unload)

@@ -27,7 +27,7 @@
  * 
  *   Frame  | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
  *  --------+---+---+---+---+---+---+---+
- *   Event  |   |PM |   | T*| T |   | J |
+ *   Event  |   |PMM|   | T | T*|   | J |
  * 
  *  P = place (by PlaceObject2)
  *  T = transform matrix (by PlaceObject2)
@@ -41,7 +41,7 @@
  *          swap the character to depth -10, and then swap it back to -16381;
  *  frame4: try to transform the character to the right (50,200)
  *  frame5: try to transform the character to the right (200,200)
- *  frame7: jump back to frame 4
+ *  frame7: jump back to frame 5 and stop
  * 
  * Expected behaviour:
  * 
@@ -134,21 +134,21 @@ main(int argc, char** argv)
   SWFDisplayItem_moveTo(it1, 50, 200); 
   add_actions(mo,
     // Immune to MOVE after swap, no matter if it swapped back to same depth
-    "xcheck_equals(static3._x, 10);"  
+    "check_equals(static3._x, 10);" // after loop back we fail ! :(
     "check_equals(static3.getDepth(), -16381);" 
     );
   SWFMovie_nextFrame(mo); 
 
   // Frame 5: move character at depth 3 to position 100,200
   SWFDisplayItem_moveTo(it1, 200, 200); 
-  add_actions(mo,
-    // Immune to MOVE after swap, no matter if it swapped back to same depth
-    "xcheck_equals(static3._x, 10);" 
-    "check_equals(static3.getDepth(), -16381);" 
-    );
   SWFMovie_nextFrame(mo); 
 
-  // Frame 6: nothing new
+  // Frame 6: nothing new, just tests
+  add_actions(mo,
+    // Immune to MOVE after swap, no matter if it swapped back to same depth
+    "check_equals(static3._x, 10);"  // after loop back we fail ! :(
+    "check_equals(static3.getDepth(), -16381);" 
+    );
   SWFMovie_nextFrame(mo); 
 
   // Frame 7: go to frame 4 
@@ -156,21 +156,20 @@ main(int argc, char** argv)
     " if(loopback == false) "
     " { "
     // this does not reset any thing
-    "   gotoAndPlay(4); "
+    "   gotoAndStop(5); "
     "   loopback = true; "
     " } "
     
     // Static3 refers to same instance
     "xcheck_equals(static3.myThing, 'guess');" // gnash fails as it create a new instance
     // immune to MOVE after swap
-    "xcheck_equals(static3._x, 10);" 
+    "xcheck_equals(static3._x, 10);"  // gnash created a new instance instead..
+
     "check_equals(static3.getDepth(), -16381);" 
+    "totals();"
     );
   SWFMovie_nextFrame(mo); 
 
-  add_actions(mo, "totals(); stop();");
-  SWFMovie_nextFrame(mo); 
-  
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);
