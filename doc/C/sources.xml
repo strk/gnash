@@ -19,6 +19,12 @@
         make check
         make install
       </programlisting>
+    <para>
+      If you are compiling with GCC you will probably need to use a machine
+      with at least 128 megabytes of physical RAM; 64MB is not enough for a
+      couple of the files, even with swap enabled and optimisation turned off.
+    </para>
+    <para>
       Continue reading for detailed step-by-step instructions 
       of the entire procedure.
     </para>  
