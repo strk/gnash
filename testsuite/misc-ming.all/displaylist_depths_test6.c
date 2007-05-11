@@ -27,10 +27,11 @@
  * 
  *   Frame  | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
  *  --------+---+---+---+---+---+---+---+
- *   Event  |   | P |   | T*| T |   | J |
+ *   Event  |   |PM |   | T*| T |   | J |
  * 
  *  P = place (by PlaceObject2)
  *  T = transform matrix (by PlaceObject2)
+ *  M = move to another depth (by swapDepth)
  *  J = jump
  *  * = jump target
  * 
@@ -111,14 +112,15 @@ main(int argc, char** argv)
   add_actions(mo, "loopback = false;");
   SWFMovie_nextFrame(mo); 
 
-  // Frame 2: Add a static movieclip at depth 3 with origin at 10,200
+  // Frame 2: Add a static movieclip at depth 3 with origin at 10,200, swap to depth -10 and swap back
   it1 = add_static_mc(mo, "static3", 3, 10, 200, 20, 20);
   add_actions(mo,
     "static3.myThing = 'guess';"
     "check_equals(static3.getDepth(), -16381);" 
     // swap to another depth
     "static3.swapDepths(-10);"    
-    // swap back to the orignal depth(just touch it and try to restore it)
+    "check_equals(static3.getDepth(), -10);" 
+    // swap back to the orignal depth
     "static3.swapDepths(-16381);" 
     "check_equals(static3.getDepth(), -16381);" 
     );
@@ -130,7 +132,7 @@ main(int argc, char** argv)
   // Frame 4: move character at depth 3 to position 50,200
   SWFDisplayItem_moveTo(it1, 50, 200); 
   add_actions(mo,
-    // immune to MOVE after swap
+    // Immune to MOVE after swap, no matter if it swapped back to same depth
     "xcheck_equals(static3._x, 10);"  
     "check_equals(static3.getDepth(), -16381);" 
     );
@@ -139,7 +141,7 @@ main(int argc, char** argv)
   // Frame 5: move character at depth 3 to position 100,200
   SWFDisplayItem_moveTo(it1, 200, 200); 
   add_actions(mo,
-    // immune to MOVE after swap
+    // Immune to MOVE after swap, no matter if it swapped back to same depth
     "xcheck_equals(static3._x, 10);" 
     "check_equals(static3.getDepth(), -16381);" 
     );
