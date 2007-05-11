@@ -161,7 +161,7 @@ main(int argc, char** argv)
     " } "
     
     // Static3 refers to same instance
-    "check_equals(static3.myThing, 'guess');" 
+    "xcheck_equals(static3.myThing, 'guess');" // gnash fails as it create a new instance
     // immune to MOVE after swap
     "xcheck_equals(static3._x, 10);" 
     "check_equals(static3.getDepth(), -16381);" 

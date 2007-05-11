@@ -1,5 +1,13 @@
 2007-05-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: enabled
+	  displaylist_depths_test6.swf runner
+	* testsuite/misc-ming.all/displaylist_depths_test6.c:
+	  Some comments cleanup, and an additional expected failure
+	  (slightly unrelated to test focus, I'd say).
+
+2007-05-11 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.h: improved documentation for the
 	  add_display_object() method. I think this is where we're going
 	  to add a TimelineInfo record (see Timeline Control page on the
