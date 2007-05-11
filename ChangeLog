@@ -1,5 +1,11 @@
 2007-05-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test8.c:
+	  New case: "Jumping backward to the start of a character's lifetime
+	  after dynamic transformation"
+
+2007-05-11 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.{cpp,h} (swapDepths): abort if target depth
 	  equals depth of source character.
 	* server/sprite_instance.cpp (sprite_swap_depths): raise
