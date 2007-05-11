@@ -157,8 +157,8 @@ main(int argc, char** argv)
     " } "
     
     // Static3 refers to same instance
-    "xcheck_equals(static3.myThing, 'guess');" // gnash fails as it create a new instance
-    "xcheck_equals(static3._x, 200);" // gnash fails as it create a new instance (at 50,200)
+    "check_equals(static3.myThing, 'guess');" 
+    "xcheck_equals(static3._x, 200);" // TODO: check why does gnash fail here 
 
     "check_equals(static3.getDepth(), -16381);" 
     "totals();"

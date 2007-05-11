@@ -132,7 +132,7 @@ main(int argc, char** argv)
     " check_equals(static3._y, 202);" 
     " _root.runs=1;"
     "} else {"
-    " xcheck_equals(static3._y, 204);"  // gnash fails as it creates a new instance
+    " check_equals(static3._y, 204);"  
     " totals();"
     " stop();"
     "}"
@@ -159,11 +159,11 @@ main(int argc, char** argv)
     "   gotoAndPlay(2); " // The movie will be ended in frame 5
     
     // Static3 refers to same instance
-    "xcheck_equals(static3.myThing, 'guess');" // gnash fails as it create a new instance
+    "check_equals(static3.myThing, 'guess');" 
     "check_equals(static3._x, 10);" // Probably PlaceObject was a no-op...
 
     // actions in frame 2 would be executed again, making this a 204, but only *after* this action block terminates..
-    "xcheck_equals(static3._y, 202);" // gnash fails as it creates a new instance
+    "check_equals(static3._y, 202);" 
 
     "check_equals(static3.getDepth(), -16381);" 
     );

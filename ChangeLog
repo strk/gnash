@@ -1,3 +1,23 @@
+2007-05-11 Sandro Santilli <strk@keybit.net>
+
+	* server/dlist.{cpp,h}: Add another DisplayList mass-removal
+	  function taking a vector of gnash::characters to remove.
+	* server/character.h: Add support for attaching TimelineInfo
+	  records to (timeline) instances.
+	* server/sprite_instance.cpp: 
+	  (add_display_object, replace_display_object):
+	  add TimelineInfo record to placed timeline instance. 
+	  (restoreDisplayList): implemented DisplayList reconstruction
+	  algorithm as defined on the "Timeline control" wiki page.
+	  (goto_frame): use restoreDisplayList when jumping-back, properly
+	  set m_current_frame when jumping-forward, for proper TimelineInfo
+	  construction.
+	* testsuite/misc-ming.all/: displaylist_depths_test4.c,
+	  displaylist_depths_test5.c, displaylist_depths_test6.c,
+	  displaylist_depths_test7.c, displaylist_depths_test8.c:
+	  Most new Timeline-focused testcases pass now.
+	  PLEASE HELP MAKING MORE !!
+
 2007-05-11  Rob Savoye  <rob@ute.welcomehome.org>
 
 	* macros/curl.m4, sdl.m4: Drop extraneous results.

@@ -149,6 +149,7 @@ public:
 	// See dox in character.h
 	bool pointInVisibleShape(float x, float y) const;
 
+	/// Return 0-based index to current frame
 	size_t get_current_frame() const
 	{
 		return m_current_frame;
@@ -441,8 +442,7 @@ public:
 	/// See character::unload for more info
 	void unload();
 
-	/// Updates the transform properties of the object at
-	/// the specified depth.
+	/// See DisplayList::move_display_object, this method is just a proxy to that...
 	void	move_display_object(
 			int depth,
 			bool use_cxform,
@@ -814,6 +814,33 @@ private:
 	///
 	void resetDisplayList();
 
+	/// Reconstruct the DisplayList for proper loop-back operations
+	//
+	/// This function will:
+	///
+	/// - Remove from current DisplayList:
+	///	- Timeline instances constructed after target frame 
+	///	- Timeline instances constructed before or at the target frame but no more at the original depth
+	///	- Dynamic instances found in the static depth zone
+	/// - Execute all displaylist tags from first to target frame, incrementing m_current_frame as it goes
+	///
+	/// See: http://www.gnashdev.org/wiki/index.php/TimelineControl#Timeline_instances
+	///
+	/// @param targetFrame
+	///	The target frame for which we're willing to restore the static DisplayList.
+	///	0-based.
+	//
+	/// POSTCONDITIONS:
+	///
+	///	- m_current_frame == targetFrame
+	///
+	/// NOTES: resetDisplayList() above should likely just call restoreDisplayList(0);
+	///
+	/// TODO: consider using this same function for jump-forward too,
+	///       with some modifications...
+	///
+	void restoreDisplayList(size_t targetFrame);
+
 	/// Queue actions in the action list
 	//
 	/// The list of action will be pushed on the current
@@ -872,7 +899,7 @@ private:
 
 	play_state	m_play_state;
 
-	// the _currentframe property
+	// 0-based index to current frame
 	size_t		m_current_frame;
 
 	// true if this sprite reached the last frame and restarted

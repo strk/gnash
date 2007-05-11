@@ -150,7 +150,7 @@ MovieTester::render()
 
 	// Force full redraw by using a WORLD invalidated ranges
 	InvalidatedRanges ranges = _invalidatedBounds; 
-	if ( _forceRedraw )
+	if ( 1 || _forceRedraw )
 	{
 		ranges.setWorld(); // set to world if asked a full redraw
 		_forceRedraw = false; // reset to no forced redraw

@@ -302,7 +302,7 @@ DisplayList::replace_character(
 		// replace existing char
 		*it = di;
 
-		// Shouldn't we construct the new object here too ?
+		// TODO: check: Shouldn't we construct the new object here too ?
 		//ch->construct();
 	}
 
@@ -565,6 +565,35 @@ DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 		}
 
 		if (is_affected == false)
+		{
+			if ( call_unload ) di->unload();
+			it = _characters.erase(it);
+			continue;
+		}
+		it++;
+	}
+}
+
+void
+DisplayList::clear(std::vector<character*>& which, bool call_unload)
+{
+	//GNASH_REPORT_FUNCTION;
+
+	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
+	{
+		DisplayItem& di = *it;
+
+		bool is_affected = false;
+		for (size_t i=0, n=which.size(); i<n; ++i)
+		{
+			if (which[i] == di.get())
+			{
+				is_affected = true;
+				break;
+			}
+		}
+
+		if (is_affected)
 		{
 			if ( call_unload ) di->unload();
 			it = _characters.erase(it);

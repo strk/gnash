@@ -184,6 +184,20 @@ public:
 	void clear(const DisplayList& from, bool call_unload=false);
 
 	/// \brief
+	/// Clear all characters in the display list also found in the given vector.
+	//
+	/// @param which
+	///	A vector containing character instances to remove.
+	///	Any instance found in the vector will be removed
+	///	from this DisplayList.
+	///
+	/// @param call_unload
+	///	If true, UNLOAD event will be invoked on the characters being
+	///	removed. False by default.
+	///
+	void clear(std::vector<character*>& which, bool call_unload=false);
+
+	/// \brief
 	/// Clear all characters in the display list except the ones
 	/// contained in the given vector.
 	//

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.73 2007/04/26 10:56:50 zoulunkai Exp $ */
+/* $Id: character.h,v 1.74 2007/05/11 17:53:29 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -55,6 +55,46 @@ namespace gnash {
 
 namespace gnash {
 
+/// Informations about timeline instances creation
+//
+/// See: http://www.gnashdev.org/wiki/index.php/TimelineControl#Timeline_instances
+///
+class TimelineInfo
+{
+
+public:
+
+	/// Construct a TimelineInfo
+	//
+	/// @param depth
+	///	Depth at which the instance was placed 
+	///
+	/// @param frame
+	///	Frame number in which the instance was placed (0-based)
+	///
+	TimelineInfo(int depth, int frame)
+		:
+		_depth(depth),
+		_frame(frame)
+	{
+	}
+
+
+	/// Return depth of initial placement 
+	int placedAtDepth() const { return _depth; }
+
+	/// Return frame number of initial placement (0-based)
+	size_t placedInFrame() const { return _frame; }
+
+private:
+
+	/// Original depth
+	int _depth;
+
+	/// Frame of placement, 0-based
+	size_t _frame;
+};
+
 /// Character is a live, stateful instance of a character_def.
 //
 /// It represents a single active element in a movie.
@@ -90,6 +130,12 @@ private:
 
 	/// Build the _target member recursive on parent
 	std::string computeTargetPath() const;
+
+	/// Timeline info, for timeline instances
+	//
+	/// For dynamically-created instances this is always NULL
+	///
+	std::auto_ptr<TimelineInfo> _timelineInfo;
 
 protected:
 
@@ -620,6 +666,8 @@ public:
 	/// "Dynamically created" means created trough ActionScript
 	///
 	bool isDynamic() const {
+		// TODO: return _timelineInfo.get() == NULL
+		assert(_timelineInfo.get() ? !_dynamicallyCreated : _dynamicallyCreated);
 		return _dynamicallyCreated;
 	}
 
@@ -627,7 +675,11 @@ public:
 	//
 	/// "Dynamically created" means created trough ActionScript
 	///
+	/// TODO: deprecate this function, all characters should be
+	///	  dynamic by default Unless setTimelineInfo is called.
+	///
 	void setDynamic() {
+		assert(_timelineInfo.get() == NULL);
 		_dynamicallyCreated = true;
 		//assert(get_depth() > 0);
 	}
@@ -835,7 +887,7 @@ public:
 
 	bool isUnloaded() { return _unloaded; }
 	
-public:
+public: // istn't this 'public' reduntant ?
 
 	/// Return full path to this object, in slash notation
 	//
@@ -848,6 +900,40 @@ public:
 	/// e.g. "_level0.sprite1.sprite2.ourSprite"
 	///
 	std::string getTarget() const;
+
+	/// Set timeline information for this instance
+	//
+	/// Timeline info should be set only once, right after creation
+	/// of a timeline instance. If this function is called twice
+	/// Gnash will abort.
+	/// Once timeline informations are added to a character, the
+	/// character become a "timeline instance". If not timeline info
+	/// is available, this is a dynamically-created character.
+	/// See isDynamic();
+	///
+	/// @param depth
+	///	Depth of first placement.
+	///
+	/// @param frame
+	///	Frame of first placement. 0-based.
+	///
+	/// NOTE: if we want to compute TimelineInfo records once at
+	/// 	  parse time and reuse pointers we'll just need to take
+	///	  a TimelineInfo pointer as parameter, externally owned.
+	///	  For now, we'll use a new object for each instance.
+	///
+	void setTimelineInfo(int depth, int frame)
+	{
+		assert(_timelineInfo.get()==NULL); // don't call twice !
+		_timelineInfo.reset(new TimelineInfo(depth, frame));
+	}
+
+	/// Return timeline information, if this is a timeline instance
+	//
+	/// For dynamic instances, NULL is returned.
+	/// Ownership of the returned object belong to this character.
+	///
+	TimelineInfo* getTimelineInfo() { return _timelineInfo.get(); }
 	
   // override from as_object
 	virtual std::string get_text_value() const;	

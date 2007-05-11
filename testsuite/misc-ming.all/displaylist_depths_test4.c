@@ -168,7 +168,7 @@ main(int argc, char** argv)
 		"gotoAndStop(4);"
 
 		// Static3 refers to same instance
-		"xcheck_equals(static3.myThing, 'guess');" // gnash fails by creating a new instance !
+		"check_equals(static3.myThing, 'guess');" 
 		"check_equals(static3.getDepth(), -16381);" 
 
 		// But it has now be reset to position 50,100 as specified
@@ -177,14 +177,14 @@ main(int argc, char** argv)
 
 		// The reference still refers to the same instance
 		//  (see http://www.gnashdev.org/wiki/index.php/SoftReferences)
-		"xcheck_equals(dynRef.myThing, 'guess');" // gnash fails by creating a new instance!
+		"check_equals(dynRef.myThing, 'guess');" 
 		"check_equals(dynRef.getDepth(), -16381);" 
 		"check_equals(typeof(dynRef), 'movieclip');"
 		"check_equals(dynRef._x, 50);"
 		"check_equals(dynRef, static3);"
 
 		// A single instance is created in total
-		"xcheck_equals(depth3Constructed, 1);"  // gnash fails by creating a new instance!
+		"check_equals(depth3Constructed, 1);"  
 
 		"totals();"
 		);
