@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.37 2007/05/03 06:00:15 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.38 2007/05/12 09:59:44 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -185,6 +185,14 @@ long	GST_sound_handler::fill_stream_data(void* data, int data_bytes, int /*sampl
 	return 0;
 }
 
+// This stops sounds when they are done playing
+static gboolean sound_killer (gpointer user_data)
+{
+	gst_elements *gstelements = static_cast<gst_elements*>(user_data);
+	gst_element_set_state (GST_ELEMENT (gstelements->pipeline), GST_STATE_NULL);
+	return false;
+}
+
 // The callback function which refills the buffer with data
 static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 {
@@ -207,8 +215,12 @@ static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*p
 		GST_BUFFER_DATA(buffer) = tmp_buf;
 	}
 
-	// This shouldn't happen
+	// All the data has been given to the pipeline, so now we need to stop
+	// the pipeline. g_idle_add() makes sure sound_killer is called soon.
 	if (gstelements->position > gstelements->data_size) {
+		g_idle_add(sound_killer, user_data);
+		GST_BUFFER_SIZE(buffer) = 0;
+		GST_BUFFER_DATA(buffer) = 0;
 		return;
 	}
 

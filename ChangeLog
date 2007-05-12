@@ -1,3 +1,12 @@
+2007-05-12 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_gst.cpp: Make sure sounds are stopped
+	  when done being played. Should fix bug #19628.
+	* libbase/FLVParser.{h,cpp}: Switched from referring to the last
+	  frame we used, to the next frame we're going to use.
+	* libbase/curl_adapter.cpp: Fix use of usleep() on windows.
+	* macros/opengl.m4: Fixed detection on windows.
+
 2007-05-12 Sandro Santilli <strk@keybit.net>
 
 	* server/character.h (isDynamic): the root movie, not having

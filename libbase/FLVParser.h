@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.5 2007/05/05 16:19:18 strk Exp $
+// $Id: FLVParser.h,v 1.6 2007/05/12 09:59:44 tgc Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -246,10 +246,10 @@ private:
 	FLVAudioInfo* _audioInfo;
 
 	/// Last audio frame returned
-	size_t _lastAudioFrame;
+	size_t _nextAudioFrame;
 
 	/// Last video frame returned
-	size_t _lastVideoFrame;
+	size_t _nextVideoFrame;
 
 	/// Audio stream is present
 	bool _audio;

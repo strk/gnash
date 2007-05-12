@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.9 2007/05/07 23:15:44 tgc Exp $
+// $Id: FLVParser.cpp,v 1.10 2007/05/12 09:59:44 tgc Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -30,8 +30,8 @@ FLVParser::FLVParser()
 	_parsingComplete(false),
 	_videoInfo(NULL),
 	_audioInfo(NULL),
-	_lastAudioFrame(-1),
-	_lastVideoFrame(-1),
+	_nextAudioFrame(0),
+	_nextVideoFrame(0),
 	_audio(false),
 	_video(false)
 {
@@ -74,9 +74,9 @@ uint32_t FLVParser::videoFrameDelay()
 	}
 
 	// If there is no video data return 0
-	if (_videoFrames.size() == 0 || !_video || _lastVideoFrame < 1) return 0;
+	if (_videoFrames.size() == 0 || !_video || _nextVideoFrame < 1) return 0;
 
-	return _videoFrames[_lastVideoFrame]->timestamp - _videoFrames[_lastVideoFrame-1]->timestamp;
+	return _videoFrames[_nextVideoFrame]->timestamp - _videoFrames[_nextVideoFrame-1]->timestamp;
 }
 
 FLVFrame* FLVParser::nextMediaFrame()
@@ -86,7 +86,7 @@ FLVFrame* FLVParser::nextMediaFrame()
 	uint32_t video_size = _videoFrames.size();
 	uint32_t audio_size = _audioFrames.size();
 
-	if ( ! (audio_size <= _lastAudioFrame+1 && video_size <= _lastVideoFrame+1) )
+	if ( ! (audio_size <= _nextAudioFrame && video_size <= _nextVideoFrame) )
 	{
 
 		// Parse a media frame if any left or if needed
@@ -96,12 +96,12 @@ FLVFrame* FLVParser::nextMediaFrame()
 	}
 
 	// Find the next frame in the file
-	bool audioReady = _audioFrames.size() > _lastAudioFrame+1;
-	bool videoReady = _videoFrames.size() > _lastVideoFrame+1;
+	bool audioReady = _audioFrames.size() > _nextAudioFrame;
+	bool videoReady = _videoFrames.size() > _nextVideoFrame;
 	bool useAudio = false;
 
 	if (audioReady && videoReady) {
-		useAudio = _audioFrames[_lastAudioFrame+1]->dataPosition < _videoFrames[_lastVideoFrame+1]->dataPosition;
+		useAudio = _audioFrames[_nextAudioFrame]->dataPosition < _videoFrames[_nextVideoFrame]->dataPosition;
 	} else if (!audioReady && videoReady) {
 		useAudio = false;
 	} else if (audioReady && !videoReady) {
@@ -115,33 +115,32 @@ FLVFrame* FLVParser::nextMediaFrame()
 #define PADDING_BYTES 8
 
 	if (useAudio) {
-		_lastAudioFrame++;
 
 		FLVFrame* frame = new FLVFrame;
-		frame->dataSize = _audioFrames[_lastAudioFrame]->dataSize;
-		frame->timestamp = _audioFrames[_lastAudioFrame]->timestamp;
+		frame->dataSize = _audioFrames[_nextAudioFrame]->dataSize;
+		frame->timestamp = _audioFrames[_nextAudioFrame]->timestamp;
 
-		_lt->seek(_audioFrames[_lastAudioFrame]->dataPosition);
+		_lt->seek(_audioFrames[_nextAudioFrame]->dataPosition);
 		frame->data = new uint8_t[frame->dataSize + PADDING_BYTES];
 		size_t bytesread = _lt->read(frame->data, frame->dataSize);
 		memset(frame->data + bytesread, 0, PADDING_BYTES);
 
 		frame->tag = 8;
+		_nextAudioFrame++;
 		return frame;
 
 	} else {
-		_lastVideoFrame++;
-
 		FLVFrame* frame = new FLVFrame;
-		frame->dataSize = _videoFrames[_lastVideoFrame]->dataSize;
-		frame->timestamp = _videoFrames[_lastVideoFrame]->timestamp;
+		frame->dataSize = _videoFrames[_nextVideoFrame]->dataSize;
+		frame->timestamp = _videoFrames[_nextVideoFrame]->timestamp;
 
-		_lt->seek(_videoFrames[_lastVideoFrame]->dataPosition);
+		_lt->seek(_videoFrames[_nextVideoFrame]->dataPosition);
 		frame->data = new uint8_t[frame->dataSize + PADDING_BYTES];
 		size_t bytesread  = _lt->read(frame->data, frame->dataSize);
 		memset(frame->data + bytesread, 0, PADDING_BYTES);
 
 		frame->tag = 9;
+		_nextVideoFrame++;
 		return frame;
 	}
 
@@ -157,22 +156,22 @@ FLVFrame* FLVParser::nextAudioFrame()
 	if (!_audio && _lastParsedPosition > 0) return NULL;
 
 	// Make sure that there are parsed enough frames to return the need frame
-	while(_audioFrames.size() <= _lastAudioFrame+1 && !_parsingComplete) {
+	while(_audioFrames.size() <= _nextAudioFrame && !_parsingComplete) {
 		if (!parseNextFrame()) break;
 	}
 
 	// If the needed frame can't be parsed (EOF reached) return NULL
-	if (_audioFrames.size() <= _lastAudioFrame+1 || _audioFrames.size() == 0) return NULL;
-
-	_lastAudioFrame++;
+	if (_audioFrames.size() <= _nextAudioFrame || _audioFrames.size() == 0) return NULL;
 
 	FLVFrame* frame = new FLVFrame;
-	frame->dataSize = _audioFrames[_lastAudioFrame]->dataSize;
-	frame->timestamp = _audioFrames[_lastAudioFrame]->timestamp;
+	frame->dataSize = _audioFrames[_nextAudioFrame]->dataSize;
+	frame->timestamp = _audioFrames[_nextAudioFrame]->timestamp;
 
-	_lt->seek(_audioFrames[_lastAudioFrame]->dataPosition);
-	frame->data = new uint8_t[_audioFrames[_lastAudioFrame]->dataSize];
-	_lt->read(frame->data, _audioFrames[_lastAudioFrame]->dataSize);
+	_lt->seek(_audioFrames[_nextAudioFrame]->dataPosition);
+	frame->data = new uint8_t[_audioFrames[_nextAudioFrame]->dataSize];
+	_lt->read(frame->data, _audioFrames[_nextAudioFrame]->dataSize);
+
+	_nextAudioFrame++;
 	return frame;
 
 }
@@ -189,27 +188,27 @@ FLVFrame* FLVParser::nextVideoFrame()
 	}
 
 	// Make sure that there are parsed enough frames to return the need frame
-	while(_videoFrames.size() <= static_cast<uint32_t>(_lastVideoFrame+1) && !_parsingComplete)
+	while(_videoFrames.size() <= static_cast<uint32_t>(_nextVideoFrame) && !_parsingComplete)
 	{
 		if (!parseNextFrame()) break;
 	}
 
 	// If the needed frame can't be parsed (EOF reached) return NULL
-	if (_videoFrames.size() <= _lastVideoFrame+1 || _videoFrames.size() == 0)
+	if (_videoFrames.size() <= _nextVideoFrame || _videoFrames.size() == 0)
 	{
 		//gnash::log_debug("The needed frame (%d) can't be parsed (EOF reached)", _lastVideoFrame);
 		return NULL;
 	}
 
-	_lastVideoFrame++;
-
 	FLVFrame* frame = new FLVFrame;
-	frame->dataSize = _videoFrames[_lastVideoFrame]->dataSize;
-	frame->timestamp = _videoFrames[_lastVideoFrame]->timestamp;
+	frame->dataSize = _videoFrames[_nextVideoFrame]->dataSize;
+	frame->timestamp = _videoFrames[_nextVideoFrame]->timestamp;
 
-	_lt->seek(_videoFrames[_lastVideoFrame]->dataPosition);
-	frame->data = new uint8_t[_videoFrames[_lastVideoFrame]->dataSize];
-	_lt->read(frame->data, _videoFrames[_lastVideoFrame]->dataSize);
+	_lt->seek(_videoFrames[_nextVideoFrame]->dataPosition);
+	frame->data = new uint8_t[_videoFrames[_nextVideoFrame]->dataSize];
+	_lt->read(frame->data, _videoFrames[_nextVideoFrame]->dataSize);
+
+	_nextVideoFrame++;
 	return frame;
 
 }
@@ -236,7 +235,7 @@ uint32_t FLVParser::seekAudio(uint32_t time)
 	// the last audioframe is returned
 	FLVAudioFrame* lastFrame = _audioFrames.back();
 	if (lastFrame->timestamp < time) {
-		_lastAudioFrame = _audioFrames.size() - 2;
+		_nextAudioFrame = _audioFrames.size() - 1;
 		return lastFrame->timestamp;
 	}
 
@@ -261,7 +260,7 @@ uint32_t FLVParser::seekAudio(uint32_t time)
 	}
 
 	gnash::log_debug("Seek (audio): " SIZET_FMT "/" SIZET_FMT " (%u/%u)", bestFrame, numFrames, _audioFrames[bestFrame]->timestamp, time);
-	_lastAudioFrame = bestFrame;
+	_nextAudioFrame = bestFrame + 1;
 	return _audioFrames[bestFrame]->timestamp;
 
 }
@@ -296,7 +295,7 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 			lastFrame = _videoFrames[lastFrameNum];
 		}
 
-		_lastVideoFrame = lastFrameNum-1; // Why -1 ?
+		_nextVideoFrame = lastFrameNum;
 		return lastFrame->timestamp;
 
 	}
@@ -368,9 +367,9 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 
 	gnash::log_debug("Seek (video): " SIZET_FMT "/" SIZET_FMT " (%u/%u)", bestFrame, numFrames, _videoFrames[bestFrame]->timestamp, time);
 
-	_lastVideoFrame = bestFrame;
-	assert( _videoFrames[_lastVideoFrame]->isKeyFrame() );
-	return _videoFrames[_lastVideoFrame]->timestamp;
+	_nextVideoFrame = bestFrame+1;
+	assert( _videoFrames[bestFrame]->isKeyFrame() );
+	return _videoFrames[bestFrame]->timestamp;
 }
 
 
@@ -442,8 +441,8 @@ uint32_t FLVParser::seek(uint32_t time)
 	boost::mutex::scoped_lock lock(_mutex);
 
 	if (time == 0) {
-		if (_video) _lastVideoFrame = -1;
-		if (_audio) _lastAudioFrame = -1;
+		if (_video) _nextVideoFrame = 0;
+		if (_audio) _nextAudioFrame = 0;
 	}
 
 	if (_video)	time = seekVideo(time);
