@@ -1,5 +1,9 @@
 2007-05-12 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h (isDynamic): the root movie, not having
+	  been placed in a parent displaylist, has NO TimelineInfo
+	  associated. Consider this in the assertion aimed at dropping
+	  the _dynamicallyCreated flag.
 	* libbase/tu_file.cpp (std_tell_func): don't require not to 
 	  be at EOF on tell() call. See bug #19861.
 

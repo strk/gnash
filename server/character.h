@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.74 2007/05/11 17:53:29 strk Exp $ */
+/* $Id: character.h,v 1.75 2007/05/12 08:41:13 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -667,7 +667,19 @@ public:
 	///
 	bool isDynamic() const {
 		// TODO: return _timelineInfo.get() == NULL
-		assert(_timelineInfo.get() ? !_dynamicallyCreated : _dynamicallyCreated);
+		// WARNING: cannot use _timelinInfo for this, unless 
+		// we'll provide a TimelineInfo object for top level movies
+		// (_level#) too... which would have no use except implementing
+		// isDynamic(). Note that we have NO automated test for this, but
+		// the "Magical Trevor 2" movie aborts due to a call to getBytesTotal
+		// against the root movie.
+#ifndef NDEBUG
+		if ( ! m_parent || _timelineInfo.get() ) assert(!_dynamicallyCreated);
+		else assert(_dynamicallyCreated);
+#endif
+		// TODO: _parent && !_timelineInfo.get() might work..
+		assert((m_parent && !_timelineInfo.get()) == _dynamicallyCreated);
+		//assert(_timelineInfo.get() ? !_dynamicallyCreated : _dynamicallyCreated);
 		return _dynamicallyCreated;
 	}
 
