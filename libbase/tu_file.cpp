@@ -93,7 +93,7 @@ std_tell_func(void *appdata)
     FILE* f = static_cast<FILE*>(appdata);
 
     //if ( feof(f) )
-    assert ( ! feof(f) );
+    //assert ( ! feof(f) ); // I guess it's legal to call tell() while at eof.
 
     int ret = ftell(f);
     assert(ret <= std_get_stream_size_func(appdata));

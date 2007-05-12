@@ -1,5 +1,10 @@
 2007-05-12 Sandro Santilli <strk@keybit.net>
 
+	* libbase/tu_file.cpp (std_tell_func): don't require not to 
+	  be at EOF on tell() call. See bug #19861.
+
+2007-05-12 Sandro Santilli <strk@keybit.net>
+
 	* server/execute_tag.h, server/swf/PlaceObject2Tag.{cpp,h},
 	  server/swf/tag_loaders.cpp: Drop execute_tag::execute_state_reverse()
 	  and execute_tag::get_depth_id_of_replace_or_add_tag) methods.
