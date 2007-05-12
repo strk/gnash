@@ -6,6 +6,7 @@
 	  frame we used, to the next frame we're going to use.
 	* libbase/curl_adapter.cpp: Fix use of usleep() on windows.
 	* macros/opengl.m4: Fixed detection on windows.
+	* macros/boost.m4: Re-commited Deannas boost patch with a small fix.
 
 2007-05-12 Sandro Santilli <strk@keybit.net>
 
