@@ -2445,6 +2445,14 @@ void sprite_instance::advance_sprite(float delta_time)
 		// First time execute_frame_tags(0) executed in dlist.cpp(child) or movie_def_impl(root)
 		if (m_current_frame != (size_t)prev_frame)
 		{
+			if ( m_current_frame == 0 && has_looped() )
+			{
+				// TODO: check why this would be any different
+				//       then calling restoreDisplayList(0) instead..
+				//       Ah! I think I know..
+				resetDisplayList();
+			}
+
 			// TODO: Make sure m_current_frame is 0-based during execution of DLIST tags
 			execute_frame_tags(m_current_frame, TAG_DLIST|TAG_ACTION);
 		}
@@ -2563,6 +2571,10 @@ sprite_instance::execute_action(action_buffer& ab)
 void
 sprite_instance::resetDisplayList()
 {
+	// TODO: see if/how this can be merged with restoreDisplayList !
+
+	assert(m_current_frame == 0);
+
 	// Add script objects in current DisplayList
 	std::vector<character*> charsToAdd; 
 	std::vector<character*> charsToKeep; 
@@ -2601,9 +2613,10 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 	//       for jump-forwards would do
 	assert(tgtFrame <= m_current_frame);
 
-	// 1. Remove from current DisplayList any timeline instance constructed
-	//    after target frame and still found at the same depth it had at
-	//    time of placement.
+	// 1. Remove from current DisplayList:
+	// 	- Timeline instances constructed after target frame are always removed.
+	// 	- Timeline instances constructed before or at the target frame but no more at the original depth are removed.
+	//  	- Dynamic instances found in the static depth zone 
 	
 	TimelineInstanceFinder finder(tgtFrame);
 #ifdef GNASH_DEBUG_TIMELINE
@@ -2634,9 +2647,6 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 
 	// 2. Execute all displaylist tags from first to target frame 
 
-	// we're going to change this during frame tags execution
-	//size_t currentFrameBackup = m_current_frame;
-
 	for (size_t f = 0; f<=tgtFrame; ++f)
 	{
 		//
@@ -2648,11 +2658,6 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 		execute_frame_tags(f, TAG_DLIST);
 	}
 
-	// Set current frame back to the backed-up value
-	// TODO: this is likely NOT needed, just documenting that we're going
-	//       to modify m_current_frame could be enough (would be the caller's
-	//       responsibility to do what they think is needed).
-	//m_current_frame = currentFrameBackup;
 }
 
 // 0-based frame number !
@@ -2662,14 +2667,6 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 	testInvariant();
 
 	assert(frame < m_def->get_frame_count());
-
-	m_is_reverse_execution = false;
-
-	if ( frame == 0 && has_looped() )
-	{
-		resetDisplayList();
-
-	}
 
 	// Execute this frame's init actions, if necessary.
 	if (m_init_actions_executed[frame] == false)
@@ -2721,29 +2718,12 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 		if ( typeflags & TAG_ACTION ) tag->execute_action(this);
 	}
 
+	// TODO: do _frame0_chars still make sense ?
+	//       Should we use the same algorithm in restoreDisplayList instead ?
 	if ( frame == 0 && ! has_looped() )
 	{
 		// Save DisplayList state
 		_frame0_chars = m_display_list;
-	}
-
-	testInvariant();
-}
-
-void sprite_instance::execute_frame_tags_reverse(size_t frame)
-{
-	testInvariant();
-
-	assert(frame < m_def->get_frame_count());
-
-	m_is_reverse_execution = true;
-
-	const PlayList& playlist = m_def->get_playlist(frame);
-
-	for (unsigned int i=0, n=playlist.size(); i<n; ++i)
-	{
-	    execute_tag*	e = playlist[i];
-	    e->execute_state_reverse(this, frame);
 	}
 
 	testInvariant();
@@ -2763,28 +2743,6 @@ void sprite_instance::execute_remove_tags(int frame)
 			    e->execute_state(this);
 			}
 		}
-}
-
-execute_tag*
-sprite_instance::find_previous_replace_or_add_tag(int frame,
-		int depth, int id)
-{
-	uint32_t depth_id = ((depth & 0x0FFFF) << 16) | (id & 0x0FFFF);
-
-	for (int f = frame - 1; f >= 0; f--)
-	{
-	    const PlayList& playlist = m_def->get_playlist(f);
-	    for (int i = playlist.size() - 1; i >= 0; i--)
-		{
-		    execute_tag*	e = playlist[i];
-		    if (e->get_depth_id_of_replace_or_add_tag() == depth_id)
-			{
-			    return e;
-			}
-		}
-	}
-
-    return NULL;
 }
 
 void
@@ -2853,7 +2811,17 @@ sprite_instance::goto_frame(size_t target_frame_number)
 	// Construct the DisplayList of the target frame
 	//
 	
-  // TODO:
+	if (target_frame_number < m_current_frame)
+	// Go backward to a previous frame
+	{
+#ifdef NEW_TIMELINE_DESIGN // new design
+		// restoreDisplayList takes care of properly setting the m_current_frame variable
+		restoreDisplayList(target_frame_number);
+		assert(m_current_frame == target_frame_number);
+#else // old design
+
+		set_invalidated();
+
   // <UdoG> current design is sub-optimal because it causes unnecessary 
   // redraw. Consider a static graphic that stays at it's position all
   // the time. When looping betwen two frames 
@@ -2864,15 +2832,6 @@ sprite_instance::goto_frame(size_t target_frame_number)
   // redraw of the whole sprite even if it doesn't change visually
   // at all.
 
-	if (target_frame_number < m_current_frame)
-	// Go backward to a previous frame
-	{
-#ifdef NEW_TIMELINE_DESIGN // new design
-		// restoreDisplayList takes care of properly setting the m_current_frame variable
-		restoreDisplayList(target_frame_number);
-		assert(m_current_frame == target_frame_number);
-#else // old design
-		set_invalidated();
 
 		resetDisplayList();
 		for (size_t f = 0; f<=target_frame_number; f++)
@@ -2928,6 +2887,8 @@ sprite_instance::goto_frame(size_t target_frame_number)
 
 	// m_action_list contains actions from frame 'target_frame_number'
 	// to frame 'm_current_frame', too much than needed, clear it first.
+	// TODO: check this, we didn't execute TAG_ACTION tags...
+	//       Can it be we're cleaning up too many actions here ?
 	m_action_list.clear();
 
 	// Get the actions of target frame.(We don't have a direct way to

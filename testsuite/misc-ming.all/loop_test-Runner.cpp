@@ -61,7 +61,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
-	dbglogfile.setActionDump(1);
+	//dbglogfile.setActionDump(1);
 
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);

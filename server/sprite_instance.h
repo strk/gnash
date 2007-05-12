@@ -252,25 +252,6 @@ public:
 	virtual void	advance_sprite(float delta_time);
 
 
-	/// Execute the tags associated with the specified frame,
-	/// IN REVERSE.
-	/// I.e. if it's an "add" tag, then we do a "remove" instead.
-	/// Only relevant to the display-list manipulation tags:
-	/// add, move, remove, replace.
-	///
-	/// frame is 0-based
-	void execute_frame_tags_reverse(size_t frame);
-
-	// return true is sprite is revserse executing frame tags
-	bool is_reverse_execution() const
-	{
-		return  m_is_reverse_execution;
-	}
-
-	execute_tag* find_previous_replace_or_add_tag(int frame,
-		int depth, int id);
-
-
 	/// Execute any remove-object tags associated with
 	/// the specified frame.
 	/// frame is 0-based
@@ -905,9 +886,6 @@ private:
 	// true if this sprite reached the last frame and restarted
 	bool		m_has_looped;
 
-	// true if reverse executing frame tags
-	bool		m_is_reverse_execution;
-
 	// a bit-array class would be ideal for this
 	std::vector<bool>	m_init_actions_executed;
 
@@ -968,10 +946,10 @@ protected:
 	/// Execution of 1st frame tags is specially handled:
 	///
 	/// - After executing them for the first time
-	///   the DisplayList state is saved.
-	///
-	/// - Before subsequent executions (loop mode)
-	///   the DisplayList is restored from saved state.
+	///   the DisplayList state is saved into the _frame0_chars
+	///   member, which is used by resetDisplayList() on loop-back
+	///   TODO: drop this _frame0_chars thing ? See comments in
+	///   resetDisplayList()
 	///
 	/// @param frame
 	///	Frame number. 0-based

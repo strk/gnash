@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.7 2007/04/28 04:54:42 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.8 2007/05/12 06:50:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -307,7 +307,7 @@ PlaceObject2Tag::execute(sprite_instance* m)
 	      m_name,
 	      m_event_handlers,
 	      m_depth,
-	      m->is_reverse_execution(),	// place_object doesn't do replacement when not in reverse execution
+	      false, // don't replace characters at target depth (TODO: check if a general rule!)
 	      m_color_transform,
 	      m_matrix,
 	      m_ratio,
@@ -348,61 +348,6 @@ PlaceObject2Tag::~PlaceObject2Tag()
 	{
 		delete m_event_handlers[i];
 	}
-}
-
-void
-PlaceObject2Tag::execute_state_reverse(sprite_instance* m, int frame)
-{
-    switch (m_place_type) {
-      case PLACE:
-	  // reverse of add is remove
-	  m->remove_display_object(m_depth, m_tag_type == 4 ? m_character_id : -1);
-	  break;
-
-      case MOVE:
-	  // reverse of move is move
-	  m->move_display_object(
-	      m_depth,
-	      m_has_cxform,
-	      m_color_transform,
-	      m_has_matrix,
-	      m_matrix,
-	      m_ratio,
-	      m_clip_depth);
-	  break;
-
-      case REPLACE:
-      {
-	  // reverse of replace is to re-add the previous object.
-	  execute_tag*	last_add = m->find_previous_replace_or_add_tag(frame, m_depth, -1);
-	  if (last_add) {
-	      last_add->execute_state(m);
-	  } else {
-	      log_error(_("reverse REPLACE can't find previous replace or add tag(%d, %d)"),
-			frame, m_depth);
-
-	  }
-	  break;
-      }
-    }
-}
-
-uint32_t
-PlaceObject2Tag::get_depth_id_of_replace_or_add_tag() const
-{
-	uint32_t depthid = 0;
-	if (m_place_type == PLACE || m_place_type == REPLACE)
-	{
-		int id = -1;
-		if (m_tag_type == SWF::PLACEOBJECT)
-		{
-		    // Old-style PlaceObject; the corresponding Remove
-		    // is specific to the character_id.
-		    id = m_character_id;
-		}
-		depthid = ((m_depth & 0x0FFFF) << 16) | (id & 0x0FFFF);
-	}
-	return depthid;
 }
 
 } // namespace gnash::SWF::tag_loaders

@@ -66,36 +66,12 @@ public:
 		if ( is_action_tag() ) execute(m);
 	}
 
-	/// Execute the reverse version of this (state) tag.
-	//
-	/// Reverse execution is only meaningful for state tegs.
-	///
-	/// @param m
-	///
-	/// @param frame
-	///
-	virtual void execute_state_reverse(sprite_instance* m, int /*frame*/)
-	{
-		// is the 'frame' arg is really needed ?
-		execute_state(m);
-	}
-
 	/// Return true if this is a RemoveObject tag
 	virtual bool	is_remove_tag() const { return false; }
 
 	/// Return true if this is an action tag.
 	virtual bool	is_action_tag() const { return false; }
 
-	/// \brief
-	/// Return 16-bit depth and id of character packed into one 32-bit int
-	/// IFF this is a replace or add tag, otherwise return 0.
-	//
-	/// The default implementation returns 0
-	///
-	virtual uint32_t	get_depth_id_of_replace_or_add_tag() const
-	{
-		return 0;
-	}
 };
 
 

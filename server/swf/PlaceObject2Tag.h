@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.3 2007/04/24 06:54:06 zoulunkai Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.4 2007/05/12 06:50:37 strk Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -121,9 +121,6 @@ private:
 	// read SWF::PLACEOBJECT2
 	void readPlaceObject2(stream* in, int movie_version);
 
-	void execute_state_reverse(sprite_instance* m, int frame);
-    
-	uint32_t	get_depth_id_of_replace_or_add_tag() const;
 };
 
 } // namespace gnash::SWF::tag_loaders

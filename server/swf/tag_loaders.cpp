@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.96 2007/05/02 18:19:02 martinwguy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.97 2007/05/12 06:50:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -844,22 +844,6 @@ public:
     virtual void	execute_state(sprite_instance* m)
 	{
 	    execute(m);
-	}
-
-    virtual void	execute_state_reverse(sprite_instance* m, int frame)
-	{
-	    // reverse of remove is to re-add the previous object.
-	    execute_tag*	last_add = m->find_previous_replace_or_add_tag(frame, m_depth, m_id);
-	    if (last_add)
-		{
-		    last_add->execute_state(m);
-		}
-	    else
-		{
-		    log_error(_("reverse REMOVE can't find previous replace or add tag(%d, %d)"),
-			      frame, m_depth);
-
-		}
 	}
 
     virtual bool	is_remove_tag() const { return true; }

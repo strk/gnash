@@ -1,3 +1,21 @@
+2007-05-12 Sandro Santilli <strk@keybit.net>
+
+	* server/execute_tag.h, server/swf/PlaceObject2Tag.{cpp,h},
+	  server/swf/tag_loaders.cpp: Drop execute_tag::execute_state_reverse()
+	  and execute_tag::get_depth_id_of_replace_or_add_tag) methods.
+	* server/sprite_instance.{cpp,h}: (advance_sprite, execute_frame_tags):
+	  call resetDisplayList in advance_sprite rather then delegate to
+	  execute_frame_tags, to avoid an invocation during
+	  restoreDisplayList(). (restoreDisplayList): fix comment for
+	  step1, remove commented out code. Drop the m_is_reverse_execution
+	  flag and associated getter. Drop execute_frame_tags_reverse() method.
+	  Drop find_previous_replace_or_add_tag method. (goto_frame) Move
+	  UdoG comment where it belonge [old design block], add comment about
+	  possible problem with clearing the action queue after displaylist 
+	  restoration.
+	* testsuite/misc-ming.all/loop_test-Runner.cpp: Don't set action
+	  verbosity.
+
 2007-05-11 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.{cpp,h}: Add another DisplayList mass-removal
