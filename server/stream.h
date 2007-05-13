@@ -40,12 +40,13 @@ namespace gnash {
 		float	read_fixed();
 		void	align();
 
-		uint8_t	read_u8();
-		int8_t	read_s8();
-		uint16_t	read_u16();
-		int16_t	read_s16();
-		uint32_t	read_u32();
-		int32_t	read_s32();
+		unsigned read(char *buf, unsigned count);
+		uint8_t  read_u8();
+		int8_t   read_s8();
+		uint16_t read_u16();
+		int16_t  read_s16();
+		uint32_t read_u32();
+		int32_t  read_s32();
 		unsigned read_variable_count()
 		{
 			unsigned count = read_u8();

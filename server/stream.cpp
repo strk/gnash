@@ -30,6 +30,10 @@ namespace gnash {
 	{
 	}
 
+	unsigned stream::read(char *buf, unsigned count)
+	{
+		return m_input->read_bytes(buf, count);
+	}
 
 // @@ better?
 // 	int	stream::read_uint(int bitcount)

@@ -1,3 +1,8 @@
+2007-05-12 Martin Guy <martinwguy@yahoo.it>
+
+	* server/stream.{h.cpp}: Punch a block-read primitive through the
+	  stream layer.
+
 2007-05-12 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_gst.cpp: Make sure sounds are stopped
