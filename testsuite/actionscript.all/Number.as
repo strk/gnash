@@ -26,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.18 2007/04/19 16:57:15 strk Exp $";
+rcsid="$Id: Number.as,v 1.19 2007/05/13 17:13:09 strk Exp $";
 
 #include "check.as"
 
@@ -304,6 +304,8 @@ check(!anum.hasOwnProperty('toString'));
 // Check conversion to number
 //-----------------------------------------------------------
 
+#ifdef MING_SUPPORTS_ASM
+
 asm { push 'val',4 tonumber setvariable };
 check_equals(val, 4);
 
@@ -369,3 +371,6 @@ obj = function() {}; obj.valueOf = function() { return 9; };
 asm { push 'val','obj' getvariable tonumber setvariable };
 check_equals(val, 9); 
 check_equals(9, val); 
+
+#endif // defined(MING_SUPPORTS_ASM)
+

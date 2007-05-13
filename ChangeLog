@@ -1,3 +1,11 @@
+2007-05-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Number.as: skip conversion-to-number
+	  tests if Ming doesnt' support ASM.
+	* testsuite/actionscript.all/XML.as: add tests exposing two bugs
+	  with XML (parseXML appending newly parsed stuff and ignoreWhite
+	  being unsupported).
+
 2007-05-12 Martin Guy <martinwguy@yahoo.it>
 
 	* server/stream.{h.cpp}: Punch a block-read primitive through the

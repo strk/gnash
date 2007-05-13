@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.28 2007/04/17 12:58:20 strk Exp $";
+rcsid="$Id: XML.as,v 1.29 2007/05/13 17:13:09 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -60,6 +60,8 @@ check(!XML.hasOwnProperty("load") );
 check(!XML.hasOwnProperty("parseXML") );
 check(!XML.hasOwnProperty("send") );
 check(!XML.hasOwnProperty("sendAndLoad") );
+// ignoreWhite is undefined by default, but is used when set to true
+check(!XML.prototype.hasOwnProperty("ignoreWhite") );
 
 check(XMLNode.prototype.hasOwnProperty("appendChild") );
 check(XMLNode.prototype.hasOwnProperty("cloneNode") );
@@ -668,6 +670,28 @@ xcheck(! myxml.loaded ); // is really loaded in a background thread
 xcheck_equals(myxml.loaded, false ); // is really loaded in a background thread
 note("myxml.loaded = "+myxml.loaded);
 note("myxml.load() returned "+ret);
+
+//------------------------------------------------
+// Test XML.ignoreWhite
+//------------------------------------------------
+
+myxml2 = new XML();
+xmlin = "<X1T> <X1C1> </X1C1> <X1C2> 
+</X1C2> 	</X1T>";
+xmlin2 = "<X0><X1/></X0>";
+xmlin2_out = "<X0><X1 /></X0>";
+xmlin_stripwhite = "<X1T><X1C1 /><X1C2 /></X1T>";
+
+myxml2.ignoreWhite = false; // doesn't work w/out load ?
+myxml2.parseXML(xmlin);
+xcheck_equals(myxml2.toString(), xmlin);  // gnash fails discarding newlines and tabs I think..
+myxml2.parseXML(xmlin2); // parsing twice doesn't append !
+xcheck_equals(myxml2.toString(), xmlin2_out); 
+
+myxml2.ignoreWhite = true; // doesn't work w/out load ?
+myxml2.parseXML(xmlin);
+xcheck_equals(myxml2.toString(), xmlin_stripwhite); 
+
 
 // We're done
 //totals();
