@@ -7,7 +7,7 @@ CLEANFILES = \
 	POTFILES \
 	update-po
 
-translations = es fr
+translations = es fr de
 
 pofiles := $(patsubst %,%.po,$(translations))
 gmofiles := $(patsubst %,%.gmo,$(translations))
@@ -66,3 +66,4 @@ force:
 install-data-hook: $(gmofiles)
 	$(INSTALL_DATA) es.gmo $(datadir)/locale/es/gnash.mo
 	$(INSTALL_DATA) fr.gmo $(datadir)/locale/fr/gnash.mo
+	$(INSTALL_DATA) de.gmo $(datadir)/locale/de/gnash.mo

@@ -1,7 +1,8 @@
 2007-05-13  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* po/Makefile.am: Add install-data-hook target so the .gmo files
-	get installed.
+	get installed. Build and install German translation.
+	* po/de.po: German translation by benjamin.goose@lrz.uni-muenchen.de.
 
 2007-05-13 Sandro Santilli <strk@keybit.net>
 
