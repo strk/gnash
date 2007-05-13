@@ -1,5 +1,6 @@
 2007-05-13 Sandro Santilli <strk@keybit.net>
 
+	* macros/boost.m4: typo fix (might need another go at testing)
 	* testsuite/actionscript.all/Number.as: skip conversion-to-number
 	  tests if Ming doesnt' support ASM.
 	* testsuite/actionscript.all/XML.as: add tests exposing two bugs
