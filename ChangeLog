@@ -2,6 +2,9 @@
 
 	* server/stream.{h.cpp}: Punch a block-read primitive through the
 	  stream layer.
+	* server/parser/sound_definition.cpp: Move ADPCM code elsewhere
+	* server/swf/tag_loaders.cpp: Decode all linear formats into native 16,
+	  move ADPCM code here where it's used.
 
 2007-05-12 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
