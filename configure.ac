@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.308 2007/05/10 12:20:42 martinwguy Exp $
+dnl $Id: configure.ac,v 1.309 2007/05/13 10:39:49 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -231,7 +231,7 @@ dnl 24 bit: RGB24, BGR24
 dnl 32 bit: RGBA32, BGRA32
 pixelformat=all
 AC_ARG_WITH(pixelformat,
-  AC_HELP_STRING([--with-pixelformat=], [Use the specified pixel format for AGG]),
+  AC_HELP_STRING([--with-pixelformat=], [Use the specified pixel format for AGG (default=all)]),
   if test -n ${withval}; then
     pixelformat="${withval}"
     withval=`echo ${withval} | tr '\054' ' ' `
