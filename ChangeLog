@@ -2,8 +2,10 @@
 
 	* po/Makefile.am: Add install-data-hook target so the .gmo files
 	get installed. Build and install German translation.
-	* po/de.po: German translation by benjamin.goose@lrz.uni-muenchen.de.
+	* po/de.po: German translation by benjamin.goose@lrz.uni-muenchen.de.	
 
+	* doc/C/sources.xml: Fix unclosed <para> tags.
+	
 2007-05-13 Sandro Santilli <strk@keybit.net>
 
 	* macros/boost.m4: typo fix (might need another go at testing)
