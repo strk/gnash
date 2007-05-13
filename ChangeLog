@@ -1,3 +1,8 @@
+2007-05-13  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* po/Makefile.am: Add install-data-hook target so the .gmo files
+	get installed.
+
 2007-05-13 Sandro Santilli <strk@keybit.net>
 
 	* macros/boost.m4: typo fix (might need another go at testing)

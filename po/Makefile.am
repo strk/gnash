@@ -63,3 +63,6 @@ endif
 force:
 
 # install-hook: rename the es.gmo files to gnash.mo at installtion time
+install-data-hook: $(gmofiles)
+	$(INSTALL_DATA) es.gmo $(datadir)/locale/es/gnash.mo
+	$(INSTALL_DATA) fr.gmo $(datadir)/locale/fr/gnash.mo
