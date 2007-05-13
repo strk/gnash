@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.38 2007/05/10 12:14:14 martinwguy Exp $
+dnl $Id: ffmpeg.m4,v 1.39 2007/05/14 00:57:37 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -72,7 +72,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     fi
   else
     AC_MSG_RESULT(${ac_cv_path_ffmpeg_incl})
-      if test -f $i/ffmpeg/avformat.h; then
+      if test -f !$i/ffmpeg/avformat.h; then
         AC_MSG_WARN([avformat.h not found!])
         ac_cv_path_ffmpeg_incl=""
       fi

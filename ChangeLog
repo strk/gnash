@@ -5,6 +5,8 @@
 	* po/de.po: German translation by benjamin.goose@lrz.uni-muenchen.de.	
 
 	* doc/C/sources.xml: Fix unclosed <para> tags.
+	* macros/ffmpeg.m4: Only print warning and reset
+	ac_cv_path_ffmpeg_incl if avformat.h doesn't exist.
 	
 2007-05-13 Sandro Santilli <strk@keybit.net>
 
