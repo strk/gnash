@@ -16,7 +16,7 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-/* $Id: fill_style.h,v 1.3 2007/02/19 15:37:02 udog Exp $ */
+/* $Id: fill_style.h,v 1.4 2007/05/14 20:15:03 strk Exp $ */
 
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
@@ -52,6 +52,7 @@ class DSOEXPORT fill_style
 {
 public:
 
+	/// Create a solid opaque white fill.
 	fill_style();
 
 	/// Construct a clipped bitmap fill style, for
@@ -85,6 +86,7 @@ public:
 
 	void	set_color(rgba new_color) { m_color = new_color; }
 
+	/// Get fill type, see SWF::fill_style_type
 	int	get_type() const { return m_type; }
 	
 	/// Sets this style to a blend of a and b.  t = [0,1] (for shape morphing)
@@ -126,6 +128,7 @@ private:
 	friend class morph2_character_def;
 	friend class triangulating_render_handler;
 	
+	/// Fill type, see SWF::fill_style_type
 	int	m_type;
 	rgba	m_color;
 	matrix	m_gradient_matrix;

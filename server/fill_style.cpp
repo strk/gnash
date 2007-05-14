@@ -56,7 +56,8 @@ gradient_record::read(stream* in, int tag_type)
 
 fill_style::fill_style()
     :
-    m_type(0),
+    m_type(SWF::FILL_SOLID),
+    m_color(), // FF.FF.FF.FF
     m_gradient_bitmap_info(0),
     m_bitmap_character(0)
 {

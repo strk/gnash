@@ -1,5 +1,6 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* server/fill_style.{cpp,h}: document default constructor and type.
 	* server/vm/ASHandlers.cpp (CommonGetUrl): check url security also
 	  when invoking firefox.
 	* server/font.cpp (readDefineFont, readDefineFont2_or_3): use 
