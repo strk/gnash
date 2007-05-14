@@ -248,7 +248,13 @@ namespace gnash {
 		}
 
 		// Do the seek.
-		m_input->set_position(pos);
+		if ( m_input->set_position(pos) == TU_FILE_SEEK_ERROR )
+		{
+			// TODO: should we throw an exception ?
+			//       we might be called from an exception handler
+			//       so throwing here might be a double throw...
+			log_swferror(_("Unexpected end of stream"));
+		}
 	}
 
 

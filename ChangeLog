@@ -1,5 +1,12 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* libbase/tu_file.{cpp,h}: changed set_position signature to return
+	  an int (0 for success TU_FILE_SEEK_ERROR on error).
+	* server/stream.cpp (end_tag): check return from
+	  tu_file::set_position().
+
+2007-05-14 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am, NetStream-Square.c,
 	  NetStream-SquareTest.c, Video-EmbedSquare.c,
 	  Video-EmbedSquareTest.c: Renamed video tests to conform

@@ -56,12 +56,14 @@ std_write_func(const void* src, int bytes, void* appdata)
 
 static int
 std_seek_func(int pos, void *appdata)
-// Return 0 on success, or TU_FILE_SEEK_ERROR on failure.
 {
     assert(appdata);
 
-    // TODO: I guess we don't want to allow seeking after stream size, do we ?
-    assert(pos <= std_get_stream_size_func(appdata));
+    // TODO: optimize this by caching total stream size ?
+    if (pos > std_get_stream_size_func(appdata))
+    {
+	    return TU_FILE_SEEK_ERROR;
+    }
 
     clearerr((FILE*) appdata);	// make sure EOF flag is cleared.
     int	result = fseek((FILE*)appdata, pos, SEEK_SET);

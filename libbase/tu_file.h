@@ -226,7 +226,9 @@ public:
     /// TODO: define what happens when an error occurs, or
     ///       when we're already in an error condition
     ///
-    void 	set_position(int p) { m_seek(p, m_data); }
+    /// @return 0 on success, or TU_FILE_SEEK_ERROR on failure.
+    ///
+    int	set_position(int p) { return m_seek(p, m_data); }
 
     /// \brief Seek to the end of the stream
     //
