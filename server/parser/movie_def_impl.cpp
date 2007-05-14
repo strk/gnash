@@ -839,6 +839,21 @@ parse_tag:
 				_swf_end_pos);
                 }
 
+		if (tag_type == SWF::END)
+                {
+			if ((unsigned int) str.get_position() != _swf_end_pos)
+                        {
+		    		IF_VERBOSE_MALFORMED_SWF(
+				// Safety break, so we don't read past
+				// the end of the  movie.
+				log_swferror(_("Hit stream-end tag, "
+					"but not at the advertised SWF end; "
+					"stopping for safety."));
+		    		)
+		    		break;
+			}
+		}
+
 		SWF::TagLoadersTable::loader_function lf = NULL;
 		//log_parse("tag_type = %d\n", tag_type);
 		if (tag_type == SWF::SHOWFRAME)
@@ -886,21 +901,6 @@ parse_tag:
 		str.close_tag();
 
 		setBytesLoaded(str.get_position());
-
-		if (tag_type == SWF::END)
-                {
-		    IF_VERBOSE_MALFORMED_SWF(
-			if ((unsigned int) str.get_position() != _swf_end_pos)
-                        {
-				// Safety break, so we don't read past
-				// the end of the  movie.
-				log_swferror(_("Hit stream-end tag, "
-					"but not at the advertised SWF end; "
-					"stopping for safety."));
-				break;
-			}
-		    )
-		}
 	}
 
 	} catch (const std::exception& e) {

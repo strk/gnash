@@ -1,5 +1,7 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.cpp (read_all_swf): handle premature
+	  SWF::END tag.
 	* libbase/tu_file.{cpp,h}: changed set_position signature to return
 	  an int (0 for success TU_FILE_SEEK_ERROR on error).
 	* server/stream.cpp (end_tag): check return from
