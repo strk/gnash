@@ -1,3 +1,9 @@
+2007-05-14 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/: displaylist_depths_test9.c, Makefile.am
+	  new scenario for Timeline Control, gnash passes.
+	  But luckly, caught a bug in ActionDuplicateClip:)
+	  
 2007-05-13  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* po/Makefile.am: Add install-data-hook target so the .gmo files
