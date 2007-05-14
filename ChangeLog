@@ -1,5 +1,7 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.cpp (run): exit with a failure if input movie has
+	  collapsed dimensions (malformed SWF most likely).
 	* server/asobj/xml.{cpp,h}: change extractNode interface to return a
 	  bool, so it can implement a custom ignoreWhite thing (the libxml2
 	  XML_PARSE_NOBLANKS seems to be not working. Add getXMLOptions()
