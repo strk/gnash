@@ -1282,7 +1282,7 @@ TEST_CASES = \
 	frame_label_testrunner \
 	path_format_testrunner \
 	duplicate_movie_clip_testrunner \
-	duplicate_movie_clip_test2runner
+	duplicate_movie_clip_test2runner \
 	event_handler_scope_testrunner \
 	masks_testrunner \
 	key_event_testrunner \

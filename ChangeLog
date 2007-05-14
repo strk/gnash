@@ -1,3 +1,9 @@
+2007-05-14 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am: fixed bad typo (missing
+	  backslash) which triggered NO warning from ./autogen.sh
+	  but still resulted in bogus Makefile.in produced (sic!).
+
 2007-05-14 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/FLVParser.cpp: Fixed a out-of-bound error (bug #19866).
