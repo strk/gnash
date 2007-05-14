@@ -121,6 +121,7 @@ check_PROGRAMS = \
 	frame_label_test \
 	path_format_test \
 	duplicate_movie_clip_test \
+	duplicate_movie_clip_test2 \
 	event_handler_scope_test \
 	masks_testrunner \
 	key_event_test \
@@ -175,6 +176,7 @@ check_SCRIPTS = \
 	frame_label_testrunner \
 	path_format_testrunner \
 	duplicate_movie_clip_testrunner \
+	duplicate_movie_clip_test2runner \
 	event_handler_scope_testrunner \
 	matrix_testrunner \
 	static_vs_dynamic1_testrunner \
@@ -642,6 +644,21 @@ duplicate_movie_clip_test.swf: duplicate_movie_clip_test
 
 duplicate_movie_clip_testrunner: $(srcdir)/../generic-testrunner.sh duplicate_movie_clip_test.swf
 	sh $< -r5 $(top_builddir) duplicate_movie_clip_test.swf > $@
+	chmod 755 $@
+
+
+duplicate_movie_clip_test2_SOURCES =	\
+	duplicate_movie_clip_test2.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+duplicate_movie_clip_test2_LDADD = $(MING_LIBS)
+
+duplicate_movie_clip_test2.swf: duplicate_movie_clip_test2
+	./duplicate_movie_clip_test2 $(top_srcdir)/testsuite/media
+
+duplicate_movie_clip_test2runner: $(srcdir)/../generic-testrunner.sh duplicate_movie_clip_test2.swf
+	sh $< -r5 $(top_builddir) duplicate_movie_clip_test2.swf > $@
 	chmod 755 $@
 
 
@@ -1265,6 +1282,7 @@ TEST_CASES = \
 	frame_label_testrunner \
 	path_format_testrunner \
 	duplicate_movie_clip_testrunner \
+	duplicate_movie_clip_test2runner
 	event_handler_scope_testrunner \
 	masks_testrunner \
 	key_event_testrunner \
