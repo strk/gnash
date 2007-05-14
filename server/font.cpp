@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.29 2007/05/14 19:04:46 strk Exp $ */
+/* $Id: font.cpp,v 1.30 2007/05/14 20:28:14 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -175,7 +175,7 @@ namespace gnash {
 
 				// Create & read the shape.
 				shape_character_def* s = new shape_character_def;
-				s->read(in, SWF::DEFINESHAPE, false, m); // why not DEFINEFONT ?
+				s->read(in, SWF::DEFINEFONT, false, m); // why not DEFINEFONT ?
 
 				m_glyphs[i] = s;
 			}}
@@ -263,7 +263,7 @@ namespace gnash {
 
 				// Create & read the shape.
 				shape_character_def* s = new shape_character_def;
-				s->read(in, SWF::DEFINESHAPE2, false, m); // why not DEFINEFONT2 ?
+				s->read(in, SWF::DEFINEFONT2, false, m); // why not DEFINEFONT2 ?
 
 				m_glyphs[i] = s;
 			}}

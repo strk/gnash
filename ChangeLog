@@ -1,5 +1,13 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* server/font.cpp (readDefineFont, readDefineFont2_or_3): pass
+	  shape_character_def the real tag we're parsing.
+	* server/parser/shape_character_def.cpp (read): when parsing
+	  DEFINEFONT tags provide a dummy solid white fill style to
+	  act as a placeholder for consistency checking.
+
+2007-05-14 Sandro Santilli <strk@keybit.net>
+
 	* server/fill_style.{cpp,h}: document default constructor and type.
 	* server/vm/ASHandlers.cpp (CommonGetUrl): check url security also
 	  when invoking firefox.
