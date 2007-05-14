@@ -16,6 +16,11 @@
 2007-05-14 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/FLVParser.cpp: Fixed a out-of-bound error (bug #19866).
+	* testsuite/media/square.flv: Added. Used for testing.
+	* testsuite/misc-ming.all/NetStream-Square.c: Added. Created simple
+	  SWF which plays square.flv using NetStream.
+	* testsuite/misc-ming.all/Video-EmbedSquare.c: Added. Created simple
+	  SWF which plays an embedded video (ripped from square.flv).
 
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
