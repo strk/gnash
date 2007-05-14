@@ -13,6 +13,8 @@
 	  But luckly, caught a bug in ActionDuplicateClip:)
 	* testsuite/misc-ming.all/action_execution_order_test8.c
 		indent
+	* testsuite/misc-ming.all/: duplicate_movie_clip_test2.c, Makefile.am
+	  new testcase for duplicateMovieClip.
 	  
 2007-05-13  Rob Savoye  <rob@bertha.welcomehome.org>
 
