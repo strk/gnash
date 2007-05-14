@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.29 2007/05/13 17:13:09 strk Exp $";
+rcsid="$Id: XML.as,v 1.30 2007/05/14 14:37:38 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -644,6 +644,17 @@ myxml.onLoad = function(success)
 	topnode = myxml.firstChild;
 	check_equals(topnode.nodeName, 'XML');
 	check_equals(topnode.attributes.attr1, 'attr1 value');
+
+	// XML, comment, NULL 
+	if ( typeof(myxml.lastChildNodesCount) == 'undefined' )
+	{
+		myxml.lastChildNodesCount = myxml.childNodes.length;
+	}
+	else
+	{
+		check_equals(myxml.childNodes.length, myxml.lastChildNodesCount);
+	}
+	xcheck_equals(myxml.childNodes.length, 3); // gnash fails discarding the comment and the ending blanks
 };
 check_equals(typeof(myxml.status), 'number');
 #if OUTPUT_VERSION < 7
@@ -671,6 +682,9 @@ xcheck_equals(myxml.loaded, false ); // is really loaded in a background thread
 note("myxml.loaded = "+myxml.loaded);
 note("myxml.load() returned "+ret);
 
+// Load again, to verify new parsing doesn't get appended to the old
+ret = myxml.load( MEDIA(gnash.xml) );
+
 //------------------------------------------------
 // Test XML.ignoreWhite
 //------------------------------------------------
@@ -684,8 +698,10 @@ xmlin_stripwhite = "<X1T><X1C1 /><X1C2 /></X1T>";
 
 myxml2.ignoreWhite = false; // doesn't work w/out load ?
 myxml2.parseXML(xmlin);
+check_equals(myxml2.childNodes.length, 1);  
 xcheck_equals(myxml2.toString(), xmlin);  // gnash fails discarding newlines and tabs I think..
 myxml2.parseXML(xmlin2); // parsing twice doesn't append !
+check_equals(myxml2.childNodes.length, 1);  
 xcheck_equals(myxml2.toString(), xmlin2_out); 
 
 myxml2.ignoreWhite = true; // doesn't work w/out load ?

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.40 2007/04/18 14:07:32 jgilmore Exp $ */
+/* $Id: xml.cpp,v 1.41 2007/05/14 14:37:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -299,7 +299,7 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
     }
 }
 
-// Read in an XML document from the specified source
+/*private*/
 bool
 XML::parseDoc(xmlDocPtr document, bool mem)
 {
@@ -344,16 +344,18 @@ XML::parseXML(const std::string& xml_in)
 #endif
 
     //_bytes_total = _bytes_loaded = xml_in.size();
-    
-    bool ret=true;
 
+    // Clear current data
+    clear(); 
+    
     xmlInitParser();
     _doc = xmlParseMemory(xml_in.c_str(), xml_in.size());
     if (_doc == 0) {
         log_error(_("Can't parse XML data"));
         return false;
     }
-    ret = parseDoc(_doc, true);
+
+    bool ret = parseDoc(_doc, true);
     xmlCleanupParser();
     xmlFreeDoc(_doc);
     xmlMemoryDump();
@@ -371,9 +373,12 @@ XML::parseXML(const std::string& xml_in)
 bool
 XML::load(const URL& url)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
   
     //log_msg(_("%s: mem is %d"), __FUNCTION__, mem);
+
+    // Clear current data
+    clear(); 
 
     std::auto_ptr<tu_file> str ( StreamProvider::getDefaultInstance().getStream(url) );
     if ( ! str.get() ) 
@@ -695,16 +700,21 @@ as_value xml_getbytestotal(const fn_call& fn)
 
 as_value xml_parsexml(const fn_call& fn)
 {
-//    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     as_value	method;
     as_value	val;    
     boost::intrusive_ptr<XML> ptr = ensureType<XML>(fn.this_ptr);
 
-    if (fn.nargs > 0)
+    if (fn.nargs < 1)
     {
-        const std::string& text = fn.arg(0).to_string(&(fn.env()));
-        ptr->parseXML(text);
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror("XML.parseXML() needs one argument");
+        );
+        return as_value();
     }
+
+    const std::string& text = fn.arg(0).to_string(&(fn.env()));
+    ptr->parseXML(text);
     
     return as_value();
 }
@@ -807,6 +817,14 @@ XML::initParser()
     }
 }
 
+void
+XML::clear()
+{
+	// TODO: should set childs's parent to NULL ?
+	_children.clear();
+
+	_attributes.clear();
+}
 
 } // end of gnash namespace
 

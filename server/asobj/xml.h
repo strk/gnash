@@ -107,10 +107,14 @@ public:
 	void set_member(const std::string& name, const as_value& val );
 
     // Methods
-    // This is the base method used by both parseXML() and load().
-    bool parseDoc(xmlDocPtr document, bool mem);
 
-    // Parses an XML document into the specified XML object tree.
+    /// Parses an XML document into the specified XML object tree.
+    //
+    /// This reads in an XML file from disk and parses into into a memory resident
+    /// tree which can be walked through later.
+    ///
+    /// Calls to this function clear any precedently parsed data.
+    ///
     bool parseXML(const std::string& xml_in);
 
     // Loads a document (specified by
@@ -127,8 +131,6 @@ public:
 
     bool loaded()    { return _loaded; }
     
-    void clear() {}
-  
     XMLNode *processNode(xmlTextReaderPtr reader, XMLNode *node);
 
     void  change_stack_frame(int frame, gnash::as_object *xml, gnash::as_environment *env);
@@ -155,6 +157,17 @@ public:
     int getBytesTotal()          { return _bytes_total; };
 
 private:
+
+    /// Remove all childs
+    void clear();
+  
+
+    /// Read in an XML document from the specified source
+    //
+    /// This is the base method used by both parseXML() and load().
+    ///
+    bool parseDoc(xmlDocPtr document, bool mem);
+
     xmlDocPtr _doc;
     xmlNodePtr _firstChild;
     
