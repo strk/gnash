@@ -1,5 +1,9 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: duplicate_movie_clip_test2.c,
+	  displaylist_depths_test9.c: don't expect any failure. 
+	* server/as_environment.cpp (find_target): strip leading colon chars
+	  in path components (fixes ActionDuplicateClip bug).
 	* testsuite/misc-ming.all/Makefile.am: fixed bad typo (missing
 	  backslash) which triggered NO warning from ./autogen.sh
 	  but still resulted in bogus Makefile.in produced (sic!).

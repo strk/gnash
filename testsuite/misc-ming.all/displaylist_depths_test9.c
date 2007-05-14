@@ -123,7 +123,7 @@ main(int argc, char** argv)
   // Frame 4: create a script instance at depth -20.
   add_actions(mo, 
     "duplicateMovieClip('/:static3', 'dup2', -20);"
-    "xcheck_equals(dup2.getDepth(), -20);"); //gnash fails because of a bug in ActionDuplicateClip
+    "check_equals(dup2.getDepth(), -20);"); 
   SWFMovie_nextFrame(mo); 
 
   // Frame 5: nothing new

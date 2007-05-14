@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.76 2007/04/28 07:22:43 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.77 2007/05/14 12:23:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -562,8 +562,11 @@ as_environment::find_target(const std::string& path) const
 	} else if (next_slash) {
 	    // Cut off the slash and everything after it.
 	    subpart.resize(next_slash - p);
+	    // Remove any column in the subpart
 	}
 	
+	while ( ! subpart.empty() && subpart[0] == ':' ) subpart = subpart.substr(1);
+
 	// No more components to scan
 	if ( subpart.empty() )
 	{

@@ -115,12 +115,12 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(dup1)", "'undefined'");
   
   add_actions(mo, "duplicateMovieClip('/:mc1', 'dup2', 2);");
-  xcheck_equals(mo, "typeof(dup2)", "'movieclip'");
+  check_equals(mo, "typeof(dup2)", "'movieclip'");
   add_actions(mo, "removeMovieClip(dup2);");
   check_equals(mo, "typeof(dup2)", "'undefined'");
   
   add_actions(mo, "duplicateMovieClip('/:mc1/', 'dup3', 3);");
-  xcheck_equals(mo, "typeof(dup3)", "'movieclip'");
+  check_equals(mo, "typeof(dup3)", "'movieclip'");
   add_actions(mo, "removeMovieClip(dup3);");
   check_equals(mo, "typeof(dup3)", "'undefined'");
   
