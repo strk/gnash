@@ -161,6 +161,19 @@ private:
     /// Remove all childs
     void clear();
   
+    /// \brief
+    /// Return true if ignoreWhite property was set to anythign evaluating
+    /// to true.
+    bool ignoreWhite() const;
+
+    /// Return the libxml2 options to use during parsing.
+    //
+    /// The options might depend on current XML object state, like
+    /// the 'ignoreWhite' parameter.
+    ///
+    /// See http://xmlsoft.org/html/libxml-parser.html#xmlParserOption
+    ///
+    int getXMLOptions() const;
 
     /// Read in an XML document from the specified source
     //
@@ -193,7 +206,10 @@ private:
     /// @param element
     ///     The XMLNode to initialize.
     ///
-    void extractNode(XMLNode& element, xmlNodePtr node, bool mem);
+    /// @return false if the xmlNodePtr shouldn't exist
+    /// (ie: an all-blanks node with ignoreWhite set to true).
+    ///
+    bool extractNode(XMLNode& element, xmlNodePtr node, bool mem);
 
     void setupFrame(gnash::as_object *xml, XMLNode *data, bool src);
   

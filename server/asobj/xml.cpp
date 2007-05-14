@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.41 2007/05/14 14:37:37 strk Exp $ */
+/* $Id: xml.cpp,v 1.42 2007/05/14 16:24:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -233,7 +233,7 @@ XML::onCloseEvent()
     call_method(method, &env, this, 0, 0);
 }
 
-void
+bool
 XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
 {
     xmlAttrPtr attr;
@@ -271,19 +271,24 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
             element.nodeTypeSet(tText);
 
             ptr = xmlNodeGetContent(node);
-            if (ptr != NULL)
-            {
-                if ((strchr((const char *)ptr, '\n') == 0) && (ptr[0] != 0))
-                {
-                    if (node->content)
-                    {
-                        //log_msg(_("extractChildNode from text for %s has contents '%s'"), node->name, ptr);
-                        std::string val(reinterpret_cast<const char*>(ptr));
-                        element.nodeValueSet(val);
-                    }
-                }
-                xmlFree(ptr);
-            }
+            if (ptr == NULL) return false;
+	    if (node->content)
+	    {
+		const char* in = reinterpret_cast<const char*>(ptr);
+		// XML_PARSE_NOBLANKS seems not to be working, so here's
+		// a custom implementation of it.
+		if ( ignoreWhite() )
+		{
+			if ( strspn(in, " \n\t\r") == strlen(in) )
+			{
+				log_msg("Text node value consists in blanks only, discarding");
+				return false;
+			}
+		}
+		std::string val(in);
+		element.nodeValueSet(val);
+	    }
+            xmlFree(ptr);
     }
 
     // See if we have any data (content)
@@ -293,10 +298,12 @@ XML::extractNode(XMLNode& element, xmlNodePtr node, bool mem)
     {
         child = new XMLNode();
         child->setParent(&element);
-        extractNode(*child, childnode, mem);
+        if ( ! extractNode(*child, childnode, mem) ) break;
         element._children.push_back(child);
         childnode = childnode->next;
     }
+
+    return true;
 }
 
 /*private*/
@@ -318,8 +325,10 @@ XML::parseDoc(xmlDocPtr document, bool mem)
     {
         boost::intrusive_ptr<XMLNode> child = new XMLNode();
         child->setParent(this);
-        extractNode(*child, cur, mem);
-        _children.push_back(child);
+        if ( extractNode(*child, cur, mem) ) 
+	{
+        	_children.push_back(child);
+	}
     }  
 
     return true;
@@ -348,8 +357,10 @@ XML::parseXML(const std::string& xml_in)
     // Clear current data
     clear(); 
     
-    xmlInitParser();
-    _doc = xmlParseMemory(xml_in.c_str(), xml_in.size());
+    initParser();
+
+    //_doc = xmlParseMemory(xml_in.c_str(), xml_in.size());
+    _doc = xmlReadMemory(xml_in.c_str(), xml_in.size(), NULL, NULL, getXMLOptions());
     if (_doc == 0) {
         log_error(_("Can't parse XML data"));
         return false;
@@ -392,8 +403,8 @@ XML::load(const URL& url)
 
     initParser();
 
-    /// see: http://xmlsoft.org/html/libxml-parser.html#xmlParserOption
-    int options = XML_PARSE_RECOVER | XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
+    int options = getXMLOptions();
+
     _doc = xmlReadIO(readFromTuFile, closeTuFile, str.get(), url.str().c_str(), NULL, options);
     if ( str->get_error() )
     {
@@ -418,15 +429,16 @@ XML::load(const URL& url)
 
     _bytes_loaded = _bytes_total;
 
-    parseDoc(_doc, false);
+    bool ret = parseDoc(_doc, false);
+
     xmlCleanupParser();
     xmlFreeDoc(_doc);
     xmlMemoryDump();
-    _loaded = 1;
+    _loaded = ret ? 1 : 0;
 
-    onLoadEvent(true);
+    onLoadEvent(ret);
 
-    return true;
+    return ret;
 }
 
 
@@ -824,6 +836,37 @@ XML::clear()
 	_children.clear();
 
 	_attributes.clear();
+}
+
+/*private*/
+bool
+XML::ignoreWhite() const
+{
+    // TODO: initialize this thing once...
+    std::string propname;
+    if ( VM::get().getSWFVersion() < 7 ) propname = "ignorewhite";
+    else propname = "ignoreWhite";
+
+    as_value val;
+    if ( ! const_cast<XML*>(this)->get_member(propname, &val) ) return false;
+    return val.to_bool();
+}
+
+/*private*/
+int
+XML::getXMLOptions() const
+{
+    int options = XML_PARSE_RECOVER | XML_PARSE_NOWARNING | XML_PARSE_NOERROR;
+
+    if ( ignoreWhite() )
+    {
+	    // This doesn't seem to work, so the blanks skipping
+	    // is actually implemented in XML::extractNode instead.
+            //log_msg("Adding XML_PARSE_NOBLANKS to options");
+            options |= XML_PARSE_NOBLANKS;
+    }
+
+    return options;
 }
 
 } // end of gnash namespace
