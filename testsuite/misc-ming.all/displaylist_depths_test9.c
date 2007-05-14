@@ -27,10 +27,10 @@
  * 
  *   Frame  | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
  *  --------+---+---+---+---+---+---+---+
- *   Event  |   |P  | D | D | * | D | J |
+ *   Event  |   |P  | p | p | * | p | J |
  * 
  *  P = place (by PlaceObject2)
- *  D = duplicate a movie clip
+ *  p = place (by ActionScript)
  *  J = jump
  *  * = jump target
  * 
