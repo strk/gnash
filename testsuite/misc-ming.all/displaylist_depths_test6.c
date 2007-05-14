@@ -19,7 +19,7 @@
 /*
  * Zou Lunkai, zoulunkai@gmail.com
  *
- * Test how swapDepth affects DisplayList refresh on gotoAndPlay(current-X).
+ * Test "Jumping backward to the midle of a character's lifetime after swap and swap back"
  *
  * run as ./displaylist_depths_test6
  *
