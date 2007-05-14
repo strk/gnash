@@ -1,5 +1,7 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* server/font.cpp (readDefineFont, readDefineFont2_or_3): use 
+	  symbolic names for tag type.
 	* server/parser/shape_character_def.cpp (read): temporarely 
 	  disabled the "don't set line and fill styles if not defined yet".
 	  It seems to break a lot of movies. We should find out why though,
