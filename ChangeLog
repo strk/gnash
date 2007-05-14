@@ -49,6 +49,7 @@
 	* gui/kde.cpp (qwidget::qwidget):  Translate strings for the
 	  pop-up menu items.
 	* libbase/network.cpp (Network::writeNet):  Remove dead code.
+	* AUTHORS, gui/gtk.cpp (authors):  Add myself to authors list.
 	
 2007-05-14 Sandro Santilli <strk@keybit.net>
 

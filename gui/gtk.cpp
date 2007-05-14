@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.90 2007/05/14 09:44:21 jgilmore Exp $ */
+/* $Id: gtk.cpp,v 1.91 2007/05/14 10:03:38 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -845,6 +845,7 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
         "Hannes Mayr", 
         "Markus Gothe", 
         "Vitaly Alexeev",
+	"John Gilmore",
         NULL 
     };
 
