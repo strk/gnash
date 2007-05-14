@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.30 2007/05/14 14:37:38 strk Exp $";
+rcsid="$Id: XML.as,v 1.31 2007/05/14 14:52:52 strk Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -702,7 +702,7 @@ check_equals(myxml2.childNodes.length, 1);
 xcheck_equals(myxml2.toString(), xmlin);  // gnash fails discarding newlines and tabs I think..
 myxml2.parseXML(xmlin2); // parsing twice doesn't append !
 check_equals(myxml2.childNodes.length, 1);  
-xcheck_equals(myxml2.toString(), xmlin2_out); 
+check_equals(myxml2.toString(), xmlin2_out); 
 
 myxml2.ignoreWhite = true; // doesn't work w/out load ?
 myxml2.parseXML(xmlin);

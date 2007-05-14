@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.33 2007/04/18 14:07:32 jgilmore Exp $ */
+/* $Id: xmlnode.cpp,v 1.34 2007/05/14 14:52:52 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -310,7 +310,18 @@ XMLNode::stringify(const XMLNode& xml, std::ostream& xmlout)
             xmlout << " " << xa.name() << "=\"" << xa.value() << "\"";
         }
 
-        xmlout << ">";
+    	// If the node has no content, just close the tag now
+    	if ( nodevalue.empty() && xml._children.empty() )
+    	{
+    		xmlout << " />";
+		return;
+    	}
+	else
+	{
+    		// Will use a closing tag later
+    		xmlout << ">";
+	}
+
     }
 
     // Node value first, then children

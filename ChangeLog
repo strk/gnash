@@ -1,5 +1,7 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/xmlnode.cpp (stringify): represent empty nodes with the
+	  "<openclose />" format.
 	* server/asobj/xml.{cpp,h}: parseDoc made private; add clear()
 	  method for dropping childs and attibutes; clear() on parseXML() or
 	  load() calls.
