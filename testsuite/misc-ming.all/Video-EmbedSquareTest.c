@@ -30,22 +30,36 @@
 #define OUTPUT_VERSION 7
 #define OUTPUT_FILENAME "Video-EmbedSquare.swf"
 
+const char* mediadir=".";
 
 int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-
-  Ming_init();
-  Ming_useSWFVersion (OUTPUT_VERSION);
-
   int frames;
   SWFVideoStream stream;
   SWFDisplayItem item;
   FILE *flv;
+  char filename[256];
 
-  flv = fopen("../media/square.flv", "rb");
-  if (flv == NULL) return -1;
+  if ( argc>1 ) mediadir=argv[1];
+  else
+  {
+    fprintf(stderr, "Usage: %s <mediadir>\n", argv[0]);
+    return 1;
+  }
+	
+  
+  sprintf(filename, "%s/square.flv", mediadir);
+  flv = fopen(filename, "rb");
+  if (flv == NULL) {
+	  perror(filename);
+	  return -1;
+  }
+
+  Ming_init();
+  Ming_useSWFVersion (OUTPUT_VERSION);
+
 	
   mo = newSWFMovie();
   SWFMovie_setDimension(mo, 128, 96);

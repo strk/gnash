@@ -30,28 +30,42 @@
 #define OUTPUT_VERSION 7
 #define OUTPUT_FILENAME "NetStream-ExtSquare.swf"
 
+const char* mediadir=".";
+char filename[256];
+
 
 int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-
-  Ming_init();
-  Ming_useSWFVersion (OUTPUT_VERSION);
-
   SWFVideoStream stream;
   SWFDisplayItem item;
   SWFAction a;
-  char* buffer= 
+  char buffer[1024];
+
+  int video_width = 128;
+  int video_height = 96;
+
+  if ( argc>1 ) mediadir=argv[1];
+  else
+  {
+    fprintf(stderr, "Usage: %s <mediadir>\n", argv[0]);
+    return 1;
+  }
+	
+  sprintf(filename, "%s/square.flv", mediadir);
+  
+  sprintf(buffer, 
   	"nc=new NetConnection();"
 	"nc.connect(null);"
 	"_global.stream = new NetStream(nc);"
 	"video.attachVideo(_global.stream); "
 	"_global.stream.setBufferTime(2); "
-	"_global.stream.play(\"../media/square.flv\");";
+	"_global.stream.play(\"%s\");", filename);
 
-  int video_width = 128;
-  int video_height = 96;
+  Ming_init();
+  Ming_useSWFVersion (OUTPUT_VERSION);
+
 
   mo = newSWFMovie();
   SWFMovie_setDimension(mo, 128, 96);

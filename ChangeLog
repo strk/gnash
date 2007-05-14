@@ -1,5 +1,14 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, NetStream-Square.c,
+	  NetStream-SquareTest.c, Video-EmbedSquare.c,
+	  Video-EmbedSquareTest.c: Renamed video tests to conform
+	  to the tests naming convention (end with "test"). Enabled
+	  build of the SWF. Test runners still missing.
+	  Get FLV path on command line.
+
+2007-05-14 Sandro Santilli <strk@keybit.net>
+
 	* server/font.cpp: more robustness improvements.
 	* server/font.cpp (readDefineFont, readDefineFont2_or_3): pass
 	  shape_character_def the real tag we're parsing.

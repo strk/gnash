@@ -128,6 +128,8 @@ check_PROGRAMS = \
 	key_event_testrunner \
 	static_vs_dynamic1 \
 	static_vs_dynamic2 \
+	Video-EmbedSquareTest \
+	NetStream-SquareTest \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -1219,6 +1221,29 @@ static_vs_dynamic2.swf: static_vs_dynamic2
 static_vs_dynamic2_testrunner: $(srcdir)/../generic-testrunner.sh static_vs_dynamic2.swf
 	sh $< $(top_builddir) static_vs_dynamic2.swf > $@
 	chmod 755 $@
+
+
+NetStream_SquareTest_SOURCES = \
+	NetStream-SquareTest.c \
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+
+NetStream_SquareTest_LDADD = $(MING_LIBS)
+
+NetStream-SquareTest.swf: NetStream-SquareTest
+	./NetStream-SquareTest $(srcdir)/../media
+
+Video_EmbedSquareTest_SOURCES = \
+	Video-EmbedSquareTest.c \
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+
+Video_EmbedSquareTest_LDADD = $(MING_LIBS)
+
+Video-EmbedSquareTest.swf: Video-EmbedSquareTest
+	./Video-EmbedSquareTest $(srcdir)/../media
 
 Dejagnu_SOURCES =	\
 	Dejagnu.c	\
