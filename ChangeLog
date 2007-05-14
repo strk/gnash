@@ -1,3 +1,7 @@
+2007-05-14 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/FLVParser.cpp: Fixed a out-of-bound error (bug #19866).
+
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
 	* po/Makefile.am: create destination directories before trying to

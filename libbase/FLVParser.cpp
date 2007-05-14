@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.10 2007/05/12 09:59:44 tgc Exp $
+// $Id: FLVParser.cpp,v 1.11 2007/05/14 11:32:49 tgc Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -74,9 +74,9 @@ uint32_t FLVParser::videoFrameDelay()
 	}
 
 	// If there is no video data return 0
-	if (_videoFrames.size() == 0 || !_video || _nextVideoFrame < 1) return 0;
+	if (_videoFrames.size() == 0 || !_video || _nextVideoFrame < 2) return 0;
 
-	return _videoFrames[_nextVideoFrame]->timestamp - _videoFrames[_nextVideoFrame-1]->timestamp;
+	return _videoFrames[_nextVideoFrame-1]->timestamp - _videoFrames[_nextVideoFrame-2]->timestamp;
 }
 
 FLVFrame* FLVParser::nextMediaFrame()
