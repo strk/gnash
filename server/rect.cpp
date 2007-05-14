@@ -36,11 +36,23 @@ void	rect::read(stream* in)
 	float ymin = (float) in->read_sint(nbits);
 	float ymax = (float) in->read_sint(nbits);
 
-	// TODO: check for swapper X or Y values,
-	//       or an assertion will fail !
+	// Check for swapped X or Y values
+	if (xmax < xmin || ymax < ymin)
+	{
+		// We set invalid rectangles to NULL, but we might instead
+		// want to actually swap the values IFF the proprietary player
+		// does so. TODO: check it out.
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("Invalid rectangle: xmin=%g xmax=%g "
+			"ymin=%g ymax=%g. Read as Null.",
+			xmin, xmax, ymin, ymax);
+		);
+		_range.setNull();
+		return;
+	}
+
 	_range.setTo(xmin, ymin, xmax, ymax);
 
-//		IF_DEBUG(log_msg("rect::read() nbits = %d\n", nbits));
 }
 
 // Debug spew.

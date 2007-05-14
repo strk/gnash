@@ -1,3 +1,11 @@
+2007-05-14 Sandro Santilli <strk@keybit.net>
+
+	* server/rect.{cpp,h} (read): check for min/max values swapped
+	  reporting SWF malformation and setting the rect to NULL if
+	  that happens.
+	* server/parser/movie_def_impl.cpp (readHeader): report SWF
+	  malformation if movie bounds were malformed.
+
 2007-05-14 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/: displaylist_depths_test9.c, Makefile.am

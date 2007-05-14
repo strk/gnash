@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: rect.h,v 1.17 2007/04/24 12:01:55 udog Exp $ */
+/* $Id: rect.h,v 1.18 2007/05/14 08:54:20 strk Exp $ */
 
 #ifndef GNASH_RECT_H
 #define GNASH_RECT_H
@@ -98,6 +98,23 @@ public:
 		_range.setWorld();
 	}
 
+	/// Read a bit-packed rectangle from an SWF stream
+	//
+	/// Format of the bit-packed rectangle is:
+	///
+	///     bits  | name  | description
+	///     ------+-------+-------------------------
+	///	  5   | nbits | number of bits used in subsequent values
+	///	nbits | xmin  | minimum X value
+	///	nbits | xmax  | maximum X value
+	///	nbits | ymin  | minimum Y value
+	///	nbits | ymax  | maximum Y value
+	///
+	/// If max values are less then min values the SWF is malformed;
+	/// in this case this method will raise an swf_error and set the
+	/// rectangle to the NULL rectangle. See is_null().
+	///	
+	///
 	void	read(stream* in);
 
 	void	print() const;

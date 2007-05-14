@@ -458,6 +458,15 @@ movie_def_impl::readHeader(std::auto_ptr<tu_file> in, const std::string& url)
 	_str.reset(new stream(_in.get()));
 
 	m_frame_size.read(_str.get());
+	// If the rect is malformed, rect::read would already 
+	// print an error. We check again here just to give 
+	// the error are better context.
+	if ( m_frame_size.is_null() )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("non-finite movie bounds");
+		);
+	}
 	m_frame_rate = _str->read_u16() / 256.0f;
 	m_frame_count = _str->read_u16();
 
