@@ -15,16 +15,15 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.24 2007/05/03 23:05:08 nihilus Exp $
+# $Id: Makefile.am,v 1.25 2007/05/14 13:36:08 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
-AM_LDFLAGS = \
-	$(top_builddir)/libbase/libgnashbase.la
-
 lib_LTLIBRARIES = libgnashamf.la
 libgnashamf_la_SOURCES = amf.cpp rtmp.cpp
-libgnashamf_la_LDFLAGS =  -release $(VERSION) -export-dynamic -no-undefined ${AM_LDFLAGS} 
+
+libgnashamf_la_LIBADD = $(top_builddir)/libbase/libgnashbase.la
+libgnashamf_la_LDFLAGS =  -release $(VERSION) ${AM_LDFLAGS} 
 # noinst_HEADERS = amf.h amfutf8.h
 
 AM_CPPFLAGS = -I.. -I$(srcdir) \

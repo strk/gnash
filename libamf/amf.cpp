@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.37 2007/05/14 09:44:21 jgilmore Exp $ */
+/* $Id: amf.cpp,v 1.38 2007/05/14 13:36:08 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,7 +28,7 @@
 #include <vector>
 
 #if defined(_WIN32) || defined(WIN32)
-#	include <Winsock2.h>
+#	include <winsock2.h>
 #else
 #	include <netinet/in.h>
 #endif

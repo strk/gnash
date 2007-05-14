@@ -23,6 +23,7 @@
 
 #include <vector>
 #include <string>
+#include <cstring>
 #include <map>
 
 #include "amfutf8.h"

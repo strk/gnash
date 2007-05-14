@@ -1,3 +1,10 @@
+2007-05-14  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* server/gnash.h: Include memory for auto_ptr.
+	* libamf/amf.h: Include cstring for C string functions.
+	* libamf/amf.cpp: Use lower case for win32 headers, as that's what
+	Mingw32 uses.
+	
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/displaylist_depths_test7.c: fix description
