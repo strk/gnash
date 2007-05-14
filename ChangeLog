@@ -1,3 +1,8 @@
+2007-05-14 Sandro Santilli <strk@keybit.net>
+
+	* utilities/Makefile.am: put GNASH_LIBS in LDADD and external
+	  libs in LDFLAGS. Drop '-dlopen self'. Please review.
+
 2007-05-14  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* server/gnash.h: Include memory for auto_ptr.
