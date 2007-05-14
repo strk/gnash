@@ -19,7 +19,7 @@
 /*
  * Zou Lunkai, zoulunkai@gmail.com
  *
- * Test how swapDepth affects DisplayList refresh on gotoAndPlay(current-X).
+ * Test "Jumping backward to the midle of a character's lifetime after swap to same depth"
  *
  * run as ./displaylist_depths_test7
  *
@@ -27,7 +27,7 @@
  * 
  *   Frame  | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
  *  --------+---+---+---+---+---+---+---+
- *   Event  |   |PM |   | T | T*|   | J |
+ *   Event  |   |PM |   | T*| T |   | J |
  * 
  *  P = place (by PlaceObject2)
  *  T = transform matrix (by PlaceObject2)
@@ -41,14 +41,14 @@
  *          swap the character to depth -16381 (YES: SAME DEPTH!)
  *  frame4: try to transform the character to the right (50,200)
  *  frame5: try to transform the character to the right (200,200)
- *  frame7: jump back to frame 5 and stop
+ *  frame7: jump back to frame 4 and stop
  * 
  * Expected behaviour:
  * 
  *  Depth swapping in frame2 have NO effect. In particular doesn't prevent subsequent static transformations to apply.
  *  In frame 4 the instance is positioned at 50,200
  *  In frame 5 and 6 the instance is positioned at 200,200
- *  After the jump we have the same instances at depth -16381, and still positioned at 200,200.
+ *  After the jump we have the same instances at depth -16381, and positioned at 50,200.
  *  A single instance has been constructed in total.
  *   
  */
@@ -147,7 +147,7 @@ main(int argc, char** argv)
     );
   SWFMovie_nextFrame(mo); 
 
-  // Frame 7: go to frame 4 
+  // Frame 7: go to frame 4
   add_actions(mo,
     " if(loopback == false) "
     " { "
@@ -158,7 +158,7 @@ main(int argc, char** argv)
     
     // Static3 refers to same instance
     "check_equals(static3.myThing, 'guess');" 
-    "xcheck_equals(static3._x, 200);" // TODO: check why does gnash fail here 
+    "check_equals(static3._x, 50);" 
 
     "check_equals(static3.getDepth(), -16381);" 
     "totals();"

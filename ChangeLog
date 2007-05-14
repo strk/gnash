@@ -1,5 +1,10 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/displaylist_depths_test7.c: fix description
+	  to match actual implementation. Don't expect a wrong behaviour.
+
+2007-05-14 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: duplicate_movie_clip_test2.c,
 	  displaylist_depths_test9.c: don't expect any failure. 
 	* server/as_environment.cpp (find_target): strip leading colon chars
