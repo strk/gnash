@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.30 2007/05/14 20:28:14 strk Exp $ */
+/* $Id: font.cpp,v 1.31 2007/05/14 20:40:10 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -29,6 +29,7 @@
 #include "movie_definition.h"
 #include "shape_character_def.h"
 #include "swf.h"
+#include "GnashException.h"
 
 #include <utility> // for std::make_pair
 
@@ -139,12 +140,12 @@ namespace gnash {
 		log_parse(_("reading DefineFont"));
 		);
 
-		int	table_base = in->get_position();
+		unsigned long table_base = in->get_position();
 
 		// Read the glyph offsets.  Offsets
 		// are measured from the start of the
 		// offset table.
-		std::vector<int>	offsets;
+		std::vector<unsigned>	offsets;
 		offsets.push_back(in->read_u16());
 
 		IF_VERBOSE_PARSE (
@@ -167,10 +168,22 @@ namespace gnash {
 		if (m->get_create_font_shapes() == DO_LOAD_FONT_SHAPES)
 		{
 			// Read the glyph shapes.
+			unsigned long endTagPos = in->get_tag_end_position();
+
 			{for (int i = 0; i < count; i++)
 			{
 				// Seek to the start of the shape data.
-				int	new_pos = table_base + offsets[i];
+				unsigned long new_pos = table_base + offsets[i];
+				if ( new_pos > endTagPos )
+				{
+        				throw ParserException(_("Glyphs offset table corrupted in DefineFont tag"));
+#if 0
+					log_swferror(_("Glyph %d in DefineFont is reported to be defined at offset %lu, but tag ends at offset %lu"),
+							i, new_pos, endTagPos);
+					m_glyphs[i] = NULL; // allowed ? or should we throw an exception instead ?
+					continue;
+#endif
+				}
 				in->set_position(new_pos);
 
 				// Create & read the shape.
@@ -272,7 +285,9 @@ namespace gnash {
 			if (font_code_offset + table_base != current_position)
 			{
 				// Bad offset!  Don't try to read any more.
-				log_error(_("Bad offset in DefineFont2"));
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror(_("Bad offset in DefineFont2"));
+				);
 				return;
 			}
 		}
@@ -339,7 +354,9 @@ namespace gnash {
 	// later using the character pair as the key.
 	if ( ! m_kerning_pairs.insert(std::make_pair(k, adjustment)).second )
 	{
-		log_error(_("Repeated kerning pair found - ignoring"));
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror(_("Repeated kerning pair found - ignoring"));
+		);
 	}
 
 			}
@@ -453,7 +470,9 @@ namespace gnash {
 			if (s_logged == false)
 			{
 				s_logged = true;
-				log_error(_("empty advance table in font %s"), get_name());
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror(_("empty advance table in font %s"), get_name());
+				);
 			}
 			return 0;
 		}

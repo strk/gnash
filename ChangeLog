@@ -1,5 +1,6 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* server/font.cpp: more robustness improvements.
 	* server/font.cpp (readDefineFont, readDefineFont2_or_3): pass
 	  shape_character_def the real tag we're parsing.
 	* server/parser/shape_character_def.cpp (read): when parsing
