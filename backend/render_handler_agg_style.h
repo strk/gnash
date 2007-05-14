@@ -297,7 +297,7 @@ public:
 
     /// Called by AGG to ask if a certain style is a solid color
     bool is_solid(unsigned style) const {
-     
+      assert(style < m_styles.size());
       return m_styles[style]->m_is_solid; 
     }
     
