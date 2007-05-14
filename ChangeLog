@@ -1,5 +1,6 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* utilities/Makefile.am: don't set LDFLAGS twice.
 	* server/parser/shape_character_def.{cpp,h}: add ShapeRecordFlags
 	  enum to use symbolic names while parsing. Don't change tag type
 	  when encountering the flagHasNewStyles set and the tag type
