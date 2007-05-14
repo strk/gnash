@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.103 2007/04/28 17:05:53 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.104 2007/05/14 20:06:48 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1879,6 +1879,11 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	}
 	else
 	{
+		if ( ! URLAccessManager::allow(url) )
+		{
+			return;
+		}
+
 		if ( sendVarsMethod )
 		{
 			log_unimpl (_("Unhandled GetUrl2 sendVariableMethod (%d)"
