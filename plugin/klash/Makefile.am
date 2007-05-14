@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.28 2007/03/06 18:06:13 rsavoye Exp $
+# $Id: Makefile.am,v 1.29 2007/05/14 15:24:04 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -68,7 +68,7 @@ uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 
 else
 all:
-	$echo "Building klash is disabled"
+	echo "Building klash is disabled"
 endif
 
 force:
