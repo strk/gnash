@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.22 2007/05/14 17:23:15 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.23 2007/05/14 17:57:45 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -95,7 +95,6 @@ read_fill_styles(std::vector<fill_style>& styles, stream* in,
 		try
 		{
 			fs.read(in, tag_type, m);
-			styles.push_back(fs);
 		}
 		catch (ParserException& e)
 		{
@@ -103,6 +102,9 @@ read_fill_styles(std::vector<fill_style>& styles, stream* in,
 				log_swferror("%s", e.what());
 			);
 		}
+		// Push a style anyway, so any path referring to
+		// it still finds it..
+		styles.push_back(fs);
 	}
 
 }
@@ -263,13 +265,21 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += fill_base;
 		}
-		current_path.setLeftFill(style);
-		IF_VERBOSE_PARSE
-		(
-		if (SHAPE_LOG) {
-		    log_parse(_("  shape_character read: fill0 (left) = %d"), current_path.getLeftFill());
+		if ( style < m_fill_styles.size() )
+		{
+			current_path.setLeftFill(style);
+			IF_VERBOSE_PARSE(
+			if (SHAPE_LOG) {
+			    log_parse(_("  shape_character read: fill0 (left) = %d"), current_path.getLeftFill());
+			}
+			)
 		}
-		);
+		else
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror(_("Unknown fill style %d in fillStyle0Change record "), style);
+			);
+		}
 
 	    }
 	    if ((flags & flagFillStyle1Change) && num_fill_bits > 0)
@@ -285,12 +295,21 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += fill_base;
 		}
-		current_path.setRightFill(style); // getRightFill() = style;
-		IF_VERBOSE_PARSE (
-		if (SHAPE_LOG) {
-		    log_parse(_("  shape_character read: fill1 (right) = %d"), current_path.getRightFill());
+		if ( style < m_fill_styles.size() )
+		{
+			current_path.setRightFill(style); // getRightFill() = style;
+			IF_VERBOSE_PARSE (
+			if (SHAPE_LOG) {
+			    log_parse(_("  shape_character read: fill1 (right) = %d"), current_path.getRightFill());
+			}
+			)
 		}
-		);
+		else
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror(_("Unknown fill style %d in fillStyle1Change record "), style);
+			);
+		}
 	    }
 	    if ((flags & flagLineStyleChange) && num_line_bits > 0)
 	    {
@@ -305,22 +324,33 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += line_base;
 		}
-		current_path.setLineStyle(style);
-		IF_VERBOSE_PARSE (
-		if (SHAPE_LOG)
+		if ( style < m_line_styles.size() )
 		{
-		    log_parse(_("  shape_character_read: line = %d"), current_path.getLineStyle());
+			current_path.setLineStyle(style);
+			IF_VERBOSE_PARSE (
+			if (SHAPE_LOG)
+			{
+			    log_parse(_("  shape_character_read: line = %d"), current_path.getLineStyle());
+			}
+			)
 		}
-		);
+		else
+		{
+			IF_VERBOSE_MALFORMED_SWF(
+			log_swferror(_("Unknown line style %d in lienStyleChange record "), style);
+			);
+		}
 	    }
 	    if (flags & flagHasNewStyles)
 	    {
-		IF_VERBOSE_MALFORMED_SWF(
 		if (tag_type == SWF::DEFINESHAPE)
 		{
+			IF_VERBOSE_MALFORMED_SWF(
 			log_swferror("unexpected HasNewStyle flag in a DEFINESHAPE tag shape record");
+	    		)
+			// Used to be tag_type += SWF::DEFINESHAPE2, but
+			// I can't belive any such thing could be correct...
 		}
-	    	)
 
 		IF_VERBOSE_PARSE (
 		log_parse(_("  shape_character read: more fill styles"));

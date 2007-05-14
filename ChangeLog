@@ -1,5 +1,14 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_agg_style.h (is_solid): check argument
+	  with an assertion before accessing the m_styles vector.
+	* server/parser/shape_character_def.cpp (read): don't set line and
+	  fill styles to unavailable values. Drop a weird an likely bogus
+	  modification of tag_type when  a flagHasNewStyle is set and the
+	  tag is DEFINESHAPE.
+
+2007-05-14 Sandro Santilli <strk@keybit.net>
+
 	* utilities/Makefile.am: don't set LDFLAGS twice.
 	* server/parser/shape_character_def.{cpp,h}: add ShapeRecordFlags
 	  enum to use symbolic names while parsing. Don't change tag type
