@@ -1,5 +1,12 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/shape_character_def.cpp (read): temporarely 
+	  disabled the "don't set line and fill styles if not defined yet".
+	  It seems to break a lot of movies. We should find out why though,
+	  as I'd think styles must *first* be defined, and *after* referred.
+
+2007-05-14 Sandro Santilli <strk@keybit.net>
+
 	* backend/render_handler_agg_style.h (is_solid): check argument
 	  with an assertion before accessing the m_styles vector.
 	* server/parser/shape_character_def.cpp (read): don't set line and

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.23 2007/05/14 17:57:45 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.24 2007/05/14 18:44:43 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -186,6 +186,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 	read_line_styles(m_line_styles, in, tag_type);
     }
 
+    log_msg("Read %u fill styles, %u line styles", m_fill_styles.size(), m_line_styles.size());
+
     int	num_fill_bits = in->read_uint(4);
     int	num_line_bits = in->read_uint(4);
 
@@ -265,7 +267,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += fill_base;
 		}
-		if ( style < m_fill_styles.size() )
+		if ( 1 || style <= m_fill_styles.size() ) // 1-based index ! TODO: signedness comparison mismatch
 		{
 			current_path.setLeftFill(style);
 			IF_VERBOSE_PARSE(
@@ -277,8 +279,9 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		else
 		{
 			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("Unknown fill style %d in fillStyle0Change record "), style);
+			log_swferror(_("Unknown fill style %d in fillStyle0Change record - %u defined"), style, m_fill_styles.size());
 			);
+			current_path.setLeftFill(0);
 		}
 
 	    }
@@ -295,7 +298,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += fill_base;
 		}
-		if ( style < m_fill_styles.size() )
+		if ( 1 || style <= m_fill_styles.size() ) // 1-based index ! TODO: signedness comparison mismatch
 		{
 			current_path.setRightFill(style); // getRightFill() = style;
 			IF_VERBOSE_PARSE (
@@ -309,6 +312,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 			IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("Unknown fill style %d in fillStyle1Change record "), style);
 			);
+			current_path.setRightFill(0);
 		}
 	    }
 	    if ((flags & flagLineStyleChange) && num_line_bits > 0)
@@ -324,7 +328,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += line_base;
 		}
-		if ( style < m_line_styles.size() )
+		if ( 1 || style <= m_line_styles.size() ) // 1-based index ! TODO: signedness comparison mismatch
 		{
 			current_path.setLineStyle(style);
 			IF_VERBOSE_PARSE (
@@ -339,6 +343,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 			IF_VERBOSE_MALFORMED_SWF(
 			log_swferror(_("Unknown line style %d in lienStyleChange record "), style);
 			);
+			current_path.setLineStyle(0);
 		}
 	    }
 	    if (flags & flagHasNewStyles)
