@@ -24,7 +24,7 @@
 //#include "rc.h"
 
 #include <string>
-//#include <cstring>
+#include <cstring>
 #include <vector>
 #include <cassert>
 #include <sstream>

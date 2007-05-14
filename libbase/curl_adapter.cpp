@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.32 2007/05/12 09:59:44 tgc Exp $ */
+/* $Id: curl_adapter.cpp,v 1.33 2007/05/14 14:18:26 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,11 +32,12 @@
 #include <map>
 #include <iostream>
 #include <string>
+#include <cstring>
 #if defined(_WIN32) || defined(WIN32)
-	#include <Windows.h>	// for sleep()
-	#define usleep(x) Sleep(x/1000)
+# include <windows.h>	// for sleep()
+# define usleep(x) Sleep(x/1000)
 #else
-	#include "unistd.h" // for usleep()
+# include "unistd.h" // for usleep()
 #endif
 
 using namespace std;

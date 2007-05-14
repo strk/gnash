@@ -14,8 +14,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: noseek_fd_adapter.cpp,v 1.17 2007/05/02 16:24:12 rsavoye Exp $ */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -26,6 +24,7 @@
 #include "GnashException.h"
 #include "log.h"
 #include <unistd.h>
+#include <cstring>
 
 //#define GNASH_NOSEEK_FD_VERBOSE 1
 

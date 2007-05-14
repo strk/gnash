@@ -46,7 +46,7 @@ AC_DEFUN([AC_PATH_MTASC], [
       yes|no) ;;
       *) MTASC_CLASSPATH=${withval} ;;
     esac
-  ], MTASC="")
+  ], MTASC_CLASSPATH="")
 
   if test x"$MTASC" = "x"; then
     AC_PATH_PROG(MTASC, mtasc, ,[${pathlist}])

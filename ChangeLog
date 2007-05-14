@@ -5,6 +5,16 @@
 
 2007-05-14  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* macros/mtasc.m4: Patch #9531, fix variable name for MTASC.
+	* libbase/noseek_fd_adapter.cpp: Include cstring to get C string
+	functions used for char * manipulation.
+	* libbase/URL.cpp: Include cstring to get C string functions used
+	for char * manipulation. 
+	* libbase/embedVideoDecoderFfmpeg.cpp: Include cstring to get C
+	string functions used for char * manipulation.
+	* libbase/curl_adapter.cpp: Include cstring to get C string
+	functions used for char * manipulation. 
+
 	* server/gnash.h: Include memory for auto_ptr.
 	* libamf/amf.h: Include cstring for C string functions.
 	* libamf/amf.cpp: Use lower case for win32 headers, as that's what
