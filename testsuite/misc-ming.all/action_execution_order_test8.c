@@ -22,22 +22,22 @@
  * expected order(or behaviour) is like this(player version higher than 4):
  *
  * (1) execute actions in 2nd frame, since "check"!=1, then do nothing;
- * (2) set "check" to 1, jump back to the second frame; * (3) execute
- *     actions in 2nd frame, since "check"==1 now, jump to the 4th frame; * (4)
- *     "mc1" is placed in the 4th frame, frame1 actions of mc1 get executed,
- *     which is the "_root.gotoAndStop(6);" * (5) As "mc1" is removed in the
- *     5th frmae, and "mc2" is removed in the 6th frame, the 6th frame of
- *     _root should be visually empty.
+ * (2) set "check" to 1, jump back to the second frame; 
+ * (3) execute actions in 2nd frame, since "check"==1 now, jump to the 4th frame; 
+ * (4) "mc1" is placed in the 4th frame, frame1 actions of mc1 get executed,
+ *     which is the "_root.gotoAndStop(6);" 
+ * (5) As "mc1" is removed in the 5th frmae, and "mc2" is removed in the 6th frame, 
+ *     the 6th frame of _root should be visually empty.
  *
  * expected behaviour of player4:
  *
  * (1)(2)(3) are the same as the above;
  * (4) "mc1" is placed in the 4th frame, frame1 actions get executed
  *     but has no effect(player4 does not support mc.gotoAndStop). _root
- *     still advances to the 5th frame.  * (5) "mc1" is removed in the 5th
- *     frame. mc2 is placed in the 5th frame and frame1 actions of mc2 get
- *     executed. Then the message 'your player version is lower than 5' is
- *     printed on the screen.
+ *     still advances to the 5th frame.  
+ * (5) "mc1" is removed in the 5th frame. mc2 is placed in the 5th frame and 
+ *     frame1 actions of mc2 get executed. Then the message 'your player version 
+ *     is lower than 5' is printed on the screen.
  *
  *  TODO: generate SWF4 and SWF5 targets to automate test for both !
  *
@@ -89,19 +89,20 @@ main(int argc, char** argv)
   
   
   mc1 = newSWFMovieClip(); // will only exist in frame4
-  add_clip_actions(mc1, " _root.note('about to invoke _root.gotoAndStop(6)');"
-  			" _root.gotoAndStop(6);"
-		        " _root.note('mc1 actions still running after _root.gotoAndStop(6), _root is '+_root);"
-                        " _root.x = 100; " );
+  add_clip_actions(mc1, 
+  	" _root.note('about to invoke _root.gotoAndStop(6)');"
+    " _root.gotoAndStop(6);"
+    " _root.note('mc1 actions still running after _root.gotoAndStop(6), _root is '+_root);"
+    " _root.x = 100; " );
   SWFMovieClip_nextFrame(mc1);
   
   /* add mc1 to _root and name it as "mc1" */
   it1 = SWFMovie_add(mo, (SWFBlock)mc1);  
   SWFDisplayItem_setDepth(it1, 3); 
   SWFDisplayItem_setName(it1, "mc1"); 
-  add_actions(mo, " _root.note('root frame '+_root._currentframe);");
-  check_equals(mo, "typeof(_root.x)", "'undefined'");
-  add_actions(mo, " _root.x = 200; ");
+  add_actions(mo, "_root.note('root frame '+_root._currentframe);");
+  check_equals(mo,"typeof(_root.x)", "'undefined'");
+  add_actions(mo, "_root.x = 200; ");
   SWFMovie_nextFrame(mo); /* 4th frame */
 
 

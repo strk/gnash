@@ -3,6 +3,8 @@
 	* testsuite/misc-ming.all/: displaylist_depths_test9.c, Makefile.am
 	  new scenario for Timeline Control, gnash passes.
 	  But luckly, caught a bug in ActionDuplicateClip:)
+	* testsuite/misc-ming.all/action_execution_order_test8.c
+		indent
 	  
 2007-05-13  Rob Savoye  <rob@bertha.welcomehome.org>
 
