@@ -1,5 +1,6 @@
+// gtk_glue_gtkglext.cpp:  Gnome ToolKit glue of some sort, for Gnash.
 //
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,23 +11,18 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-//
 //
 
-/* $Id: gtk_glue_gtkglext.cpp,v 1.10 2006/11/11 15:25:27 strk Exp $ */
+/* $Id: gtk_glue_gtkglext.cpp,v 1.11 2007/05/14 09:44:21 jgilmore Exp $ */
 
 #include "gtk_glue_gtkglext.h"
 #include "log.h"
 
 using namespace std;
-
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
 
 namespace gnash
 {
@@ -69,8 +65,8 @@ GtkGlExtGlue::init(int argc, char** argv[])
 
     gint major, minor;
     gdk_gl_query_version (&major, &minor);
-    dbglogfile << "OpenGL extension version - "
-              << (int)major << "." << (int)minor << endl;
+    log_msg (_("OpenGL extension version - %d.%d"),
+              (int)major, (int)minor);
 
     GdkGLConfigMode glcmode = (GdkGLConfigMode)(GDK_GL_MODE_RGB |
                                                 GDK_GL_MODE_DEPTH |
@@ -78,19 +74,19 @@ GtkGlExtGlue::init(int argc, char** argv[])
     _glconfig = gdk_gl_config_new_by_mode (glcmode);
 
     if (!_glconfig) {
-      dbglogfile << "Cannot find the double-buffered visual." << endl;
-      dbglogfile << "Trying single-buffered visual." << endl;
+      log_error (_("Cannot find the double-buffered visual.\n"
+      		   "Trying single-buffered visual."));
 
       glcmode = (GdkGLConfigMode)(GDK_GL_MODE_RGB | GDK_GL_MODE_DEPTH);
       _glconfig = gdk_gl_config_new_by_mode (glcmode);
       if (!_glconfig) {
-        dbglogfile << "No appropriate OpenGL-capable visual found." << endl;
+        log_error (_("No appropriate OpenGL-capable visual found."));
         gtk_main_quit(); // XXX
       } else {
-        dbglogfile << "Got single-buffered visual." << endl;
+        log_msg (_("Got single-buffered visual."));
       }
     } else {
-      dbglogfile << "Got double-buffered visual." << endl;
+      log_msg (_("Got double-buffered visual."));
     }
     
     return true;

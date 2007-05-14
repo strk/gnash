@@ -13,16 +13,16 @@ once it is playing. The only control is "play" and
 "pause". Progressive streaming doesn't even require a Media server, it
 can be done with any web server, which doesn't do any special
 handling. This is often reffered to as RTMP over HTTP, but there isn't
-and RTMP protocol used within the client-server communication. The
+any RTMP protocol used within the client-server communication. The
 protocol is purely HTTP using GET and POST directives.
 
 A Flash media server has several abilities other than just sending a
 file stream to the player. Using the RTMP protocol, it is possible to
 dynamically seek within the stream. This puts the control of the movie
 on the server side instead of the client side. This is called dynamic
-streaming. Along with seeking, dynamic streaming also supports
+streaming.  Along with seeking, dynamic streaming also supports
 capturing a stream, which allows one to send a data stream to the
-server, where it can stored, and the later replayed.
+server, where it can be stored, and then later replayed.
 
 The server collects statistics on the mumber of connections, the
 bandwidth consumed, which files are streamed, the frame rate,
@@ -50,7 +50,7 @@ There are several utility functions builtin to the servers as well for
 navigation purposes. The main one is used to generate thumbnails or a
 short preview of a movie automatically, without having to do this as
 part of another operation. This features can also be used to merge
-clips from multiple movies.. Each clip is played for the specified
+clips from multiple movies.  Each clip is played for the specified
 amount of time, and then the next clip is played starting and stopping
 at the specificied times, and so on until all the clips are played.
 

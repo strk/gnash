@@ -54,10 +54,6 @@
 
 using namespace std;
 
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
-
 namespace gnash {
 
 static const char *DEFAULTPROTO = "tcp";
@@ -378,7 +374,7 @@ Network::createClient(const char *hostname, short port)
     _sockfd = ::socket(PF_INET, SOCK_STREAM, proto->p_proto);
     if (_sockfd < 0)
         {
-            log_error(_("unable to create socket : %s"), strerror(errno));
+            log_error(_("unable to create socket: %s"), strerror(errno));
             _sockfd = -1;
             return false;
         }
@@ -594,26 +590,22 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
 
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            dbglogfile << "The socket for fd #" << fd
-                       << " we interupted by a system call!" << endl;
+            log_error (_("The socket for fd %d was interupted by a system call"), fd);
         }
 
         if (ret == -1) {
-            dbglogfile << "The socket for fd #" << fd
-                       << " never was available for reading!" << endl;
+            log_error (_("The socket for fd %d was never available for reading"), fd);
             return -1;
         }
 
         if (ret == 0) {
-            dbglogfile << "The socket for fd #" << fd
-                << " timed out waiting to read!" << endl;
+            log_error (_("The socket for fd %d timed out waiting to read"), fd);
             return -1;
         }
 
         ret = read(fd, buffer, nbytes);
 	if (_debug) {
-	    dbglogfile << "read " << ret << " bytes from fd #"
-		       << fd << endl;
+	    log_msg (_("read %d bytes from fd %d"), ret, fd);
 	}
     }
 
@@ -688,52 +680,43 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
 
         // If interupted by a system call, try again
         if (ret == -1 && errno == EINTR) {
-            dbglogfile << "The socket for fd #" << fd
-                << " we interupted by a system call!" << endl;
+            log_error (_("The socket for fd %d was interupted by a system call"), fd);
         }
 
         if (ret == -1) {
-            dbglogfile << "The socket for fd #" << fd
-                << " never was available for writing!" << endl;
+            log_error (_("The socket for fd %d was never available for writing"), fd);
         }
 
         if (ret == 0) {
-            dbglogfile << "The socket for fd #" << fd
-                << " timed out waiting to write!" << endl;
+            log_error (_("The socket for fd %d timed out waiting to write"), fd);
         }
 
         ret = write(fd, bufptr, nbytes);
 
         if (ret == 0) {
-            dbglogfile
-                << "Couldn't write any bytes to fd #: " << fd
-                << strerror(errno) << endl;
+            log_error (_("Wrote zero out of %d bytes to fd %d: %s"), 
+		nbytes, fd, strerror(errno));
             return ret;
         }
         if (ret < 0) {
-            dbglogfile << "Couldn't write " << nbytes
-                       << " bytes to fd #" << fd << endl;
-
+            log_error (_("Couldn't write %d bytes to fd %d: %s"), 
+		nbytes, fd, strerror(errno));
             return ret;
         }
         if (ret > 0) {
             bufptr += ret;
             if (ret != nbytes) {
 		if (_debug) {
-		    dbglogfile << "wrote " << ret << " bytes to fd #" << fd
-			       << " expected " << nbytes << endl;
+		    log_msg (_("wrote %d bytes to fd %d, expected %d"),
+			       ret, fd, nbytes);
 		}
 //                retries++;
             } else {
 		if (_debug) {
-		    dbglogfile << "wrote " << ret << " bytes to fd #"
-			       << fd << endl;
+		    log_msg (_("wrote %d bytes to fd %d"),
+			       ret, fd);
 		}
                 return ret;
-            }
-
-            if (ret == 0) {
-                dbglogfile << "Wrote 0 bytes to fd #" << fd << endl;
             }
         }
     }
@@ -746,9 +729,8 @@ Network::writeNet(int fd, char const *buffer, int nbytes, int timeout)
         if ((endtime.tv_sec - starttime.tv_sec) &&
             endtime.tv_usec - starttime.tv_usec)
         {
-            dbglogfile << "took " << endtime.tv_usec - starttime.tv_usec
-                       << " usec to write (" << bytes_written
-                       << " bytes)" << endl;
+            log_msg (_("took %d usec to write (%d bytes)"),
+		endtime.tv_usec - starttime.tv_usec, bytes_written);
         }
     }
 #endif

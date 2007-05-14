@@ -39,6 +39,7 @@ POTFILES: $(srcfiles)
 gnash.pot: POTFILES
 	$(XGETTEXT) --language=C++ --files-from=POTFILES -o gnash.pot \
 	  --default-domain=gnash --force \
+	  --flag=_:1:pass-c-format --keyword=_ \
 	  --copyright-holder='Free Software Foundation, Inc.'
 
 update-po: gnash.pot

@@ -167,7 +167,7 @@ Player::init_logfile()
     //
     if (!delay && rcfile.getTimerDelay() > 0) {
         delay = rcfile.getTimerDelay();
-        dbglogfile << "Timer delay set to " << delay << "milliseconds" << endl;
+        log_msg (_("Timer delay set to %d milliseconds"), delay);
     }    
 
     // Remove the logfile that's created by default, since leaving a short

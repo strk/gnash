@@ -1,5 +1,6 @@
+// cygnal.cpp:  GNU streaming Flash media server, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: cygnal.cpp,v 1.9 2007/04/24 17:52:47 rsavoye Exp $ */
+/* $Id: cygnal.cpp,v 1.10 2007/05/14 09:44:20 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -154,8 +155,8 @@ main(int argc, char *argv[])
     
     if (rcfile.getDocumentRoot().size() > 0) {
 	docroot = rcfile.getDocumentRoot().c_str();
-	dbglogfile << "Document Root for media files is: "
-		   << docroot << endl;
+	log_msg (_("Document Root for media files is: %s"),
+		   docroot);
     } else {
 	docroot = "/var/www";
     }
@@ -167,14 +168,13 @@ main(int argc, char *argv[])
               exit(0);
 	  case 'v':
               dbglogfile.setVerbosity();
-	      dbglogfile << "Verbose output turned on" << endl;
+	      log_msg (_("Verbose output turned on"));
 	      break;
 	  case 'w':
               dbglogfile.setWriteDisk(true);
-	      dbglogfile << "Logging to disk enabled." << endl;
+	      log_msg (_("Logging to disk enabled"));
 	      break;
 	  case 'p':
-	      dbglogfile << "Logging to disk enabled." << endl;
 	      port_offset = strtol(optarg, NULL, 0);
 	      break;
         }
@@ -183,7 +183,7 @@ main(int argc, char *argv[])
 
     // get the file name from the command line
     while (optind < argc) {
-        dbglogfile << "Extraneous argument!" << endl;
+        log_error (_("Extraneous argument: %s"), argv[optind]);
     }
 
     // Remove the logfile that's created by default, since leaving a short
@@ -192,7 +192,7 @@ main(int argc, char *argv[])
         dbglogfile.removeLog();
     }
     
-    // Trap ^C so we can kill all the threads
+    // Trap ^C (SIGINT) so we can kill all the threads
     act.sa_handler = cntrlc_handler;
     sigaction (SIGINT, &act, NULL);
 
@@ -205,7 +205,7 @@ main(int argc, char *argv[])
     http_port.join();
     ssl_port.join();
 
-    dbglogfile << "All done I think..." << endl;
+    log_msg (_("All done I think..."));
     
     return(0);
 }
@@ -222,7 +222,7 @@ rtmp_thread()
     
     proto.createServer(RTMP);
     while (retries++ < thread_retries) {
-	printf("%s: Thread for RTMP port looping...\n", __PRETTY_FUNCTION__);
+	log_msg(_("%s: Thread for RTMP port looping..."), __PRETTY_FUNCTION__);
 	proto.newConnection(true);
 	st.startClock();
 	proto.handShakeWait();
@@ -231,8 +231,8 @@ rtmp_thread()
 	
 	// Keep track of the network statistics
 	st.stopClock();
- 	dbglogfile << "Bytes read: " << proto.getBytesIn() << endl;
- 	dbglogfile << "Bytes written: " << proto.getBytesOut() << endl;
+ 	log_msg (_("Bytes read: %d"), proto.getBytesIn());
+ 	log_msg (_("Bytes written: %d"), proto.getBytesOut());
 	st.setBytes(proto.getBytesIn() + proto.getBytesOut());
 	st.addStats();
 	proto.resetBytesIn();
@@ -255,7 +255,7 @@ http_thread()
 
     www.createServer(port);
     while (retries++ < thread_retries) {
-	printf("%s: Thread for port %d looping...\n", __PRETTY_FUNCTION__, port);
+	log_msg(_("%s: Thread for port %d looping..."), __PRETTY_FUNCTION__, port);
 	www.newConnection(true);
 	Statistics st;
 	st.setFileType(NetStats::RTMPT);
@@ -278,16 +278,16 @@ http_thread()
 	
 	// Keep track of the network statistics
 	st.stopClock();
-//  	dbglogfile << "Bytes read: " << www.getBytesIn() << endl;
-//  	dbglogfile << "Bytes written: " << www.getBytesOut() << endl;
+// 	log_msg (_("Bytes read: %d"), www.getBytesIn());
+// 	log_msg (_("Bytes written: %d"), www.getBytesOut());
 //	st.setBytes(www.getBytesIn() + www.getBytesOut());
 	st.addStats();
 //	www.resetBytesIn();
 //	www.resetBytesOut();
 	
 	if (url != docroot) {
-	    dbglogfile << "File to load is: " << filespec << endl;
-	    dbglogfile << "Parameters are: " << parameters << endl;
+	    log_msg (_("File to load is: %s"), filespec.c_str());
+	    log_msg (_("Parameters are: %s"), parameters.c_str());
 	    memcpy(thread_data.filespec, filespec.c_str(), filespec.size());
 	    boost::thread sendthr(boost::bind(&stream_thread, &thread_data));
 	    sendthr.join();
@@ -317,7 +317,7 @@ ssl_thread()
     www.createServer(port);
     
     while (retries++ < thread_retries) {
-	printf("%s: Thread for port %d looping...\n", __PRETTY_FUNCTION__, port);
+	log_msg (_("%s: Thread for port %d looping..."), __PRETTY_FUNCTION__, port);
 	www.newConnection(true);
 	loadfile.netfd = www.getFileFd();
 	strcpy(loadfile.filespec, "Hello World");
@@ -335,7 +335,7 @@ stream_thread(struct  thread_params *params)
     //struct stat stats;
     //struct thread_params loadfile;
     
-    dbglogfile << __PRETTY_FUNCTION__ << ": " << params->filespec << endl;
+    log_msg ("%s: %s", __PRETTY_FUNCTION__, params->filespec);
     
     Stream str;
     str.open(params->filespec, params->netfd, params->statistics);
@@ -346,7 +346,7 @@ stream_thread(struct  thread_params *params)
 static void
 cntrlc_handler (int /*sig*/)
 {
-    log_msg("Got a ^C !\n");
+    log_msg(_("Got an interrupt"));
 
     exit(-1);
 }
@@ -354,19 +354,19 @@ cntrlc_handler (int /*sig*/)
 static void
 version_and_copyright()
 {
-    printf (
-"Cygnal " VERSION "\n"
-"Copyright (C) 2006 Free Software Foundation, Inc.\n"
+    printf (_(
+"Cygnal %s\n"
+"Copyright (C) 2006, 2007 Free Software Foundation, Inc.\n"
 "Cygnal comes with NO WARRANTY, to the extent permitted by law.\n"
 "You may redistribute copies of Cygnal under the terms of the GNU General\n"
-"Public License.  For more information, see the file named COPYING.\n"
-	);
+"Public License.  For more information, see the file named COPYING.\n"),
+        VERSION);
 }
 
 static void
 usage(const char* /*proc*/)
 {
-    printf(
+    printf(_(
 	"cygnal -- an streaming media server.\n"
 	"\n"
 	"usage: cygnal [options...]\n"
@@ -374,7 +374,7 @@ usage(const char* /*proc*/)
 	"  --version   Print the version numbers.\n"
 	"  --verbose (-v)   Output verbose debug info.\n"
 	"  --port-offset (-p)   RTMPT port offset.\n"
-	);
+	));
 }
  
 // local Variables:

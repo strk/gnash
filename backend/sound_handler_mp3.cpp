@@ -1,16 +1,32 @@
+// sound_handler_mp3.cpp: Audio output via libmad (MP3), for Gnash.
+//
+//   Copyright (C) 2007 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+
+// Based on sound_handler_mp3.cpp by "tbp", 2003
+// which has been donated to the Public Domain.
+
 /*
- * sound_handler_mp3.cpp	--	tbp, 2003
- *
- * This source code has been donated to the Public Domain.
- * Do whatever you want with it.
- *
  * Some brain damaged helpers to decode mp3 streams for use in
  * a gnash::sound_handler that uses SDL for output.
  * (even comments are cut&paste compliant)
- *
  */
 
-/* $Id: sound_handler_mp3.cpp,v 1.5 2006/10/15 09:11:20 nihilus Exp $ */
+/* $Id: sound_handler_mp3.cpp,v 1.6 2007/05/14 09:44:19 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,7 +51,7 @@ to compile this file. You can either reconfigure without --enable-mp3,\
 #endif
 
 using gnash::log_error;
-using gnash::log_parse;
+using gnash::log_msg;
 
 namespace mad_helpers {
 	static const char *parse_layer(const mad_header& h)
@@ -153,7 +169,7 @@ void convert_mp3_data(int16_t **adjusted_data, int *adjusted_size, void *data,
 		const int sample_rate, const bool stereo)
 {
 
-	//log_msg("convert_mp3_data sample count %d rate %d stereo %s\n", sample_count, sample_rate, stereo?"yes":"no");
+	//log_msg("convert_mp3_data sample count %d rate %d stereo %s", sample_count, sample_rate, stereo?"yes":"no");
 
 	mad_stream	stream;
 	mad_frame	frame;
@@ -187,7 +203,7 @@ void convert_mp3_data(int16_t **adjusted_data, int *adjusted_size, void *data,
 				// kludge as we stop decoding on LOSTSYNC.
 				if (stream.error != MAD_ERROR_LOSTSYNC)
 				{
-					log_error("** MP3 frame error: %s\n", mad_stream_errorstr(&stream));
+					log_error(_("** MP3 frame error: %s"), mad_stream_errorstr(&stream));
 				}
 				break;
 			}
@@ -195,7 +211,7 @@ void convert_mp3_data(int16_t **adjusted_data, int *adjusted_size, void *data,
 
 		if (fc == 0)
 		{
-			log_parse("%s", mad_helpers::parse_frame_info(frame.header));
+			log_msg("%s", mad_helpers::parse_frame_info(frame.header));
 		}
 
 		++fc;
@@ -209,7 +225,7 @@ void convert_mp3_data(int16_t **adjusted_data, int *adjusted_size, void *data,
 
 	if (total == 0) goto cleanup; // yay
 
-	log_parse("decoded frames %d bytes %d(diff %d) -- original rate %d\n\n", fc, total, total - sample_count, sample_rate);
+	log_msg("decoded frames %d bytes %d (diff %d) -- original rate %d", fc, total, total - sample_count, sample_rate);
 
 	// assemble together all decoded frames. another round of memcpy.
 	{

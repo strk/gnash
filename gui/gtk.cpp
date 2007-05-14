@@ -1,3 +1,4 @@
+// gtk.cpp: Gnome ToolKit graphical user interface, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,11 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: gtk.cpp,v 1.89 2007/05/09 10:19:58 strk Exp $ */
+/* $Id: gtk.cpp,v 1.90 2007/05/14 09:44:21 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -39,10 +42,6 @@
 
 
 using namespace std;
-
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
 
 namespace gnash 
 {
@@ -77,10 +76,10 @@ GtkGui::init(int argc, char **argv[])
 
     if (_xid) {
       _window = gtk_plug_new(_xid);
-      dbglogfile << "Created XEmbedded window" << endl;
+      log_msg (_("Created XEmbedded window"));
     } else {
       _window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-      dbglogfile << "Created top level window" << endl;
+      log_msg (_("Created top level window"));
     }
 
     // XXXbjacques: why do we need this?
@@ -206,15 +205,14 @@ GtkGui::create_pixbuf                          (const gchar     *filename)
     pathname = find_pixmap_file (filename);
 
     if (!pathname) {
-        dbglogfile << "Couldn't find pixmap file: " << filename << endl;
-        g_warning ("Couldn't find pixmap file: %s", filename);
+        log_error (_("Couldn't find pixmap file: %s"), filename);
+        g_warning (_("Couldn't find pixmap file: %s"), filename);
         return NULL;
     }
 
     pixbuf = gdk_pixbuf_new_from_file (pathname, &error);
     if (!pixbuf) {
-        dbglogfile << "Failed to load pixbuf file: " <<pathname << error->message << endl;
-        //fprintf (stderr, "Failed to load pixbuf file: %s: %s\n", pathname, error->message);
+        log_error (_("Failed to load pixbuf file: %s: %s"), pathname, error->message);
         g_error_free (error);
     }
     g_free (pathname);
@@ -389,10 +387,9 @@ void GtkGui::open_file (GtkWidget *widget, gpointer /* user_data */)
     // run() will return. If run() is then changed to return a pointer to the
     // next file to be played, then the Player class can play the next file,
     // unless run() returns NULL.
-    dbglogfile << "Attempting to open file " << filename << "." << endl
-               << "NOTE: the file open functionality is not yet implemented!"
-               << endl;
-
+    log_error (_("Attempting to open file %s.\n"
+               "NOTE: the file open functionality is not yet implemented!"),
+	       filename);
 
 #if GTK_CHECK_VERSION(2,4,0)
     g_free(filename);
@@ -551,7 +548,7 @@ GtkGui::menuitem_preferences_callback(GtkMenuItem* /*menuitem*/, gpointer /*data
                       (GtkAttachOptions) (0), 0, 0);
     
     if (rcfile.useWriteLog() == true ) {
-        dbglogfile << "Debug log filename: " << rcfile.getDebugLog().c_str() << endl;
+        log_msg (_("Debug log filename: %s"), rcfile.getDebugLog().c_str());
         gtk_entry_set_text( (GtkEntry*) logfilenameentry, rcfile.getDebugLog().c_str()); 
         gtk_widget_set_sensitive(logfilenameentry,TRUE);
     } else {

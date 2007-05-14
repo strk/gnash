@@ -1,3 +1,50 @@
+2007-05-14  John Gilmore  <gnu@toad.com>
+
+	Internationalization, further cleanup:
+	
+	* po/Makefile.am:  Pass proper flags to xgettext to handle _(...).
+	* po/LINGUAS:  Remove, superseded by Makefile.am's "translations".
+	* backend/sound_handler_gst.cpp, cygnal/cygnal.cpp, cygnal/http.cpp,
+	  cygnal/statistics.cpp, cygnal/stream.cpp, gui/gtk.cpp,
+	  gui/gtk_glue_gtkglext.cpp, gui/kde.cpp, gui/stl_agg_glue.cpp,
+	  libamf/amf.cpp, libamf/rtmp.cpp, libbase/rc.cpp,
+	  libbase/sharedlib.cpp, server/movie_root.cpp, utilities/parser.cpp,
+	  utilities/processor.cpp: Insert header
+	  comment and fix up copyright spacing.
+	* backend/sound_handler_gst.cpp, cygnal/cygnal.cpp, cygnal/http.cpp,
+	  cygnal/statistics.cpp, cygnal/stream.cpp, gui/Player.cpp,
+	  gui/gtk.cpp, gui/gtk_glue_gtkglext.cpp, gui/stl_agg_glue.cpp,
+	  libamf/amf.cpp, libamf/rtmp.cpp, libbase/network.cpp, libbase/rc.cpp,
+	  libbase/sharedlib.cpp, server/as_function.cpp, server/debugger.cpp,
+	  server/movie_root.cpp, utilities/parser.cpp, utilities/processor.cpp:
+	  Pass messages through _(...).
+	* backend/sound_handler_gst.cpp, backend/sound_handler_mp3.cpp,
+	  cygnal/README, cygnal/cygnal.cpp, cygnal/http.cpp,
+	  cygnal/statistics.cpp, cygnal/stream.cpp, gui/Player.cpp,
+	  gui/gtk.cpp, gui/gtk_glue_gtkglext.cpp, gui/stl_agg_glue.cpp,
+	  libamf/amf.cpp, libamf/rtmp.cpp, libbase/network.cpp,
+	  libbase/rc.cpp, libbase/sharedlib.cpp, server/as_function.cpp,
+	  server/debugger.cpp, server/dlist.cpp, server/movie_root.cpp,
+	  utilities/parser.cpp, utilities/processor.cpp:
+	  Clean up messages (remove \n's and !s, change wording, use
+	  log_XXX functions rather than dbglogfile <<, use proper log_XXX
+	  function, fix typos, etc).
+	* backend/sound_handler_mp3.cpp: New 2007 Free Software Foundation
+	  copyrights applied (to formerly public domain code)
+	* cygnal/cygnal.cpp, cygnal/http.cpp, cygnal/statistics.cpp,
+	  cygnal/stream.cpp, gui/gtk_glue_gtkglext.cpp, gui/kde.cpp,
+	  gui/stl_agg_glue.cpp, libbase/sharedlib.cpp: Update copyright
+	  to 2007.
+	* cygnal/http.cpp (HTTP::sendGetReply),
+	  cygnal/stream.cpp (sendfile_thread),
+	  libamf/amf.cpp (AMF::encodeElement, AMF::extractElementLength,
+	  AMF::parseBody, AMF::extractVariable),
+	  server/debugger.cpp (Debugger::dumpStackFrame): Insert FIXME
+	  about likely bug.
+	* gui/kde.cpp (qwidget::qwidget):  Translate strings for the
+	  pop-up menu items.
+	* libbase/network.cpp (Network::writeNet):  Remove dead code.
+	
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
 	* server/rect.{cpp,h} (read): check for min/max values swapped
@@ -19,8 +66,7 @@
 
 	* po/Makefile.am: Add install-data-hook target so the .gmo files
 	get installed. Build and install German translation.
-	* po/de.po: German translation by benjamin.goose@lrz.uni-muenchen.de.	
-
+	* po/de.po: German translation by benjamin.goose@lrz.uni-muenchen.de.
 	* doc/C/sources.xml: Fix unclosed <para> tags.
 	* macros/ffmpeg.m4: Only print warning and reset
 	ac_cv_path_ffmpeg_incl if avformat.h doesn't exist.

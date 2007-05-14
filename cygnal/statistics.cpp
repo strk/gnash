@@ -1,5 +1,6 @@
+// statistics.cpp:  Network performance stats for Cygnal, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,10 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
+
+/* $Id: statistics.cpp,v 1.3 2007/05/14 09:44:20 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,10 +35,6 @@
 using namespace gnash;
 using namespace std;
 
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
-
 static boost::mutex io_mutex;
 
 // The string versions of the codec, used for debugging. If you add
@@ -51,7 +51,7 @@ const char *codec_names[] = {
     "VP7"
 };
 
-// The string versions of the codec, used for debugging. If you add
+// The string versions of the file type, used for debugging. If you add
 // another enum type to filetypes_e, you have to add the string
 // representation here or you'll get the wrong output.
 const char *filetype_names[] = {
@@ -113,15 +113,15 @@ Statistics::dump() {
     for (it = _netstats.begin(); it != _netstats.end(); it++) {
         NetStats *stats = (*it);
         if (stats->getFileType() <= VIDEO) {
-            dbglogfile << "Stream type is: " << filetype_names[stats->getFileType()] << endl;
+            log_msg (_("Stream type is: %s"), filetype_names[stats->getFileType()]);
         }
         if (((stats->getFileType() == VIDEO) || (stats->getFileType() == AUDIO)) &&
             stats->getCodec() <= VP7) {
-            dbglogfile << "Stream codec is: " << codec_names[stats->getCodec()];
+            log_msg (_("Stream codec is: %s"), codec_names[stats->getCodec()]);
         }
-        dbglogfile << stats->getBytes() << " bytes were transfered in "
-                   << to_simple_string(stats->getTimeSpan()).c_str()
-                   << " seconds." << endl;
+        log_msg (_("%d bytes were transfered in %s seconds"),
+		 stats->getBytes(),
+                 to_simple_string(stats->getTimeSpan()).c_str());
     }
 }
 

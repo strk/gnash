@@ -1,5 +1,6 @@
+// sharedlib.cpp:  Shared Library support, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,11 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: sharedlib.cpp,v 1.15 2007/04/08 23:06:17 rsavoye Exp $ */
+/* $Id: sharedlib.cpp,v 1.16 2007/05/14 09:44:22 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,14 +49,8 @@
 typedef boost::mutex::scoped_lock scoped_lock;
 static boost::mutex lib_mutex;
 
-
 using namespace std;
 
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
-
-using namespace std;
 namespace gnash {
 
 #ifdef LT_DLMUTEX
@@ -107,10 +104,9 @@ SharedLib::SharedLib(const char *filespec)
     // Initialize libtool's dynamic library loader
     int errors = lt_dlinit ();
     if (errors) {
-        dbglogfile << "Couldn't initialize ltdl";
-        dbglogfile << lt_dlerror();
+        log_error (_("Couldn't initialize ltdl: %s"), lt_dlerror());
 //     } else {
-//         dbglogfile << "Initialized ltdl" << endl;
+//         log_msg ("Initialized ltdl");
     }
     char *pluginsdir;
     char *env = getenv ("GNASH_PLUGINS");
@@ -165,32 +161,23 @@ SharedLib::openLib (const char *filespec)
     
     scoped_lock lock(lib_mutex);
     
-//     // Initialize libtool's dynamic library loader
-//     errors = lt_dlinit ();
-    
-//     if (errors) {
-//         dbglogfile << "Couldn't initialize ltdl";
-//         dbglogfile << lt_dlerror();
-//         return false;
-// //    } else {
-// //    dbglogfile << "Initialized ltdl" << endl;
-//     }
+//     // libtool's dynamic library loader is already initialized in constructor
     
 //     cerr << "Searching in " << lt_dlgetsearchpath()
 //          << "for database drivers" << endl;
 
-//    dbglogfile << "Trying to open shared library \"" << filespec << "\"" << endl;
+//    log_msg ("Trying to open shared library \"%s\"", filespec);
     _dlhandle = lt_dlopenext (filespec);
     
     if (_dlhandle == NULL) {
-        dbglogfile << lt_dlerror();
+        log_error ("%s", lt_dlerror());
         return false;
     }
 
     // Make this module unloadable
     lt_dlmakeresident(_dlhandle);
     
-    dbglogfile << "Opened dynamic library \"" << filespec << "\"" << endl;
+    log_msg (_("Opened dynamic library \"%s\""), filespec);
 
     _filespec = filespec;
     
@@ -224,10 +211,10 @@ SharedLib::getInitEntry (const char *symbol)
     run  = lt_dlsym (_dlhandle, symbol);
     
     if (run == NULL) {
-        dbglogfile << " Couldn't find symbol: " << symbol << endl;
+        log_error (_("Couldn't find symbol: %s"), symbol);
         return NULL;
     } else {
-        dbglogfile << "Found symbol " << symbol << " @ " << (void *)run << endl;
+        log_msg (_("Found symbol %s @ %p"), symbol, (void *)run);
     }
     
     return (initentry *)run;
@@ -249,10 +236,10 @@ SharedLib::getDllSymbol(const char *symbol)
     Markus: 'Id est NULL.'
     */
     if (run == NULL) {
-        dbglogfile << " Couldn't find symbol: " << symbol << endl;
+        log_error (_("Couldn't find symbol: %s"), symbol);
         return NULL;
     } else {
-        dbglogfile << "Found symbol " << symbol << " @ " << (void *)run << endl;
+        log_msg (_("Found symbol %s @ %p"), symbol, (void *)run);
     }
     
     return (entrypoint *)run;

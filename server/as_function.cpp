@@ -36,10 +36,6 @@
 
 using namespace std;
 
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
-
 namespace gnash {
 
 // should be static, probably
@@ -290,7 +286,7 @@ function_call(const fn_call& fn)
 
 	if ( ! fn.nargs )
 	{
-                dbglogfile << "Function.call() with no args" << endl;
+                log_msg (_("Function.call() with no args"));
 		new_fn_call.nargs=0;
 	}
 	else

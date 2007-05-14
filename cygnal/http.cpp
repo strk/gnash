@@ -1,5 +1,6 @@
+// http.cpp:  HyperText Transport Protocol handler for Cygnal, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,12 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: http.cpp,v 1.7 2007/04/27 07:49:36 strk Exp $ */
+/* $Id: http.cpp,v 1.8 2007/05/14 09:44:20 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,10 +39,7 @@ static boost::mutex stl_mutex;
 namespace cygnal
 {
 
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
-
+// FIXME, this seems too small to me.  --gnu
 static const int readsize = 1024;
 
 HTTP::HTTP()
@@ -80,9 +79,9 @@ HTTP::waitForGetRequest()
     char buffer[readsize+1];
     memset(buffer, 0, readsize+1);
     if (readNet(buffer, readsize) > 0) {
-        dbglogfile << "Read initial GET Request" << endl;
+        log_msg (_("Read initial GET Request"));
     } else {
-        dbglogfile << "Couldn't read initial GET Request" << endl;
+        log_error (_("Couldn't read initial GET Request"));
     }
     
     extractMethod(buffer);
@@ -98,9 +97,9 @@ HTTP::waitForGetRequest()
 
     // See if we got a legit GET request
     if (strncmp(buffer, "GET ", 4) == 0) {
-        dbglogfile << "Got legit GET request: " << endl;
+        log_msg (_("Got legit GET request"));
     } else {
-        dbglogfile << "ERROR: Got bogus GET request!" << endl;
+        log_error (_("Got bogus GET request"));
     }
 
     return _url;
@@ -127,13 +126,15 @@ HTTP::sendGetReply(int filesize)
     // without any memory allocation, which could incur a small performance hit.
     char *length = strstr(reply, " XX");
     sprintf(length, " %d", filesize);
+// FIXME:  Doesn't this write to a const array?  And doesn't it fail to
+// supply the two \r\n's needed to finish the string?  --gnu
     
     int ret = writeNet(reply, strlen(reply));
 
     if (ret >= 0 && (unsigned)ret == strlen(reply)) {
-        dbglogfile << "Sent GET Reply: " << reply << endl;
+        log_msg (_("Sent GET Reply: %s"), reply);
     } else {
-        dbglogfile << "Couldn't send GET Reply, writeNet returned " << ret << endl;
+        log_msg (_("Couldn't send GET Reply, writeNet returned %d"), ret);
 	// TODO: FIXME: shouldn't we return false here ?
     }
     return true; // Default to true
@@ -378,20 +379,20 @@ HTTP::dump() {
     
     boost::mutex::scoped_lock lock(stl_mutex);
     
-    dbglogfile << "==== The HTTP header breaks down as follows: ====" << endl;
-    dbglogfile << "Filespec: " << _filespec.c_str() << endl;
-    dbglogfile << "URL: " << _url.c_str() << endl;
-    dbglogfile << "Version: " << _version.c_str() << endl;
-    dbglogfile << "Method: " << _method.c_str() << endl;
-    dbglogfile << "Referer: " << _referer.c_str() << endl;
-    dbglogfile << "Connection: " << _connection.c_str() << endl;
-    dbglogfile << "Host: " << _host.c_str() << endl;
-    dbglogfile << "User Agent: " << _agent.c_str() << endl;
-    dbglogfile << "Language: " << _language.c_str() << endl;
-    dbglogfile << "Charset: " << _charset.c_str() << endl;
-    dbglogfile << "Encoding: " << _encoding << endl;
-    dbglogfile << "TE: " << _te.c_str() << endl;
-    dbglogfile << "==== ==== ====" << endl;
+    log_msg (_("==== The HTTP header breaks down as follows: ===="));
+    log_msg (_("Filespec: %s"), _filespec.c_str());
+    log_msg (_("URL: %s"), _url.c_str());
+    log_msg (_("Version: %s"), _version.c_str());
+    log_msg (_("Method: %s"), _method.c_str());
+    log_msg (_("Referer: %s"), _referer.c_str());
+    log_msg (_("Connection: %s"), _connection.c_str());
+    log_msg (_("Host: %s"), _host.c_str());
+    log_msg (_("User Agent: %s"), _agent.c_str());
+    log_msg (_("Language: %s"), _language.c_str());
+    log_msg (_("Charset: %s"), _charset.c_str());
+    log_msg (_("Encoding: %s"), _encoding.c_str());
+    log_msg (_("TE: %s"), _te.c_str());
+    log_msg (_("==== ==== ===="));
 }
 
 } // end of cygnal namespace

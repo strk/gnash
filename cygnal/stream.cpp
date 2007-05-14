@@ -1,5 +1,6 @@
+// stream.cpp:  Network streaming server for Cygnal, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,10 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
+
+/* $Id: stream.cpp,v 1.5 2007/05/14 09:44:21 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,24 +66,22 @@ sendfile_thread()
     if (stat(loadfile.filespec, &stats) == 0) {
 
 	fd = open(loadfile.filespec, O_RDONLY);
-// 	dbglogfile << "File " << loadfile.filespec
-// 		   << " is " << stats.st_size
-// 		   << " bytes in size." << endl;
+// 	log_msg ("File %s is %lld bytes in size",
+//		 loadfile.filespec, (long long int)(stats.st_size));
 	if (fd) {
 	    fdptr = static_cast<char *>(mmap(0, stats.st_size,
 		   PROT_READ, MAP_SHARED, fd, 0));
 	} else {
-	    dbglogfile << "ERROR: Couldn't load "
-		       << loadfile.filespec << endl;
+	    log_error (_("Couldn't load file %s"), loadfile.filespec);
+// FIXME: now handle the error!
 	}
 	
 	if (fdptr == MAP_FAILED) {
-	    dbglogfile << "ERROR: Couldn't map file "
-		       << loadfile.filespec << " into memory! "
-		       << strerror(errno) << endl;
+	    log_error (_("Couldn't map file %s into memory: %s"),
+		       loadfile.filespec, strerror(errno));
 	} else {	    
-	    dbglogfile << "File " << loadfile.filespec
-		       << " mapped to: " << (void *)fdptr << endl;
+	    log_msg (_("File %s mapped to: %p"), loadfile.filespec,
+		       (void *)fdptr);
 	}
 	
 // 	if (stats.st_size > 1024*8) {
@@ -91,8 +93,7 @@ sendfile_thread()
 // 	if (stats.st_blocks > 10) {
 // 	}
     } else {
-	dbglogfile << "ERROR: File " << loadfile.filespec
-		   << " doesn't exist!" << endl;
+	log_error (_("File %s doesn't exist"), loadfile.filespec);
     }
 
     int filesize = stats.st_size;
@@ -111,7 +112,7 @@ sendfile_thread()
 	}
 	
 	if (nbytes <= 0) {
-	    dbglogfile << "Done..." << endl;
+	    log_msg (_("Done..."));
 	    return &nbytes;
 	}
     }
@@ -177,26 +178,23 @@ Stream::open(const char *filespec, int netfd, Statistics  *statistics) {
         _filesize = st.st_size;
         boost::mutex::scoped_lock lock(io_mutex);
 	_filefd = ::open(filespec, O_RDONLY);
-  	dbglogfile << "File " << filespec
-  		   << " is " << _filesize
-  		   << " bytes in size." << endl;
+  	log_msg (_("File %s is %lld bytes in size."), filespec,
+  		   (long long int) _filesize);
 	if (_filefd) {
 	    _dataptr = static_cast<unsigned char *>(mmap(0, _filesize,
 		   PROT_READ, MAP_SHARED, _filefd, 0));
 	} else {
-	    dbglogfile << "ERROR: Couldn't load "
-		       << filespec << endl;
+	    log_error (_("Couldn't load file %s"), filespec);
             return false;
 	}
 	
 	if (_seekptr == MAP_FAILED) {
-	    dbglogfile << "ERROR: Couldn't map file "
-		       << filespec << " into memory! "
-		       << strerror(errno) << endl;
+	    log_error (_("Couldn't map file %s into memory: %s"),
+		       filespec, strerror(errno));
             return false;
 	} else {	    
-	    dbglogfile << "File " << filespec
-		       << " mapped to: " << (void *)_dataptr << endl;
+	    log_msg (_("File %s mapped to: %p"), filespec,
+		       (void *)_dataptr);
             _seekptr = _dataptr;
             _state = OPEN;
             return true;
@@ -210,10 +208,8 @@ Stream::open(const char *filespec, int netfd, Statistics  *statistics) {
 // 	if (stats.st_blocks > 10) {
 // 	}
     } else {
-	dbglogfile << "ERROR: File " << filespec
-		   << " doesn't exist!" << endl;
+	log_error (_("File %s doesn't exist"), filespec);
     }
-
     
     return true;
 }

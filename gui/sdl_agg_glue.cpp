@@ -1,5 +1,6 @@
+// sdl_agg_glue.cpp:  Glue between SDL and Anti-Grain Geometry, for Gnash.
 //
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,11 +11,10 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-//
 //
 
 #include "sdl_agg_glue.h"
@@ -25,10 +25,6 @@
 #include <ostream>
 
 using namespace std;
-
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
 
 namespace gnash
 {
@@ -73,7 +69,7 @@ SdlAggGlue::createRenderHandler(int bpp)
         _agg_renderer = create_render_handler_agg("RGBA16");
         break;
       default:
-        dbglogfile << "ERROR: bit depth must be 16, 24 or 32 bits." << std::endl;
+        log_error (_("AGG's bit depth must be 16, 24 or 32 bits, not %d."), _bpp);
         assert(0);
     }
     return _agg_renderer;
@@ -90,7 +86,7 @@ SdlAggGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
     _screen = SDL_SetVideoMode(width, height, _bpp, sdl_flags | SDL_SWSURFACE);
 
     if (!_screen) {
-        fprintf(stderr, "SDL_SetVideoMode() failed.\n");
+        log_error (_("SDL_SetVideoMode() failed for SdlAggGlue."));
         exit(1);
     }
 
@@ -127,7 +123,7 @@ SdlAggGlue::prepDrawingArea(int width, int height, uint32_t sdl_flags)
 
     _offscreenbuf = new unsigned char[bufsize];
 
-    log_msg("SDL-AGG: %i bytes offscreen buffer allocated\n", bufsize);
+    log_msg (_("SDL-AGG: %i byte offscreen buffer allocated"), bufsize);
 
 
     // Only the AGG renderer has the function init_buffer, which is *not* part of

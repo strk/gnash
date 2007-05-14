@@ -34,7 +34,6 @@
 #include "movie_root.h"
 
 namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
 }
 
@@ -139,7 +138,7 @@ Debugger::console(as_environment &env)
     Debugger::watch_state_e wstate;
     bool keep_going = true;
 
-    dbglogfile << "Debugger enabled >> " << endl;
+    log_msg (_("Debugger enabled >> "));
     while (keep_going) {
 	cerr << "gnashdbg> ";
 	cin >> action;
@@ -354,7 +353,7 @@ Debugger::disassemble(const unsigned char *data)
 	cerr << "\tArg format is: " << as_arg_strs[fmt] << " Length is: " << length << endl;
 	switch (fmt) {
 	  case ARG_NONE:
-	      dbglogfile << "ERROR: No format flag!" << endl;
+	      log_error (_("No format flag"));
 	      break;
 	  case ARG_STR:
 	      if ((length == 1) && (data[3] == 0)) {
@@ -400,7 +399,7 @@ Debugger::disassemble(const unsigned char *data)
 	  case ARG_FUNCTION2:
 	      break;
 	  default:
-	      dbglogfile << "ERROR: No format flag!" << endl;
+	      log_error (_("No format flag"));
 	      break;
 	} // end of switch(fmt)
     }
@@ -452,11 +451,11 @@ Debugger::matchBreakPoint(const std::string &func, bool state)
     std::map<std::string, bool>::const_iterator it;
     it =_breakpoints.find(func);
     if (it == _breakpoints.end()) {
-//	dbglogfile << "No Match for variable \"" << var << "\"" << endl;
+//	log_msg ("No Match for variable \"%s\"", var);
  	return false;
     } else {
 	if (state == _breakpoints[func]) {
-//	    dbglogfile << "Matched for Function \"" << func << "\"" << endl;
+//	    log_msg ("Matched for Function \"%s\"", func);
 	    this->console();
 	    return true;
 	}
@@ -469,7 +468,7 @@ Debugger::setWatchPoint(const std::string &var, watch_state_e state)
 {
 //    GNASH_REPORT_FUNCTION;
     _watchpoints[var] = state;
-    dbglogfile << "Setting watchpoint for variable: \"" << var << "" << endl;
+    log_msg (_("Setting watchpoint for variable: \"%s\""), var.c_str());
 }
 
 void
@@ -512,12 +511,12 @@ Debugger::matchWatchPoint(const std::string &var, watch_state_e state)
     std::map<std::string, watch_state_e>::const_iterator it;
     it =_watchpoints.find(var);
     if (it == _watchpoints.end()) {
-//	dbglogfile << "No Match for variable \"" << var << "\"" << endl;
+//	log_msg ("No Match for variable \"%s\"", var);
  	return false;
     } else {
 	if (state == _watchpoints[var]) {
-	    dbglogfile << "Matched for variable \"" << var << "\": \""
-		       << state_strs[state] << "\"" << endl;
+	    log_msg (_("Matched for variable \"%s\": \"%s\""), var.c_str(),
+		       state_strs[state]);
 	    this->console();
 	    return true;
 	}
@@ -531,7 +530,7 @@ Debugger::dumpStackFrame()
 {
 //    GNASH_REPORT_FUNCTION;
     if (_env == 0) {
-	dbglogfile << "WARNING: environment not set in " << __PRETTY_FUNCTION__ << endl;
+	log_error (_("WARNING: environment not set in %s"), __PRETTY_FUNCTION__);
 	return;
     }
     this->dumpStackFrame(*_env);
@@ -550,7 +549,7 @@ Debugger::changeStackValue(as_environment &env, int index, as_value &val)
 {
 //    GNASH_REPORT_FUNCTION;
     if (!_env) {
-	dbglogfile << "WARNING: environment not set in " << __PRETTY_FUNCTION__ << endl;
+	log_error (_("WARNING: environment not set in %s"), __PRETTY_FUNCTION__);
 	return;
     }
     if (env.stack_size()) {
@@ -563,12 +562,13 @@ Debugger::dumpStackFrame(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;    
     if (!_env) {
-	dbglogfile << "WARNING: environment not set in " << __PRETTY_FUNCTION__ << endl;
+	log_error (_("WARNING: environment not set in %s"), __PRETTY_FUNCTION__);
 	return;
     }
     if (env.stack_size()) {
-        dbglogfile << "Stack Dump of: " << (void *)&env << endl;
+        log_msg (_("Stack Dump of: %p"), (void *)&env);
         for (unsigned int i=0, n=env.stack_size(); i<n; i++) {    
+	    // FIXME, shouldn't these go to the log as well as to cerr?
             cerr << "\t" << i << ": ";
 	    as_value val = env.m_stack[i];
 // FIXME: we want to print the name of the function
@@ -592,7 +592,7 @@ Debugger::dumpStackFrame(as_environment &env)
 	}
     }
     else {
-	dbglogfile << "Stack Dump of 0x" << (void *)&env << ": empty" << endl;
+	log_msg (_("Stack Dump of 0x%p: empty"), (void *)&env);
     }
 }
 
@@ -622,12 +622,12 @@ Debugger::dumpGlobalRegisters(as_environment &env)
 {
 //    GNASH_REPORT_FUNCTION;  
     if (!_env) {
-	dbglogfile << "WARNING: environment not set in " << __PRETTY_FUNCTION__ << endl;
+	log_error (_("WARNING: environment not set in %s"), __PRETTY_FUNCTION__);
 	return;
     }
     std::string registers;
     stringstream ss;
-    dbglogfile << "Global Registers Dump:" << endl;
+    log_msg (_("Global Registers Dump:"));
     for (unsigned int i=0; i<4; ++i) {
 	ss << "\treg #" << i << ": \"";
 	ss << env.global_register(i).to_debug_string() << "\"" << endl;
@@ -707,7 +707,8 @@ Debugger::lookupSymbol(std::string &name)
 	std::map<void *, std::string>::const_iterator it;
 	for (it=_symbols.begin(); it != _symbols.end(); it++) {
 	    if (it->second == namei) {
-//		dbglogfile << "Found symbol " << namei.c_str() << " at address: " << it->first << endl;
+//		log_msg ("Found symbol %s at address %p", namei.c_str(),
+//			   it->first);
 		return it->first;
 	    }
 	}
@@ -725,7 +726,7 @@ Debugger::addSymbol(void *ptr, std::string name)
 	boost::to_lower(namei, vm.getLocale());
     }
     if (namei.size() > 1) {
-//	dbglogfile << "Adding symbol " << namei << " at address: " << ptr << endl;
+//	log_msg ("Adding symbol %s at address: %p", namei, ptr);
 	_symbols[ptr] = namei;
     }
     
@@ -741,15 +742,15 @@ Debugger::lookupSymbol(void *ptr)
     if (_symbols.size()) {
 	std::map<void *, std::string>::const_iterator it;
 	it = _symbols.find(ptr);
-	dbglogfile.setStamp(false);
+//	dbglogfile.setStamp(false);
 	if (it != _symbols.end()) {
-//	    dbglogfile << "Found symbol " << it->second.c_str() << " at address: " << ptr << endl;
+//	    log_msg ("Found symbol %s at address: %p", it->second.c_str(), ptr);
 	    str = it->second;
 // 	} else {
-// 	    dbglogfile << "No symbol found for address " << ptr << endl;
+// 	    log_msg ("No symbol found for address %p", ptr);
 	}
     }
-    dbglogfile.setStamp(false);
+//    dbglogfile.setStamp(false);
     return str;
 }
 

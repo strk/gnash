@@ -1,15 +1,17 @@
+// sound_handler_gst.cpp: Audio output via GStreamer, for Gnash.
+//
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -18,13 +20,13 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.38 2007/05/12 09:59:44 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.39 2007/05/14 09:44:19 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-// Assume people running --enable-sound=gst know what they are doing
+// Assume people running --enable-media=gst know what they are doing
 // (HAVE_GST_GST_H seems broken atm, specifically when an older glib
 //  install is around)
 //
@@ -73,7 +75,7 @@ int	GST_sound_handler::create_sound(
 
 	sound_data *sounddata = new sound_data;
 	if (!sounddata) {
-		gnash::log_error("could not allocate memory for sounddata !");
+		gnash::log_error(_("Could not allocate memory for sound data"));
 		return -1;
 	}
 
@@ -98,7 +100,7 @@ int	GST_sound_handler::create_sound(
                 signed: { true, false }*/
 		sounddata->data = new guint8[data_bytes];
 		if (!sounddata->data) { 
-			gnash::log_error("could not allocate space for data in soundhandler.");
+			gnash::log_error(_("Could not allocate space for data in sound handler"));
 			return -1;
 		}
 		memcpy(sounddata->data, data, data_bytes);
@@ -115,7 +117,7 @@ int	GST_sound_handler::create_sound(
                 signed: { true, false }*/
 		sounddata->data = new guint8[data_bytes];
 		if (!sounddata->data) { 
-			gnash::log_error("could not allocate space for data in soundhandler.");
+			gnash::log_error(_("Could not allocate space for data in sound handler"));
 			return -1;
 		}
 		memcpy(sounddata->data, data, data_bytes);
@@ -125,7 +127,7 @@ int	GST_sound_handler::create_sound(
 	//case FORMAT_VORBIS:
 		sounddata->data = new guint8[data_bytes];
 		if (!sounddata->data) { 
-			gnash::log_error("could not allocate space for data in soundhandler.");
+			gnash::log_error(_("Could not allocate space for data in sound handler"));
 			return -1;
 		}
 		memcpy(sounddata->data, data, data_bytes);
@@ -135,17 +137,17 @@ int	GST_sound_handler::create_sound(
 	case FORMAT_ADPCM:
 	case FORMAT_UNCOMPRESSED:
 		// These should have been converted to FORMAT_NATIVE16
-		gnash::log_error("Sound data format not properly converted");
+		gnash::log_error(_("Sound data format not properly converted"));
 		assert(0);
 		break;
 
 	case FORMAT_NELLYMOSER:
-		gnash::log_unimpl("Nellymoser sound format requested, gnash does not handle it.");
+		gnash::log_unimpl(_("Nellymoser sound format requested; gnash does not handle it"));
 		return -1;
 
 	default:
 		// Unhandled format.
-		gnash::log_error(_("unknown sound format %d requested; gnash does not handle it"), (int)format);
+		gnash::log_error(_("Unknown sound format %d requested; gnash does not handle it"), (int)format);
 		return -1; // Unhandled format, set to NULL.
 	}
 
@@ -281,7 +283,7 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 	// Make a "gst_elements" for this sound which is latter placed on the vector of instances of this sound being played
 	gst_elements* gst_element = new gst_elements;
 	if (gst_element == NULL) {
-		gnash::log_error ("could not allocate memory for gst_element !");
+		gnash::log_error (_("Could not allocate memory for gst_element"));
 		return;
 	}
 	// Copy data-info to the "gst_elements"
@@ -306,10 +308,10 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 
 	// Check if the creation of the gstreamer pipeline, adder and audiosink was a succes
 	if (!gst_element->pipeline) {
-		gnash::log_error("The gstreamer pipeline element could not be created!");
+		gnash::log_error(_("The gstreamer pipeline element could not be created"));
 	}
 	if (!gst_element->audiosink) {
-		gnash::log_error("The gstreamer audiosink element could not be created!");
+		gnash::log_error(_("The gstreamer audiosink element could not be created"));
 	}
 
 	// link adder and output to bin
@@ -335,7 +337,7 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 		|| !gst_element->audioconvert
 		|| !gst_element->audioresample) {
 
-		gnash::log_error("Gstreamer element for audio handling could not be created!");
+		gnash::log_error(_("Gstreamer element for audio handling could not be created"));
 		return;
 	}
 
@@ -349,12 +351,12 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 			if (gst_element->decoder != NULL && !gst_default_registry_check_feature_version("flump3dec", 0, 10, 4))
 			{
 				// I keep getting these messages even if I hear sound... too much paranoia ?
-				gnash::log_debug("This version of fluendos mp3 plugin does not support flash streaming sounds, please upgrade to version 0.10.4 or higher.");
+				gnash::log_debug(_("This version of fluendos mp3 plugin does not support flash streaming sounds, please upgrade to version 0.10.4 or higher"));
 			}
 		}
 		// Check if the element was correctly created
 		if (!gst_element->decoder) {
-			gnash::log_error("A gstreamer mp3-decoder element could not be created! You probably need to install a mp3-decoder plugin like gstreamer0.10-mad or gstreamer0.10-fluendo-mp3.");
+			gnash::log_error(_("A gstreamer mp3-decoder element could not be created.  You probably need to install a mp3-decoder plugin like gstreamer0.10-mad or gstreamer0.10-fluendo-mp3."));
 			return;
 		}
 		gst_bin_add (GST_BIN (gst_element->bin), gst_element->decoder);
@@ -582,12 +584,12 @@ bool GST_sound_handler::is_muted() {
 
 void GST_sound_handler::attach_aux_streamer(aux_streamer_ptr /*ptr*/, void* /*owner*/)
 {
-	gnash::log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+	gnash::log_unimpl(__PRETTY_FUNCTION__);
 }
 
 void GST_sound_handler::detach_aux_streamer(void* /*owner*/)
 {
-	gnash::log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+	gnash::log_unimpl(__PRETTY_FUNCTION__);
 }
 
 void GST_sound_handler::convert_raw_data(
@@ -599,7 +601,7 @@ void GST_sound_handler::convert_raw_data(
 	int /*sample_rate*/,
 	bool /*stereo*/)
 {
-	gnash::log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
+	gnash::log_unimpl(__PRETTY_FUNCTION__);
 }
 
 

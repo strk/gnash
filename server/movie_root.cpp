@@ -1,3 +1,4 @@
+// movie_root.cpp:  The root movie, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,11 +11,11 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
-//
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,10 +38,6 @@
 #include <boost/algorithm/string/case_conv.hpp>
 
 using namespace std;
-
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
 
 namespace gnash
 {
@@ -476,9 +473,8 @@ movie_root::get_mouse_state(int& x, int& y, int& buttons)
 {
 //	    GNASH_REPORT_FUNCTION;
 
-//             dbglogfile << "X is: " << m_mouse_x << " Y is: " << m_mouse_y
-//                        << " Button is: "
-//                        << m_mouse_buttons << endl;
+//             log_msg ("X is %d, Y is %d, Button is %d", m_mouse_x,
+//			 m_mouse_y, m_mouse_buttons);
 
 	assert(testInvariant());
 
@@ -518,7 +514,7 @@ movie_root::get_url(const char *url)
     string command = "mozilla -remote \"openurl";
     command += url;
     command += ")\"";
-    dbglogfile << "Launching URL... " << command << endl;
+    log_msg (_("Launching URL... %s"), command.c_str());
     system(command.c_str());
 }
 #endif

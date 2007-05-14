@@ -1,3 +1,4 @@
+// parser.cpp:  Flash movie parser (gparser command), for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,12 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: parser.cpp,v 1.36 2007/04/06 07:58:16 jgilmore Exp $ */
+/* $Id: parser.cpp,v 1.37 2007/05/14 09:44:22 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -54,12 +56,12 @@ const char *GPARSE_VERSION = "1.0";
 bool gofast = false;		// FIXME: this flag gets set based on
 				// an XML message written using
 				// SendCommand(""). This way a movie
-				// can optimize it's own performance
+				// can optimize its own performance
 				// when needed,
 bool nodelay = false;           // FIXME: this flag gets set based on
 				// an XML message written using
 				// SendCommand(""). This way a movie
-				// can optimize it's own performance
+				// can optimize its own performance
 				// when needed,
 
 extern int xml_fd;		// FIXME: this is the file descriptor
@@ -365,13 +367,13 @@ void parse_place_object12(stream* input, int tag_type)
 	
 	UNUSED(has_actions);
 	
-	log_msg("depth: %i\n",input->read_u16());
+	log_msg("depth: %i",input->read_u16());
 	
 	if (has_char) {
-	    log_msg("character ID: %i\n",input->read_u16());
+	    log_msg("character ID: %i",input->read_u16());
 	}
 	if (has_matrix) {
-	    log_msg("matrix:\n");
+	    log_msg("matrix:");
 	    matrix::parse(input);
 	    matrix::write();
 	}
@@ -381,24 +383,24 @@ void parse_place_object12(stream* input, int tag_type)
 	    cxform::write();
 	}			
 	if (has_ratio) {
-	    log_msg("ratio: %i\n",input->read_u16());
+	    log_msg("ratio: %i",input->read_u16());
 	}			
 	if (has_name) {
-	    log_msg("name: %s\n",input->read_string());
+	    log_msg("name: %s",input->read_string());
 	}
 	if (has_clip_depth) {
-	    log_msg("clipdepth: %i\n",input->read_u16());
+	    log_msg("clipdepth: %i",input->read_u16());
 	}			
 	if (has_clip_depth) {
-	    log_msg("has_actions: to be implemented\n");
+	    log_msg("has_actions: to be implemented");
 	}
 	
 	if (has_char == true && flag_move == true) {
-	    log_msg("replacing a character previously at this depth\n");
+	    log_msg("replacing a character previously at this depth");
 	} else if (has_char == false && flag_move == true) {
-	    log_msg("moving a character previously at this depth\n");
+	    log_msg("moving a character previously at this depth");
 	} else if (has_char == true && flag_move == false) {
-	    log_msg("placing a character first time at this depth\n");
+	    log_msg("placing a character first time at this depth");
 	}
 	
 	ident--;
@@ -410,16 +412,16 @@ void parse_remove_object12(stream* input, int tag_type)
 {
     assert(tag_type == 5 || tag_type == 28);
     if (tag_type==5) {
-	log_msg("remove_object\n");
+	log_msg("remove_object");
 	ident++;
-	log_msg("character ID: %i\n", input->read_u16());
-	log_msg("depth: %i\n", input->read_u16());
+	log_msg("character ID: %i", input->read_u16());
+	log_msg("depth: %i", input->read_u16());
 	ident--;
     }
     if (tag_type==28) {
-	log_msg("remove_object_2\n");
+	log_msg("remove_object_2");
 	ident++;
-	log_msg("depth: %i\n", input->read_u16());
+	log_msg("depth: %i", input->read_u16());
 	ident--;
     }
 }
@@ -428,9 +430,9 @@ void parse_remove_object12(stream* input, int tag_type)
 void parse_define_shape_morph(stream *input, int tag_type)
 {
     assert(tag_type == 46);
-    log_msg("define_shape_morph\n");
+    log_msg("define_shape_morph");
     ident++;
-    log_msg("character ID: %i\n", input->read_u16());
+    log_msg("character ID: %i", input->read_u16());
     ident--;
 }
 
@@ -438,51 +440,51 @@ void parse_define_shape_morph(stream *input, int tag_type)
 void parse_define_bits(stream* input, int tag_type)
 {
     assert(tag_type==6);
-    log_msg("define jpeg bits\n");
+    log_msg("define jpeg bits");
     ident++;
-    log_msg("character ID: %i\n", input->read_u16());
+    log_msg("character ID: %i", input->read_u16());
     ident--;
 }
 
 void parse_jpeg_tables(stream* /* input */, int tag_type)
 {
     assert(tag_type==8);
-    log_msg("define jpeg table\n\n");
+    log_msg("define jpeg table");
 }	
 
 void parse_set_background_color(stream* input, int tag_type)
 {
     assert(tag_type==9);
     rgb::parse(input);
-    log_msg("set background color to:\n");
+    log_msg("set background color to:");
     rgb::write();		
 }
 
 void parse_do_action(stream* /* input */, int tag_type)
 {
     assert(tag_type==12);
-    log_msg("do action:\n");
+    log_msg("do action:");
     ident++;
-    log_msg("to be implemented\n");
+    log_msg("to be implemented");  // FIXME!
     ident--;
 }		
 
 void parse_define_sprite(stream* input, int tag_type)
 {
     assert(tag_type==39);
-    log_msg("define a new sprite:\n");
+    log_msg("define a new sprite:");
     ident++;
     int	tag_end = input->get_tag_end_position();
     uint32_t char_id = input->read_u16();
     uint32_t sprite_frame_count = input->read_u16();
-    log_msg("character ID: %i\n", char_id);
-    log_msg("frame count of sprite: %i\n", sprite_frame_count);
+    log_msg("character ID: %i", char_id);
+    log_msg("frame count of sprite: %i", sprite_frame_count);
     uint32_t old_current_frame = current_frame;
     current_frame = 0;
     
     ident++;
     log_msg("\n");		
-    log_msg("starting frame 0\n\n");
+    log_msg("starting frame 0\n");
     ident++;
     
     while ((uint32_t) input->get_position() < (uint32_t) tag_end) {
@@ -493,11 +495,11 @@ void parse_define_sprite(stream* input, int tag_type)
 	    ident--;
 	    ident--;
 	    ident--;
-	    log_msg("end of sprite definition\n\n");
+	    log_msg("end of sprite definition\n");
 	} else if (tag_loaders.get(tag_type, &lf)) {
 	    (*lf)(input, tag_type);
 	} else {
-	    log_msg("warning: no tag loader for tag_type %d\n", tag_type);
+	    log_msg("warning: no tag loader for tag_type %d", tag_type);
 	}
 	input->close_tag();
     }
@@ -507,10 +509,10 @@ void parse_define_sprite(stream* input, int tag_type)
 void parse_set_framelabel(stream* input, int tag_type)
 {
     assert(tag_type==43);
-    log_msg("current framelabel:\n");
+    log_msg("current framelabel:");
     ident++;
     char* str = input->read_string();
-    log_msg("%s\n",str);
+    log_msg("%s",str);
     delete str;
     
     if (input->get_position() < input->get_tag_end_position()) {
@@ -548,16 +550,16 @@ void parse_swf(std::auto_ptr<tu_file> file)
     
     uint32_t version = (header >> 24) & 255;
     if ((header & 0x0FFFFFF) != 0x00535746 && (header & 0x0FFFFFF) != 0x00535743) {
-	log_msg("\nNo valid SWF file, header is incorrect!\n");
+	log_error("No valid SWF file, header is incorrect");
 	return;
     }
     
     bool compressed = (header & 255) == 'C';
     
-    log_msg("\nSWF version %i, file length = %i bytes\n", version, file_length);
+    log_msg("SWF version %i, file length = %i bytes", version, file_length);
     
     if (compressed) {
-	log_msg("file is compressed.\n");
+	log_msg("file is compressed.");
 	file = zlib_adapter::make_inflater(file);
 	file_length -= 8;
     }
@@ -568,12 +570,12 @@ void parse_swf(std::auto_ptr<tu_file> file)
     float frame_rate = str.read_u16() / 256.0f;
     int frame_count = str.read_u16();
     
-    log_msg("viewport:\n");
+    log_msg("viewport:");
     rect::write();
-    log_msg("frame rate = %f, number of frames = %d\n", frame_rate, frame_count);
+    log_msg("frame rate = %f, number of frames = %d", frame_rate, frame_count);
     
-    log_msg("\n");
-    log_msg("starting frame 0\n\n");
+    log_msg("");
+    log_msg("starting frame 0\n");
     ident++;
     
     while ((uint32_t) str.get_position() < file_length) {
@@ -584,14 +586,14 @@ void parse_swf(std::auto_ptr<tu_file> file)
 	if (tag_loaders.get(tag_type, &lf)) {
 	    (*lf)(&str, tag_type);	    
 	} else {
-	    log_msg("warning: no tag loader for tag_type %d\n", tag_type);
+	    log_msg("warning: no tag loader for tag_type %d", tag_type);
 	}
 	
 	str.close_tag();
 	
 	if (tag_type == 0) {
 	    if ((unsigned int)str.get_position() != file_length) {
-		log_msg("warning: end of file tag found, while not at the end of the file, aborting\n");
+		log_error("warning: end of file tag found, while not at the end of the file, aborting");
 		break;
 	    }
 	}
@@ -619,8 +621,8 @@ main(int argc, char *argv[])
 	    exit(0);
 	}
 	if (strcmp("--version", argv[c]) == 0) {
-	    std::cerr << "Gnash gparser version: " << GPARSE_VERSION;
-	    std::cerr << ", Gnash version: " << VERSION << std::endl;
+	    log_msg (_("Gnash gparser version: %s, Gnash version: %s"), 
+			GPARSE_VERSION, VERSION);
             dbglogfile.removeLog();
 	    exit(0);
 	}
@@ -654,9 +656,9 @@ main(int argc, char *argv[])
 #ifdef USE_DEBUGGER
               debugger.enabled(true);
               debugger.console();
-              dbglogfile << "Setting debugger ON" << std::endl;
+              log_msg (_("Setting debugger ON"));
 #else
-              dbglogfile << "WARNING: The debugger has been disabled at configuration time" << std::endl;
+              log_error (_("The debugger has been disabled at configuration time"));
 #endif
 	  default:
 	      break;
@@ -671,7 +673,7 @@ main(int argc, char *argv[])
   
     // No file names were supplied
     if (infiles.size() == 0) {
-	printf("no input files\n");
+	log_error (_("No input files"));
 	usage(argv[0]);
         dbglogfile.removeLog();
 	exit(1);
@@ -683,9 +685,9 @@ main(int argc, char *argv[])
     parser::register_all_loaders();
     for (int i = 0, n = infiles.size(); i < n; i++) {
         std::auto_ptr<tu_file> in ( new tu_file(infiles[i], "rb") );
-	std::cerr << "Processing file: " << infiles[i] << std::endl;
+	log_msg (_("Processing file: %s"), infiles[i]);
 	if (in->get_error()) {
-	    log_msg("can't open '%s' for input\n", infiles[i]);
+	    log_error(_("Can't open file '%s' for input"), infiles[i]);
 	    exit(1);
 	}
     
@@ -699,14 +701,14 @@ main(int argc, char *argv[])
 static void
 usage (const char *)
 {
-    printf(
+    printf(_(
 	"gparser -- an SWF parser for Gnash.\n"
 	"\n"
 	"usage: gparser [swf files to process...]\n"
 	"  --help(-h)  Print this info.\n"
 	"  --version   Print the version numbers.\n"
 	"  -g          Start the Flash debugger.\n"
-	);
+	));
 }
 
 // Local Variables:

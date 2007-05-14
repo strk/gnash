@@ -1,3 +1,4 @@
+// processor.cpp:  Flash movie processor (gprocessor command), for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -10,12 +11,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: processor.cpp,v 1.55 2007/04/06 07:58:16 jgilmore Exp $ */
+/* $Id: processor.cpp,v 1.56 2007/05/14 09:44:22 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -149,8 +151,8 @@ main(int argc, char *argv[])
         exit(0);
       }
       if (strcmp("--version", argv[c]) == 0) {
-        cerr << "Gnash gprocessor version: " << GPROC_VERSION;
-        cerr << ", Gnash version: " << VERSION << endl;
+        log_msg (_("Gnash gprocessor version: %s, Gnash version: %s"),
+		   GPROC_VERSION, VERSION);
         dbglogfile.removeLog();
         exit(0);
       }
@@ -186,28 +188,28 @@ main(int argc, char *argv[])
 	      break;
 	  case 'v':
 	      dbglogfile.setVerbosity();
-	      dbglogfile << "Verbose output turned on" << endl;
+	      log_msg (_("Verbose output turned on"));
 	      break;
           case 'g':
 #ifdef USE_DEBUGGER
               debugger.enabled(true);
               debugger.console();
-              dbglogfile << "Setting debugger ON" << std::endl;
+              log_msg (_("Setting debugger ON"));
 #else
-              dbglogfile << "WARNING: The debugger has been disabled at configuration time" << std::endl;
+              log_error (_("The debugger has been disabled at configuration time"));
 #endif
 	  case 'a':
 #if VERBOSE_ACTION
 	      dbglogfile.setActionDump(true); 
 #else
-              dbglogfile << "Verbose actions disabled at compile time" << endl;
+              log_error (_("Verbose actions disabled at compile time"));
 #endif
 	      break;
 	  case 'p':
 #if VERBOSE_PARSE
 	      dbglogfile.setParserDump(true); 
 #else
-              dbglogfile << "Verbose parsing disabled at compile time" << endl;
+              log_error (_("Verbose parsing disabled at compile time"));
 #endif
 	      break;
 	  case 'r':
@@ -456,34 +458,40 @@ static void
 usage (const char *name)
 {
     printf(
-	"gprocessor -- an SWF preprocessor for Gnash.\n"
+	_("gprocessor -- an SWF preprocessor for Gnash.\n"
 	"\n"
 	"usage: %s [options] <file>\n"
 	"\n"
 	"Preprocesses the given SWF movie files.  Optionally write preprocessed shape\n"
 	"and font data to cache files, so the associated SWF files can be loaded\n"
-	"faster by gameswf.\n"
+	"faster.\n"
 	"\n"
+        "%s%s%s%s"), name, _(
 	"options:\n"
 	"\n"
 	"  --help(-h)  Print this info.\n"	
 	"  --version   Print the version numbers.\n"	
 	"  -w          Write a .gsc file with preprocessed info, for each input file.\n"	
 	"  -v          Be verbose; i.e. print log messages to stdout\n"
+          ),
 #if VERBOSE_PARSE
-	"  -vp         Be verbose about movie parsing\n"
+	_("  -vp         Be verbose about movie parsing\n"),
+#else
+	"",
 #endif
 #if VERBOSE_ACTION
-	"  -va         Be verbose about ActionScript\n"
+	_("  -va         Be verbose about ActionScript\n"),
+#else
+	"",
 #endif
+	_(
 	"  -r <times>  Allow the given number of complete runs.\n"
 	"              Keep looping undefinitely if set to 0.\n"
 	"              Default is 1 (end as soon as the last frame is reached).\n"
 	"  -f <frames>  \n"
 	"              Allow the given number of frame advancements.\n"
 	"              Keep advancing untill any other stop condition\n"
-        "              is encountered if set to 0 (default).\n"
-	, name
+        "              is encountered if set to 0 (default).\n")
 	);
 }
 

@@ -1,5 +1,6 @@
+// kde.cpp:  K Development Environment top level window, for Gnash.
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -10,12 +11,11 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
-//
-
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,10 +41,6 @@
 #include <X11/keysym.h>
 
 using namespace std;
-
-namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-}
 
 namespace gnash 
 {
@@ -342,15 +338,15 @@ qwidget::mouseMoveEvent(QMouseEvent *event)
 qwidget::qwidget(KdeGui* godfather)
   : QGLWidget(0, "hi")
 {
-    _qmenu.insertItem("Play Movie", this, SLOT(menuitem_play_callback()));
-    _qmenu.insertItem("Pause Movie", this, SLOT(menuitem_pause_callback()));
-    _qmenu.insertItem("Stop Movie", this, SLOT(menuitem_stop_callback()));
-    _qmenu.insertItem("Restart Movie", this, SLOT(menuitem_restart_callback()));
-    _qmenu.insertItem("Step Forward", this, SLOT(menuitem_step_forward_callback()));
-    _qmenu.insertItem("Step Backward", this, SLOT( menuitem_step_backward_callback()));
-    _qmenu.insertItem("Jump Forward", this, SLOT(menuitem_jump_forward_callback()));
-    _qmenu.insertItem("Jump Backward", this, SLOT(menuitem_jump_backward_callback()));
-    _qmenu.insertItem("Quit Gnash", this, SLOT(menuitem_quit_callback()));
+    _qmenu.insertItem(_("Play Movie"), this, SLOT(menuitem_play_callback()));
+    _qmenu.insertItem(_("Pause Movie"), this, SLOT(menuitem_pause_callback()));
+    _qmenu.insertItem(_("Stop Movie"), this, SLOT(menuitem_stop_callback()));
+    _qmenu.insertItem(_("Restart Movie"), this, SLOT(menuitem_restart_callback()));
+    _qmenu.insertItem(_("Step Forward"), this, SLOT(menuitem_step_forward_callback()));
+    _qmenu.insertItem(_("Step Backward"), this, SLOT( menuitem_step_backward_callback()));
+    _qmenu.insertItem(_("Jump Forward"), this, SLOT(menuitem_jump_forward_callback()));
+    _qmenu.insertItem(_("Jump Backward"), this, SLOT(menuitem_jump_backward_callback()));
+    _qmenu.insertItem(_("Quit Gnash"), this, SLOT(menuitem_quit_callback()));
 
     _godfather = godfather;
 
