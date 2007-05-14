@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape_character_def.h,v 1.11 2007/04/11 14:20:20 strk Exp $ */
+/* $Id: shape_character_def.h,v 1.12 2007/05/14 17:23:16 strk Exp $ */
 
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
@@ -82,6 +82,16 @@ namespace gnash {
 		void clear_meshes();
 
 	private:
+
+		/// Shape record flags
+		enum ShapeRecordFlags {
+			flagEnd = 0x00,
+			flagMove = 0x01,
+			flagFillStyle0Change = 0x02,
+			flagFillStyle1Change = 0x04,
+			flagLineStyleChange = 0x08,
+			flagHasNewStyles = 0x10
+		};
 
 		void	sort_and_clean_meshes() const;
 		

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.21 2007/04/30 13:03:31 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.22 2007/05/14 17:23:15 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -205,13 +205,14 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     path	current_path;
 
 #define SHAPE_LOG 0
+
     // SHAPERECORDS
     for (;;) {
 	int	type_flag = in->read_uint(1);
 	if (type_flag == 0) {
 	    // Parse the record.
 	    int	flags = in->read_uint(5);
-	    if (flags == 0) {
+	    if (flags == flagEnd) {
 		// End of shape records.
 
 		// Store the current path if any.
@@ -223,7 +224,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 
 		break;
 	    }
-	    if (flags & 0x01) {
+	    if (flags & flagMove) {
 		// move_to = 1;
 
 		// Store the current path if any, and prepare a fresh one.
@@ -249,7 +250,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		    log_parse(_("  shape_character read: moveto %4g %4g"), x, y);
 		);
 	    }
-	    if ((flags & 0x02) && num_fill_bits > 0) {
+	    if ((flags & flagFillStyle0Change) && num_fill_bits > 0)
+	    {
 		// fill_style_0_change = 1;
 		if (! current_path.is_empty()) {
 		    m_paths.push_back(current_path);
@@ -270,7 +272,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		);
 
 	    }
-	    if ((flags & 0x04) && num_fill_bits > 0) {
+	    if ((flags & flagFillStyle1Change) && num_fill_bits > 0)
+	    {
 		// fill_style_1_change = 1;
 		if (! current_path.is_empty()) {
 		    m_paths.push_back(current_path);
@@ -289,7 +292,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		}
 		);
 	    }
-	    if ((flags & 0x08) && num_line_bits > 0) {
+	    if ((flags & flagLineStyleChange) && num_line_bits > 0)
+	    {
 		// line_style_change = 1;
 		if (! current_path.is_empty()) {
 		    m_paths.push_back(current_path);
@@ -309,11 +313,14 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		}
 		);
 	    }
-	    if (flags & 0x10) {
-		if (tag_type == SWF::DEFINESHAPE) {
-		    tag_type += SWF::DEFINESHAPE2; // ?? why is this ??
+	    if (flags & flagHasNewStyles)
+	    {
+		IF_VERBOSE_MALFORMED_SWF(
+		if (tag_type == SWF::DEFINESHAPE)
+		{
+			log_swferror("unexpected HasNewStyle flag in a DEFINESHAPE tag shape record");
 		}
-		assert(tag_type >= 22);
+	    	)
 
 		IF_VERBOSE_PARSE (
 		log_parse(_("  shape_character read: more fill styles"));

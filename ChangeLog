@@ -1,5 +1,10 @@
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/shape_character_def.{cpp,h}: add ShapeRecordFlags
+	  enum to use symbolic names while parsing. Don't change tag type
+	  when encountering the flagHasNewStyles set and the tag type
+	  is DEFINESHAPE (for which supposedly that flag is reserved);
+	  keep parsing instead and print a message about SWF malformacy.
 	* gui/Player.cpp (run): exit with a failure if input movie has
 	  collapsed dimensions (malformed SWF most likely).
 	* server/asobj/xml.{cpp,h}: change extractNode interface to return a
