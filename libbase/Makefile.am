@@ -14,20 +14,19 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-AUTOMAKE_OPTIONS = 
+AUTOMAKE_OPTIONS = no-dependencies foreign
 
 EXTRA_DIST = 
 
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
-lib_LTLIBRARIES = \
-	libgnashbase.la
-	libgnashamf.la
+lib_LTLIBRARIES = libgnashbase.la
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I.. -I$(srcdir) \
 	-I$(top_srcdir)	\
+	-I$(top_srcdir)/libltdl	\
 	-I$(top_srcdir)/libamf	\
 	-I$(top_srcdir)/server	\
 	-I$(top_srcdir)/server/swf	\
@@ -70,7 +69,6 @@ libgnashbase_la_LIBADD += $(SDL_LIBS)
 else
 EXTRA_DIST += tu_file_SDL.cpp
 endif
-
 
 libgnashbase_la_SOURCES = \
 	config.cpp \
@@ -142,6 +140,11 @@ noinst_HEADERS = \
 	LoadThread.h \
 	FLVParser.h
 
+
+# add libltdl
+libgnashbase_la_SOURCES += $(top_srcdir)/libltdl/ltdl.c
+noinst_HEADERS += $(top_srcdir)/libltdl/ltdl.h
+
 if USE_SOUND_GST
 libgnashbase_la_SOURCES += gstgnashsrc.c embedVideoDecoderGst.cpp
 noinst_HEADERS += gstgnashsrc.h embedVideoDecoderGst.h
@@ -153,12 +156,10 @@ if USE_FFMPEG_ENGINE
 libgnashbase_la_SOURCES += embedVideoDecoderFfmpeg.cpp
 noinst_HEADERS += embedVideoDecoderFfmpeg.h
 libgnashbase_la_LIBADD += $(FFMPEG_LIBS)
-libgnashbase_la_CPPFLAGS+= $(FFMPEG_CFLAGS)
+libgnashbase_la_CPPFLAGS += $(FFMPEG_CFLAGS)
 endif
 
-
-# libgnashbase_la_LDFLAGS = -export-dynamic
-libgnashbase_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
+libgnashbase_la_LDFLAGS = -release $(VERSION)
 
 # We use our own rule to build the demo so it isn't built by default.
 # Since it doesn't contain a main() routine, we only try to compile,

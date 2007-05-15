@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.39 2007/05/14 00:57:37 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.40 2007/05/15 16:31:02 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -37,7 +37,6 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     fi
   ])
 
-  AC_MSG_CHECKING([for ffmpeg header])
   if test x${cross_compiling} = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
       if $PKG_CONFIG --exists libavcodec; then
@@ -47,7 +46,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       topdir=`$PKG_CONFIG --cflags-only-I libavcodec | sed -e 's:-I::g' | sed -e 's:.* /:/:' -e 's: ::g'`
       # Gets "" if not installed
       if test x"$topdir" != x; then
-	avcodec_h="$topdir/avcodec.h"
+	      avcodec_h="$topdir/avcodec.h"
       fi
     fi
   fi
@@ -56,26 +55,27 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   if test x"${ac_cv_path_ffmpeg_incl}" = x ; then
     for i in $incllist; do
       if test -f $i/ffmpeg/avcodec.h; then
-        ac_cv_path_ffmpeg_incl="-I$i/ffmpeg"
+        ac_cv_path_ffmpeg_incl="-I$i"
         CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
         topdir=$i
-	avcodec_h="$i/ffmpeg/avcodec.h"
+	      avcodec_h="$i/ffmpeg/avcodec.h"
         break
       fi
     done
   fi
 
   if test x"${ac_cv_path_ffmpeg_incl}" = x; then
-    AC_MSG_RESULT(no)
     if test x${cross_compiling} = xno; then
       AC_CHECK_HEADERS(ffmpeg/avcodec.h, [ac_cv_path_ffmpeg_incl=""])
     fi
   else
-    AC_MSG_RESULT(${ac_cv_path_ffmpeg_incl})
-      if test -f !$i/ffmpeg/avformat.h; then
-        AC_MSG_WARN([avformat.h not found!])
-        ac_cv_path_ffmpeg_incl=""
-      fi
+    AC_MSG_CHECKING([for ffmpeg header])
+    if test -f $i/ffmpeg/avformat.h; then
+      AC_MSG_RESULT([yes]);
+    else
+      AC_MSG_RESULT([no])
+      AC_MSG_WARN([you need to install the avformat package!])
+    fi
   fi
 
 dnl We need LIBAVCODEC VERSION of at least 51.29.0 to get avcodec_decode_audio2

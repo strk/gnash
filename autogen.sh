@@ -120,7 +120,7 @@ if grep "^AC_PROG_LIBTOOL" configure.ac >/dev/null; then
 fi
 
 #for coin in `find $srcdir -name CVS -prune -o -name configure.ac -print`
-for coin in configure.ac libltdl/configure.ac
+for coin in configure.ac
 do 
   dr=`dirname $coin`
   if test -f $dr/NO-AUTO-GEN; then
@@ -149,12 +149,12 @@ do
         echo "Running xml-i18n-toolize --copy --force --automake..."
 	xml-i18n-toolize --copy --force --automake
       fi
-      if grep "^AC_PROG_LIBTOOL" configure.ac >/dev/null; then
-	if test -z "$NO_LIBTOOLIZE" ; then 
-	  echo "Running libtoolize --force --copy ..."
-	  ${LIBTOOLIZE:-libtoolize} --force --copy
-	fi
-      fi
+#       if grep "^AC_PROG_LIBTOOL" configure.ac >/dev/null; then
+# 	if test -z "$NO_LIBTOOLIZE" ; then 
+# 	  echo "Running libtoolize --force --copy ..."
+# 	  ${LIBTOOLIZE:-libtoolize} --force --copy
+# 	fi
+#       fi
       echo "Running aclocal $aclocalinclude ..."
       ${ACLOCAL:-aclocal} $aclocalinclude
       if grep "^AM_CONFIG_HEADER" configure.ac >/dev/null; then

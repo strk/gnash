@@ -15,14 +15,12 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.309 2007/05/13 10:39:49 martinwguy Exp $
+dnl $Id: configure.ac,v 1.310 2007/05/15 16:31:00 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
 AC_CONFIG_SRCDIR(server/gnash.h)
-AC_CONFIG_LIBOBJ_DIR(libbase)
 AM_CONFIG_HEADER(config.h)
-AC_CONFIG_SUBDIRS(libltdl)
 
 dnl AC_CANONICAL_TARGET
 AC_CANONICAL_BUILD
@@ -61,31 +59,40 @@ AM_GNU_GETTEXT([external])
 AM_CONDITIONAL(HAS_GETTEXT, test x$ac_cv_path_XGETTEXT != x)
 dnl AM_GNU_GETTEXT_VERSION(0.15)
 
-save_CFLAGS="$CFLAGS";
-CFLAGS="$CFLAGS -Werror -Wformat";
+dnl AC_CHECK_SIZEOF([size_t], 4, AC_INCLUDES_DEFAULT)
 
-AC_TRY_COMPILE([#include <stdio.h>], [
+dnl AC_DEFINE(SIZET_FMT, ["%z"], [size_t printf modifier is z])
+
+AC_LANG_PUSH(C++)
+save_CXXFLAGS="$CXXFLAGS";
+CXXFLAGS="$CXXFLAGS -Werror -Wformat";
+
+AC_TRY_COMPILE([#include <sys/types.h>
+  #include <stdio.h>], [
   size_t num = 0;
   printf("%d", num); ],
   AC_DEFINE(SIZET_FMT, ["%d"], [size_t printf modifier is d])
 )
-AC_TRY_COMPILE([#include <stdio.h>], [
+AC_TRY_COMPILE([#include <sys/types.h>
+  #include <stdio.h>], [
   size_t num = 0;
   printf("%u", num); ],
    AC_DEFINE(SIZET_FMT, ["%u"], [size_t printf modifier is u])
 )
-AC_TRY_COMPILE([#include <stdio.h>], [
+AC_TRY_COMPILE([#include <sys/types.h>
+  #include <stdio.h>], [
   size_t num = 0;
   printf("%lu", num); ],
   AC_DEFINE(SIZET_FMT, ["%lu"], [size_t printf modifier is lu])
 )
-AC_TRY_COMPILE([#include <stdio.h>], [
+AC_TRY_COMPILE([[#include <sys/types.h> #include <stdio.h>]], [
   size_t num = 0;
   printf("%ld", num); ],
   AC_DEFINE(SIZET_FMT, ["%ld"], [size_t printf modifier is ld])
 )
 
-CFLAGS="$save_CFLAGS";
+CXXFLAGS="$save_CXXFLAGS";
+AC_LANG_POP(C++)
 
 AC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval})
 
@@ -484,6 +491,7 @@ AC_CHECK_HEADERS(libgen.h)
 
 dnl seems unused
 dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
+dnl AC_CHECK_LIB(gmp, _gmp_get_memory_functions)
 AC_CHECK_LIB(m, sqrt)
 AC_CHECK_LIB(Xi, XInput_find_display)
 AC_CHECK_LIB(X11, XDisableAccessControl)
@@ -873,23 +881,28 @@ GNASH_DOCBOOK
 AM_CONDITIONAL(DOCBOOK, test x$docbook = xyes)
 
 GNASH_PATH_CURL
-AC_LIBTOOL_DLOPEN
-dnl AC_LIBLTDL_CONVENIENCE
+
 AC_LIBLTDL_INSTALLABLE
-dnl LTVERSION_VERSION
+AC_LIBTOOL_DLOPEN
+AC_LIBTOOL_WIN32_DLL
 AC_PROG_LIBTOOL
-AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]),
-                                        AC_DEFINE(LT_DLMUTEX, 0, [doesn't have lt_dlmutex_register]) )
+AC_C_CONST
+AC_C_INLINE
+AC_SUBST([LIBTOOL_DEPS])
+AC_LIB_LTDL
 
-DLOPEN="-dlopen"
-DLPREOPEN="-dlpreopen"
-AC_SUBST(DLOPEN)
-AC_SUBST(DLPREOPEN)
+dnl AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]),
+dnl                                         AC_DEFINE(LT_DLMUTEX, 0, [doesn't have lt_dlmutex_register]) )
 
-dnl Substitute INCLTDL and LIBLTDL in the Makefiles
-AC_SUBST(INCLTDL)
-AC_SUBST(LIBLTDL)
-AC_SUBST(LIBTOOL_DEPS)
+dnl DLOPEN="-dlopen"
+dnl DLPREOPEN="-dlpreopen"
+dnl AC_SUBST(DLOPEN)
+dnl AC_SUBST(DLPREOPEN)
+
+dnl dnl Substitute INCLTDL and LIBLTDL in the Makefiles
+dnl AC_SUBST(INCLTDL)
+dnl AC_SUBST(LIBLTDL)
+dnl AC_SUBST(LIBTOOL_DEPS)
 
 dnl Define winsock if we're on windows. We could do something complicated,
 dnl but since AC_EXEEXT does it for us, we'll do this the easy way.

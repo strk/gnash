@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: parser.cpp,v 1.37 2007/05/14 09:44:22 jgilmore Exp $ */
+/* $Id: parser.cpp,v 1.38 2007/05/15 16:31:02 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,6 +35,9 @@ extern "C"{
 	extern int optind, getopt(int, char *const *, const char *);
 #endif
 }
+
+#include <libintl.h>
+#include <locale.h>
 
 #include "tu_file.h"
 #include "zlib_adapter.h"

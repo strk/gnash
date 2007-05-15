@@ -1,3 +1,28 @@
+2007-05-15  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Use C++ compiler instead of C compiler so the
+	SIZET_FMT test works correctly with GCC 4.3.x. Move libltdl tests
+	to top level. Don't configure in the libltdl directory. 
+	* gnash/Makefile.am: Don't list libltdl as a SUBDIR.
+	* gnash/autogen.sh: Only run libtoolize once.
+	* backend/sound_handler_sdl.cpp: Rearranage header order for
+	braindead platforms.
+	* libbase/Makefile.am: Built ltdl into libbase. Drop linking with
+	--no-undefined --export-dynamic.
+	* libgeometry/Makefile.am: Built ltdl into libbase. Drop linking
+	with --no-undefined --export-dynamic.
+	* macros/ffmpeg.m4: Don't add ffmpeg to include path. Fix test for
+	avformat.h to be more portable.
+	* po/Makefile.am: Install all the translations in a loop.
+	* server/URLAccessManager.cpp: Include iconv.h. Use lower case for
+	winsock2.h.
+	* server/asobj/NetStreamFfmpeg.cpp: Use lower case for winsock2.h.
+	* server/asobj/xmlsocket.cpp: Use lower case for winsock2.h.
+	* utilities/parser.cpp, processor.cpp: Include libintl.h and
+	locale.h for braindead platforms.
+	* macros/libltdl.m4: Add autoconf support from libltdl.
+
+	
 2007-05-15 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (inflate_wrapper): fix infinite loop

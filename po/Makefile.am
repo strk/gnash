@@ -65,9 +65,9 @@ force:
 
 # install-hook: rename the es.gmo files to gnash.mo at installtion time
 install-data-hook: $(gmofiles)
-	mkdir -p $(datadir)/locale/es
-	$(INSTALL_DATA) es.gmo $(datadir)/locale/es/gnash.mo
-	mkdir -p $(datadir)/locale/fr
-	$(INSTALL_DATA) fr.gmo $(datadir)/locale/fr/gnash.mo
-	mkdir -p $(datadir)/locale/de
-	$(INSTALL_DATA) de.gmo $(datadir)/locale/de/gnash.mo
+	@for i in $(translations); do \
+	  mkdir -p $(datadir)/locale/$$i; \
+	  if test -f $$i.gmo; then \
+	    $(INSTALL_DATA) $$i.gmo $(datadir)/locale/$$i/gnash.mo; \
+	  fi; \
+	done

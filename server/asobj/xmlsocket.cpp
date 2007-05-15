@@ -35,8 +35,8 @@
 
 #include <sys/types.h>
 #include <fcntl.h>
-#ifdef HAVE_WINSOCK
-# include <WinSock2.h>
+#ifdef HAVE_WINSOCK2_H
+# include <winsock2.h>
 # include <windows.h>
 # include <sys/stat.h>
 # include <io.h>

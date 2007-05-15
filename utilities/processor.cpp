@@ -15,13 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-// 
-
-/* $Id: processor.cpp,v 1.56 2007/05/14 09:44:22 jgilmore Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#include <libintl.h>
+#include <locale.h>
+#include <iostream>
+#include <cstdio>
+#include <sys/time.h>
+#include <time.h>
 
 #include "tu_file.h"
 #include "container.h"
@@ -35,11 +39,6 @@
 #include "GnashException.h"
 #include "debugger.h"
 #include "VM.h"
-
-#include <iostream>
-#include <cstdio>
-#include <sys/time.h>
-#include <time.h>
 
 extern "C"{
 	#include <unistd.h>

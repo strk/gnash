@@ -14,10 +14,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// 
-//
-//
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -31,14 +27,14 @@
 #include <cerrno> // for errno :)
 
 // temporary use of console for confirm load of network urls
+#include <iconv.h>
 #include <iostream>
-
 #include <algorithm> // for find / find_if
 
 #ifdef WIN32
-# include <Winsock2.h>
+# include <winsock2.h>
 #else
-#	include <unistd.h>
+# include <unistd.h>
 #endif
 
 #include <cstring> // for strerror

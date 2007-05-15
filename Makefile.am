@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.72 2007/05/10 15:50:20 strk Exp $
+# $Id: Makefile.am,v 1.73 2007/05/15 16:31:01 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -23,7 +23,6 @@ ACLOCAL_AMFLAGS = -I macros
 noinst_SCRIPT = autogen.sh
 
 STD_DIRS = \
-	libltdl \
 	libbase \
 	libgeometry \
 	libamf \

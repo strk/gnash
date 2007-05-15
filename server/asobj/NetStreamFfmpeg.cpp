@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.50 2007/05/15 13:01:27 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.51 2007/05/15 16:31:03 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,10 +37,10 @@
 #include <boost/scoped_array.hpp>
 
 #if defined(_WIN32) || defined(WIN32)
-	#include <Windows.h>	// for sleep()
-	#define usleep(x) Sleep(x/1000)
+# include <windows.h>	// for sleep()
+# define usleep(x) Sleep(x/1000)
 #else
-	#include "unistd.h" // for usleep()
+# include "unistd.h" // for usleep()
 #endif
 
 // Used to free data in the AVPackets we create our self
