@@ -1,5 +1,7 @@
 2007-05-15 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_instance.cpp (advance): safely handle movies 
+	  with 0 total frames (malformed SWF).
 	* gui/gui.cpp (advance_movie): handle no looping when the
 	  total frame count is 0 (malformed SWF).
 	* server/dlist.cpp (swapDepth): fix an out-of-bound access.

@@ -61,7 +61,22 @@ movie_instance::advance(float delta_time)
 	size_t nextframe = min(get_current_frame()+2, get_frame_count());
 	if ( !_def->ensure_frame_loaded(nextframe) )
 	{
-		log_error("Frame " SIZET_FMT " never loaded", nextframe);
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("Frame " SIZET_FMT " never loaded. Total frames: "
+				SIZET_FMT ".", nextframe, get_frame_count());
+		);
+	}
+
+	// The parser might have reset the total frame count
+	// due to SWF malformation, so we check this *after*
+	// the ensure_frame_loaded call above.
+	//
+	if ( get_frame_count() == 0 )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("The movie contains NO frames!");
+		);
+		return;
 	}
 
 	if (m_on_event_load_called == false)
