@@ -1,3 +1,7 @@
+2007-05-15 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStream.cpp: warn once about unimplemented stuff.
+
 2007-05-15  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Use C++ compiler instead of C compiler so the

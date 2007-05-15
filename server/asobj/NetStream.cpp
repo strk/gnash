@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.45 2007/05/15 13:01:27 tgc Exp $ */
+/* $Id: NetStream.cpp,v 1.46 2007/05/15 16:41:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -190,7 +190,12 @@ static as_value netstream_attachAudio(const fn_call& fn)
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 	UNUSED(ns);
 
-	log_unimpl("NetStream.attachAudio");
+	bool warned = false;
+	if ( ! warned ) {
+		log_unimpl("NetStream.attachAudio");
+		warned = true;
+	}
+
 	return as_value();
 }
 
@@ -199,7 +204,12 @@ static as_value netstream_attachVideo(const fn_call& fn)
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 	UNUSED(ns);
 
-	log_unimpl("NetStream.attachVideo");
+	bool warned = false;
+	if ( ! warned ) {
+		log_unimpl("NetStream.attachVideo");
+		warned = true;
+	}
+
 	return as_value();
 }
 
@@ -208,7 +218,12 @@ static as_value netstream_publish(const fn_call& fn)
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 	UNUSED(ns);
 
-	log_unimpl("NetStream.publish");
+	bool warned = false;
+	if ( ! warned ) {
+		log_unimpl("NetStream.publish");
+		warned = true;
+	}
+
 	return as_value();
 }
 
@@ -217,7 +232,12 @@ static as_value netstream_receiveAudio(const fn_call& fn)
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 	UNUSED(ns);
 
-	log_unimpl("NetStream.receiveAudio");
+	bool warned = false;
+	if ( ! warned ) {
+		log_unimpl("NetStream.receiveAudio");
+		warned = true;
+	}
+
 	return as_value();
 }
 
@@ -226,7 +246,12 @@ static as_value netstream_receiveVideo(const fn_call& fn)
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 	UNUSED(ns);
 
-	log_unimpl("NetStream.receiveVideo");
+	bool warned = false;
+	if ( ! warned ) {
+		log_unimpl("NetStream.receiveVideo");
+		warned = true;
+	}
+
 	return as_value();
 }
 
@@ -235,7 +260,12 @@ static as_value netstream_send(const fn_call& fn)
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 	UNUSED(ns);
 
-	log_unimpl("NetStream.send");
+	bool warned = false;
+	if ( ! warned ) {
+		log_unimpl("NetStream.send");
+		warned = true;
+	}
+
 	return as_value();
 }
 
@@ -277,14 +307,17 @@ netstream_currentFPS(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
+	bool warned = false;
+	if ( ! warned ) {
+		log_unimpl("NetStream.currentFPS getter/setter");
+		warned = true;
+	}
 	if ( fn.nargs == 0 ) // getter
 	{
-		log_unimpl("NetStream.currentFPS get");
 		return as_value();
 	}
 	else // setter
 	{
-		log_unimpl("NetStream.currentFPS set");
 		return as_value();
 	}
 }
@@ -295,14 +328,17 @@ netstream_bufferLength(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
+	bool warned = false;
+	if ( ! warned ) {
+		log_unimpl("NetStream.bufferLength getter/setter");
+		warned = true;
+	}
 	if ( fn.nargs == 0 ) // getter
 	{
-		log_unimpl("NetStream.bufferLength get");
 		return as_value();
 	}
 	else // setter
 	{
-		log_unimpl("NetStream.bufferLength set");
 		return as_value();
 	}
 }
@@ -323,14 +359,18 @@ netstream_liveDelay(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
+	bool warned = false;
+	if ( ! warned ) {
+		log_unimpl("NetStream.liveDelay getter/setter");
+		warned = true;
+	}
+
 	if ( fn.nargs == 0 ) // getter
 	{
-		log_unimpl("NetStream.liveDelay get");
 		return as_value();
 	}
 	else // setter
 	{
-		log_unimpl("NetStream.liveDelay set");
 		return as_value();
 	}
 }
