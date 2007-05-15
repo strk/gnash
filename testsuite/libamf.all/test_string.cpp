@@ -20,6 +20,7 @@
 
 #ifdef HAVE_DEJAGNU_H
 
+#include <cstdlib>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/stat.h>
