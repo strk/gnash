@@ -63,7 +63,7 @@ namespace jpeg
 
 		// Read data into our input buffer.  Client calls this
 		// when it needs more data from the file.
-		static bool fill_input_buffer(j_decompress_ptr cinfo)
+		static boolean fill_input_buffer(j_decompress_ptr cinfo)
 		{
 			rw_source*	src = (rw_source*) cinfo->src;
 
@@ -73,7 +73,7 @@ namespace jpeg
 				// Is the file completely empty?
 				if (src->m_start_of_file) {
 					// Treat this as a fatal error.
-					gnash::log("empty jpeg source stream.");
+					gnash::log_error("empty jpeg source stream.");
 					return false;
 				}
 				// warn("jpeg end-of-stream");
@@ -204,7 +204,7 @@ namespace jpeg
 		}
 
 		/// Write the output buffer into the stream.
-		static bool	empty_output_buffer(j_compress_ptr cinfo)
+		static boolean	empty_output_buffer(j_compress_ptr cinfo)
 		{
 			rw_dest*	dest = (rw_dest*) cinfo->dest;
 			assert(dest);
