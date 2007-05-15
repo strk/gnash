@@ -10,6 +10,8 @@
 #include "utility.h"
 #include "jpeg.h"
 #include "tu_file.h"
+#include "log.h"
+
 #include <cstdio>
 
 extern "C" {
@@ -59,9 +61,9 @@ namespace jpeg
 			src->m_start_of_file = true;
 		}
 
-		static boolean	fill_input_buffer(j_decompress_ptr cinfo)
 		// Read data into our input buffer.  Client calls this
 		// when it needs more data from the file.
+		static bool fill_input_buffer(j_decompress_ptr cinfo)
 		{
 			rw_source*	src = (rw_source*) cinfo->src;
 
@@ -71,7 +73,8 @@ namespace jpeg
 				// Is the file completely empty?
 				if (src->m_start_of_file) {
 					// Treat this as a fatal error.
-					throw "empty jpeg source stream.";
+					gnash::log("empty jpeg source stream.");
+					return false;
 				}
 				// warn("jpeg end-of-stream");
 
@@ -101,12 +104,12 @@ namespace jpeg
 			src->m_pub.bytes_in_buffer = bytes_read;
 			src->m_start_of_file = false;
 
-			return TRUE;
+			return false;
 		}
 
-		static void	skip_input_data(j_decompress_ptr cinfo, long num_bytes)
 		// Called by client when it wants to advance past some
 		// uninteresting data.
+		static void	skip_input_data(j_decompress_ptr cinfo, long num_bytes)
 		{
 			rw_source*	src = (rw_source*) cinfo->src;
 
@@ -170,11 +173,17 @@ namespace jpeg
 	public:
 		struct jpeg_destination_mgr	m_pub;	/* public fields */
 
+		/// Constructor. 
+		//
+		/// The caller is responsible for closing
+		/// the output stream after it's done using us.
+		///
+		/// @param out
+		///	The output stream, externally owned.
+		///
 		rw_dest(tu_file* out)
 			:
 			m_out_stream(out)
-		// Constructor.  The caller is responsible for closing
-		// the output stream after it's done using us.
 		{
 			// fill in function pointers...
 			m_pub.init_destination = init_destination;
@@ -194,8 +203,8 @@ namespace jpeg
 			dest->m_pub.free_in_buffer = IO_BUF_SIZE;
 		}
 
-		static boolean	empty_output_buffer(j_compress_ptr cinfo)
-		// Write the output buffer into the stream.
+		/// Write the output buffer into the stream.
+		static bool	empty_output_buffer(j_compress_ptr cinfo)
 		{
 			rw_dest*	dest = (rw_dest*) cinfo->dest;
 			assert(dest);
@@ -204,18 +213,21 @@ namespace jpeg
 			{
 				// Error.
 				// @@ bah, exceptions suck.  TODO consider alternatives.
-				throw "jpeg::rw_dest couldn't write data.";
+				gnash::log_error("jpeg::rw_dest couldn't write data.");
+				return false;
 			}
 
 			dest->m_pub.next_output_byte = dest->m_buffer;
 			dest->m_pub.free_in_buffer = IO_BUF_SIZE;
 
-			return TRUE;
+			return true;
 		}
 
+		/// Terminate the destination. 
+		//
+		/// Flush any leftover data, and make sure we get deleted.
+		///
 		static void term_destination(j_compress_ptr cinfo)
-		// Terminate the destination.  Flush any leftover
-		// data, and make sure we get deleted.
 		{
 			rw_dest*	dest = (rw_dest*) cinfo->dest;
 			assert(dest);
@@ -226,7 +238,7 @@ namespace jpeg
 				if (dest->m_out_stream->write_bytes(dest->m_buffer, datacount) != datacount)
 				{
 					// Error.
-					throw "jpeg::rw_dest::term_destination couldn't write data.";
+					gnash::log_error("jpeg::rw_dest::term_destination couldn't write data.");
 				}
 			}
 
@@ -234,15 +246,19 @@ namespace jpeg
 			delete dest;
 			cinfo->dest = NULL;
 		}
+
 	private:	
-		tu_file*	m_out_stream;		/* source stream */
+
+		// source stream, externally owned
+		tu_file*	m_out_stream;	
+
 		JOCTET	m_buffer[IO_BUF_SIZE];		/* start of buffer */
 	};
 
 
-	void	setup_rw_dest(j_compress_ptr cinfo, tu_file* outstream)
 	// Set up the given compress object to write to the given
 	// output stream.
+	void	setup_rw_dest(j_compress_ptr cinfo, tu_file* outstream)
 	{
 		cinfo->dest = (jpeg_destination_mgr*) (new rw_dest(outstream));
 	}
@@ -253,17 +269,16 @@ namespace jpeg
 	//
 
 
-	void	jpeg_error_exit(j_common_ptr cinfo)
 	// Called when jpeglib has a fatal error.
+	static void	jpeg_error_exit(j_common_ptr cinfo)
 	{
-		assert(0);
-		(*cinfo->err->output_message) (cinfo);
-		tu_error_exit(1, "internal error in jpeglib");
+		gnash::log_swferror("Internal jpeg error: %s", cinfo->err->jpeg_message_table[cinfo->err->msg_code]);
+		// TODO: set a flag to stop parsing !!
 	}
 
 
-	static void	setup_jpeg_err(jpeg_error_mgr* jerr)
 	// Set up some error handlers for the jpeg lib.
+	static void	setup_jpeg_err(jpeg_error_mgr* jerr)
 	{
 		// Set up defaults.
 		jpeg_std_error(jerr);
@@ -277,9 +292,8 @@ namespace jpeg
 	//
 
 
+	/// Bascially this is a thin wrapper around jpeg_decompress object.
 	class input_impl : public input
-	// Bascially this is a thin wrapper around jpeg_decompress
-	// object.
 	{
 	public:
 		// State needed for input.
@@ -292,11 +306,11 @@ namespace jpeg
 		enum SWF_DEFINE_BITS_JPEG2 { SWF_JPEG2 };
 		enum SWF_DEFINE_BITS_JPEG2_HEADER_ONLY { SWF_JPEG2_HEADER_ONLY };
 
+		// Constructor.  Read the header data from in, and
+		// prepare to read data.
 		input_impl(tu_file* in)
 			:
 			m_compressor_opened(false)
-		// Constructor.  Read the header data from in, and
-		// prepare to read data.
 		{
 			setup_jpeg_err(&m_jerr);
 			m_cinfo.err = &m_jerr;
@@ -310,15 +324,16 @@ namespace jpeg
 		}
 
 
-		input_impl(SWF_DEFINE_BITS_JPEG2_HEADER_ONLY /* e */, tu_file* in)
-			:
-			m_compressor_opened(false)
 		// The SWF file format stores JPEG images with the
 		// encoding tables separate from the image data.  This
 		// constructor reads the encoding table only and keeps
 		// them in this object.  You need to call
 		// start_image() and finish_image() around any calls
 		// to get_width/height/components and read_scanline.
+		//
+		input_impl(SWF_DEFINE_BITS_JPEG2_HEADER_ONLY /* e */, tu_file* in)
+			:
+			m_compressor_opened(false)
 		{
 			setup_jpeg_err(&m_jerr);
 			m_cinfo.err = &m_jerr;
@@ -335,8 +350,8 @@ namespace jpeg
 			// App does that manually using start_image.
 		}
 
-		~input_impl()
 		// Destructor.  Clean up our jpeg reader state.
+		~input_impl()
 		{
 			finish_image();
 
@@ -349,10 +364,10 @@ namespace jpeg
 		}
 
 
-		void	discard_partial_buffer()
 		// Discard any data sitting in our input buffer.  Use
 		// this before/after reading headers or partial image
 		// data, to avoid screwing up future reads.
+		void	discard_partial_buffer()
 		{
 			rw_source* src = (rw_source*) m_cinfo.src;
 
@@ -364,27 +379,19 @@ namespace jpeg
 		}
 
 
-		void	start_image()
 		// This is something you can do with "abbreviated"
 		// streams; i.e. if you constructed this inputter
 		// using (SWF_JPEG2_HEADER_ONLY) to just load the
 		// tables, or if you called finish_image() and want to
 		// load another image using the existing tables.
+		// 
+		void	start_image()
 		{
 			assert(m_compressor_opened == false);
 
-			// Now, read the image header.
-//			int result;
-//			do
-//			{
-				// Read all available headers
-//				result = jpeg_read_header(&m_cinfo, FALSE);
-//			} while (result == JPEG_HEADER_TABLES_ONLY);
-//			assert(result == JPEG_HEADER_OK);
-			
 			// hack, FIXME
-			// #define DSTATE_READY	202	/* found SOS, ready for start_decompress */
-			while (m_cinfo.global_state != 202)
+			static const int stateReady = 202;	/* found SOS, ready for start_decompress */
+			while (m_cinfo.global_state != stateReady)
 			{
 				jpeg_read_header(&m_cinfo, FALSE);
 			}
@@ -402,34 +409,36 @@ namespace jpeg
 			}
 		}
 
-		int	get_height() const
 		// Return the height of the image.  Take the data from our m_cinfo struct.
+		int	get_height() const
 		{
 			assert(m_compressor_opened);
 			return m_cinfo.output_height;
 		}
 
-		int	get_width() const
 		// Return the width of the image.  Take the data from our m_cinfo struct.
+		int	get_width() const
 		{
 			assert(m_compressor_opened);
 			return m_cinfo.output_width;
 		}
 
-		int	get_components() const
 		// Return number of components (i.e. == 3 for RGB
 		// data).  The size of the data for a scanline is
 		// get_width() * get_components().
+		//
+		int	get_components() const
 		{
 			assert(m_compressor_opened);
 			return m_cinfo.output_components;
 		}
 
 
-		void	read_scanline(unsigned char* rgb_data)
 		// Read a scanline's worth of image data into the
 		// given buffer.  The amount of data read is
 		// get_width() * get_components().
+		//
+		void	read_scanline(unsigned char* rgb_data)
 		{
 			assert(m_compressor_opened);
 			assert(m_cinfo.output_scanline < m_cinfo.output_height);
@@ -453,20 +462,20 @@ namespace jpeg
 	};
 
 
-	/*static*/ input*	input::create(tu_file* in)
-	// Create and return a jpeg-input object that will read from the
-	// given input stream.
+	/*static*/
+	input*
+	input::create(tu_file* in)
 	{
-		return new input_impl(in);
+		input* ret = new input_impl(in);
+		return ret;
 	}
 
-	/*static*/ input*	input::create_swf_jpeg2_header_only(tu_file* in)
-	// Read SWF JPEG2-style header.  App needs to call
-	// start_image() before loading any image data.  Multiple
-	// images can be loaded by bracketing within
-	// start_image()/finish_image() pairs.
+	/*static*/
+	input*
+	input::create_swf_jpeg2_header_only(tu_file* in)
 	{
-		return new input_impl(input_impl::SWF_JPEG2_HEADER_ONLY, in);
+		input* ret = new input_impl(input_impl::SWF_JPEG2_HEADER_ONLY, in);
+		return ret;
 	}
 
 
@@ -483,9 +492,11 @@ namespace jpeg
 		struct jpeg_compress_struct	m_cinfo;
 		struct jpeg_error_mgr m_jerr;
 
+		/// Constructor. 
+		//
+		/// Read the header data from in, and
+		///  prepare to read data.
 		output_impl(tu_file* out, int width, int height, int quality)
-		// Constructor.  Read the header data from in, and
-		// prepare to read data.
 		{
 			m_cinfo.err = jpeg_std_error(&m_jerr);
 

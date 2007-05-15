@@ -26,21 +26,22 @@ namespace jpeg
 {
 	/// Wrapper around jpeg_decompress_struct.
 	class input {
-		public:
+
+	public:
+
 		/// Read header and create a jpeg input object.
+		//
+		/// @return NULL on error
+		///
 		DSOEXPORT static input*	create(tu_file* in);
-
-// 		// Read SWF JPEG2-style header (separate encoding
-// 		// table followed by image data), and create jpeg
-// 		// input object.
-// 		DSOEXPORT static input*	create_swf_jpeg2(SDL_RWops* in);
-
 
 		/// Read SWF JPEG2-style header. 
 		//
 		/// App needs to call start_image() before loading any
 		/// image data.  Multiple images can be loaded by
 		/// bracketing within start_image()/finish_image() pairs.
+		///
+		/// @return NULL on error
 		///
 		DSOEXPORT static input*	create_swf_jpeg2_header_only(tu_file* in);
 
