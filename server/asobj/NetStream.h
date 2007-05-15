@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.30 2007/05/07 23:15:44 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.31 2007/05/15 13:01:27 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -34,6 +34,7 @@
 #include "impl.h"
 #include "video_stream_instance.h"
 #include "NetConnection.h"
+#include "FLVParser.h"
 
 // Forward declarations
 namespace gnash {
@@ -110,6 +111,42 @@ protected:
 	// The size of the buffer in milliseconds
 	uint32_t m_bufferTime;
 
+	// The video outputformat
+	int m_videoFrameFormat;
+
+	// Are a new frame ready to be returned?
+	volatile bool m_newFrameReady;
+
+	// Mutex to insure we don't corrupt the image
+	boost::mutex image_mutex;
+
+	// Are the playing loop running or not
+	volatile bool m_go;
+
+	// The image/videoframe which is given to the renderer
+	image::image_base* m_imageframe;
+
+	// paused or not
+	volatile bool m_pause;
+
+	// The video URL
+	std::string url;
+
+	// The homegrown parser we use for FLV
+	FLVParser* m_parser;
+
+	// Are we playing a FLV?
+	bool m_isFLV;
+
+	// The handler which is invoked on status change
+	boost::intrusive_ptr<as_function> m_statusHandler;
+
+	// should we start when buffer is full?
+	bool m_start_onbuffer;
+
+	// The position in the inputfile, only used when not playing a FLV
+	long inputPos;
+
 public:
 
 	NetStream();
@@ -120,31 +157,18 @@ public:
 
 	virtual void pause(int /*mode*/){}
 
-	virtual int play(const std::string& /*source*/){ log_error("FFMPEG or Gstreamer is needed to play video"); return 0; }
+	virtual int play(const std::string& /*source*/){ log_error(_("FFMPEG or Gstreamer is needed to play video")); return 0; }
 
 	virtual void seek(double /*pos*/){}
 
-	virtual void setNetCon(boost::intrusive_ptr<NetConnection> nc)
-	{
-		_netCon = nc;
-	}
-
-	virtual image::image_base* get_video(){ return NULL; }
-
 	virtual int64_t time() { return 0; }
-
-	virtual long bytesLoaded() { return 0; }
-
-	virtual long bytesTotal() { return 0; }
-
-	virtual bool playing()
-	{
-		return false;
-	}
 
 	virtual void advance(){}
 
-	virtual bool newFrameReady() { return false; }
+	void setNetCon(boost::intrusive_ptr<NetConnection> nc)
+	{
+		_netCon = nc;
+	}
 
 	void setEnvironment(as_environment* env)
 	{
@@ -152,9 +176,22 @@ public:
 		m_env = env;
 	}
 
+	inline bool playing()
+	{
+		return m_go;
+	}
+
 	void setBufferTime(double time);
 
 	uint32_t bufferTime();
+
+	long bytesLoaded();
+
+	long bytesTotal();
+
+	bool newFrameReady();
+
+	image::image_base* get_video();
 
 private:
 

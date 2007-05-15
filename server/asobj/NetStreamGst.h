@@ -54,21 +54,11 @@ public:
 	int play(const std::string& source);
 	void seek(double pos);
 	int64_t time();
-	long bytesLoaded();
-	long bytesTotal();
 	void advance();
-	bool newFrameReady();
 
 	// Used for gstreamer data read and seek callbacks
 	static int readPacket(void* opaque, char* buf, int buf_size);
 	static int seekMedia(void *opaque, int offset, int whence);
-
-	image::image_base* get_video();
-
-	inline bool playing()
-	{
-		return m_go;
-	}
 
 	static void startPlayback(NetStreamGst* ns);
 	static void callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
@@ -77,14 +67,6 @@ public:
 	static void audio_callback_handoff (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 
 private:
-
-	bool _bufferLength;
-	bool _bufferTime;
-	bool _bytesLoaded;
-	bool _bytesTotal;
-	bool _currentFps;
-	bool _onStatus;
-	bool _time;
 
 	// gstreamer pipeline objects
 	GstElement *pipeline;
@@ -107,48 +89,18 @@ private:
 	GstElement *videoinputcaps;
 	GstElement *audioinputcaps;
 
-	// Are the playing loop running or not
-	volatile bool m_go;
-
-	// The image/videoframe which is given to the renderer
-	image::image_base* m_imageframe;
-
-	boost::mutex image_mutex;
-
 #ifndef DISABLE_START_THREAD
 	boost::thread *startThread;
 #endif
-
-	bool m_pause;
-
-	long inputPos;
-	std::string url;
 
 	// video info
 	int videowidth;
 	int videoheight;
 
-	volatile bool m_newFrameReady;
-
 	volatile long m_clock_offset;
-
-	// The status message
-	std::string m_status;
-
-	// The handler which is invoked on status change
-	boost::intrusive_ptr<as_function> m_statusHandler;
-
-	// Are we decoding a FLV?
-	bool m_isFLV;
-
-	// The parser for FLV
-	FLVParser* m_parser;
 
 	// On next advance() should we pause?
 	volatile bool m_pausePlayback;
-
-	// should we start when buffer is full?
-	bool m_start_onbuffer;
 
 };
 

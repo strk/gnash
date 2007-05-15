@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.49 2007/05/07 23:15:44 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.50 2007/05/15 13:01:27 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,16 +63,8 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 
 	_decodeThread(NULL),
 
-	m_go(false),
-	m_imageframe(NULL),
 	m_video_clock(0),
-	m_pause(false),
-	m_unqueued_data(NULL),
-	inputPos(0),
-	m_parser(NULL),
-	m_isFLV(false),
-	m_newFrameReady(false),
-	m_start_onbuffer(false)
+	m_unqueued_data(NULL)
 {
 
 	ByteIOCxt.buffer = NULL;
@@ -530,11 +522,9 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	ns->m_Frame = avcodec_alloc_frame();
 	
 	// Determine required buffer size and allocate buffer
-	int videoFrameFormat = gnash::render::videoFrameFormat();
-
-	if (videoFrameFormat == render::YUV) {
+	if (ns->m_videoFrameFormat == render::YUV) {
 		ns->m_imageframe = new image::yuv(ns->m_VCodecCtx->width,	ns->m_VCodecCtx->height);
-	} else if (videoFrameFormat == render::RGB) {
+	} else if (ns->m_videoFrameFormat == render::RGB) {
 		ns->m_imageframe = new image::rgb(ns->m_VCodecCtx->width,	ns->m_VCodecCtx->height);
 	}
 
@@ -646,11 +636,10 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 			if (clock >= video_clock)
 			{
 				boost::mutex::scoped_lock lock(ns->image_mutex);
-				int videoFrameFormat = gnash::render::videoFrameFormat();
-				if (videoFrameFormat == render::YUV) {
+				if (ns->m_videoFrameFormat == render::YUV) {
 					// XXX m_imageframe might be a byte aligned buffer, while video is not!
 					static_cast<image::yuv*>(ns->m_imageframe)->update(video->m_data);
-				} else if (videoFrameFormat == render::RGB) {
+				} else if (ns->m_videoFrameFormat == render::RGB) {
 
 					image::rgb* imgframe = static_cast<image::rgb*>(ns->m_imageframe);
 					rgbcopy(imgframe, video, ns->m_VCodecCtx->width * 3);
@@ -820,24 +809,23 @@ bool NetStreamFfmpeg::read_frame()
 			if (got) {
 				boost::scoped_array<uint8_t> buffer;
 
-				int videoFrameFormat = gnash::render::videoFrameFormat();
 				if (m_imageframe == NULL) {
-					if (videoFrameFormat == render::YUV) {
+					if (m_videoFrameFormat == render::YUV) {
 						m_imageframe = new image::yuv(m_VCodecCtx->width, m_VCodecCtx->height);
-					} else if (videoFrameFormat == render::RGB) {
+					} else if (m_videoFrameFormat == render::RGB) {
 						m_imageframe = new image::rgb(m_VCodecCtx->width, m_VCodecCtx->height);
 					}
 				}
 
-				if (videoFrameFormat == render::NONE) { // NullGui?
+				if (m_videoFrameFormat == render::NONE) { // NullGui?
 					av_free_packet(&packet);
 					return false;
 
-				} else if (videoFrameFormat == render::YUV && m_VCodecCtx->pix_fmt != PIX_FMT_YUV420P) {
+				} else if (m_videoFrameFormat == render::YUV && m_VCodecCtx->pix_fmt != PIX_FMT_YUV420P) {
 					assert(0);	// TODO
 					//img_convert((AVPicture*) pFrameYUV, PIX_FMT_YUV420P, (AVPicture*) pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
 
-				} else if (videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
+				} else if (m_videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
 					AVFrame* frameRGB = avcodec_alloc_frame();
 					unsigned int numBytes = avpicture_get_size(PIX_FMT_RGB24, m_VCodecCtx->width, m_VCodecCtx->height);
 					buffer.reset(new uint8_t[numBytes]);
@@ -848,9 +836,9 @@ bool NetStreamFfmpeg::read_frame()
 				}
 
 				raw_videodata_t* video = new raw_videodata_t;
-				if (videoFrameFormat == render::YUV) {
+				if (m_videoFrameFormat == render::YUV) {
 					video->m_data = new uint8_t[static_cast<image::yuv*>(m_imageframe)->size()];
-				} else if (videoFrameFormat == render::RGB) {
+				} else if (m_videoFrameFormat == render::RGB) {
 					image::rgb* tmp = static_cast<image::rgb*>(m_imageframe);
 					video->m_data = new uint8_t[tmp->m_pitch * tmp->m_height];
 				}
@@ -886,7 +874,7 @@ bool NetStreamFfmpeg::read_frame()
 
 				m_video_clock += frame_delay;
 
-				if (videoFrameFormat == render::YUV) {
+				if (m_videoFrameFormat == render::YUV) {
 					image::yuv* yuvframe = static_cast<image::yuv*>(m_imageframe);
 					int copied = 0;
 					uint8_t* ptr = video->m_data;
@@ -906,7 +894,7 @@ bool NetStreamFfmpeg::read_frame()
 						}
 					}
 					video->m_size = copied;
-				} else if (videoFrameFormat == render::RGB) {
+				} else if (m_videoFrameFormat == render::RGB) {
 
 					uint8_t* srcptr = m_Frame->data[0];
 					uint8_t* srcend = m_Frame->data[0] + m_Frame->linesize[0] * m_VCodecCtx->height;
@@ -936,26 +924,6 @@ bool NetStreamFfmpeg::read_frame()
 	}
 
 	return true;
-}
-
-image::image_base* NetStreamFfmpeg::get_video()
-{
-	boost::mutex::scoped_lock lock(image_mutex);
-
-	if (!m_imageframe) return NULL;
-
-	image::image_base* ret_image;
-	int videoFrameFormat = gnash::render::videoFrameFormat();
-	if (videoFrameFormat == render::YUV) {
-		ret_image = new image::yuv(m_imageframe->m_width, m_imageframe->m_height);
-	} else if (videoFrameFormat == render::RGB) {
-		ret_image = new image::rgb(m_imageframe->m_width, m_imageframe->m_height);
-	} else {
-		return NULL;
-	}
-
-	ret_image->update(m_imageframe->m_data);
-	return ret_image;
 }
 
 void
@@ -1054,31 +1022,6 @@ NetStreamFfmpeg::time()
 		return static_cast<int64_t>(m_video_clock);
 	} else {
 		return 0;
-	}
-}
-
-long
-NetStreamFfmpeg::bytesLoaded()
-{
-	if (_netCon == NULL) return 0;
-	return _netCon->getBytesLoaded();
-}
-
-long
-NetStreamFfmpeg::bytesTotal()
-{
-	if (_netCon == NULL) return 0;
-	return _netCon->getBytesTotal();
-}
-
-bool
-NetStreamFfmpeg::newFrameReady()
-{
-	if (m_newFrameReady) {
-		m_newFrameReady = false;
-		return true;
-	} else {
-		return false;
 	}
 }
 

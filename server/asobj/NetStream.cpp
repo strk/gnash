@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.44 2007/05/08 06:46:24 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.45 2007/05/15 13:01:27 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,6 +36,7 @@
 #include "GnashException.h"
 #include "NetConnection.h"
 #include "action.h" // for call_method
+#include "render.h"	// for gnash::render::videoFrameFormat()
 
 #include "movie_root.h"
 
@@ -64,6 +65,15 @@ NetStream::NetStream()
 	_netCon(NULL),
 	m_env(NULL),
 	m_bufferTime(100),
+	m_videoFrameFormat(gnash::render::videoFrameFormat()),
+	m_newFrameReady(false),
+	m_go(false),
+	m_imageframe(NULL),
+	m_pause(false),
+	m_parser(NULL),
+	m_isFLV(false),
+	m_start_onbuffer(false),
+	inputPos(0),
 	_lastStatus(invalidStatus)
 {
 }
@@ -418,7 +428,7 @@ NetStream::processStatusNotifications()
 	as_value status;
 	if ( get_member("onStatus", &status) && status.is_function())
 	{
-		log_debug("Processing %d status notifications", _statusQueue.size());
+		log_debug("Processing "SIZET_FMT" status notifications", _statusQueue.size());
 
 		for (StatusQueue::iterator it=_statusQueue.begin(), itE=_statusQueue.end(); it!=itE; ++it)
 		{
@@ -464,6 +474,50 @@ NetStream::bufferTime()
 {
 	// The argument is in seconds, but we store in milliseconds
     return (m_bufferTime/1000);
+}
+
+long
+NetStream::bytesLoaded()
+{
+	if (_netCon == NULL) return 0;
+	return _netCon->getBytesLoaded();
+}
+
+long
+NetStream::bytesTotal()
+{
+	if (_netCon == NULL) return 0;
+	return _netCon->getBytesTotal();
+}
+
+bool
+NetStream::newFrameReady()
+{
+	if (m_newFrameReady) {
+		m_newFrameReady = false;
+		return true;
+	} else {
+		return false;
+	}
+}
+
+image::image_base* NetStream::get_video()
+{
+	boost::mutex::scoped_lock lock(image_mutex);
+
+	if (!m_imageframe) return NULL;
+
+	image::image_base* ret_image;
+	if (m_videoFrameFormat == render::YUV) {
+		ret_image = new image::yuv(m_imageframe->m_width, m_imageframe->m_height);
+	} else if (m_videoFrameFormat == render::RGB) {
+		ret_image = new image::rgb(m_imageframe->m_width, m_imageframe->m_height);
+	} else {
+		return NULL;
+	}
+
+	ret_image->update(m_imageframe->m_data);
+	return ret_image;
 }
 
 std::pair<const char*, const char*>

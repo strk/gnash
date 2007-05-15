@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.26 2007/05/07 23:15:44 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.27 2007/05/15 13:01:28 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -182,23 +182,13 @@ public:
 	int play(const std::string& source);
 	void seek(double pos);
 	int64_t time();
-	long bytesLoaded();
-	long bytesTotal();
 	void advance();
-	bool newFrameReady();
 
 	// Used for ffmpeg data read and seek callbacks
 	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
 
 	bool read_frame();
-
-	image::image_base* get_video();
-
-	bool playing()
-	{
-		return m_go;
-	}
 
 	inline double as_double(AVRational time)
 	{
@@ -210,14 +200,6 @@ public:
 	static bool audio_streamer(void *udata, uint8_t *stream, int len);
 
 private:
-
-	bool _bufferLength;
-	bool _bufferTime;
-	bool _bytesLoaded;
-	bool _bytesTotal;
-	bool _currentFps;
-	bool _onStatus;
-	bool _time;
 
 	int m_video_index;
 	int m_audio_index;
@@ -240,14 +222,8 @@ private:
 
 	boost::thread* _decodeThread;
 	boost::mutex decoding_mutex;
-	boost::mutex image_mutex;
 
-	// Are the playing loop running or not
-	volatile bool m_go;
 	unsigned int runtime;
-
-	// The image/videoframe which is given to the renderer
-	image::image_base* m_imageframe;
 
 	// The current time-position of the video
 	double m_video_clock;
@@ -256,34 +232,11 @@ private:
 	multithread_queue <raw_videodata_t*> m_qaudio;
 	multithread_queue <raw_videodata_t*> m_qvideo;
 
-	// paused or not
-	volatile bool m_pause;
-
 	// The time ws started playing
 	double m_start_clock;
 	raw_videodata_t* m_unqueued_data;
 
 	ByteIOContext ByteIOCxt;
-
-	// The position in the inputfile, only used when not playing a FLV
-	long inputPos;
-
-	std::string url;
-
-	// The homegrown parser we use for FLV
-	FLVParser* m_parser;
-
-	// Are we playing a FLV?
-	bool m_isFLV;
-
-	// Are a new frame ready to be returned?
-	volatile bool m_newFrameReady;
-
-	// The handler which is invoked on status change
-	boost::intrusive_ptr<as_function> m_statusHandler;
-
-	// should we start when buffer is full?
-	bool m_start_onbuffer;
 
 };
 

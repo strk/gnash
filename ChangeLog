@@ -1,3 +1,9 @@
+2007-05-15 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStream.{cpp.h}, server/asobj/NetStreamFfmpeg.{cpp,h},
+	  server/asobj/NetStreamGst.{cpp,h}: Moved shared code from 
+	  NetStreamFfmpeg and NetStreamGst to the NetStream base class.
+
 2007-05-15 Sandro Santilli <strk@keybit.net>
 
 	* libbase/jpeg.{cpp,h}: cleanups and robustness (first pass).

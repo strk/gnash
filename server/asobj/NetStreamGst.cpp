@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.36 2007/05/08 06:43:42 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.37 2007/05/15 13:01:28 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -82,20 +82,13 @@ NetStreamGst::NetStreamGst():
 	videoinputcaps(NULL),
 	audioinputcaps(NULL),
 
-	m_go(false),
-	m_imageframe(NULL),
 #ifndef DISABLE_START_THREAD
 	startThread(NULL),
 #endif
-	m_pause(false),
-	inputPos(0),
 	videowidth(0),
 	videoheight(0),
-	m_newFrameReady(false),
 	m_clock_offset(0),
-	m_parser(NULL),
-	m_pausePlayback(false),
-	m_start_onbuffer(false)
+	m_pausePlayback(false)
 {
 	gst_init (NULL, NULL);
 }
@@ -250,17 +243,16 @@ NetStreamGst::callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*p
 		ret = gst_structure_get_fraction (str, "framerate", &framerate1, &framerate2);
 		
 		// Setup the output videoframe
-		int videoFrameFormat = gnash::render::videoFrameFormat();
-		if (videoFrameFormat == render::YUV) {
+		if (ns->m_videoFrameFormat == render::YUV) {
 			ns->m_imageframe = new image::yuv(width, height);
-		} else if (videoFrameFormat == render::RGB) {
+		} else if (ns->m_videoFrameFormat == render::RGB) {
 			ns->m_imageframe = new image::rgb(width, height);
 		}
 	}
 
 	if (ns->m_imageframe) {
 //		ns->m_imageframe->update(GST_BUFFER_DATA(buffer));
-		if (gnash::render::videoFrameFormat() == render::YUV) {
+		if (ns->m_videoFrameFormat == render::YUV) {
 			assert(0);
 
 		/*	image::yuv* yuvframe = static_cast<image::yuv*>(m_imageframe);
@@ -552,7 +544,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 		// Setup the capsfilter which demands either YUV or RGB videoframe format
 		ns->videocaps = gst_element_factory_make ("capsfilter", NULL);
 		GstCaps* videooutcaps;
-		if (gnash::render::videoFrameFormat() == render::YUV) {
+		if (ns->m_videoFrameFormat == render::YUV) {
 			videooutcaps = gst_caps_new_simple ("video/x-raw-yuv", NULL);
 		} else {
 			videooutcaps = gst_caps_new_simple ("video/x-raw-rgb", NULL);
@@ -621,26 +613,6 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 
 	ns->setStatus(playStart);
 	return;
-}
-
-image::image_base* NetStreamGst::get_video()
-{
-	boost::mutex::scoped_lock lock(image_mutex);
-
-	if (!m_imageframe) return NULL;
-
-	image::image_base* ret_image;
-	int videoFrameFormat = gnash::render::videoFrameFormat();
-	if (videoFrameFormat == render::YUV) {
-		ret_image = new image::yuv(m_imageframe->m_width, m_imageframe->m_height);
-	} else if (videoFrameFormat == render::RGB) {
-		ret_image = new image::rgb(m_imageframe->m_width, m_imageframe->m_height);
-	} else {
-		return NULL;
-	}
-
-	ret_image->update(m_imageframe->m_data);
-	return ret_image;
 }
 
 void
@@ -734,29 +706,6 @@ NetStreamGst::time()
 		return pos - m_clock_offset/1000;
 	} else {
 		return 0;
-	}
-}
-
-long
-NetStreamGst::bytesLoaded()
-{
-	return _netCon->getBytesLoaded();
-}
-
-long
-NetStreamGst::bytesTotal()
-{
-	return _netCon->getBytesTotal();
-}
-
-bool
-NetStreamGst::newFrameReady()
-{
-	if (m_newFrameReady) {
-		m_newFrameReady = false;
-		return true;
-	} else {
-		return false;
 	}
 }
 
