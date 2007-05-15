@@ -1,5 +1,8 @@
 2007-05-15 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/morph2_character_def.cpp (read): don't abort
+	  if number of edges in start and end shapes are not equal.
+	  Just raise an SWF error.
 	* server/stream.{cpp,h} (skip_bytes): return a boolean value
 	  for success/failure.
 	* server/swf/PlaceObject2Tag.cpp (readPlaceAction): check

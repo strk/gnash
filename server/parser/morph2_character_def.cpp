@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: morph2_character_def.cpp,v 1.7 2007/04/18 14:07:32 jgilmore Exp $ */
+/* $Id: morph2_character_def.cpp,v 1.8 2007/05/15 13:54:59 strk Exp $ */
 
 // Based on the public domain morph2.cpp of:
 // Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,
@@ -378,7 +378,6 @@ private:
 			  m_shape2->m_paths.size(), edges_count2);
 		);
 
-		assert(edges_count1 == edges_count2);
 		IF_VERBOSE_MALFORMED_SWF(
 
 
