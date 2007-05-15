@@ -427,11 +427,11 @@ DisplayList::swapDepths(character* ch1, int newdepth)
 		return;
 	}
 
-	DisplayItem ch2 = *it2;
-
 	// Found another character at the given depth
-	if ( ch2->get_depth() == newdepth )
+	if ( it2 != _characters.end() && (*it2)->get_depth() == newdepth )
 	{
+		DisplayItem ch2 = *it2;
+
 		int srcdepth = ch1->get_depth();
 
 		ch2->set_depth(srcdepth);
