@@ -1,5 +1,7 @@
 2007-05-15 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.cpp (advance_movie): handle no looping when the
+	  total frame count is 0 (malformed SWF).
 	* server/dlist.cpp (swapDepth): fix an out-of-bound access.
 
 2007-05-15 Zou Lunkai <zoulunkai@gmail.com>

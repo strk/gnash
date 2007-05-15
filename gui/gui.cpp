@@ -484,9 +484,9 @@ Gui::advance_movie(Gui* gui)
 	
 	if ( ! gui->loops() )
 	{
-		size_t curframe = m->get_current_frame();
+		size_t curframe = m->get_current_frame(); // can be 0 on malformed SWF
 		gnash::sprite_instance* si = m->get_root_movie();
-		if (curframe + 1 == si->get_frame_count())
+		if (curframe + 1 >= si->get_frame_count())
 		{
 		    exit(0); // TODO: quit in a more gentile fashion.
 		}
