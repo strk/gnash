@@ -1,3 +1,10 @@
+2007-05-15 Sandro Santilli <strk@keybit.net>
+
+	* server/stream.{cpp,h} (set_position): document and change return
+	  type to signal failures.
+	* server/font.cpp (readDefineFont, readDefineFont2_or_3): use
+	  stream::set_position return code to detect SWF malformations.
+
 2007-05-15 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_{gst,sdl}.cpp: Make soundhandlers more robust.
@@ -16,7 +23,7 @@
 	* testsuite/misc-ming.all/duplicate_movie_clip_test2.c:
 	  more tests.
 	* testsuite/misc-ming.all/action_execution_order_test9.c:
-		new testcase.
+	  new testcase.
 	  
 2007-05-14 Sandro Santilli <strk@keybit.net>
 

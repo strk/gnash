@@ -100,7 +100,18 @@ namespace gnash {
 		unsigned long get_position();
 
 		/// Set the file position to the given value.
-		void	set_position(unsigned long pos);
+		//
+		///
+		/// If we're scanning a tag, don't allow seeking past
+		/// the tag end. Ideally we shouldn't also allow seeking
+		/// before tag start but this is currently unimplemented.
+		///
+		/// @return true on success, false on failure
+		/// 	Possible failures:
+		///	- given position is after end of stream.
+		///	- given position is after end of current tag, if any.
+		///
+		bool set_position(unsigned long pos);
 
 		/// Return the file position of the end of the current tag.
 		unsigned long get_tag_end_position();

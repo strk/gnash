@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.31 2007/05/14 20:40:10 strk Exp $ */
+/* $Id: font.cpp,v 1.32 2007/05/15 09:59:08 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -168,27 +168,19 @@ namespace gnash {
 		if (m->get_create_font_shapes() == DO_LOAD_FONT_SHAPES)
 		{
 			// Read the glyph shapes.
-			unsigned long endTagPos = in->get_tag_end_position();
-
 			{for (int i = 0; i < count; i++)
 			{
 				// Seek to the start of the shape data.
 				unsigned long new_pos = table_base + offsets[i];
-				if ( new_pos > endTagPos )
+
+				if ( ! in->set_position(new_pos) )
 				{
         				throw ParserException(_("Glyphs offset table corrupted in DefineFont tag"));
-#if 0
-					log_swferror(_("Glyph %d in DefineFont is reported to be defined at offset %lu, but tag ends at offset %lu"),
-							i, new_pos, endTagPos);
-					m_glyphs[i] = NULL; // allowed ? or should we throw an exception instead ?
-					continue;
-#endif
 				}
-				in->set_position(new_pos);
 
 				// Create & read the shape.
 				shape_character_def* s = new shape_character_def;
-				s->read(in, SWF::DEFINEFONT, false, m); // why not DEFINEFONT ?
+				s->read(in, SWF::DEFINEFONT, false, m); 
 
 				m_glyphs[i] = s;
 			}}
@@ -272,11 +264,14 @@ namespace gnash {
 				// have such seeks-back, see bug #16311
 				//assert(new_pos >= in->get_position());
 
-				in->set_position(new_pos);
+				if ( ! in->set_position(new_pos) )
+				{
+        				throw ParserException(_("Glyphs offset table corrupted in DefineFont2/3 tag"));
+				}
 
 				// Create & read the shape.
 				shape_character_def* s = new shape_character_def;
-				s->read(in, SWF::DEFINEFONT2, false, m); // why not DEFINEFONT2 ?
+				s->read(in, SWF::DEFINEFONT2, false, m); // .. or DEFINEFONT3 actually..
 
 				m_glyphs[i] = s;
 			}}

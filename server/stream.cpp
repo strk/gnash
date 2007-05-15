@@ -234,7 +234,7 @@ namespace gnash {
 	}
 
 
-	void	stream::set_position(unsigned long pos)
+	bool	stream::set_position(unsigned long pos)
 	{
 		align();
 
@@ -242,8 +242,12 @@ namespace gnash {
 		if (m_tag_stack.size() > 0)
 		{
 			unsigned long end_pos = m_tag_stack.back();
-			assert(pos <= end_pos);
-			end_pos = end_pos;	// inhibit warning
+			if ( pos > end_pos )
+			{
+				log_error("Attempt to seek past the end of an opened tag");
+				// abort(); ?
+				return false;
+			}
 			// @@ check start pos somehow???
 		}
 
@@ -254,7 +258,10 @@ namespace gnash {
 			//       we might be called from an exception handler
 			//       so throwing here might be a double throw...
 			log_swferror(_("Unexpected end of stream"));
+			return false;
 		}
+
+		return true;
 	}
 
 
