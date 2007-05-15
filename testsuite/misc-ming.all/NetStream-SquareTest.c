@@ -28,7 +28,7 @@
 #include "ming_utils.h"
 
 #define OUTPUT_VERSION 7
-#define OUTPUT_FILENAME "NetStream-ExtSquare.swf"
+#define OUTPUT_FILENAME "NetStream-ExtSquareTest.swf"
 
 const char* mediadir=".";
 char filename[256];

@@ -28,7 +28,7 @@
 #include "ming_utils.h"
 
 #define OUTPUT_VERSION 7
-#define OUTPUT_FILENAME "Video-EmbedSquare.swf"
+#define OUTPUT_FILENAME "Video-EmbedSquareTest.swf"
 
 const char* mediadir=".";
 
