@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.98 2007/05/13 12:20:36 martinwguy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.99 2007/05/15 09:41:54 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1287,7 +1287,13 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		break;
 
 	    case sound_handler::FORMAT_MP3:
-		// Handled elsewhere
+		// Decompressed elsewhere
+		data_bytes = in->get_tag_end_position() - in->get_position();
+		data = new unsigned char[data_bytes];
+		for (int i = 0; i < data_bytes; i++)
+		{
+		    data[i] = in->read_u8();
+		}
 		break;
 
 	    case sound_handler::FORMAT_NELLYMOSER:

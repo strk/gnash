@@ -1,3 +1,8 @@
+2007-05-15 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_{gst,sdl}.cpp: Make soundhandlers more robust.
+	* server/swf/tag_loaders.cpp: Remember to pass the mp3 data and size.
+
 2007-05-15 Sandro Santilli <strk@keybit.net>
 
 	* server/movie_instance.cpp (advance): safely handle movies 

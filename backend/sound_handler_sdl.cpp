@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.54 2007/05/03 06:00:15 strk Exp $
+// $Id: sound_handler_sdl.cpp,v 1.55 2007/05/15 09:41:54 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -256,6 +256,12 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	// sound isn't already playing. If a active_sound-struct is existing we
 	// assume it is also playing.
 	if (start_position > 0 && sounddata->m_active_sounds.size() > 0) {
+		return;
+	}
+
+	// Make sure sound actually got some data
+	if (sounddata->data_size < 1) {
+		gnash::log_error(_("Trying to play sound with size 0, malformed SWF?"));
 		return;
 	}
 

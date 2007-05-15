@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.39 2007/05/14 09:44:19 jgilmore Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.40 2007/05/15 09:41:54 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -277,6 +277,12 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 	// sound isn't already playing. If a gst_element-struct is existing we
 	// assume it is also playing.
 	if (start_position > 0 && sounddata->m_gst_elements.size() > 0) {
+		return;
+	}
+
+	// Make sure sound actually got some data
+	if (sounddata->data_size < 1) {
+		gnash::log_error(_("Trying to play sound with size 0, malformed SWF?"));
 		return;
 	}
 
