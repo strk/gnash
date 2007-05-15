@@ -1,5 +1,7 @@
 2007-05-15 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (inflate_wrapper): fix infinite loop
+	  on inflate errors.
 	* server/parser/morph2_character_def.cpp (read): don't abort
 	  if number of edges in start and end shapes are not equal.
 	  Just raise an SWF error.

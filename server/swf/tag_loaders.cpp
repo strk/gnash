@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.100 2007/05/15 10:47:51 tgc Exp $ */
+/* $Id: tag_loaders.cpp,v 1.101 2007/05/15 14:02:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -339,7 +339,9 @@ void inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
 
     int err = inflateInit(&d_stream);
     if (err != Z_OK) {
-	log_error(_("inflate_wrapper() inflateInit() returned %d"), err);
+	IF_VERBOSE_MALFORMED_SWF(
+	log_swferror(_("inflate_wrapper() inflateInit() returned %d"), err);
+	);
 	return;
     }
 
@@ -355,7 +357,10 @@ void inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
 	if (err == Z_STREAM_END) break;
 	if (err != Z_OK)
 	{
-	    log_error(_("inflate_wrapper() inflate() returned %d"), err);
+	    IF_VERBOSE_MALFORMED_SWF(
+	    log_swferror(_("inflate_wrapper() inflate() returned %d"), err);
+	    );
+	    break;
 	}
     }
 
