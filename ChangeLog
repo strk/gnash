@@ -1,3 +1,8 @@
+2007-05-15 Markus Gothe <nietzsche@lysator.liu.se>
+	
+	* po/se.po: Initial start of Swedish translation.
+	* gui/aqua*: Stubs for getting a native OS X UI.
+	
 2007-05-15 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStreamGst.{h,cpp}: add a resetPipeline() private
