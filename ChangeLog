@@ -1,5 +1,8 @@
 2007-05-15 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamGst.{h,cpp}: add a resetPipeline() private
+	  method doing some checks on the return code (some situations are 
+	  still unhandled); use resetPipeline() when needed.
 	* server/asobj/NetStream.cpp: warn once about unimplemented stuff.
 
 2007-05-15  Rob Savoye  <rob@bertha.welcomehome.org>

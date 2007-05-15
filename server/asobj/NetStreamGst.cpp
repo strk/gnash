@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.37 2007/05/15 13:01:28 tgc Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.38 2007/05/15 18:20:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -132,7 +132,12 @@ void NetStreamGst::close()
 #endif
 	}
 
-	gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
+	if ( ! resetPipeline() )
+	{
+		log_error("Can't reset pipeline on close");
+	}
+
+	// Should we keep the ref if the above failed ?
 	gst_object_unref (GST_OBJECT (pipeline));
 
 	if (m_imageframe) delete m_imageframe;
@@ -310,6 +315,8 @@ void NetStreamGst::audio_callback_handoff (GstElement * /*c*/, GstBuffer *buffer
 // Only used when playing FLV
 void NetStreamGst::video_callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 {
+	//GNASH_REPORT_FUNCTION;
+
 	NetStreamGst* ns = static_cast<NetStreamGst*>(user_data);
 
 	FLVFrame* frame = ns->m_parser->nextVideoFrame();
@@ -423,6 +430,10 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 		if (videoInfo) {
 			video = true;
 			ns->videosource = gst_element_factory_make ("fakesrc", NULL);
+			if ( ! ns->videosource )
+			{
+				log_error("Unable to create videosource 'fakesrc' element");
+			}
 			
 			// setup fake source
 			g_object_set (G_OBJECT (ns->videosource),
@@ -495,6 +506,10 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 
 		if (sound) {
 			ns->audiosource = gst_element_factory_make ("fakesrc", NULL);
+			if ( ! ns->audiosource )
+			{
+				log_error("Unable to create audiosource 'fakesrc' element");
+			}
 
 			// setup fake source
 			g_object_set (G_OBJECT (ns->audiosource),
@@ -646,6 +661,7 @@ NetStreamGst::advance()
 {
 	// Check if we should start the playback when a certain amount is buffered
 	if (m_isFLV && m_pause && m_go && m_start_onbuffer && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
+		log_debug("Setting status to bufferFull and enabling pipeline");
 		setStatus(bufferFull);
 		m_start_onbuffer = false;
 		m_pause = false;
@@ -655,10 +671,21 @@ NetStreamGst::advance()
 	// If we're out of data, but still not done loading, pause playback,
 	// or stop if loading is complete
 	if (m_pausePlayback) {
+		log_debug("Playback paused");
 		m_pausePlayback = false;
 		if (_netCon->loadCompleted()) {
+			log_debug("Load completed, setting playStop status and shutting down pipeline");
 			setStatus(playStop);
-			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
+
+			// Drop gstreamer pipeline so callbacks are not called again
+			if ( ! resetPipeline() )
+			{
+				// the state change failed
+				log_error("Could not interrupt pipeline!");
+
+				// @@ eh.. what to do then ?
+			}
+
 			m_go = false;
 			m_clock_offset = 0;
 		} else {
@@ -669,6 +696,8 @@ NetStreamGst::advance()
 			GstState current, pending;
 
 			ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
+
+			/// TODO: shouldn't we check 'ret' value here !!??
 
 			if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
 				pos = pos / 1000000;
@@ -753,6 +782,54 @@ NetStreamGst::seekMedia(void *opaque, int offset, int whence){
 	}
 	return ns->inputPos;
 }
+
+/*private*/
+bool
+NetStreamGst::resetPipeline()
+{
+	// Drop gstreamer pipeline so callbacks are not called again
+	GstStateChangeReturn ret =  gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
+	if ( ret == GST_STATE_CHANGE_FAILURE )
+	{
+		// the state change failed
+		log_error("Could not interrupt pipeline!");
+		return false;
+
+		// @@ eh.. what to do then ?
+	}
+	else if ( ret == GST_STATE_CHANGE_SUCCESS )
+	{
+		// the state change succeeded
+		log_debug("State change successful");
+	}
+	else if ( ret == GST_STATE_CHANGE_ASYNC )
+	{
+		// the state change will happen asynchronously
+		log_debug("State change will happen asynchronously!");
+
+		// @@ we should call gst_get_state() to wait for it instead..
+		return false; 
+
+	}
+	else if ( ret == GST_STATE_CHANGE_NO_PREROLL )
+	{
+		// the state change succeeded but the element
+		// cannot produce data in PAUSED.
+		// This typically happens with live sources.
+		log_debug("State change succeeded but the element cannot produce data in PAUSED");
+
+		// @@ what to do in this case ?
+	}
+	else
+	{
+		log_error("Unknown return code from gst_element_set_state");
+		return false;
+	}
+
+	return true;
+
+}
+
 
 } // gnash namespcae
 

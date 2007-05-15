@@ -68,6 +68,13 @@ public:
 
 private:
 
+	/// Set pipeline state to GST_STATE_NULL 
+	/// (the NULL state or initial state of an elemen)
+	///
+	/// If the call needs be asynchronous, we'll wait for it.
+	///
+	bool resetPipeline();
+
 	// gstreamer pipeline objects
 	GstElement *pipeline;
 	GstElement *audiosink;
