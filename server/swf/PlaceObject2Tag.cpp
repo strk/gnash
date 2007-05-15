@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.8 2007/05/12 06:50:37 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.9 2007/05/15 13:08:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -68,7 +68,12 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 {
 
 	uint16_t reserved = in->read_u16();
-	assert(reserved == 0);	// must be 0
+	IF_VERBOSE_MALFORMED_SWF (
+		if ( reserved != 0 ) // must be 0
+		{
+			log_swferror(_("Reserved field in PlaceObject actions == %u (expected 0)"), reserved);
+		}
+	);
 	
 	// The logical 'or' of all the following handlers.
 	all_event_flags = (movie_version >= 6) ? in->read_u32() : in->read_u16();

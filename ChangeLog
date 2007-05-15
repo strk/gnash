@@ -1,3 +1,8 @@
+2007-05-15 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/PlaceObject2Tag.cpp (readPlaceActions): don't abort when
+	  reserved flag != 0.
+
 2007-05-15 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStream.{cpp.h}, server/asobj/NetStreamFfmpeg.{cpp,h},
