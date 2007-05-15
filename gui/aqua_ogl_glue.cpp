@@ -17,12 +17,13 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.cpp,v 1.5 2007/05/09 20:28:57 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.cpp,v 1.6 2007/05/15 22:04:18 nihilus Exp $ */
 
 
 #include "aqua_ogl_glue.h"
-#include "tu_opengl_includes.h"
-
+#include <AGL/agl.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 #include "log.h"
 
 #define OVERSIZE 1.0f

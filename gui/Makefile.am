@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.70 2007/05/15 21:31:24 nihilus Exp $
+# $Id: Makefile.am,v 1.71 2007/05/15 22:04:18 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -80,7 +80,7 @@ if USE_GUI_GTK
 endif # USE_GUI_GTK
 if USE_GUI_AQUA
   AQUA_OPENGL_SRCS = aqua_ogl_glue.cpp aqua_ogl_glue.h
-  AM_CPPFLAGS += -framework Carbon -framework openGL -framework AGL
+  AM_LDFLAGS += -framework Carbon -framework openGL -framework AGL
 endif # USE_GUI_AQUA
 if USE_GUI_SDL
   SDL_OPENGL_SRCS = sdl_ogl_glue.cpp sdl_ogl_glue.h

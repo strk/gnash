@@ -84,7 +84,7 @@
     <reference idRef="190"/>
     <object class="IBCarbonWindow" id="198">
       <string name="windowRect">134 719 494 1199 </string>
-      <string name="title">Window</string>
+      <string name="title">Gnash</string>
       <object name="rootControl" class="IBCarbonRootControl" id="199">
         <string name="bounds">0 0 360 480 </string>
         <string name="viewFrame">0 0 480 360 </string>
@@ -123,12 +123,12 @@
   <dictionary count="4" name="nameTable">
     <string>Files Owner</string>
     <reference idRef="1"/>
+    <string>MainWindow</string>
+    <reference idRef="198"/>
     <string>MenuBar</string>
     <reference idRef="29"/>
     <string>View31</string>
     <reference idRef="204"/>
-    <string>Window</string>
-    <reference idRef="198"/>
   </dictionary>
-  <unsigned_int name="nextObjectID">212</unsigned_int>
+  <unsigned_int name="nextObjectID">214</unsigned_int>
 </object>
