@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.55 2007/05/15 09:41:54 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.56 2007/05/15 10:47:50 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -261,7 +261,9 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 	// Make sure sound actually got some data
 	if (sounddata->data_size < 1) {
-		gnash::log_error(_("Trying to play sound with size 0, malformed SWF?"));
+		IF_VERBOSE_MALFORMED_SWF(
+			gnash::log_swferror(_("Trying to play sound with size 0"));
+		);
 		return;
 	}
 

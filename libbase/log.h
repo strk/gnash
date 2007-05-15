@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.h,v 1.50 2007/05/07 10:29:39 strk Exp $ */
+/* $Id: log.h,v 1.51 2007/05/15 10:47:51 tgc Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -302,14 +302,14 @@ DSOEXPORT void log_aserror(const char* fmt, ...) GNUC_LOG_ATTRS;
 
 #if VERBOSE_ASCODING_ERRORS
 // TODO: check if it's worth to check verbosity level too...
-#define IF_VERBOSE_ASCODING_ERRORS(x) { if ( RcInitFile::getDefaultInstance().showASCodingErrors() ) { x; } } while (0);
+#define IF_VERBOSE_ASCODING_ERRORS(x) { if ( gnash::RcInitFile::getDefaultInstance().showASCodingErrors() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_ASCODING_ERRORS(x)
 #endif
 
 #if VERBOSE_MALFORMED_SWF
 // TODO: check if it's worth to check verbosity level too... 
-#define IF_VERBOSE_MALFORMED_SWF(x) { if ( RcInitFile::getDefaultInstance().showMalformedSWFErrors() ) { x; } } while (0);
+#define IF_VERBOSE_MALFORMED_SWF(x) { if ( gnash::RcInitFile::getDefaultInstance().showMalformedSWFErrors() ) { x; } } while (0);
 #else
 #define IF_VERBOSE_MALFORMED_SWF(x)
 #endif

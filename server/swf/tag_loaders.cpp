@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.99 2007/05/15 09:41:54 tgc Exp $ */
+/* $Id: tag_loaders.cpp,v 1.100 2007/05/15 10:47:51 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1290,10 +1290,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		// Decompressed elsewhere
 		data_bytes = in->get_tag_end_position() - in->get_position();
 		data = new unsigned char[data_bytes];
-		for (int i = 0; i < data_bytes; i++)
-		{
-		    data[i] = in->read_u8();
-		}
+		in->read((char *)data, data_bytes);
 		break;
 
 	    case sound_handler::FORMAT_NELLYMOSER:
@@ -1475,15 +1472,9 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
     {
 	// Raw data
 	sample_count =  data_bytes / (stereo ? 4 : 2);
-	for (int i = 0; i < data_bytes; i++)
-	{
-	    data[i] = in->read_u8();
-	}
+	in->read((char *)data, data_bytes);
     } else {
-	for (int i = 0; i < data_bytes; i++)
-	{
-	    data[i] = in->read_u8();
-	}
+	in->read((char *)data, data_bytes);
 
 	// Swap bytes on behalf of the host, to make it easier for the handler.
 	// @@ I'm assuming this is a good idea?	 Most sound handlers will prefer native endianness?
