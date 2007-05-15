@@ -92,7 +92,7 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); // 5th frame 
 
   SWFDisplayItem_remove(it2);
-  check_equals(mo, "typeof(_root.x)", "'undefined'");
+  xcheck_equals(mo, "typeof(_root.x)", "'undefined'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); // 6th frame 
   
