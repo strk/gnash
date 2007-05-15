@@ -1,5 +1,6 @@
 2007-05-15 Sandro Santilli <strk@keybit.net>
 
+	* libbase/jpeg.cpp: fix typo introduced in last commit.
 	* server/swf/PlaceObject2Tag.cpp (readPlaceActions): don't abort when
 	  reserved flag != 0.
 

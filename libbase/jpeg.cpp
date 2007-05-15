@@ -74,7 +74,7 @@ namespace jpeg
 				if (src->m_start_of_file) {
 					// Treat this as a fatal error.
 					gnash::log_error("empty jpeg source stream.");
-					return false;
+					return FALSE;
 				}
 				// warn("jpeg end-of-stream");
 
@@ -104,7 +104,7 @@ namespace jpeg
 			src->m_pub.bytes_in_buffer = bytes_read;
 			src->m_start_of_file = false;
 
-			return false;
+			return TRUE;
 		}
 
 		// Called by client when it wants to advance past some
