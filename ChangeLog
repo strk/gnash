@@ -1,5 +1,9 @@
 2007-05-15 Sandro Santilli <strk@keybit.net>
 
+	* server/stream.{cpp,h} (skip_bytes): return a boolean value
+	  for success/failure.
+	* server/swf/PlaceObject2Tag.cpp (readPlaceAction): check
+	  return from stream::skip_bytes.
 	* libbase/jpeg.cpp: fix typo introduced in last commit.
 	* server/swf/PlaceObject2Tag.cpp (readPlaceActions): don't abort when
 	  reserved flag != 0.

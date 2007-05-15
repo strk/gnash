@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.9 2007/05/15 13:08:07 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.10 2007/05/15 13:48:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -142,7 +142,16 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 				". Skipping excessive bytes."),
 				event_length, readlen);
 			);
-			in->skip_bytes(event_length - readlen);
+
+			if ( ! in->skip_bytes(event_length - readlen) )
+			{
+				// TODO: should we throw a ParserException instead
+				//       so to completely discard this tag ?
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror(_("Bytes skipping failed."));
+				);
+				break;
+			}
 		}
 
 		// 13 bits reserved, 19 bits used

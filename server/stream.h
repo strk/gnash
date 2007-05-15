@@ -134,14 +134,19 @@ namespace gnash {
 
 		/// Discard given number of bytes
 		//
-		/// Note: crossing a tag boundary triggers an error,
-		/// but I'm not sure we really want this --strk;
-		void skip_bytes(unsigned num)
+		///
+		/// @return true on success, false on failure
+		/// 	Possible failures:
+		///	- skipping given number of bytes reaches end of stream.
+		///	- skipping given number of bytes reaches end of
+		///	  current tag, if any.
+		///
+		bool skip_bytes(unsigned num)
 		{
 			// there's probably a better way, but
 			// it's the interface that counts atm
 			size_t curpos = get_position();
-			set_position(curpos+num);
+			return set_position(curpos+num);
 		}
 
 		/// Discard all bytes up to end of tag
