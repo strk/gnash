@@ -18,8 +18,8 @@
 
 /*
  * frame2: gotoAndPlay(4);
- * frame4: place "mc1"; gotoAndPlay(6);
- * frame5: place "mc2";
+ * frame4: place "mc1" at depth3; gotoAndPlay(6);
+ * frame5: place "mc2" at depth4;
  * frame6: stop;
  *
  * expected behaviour:
@@ -92,6 +92,7 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); // 5th frame 
 
   SWFDisplayItem_remove(it2);
+  // Gnash fails because actions in "mc1" got executed, see expected behaviour
   xcheck_equals(mo, "typeof(_root.x)", "'undefined'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); // 6th frame 
