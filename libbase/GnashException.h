@@ -21,6 +21,7 @@
 #define _GNASH_GNASHEXCEPTION__H 1
 
 #include <exception>
+#include <string>
 
 namespace gnash
 {

@@ -1,3 +1,7 @@
+2007-05-15 Sandro Santilli <strk@keybit.net>
+
+	* libbase/GnashException.h: add missing <string> include.
+
 2007-05-15 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/action_execution_order_test9.c:
