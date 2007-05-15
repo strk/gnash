@@ -79,11 +79,17 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); /* 1st frame */
 
-  add_actions(mo, " _root.note('root frame '+_root._currentframe);");
-  add_actions(mo, " if(check == 1) gotoAndPlay(4); ");
+  add_actions(mo,
+		  " if(check == 1) "
+		  " {"
+		  "  _root.note('root frame '+_root._currentframe+'. About to call gotoAndPlay(4)');"
+		  "  gotoAndPlay(4);"
+		  " } else {"
+		  "  _root.note('root frame '+_root._currentframe);"
+		  " }");
   SWFMovie_nextFrame(mo); /* 2nd frame */
   
-  add_actions(mo, " _root.note('root frame '+_root._currentframe);");
+  add_actions(mo, " _root.note('root frame '+_root._currentframe+'. About to call gotoAndPlay(2).');");
   add_actions(mo, " check = 1; gotoAndPlay(2); ");
   SWFMovie_nextFrame(mo); /* 3rd frame */
   
@@ -103,29 +109,33 @@ main(int argc, char** argv)
   add_actions(mo, "_root.note('root frame '+_root._currentframe);");
   check_equals(mo,"typeof(_root.x)", "'undefined'");
   add_actions(mo, "_root.x = 200; ");
+
   SWFMovie_nextFrame(mo); /* 4th frame */
 
 
+  /* Remove mc1 in frame 4 (from depth 3) */
   SWFDisplayItem_remove(it1);
   
   mc2 = newSWFMovieClip();
-  // these actions are expected to be skipped with SWF version higher then 4
+
+  /* these actions are expected to be skipped with SWF version higher then 4 */
   add_clip_actions(mc2, " _root.note('mc2 frame '+this._currentframe);");
-  add_clip_actions(mc2, " _root.note(' your player version is lower than  5');"
-                        " _root.note(' Or your player is bogus'); "
-                        " fail = 0; "
-                        //this should not be executed with SWF6
-                        " _root.xcheck_equals(fail, 1); " ); 
+  add_clip_actions(mc2, " _root.xfail('This actions should not be executed with SWF5+');"); 
+  SWFMovieClip_nextFrame(mc2);
+
+  /* Place mc2 in frame 4 (at depth 3) */
   it2 = SWFMovie_add(mo, (SWFBlock)mc2);  
   SWFDisplayItem_setDepth(it2, 3); 
   SWFDisplayItem_setName(it2, "mc2"); 
-  SWFMovieClip_nextFrame(mc2);
+
   add_actions(mo, " _root.note('root frame '+_root._currentframe);");
   add_actions(mo, " stop(); ");  
    
   SWFMovie_nextFrame(mo); /* 5th frame */
 
+  /* Remove mc2 in frame 5 (from depth 3) */
   SWFDisplayItem_remove(it2);
+
   check_equals(mo, "_root.x", "200");
   add_actions(mo, " _root.note('root frame '+_root._currentframe);");
   add_actions(mo, " _root.totals(); stop(); ");
