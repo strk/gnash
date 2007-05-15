@@ -1,3 +1,8 @@
+2007-05-15 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/duplicate_movie_clip_test2.c:
+	  more tests.
+	  
 2007-05-14 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/movie_def_impl.cpp (read_all_swf): handle premature

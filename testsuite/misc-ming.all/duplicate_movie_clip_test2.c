@@ -27,7 +27,7 @@
  *
  * expected behaviour:
  * (1)target path is supported in duplicateMovieClip, valid path formats
- *    are: a.b.c; a/b/c; a/b/c/; a/b/:c; a/b/:c/ ;
+ *    are: a.b.c; a/b/c; a/b/c/; a/b/:c; a/b/:c/;  /:a/:b/:c(odd);
  * (2)the source movie clip should be within the same timeline as the new movie clip.
  */
 
@@ -64,7 +64,7 @@ main(int argc, char** argv)
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  SWFMovie_nextFrame(mo); /* 1st frame */
+  SWFMovie_nextFrame(mo); // 1st frame 
 
   /* add mc1, mc2 to the main movie */  
       
@@ -83,16 +83,19 @@ main(int argc, char** argv)
     "duplicateMovieClip('/_root/mc1/mc11', 'dup_ch2', 2);"
     "_root.check_equals(typeof(dup_ch2), 'movieclip');"
     
-    "duplicateMovieClip('mc2', 'dup_ch3', 3);"
-    // can not duplicate a movie clip in a different time
-    "_root.check_equals(typeof(dup_ch3), 'undefined');"
+    "duplicateMovieClip('/:_root/:mc1/:mc11', 'dup_ch3', 3);"
+    "_root.check_equals(typeof(dup_ch3), 'movieclip');"
     
-    "duplicateMovieClip('/:mc2', 'dup_ch4', 4);"
+    "duplicateMovieClip('mc2', 'dup_ch4', 4);"
     // can not duplicate a movie clip in a different time
     "_root.check_equals(typeof(dup_ch4), 'undefined');"
     
+    "duplicateMovieClip('/:mc2', 'dup_ch5', 5);"
+    // can not duplicate a movie clip in a different time
+    "_root.check_equals(typeof(dup_ch5), 'undefined');"
+    
     // Don't do this, duplicate a self-clip will crash the proprietary player"
-    // "duplicateMovieClip('/:mc1', 'dup_ch4', 4);"
+    // "duplicateMovieClip('/:mc1', 'dup_ch6', 6);"
     "stop();"
     );
   SWFMovieClip_nextFrame(mc1); 
@@ -134,15 +137,15 @@ main(int argc, char** argv)
   add_actions(mo, "removeMovieClip(dup5);");
   check_equals(mo, "typeof(dup5)", "'undefined'");
   
-  add_actions(mo, "duplicateMovieClip('_root.mc1.mc2', 'dup6', 6);");
+  add_actions(mo, "duplicateMovieClip('_root.mc1.mc11', 'dup6', 6);");
   // can not duplicate a movieclip in a different timeline
   check_equals(mo, "typeof(dup6)", "'undefined'");
   
-  add_actions(mo, "duplicateMovieClip('/_root/mc1/:mc2', 'dup7', 7);");
+  add_actions(mo, "duplicateMovieClip('/_root/mc1/:mc11', 'dup7', 7);");
   // can not duplicate a movieclip in a different timeline
   check_equals(mo, "typeof(dup7)", "'undefined'");
   
-  add_actions(mo, "duplicateMovieClip('/_root/mc1/mc2', 'dup8', 8);");
+  add_actions(mo, "duplicateMovieClip('/_root/mc1/mc11', 'dup8', 8);");
   // can not duplicate a movieclip in a different timeline
   check_equals(mo, "typeof(dup8)", "'undefined'");
   SWFMovie_nextFrame(mo); // 3rd frame
