@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.310 2007/05/15 16:31:00 rsavoye Exp $
+dnl $Id: configure.ac,v 1.311 2007/05/16 15:58:22 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -425,17 +425,19 @@ dnl options to configure.
 if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([Configuring Gnash for cross compilation])
   export pkgroot=`$CXX -print-search-dirs | grep "install:" | sed -e 's/install: //' -e 's:/lib/gcc/.*::'`
-  export incllist="${with_top_level}/include ${pkgroot}/${host_alias}/include ${pkgroot}/include"
-  export libslist="${with_top_level}/lib ${pkgroot}/${host_alias}/lib ${pkgroot}/lib64 ${pkgroot}/lib32 ${pkgroot}/lib"
-  export pathlist="${pkgroot}/${host_alias}/bin:${pkgroot}/bin"
-  LDFLAGS="${LDFLAGS} -Wl,--as-needed"
+  export incllist=`eval echo ${with_top_level}/include ${pkgroot}/${host_alias}/include ${pkgroot}/include`
+  export libslist=`eval echo ${with_top_level}/lib ${pkgroot}/${host_alias}/lib ${pkgroot}/lib64 ${pkgroot}/lib32 ${pkgroot}/lib`
+  export pathlist=`eval echo ${pkgroot}/${host_alias}/bin:${pkgroot}/bin`
   plugin=no
 else
   AC_MSG_NOTICE([Configuring Gnash for native compilation])
-  export incllist=`cat ${srcdir}/macros/incllist`
-  export libslist=`cat ${srcdir}/macros/libslist`
+  export incllist=`eval cat ${srcdir}/macros/incllist`
+  export libslist=`eval cat ${srcdir}/macros/libslist`
   export pathlist=$PATH
 fi
+
+dnl Try to ignore stupid dependencies
+LDFLAGS="${LDFLAGS} -Wl,--as-needed"
 
 dnl GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
@@ -894,15 +896,15 @@ AC_LIB_LTDL
 dnl AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]),
 dnl                                         AC_DEFINE(LT_DLMUTEX, 0, [doesn't have lt_dlmutex_register]) )
 
-dnl DLOPEN="-dlopen"
-dnl DLPREOPEN="-dlpreopen"
-dnl AC_SUBST(DLOPEN)
-dnl AC_SUBST(DLPREOPEN)
+DLOPEN="-dlopen"
+DLPREOPEN="-dlpreopen"
+AC_SUBST(DLOPEN)
+AC_SUBST(DLPREOPEN)
 
 dnl dnl Substitute INCLTDL and LIBLTDL in the Makefiles
-dnl AC_SUBST(INCLTDL)
-dnl AC_SUBST(LIBLTDL)
-dnl AC_SUBST(LIBTOOL_DEPS)
+AC_SUBST(INCLTDL)
+AC_SUBST(LIBLTDL)
+AC_SUBST(LIBTOOL_DEPS)
 
 dnl Define winsock if we're on windows. We could do something complicated,
 dnl but since AC_EXEEXT does it for us, we'll do this the easy way.

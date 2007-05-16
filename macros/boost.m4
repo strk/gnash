@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.43 2007/05/13 19:26:30 strk Exp $
+dnl $Id: boost.m4,v 1.44 2007/05/16 15:58:21 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -49,14 +49,19 @@ AC_DEFUN([GNASH_PATH_BOOST],
     gnash_boost_version=""
     for i in $incllist; do
       for j in `ls -dr $i/boost* 2>/dev/null`; do
+        if test -f ${j}/boost/detail/lightweight_mutex.hpp; then
+          gnash_boost_topdir=`basename $j`
+          ac_cv_path_boost_incl="-I${j}"
+          break
+        fi
         if test -f ${j}/detail/lightweight_mutex.hpp; then
           gnash_boost_topdir=`basename $j`
-          gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`
-          ac_cv_path_boost_incl="-I$i"
+          ac_cv_path_boost_incl="-I${i}"
           break
         fi
       done
-      if test x$gnash_boost_version != x; then
+      if test x$gnash_boost_topdir != x; then
+        gnash_boost_version=`echo ${gnash_boost_topdir} | sed -e 's:boost-::'`
         break;
       fi
     done
@@ -93,31 +98,84 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl version compiled with GCC instead of the native
   dnl compiler. Finally look for the library without any qualitfying
   dnl attributes.
-  boost_datenames="boost_date_time-gcc-mt boost_date_time-mt boost_date_time-gcc boost_date_time-mt boost_date_time"
-  boost_threadnames="boost_thread-gcc-mt boost_thread-mt boost_thread boost_thread-gcc"
-  boost_date_time=no
-  boost_thread=no
+  boost_date_time="no"
+  boost_thread="no"
   AC_MSG_CHECKING([for Boost libraries])
   for i in $libslist; do
     if test x${boost_date_time} = xyes && test x${boost_thread} = xyes; then
       break;
     fi
-    for libname in ${boost_datenames}; do
-      # ${shlibext}* allows .so to work where .so symlink is not installed (the * has been removed for now to fix detection on normal systems)
-      if test -f $i/lib${libname}.a -o -f $i/lib${libname}.${shlibext}; then
+    dirs=`ls -dr $i/libboost_date_time*.${shlibext} $i/libboost_date_time*.a 2>/dev/null`
+    for libname in $dirs; do
+      if test x"${boost_date_time}" = xno; then
+        lfile=`basename ${libname} | eval sed -e 's:^lib::' -e 's:\.${shlibext}.*::'`
+        ldir=`dirname ${libname}`
+        if test -f ${ldir}/lib${lfile}-mt.${shlibext}; then
+          lfile="${lfile}-mt"
+        fi
         boost_date_time=yes
-        ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${libname}"
-        break;
+        ac_cv_path_boost_lib="-L${ldir} -l${lfile}"
+        break
+      else
+        break
       fi
     done
-    for libname in ${boost_threadnames}; do
-      # ${shlibext}* allows .so to work where .so symlink is not installed (the * has been removed for now to fix detection on normal systems)
-      if test -f $i/lib${libname}.a -o -f $i/lib${libname}.${shlibext}; then
+
+    dnl now look for the Boost Thread library
+    dirs=`ls -dr $i/libboost_thread*.${shlibext} $i/libboost_thread*.a 2>/dev/null`
+    for libname in $dirs; do
+      if test x"${boost_thread}" = xno; then
+        lfile=`basename ${libname} | eval sed -e 's:^lib::' -e 's:\.${shlibext}.*::'`
+        ldir=`dirname ${libname}`
+        if test -f ${ldir}/lib${lfile}-mt.${shlibext}; then
+          lfile=${lfile}-mt
+        fi
         boost_thread=yes
-        ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${libname}"
-        break;
+        ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
+        break
+      else
+        break
       fi
     done
+
+dnl     for libname in `eval ls -dr $i/libboost_thread* 2>/dev/null`; do
+dnl       # ${shlibext}* allows .so to work where .so symlink is not installed (the *
+dnl       # has been removed for now to fix detection on normal systems)
+dnl       if test x"${boost_thread}" = xno; then
+dnl         lfile=`basename ${libname} | eval sed -e 's:^lib::' -e 's:\.${shlibext}.*::'`
+dnl         ldir=`dirname ${libname}`
+dnl         case "${libname}" in
+dnl           *-mt-${gnash_boost_version}.${shlibext})
+dnl             boost_thread=yes
+dnl             ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
+dnl             echo "FIXME: ${libname} shared lib with version"
+dnl             ;;
+dnl           *-mt-${gnash_boost_version}.a)
+dnl             boost_thread=yes
+dnl             ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
+dnl             echo "FIXME: ${libname} static lib with version"
+dnl             ;;
+dnl           *-mt.${shlibext})
+dnl             boost_thread=yes
+dnl             ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
+
+dnl             echo "FIXME: ${libname} shared lib without version"
+dnl             ;;
+dnl           *-mt.a)
+dnl             boost_thread=yes
+dnl              ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
+dnl             echo "FIXME: ${libname} static lib without version"
+dnl             ;;
+dnl           *-mt.${shlibext}*)
+dnl             boost_thread=yes
+dnl             ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
+dnl             echo "FIXME: ${libname} shared lib doesn't end with .so"
+dnl             ;;
+dnl         esac
+dnl       else
+dnl         break
+dnl       fi
+dnl    done
   done
   AC_MSG_RESULT(${ac_cv_path_boost_lib})
 

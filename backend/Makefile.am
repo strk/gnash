@@ -44,7 +44,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/server \
         -I$(top_srcdir)/server/parser \
         -I$(top_srcdir)/libbase \
-	        -I$(top_srcdir)/backend \
+	-I$(top_srcdir)/backend \
         -I$(top_srcdir)/libgeometry \
 	$(PTHREAD_CFLAGS) \
         $(SDL_CFLAGS) \
@@ -125,7 +125,7 @@ libgnashbackend_la_SOURCES = \
 	$(RENDER_SOURCES) \
 	$(SOUND_SOURCES)
 
-libgnashbackend_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
+libgnashbackend_la_LDFLAGS = -release $(VERSION)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

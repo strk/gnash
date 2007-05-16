@@ -1,3 +1,27 @@
+2007-05-16  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Eval lists so the embedded variables get
+	expanded on all systems. Turn on --as-needed for all
+	builds. Define LIBLTDL variables and DLOPEN again.
+	* backend/Makefile.am: Don't use no-undefined -export-dynamic for
+	a library.
+	* libbase/Makefile.am: Build standalone libltdl now so we can work
+	with an installed one too, which appears to be necessary on 64 bit
+	systems.
+	* macros/boost.m4: Rewrite to support Boost 3.4, which of course
+	changed the library names. Get all libraries with of the right
+	type, and sort through the variants to choose the correct one,
+	preferably ending in *-mt.so.
+	* macros/kde.m4: Define newlist, so we don't stomp the value of
+	libslist, which produces bizarre side effects when cross
+	compiling.
+	* macros/libltdl.m4: Our build of libltdl.la lives in libbase
+	instead of libltdl. NOTE: This will unfortunately have to be done
+	again if this file is updated in the future from the version
+	included on libtool.
+	* gui/Makefile.am: -framework Carbon should be defined in
+	$OPENGL_LIBS.
+
 2007-05-16 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStreamGst.{cpp,h}: define and use 

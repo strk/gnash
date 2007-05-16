@@ -21,12 +21,13 @@ EXTRA_DIST =
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
-lib_LTLIBRARIES = libgnashbase.la
+lib_LTLIBRARIES =  libltdl.la libgnashbase.la
+
+libltdl_la_CPPFLAGS = $(LTDLINCL)
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I.. -I$(srcdir) \
 	-I$(top_srcdir)	\
-	-I$(top_srcdir)/libltdl	\
 	-I$(top_srcdir)/libamf	\
 	-I$(top_srcdir)/server	\
 	-I$(top_srcdir)/server/swf	\
@@ -41,7 +42,6 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(Z_CFLAGS) \
 	$(JPEG_CFLAGS) \
 	$(BOOST_CFLAGS) \
-	$(INCLTDL) \
 	$(NULL)
 
 # These headers get installed
@@ -69,6 +69,8 @@ libgnashbase_la_LIBADD += $(SDL_LIBS)
 else
 EXTRA_DIST += tu_file_SDL.cpp
 endif
+
+libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 
 libgnashbase_la_SOURCES = \
 	config.cpp \
@@ -141,10 +143,6 @@ noinst_HEADERS = \
 	FLVParser.h
 
 
-# add libltdl
-libgnashbase_la_SOURCES += $(top_srcdir)/libltdl/ltdl.c
-noinst_HEADERS += $(top_srcdir)/libltdl/ltdl.h
-
 if USE_SOUND_GST
 libgnashbase_la_SOURCES += gstgnashsrc.c embedVideoDecoderGst.cpp
 noinst_HEADERS += gstgnashsrc.h embedVideoDecoderGst.h
@@ -160,6 +158,7 @@ libgnashbase_la_CPPFLAGS += $(FFMPEG_CFLAGS)
 endif
 
 libgnashbase_la_LDFLAGS = -release $(VERSION)
+libltdl_la_LDFLAGS = -release $(VERSION)
 
 # We use our own rule to build the demo so it isn't built by default.
 # Since it doesn't contain a main() routine, we only try to compile,

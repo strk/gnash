@@ -2542,7 +2542,7 @@ AC_DEFUN([AC_LIBLTDL_CONVENIENCE],
   "") enable_ltdl_convenience=yes
       ac_configure_args="$ac_configure_args --enable-ltdl-convenience" ;;
   esac
-  LIBLTDL='${top_builddir}/'ifelse($#,1,[$1],['libltdl'])/libltdlc.la
+  LIBLTDL='${top_builddir}/'ifelse($#,1,[$1],['libbase'])/libltdlc.la
   LTDLINCL='-I${top_srcdir}/'ifelse($#,1,[$1],['libltdl'])
   # For backwards non-gettext consistent compatibility...
   INCLTDL="$LTDLINCL"
@@ -2573,7 +2573,7 @@ AC_DEFUN([AC_LIBLTDL_INSTALLABLE],
   ])
   if test x"$enable_ltdl_install" = x"yes"; then
     ac_configure_args="$ac_configure_args --enable-ltdl-install"
-    LIBLTDL='${top_builddir}/'ifelse($#,1,[$1],['libltdl'])/libltdl.la
+    LIBLTDL='${top_builddir}/'ifelse($#,1,[$1],['libbase'])/libltdl.la
     LTDLINCL='-I${top_srcdir}/'ifelse($#,1,[$1],['libltdl'])
   else
     ac_configure_args="$ac_configure_args --enable-ltdl-install=no"
@@ -6465,7 +6465,7 @@ fi
 AC_MSG_CHECKING([whether to use included libltdl])
 AC_MSG_RESULT([$with_included_ltdl])
 
-AC_CONFIG_SUBDIRS([libltdl])
+dnl AC_CONFIG_SUBDIRS([libltdl])
 ])# AC_WITH_LTDL
 
 

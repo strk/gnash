@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.73 2007/05/16 07:14:00 strk Exp $
+# $Id: Makefile.am,v 1.74 2007/05/16 15:58:22 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -36,7 +36,8 @@ AM_CPPFLAGS = -I.. \
         $(SDL_CFLAGS) \
         $(DMALLOC_CFLAGS) \
 	$(BOOST_CFLAGS) \
-        $(PTHREAD_CFLAGS)
+        $(PTHREAD_CFLAGS) \
+	$(NULL)
 
 GTK_CFLAGS = \
 	$(GTK2_CFLAGS) \
@@ -66,6 +67,7 @@ AM_LDFLAGS =  \
 	$(FFMPEG_LIBS) \
 	$(CURL_LIBS) \
 	$(LIBXML_LIBS) \
+	$(INCLTDL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
@@ -80,7 +82,7 @@ if USE_GUI_GTK
 endif # USE_GUI_GTK
 if USE_GUI_AQUA
   AQUA_OPENGL_SRCS = aqua_ogl_glue.cpp aqua_ogl_glue.h
-  AM_LDFLAGS += -framework Carbon $(OPENGL_LIBS)
+  AM_LDFLAGS += $(OPENGL_LIBS)
 endif # USE_GUI_AQUA
 if USE_GUI_SDL
   SDL_OPENGL_SRCS = sdl_ogl_glue.cpp sdl_ogl_glue.h
@@ -255,9 +257,9 @@ libgnashplayer_la_LDFLAGS = \
 	-export-dynamic \
 	$(AM_LDFLAGS) 
 
-gnash_SOURCES = gnash.cpp 
+gnash_SOURCES = gnash.cpp
 # export our symbols so they can be used by Gnash plugins
-gnash_LDFLAGS = -no-undefined -export-dynamic
+gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
 gnash_DEPENDENCIES = $(GNASH_LIBS)
 gnash_LDADD = \
 	$(MYSQL_LIBS) \
