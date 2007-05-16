@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.42 2007/05/16 16:08:12 tgc Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.43 2007/05/16 16:30:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -584,46 +584,43 @@ NetStreamGst::buildPipeline()
 void
 NetStreamGst::startPlayback()
 {
-	NetStreamGst* ns = this; // quick hack
-
-	boost::intrusive_ptr<NetConnection> nc = ns->_netCon;
+	boost::intrusive_ptr<NetConnection> nc = _netCon;
 	assert(nc);
 
 	// Pass stuff from/to the NetConnection object.
-	assert(ns);
-	if ( !nc->openConnection(ns->url) ) {
-		ns->setStatus(streamNotFound);
-		log_debug(_("Gnash could not open movie: %s"), ns->url.c_str());
+	if ( !nc->openConnection(url) ) {
+		setStatus(streamNotFound);
+		log_debug(_("Gnash could not open movie: %s"), url.c_str());
 		return;
 	}
 
-	ns->inputPos = 0;
+	inputPos = 0;
 
 	uint8_t head[3];
 	if (nc->read(head, 3) < 3) {
-		ns->setStatus(streamNotFound);
+		setStatus(streamNotFound);
 		return;
 	}
 	nc->seek(0);
 	if (head[0] == 'F' && head[1] == 'L' && head[2] == 'V') { 
-		ns->m_isFLV = true;
-		ns->m_parser = new FLVParser(); // TODO: define ownership, use auto_ptr !
-		if (!nc->connectParser(*(ns->m_parser))) {
-			ns->setStatus(streamNotFound);
-			log_debug(_("Gnash could not open movie: %s"), ns->url.c_str());
+		m_isFLV = true;
+		m_parser = new FLVParser(); // TODO: define ownership, use auto_ptr !
+		if (!nc->connectParser(*(m_parser))) {
+			setStatus(streamNotFound);
+			log_debug(_("Gnash could not open movie: %s"), url.c_str());
 			return;
 			
 		}
 	}
 
 	// setup the GnashNC plugin if we are not decoding FLV
-	if (!ns->m_isFLV) _gst_plugin_register_static (&gnash_plugin_desc);
+	if (!m_isFLV) _gst_plugin_register_static (&gnash_plugin_desc);
 
 	// setup the pipeline
-	ns->pipeline = gst_pipeline_new (NULL);
+	pipeline = gst_pipeline_new (NULL);
 
 	// Check if the creation of the gstreamer pipeline was a succes
-	if (!ns->pipeline) {
+	if (!pipeline) {
 		gnash::log_error(_("The gstreamer pipeline element could not be created"));
 		return;
 	}
@@ -635,7 +632,7 @@ NetStreamGst::startPlayback()
 	if (get_sound_handler()) sound = true;
 	
 	// Setup the decoder and source
-	if (ns->m_isFLV) {
+	if (m_isFLV) {
 		if (!buildFLVPipeline(&sound, &video)) {
 			unrefElements();
 			return;
@@ -654,36 +651,36 @@ NetStreamGst::startPlayback()
 		// If the gstreamer adder ever gets fixed this should be connected to the
 		// adder in the soundhandler.
 #if !defined(__NetBSD__)
-		ns->audiosink = gst_element_factory_make ("autoaudiosink", NULL);
-		if (!ns->audiosink) ns->audiosink = gst_element_factory_make ("alsasink", NULL);
-		if (!ns->audiosink) ns->audiosink = gst_element_factory_make ("osssink", NULL);
+		audiosink = gst_element_factory_make ("autoaudiosink", NULL);
+		if (!audiosink) audiosink = gst_element_factory_make ("alsasink", NULL);
+		if (!audiosink) audiosink = gst_element_factory_make ("osssink", NULL);
 #endif
-		if (!ns->audiosink) ns->audiosink = gst_element_factory_make ("esdsink", NULL);
+		if (!audiosink) audiosink = gst_element_factory_make ("esdsink", NULL);
 
-		if (!ns->audiosink) {
+		if (!audiosink) {
 			log_error(_("The gstreamer audiosink element could not be created"));
 			unrefElements();
 			return;
 		}
 		// setup the audio converter
-		ns->audioconv = gst_element_factory_make ("audioconvert", NULL);
-		if (!ns->audioconv) {
+		audioconv = gst_element_factory_make ("audioconvert", NULL);
+		if (!audioconv) {
 			log_error(_("The gstreamer audioconvert element could not be created"));
 			unrefElements();
 			return;
 		}
 
 		// setup the volume controller
-		ns->volume = gst_element_factory_make ("volume", NULL);
-		if (!ns->volume) {
+		volume = gst_element_factory_make ("volume", NULL);
+		if (!volume) {
 			log_error(_("The gstreamer volume element could not be created"));
 			unrefElements();
 			return;
 		}
 
 	} else  {
-		ns->audiosink = gst_element_factory_make ("fakesink", NULL);
-		if (!ns->audiosink) {
+		audiosink = gst_element_factory_make ("fakesink", NULL);
+		if (!audiosink) {
 			log_error(_("The gstreamer fakesink element could not be created"));
 			unrefElements();
 			return;
@@ -692,8 +689,8 @@ NetStreamGst::startPlayback()
 
 	if (video) {
 		// setup the video colorspaceconverter converter
-		ns->colorspace = gst_element_factory_make ("ffmpegcolorspace", NULL);
-		if (!ns->colorspace)
+		colorspace = gst_element_factory_make ("ffmpegcolorspace", NULL);
+		if (!colorspace)
 		{
 			log_error("Unable to create colorspace 'ffmpegcolorspace' element");
 			unrefElements();
@@ -701,8 +698,8 @@ NetStreamGst::startPlayback()
 		}
 
 		// Setup the capsfilter which demands either YUV or RGB videoframe format
-		ns->videocaps = gst_element_factory_make ("capsfilter", NULL);
-		if (!ns->videocaps)
+		videocaps = gst_element_factory_make ("capsfilter", NULL);
+		if (!videocaps)
 		{
 			log_error("Unable to create videocaps 'capsfilter' element");
 			unrefElements();
@@ -710,17 +707,17 @@ NetStreamGst::startPlayback()
 		}
 
 		GstCaps* videooutcaps;
-		if (ns->m_videoFrameFormat == render::YUV) {
+		if (m_videoFrameFormat == render::YUV) {
 			videooutcaps = gst_caps_new_simple ("video/x-raw-yuv", NULL);
 		} else {
 			videooutcaps = gst_caps_new_simple ("video/x-raw-rgb", NULL);
 		}
-		g_object_set (G_OBJECT (ns->videocaps), "caps", videooutcaps, NULL);
+		g_object_set (G_OBJECT (videocaps), "caps", videooutcaps, NULL);
 		gst_caps_unref (videooutcaps);
 
 		// Setup the videorate element which makes sure the frames are delivered on time.
-		ns->videorate = gst_element_factory_make ("videorate", NULL);
-		if (!ns->videorate)
+		videorate = gst_element_factory_make ("videorate", NULL);
+		if (!videorate)
 		{
 			log_error("Unable to create videorate 'videorate' element");
 			unrefElements();
@@ -728,51 +725,51 @@ NetStreamGst::startPlayback()
 		}
 
 		// setup the videosink with callback
-		ns->videosink = gst_element_factory_make ("fakesink", NULL);
-		if (!ns->videosink)
+		videosink = gst_element_factory_make ("fakesink", NULL);
+		if (!videosink)
 		{
 			log_error("Unable to create videosink 'fakesink' element");
 			unrefElements();
 			return;
 		}
 
-		g_object_set (G_OBJECT (ns->videosink), "signal-handoffs", TRUE, "sync", TRUE, NULL);
+		g_object_set (G_OBJECT (videosink), "signal-handoffs", TRUE, "sync", TRUE, NULL);
 		// TODO: use connectVideoSincCallback()
-		g_signal_connect (ns->videosink, "handoff", G_CALLBACK (NetStreamGst::callback_output), ns);
+		g_signal_connect (videosink, "handoff", G_CALLBACK (NetStreamGst::callback_output), this);
 	}
 
-	if (video && (!ns->colorspace || !ns->videocaps || !ns->videorate || !ns->videosink)) {
+	if (video && (!colorspace || !videocaps || !videorate || !videosink)) {
 		log_error(_("Gstreamer element(s) for video movie handling could not be created, you probably need to install gstreamer0.10-base for ffmpegcolorspace and videorate support."));
 		unrefElements();
 		return;
 	}
 
 	// put it all in the pipeline and link the elements
-	if (!ns->m_isFLV) { 
-		if (sound) gst_bin_add_many (GST_BIN (ns->pipeline),ns->audiosink, ns->audioconv, ns->volume, NULL);
-		if (video) gst_bin_add_many (GST_BIN (ns->pipeline), ns->source, ns->decoder, ns->colorspace, 
-					ns->videosink, ns->videorate, ns->videocaps, NULL);
+	if (!m_isFLV) { 
+		if (sound) gst_bin_add_many (GST_BIN (pipeline),audiosink, audioconv, volume, NULL);
+		if (video) gst_bin_add_many (GST_BIN (pipeline), source, decoder, colorspace, 
+					videosink, videorate, videocaps, NULL);
 
-		if (video || sound) gst_element_link(ns->source, ns->decoder);
-		if (video) gst_element_link_many(ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
-		if (sound) gst_element_link_many(ns->audioconv, ns->volume, ns->audiosink, NULL);
+		if (video || sound) gst_element_link(source, decoder);
+		if (video) gst_element_link_many(colorspace, videocaps, videorate, videosink, NULL);
+		if (sound) gst_element_link_many(audioconv, volume, audiosink, NULL);
 
 	} else {
-		if (video) gst_bin_add_many (GST_BIN (ns->pipeline), ns->videosource, ns->videoinputcaps, ns->videodecoder, ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
-		if (sound) gst_bin_add_many (GST_BIN (ns->pipeline), ns->audiosource, ns->audioinputcaps, ns->audiodecoder, ns->audioconv, ns->volume, ns->audiosink, NULL);
+		if (video) gst_bin_add_many (GST_BIN (pipeline), videosource, videoinputcaps, videodecoder, colorspace, videocaps, videorate, videosink, NULL);
+		if (sound) gst_bin_add_many (GST_BIN (pipeline), audiosource, audioinputcaps, audiodecoder, audioconv, volume, audiosink, NULL);
 
-		if (sound) gst_element_link_many(ns->audiosource, ns->audioinputcaps, ns->audiodecoder, ns->audioconv, ns->volume, ns->audiosink, NULL);
-		if (video) gst_element_link_many(ns->videosource, ns->videoinputcaps, ns->videodecoder, ns->colorspace, ns->videocaps, ns->videorate, ns->videosink, NULL);
+		if (sound) gst_element_link_many(audiosource, audioinputcaps, audiodecoder, audioconv, volume, audiosink, NULL);
+		if (video) gst_element_link_many(videosource, videoinputcaps, videodecoder, colorspace, videocaps, videorate, videosink, NULL);
 
 	}
 
 	// start playing	
-	if (!ns->m_isFLV)
+	if (!m_isFLV)
 	{
 		if (video || sound)
 		{
 			// TODO: should call playPipeline() ?
-			gst_element_set_state (GST_ELEMENT (ns->pipeline), GST_STATE_PLAYING);
+			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
 		}
 	}
 	else
@@ -787,7 +784,7 @@ NetStreamGst::startPlayback()
 		}
 	}
 
-	ns->setStatus(playStart);
+	setStatus(playStart);
 	return;
 }
 
