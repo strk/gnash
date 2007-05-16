@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.47 2007/05/16 17:50:03 tgc Exp $ */
+/* $Id: NetStream.cpp,v 1.48 2007/05/16 18:22:32 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -328,19 +328,8 @@ netstream_bufferLength(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	bool warned = false;
-	if ( ! warned ) {
-		log_unimpl("NetStream.bufferLength getter/setter");
-		warned = true;
-	}
-	if ( fn.nargs == 0 ) // getter
-	{
-		return as_value();
-	}
-	else // setter
-	{
-		return as_value();
-	}
+	long ret = ns->bufferLength();
+	return as_value(ret);
 }
 
 // Both a getter and a (do-nothing) setter for bufferTime
@@ -528,6 +517,13 @@ NetStream::bytesTotal()
 {
 	if (_netCon == NULL) return 0;
 	return _netCon->getBytesTotal();
+}
+
+long
+NetStream::bufferLength()
+{
+	if (m_parser == NULL) return 0;
+	return m_parser->getBufferLength();
 }
 
 bool

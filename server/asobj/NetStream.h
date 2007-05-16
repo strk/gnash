@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.32 2007/05/16 17:50:03 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.33 2007/05/16 18:22:32 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -195,6 +195,10 @@ public:
 
 	/// Returns the total number of bytes (size) of the media file
 	long bytesTotal();
+
+	/// Returns the number of second of the media file that is buffered and 
+	/// yet to be played
+	long bufferLength();
 
 	/// Tells us if there is a new video frame ready
 	bool newFrameReady();

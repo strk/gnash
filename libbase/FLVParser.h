@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.7 2007/05/16 17:38:23 strk Exp $
+// $Id: FLVParser.h,v 1.8 2007/05/16 18:22:32 tgc Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -201,6 +201,11 @@ public:
 
 	/// Returns the framerate of the video
 	uint16_t videoFrameRate();
+
+	/// Returns the "bufferlength", meaning the differens between the
+	/// current frames timestamp and the timestamp of the last parseable
+	/// frame. Returns the difference in milliseconds.
+	uint32_t getBufferLength();
 
 private:
 

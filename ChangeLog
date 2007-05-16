@@ -2,6 +2,8 @@
 
 	* server/asobj/NetStream.{h,cpp}, 
 	  server/asobj/NetStream{Gst,Ffmpeg}.{h,cpp}: Updated documentation.
+	* libbase/FLVParser.{h,cpp}, server/asobj/NetStream.{h,cpp}: 
+	  Implemented bufferLength.
 
 2007-05-16 Sandro Santilli <strk@keybit.net>
 
