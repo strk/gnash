@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.44 2007/05/16 15:58:21 rsavoye Exp $
+dnl $Id: boost.m4,v 1.45 2007/05/16 19:58:55 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -105,10 +105,10 @@ AC_DEFUN([GNASH_PATH_BOOST],
     if test x${boost_date_time} = xyes && test x${boost_thread} = xyes; then
       break;
     fi
-    dirs=`ls -dr $i/libboost_date_time*.${shlibext} $i/libboost_date_time*.a 2>/dev/null`
+    dirs=`ls -dr $i/libboost_date_time*.${shlibext} $i/libboost_date_time*.${shlibext}.* $i/libboost_date_time*.a 2>/dev/null`
     for libname in $dirs; do
       if test x"${boost_date_time}" = xno; then
-        lfile=`basename ${libname} | eval sed -e 's:^lib::' -e 's:\.${shlibext}.*::'`
+        lfile=`basename ${libname} | eval sed -e 's:^lib::' -e 's:.a$::' -e 's:\.${shlibext}.*::'`
         ldir=`dirname ${libname}`
         if test -f ${ldir}/lib${lfile}-mt.${shlibext}; then
           lfile="${lfile}-mt"
@@ -122,10 +122,10 @@ AC_DEFUN([GNASH_PATH_BOOST],
     done
 
     dnl now look for the Boost Thread library
-    dirs=`ls -dr $i/libboost_thread*.${shlibext} $i/libboost_thread*.a 2>/dev/null`
+    dirs=`ls -dr $i/libboost_thread*.${shlibext} $i/libboost_thread*.${shlibext}.* $i/libboost_thread*.a 2>/dev/null`
     for libname in $dirs; do
       if test x"${boost_thread}" = xno; then
-        lfile=`basename ${libname} | eval sed -e 's:^lib::' -e 's:\.${shlibext}.*::'`
+        lfile=`basename ${libname} | eval sed -e 's:^lib::'  -e 's:.a$::' -e 's:\.${shlibext}.*::'`
         ldir=`dirname ${libname}`
         if test -f ${ldir}/lib${lfile}-mt.${shlibext}; then
           lfile=${lfile}-mt
@@ -137,45 +137,6 @@ AC_DEFUN([GNASH_PATH_BOOST],
         break
       fi
     done
-
-dnl     for libname in `eval ls -dr $i/libboost_thread* 2>/dev/null`; do
-dnl       # ${shlibext}* allows .so to work where .so symlink is not installed (the *
-dnl       # has been removed for now to fix detection on normal systems)
-dnl       if test x"${boost_thread}" = xno; then
-dnl         lfile=`basename ${libname} | eval sed -e 's:^lib::' -e 's:\.${shlibext}.*::'`
-dnl         ldir=`dirname ${libname}`
-dnl         case "${libname}" in
-dnl           *-mt-${gnash_boost_version}.${shlibext})
-dnl             boost_thread=yes
-dnl             ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
-dnl             echo "FIXME: ${libname} shared lib with version"
-dnl             ;;
-dnl           *-mt-${gnash_boost_version}.a)
-dnl             boost_thread=yes
-dnl             ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
-dnl             echo "FIXME: ${libname} static lib with version"
-dnl             ;;
-dnl           *-mt.${shlibext})
-dnl             boost_thread=yes
-dnl             ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
-
-dnl             echo "FIXME: ${libname} shared lib without version"
-dnl             ;;
-dnl           *-mt.a)
-dnl             boost_thread=yes
-dnl              ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
-dnl             echo "FIXME: ${libname} static lib without version"
-dnl             ;;
-dnl           *-mt.${shlibext}*)
-dnl             boost_thread=yes
-dnl             ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
-dnl             echo "FIXME: ${libname} shared lib doesn't end with .so"
-dnl             ;;
-dnl         esac
-dnl       else
-dnl         break
-dnl       fi
-dnl    done
   done
   AC_MSG_RESULT(${ac_cv_path_boost_lib})
 

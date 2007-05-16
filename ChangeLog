@@ -1,3 +1,8 @@
+2007-05-16  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* macros/boost.m4: Look for shared libs with version numbers after
+	the suffix, for OpenBSD.
+
 2007-05-16 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStream.{h,cpp}, 
