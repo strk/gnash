@@ -129,7 +129,9 @@ check_PROGRAMS = \
 	static_vs_dynamic1 \
 	static_vs_dynamic2 \
 	Video-EmbedSquareTest \
+	Video-EmbedSquareTestRunner \
 	NetStream-SquareTest \
+	NetStream-SquareTestRunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -1234,6 +1236,24 @@ NetStream_SquareTest_LDADD = $(MING_LIBS)
 NetStream-SquareTest.swf: NetStream-SquareTest
 	./NetStream-SquareTest $(srcdir)/../media
 
+NetStream_SquareTestRunner_SOURCES = \
+	NetStream-SquareTestRunner.cpp \
+	$(NULL)
+
+NetStream_SquareTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
+NetStream_SquareTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+
+NetStream_SquareTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	NetStream-SquareTest.swf	\
+	$(NULL)
+
 Video_EmbedSquareTest_SOURCES = \
 	Video-EmbedSquareTest.c \
 	ming_utils.h		\
@@ -1244,6 +1264,24 @@ Video_EmbedSquareTest_LDADD = $(MING_LIBS)
 
 Video-EmbedSquareTest.swf: Video-EmbedSquareTest
 	./Video-EmbedSquareTest $(srcdir)/../media
+
+Video_EmbedSquareTestRunner_SOURCES = \
+	Video-EmbedSquareTestRunner.cpp \
+	$(NULL)
+
+Video_EmbedSquareTestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+
+Video_EmbedSquareTestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+
+Video_EmbedSquareTestRunner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	Video-EmbedSquareTest.swf	\
+	$(NULL)
 
 Dejagnu_SOURCES =	\
 	Dejagnu.c	\
@@ -1313,6 +1351,8 @@ TEST_CASES = \
 	key_event_testrunner \
 	static_vs_dynamic1_testrunner \
 	static_vs_dynamic2_testrunner \
+	Video-EmbedSquareTestRunner \
+	NetStream-SquareTestRunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS

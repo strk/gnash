@@ -1,3 +1,9 @@
+2007-05-16 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: Makefile.am,
+	  NetStream-SquareTestRunner.cpp, Video-EmbedSquareTestRunner.cpp:
+	  Stub video test runners.
+
 2007-05-16 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStreamGst.{cpp,h}: Split startPlayback() into 
