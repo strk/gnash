@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.40 2007/05/16 12:50:26 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.41 2007/05/16 13:01:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -906,7 +906,7 @@ NetStreamGst::disconnectVideoHandoffSignal()
 {
 	if (videosource && _handoffVideoSigHandler )
 	{
-		log_debug("Disconnecting video handoff signal %lu", _handoffAudioSigHandler);
+		log_debug("Disconnecting video handoff signal %lu", _handoffVideoSigHandler);
 		g_signal_handler_disconnect(videosource, _handoffVideoSigHandler);
 		_handoffVideoSigHandler = 0;
 	}
@@ -919,7 +919,7 @@ NetStreamGst::disconnectVideoHandoffSignal()
 bool
 NetStreamGst::disconnectAudioHandoffSignal()
 {
-	if ( audiosource && _handoffAudioSigHandler );
+	if ( audiosource && _handoffAudioSigHandler )
 	{
 		log_debug("Disconnecting audio handoff signal %lu", _handoffAudioSigHandler);
 		g_signal_handler_disconnect(audiosource, _handoffAudioSigHandler);
