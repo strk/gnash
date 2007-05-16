@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.72 2007/05/15 22:11:12 nihilus Exp $
+# $Id: Makefile.am,v 1.73 2007/05/16 07:14:00 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -85,7 +85,7 @@ endif # USE_GUI_AQUA
 if USE_GUI_SDL
   SDL_OPENGL_SRCS = sdl_ogl_glue.cpp sdl_ogl_glue.h
 endif # USE_GUI_SDL
-Âif USE_GUI_KDE
+if USE_GUI_KDE
   KDE_OPENGL_SRCS = kde_glue_opengl.cpp kde_glue_opengl.h
   AM_CPPFLAGS += $(KDE_CFLAGS) $(QT_CFLAGS)
   AM_LDFLAGS +=  $(KDE_LIBS) $(QT_LIBS)
@@ -216,7 +216,13 @@ libgnashgui_la_SOURCES = \
 libgnashgui_la_LIBADD = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/backend/libgnashbackend.la \
-	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/libamf/libgnashamf.la 
+
+# is LDFLAGS still needed when AM_LDFLAGS is defined already ?
+libgnashgui_la_LDFLAGS = \
+	-release $(VERSION) \
+	-no-undefined \
+	-export-dynamic \
 	$(AM_LDFLAGS)
 
 if USE_GUI_KDE
@@ -241,7 +247,12 @@ libgnashplayer_la_SOURCES = \
 libgnashplayer_la_LIBADD = \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/backend/libgnashbackend.la \
-	libgnashgui.la \
+	libgnashgui.la 
+
+libgnashplayer_la_LDFLAGS = \
+	-release $(VERSION) \
+	-no-undefined \
+	-export-dynamic \
 	$(AM_LDFLAGS) 
 
 gnash_SOURCES = gnash.cpp 
@@ -283,8 +294,6 @@ klash.moc: $(srcdir)/kdesup.h
 #guitest_SOURCES = guitest.cpp #fltk.cpp #fltksup.h fltksupp.h gnash.cpp gtk.cpp 
 #	gtksup.h gui.cpp gui.h menu.cpp menu.h sdl.cpp sdlsup.h [21~sdlsupp.h
 #guitest_LDADD = $(gnash_LDADD)
-libgnashplayer_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
-libgnashgui_la_LDFLAGS = -release $(VERSION) -no-undefined -export-dynamic
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
