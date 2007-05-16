@@ -60,7 +60,9 @@ public:
 	static int readPacket(void* opaque, char* buf, int buf_size);
 	static int seekMedia(void *opaque, int offset, int whence);
 
-	static void startPlayback(NetStreamGst* ns);
+	void startPlayback();
+
+	static void playbackStarter(NetStreamGst* ns);
 	static void callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 	static void callback_newpad (GstElement *decodebin, GstPad *pad, gboolean last, gpointer data);
 	static void video_callback_handoff (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
@@ -68,12 +70,57 @@ public:
 
 private:
 
-	/// Set pipeline state to GST_STATE_NULL 
-	/// (the NULL state or initial state of an elemen)
+	/// Connect the video "handoff" signal
+	//
+	/// @return true on success, false on failure
 	///
+	bool connectVideoHandoffSignal();
+
+	/// Connect the audio "handoff" signal
+	//
+	/// @return true on success, false on failure
+	///
+	bool connectAudioHandoffSignal();
+
+	/// Disconnect the video "handoff" signal
+	//
+	/// @return true on success, false on failure
+	///
+	bool disconnectVideoHandoffSignal();
+
+	/// Disconnect the audio "handoff" signal
+	//
+	/// @return true on success, false on failure
+	///
+	bool disconnectAudioHandoffSignal();
+
+	/// \brief
+	/// Set pipeline state to GST_STATE_NULL
+	/// and disconnect handoff signals
+	//
 	/// If the call needs be asynchronous, we'll wait for it.
+	/// TODO: implement the above
 	///
-	bool resetPipeline();
+	bool disablePipeline();
+
+	/// \brief
+	/// Set pipeline state to GST_STATE_PLAYING,
+	/// connect handoff signals, send appropriate
+	/// notifications.
+	//
+	/// If the call needs be asynchronous, we'll wait for it.
+	/// TOOD: implement the above
+	///
+	bool playPipeline();
+
+	/// \brief
+	/// Set pipeline state to GST_STATE_PAUSE,
+	/// connect handoff signals if not connected already
+	//
+	/// If the call needs be asynchronous, we'll wait for it.
+	/// TOOD: implement the above
+	///
+	bool pausePipeline(bool startOnBuffer);
 
 	// gstreamer pipeline objects
 	GstElement *pipeline;
@@ -87,6 +134,9 @@ private:
 	GstElement *videoflip;
 	GstElement *audioconv;
 
+	// Mutex protecting pipeline control
+	boost::mutex _pipelineMutex;
+
 	// used only for FLV
 	GstElement *audiosource;
 	GstElement *videosource;
@@ -95,6 +145,10 @@ private:
 	GstElement *audiodecoder;
 	GstElement *videoinputcaps;
 	GstElement *audioinputcaps;
+
+	// Signal handlers id
+	gulong _handoffVideoSigHandler;
+	gulong _handoffAudioSigHandler;
 
 #ifndef DISABLE_START_THREAD
 	boost::thread *startThread;

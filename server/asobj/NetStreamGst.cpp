@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.39 2007/05/16 09:09:39 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.40 2007/05/16 12:50:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -81,6 +81,8 @@ NetStreamGst::NetStreamGst():
 	audiodecoder(NULL),
 	videoinputcaps(NULL),
 	audioinputcaps(NULL),
+	_handoffVideoSigHandler(0),
+	_handoffAudioSigHandler(0),
 
 #ifndef DISABLE_START_THREAD
 	startThread(NULL),
@@ -108,15 +110,23 @@ void NetStreamGst::pause(int mode)
 	{
 		m_pause = (mode == 0) ? true : false;
 	}
-	if (pipeline) {
-		if (m_pause) { 
-			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PAUSED);
-		} else {
-			if (!m_go) { 
-				setStatus(playStart);
-				m_go = true;
+
+	if (pipeline)
+	{
+		if (m_pause)
+		{ 
+			log_msg("Pausing pipeline on user request");
+			if ( ! pausePipeline(false) )
+			{
+				log_error("Could not pause pipeline");
 			}
-			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
+		}
+		else
+		{
+			if ( ! playPipeline() )
+			{
+				log_error("Could not play pipeline");
+			}
 		}
 	}
 }
@@ -132,7 +142,7 @@ void NetStreamGst::close()
 #endif
 	}
 
-	if ( ! resetPipeline() )
+	if ( ! disablePipeline() )
 	{
 		log_error("Can't reset pipeline on close");
 	}
@@ -149,16 +159,6 @@ int
 NetStreamGst::play(const std::string& c_url)
 {
 
-	// Is it already playing ?
-	if (m_go)
-	{
-		if (m_pause) {
-			m_pause = false;
-			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
-		}
-		return 0;
-	}
-
 	// Does it have an associated NetConnection?
 	if ( ! _netCon )
 	{
@@ -167,6 +167,17 @@ NetStreamGst::play(const std::string& c_url)
 		);
 		return 0;
 	}
+
+	// Is it already playing ?
+	if (m_go)
+	{
+		if (m_pause)
+		{
+			playPipeline();
+		}
+		return 0;
+	}
+
 
 	url += c_url;
 	// Remove any "mp3:" prefix. Maybe should use this to mark as audio-only
@@ -177,7 +188,7 @@ NetStreamGst::play(const std::string& c_url)
 
 	// To avoid blocking while connecting, we use a thread.
 #ifndef DISABLE_START_THREAD
-	startThread = new boost::thread(boost::bind(NetStreamGst::startPlayback, this));
+	startThread = new boost::thread(boost::bind(NetStreamGst::playbackStarter, this));
 #else
 	startPlayback(this);
 #endif
@@ -227,7 +238,6 @@ NetStreamGst::callback_newpad (GstElement* /*decodebin*/, GstPad *pad, gboolean 
 void 
 NetStreamGst::callback_output (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 {
-
 	NetStreamGst* ns = static_cast<NetStreamGst*>(user_data);
 
 	boost::mutex::scoped_lock lock(ns->image_mutex);
@@ -336,8 +346,16 @@ NetStreamGst::video_callback_handoff (GstElement * /*c*/, GstBuffer *buffer, Gst
 }
 
 void
-NetStreamGst::startPlayback(NetStreamGst* ns)
+NetStreamGst::playbackStarter(NetStreamGst* ns)
 {
+	ns->startPlayback();
+}
+
+void
+NetStreamGst::startPlayback()
+{
+	NetStreamGst* ns = this; // quick hack
+
 	boost::intrusive_ptr<NetConnection> nc = ns->_netCon;
 	assert(nc);
 
@@ -455,7 +473,11 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 						"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE, NULL);
 
 			// Setup the callback
-			g_signal_connect (ns->videosource, "handoff", G_CALLBACK (NetStreamGst::video_callback_handoff), ns);
+			if ( ! connectVideoHandoffSignal() )
+			{
+				log_error("Unable to connect the video 'handoff' signal handler");
+				// TODO: what to do in this case ?
+			}
 
 			// Setup the input capsfilter
 			ns->videoinputcaps = gst_element_factory_make ("capsfilter", NULL);
@@ -546,7 +568,13 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 			g_object_set (G_OBJECT (ns->audiosource),
 						"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE, NULL);
 
-			g_signal_connect (ns->audiosource, "handoff", G_CALLBACK (NetStreamGst::audio_callback_handoff), ns);		
+			// Setup the callback
+			if ( ! connectAudioHandoffSignal() )
+			{
+				log_error("Unable to connect the audio 'handoff' signal handler");
+				// TODO: what to do in this case ?
+			}
+
 
 			if (audioInfo->codec == AUDIO_CODEC_MP3) { 
 
@@ -641,6 +669,7 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 		}
 
 		g_object_set (G_OBJECT (ns->videosink), "signal-handoffs", TRUE, "sync", TRUE, NULL);
+		// TODO: use connectVideoSincCallback()
 		g_signal_connect (ns->videosink, "handoff", G_CALLBACK (NetStreamGst::callback_output), ns);
 	}
 
@@ -686,12 +715,24 @@ NetStreamGst::startPlayback(NetStreamGst* ns)
 	}
 
 	// start playing	
-	if (!ns->m_isFLV) {
-		if (video || sound) gst_element_set_state (GST_ELEMENT (ns->pipeline), GST_STATE_PLAYING);
-	} else {
-		if (video || sound) gst_element_set_state (GST_ELEMENT (ns->pipeline), GST_STATE_PAUSED);
-		ns->m_pause = true;
-		ns->m_start_onbuffer = true;
+	if (!ns->m_isFLV)
+	{
+		if (video || sound)
+		{
+			// TODO: should call playPipeline() ?
+			gst_element_set_state (GST_ELEMENT (ns->pipeline), GST_STATE_PLAYING);
+		}
+	}
+	else
+	{
+		if (video || sound)
+		{
+			log_msg("Pausing pipeline on startPlayback");
+			if ( ! pausePipeline(true) )
+			{
+				log_error("Could not pause pipeline");
+			}
+		}
 	}
 
 	ns->setStatus(playStart);
@@ -728,25 +769,29 @@ void
 NetStreamGst::advance()
 {
 	// Check if we should start the playback when a certain amount is buffered
-	if (m_isFLV && m_pause && m_go && m_start_onbuffer && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
-		log_debug("Setting status to bufferFull and enabling pipeline");
-		setStatus(bufferFull);
-		m_start_onbuffer = false;
-		m_pause = false;
-		gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
+	if (m_isFLV && m_pause && m_go && m_start_onbuffer && m_parser && m_parser->isTimeLoaded(m_bufferTime))
+	{
+		if ( ! playPipeline() )
+		{
+			log_error("Could not enable pipeline");
+			return;
+		}
 	}
 
 	// If we're out of data, but still not done loading, pause playback,
 	// or stop if loading is complete
-	if (m_pausePlayback) {
-		log_debug("Playback paused");
+	if (m_pausePlayback)
+	{
+		log_debug("Playback paused (out of data?)");
+
 		m_pausePlayback = false;
-		if (_netCon->loadCompleted()) {
+		if (_netCon->loadCompleted())
+		{
 			log_debug("Load completed, setting playStop status and shutting down pipeline");
 			setStatus(playStop);
 
 			// Drop gstreamer pipeline so callbacks are not called again
-			if ( ! resetPipeline() )
+			if ( ! disablePipeline() )
 			{
 				// the state change failed
 				log_error("Could not interrupt pipeline!");
@@ -756,17 +801,23 @@ NetStreamGst::advance()
 
 			m_go = false;
 			m_clock_offset = 0;
-		} else {
-			gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PAUSED);
-			GstFormat fmt = GST_FORMAT_TIME;
-			int64_t pos;
-			GstStateChangeReturn ret;
-			GstState current, pending;
-
-			ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
+		}
+		else
+		{
+			log_msg("Pausing pipeline on ::advance() [ loadCompleted returned false ]");
+			if ( !pausePipeline(true) )
+			{
+				log_error("Could not pause pipeline");
+			}
 
 			/// TODO: shouldn't we check 'ret' value here !!??
 
+			int64_t pos;
+			GstState current, pending;
+			GstStateChangeReturn ret;
+			GstFormat fmt = GST_FORMAT_TIME;
+
+			ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
 			if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
 				pos = pos / 1000000;
 			} else {
@@ -774,8 +825,6 @@ NetStreamGst::advance()
 			}
 			// Buffer a second before continuing
 			m_bufferTime = pos + 1000;
-			m_start_onbuffer = true;
-			m_pause = true;
 		}
 	}
 
@@ -853,8 +902,82 @@ NetStreamGst::seekMedia(void *opaque, int offset, int whence){
 
 /*private*/
 bool
-NetStreamGst::resetPipeline()
+NetStreamGst::disconnectVideoHandoffSignal()
 {
+	if (videosource && _handoffVideoSigHandler )
+	{
+		log_debug("Disconnecting video handoff signal %lu", _handoffAudioSigHandler);
+		g_signal_handler_disconnect(videosource, _handoffVideoSigHandler);
+		_handoffVideoSigHandler = 0;
+	}
+
+	// TODO: check return code from previous call !
+	return true;
+}
+
+/*private*/
+bool
+NetStreamGst::disconnectAudioHandoffSignal()
+{
+	if ( audiosource && _handoffAudioSigHandler );
+	{
+		log_debug("Disconnecting audio handoff signal %lu", _handoffAudioSigHandler);
+		g_signal_handler_disconnect(audiosource, _handoffAudioSigHandler);
+		_handoffAudioSigHandler = 0;
+	}
+
+	// TODO: check return code from previous call !
+	return true;
+}
+
+/*private*/
+bool
+NetStreamGst::connectVideoHandoffSignal()
+{
+	log_debug("Connecting video handoff signal");
+
+	assert(_handoffVideoSigHandler == 0);
+
+	_handoffVideoSigHandler = g_signal_connect (videosource, "handoff",
+			G_CALLBACK (NetStreamGst::video_callback_handoff), this);
+	log_debug("New _handoffVideoSigHandler id : %lu", _handoffVideoSigHandler);
+
+	assert(_handoffVideoSigHandler != 0);
+
+	// TODO: check return code from previous call !
+	return true;
+}
+
+/*private*/
+bool
+NetStreamGst::connectAudioHandoffSignal()
+{
+	log_debug("Connecting audio handoff signal");
+
+	assert(_handoffAudioSigHandler == 0);
+
+	_handoffAudioSigHandler = g_signal_connect (audiosource, "handoff",
+			G_CALLBACK (NetStreamGst::audio_callback_handoff), this);
+
+	log_debug("New _handoffAudioSigHandler id : %lu", _handoffAudioSigHandler);
+
+	assert(_handoffAudioSigHandler != 0);
+
+	// TODO: check return code from previous call !
+	return true;
+}
+
+/*private*/
+bool
+NetStreamGst::disablePipeline()
+{
+	boost::mutex::scoped_lock lock(_pipelineMutex);
+
+	// Disconnect the handoff handler
+	// TODO: VERIFY THE SIGNAL WILL BE RESTORED WHEN NEEDED !!
+	if ( videosource ) disconnectVideoHandoffSignal();
+	if ( audiosource ) disconnectAudioHandoffSignal();
+
 	// Drop gstreamer pipeline so callbacks are not called again
 	GstStateChangeReturn ret =  gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
 	if ( ret == GST_STATE_CHANGE_FAILURE )
@@ -868,15 +991,244 @@ NetStreamGst::resetPipeline()
 	else if ( ret == GST_STATE_CHANGE_SUCCESS )
 	{
 		// the state change succeeded
-		log_debug("State change successful");
+		log_debug("State change to NULL successful");
+
+		// just make sure
+		GstState current, pending;
+		ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
+		if (current != GST_STATE_NULL )
+		{
+			log_error("State change to NULL NOT confirmed !");
+			return false;
+		}
 	}
 	else if ( ret == GST_STATE_CHANGE_ASYNC )
 	{
-		// the state change will happen asynchronously
-		log_debug("State change will happen asynchronously!");
+		// The element will perform the remainder of the state change
+		// asynchronously in another thread
+		// We'll wait for it...
 
-		// @@ we should call gst_get_state() to wait for it instead..
-		return false; 
+		log_debug("State change to NULL will be asynchronous.. waiting for it");
+
+		GstState current, pending;
+		do {
+			ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, GST_SECOND*1); 
+
+			log_debug(" NULL state change still not completed after X seconds");
+
+		} while ( ret == GST_STATE_CHANGE_ASYNC && current != GST_STATE_NULL );
+
+		if ( ret == GST_STATE_CHANGE_SUCCESS )
+		{
+			assert ( current == GST_STATE_NULL );
+			log_debug(" Async NULL completed successfully");
+		}
+		else if ( ret == GST_STATE_CHANGE_FAILURE )
+		{
+			assert ( current != GST_STATE_NULL );
+			log_debug(" Async NULL completed failing.");
+			return false;
+		}
+		else abort();
+
+
+	}
+	else if ( ret == GST_STATE_CHANGE_NO_PREROLL )
+	{
+		// the state change succeeded but the element
+		// cannot produce data in PAUSED.
+		// This typically happens with live sources.
+		log_debug("State change succeeded but the element cannot produce data in PAUSED");
+
+		// @@ what to do in this case ?
+	}
+	else
+	{
+		log_error("Unknown return code from gst_element_set_state");
+		return false;
+	}
+
+	return true;
+
+}
+
+/*private*/
+bool
+NetStreamGst::playPipeline()
+{
+	boost::mutex::scoped_lock lock(_pipelineMutex);
+
+	log_debug("Setting status to bufferFull and enabling pipeline");
+
+	if ( videosource && ! _handoffVideoSigHandler )
+	{
+		connectVideoHandoffSignal();
+	}
+
+	if ( audiosource && ! _handoffAudioSigHandler )
+	{
+		connectAudioHandoffSignal();
+	}
+
+	if (!m_go) { 
+		setStatus(playStart);
+		m_go = true;
+	}
+	m_pause = false;
+	m_start_onbuffer = false;
+
+
+	// Set pipeline to PLAYING state
+	GstStateChangeReturn ret =  gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PLAYING);
+	if ( ret == GST_STATE_CHANGE_FAILURE )
+	{
+		// the state change failed
+		log_error("Could not set pipeline state to PLAYING!");
+		return false;
+
+		// @@ eh.. what to do then ?
+	}
+	else if ( ret == GST_STATE_CHANGE_SUCCESS )
+	{
+		// the state change succeeded
+		log_debug("State change to PLAYING successful");
+
+		// just make sure
+		GstState current, pending;
+		ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
+		if (current != GST_STATE_PLAYING )
+		{
+			log_error("State change to PLAYING NOT confirmed !");
+			return false;
+		}
+	}
+	else if ( ret == GST_STATE_CHANGE_ASYNC )
+	{
+		// The element will perform the remainder of the state change
+		// asynchronously in another thread
+		// We'll wait for it...
+
+		log_debug("State change to play will be asynchronous.. waiting for it");
+
+		GstState current, pending;
+		do {
+			ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, GST_SECOND*1); 
+
+			log_debug(" Play still not completed after X seconds");
+
+		} while ( ret == GST_STATE_CHANGE_ASYNC && current != GST_STATE_PLAYING );
+
+		if ( ret == GST_STATE_CHANGE_SUCCESS )
+		{
+			assert ( current == GST_STATE_PLAYING );
+			log_debug(" Async play completed successfully");
+		}
+		else if ( ret == GST_STATE_CHANGE_FAILURE )
+		{
+			assert ( current != GST_STATE_PLAYING );
+			log_debug(" Async play completed failing.");
+			return false;
+		}
+		else abort();
+
+	}
+	else if ( ret == GST_STATE_CHANGE_NO_PREROLL )
+	{
+		// the state change succeeded but the element
+		// cannot produce data in PAUSED.
+		// This typically happens with live sources.
+		log_debug("State change succeeded but the element cannot produce data in PAUSED");
+
+		// @@ what to do in this case ?
+	}
+	else
+	{
+		log_error("Unknown return code from gst_element_set_state");
+		return false;
+	}
+
+	return true;
+
+}
+
+/*private*/
+bool
+NetStreamGst::pausePipeline(bool startOnBuffer)
+{
+	boost::mutex::scoped_lock lock(_pipelineMutex);
+
+	log_debug("Setting pipeline state to PAUSE");
+
+	if ( ! m_go )
+	{
+		log_debug("Won't set the pipeline to PAUSE state if m_go is false");
+		return false;
+	}
+
+
+	if ( videosource && ! _handoffVideoSigHandler )
+	{
+		connectVideoHandoffSignal();
+	}
+
+	if ( audiosource && ! _handoffAudioSigHandler )
+	{
+		connectAudioHandoffSignal();
+	}
+
+	m_pause = true;
+	m_start_onbuffer = startOnBuffer;
+
+	// Set pipeline to PAUSE state
+	GstStateChangeReturn ret =  gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_PAUSED);
+	if ( ret == GST_STATE_CHANGE_FAILURE )
+	{
+		// the state change failed
+		log_error("Could not interrupt pipeline!");
+		return false;
+	}
+	else if ( ret == GST_STATE_CHANGE_SUCCESS )
+	{
+		// the state change succeeded
+		log_debug("State change to PAUSE successful");
+
+		// just make sure
+		GstState current, pending;
+		ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
+		if (current != GST_STATE_PAUSED )
+		{
+			log_error("State change to PLAYING NOT confirmed !");
+			return false;
+		}
+	}
+	else if ( ret == GST_STATE_CHANGE_ASYNC )
+	{
+		// The element will perform the remainder of the state change
+		// asynchronously in another thread
+		// We'll wait for it...
+
+		log_debug("State change to paused will be asynchronous.. waiting for it");
+
+		GstState current, pending;
+		do {
+			ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, GST_SECOND*1); 
+
+			log_debug(" Pause still not completed after X seconds");
+
+		} while ( ret == GST_STATE_CHANGE_ASYNC && current != GST_STATE_PAUSED );
+
+		if ( ret == GST_STATE_CHANGE_SUCCESS )
+		{
+			assert ( current == GST_STATE_PAUSED );
+			log_debug(" Async pause completed successfully");
+		}
+		else if ( ret == GST_STATE_CHANGE_FAILURE )
+		{
+			assert ( current != GST_STATE_PAUSED );
+			log_debug(" Async pause completed failing.");
+			return false;
+		}
+		else abort();
 
 	}
 	else if ( ret == GST_STATE_CHANGE_NO_PREROLL )
