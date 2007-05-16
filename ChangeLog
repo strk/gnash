@@ -1,3 +1,7 @@
+2007-05-16 Sandro Santilli <strk@keybit.net>
+
+	* libbase/FLVParser.h: class documentation.
+
 2007-05-16 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStreamGst.{h,cpp}: Splitted buildFLVPipeline

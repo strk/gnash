@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.6 2007/05/12 09:59:44 tgc Exp $
+// $Id: FLVParser.h,v 1.7 2007/05/16 17:38:23 strk Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -147,10 +147,13 @@ public:
 };
 
 /// \brief
-/// The FLVParser class parses a FLV file, and can return
-/// video or audio frames for a specific time, or just
-/// get the next in the timeline.
-
+/// The FLVParser class parses an FLV stream, buffers audio/video frames
+/// and provides cursor-based access to them.
+//
+/// Cursor-based access allow seeking as close as possible to a specified time
+/// and fetching frames from there on, sequentially.
+/// See seek(), nextVideoFrame(), nextAudioFrame() and nextMediaFrame().
+///
 class FLVParser
 {
 
