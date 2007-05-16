@@ -1,3 +1,9 @@
+2007-05-16 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStreamGst.{cpp,h}: Split startPlayback() into 
+	  smaller function (buildFLVPipeline and buildPipeline). Made sure
+	  gstreamer elements are cleaned up if setup fails.
+
 2007-05-16  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Eval lists so the embedded variables get

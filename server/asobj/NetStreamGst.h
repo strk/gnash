@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $id$ */
+/* $Id: */
 
 #ifndef __NETSTREAMGST_H__
 #define __NETSTREAMGST_H__
@@ -69,6 +69,21 @@ public:
 	static void audio_callback_handoff (GstElement* /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 
 private:
+
+	/// Creates the decoders and source elements for playing FLVs
+	//
+	/// @return true on success, false on failure
+	///
+	bool buildFLVPipeline(bool* sound, bool* video);
+
+	/// Creates the decoder and source element for playing non-FLVs
+	//
+	/// @return true on success, false on failure
+	///
+	bool buildPipeline();
+
+	/// Unrefs (deletes) all the gstreamer elements. Used when the setup failed.
+	void unrefElements();
 
 	/// Connect the video "handoff" signal
 	//
@@ -158,6 +173,10 @@ private:
 	int videowidth;
 	int videoheight;
 
+	// Used when seeking. To make the gst-pipeline more cooperative
+	// we don't tell it when we seek, but just add m_clock_offset to
+	// make it believe the search never happend. A better aproach whould
+	// probably be to make a dedicated gstreamer source element.
 	volatile long m_clock_offset;
 
 	// On next advance() should we pause?

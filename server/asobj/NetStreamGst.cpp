@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.41 2007/05/16 13:01:02 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.42 2007/05/16 16:08:12 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -148,6 +148,7 @@ void NetStreamGst::close()
 	}
 
 	// Should we keep the ref if the above failed ?
+	// Unreffing the pipeline should also unref all elements in it.
 	gst_object_unref (GST_OBJECT (pipeline));
 
 	if (m_imageframe) delete m_imageframe;
@@ -352,6 +353,235 @@ NetStreamGst::playbackStarter(NetStreamGst* ns)
 }
 
 void
+NetStreamGst::unrefElements()
+{
+log_debug("unreffing elements");
+	gst_object_unref (GST_OBJECT (pipeline));
+	gst_object_unref (GST_OBJECT (audiosink));
+	gst_object_unref (GST_OBJECT (videosink));
+
+	gst_object_unref (GST_OBJECT (volume));
+	gst_object_unref (GST_OBJECT (colorspace));
+	gst_object_unref (GST_OBJECT (videorate));
+	gst_object_unref (GST_OBJECT (videocaps));
+	gst_object_unref (GST_OBJECT (videoflip));
+	gst_object_unref (GST_OBJECT (audioconv));
+
+	if (m_isFLV) {
+		gst_object_unref (GST_OBJECT (audiosource));
+		gst_object_unref (GST_OBJECT (videosource));
+		gst_object_unref (GST_OBJECT (videodecoder));
+		gst_object_unref (GST_OBJECT (audiodecoder));
+		gst_object_unref (GST_OBJECT (videoinputcaps));
+		gst_object_unref (GST_OBJECT (audioinputcaps));
+
+	} else {
+		gst_object_unref (GST_OBJECT (source));
+		gst_object_unref (GST_OBJECT (decoder));
+
+	}
+}
+
+
+bool
+NetStreamGst::buildFLVPipeline(bool* sound, bool* video)
+{
+	log_debug("Building FLV decoding pipeline");
+	FLVVideoInfo* videoInfo = m_parser->getVideoInfo();
+
+	bool doVideo = *video;
+	bool doSound = *sound;
+
+	if (videoInfo) {
+		doVideo = true;
+		videosource = gst_element_factory_make ("fakesrc", NULL);
+		if ( ! videosource )
+		{
+			log_error("Unable to create videosource 'fakesrc' element");
+			return false;
+		}
+		
+		// setup fake source
+		g_object_set (G_OBJECT (videosource),
+					"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE, NULL);
+
+		// Setup the callback
+		if ( ! connectVideoHandoffSignal() )
+		{
+			log_error("Unable to connect the video 'handoff' signal handler");
+			return false;
+		}
+
+		// Setup the input capsfilter
+		videoinputcaps = gst_element_factory_make ("capsfilter", NULL);
+		if ( ! videoinputcaps )
+		{
+			log_error("Unable to create videoinputcaps 'capsfilter' element");
+			return false;
+		}
+
+		uint32_t fps = m_parser->videoFrameRate(); 
+
+		GstCaps* videonincaps;
+		if (videoInfo->codec == VIDEO_CODEC_H263) {
+			videonincaps = gst_caps_new_simple ("video/x-flash-video",
+				"width", G_TYPE_INT, videoInfo->width,
+				"height", G_TYPE_INT, videoInfo->height,
+				"framerate", GST_TYPE_FRACTION, fps, 1,
+				"flvversion", G_TYPE_INT, 1,
+				NULL);
+			videodecoder = gst_element_factory_make ("ffdec_flv", NULL);
+			if ( ! videodecoder )
+			{
+				log_error("Unable to create videodecoder 'ffdec_flv' element");
+				return false;
+			}
+
+			// Check if the element was correctly created
+			if (!videodecoder) {
+				log_error(_("A gstreamer flashvideo (h.263) decoder element could not be created.  You probably need to install gst-ffmpeg."));
+				return false;
+			}
+
+		} else if (videoInfo->codec == VIDEO_CODEC_VP6) {
+			videonincaps = gst_caps_new_simple ("video/x-vp6-flash",
+				"width", G_TYPE_INT, 320, // We don't yet have a size extract for this codec, so we guess...
+				"height", G_TYPE_INT, 240,
+				"framerate", GST_TYPE_FRACTION, fps, 1,
+				NULL);
+			videodecoder = gst_element_factory_make ("ffdec_vp6f", NULL);
+			if ( ! videodecoder )
+			{
+				log_error("Unable to create videodecoder 'ffdec_vp6f' element");
+				return false;
+			}
+
+			// Check if the element was correctly created
+			if (!videodecoder) {
+				log_error(_("A gstreamer flashvideo (VP6) decoder element could not be created! You probably need to install gst-ffmpeg."));
+				return false;
+			}
+
+		} else if (videoInfo->codec == VIDEO_CODEC_SCREENVIDEO) {
+			videonincaps = gst_caps_new_simple ("video/x-flash-screen",
+				"width", G_TYPE_INT, 320, // We don't yet have a size extract for this codec, so we guess...
+				"height", G_TYPE_INT, 240,
+				"framerate", GST_TYPE_FRACTION, fps, 1,
+				NULL);
+			videodecoder = gst_element_factory_make ("ffdec_flashsv", NULL);
+
+			// Check if the element was correctly created
+			if (!videodecoder) {
+				log_error(_("A gstreamer flashvideo (ScreenVideo) decoder element could not be created! You probably need to install gst-ffmpeg."));
+				return false;
+			}
+
+		} else {
+			log_error(_("Unsupported video codec %d"), videoInfo->codec);
+			return false;
+		}
+
+		g_object_set (G_OBJECT (videoinputcaps), "caps", videonincaps, NULL);
+		gst_caps_unref (videonincaps);
+
+	}
+
+	FLVAudioInfo* audioInfo = m_parser->getAudioInfo();
+	if (!audioInfo) doSound = false;
+
+	if (doSound) {
+		audiosource = gst_element_factory_make ("fakesrc", NULL);
+		if ( ! audiosource )
+		{
+			log_error("Unable to create audiosource 'fakesrc' element");
+			return false;
+		}
+
+		// setup fake source
+		g_object_set (G_OBJECT (audiosource),
+					"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE, NULL);
+
+		// Setup the callback
+		if ( ! connectAudioHandoffSignal() )
+		{
+			log_error("Unable to connect the audio 'handoff' signal handler");
+			// TODO: what to do in this case ?
+		}
+
+
+		if (audioInfo->codec == AUDIO_CODEC_MP3) { 
+
+			audiodecoder = gst_element_factory_make ("mad", NULL);
+			if ( ! audiodecoder )
+			{
+				audiodecoder = gst_element_factory_make ("flump3dec", NULL);
+				// Check if the element was correctly created
+				if (!audiodecoder)
+				{
+					log_error(_("A gstreamer mp3-decoder element could not be created! You probably need to install a mp3-decoder plugin like gstreamer0.10-mad or gstreamer0.10-fluendo-mp3."));
+					return false;
+				}
+			}
+
+
+			// Set the info about the stream so that gstreamer knows what it is.
+			audioinputcaps = gst_element_factory_make ("capsfilter", NULL);
+			if (!audioinputcaps)
+			{
+				log_error("Unable to create audioinputcaps 'capsfilter' element");
+				return false;
+			}
+
+			GstCaps* audioincaps = gst_caps_new_simple ("audio/mpeg",
+				"mpegversion", G_TYPE_INT, 1,
+				"layer", G_TYPE_INT, 3,
+				"rate", G_TYPE_INT, audioInfo->sampleRate,
+				"channels", G_TYPE_INT, audioInfo->stereo ? 2 : 1, NULL);
+			g_object_set (G_OBJECT (audioinputcaps), "caps", audioincaps, NULL);
+			gst_caps_unref (audioincaps);
+		} else {
+			log_error(_("Unsupported audio codec %d"), audioInfo->codec);
+			return false;
+		}
+	}
+
+	*sound = doSound;
+	*video = doVideo;
+
+	return true;
+}
+
+bool
+NetStreamGst::buildPipeline()
+{
+	log_debug("Building non-FLV decoding pipeline");
+
+	// setup gnashnc source if we are not decoding FLV (our homegrown source element)
+	source = gst_element_factory_make ("gnashsrc", NULL);
+	if ( ! source )
+	{
+		log_error("Failed to create 'gnashrc' element");
+		return false;
+	}
+	gnashsrc_callback* gc = new gnashsrc_callback; // TODO: who's going to delete this ?
+	gc->read = NetStreamGst::readPacket;
+	gc->seek = NetStreamGst::seekMedia;
+	g_object_set (G_OBJECT (source), "data", this, "callbacks", gc, NULL);
+
+	// setup the decoder with callback
+	decoder = gst_element_factory_make ("decodebin", NULL);
+	if (!decoder)
+	{
+		log_error("Unable to create decoder 'decodebin' element");
+		return false;
+	}
+	g_signal_connect (decoder, "new-decoded-pad", G_CALLBACK (NetStreamGst::callback_newpad), this);
+
+	return true;
+}
+
+
+void
 NetStreamGst::startPlayback()
 {
 	NetStreamGst* ns = this; // quick hack
@@ -404,6 +634,20 @@ NetStreamGst::startPlayback()
 	// If sound is enabled we set it up
 	if (get_sound_handler()) sound = true;
 	
+	// Setup the decoder and source
+	if (ns->m_isFLV) {
+		if (!buildFLVPipeline(&sound, &video)) {
+			unrefElements();
+			return;
+		}
+	} else {
+		if (!buildPipeline()) {
+			unrefElements();
+			return;
+		}
+	}
+
+
 	if (sound) {
 		// create an audio sink - use oss, alsa or...? make a commandline option?
 		// we first try autodetect, then alsa, then oss, then esd, then...?
@@ -418,12 +662,14 @@ NetStreamGst::startPlayback()
 
 		if (!ns->audiosink) {
 			log_error(_("The gstreamer audiosink element could not be created"));
+			unrefElements();
 			return;
 		}
 		// setup the audio converter
 		ns->audioconv = gst_element_factory_make ("audioconvert", NULL);
 		if (!ns->audioconv) {
 			log_error(_("The gstreamer audioconvert element could not be created"));
+			unrefElements();
 			return;
 		}
 
@@ -431,6 +677,7 @@ NetStreamGst::startPlayback()
 		ns->volume = gst_element_factory_make ("volume", NULL);
 		if (!ns->volume) {
 			log_error(_("The gstreamer volume element could not be created"));
+			unrefElements();
 			return;
 		}
 
@@ -438,192 +685,9 @@ NetStreamGst::startPlayback()
 		ns->audiosink = gst_element_factory_make ("fakesink", NULL);
 		if (!ns->audiosink) {
 			log_error(_("The gstreamer fakesink element could not be created"));
-			// TODO: what to do in these cases ?
+			unrefElements();
 			return;
 		}
-	}
-
-	// setup gnashnc source if we are not decoding FLV (our homegrown source element)
-	if (!ns->m_isFLV) {
-		ns->source = gst_element_factory_make ("gnashsrc", NULL);
-		if ( ! ns->source )
-		{
-			log_error("Failed to create 'gnashrc' element");
-			// TODO: should we still create the gnashrc_callback below ?
-		}
-		gnashsrc_callback* gc = new gnashsrc_callback; // TODO: who's going to delete this ?
-		gc->read = NetStreamGst::readPacket;
-		gc->seek = NetStreamGst::seekMedia;
-		g_object_set (G_OBJECT (ns->source), "data", ns, "callbacks", gc, NULL);
-	} else {
-
-		FLVVideoInfo* videoInfo = ns->m_parser->getVideoInfo();
-
-		if (videoInfo) {
-			video = true;
-			ns->videosource = gst_element_factory_make ("fakesrc", NULL);
-			if ( ! ns->videosource )
-			{
-				log_error("Unable to create videosource 'fakesrc' element");
-				// TODO: what to do in this case ?
-			}
-			
-			// setup fake source
-			g_object_set (G_OBJECT (ns->videosource),
-						"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE, NULL);
-
-			// Setup the callback
-			if ( ! connectVideoHandoffSignal() )
-			{
-				log_error("Unable to connect the video 'handoff' signal handler");
-				// TODO: what to do in this case ?
-			}
-
-			// Setup the input capsfilter
-			ns->videoinputcaps = gst_element_factory_make ("capsfilter", NULL);
-			if ( ! ns->videoinputcaps )
-			{
-				log_error("Unable to create videoinputcaps 'capsfilter' element");
-				// TODO: what to do in this case ?
-			}
-
-			uint32_t fps = ns->m_parser->videoFrameRate(); 
-
-			GstCaps* videonincaps;
-			if (videoInfo->codec == VIDEO_CODEC_H263) {
-				videonincaps = gst_caps_new_simple ("video/x-flash-video",
-					"width", G_TYPE_INT, videoInfo->width,
-					"height", G_TYPE_INT, videoInfo->height,
-					"framerate", GST_TYPE_FRACTION, fps, 1,
-					"flvversion", G_TYPE_INT, 1,
-					NULL);
-				ns->videodecoder = gst_element_factory_make ("ffdec_flv", NULL);
-				if ( ! ns->videodecoder )
-				{
-					log_error("Unable to create videodecoder 'ffdec_flv' element");
-					// TODO: what to do in this case ?
-				}
-
-				// Check if the element was correctly created
-				if (!ns->videodecoder) {
-					log_error(_("A gstreamer flashvideo (h.263) decoder element could not be created.  You probably need to install gst-ffmpeg."));
-					return;
-				}
-
-			} else if (videoInfo->codec == VIDEO_CODEC_VP6) {
-				videonincaps = gst_caps_new_simple ("video/x-vp6-flash",
-					"width", G_TYPE_INT, 320, // We don't yet have a size extract for this codec, so we guess...
-					"height", G_TYPE_INT, 240,
-					"framerate", GST_TYPE_FRACTION, fps, 1,
-					NULL);
-				ns->videodecoder = gst_element_factory_make ("ffdec_vp6f", NULL);
-				if ( ! ns->videodecoder )
-				{
-					log_error("Unable to create videodecoder 'ffdec_vp6f' element");
-					// TODO: what to do in this case ?
-				}
-
-				// Check if the element was correctly created
-				if (!ns->videodecoder) {
-					log_error(_("A gstreamer flashvideo (VP6) decoder element could not be created! You probably need to install gst-ffmpeg."));
-					return;
-				}
-
-			} else if (videoInfo->codec == VIDEO_CODEC_SCREENVIDEO) {
-				videonincaps = gst_caps_new_simple ("video/x-flash-screen",
-					"width", G_TYPE_INT, 320, // We don't yet have a size extract for this codec, so we guess...
-					"height", G_TYPE_INT, 240,
-					"framerate", GST_TYPE_FRACTION, fps, 1,
-					NULL);
-				ns->videodecoder = gst_element_factory_make ("ffdec_flashsv", NULL);
-
-				// Check if the element was correctly created
-				if (!ns->videodecoder) {
-					log_error(_("A gstreamer flashvideo (ScreenVideo) decoder element could not be created! You probably need to install gst-ffmpeg."));
-					return;
-				}
-
-			} else {
-				log_error(_("Unsupported video codec %d"),
-					  videoInfo->codec);
-				return;
-			}
-
-			g_object_set (G_OBJECT (ns->videoinputcaps), "caps", videonincaps, NULL);
-			gst_caps_unref (videonincaps);
-
-		}
-
-		FLVAudioInfo* audioInfo = ns->m_parser->getAudioInfo();
-		if (!audioInfo) sound = false;
-
-		if (sound) {
-			ns->audiosource = gst_element_factory_make ("fakesrc", NULL);
-			if ( ! ns->audiosource )
-			{
-				log_error("Unable to create audiosource 'fakesrc' element");
-			}
-
-			// setup fake source
-			g_object_set (G_OBJECT (ns->audiosource),
-						"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE, NULL);
-
-			// Setup the callback
-			if ( ! connectAudioHandoffSignal() )
-			{
-				log_error("Unable to connect the audio 'handoff' signal handler");
-				// TODO: what to do in this case ?
-			}
-
-
-			if (audioInfo->codec == AUDIO_CODEC_MP3) { 
-
-				ns->audiodecoder = gst_element_factory_make ("mad", NULL);
-				if ( ! ns->audiodecoder )
-				{
-					ns->audiodecoder = gst_element_factory_make ("flump3dec", NULL);
-					// Check if the element was correctly created
-					if (!ns->audiodecoder)
-					{
-						log_error(_("A gstreamer mp3-decoder element could not be created! You probably need to install a mp3-decoder plugin like gstreamer0.10-mad or gstreamer0.10-fluendo-mp3."));
-						return;
-					}
-				}
-
-
-
-				// Set the info about the stream so that gstreamer knows what it is.
-				ns->audioinputcaps = gst_element_factory_make ("capsfilter", NULL);
-				if (!ns->audioinputcaps)
-				{
-					log_error("Unable to create audioinputcaps 'capsfilter' element");
-					// TODO: what to do in this case ?
-				}
-
-				GstCaps* audioincaps = gst_caps_new_simple ("audio/mpeg",
-					"mpegversion", G_TYPE_INT, 1,
-					"layer", G_TYPE_INT, 3,
-					"rate", G_TYPE_INT, audioInfo->sampleRate,
-					"channels", G_TYPE_INT, audioInfo->stereo ? 2 : 1, NULL);
-				g_object_set (G_OBJECT (ns->audioinputcaps), "caps", audioincaps, NULL);
-				gst_caps_unref (audioincaps);
-			} else {
-				log_error(_("Unsupported audio codec %d"),
-					  audioInfo->codec);
-				return;
-			}
-		}
-	}
-
-	// setup the decoder with callback, but only if we are not decoding a FLV
-	if (!ns->m_isFLV) {
-		ns->decoder = gst_element_factory_make ("decodebin", NULL);
-		if (!ns->decoder)
-		{
-			log_error("Unable to create decoder 'decodebin' element");
-			// TODO: what to do in this case ?
-		}
-		g_signal_connect (ns->decoder, "new-decoded-pad", G_CALLBACK (NetStreamGst::callback_newpad), ns);
 	}
 
 	if (video) {
@@ -632,7 +696,8 @@ NetStreamGst::startPlayback()
 		if (!ns->colorspace)
 		{
 			log_error("Unable to create colorspace 'ffmpegcolorspace' element");
-			// TODO: what to do in this case ?
+			unrefElements();
+			return;
 		}
 
 		// Setup the capsfilter which demands either YUV or RGB videoframe format
@@ -640,7 +705,8 @@ NetStreamGst::startPlayback()
 		if (!ns->videocaps)
 		{
 			log_error("Unable to create videocaps 'capsfilter' element");
-			// TODO: what to do in this case ?
+			unrefElements();
+			return;
 		}
 
 		GstCaps* videooutcaps;
@@ -657,7 +723,8 @@ NetStreamGst::startPlayback()
 		if (!ns->videorate)
 		{
 			log_error("Unable to create videorate 'videorate' element");
-			// TODO: what to do in this case ?
+			unrefElements();
+			return;
 		}
 
 		// setup the videosink with callback
@@ -665,7 +732,8 @@ NetStreamGst::startPlayback()
 		if (!ns->videosink)
 		{
 			log_error("Unable to create videosink 'fakesink' element");
-			// TODO: what to do in this case ?
+			unrefElements();
+			return;
 		}
 
 		g_object_set (G_OBJECT (ns->videosink), "signal-handoffs", TRUE, "sync", TRUE, NULL);
@@ -673,25 +741,9 @@ NetStreamGst::startPlayback()
 		g_signal_connect (ns->videosink, "handoff", G_CALLBACK (NetStreamGst::callback_output), ns);
 	}
 
-	if (ns->m_isFLV) {
-		if (video && (!ns->videosource || !ns->videoinputcaps)) {
-			log_error(_("Gstreamer source element(s) for video movie handling could not be created, you probably need to install gstreamer0.10-core for fakesrc and capsfilter support."));
-			return;
-		}
-		if (sound && (!ns->audiosource || !ns->audioinputcaps)) {
-			log_error(_("Gstreamer source element(s) for audio movie handling could not be created, you probably need to install gstreamer0.10-core for fakesrc and capsfilter support."));
-			return;
-		}
-
-	} else {
-		if (!ns->decoder || !ns->source) {
-			log_error(_("Gstreamer element(s) for movie handling could not be created, you probably need to install gstreamer0.10-base for decodebin support."));
-			return;
-		}
-	}
-
 	if (video && (!ns->colorspace || !ns->videocaps || !ns->videorate || !ns->videosink)) {
 		log_error(_("Gstreamer element(s) for video movie handling could not be created, you probably need to install gstreamer0.10-base for ffmpegcolorspace and videorate support."));
+		unrefElements();
 		return;
 	}
 
@@ -810,21 +862,26 @@ NetStreamGst::advance()
 				log_error("Could not pause pipeline");
 			}
 
-			/// TODO: shouldn't we check 'ret' value here !!??
-
 			int64_t pos;
 			GstState current, pending;
 			GstStateChangeReturn ret;
 			GstFormat fmt = GST_FORMAT_TIME;
 
 			ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
-			if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
-				pos = pos / 1000000;
+			if (ret == GST_STATE_CHANGE_SUCCESS) {
+				if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
+					pos = pos / 1000000;
+				} else {
+					pos = 0;
+				}
+				// Buffer a second before continuing
+				m_bufferTime = pos + 1000;
 			} else {
-				pos = 0;
+				// the pipeline failed state change
+				log_error("Pipeline failed to complete state change!");
+
+				// @@ eh.. what to do then 
 			}
-			// Buffer a second before continuing
-			m_bufferTime = pos + 1000;
 		}
 	}
 
