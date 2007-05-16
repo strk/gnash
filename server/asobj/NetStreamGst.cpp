@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.43 2007/05/16 16:30:25 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.44 2007/05/16 16:37:26 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -384,13 +384,12 @@ log_debug("unreffing elements");
 
 
 bool
-NetStreamGst::buildFLVPipeline(bool* sound, bool* video)
+NetStreamGst::buildFLVVideoPipeline(bool* video)
 {
 	log_debug("Building FLV decoding pipeline");
 	FLVVideoInfo* videoInfo = m_parser->getVideoInfo();
 
 	bool doVideo = *video;
-	bool doSound = *sound;
 
 	if (videoInfo) {
 		doVideo = true;
@@ -483,8 +482,17 @@ NetStreamGst::buildFLVPipeline(bool* sound, bool* video)
 
 		g_object_set (G_OBJECT (videoinputcaps), "caps", videonincaps, NULL);
 		gst_caps_unref (videonincaps);
-
 	}
+	*video = doVideo;
+
+	return true;
+
+}
+
+bool
+NetStreamGst::buildFLVSoundPipeline(bool* sound)
+{
+	bool doSound = *sound;
 
 	FLVAudioInfo* audioInfo = m_parser->getAudioInfo();
 	if (!audioInfo) doSound = false;
@@ -546,7 +554,6 @@ NetStreamGst::buildFLVPipeline(bool* sound, bool* video)
 	}
 
 	*sound = doSound;
-	*video = doVideo;
 
 	return true;
 }
@@ -633,7 +640,11 @@ NetStreamGst::startPlayback()
 	
 	// Setup the decoder and source
 	if (m_isFLV) {
-		if (!buildFLVPipeline(&sound, &video)) {
+		if (!buildFLVVideoPipeline(&video)) {
+			unrefElements();
+			return;
+		}
+		if (sound && !buildFLVSoundPipeline(&sound)) {
 			unrefElements();
 			return;
 		}
