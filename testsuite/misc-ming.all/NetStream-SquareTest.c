@@ -38,6 +38,7 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
+  SWFMovieClip dejagnuclip;
   SWFVideoStream stream;
   SWFDisplayItem item;
   SWFAction a;
@@ -58,34 +59,54 @@ main(int argc, char** argv)
   sprintf(buffer, 
   	"nc=new NetConnection();"
 	"nc.connect(null);"
-	"_global.stream = new NetStream(nc);"
-	"video.attachVideo(_global.stream); "
-	"_global.stream.setBufferTime(2); "
-	"_global.stream.play(\"%s\");", filename);
+	"stream = new NetStream(nc);"
+	"video.attachVideo(stream); "
+	"stream.setBufferTime(2); "
+	"stream.play(\"%s\");"
+	"stop();",
+	filename);
 
   Ming_init();
   Ming_useSWFVersion (OUTPUT_VERSION);
 
 
   mo = newSWFMovie();
-  SWFMovie_setDimension(mo, 128, 96);
+  SWFMovie_setDimension(mo, 800, 600);
 
-  SWFMovie_setRate(mo, 15);
+  SWFMovie_setRate(mo, 1);
+
+  dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(mediadir), 10, 0, 0, 800, 600);
+  item = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+  SWFDisplayItem_moveTo(item, 0, 100);
+  SWFMovie_nextFrame(mo); 
  
   stream = newSWFVideoStream();
   SWFVideoStream_setDimension(stream, video_width, video_height);
   item = SWFMovie_add(mo, (SWFBlock)stream);
-//  SWFDisplayItem_moveTo(item, (400 - video_width / 2), 0);
+  /* SWFDisplayItem_moveTo(item, 0, 200); */
   SWFDisplayItem_setName(item, "video");
 
   a = newSWFAction(buffer);
-
   if(a == NULL) return -1;
   SWFMovie_add(mo, (SWFBlock)a);
+  SWFMovie_add(mo, newSWFAction(
+		"stream.onStatus = function(info) {"
+		" _root.note('onStatus('+info.code+') called'); "
+		//" _root.note(' bufferLength:'+stream.bufferLength+' bufferTime:'+stream.bufferTime);"
+		//" _root.note(' bytesLoaded:'+stream.bytesLoaded+' bytesTotal:'+stream.bytesTotal);"
+		//" _root.note(' currentFps:'+stream.currentFps+' time:'+stream.time);"
+		"};"
+		"stream.onCuePoint = function(info) {"
+		" _root.note('onCuePoint('+info+') called'); "
+		"};"
+		"stream.onMetaData = function(info) {"
+		" _root.note('onMetaData('+info+') called'); "
+		"};"
+		));
 
   SWFMovie_nextFrame(mo);
 
-  //Output movie
+  /* Output movie */
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);
 
