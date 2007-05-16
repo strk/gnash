@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.31 2007/05/15 13:01:27 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.32 2007/05/16 17:50:03 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -141,7 +141,10 @@ protected:
 	// The handler which is invoked on status change
 	boost::intrusive_ptr<as_function> m_statusHandler;
 
-	// should we start when buffer is full?
+	// should we start when the FLVParser has buffered/parsed enough frames,
+	// so that the differens between the current frames timestamp (0 at the 
+	// beginning) and the last parseable frames timestamp i bigger than 
+	// m_bufferTime.
 	bool m_start_onbuffer;
 
 	// The position in the inputfile, only used when not playing a FLV
@@ -181,16 +184,22 @@ public:
 		return m_go;
 	}
 
-	void setBufferTime(double time);
+	/// Specifies how long to buffer data before starting to display the stream.
+	void setBufferTime(uint32_t time);
 
+	/// Returns what the buffer has been set to. (100 miliseconds is default)
 	uint32_t bufferTime();
 
+	/// Returns the number of bytes loaded of the media file
 	long bytesLoaded();
 
+	/// Returns the total number of bytes (size) of the media file
 	long bytesTotal();
 
+	/// Tells us if there is a new video frame ready
 	bool newFrameReady();
 
+	/// Returns the newest video frame
 	image::image_base* get_video();
 
 private:

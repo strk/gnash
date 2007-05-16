@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.44 2007/05/16 16:37:26 tgc Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.45 2007/05/16 17:50:03 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -384,12 +384,12 @@ log_debug("unreffing elements");
 
 
 bool
-NetStreamGst::buildFLVVideoPipeline(bool* video)
+NetStreamGst::buildFLVVideoPipeline(bool &video)
 {
 	log_debug("Building FLV decoding pipeline");
 	FLVVideoInfo* videoInfo = m_parser->getVideoInfo();
 
-	bool doVideo = *video;
+	bool doVideo = video;
 
 	if (videoInfo) {
 		doVideo = true;
@@ -483,16 +483,16 @@ NetStreamGst::buildFLVVideoPipeline(bool* video)
 		g_object_set (G_OBJECT (videoinputcaps), "caps", videonincaps, NULL);
 		gst_caps_unref (videonincaps);
 	}
-	*video = doVideo;
+	video = doVideo;
 
 	return true;
 
 }
 
 bool
-NetStreamGst::buildFLVSoundPipeline(bool* sound)
+NetStreamGst::buildFLVSoundPipeline(bool &sound)
 {
-	bool doSound = *sound;
+	bool doSound = sound;
 
 	FLVAudioInfo* audioInfo = m_parser->getAudioInfo();
 	if (!audioInfo) doSound = false;
@@ -553,7 +553,7 @@ NetStreamGst::buildFLVSoundPipeline(bool* sound)
 		}
 	}
 
-	*sound = doSound;
+	sound = doSound;
 
 	return true;
 }
@@ -640,11 +640,11 @@ NetStreamGst::startPlayback()
 	
 	// Setup the decoder and source
 	if (m_isFLV) {
-		if (!buildFLVVideoPipeline(&video)) {
+		if (!buildFLVVideoPipeline(video)) {
 			unrefElements();
 			return;
 		}
-		if (sound && !buildFLVSoundPipeline(&sound)) {
+		if (sound && !buildFLVSoundPipeline(sound)) {
 			unrefElements();
 			return;
 		}
@@ -829,6 +829,12 @@ void
 NetStreamGst::advance()
 {
 	// Check if we should start the playback when a certain amount is buffered
+	// This can happen in 2 cases: 
+	// 1) When playback has just started and we've been waiting for the buffer 
+	//    to be filled (buffersize set by setBufferTime() and default is 100
+	//    miliseconds).
+	// 2) The buffer has be "starved" (not being filled as quickly as needed),
+	//    and we then wait until the buffer contains some data (1 sec) again.
 	if (m_isFLV && m_pause && m_go && m_start_onbuffer && m_parser && m_parser->isTimeLoaded(m_bufferTime))
 	{
 		if ( ! playPipeline() )

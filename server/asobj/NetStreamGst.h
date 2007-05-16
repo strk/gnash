@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamGst.h,v 1.21 2007/05/16 16:37:27 tgc Exp $ */
+/* $Id: NetStreamGst.h,v 1.22 2007/05/16 17:50:03 tgc Exp $ */
 
 #ifndef __NETSTREAMGST_H__
 #define __NETSTREAMGST_H__
@@ -74,13 +74,21 @@ private:
 	//
 	/// @return true on success, false on failure
 	///
-	bool buildFLVSoundPipeline(bool* sound);
+	/// @param sound
+	///	Determines if sound should be setup. It is passed by reference 
+	/// and might be changed.
+	///
+	bool buildFLVSoundPipeline(bool &sound);
 
 	/// Creates the video decoder and source element for playing FLVs
 	//
 	/// @return true on success, false on failure
 	///
-	bool buildFLVVideoPipeline(bool* video);
+	/// @param video
+	///	Determines if video should be setup. It is passed by reference 
+	/// and might be changed.
+	///
+	bool buildFLVVideoPipeline(bool &video);
 
 	/// Creates the decoder and source element for playing non-FLVs
 	//

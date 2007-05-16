@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.51 2007/05/15 16:31:03 rsavoye Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.52 2007/05/16 17:50:03 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -999,7 +999,12 @@ NetStreamFfmpeg::seek(double pos)
 void
 NetStreamFfmpeg::advance()
 {
-	// Check if we should start the playback when a certain amount is buffered
+	// This can happen in 2 cases: 
+	// 1) When playback has just started and we've been waiting for the buffer 
+	//    to be filled (buffersize set by setBufferTime() and default is 100
+	//    miliseconds).
+	// 2) The buffer has be "starved" (not being filled as quickly as needed),
+	//    and we then wait until the buffer contains some data (1 sec) again.
 	if (m_go && m_pause && m_start_onbuffer && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
 		setStatus(bufferFull);
 		m_pause = false;
