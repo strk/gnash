@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: x11.m4,v 1.7 2007/05/11 14:20:00 rsavoye Exp $
+dnl $Id: x11.m4,v 1.8 2007/05/17 18:28:00 strk Exp $
 
 AC_DEFUN([GNASH_PATH_X11],
 [
@@ -71,7 +71,11 @@ AC_DEFUN([GNASH_PATH_X11],
     newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/X11R6/lib ${libslist}"
     for i in $newlist; do
      if test -f $i/libX11.a -o -f $i/libX11.${shlibext}; then
-       ac_cv_path_x11_lib="-L$i -lX11"
+       if "x${i}" != "x/usr/lib"; then
+         ac_cv_path_x11_lib="-L$i -lX11"
+       else
+         ac_cv_path_x11_lib="-lX11"
+       fi
         if test -f $i/libXinerama.a -o -f $i/libXinerama.${shlibext}; then
           ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXinerama"
         fi
@@ -91,7 +95,11 @@ AC_DEFUN([GNASH_PATH_X11],
 
   for i in $newlist; do
     if test -f $i/libXplugin.a -o -f $i/libXplugin.${shlibext}; then
-      ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -L$i -lXplugin"
+      if "x${i}" != "x/usr/lib"; then
+        ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -L$i -lXplugin"
+      else
+        ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXplugin"
+      fi
       break
     fi
   done
