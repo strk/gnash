@@ -1,3 +1,11 @@
+2007-05-17  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* po/Makefile.am: Use DESTDIR when installing. 
+
+	* testsuite/server/Makefile.am: Link in FFMPEG is configured to do
+	so.
+	* libbase/Makefile.am: Add path for ltdl.h.
+
 2007-05-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac: Check if LD supports --as-needed.
