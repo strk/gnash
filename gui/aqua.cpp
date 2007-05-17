@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.7 2007/05/08 21:55:32 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.8 2007/05/17 22:16:22 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -57,6 +57,17 @@ AquaGui::AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 AquaGui::~AquaGui()
 {
 	
+}
+
+void AquaGui::setInterval(unsigned int interval)
+{
+    _interval = interval;
+}
+
+bool AquaGui::run()
+{
+    GNASH_REPORT_FUNCTION;
+    return false;
 }
 
 void AquaGui::renderBuffer()
