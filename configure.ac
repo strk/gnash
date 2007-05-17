@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.311 2007/05/16 15:58:22 rsavoye Exp $
+dnl $Id: configure.ac,v 1.312 2007/05/17 14:30:29 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -437,7 +437,19 @@ else
 fi
 
 dnl Try to ignore stupid dependencies
-LDFLAGS="${LDFLAGS} -Wl,--as-needed"
+
+AC_MSG_CHECKING(linker --as-needed support)
+gcc_cv_ld_as_needed=no
+if test x$gcc_cv_ld != x; then
+	# Check if linker supports --as-needed and --no-as-needed options
+	if $gcc_cv_ld --help 2>/dev/null | grep as-needed > /dev/null; then
+		gcc_cv_ld_as_needed=yes
+	fi
+fi
+if test x"$gcc_cv_ld_as_needed" = xyes; then
+	LDFLAGS="${LDFLAGS} -Wl,--as-needed"
+fi
+AC_MSG_RESULT($gcc_cv_ld_as_needed)
 
 dnl GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
