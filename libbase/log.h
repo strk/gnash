@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.h,v 1.51 2007/05/15 10:47:51 tgc Exp $ */
+/* $Id: log.h,v 1.52 2007/05/18 00:50:30 nihilus Exp $ */
 
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
@@ -173,6 +173,8 @@ DSOEXPORT unsigned char *hexify(unsigned char *p, const unsigned char *s, int le
 
 #ifdef __GNUC__
 #define GNUC_LOG_ATTRS __attribute__((format (printf, 1, 2)))
+#else
+#define GNUC_LOG_ATTRS
 #endif
 
 /// Log a generic message
