@@ -72,6 +72,7 @@ EXTRA_DIST += tu_file_SDL.cpp
 endif
 
 libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+noinst_HEADERS = $(top_srcdir)/libltdl/ltdl.h
 
 libgnashbase_la_SOURCES = \
 	config.cpp \
@@ -103,7 +104,7 @@ libgnashbase_la_SOURCES = \
 	LoadThread.cpp \
 	FLVParser.cpp
 
-noinst_HEADERS = \
+noinst_HEADERS += \
 	container.h \
 	demo.h \
 	dlmalloc.h \

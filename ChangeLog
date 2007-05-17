@@ -1,5 +1,7 @@
 2007-05-17  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* libbase/Makefile.am: Add ltdl.h to noinst_HEADERS.
+
 	* po/Makefile.am: Use DESTDIR when installing. 
 
 	* testsuite/server/Makefile.am: Link in FFMPEG is configured to do
