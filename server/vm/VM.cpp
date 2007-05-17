@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.6 2007/04/28 00:04:26 rsavoye Exp $ */
+/* $Id: VM.cpp,v 1.7 2007/05/17 09:23:27 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -25,6 +25,7 @@
 #include "movie_instance.h"
 #include "movie_root.h"
 #include "Global.h"
+#include "tu_timer.h" // for tu_timer::get_ticks()
 
 #include <memory>
 
@@ -33,6 +34,7 @@ namespace gnash {
 
 // Pointer to our singleton
 std::auto_ptr<VM> VM::_singleton;
+uint64_t VM::_start_time;
 
 VM&
 VM::init(movie_definition& movie)
@@ -50,6 +52,9 @@ VM::init(movie_definition& movie)
 
 	_singleton->setGlobal(new Global(*_singleton));
 	assert(_singleton->getGlobal());
+
+	// init singleton start time
+	_start_time = tu_timer::get_ticks();
 
 	return *_singleton;
 }
@@ -138,6 +143,11 @@ VM::setGlobal(as_object* o)
 	_global = o;
 }
 
+uint64_t
+VM::getStartTime()
+{
+  return _start_time;
+}
 
 } // end of namespace gnash
 

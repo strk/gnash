@@ -110,6 +110,7 @@ check_PROGRAMS = \
 	action_execution_order_test6 \
 	action_execution_order_test7 \
 	action_execution_order_test8 \
+	action_execution_order_test9 \
 	reverse_execute_PlaceObject2_test1 \
 	reverse_execute_PlaceObject2_test2 \
 	loadMovieTest \
@@ -128,6 +129,7 @@ check_PROGRAMS = \
 	key_event_testrunner \
 	static_vs_dynamic1 \
 	static_vs_dynamic2 \
+	getTimer_test \
 	Video-EmbedSquareTest \
 	Video-EmbedSquareTestRunner \
 	NetStream-SquareTest \
@@ -165,6 +167,7 @@ check_SCRIPTS = \
 	action_execution_order_test6runner \
 	action_execution_order_test7runner \
 	action_execution_order_test8runner \
+	action_execution_order_test9runner \
 	reverse_execute_PlaceObject2_test1runner \
 	reverse_execute_PlaceObject2_test2runner \
 	displaylist_depths_testrunner \
@@ -185,6 +188,7 @@ check_SCRIPTS = \
 	matrix_testrunner \
 	static_vs_dynamic1_testrunner \
 	static_vs_dynamic2_testrunner \
+	getTimer_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -924,6 +928,20 @@ action_execution_order_test8runner: $(srcdir)/../generic-testrunner.sh action_ex
 	sh $< -f8 $(top_builddir) action_execution_order_test8.swf > $@
 	chmod 755 $@
 
+action_execution_order_test9_SOURCES =	\
+	action_execution_order_test9.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+action_execution_order_test9_LDADD = $(MING_LIBS)
+
+action_execution_order_test9.swf: action_execution_order_test9
+	./action_execution_order_test9 $(top_srcdir)/testsuite/media
+
+action_execution_order_test9runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test9.swf
+	sh $< -f8 $(top_builddir) action_execution_order_test9.swf > $@
+	chmod 755 $@
+
 reverse_execute_PlaceObject2_test1_SOURCES =	\
 	reverse_execute_PlaceObject2_test1.c	\
 	ming_utils.h		\
@@ -1225,6 +1243,21 @@ static_vs_dynamic2_testrunner: $(srcdir)/../generic-testrunner.sh static_vs_dyna
 	chmod 755 $@
 
 
+getTimer_test_SOURCES = \
+	getTimer_test.c \
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+
+getTimer_test_LDADD = $(MING_LIBS)
+
+getTimer_test.swf: getTimer_test
+	./getTimer_test $(srcdir)/../media
+
+getTimer_testrunner: $(srcdir)/../generic-testrunner.sh getTimer_test.swf
+	sh $< $(top_builddir) getTimer_test.swf > $@
+	chmod 755 $@
+
 NetStream_SquareTest_SOURCES = \
 	NetStream-SquareTest.c \
 	ming_utils.h		\
@@ -1329,6 +1362,7 @@ TEST_CASES = \
 	action_execution_order_test6runner \
 	action_execution_order_test7runner \
 	action_execution_order_test8runner \
+	action_execution_order_test9runner \
 	reverse_execute_PlaceObject2_test1runner \
 	reverse_execute_PlaceObject2_test2runner \
 	displaylist_depths_testrunner \
@@ -1351,6 +1385,7 @@ TEST_CASES = \
 	key_event_testrunner \
 	static_vs_dynamic1_testrunner \
 	static_vs_dynamic2_testrunner \
+	getTimer_testrunner \
 	Video-EmbedSquareTestRunner \
 	NetStream-SquareTestRunner \
 	$(NULL)

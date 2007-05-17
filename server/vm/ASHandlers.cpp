@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.104 2007/05/14 20:06:48 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.105 2007/05/17 09:23:27 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,6 +49,7 @@
 #include "movie_root.h" // for set_drag_state (ActionStartDragMovie)
 #include "debugger.h"
 #include "sound_handler.h"
+#include "tu_timer.h" // for tu_timer::get_ticks()
 
 #include <string>
 #include <map>
@@ -1436,7 +1437,7 @@ SWFHandlers::ActionGetTimer(ActionExec& thread)
 	// movies in multiple windows using the same executable)
 
 	as_environment& env = thread.env;
-	env.push(floorf(VM::get().getRoot().get_timer() * 1000.0f));
+	env.push(floorf(tu_timer::get_ticks() - VM::getStartTime()));
 }
 
 void

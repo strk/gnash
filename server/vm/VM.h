@@ -23,6 +23,7 @@
 
 #include "smart_ptr.h" // for boost::intrusive_ptr
 #include "movie_root.h" // for composition
+#include "tu_types.h"  // for uint64_t
 
 #include <memory> // for auto_ptr
 #include <locale>
@@ -85,6 +86,9 @@ class VM {
 	/// Target SWF version
 	int _swfversion;
 
+	/// Time when the VM get started
+	static uint64_t _start_time;
+
 	/// Set the current Root movie.
 	//
 	/// Will be called by the init() function
@@ -136,6 +140,9 @@ public:
 	/// This information will drive operations of the virtual machine
 	///
 	int getSWFVersion() const;
+
+	/// Get the time when VM was started
+	static uint64_t getStartTime();
 
 	/// Get version of the player, in a compatible representation
 	//

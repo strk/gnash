@@ -61,7 +61,7 @@ double	tu_timer::profile_ticks_to_seconds(uint64_t ticks)
 
 uint64_t tu_timer::get_ticks()
 {
-	return get_profile_ticks();
+	return get_profile_ticks()/1000.0;
 }
 
 
@@ -82,7 +82,7 @@ uint64_t	tu_timer::get_profile_ticks()
 
 	uint64_t result = tv.tv_sec * 1000000;
 	result += tv.tv_usec;
-	
+	// Time Unit: microsecond
 	return result;
 }
 
