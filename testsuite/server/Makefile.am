@@ -29,6 +29,7 @@ AM_CPPFLAGS = -I.. \
         -I$(top_srcdir)/server  \
         -I$(top_srcdir)/server/parser  \
         -I$(top_srcdir)/server/vm  \
+	$(FFMPEG_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(NULL)
 
@@ -55,6 +56,10 @@ GNASH_LIBS = \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(NULL)
+
+if USE_FFMPEG_ENGINE
+	GNASH_LIBS += $(FFMPEG_LIBS)
+endif
 
 MatrixTest_SOURCES = MatrixTest.cpp
 MatrixTest_LDADD = \

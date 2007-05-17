@@ -42,6 +42,7 @@ libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	$(Z_CFLAGS) \
 	$(JPEG_CFLAGS) \
 	$(BOOST_CFLAGS) \
+	$(INCLTDL) \
 	$(NULL)
 
 # These headers get installed
