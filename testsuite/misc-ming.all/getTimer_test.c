@@ -47,7 +47,7 @@ main(int argc, char** argv)
   Ming_init();
   mo = newSWFMovieWithVersion(OUTPUT_VERSION);
   SWFMovie_setDimension(mo, 800, 600);
-  SWFMovie_setRate (mo, 10.0);
+  SWFMovie_setRate (mo, 1.0);
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
@@ -60,12 +60,15 @@ main(int argc, char** argv)
   
   add_actions(mo, "x2 = getTimer();");
   
+  // just delay some time here
+  add_actions(mo, " for(i=0; i<3000; i++) {} ");
+  
   // check that the timer is working
   check(mo, "x2 > x1" );
 
-  // this is dependent on frame rate(current setting is 100ms per frame)
-  // check(mo, "x2 > 100");
-  check(mo, "x2 < 400");
+  // this is dependent on frame rate(current setting is 1 second per frame)
+  // check(mo, "x2 > 1000");
+  check(mo, "x2 < 6000");
 
   // check that "getTimer" return a intergral number
   check(mo, "x2 == Math.ceil(x2)");
