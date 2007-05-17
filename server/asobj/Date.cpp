@@ -107,13 +107,16 @@
 // where these things are used if available.
 
 #if !defined(HAVE_GETTIMEOFDAY) || (!defined(HAVE_TM_GMTOFF) && !defined(HAVE_TZSET))
-# if HAVE_FTIME
+#ifdef HAVE_FTIME
+extern "C" {
+#  include <sys/types.h>		// for ftime()
 #  include <sys/timeb.h>		// for ftime()
-# endif
+}
+#endif
 #endif
 
 #if !defined(HAVE_TM_GMTOFF)
-# if HAVE_LONG_TIMEZONE
+# ifdef HAVE_LONG_TIMEZONE
 extern long timezone;		// for tzset()/long timezone;
 # endif
 #endif
@@ -132,7 +135,7 @@ namespace gnash {
 // DST period changes the UTC time of day (it shouldn't).
 #define USE_UTCCONV 1
 
-#if USE_UTCCONV
+#ifdef USE_UTCCONV
 // forward declarations
 static void utctime(double tim, struct tm *tmp, double *msecp);
 static double mkutctime(struct tm *tmp, double msec);
@@ -148,7 +151,7 @@ static double rogue_date_args(const fn_call& fn, unsigned maxargs);
 // because the C library does not provide a function to convert
 // from struct tm to datestamp in UTC.
 
-#if HAVE_LOCALTIME_R
+#ifdef HAVE_LOCALTIME_R
 	// Use the library function
 #	define _localtime_r localtime_r
 
@@ -178,7 +181,7 @@ _localtime_r(time_t *t, struct tm *tm)
 static struct tm *
 _gmtime_r(time_t *t, struct tm *tm)
 {
-#if USE_UTCCONV
+#ifdef USE_UTCCONV
 	double msec;
 	utctime(*t * 1000.0, tm, &msec);
 #else
@@ -386,9 +389,9 @@ date_new(const fn_call& fn)
 
 		gettimeofday(&tv,&tz);
 		date->value = (double)tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
-#elif HAVE_FTIME
+#elif defined(HAVE_FTIME)
 		struct timeb tb;
-		
+
 		ftime (&tb);
 		date->value = (double)tb.time * 1000.0 + tb.millitm;
 #else
@@ -541,10 +544,10 @@ date_get_proto(date_getutcseconds,  gmtime, tm_sec)
 
 // Return the difference between UTC and localtime+DST for a given date/time
 // as the number of minutes east of GMT.
-
+ 
 static int minutes_east_of_gmt(struct tm &tm)
 {
-#if HAVE_TM_GMTOFF
+#ifdef HAVE_TM_GMTOFF
 	// tm_gmtoff is in seconds east of GMT; convert to minutes.
 	return((int) (tm.tm_gmtoff / 60));
 #else
@@ -563,16 +566,7 @@ static int minutes_east_of_gmt(struct tm &tm)
 # if defined(HAVE_TZSET) && defined(HAVE_LONG_TIMEZONE)
 	tzset();
 	minutes_east = -timezone/60; // timezone is seconds west of GMT
-# elif HAVE_FTIME
-	// ftime(3): "These days the contents of the timezone and dstflag
-	// fields are undefined."
-	// In practice, timezone is -120 in Italy when it should be -60.
-	struct timeb tb;
-		
-	ftime (&tb);
-	// tb.timezone is number of minutes west of GMT
-	minutes_east = -tb.timezone;
-# elif HAVE_GETTIMEOFDAY
+# elif defined(HAVE_GETTIMEOFDAY)
 	// gettimeofday(3):
 	// "The use of the timezone structure is obsolete; the tz argument
 	// should normally be specified as NULL. The tz_dsttime field has
@@ -583,6 +577,17 @@ static int minutes_east_of_gmt(struct tm &tm)
 	struct timezone tz;
 	gettimeofday(&tv,&tz);
 	minutes_east = -tz.tz_minuteswest;
+
+# elif defined(HAVE_FTIME)
+	// ftime(3): "These days the contents of the timezone and dstflag
+	// fields are undefined."
+	// In practice, timezone is -120 in Italy when it should be -60.
+	struct timeb tb;
+		
+	ftime (&tb);
+	// tb.timezone is number of minutes west of GMT
+	minutes_east = -tb.timezone;
+
 # else
 	minutes_east = 0;	// No idea.
 # endif
@@ -717,7 +722,7 @@ local_tm_msec_to_date(struct tm &tm, double &msec)
 static void
 utc_date_to_tm_msec(double value, struct tm &tm, double &msec)
 {
-#if USE_UTCCONV
+#ifdef USE_UTCCONV
 	utctime(value, &tm, &msec);
 #else
 	time_t t = (time_t)(value / 1000.0);
@@ -734,7 +739,7 @@ utc_date_to_tm_msec(double value, struct tm &tm, double &msec)
 static double
 utc_tm_msec_to_date(struct tm &tm, double &msec)
 {
-#if USE_UTCCONV
+#ifdef USE_UTCCONV
 	return (mkutctime(&tm, msec));	// The better algorithm :)
 #else
 	time_t t = mktime(&tm);

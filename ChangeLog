@@ -17,6 +17,7 @@
 2007-05-17 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac: Check if LD supports --as-needed.
+	* server/asobj/Date.cpp: Clean up and fixed uneeded ftime() use.
 
 2007-05-17 Sandro Santilli <strk@keybit.net>
 
