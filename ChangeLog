@@ -2,13 +2,11 @@
 
 	* testsuite/misc-ming.all: getTimer_test.c, Makefile.am
 	  add a new testcase; activate action_execution_order_test9.c
-	* server/vm/VM.{h,cpp}:
-		add a getStartTime() for VM.
-	* server/vm/ASHandlers.cpp:
-		use new "getStartTime()" interface, fix ActionGetTimer;
-	* libbase/tu_timer.{h,cpp}:
-		change time unit for non-win32 version "get_ticks()";
-	
+	* server/vm/VM.{h,cpp}: add a getStartTime() for VM.
+	* server/vm/ASHandlers.cpp: use new "getStartTime()" interface,
+	  fix ActionGetTimer;
+	* libbase/tu_timer.{h,cpp}: change time unit for non-win32 version
+	  "get_ticks()";
 	  
 2007-05-16  Rob Savoye  <rob@bertha.welcomehome.org>
 
