@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.313 2007/05/17 14:43:31 nihilus Exp $
+dnl $Id: configure.ac,v 1.314 2007/05/18 00:38:21 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1399,7 +1399,7 @@ if test "$media_handler" = "gst"; then
     echo "        ERROR: gstreamer media handling requested, but no gstreamer 0.10+ found"
     echo "               You need to have the gstreamer development package installed"
     echo "               to compile this project. You can either reconfigure using"
-    echo "               --media-handler=ffmpeg or =mad or install libgstreamer0.10-dev"
+    echo "               --enable-media=ffmpeg or =mad or install libgstreamer0.10-dev"
     echo "               (using apt-get) or gstreamer-devel (using yum)."
     nogo=true
   fi
@@ -1418,7 +1418,7 @@ fi
       echo "        ERROR: No libmad (mp3) development package installed!"
       echo "               You need to have the libmad development package installed"
       echo "               to enable mp3 decoding. You can either reconfigure using"
-      echo "               --media-handler=ffmpeg to use ffmpeg or install libmad0-dev"
+      echo "               --enable-media=ffmpeg to use ffmpeg or install libmad0-dev"
       echo "               (using apt-get) or libmad (using yum)."
       nogo=true
     fi
@@ -1443,7 +1443,7 @@ fi
         echo "        ERROR: No FFMPEG development package installed!"
         echo "               You need to have the ffmpeg development package installed"
         echo "               to enable mp3 decoding. You can either reconfigure using"
-        echo "               --media-handler=mad to use libmad or install libavformat-dev"
+        echo "               --enable-media=mad to use libmad or install libavformat-dev"
         echo "               (using apt-get) or <package_names_here> (using yum)."
         nogo=true
       fi
