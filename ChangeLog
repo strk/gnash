@@ -1,5 +1,8 @@
 2007-05-17 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamGst.cpp (unrefElements): don't attempt
+	  to unref NULL objects, set objects to NULL after unreffing. Add
+	  TODO item.
 	* testsuite/misc-ming.all/NetStream-SquareTest.c:
 	  Add self-contained tests.
 	* testsuite/misc-ming.all/NetStream-SquareTestRunner.cpp:

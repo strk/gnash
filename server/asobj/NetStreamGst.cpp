@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.45 2007/05/16 17:50:03 tgc Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.46 2007/05/17 13:38:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -356,29 +356,128 @@ void
 NetStreamGst::unrefElements()
 {
 log_debug("unreffing elements");
-	gst_object_unref (GST_OBJECT (pipeline));
-	gst_object_unref (GST_OBJECT (audiosink));
-	gst_object_unref (GST_OBJECT (videosink));
 
-	gst_object_unref (GST_OBJECT (volume));
-	gst_object_unref (GST_OBJECT (colorspace));
-	gst_object_unref (GST_OBJECT (videorate));
-	gst_object_unref (GST_OBJECT (videocaps));
-	gst_object_unref (GST_OBJECT (videoflip));
-	gst_object_unref (GST_OBJECT (audioconv));
+	// TODO: Define an GstElement class for storing all these elements,
+	//       and have it's destructor take care of unreffing...
+	//
+	// TODO2: check if calling gst_object_unref is enough to release all
+	//       resources allocated by gst_*_new or gst_element_factory_make
 
-	if (m_isFLV) {
-		gst_object_unref (GST_OBJECT (audiosource));
-		gst_object_unref (GST_OBJECT (videosource));
-		gst_object_unref (GST_OBJECT (videodecoder));
-		gst_object_unref (GST_OBJECT (audiodecoder));
-		gst_object_unref (GST_OBJECT (videoinputcaps));
-		gst_object_unref (GST_OBJECT (audioinputcaps));
+	if ( pipeline )
+	{
+		gst_object_unref (GST_OBJECT (pipeline));
+		pipeline = NULL;
+	}
 
-	} else {
-		gst_object_unref (GST_OBJECT (source));
-		gst_object_unref (GST_OBJECT (decoder));
+	if ( audiosink )
+	{
+		gst_object_unref (GST_OBJECT (audiosink));
+		audiosink = NULL;
+	}
 
+	if ( videosink )
+	{
+		gst_object_unref (GST_OBJECT (videosink));
+		videosink = NULL;
+	}
+
+	if ( volume )
+	{
+		gst_object_unref (GST_OBJECT (volume));
+		volume = NULL;
+	}
+
+	if ( colorspace )
+	{
+		gst_object_unref (GST_OBJECT (colorspace));
+		colorspace = NULL;
+	}
+
+	if ( videorate )
+	{
+		gst_object_unref (GST_OBJECT (videorate));
+		videorate = NULL;
+	}
+
+	if ( videocaps )
+	{
+		gst_object_unref (GST_OBJECT (videocaps));
+		videocaps = NULL;
+	}
+
+	if ( videoflip )
+	{
+		gst_object_unref (GST_OBJECT (videoflip));
+		videoflip = NULL;
+	}
+
+	if ( audioconv )
+	{
+		gst_object_unref (GST_OBJECT (audioconv));
+		audioconv = NULL;
+	}
+
+	if (m_isFLV)
+	{
+		if ( audiosource )
+		{
+			gst_object_unref (GST_OBJECT (audiosource));
+			audiosource = NULL;
+		}
+
+		if ( videosource )
+		{
+			gst_object_unref (GST_OBJECT (videosource));
+			videosource = NULL;
+		}
+
+		if ( videodecoder )
+		{
+			gst_object_unref (GST_OBJECT (videodecoder));
+			videodecoder = NULL;
+		}
+
+		if ( audiodecoder )
+		{
+			gst_object_unref (GST_OBJECT (audiodecoder));
+			audiodecoder = NULL;
+		}
+
+		if ( videoinputcaps )
+		{
+			gst_object_unref (GST_OBJECT (videoinputcaps));
+			videoinputcaps = NULL;
+		}
+
+		if ( audioinputcaps )
+		{
+			gst_object_unref (GST_OBJECT (audioinputcaps));
+			audioinputcaps = NULL;
+		}
+
+		assert(source == NULL);
+		assert(decoder == NULL);
+	}
+	else
+	{
+		if ( source )
+		{
+			gst_object_unref (GST_OBJECT (source));
+			source = NULL;
+		}
+
+		if ( decoder )
+		{
+			gst_object_unref (GST_OBJECT (decoder));
+			decoder = NULL;
+		}
+
+		assert( audiosource == NULL);
+		assert( videosource == NULL);
+		assert( videodecoder == NULL);
+		assert( audiodecoder == NULL);
+		assert( videoinputcaps == NULL);
+		assert( audioinputcaps == NULL);
 	}
 }
 
