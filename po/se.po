@@ -60,51 +60,51 @@ msgstr "FFMPEG byggt utan mp3-stöd?"
 #: backend/sound_handler_sdl.cpp:304
 #, c-format
 msgid "Unable to start SDL sound: %s"
-msgstr "Kann SDL-Audioausgabe nicht starten: %s"
+msgstr "Kan inte starta SDL audio: %s"
 
 #: backend/sound_handler_sdl.cpp:496
 #, c-format
 msgid "Unable to start aux SDL sound: %s"
-msgstr "Kann Aux-SDL-Audioausgabe nicht starten: %s"
+msgstr "Kan inte starta SDL audio: %s"
 
 #: backend/sound_handler_sdl.cpp:717
 #, c-format
 msgid "Negative buffer length in sdl_audio_callback (%d)"
-msgstr "Negative PufferlÃ¤nge in sdl_audio_callback (%d)"
+msgstr "Bufferlängd mindre än 0 in sdl_audio_callback (%d)"
 
 #: backend/sound_handler_sdl.cpp:834
 msgid ""
 "Error while decoding MP3-stream.  Upgrading ffmpeg/libavcodec might fix this "
 "issue."
-msgstr "Fehler beim Dekodieren des MP3-Streams. Eine Aktualisierung von "
-"ffmpeg/libavcodec kÃ¶nnte dieses Problem beheben."
+msgstr "Fel under dekodning av MP3-ström. Uppgradering av ffmpeg/libavcdec "
+"detta problem"
 
 #: backend/sound_handler_sdl.cpp:864
 #, c-format
 msgid "Recoverable error while decoding MP3-stream, MAD error: %s"
-msgstr "Behebbarer Fehler beim Dekodieren des MP3-Streams, MAD-Fehler: %s"
+msgstr "Korrigerbart fel under dekodning av MP3-ström, MAD-fel: %s"
 
 #: backend/sound_handler_sdl.cpp:872
 #, c-format
 msgid "Unrecoverable error while decoding MP3-stream, MAD error: %s"
-msgstr "Nicht behebbarer Fehler beim Dekodieren des MP3-Streams, MAD-Fehler: %s"
+msgstr "Icke korrigerbart fel under dekodning av MP3-ström, MAD-fel: %s"
 
 #: backend/sound_handler_sdl.cpp:929
 msgid "Error in sound sample conversion"
-msgstr "Fehler bei Audio-Sample-Umwandlung"
+msgstr "Fel i ljud-resampling"
 
 #: extensions/mysql/mysql_db.cpp:186
 msgid "Couldn't initialize database"
-msgstr "Konnte Datenbank nicht initialisieren"
+msgstr "Kan inte initialisera databas"
 
 #: extensions/mysql/mysql_db.cpp:191
 msgid "Couldn't connect to database"
-msgstr "Konnte mit Datenbank nicht verbinden"
+msgstr "Kan inte ansluta till databas"
 
 #: extensions/mysql/mysql_db.cpp:217 extensions/mysql/mysql_db.cpp:244
 #, c-format
 msgid "MySQL connection error: %s"
-msgstr "MySQL-Verbindungsfehler: %s"
+msgstr "Fel i MySQL-anslutningen: %s"
 
 #: extensions/mysql/mysql_db.cpp:224 extensions/mysql/mysql_db.cpp:251
 #, c-format
@@ -113,14 +113,14 @@ msgid ""
 "\t%s\n"
 "Query was: %s"
 msgstr ""
-"MySQL-Fehler bei Abfrage nach:\n"
+"MySQL-fel i query för:\n"
 "\t%s\n"
-"Abfrage war: %s"
+"Query var: %s"
 
 #: extensions/mysql/mysql_db.cpp:265
 #, c-format
 msgid "Field name is: %s: "
-msgstr "Feldname ist: %s: "
+msgstr "Fältnamnet är: %s: "
 
 #: gui/gnash.cpp:73
 msgid ""
