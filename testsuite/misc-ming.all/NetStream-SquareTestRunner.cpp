@@ -45,13 +45,20 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
-	// Just loop twice, so to catch crashes...
-	// TODO: lots of more tests :)
-	size_t framecount = root->get_frame_count();
-	for (size_t i=0; i<framecount*2; ++i)
+	// On NetStatus.Play.Stop we jump to last frame and stop,
+	// so this loop is about equivalent to running a
+	// generic self-contained test.
+	//
+	// When all possible tests are implemented as self-contained, we'll
+	// add tests that can't be self-contained.
+	//
+	while (root->get_current_frame() < 2)
 	{
-		check_equals(root->get_current_frame(), i%framecount);
 		tester.advance();
+
+		// sleep to give the NetStream a chance to load data and trigger notifications
+		// needs more analisys to find a good way for doing this..
+		sleep(1);
 	}
 
 

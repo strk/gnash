@@ -90,12 +90,37 @@ main(int argc, char** argv)
   if(a == NULL) return -1;
   SWFMovie_add(mo, (SWFBlock)a);
   SWFMovie_add(mo, newSWFAction(
+
 		"stream.onStatus = function(info) {"
+
+		// Ignore Buffer.Flush for now
+		"  if ( info.code == 'NetStream.Buffer.Flush' ) return; "
+
+		// Print some info
 		" _root.note('onStatus('+info.code+') called'); "
-		//" _root.note(' bufferLength:'+stream.bufferLength+' bufferTime:'+stream.bufferTime);"
-		//" _root.note(' bytesLoaded:'+stream.bytesLoaded+' bytesTotal:'+stream.bytesTotal);"
-		//" _root.note(' currentFps:'+stream.currentFps+' time:'+stream.time);"
+		" _root.note(' bufferLength:'+stream.bufferLength+"
+		" 	' bytesLoaded:'+stream.bytesLoaded+"
+		"	' currentFps:'+stream.currentFps+' time:'+stream.time);"
+
+		" if ( info.code == 'NetStream.Play.Stop' )"
+		" {"
+		" 	_root.check(this instanceOf NetStream); "
+		" 	_root.check_equals(this.bufferTime, 2); "
+		" 	_root.check_equals(this.bytesTotal, 46893); "
+		"	this.stopNotified = true;"
+		"	_root.nextFrame();"
+		" }"
+#if 0
+		" else if ( info.code == 'NetStream.Buffer.Empty' && this.stopNotified ) "
+	        " {"
+		"	check ( this.stopNotified )
+		"	this.close();"
+		"	_root.nextFrame();"
+		" }"
+#endif
+
 		"};"
+
 		"stream.onCuePoint = function(info) {"
 		" _root.note('onCuePoint('+info+') called'); "
 		"};"
@@ -105,6 +130,11 @@ main(int argc, char** argv)
 		));
 
   SWFMovie_nextFrame(mo);
+
+  SWFMovie_add(mo, newSWFAction("totals(); stop();"));
+
+  SWFMovie_nextFrame(mo);
+
 
   /* Output movie */
   puts("Saving " OUTPUT_FILENAME );

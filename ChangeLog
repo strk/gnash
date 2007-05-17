@@ -1,3 +1,10 @@
+2007-05-17 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/NetStream-SquareTest.c:
+	  Add self-contained tests.
+	* testsuite/misc-ming.all/NetStream-SquareTestRunner.cpp:
+	  Adjust to simply run the self-contained tests.
+
 2007-05-17 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all: getTimer_test.c, Makefile.am
