@@ -55,6 +55,16 @@ main(int argc, char** argv)
   }
 	
   sprintf(filename, "%s/square.flv", mediadir);
+
+  // Some online examples...
+  //
+  // 'ffdec_vp6f' 
+  //sprintf(filename, "http://www.helpexamples.com/flash/video/water.flv");
+  //sprintf(filename, "http://www.helpexamples.com/flash/video/clouds.flv");
+  //
+  // This one works
+  //sprintf(filename, "http://www.helpexamples.com/flash/video/caption_video.flv");
+  //
   
   sprintf(buffer, 
   	"nc=new NetConnection();"
@@ -62,9 +72,9 @@ main(int argc, char** argv)
 	"stream = new NetStream(nc);"
 	"video.attachVideo(stream); "
 	"stream.setBufferTime(2); "
-	"stream.play(\"%s\");"
+	"stream.play('%s');"
 	"stop();",
-	filename);
+	filename );
 
   Ming_init();
   Ming_useSWFVersion (OUTPUT_VERSION);
@@ -89,7 +99,7 @@ main(int argc, char** argv)
   a = newSWFAction(buffer);
   if(a == NULL) return -1;
   SWFMovie_add(mo, (SWFBlock)a);
-  SWFMovie_add(mo, newSWFAction(
+  SWFMovie_add(mo, (SWFBlock)newSWFAction(
 
 		"stream.onStatus = function(info) {"
 
@@ -131,7 +141,7 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo);
 
-  SWFMovie_add(mo, newSWFAction("totals(); stop();"));
+  SWFMovie_add(mo, (SWFBlock)newSWFAction("totals(); stop();"));
 
   SWFMovie_nextFrame(mo);
 
