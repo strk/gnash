@@ -38,10 +38,6 @@ void sound_handler::convert_raw_data(
     int m_sample_rate,
     bool m_stereo)
 {
-    fprintf(stderr, "Converting raw data from size=%d %d(%s) to %d(%s)\n",
-		sample_size, sample_rate, stereo ? "stereo" : "mono",
-		m_sample_rate, stereo ? "stereo" : "mono");
-
     // simple hack to handle dup'ing mono to stereo
     if ( !stereo && m_stereo)
     {
