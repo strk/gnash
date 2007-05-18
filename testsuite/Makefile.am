@@ -11,6 +11,7 @@ SUBDIRS = \
 	libamf.all \
 	misc-ming.all \
 	misc-mtasc.all \
+	misc-swfmill.all \
 	movies.all \
 	actionscript.all \
 	$(NULL)

@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.317 2007/05/18 03:14:01 martinwguy Exp $
+dnl $Id: configure.ac,v 1.318 2007/05/18 10:14:10 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -676,6 +676,12 @@ AC_ARG_WITH([swfdec_testsuite],
 AC_SUBST(SWFDEC_TESTSUITE)
 AM_CONDITIONAL(ENABLE_SWFDEC_TESTSUITE, [ test x"$SWFDEC_TESTSUITE" != x ])
 
+dnl
+dnl See if we can use the swfmill based testsuite
+dnl
+AC_PATH_PROG(SWFMILL, swfmill)
+AM_CONDITIONAL(ENABLE_SWFMILL, [ test x"$SWFMILL" != x ])
+
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
@@ -1067,6 +1073,7 @@ testsuite/samples/Makefile
 testsuite/swfdec/Makefile
 testsuite/misc-ming.all/Makefile
 testsuite/misc-mtasc.all/Makefile
+testsuite/misc-swfmill.all/Makefile
 testsuite/movies.all/Makefile
 testsuite/server/Makefile
 testsuite/libamf.all/Makefile
@@ -1647,6 +1654,14 @@ else
     echo "                 to run some of the tests in Gnash testsuite."
     echo "                 You can install it from http://mtasc.org"
     echo "                 or .deb users: apt-get install mtasc"
+fi
+
+if test x"$SWFMILL" != x; then
+    echo "        SWFMILL is $SWFMILL"
+else
+    echo "        WARNING: You need to have the 'swfmill' tool installed"
+    echo "                 to run some of the tests in Gnash testsuite."
+    echo "                 You can install it from http://iterative.org/swfmill/"
 fi
 
 if test x"$Z_LIBS" != x; then

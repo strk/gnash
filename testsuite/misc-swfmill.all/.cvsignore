@@ -1,0 +1,11 @@
+Makefile
+Makefile.in
+gnash-dbg.log
+gnash.log
+gnash.sum
+site.exp
+*.swf
+testrun.*
+*.pp
+alltests-runner
+gmon.out

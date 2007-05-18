@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<swf version="6" compressed="1">
+
+<!--
+Simple source code example for swfmill.
+Build with 'swfmill xml2swf hello.xml hello.swf'.
+When in gnash testsuite, 'make hello.swf' is enough.
+
+TODO:
+  - Find out how to embed the Dejagnu.swf lib
+  - Find out how to call the Dejagnu.swf interfaces
+-->
+
+  <Header width="12800" height="9600" framerate="12" frames="1">
+    <size>
+      <Rectangle left="0" right="12800" top="0" bottom="9600"/>
+    </size>
+
+    <tags>
+
+      <background color="#ffffff"/>
+
+      <DoAction>
+        <actions>
+          <Dictionary>
+            <strings>
+              <String value="hello world"/>
+            </strings>
+          </Dictionary>
+          <PushData>
+            <items>
+              <StackDictionaryLookup index="0"/>
+            </items>
+          </PushData>
+          <Trace/>
+          <EndAction/>
+        </actions>
+      </DoAction>
+
+      <ShowFrame/>
+      <End/>
+    </tags>
+
+  </Header>
+</swf>

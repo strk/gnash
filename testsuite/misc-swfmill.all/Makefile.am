@@ -1,0 +1,75 @@
+## Process this fill with automake to generate Makefile.in
+# 
+# Copyright (C) 2007 Free Software Foundation, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+AUTOMAKE_OPTIONS = dejagnu
+
+abs_topbuilddir=$(shell cd $(top_builddir); pwd)
+
+if ENABLE_SWFMILL
+
+## Self-contained XML tests
+SC_XMLTESTS =		\
+	hello.xml	\
+	$(NULL)
+
+## Path to Dejagnu.swf file
+DEJAGNU_SO_PATH = ../misc-ming.all/Dejagnu.swf
+
+SC_XMLTESTS_OUT = $(SC_XMLTESTS:.xml=.swf)
+
+# Dependencies for all self-contained SWF tests
+$(SC_XMLTESTS_OUT) : Dejagnu.swf
+
+Dejagnu.swf: $(DEJAGNU_SO_PATH)
+	cp ../misc-ming.all/Dejagnu.swf .
+
+check_SCRIPTS = \
+	$(NULL)
+
+.xml.swf: 
+	$(SWFMILL) -v simple $(@:%.swf=$(srcdir)/%.xml) $@
+
+clean-local: 
+	rm -f $(check_SCRIPTS) $(SC_XMLTESTS_OUT) \
+		*.log *.trace-gnash \
+		site.bak site.exp site.exp.bak testrun.sum \
+		gnash.sum Dejagnu.swf 
+
+
+TEST_DRIVERS = ../simple.exp
+TEST_CASES = ${check_SCRIPTS}
+
+check-DEJAGNU: site-update $(check_PROGRAMS)
+	@runtest=$(RUNTEST); \
+	if $(SHELL) -c "$$runtest --version" > /dev/null 2>&1; then \
+	    $$runtest $(RUNTESTFLAGS) $(TEST_DRIVERS); \
+	else \
+	  echo "WARNING: could not find \`runtest'" 1>&2; \
+          for i in "$(TEST_CASES)"; do \
+	    $(SHELL) $$i; \
+	  done; \
+	fi
+
+site-update: site.exp
+	@rm -fr site.exp.bak
+	@cp site.exp site.exp.bak
+	@sed -e '/testcases/d' site.exp.bak > site.exp
+	@echo "# This is a list of the pre-compiled testcases" >> site.exp
+	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
+
+endif

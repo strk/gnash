@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.73 2007/05/15 16:31:01 rsavoye Exp $
+# $Id: Makefile.am,v 1.74 2007/05/18 10:14:10 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -219,6 +219,9 @@ endif
 if ENABLE_MTASC
 	@echo "	MTASC $(MTASC)"
 	@echo "	MTASC CLASSPATH $(MTASC_CLASSPATH)"
+endif
+if ENABLE_SWFMILL
+	@echo "	SWFMILL $(SWFMILL) "
 endif
 if ENABLE_SWFDEC_TESTSUITE
 	@echo "	SWFDEC_TESTSUITE $(SWFDEC_TESTSUITE)"
