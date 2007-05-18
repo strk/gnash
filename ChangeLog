@@ -1,5 +1,7 @@
 2007-05-18 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test10.c:
+	  Add test for "Skipping frames backward".
 	* Makefile.am, configure.ac: detect 'swfmill'
 	* testsuite/misc-swfmill.all/: .cvsignore, Makefile.am:
 	  new testsuite dir for swfmill
