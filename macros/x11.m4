@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: x11.m4,v 1.8 2007/05/17 18:28:00 strk Exp $
+dnl $Id: x11.m4,v 1.9 2007/05/18 01:26:01 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_X11],
 [
@@ -32,7 +32,7 @@ AC_DEFUN([GNASH_PATH_X11],
   ])
 
   dnl If the path hasn't been specified, go look for it.
-  if test x"${ac_cv_path_x11_incl}" = x; then
+  if test x"${ac_cv_path_x11_incl}" = x ; then
     newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/include ${incllist}"
     for i in $newlist; do
     	if test -f $i/X11/X.h; then
@@ -41,7 +41,7 @@ AC_DEFUN([GNASH_PATH_X11],
     done
   fi
 
-  if test x"${ac_cv_path_x11_incl}" = x; then
+  if test x"${ac_cv_path_x11_incl}" = x ; then
     AC_CHECK_HEADERS(X11/X.h, [ac_cv_path_x11_incl=""])
   fi
 
@@ -67,11 +67,11 @@ AC_DEFUN([GNASH_PATH_X11],
   ])
 
   dnl If the header doesn't exist, there is no point looking for the library.
-  if test x"${ac_cv_path_x11_incl}" != x; then
+  if test x"${ac_cv_path_x11_incl}" != x ; then
     newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/X11R6/lib ${libslist}"
     for i in $newlist; do
      if test -f $i/libX11.a -o -f $i/libX11.${shlibext}; then
-       if "x${i}" != "x/usr/lib"; then
+       if x"${i}" != x"/usr/lib"; then
          ac_cv_path_x11_lib="-L$i -lX11"
        else
          ac_cv_path_x11_lib="-lX11"
@@ -95,7 +95,7 @@ AC_DEFUN([GNASH_PATH_X11],
 
   for i in $newlist; do
     if test -f $i/libXplugin.a -o -f $i/libXplugin.${shlibext}; then
-      if "x${i}" != "x/usr/lib"; then
+      if x"${i}" != x"/usr/lib"; then
         ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -L$i -lXplugin"
       else
         ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXplugin"
@@ -104,7 +104,7 @@ AC_DEFUN([GNASH_PATH_X11],
     fi
   done
 
-  if test x"${ac_cv_path_x11_lib}" = x; then
+  if test x"${ac_cv_path_x11_lib}" = x ; then
     AC_CHECK_LIB(X11, x11_mem_init, [ac_cv_path_x11_lib=""])
   fi
 
