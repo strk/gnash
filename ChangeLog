@@ -53,6 +53,8 @@
 	  testsuite/sound_handler_test.cpp,
 	  testsuite/sound_handler_test.h:
 	  convert_raw_samples is now just a static fn of sound_handler::
+	* backend/sound_handler.cpp: Speed convert_raw_data and handle stereo
+	  upsampling correctly
 
 2007-05-17  Rob Savoye  <rob@bertha.welcomehome.org>
 
