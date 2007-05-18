@@ -17,8 +17,6 @@
  */ 
 
 /*
- * Zou Lunkai, zoulunkai@gmail.com
- *
  * Test "Jumping backward to the start of two character's lifetime after depth swap"
  *
  * Timeline:
