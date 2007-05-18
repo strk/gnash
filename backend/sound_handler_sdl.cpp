@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.59 2007/05/18 13:17:51 martinwguy Exp $
+// $Id: sound_handler_sdl.cpp,v 1.60 2007/05/18 15:28:01 martinwguy Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -167,14 +167,16 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 		int16_t*	adjusted_data = 0;
 		int	adjusted_size = 0;
 
-		convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 2, sounddata->sample_rate, sounddata->stereo,
-				 audioSpec.freq, (audioSpec.channels == 2 ? true : false));
+		convert_raw_data(&adjusted_data, &adjusted_size,
+				 data, sample_count, 2 /*sample size*/,
+				 sounddata->sample_rate, sounddata->stereo,
+				 audioSpec.freq, (audioSpec.channels == 2));
 		if (!adjusted_data || adjusted_size < 1) {
 			gnash::log_error(_("Some kind of error with resampling sound data"));
 			return -1;
 		}
-		adjusted_data = static_cast<int16_t*>(data);
-		adjusted_size = data_bytes;
+		// adjusted_data = static_cast<int16_t*>(data);
+		// adjusted_size = data_bytes;
 
 		// Reallocate the required memory.
 		Uint8* tmp_data = new Uint8[adjusted_size + sounddata->data_size];

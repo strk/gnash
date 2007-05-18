@@ -2,7 +2,6 @@
 
 	* backend/sound_handler.cpp: Include cstring so memcpy is
 	defined.
-
 	* libbase/Makefile.am: Add makefile rules from libltd.
 
 2007-05-18 Sandro Santilli <strk@keybit.net>
@@ -58,6 +57,8 @@
 	  convert_raw_samples is now just a static fn of sound_handler::
 	* backend/sound_handler.cpp: Speed convert_raw_data and handle stereo
 	  upsampling correctly
+	* backend/sound_handler_sdl.cpp: Remove bug 19750 that garbled
+	  SOUNDSTREAM audio.
 
 2007-05-17  Rob Savoye  <rob@bertha.welcomehome.org>
 
