@@ -40,8 +40,8 @@
  *  frame2: character placed at depth -16381 at position (10,200)
  *  frame4: position of instance at depth -16381 shifted to the right (50,200)
  *  frame5: position of instance at depth -16381 shifted to the right (100,200)
- *  frame6: depth of instance changed to -10 (static zone) and stop.
- *  frame7: jump back to frame 4
+ *  frame6: depth of instance changed to -10 (static zone) 
+ *  frame7: jump back to frame 4 and stop.
  * 
  * Expected behaviour on jump back:
  * 
