@@ -138,6 +138,7 @@ main(int argc, char** argv)
   add_actions(mo,
     "gotoAndStop(2); " 
     "check_equals(_root.depth3Constructed, 1);"
+    "check_equals(typeof(static3), 'undefined');"
     "totals();"
     );
   SWFMovie_nextFrame(mo); 
