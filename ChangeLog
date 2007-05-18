@@ -1,7 +1,12 @@
+2007-05-17  Martin Guy  <martinwguy@yahoo.it>
+
+	* configure.ac: Change package help message format
+	  and fix typo MYSQC_CFLAGS
+
 2007-05-17  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* libbase/Makefile.am: Build libltdl optionally by duplicating the
-	way libltdl/Makefile used to buuld this library.
+	  way libltdl/Makefile used to buuld this library.
 
 2007-05-17 Sandro Santilli <strk@keybit.net>
 
