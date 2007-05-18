@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.315 2007/05/18 01:05:03 nihilus Exp $
+dnl $Id: configure.ac,v 1.316 2007/05/18 01:30:02 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -64,8 +64,8 @@ dnl AC_CHECK_SIZEOF([size_t], 4, AC_INCLUDES_DEFAULT)
 dnl AC_DEFINE(SIZET_FMT, ["%z"], [size_t printf modifier is z])
 
 AC_LANG_PUSH(C++)
-save_CXXFLAGS="$CXXFLAGS";
-CXXFLAGS="$CXXFLAGS -Werror -Wformat";
+save_CXXFLAGS="$CXXFLAGS"
+CXXFLAGS="$CXXFLAGS -Werror -Wformat"
 
 AC_TRY_COMPILE([#include <sys/types.h>
   #include <stdio.h>], [
@@ -92,7 +92,7 @@ AC_TRY_COMPILE([#include <sys/types.h>
   AC_DEFINE(SIZET_FMT, ["%ld"], [size_t printf modifier is ld])
 )
 
-CXXFLAGS="$save_CXXFLAGS";
+CXXFLAGS="$save_CXXFLAGS"
 AC_LANG_POP(C++)
 
 AC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval})
