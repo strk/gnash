@@ -1,7 +1,7 @@
 2007-05-18 Sandro Santilli <strk@keybit.net>
 
-	* testsuite/misc-ming.all/: Makefile.am, loop_test2.c:
-	  New Timeline control test. GNASH FAILS THIS ONE !!
+	* testsuite/misc-ming.all/: Makefile.am, loop_test2.c, loop_test3.c:
+	  New Timeline control test. GNASH FAILS THESE ONES !!
 
 2007-05-18 Sandro Santilli <strk@keybit.net>
 

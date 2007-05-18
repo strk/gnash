@@ -74,6 +74,7 @@ check_PROGRAMS = \
 	root_stop_testrunner \
 	loop_test \
 	loop_test2 \
+	loop_test3 \
 	loop_test-Runner \
 	place_object_test \
 	move_object_test \
@@ -193,6 +194,7 @@ check_SCRIPTS = \
 	static_vs_dynamic2_testrunner \
 	getTimer_testrunner \
 	loop_test2runner \
+	loop_test3runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -367,6 +369,20 @@ loop_test2.swf: loop_test2
 
 loop_test2runner: $(srcdir)/../generic-testrunner.sh loop_test2.swf
 	sh $< -f20 $(top_builddir) loop_test2.swf > $@
+	chmod 755 $@
+
+loop_test3_SOURCES =	\
+	loop_test3.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+loop_test3_LDADD = $(MING_LIBS)
+
+loop_test3.swf: loop_test3
+	./loop_test3 $(top_srcdir)/testsuite/media
+
+loop_test3runner: $(srcdir)/../generic-testrunner.sh loop_test3.swf
+	sh $< -f20 $(top_builddir) loop_test3.swf > $@
 	chmod 755 $@
 
 key_event_test_SOURCES =	\
@@ -1421,6 +1437,7 @@ TEST_CASES = \
 	Video-EmbedSquareTestRunner \
 	NetStream-SquareTestRunner \
 	loop_test2runner \
+	loop_test3runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
