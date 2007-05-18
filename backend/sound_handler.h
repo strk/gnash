@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.5 2007/05/07 14:30:51 martinwguy Exp $ */
+/* $Id: sound_handler.h,v 1.6 2007/05/18 03:17:22 martinwguy Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -140,15 +140,6 @@ public:
 			  int sample_size, int sample_rate, bool stereo) = 0;
 
 	virtual ~sound_handler() {};
-
-	// Utility function to uncompress ADPCM.
-	static void adpcm_expand(
-		void* data_out,
-		stream* in,
-		int sample_count,	// in stereo, this is number of *pairs* of samples
-		bool stereo);
-
-
 };
 
 // TODO: move to appropriate specific sound handlers
