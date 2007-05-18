@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.56 2007/05/15 10:47:50 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.57 2007/05/18 10:25:43 martinwguy Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -91,19 +91,6 @@ int	SDL_sound_handler::create_sound(
 
 	switch (format)
 	{
-	case FORMAT_RAW:
-
-		if (data_bytes > 0) {
-			convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 1, sample_rate, stereo);
-			if (!adjusted_data) {
-				gnash::log_error(_("Some kind of error occurred with raw sound data"));
-				return -1;
-			}
-			sounddata->data_size = adjusted_size;
-			sounddata->data = (Uint8*) adjusted_data;
-		}
-		break;
-
 	case FORMAT_NATIVE16:
 
 		if (data_bytes > 0) {
@@ -130,15 +117,16 @@ int	SDL_sound_handler::create_sound(
 			return -1;
 		}
 		memcpy(sounddata->data, data, data_bytes);
-
 		break;
+
 	//case FORMAT_VORBIS:
 
+	case FORMAT_RAW:
 	case FORMAT_ADPCM:
 	case FORMAT_UNCOMPRESSED:
 		// These should have been converted to FORMAT_NATIVE16
 		gnash::log_error(_("Sound data format not properly converted"));
-		assert(0);
+		return -1;
 		break;
 
 	case FORMAT_NELLYMOSER:

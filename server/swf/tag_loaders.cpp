@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.101 2007/05/15 14:02:21 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.102 2007/05/18 10:25:43 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -71,12 +71,14 @@ namespace gnash {
 namespace gnash {
 
 // Forward declaration for functions at end of file
+//
+// Both modify "data" parameter, allocating memory for it.
 
-static void u8_expand(void* out_data_void, stream* in,
+static void u8_expand(unsigned char* &data, stream* in,
 	int sample_count,  // in stereo, this is number of *pairs* of samples
 	bool stereo);
 
-static void adpcm_expand(void* out_data_void, stream* in,
+static void adpcm_expand(unsigned char* &data, stream* in,
 	int sample_count,  // in stereo, this is number of *pairs* of samples
 	bool stereo);
 
@@ -1165,6 +1167,11 @@ do_init_action_loader(stream* in, tag_type tag, movie_definition* m)
 // Sound
 //
 
+// Forward declaration
+static void sound_expand(stream *in, sound_handler::format_type &format,
+	bool sample_16bit, bool stereo,
+	unsigned char* &data, unsigned &data_bytes);
+
 // Common data
 static int	s_sample_rate_table[] = { 5512, 11025, 22050, 44100 };
 
@@ -1199,9 +1206,6 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	if (handler)
 	{
-	    unsigned data_bytes = 0;
-	    unsigned char*	data = NULL;
-
 	    if (! (sample_rate >= 0 && sample_rate <= 3))
 	    {
 		IF_VERBOSE_MALFORMED_SWF(
@@ -1210,103 +1214,15 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 		return;
 	    }
 
-	    switch (format) {
+	    unsigned char *data; // Expanded audio data ready for playing
+    	    unsigned data_bytes; // First it is the amount of data from file,
+			// then the amount allocated at *data (it may grow)
 
-	    case sound_handler::FORMAT_ADPCM:
-		// Uncompress the ADPCM before handing data to host.
-		data_bytes = sample_count * (stereo ? 4 : 2);
-		data = new unsigned char[data_bytes];
-		adpcm_expand(data, in, sample_count, stereo);
-		format = sound_handler::FORMAT_NATIVE16;
-		break;
+	    data_bytes = in->get_tag_end_position() - in->get_position();
 
-	    case sound_handler::FORMAT_RAW:
-		// 8- or 16-bit mono or stereo host-endian audio
-		data_bytes = in->get_tag_end_position() - in->get_position();
-		data = new unsigned char[data_bytes];
-		// Convert to 16-bit host-endian
-		if (sample_16bit) {
-		    // FORMAT_RAW 16-bit is exactly what we want!
-		    in->read((char *)data, data_bytes);
-		} else {
-		    // Convert 8-bit signed to 16-bit range
-		    // Allocate as many shorts as there are samples
-		    int16_t *newdata = new int16_t[data_bytes];
-		    u8_expand(newdata, in, sample_count, stereo);
-
-		    // Keep new data and dispose of old
-		    unsigned char *tmp = data;
-		    data = (unsigned char *) newdata;
-		    delete [] tmp;
-		}
-		format = sound_handler::FORMAT_NATIVE16;
-	    	break;
-
-	    case sound_handler::FORMAT_UNCOMPRESSED:
-		// 8- or 16-bit mono or stereo little-endian audio
-		data_bytes = in->get_tag_end_position() - in->get_position();
-
-		// Convert to 16-bit host-endian.
-		if (!sample_16bit)
-		{
-		    // Convert 8-bit signed to 16-bit range
-		    // Allocate as many shorts as there are 8-bit samples
-		    int16_t *newdata = new int16_t[data_bytes];
-		    u8_expand(newdata, in, sample_count, stereo);
-		    data = (unsigned char *) newdata;
-		} else {
-		    // Read 16-bit data into buffer
-		    data = new unsigned char[data_bytes];
-		    in->read((char *)data, data_bytes);
-
-		    // Convert 16-bit little-endian data to host-endian.
-
-		    // Runtime detection of host endianness costs almost
-		    // nothing and is less of a continual maintenance headache
-		    // than compile-time detection.
-		    union u {
-		    	uint16_t s;
-			struct {
-			    uint8_t c0;
-			    uint8_t c1;
-			} c;
-		    } u = { 0x0001 };
-
-		    switch (u.c.c0) {
-		    case 0x01:	// Little-endian host: sample is already native.
-			break;
-		    case 0x00:  // Big-endian host
-		        // Swap sample bytes to get big-endian format.
-			assert(data_bytes & 1 == 0);
-		        for (unsigned i = 0; i < data_bytes; i+=2)
-		        {
-			    swap(&data[i], &data[i+1]);
-		        }
-			break;
-		    default:	// Impossible
-			log_error(_("Host endianness not detected in define_sound_loader"));
-			// Just carry on anyway...
-		    }
-		}
-		format = sound_handler::FORMAT_NATIVE16;
-		break;
-
-	    case sound_handler::FORMAT_MP3:
-		// Decompressed elsewhere
-		data_bytes = in->get_tag_end_position() - in->get_position();
-		data = new unsigned char[data_bytes];
-		in->read((char *)data, data_bytes);
-		break;
-
-	    case sound_handler::FORMAT_NELLYMOSER:
-		// One day...
-		break;
-
-	    // This is impossible as an input but stops fussy compilers
-	    // complaining about unhandled enum values.
-	    case sound_handler::FORMAT_NATIVE16:
-		break;
-	    }
+	    // sound_expand allocates storage for data[].
+	    // and modifies 3 parameters: format, data and data_bytes.
+	    sound_expand(in, format, sample_16bit, stereo, data, data_bytes);
 
 	    int	handler_id = handler->create_sound(
 		data,
@@ -1368,6 +1284,13 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
     }
 }
 
+// There is only one soundstream active per movie, so we cache the extra data
+// we need to be able to decode subsequent soundstreamblocks here.
+//
+static sound_handler::format_type stream_input_format;
+static bool stream_input_is16bit;
+static bool stream_input_stereo;
+
 // Load a SoundStreamHead(2) tag.
 void
 sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
@@ -1389,7 +1312,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     // extract garbage data
     int	garbage = in->read_uint(8);
 
-    sound_handler::format_type	format = static_cast<sound_handler::format_type>(in->read_uint(4));
+    sound_handler::format_type format = static_cast<sound_handler::format_type>(in->read_uint(4));
     int sample_rate = in->read_uint(2);	// multiples of 5512.5
     bool sample_16bit = in->read_uint(1) ? true : false;
     bool stereo = in->read_uint(1) ? true : false;
@@ -1406,6 +1329,8 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 		  int(format), sample_rate, int(sample_16bit), int(stereo), sample_count);
     );
 
+   // Wot about reading the sample_count samples?
+
     // Ask sound_handler it to init this sound.
     int	data_bytes = 0;
 
@@ -1418,8 +1343,26 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	return;
     }
 
-    // Since the ADPCM is converted to NATIVE16, the format is set to that...
-    if (format == sound_handler::FORMAT_ADPCM) format = sound_handler::FORMAT_NATIVE16;
+    // Remember settings for decoding of subsequent blocks.
+    // "stereo" is also in the sound object, 16bit no, format get stomped.
+    stream_input_format = format;
+    stream_input_is16bit = sample_16bit;
+    stream_input_stereo = stereo;
+
+    // Tell create_sound what format it will be receiving, in case it cares
+    // at this stage.
+    switch (format) {
+    case sound_handler::FORMAT_ADPCM:
+    case sound_handler::FORMAT_RAW:
+    case sound_handler::FORMAT_UNCOMPRESSED:
+	format = sound_handler::FORMAT_NATIVE16;
+	break;
+    // Shut fussy compilers up...
+    case sound_handler::FORMAT_MP3:
+    case sound_handler::FORMAT_NELLYMOSER:
+    case sound_handler::FORMAT_NATIVE16:
+	break;
+    }
 
     int	handler_id = handler->create_sound(
 	NULL,
@@ -1449,58 +1392,20 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
     int handle_id = m->get_loading_sound_stream_id();
 
-    // store the data with the appropiate sound.
-    int	data_bytes = 0;
+    unsigned char *data;	// Storage is allocated by sound_expand()
+    unsigned data_bytes = in->get_tag_end_position() - in->get_position();
 
-    // @@ This is pretty awful -- lots of copying, slow reading.
-    data_bytes = in->get_tag_end_position() - in->get_position();
+    // The format in the input file is in stream_input_*
+    sound_handler::format_type format = stream_input_format;
 
-    if (data_bytes <= 0) return;
-    unsigned char *data = new unsigned char[data_bytes];
+    sound_expand(in, format,
+		 stream_input_is16bit, stream_input_stereo,
+		 data, data_bytes);
+    // "format" now reflects what we hand(ed) to the sound drivers.
 
-
-    int format = 0;
-    bool stereo = true;
-    int sample_count = -1;
-
-    handler->get_info(handle_id, &format, &stereo);
-
-    if (format == sound_handler::FORMAT_ADPCM)
-    {
-	// Uncompress the ADPCM before handing data to host.
-	sample_count =  data_bytes / (stereo ? 4 : 2);
-	data_bytes = sample_count * (stereo ? 4 : 2);
-	data = new unsigned char[data_bytes];
-	adpcm_expand(data, in, sample_count, stereo);
-	format = sound_handler::FORMAT_NATIVE16;
-    } else if (format == sound_handler::FORMAT_NATIVE16)
-    {
-	// Raw data
-	sample_count =  data_bytes / (stereo ? 4 : 2);
-	in->read((char *)data, data_bytes);
-    } else {
-	in->read((char *)data, data_bytes);
-
-	// Swap bytes on behalf of the host, to make it easier for the handler.
-	// @@ I'm assuming this is a good idea?	 Most sound handlers will prefer native endianness?
-	// I dunno why this is commented-out, but if you want to re-enable it,
-	// recode it with the same runtime endian order detection as above.
-	// Or, better, unify the two routines as there is a lot of duplicated
-	// code here.
-	/*if (format == sound_handler::FORMAT_UNCOMPRESSED && sample_16bit)
-	{
-#ifndef (?(*!(_TU_LITTLE_ENDIAN_ has gone. Use <boost/detail/endian.hpp>
-	    // Swap sample bytes to get big-endian format.
-	    for (int i = 0; i < data_bytes - 1; i += 2)
-	    {
-		swap(&data[i], &data[i+1]);
-	    }
-#endif // not _TU_LITTLE_ENDIAN_
-
-	    format = sound_handler::FORMAT_NATIVE16;
-	}*/
-    }
-
+    unsigned sample_count = data_bytes;
+    if (stream_input_stereo)  sample_count /= 2;
+    if (stream_input_is16bit) sample_count /= 2;
 
     // Fill the data on the apropiate sound, and receives the starting point
     // for later "start playing from this frame" events.
@@ -1510,8 +1415,112 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
     start_stream_sound_tag*	ssst = new start_stream_sound_tag();
     ssst->read(m, handle_id, start);
+}
 
-    // @@ who's going to delete the start_stream_sound_tag ??
+// sound_expand: Expand audio data to 16-bit host endian.
+//
+// This modifies three of its parameters:
+// On entry, "format" is the format of the original data. If this routine
+// expands that to 16-bit native-endian, it will also modify "format" to
+// FORMAT_NATIVE16. Otherwise it leaves it alone (MP3 and NELLYMOSER).
+//
+// Storage for "data" is allocated here, and the the "data" pointer is modified.
+//
+// On entry, data_bytes is the amount of sound data to be read from "in";
+// on exit it reflects the number of bytes that "data" now points to.
+static void
+sound_expand(stream *in, sound_handler::format_type &format,
+	bool sample_16bit, bool stereo,
+	unsigned char* &data, unsigned &data_bytes)
+{
+    switch (format) {
+
+    case sound_handler::FORMAT_ADPCM:
+      {
+	// Uncompress the ADPCM before handing data to host.
+	unsigned sample_count = data_bytes / (stereo ? 4 : 2);
+	adpcm_expand(data, in, sample_count, stereo);
+	format = sound_handler::FORMAT_NATIVE16;
+	break;
+      }
+    case sound_handler::FORMAT_RAW:
+	// 8- or 16-bit mono or stereo host-endian audio
+	// Convert to 16-bit host-endian
+	if (sample_16bit) {
+	    // FORMAT_RAW 16-bit is exactly what we want!
+	    data = new unsigned char[data_bytes];
+	    in->read((char *)data, data_bytes);
+	} else {
+	    // Convert 8-bit signed to 16-bit range
+	    // Allocate as many shorts as there are samples
+	    unsigned sample_count = data_bytes / (stereo ? 2 : 1);
+	    u8_expand(data, in, sample_count, stereo);
+	}
+	format = sound_handler::FORMAT_NATIVE16;
+	break;
+
+    case sound_handler::FORMAT_UNCOMPRESSED:
+	// 8- or 16-bit mono or stereo little-endian audio
+	// Convert to 16-bit host-endian.
+	if (!sample_16bit)
+	{
+	    // Convert 8-bit signed to 16-bit range
+	    // Allocate as many shorts as there are 8-bit samples
+	    unsigned sample_count = data_bytes / (stereo ? 2 : 1);
+	    u8_expand(data, in, sample_count, stereo);
+	} else {
+	    // Read 16-bit data into buffer
+	    data = new unsigned char[data_bytes];
+	    in->read((char *)data, data_bytes);
+
+	    // Convert 16-bit little-endian data to host-endian.
+
+	    // Runtime detection of host endianness costs almost
+	    // nothing and is less of a continual maintenance headache
+	    // than compile-time detection.
+	    union u {
+	    	uint16_t s;
+		struct {
+		    uint8_t c0;
+		    uint8_t c1;
+		} c;
+	    } u = { 0x0001 };
+
+	    switch (u.c.c0) {
+	    case 0x01:	// Little-endian host: sample is already native.
+		break;
+	    case 0x00:  // Big-endian host
+	        // Swap sample bytes to get big-endian format.
+		assert(data_bytes & 1 == 0);
+	        for (unsigned i = 0; i < data_bytes; i+=2)
+	        {
+		    swap(&data[i], &data[i+1]);
+	        }
+		break;
+	    default:	// Impossible
+		log_error(_("Host endianness not detected in define_sound_loader"));
+		// Just carry on anyway...
+	    }
+	}
+	format = sound_handler::FORMAT_NATIVE16;
+	break;
+
+    case sound_handler::FORMAT_MP3:
+	// Decompressed elsewhere
+	data = new unsigned char[data_bytes];
+	in->read((char *)data, data_bytes);
+	break;
+
+    case sound_handler::FORMAT_NELLYMOSER:
+	// One day...
+	in->skip_bytes(data_bytes);
+	break;
+
+    // This is impossible as an input but stops fussy compilers
+    // complaining about unhandled enum values.
+    case sound_handler::FORMAT_NATIVE16:
+	break;
+    }
 }
 
 void
@@ -1632,7 +1641,7 @@ serialnumber_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 //
 // Provides:
 //
-// void	adpcm_expand(void* out_data_void, stream* in,
+// void	adpcm_expand(unsigned char* &data, stream* in,
 //	int sample_count, // in stereo, this is number of *pairs* of samples
 //	bool stereo)
 //
@@ -1647,17 +1656,19 @@ serialnumber_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 //
 // Unsigned 8-bit expansion (128 is silence)
 //
+// u8_expand allocates the memory for its "data" pointer.
+//
 
 static void u8_expand(
-	void* out_data_void,
+	unsigned char * &data,
 	stream* in,
 	int sample_count,	// in stereo, this is number of *pairs* of samples
 	bool stereo)
 {
-	int16_t	*out_data = (int16_t*) out_data_void;
-
 	unsigned total_samples = stereo ? sample_count*2 : sample_count;
 	uint8_t *in_data = new uint8_t[total_samples];
+	int16_t	*out_data = new int16_t[total_samples];
+
 	in->read((char *)in_data, total_samples); // Read 8-bit samples
 
 	// Convert 8-bit to 16
@@ -1667,6 +1678,8 @@ static void u8_expand(
 		*outp++ = ((int16_t)(*inp++) - 128) * 256;
 	}
 	
+	data = (unsigned char *)out_data;
+
 	delete [] in_data;
 }
 
@@ -1813,12 +1826,12 @@ public:
 // out_data[].	The output buffer must have (sample_count*2)
 // bytes for mono, or (sample_count*4) bytes for stereo.
 static void adpcm_expand(
-	void* out_data_void,
+	unsigned char* &data,
 	stream* in,
 	int sample_count,	// in stereo, this is number of *pairs* of samples
 	bool stereo)
 {
-	int16_t*	out_data = (int16_t*) out_data_void;
+	int16_t* out_data = new int16_t[stereo ? sample_count*2 : sample_count];
 
 	// Read header.
 	int	n_bits = in->read_uint(2) + 2;	// 2 to 5 bits
@@ -1874,6 +1887,8 @@ static void adpcm_expand(
 			}
 		}
 	}
+
+	data = (unsigned char *)out_data;
 }
 
 } // namespace gnash

@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.41 2007/05/15 10:47:50 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.42 2007/05/18 10:25:43 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -88,33 +88,7 @@ int	GST_sound_handler::create_sound(
 
 	switch (format)
 	{
-	// TODO: Do we need to do the raw-data-convert? Can't Gstreamer handle it?
-	case FORMAT_RAW:
-/*	caps info:
-    audio/x-raw-int
-                rate: [ 1, 2147483647 ]
-            channels: [ 1, 8 ]
-            endianness: { 1234, 4321 }
-                width: 8
-                depth: [ 1, 8 ]
-                signed: { true, false }*/
-		sounddata->data = new guint8[data_bytes];
-		if (!sounddata->data) { 
-			gnash::log_error(_("Could not allocate space for data in sound handler"));
-			return -1;
-		}
-		memcpy(sounddata->data, data, data_bytes);
-		break;
-
 	case FORMAT_NATIVE16:
-/*	caps info:
-    audio/x-raw-int
-                rate: [ 1, 2147483647 ]
-            channels: [ 1, 8 ]
-            endianness: { 1234, 4321 }
-                width: 16
-                depth: [ 1, 16 ]
-                signed: { true, false }*/
 		sounddata->data = new guint8[data_bytes];
 		if (!sounddata->data) { 
 			gnash::log_error(_("Could not allocate space for data in sound handler"));
@@ -134,6 +108,7 @@ int	GST_sound_handler::create_sound(
 
 		break;
 
+	case FORMAT_RAW:
 	case FORMAT_ADPCM:
 	case FORMAT_UNCOMPRESSED:
 		// These should have been converted to FORMAT_NATIVE16
@@ -599,19 +574,6 @@ void GST_sound_handler::detach_aux_streamer(void* /*owner*/)
 {
 	gnash::log_unimpl(__PRETTY_FUNCTION__);
 }
-
-void GST_sound_handler::convert_raw_data(
-	int16_t** /*adjusted_data*/,
-	int* /*adjusted_size*/,
-	void* /*data*/,
-	int /*sample_count*/,
-	int /*sample_size*/,
-	int /*sample_rate*/,
-	bool /*stereo*/)
-{
-	gnash::log_unimpl(__PRETTY_FUNCTION__);
-}
-
 
 gnash::sound_handler*	gnash::create_sound_handler_gst()
 // Factory.
