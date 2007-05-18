@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: x11.m4,v 1.9 2007/05/18 01:26:01 nihilus Exp $
+dnl $Id: x11.m4,v 1.10 2007/05/18 03:52:23 martinwguy Exp $
 
 AC_DEFUN([GNASH_PATH_X11],
 [
@@ -71,7 +71,7 @@ AC_DEFUN([GNASH_PATH_X11],
     newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/X11R6/lib ${libslist}"
     for i in $newlist; do
      if test -f $i/libX11.a -o -f $i/libX11.${shlibext}; then
-       if x"${i}" != x"/usr/lib"; then
+       if test x"${i}" != x"/usr/lib"; then
          ac_cv_path_x11_lib="-L$i -lX11"
        else
          ac_cv_path_x11_lib="-lX11"
@@ -95,7 +95,7 @@ AC_DEFUN([GNASH_PATH_X11],
 
   for i in $newlist; do
     if test -f $i/libXplugin.a -o -f $i/libXplugin.${shlibext}; then
-      if x"${i}" != x"/usr/lib"; then
+      if test x"${i}" != x"/usr/lib"; then
         ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -L$i -lXplugin"
       else
         ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXplugin"

@@ -3,6 +3,7 @@
 	* configure.ac: Change package help message format
 	  and fix typo MYSQC_CFLAGS
 	* backend/sound_handler.h: Remove old adpcm_expand() decl
+	* macros/x11.m4: Two typoes "if x${a} != xfoo"
 
 2007-05-17  Rob Savoye  <rob@bertha.welcomehome.org>
 
