@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.102 2007/05/18 10:25:43 martinwguy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.103 2007/05/18 15:39:51 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1398,14 +1398,15 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
     // The format in the input file is in stream_input_*
     sound_handler::format_type format = stream_input_format;
 
+    unsigned sample_count = data_bytes;
+    if (stream_input_stereo)  sample_count /= 2;
+    if (stream_input_is16bit) sample_count /= 2;
+
     sound_expand(in, format,
 		 stream_input_is16bit, stream_input_stereo,
 		 data, data_bytes);
     // "format" now reflects what we hand(ed) to the sound drivers.
-
-    unsigned sample_count = data_bytes;
-    if (stream_input_stereo)  sample_count /= 2;
-    if (stream_input_is16bit) sample_count /= 2;
+    // "data_bytes" now reflects the size of the uncompressed data.
 
     // Fill the data on the apropiate sound, and receives the starting point
     // for later "start playing from this frame" events.

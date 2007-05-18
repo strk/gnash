@@ -59,6 +59,7 @@
 	  upsampling correctly
 	* backend/sound_handler_sdl.cpp: Remove bug 19750 that garbled
 	  SOUNDSTREAM audio.
+	* server/swf/tag_loaders.cpp: Bug fix: calculate # samples correctly.
 
 2007-05-17  Rob Savoye  <rob@bertha.welcomehome.org>
 
