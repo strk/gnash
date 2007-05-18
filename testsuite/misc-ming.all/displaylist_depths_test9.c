@@ -19,7 +19,7 @@
 /*
  * Zou Lunkai, zoulunkai@gmail.com
  *
- * Test how swapDepth affects DisplayList refresh on gotoAndPlay(current-X).
+ * Test "Jumping backward with dynamic instances in static depth zone removed"
  *
  * run as ./displaylist_depths_test9
  *
