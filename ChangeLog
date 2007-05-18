@@ -21,7 +21,8 @@
 	* backend/sound_handler.h: Remove old adpcm_expand() decl
 	* macros/x11.m4: Two typoes "if x${a} != xfoo"
 	* utilities/parser.cpp: Shut compiler up
-	* backend/sound_handler_gst.cpp, testsuite/sound_handler_test.cpp:
+	* backend/sound_handler_gst.cpp, testsuite/sound_handler_test.cpp,
+	  testsuite/sound_handler_test.cpp:
 	  Remove never-implemented stub declaration.
 	* server/swf/tag_loaders.cpp: Rewrite of sample-reading code to decode
 	  all linear formats in one place.
