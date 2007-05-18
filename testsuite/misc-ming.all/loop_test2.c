@@ -34,7 +34,7 @@
  *
  *  frame2: two static characters are placed
  *  frame3: the two characters are depth-swapped
- *  frame4: jump to frame 1 and stop.
+ *  frame4: jump to frame 2 and stop.
  *
  * Expected behaviour:
  *
