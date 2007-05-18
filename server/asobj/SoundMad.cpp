@@ -262,8 +262,9 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 					int sample_count = outsize / ((so->frame.header.mode) ? 4 : 2);
 
 					// Convert to needed samplerate
-					s->convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 
-							so->frame.header.samplerate, so->frame.header.mode);
+					s->convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 2, 
+							so->frame.header.samplerate, so->frame.header.mode,
+							44100, true/*stereo*/);
 
 					// Hopefully this won't happen
 					if (!adjusted_data) {

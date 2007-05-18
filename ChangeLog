@@ -29,6 +29,15 @@
 	  at decoding other linear audio formats.
 	* backend/sound_handler_gst.cpp, testsuite/sound_handler_test.cpp:
 	  Replace never-implemented stub declarations, symptom of a deeper ill.
+	* backend/sound_handler.h,
+	  backend/sound_handler_gst.cpp,
+	  backend/sound_handler_gst.h,
+	  backend/sound_handler_sdl.cpp,
+	  backend/sound_handler_sdl.h,
+	  testsuite/sound_handler_test.cpp,
+	  testsuite/sound_handler_test.h,
+	  server/asobj/SoundMad.cpp:
+	  Add two params to convert_raw_data so that it is SDL-independent
 
 2007-05-17  Rob Savoye  <rob@bertha.welcomehome.org>
 

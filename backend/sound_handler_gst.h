@@ -156,7 +156,8 @@ public:
 	/// Converts input data to the SDL output format.
 	virtual void	convert_raw_data(int16_t** adjusted_data,
 			  int* adjusted_size, void* data, int sample_count,
-			  int sample_size, int sample_rate, bool stereo);	//vv
+			  int sample_size, int sample_rate, bool stereo,
+			  int m_sample_rate, bool m_stereo);
 };
 
 #endif // SOUND_HANDLER_GST_H

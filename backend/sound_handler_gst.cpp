@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.42 2007/05/18 10:25:43 martinwguy Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.43 2007/05/18 12:51:47 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -571,6 +571,20 @@ void GST_sound_handler::attach_aux_streamer(aux_streamer_ptr /*ptr*/, void* /*ow
 }
 
 void GST_sound_handler::detach_aux_streamer(void* /*owner*/)
+{
+	gnash::log_unimpl(__PRETTY_FUNCTION__);
+}
+
+void GST_sound_handler::convert_raw_data(
+	int16_t** /*adjusted_data*/,
+	int* /*adjusted_size*/,
+	void* /*data*/,
+	int /*sample_count*/,
+	int /*sample_size*/,
+	int /*sample_rate*/,
+	bool /*stereo*/,
+	int /*m_sample_rate*/,
+	bool /*m_stereo*/)
 {
 	gnash::log_unimpl(__PRETTY_FUNCTION__);
 }

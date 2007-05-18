@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.57 2007/05/18 10:25:43 martinwguy Exp $
+// $Id: sound_handler_sdl.cpp,v 1.58 2007/05/18 12:51:47 martinwguy Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -94,9 +94,10 @@ int	SDL_sound_handler::create_sound(
 	case FORMAT_NATIVE16:
 
 		if (data_bytes > 0) {
-			convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 2, sample_rate, stereo);
+			convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 2, sample_rate, stereo,
+					 audioSpec.freq, (audioSpec.channels == 2 ? true : false));
 			if (!adjusted_data) {
-				gnash::log_error(_("Some kind of error occurred with adpcm sound data"));
+				gnash::log_error(_("Some kind of error occurred with sound data"));
 				return -1;
 			}
 			sounddata->data_size = adjusted_size;
@@ -166,7 +167,8 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 		int16_t*	adjusted_data = 0;
 		int	adjusted_size = 0;
 
-		convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 2, sounddata->sample_rate, sounddata->stereo);
+		convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 2, sounddata->sample_rate, sounddata->stereo,
+				 audioSpec.freq, (audioSpec.channels == 2 ? true : false));
 		if (!adjusted_data || adjusted_size < 1) {
 			gnash::log_error(_("Some kind of error with resampling sound data"));
 			return -1;
@@ -529,14 +531,17 @@ void SDL_sound_handler::convert_raw_data(
 	void* data,
 	int sample_count,
 	int sample_size,
-	int sample_rate,
-	bool stereo)
+	// stereo, sample_rate are those of the incoming sample
+	int sample_rate, 
+	bool stereo,
+	// m_stereo etc are the format we must convert to.
+	int m_sample_rate,
+	bool m_stereo)
 // VERY crude sample-rate & sample-size conversion.  Converts
 // input data to the SDL output format (SAMPLE_RATE,
 // stereo, 16-bit native endianness)
 {
-	bool m_stereo = (audioSpec.channels == 2 ? true : false);
-	int m_sample_rate = audioSpec.freq;
+	assert(sample_size == 2);
 
 	// simple hack to handle dup'ing mono to stereo
 	if ( !stereo && m_stereo)
@@ -545,6 +550,7 @@ void SDL_sound_handler::convert_raw_data(
 	}
 
 	// simple hack to lose half the samples to get mono from stereo
+	// Unfortunately, this gives two copies of the left channel.
 	if ( stereo && !m_stereo)
 	{
 		sample_rate <<= 1;
@@ -564,28 +570,15 @@ void SDL_sound_handler::convert_raw_data(
 	}
 
 	int	output_sample_count = (sample_count * dup * (stereo ? 2 : 1)) / inc;
-
 	int16_t*	out_data = new int16_t[output_sample_count];
 	*adjusted_data = out_data;
 	*adjusted_size = output_sample_count * 2;	// 2 bytes per sample
 
-	if (sample_size == 1)
-	{
-		// Expand from 8 bit unsigned to 16 bit signed.
-		uint8_t*	in = (uint8_t*) data;
-		for (int i = 0; i < output_sample_count; i += dup)
-		{
-			uint8_t	val = *in;
-			for (int j = 0; j < dup; j++)
-			{
-				*out_data++ = (int(val) - 128) * 256 ;
-			}
-			in += inc;
-		}
-	}
-	else
-	{
-		// 16-bit to 16-bit conversion.
+	if (inc == 1 && dup == 1) {
+		// Speed up no-op case
+		memcpy(out_data, data, output_sample_count * sizeof(int16_t));
+	} else {
+		// crude sample rate conversion.
 		int16_t*	in = (int16_t*) data;
 		for (int i = 0; i < output_sample_count; i += dup)
 		{
@@ -937,7 +930,8 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 
 						// Convert to needed samplerate
 						handler->convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 
-								sounddata->sample_rate, sounddata->stereo);
+								sounddata->sample_rate, sounddata->stereo,
+								handler->audioSpec.freq, (handler->audioSpec.channels == 2 ? true : false));
 
 						// Hopefully this wont happen
 						if (!adjusted_data) {

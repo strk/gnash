@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.6 2007/05/18 03:17:22 martinwguy Exp $ */
+/* $Id: sound_handler.h,v 1.7 2007/05/18 12:51:47 martinwguy Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -137,7 +137,8 @@ public:
 	// Converts input data to the SDL output format.
 	virtual void	convert_raw_data(int16_t** adjusted_data,
 			  int* adjusted_size, void* data, int sample_count,
-			  int sample_size, int sample_rate, bool stereo) = 0;
+			  int sample_size, int sample_rate, bool stereo,
+			  int m_sample_rate, bool m_stereo) = 0;
 
 	virtual ~sound_handler() {};
 };
