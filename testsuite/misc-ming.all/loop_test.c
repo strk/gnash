@@ -20,11 +20,26 @@
  * Zou Lunkai, zoulunkai@gmail.com
  *
  * Test for movie loop.
- * 
- * The _root movie has 30 frames. 
  *
- * Normally, you can see both the red and black squares overlap each
+ * Timeline:
+ * 
+ *   Frame  | 1 | 2 | 3 | 
+ *  --------+---+---+---+
+ *   Event  |PP |   | M |
+ * 
+ *  P = place (by PlaceObject2)
+ *  M = move to another depth (by swapDepth)
+ *
+ * Description:
+ *
+ *  frame1: two static characters are placed
+ *  frame3: the two characters are depth-swapped
+ *
+ * Expected behaviour:
+ *
+ *  Normally, you can see both the red and black squares overlap each
  *  other with equal time.
+ *  A single instance of the two characters is created.
  *
  * run as ./loop_test
  */
@@ -44,14 +59,19 @@ SWFAction  action_in_root(void);
 SWFAction  action_in_root()
 {
   SWFAction ac;
-  ac = compileSWFActionCode(" \
-      var mc1_depth = movieClip1.getDepth(); \
-      var mc2_depth = movieClip2.getDepth(); \
-      movieClip1.swapDepths(movieClip2); \
-  ");
-  // we're not loading dejagnu clip !
-  //_root.check_equals(movieClip1.getDepth(), mc2_depth); 
-  //_root.check_equals(movieClip2.getDepth(), mc1_depth);
+  ac = compileSWFActionCode(
+      "var mc1_depth = movieClip1.getDepth();"
+      "var mc2_depth = movieClip2.getDepth();"
+      "movieClip1.swapDepths(movieClip2);"
+      "_root.check_equals(movieClip1.getDepth(), mc2_depth);" 
+      "_root.check_equals(movieClip2.getDepth(), mc1_depth);"
+      "if ( ++runs > 5 )  {"
+      "  _root.check_equals(mc1Constructed, 1);"
+      "  _root.check_equals(mc2Constructed, 1);"
+      "  totals();"
+      "  stop();"
+      "}"
+  );
   return ac;
 }
 
@@ -79,9 +99,10 @@ main(int argc, char** argv)
   
   mo = newSWFMovie();
   SWFMovie_setDimension(mo, 800, 600);
+  SWFMovie_setRate(mo, 6);
 
-  //dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
-  //SWFMovie_add(mo, (SWFBlock)dejagnuclip);
+  dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
+  SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   //SWFMovie_nextFrame(mo); 
 
 
@@ -97,14 +118,17 @@ main(int argc, char** argv)
 
   SWFDisplayItem it1, it2;
   it1 = SWFMovie_add(mo, (SWFBlock)mc1);  //add movieClip1 to the _root
-  it2 = SWFMovie_add(mo, (SWFBlock)mc2);  //add movieClip2 to the _root
   SWFDisplayItem_setName(it1, "movieClip1"); //name movieClip1
+  SWFDisplayItem_addAction(it1, newSWFAction("_root.mc1Constructed++;"),
+		  SWFACTION_CONSTRUCT);
+
+  it2 = SWFMovie_add(mo, (SWFBlock)mc2);  //add movieClip2 to the _root
   SWFDisplayItem_setName(it2, "movieClip2"); //name movieClip2
+  SWFDisplayItem_addAction(it2, newSWFAction("_root.mc2Constructed++;"),
+		  SWFACTION_CONSTRUCT);
   
-  for(i=0; i<29; i++)
-  {
-    SWFMovie_nextFrame(mo); 
-  }
+  SWFMovie_nextFrame(mo); 
+  SWFMovie_nextFrame(mo); 
 
   ac =  action_in_root();
   SWFMovie_add(mo, (SWFBlock)ac);

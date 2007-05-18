@@ -1,3 +1,9 @@
+2007-05-18 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: loop_test-Runner.cpp, loop_test.c:
+	  Make loop_test.swf self-contained. Use the runner for checking
+	  invalidated bounds and rendering.
+
 2007-05-18  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* backend/sound_handler.cpp: Include cstring so memcpy is

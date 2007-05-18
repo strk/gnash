@@ -57,7 +57,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	// TODO: check why we need this !!
 	//       I wouldn't want the first advance to be needed
-	tester.advance();
+	//tester.advance();
 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
@@ -66,66 +66,73 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
-	check_equals(root->get_frame_count(), 30);
-
-	const character* movieClip1 = tester.findDisplayItemByName(*root, "movieClip1");
-	check(movieClip1);
-	check_equals(movieClip1->get_depth(), 1+character::staticDepthOffset);
-
-	const character* movieClip2 = tester.findDisplayItemByName(*root, "movieClip2");
-	check(movieClip2);
-	check_equals(movieClip2->get_depth(), 2+character::staticDepthOffset);
-
-	// Advance to frame 27
-	for (int i=root->get_current_frame(); i<28; ++i) {
-		tester.advance();
-	}
-
-	// In frame 29, a swapDepth() action will
-	// change the characters depth
-	tester.advance();
-	check_equals(root->get_current_frame(), 29);
-	check_equals(movieClip1->get_depth(), 2+character::staticDepthOffset);
-	check_equals(movieClip2->get_depth(), 1+character::staticDepthOffset);
-
-	// Now keep advancing until last frame is reached
-	// (29, as framecount is 0-based)
-	for (int i=root->get_current_frame(); i<29; ++i) {
-		tester.advance();
-	}
-
-	check_equals(root->get_current_frame(), 29);
-	check_equals(movieClip1->get_depth(), 2+character::staticDepthOffset);
-	check_equals(movieClip2->get_depth(), 1+character::staticDepthOffset);
-
-
-	// Next advance will make the movie restart
-	tester.advance();
+	size_t framecount = root->get_frame_count();
+	check_equals(framecount, 3);
 	check_equals(root->get_current_frame(), 0);
 
-	// We expect the depth to be kept on restart
-	check_equals(movieClip1->get_depth(), 2+character::staticDepthOffset);
-	check_equals(movieClip2->get_depth(), 1+character::staticDepthOffset);
+	rgba black(0,0,0,255);
+	rgba red(255,0,0,255);
+	rgba white(255,255,255,255);
 
-	// ... until next SwapDepth ...
+	// Advance till the movie is stopped (or 10 loops are performed)
+	bool blackOverRed=true;
+	for (size_t i=0; i<=framecount*10; ++i)
+	{
+		check_equals(root->get_current_frame(), i%framecount);
 
-	for (int i=root->get_current_frame(); i<28; ++i) {
+		// Out of any character
+		check_pixel(317, 430, 2, white, 2);
+
+		// Fully on the red square: 317,330
+		check_pixel(317, 330, 2, red, 2);
+
+		// Fully on the black square: 400,330
+		check_pixel(400, 330, 2, black, 2);
+
+		// Intersection of the two squares: 343,330
+		// This is black or red depending on loop count
+		if ( blackOverRed )
+		{
+			check_pixel(343, 330, 2, black, 2);
+		}
+		else
+		{
+			check_pixel(343, 330, 2, red, 2);
+		}
+
 		tester.advance();
+
+		// Let's break if we stopped, as we'll print totals() thus
+		// enlarging invalidated bounds too ...
+		if (root->get_play_state() == sprite_instance::STOP) break;
+
+		// Compute 1-based currentFrame
+		size_t currentFrame = root->get_current_frame()+1;
+
+		if ( currentFrame == 3 ) // We swap depths here !
+		{
+			blackOverRed = !blackOverRed;
+			
+			// Check the intersection of the two characters to
+			// be invalidated
+			check( tester.getInvalidatedRanges().contains(343, 330) );
+		}
+		else if ( currentFrame == 1 ) // We restarted here !
+		{
+			assert(i > 1); // to ensure we looped back
+
+			// Not sure if invalidated ranges should be null here.. 
+			// visuall, it seems so, but loop-back is too complex
+			// to be sure (ie: xtrace window text might be reset or something)
+			// I checked that it's not resetDisplayList invalidating it...
+			xcheck( tester.getInvalidatedRanges().isNull() );
+		}
+		else // we did nothing here...
+		{
+			check( tester.getInvalidatedRanges().isNull() );
+		}
+
 	}
 
-	check_equals(movieClip1->get_depth(), 2+character::staticDepthOffset);
-	check_equals(movieClip2->get_depth(), 1+character::staticDepthOffset);
-
-	// we expect depths to be swapped again 
-	tester.advance();
-	check_equals(root->get_current_frame(), 29);
-	check_equals(movieClip1->get_depth(), 1+character::staticDepthOffset);
-	check_equals(movieClip2->get_depth(), 2+character::staticDepthOffset);
-
-	// .. and the new deptsh to be kept at restart
-	tester.advance();
-	check_equals(root->get_current_frame(), 0);
-	check_equals(movieClip1->get_depth(), 1+character::staticDepthOffset);
-	check_equals(movieClip2->get_depth(), 2+character::staticDepthOffset);
 }
 
