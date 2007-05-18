@@ -73,6 +73,7 @@ check_PROGRAMS = \
 	root_stop_test \
 	root_stop_testrunner \
 	loop_test \
+	loop_test2 \
 	loop_test-Runner \
 	place_object_test \
 	move_object_test \
@@ -191,6 +192,7 @@ check_SCRIPTS = \
 	static_vs_dynamic1_testrunner \
 	static_vs_dynamic2_testrunner \
 	getTimer_testrunner \
+	loop_test2runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -353,6 +355,19 @@ loop_test_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
+loop_test2_SOURCES =	\
+	loop_test2.c	\
+	ming_utils.h		\
+	ming_utils.c		\
+	$(NULL)
+loop_test2_LDADD = $(MING_LIBS)
+
+loop_test2.swf: loop_test2
+	./loop_test2 $(top_srcdir)/testsuite/media
+
+loop_test2runner: $(srcdir)/../generic-testrunner.sh loop_test2.swf
+	sh $< -f20 $(top_builddir) loop_test2.swf > $@
+	chmod 755 $@
 
 key_event_test_SOURCES =	\
 	key_event_test.c	\
@@ -1405,6 +1420,7 @@ TEST_CASES = \
 	getTimer_testrunner \
 	Video-EmbedSquareTestRunner \
 	NetStream-SquareTestRunner \
+	loop_test2runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
