@@ -17,6 +17,8 @@
 
 #include "sound_handler.h"
 
+#include <cstring>
+
 namespace gnash {
 
 // VERY crude sample-rate conversion.

@@ -1,5 +1,8 @@
 2007-05-18  Rob Savoye  <rob@bertha.welcomehome.org>
 
+	* backend/sound_handler.cpp: Include cstring so memcpy is
+	defined.
+
 	* libbase/Makefile.am: Add makefile rules from libltd.
 
 2007-05-18 Sandro Santilli <strk@keybit.net>
