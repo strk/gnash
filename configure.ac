@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.318 2007/05/18 10:14:10 strk Exp $
+dnl $Id: configure.ac,v 1.319 2007/05/18 19:39:20 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1428,14 +1428,23 @@ fi
       echo "               or reconfigure using --enable-media=ffmpeg"
       nogo=true
     fi
-  else
-    if test x"$media_handler" = x"ffmpeg"; then
-      if test x"$FFMPEG_LIBS" != x; then
-        echo "        MP3 and video support enabled through ffmpeg"
-        if test x"${ffmpeg_version}" != xok; then
-          echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed."
-          echo "               This version of ffmpeg may not work!"
-          echo "               Version 51.27.0 or newer is highly recommended."
+  fi
+
+  if test x"$media_handler" = x"ffmpeg"; then
+    if test x"$FFMPEG_LIBS" != x; then
+      echo "        MP3 and video support enabled through ffmpeg"
+      if test x"${ffmpeg_version}" != xok; then
+        echo "        ERROR: You have version ${ffmpeg_version} of ffmpeg installed."
+        echo "               This version of ffmpeg may not work!"
+        echo "               Version 51.27.0 or newer is highly recommended."
+        nogo=true
+      else
+	avformat_h=`echo $avcodec_h | sed 's/avcodec.h/avformat.h/'`
+	if test ! -f "$avformat_h"; then
+	  echo "        ERROR: FFMPEG's libavcodec header is installed but not libavformat."
+          echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu"
+          echo "               or .deb users: apt-get install libavformat-dev"
+          echo "               or reconfigure with --enable-media=mad"
 	  nogo=true
 	else
           if test x"$FFMPEG_CFLAGS" != x; then
@@ -1445,13 +1454,13 @@ fi
           fi
           echo "        FFMPEG libs are: $FFMPEG_LIBS"
 	fi
-      else
-        echo "        ERROR: No FFMPEG development package installed!"
-        echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu"
-        echo "               or .deb users: apt-get install libavformat-dev"
-        echo "               or reconfigure with --enable-media=mad"
-        nogo=true
       fi
+    else
+      echo "        ERROR: No FFMPEG development package installed!"
+      echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu"
+      echo "               or .deb users: apt-get install libavformat-dev"
+      echo "               or reconfigure with --enable-media=mad"
+      nogo=true
     fi
   fi
 

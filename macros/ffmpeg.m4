@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.40 2007/05/15 16:31:02 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.41 2007/05/18 19:39:19 martinwguy Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -40,13 +40,20 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   if test x${cross_compiling} = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_incl}" = x; then
       if $PKG_CONFIG --exists libavcodec; then
-         ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec`
-         CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
+	# Some systems return /usr/include/ffmpeg, others /usr/include.
+	# We use #include <ffmpeg/avcodec.h> everywhere so weed out funny
+	# values into the short form.
+
+	# Here pkg-config outputs two spaces on the end, so match those too!
+	ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec | sed 's:/ffmpeg *$::'`
+        CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
       fi
-      topdir=`$PKG_CONFIG --cflags-only-I libavcodec | sed -e 's:-I::g' | sed -e 's:.* /:/:' -e 's: ::g'`
+      topdir=`$PKG_CONFIG --cflags-only-I libavcodec | sed -e 's:-I::g' -e 's:.* /:/:' -e 's: ::g'`
+      # Again adjust for ffmpeg/ foolery
+      topdir=`echo "$topdir" | sed 's:/ffmpeg *$::'`
       # Gets "" if not installed
       if test x"$topdir" != x; then
-	      avcodec_h="$topdir/avcodec.h"
+	avcodec_h="$topdir/ffmpeg/avcodec.h"
       fi
     fi
   fi
@@ -58,7 +65,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
         ac_cv_path_ffmpeg_incl="-I$i"
         CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
         topdir=$i
-	      avcodec_h="$i/ffmpeg/avcodec.h"
+	avcodec_h="$i/ffmpeg/avcodec.h"
         break
       fi
     done
@@ -67,14 +74,6 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
   if test x"${ac_cv_path_ffmpeg_incl}" = x; then
     if test x${cross_compiling} = xno; then
       AC_CHECK_HEADERS(ffmpeg/avcodec.h, [ac_cv_path_ffmpeg_incl=""])
-    fi
-  else
-    AC_MSG_CHECKING([for ffmpeg header])
-    if test -f $i/ffmpeg/avformat.h; then
-      AC_MSG_RESULT([yes]);
-    else
-      AC_MSG_RESULT([no])
-      AC_MSG_WARN([you need to install the avformat package!])
     fi
   fi
 
@@ -125,7 +124,9 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     ffmpeg_version=ok # trust the user-specified dir
   fi
 
-  if test x"${ac_cv_path_ffmpeg_incl}" != x ; then
+  # Eliminate the pointless -I/usr/include, which can happen
+  if test x"${ac_cv_path_ffmpeg_incl}" != x \
+       -a x"${ac_cv_path_ffmpeg_incl}" != x-I/usr/include ; then
     FFMPEG_CFLAGS="${ac_cv_path_ffmpeg_incl}"
   else
     FFMPEG_CFLAGS=""
@@ -317,7 +318,8 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     fi
   fi                            dnl end of all optional library tests
 
-  if test x"${ac_cv_path_ffmpeg_lib}" != x; then
+  # Set final compilation flags, eliminating the pointless "-I/usr/include"
+  if test x"${ac_cv_path_ffmpeg_lib}" != x ; then
     FFMPEG_LIBS="${ac_cv_path_ffmpeg_lib}"
   else
     FFMPEG_LIBS=""
