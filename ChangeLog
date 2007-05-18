@@ -1,5 +1,9 @@
 2007-05-18 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamGst.cpp: provide a buildFLVPipeline() calling
+	  the video/audio versions internally and locking the pipelineMutex.
+	  Lock the pipelineMutex from buildPipeline() too. Document locking
+	  in header.
 	* testsuite/misc-ming.all/: loop_test-Runner.cpp, loop_test.c:
 	  Make loop_test.swf self-contained. Use the runner for checking
 	  invalidated bounds and rendering.

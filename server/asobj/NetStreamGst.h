@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamGst.h,v 1.22 2007/05/16 17:50:03 tgc Exp $ */
+/* $Id: NetStreamGst.h,v 1.23 2007/05/18 16:23:28 strk Exp $ */
 
 #ifndef __NETSTREAMGST_H__
 #define __NETSTREAMGST_H__
@@ -72,31 +72,57 @@ private:
 
 	/// Creates the sound decoder and source element for playing FLVs
 	//
+	/// Does NOT Lock the pipeline mutex during operations, use buildFLVPipeline() for that.
+	///
 	/// @return true on success, false on failure
 	///
 	/// @param sound
 	///	Determines if sound should be setup. It is passed by reference 
-	/// and might be changed.
+	///     and might be changed.
 	///
 	bool buildFLVSoundPipeline(bool &sound);
 
 	/// Creates the video decoder and source element for playing FLVs
 	//
+	/// Does NOT Lock the pipeline mutex during operations, use buildFLVPipeline() for that.
+	///
 	/// @return true on success, false on failure
 	///
 	/// @param video
 	///	Determines if video should be setup. It is passed by reference 
-	/// and might be changed.
+	///     and might be changed.
 	///
 	bool buildFLVVideoPipeline(bool &video);
 
+	/// Creates the decoder and source element for playing FLVs
+	//
+	/// Locks the pipeline mutex during operations
+	///
+	///
+	/// @param video
+	///	Determines if video should be setup. It is passed by reference 
+	/// 	and might be changed.
+	///
+	/// @param sound
+	///	Determines if sound should be setup. It is passed by reference 
+	/// 	and might be changed.
+	///
+	/// @return true on success, false on failure
+	///
+	bool buildFLVPipeline(bool& video, bool& audio);
+
 	/// Creates the decoder and source element for playing non-FLVs
 	//
+	/// Locks the pipeline mutex during operations
+	///
 	/// @return true on success, false on failure
 	///
 	bool buildPipeline();
 
 	/// Unrefs (deletes) all the gstreamer elements. Used when the setup failed.
+	//
+	/// Locks the pipeline mutex during operations
+	///
 	void unrefElements();
 
 	/// Connect the video "handoff" signal
@@ -127,6 +153,8 @@ private:
 	/// Set pipeline state to GST_STATE_NULL
 	/// and disconnect handoff signals
 	//
+	/// Locks the pipeline mutex during operations
+	///
 	/// If the call needs be asynchronous, we'll wait for it.
 	/// TODO: implement the above
 	///
@@ -137,6 +165,8 @@ private:
 	/// connect handoff signals, send appropriate
 	/// notifications.
 	//
+	/// Locks the pipeline mutex during operations
+	///
 	/// If the call needs be asynchronous, we'll wait for it.
 	/// TOOD: implement the above
 	///
@@ -146,6 +176,8 @@ private:
 	/// Set pipeline state to GST_STATE_PAUSE,
 	/// connect handoff signals if not connected already
 	//
+	/// Locks the pipeline mutex during operations
+	///
 	/// If the call needs be asynchronous, we'll wait for it.
 	/// TOOD: implement the above
 	///

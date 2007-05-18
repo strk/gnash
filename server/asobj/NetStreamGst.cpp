@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.46 2007/05/17 13:38:17 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.47 2007/05/18 16:23:28 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -355,7 +355,9 @@ NetStreamGst::playbackStarter(NetStreamGst* ns)
 void
 NetStreamGst::unrefElements()
 {
-log_debug("unreffing elements");
+	log_debug("unreffing elements");
+
+	boost::mutex::scoped_lock lock(_pipelineMutex);
 
 	// TODO: Define an GstElement class for storing all these elements,
 	//       and have it's destructor take care of unreffing...
@@ -481,11 +483,26 @@ log_debug("unreffing elements");
 	}
 }
 
+bool
+NetStreamGst::buildFLVPipeline(bool& video, bool& audio)
+{
+	boost::mutex::scoped_lock lock(_pipelineMutex);
+
+	if ( ! buildFLVVideoPipeline(video) ) return false;
+	if ( audio )
+	{
+		if ( ! buildFLVSoundPipeline(audio) ) return false;
+	}
+
+	return true;
+
+}
 
 bool
 NetStreamGst::buildFLVVideoPipeline(bool &video)
 {
-	log_debug("Building FLV decoding pipeline");
+	log_debug("Building FLV video decoding pipeline");
+
 	FLVVideoInfo* videoInfo = m_parser->getVideoInfo();
 
 	bool doVideo = video;
@@ -597,6 +614,9 @@ NetStreamGst::buildFLVSoundPipeline(bool &sound)
 	if (!audioInfo) doSound = false;
 
 	if (doSound) {
+
+		log_debug("Building FLV video decoding pipeline");
+
 		audiosource = gst_element_factory_make ("fakesrc", NULL);
 		if ( ! audiosource )
 		{
@@ -661,6 +681,8 @@ bool
 NetStreamGst::buildPipeline()
 {
 	log_debug("Building non-FLV decoding pipeline");
+
+	boost::mutex::scoped_lock lock(_pipelineMutex);
 
 	// setup gnashnc source if we are not decoding FLV (our homegrown source element)
 	source = gst_element_factory_make ("gnashsrc", NULL);
@@ -738,17 +760,19 @@ NetStreamGst::startPlayback()
 	if (get_sound_handler()) sound = true;
 	
 	// Setup the decoder and source
-	if (m_isFLV) {
-		if (!buildFLVVideoPipeline(video)) {
+	// TODO: move the m_isFLV test into buildPipeline and just call that one...
+	if (m_isFLV)
+	{
+		if ( ! buildFLVPipeline(video, sound) )
+		{
 			unrefElements();
 			return;
 		}
-		if (sound && !buildFLVSoundPipeline(sound)) {
-			unrefElements();
-			return;
-		}
-	} else {
-		if (!buildPipeline()) {
+	}
+	else
+	{
+		if (!buildPipeline())
+		{
 			unrefElements();
 			return;
 		}
