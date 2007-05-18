@@ -7,7 +7,7 @@
     <para>
       The top level of Gnash has several libraries, <emphasis>libgnashbase</emphasis>,
       <emphasis>libgnashgeo</emphasis>, <emphasis>libgnashserver</emphasis>,
-      <emphasis>libgasnhasobjs</emphasis> and
+      <emphasis>libgnashasobjs</emphasis> and
       <emphasis>libgnashbackend</emphasis>. There are two utility programs 
       included for debug parsing and processing of Flash movie files
       which test the Actionscript interpreter. There is also a standalone
