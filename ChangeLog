@@ -1,3 +1,13 @@
+2007-05-18 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/getTimer_test.c
+	* server/vm/VM.{h,cpp}
+	* server/vm/ASHandlers.cpp
+	* gui/fb.cpp
+	  cleanup "ActionGetTimer" related stuff.
+	* server/movie_root.h
+	  remove unused get_timer, set_timer.
+	  
 2007-05-17  Martin Guy  <martinwguy@yahoo.it>
 
 	* configure.ac: Change package help message format
@@ -37,6 +47,11 @@
 	* testsuite/misc-ming.all/NetStream-SquareTestRunner.cpp:
 	  Adjust to simply run the self-contained tests.
 
+2007-05-17 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/getTimer_test.c:
+		make the time dependent tests be more tolerant
+	
 2007-05-17 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all: getTimer_test.c, Makefile.am

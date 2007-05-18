@@ -87,7 +87,7 @@ class VM {
 	int _swfversion;
 
 	/// Time when the VM get started
-	static uint64_t _start_time;
+	uint64_t _start_time;
 
 	/// Set the current Root movie.
 	//
@@ -141,8 +141,8 @@ public:
 	///
 	int getSWFVersion() const;
 
-	/// Get the time when VM was started
-	static uint64_t getStartTime();
+	/// Get the number of milliseconds since VM was started
+	uint64_t getTime();
 
 	/// Get version of the player, in a compatible representation
 	//

@@ -16,7 +16,15 @@
  *
  */ 
 /*
- * test ActionGetTimer, getTimer returns the time in milliseconds
+ * test ActionGetTimer, getTimer returns the time in milliseconds.
+ *
+ * TODO: use AS method "ifFrameLoaded" to ensure that all frames are loaded before
+ * testing getTimer().  
+ *
+ * Ming seems do not support "ifFrameLoaded" yet:(
+ * Take care that gprocessor does not support frame-rate-control!
+ * Take care that this test might fail if it is loaded from a network 
+ *   and the loading speed is too slow!
 */
 
 #include <stdlib.h>
@@ -53,30 +61,29 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo);  // frame1
   
+  // get current time in frame2
   add_actions(mo, "x1 = getTimer();");
-  // check that the timer was properly initialized
-  check(mo, "x1 > 0" );
   SWFMovie_nextFrame(mo); // frame2
-  
-  add_actions(mo, "x2 = getTimer();");
-  
-  // just delay some time here
-  add_actions(mo, " for(i=0; i<3000; i++) {} ");
-  
-  // check that the timer is working
-  check(mo, "x2 > x1" );
 
+  // just delay some time here
+  add_actions(mo, " for(i=0; i<1000; i++) {} ");
+  // get current time in frame3 
+  add_actions(mo, "x2 = getTimer();");
+  SWFMovie_nextFrame(mo); // frame3
+
+  // check that the timer is working
+  check(mo, "x1 > 0");
+  check(mo, "x2 > x1" );
   // this is dependent on frame rate(current setting is 1 second per frame)
   // check(mo, "x2 > 1000");
   check(mo, "x2 < 6000");
-
   // check that "getTimer" return a intergral number
   check(mo, "x2 == Math.ceil(x2)");
   check(mo, "x2 == Math.floor(x2)");
-  SWFMovie_nextFrame(mo); // frame3        
+  SWFMovie_nextFrame(mo); // frame4        
 
   add_actions(mo, "_root.totals(); stop();");
-  SWFMovie_nextFrame(mo);        
+  SWFMovie_nextFrame(mo); // frame5       
   
   //Output movie
   puts("Saving " OUTPUT_FILENAME );

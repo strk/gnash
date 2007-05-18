@@ -352,13 +352,8 @@ bool FBGui::run()
         timer = (double)tv.tv_sec + (double)tv.tv_usec / 1000000.0;
     }
   
-    // update global timer (getTimer())    
-    // (Udo): Just a quick hack. I suggest we solve this in a different way
-    gnash::movie_root* m = gnash::get_current_root();
-    m->set_timer(timer - start_timer);
-    
-    // advance movie	
-		Gui::advance_movie(this);
+	// advance movie	
+	Gui::advance_movie(this);
 	}
 	return true;
 }

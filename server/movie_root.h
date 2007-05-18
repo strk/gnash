@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.52 2007/05/01 18:02:51 strk Exp $ */
+/* $Id: movie_root.h,v 1.53 2007/05/18 06:05:38 zoulunkai Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -306,15 +306,6 @@ public:
 	{
 	    return m_background_color.m_a / 255.0f;
 	}
-
-	float	get_timer() const { return m_timer; }
-	
-	/// Sets the current movie timer in seconds.
-	//
-	/// (Udo): I think getTimer() should be handled *completely* 
-	/// in the AS VM... 
-	///
-	void set_timer(float value) { m_timer = value; }
 
 	/// Delegate to current top-level root sprite
 	void	restart() { _movie->restart(); }
