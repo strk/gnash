@@ -1,10 +1,8 @@
 2007-05-18 Zou Lunkai <zoulunkai@gmail.com>
 
-	* testsuite/misc-ming.all/getTimer_test.c
-	* server/vm/VM.{h,cpp}
-	* server/vm/ASHandlers.cpp
-	* gui/fb.cpp
-	  cleanup "ActionGetTimer" related stuff.
+	* testsuite/misc-ming.all/getTimer_test.c,
+	  server/vm/VM.{h,cpp}, server/vm/ASHandlers.cpp,
+	  gui/fb.cpp: cleanup "ActionGetTimer" related stuff.
 	* server/movie_root.h
 	  remove unused get_timer, set_timer.
 	  
