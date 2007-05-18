@@ -1,3 +1,7 @@
+2007-05-18  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* libbase/Makefile.am: Add makefile rules from libltd.
+
 2007-05-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test10.c:

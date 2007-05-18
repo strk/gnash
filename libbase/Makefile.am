@@ -21,14 +21,7 @@ EXTRA_DIST =
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
-if CONVENIENCE_LTDL
-noinst_LTLIBRARIES = libltdlc.la
-endif
-CLEANFILES = libltdl.la libltdlc.la
-
 lib_LTLIBRARIES =  libgnashbase.la
-
-libltdl_la_CPPFLAGS = $(LTDLINCL)
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I.. -I$(srcdir) \
@@ -73,12 +66,8 @@ if HAS_SDL
 SDL_FILE = tu_file_SDL.cpp
 libgnashbase_la_LIBADD += $(SDL_LIBS)
 else
-EXTRA_DIST += tu_file_SDL.cpp
+EXTRA_DIST += tu_file_SDL.cpp 
 endif
-
-libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
-libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
-libltdl_la_LIBADD = $(LIBADD_DL)
 
 libgnashbase_la_SOURCES = \
 	config.cpp \
@@ -151,6 +140,7 @@ noinst_HEADERS = \
 	FLVParser.h
 
 
+
 if USE_SOUND_GST
 libgnashbase_la_SOURCES += gstgnashsrc.c embedVideoDecoderGst.cpp
 noinst_HEADERS += gstgnashsrc.h embedVideoDecoderGst.h
@@ -167,6 +157,13 @@ endif
 
 libgnashbase_la_LDFLAGS = -release $(VERSION)
 
+libltdlc_la_CPPFLAGS = $(LTDLINCL)
+if CONVENIENCE_LTDL
+noinst_LTLIBRARIES = libltdlc.la
+libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+endif
+CLEANFILES = libltdl.la libltdlc.la
+
 if INSTALL_LTDL
 include_HEADERS =  $(top_srcdir)/libltdl/ltdl.h
 lib_LTLIBRARIES += libltdl.la
@@ -174,6 +171,9 @@ else
 noinst_HEADERS +=  $(top_srcdir)/libltdl/ltdl.h
 endif
 
+libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
+libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
+libltdl_la_LIBADD = $(LIBADD_DL)
 
 # We use our own rule to build the demo so it isn't built by default.
 # Since it doesn't contain a main() routine, we only try to compile,
