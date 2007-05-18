@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.7 2007/05/18 12:51:47 martinwguy Exp $ */
+/* $Id: sound_handler.h,v 1.8 2007/05/18 13:17:51 martinwguy Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -134,11 +134,11 @@ public:
 	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner) = 0;
 	virtual void	detach_aux_streamer(void* owner) = 0;
 
-	// Converts input data to the SDL output format.
-	virtual void	convert_raw_data(int16_t** adjusted_data,
+	// Converts audio input data to required sample rate/stereo.
+	static void	convert_raw_data(int16_t** adjusted_data,
 			  int* adjusted_size, void* data, int sample_count,
 			  int sample_size, int sample_rate, bool stereo,
-			  int m_sample_rate, bool m_stereo) = 0;
+			  int m_sample_rate, bool m_stereo);
 
 	virtual ~sound_handler() {};
 };

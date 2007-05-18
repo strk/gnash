@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.58 2007/05/18 12:51:47 martinwguy Exp $
+// $Id: sound_handler_sdl.cpp,v 1.59 2007/05/18 13:17:51 martinwguy Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -523,73 +523,6 @@ void	SDL_sound_handler::detach_aux_streamer(void* owner)
 {
 	--soundsPlaying;
 	m_aux_streamer.erase(owner);
-}
-
-void SDL_sound_handler::convert_raw_data(
-	int16_t** adjusted_data,
-	int* adjusted_size,
-	void* data,
-	int sample_count,
-	int sample_size,
-	// stereo, sample_rate are those of the incoming sample
-	int sample_rate, 
-	bool stereo,
-	// m_stereo etc are the format we must convert to.
-	int m_sample_rate,
-	bool m_stereo)
-// VERY crude sample-rate & sample-size conversion.  Converts
-// input data to the SDL output format (SAMPLE_RATE,
-// stereo, 16-bit native endianness)
-{
-	assert(sample_size == 2);
-
-	// simple hack to handle dup'ing mono to stereo
-	if ( !stereo && m_stereo)
-	{
-		sample_rate >>= 1;
-	}
-
-	// simple hack to lose half the samples to get mono from stereo
-	// Unfortunately, this gives two copies of the left channel.
-	if ( stereo && !m_stereo)
-	{
-		sample_rate <<= 1;
-	}
-
-	// Brain-dead sample-rate conversion: duplicate or
-	// skip input samples an integral number of times.
-	int	inc = 1;	// increment
-	int	dup = 1;	// duplicate
-	if (sample_rate > m_sample_rate)
-	{
-		inc = sample_rate / m_sample_rate;
-	}
-	else if (sample_rate < m_sample_rate)
-	{
-		dup = m_sample_rate / sample_rate;
-	}
-
-	int	output_sample_count = (sample_count * dup * (stereo ? 2 : 1)) / inc;
-	int16_t*	out_data = new int16_t[output_sample_count];
-	*adjusted_data = out_data;
-	*adjusted_size = output_sample_count * 2;	// 2 bytes per sample
-
-	if (inc == 1 && dup == 1) {
-		// Speed up no-op case
-		memcpy(out_data, data, output_sample_count * sizeof(int16_t));
-	} else {
-		// crude sample rate conversion.
-		int16_t*	in = (int16_t*) data;
-		for (int i = 0; i < output_sample_count; i += dup)
-		{
-			int16_t	val = *in;
-			for (int j = 0; j < dup; j++)
-			{
-				*out_data++ = val;
-			}
-			in += inc;
-		}
-	}
 }
 
 

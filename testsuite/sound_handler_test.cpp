@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: sound_handler_test.cpp,v 1.6 2007/05/18 12:51:47 martinwguy Exp $
+// $Id: sound_handler_test.cpp,v 1.7 2007/05/18 13:17:51 martinwguy Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -371,21 +371,6 @@ int TEST_sound_handler::test_times_started(int sound_handle) {
 	}
 
 }
-
-void TEST_sound_handler::convert_raw_data(
-	int16_t** /*adjusted_data*/,
-	int* /*adjusted_size*/,
-	void* /*data*/,
-	int /*sample_count*/,
-	int /*sample_size*/,
-	int /*sample_rate*/,
-	bool /*stereo*/,
-	int /*m_sample_rate*/,
-	bool /*m_stereo*/)
-{
-	gnash::log_msg("%s: unimplemented \n", __PRETTY_FUNCTION__);
-}
-
 
 gnash::sound_handler*	gnash::create_sound_handler_test()
 // Factory.

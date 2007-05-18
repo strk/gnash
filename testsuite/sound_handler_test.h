@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_test.h,v 1.3 2007/05/18 12:51:47 martinwguy Exp $
+// $Id: sound_handler_test.h,v 1.4 2007/05/18 13:17:51 martinwguy Exp $
 
 #ifndef SOUND_HANDLER_TEST_H
 #define SOUND_HANDLER_TEST_H
@@ -171,12 +171,6 @@ public:
 
 	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner);	//vv
 	virtual void	detach_aux_streamer(void* owner);	//vv
-
-	/// Converts input data to the SDL output format.
-	virtual void	convert_raw_data(int16_t** adjusted_data,
-			  int* adjusted_size, void* data, int sample_count,
-			  int sample_size, int sample_rate, bool stereo,
-			  int m_sample_rate, bool m_stereo);
 
 	/// Special test-fuction. Reports how many times this sound has been started
 	int test_times_started(int sound_handle);
