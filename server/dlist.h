@@ -227,10 +227,27 @@ public:
 	///
 	void clear_except(const DisplayList& exclude, bool call_unload=false);
 
-	/// Add all chars in the list
+	/// Add all characters in the list, maintaining depth-order
+	//
+	/// @param chars
+	///	The characters to add
+	///
+	/// @param replace
+	///	If true the given characters would replace any
+	///	pre-existing character at the same depth.
+	///
 	void addAll(std::vector<character*>& chars, bool replace);
 
-	/// Add chars in the list
+	/// Add a character in the list, maintaining depth-order
+	//
+	///
+	/// @param ch
+	///	The character to add
+	///
+	/// @param replace
+	///	If true the given character would replace any
+	///	pre-existing character at the same depth.
+	///
 	void add(character* ch, bool replace);
 
 	// It is executed only before the second and the subsequent

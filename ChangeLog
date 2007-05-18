@@ -1,5 +1,6 @@
 2007-05-18 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.h: document the addAll() and add() methods.
 	* server/asobj/NetStreamGst.cpp: provide a buildFLVPipeline() calling
 	  the video/audio versions internally and locking the pipelineMutex.
 	  Lock the pipelineMutex from buildPipeline() too. Document locking
