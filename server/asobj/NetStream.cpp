@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.48 2007/05/16 18:22:32 tgc Exp $ */
+/* $Id: NetStream.cpp,v 1.49 2007/05/19 21:45:03 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -563,31 +563,31 @@ NetStream::getStatusCodeInfo(StatusCode code)
 	{
 	
 		case bufferEmpty:
-			return make_pair("NetStream.Buffer.Empty", "status");
+			return std::pair<const char*, const char*>("NetStream.Buffer.Empty", "status");
 
 		case bufferFull:
-			return make_pair("NetStream.Buffer.Full", "status");
+			return std::pair<const char*, const char*>("NetStream.Buffer.Full", "status");
 
 		case bufferFlush:
-			return make_pair("NetStream.Buffer.Flush", "status");
+			return std::pair<const char*, const char*>("NetStream.Buffer.Flush", "status");
 
 		case playStart:
-			return make_pair("NetStream.Play.Start", "status");
+			return std::pair<const char*, const char*>("NetStream.Play.Start", "status");
 
 		case playStop:
-			return make_pair("NetStream.Play.Stop", "status");
+			return std::pair<const char*, const char*>("NetStream.Play.Stop", "status");
 
 		case seekNotify:
-			return make_pair("NetStream.Seek.Notify", "status");
+			return std::pair<const char*, const char*>("NetStream.Seek.Notify", "status");
 
 		case streamNotFound:
-			return make_pair("NetStream.Play.StreamNotFound", "error");
+			return std::pair<const char*, const char*>("NetStream.Play.StreamNotFound", "error");
 
 		case invalidTime:
-			return make_pair("NetStream.Seek.InvalidTime", "error");
+			return std::pair<const char*, const char*>("NetStream.Seek.InvalidTime", "error");
 
 		default:
-			return make_pair("","");
+			return std::pair<const char*, const char*>("","");
 	}
 }
 
