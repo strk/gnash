@@ -2,6 +2,7 @@
 
 	* server/asobj/NetStream.cpp: Got rid of make_pair in favor of
 	  std::pair<>();
+	* server/cxform.h: include <string>
 
 2007-05-19 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
@@ -10,7 +11,6 @@
 	  loops works. We now use condition variables to pause the decoding 
 	  loop. We now disconnect from the soundhandler when pausing.
 
->>>>>>> 1.3281
 2007-05-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: Makefile.am, loop_test2.c, loop_test3.c:
