@@ -151,8 +151,8 @@ public:
   const rect&	get_button_bound(int id) const {
     UNUSED(id);
     assert(0); // not implemented
-    return; //No whining
-  }
+    return NULL; //No whining
+Å  }
 	
 };
 
