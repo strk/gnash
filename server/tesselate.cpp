@@ -71,11 +71,14 @@
 // rationally deals with self-intersection by just overlapping parts
 // of the tesselated poly.
 
+/* $Id: tesselate.cpp,v 1.13 2007/05/19 22:24:48 nihilus Exp $ */
 
 #include "tesselate.h"
 #include "types.h"
 #include "utility.h"
 #include "container.h"
+
+#include <vector>
 
 namespace gnash {
 namespace tesselate {
