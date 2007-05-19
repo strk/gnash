@@ -61,7 +61,7 @@ double	tu_timer::profile_ticks_to_seconds(uint64_t ticks)
 
 uint64_t tu_timer::get_ticks()
 {
-	return get_profile_ticks()/1000.0;
+	return static_cast<uint64_t>(get_profile_ticks()/1000.0);
 }
 
 

@@ -1,3 +1,10 @@
+2007-05-19 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/tu_timer.cpp: Fixed a compiler warning.
+	* server/asobj/NetStreamFfmpeg.{h,cpp}: Changed the way the decoding
+	  loops works. We now use condition variables to pause the decoding 
+	  loop. We now disconnect from the soundhandler when pausing.
+
 2007-05-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: Makefile.am, loop_test2.c, loop_test3.c:

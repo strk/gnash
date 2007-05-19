@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.27 2007/05/15 13:01:28 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.28 2007/05/19 21:18:34 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -33,6 +33,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp> 
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/condition.hpp>
 
 #include "impl.h"
 #include "video_stream_instance.h"
@@ -201,6 +202,15 @@ public:
 
 private:
 
+	// Pauses the decoding - don't directly modify m_pause!!
+	void pauseDecoding();
+
+	// Unpauses/resumes the decoding - don't directly modify m_pause!!
+	void unpauseDecoding();
+
+	// Check is we need to update the video frame
+	void refreshVideoFrame();
+
 	int m_video_index;
 	int m_audio_index;
 	
@@ -220,23 +230,35 @@ private:
 	// Use for resampling audio
 	AudioResampler _resampler;
 
+	// The decoding thread
 	boost::thread* _decodeThread;
+
+	// Mutex used to make sure things arn't messed up when seeking and decoding (is it really necessary?)
 	boost::mutex decoding_mutex;
 
-	unsigned int runtime;
+	// Mutex and condition used to pause the decoding thread/loop when
+	// playback is paused, or when the video and audio queues are full
+	boost::mutex decode_wait_mutex;
+	boost::condition decode_wait;
 
-	// The current time-position of the video
-	double m_video_clock;
+	// The current time-position of the video in seconds
+	volatile double m_video_clock;
 
 	// The queues of audio and video data.
 	multithread_queue <raw_videodata_t*> m_qaudio;
 	multithread_queue <raw_videodata_t*> m_qvideo;
 
-	// The time ws started playing
-	double m_start_clock;
+	// The time we started playing
+	volatile double m_start_clock;
+
+	// When the queues are full, this is where we keep the audio/video frame
+	// there wasen't room for on its queue
 	raw_videodata_t* m_unqueued_data;
 
 	ByteIOContext ByteIOCxt;
+
+	// Time of when pause started
+	double m_time_of_pause;
 
 };
 

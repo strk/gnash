@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.52 2007/05/16 17:50:03 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.53 2007/05/19 21:18:34 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -64,7 +64,8 @@ NetStreamFfmpeg::NetStreamFfmpeg():
 	_decodeThread(NULL),
 
 	m_video_clock(0),
-	m_unqueued_data(NULL)
+	m_unqueued_data(NULL),
+	m_time_of_pause(0)
 {
 
 	ByteIOCxt.buffer = NULL;
@@ -80,11 +81,17 @@ void NetStreamFfmpeg::pause(int mode)
 {
 	if (mode == -1)
 	{
-		m_pause = ! m_pause;
+		if (m_pause) unpauseDecoding();
+		else pauseDecoding();
+		
+//		m_pause = ! m_pause;
 	}
 	else
 	{
-		m_pause = (mode == 0) ? true : false;
+		if (mode == 0) pauseDecoding();
+		else unpauseDecoding();
+
+//		m_pause = (mode == 0) ? true : false;
 	}
 	if (!m_pause && !m_go) { 
 		setStatus(playStart);
@@ -201,7 +208,7 @@ NetStreamFfmpeg::play(const std::string& c_url)
 	// Is it already playing ?
 	if (m_go)
 	{
-		if (m_pause) m_pause = false;
+		if (m_pause) unpauseDecoding(); //m_pause = false;
 		return 0;
 	}
 
@@ -221,7 +228,7 @@ NetStreamFfmpeg::play(const std::string& c_url)
 	}
 
 	m_go = true;
-	m_pause = true;
+	unpauseDecoding();//m_pause = true;
 
 	// This starts the decoding thread
 	_decodeThread = new boost::thread(boost::bind(NetStreamFfmpeg::av_streamer, this)); 
@@ -411,7 +418,6 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 		sound_handler* s = get_sound_handler();
 		if (s) s->attach_aux_streamer(audio_streamer, (void*) ns);
 
-//		ns->m_pause = false;
 		ns->m_start_onbuffer = true;
 
 		// Allocate a frame to store the decoded frame in
@@ -466,7 +472,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 	ns->m_video_index = -1;
 	ns->m_audio_index = -1;
 	//assert(ns->m_FormatCtx->nb_streams >= 0); useless assert. 
-	for (int i = 0; i < ns->m_FormatCtx->nb_streams; i++)
+	for (unsigned int i = 0; i < ns->m_FormatCtx->nb_streams; i++)
 	{
 		AVCodecContext* enc = ns->m_FormatCtx->streams[i]->codec; 
 
@@ -555,7 +561,7 @@ NetStreamFfmpeg::startPlayback(NetStreamFfmpeg* ns)
 
 	}
 
-	ns->m_pause = false;
+	ns->unpauseDecoding(); //ns->m_pause = false;
 }
 
 
@@ -601,67 +607,30 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 
 	ns->setStatus(playStart);
 
-	raw_videodata_t* video = NULL;
-
 	ns->m_video_clock = 0;
 
-	int delay = 0;
 	ns->m_start_clock = tu_timer::ticks_to_seconds(tu_timer::get_ticks());
+
 	ns->m_unqueued_data = NULL;
 
+	boost::mutex::scoped_lock lock(ns->decode_wait_mutex);
+
+	// Loop while we're playing
 	while (ns->m_go)
 	{
-		if (ns->m_pause)
+		// If paused, wait for being unpaused
+		if (ns->m_pause) ns->decode_wait.wait(lock);
+
+		// If we have problems with decoding - break
+		if (ns->read_frame() == false && ns->m_start_onbuffer == false && ns->m_qvideo.size() == 0)
 		{
-			double t = tu_timer::ticks_to_seconds(tu_timer::get_ticks());
-			usleep(100000);
-			ns->m_start_clock += tu_timer::ticks_to_seconds(tu_timer::get_ticks()) - t;
-			continue;
+			break;
 		}
 
-		if (ns->read_frame() == false && ns->m_start_onbuffer == false)
+		// If the queue is full we wait until someone notifies us that data is needed.
+		if (ns->m_qvideo.size() > 0 && ns->m_unqueued_data)
 		{
-			if (ns->m_qvideo.size() == 0)
-			{
-				break;
-			}
-		}
-
-		if (ns->m_qvideo.size() > 0)
-		{
-			video = ns->m_qvideo.front();
-			double clock = tu_timer::ticks_to_seconds(tu_timer::get_ticks()) - ns->m_start_clock;
-			double video_clock = video->m_pts;
-
-			if (clock >= video_clock)
-			{
-				boost::mutex::scoped_lock lock(ns->image_mutex);
-				if (ns->m_videoFrameFormat == render::YUV) {
-					// XXX m_imageframe might be a byte aligned buffer, while video is not!
-					static_cast<image::yuv*>(ns->m_imageframe)->update(video->m_data);
-				} else if (ns->m_videoFrameFormat == render::RGB) {
-
-					image::rgb* imgframe = static_cast<image::rgb*>(ns->m_imageframe);
-					rgbcopy(imgframe, video, ns->m_VCodecCtx->width * 3);
-				}
-				ns->m_qvideo.pop();
-				delete video;
-				delay = 0;
-				ns->m_newFrameReady = true;
-			}
-			else
-			{
-				delay = int((video_clock - clock)*100000000); 
-			}
-
-			// Don't hog the CPU.
-			// Queues have filled, video frame have shown
-			// now it is possible and to have a rest
-
-			if (ns->m_unqueued_data && delay > 0)
-			{
-				usleep(delay);
-			}
+			ns->decode_wait.wait(lock);
 		}
 	}
 	ns->m_go = false;
@@ -676,23 +645,57 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 
 	boost::mutex::scoped_lock  lock(ns->decoding_mutex);
 
-	if (!ns->m_go) return false;
+	if (!ns->m_go || ns->m_pause) return false;
 
 	while (len > 0 && ns->m_qaudio.size() > 0)
 	{
-		raw_videodata_t* samples = ns->m_qaudio.front();
+		raw_videodata_t* samples = NULL; // = ns->m_qaudio.front();
 
-		int n = imin(samples->m_size, len);
-		memcpy(stream, samples->m_ptr, n);
-		stream += n;
-		samples->m_ptr += n;
-		samples->m_size -= n;
-		len -= n;
+		// Find the best audioframe
+		while(1) {
+			samples = ns->m_qaudio.front();
 
-		if (samples->m_size == 0)
-		{
-			ns->m_qaudio.pop();
-			delete samples;
+			// If the queue is empty, we tell the decoding thread to wake up,
+			// and decode some more.
+			if (!samples) {
+				ns->decode_wait.notify_one();
+				return true;
+			}
+
+			if (ns->m_qaudio.size() < 10) {
+				ns->decode_wait.notify_one();
+			}
+
+			// Caclulate the current time
+			double current_clock = (tu_timer::ticks_to_seconds(tu_timer::get_ticks()) - ns->m_start_clock)*1000;
+			double audio_clock = samples->m_pts;
+
+			// If the timestamp on the videoframe is smaller than the
+			// current time, we put it in the output image.
+			if (current_clock >= audio_clock)
+			{
+				break;
+			} else {
+				ns->m_qaudio.pop();
+				delete samples;
+				samples = NULL;
+			}
+		}
+
+
+		if (samples) {
+			int n = imin(samples->m_size, len);
+			memcpy(stream, samples->m_ptr, n);
+			stream += n;
+			samples->m_ptr += n;
+			samples->m_size -= n;
+			len -= n;
+
+			if (samples->m_size == 0)
+			{
+				ns->m_qaudio.pop();
+				delete samples;
+			}
 		}
 	}
 	return true;
@@ -736,7 +739,7 @@ bool NetStreamFfmpeg::read_frame()
 				m_go = false;
 			} else {
 				// We pause and load and buffer a second before continuing.
-				m_pause = true;
+				pauseDecoding(); m_pause = true;
 				m_bufferTime = static_cast<uint32_t>(m_video_clock) * 1000 + 1000;
 				setStatus(bufferEmpty);
 				m_start_onbuffer = true;
@@ -957,9 +960,10 @@ NetStreamFfmpeg::seek(double pos)
 
 	} else if (m_isFLV) {
 		double newtime = static_cast<double>(newpos) / 1000.0;
-		m_start_clock +=  m_video_clock - newtime;
+		m_start_clock += (m_video_clock - newtime) / 1000.0;
 
 		m_video_clock = newtime;
+
 	} else {
 		AVPacket Packet;
 		av_init_packet(&Packet);
@@ -977,7 +981,7 @@ NetStreamFfmpeg::seek(double pos)
 		av_free_packet(&Packet);
 		av_seek_frame(m_FormatCtx, m_video_index, newpos, 0);
 
-		m_start_clock +=  m_video_clock - newtime;
+		m_start_clock += (m_video_clock - newtime) / 1000.0;
 
 		m_video_clock = newtime;
 	}
@@ -997,6 +1001,64 @@ NetStreamFfmpeg::seek(double pos)
 }
 
 void
+NetStreamFfmpeg::refreshVideoFrame()
+{
+	// If we're paused or not running, there is no need to do this
+	if (!m_go && m_pause) return;
+
+	// Loop until a good frame is found
+	while(1) {
+		// Get video frame from queue, will have the lowest timestamp
+		raw_videodata_t* video = m_qvideo.front();
+
+		// If the queue is empty, we tell the decoding thread to wake up, 1179596,155087 1179596,169546
+		// and decode some more.
+		if (!video) {
+			decode_wait.notify_one();
+			break;
+		}
+
+		// Caclulate the current time
+		double current_clock = (tu_timer::ticks_to_seconds(tu_timer::get_ticks()) - m_start_clock)*1000;
+
+		double video_clock = video->m_pts;
+
+		// If the timestamp on the videoframe is smaller than the
+		// current time, we put it in the output image.
+		if (current_clock >= video_clock)
+		{
+			boost::mutex::scoped_lock lock(image_mutex);
+			if (m_videoFrameFormat == render::YUV) {
+				// XXX m_imageframe might be a byte aligned buffer, while video is not!
+				static_cast<image::yuv*>(m_imageframe)->update(video->m_data);
+			} else if (m_videoFrameFormat == render::RGB) {
+
+				image::rgb* imgframe = static_cast<image::rgb*>(m_imageframe);
+				rgbcopy(imgframe, video, m_VCodecCtx->width * 3);
+			}
+
+			// Delete the frame from the queue
+			m_qvideo.pop();
+			delete video;
+
+			// A frame is ready for pickup
+			m_newFrameReady = true;
+		} else {
+			// The timestamp on the first frame in the queue is greater
+			// than the current time, so no need to do anything.
+			break;
+		}
+
+		// If less than 10 frames in the queue notify the decoding thread
+		// so that we don't suddenly run out.
+		if (m_qvideo.size() < 10) {
+			decode_wait.notify_one();
+		}
+	}
+}
+
+
+void
 NetStreamFfmpeg::advance()
 {
 	// This can happen in 2 cases: 
@@ -1007,13 +1069,17 @@ NetStreamFfmpeg::advance()
 	//    and we then wait until the buffer contains some data (1 sec) again.
 	if (m_go && m_pause && m_start_onbuffer && m_parser && m_parser->isTimeLoaded(m_bufferTime)) {
 		setStatus(bufferFull);
-		m_pause = false;
+		unpauseDecoding();	m_pause = false;
 		m_start_onbuffer = false;
 	}
 
 	// Check if there are any new status messages, and if we should
 	// pass them to a event handler
 	processStatusNotifications();
+
+	// Find video frame with the most suited timestamp in the video queue,
+	// and put it in the output image frame.
+	refreshVideoFrame();
 }
 
 int64_t
@@ -1029,6 +1095,35 @@ NetStreamFfmpeg::time()
 		return 0;
 	}
 }
+
+void NetStreamFfmpeg::pauseDecoding()
+{
+	if (m_pause) return;
+
+	m_pause = true;
+
+	// Save the current time so we later can tell how long the pause lasted
+	m_time_of_pause = tu_timer::ticks_to_seconds(tu_timer::get_ticks());
+}
+
+void NetStreamFfmpeg::unpauseDecoding()
+{
+	if (!m_pause) return;
+
+	m_pause = false;	
+
+	// Add the paused time to the start time so that the playhead doesn't
+	// noticed that we have been paused
+	m_start_clock += tu_timer::ticks_to_seconds(tu_timer::get_ticks()) - m_time_of_pause;
+
+	// Notify the decode thread/loop that we are running again
+	decode_wait.notify_one();
+
+	// Re-connect to the soundhandler
+	sound_handler* s = get_sound_handler();
+	if (s) s->attach_aux_streamer(audio_streamer, (void*) this);
+}
+
 
 } // gnash namespcae
 
