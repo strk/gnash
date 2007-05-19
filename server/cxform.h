@@ -24,6 +24,7 @@
 #include "tu_config.h" // for DSOEXPORT
 #include "tu_types.h" // for uint8_t
 
+#include <string>
 #include <iosfwd>
 
 namespace gnash {

@@ -55,9 +55,16 @@
 #include <string>
 #include <cmath>
 
+#ifdef __sgi
+extern double round(double);
+#pragma optional round
+#endif
+
 #include <functional> // for mem_fun, bind1st
 #include <algorithm> // for for_each
 #include <boost/algorithm/string/case_conv.hpp>
+
+using namespace std;
 
 namespace gnash {
 
