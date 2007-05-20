@@ -1,3 +1,8 @@
+2007-05-20  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* libbase/log.h: Add empty braces around a while(0) to shut up GCC
+	4.3.
+
 2007-05-20 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/displaylist_depths_test9.c:

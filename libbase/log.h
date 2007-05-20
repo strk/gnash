@@ -14,8 +14,6 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: log.h,v 1.52 2007/05/18 00:50:30 nihilus Exp $ */
-
 #ifndef GNASH_LOG_H
 #define GNASH_LOG_H
 
@@ -195,11 +193,7 @@ DSOEXPORT void log_msg(const char* fmt, ...) GNUC_LOG_ATTRS;
 DSOEXPORT void log_error(const char* fmt, ...) GNUC_LOG_ATTRS;
 
 // Temporary expedient til the other source files are converted.  --gnu
-// I'm not sure a WARNING logger should really be deprecated, anyway
-// there are no more log_warning callers so far. If anyone feels like using
-// it (ie: the other log levels seem not appropriate) please discuss this on the
-// mailing list
-//#define log_warning	log_unimpl
+#define log_warning	log_unimpl
 
 /// Log a message about unimplemented features.
 //
@@ -304,14 +298,14 @@ DSOEXPORT void log_aserror(const char* fmt, ...) GNUC_LOG_ATTRS;
 
 #if VERBOSE_ASCODING_ERRORS
 // TODO: check if it's worth to check verbosity level too...
-#define IF_VERBOSE_ASCODING_ERRORS(x) { if ( gnash::RcInitFile::getDefaultInstance().showASCodingErrors() ) { x; } } while (0);
+#define IF_VERBOSE_ASCODING_ERRORS(x) { if ( gnash::RcInitFile::getDefaultInstance().showASCodingErrors() ) { x; } } while (0) {};
 #else
 #define IF_VERBOSE_ASCODING_ERRORS(x)
 #endif
 
 #if VERBOSE_MALFORMED_SWF
 // TODO: check if it's worth to check verbosity level too... 
-#define IF_VERBOSE_MALFORMED_SWF(x) { if ( gnash::RcInitFile::getDefaultInstance().showMalformedSWFErrors() ) { x; } } while (0);
+#define IF_VERBOSE_MALFORMED_SWF(x) { if ( gnash::RcInitFile::getDefaultInstance().showMalformedSWFErrors() ) { x; } } while (0) {};
 #else
 #define IF_VERBOSE_MALFORMED_SWF(x)
 #endif
