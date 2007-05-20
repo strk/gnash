@@ -1,3 +1,8 @@
+2007-05-20 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/displaylist_depths_test9.c:
+	 	more tests, all passed.
+		
 2007-05-19 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/asobj/NetStream.cpp: Got rid of make_pair in favor of

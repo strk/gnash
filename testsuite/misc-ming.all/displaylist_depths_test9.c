@@ -27,7 +27,7 @@
  * 
  *   Frame  | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
  *  --------+---+---+---+---+---+---+---+
- *   Event  |   |P  | p | p | * | p | J |
+ *   Event  |   |PPp| p | p | * | p | J |
  * 
  *  P = place (by PlaceObject2)
  *  p = place (by ActionScript)
@@ -36,7 +36,9 @@
  * 
  * Description:
  * 
- *  frame2: character placed at depth -16381 at position (10,200);
+ *  frame2: place a static character at depth -16381 at position (10,200);
+ *          place a static character at depth -16380 at position (100,200);
+ *          replace the character at depth -16380 with a dynamic character;
  *  frame3: create a script character at depth -10;
  *  frame4: create a script character at depth -20;
  *  frame6: create a script character at depth -30;
@@ -44,9 +46,9 @@
  * 
  * Expected behaviour:
  * 
- *  Before the jump we have 4 instances.
- *  After the jump only the timeline instance keeps alive;
- *  Four instances have been constructed in total.
+ *  Before the jump we have 5 instances.
+ *  After the jump only two timeline instances keep alive, all dynamic instances get removed;
+ *  Seven instances have been constructed in total.
  */
 
 #include "ming_utils.h"
@@ -88,7 +90,7 @@ main(int argc, char** argv)
   SWFMovie mo;
   SWFMovieClip dejagnuclip;
   int i;
-  SWFDisplayItem it1;
+  SWFDisplayItem it1, it2;
 
 
   const char *srcdir=".";
@@ -109,15 +111,22 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); 
 
-  // Frame 2: Add a static movieclip at depth 3 with origin at 10,200.
+  // Frame 2: 
+  //   Add a "static3" at depth 3 with origin at 10,200.
+  //   Add a "static4" at depth 4 with origin at 100,200.
+  //   Replace "static4" with a dynamic movieClip "dup0". 
   it1 = add_static_mc(mo, "static3", 3, 10, 200, 20, 20);
-  add_actions(mo, "check_equals(static3.getDepth(), -16381);");
+  check_equals(mo, "static3.getDepth()", "-16381");
+  it2 = add_static_mc(mo, "static4", 4, 100, 200, 20, 20);
+  check_equals(mo, "static4.getDepth()", "-16380");
+  add_actions(mo, "duplicateMovieClip('/static4', 'dup0', -16380);");
+  check_equals(mo, "dup0.getDepth()", "-16380");
   SWFMovie_nextFrame(mo); 
 
   // Frame 3: create a script instance at depth -10.
-  add_actions(mo, 
-    "duplicateMovieClip('static3', 'dup1', -10);"
-    "check_equals(dup1.getDepth(), -10);");
+  check_equals(mo, "dup0.getDepth()", "-16380");
+  add_actions(mo,  "duplicateMovieClip('static3', 'dup1', -10);");
+  check_equals(mo, "dup1.getDepth()", "-10");
   SWFMovie_nextFrame(mo); 
  
   // Frame 4: create a script instance at depth -20.
@@ -135,15 +144,15 @@ main(int argc, char** argv)
     "check_equals(dup3.getDepth(), -30);");
   SWFMovie_nextFrame(mo); 
 
-  // Frame 7: go to frame 5 
-  add_actions(mo,
-    "gotoAndStop(5); "  
-    "check_equals(typeof(static3), 'movieclip');"
-    "check_equals(typeof(dup1), 'undefined');"
-    "check_equals(typeof(dup2), 'undefined');"
-    "check_equals(typeof(dup3), 'undefined');"
-    "totals();"
-    );
+  // Frame 7: go to frame 5 and checks
+  add_actions(mo,  "gotoAndStop(5);");
+  check_equals(mo, "typeof(static3)", "'movieclip'");
+  check_equals(mo, "typeof(static4)", "'movieclip'");
+  check_equals(mo, "typeof(dup0)", "'undefined'");
+  check_equals(mo, "typeof(dup1)", "'undefined'");
+  check_equals(mo, "typeof(dup2)", "'undefined'");
+  check_equals(mo, "typeof(dup3)", "'undefined'");
+  add_actions(mo,  "totals();");
   SWFMovie_nextFrame(mo); 
 
   //Output movie
