@@ -1,5 +1,5 @@
 /* 
- *   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+ *   Copyright (C) 2007 Free Software Foundation, Inc.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,7 +97,7 @@ main(int argc, char** argv)
   }
   else
   {
-    // check that "static_mc2" do get placed
+    // check that "static_mc2" does get placed
     check_equals(mo, "typeof(static_mc2)", "'movieclip'");
   }
   SWFMovie_nextFrame(mo); // frame3
@@ -118,7 +118,7 @@ main(int argc, char** argv)
   }
   else
   {
-    // check that "static_mc3" do get placed
+    // check that "static_mc3" does get placed
     check_equals(mo, "typeof(static_mc3)", "'movieclip'");
   }
   SWFMovie_nextFrame(mo); // frame4
@@ -140,7 +140,7 @@ main(int argc, char** argv)
   }
   else
   {
-    // check that "static_mc4" do get placed.
+    // check that "static_mc4" does get placed.
     check_equals(mo, "typeof(static_mc4)", "'movieclip'");
   }
   SWFMovie_nextFrame(mo); // frame5
@@ -162,7 +162,7 @@ main(int argc, char** argv)
   }
   else
   {
-    // check that "static_mc5" do get placed.
+    // check that "static_mc5" does get placed.
     check_equals(mo, "typeof(static_mc5)", "'movieclip'");
   }
   SWFMovie_nextFrame(mo); // frame6
@@ -170,7 +170,7 @@ main(int argc, char** argv)
   
   //
   // Odd, where are the movieclips now?
-  // Note that all those movieclips are undefined now.
+  // Note that all those movieclips are defined above but not now.
   //
   if(OUTPUT_VERSION <= 5)
   {
