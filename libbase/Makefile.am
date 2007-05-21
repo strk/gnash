@@ -21,7 +21,15 @@ EXTRA_DIST =
 # this is where Gnash plugins get installed
 pluginsdir = $(prefix)/lib/gnash/plugins
 
-lib_LTLIBRARIES =  libgnashbase.la
+if INSTALL_LTDL
+include_HEADERS =  $(top_srcdir)/libltdl/ltdl.h
+LIBLTDLLIB = libltdl.la
+LIBLTDLHEAD =  $(top_srcdir)/libltdl/ltdl.h
+endif
+
+# If we are using an installable libltdl, then it needs to be built
+# before libgnash, as libgnash depends on it for extensions.
+lib_LTLIBRARIES =  $(LIBLTDLLIB) libgnashbase.la
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I.. -I$(srcdir) \
@@ -56,9 +64,10 @@ libgnashbase_la_LIBADD = \
 	$(Z_LIBS) \
 	$(CURL_LIBS) \
 	$(OPENGL_LIBS) \
+	$(LIBINTL) \
+	$(LIBLTDL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(LIBINTL) \
 	$(NULL)
 
 if HAS_SDL
@@ -99,6 +108,7 @@ libgnashbase_la_SOURCES = \
 	FLVParser.cpp
 
 noinst_HEADERS = \
+	$(LIBLTDLHEAD) \
 	container.h \
 	demo.h \
 	dlmalloc.h \
@@ -162,13 +172,6 @@ noinst_LTLIBRARIES = libltdlc.la
 libltdlc_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 endif
 CLEANFILES = libltdl.la libltdlc.la
-
-if INSTALL_LTDL
-include_HEADERS =  $(top_srcdir)/libltdl/ltdl.h
-lib_LTLIBRARIES += libltdl.la
-else
-noinst_HEADERS +=  $(top_srcdir)/libltdl/ltdl.h
-endif
 
 libltdl_la_SOURCES = $(top_srcdir)/libltdl/ltdl.c
 libltdl_la_LDFLAGS = -no-undefined -version-info 4:4:1
