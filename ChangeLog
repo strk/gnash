@@ -1,5 +1,15 @@
 2007-05-21 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/: Makefile.am, Timeline.h: new class for
+	  timeline control.
+	* server/parser/: movie_definition.h, movie_def_impl.{cpp,h},
+	  sprite_definition.{cpp,h}: new addTimelineDepth() and
+	  removeTimelineDepth() interfaces in base class, implementation
+	  in subclasses.
+	* server/swf/tag_loaders.cpp (remove_object2_tag): add getDepth()
+	  method; call movie_definition::addTimelineDepth when a PlaceObject
+	  tag is parsed and movie_definition::removeTimelineDepth when
+	  a RemoveObject is parsed.
 	* server/swf/PlaceObject2Tag.h: add getDepth() method, more dox
 	  and 3 new inspectors to know wheter it's a place, replace or move
 	  tag.

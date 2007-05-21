@@ -949,6 +949,10 @@ movie_def_impl::incrementLoadedFrames()
 	boost::mutex::scoped_lock lock(_frames_loaded_mutex);
 
 	++_frames_loaded;
+
+	// Close current frame definition in Timeline object
+	_timeline.closeFrame();
+
 	if ( _frames_loaded > m_frame_count )
 	{
 		IF_VERBOSE_MALFORMED_SWF(

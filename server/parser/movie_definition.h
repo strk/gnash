@@ -555,6 +555,35 @@ public:
 	virtual void load_next_frame_chunk() 
 	{
 	}
+
+	/// Add a depth to the timeline depth set in current frame 
+	//
+	/// The default implementations is a no-op
+	///
+	/// It is overridden by timeline-equipped definitions:
+	///	- sprite_definition
+	///	- movie_def_impl
+	///
+	/// @param depth
+	///	Depth of an instance placed by PlaceObject* tag.
+	///	Assumed to be in the static zone (an assertion would fail otherwise).
+	///
+	virtual void addTimelineDepth(int /*depth*/) {}
+
+	/// Remove a depth from the timeline depth set in current frame 
+	//
+	/// The default implementations is a no-op
+	///
+	/// It is overridden by timeline-equipped definitions:
+	///	- sprite_definition
+	///	- movie_def_impl
+	///
+	/// @param depth
+	///	Depth of an instance placed by PlaceObject* tag.
+	///	Assumed to be in the static zone (an assertion would fail otherwise).
+	///
+	virtual void removeTimelineDepth(int /*depth*/) {}
+
 };
 
 } // namespace gnash

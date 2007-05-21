@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.103 2007/05/18 15:39:51 martinwguy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.104 2007/05/21 11:11:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -787,6 +787,7 @@ place_object_2_loader(stream* in, tag_type tag, movie_definition* m)
     ch->read(in, tag, m->get_version());
 
     m->add_execute_tag(ch);
+    m->addTimelineDepth(ch->getDepth());
 }
 
 // Create and initialize a sprite, and add it to the movie.
@@ -834,6 +835,10 @@ void	end_loader(stream* in, tag_type tag, movie_definition* /*m*/)
 
 
 /// SWF Tag RemoveObject2 (28)
+//
+/// TODO: move in a separate file, like it was done
+///       for PlaceObject2Tag.
+///
 class remove_object_2 : public execute_tag
 {
 public:
@@ -854,17 +859,27 @@ public:
 	    m_depth = in->read_u16()+character::staticDepthOffset;
 	}
 
+    // TODO: be non-virtual if no allowing sublcassing this class
     virtual void	execute(sprite_instance* m)
 	{
 	    m->remove_display_object(m_depth, m_id);
 	}
 
+    // TODO: be non-virtual if no allowing sublcassing this class
     virtual void	execute_state(sprite_instance* m)
 	{
 	    execute(m);
 	}
 
+    // TODO: be non-virtual if no allowing sublcassing this class
     virtual bool	is_remove_tag() const { return true; }
+
+    /// Return the depth affected by this RemoveObject tag
+    //
+    /// NOTE: the returned depth is always in the
+    ///       static depth zone (character::staticDepthOffset .. -1)
+    ///
+    int getDepth() const { return m_depth; }
 };
 
 
@@ -881,6 +896,7 @@ void	remove_object_2_loader(stream* in, tag_type tag, movie_definition* m)
     );
 
     m->add_execute_tag(t);
+    m->removeTimelineDepth(t->getDepth());
 }
 
 

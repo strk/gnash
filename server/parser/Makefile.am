@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.32 2007/05/04 09:40:25 strk Exp $
+# $Id: Makefile.am,v 1.33 2007/05/21 11:11:39 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -60,6 +60,7 @@ libgnashparser_la_SOURCES = \
 	video_stream_def.cpp
 
 noinst_HEADERS = \
+	Timeline.h	\
 	action_buffer.h \
 	button_character_def.h \
 	character_def.h	\

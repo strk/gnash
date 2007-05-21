@@ -31,6 +31,7 @@
 #include "bitmap_character_def.h" // for boost::intrusive_ptr visibility of dtor
 #include "resource.h" // for boost::intrusive_ptr visibility of dtor
 #include "stream.h" // for get_bytes_loaded
+#include "Timeline.h" // for composition 
 
 #include <map> // for CharacterDictionary
 #include <string>
@@ -295,6 +296,12 @@ private:
 		boost::mutex::scoped_lock lock(_bytes_loaded_mutex);
 		_bytes_loaded=bytes;
 	}
+
+	/// Timeline depth info
+	//
+	/// TODO: move to base class ?
+	///
+	Timeline _timeline;
 
 public:
 
@@ -588,6 +595,24 @@ public:
     assert(0); // should not be called  
 		static rect unused;
 		return unused;
+	}
+
+	// See dox in base class
+	//
+	// TODO: implement in base class ?
+	//
+	void addTimelineDepth(int depth)
+	{
+		_timeline.addDepth(depth);
+	}
+
+	// See dox in base class
+	//
+	// TODO: implement in base class ?
+	//
+	void removeTimelineDepth(int depth)
+	{
+		_timeline.removeDepth(depth);
 	}
 
 };
