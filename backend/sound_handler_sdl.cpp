@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.61 2007/05/18 15:30:41 martinwguy Exp $
+// $Id: sound_handler_sdl.cpp,v 1.62 2007/05/21 16:23:42 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -521,8 +521,13 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 
 void	SDL_sound_handler::detach_aux_streamer(void* owner)
 {
-	--soundsPlaying;
-	m_aux_streamer.erase(owner);
+	aux_streamer_ptr p;	
+	if (m_aux_streamer.get(owner, &p))
+	{
+		--soundsPlaying;
+		m_aux_streamer.erase(owner);
+	}
+
 }
 
 

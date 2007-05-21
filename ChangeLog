@@ -1,3 +1,10 @@
+2007-05-21 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Only try to detach video-sound
+	  input, if it exists.
+	* server/asobj/NetStreamFfmpeg.cpp: Shutdown the decoding thread
+	  proberbly.
+
 2007-05-21  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* libbase/Makefile.am: Build the installable libltdl before

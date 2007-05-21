@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.53 2007/05/19 21:18:34 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.54 2007/05/21 16:23:42 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -108,6 +108,7 @@ void NetStreamFfmpeg::close()
 	{
 		// terminate thread
 		m_go = false;
+		decode_wait.notify_one();
 
 		// wait till thread is complete before main continues
 		_decodeThread->join();
@@ -618,20 +619,18 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 	// Loop while we're playing
 	while (ns->m_go)
 	{
-		// If paused, wait for being unpaused
-		if (ns->m_pause) ns->decode_wait.wait(lock);
-
 		// If we have problems with decoding - break
 		if (ns->read_frame() == false && ns->m_start_onbuffer == false && ns->m_qvideo.size() == 0)
 		{
 			break;
 		}
 
-		// If the queue is full we wait until someone notifies us that data is needed.
-		if (ns->m_qvideo.size() > 0 && ns->m_unqueued_data)
-		{
+		// If paused, wait for being unpaused, or
+		// if the queue is full we wait until someone notifies us that data is needed.
+		if (ns->m_pause || (ns->m_qvideo.size() > 0 && ns->m_unqueued_data)) { 
 			ns->decode_wait.wait(lock);
 		}
+
 	}
 	ns->m_go = false;
 	ns->setStatus(playStop);
@@ -758,6 +757,7 @@ bool NetStreamFfmpeg::read_frame()
 		// FIXME: is this the right value for packet.dts?
 		packet.pts = packet.dts = static_cast<int64_t>(frame->timestamp);
 		rc = 0;
+
 	} else {
 		rc = av_read_frame(m_FormatCtx, &packet);
 	}
