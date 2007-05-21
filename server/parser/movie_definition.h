@@ -584,6 +584,26 @@ public:
 	///
 	virtual void removeTimelineDepth(int /*depth*/) {}
 
+	/// \brief
+	/// Get the set of timeline depths supposed to contain
+	/// an instance in the given frame (0-based)
+	//
+	/// The default implementations is a no-op
+	///
+	/// PRECONDITIONS:
+	///	- Target frame was completely parsed.
+	///
+	/// @param frameno
+	///	0-based frame number we want to inspect.
+	///	Assumed to be in the static zone.
+	///
+	/// @param depths
+	///	A vector to copy all frame depths to.
+	///
+	virtual void getTimelineDepths(size_t /*frameno*/,
+			std::vector<int>& /*depths*/)
+	{}
+
 };
 
 } // namespace gnash

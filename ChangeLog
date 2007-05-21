@@ -1,5 +1,11 @@
 2007-05-21 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/: movie_definition.h, movie_def_impl.h,
+	  sprite_definition.h: add getTimelineDepths() methods
+	  and implementations.
+
+2007-05-21 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/: Makefile.am, Timeline.h: new class for
 	  timeline control.
 	* server/parser/: movie_definition.h, movie_def_impl.{cpp,h},

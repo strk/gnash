@@ -615,6 +615,15 @@ public:
 		_timeline.removeDepth(depth);
 	}
 
+	// See dox in base class
+	//
+	// TODO: implement in base class ?
+	//
+	void getTimelineDepths(size_t frameno, std::vector<int>& depths)
+	{
+		_timeline.getFrameDepths(frameno, depths);
+	}
+
 };
 
 } // namespace gnash
