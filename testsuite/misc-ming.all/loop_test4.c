@@ -17,15 +17,16 @@
  */ 
 
 /*
- * Test "Jumping backward to the middle of a character's lifetime after ..."
+ * Test "Jumping backward to the middle of a character's lifetime after removal and replacement"
  *
  * Timeline:
  * 
  *   Frame  | 1 | 2 | 3 | 4 | 5 | 6 |
  *  --------+---+---+---+---+---+---+
- *   Event  |   |PP | * | RR| PP| J |
+ *   Event  |   |PP | * | RR| Pp| J |
  * 
  *  P = place (by PlaceObject2)
+ *  p = place (by ActionScript)
  *  M = move to another depth (by swapDepth)
  *  R = remove ((by RemoveObject* tag)
  *  J = jump
@@ -179,6 +180,7 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(movieClip4)", "'undefined'");
   check_equals(mo, "_root.mc1Constructed", "2");
   check_equals(mo, "_root.mc2Constructed", "2");
+  check_equals(mo, "_root.mc3Constructed", "1");
   
   SWFMovie_add(mo, (SWFBlock)newSWFAction( "totals(); stop();" ));
   SWFMovie_nextFrame(mo);

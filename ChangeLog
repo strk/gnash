@@ -12,6 +12,11 @@
 2007-05-21 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/loop_test4.c:
+	 	add a another check, comments
+	 	
+2007-05-21 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/loop_test4.c:
 	 	new testcase for timeline control.
 	 	
 2007-05-21 Zou Lunkai <zoulunkai@gmail.com>
