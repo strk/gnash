@@ -192,9 +192,6 @@ DSOEXPORT void log_msg(const char* fmt, ...) GNUC_LOG_ATTRS;
 ///
 DSOEXPORT void log_error(const char* fmt, ...) GNUC_LOG_ATTRS;
 
-// Temporary expedient til the other source files are converted.  --gnu
-#define log_warning	log_unimpl
-
 /// Log a message about unimplemented features.
 //
 /// This function must be used to warn user about missing Gnash features.
