@@ -53,6 +53,8 @@ class Timeline
 
 public:
 
+	friend std::ostream& operator<< (std::ostream& os, const Timeline& t);
+
 	/// Construct a Timeline instance 
 	Timeline()
 	{
@@ -157,11 +159,12 @@ public:
 	///	
 	///	
 	///
-	void getFrameDepths(size_t frameno, std::vector<int> depths)
+	void getFrameDepths(size_t frameno, std::vector<int>& depths)
 	{
 		assert(frameno < _frameDepths.size());
 
-		depths.assign(_frameDepths[frameno].begin(), _frameDepths[frameno].end());
+		DepthSet& from = _frameDepths[frameno];
+		depths.assign(from.begin(), from.end());
 	}
 
 private:
@@ -204,6 +207,21 @@ private:
 
 };
 
+inline std::ostream&
+operator<< (std::ostream& os, const Timeline& t)
+{
+	for (Timeline::FrameDepths::const_iterator it=t._frameDepths.begin(), itEnd=t._frameDepths.end(); it!=itEnd; ++it)
+	{
+		os << "[";
+		for (Timeline::DepthSet::const_iterator di=it->begin(), de=it->end(); di!=de; ++di)
+		{
+			if ( di != it->begin() ) os << ",";
+			os << *di;
+		}
+		os << "]";
+	}
+	return os;
+}
 
 } // end of namespace gnash
 

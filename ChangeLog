@@ -1,3 +1,8 @@
+2007-05-21 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/Timeline.h: fix getFrameDepths to really return
+	  depths. Add output operator.
+
 2007-05-21 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp: Only try to detach video-sound
