@@ -52,6 +52,9 @@ AM_CPPFLAGS = -I.. \
 	-DMING_VERSION_CODE=$(MING_VERSION_CODE) \
 	$(NULL)
 
+AM_LDFLAGS = $(MING_LIBS)
+
+
 check_PROGRAMS = \
 	ButtonEventsTest \
 	ButtonEventsTest-Runner \
@@ -213,6 +216,11 @@ endif
 # TESTS = \
 # 	DefineEditTextVariableNameTest-Runner 
 
+check_LTLIBRARIES = libgnashmingutils.la 
+libgnashmingutils_la_SOURCES =	\
+	ming_utils.h		\
+	ming_utils.c
+
 definebitsjpeg2_SOURCES = definebitsjpeg2.c
 definebitsjpeg2_LDADD = $(MING_LIBS)
 
@@ -236,26 +244,22 @@ DefineEditTextTest_LDADD = $(MING_LIBS)
 
 DefineEditTextVariableNameTest_SOURCES =	\
 	DefineEditTextVariableNameTest.c	\
-	ming_utils.h				\
-	ming_utils.c				\
 	$(NULL)
-DefineEditTextVariableNameTest_LDADD = $(MING_LIBS)
+DefineEditTextVariableNameTest_LDADD = libgnashmingutils.la
 
 spritehier_SOURCES =  spritehier.c
 spritehier_LDADD = $(MING_LIBS)
 
 PlaceObject2Test_SOURCES =	\
 	PlaceObject2Test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-PlaceObject2Test_LDADD = $(MING_LIBS)
+PlaceObject2Test_LDADD = libgnashmingutils.la
 
 RemoveObject2Test_SOURCES = RemoveObject2Test.c
-RemoveObject2Test_LDADD = $(MING_LIBS)
+RemoveObject2Test_LDADD = libgnashmingutils.la
 
 eventSoundTest1_SOURCES = eventSoundTest1.c
-eventSoundTest1_LDADD = $(MING_LIBS)
+eventSoundTest1_LDADD = libgnashmingutils.la
 
 eventSoundTest1.swf: eventSoundTest1
 	./eventSoundTest1 $(srcdir)/../media/sound1.mp3
@@ -296,10 +300,8 @@ DefineEditTextVariableNameTest_Runner_DEPENDENCIES = \
 
 timeline_var_test_SOURCES =	\
 	timeline_var_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-timeline_var_test_LDADD = $(MING_LIBS)
+timeline_var_test_LDADD = libgnashmingutils.la
 
 timeline_var_test.swf: timeline_var_test
 	./timeline_var_test $(top_srcdir)/testsuite/media
@@ -308,12 +310,8 @@ timeline_var_test-Runner: $(srcdir)/../generic-testrunner.sh timeline_var_test.s
 	sh $< $(top_builddir) timeline_var_test.swf > $@
 	chmod 755 $@
 
-root_stop_test_SOURCES =	\
-	root_stop_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
-	$(NULL)
-root_stop_test_LDADD = $(MING_LIBS)
+root_stop_test_SOURCES = root_stop_test.c
+root_stop_test_LDADD = libgnashmingutils.la
 
 root_stop_test.swf: root_stop_test
 	./root_stop_test $(top_srcdir)/testsuite/media
@@ -332,37 +330,27 @@ root_stop_testrunner_DEPENDENCIES = \
 	root_stop_test.swf      \
 	$(NULL)
 
-loop_test_SOURCES =	\
-	loop_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
-	$(NULL)
-loop_test_LDADD = $(MING_LIBS)
+loop_test_SOURCES = loop_test.c	
+loop_test_LDADD = libgnashmingutils.la
 
 loop_test.swf: loop_test
 	./loop_test $(top_srcdir)/testsuite/media
 
-loop_test_Runner_SOURCES = \
-	loop_test-Runner.cpp \
-	$(NULL)
-loop_test_Runner_LDADD = \
-	$(top_builddir)/testsuite/libtestsuite.la \
-	$(NULL)
+loop_test_Runner_SOURCES = loop_test-Runner.cpp 
+loop_test_Runner_LDADD = $(top_builddir)/testsuite/libtestsuite.la 
+
 loop_test_Runner_CXXFLAGS = \
 	-DSRCDIR='"$(srcdir)"' \
 	-DTGTDIR='"$(abs_builddir)"' \
 	$(NULL)
+
 loop_test_Runner_DEPENDENCIES = \
 	loop_test.swf \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
-loop_test2_SOURCES =	\
-	loop_test2.c	\
-	ming_utils.h		\
-	ming_utils.c		\
-	$(NULL)
-loop_test2_LDADD = $(MING_LIBS)
+loop_test2_SOURCES = loop_test2.c	
+loop_test2_LDADD = libgnashmingutils.la
 
 loop_test2.swf: loop_test2
 	./loop_test2 $(top_srcdir)/testsuite/media
@@ -371,12 +359,8 @@ loop_test2runner: $(srcdir)/../generic-testrunner.sh loop_test2.swf
 	sh $< -f20 $(top_builddir) loop_test2.swf > $@
 	chmod 755 $@
 
-loop_test3_SOURCES =	\
-	loop_test3.c	\
-	ming_utils.h		\
-	ming_utils.c		\
-	$(NULL)
-loop_test3_LDADD = $(MING_LIBS)
+loop_test3_SOURCES = loop_test3.c
+loop_test3_LDADD = libgnashmingutils.la
 
 loop_test3.swf: loop_test3
 	./loop_test3 $(top_srcdir)/testsuite/media
@@ -385,12 +369,8 @@ loop_test3runner: $(srcdir)/../generic-testrunner.sh loop_test3.swf
 	sh $< -f20 $(top_builddir) loop_test3.swf > $@
 	chmod 755 $@
 
-key_event_test_SOURCES =	\
-	key_event_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
-	$(NULL)
-key_event_test_LDADD = $(MING_LIBS)
+key_event_test_SOURCES = key_event_test.c
+key_event_test_LDADD = libgnashmingutils.la
 
 key_event_test.swf: key_event_test
 	./key_event_test $(top_srcdir)/testsuite/media
@@ -410,12 +390,8 @@ key_event_testrunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
-place_object_test_SOURCES =	\
-	place_object_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
-	$(NULL)
-place_object_test_LDADD = $(MING_LIBS)
+place_object_test_SOURCES = place_object_test.c	
+place_object_test_LDADD = libgnashmingutils.la
 
 place_object_test.swf: place_object_test
 	./place_object_test $(top_srcdir)/testsuite/media
@@ -426,10 +402,8 @@ place_object_testrunner: $(srcdir)/../generic-testrunner.sh place_object_test.sw
 
 move_object_test_SOURCES =	\
 	move_object_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-move_object_test_LDADD = $(MING_LIBS)
+move_object_test_LDADD = libgnashmingutils.la
 
 move_object_test.swf: move_object_test
 	./move_object_test $(top_srcdir)/testsuite/media
@@ -440,10 +414,8 @@ move_object_testrunner: $(srcdir)/../generic-testrunner.sh move_object_test.swf
 
 place_and_remove_object_test_SOURCES =	\
 	place_and_remove_object_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-place_and_remove_object_test_LDADD = $(MING_LIBS)
+place_and_remove_object_test_LDADD = libgnashmingutils.la
 
 place_and_remove_object_test.swf: place_and_remove_object_test
 	./place_and_remove_object_test $(top_srcdir)/testsuite/media
@@ -454,10 +426,8 @@ place_and_remove_object_testrunner: $(srcdir)/../generic-testrunner.sh place_and
 
 place_and_remove_object_insane_test_SOURCES =	\
 	place_and_remove_object_insane_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-place_and_remove_object_insane_test_LDADD = $(MING_LIBS)
+place_and_remove_object_insane_test_LDADD = libgnashmingutils.la
 
 place_and_remove_object_insane_test.swf: place_and_remove_object_insane_test
 	./place_and_remove_object_insane_test $(top_srcdir)/testsuite/media
@@ -468,10 +438,8 @@ place_and_remove_object_insane_testrunner: $(srcdir)/../generic-testrunner.sh pl
 
 displaylist_depths_test_SOURCES =	\
 	displaylist_depths_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-displaylist_depths_test_LDADD = $(MING_LIBS)
+displaylist_depths_test_LDADD = libgnashmingutils.la
 
 displaylist_depths_test.swf: displaylist_depths_test
 	./displaylist_depths_test $(top_srcdir)/testsuite/media
@@ -482,10 +450,8 @@ displaylist_depths_testrunner: $(srcdir)/../generic-testrunner.sh displaylist_de
 
 displaylist_depths_test2_SOURCES =	\
 	displaylist_depths_test2.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-displaylist_depths_test2_LDADD = $(MING_LIBS)
+displaylist_depths_test2_LDADD = libgnashmingutils.la
 
 displaylist_depths_test2.swf: displaylist_depths_test2
 	./displaylist_depths_test2 $(top_srcdir)/testsuite/media
@@ -496,10 +462,8 @@ displaylist_depths_test2runner: $(srcdir)/../generic-testrunner.sh displaylist_d
 
 displaylist_depths_test3_SOURCES =	\
 	displaylist_depths_test3.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-displaylist_depths_test3_LDADD = $(MING_LIBS)
+displaylist_depths_test3_LDADD = libgnashmingutils.la
 
 displaylist_depths_test3.swf: displaylist_depths_test3
 	./displaylist_depths_test3 $(top_srcdir)/testsuite/media
@@ -510,10 +474,8 @@ displaylist_depths_test3runner: $(srcdir)/../generic-testrunner.sh displaylist_d
 
 displaylist_depths_test4_SOURCES =	\
 	displaylist_depths_test4.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-displaylist_depths_test4_LDADD = $(MING_LIBS)
+displaylist_depths_test4_LDADD = libgnashmingutils.la
 
 displaylist_depths_test4.swf: displaylist_depths_test4
 	./displaylist_depths_test4 $(top_srcdir)/testsuite/media
@@ -524,10 +486,8 @@ displaylist_depths_test4runner: $(srcdir)/../generic-testrunner.sh displaylist_d
 
 displaylist_depths_test5_SOURCES =	\
 	displaylist_depths_test5.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-displaylist_depths_test5_LDADD = $(MING_LIBS)
+displaylist_depths_test5_LDADD = libgnashmingutils.la
 
 displaylist_depths_test5.swf: displaylist_depths_test5
 	./displaylist_depths_test5 $(top_srcdir)/testsuite/media
@@ -538,10 +498,8 @@ displaylist_depths_test5runner: $(srcdir)/../generic-testrunner.sh displaylist_d
 
 displaylist_depths_test6_SOURCES =	\
 	displaylist_depths_test6.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-displaylist_depths_test6_LDADD = $(MING_LIBS)
+displaylist_depths_test6_LDADD = libgnashmingutils.la
 
 displaylist_depths_test6.swf: displaylist_depths_test6
 	./displaylist_depths_test6 $(top_srcdir)/testsuite/media
@@ -552,10 +510,8 @@ displaylist_depths_test6runner: $(srcdir)/../generic-testrunner.sh displaylist_d
 
 displaylist_depths_test7_SOURCES =	\
 	displaylist_depths_test7.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-displaylist_depths_test7_LDADD = $(MING_LIBS)
+displaylist_depths_test7_LDADD = libgnashmingutils.la
 
 displaylist_depths_test7.swf: displaylist_depths_test7
 	./displaylist_depths_test7 $(top_srcdir)/testsuite/media
@@ -566,10 +522,8 @@ displaylist_depths_test7runner: $(srcdir)/../generic-testrunner.sh displaylist_d
 
 displaylist_depths_test8_SOURCES =	\
 	displaylist_depths_test8.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-displaylist_depths_test8_LDADD = $(MING_LIBS)
+displaylist_depths_test8_LDADD = libgnashmingutils.la
 
 displaylist_depths_test8.swf: displaylist_depths_test8
 	./displaylist_depths_test8 $(top_srcdir)/testsuite/media
@@ -581,10 +535,8 @@ displaylist_depths_test8runner: $(srcdir)/../generic-testrunner.sh displaylist_d
 
 displaylist_depths_test9_SOURCES =	\
 	displaylist_depths_test9.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-displaylist_depths_test9_LDADD = $(MING_LIBS)
+displaylist_depths_test9_LDADD = libgnashmingutils.la
 
 displaylist_depths_test9.swf: displaylist_depths_test9
 	./displaylist_depths_test9 $(top_srcdir)/testsuite/media
@@ -595,10 +547,8 @@ displaylist_depths_test9runner: $(srcdir)/../generic-testrunner.sh displaylist_d
 
 displaylist_depths_test10_SOURCES =	\
 	displaylist_depths_test10.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-displaylist_depths_test10_LDADD = $(MING_LIBS)
+displaylist_depths_test10_LDADD = libgnashmingutils.la
 
 displaylist_depths_test10.swf: displaylist_depths_test10
 	./displaylist_depths_test10 $(top_srcdir)/testsuite/media
@@ -609,10 +559,8 @@ displaylist_depths_test10runner: $(srcdir)/../generic-testrunner.sh displaylist_
 
 masks_test_SOURCES =	\
 	masks_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-masks_test_LDADD = $(MING_LIBS)
+masks_test_LDADD = libgnashmingutils.la
 
 masks_test.swf: masks_test
 	./masks_test $(top_srcdir)/testsuite/media
@@ -633,10 +581,8 @@ masks_testrunner_DEPENDENCIES = \
 
 matrix_test_SOURCES =	\
 	matrix_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-matrix_test_LDADD = $(MING_LIBS)
+matrix_test_LDADD = libgnashmingutils.la
 
 matrix_test.swf: matrix_test
 	./matrix_test $(top_srcdir)/testsuite/media
@@ -647,10 +593,8 @@ matrix_testrunner: $(srcdir)/../generic-testrunner.sh matrix_test.swf
 
 get_frame_number_test_SOURCES =	\
 	get_frame_number_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-get_frame_number_test_LDADD = $(MING_LIBS)
+get_frame_number_test_LDADD = libgnashmingutils.la
 
 get_frame_number_test.swf: get_frame_number_test
 	./get_frame_number_test $(top_srcdir)/testsuite/media
@@ -661,10 +605,8 @@ get_frame_number_testrunner: $(srcdir)/../generic-testrunner.sh get_frame_number
 
 frame_label_test_SOURCES =	\
 	frame_label_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-frame_label_test_LDADD = $(MING_LIBS)
+frame_label_test_LDADD = libgnashmingutils.la
 
 frame_label_test.swf: frame_label_test
 	./frame_label_test $(top_srcdir)/testsuite/media
@@ -675,10 +617,8 @@ frame_label_testrunner: $(srcdir)/../generic-testrunner.sh frame_label_test.swf
 
 path_format_test_SOURCES =	\
 	path_format_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-path_format_test_LDADD = $(MING_LIBS)
+path_format_test_LDADD = libgnashmingutils.la
 
 path_format_test.swf: path_format_test
 	./path_format_test $(top_srcdir)/testsuite/media
@@ -689,10 +629,8 @@ path_format_testrunner: $(srcdir)/../generic-testrunner.sh path_format_test.swf
 
 duplicate_movie_clip_test_SOURCES =	\
 	duplicate_movie_clip_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-duplicate_movie_clip_test_LDADD = $(MING_LIBS)
+duplicate_movie_clip_test_LDADD = libgnashmingutils.la
 
 duplicate_movie_clip_test.swf: duplicate_movie_clip_test
 	./duplicate_movie_clip_test $(top_srcdir)/testsuite/media
@@ -704,10 +642,8 @@ duplicate_movie_clip_testrunner: $(srcdir)/../generic-testrunner.sh duplicate_mo
 
 duplicate_movie_clip_test2_SOURCES =	\
 	duplicate_movie_clip_test2.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-duplicate_movie_clip_test2_LDADD = $(MING_LIBS)
+duplicate_movie_clip_test2_LDADD = libgnashmingutils.la
 
 duplicate_movie_clip_test2.swf: duplicate_movie_clip_test2
 	./duplicate_movie_clip_test2 $(top_srcdir)/testsuite/media
@@ -719,10 +655,8 @@ duplicate_movie_clip_test2runner: $(srcdir)/../generic-testrunner.sh duplicate_m
 
 event_handler_scope_test_SOURCES =	\
 	event_handler_scope_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-event_handler_scope_test_LDADD = $(MING_LIBS)
+event_handler_scope_test_LDADD = libgnashmingutils.la
 
 event_handler_scope_test.swf: event_handler_scope_test
 	./event_handler_scope_test $(top_srcdir)/testsuite/media
@@ -733,10 +667,8 @@ event_handler_scope_testrunner: $(srcdir)/../generic-testrunner.sh event_handler
 		
 attachMovieTest_SOURCES =	\
 	attachMovieTest.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-attachMovieTest_LDADD = $(MING_LIBS)
+attachMovieTest_LDADD = libgnashmingutils.la
 
 attachMovieTest.swf: attachMovieTest
 	./attachMovieTest $(top_srcdir)/testsuite/media
@@ -758,10 +690,8 @@ attachMovieTestRunner_DEPENDENCIES = \
 
 attachMovieLoopingTest_SOURCES =	\
 	attachMovieLoopingTest.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-attachMovieLoopingTest_LDADD = $(MING_LIBS)
+attachMovieLoopingTest_LDADD = libgnashmingutils.la
 
 attachMovieLoopingTest.swf: attachMovieLoopingTest
 	./attachMovieLoopingTest $(top_srcdir)/testsuite/media
@@ -783,10 +713,8 @@ attachMovieLoopingTestRunner_DEPENDENCIES = \
 
 simple_loop_test_SOURCES =	\
 	simple_loop_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-simple_loop_test_LDADD = $(MING_LIBS)
+simple_loop_test_LDADD = libgnashmingutils.la
 
 simple_loop_test.swf: simple_loop_test
 	./simple_loop_test $(top_srcdir)/testsuite/media
@@ -809,10 +737,8 @@ simple_loop_testrunner_DEPENDENCIES = \
 
 goto_frame_test_SOURCES =	\
 	goto_frame_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-goto_frame_test_LDADD = $(MING_LIBS)
+goto_frame_test_LDADD = libgnashmingutils.la
 
 goto_frame_test.swf: goto_frame_test
 	./goto_frame_test $(top_srcdir)/testsuite/media
@@ -823,10 +749,8 @@ goto_frame_testrunner: $(srcdir)/../generic-testrunner.sh goto_frame_test.swf
 
 consecutive_goto_frame_test_SOURCES =	\
 	consecutive_goto_frame_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-consecutive_goto_frame_test_LDADD = $(MING_LIBS)
+consecutive_goto_frame_test_LDADD = libgnashmingutils.la
 
 consecutive_goto_frame_test.swf: consecutive_goto_frame_test
 	./consecutive_goto_frame_test $(top_srcdir)/testsuite/media
@@ -837,10 +761,8 @@ consecutive_goto_frame_testrunner: $(srcdir)/../generic-testrunner.sh consecutiv
 
 multi_doactions_and_goto_frame_test_SOURCES =	\
 	multi_doactions_and_goto_frame_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-multi_doactions_and_goto_frame_test_LDADD = $(MING_LIBS)
+multi_doactions_and_goto_frame_test_LDADD = libgnashmingutils.la
 
 multi_doactions_and_goto_frame_test.swf: multi_doactions_and_goto_frame_test
 	./multi_doactions_and_goto_frame_test $(top_srcdir)/testsuite/media
@@ -851,10 +773,8 @@ multi_doactions_and_goto_frame_testrunner: $(srcdir)/../generic-testrunner.sh mu
 
 action_execution_order_test_SOURCES =	\
 	action_execution_order_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-action_execution_order_test_LDADD = $(MING_LIBS)
+action_execution_order_test_LDADD = libgnashmingutils.la
 
 action_execution_order_test.swf: action_execution_order_test
 	./action_execution_order_test $(top_srcdir)/testsuite/media
@@ -865,10 +785,8 @@ action_execution_order_testrunner: $(srcdir)/../generic-testrunner.sh action_exe
 
 action_execution_order_test1_SOURCES =	\
 	action_execution_order_test1.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-action_execution_order_test1_LDADD = $(MING_LIBS)
+action_execution_order_test1_LDADD = libgnashmingutils.la
 
 action_execution_order_test1.swf: action_execution_order_test1
 	./action_execution_order_test1 $(top_srcdir)/testsuite/media
@@ -879,10 +797,8 @@ action_execution_order_test1runner: $(srcdir)/../generic-testrunner.sh action_ex
 
 action_execution_order_test2_SOURCES =	\
 	action_execution_order_test2.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-action_execution_order_test2_LDADD = $(MING_LIBS)
+action_execution_order_test2_LDADD = libgnashmingutils.la
 
 action_execution_order_test2.swf: action_execution_order_test2
 	./action_execution_order_test2 $(top_srcdir)/testsuite/media
@@ -893,10 +809,8 @@ action_execution_order_test2runner: $(srcdir)/../generic-testrunner.sh action_ex
 
 action_execution_order_test3_SOURCES =	\
 	action_execution_order_test3.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-action_execution_order_test3_LDADD = $(MING_LIBS)
+action_execution_order_test3_LDADD = libgnashmingutils.la
 
 action_execution_order_test3.swf: action_execution_order_test3
 	./action_execution_order_test3 $(top_srcdir)/testsuite/media
@@ -907,10 +821,8 @@ action_execution_order_test3runner: $(srcdir)/../generic-testrunner.sh action_ex
 
 action_execution_order_test4_SOURCES =	\
 	action_execution_order_test4.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-action_execution_order_test4_LDADD = $(MING_LIBS)
+action_execution_order_test4_LDADD = libgnashmingutils.la
 
 action_execution_order_test4.swf: action_execution_order_test4
 	./action_execution_order_test4 $(top_srcdir)/testsuite/media
@@ -921,10 +833,8 @@ action_execution_order_test4runner: $(srcdir)/../generic-testrunner.sh action_ex
 
 action_execution_order_test5_SOURCES =	\
 	action_execution_order_test5.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-action_execution_order_test5_LDADD = $(MING_LIBS)
+action_execution_order_test5_LDADD = libgnashmingutils.la
 
 action_execution_order_test5.swf: action_execution_order_test5
 	./action_execution_order_test5 $(top_srcdir)/testsuite/media
@@ -935,10 +845,8 @@ action_execution_order_test5runner: $(srcdir)/../generic-testrunner.sh action_ex
 
 action_execution_order_test6_SOURCES =	\
 	action_execution_order_test6.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-action_execution_order_test6_LDADD = $(MING_LIBS)
+action_execution_order_test6_LDADD = libgnashmingutils.la
 
 action_execution_order_test6.swf: action_execution_order_test6
 	./action_execution_order_test6 $(top_srcdir)/testsuite/media
@@ -949,10 +857,8 @@ action_execution_order_test6runner: $(srcdir)/../generic-testrunner.sh action_ex
 
 action_execution_order_test7_SOURCES =	\
 	action_execution_order_test7.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-action_execution_order_test7_LDADD = $(MING_LIBS)
+action_execution_order_test7_LDADD = libgnashmingutils.la
 
 action_execution_order_test7.swf: action_execution_order_test7
 	./action_execution_order_test7 $(top_srcdir)/testsuite/media
@@ -963,10 +869,8 @@ action_execution_order_test7runner: $(srcdir)/../generic-testrunner.sh action_ex
 
 action_execution_order_test8_SOURCES =	\
 	action_execution_order_test8.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-action_execution_order_test8_LDADD = $(MING_LIBS)
+action_execution_order_test8_LDADD = libgnashmingutils.la
 
 action_execution_order_test8.swf: action_execution_order_test8
 	./action_execution_order_test8 $(top_srcdir)/testsuite/media
@@ -977,10 +881,8 @@ action_execution_order_test8runner: $(srcdir)/../generic-testrunner.sh action_ex
 
 action_execution_order_test9_SOURCES =	\
 	action_execution_order_test9.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-action_execution_order_test9_LDADD = $(MING_LIBS)
+action_execution_order_test9_LDADD = libgnashmingutils.la
 
 action_execution_order_test9.swf: action_execution_order_test9
 	./action_execution_order_test9 $(top_srcdir)/testsuite/media
@@ -991,10 +893,8 @@ action_execution_order_test9runner: $(srcdir)/../generic-testrunner.sh action_ex
 
 reverse_execute_PlaceObject2_test1_SOURCES =	\
 	reverse_execute_PlaceObject2_test1.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-reverse_execute_PlaceObject2_test1_LDADD = $(MING_LIBS)
+reverse_execute_PlaceObject2_test1_LDADD = libgnashmingutils.la
 
 reverse_execute_PlaceObject2_test1.swf: reverse_execute_PlaceObject2_test1
 	./reverse_execute_PlaceObject2_test1 $(top_srcdir)/testsuite/media
@@ -1005,10 +905,8 @@ reverse_execute_PlaceObject2_test1runner: $(srcdir)/../generic-testrunner.sh rev
 
 reverse_execute_PlaceObject2_test2_SOURCES =	\
 	reverse_execute_PlaceObject2_test2.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-reverse_execute_PlaceObject2_test2_LDADD = $(MING_LIBS)
+reverse_execute_PlaceObject2_test2_LDADD = libgnashmingutils.la
 
 reverse_execute_PlaceObject2_test2.swf: reverse_execute_PlaceObject2_test2
 	./reverse_execute_PlaceObject2_test2 $(top_srcdir)/testsuite/media
@@ -1019,10 +917,8 @@ reverse_execute_PlaceObject2_test2runner: $(srcdir)/../generic-testrunner.sh rev
 
 action_execution_order_extend_test_SOURCES =	\
 	action_execution_order_extend_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-action_execution_order_extend_test_LDADD = $(MING_LIBS)
+action_execution_order_extend_test_LDADD = libgnashmingutils.la
 
 action_execution_order_extend_test.swf: action_execution_order_extend_test
 	./action_execution_order_extend_test $(top_srcdir)/testsuite/media
@@ -1033,10 +929,8 @@ action_execution_order_extend_testrunner: $(srcdir)/../generic-testrunner.sh act
 
 registerClassTest_SOURCES =	\
 	registerClassTest.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-registerClassTest_LDADD = $(MING_LIBS)
+registerClassTest_LDADD = libgnashmingutils.la
 
 registerClassTest.swf: registerClassTest
 	./registerClassTest $(top_srcdir)/testsuite/media
@@ -1067,10 +961,8 @@ RemoveObject2Test.swf: RemoveObject2Test
 
 RollOverOutTest_SOURCES =	\
 	RollOverOutTest.c	\
-	ming_utils.h	\
-	ming_utils.c	\
 	$(NULL)
-RollOverOutTest_LDADD = $(MING_LIBS)
+RollOverOutTest_LDADD = libgnashmingutils.la
 RollOverOutTest.swf: RollOverOutTest
 	./RollOverOutTest $(top_srcdir)/testsuite/media
 RollOverOutTest_Runner_SOURCES = \
@@ -1089,10 +981,8 @@ RollOverOutTest_Runner_DEPENDENCIES = \
 
 ButtonEventsTest_SOURCES =	\
 	ButtonEventsTest.c	\
-	ming_utils.h	\
-	ming_utils.c	\
 	$(NULL)
-ButtonEventsTest_LDADD = $(MING_LIBS)
+ButtonEventsTest_LDADD = libgnashmingutils.la
 ButtonEventsTest.swf: ButtonEventsTest
 	./ButtonEventsTest $(top_srcdir)/testsuite/media
 ButtonEventsTest_Runner_SOURCES = \
@@ -1111,10 +1001,8 @@ ButtonEventsTest_Runner_CXXFLAGS = \
 
 SpriteButtonEventsTest_SOURCES =	\
 	SpriteButtonEventsTest.c	\
-	ming_utils.h	\
-	ming_utils.c	\
 	$(NULL)
-SpriteButtonEventsTest_LDADD = $(MING_LIBS)
+SpriteButtonEventsTest_LDADD = libgnashmingutils.la
 SpriteButtonEventsTest.swf: SpriteButtonEventsTest
 	./SpriteButtonEventsTest $(top_srcdir)/testsuite/media
 SpriteButtonEventsTest_Runner_SOURCES = \
@@ -1133,10 +1021,8 @@ SpriteButtonEventsTest_Runner_CXXFLAGS = \
 
 loadMovieTest_SOURCES =	\
 	loadMovieTest.c	\
-	ming_utils.h	\
-	ming_utils.c	\
 	$(NULL)
-loadMovieTest_LDADD = $(MING_LIBS)
+loadMovieTest_LDADD = libgnashmingutils.la
 loadMovieTest.swf: loadMovieTest
 	./loadMovieTest $(top_srcdir)/testsuite/media
 loadMovieTestRunner_SOURCES = \
@@ -1167,25 +1053,23 @@ loadMovieTestRunner_DEPENDENCIES = \
 #	$(NULL)
 
 # This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
-VarAndCharClashTest.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/VarAndCharClashTest.as 
-	$(MAKESWF) -o $@ ../Dejagnu.swf $(srcdir)/../media/green.swf $(srcdir)/VarAndCharClashTest.as
+VarAndCharClashTest.swf: $(srcdir)/../media/green.swf Dejagnu.swf $(srcdir)/VarAndCharClashTest.as 
+	$(MAKESWF) -o $@ Dejagnu.swf $(srcdir)/../media/green.swf $(srcdir)/VarAndCharClashTest.as
 VarAndCharClashTest-Runner: $(srcdir)/../generic-testrunner.sh VarAndCharClashTest.swf
 	sh $< $(top_builddir) VarAndCharClashTest.swf > $@
 	chmod 755 $@
 
 # This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
-FlashVarsTest.swf: ../Dejagnu.swf $(srcdir)/FlashVarsTest.as 
-	$(MAKESWF) -o $@ ../Dejagnu.swf $(srcdir)/FlashVarsTest.as
+FlashVarsTest.swf: Dejagnu.swf $(srcdir)/FlashVarsTest.as 
+	$(MAKESWF) -o $@ Dejagnu.swf $(srcdir)/FlashVarsTest.as
 FlashVarsTest-Runner: $(srcdir)/../generic-testrunner.sh FlashVarsTest.swf
 	echo "$(top_builddir)/gui/gnash -1 -r0 -v -P 'FlashVars=?a=a_in_fvars&v=v_in_fvars' 'FlashVarsTest.swf?a=a_in_qstring&q=q_in_qstring'" > $@
 	chmod 755 $@
 
 init_action_test_SOURCES =	\
 	init_action_test.c	\
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
-init_action_test_LDADD = $(MING_LIBS)
+init_action_test_LDADD = libgnashmingutils.la
 
 init_action_test.swf: init_action_test
 	./init_action_test $(top_srcdir)/testsuite/media
@@ -1194,8 +1078,8 @@ init_action_testrunner: $(srcdir)/../generic-testrunner.sh init_action_test.swf
 	sh $< $(top_builddir) init_action_test.swf > $@
 	chmod 755 $@
 
-intervalTest.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/intervalTest.as 
-	$(MAKESWF) -o $@ ../Dejagnu.swf $(srcdir)/intervalTest.as
+intervalTest.swf: $(srcdir)/../media/green.swf Dejagnu.swf $(srcdir)/intervalTest.as 
+	$(MAKESWF) -o $@ Dejagnu.swf $(srcdir)/intervalTest.as
 intervalTestRunner_SOURCES = \
 	intervalTestRunner.cpp \
 	$(NULL)
@@ -1213,8 +1097,8 @@ intervalTestRunner_DEPENDENCIES = \
 
 # This will only work with Ming-0.4.0beta2 (support for prebuilt clips inclusion)
 # Uses a low frame rate to test immediate redraw on key event
-KeyTest.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/KeyTest.as 
-	$(MAKESWF) -o $@ ../Dejagnu.swf $(srcdir)/../media/green.swf $(srcdir)/KeyTest.as
+KeyTest.swf: $(srcdir)/../media/green.swf Dejagnu.swf $(srcdir)/KeyTest.as 
+	$(MAKESWF) -o $@ Dejagnu.swf $(srcdir)/../media/green.swf $(srcdir)/KeyTest.as
 #
 KeyTest_Runner_SOURCES = \
 	KeyTest-Runner.cpp \
@@ -1231,8 +1115,8 @@ KeyTest_Runner_DEPENDENCIES = \
 	KeyTest.swf	\
 	$(NULL)
 
-gotoFrame2Test.swf: $(srcdir)/../media/green.swf ../Dejagnu.swf $(srcdir)/gotoFrame2Test.as 
-	$(MAKESWF) -o $@ -i../Dejagnu.swf:dejagnu $(srcdir)/../actionscript.all/dejagnu_so_init.as \
+gotoFrame2Test.swf: $(srcdir)/../media/green.swf Dejagnu.swf $(srcdir)/gotoFrame2Test.as 
+	$(MAKESWF) -o $@ -iDejagnu.swf:dejagnu $(srcdir)/../actionscript.all/dejagnu_so_init.as \
 		$(srcdir)/gotoFrame2Test.as 
 
 gotoFrame2Test-Runner: $(srcdir)/../generic-testrunner.sh gotoFrame2Test.swf
@@ -1261,11 +1145,9 @@ DrawingApiTestRunner_DEPENDENCIES = \
 
 static_vs_dynamic1_SOURCES = \
 	static_vs_dynamic1.c \
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
 
-static_vs_dynamic1_LDADD = $(MING_LIBS)
+static_vs_dynamic1_LDADD = libgnashmingutils.la
 
 static_vs_dynamic1.swf: static_vs_dynamic1
 	./static_vs_dynamic1 $(srcdir)/../media
@@ -1276,11 +1158,9 @@ static_vs_dynamic1_testrunner: $(srcdir)/../generic-testrunner.sh static_vs_dyna
 
 static_vs_dynamic2_SOURCES = \
 	static_vs_dynamic2.c \
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
 
-static_vs_dynamic2_LDADD = $(MING_LIBS)
+static_vs_dynamic2_LDADD = libgnashmingutils.la
 
 static_vs_dynamic2.swf: static_vs_dynamic2
 	./static_vs_dynamic2 $(srcdir)/../media
@@ -1292,11 +1172,9 @@ static_vs_dynamic2_testrunner: $(srcdir)/../generic-testrunner.sh static_vs_dyna
 
 getTimer_test_SOURCES = \
 	getTimer_test.c \
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
 
-getTimer_test_LDADD = $(MING_LIBS)
+getTimer_test_LDADD = libgnashmingutils.la
 
 getTimer_test.swf: getTimer_test
 	./getTimer_test $(srcdir)/../media
@@ -1307,11 +1185,9 @@ getTimer_testrunner: $(srcdir)/../generic-testrunner.sh getTimer_test.swf
 
 NetStream_SquareTest_SOURCES = \
 	NetStream-SquareTest.c \
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
 
-NetStream_SquareTest_LDADD = $(MING_LIBS)
+NetStream_SquareTest_LDADD = libgnashmingutils.la
 
 NetStream-SquareTest.swf: NetStream-SquareTest
 	./NetStream-SquareTest $(srcdir)/../media
@@ -1336,11 +1212,9 @@ NetStream_SquareTestRunner_DEPENDENCIES = \
 
 Video_EmbedSquareTest_SOURCES = \
 	Video-EmbedSquareTest.c \
-	ming_utils.h		\
-	ming_utils.c		\
 	$(NULL)
 
-Video_EmbedSquareTest_LDADD = $(MING_LIBS)
+Video_EmbedSquareTest_LDADD = libgnashmingutils.la
 
 Video-EmbedSquareTest.swf: Video-EmbedSquareTest
 	./Video-EmbedSquareTest $(srcdir)/../media
@@ -1365,10 +1239,8 @@ Video_EmbedSquareTestRunner_DEPENDENCIES = \
 
 Dejagnu_SOURCES =	\
 	Dejagnu.c	\
-	ming_utils.h				\
-	ming_utils.c				\
 	$(NULL)
-Dejagnu_LDADD = $(MING_LIBS)
+Dejagnu_LDADD = libgnashmingutils.la
 
 Dejagnu.swf: Dejagnu
 	./Dejagnu $(top_srcdir)/testsuite/media

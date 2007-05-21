@@ -1,5 +1,7 @@
 .deps
 .libs
+*.la
+*.lo
 Makefile.in
 Makefile
 definebitsjpeg2
@@ -25,4 +27,5 @@ static_vs_dynamic2
 *est7
 *est8
 *est9
+*est10
 *unner

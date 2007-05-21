@@ -1,5 +1,8 @@
 2007-05-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: build libgnashmingutils
+	  as a convenience library; have Dejagnu.swf users depend on
+	  the local copy, not the one moved one dir up.
 	* libbase/log.{cpp,h}: make LogFile output operators
 	  private, provide a sipler thread-safe log() method.
 	  Have all printf-like log_*() method use this new method.
