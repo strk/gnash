@@ -1,5 +1,7 @@
 2007-05-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test11.c:
+	  New timeline control test.
 	* server/parser/Timeline.h: fix getFrameDepths to really return
 	  depths. Add output operator.
 

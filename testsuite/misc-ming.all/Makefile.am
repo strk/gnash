@@ -93,6 +93,7 @@ check_PROGRAMS = \
 	displaylist_depths_test8 \
 	displaylist_depths_test9 \
 	displaylist_depths_test10 \
+	displaylist_depths_test11 \
 	masks_test \
 	attachMovieTest \
 	attachMovieTestRunner \
@@ -186,6 +187,7 @@ check_SCRIPTS = \
 	displaylist_depths_test8runner \
 	displaylist_depths_test9runner \
 	displaylist_depths_test10runner \
+	displaylist_depths_test11runner \
 	get_frame_number_testrunner \
 	frame_label_testrunner \
 	path_format_testrunner \
@@ -555,6 +557,16 @@ displaylist_depths_test10.swf: displaylist_depths_test10
 
 displaylist_depths_test10runner: $(srcdir)/../generic-testrunner.sh displaylist_depths_test10.swf
 	sh $< -f20 $(top_builddir) displaylist_depths_test10.swf > $@
+	chmod 755 $@
+
+displaylist_depths_test11_SOURCES = displaylist_depths_test11.c	
+displaylist_depths_test11_LDADD = libgnashmingutils.la
+
+displaylist_depths_test11.swf: displaylist_depths_test11
+	./displaylist_depths_test11 $(top_srcdir)/testsuite/media
+
+displaylist_depths_test11runner: $(srcdir)/../generic-testrunner.sh displaylist_depths_test11.swf
+	sh $< -f20 $(top_builddir) displaylist_depths_test11.swf > $@
 	chmod 755 $@
 
 masks_test_SOURCES =	\
@@ -1294,6 +1306,7 @@ TEST_CASES = \
 	displaylist_depths_test8runner \
 	displaylist_depths_test9runner \
 	displaylist_depths_test10runner \
+	displaylist_depths_test11runner \
 	matrix_testrunner \
 	get_frame_number_testrunner \
 	frame_label_testrunner \
