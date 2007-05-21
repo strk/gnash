@@ -1,7 +1,12 @@
+2007-05-21 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/displaylist_depths_test9.c: add
+	  a construct event handler for the static character placed
+	  and replaced (duplicated), and tests for its run.
+
 2007-05-21  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* libbase/Makefile.am: Don't include LIBLTDL in libgnashbase.la.
-
 
 2007-05-21 Sandro Santilli <strk@keybit.net>
 

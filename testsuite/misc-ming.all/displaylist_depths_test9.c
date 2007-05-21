@@ -118,6 +118,10 @@ main(int argc, char** argv)
   it1 = add_static_mc(mo, "static3", 3, 10, 200, 20, 20);
   check_equals(mo, "static3.getDepth()", "-16381");
   it2 = add_static_mc(mo, "static4", 4, 100, 200, 20, 20);
+  SWFDisplayItem_addAction(it2, newSWFAction(
+		"_root.note(this+' constructed');"
+		"_root.mc4Constructed++;"
+		), SWFACTION_CONSTRUCT);
   check_equals(mo, "static4.getDepth()", "-16380");
   add_actions(mo, "duplicateMovieClip('/static4', 'dup0', -16380);");
   check_equals(mo, "dup0.getDepth()", "-16380");
@@ -145,10 +149,14 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); 
 
   // Frame 7: go to frame 5 and checks
+  check_equals(mo, "typeof(static4)", "'undefined'");
+  check_equals(mo, "typeof(dup0)", "'movieclip'");
+  check_equals(mo, "_root.mc4Constructed", "2"); // static4 and dup0...
   add_actions(mo,  "gotoAndStop(5);");
   check_equals(mo, "typeof(static3)", "'movieclip'");
   check_equals(mo, "typeof(static4)", "'movieclip'");
   check_equals(mo, "typeof(dup0)", "'undefined'");
+  check_equals(mo, "mc4Constructed", "3"); // static4 twice, dup0 once
   check_equals(mo, "typeof(dup1)", "'undefined'");
   check_equals(mo, "typeof(dup2)", "'undefined'");
   check_equals(mo, "typeof(dup3)", "'undefined'");
