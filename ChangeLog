@@ -1,5 +1,11 @@
 2007-05-21 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/PlaceObject2Tag.h: add getDepth() method, more dox
+	  and 3 new inspectors to know wheter it's a place, replace or move
+	  tag.
+
+2007-05-21 Sandro Santilli <strk@keybit.net>
+
 	* libbase/log.h: removed useless 'while (0) {};' snippet from
 	  IF_VERBOSE_ASCODING_ERRORS and IF_VERBOSE_MALFORMED_SWF
 

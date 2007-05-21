@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.4 2007/05/12 06:50:37 strk Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.5 2007/05/21 11:05:12 strk Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -50,7 +50,14 @@ namespace tag_loaders {
 
 /// SWF Tag PlaceObject (4) or PlaceObject2 (9) 
 //
+/// The PlaceObject tags can be used to:
+///	- Place a character to a depth. See isPlace().
+///	- Transform the character placed at a depth. See isMove().
+///	- Replace a character at a depth. See isReplace().
 ///
+/// In any case a single Timeline depth is affected.
+/// Postcondition of this tag execution is presence of an instance
+/// at the affected depth. See getDepth().
 ///
 class PlaceObject2Tag : public execute_tag
 {
@@ -86,7 +93,26 @@ public:
 	{
 	    execute(m);
 	}
-    
+
+	/// Return true if this tag places a character
+	bool isPlace() const { return m_place_type == PLACE; }
+
+	/// Return true if this tag replaces a character
+	bool isReplace() const { return m_place_type == REPLACE; }
+
+	/// Return true if this tag transforms a character
+	bool isMove() const { return m_place_type == MOVE; }
+
+	/// Return the depth affected by this tag
+	//
+	/// NOTE: the returned depth is always in the
+	///       static depth zone (character::staticDepthOffset .. -1)
+	///
+	int getDepth() const
+	{
+		return m_depth;
+	}
+
 private:
 
 	int	m_tag_type;
