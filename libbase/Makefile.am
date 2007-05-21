@@ -56,7 +56,6 @@ libgnashbase_la_LIBADD = \
 	$(Z_LIBS) \
 	$(CURL_LIBS) \
 	$(OPENGL_LIBS) \
-	$(LIBLTDL) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(LIBINTL) \
