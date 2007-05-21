@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.75 2007/05/12 08:41:13 strk Exp $ */
+/* $Id: character.h,v 1.76 2007/05/21 10:10:59 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -195,11 +195,17 @@ protected:
 	/// \brief
 	/// Bounds of this character instance before first invalidation
 	/// since last call to clear_invalidated().
-	//
+	///
+	/// This stores the bounds of the character before it has been changed, ie. 
+	/// the position when set_invalidated() is being called. While drawing, both 
+	/// the old and the new bounds are updated (rendered). When moving a 
+	/// character A to B then both the position A needs to be re-rendered (to 
+	/// reveal the backgrond) and the position B needs to be re-rendered (to show 
+	/// the character in it's new position). The bounds may be identical or 
+	/// overlap, but SnappingRanges takes care of that.
+	/// 
 	/// Will be set by set_invalidated() and used by
 	/// get_invalidated_bounds().
-	///
-	/// NOTE: this is currently initialized as the NULL rectangle.
 	///
 	InvalidatedRanges m_old_invalidated_ranges;
   	
@@ -857,12 +863,18 @@ public:
   
   
 	/// \brief
-	/// Add the character's invalidated bounds to the ranges list.
+	/// Add the character's invalidated bounds *to* the given ranges list.
 	//
 	/// NOTE that this method should include the bounds that it
 	/// covered the last time clear_invalidated() was called,
 	/// as those need to be rerendered as well (to clear the region
 	/// previously occupied by this character).
+	///
+	/// That's why it returns the *union* of old_invalidated_ranges and
+	/// the current bounds. The function is also used internally by 
+	/// set_invalidated() to update m_old_invalidated_ranges itself (you may 
+	/// notice some kind of circular reference), but that's no problem since 
+	/// old_invalidated_ranges is NULL during that call. 
 	///
 	/// It is used to determine what area needs to be re-rendered.
 	/// The coordinates are world coordinates (in TWIPS).
