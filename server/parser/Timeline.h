@@ -88,7 +88,7 @@ public:
 	//
 	/// Locks the mutex to avoid race conditions in which the parser
 	/// is closing a frame and the VM is inspecting a frame (either the
-	/// same or a different one). See getDepths().
+	/// same or a different one). See getFrameDepths().
 	///
 	void closeFrame()
 	{
