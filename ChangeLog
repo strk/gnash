@@ -1,3 +1,14 @@
+2007-05-21 Sandro Santilli <strk@keybit.net>
+
+	* libbase/log.{cpp,h}: make LogFile output operators
+	  private, provide a sipler thread-safe log() method.
+	  Have all printf-like log_*() method use this new method.
+	  Fixes bug bug #19906.
+	* cygnal/stream.cpp, server/parser/action_buffer.cpp,
+	  server/parser/action_buffer.h, server/vm/ActionExec.cpp,
+	  testsuite/server/PropertyListTest.cpp: remove any
+	  use of LogFile::operator<<, substitute with log_*() calls.
+
 2007-05-21 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/loop_test4.c:

@@ -49,7 +49,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	VM& vm = VM::init(*md5);
 
-	dbglogfile << "VM version " << vm.getSWFVersion() << endl;
+	log_debug("VM version %d", vm.getSWFVersion());
 
 	as_object obj;
 	PropertyList props;

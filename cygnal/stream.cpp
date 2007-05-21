@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: stream.cpp,v 1.5 2007/05/14 09:44:21 jgilmore Exp $ */
+/* $Id: stream.cpp,v 1.6 2007/05/21 06:53:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -46,7 +46,7 @@ using namespace std;
 namespace cygnal {
 
 namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+//gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 }
 
 #if 0
@@ -172,7 +172,7 @@ Stream::open(const char *filespec, int netfd, Statistics  *statistics) {
     _netfd = netfd;
     _statistics = statistics;
 
-    dbglogfile << "Trying to open " << filespec << endl;
+    log_debug("Trying to open %s", filespec);
     
     if (stat(filespec, &st) == 0) {
         _filesize = st.st_size;
@@ -265,7 +265,7 @@ Stream::play(int netfd) {
     _bytes += nbytes;
     _seekptr += nbytes;
 	
-    dbglogfile << "Done..." << endl;
+    log_debug("Done...");
 	   
     munmap(_dataptr, _filesize);
     _seekptr = 0;

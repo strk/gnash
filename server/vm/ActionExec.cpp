@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.32 2007/04/27 16:09:01 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.33 2007/05/21 06:53:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -59,7 +59,7 @@ using std::stringstream;
 
 namespace gnash {
 
-static LogFile& dbglogfile = LogFile::getDefaultInstance();
+//static LogFile& dbglogfile = LogFile::getDefaultInstance();
 #ifdef USE_DEBUGGER
 static Debugger& debugger = Debugger::getDefaultInstance();
 #endif
@@ -175,8 +175,7 @@ ActionExec::operator() ()
 
 	IF_VERBOSE_ACTION (
 		// FIXME, avoid direct dbglogfile access, use log_action
-		dbglogfile << std::endl << "PC:" << pc << " - EX: ";
-		code.log_disasm(pc);
+		log_action("PC:" SIZET_FMT " - EX: %s", pc, code.disasm(pc).c_str());
 	);
 
 	// Set default next_pc offset, control flow action handlers

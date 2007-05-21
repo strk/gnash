@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.49 2007/05/04 00:11:24 nihilus Exp $ */
+/* $Id: log.cpp,v 1.50 2007/05/21 06:53:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -45,15 +45,6 @@
    This should be set by boost itself.
 */
 
-#if defined(_WIN32) || defined(WIN32)
-#define lock(io_mutex) ;
-#define scoped_lock ;
-#else
-	#include <boost/detail/lightweight_mutex.hpp>
-	using boost::detail::lightweight_mutex;
-	#define scoped_lock lightweight_mutex::scoped_lock
-	static lightweight_mutex io_mutex;
-#endif
 
 #include "log.h"
 
@@ -146,8 +137,6 @@ ostream& datetimestamp(ostream& x) {
 // THIS IS DANGEROUS AS TIME OF INITIALIZATION IS UNPREDICTABLE,
 // THUS WE NOW HAVE A LogFile::getDefaultInstance() TO MAKE SURE
 // INITIALIZATION OF THE GLOBAL data HAPPENS BEFORE USE
-//LogFile dbglogfile;
-
 LogFile&
 LogFile::getDefaultInstance()
 {
@@ -170,7 +159,7 @@ log_msg(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile << tmp << endl;
+    dbglogfile.log(tmp);
 
     va_end (ap);
 }
@@ -186,7 +175,7 @@ log_trace(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile << _("TRACE: ") << tmp << endl;
+    dbglogfile.log(_("TRACE"), tmp);
 
     va_end (ap);
 }
@@ -207,7 +196,7 @@ log_debug(const char* fmt, ...)
     // its type would change (to non-const char string) and the letters would
     // change to the local language.  Could perhaps be fixed more cleanly
     // later...
-    dbglogfile << N_("DEBUG: ") << tmp << endl;
+    dbglogfile.log(N_("DEBUG"), tmp);
 
     va_end (ap);
 }
@@ -224,7 +213,7 @@ log_action(const char* fmt, ...)
 
     bool stamp = dbglogfile.getStamp();
     dbglogfile.setStamp(false);
-    dbglogfile << tmp << endl;
+    dbglogfile.log(tmp);
     dbglogfile.setStamp(stamp);
 }
 
@@ -239,7 +228,7 @@ log_parse(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile << tmp << endl;
+    dbglogfile.log(tmp);
 
     va_end (ap);
 }
@@ -255,7 +244,7 @@ log_error(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile << _("ERROR: ") << tmp << endl;
+    dbglogfile.log(_("ERROR"), tmp);
 
     va_end (ap);
 }
@@ -270,7 +259,7 @@ log_unimpl(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile << _("ERROR: Unimplemented: ") << tmp << endl;
+    dbglogfile.log(_("ERROR: Unimplemented"), tmp);
 
     va_end (ap);
 }
@@ -285,7 +274,7 @@ log_security(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile << _("SECURITY: ") << tmp << endl;
+    dbglogfile.log(_("SECURITY"), tmp);
 
     va_end (ap);
 }
@@ -300,7 +289,7 @@ log_swferror(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile << _("MALFORMED SWF: ") << tmp << endl;
+    dbglogfile.log(_("MALFORMED SWF"), tmp);
 
     va_end (ap);
 }
@@ -315,7 +304,7 @@ log_aserror(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile << _("ACTIONSCRIPT ERROR: ") << tmp << endl;
+    dbglogfile.log(_("ACTIONSCRIPT ERROR"), tmp);
 
     va_end (ap);
 }
@@ -324,6 +313,24 @@ const char *
 LogFile::getEntry(void)
 {
     return _logentry.c_str();
+}
+
+void
+LogFile::log(const char* msg)
+{
+    boost::mutex::scoped_lock lock(_ioMutex);
+
+    dbglogfile << msg << endl;
+
+}
+
+void
+LogFile::log(const char* label, const char* msg)
+{
+    boost::mutex::scoped_lock lock(_ioMutex);
+
+    dbglogfile << label << ": " << msg << endl;
+
 }
 
 // Default constructor
@@ -420,7 +427,6 @@ LogFile::removeLog (void)
 LogFile&
 LogFile::operator << (char x)
 {
-    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -438,7 +444,6 @@ LogFile::operator << (char x)
 LogFile&
 LogFile::operator << (long x)
 {
-    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -456,7 +461,6 @@ LogFile::operator << (long x)
 LogFile&
 LogFile::operator << (unsigned int x)
 {
-    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -474,7 +478,6 @@ LogFile::operator << (unsigned int x)
 LogFile&
 LogFile::operator << (unsigned long x)
 {
-    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -492,7 +495,6 @@ LogFile::operator << (unsigned long x)
 LogFile&
 LogFile::operator << (float x)
 {
-    scoped_lock lock(io_mutex);
     if (_verbose > 0) {
 	cout << x;
     }
@@ -510,7 +512,6 @@ LogFile::operator << (float x)
 LogFile&
 LogFile::operator << (double &x)
 {
-    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << x;
     }
@@ -545,7 +546,6 @@ LogFile::operator << (int x)
 LogFile&
 LogFile::operator << (void *ptr)
 {
-    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << ptr;
     }
@@ -563,7 +563,6 @@ LogFile::operator << (void *ptr)
 LogFile&
 LogFile::operator << (const std::string &s)
 {
-    scoped_lock lock(io_mutex);
     if (_verbose) {
 	cout << s;
     }
@@ -599,22 +598,6 @@ LogFile::operator << (const char *str)
     if (strstr(str, N_("DEBUG: "))) {
 	_trace = true;
     }
-
-    scoped_lock lock(io_mutex);
-
-#if 0  // Fixed the callers!
-    // Since the log_* functions are wrappers for the older API used
-    // for logging, we have to strip the CR off the end otr we get
-    // blanks lines as the previous implementation required a CR, and
-    // now we don't.
-    int len = c.length();
-    if (len > 0) {
-	if (c[len-1] == '\n') {
-	    //c[len-1] = 0;
-	    c.resize(len-1);
-	}
-    }
-#endif
 
     if (_stamp == true && (_state == IDLE || _state == OPEN)) {
 	_state = INPROGRESS;
@@ -659,7 +642,6 @@ LogFile::operator << (unsigned char const *c)
       return *this;
     }
 
-    scoped_lock lock(io_mutex);
     if (_stamp == true && (_state == IDLE || _state == OPEN)) {
 	_state = INPROGRESS;
 	if (_verbose) {
@@ -680,47 +662,11 @@ LogFile::operator << (unsigned char const *c)
 
     return *this;
 }
-
-#if 0
-/// \brief print an XML char *
-LogFile&
-LogFile::operator << (const xmlChar *c)
-{
-    scoped_lock lock(io_mutex);
-    _logentry = timestamp();
-    _logentry += ": ";
-
-    if (c == -0) {
-      return *this;
-    }
-
-    if (_stamp == true && (_state == IDLE || _state == OPEN)) {
-	_state = INPROGRESS;
-	if (_verbose) {
-	    cout << _logentry  << c;
-	}
-	if (_write) {
-	    _outstream << _logentry << c;
-	}
-    } else {
-	if (_verbose) {
-	    cout << c;
-	}
-	if (_write) {
-	    _outstream << c;
-	}
-    }
-    _logentry += (const char*)c;
-
-    return *this;
-}
-#endif
 
 /// \brief Grab the endl operator.
 LogFile&
 LogFile::operator << (std::ostream & (&)(std::ostream &))
 {
-    scoped_lock lock(io_mutex);
     if (_trace) {
 	if (_verbose) {
 	    cout << endl;

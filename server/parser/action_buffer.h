@@ -107,8 +107,8 @@ public:
 		return m_buffer[off];
 	}
 
-	/// Disassemble instruction at given offset to the log.
-	void log_disasm(size_t pc) const;
+	/// Disassemble instruction at given offset and return as a string
+	std::string disasm(size_t pc) const;
 
 	/// Get a null-terminated string from given offset
 	//

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: action_buffer.cpp,v 1.19 2007/04/25 11:29:12 martinwguy Exp $ */
+/* $Id: action_buffer.cpp,v 1.20 2007/05/21 06:53:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,7 +38,7 @@ using std::string;
 using std::endl;
 
 namespace {
-gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+//gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 }
 
 namespace gnash {
@@ -189,9 +189,9 @@ action_buffer::execute(
 #endif
 
 // Disassemble one instruction to the log.
-static void
-disasm(const unsigned char* instruction_data)
-{    
+static std::string
+disasm_instruction(const unsigned char* instruction_data)
+{
 
     using namespace gnash::SWF;
 
@@ -202,12 +202,13 @@ disasm(const unsigned char* instruction_data)
     unsigned char num[10];
     memset(num, 0, 10);
 
-    dbglogfile.setStamp(false);
+    std::stringstream ss;
+
     // Show instruction.
     if (action_id > ash.lastType()) {
-	dbglogfile << "<unknown>[0x" << action_id  << "]" << endl;
+	ss << "<unknown>[0x]" <<  action_id << endl;
     } else {
-	dbglogfile << ash[action_id].getName().c_str() << endl;
+	ss << ash[action_id].getName() << endl;
 	fmt = ash[action_id].getArgFormat();
     }
 
@@ -218,28 +219,27 @@ disasm(const unsigned char* instruction_data)
 	if (fmt == ARG_HEX) {
 	    for (int i = 0; i < length; i++) {
 		hexify(num, (const unsigned char *)&instruction_data[3 + i], 1, false);
-		dbglogfile << "0x" << num << " ";
-//		dbglogfile << instruction_data[3 + i] << " ";
+		ss << "0x" << num << " ";
 	    }
-	    dbglogfile << endl;
+	    ss << endl;
 	} else if (fmt == ARG_STR) {
 	    string str;
 	    for (int i = 0; i < length; i++) {
 		str += instruction_data[3 + i];
 	    }
-	    dbglogfile << "\"" << str.c_str() << "\"" << endl;
+	    ss << "\"" << str.c_str() << "\"" << endl;
 	} else if (fmt == ARG_U8) {
 	    int	val = instruction_data[3];
-	    dbglogfile << " " << val << endl;
+	    ss << " " << val << endl;
 	} else if (fmt == ARG_U16) {
 	    int	val = instruction_data[3] | (instruction_data[4] << 8);
-	    dbglogfile << " " << val << endl;
+	    ss << " " << val << endl;
 	} else if (fmt == ARG_S16) {
 	    int	val = instruction_data[3] | (instruction_data[4] << 8);
 	    if (val & 0x8000) val |= ~0x7FFF;	// sign-extend
-	    dbglogfile << " " << val << endl;
+	    ss << " " << val << endl;
 	} else if (fmt == ARG_PUSH_DATA) {
-	    dbglogfile << endl;
+	    ss << endl;
 	    int i = 0;
 	    while (i < length) {
 		int	type = instruction_data[3 + i];
@@ -252,30 +252,30 @@ disasm(const unsigned char* instruction_data)
 			i++;
 		    }
 		    i++;
-		    dbglogfile << "\t\"" << str.c_str() << "\"" << endl;
+		    ss << "\t\"" << str.c_str() << "\"" << endl;
 		} else if (type == 1) {
 		    // float (little-endian)
 		    float f = convert_float_little(instruction_data + 3 + i);
 		    i += 4;
-		    dbglogfile << "(float) " << f << endl;
+		    ss << "(float) " << f << endl;
 		} else if (type == 2) {
-		    dbglogfile << "NULL" << endl;
+		    ss << "NULL" << endl;
 		} else if (type == 3) {
-		    dbglogfile << "undef" << endl;
+		    ss << "undef" << endl;
 		} else if (type == 4) {
 		    // contents of register
 		    int	reg = instruction_data[3 + i];
 		    i++;
-		    dbglogfile << "reg[" << reg << "]" << endl;
+		    ss << "reg[" << reg << "]" << endl;
 		} else if (type == 5) {
 		    int	bool_val = instruction_data[3 + i];
 		    i++;
-		    dbglogfile << "bool(" << bool_val << ")" << endl;
+		    ss << "bool(" << bool_val << ")" << endl;
 		} else if (type == 6) {
 		    // double in wacky format: 45670123
 		    double d = convert_double_wacky(instruction_data + 3 + i);
 		    i += 8;
-		    dbglogfile << "(double) " << d << endl;
+		    ss << "(double) " << d << endl;
 		} else if (type == 7) {
 		    // int32_t
 		    int32_t	val = instruction_data[3 + i]
@@ -283,15 +283,15 @@ disasm(const unsigned char* instruction_data)
 			| (instruction_data[3 + i + 2] << 16)
 			| (instruction_data[3 + i + 3] << 24);
 		    i += 4;
-		    dbglogfile << "(int) " << val << endl;
+		    ss << "(int) " << val << endl;
 		} else if (type == 8) {
 		    int	id = instruction_data[3 + i];
 		    i++;
-		    dbglogfile << "dict_lookup[" << id << "]" << endl;
+		    ss << "dict_lookup[" << id << "]" << endl;
 		} else if (type == 9) {
 		    int	id = instruction_data[3 + i] | (instruction_data[3 + i + 1] << 8);
 		    i += 2;
-		    dbglogfile << "dict_lookup_lg[" << id << "]" << endl;
+		    ss << "dict_lookup_lg[" << id << "]" << endl;
 		}
 	    }
 	} else if (fmt == ARG_DECL_DICT) {
@@ -299,23 +299,23 @@ disasm(const unsigned char* instruction_data)
 	    int	count = instruction_data[3 + i] | (instruction_data[3 + i + 1] << 8);
 	    i += 2;
 	    
-	    dbglogfile << " [" << count << "]" << endl;
+	    ss << " [" << count << "]" << endl;
 	    
 	    // Print strings.
 	    for (int ct = 0; ct < count; ct++) {
-		dbglogfile << "\t" << ct << ") "; 
+		ss << "\t" << ct << ") "; 
 		
 		string str;
 		while (instruction_data[3 + i]) {
 			// safety check.
 		    if (i >= length) {
-			dbglogfile << "<disasm error -- length exceeded>" << endl;
+			log_debug("<disasm error -- length exceeded>");
 			break;
 		    }
 		    str += instruction_data[3 + i];
 		    i++;
 		}
-		dbglogfile << "\"" << str.c_str() << "\"" << endl;
+		ss << "\"" << str.c_str() << "\"" << endl;
 		i++;
 	    }
 	} else if (fmt == ARG_FUNCTION2) {
@@ -330,7 +330,7 @@ disasm(const unsigned char* instruction_data)
 	    int	reg_count = instruction_data[3 + i];
 	    i++;
 
-	    dbglogfile << "\t\tname = '" << function_name << "'"
+	    ss << "\t\tname = '" << function_name << "'"
 		       << " arg_count = " << arg_count
 		       << " reg_count = " << reg_count << endl;
 	    
@@ -371,7 +371,7 @@ disasm(const unsigned char* instruction_data)
 		const char*	arg_name = (const char*) &instruction_data[3 + i];
 		i += strlen(arg_name) + 1;
 		
-		dbglogfile << "\t\targ[" << argi << "]"
+		ss << "\t\targ[" << argi << "]"
 			   << " - reg[" << arg_register << "]"
 			   << " - '" << arg_name << "'" << endl;
 	    }
@@ -379,21 +379,24 @@ disasm(const unsigned char* instruction_data)
 	    int	function_length = instruction_data[3 + i] | (instruction_data[3 + i + 1] << 8);
 	    i += 2;
 	    
-	    dbglogfile << "\t\tfunction length = " << function_length << endl;
+	    ss << "\t\tfunction length = " << function_length << endl;
 	}
     } else {
-	dbglogfile << endl;
+	ss << endl;
     }
-    dbglogfile.setStamp(true);
+
+    //dbglogfile.setStamp(false); // why ?
+    //log_msg("%s", ss.str().c_str());
+    //dbglogfile.setStamp(true);
+    return ss.str();
 }
 
-// Disassemble one instruction to the log.
-void
-action_buffer::log_disasm(size_t pc) const
-{    
+std::string
+action_buffer::disasm(size_t pc) const
+{
 	const unsigned char* instruction_data =
 		(const unsigned char *)&m_buffer[pc];
-	disasm(instruction_data);
+	return disasm_instruction(instruction_data);
 }
 
 // Endian conversion routines.

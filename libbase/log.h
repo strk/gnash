@@ -35,6 +35,8 @@
 
 #include <fstream>
 #include <sstream>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/mutex.hpp>
 
 // the default name for the debug log
 #define DEFAULT_LOGFILE "gnash-dbg.log"
@@ -59,8 +61,6 @@ public:
 // This is a basic file logging class
 class DSOEXPORT LogFile {
 public:
-    LogFile (void);
-    LogFile (const char *);
 
     static LogFile& getDefaultInstance();
 
@@ -69,45 +69,32 @@ public:
 	    closeLog();
 	}
     }
+
     enum file_state {
 	CLOSED,
 	OPEN,
 	INPROGRESS,
 	IDLE
     } _state;
+
+    /// Intended for use by log_*(). Thread-safe (locks _ioMutex)
+    //
+    /// @param label
+    ///		The label string ie: "ERROR" for "ERROR: <msg>"
+    ///
+    /// @param msg
+    ///		The message string ie: "bah" for "ERROR: bah"
+    ///
+    void log(const char* label, const char* msg);
+
+    /// Intended for use by log_*(). Thread-safe (locks _ioMutex)
+    //
+    /// @param msg
+    ///		The message to print
+    ///
+    void log(const char* msg);
     
     file_state GetState (void) { return _state; }
-    LogFile& operator << (char x);
-    LogFile& operator << (int x);
-    LogFile& operator << (long x);
-    LogFile& operator << (unsigned int x);
-    LogFile& operator << (unsigned long x);
-    // These both resolve to an unsigned int.
-    // LogFile& operator << (size_t x);
-    // LogFile& operator << (time_t x);
-    LogFile& operator << (float x);
-    LogFile& operator << (double &x);
-    LogFile& operator << (bool x);
-    LogFile& operator << (void *);
-    LogFile& operator << (const char *);
-    LogFile& operator << (unsigned char const *);
-    LogFile& operator << (const std::string &s);
-//     LogFile& operator << (const xmlChar *c);
-    LogFile& operator << (std::ostream & (&)(std::ostream &));
-
-    /// Print anything that can be printed on a stringstream
-    //
-    /// This template function could replace ALL but
-    /// operator << (const std::string&) members of
-    /// LogFile class.
-    ///
-    template <class T>
-    LogFile& operator << (const T& any)
-    {
-	    std::stringstream ss;
-	    ss << any;
-	    return *this << ss.str();
-    }
 
     const char *getEntry(void);
     
@@ -153,6 +140,15 @@ public:
     }
     
 private:
+
+    // Use getDefaultInstance for getting the singleton
+    LogFile (void);
+
+    // Use getDefaultInstance for getting the singleton
+    LogFile (const char *);
+
+    boost::mutex _ioMutex;
+
     static std::ofstream _console;
     std::ofstream	 _outstream;
     static int		 _verbose;
@@ -164,6 +160,39 @@ private:
     std::string		 _filespec;
     std::string		 _logentry;
     friend std::ostream & operator << (std::ostream &os, LogFile& e);
+
+    LogFile& operator << (char x);
+    LogFile& operator << (int x);
+    LogFile& operator << (long x);
+    LogFile& operator << (unsigned int x);
+    LogFile& operator << (unsigned long x);
+    // These both resolve to an unsigned int.
+    // LogFile& operator << (size_t x);
+    // LogFile& operator << (time_t x);
+    LogFile& operator << (float x);
+    LogFile& operator << (double &x);
+    LogFile& operator << (bool x);
+    LogFile& operator << (void *);
+    LogFile& operator << (const char *);
+    LogFile& operator << (unsigned char const *);
+    LogFile& operator << (const std::string &s);
+//     LogFile& operator << (const xmlChar *c);
+    LogFile& operator << (std::ostream & (&)(std::ostream &));
+
+    /// Print anything that can be printed on a stringstream
+    //
+    /// This template function could replace ALL but
+    /// operator << (const std::string&) members of
+    /// LogFile class.
+    ///
+    template <class T>
+    LogFile& operator << (const T& any)
+    {
+	    std::stringstream ss;
+	    ss << any;
+	    return *this << ss.str();
+    }
+
 };
 
 
