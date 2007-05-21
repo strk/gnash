@@ -1,3 +1,8 @@
+2007-05-21 Sandro Santilli <strk@keybit.net>
+
+	* libbase/log.h: removed useless 'while (0) {};' snippet from
+	  IF_VERBOSE_ASCODING_ERRORS and IF_VERBOSE_MALFORMED_SWF
+
 2007-05-21 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/loop_test5.c:
