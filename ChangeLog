@@ -1,5 +1,7 @@
 2007-05-22 Ann Barcomb <ann@lulu.com>
 	* doc/C/usermanual/*: Added files for the new user manual.
+	* doc/C/app_authors.xml: Added a file which is used in the user manual
+	  but might be cross-referenced by other documents.
 
 2007-05-22 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
