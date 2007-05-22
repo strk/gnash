@@ -39,7 +39,7 @@
  *  frame2: character 1 placed at depth -16381 
  *  frame3: remove character -16381 
  *  frame4: character 1 placed at depth -16381 (same character id)
- *  frame4: jump back to frame 2 and stop
+ *  frame5: jump back to frame 2 and stop
  * 
  * Expected behaviour:
  * 
