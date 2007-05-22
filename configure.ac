@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.321 2007/05/22 18:27:39 strk Exp $
+dnl $Id: configure.ac,v 1.322 2007/05/22 18:50:15 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1461,6 +1461,7 @@ fi
       echo "        ERROR: No FFMPEG development package installed!"
       echo "               You can install FFMPEG from http://ffmpeg.mplayerhq.hu"
       echo "               or .deb users: apt-get install libavformat-dev"
+      echo "               or .rpm users: yum install ffmpeg-devel"
       echo "               or reconfigure with --enable-media=mad"
       nogo=true
     fi
