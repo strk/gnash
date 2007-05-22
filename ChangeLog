@@ -1,5 +1,8 @@
 2007-05-22 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (place_object_2_loader): don't
+	  add a TimelineDepth if read depth is out of static depth zone 
+	  boundaries (warn user about it too...).
 	* gui/Player.cpp (run): use movie url for window title (-u).
 	  Useful when reading stdin...
 	* server/parser/shape_character_def.cpp (read): don't force

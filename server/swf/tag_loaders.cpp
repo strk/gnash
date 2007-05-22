@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.104 2007/05/21 11:11:39 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.105 2007/05/22 20:23:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -787,7 +787,16 @@ place_object_2_loader(stream* in, tag_type tag, movie_definition* m)
     ch->read(in, tag, m->get_version());
 
     m->add_execute_tag(ch);
-    m->addTimelineDepth(ch->getDepth());
+
+    int depth = ch->getDepth();
+    if ( depth < 0 && depth >= character::staticDepthOffset )
+    {
+    	m->addTimelineDepth(ch->getDepth());
+    }
+    else
+    {
+	log_debug("PlaceObject2Tag depth %d is out of static depth zone. Won't register its TimelineDepth.", depth);
+    }
 }
 
 // Create and initialize a sprite, and add it to the movie.
