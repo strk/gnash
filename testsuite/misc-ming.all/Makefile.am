@@ -154,6 +154,13 @@ check_PROGRAMS += \
 	$(NULL)
 endif
 
+if MING_SUPPORTS_REPLACE_TAG
+check_PROGRAMS += \
+	replace_shapes1test \
+	replace_sprites1test \
+	$(NULL)
+endif
+
 check_SCRIPTS = \
 	timeline_var_test-Runner \
 	place_object_testrunner \
@@ -211,6 +218,13 @@ endif
 if MING_SUPPORTS_INIT_ACTIONS
 check_SCRIPTS += \
 	init_action_testrunner \
+	$(NULL)
+endif
+
+if MING_SUPPORTS_REPLACE_TAG
+check_SCRIPTS += \
+	replace_shapes1test_runner \
+	replace_sprites1test_runner \
 	$(NULL)
 endif
 
@@ -567,6 +581,26 @@ displaylist_depths_test11.swf: displaylist_depths_test11
 
 displaylist_depths_test11runner: $(srcdir)/../generic-testrunner.sh displaylist_depths_test11.swf
 	sh $< -f20 $(top_builddir) displaylist_depths_test11.swf > $@
+	chmod 755 $@
+
+replace_shapes1test_SOURCES = replace_shapes1test.c	
+replace_shapes1test_LDADD = libgnashmingutils.la
+
+replace_shapes1test.swf: replace_shapes1test
+	./replace_shapes1test $(top_srcdir)/testsuite/media
+
+replace_shapes1test_runner: $(srcdir)/../generic-testrunner.sh replace_shapes1test.swf
+	sh $< -f20 $(top_builddir) replace_shapes1test.swf > $@
+	chmod 755 $@
+
+replace_sprites1test_SOURCES = replace_sprites1test.c	
+replace_sprites1test_LDADD = libgnashmingutils.la
+
+replace_sprites1test.swf: replace_sprites1test
+	./replace_sprites1test $(top_srcdir)/testsuite/media
+
+replace_sprites1test_runner: $(srcdir)/../generic-testrunner.sh replace_sprites1test.swf
+	sh $< -f20 $(top_builddir) replace_sprites1test.swf > $@
 	chmod 755 $@
 
 masks_test_SOURCES =	\
@@ -1336,6 +1370,13 @@ endif
 if MING_SUPPORTS_INIT_ACTIONS
 TEST_CASES += \
 	init_action_testrunner \
+	$(NULL)
+endif
+
+if MING_SUPPORTS_REPLACE_TAG
+TEST_CASES += \
+	replace_shapes1test_runner \
+	replace_sprites1test_runner \
 	$(NULL)
 endif
 
