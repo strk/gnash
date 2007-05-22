@@ -1,4 +1,14 @@
+2007-05-22 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: add MING_SUPPORTS_REPLACE_TAG conditinal variable,
+	  based on version (0.4.0.beta5).
+	* testsuite/misc-ming.all/: Makefile.am, replace_shapes1test.c,
+	  replace_sprites1test.c: Add a couple of test for REPLACE tags.
+	  Needs a Ming version that supports it, checked by
+	  MING_SUPPORTS_REPLACE as set by ./configure.
+
 2007-05-22 Ann Barcomb <ann@lulu.com>
+
 	* doc/C/usermanual/installation/configuration.xml: List interesting
 	  options before custom path options
 	* doc/C/usermanual/installation/feature_configuration.xml: Added
