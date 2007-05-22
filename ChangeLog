@@ -1,4 +1,15 @@
+2007-05-22 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/character.{h,cpp}: Added preprocessor code to analyze 
+	  calls to set_invalidated() more easily.
+	* server/cxform.h: Implemented == operator
+	* server/dlist.cpp: inherit invalidated bounds when replacing a
+	  character
+	* server/sprite_instance.cpp: avoid call to set_invalidated()
+    (of parent) when replacing a char	  				
+		 
 2007-05-22 Ann Barcomb <ann@lulu.com>
+
 	* doc/C/usermanual/*: Added files for the new user manual.
 	* doc/C/app_authors.xml: Added a file which is used in the user manual
 	  but might be cross-referenced by other documents.

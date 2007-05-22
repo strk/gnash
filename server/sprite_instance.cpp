@@ -71,7 +71,7 @@ namespace gnash {
 //#define GNASH_DEBUG 1
 //#define GNASH_DEBUG_TIMELINE 1
 #define NEW_TIMELINE_DESIGN 1
-	
+
 
 
 // Forward declarations
@@ -2102,7 +2102,7 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 
 	// TODO: only call set_invalidated if this character actually overrides
 	//       an existing one !
-	set_invalidated();
+	set_invalidated(); 
 
 	m_display_list.place_character(
 		sprite,
@@ -2605,7 +2605,7 @@ sprite_instance::resetDisplayList()
 
 		// Set this character as invalidated *before*
 		// actually updating the displaylist !
-		set_invalidated();
+		set_invalidated(); 
 
 		m_display_list = _frame0_chars;			
 	};
@@ -2644,7 +2644,7 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 		cout << "Current DisplayList: " << m_display_list << endl;
 #endif
 
-		set_invalidated();
+		set_invalidated(); 
 		m_display_list.clear(toRemove, true); // call onUnload
 
 #ifdef GNASH_DEBUG_TIMELINE
@@ -2827,7 +2827,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
 		assert(m_current_frame == target_frame_number);
 #else // old design
 
-		set_invalidated();
+		set_invalidated(); 
 
   // <UdoG> current design is sub-optimal because it causes unnecessary 
   // redraw. Consider a static graphic that stays at it's position all
@@ -3163,8 +3163,6 @@ void sprite_instance::replace_display_object(
 	    ch->set_name(name);
 	}
 
-	 set_invalidated();
-
     m_display_list.replace_character(
 	ch,
 	depth,
@@ -3416,7 +3414,7 @@ void sprite_instance::restart()
     // so take note of the current bounds
     // for the renderer to know what to 
     // redraw.
-    set_invalidated();
+    set_invalidated(); 
 
     // Clear current display list and 
     // its backup

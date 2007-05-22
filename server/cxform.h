@@ -39,6 +39,7 @@ class DSOEXPORT cxform
 {
 public:
 
+    friend bool operator== (const cxform&, const cxform&);
     friend std::ostream& operator<< (std::ostream& os, const cxform& cx);
 
     /// [RGBA][multiply, add]
@@ -84,6 +85,19 @@ public:
     std::string toString() const;
 };
 
+
+inline bool operator== (const cxform& a, const cxform& b)
+{
+	return	
+		a.m_[0][0] == b.m_[0][0] &&
+		a.m_[0][1] == b.m_[0][1] &&
+		a.m_[1][0] == b.m_[1][0] &&
+		a.m_[1][1] == b.m_[1][1] &&
+		a.m_[2][0] == b.m_[2][0] &&
+		a.m_[2][1] == b.m_[2][1] &&
+		a.m_[3][0] == b.m_[3][0] &&
+		a.m_[3][1] == b.m_[3][1];
+}
 
 
 

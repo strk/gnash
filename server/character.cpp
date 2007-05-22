@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.41 2007/05/03 09:54:45 udog Exp $ */
+/* $Id: character.cpp,v 1.42 2007/05/22 14:23:51 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,6 +32,8 @@
 #include "ExecutableCode.h"
 
 #include <boost/algorithm/string/case_conv.hpp>
+
+#undef set_invalidated
 
 namespace gnash
 {
@@ -182,8 +184,14 @@ character::get_relative_target_common(const std::string& name)
 	return NULL;
 }
 
-void
+void 
 character::set_invalidated()
+{
+	set_invalidated("unknown", -1);
+}
+
+void
+character::set_invalidated(const char* debug_file, int debug_line)
 {
   // Set the invalidated-flag of the parent. Note this does not mean that
   // the parent must re-draw itself, it just means that one of it's childs
@@ -201,6 +209,11 @@ character::set_invalidated()
 	if ( ! m_invalidated )
 	{
 		m_invalidated = true;
+		
+		#ifdef DEBUG_SET_INVALIDATED
+		printf("%p set_invalidated() of %s in %s:%d\n", this, get_name().c_str(),
+			debug_file, debug_line);
+		#endif
 		
 		// NOTE: we need to set snap_distance in order to avoid too tight 
 		// invalidated ranges. The GUI chooses the appropriate distance in base
@@ -226,6 +239,13 @@ character::set_child_invalidated()
     m_child_invalidated=true;
   	if ( m_parent ) m_parent->set_child_invalidated();
   } 
+}
+
+void
+character::extend_invalidated_bounds(const InvalidatedRanges& ranges)
+{
+	set_invalidated(__FILE__, __LINE__);
+	m_old_invalidated_ranges.add(ranges);
 }
 
 //---------------------------------------------------------------------

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.76 2007/05/21 10:10:59 udog Exp $ */
+/* $Id: character.h,v 1.77 2007/05/22 14:23:51 udog Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -45,6 +45,8 @@
 #include <string>
 #include <cassert>
 #include <typeinfo>
+
+//#define DEBUG_SET_INVALIDATED 1
 
 // Forward declarations
 namespace gnash {
@@ -360,7 +362,7 @@ public:
 	{
 	    assert(m.is_valid());
 	    if (!(m == m_matrix)) {
-	      set_invalidated();
+	      set_invalidated(__FILE__, __LINE__);
 	      m_matrix = m;
 	    }
 	}
@@ -382,15 +384,17 @@ public:
 
     const cxform&	get_cxform() const { return m_color_transform; }
     void	set_cxform(const cxform& cx) 
-    { 
-      set_invalidated(); 
-      m_color_transform = cx;
+    {       
+      if (!(cx == m_color_transform)) {
+      	set_invalidated(__FILE__, __LINE__);
+      	m_color_transform = cx;
+      }
     }
     void	concatenate_cxform(const cxform& cx) { m_color_transform.concatenate(cx); }
     void	concatenate_matrix(const matrix& m) { m_matrix.concatenate(m); }
     float	get_ratio() const { return m_ratio; }
     void	set_ratio(float f) {
-      if (f!=m_ratio) set_invalidated(); 
+      if (f!=m_ratio) set_invalidated(__FILE__, __LINE__); 
       m_ratio = f;       
     }
 
@@ -720,7 +724,7 @@ public:
 
     // TODO: why is this virtual ??
     virtual void	set_visible(bool visible) {
-      if (m_visible!=visible) set_invalidated();  
+      if (m_visible!=visible) set_invalidated(__FILE__, __LINE__);  
       m_visible = visible;      
     }
 
@@ -847,6 +851,14 @@ public:
 	/// @see \ref region_update
 	///
 	void set_invalidated();
+	void set_invalidated(const char* debug_file, int debug_line);
+	
+	
+	/// Calls set_invalidated() and extends old_invalidated_ranges to the
+	/// given value so that also this area gets re-rendered (used when
+	/// replacing characters).	
+	void extend_invalidated_bounds(const InvalidatedRanges& ranges);
+	
 	
 	/// Called by a child to signalize it has changed visibily. The
 	/// difference to set_invalidated() is that *this* character does
@@ -968,6 +980,9 @@ public: // istn't this 'public' reduntant ?
 
 }	// end namespace gnash
 
+#ifdef DEBUG_SET_INVALIDATED
+#define set_invalidated() set_invalidated(__FILE__, __LINE__)
+#endif
 
 #endif // GNASH_CHARACTER_H
 

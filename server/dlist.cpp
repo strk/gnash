@@ -195,15 +195,24 @@ DisplayList::place_character(
 	if ( it == _characters.end() || (*it)->get_depth() != depth )
 	{
 		//log_msg(_("place_character: new character at depth %d"), depth);
+		
 		// add the new char
 		_characters.insert(it, DisplayItem(ch));
 	}
 	else
 	{
 		//log_msg(_("place_character: replacing existing character at depth %d"), depth);
+		
+		// remember bounds of old char
+		InvalidatedRanges old_ranges;	
+		(*it)->add_invalidated_bounds(old_ranges, true);	
+	
 		(*it)->unload();
 		// replace existing char
 		*it = DisplayItem(ch);
+		
+		// extend invalidated bounds
+		ch->extend_invalidated_bounds(old_ranges); 				
 	}
 
 	// Give life to this instance
@@ -283,6 +292,9 @@ DisplayList::replace_character(
 	}
 	else
 	{
+	
+		InvalidatedRanges old_ranges;
+	
 		if (!use_cxform)
 		{
 			// Use the cxform from the old character.
@@ -294,9 +306,15 @@ DisplayList::replace_character(
 			// Use the matrix from the old character.
 			ch->set_matrix((*it)->get_matrix());
 		}
+		
+		// remember bounds of old char
+		(*it)->add_invalidated_bounds(old_ranges, true);		
 
-		// replace existing char
+		// replace existing char		
 		*it = di;
+		
+		// extend invalidated bounds
+		ch->extend_invalidated_bounds(old_ranges);				
 
 		// TODO: check: Shouldn't we construct the new object here too ?
 		//ch->construct();
