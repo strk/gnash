@@ -1,5 +1,14 @@
 2007-05-22 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.cpp (run): use movie url for window title (-u).
+	  Useful when reading stdin...
+	* server/parser/shape_character_def.cpp (read): don't force
+	  fill and line style of glyphs to have a corresponding style
+	  definition, just warn if the value in a styleChangeRecord is
+	  neither 0 or 1. Set style to 0 when invalid.
+
+2007-05-22 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/loop_test-Runner.cpp: don't expect
 	  failure in invalidated bounds after Udo commits.
 	* testsuite/misc-ming.all/replace_sprites1test.c: Change expected

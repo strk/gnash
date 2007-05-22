@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.25 2007/05/14 20:28:14 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.26 2007/05/22 19:38:54 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -195,7 +195,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
     {
 	    assert(!with_style);
-	    m_fill_styles.push_back(fill_style());
+	    //m_fill_styles.push_back(fill_style());
     }
 
 
@@ -280,21 +280,34 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += fill_base;
 		}
-		if ( style <= m_fill_styles.size() ) // 1-based index 
+
+    		if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
 		{
-			current_path.setLeftFill(style);
-			IF_VERBOSE_PARSE(
-			if (SHAPE_LOG) {
-			    log_parse(_("  shape_character read: fill0 (left) = %d"), current_path.getLeftFill());
+			if ( style > 1 ) // 0:hide 1:renderer
+			{
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror(_("Invalid fill style %d in fillStyle0Change record for font tag (0 or 1 valid). Set to 0."), style);
+				);
+				style = 0;
 			}
-			)
 		}
 		else
 		{
-			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("Unknown fill style %d in fillStyle0Change record - %u defined"), style, m_fill_styles.size());
-			);
+			if ( style > m_fill_styles.size() ) // 1-based index 
+			{
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror(_("Invalid fill style %d in fillStyle0Change record - %u defined. Set to 0."), style, m_fill_styles.size());
+				);
+				style = 0;
+			}
 		}
+
+		current_path.setLeftFill(style);
+		IF_VERBOSE_PARSE(
+		if (SHAPE_LOG) {
+		    log_parse(_("  shape_character read: fill0 (left) = %d"), current_path.getLeftFill());
+		}
+		);
 
 	    }
 	    if ((flags & flagFillStyle1Change) && num_fill_bits > 0)
@@ -310,21 +323,33 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += fill_base;
 		}
-		if ( style <= m_fill_styles.size() ) // 1-based index 
+
+    		if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
 		{
-			current_path.setRightFill(style); // getRightFill() = style;
-			IF_VERBOSE_PARSE (
-			if (SHAPE_LOG) {
-			    log_parse(_("  shape_character read: fill1 (right) = %d"), current_path.getRightFill());
+			if ( style > 1 ) // 0:hide 1:renderer
+			{
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror(_("Invalid fill style %d in fillStyle1Change record for font tag (0 or 1 valid). Set to 0."), style);
+				);
+				style = 0;
 			}
-			)
 		}
 		else
 		{
-			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("Unknown fill style %d in fillStyle1Change record, %u defined "), style, m_fill_styles.size());
-			);
+			if ( style > m_fill_styles.size() ) // 1-based index 
+			{
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror(_("Invalid fill style %d in fillStyle1Change record - %u defined. Set to 0."), style, m_fill_styles.size());
+				);
+				style = 0;
+			}
 		}
+		current_path.setRightFill(style); // getRightFill() = style;
+		IF_VERBOSE_PARSE (
+		if (SHAPE_LOG) {
+		    log_parse(_("  shape_character read: fill1 (right) = %d"), current_path.getRightFill());
+		}
+		)
 	    }
 	    if ((flags & flagLineStyleChange) && num_line_bits > 0)
 	    {
@@ -339,22 +364,33 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		if (style > 0) {
 		    style += line_base;
 		}
-		if ( style <= m_line_styles.size() ) // 1-based index 
+    		if ( tag_type == SWF::DEFINEFONT || tag_type == SWF::DEFINEFONT2 )
 		{
-			current_path.setLineStyle(style);
-			IF_VERBOSE_PARSE (
-			if (SHAPE_LOG)
+			if ( style > 1 ) // 0:hide 1:renderer
 			{
-			    log_parse(_("  shape_character_read: line = %d"), current_path.getLineStyle());
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror(_("Invalid line style %d in lineStyleChange record for font tag (0 or 1 valid). Set to 0."), style);
+				);
+				style = 0;
 			}
-			)
 		}
 		else
 		{
-			IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("Unknown line style %d in lineStyleChange record, %u defined "), style, m_line_styles.size());
-			);
+			if ( style > m_fill_styles.size() ) // 1-based index 
+			{
+				IF_VERBOSE_MALFORMED_SWF(
+				log_swferror(_("Invalid fill style %d in lineStyleChange record - %u defined. Set to 0."), style, m_line_styles.size());
+				);
+				style = 0;
+			}
 		}
+		current_path.setLineStyle(style);
+		IF_VERBOSE_PARSE (
+		if (SHAPE_LOG)
+		{
+		    log_parse(_("  shape_character_read: line = %d"), current_path.getLineStyle());
+		}
+		)
 	    }
 	    if (flags & flagHasNewStyles)
 	    {
