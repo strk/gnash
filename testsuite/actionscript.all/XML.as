@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.32 2007/05/14 16:24:44 strk Exp $";
+rcsid="$Id: XML.as,v 1.33 2007/05/22 09:56:25 udog Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"
@@ -690,8 +690,7 @@ ret = myxml.load( MEDIA(gnash.xml) );
 //------------------------------------------------
 
 myxml2 = new XML();
-xmlin = "<X1T> <X1C1> </X1C1> <X1C2> 
-</X1C2> 	</X1T>";
+xmlin = "<X1T> <X1C1> </X1C1> <X1C2>\n</X1C2> 	</X1T>";	 
 xmlin2 = "<X0><X1/></X0>";
 xmlin2_out = "<X0><X1 /></X0>";
 xmlin_stripwhite = "<X1T><X1C1 /><X1C2 /></X1T>";
@@ -723,8 +722,7 @@ check_equals(myxml2.childNodes[0].childNodes[0].nodeValue, ' '); // text node
 check_equals(myxml2.toString(), "<X1> </X1>"); 
 
 myxml2.ignoreWhite = true;
-myxml2.parseXML("<X1>
-</X1>");
+myxml2.parseXML("<X1>\n</X1>");
 check_equals(myxml2.childNodes.length, 1);
 check(!myxml2.childNodes[0].hasChildNodes());
 check_equals(myxml2.toString(), "<X1 />"); 

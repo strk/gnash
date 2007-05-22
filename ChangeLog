@@ -1,6 +1,7 @@
 2007-05-22 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: add missing end quote
+	* testsuite/actionscript.all/XML.as: fix broken string
 
 2007-05-21 Sandro Santilli <strk@keybit.net>
 
