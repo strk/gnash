@@ -1,3 +1,7 @@
+2007-05-22 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: add missing end quote
+
 2007-05-21 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: Makefile.am, displaylist_depths_test11.c:

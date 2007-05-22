@@ -126,7 +126,7 @@ main(int argc, char** argv)
 #if 0
 		" else if ( info.code == 'NetStream.Buffer.Empty' && this.stopNotified ) "
 	        " {"
-		"	check ( this.stopNotified )
+		"	check ( this.stopNotified )"
 		"	this.close();"
 		"	_root.nextFrame();"
 		" }"
