@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.105 2007/05/22 20:23:33 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.106 2007/05/22 22:51:00 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1459,6 +1459,9 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	bool sample_16bit, bool stereo,
 	unsigned char* &data, unsigned &data_bytes)
 {
+    // Make sure that an unassigned pointer cannot get through
+    data = NULL;
+
     switch (format) {
 
     case sound_handler::FORMAT_ADPCM:
@@ -1540,6 +1543,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
     case sound_handler::FORMAT_NELLYMOSER:
 	// One day...
 	in->skip_bytes(data_bytes);
+	data = NULL;
 	break;
 
     // This is impossible as an input but stops fussy compilers
