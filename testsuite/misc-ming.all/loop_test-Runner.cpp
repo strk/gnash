@@ -122,10 +122,10 @@ main(int /*argc*/, char** /*argv*/)
 			assert(i > 1); // to ensure we looped back
 
 			// Not sure if invalidated ranges should be null here.. 
-			// visuall, it seems so, but loop-back is too complex
+			// visually, it seems so, but loop-back is too complex
 			// to be sure (ie: xtrace window text might be reset or something)
 			// I checked that it's not resetDisplayList invalidating it...
-			xcheck( tester.getInvalidatedRanges().isNull() );
+			check( tester.getInvalidatedRanges().isNull() );
 		}
 		else // we did nothing here...
 		{

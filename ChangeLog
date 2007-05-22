@@ -1,5 +1,13 @@
 2007-05-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/loop_test-Runner.cpp: don't expect
+	  failure in invalidated bounds after Udo commits.
+	* testsuite/misc-ming.all/replace_sprites1test.c: Change expected
+	  Gnash behaviour (previous one was based on 3rd displaylist reset
+	  design implementation).
+
+2007-05-22 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: add MING_SUPPORTS_REPLACE_TAG conditinal variable,
 	  based on version (0.4.0.beta5).
 	* testsuite/misc-ming.all/: Makefile.am, replace_shapes1test.c,

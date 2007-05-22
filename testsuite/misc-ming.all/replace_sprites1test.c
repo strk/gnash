@@ -189,16 +189,16 @@ main(int argc, char** argv)
     "gotoAndStop(2); " 
 
     // A single instance has been constructed !!
-    "check_equals(_root.depth3Constructed, '1');"
+    "xcheck_equals(_root.depth3Constructed, '1');"
 
     // Original character name is still referenceable
-    "xcheck_equals(typeof(static1), 'movieclip');"
+    "check_equals(typeof(static1), 'movieclip');"
 
     // And it still has it's user-provided property
     "xcheck_equals(static1.name, 'static1');"
 
     // The instance have been moved back to its original position (100,100)
-    "xcheck_equals(static1._x, 100);"
+    "check_equals(static1._x, 100);"
 
     // We can't check the color in a self-contained testcase unfortunately,
     // we'll need a MovieTester-based runner for this.
