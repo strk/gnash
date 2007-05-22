@@ -21,10 +21,9 @@
   All the standard <emphasis>configure</emphasis> options
 TODO - look up what the standard options are; man configure doesn't work.  This text was copied from the existing manual.
   are available.  In addition, &app; has two types of
-  options:
+  options: those which enable or disable features, and
   those which specify custom paths for development packages
-  which aren't found during the default search, and those
-  which enable or disable features.
+  which aren't found during the default search.
 </para>
 <para>
   The syntax for running <emphasis>configure</emphasis> is as follows:
@@ -37,12 +36,12 @@ TODO - look up what the standard options are; man configure doesn't work.  This 
   ./configure --disable-sound --disable-klash --with-docbook-styles=/opt/local/share/xsl/docbook-xsl --enable-docbook --enable-gui=fltk --enable-renderer=agg
   </programlisting>
 </para>
+
+<sect4 id="features">
+  &featureoptions;
+</sect4>
          
 <sect4 id="custompath">
   &custompath;
 </sect4>
 
-<sect4 id="features">
-  <title>Features</title>
-  &featureoptions;
-</sect4>

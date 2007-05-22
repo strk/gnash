@@ -1,3 +1,9 @@
+2007-05-22 Ann Barcomb <ann@lulu.com>
+	* doc/C/usermanual/installation/configuration.xml: List interesting
+	  options before custom path options
+	* doc/C/usermanual/installation/feature_configuration.xml: Added
+	  missing title (it had been left in configuration.xml).
+
 2007-05-22 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/character.{h,cpp}: Added preprocessor code to analyze 
