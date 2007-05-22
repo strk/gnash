@@ -1,0 +1,48 @@
+<title>Configuration</title>
+<para>
+  &app; uses <ulink type="http"
+  url="http://www.gnu.org/software/autoconf/">GNU Autoconf</ulink>
+  for configuration.
+</para>
+<para>
+  If you opted to download the 
+  <link linkend="sourcerepo">development checkout</link>
+  of &app;, the <emphasis>configure</emphasis> script will
+  not be included.  It can be created by running 
+  <emphasis>autogen.sh</emphasis> from the source root directory:
+  <programlisting>
+  ./autogen.sh
+  </programlisting>
+  Note that there are some 
+  <link linkend="codedepend">dependencies</link> for
+  autogen.
+</para>
+<para>
+  All the standard <emphasis>configure</emphasis> options
+TODO - look up what the standard options are; man configure doesn't work.  This text was copied from the existing manual.
+  are available.  In addition, &app; has two types of
+  options:
+  those which specify custom paths for development packages
+  which aren't found during the default search, and those
+  which enable or disable features.
+</para>
+<para>
+  The syntax for running <emphasis>configure</emphasis> is as follows:
+  <programlisting>
+  ./configure &lt;options&gt;
+  </programlisting>
+  The example below shows running <emphasis>configure</emphasis>
+  from the &app; source root directory, with several options specified:
+  <programlisting>
+  ./configure --disable-sound --disable-klash --with-docbook-styles=/opt/local/share/xsl/docbook-xsl --enable-docbook --enable-gui=fltk --enable-renderer=agg
+  </programlisting>
+</para>
+         
+<sect4 id="custompath">
+  &custompath;
+</sect4>
+
+<sect4 id="features">
+  <title>Features</title>
+  &featureoptions;
+</sect4>

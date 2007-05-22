@@ -1,0 +1,266 @@
+<para>TODO - review this section</para>
+      <variablelist>
+	<varlistentry>
+	  <term>--disable-fork</term>
+	  <listitem>
+	    <para>
+	      Disable the plugin forking the standalone player, and
+	      using a thread for the player instead. Currently forking
+	      the standalone player will give you the best results.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>--enable-plugin</term>
+	  <listitem>
+	    <para>
+	      Enable building the plugin. By default the
+	      Mozilla Firefox plugin won't be built, even if all the required
+	      files are found by configure. Configure
+	      <emphasis>--with-plugindir=</emphasis> to specify where the
+	      plugin should be installed. 
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--disable-glext</term>
+	  <listitem>
+	    <para>
+	      Disable using GtkGlExt, which forces the use of SDL
+	      instead. By default if the GtkGL extension for Gtk is found
+	      by configure, the GTK enabled GUI is built.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--disable-klash</term>
+	  <listitem>
+	    <para>
+	      Disable support for Konqueror plugin. If
+	      <emphasis>--enable--plugin</emphasis> is  specified, and
+	      support for building KDE programs is found, Klash is
+	      built by default. This option limits the plugin to only
+	      the Mozilla/Firefox one.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--disable-debugger</term>
+	  <listitem>
+	    <para>
+	      Disable support for the Flash debugger. The debugger is
+	      mainly of interest to Flash developers.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-libsuffix</term>
+	  <listitem>
+	    <para>
+	      /lib directory suffix (64,32,none=default). This is only
+	      used by Klash.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-embedded</term>
+	  <listitem>
+	    <para>
+	      Link to Qt-embedded, don't use X. This is only used by
+	      Klash.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-qtopia</term>
+	  <listitem>
+	    <para>
+	      Link to Qt-embedded, link to the Qtopia
+	      Environment. This is only used by Klash.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-mac</term>
+	  <listitem>
+	    <para>
+	      Link to Qt/Mac (don't use X). This is only used by
+	      Klash. 
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-sdk-install</term>
+	  <listitem>
+	    <para>
+	      Enable installing the libraries and headers as an SDK.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-testing</term>
+	  <listitem>
+	    <para>
+	      Enable testing-specific methods.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-strict</term>
+	  <listitem>
+	    <para>
+	      Turn on tons of GCC compiler warnings. By default only
+	      <emphasis>-Wall</emphasis> is used with GCC.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-ghelp</term>
+	  <listitem>
+	    <para>
+	      Enable support for the GNOME help system.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-dom</term>
+	  <listitem>
+	    <para>
+	      When using the XML library, parse the messages using a
+	      DOM based parser. This is the default.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-xmlreader</term>
+	  <listitem>
+	    <para>
+	      When using the XML library, parse the messages using a
+	      SAX based parser.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-dmalloc</term>
+	  <listitem>
+	    <para>
+	      Enable support for the DMalloc memory debugging tool.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-i810-lod-bias</term>
+	  <listitem>
+	    <para>
+	      Enable fix for Intel 810 LOD bias problem. Older versions
+	      of libMesa on the Intel i810 or i815 graphics processor
+	      need this flag or Gnash will core dump. This has been
+	      fixed in newer versions (summer 2005) of libMesa.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-sound=gst|sdl</term>
+	  <listitem>
+	    <para>
+	      Enable support for the a sound handing system. Currently
+	      only <emphasis>sdl</emphasis> works sufficiently. This
+	      is enabled by default when building Gnash.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--with-mp3-decoder=ffmpeg|mad</term>
+	  <listitem>
+	    <para>
+	      Specified the MP3 decoder to use with sdl sound handler.
+              Mixing this with --enable-sound=gst is invalid. Using
+	      <emphasis>mad</emphasis> is the default decoder.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-renderer=opengl|cairo|agg</term>
+	  <listitem>
+	    <para>
+	      Enable support for the a graphics backend. Currently
+	      only <emphasis>opengl</emphasis> and
+	      <emphasis>agg</emphasis> work sufficiently. OpenGL is
+	      used when you have hardware accelerated graphics. AGG i
+	      used when you don't have hardware accelerated
+	      graphics. Typically most desktop machines have OpenGL
+	      support, and most embedded systems don't. OpenGl is the
+	      default when building Gnash, though the quality of AGG's
+	      rendering is currently superior to OpenGL.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+      </variablelist>
+      
+      <para>
+	You can control other flags used for compiling using
+	environment variables. Set these variables before configuring,
+	and they will be used by the configure process instead of the
+	default values.
+      </para>
+
+      <variablelist>
+	<varlistentry>
+	  <term>CXX</term>
+	  <listitem>
+	    <para>
+	      C++ compiler command.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>LDFLAGS</term>
+	  <listitem>
+	    <para>
+	      linker flags, e.g. -L[library directory] if you have libraries in a
+	      nonstandard directory.
+	    </para>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>CPPFLAGS</term>
+	  <listitem>
+	    <para>
+	      C/C++ preprocessor flags, e.g. -I[headers directory] if you have
+	      headers in a nonstandard directory.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>CXXFLAGS</term>
+	  <listitem>
+	    <para>
+	      C++ compiler flags.
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+

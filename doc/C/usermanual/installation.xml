@@ -1,0 +1,45 @@
+<sect1 id="build">
+  <title>Installing &app;</title>
+
+  <para>
+    There are two ways of installing &app;:
+    <link linkend="packagemanager">using a package manager</link>
+    or <link linkend="building_overview">installing from source</link>.
+  </para>
+
+  <sect2 id="packagemanager">
+    &pkgmanager;
+  </sect2>
+
+  <sect2 id="building_overview">
+    &sources;
+        
+    <sect3 id="codedepend">
+        &codedependencies;
+    </sect3>
+        
+    <sect3 id="docdepend">
+        &docdependencies;
+    </sect3>
+
+    <sect3 id="testdepend">
+        &testdependencies;
+    </sect3>
+
+        
+    <sect3 id="configure">
+        &configuration;
+    </sect3>
+    
+        <sect3 id="building">
+            <title>Building from Source</title>
+        </sect3>
+    
+        <sect3 id="install">
+            <title>Installation</title>
+        </sect3>
+    </sect2>
+</sect1>
+
+
+

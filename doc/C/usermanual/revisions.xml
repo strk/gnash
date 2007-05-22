@@ -1,0 +1,29 @@
+  <revhistory>
+
+      <revision>
+          <revnumber>&appname; Manual version 0.4.0</revnumber> 
+          <date>May 2007</date>
+          <revdescription>
+              <para role="author">Ann Barcomb
+              <email>ann@lulu.com</email>
+              Rewritten for software version 0.8.0.
+              </para>
+
+              <para role="publisher">Free Software Foundation</para>
+          </revdescription>
+      </revision>
+
+      <revision> 
+          <revnumber>&appname; Manual version 0.3.0</revnumber> 
+          <date>Oct 2006</date>
+          <revdescription> 
+              <para role="author">Rob Savoye
+              <email>rob@senecass.com</email>
+              Updated for the alpha release.
+              </para>
+
+              <para role="publisher">Free Software Foundation</para>
+          </revdescription> 
+      </revision> 
+
+    </revhistory> 

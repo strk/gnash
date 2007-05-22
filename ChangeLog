@@ -1,3 +1,6 @@
+2007-05-22 Ann Barcomb <ann@lulu.com>
+	* doc/C/usermanual/*: Added files for the new user manual.
+
 2007-05-22 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: add missing end quote

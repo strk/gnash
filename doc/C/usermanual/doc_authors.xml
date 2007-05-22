@@ -1,0 +1,37 @@
+  <authorgroup> 
+      <author> 
+          <firstname>Rob</firstname> 
+          <surname>Savoye</surname> 
+          <affiliation> 
+	      <address>
+	          <email>rob@senecass.com</email>
+	      </address> 
+          </affiliation> 
+      </author> 
+
+      <othercredit role="maintainer">
+        <firstname>Ann</firstname>
+        <surname>Barcomb</surname>
+        <affiliation>
+          <address> 
+              <email>ann@lulu.com</email>
+          </address>
+        </affiliation>
+        <contrib>Document maintainer</contrib>
+      </othercredit>
+
+      <!-- TRANSLATOR NOTE: add yourself to this section
+      <othercredit role="translator">
+        <firstname>Example</firstname> 
+        <surname>Translator</surname> 
+        <affiliation> 
+	  <orgname>Example Translation Team</orgname> 
+	  <address> 
+              <email>translator@example.org</email> 
+          </address> 
+        </affiliation> 
+        <contrib>Example translation</contrib>
+      </othercredit>
+      -->
+
+  </authorgroup> 

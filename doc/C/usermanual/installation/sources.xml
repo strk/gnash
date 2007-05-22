@@ -1,0 +1,60 @@
+<title>Building from Source</title>
+
+<para>
+  Installing from source will involve the following steps:
+  <link linkend="gettingsource">getting the source</link>,
+  <link linkend="codedepend">resolving dependencies</link>,
+  <link linkend="configure">configuration</link>,
+  <link linkend="compile">compilation</link>,
+  <link linkend="runtests">testing</link>, and
+  <link linkend="install">installation</link>.
+  The &app; installation process is fairly standard:
+  <programlisting>
+  ./autogen.sh
+  ./configure &lt;options&gt;
+  make
+  make check
+  make install
+  </programlisting>
+</para>
+
+<sect3 id="gettingsource">
+  <title>Getting the Source</title>
+
+  <para>
+    <!-- NOTE: mention daily snapshots when they are available. -->
+    &app; is available as a <link linkend="sourcereleases">release
+    tarball</link> or a <link linkend="sourcerepo">development 
+    checkout</link>.
+  </para>
+
+  <sect4 id="sourcereleases">
+    <title>Releases</title>
+
+    <para>
+      The source can be acquired from a
+      <ulink type="http" 
+      url="http://www.gnu.org/prep/ftp.html">GNU FTP
+      Mirror</ulink>.  First, choose a mirror near you, then
+      select the <filename>gnash</filename> directory.
+    </para>
+  </sect4>
+
+  <sect4 id="sourcerepo">
+    <title>Repository</title>
+
+    <para>
+      The latest development sources are available via
+      anonymous CVS (leave the password blank).  First set the
+      environment variable <emphasis>CVS_RSH</emphasis> to 'ssh', as shown
+      in this example, which uses the GNU Bourne-Again shell (bash):
+      <programlisting>
+  export CVS_RSH="ssh"
+  cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
+      </programlisting>
+      It is also possible to
+      <ulink url="http://cvs.savannah.gnu.org/viewcvs/gnash/?root=gnash"
+      type="http">browse the repository</ulink> on the web.
+    </para>
+  </sect4>
+</sect3>

@@ -1,0 +1,43 @@
+<sect1 id="intro">
+    <title>Introduction</title>
+
+    <para>
+      &app; is a free Flash movie player, which can be used as a
+      stand-alone application or as a browser plugin.
+    </para>
+
+
+    <sect2 id="gnashoverview">
+        <title>&app; Overview</title>
+
+        <para>
+          &app; started life as <application>GameSWF</application>,
+          a free Flash movie player with fairly good Flash format v7
+          compliance.  In December 2005, &app; was forked from
+          <application>GameSWF</application> and repackaged in the
+          GNU project style.  The objective of &app; is to create an
+          industrial strength Flash movie player which can be widely
+          deployed.
+        </para>
+      
+        <para>
+          &app; can be used as a stand-alone player, as a Mozilla
+          Firefox plugin, or as a Konqueror plugin ('Kpart').  
+          The plugin works by creating a new window in the stand-alone
+          player which is connected to the browser window. 
+       </para>
+
+       <sect3 id="flashsupport">
+         <title>Flash Support</title>
+
+         <para>
+           &app; supports the majority of Flash opcodes up to SWF version
+           7, and a wide sampling of ActionScript classes for SWF version
+           7.   There are plans to work towards greater support for SWF
+           8 and beyond.  AMF support is minimal.
+         </para>
+      </sect3>
+
+    </sect2>
+</sect1>
+    
