@@ -80,6 +80,7 @@ check_PROGRAMS = \
 	loop_test3 \
 	loop_test4 \
 	loop_test5 \
+	loop_test6 \
 	loop_test-Runner \
 	place_object_test \
 	move_object_test \
@@ -212,6 +213,7 @@ check_SCRIPTS = \
 	loop_test3runner \
 	loop_test4runner \
 	loop_test5runner \
+	loop_test6runner \
 	shape_testrunner \
 	$(NULL)
 
@@ -411,6 +413,16 @@ loop_test5.swf: loop_test5
 
 loop_test5runner: $(srcdir)/../generic-testrunner.sh loop_test5.swf
 	sh $< -f20 $(top_builddir) loop_test5.swf > $@
+	chmod 755 $@
+
+loop_test6_SOURCES = loop_test6.c
+loop_test6_LDADD = libgnashmingutils.la
+
+loop_test6.swf: loop_test6
+	./loop_test6 $(top_srcdir)/testsuite/media
+
+loop_test6runner: $(srcdir)/../generic-testrunner.sh loop_test6.swf
+	sh $< -f20 $(top_builddir) loop_test6.swf > $@
 	chmod 755 $@
 
 shape_test_SOURCES = shape_test.c
@@ -1417,6 +1429,7 @@ TEST_CASES = \
 	loop_test3runner \
 	loop_test4runner \
 	loop_test5runner \
+	loop_test6runner \
 	shape_testrunner \
 	$(NULL)
 

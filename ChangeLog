@@ -1,5 +1,13 @@
 2007-05-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, loop_test6.c:
+	  New test for "Jumping backward after a character's lifetime".
+	  Reveals a conceptual bug in last step of all redesign attempts
+	  for displaylist reconstruction (execute *all* frame tags
+	  from start to target frame).
+
+2007-05-23 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am, replace_shapes1test.c,
 	  replace_sprites1test.c, replace_shapes1test_runner.cpp,
 	  replace_sprites1test_runner.cpp: Modified coordinates and size
