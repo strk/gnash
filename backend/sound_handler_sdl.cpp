@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.63 2007/05/23 07:41:46 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.64 2007/05/23 11:38:22 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -684,23 +684,27 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 	Uint8* buffer = stream;
 	memset(buffer, 0, buffer_length);
 
-	// call NetStream audio callbacks
+	// call NetStream or Sound audio callbacks
 	if (handler->m_aux_streamer.size() > 0)
 	{
 		Uint8* buf = new Uint8[buffer_length];
 
-		for (hash_wrapper< void*, gnash::sound_handler::aux_streamer_ptr >::iterator it =
-			handler->m_aux_streamer.begin();
-			it != handler->m_aux_streamer.end(); ++it)
-		{
+		// Loop through the attached sounds
+		hash_wrapper< void*, gnash::sound_handler::aux_streamer_ptr >::iterator it = handler->m_aux_streamer.begin();
+		hash_wrapper< void*, gnash::sound_handler::aux_streamer_ptr >::iterator end = handler->m_aux_streamer.end();
+		while (it != end) {
 			memset(buf, 0, buffer_length);
 
 			SDL_sound_handler::aux_streamer_ptr aux_streamer = it->second; //handler->m_aux_streamer[i]->ptr;
 			void* owner = it->first;
+
+			// If false is returned the sound doesn't want to be attached anymore
 			bool ret = (aux_streamer)(owner, buf, buffer_length);
 			if (!ret) {
-				handler->m_aux_streamer.erase(it);
+				handler->m_aux_streamer.erase(it++);
 				handler->soundsPlaying--;
+			} else {
+				++it;
 			}
 			SDL_MixAudio(stream, buf, buffer_length, SDL_MIX_MAXVOLUME);
 

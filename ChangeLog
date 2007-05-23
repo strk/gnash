@@ -2,6 +2,7 @@
 
 	* backend/sound_handler_sdl.cpp: Made it a bit more thread-safe by
 	  locking when attaching/detaching a aux_streamer.
+	  Fixed a crash when removing attached sounds from the aux_streamer list.
 	* libbase/FLVParser.{h,cpp}: Added audioFrameDelay(), and a fixes.
 	* libbase/curl_adapter.cpp: Changed min and max sleep.
 	* server/asobj/NetStreamFfmpeg.{h,cpp}: Cleanup! Splitted the big
