@@ -1,3 +1,10 @@
+2007-05-23 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: replace_shapes1test.c,
+	  replace_sprites1test.c: Fix implementation (don't
+	  use Ming internal methods); add new tests and comments
+	  about why Gnash fails.
+
 2007-05-23 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* cygnal/cygnal.cpp: Don't include <libintl.h> directly; instead,

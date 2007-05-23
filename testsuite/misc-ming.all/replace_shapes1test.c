@@ -58,6 +58,7 @@
 
 SWFDisplayItem add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height);
 SWFMovieClip get_static_mc(int width, int height, int r, int g, int b);
+SWFShape get_shape(int width, int height, int r, int g, int b);
 
 SWFShape
 get_shape(int width, int height, int r, int g, int b)
@@ -106,8 +107,7 @@ main(int argc, char** argv)
   SWFMovie mo;
   SWFMovieClip dejagnuclip;
   SWFShape static1, static2;
-  int i;
-  SWFDisplayItem it1, it2;
+  SWFDisplayItem it1;
 
 
   const char *srcdir=".";
@@ -147,13 +147,23 @@ main(int argc, char** argv)
 			" _root.note('_root.depth3Constructed set to '+_root.depth3Constructed);"
 			), SWFACTION_CONSTRUCT);
   add_actions(mo, "static1.name='static1';"); 
+  xcheck_equals(mo, "typeof(static1)", "'movieclip'"); 
+
+  // Gnash allows custom members to shape characters...
+  // this is important to verify, see next check for it after REPLACE
+  check_equals(mo, "static1.name", "'static1'");
+
+  xcheck_equals(mo, "static1._target", "'/'");
   SWFMovie_nextFrame(mo); 
 
   // Frame 3: replace instance at depth -16381 with character 2
-  it2 = SWFDisplayItem_replace(it1, (SWFBlock)static2);
-  SWFDisplayItem_moveTo(it2, 110, 110);
-  SWFDisplayItem_setName(it2, "static2");
-  SWFDisplayItem_addAction(it2, newSWFAction(
+  if ( ! SWFMovie_replace(mo, it1, (SWFBlock)static2) )
+  {
+	  abort(); // grace and beauty...
+  }
+  SWFDisplayItem_moveTo(it1, 110, 110);
+  SWFDisplayItem_setName(it1, "static2");
+  SWFDisplayItem_addAction(it1, newSWFAction(
 			"_root.note(this+' onClipConstruct');"
 			" _root.check_equals(typeof(_root), 'movieclip');"
 		        " if ( isNaN(_root.depth3Constructed) ) {"
@@ -168,9 +178,13 @@ main(int argc, char** argv)
   // Can still reference the old character and it's variables, after replace
   xcheck_equals(mo, "typeof(static1)", "'movieclip'"); 
   xcheck_equals(mo, "static1.name", "'static1'");
+  xcheck_equals(mo, "static1._target", "'/'");
 
-  // While we can NOT reference the new character by name
+  // While the new name results undefined...
   xcheck_equals(mo, "typeof(static2)", "'undefined'"); // the name wasn't changed
+
+  // Everything suggests that a new instance is NOT created on replace !!!
+  // Gnash here fails because it creates a NEW instance
 
   // We can't check the color or the _x in a self-contained testcase unfortunately,
   // we'll need a MovieTester-based runner for this.
