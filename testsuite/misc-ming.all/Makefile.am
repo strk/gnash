@@ -229,8 +229,10 @@ endif
 
 if MING_SUPPORTS_REPLACE_TAG
 check_SCRIPTS += \
-	replace_shapes1test_runner \
 	replace_sprites1test_runner \
+	$(NULL)
+check_PROGRAMS += \
+	replace_shapes1test_runner \
 	$(NULL)
 endif
 
@@ -625,9 +627,19 @@ replace_shapes1test_LDADD = libgnashmingutils.la
 replace_shapes1test.swf: replace_shapes1test
 	./replace_shapes1test $(top_srcdir)/testsuite/media
 
-replace_shapes1test_runner: $(srcdir)/../generic-testrunner.sh replace_shapes1test.swf
-	sh $< -f20 $(top_builddir) replace_shapes1test.swf > $@
-	chmod 755 $@
+replace_shapes1test_runner_SOURCES = \
+	replace_shapes1test_runner.cpp \
+	$(NULL)
+replace_shapes1test_runner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+replace_shapes1test_runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+replace_shapes1test_runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	replace_shapes1test.swf      \
+	$(NULL)
 
 replace_sprites1test_SOURCES = replace_sprites1test.c	
 replace_sprites1test_LDADD = libgnashmingutils.la

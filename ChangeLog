@@ -1,5 +1,9 @@
 2007-05-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am, replace_shapes1test.c,
+	  replace_shapes1test_runner.cpp: Modified coordinates and size
+	  of shapes to help writing a test runner. Wrote a real test
+	  runner checking for rendering and bounds invalidation.
 	* testsuite/MovieTester.cpp (render): don't force redraw
 	  always (don't cheat) - do only when asked to do so..
 
