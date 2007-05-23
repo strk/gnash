@@ -64,6 +64,8 @@
 	is not the first window to receive key notifications.
 	* macros/gnashpkgtool.m4: Don't forget to set the "found" flag
 	for CFLAGS when --with-pkg-incl is used to find the include path.
+	* libbase/FLVParser.cpp: Fix more memory bugs by adding padding
+	zero bytes. Should fix bug #19898.
 
 2007-05-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 

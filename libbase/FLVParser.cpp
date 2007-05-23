@@ -17,11 +17,14 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.13 2007/05/23 07:42:16 tgc Exp $
+// $Id: FLVParser.cpp,v 1.14 2007/05/23 20:31:07 bjacques Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
 #include "log.h"
+
+#define PADDING_BYTES 8
+
 
 FLVParser::FLVParser()
 	:
@@ -147,7 +150,6 @@ FLVFrame* FLVParser::nextMediaFrame()
 	}
 
 	// Find the next frame in the file a return it
-#define PADDING_BYTES 8
 
 	if (useAudio) {
 
@@ -179,7 +181,6 @@ FLVFrame* FLVParser::nextMediaFrame()
 		return frame;
 	}
 
-#undef PADDING_BYTES
 
 }
 
@@ -204,8 +205,11 @@ FLVFrame* FLVParser::nextAudioFrame()
 	frame->tag = 8;
 
 	_lt->seek(_audioFrames[_nextAudioFrame]->dataPosition);
-	frame->data = new uint8_t[_audioFrames[_nextAudioFrame]->dataSize];
-	_lt->read(frame->data, _audioFrames[_nextAudioFrame]->dataSize);
+	frame->data = new uint8_t[_audioFrames[_nextAudioFrame]->dataSize +
+				  PADDING_BYTES];
+	size_t bytesread = _lt->read(frame->data, 
+				_audioFrames[_nextAudioFrame]->dataSize);
+	memset(frame->data + bytesread, 0, PADDING_BYTES);
 
 	_nextAudioFrame++;
 	return frame;
@@ -236,18 +240,21 @@ FLVFrame* FLVParser::nextVideoFrame()
 		return NULL;
 	}
 
+
 	FLVFrame* frame = new FLVFrame;
 	frame->dataSize = _videoFrames[_nextVideoFrame]->dataSize;
 	frame->timestamp = _videoFrames[_nextVideoFrame]->timestamp;
 	frame->tag = 9;
 
 	_lt->seek(_videoFrames[_nextVideoFrame]->dataPosition);
-	frame->data = new uint8_t[_videoFrames[_nextVideoFrame]->dataSize];
-	_lt->read(frame->data, _videoFrames[_nextVideoFrame]->dataSize);
+	frame->data = new uint8_t[_videoFrames[_nextVideoFrame]->dataSize + 
+				  PADDING_BYTES];
+	size_t bytesread = _lt->read(frame->data, 
+				_videoFrames[_nextVideoFrame]->dataSize);
+	memset(frame->data + bytesread, 0, PADDING_BYTES);
 
 	_nextVideoFrame++;
 	return frame;
-
 }
 
 
@@ -657,3 +664,5 @@ void FLVParser::setLoadThread(LoadThread* lt)
 {
 	_lt = lt;
 }
+
+#undef PADDING_BYTES
