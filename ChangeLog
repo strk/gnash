@@ -1,3 +1,13 @@
+2007-05-23 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* cygnal/cygnal.cpp: Don't include <libintl.h> directly; instead,
+	rely on our own gettext.h to do the right thing.
+	* gui/fltk.cpp: Update the FLTK GUI to the new Gnash key handling 
+	API. Make sure the window is listening for key events even if it
+	is not the first window to receive key notifications.
+	* macros/gnashpkgtool.m4: Don't forget to set the "found" flag
+	for CFLAGS when --with-pkg-incl is used to find the include path.
+
 2007-05-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp: Made it a bit more thread-safe by

@@ -114,6 +114,7 @@ FltkGui::handle(int event)
         notify_mouse_moved(x, y);
         return Window::handle(event);;
       }
+      case SHORTCUT:
       case KEY:
         handleKey(event_key());
         return true;
@@ -134,12 +135,6 @@ FltkGui::handleKey(unsigned key)
       { TabKey,             gnash::key::TAB },
       { ClearKey,           gnash::key::CLEAR },
       { ReturnKey,          gnash::key::ENTER },
-      { LeftShiftKey,       gnash::key::SHIFT },
-      { RightShiftKey,      gnash::key::SHIFT },
-      { LeftCtrlKey,        gnash::key::CONTROL },
-      { RightCtrlKey,       gnash::key::CONTROL },
-      { LeftAltKey,         gnash::key::ALT },
-      { RightAltKey,        gnash::key::ALT },
       { CapsLockKey,        gnash::key::CAPSLOCK },
       { EscapeKey,          gnash::key::ESCAPE },
       { SpaceKey,           gnash::key::SPACE },
@@ -170,10 +165,24 @@ FltkGui::handleKey(unsigned key)
 #endif
     };
 
+    int modifier = gnash::key::MOD_NONE;
+
+    unsigned long state = event_state();
+
+    if (state & SHIFT) { 
+        modifier = modifier | gnash::key::MOD_SHIFT;
+    }
+    if (state & CTRL) {
+        modifier = modifier | gnash::key::MOD_CONTROL;
+    }
+    if (state & ALT) {
+        modifier = modifier | gnash::key::MOD_ALT;
+    }
 
     for (int i = 0; table[i].fltkKey; i++) {
         if (key == table[i].fltkKey) {
-            notify_key_event((gnash::key::code)table[i].gnashKey, true);
+            notify_key_event((gnash::key::code)table[i].gnashKey, modifier, 
+                             true);
             break;
         }
     }

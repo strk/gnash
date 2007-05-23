@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: gnashpkgtool.m4,v 1.40 2007/04/08 23:06:17 rsavoye Exp $
+dnl $Id: gnashpkgtool.m4,v 1.41 2007/05/23 13:59:32 bjacques Exp $
 
 dnl Generic macros for finding and setting include-paths and library-path
 dnl for packages. Implements GNASH_PKG_INCLUDES() and GNASH_PKG_LIBS().
@@ -55,6 +55,7 @@ dnl     esac], $1=yes)
   	  if test x"${with_$1_incl}" != x ; then
  	      if test -f ${with_$1_incl}/$2 ; then
   	      ac_cv_path_$1_incl=-I`(cd ${with_$1_incl}; pwd)`
+	      found_$1_incl="yes"
  	      else
 	        AC_MSG_ERROR([${with_$1_incl} directory doesn't contain $2.])
 	      fi
