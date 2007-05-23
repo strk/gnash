@@ -30,10 +30,12 @@ TODO - look up what the standard options are; man configure doesn't work.  This 
   <programlisting>
   ./configure &lt;options&gt;
   </programlisting>
-  The example below shows running <emphasis>configure</emphasis>
-  from the &app; source root directory, with several options specified:
+  The example below shows the <emphasis>configure</emphasis> options
+  which create the smallest working standalone version of &app;.  In
+  this example, <emphasis>configure</emphasis> is being run from the
+  source root directory:
   <programlisting>
-  ./configure --disable-sound --disable-klash --with-docbook-styles=/opt/local/share/xsl/docbook-xsl --enable-docbook --enable-gui=fltk --enable-renderer=agg
+  ./configure --disable-debugger --disable-cygnal --disable-docbook --disable-plugin --enable-media=mad --enable-gui=sdl
   </programlisting>
 </para>
 

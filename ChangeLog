@@ -1,3 +1,9 @@
+2007-05-23 Ann Barcomb <ann@lulu.com>
+
+	* doc/C/usermanual/installation/feature_configuration.xml,
+	  doc/C/usermanual/installation/configuration.xml: Incorporated
+	  some changes from r1.38 of doc/C/sources.xml.
+
 2007-05-23 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/: Makefile.am, loop_test6.c:

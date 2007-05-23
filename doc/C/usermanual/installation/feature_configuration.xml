@@ -1,6 +1,73 @@
-  <title>Features</title>
+<title>Features</title>
+
+<para>
+  Some switches can be used during configuration to enable or disable
+  features of &app;.  Some of the most important configuration options
+  are:
+  <itemizedlist mark="opencircle">
+    <listitem>
+    <para>
+      <emphasis>--enable-gui</emphasis> lets you specify your GUI of choice.
+      The default option is GTK.
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+      <emphasis>--enable-renderer</emphasis> allows a renderer to be
+      chosen.  The default renderer is AGG.
+    </para>
+    </listitem>
+    <listitem>
+    <para>
+      <emphasis>--enable-media</emphasis> permits a media handler to be
+      selected.  The default is FFMPEG with SDL sound.
+    </para>
+    </listitem>
+  </itemizedlist>
+  A complete list of available features follows.
+</para>
+
 <para>TODO - review this section</para>
       <variablelist>
+	<varlistentry>
+	  <term>--disable-debugger</term>
+	  <listitem>
+	    <para>
+	      Disable support for the Flash debugger. The debugger is
+	      mainly of interest to Flash developers.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-dmalloc</term>
+	  <listitem>
+	    <para>
+	      Enable support for the DMalloc memory debugging tool.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-dom</term>
+	  <listitem>
+	    <para>
+	      When using the XML library, parse the messages using a
+	      DOM based parser. This is the default.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-embedded</term>
+	  <listitem>
+	    <para>
+	      Link to Qt-embedded, don't use X. This is only used by
+	      Klash.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
 	<varlistentry>
 	  <term>--disable-fork</term>
 	  <listitem>
@@ -11,20 +78,16 @@
 	    </para>
 	  </listitem>
 	</varlistentry>
-	
+
 	<varlistentry>
-	  <term>--enable-plugin</term>
+	  <term>--enable-ghelp</term>
 	  <listitem>
 	    <para>
-	      Enable building the plugin. By default the
-	      Mozilla Firefox plugin won't be built, even if all the required
-	      files are found by configure. Configure
-	      <emphasis>--with-plugindir=</emphasis> to specify where the
-	      plugin should be installed. 
+	      Enable support for the GNOME help system.
 	    </para>
 	  </listitem>
 	</varlistentry>
-
+	
 	<varlistentry>
 	  <term>--disable-glext</term>
 	  <listitem>
@@ -32,6 +95,67 @@
 	      Disable using GtkGlExt, which forces the use of SDL
 	      instead. By default if the GtkGL extension for Gtk is found
 	      by configure, the GTK enabled GUI is built.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-gui=gtk|sdl|kde|fltk|fb</term>
+	  <listitem>
+	    <para>
+	      Select the Graphic User Interface to use (just one at a time please).
+	    </para>
+	    <varlistentry>
+	      <term>GTK</term>
+	      <listitem>
+		The GTK+ toolkit, which is the default GUI.
+		Said to interwork particularly well with firefox.
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>SDL</term>
+	      <listitem>
+		Simple DirectMedia Layer, a simple and portable GUI.
+		Its sound facilities are used when --enable-media=ffmpeg|mad
+		regoardless of whether it is also in charge of the GUI.
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>KDE</term>
+	      <listitem>
+		An interface adapted to the KDE Desktop Environment.
+		This must be selected when building the Konqueror plugin
+		"klash". Furthermore, the only renderer that currently
+		works with KDE is opengl.
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>FLTK</term>
+	      <listitem>
+		Fast Light ToolKit, low on resource usage.
+		Since all build using fltk are now broken, we declare it
+		"for developers".
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>FB</term>
+	      <listitem>
+		The Linux Frame Buffer, also known as /dev/fb0.
+		AGG is the only renderer that can currently be used
+		with the framebuffer GUI.
+	      </listitem>
+	    </varlistentry>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-i810-lod-bias</term>
+	  <listitem>
+	    <para>
+	      Enable fix for Intel 810 LOD bias problem. Older versions
+	      of libMesa on the Intel i810 or i815 graphics processor
+	      need this flag or Gnash will core dump. This has been
+	      fixed in newer versions (summer 2005) of libMesa.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -50,41 +174,11 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>--disable-debugger</term>
-	  <listitem>
-	    <para>
-	      Disable support for the Flash debugger. The debugger is
-	      mainly of interest to Flash developers.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
 	  <term>--enable-libsuffix</term>
 	  <listitem>
 	    <para>
 	      /lib directory suffix (64,32,none=default). This is only
 	      used by Klash.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--enable-embedded</term>
-	  <listitem>
-	    <para>
-	      Link to Qt-embedded, don't use X. This is only used by
-	      Klash.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--enable-qtopia</term>
-	  <listitem>
-	    <para>
-	      Link to Qt-embedded, link to the Qtopia
-	      Environment. This is only used by Klash.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -100,101 +194,39 @@
 	</varlistentry>
 
 	<varlistentry>
-	  <term>--enable-sdk-install</term>
+	  <term>--enable-media=ffmpeg|mad|gst</term>
 	  <listitem>
 	    <para>
-	      Enable installing the libraries and headers as an SDK.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--enable-testing</term>
-	  <listitem>
-	    <para>
-	      Enable testing-specific methods.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--enable-strict</term>
-	  <listitem>
-	    <para>
-	      Turn on tons of GCC compiler warnings. By default only
-	      <emphasis>-Wall</emphasis> is used with GCC.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--enable-ghelp</term>
-	  <listitem>
-	    <para>
-	      Enable support for the GNOME help system.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--enable-dom</term>
-	  <listitem>
-	    <para>
-	      When using the XML library, parse the messages using a
-	      DOM based parser. This is the default.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--enable-xmlreader</term>
-	  <listitem>
-	    <para>
-	      When using the XML library, parse the messages using a
-	      SAX based parser.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--enable-dmalloc</term>
-	  <listitem>
-	    <para>
-	      Enable support for the DMalloc memory debugging tool.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--enable-i810-lod-bias</term>
-	  <listitem>
-	    <para>
-	      Enable fix for Intel 810 LOD bias problem. Older versions
-	      of libMesa on the Intel i810 or i815 graphics processor
-	      need this flag or Gnash will core dump. This has been
-	      fixed in newer versions (summer 2005) of libMesa.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--enable-sound=gst|sdl</term>
-	  <listitem>
-	    <para>
-	      Enable support for the a sound handing system. Currently
-	      only <emphasis>sdl</emphasis> works sufficiently. This
-	      is enabled by default when building Gnash.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>--with-mp3-decoder=ffmpeg|mad</term>
-	  <listitem>
-	    <para>
-	      Specified the MP3 decoder to use with sdl sound handler.
+	      Select the specified media decoder and sound engine.
+	      FFMPEG and MAD use the SDL sound engine; GST uses its own.
               Mixing this with --enable-sound=gst is invalid. Using
-	      <emphasis>mad</emphasis> is the default decoder.
+	      <emphasis>ffmpeg</emphasis> is the default decoder.
+	    </para>
+	    <para>
+	      You should only select one media decoder.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-plugin</term>
+	  <listitem>
+	    <para>
+	      Enable building the plugin. By default the
+	      Mozilla Firefox plugin won't be built, even if all the required
+	      files are found by configure. Configure
+	      <emphasis>--with-plugindir=</emphasis> to specify where the
+	      plugin should be installed. 
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-qtopia</term>
+	  <listitem>
+	    <para>
+	      Link to Qt-embedded, link to the Qtopia
+	      Environment. This is only used by Klash.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -216,52 +248,53 @@
 	  </listitem>
 	</varlistentry>
 
+	<varlistentry>
+	  <term>--enable-sdk-install</term>
+	  <listitem>
+	    <para>
+	      Enable installing the libraries and headers as an SDK.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--disable-shared</term>
+	  <listitem>
+	    <para>
+	      Enable installing the shared libraries and headers.
+	      Note that the extensions mechanism may not work if shared
+	      libraries are disabled.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-strict</term>
+	  <listitem>
+	    <para>
+	      Turn on tons of GCC compiler warnings. By default only
+	      <emphasis>-Wall</emphasis> is used with GCC.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-testing</term>
+	  <listitem>
+	    <para>
+	      Enable testing-specific methods.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>--enable-xmlreader</term>
+	  <listitem>
+	    <para>
+	      When using the XML library, parse the messages using a
+	      SAX based parser.
+	    </para>
+	  </listitem>
+	</varlistentry>
+
       </variablelist>
-      
-      <para>
-	You can control other flags used for compiling using
-	environment variables. Set these variables before configuring,
-	and they will be used by the configure process instead of the
-	default values.
-      </para>
-
-      <variablelist>
-	<varlistentry>
-	  <term>CXX</term>
-	  <listitem>
-	    <para>
-	      C++ compiler command.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>LDFLAGS</term>
-	  <listitem>
-	    <para>
-	      linker flags, e.g. -L[library directory] if you have libraries in a
-	      nonstandard directory.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>CPPFLAGS</term>
-	  <listitem>
-	    <para>
-	      C/C++ preprocessor flags, e.g. -I[headers directory] if you have
-	      headers in a nonstandard directory.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>CXXFLAGS</term>
-	  <listitem>
-	    <para>
-	      C++ compiler flags.
-	    </para>
-	  </listitem>
-	</varlistentry>
-      </variablelist>
-
