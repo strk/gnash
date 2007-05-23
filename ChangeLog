@@ -1,5 +1,8 @@
 2007-05-23 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.{cpp,h}: Add new reset() method taking
+	  enough parameters (I hope) to remove what needs to
+	  on jump-back; drop obsoleted clear_unaffected function.
 	* testsuite/misc-ming.all/: replace_shapes1test.c,
 	  replace_sprites1test.c: Fix implementation (don't
 	  use Ming internal methods); add new tests and comments

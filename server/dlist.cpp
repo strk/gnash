@@ -496,34 +496,87 @@ DisplayList::swapDepths(character* ch1, int newdepth)
 
 }
 	
-void DisplayList::clear_unaffected(std::vector<int>& affected_depths, bool call_unload)
+void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_unload)
 {
 	//GNASH_REPORT_FUNCTION;
+
+	// 1. Find all "timeline depth" for the target frame, querying the
+	//    Timeline object in the sprite/movie definition (see implementation details)
+	std::vector<int> save;
+	movieDef.getTimelineDepths(tgtFrame, save);
+
+#define GNASH_DEBUG_TIMELINE 1
+#ifdef GNASH_DEBUG_TIMELINE
+	cout << "Depths found to save: " << endl;
+	std::ostream_iterator<int> ostrIter(cout, "," ) ;
+	std::copy(save.begin(), save.end(), ostrIter);
+	cout << endl;
+	cout << "Current DisplayList: " << *this << endl;
+#endif
+
+
+	typedef std::vector<int>::iterator SeekIter;
+
+	SeekIter startSeek = save.begin();
+        SeekIter endSeek = save.end();
 
 	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
 	{
 		DisplayItem& di = *it;
 
-		int di_depth = di.get()->get_depth();
-		bool is_affected = false;
+		int di_depth = di->get_depth();
 
-		for (size_t i=0, n=affected_depths.size(); i<n; ++i)
-		{
-			if (affected_depths[i] != di_depth)
-			{
-				continue;
-			}
-			is_affected = true;
-			break;
-		}
+		/// We won't scan chars in the dynamic depth zone
+		if ( di_depth >= 0 ) return;
 
-		if (is_affected == false)
+		/// Always remove non-timeline instances ?
+		/// Seems so, at least for duplicateMovieClip
+		TimelineInfo* info = di->getTimelineInfo();
+		//if ( di->getTimelineInfo() == NULL )
+		//if ( di->isDynamic() )
+		if ( ! info )
 		{
+			// Not to be saved, killing
 			if ( call_unload ) di->unload();
 			it = _characters.erase(it);
 			continue;
 		}
-		it++;
+
+#if 0 // let's handle this at PlaceObject2 execution time... an instance placed by REPLACE tag
+      // in a subsequent frame will be replaced again rather then left untouched.
+      // This is to allow later fixing of REPLACE tag to avoid creation of a new instance
+      // (see replace_shapes1test.swf and replace_sprites1test.swf)
+
+		// Remove if placed by REPLACE tag in a later frame
+		if ( info->placedByReplaceTag() && info->placedInFrame() > tgtFrame )
+		{
+			// Not to be saved, killing
+			// [ replace_sprites1test.swf and replace_shapes1test.swf seems to not want the replace ... ]
+			if ( call_unload ) di->unload();
+			it = _characters.erase(it);
+			continue;
+		}
+#endif
+
+		/// Only remove if not in the save vector
+		SeekIter match = std::find(startSeek, endSeek, di_depth);
+		if ( match == save.end() )
+		{
+			// Not to be saved, killing
+			if ( call_unload ) di->unload();
+			it = _characters.erase(it);
+			continue;
+		}
+
+		// To be saved, don't kill
+
+		// IFF the 'save' vector is known to be sorted
+		// we can let next seek start to next seek item
+		// We can't assume this here, unless we request
+		// by caller, in the dox.
+		//startSeek = ++match;
+
+		++it;
 	}
 }
 
