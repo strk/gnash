@@ -251,16 +251,8 @@ public:
 	//virtual void	advance_root(float delta_time);
 	virtual void	advance_sprite(float delta_time);
 
-
-	/// Execute any remove-object tags associated with
-	/// the specified frame.
-	/// frame is 0-based
-	void	execute_remove_tags(int frame);
-
-
 	/// Take care of this frame's actions.
 	void do_actions();
-
 
 	/// Set the sprite state at the specified frame number.
 	//

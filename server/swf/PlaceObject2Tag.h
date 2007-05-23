@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.5 2007/05/21 11:05:12 strk Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.6 2007/05/23 20:06:20 strk Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -27,7 +27,7 @@
 #include "config.h"
 #endif
 
-#include "execute_tag.h" // for inheritance
+#include "DisplayListTag.h" // for inheritance
 #include "swf.h" // for tag_type definition
 #include "matrix.h" // for composition
 #include "cxform.h" // for composition 
@@ -59,7 +59,7 @@ namespace tag_loaders {
 /// Postcondition of this tag execution is presence of an instance
 /// at the affected depth. See getDepth().
 ///
-class PlaceObject2Tag : public execute_tag
+class PlaceObject2Tag : public DisplayListTag
 {
 public:
 
@@ -67,12 +67,12 @@ public:
 
 	PlaceObject2Tag(const movie_definition& def)
 		:
+		DisplayListTag(0), // why is it 0 here and -1 for RemoveObjectTag ??
 		m_tag_type(0),
 		m_name(NULL),
 		m_ratio(0),
 		m_has_matrix(false),
 		m_has_cxform(false),
-		m_depth(0),
 		m_character_id(0),
 		m_clip_depth(0),
 		m_place_type(PLACE),
@@ -88,12 +88,6 @@ public:
 	/// Place/move/whatever our object in the given movie.
 	void execute(sprite_instance* m);
 
-	/// Proxy for execute(sprite_instance*)
-	void execute_state(sprite_instance* m)
-	{
-	    execute(m);
-	}
-
 	/// Return true if this tag places a character
 	bool isPlace() const { return m_place_type == PLACE; }
 
@@ -102,16 +96,6 @@ public:
 
 	/// Return true if this tag transforms a character
 	bool isMove() const { return m_place_type == MOVE; }
-
-	/// Return the depth affected by this tag
-	//
-	/// NOTE: the returned depth is always in the
-	///       static depth zone (character::staticDepthOffset .. -1)
-	///
-	int getDepth() const
-	{
-		return m_depth;
-	}
 
 private:
 
@@ -122,7 +106,6 @@ private:
 	matrix	m_matrix;
 	bool	m_has_matrix;
 	bool	m_has_cxform;
-	int		m_depth;
 	uint16_t	m_character_id;
 	int 	m_clip_depth;
 	uint32_t all_event_flags; 

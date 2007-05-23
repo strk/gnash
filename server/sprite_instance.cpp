@@ -2767,22 +2767,6 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 	testInvariant();
 }
 
-void sprite_instance::execute_remove_tags(int frame)
-{
-	    assert(frame >= 0);
-	    assert((size_t)frame < m_def->get_frame_count());
-
-	    const PlayList& playlist = m_def->get_playlist(frame);
-	    for (unsigned int i = 0; i < playlist.size(); i++)
-		{
-		    execute_tag*	e = playlist[i];
-		    if (e->is_remove_tag())
-			{
-			    e->execute_state(this);
-			}
-		}
-}
-
 void
 sprite_instance::goto_frame(size_t target_frame_number)
 {

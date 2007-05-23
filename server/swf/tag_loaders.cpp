@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.106 2007/05/22 22:51:00 martinwguy Exp $ */
+/* $Id: tag_loaders.cpp,v 1.107 2007/05/23 20:06:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -56,6 +56,7 @@
 #include "video_stream_def.h"
 #include "sound_definition.h"
 #include "PlaceObject2Tag.h"
+#include "RemoveObjectTag.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -842,70 +843,22 @@ void	end_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     assert(in->get_position() == in->get_tag_end_position());
 }
 
-
-/// SWF Tag RemoveObject2 (28)
-//
-/// TODO: move in a separate file, like it was done
-///       for PlaceObject2Tag.
-///
-class remove_object_2 : public execute_tag
-{
-public:
-    int	m_depth, m_id;
-    remove_object_2() : m_depth(-1), m_id(-1) {}
-
-    void	read(stream* in, int tag)
-	{
-	    assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
-
-	    if (tag == SWF::REMOVEOBJECT)
-	    {
-		// Older SWF's allow multiple objects at the same depth;
-		// this m_id disambiguates.  Later SWF's just use one
-		// object per depth.
-		m_id = in->read_u16();
-	    }
-	    m_depth = in->read_u16()+character::staticDepthOffset;
-	}
-
-    // TODO: be non-virtual if no allowing sublcassing this class
-    virtual void	execute(sprite_instance* m)
-	{
-	    m->remove_display_object(m_depth, m_id);
-	}
-
-    // TODO: be non-virtual if no allowing sublcassing this class
-    virtual void	execute_state(sprite_instance* m)
-	{
-	    execute(m);
-	}
-
-    // TODO: be non-virtual if no allowing sublcassing this class
-    virtual bool	is_remove_tag() const { return true; }
-
-    /// Return the depth affected by this RemoveObject tag
-    //
-    /// NOTE: the returned depth is always in the
-    ///       static depth zone (character::staticDepthOffset .. -1)
-    ///
-    int getDepth() const { return m_depth; }
-};
-
-
 void	remove_object_2_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
 
-    remove_object_2*	t = new remove_object_2;
+    std::auto_ptr<RemoveObjectTag> t ( new RemoveObjectTag );
     t->read(in, tag);
 
     IF_VERBOSE_PARSE
     (
-	log_parse(_("  remove_object_2(%d)"), t->m_depth);
+	log_parse(_("  remove_object_2(%d)"), t->getDepth());
     );
 
-    m->add_execute_tag(t);
     m->removeTimelineDepth(t->getDepth());
+
+    // Ownership transferred to movie_definition
+    m->add_execute_tag(t.release());
 }
 
 

@@ -1,3 +1,14 @@
+2007-05-23 Sandro Santilli <strk@keybit.net>
+
+	* server/execute_tag.h: drop is_remove_tag() method.
+	* server/sprite_instance.{cpp,h}: drop unused
+	  execute_remove_tags() method.
+	* server/Makefile.am, server/swf/: DisplayListTag.h,
+	  PlaceObject2Tag.h, RemoveObjectTag.{cpp,h}
+	  tag_loaders.cpp: Add a DisplayListTag subclass of
+	  execute_tag, and make RemoveObject and PlaceObject subclasses
+	  of it.
+
 2007-05-23 Ann Barcomb <ann@lulu.com>
 
 	* doc/C/usermanual/installation/feature_configuration.xml,

@@ -66,9 +66,6 @@ public:
 		if ( is_action_tag() ) execute(m);
 	}
 
-	/// Return true if this is a RemoveObject tag
-	virtual bool	is_remove_tag() const { return false; }
-
 	/// Return true if this is an action tag.
 	virtual bool	is_action_tag() const { return false; }
 
