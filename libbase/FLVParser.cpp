@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.12 2007/05/16 18:22:31 tgc Exp $
+// $Id: FLVParser.cpp,v 1.13 2007/05/23 07:42:16 tgc Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -94,6 +94,24 @@ uint32_t FLVParser::videoFrameDelay()
 	if (_videoFrames.size() == 0 || !_video || _nextVideoFrame < 2) return 0;
 
 	return _videoFrames[_nextVideoFrame-1]->timestamp - _videoFrames[_nextVideoFrame-2]->timestamp;
+}
+
+uint32_t FLVParser::audioFrameDelay()
+{
+	boost::mutex::scoped_lock lock(_mutex);
+
+	// If there are no audio in this FLV return 0
+	if (!_audio && _lastParsedPosition > 0) return 0;
+
+	// Make sure that there are parsed some frames
+	while(_audioFrames.size() < 2 && !_parsingComplete) {
+		parseNextFrame();
+	}
+
+	// If there is no video data return 0
+	if (_audioFrames.size() == 0 || !_audio || _nextAudioFrame < 2) return 0;
+
+	return _audioFrames[_nextAudioFrame-1]->timestamp - _audioFrames[_nextAudioFrame-2]->timestamp;
 }
 
 FLVFrame* FLVParser::nextMediaFrame()
@@ -183,6 +201,7 @@ FLVFrame* FLVParser::nextAudioFrame()
 	FLVFrame* frame = new FLVFrame;
 	frame->dataSize = _audioFrames[_nextAudioFrame]->dataSize;
 	frame->timestamp = _audioFrames[_nextAudioFrame]->timestamp;
+	frame->tag = 8;
 
 	_lt->seek(_audioFrames[_nextAudioFrame]->dataPosition);
 	frame->data = new uint8_t[_audioFrames[_nextAudioFrame]->dataSize];
@@ -220,6 +239,7 @@ FLVFrame* FLVParser::nextVideoFrame()
 	FLVFrame* frame = new FLVFrame;
 	frame->dataSize = _videoFrames[_nextVideoFrame]->dataSize;
 	frame->timestamp = _videoFrames[_nextVideoFrame]->timestamp;
+	frame->tag = 9;
 
 	_lt->seek(_videoFrames[_nextVideoFrame]->dataPosition);
 	frame->data = new uint8_t[_videoFrames[_nextVideoFrame]->dataSize];
@@ -437,8 +457,12 @@ bool FLVParser::isTimeLoaded(uint32_t time)
 	boost::mutex::scoped_lock lock(_mutex);
 
 	// Parse frames until the need time is found, or EOF
-	while (!_parsingComplete && _videoFrames.size() > 0 && _videoFrames.back()->timestamp < time && _audioFrames.size() > 0 && _audioFrames.back()->timestamp < time) {
+	while (!_parsingComplete) {
 		if (!parseNextFrame()) break;
+		if ((_videoFrames.size() > 0 && _videoFrames.back()->timestamp >= time)
+			|| (_audioFrames.size() > 0 && _audioFrames.back()->timestamp >= time)) {
+			return true;
+		}
 	}
 
 	if (_videoFrames.size() > 0 && _videoFrames.back()->timestamp >= time) {

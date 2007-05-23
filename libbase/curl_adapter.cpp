@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.33 2007/05/14 14:18:26 rsavoye Exp $ */
+/* $Id: curl_adapter.cpp,v 1.34 2007/05/23 07:42:16 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -273,7 +273,7 @@ CurlStreamFile::fill_cache(long unsigned size)
 #endif
 
 // Disable this when you're convinced the sleeping mechanism is satisfactory
-#define VERBOSE_POLLING_LOOP 1
+//#define VERBOSE_POLLING_LOOP 1
 
 #if VERBOSE_POLLING_LOOP
 	long unsigned fetchRequested = size-_cached;
@@ -283,8 +283,8 @@ CurlStreamFile::fill_cache(long unsigned size)
 	// to nap between curl_multi_perform calls if the amount
 	// of data requested haven't arrived yet.
 	// 
-	const long unsigned minSleep =  500000; // half second
-	const long unsigned maxSleep = 1000000; // one second
+	const long unsigned minSleep =  100000; // 1/10 second
+	const long unsigned maxSleep =  300000; // 3/10 second
 
 	CURLMcode mcode;
 #if VERBOSE_POLLING_LOOP

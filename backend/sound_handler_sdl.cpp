@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.62 2007/05/21 16:23:42 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.63 2007/05/23 07:41:46 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -495,6 +495,7 @@ bool SDL_sound_handler::is_muted()
 
 void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 {
+	mutex::scoped_lock lock(_mutex);
 	assert(owner);
 	assert(ptr);
 
@@ -521,6 +522,7 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 
 void	SDL_sound_handler::detach_aux_streamer(void* owner)
 {
+	mutex::scoped_lock lock(_mutex);
 	aux_streamer_ptr p;	
 	if (m_aux_streamer.get(owner, &p))
 	{

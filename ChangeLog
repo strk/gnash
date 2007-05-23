@@ -1,9 +1,18 @@
+2007-05-23 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Made it a bit more thread-safe by
+	  locking when attaching/detaching a aux_streamer.
+	* libbase/FLVParser.{h,cpp}: Added audioFrameDelay(), and a fixes.
+	* libbase/curl_adapter.cpp: Changed min and max sleep.
+	* server/asobj/NetStreamFfmpeg.{h,cpp}: Cleanup! Splitted the big
+	  decode function (read_frame) into 3 functions. Changed a few names
+	  to make more sence. Improved syncing, and made it depend on audio 
+	  if available, not video. Plus some overall improvements.
+
 2007-05-23 Zou Lunkai <zoulunkai@gmail.com>
 
-	* testsuite/misc-ming.all: shape_test.c
-	 	add tests for shpaes.
-	* testsuite/misc-ming.all/Makefile.am
-	 	activate some testcases.
+	* testsuite/misc-ming.all/shape_test.c: add tests for shapes.
+	* testsuite/misc-ming.all/Makefile.am: activate some testcases.
 	 	
 2007-05-22 Martin Guy <martinwguy@yahoo.it>
 

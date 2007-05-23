@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.28 2007/05/19 21:18:34 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.29 2007/05/23 07:42:16 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -48,21 +48,22 @@
 
 namespace gnash {
   
-struct raw_videodata_t
+class raw_mediadata_t
 {
-	raw_videodata_t():
+public:
+	raw_mediadata_t():
 	m_stream_index(-1),
 	m_size(0),
 	m_data(NULL),
 	m_ptr(NULL),
 	m_pts(0)
 	{
-	};
+	}
 
-	~raw_videodata_t()
+	~raw_mediadata_t()
 	{
 		if (m_data) delete [] m_data;
-	};
+	}
 
 	int m_stream_index;
 	uint32_t m_size;
@@ -169,6 +170,8 @@ public:
 		return audio_resample (_context, output, input, samples);
 	}
 	
+	// The timestamp of the last decoded video frame
+	volatile double m_last_video_timestamp;
 
 private:
 	ReSampleContext* _context;
@@ -189,18 +192,13 @@ public:
 	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
 
-	bool read_frame();
-
-	inline double as_double(AVRational time)
-	{
-		return time.num / (double) time.den;
-	}
-
-	static void startPlayback(NetStreamFfmpeg* ns);
 	static void av_streamer(NetStreamFfmpeg* ns);
 	static bool audio_streamer(void *udata, uint8_t *stream, int len);
 
 private:
+
+	// Setups the playback
+	bool startPlayback();
 
 	// Pauses the decoding - don't directly modify m_pause!!
 	void pauseDecoding();
@@ -210,6 +208,24 @@ private:
 
 	// Check is we need to update the video frame
 	void refreshVideoFrame();
+
+	// Used to decode and push the next available (non-FLV) frame to the audio or video queue
+	bool decodeMediaFrame();
+
+	// Used to decode push the next available FLV frame to the audio or video queue
+	bool decodeFLVFrame();
+
+	// Used to decode a video frame and push it on the videoqueue
+	bool decodeVideo(AVPacket* packet);
+
+	// Used to decode a audio frame and push it on the audioqueue
+	bool decodeAudio(AVPacket* packet);
+
+	// Used to calculate a decimal value from a ffmpeg fraction
+	inline double as_double(AVRational time)
+	{
+		return time.num / (double) time.den;
+	}
 
 	int m_video_index;
 	int m_audio_index;
@@ -241,25 +257,30 @@ private:
 	boost::mutex decode_wait_mutex;
 	boost::condition decode_wait;
 
-	// The current time-position of the video in seconds
-	volatile double m_video_clock;
+	// The timestamp of the last decoded video frame
+	volatile double m_last_video_timestamp;
+
+	// The timestamp of the last decoded audio frame
+	volatile double m_last_audio_timestamp;
+
+	// The timestamp of the last played audio (default) or video (if no audio) frame
+	double m_current_timestamp;
 
 	// The queues of audio and video data.
-	multithread_queue <raw_videodata_t*> m_qaudio;
-	multithread_queue <raw_videodata_t*> m_qvideo;
+	multithread_queue <raw_mediadata_t*> m_qaudio;
+	multithread_queue <raw_mediadata_t*> m_qvideo;
 
 	// The time we started playing
 	volatile double m_start_clock;
 
 	// When the queues are full, this is where we keep the audio/video frame
 	// there wasen't room for on its queue
-	raw_videodata_t* m_unqueued_data;
+	raw_mediadata_t* m_unqueued_data;
 
 	ByteIOContext ByteIOCxt;
 
 	// Time of when pause started
 	double m_time_of_pause;
-
 };
 
 } // gnash namespace
