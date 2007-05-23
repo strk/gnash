@@ -1,3 +1,10 @@
+2007-05-23 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all: shape_test.c
+	 	add tests for shpaes.
+	* testsuite/misc-ming.all/Makefile.am
+	 	activate some testcases.
+	 	
 2007-05-22 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac: add help text for ffmpeg-devel RPM package
