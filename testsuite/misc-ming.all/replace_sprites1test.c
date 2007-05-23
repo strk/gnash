@@ -36,15 +36,15 @@
  * 
  * Description:
  * 
- *  frame2: movieclip 1 placed at depth -16381 and position 100,100
- *  frame3: instance at depth -16381 replaced by character 2 at position 110,110
+ *  frame2: movieclip 1 placed at depth -16381 and position 100,300
+ *  frame3: instance at depth -16381 replaced by character 2 at position 130,330
  *  frame4: jump back to frame 2 and stop
  * 
  * Expected behaviour:
  * 
  *  A single "movieclip" instances have been constructed in total.
- *  The instance contains a red shape at (100,100) initially, still a red shape
- *  at (110,110) after the replace, a red shape at (100,100) again on loop-back.
+ *  The instance contains a red shape at (100,300) initially, still a red shape
+ *  at (130,330) after the replace, a red shape at (100,300) again on loop-back.
  */
 
 #include "ming_utils.h"
@@ -65,7 +65,7 @@ get_shape(int width, int height, int r, int g, int b)
 {
   SWFShape sh;
 
-  sh = make_fill_square (-(width/2), -(height/2), width, height, r, g, b, r, g, b);
+  sh = make_fill_square (0, 0, width, height, r, g, b, r, g, b);
 
   return sh;
 }
@@ -124,8 +124,8 @@ main(int argc, char** argv)
   SWFMovie_setDimension(mo, 800, 600);
   SWFMovie_setRate (mo, 2);
 
-  static1 = get_static_mc(20, 20, 255, 0, 0);
-  static2 = get_static_mc(20, 20, 0, 255, 0);
+  static1 = get_static_mc(60, 60, 255, 0, 0);
+  static2 = get_static_mc(60, 60, 0, 255, 0);
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
@@ -134,7 +134,7 @@ main(int argc, char** argv)
   // Frame 2: place character at depth 3 (-16381)
   it1 = SWFMovie_add(mo, (SWFBlock)static1);
   SWFDisplayItem_setDepth(it1, 3);
-  SWFDisplayItem_moveTo(it1, 100, 100);
+  SWFDisplayItem_moveTo(it1, 100, 300);
   SWFDisplayItem_setName(it1, "static1");
   SWFDisplayItem_addAction(it1, newSWFAction(
 			"_root.note(this+' onClipConstruct');"
@@ -162,7 +162,7 @@ main(int argc, char** argv)
   {
 	  abort(); // grace and beauty...
   }
-  SWFDisplayItem_moveTo(it1, 110, 110);
+  SWFDisplayItem_moveTo(it1, 130, 330);
   SWFDisplayItem_setName(it1, "static2");
   SWFDisplayItem_addAction(it1, newSWFAction(
 			"_root.note(this+' onClipConstruct');"
@@ -187,8 +187,8 @@ main(int argc, char** argv)
   // Everything suggests that a new instance is NOT created on replace !!!
   // Gnash here fails because it creates a NEW instance
 
-  // Anyway, the old character matrix changed to 110,110 !
-  xcheck_equals(mo, "static1._x", "110");
+  // Anyway, the old character matrix changed to 130,330 !
+  xcheck_equals(mo, "static1._x", "130");
 
   // We can't check the color in a self-contained testcase unfortunately,
   // we'll need a MovieTester-based runner for this.
@@ -212,7 +212,7 @@ main(int argc, char** argv)
     // And it still has it's user-provided property
     "xcheck_equals(static1.name, 'static1');"
 
-    // The instance have been moved back to its original position (100,100)
+    // The instance have been moved back to its original position (100,300)
     "check_equals(static1._x, 100);"
 
     // We can't check the color in a self-contained testcase unfortunately,
