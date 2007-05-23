@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.105 2007/05/02 18:19:02 martinwguy Exp $ */
+/* $Id: impl.cpp,v 1.106 2007/05/23 21:55:05 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,6 +49,8 @@
 #include "VM.h"
 #include "BitmapMovieDefinition.h"
 #include "DefineFontAlignZonesTag.h"
+#include "PlaceObject2Tag.h"
+#include "RemoveObjectTag.h"
 #include "sound_handler.h" // for get_sound_handler
 
 #include <string>
@@ -134,6 +136,7 @@ register_tag_loader(SWF::tag_type t, SWF::TagLoadersTable::loader_function lf)
 static void	ensure_loaders_registered()
 {
 	using namespace SWF::tag_loaders;
+	using namespace SWF;
 
 	static bool s_registered = false;
 	
@@ -145,8 +148,8 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::END,		end_loader);
 	register_tag_loader(SWF::DEFINESHAPE,	define_shape_loader);
 	register_tag_loader(SWF::FREECHARACTER, fixme_loader); // 03
-	register_tag_loader(SWF::PLACEOBJECT,	place_object_2_loader);
-	register_tag_loader(SWF::REMOVEOBJECT,	remove_object_2_loader);
+	register_tag_loader(SWF::PLACEOBJECT,	PlaceObject2Tag::loader);
+	register_tag_loader(SWF::REMOVEOBJECT,	RemoveObjectTag::loader); // 05
 	register_tag_loader(SWF::DEFINEBITS,	define_bits_jpeg_loader);
 	register_tag_loader(SWF::DEFINEBUTTON,	button_character_loader);
 	register_tag_loader(SWF::JPEGTABLES,	jpeg_tables_loader);
@@ -170,9 +173,9 @@ static void	ensure_loaders_registered()
 	// (might be nice to dump the password instead..)
 	register_tag_loader(SWF::PROTECT,	null_loader);
 	register_tag_loader(SWF::PATHSAREPOSTSCRIPT, fixme_loader); // 25
-	register_tag_loader(SWF::PLACEOBJECT2,	place_object_2_loader);
+	register_tag_loader(SWF::PLACEOBJECT2,	PlaceObject2Tag::loader);
 	// 27 - _UNKNOWN_ unimplemented
-	register_tag_loader(SWF::REMOVEOBJECT2, remove_object_2_loader);
+	register_tag_loader(SWF::REMOVEOBJECT2, RemoveObjectTag::loader); // 28
 	register_tag_loader(SWF::SYNCFRAME,	fixme_loader); // 29
 	// 30 - _UNKNOWN_ unimplemented
 	register_tag_loader(SWF::FREEALL,	fixme_loader); // 31

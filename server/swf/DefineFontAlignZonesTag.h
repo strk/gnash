@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: DefineFontAlignZonesTag.h,v 1.1 2007/02/21 13:22:37 strk Exp $ */
+/* $Id: DefineFontAlignZonesTag.h,v 1.2 2007/05/23 21:55:05 strk Exp $ */
 
 #ifndef GNASH_SWF_DEFINEFONTALIGNZONESTAG_H
 #define GNASH_SWF_DEFINEFONTALIGNZONESTAG_H
@@ -35,7 +35,6 @@ namespace gnash {
 
 namespace gnash {
 namespace SWF {
-namespace tag_loaders {
 
 class DefineFontAlignZonesTag {
 public:
@@ -58,7 +57,6 @@ private:
 
 };
 
-} // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
 } // namespace gnash
 

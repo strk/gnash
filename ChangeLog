@@ -1,5 +1,17 @@
 2007-05-23 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/: tag_loaders.cpp, DefineFontAlignZonesTag.{cpp,h},
+	  DisplayListTag.h, PlaceObject2Tag.{cpp,h},
+	  RemoveObjectTag.{cpp,h}:
+	  Move one namespace up (gnash::SWF - strip tag_loaders);
+	  Provide a static public loader() function for use by 
+	  register_tag_loader (moved implementation from tag_loaders.cpp
+	  to the classes themselves).
+	* server/impl.cpp: update loaders registration to call the new
+	  public static methods of ReplaceObjectTag and PlaceObject2Tag.
+
+2007-05-23 Sandro Santilli <strk@keybit.net>
+
 	* server/execute_tag.h: drop is_remove_tag() method.
 	* server/sprite_instance.{cpp,h}: drop unused
 	  execute_remove_tags() method.

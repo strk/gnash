@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: RemoveObjectTag.cpp,v 1.1 2007/05/23 20:06:20 strk Exp $ */
+/* $Id: RemoveObjectTag.cpp,v 1.2 2007/05/23 21:55:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,7 +31,6 @@
 
 namespace gnash {
 namespace SWF {
-namespace tag_loaders {
 
 void
 RemoveObjectTag::read(stream* in, tag_type tag)
@@ -55,7 +54,26 @@ RemoveObjectTag::execute(sprite_instance* m)
 	m->remove_display_object(m_depth, m_id);
 }
 
-} // namespace gnash::SWF::tag_loaders
+/* public static */
+void
+RemoveObjectTag::loader(stream* in, tag_type tag, movie_definition* m)
+{
+    assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
+
+    std::auto_ptr<RemoveObjectTag> t ( new RemoveObjectTag );
+    t->read(in, tag);
+
+    IF_VERBOSE_PARSE
+    (
+	log_parse(_("  remove_object_2(%d)"), t->getDepth());
+    );
+
+    m->removeTimelineDepth(t->getDepth());
+
+    // Ownership transferred to movie_definition
+    m->add_execute_tag(t.release());
+}
+
 } // namespace gnash::SWF
 } // namespace gnash
 

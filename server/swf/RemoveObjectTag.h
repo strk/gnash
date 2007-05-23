@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: RemoveObjectTag.h,v 1.1 2007/05/23 20:06:20 strk Exp $ */
+/* $Id: RemoveObjectTag.h,v 1.2 2007/05/23 21:55:06 strk Exp $ */
 
 #ifndef GNASH_SWF_REMOVEOBJECTTAG_H
 #define GNASH_SWF_REMOVEOBJECTTAG_H
@@ -41,7 +41,6 @@ namespace gnash {
 
 namespace gnash {
 namespace SWF {
-namespace tag_loaders {
 
 /// SWF Tag RemoveObject (5) or RemoveObject2 (28)
 //
@@ -68,13 +67,14 @@ public:
 	// See dox in execute_tag.h
 	bool isRemove() const { return true; }
 
+	static void loader(stream* in, tag_type tag, movie_definition* m);
+
 private:
 
 	int m_id;
 
 };
 
-} // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
 } // namespace gnash
 

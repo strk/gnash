@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: DisplayListTag.h,v 1.1 2007/05/23 20:06:20 strk Exp $ */
+/* $Id: DisplayListTag.h,v 1.2 2007/05/23 21:55:05 strk Exp $ */
 
 #ifndef GNASH_SWF_DISPLAYLISTTAG_H
 #define GNASH_SWF_DISPLAYLISTTAG_H
@@ -44,7 +44,6 @@ namespace gnash {
 
 namespace gnash {
 namespace SWF {
-namespace tag_loaders {
 
 /// DisplayList tag
 //
@@ -96,7 +95,6 @@ protected:
 
 };
 
-} // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
 } // namespace gnash
 

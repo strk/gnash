@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.10 2007/05/15 13:48:37 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.11 2007/05/23 21:55:05 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,7 +32,6 @@
 
 namespace gnash {
 namespace SWF {
-namespace tag_loaders {
 
 void
 PlaceObject2Tag::readPlaceObject(stream* in)
@@ -364,7 +363,34 @@ PlaceObject2Tag::~PlaceObject2Tag()
 	}
 }
 
-} // namespace gnash::SWF::tag_loaders
+/* public static */
+void
+PlaceObject2Tag::loader(stream* in, tag_type tag, movie_definition* m)
+{
+    assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2);
+
+    IF_VERBOSE_PARSE
+    (
+	log_parse(_("  place_object_2"));
+    );
+
+    // TODO: who owns and is going to remove this tag ?
+    PlaceObject2Tag* ch = new PlaceObject2Tag(*m);
+    ch->read(in, tag, m->get_version());
+
+    m->add_execute_tag(ch);
+
+    int depth = ch->getDepth();
+    if ( depth < 0 && depth >= character::staticDepthOffset )
+    {
+    	m->addTimelineDepth(ch->getDepth());
+    }
+    else
+    {
+	log_debug("PlaceObject2Tag depth %d is out of static depth zone. Won't register its TimelineDepth.", depth);
+    }
+}
+
 } // namespace gnash::SWF
 } // namespace gnash
 

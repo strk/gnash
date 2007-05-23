@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.107 2007/05/23 20:06:20 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.108 2007/05/23 21:55:06 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -773,33 +773,6 @@ void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
     }
 }
 
-void
-place_object_2_loader(stream* in, tag_type tag, movie_definition* m)
-{
-    assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2);
-
-    IF_VERBOSE_PARSE
-    (
-	log_parse(_("  place_object_2"));
-    );
-
-    // TODO: who owns and is going to remove this tag ?
-    PlaceObject2Tag* ch = new PlaceObject2Tag(*m);
-    ch->read(in, tag, m->get_version());
-
-    m->add_execute_tag(ch);
-
-    int depth = ch->getDepth();
-    if ( depth < 0 && depth >= character::staticDepthOffset )
-    {
-    	m->addTimelineDepth(ch->getDepth());
-    }
-    else
-    {
-	log_debug("PlaceObject2Tag depth %d is out of static depth zone. Won't register its TimelineDepth.", depth);
-    }
-}
-
 // Create and initialize a sprite, and add it to the movie.
 void
 sprite_loader(stream* in, tag_type tag, movie_definition* m)
@@ -842,25 +815,6 @@ void	end_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     assert(tag == SWF::END); // 0
     assert(in->get_position() == in->get_tag_end_position());
 }
-
-void	remove_object_2_loader(stream* in, tag_type tag, movie_definition* m)
-{
-    assert(tag == SWF::REMOVEOBJECT || tag == SWF::REMOVEOBJECT2);
-
-    std::auto_ptr<RemoveObjectTag> t ( new RemoveObjectTag );
-    t->read(in, tag);
-
-    IF_VERBOSE_PARSE
-    (
-	log_parse(_("  remove_object_2(%d)"), t->getDepth());
-    );
-
-    m->removeTimelineDepth(t->getDepth());
-
-    // Ownership transferred to movie_definition
-    m->add_execute_tag(t.release());
-}
-
 
 void	button_sound_loader(stream* in, tag_type tag, movie_definition* m)
 {

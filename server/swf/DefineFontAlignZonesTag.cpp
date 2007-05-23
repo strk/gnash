@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: DefineFontAlignZonesTag.cpp,v 1.3 2007/04/18 14:07:33 jgilmore Exp $ */
+/* $Id: DefineFontAlignZonesTag.cpp,v 1.4 2007/05/23 21:55:05 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,7 +32,6 @@
 
 namespace gnash {
 namespace SWF {
-namespace tag_loaders {
 
 DefineFontAlignZonesTag::DefineFontAlignZonesTag(movie_definition& /* m */,
 	stream& /* in */)
@@ -74,7 +73,6 @@ DefineFontAlignZonesTag::loader(stream* in, tag_type tag, movie_definition* m)
 }
 
 
-} // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
 } // namespace gnash
 

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.6 2007/05/23 20:06:20 strk Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.7 2007/05/23 21:55:05 strk Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -46,7 +46,6 @@ namespace gnash {
 
 namespace gnash {
 namespace SWF {
-namespace tag_loaders {
 
 /// SWF Tag PlaceObject (4) or PlaceObject2 (9) 
 //
@@ -97,6 +96,8 @@ public:
 	/// Return true if this tag transforms a character
 	bool isMove() const { return m_place_type == MOVE; }
 
+	static void loader(stream* in, tag_type tag, movie_definition* m);
+
 private:
 
 	int	m_tag_type;
@@ -132,7 +133,6 @@ private:
 
 };
 
-} // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
 } // namespace gnash
 
