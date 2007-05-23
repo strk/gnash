@@ -78,6 +78,8 @@ check_PROGRAMS = \
 	loop_test \
 	loop_test2 \
 	loop_test3 \
+	loop_test4 \
+	loop_test5 \
 	loop_test-Runner \
 	place_object_test \
 	move_object_test \
@@ -141,6 +143,7 @@ check_PROGRAMS = \
 	Video-EmbedSquareTestRunner \
 	NetStream-SquareTest \
 	NetStream-SquareTestRunner \
+	shape_test \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -207,6 +210,9 @@ check_SCRIPTS = \
 	getTimer_testrunner \
 	loop_test2runner \
 	loop_test3runner \
+	loop_test4runner \
+	loop_test5runner \
+	shape_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -383,6 +389,36 @@ loop_test3.swf: loop_test3
 
 loop_test3runner: $(srcdir)/../generic-testrunner.sh loop_test3.swf
 	sh $< -f20 $(top_builddir) loop_test3.swf > $@
+	chmod 755 $@
+
+loop_test4_SOURCES = loop_test4.c
+loop_test4_LDADD = libgnashmingutils.la
+
+loop_test4.swf: loop_test4
+	./loop_test4 $(top_srcdir)/testsuite/media
+
+loop_test4runner: $(srcdir)/../generic-testrunner.sh loop_test4.swf
+	sh $< -f20 $(top_builddir) loop_test4.swf > $@
+	chmod 755 $@
+
+loop_test5_SOURCES = loop_test5.c
+loop_test5_LDADD = libgnashmingutils.la
+
+loop_test5.swf: loop_test5
+	./loop_test5 $(top_srcdir)/testsuite/media
+
+loop_test5runner: $(srcdir)/../generic-testrunner.sh loop_test5.swf
+	sh $< -f20 $(top_builddir) loop_test5.swf > $@
+	chmod 755 $@
+
+shape_test_SOURCES = shape_test.c
+shape_test_LDADD = libgnashmingutils.la
+
+shape_test.swf: shape_test
+	./shape_test $(top_srcdir)/testsuite/media
+
+shape_testrunner: $(srcdir)/../generic-testrunner.sh shape_test.swf
+	sh $< -f20 $(top_builddir) shape_test.swf > $@
 	chmod 755 $@
 
 key_event_test_SOURCES = key_event_test.c
@@ -1357,6 +1393,9 @@ TEST_CASES = \
 	NetStream-SquareTestRunner \
 	loop_test2runner \
 	loop_test3runner \
+	loop_test4runner \
+	loop_test5runner \
+	shape_testrunner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
