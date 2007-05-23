@@ -1,5 +1,10 @@
 2007-05-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.cpp (render): don't force redraw
+	  always (don't cheat) - do only when asked to do so..
+
+2007-05-23 Sandro Santilli <strk@keybit.net>
+
 	* server/character.h: Extended TimelineInfo to store information
 	  about wheter a character was placed by a REPLACE tag.
 	* server/sprite_instance.cpp: implemented 3rd redesign attempt
