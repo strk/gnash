@@ -50,6 +50,7 @@
 #include "LoadVariablesThread.h" 
 #include "ExecutableCode.h"
 #include "gnash.h" // for point class !
+#include "Timeline.h" // for restoreDisplayList
 
 #include <vector>
 #include <string>
@@ -69,8 +70,10 @@ using namespace std;
 namespace gnash {
 
 //#define GNASH_DEBUG 1
-//#define GNASH_DEBUG_TIMELINE 1
-#define NEW_TIMELINE_DESIGN 1
+#define GNASH_DEBUG_TIMELINE 1
+
+// Unfed for original design, 2 for second redesign attempt, 3 for third redesign attempt
+#define NEW_TIMELINE_DESIGN 2
 
 
 
@@ -1703,109 +1706,6 @@ public:
 	}
 };
 
-/// A DisplayList visitor used to extract timeline instances that
-/// should be removed when rewinding playhead to a given frame
-///
-///
-/// See http://www.gnashdev.org/wiki/index.php/TimelineControl for
-/// more informations.
-///
-class TimelineInstanceFinder {
-
-	std::vector<character*> _toRemove;
-
-	// target frame, 0-based
-	size_t _frame;
-
-public:
-
-	/// @param tgtFrame
-	///	The frame to which we're rewinding. 0-based.
-	///
-	TimelineInstanceFinder(size_t tgtFrame)
-		:
-		_frame(tgtFrame)
-	{
-	}
-
-	/// Return a vector of characters to remove
-	std::vector<character*>& toRemove() { return _toRemove; }
-
-	bool operator() (character* ch) 
-	{
-		int depth = ch->get_depth();
-
-		// Timeline instances are always initially placed
-		// at negative depths and we don't want to remove those
-		// moved to different depths, so when depth 0 is
-		// reached our scan is complete.
-		if ( depth >= 0 )
-		{
-#ifdef GNASH_DEBUG_TIMELINE
-			cout << this << "] Char at depth " << depth << " reached, end scan" << endl;
-#endif
-			return false;
-		}
-
-		TimelineInfo* info = ch->getTimelineInfo();
-		if ( ! info )
-		{
-#ifdef GNASH_DEBUG_TIMELINE
-			cout << this << "] Char at depth " << depth
-				<< " is not a timeline, will remove" << endl;
-#endif
-			// non-timeline instances in static depth zone
-			// needs to be removed
-			_toRemove.push_back(ch);
-		}
-		else
-		{
-#ifdef GNASH_DEBUG_TIMELINE
-			cout << this << "] Char at depth " << depth
-				<< " is a timeline instance, placed originally in frame "
-				<< info->placedInFrame() << " at depth "
-				<< info->placedAtDepth() << endl;
-#endif
-
-			// timeline instances created after the target frame
-			// are always removed (those in the 'dynamic depth zone'
-			// won't get to this point)
-			if ( info->placedInFrame() > _frame )
-			{
-#ifdef GNASH_DEBUG_TIMELINE
-			        cout << this << "] will remove "
-					<< "(placed after target frame "
-					<< _frame << ")" << endl;
-#endif
-				_toRemove.push_back(ch);
-			}
-
-			// timeline instances created before or at the target frame
-			// are only removed if they are no more at the original depth
-			else if ( info->placedAtDepth() != depth )
-			{
-#ifdef GNASH_DEBUG_TIMELINE
-			        cout << this << "] will remove "
-					<< "(originally at a different depth)"
-					<< endl;
-#endif
-				_toRemove.push_back(ch);
-			}
-
-#ifdef GNASH_DEBUG_TIMELINE
-			else
-			{
-			        cout << this << "] will keep "
-					<< "(none of the above applied)"
-					<< endl;
-			}
-#endif
-		}
-
-		return true;
-	}
-};
-
 /// A DisplayList visitor used to extract all characters
 //
 /// Script characters are characters created or transformed
@@ -2611,6 +2511,113 @@ sprite_instance::resetDisplayList()
 	};
 }
 
+#if NEW_TIMELINE_DESIGN == 2 // 2nd redesign attempt
+
+/// A DisplayList visitor used to extract timeline instances that
+/// should be removed when rewinding playhead to a given frame
+///
+///
+/// See http://www.gnashdev.org/wiki/index.php/TimelineControl for
+/// more informations.
+///
+class TimelineInstanceFinder {
+
+	std::vector<character*> _toRemove;
+
+	// target frame, 0-based
+	size_t _frame;
+
+public:
+
+	/// @param tgtFrame
+	///	The frame to which we're rewinding. 0-based.
+	///
+	TimelineInstanceFinder(size_t tgtFrame)
+		:
+		_frame(tgtFrame)
+	{
+	}
+
+	/// Return a vector of characters to remove
+	std::vector<character*>& toRemove() { return _toRemove; }
+
+	bool operator() (character* ch) 
+	{
+		int depth = ch->get_depth();
+
+		// Timeline instances are always initially placed
+		// at negative depths and we don't want to remove those
+		// moved to different depths, so when depth 0 is
+		// reached our scan is complete.
+		if ( depth >= 0 )
+		{
+#ifdef GNASH_DEBUG_TIMELINE
+			cout << this << "] Char at depth " << depth << " reached, end scan" << endl;
+#endif
+			return false;
+		}
+
+		TimelineInfo* info = ch->getTimelineInfo();
+		if ( ! info )
+		{
+#ifdef GNASH_DEBUG_TIMELINE
+			cout << this << "] Char at depth " << depth
+				<< " is not a timeline, will remove" << endl;
+#endif
+			// non-timeline instances in static depth zone
+			// needs to be removed
+			_toRemove.push_back(ch);
+		}
+		else
+		{
+#ifdef GNASH_DEBUG_TIMELINE
+			cout << this << "] Char at depth " << depth
+				<< " is a timeline instance, placed originally in frame "
+				<< info->placedInFrame() << " at depth "
+				<< info->placedAtDepth() << endl;
+#endif
+
+			// timeline instances created after the target frame
+			// are always removed (those in the 'dynamic depth zone'
+			// won't get to this point)
+			if ( info->placedInFrame() > _frame )
+			{
+#ifdef GNASH_DEBUG_TIMELINE
+			        cout << this << "] will remove "
+					<< "(placed after target frame "
+					<< _frame << ")" << endl;
+#endif
+				_toRemove.push_back(ch);
+			}
+
+			// timeline instances created before or at the target frame
+			// are only removed if they are no more at the original depth
+			else if ( info->placedAtDepth() != depth )
+			{
+#ifdef GNASH_DEBUG_TIMELINE
+			        cout << this << "] will remove "
+					<< "(originally at a different depth)"
+					<< endl;
+#endif
+				_toRemove.push_back(ch);
+			}
+
+#ifdef GNASH_DEBUG_TIMELINE
+			else
+			{
+			        cout << this << "] will keep "
+					<< "(none of the above applied)"
+					<< endl;
+			}
+#endif
+		}
+
+		return true;
+	}
+};
+
+#endif // NEW_TIMELINE_DESIGN == 2
+
 /*private*/
 void
 sprite_instance::restoreDisplayList(size_t tgtFrame)
@@ -2619,6 +2626,8 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 	// TODO: I guess just moving here the code currently in goto_frame
 	//       for jump-forwards would do
 	assert(tgtFrame <= m_current_frame);
+
+#if NEW_TIMELINE_DESIGN == 2 // 2nd redesign attempt
 
 	// 1. Remove from current DisplayList:
 	// 	- Timeline instances constructed after target frame are always removed.
@@ -2651,6 +2660,28 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 		cout << "DisplayList after removal: " << m_display_list << endl;
 #endif
 	}
+
+#elif NEW_TIMELINE_DESIGN == 3 // 3rd redesign attempt
+
+	// 1. Find all "timeline depth" for the target frame, querying the
+	//    Timeline object in the sprite/movie definition (see implementation details)
+	// 2. Remove step 
+	// 2.1 Remove all current dynamic instances found in static depth zone 
+	// 2.2 Remove all current timeline instances at a depth NOT in the set found in step 1 
+
+	// TODO: try to optize by avoid calling set_invalidated
+	DisplayList newList = m_display_list;
+	assert( newList == m_display_list );
+	newList.reset(*m_def, tgtFrame, true);
+	if ( newList != m_display_list )
+	{
+		cout << "Modified DisplayList: " << newList << endl;
+		set_invalidated();
+		m_display_list = newList;
+	}
+
+#endif // NEW_TIMELINE_DESIGN == 3
+
 
 	// 2. Execute all displaylist tags from first to target frame 
 
@@ -3032,6 +3063,7 @@ sprite_instance::add_display_object(
 
 	if (existing_char)
 	{
+		log_debug("Another character exists in depth %d", depth);
 
 		// If we already have this object on this
 		// plane, then move it instead of replacing it.
@@ -3040,11 +3072,50 @@ sprite_instance::add_display_object(
 		//       ... I guess it's checked inside move_display_object ...
 		if ( existing_char->get_id() == character_id )
 		{
+			log_debug("Char has same id (%d), moving ", character_id);
+
 			// TODO: update name ?
 			move_display_object(depth, true, color_transform,
 				true, matrix, ratio, clip_depth);
 			return NULL;
 		}
+
+
+#if 1 // snipped based on deduction based on testcases:
+      // replace_sprites1test.swf, replace_shapes1test.swf and clip_as_button2.swf
+
+		TimelineInfo* info = existing_char->getTimelineInfo();
+		if ( info && info->placedByReplaceTag() && info->placedInFrame() > m_current_frame )
+		{
+			log_debug("Char was placed by REPLACE tag in frame %d (now in frame %d)", info->placedInFrame(), m_current_frame);
+
+			if ( existing_char->to_movie() )
+			{
+				log_debug("Char is a sprite, moving");
+				// If it's a sprite we move it.
+				// See replace_sprites1test.swf
+				move_display_object(depth, true, color_transform, true, matrix, ratio, clip_depth);
+			}
+			else
+			{
+				log_debug("Char is NOT a sprite, replacing");
+				// If it's something else (a shape?) replace it
+				replace_display_object(character_id, name, depth, true, color_transform, true, matrix, ratio, clip_depth);
+			}
+			return NULL;
+		}
+#endif
+
+#if 0 // still not sure here...
+		// See loop_test5.swf (maybe should compare against *this* ratio instead...
+		if ( existing_char->get_ratio() > 0 )
+		{
+			log_debug("Char has ratio==%g (> 0). Replacing it.", existing_char->get_ratio());
+
+			replace_display_object(character_id, name, depth, true, color_transform, true, matrix, ratio, clip_depth);
+			return NULL;
+		}
+#endif
 
 		// If we've been asked NOT to replace existing chars just
 		// return NULL now
@@ -3065,7 +3136,7 @@ sprite_instance::add_display_object(
 #ifdef GNASH_DEBUG_TIMELINE
 	cout << " Placing timeline char " << character_id << " at depth " << depth << " in frame " << m_current_frame << " of sprite " << getTarget() << endl;
 #endif
-	ch->setTimelineInfo(depth, m_current_frame);
+	ch->setTimelineInfo(depth, m_current_frame, false);
 
 	if ( name )
 	{
@@ -3134,7 +3205,7 @@ sprite_instance::replace_display_object(
 #ifdef GNASH_DEBUG_TIMELINE
 	cout << " Replacing timeline char at depth " << depth << " in frame " << m_current_frame << " of sprite " << getTarget() << " with char " << character_id << endl;
 #endif
-	ch->setTimelineInfo(depth, m_current_frame);
+	ch->setTimelineInfo(depth, m_current_frame, true);
 
 	replace_display_object(
 		ch.get(), name, depth,

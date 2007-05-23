@@ -1,5 +1,17 @@
 2007-05-23 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h: Extended TimelineInfo to store information
+	  about wheter a character was placed by a REPLACE tag.
+	* server/sprite_instance.cpp: implemented 3rd redesign attempt
+	  for DisplayList reconstruction compile-time enableable by
+	  setting NEW_TIMELINE_DESIGN to 3. Defined to 2 by defualt
+	  which gives us 2nd redesign attempt. See wiki.
+	  3rd redesign is promising and give us lots of unexpected
+	  successes, but also some unexpected failures for the new
+	  testcases for REPLACE tag. 
+
+2007-05-23 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.{cpp,h}: Add new reset() method taking
 	  enough parameters (I hope) to remove what needs to
 	  on jump-back; drop obsoleted clear_unaffected function.

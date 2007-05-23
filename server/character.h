@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.77 2007/05/22 14:23:51 udog Exp $ */
+/* $Id: character.h,v 1.78 2007/05/23 16:38:31 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -74,10 +74,15 @@ public:
 	/// @param frame
 	///	Frame number in which the instance was placed (0-based)
 	///
-	TimelineInfo(int depth, int frame)
+	/// @param replace
+	///	True if this object was placed by a REPLACE tag
+	///	(see PlaceObject2).
+	///
+	TimelineInfo(int depth, int frame, bool replace)
 		:
 		_depth(depth),
-		_frame(frame)
+		_frame(frame),
+		_replace(replace)
 	{
 	}
 
@@ -88,6 +93,10 @@ public:
 	/// Return frame number of initial placement (0-based)
 	size_t placedInFrame() const { return _frame; }
 
+	/// Return true if this instance replaced an other one at same depth
+	bool placedByReplaceTag() const { return _replace; }
+
+
 private:
 
 	/// Original depth
@@ -95,6 +104,9 @@ private:
 
 	/// Frame of placement, 0-based
 	size_t _frame;
+
+	/// Placed by Replace tag ?
+	bool _replace;
 };
 
 /// Character is a live, stateful instance of a character_def.
@@ -953,15 +965,19 @@ public: // istn't this 'public' reduntant ?
 	/// @param frame
 	///	Frame of first placement. 0-based.
 	///
+	/// @param replacing
+	///	True if this object was placed by a REPLACE tag
+	///	(see PlaceObject2).
+	///
 	/// NOTE: if we want to compute TimelineInfo records once at
 	/// 	  parse time and reuse pointers we'll just need to take
 	///	  a TimelineInfo pointer as parameter, externally owned.
 	///	  For now, we'll use a new object for each instance.
 	///
-	void setTimelineInfo(int depth, int frame)
+	void setTimelineInfo(int depth, int frame, bool replacing)
 	{
 		assert(_timelineInfo.get()==NULL); // don't call twice !
-		_timelineInfo.reset(new TimelineInfo(depth, frame));
+		_timelineInfo.reset(new TimelineInfo(depth, frame, replacing));
 	}
 
 	/// Return timeline information, if this is a timeline instance
