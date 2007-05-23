@@ -7,3 +7,5 @@ Makefile.in
 site.exp
 testrun.log
 testrun.sum
+*.swf
+*.pp
