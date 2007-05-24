@@ -85,14 +85,6 @@ public:
 
 	virtual ~sprite_instance();
 
-
-	enum mouse_state
-	{
-		UP = 0,
-		DOWN,
-		OVER
-	};
-
 	enum play_state
 	{
 		PLAY,
@@ -830,8 +822,6 @@ private:
 	/// element. When the function returns the list should be empty.
 	///
 	void execute_actions(ActionList& action_list);
-
-	mouse_state m_mouse_state;
 
 	// TODO: shouldn't we keep this by intrusive_ptr ?
 	movie_instance*	m_root;
