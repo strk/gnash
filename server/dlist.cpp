@@ -287,8 +287,6 @@ DisplayList::replace_character(
 		// add the new char
 		_characters.insert(it, di);
 
-		// Give life to this instance
-		ch->construct();
 	}
 	else
 	{
@@ -314,12 +312,18 @@ DisplayList::replace_character(
 		*it = di;
 		
 		// extend invalidated bounds
+		// WARNING: when a new Button character is added,
+		//          the invalidated bounds computation will likely
+		//          be bogus, as the actual character shown is not instantiated
+		//          until ::construct for buttons (I'd say this is a bug in button_character_instance)
+		//          UdoG, following ? 
+		//
 		ch->extend_invalidated_bounds(old_ranges);				
 
-		// TODO: check: Shouldn't we construct the new object here too ?
-		//ch->construct();
 	}
 
+	// Give life to this instance
+	ch->construct();
 }
 	
 	

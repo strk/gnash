@@ -1,5 +1,7 @@
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.cpp (replace_character): always call ::construct
+	  on the new character.
 	* backend/sound_handler_sdl.h: fix const-correctness
 	  of active_sound (btw, do we really need two different
 	  definitions of that class for SDL and GST ?).
