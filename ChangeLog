@@ -1,5 +1,12 @@
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am,
+	  loop_test6.c, loop_test7.c:
+	  Add a clone of "Jumping backward to the end of a character's
+	  lifetime" test this time with onUnload defined.
+
+2007-05-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: replace_shapes1test.c,
 	  replace_sprites1test.c: SWFMovie_replace returns 0 on success
 	  and non-0 on failure. Fixed code to reflect that (I'm not sure

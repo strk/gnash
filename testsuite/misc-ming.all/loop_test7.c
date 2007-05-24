@@ -17,7 +17,7 @@
  */ 
 
 /*
- * Test "Jumping backward to the end of a character's lifetime (with events: onConstruct)"
+ * Test "Jumping backward to the end of a character's lifetime (with events: onConstruct, onUnload)"
  *
  * Timeline:
  * 
@@ -33,15 +33,16 @@
  * Description:
  *
  *  frame2: a static characters is placed at depth 3 (-16381) [ a red square ]
- *          onConstruct event handler defined, onUnload event handlers NOT defined
+ *          Both onConstruct and onUnload event handlers defined.
  *  frame3: character at depth 3 (-16381) removed
  *  frame5: jump back to frame 4 and stop
  *
  * Expected behaviour:
  *
- *   After jump back, the onConstruct event handler for the red square has been invoked only once.
+ *   TODO: verify
+ *   After jump back, the onConstruct event handler for the red square has been invoked twice.
  *
- * run as ./loop_test6
+ * run as ./loop_test7
  */
 
 
@@ -51,8 +52,8 @@
 
 #include "ming_utils.h"
 
-#define OUTPUT_VERSION 7
-#define OUTPUT_FILENAME "loop_test6.swf"
+#define OUTPUT_VERSION 6
+#define OUTPUT_FILENAME "loop_test7.swf"
 
 
 int
@@ -104,15 +105,19 @@ main(int argc, char** argv)
     "_root.note(this+' constructed');"
     "_root.mc1Constructed++;"
     ), SWFACTION_CONSTRUCT);
+  SWFDisplayItem_addAction(it1, newSWFAction(
+    "_root.note(this+' unloaded');"
+    "_root.mc1Unloaded++;"
+    ), SWFACTION_UNLOAD);
 
   check_equals(mo, "typeof(movieClip1)", "'movieclip'");
-  check_equals(mo, "_root.mc1Constructed", "1");
+  xcheck_equals(mo, "_root.mc1Constructed", "1");
 
   SWFMovie_nextFrame(mo);  
 
   // Frame3: Remove red square
   SWFDisplayItem_remove(it1);
-  check_equals(mo, "typeof(movieClip1)", "'undefined'");
+  xcheck_equals(mo, "typeof(movieClip1)", "'movieclip'"); // kept alive for calling onUnload!
   check_equals(mo, "_root.mc1Constructed", "1");
   SWFMovie_nextFrame(mo);  
   
@@ -121,11 +126,16 @@ main(int argc, char** argv)
   
   // Frame5: check, gotoAndStop(4), check..
 
-  SWFMovie_add(mo, (SWFBlock)newSWFAction( "gotoAndStop(4);"));
   check_equals(mo, "typeof(movieClip1)", "'undefined'");
+  SWFMovie_add(mo, (SWFBlock)newSWFAction( "gotoAndStop(4);"));
+  xcheck_equals(mo, "typeof(movieClip1)", "'movieclip'");
 
   // Gnash calls onConstruct again !!
-  xcheck_equals(mo, "_root.mc1Constructed", "1");
+  xcheck_equals(mo, "_root.mc1Constructed", "2");
+
+  // this is due to action execution order, it's called twice, but
+  // the second time it's called *after* the end of *this* DOACTION block ..
+  check_equals(mo, "_root.mc1Unloaded", "1");
 
   SWFMovie_add(mo, (SWFBlock)newSWFAction( "totals(); stop();" ));
   SWFMovie_nextFrame(mo);
