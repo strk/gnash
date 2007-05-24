@@ -145,6 +145,13 @@ private:
 
 	// size of the stream
 	long _streamSize;
+
+	// Tell the download loop to be nice and take a break
+	// This is needed since the loop in downloadThread() calls fillCache() and 
+	// download() which locks _mutex, and sometimes the read() function can't
+	// get a lock because fillCache() and download() just "keeps" it, which can
+	// makes read() wait for for a really long time.
+	volatile bool _needAccess;
 };
 
 #endif // __LOADTHREAD_H__

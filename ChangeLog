@@ -1,3 +1,11 @@
+2007-05-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/LoadThread.{cpp,h}: Made the download loop sleep when
+	  read() wants to get a lock on the mutex.
+	* libbase/curl_adapter.cpp: Decreased the sleeping time in fill_cache.
+	* backend/{sound_handler.h,sound_handler_gst.h,sound_handler_sdl.h}:
+	  Moved sound_data class to the base header.
+
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
 	* libbase/curl_adapter.cpp (CurlStreamFile::seek): use the _cached

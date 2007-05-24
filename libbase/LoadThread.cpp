@@ -16,9 +16,16 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.10 2007/05/07 07:25:06 strk Exp $
+// $Id: LoadThread.cpp,v 1.11 2007/05/24 22:27:09 tgc Exp $
 
 #include "LoadThread.h"
+
+#if defined(_WIN32) || defined(WIN32)
+# include <windows.h>	// for sleep()
+# define usleep(x) Sleep(x/1000)
+#else
+# include "unistd.h" // for usleep()
+#endif
 
 LoadThread::LoadThread()
 	:
@@ -31,7 +38,8 @@ LoadThread::LoadThread()
 	_cachedData(0),
 	_cacheSize(0),
 	_chunkSize(56),
-	_streamSize(0)
+	_streamSize(0),
+	_needAccess(false)
 {
 }
 
@@ -107,6 +115,9 @@ size_t LoadThread::read(void *dst, size_t bytes)
 	// so we now either load more data into the cache, or completely
 	// replace the content.
 
+	// Tell the download loop to be nice and take a break
+	_needAccess = true;
+
 #ifdef THREADED_LOADS
 	boost::mutex::scoped_lock lock(_mutex);
 #endif
@@ -129,6 +140,7 @@ size_t LoadThread::read(void *dst, size_t bytes)
 		_cachedData = _userPosition - _cacheStart + ret;
 		_userPosition += ret;
 		_actualPosition = _userPosition;
+		_needAccess = false;
 		return ret;
 
 	}
@@ -169,6 +181,8 @@ size_t LoadThread::read(void *dst, size_t bytes)
 
 	_cachedData = ret;
 	_cacheStart = newcachestart;
+
+	_needAccess = false;
 
 	if (ret < _userPosition - newcachestart) return 0;
 
@@ -243,8 +257,15 @@ void LoadThread::downloadThread(LoadThread* lt)
 {
 	// Until the download is completed keep downloading
 	while (!lt->_completed) {
+		// If the cache is full just "warm up" the data using download(),
+		// else put data directly into the cache using fillCache().
 		if (lt->_chunkSize + lt->_loadPosition > lt->_cacheStart + lt->_cacheSize) lt->download();
 		else lt->fillCache();
+
+		// If the read() fuction needs to get access to the stream we take a break. 
+		if (lt->_needAccess) {
+			usleep(100000); // 1/10 second
+		}
 	}
 
 }
@@ -260,8 +281,11 @@ void LoadThread::fillCache()
 	boost::mutex::scoped_lock lock(_mutex);
 #endif
 
+	// If we're not at the reading head, move to it
 	if (_loadPosition != _actualPosition) _stream->set_position(_loadPosition);
 
+	// If loading the next chunk will overflow the cache, only fill the cache
+	// the "the edge", and "warm up" the remaining data.
 	int ret;
 	if (_cachedData + _chunkSize > _cacheSize) {
 		ret = _stream->read_bytes(_cache + _cachedData, _cacheSize - _cachedData);
@@ -319,5 +343,6 @@ void LoadThread::download()
 	_loadPosition = pos;
 	assert(_loadPosition <= _streamSize);
 	_actualPosition = pos;
+
 }
 

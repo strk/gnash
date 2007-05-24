@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.21 2007/05/24 11:46:28 strk Exp $
+// $Id: sound_handler_sdl.h,v 1.22 2007/05/24 22:27:09 tgc Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -108,39 +108,6 @@ private:
 	uint8_t* raw_data;
 
 };
-
-
-/// Used to hold the sounddata when doing on-demand-decoding
-class sound_data
-{
-public:
-	/// The undecoded data
-	uint8_t* data;
-
-	/// Format of the sound (MP3, raw, etc).
-	int format;
-
-	/// The size of the undecoded data
-	long data_size;
-
-	/// Stereo or not
-	bool stereo;
-
-	/// Number of samples
-	int sample_count;
-
-	/// Sample rate
-	int sample_rate;
-
-	/// Volume for AS-sounds, range: 0-100.
-	/// It's the SWF range that is represented here.
-	int volume;
-
-	/// Vector containing the active instances of this sounds being played
-	std::vector<active_sound*>	m_active_sounds;
-
-};
-
 
 // Use SDL and ffmpeg/mad/nothing to handle sounds.
 class SDL_sound_handler : public gnash::sound_handler

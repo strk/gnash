@@ -62,38 +62,6 @@ public:
 
 };
 
-
-// Used to hold the sounddata when doing on-demand-decoding
-class sound_data
-{
-public:
-	// The (un)compressed data
-	guint8* data;
-
-	// data format
-	int format;
-
-	// data size
-	long data_size;
-
-	// stereo or not
-	bool stereo;
-
-	// number of samples
-	int sample_count;
-
-	// sample rate
-	int sample_rate;
-
-	// Volume, SWF range: 0-100, GST range 0-10 (we only use 0-1, the rest is amplified)
-	// It's the SWF range that is represented here
-	int volume;
-
-	// gstreamer objects
-	std::vector<gst_elements*>	m_gst_elements;
-
-};
-
 // Use gstreamer to handle sounds.
 class GST_sound_handler : public gnash::sound_handler
 {

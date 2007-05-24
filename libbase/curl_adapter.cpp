@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.35 2007/05/24 22:06:09 strk Exp $ */
+/* $Id: curl_adapter.cpp,v 1.36 2007/05/24 22:27:09 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -283,8 +283,8 @@ CurlStreamFile::fill_cache(long unsigned size)
 	// to nap between curl_multi_perform calls if the amount
 	// of data requested haven't arrived yet.
 	// 
-	const long unsigned minSleep =  100000; // 1/10 second
-	const long unsigned maxSleep =  300000; // 3/10 second
+	const long unsigned minSleep =  10000; // 1/100 second
+	const long unsigned maxSleep =  100000; // 1/10 second
 
 	CURLMcode mcode;
 #if VERBOSE_POLLING_LOOP
