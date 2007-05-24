@@ -1,5 +1,11 @@
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.cpp: protect vector
+	  elements dereferencing by assertions. I have a segfault
+	  triggered by a new uncommitted testcase replacing buttons...
+
+2007-05-24 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.{cpp,h}: remove unused
 	  sprite_instance::mouse_state typedef and member.
 	* server/parser/BitmapMovieDefinition.h,

@@ -264,7 +264,7 @@ button_character_instance::button_character_instance(
 	attachButtonInterface(*this);
 
 	// check up presence Key events
-	for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
+	for (size_t i = 0, e = m_def->m_button_actions.size(); i < e; ++i)
 	{
 		if (m_def->m_button_actions[i].m_conditions & 0xFE00)	// check up on CondKeyPress: UB[7]
 		{
@@ -382,7 +382,7 @@ button_character_instance::restart()
 	m_last_mouse_flags = IDLE;
 	m_mouse_flags = IDLE;
 	m_mouse_state = UP;
-	int r, r_num =  m_record_character.size();
+	size_t r, r_num =  m_record_character.size();
 	for (r = 0; r < r_num; r++)
 	{
 		m_record_character[r]->restart();
@@ -399,9 +399,10 @@ button_character_instance::advance(float delta_time)
 	matrix	mat = get_world_matrix();
 
 	// Advance our relevant characters.
-	{for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	{for (size_t i = 0; i < m_def->m_button_records.size(); i++)
 	{
 		button_record&	rec = m_def->m_button_records[i];
+		assert(m_record_character.size() > i);
 		if (m_record_character[i] == NULL)
 		{
 			continue;
@@ -431,9 +432,10 @@ button_character_instance::display()
   for (int layer=m_def->m_min_layer; layer<=m_def->m_max_layer; layer++) 
   {   
 
-  	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+  	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
   	{
   		button_record&	rec = m_def->m_button_records[i];
+		assert(m_record_character.size() > i);
   		if (m_record_character[i] == NULL)
   		{
   			continue;
@@ -470,7 +472,7 @@ button_character_instance::get_topmost_mouse_entity(float x, float y)
 	point	p;
 	m.transform_by_inverse(&p, point(x, y));
 
-	{for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	{for (size_t i = 0; i < m_def->m_button_records.size(); i++)
 	{
 		button_record&	rec = m_def->m_button_records[i];
 		if (rec.m_character_id < 0 || rec.m_hit_test == false)
@@ -603,12 +605,12 @@ button_character_instance::on_button_event(const event_id& event)
 	// Immediately execute all events actions (don't append to
 	// parent's action buffer for later execution!)
 
-	for (unsigned int i = 0; i < m_def->m_button_actions.size(); i++)
+	for (size_t i = 0; i < m_def->m_button_actions.size(); i++)
 	{
 		if (m_def->m_button_actions[i].m_conditions & c)
 		{
 			// Matching action.
-			for (unsigned int j = 0; j < m_def->m_button_actions[i].m_actions.size(); j++)
+			for (size_t j = 0; j < m_def->m_button_actions[i].m_actions.size(); j++)
 			{
 				action_buffer* ab = m_def->m_button_actions[i].m_actions[j];
 				assert(ab);
@@ -655,9 +657,10 @@ button_character_instance::get_active_characters(std::vector<character*>& list,
 {
 	list.clear();
 	
-	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
 	{
 		button_record&	rec = m_def->m_button_records[i];
+		assert(m_record_character.size() > i);
 		if (m_record_character[i] == NULL)
 		{
 			continue;
@@ -691,12 +694,12 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 	if (new_list.size() != old_list.size())
 		set_invalidated();		// something changed 
   
-  unsigned int old_count = old_list.size();
-  unsigned int new_count = new_list.size();
-  for (unsigned int i=0; i<new_count; i++) {
+  size_t old_count = old_list.size();
+  size_t new_count = new_list.size();
+  for (size_t i=0; i<new_count; i++) {
 
   	bool found=false;
-  	for (unsigned int j=0; j<old_count; j++) { 
+  	for (size_t j=0; j<old_count; j++) { 
 	  	if (new_list[i] == old_list[j]) {
 				found=true;
 				break; 
@@ -718,7 +721,7 @@ void
 button_character_instance::restart_characters(int condition)
 {
 	// Restart our relevant characters
-	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
 	{
 		bool	restart = false;
 		button_record* rec = &m_def->m_button_records[i];
@@ -742,6 +745,7 @@ button_character_instance::restart_characters(int condition)
 
 		if (restart == true)
 		{
+			assert(m_record_character.size() > i);
 			m_record_character[i]->restart();
 		}
 	}
@@ -763,9 +767,10 @@ button_character_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 
   // TODO: Instead of using these for loops again and again, wouldn't it be a
   // good idea to have a generic "get_record_character()" method?
-	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
 	{
 		button_record&	rec = m_def->m_button_records[i];
+		assert(m_record_character.size() > i);
 		if (m_record_character[i] == NULL)
 		{
 			continue;
@@ -786,9 +791,10 @@ button_character_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 geometry::Range2d<float>
 button_character_instance::getBounds() const
 {
-	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
 	{
 		button_record&	rec = m_def->m_button_records[i];
+		assert(m_record_character.size() > i);
 		if (m_record_character[i] == NULL)
 		{
 			continue;
@@ -808,9 +814,10 @@ button_character_instance::getBounds() const
 bool
 button_character_instance::pointInShape(float x, float y) const
 {
-	for (unsigned int i = 0; i < m_def->m_button_records.size(); i++)
+	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
 	{
 		button_record&	rec = m_def->m_button_records[i];
+		assert(m_record_character.size() > i);
 		if (m_record_character[i] == NULL)
 		{
 			continue;
@@ -834,12 +841,12 @@ button_character_instance::get_relative_target(const std::string& name)
 
 	if ( ! ch )
 	{
-		int size = m_record_character.size();
+		size_t size = m_record_character.size();
 		
 		// See if we have a match on the button records list
 		// TODO: Should we scan only currently visible characters 
 		// (get_active_characters) ?? 
-		for (int i=0; i<size; i++) {
+		for (size_t i=0; i<size; i++) {
 			character* child = m_record_character[i].get();
 			if (child->get_name() == name)
 				return child;
@@ -852,7 +859,7 @@ button_character_instance::get_relative_target(const std::string& name)
 void
 button_character_instance::construct()
 {
-	int r, r_num =  m_def->m_button_records.size();
+	size_t r, r_num =  m_def->m_button_records.size();
 	m_record_character.resize(r_num);
 
 	for (r = 0; r < r_num; r++)
