@@ -70,7 +70,8 @@ using namespace std;
 namespace gnash {
 
 //#define GNASH_DEBUG 1
-#define GNASH_DEBUG_TIMELINE 1
+//#define GNASH_DEBUG_TIMELINE 1
+//#define GNASH_DEBUG_REPLACE 1
 
 // Unfed for original design, 2 for second redesign attempt, 3 for third redesign attempt
 #define NEW_TIMELINE_DESIGN 2
@@ -3064,7 +3065,9 @@ sprite_instance::add_display_object(
 
 	if (existing_char)
 	{
+#ifdef GNASH_DEBUG_REPLACE
 		log_debug("Another character exists in depth %d", depth);
+#endif
 
 		// If we already have this object on this
 		// plane, then move it instead of replacing it.
@@ -3073,7 +3076,9 @@ sprite_instance::add_display_object(
 		//       ... I guess it's checked inside move_display_object ...
 		if ( existing_char->get_id() == character_id )
 		{
+#ifdef GNASH_DEBUG_REPLACE
 			log_debug("Char has same id (%d), moving ", character_id);
+#endif
 
 			// TODO: update name ?
 			move_display_object(depth, true, color_transform,
@@ -3088,18 +3093,24 @@ sprite_instance::add_display_object(
 		TimelineInfo* info = existing_char->getTimelineInfo();
 		if ( info && info->placedByReplaceTag() && info->placedInFrame() > m_current_frame )
 		{
+#ifdef GNASH_DEBUG_REPLACE
 			log_debug("Char was placed by REPLACE tag in frame %d (now in frame %d)", info->placedInFrame(), m_current_frame);
+#endif
 
 			if ( existing_char->to_movie() )
 			{
+#ifdef GNASH_DEBUG_REPLACE
 				log_debug("Char is a sprite, moving");
+#endif
 				// If it's a sprite we move it.
 				// See replace_sprites1test.swf
 				move_display_object(depth, true, color_transform, true, matrix, ratio, clip_depth);
 			}
 			else
 			{
+#ifdef GNASH_DEBUG_REPLACE
 				log_debug("Char is NOT a sprite, replacing");
+#endif
 				// If it's something else (a shape?) replace it
 				replace_display_object(character_id, name, depth, true, color_transform, true, matrix, ratio, clip_depth);
 			}
@@ -3111,7 +3122,9 @@ sprite_instance::add_display_object(
 		// See loop_test5.swf (maybe should compare against *this* ratio instead...
 		if ( existing_char->get_ratio() > 0 )
 		{
+#ifdef GNASH_DEBUG_REPLACE
 			log_debug("Char has ratio==%g (> 0). Replacing it.", existing_char->get_ratio());
+#endif
 
 			replace_display_object(character_id, name, depth, true, color_transform, true, matrix, ratio, clip_depth);
 			return NULL;
