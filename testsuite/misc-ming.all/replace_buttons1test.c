@@ -53,7 +53,7 @@
 #include <stdio.h>
 #include <ming.h>
 
-#define OUTPUT_VERSION 6
+#define OUTPUT_VERSION 7
 #define OUTPUT_FILENAME "replace_buttons1test.swf"
 
 SWFDisplayItem add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height);
@@ -189,14 +189,14 @@ main(int argc, char** argv)
 
 
   // Can still reference the old character and it's variables, after replace
-  xcheck_equals(mo, "typeof(static2)", "'undefined'"); 
-  xcheck_equals(mo, "typeof(static1)", "'object'"); 
-  xcheck_equals(mo, "static1._target", "'/static1'");
-  xcheck_equals(mo, "static1.name", "'static1'");
-  xcheck_equals(mo, "static1._x", "130");
+  check_equals(mo, "typeof(static2)", "'undefined'"); 
+  check_equals(mo, "typeof(static1)", "'object'"); 
+  check_equals(mo, "static1._target", "'/static1'");
+  check_equals(mo, "static1.name", "'static1'");
+  check_equals(mo, "static1._x", "130");
 
   // While the new name results undefined...
-  xcheck_equals(mo, "typeof(static2)", "'undefined'"); // the name wasn't changed
+  check_equals(mo, "typeof(static2)", "'undefined'"); // the name wasn't changed
 
   // Everything suggests that a new instance is NOT created on replace !!!
   // Gnash here fails because it creates a NEW instance
@@ -215,14 +215,15 @@ main(int argc, char** argv)
 
     "gotoAndStop(2); " 
 
-    // Shapes don't get their onConstruct event invoked !
+    // Buttons don't get their onConstruct event invoked ...
     "check_equals(typeof(_root.depth3Constructed), 'undefined');"
 
     // Original character name is still referenceable
     "check_equals(typeof(static1), 'object');"
 
-    // It's a new instance !
-    "check_equals(typeof(static1.name), 'undefined');"
+    // But it's a new instance !!
+    // Gnash fails here becasue it does a simple *move* instead.
+    "xcheck_equals(typeof(static1.name), 'undefined');"
 
     // We can't check the color or the _x in a self-contained testcase unfortunately,
     // we'll need a MovieTester-based runner for this.

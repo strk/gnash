@@ -1,5 +1,14 @@
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (replace_display_object):
+	  When the object being replaced is NOT a scriptable object,
+	  move instead of replacing.
+	* testsuite/misc-ming.all/: replace_buttons1test.c,
+	  replace_buttons1test_runner.cpp, replace_sprites1test.c,
+	  replace_sprites1test_runner.cpp: Expect less failures.
+
+2007-05-24 Sandro Santilli <strk@keybit.net>
+
 	* server/: dlist.{cpp,h}, sprite_instance.{cpp,h},
 	  server/swf/PlaceObject2Tag.cpp, server/vm/action.cpp:
 	  Drop the use_matrix/use_color_xform parameters, use

@@ -194,19 +194,19 @@ main(int argc, char** argv)
 
 
   // Can still reference the old character and it's variables, after replace
-  xcheck_equals(mo, "typeof(static1)", "'movieclip'"); 
-  xcheck_equals(mo, "static1.name", "'static1'");
-  xcheck_equals(mo, "static1._target", "'/static1'");
-  xcheck_equals(mo, "static1._x", "130");
+  check_equals(mo, "typeof(static1)", "'movieclip'"); 
+  check_equals(mo, "static1.name", "'static1'");
+  check_equals(mo, "static1._target", "'/static1'");
+  check_equals(mo, "static1._x", "130");
 
   // While the new name results undefined...
-  xcheck_equals(mo, "typeof(static2)", "'undefined'"); 
+  check_equals(mo, "typeof(static2)", "'undefined'"); 
 
   // Everything suggests that a new instance is NOT created on replace !!!
   // Gnash here fails because it creates a NEW instance
 
   // Anyway, the old character matrix changed to 130,330 !
-  xcheck_equals(mo, "static1._x", "130");
+  check_equals(mo, "static1._x", "130");
 
   // We can't check the color in a self-contained testcase unfortunately,
   // we'll need a MovieTester-based runner for this.
@@ -222,13 +222,13 @@ main(int argc, char** argv)
     "gotoAndStop(2); " 
 
     // A single instance has been constructed !!
-    "xcheck_equals(_root.depth3Constructed, '1');"
+    "check_equals(_root.depth3Constructed, '1');"
 
     // Original character name is still referenceable
     "check_equals(typeof(static1), 'movieclip');"
 
     // And it still has it's user-provided property
-    "xcheck_equals(static1.name, 'static1');"
+    "check_equals(static1.name, 'static1');"
 
     // The instance have been moved back to its original position (100,300)
     "check_equals(static1._x, 100);"

@@ -106,10 +106,10 @@ main(int /*argc*/, char** /*argv*/)
 	// check that we have a red square at (130,330 - 190,390)
 	// Gnash fails here becase it does a *real* replace, while it
 	// seems we're not supposed to replace, just to move (who knows why?!)
-	xcheck_pixel(134, 334, 2, red, 2); // UL
-	xcheck_pixel(186, 334, 2, red, 2); // UR
-	xcheck_pixel(186, 386, 2, red, 2); // LL
-	xcheck_pixel(134, 386, 2, red, 2); // LR
+	check_pixel(134, 334, 2, red, 2); // UL
+	check_pixel(186, 334, 2, red, 2); // UR
+	check_pixel(186, 386, 2, red, 2); // LL
+	check_pixel(134, 386, 2, red, 2); // LR
 
 	// and nothing around it...
 	check_pixel(126, 360, 2, white, 2); // Left

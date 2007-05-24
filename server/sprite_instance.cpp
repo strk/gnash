@@ -3210,6 +3210,40 @@ sprite_instance::replace_display_object(
 	}
 	assert(cdef);
 
+#define MOVE_NONSHAPES_ON_REPLACE
+#ifdef MOVE_NONSHAPES_ON_REPLACE
+	character* existing_char = m_display_list.get_character_at_depth(depth);
+	if (existing_char)
+	{
+#ifdef GNASH_DEBUG_REPLACE
+		log_debug("Another character exists in depth %d", depth);
+#endif
+		if ( existing_char->isActionScriptReferenceable() )
+		{
+#ifdef GNASH_DEBUG_PLACE
+			log_debug("Char is a scriptable instance, moving rather then replace");
+#endif
+			// If it's a sprite we move it.
+			// See replace_sprites1test.swf and replace_buttons1test.swf
+			// Note that for buttons, it seems we should also wipe out the members !
+			// Maybe this is not the this we're supposed to do here, rather some weird
+			// simptom from implementation of a proper displaylist reconstruction.
+			// For example, the REPLACE tag might act like a PLACE tag when executed
+			// alone, looking for missing info (character_id, name) in the previous 
+			// PLACE tag affecting this same depth..
+			//
+			move_display_object(depth, color_transform, mat, ratio, clip_depth);
+			return;
+		}
+	}
+	else
+	{
+#ifdef GNASH_DEBUG_REPLACE
+		log_debug("REPLACE: no character exists in depth %d - should add ?", depth);
+#endif
+	}
+#endif // MOVE_NONSHAPES_ON_REPLACE
+
 	boost::intrusive_ptr<character> ch = cdef->create_character_instance(this,
 			character_id);
 
