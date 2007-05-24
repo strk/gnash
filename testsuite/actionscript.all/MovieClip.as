@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.69 2007/05/10 10:08:32 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.70 2007/05/24 09:00:48 strk Exp $";
 
 #include "check.as"
 
@@ -552,6 +552,10 @@ xcheck(textfieldTest instanceof MovieClip);
 
 // getDepth was not available as of SWF5
 #if OUTPUT_VERSION > 5
+
+// _level0 is at depth 0 !
+// _level1 is at depth 1 ! (and so on)..
+xcheck_equals(_root.getDepth(), -16384);
 
 static_clip_name = "__shared_assets";
 static_clip = eval(static_clip_name);
