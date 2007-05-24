@@ -1,5 +1,12 @@
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* server/: Makefile.am, impl.cpp, swf/DoActionTag.h,
+	  swf/tag_loaders.cpp:
+	  Move DoAction and DoInitAction tag stuff to its 
+	  own file (both loader and parser).
+
+2007-05-24 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (replace_display_object):
 	  When the object being replaced is NOT a scriptable object,
 	  move instead of replacing.

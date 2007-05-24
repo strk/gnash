@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.106 2007/05/23 21:55:05 strk Exp $ */
+/* $Id: impl.cpp,v 1.107 2007/05/24 20:10:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -51,6 +51,7 @@
 #include "DefineFontAlignZonesTag.h"
 #include "PlaceObject2Tag.h"
 #include "RemoveObjectTag.h"
+#include "DoActionTag.h"
 #include "sound_handler.h" // for get_sound_handler
 
 #include <string>
@@ -156,7 +157,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::SETBACKGROUNDCOLOR, set_background_color_loader);
 	register_tag_loader(SWF::DEFINEFONT,	define_font_loader);
 	register_tag_loader(SWF::DEFINETEXT,	define_text_loader);
-	register_tag_loader(SWF::DOACTION,	do_action_loader);
+	register_tag_loader(SWF::DOACTION,	DoActionTag::doActionLoader);
 	register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
 	register_tag_loader(SWF::DEFINEFONTINFO2, define_font_info_loader);
 	register_tag_loader(SWF::DEFINESOUND,	define_sound_loader);
@@ -210,7 +211,7 @@ static void	ensure_loaders_registered()
 	// (might be nice to dump the password instead..)
 	register_tag_loader(SWF::ENABLEDEBUGGER, null_loader);    // 58
 
-	register_tag_loader(SWF::INITACTION, do_init_action_loader);  // 59  
+	register_tag_loader(SWF::INITACTION, DoActionTag::doInitActionLoader);  // 59  
 
 	register_tag_loader(SWF::DEFINEVIDEOSTREAM, define_video_loader); // 60
 	register_tag_loader(SWF::VIDEOFRAME, video_loader); // 61

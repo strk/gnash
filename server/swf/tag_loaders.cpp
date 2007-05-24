@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.109 2007/05/24 08:48:03 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.110 2007/05/24 20:10:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -50,13 +50,11 @@
 #include "generic_character.h"
 #include "text_character_def.h"
 #include "edit_text_character_def.h"
-#include "execute_tag.h" // for do_action inheritance (DOACTION tag loader)
+#include "execute_tag.h" // for set_background_color inheritance 
 #include "URL.h"
 #include "GnashException.h"
 #include "video_stream_def.h"
 #include "sound_definition.h"
-#include "PlaceObject2Tag.h"
-#include "RemoveObjectTag.h"
 
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
@@ -90,32 +88,6 @@ namespace tag_loaders {
 // Some tag implementations
 //
 
-
-/// Thin wrapper around action_buffer.
-//
-/// TODO: Move in its own DoActionTag files
-///
-class do_action : public execute_tag
-{
-private:
-	action_buffer m_buf;
-public:
-	void read(stream* in)
-	{
-	    m_buf.read(in);
-	}
-
-	virtual void execute(sprite_instance* m) const
-	{
-	    m->add_action_buffer(&m_buf);
-	}
-
-	// Tell the caller that we are an action tag.
-	virtual bool is_action_tag() const
-	{
-	    return true;
-	}
-};
 
 //
 // Tag loaders
@@ -1050,52 +1022,6 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
     // IF_VERBOSE_PARSE(print some stuff);
 
     m->add_character(character_id, ch);
-}
-
-//
-// do_action
-//
-
-
-
-
-void
-do_action_loader(stream* in, tag_type tag, movie_definition* m)
-{
-    IF_VERBOSE_PARSE
-    (
-	log_parse(_("tag %d: do_action_loader"), tag);
-	log_parse(_("-- actions in frame " SIZET_FMT), m->get_loading_frame());
-    );
-
-    assert(in);
-    assert(tag == SWF::DOACTION); // 12
-    assert(m);
-
-    do_action*	da = new do_action;
-    da->read(in);
-
-    m->add_execute_tag(da);
-}
-
-void
-do_init_action_loader(stream* in, tag_type tag, movie_definition* m)
-{
-    assert(tag == SWF::INITACTION); // 59
-
-    int sprite_character_id = in->read_u16();
-    UNUSED(sprite_character_id);
-
-    IF_VERBOSE_PARSE
-    (
-	log_parse(_("  tag %d: do_init_action_loader"), tag);
-	log_parse(_("  -- init actions for sprite %d"), sprite_character_id);
-    );
-
-    do_action* da = new do_action;
-    da->read(in);
-    //m->add_init_action(sprite_character_id, da);
-    m->add_init_action(da);
 }
 
 //

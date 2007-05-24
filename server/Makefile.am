@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.112 2007/05/23 20:06:19 strk Exp $
+# $Id: Makefile.am,v 1.113 2007/05/24 20:10:42 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -147,6 +147,7 @@ noinst_HEADERS = \
 	swf/PlaceObject2Tag.h \
 	swf/RemoveObjectTag.h \
 	swf/DisplayListTag.h \
+	swf/DoActionTag.h \
 	swf_event.h \
 	swf_function.h \
 	tesselate.h \
