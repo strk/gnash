@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.64 2007/05/23 11:38:22 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.65 2007/05/24 08:48:02 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -228,7 +228,7 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 }
 
 
-void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long start_position, std::vector<sound_envelope>* envelopes)
+void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long start_position, const std::vector<sound_envelope>* envelopes)
 // Play the index'd sample.
 {
 	mutex::scoped_lock lock(_mutex);

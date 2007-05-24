@@ -63,7 +63,7 @@ class sprite_instance : public character
 
 public:
 
-	typedef std::list<action_buffer*> ActionList;
+	typedef std::list<const action_buffer*> ActionList;
 
 	// definition must match movie_definition::PlayList
 	typedef std::vector<execute_tag*> PlayList;
@@ -469,7 +469,7 @@ public:
 	/// Add the given action buffer to the list of action
 	/// buffers to be processed at the end of the next
 	/// frame advance.
-	void	add_action_buffer(action_buffer* a)
+	void	add_action_buffer(const action_buffer* a)
 	{
 	    m_action_list.push_back(a);
 	}
@@ -822,7 +822,7 @@ private:
 	void queueActions(ActionList& action_list);
 
 	/// Execute a single action buffer (DOACTION block)
-	void execute_action(action_buffer& ab);
+	void execute_action(const action_buffer& ab);
 
 	/// Execute the actions in the action list
 	//

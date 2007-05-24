@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.8 2007/05/18 13:17:51 martinwguy Exp $ */
+/* $Id: sound_handler.h,v 1.9 2007/05/24 08:48:02 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -99,7 +99,7 @@ public:
 
 	// gnash calls this when it wants you to play the defined sound.
 	// loop_count == 0 means play the sound once (1 means play it twice, etc)
-	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset, long start, std::vector<sound_envelope>* envelopes) = 0;
+	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset, long start, const std::vector<sound_envelope>* envelopes) = 0;
 
 	//	stops all sounds currently playing in a SWF file without stopping the playhead.
 	//	Sounds set to stream will resume playing as the playhead moves over the frames they are in.

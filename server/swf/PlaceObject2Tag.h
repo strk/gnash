@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.7 2007/05/23 21:55:05 strk Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.8 2007/05/24 08:48:03 strk Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -85,7 +85,7 @@ public:
 	void read(stream* in, tag_type tag, int movie_version);
 
 	/// Place/move/whatever our object in the given movie.
-	void execute(sprite_instance* m);
+	void execute(sprite_instance* m) const;
 
 	/// Return true if this tag places a character
 	bool isPlace() const { return m_place_type == PLACE; }

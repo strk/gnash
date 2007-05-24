@@ -121,7 +121,7 @@ public:
 
 	/// Play the index'd sample.
 	virtual void	play_sound(int sound_handle, int loop_count, int offset,
-				   long start_position, std::vector<sound_envelope>* envelopes);
+				   long start_position, const std::vector<sound_envelope>* envelopes);
 
 	/// Stop the index'd sample.
 	virtual void	stop_sound(int sound_handle);

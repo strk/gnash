@@ -111,7 +111,7 @@ main(int argc, char** argv)
     ), SWFACTION_UNLOAD);
 
   check_equals(mo, "typeof(movieClip1)", "'movieclip'");
-  xcheck_equals(mo, "_root.mc1Constructed", "1");
+  check_equals(mo, "_root.mc1Constructed", "1");
 
   SWFMovie_nextFrame(mo);  
 
@@ -130,8 +130,8 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)newSWFAction( "gotoAndStop(4);"));
   xcheck_equals(mo, "typeof(movieClip1)", "'movieclip'");
 
-  // Gnash calls onConstruct again !!
-  xcheck_equals(mo, "_root.mc1Constructed", "2");
+  // onConstruct is called twice
+  check_equals(mo, "_root.mc1Constructed", "2");
 
   // this is due to action execution order, it's called twice, but
   // the second time it's called *after* the end of *this* DOACTION block ..

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: RemoveObjectTag.cpp,v 1.2 2007/05/23 21:55:06 strk Exp $ */
+/* $Id: RemoveObjectTag.cpp,v 1.3 2007/05/24 08:48:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,7 +49,7 @@ RemoveObjectTag::read(stream* in, tag_type tag)
 }
 
 void
-RemoveObjectTag::execute(sprite_instance* m)
+RemoveObjectTag::execute(sprite_instance* m) const
 {
 	m->remove_display_object(m_depth, m_id);
 }

@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.44 2007/05/18 13:17:51 martinwguy Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.45 2007/05/24 08:48:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -235,7 +235,7 @@ static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*p
 }
 
 
-void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offset*/, long start_position, std::vector<sound_envelope>* /*envelopes*/)
+void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offset*/, long start_position, const std::vector<sound_envelope>* /*envelopes*/)
 // Play the index'd sample.
 {
 

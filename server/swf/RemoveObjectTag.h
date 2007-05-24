@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: RemoveObjectTag.h,v 1.2 2007/05/23 21:55:06 strk Exp $ */
+/* $Id: RemoveObjectTag.h,v 1.3 2007/05/24 08:48:03 strk Exp $ */
 
 #ifndef GNASH_SWF_REMOVEOBJECTTAG_H
 #define GNASH_SWF_REMOVEOBJECTTAG_H
@@ -62,7 +62,7 @@ public:
 	void read(stream* in, tag_type tag);
 
 	/// Remove object at specified depth from sprite_instance DisplayList.
-	void	execute(sprite_instance* m);
+	void	execute(sprite_instance* m) const;
 
 	// See dox in execute_tag.h
 	bool isRemove() const { return true; }

@@ -30,7 +30,6 @@ sound_sample::~sound_sample()
 //
 // SWF Tag StartSound (15) 
 //
-
 void
 start_sound_tag::read(stream* in, int /* tag_type */, movie_definition* m,
 		const sound_sample* sam)
@@ -76,7 +75,7 @@ start_sound_tag::read(stream* in, int /* tag_type */, movie_definition* m,
 
 
 void
-start_sound_tag::execute_state(sprite_instance* /* m */)
+start_sound_tag::execute_state(sprite_instance* /* m */) const
 {
 	// Make static ?
 	sound_handler* handler = get_sound_handler();
@@ -112,7 +111,7 @@ start_stream_sound_tag::read(movie_definition* m, int handler_id, long start)
 
 
 void
-start_stream_sound_tag::execute_state(sprite_instance* m)
+start_stream_sound_tag::execute_state(sprite_instance* m) const
 {
 	// Make static ?
 	sound_handler* handler = get_sound_handler();

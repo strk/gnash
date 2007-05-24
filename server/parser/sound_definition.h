@@ -48,6 +48,9 @@ public:
 };
 
 /// SWF Tag StartSound (15) 
+//
+/// TODO: move in it's own StartSoundTag files...
+///
 class start_sound_tag : public execute_tag
 {
 public:
@@ -77,11 +80,11 @@ public:
 		movie_definition* m, const sound_sample* sam);
 
 	/// StartSound is a "state" tag.
-	void	execute_state(sprite_instance* m);
+	void	execute_state(sprite_instance* m) const;
 
 	/// This implementation of 'execute' should likely
 	/// be the default one.
-	void execute(sprite_instance* m)
+	void execute(sprite_instance* m) const
 	{
 		execute_state(m);
 	}
@@ -91,6 +94,9 @@ public:
 };
 
 /// SWF Tag SoundStreamBlock (19) 
+//
+/// TODO: move in it's own SoundStreamBlockTag files...
+///
 class start_stream_sound_tag : public execute_tag
 {
 public:
@@ -115,9 +121,9 @@ public:
 	void	read(movie_definition* m, int handler_id, long start);
 
 	/// StartStreamSound is a "state" tag.
-	void	execute_state(sprite_instance* m);
+	void	execute_state(sprite_instance* m) const;
 
-	void execute(sprite_instance* m)
+	void execute(sprite_instance* m) const
 	{
 		execute_state(m);
 	}

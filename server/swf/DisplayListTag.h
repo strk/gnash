@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: DisplayListTag.h,v 1.2 2007/05/23 21:55:05 strk Exp $ */
+/* $Id: DisplayListTag.h,v 1.3 2007/05/24 08:48:03 strk Exp $ */
 
 #ifndef GNASH_SWF_DISPLAYLISTTAG_H
 #define GNASH_SWF_DISPLAYLISTTAG_H
@@ -63,9 +63,9 @@ public:
 
 	virtual ~DisplayListTag() {}
 
-	virtual void execute(sprite_instance* m)=0;
+	virtual void execute(sprite_instance* m) const=0;
 
-	void execute_state(sprite_instance* m)
+	void execute_state(sprite_instance* m) const
 	{
 		execute(m);
 	}

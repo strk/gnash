@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.108 2007/05/23 21:55:06 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.109 2007/05/24 08:48:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -92,6 +92,9 @@ namespace tag_loaders {
 
 
 /// Thin wrapper around action_buffer.
+//
+/// TODO: Move in its own DoActionTag files
+///
 class do_action : public execute_tag
 {
 private:
@@ -102,14 +105,10 @@ public:
 	    m_buf.read(in);
 	}
 
-	virtual void execute(sprite_instance* m)
+	virtual void execute(sprite_instance* m) const
 	{
 	    m->add_action_buffer(&m_buf);
 	}
-
-	// Don't override because actions should not be replayed when
-	// seeking the movie.
-	//void	execute_state(movie* m) {}
 
 	// Tell the caller that we are an action tag.
 	virtual bool is_action_tag() const
@@ -171,20 +170,24 @@ frame_label_loader(stream* in, tag_type tag, movie_definition* m)
 }
 
 /// SWF Tag SetBackgroundColor (9)
+//
+/// TODO: Move in it's own SetBackgroundColorTag files
+///
 class set_background_color : public execute_tag
 {
 private:
     rgba	m_color;
 
 public:
-    void	execute(sprite_instance* m)
+    void	execute(sprite_instance* m) const
 	{
 	    float	current_alpha = m->get_background_alpha();
-	    m_color.m_a = frnd(current_alpha * 255.0f);
-	    m->set_background_color(m_color);
+	    rgba newcolor = m_color; // to avoid making m_color mutable
+	    newcolor.m_a = frnd(current_alpha * 255.0f);
+	    m->set_background_color(newcolor);
 	}
 
-    void	execute_state(sprite_instance* m)
+    void	execute_state(sprite_instance* m) const
 	{
 	    execute(m);
 	}

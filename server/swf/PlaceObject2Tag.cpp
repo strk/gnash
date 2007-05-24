@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.11 2007/05/23 21:55:05 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.12 2007/05/24 08:48:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -310,7 +310,7 @@ PlaceObject2Tag::read(stream* in, tag_type tag, int movie_version)
 
 /// Place/move/whatever our object in the given movie.
 void
-PlaceObject2Tag::execute(sprite_instance* m)
+PlaceObject2Tag::execute(sprite_instance* m) const
 {
     switch (m_place_type) {
 

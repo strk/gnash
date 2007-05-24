@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: sound_handler_test.cpp,v 1.7 2007/05/18 13:17:51 martinwguy Exp $
+// $Id: sound_handler_test.cpp,v 1.8 2007/05/24 08:48:03 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -125,7 +125,7 @@ long	TEST_sound_handler::fill_stream_data(void* data, int data_bytes, int /*samp
 }
 
 
-void	TEST_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long start_position, std::vector<sound_envelope>* envelopes)
+void	TEST_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long start_position, const std::vector<sound_envelope>* envelopes)
 // Play the index'd sample.
 {
 	mutex::scoped_lock lock(_mutex);

@@ -1,5 +1,21 @@
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* backend/sound_handler.h, backend/sound_handler_gst.cpp,
+	  backend/sound_handler_gst.h, backend/sound_handler_sdl.cpp,
+	  backend/sound_handler_sdl.h, server/execute_tag.h,
+	  server/sprite_instance.cpp, server/sprite_instance.h,
+	  server/parser/sound_definition.cpp,
+	  server/parser/sound_definition.h,
+	  server/swf/DisplayListTag.h, server/swf/PlaceObject2Tag.cpp,
+	  server/swf/PlaceObject2Tag.h, server/swf/RemoveObjectTag.cpp,
+	  server/swf/RemoveObjectTag.h, server/swf/tag_loaders.cpp,
+	  testsuite/sound_handler_test.cpp, testsuite/sound_handler_test.h:
+	  Const-corrected execute_tag::execute and execute_state, and
+	  cascading changes
+	* testsuite/misc-ming.all/loop_test7.c: fix wrong expected failures.
+
+2007-05-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am,
 	  loop_test6.c, loop_test7.c:
 	  Add a clone of "Jumping backward to the end of a character's

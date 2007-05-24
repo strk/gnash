@@ -98,7 +98,7 @@ sprite_instance::execute_actions(sprite_instance::ActionList& action_list)
 	// and a final call to .clear() 
 	while ( ! action_list.empty() )
 	{
-		action_buffer* ab = action_list.front();
+		const action_buffer* ab = action_list.front();
 		action_list.pop_front(); 
 
 		execute_action(*ab);
@@ -2151,7 +2151,7 @@ sprite_instance::queueActions(ActionList& actions)
 	for(ActionList::iterator it=actions.begin(), itEnd=actions.end();
 		       it != itEnd; ++it)
 	{
-		action_buffer* buf = *it;
+		const action_buffer* buf = *it;
 		root.pushAction(*buf, boost::intrusive_ptr<sprite_instance>(this));
 	}
 }
@@ -2459,7 +2459,7 @@ void sprite_instance::advance(float delta_time)
 }
 
 void
-sprite_instance::execute_action(action_buffer& ab)
+sprite_instance::execute_action(const action_buffer& ab)
 {
 	as_environment& env = m_as_environment; // just type less
 

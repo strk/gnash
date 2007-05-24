@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_test.h,v 1.4 2007/05/18 13:17:51 martinwguy Exp $
+// $Id: sound_handler_test.h,v 1.5 2007/05/24 08:48:03 strk Exp $
 
 #ifndef SOUND_HANDLER_TEST_H
 #define SOUND_HANDLER_TEST_H
@@ -49,7 +49,7 @@ public:
 
 	/// Sound envelopes for the current sound, which determine the volume level
 	/// from a given position. Only used with sound events.
-	std::vector<gnash::sound_handler::sound_envelope>* envelopes;
+	const std::vector<gnash::sound_handler::sound_envelope>* envelopes;
 
 	/// Index of current envelope.
 	uint32_t current_env;
@@ -140,7 +140,7 @@ public:
 
 	/// Play the index'd sample.
 	virtual void	play_sound(int sound_handle, int loop_count, int offset,
-				   long start_position, std::vector<sound_envelope>* envelopes);
+				   long start_position, const std::vector<sound_envelope>* envelopes);
 
 	/// Stop the index'd sample.
 	virtual void	stop_sound(int sound_handle);

@@ -48,7 +48,7 @@ public:
 	}
 
 	/// Execute this tag, whatever it is.
-	virtual void execute(sprite_instance* /*m*/)
+	virtual void execute(sprite_instance* /*m*/) const
 	{
 	}
 
@@ -56,12 +56,12 @@ public:
 	//
 	/// State tags include all tags except action tags.
 	///
-	virtual void execute_state(sprite_instance* /*m*/)
+	virtual void execute_state(sprite_instance* /*m*/) const
 	{
 	}
 
 	/// Execute this tag but only if it is an action tag
-	void execute_action(sprite_instance* m)
+	void execute_action(sprite_instance* m) const
 	{
 		if ( is_action_tag() ) execute(m);
 	}
