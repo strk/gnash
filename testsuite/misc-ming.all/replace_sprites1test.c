@@ -137,8 +137,7 @@ main(int argc, char** argv)
   SWFDisplayItem_moveTo(it1, 100, 300);
   SWFDisplayItem_setName(it1, "static1");
   SWFDisplayItem_addAction(it1, newSWFAction(
-			"_root.note(this+' onClipConstruct');"
-			" _root.check_equals(typeof(_root), 'movieclip');"
+			"_root.note(this+' onClipConstruct (place)');"
 		        " if ( isNaN(_root.depth3Constructed) ) {"
 			"	_root.depth3Constructed=1; "
 			" } else {"
@@ -146,6 +145,15 @@ main(int argc, char** argv)
 			" }"
 			" _root.note('_root.depth3Constructed set to '+_root.depth3Constructed);"
 			), SWFACTION_CONSTRUCT);
+  SWFDisplayItem_addAction(it1, newSWFAction(
+			"_root.note(this+' onClipUnload (place)');"
+		        " if ( isNaN(_root.depth3Unloaded) ) {"
+			"	_root.depth3Unloaded=1; "
+			" } else {"
+			"	_root.depth3Unloaded++;"
+			" }"
+			" _root.note('_root.depth3Unloaded set to '+_root.depth3Unloaded);"
+			), SWFACTION_UNLOAD);
   add_actions(mo, "static1.name='static1';"); 
 
   check_equals(mo, "typeof(static1)", "'movieclip'"); 
@@ -165,7 +173,7 @@ main(int argc, char** argv)
   SWFDisplayItem_moveTo(it1, 130, 330);
   SWFDisplayItem_setName(it1, "static2");
   SWFDisplayItem_addAction(it1, newSWFAction(
-			"_root.note(this+' onClipConstruct');"
+			"_root.note(this+' onClipConstruct (replace)');"
 			" _root.check_equals(typeof(_root), 'movieclip');"
 		        " if ( isNaN(_root.depth3Constructed) ) {"
 			"	_root.depth3Constructed=1; "
@@ -174,6 +182,15 @@ main(int argc, char** argv)
 			" }"
 			" _root.note('_root.depth3Constructed set to '+_root.depth3Constructed);"
 			), SWFACTION_CONSTRUCT);
+  SWFDisplayItem_addAction(it1, newSWFAction(
+			"_root.note(this+' onClipUnload (replace)');"
+		        " if ( isNaN(_root.depth3Unloaded) ) {"
+			"	_root.depth3Unloaded=1; "
+			" } else {"
+			"	_root.depth3Unloaded++;"
+			" }"
+			" _root.note('_root.depth3Unloaded set to '+_root.depth3Unloaded);"
+			), SWFACTION_UNLOAD);
 
 
   // Can still reference the old character and it's variables, after replace
