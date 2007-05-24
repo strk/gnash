@@ -1,3 +1,10 @@
+2007-05-24 Sandro Santilli <strk@keybit.net>
+
+	* libbase/zlib_adapter.cpp: fix seek function to respect
+	  tu_file interface. Fix inflater to no set an error condition
+	  when inflate() just needs more calls to complete the request.
+	  Fixes bug #19931.
+
 2007-05-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/LoadThread.{cpp,h}: Made the download loop sleep when

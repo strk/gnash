@@ -10,6 +10,7 @@
 #include "zlib_adapter.h"
 #include "tu_file.h"
 #include "utility.h"
+#include "log.h"
 
 #include <memory>
 
@@ -83,7 +84,7 @@ namespace zlib_adapter
 
 			int	err = inflateInit(&m_zstream);
 			if (err != Z_OK) {
-				//log_error("error: inflater_impl::ctor() inflateInit() returned %d\n", err);
+				gnash::log_error("inflater_impl::ctor() inflateInit() returned %d\n", err);
 				m_error = 1;
 				return;
 			}
@@ -100,6 +101,7 @@ namespace zlib_adapter
 			m_at_eof = 0;
 			int	err = inflateReset(&m_zstream);
 			if (err != Z_OK) {
+				gnash::log_error("inflater_impl::reset() inflateReset() returned %d\n", err);
 				m_error = 1;
 				return;
 			}
@@ -151,9 +153,17 @@ namespace zlib_adapter
 					m_at_eof = true;
 					break;
 				}
+				if (err == Z_BUF_ERROR)
+				{
+					//gnash::log_error("inflater_impl::inflate_from_stream() inflate() returned Z_BUF_ERROR");
+					// we should call inflate again... giving more input or output space !
+					//m_error = 1;
+					break;
+				}
 				if (err != Z_OK)
 				{
 					// something's wrong.
+					gnash::log_error("inflater_impl::inflate_from_stream() inflate() returned %d", err);
 					m_error = 1;
 					break;
 				}
@@ -212,12 +222,14 @@ namespace zlib_adapter
 
 
 	int inflate_seek(int pos, void* appdata)
-	// Try to go to pos.  Return actual pos.
+	// Try to go to pos.  Return 0 on success or TU_FILE_SEEK_ERROR on error.
 	{
 		inflater_impl*	inf = (inflater_impl*) appdata;
 		if (inf->m_error)
 		{
-			return inf->m_logical_stream_pos;
+			gnash::log_debug("Inflater is in error condition");
+			return TU_FILE_SEEK_ERROR;
+			//return inf->m_logical_stream_pos;
 		}
 
 		// If we're seeking backwards, then restart from the beginning.
@@ -240,13 +252,16 @@ namespace zlib_adapter
 			if (bytes_read == 0)
 			{
 				// Trouble; can't seek any further.
+				gnash::log_debug("Trouble: can't seek any further.. ");
+				return TU_FILE_SEEK_ERROR;
 				break;
 			}
 		}
 
-		assert(inf->m_logical_stream_pos <= pos);
+		//assert(inf->m_logical_stream_pos <= pos);
+		assert(inf->m_logical_stream_pos == pos);
 
-		return inf->m_logical_stream_pos;
+		return 0; // inf->m_logical_stream_pos;
 	}
 
 
