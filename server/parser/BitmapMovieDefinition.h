@@ -133,7 +133,8 @@ public:
 		return new BitmapMovieInstance(this);
 	}
 
-	virtual const PlayList& get_playlist(size_t frame_number) {
+	virtual const PlayList& get_playlist(size_t frame_number) const
+	{
 		assert ( frame_number < _playlist.size() );
 		return _playlist[frame_number];
 	}

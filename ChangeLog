@@ -1,5 +1,14 @@
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/BitmapMovieDefinition.h,
+	  server/parser/movie_def_impl.h,
+	  server/parser/movie_definition.h,
+	  server/parser/sprite_definition.h,
+	  testsuite/DummyMovieDefinition.h:
+	  Const-corrected get_playlist.
+
+2007-05-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/replace_shapes1test.c:
 	  Add more tests, updated comments.
 	* testsuite/actionscript.all/MovieClip.as:

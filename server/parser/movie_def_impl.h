@@ -490,7 +490,7 @@ public:
 	    return m_jpeg_in.get();
 	}
 
-	virtual const PlayList& get_playlist(size_t frame_number)
+	virtual const PlayList& get_playlist(size_t frame_number) const
 	{
 		assert(frame_number <= _frames_loaded);
 		return m_playlist[frame_number];

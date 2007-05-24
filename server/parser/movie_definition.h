@@ -230,7 +230,7 @@ public:
 	/// @param frame_number
 	///	 Frame number, 0-based (ie: first frame is 0)
 	///
-	virtual const PlayList& get_playlist(size_t frame_number) = 0;
+	virtual const PlayList& get_playlist(size_t frame_number) const = 0;
 
 	/// Return the list of init actions for given frame number
 	//

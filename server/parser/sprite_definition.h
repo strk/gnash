@@ -312,7 +312,7 @@ private:
 	bool get_labeled_frame(const std::string& label, size_t& frame_number);
 
 	/// frame_number is 0-based
-	const PlayList& get_playlist(size_t frame_number)
+	const PlayList& get_playlist(size_t frame_number) const
 	{
 		return m_playlist[frame_number];
 	}
