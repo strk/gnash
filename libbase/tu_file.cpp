@@ -57,8 +57,6 @@ std_write_func(const void* src, int bytes, void* appdata)
 static int
 std_seek_func(int pos, void *appdata)
 {
-	GNASH_REPORT_FUNCTION;
-
     assert(appdata);
 
     // TODO: optimize this by caching total stream size ?
