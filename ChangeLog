@@ -1,5 +1,10 @@
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/shape_character_def.cpp (read): 
+	  Fix typo reporting false malformations in the SWF.
+
+2007-05-24 Sandro Santilli <strk@keybit.net>
+
 	* server/character.h: add isActionScriptReferenciable() 
 	  method to find "scriptable objects". See:
 	  http://www.gnashdev.org/wiki/index.php/ScriptableCharacters

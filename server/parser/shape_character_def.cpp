@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.26 2007/05/22 19:38:54 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.27 2007/05/24 13:42:50 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -376,7 +376,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		}
 		else
 		{
-			if ( style > m_fill_styles.size() ) // 1-based index 
+			if ( style > m_line_styles.size() ) // 1-based index 
 			{
 				IF_VERBOSE_MALFORMED_SWF(
 				log_swferror(_("Invalid fill style %d in lineStyleChange record - %u defined. Set to 0."), style, m_line_styles.size());
