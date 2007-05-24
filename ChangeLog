@@ -1,5 +1,7 @@
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/replace_shapes1test.c:
+	  Add more tests, updated comments.
 	* testsuite/actionscript.all/MovieClip.as:
 	  Add test for _root.getDepth() being static-0.
 

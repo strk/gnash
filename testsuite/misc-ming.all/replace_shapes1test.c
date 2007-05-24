@@ -42,9 +42,10 @@
  * 
  * Expected behaviour:
  * 
- *  A single instances have been constructed in total.
- *  The instance contains a red shape at (100,300) initially, a green shape
- *  at (130,330) after the replace, a red shape at (100,300) again on loop-back.
+ *  In frame 2 we have a red square at (100,300), in frame 3 we have a green square at (130,330),
+ *  after the jump-back we have a red square at (100,300) again.
+ *  The name specified in the PlaceObject2 tag in frame 2 evaluates to the _root movie.
+ *  The name specified in the PlaceObject2 tag in frame 3 (replace) evaluates to undefined.
  */
 
 #include "ming_utils.h"
@@ -148,7 +149,11 @@ main(int argc, char** argv)
 			" _root.note('_root.depth3Constructed set to '+_root.depth3Constructed);"
 			), SWFACTION_CONSTRUCT);
   add_actions(mo, "static1.name='static1';"); 
+
   xcheck_equals(mo, "typeof(static1)", "'movieclip'"); 
+  xcheck_equals(mo, "static1", "_root");
+  check_equals(mo, "static1.name", "'static1'");
+  xcheck_equals(mo, "_root.name", "'static1'");
 
   // Gnash allows custom members to shape characters...
   // this is important to verify, see next check for it after REPLACE
@@ -178,8 +183,9 @@ main(int argc, char** argv)
 
   // Can still reference the old character and it's variables, after replace
   xcheck_equals(mo, "typeof(static1)", "'movieclip'"); 
+  xcheck_equals(mo, "static1", "_root");
   xcheck_equals(mo, "static1.name", "'static1'");
-  xcheck_equals(mo, "static1._target", "'/'");
+  xcheck_equals(mo, "_root.name", "'static1'");
 
   // While the new name results undefined...
   xcheck_equals(mo, "typeof(static2)", "'undefined'"); // the name wasn't changed
