@@ -308,7 +308,7 @@ namespace gnash {
 		unsigned long end_pos = m_tag_stack.back();
 		m_tag_stack.pop_back();
 
-		if ( ! m_input->set_position(end_pos) )
+		if ( m_input->set_position(end_pos) == TU_FILE_SEEK_ERROR )
 		{
 			log_error("Could not seek to end position");
 		}
