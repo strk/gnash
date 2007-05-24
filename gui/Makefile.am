@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.74 2007/05/16 15:58:22 rsavoye Exp $
+# $Id: Makefile.am,v 1.75 2007/05/24 21:35:02 bjacques Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -184,7 +184,7 @@ endif
 
 if USE_GUI_FLTK
  FLTK_SRCS = fltk.cpp fltksup.h $(FLTK_AGG_SRCS) $(FLTK_CAIRO_SRCS)
- AM_CPPFLAGS += $(FLTK2_CFLAGS) 
+ AM_CPPFLAGS += $(FLTK2_CFLAGS) $(X11_CFLAGS)
  AM_LDFLAGS += $(FLTK2_LIBS) $(XFT_LIBS) $(X11_LIBS)
 else
  FLTK_SRCS = 

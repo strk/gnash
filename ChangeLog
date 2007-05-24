@@ -1,3 +1,13 @@
+2007-05-24 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/Makefile.am: When building FLTK GUI, also include
+	the X11 CFLAGS (when available).
+	* gui/fltk.cpp: Only try to do X11 things with FLTK if
+	X11 is actually available. Should fix compilation on
+	OS X (bug #19618).
+	* macros/x11.m4: Don't forget to set the x11 flag
+	variable which is used to check if X11 was found.
+
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
 	* server/: Makefile.am, impl.cpp, swf/DoActionTag.h,

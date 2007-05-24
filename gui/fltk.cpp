@@ -20,7 +20,11 @@
 
 #include <fltk/Item.h>
 #include <fltk/Window.h>
+
+#ifdef HAVE_X11
 #include <fltk/x11.h>
+#endif
+
 #include <fltk/events.h>
 #include <fltk/run.h>
 #include <fltk/Cursor.h>
@@ -65,6 +69,7 @@ FltkGui::renderBuffer()
     // so in draw() you can check what exactly you want to redraw. But
     // unfortunately it doesn't seem to remember what bits you turn on. So I'll
     // just do it the old-fashioned way.
+
     static bool firstRun = true;
 
     if (firstRun) {
@@ -213,12 +218,14 @@ FltkGui::setInterval(unsigned int time)
 void
 FltkGui::create()
 {
-    // TODO: make the set_xid() call conditional on the availability of X11.
+#ifdef HAVE_X11
     if (_xid) {
+      // Make FLTK render into an X window indicated by the XID.
       CreatedWindow::set_xid(this, _xid);
-    } else {
-      Window::create();
+      return;
     }
+#endif
+    Window::create();
 }
 
 bool

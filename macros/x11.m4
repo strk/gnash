@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: x11.m4,v 1.10 2007/05/18 03:52:23 martinwguy Exp $
+dnl $Id: x11.m4,v 1.11 2007/05/24 21:35:02 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_X11],
 [
@@ -117,7 +117,15 @@ AC_DEFUN([GNASH_PATH_X11],
     AC_MSG_RESULT(none)
   fi
 
+  if test -n "$X11_LIBS" -a -n "$X11_CFLAGS"; then
+    x11=yes
+  fi
+
   AM_CONDITIONAL(HAVE_X11, [test x$x11 = xyes])
+
+  if test "x$x11" = xyes; then
+    AC_DEFINE(HAVE_X11, [1], [X11 headers and libraries])
+  fi
 
   AC_SUBST(X11_CFLAGS)
   AC_SUBST(X11_LIBS)
