@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.10 2007/05/24 22:27:09 tgc Exp $ */
+/* $Id: sound_handler.h,v 1.11 2007/05/24 22:44:59 tgc Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -41,37 +41,6 @@ namespace gnash {
 }
 
 namespace gnash {
-
-/// Used to hold the sounddata when doing on-demand-decoding
-class sound_data
-{
-public:
-	// The (un)compressed data
-	guint8* data;
-
-	// data format
-	int format;
-
-	// data size
-	long data_size;
-
-	// stereo or not
-	bool stereo;
-
-	// number of samples
-	int sample_count;
-
-	// sample rate
-	int sample_rate;
-
-	// Volume, SWF range: 0-100, GST range 0-10 (we only use 0-1, the rest is amplified)
-	// It's the SWF range that is represented here
-	int volume;
-
-	// gstreamer objects
-	std::vector<gst_elements*>	m_gst_elements;
-
-};
 
 //
 // Sound callback handler.
