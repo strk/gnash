@@ -102,16 +102,19 @@ public:
 	/// present at the given depth, then keep those respective
 	/// properties from the existing character.
 	///
-	/// TODO: use pointers for matrix and cxform, and use NULL
-	///       instead of the two bool arguments
+	/// @param color_xform
+	///	The color tranform to assign to the new character.
+	///	If NULL the default color transform will be kept.
+	//
+	/// @param mat
+	///	The matrix tranform to assign to the new character.
+	///	If NULL the default matrix will be kept.
 	///
 	void replace_character(
 		character* ch,
 		int depth,
-		bool use_cxform,
-		const cxform& color_xform,
-		bool use_matrix,
-		const matrix& mat,
+		const cxform* color_xform,
+		const matrix* mat,
 		float ratio,
 		int clip_depth);
 
@@ -146,12 +149,18 @@ public:
 	//
 	///  See character::get_accept_anim_moves()
 	///
+	/// @param color_xform
+	///	The color tranform to assign to the new character.
+	///	If NULL the default color transform will be kept.
+	//
+	/// @param mat
+	///	The matrix tranform to assign to the new character.
+	///	If NULL the default matrix will be kept.
+	///
 	void	move_display_object(
 		int depth,
-		bool use_cxform,
-		const cxform& color_xform,
-		bool use_matrix,
-		const matrix& mat,
+		const cxform* color_xform,
+		const matrix* mat,
 		float ratio,
 		int clip_depth);
 

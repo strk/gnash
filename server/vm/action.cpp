@@ -175,10 +175,6 @@ attach_extern_movie(const char* c_url,
 		const character* tar = (const character*)target;
 		const char* name = tar->get_name().c_str();
 		uint16_t depth = tar->get_depth();
-		bool use_cxform = false;
-		cxform color_transform =  tar->get_cxform();
-		bool use_matrix = false;
-		matrix mat = tar->get_matrix();
 		float ratio = tar->get_ratio();
 		uint16_t clip_depth = tar->get_clip_depth();
 
@@ -197,10 +193,8 @@ attach_extern_movie(const char* c_url,
 		newsprite.get(),
 		name,
 		depth,
-		use_cxform,
-		color_transform,
-		use_matrix,
-		mat,
+		NULL, // don't use color transform
+		NULL, // don't use matrix transform
 		ratio,
 		clip_depth);
 	}

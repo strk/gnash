@@ -408,39 +408,60 @@ public:
 	void unload();
 
 	/// See DisplayList::move_display_object, this method is just a proxy to that...
+	//
+	/// @param color_xform
+	///	The color tranform to assign to the new character.
+	///	If NULL the default color transform will be kept.
+	///
+	/// @param mat
+	///	The matrix tranform to assign to the new character.
+	///	If NULL the default matrix will be kept.
+	///
 	void	move_display_object(
 			int depth,
-			bool use_cxform,
-			const cxform& color_xform,
-			bool use_matrix,
-			const matrix& mat,
+			const cxform* color_xform,
+			const matrix* mat,
 			float ratio,
 			int clip_depth)
 	{
-	    m_display_list.move_display_object(depth, use_cxform, color_xform, use_matrix, mat, ratio, clip_depth);
+	    m_display_list.move_display_object(depth, color_xform, mat, ratio, clip_depth);
 	}
 
 
+	///
+	/// @param color_xform
+	///	The color tranform to assign to the new character.
+	///	If NULL the default color transform will be kept.
+	///
+	/// @param mat
+	///	The matrix tranform to assign to the new character.
+	///	If NULL the default matrix will be kept.
+	///
 	void	replace_display_object(
 			uint16_t character_id,
 			const char* name,
 			int depth,
-			bool use_cxform,
-			const cxform& color_transform,
-			bool use_matrix,
-			const matrix& mat,
+			const cxform* color_xform,
+			const matrix* mat,
 			float ratio,
 			int clip_depth);
 
 
+	///
+	/// @param color_xform
+	///	The color tranform to assign to the new character.
+	///	If NULL the default color transform will be kept.
+	//
+	/// @param mat
+	///	The matrix tranform to assign to the new character.
+	///	If NULL the default matrix will be kept.
+	///
 	void	replace_display_object(
 			character* ch,
 			const char* name,
 			int depth,
-			bool use_cxform,
-			const cxform& color_transform,
-			bool use_matrix,
-			const matrix& mat,
+			const cxform* color_xform,
+			const matrix* mat,
 			float ratio,
 			int clip_depth);
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.12 2007/05/24 08:48:03 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.13 2007/05/24 18:09:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -330,10 +330,8 @@ PlaceObject2Tag::execute(sprite_instance* m) const
       case MOVE:
 	  m->move_display_object(
 	      m_depth,
-	      m_has_cxform,
-	      m_color_transform,
-	      m_has_matrix,
-	      m_matrix,
+	      m_has_cxform ? &m_color_transform : NULL,
+	      m_has_matrix ? &m_matrix : NULL,
 	      m_ratio,
 	      m_clip_depth);
 	  break;
@@ -343,10 +341,8 @@ PlaceObject2Tag::execute(sprite_instance* m) const
 	      m_character_id,
 	      m_name,
 	      m_depth,
-	      m_has_cxform,
-	      m_color_transform,
-	      m_has_matrix,
-	      m_matrix,
+	      m_has_cxform ? &m_color_transform : NULL,
+	      m_has_matrix ? &m_matrix : NULL,
 	      m_ratio,
 	      m_clip_depth);
 	  break;

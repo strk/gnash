@@ -252,10 +252,8 @@ void
 DisplayList::replace_character(
 	character* ch,
 	int depth,
-	bool use_cxform,
-	const cxform& color_xform,
-	bool use_matrix,
-	const matrix& mat,
+	const cxform* color_xform,
+	const matrix* mat,
 	float ratio,
 	int clip_depth)
 {
@@ -263,8 +261,8 @@ DisplayList::replace_character(
 
 	ch->set_invalidated();
 	ch->set_depth(depth);
-	ch->set_cxform(color_xform);
-	ch->set_matrix(mat);
+	if ( color_xform ) ch->set_cxform(*color_xform);
+	if ( mat ) ch->set_matrix(*mat);
 	ch->set_ratio(ratio);
 	ch->set_clip_depth(clip_depth);
 	ch->restart();
@@ -290,23 +288,24 @@ DisplayList::replace_character(
 	}
 	else
 	{
-	
+		character* oldch = it->get();
+
 		InvalidatedRanges old_ranges;
 	
-		if (!use_cxform)
+		if (!color_xform)
 		{
 			// Use the cxform from the old character.
-			ch->set_cxform((*it)->get_cxform());
+			ch->set_cxform(oldch->get_cxform());
 		}
 
-		if (!use_matrix)
+		if (!mat)
 		{
 			// Use the matrix from the old character.
-			ch->set_matrix((*it)->get_matrix());
+			ch->set_matrix(oldch->get_matrix());
 		}
 		
 		// remember bounds of old char
-		(*it)->add_invalidated_bounds(old_ranges, true);		
+		oldch->add_invalidated_bounds(old_ranges, true);		
 
 		// replace existing char		
 		*it = di;
@@ -332,10 +331,8 @@ DisplayList::replace_character(
 void
 DisplayList::move_display_object(
 	int depth,
-	bool use_cxform,
-	const cxform& color_xform,
-	bool use_matrix,
-	const matrix& mat,
+	const cxform* color_xform,
+	const matrix* mat,
 	float ratio,
 	int /* clip_depth */)
 {
@@ -362,13 +359,13 @@ DisplayList::move_display_object(
 		return;
 	}
 
-	if (use_cxform)
+	if (color_xform)
 	{
-		ch->set_cxform(color_xform);
+		ch->set_cxform(*color_xform);
 	}
-	if (use_matrix)
+	if (mat)
 	{
-		ch->set_matrix(mat);
+		ch->set_matrix(*mat);
 	}
 	ch->set_ratio(ratio);
 }

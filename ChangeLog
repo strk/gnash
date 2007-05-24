@@ -1,5 +1,13 @@
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* server/: dlist.{cpp,h}, sprite_instance.{cpp,h},
+	  server/swf/PlaceObject2Tag.cpp, server/vm/action.cpp:
+	  Drop the use_matrix/use_color_xform parameters, use
+	  pointers for the actual matrix/color_xform so that NULL
+	  signifies "don't use".
+
+2007-05-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/replace_sprites1test.c: 
 	  Add onClipEvent(unload) to both PLACE and REPLACE tag.
 
