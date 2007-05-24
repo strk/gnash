@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.20 2007/05/24 08:48:02 strk Exp $
+// $Id: sound_handler_sdl.h,v 1.21 2007/05/24 11:46:28 strk Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -75,7 +75,7 @@ public:
 
 	/// Sound envelopes for the current sound, which determine the volume level
 	/// from a given position. Only used with sound events.
-	std::vector<gnash::sound_handler::sound_envelope>* envelopes;
+	const std::vector<gnash::sound_handler::sound_envelope>* envelopes;
 
 	/// Index of current envelope.
 	uint32_t current_env;
