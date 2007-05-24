@@ -150,16 +150,16 @@ main(int argc, char** argv)
 			), SWFACTION_CONSTRUCT);
   add_actions(mo, "static1.name='static1';"); 
 
-  xcheck_equals(mo, "typeof(static1)", "'movieclip'"); 
-  xcheck_equals(mo, "static1", "_root");
+  check_equals(mo, "typeof(static1)", "'movieclip'"); 
+  check_equals(mo, "static1", "_root");
   check_equals(mo, "static1.name", "'static1'");
-  xcheck_equals(mo, "_root.name", "'static1'");
+  check_equals(mo, "_root.name", "'static1'");
 
   // Gnash allows custom members to shape characters...
   // this is important to verify, see next check for it after REPLACE
   check_equals(mo, "static1.name", "'static1'");
 
-  xcheck_equals(mo, "static1._target", "'/'");
+  check_equals(mo, "static1._target", "'/'");
   SWFMovie_nextFrame(mo); 
 
   // Frame 3: replace instance at depth -16381 with character 2
@@ -185,7 +185,7 @@ main(int argc, char** argv)
   xcheck_equals(mo, "typeof(static1)", "'movieclip'"); 
   xcheck_equals(mo, "static1", "_root");
   xcheck_equals(mo, "static1.name", "'static1'");
-  xcheck_equals(mo, "_root.name", "'static1'");
+  check_equals(mo, "_root.name", "'static1'");
 
   // While the new name results undefined...
   xcheck_equals(mo, "typeof(static2)", "'undefined'"); // the name wasn't changed
@@ -211,10 +211,10 @@ main(int argc, char** argv)
     "check_equals(typeof(_root.depth3Constructed), 'undefined');"
 
     // Original character name is still referenceable
-    "xcheck_equals(typeof(static1), 'movieclip');"
+    "check_equals(typeof(static1), 'movieclip');"
 
     // And it still has it's user-provided property
-    "xcheck_equals(static1.name, 'static1');"
+    "check_equals(static1.name, 'static1');"
 
     // We can't check the color or the _x in a self-contained testcase unfortunately,
     // we'll need a MovieTester-based runner for this.

@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.11 2007/05/03 15:41:06 strk Exp $
+// $Id: video_stream_instance.h,v 1.12 2007/05/24 13:01:46 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -56,6 +56,12 @@ public:
 
 	virtual void	advance(float delta_time);
 	void	display();
+
+	// For sure isActionScriptReferenceable...
+	bool wantsInstanceName()
+	{
+		return true; // text fields can be referenced 
+	}	
 
 	void add_invalidated_bounds(InvalidatedRanges& ranges, bool force);
 

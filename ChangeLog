@@ -1,5 +1,18 @@
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h: add isActionScriptReferenciable() 
+	  method to find "scriptable objects". See:
+	  http://www.gnashdev.org/wiki/index.php/ScriptableCharacters
+	* server/sprite_instance.cpp (get_member, get_relative_target):
+	  When requested name matches a NON scriptable instance, return
+	  self.
+	* server/video_stream_instance.h: implement wantsInstanceName()
+	  [ used by isActionScriptReferenciable ]
+	* testsuite/misc-ming.all/replace_shapes1test.c: expect less failures.
+	* testsuite/misc-ming.all/shape_test.c: don't expect any more failure
+
+2007-05-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/: Makefile.am,
 	  replace_buttons1test.c, replace_buttons1test_runner.cpp:
 	  New test for buttons replacement.

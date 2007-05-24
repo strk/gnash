@@ -68,32 +68,36 @@ main(int argc, char** argv)
   check(mo, "sh1 != undefined");
   check(mo, "sh2 != undefined");
   
+  // Do these checks mean that shapes are movieclips?
+  check_equals(mo, "typeof(sh1)", "'movieclip'");
+  check_equals(mo, "typeof(sh2)", "'movieclip'");
+
   add_actions(mo, 
-  	// Do these checks mean that shapes are movieclips?
-    "xcheck_equals(typeof(sh1), 'movieclip');"
-    "xcheck_equals(typeof(sh2), 'movieclip');"
-    
     "sh1.var1 = 10;"
     "sh2.var2 = 20;"
-    // Do these checks mean that we can add variables to shapes?
-    "check_equals(sh1.var1, 10);"
-    "check_equals(sh2.var2, 20);"
+    );
 
-    "xcheck_equals(sh1._x, 0);"
-    "xcheck_equals(sh2._x, 0);"
+    // Do these checks mean that we can add variables to shapes?
+  check_equals(mo, "sh1.var1", "10");
+  check_equals(mo, "sh2.var2", "20");
+  check_equals(mo, "sh1._x", "0");
+  check_equals(mo, "sh2._x", "0");
+
+  add_actions(mo, 
     "sh1._x = 0;"
     "sh2._x = 400;"
-    "xcheck_equals(sh1._x, 400);" //odd, why???
-    "check_equals(sh2._x, 400);"
+    );
+
+  check_equals(mo, "sh1._x", "400");
+  check_equals(mo, "sh2._x", "400");
     
-    // Do these checks mean that shapes are *not* movieclips?
-    "check_equals(typeof(sh1.getDepth()), 'undefined');"
-    "check_equals(typeof(sh2.getDepth()), 'undefined');"
+  // Do these checks mean that shapes are *not* movieclips?
+  check_equals(mo, "typeof(sh1.getDepth())", "'undefined'");
+  check_equals(mo, "typeof(sh2.getDepth())", "'undefined'");
     
-    // Do these checks mean that shapes are *not* movieclips?
-    "check_equals(typeof(getInstanceAtDepth(-16381)), 'undefined');"
-    "check_equals(typeof(getInstanceAtDepth(-16380)), 'undefined');"
-  );
+  // Do these checks mean that shapes are *not* movieclips?
+  check_equals(mo, "typeof(getInstanceAtDepth(-16381))", "'undefined'");
+  check_equals(mo, "typeof(getInstanceAtDepth(-16380))", "'undefined'");
 
   add_actions(mo, "_root.totals(); stop();");
 

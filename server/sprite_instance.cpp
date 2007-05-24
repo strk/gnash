@@ -1872,7 +1872,18 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 	if (ch)
 	{
 	    // Found object.
-	    val->set_as_object(static_cast<as_object*>(ch));
+
+	    // If the object is an ActionScript referenciable one we
+	    // return it, otherwise we return ourselves
+	    if ( ch->isActionScriptReferenceable() )
+	    {
+		    val->set_as_object(ch);
+	    }
+	    else
+	    {
+		    val->set_as_object(this);
+	    }
+
 	    return true;
 	}
 
@@ -2105,8 +2116,9 @@ void sprite_instance::clone_display_object(const std::string& name,
 //            GNASH_REPORT_FUNCTION;
 
     character* ch = m_display_list.get_character_by_name(name);
-    if (ch)
+    if (ch) // TODO: should we check for isActionScriptReferenceable here ?
 	{
+
 	    std::vector<swf_event*>	dummy_event_handlers;
 
 	    add_display_object(
@@ -2134,7 +2146,7 @@ void sprite_instance::remove_display_object(const std::string& name)
 //	    GNASH_REPORT_FUNCTION;
 
 	character* ch = m_display_list.get_character_by_name(name.c_str());
-	if (ch)
+	if (ch) // TODO: should we check for isActionScriptReferenceable here ?
 	{
 	    // @@ TODO: should only remove movies that were created via clone_display_object --
 	    // apparently original movies, placed by anim events, are immune to this.
@@ -2205,14 +2217,20 @@ character*
 sprite_instance::get_relative_target(const std::string& name)
 {
 	character* ch = get_relative_target_common(name);
+	if ( ch ) return ch;
 
-	if ( ! ch )
+	// See if we have a match on the display list.
+	ch =  m_display_list.get_character_by_name(name);
+    	// TODO: should we check for isActionScriptReferenceable here ?
+	if ( ch )
 	{
-		// See if we have a match on the display list.
-		return m_display_list.get_character_by_name(name);
+		// If the object is an ActionScript referenciable one we
+		// return it, otherwise we return ourselves
+		if ( ch->isActionScriptReferenceable() ) return ch;
+		else return this;
 	}
 
-	return ch; // possibly NULL
+	return NULL;
 }
 
 void sprite_instance::set_member(const std::string& name,

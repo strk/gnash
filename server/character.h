@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character.h,v 1.78 2007/05/23 16:38:31 strk Exp $ */
+/* $Id: character.h,v 1.79 2007/05/24 13:01:46 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -837,6 +837,15 @@ public:
 	virtual bool wantsInstanceName()
 	{
 		return false; 
+	}
+
+	/// Returns true when the object (type) can be referenced by ActionScipt
+	bool isActionScriptReferenceable()
+	{
+		// The way around
+		// [ wantsInstanceName() returning isActionScriptReferenceable() ]
+		// would be cleaner, but I wouldn't want to touch all files now.
+		return wantsInstanceName();
 	}
 
 	/// @}
