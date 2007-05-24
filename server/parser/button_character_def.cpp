@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.11 2007/04/18 14:07:32 jgilmore Exp $ */
+/* $Id: button_character_def.cpp,v 1.12 2007/05/24 13:46:24 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -96,9 +96,11 @@ button_record::read(stream* in, int tag_type,
 	// definition, we print an error, but keep parsing.
 	if ( ! m_character_def )
 	{
-		log_error(_("button record refer to "
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror(_("button record refer to "
 			"character with id %d, which is not found "
 			"in the chars dictionary"), m_character_id);
+		);
 	}
 
 	m_button_layer = in->read_u16();
