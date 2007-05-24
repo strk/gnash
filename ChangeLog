@@ -1,5 +1,13 @@
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: Makefile.am,
+	  replace_buttons1test.c, replace_buttons1test_runner.cpp:
+	  New test for buttons replacement.
+	* testsuite/misc-ming.all/replace_sprites1test.c:
+	  Add new test checking for _x.
+
+2007-05-24 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.cpp (replace_character): always call ::construct
 	  on the new character.
 	* backend/sound_handler_sdl.h: fix const-correctness

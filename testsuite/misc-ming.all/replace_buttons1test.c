@@ -19,9 +19,9 @@
 /*
  * Sandro Santilli, strk@keybit.net
  *
- * Test  "Jump backward to start of lifetime after replacement with different sprite"
+ * Test  "Jump backward to start of lifetime after replacement with different button"
  *
- * run as ./replace_sprites1test
+ * run as ./replace_buttons1test
  *
  * Timeline:
  * 
@@ -36,8 +36,8 @@
  * 
  * Description:
  * 
- *  frame2: movieclip 1 placed at depth -16381 and position 100,300
- *  frame3: instance at depth -16381 replaced by character 2 at position 130,330
+ *  frame2: button 1 placed at depth -16381 and position 100,300
+ *  frame3: instance at depth -16381 replaced by button 2 at position 130,330
  *  frame4: jump back to frame 2 and stop
  * 
  * Expected behaviour:
@@ -54,20 +54,35 @@
 #include <ming.h>
 
 #define OUTPUT_VERSION 6
-#define OUTPUT_FILENAME "replace_sprites1test.swf"
+#define OUTPUT_FILENAME "replace_buttons1test.swf"
 
 SWFDisplayItem add_static_mc(SWFMovie mo, const char* name, int depth, int x, int y, int width, int height);
 SWFMovieClip get_static_mc(int width, int height, int r, int g, int b);
 SWFShape get_shape(int width, int height, int r, int g, int b);
+SWFButton get_button(int width, int height, int r, int g, int b);
 
 SWFShape
 get_shape(int width, int height, int r, int g, int b)
 {
   SWFShape sh;
 
+  /*sh = make_fill_square (-(width/2), -(height/2), width, height, r, g, b, r, g, b);*/
   sh = make_fill_square (0, 0, width, height, r, g, b, r, g, b);
 
   return sh;
+}
+
+SWFButton
+get_button(int width, int height, int r, int g, int b)
+{
+  SWFButton bu = newSWFButton();
+  SWFShape sh;
+
+  sh = make_fill_square (0, 0, width, height, r, g, b, r, g, b);
+
+  SWFButton_addShape(bu, (SWFCharacter)sh, SWFBUTTON_UP );
+
+  return bu;
 }
 
 SWFMovieClip
@@ -106,7 +121,7 @@ main(int argc, char** argv)
 {
   SWFMovie mo;
   SWFMovieClip dejagnuclip;
-  SWFMovieClip static1, static2;
+  SWFButton static1, static2;
   SWFDisplayItem it1;
 
 
@@ -124,8 +139,8 @@ main(int argc, char** argv)
   SWFMovie_setDimension(mo, 800, 600);
   SWFMovie_setRate (mo, 2);
 
-  static1 = get_static_mc(60, 60, 255, 0, 0);
-  static2 = get_static_mc(60, 60, 0, 255, 0);
+  static1 = get_button(60, 60, 255, 0, 0);
+  static2 = get_button(60, 60, 0, 255, 0);
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
@@ -148,12 +163,9 @@ main(int argc, char** argv)
 			), SWFACTION_CONSTRUCT);
   add_actions(mo, "static1.name='static1';"); 
 
-  check_equals(mo, "typeof(static1)", "'movieclip'"); 
-
-  // This is important to verify, see next check for it after REPLACE
-  check_equals(mo, "static1.name", "'static1'");
-
+  check_equals(mo, "typeof(static1)", "'object'"); 
   check_equals(mo, "static1._target", "'/static1'");
+  check_equals(mo, "static1.name", "'static1'");
 
   SWFMovie_nextFrame(mo); 
 
@@ -177,23 +189,22 @@ main(int argc, char** argv)
 
 
   // Can still reference the old character and it's variables, after replace
-  xcheck_equals(mo, "typeof(static1)", "'movieclip'"); 
-  xcheck_equals(mo, "static1.name", "'static1'");
+  xcheck_equals(mo, "typeof(static2)", "'undefined'"); 
+  xcheck_equals(mo, "typeof(static1)", "'object'"); 
   xcheck_equals(mo, "static1._target", "'/static1'");
+  xcheck_equals(mo, "static1.name", "'static1'");
   xcheck_equals(mo, "static1._x", "130");
 
   // While the new name results undefined...
-  xcheck_equals(mo, "typeof(static2)", "'undefined'"); 
+  xcheck_equals(mo, "typeof(static2)", "'undefined'"); // the name wasn't changed
 
   // Everything suggests that a new instance is NOT created on replace !!!
   // Gnash here fails because it creates a NEW instance
 
-  // Anyway, the old character matrix changed to 130,330 !
-  xcheck_equals(mo, "static1._x", "130");
-
-  // We can't check the color in a self-contained testcase unfortunately,
+  // We can't check the color or the _x in a self-contained testcase unfortunately,
   // we'll need a MovieTester-based runner for this.
-  // It is expected the color of the current instance to be RED
+  // It is expected the color of the current instane is GREEN, and the boundaries
+  // are from 130 to 190 for X and 330 to 390 for Y.
   // TODO: implement a MovieTester based runner !!
 
   SWFMovie_nextFrame(mo); 
@@ -204,21 +215,19 @@ main(int argc, char** argv)
 
     "gotoAndStop(2); " 
 
-    // A single instance has been constructed !!
-    "xcheck_equals(_root.depth3Constructed, '1');"
+    // Shapes don't get their onConstruct event invoked !
+    "check_equals(typeof(_root.depth3Constructed), 'undefined');"
 
     // Original character name is still referenceable
-    "check_equals(typeof(static1), 'movieclip');"
+    "check_equals(typeof(static1), 'object');"
 
-    // And it still has it's user-provided property
-    "xcheck_equals(static1.name, 'static1');"
+    // It's a new instance !
+    "check_equals(typeof(static1.name), 'undefined');"
 
-    // The instance have been moved back to its original position (100,300)
-    "check_equals(static1._x, 100);"
-
-    // We can't check the color in a self-contained testcase unfortunately,
+    // We can't check the color or the _x in a self-contained testcase unfortunately,
     // we'll need a MovieTester-based runner for this.
-    // It is expected the color of the current instance to be RED
+    // It is expected the color of the current instance is RED, and the boundaries
+    // are from 100 to 120 for both X and Y.
     // TODO: implement a MovieTester based runner !!
 
     "totals();"

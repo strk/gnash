@@ -163,6 +163,7 @@ if MING_SUPPORTS_REPLACE_TAG
 check_PROGRAMS += \
 	replace_shapes1test \
 	replace_sprites1test \
+	replace_buttons1test \
 	$(NULL)
 endif
 
@@ -237,6 +238,7 @@ check_SCRIPTS += \
 check_PROGRAMS += \
 	replace_shapes1test_runner \
 	replace_sprites1test_runner \
+	replace_buttons1test_runner \
 	$(NULL)
 endif
 
@@ -684,6 +686,27 @@ replace_sprites1test_runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	replace_sprites1test.swf      \
 	$(NULL)
+
+replace_buttons1test_SOURCES = replace_buttons1test.c	
+replace_buttons1test_LDADD = libgnashmingutils.la
+
+replace_buttons1test.swf: replace_buttons1test
+	./replace_buttons1test $(top_srcdir)/testsuite/media
+
+replace_buttons1test_runner_SOURCES = \
+	replace_buttons1test_runner.cpp \
+	$(NULL)
+replace_buttons1test_runner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+replace_buttons1test_runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+replace_buttons1test_runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	replace_buttons1test.swf      \
+	$(NULL)
+
 
 masks_test_SOURCES =	\
 	masks_test.c	\
@@ -1464,6 +1487,7 @@ if MING_SUPPORTS_REPLACE_TAG
 TEST_CASES += \
 	replace_shapes1test_runner \
 	replace_sprites1test_runner \
+	replace_buttons1test_runner \
 	$(NULL)
 endif
 
