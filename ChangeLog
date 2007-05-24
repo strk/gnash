@@ -1,3 +1,9 @@
+2007-05-24 Sandro Santilli <strk@keybit.net>
+
+	* libbase/curl_adapter.cpp (CurlStreamFile::seek): use the _cached
+	  member for checking wheter a seek will succeed or not (fseek
+	  allows you to seek past the end of the file otherwise).
+
 2007-05-24 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/Makefile.am: When building FLTK GUI, also include

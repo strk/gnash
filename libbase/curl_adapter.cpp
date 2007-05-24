@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.34 2007/05/23 07:42:16 tgc Exp $ */
+/* $Id: curl_adapter.cpp,v 1.35 2007/05/24 22:06:09 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -537,6 +537,12 @@ CurlStreamFile::seek(size_t pos)
 
 	fill_cache(pos);
 	if ( _error ) return false; // error can be set by fill_cache
+
+	if ( _cached < pos )
+	{
+		fprintf(stderr, "Warning: could not cache anough bytes on seek\n");
+		return false; // couldn't cache so many bytes
+	}
 
 	if ( fseek(_cache, pos, SEEK_SET) == -1 ) {
 		fprintf(stderr, "Warning: fseek failed\n");
