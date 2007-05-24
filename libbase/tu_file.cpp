@@ -57,6 +57,8 @@ std_write_func(const void* src, int bytes, void* appdata)
 static int
 std_seek_func(int pos, void *appdata)
 {
+	GNASH_REPORT_FUNCTION;
+
     assert(appdata);
 
     // TODO: optimize this by caching total stream size ?
@@ -65,12 +67,17 @@ std_seek_func(int pos, void *appdata)
 	    return TU_FILE_SEEK_ERROR;
     }
 
-    clearerr((FILE*) appdata);	// make sure EOF flag is cleared.
-    int	result = fseek((FILE*)appdata, pos, SEEK_SET);
+    FILE* file = static_cast<FILE*>(appdata);
+
+    clearerr(file); // make sure EOF flag is cleared.
+    int	result = fseek(file, pos, SEEK_SET);
     if (result == EOF) {
 	// @@ TODO should set m_error to something relevant based on errno.
 	return TU_FILE_SEEK_ERROR;
     }
+
+    assert ( ftell(file) == pos );
+
     return 0;
 }
 

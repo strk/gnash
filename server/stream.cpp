@@ -288,15 +288,15 @@ namespace gnash {
 			tag_length = m_input->read_le32();
 		}
 		_current_tag_length = tag_length;
-
-		IF_VERBOSE_PARSE (
-			log_parse("SWF[%lu]: tag type = %d, tag length = %d",
-			offset, tag_type, tag_length);
-		);
 			
 		// Remember where the end of the tag is, so we can
 		// fast-forward past it when we're done reading it.
 		m_tag_stack.push_back(get_position() + tag_length);
+
+		IF_VERBOSE_PARSE (
+			log_parse("SWF[%lu]: tag type = %d, tag length = %d, end tag = %lu",
+			offset, tag_type, tag_length, m_tag_stack.back());
+		);
 
 		return static_cast<SWF::tag_type>(tag_type);
 	}
@@ -307,7 +307,15 @@ namespace gnash {
 		assert(m_tag_stack.size() > 0);
 		unsigned long end_pos = m_tag_stack.back();
 		m_tag_stack.pop_back();
-		m_input->set_position(end_pos);
+
+		if ( ! m_input->set_position(end_pos) )
+		{
+			log_error("Could not seek to end position");
+		}
+		else
+		{
+			assert(m_input->get_position() == end_pos);
+		}
 
 		m_unused_bits = 0;
 	}

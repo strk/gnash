@@ -8,6 +8,11 @@
 
 2007-05-24 Sandro Santilli <strk@keybit.net>
 
+	* server/stream.cpp (open_tag): print end tag position in verbose
+	  parse mode; (close_tag): assertion checking (shows a bug in
+	  zlib_adapter, see bug #19931).
+	* libbase/tu_file.cpp (std_seek_func): assertion checking and minor
+	  cleanups.
 	* libbase/curl_adapter.cpp (CurlStreamFile::seek): use the _cached
 	  member for checking wheter a seek will succeed or not (fseek
 	  allows you to seek past the end of the file otherwise).
