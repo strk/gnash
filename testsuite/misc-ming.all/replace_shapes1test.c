@@ -158,7 +158,7 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); 
 
   // Frame 3: replace instance at depth -16381 with character 2
-  if ( ! SWFMovie_replace(mo, it1, (SWFBlock)static2) )
+  if ( SWFMovie_replace(mo, it1, (SWFBlock)static2) )
   {
 	  abort(); // grace and beauty...
   }
