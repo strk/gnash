@@ -1,3 +1,12 @@
+2007-05-25 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/swf/tag_loaders.cpp: Move the assignment into the data
+	pointer up to right after the corresponding memory is allocated,
+	because the DO_{MONO,STEREO}_BLOCK macros use the temporary
+	pointer to iterate the buffer. This was causing delete[] to be
+	called on the pointer which had walked to the end of the buffer
+	and, thus, crashing.
+
 2007-05-25 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.{cpp,h}: drop unused remove_display_item

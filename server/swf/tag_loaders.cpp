@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.110 2007/05/24 20:10:42 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.111 2007/05/25 12:41:48 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1698,6 +1698,7 @@ static void adpcm_expand(
 	bool stereo)
 {
 	int16_t* out_data = new int16_t[stereo ? sample_count*2 : sample_count];
+	data = reinterpret_cast<unsigned char *>(out_data);
 
 	// Read header.
 	int	n_bits = in->read_uint(2) + 2;	// 2 to 5 bits
@@ -1754,7 +1755,6 @@ static void adpcm_expand(
 		}
 	}
 
-	data = (unsigned char *)out_data;
 }
 
 } // namespace gnash
