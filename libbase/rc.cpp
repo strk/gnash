@@ -59,7 +59,8 @@ RcInitFile::RcInitFile() : _delay(0),
                            _localdomain_only(false),
                            _localhost_only(false),
                            _sound(true),
-                           _plugin_sound(true)
+                           _plugin_sound(true),
+			   _extensionsEnabled(false)
 {
 //    GNASH_REPORT_FUNCTION;
     loadFiles();
@@ -180,6 +181,7 @@ RcInitFile::parseFile(const std::string& filespec)
                 extractSetting(&_plugin_sound, "pluginsound", variable, value);
                 extractSetting(&_verboseASCodingErrors, "ASCodingErrorsVerbosity", variable, value);
                 extractSetting(&_verboseMalformedSWF, "MalformedSWFVerbosity", variable, value);
+                extractSetting(&_extensionsEnabled, "EnableExtensions", variable, value);
                 
                 extractNumber(&_delay, "delay", variable, value);
                 extractNumber(&_verbosity, "verbosity", variable, value);
@@ -317,6 +319,8 @@ RcInitFile::dump()
          << ((_sound)?"enabled":"disabled") << endl;
     cerr << "\tEnable Plugin sound: "
          << ((_plugin_sound)?"enabled":"disabled") << endl;
+    cerr << "\tEnable Extensions: "
+         << ((_extensionsEnabled)?"enabled":"disabled") << endl;
     if (_log.size()) {
         cerr << "\tDebug Log name is: " << _log << endl;
     }

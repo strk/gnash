@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.60 2007/04/18 13:47:24 martinwguy Exp $ */
+/* $Id: Global.cpp,v 1.61 2007/05/25 16:04:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,6 +63,7 @@
 #include "URL.h" // for URL::encode and URL::decode (escape/unescape)
 #include "builtin_function.h"
 #include "edit_text_character.h"
+#include "rc.h"
 
 #include "fn_call.h"
 #include "sprite_instance.h"
@@ -477,18 +478,27 @@ Global::Global(VM& vm)
 	// SWF8
 	//-----------------------
 
+extscan: 
+
 	//-----------------------
 	// Extensions
 	//-----------------------
-extscan: 
-
         // Scan the plugin directories for all plugins, and load them now.
         // FIXME: this should actually be done dynamically, and only
         // if a plugin defines a class that a movie actually wants to
         // use.
 #ifdef USE_EXTENSIONS
-//        et.scanDir("/usr/local/lib/gnash/plugins");
-        et.scanAndLoad(*this);
+
+	if ( RcInitFile::getDefaultInstance().enableExtensions() )
+	{
+		log_security("Extensions enabled, scanning plugin dir for load");
+		//et.scanDir("/usr/local/lib/gnash/plugins");
+		et.scanAndLoad(*this);
+	}
+	else
+	{
+		log_security("Extensions disabled");
+	}
 #else
 	return;
 #endif

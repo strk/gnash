@@ -45,58 +45,63 @@ public:
     bool parseFile(const std::string& filespec);
     bool updateFile(const std::string& filespec);
     
-    bool useSplashScreen() { return _splash_screen; }
+    bool useSplashScreen() const { return _splash_screen; }
     void useSplashScreen(bool value);
 
-    bool useActionDump() { return _actiondump; }
+    bool useActionDump() const { return _actiondump; }
     void useActionDump(bool value);
 
-    bool useParserDump() { return _parserdump; }
+    bool useParserDump() const { return _parserdump; }
     void useParserDump(bool value);
 
-    bool useWriteLog() { return _writelog; }
+    bool useWriteLog() const { return _writelog; }
     void useWriteLog(bool value);
 
-    int getTimerDelay() { return _delay; }
+    int getTimerDelay() const { return _delay; }
     void setTimerDelay(int x) { _delay = x; }
 
-    bool showASCodingErrors() { return _verboseASCodingErrors; }
+    bool showASCodingErrors() const { return _verboseASCodingErrors; }
     void showASCodingErrors(bool value);
 
-    bool showMalformedSWFErrors() { return _verboseMalformedSWF; }
+    bool showMalformedSWFErrors() const { return _verboseMalformedSWF; }
     void showMalformedSWFErrors(bool value);
+
+    bool enableExtensions() const { return _extensionsEnabled; }
+    //void enableExtension(bool mode) { _extensionsEnabled=mode; }
     
-    int verbosityLevel() { return _verbosity; }
+    int verbosityLevel() const { return _verbosity; }
     void verbosityLevel(int value) { _verbosity = value; }
     
-    std::string getDebugLog() { return _log; }
+    std::string getDebugLog() const { return _log; }
     std::string getDocumentRoot() { return _wwwroot; }
     
-    bool useDebugger() { return _debugger; }
+    bool useDebugger() const { return _debugger; }
     void useDebugger(bool value) { _debugger = value; }
 
-    bool useSound() { return _sound; }
+    bool useSound() const { return _sound; }
     void useSound(bool value) { _sound = value; }
 
-    bool usePluginSound() { return _plugin_sound; }
+    // strk: I'd drop this, and allow an -f switch to select
+    //       the gnashrc file to use instead
+    bool usePluginSound() const { return _plugin_sound; }
     void usePluginSound(bool value) { _plugin_sound = value; }
 
-    bool useLocalDomain() { return _localdomain_only; }
+    bool useLocalDomain() const { return _localdomain_only; }
     void useLocalDomain(bool value);
     
-    bool useLocalHost() { return _localhost_only; }
+    bool useLocalHost() const { return _localhost_only; }
     void useLocalHost(bool value);
 
-    bool extractSetting(bool *var, const char *pattern, std::string &variable,
+    static bool extractSetting(bool *var, const char *pattern, std::string &variable,
                         std::string &value);
     
-    int extractNumber(int *num, const char *pattern, std::string &variable,
+    static int extractNumber(int *num, const char *pattern, std::string &variable,
                         std::string &value);
     
-    std::vector<std::string> getWhiteList() { return _whitelist; }
-    std::vector<std::string> getBlackList() { return _blacklist; }
+    const std::vector<std::string>& getWhiteList() const { return _whitelist; }
+    const std::vector<std::string>& getBlackList() const { return _blacklist; }
 
-    int getRetries() { return _retries; }
+    int getRetries() const { return _retries; }
     void setRetries(int x) { _retries = x; }
 
     void dump();
@@ -132,6 +137,8 @@ private:
     int _retries;               // the number of retries for a thread
     bool _sound;		// whether sound is enable or not
     bool _plugin_sound;		// whether sound is desired for the plugin
+
+    bool _extensionsEnabled;
 };
 
 //extern DSOEXPORT RcInitFile rcfile;

@@ -160,6 +160,16 @@
 	  </para>
 	</listitem>
       </varlistentry>
+
+      <varlistentry>
+	<term>EnableExtensions</term>
+	<listitem>
+	  <para>
+	    Set to ``on'' to enable extensions. Off by default.
+	  </para>
+	</listitem>
+      </varlistentry>
+
    </variablelist>
 
   <para>

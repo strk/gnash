@@ -1,5 +1,14 @@
 2007-05-25 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/gnashrc.xml: document new EnableExtensions gnashrc
+	  variable
+	* libbase/rc.{cpp,h}: add support for EnableExtensions variable,
+	  defaults to OFF. Cleanup const-correctness and static methods.
+	* server/asobj/Global.cpp: Don't load extensions if disabled 
+	  by gnashrc.
+
+2007-05-25 Sandro Santilli <strk@keybit.net>
+
 	* libgeometry/snappingrange.h: add intersects(Range2d)
 	* testsuite/misc-ming.all/: Makefile.am,
 	  loop_test2.c, loop_test2runner.cpp: Add a visual test
