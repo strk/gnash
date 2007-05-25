@@ -42,7 +42,7 @@
  *  First time in frame1 depths are the original ones,
  *  second time depths are swapped.
  *
- * run as ./loop_test
+ * run as ./loop_test2
  */
 
 
@@ -79,7 +79,7 @@ main(int argc, char** argv)
   
   mo = newSWFMovie();
   SWFMovie_setDimension(mo, 800, 600);
-  SWFMovie_setRate(mo, 6);
+  SWFMovie_setRate(mo, 2);
 
   // Frame 1: Place dejagnu clip
 

@@ -1,5 +1,13 @@
 2007-05-25 Sandro Santilli <strk@keybit.net>
 
+	* libgeometry/snappingrange.h: add intersects(Range2d)
+	* testsuite/misc-ming.all/: Makefile.am,
+	  loop_test2.c, loop_test2runner.cpp: Add a visual test
+	  runner, showing that 2nd redesign attempt is really
+	  bogus.
+
+2007-05-25 Sandro Santilli <strk@keybit.net>
+
 	* server/as_environment.cpp: don't print a separate error
 	  when call stack limit is exceeded, leave that to the 
 	  exception handler.

@@ -77,6 +77,7 @@ check_PROGRAMS = \
 	root_stop_testrunner \
 	loop_test \
 	loop_test2 \
+	loop_test2runner \
 	loop_test3 \
 	loop_test4 \
 	loop_test5 \
@@ -211,7 +212,6 @@ check_SCRIPTS = \
 	static_vs_dynamic1_testrunner \
 	static_vs_dynamic2_testrunner \
 	getTimer_testrunner \
-	loop_test2runner \
 	loop_test3runner \
 	loop_test4runner \
 	loop_test5runner \
@@ -385,9 +385,19 @@ loop_test2_LDADD = libgnashmingutils.la
 loop_test2.swf: loop_test2
 	./loop_test2 $(top_srcdir)/testsuite/media
 
-loop_test2runner: $(srcdir)/../generic-testrunner.sh loop_test2.swf
-	sh $< -f20 $(top_builddir) loop_test2.swf > $@
-	chmod 755 $@
+loop_test2runner_SOURCES = \
+	loop_test2runner.cpp \
+	$(NULL)
+loop_test2runner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+loop_test2runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+loop_test2runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	loop_test2.swf      \
+	$(NULL)
 
 loop_test3_SOURCES = loop_test3.c
 loop_test3_LDADD = libgnashmingutils.la

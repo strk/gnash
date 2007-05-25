@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.19 2007/04/27 12:42:31 strk Exp $
+// $Id: snappingrange.h,v 1.20 2007/05/25 15:18:04 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -348,6 +348,23 @@ public:
 	
 		for (unsigned rno=0, rcount=_ranges.size(); rno<rcount; rno++) 
 		if (_ranges[rno].contains(r))
+			return true;
+			
+		return false;
+	
+	}
+
+	/// Returns true if any of the ranges intersect the given range
+	//
+	/// Note that a NULL range doesn't intersect anything
+	/// and a WORLD range intersects everything except a NULL Range.
+	///
+	bool intersects(const RangeType& r) const {
+	
+		finalize();
+	
+		for (unsigned rno=0, rcount=_ranges.size(); rno<rcount; rno++) 
+		if (_ranges[rno].intersects(r))
 			return true;
 			
 		return false;
