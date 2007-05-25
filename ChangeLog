@@ -1,5 +1,14 @@
 2007-05-25 Sandro Santilli <strk@keybit.net>
 
+	* extensions/gnashrc: new file, with required variables
+	  for running extensions tests.
+	* extensions/fileio/Makefile.am: Provide a GNASHRC variable
+	  to the generic-testrunner.sh
+	* libbase/rc.cpp (loadFiles): load a GNASHRC if specified, after
+	  all precedent files are loaded. See task #6937.
+
+2007-05-25 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in: test EnableExtensions.
 	* doc/C/gnashrc.xml: document new EnableExtensions gnashrc
 	  variable

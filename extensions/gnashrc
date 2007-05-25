@@ -1,0 +1,9 @@
+# This file should be pointed to by a GNASHRC environment variable
+# whenever an extensions test is run
+#
+# Do this by adding GNASHRC=$(srcdir)/../gnasrc prefix to your
+# generic_testrunner.sh invokation inside Makefile.am
+#
+
+# Enable extensions for allowing testing them..
+set EnableExtensions on

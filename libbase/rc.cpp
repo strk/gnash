@@ -90,6 +90,13 @@ RcInitFile::loadFiles()
     if (home) {
         loadfile = home;
         loadfile += "/.gnashrc";
+        parseFile(loadfile);
+    }
+
+    // Check the GNASHRC environment variable
+    char *gnashrc = getenv("GNASHRC");
+    if (gnashrc) {
+        loadfile = gnashrc;
         return parseFile(loadfile);
     }
     
