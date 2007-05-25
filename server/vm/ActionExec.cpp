@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.34 2007/05/25 13:25:47 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.35 2007/05/25 13:35:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -268,7 +268,7 @@ ActionExec::operator() ()
 	    // what to do instead..
 	    //
 	    //IF_VERBOSE_ASCODING_ERRORS (
-	    log_swferror("Script aborted due to exceeded limit: %s", ex.what());
+	    log_aserror("Script aborted due to exceeded limit: %s", ex.what());
 	    //)
     }
 
