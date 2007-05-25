@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.50 2007/05/21 06:53:36 strk Exp $ */
+/* $Id: log.cpp,v 1.51 2007/05/25 07:36:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -109,15 +109,19 @@ timestamp(ostream& x) {
 
 string
 timestamp() {
+
     time_t t;
     char buf[10];
 
     memset (buf, '0', 10);        // this terminates the string
     time (&t);                    // get the current time
     strftime (buf, sizeof(buf), "%H:%M:%S", localtime (&t));
-    string sbuf = buf;
 
-    return sbuf;
+    std::stringstream ss;
+    ss << getpid() << "] " << buf;
+    return ss.str();
+    //string sbuf = buf;
+    //return sbuf;
 }
 
 ostream& datetimestamp(ostream& x) {
