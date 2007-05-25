@@ -578,12 +578,6 @@ public:
 		const std::string& newname,
 		int newdepth, as_object* init_object=NULL);
 		
-	/// Remove the object with the specified name.
-	//
-	/// @@ what happens if the we have multiple objects
-	///    with the same name ?
-	void remove_display_object(const std::string& name);
-
 	/// Dispatch event handler(s), if any.
 	virtual bool	on_event(const event_id& id);
 

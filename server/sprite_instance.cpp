@@ -2142,19 +2142,6 @@ void sprite_instance::clone_display_object(const std::string& name,
     }
 }
 
-void sprite_instance::remove_display_object(const std::string& name)
-{
-//	    GNASH_REPORT_FUNCTION;
-
-	character* ch = m_display_list.get_character_by_name(name.c_str());
-	if (ch) // TODO: should we check for isActionScriptReferenceable here ?
-	{
-	    // @@ TODO: should only remove movies that were created via clone_display_object --
-	    // apparently original movies, placed by anim events, are immune to this.
-	    remove_display_object(ch->get_depth(), ch->get_id());
-	}
-}
-
 /* private */
 void
 sprite_instance::queueActions(ActionList& actions)
