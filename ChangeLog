@@ -1,3 +1,8 @@
+2007-05-25 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStreamFfmpeg.h: Fix resampling for some FLVs,
+	  fixes bug #19959.
+
 2007-05-25 Sandro Santilli <strk@keybit.net>
 
 	* libbase/log.cpp (timestamp): include PID in timestamp,

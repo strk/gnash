@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.29 2007/05/23 07:42:16 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.30 2007/05/25 09:37:59 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -155,7 +155,7 @@ public:
 	
 	bool init(AVCodecContext* ctx)
 	{
-		if (ctx->sample_rate != 44100 && ctx->channels != 2) {
+		if (ctx->sample_rate != 44100 || ctx->channels != 2) {
 			if (!_context) {
 				_context = audio_resample_init(2,  ctx->channels, 
 					44100, ctx->sample_rate);
@@ -169,9 +169,6 @@ public:
 	{
 		return audio_resample (_context, output, input, samples);
 	}
-	
-	// The timestamp of the last decoded video frame
-	volatile double m_last_video_timestamp;
 
 private:
 	ReSampleContext* _context;
@@ -188,11 +185,14 @@ public:
 	int64_t time();
 	void advance();
 
-	// Used for ffmpeg data read and seek callbacks
+	// Used for ffmpeg data read and seek callbacks with non-FLV
 	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
 
+	// The decoding thread. Sets up the decoder, and decodes.
 	static void av_streamer(NetStreamFfmpeg* ns);
+
+	// Callback used by the soundhandler to get audio data
 	static bool audio_streamer(void *udata, uint8_t *stream, int len);
 
 private:
