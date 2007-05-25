@@ -1,5 +1,6 @@
 2007-05-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in: test EnableExtensions.
 	* doc/C/gnashrc.xml: document new EnableExtensions gnashrc
 	  variable
 	* libbase/rc.{cpp,h}: add support for EnableExtensions variable,

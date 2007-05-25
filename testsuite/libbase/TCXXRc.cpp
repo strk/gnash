@@ -151,6 +151,12 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("usePluginSound");
     }
 
+    if (rc.enableExtensions() == 1) {
+        runtest.pass ("enableExtensions");
+    } else {
+        runtest.fail ("enableExtensions");
+    }
+
     std::vector<std::string> whitelist = rc.getWhiteList();
     if (whitelist.size()) {
         if ((whitelist[0] == "www.doonesbury.com")

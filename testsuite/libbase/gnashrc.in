@@ -40,3 +40,5 @@ set Sound off
 # Don't use plugin sound (actually this is a test for case-insensitiveness)
 set pluginSoUND off
 
+# Enable extensions
+set enableExtensions on
