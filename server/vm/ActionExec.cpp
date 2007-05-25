@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.33 2007/05/21 06:53:36 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.34 2007/05/25 13:25:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -160,8 +160,11 @@ ActionExec::operator() ()
 	);
 #endif
 
+	size_t branchCount = 0;
 	try {
-	while (pc<stop_pc) {
+	while (pc<stop_pc)
+	{
+
 	    // Cleanup any expired "with" blocks.
 	    while ( ! with_stack.empty() && pc >= with_stack.back().end_pc() ) {
 		// Drop last stack element
@@ -172,6 +175,7 @@ ActionExec::operator() ()
 
 	// Get the opcode.
 	uint8_t action_id = code[pc];
+	size_t oldPc = pc;
 
 	IF_VERBOSE_ACTION (
 		// FIXME, avoid direct dbglogfile access, use log_action
@@ -236,14 +240,36 @@ ActionExec::operator() ()
 	// Control flow actions will change the PC (next_pc)
 	pc = next_pc;
 
+	// Check for loop backs. Actually this should be implemented
+	// as a timeout in seconds.
+	// See: http://www.gnashdev.org/wiki/index.php/ScriptLimits
+	// 
+	if ( pc < oldPc )
+	{
+		// TODO: specify in the .gnashrc ?
+		size_t maxBranchCount = 512; // what's enough ?
+		if ( ++branchCount > maxBranchCount )
+		{
+			char buf[256];
+			snprintf(buf, 255, _("Loop iterations count exceeded limit of %u"),
+				maxBranchCount);
+			throw ActionLimitException(buf);
+		}
+		//log_debug("Branch count: %u", branchCount);
+	}
+
     }
 
     }
     catch (ActionLimitException& ex)
     {
-	    IF_VERBOSE_ASCODING_ERRORS (
-	    log_aserror("%s", ex.what());
-	    )
+	    // We want to always show these messages, as in the future
+	    // we'll eventually need to pop up a window asking user about
+	    // what to do instead..
+	    //
+	    //IF_VERBOSE_ASCODING_ERRORS (
+	    log_swferror("Script aborted due to exceeded limit: %s", ex.what());
+	    //)
     }
 
     cleanupAfterRun();

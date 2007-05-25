@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.77 2007/05/14 12:23:39 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.78 2007/05/25 13:25:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -993,10 +993,12 @@ as_environment::pushCallFrame(as_function* func)
 
 	if ( _localFrames.size() == maxstacksize )
 	{
-		log_error(_("Max stack count reached (%u) - should abort execution"),
+		char buf[256];
+		snprintf(buf, 255, _("Max stack count reached (%u)"),
 				maxstacksize);
+
 		// throw something
-		throw ActionLimitException("Call stack limit exceeded");
+		throw ActionLimitException(buf); 
 	}
 	_localFrames.push_back(CallFrame(func));
 }

@@ -1,3 +1,12 @@
+2007-05-25 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.cpp: don't print a separate error
+	  when call stack limit is exceeded, leave that to the 
+	  exception handler.
+	* server/vm/ActionExec.cpp: implement number of iterations
+	  limit (should be a timeout in second actually, but better
+	  this then hanging forever). Fixes bug #19961.
+
 2007-05-25 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/swf/tag_loaders.cpp: Move the assignment into the data
