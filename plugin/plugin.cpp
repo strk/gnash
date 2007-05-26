@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.75 2007/04/21 07:05:41 jgilmore Exp $ */
+/* $Id: plugin.cpp,v 1.76 2007/05/26 11:57:53 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -232,6 +232,8 @@ nsPluginInstance::nsPluginInstance(nsPluginCreateData* data)
   : nsPluginInstanceBase(),
     _instance(data->instance),
     _window(0),
+    _width(0),
+    _height(0),
     _childpid(0)
 {
 	for (size_t i=0, n=data->argc; i<n; ++i) {

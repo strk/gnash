@@ -159,6 +159,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 {
     bool specified_rendering_flag=false;
     bool called_by_plugin=false;
+    bool width_given=false, height_given=false;
 
     int c = 0;
     // scan for the two main long GNU options
@@ -225,6 +226,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 		break;
 	  }
           case 'j':
+              width_given = true;
               player.setWidth ( strtol(optarg, NULL, 0) );
               log_msg (_("Setting width to %d"), player.getWidth());
               break;
@@ -239,11 +241,12 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 #endif
               break;
           case 'k':
+              height_given = true;
               player.setHeight ( strtol(optarg, NULL, 0) );
               log_msg (_("Setting height to %d"), player.getHeight());
               break;
           case 'x':
-	      called_by_plugin=true;
+              called_by_plugin=true;
               player.setWindowId(strtol(optarg, NULL, 0));
               break;
           case '1':
@@ -319,6 +322,13 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         }
     }
 
+    if (called_by_plugin && height_given && width_given && !player.getHeight() && 
+        !player.getWidth()) {
+        // We were given dimensions of 0x0 to render to (probably the plugin
+        // is playing an "invisible" movie. Disable video rendering.
+        player.setDoRender(false);
+    }
+
     // get the file name from the command line
     while (optind < argc) {
 
@@ -363,3 +373,4 @@ main(int argc, char *argv[])
 
 	return player.run(argc, argv, infile, url);
 }
+

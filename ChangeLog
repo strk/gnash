@@ -1,13 +1,20 @@
+2007-05-26 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* plugin/plugin.cpp: Initialise _width and _height to safe defaults,
+	in case SetWindow is never called (for "hidden" flash movies).
+	* gui/gnash.cpp: If the plugin attempts to create a 0x0 pixels window
+	don't try to create a rendering GUI.
+
 2007-05-26 Ann Barcomb <ann@lulu.com>
 
 	* doc/C/usermanual/installation/cross_compiling.xml,
-          doc/C/usermanual/installation.xml: Added section on cross compiling
+	doc/C/usermanual/installation.xml: Added section on cross compiling
 	* doc/C/usermanual/installation/configuration.xml: Resolved a TODO
 	* doc/C/usermanual/installation/code_dependencies.xml: Marked a TODO
 	* doc/C/usermanual/installation/sources.xml: RAM requirements
 	* doc/C/usermanual/installation/sources.xml: Disk space requirements
 	* doc/C/usermanual/installation/configuration/feature_configuration.xml,
-          custompath_configuration.xml: Formatting
+	custompath_configuration.xml: Formatting
 	* doc/C/usermanual/installation/configuration/sources.xml:
 	  Include development snapshots as a download option
 
