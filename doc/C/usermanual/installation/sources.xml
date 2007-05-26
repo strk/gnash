@@ -21,6 +21,12 @@
   Continue reading for detailed step-by-step instructions 
   of the entire procedure.
 </para>  
+<para>
+  Presently, &app; source is about 16 MB when extracted and
+  <link linkend="configure">configured</link>.  <link
+  linkend="compile">Compilation</link> requires about 100 MB of
+  harddrive space.
+</para>  
 
 
 <sect3 id="gettingsource">
