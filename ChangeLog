@@ -1,3 +1,8 @@
+2007-05-26 Ann Barcomb <ann@lulu.com>
+
+	* doc/C/usermanual/installation/cross_compiling.xml: Made the
+	  cross compilation information more generic.
+
 2007-05-26 Jurka <jurka@ejurka.com>
 
 	* gui/gnash.cpp, libbase/FLVParser.cpp: Clear up printf-related

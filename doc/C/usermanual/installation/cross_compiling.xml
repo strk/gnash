@@ -3,11 +3,11 @@
 <para>
   To cross configure and compile &app;, begin by building a target system
   on your workstation.  This includes cross compilers for the target
-  architecture, and some system headers.  You will also need
-  <emphasis>libxml2</emphasis>, <emphasis>libpng</emphasis>,
-  <emphasis>libjpeg</emphasis>, <emphasis>sdl</emphasis>,
-  <emphasis>opengl</emphasis>, and <emphasis>ogg</emphasis> development
-  packages built for the target system.  The page
+  architecture, and some system headers. 
+  You will also need the following packages to be built for the target
+  system: <emphasis>libxml2</emphasis>, <emphasis>libpng</emphasis> 
+  (if used), <emphasis>libjpeg</emphasis> (if used), your
+  GUI library, your renderer, and your video handler (if used).  The page
   <ulink url="http://frank.harvard.edu/~coldwell/toolchain/"
   type="http">http://frank.harvard.edu/~coldwell/toolchain/</ulink>
   has instructions on building a target system from scratch and
