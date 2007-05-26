@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.55 2007/05/23 07:42:16 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.56 2007/05/26 13:57:09 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -123,6 +123,9 @@ void NetStreamFfmpeg::close()
 		s->detach_aux_streamer((void*) NULL);
 	}
 
+	// Make sure al decoding has stopped
+	boost::mutex::scoped_lock lock(decoding_mutex);
+
 	if (m_Frame) av_free(m_Frame);
 	m_Frame = NULL;
 
@@ -139,6 +142,9 @@ void NetStreamFfmpeg::close()
 	}
 
 	delete m_imageframe;
+	m_imageframe = NULL;
+	delete m_unqueued_data;
+	m_unqueued_data = NULL;
 
 	while (m_qvideo.size() > 0)
 	{
@@ -220,7 +226,7 @@ NetStreamFfmpeg::play(const std::string& c_url)
 		return 0;
 	}
 
-	url += c_url;
+	if (url.size() == 0) url += c_url;
 	// Remove any "mp3:" prefix. Maybe should use this to mark as audio-only
 	if (url.compare(0, 4, std::string("mp3:")) == 0) {
 		url = url.substr(4);
@@ -388,12 +394,14 @@ NetStreamFfmpeg::startPlayback()
 	nc->seek(0);
 	if (std::string(head) == "FLV") {
 		ns->m_isFLV = true;
-		ns->m_parser = new FLVParser(); // TODO: define ownership, use auto_ptr !
-		if (!nc->connectParser(*(ns->m_parser))) {
-			ns->setStatus(streamNotFound);
-			log_error(_("Gnash could not open FLV movie: %s"), ns->url.c_str());
-			delete ns->m_parser;
-			return false;
+		if (!ns->m_parser) {
+			ns->m_parser = new FLVParser(); // TODO: define ownership, use auto_ptr !
+			if (!nc->connectParser(*(ns->m_parser))) {
+				ns->setStatus(streamNotFound);
+				log_error(_("Gnash could not open FLV movie: %s"), ns->url.c_str());
+				delete ns->m_parser;
+				return false;
+			}
 		}
 
 		// Init the avdecoder-decoder
@@ -593,7 +601,10 @@ rgbcopy(image::rgb* dst, raw_mediadata_t* src, int width)
 void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
 
-	if (!ns->m_parser && !ns->m_FormatCtx) {
+	// This should only happen if close() is called before this thread is ready
+	if (!ns->m_go) return;
+
+	if (!ns->m_ACodecCtx && !ns->m_VCodecCtx && !ns->m_FormatCtx) {
 		if (!ns->startPlayback()) return;
 	} else {
 		// We need to restart the audio
@@ -602,9 +613,6 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 			s->attach_aux_streamer(audio_streamer, ns);
 		}
 	}
-
-	// This should only happen if close() is called before setup is complete
-	if (!ns->m_go) return;
 
 	ns->setStatus(playStart);
 
@@ -733,6 +741,8 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 
 bool NetStreamFfmpeg::decodeAudio(AVPacket* packet)
 {
+	if (!m_ACodecCtx) return false;
+
 	int frame_size;
 	unsigned int bufsize = (AVCODEC_MAX_AUDIO_FRAME_SIZE * 3) / 2;
 
@@ -799,6 +809,8 @@ bool NetStreamFfmpeg::decodeAudio(AVPacket* packet)
 
 bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 {
+	if (!m_VCodecCtx) return false;
+
 	int got = 0;
 	avcodec_decode_video(m_VCodecCtx, m_Frame, &got, packet->data, packet->size);
 	if (got) {
@@ -911,6 +923,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 
 		return true;
 	}
+
 	return false;
 }
 
@@ -981,7 +994,11 @@ NetStreamFfmpeg::seek(double pos)
 
 	// Seek to new position
 	if (m_isFLV) {
-		newpos = m_parser->seek(static_cast<uint32_t>(pos*1000));
+		if (m_parser) {
+			newpos = m_parser->seek(static_cast<uint32_t>(pos*1000));
+		} else {
+			newpos = 0;
+		}
 	} else if (m_FormatCtx) {
 
 		timebase = static_cast<double>(m_FormatCtx->streams[m_video_index]->time_base.num) / static_cast<double>(m_FormatCtx->streams[m_video_index]->time_base.den);
@@ -1033,6 +1050,7 @@ NetStreamFfmpeg::seek(double pos)
 		m_last_video_timestamp = newtime;
 		m_current_timestamp = newtime;
 	}
+	
 	// Flush the queues
 	while (m_qvideo.size() > 0)
 	{

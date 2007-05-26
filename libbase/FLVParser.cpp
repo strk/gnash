@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.14 2007/05/23 20:31:07 bjacques Exp $
+// $Id: FLVParser.cpp,v 1.15 2007/05/26 13:57:09 tgc Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -304,7 +304,7 @@ uint32_t FLVParser::seekAudio(uint32_t time)
 	}
 
 	gnash::log_debug("Seek (audio): " SIZET_FMT "/" SIZET_FMT " (%u/%u)", bestFrame, numFrames, _audioFrames[bestFrame]->timestamp, time);
-	_nextAudioFrame = bestFrame + 1;
+	_nextAudioFrame = bestFrame;
 	return _audioFrames[bestFrame]->timestamp;
 
 }
@@ -411,7 +411,7 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 
 	gnash::log_debug("Seek (video): " SIZET_FMT "/" SIZET_FMT " (%u/%u)", bestFrame, numFrames, _videoFrames[bestFrame]->timestamp, time);
 
-	_nextVideoFrame = bestFrame+1;
+	_nextVideoFrame = bestFrame;
 	assert( _videoFrames[bestFrame]->isKeyFrame() );
 	return _videoFrames[bestFrame]->timestamp;
 }
@@ -647,7 +647,7 @@ bool FLVParser::parseHeader()
 		_audio = false;
 		_video = true;
 	} else {
-		printf("Weird bit mask\n");
+		gnash::log_debug("Weird FLV bit mask\n");
 	}
 
 	_lastParsedPosition = 9;

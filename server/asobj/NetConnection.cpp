@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.44 2007/05/07 11:51:52 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.45 2007/05/26 13:57:09 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -110,6 +110,10 @@ NetConnection::addToURL(const std::string& url)
 {
 	// What is this ? It is NOT documented in the header !!
 	//if (url == "null" || url == "NULL") return;
+
+	// If there already is something in _url, then we already have a url,
+	// so no need to renew it.
+	if (_url.size() > 0) return;
 
 	_url += url;
 }

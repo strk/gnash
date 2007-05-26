@@ -1,3 +1,13 @@
+2007-05-26 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/FLVParser.cpp: When seeking the frame after the correct
+	  one was returned.
+	* server/asobj/NetConnection.cpp: Don't allow url prefix to be changed,
+	  might not be correct behavoir...
+	* server/asobj/NetStreamFfmpeg.cpp: Don't allow play url to be changed,
+	  might not be correct behavoir... Fix some issues when closing 
+	  NetStream before playback has been set up.
+
 2007-05-26 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* plugin/plugin.cpp: Initialise _width and _height to safe defaults,
