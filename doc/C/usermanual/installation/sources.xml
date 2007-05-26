@@ -26,6 +26,7 @@
   <link linkend="configure">configured</link>.  <link
   linkend="compile">Compilation</link> requires about 100 MB of
   harddrive space.
+  A minimum of 128 MB of physical RAM is recommended for compiling.
 </para>  
 
 
