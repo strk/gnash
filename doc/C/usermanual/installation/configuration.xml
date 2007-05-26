@@ -19,16 +19,24 @@
 </para>
 <para>
   All the standard <emphasis>configure</emphasis> options
-TODO - look up what the standard options are; man configure doesn't work.  This text was copied from the existing manual.
-  are available.  In addition, &app; has two types of
-  options: those which enable or disable features, and
-  those which specify custom paths for development packages
-  which aren't found during the default search.
+  are avaiable.  In addition, &app; has two types of
+  options: those which <link linkend="features">enable or disable 
+  features</link>, and
+  those which <link linkend="custompath">specify custom paths for 
+  development packages</link>
+  which aren't found during the default search.  A complete
+  list of <emphasis>all</emphasis> configuration options, including
+  standard ones, can be seen by typing:
+  <programlisting>
+  ./configure --help
+  </programlisting>
+  Read further for a more detailed explanation of &app;-specific
+  options.
 </para>
 <para>
   The syntax for running <emphasis>configure</emphasis> is as follows:
   <programlisting>
-  ./configure &lt;options&gt;
+  configure &lt;options&gt;
   </programlisting>
   The example below shows the <emphasis>configure</emphasis> options
   which create the smallest working standalone version of &app;.  In
@@ -47,3 +55,6 @@ TODO - look up what the standard options are; man configure doesn't work.  This 
   &custompath;
 </sect4>
 
+<sect4 id="crosscompilingconfiguration">
+  &cross_compiling;
+</sect4>
