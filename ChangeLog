@@ -27,6 +27,8 @@
 	in case SetWindow is never called (for "hidden" flash movies).
 	* gui/gnash.cpp: If the plugin attempts to create a 0x0 pixels window
 	don't try to create a rendering GUI.
+	* macros/kde.m4: Check if we actually need the kde subdirectory of the
+	KDE prefix we got from kde-config.
 
 2007-05-26 Ann Barcomb <ann@lulu.com>
 
