@@ -47,7 +47,7 @@
 	<term>whitelist</term>
 	<listitem>
 	  <para>
-	    This is a list of hostnames, seperated by a colon
+	    This is a list of hostnames, separated by a colon
 	    <emphasis>:</emphasis>. If this list is not empty,
 	    only external flash movies from these hosts are allowed to
 	    load.
@@ -59,7 +59,7 @@
 	<term>blacklist</term>
 	<listitem>
 	  <para>
-	    This is a list of hostnames, seperated by a colon
+	    This is a list of hostnames, separated by a colon
 	    <emphasis>:</emphasis>.  External flash movies from these
             domains are never allowed to load. If whitelist is present
 	    and not empty, blacklist is not used.
@@ -195,7 +195,7 @@
     # Don't access content from these sites
     set blacklist www.doubleclick.com:mochibot.com
 
-    # The delay between timer interupts
+    # The delay between timer interrupts
     set delay 50
 
     # The default verbosity level

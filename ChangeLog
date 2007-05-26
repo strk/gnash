@@ -1,5 +1,6 @@
 2007-05-26 Ann Barcomb <ann@lulu.com>
 
+	* doc/C/gnashrc.xml: Corrected spelling
 	* doc/C/usermanual/usage/gnashrc.xml: Propogated changes from
 	  ../../gnashrc.xml r1.3357 to the new gnashrc file.
 	* doc/C/usermanual/installation/cross_compiling.xml: Made the
