@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.47 2007/05/18 16:23:28 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.48 2007/05/26 20:25:12 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -98,6 +98,7 @@ NetStreamGst::NetStreamGst():
 NetStreamGst::~NetStreamGst()
 {
 	close();
+	delete m_parser;
 }
 
 void NetStreamGst::pause(int mode)
@@ -129,12 +130,24 @@ void NetStreamGst::pause(int mode)
 			}
 		}
 	}
+
+	if (!pipeline && !m_pause && !m_go) {
+		setStatus(playStart);
+		m_go = true;
+		// To avoid blocking while connecting, we use a thread.
+#ifndef DISABLE_START_THREAD
+		startThread = new boost::thread(boost::bind(NetStreamGst::playbackStarter, this));
+#else
+		startPlayback(this);
+#endif
+	}
 }
 
 void NetStreamGst::close()
 {
 	if (m_go)
 	{
+		setStatus(playStop);
 		m_go = false;
 #ifndef DISABLE_START_THREAD
 		startThread->join();
@@ -150,9 +163,20 @@ void NetStreamGst::close()
 	// Should we keep the ref if the above failed ?
 	// Unreffing the pipeline should also unref all elements in it.
 	gst_object_unref (GST_OBJECT (pipeline));
+	pipeline = NULL;
 
-	if (m_imageframe) delete m_imageframe;
+	boost::mutex::scoped_lock lock(image_mutex);
 
+	delete m_imageframe;
+	m_imageframe = NULL;
+
+	_handoffVideoSigHandler = 0;
+	_handoffAudioSigHandler = 0;
+
+	videowidth = 0;
+	videoheight = 0;
+	m_clock_offset = 0;
+	m_pausePlayback = false;
 }
 
 
@@ -179,8 +203,7 @@ NetStreamGst::play(const std::string& c_url)
 		return 0;
 	}
 
-
-	url += c_url;
+	if (url.size() == 0) url += c_url;
 	// Remove any "mp3:" prefix. Maybe should use this to mark as audio-only
 	if (url.compare(0, 4, std::string("mp3:")) == 0) {
 		url = url.substr(4);
@@ -712,6 +735,9 @@ NetStreamGst::buildPipeline()
 void
 NetStreamGst::startPlayback()
 {
+	// This should only happen if close() is called before this thread is ready
+	if (!m_go) return;
+
 	boost::intrusive_ptr<NetConnection> nc = _netCon;
 	assert(nc);
 
@@ -732,13 +758,16 @@ NetStreamGst::startPlayback()
 	nc->seek(0);
 	if (head[0] == 'F' && head[1] == 'L' && head[2] == 'V') { 
 		m_isFLV = true;
-		m_parser = new FLVParser(); // TODO: define ownership, use auto_ptr !
-		if (!nc->connectParser(*(m_parser))) {
-			setStatus(streamNotFound);
-			log_debug(_("Gnash could not open movie: %s"), url.c_str());
-			return;
-			
+		if (!m_parser) {
+			m_parser = new FLVParser(); // TODO: define ownership, use auto_ptr !
+			if (!nc->connectParser(*(m_parser))) {
+				setStatus(streamNotFound);
+				log_error(_("Gnash could not open FLV movie: %s"), url.c_str());
+				delete m_parser;
+				return;
+			}
 		}
+
 	}
 
 	// setup the GnashNC plugin if we are not decoding FLV
@@ -925,8 +954,13 @@ NetStreamGst::startPlayback()
 void
 NetStreamGst::seek(double pos)
 {
-
-	if (!pipeline) return;
+	if (!pipeline) {
+		if (m_parser)  {
+			uint32_t newpos = m_parser->seek(static_cast<uint32_t>(pos*1000));
+			m_clock_offset = 0;
+		}
+		return;
+	}
 
 	if (m_isFLV) {
 		uint32_t newpos = m_parser->seek(static_cast<uint32_t>(pos*1000));

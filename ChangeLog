@@ -1,3 +1,9 @@
+2007-05-26 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStreamGst.cpp: Don't allow play url to be changed,
+	  might not be correct behavoir... Fix some issues when closing 
+	  NetStream before playback has been set up.
+
 2007-05-26 Ann Barcomb <ann@lulu.com>
 
 	* doc/C/gnashrc.xml: Corrected spelling
