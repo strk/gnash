@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.15 2007/05/26 13:57:09 tgc Exp $
+// $Id: FLVParser.cpp,v 1.16 2007/05/26 16:23:21 bjacques Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -329,7 +329,7 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 	// If there are no videoframe greater than the given time
 	// the last key videoframe is returned
 	FLVVideoFrame* lastFrame = _videoFrames.back();
-	uint32_t numFrames = _videoFrames.size();
+	size_t numFrames = _videoFrames.size();
 	if (lastFrame->timestamp < time)
 	{
 		size_t lastFrameNum = numFrames -1;

@@ -228,7 +228,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
           case 'j':
               width_given = true;
               player.setWidth ( strtol(optarg, NULL, 0) );
-              log_msg (_("Setting width to %d"), player.getWidth());
+              log_msg (_("Setting width to " SIZET_FMT), player.getWidth());
               break;
           case 'g':
 #ifdef USE_DEBUGGER
@@ -243,7 +243,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
           case 'k':
               height_given = true;
               player.setHeight ( strtol(optarg, NULL, 0) );
-              log_msg (_("Setting height to %d"), player.getHeight());
+              log_msg (_("Setting height to " SIZET_FMT), player.getHeight());
               break;
           case 'x':
               called_by_plugin=true;
