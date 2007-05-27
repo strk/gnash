@@ -97,8 +97,7 @@
           type="http">http://xmlgraphics.apache.org/fop/</ulink>.
         </entry>
         <entry>
-          Texinfo is required if you wish to produce GNU info
-          pages.
+          FOP is required for PDF output.
         </entry>
         <entry>TODO<filename></filename></entry>
         <entry>TODO<filename></filename></entry>
