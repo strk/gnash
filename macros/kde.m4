@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: kde.m4,v 1.30 2007/05/26 18:17:32 bjacques Exp $
+dnl $Id: kde.m4,v 1.31 2007/05/27 18:30:42 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_KDE],
 [
@@ -176,7 +176,7 @@ AC_DEFUN([GNASH_PATH_QT],
   dnl QT stores it's headers in ../lib/qt-3.3/include for example, so use libslist
   dnl instead of incllist
   for i in $QTDIR $libslist $incllist; do
-    for j in `ls -dr $i/qt-[[0-9]].[[0-9]] 2>/dev/null`; do
+    for j in $QTDIR `ls -dr $i/qt-[[0-9]].[[0-9]] 2>/dev/null`; do
       if test -f $j/include/qobject.h; then
         gnash_qt_topdir=$j
         gnash_qt_version=`echo ${gnash_qt_topdir} | sed -e 's:qt-::'`

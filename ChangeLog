@@ -5,6 +5,10 @@
 	server/sprite_instance.h, server/vm/VM.h: Mark symbols which are
 	used across DSOs as DSOEXPORT. This allows compilation with
 	-fvisibility=hidden.
+	* macros/kde.m4: When detecting QT, also allow for the check for
+	the possibility that the QTDIR environment variable points to
+	the base QT directory, no strings attached (and no version
+	numbers required).
 
 2007-05-27 Ann Barcomb <ann@lulu.com>
 
