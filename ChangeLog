@@ -1,5 +1,6 @@
 2007-05-27 Ann Barcomb <ann@lulu.com>
 
+	* doc/C/usermanual/installation/install.xml: Placeholder file.
 	* doc/C/usermanual/installation.xml,
 	  doc/C/usermanual/installation/building.xml: Started a section on
 	  building Gnash.
