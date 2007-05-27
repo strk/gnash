@@ -1,3 +1,9 @@
+2007-05-27 Ann Barcomb <ann@lulu.com>
+
+	* doc/C/usermanual/installation.xml,
+	  doc/C/usermanual/installation/building.xml: Started a section on
+	  building Gnash.
+
 2007-05-26 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStreamGst.cpp: Don't allow play url to be changed,

@@ -15,31 +15,30 @@
     &sources;
         
     <sect3 id="codedepend">
-        &codedependencies;
+       &codedependencies;
     </sect3>
         
     <sect3 id="docdepend">
-        &docdependencies;
+       &docdependencies;
     </sect3>
 
     <sect3 id="testdepend">
-        &testdependencies;
+       &testdependencies;
     </sect3>
 
         
     <sect3 id="configure">
-        &configuration;
+      &configuration;
     </sect3>
     
-        <sect3 id="building">
-            <title>Building from Source</title>
-        </sect3>
+    <sect3 id="building">
+      &building; 
+    </sect3>
     
-        <sect3 id="install">
-            <title>Installation</title>
-        </sect3>
-    </sect2>
+    <sect3 id="install">
+      &install; 
+    </sect3>
+
+  </sect2>
 </sect1>
-
-
 

@@ -1,0 +1,70 @@
+<title>Building from Source</title>
+
+<para>
+  Once you have <link linkend="configure">configured</link> &app;,
+  you are ready to build the code.  &app; is built using
+  <emphasis>GNU make</emphasis>.
+</para>
+
+<sect3 id="compile">
+  <title>Compiling the Code</title>
+
+  <para>
+    The most basic way to compile code is simply:
+    <programlisting>
+  make
+    </programlisting>
+    If the compilation ends with an error, check the output of 
+    <emphasis>configure</emphasis> and ensure that you are not missing 
+    any required prerequisites.
+  </para>
+
+  <para>
+    The variables used by <emphasis>make</emphasis> can be redefined when
+    the program is invoked, if you desire it.   The most interesting flags
+    are <emphasis>CFLAGS</emphasis> and <emphasis>CXXFLAGS</emphasis>,
+    which are often used to enable debugging or turn of optimization.
+    The default value for both of these variables is
+    <emphasis>-O2 -g</emphasis>.  A list of influential 
+    environment variables can be seen in the configuration help:
+    <programlisting>
+  ./configure --help
+    </programlisting>
+    In the following example, debugging is enabled and optimization is
+    disabled:
+    <programlisting>
+  make CFLAGS=-g CXXFLAGS=-g
+    </programlisting>
+  </para>
+</sect3>
+
+<sect3 id="processdoc">
+  <title>Creating the Documentation</title>
+
+  <para>
+    By default, documentation isn't built, even when you
+    <link linkend="install">install</link> &app;.  This is because
+    there are a number of <link linkend="docdepend">dependencies 
+    for the documentation</link>.  Documentation is built when it
+    is specified with a specific target in the generated 
+    <emphasis>Makefile</emphasis> in the <filename>doc/C</filename>
+    sub-directory.  If you type <emphasis>make install</emphasis> in
+    this directory, all documents will be built.
+  </para>
+
+  <para>
+    You need to specify a target output format when you wish to create
+    documentation.  The available output formats are: <emphasis>html</emphasis>,
+    <emphasis>pdf</emphasis>, <emphasis>info</emphasis>, 
+    <emphasis>man</emphasis>, and <emphasis>alldocs</emphasis>.  
+    <emphasis>alldocs</emphasis> will build all of the other four output 
+    formats.  For example, to create HTML output, type:
+    <programlisting>
+  make html
+    </programlisting>
+  </para>
+
+  <para>TODO</para>
+</sect3>
+
+
