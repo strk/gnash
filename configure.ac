@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.322 2007/05/22 18:50:15 martinwguy Exp $
+dnl $Id: configure.ac,v 1.323 2007/05/27 23:41:48 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -95,6 +95,9 @@ AC_TRY_COMPILE([#include <sys/types.h>
 CXXFLAGS="$save_CXXFLAGS"
 AC_LANG_POP(C++)
 
+dnl This is primarily used when compiling for a similar architecture,
+dnl like pentium->geode, which can use the same compiler, but have
+dnl different development
 AC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval})
 
 AC_ARG_ENABLE(debugger,
@@ -109,6 +112,20 @@ if test x"$debugger" = x"yes"; then
   AC_DEFINE([USE_DEBUGGER], [], [Flash Debugger support])
 fi
 AM_CONDITIONAL(DEBUGGER, test x$debugger = xyes)
+
+AC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval})
+
+AC_ARG_WITH(cpu,
+  AC_HELP_STRING([--with-cpu],[specify a cpu when cross compiling.]),
+  [case "${withval}" in
+    geode) with_cpu=geode ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for --with-cpu option]) ;;
+   esac],with_cpu=none)
+
+if test x"$with_cpu" != x"none"; then
+dnl   $CXXFLAGS="$CXXFLAGS -march=${with_cpu}"
+   cross_compiling=yes
+fi
 
 AC_ARG_ENABLE(menus,
   AC_HELP_STRING([--disable-menus],[Disable the GUI menus]),

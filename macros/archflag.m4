@@ -68,8 +68,11 @@ AC_DEFUN([AX_GCC_ARCHFLAG],
 [AC_REQUIRE([AC_PROG_CC])
 AC_REQUIRE([AC_CANONICAL_HOST])
 
-AC_ARG_WITH(gcc-arch, [AC_HELP_STRING([--with-gcc-arch=<arch>], [use architecture <arch> for gcc -march/-mtune, instead of guessing])],
-        ax_gcc_arch=$withval, ax_gcc_arch=yes)
+if test x"${with_cpu}" != xnone ; then
+  ax_gcc_arch=${with_cpu}
+  ax_gcc_arch=yes
+  ax_cv_gcc_archflag="-march=${with_cpu}"
+fi
 
 AC_MSG_CHECKING([for gcc architecture flag])
 AC_MSG_RESULT([])
@@ -80,67 +83,67 @@ ax_cv_gcc_archflag="unknown"
 if test "$GCC" = yes; then
 
 if test "x$ax_gcc_arch" = xyes; then
-ax_gcc_arch=""
-if test "$cross_compiling" = no; then
-case $host_cpu in
-  i[[3456]]86*|x86_64*) # use cpuid codes, in part from x86info-1.7 by D. Jones
-     AX_GCC_X86_CPUID(0)
-     AX_GCC_X86_CPUID(1)
-     case $ax_cv_gcc_x86_cpuid_0 in
-       *:756e6547:*:*) # Intel
-          case $ax_cv_gcc_x86_cpuid_1 in
-            *5[[48]]?:*:*:*) ax_gcc_arch="pentium-mmx pentium" ;;
-            *5??:*:*:*) ax_gcc_arch=pentium ;;
-            *6[[3456]]?:*:*:*) ax_gcc_arch="pentium2 pentiumpro" ;;
-            *6a?:*[[01]]:*:*) ax_gcc_arch="pentium2 pentiumpro" ;;
-            *6a?:*[[234]]:*:*) ax_gcc_arch="pentium3 pentiumpro" ;;
-            *6[[9d]]?:*:*:*) ax_gcc_arch="pentium-m pentium3 pentiumpro" ;;
-            *6[[78b]]?:*:*:*) ax_gcc_arch="pentium3 pentiumpro" ;;
-            *6??:*:*:*) ax_gcc_arch=pentiumpro ;;
-            *f3[[347]]:*:*:*|*f4[1347]:*:*:*)
-                case $host_cpu in
-                  x86_64*) ax_gcc_arch="nocona pentium4 pentiumpro" ;;
-                  *) ax_gcc_arch="prescott pentium4 pentiumpro" ;;
+  ax_gcc_arch=""
+  if test "$cross_compiling" = no; then
+    case $host_cpu in
+      i[[3456]]86*|x86_64*) # use cpuid codes, in part from x86info-1.7 by D. Jones
+        AX_GCC_X86_CPUID(0)
+        AX_GCC_X86_CPUID(1)
+        case $ax_cv_gcc_x86_cpuid_0 in
+          *:756e6547:*:*) # Intel
+            case $ax_cv_gcc_x86_cpuid_1 in
+              *5[[48]]?:*:*:*) ax_gcc_arch="pentium-mmx pentium" ;;
+              *5??:*:*:*) ax_gcc_arch=pentium ;;
+              *6[[3456]]?:*:*:*) ax_gcc_arch="pentium2 pentiumpro" ;;
+              *6a?:*[[01]]:*:*) ax_gcc_arch="pentium2 pentiumpro" ;;
+              *6a?:*[[234]]:*:*) ax_gcc_arch="pentium3 pentiumpro" ;;
+              *6[[9d]]?:*:*:*) ax_gcc_arch="pentium-m pentium3 pentiumpro" ;;
+              *6[[78b]]?:*:*:*) ax_gcc_arch="pentium3 pentiumpro" ;;
+              *6??:*:*:*) ax_gcc_arch=pentiumpro ;;
+              *f3[[347]]:*:*:*|*f4[1347]:*:*:*)
+              case $host_cpu in
+                x86_64*) ax_gcc_arch="nocona pentium4 pentiumpro" ;;
+                *) ax_gcc_arch="prescott pentium4 pentiumpro" ;;
+              esac ;;
+              *f??:*:*:*) ax_gcc_arch="pentium4 pentiumpro";;
+            esac ;;
+          *:68747541:*:*|geode*) # AMD
+            case $ax_cv_gcc_x86_cpuid_1 in
+              *5[[67]]?:*:*:*) ax_gcc_arch=k6 ;;
+              *5[[8d]]?:*:*:*) ax_gcc_arch="k6-2 k6" ;;
+              *5[[9]]?:*:*:*) ax_gcc_arch="k6-3 k6" ;;
+              *60?:*:*:*) ax_gcc_arch=k7 ;;
+              *6[[12]]?:*:*:*) ax_gcc_arch="athlon k7" ;;
+              *6[[34]]?:*:*:*) ax_gcc_arch="athlon-tbird k7" ;;
+              *67?:*:*:*) ax_gcc_arch="athlon-4 athlon k7" ;;
+              *6[[68a]]?:*:*:*)
+                AX_GCC_X86_CPUID(0x80000006) # L2 cache size
+                case $ax_cv_gcc_x86_cpuid_0x80000006 in
+                  *:*:*[[1-9a-f]]??????:*) # (L2 = ecx >> 16) >= 256
+                     ax_gcc_arch="athlon-xp athlon-4 athlon k7" ;;
+                  *) ax_gcc_arch="athlon-4 athlon k7" ;;
                 esac ;;
-            *f??:*:*:*) ax_gcc_arch="pentium4 pentiumpro";;
-          esac ;;
-       *:68747541:*:*) # AMD
-          case $ax_cv_gcc_x86_cpuid_1 in
-            *5[[67]]?:*:*:*) ax_gcc_arch=k6 ;;
-            *5[[8d]]?:*:*:*) ax_gcc_arch="k6-2 k6" ;;
-            *5[[9]]?:*:*:*) ax_gcc_arch="k6-3 k6" ;;
-            *60?:*:*:*) ax_gcc_arch=k7 ;;
-            *6[[12]]?:*:*:*) ax_gcc_arch="athlon k7" ;;
-            *6[[34]]?:*:*:*) ax_gcc_arch="athlon-tbird k7" ;;
-            *67?:*:*:*) ax_gcc_arch="athlon-4 athlon k7" ;;
-            *6[[68a]]?:*:*:*)
-               AX_GCC_X86_CPUID(0x80000006) # L2 cache size
-               case $ax_cv_gcc_x86_cpuid_0x80000006 in
-                 *:*:*[[1-9a-f]]??????:*) # (L2 = ecx >> 16) >= 256
-                        ax_gcc_arch="athlon-xp athlon-4 athlon k7" ;;
-                 *) ax_gcc_arch="athlon-4 athlon k7" ;;
-               esac ;;
-            *f[[4cef8b]]?:*:*:*) ax_gcc_arch="athlon64 k8" ;;
-            *f5?:*:*:*) ax_gcc_arch="opteron k8" ;;
-            *f7?:*:*:*) ax_gcc_arch="athlon-fx opteron k8" ;;
-            *f??:*:*:*) ax_gcc_arch="k8" ;;
-          esac ;;
-        *:746e6543:*:*) # IDT
-           case $ax_cv_gcc_x86_cpuid_1 in
-             *54?:*:*:*) ax_gcc_arch=winchip-c6 ;;
-             *58?:*:*:*) ax_gcc_arch=winchip2 ;;
-             *6[[78]]?:*:*:*) ax_gcc_arch=c3 ;;
-             *69?:*:*:*) ax_gcc_arch="c3-2 c3" ;;
-           esac ;;
-     esac
-     if test x"$ax_gcc_arch" = x; then # fallback
-        case $host_cpu in
-          i586*) ax_gcc_arch=pentium ;;
-          i686*) ax_gcc_arch=pentiumpro ;;
-        esac
-     fi
+              *f[[4cef8b]]?:*:*:*) ax_gcc_arch="athlon64 k8" ;;
+              *f5?:*:*:*) ax_gcc_arch="opteron k8" ;;
+              *f7?:*:*:*) ax_gcc_arch="athlon-fx opteron k8" ;;
+              *f??:*:*:*) ax_gcc_arch="k8" ;;
+            esac ;;
+          *:746e6543:*:*) # IDT
+            case $ax_cv_gcc_x86_cpuid_1 in
+              *54?:*:*:*) ax_gcc_arch=winchip-c6 ;;
+              *58?:*:*:*) ax_gcc_arch=winchip2 ;;
+              *6[[78]]?:*:*:*) ax_gcc_arch=c3 ;;
+              *69?:*:*:*) ax_gcc_arch="c3-2 c3" ;;
+             esac ;;
+           esac
+        if test x"$ax_gcc_arch" = x; then # fallback
+          case $host_cpu in
+            i586*) ax_gcc_arch=pentium ;;
+            i686*) ax_gcc_arch=pentiumpro ;;
+         esac
+      fi
      ;;
-
+  
   sparc*)
      AC_PATH_PROG([PRTDIAG], [prtdiag], [prtdiag], [$PATH:/usr/platform/`uname -i`/sbin/:/usr/platform/`uname -m`/sbin/])
      cputype=`(((grep cpu /proc/cpuinfo | cut -d: -f2) ; ($PRTDIAG -v |grep -i sparc) ; grep -i cpu /var/run/dmesg.boot ) | head -n 1) 2> /dev/null`
