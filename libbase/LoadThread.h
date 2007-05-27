@@ -53,7 +53,7 @@
 /// @todo When we read from a real movie stream (rtmp) we might
 /// want to use a cirkular-buffer.
 
-class LoadThread
+class DSOEXPORT LoadThread
 {
 
 public:

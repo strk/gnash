@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.53 2007/05/18 06:05:38 zoulunkai Exp $ */
+/* $Id: movie_root.h,v 1.54 2007/05/27 14:22:04 bjacques Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -96,7 +96,7 @@ namespace gnash
 /// There is a *single* instance of this class for each run;
 /// loading external movies will *not* create a new instance of it.
 ///
-class movie_root 
+class DSOEXPORT movie_root 
 {
 
 public:

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: debugger.h,v 1.12 2007/04/25 06:58:56 martinwguy Exp $ */
+/* $Id: debugger.h,v 1.13 2007/05/27 14:22:04 bjacques Exp $ */
 
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
@@ -33,7 +33,7 @@
 namespace gnash 
 {
 
-class Debugger {
+class DSOEXPORT Debugger {
 public:
     Debugger();
     ~Debugger();

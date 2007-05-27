@@ -745,7 +745,7 @@ public:
 	typedef std::map<std::string, std::string> VariableMap;
 
 	/// Set all variables in the given map with their corresponding values
-	void setVariables(VariableMap& vars);
+	DSOEXPORT void setVariables(VariableMap& vars);
 
 private:
 

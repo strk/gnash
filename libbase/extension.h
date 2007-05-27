@@ -28,7 +28,7 @@
 namespace gnash 
 {  
   
-class Extension
+class DSOEXPORT Extension
 {
   public:
 //    typedef bool init_func_t (as_object &obj);

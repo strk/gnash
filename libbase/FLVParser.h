@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.9 2007/05/23 07:42:16 tgc Exp $
+// $Id: FLVParser.h,v 1.10 2007/05/27 14:22:03 bjacques Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -154,7 +154,7 @@ public:
 /// and fetching frames from there on, sequentially.
 /// See seek(), nextVideoFrame(), nextAudioFrame() and nextMediaFrame().
 ///
-class FLVParser
+class DSOEXPORT FLVParser
 {
 
 public:

@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderFfmpeg.h,v 1.1 2007/02/08 13:25:41 tgc Exp $
+// $Id: embedVideoDecoderFfmpeg.h,v 1.2 2007/05/27 14:22:03 bjacques Exp $
 
 #ifndef __EMBEDVIDEODECODERFFMPEG_H__
 #define __EMBEDVIDEODECODERFFMPEG_H__
@@ -32,7 +32,7 @@
 
 
 
-class embedVideoDecoderFfmpeg: public embedVideoDecoder {
+class DSOEXPORT embedVideoDecoderFfmpeg: public embedVideoDecoder {
 public:
 	embedVideoDecoderFfmpeg();
 	

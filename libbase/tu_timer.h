@@ -16,10 +16,10 @@ namespace tu_timer
 {
 	// General-purpose wall-clock timer.  May not be hi-res enough
 	// for profiling. Time Unit: millisecond
-	uint64_t get_ticks();
+	DSOEXPORT uint64_t get_ticks();
 
 	// Time Unit: second
-	double ticks_to_seconds(uint64_t ticks);
+	DSOEXPORT double ticks_to_seconds(uint64_t ticks);
 	
 	// Hi-res timer for CPU profiling.
 

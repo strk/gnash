@@ -56,7 +56,7 @@ namespace gnash {
 /// For the moment, it will be a singleton, providing one-time
 /// initialization.
 ///
-class VM {
+class DSOEXPORT VM {
 
 	/// Use VM::get() to access the singleton
 	VM(movie_definition& movie);
