@@ -1,3 +1,8 @@
+2007-05-27 Ann Barcomb <ann@lulu.com>
+
+	* devtools/testsuite/copyright_notices.t: Added a script to look
+	  for incorrect copyright notices.
+
 2007-05-27  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* macros/archflag.m4: Drop --with-gcc-arch, and use --with-cpu,
