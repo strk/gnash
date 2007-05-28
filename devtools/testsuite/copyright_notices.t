@@ -56,7 +56,7 @@ FILE: foreach my $path (@files) {
 
     ## Copyright notices should include the current year
     if ($entire_file !~ m|Copyright \(C\)[,\s\d]+$year|is) {
-        push @reason, "* Copyright does not extent to $year.";
+        push @reason, "* Copyright does not extend to $year.";
     }
 
     push @failures => "$path:\n\t". (join "\n\t", @reason) ."\n" if (@reason);
