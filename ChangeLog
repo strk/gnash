@@ -1,5 +1,6 @@
 2007-05-27 Ann Barcomb <ann@lulu.com>
 
+	* devtools/testsuite/copyright_notices.t: Minor code improvement
 	* many files: Add current year to all copyright notices which were
 	  lacking it.
 

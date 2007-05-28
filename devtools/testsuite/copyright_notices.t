@@ -27,13 +27,13 @@ FILE: foreach my $path (@files) {
     ## Read in the entire file, as some of the cleaning spans lines
     local $/ = undef;
     my $entire_file = <$fh>;
+    close $fh;
 
     my @reason;
 
     ## If there is no copyright notice, skip other checks
     if ($entire_file !~ m|This program is free software; you can|) {
         push @failures => "$path:\n\t* Copyright notice is missing.\n";
-        close $fh;
         next FILE;
     }
 
@@ -60,12 +60,13 @@ FILE: foreach my $path (@files) {
     }
 
     push @failures => "$path:\n\t". (join "\n\t", @reason) ."\n" if (@reason);
-    close $fh;
 }
 
 ok( !scalar(@failures), "Incorrect GNU copyright notice" )
     or diag("Incorrect GNU copyright notice found in ".
     scalar @failures." files:\n@failures");
+
+=pod
 
 =head1 NAME
 
