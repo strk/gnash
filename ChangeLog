@@ -1,3 +1,11 @@
+2007-05-28 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all: Makefile.am, key_event_test2.c, 
+	  key_event_test2runner.cpp: add tests for key listeners.
+	* server/sprite_instance.cpp: call "unload" for characters removed
+	  in ::resetDisplayList, partly fix the increasing key listeners
+	  problem when loop back.
+	
 2007-05-28 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/matrix_test.c: round numbers

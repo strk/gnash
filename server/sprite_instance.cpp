@@ -2512,7 +2512,8 @@ sprite_instance::resetDisplayList()
 		// actually updating the displaylist !
 		set_invalidated(); 
 
-		m_display_list = _frame0_chars;			
+		//m_display_list = _frame0_chars;	
+		m_display_list.clear_except(_frame0_chars, true); // call unload
 	};
 }
 
