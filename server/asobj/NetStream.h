@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.34 2007/05/28 14:26:04 strk Exp $ */
+/*  $Id: NetStream.h,v 1.35 2007/05/28 15:24:59 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -161,54 +161,113 @@ public:
 
 	virtual ~NetStream(){}
 
+	/// Closes the video session and frees all ressources used for decoding
+	/// except the FLV-parser (this might not be correct).
 	virtual void close(){}
 
+	/// Pauses/starts the playback of the media played by the current instance
+	//
+	/// @param mode
+	///	Defines what mode to put the instance in. 
+	/// -1 : toogle mode
+	/// 0 : switch to pause
+	/// 1 : switch to play
+	///
 	virtual void pause(int /*mode*/){}
 
+	/// Starts the playback of the media
+	//
+	/// @param source
+	///	Defines what file to play
+	///
+	/// @return 1 (true) on success, 0 (false) on failure
+	///
 	virtual int play(const std::string& /*source*/){ log_error(_("FFMPEG or Gstreamer is needed to play video")); return 0; }
 
+	/// Seek in the media played by the current instance
+	//
+	/// @param position
+	///	Defines in seconds where to seek to
+	///
 	virtual void seek(double /*pos*/){}
 
+	/// Tells where the playhead currently is
+	//
+	/// @return The time in seconds of the current playhead position
+	///
 	virtual int64_t time() { return 0; }
 
+	/// Prepare for the rendering of next SWF frame
 	virtual void advance(){}
 
+	/// Sets the NetConnection needed to access external files
+	//
+	/// @param netconnection
+	///
 	void setNetCon(boost::intrusive_ptr<NetConnection> nc)
 	{
 		_netCon = nc;
 	}
 
+	/// Sets the AS Enviroment needed for eventhandlers
+	//
+	/// @param enviroment
+	///
 	void setEnvironment(as_environment* env)
 	{
 		assert(env);
 		m_env = env;
 	}
 
+	/// Tells whether we're playing or not
+	//
+	/// @return true if playing, false if not.
+	///
 	inline bool playing()
 	{
 		return m_go;
 	}
 
 	/// Specifies how long to buffer data before starting to display the stream.
+	//
+	/// @param time
+	/// The time in seconds that should be buffered.
+	///
 	void setBufferTime(uint32_t time);
 
 	/// Returns what the buffer has been set to. (100 miliseconds is default)
+	//
+	/// @return The size of the buffer in seconds.
+	///
 	uint32_t bufferTime();
 
 	/// Returns the number of bytes loaded of the media file
+	//
+	/// @return the number of bytes loaded of the media file
+	///
 	long bytesLoaded();
 
 	/// Returns the total number of bytes (size) of the media file
+	//
+	/// @return the total number of bytes (size) of the media file
+	///
 	long bytesTotal();
 
 	/// Returns the number of second of the media file that is buffered and 
 	/// yet to be played
+	//
+	/// @return Returns the number of second of the media file that is 
+	/// buffered and yet to be played
 	long bufferLength();
 
 	/// Tells us if there is a new video frame ready
+	//
+	/// @return true if a frame is ready, false if not
 	bool newFrameReady();
 
-	/// Returns the newest video frame
+	/// Returns the video frame closest to current cursor. See time().
+	//
+	/// @return a image containing the video frame, NULL if none were ready
 	image::image_base* get_video();
 
 private:
