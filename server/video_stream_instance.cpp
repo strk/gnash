@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.24 2007/05/28 13:26:35 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.25 2007/05/28 16:05:57 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -88,14 +88,11 @@ video_stream_instance::display()
 	{
 		boost::intrusive_ptr<NetStream> nso = _ns;
 
-		if (nso->playing())
+		image::image_base* i = nso->get_video();
+		if (i)
 		{
-			image::image_base* i = nso->get_video();
-			if (i)
-			{
-				gnash::render::drawVideoFrame(i, &m, &bounds);
-				delete i;
-			}
+			gnash::render::drawVideoFrame(i, &m, &bounds);
+			delete i;
 		}
 
 	// If this is a video from a VideoFrame tag, retrieve a video frame from there.

@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.36 2007/05/28 15:40:03 ann Exp $ */
+/*  $Id: NetStream.h,v 1.37 2007/05/28 16:05:57 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -218,15 +218,6 @@ public:
 	{
 		assert(env);
 		m_env = env;
-	}
-
-	/// Tells whether we're playing or not
-	//
-	/// @return true if playing, false if not.
-	///
-	inline bool playing()
-	{
-		return m_go;
 	}
 
 	/// Specifies how long to buffer data before starting to display the stream.

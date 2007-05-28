@@ -1,4 +1,11 @@
-2007-05-27 Ann Barcomb <ann@lulu.com>
+2007-05-28 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStream.h: drop playing() method (unclear
+	  and unnecessary).
+	* server/video_stream_instance.cpp (display): stop
+	  calling NetStream::playing().
+
+2007-05-28 Ann Barcomb <ann@lulu.com>
 
 	* many files: Add a paragraph break before the line 'You should
 	  have received...' in the copyright notice.
