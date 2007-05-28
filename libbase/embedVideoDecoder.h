@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 //
 
-//  $Id: embedVideoDecoder.h,v 1.4 2007/02/25 16:41:29 nihilus Exp $
+//  $Id: embedVideoDecoder.h,v 1.5 2007/05/28 14:59:29 ann Exp $
 
 #ifndef __EMBEDVIDEODECODER_H__
 #define __EMBEDVIDEODECODER_H__

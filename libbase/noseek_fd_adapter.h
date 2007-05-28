@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: noseek_fd_adapter.h,v 1.3 2006/10/29 18:34:11 rsavoye Exp $ */
+/* $Id: noseek_fd_adapter.h,v 1.4 2007/05/28 14:59:29 ann Exp $ */
 
 #ifndef STDIN_ADAPTER_H
 #define STDIN_ADAPTER_H

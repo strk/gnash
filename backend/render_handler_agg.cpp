@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.80 2007/05/09 09:54:44 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.81 2007/05/28 14:59:25 ann Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)

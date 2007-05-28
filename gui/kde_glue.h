@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 
 
-/* $Id: kde_glue.h,v 1.9 2007/04/13 09:15:54 bjacques Exp $ */
+/* $Id: kde_glue.h,v 1.10 2007/05/28 14:59:27 ann Exp $ */
 
 #include "gnash.h"
 

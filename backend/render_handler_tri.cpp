@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.11 2007/01/09 23:30:37 strk Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.12 2007/05/28 14:59:25 ann Exp $ */
 
 #include "render_handler_tri.h"
 

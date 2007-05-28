@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: impl.h,v 1.43 2007/04/11 14:20:20 strk Exp $ */
+/* $Id: impl.h,v 1.44 2007/05/28 14:59:33 ann Exp $ */
 
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H

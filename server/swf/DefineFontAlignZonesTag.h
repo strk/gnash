@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: DefineFontAlignZonesTag.h,v 1.2 2007/05/23 21:55:05 strk Exp $ */
+/* $Id: DefineFontAlignZonesTag.h,v 1.3 2007/05/28 14:59:37 ann Exp $ */
 
 #ifndef GNASH_SWF_DEFINEFONTALIGNZONESTAG_H
 #define GNASH_SWF_DEFINEFONTALIGNZONESTAG_H

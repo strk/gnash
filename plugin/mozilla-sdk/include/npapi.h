@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 
 
 /*
- *  npapi.h $Revision: 1.4 $
+ *  npapi.h $Revision: 1.5 $
  *  Netscape client plug-in API spec
  */
 

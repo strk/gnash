@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 //
 
 
-/* $Id: Range2d.h,v 1.14 2007/04/24 12:01:54 udog Exp $ */
+/* $Id: Range2d.h,v 1.15 2007/05/28 14:59:30 ann Exp $ */
 
 #ifndef GNASH_RANGE2D_H
 #define GNASH_RANGE2D_H

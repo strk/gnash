@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: gtk_glue_gtkglext.h,v 1.8 2007/04/25 12:36:44 martinwguy Exp $ */
+/* $Id: gtk_glue_gtkglext.h,v 1.9 2007/05/28 14:59:27 ann Exp $ */
 
 #include "gtk_glue.h"
 

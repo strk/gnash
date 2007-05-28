@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: textformat.h,v 1.16 2007/04/13 07:35:56 bjacques Exp $
+// $Id: textformat.h,v 1.17 2007/05/28 14:59:33 ann Exp $
 //
 
 #ifndef __TEXTFORMAT_H__

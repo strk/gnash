@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: character_def.cpp,v 1.3 2006/10/29 18:34:15 rsavoye Exp $ */
+/* $Id: character_def.cpp,v 1.4 2007/05/28 14:59:36 ann Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.h,v 1.8 2006/12/02 21:03:50 strk Exp $ */
+/* $Id: render_handler_tri.h,v 1.9 2007/05/28 14:59:25 ann Exp $ */
 
 #ifndef GNASH_RENDER_HANDLER_TRI_H
 #define GNASH_RENDER_HANDLER_TRI_H

@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: netstats.cpp,v 1.4 2007/04/27 07:49:36 strk Exp $ */
+/* $Id: netstats.cpp,v 1.5 2007/05/28 14:59:26 ann Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

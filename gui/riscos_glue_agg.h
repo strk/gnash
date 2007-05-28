@@ -1,5 +1,5 @@
 //
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 //
 //
 
-/* $Id: riscos_glue_agg.h,v 1.2 2006/11/28 12:34:47 nihilus Exp $ */
+/* $Id: riscos_glue_agg.h,v 1.3 2007/05/28 14:59:28 ann Exp $ */
 
 #include "riscos_glue.h"
 

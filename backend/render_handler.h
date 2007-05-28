@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.38 2007/05/03 10:43:57 strk Exp $ */
+/* $Id: render_handler.h,v 1.39 2007/05/28 14:59:25 ann Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H

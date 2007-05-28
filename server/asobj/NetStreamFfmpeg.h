@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.30 2007/05/25 09:37:59 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.31 2007/05/28 14:59:35 ann Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__

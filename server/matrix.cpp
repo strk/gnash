@@ -1,5 +1,5 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.13 2007/04/18 12:39:18 strk Exp $ 
+// $Id: matrix.cpp,v 1.14 2007/05/28 14:59:33 ann Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
