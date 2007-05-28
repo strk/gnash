@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.29 2007/05/04 21:40:50 strk Exp $ */
+/* $Id: NetConnection.h,v 1.30 2007/05/28 14:31:29 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -47,6 +47,10 @@ namespace gnash {
 
 namespace gnash {
 
+/// NetConnection ActionScript class
+//
+/// Provides interfaces to load data from an URL
+///
 class NetConnection: public as_object {
 public:
 
