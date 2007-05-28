@@ -1,5 +1,7 @@
 2007-05-28 Sandro Santilli <strk@keybit.net>
 
+	* server/video_stream_instance.{cpp,h}: add brief class description,
+	  drop unused member.
 	* testsuite/misc-ming.all/matrix_test.c: Really round numbers, don't
 	  just truncate them up to 2nd decimal position.
 

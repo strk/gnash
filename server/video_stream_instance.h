@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.12 2007/05/24 13:01:46 strk Exp $
+// $Id: video_stream_instance.h,v 1.13 2007/05/28 13:26:36 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -32,6 +32,12 @@ namespace gnash {
 
 namespace gnash {
 
+/// VideoStream ActionScript object
+//
+/// A VideoStream provides audio/video frames either
+/// embedded into the SWF itself or loaded from the
+/// network using an associated NetStream object.
+///
 class video_stream_instance : public character
 {
 
@@ -39,11 +45,6 @@ public:
 
 	video_stream_definition*	m_def;
 	
-	// m_video_source - A Camera object that is capturing video data or a NetStream object.
-	// To drop the connection to the Video object, pass null for source.
-	// FIXME: don't use as_object, but a more meaningful type
-	as_object* m_video_source;
-
 	video_stream_instance(video_stream_definition* def,
 			character* parent, int id);
 
@@ -69,6 +70,11 @@ public:
 	void setStream(boost::intrusive_ptr<NetStream> ns);
 
 private:
+
+	// m_video_source - A Camera object that is capturing video data or a NetStream object.
+	// To drop the connection to the Video object, pass null for source.
+	// FIXME: don't use as_object, but a more meaningful type
+	//as_object* m_video_source;
 
 	// Who owns this ? Should it be an intrusive ptr ?
 	boost::intrusive_ptr<NetStream> _ns;

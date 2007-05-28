@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.23 2007/05/04 12:16:07 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.24 2007/05/28 13:26:35 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -65,7 +65,7 @@ video_stream_instance::video_stream_instance(video_stream_definition* def,
 	:
 	character(parent, id),
 	m_def(def),
-	m_video_source(NULL),
+	//m_video_source(NULL),
 	_ns(NULL),
 	m_decoder(m_def->get_decoder()) // should abort if m_def is null
 {
