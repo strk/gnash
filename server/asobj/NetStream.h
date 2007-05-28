@@ -18,7 +18,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.33 2007/05/16 18:22:32 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.34 2007/05/28 14:26:04 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -44,6 +44,11 @@ namespace gnash {
 namespace gnash {
   
 
+/// NetStream ActionScript class
+//
+/// This class is responsible for handlign external
+/// media files. Provides interfaces for playback control.
+///
 class NetStream : public as_object {
 
 protected:
