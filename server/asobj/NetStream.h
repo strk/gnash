@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.37 2007/05/28 16:05:57 strk Exp $ */
+/*  $Id: NetStream.h,v 1.38 2007/05/28 16:19:03 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -139,7 +139,7 @@ protected:
 	std::string url;
 
 	// The homegrown parser we use for FLV
-	FLVParser* m_parser;
+	std::auto_ptr<FLVParser> m_parser;
 
 	// Are we playing a FLV?
 	bool m_isFLV;

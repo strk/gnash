@@ -1,5 +1,13 @@
 2007-05-28 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: NetStream.{cpp,h},
+	  NetStreamFfmpeg.cpp, NetStreamGst.cpp:
+	  Encode FLVParser ownership by using an auto_ptr;
+	  cleanup startPlayback method in FFMPEG implementation
+	  removing the "this" alias.
+
+2007-05-28 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStream.h: drop playing() method (unclear
 	  and unnecessary).
 	* server/video_stream_instance.cpp (display): stop

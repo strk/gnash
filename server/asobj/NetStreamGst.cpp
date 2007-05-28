@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.48 2007/05/26 20:25:12 tgc Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.49 2007/05/28 16:19:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -98,7 +98,7 @@ NetStreamGst::NetStreamGst():
 NetStreamGst::~NetStreamGst()
 {
 	close();
-	delete m_parser;
+	//delete m_parser;
 }
 
 void NetStreamGst::pause(int mode)
@@ -758,12 +758,13 @@ NetStreamGst::startPlayback()
 	nc->seek(0);
 	if (head[0] == 'F' && head[1] == 'L' && head[2] == 'V') { 
 		m_isFLV = true;
-		if (!m_parser) {
-			m_parser = new FLVParser(); // TODO: define ownership, use auto_ptr !
-			if (!nc->connectParser(*(m_parser))) {
+		if (!m_parser.get()) {
+			m_parser.reset(new FLVParser()); // TODO: define ownership, use auto_ptr !
+			if (!nc->connectParser(*m_parser)) {
 				setStatus(streamNotFound);
 				log_error(_("Gnash could not open FLV movie: %s"), url.c_str());
-				delete m_parser;
+				m_parser.reset(); // release memory associated with the parser
+				//delete m_parser;
 				return;
 			}
 		}
@@ -955,7 +956,7 @@ void
 NetStreamGst::seek(double pos)
 {
 	if (!pipeline) {
-		if (m_parser)  {
+		if (m_parser.get())  {
 			uint32_t newpos = m_parser->seek(static_cast<uint32_t>(pos*1000));
 			m_clock_offset = 0;
 		}
@@ -963,6 +964,7 @@ NetStreamGst::seek(double pos)
 	}
 
 	if (m_isFLV) {
+		assert(m_parser.get()); // why assumed here and not above ?
 		uint32_t newpos = m_parser->seek(static_cast<uint32_t>(pos*1000));
 		GstClock* clock = GST_ELEMENT_CLOCK(pipeline);
 		uint64_t currenttime = gst_clock_get_time (clock);
@@ -992,7 +994,7 @@ NetStreamGst::advance()
 	//    miliseconds).
 	// 2) The buffer has be "starved" (not being filled as quickly as needed),
 	//    and we then wait until the buffer contains some data (1 sec) again.
-	if (m_isFLV && m_pause && m_go && m_start_onbuffer && m_parser && m_parser->isTimeLoaded(m_bufferTime))
+	if (m_isFLV && m_pause && m_go && m_start_onbuffer && m_parser.get() && m_parser->isTimeLoaded(m_bufferTime))
 	{
 		if ( ! playPipeline() )
 		{

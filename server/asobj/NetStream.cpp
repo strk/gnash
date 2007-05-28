@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.49 2007/05/19 21:45:03 nihilus Exp $ */
+/* $Id: NetStream.cpp,v 1.50 2007/05/28 16:19:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -522,7 +522,7 @@ NetStream::bytesTotal()
 long
 NetStream::bufferLength()
 {
-	if (m_parser == NULL) return 0;
+	if (m_parser.get() == NULL) return 0;
 	return m_parser->getBufferLength();
 }
 
