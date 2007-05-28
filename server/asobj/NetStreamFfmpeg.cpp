@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.57 2007/05/28 15:19:19 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.58 2007/05/28 15:22:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -690,7 +690,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 // audio callback is running in sound handler thread
 bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 {
-	GNASH_DEBUG_FUNCTION;
+	GNASH_REPORT_FUNCTION;
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(owner);
 
