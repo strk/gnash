@@ -10,11 +10,12 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.30 2007/05/28 14:31:29 strk Exp $ */
+/* $Id: NetConnection.h,v 1.31 2007/05/28 15:41:08 ann Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__

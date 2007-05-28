@@ -10,13 +10,13 @@
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
+// 
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Math.cpp,v 1.21 2007/04/02 10:42:21 bjacques Exp $ */
+/* $Id: Math.cpp,v 1.22 2007/05/28 15:41:07 ann Exp $ */
 
 //
 // This file implements methods of the ActionScript Math class.
