@@ -1,3 +1,8 @@
+2007-05-28 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/matrix_test.c: round numbers
+	  to 1/100 to reduce floating number based errors.
+
 2007-05-27 Ann Barcomb <ann@lulu.com>
 
 	* devtools/testsuite/copyright_notices.t: Added a script to look

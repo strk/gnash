@@ -90,7 +90,7 @@ main(int argc, char** argv)
 	dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
 	SWFMovie_add(mo, (SWFBlock)dejagnuclip);
 
-	add_actions(mo, "printBounds = function(b) { return ''+b.xMin+','+b.yMin+' '+b.xMax+','+b.yMax; };");
+	add_actions(mo, "printBounds = function(b) { return ''+parseInt(b.xMin*100)/100+','+parseInt(b.yMin*100)/100+' '+parseInt(b.xMax*100)/100+','+parseInt(b.yMax*100)/100; };");
 
 	SWFMovie_nextFrame(mo); 
 
