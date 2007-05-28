@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.56 2007/05/26 13:57:09 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.57 2007/05/28 15:19:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -600,13 +600,25 @@ rgbcopy(image::rgb* dst, raw_mediadata_t* src, int width)
 // decoder thread
 void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
+	GNASH_REPORT_FUNCTION;
 
 	// This should only happen if close() is called before this thread is ready
-	if (!ns->m_go) return;
+	if (!ns->m_go)
+	{
+		log_debug("av_streamer: !ns->m_go, returning");
+		return;
+	}
 
-	if (!ns->m_ACodecCtx && !ns->m_VCodecCtx && !ns->m_FormatCtx) {
-		if (!ns->startPlayback()) return;
-	} else {
+	if (!ns->m_ACodecCtx && !ns->m_VCodecCtx && !ns->m_FormatCtx)
+	{
+		if (!ns->startPlayback())
+		{
+			log_debug("av_streamer: !ns->startPlayback, returning");
+			return;
+		}
+	}
+	else
+	{
 		// We need to restart the audio
 		sound_handler* s = get_sound_handler();
 		if (s) {
@@ -629,16 +641,24 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 	// Loop while we're playing
 	while (ns->m_go)
 	{
+		log_debug("Decoding iteration");
+
 		if (ns->m_isFLV) {
 			// If queues are full then don't bother filling it
 			if (ns->m_qvideo.size() < 20 || ns->m_qvideo.size() < 20) {
 
 				// If we have problems with decoding - break
-				if (!ns->decodeFLVFrame() && ns->m_start_onbuffer == false && ns->m_qvideo.size() == 0 && ns->m_qaudio.size() == 0) break;
+				if (!ns->decodeFLVFrame() && ns->m_start_onbuffer == false && ns->m_qvideo.size() == 0 && ns->m_qaudio.size() == 0)
+				{
+					break;
+				}
 			}
 
-			if (ns->m_pause || (ns->m_qvideo.size() > 10 && ns->m_qaudio.size() > 10)) { 
+			if (ns->m_pause || (ns->m_qvideo.size() > 10 && ns->m_qaudio.size() > 10))
+			{ 
+				log_debug("Waiting on lock..");
 				ns->decode_wait.wait(lock);
+				log_debug("Finished waiting.");
 			}
 		} else {
 
@@ -650,19 +670,28 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 
 			// If paused, wait for being unpaused, or
 			// if the queue is full we wait until someone notifies us that data is needed.
-			if (ns->m_pause || ((ns->m_qvideo.size() > 0 && ns->m_qaudio.size() > 0) && ns->m_unqueued_data)) { 
+			if (ns->m_pause || ((ns->m_qvideo.size() > 0 && ns->m_qaudio.size() > 0) && ns->m_unqueued_data))
+			{ 
+				log_debug("Waiting on lock..");
 				ns->decode_wait.wait(lock);
+				log_debug("Finished waiting.");
 			}
 		}
 
 	}
+
+	log_debug("Out of decoding loop");
 	ns->m_go = false;
+
+	log_debug("Setting playStop status");
 	ns->setStatus(playStop);
 }
 
 // audio callback is running in sound handler thread
 bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 {
+	GNASH_DEBUG_FUNCTION;
+
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(owner);
 
 	boost::mutex::scoped_lock  lock(ns->decoding_mutex);
