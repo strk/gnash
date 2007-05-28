@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.59 2007/05/28 16:19:03 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.60 2007/05/28 19:27:19 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -206,7 +206,7 @@ NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
 	return ns->inputPos;
 }
 
-int
+void
 NetStreamFfmpeg::play(const std::string& c_url)
 {
 
@@ -214,7 +214,7 @@ NetStreamFfmpeg::play(const std::string& c_url)
 	if (m_go)
 	{
 		if (m_pause) unpauseDecoding();
-		return 0;
+		return;
 	}
 
 	// Does it have an associated NetConnection ?
@@ -223,7 +223,7 @@ NetStreamFfmpeg::play(const std::string& c_url)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("No NetConnection associated with this NetStream, won't play"));
 		);
-		return 0;
+		return;
 	}
 
 	if (url.size() == 0) url += c_url;
@@ -238,7 +238,7 @@ NetStreamFfmpeg::play(const std::string& c_url)
 	// This starts the decoding thread
 	_decodeThread = new boost::thread(boost::bind(NetStreamFfmpeg::av_streamer, this)); 
 
-	return 0;
+	return;
 }
 
 /// Finds a decoder, allocates a context and initializes it.

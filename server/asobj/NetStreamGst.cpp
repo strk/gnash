@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.49 2007/05/28 16:19:04 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.50 2007/05/28 19:27:20 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -180,7 +180,7 @@ void NetStreamGst::close()
 }
 
 
-int
+void
 NetStreamGst::play(const std::string& c_url)
 {
 
@@ -190,7 +190,7 @@ NetStreamGst::play(const std::string& c_url)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("No NetConnection associated with this NetStream, won't play"));
 		);
-		return 0;
+		return;
 	}
 
 	// Is it already playing ?
@@ -200,7 +200,7 @@ NetStreamGst::play(const std::string& c_url)
 		{
 			playPipeline();
 		}
-		return 0;
+		return;
 	}
 
 	if (url.size() == 0) url += c_url;
@@ -216,7 +216,7 @@ NetStreamGst::play(const std::string& c_url)
 #else
 	startPlayback(this);
 #endif
-	return 0;
+	return;
 }
 
 
@@ -957,7 +957,7 @@ NetStreamGst::seek(double pos)
 {
 	if (!pipeline) {
 		if (m_parser.get())  {
-			uint32_t newpos = m_parser->seek(static_cast<uint32_t>(pos*1000));
+			m_parser->seek(static_cast<uint32_t>(pos*1000));
 			m_clock_offset = 0;
 		}
 		return;

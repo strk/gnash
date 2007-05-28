@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.50 2007/05/28 16:19:03 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.51 2007/05/28 19:27:19 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -148,10 +148,8 @@ static as_value netstream_play(const fn_call& fn)
 		return as_value();
 	}
 
-	if (ns->play(fn.arg(0).to_string(&fn.env())) != 0)
-	{
-		ns->close();
-	};
+	ns->play(fn.arg(0).to_string(&fn.env()));
+
 	return as_value();
 }
 

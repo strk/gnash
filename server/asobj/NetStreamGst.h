@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamGst.h,v 1.25 2007/05/28 15:41:08 ann Exp $ */
+/* $Id: NetStreamGst.h,v 1.26 2007/05/28 19:27:20 tgc Exp $ */
 
 #ifndef __NETSTREAMGST_H__
 #define __NETSTREAMGST_H__
@@ -52,7 +52,7 @@ public:
 	~NetStreamGst();
 	void close();
 	void pause(int mode);
-	int play(const std::string& source);
+	void play(const std::string& source);
 	void seek(double pos);
 	int64_t time();
 	void advance();

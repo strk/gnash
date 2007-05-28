@@ -1,3 +1,8 @@
+2007-05-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStream*.{cpp,h}: Updated a comment and made play()
+	  return void to be closer to defined behavoir.
+
 2007-05-28 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/: NetStream.{cpp,h},

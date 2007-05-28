@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.38 2007/05/28 16:19:03 strk Exp $ */
+/*  $Id: NetStream.h,v 1.39 2007/05/28 19:27:19 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -181,9 +181,7 @@ public:
 	/// @param source
 	///	Defines what file to play
 	///
-	/// @return 1 (true) on success, 0 (false) on failure
-	///
-	virtual int play(const std::string& /*source*/){ log_error(_("FFMPEG or Gstreamer is needed to play video")); return 0; }
+	virtual void play(const std::string& /*source*/){ log_error(_("FFMPEG or Gstreamer is needed to play video")); }
 
 	/// Seek in the media played by the current instance
 	//
@@ -198,7 +196,9 @@ public:
 	///
 	virtual int64_t time() { return 0; }
 
-	/// Prepare for the rendering of next SWF frame
+	/// Called at the SWF framerate. Used to process queued status messages
+	/// and (re)start after a buffering pause. In NetStreamFfmpeg it is also
+	/// used to find the next video frame to be shown, though this might change.
 	virtual void advance(){}
 
 	/// Sets the NetConnection needed to access external files
