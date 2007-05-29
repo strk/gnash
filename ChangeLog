@@ -1,5 +1,11 @@
 2007-05-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/rtmp.as: remove any
+	  trace of "rtmp" from the code to show that bug #19886
+	  is unrelated to RTMP.
+
+2007-05-29 Sandro Santilli <strk@keybit.net>
+
 	* backend/sound_handler.h: add numSoundsStarted() and
 	  numSoundsStopped() methods to be used in testing, and
 	  associated protected counts.
