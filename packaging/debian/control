@@ -1,7 +1,7 @@
 Source: gnash
 Priority: optional
 Maintainer: Miriam Ruiz <little_miry@yahoo.es>
-Build-Depends: debhelper (>= 4.0.0), autoconf, automake, libxmu-dev, dejagnu, autotools-dev, libxml2-dev, libjpeg-dev, libpng-dev, libsdl1.2-dev, libsdl-mixer1.2-dev, libgl1-mesa-dev | xlibmesa-gl-dev, libglu1-mesa-dev | libglu1-xorg-dev, libmad0-dev, mozilla-dev
+Build-Depends: debhelper (>= 4.0.0), autoconf, automake, libxmu-dev, dejagnu, autotools-dev, libxml2-dev, libjpeg-dev, libpng-dev, libsdl1.2-dev, libsdl-mixer1.2-dev, libgl1-mesa-dev | xlibmesa-gl-dev, libglu1-mesa-dev | libglu1-xorg-dev, libgtkglextext1-dev, libmad0-dev, mozilla-dev
 Standards-Version: 3.6.2
 Section: utils
 

@@ -41,6 +41,7 @@
 2007-05-29 Martin Guy <martinwguy@yahoo.it>
 
 	* server/asobj/NetStreamFfmpeg.cpp: Fix sign/unsign compiler warning
+	* packaging/debian/control: Add missing build dependency for opengl-gtk
 
 2007-05-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
