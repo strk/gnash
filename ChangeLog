@@ -1,5 +1,11 @@
 2007-05-29 Zou Lunkai <zoulunkai@gmail.com>
 
+	* testsuite/misc-ming.all: Makefile.am, key_event_test3.c, 
+	  key_event_test3runner.cpp: new testcase for key listeners.
+
+	
+2007-05-29 Zou Lunkai <zoulunkai@gmail.com>
+
 	* testsuite/misc-ming.all/key_event_test2runner.cpp: remove obsolete comments
 	  
 2007-05-29 Zou Lunkai <zoulunkai@gmail.com>
