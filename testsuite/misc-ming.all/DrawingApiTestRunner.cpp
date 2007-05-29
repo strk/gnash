@@ -118,15 +118,10 @@ main(int /*argc*/, char** /*argv*/)
 	// Over the black "hairlined" line
 	tester.movePointerTo(250, 180);
 	check(tester.isMouseOverMouseEntity());
-	// The line used to be rendered at Y=180.
-	// After pixel hinting was touched (see bug #19775)
-	// it moved to Y=179. Since isMouseOverMouseEntity()
-	// would return false for 250,180 we're going to
-	// tolerate the drift of one pixel for the line.
-	// This will accept both 179 and 180 as valid positions
-	// for the line. In the future we might add test for 
-	// exact placement using a more focused testcase.
-	// See bug #19828 for more info about this change.
+	// pixel at 250,180 is black
+	check_pixel(250, 180, 1, black, 2);
+	// pixels above and below 180 is white, so 
+	// we get gray with a radius of 2
 	check_pixel(250, 180, 2, gray, 2);
 
 	// Over the transparent line (150,100)

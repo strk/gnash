@@ -1,3 +1,8 @@
+2007-05-29 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: reintruduce
+	  the pixel-accurate test after Udo fix for #19828.
+
 2007-05-29 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: Fix coordinate translation and  
