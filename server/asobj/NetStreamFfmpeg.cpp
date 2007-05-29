@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.65 2007/05/29 16:43:43 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.66 2007/05/29 21:38:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -81,8 +81,6 @@ NetStreamFfmpeg::~NetStreamFfmpeg()
 
 void NetStreamFfmpeg::pause(int mode)
 {
-	boost::mutex::scoped_lock lock(decoding_mutex);
-
 	if (mode == -1)
 	{
 		if (m_pause) unpauseDecoding();
@@ -103,10 +101,6 @@ void NetStreamFfmpeg::pause(int mode)
 
 void NetStreamFfmpeg::close()
 {
-
-	log_debug("Thread %d locking on ::close", pthread_self());
-	boost::mutex::scoped_lock lock(decoding_mutex);
-	log_debug(" obtained (close)");
 
 	if (m_go)
 	{
@@ -212,9 +206,6 @@ NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
 void
 NetStreamFfmpeg::play(const std::string& c_url)
 {
-	log_debug("Thread %d locking on ::play", pthread_self());
-	boost::mutex::scoped_lock  lock(decoding_mutex);
-	log_debug(" obtained (play)");
 
 	// Is it already playing ?
 	if (m_go)

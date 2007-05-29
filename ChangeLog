@@ -1,5 +1,8 @@
 2007-05-29 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: Don't lock the mutex
+	  in pause(), play() and close(), all intended to be called
+	  by the locking advance(). More dox about locking in the header.
 	* testsuite/actionscript.all/rtmp.as: remove any
 	  trace of "rtmp" from the code to show that bug #19886
 	  is unrelated to RTMP.

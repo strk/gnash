@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.35 2007/05/29 11:01:41 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.36 2007/05/29 21:38:35 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -181,12 +181,22 @@ public:
 	~NetStreamFfmpeg();
 
 	// Locks decoding_mutex
+	//
+	/// does NOT lock decoding_mutex, intended to be called
+	/// by ::advance which locks and by destructor (locking in destructor might be needed)
+	///
 	void close();
 
 	/// Locks decoding_mutex
+	//
+	/// does NOT lock decoding_mutex, intended to be only called
+	/// by ::advance, itself locking.
+	///
 	void pause(int mode);
 
-	/// Locks decoding_mutex
+	/// does NOT lock decoding_mutex, intended to be only called
+	/// by ::advance, itself locking.
+	///
 	void play(const std::string& source);
 
 	/// Locks decoding_mutex
@@ -224,13 +234,19 @@ private:
 
 	// Pauses the decoding - don't directly modify m_pause!!
 	//
-	// does NOT lock decoding_mutex, use ::pause() for that
+	// does NOT lock decoding_mutex. Users:
+	// 	- ::decodeFLVFrame() not locking  byt called by av_streamer which locks
+	// 	- ::pause() not locking but called by ::advance
+	// 	- ::play() not locking but called by ::advance which locks
 	//
 	void pauseDecoding();
 
 	// Unpauses/resumes the decoding - don't directly modify m_pause!!
 	//
-	// does NOT lock decoding_mutex, used by ::av_streamer() which locks
+	// does NOT lock decoding_mutex. Users:
+	// 	- ::av_streamer() which locks
+	// 	- ::play() not locking but called by ::advance which locks
+	// 	- ::startPlayback() not locking but called by ::av_streamer
 	//
 	void unpauseDecoding();
 
