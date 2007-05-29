@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.61 2007/05/29 01:10:48 martinwguy Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.62 2007/05/29 11:01:40 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -81,6 +81,8 @@ NetStreamFfmpeg::~NetStreamFfmpeg()
 
 void NetStreamFfmpeg::pause(int mode)
 {
+	boost::mutex::scoped_lock lock(decoding_mutex);
+
 	if (mode == -1)
 	{
 		if (m_pause) unpauseDecoding();
@@ -102,6 +104,8 @@ void NetStreamFfmpeg::pause(int mode)
 void NetStreamFfmpeg::close()
 {
 
+	boost::mutex::scoped_lock lock(decoding_mutex);
+
 	if (m_go)
 	{
 		// terminate thread
@@ -122,9 +126,6 @@ void NetStreamFfmpeg::close()
 	{
 		s->detach_aux_streamer((void*) NULL);
 	}
-
-	// Make sure al decoding has stopped
-	boost::mutex::scoped_lock lock(decoding_mutex);
 
 	if (m_Frame) av_free(m_Frame);
 	m_Frame = NULL;
@@ -209,6 +210,7 @@ NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
 void
 NetStreamFfmpeg::play(const std::string& c_url)
 {
+	boost::mutex::scoped_lock  lock(decoding_mutex);
 
 	// Is it already playing ?
 	if (m_go)
@@ -599,6 +601,8 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
 	GNASH_REPORT_FUNCTION;
 
+	boost::mutex::scoped_lock lock(ns->decoding_mutex);
+
 	// This should only happen if close() is called before this thread is ready
 	if (!ns->m_go)
 	{
@@ -632,8 +636,6 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 	ns->m_start_clock = tu_timer::ticks_to_seconds(tu_timer::get_ticks());
 
 	ns->m_unqueued_data = NULL;
-
-	boost::mutex::scoped_lock lock(ns->decode_wait_mutex);
 
 	// Loop while we're playing
 	while (ns->m_go)
@@ -1160,6 +1162,9 @@ NetStreamFfmpeg::refreshVideoFrame()
 void
 NetStreamFfmpeg::advance()
 {
+	boost::mutex::scoped_lock lock(decoding_mutex);
+
+	// Make sure al decoding has stopped
 	// This can happen in 2 cases: 
 	// 1) When playback has just started and we've been waiting for the buffer 
 	//    to be filled (buffersize set by setBufferTime() and default is 100
@@ -1197,6 +1202,8 @@ NetStreamFfmpeg::time()
 
 void NetStreamFfmpeg::pauseDecoding()
 {
+	// assert(decoding_mutex is locked by this thread!)
+
 	if (m_pause) return;
 
 	m_pause = true;
@@ -1207,6 +1214,8 @@ void NetStreamFfmpeg::pauseDecoding()
 
 void NetStreamFfmpeg::unpauseDecoding()
 {
+	// assert(decoding_mutex is locked by this thread!)
+
 	if (!m_pause) return;
 
 	m_pause = false;	

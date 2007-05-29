@@ -1,3 +1,12 @@
+2007-05-29 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: drop
+	  the decode_wait_mutex, use decoding_mutex instead.
+	  Document which function lock it and which not, adding
+	  more locking. Seems to fix bug #19978, but exposes
+	  a deadlock playing youtube with a full-offline setup
+	  with reduced bandwidth.
+
 2007-05-29 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: testing for gray
