@@ -1,3 +1,10 @@
+2007-05-29 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/LoadThread.cpp: Don't lock the mutex and try to join the 
+	  download thread when calling complete(), instead do that in the
+	  destrutor. Fixes some blocking (with the no-decode-thread-patch
+	  for NetStreamFfmpeg).
+
 2007-05-29 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: don't lock

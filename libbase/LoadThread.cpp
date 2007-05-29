@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.11 2007/05/24 22:27:09 tgc Exp $
+// $Id: LoadThread.cpp,v 1.12 2007/05/29 23:41:26 tgc Exp $
 
 #include "LoadThread.h"
 
@@ -46,7 +46,14 @@ LoadThread::LoadThread()
 LoadThread::~LoadThread()
 {
 	// stop the download thread if it's still runnning
-	completed();
+#ifdef THREADED_LOADS
+	boost::mutex::scoped_lock lock(_mutex);
+	if (  _completed && _thread.get() )
+	{
+		_thread->join();
+		_thread.reset(NULL);
+	}
+#endif
 	if (_cache) delete[] _cache;
 }
 
@@ -225,15 +232,6 @@ long LoadThread::getBytesTotal()
 
 bool LoadThread::completed()
 {
-#ifdef THREADED_LOADS
-	boost::mutex::scoped_lock lock(_mutex);
-	if (  _completed && _thread.get() )
-	{
-		_thread->join();
-		_thread.reset(NULL);
-	}
-#endif
-
 	return _completed;
 }
 
