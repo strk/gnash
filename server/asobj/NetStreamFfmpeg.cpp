@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.63 2007/05/29 15:23:22 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.64 2007/05/29 15:52:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -104,7 +104,7 @@ void NetStreamFfmpeg::pause(int mode)
 void NetStreamFfmpeg::close()
 {
 
-	log_debug("Locking on ::close");
+	log_debug("Thread %d locking on ::close", pthread_self());
 	boost::mutex::scoped_lock lock(decoding_mutex);
 	log_debug(" obtained (close)");
 
@@ -212,7 +212,7 @@ NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
 void
 NetStreamFfmpeg::play(const std::string& c_url)
 {
-	log_debug("Locking on ::play");
+	log_debug("Thread %d locking on ::play", pthread_self());
 	boost::mutex::scoped_lock  lock(decoding_mutex);
 	log_debug(" obtained (play)");
 
@@ -605,7 +605,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
 	GNASH_REPORT_FUNCTION;
 
-	log_debug("Locking on ::av_streamer");
+	log_debug("Thread %d locking on ::av_streamer", pthread_self());
 	boost::mutex::scoped_lock lock(ns->decoding_mutex);
 	log_debug(" obtained (av_streamer)");
 
@@ -661,6 +661,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 
 			if (ns->m_pause || (ns->m_qvideo.size() > 10 && ns->m_qaudio.size() > 10))
 			{ 
+				assert(ns->m_go);
 				log_debug("Waiting on lock..");
 				ns->decode_wait.wait(lock);
 				log_debug("Finished waiting.");
@@ -699,7 +700,7 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(owner);
 
-	log_debug("Locking on ::audio_streamer");
+	log_debug("Thread %d locking on ::audio_streamer", pthread_self());
 	boost::mutex::scoped_lock  lock(ns->decoding_mutex);
 	log_debug(" obtained (audio_streamer)");
 
@@ -965,7 +966,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 
 bool NetStreamFfmpeg::decodeMediaFrame()
 {
-	log_debug("Locking on ::decodeMediaFrame");
+	log_debug("Thread %d locking on ::decodeMediaFrame", pthread_self());
 	boost::mutex::scoped_lock  lock(decoding_mutex);
 	log_debug(" obtained (decodeMediaFrame)");
 
@@ -1025,7 +1026,7 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 void
 NetStreamFfmpeg::seek(double pos)
 {
-	log_debug("Locking on ::seek");
+	log_debug("Thread %d locking on ::seek", pthread_self());
 	boost::mutex::scoped_lock  lock(decoding_mutex);
 	log_debug(" obtained (seek)");
 
@@ -1174,7 +1175,7 @@ NetStreamFfmpeg::refreshVideoFrame()
 void
 NetStreamFfmpeg::advance()
 {
-	log_debug("Locking on ::advance");
+	log_debug("Thread %d locking on ::advance", pthread_self());
 	boost::mutex::scoped_lock lock(decoding_mutex);
 	log_debug(" obtained (advance)");
 
@@ -1185,7 +1186,8 @@ NetStreamFfmpeg::advance()
 	//    miliseconds).
 	// 2) The buffer has be "starved" (not being filled as quickly as needed),
 	//    and we then wait until the buffer contains some data (1 sec) again.
-	if (m_go && m_pause && m_start_onbuffer && m_parser.get() && m_parser->isTimeLoaded(m_bufferTime)) {
+	if (m_go && m_pause && m_start_onbuffer && m_parser.get() && m_parser->isTimeLoaded(m_bufferTime))
+	{
 		setStatus(bufferFull);
 		unpauseDecoding();
 		m_start_onbuffer = false;
