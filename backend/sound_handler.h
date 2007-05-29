@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.13 2007/05/29 11:11:49 tgc Exp $ */
+/* $Id: sound_handler.h,v 1.14 2007/05/29 11:14:55 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -43,12 +43,15 @@ namespace gnash {
 
 namespace gnash {
 
-/// Sound handler. Stores the audio found by the parser and plays on demand.
+/// Sound handler.
+//
+/// Stores the audio found by the parser and plays on demand.
 /// Can also play sound from AS classes NetStream and Sound using callbacks
 /// (see attach_aux_streamer and dettach_aux_streamer).
-	
-// You may define a subclass of this, and pass an instance to
-// set_sound_handler().
+///
+/// You may define a subclass of this, and pass an instance to
+/// set_sound_handler().
+///
 class DSOEXPORT sound_handler
 {
 public:
