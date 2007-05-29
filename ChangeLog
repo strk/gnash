@@ -1,3 +1,7 @@
+2007-05-29 Martin Guy <martinwguy@yahoo.it>
+
+	* server/asobj/NetStreamFfmpeg.cpp: Fix sign/unsign compiler warning
+
 2007-05-28 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStream*.{cpp,h}: Updated a comment and made play()
