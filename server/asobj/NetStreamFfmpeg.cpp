@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.62 2007/05/29 11:01:40 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.63 2007/05/29 15:23:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -104,7 +104,9 @@ void NetStreamFfmpeg::pause(int mode)
 void NetStreamFfmpeg::close()
 {
 
+	log_debug("Locking on ::close");
 	boost::mutex::scoped_lock lock(decoding_mutex);
+	log_debug(" obtained (close)");
 
 	if (m_go)
 	{
@@ -210,7 +212,9 @@ NetStreamFfmpeg::seekMedia(void *opaque, offset_t offset, int whence){
 void
 NetStreamFfmpeg::play(const std::string& c_url)
 {
+	log_debug("Locking on ::play");
 	boost::mutex::scoped_lock  lock(decoding_mutex);
+	log_debug(" obtained (play)");
 
 	// Is it already playing ?
 	if (m_go)
@@ -601,7 +605,9 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
 	GNASH_REPORT_FUNCTION;
 
+	log_debug("Locking on ::av_streamer");
 	boost::mutex::scoped_lock lock(ns->decoding_mutex);
+	log_debug(" obtained (av_streamer)");
 
 	// This should only happen if close() is called before this thread is ready
 	if (!ns->m_go)
@@ -693,7 +699,9 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(owner);
 
+	log_debug("Locking on ::audio_streamer");
 	boost::mutex::scoped_lock  lock(ns->decoding_mutex);
+	log_debug(" obtained (audio_streamer)");
 
 	if (!ns->m_go || ns->m_pause) return false;
 
@@ -957,7 +965,9 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 
 bool NetStreamFfmpeg::decodeMediaFrame()
 {
+	log_debug("Locking on ::decodeMediaFrame");
 	boost::mutex::scoped_lock  lock(decoding_mutex);
+	log_debug(" obtained (decodeMediaFrame)");
 
 	if (m_unqueued_data)
 	{
@@ -1015,7 +1025,9 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 void
 NetStreamFfmpeg::seek(double pos)
 {
+	log_debug("Locking on ::seek");
 	boost::mutex::scoped_lock  lock(decoding_mutex);
+	log_debug(" obtained (seek)");
 
 	long newpos = 0;
 	double timebase = 0;
@@ -1162,7 +1174,9 @@ NetStreamFfmpeg::refreshVideoFrame()
 void
 NetStreamFfmpeg::advance()
 {
+	log_debug("Locking on ::advance");
 	boost::mutex::scoped_lock lock(decoding_mutex);
+	log_debug(" obtained (advance)");
 
 	// Make sure al decoding has stopped
 	// This can happen in 2 cases: 
