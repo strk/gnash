@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.14 2007/05/29 11:14:55 strk Exp $ */
+/* $Id: sound_handler.h,v 1.15 2007/05/29 17:15:13 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -274,7 +274,27 @@ public:
 			  int sample_size, int sample_rate, bool stereo,
 			  int m_sample_rate, bool m_stereo);
 
+	sound_handler()
+		:
+		_soundsStarted(0),
+		_soundsStopped(0)
+	{}
+
 	virtual ~sound_handler() {};
+
+	/// Special test-fuction. Reports how many times a sound has been started
+	size_t numSoundsStarted() const { return _soundsStarted; }
+
+	/// Special test-fuction. Reports how many times a sound has been stopped
+	size_t numSoundsStopped() const { return _soundsStopped; }
+
+protected:
+
+	/// Special test-member. Stores count of started sounds.
+	size_t _soundsStarted;
+
+	/// Special test-member. Stores count of stopped sounds.
+	size_t _soundsStopped;
 };
 
 // TODO: move to appropriate specific sound handlers

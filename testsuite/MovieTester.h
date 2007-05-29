@@ -23,7 +23,7 @@
 
 #include "Range2d.h"
 #include "gnash.h" // for namespace key
-#include "sound_handler_test.h" // for creating the "test" sound handler
+#include "sound_handler.h" // for creating the "test" sound handlers
 #include "types.h" // for rgba class
 #include "render_handler.h" // for dtor visibility by auto_ptr
 
@@ -216,6 +216,14 @@ private:
 	/// Initialize testing renderers
 	void initTestingRenderers();
 
+	/// Initialize sound handlers
+	//
+	/// For now this function initializes a single sound handler,
+	/// the one enabled at configure time.
+	/// In the future it might initialize multiple ones (maybe)
+	///
+	void initTestingSoundHandlers();
+
 	/// Render the current movie to all testing renderers
 	//
 	/// This function calls movie_root::display internally
@@ -242,7 +250,7 @@ private:
 
 	gnash::sprite_instance* _movie;
 
-	std::auto_ptr<TEST_sound_handler> _sound_handler;
+	std::auto_ptr<sound_handler> _sound_handler;
 
 	/// Current pointer position - X ordinate
 	int _x;

@@ -1,5 +1,19 @@
 2007-05-29 Sandro Santilli <strk@keybit.net>
 
+	* backend/sound_handler.h: add numSoundsStarted() and
+	  numSoundsStopped() methods to be used in testing, and
+	  associated protected counts.
+	* backend/: sound_handler_gst.cpp, sound_handler_sdl.cpp:
+	  Increment started/stopped sound counters.
+	* testsuite/FuzzyPixel.h: remove unused header.
+	* testsuite/: Makefile.am, sound_handler_test.{cpp,h}:
+	  drop sound_handler_test, testing will now be done against
+	  the built sound_handler.
+	* testsuite/MovieTester.{cpp,h}: initialize the currently
+	  configured sound handler and use that for testing.
+
+2007-05-29 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: drop
 	  the decode_wait_mutex, use decoding_mutex instead.
 	  Document which function lock it and which not, adding

@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.66 2007/05/28 15:40:57 ann Exp $
+// $Id: sound_handler_sdl.cpp,v 1.67 2007/05/29 17:15:14 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -326,6 +326,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	}
 
 	++soundsPlaying;
+	++_soundsStarted;
 	sounddata->m_active_sounds.push_back(sound);
 
 	if (soundsPlaying == 1) {
@@ -363,13 +364,13 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 #endif
 				sound->delete_raw_data();
 				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + i);
-				soundsPlaying--;
 
 			// Stop sound, remove it from the active list (adpcm/native16)
 			} else {
 				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + i);
-				soundsPlaying--;
 			}
+			--soundsPlaying;
+			++_soundsStopped;
 		}
 	}
 

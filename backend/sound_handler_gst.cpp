@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.46 2007/05/24 13:48:43 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.47 2007/05/29 17:15:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -439,6 +439,8 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 	// If not already playing, start doing it
 	gst_element_set_state (GST_ELEMENT (gst_element->pipeline), GST_STATE_PLAYING);
 
+	++_soundsStarted;
+
 }
 
 
@@ -476,6 +478,7 @@ void	GST_sound_handler::stop_sound(int sound_handle)
 		sounddata->m_gst_elements.erase(sounddata->m_gst_elements.begin() + i);
 	}
 
+	++_soundsStopped;
 }
 
 

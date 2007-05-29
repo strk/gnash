@@ -29,7 +29,7 @@
 #include "as_environment.h"
 #include "gnash.h" // for create_movie and create_library_movie and for gnash::key namespace
 #include "VM.h" // for initialization
-#include "sound_handler_test.h" // for creating the "test" sound handler
+#include "sound_handler.h" // for creating the "test" sound handlers
 #include "render.h" // for get_render_handler
 #include "types.h" // for rgba class
 #include "FuzzyPixel.h"
@@ -75,9 +75,8 @@ MovieTester::MovieTester(const std::string& url)
 		throw GnashException("Could not load movie from "+url);
 	}
 
-	// Create a soundhandler
-	_sound_handler.reset( static_cast<TEST_sound_handler*>(gnash::create_sound_handler_test()));
-	gnash::set_sound_handler(_sound_handler.get());
+	// Initialize the sound handler(s)
+	initTestingSoundHandlers();
 
 	_movie_root = &(VM::init(*_movie_def).getRoot());
 
@@ -343,13 +342,13 @@ MovieTester::getInvalidatedRanges() const
 int
 MovieTester::soundsStarted()
 {
-	return _sound_handler.get()->test_times_started_all();
+	return _sound_handler->numSoundsStarted();
 }
 
 int
 MovieTester::soundsStopped()
 {
-	return _sound_handler.get()->test_times_stopped_all();
+	return _sound_handler->numSoundsStopped();
 }
 
 void
@@ -419,6 +418,23 @@ MovieTester::addTestingRenderer(std::auto_ptr<render_handler> h, const std::stri
 	}
 
 	_testingRenderers.push_back(TestingRendererPtr(new TestingRenderer(h, name)));
+}
+
+void
+MovieTester::initTestingSoundHandlers()
+{
+#ifdef SOUND_SDL
+	cout << "Creating SDL sound handler" << endl;
+        _sound_handler.reset( gnash::create_sound_handler_sdl() );
+#elif defined(SOUND_GST)
+	cout << "Creating GST sound handler" << endl;
+        _sound_handler.reset( gnash::create_sound_handler_gst() );
+#else
+	cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << endl;
+	exit(1);
+#endif
+
+	gnash::set_sound_handler(_sound_handler.get());
 }
 
 } // namespace gnash

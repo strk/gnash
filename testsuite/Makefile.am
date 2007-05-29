@@ -28,8 +28,6 @@ libtestsuite_la_SOURCES = \
 	MovieTester.cpp \
 	FuzzyPixel.cpp \
 	FuzzyPixel.h \
-	sound_handler_test.h \
-	sound_handler_test.cpp \
 	$(NULL)
 libtestsuite_la_LIBADD = \
 	$(top_builddir)/backend/libgnashbackend.la \

@@ -23,7 +23,6 @@
 
 #include "Range2d.h"
 #include "gnash.h" // for namespace key
-#include "sound_handler_test.h" // for creating the "test" sound handler
 #include "types.h" // for rgba class
 
 #include <iostream> 
