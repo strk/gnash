@@ -571,6 +571,8 @@ movie_root::advance(float delta_time)
 	}
 
 	// Cleanup key listeners (remove unloaded characters)
+	// FIXME: not all key listeners could be cleaned here!
+	// (eg. characters unloaded by loop-back won't be cleared until next advancement)
 	cleanup_key_listeners();
 
 	// random should go continuously that:

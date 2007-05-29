@@ -10,8 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
@@ -46,11 +45,14 @@ main(int /*argc*/, char** /*argv*/)
   sprite_instance* root = tester.getRootMovie();
   assert(root);
 
-  check_equals(root->get_frame_count(), 2);
+  check_equals(root->get_frame_count(), 3);
   check_equals(root->get_current_frame(), 0);
 
   tester.advance();
   check_equals(root->get_current_frame(), 1);
+
+  tester.advance();
+  check_equals(root->get_current_frame(), 2);
 
   character* mc = const_cast<character*>(tester.findDisplayItemByName(*root, "mc"));
   check(mc);
@@ -70,13 +72,15 @@ main(int /*argc*/, char** /*argv*/)
   
   tester.advance(); // loop back to frame1
   // press key 'A' and checks
-  // tester.pressKey(key::A);
-  // tester.releaseKey(key::A);
+   tester.pressKey(key::A);
+   tester.releaseKey(key::A);
   // check that no KeyDown was triggered(no key event handler at frame1);
-  // check(root->get_member("x1", &tmp));
-  // xcheck_equals(tmp.to_number(), 0);
+  check(root->get_member("x1", &tmp));
+  check_equals(tmp.to_number(), 0);
+
   tester.advance(); // advance to frame2
-  check_equals(root->get_current_frame(), 1);
+  tester.advance(); // advance to frame3
+  check_equals(root->get_current_frame(), 2);
 
   // press key 'A' and checks
   tester.pressKey(key::A);
@@ -88,15 +92,17 @@ main(int /*argc*/, char** /*argv*/)
   // and get added to the list again;
   check_equals(tmp.to_number(), 1); 
 
-  tester.advance(); // loop back to frame1
+  tester.advance(); // loop back to frame1 again
   // press key 'A' and checks
-  // tester.pressKey(key::A);
-  // tester.releaseKey(key::A);
+  tester.pressKey(key::A);
+  tester.releaseKey(key::A);
   // check that no KeyDown was triggered(no key event handler at frame1);
-  // check(root->get_member("x1", &tmp));
-  // xcheck_equals(tmp.to_number(), 0);
+  check(root->get_member("x1", &tmp));
+  check_equals(tmp.to_number(), 0);
+
   tester.advance(); // advance to frame2
-  check_equals(root->get_current_frame(), 1);
+  tester.advance(); // advance to frame3
+  check_equals(root->get_current_frame(), 2);
 
   // press key 'A' and checks
   tester.pressKey(key::A);

@@ -18,10 +18,12 @@
 
 /*
  *  frame1: set _root.x1 to zero;
- *  frame2: 
+ *  frame2: check that _root.x1 is still zero;
+ *  frame3: 
  *    place a static movieclip "mc" at depth 20 with a onClipKeyDown event handler;
  *    increases _root.x1;
- *  frame3: nothing
+ *
+ *  KeyDown events are provided by the testrunner.
  */
 
 #include <stdlib.h>
@@ -70,26 +72,26 @@ main(int argc, char** argv)
   Ming_init();
   mo = newSWFMovieWithVersion(OUTPUT_VERSION);
   SWFMovie_setDimension(mo, 800, 600);
-  SWFMovie_setRate (mo, 12.0);
+  SWFMovie_setRate (mo, 1.0);
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   add_actions(mo, "x1=0;");
-  SWFMovie_nextFrame(mo);  /* 1st frame */
-
+  SWFMovie_nextFrame(mo);  // 1st frame 
+  
+  check_equals(mo, "x1", "0");
+  SWFMovie_nextFrame(mo);  // 2nd frame 
+  
   // place a static movieclip "mc" at depth 20
   it = add_static_mc(mo, "mc", 20);
-
+  
   // Define onClipKeyDown for "mc"
   SWFDisplayItem_addAction(it,
     newSWFAction(" _root.note('onClipKeyDown triggered'); "
                  " _root.x1++; "
-                 // TODO: enable this self-contained check after fix
-                 // " _root.check_equals(_root.x1, 1);"
                 ), 
     SWFACTION_KEYDOWN);    
-    
-  SWFMovie_nextFrame(mo); /* 2nd frame */
+  SWFMovie_nextFrame(mo); // 3rd frame
   
   
   //Output movie
