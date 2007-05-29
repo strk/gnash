@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.64 2007/05/29 15:52:14 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.65 2007/05/29 16:43:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -747,7 +747,9 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 	}
 
 	if (frame == NULL) {
-		if (_netCon->loadCompleted()) {
+		if (_netCon->loadCompleted())
+		{
+			log_debug("decodeFLVFrame: load completed, stopping");
 			// Stop!
 			m_go = false;
 		} else {
@@ -1188,10 +1190,13 @@ NetStreamFfmpeg::advance()
 	//    and we then wait until the buffer contains some data (1 sec) again.
 	if (m_go && m_pause && m_start_onbuffer && m_parser.get() && m_parser->isTimeLoaded(m_bufferTime))
 	{
+		log_debug("(advance): setting buffer full");
 		setStatus(bufferFull);
 		unpauseDecoding();
 		m_start_onbuffer = false;
 	}
+
+	log_debug("(advance): processing status notification, refreshing video frame");
 
 	// Check if there are any new status messages, and if we should
 	// pass them to a event handler
@@ -1218,6 +1223,8 @@ NetStreamFfmpeg::time()
 
 void NetStreamFfmpeg::pauseDecoding()
 {
+	log_msg("pauseDecoding called");
+
 	// assert(decoding_mutex is locked by this thread!)
 
 	if (m_pause) return;
