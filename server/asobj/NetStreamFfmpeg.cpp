@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.66 2007/05/29 21:38:35 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.67 2007/05/29 22:48:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1019,10 +1019,6 @@ bool NetStreamFfmpeg::decodeMediaFrame()
 void
 NetStreamFfmpeg::seek(double pos)
 {
-	log_debug("Thread %d locking on ::seek", pthread_self());
-	boost::mutex::scoped_lock  lock(decoding_mutex);
-	log_debug(" obtained (seek)");
-
 	long newpos = 0;
 	double timebase = 0;
 

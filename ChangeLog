@@ -1,5 +1,11 @@
 2007-05-29 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: don't lock
+	  the mutex in seek() even, also intended to be called by
+	  the VM..
+
+2007-05-29 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: Don't lock the mutex
 	  in pause(), play() and close(), all intended to be called
 	  by the locking advance(). More dox about locking in the header.

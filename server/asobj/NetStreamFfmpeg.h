@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.36 2007/05/29 21:38:35 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.37 2007/05/29 22:48:25 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -199,7 +199,11 @@ public:
 	///
 	void play(const std::string& source);
 
-	/// Locks decoding_mutex
+	/// does NOT lock decoding_mutex. Users:
+	///	- ::advance (VM), itself locking
+	///	- ::startPlayback() non locking but called by av_streamer which locks
+	///	- ::seekMedia() set as a callback with init_put_byte (??)
+	///
 	void seek(double pos);
 
 	int64_t time();
