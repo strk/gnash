@@ -1,3 +1,8 @@
+2007-05-29 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: testing for gray
+	  is funny, but better let's be accurate ;) 
+			
 2007-05-29 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp: reintruduce

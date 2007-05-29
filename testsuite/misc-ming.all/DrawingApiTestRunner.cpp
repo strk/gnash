@@ -120,9 +120,9 @@ main(int /*argc*/, char** /*argv*/)
 	check(tester.isMouseOverMouseEntity());
 	// pixel at 250,180 is black
 	check_pixel(250, 180, 1, black, 2);
-	// pixels above and below 180 is white, so 
-	// we get gray with a radius of 2
-	check_pixel(250, 180, 2, gray, 2);
+	// pixels above and below 180 are white
+	check_pixel(250, 179, 1, white, 2);
+	check_pixel(250, 181, 1, white, 2);
 
 	// Over the transparent line (150,100)
 	tester.movePointerTo(150, 100);
