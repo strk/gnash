@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.82 2007/05/28 15:40:57 ann Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.83 2007/05/29 08:49:14 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -177,7 +177,7 @@ AGG ressources
 #endif
 
 #ifndef round
-#define round(x) rint(x+0.5f)
+#define round(x) rint(x)
 #endif
 
 using namespace gnash;
@@ -1129,6 +1129,10 @@ public:
   /// and shapes. Subshapes are ignored (ie. all paths are converted). Converts 
   /// TWIPS to pixels on the fly.
   void build_agg_paths(std::vector<agg::path_storage>& dest, const std::vector<path>& paths) {
+  
+    // Shift all coordinates a half pixel for correct results (the middle of
+    // a pixel is at .5 / .5, ie. it's subpixel center) 
+    const float subpixel_offset = 0.5f;
     
     int pcount = paths.size();
 
@@ -1139,7 +1143,8 @@ public:
       const gnash::path& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
       
-      new_path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
+      new_path.move_to(this_path.m_ax*xscale + subpixel_offset, 
+        this_path.m_ay*yscale + subpixel_offset);
       
       int ecount = this_path.m_edges.size();
       
@@ -1148,10 +1153,13 @@ public:
         const edge& this_edge = this_path.m_edges[eno];
         
         if (this_edge.is_straight())
-          new_path.line_to(this_edge.m_ax*xscale, this_edge.m_ay*yscale);
+          new_path.line_to(this_edge.m_ax*xscale + subpixel_offset, 
+            this_edge.m_ay*yscale + subpixel_offset);
         else
-          new_path.curve3(this_edge.m_cx*xscale, this_edge.m_cy*yscale,
-                      this_edge.m_ax*xscale, this_edge.m_ay*yscale);
+          new_path.curve3(this_edge.m_cx*xscale + subpixel_offset, 
+            this_edge.m_cy*yscale + subpixel_offset,
+            this_edge.m_ax*xscale + subpixel_offset, 
+            this_edge.m_ay*yscale + subpixel_offset);
         
         
       }
@@ -1165,16 +1173,21 @@ public:
   // This is used for outlines which are aligned to the pixel grid to avoid
   // anti-aliasing problems (a perfect horizontal line being drawn over two
   // lines and looking blurry). The proprietary player does this too.  
-  // Remember the middle of a pixel is at .5 / .5 (at it's subpixel center).
   //
   // Not all points are aligned, only those lines that:
   //   - are straight
   //   - are pure horizontal or vertical
   // Also, single segments of a path may be aligned or not depending on 
-  // the segment properties (this matches MM player behaviour)  
+  // the segment properties (this matches MM player behaviour)
+  //
+  // TODO: Flash never aligns lines that are wider than 1 pixel on *screen*,
+  // but we currently don't check the width.  
   void build_agg_paths_rounded(std::vector<agg::path_storage>& dest, 
     const std::vector<path>& paths) {
   
+    // Shift all coordinates a half pixel for correct results (the middle of
+    // a pixel is at .5 / .5, ie. it's subpixel center) 
+    const float subpixel_offset = 0.5f;
     
     int pcount = paths.size();
 
@@ -1206,21 +1219,22 @@ public:
           bool align_y = prev_ay == this_ay;
           
           if (align_x) 
-            this_ax = round(this_ax) - 0.5f;
+            this_ax = round(this_ax);
           
           if (align_y)
-            this_ay = round(this_ay) - 0.5f;
+            this_ay = round(this_ay);
           
           // first line?
           if (eno==0) {
           
             if (align_x) 
-              prev_ax = round(prev_ax) - 0.5f;
+              prev_ax = round(prev_ax);
               
             if (align_y)
-              prev_ay = round(prev_ay) - 0.5f;
+              prev_ay = round(prev_ay);
               
-            new_path.move_to(prev_ax, prev_ay);
+            new_path.move_to(prev_ax + subpixel_offset, 
+              prev_ay + subpixel_offset);
             
           } else {
           
@@ -1231,12 +1245,13 @@ public:
             if ((align_x && !prev_align_x) || (align_y && !prev_align_y)) {
             
               if (align_x) 
-                prev_ax = round(prev_ax) - 0.5f;
+                prev_ax = round(prev_ax);
                 
               if (align_y)
-                prev_ay = round(prev_ay) - 0.5f;
+                prev_ay = round(prev_ay);
                 
-              new_path.line_to(prev_ax, prev_ay);
+              new_path.line_to(prev_ax + subpixel_offset, 
+                prev_ay + subpixel_offset);
               
             }
             
@@ -1250,7 +1265,8 @@ public:
           
           }
         
-          new_path.line_to(this_ax, this_ay);
+          new_path.line_to(this_ax + subpixel_offset, 
+            this_ay + subpixel_offset);
           
           prev_align_x = align_x;
           prev_align_y = align_y;  
@@ -1263,10 +1279,10 @@ public:
             new_path.move_to(prev_ax, prev_ay);
         
           // never align curves!
-          new_path.curve3(this_edge.m_cx*xscale, 
-            this_edge.m_cy*yscale,
-            this_ax, 
-            this_ay);
+          new_path.curve3(this_edge.m_cx*xscale + subpixel_offset, 
+            this_edge.m_cy*yscale + subpixel_offset,
+            this_ax + subpixel_offset, 
+            this_ay + subpixel_offset);
             
           prev_align_x = false;
           prev_align_y = false;  

@@ -1,3 +1,8 @@
+2007-05-29 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: Fix coordinate translation and  
+	  pixel hinting. Fixes bug #19828.
+
 2007-05-29 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all: Makefile.am, key_event_test3.c, 
