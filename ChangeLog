@@ -1,5 +1,9 @@
 2007-05-29 Zou Lunkai <zoulunkai@gmail.com>
 
+	* testsuite/misc-ming.all/key_event_test2runner.cpp: remove obsolete comments
+	  
+2007-05-29 Zou Lunkai <zoulunkai@gmail.com>
+
 	* testsuite/misc-ming.all/key_event_test2.c, 
 	  key_event_test2runner.cpp: add more tests.
 	* server/movie_root.cpp: add comments for ::cleanup_key_listeners().

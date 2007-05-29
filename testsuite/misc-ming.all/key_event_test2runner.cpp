@@ -88,8 +88,6 @@ main(int /*argc*/, char** /*argv*/)
 
   // check that KeyDown have been triggered
   check(root->get_member("x1", &tmp));
-  // gnash fails because the key listener didn't get removed when loop back
-  // and get added to the list again;
   check_equals(tmp.to_number(), 1); 
 
   tester.advance(); // loop back to frame1 again
@@ -110,8 +108,6 @@ main(int /*argc*/, char** /*argv*/)
 
   // check that KeyDown have been triggered
   check(root->get_member("x1", &tmp));
-  // gnash fails because the key listener didn't get removed when loop back
-  // and get added to the list again;
   check_equals(tmp.to_number(), 1);
   
   return 0; 
