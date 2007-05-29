@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.12 2007/05/28 15:40:57 ann Exp $ */
+/* $Id: sound_handler.h,v 1.13 2007/05/29 11:11:49 tgc Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -43,9 +43,9 @@ namespace gnash {
 
 namespace gnash {
 
-//
-// Sound callback handler.
-//
+/// Sound handler. Stores the audio found by the parser and plays on demand.
+/// Can also play sound from AS classes NetStream and Sound using callbacks
+/// (see attach_aux_streamer and dettach_aux_streamer).
 	
 // You may define a subclass of this, and pass an instance to
 // set_sound_handler().
@@ -55,6 +55,9 @@ public:
 
 	typedef bool (*aux_streamer_ptr)(void *udata, uint8_t *stream, int len);
 
+	/// Used to control volume for event sounds. It basically tells that from
+	/// sample X the volume for left out is Y and for right out is Z. Several
+	/// envelopes can be assigned to a sound to make a fade out or similar stuff.
 	struct sound_envelope
 	{
 		uint32_t m_mark44;
@@ -62,6 +65,7 @@ public:
 		uint16_t m_level1;
 	};
 
+	/// Format type that the sound can be.
 	enum format_type
 	{
 		FORMAT_RAW = 0,		// Host-endian 8- or 16-bit
@@ -75,14 +79,28 @@ public:
 	};
 	// If stereo is true, samples are interleaved w/ left sample first.
 	
-	// gnash calls at load-time with sound data, to be
-	// played later.  You should create a sample with the
-	// data, and return a handle that can be used to play
-	// it later.  If the data is in a format you can't
-	// deal with, then you can return 0 (for example), and
-	// then ignore 0's in play_sound() and delete_sound().
+	/// gnash's parser calls this to create sounds to be played later.
 	//
-	// Assign handles however you like.
+	/// @param data
+	/// The data to be stored. For soundstream this is NULL.
+	///
+	/// @param data_bytes
+	/// The size of the data to be stored. For soundstream this is 0.
+	///
+	/// @param sample_count
+	/// Number of samples in the data.
+	///
+	/// @param format
+	/// Defines what sound type the data is.
+	///
+	/// @param sample_rate
+	/// The sample rate of the sound.
+	///
+	/// @param stereo
+	/// Defines whether the sound is in stereo.
+	///
+	/// @return the id given by the soundhandler for later identification.
+	///
 	virtual int	create_sound(
 		void*		data,
 		int		data_bytes,
@@ -92,50 +110,162 @@ public:
 		bool		stereo
 		) = 0;
 
-	// gnash calls this to fill up soundstreams data
+	/// gnash's parser calls this to fill up soundstreams data
+	//
+	/// @param data
+	/// The sound data to be saved.
+	///
+	/// @param data_bytes
+	/// Size of the data in bytes
+	///
+	/// @param sample_count
+	/// Number of samples in the data
+	///
+	/// @param handle_id
+	/// The soundhandlers id of the sound we want some info about.
+	///
 	virtual long	fill_stream_data(void* data, int data_bytes, int sample_count, int handle_id) = 0;
 
-	//	Gives info about the format, samplerate and stereo of the sound in question;
+	/// Gives info about the format, samplerate and stereo of the sound in question.
+	//
+	/// @param soundhandle
+	/// The soundhandlers id of the sound we want some info about.
+	///
+	/// @param format
+	/// Here the format id will be placed.
+	///
+	/// @param stereo
+	/// Here will be placed whether or not the sound is stereo.
+	///
 	virtual void get_info(int sound_handle, int* format, bool* stereo) = 0;
 
-	// gnash calls this when it wants you to play the defined sound.
-	// loop_count == 0 means play the sound once (1 means play it twice, etc)
+	/// gnash calls this when it wants you to play the defined sound.
+	//
+	/// @param sound_handle
+	///	The sound_handlers id for the sound to start playing
+	///
+	/// @param loop_count
+	/// loop_count == 0 means play the sound once (1 means play it twice, etc)
+	///
+	/// @param secondOffset
+	/// When starting soundstreams there sometimes is a offset to make the sound
+	/// start at the exact right moment.
+	///
+	/// @param start
+	/// When starting a soundstream from a random frame, this tells where in the
+	/// data the decoding should start.
+	///
+	/// @param envelopes
+	/// Some eventsounds have some volume control mechanism called envelopes.
+	/// They basically tells that from sample X the volume should be Y.
+	///
 	virtual void	play_sound(int sound_handle, int loop_count, int secondOffset, long start, const std::vector<sound_envelope>* envelopes) = 0;
 
-	//	stops all sounds currently playing in a SWF file without stopping the playhead.
-	//	Sounds set to stream will resume playing as the playhead moves over the frames they are in.
+	/// stops all sounds currently playing in a SWF file without stopping the playhead.
+	/// Sounds set to stream will resume playing as the playhead moves over the frames they are in.
 	virtual void	stop_all_sounds() = 0;
 
-	//	returns the sound volume level as an integer from 0 to 100,
-	//	where 0 is off and 100 is full volume. The default setting is 100.
+	/// Gets the volume for a given sound. Only used by the AS Sound class
+	//
+	/// @param sound_handle
+	///	The sound_handlers id for the sound to be deleted
+	///
+	/// @return the sound volume level as an integer from 0 to 100,
+	/// where 0 is off and 100 is full volume. The default setting is 100.
 	virtual int	get_volume(int sound_handle) = 0;
 	
-	//	A number from 0 to 100 representing a volume level. 
-	//	100 is full volume and 0 is no volume. The default setting is 100.
+	/// Sets the volume for a given sound. Only used by the AS Sound class
+	//
+	/// @param sound_handle
+	///	The sound_handlers id for the sound to be deleted
+	///
+	/// @param volume
+	/// A number from 0 to 100 representing a volume level. 
+	/// 100 is full volume and 0 is no volume. The default setting is 100.
+	///
 	virtual void	set_volume(int sound_handle, int volume) = 0;
 		
-	// Stop the specified sound if it's playing.
-	// (Normally a full-featured sound API would take a
-	// handle specifying the *instance* of a playing
-	// sample, but SWF is not expressive that way.)
+	/// Stop the specified sound if it's playing.
+	/// (Normally a full-featured sound API would take a
+	/// handle specifying the *instance* of a playing
+	/// sample, but SWF is not expressive that way.)
+	//
+	/// @param sound_handle
+	///	The sound_handlers id for the sound to be deleted
+	///
 	virtual void	stop_sound(int sound_handle) = 0;
 		
-	// gnash calls this when it's done with a particular sound.
+	/// gnash calls this when it's done with a particular sound.
+	//
+	/// @param sound_handle
+	///	The sound_handlers id for the sound to be deleted
+	///
 	virtual void	delete_sound(int sound_handle) = 0;
 		
-	// gnash calls this to mute audio
+	/// gnash calls this to mute audio
 	virtual void	mute() = 0;
 
-	// gnash calls this to unmute audio
+	/// gnash calls this to unmute audio
 	virtual void	unmute() = 0;
 
-	//// @return Whether or not sound is muted.
+	/// Returns whether or not sound is muted.
+	//
+	/// @return true if muted, false if not
+	///
 	virtual bool	is_muted() = 0;
 
+	/// This is called by AS classes NetStream or Sound to attach callback, so
+	/// that audio from the classes will be played through the soundhandler.
+	//
+	/// @param ptr
+	///	The pointer to the callback function
+	///
+	/// @param owner
+	/// The pointer to the owner AS class, used to identify which sound callback
+	/// is owned by whom.
+	///
 	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner) = 0;
+
+	/// This is called by AS classes NetStream or Sound to dettach callback, so
+	/// that audio from the classes no longer will be played through the 
+	/// soundhandler.
+	//
+	/// @param owner
+	/// The pointer to the owner AS class, used to identify which sound callback
+	/// is owned by whom.
+	///
 	virtual void	detach_aux_streamer(void* owner) = 0;
 
-	// Converts audio input data to required sample rate/stereo.
+	/// VERY crude sample-rate and steroe conversion. Converts input data to 
+	/// output format.
+	//
+	/// @param adjusted_data
+	/// Where the converted data is placed.
+	///
+	/// @param adjusted_size
+	/// The size of the converted data.
+	///
+	/// @param data
+	/// Data that needs to be converted.
+	///
+	/// @param sample_count
+	/// The datas current sample count.
+	/// 
+	/// @param sample_size
+	/// The datas current sample size.
+	///
+	/// @param sample_rate
+	/// The datas current sample rate.
+	///
+	/// @param stereo
+	/// Whether the current data is in stereo
+	///
+	/// @param m_sample_rate
+	/// The samplerate we which to convert to.
+	///
+	/// @param m_stereo
+	/// Do we want the output data to be in stereo?
+	///
 	static void	convert_raw_data(int16_t** adjusted_data,
 			  int* adjusted_size, void* data, int sample_count,
 			  int sample_size, int sample_rate, bool stereo,
