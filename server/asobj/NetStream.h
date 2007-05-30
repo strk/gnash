@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.40 2007/05/30 08:49:44 strk Exp $ */
+/*  $Id: NetStream.h,v 1.41 2007/05/30 08:57:59 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -220,10 +220,10 @@ public:
 		m_env = env;
 	}
 
-	/// Specifies how long to buffer data before starting to display the stream.
+	/// Specifies the number of milliseconds to buffer before starting to display the stream.
 	//
 	/// @param time
-	/// The time in seconds that should be buffered.
+	/// The time in milliseconds that should be buffered.
 	///
 	void setBufferTime(uint32_t time);
 

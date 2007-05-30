@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.53 2007/05/30 08:49:44 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.54 2007/05/30 08:57:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -173,12 +173,14 @@ static as_value netstream_setbuffertime(const fn_call& fn)
 
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	uint32_t time = 0;
+	// TODO: should we do anything if given no args ?
+	//       are we sure setting bufferTime to 0 is what we have to do ?
+	double time = 0;
 	if (fn.nargs > 0)
 	{
-		time = static_cast<uint32_t>(fn.arg(0).to_number(&fn.env()));
+		time = fn.arg(0).to_number(&fn.env());
 	}
-	ns->setBufferTime(time);
+	ns->setBufferTime(time*1000);
 
 	return as_value();
 }
@@ -495,7 +497,7 @@ void
 NetStream::setBufferTime(uint32_t time)
 {
 	// The argument is in seconds, but we store in milliseconds
-    m_bufferTime = time*1000;
+	m_bufferTime = time;
 }
 
 uint32_t
