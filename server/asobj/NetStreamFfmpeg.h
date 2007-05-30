@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.41 2007/05/30 14:44:17 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.42 2007/05/30 14:55:23 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -175,7 +175,8 @@ class multithread_queue
 		std::queue < T > m_queue;
 };
 
-
+/// This class is used to provide an easy interface to libavcodecs audio resampler.
+///
 class AudioResampler
 {
 public:
@@ -187,6 +188,13 @@ public:
 		}
 	}
 	
+	/// Initializes the resampler
+	//
+	/// @param ctx
+	/// The audio format container.
+	///
+	/// @return true if resampling is needed, if not false
+	///
 	bool init(AVCodecContext* ctx)
 	{
 		if (ctx->sample_rate != 44100 || ctx->channels != 2) {
@@ -199,12 +207,26 @@ public:
 		return false;
 	}
 	
+	/// Resamples audio
+	//
+	/// @param input
+	/// A pointer to the audio data that needs resampling
+	///
+	/// @param output
+	/// A pointer to where the resampled output should be placed
+	///
+	/// @param samples
+	/// Number of samples in the audio
+	///
+	/// @return the number of samples in the output data.
+	///
 	int resample(int16_t* input, int16_t* output, int samples)
 	{
 		return audio_resample (_context, output, input, samples);
 	}
 
 private:
+	// The container of the resample format information.
 	ReSampleContext* _context;
 };
 
