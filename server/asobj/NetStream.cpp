@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.57 2007/05/30 12:26:54 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.58 2007/05/30 13:39:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -340,7 +340,8 @@ netstream_bufferTime(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	uint32_t ret = ns->bufferTime();
+	// We return bufferTime in seconds
+	double ret = ns->bufferTime()/1000.0;
 	return as_value(ret);
 }
 

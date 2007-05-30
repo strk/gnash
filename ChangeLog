@@ -1,3 +1,8 @@
+2007-05-30 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStream.cpp: fix NetStream.bufferTime getter to
+	  return value in seconds, not milliseconds.
+
 2007-05-30 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStreamFfmpeg.cpp: Fixed seeking to work when not
