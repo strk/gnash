@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.54 2007/05/30 08:57:59 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.55 2007/05/30 09:19:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -64,7 +64,7 @@ NetStream::NetStream()
 	as_object(getNetStreamInterface()),
 	_netCon(NULL),
 	m_env(NULL),
-	m_bufferTime(100), // The default size needed to begin playback of media is 1000 miliseconds
+	m_bufferTime(1000), // The default size needed to begin playback of media is 1000 miliseconds
 	m_videoFrameFormat(gnash::render::videoFrameFormat()),
 	m_newFrameReady(false),
 	m_go(false),
@@ -496,15 +496,8 @@ NetStream::setStatus(StatusCode status)
 void
 NetStream::setBufferTime(uint32_t time)
 {
-	// The argument is in seconds, but we store in milliseconds
+	// The argument is in milliseconds,
 	m_bufferTime = time;
-}
-
-uint32_t
-NetStream::bufferTime()
-{
-	// The argument is in seconds, but we store in milliseconds
-    return (m_bufferTime/1000);
 }
 
 long

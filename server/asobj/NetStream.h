@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.41 2007/05/30 08:57:59 strk Exp $ */
+/*  $Id: NetStream.h,v 1.42 2007/05/30 09:19:01 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -227,11 +227,11 @@ public:
 	///
 	void setBufferTime(uint32_t time);
 
-	/// Returns what the buffer has been set to. (100 miliseconds is default)
+	/// Returns what the buffer time has been set to. (1000 miliseconds is default)
 	//
-	/// @return The size of the buffer in seconds.
+	/// @return The size of the buffer in milliseconds.
 	///
-	uint32_t bufferTime();
+	uint32_t bufferTime() { return m_bufferTime; }
 
 	/// Returns the number of bytes loaded of the media file
 	//
