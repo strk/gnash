@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.39 2007/05/30 12:48:21 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.40 2007/05/30 14:37:45 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -73,6 +73,9 @@ public:
 	double m_pts;	// presentation timestamp in sec
 };
 
+/// This class is a threadsafe queue, using std:queue and locking.
+/// It is used to store decoded audio and video data which are waiting to be "played"
+///
 template<class T>
 class multithread_queue
 {
@@ -93,6 +96,10 @@ class multithread_queue
 			}
 		}
 
+		/// Returns the size if the queue. Locks.
+		//
+		/// @return the size of the queue
+		///
 		size_t size()
 		{
 			boost::mutex::scoped_lock lock(_mutex);
@@ -100,6 +107,14 @@ class multithread_queue
 			return n;
 		}
 
+		/// Pushes an element to the queue. Locks.
+		//
+		/// @param member
+		/// The element to be pushed unto the queue.
+		///
+		/// @return true if queue isn't full and the element was pushed to the queue,
+		/// or false if the queue was full, and the element wasn't push unto it.
+		///
 		bool push(T member)
 		{
 			bool rc = false;
@@ -116,6 +131,10 @@ class multithread_queue
 			return rc;
 		}
 
+		/// Returns a pointer to the first element on the queue
+		//
+		/// @return a pointer to the first element on the queue, NULL if queue is empty.
+		///
 		T front()
 		{
 			boost::mutex::scoped_lock lock(_mutex);
@@ -127,6 +146,7 @@ class multithread_queue
 			return member;
 		}
 
+		/// Pops the first element from the queue.
 		void pop()
 		{
 			boost::mutex::scoped_lock lock(_mutex);
@@ -138,7 +158,10 @@ class multithread_queue
 
 	private:
 
+		// Mutex used for locking
 		boost::mutex _mutex;
+
+		// The actual queue.
 		std::queue < T > m_queue;
 };
 
