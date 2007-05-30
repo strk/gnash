@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.38 2007/05/30 09:55:30 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.39 2007/05/30 12:48:21 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -314,29 +314,30 @@ private:
 	//
 	boost::condition decode_wait;
 
-	// The timestamp of the last decoded video frame
+	// The timestamp of the last decoded video frame, in seconds.
 	volatile double m_last_video_timestamp;
 
-	// The timestamp of the last decoded audio frame
+	// The timestamp of the last decoded audio frame, in seconds.
 	volatile double m_last_audio_timestamp;
 
-	// The timestamp of the last played audio (default) or video (if no audio) frame
+	// The timestamp of the last played audio (default) or video (if no audio) frame.
+	// Misured in seconds.
 	double m_current_timestamp;
 
 	// The queues of audio and video data.
 	multithread_queue <raw_mediadata_t*> m_qaudio;
 	multithread_queue <raw_mediadata_t*> m_qvideo;
 
-	// The time we started playing
+	// The time we started playing in seconds (since VM start ?)
 	volatile double m_start_clock;
 
 	// When the queues are full, this is where we keep the audio/video frame
-	// there wasen't room for on its queue
+	// there wasn't room for on its queue
 	raw_mediadata_t* m_unqueued_data;
 
 	ByteIOContext ByteIOCxt;
 
-	// Time of when pause started
+	// Time of when pause started, in seconds since VM started
 	double m_time_of_pause;
 };
 

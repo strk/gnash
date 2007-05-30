@@ -6,6 +6,14 @@
 
 2007-05-30 Sandro Santilli <strk@keybit.net>
 
+	* libbase/FLVParser.h: document timestamp units for media frames
+	  and isTimeLoaded().
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: document units for time
+	  members; (advance): fix isTimeLoaded() call, thanks Martin Guy
+	  for noticing.
+
+2007-05-30 Sandro Santilli <strk@keybit.net>
+
 	* libbase/FLVParser.{cpp,h}: drop setLoadThread method, require
 	  a LoadThread to be passed on construction.
 	* server/asobj/NetConnection.{cpp,h}: drop connectParser, substitute

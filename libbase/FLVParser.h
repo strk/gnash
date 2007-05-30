@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.12 2007/05/30 12:18:49 strk Exp $
+// $Id: FLVParser.h,v 1.13 2007/05/30 12:48:21 strk Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -127,6 +127,8 @@ public:
 	uint16_t frameType;
 	uint32_t dataSize;
 	uint64_t dataPosition;
+
+	/// in milliseconds 
 	uint32_t timestamp;
 
 	/// Return true if this video frame is a key frame
@@ -142,6 +144,8 @@ class FLVAudioFrame
 public:
 	uint32_t dataSize;
 	uint64_t dataPosition;
+
+	/// in milliseconds 
 	uint32_t timestamp;
 
 };
@@ -221,6 +225,9 @@ public:
 	/// parse some more. This is used to check how much is buffered.
 	///
 	/// Locks the _mutex
+	///
+	/// @param time
+	///	Timestamp, in milliseconds.
 	///
 	bool isTimeLoaded(uint32_t time);
 

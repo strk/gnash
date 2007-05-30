@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.73 2007/05/30 12:42:03 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.74 2007/05/30 12:48:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1215,7 +1215,7 @@ NetStreamFfmpeg::advance()
 	//    miliseconds).
 	// 2) The buffer has be "starved" (not being filled as quickly as needed),
 	//    and we then wait until the buffer contains some data (1 sec) again.
-	if (m_go && m_pause && m_start_onbuffer && m_parser.get() && m_parser->isTimeLoaded(m_current_timestamp+m_bufferTime))
+	if (m_go && m_pause && m_start_onbuffer && m_parser.get() && m_parser->isTimeLoaded(uint32_t(m_current_timestamp*1000)+m_bufferTime))
 	{
 		log_debug("(advance): setting buffer full");
 		setStatus(bufferFull);
