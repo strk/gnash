@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.56 2007/05/30 09:53:30 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.57 2007/05/30 12:26:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -180,7 +180,7 @@ static as_value netstream_setbuffertime(const fn_call& fn)
 	{
 		time = fn.arg(0).to_number(&fn.env());
 	}
-	ns->setBufferTime(time*1000);
+	ns->setBufferTime(uint32_t(time*1000));
 
 	return as_value();
 }
