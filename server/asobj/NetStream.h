@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.42 2007/05/30 09:19:01 strk Exp $ */
+/*  $Id: NetStream.h,v 1.43 2007/05/30 15:12:28 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -260,8 +260,9 @@ public:
 
 	/// Returns the video frame closest to current cursor. See time().
 	//
-	/// @return a image containing the video frame, NULL if none were ready
-	image::image_base* get_video();
+	/// @return a image containing the video frame, a NULL auto_ptr if none were ready
+	///
+	std::auto_ptr<image::image_base> get_video();
 
 private:
 

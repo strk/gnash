@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.42 2007/05/30 14:55:23 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.43 2007/05/30 15:12:28 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -310,10 +310,14 @@ private:
 	//
 	void unpauseDecoding();
 
-	// Check is we need to update the video frame
+	/// Update the image/videoframe to be returned by next get_video() call.
 	//
-	// does NOT lock decoding_mutex, uses by ::advance() which locks
-	//
+	/// Does NOT lock decoding_mutex, uses by ::advance() which locks.
+	/// Note that get_video will be called by video_stream_instance::display, which
+	/// is usually called right after video_stream_instance::advance, so  the result
+	/// is that  refreshVideoFrame() is called right before get_video(). This is important
+	/// to ensure timing is correct..
+	///
 	void refreshVideoFrame();
 
 	// Used to decode and push the next available (non-FLV) frame to the audio or video queue

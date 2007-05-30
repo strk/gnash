@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.58 2007/05/30 13:39:25 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.59 2007/05/30 15:12:28 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -535,20 +535,22 @@ NetStream::newFrameReady()
 	}
 }
 
-image::image_base* NetStream::get_video()
+std::auto_ptr<image::image_base>
+NetStream::get_video()
 {
 	boost::mutex::scoped_lock lock(image_mutex);
 
-	if (!m_imageframe) return NULL;
+	// TODO: inspect if we could return m_imageframe directly...
 
-	image::image_base* ret_image;
+	std::auto_ptr<image::image_base> ret_image;
+
+	if (!m_imageframe) return ret_image;
+
 	if (m_videoFrameFormat == render::YUV) {
-		ret_image = new image::yuv(m_imageframe->m_width, m_imageframe->m_height);
+		ret_image.reset(new image::yuv(m_imageframe->m_width, m_imageframe->m_height));
 	} else if (m_videoFrameFormat == render::RGB) {
-		ret_image = new image::rgb(m_imageframe->m_width, m_imageframe->m_height);
-	} else {
-		return NULL;
-	}
+		ret_image.reset(new image::rgb(m_imageframe->m_width, m_imageframe->m_height));
+	} 
 
 	ret_image->update(m_imageframe->m_data);
 	return ret_image;
