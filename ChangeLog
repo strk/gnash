@@ -45,6 +45,7 @@
 
 	* server/asobj/NetStreamFfmpeg.cpp: Two casts to quiet compiler warnings
 	* configure.ac: Add rpm/deb help for AGG
+	* configure.ac: Warn if libcurl is missing
 
 2007-05-30 Sandro Santilli <strk@keybit.net>
 
