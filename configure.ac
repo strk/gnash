@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.324 2007/05/30 13:10:28 martinwguy Exp $
+dnl $Id: configure.ac,v 1.325 2007/05/30 15:51:37 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1608,6 +1608,12 @@ if test x"$CURL_LIBS" != x; then
     echo "        CURL flags are: default include path"
   fi
     echo "        CURL libs are: $CURL_LIBS"
+else
+  echo "        WARNING: CURL library not found.
+  echo "                 Gnash will be built without support for streaming from URLs."
+  echo "                 Why not install libcurl from http://curl.haxx.se/libcurl"
+  echo "                 or .deb users: apt-get install libcurl3-dev"
+  echo "                 or .rpm users: yum install curl-devel"
 fi
 
 if test x$renderer = xagg; then
