@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.40 2007/05/30 14:37:45 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.41 2007/05/30 14:44:17 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -73,8 +73,11 @@ public:
 	double m_pts;	// presentation timestamp in sec
 };
 
+/// Threadsafe elements-owning queue
+//
 /// This class is a threadsafe queue, using std:queue and locking.
 /// It is used to store decoded audio and video data which are waiting to be "played"
+/// Elements of the queue are owned by instances of this class.
 ///
 template<class T>
 class multithread_queue
@@ -85,6 +88,7 @@ class multithread_queue
 		{
 		}
 
+	// Destroy all elements of the queue. Locks.
 	~multithread_queue()
 		{
 			boost::mutex::scoped_lock lock(_mutex);
@@ -131,8 +135,10 @@ class multithread_queue
 			return rc;
 		}
 
-		/// Returns a pointer to the first element on the queue
+		/// Returns a pointer to the first element on the queue. Locks.
 		//
+		/// If no elements are available this function returns NULL.
+		///
 		/// @return a pointer to the first element on the queue, NULL if queue is empty.
 		///
 		T front()
@@ -146,7 +152,11 @@ class multithread_queue
 			return member;
 		}
 
-		/// Pops the first element from the queue.
+		/// Pops the first element from the queue. Locks.
+		//
+		/// If no elements are available this function is
+		/// a noop. 
+		///
 		void pop()
 		{
 			boost::mutex::scoped_lock lock(_mutex);
