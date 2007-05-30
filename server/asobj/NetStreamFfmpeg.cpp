@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.67 2007/05/29 22:48:25 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.68 2007/05/30 09:06:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,6 +42,9 @@
 #else
 # include "unistd.h" // for usleep()
 #endif
+
+/// Define this to add debugging prints for locking
+//#define GNASH_DEBUG_THREADS
 
 // Used to free data in the AVPackets we create our self
 static void avpacket_destruct(AVPacket* av) {
@@ -594,11 +597,15 @@ rgbcopy(image::rgb* dst, raw_mediadata_t* src, int width)
 // decoder thread
 void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
+#ifdef GNASH_DEBUG_THREADS
 	log_debug("Thread %d locking on ::av_streamer", pthread_self());
+#endif
 	boost::mutex::scoped_lock lock(ns->decoding_mutex);
+#ifdef GNASH_DEBUG_THREADS
 	log_debug(" obtained (av_streamer)");
+#endif
 
 	// This should only happen if close() is called before this thread is ready
 	if (!ns->m_go)
@@ -637,7 +644,9 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 	// Loop while we're playing
 	while (ns->m_go)
 	{
+#ifdef GNASH_DEBUG_THREADS
 		log_debug("Decoding iteration");
+#endif
 
 		if (ns->m_isFLV) {
 			// If queues are full then don't bother filling it
@@ -653,9 +662,13 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 			if (ns->m_pause || (ns->m_qvideo.size() > 10 && ns->m_qaudio.size() > 10))
 			{ 
 				assert(ns->m_go);
+#ifdef GNASH_DEBUG_THREADS
 				log_debug("Waiting on lock..");
+#endif
 				ns->decode_wait.wait(lock);
+#ifdef GNASH_DEBUG_THREADS
 				log_debug("Finished waiting.");
+#endif
 			}
 		} else {
 
@@ -669,15 +682,21 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 			// if the queue is full we wait until someone notifies us that data is needed.
 			if (ns->m_pause || ((ns->m_qvideo.size() > 0 && ns->m_qaudio.size() > 0) && ns->m_unqueued_data))
 			{ 
+#ifdef GNASH_DEBUG_THREADS
 				log_debug("Waiting on lock..");
+#endif
 				ns->decode_wait.wait(lock);
+#ifdef GNASH_DEBUG_THREADS
 				log_debug("Finished waiting.");
+#endif
 			}
 		}
 
 	}
 
+#ifdef GNASH_DEBUG_THREADS
 	log_debug("Out of decoding loop");
+#endif
 	ns->m_go = false;
 
 	log_debug("Setting playStop status");
@@ -687,13 +706,17 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 // audio callback is running in sound handler thread
 bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(owner);
 
+#ifdef GNASH_DEBUG_THREADS
 	log_debug("Thread %d locking on ::audio_streamer", pthread_self());
+#endif
 	boost::mutex::scoped_lock  lock(ns->decoding_mutex);
+#ifdef GNASH_DEBUG_THREADS
 	log_debug(" obtained (audio_streamer)");
+#endif
 
 	if (!ns->m_go || ns->m_pause) return false;
 
@@ -740,7 +763,9 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 	if (frame == NULL) {
 		if (_netCon->loadCompleted())
 		{
+#ifdef GNASH_DEBUG_THREADS
 			log_debug("decodeFLVFrame: load completed, stopping");
+#endif
 			// Stop!
 			m_go = false;
 		} else {
@@ -959,9 +984,13 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 
 bool NetStreamFfmpeg::decodeMediaFrame()
 {
+#ifdef GNASH_DEBUG_THREADS
 	log_debug("Thread %d locking on ::decodeMediaFrame", pthread_self());
+#endif
 	boost::mutex::scoped_lock  lock(decoding_mutex);
+#ifdef GNASH_DEBUG_THREADS
 	log_debug(" obtained (decodeMediaFrame)");
+#endif
 
 	if (m_unqueued_data)
 	{
@@ -1164,9 +1193,13 @@ NetStreamFfmpeg::refreshVideoFrame()
 void
 NetStreamFfmpeg::advance()
 {
+#ifdef GNASH_DEBUG_THREADS
 	log_debug("Thread %d locking on ::advance", pthread_self());
+#endif
 	boost::mutex::scoped_lock lock(decoding_mutex);
+#ifdef GNASH_DEBUG_THREADS
 	log_debug(" obtained (advance)");
+#endif
 
 	// Make sure al decoding has stopped
 	// This can happen in 2 cases: 
@@ -1183,7 +1216,7 @@ NetStreamFfmpeg::advance()
 		m_start_onbuffer = false;
 	}
 
-	log_debug("(advance): processing status notification, refreshing video frame");
+	//log_debug("(advance): processing status notification, refreshing video frame");
 
 	// Check if there are any new status messages, and if we should
 	// pass them to a event handler

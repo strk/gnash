@@ -4,7 +4,8 @@
 	  method (return milliseconds, not seconds); have
 	  NetStream.bufferLength return in fractional seconds, as expected;
 	  Change bufferTime to take milliseconds, convert from seconds
-	  in the AS method (so we can accept fractional seconds..).
+	  in the AS method (so we can accept fractional seconds..);
+	  make locking debugging messages a compile-time option.
 
 2007-05-30 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
