@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.37 2007/05/29 22:48:25 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.38 2007/05/30 09:55:30 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -251,6 +251,7 @@ private:
 	// 	- ::av_streamer() which locks
 	// 	- ::play() not locking but called by ::advance which locks
 	// 	- ::startPlayback() not locking but called by ::av_streamer
+	// 	- ::advance() which locks
 	//
 	void unpauseDecoding();
 
