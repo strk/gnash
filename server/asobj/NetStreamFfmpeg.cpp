@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.69 2007/05/30 10:29:41 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.70 2007/05/30 10:41:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -109,6 +109,7 @@ void NetStreamFfmpeg::close()
 	{
 		// terminate thread
 		m_go = false;
+		log_debug("Waking up decoder thread on close()");
 		decode_wait.notify_one();
 
 		// wait till thread is complete before main continues
@@ -726,7 +727,9 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 
 		// If less than 3 frames in the queue notify the decoding thread
 		// so that we don't suddenly run out.
-		if (ns->m_qaudio.size() < 3) {
+		if (ns->m_qaudio.size() < 3)
+		{
+			log_debug("Waking up decoder thread from audio_streamer due to short qaudio size (%lu)", ns->m_qaudio.size());
 			ns->decode_wait.notify_one();
 		}
 
@@ -1130,13 +1133,17 @@ NetStreamFfmpeg::refreshVideoFrame()
 	if (!m_go || m_pause) return;
 
 	// Loop until a good frame is found
-	while(1) {
+	while(1)
+	{
 		// Get video frame from queue, will have the lowest timestamp
+		// will return NULL if empty(). See multithread_queue::front
 		raw_mediadata_t* video = m_qvideo.front();
 
 		// If the queue is empty, we tell the decoding thread to wake up,
 		// and decode some more.
-		if (!video) {
+		if (!video)
+		{
+			log_debug("Waking up decoder thread from refreshVideoFrame due to empty video queue");
 			decode_wait.notify_one();
 			return;
 		}
@@ -1181,7 +1188,9 @@ NetStreamFfmpeg::refreshVideoFrame()
 
 		// If less than 3 frames in the queue notify the decoding thread
 		// so that we don't suddenly run out.
-		if (m_qvideo.size() < 3) {
+		if (m_qvideo.size() < 3)
+		{
+			log_debug("Waking up decoder thread from refreshVideoFrame due short video queue (%lu)", m_qvideo.size());
 			decode_wait.notify_one();
 		}
 	}
@@ -1270,6 +1279,7 @@ void NetStreamFfmpeg::unpauseDecoding()
 	}
 
 	// Notify the decode thread/loop that we are running again
+	log_debug("Waking up decoder thread from unpauseDecoding...");
 	decode_wait.notify_one();
 
 	// Re-connect to the soundhandler
