@@ -1,3 +1,9 @@
+2007-05-30 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStreamFfmpeg.cpp: Fixed seeking to work when not
+	  seeking to 0.
+	* server/asobj/SoundFfmpeg.cpp: Silence a compiler warning.
+
 2007-05-30 Sandro Santilli <strk@keybit.net>
 
 	* libbase/FLVParser.{cpp,h}: drop setLoadThread method, require

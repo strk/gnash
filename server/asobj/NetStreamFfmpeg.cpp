@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.72 2007/05/30 12:18:49 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.73 2007/05/30 12:42:03 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1081,10 +1081,11 @@ NetStreamFfmpeg::seek(double pos)
 
 	} else if (m_isFLV) {
 		double newtime = static_cast<double>(newpos) / 1000.0;
-		m_start_clock += (m_last_audio_timestamp - newtime) / 1000.0;
+		if (m_VCodecCtx) m_start_clock += (m_last_video_timestamp - newtime) / 1000.0;
+		else m_start_clock += (m_last_audio_timestamp - newtime) / 1000.0;
 
-		m_last_audio_timestamp = newtime;
-		m_last_video_timestamp = newtime;
+		if (m_ACodecCtx) m_last_audio_timestamp = newtime;
+		if (m_VCodecCtx) m_last_video_timestamp = newtime;
 		m_current_timestamp = newtime;
 	} else {
 		AVPacket Packet;
