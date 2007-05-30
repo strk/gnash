@@ -1,3 +1,10 @@
+2007-05-30 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetConnection.h: add documentation about which calls
+	  are blocking and which not.
+	* server/asobj/NetConnection.cpp (openConnection): return false if
+	  already connected
+
 2007-05-29 Martin Guy <martinwguy@yahoo.it>
 
 	* server/asobj/NetStreamFfmpeg.cpp: Two casts to quiet compiler warnings

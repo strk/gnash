@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.31 2007/05/28 15:41:08 ann Exp $ */
+/* $Id: NetConnection.h,v 1.32 2007/05/30 11:58:21 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -60,6 +60,11 @@ public:
 
 	/// Open a connection to stream FLV files.
 	//
+	/// If already connected an error is raised and false
+	/// is returned. Otherwise, a connection is attempted
+	/// using a separate thread that starts loading data
+	/// caching it.
+	///
 	/// @param url
 	///	An url portion to append to the base url (???)
 	///
@@ -73,30 +78,62 @@ public:
 	bool openConnection(const std::string& url);
 
 	/// Put read pointer at given position
+	//
+	/// If the position has not been loaded yet
+	/// this call blocks. If not connected false
+	/// is returned w/out blocking.
+	///
 	bool seek(size_t pos);
 
 	/// Read 'bytes' bytes into the given buffer.
 	//
+	/// If not enough bytes have been loaded yet
+	/// this call blocks. If not connected false
+	/// is returned w/out blocking.
+	///
 	/// Return number of actually read bytes
 	///
 	size_t read(void *dst, size_t bytes);
 
 	/// Return true if EOF has been reached
+	//
+	/// This call never blocks.
+	/// If not connected, true is returned (is this correct behaviour?)
+	///
 	bool eof();
 
 	/// Report global position within the file
+	//
+	/// This call never blocks.
+	/// If not connected, 0 is returned (is this correct behaviour?)
+	///
 	size_t tell();
 
-	///	Returns the number of bytes cached
+	/// Returns the number of bytes cached
+	//
+	/// This call never blocks.
+	/// If not connected, 0 is returned (is this correct behaviour?)
+	///
 	long getBytesLoaded();
 
-	///	Returns the total size of the file
+	/// Returns the total size of the file
+	//
+	/// This call never blocks.
+	/// If not connected, 0 is returned (is this correct behaviour?)
+	///
 	long getBytesTotal();
 
 	/// Connects FLV parser with the LoadThread
+	//
+	/// This call never blocks.
+	/// If not connected, false is returned.
+	///
 	bool connectParser(FLVParser& parser);
 
 	/// Returns whether the load is complete
+	//
+	/// This call never blocks.
+	///
 	bool loadCompleted();
 
 	/// Register the "NetConnection" constructor to the given global object

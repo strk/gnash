@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.45 2007/05/26 13:57:09 tgc Exp $ */
+/* $Id: NetConnection.cpp,v 1.46 2007/05/30 11:58:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -70,7 +70,7 @@ bool NetConnection::openConnection(const std::string& url)
 	if (_loader.get())
 	{
 		log_error("NetConnection::openConnection() called when already connected to a stream. Should we close the old stream and open a new one?.");
-		return true;
+		return false;
 	}
 
 	if (_url.size() > 0) {
