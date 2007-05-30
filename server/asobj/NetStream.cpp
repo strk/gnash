@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.52 2007/05/29 05:15:21 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.53 2007/05/30 08:49:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -326,7 +326,9 @@ netstream_bufferLength(const fn_call& fn)
 {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	long ret = ns->bufferLength();
+	// NetStream::bufferLength returns milliseconds, we want
+	// to return *fractional* seconds.
+	double ret = ns->bufferLength()/1000.0;
 	return as_value(ret);
 }
 
@@ -521,6 +523,7 @@ long
 NetStream::bufferLength()
 {
 	if (m_parser.get() == NULL) return 0;
+
 	return m_parser->getBufferLength();
 }
 
