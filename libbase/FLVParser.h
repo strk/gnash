@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.11 2007/05/30 09:52:47 strk Exp $
+// $Id: FLVParser.h,v 1.12 2007/05/30 12:18:49 strk Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -154,12 +154,24 @@ public:
 /// and fetching frames from there on, sequentially.
 /// See seek(), nextVideoFrame(), nextAudioFrame() and nextMediaFrame().
 ///
+/// Input is received from a LoadThread object.
+///
+/// TODO: have the LoadThread passed at construction time
+///
 class DSOEXPORT FLVParser
 {
 
 public:
-	/// Creating the object...
-	FLVParser();
+
+	/// \brief
+	/// Create an FLV parser reading input from
+	/// the given LoadThread
+	//
+	/// @param lt
+	/// 	LoadThread to use for input.
+	/// 	Ownership left to the caller.
+	///
+	FLVParser(LoadThread& lt);
 
 	/// Kills the parser...
 	~FLVParser();
@@ -199,9 +211,6 @@ public:
 	/// Locks the _mutex
 	///
 	FLVAudioInfo* getAudioInfo();
-
-	/// Sets the LoadThread which is used as interface
-	void setLoadThread(LoadThread* lt);
 
 	/// \brief
 	/// Asks if a frame with with a timestamp larger than
@@ -273,8 +282,8 @@ private:
 	// Functions used to extract numbers from the file
 	inline uint32_t getUInt24(uint8_t* in);
 
-	/// The interface to the file
-	LoadThread* _lt;
+	/// The interface to the file, externally owned
+	LoadThread& _lt;
 
 	typedef std::vector<FLVVideoFrame*> VideoFrames;
 

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.32 2007/05/30 11:58:21 strk Exp $ */
+/* $Id: NetConnection.h,v 1.33 2007/05/30 12:18:49 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -123,12 +123,11 @@ public:
 	///
 	long getBytesTotal();
 
-	/// Connects FLV parser with the LoadThread
+	/// Return an FLVParser using our LoadThread for input
 	//
-	/// This call never blocks.
-	/// If not connected, false is returned.
+	/// If not connected, a NULL auto_ptr is returned.
 	///
-	bool connectParser(FLVParser& parser);
+	std::auto_ptr<FLVParser> getConnectedParser() const;
 
 	/// Returns whether the load is complete
 	//

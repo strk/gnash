@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.46 2007/05/30 11:58:21 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.47 2007/05/30 12:18:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -175,13 +175,17 @@ NetConnection::loadCompleted()
 	return _loader->completed();
 }
 
-bool
-NetConnection::connectParser(FLVParser& parser)
+std::auto_ptr<FLVParser>
+NetConnection::getConnectedParser() const
 {
-	if (!_loader.get()) return false;
+	std::auto_ptr<FLVParser> ret;
 
-	parser.setLoadThread(_loader.get());
-	return true;
+	if ( _loader.get() )
+	{
+		ret.reset(new FLVParser(*_loader));
+	}
+
+	return ret;
 }
 
 /// \brief callback to instantiate a new NetConnection object.

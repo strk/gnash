@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.50 2007/05/28 19:27:20 tgc Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.51 2007/05/30 12:18:49 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -98,7 +98,6 @@ NetStreamGst::NetStreamGst():
 NetStreamGst::~NetStreamGst()
 {
 	close();
-	//delete m_parser;
 }
 
 void NetStreamGst::pause(int mode)
@@ -759,12 +758,11 @@ NetStreamGst::startPlayback()
 	if (head[0] == 'F' && head[1] == 'L' && head[2] == 'V') { 
 		m_isFLV = true;
 		if (!m_parser.get()) {
-			m_parser.reset(new FLVParser()); // TODO: define ownership, use auto_ptr !
-			if (!nc->connectParser(*m_parser)) {
+			m_parser = nc->getConnectedParser(); 
+			if (! m_parser.get() )
+			{
 				setStatus(streamNotFound);
 				log_error(_("Gnash could not open FLV movie: %s"), url.c_str());
-				m_parser.reset(); // release memory associated with the parser
-				//delete m_parser;
 				return;
 			}
 		}

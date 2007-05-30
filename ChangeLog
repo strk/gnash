@@ -1,5 +1,14 @@
 2007-05-30 Sandro Santilli <strk@keybit.net>
 
+	* libbase/FLVParser.{cpp,h}: drop setLoadThread method, require
+	  a LoadThread to be passed on construction.
+	* server/asobj/NetConnection.{cpp,h}: drop connectParser, substitute
+	  with getConnectedParser().
+	* server/asobj/: NetStreamFfmpeg.cpp, NetStreamGst.cpp: use
+	  NetConnection::getConnectedParser() for initializing an FLV parser.
+
+2007-05-30 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetConnection.h: add documentation about which calls
 	  are blocking and which not.
 	* server/asobj/NetConnection.cpp (openConnection): return false if
