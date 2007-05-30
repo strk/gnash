@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.323 2007/05/27 23:41:48 rsavoye Exp $
+dnl $Id: configure.ac,v 1.324 2007/05/30 13:10:28 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1630,7 +1630,9 @@ dnl      echo "          needs compatibility layer: $agg_need_compatibility_laye
     fi
   else
     echo "        WARNING: Your installation of AGG appears to be version 2.4 or older."
-    echo "                 Please upgrade to AGG 2.5 or greater."
+    echo "                 Please upgrade to AGG 2.5 or greater"
+    echo "                 or .deb users: apt-get install libagg-dev"
+    echo "                 or .rpm users: yum install agg-devel"
   fi
 fi
 
