@@ -1,3 +1,8 @@
+2007-05-30 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/LoadThread.cpp: Close the download thread even if
+	  download wasen't completed.
+
 2007-05-29 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/LoadThread.cpp: Don't lock the mutex and try to join the 
