@@ -1,3 +1,7 @@
+2007-05-29 Martin Guy <martinwguy@yahoo.it>
+
+	* server/asobj/NetStreamFfmpeg.cpp: Two casts to quiet compiler warnings
+
 2007-05-30 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStreamFfmpeg.cpp (decodeFLVFrame): Don't modify m_bufferTime

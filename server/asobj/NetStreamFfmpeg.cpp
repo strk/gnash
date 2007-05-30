@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.70 2007/05/30 10:41:15 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.71 2007/05/30 11:32:13 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -729,7 +729,7 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 		// so that we don't suddenly run out.
 		if (ns->m_qaudio.size() < 3)
 		{
-			log_debug("Waking up decoder thread from audio_streamer due to short qaudio size (%lu)", ns->m_qaudio.size());
+			log_debug("Waking up decoder thread from audio_streamer due to short qaudio size (%lu)", static_cast<unsigned long>(ns->m_qaudio.size()));
 			ns->decode_wait.notify_one();
 		}
 
@@ -1190,7 +1190,7 @@ NetStreamFfmpeg::refreshVideoFrame()
 		// so that we don't suddenly run out.
 		if (m_qvideo.size() < 3)
 		{
-			log_debug("Waking up decoder thread from refreshVideoFrame due short video queue (%lu)", m_qvideo.size());
+			log_debug("Waking up decoder thread from refreshVideoFrame due short video queue (%lu)", static_cast<unsigned long>(m_qvideo.size()));
 			decode_wait.notify_one();
 		}
 	}
