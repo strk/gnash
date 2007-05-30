@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.16 2007/05/26 16:23:21 bjacques Exp $
+// $Id: FLVParser.cpp,v 1.17 2007/05/30 09:52:46 strk Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -50,6 +50,8 @@ FLVParser::~FLVParser()
 
 uint32_t FLVParser::getBufferLength()
 {
+	boost::mutex::scoped_lock lock(_mutex);
+
 	if (_video) {
 		size_t size = _videoFrames.size();
 		if (size > 1 && size > _nextVideoFrame) {

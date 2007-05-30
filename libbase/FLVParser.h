@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.10 2007/05/27 14:22:03 bjacques Exp $
+// $Id: FLVParser.h,v 1.11 2007/05/30 09:52:47 strk Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -164,51 +164,92 @@ public:
 	/// Kills the parser...
 	~FLVParser();
 
+	/// Return next media frame
+	//
+	/// Locks the _mutex
+	///
 	FLVFrame* nextMediaFrame();
 
+	/// \brief
 	/// Returns the next audio frame in the timeline. If no frame has been
 	/// played before the first frame is returned. If there is no more frames
 	/// in the timeline NULL is returned.
+	//
+	/// Locks the _mutex
+	///
 	FLVFrame* nextAudioFrame();
 
+	/// \brief
 	/// Returns the next video frame in the timeline. If no frame has been
 	/// played before the first frame is returned. If there is no more frames
 	/// in the timeline NULL is returned.
+	//
+	/// Locks the _mutex
+	///
 	FLVFrame* nextVideoFrame();
 
 	/// Returns a FLVVideoInfo class about the videostream
+	//
+	/// Locks the _mutex
+	///
 	FLVVideoInfo* getVideoInfo();
 
 	/// Returns a FLVAudioInfo class about the audiostream
+	//
+	/// Locks the _mutex
+	///
 	FLVAudioInfo* getAudioInfo();
 
 	/// Sets the LoadThread which is used as interface
 	void setLoadThread(LoadThread* lt);
 
+	/// \brief
 	/// Asks if a frame with with a timestamp larger than
-	/// the given time is available. If such a frame is not
+	/// the given time is available.
+	//
+	/// If such a frame is not
 	/// available in list of already the parsed frames, we
 	/// parse some more. This is used to check how much is buffered.
+	///
+	/// Locks the _mutex
+	///
 	bool isTimeLoaded(uint32_t time);
 
-	/// seeks to the closest possible position the given position,
+	/// \brief
+	/// Seeks to the closest possible position the given position,
 	/// and returns the new position.
+	//
+	/// Locks the _mutex
+	///
 	uint32_t seek(uint32_t);
 
 	/// Returns the framedelay from the last to the current
 	/// audioframe in milliseconds. This is used for framerate.
+	//
+	/// Locks the _mutex
+	///
 	uint32_t audioFrameDelay();
 
+	/// \brief
 	/// Returns the framedelay from the last to the current
-	/// videoframe in milliseconds. This is used for framerate.
+	/// videoframe in milliseconds. 
+	//
+	/// Locks the _mutex
+	///
 	uint32_t videoFrameDelay();
 
 	/// Returns the framerate of the video
+	//
+	/// Locks the _mutex
+	///
 	uint16_t videoFrameRate();
 
 	/// Returns the "bufferlength", meaning the differens between the
 	/// current frames timestamp and the timestamp of the last parseable
 	/// frame. Returns the difference in milliseconds.
+	//
+	/// Locks the _mutex
+	///
 	uint32_t getBufferLength();
 
 private:

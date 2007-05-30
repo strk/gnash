@@ -1,5 +1,7 @@
 2007-05-30 Sandro Santilli <strk@keybit.net>
 
+	* libbase/FLVParser.{h,cpp}: document which methods lock and which
+	  not, add locking in getBufferLength().
 	* server/asobj/NetStream.{h,cpp}: fix documentation for bufferLength
 	  method (return milliseconds, not seconds); have
 	  NetStream.bufferLength return in fractional seconds, as expected;
