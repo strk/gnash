@@ -1,5 +1,7 @@
 2007-05-30 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: add missing quote in martin's commit (no ChangeLog
+	  entry for it, btw)
 	* server/asobj/README.NetStream: add design notes for NetStream.
 
 2007-05-30 Sandro Santilli <strk@keybit.net>
