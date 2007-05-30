@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.68 2007/05/30 09:06:57 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.69 2007/05/30 10:29:41 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -645,7 +645,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 	while (ns->m_go)
 	{
 #ifdef GNASH_DEBUG_THREADS
-		log_debug("Decoding iteration");
+		log_debug("Decoding iteration. bufferTime=%lu, bufferLen=%lu", ns->bufferTime(), ns->bufferLength());
 #endif
 
 		if (ns->m_isFLV) {
@@ -769,9 +769,7 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 			// Stop!
 			m_go = false;
 		} else {
-			// We pause and load and buffer a second before continuing.
 			pauseDecoding();
-			m_bufferTime = static_cast<uint32_t>(m_current_timestamp) * 1000 + 1000;
 			setStatus(bufferEmpty);
 			m_start_onbuffer = true;
 		}
@@ -1208,7 +1206,7 @@ NetStreamFfmpeg::advance()
 	//    miliseconds).
 	// 2) The buffer has be "starved" (not being filled as quickly as needed),
 	//    and we then wait until the buffer contains some data (1 sec) again.
-	if (m_go && m_pause && m_start_onbuffer && m_parser.get() && m_parser->isTimeLoaded(m_bufferTime))
+	if (m_go && m_pause && m_start_onbuffer && m_parser.get() && m_parser->isTimeLoaded(m_current_timestamp+m_bufferTime))
 	{
 		log_debug("(advance): setting buffer full");
 		setStatus(bufferFull);

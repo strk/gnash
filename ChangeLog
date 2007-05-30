@@ -1,5 +1,14 @@
 2007-05-30 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.cpp (decodeFLVFrame): Don't modify m_bufferTime
+	  internally: should only be done on user request. (advance):
+	  bufferFull condition is when parser loaded current+buffer time.
+	  (av_streamer): add bufferTime/Length info in Decoding iteration
+	  message - this shows that the playback is NOT waiting for bufferTime
+	  to be reached before starting again (bug).
+
+2007-05-30 Sandro Santilli <strk@keybit.net>
+
 	* libbase/FLVParser.{h,cpp}: document which methods lock and which
 	  not, add locking in getBufferLength().
 	* server/asobj/NetStream.{h,cpp}: fix documentation for bufferLength
