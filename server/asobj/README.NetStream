@@ -1,0 +1,80 @@
+Design info for NetStream based media playing
+
+===============================================================================
+ Data flow diagram for Gnash implementation of NetStream playback using FFMPEG
+===============================================================================
+
+Notation: process, [dataStore], <externalEvent>
+
+       [input] --> (2) parser --> [parsedBuffer]
+                                        |
+           +----------------------------+
+           |
+           V
+      (2) decoder <-+-> [videoQueue] ---> (1) videoFrameUpdater --> [renderableFrame] 
+           ^        |                              ^                     |
+           |        |                              |                     |
+           +------- | -----------------------------+                     |
+                    |                              |                     V
+                    |          (1) <seek>  ---> [PlayHead]        (1) renderer --> [videoOut]
+                    |                              ^       
+                    |                              |       
+                    +-> [audioQueue] ---> (3) soundPlayer -> [audioOut]
+
+ Processes
+===========
+
+
+                parser : FLVParser           
+               decoder : av_streamer        
+     videoFrameUpdater : refreshVideoFrame  
+              renderer : render_handler    
+           soundPlayer : sound_streamer   
+                  seek : NetStream::seek
+
+
+
+ Datastores and protection
+===========================
+
+           [input] : Accessible trough LoadThread, providing thread-safe interfaces
+    [parsedBuffer] : Accessible trough FLVParser, providing thread-safe interfaces
+      [videoQueue] : Accessible trough multithread_queue, providing thread-safe interfaces
+      [audioQueue] : Accessible trough multithread_queue, providing thread-safe interfaces
+ [renderableFrame] : Direct access, disciplined by image_mutex
+        [audioOut] : Audio output channel
+        [videoOut] : Video output channel
+        [PlayHead] : m_current_timestamp, m_go and m_pause. protection UNCLEAR !! refactoring planned 
+
+
+ Threads
+=========
+
+  thread1 (main)              : videoFrameUpdater, renderer, seek
+  thread2 (load/parse/decode) : parser, decoder
+  thread3 (playsound)         : soundPlayer
+
+  NOTE: thread2 actually includes a loading thread hidden in this diagram for simplicity.
+        it is likely that we can safely drop that additional thread as a whole.
+
+
+===============================================================================
+ Data flow diagram for Gnash implementation of NetStream playback using GST
+===============================================================================
+
+
+                         +-->  (2) [ParsedVideoBuffer]---+
+                         |                               |
+(2) [input] --> parser --+                               +---> (2) GST pipeline --> [renderableFrame] --> (1) renderer -> [videoOut]
+                         |                               |               |                                      
+                         +-->  (2) [ParsedAudioBuffer]---+               |
+                                                                         +---> (2) soundPlayer --> [audioOut]
+
+
+ Processes
+===========
+
+
+ thread 2 : FLVParser, decoder, audio output
+ thread 1 : fetch videoframe
+

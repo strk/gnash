@@ -1,5 +1,9 @@
 2007-05-30 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/README.NetStream: add design notes for NetStream.
+
+2007-05-30 Sandro Santilli <strk@keybit.net>
+
 	* server/video_stream_instance.cpp (display): update call to
 	  get_video.
 	* server/asobj/NetStream.{cpp,h}: change get_video to return by
