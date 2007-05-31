@@ -39,10 +39,10 @@ Notation: process, [dataStore], <externalEvent>
  Datastores and protection
 ===========================
 
-           [input] : Accessible trough LoadThread, providing thread-safe interfaces
-    [parsedBuffer] : Accessible trough FLVParser, providing thread-safe interfaces
-      [videoQueue] : Accessible trough multithread_queue, providing thread-safe interfaces
-      [audioQueue] : Accessible trough multithread_queue, providing thread-safe interfaces
+           [input] : Accessible through LoadThread, providing thread-safe interfaces
+    [parsedBuffer] : Accessible through FLVParser, providing thread-safe interfaces
+      [videoQueue] : Accessible through multithread_queue, providing thread-safe interfaces
+      [audioQueue] : Accessible through multithread_queue, providing thread-safe interfaces
  [renderableFrame] : Direct access, disciplined by image_mutex
         [audioOut] : Audio output channel
         [videoOut] : Video output channel
