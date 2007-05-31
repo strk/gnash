@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.18 2007/05/30 12:18:49 strk Exp $
+// $Id: FLVParser.cpp,v 1.19 2007/05/31 11:20:47 tgc Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -126,11 +126,11 @@ FLVFrame* FLVParser::nextMediaFrame()
 	uint32_t video_size = _videoFrames.size();
 	uint32_t audio_size = _audioFrames.size();
 
-	if ( ! (audio_size <= _nextAudioFrame && video_size <= _nextVideoFrame) )
+	if (audio_size <= _nextAudioFrame && video_size <= _nextVideoFrame)
 	{
 
 		// Parse a media frame if any left or if needed
-		while(video_size == _videoFrames.size() && audio_size == _audioFrames.size() && !_parsingComplete) {
+		while(_videoFrames.size() <= _nextVideoFrame && _audioFrames.size() <= _nextAudioFrame && !_parsingComplete) {
 			if (!parseNextFrame()) break;
 		}
 	}

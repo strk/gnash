@@ -1,3 +1,8 @@
+2007-05-31 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/FLVParser.cpp: (FLVFrame* FLVParser::nextMediaFrame)
+	  Fixed a bug causing nextMediaFrame to return NULL.
+
 2007-05-31 Martin Guy <martinwguy@yahoo.it>
 
         * libbase/embedVideoDecoderFfmpeg.cpp,
