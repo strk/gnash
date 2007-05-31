@@ -101,7 +101,10 @@ public:
     
     bool openLog(const char *filespec);
     bool removeLog(void);
+
+    // locks _ioMutex to prevent race conditions accessing _outstream
     bool closeLog(void);
+
     // accessors for the verbose level
     void setVerbosity (void) {
 	_verbose++;

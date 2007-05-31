@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.51 2007/05/25 07:36:44 strk Exp $ */
+/* $Id: log.cpp,v 1.52 2007/05/31 12:34:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -402,6 +402,7 @@ LogFile::openLog (const char *filespec)
 bool
 LogFile::closeLog (void)
 {
+    boost::mutex::scoped_lock lock(_ioMutex);
     if (_state == OPEN) {
 	_outstream.flush();
         _outstream.close();

@@ -1,3 +1,9 @@
+2007-05-31 Sandro Santilli <strk@keybit.net>
+
+	* libbase/log.{cpp,h}: lock the io Mutex on closeLog, to
+	  prevent race conditions between a thread using log()
+	  and one using closeLog().
+
 2007-05-31 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/FLVParser.cpp: (FLVFrame* FLVParser::nextMediaFrame)
