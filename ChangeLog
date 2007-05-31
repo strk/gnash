@@ -1,3 +1,10 @@
+2007-05-31 Martin Guy <martinwguy@yahoo.it>
+
+        * libbase/embedVideoDecoderFfmpeg.cpp,
+          server/asobj/NetStreamFfmpeg.cpp:
+          Add comments by commented img_convert()s to use sws_scale() when
+          implementing.
+
 2007-05-31 Sandro Santilli <strk@keybit.net>
 
 	* libbase/embedVideoDecoderFfmpeg.{cpp,h}:

@@ -153,6 +153,7 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 		} else if (outputFormat == YUV && cc->pix_fmt != PIX_FMT_YUV420P) {
 			//assert(0);	// TODO
 			//img_convert((AVPicture*) pFrameYUV, PIX_FMT_YUV420P, (AVPicture*) pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
+			// Don't use depreceted img_convert, use sws_scale
 
 		} else if (outputFormat == RGB && cc->pix_fmt != PIX_FMT_RGB24) {
 			buffer.reset(convertRGB24(cc, frame));

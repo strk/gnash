@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.76 2007/05/31 06:39:08 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.77 2007/05/31 09:19:31 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -888,6 +888,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 		} else if (m_videoFrameFormat == render::YUV && m_VCodecCtx->pix_fmt != PIX_FMT_YUV420P) {
 			assert(0);	// TODO
 			//img_convert((AVPicture*) pFrameYUV, PIX_FMT_YUV420P, (AVPicture*) pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
+			// Don't use depreceted img_convert, use sws_scale
 
 		} else if (m_videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
 			buffer.reset(embedVideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, m_Frame));
