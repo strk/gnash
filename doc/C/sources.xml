@@ -764,11 +764,12 @@
 	      Enable support for the a graphics backend. Currently
 	      only <emphasis>opengl</emphasis> and
 	      <emphasis>agg</emphasis> work sufficiently. OpenGL is
-	      used when you have hardware accelerated graphics. AGG i
+	      used when you have hardware accelerated graphics. AGG is
 	      used when you don't have hardware accelerated
 	      graphics. Typically most desktop machines have OpenGL
-	      support, and most embedded systems don't. AGG is the
-	      default when building Gnash.
+	      support, and most embedded systems don't. OpenGL is the
+	      default when building Gnash, though the quality of AGG's
+	      rendering is currently superior to OpenGL.
 	    </para>
 	  </listitem>
 	</varlistentry>
@@ -1382,7 +1383,7 @@
       </para>
 
       <programlisting>
-        ../../gnash/configure --build=i686-pc-linux-gnu --host=arm-linux --prefix=/usr/local/arm/oe --disable-plugin --disable-shared
+        ../../gnash/configure --build=i686-pc-linux-gnu --host=arm-linux --prefix=/usr/local/arm/oe --disable-plugin --enable-renderer=agg --disable-shared
       </programlisting>
       
       <para>
