@@ -4,6 +4,7 @@
           server/asobj/NetStreamFfmpeg.cpp:
           Add comments by commented img_convert()s to use sws_scale() when
           implementing.
+	* Change default renderer to agg for 0.8.0 release
 
 2007-05-31 Sandro Santilli <strk@keybit.net>
 

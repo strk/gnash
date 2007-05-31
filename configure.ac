@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.326 2007/05/30 17:17:59 strk Exp $
+dnl $Id: configure.ac,v 1.327 2007/05/31 10:46:52 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -217,14 +217,14 @@ dnl   AC_MSG_ERROR([You must use the kde GUI ( --enable-gui=KDE ) if you enable 
 dnl fi
 
 AC_ARG_ENABLE(renderer,
-  AC_HELP_STRING([--enable-renderer=engine], [Specify rendering engine: OpenGL, Agg or Cairo (experimental) [[OpenGL]] ]),
+  AC_HELP_STRING([--enable-renderer=engine], [Specify rendering engine: OpenGL, Agg or Cairo (experimental) [[agg]] ]),
  [case "${enableval}" in
    opengl|OpenGL) renderer=opengl ;;
    cairo|Cairo)  renderer=cairo  ;;
    agg|Agg|AGG)  renderer=agg  ;;
    *)      AC_MSG_ERROR([invalid renderer ${enableval} given]) ;;
   esac],
- [renderer=opengl]
+ [renderer=agg]
 )
 
 if test x$renderer = xopengl; then
