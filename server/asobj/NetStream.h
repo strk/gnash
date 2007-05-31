@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.43 2007/05/30 15:12:28 strk Exp $ */
+/*  $Id: NetStream.h,v 1.44 2007/05/31 15:52:28 tgc Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -186,15 +186,15 @@ public:
 	/// Seek in the media played by the current instance
 	//
 	/// @param position
-	///	Defines in seconds where to seek to
+	///	Defines in milliseconds where to seek to
 	///
-	virtual void seek(double /*pos*/){}
+	virtual void seek(uint32_t /*pos*/){}
 
 	/// Tells where the playhead currently is
 	//
-	/// @return The time in seconds of the current playhead position
+	/// @return The time in milliseconds of the current playhead position
 	///
-	virtual int64_t time() { return 0; }
+	virtual int32_t time() { return 0; }
 
 	/// Called at the SWF framerate. Used to process queued status messages
 	/// and (re)start after a buffering pause. In NetStreamFfmpeg it is also
@@ -227,7 +227,7 @@ public:
 	///
 	void setBufferTime(uint32_t time);
 
-	/// Returns what the buffer time has been set to. (1000 miliseconds is default)
+	/// Returns what the buffer time has been set to. (100 miliseconds is default)
 	//
 	/// @return The size of the buffer in milliseconds.
 	///

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.60 2007/05/31 14:35:18 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.61 2007/05/31 15:52:28 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -67,7 +67,7 @@ NetStream::NetStream()
 	as_object(getNetStreamInterface()),
 	_netCon(NULL),
 	m_env(NULL),
-	m_bufferTime(1000), // The default size needed to begin playback of media is 1000 miliseconds
+	m_bufferTime(100), // The default size needed to begin playback of media is 100 miliseconds
 	m_videoFrameFormat(gnash::render::videoFrameFormat()),
 	m_newFrameReady(false),
 	m_go(false),
@@ -164,7 +164,7 @@ static as_value netstream_seek(const fn_call& fn) {
 	{
 		time = fn.arg(0).to_number(&fn.env());
 	}
-	ns->seek(time);
+	ns->seek(static_cast<uint32_t>(time*1000.0));
 
 	return as_value();
 }
@@ -281,7 +281,7 @@ netstream_time(const fn_call& fn)
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
 	assert(fn.nargs == 0); // we're a getter
-	return as_value(double(ns->time()));
+	return as_value(double(ns->time()/1000.0));
 }
 
 // Both a getter and a (do-nothing) setter for bytesLoaded
@@ -528,7 +528,7 @@ NetStream::bufferLength()
 	if (m_parser.get() == NULL) return 0;
 
 	// m_parser will lock a mutex
-	return m_parser->getBufferLength();
+	return m_parser->getBufferLength()/1000;
 }
 
 bool

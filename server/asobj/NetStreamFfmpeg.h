@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.43 2007/05/30 15:12:28 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.44 2007/05/31 15:52:28 tgc Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -70,7 +70,7 @@ public:
 	uint32_t m_size;
 	uint8_t* m_data;
 	uint8_t* m_ptr;
-	double m_pts;	// presentation timestamp in sec
+	uint32_t m_pts;	// presentation timestamp in millisec
 };
 
 /// Threadsafe elements-owning queue
@@ -259,9 +259,9 @@ public:
 	///	- ::startPlayback() non locking but called by av_streamer which locks
 	///	- ::seekMedia() set as a callback with init_put_byte (??)
 	///
-	void seek(double pos);
+	void seek(uint32_t pos);
 
-	int64_t time();
+	int32_t time();
 
 	// Locks decoding_mutex
 	void advance();
@@ -374,21 +374,21 @@ private:
 	boost::condition decode_wait;
 
 	// The timestamp of the last decoded video frame, in seconds.
-	volatile double m_last_video_timestamp;
+	volatile uint32_t m_last_video_timestamp;
 
 	// The timestamp of the last decoded audio frame, in seconds.
-	volatile double m_last_audio_timestamp;
+	volatile uint32_t m_last_audio_timestamp;
 
 	// The timestamp of the last played audio (default) or video (if no audio) frame.
 	// Misured in seconds.
-	double m_current_timestamp;
+	uint32_t m_current_timestamp;
 
 	// The queues of audio and video data.
 	multithread_queue <raw_mediadata_t*> m_qaudio;
 	multithread_queue <raw_mediadata_t*> m_qvideo;
 
 	// The time we started playing in seconds (since VM start ?)
-	volatile double m_start_clock;
+	volatile uint64_t m_start_clock;
 
 	// When the queues are full, this is where we keep the audio/video frame
 	// there wasn't room for on its queue
@@ -397,7 +397,7 @@ private:
 	ByteIOContext ByteIOCxt;
 
 	// Time of when pause started, in seconds since VM started
-	double m_time_of_pause;
+	volatile uint64_t m_time_of_pause;
 };
 
 } // gnash namespace

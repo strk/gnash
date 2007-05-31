@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.51 2007/05/30 12:18:49 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.52 2007/05/31 15:52:28 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -951,11 +951,11 @@ NetStreamGst::startPlayback()
 }
 
 void
-NetStreamGst::seek(double pos)
+NetStreamGst::seek(uint32_t pos)
 {
 	if (!pipeline) {
 		if (m_parser.get())  {
-			m_parser->seek(static_cast<uint32_t>(pos*1000));
+			m_parser->seek(pos);
 			m_clock_offset = 0;
 		}
 		return;
@@ -963,7 +963,7 @@ NetStreamGst::seek(double pos)
 
 	if (m_isFLV) {
 		assert(m_parser.get()); // why assumed here and not above ?
-		uint32_t newpos = m_parser->seek(static_cast<uint32_t>(pos*1000));
+		uint32_t newpos = m_parser->seek(pos);
 		GstClock* clock = GST_ELEMENT_CLOCK(pipeline);
 		uint64_t currenttime = gst_clock_get_time (clock);
 		gst_object_unref(clock);
@@ -972,7 +972,7 @@ NetStreamGst::seek(double pos)
 
 	} else {
 		if (!gst_element_seek (pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
-			GST_SEEK_TYPE_SET, GST_SECOND * static_cast<long>(pos),
+			GST_SEEK_TYPE_SET, GST_MSECOND * pos,
 			GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE)) {
 			log_error("Gstreamer seek failed");
 			setStatus(invalidTime);
@@ -1061,7 +1061,7 @@ NetStreamGst::advance()
 	processStatusNotifications();
 }
 
-int64_t
+int32_t
 NetStreamGst::time()
 {
 
@@ -1075,9 +1075,9 @@ NetStreamGst::time()
 	ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
 
 	if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
-		pos = pos / 1000000000;
+		pos = pos / 1000000;
 
-		return pos - m_clock_offset/1000;
+		return pos - m_clock_offset;
 	} else {
 		return 0;
 	}
