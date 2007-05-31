@@ -1,3 +1,10 @@
+2007-05-31 Sandro Santilli <strk@keybit.net>
+
+	* backend/sound_handler.h: document attach_aux_streamer and
+	  detach_aux_streamer; add TODO items.
+	* backend/sound_handler_sdl.cpp (sdl_audio_callback): documentation,
+	  TODO items, early return if buffer len passed by SDL == 0.
+
 2007-05-31 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStream*.{h,cpp}: Always use milliseconds internally.

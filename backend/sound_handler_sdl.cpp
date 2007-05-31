@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.67 2007/05/29 17:15:14 strk Exp $
+// $Id: sound_handler_sdl.cpp,v 1.68 2007/05/31 16:42:06 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -650,20 +650,46 @@ do_mixing(Uint8* stream, active_sound* sound, Uint8* data, unsigned int mix_leng
 }
 
 
-// The callback function which refills the buffer with data
-// We run through all of the sounds, and mix all of the active sounds 
-// into the stream given by the callback.
-// If sound is compresssed (mp3) a mp3-frame is decoded into a buffer,
-// and resampled if needed. When the buffer has been sampled, another
-// frame is decoded until all frames has been decoded.
-// If a sound is looping it will be decoded from the beginning again.
-
+/// Callback invoked by the SDL audio thread.
+//
+/// Refills the output stream/buffer with data.
+///
+/// We run trough all the attached auxiliary streamers fetching decoded
+/// audio blocks and mixing them into the given output stream.
+///
+/// <UnverifiedComment>
+///   If sound is compresssed (mp3) a mp3-frame is decoded into a buffer,
+///   and resampled if needed. When the buffer has been sampled, another
+///   frame is decoded until all frames has been decoded.
+///   If a sound is looping it will be decoded from the beginning again.
+/// </UnverifiedComment>
+///
+/// TODO: make a static method of the SDL_sound_handler class
+///
+/// @param udata
+///	User data pointer (SDL_sound_handler instance in our case).
+///	We'll lock the SDL_sound_handler::_mutex during operations.
+///
+/// @param stream
+/// 	The output stream/buffer to fill
+///
+/// @param buffer_length_in
+///	Length of the buffer.
+///	If zero or negative we log an error and return
+///	(negative is probably an SDL bug, zero dunno yet).
+///
 static void
 sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 {
 	if ( buffer_length_in < 0 )
 	{
 		gnash::log_error(_("Negative buffer length in sdl_audio_callback (%d)"), buffer_length_in);
+		return;
+	}
+
+	if ( buffer_length_in == 0 )
+	{
+		gnash::log_error(_("Zero buffer length in sdl_audio_callback"));
 		return;
 	}
 

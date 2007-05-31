@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.15 2007/05/29 17:15:13 strk Exp $ */
+/* $Id: sound_handler.h,v 1.16 2007/05/31 16:42:06 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -56,6 +56,8 @@ class DSOEXPORT sound_handler
 {
 public:
 
+	// See attach_aux_streamer
+	// TODO: change third parameter type to unsigned
 	typedef bool (*aux_streamer_ptr)(void *udata, uint8_t *stream, int len);
 
 	/// Used to control volume for event sounds. It basically tells that from
@@ -220,12 +222,23 @@ public:
 	/// This is called by AS classes NetStream or Sound to attach callback, so
 	/// that audio from the classes will be played through the soundhandler.
 	//
+	/// This is actually only used by the SDL sound_handler. It uses these "auxiliary"
+	/// streamers to fetch decoded audio data to mix and send to the output channel.
+	///
+	/// The "aux streamer" will be called with the 'udata' pointer as first argument,
+	/// then will be passed a buffer pointer as second argument and it's length
+	/// as third. The callbacks should fill the given buffer if possible.
+	/// The callback should return true if wants to remain attached, false if wants
+	/// to be detached. 
+	///
 	/// @param ptr
 	///	The pointer to the callback function
 	///
-	/// @param owner
-	/// The pointer to the owner AS class, used to identify which sound callback
-	/// is owned by whom.
+	/// @param udata
+	///	User data pointer, passed as first argument to the registered callback.
+	/// 	WARNING: this is currently also used to *identify* the callback for later
+	///	removal, see detach_aux_streamer. TODO: stop using the data pointer for 
+	///	identification purposes and use the callback pointer directly instead.
 	///
 	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner) = 0;
 
@@ -233,11 +246,12 @@ public:
 	/// that audio from the classes no longer will be played through the 
 	/// soundhandler.
 	//
-	/// @param owner
-	/// The pointer to the owner AS class, used to identify which sound callback
-	/// is owned by whom.
+	/// @param udata
+	/// 	The key identifying the auxiliary streamer.
+	/// 	WARNING: this need currently be the 'udata' pointer passed to attach_aux_streamer.
+	///	TODO: get the aux_streamer_ptr as key !!
 	///
-	virtual void	detach_aux_streamer(void* owner) = 0;
+	virtual void	detach_aux_streamer(void* udata) = 0;
 
 	/// VERY crude sample-rate and steroe conversion. Converts input data to 
 	/// output format.
