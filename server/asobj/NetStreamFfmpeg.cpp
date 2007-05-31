@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.80 2007/05/31 15:52:28 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.81 2007/05/31 21:48:33 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,7 +36,6 @@
 #include "embedVideoDecoderFfmpeg.h"
 
 #include <boost/scoped_array.hpp>
-#include <ffmpeg/swscale.h>
 
 
 #if defined(_WIN32) || defined(WIN32)
