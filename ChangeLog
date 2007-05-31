@@ -1,5 +1,12 @@
 2007-05-31 Sandro Santilli <strk@keybit.net>
 
+	* libbase/FLVParser.cpp: protect seek debugging by
+	  a GNASH_DEBUG_SEEK macro
+	* server/asobj/NetStreamFfmpeg.cpp: dont debug condition
+	  variable signaling if GNASH_DEBUG_THREADS is undefined.
+
+2007-05-31 Sandro Santilli <strk@keybit.net>
+
 	* libbase/log.{cpp,h}: lock the io Mutex on closeLog, to
 	  prevent race conditions between a thread using log()
 	  and one using closeLog().

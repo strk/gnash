@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.77 2007/05/31 09:19:31 martinwguy Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.78 2007/05/31 14:30:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -111,7 +111,9 @@ void NetStreamFfmpeg::close()
 	{
 		// terminate thread
 		m_go = false;
+#ifdef GNASH_DEBUG_THREADS
 		log_debug("Waking up decoder thread on close()");
+#endif
 		decode_wait.notify_one();
 
 		// wait till thread is complete before main continues
@@ -731,7 +733,9 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 		// so that we don't suddenly run out.
 		if (ns->m_qaudio.size() < 3)
 		{
+#ifdef GNASH_DEBUG_THREADS
 			log_debug("Waking up decoder thread from audio_streamer due to short qaudio size (%lu)", static_cast<unsigned long>(ns->m_qaudio.size()));
+#endif
 			ns->decode_wait.notify_one();
 		}
 
@@ -1141,7 +1145,9 @@ NetStreamFfmpeg::refreshVideoFrame()
 		// and decode some more.
 		if (!video)
 		{
+#ifdef GNASH_DEBUG_THREADS
 			log_debug("Waking up decoder thread from refreshVideoFrame due to empty video queue");
+#endif
 			decode_wait.notify_one();
 			return;
 		}
@@ -1188,7 +1194,9 @@ NetStreamFfmpeg::refreshVideoFrame()
 		// so that we don't suddenly run out.
 		if (m_qvideo.size() < 3)
 		{
+#ifdef GNASH_DEBUG_THREADS
 			log_debug("Waking up decoder thread from refreshVideoFrame due short video queue (%lu)", static_cast<unsigned long>(m_qvideo.size()));
+#endif
 			decode_wait.notify_one();
 		}
 	}
@@ -1277,7 +1285,9 @@ void NetStreamFfmpeg::unpauseDecoding()
 	}
 
 	// Notify the decode thread/loop that we are running again
+#ifdef GNASH_DEBUG_THREADS
 	log_debug("Waking up decoder thread from unpauseDecoding...");
+#endif
 	decode_wait.notify_one();
 
 	// Re-connect to the soundhandler

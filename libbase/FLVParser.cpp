@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.19 2007/05/31 11:20:47 tgc Exp $
+// $Id: FLVParser.cpp,v 1.20 2007/05/31 14:30:03 strk Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -25,6 +25,8 @@
 
 #define PADDING_BYTES 8
 
+// Define the following macro the have seek() operations printed
+//#define GNASH_DEBUG_SEEK 1
 
 FLVParser::FLVParser(LoadThread& lt)
 	:
@@ -305,7 +307,9 @@ uint32_t FLVParser::seekAudio(uint32_t time)
 		while ( bestFrame < _audioFrames.size()-1 && _audioFrames[bestFrame+1]->timestamp < time ) ++bestFrame;
 	}
 
+#ifdef GNASH_DEBUG_SEEK
 	gnash::log_debug("Seek (audio): " SIZET_FMT "/" SIZET_FMT " (%u/%u)", bestFrame, numFrames, _audioFrames[bestFrame]->timestamp, time);
+#endif
 	_nextAudioFrame = bestFrame;
 	return _audioFrames[bestFrame]->timestamp;
 
@@ -411,7 +415,9 @@ uint32_t FLVParser::seekVideo(uint32_t time)
 		else bestFrame = rewindKeyframe;
 	}
 
+#ifdef GNASH_DEBUG_SEEK
 	gnash::log_debug("Seek (video): " SIZET_FMT "/" SIZET_FMT " (%u/%u)", bestFrame, numFrames, _videoFrames[bestFrame]->timestamp, time);
+#endif
 
 	_nextVideoFrame = bestFrame;
 	assert( _videoFrames[bestFrame]->isKeyFrame() );
