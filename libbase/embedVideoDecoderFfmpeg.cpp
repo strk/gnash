@@ -87,19 +87,8 @@ embedVideoDecoderFfmpeg::createDecoder(int widthi, int heighti, int deblockingi,
 	}
 }
 
-// FIXME: This function (and a lot of other code in this file) is
-//        duplicated in NetStreamFfmpeg.
-
-/// Convert the given srcFrame to RGB24 pixel format.
-//
-/// @param srcCtx The codec context with which srcFrame is associated.
-/// @param srcFrame The source frame to convert. The data and linesize members
-///                 of srcFrame will be changed to match the conversion.
-/// @return A pointer to the newly allocated and freshly converted video data.
-///         The caller owns the pointer! It must be freed with delete [] when
-///	    the frame has been processed.
 uint8_t*
-convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
+embedVideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 {
 	static SwsContext* context = NULL;
 	int width = srcCtx->width, height = srcCtx->height;

@@ -1,3 +1,11 @@
+2007-05-31 Sandro Santilli <strk@keybit.net>
+
+	* libbase/embedVideoDecoderFfmpeg.{cpp,h}:
+	  Make convertRGB24 a public static function.
+	* server/asobj/NetStreamFfmpeg.cpp: use
+	  embedVideoDecoderFfmpeg::convertRGB24, dropping the
+	  duplicated implementation.
+
 2007-05-31 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetStreamFfmpeg.cpp, 

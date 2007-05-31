@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.75 2007/05/31 01:52:13 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.76 2007/05/31 06:39:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,7 +33,8 @@
 #include "movie_root.h"
 #include "NetConnection.h"
 #include "sound_handler.h"
-//#include "action.h"
+#include "embedVideoDecoderFfmpeg.h"
+
 #include <boost/scoped_array.hpp>
 #include <ffmpeg/swscale.h>
 
@@ -864,60 +865,6 @@ bool NetStreamFfmpeg::decodeAudio(AVPacket* packet)
 	return true;
 }
 
-// FIXME: This function (and a lot of other code in this file) is
-//        duplicated in embedVideoDecoderFfmpeg.
-
-/// Convert the given srcFrame to RGB24 pixel format.
-//
-/// @param srcCtx The codec context with which srcFrame is associated.
-/// @param srcFrame The source frame to convert. The data and linesize members
-///                 of srcFrame will be changed to match the conversion.
-/// @return A pointer to the newly allocated and freshly converted video data.
-///         The caller owns the pointer! It must be freed with delete [] when
-///	    the frame has been processed.
-uint8_t*
-convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
-{
-	static SwsContext* context = NULL;
-	int width = srcCtx->width, height = srcCtx->height;
-
-	if (!context) {
-		context = sws_getContext(width, height, srcCtx->pix_fmt,
-					 width, height, PIX_FMT_RGB24,
-					 SWS_FAST_BILINEAR, NULL, NULL, NULL);
-		if (!context) {
-			return NULL;
-		}
-	}
-
-	int bufsize = avpicture_get_size(PIX_FMT_RGB24, width, height);
-	if (bufsize == -1) {
-		return NULL;
-	}
-
-	uint8_t* buffer = new uint8_t[bufsize];
-	if (!buffer) {
-		return NULL;
-	}
-
-	AVPicture picture;
-
-	avpicture_fill(&picture, buffer, PIX_FMT_RGB24, width, height);
-
-
-	int rv = sws_scale(context, srcFrame->data, srcFrame->linesize, 0, 
-			   width, picture.data, picture.linesize);
-	if (rv == -1) {
-		delete [] buffer;
-		return NULL;
-	}
-
-	srcFrame->linesize[0] = picture.linesize[0];
-	srcFrame->data[0] = picture.data[0];
-
-	return buffer;
-}
-
 bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 {
 	if (!m_VCodecCtx) return false;
@@ -943,7 +890,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 			//img_convert((AVPicture*) pFrameYUV, PIX_FMT_YUV420P, (AVPicture*) pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
 
 		} else if (m_videoFrameFormat == render::RGB && m_VCodecCtx->pix_fmt != PIX_FMT_RGB24) {
-			buffer.reset(convertRGB24(m_VCodecCtx, m_Frame));
+			buffer.reset(embedVideoDecoderFfmpeg::convertRGB24(m_VCodecCtx, m_Frame));
 		}
 
 		raw_mediadata_t* video = new raw_mediadata_t;

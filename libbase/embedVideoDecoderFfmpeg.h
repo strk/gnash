@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderFfmpeg.h,v 1.3 2007/05/28 15:41:01 ann Exp $
+// $Id: embedVideoDecoderFfmpeg.h,v 1.4 2007/05/31 06:39:08 strk Exp $
 
 #ifndef __EMBEDVIDEODECODERFFMPEG_H__
 #define __EMBEDVIDEODECODERFFMPEG_H__
@@ -50,6 +50,16 @@ public:
 	// gnash calls this when it wants you to decode the given videoframe
 	image::image_base*	decodeFrame(uint8_t* data, int size);
 
+	/// Convert the given srcFrame to RGB24 pixel format.
+	//
+	/// @param srcCtx The codec context with which srcFrame is associated.
+	/// @param srcFrame The source frame to convert. The data and linesize members
+	///                 of srcFrame will be changed to match the conversion.
+	/// @return A pointer to the newly allocated and freshly converted video data.
+	///         The caller owns the pointer! It must be freed with delete [] when
+	///	    the frame has been processed.
+	///
+	static uint8_t* convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame);
 
 private:
 
