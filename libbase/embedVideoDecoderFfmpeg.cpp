@@ -24,6 +24,8 @@
 #include <cstring>
 
 #include "embedVideoDecoderFfmpeg.h"
+#include <ffmpeg/swscale.h>
+#include <boost/scoped_array.hpp>
 
 embedVideoDecoderFfmpeg::embedVideoDecoderFfmpeg() :
 	codec(NULL),
@@ -85,6 +87,59 @@ embedVideoDecoderFfmpeg::createDecoder(int widthi, int heighti, int deblockingi,
 	}
 }
 
+// FIXME: This function (and a lot of other code in this file) is
+//        duplicated in NetStreamFfmpeg.
+
+/// Convert the given srcFrame to RGB24 pixel format.
+//
+/// @param srcCtx The codec context with which srcFrame is associated.
+/// @param srcFrame The source frame to convert. The data and linesize members
+///                 of srcFrame will be changed to match the conversion.
+/// @return A pointer to the newly allocated and freshly converted video data.
+///         The caller owns the pointer! It must be freed with delete [] when
+///	    the frame has been processed.
+uint8_t*
+convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
+{
+	static SwsContext* context = NULL;
+	int width = srcCtx->width, height = srcCtx->height;
+
+	if (!context) {
+		context = sws_getContext(width, height, srcCtx->pix_fmt,
+					 width, height, PIX_FMT_RGB24,
+					 SWS_FAST_BILINEAR, NULL, NULL, NULL);
+		if (!context) {
+			return NULL;
+		}
+	}
+
+	int bufsize = avpicture_get_size(PIX_FMT_RGB24, width, height);
+	if (bufsize == -1) {
+		return NULL;
+	}
+
+	uint8_t* buffer = new uint8_t[bufsize];
+	if (!buffer) {
+		return NULL;
+	}
+
+	AVPicture picture;
+
+	avpicture_fill(&picture, buffer, PIX_FMT_RGB24, width, height);
+
+
+	int rv = sws_scale(context, srcFrame->data, srcFrame->linesize, 0, 
+			   width, picture.data, picture.linesize);
+	if (rv == -1) {
+		delete [] buffer;
+		return NULL;
+	}
+
+	srcFrame->linesize[0] = picture.linesize[0];
+	srcFrame->data[0] = picture.data[0];
+
+	return buffer;
+}
 
 // gnash calls this when it wants you to decode the given videoframe
 image::image_base*
@@ -100,7 +155,7 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 	avcodec_decode_video(cc, frame, &got, data, size);
 
 	if (got) {
-		uint8_t *buffer = NULL;
+		boost::scoped_array<uint8_t> buffer;
 
 		if (outputFormat == NONE) { // NullGui?
 			av_free(frame);
@@ -111,13 +166,7 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 			//img_convert((AVPicture*) pFrameYUV, PIX_FMT_YUV420P, (AVPicture*) pFrame, pCodecCtx->pix_fmt, pCodecCtx->width, pCodecCtx->height);
 
 		} else if (outputFormat == RGB && cc->pix_fmt != PIX_FMT_RGB24) {
-			AVFrame* frameRGB = avcodec_alloc_frame();
-			unsigned int numBytes = avpicture_get_size(PIX_FMT_RGB24, cc->width, cc->height);
-			buffer = new uint8_t[numBytes];
-			avpicture_fill((AVPicture *)frameRGB, buffer, PIX_FMT_RGB24, cc->width, cc->height);
-			img_convert((AVPicture*) frameRGB, PIX_FMT_RGB24, (AVPicture*) frame, cc->pix_fmt, cc->width, cc->height);
-			av_free(frame);
-			frame = frameRGB;
+			buffer.reset(convertRGB24(cc, frame));
 		}
 
 		if (outputFormat == YUV) {
@@ -149,7 +198,6 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 				}
 			}
 		}
-		delete [] buffer;
 	} else {
 		return decodedFrame;
 	}

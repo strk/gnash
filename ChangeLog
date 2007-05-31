@@ -1,3 +1,10 @@
+2007-05-31 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetStreamFfmpeg.cpp, 
+	libbase/embedVideoDecoderFfmpeg.cpp: Use libswscale instead of
+	img_convert for YUV->RGB conversion, because it is deprecated and
+	has been removed from recent ffmpeg.
+
 2007-05-30 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: add missing quote in martin's commit (no ChangeLog
