@@ -6,20 +6,22 @@ Design info for NetStream based media playing
 
 Notation: process, [dataStore], <externalEvent>
 
-       [input] --> (2) parser --> [parsedBuffer]
-                                        |
-           +----------------------------+
-           |
-           V
-      (2) decoder <-+-> [videoQueue] ---> (1) videoFrameUpdater --> [renderableFrame] 
-           ^        |                              ^                     |
-           |        |                              |                     |
-           +------- | -----------------------------+                     |
-                    |                              |                     V
-                    |          (1) <seek>  ---> [PlayHead]        (1) renderer --> [videoOut]
-                    |                              ^       
-                    |                              |       
-                    +-> [audioQueue] ---> (3) soundPlayer -> [audioOut]
+  [input] --> (2) parser --> [parsedBuffer]
+                                   |
+      +----------------------------+
+      |
+      V
+ (2) decoder <-+-> [videoQueue] --> (1) videoFrameUpdater --> [renderableFrame]
+      ^        |                              ^                     |
+      |        |                              |                     |
+      +------- | -----------------------------+                     |
+               |                              |                     V
+               |          (1) <seek>  ---> [PlayHead]       (1) renderer 
+               |                              ^                     |
+               |                              |                     V
+               |                              |                 [videoOut]   
+               |                              |       
+               +-> [audioQueue] ---> (3) soundPlayer -> [audioOut]
 
  Processes
 ===========
