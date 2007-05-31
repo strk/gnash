@@ -90,17 +90,7 @@ embedVideoDecoderFfmpeg::createDecoder(int widthi, int heighti, int deblockingi,
 uint8_t*
 embedVideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 {
-	static SwsContext* context = NULL;
 	int width = srcCtx->width, height = srcCtx->height;
-
-	if (!context) {
-		context = sws_getContext(width, height, srcCtx->pix_fmt,
-					 width, height, PIX_FMT_RGB24,
-					 SWS_FAST_BILINEAR, NULL, NULL, NULL);
-		if (!context) {
-			return NULL;
-		}
-	}
 
 	int bufsize = avpicture_get_size(PIX_FMT_RGB24, width, height);
 	if (bufsize == -1) {
@@ -115,7 +105,21 @@ embedVideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 	AVPicture picture;
 
 	avpicture_fill(&picture, buffer, PIX_FMT_RGB24, width, height);
+#ifndef HAVE_SWSCALE_H
+	img_convert(&picture, PIX_FMT_RGB24, (AVPicture*) srcFrame, srcCtx->pix_fmt,
+		    width, height);
+#else
+	static SwsContext* context = NULL;
 
+	if (!context) {
+		context = sws_getContext(width, height, srcCtx->pix_fmt,
+					 width, height, PIX_FMT_RGB24,
+					 SWS_FAST_BILINEAR, NULL, NULL, NULL);
+		if (!context) {
+			delete [] buffer;
+			return NULL;
+		}
+	}
 
 	int rv = sws_scale(context, srcFrame->data, srcFrame->linesize, 0, 
 			   width, picture.data, picture.linesize);
@@ -123,6 +127,8 @@ embedVideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 		delete [] buffer;
 		return NULL;
 	}
+
+#endif // HAVE_SWSCALE_H
 
 	srcFrame->linesize[0] = picture.linesize[0];
 	srcFrame->data[0] = picture.data[0];

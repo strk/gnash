@@ -1,3 +1,9 @@
+2007-05-31 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* macros/ffmpeg.m4: Define HAVE_SWSCALE_H if swscale.h is present.
+	* libbase/embedVideoDecoderFfmpeg.cpp: If swscale.h is available,
+	use swscale and friends. Otherwise, default to img_convert.
+
 2007-05-31 Sandro Santilli <strk@keybit.net>
 
 	* backend/sound_handler.h: document attach_aux_streamer and
