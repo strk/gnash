@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.78 2007/05/31 14:30:04 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.79 2007/05/31 14:35:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -48,6 +48,9 @@
 
 /// Define this to add debugging prints for locking
 //#define GNASH_DEBUG_THREADS
+
+// Define the following macro to have status notification handling debugged
+//#define GNASH_DEBUG_STATUS
 
 // Used to free data in the AVPackets we create our self
 static void avpacket_destruct(AVPacket* av) {
@@ -704,7 +707,9 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 #endif
 	ns->m_go = false;
 
+#ifdef GNASH_DEBUG_STATUS
 	log_debug("Setting playStop status");
+#endif
 	ns->setStatus(playStop);
 }
 
@@ -1223,7 +1228,9 @@ NetStreamFfmpeg::advance()
 	//    and we then wait until the buffer contains some data (1 sec) again.
 	if (m_go && m_pause && m_start_onbuffer && m_parser.get() && m_parser->isTimeLoaded(uint32_t(m_current_timestamp*1000)+m_bufferTime))
 	{
+#ifdef GNASH_DEBUG_STATUS
 		log_debug("(advance): setting buffer full");
+#endif
 		setStatus(bufferFull);
 		unpauseDecoding();
 		m_start_onbuffer = false;
@@ -1256,7 +1263,7 @@ NetStreamFfmpeg::time()
 
 void NetStreamFfmpeg::pauseDecoding()
 {
-	log_msg("pauseDecoding called");
+	//GNASH_REPORT_FUNCTION
 
 	// assert(decoding_mutex is locked by this thread!)
 

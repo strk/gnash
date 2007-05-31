@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.59 2007/05/30 15:12:28 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.60 2007/05/31 14:35:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -39,6 +39,9 @@
 #include "render.h"	// for gnash::render::videoFrameFormat()
 
 #include "movie_root.h"
+
+// Define the following macro to have status notification handling debugged
+//#define GNASH_DEBUG_STATUS
 
 namespace gnash {
  
@@ -460,13 +463,17 @@ NetStream::processStatusNotifications()
 	as_value status;
 	if ( get_member("onStatus", &status) && status.is_function())
 	{
+#ifdef GNASH_DEBUG_STATUS
 		log_debug("Processing "SIZET_FMT" status notifications", _statusQueue.size());
+#endif
 
 		for (StatusQueue::iterator it=_statusQueue.begin(), itE=_statusQueue.end(); it!=itE; ++it)
 		{
 			StatusCode code = *it; 
 
+#ifdef GNASH_DEBUG_STATUS
 			log_debug(" Invoking onStatus(%s)", getStatusCodeInfo(code).first);
+#endif
 
 			// TODO: optimize by reusing the same as_object ?
 			boost::intrusive_ptr<as_object> o = getStatusObject(code);
