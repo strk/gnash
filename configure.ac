@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.327 2007/05/31 10:46:52 martinwguy Exp $
+dnl $Id: configure.ac,v 1.328 2007/05/31 15:40:44 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -224,7 +224,7 @@ AC_ARG_ENABLE(renderer,
    agg|Agg|AGG)  renderer=agg  ;;
    *)      AC_MSG_ERROR([invalid renderer ${enableval} given]) ;;
   esac],
- [renderer=agg]
+ [renderer=opengl]
 )
 
 if test x$renderer = xopengl; then
