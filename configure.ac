@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.330 2007/06/01 17:50:06 bjacques Exp $
+dnl $Id: configure.ac,v 1.331 2007/06/01 17:54:52 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -212,12 +212,9 @@ AC_ARG_ENABLE(gui,
  [gui=gtk]
 )
 
-if test x"$klash" = xyes ; then
-  if test x"$gui" != xkde -a x"$gui" != xfltk; then
-    AC_MSG_ERROR([You must use either the kde GUI ( --enable-gui=KDE )
-      or the fltk GUI ( --enable-gui=FLTK ) if you enable klash.])
-  fi
-fi
+dnl if test x"$klash" = xyes -a x"$gui" != xkde; then
+dnl   AC_MSG_ERROR([You must use the kde GUI ( --enable-gui=KDE ) if you enable klash.])
+dnl fi
 
 AC_ARG_ENABLE(renderer,
   AC_HELP_STRING([--enable-renderer=engine], [Specify rendering engine: OpenGL, Agg or Cairo (experimental) [[OpenGL]] ]),
@@ -464,6 +461,9 @@ gcc_cv_ld_as_needed=no
 # Check if linker supports --as-needed and --no-as-needed options
 if $LD --help 2>/dev/null | grep as-needed > /dev/null; then
 	gcc_cv_ld_as_needed=yes
+fi
+if test x"$gcc_cv_ld_as_needed" = xyes; then
+	LDFLAGS="${LDFLAGS} -Wl,--as-needed"
 fi
 AC_MSG_RESULT($gcc_cv_ld_as_needed)
 

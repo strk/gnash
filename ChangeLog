@@ -2,6 +2,7 @@
 
 	* macros/ffmpeg.m4: Avoid using libswscale with broken ffmpeg
 	versions.
+	* configure.ac: Revert unintentional change.
 
 2007-06-01 Sandro Santilli <strk@keybit.net>
 
