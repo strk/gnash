@@ -68,7 +68,12 @@ public:
     void showMalformedSWFErrors(bool value);
 
     bool enableExtensions() const { return _extensionsEnabled; }
-    //void enableExtension(bool mode) { _extensionsEnabled=mode; }
+
+    /// Return true if user is willing to start the gui in "stop" mode
+    //
+    /// defaults to false.
+    ///
+    bool startStopped() const { return _startStopped; }
     
     int verbosityLevel() const { return _verbosity; }
     void verbosityLevel(int value) { _verbosity = value; }
@@ -139,7 +144,9 @@ private:
     bool _sound;		// whether sound is enable or not
     bool _plugin_sound;		// whether sound is desired for the plugin
 
-    bool _extensionsEnabled;
+    bool _extensionsEnabled;	// wheter to scan plugin path for extensions
+
+    bool _startStopped;		// whether to start the gui in "stop" mode
 };
 
 //extern DSOEXPORT RcInitFile rcfile;

@@ -1,5 +1,15 @@
 2007-06-01 Sandro Santilli <strk@keybit.net>
 
+	* libbase/rc.{cpp,h}: Add a "StartStopped" variable, to
+	  have the gui start in "stop" mode.
+	* doc/C/gnashrc.xml: document the new "StartStopped" variable.
+	* gui/Player.cpp (init_gui): set the Gui to "stop" if requested
+	  by the user (trough gnashrc)
+	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in: test "StartStopped"
+	  variable.
+
+2007-06-01 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStream.{cpp,h}: split processStatusNotifications
 	  so that onStatus handler call is performed while the statusMutex
 	  is NOT locked, to prevent attempts to lock the mutex again while

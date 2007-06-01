@@ -158,6 +158,12 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("enableExtensions");
     }
 
+    if (rc.startStopped() == 1) {
+        runtest.pass ("startStopped");
+    } else {
+        runtest.fail ("startStopped");
+    }
+
     std::vector<std::string> whitelist = rc.getWhiteList();
     if (whitelist.size()) {
         if ((whitelist[0] == "www.doonesbury.com")

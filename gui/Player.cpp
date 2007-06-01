@@ -202,11 +202,19 @@ Player::init_gui()
 	if ( do_render )
 	{
 		_gui.reset(new GUI_CLASS(windowid, scale, do_loop, bit_depth));
+
+		RcInitFile& rcfile = RcInitFile::getDefaultInstance();
+		if ( rcfile.startStopped() )
+		{
+			_gui->stop();
+		}
+
 	}
 	else
 	{
 		_gui.reset(new NullGui(do_loop));
 	}
+
 }
 
 movie_definition* 

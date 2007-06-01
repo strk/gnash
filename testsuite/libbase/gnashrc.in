@@ -42,3 +42,6 @@ set pluginSoUND off
 
 # Enable extensions
 set enableExtensions on
+
+# Start the gui in STOP mode
+set startStopped on

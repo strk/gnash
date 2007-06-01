@@ -60,7 +60,8 @@ RcInitFile::RcInitFile() : _delay(0),
                            _localhost_only(false),
                            _sound(true),
                            _plugin_sound(true),
-			   _extensionsEnabled(false)
+			   _extensionsEnabled(false),
+			   _startStopped(false)
 {
 //    GNASH_REPORT_FUNCTION;
     loadFiles();
@@ -189,6 +190,7 @@ RcInitFile::parseFile(const std::string& filespec)
                 extractSetting(&_verboseASCodingErrors, "ASCodingErrorsVerbosity", variable, value);
                 extractSetting(&_verboseMalformedSWF, "MalformedSWFVerbosity", variable, value);
                 extractSetting(&_extensionsEnabled, "EnableExtensions", variable, value);
+                extractSetting(&_startStopped, "StartStopped", variable, value);
                 
                 extractNumber(&_delay, "delay", variable, value);
                 extractNumber(&_verbosity, "verbosity", variable, value);
