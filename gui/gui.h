@@ -101,6 +101,13 @@ public:
     /// Start main rendering loop.
     virtual bool run() = 0;
 
+    /// End main rendering loop, making the call to run() return.
+    //
+    /// The default implementation calls exit(0), which isn't nice.
+    /// Please implement the proper main loop quitter in the subclasses.
+    ///
+    virtual void quit()  { exit(0); }
+
     /// Create a menu and attach it to our window.
     virtual bool createMenu() = 0;
 

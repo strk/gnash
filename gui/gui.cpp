@@ -162,7 +162,7 @@ void
 Gui::menu_quit()
 {
 //    GNASH_REPORT_FUNCTION;
-    exit(0);
+    quit();
 }
 
 void
