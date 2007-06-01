@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.61 2007/05/31 15:52:28 tgc Exp $ */
+/* $Id: NetStream.cpp,v 1.62 2007/06/01 11:53:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -453,49 +453,42 @@ void netstream_class_init(as_object& global)
 void
 NetStream::processStatusNotifications()
 {
-	// Get an exclusive lock so any notification from loader thread will wait
-	boost::mutex::scoped_lock lock(statusMutex);
-
-	// No queued statuses to notify ...
-	if ( _statusQueue.empty() ) return;
-
 	// TODO: check for System.onStatus too ! use a private getStatusHandler() method for this.
 	as_value status;
-	if ( get_member("onStatus", &status) && status.is_function())
+	if ( ! get_member("onStatus", &status) || ! status.is_function())
 	{
-#ifdef GNASH_DEBUG_STATUS
-		log_debug("Processing "SIZET_FMT" status notifications", _statusQueue.size());
-#endif
-
-		for (StatusQueue::iterator it=_statusQueue.begin(), itE=_statusQueue.end(); it!=itE; ++it)
-		{
-			StatusCode code = *it; 
-
-#ifdef GNASH_DEBUG_STATUS
-			log_debug(" Invoking onStatus(%s)", getStatusCodeInfo(code).first);
-#endif
-
-			// TODO: optimize by reusing the same as_object ?
-			boost::intrusive_ptr<as_object> o = getStatusObject(code);
-
-			m_env->push_val(as_value(o.get()));
-			call_method(status, m_env, this, 1, m_env->get_top_index() );
-		}
-
+		clearStatusQueue();
+		return;
 	}
 
-	_statusQueue.clear();
+	StatusCode code;
+	while (1)
+	{
+		code = popNextPendingStatusNotification();
+		if ( code == invalidStatus ) break; // no more pending notifications
+
+#ifdef GNASH_DEBUG_STATUS
+		log_debug(" Invoking onStatus(%s)", getStatusCodeInfo(code).first);
+#endif
+
+		// TODO: optimize by reusing the same as_object ?
+		boost::intrusive_ptr<as_object> o = getStatusObject(code);
+
+		m_env->push_val(as_value(o.get()));
+		call_method(status, m_env, this, 1, m_env->get_top_index() );
+	}
+
 
 }
 
 void
 NetStream::setStatus(StatusCode status)
 {
-	// status unchanged
-	if ( _lastStatus == status) return;
-
 	// Get a lock to avoid messing with statuses while processing them
 	boost::mutex::scoped_lock lock(statusMutex);
+
+	// status unchanged
+	if ( _lastStatus == status) return;
 
 	_lastStatus = status;
 	_statusQueue.push_back(status);
@@ -609,6 +602,29 @@ NetStream::getStatusObject(StatusCode code)
 	o->init_member("level", info.second, as_prop_flags::dontDelete|as_prop_flags::dontEnum);
 
 	return o;
+}
+
+NetStream::StatusCode
+NetStream::popNextPendingStatusNotification()
+{
+	// Get an exclusive lock on the queue
+	boost::mutex::scoped_lock lock(statusMutex);
+
+	// No queued statuses to notify ...
+	if ( _statusQueue.empty() ) return invalidStatus;
+
+	StatusCode nextCode = _statusQueue.front();
+	_statusQueue.pop_front();
+	return nextCode;
+}
+
+void
+NetStream::clearStatusQueue()
+{
+	// Get an exclusive lock on the queue
+	boost::mutex::scoped_lock lock(statusMutex);
+
+	_statusQueue.clear();
 }
 
 

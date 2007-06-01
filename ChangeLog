@@ -1,5 +1,13 @@
 2007-06-01 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStream.{cpp,h}: split processStatusNotifications
+	  so that onStatus handler call is performed while the statusMutex
+	  is NOT locked, to prevent attempts to lock the mutex again while
+	  reacting to status handlers. statusQueue type changed from vector
+	  to deque, for faster pop_front.
+
+2007-06-01 Sandro Santilli <strk@keybit.net>
+
 	* gui/Player.cpp (run): remove sound_handler cleanup, will
 	  be done by gnash::clear().
 	* gui/: gtk.cpp, gtksup.h: implement gui::quit()

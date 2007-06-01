@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.44 2007/05/31 15:52:28 tgc Exp $ */
+/*  $Id: NetStream.h,v 1.45 2007/06/01 11:53:19 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -36,6 +36,8 @@
 #include "video_stream_instance.h"
 #include "NetConnection.h"
 #include "FLVParser.h"
+
+#include <deque>
 
 // Forward declarations
 namespace gnash {
@@ -103,12 +105,20 @@ protected:
 	///  - NetStream.Play.StreamNotFound
 	///  - NetStream.Seek.InvalidTime
 	///
+	/// This method locks the statusMutex during operations
+	///
 	void setStatus(StatusCode code);
 
 	/// \brief
 	/// Call any onStatus event handler passing it
 	/// any queued status change, see _statusQueue
 	//
+	/// Will NOT lock the statusMutex itself, rather it will
+	/// iteratively call the popNextPendingStatusNotification()
+	/// private method, which will take care of locking it.
+	/// This is to make sure onStatus handler won't call methods
+	/// possibly trying to obtain the lock again (::play, ::pause, ...)
+	///
 	void processStatusNotifications();
 
 	// The actionscript enviroment for the AS callbacks
@@ -266,7 +276,23 @@ public:
 
 private:
 
-	typedef std::vector<StatusCode> StatusQueue;
+	/// Pop next queued status notification from the queue
+	//
+	/// Lock the statusMutex during operations
+	///
+	/// @return The status code to notify, or invalidStatus when
+	///	    the queue is empty
+	///
+	StatusCode popNextPendingStatusNotification();
+
+	/// Clear status notification queue
+	//
+	/// Lock the statusMutex during operations
+	///
+	void clearStatusQueue();
+
+	// TODO: change to a container with fast pop_front()
+	typedef std::deque<StatusCode> StatusQueue;
 
 	/// List of status messages to be processed
 	StatusQueue _statusQueue;
