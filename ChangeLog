@@ -1,5 +1,7 @@
 2007-06-01 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.cpp: print a debugging message when the main gui loop
+	  returns so we know if we exited cleanly or due to a call to exit().
 	* gui/gui.cpp{cpp,h}: add a quit() virtual method, for returning
 	  from the main rendering loop. This is aimed at removing the exit()
 	  call, altought currently we'll still call it as the default
