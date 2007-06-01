@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.35 2007/05/25 13:35:00 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.36 2007/06/01 10:04:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -244,10 +244,10 @@ ActionExec::operator() ()
 	// as a timeout in seconds.
 	// See: http://www.gnashdev.org/wiki/index.php/ScriptLimits
 	// 
-	if ( pc < oldPc )
+	if ( pc <= oldPc )
 	{
 		// TODO: specify in the .gnashrc ?
-		size_t maxBranchCount = 512; // what's enough ?
+		size_t maxBranchCount = 65524; // what's enough ?
 		if ( ++branchCount > maxBranchCount )
 		{
 			char buf[256];
