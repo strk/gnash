@@ -1,5 +1,10 @@
 2007-06-01 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamGst.cpp: protect all log_debug calls
+	  with a GNASH_DEBUG macro.
+
+2007-06-01 Sandro Santilli <strk@keybit.net>
+
 	* libbase/rc.{cpp,h}: Add a "StartStopped" variable, to
 	  have the gui start in "stop" mode.
 	* doc/C/gnashrc.xml: document the new "StartStopped" variable.

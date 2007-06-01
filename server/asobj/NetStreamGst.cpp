@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.52 2007/05/31 15:52:28 tgc Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.53 2007/06/01 15:23:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,6 +38,9 @@
 #include "gstgnashsrc.h"
 
 #include "URL.h"
+
+// Define the following macro to enable debugging traces
+//#define GNASH_DEBUG
 
 namespace gnash {
 
@@ -377,7 +380,9 @@ NetStreamGst::playbackStarter(NetStreamGst* ns)
 void
 NetStreamGst::unrefElements()
 {
+#ifdef GNASH_DEBUG
 	log_debug("unreffing elements");
+#endif
 
 	boost::mutex::scoped_lock lock(_pipelineMutex);
 
@@ -523,7 +528,9 @@ NetStreamGst::buildFLVPipeline(bool& video, bool& audio)
 bool
 NetStreamGst::buildFLVVideoPipeline(bool &video)
 {
+#ifdef GNASH_DEBUG
 	log_debug("Building FLV video decoding pipeline");
+#endif
 
 	FLVVideoInfo* videoInfo = m_parser->getVideoInfo();
 
@@ -637,7 +644,9 @@ NetStreamGst::buildFLVSoundPipeline(bool &sound)
 
 	if (doSound) {
 
+#ifdef GNASH_DEBUG
 		log_debug("Building FLV video decoding pipeline");
+#endif
 
 		audiosource = gst_element_factory_make ("fakesrc", NULL);
 		if ( ! audiosource )
@@ -702,7 +711,9 @@ NetStreamGst::buildFLVSoundPipeline(bool &sound)
 bool
 NetStreamGst::buildPipeline()
 {
+#ifdef GNASH_DEBUG
 	log_debug("Building non-FLV decoding pipeline");
+#endif
 
 	boost::mutex::scoped_lock lock(_pipelineMutex);
 
@@ -743,7 +754,9 @@ NetStreamGst::startPlayback()
 	// Pass stuff from/to the NetConnection object.
 	if ( !nc->openConnection(url) ) {
 		setStatus(streamNotFound);
+#ifdef GNASH_DEBUG
 		log_debug(_("Gnash could not open movie: %s"), url.c_str());
+#endif
 		return;
 	}
 
@@ -1005,12 +1018,16 @@ NetStreamGst::advance()
 	// or stop if loading is complete
 	if (m_pausePlayback)
 	{
+#ifdef GNASH_DEBUG
 		log_debug("Playback paused (out of data?)");
+#endif
 
 		m_pausePlayback = false;
 		if (_netCon->loadCompleted())
 		{
+#ifdef GNASH_DEBUG
 			log_debug("Load completed, setting playStop status and shutting down pipeline");
+#endif
 			setStatus(playStop);
 
 			// Drop gstreamer pipeline so callbacks are not called again
@@ -1134,7 +1151,9 @@ NetStreamGst::disconnectVideoHandoffSignal()
 {
 	if (videosource && _handoffVideoSigHandler )
 	{
+#ifdef GNASH_DEBUG
 		log_debug("Disconnecting video handoff signal %lu", _handoffVideoSigHandler);
+#endif
 		g_signal_handler_disconnect(videosource, _handoffVideoSigHandler);
 		_handoffVideoSigHandler = 0;
 	}
@@ -1149,7 +1168,9 @@ NetStreamGst::disconnectAudioHandoffSignal()
 {
 	if ( audiosource && _handoffAudioSigHandler )
 	{
+#ifdef GNASH_DEBUG
 		log_debug("Disconnecting audio handoff signal %lu", _handoffAudioSigHandler);
+#endif
 		g_signal_handler_disconnect(audiosource, _handoffAudioSigHandler);
 		_handoffAudioSigHandler = 0;
 	}
@@ -1162,13 +1183,17 @@ NetStreamGst::disconnectAudioHandoffSignal()
 bool
 NetStreamGst::connectVideoHandoffSignal()
 {
+#ifdef GNASH_DEBUG
 	log_debug("Connecting video handoff signal");
+#endif
 
 	assert(_handoffVideoSigHandler == 0);
 
 	_handoffVideoSigHandler = g_signal_connect (videosource, "handoff",
 			G_CALLBACK (NetStreamGst::video_callback_handoff), this);
+#ifdef GNASH_DEBUG
 	log_debug("New _handoffVideoSigHandler id : %lu", _handoffVideoSigHandler);
+#endif
 
 	assert(_handoffVideoSigHandler != 0);
 
@@ -1180,14 +1205,18 @@ NetStreamGst::connectVideoHandoffSignal()
 bool
 NetStreamGst::connectAudioHandoffSignal()
 {
+#ifdef GNASH_DEBUG
 	log_debug("Connecting audio handoff signal");
+#endif
 
 	assert(_handoffAudioSigHandler == 0);
 
 	_handoffAudioSigHandler = g_signal_connect (audiosource, "handoff",
 			G_CALLBACK (NetStreamGst::audio_callback_handoff), this);
 
+#ifdef GNASH_DEBUG
 	log_debug("New _handoffAudioSigHandler id : %lu", _handoffAudioSigHandler);
+#endif
 
 	assert(_handoffAudioSigHandler != 0);
 
@@ -1219,7 +1248,9 @@ NetStreamGst::disablePipeline()
 	else if ( ret == GST_STATE_CHANGE_SUCCESS )
 	{
 		// the state change succeeded
+#ifdef GNASH_DEBUG
 		log_debug("State change to NULL successful");
+#endif
 
 		// just make sure
 		GstState current, pending;
@@ -1236,25 +1267,33 @@ NetStreamGst::disablePipeline()
 		// asynchronously in another thread
 		// We'll wait for it...
 
+#ifdef GNASH_DEBUG
 		log_debug("State change to NULL will be asynchronous.. waiting for it");
+#endif
 
 		GstState current, pending;
 		do {
 			ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, GST_SECOND*1); 
 
+#ifdef GNASH_DEBUG
 			log_debug(" NULL state change still not completed after X seconds");
+#endif
 
 		} while ( ret == GST_STATE_CHANGE_ASYNC && current != GST_STATE_NULL );
 
 		if ( ret == GST_STATE_CHANGE_SUCCESS )
 		{
 			assert ( current == GST_STATE_NULL );
+#ifdef GNASH_DEBUG
 			log_debug(" Async NULL completed successfully");
+#endif
 		}
 		else if ( ret == GST_STATE_CHANGE_FAILURE )
 		{
 			assert ( current != GST_STATE_NULL );
+#ifdef GNASH_DEBUG
 			log_debug(" Async NULL completed failing.");
+#endif
 			return false;
 		}
 		else abort();
@@ -1266,7 +1305,9 @@ NetStreamGst::disablePipeline()
 		// the state change succeeded but the element
 		// cannot produce data in PAUSED.
 		// This typically happens with live sources.
+#ifdef GNASH_DEBUG
 		log_debug("State change succeeded but the element cannot produce data in PAUSED");
+#endif
 
 		// @@ what to do in this case ?
 	}
@@ -1286,7 +1327,9 @@ NetStreamGst::playPipeline()
 {
 	boost::mutex::scoped_lock lock(_pipelineMutex);
 
+#ifdef GNASH_DEBUG
 	log_debug("Setting status to bufferFull and enabling pipeline");
+#endif
 
 	if ( videosource && ! _handoffVideoSigHandler )
 	{
@@ -1319,7 +1362,9 @@ NetStreamGst::playPipeline()
 	else if ( ret == GST_STATE_CHANGE_SUCCESS )
 	{
 		// the state change succeeded
+#ifdef GNASH_DEBUG
 		log_debug("State change to PLAYING successful");
+#endif
 
 		// just make sure
 		GstState current, pending;
@@ -1336,25 +1381,33 @@ NetStreamGst::playPipeline()
 		// asynchronously in another thread
 		// We'll wait for it...
 
+#ifdef GNASH_DEBUG
 		log_debug("State change to play will be asynchronous.. waiting for it");
+#endif
 
 		GstState current, pending;
 		do {
 			ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, GST_SECOND*1); 
 
+#ifdef GNASH_DEBUG
 			log_debug(" Play still not completed after X seconds");
+#endif
 
 		} while ( ret == GST_STATE_CHANGE_ASYNC && current != GST_STATE_PLAYING );
 
 		if ( ret == GST_STATE_CHANGE_SUCCESS )
 		{
 			assert ( current == GST_STATE_PLAYING );
+#ifdef GNASH_DEBUG
 			log_debug(" Async play completed successfully");
+#endif
 		}
 		else if ( ret == GST_STATE_CHANGE_FAILURE )
 		{
 			assert ( current != GST_STATE_PLAYING );
+#ifdef GNASH_DEBUG
 			log_debug(" Async play completed failing.");
+#endif
 			return false;
 		}
 		else abort();
@@ -1365,7 +1418,9 @@ NetStreamGst::playPipeline()
 		// the state change succeeded but the element
 		// cannot produce data in PAUSED.
 		// This typically happens with live sources.
+#ifdef GNASH_DEBUG
 		log_debug("State change succeeded but the element cannot produce data in PAUSED");
+#endif
 
 		// @@ what to do in this case ?
 	}
@@ -1385,11 +1440,15 @@ NetStreamGst::pausePipeline(bool startOnBuffer)
 {
 	boost::mutex::scoped_lock lock(_pipelineMutex);
 
+#ifdef GNASH_DEBUG
 	log_debug("Setting pipeline state to PAUSE");
+#endif
 
 	if ( ! m_go )
 	{
+#ifdef GNASH_DEBUG
 		log_debug("Won't set the pipeline to PAUSE state if m_go is false");
+#endif
 		return false;
 	}
 
@@ -1418,7 +1477,9 @@ NetStreamGst::pausePipeline(bool startOnBuffer)
 	else if ( ret == GST_STATE_CHANGE_SUCCESS )
 	{
 		// the state change succeeded
+#ifdef GNASH_DEBUG
 		log_debug("State change to PAUSE successful");
+#endif
 
 		// just make sure
 		GstState current, pending;
@@ -1435,25 +1496,33 @@ NetStreamGst::pausePipeline(bool startOnBuffer)
 		// asynchronously in another thread
 		// We'll wait for it...
 
+#ifdef GNASH_DEBUG
 		log_debug("State change to paused will be asynchronous.. waiting for it");
+#endif
 
 		GstState current, pending;
 		do {
 			ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, GST_SECOND*1); 
 
+#ifdef GNASH_DEBUG
 			log_debug(" Pause still not completed after X seconds");
+#endif
 
 		} while ( ret == GST_STATE_CHANGE_ASYNC && current != GST_STATE_PAUSED );
 
 		if ( ret == GST_STATE_CHANGE_SUCCESS )
 		{
 			assert ( current == GST_STATE_PAUSED );
+#ifdef GNASH_DEBUG
 			log_debug(" Async pause completed successfully");
+#endif
 		}
 		else if ( ret == GST_STATE_CHANGE_FAILURE )
 		{
 			assert ( current != GST_STATE_PAUSED );
+#ifdef GNASH_DEBUG
 			log_debug(" Async pause completed failing.");
+#endif
 			return false;
 		}
 		else abort();
@@ -1464,7 +1533,9 @@ NetStreamGst::pausePipeline(bool startOnBuffer)
 		// the state change succeeded but the element
 		// cannot produce data in PAUSED.
 		// This typically happens with live sources.
+#ifdef GNASH_DEBUG
 		log_debug("State change succeeded but the element cannot produce data in PAUSED");
+#endif
 
 		// @@ what to do in this case ?
 	}
