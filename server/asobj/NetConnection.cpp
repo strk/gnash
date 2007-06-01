@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.47 2007/05/30 12:18:49 strk Exp $ */
+/* $Id: NetConnection.cpp,v 1.48 2007/06/01 23:36:48 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,7 +52,6 @@ static as_value netconnection_new(const fn_call& fn);
 NetConnection::NetConnection()
 	:
 	as_object(getNetConnectionInterface()),
-	_url(),
 	_loader()
 {
 	attachProperties();
@@ -69,37 +68,45 @@ bool NetConnection::openConnection(const std::string& url)
 	// if already running there is no need to setup things again
 	if (_loader.get())
 	{
-		log_error("NetConnection::openConnection() called when already connected to a stream. Should we close the old stream and open a new one?.");
-		return false;
+		log_debug("NetConnection::openConnection() called when already connected to a stream. Checking if the existing connection can be used.");
+		std::string newurl;
+		if (_prefixUrl.size() > 0) {
+			newurl += _prefixUrl + "/" + url;
+		} else {
+			newurl += url;
+		}
+		if (newurl.compare(_completeUrl) == 0) return true;
+		else return false;
 	}
 
-	if (_url.size() > 0) {
-		_url += "/";
+	if (_prefixUrl.size() > 0) {
+		_completeUrl += _prefixUrl + "/" + url;
+	} else {
+		_completeUrl += url;
 	}
-	_url += url;
 
-	URL uri(_url, get_base_url());
+	URL uri(_completeUrl, get_base_url());
 
-	_url = uri.str();
-	assert(_url.find("://")!=string::npos);
+	std::string uriStr(uri.str());
+	assert(uriStr.find("://")!=string::npos);
 
 	// Check if we're allowed to open url
 	if (!URLAccessManager::allow(uri)) {
-		log_security(_("Gnash is not allowed to open this url: %s"), _url.c_str());
+		log_security(_("Gnash is not allowed to open this url: %s"), uriStr.c_str());
 		return false;
 	}
 
-	log_msg(_("Connecting to movie: %s"), _url.c_str());
+	log_msg(_("Connecting to movie: %s"), uriStr.c_str());
 
 	_loader.reset( new LoadThread() );
 	
 	if (!_loader->setStream(std::auto_ptr<tu_file>(StreamProvider::getDefaultInstance().getStream(uri)))) {
-		log_error(_("Gnash could not open this url: %s"), _url.c_str());
+		log_error(_("Gnash could not open this url: %s"), uriStr.c_str());
 		_loader.reset();
 		return false;
 	}
 
-	log_msg(_("Connection etablished to movie: %s"), _url.c_str());
+	log_msg(_("Connection etablished to movie: %s"), uriStr.c_str());
 
 	return true;
 }
@@ -111,11 +118,11 @@ NetConnection::addToURL(const std::string& url)
 	// What is this ? It is NOT documented in the header !!
 	//if (url == "null" || url == "NULL") return;
 
-	// If there already is something in _url, then we already have a url,
-	// so no need to renew it.
-	if (_url.size() > 0) return;
+	// If there already is something in _prefixUrl, then we already have a url,
+	// so no need to renew it. This may not correct, needs some testing.
+	if (_prefixUrl.size() > 0) return;
 
-	_url += url;
+	_prefixUrl += url;
 }
 
 /*public*/

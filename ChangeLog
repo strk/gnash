@@ -1,3 +1,14 @@
+2007-06-02 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* server/asobj/NetConnection.{cpp,h}: Permit openConnection 
+	to be called more than once with the same URL.
+	* server/asobj/NetStreamFfmpeg.cpp: Call detach_aux_streamer
+	with a valid owner argument, so something will actually
+	happen. Make sure that the NetConnection position is 0
+	just in case openConnection was called before. Fix a deadlock
+	by avoiding calls to the sound handler in startPlayback().
+	This is cheating, but fixes bug #20036.
+
 2007-06-01 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* macros/ffmpeg.m4: Avoid using libswscale with broken ffmpeg

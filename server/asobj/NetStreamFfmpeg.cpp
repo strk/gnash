@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.81 2007/05/31 21:48:33 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.82 2007/06/01 23:36:48 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -88,6 +88,7 @@ NetStreamFfmpeg::~NetStreamFfmpeg()
 
 void NetStreamFfmpeg::pause(int mode)
 {
+
 	if (mode == -1)
 	{
 		if (m_pause) unpauseDecoding();
@@ -130,7 +131,7 @@ void NetStreamFfmpeg::close()
 	sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
-		s->detach_aux_streamer((void*) NULL);
+		s->detach_aux_streamer(this);
 	}
 
 	if (m_Frame) av_free(m_Frame);
@@ -386,6 +387,7 @@ NetStreamFfmpeg::startPlayback()
 		return false;
 	}
 
+	nc->seek(0);
 	inputPos = 0;
 
 	// Check if the file is a FLV, in which case we use our own parser
@@ -428,9 +430,6 @@ NetStreamFfmpeg::startPlayback()
 		// the file format is FLV
 		m_video_index = 0;
 		m_audio_index = 1;
-
-		sound_handler* s = get_sound_handler();
-		if (s) s->attach_aux_streamer(audio_streamer, (void*) this);
 
 		m_start_onbuffer = true;
 
@@ -568,8 +567,6 @@ NetStreamFfmpeg::startPlayback()
 				m_ACodecCtx->codec_id, url.c_str());
 			return false;
 		}
-
-		s->attach_aux_streamer(audio_streamer, (void*) this);
 
 	}
 

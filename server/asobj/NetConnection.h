@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.33 2007/05/30 12:18:49 strk Exp $ */
+/* $Id: NetConnection.h,v 1.34 2007/06/01 23:36:48 bjacques Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -143,8 +143,11 @@ private:
 	/// Extend the URL to be used for playing
 	void addToURL(const std::string& url);
 
-	/// the url of the file
-	std::string _url;
+	/// the url prefix optionally passed to connect()
+	std::string _prefixUrl;
+
+	/// the complete url of the file
+	std::string _completeUrl;
 
 	/// the as_object which owns the connection
 	boost::intrusive_ptr<as_object> _owner;
