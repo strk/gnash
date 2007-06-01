@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.91 2007/05/14 10:03:38 jgilmore Exp $ */
+/* $Id: gtk.cpp,v 1.92 2007/06/01 11:02:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -301,6 +301,12 @@ void
 GtkGui::setTimeout(unsigned int timeout)
 {
     g_timeout_add(timeout, (GSourceFunc)gtk_main_quit, NULL);
+}
+
+void
+GtkGui::quit()
+{
+	gtk_main_quit();
 }
 
 void

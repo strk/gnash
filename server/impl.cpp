@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.107 2007/05/24 20:10:42 strk Exp $ */
+/* $Id: impl.cpp,v 1.108 2007/06/01 11:02:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -554,8 +554,30 @@ movie_definition*	create_movie_no_recurse(
 void	clear()
     // Maximum release of resources.
 {
+    // Ideally, we should make sure that function properly signals all threads
+    // about exiting and giving them a chance to cleanly exit.
+    //
+    // If we clear shared memory here we're going to leave threads possibly
+    // accessing deleted memory, which would trigger a segfault.
+    //
+    // My experience is that calling exit(), altought it has the same problem,
+    // reduces the chances of segfaulting ...
+    //
+    // We want this fixed anyway as exit()
+    // itselt can also trigger segfaults.
+    //
+    // See task task #6959 and depending items
+    //
+    std::cerr << "Any segfault past this message is likely due to improper threads cleanup." << std::endl;
+    exit(EXIT_SUCCESS);
+
     clear_library();
     fontlib::clear();
+
+    // By setting the soundhandler to NULL we avoid it being used
+    // after it's been de-referenced
+    set_sound_handler(NULL);
+
 }
 
 

@@ -359,10 +359,6 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     // Clean up as much as possible, so valgrind will help find actual leaks.
     gnash::clear();
 
-	// By setting the soundhandler to NULL we avoid it being used
-	// after it's been de-referenced
-	gnash::set_sound_handler(NULL);
-
     return EXIT_SUCCESS;
 }
 

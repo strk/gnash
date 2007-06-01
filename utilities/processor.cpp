@@ -289,8 +289,8 @@ main(int argc, char *argv[])
 	}
     }
 
-    // Clean up as much as possible, so valgrind will help find actual leaks.
-    //gnash::clear();
+    // Signal core lib we're willing to quit.
+    gnash::clear();
     
     return 0;
 }

@@ -1,5 +1,16 @@
 2007-06-01 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.cpp (run): remove sound_handler cleanup, will
+	  be done by gnash::clear().
+	* gui/: gtk.cpp, gtksup.h: implement gui::quit()
+	* server/impl.cpp (clear): report the problem with cleaning
+	  up resources before all threads are completed, exit() rather
+	  then cleanup and document the reason for doing so.
+	* utilities/processor.cpp (main): call gnash::clear() again, that's
+	  where proper threads cleanup is supposed to be implemented.
+
+2007-06-01 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ActionExec.cpp (call operator): if pc == oldPc that's
 	  still to be considered a branch-back, so count it; Increment
 	  branch-back limit to 2^16 (65535).
