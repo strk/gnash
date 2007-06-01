@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.42 2007/05/31 21:18:20 bjacques Exp $
+dnl $Id: ffmpeg.m4,v 1.43 2007/06/01 17:50:07 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -134,7 +134,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
 
   if test x"$avcodec_h" != x; then
     swscale_h="`dirname $avcodec_h`/swscale.h"
-    if test -f "$swscale_h"; then
+    if test -f "$swscale_h" -a $ffmpeg_num_version -gt 51403; then
       AC_DEFINE(HAVE_SWSCALE_H, 1, [Define if swscale.h is found])
     fi
   fi

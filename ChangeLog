@@ -1,3 +1,8 @@
+2007-06-01 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* macros/ffmpeg.m4: Avoid using libswscale with broken ffmpeg
+	versions.
+
 2007-06-01 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStreamGst.cpp: protect all log_debug calls
@@ -48,7 +53,9 @@
 
 	* macros/ffmpeg.m4: Define HAVE_SWSCALE_H if swscale.h is present.
 	* libbase/embedVideoDecoderFfmpeg.cpp: If swscale.h is available,
-	use swscale and friends. Otherwise, default to img_convert.
+	use swscale and friends. Otherwise, default to img_convert. Also,
+	conditionally include swscale.h itself.
+	* server/asobj/NetStreamFfmpeg.cpp: Remove unused include.
 
 2007-05-31 Sandro Santilli <strk@keybit.net>
 
