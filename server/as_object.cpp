@@ -119,6 +119,7 @@ as_object::get_member_default(const std::string& name, as_value* val)
 	}
 	catch (ActionException& exc)
 	{
+		// TODO: check if this should be an 'as' error.. (log_aserror)
 		log_error(_("Caught exception: %s"), exc.what());
 		return false;
 	}
@@ -224,9 +225,11 @@ as_object::set_member_default(const std::string& key, const as_value& val )
 	// SimpleProperty (if possible)
 	if ( ! _members.setValue(key, val, *this) )
 	{
-		log_error(_("Attempt to set read-only property ``%s''"
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Attempt to set read-only property ``%s''"
 			" on object ``%p''"),
 			key.c_str(), (void*)this);
+		);
 	}
 
 }
@@ -248,7 +251,7 @@ as_object::init_member(const std::string& key, const as_value& val, int flags)
 		if ( ! _members.setValue(keylower, val, *this) )
 		{
 			log_error(_("Attempt to initialize read-only property ``%s''"
-				" (%s) on object ``%p''"),
+				" (%s) on object ``%p'' twice"),
 				keylower.c_str(), key.c_str(), (void*)this);
 			// We shouldn't attempt to initialize a member twice, should we ?
 			assert(0);
@@ -262,7 +265,7 @@ as_object::init_member(const std::string& key, const as_value& val, int flags)
 		if ( ! _members.setValue(key, val, *this) )
 		{
 			log_error(_("Attempt to initialize read-only property ``%s''"
-				" on object ``%p''"),
+				" on object ``%p'' twice"),
 				key.c_str(), (void*)this);
 			// We shouldn't attempt to initialize a member twice, should we ?
 			assert(0);
@@ -418,10 +421,12 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 			// set_member_flags will take care of case conversion
 			if ( ! set_member_flags(prop.c_str(), set_true, set_false) )
 			{
-				log_error(_("Can't set propflags on object "
+				IF_VERBOSE_ASCODING_ERRORS(
+				log_aserror(_("Can't set propflags on object "
 					"property %s "
 					"(either not found or protected)"),
 					prop.c_str());
+				);
 			}
 
 			if ( next_comma == std::string::npos )
