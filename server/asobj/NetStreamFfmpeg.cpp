@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.82 2007/06/01 23:36:48 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.83 2007/06/02 18:19:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -123,6 +123,10 @@ void NetStreamFfmpeg::close()
 		_decodeThread->join();
 		delete _decodeThread;
 
+	}
+	else
+	{
+		// WARNING: decoder might be still waiting on the decode_wait condition...
 	}
 
 
@@ -665,7 +669,16 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 
 			if (ns->m_pause || (ns->m_qvideo.size() > 10 && ns->m_qaudio.size() > 10))
 			{ 
-				assert(ns->m_go);
+				if ( ! ns->m_go )
+				{
+					log_debug("m_go=%d, m_start_onbuffer=%d, qVideoSize=%d, qAudioSize=%d", ns->m_go, ns->m_start_onbuffer, ns->m_qvideo.size(), ns->m_qaudio.size());
+					// decodeFLVFrame above might set m_go to false when parsed buffer is over
+					// note that when parsed buffer is over decodeFLVFrame would return false,
+					// but the break above might still not be reached due to m_start_onbuffer 
+					// or queue sizes not being 0.
+					assert(0);
+					break;
+				}
 #ifdef GNASH_DEBUG_THREADS
 				log_debug("Waiting on lock..");
 #endif
@@ -686,6 +699,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 			// if the queue is full we wait until someone notifies us that data is needed.
 			if (ns->m_pause || ((ns->m_qvideo.size() > 0 && ns->m_qaudio.size() > 0) && ns->m_unqueued_data))
 			{ 
+				assert ( ns->m_go ); // or we'll have a problem ending the wait...
 #ifdef GNASH_DEBUG_THREADS
 				log_debug("Waiting on lock..");
 #endif
@@ -1276,7 +1290,11 @@ void NetStreamFfmpeg::unpauseDecoding()
 {
 	// assert(decoding_mutex is locked by this thread!)
 
-	if (!m_pause) return;
+	if (!m_pause)
+	{
+		// WARNING: decoder might be still waiting on the decode_wait condition...
+		return;
+	}
 
 	m_pause = false;	
 

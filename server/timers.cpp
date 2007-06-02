@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.31 2007/05/28 15:41:07 ann Exp $ */
+/* $Id: timers.cpp,v 1.32 2007/06/02 18:19:54 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -91,8 +91,11 @@ Timer::expired()
 	if (_start)
 	{
 		uint64_t now = tu_timer::get_profile_ticks();
-		//log_msg("now: %lu", now);
-		assert(now > _start);
+		if (now <= _start)
+		{
+			log_debug("now: %lu, _start: %lu (aborting)", now, _start);
+			abort();
+		}
 
 		//printf("FIXME: %s: now is %f, start time is %f, interval is %f\n", __FUNCTION__, now, _start, _interval);
 		if (now > _start + _interval)
