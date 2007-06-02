@@ -1,3 +1,8 @@
+2007-06-02 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (CommonGetUrl): log about _level#
+	  target for GetUrl being unsupported.
+
 2007-06-02 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* server/asobj/NetConnection.{cpp,h}: Permit openConnection 

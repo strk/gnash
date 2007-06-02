@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.106 2007/05/18 06:05:38 zoulunkai Exp $ */
+/* $Id: ASHandlers.cpp,v 1.107 2007/06/02 06:50:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1774,6 +1774,12 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	if ( ! target.is_undefined() && ! target.is_null() )
 	{
 		target_string = target.to_string(&env);
+		if ( target_string.substr(0, 6) == "_level" )
+		{
+			// Might set loadTargetFlag to true, but _level# would likely not
+			// be resolved anyway
+			log_unimpl(_("GetUrl with target %s unsupported"), target_string.c_str());
+		}
 	}
 
 	// If the url starts with "FSCommand:", then this is
@@ -1818,8 +1824,8 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	const URL& baseurl = get_base_url();
 	URL url(url_s, baseurl);
 
-	log_msg(_("get url: target=%s, url=%s (%s)"), target_string.c_str(),
-		url.str().c_str(), url_c);
+	log_msg(_("get url: target=%s, url=%s (%s), method=%x"), target_string.c_str(),
+		url.str().c_str(), url_c, method);
 
 	if ( loadTargetFlag )
 	{
