@@ -5,7 +5,7 @@
 
 // A render_handler that uses SDL & OpenGL
 
-/* $Id: render_handler_ogl.cpp,v 1.73 2007/05/03 23:47:21 nihilus Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.74 2007/06/02 09:54:20 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,7 +32,11 @@
 #include <OpenGL/glext.h>
 #else
 # include <GL/gl.h>
+# ifdef WIN32
+#  define GL_CLAMP_TO_EDGE 0x812F
+# else
 # include <GL/glx.h>
+# endif
 # include <GL/glu.h>
 # ifndef APIENTRY
 #  define APIENTRY

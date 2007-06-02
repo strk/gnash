@@ -89,6 +89,7 @@
 
 #if defined(_WIN32) || defined(WIN32)
 # define snprintf _snprintf
+# include <sys/time.h>
 #else
 # include <sys/time.h>
 #endif

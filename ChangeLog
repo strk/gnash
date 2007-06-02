@@ -1,3 +1,9 @@
+2007-06-02 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/render_handler_ogl.cpp,libbase/log.cpp, macros/opengl.m4,
+	  server/asobj/Date.cpp: Fixes for builing on win32/MSYS/mingw.
+	  Linking is still broken.
+
 2007-06-02 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (CommonGetUrl): log about _level#
