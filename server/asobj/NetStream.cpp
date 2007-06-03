@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.62 2007/06/01 11:53:19 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.63 2007/06/03 18:17:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -521,7 +521,8 @@ NetStream::bufferLength()
 	if (m_parser.get() == NULL) return 0;
 
 	// m_parser will lock a mutex
-	return m_parser->getBufferLength()/1000;
+	// FLVParser::getBufferLength returns milliseconds already
+	return m_parser->getBufferLength();
 }
 
 bool
