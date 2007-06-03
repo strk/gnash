@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.83 2007/06/02 18:19:54 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.84 2007/06/03 18:40:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -738,7 +738,11 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 	log_debug(" obtained (audio_streamer)");
 #endif
 
-	if (!ns->m_go || ns->m_pause) return false;
+	if (!ns->m_go || ns->m_pause)
+	{
+		// WARNING: decoder might be still waiting on the decode_wait condition...
+		return false;
+	}
 
 	while (len > 0 && ns->m_qaudio.size() > 0)
 	{
