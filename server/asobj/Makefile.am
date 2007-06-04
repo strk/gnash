@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.38 2007/05/04 09:40:25 strk Exp $
+# $Id: Makefile.am,v 1.39 2007/06/04 18:00:09 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -124,7 +124,7 @@ libgnashasobjs_la_LIBADD = \
 if USE_FFMPEG_ENGINE
 libgnashasobjs_la_SOURCES += NetStreamFfmpeg.cpp SoundFfmpeg.cpp
 AM_CPPFLAGS += $(FFMPEG_CFLAGS)
-libgnashasobjs_la_LIBADD += $(FFMPEG_LIBS)
+# libgnashasobjs_la_LIBADD += $(FFMPEG_LIBS)
 endif
 
 if USE_SOUND_GST

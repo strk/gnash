@@ -1,4 +1,4 @@
-$Id: README,v 1.27 2007/04/26 02:45:51 jgilmore Exp $
+$Id: README,v 1.28 2007/06/04 18:00:08 rsavoye Exp $
 
 		    Gnash: the GNU Flash Player
 
@@ -39,21 +39,23 @@ and methods print a warning when using -v with gnash or gprocessor.  Using
 gprocessor -v is a quick way to see why a movie isn't playing correctly.
 
 Currently implemented ActionScript classes are: Array, Boolean, Date,
-Key, Math, Mouse, Number, Object, Sound, String, XML,
-XMLNode, and XMLSocket.
+Key, Math, Mouse, Number, Object, Sound, String, XML, XMLNode,
+XMLSocket, NetStream, NetConnection, 
 
-Partially implemented classes are: MovieClipLoader, NetConnection,
-LocalConnection, MovieClip, TextField, and TextFormat.
+Partially implemented classes are: MovieClipLoader, LocalConnection,
+MovieClip, TextField, TextFormat, System, Function, LoadVars,
 
-Unimplemented classes are: Accessibility, Error, Function, LoadVars,
-Microphone, NetStream, Selection, SharedObject, Stage, System, Button,
-Camera, Color, ContextMenu, CustomActions, Video.
+Unimplemented classes are: Accessibility, Error, Microphone,
+Selection, SharedObject, Stage, Button, Camera, Color, ContextMenu,
+CustomActions, Video.
 
 Unimplemented Opcodes are: Throw, Implements, Extends, EnumObject, Try,
 NewMethod, MDLength, MDSubstring, MDChr, Delete, GetTarget.
 
-There is currently some FLV video support, only minimal AMF data support,
-and no loading of external jpegs.
+Currently streaming video for some video sharing sites like Lulu.tv,
+or YouTube.com, does work. Your mileage with other sites may vary, but
+work continues on improving Gnash.
+
 
 Plugin:	
 -------
@@ -62,7 +64,7 @@ The plugin correctly installs itself into Mozilla, Firefox, or Konqueror.
 It can play some Flash files in cooperation with the browser. It
 should work with any browser that supports the of Mozilla's NSPR API and
 plugin SDK. It has been tested with Mozilla 1.7.13 with gtk2 (won't work with
-gtk1 due to the NSAPI used), Firefox 1.0.x and Firefox 1.5.x.
+gtk1 due to the NSAPI used), Firefox 1.0.x, Firefox 1.5.x, and Firefox 2.x.
 
 Some web pages have Internet Explorer-specific Javascript that fail
 in Firefox, which prevents the plugin from being loaded. In these cases
@@ -71,7 +73,8 @@ I "view source" and then use wget to grab the movie for testing.
 By default, the configure script looks for the GtkGl extension, and
 if that can't be found, it defaults to using SDL. The plugin works by
 forking and running the standalone player, so whichever graphics library
-Gnash uses will also be used by the plugin.
+Gnash uses will also be used by the plugin. As an alternate to SDL,
+Gnash also now has FLTK2 support.
 
 The GTK version has full event handling, and supports a right-click
 mouse menu to control the movie. The SDL version has no event
@@ -84,6 +87,32 @@ Configure with --with-plugindir= to set the directory that "make
 install" will install the plugin in. By default it will be installed
 in the user's .mozilla/plugins or .firefox/plugins directory.
 
+Platforms Supported:
+--------------------
+
+Gnash has been ported to a wide variety of hardware and operating
+systems. Primary platforms that get the most support are most of
+the GNU/Linux distributions, but Ubuntu, Fedora, and Debian primarily.
+OpenBSD is also adequately maintained, but Gnash is known to run on
+FreeBSD and NetBSD systems as well. There are also ports to Beos,
+Haiku, OS/2, Irix, Solaris, and OpenEmbedded.
+
+There are ports of the standalone player to Darwin and Win32. Both
+require adding the dependent libraries Gnash needs. Work has started
+on a native Darwin (Aqua/Carbon/OpenGL) GUI so most of these packages
+won't be required. The win32 player can be built with VC++, or
+Mingw32. 
+
+Gnash has also been ported to a variety of embedded devices, most
+running variations of OpenEmbedded. These include several custom
+hardware platforms aimed at educational software for children. Better
+known devices are the Sharp Zaurus family of PDAs (reflashed to run Open
+Zaurus), the Nokia 770/800, the OLPC and the Pepper Pad 3, that both
+run a trimmed down Fedora.
+
+64bit systems Gnash has been known to run on are the Itanium,
+UltraSparc, PowerPC, AMD64, MIPS. Embedded systems include several ARM
+variants, MIPS, and the Geode GX.
 
 Building Gnash:
 ---------------
@@ -105,7 +134,7 @@ back-ends for sound and/or video:
 
    --enable-media=GST			Gstreamer
    --enable-media=ffmpeg		Ffmpeg
-   --enable-media=mad			libmad (MP3 audio decoding only)
+or --enable-media=mad			libmad (MP3 audio decoding only)
 
 The "media" setting is independent of the "renderer" setting.
 
@@ -117,18 +146,21 @@ You can build the player without GTK support, and these are the
 dependent packages: OpenGL(libMesa), SDL.
 
 The GTK support is more developed and featureful, while the SDL
-support has fewer dependancies on other packages.
+support has fewer dependancies on other packages. The AGG backend
+gives better quality results, and works on devices with only a
+framebuffer, but the performance isn't as good as the OpenGL backend
+if you have a binary blob acelerated graphics driver installed.
 
 Other required packages are libxml2, libpng, and libjpeg.
 If gettext support is installed, or is present in the standard C library,
-gnash will support translation of its messages into other languages.
-
-At this time the sound support is experimental until the new sound
-support is completed. This will support both Gstreamer and
-ffmpeg.
+gnash will support translation of its messages into other
+languages. Boost is also required, as Gnash uses it for portable
+mutexes and threading.
 
 Gstreamer version 0.10 is required because earlier versions wouldn't
-let you insert clips into an existing sound stream, as Gnash needs to do.
+let you insert clips into an existing sound stream, as Gnash needs to
+do. If you use Gstreamer, you still need the ffmeg decoders, and the
+ffmpeg plugin for Gstreamer.
 
 You no longer need the Mozilla or Firefox development packages to
 build Gnash. All the required files are now included in Gnash, so the
@@ -137,6 +169,10 @@ plugin can be built whenever the main gnash program can be built.
 To build Klash, the Konqueror plugin, you need to have the KDE
 development packages installed. This now installs a KDE executable
 called "klash" that is used by this plugin.
+
+As of ffmpeg version 51.40.4, the swscale implementation will be used
+instead of img_convert. Note that using when using ffmpeg version
+51.40.4, Gnash won't link.
 
 The Gnash Community:
 --------------------

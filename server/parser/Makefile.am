@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.33 2007/05/21 11:11:39 strk Exp $
+# $Id: Makefile.am,v 1.34 2007/06/04 18:00:09 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -38,8 +38,6 @@ AM_CPPFLAGS = \
         -I$(top_srcdir)	\
 	$(LIBXML_CFLAGS) \
 	$(GLIB_CFLAGS) \
-	$(FFMPEG_CFLAGS) \
-	$(GSTREAMER_CFLAGS) \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
         $(BOOST_CFLAGS) 

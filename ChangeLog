@@ -1,3 +1,11 @@
+2007-06-04  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* NEWS, README: Update for upcoming release.
+	* macros/kde.m4: Use newlist so we don't stomp on libslist.
+	* server/asobj/Makefile.am: Don't link ffmpeg to convienince lib. 
+	* server/parser/Makefile.am: We don't need ffmpeg or gstreamer
+	headers for this directory.
+
 2007-06-04 Sandro Santilli <strk@keybit.net>
 
 	* backend/render_handler.h: expose a new getBitsPerPixel interface.

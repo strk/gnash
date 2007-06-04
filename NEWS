@@ -1,3 +1,25 @@
+2007-06-XX  Rob Savoye  <rob@darkstar.welcomehome.org>
+
+The third alpha release of Gnash. Improvements since the 0.7.2 release
+are: 
+
+* Streaming video works with YouTube and Lulu.tv! This has been the
+focus for the majority of the time since the last release.
+* Many core improvments in the VM as our understanding of Flash
+improves. These all improve both the correctness of a movie that is
+being played, but enebles more movies to play that used to not work.
+* New FLTK2 gui.
+* Simple Flash debugger added.
+* Improved Darwin support that can use the system OpenGL.
+* Flash extensions, direct support for file handling, MySQL access,
+etc.. through plugins to the Gnash VM. Wrappers for any C/C++ API
+libraries can be exported into ActionScript, and used as native
+commands in a Flash movie.
+* Updated manuals.
+* Many new testcases! Support for testing with ming, swfmill, amd
+mtasc compilers.
+* New drawing API for MovieClips..
+
 2006-09-10  Rob Savoye  <rob@bertha.welcomehome.org>
 
 The second alpha release of Gnash is coming soon. Improvements since
