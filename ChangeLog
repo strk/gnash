@@ -1,3 +1,8 @@
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
+	* server/timers.cpp (expired): allow now == _start.
+	  Hopefully fixes bug #20047.
+
 2007-06-02 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStream.cpp (::bufferLength): return milliseconds,
