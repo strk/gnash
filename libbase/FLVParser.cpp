@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.20 2007/05/31 14:30:03 strk Exp $
+// $Id: FLVParser.cpp,v 1.21 2007/06/04 09:15:41 strk Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -27,6 +27,8 @@
 
 // Define the following macro the have seek() operations printed
 //#define GNASH_DEBUG_SEEK 1
+
+namespace gnash {
 
 FLVParser::FLVParser(LoadThread& lt)
 	:
@@ -667,5 +669,7 @@ inline uint32_t FLVParser::getUInt24(uint8_t* in)
 	// The bits are in big endian order
 	return (in[0] << 16) | (in[1] << 8) | in[2];
 }
+
+} // end of gnash namespace
 
 #undef PADDING_BYTES

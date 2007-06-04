@@ -1,5 +1,9 @@
 2007-06-04 Sandro Santilli <strk@keybit.net>
 
+	* libbase/FLVParser.{cpp,h}: put FLVParser in the gnash namespace.
+
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.{cpp,h}: Drop the decoder mutex and
 	  conditional variable. Decoder should never stop till the end of
 	  the stream is fully decoder. Rename {pause,unpause}Decoding to

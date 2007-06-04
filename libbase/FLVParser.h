@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.13 2007/05/30 12:48:21 strk Exp $
+// $Id: FLVParser.h,v 1.14 2007/06/04 09:15:41 strk Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -27,6 +27,8 @@
 #include "LoadThread.h"
 #include <vector>
 #include <boost/thread/mutex.hpp>
+
+namespace gnash {
 
 enum videoCodecType
 {
@@ -329,5 +331,7 @@ private:
 	/// Mutex to avoid problems with threads using the parser
 	boost::mutex _mutex;
 };
+
+} // end of gnash namespace
 
 #endif // __FLVPARSER_H__
