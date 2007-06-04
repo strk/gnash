@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.53 2007/06/01 15:23:35 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.54 2007/06/04 20:55:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1044,7 +1044,7 @@ NetStreamGst::advance()
 		}
 		else
 		{
-			log_msg("Pausing pipeline on ::advance() [ loadCompleted returned false ]");
+			//log_debug("Pausing pipeline on ::advance() [ loadCompleted returned false ]");
 			if ( !pausePipeline(true) )
 			{
 				log_error("Could not pause pipeline");
