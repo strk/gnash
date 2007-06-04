@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.40 2007/05/28 15:40:57 ann Exp $ */
+/* $Id: render_handler.h,v 1.41 2007/06/04 16:59:03 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -580,6 +580,19 @@ public:
 	virtual bool initTestBuffer(unsigned /*width*/, unsigned /*height*/)
 	{
 		return false;
+	}
+
+	/// Return color depth (bits per pixel) or 0 if unknown/unimplemented.
+	//
+	/// Default implementation returns 0 (unknown).
+	///
+	/// TODO: this should be a pure abstract function, just don't want
+	///       to scan ogl and cairo backend for an implementation *now*
+	///       but would be needed for automated testing... Quinn, can you help ?
+	///
+	virtual unsigned int getBitsPerPixel() const
+	{
+		return 0;
 	}
   
 	/// Sets the x/y scale for the movie  

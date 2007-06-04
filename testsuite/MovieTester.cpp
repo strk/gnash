@@ -40,6 +40,7 @@
 #include <cstdio>
 #include <string>
 #include <memory> // for auto_ptr
+#include <cmath> // for ceil and exp2
 
 #define SHOW_INVALIDATED_BOUNDS_ON_ADVANCE 1
 
@@ -238,22 +239,36 @@ MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 
 		rgba obt_col;
 
-	        if ( ! rend.getRenderer().getAveragePixel(obt_col, x, y, radius) )
-	        //if ( ! rend.getRenderer().getPixel(obt_col, x, y) )
+		render_handler& handler = rend.getRenderer();
+
+	        if ( ! handler.getAveragePixel(obt_col, x, y, radius) )
 		{
 			ss << " is out of rendering buffer";
 			log_msg("%sFAILED: %s (%s)", X,
 					ss.str().c_str(),
 					label.c_str()
 					);
+			continue;
 		}
+
+		// Find minimum tolerance as a function of BPP
+
+		unsigned short minRendererTolerance = tolerance;
+		unsigned int bpp = handler.getBitsPerPixel();
+		if ( bpp ) 
+		{
+			// UdoG: check_pixel should *always* tolerate at least 2 ^ (8 - bpp/3)
+			minRendererTolerance = int(ceil(exp2(8 - bpp/3)));
+		}
+
+		unsigned short tol = std::max(tolerance, minRendererTolerance);
 
 	        ss << "exp:" << color.toShortString() << " ";
 	        ss << "obt:" << obt_col.toShortString() << " ";
-	        ss << "tol:" << tolerance;
+	        ss << "tol:" << tol;
 
-		FuzzyPixel obt(obt_col, tolerance);
-		if (exp ==  obt)
+		FuzzyPixel obt(obt_col, tol);
+		if (exp ==  obt) // equality operator would use tolerance of most tolerating FuzzyPixel
 		{
 			log_msg("%sPASSED: %s %s", X,
 					ss.str().c_str(),

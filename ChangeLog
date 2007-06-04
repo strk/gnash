@@ -1,5 +1,15 @@
 2007-06-04 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler.h: expose a new getBitsPerPixel interface.
+	* backend/render_handler_agg.{cpp,h}: implement getBitsPerPixel,
+	  const-correct the existing getBytesPerPixel.
+	* testsuite/MovieTester.cpp (checkPixel): never use a tolerance
+	  inferior to the minimum tolerance for a renderer, with min tolerance
+	  being a function of BPP (formula suggested by UdoG).
+	  Fixes bug #20035.
+
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamFfmpeg.cpp (av_streamer): sleep for 1
 	  microsecond between iterations, to allow other threads to run.
 	  Fixes the 100% CPU problem (thanks to UdoG for support).

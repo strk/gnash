@@ -42,7 +42,9 @@ public:
   // these methods need to be accessed from outside:
   virtual void init_buffer(unsigned char *mem, int size, int x, int y)=0;
 
-  virtual unsigned int getBytesPerPixel()=0;
+  virtual unsigned int getBytesPerPixel() const=0;
+
+  unsigned int getBitsPerPixel() const { return getBytesPerPixel()*8; }
   
   virtual bool initTestBuffer(unsigned width, unsigned height) {
     int size = width * height * getBytesPerPixel();
