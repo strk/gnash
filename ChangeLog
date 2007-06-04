@@ -1,5 +1,13 @@
 2007-06-04 Sandro Santilli <strk@keybit.net>
 
+	* libbase/FLVParser.h: updated dox for nextAudioFrame() and
+	  nextVideoFrame() noting the non-blocking nature of the calls;
+	  add a parsingCompleted() method.
+	* server/asobj/NetStreamFfmpeg.h: update documentation of
+	  decodeFLVFrame()
+
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
 	* libbase/FLVParser.{cpp,h}: put FLVParser in the gnash namespace.
 
 2007-06-04 Sandro Santilli <strk@keybit.net>

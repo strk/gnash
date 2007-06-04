@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.45 2007/06/04 09:04:32 strk Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.46 2007/06/04 12:02:16 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -314,10 +314,18 @@ private:
 	// Used to decode and push the next available (non-FLV) frame to the audio or video queue
 	bool decodeMediaFrame();
 
-	// Used to decode push the next available FLV frame to the audio or video queue
+	/// Used to decode push the next available FLV frame to the audio or video queue
 	//
-	// Uses by ::advance().
-	//
+	/// Called by ::av_streamer to buffer more a/v frames when possible.
+	///
+	/// This is a non-blocking call, if data isn't available in the parser no
+	/// new frame is decoded and this method returns false. Note that this doesn't
+	/// necessarely means the FLV stream is ended, rather it is possible the loader
+	/// thread is starving. 
+	///
+	/// TODO: return a more informative value to distinguish between EOF and starving
+	///       conditions ?
+	///
 	bool decodeFLVFrame();
 
 	// Used to decode a video frame and push it on the videoqueue

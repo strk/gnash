@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.14 2007/06/04 09:15:41 strk Exp $
+// $Id: FLVParser.h,v 1.15 2007/06/04 12:02:15 strk Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -189,22 +189,35 @@ public:
 	FLVFrame* nextMediaFrame();
 
 	/// \brief
-	/// Returns the next audio frame in the timeline. If no frame has been
-	/// played before the first frame is returned. If there is no more frames
-	/// in the timeline NULL is returned.
+	/// Returns the next audio frame in the parsed buffer.
 	//
+	/// If no frame has been played before the first frame is returned.
+	/// If there is no more frames in the parsed buffer NULL is returned,
+	/// you can check with parsingCompleted() to know wheter this is due to 
+	/// EOF reached.
+	///
 	/// Locks the _mutex
 	///
 	FLVFrame* nextAudioFrame();
 
 	/// \brief
-	/// Returns the next video frame in the timeline. If no frame has been
-	/// played before the first frame is returned. If there is no more frames
-	/// in the timeline NULL is returned.
+	/// Returns the next video frame in the parsed buffer.
 	//
+	/// If no frame has been played before the first frame is returned.
+	/// If there is no more frames in the parsed buffer NULL is returned.
+	/// you can check with parsingCompleted() to know wheter this is due to 
+	/// EOF reached.
+	///
 	/// Locks the _mutex
 	///
 	FLVFrame* nextVideoFrame();
+
+	/// Return true of parsing is completed
+	//
+	/// If this function returns true, any call to nextVideoFrame() or nextAudioFrame
+	/// will always return NULL
+	///
+	bool parsingCompleted() const { return _parsingComplete; }
 
 	/// Returns a FLVVideoInfo class about the videostream
 	//
