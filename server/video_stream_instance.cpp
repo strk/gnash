@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.26 2007/05/30 15:12:28 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.27 2007/06/04 19:21:20 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -32,33 +32,122 @@
 
 namespace gnash {
 
-	static as_value
-	attach_video(const fn_call& fn)
-	{
-		boost::intrusive_ptr<video_stream_instance> video = ensureType<video_stream_instance>(fn.this_ptr);
-	
-		if (fn.nargs < 1)
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-	    		log_aserror(_("attachVideo needs 1 arg"));
-			);
-			return as_value();
-		}
+static as_object* getVideoInterface();
+static void attachVideoInterface(as_object& o);
+static void attachVideoProperties(as_object& o);
+static as_value video_ctor(const fn_call& fn);
+static as_value video_attach(const fn_call& fn);
+static as_value video_clear(const fn_call& fn);
 
-		boost::intrusive_ptr<NetStream> ns = boost::dynamic_pointer_cast<NetStream>(fn.arg(0).to_object());
-		if (ns)
-		{
-			video->setStream(ns);
-		}
-		else
-		{
-			IF_VERBOSE_ASCODING_ERRORS(
-	    		log_aserror(_("attachVideo(%s) first arg is not a NetStream instance"),
-				fn.arg(0).to_debug_string().c_str());
-			);
-		}
+static as_object* getVideoInterface()
+{
+	static boost::intrusive_ptr<as_object> proto;
+	if ( proto == NULL )
+	{
+		proto = new as_object();
+		attachVideoInterface(*proto);
+		proto->init_member("constructor", new builtin_function(video_ctor));
+	}
+	return proto.get();
+}
+
+static void attachVideoInterface(as_object& o)
+{
+	o.init_member("attachVideo", new builtin_function(video_attach));
+	o.init_member("clear", new builtin_function(video_clear));
+}
+
+static void attachVideoProperties(as_object& o)
+{
+	//int target_version = o.getVM().getSWFVersion();
+
+	boost::intrusive_ptr<builtin_function> gettersetter;
+
+	gettersetter = new builtin_function(&character::x_getset, NULL);
+	o.init_property("_x", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::y_getset, NULL);
+	o.init_property("_y", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::xscale_getset, NULL);
+	o.init_property("_xscale", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::yscale_getset, NULL);
+	o.init_property("_yscale", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::xmouse_get, NULL);
+	o.init_readonly_property("_xmouse", *gettersetter);
+
+	gettersetter = new builtin_function(&character::ymouse_get, NULL);
+	o.init_readonly_property("_ymouse", *gettersetter);
+
+	gettersetter = new builtin_function(&character::alpha_getset, NULL);
+	o.init_property("_alpha", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::visible_getset, NULL);
+	o.init_property("_visible", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::width_getset, NULL);
+	o.init_property("_width", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::height_getset, NULL);
+	o.init_property("_height", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::rotation_getset, NULL);
+	o.init_property("_rotation", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::parent_getset, NULL);
+	o.init_property("_parent", *gettersetter, *gettersetter);
+
+	gettersetter = new builtin_function(&character::target_getset, NULL);
+	o.init_property("_target", *gettersetter, *gettersetter);
+}
+
+static as_value
+video_attach(const fn_call& fn)
+{
+	boost::intrusive_ptr<video_stream_instance> video = ensureType<video_stream_instance>(fn.this_ptr);
+
+	if (fn.nargs < 1)
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("attachVideo needs 1 arg"));
+		);
 		return as_value();
 	}
+
+	boost::intrusive_ptr<NetStream> ns = boost::dynamic_pointer_cast<NetStream>(fn.arg(0).to_object());
+	if (ns)
+	{
+		video->setStream(ns);
+	}
+	else
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("attachVideo(%s) first arg is not a NetStream instance"),
+			fn.arg(0).to_debug_string().c_str());
+		);
+	}
+	return as_value();
+}
+
+static as_value
+video_clear(const fn_call& /*fn*/)
+{
+    log_unimpl (__FUNCTION__);
+    return as_value();
+}
+
+static as_value
+video_ctor(const fn_call& /* fn */)
+{
+	log_debug("new Video() TESTING !");
+
+	// I'm not sure We can rely on the def and parent values being accepted  as NULL
+	// Not till we add some testing...
+	boost::intrusive_ptr<as_object> obj = new video_stream_instance(NULL, NULL, -1);
+	return as_value(obj.get()); // will keep alive
+}
 
 video_stream_instance::video_stream_instance(video_stream_definition* def,
 		character* parent, int id)
@@ -67,10 +156,16 @@ video_stream_instance::video_stream_instance(video_stream_definition* def,
 	m_def(def),
 	//m_video_source(NULL),
 	_ns(NULL),
-	m_decoder(m_def->get_decoder()) // should abort if m_def is null
+	m_decoder(NULL) // don't abort if m_def is null
 {
-	// FIXME: use new layout
-	init_member("attachVideo", new builtin_function(attach_video));
+	if ( m_def )
+	{
+		m_decoder = m_def->get_decoder();
+	}
+
+	set_prototype(getVideoInterface());
+			
+	attachVideoProperties(*this);
 }
 
 video_stream_instance::~video_stream_instance()
@@ -80,6 +175,10 @@ video_stream_instance::~video_stream_instance()
 void
 video_stream_instance::display()
 {
+	// if m_def is NULL we've been constructed by 'new Video', in this
+	// case I think display() would never be invoked on us...
+	assert(m_def);
+
 	matrix m = get_world_matrix();
 	rect bounds(0.0f, 0.0f, PIXELS_TO_TWIPS(m_def->m_width), PIXELS_TO_TWIPS(m_def->m_height));
 
@@ -98,7 +197,13 @@ video_stream_instance::display()
 	} else if (m_decoder.get()) {
 		uint8_t* data = 0;
 		int size = 0;
-		int current_frame = get_parent()->to_movie()->get_current_frame();
+		character* parent = get_parent();
+		assert(parent);
+		sprite_instance* sprite = parent->to_movie();
+		assert(sprite);
+
+		int current_frame = sprite->get_current_frame();
+		assert(m_def);
 		m_def->get_frame_data(current_frame, &data, &size);
 
 		image::image_base* i = m_decoder->decodeFrame(data, size);
@@ -134,6 +239,10 @@ video_stream_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 	
 	// NOTE: do not use m_def->get_bounds()
 
+	// if m_def is NULL we've been constructed by 'new Video', in this
+	// case I think add_invalidated_bouns would never be invoked on us...
+	assert ( m_def );
+
   rect def_bounds(0.0f, 0.0f, 
     PIXELS_TO_TWIPS(m_def->m_width), PIXELS_TO_TWIPS(m_def->m_height));
     
@@ -148,6 +257,24 @@ void
 video_stream_instance::setStream(boost::intrusive_ptr<NetStream> ns)
 {
 	_ns = ns;
+}
+
+// extern (used by Global.cpp)
+void video_class_init(as_object& global)
+{
+	// This is going to be the global Video "class"/"function"
+	static boost::intrusive_ptr<builtin_function> cl;
+
+	if ( cl == NULL )
+	{
+		cl=new builtin_function(&video_ctor, getVideoInterface());
+		// replicate all interface to class, to be able to access
+		// all methods as static functions
+		//attachVideoInterface(*cl);
+	}
+
+	// Register _global.Video
+	global.init_member("Video", cl.get());
 }
 
 } // end of namespace gnash

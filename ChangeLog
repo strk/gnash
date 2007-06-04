@@ -1,5 +1,15 @@
 2007-06-04 Sandro Santilli <strk@keybit.net>
 
+	* server/video_stream_instance.{cpp,h}: register Video AS class
+	  interface and provide class initialization.
+	* server/asobj/: Global.cpp, Makefile.am, Video.{cpp,h}: Drop Video file, video
+	  class is now implemented in video_stream_instance.cpp
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: don't expect
+	  failures due to video stream character NOT being a real Video
+	  object.
+
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: set SWF rate back to
 	  an high value to allow for testing pixel color and also testing with
 	  eyes what's hard to test when nothing is shown due to Gnash not

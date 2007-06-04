@@ -112,10 +112,10 @@ main(int argc, char** argv)
   if(a == NULL) return -1;
   SWFMovie_add(mo, (SWFBlock)a);
 
-  xcheck_equals(mo, "video._xscale", "100");
-  xcheck_equals(mo, "video._yscale", "100");
-  xcheck_equals(mo, "video._rotation", "0");
-  xcheck_equals(mo, "video._target", "'/video'");
+  check_equals(mo, "video._xscale", "100");
+  check_equals(mo, "video._yscale", "100");
+  check_equals(mo, "video._rotation", "0");
+  check_equals(mo, "video._target", "'/video'");
 
   add_actions(mo,
 		"video._x = 100;"
@@ -124,9 +124,9 @@ main(int argc, char** argv)
 		"video._rotation = 45;");
 
   check_equals(mo, "video._x", "100")	;
-  check_equals(mo, "video._xscale", "120");
-  check_equals(mo, "video._yscale", "120");
-  check_equals(mo, "video._rotation", "45");
+  check_equals(mo, "Math.round(video._xscale*100)/100", "120");
+  check_equals(mo, "Math.round(video._yscale*100)/100", "120");
+  check_equals(mo, "Math.round(video._rotation*100)/100", "45");
 
 
   // How can I test props here ?

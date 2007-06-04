@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.39 2007/06/04 18:00:09 rsavoye Exp $
+# $Id: Makefile.am,v 1.40 2007/06/04 19:21:20 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -67,7 +67,6 @@ libgnashasobjs_la_SOURCES = \
 	Stage.cpp	\
 	System.cpp	\
 	TextSnapshot.cpp\
-	Video.cpp	\
 	MovieClipLoader.cpp\
 	string.cpp \
 	xml.cpp \
@@ -107,7 +106,6 @@ noinst_HEADERS = \
 	Stage.h		\
 	System.h	\
 	TextSnapshot.h	\
-	Video.h		\
 	gstring.h	\
 	xml.h		\
 	xmlsocket.h \

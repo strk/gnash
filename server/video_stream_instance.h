@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.14 2007/05/28 15:41:07 ann Exp $
+// $Id: video_stream_instance.h,v 1.15 2007/06/04 19:21:20 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -83,6 +83,8 @@ private:
 	/// Decoder for embedded video
 	std::auto_ptr<embedVideoDecoder> m_decoder;
 };
+
+void video_class_init(as_object& global);
 
 }	// end namespace gnash
 

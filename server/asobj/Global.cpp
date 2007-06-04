@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.61 2007/05/25 16:04:11 strk Exp $ */
+/* $Id: Global.cpp,v 1.62 2007/06/04 19:21:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -56,7 +56,7 @@
 #include "System.h"
 #include "textformat.h"
 #include "TextSnapshot.h"
-#include "Video.h"
+#include "video_stream_instance.h"
 #include "extension.h"
 #include "VM.h"
 #include "timers.h"
