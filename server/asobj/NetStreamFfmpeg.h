@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.44 2007/05/31 15:52:28 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.45 2007/06/04 09:04:32 strk Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -235,45 +235,37 @@ public:
 	NetStreamFfmpeg();
 	~NetStreamFfmpeg();
 
-	// Locks decoding_mutex
-	//
-	/// does NOT lock decoding_mutex, intended to be called
-	/// by ::advance which locks and by destructor (locking in destructor might be needed)
-	///
+	// See dox in NetStream.h
 	void close();
 
-	/// Locks decoding_mutex
-	//
-	/// does NOT lock decoding_mutex, intended to be only called
-	/// by ::advance, itself locking.
-	///
+	// See dox in NetStream.h
 	void pause(int mode);
 
-	/// does NOT lock decoding_mutex, intended to be only called
-	/// by ::advance, itself locking.
-	///
+	// See dox in NetStream.h
 	void play(const std::string& source);
 
-	/// does NOT lock decoding_mutex. Users:
-	///	- ::advance (VM), itself locking
-	///	- ::startPlayback() non locking but called by av_streamer which locks
-	///	- ::seekMedia() set as a callback with init_put_byte (??)
-	///
+	// See dox in NetStream.h
+	//
+	// Users:
+	//	- ::advance (VM), itself locking
+	//	- ::startPlayback() non locking but called by av_streamer which locks
+	//	- ::seekMedia() set as a callback with init_put_byte (??)
+	//
 	void seek(uint32_t pos);
 
+	// See dox in NetStream.h
 	int32_t time();
 
-	// Locks decoding_mutex
+	// See dox in NetStream.h
 	void advance();
 
 	// Used for ffmpeg data read and seek callbacks with non-FLV
 	static int readPacket(void* opaque, uint8_t* buf, int buf_size);
+
+	// Used for ffmpeg data read and seek callbacks with non-FLV
 	static offset_t seekMedia(void *opaque, offset_t offset, int whence);
 
 	/// The decoding thread. Sets up the decoder, and decodes.
-	//
-	/// Locks decoding_mutex
-	///
 	static void av_streamer(NetStreamFfmpeg* ns);
 
 	/// Callback used by sound_handler to get audio data
@@ -282,8 +274,6 @@ public:
 	///
 	/// It will be invoked by a separate thread (neither main, nor decoder thread).
 	///
-	/// Locks decoding_mutex
-	///
 	static bool audio_streamer(void *udata, uint8_t *stream, int len);
 
 private:
@@ -291,28 +281,29 @@ private:
 	// Setups the playback
 	bool startPlayback();
 
-	// Pauses the decoding - don't directly modify m_pause!!
+	// Pauses the playhead 
 	//
-	// does NOT lock decoding_mutex. Users:
-	// 	- ::decodeFLVFrame() not locking  byt called by av_streamer which locks
-	// 	- ::pause() not locking but called by ::advance
-	// 	- ::play() not locking but called by ::advance which locks
+	// Users:
+	// 	- ::decodeFLVFrame() 
+	// 	- ::pause() 
+	// 	- ::play() 
 	//
-	void pauseDecoding();
+	void pausePlayback();
 
-	// Unpauses/resumes the decoding - don't directly modify m_pause!!
+	// Resumes the playback 
 	//
-	// does NOT lock decoding_mutex. Users:
-	// 	- ::av_streamer() which locks
-	// 	- ::play() not locking but called by ::advance which locks
-	// 	- ::startPlayback() not locking but called by ::av_streamer
-	// 	- ::advance() which locks
+	// Users:
+	// 	- ::av_streamer() 
+	// 	- ::play() 
+	// 	- ::startPlayback() 
+	// 	- ::advance() 
 	//
-	void unpauseDecoding();
+	void unpausePlayback();
 
 	/// Update the image/videoframe to be returned by next get_video() call.
 	//
-	/// Does NOT lock decoding_mutex, uses by ::advance() which locks.
+	/// Uses by ::advance().
+	///
 	/// Note that get_video will be called by video_stream_instance::display, which
 	/// is usually called right after video_stream_instance::advance, so  the result
 	/// is that  refreshVideoFrame() is called right before get_video(). This is important
@@ -325,7 +316,7 @@ private:
 
 	// Used to decode push the next available FLV frame to the audio or video queue
 	//
-	// does NOT lock decoding_mutex, uses by ::advance() which locks
+	// Uses by ::advance().
 	//
 	bool decodeFLVFrame();
 
@@ -362,16 +353,6 @@ private:
 
 	// The decoding thread
 	boost::thread* _decodeThread;
-
-	// Mutex used to make sure things arn't messed up when seeking and decoding (is it really necessary?)
-	boost::mutex decoding_mutex;
-
-	// Condition used to pause the decoding thread/loop when
-	// playback is paused, or when the video and audio queues are full
-	//
-	// Associated with the decoding_mutex
-	//
-	boost::condition decode_wait;
 
 	// The timestamp of the last decoded video frame, in seconds.
 	volatile uint32_t m_last_video_timestamp;

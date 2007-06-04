@@ -1,5 +1,13 @@
 2007-06-04 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.{cpp,h}: Drop the decoder mutex and
+	  conditional variable. Decoder should never stop till the end of
+	  the stream is fully decoder. Rename {pause,unpause}Decoding to
+	  {pause,unpause}Playback, which is matches reality more, and is
+	  also more correct.
+
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
 	* server/timers.cpp (expired): allow now == _start.
 	  Hopefully fixes bug #20047.
 

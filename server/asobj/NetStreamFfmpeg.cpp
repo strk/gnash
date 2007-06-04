@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.84 2007/06/03 18:40:21 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.85 2007/06/04 09:04:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -91,13 +91,13 @@ void NetStreamFfmpeg::pause(int mode)
 
 	if (mode == -1)
 	{
-		if (m_pause) unpauseDecoding();
-		else pauseDecoding();
+		if (m_pause) unpausePlayback();
+		else pausePlayback();
 	}
 	else
 	{
-		if (mode == 0) pauseDecoding();
-		else unpauseDecoding();
+		if (mode == 0) pausePlayback();
+		else unpausePlayback();
 	}
 	if (!m_pause && !m_go) { 
 		setStatus(playStart);
@@ -112,23 +112,15 @@ void NetStreamFfmpeg::close()
 
 	if (m_go)
 	{
-		// terminate thread
+		// request decoder thread termination
 		m_go = false;
-#ifdef GNASH_DEBUG_THREADS
-		log_debug("Waking up decoder thread on close()");
-#endif
-		decode_wait.notify_one();
 
 		// wait till thread is complete before main continues
 		_decodeThread->join();
+
 		delete _decodeThread;
 
 	}
-	else
-	{
-		// WARNING: decoder might be still waiting on the decode_wait condition...
-	}
-
 
 	// When closing gnash before playback is finished, the soundhandler 
 	// seems to be removed before netstream is destroyed.
@@ -225,7 +217,7 @@ NetStreamFfmpeg::play(const std::string& c_url)
 	// Is it already playing ?
 	if (m_go)
 	{
-		if (m_pause) unpauseDecoding();
+		unpausePlayback(); // will check for m_pause itself..
 		return;
 	}
 
@@ -245,7 +237,7 @@ NetStreamFfmpeg::play(const std::string& c_url)
 	}
 
 	m_go = true;
-	pauseDecoding();
+	pausePlayback();
 
 	// This starts the decoding thread
 	_decodeThread = new boost::thread(boost::bind(NetStreamFfmpeg::av_streamer, this)); 
@@ -574,7 +566,7 @@ NetStreamFfmpeg::startPlayback()
 
 	}
 
-	unpauseDecoding();
+	unpausePlayback();
 	return true;
 }
 
@@ -606,14 +598,6 @@ rgbcopy(image::rgb* dst, raw_mediadata_t* src, int width)
 void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 {
 	//GNASH_REPORT_FUNCTION;
-
-#ifdef GNASH_DEBUG_THREADS
-	log_debug("Thread %d locking on ::av_streamer", pthread_self());
-#endif
-	boost::mutex::scoped_lock lock(ns->decoding_mutex);
-#ifdef GNASH_DEBUG_THREADS
-	log_debug(" obtained (av_streamer)");
-#endif
 
 	// This should only happen if close() is called before this thread is ready
 	if (!ns->m_go)
@@ -667,26 +651,6 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 				}
 			}
 
-			if (ns->m_pause || (ns->m_qvideo.size() > 10 && ns->m_qaudio.size() > 10))
-			{ 
-				if ( ! ns->m_go )
-				{
-					log_debug("m_go=%d, m_start_onbuffer=%d, qVideoSize=%d, qAudioSize=%d", ns->m_go, ns->m_start_onbuffer, ns->m_qvideo.size(), ns->m_qaudio.size());
-					// decodeFLVFrame above might set m_go to false when parsed buffer is over
-					// note that when parsed buffer is over decodeFLVFrame would return false,
-					// but the break above might still not be reached due to m_start_onbuffer 
-					// or queue sizes not being 0.
-					assert(0);
-					break;
-				}
-#ifdef GNASH_DEBUG_THREADS
-				log_debug("Waiting on lock..");
-#endif
-				ns->decode_wait.wait(lock);
-#ifdef GNASH_DEBUG_THREADS
-				log_debug("Finished waiting.");
-#endif
-			}
 		} else {
 
 			// If we have problems with decoding - break
@@ -695,19 +659,6 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 				break;
 			}
 
-			// If paused, wait for being unpaused, or
-			// if the queue is full we wait until someone notifies us that data is needed.
-			if (ns->m_pause || ((ns->m_qvideo.size() > 0 && ns->m_qaudio.size() > 0) && ns->m_unqueued_data))
-			{ 
-				assert ( ns->m_go ); // or we'll have a problem ending the wait...
-#ifdef GNASH_DEBUG_THREADS
-				log_debug("Waiting on lock..");
-#endif
-				ns->decode_wait.wait(lock);
-#ifdef GNASH_DEBUG_THREADS
-				log_debug("Finished waiting.");
-#endif
-			}
 		}
 
 	}
@@ -730,33 +681,14 @@ bool NetStreamFfmpeg::audio_streamer(void *owner, uint8_t *stream, int len)
 
 	NetStreamFfmpeg* ns = static_cast<NetStreamFfmpeg*>(owner);
 
-#ifdef GNASH_DEBUG_THREADS
-	log_debug("Thread %d locking on ::audio_streamer", pthread_self());
-#endif
-	boost::mutex::scoped_lock  lock(ns->decoding_mutex);
-#ifdef GNASH_DEBUG_THREADS
-	log_debug(" obtained (audio_streamer)");
-#endif
-
 	if (!ns->m_go || ns->m_pause)
 	{
-		// WARNING: decoder might be still waiting on the decode_wait condition...
 		return false;
 	}
 
 	while (len > 0 && ns->m_qaudio.size() > 0)
 	{
 		raw_mediadata_t* samples = ns->m_qaudio.front();
-
-		// If less than 3 frames in the queue notify the decoding thread
-		// so that we don't suddenly run out.
-		if (ns->m_qaudio.size() < 3)
-		{
-#ifdef GNASH_DEBUG_THREADS
-			log_debug("Waking up decoder thread from audio_streamer due to short qaudio size (%lu)", static_cast<unsigned long>(ns->m_qaudio.size()));
-#endif
-			ns->decode_wait.notify_one();
-		}
 
 		int n = imin(samples->m_size, len);
 		memcpy(stream, samples->m_ptr, n);
@@ -797,7 +729,7 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 			// Stop!
 			m_go = false;
 		} else {
-			pauseDecoding();
+			pausePlayback();
 			setStatus(bufferEmpty);
 			m_start_onbuffer = true;
 		}
@@ -1005,13 +937,6 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 
 bool NetStreamFfmpeg::decodeMediaFrame()
 {
-#ifdef GNASH_DEBUG_THREADS
-	log_debug("Thread %d locking on ::decodeMediaFrame", pthread_self());
-#endif
-	boost::mutex::scoped_lock  lock(decoding_mutex);
-#ifdef GNASH_DEBUG_THREADS
-	log_debug(" obtained (decodeMediaFrame)");
-#endif
 
 	if (m_unqueued_data)
 	{
@@ -1161,14 +1086,9 @@ NetStreamFfmpeg::refreshVideoFrame()
 		// will return NULL if empty(). See multithread_queue::front
 		raw_mediadata_t* video = m_qvideo.front();
 
-		// If the queue is empty, we tell the decoding thread to wake up,
-		// and decode some more.
+		// If the queue is empty we have nothing to do
 		if (!video)
 		{
-#ifdef GNASH_DEBUG_THREADS
-			log_debug("Waking up decoder thread from refreshVideoFrame due to empty video queue");
-#endif
-			decode_wait.notify_one();
 			return;
 		}
 
@@ -1210,15 +1130,6 @@ NetStreamFfmpeg::refreshVideoFrame()
 			return;
 		}
 
-		// If less than 3 frames in the queue notify the decoding thread
-		// so that we don't suddenly run out.
-		if (m_qvideo.size() < 3)
-		{
-#ifdef GNASH_DEBUG_THREADS
-			log_debug("Waking up decoder thread from refreshVideoFrame due short video queue (%lu)", static_cast<unsigned long>(m_qvideo.size()));
-#endif
-			decode_wait.notify_one();
-		}
 	}
 }
 
@@ -1226,13 +1137,6 @@ NetStreamFfmpeg::refreshVideoFrame()
 void
 NetStreamFfmpeg::advance()
 {
-#ifdef GNASH_DEBUG_THREADS
-	log_debug("Thread %d locking on ::advance", pthread_self());
-#endif
-	boost::mutex::scoped_lock lock(decoding_mutex);
-#ifdef GNASH_DEBUG_THREADS
-	log_debug(" obtained (advance)");
-#endif
 
 	// Make sure al decoding has stopped
 	// This can happen in 2 cases: 
@@ -1247,7 +1151,7 @@ NetStreamFfmpeg::advance()
 		log_debug("(advance): setting buffer full");
 #endif
 		setStatus(bufferFull);
-		unpauseDecoding();
+		unpausePlayback();
 		m_start_onbuffer = false;
 	}
 
@@ -1276,11 +1180,9 @@ NetStreamFfmpeg::time()
 	}
 }
 
-void NetStreamFfmpeg::pauseDecoding()
+void NetStreamFfmpeg::pausePlayback()
 {
 	//GNASH_REPORT_FUNCTION
-
-	// assert(decoding_mutex is locked by this thread!)
 
 	if (m_pause) return;
 
@@ -1290,13 +1192,10 @@ void NetStreamFfmpeg::pauseDecoding()
 	m_time_of_pause = tu_timer::get_ticks();
 }
 
-void NetStreamFfmpeg::unpauseDecoding()
+void NetStreamFfmpeg::unpausePlayback()
 {
-	// assert(decoding_mutex is locked by this thread!)
-
-	if (!m_pause)
+	if (!m_pause) // already not paused
 	{
-		// WARNING: decoder might be still waiting on the decode_wait condition...
 		return;
 	}
 
@@ -1310,13 +1209,8 @@ void NetStreamFfmpeg::unpauseDecoding()
 		m_start_clock += tu_timer::get_ticks() - m_time_of_pause;
 	}
 
-	// Notify the decode thread/loop that we are running again
-#ifdef GNASH_DEBUG_THREADS
-	log_debug("Waking up decoder thread from unpauseDecoding...");
-#endif
-	decode_wait.notify_one();
-
-	// Re-connect to the soundhandler
+	// Re-connect to the soundhandler.
+	// It was disconnected to avoid to keep playing sound while paused
 	sound_handler* s = get_sound_handler();
 	if (s) s->attach_aux_streamer(audio_streamer, (void*) this);
 }
