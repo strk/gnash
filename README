@@ -1,4 +1,4 @@
-$Id: README,v 1.28 2007/06/04 18:00:08 rsavoye Exp $
+$Id: README,v 1.29 2007/06/04 20:46:03 strk Exp $
 
 		    Gnash: the GNU Flash Player
 
@@ -40,17 +40,17 @@ gprocessor -v is a quick way to see why a movie isn't playing correctly.
 
 Currently implemented ActionScript classes are: Array, Boolean, Date,
 Key, Math, Mouse, Number, Object, Sound, String, XML, XMLNode,
-XMLSocket, NetStream, NetConnection, 
+XMLSocket, NetStream, NetConnection, Stage, Button.
 
 Partially implemented classes are: MovieClipLoader, LocalConnection,
-MovieClip, TextField, TextFormat, System, Function, LoadVars,
+MovieClip, TextField, TextFormat, System, Function, LoadVars, Video.
 
 Unimplemented classes are: Accessibility, Error, Microphone,
-Selection, SharedObject, Stage, Button, Camera, Color, ContextMenu,
-CustomActions, Video.
+Selection, SharedObject, Camera, Color, ContextMenu,
+CustomActions.
 
-Unimplemented Opcodes are: Throw, Implements, Extends, EnumObject, Try,
-NewMethod, MDLength, MDSubstring, MDChr, Delete, GetTarget.
+Unimplemented Opcodes are: Throw, Implements, Try,
+MDLength, MDSubstring, MDChr.
 
 Currently streaming video for some video sharing sites like Lulu.tv,
 or YouTube.com, does work. Your mileage with other sites may vary, but

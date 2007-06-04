@@ -1,5 +1,9 @@
 2007-06-04 Sandro Santilli <strk@keybit.net>
 
+	* README: some opcode and classes are actually implemented now.
+
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
 	* server/video_stream_instance.{cpp,h}: register Video AS class
 	  interface and provide class initialization.
 	* server/asobj/: Global.cpp, Makefile.am, Video.{cpp,h}: Drop Video file, video
