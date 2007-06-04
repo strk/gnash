@@ -22,8 +22,8 @@
  *
  * Expected behaviour:
  *
- *   Shows a 90x90 pixels red square moving from left to right over
- *   a 255x200 yellow background.
+ *   Shows a 54x54 pixels red square moving from left to right over
+ *   a 152x120 yellow background. The whole thing rotated by 45 degrees clockwise.
  */
 
 #include <stdlib.h>
@@ -79,8 +79,11 @@ main(int argc, char** argv)
 	"nc.connect(null);"
 	"stream = new NetStream(nc);"
 	"video.attachVideo(stream); "
-	"video._xscale = 200;"
-	"video._yscale = 200;"
+	"video._x = 100;"
+	"video._1 = 100;"
+	"video._xscale = 120;"
+	"video._yscale = 120;"
+	"video._rotation = 45;"
 	"stream.setBufferTime(2); "
 	"stream.play('%s');"
 	"stop();",
@@ -101,7 +104,7 @@ main(int argc, char** argv)
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(mediadir), 10, 0, 0, 800, 600);
   item = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  SWFDisplayItem_moveTo(item, 0, 200);
+  SWFDisplayItem_moveTo(item, 0, 250);
   SWFMovie_nextFrame(mo); 
  
   stream = newSWFVideoStream();

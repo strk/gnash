@@ -3,8 +3,9 @@
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: set SWF rate back to
 	  an high value to allow for testing pixel color and also testing with
 	  eyes what's hard to test when nothing is shown due to Gnash not
-	  supporting sub-SWF rate videos; Scale video by 200% to verify video
-	  scaling bugs (not automated yet); documented expected behaviour.
+	  supporting sub-SWF rate videos; Scale video by 120% and rotate 45
+	  degrees clockwise to verify video transform
+	  bugs (not automated yet); documented expected behaviour.
 
 2007-06-04  Rob Savoye  <rob@bertha.welcomehome.org>
 
