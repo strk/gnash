@@ -19,6 +19,11 @@
 /*
  * Plays an external FLV video
  * Should be used with the MovieTester to test if the video decoder works.
+ *
+ * Expected behaviour:
+ *
+ *   Shows a 90x90 pixels red square moving from left to right over
+ *   a 255x200 yellow background.
  */
 
 #include <stdlib.h>
@@ -74,6 +79,8 @@ main(int argc, char** argv)
 	"nc.connect(null);"
 	"stream = new NetStream(nc);"
 	"video.attachVideo(stream); "
+	"video._xscale = 200;"
+	"video._yscale = 200;"
 	"stream.setBufferTime(2); "
 	"stream.play('%s');"
 	"stop();",
@@ -86,11 +93,15 @@ main(int argc, char** argv)
   mo = newSWFMovie();
   SWFMovie_setDimension(mo, 800, 600);
 
-  SWFMovie_setRate(mo, 1);
+  // We also want to test that 1FPS of SWF rate doesn't influence
+  // rate of video playback, but for now it's more useful to actually
+  // have something rendered, so check_pixel can eventually do something,
+  // so we run fast...
+  SWFMovie_setRate(mo, 32);
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(mediadir), 10, 0, 0, 800, 600);
   item = SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  SWFDisplayItem_moveTo(item, 0, 100);
+  SWFDisplayItem_moveTo(item, 0, 200);
   SWFMovie_nextFrame(mo); 
  
   stream = newSWFVideoStream();
