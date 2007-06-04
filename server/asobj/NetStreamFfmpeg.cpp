@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.85 2007/06/04 09:04:32 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.86 2007/06/04 14:31:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -647,6 +647,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 				// If we have problems with decoding - break
 				if (!ns->decodeFLVFrame() && ns->m_start_onbuffer == false && ns->m_qvideo.size() == 0 && ns->m_qaudio.size() == 0)
 				{
+					// TODO: do we really want to break here !?
 					break;
 				}
 			}
@@ -660,6 +661,8 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 			}
 
 		}
+
+		usleep(1); // task switch, to avoid 100% CPU
 
 	}
 

@@ -1,5 +1,11 @@
 2007-06-04 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamFfmpeg.cpp (av_streamer): sleep for 1
+	  microsecond between iterations, to allow other threads to run.
+	  Fixes the 100% CPU problem (thanks to UdoG for support).
+
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
 	* libbase/FLVParser.h: updated dox for nextAudioFrame() and
 	  nextVideoFrame() noting the non-blocking nature of the calls;
 	  add a parsingCompleted() method.
