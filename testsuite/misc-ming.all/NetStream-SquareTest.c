@@ -79,11 +79,6 @@ main(int argc, char** argv)
 	"nc.connect(null);"
 	"stream = new NetStream(nc);"
 	"video.attachVideo(stream); "
-	"video._x = 100;"
-	"video._1 = 100;"
-	"video._xscale = 120;"
-	"video._yscale = 120;"
-	"video._rotation = 45;"
 	"stream.setBufferTime(2); "
 	"stream.play('%s');"
 	"stop();",
@@ -116,6 +111,28 @@ main(int argc, char** argv)
   a = newSWFAction(buffer);
   if(a == NULL) return -1;
   SWFMovie_add(mo, (SWFBlock)a);
+
+  xcheck_equals(mo, "video._xscale", "100");
+  xcheck_equals(mo, "video._yscale", "100");
+  xcheck_equals(mo, "video._rotation", "0");
+  xcheck_equals(mo, "video._target", "'/video'");
+
+  add_actions(mo,
+		"video._x = 100;"
+		"video._xscale = 120;"
+		"video._yscale = 120;"
+		"video._rotation = 45;");
+
+  check_equals(mo, "video._x", "100")	;
+  check_equals(mo, "video._xscale", "120");
+  check_equals(mo, "video._yscale", "120");
+  check_equals(mo, "video._rotation", "45");
+
+
+  // How can I test props here ?
+  check_equals(mo, "typeof(video.hitTest)", "'undefined'");
+  check_equals(mo, "typeof(video.getBounds)", "'undefined'");
+
   SWFMovie_add(mo, (SWFBlock)newSWFAction(
 
 		"stream.onStatus = function(info) {"
