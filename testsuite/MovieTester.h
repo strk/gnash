@@ -168,7 +168,12 @@ public:
 	///	The color we expect to find under the pointer.
 	///
 	/// @param tolerance
-	///	The tolerated difference of any r,g,b,a values
+	///	The tolerated difference of any r,g,b,a values.
+	///	Note that the actual tolerance used for comparison might
+	///	be bigger then the given one depending on the minimum tolerance
+	///	supported by the renderers being tested, being a function of color
+	///	depth. For example, comparisions against 16bpp renderers will use
+	///	at tolerance of at least 8.
 	///
 	/// @param label
 	///	A label to use in test results.
