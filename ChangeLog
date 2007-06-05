@@ -1,4 +1,4 @@
-2007-06-04 Udo Giacomozzi <udo.gnu@nova-sys.net>
+2007-06-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: correct matrix transformation
 	  for rotated video; switch to /cloning/ image accessor to
