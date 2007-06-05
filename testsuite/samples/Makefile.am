@@ -37,6 +37,7 @@ AM_CPPFLAGS = -I.. \
 
 check_PROGRAMS = \
 	clip_as_button2-TestRunner \
+	subshapes-TestRunner \
 	gotoFrameOnKeyEvent-TestRunner \
 	$(NULL)
 
@@ -55,6 +56,20 @@ clip_as_button2_TestRunner_CXXFLAGS = \
 	$(NULL)
 clip_as_button2_TestRunner_DEPENDENCIES = \
 	clip_as_button2.swf \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+
+subshapes_TestRunner_SOURCES = \
+	subshapes-TestRunner.cpp \
+	$(NULL)
+subshapes_TestRunner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+subshapes_TestRunner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	$(NULL)
+subshapes_TestRunner_DEPENDENCIES = \
+	subshapes.swf \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
