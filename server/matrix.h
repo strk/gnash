@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.h,v 1.9 2007/05/28 15:41:06 ann Exp $ 
+// $Id: matrix.h,v 1.10 2007/06/05 08:28:27 strk Exp $ 
 //
 
 #ifndef GNASH_MATRIX_H
@@ -122,7 +122,7 @@ public:
 	/// Set the Y scale part of the matrix, will keep current rotation and X scale
 	void	set_y_scale(float scale);
 
-	/// Set the rotation part of the matrix, will keep current scale
+	/// Set the rotation part of the matrix, will keep current scale. Angle in radians.
 	void	set_rotation(float rotation);
 
 	/// Set x translation
