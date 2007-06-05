@@ -1,3 +1,9 @@
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/MovieTester.cpp (addTestingRenderer): register the first
+	  and only tested renderer immediately, to be more tolerant about
+	  limitations in the core lib preveing hot-swap of renderers.
+
 2007-06-05 Ann Barcomb <kudra@domaintje.com>
 
 	* doc/C/usermanual/usage/gnashrc.xml: Copy Sandro's commit

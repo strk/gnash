@@ -433,6 +433,10 @@ MovieTester::addTestingRenderer(std::auto_ptr<render_handler> h, const std::stri
 	}
 
 	_testingRenderers.push_back(TestingRendererPtr(new TestingRenderer(h, name)));
+
+	// this will be needed till we allow run-time swapping of renderers,
+	// see above UNTESTED message...
+	set_render_handler(&(_testingRenderers.back()->getRenderer()));
 }
 
 void
