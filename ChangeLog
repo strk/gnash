@@ -1,3 +1,8 @@
+2007-06-05 Ann Barcomb <ann@lulu.com>
+
+	* doc/C/usermanual/usage/gnashrc.xml: Copy Sandro's commit
+	  1.3435 of doc/C/gnashrc.xml to the new gnashrc.xml
+
 2007-06-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: correct matrix transformation
