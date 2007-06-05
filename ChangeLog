@@ -1,3 +1,10 @@
+2007-06-05 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* testsuite/media/square.flv: Changed the movements in the movie to
+	  be more fluent so that testing is easier.
+	* testsuite/misc-ming.all/Video-EmbedSquareTestRunner.cpp: Check if
+	  the video really does play.
+
 2007-06-04 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: support --without-extensions.

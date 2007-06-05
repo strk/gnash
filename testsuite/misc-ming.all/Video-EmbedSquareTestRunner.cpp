@@ -46,15 +46,52 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
+	rgba red(255,0,0,255);
+	rgba yellow(255,255,0,255);
+
+	// TODO: change the scaling of the window/canvas
+	int scale_x = 1;
+	int scale_y = 1;
+	
 	// Just loop twice, so to catch crashes...
-	// TODO: lots of more tests :)
-	size_t framecount = root->get_frame_count();
-	for (size_t i=0; i<framecount*2; ++i)
-	{
-		check_equals(root->get_current_frame(), i%framecount);
+	for (int j = 0; j < 2; ++j) {
+		// Frame 1
+
+		// Check the color in (1,1) - should be red
+		check_pixel(1, 1, 1, red, 5);
+
+		// Check the color in (30,1) - should be yellow
+		check_pixel(35*scale_x, 1, 1, yellow, 5);
+
+		// Check the color in (1,30) - should be yellow
+		check_pixel(1, 35*scale_y, 1, yellow, 5);
+
+		size_t framecount = root->get_frame_count();
+		int frame = 1;
+		int i = 0;
+		while (frame++ < framecount) {
+			// Frame X
+			tester.advance();
+
+			// Check the color in (9+i,1) - should be yellow
+			check_pixel((5 + i)*scale_x, 1, 1, yellow, 5);
+
+			// Check the color in (25+i,1) - should be red
+			check_pixel((25 + i)*scale_x, 1, 1, red, 5);
+
+			// Check the color in (25+i,30) - should be yellow
+			check_pixel((25 + i)*scale_x, 35*scale_y, 1, yellow, 5);
+
+			// The video is 128x96 so we don't want to check beyond that
+			if (45+i <= 128) {
+				// Check the color in (40+i,1) - should be yellow
+				check_pixel((45 + i)*scale_x, 1, 1, yellow, 5);
+			}
+
+			i += 10;
+		}
 		tester.advance();
 	}
-
 
 }
 
