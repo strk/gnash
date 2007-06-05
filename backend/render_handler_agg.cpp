@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.84 2007/06/04 16:59:03 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.85 2007/06/05 08:27:55 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -332,6 +332,8 @@ private:
   int yres;
   int bpp;  // bits per pixel
   double xscale, yscale;
+  
+  
 
 
 public:
@@ -434,9 +436,6 @@ public:
     // whatever), but we'd need some way to tell the renderer the desired
     // quality.
     
-    // TODO: Test this with a rotated video. Maybe the image accessor
-    // will insert some ugly pixels (even if I don't think so) - Udo
-
     // TODO: keep heavy instances alive accross frames for performance!
     
     // TODO: Maybe implement specialization for 1:1 scaled videos
@@ -451,18 +450,21 @@ public:
     double vscaleY = TWIPS_TO_PIXELS(bounds->height()) / frame->m_height;
     
     // convert Gnash matrix to AGG matrix and scale down to pixel coordinates
-    // while we're at it 
+    // while we're at it
     agg::trans_affine img_mtx(
-      mat->m_[0][0]*20.0*vscaleX, mat->m_[1][0], 
-      mat->m_[0][1],              mat->m_[1][1]*20.0*vscaleY, 
-      mat->m_[0][2],              mat->m_[1][2]
-    );
+      mat->m_[0][0], mat->m_[1][0], 
+      mat->m_[0][1], mat->m_[1][1], 
+      mat->m_[0][2], mat->m_[1][2]
+    );    
     
-    // apply global movie scaling
+    // apply global movie scaling    
     img_mtx *= agg::trans_affine_scaling((xscale+yscale) * 0.5);
     
     // invert matrix since this is used for the image source
     img_mtx.invert();
+    
+    // convert TWIPS to pixels and apply video scale
+    img_mtx *= agg::trans_affine_scaling(1.0/(20.0*vscaleX), 1.0/(20.0*vscaleY));
     
     // span allocator is used to apply the matrix
     agg::span_allocator<agg::rgba8> sa;
@@ -470,8 +472,9 @@ public:
     typedef agg::span_interpolator_linear<> interpolator_type;
     interpolator_type interpolator(img_mtx);
     
-    // clipping image accessor is used to avoid repeating of the image
-    typedef agg::image_accessor_clip<baseformat> img_source_type;
+    // cloning image accessor is used to avoid disturbing pixels at the edges
+    // for rotated video. 
+    typedef agg::image_accessor_clone<baseformat> img_source_type;
     
     // rendering buffer is used to access the frame pixels here        
     agg::rendering_buffer img_buf(frame->m_data, frame->m_width, frame->m_height,
@@ -479,10 +482,7 @@ public:
          
     baseformat img_pixf(img_buf);
     
-    // The second parameter passed to the constructor is the color (R,G,B,A) 
-    // used for pixels outside the source image (ie. when the movie aspect 
-    // ratio does not match the video instance). 
-    img_source_type img_src(img_pixf, agg::rgba_pre(255,0,0,0));
+    img_source_type img_src(img_pixf);
     
     // renderer base for the stage buffer (not the frame image!)
     renderer_base rbase(*m_pixf);

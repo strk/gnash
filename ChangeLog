@@ -1,3 +1,9 @@
+2007-06-04 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: correct matrix transformation
+	  for rotated video; switch to /cloning/ image accessor to
+	  make edges smooth for rotated video	
+	
 2007-06-05 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/as_object.h: change operator "==" to "=", should fix a typo.
