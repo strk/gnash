@@ -1,3 +1,7 @@
+2007-06-05 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/as_object.h: change operator "==" to "=", should fix a typo.
+	  
 2007-06-04 Sandro Santilli <strk@keybit.net>
 
 	* README: some opcode and classes are actually implemented now.

@@ -63,7 +63,7 @@ class DSOEXPORT as_object : public ref_counted
 	PropertyList _members;
 
 	/// Don't allow implicit copy, must think about behaviour
-	as_object& operator==(const as_object&)
+	as_object& operator=(const as_object&)
 	{
 		assert(0);
 		return *this;
