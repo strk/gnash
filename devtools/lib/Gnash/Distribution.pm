@@ -284,7 +284,7 @@ extension.
 
 =head1 AUTHORS
 
-Ann Barcomb <ann@lulu.com> and Jerry Gay, based upon ideas from the Parrot
+Ann Barcomb <kudra@domaintje.com> and Jerry Gay, based upon ideas from the Parrot
 L<http://http://dev.perl.org/perl6/> test suite.
 
 =head1 COPYRIGHT

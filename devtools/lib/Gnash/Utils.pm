@@ -125,7 +125,7 @@ becomes
 
 =head1 AUTHORS
 
-Ann Barcomb <ann@lulu.com>
+Ann Barcomb <kudra@domaintje.com>
 
 =head1 COPYRIGHT
 

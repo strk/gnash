@@ -64,7 +64,7 @@ This test checks for code which contains tabs.
 
 =head1 AUTHORS
 
-Ann Barcomb <ann@lulu.com>, based upon ideas from the Parrot
+Ann Barcomb <kudra@domaintje.com>, based upon ideas from the Parrot
 L<http://http://dev.perl.org/perl6/> test suite.
 
 =head1 COPYRIGHT
