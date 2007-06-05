@@ -1,5 +1,6 @@
 2007-06-04 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: support --without-extensions.
 	* testsuite/samples/: Makefile.am, subshapes-TestRunner.cpp:
 	  Test runner for subshapes.swf (see bug #20084).
 	* testsuite/MovieTester.cpp (addTestingRenderer): register the first

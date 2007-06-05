@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.331 2007/06/01 17:54:52 bjacques Exp $
+dnl $Id: configure.ac,v 1.332 2007/06/05 13:56:27 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -338,8 +338,13 @@ ext_all=no
 AC_ARG_WITH(extensions,
   AC_HELP_STRING([--with-extensions=], [Specify which extensions to build]),
   if test -n ${withval}; then
-    extlist="${withval}"
-    withval=`echo ${withval} | tr '\054' ' ' `
+    if test "x${withval}" != "xno"; then
+      extlist="${withval}"
+      withval=`echo ${withval} | tr '\054' ' ' `
+    else
+      extlist=""
+      withval=""
+    fi
   fi
   nextensions=0
   while test -n "${withval}" ; do
