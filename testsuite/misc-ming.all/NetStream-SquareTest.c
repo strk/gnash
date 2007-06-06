@@ -150,7 +150,7 @@ main(int argc, char** argv)
 		" {"
 		" 	_root.check(this instanceOf NetStream); "
 		" 	_root.check_equals(this.bufferTime, 2); "
-		" 	_root.check_equals(this.bytesTotal, 46893); "
+		" 	_root.check_equals(this.bytesTotal, 21482); "
 		"	this.stopNotified = true;"
 		"	_root.nextFrame();"
 		" }"
