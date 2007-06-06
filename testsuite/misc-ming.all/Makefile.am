@@ -1423,7 +1423,7 @@ Video_EmbedSquareTest_SOURCES = \
 
 Video_EmbedSquareTest_LDADD = libgnashmingutils.la
 
-Video-EmbedSquareTest.swf: Video-EmbedSquareTest
+Video-EmbedSquareTest.swf: Video-EmbedSquareTest $(srcdir)/../media/square.flv
 	./Video-EmbedSquareTest $(srcdir)/../media
 
 Video_EmbedSquareTestRunner_SOURCES = \
