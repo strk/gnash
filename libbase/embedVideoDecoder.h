@@ -19,7 +19,7 @@
 //
 //
 
-//  $Id: embedVideoDecoder.h,v 1.7 2007/06/06 15:41:12 tgc Exp $
+//  $Id: embedVideoDecoder.h,v 1.8 2007/06/06 16:28:29 strk Exp $
 
 #ifndef __EMBEDVIDEODECODER_H__
 #define __EMBEDVIDEODECODER_H__
@@ -38,7 +38,6 @@ namespace gnash {
 /// The embedVideoDecoder is used to decodes a video frame which has been
 /// embedded in a SWF.
 ///
-
 class embedVideoDecoder
 {
 public:
@@ -61,47 +60,58 @@ public:
 		CODEC_SCREENVIDEO2 = 6	// Screenvideo2 codec
 	};
 
-	///
 	/// Sets up the decoder.
 	//
 	/// @param width
-	/// The width of the video
+	/// 	The width of the video
 	///
 	/// @param height
-	/// The height of the video
+	/// 	The height of the video
 	///
 	/// @param deblocking
-	/// Should a deblocking filter be used? 1 = off, 2 = on
+	/// 	Should a deblocking filter be used? 1 = off, 2 = on
 	///
 	/// @param smoothing
-	/// Should the video be smoothed?
+	/// 	Should the video be smoothed?
 	///
 	/// @param format
-	/// The codec of the video, see codecType
+	/// 	The codec of the video, see codecType
 	///
 	/// @param outputFormat
-	/// The outputFormat of the video, see videoOutputFormat
+	/// 	The outputFormat of the video, see videoOutputFormat
+	///
+	/// The default implementation is a no-op
+	///
+	/// TODO: shouldn't this initialization be done by the constructor ?
 	///
 	virtual void createDecoder(int /*width*/,
 		int /*height*/,
 		int /*deblocking*/,
 		bool /*smoothing*/,
-		int /*format*/,
-		int /*outputFormat*/){}
+		int /*format*/, // should this argument be of codecType type ?
+		int /*outputFormat*/) // should this argument be of VideoOutputFormat type ?
+	{}
 
-	///
 	/// gnash calls this when it wants to decode the given videoframe.
 	//
 	/// @param data
-	/// The video frame that is to be decoded.
+	/// 	The video frame that is to be decoded.
+	///	Data is expected to be in the format specified with the 
+	///	"format" parameter in the createDecoder call.
 	///
 	/// @param size
-	/// The sizes of the undecoded videoframe in bytes.
+	/// 	The sizes of the undecoded videoframe in bytes.
 	///
-	/// @return a auto_ptr containing the image which is a result of the decoding.
-	/// The caller owns the returned image.
+	/// @return
+	///	An auto_ptr containing the image which is a result of the decoding.
+	///	A NULL one on error.
 	///
-	virtual std::auto_ptr<image::image_base> decodeFrame(uint8_t* /*data*/, int /*size*/) { std::auto_ptr<image::image_base> i (NULL); return i; }
+	/// The default implementation always returns a NULL auto pointer.
+	///
+	virtual std::auto_ptr<image::image_base> decodeFrame(uint8_t* /*data*/, int /*size*/)
+	{
+		return std::auto_ptr<image::image_base>(NULL); 
+	}
 
 	virtual ~embedVideoDecoder() {};
 };
