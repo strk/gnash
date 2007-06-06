@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.74 2007/05/18 10:14:10 strk Exp $
+# $Id: Makefile.am,v 1.75 2007/06/06 06:58:19 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -139,6 +139,7 @@ dumpconfig:
 	@echo "Some directories may be excluded from the build"
 	@uname -a
 	$(CXX) -v
+	@echo "CXXFLAGS: $(CXXFLAGS)"
 	@echo ""
 	@echo "Image decoding support..."
 	@echo "	JPEG_CFLAGS is $(JPEG_CFLAGS)"

@@ -1,3 +1,7 @@
+2007-06-06 Sandro Santilli <strk@keybit.net>
+
+	* Makefile.am: Add print of CXXFLAGS at 'make dumpconfig' time.
+
 2007-06-05 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* testsuite/media/square.flv: Changed the movements in the movie to
