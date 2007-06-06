@@ -357,14 +357,14 @@ MovieTester::getInvalidatedRanges() const
 int
 MovieTester::soundsStarted()
 {
-	if ( ! _sound_handler ) return 0;
+	if ( ! _sound_handler.get() ) return 0;
 	return _sound_handler->numSoundsStarted();
 }
 
 int
 MovieTester::soundsStopped()
 {
-	if ( ! _sound_handler ) return 0;
+	if ( ! _sound_handler.get() ) return 0;
 	return _sound_handler->numSoundsStopped();
 }
 
