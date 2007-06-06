@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.86 2007/06/06 13:24:52 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.87 2007/06/06 13:42:38 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -444,6 +444,8 @@ public:
     
       
     typedef agg::pixfmt_rgb24_pre baseformat;
+    
+    assert(dynamic_cast<image::rgb*>(baseframe));
   
     image::rgb* frame = static_cast<image::rgb*>(baseframe);
     
