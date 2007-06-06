@@ -1,5 +1,12 @@
 2007-06-06 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: If no --enable-media was specified, use the first
+	  detected one in this order: ffmpeg/gst/mad. This is to allow
+	  ./configure with no args to be more failsafe (useful on 'make
+	  distcheck'). If you guys like this patch I'd backport to 0.8 branch.
+
+2007-06-06 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/samples/Makefile.am: distribute subshapes.swf, as we're
 	  now using it for testing purposes.
 	* testsuite/misc-ming.all/Makefile.am: VideoEmbed-SquareTest.swf

@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.333 2007/06/06 07:50:13 strk Exp $
+dnl $Id: configure.ac,v 1.334 2007/06/06 12:57:33 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -321,13 +321,26 @@ dnl --------------------------------------------------------
 dnl  Select media handler
 dnl --------------------------------------------------------
 
+media_handler_specified=false
 AC_ARG_ENABLE(media,
  AC_HELP_STRING([--enable-media=handler], [Enable media handling support using the specified handler: ffmpeg, mad, GST (Gstreamer) or none (no sound) [[ffmpeg]] ]),
  [case "${enableval}" in
-   GST|gst) media_handler=gst ;;
-   ffmpeg|FFMPEG) media_handler=ffmpeg  ;;
-   mad|MAD) media_handler=mad  ;;
-   no|NO|none) media_handler=none ;;
+   GST|gst)
+     media_handler=gst
+     media_handler_specified=true
+     ;;
+   ffmpeg|FFMPEG)
+     media_handler=ffmpeg 
+     media_handler_specified=true
+     ;;
+   mad|MAD)
+     media_handler=mad 
+     media_handler_specified=true
+     ;;
+   no|NO|none)
+     media_handler=none
+     media_handler_specified=true
+     ;;
    *) AC_MSG_ERROR([bad value ${enableval} for --enable-media option]) ;;
   esac],
  [media_handler=ffmpeg]
@@ -865,20 +878,38 @@ esac
 
 if test x"$media_handler" = x"ffmpeg"; then
   GNASH_PATH_FFMPEG
-  # If the library is not found, this will be reported and nogo'd at the end.
-  # if test x"${ac_cv_path_ffmpeg_lib}" = x; then
-  #   AC_MSG_WARN([ffmpeg was specified as the media decoder but its library could not be found])
-  # fi
+  if test x"${media_handler_specified}" = xfalse; then
+     # If the library is not found, or its version is not ok, we'll try gst
+     if test x"${ac_cv_path_ffmpeg_lib}" = x -o x"${ffmpeg_version}" != xok; then
+       AC_MSG_WARN([No appropriate ffmpeg library found, will try using gstreamer.])
+       media_handler=gst
+     fi
+  fi
 fi
+
+if test "$media_handler" = "gst"; then
+  GNASH_PKG_FIND(gstreamer, [gst/gst.h], [gstreamer library], gst_init, [0.10])
+  if test x"${media_handler_specified}" = xfalse; then
+    # If the library is not found, or its version is not ok, we'll try mad
+    if test x"$GSTREAMER_LIBS" = x; then
+       AC_MSG_WARN([No appropriate gstreamer library found, will try using mad.])
+       media_handler=mad
+    fi
+  fi
+fi
+
 
 if test x"$media_handler" = x"mad"; then
   dnl Will set MAD_LIBS and MAD_CFLAGS.
   dnl Handles --with-mad-incl and --with-mad-lib
   GNASH_PKG_FIND(mad, [mad.h], [mad library], mad_copyright)
-  # If the library is not found, this will be reported and nogo'd at the end.
-  # if test x"${ac_cv_path_mad_lib}" = x ; then
-  #   AC_MSG_WARN([Libmad was specified as the media decoder, but it could not be found])
-  # fi
+  if test x"${media_handler_specified}" = xfalse; then
+    # If the library is not found, we'll disable media handling
+    if test x"${ac_cv_path_mad_lib}" = x ; then
+      AC_MSG_WARN([No libmad found, disabling media handlign.])
+      media_handler=none
+    fi
+  fi
 fi
 
 dnl I'm kinda lazy, get rid of this later... //Markus
@@ -903,10 +934,6 @@ case "${media_handler}" in
   mad)  AC_DEFINE([USE_MAD],  [1], [Use MAD for media decoding]) ;;
   *)
 esac
-
-if test "$media_handler" = "gst"; then
-  GNASH_PKG_FIND(gstreamer, [gst/gst.h], [gstreamer library], gst_init, [0.10])
-fi
 
 dnl I'm kinda lazy, get rid of this later... //Markus
 AM_CONDITIONAL(HAVE_GST, test x$media_handler = xgst)
