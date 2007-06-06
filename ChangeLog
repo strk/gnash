@@ -1,5 +1,7 @@
 2007-06-06 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: don't set CXXFLAGS as a side-effect of the SIZET_FMT
+	  tests if not already set by user.
 	* Makefile.am: Add print of CXXFLAGS at 'make dumpconfig' time.
 
 2007-06-05 Tomas Groth Christensen <tomasgroth@yahoo.dk>
