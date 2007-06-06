@@ -1,5 +1,10 @@
 2007-06-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.{cpp,h}: Don't abort if sound support wasn't
+	  compiled in. Add a canTestSound() method to query that capability.
+
+2007-06-06 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: If no --enable-media was specified, use the first
 	  detected one in this order: ffmpeg/gst/mad. This is to allow
 	  ./configure with no args to be more failsafe (useful on 'make

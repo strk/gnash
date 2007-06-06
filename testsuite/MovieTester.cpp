@@ -357,12 +357,14 @@ MovieTester::getInvalidatedRanges() const
 int
 MovieTester::soundsStarted()
 {
+	if ( ! _sound_handler ) return 0;
 	return _sound_handler->numSoundsStarted();
 }
 
 int
 MovieTester::soundsStopped()
 {
+	if ( ! _sound_handler ) return 0;
 	return _sound_handler->numSoundsStopped();
 }
 
@@ -450,7 +452,8 @@ MovieTester::initTestingSoundHandlers()
         _sound_handler.reset( gnash::create_sound_handler_gst() );
 #else
 	cerr << "Neigher SOUND_SDL nor SOUND_GST defined" << endl;
-	exit(1);
+	return;
+	//exit(1);
 #endif
 
 	gnash::set_sound_handler(_sound_handler.get());

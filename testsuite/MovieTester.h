@@ -75,6 +75,12 @@ public:
 	/// Return the underlying render handler
 	render_handler& getRenderer() const { return *_renderer; }
 
+	/// Return true if this build of MovieTester supports sound testing
+	//
+	/// Sound will be supported as long as a sound handler was compiled in.
+	///
+	bool canTestSound() const { return _sound_handler.get() != NULL; }
+
 private:
 
 	std::string _name;
@@ -210,10 +216,16 @@ public:
 	/// handles mouse events
 	bool isMouseOverMouseEntity();
 
-	/// Return the number of times a sound has been stopped.
+	/// \brief
+	/// Return the number of times a sound has been stopped,
+	/// or 0 if sound testing is not supported. See canTestSound().
+	//
 	int soundsStopped();
 
-	/// Return the number of times a sound has been started.
+	/// \brief
+	/// Return the number of times a sound has been started,
+	/// or 0 if sound testing is not supported. See canTestSound().
+	//
 	int soundsStarted();
 
 private:
