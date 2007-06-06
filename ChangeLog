@@ -1,3 +1,8 @@
+2007-06-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: apply stage scaling to matrix,
+	  don't multiply each coordinate (should improve rendering performance) 	
+
 2007-06-06 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/MovieTester.{cpp,h}: Don't abort if sound support wasn't

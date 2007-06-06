@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.85 2007/06/05 08:27:55 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.86 2007/06/06 13:24:52 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -331,7 +331,8 @@ private:
   int xres;
   int yres;
   int bpp;  // bits per pixel
-  double xscale, yscale;
+  // double xscale, yscale;  <-- deprecated, to be removed
+  gnash::matrix stage_matrix;  // conversion from TWIPS to pixels
   
   
 
@@ -426,7 +427,8 @@ public:
   }
   
 
-  void drawVideoFrame(image::image_base* baseframe, const matrix* mat, const rect* bounds) {
+  void drawVideoFrame(image::image_base* baseframe, const matrix* source_mat, 
+		const rect* bounds) {
   
     // NOTE: Assuming that the source image is RGB 8:8:8
     
@@ -445,6 +447,9 @@ public:
   
     image::rgb* frame = static_cast<image::rgb*>(baseframe);
     
+    matrix mat = stage_matrix;
+    mat.concatenate(*source_mat);
+    
     // compute video scaling relative to video obejct size
     double vscaleX = TWIPS_TO_PIXELS(bounds->width())  / frame->m_width;
     double vscaleY = TWIPS_TO_PIXELS(bounds->height()) / frame->m_height;
@@ -452,13 +457,10 @@ public:
     // convert Gnash matrix to AGG matrix and scale down to pixel coordinates
     // while we're at it
     agg::trans_affine img_mtx(
-      mat->m_[0][0], mat->m_[1][0], 
-      mat->m_[0][1], mat->m_[1][1], 
-      mat->m_[0][2], mat->m_[1][2]
+      mat.m_[0][0], mat.m_[1][0], 
+      mat.m_[0][1], mat.m_[1][1], 
+      mat.m_[0][2], mat.m_[1][2]
     );    
-    
-    // apply global movie scaling    
-    img_mtx *= agg::trans_affine_scaling((xscale+yscale) * 0.5);
     
     // invert matrix since this is used for the image source
     img_mtx.invert();
@@ -497,17 +499,17 @@ public:
     
     // make a path for the video outline
     point a, b, c, d;
-    mat->transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
-    mat->transform(&b, point(bounds->get_x_max(), bounds->get_y_min()));
-    mat->transform(&c, point(bounds->get_x_max(), bounds->get_y_max()));
-    mat->transform(&d, point(bounds->get_x_min(), bounds->get_y_max()));
+    mat.transform(&a, point(bounds->get_x_min(), bounds->get_y_min()));
+    mat.transform(&b, point(bounds->get_x_max(), bounds->get_y_min()));
+    mat.transform(&c, point(bounds->get_x_max(), bounds->get_y_max()));
+    mat.transform(&d, point(bounds->get_x_min(), bounds->get_y_max()));
     
     agg::path_storage path;
-    path.move_to(a.m_x*xscale, a.m_y*yscale);
-    path.line_to(b.m_x*xscale, b.m_y*yscale);
-    path.line_to(c.m_x*xscale, c.m_y*yscale);
-    path.line_to(d.m_x*xscale, d.m_y*yscale);
-    path.line_to(a.m_x*xscale, a.m_y*yscale);
+    path.move_to(a.m_x, a.m_y);
+    path.line_to(b.m_x, b.m_y);
+    path.line_to(c.m_x, c.m_y);
+    path.line_to(d.m_x, d.m_y);
+    path.line_to(a.m_x, a.m_y);
 
     if (m_alpha_mask.empty()) {
     
@@ -563,8 +565,8 @@ public:
       xres(1),
       yres(1),
       bpp(bits_per_pixel),
-      xscale(1.0/20.0),
-      yscale(1.0/20.0),
+      /*xscale(1.0/20.0),
+      yscale(1.0/20.0),*/
       m_enable_antialias(true),
       m_pixf(NULL),
       m_drawing_mask(false)
@@ -747,8 +749,12 @@ public:
   void  draw_line_strip(const void* coords, int vertex_count, const rgba color)
   // Draw the line strip formed by the sequence of points.
   {
+  
     assert(m_pixf != NULL);
-    
+
+    matrix mat = stage_matrix;
+    mat.concatenate(m_current_matrix);    
+
     if ( _clipbounds.size()==0 ) return;
 
     point pnt;
@@ -777,12 +783,12 @@ public:
   
       const int16_t *vertex = static_cast<const int16_t*>(coords);
       
-      m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
-      path.move_to(pnt.m_x * xscale, pnt.m_y * yscale);
+      mat.transform(&pnt, point(vertex[0], vertex[1]));
+      path.move_to(pnt.m_x, pnt.m_y);
   
       for (vertex += 2;  vertex_count > 1;  vertex_count--, vertex += 2) {
-        m_current_matrix.transform(&pnt, point(vertex[0], vertex[1]));
-        path.line_to(pnt.m_x * xscale, pnt.m_y * yscale);
+        mat.transform(&pnt, point(vertex[0], vertex[1]));
+        path.line_to(pnt.m_x, pnt.m_y);
       }
       // The vectorial pipeline
       ras.add_path(stroke);
@@ -890,7 +896,11 @@ public:
   /// rendering of characters outside a particular clipping range.
   /// "_clipbounds_selected" is used by draw_shape() and draw_outline() and
   /// *must* be initialized prior to using those function.
-  void select_clipbounds(const shape_character_def *def, const matrix& mat) {
+  void select_clipbounds(const shape_character_def *def, 
+		const matrix& source_mat) {
+		
+		matrix mat = stage_matrix;
+		mat.concatenate(source_mat);
   
     _clipbounds_selected.clear();
     _clipbounds_selected.reserve(_clipbounds.size());
@@ -906,8 +916,6 @@ public:
     rect bounds;    
     bounds.set_null();
     bounds.expand_to_transformed_rect(mat, ch_bounds);
-    bounds.scale_x(xscale);
-    bounds.scale_y(yscale);
     
     const geometry::Range2d<float>& range_float = bounds.getRange();
     
@@ -1055,10 +1063,13 @@ public:
   /// Takes a path and translates it using the given matrix. The new path
   /// is stored in paths_out.  
   void apply_matrix_to_path(const std::vector<path> &paths_in, 
-    std::vector<path> &paths_out, const matrix &mat) {
+    std::vector<path> &paths_out, const matrix &source_mat) {
     
     int pcount, ecount;
     int pno, eno;
+
+		matrix mat = stage_matrix;
+    mat.concatenate(source_mat);
     
     // copy path
     paths_out = paths_in;    
@@ -1143,8 +1154,8 @@ public:
       const gnash::path& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
       
-      new_path.move_to(this_path.m_ax*xscale + subpixel_offset, 
-        this_path.m_ay*yscale + subpixel_offset);
+      new_path.move_to(this_path.m_ax + subpixel_offset, 
+        this_path.m_ay + subpixel_offset);
       
       int ecount = this_path.m_edges.size();
       
@@ -1153,19 +1164,16 @@ public:
         const edge& this_edge = this_path.m_edges[eno];
         
         if (this_edge.is_straight())
-          new_path.line_to(this_edge.m_ax*xscale + subpixel_offset, 
-            this_edge.m_ay*yscale + subpixel_offset);
+          new_path.line_to(this_edge.m_ax + subpixel_offset, 
+            this_edge.m_ay + subpixel_offset);
         else
-          new_path.curve3(this_edge.m_cx*xscale + subpixel_offset, 
-            this_edge.m_cy*yscale + subpixel_offset,
-            this_edge.m_ax*xscale + subpixel_offset, 
-            this_edge.m_ay*yscale + subpixel_offset);
+          new_path.curve3(this_edge.m_cx + subpixel_offset, 
+            this_edge.m_cy + subpixel_offset,
+            this_edge.m_ax + subpixel_offset, 
+            this_edge.m_ay + subpixel_offset);       
         
-        
-      }
-    
-    }
-    
+      }    
+    }    
   } //build_agg_paths
   
   
@@ -1198,8 +1206,8 @@ public:
       const gnash::path& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
       
-      float prev_ax = this_path.m_ax*xscale;
-      float prev_ay = this_path.m_ay*yscale;  
+      float prev_ax = this_path.m_ax;
+      float prev_ay = this_path.m_ay;  
       bool prev_align_x = true;
       bool prev_align_y = true;
       
@@ -1209,8 +1217,8 @@ public:
         
         const edge& this_edge = this_path.m_edges[eno];
         
-        float this_ax = this_edge.m_ax*xscale;  
-        float this_ay = this_edge.m_ay*yscale;  
+        float this_ax = this_edge.m_ax;  
+        float this_ay = this_edge.m_ay;  
         
         if (this_edge.is_straight()) {
         
@@ -1279,8 +1287,8 @@ public:
             new_path.move_to(prev_ax, prev_ay);
         
           // never align curves!
-          new_path.curve3(this_edge.m_cx*xscale + subpixel_offset, 
-            this_edge.m_cy*yscale + subpixel_offset,
+          new_path.curve3(this_edge.m_cx + subpixel_offset, 
+            this_edge.m_cy + subpixel_offset,
             this_ax + subpixel_offset, 
             this_ay + subpixel_offset);
             
@@ -1318,7 +1326,7 @@ public:
       (fabsf(linestyle_matrix.get_x_scale()) + 
        fabsf(linestyle_matrix.get_y_scale()))
        / 2.0f
-      * (xscale+yscale)/2.0f;   
+      * get_stroke_scale();   
     
     for (int pno=0; pno<pcount; pno++) {
           
@@ -1351,6 +1359,9 @@ public:
     const matrix& fillstyle_matrix,
     const cxform& cx) {
     
+    matrix inv_stage_matrix;
+		inv_stage_matrix.set_inverse(stage_matrix);
+    
     int fcount = fill_styles.size();
     for (int fno=0; fno<fcount; fno++) {
     
@@ -1365,7 +1376,7 @@ public:
           matrix cm;
           cm.set_inverse(fillstyle_matrix);
           m.concatenate(cm);
-          m.concatenate_scales(1.0f/xscale, 1.0f/yscale);
+          m.concatenate(inv_stage_matrix);
           
           sh.add_gradient_linear(fill_styles[fno], m, cx);
           break;
@@ -1377,7 +1388,7 @@ public:
           matrix cm;
           cm.set_inverse(fillstyle_matrix);
           m.concatenate(cm);
-          m.concatenate_scales(1.0f/xscale, 1.0f/yscale);
+          m.concatenate(inv_stage_matrix);
           
           sh.add_gradient_radial(fill_styles[fno], m, cx);
           break;
@@ -1394,7 +1405,7 @@ public:
           matrix cm;
           cm.set_inverse(fillstyle_matrix);
           m.concatenate(cm);
-          m.concatenate_scales(1.0f/xscale, 1.0f/yscale);
+          m.concatenate(inv_stage_matrix);
           
           sh.add_bitmap(dynamic_cast<agg_bitmap_info_base*> 
             (fill_styles[fno].get_bitmap_info()), m, cx, 
@@ -1640,7 +1651,7 @@ public:
                   this_path.m_fill1==0 ? -1 : 0);
                   
       // starting point of path
-      path.move_to(this_path.m_ax*xscale, this_path.m_ay*yscale);
+      path.move_to(this_path.m_ax, this_path.m_ay);
     
       unsigned int ecount = this_path.m_edges.size();
       for (unsigned int eno=0; eno<ecount; eno++) {
@@ -1648,10 +1659,10 @@ public:
         const edge &this_edge = this_path.m_edges[eno];
 
         if (this_edge.is_straight())
-          path.line_to(this_edge.m_ax*xscale, this_edge.m_ay*yscale);
+          path.line_to(this_edge.m_ax, this_edge.m_ay);
         else
-          path.curve3(this_edge.m_cx*xscale, this_edge.m_cy*yscale,
-                      this_edge.m_ax*xscale, this_edge.m_ay*yscale);
+          path.curve3(this_edge.m_cx, this_edge.m_cy,
+                      this_edge.m_ax, this_edge.m_ay);
         
       } // for edge
       
@@ -1730,7 +1741,7 @@ public:
       (fabsf(linestyle_matrix.get_x_scale()) + 
        fabsf(linestyle_matrix.get_y_scale())) 
       / 2.0f
-      * (xscale+yscale)/2.0f;
+      * get_stroke_scale();
     
     
     // AGG stuff
@@ -1811,6 +1822,9 @@ public:
     
     if ( _clipbounds.size()==0 ) return;
     
+    matrix mat = stage_matrix;
+    mat.concatenate(m_current_matrix);
+    
     // TODO: Use aliased scanline renderer instead of anti-aliased one since
     // it is undesired anyway.
     typedef agg::rasterizer_scanline_aa<> ras_type;
@@ -1836,19 +1850,19 @@ public:
       // Note: The coordinates are rounded and 0.5 is added to snap them to the 
       // center of the pixel. This avoids blurring caused by anti-aliasing.
       
-      m_current_matrix.transform(&origin, 
+      mat.transform(&origin, 
         point(trunc(corners[0].m_x), trunc(corners[0].m_y)));
-      path.move_to(trunc(origin.m_x*xscale)+0.5, trunc(origin.m_y*yscale)+0.5);
+      path.move_to(trunc(origin.m_x)+0.5, trunc(origin.m_y)+0.5);
       
       for (unsigned int i=1; i<corner_count; i++) {
       
-        m_current_matrix.transform(&pnt, point(corners[i].m_x, corners[i].m_y));
+        mat.transform(&pnt, point(corners[i].m_x, corners[i].m_y));
           
-        path.line_to(trunc(pnt.m_x*xscale)+0.5, trunc(pnt.m_y*yscale)+0.5);
+        path.line_to(trunc(pnt.m_x)+0.5, trunc(pnt.m_y)+0.5);
       }
       
       // close polygon
-      path.line_to(trunc(origin.m_x*xscale)+0.5, trunc(origin.m_y*yscale)+0.5);
+      path.line_to(trunc(origin.m_x)+0.5, trunc(origin.m_y)+0.5);
       
       // fill polygon
       if (fill.m_a>0) {
@@ -1873,17 +1887,23 @@ public:
     }
     
   }
-                      
+
+
+	inline float get_stroke_scale() {
+		return (stage_matrix.get_x_scale() + stage_matrix.get_y_scale()) / 2.0f;
+	}                      
   
-  inline void world_to_pixel(int& x, int& y,
-    float world_x, float world_y)
-  {
-        // negative pixels seems ok here... we don't 
-  // clip to valid range, use world_to_pixel(rect&)
-  // and Intersect() against valid range instead.
-  x = (int)(world_x * xscale);
-  y = (int)(world_y * yscale);
-  }
+	inline void world_to_pixel(int& x, int& y,
+		float world_x, float world_y)
+	{
+		// negative pixels seems ok here... we don't 
+		// clip to valid range, use world_to_pixel(rect&)
+		// and Intersect() against valid range instead.
+		point p(world_x, world_y);
+		stage_matrix.transform(p);
+		x = p.m_x;
+		y = p.m_y;
+	}
 
   geometry::Range2d<int> world_to_pixel(const rect& wb)
   {
@@ -1990,13 +2010,16 @@ public:
   }
   
   void set_scale(float new_xscale, float new_yscale) {
-    xscale = new_xscale/20.0f;
-    yscale = new_yscale/20.0f;
+    /*xscale = new_xscale/20.0f;
+    yscale = new_yscale/20.0f;*/
+    
+    stage_matrix.set_identity();
+		stage_matrix.set_scale(new_xscale/20.0f, new_yscale/20.0f);
   }
 
   virtual void get_scale(point& scale) {
-    scale.m_x = PIXELS_TO_TWIPS(xscale);
-    scale.m_y = PIXELS_TO_TWIPS(yscale);
+    scale.m_x = PIXELS_TO_TWIPS(stage_matrix.get_x_scale());
+    scale.m_y = PIXELS_TO_TWIPS(stage_matrix.get_y_scale());
   }
   
   virtual unsigned int getBytesPerPixel() const {
