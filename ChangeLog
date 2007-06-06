@@ -1,5 +1,7 @@
 2007-06-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/samples/Makefile.am: distribute subshapes.swf, as we're
+	  now using it for testing purposes.
 	* testsuite/misc-ming.all/Makefile.am: VideoEmbed-SquareTest.swf
 	  depends on testsuite/media/square.flv ! Fixes bug #20090.
 	* testsuite/misc-ming.all/NetStream-SquareTest.c: Fixed test for

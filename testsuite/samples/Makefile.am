@@ -97,6 +97,7 @@ EXTRA_DIST = \
 	clip_as_button2.swf \
 	GotoAndPlayTest.swf \
 	gotoFrameOnKeyEvent.swf \
+	subshapes.swf \
 	README \
 	$(NULL)
 
