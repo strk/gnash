@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderFfmpeg.h,v 1.4 2007/05/31 06:39:08 strk Exp $
+// $Id: embedVideoDecoderFfmpeg.h,v 1.5 2007/06/06 15:41:12 tgc Exp $
 
 #ifndef __EMBEDVIDEODECODERFFMPEG_H__
 #define __EMBEDVIDEODECODERFFMPEG_H__
@@ -31,7 +31,7 @@
 #include <ffmpeg/avcodec.h>
 #include "image.h"
 
-
+namespace gnash {
 
 class DSOEXPORT embedVideoDecoderFfmpeg: public embedVideoDecoder {
 public:
@@ -48,7 +48,7 @@ public:
 		int outputFormat);
 
 	// gnash calls this when it wants you to decode the given videoframe
-	image::image_base*	decodeFrame(uint8_t* data, int size);
+	std::auto_ptr<image::image_base> decodeFrame(uint8_t* data, int size);
 
 	/// Convert the given srcFrame to RGB24 pixel format.
 	//
@@ -80,6 +80,7 @@ private:
 
 };
 
+} // end of gnash namespace
 
 #endif // USE_FFMPEG
 

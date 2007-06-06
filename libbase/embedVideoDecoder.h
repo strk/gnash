@@ -19,7 +19,7 @@
 //
 //
 
-//  $Id: embedVideoDecoder.h,v 1.6 2007/05/28 15:41:01 ann Exp $
+//  $Id: embedVideoDecoder.h,v 1.7 2007/06/06 15:41:12 tgc Exp $
 
 #ifndef __EMBEDVIDEODECODER_H__
 #define __EMBEDVIDEODECODER_H__
@@ -29,16 +29,21 @@
 #endif
 
 #include "image.h"
+#include "log.h"
 
-//
-// Decoder for embedded video.
-//
+namespace gnash {
+
+///
+/// \brief
+/// The embedVideoDecoder is used to decodes a video frame which has been
+/// embedded in a SWF.
+///
 
 class embedVideoDecoder
 {
 public:
 
-	// This is copied from the render and should be changed if the original is.
+	/// This is copied from the render and should be changed if the original is.
 	enum videoOutputFormat
 	{
 		NONE,
@@ -46,6 +51,7 @@ public:
 		RGB
 	};
 
+	/// Codecs type we know of
 	enum codecType
 	{
 		CODEC_H263 = 2,	// H263/SVQ3 video codec
@@ -55,19 +61,50 @@ public:
 		CODEC_SCREENVIDEO2 = 6	// Screenvideo2 codec
 	};
 
-	// Assign handles however you like.
-	virtual void createDecoder(
-		int /*width*/,
+	///
+	/// Sets up the decoder.
+	//
+	/// @param width
+	/// The width of the video
+	///
+	/// @param height
+	/// The height of the video
+	///
+	/// @param deblocking
+	/// Should a deblocking filter be used? 1 = off, 2 = on
+	///
+	/// @param smoothing
+	/// Should the video be smoothed?
+	///
+	/// @param format
+	/// The codec of the video, see codecType
+	///
+	/// @param outputFormat
+	/// The outputFormat of the video, see videoOutputFormat
+	///
+	virtual void createDecoder(int /*width*/,
 		int /*height*/,
 		int /*deblocking*/,
 		bool /*smoothing*/,
 		int /*format*/,
 		int /*outputFormat*/){}
 
-	// gnash calls this when it wants you to decode the given videoframe
-	virtual image::image_base*	decodeFrame(uint8_t* /*data*/, int /*size*/) { return NULL; }
+	///
+	/// gnash calls this when it wants to decode the given videoframe.
+	//
+	/// @param data
+	/// The video frame that is to be decoded.
+	///
+	/// @param size
+	/// The sizes of the undecoded videoframe in bytes.
+	///
+	/// @return a auto_ptr containing the image which is a result of the decoding.
+	/// The caller owns the returned image.
+	///
+	virtual std::auto_ptr<image::image_base> decodeFrame(uint8_t* /*data*/, int /*size*/) { std::auto_ptr<image::image_base> i (NULL); return i; }
 
 	virtual ~embedVideoDecoder() {};
 };
 
+} // end of gnash namespace
 #endif // __EMBEDVIDEODECODER_H__

@@ -31,6 +31,8 @@
 
 #include <boost/scoped_array.hpp>
 
+namespace gnash {
+
 embedVideoDecoderFfmpeg::embedVideoDecoderFfmpeg() :
 	codec(NULL),
 	cc(NULL),
@@ -42,7 +44,7 @@ embedVideoDecoderFfmpeg::~embedVideoDecoderFfmpeg()
 {
 	if (cc) avcodec_close(cc);
 
-	if(decodedFrame) delete decodedFrame;
+	delete decodedFrame;
 
 }
 
@@ -71,10 +73,12 @@ embedVideoDecoderFfmpeg::createDecoder(int widthi, int heighti, int deblockingi,
 	} else if (format == CODEC_SCREENVIDEO) {
 		codec = avcodec_find_decoder(CODEC_ID_FLASHSV);
 	} else {
+		gnash::log_error("Unsupported embedded video format, it might help if you upgrade ffmpeg and recompile gnash");
 		return;
 	}
 
 	if (codec == NULL) {
+		gnash::log_error("Unsupported embedded video format, it might help if you upgrade ffmpeg and recompile gnash");
 		return;
 	}
 
@@ -141,11 +145,18 @@ embedVideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 }
 
 // gnash calls this when it wants you to decode the given videoframe
-image::image_base*
+std::auto_ptr<image::image_base> 
 embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 {
+	std::auto_ptr<image::image_base> ret_image;
 
-	if (data == NULL || codec == NULL) return decodedFrame;
+	if (outputFormat == YUV) {
+		ret_image.reset(new image::yuv(width, height));
+	} else if (outputFormat == RGB) {
+		ret_image.reset(new image::rgb(width, height));
+	} 
+
+	if (data == NULL || codec == NULL || size == 0) return ret_image;
 
 	// Allocate a frame to store the decoded frame in
 	AVFrame* frame = avcodec_alloc_frame();
@@ -158,7 +169,7 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 
 		if (outputFormat == NONE) { // NullGui?
 			av_free(frame);
-			return NULL;
+			return ret_image;
 
 		} else if (outputFormat == YUV && cc->pix_fmt != PIX_FMT_YUV420P) {
 			//assert(0);	// TODO
@@ -199,12 +210,13 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 			}
 		}
 	} else {
-		return decodedFrame;
+		return ret_image;
 	}
 
-	return decodedFrame;
+	ret_image->update(decodedFrame->m_data);
+	return ret_image;
 }
 
-
+} // end of gnash namespace
 
 #endif // USE_FFMPEG

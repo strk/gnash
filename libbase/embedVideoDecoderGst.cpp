@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderGst.cpp,v 1.4 2007/05/28 15:41:01 ann Exp $
+// $Id: embedVideoDecoderGst.cpp,v 1.5 2007/06/06 15:41:12 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -25,6 +25,8 @@
 
 #include "embedVideoDecoderGst.h"
 
+namespace gnash {
+
 embedVideoDecoderGst::embedVideoDecoderGst() :
 	pipeline(NULL),
 	input(NULL),
@@ -33,16 +35,19 @@ embedVideoDecoderGst::embedVideoDecoderGst() :
 	output(NULL),
 	decoder(NULL),
 	colorspace(NULL),
-	decodedFrame(NULL)
+	decodedFrame(NULL),
+	stop(false)
 
 {
 }
 
 embedVideoDecoderGst::~embedVideoDecoderGst()
 {
-	if(decodedFrame) delete decodedFrame;
+	delete decodedFrame;
 
 	if (pipeline) {
+		stop = true;
+		delete input_lock;
 		gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
 		gst_object_unref (GST_OBJECT (pipeline));
 	}
@@ -120,7 +125,7 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 	// setup the video colorspaceconverter converter
 	colorspace = gst_element_factory_make ("ffmpegcolorspace", NULL);
 
-	// Find the decoder and init the parser
+	// Find the decoder
 	if (format == CODEC_H263) {
 		decoder = gst_element_factory_make ("ffdec_flv", NULL);
 	} else if (format == CODEC_VP6) {
@@ -128,10 +133,17 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 	} else if (format == CODEC_SCREENVIDEO) {
 		decoder = gst_element_factory_make ("ffdec_flashsv", NULL);
 	} else {
+		gnash::log_error("Unsupported embedded video format");
 		return;
 	}
 
-	if (!pipeline || !input || !inputcaps || !videocaps || !output || !decoder || !colorspace) {
+	if (!pipeline || !input || !inputcaps || !videocaps || !output || !colorspace) {
+		gnash::log_error("Creation of Gstreamer baisc elements failed, is your Gstreamer installation complete?");
+		return;
+	}
+
+	if (!decoder) {
+		gnash::log_error("Creation of decoder element failed, do you have gstreamer-0.10-ffmpeg installed?");
 		return;
 	}
 
@@ -160,11 +172,19 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 
 
 // gnash calls this when it wants you to decode the given videoframe
-image::image_base*
+std::auto_ptr<image::image_base>
 embedVideoDecoderGst::decodeFrame(uint8_t* data, int size)
 {
 
-	if (data == NULL) return decodedFrame;
+	std::auto_ptr<image::image_base> ret_image;
+
+	if (outputFormat == YUV) {
+		ret_image.reset(new image::yuv(width, height));
+	} else if (outputFormat == RGB) {
+		ret_image.reset(new image::rgb(width, height));
+	} 
+
+	if (data == NULL || size == 0) return ret_image;
 
 	frame = data;
 	frameSize = size;
@@ -173,7 +193,8 @@ embedVideoDecoderGst::decodeFrame(uint8_t* data, int size)
 
 	output_lock = new boost::mutex::scoped_lock(output_mutex);
 
-	return decodedFrame;
+	ret_image->update(decodedFrame->m_data);
+	return ret_image;
 }
 
 // The callback function which refills the buffer with data
@@ -181,6 +202,8 @@ void
 embedVideoDecoderGst::callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 {
 	embedVideoDecoderGst* decoder = static_cast<embedVideoDecoderGst*>(user_data);
+
+	if (decoder->stop) return;
 
 	decoder->input_lock = new boost::mutex::scoped_lock(decoder->input_mutex);
 
@@ -194,6 +217,8 @@ void
 embedVideoDecoderGst::callback_output (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 {
 	embedVideoDecoderGst* decoder = static_cast<embedVideoDecoderGst*>(user_data);
+
+	if (decoder->stop) return;
 
 	if (decoder->decodedFrame) {
 
@@ -227,5 +252,7 @@ embedVideoDecoderGst::callback_output (GstElement * /*c*/, GstBuffer *buffer, Gs
 	delete decoder->output_lock;
 
 }
+
+} // end of gnash namespace
 
 #endif // SOUND_GST

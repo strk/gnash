@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderGst.h,v 1.2 2007/05/28 15:41:01 ann Exp $
+// $Id: embedVideoDecoderGst.h,v 1.3 2007/06/06 15:41:12 tgc Exp $
 
 #ifndef __EMBEDVIDEODECODERGST_H__
 #define __EMBEDVIDEODECODERGST_H__
@@ -33,6 +33,7 @@
 #include <boost/bind.hpp> 
 #include <boost/thread/mutex.hpp>
 
+namespace gnash {
 
 class embedVideoDecoderGst : public embedVideoDecoder {
 public:
@@ -49,7 +50,7 @@ public:
 		int outputFormat);
 
 	// gnash calls this when it wants you to decode the given videoframe
-	image::image_base*	decodeFrame(uint8_t* data, int size);
+	std::auto_ptr<image::image_base> decodeFrame(uint8_t* data, int size);
 
 	// Callback functions used to handle input and output
 	static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
@@ -65,11 +66,10 @@ private:
 	/// Gstreamer objects
 	GstElement *input;
 	GstElement *inputcaps;
-	GstElement *parser;
-	GstElement *decoder;
 	GstElement *videocaps;
-	GstElement *colorspace;
 	GstElement *output;
+	GstElement *decoder;
+	GstElement *colorspace;
 
 	/// mutexes and locks used to handle input and output.
 	boost::mutex input_mutex;
@@ -92,8 +92,11 @@ private:
 	/// Last decoded frame
 	image::image_base* decodedFrame;
 
+	/// If we should stop this will be true
+	volatile bool stop;
 };
 
+} // end of gnash namespace
 
 #endif // SOUND_GST
 

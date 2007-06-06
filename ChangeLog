@@ -1,3 +1,14 @@
+2007-06-06 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/embedVideoDecoder.h: Added docs and made decodeFrame 
+	  return a auto_ptr.
+	* libbase/embedVideoDecoderFfmpeg.{cpp,h}: Made decodeFrame 
+	  return a auto_ptr.
+	* libbase/embedVideoDecoderGst.{cpp,h}: Made decodeFrame 
+	  return a auto_ptr, and fixed a deadlock.
+	* server/video_stream_instance.cpp: embedVideoDecoder::decodeFrame 
+	  now returns a auto_ptr, adjust to that.
+
 2007-06-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: dynamic cast check 	
