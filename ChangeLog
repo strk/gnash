@@ -1,3 +1,8 @@
+2007-06-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/eventSoundTest1-Runner.cpp: don't test sound
+	  if sound is not supported.
+
 2007-06-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: apply stage scaling to matrix,

@@ -67,6 +67,12 @@ main(int /*argc*/, char** /*argv*/)
 
 	check_equals(root->get_frame_count(), 20);
 
+	if ( ! tester.canTestSound() )
+	{
+		cout << "UNTESTED: sounds can't be tested with this build." << endl;
+		return EXIT_SUCCESS; // so testing doesn't abort
+	} 
+
 	// Advance and check...
 	int frame = root->get_current_frame(); // 1
 	int sounds = 1;
