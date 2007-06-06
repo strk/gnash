@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.111 2007/05/25 12:41:48 bjacques Exp $ */
+/* $Id: tag_loaders.cpp,v 1.112 2007/06/06 17:49:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -59,6 +59,7 @@
 #ifdef HAVE_ZLIB_H
 #include <zlib.h>
 #endif
+#include <map>
 
 namespace gnash {
 
@@ -665,7 +666,12 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 void
 fixme_loader(stream* /*in*/, tag_type tag, movie_definition* /*m*/)
 {
-    log_unimpl(_("  FIXME: tagtype = %d"), tag);
+	static std::map<tag_type, bool> warned;
+	if ( ! warned[tag] )
+	{
+		log_unimpl(_("  FIXME: tagtype = %d"), tag);
+		warned[tag] = true;
+	}
 }
 
 void define_shape_loader(stream* in, tag_type tag, movie_definition* m)
