@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.87 2007/06/06 13:42:38 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.88 2007/06/06 16:15:00 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -333,6 +333,7 @@ private:
   int bpp;  // bits per pixel
   // double xscale, yscale;  <-- deprecated, to be removed
   gnash::matrix stage_matrix;  // conversion from TWIPS to pixels
+  bool scale_set;
   
   
 
@@ -571,8 +572,15 @@ public:
       yscale(1.0/20.0),*/
       m_enable_antialias(true),
       m_pixf(NULL),
-      m_drawing_mask(false)
+      m_drawing_mask(false),
+      scale_set(false)
   {
+  	// TODO: we really don't want to set the scale here as the core should
+  	// tell us the right values before rendering anything. However this is
+  	// currently difficult to implement. Removing the next call will
+  	// lead to an assertion failure in begin_display() because we check
+  	// whether the scale is known there.
+  	set_scale(1.0f, 1.0f);
   }   
 
   // Destructor
@@ -640,6 +648,8 @@ public:
   // bounds.
   {
     assert(m_pixf != NULL);
+    
+    assert(scale_set);
 
     // clear the stage using the background color
     for (unsigned int i=0; i<_clipbounds.size(); i++) 
@@ -2014,6 +2024,8 @@ public:
   void set_scale(float new_xscale, float new_yscale) {
     /*xscale = new_xscale/20.0f;
     yscale = new_yscale/20.0f;*/
+    
+    scale_set=true;
     
     stage_matrix.set_identity();
 		stage_matrix.set_scale(new_xscale/20.0f, new_yscale/20.0f);
