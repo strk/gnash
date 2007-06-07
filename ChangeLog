@@ -1,5 +1,7 @@
 2007-06-07 Sandro Santilli <strk@keybit.net>
 
+	* macros/ffmpeg.m4: check for libgsm and add to FFMPEG_LIBS if
+	  available.
 	* testsuite/anaylse-results.sh: don't forget to initialize
 	  total_untested.
 

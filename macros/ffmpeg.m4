@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.43 2007/06/01 17:50:07 bjacques Exp $
+dnl $Id: ffmpeg.m4,v 1.44 2007/06/07 18:59:51 strk Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -300,6 +300,28 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     else
       AC_MSG_RESULT(${libtheora})
       ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libtheora}"      
+    fi
+
+    dnl Look for the GSM library, which is required on some systems.
+    AC_MSG_CHECKING([for libgsm library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
+      $PKG_CONFIG --exists gsm && libgsm=`$PKG_CONFIG --libs gsm`
+    else
+      libgsm=""
+    fi
+    if test x"${libgsm}" = x; then
+      if test -f ${topdir}/libgsm.a -o -f ${topdir}/libgsm.${shlibext}; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"
+        AC_MSG_RESULT(${topdir}/libgsm)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+          AC_CHECK_LIB(gsm, gsm_destroy, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lgsm"])
+        fi
+      fi
+    else
+      AC_MSG_RESULT(${libgsm})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libgsm}"      
     fi
     
     dnl Look for the DC1394 library, which is required on some systems.
