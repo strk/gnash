@@ -12,6 +12,7 @@ total_fail=0;
 total_pass=0;
 total_xfail=0;
 total_xpass=0;
+total_untested=0;
 total_unresolved=0;
 
 echo

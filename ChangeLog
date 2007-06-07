@@ -1,5 +1,10 @@
 2007-06-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/anaylse-results.sh: don't forget to initialize
+	  total_untested.
+
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
 	* doc/C/Makefile.am: distribute all XML files.
 	* macros/docbook.m4: advertise --enable-docbook, not
 	  --disable-docbook since it's disabled by default.
