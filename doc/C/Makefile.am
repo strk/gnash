@@ -26,7 +26,6 @@ docname = gnash
 lang = C
 omffile = gnash-C.omf
 entities = \
-	sources.xml \
 	internals.xml \
 	amf.xml	\
 	appendix.xml \
@@ -42,7 +41,70 @@ entities = \
 	rtmp.xml \
 	actionscript/main.xml \
 	actionscript/as_value.xml \
-	actionscript/new_as_class.xml
+	actionscript/new_as_class.xml \
+	asspec/accessibility.xml	\
+	asspec/array.xml	\
+	asspec/asspec.xml	\
+	asspec/boolean.xml	\
+	asspec/button.xml	\
+	asspec/camera.xml	\
+	asspec/color.xml	\
+	asspec/contextmenu.xml	\
+	asspec/customactions.xml	\
+	asspec/date.xml	\
+	asspec/error.xml	\
+	asspec/fdl-appendix.xml	\
+	asspec/function.xml	\
+	asspec/key.xml	\
+	asspec/legal.xml	\
+	asspec/loadvars.xml	\
+	asspec/localconnection.xml	\
+	asspec/math.xml	\
+	asspec/microphone.xml	\
+	asspec/mouse.xml	\
+	asspec/movieclip.xml	\
+	asspec/moviecliploader.xml	\
+	asspec/netconnection.xml	\
+	asspec/netstream.xml	\
+	asspec/number.xml	\
+	asspec/selection.xml	\
+	asspec/sharedobject.xml	\
+	asspec/sound.xml	\
+	asspec/stage.xml	\
+	asspec/string.xml	\
+	asspec/system.xml	\
+	asspec/textfield.xml	\
+	asspec/textformat.xml	\
+	asspec/textsnapshot.xml	\
+	asspec/video.xml	\
+	asspec/xml.xml	\
+	asspec/xmlnode.xml	\
+	asspec/xmlsocket.xml	\
+	conformance.xml	\
+	usermanual/installation/code_dependencies.xml	\
+	usermanual/installation/configuration.xml	\
+	usermanual/installation/custompath_configuration.xml	\
+	usermanual/installation/documentation_dependencies.xml	\
+	usermanual/installation/feature_configuration.xml	\
+	usermanual/installation/packagemanager.xml	\
+	usermanual/installation/sources.xml	\
+	usermanual/installation/testing_dependencies.xml	\
+	usermanual/installation/cross_compiling.xml	\
+	usermanual/installation/building.xml	\
+	usermanual/installation/install.xml	\
+	usermanual/doc_authors.xml	\
+	usermanual/installation.xml	\
+	usermanual/introduction.xml	\
+	usermanual/revisions.xml	\
+	usermanual/usage.xml	\
+	usermanual/usage/gnashrc.xml	\
+	usermanual/bugreport.xml	\
+	usermanual/glossary.xml	\
+	app_authors.xml	\
+	gpl-appendix.xml	\
+	legal.xml	\
+	logging.xml	\
+	$(NULL)
 
 xml_files = $(entities) $(docname).xml actionscript.xml
 

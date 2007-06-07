@@ -1,5 +1,11 @@
 2007-06-07 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/Makefile.am: distribute all XML files.
+	* macros/docbook.m4: advertise --enable-docbook, not
+	  --disable-docbook since it's disabled by default.
+
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: disable klash if QT lib aren't found.
 	* gui/Makefile.am: add kde_glue.h  in KDE_SRCS (hopefully this adds
 	  to distribution).
