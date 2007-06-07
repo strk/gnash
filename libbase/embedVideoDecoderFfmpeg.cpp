@@ -148,15 +148,25 @@ embedVideoDecoderFfmpeg::convertRGB24(AVCodecContext* srcCtx, AVFrame* srcFrame)
 std::auto_ptr<image::image_base> 
 embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 {
+
 	std::auto_ptr<image::image_base> ret_image;
 
 	if (outputFormat == YUV) {
 		ret_image.reset(new image::yuv(width, height));
 	} else if (outputFormat == RGB) {
 		ret_image.reset(new image::rgb(width, height));
-	} 
+	} else {
+		ret_image.reset(NULL);
+		return ret_image;
+	}
 
-	if (data == NULL || codec == NULL || size == 0) return ret_image;
+	// If there is nothing to decode in the new frame
+	// we just return the lastest.
+	if (data == NULL || codec == NULL || size == 0) {
+		ret_image->update(decodedFrame->m_data);
+		return ret_image;
+	}
+
 
 	// Allocate a frame to store the decoded frame in
 	AVFrame* frame = avcodec_alloc_frame();
@@ -169,6 +179,7 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 
 		if (outputFormat == NONE) { // NullGui?
 			av_free(frame);
+			ret_image->update(decodedFrame->m_data);
 			return ret_image;
 
 		} else if (outputFormat == YUV && cc->pix_fmt != PIX_FMT_YUV420P) {
@@ -209,8 +220,6 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 				}
 			}
 		}
-	} else {
-		return ret_image;
 	}
 
 	ret_image->update(decodedFrame->m_data);

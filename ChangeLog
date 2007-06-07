@@ -1,3 +1,10 @@
+2007-06-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler.cpp: Fixed a warning.
+	* backend/sound_handler_gst.cpp: Small cleanup.
+	* libbase/embedVideoDecoder{Ffmpeg, Gst}.cpp: Made more robust, can
+	  now handle if render image format is NONE. Should fix bug #20111.
+
 2007-06-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/edit_text_character.cpp: better version of previous patch;

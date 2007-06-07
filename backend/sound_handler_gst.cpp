@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.47 2007/05/29 17:15:14 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.48 2007/06/07 12:10:21 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -381,21 +381,15 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 			"channels", G_TYPE_INT, sounddata->stereo ? 2 : 1,
 			"endianness", G_TYPE_INT, G_BIG_ENDIAN,
 			"width", G_TYPE_INT, 16,
+			"depth", G_TYPE_INT, 16,
 			/*"signed", G_TYPE_INT, 1,*/ NULL);
 		g_object_set (G_OBJECT (gst_element->capsfilter), "caps", caps, NULL);
 		gst_caps_unref (caps);
 
-		// number of buffers to send
-		int numBuf = static_cast<int>(ceil(static_cast<float>(sounddata->data_size) / static_cast<float>(BUFFER_SIZE)));
-		if (loop_count == -1) {
-			numBuf = -1;
-		} else if (loop_count > 0) {
-			numBuf = numBuf * (loop_count+1) -1;
-		}
 		// setup fake source
 		g_object_set (G_OBJECT (gst_element->input),
 					"sizetype", 2, "can-activate-pull", FALSE, "signal-handoffs", TRUE,
-					"sizemax", BUFFER_SIZE, "num-buffers", numBuf, NULL);
+					"sizemax", BUFFER_SIZE, NULL);
 		// Setup the callback
 		gst_element->handoff_signal_id = g_signal_connect (gst_element->input, "handoff", G_CALLBACK (callback_handoff), gst_element);
 

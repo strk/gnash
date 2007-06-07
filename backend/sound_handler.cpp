@@ -31,7 +31,7 @@ void sound_handler::convert_raw_data(
     int* adjusted_size,
     void* data,
     int sample_count,	// A stereo pair counts as one
-    int sample_size,	// Should now always == 2
+    int /*sample_size*/,	// Should now always == 2
     // sample_rate and stereo are those of the incoming sample
     int sample_rate, 
     bool stereo,
@@ -112,6 +112,7 @@ void sound_handler::convert_raw_data(
 		in += 2;
 	    }
 	} else {
+
 	    // Linear upsampling, either to increase a sample rate
 	    // or to convert a mono file to stereo or both:
 	    // replicate each sample several times.

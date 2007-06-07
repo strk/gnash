@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderGst.cpp,v 1.5 2007/06/06 15:41:12 tgc Exp $
+// $Id: embedVideoDecoderGst.cpp,v 1.6 2007/06/07 12:10:21 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -182,9 +182,17 @@ embedVideoDecoderGst::decodeFrame(uint8_t* data, int size)
 		ret_image.reset(new image::yuv(width, height));
 	} else if (outputFormat == RGB) {
 		ret_image.reset(new image::rgb(width, height));
-	} 
+	} else {
+		ret_image.reset(NULL);
+		return ret_image;
+	}
 
-	if (data == NULL || size == 0) return ret_image;
+	// If there is nothing to decode in the new frame
+	// we just return the lastest.
+	if (data == NULL || size == 0 || !decoder) {
+		ret_image->update(decodedFrame->m_data);
+		return ret_image;
+	}
 
 	frame = data;
 	frameSize = size;
@@ -194,6 +202,7 @@ embedVideoDecoderGst::decodeFrame(uint8_t* data, int size)
 	output_lock = new boost::mutex::scoped_lock(output_mutex);
 
 	ret_image->update(decodedFrame->m_data);
+
 	return ret_image;
 }
 
