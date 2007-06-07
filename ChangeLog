@@ -1,5 +1,11 @@
 2007-06-07 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: disable klash if QT lib aren't found.
+	* gui/Makefile.am: add kde_glue.h  in KDE_SRCS (hopefully this adds
+	  to distribution).
+
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: hint user about using AGG if framebuffer gui is
 	  requested.
 	* server/Makefile.am, utilities/Makefile.am:
