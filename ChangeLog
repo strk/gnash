@@ -1,5 +1,7 @@
 2007-06-07 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: hint user about using AGG if framebuffer gui is
+	  requested.
 	* server/Makefile.am, utilities/Makefile.am:
 	  Moved the libgnashbackend dependency out of libgnashserver
 	  and into the utilities/ dir. This is to avoid a circular

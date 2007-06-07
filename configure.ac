@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.334 2007/06/06 12:57:33 strk Exp $
+dnl $Id: configure.ac,v 1.335 2007/06/07 15:10:55 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -237,7 +237,7 @@ AC_ARG_ENABLE(renderer,
 
 if test x$renderer = xopengl; then
   if test x"$gui" = xfb -o x"$gui" = xfltk; then
-    AC_MSG_ERROR([opengl renderer is not supported by the $gui gui]);
+    AC_MSG_ERROR([OpenGL renderer is not supported by the $gui gui. Try using AGG ( --enable-renderer=AGG ).]);
   fi
   AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
