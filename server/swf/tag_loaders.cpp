@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.113 2007/06/07 22:13:47 tgc Exp $ */
+/* $Id: tag_loaders.cpp,v 1.114 2007/06/08 00:44:26 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1036,7 +1036,7 @@ define_text_loader(stream* in, tag_type tag, movie_definition* m)
 
 // Forward declaration
 static void sound_expand(stream *in, sound_handler::format_type &format,
-	bool sample_16bit, bool stereo,
+	bool sample_16bit, bool stereo, unsigned int &sample_count,
 	unsigned char* &data, unsigned &data_bytes);
 
 // Common data
@@ -1059,7 +1059,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
 	bool	sample_16bit = in->read_uint(1) ? true : false;
 	bool	stereo = in->read_uint(1) ? true : false;
-	int	sample_count = in->read_u32();
+	unsigned int	sample_count = in->read_u32();
 
 	IF_VERBOSE_PARSE
 	(
@@ -1089,7 +1089,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	    // sound_expand allocates storage for data[].
 	    // and modifies 3 parameters: format, data and data_bytes.
-	    sound_expand(in, format, sample_16bit, stereo, data, data_bytes);
+	    sound_expand(in, format, sample_16bit, stereo, sample_count, data, data_bytes);
 
 	    int	handler_id = handler->create_sound(
 		data,
@@ -1157,6 +1157,7 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 static sound_handler::format_type stream_input_format;
 static bool stream_input_is16bit;
 static bool stream_input_stereo;
+static unsigned int stream_input_sample_count;
 
 // Load a SoundStreamHead(2) tag.
 void
@@ -1187,8 +1188,12 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     // checks if this is a new streams header or just one in the row
     if (format == 0 && sample_rate == 0 && !sample_16bit && !stereo) return;
 
-    int sample_count = in->read_u32();
-    if (format == 2) garbage = in->read_uint(16);
+    unsigned int sample_count = in->read_u16();
+	int latency = 0;
+    if (format == sound_handler::FORMAT_MP3) {
+		latency = in->read_s16();
+		garbage = in->read_uint(16);
+	}
 
     IF_VERBOSE_PARSE
     (
@@ -1215,6 +1220,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     stream_input_format = format;
     stream_input_is16bit = sample_16bit;
     stream_input_stereo = stereo;
+	stream_input_sample_count = sample_count;
 
     // Tell create_sound what format it will be receiving, in case it cares
     // at this stage.
@@ -1265,12 +1271,10 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
     // The format in the input file is in stream_input_*
     sound_handler::format_type format = stream_input_format;
 
-    unsigned sample_count = data_bytes;
-    if (stream_input_stereo)  sample_count /= 2;
-    if (stream_input_is16bit) sample_count /= 2;
+    unsigned int sample_count = stream_input_sample_count;
 
     sound_expand(in, format,
-		 stream_input_is16bit, stream_input_stereo,
+		 stream_input_is16bit, stream_input_stereo, sample_count,
 		 data, data_bytes);
     // "format" now reflects what we hand(ed) to the sound drivers.
     // "data_bytes" now reflects the size of the uncompressed data.
@@ -1298,7 +1302,7 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 // on exit it reflects the number of bytes that "data" now points to.
 static void
 sound_expand(stream *in, sound_handler::format_type &format,
-	bool sample_16bit, bool stereo,
+	bool sample_16bit, bool stereo, unsigned int &sample_count,
 	unsigned char* &data, unsigned &data_bytes)
 {
     // Make sure that an unassigned pointer cannot get through
@@ -1309,9 +1313,9 @@ sound_expand(stream *in, sound_handler::format_type &format,
     case sound_handler::FORMAT_ADPCM:
       {
 	// Uncompress the ADPCM before handing data to host.
-	unsigned sample_count = data_bytes / (stereo ? 4 : 2);
+	if (sample_count == 0) sample_count = data_bytes / ( stereo ? 4 : 2 );
 	adpcm_expand(data, in, sample_count, stereo);
-	data_bytes = sample_count * (stereo ? 4 : 2) * (sample_16bit ? 2 : 1);
+	data_bytes = sample_count * (stereo ? 4 : 2);
 	format = sound_handler::FORMAT_NATIVE16;
 	break;
       }
@@ -1325,9 +1329,9 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	} else {
 	    // Convert 8-bit signed to 16-bit range
 	    // Allocate as many shorts as there are samples
-	    unsigned sample_count = data_bytes / (stereo ? 2 : 1);
+	    if (sample_count == 0) sample_count = data_bytes / (stereo ? 2 : 1);
 	    u8_expand(data, in, sample_count, stereo);
-		data_bytes = sample_count * (stereo ? 4 : 2) * 2;
+		data_bytes = sample_count * (stereo ? 4 : 2);
 	}
 	format = sound_handler::FORMAT_NATIVE16;
 	break;
@@ -1339,9 +1343,9 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	{
 	    // Convert 8-bit signed to 16-bit range
 	    // Allocate as many shorts as there are 8-bit samples
-	    unsigned sample_count = data_bytes / (stereo ? 2 : 1);
+	    if (sample_count == 0) sample_count = data_bytes / (stereo ? 2 : 1);
 	    u8_expand(data, in, sample_count, stereo);
-		data_bytes = sample_count * (stereo ? 4 : 2) * 2;
+		data_bytes = sample_count * (stereo ? 4 : 2);
 
 	} else {
 	    // Read 16-bit data into buffer
