@@ -1,714 +1,89 @@
 <?xml version="1.0"?>
+
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
-    "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-  <!ENTITY legal SYSTEM "legal.xml">
-  <!ENTITY fdl-app SYSTEM "fdl-appendix.xml">
-  <!ENTITY appversion "0.7.2">
-  <!ENTITY manrevision "0.3.9">
-  <!ENTITY date "Feb 2007">
-  <!ENTITY app "<application>Gnash</application>">
-  <!ENTITY appname "Gnash">
-  <!ENTITY version "0.7.2">
-  <!ENTITY appendix SYSTEM "appendix.xml">
-  <!ENTITY sources SYSTEM "sources.xml">
-  <!ENTITY internals SYSTEM "internals.xml">
-  <!ENTITY amf SYSTEM "amf.xml">
-  <!ENTITY plugin SYSTEM "plugin.xml">
-  <!ENTITY logging SYSTEM "logging.xml">
-  <!ENTITY opcodes SYSTEM "opcodes.xml">
-  <!ENTITY rtmp SYSTEM "rtmp.xml">
-  <!ENTITY gnashrc SYSTEM "gnashrc.xml">
-  <!ENTITY debugger SYSTEM "debugger.xml">
-  <!ENTITY extend SYSTEM "extensions.xml">
-  <!ENTITY mysql SYSTEM "mysqlext.xml">
-  <!ENTITY file SYSTEM "fileext.xml">
-  <!ENTITY gtk SYSTEM "gtkext.xml">
+ "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
+    <!ENTITY legal SYSTEM "legal.xml">
+    <!ENTITY fdl-app SYSTEM "fdl-appendix.xml">
+    <!ENTITY appversion "0.8.0">
+    <!ENTITY manrevision "0.4.0">
+    <!ENTITY date "May 2007">
+    <!ENTITY app "<application>Gnash</application>">
+    <!ENTITY appname "Gnash">
+
+    <!ENTITY programmers     SYSTEM "app_authors.xml">
+    <!ENTITY writers         SYSTEM "usermanual/doc_authors.xml">
+    <!ENTITY revisionhistory SYSTEM "usermanual/revisions.xml">
+    <!ENTITY introduction    SYSTEM "usermanual/introduction.xml">
+    <!ENTITY installation    SYSTEM "usermanual/installation.xml">
+    <!ENTITY usage           SYSTEM "usermanual/usage.xml">
+    <!ENTITY glossary        SYSTEM "usermanual/glossary.xml">
+    <!ENTITY bugreport       SYSTEM "usermanual/bugreport.xml">
+
+    <!ENTITY custompath       SYSTEM "usermanual/installation/custompath_configuration.xml">
+    <!ENTITY featureoptions   SYSTEM "usermanual/installation/feature_configuration.xml">
+    <!ENTITY docdependencies  SYSTEM "usermanual/installation/documentation_dependencies.xml">
+    <!ENTITY codedependencies SYSTEM "usermanual/installation/code_dependencies.xml">
+    <!ENTITY testdependencies SYSTEM "usermanual/installation/testing_dependencies.xml">
+    <!ENTITY sources          SYSTEM "usermanual/installation/sources.xml">
+    <!ENTITY pkgmanager       SYSTEM "usermanual/installation/packagemanager.xml">
+    <!ENTITY configuration    SYSTEM "usermanual/installation/configuration.xml">
+    <!ENTITY cross_compiling  SYSTEM "usermanual/installation/cross_compiling.xml">
+    <!ENTITY building         SYSTEM "usermanual/installation/building.xml">
+    <!ENTITY install          SYSTEM "usermanual/installation/install.xml">
+    <!ENTITY gnashrc          SYSTEM "usermanual/usage/gnashrc.xml">
  ]
 >
 
- <!-- =============Document Header ============================= -->
- <article id="index" lang="en">
-<!-- please do not change the id; for translations, change lang to -->
-<!-- appropriate code -->
-   <articleinfo>
-     <title>&app; Manual V&manrevision;</title>
-     <copyright>
-       <year>2005, 2006, 2007</year>
-       <holder>Free Software Foundation</holder>
-     </copyright>
-<!-- translators: uncomment this:
 
-  <copyright>
-   <year>2005, 2006, 2007</year>
-   <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
-  </copyright>
+<!-- TRANSLATOR NOTE: do not change the id, just the lang -->
+<article id="index" lang="en">
 
-   -->
-<!-- An address can be added to the publisher information.  If a role is 
-     not specified, the publisher/author is the same for all versions of the 
-     document.  -->
-    <publisher> 
-      <publishername> GNOME Documentation Project </publishername> 
-    </publisher> 
+<!-- =============Document Header ============================ -->
 
-<!-- 
-      Copyright (c)  2005, 2006, 2007, Free Software Foundation, Inc.
-      Permission is granted to copy, distribute and/or modify this document
-      under the terms of the GNU Free Documentation License, Version 1.2
-      or any later version published by the Free Software Foundation;
-      with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
-      Texts.  A copy of the license is included in the section entitled "GNU
-      Free Documentation License".
--->
+  <articleinfo>
+      <title>&app; Manual version &manrevision;</title>
+      <copyright>
+         <year>2005, 2006, 2007</year>
+         <holder>Free Software Foundation</holder>
+      </copyright>
 
-   &legal;
+  <!-- TRANSLATOR NOTE: uncomment this section
 
-   <!-- This file  contains link to license for the documentation (GNU FDL), and 
-        other legal stuff such as "NO WARRANTY" statement. Please do not change 
-	any of this. -->
+      <copyright>
+         <year>2007</year>
+         <holder>ME-THE-TRANSLATOR (Latin translation)</holder>
+      </copyright>
 
-    <authorgroup> 
-      <author> 
-	<firstname>Rob</firstname> 
-	<surname>Savoye</surname> 
-	<affiliation> 
-	  <address>
-	    <email>rob@senecass.com</email>
-	  </address> 
-	</affiliation> 
-      </author> 
+  -->
 
-<!-- This is appropriate place for other contributors: translators,
-      maintainers,  etc. Commented out by default.
-       <othercredit role="translator">
-	<firstname>Latin</firstname> 
-	<surname>Translator 1</surname> 
-	<affiliation> 
-	  <orgname>Latin Translation Team</orgname> 
-	  <address> <email>translator@gnome.org</email> </address> 
-	</affiliation>
-	<contrib>Latin translation</contrib>
-      </othercredit>
--->
-    </authorgroup>
+  &legal;
+  &writers;
+  &revisionhistory;
 
-    <revhistory>
-      <revision> 
-	<revnumber>&appname; Manual V&manrevision;</revnumber> 
-	<date>&date;</date>
-	<revdescription> 
-	  <para role="author">Rob Savoye
-	    <email>rob@senecass.com</email>
-	    Updated for the alpha release.
-	  </para>
-	  <para role="publisher">Free Software Foundation</para>
-	</revdescription> 
-      </revision> 
-    </revhistory> 
-
-    <releaseinfo>This manual describes version &appversion; of &appname;.
+    <releaseinfo>
+        This manual describes version &appversion; of &appname;.
     </releaseinfo>
-   </articleinfo>
+
+  </articleinfo>
 
   <indexterm zone="index"> 
-    <primary>Gnash</primary> 
+      <primary>Gnash</primary> 
   </indexterm>
 
-<!-- ============= Document Body ============================= -->
 
 <!-- ============= Introduction ============================== -->
-  <sect1 id="intro"> <title>Introduction</title>
-    <para>
-      Gnash is a free Flash movie player, which can be used
-      standalone or as a Firebox/Mozilla plugin.
-    </para>
+  &introduction;
 
-    <sect2 id="Gnash Overview">
-      <title>Gnash Overview</title>
+<!-- ============= Document Body ============================= -->
+  &usage;
+  &installation;
+  &bugreport;
+  &glossary;
 
-      <para>
-	Gnash is originally based on the code of GameSWF, by Thatcher 
-	Ulrich. GameSWF was the most advanced of the free flash movie player
-	projects, and implemented a fairly broad set of Flash Format
-	v7 compliance. GameSWF was unsupported public domain software however,
-	and not really designed as an industrial strength project which could
-	be used by everyone who uses Firefox. So in early December of 2005,
-	GameSWF was forked. After being rearranged in GNU project style,
-	development of the plugin was started.
-      </para>
-      
-      <para>
-	Gnash works as standalone player; as a Mozilla Firefox plugin;
-	and as a Konqueror plugin, called Klash. The plugins use the
-	standalone player for processing, but embed the output into
-	the browser.
-      </para>
+<!-- ============= Authors =================================== -->
+  &programmers;
 
-      <para>
-	Currently, Gnash uses OpenGL to get a high quality rendered
-	image. There are plans to write a Cairo back-end to give Gnash
-	a performance boost on graphics processors without 3D hardware 
-	acceleration. Other plans involve running Gnash in a framebuffer,
-        with no windowing system at all.
-      </para>
-
-<!--
-      <para>
-	Gnash currently has two back-ends for graphic display. The
-	only one currently used by Gnash is the OpenGL one. There is
-	an XBox back-end, but as I don't own an XBox, I can't verify if
-	it even works anymore.
-      </para>
--->
-
-      <para>
-	Included in the Gnash is an XML-based messaging system, as
-	specified in the Flash specification. This lets a flash movie
-	communicate over a TCP/IP socket, and parse the incoming XML
-	message. This allows a movie be a remote control for other
-	devices or applications.
-      </para>
-
-      <sect3 id="pluginintro">
-	<title>Plugin Overview</title>
-	<para>
-	  The plugin currently works by creating a new window in the
-	  standalone player which is connected to the browser window in
-	  Firefox.
-	</para>
-	
-	<para>
-	  All movies are downloaded to /tmp and played from there. 
-          Many web pages use IE-specific JavaScript to initiate movies, 
-          which means that Firefox does not load the Gnash plugin.
-	</para>
-      </sect3>
-      
-      <sect3 id="playerintro">
-	<title>Standalone Player Overview</title>
-	<para>
-	  The standalone player supports both SDL and GTK2. The SDL
-	  support is more portable, and the GTK support allows better
-          integration as a Firefox plugin.  When using GTK, a right-button
-          mouse click will activate a menu which can be used to control
-          the movie.
-	</para>
-      </sect3>
-
-      <sect3 id="flashsupport">
-	<title>Flash Support:</title>
-
-	<para>
-          Many movies play without any difficulty in Gnash.  
-	  Gnash supports the majority of Flash
-	  opcodes up to SWF version 7, and a wide sampling of
-	  ActionScript classes for SWF version 7. All the core ones
-	  are implemented, and many of the newer ones work, but may be
-	  missing some of the methods. All unimplemented opcodes and
-	  ActionScript classes and methods print a warning when using
-	  -v with gnash or gprocessor. Using gprocessor -v is a quick
-	  way to see why a movie isn't playing correctly.
-	</para>
-
-	<para>
-	  There are plans to work towards supporting all the SWF
-	  version 8 and greater opcodes, as well as as implementing the
-	  missing methods and ActionScript classes. During the first
-	  few months of Gnash's existence as a project, most of the
-	  focus has been towards portability issues, and getting the
-	  plugin to work. Now that the plugin works, more focus will
-	  be spent on catching up to full compliance with version 7
-	  and beyond.
-
-	</para>
-	<para>
-	  Currently implemented ActionScript classes are: Array,
-	  Boolean, Date, Key, Math, Mouse, MovieClip, Number, Object,
-	  Sound, String, XML, XMLNode, and XMLSocket.
-	</para>
-
-	<para>
-	  Partially implemented classes are: MovieClipLoader,
-	  NetConnection, LocalConnection, TextField, and TextFormat.
-	</para>
-
-	<para>
-	  Unimplemented classes are: Accessibility, Error, Function,
-	  LoadVars, Microphone, NetStream, Selection, SharedObject,
-	  Stage, System, Button, Camera, Color, ContextMenu,
-	  CustomActions, and Video.
-	</para>
-	<para>
-	  Unimplemented Opcodes are: Throw, Implements, Extends,
-	  enum_object, Try, new_method, enum_object, md length, md
-	  substring, md chr, delete, and get target.
-	</para>
-	<para>
-          There is currently no support for FLV video, more than minimal
-          AMF data, or loading external jpegs.
-	</para>
-      </sect3>
-
-    </sect2>
-  </sect1>
-    
-  <sect1 id="usage">
-    <title>Gnash Usage</title>
-    
-    <para>
-      Gnash can be used as a standalone player or as a plugin.  Using it
-      as a standalone player, you
-      can execute any flash movie from the command line by just
-      supplying the file name. No command line options are required to
-      just play the movie using the default actions. So if you type:
-    </para>
-      
-
-    <para>
-      <emphasis>gnash samples/car_smash.swf</emphasis>
-    </para>
-
-    <para>
-      It will create a window and play the movie. In this case it's a
-      simple animation of a car driving, swerving, and finally
-      crashing.
-      <mediaobject>
-	<imageobject>
-	  <imagedata align="center" fileref="images/car_crash.png"/>
-	</imageobject>
-      </mediaobject>
-      
-    </para>
-
-    <sect2 id="options">
-      <title>Gnash Command Line Options</title>
-
-      <para>
-	While by default no options are necessary, there are options
-	that can be used to change <emphasis>Gnash's</emphasis> basic
-	behavior.
-      </para>
-      
-      <para>
-	gnash [options] file
-      </para>
-      
-      <variablelist>
-	<varlistentry>
-	  <term>-h</term>
-	  <listitem>
-	    <para>
-	      Print usage information.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-s factor</term>
-	  <listitem>
-	    <para>
-	      Scale the movie up/down by the specified factor.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-c</term>
-	  <listitem>
-	    <para>
-	      Produce a core file instead of letting SDL trap it. By
-	      default, SDL traps all signals, but sometimes a core file
-	      is desired to assist with debugging.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-d num</term>
-	  <listitem>
-	    <para>
-	      Number of milliseconds to delay in main loop. The main
-	      loop polls continuously with a delay to adjust how long
-	      <emphasis>Gnash</emphasis> sleeps between iterations of the
-	      loop. The smaller the number, the higher the CPU load
-	      gets, and of course, the more iterations of the main
-	      command loop.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-p</term>
-	  <listitem>
-	    <para>
-	      Run full speed (no sleep) and log frame rate.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-a</term>
-	  <listitem>
-	    <para>
-              Enable Actionscript debugging.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-v</term>
-	  <listitem>
-	    <para>
-	      Be verbose; i.e. print debug messages to stdout.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-va</term>
-	  <listitem>
-	    <para>
-	      Be verbose about movie Actions. 
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-vp</term>
-	  <listitem>
-	    <para>
-	      Be verbose about parsing the movie. Warning: this can
-	      generate a lot of text, and can affect the performance of
-	      the movie you are playing.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-ml bias</term>
-	  <listitem>
-	    <para>
-	      Specify the texture LOD bias (float, default is -1) This
-	      affects the fuzziness of small objects, especially small
-	      text.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	<varlistentry>
-	  <term>-w</term>
-	  <listitem>
-	    <para>
-	      Write a debug log called gnash-dbg.log. This will 
-	      record of all the debug messages whether they are printed
-	      to the screen or not.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	<varlistentry>
-	  <term>-j</term>
-	  <listitem>
-	    <para>
-	      Specify the width of the window. This is mostly used
-	      only by the plugin.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	<varlistentry>
-	  <term>-k</term>
-	  <listitem>
-	    <para>
-	      Specify the height of the window. This is mostly used
-	      only by the plugin.
-	    </para>
-	  </listitem>
-	</varlistentry>
-<!--	
-	<varlistentry>
-	  <term>-e</term>
-	  <listitem>
-	    <para>
-	      Use SDL Event thread. This uses a separate thread to make
-	      the event loop more event driven than polling. This can
-	      improve performance for some types of movies.
-	    </para>
-	  </listitem>
-	</varlistentry>
--->
-	<varlistentry>
-	  <term>-1</term>
-	  <listitem>
-	    <para>
-	      Play once; exit when/if movie reaches the last
-	      frame. This is the default.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-r [0|1|2|3]</term>
-	  <listitem>
-	    <para>
-	      0 disables rendering and sound (good for batch tests).
-	    </para>
-	    <para>
-	      1 enables rendering and disables sound (default setting).
-	    </para>
-	    <para>
-	      2 enables sound and disables rendering.
-	    </para>
-	    <para>
-	      3 enables rendering and sound.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-t sec</term>
-	  <listitem>
-	    <para>
-	      Timeout and exit after the specified number of
-	      seconds. This is useful for movies which repeat
-	      themselves.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-g</term>
-	  <listitem>
-	    <para>
-	      Start Gnash with a Flash debugger console so one can set
-	      break points or watchpoints.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-x id</term>
-	  <listitem>
-	    <para>
-	      This specifies the X11 window ID to display
-	      in; this is mainly used by plugins.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>-b bits</term>
-	  <listitem>
-	    <para>
-	      Bit depth of output window (for example, 16 or 32). Appropriate
-              bit depths depend on the renderer and GUI library used.
-              FIXME: add information about which depths are suitable for each
-              renderer.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>-u url</term>
-	  <listitem>
-	    <para>
-	      Set the _url member of the root movie. This is useful 
-              when you download a movie and play it from a different 
-              location. See also the -U switch.
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>-U baseurl</term>
-	  <listitem>
-	    <para>
-	      Set base url for this run. URLs are resolved relative to 
-              this base. If omitted defaults to the _url member of the 
-              top-level movie (see the -u switch).
-	    </para>
-	  </listitem>
-	</varlistentry>
-
-	<varlistentry>
-	  <term>-P parameter</term>
-	  <listitem>
-	    <para>
-		Parameters are given in ParamName=Value syntax and are mostly 
-                useful to the plugin to honour EMBED tags attributes 
-                or explicit OBJECT PARAM tags. A common use for -P 
-                is to provide FlashVars 
-                (ie: -P "FlashVars=home=http://www.gnu.org").
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-      </variablelist>
-      
-    </sect2>
-
-    <sect2 id="keys">
-      <title>Gnash Interactive Control Keys</title>
-
-      <para>
-	While a movie is playing, there are several control
-	keys. These can be used to step through frames, pause the
-	playing, and control other actions.
-      </para>
-      
-      <variablelist>
-	<varlistentry>
-	  <term>CTRL-Q</term>
-	  <listitem>
-	    <para>
-	      Quit/Exit.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>CTRL-W</term>
-	  <listitem>
-	    <para>
-	      Quit/Exit.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>ESC</term>
-	  <listitem>
-	    <para>
-	      Quit/Exit.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>CTRL-P</term>
-	  <listitem>
-	    <para>
-	      Toggle Pause.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>CTRL-R   </term>
-	  <listitem>
-	    <para>
-	      Restart the movie.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>CTRL-[ or kp-</term>
-	  <listitem>
-	    <para>
-	      Step back one frame.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>CTRL-] or kp+</term>
-	  <listitem>
-	    <para>
-	      Step forward one frame.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-<!--
-	<varlistentry>
-	  <term>CTRL-A</term>
-	  <listitem>
-	    <para>
-	      Toggle anti-aliasing (doesn't work).
-	    </para>
-	  </listitem>
-	</varlistentry>
--->
-	
-	<varlistentry>
-	  <term>CTRL-T</term>
-	  <listitem>
-	    <para>
-	      Debug.  Test the set_variable() function.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>CTRL-G</term>
-	  <listitem>
-	    <para>
-	      Debug.  Test the get_variable() function.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>CTRL-M</term>
-	  <listitem>
-	    <para>
-	      Debug.  Test the call_method() function.
-	    </para>
-	  </listitem>
-	</varlistentry>
-	
-	<varlistentry>
-	  <term>CTRL-B</term>
-	  <listitem>
-	    <para>
-	      Toggle the background color.
-	    </para>
-	  </listitem>
-	</varlistentry>
-      </variablelist>
-    </sect2>
-
-    &gnashrc;
-    &debugger;
-
-  </sect1>
-
-  &sources;
-  &internals;
-  &extend;
-  &appendix;
-
-<!-- ============= Authors ================================ -->
-
-  <sect1 id="authors">
-    <title>Authors</title>
-    <para>
-      <application>Gnash</application> is maintained by Rob Savoye
-      <email>rob@senecass.com</email>.  Other active developers are:
-      Sandro Santilli, Bastiaan Jacques, Vitaly Alexeev, and Tomas
-      Groth.  Please send all comments and suggestions to
-      <email>gnash-dev@gnu.org</email>. Please use this link to <ulink
-      type="http"
-      url="https://savannah.gnu.org/patch/?group=gnash">submit a
-      patch</ulink> 
-      or this link to <ulink  type="http"
-      url="https://savannah.gnu.org/bugs/?group=gnash">file a bug
-      report</ulink>.
-      I am available for consulting on a variety of renewable energy
-      and open source technologies. More details at <ulink type="http"
-      url="http://www.senecass.com">http://www.senecass.com</ulink>
-    </para>
-    
-    <para>
-      The primary author of GameSWF (which provided the initial code for
-      Gnash) is Thatcher Ulrich <email>tu@tulrich.com</email>. Other 
-      individuals who contributed code are: Mike Shaver, Thierry Berger-Perrin,
-      Ignacio CastaÃ±o, Willem Kokke, Vitaly Alexeev,
-      Alexander Streit, and Rob Savoye.
-    </para>
-
-  </sect1>
-
-  <!-- ============= Application License ============================= -->
-
+<!-- ============= Application License ======================= -->
   &fdl-app;
 
 </article>

@@ -43,8 +43,10 @@
         <entry>
           &app; documentation is written in Docbook.
         </entry>
-        <entry>TODO<filename></filename></entry>
-        <entry>TODO<filename></filename></entry>
+        <entry><filename>docbook-utils</filename> and 
+               <filename>docbook-dsssl</filename></entry>
+        <entry><filename>docbook-dtd41-sgml</filename> and
+               <filename>docbook-style-dsssl</filename></entry>
       </row>
 
       <row>
@@ -99,8 +101,8 @@
         <entry>
           FOP is required for PDF output.
         </entry>
-        <entry>TODO<filename></filename></entry>
-        <entry>TODO<filename></filename></entry>
+        <entry><filename>fop</filename></entry>
+        <entry><filename>fop</filename></entry>
       </row>
 
       <row>

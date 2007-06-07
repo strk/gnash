@@ -1,3 +1,34 @@
+2007-06-07 Ann Barcomb <kudra@domaintje.com>
+
+	* doc/C/usermanual/installation/building.xml: mention that
+	  GNOME help is a possible documentation make target.  Completed
+	  instructions for building documentation; added instructions for 
+	  testing from old manual.
+	* doc/C/usermanual/installation/feature_configuration.xml: The
+	  default renderer isn't AGG. FLTK works. Spelling fixes.
+	  Comment out TODO/FIXME sections, so that they are not visible 
+	  to users, but can still be searched.
+	* doc/C/usermanual/installation.xml: Changed the title of this
+	  section.
+	* doc/C/usermanual/installation/install.xml: Added information on
+	   where Gnash installs.
+	* doc/C/usermanual/installation/custompath_configuration.xml,
+	   doc/C/usermanual/usage.xml: Comment out TODO/FIXME sections, 
+	  so that they are not visible to users, but can still be searched.
+	* doc/C/usermanual/installation/testing_dependencies.xml,
+	   doc/C/usermanual/installation/documentation_dependencies.xml,
+	   doc/C/usermanual/installation/code_dependencies.xml: Resolved
+	   TODO items in the dependency tables (package names).
+	* doc/C/usermanual/bugreport.xml: Described how to make a bug
+	  report.
+	* doc/C/usermanual/glossary.xml: Created the glossary.
+	* doc/C/sources.xml: Removed file; the replacement is
+	   doc/C/usermanual/installation/sources.xml.
+	* doc/C/gnashrc.xml: Removed file; it has been moved to
+	  doc/C/usermanual/usage/gnashrc.xml.
+	* doc/C/gnash.xml: Replace the old usermanual + developer
+	  information with the new usermanual.
+
 2007-06-07 Sandro Santilli <strk@keybit.net>
 
 	* server/Makefile.am: add libgnashbackend to libserver LDADD.

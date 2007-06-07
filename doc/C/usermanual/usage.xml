@@ -1,5 +1,5 @@
 <sect1 id="usage">
-    <title>&app; Usage</title>
+    <title>Using &app;</title>
     
     <para>
       &app; can be used as a standalone player or as a plugin.  Using it
@@ -245,8 +245,10 @@
 	    <para>
 	      Bit depth of output window (for example, 16 or 32). Appropriate
               bit depths depend on the renderer and GUI library used.
-              FIXME: add information about which depths are suitable for each
+<!--
+              TODO: add information about which depths are suitable for each
               renderer.
+-->
 	    </para>
 	  </listitem>
 	</varlistentry>

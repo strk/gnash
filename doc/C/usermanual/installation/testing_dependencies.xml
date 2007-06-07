@@ -39,8 +39,8 @@
         <entry>
           Ming is the primary compiler for ActionScript testcases.
         </entry>
-        <entry>TODO<filename></filename></entry>
-        <entry>TODO<filename></filename></entry>
+        <entry>No distribution packages are available.</entry>
+        <entry>No distribution packages are available.</entry>
       </row>
 
       <row>
@@ -53,8 +53,8 @@
         <entry>
           Mtasc is used in some tests.
         </entry>
-        <entry>TODO<filename></filename></entry>
-        <entry>TODO<filename></filename></entry>
+        <entry><filename>mtasc</filename></entry>
+        <entry>No distribution packages are available.</entry>
       </row>
 
       <row>
@@ -67,8 +67,8 @@
         <entry>
           Swfdec is used in some testcases.
         </entry>
-        <entry>TODO<filename></filename></entry>
-        <entry>TODO<filename></filename></entry>
+        <entry>No distribution packages are available.</entry>
+        <entry>Unofficial package <filename>swfdec</filename></entry>
       </row>
 
       <row>
@@ -82,8 +82,8 @@
           DejaGnu is used to run multiple tests in an
           automated fashion.
         </entry>
-        <entry>TODO<filename></filename></entry>
-        <entry>TODO<filename></filename></entry>
+        <entry><filename>dejagnu</filename></entry>
+        <entry><filename>dejagnu</filename></entry>
       </row>
 
     </tbody>

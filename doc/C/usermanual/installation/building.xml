@@ -57,14 +57,147 @@
     documentation.  The available output formats are: <emphasis>html</emphasis>,
     <emphasis>pdf</emphasis>, <emphasis>info</emphasis>, 
     <emphasis>man</emphasis>, and <emphasis>alldocs</emphasis>.  
-    <emphasis>alldocs</emphasis> will build all of the other four output 
-    formats.  For example, to create HTML output, type:
+    It is also possible to output <emphasis>GNOME help</emphasis> if
+    the <link linkend="features">configure option</link>
+    <emphasis>--enable-ghelp</emphasis> was used.  
+    The <emphasis>alldocs</emphasis> target will build all output formats
+    except <emphasis>GNOME help</emphasis>.
+    For example, to create HTML output, type:
     <programlisting>
   make html
     </programlisting>
   </para>
 
-  <para>TODO</para>
+  <para>
+    &app; also uses <ulink url="http://www.stack.nl/~dimitri/doxygen/index.html"
+    type="http">Doxygen</ulink> to produce <emphasis>HTML</emphasis>
+    documentation of &app; internals.  You must have Doxygen installed
+    to produce this documentation, which is built from the
+    <filename>doc</filename> directory with the command (documents
+    will be placed in the subdirectory <filename>apidoc/html</filename>):
+    <programlisting>
+  make apidoc
+    </programlisting>
+  </para>
 </sect3>
 
 
+<sect3 id="runtests">
+  <title>Running the Tests</title>
+
+  <para>
+    If a test fails, please report it by following the
+    <link linkend="bugreport">instructions for reporting a bug</link>.
+  </para>
+
+  <sect4 id="dejagnu">
+    <title>Using DejaGnu</title>
+
+    <para>
+  <!--
+      TODO: Add a section on running tests without DejaGnu.
+  -->
+      The easiest way to run &app;'s test suite is to install
+      <emphasis><ulink type="http" 
+      url="http://www.gnu.org/software/dejagnu">DejaGnu</ulink></emphasis>.
+      After installing DejaGnu, run:
+      <programlisting>
+        make check
+      </programlisting>
+    </para>
+  
+    <sect5 id="testing_verbosity">
+      <title>Increasing Verbosity</title>
+      <para>
+        If you encounter a problem with a test, increasing the
+        verbosity may make the issue easier to spot.
+        Additional details are visible when 
+        <emphasis>RUNTESTFLAGS</emphasis> are used to add the 
+        <emphasis>verbose</emphasis> and <emphasis>all</emphasis> options.
+        Verbose prints more information about the testing process, while
+        all includes details on passing tests.  
+        <programlisting>
+  make check RUNTESTFLAGS="-v -a"
+        </programlisting>
+      </para> 
+    </sect5>
+     
+    <sect5 id="running_some_tests">
+      <title>Running Some Tests</title>
+      <para>
+        It is possible to run just a particular test, or 
+        subdirectory of tests, by specifying the directory or 
+        compiled test file.
+      </para>
+      <para>
+        Some tests rely on <emphasis>testsuite/Dejagnu.swf</emphasis>,
+        which in turn relies on <emphasis>Ming</emphasis>.
+        This file is created when you run 'make check' for the entire
+        testsuite, and can also be created on demand:
+        <programlisting>
+  make -C testsuite Dejagnu.swf 
+        </programlisting>
+      </para>
+      <para>
+        In this example, the 'clip_as_button2' test is compiled and
+        run:
+        <programlisting>
+  make -C testsuite/samples clip_as_button2-TestRunner 
+  cd testsuite/samples &amp;&amp; ./clip_as_button2-TestRunner
+        </programlisting>
+        This would create and run all the tests in the directory
+        <filename>movies.all</filename>:
+        <programlisting>
+  make -C testsuite/movies.all check
+        </programlisting>
+      </para>
+    </sect5>
+     
+  </sect4>
+  <sect4 id="manually">
+    <title>Running The Tests Manually</title>
+     
+    <para>
+      You may also run test cases by hand, which can be useful if you
+      want to see all the debugging output from the test case.  Often
+      the messages which come from deep within &app; are most useful for
+      development.
+    </para>  
+     
+    <para>
+      The first step is to compile the test case, which can be done
+      with <filename>make XML-v#.swf</filename> where the '#' is replaced
+       with the <emphasis>target</emphasis> SWF version or versions.  
+      For example:
+      <programlisting>
+  make XML-v{5,6,7,8}.swf
+      </programlisting>
+    </para>
+  
+    <sect5 id="manual_compiled_tests">
+    <title>Movie tests</title>
+      <para>
+        This creates a Flash movie version of the test case, which
+        can be run with a standalone Flash player.  For instance,
+        the target for SWF version 6 could be run with &app;:
+        <programlisting>
+   gnash -v XML-v6.swf
+        </programlisting>
+      </para>
+    </sect5>
+  
+    <sect5 id="manual_actionscript_tests">
+      <title>ActionScript Unit Tests</title>
+      <para>
+        Unit tests for ActionScript classes in 'testsuite/actionscript.all'
+        are run without a graphical display:
+        <programlisting>
+  gprocessor -v XML-v6.swf
+        </programlisting>
+      </para>
+    </sect5>
+  </sect4>
+
+
+
+</sect3>

@@ -75,7 +75,7 @@
         <entry>
           &app; requires the installation of at least one
           renderer.  AGG is considered the <emphasis>best
-          supported</emphasis> renderer for &app;
+          supported</emphasis> renderer for &app;.
         </entry>
         <entry><filename>libagg-dev</filename></entry>
         <entry><filename>agg-devel</filename></entry>
@@ -194,8 +194,8 @@
           GUI library.  FLTK may be used in conjunction with
           the Cairo and AGG renderers.
         </entry>
-        <entry>No distribution packages are available</entry>
-        <entry>No distribution packages are available</entry>
+        <entry>No distribution packages are available.</entry>
+        <entry>No distribution packages are available.</entry>
       </row>
 
       <row>
@@ -319,8 +319,9 @@
         <entry>
           This library is used for URL downloading.
         </entry>
-        <entry>TODO<filename></filename></entry>
-        <entry>TODO<filename></filename></entry>
+        <entry><filename>libcurl4-gnutls</filename></entry>
+        <entry><filename>libcurl</filename></entry>
+
       </row>
 
       <row>
