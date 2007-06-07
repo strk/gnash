@@ -48,7 +48,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	if ( ! tester.canTestRendering() )
 	{
-		cout << "UNTESTED: rendering can't be tested with this build." << endl;
+		cout << "UNTESTED: rendering of embedded video (testing not possible with this build)." << endl;
 		return EXIT_SUCCESS; // so testing doesn't abort
 	} 
 
