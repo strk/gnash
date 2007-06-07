@@ -1,0 +1,121 @@
+<sect1 id="bugreport">
+  <title>Reporting Bugs</title>
+
+  <para>
+    The better your bug report is, the easier it will be for the
+    developers to address the issue.
+    Please follow the three steps described below before filing a bug
+    report:
+    <orderedlist>
+      <listitem><para>
+        <link linkend="bugstep_newcheckout">Compile the latest
+        &app; build.</link>
+      </para></listitem>
+      <listitem><para>
+        <link linkend="bugstep_search">Determine if the bug was
+        previously reported.</link>
+      </para></listitem>
+      <listitem><para>
+        <link linkend="bugstep_guidelines">Review the bug writing 
+        guidelines.</link>
+      </para></listitem>
+    </orderedlist>
+  </para>
+
+  <sect2 id="bugstep_newcheckout">
+    <title>Compile the latest &app; build</title>
+    <para>
+      Obtain a copy of the latest <link linkend="sourcerepo">development
+      checkout</link> or <link linkend="sourcesnapshot">development
+      snapshot</link>.  Put the source in an empty directory, then
+      <link linkend="configure">configure</link> and 
+      <link linkend="compile">compile</link> &app;.
+    </para>
+    <para>
+      If you are able to replicate the bug, 
+      <link linkend="bugstep_search">proceed to the next step</link>.
+    </para>
+    <para>
+      If the bug does not persist, the problem may have been solved, or
+      the issue may involve your environment.  By creating a fresh build
+      of your original version and trying to replicate the bug you
+      can determine if it is an environmental issue or a resolved bug.
+      If you are able to replicate the bug, the problem has been fixed
+      and there is no need to file a bug report.
+    </para>
+    <para>
+      If the bug is no longer visible, the problem may be related to
+      your environment.  Try to determine the source of the conflict
+      so that you can include this information in your bug report.
+    </para>
+  </sect2>
+
+  <sect2 id="bugstep_search">
+    <title>Determine if the bug was previously reported</title>
+    <para>
+      Search the <ulink type="https"
+      url="https://savannah.gnu.org/bugs/?group=gnash">&app;
+      bug tracker</ulink> to see if the bug has already been identified.
+    </para>
+    <para>
+      If the issue has already been reported, you should not file
+      a bug report.  However, you may add some additional information
+      to the ticket if you feel that it will be beneficial to the
+      developers.  For instance, if someone reported a memory issue
+      on Ubuntu GNU/Linux, and you noticed the same problem on OpenBSD,
+      your stacktrace would be useful.  Conversely, adding a "me too"
+      note to a feature request is not helpful.
+    </para>
+  </sect2>
+
+  <sect2 id="bugstep_guidelines">
+    <title>Review the bug writing guidelines</title>
+    <para>
+      A good bug report should be precise, explicit, and discrete.
+      This means that there should be just one bug per ticket, and
+      that a ticket should contain the following information:
+      <itemizedlist mark="opencircle">
+        <listitem>
+          An overview of the problem;
+        </listitem> 
+        <listitem>
+          Instructions on how to replicate the bug;
+        </listitem> 
+        <listitem>
+          A description of what happened when you performed the steps
+          to replicate the bug, and what you expected to happen;
+        </listitem> 
+        <listitem>
+          Your system information: operating system name and version, as
+          well as the versions of major <link 
+          linkend="codedepend">dependencies</link>;
+        </listitem> 
+        <listitem>
+          The release number or checkout timestamp for the version of &app;
+          where you observe the problem;
+        </listitem> 
+        <listitem>
+          The file <filename>config.log</filename>, which should be
+          attached as a file; and
+        </listitem> 
+        <listitem>
+          A descriptive title.
+        </listitem> 
+      </itemizedlist>
+      Include any additional information that you feel might be useful
+      to the developers.
+    </para>
+  </sect2>
+
+  <sect2 id="bugstep_file">
+    <title>Filing a bug report</title>
+    <para>
+      After following the steps described above, you can
+      <ulink type="https"
+      url="https://savannah.gnu.org/bugs/?group=gnash">file a
+      bug report</ulink>.
+    </para>
+  </sect2>
+
+</sect1>
+    

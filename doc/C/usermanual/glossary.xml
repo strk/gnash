@@ -1,0 +1,221 @@
+<sect1 id="glossary">
+  <title>Glossary</title>
+
+  <para><variablelist mark="opencircle">
+    <varlistentry>
+      <term>
+        ActionScript
+      </term>
+      <listitem>
+        <para>
+          <emphasis>ActionScript</emphasis>, or "AS", is the scripting 
+          language for <emphasis>Flash</emphasis>
+          applications.  It is compiled to bytecode, which is a subset of
+          the <emphasis>SWF</emphasis> format.
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        AMF
+      </term>
+      <listitem>
+        <para>
+          <emphasis>AMF</emphasis> 
+          is the object format used by <emphasis>Flash</emphasis> 
+          for shared objects and streaming video.
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        DocBook
+      </term>
+      <listitem>
+        <para>
+          <emphasis>DocBook</emphasis>
+           is a markup language for presentation-neutral 
+          documentation, such as manuals.
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        Doxygen
+      </term>
+      <listitem>
+        <para>
+          <emphasis>Doxygen</emphasis> 
+          is a documentation generator for for multiple languages 
+          which uses comments in the source code to create stand-alone 
+          documentation. 
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        extensions
+      </term>
+      <listitem>
+        <para>
+          A &app; <emphasis>extension</emphasis> is a plugin (not
+          a browser plugin) which
+          implements additional 
+          functionality beyond what is covered by 
+          <emphasis>Flash</emphasis> specification. 
+          These are shared libraries which are loaded at runtime.
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        Flash
+      </term>
+      <listitem>
+        <para>
+          The term <emphasis>Flash</emphasis> is used to describe both the 
+          Adobe IDE for creating <emphasis>SWF</emphasis>
+           files, and the technology itself.  
+          &app; documentation uses the latter definition.
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        GUI
+      </term>
+      <listitem>
+        <para>
+          A <emphasis>GUI</emphasis> is a 
+          "graphical user interface". In &app;, the GUI 
+          library provides a wrapper for mouse and keyboard events, 
+          menus, windowing (where available) and a drawing area. 
+          You must choose a GUI library during the
+          <link linkend="configure">configuration</link> stage.
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        Klash
+      </term>
+      <listitem>
+        <para>
+          <emphasis>Klash</emphasis> was the name given to the stand-alone 
+          instance of &app; which used the KDE GUI.  It has been replaced with 
+          an implementation using Qt.  Some documentation may incorrectly
+          refer to the Konqueror plugin as <emphasis>Klash</emphasis>.
+          The plugin was renamed <emphasis>Kpart</emphasis>.
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        Kpart
+      </term>
+      <listitem>
+        <para>
+          <emphasis>Kpart</emphasis> is a plugin for Konqueror which is
+          enabled with the <link linkend="features">configuration option</link>
+          <emphasis>--enable-klash</emphasis>.
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        Mesa
+      </term>
+      <listitem>
+        <para>
+          <emphasis>Mesa</emphasis> is the free software OpenGL 
+          implementation.  &app; documentation will sometimes use the
+          terms 'OpenGL' and 'Mesa' interchangeably.
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        plugin
+      </term>
+      <listitem>
+        <para>
+          The term <emphasis>plugin</emphasis> is used in &app; to
+          refer to both any &app; browser plugin, as well as the Firefox
+          plugin specifically.  The Konqueror plugin is called
+          <emphasis>Kpart</emphasis>.  Sometimes, the term is used in
+          an even more generic sense to refer to 
+          <emphasis>extensions</emphasis>.
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        renderer
+      </term>
+      <listitem>
+        <para>
+          The <emphasis>renderer</emphasis> is the subsystem of &app;
+          which renders content.  Only one renderer may be used; it is
+          chosen during <link linkend="configure">configuration</link>.
+        </para>
+        <para>
+          Available renderers are: AGG, OpenGL, and Cairo. In terms of 
+          feature completeness, AGG comes first; followed by OpenGL and 
+          then Cairo. In most cases, AGG is preferred for performance, 
+          except cases where it is beneficial to have hardware accelerated 
+          rendering (for example, when you have a very slow CPU but a very 
+          fast graphics card). In this case OpenGL should be used.
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        sound handler
+      </term>
+      <listitem>
+        <para>
+          The <emphasis>sound handler</emphasis> is the part of &app;
+          which handles both event sounds and streaming sound.  Audio
+          from external sources are also handled through the sound handler
+          when SDL is used.  The sound handler must be selected during
+          <link linkend="configure">configuration</link>.
+        </para>
+        <para>
+          There are currently two sound handlers available in &app;:
+          SDL and Gstreamer.  The SDL sound handler uses ffmpeg or 
+          libmad for decoding mp3-audio, although it can be built without 
+          mp3-support. The Gstreamer-sound handler uses the available 
+          plugins to decode the audio, so it might not work if some 
+          important plugins are missing.  The SDL sound handler is 
+          recommended.  
+        </para>
+      </listitem>
+    </varlistentry>
+
+    <varlistentry>
+      <term>
+        SWF
+      </term>
+      <listitem>
+        <para>
+          <emphasis>SWF</emphasis> is the file format for 
+          <emphasis>Flash</emphasis> movies.
+        </para>
+      </listitem>
+    </varlistentry>
+
+  </variablelist></para>
+</sect1>
+    
