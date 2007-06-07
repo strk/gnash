@@ -1,3 +1,8 @@
+2007-06-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/edit_text_character.cpp: shift text by 2 pixels, 
+	  fixes bug #17954
+
 2007-06-07 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/sprite_instance.cpp: improved call_frame_actions(), 

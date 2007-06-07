@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.62 2007/04/26 10:56:50 zoulunkai Exp $ */
+/* $Id: edit_text_character.cpp,v 1.63 2007/06/07 09:20:44 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -451,10 +451,19 @@ edit_text_character::display()
 	// m_x_offset and m_y_offset memebers in glyph records.
 	// Anyway, see bug #17954 for a testcase.
 	matrix m;
+
 	if ( ! def_bounds.is_null() && ! def_bounds.is_world() )
 	{
-		m.set_translation(def_bounds.get_x_min(), def_bounds.get_y_min());
+		m.concatenate_translation(def_bounds.get_x_min(), def_bounds.get_y_min());
 	}
+	
+	// Shift by two additional pixels. I absolutely dislike this hack because
+	// it's based on empirical tests. I checked with various files (including
+	// various text format styles) and it seems to be work fine, though.
+	// Maybe it's really some hard-coded border in Flash.
+	// See bug #17954 for more info.
+	m.concatenate_translation(2*20.0, 2*20.0);
+	
 	display_glyph_records(m, this, m_text_glyph_records,
 			      m_def->get_root_def());
 
@@ -965,7 +974,7 @@ edit_text_character::format_text()
 
 	float	x = rec.m_style.m_x_offset;
 	float	y = rec.m_style.m_y_offset;
-
+	
 
 	// Start the bbox at the upper-left corner of the first glyph.
 	reset_bounding_box(x, y - _font->get_descent() * scale + m_def->get_font_height());
