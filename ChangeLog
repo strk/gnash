@@ -1,3 +1,10 @@
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/MovieTester.{cpp,h}: add a canTestVideo() method.
+	* testsuite/misc-ming.all/NetStream-SquareTestRunner.cpp: don't
+	  wait for Play.Stop event to be sent if video can't be tested
+	  (ie: not supported by mad).
+
 2007-06-07 Ann Barcomb <kudra@domaintje.com>
 
 	* doc/C/usermanual/installation/building.xml: mention that

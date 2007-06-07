@@ -46,6 +46,12 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
+	if ( ! tester.canTestVideo() )
+	{
+		cout << "UNTESTED: NetStream video (not supported by this build)." << endl;
+		return EXIT_SUCCESS;
+	}
+
 	// On NetStatus.Play.Stop we jump to last frame and stop,
 	// so this loop is about equivalent to running a
 	// generic self-contained test.

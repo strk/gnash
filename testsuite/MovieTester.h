@@ -236,6 +236,9 @@ public:
 	///
 	bool canTestRendering() const { return ! _testingRenderers.empty(); }
 
+	/// Return true if this build of gnash supports video
+	bool canTestVideo() const;
+
 private:
 
 	/// Initialize testing renderers

@@ -448,9 +448,23 @@ MovieTester::addTestingRenderer(std::auto_ptr<render_handler> h, const std::stri
 	set_render_handler(&(_testingRenderers.back()->getRenderer()));
 }
 
+bool
+MovieTester::canTestVideo() const
+{
+	if ( ! canTestSound() ) return false;
+
+#ifdef USE_MAD
+	// mad doesn't support video !
+	return false;
+#endif
+
+	return true;
+}
+
 void
 MovieTester::initTestingSoundHandlers()
 {
+
 #ifdef SOUND_SDL
 	cout << "Creating SDL sound handler" << endl;
         _sound_handler.reset( gnash::create_sound_handler_sdl() );
