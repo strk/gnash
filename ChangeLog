@@ -1,4 +1,4 @@
-2007-06-06 Sandro Santilli <strk@keybit.net>
+2007-06-07 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/MovieTester.cpp (checkPixel): print an UNTESTED
 	  message if no renderers were initialized. This gives you
