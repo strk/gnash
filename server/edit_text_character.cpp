@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.63 2007/06/07 09:20:44 udog Exp $ */
+/* $Id: edit_text_character.cpp,v 1.64 2007/06/07 11:59:56 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,6 +41,10 @@
 #include <algorithm>
 #include <string>
 #include <boost/algorithm/string/case_conv.hpp>
+
+// Text fields have a fixed 2 pixel padding for each side (regardless of border)
+#define PADDING_TWIPS 40.0f
+
 
 namespace gnash {
 
@@ -457,12 +461,6 @@ edit_text_character::display()
 		m.concatenate_translation(def_bounds.get_x_min(), def_bounds.get_y_min());
 	}
 	
-	// Shift by two additional pixels. I absolutely dislike this hack because
-	// it's based on empirical tests. I checked with various files (including
-	// various text format styles) and it seems to be work fine, though.
-	// Maybe it's really some hard-coded border in Flash.
-	// See bug #17954 for more info.
-	m.concatenate_translation(2*20.0, 2*20.0);
 	
 	display_glyph_records(m, this, m_text_glyph_records,
 			      m_def->get_root_def());
@@ -837,10 +835,6 @@ edit_text_character::get_member(const std::string& name, as_value* val)
 	return get_member_default(name, val);
 }
 	
-// @@ WIDTH_FUDGE is a total fudge to make it match the Flash player!  Maybe
-// we have a bug?
-#define WIDTH_FUDGE 80.0f
-
 
 float
 edit_text_character::align_line(
@@ -851,7 +845,7 @@ edit_text_character::align_line(
 	assert(m_def);
 
 	float	extra_space = (m_def->width() -
-			m_def->get_right_margin()) - x - WIDTH_FUDGE;
+			m_def->get_right_margin()) - x - PADDING_TWIPS;
 
 	//assert(extra_space >= 0.0f);
 	if (extra_space <= 0.0f)
@@ -965,8 +959,8 @@ edit_text_character::format_text()
 	text_glyph_record	rec;	// one to work on
 	rec.m_style.m_font = _font;
 	rec.m_style.m_color = m_def->get_text_color();
-	rec.m_style.m_x_offset = std::max(0, m_def->get_left_margin() + m_def->get_indent());
-	rec.m_style.m_y_offset = m_def->get_font_height()
+	rec.m_style.m_x_offset = PADDING_TWIPS + std::max(0, m_def->get_left_margin() + m_def->get_indent());
+	rec.m_style.m_y_offset = PADDING_TWIPS + m_def->get_font_height()
 		+ (_font->get_leading() - _font->get_descent()) * scale;
 	rec.m_style.m_text_height = m_def->get_font_height();
 	rec.m_style.m_has_x_offset = true;
@@ -1027,7 +1021,8 @@ edit_text_character::format_text()
 			align_line(m_def->get_alignment(), last_line_start_record, x);
 
 			// new paragraphs get the indent.
-			x = std::max(0, m_def->get_left_margin() + m_def->get_indent());
+			x = std::max(0, m_def->get_left_margin() + m_def->get_indent()) + 
+			  PADDING_TWIPS;
 			y += m_def->get_font_height() + leading;
 
 			// Start a new record on the next line.
@@ -1141,7 +1136,7 @@ edit_text_character::format_text()
 		
 after_x_advance:
 
-		if (x >= m_def->width() - m_def->get_right_margin() - WIDTH_FUDGE)
+		if (x >= m_def->width() - m_def->get_right_margin() - PADDING_TWIPS)
 		{
 			// Whoops, we just exceeded the box width. 
 			// Do word-wrap if requested to do so.
@@ -1161,8 +1156,7 @@ after_x_advance:
 			// Close out this stretch of glyphs.
 			m_text_glyph_records.push_back(rec);
 			float	previous_x = x;
-
-			x = m_def->get_left_margin();
+			x = m_def->get_left_margin() + PADDING_TWIPS;
 			y += m_def->get_font_height() + leading;
 
 			// Start a new record on the next line.

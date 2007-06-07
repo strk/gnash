@@ -1,5 +1,10 @@
 2007-06-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
+	* server/edit_text_character.cpp: better version of previous patch;
+	  gets rid of WIDTH_FUDGE too 	
+
+2007-06-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
 	* server/edit_text_character.cpp: shift text by 2 pixels, 
 	  fixes bug #17954
 
