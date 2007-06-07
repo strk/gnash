@@ -222,6 +222,7 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 		}
 	}
 
+	av_free(frame);
 	ret_image->update(decodedFrame->m_data);
 	return ret_image;
 }

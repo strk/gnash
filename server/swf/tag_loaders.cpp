@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.112 2007/06/06 17:49:01 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.113 2007/06/07 22:13:47 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1311,6 +1311,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	// Uncompress the ADPCM before handing data to host.
 	unsigned sample_count = data_bytes / (stereo ? 4 : 2);
 	adpcm_expand(data, in, sample_count, stereo);
+	data_bytes = sample_count * (stereo ? 4 : 2) * (sample_16bit ? 2 : 1);
 	format = sound_handler::FORMAT_NATIVE16;
 	break;
       }
@@ -1326,6 +1327,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	    // Allocate as many shorts as there are samples
 	    unsigned sample_count = data_bytes / (stereo ? 2 : 1);
 	    u8_expand(data, in, sample_count, stereo);
+		data_bytes = sample_count * (stereo ? 4 : 2) * 2;
 	}
 	format = sound_handler::FORMAT_NATIVE16;
 	break;
@@ -1339,6 +1341,8 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	    // Allocate as many shorts as there are 8-bit samples
 	    unsigned sample_count = data_bytes / (stereo ? 2 : 1);
 	    u8_expand(data, in, sample_count, stereo);
+		data_bytes = sample_count * (stereo ? 4 : 2) * 2;
+
 	} else {
 	    // Read 16-bit data into buffer
 	    data = new unsigned char[data_bytes];
