@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.113 2007/05/24 20:10:42 strk Exp $
+# $Id: Makefile.am,v 1.114 2007/06/07 13:11:33 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -160,6 +160,7 @@ noinst_HEADERS = \
 
 libgnashserver_la_LIBADD = \
 	$(top_builddir)/libbase/libgnashbase.la \
+	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/asobj/libgnashasobjs.la \
 	$(top_builddir)/server/parser/libgnashparser.la \
 	$(top_builddir)/server/vm/libgnashvm.la \
