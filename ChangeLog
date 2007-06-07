@@ -1,5 +1,6 @@
 2007-06-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/anaylse-results.sh: print untested in report.
 	* testsuite/MovieTester.h: add a canTestRendering() method.
 	* testsuite/misc-ming.all/Video-EmbedSquareTestRunner.cpp: 
 	  Don't run the pixel checking part if MovieTester can't test

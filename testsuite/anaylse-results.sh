@@ -31,6 +31,7 @@ for dir in `find . -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
     noxfail=`grep -c "^XFAIL: " ${dir}/testrun.sum`
     noxpass=`grep -c "^XPASS: " ${dir}/testrun.sum`
     nounresolved=`grep -c "^UNRESOLVED: " ${dir}/testrun.sum`
+    nountested=`grep -c "^UNTESTED: " ${dir}/testrun.sum`
     echo -n "Test suite $dir: "
     if test $nofail -gt 0; then
 	echo -n " $nofail real failures"
@@ -60,6 +61,14 @@ for dir in `find . -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
 	fi
 	total_unresolved=`expr ${total_unresolved} + ${nounresolved}`
     fi
+    if test ${nountested} -gt 0; then
+	if test $nofail -gt 0 -o $nopass -gt 0 -o $noxfail -gt 0 -o $nounresolved -gt 0; then
+	    echo -n ", ${nountested} untested"
+	else
+	    echo -n "${nountested} untested"
+	fi
+	total_untested=`expr ${total_untested} + ${nountested}`
+    fi
     echo
 done
 
@@ -76,6 +85,9 @@ if test ${total_unresolved} -gt 0; then
 fi
 if test ${total_xfail} -gt 0; then
     echo "	Total expected failures: ${total_xfail}"
+fi
+if test ${total_untested} -gt 0; then
+    echo "	Total untested: ${total_untested}"
 fi
 
 echo
