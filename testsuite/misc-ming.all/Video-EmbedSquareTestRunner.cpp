@@ -46,6 +46,12 @@ main(int /*argc*/, char** /*argv*/)
 	sprite_instance* root = tester.getRootMovie();
 	assert(root);
 
+	if ( ! tester.canTestRendering() )
+	{
+		cout << "UNTESTED: rendering can't be tested with this build." << endl;
+		return EXIT_SUCCESS; // so testing doesn't abort
+	} 
+
 	rgba red(255,0,0,255);
 	rgba yellow(255,255,0,255);
 

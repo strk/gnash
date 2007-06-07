@@ -228,6 +228,14 @@ public:
 	///
 	bool canTestSound() const { return _sound_handler.get() != NULL; }
 
+	/// Return true if this build of MovieTester supports pixel checking 
+	//
+	/// Pixel checking will be supported as long as a testing-capable render handler
+	/// was compiled in. Testing-capable means capable of off-screen rendering, which
+	/// is implementing the render_handler::initTestBuffer method.
+	///
+	bool canTestRendering() const { return ! _testingRenderers.empty(); }
+
 private:
 
 	/// Initialize testing renderers
