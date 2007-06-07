@@ -1,3 +1,8 @@
+2007-06-07 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/sprite_instance.cpp: improved call_frame_actions(), 
+	  avoid using possibly invalidated interators.
+	
 2007-06-06 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loader.cpp (fixme_loader): warn only once for each

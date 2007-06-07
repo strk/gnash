@@ -1981,20 +1981,18 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 		}
 	}
 
-	// Execute any new actions triggered by the tag,
-	// leaving existing actions to be executed.
+	//
+	// exetract target frame actions and execute them
+	//
 	ActionList::iterator it = m_action_list.begin();
-	for(size_t i =0; i<original_size; i++)
-	{
-		it++;
-	}
-	ActionList::iterator previous_end = it;
-	while (it != m_action_list.end())
-	{
-		execute_action(*(*it));
-		++it;
-	}
-	m_action_list.erase(previous_end, m_action_list.end());
+	for(size_t i =0; i<original_size; i++) { it++; }
+	ActionList::iterator original_end = it;
+	
+	ActionList frame_actions(original_end, m_action_list.end());
+	// erase the target frame actions from the orignal list
+	m_action_list.erase(original_end, m_action_list.end());
+	// Note: this function may invalidate the iterators above
+	execute_actions(frame_actions);
 
 	assert(m_action_list.size() == original_size);
 }
