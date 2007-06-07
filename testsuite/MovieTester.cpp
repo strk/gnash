@@ -222,6 +222,13 @@ void
 MovieTester::checkPixel(int x, int y, unsigned radius, const rgba& color,
 		short unsigned tolerance, const std::string& label, bool expectFailure) const
 {
+	if ( ! canTestRendering() )
+	{
+		std::stringstream ss;
+	        ss << "exp:" << color.toShortString() << " ";
+		log_msg("UNTESTED: NORENDERER: pix:%d,%d %s %s", x,  y, ss.str().c_str(), label.c_str());
+	}
+
 	FuzzyPixel exp(color, tolerance);
 	const char* X="";
 	if ( expectFailure ) X="X";

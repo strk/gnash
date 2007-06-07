@@ -1,5 +1,9 @@
 2007-06-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/MovieTester.cpp (checkPixel): print an UNTESTED
+	  message if no renderers were initialized. This gives you
+	  a feel about how many tests are we failign to run when building
+	  with a renderer that doesn't provide testing facilities.
 	* testsuite/anaylse-results.sh: print untested in report.
 	* testsuite/MovieTester.h: add a canTestRendering() method.
 	* testsuite/misc-ming.all/Video-EmbedSquareTestRunner.cpp: 
