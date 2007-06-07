@@ -1,5 +1,14 @@
 2007-06-07 Sandro Santilli <strk@keybit.net>
 
+	* server/Makefile.am, utilities/Makefile.am:
+	  Moved the libgnashbackend dependency out of libgnashserver
+	  and into the utilities/ dir. This is to avoid a circular
+	  dependency I erroneously introduced with my last 
+	  commit aimed at fixing bug #20110. This should be a better
+	  fix.
+
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/MovieTester.{cpp,h}: add a canTestVideo() method.
 	* testsuite/misc-ming.all/NetStream-SquareTestRunner.cpp: don't
 	  wait for Play.Stop event to be sent if video can't be tested
