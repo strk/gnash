@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.21 2007/05/28 15:41:02 ann Exp $
+// $Id: snappingrange.h,v 1.22 2007/06/07 12:24:34 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -94,12 +94,20 @@ public:
 	/// Templated copy constructor, for casting between range types
 	template <typename U>
 	SnappingRanges2d(const SnappingRanges2d<U>& from)
+		:
+		snap_distance(T(from.snap_distance)), // does it make sense ?
+		single_mode(from.single_mode),
+		_combine_counter(0)
 	{
 		if ( from.isWorld() ) {
 			setWorld();
 		} else if ( from.isNull() ) {
 			setNull();
 		} else {
+			// TODO: can we safely assume that the 'from' parameter was
+			//       finalized ?
+			// from.finalize(); // can't call finalize, it's private !!
+
 			// TODO: use visitor pattern !
 			unsigned rcount = from.size();
 			for (unsigned int rno=0; rno<rcount; rno++)
@@ -282,7 +290,7 @@ public:
 		_ranges[0].setWorld();
 	}
 	
-	/// Returns true, wenn the ranges equal world range
+	/// Returns true, when the ranges equal world range
 	bool isWorld() const {
 		return ( (size()==1) && (_ranges.front().isWorld()) );
 	}

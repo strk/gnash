@@ -1,3 +1,8 @@
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
+	* libgeometry/snappingrange.h: initialize all members in the
+	  templated copy ctor.
+
 2007-06-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler.cpp: Fixed a warning.
