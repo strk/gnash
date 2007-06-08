@@ -1,3 +1,8 @@
+2007-06-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/embedVideoDecoderFfmpeg.{cpp,h}: Store decodedFrame
+	  in an auto_ptr to avoid possible leaks.
+
 2007-06-08 Sandro Santilli <strk@keybit.net>
 
 	* server/FreetypeRasterizer.{cpp,h}: Ported truetype

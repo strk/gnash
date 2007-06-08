@@ -44,8 +44,6 @@ embedVideoDecoderFfmpeg::~embedVideoDecoderFfmpeg()
 {
 	if (cc) avcodec_close(cc);
 
-	delete decodedFrame;
-
 }
 
 void
@@ -89,9 +87,9 @@ embedVideoDecoderFfmpeg::createDecoder(int widthi, int heighti, int deblockingi,
 
 	// Determine required buffer size and allocate buffer
 	if (outputFormat == YUV) {
-		decodedFrame = new image::yuv(width, height);
+		decodedFrame.reset(new image::yuv(width, height));
 	} else if (outputFormat == RGB) {
-		decodedFrame = new image::rgb(width, height);
+		decodedFrame.reset(new image::rgb(width, height));
 	}
 }
 
@@ -177,15 +175,14 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 	// If the size of the video frame changed, adjust.
 	// This could happen if the decoded video frame is
 	// bigger than the defined SWF videoframe.
-	if (cc->width != width || cc->height != height) {
+	if (static_cast<uint32_t>(cc->width) != width || static_cast<uint32_t>(cc->height) != height) {
 		width = cc->width;
 		height = cc->height;
-		delete decodedFrame;
 		if (outputFormat == YUV) {
-			decodedFrame = new image::yuv(width, height);
+			decodedFrame.reset(new image::yuv(width, height));
 			ret_image.reset(new image::yuv(width, height));
 		} else if (outputFormat == RGB) {
-			decodedFrame = new image::rgb(width, height);
+			decodedFrame.reset(new image::rgb(width, height));
 			ret_image.reset(new image::rgb(width, height));
 		}
 	}
@@ -208,7 +205,7 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 		}
 
 		if (outputFormat == YUV) {
-			image::yuv* yuvframe = static_cast<image::yuv*>(decodedFrame);
+			image::yuv* yuvframe = static_cast<image::yuv*>(decodedFrame.get());
 			int copied = 0;
 			uint8_t* ptr = yuvframe->m_data;
 			for (int i = 0; i < 3 ; i++)

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderFfmpeg.h,v 1.5 2007/06/06 15:41:12 tgc Exp $
+// $Id: embedVideoDecoderFfmpeg.h,v 1.6 2007/06/08 21:58:06 tgc Exp $
 
 #ifndef __EMBEDVIDEODECODERFFMPEG_H__
 #define __EMBEDVIDEODECODERFFMPEG_H__
@@ -76,7 +76,7 @@ private:
 	int outputFormat;
 
 	/// Last decoded frame
-	image::image_base* decodedFrame;
+	std::auto_ptr<image::image_base> decodedFrame;
 
 };
 
