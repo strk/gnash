@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.68 2007/05/31 16:42:06 strk Exp $
+// $Id: sound_handler_sdl.cpp,v 1.69 2007/06/08 11:38:17 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -155,7 +155,7 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 	// @@ does a negative handle_id have any meaning ?
 	//    should we change it to unsigned instead ?
 	if (handle_id < 0 || (unsigned int) handle_id+1 > m_sound_data.size()) {
-		return 1;
+		return -1;
 	}
 	int start_size = 0;
 	sound_data* sounddata = m_sound_data[handle_id];
@@ -187,11 +187,10 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 		sounddata->data_size += adjusted_size;
 		std::vector<active_sound*> asounds = sounddata->m_active_sounds;
 
+		// If playback has already started, we also update the active sounds
 		for(uint32_t i=0; i < asounds.size(); i++) {
 			active_sound* sound = asounds[i];
-			sound->set_data(sounddata->data);
-			sound->data_size = sounddata->data_size;
-			sound->position = sounddata->data_size;
+			sound->raw_data_size = sounddata->data_size;
 			sound->set_raw_data(sounddata->data);
 		}
 	    }
@@ -312,7 +311,8 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 		sound->raw_data_size = sounddata->data_size;
 		sound->set_raw_data(sounddata->data);
 		sound->raw_position = 0;
-		sound->position = sounddata->data_size;
+		sound->position = 0;
+		sound->data_size = 0;
 
 	}
 
@@ -766,6 +766,19 @@ sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 
 				}
 
+				// If this isn't MP3 (which means its NATIVE16) there is nothing to decode,
+				// reusing the available data is the only option.
+				if (sounddata->format != 2) {
+					if (index < buffer_length) {
+						sound->loop_count--;
+						sound->raw_position = 0;
+						unsigned int mix_length = ((buffer_length - index) > sound->raw_data_size ? sound->raw_data_size : (buffer_length - index));
+						do_mixing(stream+index, sound, sound->get_raw_data_ptr(sound->raw_position), 
+							mix_length, sounddata->volume);
+					}
+					continue;
+				}
+				
 				// Then we decode some data
 				// We loop until the size of the decoded sound is greater than the buffer size,
 				// or there is no more to decode.

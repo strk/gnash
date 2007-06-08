@@ -1,3 +1,8 @@
+2007-06-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Fixed an assertion fault
+	  when non-mp3 audio was looping.
+
 2007-06-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/embedVideoDecoderFfmpeg.cpp: Free the av_frame after use.
