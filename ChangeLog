@@ -4,6 +4,9 @@
 	  loop/thread until the queues are empty, or the media left
 	  in the queues wont get played.
 	* server/movie_root.cpp: Include action.h, not Action.h.
+	* libbase/embedVideoDecoderFfmpeg.cpp: Changed the image copying,
+	  and check if the decoded videoframe is bigger than expected.
+
 
 2007-06-08 Zou Lunkai <zoulunkai@gmail.com>
 

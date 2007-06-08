@@ -174,6 +174,22 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 	int got = 0;
 	avcodec_decode_video(cc, frame, &got, data, size);
 
+	// If the size of the video frame changed, adjust.
+	// This could happen if the decoded video frame is
+	// bigger than the defined SWF videoframe.
+	if (cc->width != width || cc->height != height) {
+		width = cc->width;
+		height = cc->height;
+		delete decodedFrame;
+		if (outputFormat == YUV) {
+			decodedFrame = new image::yuv(width, height);
+			ret_image.reset(new image::yuv(width, height));
+		} else if (outputFormat == RGB) {
+			decodedFrame = new image::rgb(width, height);
+			ret_image.reset(new image::rgb(width, height));
+		}
+	}
+	
 	if (got) {
 		boost::scoped_array<uint8_t> buffer;
 
@@ -212,13 +228,18 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 			}
 			yuvframe->m_size = copied;
 		} else if (outputFormat == RGB) {
-			for(int line = 0; line < cc->height; line++)
-			{
-				for(int byte = 0; byte < (cc->width*3); byte++)
-				{
-					decodedFrame->m_data[byte + (line*cc->width*3)] = (unsigned char) *(frame->data[0]+(line*frame->linesize[0])+byte);
-				}
+
+			uint8_t* srcptr = frame->data[0];
+			uint8_t* srcend = frame->data[0] + frame->linesize[0] * cc->height;
+			uint8_t* dstptr = decodedFrame->m_data;
+			unsigned int srcwidth = cc->width * 3;
+
+			while (srcptr < srcend) {
+				memcpy(dstptr, srcptr, srcwidth);
+				srcptr += frame->linesize[0];
+				dstptr += srcwidth;
 			}
+
 		}
 	}
 
