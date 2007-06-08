@@ -3,6 +3,7 @@
 	* server/asobj/NetStreamFfmpeg.cpp: Don't leave the decoding
 	  loop/thread until the queues are empty, or the media left
 	  in the queues wont get played.
+	* server/movie_root.cpp: Include action.h, not Action.h.
 
 2007-06-08 Zou Lunkai <zoulunkai@gmail.com>
 
