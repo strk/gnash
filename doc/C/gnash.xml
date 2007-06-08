@@ -6,7 +6,7 @@
     <!ENTITY fdl-app SYSTEM "fdl-appendix.xml">
     <!ENTITY appversion "0.8.0">
     <!ENTITY manrevision "0.4.0">
-    <!ENTITY date "May 2007">
+    <!ENTITY date "June 2007">
     <!ENTITY app "<application>Gnash</application>">
     <!ENTITY appname "Gnash">
 
