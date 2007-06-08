@@ -1,3 +1,11 @@
+2007-06-08 Sandro Santilli <strk@keybit.net>
+
+	* libbase/embedVideoDecoderGst.{cpp,h}: Store decodedFrame
+	  in an auto_ptr to avoid leaks. Fix the case in which
+	  there's NO decoded frame (ie: no gst-ffmpeg installed)
+	  previously segfaulting by simply running
+	  Video-EmbedSquareTestRunner.
+
 2007-06-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/asobj/NetStreamFfmpeg.cpp: Don't leave the decoding

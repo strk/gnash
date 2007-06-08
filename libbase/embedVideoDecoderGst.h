@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderGst.h,v 1.3 2007/06/06 15:41:12 tgc Exp $
+// $Id: embedVideoDecoderGst.h,v 1.4 2007/06/08 21:10:43 strk Exp $
 
 #ifndef __EMBEDVIDEODECODERGST_H__
 #define __EMBEDVIDEODECODERGST_H__
@@ -90,7 +90,7 @@ private:
 	int frameSize;
 	
 	/// Last decoded frame
-	image::image_base* decodedFrame;
+	std::auto_ptr<image::image_base> decodedFrame;
 
 	/// If we should stop this will be true
 	volatile bool stop;

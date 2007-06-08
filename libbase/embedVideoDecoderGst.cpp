@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderGst.cpp,v 1.6 2007/06/07 12:10:21 tgc Exp $
+// $Id: embedVideoDecoderGst.cpp,v 1.7 2007/06/08 21:10:43 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,7 +43,6 @@ embedVideoDecoderGst::embedVideoDecoderGst() :
 
 embedVideoDecoderGst::~embedVideoDecoderGst()
 {
-	delete decodedFrame;
 
 	if (pipeline) {
 		stop = true;
@@ -161,9 +160,9 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 
 	// Determine required buffer size and allocate buffer
 	if (outputFormat == YUV) {
-		decodedFrame = new image::yuv(width, height);
+		decodedFrame.reset(new image::yuv(width, height));
 	} else if (outputFormat == RGB) {
-		decodedFrame = new image::rgb(width, height);
+		decodedFrame.reset(new image::rgb(width, height));
 	}
 
 	// Start "playing"
@@ -189,7 +188,15 @@ embedVideoDecoderGst::decodeFrame(uint8_t* data, int size)
 
 	// If there is nothing to decode in the new frame
 	// we just return the lastest.
-	if (data == NULL || size == 0 || !decoder) {
+	if (data == NULL || size == 0 || !decoder)
+	{
+		// If we never decoded any frame return a NULL
+		// auto pointer ..
+		if ( ! decodedFrame.get() )
+		{
+			ret_image.reset(NULL);
+			return ret_image;
+		}
 		ret_image->update(decodedFrame->m_data);
 		return ret_image;
 	}
@@ -201,6 +208,13 @@ embedVideoDecoderGst::decodeFrame(uint8_t* data, int size)
 
 	output_lock = new boost::mutex::scoped_lock(output_mutex);
 
+	// If we never decoded any frame return a NULL
+	// auto pointer ..
+	if ( ! decodedFrame.get() )
+	{
+		ret_image.reset(NULL);
+		return ret_image;
+	}
 	ret_image->update(decodedFrame->m_data);
 
 	return ret_image;
@@ -229,7 +243,8 @@ embedVideoDecoderGst::callback_output (GstElement * /*c*/, GstBuffer *buffer, Gs
 
 	if (decoder->stop) return;
 
-	if (decoder->decodedFrame) {
+	if (decoder->decodedFrame.get())
+	{
 
 		if (decoder->outputFormat == YUV) {
 			assert(0);
