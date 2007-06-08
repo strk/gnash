@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.80 2007/05/28 15:41:05 ann Exp $ */
+/* $Id: character.h,v 1.81 2007/06/08 12:11:50 zoulunkai Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -158,7 +158,7 @@ protected:
 	{
 	    return _event_handlers;
 	}
-
+#ifndef NEW_KEY_LISTENER_LIST_DESIGN
 	/// Return a user defined event handler, if any
 	//
 	/// @param name
@@ -171,7 +171,7 @@ protected:
 	///	casts to an as_function. A NULL pointer otherwise.
 	///
 	boost::intrusive_ptr<as_function> getUserDefinedEventHandler(const std::string& name) const;
-	
+#endif	
 	void set_event_handlers(const Events& copyfrom);
 
 	/// Used to assign a name to unnamed instances
@@ -999,7 +999,10 @@ public: // istn't this 'public' reduntant ?
 	
   // override from as_object
 	virtual std::string get_text_value() const;	
-	
+
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+	boost::intrusive_ptr<as_function> getUserDefinedEventHandler(const std::string& name) const;
+#endif
 };
 
 

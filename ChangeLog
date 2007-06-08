@@ -1,3 +1,12 @@
+2007-06-08 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/as_object.{h,cpp}: add a virtual on_event() for event handler. 
+	* movie_root.{h,cpp}: add a new KeyListener class.
+	* server/asobj/Key.{h ,cpp}, sprite_instance.cpp, edit_text_character.cpp,
+	  button_character_instance.cpp: adopt new KeyListener interface.
+	* server/character.h: change getUserDefinedEventHandler() from private to public.
+	  all in all, merged two listener lists into one.
+	  
 2007-06-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp: Fixed an assertion fault

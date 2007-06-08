@@ -177,6 +177,19 @@ key_as_object::notify_listeners(const event_id key_event_type)
     }
 }
 
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+void
+key_as_object::add_listener(const KeyListener& listener)
+{
+	_vm.getRoot().add_key_listener(listener);
+}
+
+void
+key_as_object::remove_listener(const KeyListener& listener)
+{
+	_vm.getRoot().remove_key_listener(listener);
+}
+#else
 void
 key_as_object::add_listener(boost::intrusive_ptr<as_object> listener)
 {
@@ -209,14 +222,36 @@ key_as_object::remove_listener(boost::intrusive_ptr<as_object> listener)
 		iter++;
 	}
 }
-
+#endif
 int
 key_as_object::get_last_key_pressed() const
 {
 	return m_last_key_pressed;
 }
 
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+as_value
+key_add_listener(const fn_call& fn)
+{
+    if (fn.nargs < 1)
+	{
+	    log_error(_("key_add_listener needs one argument (the listener object)"));
+	    return as_value();
+	}
 
+    boost::intrusive_ptr<as_object> toadd = fn.arg(0).to_object();
+    if (toadd == NULL)
+	{
+	    log_error(_("key_add_listener passed a NULL object; ignored"));
+	    return as_value();
+	}
+
+    boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
+
+    ko->add_listener(KeyListener(toadd, true));
+    return as_value();
+}
+#else
 as_value
 key_add_listener(const fn_call& fn)
 {
@@ -238,7 +273,7 @@ key_add_listener(const fn_call& fn)
     ko->add_listener(listener);
     return as_value();
 }
-
+#endif
 as_value	key_get_ascii(const fn_call& fn)
 // Return the ascii value of the last key pressed.
 /// FIXME: return the ascii number(not string) of the last pressed key!
@@ -289,7 +324,30 @@ as_value	key_is_toggled(const fn_call& /* fn */)
     // @@ TODO
     return as_value(false);
 }
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+as_value	
+key_remove_listener(const fn_call& fn)
+// Remove a previously-added listener.
+{
+    if (fn.nargs < 1)
+	{
+	    log_error(_("key_remove_listener needs one argument (the listener object)"));
+	    return as_value();
+	}
 
+    boost::intrusive_ptr<as_object> toremove = fn.arg(0).to_object();
+    if (toremove == NULL)
+	{
+	    log_error(_("key_remove_listener passed a NULL object; ignored"));
+	    return as_value();
+	}
+
+    boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr); 
+
+    ko->remove_listener(KeyListener(toremove));
+    return as_value();
+}
+#else
 as_value	key_remove_listener(const fn_call& fn)
     // Remove a previously-added listener.
 {
@@ -311,7 +369,7 @@ as_value	key_remove_listener(const fn_call& fn)
     ko->remove_listener(listener);
     return as_value();
 }
-
+#endif
 void key_class_init(as_object& global)
 {
 

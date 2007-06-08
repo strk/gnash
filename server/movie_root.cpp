@@ -30,7 +30,9 @@
 #include "tu_random.h"
 #include "ExecutableCode.h"
 #include "Stage.h"
-
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+  #include "Action.h"
+#endif
 #include <iostream>
 #include <string>
 #include <typeinfo>
@@ -217,7 +219,8 @@ movie_root::notify_key_event(key::code k, bool down)
 
 	// Notify character key listeners.
 	notify_key_listeners(k, down);
-	
+
+#ifndef NEW_KEY_LISTENER_LIST_DESIGN
 	// Notify both character and non-character Key listeners
 	//	for user defined handerlers.
 	// FIXME: this may violates the event order
@@ -231,7 +234,7 @@ movie_root::notify_key_event(key::code k, bool down)
 		else
 			global_key->notify_listeners(event_id::KEY_UP);
 	}
-	
+#endif	
 	processActionQueue();
 
 	return false; // should return true if needs update ...
@@ -569,12 +572,12 @@ movie_root::advance(float delta_time)
 			timer();
 		}
 	}
-
+#ifndef NEW_KEY_LISTENER_LIST_DESIGN
 	// Cleanup key listeners (remove unloaded characters)
 	// FIXME: not all key listeners could be cleaned here!
 	// (eg. characters unloaded by loop-back won't be cleared until next advancement)
 	cleanup_key_listeners();
-
+#endif
 	// random should go continuously that:
 	// 1. after restart of the player the situation has not repeated
 	// 2. by different machines the random gave different numbers
@@ -595,7 +598,9 @@ movie_root::advance(float delta_time)
 	boost::intrusive_ptr<sprite_instance> keepMovieAlive(_movie.get());
 
 	_movie->advance(delta_time);
-
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+	cleanup_key_listeners();
+#endif
 	processActionQueue();
 
 #ifdef GNASH_DEBUG
@@ -671,6 +676,138 @@ char* movie_root::call_method_args(const char* method_name,
 	assert(testInvariant());
 	return _movie->call_method_args(method_name, method_arg_fmt, args);
 }
+
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+void movie_root::cleanup_key_listeners()
+{
+#ifdef KEY_LISTENERS_DEBUG
+	size_t prevsize = m_key_listeners.size();
+	log_msg("Cleaning up %u key listeners", m_key_listeners.size());
+#endif
+
+	for (std::vector<KeyListener>::iterator iter = _keyListners.begin();
+		 iter != _keyListners.end(); )
+	{
+		
+		character* ch = dynamic_cast<character*>(iter->get());
+		// remove character listener
+		if ( ch && ch->isUnloaded() ) 
+		{
+			iter = _keyListners.erase(iter);
+		}
+		// remove non-character listener
+		else if(!ch && !iter->isRegistered())
+		{
+			iter = _keyListners.erase(iter);
+		}
+		else
+			++iter;
+	}
+
+
+#ifdef KEY_LISTENERS_DEBUG
+	size_t currsize = m_key_listeners.size();
+	log_msg("Cleaned up %u listeners (from %u to %u)", prevsize-currsize, prevsize, currsize);
+#endif
+}
+
+void movie_root::notify_key_listeners(key::code k, bool down)
+{
+	log_msg("Notifying " SIZET_FMT " keypress listeners", _keyListners.size());
+
+	for (std::vector<KeyListener>::iterator iter = _keyListners.begin();
+		iter != _keyListners.end(); ++iter)
+	{
+		character* ch = dynamic_cast<character*>(iter->get());
+		// notify character listeners
+		if ( ch && ! ch->isUnloaded() ) 
+		{
+			if(down)
+			{
+				// invoke onClipKeyDown handler
+				ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID));
+				
+				if(iter->isRegistered())
+				// invoke onKeyDown handler
+				{
+					boost::intrusive_ptr<as_function> 
+						method = ch->getUserDefinedEventHandler("onKeyDown");
+					if ( method )
+					{
+						call_method0(as_value(method.get()), &(_movie->get_environment()), _movie.get());
+					}
+				}
+				// invoke onClipKeyPress handler
+				ch->on_event(event_id(event_id::KEY_PRESS, k));
+			}
+			else
+			{
+				//invoke onClipKeyUp handler
+				ch->on_event(event_id(event_id::KEY_UP, key::INVALID));   
+
+				if(iter->isRegistered())
+				// invoke onKeyUp handler
+				{
+					boost::intrusive_ptr<as_function> 
+						method = ch->getUserDefinedEventHandler("onKeyUp");
+					if ( method )
+					{
+						call_method0(as_value(method.get()), &(_movie->get_environment()), _movie.get());
+					}
+				}
+			}
+		}
+		// notify non-character listeners
+		else 
+		{
+			if(down) 
+			{
+				iter->get()->on_event(event_id(event_id::KEY_DOWN, key::INVALID));
+			}
+			else 
+			{
+				iter->get()->on_event(event_id(event_id::KEY_UP, key::INVALID));
+			}
+		}
+	}
+
+	assert(testInvariant());
+}
+
+void movie_root::add_key_listener(const KeyListener & listener)
+{
+	std::vector<KeyListener>::iterator end = _keyListners.end();
+    for (std::vector<KeyListener>::iterator iter = _keyListners.begin();
+         iter != end; ++iter) 
+	{
+      if ((*iter) == listener) {
+        // Already in the list.
+		iter->registerUserHandler();
+        return;
+      }
+    }
+
+    _keyListners.push_back(listener);
+
+	assert(testInvariant());
+}
+
+void movie_root::remove_key_listener(const KeyListener& listener)
+{
+	std::vector<KeyListener>::iterator end = _keyListners.end();
+    for (std::vector<KeyListener>::iterator iter = _keyListners.begin();
+         iter != end; ++iter) 
+	{
+      if ((*iter) == listener) {
+		  // Found it
+		iter->unregisterUserHandler();
+        return;
+      }
+    }
+	assert(testInvariant());
+}
+
+#else
 
 void movie_root::cleanup_key_listeners()
 {
@@ -750,6 +887,7 @@ void movie_root::remove_key_listener(as_object* listener)
 	//log_msg("After removing key listener %p, %u listeners are left", (void*)listener, m_key_listeners.size());
 	assert(testInvariant());
 }
+#endif
 
 void movie_root::add_mouse_listener(as_object* listener)
 {

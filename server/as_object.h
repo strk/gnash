@@ -31,6 +31,10 @@
 #include "smart_ptr.h"
 #include "as_prop_flags.h" // for enum
 #include "GnashException.h"
+#define NEW_KEY_LISTENER_LIST_DESIGN
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+  #include "event_id.h" // for event_id
+#endif
 #include <sstream>
 
 #if defined(__GNUC__) && __GNUC__ > 2
@@ -166,7 +170,9 @@ public:
 	{
 		return set_member_default(name, val);
 	}
-
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+	virtual bool on_event(const event_id& id );
+#endif
 	/// Initialize a member value
 	//
 	/// This method has to be used by built-in classes initialization

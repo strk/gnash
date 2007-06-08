@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.18 2007/05/28 15:41:07 ann Exp $ */
+/* $Id: Key.h,v 1.19 2007/06/08 12:11:50 zoulunkai Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -38,7 +38,9 @@
 #endif
 
 namespace gnash {
-  
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+class KeyListener; //forward declaration
+#endif
 class DSOEXPORT Key {
 public:
     Key();
@@ -115,9 +117,15 @@ public:
 	/// take over both characters and non-characters object.
 	void notify_listeners(const event_id key_event_type);
 
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+	void add_listener(const KeyListener& listener);
+
+	void remove_listener(const KeyListener& listener);
+#else  
 	void add_listener(boost::intrusive_ptr<as_object> listener);
 
 	void remove_listener(boost::intrusive_ptr<as_object> listener);
+#endif
 
 	int get_last_key_pressed() const;
 };

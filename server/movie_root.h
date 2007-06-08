@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.55 2007/05/28 15:41:06 ann Exp $ */
+/* $Id: movie_root.h,v 1.56 2007/06/08 12:11:50 zoulunkai Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -90,6 +90,28 @@ namespace gnash {
 
 namespace gnash
 {
+
+  #ifdef NEW_KEY_LISTENER_LIST_DESIGN
+class KeyListener{
+	public:
+		KeyListener(boost::intrusive_ptr<as_object> obj, bool flag=false)
+		: _listener(obj), _user_defined_handler_added(flag)
+		{}
+
+		as_object * get() const { return _listener.get(); }
+
+		bool operator == (const KeyListener & rhs ) const { return _listener.get() == rhs.get(); }
+		bool operator != (const KeyListener & rhs ) const { return _listener.get() != rhs.get(); }
+
+		bool isRegistered() const { return _user_defined_handler_added; }
+		void unregisterUserHandler() { _user_defined_handler_added = false; }
+		void registerUserHandler() { _user_defined_handler_added = true; }
+
+	private:
+		boost::intrusive_ptr<as_object> _listener;
+		bool _user_defined_handler_added;
+	};
+#endif 
 
 /// The absolute top level movie
 //
@@ -372,8 +394,13 @@ public:
 	void set_userdata(void * ud ) { m_userdata = ud;  }
 
 	DSOEXPORT void notify_key_listeners(key::code k, bool down);
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+	void add_key_listener(const KeyListener& listener);
+	void remove_key_listener(const KeyListener& listener);
+#else
 	void add_key_listener(as_object* listener);
 	void remove_key_listener(as_object* listener);
+#endif
 
 	DSOEXPORT void notify_mouse_listeners(const event_id& event);
 	void add_mouse_listener(as_object* listener);
@@ -473,8 +500,11 @@ private:
 	typedef std::set< boost::intrusive_ptr<as_object> > ListenerSet;
 
 	/// Objects listening for key events
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+	std::vector<KeyListener> _keyListners;
+#else
 	ListenerSet m_key_listeners;
-
+#endif
 	/// Objects listening for mouse events (down,up,move)
 	ListenerSet m_mouse_listeners;
 

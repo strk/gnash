@@ -30,7 +30,9 @@
 #include "GnashException.h"
 #include "fn_call.h" // for generic methods
 #include "Object.h" // for getObjectInterface
-
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+  #include "action.h" // for call_method
+#endif					
 #include <set>
 #include <string>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -615,5 +617,28 @@ as_object::get_prototype()
 	//log_msg(_("as_object::get_prototype(): Hit top of inheritance chain"));
 	return getObjectInterface();
 }
+
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+bool
+as_object::on_event(const event_id& id )
+{
+	as_value event_handler;
+
+	std::string handler_name = id.get_function_name();
+
+	if ( _vm.getSWFVersion() < 7 )
+	{
+		boost::to_lower(handler_name, _vm.getLocale());
+	}
+
+	if (get_member(handler_name, &event_handler) )
+	{
+		call_method(event_handler, NULL, this, 0, 0);
+		return true;
+	}
+
+	return false;
+}
+#endif 
 
 } // end of gnash namespace
