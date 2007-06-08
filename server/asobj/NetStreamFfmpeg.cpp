@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.86 2007/06/04 14:31:31 strk Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.87 2007/06/08 13:02:06 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -730,7 +730,7 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 			log_debug("decodeFLVFrame: load completed, stopping");
 #endif
 			// Stop!
-			m_go = false;
+			//m_go = false;
 		} else {
 			pausePlayback();
 			setStatus(bufferEmpty);

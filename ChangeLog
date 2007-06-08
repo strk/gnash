@@ -1,3 +1,9 @@
+2007-06-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStreamFfmpeg.cpp: Don't leave the decoding
+	  loop/thread until the queues are empty, or the media left
+	  in the queues wont get played.
+
 2007-06-08 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/as_object.{h,cpp}: add a virtual on_event() for event handler. 
