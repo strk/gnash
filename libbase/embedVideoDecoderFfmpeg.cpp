@@ -160,7 +160,16 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 
 	// If there is nothing to decode in the new frame
 	// we just return the lastest.
-	if (data == NULL || codec == NULL || size == 0) {
+	if (data == NULL || codec == NULL || size == 0)
+	{
+		// If haven't decoded any frame yet, return
+		// the null pointer.
+		if ( ! decodedFrame.get() )
+		{
+			ret_image.reset(NULL);
+			return ret_image;
+		}
+
 		ret_image->update(decodedFrame->m_data);
 		return ret_image;
 	}
@@ -241,6 +250,13 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 	}
 
 	av_free(frame);
+	// If haven't decoded any frame yet, return
+	// the null pointer.
+	if ( ! decodedFrame.get() )
+	{
+		ret_image.reset(NULL);
+		return ret_image;
+	}
 	ret_image->update(decodedFrame->m_data);
 	return ret_image;
 }
