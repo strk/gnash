@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: kde_glue_opengl.cpp,v 1.10 2007/05/28 15:41:00 ann Exp $ */
+/* $Id: kde_glue_opengl.cpp,v 1.11 2007/06/09 19:42:05 bjacques Exp $ */
 
 #include "kde_glue_opengl.h"
 #include "tu_opengl_includes.h"
@@ -58,6 +58,7 @@ void
 KdeOpenGLGlue::prepDrawingArea(QWidget *drawing_area)
 {
 //    GNASH_REPORT_FUNCTION;
+    static_cast<QGLWidget*>(drawing_area)->makeCurrent();
     _drawing_area = drawing_area;
 }
 

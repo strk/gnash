@@ -22,12 +22,14 @@
 #endif
 
 
-#include <qgl.h>
 #include <qtimer.h>
 #include <qwidget.h>
 #include <qmessagebox.h>
 #include <qcursor.h>
 #include <qxembed.h>
+#include <qnamespace.h>
+
+#include "Range2d.h"
 
 #include "gnash.h"
 #include "movie_definition.h" 
@@ -77,20 +79,22 @@ KdeGui::init(int argc, char **argv[])
 }
 
 bool
-KdeGui::createWindow(const char* /*windowtitle*/, int width, int height)
+KdeGui::createWindow(const char* windowtitle, int width, int height)
 {
     GNASH_REPORT_FUNCTION;
 
-    _qwidget->makeCurrent();
     _qwidget->setGeometry(0, 0, width, height);
+    _qwidget->setCaption(windowtitle);
+
     _qapp->setMainWidget(_qwidget);
     _qwidget->show();
 
     _glue.prepDrawingArea(_qwidget);
+    _renderer = _glue.createRenderHandler();
+    _glue.initBuffer(width, height);
     
     _width = width;
     _height = height;
-    _renderer = _glue.createRenderHandler();
     set_render_handler(_renderer);
     
     return true;
@@ -101,6 +105,13 @@ KdeGui::renderBuffer()
 {
 //    GNASH_REPORT_FUNCTION;
     _glue.render();
+}
+
+
+void
+KdeGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
+{
+    _glue.setInvalidatedRegions(ranges);
 }
 
 void
@@ -241,6 +252,13 @@ KdeGui::handleKeyEvent(QKeyEvent *event, bool down)
     notify_key_event(c, mod, down);
 }
 
+void
+KdeGui::resize(int width, int height)
+{
+    _glue.resize(width, height);
+    resize_view(width, height);
+}
+
 
 /// \brief restart the movie from the beginning
 void
@@ -332,11 +350,13 @@ qwidget::mouseMoveEvent(QMouseEvent *event)
     assert(_godfather);
     QPoint position = event->pos();
 
-    _godfather->notify_mouse_moved(position.x(), position.y());
+    float xscale = _godfather->getXScale();
+    float yscale = _godfather->getYScale();
+
+    _godfather->notify_mouse_moved(position.x() / xscale, position.y() / yscale);
 }
 
 qwidget::qwidget(KdeGui* godfather)
-  : QGLWidget(0, "hi")
 {
     _qmenu.insertItem(_("Play Movie"), this, SLOT(menuitem_play_callback()));
     _qmenu.insertItem(_("Pause Movie"), this, SLOT(menuitem_pause_callback()));
@@ -400,8 +420,25 @@ qwidget::keyReleaseEvent(QKeyEvent *event)
 void
 qwidget::resizeEvent(QResizeEvent *event)
 {
-    _godfather->resize_view(int(event->size().width()), int(event->size().height()));
+    _godfather->resize(event->size().width(), event->size().height());
+}
+
+void 
+qwidget::paintEvent(QPaintEvent *event)
+{
+    const QRegion& region = event->region();
+    QRect rect = region.boundingRect();
+
+    geometry::Range2d<int> range(PIXELS_TO_TWIPS(rect.x()-1), 
+                                 PIXELS_TO_TWIPS(rect.y()-1),
+				 PIXELS_TO_TWIPS(rect.right()+1),
+				 PIXELS_TO_TWIPS(rect.bottom()+1));
+    InvalidatedRanges ranges;
+    ranges.add(range);
+
     
+    _godfather->setInvalidatedRegions(ranges);
+    _godfather->renderBuffer();
 }
 
 // end of namespace gnash

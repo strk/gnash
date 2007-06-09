@@ -1,0 +1,158 @@
+//
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+/* $Id: kde_glue_agg.cpp,v 1.1 2007/06/09 19:42:05 bjacques Exp $ */
+
+#include "kde_glue_agg.h"
+#include "render_handler.h"
+#include "render_handler_agg.h"
+#include <qpixmap.h>
+#include <qcolor.h>
+
+namespace gnash
+{
+
+KdeAggGlue::KdeAggGlue()
+: _offscreenbuf(NULL),
+  _renderer(NULL),
+  _width(0),
+  _height(0)
+{
+}
+
+KdeAggGlue::~KdeAggGlue()
+{
+}
+
+bool
+KdeAggGlue::init(int /* argc */, char *** /* argv */)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    return true;
+}
+
+
+void
+KdeAggGlue::prepDrawingArea(QWidget *drawing_area)
+{
+//    GNASH_REPORT_FUNCTION;
+    _drawing_area = drawing_area;
+}
+
+
+void
+KdeAggGlue::initBuffer(int width, int height)
+{
+    assert(_renderer);
+
+    int _bpp = 32;
+    int depth_bytes = _bpp / 8;
+
+    assert(_bpp % 8 == 0);
+
+#define CHUNK_SIZE (100 * 100 * depth_bytes)
+
+    int bufsize = (width * height * depth_bytes / CHUNK_SIZE + 1) * CHUNK_SIZE;
+
+    _offscreenbuf = new unsigned char[bufsize];
+
+    // Only the AGG renderer has the function init_buffer, which is *not* part of
+    // the renderer api. It allows us to change the renderers movie size (and buffer
+    // address) during run-time.
+    render_handler_agg_base * renderer =
+      static_cast<render_handler_agg_base *>(_renderer);
+    renderer->init_buffer(_offscreenbuf, bufsize, width, height);
+
+    _width = width;
+    _height = height;
+
+    _validbounds.setTo(0, 0, _width, _height);
+    _drawbounds.push_back(_validbounds);
+    
+    _qimage.reset(new QImage(_offscreenbuf, _width, _height, 32 /* bits per pixel */,
+                             0 , 0, QImage::IgnoreEndian));
+}
+
+void
+KdeAggGlue::render()
+{
+    // In order to use our buffer in QT, we must copy it into a pixmap. This is
+    // an expensive operation, but, as far as I can see, the only way to do it.
+    QPixmap qpixmap(*_qimage);
+
+    for (unsigned bno=0; bno < _drawbounds.size(); bno++) {
+       geometry::Range2d<int>& bounds = _drawbounds[bno];
+
+       assert ( bounds.isFinite() );
+
+       QPoint dest_point(bounds.getMinX(), bounds.getMinY()) ;
+       QRect src_rect(bounds.getMinX(), bounds.getMinY(), bounds.width(),
+                      bounds.height());
+       
+       bitBlt (_drawing_area, dest_point, &qpixmap, src_rect, Qt::CopyROP,
+               true /* ignore mask */ );
+    }
+}
+
+void
+KdeAggGlue::setInvalidatedRegions(const InvalidatedRanges& ranges)
+{
+    _renderer->set_invalidated_regions(ranges);
+
+    _drawbounds.clear();
+
+    for (size_t rno=0; rno<ranges.size(); rno++) {
+
+      geometry::Range2d<int> bounds = Intersection(
+      _renderer->world_to_pixel(ranges.getRange(rno)),
+      _validbounds);
+
+      // it may happen that a particular range is out of the screen, which 
+      // will lead to bounds==null. 
+      if (bounds.isNull()) continue;
+
+      assert(bounds.isFinite());
+
+      _drawbounds.push_back(bounds);
+
+    }
+}
+
+
+render_handler*
+KdeAggGlue::createRenderHandler()
+{
+    // QT requires the use of this pixel format...
+    _renderer = create_render_handler_agg("BGRA32");
+    return _renderer;
+}
+
+void
+KdeAggGlue::resize(int width, int height)
+{
+    if (!_offscreenbuf) {
+      // If initialisation has not taken place yet, we don't want to touch this.
+      return;
+    }
+
+    delete [] _offscreenbuf;
+    initBuffer(width, height);
+}
+
+// end of namespace gnash
+}

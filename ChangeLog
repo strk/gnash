@@ -1,3 +1,16 @@
+2007-06-09 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac: Allow the KDE GUI to be compiled against AGG.
+	* gui/Makefile.am: Compile KDE/AGG files when requested.
+	* gui/kde.cpp: Make the KDE GUI compatible with AGG by moving
+	OpenGL-specific code into its respective glue. Also fix mouse
+	movement in combination with scaling.
+	* gui/kde_glue.h: Add stubs for AGG compatibility.
+	* gui/kde_glue_opengl.cpp: run makeCurrent in the glue.
+	* gui/kdesup.h: Allow the AGG glue to be used.
+	* gui/kde_glue_agg{.cpp, .h}: Initial implementation of AGG
+	glue for QT/KDE.
+
 2007-06-09 Sandro Santilli <strk@keybit.net>
 
 	* libbase/embedVideoDecoderFfmpeg.cpp (decodeFrame): do not

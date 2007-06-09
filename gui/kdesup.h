@@ -52,7 +52,19 @@
 // #include <cairo.h>
 // #include "kde_glue_cairo.h"
 # error "Cairo not supported yet for KDE!"
+#elif defined(RENDERER_AGG)
+# include "kde_glue_agg.h"
 #endif
+
+
+#ifdef RENDERER_OPENGL
+#define WIDGETCLASS QGLWidget
+#define GLUE KdeOpenGLGlue
+#else
+#define WIDGETCLASS QWidget
+#define GLUE KdeAggGlue
+#endif
+
 
 namespace gnash
 {
@@ -60,7 +72,7 @@ namespace gnash
 
 class KdeGui;
 
-class DSOEXPORT qwidget : public QGLWidget
+class DSOEXPORT qwidget : public WIDGETCLASS
 {
     Q_OBJECT
 public:
@@ -75,6 +87,7 @@ protected:
     void keyReleaseEvent(QKeyEvent *event);
     void timerEvent(QTimerEvent *);
     void resizeEvent(QResizeEvent *event);
+    void paintEvent (QPaintEvent *event);
 public slots:
     void menuitem_restart_callback();
     void menuitem_quit_callback();
@@ -106,10 +119,12 @@ public:
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
     virtual void handleKeyEvent(QKeyEvent *event, bool down);
+    void setInvalidatedRegions(const InvalidatedRanges& ranges);
+    void resize(int width, int height);
  private:
     QApplication*  _qapp;
     qwidget*       _qwidget;
-    KdeOpenGLGlue  _glue;    
+    GLUE           _glue;    
 
     QTimer        *_timer;
 

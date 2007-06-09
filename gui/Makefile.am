@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.76 2007/06/07 15:42:19 strk Exp $
+# $Id: Makefile.am,v 1.77 2007/06/09 19:42:05 bjacques Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -121,11 +121,13 @@ if USE_RENDERER_AGG
   RISCOS_AGG_SRCS = riscos_glue_agg.cpp riscos_glue_agg.h
   SDL_AGG_SRCS = sdl_agg_glue.cpp sdl_agg_glue.h
   FLTK_AGG_SRCS = fltk_glue_agg.cpp fltk_glue_agg.h
+  KDE_AGG_SRCS = kde_glue_agg.cpp kde_glue_agg.h
 else
   GTK_AGG_SRCS =
   RISCOS_AGG_SRCS =
   SDL_AGG_SRCS =
   FLTK_AGG_SRCS =
+  KDE_AGG_SRCS =
 endif
 
 if USE_GUI_GTK
@@ -157,8 +159,9 @@ else
 endif
 
 if USE_GUI_KDE
- KDE_SRCS = kde.cpp kdesup.h kde_glue.h $(KDE_CAIRO_SRCS) $(KDE_OPENGL_SRCS)
- AM_CPPFLAGS += -I$(kde_includes)/kio $(all_includes) 
+ KDE_SRCS = kde.cpp kdesup.h kde_glue.h $(KDE_CAIRO_SRCS) $(KDE_OPENGL_SRCS) $(KDE_AGG_SRCS)
+ AM_CPPFLAGS += $(KDE_CFLAGS) $(QT_CFLAGS)
+ AM_LDFLAGS += $(KDE_LIBS) $(QT_LIBS)
 else
  KDE_SRCS = 
 endif

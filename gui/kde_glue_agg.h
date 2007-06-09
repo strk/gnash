@@ -15,35 +15,38 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-//
+#include "kde_glue.h"
+#include <qimage.h>
 
-
-/* $Id: kde_glue.h,v 1.12 2007/06/09 19:42:05 bjacques Exp $ */
-
-#include "gnash.h"
-
-#include <qwidget.h>
-#include "snappingrange.h"
 
 namespace gnash
 {
 
-class KdeGlue
+class KdeAggGlue : public KdeGlue
 {
   public:
-    KdeGlue() : _drawing_area(NULL) {}
-    virtual ~KdeGlue() { }
-    virtual bool init(int argc, char **argv[]) = 0;
+    KdeAggGlue();
+    ~KdeAggGlue();
+    
+    bool init(int argc, char **argv[]);
+    void prepDrawingArea(QWidget *drawing_area);
+    render_handler* createRenderHandler();
+    void initBuffer(int width, int height);
+    void resize(int width, int height);
+    void render();
+    void setInvalidatedRegions(const InvalidatedRanges& ranges);
 
-    virtual void prepDrawingArea(QWidget *drawing_area) = 0;
-    virtual render_handler* createRenderHandler() = 0;
-    virtual void render() = 0;
-    virtual void setInvalidatedRegions(const InvalidatedRanges& /* ranges */) {}
-    virtual void resize(int, int) {}
-    virtual void initBuffer(int, int) {}
-  protected:
-    QWidget     *_drawing_area;
+  private:
+    int _width;
+    int _height;
+    unsigned char* _offscreenbuf;
+    render_handler* _renderer;
+    geometry::Range2d<int> _validbounds;
+    std::vector< geometry::Range2d<int> > _drawbounds;
+    std::auto_ptr<QImage> _qimage;
 };
 
-} // namespace gnash
+
+
+
+}

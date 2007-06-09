@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.336 2007/06/07 15:42:19 strk Exp $
+dnl $Id: configure.ac,v 1.337 2007/06/09 19:42:05 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -252,8 +252,9 @@ fi
 AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
 
 if test x$renderer = xagg; then
-  if test x"$gui" != xfb -a x"$gui" != xgtk -a x"$gui" != xsdl -a x"$gui" != xriscos -a x"$gui" != xfltk; then
-    AC_MSG_ERROR([agg renderer is only supported by fb, gtk, riscos, sdl and fltk GUIs]);
+  if test x"$gui" != xfb -a x"$gui" != xgtk -a x"$gui" != xsdl -a x"$gui" != xriscos -a x"$gui" != xfltk
+                         -a x"$gui" != xkde; then
+    AC_MSG_ERROR([agg renderer is only supported by fb, gtk, riscos, sdl, fltk and kde GUIs]);
   fi
   AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
 fi
