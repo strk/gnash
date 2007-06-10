@@ -1,4 +1,4 @@
-# Swedish� translation of GNU Gnash.
+# Swedish translation of GNU Gnash.
 # Copyright (C) 2007 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gnash package.
 # <>, 2007.
@@ -11,18 +11,18 @@ msgstr ""
 "POT-Creation-Date: 2007-05-15 08:44+0200\n"
 "PO-Revision-Date: 2007-05-15 08:44+0200\n"
 "Last-Translator: Markus Gothe <nietzsche@lysator.liu.se>\n"
-"Language-Team: Swedish <gnome-sv@gnome.org>\n"
+"Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
 
 #: backend/sound_handler_sdl.cpp:76
 msgid "could not allocate memory for sound data"
-msgstr "kan inte allokera minne f�r ljud-data "
+msgstr "kan inte allokera minne för ljud-data "
 
 #: backend/sound_handler_sdl.cpp:99
 msgid "Some kind of error occurred with raw sound data"
-msgstr "Fel uppstod med r�tt ljud-datat"
+msgstr "Fel uppstod med rått ljud-datat"
 
 #: backend/sound_handler_sdl.cpp:112
 msgid "Some kind of error occurred with adpcm sound data"
@@ -30,16 +30,15 @@ msgstr "Fel uppstod med ADPCM-ljud"
 
 #: backend/sound_handler_sdl.cpp:123
 msgid "gnash has not been compiled to handle mp3 audio"
-msgstr "gnash har inte byggts med mp3-st�d"
+msgstr "gnash har inte byggts med mp3-stöd"
 
 #: backend/sound_handler_sdl.cpp:129
 msgid "could not allocate space for data in sound handler"
-msgstr "kan inte allokera utrymme f�r data i ljudhanteraren"
+msgstr "kan inte allokera utrymme för data i ljudhanteraren"
 
 #: backend/sound_handler_sdl.cpp:138
-#, c-format
 msgid "unknown sound format %d requested; gnash does not handle it"
-msgstr "ok�nkt ljudformat % beg�rt. gnash hanterar det inte"
+msgstr "okänt ljudformat % begärt. gnash hanterar det inte"
 
 #: backend/sound_handler_sdl.cpp:170
 msgid "Some kind of error with resampling sound data"
@@ -50,12 +49,12 @@ msgstr "Fell uppstod under resampling av ljud"
 msgid ""
 "Behavior for this audio codec %d is unknown.  Please send this SWF to the "
 "developers"
-msgstr "Detta ljud-codec, %d, �r ok�nt. S�nd SWF-filen till "
+msgstr "Detta ljud-codec, %d, är okänt. Sänd SWF-filen till "
 "en utvecklare"
 
 #: backend/sound_handler_sdl.cpp:276
 msgid "Your FFMPEG can't decode MP3?!"
-msgstr "FFMPEG byggt utan mp3-st�d?"
+msgstr "FFMPEG byggt utan mp3-stöd?"
 
 #: backend/sound_handler_sdl.cpp:304
 #, c-format
@@ -70,14 +69,14 @@ msgstr "Kann Aux-SDL-Audioausgabe nicht starten: %s"
 #: backend/sound_handler_sdl.cpp:717
 #, c-format
 msgid "Negative buffer length in sdl_audio_callback (%d)"
-msgstr "Negative Pufferlänge in sdl_audio_callback (%d)"
+msgstr "Negative PufferlÃ¤nge in sdl_audio_callback (%d)"
 
 #: backend/sound_handler_sdl.cpp:834
 msgid ""
 "Error while decoding MP3-stream.  Upgrading ffmpeg/libavcodec might fix this "
 "issue."
 msgstr "Fehler beim Dekodieren des MP3-Streams. Eine Aktualisierung von "
-"ffmpeg/libavcodec könnte dieses Problem beheben."
+"ffmpeg/libavcodec kÃ¶nnte dieses Problem beheben."
 
 #: backend/sound_handler_sdl.cpp:864
 #, c-format
@@ -149,15 +148,15 @@ msgstr ""
 "  -s <Faktor> Film um den angegebenen Faktor skalieren\n"
 "  -c          Core-Dump-Datei erstellen anstatt SDL zu erlauben, ihn aufzufangen\n"
 "  -d num      Number of milliseconds to delay in main loop\n"
-"  -v          Ausführlicher Modus; d.h. Log-Meldungen nach stdout senden\n"
+"  -v          AusfÃ¼hrlicher Modus; d.h. Log-Meldungen nach stdout senden\n"
 
 #: gui/gnash.cpp:85
 msgid "  -va         Be verbose about movie Actions\n"
-msgstr "  -va         Ausführlicher Modus für Film-Aktionen\n"
+msgstr "  -va         AusfÃ¼hrlicher Modus fÃ¼r Film-Aktionen\n"
 
 #: gui/gnash.cpp:90
 msgid "  -vp         Be verbose about parsing the movie\n"
-msgstr "  -vp         Ausführlicher Modus beim Parsen des Films\n"
+msgstr "  -vp         AusfÃ¼hrlicher Modus beim Parsen des Films\n"
 
 #: gui/gnash.cpp:95
 msgid ""
@@ -216,9 +215,9 @@ msgstr "\n"
 "  Strg-Q, Strg-W, ESC   Beenden\n"
 "  Strg-P          Pause\n"
 "  Strg-R          Film neu starten\n"
-"  Strg-[ or kp-   Ein Bild zurück\n"
-"  Strg-] or kp+   Ein Bild vorwärts\n"
-"  Strg-B          Hintergrundfarbe ändern\n"
+"  Strg-[ or kp-   Ein Bild zurÃ¼ck\n"
+"  Strg-] or kp+   Ein Bild vorwÃ¤rts\n"
+"  Strg-B          Hintergrundfarbe Ã¤ndern\n"
 "  Strg-A          Toggle antialiasing (doesn't work)\n"
 "  Strg-T          Debug.  Test the set_variable() function\n"
 "  Strg-G          Debug.  Test the get_variable() function\n"
@@ -252,7 +251,7 @@ msgstr ""
 
 #: gui/gnash.cpp:190 plugin/klash/klash.cpp:319
 msgid "Verbose output turned on"
-msgstr "Ausführliche Ausgabe eingeschaltet"
+msgstr "AusfÃ¼hrliche Ausgabe eingeschaltet"
 
 #: gui/gnash.cpp:194
 msgid "Logging to disk enabled"
@@ -260,11 +259,11 @@ msgstr "Logging auf Festplatte aktiviert"
 
 #: gui/gnash.cpp:200
 msgid "No verbose actions; disabled at compile time"
-msgstr "Kein ausführlicher Modus für Aktionen. Bei der Kompilierung deaktiviert"
+msgstr "Kein ausfÃ¼hrlicher Modus fÃ¼r Aktionen. Bei der Kompilierung deaktiviert"
 
 #: gui/gnash.cpp:207
 msgid "No verbose parsing; disabled at compile time"
-msgstr "Kein ausführlicher Modus beim Parsen. Bei der Kompilierung deaktiviert"
+msgstr "Kein ausfÃ¼hrlicher Modus beim Parsen. Bei der Kompilierung deaktiviert"
 
 #: gui/gnash.cpp:218
 #, c-format
@@ -292,12 +291,12 @@ msgstr "Kein Debugging. Bei der Kompilierung deaktiviert"
 #: gui/gnash.cpp:243
 #, c-format
 msgid "Setting height to %d"
-msgstr "Setze Höhe auf %d"
+msgstr "Setze HÃ¶he auf %d"
 
 #: gui/gnash.cpp:279
 #, c-format
 msgid "-r must be followed by 0, 1, 2 or 3 (%ld is invalid)"
-msgstr "-r erfordert 0, 1, 2, oder 3 (%ld ist ungültig)"
+msgstr "-r erfordert 0, 1, 2, oder 3 (%ld ist ungÃ¼ltig)"
 
 #: gui/gnash.cpp:314
 msgid "No rendering flags specified, using rcfile"
@@ -315,7 +314,7 @@ msgstr "Bild %d"
 
 #: gui/Player.cpp:187
 msgid "Sound requested but no sound support compiled in"
-msgstr "Audio erfordert, jedoch keine Audiounterstützung bei der Kompilierung aktiviert"
+msgstr "Audio erfordert, jedoch keine AudiounterstÃ¼tzung bei der Kompilierung aktiviert"
 
 #: gui/Player.cpp:364
 #, c-format
@@ -487,12 +486,12 @@ msgstr "Konnte class_init-Symbol nicht ermitteln"
 #: libbase/extension.cpp:192
 #, c-format
 msgid "Scanning directory \"%s\" for plugins"
-msgstr "Scanne Ordner \"%s\" für Plugins"
+msgstr "Scanne Ordner \"%s\" fÃ¼r Plugins"
 
 #: libbase/extension.cpp:196
 #, c-format
 msgid "Can't open directory %s"
-msgstr "Kann Ordner %s nicht öffnen"
+msgstr "Kann Ordner %s nicht Ã¶ffnen"
 
 #: libbase/extension.cpp:218
 #, c-format
@@ -539,7 +538,7 @@ msgstr "Kann mit privilegiertem Port %d nicht verbinden"
 #: libbase/network.cpp:149
 #, c-format
 msgid "unable to get protocol entry for %s"
-msgstr "Erfassen des Protokolleintrags für %s nicht möglich!"
+msgstr "Erfassen des Protokolleintrags fÃ¼r %s nicht mÃ¶glich!"
 
 #: libbase/network.cpp:166
 #, c-format
@@ -553,7 +552,7 @@ msgstr "setsockopt SO_REUSEADDR fehlgeschlagen"
 #: libbase/network.cpp:183
 #, c-format
 msgid "unable to bind to port %hd: %s"
-msgstr "Binden an Port %hd unmöglich: %s"
+msgstr "Binden an Port %hd unmÃ¶glich: %s"
 
 #: libbase/network.cpp:192
 #, c-format
@@ -602,7 +601,7 @@ msgstr "Nehme TCP/IP-Verbindung an fd %d an"
 #: libbase/network.cpp:344
 #, c-format
 msgid "Can't connect to privileged port %hd"
-msgstr "Verbindung mit privilegiertem Port %hd unmöglich"
+msgstr "Verbindung mit privilegiertem Port %hd unmÃ¶glich"
 
 #: libbase/network.cpp:349
 #, c-format
@@ -612,16 +611,16 @@ msgstr ""
 #: libbase/network.cpp:355
 #, c-format
 msgid "The hostname for this machine is %s"
-msgstr "Der Hostname für diesen Rechner ist %s"
+msgstr "Der Hostname fÃ¼r diesen Rechner ist %s"
 
 #: libbase/network.cpp:357
 msgid "Couldn't get the hostname for this machine"
-msgstr "Konnte Hostnamen für diesen Rechner nicht ermitteln"
+msgstr "Konnte Hostnamen fÃ¼r diesen Rechner nicht ermitteln"
 
 #: libbase/network.cpp:371
 #, c-format
 msgid "The IP address for this client socket is %s"
-msgstr "Die IP-Adresse für diesen Client-Sockel ist %s"
+msgstr "Die IP-Adresse fÃ¼r diesen Client-Sockel ist %s"
 
 #: libbase/network.cpp:379
 #, c-format
@@ -631,7 +630,7 @@ msgstr "Kann Sockel nicht erstellen: %s"
 #: libbase/network.cpp:401
 #, c-format
 msgid "The connect() socket for fd %d was interupted by a system call"
-msgstr "Der connect()-Sockel für fd %d wurde durch einen Systemaufruf unterbrochen"
+msgstr "Der connect()-Sockel fÃ¼r fd %d wurde durch einen Systemaufruf unterbrochen"
 
 #: libbase/network.cpp:408 libbase/network.cpp:436
 #, c-format
@@ -651,7 +650,7 @@ msgstr ""
 #: libbase/network.cpp:505
 #, c-format
 msgid "Unable to close the socket for fd %d: %s"
-msgstr "Kann Sockel für fd %d nicht schließen: %s"
+msgstr "Kann Sockel fÃ¼r fd %d nicht schlieÃen: %s"
 
 #: libbase/network.cpp:512
 #, c-format
@@ -680,15 +679,15 @@ msgstr "Vorspulen"
 
 #: plugin/klash/klash.cpp:106
 msgid "Step Backward"
-msgstr "Zurückspulen"
+msgstr "ZurÃ¼ckspulen"
 
 #: plugin/klash/klash.cpp:107
 msgid "Jump Forward"
-msgstr "Vorwärts springen"
+msgstr "VorwÃ¤rts springen"
 
 #: plugin/klash/klash.cpp:108
 msgid "Jump Backward"
-msgstr "Zurück springen"
+msgstr "ZurÃ¼ck springen"
 
 #: plugin/klash/klash.cpp:109
 msgid "Quit Gnash"
@@ -700,12 +699,12 @@ msgstr "Klash"
 
 #: plugin/klash/klash.cpp:148
 msgid "The Gnash Flash player for KDE.\n"
-msgstr "Der Gnash-Flash-Player für KDE.\n"
+msgstr "Der Gnash-Flash-Player fÃ¼r KDE.\n"
 
 #: plugin/klash/klash.cpp:309
 #, c-format
 msgid "Timer delay set to %d milliseconds"
-msgstr "Timer-Verzögerung auf %d Millisekunden gesetzt"
+msgstr "Timer-VerzÃ¶gerung auf %d Millisekunden gesetzt"
 
 #: plugin/klash/klash.cpp:323
 msgid "Logging to disk enabled."
@@ -724,12 +723,12 @@ msgstr "Setze Breite auf: %d"
 #: plugin/klash/klash.cpp:350
 #, c-format
 msgid "Setting height to: %d"
-msgstr "Setze Höhe auf: %d"
+msgstr "Setze HÃ¶he auf: %d"
 
 #: plugin/klash/klash.cpp:381
 #, c-format
 msgid "-r must be followed by 0, 1 or 2 (%d is invalid)"
-msgstr "-r erfordert 0, 1, 2 (%d ist ungültig)"
+msgstr "-r erfordert 0, 1, 2 (%d ist ungÃ¼ltig)"
 
 #: plugin/klash/klash.cpp:399
 msgid "Got variable option on command line!"
@@ -743,7 +742,7 @@ msgstr "Keine Eingabedateien"
 #: plugin/klash/klash.cpp:448
 #, c-format
 msgid "error: can't get info about %s\n"
-msgstr "Fehler: Kann keine Informationen über %s ermitteln\n"
+msgstr "Fehler: Kann keine Informationen Ã¼ber %s ermitteln\n"
 
 #: plugin/klash/klash.cpp:508
 #, c-format
@@ -789,9 +788,9 @@ msgstr ""
 "  -s <Faktor> Film um den angegebenen Faktor skalieren\n"
 "  -c          Core-Dump-Datei erstellen anstatt SDL zu erlauben, ihn aufzufangen\n"
 "  -d num      Number of milliseconds to delay in main loop\n"
-"  -v          Ausführlicher Modus; d.h. Log-Meldungen nach stdout senden\n"
-"  -va         Ausführlicher Modus für Film-Aktionen\n"
-"  -vp         Ausführlicher Modus beim Parsen des Films\n"
+"  -v          AusfÃ¼hrlicher Modus; d.h. Log-Meldungen nach stdout senden\n"
+"  -va         AusfÃ¼hrlicher Modus fÃ¼r Film-Aktionen\n"
+"  -vp         AusfÃ¼hrlicher Modus beim Parsen des Films\n"
 ""
 
 #: plugin/klash/klash.cpp:685
@@ -823,9 +822,9 @@ msgstr ""
 "  Strg-Q, Strg-W, ESC   Beenden\n"
 "  Strg-P          Pause\n"
 "  Strg-R          Film neu starten\n"
-"  Strg-[ or kp-   Ein Bild zurück\n"
-"  Strg-] or kp+   Ein Bild vorwärts\n"
-"  Strg-B          Hintergrundfarbe ändern\n"
+"  Strg-[ or kp-   Ein Bild zurÃ¼ck\n"
+"  Strg-] or kp+   Ein Bild vorwÃ¤rts\n"
+"  Strg-B          Hintergrundfarbe Ã¤ndern\n"
 
 #: plugin/win32/plugin.cpp:259
 #, c-format
@@ -835,7 +834,7 @@ msgstr ""
 #: plugin/win32/plugin.cpp:262
 #, c-format
 msgid "Movie %s: width is %d, height is %d, version is %d\n"
-msgstr "Film %s: Breite ist %d, Höhe ist %d, Version ist %d\n"
+msgstr "Film %s: Breite ist %d, HÃ¶he ist %d, Version ist %d\n"
 
 #: plugin/win32/plugin.cpp:272
 #, c-format
@@ -1414,12 +1413,12 @@ msgstr ""
 #: server/asobj/NetConnection.cpp:97
 #, c-format
 msgid "Gnash is not allowed to open this url: %s"
-msgstr "Gnash darf diese URL nicht öffnen: %s"
+msgstr "Gnash darf diese URL nicht Ã¶ffnen: %s"
 
 #: server/asobj/NetConnection.cpp:104
 #, c-format
 msgid "Gnash could not open this url: %s"
-msgstr "Gnash konnte diese URL nicht öffnen: %s"
+msgstr "Gnash konnte diese URL nicht Ã¶ffnen: %s"
 
 #: server/asobj/NetConnection.cpp:110
 #, c-format
@@ -1455,12 +1454,12 @@ msgstr "libavcodec konnte Codec nicht initialisieren"
 #: server/asobj/NetStreamFfmpeg.cpp:311 server/asobj/NetStreamGst.cpp:491
 #, c-format
 msgid "Unsupported video codec %d"
-msgstr "Video-Codec %d nicht unterstützt"
+msgstr "Video-Codec %d nicht unterstÃ¼tzt"
 
 #: server/asobj/NetStreamFfmpeg.cpp:342 server/asobj/NetStreamGst.cpp:530
 #, c-format
 msgid "Unsupported audio codec %d"
-msgstr "Audio-Codec %d nicht unterstützt"
+msgstr "Audio-Codec %d nicht unterstÃ¼tzt"
 
 #: server/asobj/NetStreamFfmpeg.cpp:367
 msgid "Gnash could not read from movie url"
@@ -1470,12 +1469,12 @@ msgstr "Gnash konnte von Film-URL nicht lesen"
 #: server/asobj/NetStreamGst.cpp:363
 #, c-format
 msgid "Gnash could not open movie: %s"
-msgstr "Gnash konnte Film nicht öffnen: %s"
+msgstr "Gnash konnte Film nicht Ã¶ffnen: %s"
 
 #: server/asobj/NetStreamFfmpeg.cpp:403
 #, c-format
 msgid "Gnash could not open FLV movie: %s"
-msgstr "Gnash konnte FLV-Film nicht öffnen: %s"
+msgstr "Gnash konnte FLV-Film nicht Ã¶ffnen: %s"
 
 #: server/asobj/NetStreamFfmpeg.cpp:414
 msgid "Failed to initialize FLV video codec"
@@ -1493,7 +1492,7 @@ msgstr ""
 #: server/asobj/NetStreamFfmpeg.cpp:466 server/asobj/SoundFfmpeg.cpp:136
 #, c-format
 msgid "Couldn't open file '%s' for decoding"
-msgstr "Konnte Datei '%s' für Dekodierung nicht öffnen"
+msgstr "Konnte Datei '%s' fÃ¼r Dekodierung nicht Ã¶ffnen"
 
 #: server/asobj/NetStreamFfmpeg.cpp:476 server/asobj/SoundFfmpeg.cpp:146
 #, c-format
@@ -1513,17 +1512,17 @@ msgstr "Video-Decoder %d nicht gefunden"
 #: server/asobj/NetStreamFfmpeg.cpp:535
 #, c-format
 msgid "Could not open codec %d"
-msgstr "Konnte Codec %d nicht öffnen"
+msgstr "Konnte Codec %d nicht Ã¶ffnen"
 
 #: server/asobj/NetStreamFfmpeg.cpp:561
 #, c-format
 msgid "No available audio decoder %d to process MPEG file: '%s'"
-msgstr "Kein verfügbarer Audio-Decoder %d, um MPEG-Datei '%s' zu verarbeiten"
+msgstr "Kein verfÃ¼gbarer Audio-Decoder %d, um MPEG-Datei '%s' zu verarbeiten"
 
 #: server/asobj/NetStreamFfmpeg.cpp:569 server/asobj/SoundFfmpeg.cpp:201
 #, c-format
 msgid "Could not open audio codec %d for %s"
-msgstr "Konnte Audio-Codec %d für %s nicht öffnen"
+msgstr "Konnte Audio-Codec %d fÃ¼r %s nicht Ã¶ffnen"
 
 #: server/asobj/NetStreamFfmpeg.cpp:744
 msgid "read_frame: not audio & video stream"
@@ -1572,8 +1571,8 @@ msgstr ""
 msgid ""
 "This version of Fluendo's mp3 plugin does not support flash streaming "
 "sounds, please upgrade to version 0.10.4 or higher."
-msgstr "Diese Version des Fluendo-mp3-Plugins unterstützt kein Flash-Audio-Streaming."
-"Bitte auf Version 0.10.4 oder höher aktualisieren."
+msgstr "Diese Version des Fluendo-mp3-Plugins unterstÃ¼tzt kein Flash-Audio-Streaming."
+"Bitte auf Version 0.10.4 oder hÃ¶her aktualisieren."
 
 #: server/asobj/NetStreamGst.cpp:516
 msgid ""
@@ -1741,7 +1740,7 @@ msgstr ""
 #: server/asobj/SoundFfmpeg.cpp:92
 #, c-format
 msgid "%s could not open audio url: %s"
-msgstr "%s konnte Audio-URL nicht öffnen: %s"
+msgstr "%s konnte Audio-URL nicht Ã¶ffnen: %s"
 
 #: server/asobj/SoundFfmpeg.cpp:115
 #, c-format
@@ -1796,7 +1795,7 @@ msgstr "%s: Nichtaudiodaten in Datei %s gefunden"
 #: server/asobj/SoundGst.cpp:142
 #, c-format
 msgid "could not open audio url: %s"
-msgstr "konnte Audio-URL nicht öffnen: %s"
+msgstr "konnte Audio-URL nicht Ã¶ffnen: %s"
 
 #: server/asobj/SoundGst.cpp:171
 msgid "Could not create gstreamer pipeline element"
@@ -1808,12 +1807,12 @@ msgstr ""
 
 #: server/asobj/SoundGst.cpp:198
 msgid "Could not create Gstreamer element(s) for movie handling"
-msgstr "Konnte Gstreamer-Element(e) für Film-Verarbeitung nicht erstellen"
+msgstr "Konnte Gstreamer-Element(e) fÃ¼r Film-Verarbeitung nicht erstellen"
 
 #: server/asobj/SoundMad.cpp:83
 #, c-format
 msgid "Gnash could not open audio url: %s"
-msgstr "Gnash konnte Audio-URL nicht öffnen: %s"
+msgstr "Gnash konnte Audio-URL nicht Ã¶ffnen: %s"
 
 #: server/asobj/SoundMad.cpp:120 server/asobj/SoundMad.cpp:207
 #, c-format
@@ -2254,7 +2253,7 @@ msgstr ""
 #: server/edit_text_character.cpp:909
 #, c-format
 msgid "No font for edit_text_character! [%s:%d]"
-msgstr "Keine Schriftart für edit_text_character! [%s:%d]"
+msgstr "Keine Schriftart fÃ¼r edit_text_character! [%s:%d]"
 
 #: server/edit_text_character.cpp:937
 #, c-format
@@ -2409,7 +2408,7 @@ msgstr "Setze Basis-URL auf: %s"
 #: server/impl.cpp:254
 #, c-format
 msgid "get_movie_info(): can't open '%s'"
-msgstr "get_movie_info(): kann '%s' nicht öffnen"
+msgstr "get_movie_info(): kann '%s' nicht Ã¶ffnen"
 
 #: server/impl.cpp:269
 #, c-format
@@ -2443,17 +2442,17 @@ msgstr "unbekannter Dateityp (%s)"
 #: server/impl.cpp:466
 #, c-format
 msgid "failed to open '%s'; can't create movie"
-msgstr "Konnte '%s' nicht öffnen. Kann Film nicht erstellen"
+msgstr "Konnte '%s' nicht Ã¶ffnen. Kann Film nicht erstellen"
 
 #: server/impl.cpp:471
 #, c-format
 msgid "streamProvider opener can't open '%s'"
-msgstr "streamProvider opener kann '%s' nicht öffnen"
+msgstr "streamProvider opener kann '%s' nicht Ã¶ffnen"
 
 #: server/impl.cpp:490
 #, c-format
 msgid "note: couldn't open cache file '%s'"
-msgstr "Bemerkung: Konnte Cache-Datei '%s' nicht öffnen"
+msgstr "Bemerkung: Konnte Cache-Datei '%s' nicht Ã¶ffnen"
 
 #: server/impl.cpp:499
 #, c-format
@@ -4397,7 +4396,7 @@ msgstr ""
 #: utilities/dumpshm.cpp:206
 msgid ""
 "Sorry, we can only list the files on systems with disk based shared memory"
-msgstr "Entschuldigung, wir können Dateien nur auf Systemen mit plattenbasiertem geteiltem Speicher auflisten"
+msgstr "Entschuldigung, wir kÃ¶nnen Dateien nur auf Systemen mit plattenbasiertem geteiltem Speicher auflisten"
 
 #: utilities/dumpshm.cpp:215
 msgid "No name specified, nuking everything..."
@@ -4413,7 +4412,7 @@ msgstr ""
 
 #: utilities/dumpshm.cpp:256
 msgid "ERROR: couldn't read!"
-msgstr "FEHLER: Lesen unmöglich!"
+msgstr "FEHLER: Lesen unmÃ¶glich!"
 
 #: utilities/dumpshm.cpp:287
 msgid "This program dumps the internal data of a shared memory segment"
@@ -4471,22 +4470,22 @@ msgstr "has_scale = %d, has_rotate = %d\n"
 #: utilities/parser.cpp:163
 #, c-format
 msgid "x_min: %i, x_max: %i,\twidth: %i twips, %4.0f pixels\n"
-msgstr "x_min : %i, x_max : %i,\tHöhe : %i twips, %4.0f Pixel\n"
+msgstr "x_minÂ : %i, x_maxÂ : %i,\tHÃ¶heÂ : %i twips, %4.0f Pixel\n"
 
 #: utilities/parser.cpp:164
 #, c-format
 msgid "y_min: %i, y_max: %i, height: %i twips, %4.0f pixels\n"
-msgstr "y_min : %i, y_max : %i, Höhe : %i twips, %4.0f Pixel\n"
+msgstr "y_minÂ : %i, y_maxÂ : %i, HÃ¶heÂ : %i twips, %4.0f Pixel\n"
 
 #: utilities/parser.cpp:185
 #, c-format
 msgid "rgb: %d %d %d \n"
-msgstr "rgb : %d %d %d \n"
+msgstr "rgbÂ : %d %d %d \n"
 
 #: utilities/parser.cpp:206
 #, c-format
 msgid "rgba: %d %d %d %d\n"
-msgstr "rgba : %d %d %d %d\n"
+msgstr "rgbaÂ : %d %d %d %d\n"
 
 #: utilities/parser.cpp:279
 msgid "cxform:\n"
