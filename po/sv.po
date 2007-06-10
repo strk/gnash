@@ -11,7 +11,7 @@ msgstr ""
 "POT-Creation-Date: 2007-05-15 08:44+0200\n"
 "PO-Revision-Date: 2007-05-15 08:44+0200\n"
 "Last-Translator: Markus Gothe <nietzsche@lysator.liu.se>\n"
-"Language-Team: Swedish <gnome-se@gnome.org>\n"
+"Language-Team: Swedish <gnome-sv@gnome.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit"
@@ -60,51 +60,51 @@ msgstr "FFMPEG byggt utan mp3-stöd?"
 #: backend/sound_handler_sdl.cpp:304
 #, c-format
 msgid "Unable to start SDL sound: %s"
-msgstr "Kan inte starta SDL audio: %s"
+msgstr "Kann SDL-Audioausgabe nicht starten: %s"
 
 #: backend/sound_handler_sdl.cpp:496
 #, c-format
 msgid "Unable to start aux SDL sound: %s"
-msgstr "Kan inte starta SDL audio: %s"
+msgstr "Kann Aux-SDL-Audioausgabe nicht starten: %s"
 
 #: backend/sound_handler_sdl.cpp:717
 #, c-format
 msgid "Negative buffer length in sdl_audio_callback (%d)"
-msgstr "Bufferlängd mindre än 0 in sdl_audio_callback (%d)"
+msgstr "Negative PufferlÃ¤nge in sdl_audio_callback (%d)"
 
 #: backend/sound_handler_sdl.cpp:834
 msgid ""
 "Error while decoding MP3-stream.  Upgrading ffmpeg/libavcodec might fix this "
 "issue."
-msgstr "Fel under dekodning av MP3-ström. Uppgradering av ffmpeg/libavcdec "
-"detta problem"
+msgstr "Fehler beim Dekodieren des MP3-Streams. Eine Aktualisierung von "
+"ffmpeg/libavcodec kÃ¶nnte dieses Problem beheben."
 
 #: backend/sound_handler_sdl.cpp:864
 #, c-format
 msgid "Recoverable error while decoding MP3-stream, MAD error: %s"
-msgstr "Korrigerbart fel under dekodning av MP3-ström, MAD-fel: %s"
+msgstr "Behebbarer Fehler beim Dekodieren des MP3-Streams, MAD-Fehler: %s"
 
 #: backend/sound_handler_sdl.cpp:872
 #, c-format
 msgid "Unrecoverable error while decoding MP3-stream, MAD error: %s"
-msgstr "Icke korrigerbart fel under dekodning av MP3-ström, MAD-fel: %s"
+msgstr "Nicht behebbarer Fehler beim Dekodieren des MP3-Streams, MAD-Fehler: %s"
 
 #: backend/sound_handler_sdl.cpp:929
 msgid "Error in sound sample conversion"
-msgstr "Fel i ljud-resampling"
+msgstr "Fehler bei Audio-Sample-Umwandlung"
 
 #: extensions/mysql/mysql_db.cpp:186
 msgid "Couldn't initialize database"
-msgstr "Kan inte initialisera databas"
+msgstr "Konnte Datenbank nicht initialisieren"
 
 #: extensions/mysql/mysql_db.cpp:191
 msgid "Couldn't connect to database"
-msgstr "Kan inte ansluta till databas"
+msgstr "Konnte mit Datenbank nicht verbinden"
 
 #: extensions/mysql/mysql_db.cpp:217 extensions/mysql/mysql_db.cpp:244
 #, c-format
 msgid "MySQL connection error: %s"
-msgstr "Fel i MySQL-anslutningen: %s"
+msgstr "MySQL-Verbindungsfehler: %s"
 
 #: extensions/mysql/mysql_db.cpp:224 extensions/mysql/mysql_db.cpp:251
 #, c-format
@@ -113,14 +113,14 @@ msgid ""
 "\t%s\n"
 "Query was: %s"
 msgstr ""
-"MySQL-fel i query för:\n"
+"MySQL-Fehler bei Abfrage nach:\n"
 "\t%s\n"
-"Query var: %s"
+"Abfrage war: %s"
 
 #: extensions/mysql/mysql_db.cpp:265
 #, c-format
 msgid "Field name is: %s: "
-msgstr "Fältnamnet är: %s: "
+msgstr "Feldname ist: %s: "
 
 #: gui/gnash.cpp:73
 msgid ""
