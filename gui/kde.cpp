@@ -22,12 +22,13 @@
 #endif
 
 
-#include <qtimer.h>
 #include <qwidget.h>
 #include <qmessagebox.h>
 #include <qcursor.h>
 #include <qxembed.h>
 #include <qnamespace.h>
+#include <qtimer.h>
+#include <qeventloop.h>
 
 #include "Range2d.h"
 
@@ -39,9 +40,6 @@
 #include "kdesup.h"
 #include "klash.moc"
 
-//#include <cstdio>
-#include <X11/keysym.h>
-
 using namespace std;
 
 namespace gnash 
@@ -50,29 +48,25 @@ namespace gnash
 KdeGui::~KdeGui()
 {
 //    GNASH_REPORT_FUNCTION;
-    delete _qwidget;
 }
 
 
 KdeGui::KdeGui(unsigned long xid, float scale, bool loop, unsigned int depth)
  : Gui(xid, scale, loop, depth)
 {
-    GNASH_REPORT_FUNCTION;
-
-
 }
 
 bool
 KdeGui::init(int argc, char **argv[])
 {
-    _qapp = new QApplication(argc, *argv);
-    _qwidget = new qwidget(this); 
+//    GNASH_REPORT_FUNCTION;
+    _qapp.reset(new QApplication(argc, *argv));
+    _qwidget.reset(new qwidget(this)); 
     if (_xid) {
         QXEmbed::initialize();
-        QXEmbed::embedClientIntoWindow(_qwidget, _xid);
+        QXEmbed::embedClientIntoWindow(_qwidget.get(), _xid);
     }
 
-//    GNASH_REPORT_FUNCTION;
     _glue.init (argc, argv);
     
     return true;
@@ -81,15 +75,15 @@ KdeGui::init(int argc, char **argv[])
 bool
 KdeGui::createWindow(const char* windowtitle, int width, int height)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
 
     _qwidget->setGeometry(0, 0, width, height);
     _qwidget->setCaption(windowtitle);
 
-    _qapp->setMainWidget(_qwidget);
+    _qapp->setMainWidget(_qwidget.get());
     _qwidget->show();
 
-    _glue.prepDrawingArea(_qwidget);
+    _glue.prepDrawingArea(_qwidget.get());
     _renderer = _glue.createRenderHandler();
     _glue.initBuffer(width, height);
     
@@ -118,13 +112,13 @@ void
 KdeGui::setTimeout(unsigned int timeout)
 {
 //    GNASH_REPORT_FUNCTION;
-//    _timeout = timeout;
+    QTimer::singleShot(timeout, _qapp.get(), SLOT(quit()));
 }
 
 void
 KdeGui::setInterval(unsigned int interval)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     _qwidget->setInterval(interval);
     
 }
@@ -132,9 +126,7 @@ KdeGui::setInterval(unsigned int interval)
 bool
 KdeGui::run()
 {
-    GNASH_REPORT_FUNCTION;
- //   _qwidget->connect(&_qapp, SIGNAL(lastWindowClosed()), &_qapp, SLOT(quit()));
-    
+//    GNASH_REPORT_FUNCTION;
     _qapp->exec();
 
     return true;
@@ -259,6 +251,12 @@ KdeGui::resize(int width, int height)
     resize_view(width, height);
 }
 
+void
+KdeGui::quit()
+{
+    _qapp->eventLoop()->exit();
+}
+
 
 /// \brief restart the movie from the beginning
 void
@@ -273,12 +271,7 @@ void
 qwidget::menuitem_quit_callback()
 {
 //    GNASH_REPORT_FUNCTION;
-#if 0
-    _qapp->closeAllWindows();
-    _qapp->quit();
- #endif
-
-    exit(0);
+    _godfather->quit();
 }
 
 /// \brief Start the movie playing from the current frame.
@@ -346,14 +339,14 @@ qwidget::menuitem_jump_backward_callback()
 void
 qwidget::mouseMoveEvent(QMouseEvent *event)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
     assert(_godfather);
     QPoint position = event->pos();
 
-    float xscale = _godfather->getXScale();
-    float yscale = _godfather->getYScale();
+    int newX = static_cast<int> (position.x() / _godfather->getXScale());
+    int newY = static_cast<int> (position.y() / _godfather->getYScale());
 
-    _godfather->notify_mouse_moved(position.x() / xscale, position.y() / yscale);
+    _godfather->notify_mouse_moved(newX, newY);
 }
 
 qwidget::qwidget(KdeGui* godfather)
@@ -394,13 +387,13 @@ qwidget::contextMenuEvent(QContextMenuEvent*)
 }
 
 void
-qwidget::mousePressEvent(QMouseEvent *event)
+qwidget::mousePressEvent(QMouseEvent* /* event */)
 {
     _godfather->notify_mouse_clicked(true, 1);
 }
 
 void
-qwidget::mouseReleaseEvent(QMouseEvent *event)
+qwidget::mouseReleaseEvent(QMouseEvent* /* event */)
 {
     _godfather->notify_mouse_clicked(false, 1);
 }
@@ -429,10 +422,12 @@ qwidget::paintEvent(QPaintEvent *event)
     const QRegion& region = event->region();
     QRect rect = region.boundingRect();
 
-    geometry::Range2d<int> range(PIXELS_TO_TWIPS(rect.x()-1), 
-                                 PIXELS_TO_TWIPS(rect.y()-1),
-				 PIXELS_TO_TWIPS(rect.right()+1),
-				 PIXELS_TO_TWIPS(rect.bottom()+1));
+    int xmin = static_cast<int> (PIXELS_TO_TWIPS(rect.x()-1)),
+        ymin = static_cast<int> (PIXELS_TO_TWIPS(rect.y()-1)),
+        xmax = static_cast<int> (PIXELS_TO_TWIPS(rect.right()+1)),
+        ymax = static_cast<int> (PIXELS_TO_TWIPS(rect.bottom()+1));
+
+    geometry::Range2d<int> range(xmin, ymin, xmax, ymax);
     InvalidatedRanges ranges;
     ranges.add(range);
 

@@ -28,41 +28,22 @@
 #include "tu_config.h"
 #include "gui.h"
 
-#if 0
-#include <qobject.h>
-#include <qgl.h>
-#include <qwidget.h>
-
-#include <qtimer.h>
-#include <qapplication.h>
-#include <qeventloop.h>
-#include <qlabel.h>
-#include <qevent.h>
-#include <qkeycode.h>
-
-#endif
-
 #include <qapplication.h>
 #include <qpopupmenu.h>
 
 #ifdef RENDERER_OPENGL
 # include <qgl.h>
 # include "kde_glue_opengl.h"
+# define WIDGETCLASS QGLWidget
+# define GLUE KdeOpenGLGlue
 #elif defined(RENDERER_CAIRO)
 // #include <cairo.h>
 // #include "kde_glue_cairo.h"
 # error "Cairo not supported yet for KDE!"
 #elif defined(RENDERER_AGG)
 # include "kde_glue_agg.h"
-#endif
-
-
-#ifdef RENDERER_OPENGL
-#define WIDGETCLASS QGLWidget
-#define GLUE KdeOpenGLGlue
-#else
-#define WIDGETCLASS QWidget
-#define GLUE KdeAggGlue
+# define WIDGETCLASS QWidget
+# define GLUE KdeAggGlue
 #endif
 
 
@@ -121,12 +102,11 @@ public:
     virtual void handleKeyEvent(QKeyEvent *event, bool down);
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     void resize(int width, int height);
+    void quit();
  private:
-    QApplication*  _qapp;
-    qwidget*       _qwidget;
-    GLUE           _glue;    
-
-    QTimer        *_timer;
+    std::auto_ptr<QApplication>  _qapp;
+    std::auto_ptr<qwidget>       _qwidget;
+    GLUE                         _glue;    
 
     gnash::key::code qtToGnashKey(QKeyEvent *event);
     int qtToGnashModifier(Qt::ButtonState state);

@@ -17,6 +17,7 @@
 
 #include "kde_glue.h"
 #include <qimage.h>
+#include <boost/scoped_array.hpp>
 
 
 namespace gnash
@@ -39,8 +40,8 @@ class KdeAggGlue : public KdeGlue
   private:
     int _width;
     int _height;
-    unsigned char* _offscreenbuf;
-    render_handler* _renderer;
+    boost::scoped_array<unsigned char> _offscreenbuf;
+    render_handler* _renderer; // We don't own this pointer.
     geometry::Range2d<int> _validbounds;
     std::vector< geometry::Range2d<int> > _drawbounds;
     std::auto_ptr<QImage> _qimage;

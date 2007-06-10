@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: kde_glue_agg.cpp,v 1.1 2007/06/09 19:42:05 bjacques Exp $ */
+/* $Id: kde_glue_agg.cpp,v 1.2 2007/06/10 14:46:44 bjacques Exp $ */
 
 #include "kde_glue_agg.h"
 #include "render_handler.h"
@@ -27,8 +27,7 @@ namespace gnash
 {
 
 KdeAggGlue::KdeAggGlue()
-: _offscreenbuf(NULL),
-  _renderer(NULL),
+: _renderer(NULL),
   _width(0),
   _height(0)
 {
@@ -69,14 +68,14 @@ KdeAggGlue::initBuffer(int width, int height)
 
     int bufsize = (width * height * depth_bytes / CHUNK_SIZE + 1) * CHUNK_SIZE;
 
-    _offscreenbuf = new unsigned char[bufsize];
+    _offscreenbuf.reset(new unsigned char[bufsize]);
 
     // Only the AGG renderer has the function init_buffer, which is *not* part of
     // the renderer api. It allows us to change the renderers movie size (and buffer
     // address) during run-time.
     render_handler_agg_base * renderer =
       static_cast<render_handler_agg_base *>(_renderer);
-    renderer->init_buffer(_offscreenbuf, bufsize, width, height);
+    renderer->init_buffer(_offscreenbuf.get(), bufsize, width, height);
 
     _width = width;
     _height = height;
@@ -84,7 +83,7 @@ KdeAggGlue::initBuffer(int width, int height)
     _validbounds.setTo(0, 0, _width, _height);
     _drawbounds.push_back(_validbounds);
     
-    _qimage.reset(new QImage(_offscreenbuf, _width, _height, 32 /* bits per pixel */,
+    _qimage.reset(new QImage(_offscreenbuf.get(), _width, _height, 32 /* bits per pixel */,
                              0 , 0, QImage::IgnoreEndian));
 }
 
@@ -145,12 +144,6 @@ KdeAggGlue::createRenderHandler()
 void
 KdeAggGlue::resize(int width, int height)
 {
-    if (!_offscreenbuf) {
-      // If initialisation has not taken place yet, we don't want to touch this.
-      return;
-    }
-
-    delete [] _offscreenbuf;
     initBuffer(width, height);
 }
 
