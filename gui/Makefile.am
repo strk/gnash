@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.77 2007/06/09 19:42:05 bjacques Exp $
+# $Id: Makefile.am,v 1.78 2007/06/10 07:36:13 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -159,7 +159,7 @@ else
 endif
 
 if USE_GUI_KDE
- KDE_SRCS = kde.cpp kdesup.h kde_glue.h $(KDE_CAIRO_SRCS) $(KDE_OPENGL_SRCS) $(KDE_AGG_SRCS)
+ KDE_SRCS = kde.cpp kdesup.h kde_glue.h klash.moc $(KDE_CAIRO_SRCS) $(KDE_OPENGL_SRCS) $(KDE_AGG_SRCS)
  AM_CPPFLAGS += $(KDE_CFLAGS) $(QT_CFLAGS)
  AM_LDFLAGS += $(KDE_LIBS) $(QT_LIBS)
 else
