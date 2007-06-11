@@ -30,6 +30,11 @@ namespace gnash
 {
 
 SdlAggGlue::SdlAggGlue()
+	:
+_sdl_surface(NULL),
+_screen(NULL),
+_offscreenbuf(NULL),
+_agg_renderer(NULL)
 {
 //    GNASH_REPORT_FUNCTION;
 }

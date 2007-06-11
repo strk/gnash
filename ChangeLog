@@ -1,3 +1,8 @@
+2007-06-11 Zou Lunkai <zoulunkai@gmail.com>
+
+	* gui/sdl_agg_glue.cpp: initialize member variables at construction, 
+	  fix an abortion when loading nonexistent swf files.
+	
 2007-06-10 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* gui/kde{sup.h, .cpp}: Comment out debugging statements. Make
