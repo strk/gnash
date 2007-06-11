@@ -90,6 +90,28 @@ private:
 	// TODO: drop ?
 	float get_advance_x(uint16_t code);
 
+	/// Get filename containing given font
+	//
+	/// @param name
+	///	Font name
+	///
+	/// @param bold
+	///	Want bold version
+	///
+	/// @param italic
+	///	Want italic version
+	///
+	/// @param filename
+	///	Where to return the filename to
+	///
+	/// @return true if the font was found, false otherwise.
+	///	Actually, this function should return a default
+	///	filename in any case, so false should only be
+	///	returned if not even a default font was found.
+	///
+	bool getFontFilename(const std::string& name, bool bold, bool italic,
+			std::string& filename);
+
 	static void init();
 
 	static void close();

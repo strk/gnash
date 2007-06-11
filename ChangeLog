@@ -1,3 +1,8 @@
+2007-06-11 Sandro Santilli <strk@keybit.net>
+
+	* server/FreetypeRasterizer.{cpp,h}: 
+	  Add missing stub for font filename finder method.
+
 2007-06-11 Zou Lunkai <zoulunkai@gmail.com>
 
 	* gui/sdl_agg_glue.cpp: initialize member variables at construction, 

@@ -129,7 +129,7 @@ FreetypeRasterizer::FreetypeRasterizer(const std::string& name, bool bold, bool 
 	}
 
 	std::string filename;
-	if (get_fontfile(name, filename, bold, italic) == false)
+	if (getFontFilename(name, bold, italic, filename) == false)
 	{
 		snprintf(buf, maxerrlen, _("Can't find font file for font '%s'"), name.c_str());
 		buf[maxerrlen-1] = '\0';
@@ -201,6 +201,13 @@ FreetypeRasterizer::getRenderedGlyph(uint16_t, rect& , float&)
 }
 #endif // ndef(HAVE_LIBFREETYPE)
 
+bool
+FreetypeRasterizer::getFontFilename(const std::string& name,
+		bool bold, bool italic, std::string& filename)
+{
+	// TODO: implement
+	return false;
+}
 
 } // namespace gnash
 
