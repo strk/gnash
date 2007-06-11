@@ -86,6 +86,15 @@ FreetypeRasterizer::get_advance_x(uint16_t code)
 	return (float) m_face->glyph->metrics.horiAdvance * s_advance_scale;
 }
 
+// private
+bool
+FreetypeRasterizer::getFontFilename(const std::string& name,
+		bool bold, bool italic, std::string& filename)
+{
+	// TODO: implement
+	return false;
+}
+
 #endif // HAVE_LIBFREETYPE 
 
 #ifdef HAVE_LIBFREETYPE 
@@ -200,14 +209,6 @@ FreetypeRasterizer::getRenderedGlyph(uint16_t, rect& , float&)
 	assert(0); // should never be called... 
 }
 #endif // ndef(HAVE_LIBFREETYPE)
-
-bool
-FreetypeRasterizer::getFontFilename(const std::string& name,
-		bool bold, bool italic, std::string& filename)
-{
-	// TODO: implement
-	return false;
-}
 
 } // namespace gnash
 
