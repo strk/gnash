@@ -10,24 +10,29 @@
 #include "config.h"
 #endif
 
+
+#ifdef HAVE_FREETYPE_FREETYPE_H
+# define HAVE_FREETYPE2 1
+#endif
+
 #include "rect.h"
+#include "smart_ptr.h" // for intrusive_ptr
 
 #include <string>
 #include <memory> // for auto_ptr
 
-#ifdef HAVE_LIBFREETYPE 
+#ifdef HAVE_FREETYPE2 
 # include <ft2build.h>
-# include <freetype.h>
-# include <ftglyph.h>
+# include FT_FREETYPE_H
 # include FT_GLYPH_H
 #endif
 
 // Forward declarations
 namespace gnash {
 	class bitmap_info;
-	namespace image {
-		class alpha;
-	}
+}
+namespace image {
+	class alpha;
 }
 
 
@@ -44,6 +49,9 @@ namespace gnash {
 ///
 class FreetypeRasterizer 
 {
+
+public:
+
 	/// Named constructor for a face-bound rasterizer.
 	//
 	/// @param name
@@ -75,7 +83,7 @@ class FreetypeRasterizer
 	/// @return A bitmap_info, or a NULL pointer if the given character code
 	///	    doesn't exist in this font.
 	///
-	std::auto_ptr<bitmap_info> getRenderedGlyph(uint16_t code, rect& box, float& advance);
+	boost::intrusive_ptr<bitmap_info> getRenderedGlyph(uint16_t code, rect& box, float& advance);
 
 private:
 
@@ -85,10 +93,10 @@ private:
 	///
 	FreetypeRasterizer(const std::string& fontname, bool bold, bool italic);
 
-#ifdef HAVE_LIBFREETYPE 
+#ifdef HAVE_FREETYPE2 
 
 	// TODO: drop ?
-	float get_advance_x(uint16_t code);
+	//float get_advance_x(uint16_t code);
 
 	/// Get filename containing given font
 	//
@@ -126,7 +134,7 @@ private:
 	static FT_Library	m_lib;
 	FT_Face	m_face;
 
-#endif	// HAVE_LIBFREETYPE
+#endif // HAVE_FREETYPE2
 
 };
 

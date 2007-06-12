@@ -17,6 +17,8 @@
 #include "ref_counted.h" // for inheritance of texture_glyph
 #include "swf.h" // for tag_type definition
 #include "bitmap_info.h" // for dtor visibility by smart pointer
+#include "FreetypeRasterizer.h" // for device fonts support
+#include "log.h"
 
 #include <map>
 
@@ -110,10 +112,31 @@ namespace gnash {
 		~font();
 
 		// override from resource.
-		virtual font*	cast_to_font() { return this; }
+		font*	cast_to_font() { return this; }
+
+		void testInvariant()
+		{
+			assert(m_texture_glyphs.size() == m_glyphs.size());
+			assert(m_texture_glyphs.size() == m_advance_table.size());
+		}
 
 		/// Get number of glyphs defined for this font
-		int	get_glyph_count() const { return m_glyphs.size(); }
+		//
+		/// NOTE: for device fonts, this method will returns whatever
+		///       number of glyphs the cache happens to have at time of
+		///	  calls. Anyway, the cache will grow if any font user
+		///	  requests more glyphs... 
+		///	  
+		/// Callers of this function are:
+		///
+		///	- fontlib, for writing cache data (known to be not working anyway).
+		///	- edit_text_character, for validating the font (obsoleted too).
+		///
+		int	get_glyph_count() const
+		{
+			log_error("FIXME: font::get_glyph_count() is a deprecated method");
+			return m_glyphs.size();
+		}
 
 		/// Get glyph by index. Return NULL if out of range
 		shape_character_def*	get_glyph(int glyph_index) const;
@@ -161,10 +184,14 @@ namespace gnash {
 		/// texture_glyph.
 		///
 		const texture_glyph&	get_texture_glyph(int glyph_index) const;
+
 		/// \brief
 		/// Register some texture info for the glyph at the specified
 		/// index.  The texture_glyph can be used later to render the
 		/// glyph.
+		//
+		/// TODO: deprecate this, probably only used by the caching mechanism
+		///
 		void	add_texture_glyph(int glyph_index, const texture_glyph& glyph);
 
 		void	set_texture_glyph_nominal_size(int size) { m_texture_glyph_nominal_size = imax(1, size); }
@@ -189,8 +216,23 @@ namespace gnash {
 		/// Read a DefineFont2 or DefineFont3 tag
 		void readDefineFont2_or_3(stream* in, movie_definition* m);
 
-		// Read a DefineFont tag
+		/// Read a DefineFont tag
 		void readDefineFont(stream* in, movie_definition* m);
+
+		/// Add a glyph from the os font.
+		//
+		/// It is assumed that the glyph tables do NOT contain
+		/// an entry for the given code.
+		/// Initializes the rasterizer if not already done so.
+		///
+		/// @return index of the newly added glyph, or -1 on error.
+		///
+		int add_os_glyph(uint16_t code);
+
+		/// Initialize the freetype rasterizer
+		//
+		/// Return true on success, false on error
+		bool initDeviceFontRasterizer();
 
 		std::vector< boost::intrusive_ptr<shape_character_def> >	m_glyphs;
 
@@ -210,17 +252,6 @@ namespace gnash {
 		bool	m_wide_codes;
 
 		// This table maps from Unicode character number to glyph index.
-		// m_code_table[character_code] = glyph_index
-		//
-		// @@ TODO: avoid little allocs; replace this with a flat hash, or else a sorted array (binary search)
-//		template<class T>
-//		class simple_code_hash
-//		// Dummy hash functor.
-//		{
-		public:
-//			size_t	operator()(const T& data) const { return data; }
-//		};
-//		hash<uint16_t, int, simple_code_hash<uint16_t> > m_code_table;
 		typedef std::map<uint16_t, int> code_table;
 		code_table m_code_table; 
 
@@ -229,13 +260,11 @@ namespace gnash {
 		float	m_descent;
 		float	m_leading;
 		std::vector<float>	m_advance_table;
-		// @@ we don't seem to use this thing at all, so don't bother keeping it.
-		// std::vector<rect>	m_bounds_table;	// @@ this thing should be optional.
 
-
-		//hash<kerning_pair, float>	m_kerning_pairs;
 		typedef std::map<kerning_pair, float> kernings_table;
 		kernings_table m_kerning_pairs;
+
+		std::auto_ptr<FreetypeRasterizer> _ftRasterizer;
 	};
 
 

@@ -1,3 +1,20 @@
+2007-06-12 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: Look for libfreetype using GNASH_PKG_FIND
+	* server/FreetypeRasterizer.{cpp,h}: use HAVE_FREETYPE_H,
+	  use intrusive_ptr for bitmap_info, not auto_ptr; add missing
+	  includes, make it actually buildable.
+	* server/Makefile.am: Build FreetypeRasterizer
+	* server/parser/Makefile.am: add FREETYPE_CFLAGS
+	* server/edit_text_character.cpp (format_text): stop relying
+	  on font::get_glyph_count, as for device fonts count of glyph
+	  is not known in advance (grows as needed).
+	* server/font.{cpp,h}: Add private methods for initialization
+	  and use of a freetype rasterizer; get_glyph_index() will now
+	  try to create a missing glyph.
+	* server/parser/bitmap_character_def.h: add forward declaration
+	  for image::rgb
+
 2007-06-12 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/loop_test8.c:

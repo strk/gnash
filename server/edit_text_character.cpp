@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.65 2007/06/08 12:11:50 zoulunkai Exp $ */
+/* $Id: edit_text_character.cpp,v 1.66 2007/06/12 12:33:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -922,6 +922,7 @@ edit_text_character::format_text()
 		return;
 	}
 
+#if 0 // device fonts has an unknown (unless we scan them) number of glyphs
 	// @@ mostly for debugging
 	// Font substitution -- if the font has no
 	// glyphs, try some other defined font!
@@ -960,6 +961,7 @@ edit_text_character::format_text()
 		}
 
 	}
+#endif
 
 
 	float	scale = m_def->get_font_height() / 1024.0f;	// the EM square is 1024 x 1024

@@ -11,6 +11,10 @@
 #endif
 
 #include "FreetypeRasterizer.h"
+#include "smart_ptr.h" // for intrusive_ptr
+#include "image.h" // for create_alpha
+#include "GnashException.h"
+#include "render.h"
 #include "log.h"
 
 #include <cstdio> // for snprintf
@@ -21,7 +25,7 @@
 
 namespace gnash {
 
-#ifdef HAVE_LIBFREETYPE 
+#ifdef HAVE_FREETYPE2 
 
 // static
 FT_Library FreetypeRasterizer::m_lib;
@@ -62,8 +66,8 @@ FreetypeRasterizer::draw_bitmap(const FT_Bitmap& bitmap)
 	// copy image to alpha
 	for (int i = 0; i < bitmap.rows; i++)
 	{
-		uint8*	src = bitmap.buffer + bitmap.pitch * i;
-		uint8*	dst = alpha->m_data + alpha->m_pitch * i;
+		uint8_t*	src = bitmap.buffer + bitmap.pitch * i;
+		uint8_t*	dst = alpha->m_data + alpha->m_pitch * i;
 		int	x = bitmap.width;
 		while (x-- > 0)
 		{
@@ -74,6 +78,7 @@ FreetypeRasterizer::draw_bitmap(const FT_Bitmap& bitmap)
 	return alpha;
 }
 
+#if 0
 // private
 float
 FreetypeRasterizer::get_advance_x(uint16_t code)
@@ -85,6 +90,7 @@ FreetypeRasterizer::get_advance_x(uint16_t code)
 	}
 	return (float) m_face->glyph->metrics.horiAdvance * s_advance_scale;
 }
+#endif
 
 // private
 bool
@@ -92,18 +98,19 @@ FreetypeRasterizer::getFontFilename(const std::string& name,
 		bool bold, bool italic, std::string& filename)
 {
 	// TODO: implement
+	log_error("FIXME: font name to filename mapping unimplemented");
 	return false;
 }
 
-#endif // HAVE_LIBFREETYPE 
+#endif // HAVE_FREETYPE2 
 
-#ifdef HAVE_LIBFREETYPE 
+#ifdef HAVE_FREETYPE2 
 // static
 std::auto_ptr<FreetypeRasterizer>
 FreetypeRasterizer::createFace(const std::string& name, bool bold, bool italic)
 {
 
-	std::auto_ptr<FreetypeRasterizer> ret( 
+	std::auto_ptr<FreetypeRasterizer> ret;
 
 	try { 
 		ret.reset( new FreetypeRasterizer(name, bold, italic) );
@@ -115,16 +122,16 @@ FreetypeRasterizer::createFace(const std::string& name, bool bold, bool italic)
 	return ret;
 
 }
-#else // ndef HAVE_LIBFREETYPE 
+#else // ndef HAVE_FREETYPE2 
 std::auto_ptr<FreetypeRasterizer>
 FreetypeRasterizer::createFace(const std::string&, bool, bool)
 {
 	log_error("Freetype not supported");
 	return std::auto_ptr<FreetypeRasterizer>(NULL);
 }
-#endif // ndef HAVE_LIBFREETYPE 
+#endif // ndef HAVE_FREETYPE2 
 
-#ifdef HAVE_LIBFREETYPE 
+#ifdef HAVE_FREETYPE2 
 FreetypeRasterizer::FreetypeRasterizer(const std::string& name, bool bold, bool italic)
 	:
 	m_face(NULL)
@@ -142,7 +149,7 @@ FreetypeRasterizer::FreetypeRasterizer(const std::string& name, bool bold, bool 
 	{
 		snprintf(buf, maxerrlen, _("Can't find font file for font '%s'"), name.c_str());
 		buf[maxerrlen-1] = '\0';
-		throw GnashException(buf):
+		throw GnashException(buf);
 	}
 
 	int error = FT_New_Face(m_lib, filename.c_str(), 0, &m_face);
@@ -152,33 +159,31 @@ FreetypeRasterizer::FreetypeRasterizer(const std::string& name, bool bold, bool 
 			break;
 
 		case FT_Err_Unknown_File_Format:
-			char buf[64];
 			snprintf(buf, maxerrlen, _("Font file '%s' has bad format"), filename.c_str());
 			buf[maxerrlen-1] = '\0';
-			throw GnashException(buf):
+			throw GnashException(buf);
 			break;
 
 		default:
 			// TODO: return a better error message !
-			char buf[64];
 			snprintf(buf, maxerrlen, _("Some error opening font '%s'"), filename.c_str());
 			buf[maxerrlen-1] = '\0';
-			throw GnashException(buf):
+			throw GnashException(buf);
 			break;
 	}
 }
-#else // ndef(HAVE_LIBFREETYPE)
+#else // ndef(HAVE_FREETYPE2)
 FreetypeRasterizer::FreetypeRasterizer(const std::string&, bool, bool)
 {
 	assert(0); // should never be called
 }
-#endif // ndef HAVE_LIBFREETYPE 
+#endif // ndef HAVE_FREETYPE2 
 
-#ifdef HAVE_LIBFREETYPE
-std::auto_ptr<bitmap_info>
+#ifdef HAVE_FREETYPE2
+boost::intrusive_ptr<bitmap_info>
 FreetypeRasterizer::getRenderedGlyph(uint16_t code, rect& box, float& advance)
 {
-	std::auto_ptr<bitmap_info> bi;
+	boost::intrusive_ptr<bitmap_info> bi;
 
 	FT_Set_Pixel_Sizes(m_face, 0, FREETYPE_MAX_FONTSIZE);
 	if (FT_Load_Char(m_face, code, FT_LOAD_RENDER))
@@ -188,27 +193,33 @@ FreetypeRasterizer::getRenderedGlyph(uint16_t code, rect& box, float& advance)
 
 
 	std::auto_ptr<image::alpha> im ( draw_bitmap(m_face->glyph->bitmap) );
-	bi.reset( render::create_bitmap_info_alpha(im->m_width, im->m_height, im->m_data) );
+	bi = render::create_bitmap_info_alpha(im->m_width, im->m_height, im->m_data);
 
-	box.m_x_max = float(m_face->glyph->bitmap.width) / float(bi->m_suspended_image->m_width);
-	box.m_y_max = float(m_face->glyph->bitmap.rows) / float(bi->m_suspended_image->m_height);
+	float xmax = float(m_face->glyph->bitmap.width) / float(bi->m_suspended_image->m_width);
+	float ymax = float(m_face->glyph->bitmap.rows) / float(bi->m_suspended_image->m_height);
 
-	box.m_x_min = float(m_face->glyph->metrics.horiBearingX) / float(m_face->glyph->metrics.width);
-	box.m_y_min = float(m_face->glyph->metrics.horiBearingY) / float(m_face->glyph->metrics.height);
-	box.m_x_min *= -box.m_x_max;
-	box.m_y_min *= box.m_y_max;
+	float xmin = float(m_face->glyph->metrics.horiBearingX) / float(m_face->glyph->metrics.width);
+	float ymin = float(m_face->glyph->metrics.horiBearingY) / float(m_face->glyph->metrics.height);
+
+	// ???
+	xmin *= -xmax;
+	ymin *= ymax;
+
+	box.enclose_point(xmin, ymin);
+	box.expand_to_point(xmax, ymax);
 	
+	static float s_advance_scale = 0.16666666f; //vv hack
 	advance = (float) m_face->glyph->metrics.horiAdvance * s_advance_scale;
 
 	return bi;
 }
-#else // ndef(HAVE_LIBFREETYPE)
-std::auto_ptr<bitmap_info>
+#else // ndef(HAVE_FREETYPE2)
+boost::intrusive_ptr<bitmap_info>
 FreetypeRasterizer::getRenderedGlyph(uint16_t, rect& , float&)
 {
 	assert(0); // should never be called... 
 }
-#endif // ndef(HAVE_LIBFREETYPE)
+#endif // ndef(HAVE_FREETYPE2)
 
 } // namespace gnash
 

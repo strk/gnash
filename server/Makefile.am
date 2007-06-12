@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.115 2007/06/07 14:59:08 strk Exp $
+# $Id: Makefile.am,v 1.116 2007/06/12 12:33:21 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -27,6 +27,9 @@ SUBDIRS = asobj parser vm
 # noinst_LTLIBRARIES = libserver.la 
 lib_LTLIBRARIES = libgnashserver.la
 # noinst_SCRIPTS = gen-files.sh
+
+# TODO: use a conditional to optionally link ?
+FREETYPE_SOURCES = FreetypeRasterizer.h FreetypeRasterizer.cpp
 
 # Only enable if we're configured with --enable-mp3
 AM_CPPFLAGS = \
@@ -45,6 +48,7 @@ AM_CPPFLAGS = \
 	$(GSTREAMER_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(LIBXML_CFLAGS) \
+	$(FREETYPE_CFLAGS) \
 	$(NULL)
 
 libgnashserver_la_SOURCES = \
@@ -92,6 +96,7 @@ libgnashserver_la_SOURCES = \
 	textformat.cpp \
 	timers.cpp \
 	types.cpp 	\
+	$(FREETYPE_SOURCES) \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -166,6 +171,7 @@ libgnashserver_la_LIBADD = \
 	$(LIBXML_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
+	$(FREETYPE_LIBS) \
 	$(NULL)
 
 if USE_SOUND_GST

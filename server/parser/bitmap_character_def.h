@@ -38,6 +38,10 @@
 #include <cassert>
 #include <memory> // for auto_ptr
 
+namespace image {
+	class rgb;
+}
+
 namespace gnash {
 
 /// Definition of a bitmap character

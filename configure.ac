@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.337 2007/06/09 19:42:05 bjacques Exp $
+dnl $Id: configure.ac,v 1.338 2007/06/12 12:33:21 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -705,6 +705,9 @@ dnl AC_CHECK_LIB(c, mremap)
 GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
+
+dnl Find freetype
+GNASH_PKG_FIND(freetype, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
 
 AC_PATH_MING
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
@@ -1763,6 +1766,22 @@ else
   echo "                 or .deb users: apt-get install zlib1g-dev"
   echo "                 or .rpm users: yum install zlib-dev."
   echo "                 It may still be possible to configure without zlib."
+fi
+
+if test x"$FREETYPE_LIBS" != x; then
+  if test x"$FREETYPE_CFLAGS" != x; then
+    echo "        FreeType flags are: $FREETYPE_CFLAGS"
+  else
+    echo "        FreeType flags are: default include path"
+  fi
+  echo "        FreeType libs are: $FREETYPE_LIBS"
+else
+  echo "        WARNING: You need to have the freetype development packages installed"
+  echo "                 to use device fonts."
+  echo "                 Install it from http://www.freetype.org"
+  echo "                 or .deb users: apt-get install libfreetype6-dev"
+  echo "                 or .rpm users: yum install libfreetype6-dev (??)"
+  echo "                 It may still be possible to configure without freetype."
 fi
 
 if test x$ext_mysql = xyes; then

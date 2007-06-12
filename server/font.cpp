@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.32 2007/05/15 09:59:08 strk Exp $ */
+/* $Id: font.cpp,v 1.33 2007/06/12 12:33:21 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -130,6 +130,11 @@ namespace gnash {
 		{
 			assert (tag == SWF::DEFINEFONT2 || tag == SWF::DEFINEFONT3);
 			readDefineFont2_or_3(in, m);
+		}
+
+		if ( m_name && ! initDeviceFontRasterizer() )
+		{
+			log_error("Could not initialize device font face '%s'", m_name);
 		}
 	}
 
@@ -433,10 +438,11 @@ namespace gnash {
 
 	int	font::get_glyph_index(uint16_t code) const
 	{
+		int glyph_index = -1;
 		code_table::const_iterator it = m_code_table.find(code);
 		if ( it != m_code_table.end() )
 		{
-			int glyph_index = it->second;
+			glyph_index = it->second;
 #if 0
 			log_msg(_("get_glyph_index(%u) returning %d"),
 				code, glyph_index);
@@ -444,10 +450,15 @@ namespace gnash {
 			return glyph_index;
 		}
 
+		// Try adding an os font, of possible
+		if ( _ftRasterizer.get() )
+		{
+			glyph_index = const_cast<font*>(this)->add_os_glyph(code);
+		}
 #if 0
 		log_msg(_("get_glyph_index(%u) returning -1"), code);
 #endif
-		return -1;
+		return glyph_index;
 	}
 
 	float	font::get_advance(int glyph_index) const
@@ -545,6 +556,61 @@ namespace gnash {
 			m_glyphs[i]->input_cached_data(in);
 		}
 #endif // 0
+	}
+
+	int
+	font::add_os_glyph(uint16_t code)
+	{
+		assert ( _ftRasterizer.get() );
+		assert(m_code_table.find(code) == m_code_table.end());
+
+		rect box;
+		float advance;
+		boost::intrusive_ptr<bitmap_info> bi ( _ftRasterizer->getRenderedGlyph(code, box, advance) );
+
+		if ( ! bi.get() )
+		{
+			log_error("Could not create glyph for character code %u with device font %s (%p)", code, m_name, _ftRasterizer.get());
+			return -1;
+		}
+
+		// Create textured glyph from the bitmap info
+		texture_glyph tg;
+		tg.m_uv_bounds.enclose_point(0, 0);
+		tg.m_uv_bounds.expand_to_point(box.get_x_max(), box.get_y_max());
+		// the origin
+		tg.m_uv_origin.m_x = box.get_x_min();
+		tg.m_uv_origin.m_y = box.get_y_min();
+		tg.set_bitmap_info(bi.get());
+
+		// Add the textured glyph
+		int newOffset = m_texture_glyphs.size();
+		m_code_table[code] = newOffset;
+		m_advance_table.push_back(advance);
+		m_texture_glyphs.push_back(tg);
+		m_glyphs.push_back(NULL);
+
+		testInvariant();
+
+		return newOffset;
+	}
+
+	bool
+	font::initDeviceFontRasterizer()
+	{
+		if ( ! m_name )
+		{
+			log_error("No name associated with this font, can't use device fonts (should I use a default one?)");
+			return false;
+		}
+
+		_ftRasterizer = FreetypeRasterizer::createFace(m_name, m_is_bold, m_is_italic);
+		if ( ! _ftRasterizer.get() )
+		{
+			log_error("Could not create a freetype face %s", m_name);
+			return false;
+		}
+		return true;
 	}
 
 
