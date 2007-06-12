@@ -48,8 +48,8 @@
  * frame6: gotoAndStop frame3
  *
  * Expected behaviour:
- *
- *  A *single* instance of each characters is created in the whole process.
+ *   movieclip in depth4 placed at frame5 kept alive;
+ *   movieclip in depth5 placed at frame5 get destroyed;
  * 
  *  run as ./loop_test8
  */
@@ -105,6 +105,7 @@ add_static_mc(SWFMovie mo, const char* name, const char* color, int depth, float
   it = SWFMovie_add(mo, (SWFBlock)mc);
   SWFDisplayItem_setDepth(it, depth); 
   SWFDisplayItem_setName(it, name);
+  SWFDisplayItem_setRatio(it, ratio);
 
   return it;
 }
@@ -216,18 +217,14 @@ main(int argc, char** argv)
   
   add_actions(mo, "gotoAndStop(3);");
   
-  // No differences observed after jump, all checks keep the same.
-  // all movieclips are constructed only once, 
-  // testing results keep consistent with visual effect(good:).
   check_equals(mo, "typeof(mc1)", "'movieclip'");
-  xcheck_equals(mo, "typeof(mc2)", "'undefined'"); //Gnash fails by unneeded recreating
-  xcheck_equals(mo, "typeof(mc3)", "'undefined'"); //Gnash fails by unneeded recreating
-  xcheck_equals(mo, "typeof(mc4)", "'movieclip'"); //Gnash fails by unneeded recreating
-  xcheck_equals(mo, "typeof(mc5)", "'movieclip'"); //Gnash fails by unneeded recreating
+  xcheck_equals(mo, "typeof(mc2)", "'undefined'"); 
+  check_equals(mo, "typeof(mc3)", "'movieclip'"); 
+  xcheck_equals(mo, "typeof(mc4)", "'movieclip'"); 
+  xcheck_equals(mo, "typeof(mc5)", "'movieclip'"); 
   check_equals(mo, "mc1Constructed", "1");
-  check_equals(mo, "mc1Constructed", "1");
-  xcheck_equals(mo, "mc2Constructed", "1"); //Gnash fails by unneeded recreating
-  xcheck_equals(mo, "mc3Constructed", "1"); //Gnash fails by unneeded recreating
+  xcheck_equals(mo, "mc2Constructed", "1"); 
+  xcheck_equals(mo, "mc3Constructed", "2"); 
   check_equals(mo, "mc4Constructed", "1");
   check_equals(mo, "mc5Constructed", "1");
   check_equals(mo, "mc1Unloaded", "0");

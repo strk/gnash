@@ -1,5 +1,10 @@
 2007-06-12 Zou Lunkai <zoulunkai@gmail.com>
 
+	* testsuite/misc-ming.all/loop_test8.c:
+	  correctly set ratio, forgot in last commit.
+	  
+2007-06-12 Zou Lunkai <zoulunkai@gmail.com>
+
 	* testsuite/misc-ming.all/loop_test8.c, Makefile.am:
 	  new testcase for timeline control, focus on ratio.
 	  
