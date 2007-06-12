@@ -30,6 +30,7 @@
 // Forward declarations
 namespace gnash {
 	class bitmap_info;
+	class shape_character_def;
 }
 namespace image {
 	class alpha;
@@ -40,12 +41,15 @@ namespace gnash {
 
 /// Truetype font rasterizer based on freetype library
 //
-/// Instances of this class provide rasterized glyphs for a given
-/// truetype font face.
+/// Instances of this class provide rasterized or vectorial glyphs
+/// for a given truetype font face.
 ///
 /// The rasterized glyphs have a max size of 96 (TODO: make parametrizable)
 /// but I think the actual size could change between glyphs (see the 'box'
 /// parameter of getRenderedGlyph() method).
+///
+/// Vectorial glyphs are instances of a shape_character_def, same class
+/// resulting from parsing of embedded fonts.
 ///
 class FreetypeRasterizer 
 {
@@ -75,15 +79,29 @@ public:
 	/// 	Character code.
 	///
 	/// @param box
-	///	Output parameter... TODO: describe what it is.
+	///	Output parameter. Bounding box of glyph is returned here.
+	///	TODO: document units, and more about what a bounding box is
+	///	(ie: actual bounds of visible shape or including padding?).
+	///	NOTE: can be the NULL bound, for non-visible characters 
+	///	(space, tab, whatever else).
 	///
 	/// @param advance
-	///	Output parameter... TODO: describe what it is.
+	///	Output parameter... TODO: describe what it is (units?)
 	///
 	/// @return A bitmap_info, or a NULL pointer if the given character code
 	///	    doesn't exist in this font.
 	///
 	boost::intrusive_ptr<bitmap_info> getRenderedGlyph(uint16_t code, rect& box, float& advance);
+
+	/// Return the given character glyph as a shape character definition
+	//
+	/// @param code
+	/// 	Character code.
+	///
+	/// @return A shape_character_def, or a NULL pointer if the given character code
+	///	    doesn't exist in this font.
+	///
+	boost::intrusive_ptr<shape_character_def> getGlyph(uint16_t code);
 
 private:
 

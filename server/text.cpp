@@ -17,14 +17,13 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.29 2007/04/18 11:00:29 jgilmore Exp $ */
+/* $Id: text.cpp,v 1.30 2007/06/13 00:17:45 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
 #include "utf8.h"
 #include "utility.h"
 #include "impl.h"
-//#include "shape.h"
 #include "shape_character_def.h"
 #include "stream.h"
 #include "log.h"
@@ -34,6 +33,10 @@
 #include "textformat.h"
 #include "text.h"
 #include "movie_definition.h"
+
+// Define the following macro to get debugging messages
+// for text rendering
+#define GNASH_DEBUG_TEXT_RENDERING 1
 
 namespace gnash {
 
@@ -178,7 +181,7 @@ log_error(_("invalid glyph, render as an empty box"));
 					    && (use_glyph_textures || glyph == NULL))
 					{
 #ifdef GNASH_DEBUG_TEXT_RENDERING
-log_msg(_("render glyph using draw_glyph"));
+log_msg(_("render textured glyph (fontlib::draw_glyph)"));
 #endif
 						fontlib::draw_glyph(mat, tg, transformed_color, nominal_glyph_height);
 					}
@@ -189,7 +192,7 @@ log_msg(_("render glyph using draw_glyph"));
 						if (glyph)
 						{
 #ifdef GNASH_DEBUG_TEXT_RENDERING
-log_msg(_("render glyph using filled outline (?) actually draw_glyph()"));
+log_msg(_("render shape glyph using filled outline (render::draw_glyph)"));
 #endif
 
 							gnash::render::draw_glyph(glyph, mat, transformed_color, pixel_scale);

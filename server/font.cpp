@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.33 2007/06/12 12:33:21 strk Exp $ */
+/* $Id: font.cpp,v 1.34 2007/06/13 00:17:44 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -564,31 +564,52 @@ namespace gnash {
 		assert ( _ftRasterizer.get() );
 		assert(m_code_table.find(code) == m_code_table.end());
 
-		rect box;
-		float advance;
+		// Get the vectorial glyph
+		boost::intrusive_ptr<shape_character_def> sh = _ftRasterizer->getGlyph(code);
+
+		// Get the textured glyph and the advance info
+		rect box; float advance;
 		boost::intrusive_ptr<bitmap_info> bi ( _ftRasterizer->getRenderedGlyph(code, box, advance) );
 
-		if ( ! bi.get() )
+		if ( ! sh && ! bi )
 		{
-			log_error("Could not create glyph for character code %u with device font %s (%p)", code, m_name, _ftRasterizer.get());
+			log_error("Could not create either bitmap or shape "
+					"glyph for character code %u (%c) with "
+					"device font %s (%p)", code, code, m_name,
+					_ftRasterizer.get());
 			return -1;
 		}
 
 		// Create textured glyph from the bitmap info
 		texture_glyph tg;
-		tg.m_uv_bounds.enclose_point(0, 0);
-		tg.m_uv_bounds.expand_to_point(box.get_x_max(), box.get_y_max());
-		// the origin
-		tg.m_uv_origin.m_x = box.get_x_min();
-		tg.m_uv_origin.m_y = box.get_y_min();
-		tg.set_bitmap_info(bi.get());
+
+		if ( bi.get() )
+		{
+
+			if ( ! box.is_null() )
+			{
+				tg.m_uv_bounds.enclose_point(0, 0);
+				tg.m_uv_bounds.expand_to_point(box.get_x_max(), box.get_y_max());
+				// the origin
+				tg.m_uv_origin.m_x = box.get_x_min();
+				tg.m_uv_origin.m_y = box.get_y_min();
+			}
+			else
+			{
+				tg.m_uv_bounds.set_null();
+				tg.m_uv_origin.m_x = 0;
+				tg.m_uv_origin.m_y = 0;
+			}
+			tg.set_bitmap_info(bi.get());
+		}
 
 		// Add the textured glyph
 		int newOffset = m_texture_glyphs.size();
 		m_code_table[code] = newOffset;
 		m_advance_table.push_back(advance);
 		m_texture_glyphs.push_back(tg);
-		m_glyphs.push_back(NULL);
+
+		m_glyphs.push_back(sh);
 
 		testInvariant();
 

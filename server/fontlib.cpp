@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.26 2006/11/11 22:44:54 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.27 2007/06/13 00:17:45 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -1309,12 +1309,20 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 		// @@ worth it to precompute these bounds?
 
 		rect	bounds = tg.m_uv_bounds;
+		if ( bounds.is_null() )
+		{
+			log_debug("Textured glyph rendering skipped, since it's bounds are null");
+			return;
+		}
+
 		bounds.shift_x (-tg.m_uv_origin.m_x);
 		bounds.shift_y (-tg.m_uv_origin.m_y);
 
 		// Scale from uv coords to the 1024x1024 glyph square.
 		// @@ need to factor this out!
 		static float	s_scale = GLYPH_CACHE_TEXTURE_SIZE * s_rendering_box / nominal_glyph_height;
+
+		log_msg("Scaling bounds %s by factor %g (nominal_glyph_height: %d)", bounds.toString().c_str(), s_scale, nominal_glyph_height);
 
 		bounds.scale_x(s_scale);
 		bounds.scale_y(s_scale);
