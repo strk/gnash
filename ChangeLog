@@ -1,3 +1,8 @@
+2007-06-12 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/loop_test8.c, Makefile.am:
+	  new testcase for timeline control, focus on ratio.
+	  
 2007-06-11 Sandro Santilli <strk@keybit.net>
 
 	* server/FreetypeRasterizer.{cpp,h}: 
