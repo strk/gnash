@@ -19,8 +19,9 @@
 
 /*
  * Test DefineEditText tag.
- * Uses "embedded" font and defines a smaller rectangle then required.
- * The text written is 'Hello world', expected result is a single 'H'.
+ * Uses both "embedded" font and device fonts.
+ * The text written is 'Hello world' in both cases.
+ * Text at the bottom is the one with embedded fonts.
  *
  * run as ./DefineEditTextTest
  */
@@ -32,9 +33,9 @@
 #define OUTPUT_VERSION 7
 #define OUTPUT_FILENAME "DefineEditTextTest.swf"
 
-void add_text_field(SWFMovie mo, SWFBlock font, const char* text);
+SWFDisplayItem add_text_field(SWFMovie mo, SWFBlock font, const char* text);
 
-void
+SWFDisplayItem
 add_text_field(SWFMovie mo, SWFBlock font, const char* text)
 {
 	SWFTextField tf;
@@ -56,7 +57,8 @@ add_text_field(SWFMovie mo, SWFBlock font, const char* text)
 	 *
 	 * Ref: https://savannah.gnu.org/bugs/?func=detailitem&item_id=16637.
 	 */
-	SWFTextField_setBounds(tf, 160, 338);
+	//SWFTextField_setBounds(tf, 160, 338);
+	SWFTextField_setBounds(tf, 60000, 338);
 
 	/*
 	 * The following settings (found in the reported SWF)
@@ -72,7 +74,7 @@ add_text_field(SWFMovie mo, SWFBlock font, const char* text)
 	/*SWFTextField_setLineSpacing(tf, 40);*/
 	/*SWFTextField_setLineSpacing(tf, 40);*/
 
-	SWFMovie_add(mo, (SWFBlock)tf);
+	return SWFMovie_add(mo, (SWFBlock)tf);
 }
 
 int
@@ -101,11 +103,11 @@ main(int argc, char** argv)
 
 	Ming_init();
         Ming_useSWFVersion (OUTPUT_VERSION);
-	Ming_setScale(1.0); /* so we talk twips */
+	//Ming_setScale(20.0); /* so we talk twips */
  
 	mo = newSWFMovie();
 	SWFMovie_setRate(mo, 24);
-	SWFMovie_setDimension(mo, 12560, 9020);
+	//SWFMovie_setDimension(mo, 12560, 9020);
 
 	/*********************************************
 	 *
@@ -115,15 +117,19 @@ main(int argc, char** argv)
 
 	/* This is with embedded fonts, not working */
 	{
+		SWFDisplayItem it;
 		FILE *font_file = fopen(fdbfont, "r");
 		if ( font_file == NULL )
 		{
 			perror(fdbfont);
 			exit(1);
 		}
-		/*SWFBrowserFont bfont = newSWFBrowserFont("_sans");*/
-		SWFFont bfont = loadSWFFontFromFile(font_file);
-		add_text_field(mo, (SWFBlock)bfont, "Hello world");
+		SWFBrowserFont bfont = newSWFBrowserFont("_sans");
+		SWFFont efont = loadSWFFontFromFile(font_file);
+
+		it = add_text_field(mo, (SWFBlock)bfont, "Hello world");
+		it = add_text_field(mo, (SWFBlock)efont, "Hello world");
+		SWFDisplayItem_moveTo(it, 0, 30);
 	}
 
 	/*****************************************************

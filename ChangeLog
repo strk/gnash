@@ -1,5 +1,10 @@
 2007-06-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextTest.c:
+	  Test both embedded and device fonts.
+
+2007-06-12 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: Look for libfreetype using GNASH_PKG_FIND
 	* server/FreetypeRasterizer.{cpp,h}: use HAVE_FREETYPE_H,
 	  use intrusive_ptr for bitmap_info, not auto_ptr; add missing
