@@ -1,5 +1,8 @@
 2007-06-12 Sandro Santilli <strk@keybit.net>
 
+	* server/FreetypeRasterizer.cpp (getRenderedGlyph): don't assume
+	  "suspeded_image" is not-null after creation of the bitmap_info_alpha
+	  instance (those bitmap interfaces needs a big cleanup really...).
 	* testsuite/misc-ming.all/DefineEditTextTest.c:
 	  Test both embedded and device fonts.
 

@@ -195,8 +195,8 @@ FreetypeRasterizer::getRenderedGlyph(uint16_t code, rect& box, float& advance)
 	std::auto_ptr<image::alpha> im ( draw_bitmap(m_face->glyph->bitmap) );
 	bi = render::create_bitmap_info_alpha(im->m_width, im->m_height, im->m_data);
 
-	float xmax = float(m_face->glyph->bitmap.width) / float(bi->m_suspended_image->m_width);
-	float ymax = float(m_face->glyph->bitmap.rows) / float(bi->m_suspended_image->m_height);
+	float xmax = float(m_face->glyph->bitmap.width) / float(im->m_width);
+	float ymax = float(m_face->glyph->bitmap.rows) / float(im->m_height);
 
 	float xmin = float(m_face->glyph->metrics.horiBearingX) / float(m_face->glyph->metrics.width);
 	float ymin = float(m_face->glyph->metrics.horiBearingY) / float(m_face->glyph->metrics.height);
