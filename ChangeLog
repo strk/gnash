@@ -1,3 +1,15 @@
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* server/FreetypeRasterizer.{cpp,h}: added interface
+	  to fetch vectorial glyph (just a stub).
+	* server/font.cpp (add_os_glyph): fetch both rasterized
+	  and vectorial glyphs, survive to texture glyphs with a null
+	  bound (space is one such glyph).
+	* server/fontlib.cpp (draw_glyph): skip rendering of textured
+	  glyphs with null bounds.
+	* server/text.cpp (display_glyph_records): enable debugging by
+	  default.
+
 2007-06-12 Sandro Santilli <strk@keybit.net>
 
 	* server/FreetypeRasterizer.cpp (getRenderedGlyph): don't assume
