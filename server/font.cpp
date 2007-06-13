@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.34 2007/06/13 00:17:44 strk Exp $ */
+/* $Id: font.cpp,v 1.35 2007/06/13 02:24:42 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -564,11 +564,13 @@ namespace gnash {
 		assert ( _ftRasterizer.get() );
 		assert(m_code_table.find(code) == m_code_table.end());
 
+		float advance;
+
 		// Get the vectorial glyph
-		boost::intrusive_ptr<shape_character_def> sh = _ftRasterizer->getGlyph(code);
+		boost::intrusive_ptr<shape_character_def> sh = _ftRasterizer->getGlyph(code, advance);
 
 		// Get the textured glyph and the advance info
-		rect box; float advance;
+		rect box;
 		boost::intrusive_ptr<bitmap_info> bi ( _ftRasterizer->getRenderedGlyph(code, box, advance) );
 
 		if ( ! sh && ! bi )

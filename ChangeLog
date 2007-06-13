@@ -1,5 +1,12 @@
 2007-06-13 Sandro Santilli <strk@keybit.net>
 
+	* server/FreetypeRasterizer.{cpp,h}: Implement shape_character_def
+	  output using DynamicShape; changed getGlyph method to also take
+	  an 'advance' output parameter (toward deprecation of bitmap output).
+	* server/font.cpp (add_os_glyph): update call to ::getGlyph.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
 	* server/FreetypeRasterizer.{cpp,h}: added interface
 	  to fetch vectorial glyph (just a stub).
 	* server/font.cpp (add_os_glyph): fetch both rasterized

@@ -39,7 +39,7 @@ namespace image {
 
 namespace gnash {
 
-/// Truetype font rasterizer based on freetype library
+/// Truetype font rasterizer/converter based on freetype library
 //
 /// Instances of this class provide rasterized or vectorial glyphs
 /// for a given truetype font face.
@@ -50,6 +50,8 @@ namespace gnash {
 ///
 /// Vectorial glyphs are instances of a shape_character_def, same class
 /// resulting from parsing of embedded fonts.
+///
+/// TODO: rename this class to something like FreetypeGlyphProvider...
 ///
 class FreetypeRasterizer 
 {
@@ -91,6 +93,8 @@ public:
 	/// @return A bitmap_info, or a NULL pointer if the given character code
 	///	    doesn't exist in this font.
 	///
+	/// TODO: drop ?
+	///
 	boost::intrusive_ptr<bitmap_info> getRenderedGlyph(uint16_t code, rect& box, float& advance);
 
 	/// Return the given character glyph as a shape character definition
@@ -98,10 +102,14 @@ public:
 	/// @param code
 	/// 	Character code.
 	///
+	/// @param advance
+	///	Output parameter... TODO: describe what it is (units?)
+	///
 	/// @return A shape_character_def, or a NULL pointer if the given character code
 	///	    doesn't exist in this font.
 	///
-	boost::intrusive_ptr<shape_character_def> getGlyph(uint16_t code);
+	boost::intrusive_ptr<shape_character_def> getGlyph(uint16_t code, float& advance);
+
 
 private:
 

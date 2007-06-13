@@ -18,15 +18,74 @@
 #include "DynamicShape.h"
 #include "log.h"
 
+#ifdef HAVE_FREETYPE2 
+# include <ft2build.h>
+# include FT_OUTLINE_H
+# include FT_BBOX_H
+#endif
+
 #include <cstdio> // for snprintf
 #include <string>
 #include <memory> // for auto_ptr
 
+// Define the following to make outline decomposition verbose
+//#define DEBUG_OUTLINE_DECOMPOSITION 1
+
+// TODO: drop this ?
 #define FREETYPE_MAX_FONTSIZE 96
 
 namespace gnash {
 
 #ifdef HAVE_FREETYPE2 
+
+static int
+walkMoveTo(FT_Vector* to, void* ptr)
+{
+	DynamicShape* sh = static_cast<DynamicShape*>(ptr);
+#ifdef DEBUG_OUTLINE_DECOMPOSITION 
+	log_debug("moveTo: %ld,%ld", to->x, to->y);
+#endif
+	sh->moveTo(to->x, -to->y);
+	return 0;
+}
+
+static int
+walkLineTo(FT_Vector* to, void* ptr)
+{
+	DynamicShape* sh = static_cast<DynamicShape*>(ptr);
+#ifdef DEBUG_OUTLINE_DECOMPOSITION 
+	log_debug("lineTo: %ld,%ld", to->x, to->y);
+#endif
+	sh->lineTo(to->x, -to->y);
+	return 0;
+}
+
+static int
+walkConicTo(FT_Vector* ctrl, FT_Vector* to, void* ptr)
+{
+	DynamicShape* sh = static_cast<DynamicShape*>(ptr);
+#ifdef DEBUG_OUTLINE_DECOMPOSITION 
+	log_debug("conicTo: %ld,%ld %ld,%ld", ctrl->x, ctrl->y, to->x, to->y);
+#endif
+	sh->curveTo(ctrl->x, -ctrl->y, to->x, -to->y);
+	return 0;
+}
+
+static int
+walkCubicTo(FT_Vector* ctrl1, FT_Vector* ctrl2, FT_Vector* to, void* ptr)
+{
+	DynamicShape* sh = static_cast<DynamicShape*>(ptr);
+#ifdef DEBUG_OUTLINE_DECOMPOSITION 
+	log_debug("cubicTo: %ld,%ld %ld,%ld %ld,%ld", ctrl1->x, ctrl1->y, ctrl2->x, ctrl2->y, to->x, to->y);
+#endif
+
+	float x = ctrl1->x + ( (ctrl2->x - ctrl1->x) * 0.5 );
+	float y = ctrl1->y + ( (ctrl2->y - ctrl1->y) * 0.5 );
+
+	sh->curveTo(x, -y, to->x, -to->y);
+
+	return 0;
+}
 
 // static
 FT_Library FreetypeRasterizer::m_lib;
@@ -95,8 +154,8 @@ FreetypeRasterizer::get_advance_x(uint16_t code)
 
 // private
 bool
-FreetypeRasterizer::getFontFilename(const std::string& name,
-		bool bold, bool italic, std::string& filename)
+FreetypeRasterizer::getFontFilename(const std::string& /*name*/,
+		bool /*bold*/, bool /*italic*/, std::string& filename)
 {
 #define DEFAULT_FONTFILE "/usr/share/fonts/truetype/freefont/FreeSans.ttf"
 
@@ -207,7 +266,7 @@ FreetypeRasterizer::getRenderedGlyph(uint16_t code, rect& box, float& advance)
 
 	log_debug("image::alpha drawn for character glyph '%c' bitmap has size %dx%d", code, im->m_width, im->m_height);
 	log_debug("ttf bitmap glyph width:%d, rows:%d", bitmap.width, bitmap.rows);
-	log_debug("ttf glyph metrics width:%d, height:%d", metrics.width, metrics.height);
+	log_debug("ttf glyph metrics width:%ld, height:%ld", metrics.width, metrics.height);
 	log_debug("ttf glyph metrics X bearing:%ld, Y bearing:%ld", metrics.horiBearingX, metrics.horiBearingY);
 
 	bi = render::create_bitmap_info_alpha(im->m_width, im->m_height, im->m_data);
@@ -232,6 +291,7 @@ FreetypeRasterizer::getRenderedGlyph(uint16_t code, rect& box, float& advance)
 		box.set_null();
 	}
 	
+	// TODO: check this. Also check FT_FaceRec::units_per_EM
 	static float s_advance_scale = 0.16666666f; //vv hack
 	advance = (float) m_face->glyph->metrics.horiAdvance * s_advance_scale;
 
@@ -250,41 +310,47 @@ FreetypeRasterizer::getRenderedGlyph(uint16_t, rect& , float&)
 
 #ifdef HAVE_FREETYPE2
 boost::intrusive_ptr<shape_character_def>
-FreetypeRasterizer::getGlyph(uint16_t code)
+FreetypeRasterizer::getGlyph(uint16_t code, float& advance)
 {
 	boost::intrusive_ptr<DynamicShape> sh;
-	//return sh;
 
-	FT_Set_Pixel_Sizes(m_face, 0, FREETYPE_MAX_FONTSIZE);
-	FT_Error error = FT_Load_Char(m_face, code, FT_LOAD_NO_BITMAP);
-	//error = FT_Load_Char(m_face, code, FT_LOAD_RENDER);
+	FT_Error error = FT_Load_Char(m_face, code, FT_LOAD_NO_BITMAP|FT_LOAD_NO_SCALE);
 	if ( error != 0 )
 	{
 		log_error("Error loading freetype outline glyph for char '%c' (error: %d)", code, error);
 		return sh.get();
 	}
 
+	// TODO: check this. Also check FT_FaceRec::units_per_EM
+	advance = m_face->glyph->metrics.horiAdvance;
+
 	assert(m_face->glyph->format == FT_GLYPH_FORMAT_OUTLINE);
 
+	FT_Outline* outline = &(m_face->glyph->outline);
+
+	FT_BBox	glyphBox;
+	FT_Outline_Get_BBox(outline, &glyphBox);
+	rect r(glyphBox.xMin, glyphBox.yMin, glyphBox.xMax, glyphBox.yMax);
+	log_msg("Glyph for character '%c' has computed bounds %s", code, r.toString().c_str());
+
 	sh = new DynamicShape();
-
-	// TODO: implement proper conversion,
-	// 	 this is just a placeholder
-
-	int width=80*20;
-	int height=100*20;
-
-	//sh->lineStyle(1, rgba(255, 255, 255, 255));
 	sh->beginFill(rgba(255, 255, 255, 255));
 
-	sh->moveTo(0, 0);
-	sh->lineTo(0, height);
-	sh->lineTo(width, height);
-	sh->lineTo(width, 0);
-	sh->lineTo(0, 0);
-	sh->endFill();
+	FT_Outline_Funcs walk;
+       	walk.move_to = walkMoveTo;
+	walk.line_to = walkLineTo;
+	walk.conic_to = walkConicTo;
+	walk.cubic_to = walkCubicTo;
+	walk.shift = 0; // ?
+	walk.delta = 0; // ?
 
-	sh->finalize();
+#ifdef DEBUG_OUTLINE_DECOMPOSITION 
+	log_debug("Decomposing glyph outline for character %u", code);
+#endif
+	FT_Outline_Decompose(outline, &walk, sh.get());
+#ifdef DEBUG_OUTLINE_DECOMPOSITION 
+	log_msg("Decomposed glyph for character '%c' has bounds %s", code, sh->get_bound().toString().c_str());
+#endif
 
 	return sh.get();
 }
