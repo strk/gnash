@@ -363,7 +363,7 @@ FreetypeRasterizer::getGlyph(uint16_t code, float& advance)
 }
 #else // ndef(HAVE_FREETYPE2)
 boost::intrusive_ptr<shape_character_def>
-FreetypeRasterizer::getGlyph(uint16_t)
+FreetypeRasterizer::getGlyph(uint16_t, float& advance)
 {
 	assert(0); // should never be called... 
 }
