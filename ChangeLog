@@ -1,4 +1,4 @@
-2007-06-13 petr.pisar@atlas.cz
+2007-06-13 Petr Pisar <petr.pisar@atlas.cz>
 
 	* gui/gtk.cpp: internationalize menus. (patch #6006).
 
