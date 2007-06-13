@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.93 2007/06/13 02:49:32 strk Exp $ */
+/* $Id: gtk.cpp,v 1.94 2007/06/13 17:56:18 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1264,7 +1264,7 @@ void
 GtkGui::createFileMenu(GtkWidget *obj)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic ("File");
+    GtkWidget *menuitem = gtk_menu_item_new_with_mnemonic (_("File"));
     gtk_widget_show (menuitem);
     gtk_container_add (GTK_CONTAINER (obj), menuitem);
     
@@ -1308,14 +1308,14 @@ GtkGui::createEditMenu(GtkWidget *obj)
 {
 //    GNASH_REPORT_FUNCTION;
     
-    GtkWidget *menuitem = gtk_menu_item_new_with_label ("Edit");
+    GtkWidget *menuitem = gtk_menu_item_new_with_label (_("Edit"));
     gtk_widget_show (menuitem);
     gtk_container_add (GTK_CONTAINER (obj), menuitem);
     
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
 
-    GtkWidget *preferences1 = gtk_menu_item_new_with_label ("Preferences");
+    GtkWidget *preferences1 = gtk_menu_item_new_with_label (_("Preferences"));
     gtk_widget_show (preferences1);
     gtk_container_add (GTK_CONTAINER (menu), preferences1);
 
@@ -1329,14 +1329,14 @@ void
 GtkGui::createHelpMenu(GtkWidget *obj)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem = gtk_menu_item_new_with_label ("Help");
+    GtkWidget *menuitem = gtk_menu_item_new_with_label (_("Help"));
     gtk_widget_show (menuitem);
     gtk_container_add (GTK_CONTAINER (obj), menuitem);
     
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
 
-    GtkWidget *about = gtk_menu_item_new_with_label ("About");
+    GtkWidget *about = gtk_menu_item_new_with_label (_("About"));
     gtk_widget_show (about);
     gtk_container_add (GTK_CONTAINER (menu), about);
     
@@ -1350,7 +1350,7 @@ void
 GtkGui::createControlMenu(GtkWidget *obj)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem_control = gtk_menu_item_new_with_label ("Movie Control");
+    GtkWidget *menuitem_control = gtk_menu_item_new_with_label (_("Movie Control"));
     gtk_widget_show (menuitem_control);
     gtk_container_add (GTK_CONTAINER (obj), menuitem_control);
     
@@ -1358,51 +1358,51 @@ GtkGui::createControlMenu(GtkWidget *obj)
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem_control), menu);
 
     GtkMenuItem *menuitem_play =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Play Movie"));
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Play Movie")));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_play));
     gtk_widget_show(GTK_WIDGET(menuitem_play));    
     g_signal_connect ((gpointer) menuitem_play, "activate",
         G_CALLBACK (&menuitem_play_callback), this);
 
     GtkMenuItem *menuitem_pause =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Pause Movie"));
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Pause Movie")));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_pause));
     gtk_widget_show(GTK_WIDGET(menuitem_pause));
     g_signal_connect ((gpointer) menuitem_pause, "activate",
         G_CALLBACK (&menuitem_pause_callback), this);
 
     GtkMenuItem *menuitem_stop =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Stop Movie"));
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Stop Movie")));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_stop));
     gtk_widget_show(GTK_WIDGET(menuitem_stop));
     g_signal_connect ((gpointer) menuitem_stop, "activate",
         G_CALLBACK (&menuitem_stop_callback), this);
 
     GtkMenuItem *menuitem_restart =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Restart Movie"));
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Restart Movie")));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_restart));
     gtk_widget_show(GTK_WIDGET(menuitem_restart));
     g_signal_connect ((gpointer) menuitem_restart, "activate",
         G_CALLBACK (&menuitem_restart_callback), this);
 
     GtkMenuItem *menuitem_step_forward =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Step Forward Frame"));
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Step Forward Frame")));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_step_forward));
     gtk_widget_show(GTK_WIDGET(menuitem_step_forward));
 //     gtk_widget_add_accelerator (GTK_WIDGET(menuitem_step_forward), "activate", accel_group,
 //                                 GDK_bracketleft, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
     GtkMenuItem *menuitem_step_backward =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Step Backward Frame"));
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Step Backward Frame")));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_step_backward));
     gtk_widget_show(GTK_WIDGET(menuitem_step_backward));
 //     gtk_widget_add_accelerator (GTK_WIDGET(menuitem_step_forward), "activate", accel_group,
 //                                 GDK_bracketright, GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE);
     GtkMenuItem *menuitem_jump_forward =
-        GTK_MENU_ITEM(gtk_menu_item_new_with_label("Jump Forward 10 Frames"));
+        GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Jump Forward 10 Frames")));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_forward));
     gtk_widget_show(GTK_WIDGET(menuitem_jump_forward));
     GtkMenuItem *menuitem_jump_backward =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label("Jump Backward 10 Frames"));
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Jump Backward 10 Frames")));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_jump_backward));
     gtk_widget_show(GTK_WIDGET(menuitem_jump_backward));
 }

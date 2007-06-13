@@ -1,3 +1,7 @@
+2007-06-13 petr.pisar@atlas.cz
+
+	* gui/gtk.cpp: internationalize menus. (patch #6006).
+
 2007-06-13 Andrew Guertin <bugzilla@dolphinling.net>
 
 	* configure.ac: removes the duplicate "Checking" and adds the missing
