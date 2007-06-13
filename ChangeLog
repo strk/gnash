@@ -1,5 +1,10 @@
 2007-06-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextTest.c:
+	  Apply transformation to text characters.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
 	* gui/gtk.cpp, server/FreetypeRasterizer.cpp,
 	  server/fontlib.cpp, server/movie_root.cpp,
 	  server/text.cpp: Reduced verbosity.

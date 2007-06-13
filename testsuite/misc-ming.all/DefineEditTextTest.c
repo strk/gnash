@@ -106,7 +106,7 @@ main(int argc, char** argv)
 	//Ming_setScale(20.0); /* so we talk twips */
  
 	mo = newSWFMovie();
-	SWFMovie_setRate(mo, 24);
+	SWFMovie_setRate(mo, 12);
 	//SWFMovie_setDimension(mo, 12560, 9020);
 
 	/*********************************************
@@ -127,10 +127,25 @@ main(int argc, char** argv)
 		SWFBrowserFont bfont = newSWFBrowserFont("_sans");
 		SWFFont efont = loadSWFFontFromFile(font_file);
 
-		it = add_text_field(mo, (SWFBlock)bfont, "Hello world");
-		it = add_text_field(mo, (SWFBlock)efont, "Hello world");
-		SWFDisplayItem_moveTo(it, 0, 30);
+		it = add_text_field(mo, (SWFBlock)bfont, "Hello device font world");
+		SWFDisplayItem_setName(it, "dtext");
+		SWFDisplayItem_moveTo(it, 60, 60);
+		it = add_text_field(mo, (SWFBlock)efont, "Hello embedded font world");
+		SWFDisplayItem_setName(it, "etext");
+		SWFDisplayItem_moveTo(it, 60, 120);
 	}
+
+	SWFMovie_add(mo, newSWFAction("offset = 1; count=0;"
+			        "onEnterFrame = function() {"
+				" if ( ++count > 10 ) { count = 0; offset = -offset; }"
+				" etext._y += offset;"
+				" etext._x += offset;"
+				//" etext._rotation += offset;"
+				" dtext._y += offset;"
+				" dtext._x += offset;"
+				//" dtext._rotation += offset;"
+				"};"
+				));
 
 	/*****************************************************
 	 *
