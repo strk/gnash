@@ -462,7 +462,7 @@ loop_test8.swf: loop_test8
 	./loop_test8 $(top_srcdir)/testsuite/media
 
 loop_test8runner: $(srcdir)/../generic-testrunner.sh loop_test8.swf
-	sh $< -f20 $(tsop_builddir) loop_test8.swf > $@
+	sh $< -f20 $(top_builddir) loop_test8.swf > $@
 	chmod 755 $@
 	
 shape_test_SOURCES = shape_test.c

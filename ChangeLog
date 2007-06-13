@@ -1,3 +1,8 @@
+2007-06-13 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/Makefile.am:
+	  fix a typo(thank strk).
+	  
 2007-06-13 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: newlines are tokens with bourne shell !
