@@ -1,5 +1,9 @@
 2007-06-13 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: newlines are tokens with bourne shell !
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
 	* server/FreetypeRasterizer.cpp: fix build w/out libfreetype.
 
 2007-06-13 Sandro Santilli <strk@keybit.net>
