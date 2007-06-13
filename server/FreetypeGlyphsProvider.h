@@ -1,4 +1,4 @@
-// FreetypeRasterizer.h:  Freetype glyphs manager
+// FreetypeGlyphsProvider.h:  Freetype glyphs manager
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -66,7 +66,7 @@ namespace gnash {
 ///
 /// TODO: rename this class to something like FreetypeGlyphProvider...
 ///
-class FreetypeRasterizer 
+class FreetypeGlyphsProvider 
 {
 
 public:
@@ -86,29 +86,7 @@ public:
 	///         or a NULL auto_ptr if the given truetype font
 	///         could not be found.
 	///
-	static std::auto_ptr<FreetypeRasterizer> createFace(const std::string& name, bool bold, bool italic);
-
-	/// Return the given character glyph as a bitmap
-	//
-	/// @param code
-	/// 	Character code.
-	///
-	/// @param box
-	///	Output parameter. Bounding box of glyph is returned here.
-	///	TODO: document units, and more about what a bounding box is
-	///	(ie: actual bounds of visible shape or including padding?).
-	///	NOTE: can be the NULL bound, for non-visible characters 
-	///	(space, tab, whatever else).
-	///
-	/// @param advance
-	///	Output parameter... TODO: describe what it is (units?)
-	///
-	/// @return A bitmap_info, or a NULL pointer if the given character code
-	///	    doesn't exist in this font.
-	///
-	/// TODO: drop ?
-	///
-	boost::intrusive_ptr<bitmap_info> getRenderedGlyph(uint16_t code, rect& box, float& advance);
+	static std::auto_ptr<FreetypeGlyphsProvider> createFace(const std::string& name, bool bold, bool italic);
 
 	/// Return the given character glyph as a shape character definition
 	//
@@ -116,7 +94,8 @@ public:
 	/// 	Character code.
 	///
 	/// @param advance
-	///	Output parameter... TODO: describe what it is (units?)
+	///	Output parameter... units to advance horizontally from this glyph to the next,
+	///	in EM units.
 	///
 	/// @return A shape_character_def, or a NULL pointer if the given character code
 	///	    doesn't exist in this font.
@@ -130,7 +109,7 @@ private:
 	//
 	/// throw a GnashException on error (unkonwn font name or similar).
 	///
-	FreetypeRasterizer(const std::string& fontname, bool bold, bool italic);
+	FreetypeGlyphsProvider(const std::string& fontname, bool bold, bool italic);
 
 #ifdef HAVE_FREETYPE2 
 

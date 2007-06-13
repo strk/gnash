@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.117 2007/06/13 09:59:42 strk Exp $
+# $Id: Makefile.am,v 1.118 2007/06/13 15:17:30 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -29,7 +29,7 @@ lib_LTLIBRARIES = libgnashserver.la
 # noinst_SCRIPTS = gen-files.sh
 
 # TODO: use a conditional to optionally link ?
-FREETYPE_SOURCES = FreetypeRasterizer.h FreetypeRasterizer.cpp
+FREETYPE_SOURCES = FreetypeGlyphsProvider.h FreetypeGlyphsProvider.cpp
 
 # Only enable if we're configured with --enable-mp3
 AM_CPPFLAGS = \

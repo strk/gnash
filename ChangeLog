@@ -1,5 +1,13 @@
 2007-06-13 Sandro Santilli <strk@keybit.net>
 
+	* server/: font.{cpp,h}, Makefile.am, FreetypeRasterizer.{cpp,h},
+	  FreetypeGlyphsProvider.{cpp,h}: renamed file and class since
+	  we won't serve rendered glyphs anymore. Rendered glyphs can
+	  always be obtained by rendering the shape_character_def,
+	  the code should be buried somewhere in fontlib.cpp.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
 	* server/font.cpp (add_os_font): use the advance value
 	  computed by getGlyph, not getRenderedGlyph (the latter
 	  is bogus).

@@ -17,7 +17,7 @@
 #include "ref_counted.h" // for inheritance of texture_glyph
 #include "swf.h" // for tag_type definition
 #include "bitmap_info.h" // for dtor visibility by smart pointer
-#include "FreetypeRasterizer.h" // for device fonts support
+#include "FreetypeGlyphsProvider.h" // for device fonts support
 #include "log.h"
 
 #include <map>
@@ -241,7 +241,7 @@ namespace gnash {
 		/// Initialize the freetype rasterizer
 		//
 		/// Return true on success, false on error
-		bool initDeviceFontRasterizer();
+		bool initDeviceFontProvider();
 
 		std::vector< boost::intrusive_ptr<shape_character_def> >	m_glyphs;
 
@@ -273,7 +273,7 @@ namespace gnash {
 		typedef std::map<kerning_pair, float> kernings_table;
 		kernings_table m_kerning_pairs;
 
-		std::auto_ptr<FreetypeRasterizer> _ftRasterizer;
+		std::auto_ptr<FreetypeGlyphsProvider> _ftProvider;
 	};
 
 

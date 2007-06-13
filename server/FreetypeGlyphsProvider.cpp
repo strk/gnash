@@ -1,4 +1,4 @@
-// FreetypeRasterizer.cpp:  Freetype glyphs manager
+// FreetypeGlyphsProvider.cpp:  Freetype glyphs manager
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -20,7 +20,7 @@
 #include "config.h"
 #endif
 
-#include "FreetypeRasterizer.h"
+#include "FreetypeGlyphsProvider.h"
 #include "smart_ptr.h" // for intrusive_ptr
 #include "image.h" // for create_alpha
 #include "GnashException.h"
@@ -110,10 +110,10 @@ walkCubicTo(FT_Vector* ctrl1, FT_Vector* ctrl2, FT_Vector* to, void* ptr)
 }
 
 // static
-FT_Library FreetypeRasterizer::m_lib;
+FT_Library FreetypeGlyphsProvider::m_lib;
 
 // static private
-void FreetypeRasterizer::init()
+void FreetypeGlyphsProvider::init()
 {
 	int	error = FT_Init_FreeType(&m_lib);
 	if (error)
@@ -124,7 +124,7 @@ void FreetypeRasterizer::init()
 }
 
 // static private
-void FreetypeRasterizer::close()
+void FreetypeGlyphsProvider::close()
 {
 	int error = FT_Done_FreeType(m_lib);
 	if (error)
@@ -135,7 +135,7 @@ void FreetypeRasterizer::close()
 
 // private
 std::auto_ptr<image::alpha>
-FreetypeRasterizer::draw_bitmap(const FT_Bitmap& bitmap)
+FreetypeGlyphsProvider::draw_bitmap(const FT_Bitmap& bitmap)
 {
 	// You must use power-of-two dimensions!!
 	int	w = 1; while (w < bitmap.pitch) { w <<= 1; }
@@ -163,7 +163,7 @@ FreetypeRasterizer::draw_bitmap(const FT_Bitmap& bitmap)
 #if 0
 // private
 float
-FreetypeRasterizer::get_advance_x(uint16_t code)
+FreetypeGlyphsProvider::get_advance_x(uint16_t code)
 {
 	FT_Set_Pixel_Sizes(m_face, 0, FREETYPE_MAX_FONTSIZE);
 	if (FT_Load_Char(m_face, code, FT_LOAD_RENDER))
@@ -176,7 +176,7 @@ FreetypeRasterizer::get_advance_x(uint16_t code)
 
 // private
 bool
-FreetypeRasterizer::getFontFilename(const std::string& name,
+FreetypeGlyphsProvider::getFontFilename(const std::string& name,
 		bool /*bold*/, bool /*italic*/, std::string& filename)
 {
 
@@ -247,14 +247,14 @@ FreetypeRasterizer::getFontFilename(const std::string& name,
 
 #ifdef HAVE_FREETYPE2 
 // static
-std::auto_ptr<FreetypeRasterizer>
-FreetypeRasterizer::createFace(const std::string& name, bool bold, bool italic)
+std::auto_ptr<FreetypeGlyphsProvider>
+FreetypeGlyphsProvider::createFace(const std::string& name, bool bold, bool italic)
 {
 
-	std::auto_ptr<FreetypeRasterizer> ret;
+	std::auto_ptr<FreetypeGlyphsProvider> ret;
 
 	try { 
-		ret.reset( new FreetypeRasterizer(name, bold, italic) );
+		ret.reset( new FreetypeGlyphsProvider(name, bold, italic) );
 	} catch (GnashException& ge) {
 		log_error(ge.what());
 		assert(! ret.get());
@@ -264,16 +264,16 @@ FreetypeRasterizer::createFace(const std::string& name, bool bold, bool italic)
 
 }
 #else // ndef HAVE_FREETYPE2 
-std::auto_ptr<FreetypeRasterizer>
-FreetypeRasterizer::createFace(const std::string&, bool, bool)
+std::auto_ptr<FreetypeGlyphsProvider>
+FreetypeGlyphsProvider::createFace(const std::string&, bool, bool)
 {
 	log_error("Freetype not supported");
-	return std::auto_ptr<FreetypeRasterizer>(NULL);
+	return std::auto_ptr<FreetypeGlyphsProvider>(NULL);
 }
 #endif // ndef HAVE_FREETYPE2 
 
 #ifdef HAVE_FREETYPE2 
-FreetypeRasterizer::FreetypeRasterizer(const std::string& name, bool bold, bool italic)
+FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bold, bool italic)
 	:
 	m_face(NULL)
 {
@@ -314,83 +314,15 @@ FreetypeRasterizer::FreetypeRasterizer(const std::string& name, bool bold, bool 
 	}
 }
 #else // ndef(HAVE_FREETYPE2)
-FreetypeRasterizer::FreetypeRasterizer(const std::string&, bool, bool)
+FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string&, bool, bool)
 {
 	assert(0); // should never be called
 }
 #endif // ndef HAVE_FREETYPE2 
 
 #ifdef HAVE_FREETYPE2
-boost::intrusive_ptr<bitmap_info>
-FreetypeRasterizer::getRenderedGlyph(uint16_t code, rect& box, float& advance)
-{
-	boost::intrusive_ptr<bitmap_info> bi;
-
-	FT_Set_Pixel_Sizes(m_face, 0, FREETYPE_MAX_FONTSIZE);
-	FT_Error error = FT_Load_Char(m_face, code, FT_LOAD_RENDER);
-	if ( error != 0 )
-	{
-		log_error("Error loading freetype render glyph for char '%c' (error: %d)", code, error);
-		return bi;
-	}
-
-	FT_GlyphSlot glyph = m_face->glyph;
-	FT_Bitmap bitmap = glyph->bitmap;
-	FT_Glyph_Metrics metrics = glyph->metrics;
-
-	std::auto_ptr<image::alpha> im ( draw_bitmap(bitmap) );
-
-#ifdef DEBUG_GLYPH_RENDERING
-	log_debug("image::alpha drawn for character glyph '%c' bitmap has size %dx%d", code, im->m_width, im->m_height);
-	log_debug("ttf bitmap glyph width:%d, rows:%d", bitmap.width, bitmap.rows);
-	log_debug("ttf glyph metrics width:%ld, height:%ld", metrics.width, metrics.height);
-	log_debug("ttf glyph metrics X bearing:%ld, Y bearing:%ld", metrics.horiBearingX, metrics.horiBearingY);
-#endif
-
-	bi = render::create_bitmap_info_alpha(im->m_width, im->m_height, im->m_data);
-
-	if ( bitmap.width && bitmap.rows && metrics.width && metrics.height )
-	{
-		float xmax = float(bitmap.width) / float(im->m_width);
-		float ymax = float(bitmap.rows) / float(im->m_height);
-
-		float xmin = float(metrics.horiBearingX) / float(metrics.width);
-		float ymin = float(metrics.horiBearingY) / float(metrics.height);
-
-		// ???
-		xmin *= -xmax;
-		ymin *= ymax;
-
-		box.enclose_point(xmin, ymin);
-		box.expand_to_point(xmax, ymax);
-	}
-	else
-	{
-		box.set_null();
-	}
-	
-	// TODO: check this. Also check FT_FaceRec::units_per_EM
-	static float s_advance_scale = 0.16666666f; //vv hack
-	advance = (float) m_face->glyph->metrics.horiAdvance * s_advance_scale;
-
-#ifdef DEBUG_GLYPH_RENDERING
-	log_debug(" box: %s, advance: %g", box.toString().c_str(), advance);
-#endif
-
-
-	return bi;
-}
-#else // ndef(HAVE_FREETYPE2)
-boost::intrusive_ptr<bitmap_info>
-FreetypeRasterizer::getRenderedGlyph(uint16_t, rect& , float&)
-{
-	assert(0); // should never be called... 
-}
-#endif // ndef(HAVE_FREETYPE2)
-
-#ifdef HAVE_FREETYPE2
 boost::intrusive_ptr<shape_character_def>
-FreetypeRasterizer::getGlyph(uint16_t code, float& advance)
+FreetypeGlyphsProvider::getGlyph(uint16_t code, float& advance)
 {
 	boost::intrusive_ptr<DynamicShape> sh;
 
@@ -436,7 +368,7 @@ FreetypeRasterizer::getGlyph(uint16_t code, float& advance)
 }
 #else // ndef(HAVE_FREETYPE2)
 boost::intrusive_ptr<shape_character_def>
-FreetypeRasterizer::getGlyph(uint16_t, float& advance)
+FreetypeGlyphsProvider::getGlyph(uint16_t, float& advance)
 {
 	assert(0); // should never be called... 
 }
