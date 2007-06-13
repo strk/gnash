@@ -17,13 +17,12 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.36 2007/06/13 10:21:36 strk Exp $ */
+/* $Id: font.cpp,v 1.37 2007/06/13 13:38:29 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
 #include "font.h"
 #include "stream.h"
-//#include "impl.h"
 #include "log.h"
 #include "tu_file.h"
 #include "movie_definition.h"
@@ -567,14 +566,18 @@ namespace gnash {
 		assert ( _ftRasterizer.get() );
 		assert(m_code_table.find(code) == m_code_table.end());
 
-		float advance;
+		float advance1, advance2;
 
 		// Get the vectorial glyph
-		boost::intrusive_ptr<shape_character_def> sh = _ftRasterizer->getGlyph(code, advance);
+		boost::intrusive_ptr<shape_character_def> sh = _ftRasterizer->getGlyph(code, advance1);
 
 		// Get the textured glyph and the advance info
-		rect box;
-		boost::intrusive_ptr<bitmap_info> bi ( _ftRasterizer->getRenderedGlyph(code, box, advance) );
+		rect box; 
+		boost::intrusive_ptr<bitmap_info> bi ( _ftRasterizer->getRenderedGlyph(code, box, advance2) );
+
+		// Advance must be given relative to the EM, is that correct or should we change ?
+		float advance = advance1; // vect
+		//float advance = advance2; // rast
 
 		if ( ! sh && ! bi )
 		{

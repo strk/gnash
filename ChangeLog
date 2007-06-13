@@ -1,5 +1,11 @@
 2007-06-13 Sandro Santilli <strk@keybit.net>
 
+	* server/font.cpp (add_os_font): use the advance value
+	  computed by getGlyph, not getRenderedGlyph (the latter
+	  is bogus).
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/loop_test8.c: xchec -> check.
 
 2007-06-13 Sandro Santilli <strk@keybit.net>
