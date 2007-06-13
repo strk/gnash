@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.66 2007/06/12 12:33:21 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.67 2007/06/13 16:52:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -858,8 +858,8 @@ edit_text_character::align_line(
 	//assert(extra_space >= 0.0f);
 	if (extra_space <= 0.0f)
 	{
-		log_error(_("TextField text doesn't fit in its boundaries: "
-			    "width %g, margin %d"),
+		log_debug(_("TextField text doesn't fit in its boundaries: "
+			    "width %g, margin %d - nothing to align"),
 			    m_def->width(), m_def->get_right_margin());
 		return 0.0f;
 	}
@@ -1153,12 +1153,17 @@ after_x_advance:
 
 			if ( ! m_def->do_word_wrap() )
 			{
-				static bool warned=false;
-				if ( ! warned )
+				// TODO: scan more glyphs till newline and continue
+				bool newlinefound = false;
+				while (code = utf8::decode_next_unicode_character(&text))
 				{
-					log_unimpl("edit_text_character: no word wrap");
-					warned=true;
+					if (code == 13 || code == 10)
+					{
+						newlinefound = true;
+						break;
+					}
 				}
+				if ( ! newlinefound ) break;
 			}
 
 			// Insert newline.
