@@ -1,5 +1,7 @@
 2007-06-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextTest.c: put reduced margins
+	  back, to verify no word wrap works.
 	* server/edit_text_character.cpp (format_text): implement no word wra
 	* server/FreetypeGlyphsProvider.{cpp,h}: document coordinate space of
 	  getGlyph output values and implement proper scaling between freetype

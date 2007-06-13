@@ -57,8 +57,8 @@ add_text_field(SWFMovie mo, SWFBlock font, const char* text)
 	 *
 	 * Ref: https://savannah.gnu.org/bugs/?func=detailitem&item_id=16637.
 	 */
-	//SWFTextField_setBounds(tf, 160, 338);
-	SWFTextField_setBounds(tf, 60000, 338);
+	SWFTextField_setBounds(tf, 260, 338);
+	//SWFTextField_setBounds(tf, 60000, 338);
 
 	/*
 	 * The following settings (found in the reported SWF)
