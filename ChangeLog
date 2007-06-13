@@ -1,5 +1,13 @@
 2007-06-13 Sandro Santilli <strk@keybit.net>
 
+	* server/font.{cpp,h}: always maintain m_advance_table of the 
+	  same size of the other two glyph info containers (should really
+	  make a structure keeping all of them..). Fixes an testInvariant
+	  failure with the device font selector (see DeviceFonts page
+	  on wiki).
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: look for libfontconfig
 	* Makefile.am: print fontconfig info on 'dumpconfig'
 	* server/FreetypeRasterizer.{cpp,h}: implement font name

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.35 2007/06/13 02:24:42 strk Exp $ */
+/* $Id: font.cpp,v 1.36 2007/06/13 10:21:36 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -53,7 +53,7 @@ namespace gnash {
 
 	font::~font()
 	{
-		m_glyphs.resize(0);
+		m_glyphs.resize(0); // there's no need for this !
 
 		// Delete the name string.
 		delete [] m_name;
@@ -167,8 +167,10 @@ namespace gnash {
 			);
 		}
 
+		// TODO: use a structure to hold all of these ?
 		m_glyphs.resize(count);
-		m_texture_glyphs.resize(m_glyphs.size());
+		m_texture_glyphs.resize(count);
+		m_advance_table.resize(count);
 
 		if (m->get_create_font_shapes() == DO_LOAD_FONT_SHAPES)
 		{
@@ -254,8 +256,10 @@ namespace gnash {
 			font_code_offset = in->read_u16();
 		}
 
+		// TODO: use a structure to hold all of these ?
 		m_glyphs.resize(glyph_count);
-		m_texture_glyphs.resize(m_glyphs.size());
+		m_texture_glyphs.resize(glyph_count);
+		m_advance_table.resize(glyph_count);
 
 		if (m->get_create_font_shapes() == DO_LOAD_FONT_SHAPES)
 		{
@@ -314,7 +318,6 @@ namespace gnash {
 			m_leading = (float) in->read_s16();
 			
 			// Advance table; i.e. how wide each character is.
-			m_advance_table.resize(m_glyphs.size());
 			for (int i = 0, n = m_advance_table.size(); i < n; i++)
 			{
 				m_advance_table[i] = (float) in->read_s16();

@@ -117,7 +117,16 @@ namespace gnash {
 		void testInvariant()
 		{
 			assert(m_texture_glyphs.size() == m_glyphs.size());
-			assert(m_texture_glyphs.size() == m_advance_table.size());
+#ifndef NDEBUG
+			if (m_texture_glyphs.size() != m_advance_table.size())
+			{
+				log_error("Font '%s': Number of texture glyphs: %lu, advance records: %lu",
+						m_name,
+						static_cast<unsigned long>(m_texture_glyphs.size()),
+						static_cast<unsigned long>(m_advance_table.size()));
+				abort();
+			}
+#endif
 		}
 
 		/// Get number of glyphs defined for this font
