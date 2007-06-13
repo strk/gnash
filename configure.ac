@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.339 2007/06/13 09:29:04 strk Exp $
+dnl $Id: configure.ac,v 1.340 2007/06/13 09:59:42 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -705,8 +705,9 @@ GNASH_PKG_FIND(z, [zlib.h], [zlib compression library], compress)
 GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
-dnl Find freetype
+dnl Find freetype and fontconfig
 GNASH_PKG_FIND(freetype, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
+GNASH_PKG_FIND(fontconfig, [fontconfig/fontconfig.h], [fontconfig library], FcFontMatch)
 
 AC_PATH_MING
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
@@ -1781,6 +1782,22 @@ else
   echo "                 or .deb users: apt-get install libfreetype6-dev"
   echo "                 or .rpm users: yum install libfreetype6-dev (??)"
   echo "                 It may still be possible to configure without freetype."
+fi
+
+if test x"$FONTCONFIG_LIBS" != x; then
+  if test x"$FONTCONFIG_CFLAGS" != x; then
+    echo "        Fontconfig flags are: $FONTCONFIG_CFLAGS"
+  else
+    echo "        Fontconfig flags are: default include path"
+  fi
+  echo "        Fontconfig libs are: $FONTCONFIG_LIBS"
+else
+  echo "        WARNING: You need to have the freetype development packages installed"
+  echo "                 to use device fonts."
+  echo "                 Install it from http://www.fontconfig.org"
+  echo "                 or .deb users: apt-get install libfontconfig1-dev"
+  echo "                 or .rpm users: yum install ??"
+  echo "                 It may still be possible to configure without fontconfig."
 fi
 
 if test x$ext_mysql = xyes; then

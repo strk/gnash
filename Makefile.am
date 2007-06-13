@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.76 2007/06/12 12:33:21 strk Exp $
+# $Id: Makefile.am,v 1.77 2007/06/13 09:59:42 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -195,6 +195,8 @@ endif
 	@echo "	LIBXML_LIBS is $(LIBXML_LIBS)"
 	@echo "	FREETYPE_CFLAGS is $(FREETYPE_CFLAGS)"
 	@echo "	FREETYPE_LIBS is $(FREETYPE_LIBS)"
+	@echo "	FONTCONFIG_CFLAGS is $(FONTCONFIG_CFLAGS)"
+	@echo "	FONTCONFIG_LIBS is $(FONTCONFIG_LIBS)"
 if HAVE_DMALLOC
 	@echo "	DMALLOC_CFLAGS is $(DMALLOC_CFLAGS)"
 	@echo "	DMALLOC_LIBS is $(DMALLOC_LIBS)"

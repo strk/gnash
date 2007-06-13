@@ -1,10 +1,20 @@
-// gameswf_freetype.cpp	-- Vitaly Alexeev <tishka92@yahoo.com>	2007
-
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
-
-// TrueType font rasterizer based on freetype library,
-// used code from demos/font_output/font_output.cpp
+// FreetypeRasterizer.cpp:  Freetype glyphs manager
+// 
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 2 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -22,6 +32,15 @@
 # include <ft2build.h>
 # include FT_OUTLINE_H
 # include FT_BBOX_H
+#endif
+
+#ifdef HAVE_FONTCONFIG_FONTCONFIG_H
+# define HAVE_FONTCONFIG 1
+#endif
+
+#ifdef HAVE_FONTCONFIG
+# include <fontconfig/fontconfig.h>
+# include <fontconfig/fcfreetype.h>
 #endif
 
 #include <cstdio> // for snprintf
@@ -157,17 +176,71 @@ FreetypeRasterizer::get_advance_x(uint16_t code)
 
 // private
 bool
-FreetypeRasterizer::getFontFilename(const std::string& /*name*/,
+FreetypeRasterizer::getFontFilename(const std::string& name,
 		bool /*bold*/, bool /*italic*/, std::string& filename)
 {
+
 #define DEFAULT_FONTFILE "/usr/share/fonts/truetype/freefont/FreeSans.ttf"
 
+#ifdef HAVE_FONTCONFIG
+
+	if (!FcInit ())
+	{
+
+		log_error("Can't init fontconfig library, using hard-coded font filename");
+		filename = DEFAULT_FONTFILE;
+		return true;
+		//return false;
+	}
+
+	FcResult    result;
+
+	FcPattern* pat = FcNameParse((const FcChar8*)name.c_str());
+
+	FcConfigSubstitute (0, pat, FcMatchPattern);
+	FcDefaultSubstitute (pat);
+
+	FcPattern   *match;
+	match = FcFontMatch (0, pat, &result);
+	FcPatternDestroy (pat);
+
+	FcFontSet* fs = NULL;
+	if (match)
+	{
+		fs = FcFontSetCreate ();
+		FcFontSetAdd (fs, match);
+	}
+
+	if ( fs )
+	{
+		log_debug("Found %d fonts matching the family %s (using first)", fs->nfont, name.c_str());
+
+		for (int j = 0; j < fs->nfont; j++)
+		{
+			FcChar8 *file;
+			if (FcPatternGetString (fs->fonts[j], FC_FILE, 0, &file) != FcResultMatch)
+			{
+		log_debug("Matching font %d has unknown filename, skipping", j);
+		continue;
+			}
+
+			filename = (char *)file;
+			return true;
+
+		}
+
+		FcFontSetDestroy(fs);
+	}
+
+	log_error("No device font matches the name '%s', using hard-coded font filename", name.c_str());
 	filename = DEFAULT_FONTFILE;
 	return true;
-
-	// TODO: implement
-	log_error("FIXME: font name to filename mapping unimplemented");
-	return false;
+#else
+	log_error("Font filename matching not implemented (no fontconfig support built-in), using hard-coded font filename",
+			name.c_str());
+	filename = DEFAULT_FONTFILE;
+	return true;
+#endif
 }
 
 #endif // HAVE_FREETYPE2 

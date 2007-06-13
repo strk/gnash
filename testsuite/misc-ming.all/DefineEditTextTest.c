@@ -127,12 +127,17 @@ main(int argc, char** argv)
 		SWFBrowserFont bfont = newSWFBrowserFont("_sans");
 		SWFFont efont = loadSWFFontFromFile(font_file);
 
-		it = add_text_field(mo, (SWFBlock)bfont, "Hello device font world");
+		it = add_text_field(mo, (SWFBlock)bfont, "Hello device _sans font world");
 		SWFDisplayItem_setName(it, "dtext");
 		SWFDisplayItem_moveTo(it, 60, 60);
 		it = add_text_field(mo, (SWFBlock)efont, "Hello embedded font world");
 		SWFDisplayItem_setName(it, "etext");
 		SWFDisplayItem_moveTo(it, 60, 120);
+
+		SWFBrowserFont bfont2 = newSWFBrowserFont("times");
+		it = add_text_field(mo, (SWFBlock)bfont2, "Hello device times font world");
+		SWFDisplayItem_setName(it, "dtext2");
+		SWFDisplayItem_moveTo(it, 60, 180);
 	}
 
 	SWFMovie_add(mo, newSWFAction("offset = 1; count=0;"
@@ -144,6 +149,9 @@ main(int argc, char** argv)
 				" dtext._y += offset;"
 				" dtext._x += offset;"
 				//" dtext._rotation += offset;"
+				" dtext2._y += offset;"
+				" dtext2._x += offset;"
+				//" dtext2._rotation += offset;"
 				"};"
 				));
 

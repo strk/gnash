@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.116 2007/06/12 12:33:21 strk Exp $
+# $Id: Makefile.am,v 1.117 2007/06/13 09:59:42 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -49,6 +49,7 @@ AM_CPPFLAGS = \
 	$(BOOST_CFLAGS) \
 	$(LIBXML_CFLAGS) \
 	$(FREETYPE_CFLAGS) \
+	$(FONTCONFIG_CFLAGS) \
 	$(NULL)
 
 libgnashserver_la_SOURCES = \
@@ -172,6 +173,7 @@ libgnashserver_la_LIBADD = \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(FREETYPE_LIBS) \
+	$(FONTCONFIG_LIBS) \
 	$(NULL)
 
 if USE_SOUND_GST
