@@ -50,64 +50,123 @@
 // Define the following to make outline decomposition verbose
 //#define DEBUG_OUTLINE_DECOMPOSITION 1
 
-// Define the following to make glyph rendering verbose
-//#define DEBUG_GLYPH_RENDERING 1
-
-// TODO: drop this ?
-#define FREETYPE_MAX_FONTSIZE 96
-
 namespace gnash {
 
 #ifdef HAVE_FREETYPE2 
 
-static int
-walkMoveTo(FT_Vector* to, void* ptr)
-{
-	DynamicShape* sh = static_cast<DynamicShape*>(ptr);
+/// Outline glyph walker/decomposer, for drawing an FT_Outline to DynamicShape
+//
+/// See  FT_Outline_Decompose function of freetype2 lib
+///
+class OutlineWalker {
+
+public:
+
+	/// Create an outline walker drawing to the given DynamiShape
+	//
+	/// @param sh
+	///	The DynamiShape to draw to. Externally owned.
+	///
+	/// @param scale
+	///	The scale to apply to coordinates.
+	///	This is to match an EM of 1024x1024 when units_per_EM
+	///	are of a different value.
+	///
+	OutlineWalker(DynamicShape& sh, float scale)
+		:
+		_sh(sh),
+		_scale(scale)
+	{}
+
+	~OutlineWalker() {}
+
+	/// Callback function for the move_to member of FT_Outline_Funcs
+	static int
+	walkMoveTo(FT_Vector* to, void* ptr)
+	{
+		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
+		return walker->moveTo(to);
+	}
+
+	/// Callback function for the line_to member of FT_Outline_Funcs
+	static int
+	walkLineTo(FT_Vector* to, void* ptr)
+	{
+		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
+		return walker->lineTo(to);
+	}
+
+	/// Callback function for the conic_to member of FT_Outline_Funcs
+	static int
+	walkConicTo(FT_Vector* ctrl, FT_Vector* to, void* ptr)
+	{
+		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
+		return walker->conicTo(ctrl, to);
+	}
+
+	/// Callback function for the cubic_to member of FT_Outline_Funcs
+	//
+	/// Transform the cubic curve into a quadratic one an interpolated point
+	/// falling in the middle of the two control points.
+	///
+	static int
+	walkCubicTo(FT_Vector* ctrl1, FT_Vector* ctrl2, FT_Vector* to, void* ptr)
+	{
+		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
+		return walker->cubicTo(ctrl1, ctrl2, to);
+	}
+
+private:
+
+	DynamicShape& _sh;
+
+	float _scale;
+
+	int moveTo(FT_Vector* to)
+	{
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-	log_debug("moveTo: %ld,%ld", to->x, to->y);
+		log_debug("moveTo: %ld,%ld", to->x, to->y);
 #endif
-	sh->moveTo(to->x, -to->y);
-	return 0;
-}
+		_sh.moveTo(to->x*_scale, -to->y*_scale);
+		return 0;
+	}
 
-static int
-walkLineTo(FT_Vector* to, void* ptr)
-{
-	DynamicShape* sh = static_cast<DynamicShape*>(ptr);
+	int
+	lineTo(FT_Vector* to)
+	{
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-	log_debug("lineTo: %ld,%ld", to->x, to->y);
+		log_debug("lineTo: %ld,%ld", to->x, to->y);
 #endif
-	sh->lineTo(to->x, -to->y);
-	return 0;
-}
+		_sh.lineTo(to->x*_scale, -to->y*_scale);
+		return 0;
+	}
 
-static int
-walkConicTo(FT_Vector* ctrl, FT_Vector* to, void* ptr)
-{
-	DynamicShape* sh = static_cast<DynamicShape*>(ptr);
+	int
+	conicTo(FT_Vector* ctrl, FT_Vector* to)
+	{
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-	log_debug("conicTo: %ld,%ld %ld,%ld", ctrl->x, ctrl->y, to->x, to->y);
+		log_debug("conicTo: %ld,%ld %ld,%ld", ctrl->x, ctrl->y, to->x, to->y);
 #endif
-	sh->curveTo(ctrl->x, -ctrl->y, to->x, -to->y);
-	return 0;
-}
+		_sh.curveTo(ctrl->x*_scale, -ctrl->y*_scale, to->x*_scale, -to->y*_scale);
+		return 0;
+	}
 
-static int
-walkCubicTo(FT_Vector* ctrl1, FT_Vector* ctrl2, FT_Vector* to, void* ptr)
-{
-	DynamicShape* sh = static_cast<DynamicShape*>(ptr);
+	int
+	cubicTo(FT_Vector* ctrl1, FT_Vector* ctrl2, FT_Vector* to)
+	{
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-	log_debug("cubicTo: %ld,%ld %ld,%ld %ld,%ld", ctrl1->x, ctrl1->y, ctrl2->x, ctrl2->y, to->x, to->y);
+		log_debug("cubicTo: %ld,%ld %ld,%ld %ld,%ld", ctrl1->x, ctrl1->y, ctrl2->x, ctrl2->y, to->x, to->y);
 #endif
 
-	float x = ctrl1->x + ( (ctrl2->x - ctrl1->x) * 0.5 );
-	float y = ctrl1->y + ( (ctrl2->y - ctrl1->y) * 0.5 );
+		float x = ctrl1->x + ( (ctrl2->x - ctrl1->x) * 0.5 );
+		float y = ctrl1->y + ( (ctrl2->y - ctrl1->y) * 0.5 );
 
-	sh->curveTo(x, -y, to->x, -to->y);
+		_sh.curveTo(x*_scale, -y*_scale, to->x*_scale, -to->y*_scale);
+		return 0;
+	}
 
-	return 0;
-}
+
+};
 
 // static
 FT_Library FreetypeGlyphsProvider::m_lib;
@@ -159,20 +218,6 @@ FreetypeGlyphsProvider::draw_bitmap(const FT_Bitmap& bitmap)
 
 	return alpha;
 }
-
-#if 0
-// private
-float
-FreetypeGlyphsProvider::get_advance_x(uint16_t code)
-{
-	FT_Set_Pixel_Sizes(m_face, 0, FREETYPE_MAX_FONTSIZE);
-	if (FT_Load_Char(m_face, code, FT_LOAD_RENDER))
-	{
-		return 0;
-	}
-	return (float) m_face->glyph->metrics.horiAdvance * s_advance_scale;
-}
-#endif
 
 // private
 bool
@@ -312,6 +357,12 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bol
 			throw GnashException(buf);
 			break;
 	}
+
+	// We want an EM of 1024, so if units_per_EM is different
+	// we will scale 
+	scale = 1024.0f/m_face->units_per_EM;
+
+	log_debug("EM square for font '%s' is %d, scale is thus %g", name.c_str(), m_face->units_per_EM, scale);
 }
 #else // ndef(HAVE_FREETYPE2)
 FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string&, bool, bool)
@@ -333,8 +384,8 @@ FreetypeGlyphsProvider::getGlyph(uint16_t code, float& advance)
 		return sh.get();
 	}
 
-	// TODO: check this. Also check FT_FaceRec::units_per_EM
-	advance = m_face->glyph->metrics.horiAdvance;
+	// Scale advance by current scale, to match expected output coordinate space
+	advance = m_face->glyph->metrics.horiAdvance * scale;
 
 	assert(m_face->glyph->format == FT_GLYPH_FORMAT_OUTLINE);
 
@@ -349,19 +400,23 @@ FreetypeGlyphsProvider::getGlyph(uint16_t code, float& advance)
 	sh->beginFill(rgba(255, 255, 255, 255));
 
 	FT_Outline_Funcs walk;
-       	walk.move_to = walkMoveTo;
-	walk.line_to = walkLineTo;
-	walk.conic_to = walkConicTo;
-	walk.cubic_to = walkCubicTo;
+       	walk.move_to = OutlineWalker::walkMoveTo;
+	walk.line_to = OutlineWalker::walkLineTo;
+	walk.conic_to = OutlineWalker::walkConicTo;
+	walk.cubic_to = OutlineWalker::walkCubicTo;
 	walk.shift = 0; // ?
 	walk.delta = 0; // ?
 
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 	log_debug("Decomposing glyph outline for character %u", code);
 #endif
-	FT_Outline_Decompose(outline, &walk, sh.get());
+
+	OutlineWalker walker(*sh, scale);
+
+	FT_Outline_Decompose(outline, &walk, &walker);
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
-	log_msg("Decomposed glyph for character '%c' has bounds %s", code, sh->get_bound().toString().c_str());
+	rect bound; sh->compute_bound(&bound);
+	log_msg("Decomposed glyph for character '%c' has bounds %s", code, bound.toString().c_str());
 #endif
 
 	return sh.get();

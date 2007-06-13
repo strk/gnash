@@ -88,17 +88,20 @@ public:
 	///
 	static std::auto_ptr<FreetypeGlyphsProvider> createFace(const std::string& name, bool bold, bool italic);
 
-	/// Return the given character glyph as a shape character definition
+	/// Return the given character glyph as a shape character definition in 1024 EM coordinates.
 	//
+	///
+	/// TODO: allow using a custom EM square ?
+	///
 	/// @param code
 	/// 	Character code.
 	///
 	/// @param advance
 	///	Output parameter... units to advance horizontally from this glyph to the next,
-	///	in EM units.
+	///	in 1024 EM units.
 	///
-	/// @return A shape_character_def, or a NULL pointer if the given character code
-	///	    doesn't exist in this font.
+	/// @return A shape_character_def in 1024 EM coordinates, or a NULL pointer if the given
+	///         character code doesn't exist in this font.
 	///
 	boost::intrusive_ptr<shape_character_def> getGlyph(uint16_t code, float& advance);
 
@@ -113,8 +116,11 @@ private:
 
 #ifdef HAVE_FREETYPE2 
 
-	// TODO: drop ?
-	//float get_advance_x(uint16_t code);
+	/// Scale factor to make the freetype glyph metrix match our 1024 EM square
+	/// coordinate space. Not all font faces have am EM square of 1024, so we
+	/// use this value to scale both coordinates and advance values
+	/// The value is computed by the costructor, as soon as a face is initialized.
+	float scale;
 
 	/// Get filename containing given font
 	//

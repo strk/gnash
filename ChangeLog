@@ -1,5 +1,11 @@
 2007-06-13 Sandro Santilli <strk@keybit.net>
 
+	* server/FreetypeGlyphsProvider.{cpp,h}: document coordinate space of
+	  getGlyph output values and implement proper scaling between freetype
+	  glyph EM units and our 1024 EM square.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
 	* server/: font.{cpp,h}, Makefile.am, FreetypeRasterizer.{cpp,h},
 	  FreetypeGlyphsProvider.{cpp,h}: renamed file and class since
 	  we won't serve rendered glyphs anymore. Rendered glyphs can
