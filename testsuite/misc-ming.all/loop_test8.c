@@ -224,7 +224,7 @@ main(int argc, char** argv)
   xcheck_equals(mo, "typeof(mc5)", "'movieclip'"); 
   check_equals(mo, "mc1Constructed", "1");
   xcheck_equals(mo, "mc2Constructed", "1"); 
-  xcheck_equals(mo, "mc3Constructed", "2"); 
+  check_equals(mo, "mc3Constructed", "2"); 
   check_equals(mo, "mc4Constructed", "1");
   check_equals(mo, "mc5Constructed", "1");
   check_equals(mo, "mc1Unloaded", "0");

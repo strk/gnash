@@ -1,5 +1,9 @@
 2007-06-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/loop_test8.c: xchec -> check.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
 	* server/font.{cpp,h}: always maintain m_advance_table of the 
 	  same size of the other two glyph info containers (should really
 	  make a structure keeping all of them..). Fixes an testInvariant
