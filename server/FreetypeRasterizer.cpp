@@ -31,6 +31,9 @@
 // Define the following to make outline decomposition verbose
 //#define DEBUG_OUTLINE_DECOMPOSITION 1
 
+// Define the following to make glyph rendering verbose
+//#define DEBUG_GLYPH_RENDERING 1
+
 // TODO: drop this ?
 #define FREETYPE_MAX_FONTSIZE 96
 
@@ -264,10 +267,12 @@ FreetypeRasterizer::getRenderedGlyph(uint16_t code, rect& box, float& advance)
 
 	std::auto_ptr<image::alpha> im ( draw_bitmap(bitmap) );
 
+#ifdef DEBUG_GLYPH_RENDERING
 	log_debug("image::alpha drawn for character glyph '%c' bitmap has size %dx%d", code, im->m_width, im->m_height);
 	log_debug("ttf bitmap glyph width:%d, rows:%d", bitmap.width, bitmap.rows);
 	log_debug("ttf glyph metrics width:%ld, height:%ld", metrics.width, metrics.height);
 	log_debug("ttf glyph metrics X bearing:%ld, Y bearing:%ld", metrics.horiBearingX, metrics.horiBearingY);
+#endif
 
 	bi = render::create_bitmap_info_alpha(im->m_width, im->m_height, im->m_data);
 
@@ -295,7 +300,9 @@ FreetypeRasterizer::getRenderedGlyph(uint16_t code, rect& box, float& advance)
 	static float s_advance_scale = 0.16666666f; //vv hack
 	advance = (float) m_face->glyph->metrics.horiAdvance * s_advance_scale;
 
+#ifdef DEBUG_GLYPH_RENDERING
 	log_debug(" box: %s, advance: %g", box.toString().c_str(), advance);
+#endif
 
 
 	return bi;
@@ -328,10 +335,10 @@ FreetypeRasterizer::getGlyph(uint16_t code, float& advance)
 
 	FT_Outline* outline = &(m_face->glyph->outline);
 
-	FT_BBox	glyphBox;
-	FT_Outline_Get_BBox(outline, &glyphBox);
-	rect r(glyphBox.xMin, glyphBox.yMin, glyphBox.xMax, glyphBox.yMax);
-	log_msg("Glyph for character '%c' has computed bounds %s", code, r.toString().c_str());
+	//FT_BBox	glyphBox;
+	//FT_Outline_Get_BBox(outline, &glyphBox);
+	//rect r(glyphBox.xMin, glyphBox.yMin, glyphBox.xMax, glyphBox.yMax);
+	//log_msg("Glyph for character '%c' has computed bounds %s", code, r.toString().c_str());
 
 	sh = new DynamicShape();
 	sh->beginFill(rgba(255, 255, 255, 255));

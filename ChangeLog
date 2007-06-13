@@ -1,5 +1,11 @@
 2007-06-13 Sandro Santilli <strk@keybit.net>
 
+	* gui/gtk.cpp, server/FreetypeRasterizer.cpp,
+	  server/fontlib.cpp, server/movie_root.cpp,
+	  server/text.cpp: Reduced verbosity.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
 	* server/FreetypeRasterizer.{cpp,h}: Implement shape_character_def
 	  output using DynamicShape; changed getGlyph method to also take
 	  an 'advance' output parameter (toward deprecation of bitmap output).

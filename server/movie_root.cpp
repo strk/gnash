@@ -713,7 +713,7 @@ void movie_root::cleanup_key_listeners()
 
 void movie_root::notify_key_listeners(key::code k, bool down)
 {
-	log_msg("Notifying " SIZET_FMT " keypress listeners", _keyListners.size());
+	//log_msg("Notifying " SIZET_FMT " keypress listeners", _keyListners.size());
 
 	for (std::vector<KeyListener>::iterator iter = _keyListners.begin();
 		iter != _keyListners.end(); ++iter)

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.92 2007/06/01 11:02:17 strk Exp $ */
+/* $Id: gtk.cpp,v 1.93 2007/06/13 02:49:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -65,7 +65,7 @@ GtkGui::GtkGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 bool
 GtkGui::init(int argc, char **argv[])
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
 
     gtk_init (&argc, argv);
@@ -223,7 +223,7 @@ GtkGui::create_pixbuf                          (const gchar     *filename)
 bool
 GtkGui::createWindow(int width, int height)
 {
-	GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
 	assert(_width>0);
 	assert(_height>0);
@@ -320,7 +320,7 @@ GtkGui::setInterval(unsigned int interval)
 bool
 GtkGui::run()
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
     gtk_main();
     return true;
 }
@@ -328,7 +328,7 @@ GtkGui::run()
 bool
 GtkGui::createMenu()
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
     _popup_menu = GTK_MENU(gtk_menu_new());
 //    GtkAccelGroup *accel_group = gtk_accel_group_new();;
@@ -785,7 +785,7 @@ GtkGui::setCursor(gnash_cursor_type newcursor)
 bool
 GtkGui::setupEvents()
 {
-  GNASH_REPORT_FUNCTION;
+  //GNASH_REPORT_FUNCTION;
 
   g_signal_connect(G_OBJECT(_window), "delete_event",
                    G_CALLBACK(delete_event), this);
@@ -1071,7 +1071,7 @@ gboolean
 GtkGui::realize_event(GtkWidget* /*widget*/, GdkEvent* /*event*/,
 		gpointer /*data*/)
 {
-    GNASH_REPORT_FUNCTION;
+    //GNASH_REPORT_FUNCTION;
 
     return TRUE;
 }

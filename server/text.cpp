@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.30 2007/06/13 00:17:45 strk Exp $ */
+/* $Id: text.cpp,v 1.31 2007/06/13 02:49:33 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -36,7 +36,7 @@
 
 // Define the following macro to get debugging messages
 // for text rendering
-#define GNASH_DEBUG_TEXT_RENDERING 1
+//#define GNASH_DEBUG_TEXT_RENDERING 1
 
 namespace gnash {
 

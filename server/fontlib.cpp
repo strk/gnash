@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.27 2007/06/13 00:17:45 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.28 2007/06/13 02:49:32 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -1311,7 +1311,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 		rect	bounds = tg.m_uv_bounds;
 		if ( bounds.is_null() )
 		{
-			log_debug("Textured glyph rendering skipped, since it's bounds are null");
+			//log_debug("Textured glyph rendering skipped, since it's bounds are null");
 			return;
 		}
 
@@ -1322,7 +1322,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 		// @@ need to factor this out!
 		static float	s_scale = GLYPH_CACHE_TEXTURE_SIZE * s_rendering_box / nominal_glyph_height;
 
-		log_msg("Scaling bounds %s by factor %g (nominal_glyph_height: %d)", bounds.toString().c_str(), s_scale, nominal_glyph_height);
+		//log_msg("Scaling bounds %s by factor %g (nominal_glyph_height: %d)", bounds.toString().c_str(), s_scale, nominal_glyph_height);
 
 		bounds.scale_x(s_scale);
 		bounds.scale_y(s_scale);
