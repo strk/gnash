@@ -1,5 +1,7 @@
 2007-06-13 Andrew Guertin <bugzilla@dolphinling.net>
 
+	* configure.ac: removes the duplicate "Checking" and adds the missing
+	  newline while checking for archiver type.
 	* macros/agg.m4: print the missing "checking for AGG headers" line.
 	  (patch #5933)
 

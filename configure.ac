@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.340 2007/06/13 09:59:42 strk Exp $
+dnl $Id: configure.ac,v 1.341 2007/06/13 17:51:24 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -441,11 +441,13 @@ dnl Darwin uses libtool instead of ar to produce libraries. We determine which o
 dnl we have here now. For some reason on Darwin, we don't get the
 dnl count from grep via stdin correctly. Writing a temp file does the
 dnl trick, so although it's ugly, that's what we gotta do...
-AC_MSG_CHECKING([Checking which type of library archiver we have])
+AC_MSG_CHECKING([which type of library archiver we have])
 rm -f .tmp
 libtool > .tmp 2>&1
 archiver=`grep -c dynamic .tmp 2>&1`
 rm -f .tmp
+dnl is there any good way to report what we found here?
+AC_MSG_RESULT()
 if test $archiver -eq 1; then
 dnl   if test "$enable_shared" = no; then
 dnl     AR="libtool -static"
