@@ -1,3 +1,8 @@
+2007-06-13 Andrew Guertin <bugzilla@dolphinling.net>
+
+	* macros/agg.m4: print the missing "checking for AGG headers" line.
+	  (patch #5933)
+
 2007-06-13 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/DefineEditTextTest.c: put reduced margins

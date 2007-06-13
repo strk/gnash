@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: agg.m4,v 1.27 2007/04/28 00:04:26 rsavoye Exp $
+dnl $Id: agg.m4,v 1.28 2007/06/13 17:44:01 strk Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 
@@ -22,6 +22,7 @@ AC_DEFUN([GNASH_PATH_AGG],
 [
   dnl Lool for the header
   AC_ARG_WITH(agg_incl, AC_HELP_STRING([--with-agg-incl], [directory where AGG headers are]), with_agg_incl=${withval})
+  AC_MSG_CHECKING([for AGG headers])
   AC_CACHE_VAL(ac_cv_path_agg_incl, [
     if test x"${with_agg_incl}" != x ; then
       if test -f ${with_agg_incl}/agg_rasterizer_compound_aa.h ; then
@@ -51,7 +52,6 @@ AC_DEFUN([GNASH_PATH_AGG],
   fi
 
   if test x"${ac_cv_path_agg_incl}" = x; then
-    AC_MSG_CHECKING([for AGG headers])
     for i in $incllist; do
       if test -f $i/agg2/agg_gradient_lut.h; then
         ac_cv_path_agg_incl="-I$i/agg2"
@@ -73,7 +73,7 @@ AC_DEFUN([GNASH_PATH_AGG],
 
   dnl Look for the library
   AC_ARG_WITH(agg_lib, AC_HELP_STRING([--with-agg-lib], [directory where AGG libraries are]), with_agg_lib=${withval})
-    AC_CACHE_VAL(ac_cv_path_agg_lib,[
+  AC_CACHE_VAL(ac_cv_path_agg_lib,[
     if test x"${with_agg_lib}" != x ; then
       if test -f ${with_agg_lib}/libagg.a -o -f ${with_agg_lib}/libagg.${shlibext}; then
       	ac_cv_path_agg_lib="-L`(cd ${with_agg_lib}; pwd)`"
@@ -120,7 +120,7 @@ AC_DEFUN([GNASH_PATH_AGG],
     if test x"$agg25" = x"yes"; then
       AGG_LIBS="${ac_cv_path_agg_lib} -lagg"
     else
-     AGG_LIBS=""
+      AGG_LIBS=""
     fi     
   fi
 
