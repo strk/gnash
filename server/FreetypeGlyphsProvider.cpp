@@ -32,6 +32,14 @@
 # include <ft2build.h>
 # include FT_OUTLINE_H
 # include FT_BBOX_H
+// Methods of FT_Outline_Funcs take a 'const FT_Vector*' in 2.2
+// and a non-const one in 2.1, so we use an FT_CONST macro to
+// support both
+# if FREETYPE_MAJOR == 2 && FREETYPE_MINOR < 2
+#  define FT_CONST 
+# else
+#  define FT_CONST const
+# endif
 #endif
 
 #ifdef HAVE_FONTCONFIG_FONTCONFIG_H
@@ -82,7 +90,7 @@ public:
 
 	/// Callback function for the move_to member of FT_Outline_Funcs
 	static int
-	walkMoveTo(FT_Vector* to, void* ptr)
+	walkMoveTo(FT_CONST FT_Vector* to, void* ptr)
 	{
 		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
 		return walker->moveTo(to);
@@ -90,7 +98,7 @@ public:
 
 	/// Callback function for the line_to member of FT_Outline_Funcs
 	static int
-	walkLineTo(FT_Vector* to, void* ptr)
+	walkLineTo(FT_CONST FT_Vector* to, void* ptr)
 	{
 		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
 		return walker->lineTo(to);
@@ -98,7 +106,7 @@ public:
 
 	/// Callback function for the conic_to member of FT_Outline_Funcs
 	static int
-	walkConicTo(FT_Vector* ctrl, FT_Vector* to, void* ptr)
+	walkConicTo(FT_CONST FT_Vector* ctrl, FT_CONST FT_Vector* to, void* ptr)
 	{
 		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
 		return walker->conicTo(ctrl, to);
@@ -110,7 +118,7 @@ public:
 	/// falling in the middle of the two control points.
 	///
 	static int
-	walkCubicTo(FT_Vector* ctrl1, FT_Vector* ctrl2, FT_Vector* to, void* ptr)
+	walkCubicTo(FT_CONST FT_Vector* ctrl1, FT_CONST FT_Vector* ctrl2, FT_CONST FT_Vector* to, void* ptr)
 	{
 		OutlineWalker* walker = static_cast<OutlineWalker*>(ptr);
 		return walker->cubicTo(ctrl1, ctrl2, to);
@@ -122,7 +130,7 @@ private:
 
 	float _scale;
 
-	int moveTo(FT_Vector* to)
+	int moveTo(const FT_Vector* to)
 	{
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 		log_debug("moveTo: %ld,%ld", to->x, to->y);
@@ -132,7 +140,7 @@ private:
 	}
 
 	int
-	lineTo(FT_Vector* to)
+	lineTo(const FT_Vector* to)
 	{
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 		log_debug("lineTo: %ld,%ld", to->x, to->y);
@@ -142,7 +150,7 @@ private:
 	}
 
 	int
-	conicTo(FT_Vector* ctrl, FT_Vector* to)
+	conicTo(const FT_Vector* ctrl, const FT_Vector* to)
 	{
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 		log_debug("conicTo: %ld,%ld %ld,%ld", ctrl->x, ctrl->y, to->x, to->y);
@@ -152,7 +160,7 @@ private:
 	}
 
 	int
-	cubicTo(FT_Vector* ctrl1, FT_Vector* ctrl2, FT_Vector* to)
+	cubicTo(const FT_Vector* ctrl1, const FT_Vector* ctrl2, const FT_Vector* to)
 	{
 #ifdef DEBUG_OUTLINE_DECOMPOSITION 
 		log_debug("cubicTo: %ld,%ld %ld,%ld %ld,%ld", ctrl1->x, ctrl1->y, ctrl2->x, ctrl2->y, to->x, to->y);

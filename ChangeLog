@@ -1,3 +1,14 @@
+2007-06-14 Hubert Figuiere <hfiguiere@novell.com>
+
+	* Makefile.am, configure.ac: look for freetype2, not freetype
+	  (for pkg-config to be effective). Rename _CFLAGS and _LIBS
+	  to be FREETYPE2, not FREETYPE
+	* server/Makefile.am, server/parser/Makefile.am: 
+	  Use FREETYPE2_{CFLAGS,LIBS}
+	* server/FreetypeGlyphsProvider.cpp: use an FT_CONST macro
+	  to switch between constness of Outline walker func between
+	  freetype 2.1 (wants non-const) and 2.2 (wants const).
+
 2007-06-14 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/character.h, 

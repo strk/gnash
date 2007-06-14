@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.35 2007/06/12 12:33:22 strk Exp $
+# $Id: Makefile.am,v 1.36 2007/06/14 07:17:12 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -41,7 +41,7 @@ AM_CPPFLAGS = \
 	$(PTHREAD_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
         $(BOOST_CFLAGS) \
-	$(FREETYPE_CFLAGS) \
+	$(FREETYPE2_CFLAGS) \
 	$(NULL)
 
 libgnashparser_la_SOURCES = \

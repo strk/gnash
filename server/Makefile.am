@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.118 2007/06/13 15:17:30 strk Exp $
+# $Id: Makefile.am,v 1.119 2007/06/14 07:17:11 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -48,7 +48,7 @@ AM_CPPFLAGS = \
 	$(GSTREAMER_CFLAGS) \
 	$(BOOST_CFLAGS) \
 	$(LIBXML_CFLAGS) \
-	$(FREETYPE_CFLAGS) \
+	$(FREETYPE2_CFLAGS) \
 	$(FONTCONFIG_CFLAGS) \
 	$(NULL)
 
@@ -172,7 +172,7 @@ libgnashserver_la_LIBADD = \
 	$(LIBXML_LIBS) \
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
-	$(FREETYPE_LIBS) \
+	$(FREETYPE2_LIBS) \
 	$(FONTCONFIG_LIBS) \
 	$(NULL)
 

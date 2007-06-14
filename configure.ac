@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.341 2007/06/13 17:51:24 strk Exp $
+dnl $Id: configure.ac,v 1.342 2007/06/14 07:17:11 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -708,7 +708,7 @@ GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
 dnl Find freetype and fontconfig
-GNASH_PKG_FIND(freetype, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
+GNASH_PKG_FIND(freetype2, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
 GNASH_PKG_FIND(fontconfig, [fontconfig/fontconfig.h], [fontconfig library], FcFontMatch)
 
 AC_PATH_MING
