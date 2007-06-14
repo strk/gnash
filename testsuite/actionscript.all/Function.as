@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.49 2007/04/28 07:22:43 strk Exp $";
+rcsid="$Id: Function.as,v 1.50 2007/06/14 13:58:29 strk Exp $";
 
 #include "check.as"
 
@@ -678,3 +678,21 @@ o = new Object();
 o.valueOf = function() { return _root; };
 check_equals(_root, o);
 check_equals(o, _root);
+
+//-----------------------------------------------------------------------------
+// Test local vars scope of outer function to be kept alive by inner functions
+//-----------------------------------------------------------------------------
+
+foo = function () {
+	var x = 42;
+	return function () { return x; }; 
+};
+
+f = foo();
+delete foo;
+#if OUTPUT_VERSION > 5
+check_equals(f(), 42);
+#else
+check_equals(typeof(f()), 'undefined');
+#endif
+

@@ -1,5 +1,7 @@
 2007-06-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Function.as: test local vars scope of
+	  outer function to be kept alive by inner functions.
 	* libbase/ref_counted.h: made destructor protected, to ensure no 
 	  user is explicitly deleting a ref_counted object (propedeutic
 	  to GC)
