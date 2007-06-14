@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.9 2007/05/28 15:41:09 ann Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.10 2007/06/14 02:03:19 zoulunkai Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -103,7 +103,7 @@ private:
 
 	int	m_tag_type;
 	char*	m_name;
-	float	m_ratio;
+	int 	m_ratio;
 	cxform	m_color_transform;
 	matrix	m_matrix;
 	bool	m_has_matrix;

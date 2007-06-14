@@ -2022,7 +2022,7 @@ character* sprite_instance::add_empty_movieclip(const char* name, int depth)
 		depth,
 		color_transform,
 		matrix,
-		0.0f,
+		0,
 		character::noClipDepthValue); 
 
 	return sprite;
@@ -2056,7 +2056,7 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
 		depth,
 		cxform(),
 		txt_matrix,
-		0.0f,
+		0,
 		character::noClipDepthValue);
 
 	static bool warned = false;
@@ -3026,7 +3026,7 @@ sprite_instance::attachCharacter(character& newch, int depth)
 		depth,
 		cxform(),
 		matrix(),
-		1.0,
+		65535,
 		character::noClipDepthValue);
 
 	return true; // FIXME: check return from place_character above ?
@@ -3040,7 +3040,7 @@ sprite_instance::add_display_object(
 		int depth, 
 		bool replace_if_depth_is_occupied,
 		const cxform& color_transform, const matrix& mat,
-		float ratio, int clip_depth)
+		int ratio, int clip_depth)
 {
 //	    GNASH_REPORT_FUNCTION;
 	assert(m_def != NULL);
@@ -3189,7 +3189,7 @@ sprite_instance::replace_display_object(
 		int depth,
 		const cxform* color_transform,
 		const matrix* mat,
-		float ratio,
+		int ratio,
 		int clip_depth)
 {
 	assert(m_def != NULL);
@@ -3263,7 +3263,7 @@ void sprite_instance::replace_display_object(
 		int depth,
 		const cxform* color_transform,
 		const matrix* mat,
-		float ratio,
+		int ratio,
 		int clip_depth)
 {
     //printf("%s: character %s, id is %d\n", __FUNCTION__, name, ch->get_id()); // FIXME:
@@ -3788,7 +3788,7 @@ sprite_instance::loadMovie(const URL& url)
 	cxform color_transform = get_cxform();
 	bool use_matrix = false;
 	matrix mat = get_matrix();
-	float ratio = get_ratio();
+	int ratio = get_ratio();
 	int clip_depth = get_clip_depth();
 	//character* new_movie = extern_movie->get_root_movie();
 

@@ -371,7 +371,7 @@ public:
 		bool replace_if_depth_is_occupied,
 		const cxform& color_transform,
 		const matrix& matrix,
-		float ratio,
+		int ratio,
 		int clip_depth);
 
 	/// Attach the given character instance to current display list
@@ -422,7 +422,7 @@ public:
 			int depth,
 			const cxform* color_xform,
 			const matrix* mat,
-			float ratio,
+			int ratio,
 			int clip_depth)
 	{
 	    m_display_list.move_display_object(depth, color_xform, mat, ratio, clip_depth);
@@ -444,7 +444,7 @@ public:
 			int depth,
 			const cxform* color_xform,
 			const matrix* mat,
-			float ratio,
+			int ratio,
 			int clip_depth);
 
 
@@ -463,7 +463,7 @@ public:
 			int depth,
 			const cxform* color_xform,
 			const matrix* mat,
-			float ratio,
+			int ratio,
 			int clip_depth);
 
 
@@ -934,7 +934,7 @@ protected:
 
 	void place_character(character* ch, int depth,
 			const cxform& color_transform, const matrix& mat,
-			float ratio, int clip_depth)
+			int ratio, int clip_depth)
 	{
 		m_display_list.place_character(ch, depth, color_transform, mat, ratio, clip_depth);
 	}

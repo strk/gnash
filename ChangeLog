@@ -1,3 +1,17 @@
+2007-06-14 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/character.h, 
+	  server/dlist.h,
+	  server/dlist.cpp, 
+	  server/sprite_instance.h,
+	  server/sprite_instance.cpp,
+	  server/parser/morph2_character_def.cpp,
+	  server/swf/PlaceObject2Tag.h,
+	  server/swf/PlaceObject2Tag.cpp,
+	  server/vm/action.cpp,
+	  testsuite/server/DisplayListTest.cpp,
+	  change type of "ratio" from float to integer, don't re-interpret the definition.
+	  
 2007-06-13 Petr Pisar <petr.pisar@atlas.cz>
 
 	* gui/gtk.cpp: internationalize menus. (patch #6006).

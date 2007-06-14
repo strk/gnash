@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: morph2_character_def.cpp,v 1.8 2007/05/15 13:54:59 strk Exp $ */
+/* $Id: morph2_character_def.cpp,v 1.9 2007/06/14 02:03:18 zoulunkai Exp $ */
 
 // Based on the public domain morph2.cpp of:
 // Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,
@@ -117,7 +117,7 @@ private:
 //		GNASH_REPORT_FUNCTION;
 
 		unsigned int i;
-		float ratio = inst->get_ratio(); //m_ratio;
+		float ratio = inst->get_ratio() / 65535.0; 
 
 		// bounds
 		rect	new_bound;

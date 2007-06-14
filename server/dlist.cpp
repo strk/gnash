@@ -171,7 +171,7 @@ DisplayList::place_character(
 	int depth,
 	const cxform& color_xform, 
 	const matrix& mat, 
-	float ratio,
+	int ratio,
 	int clip_depth)
 {
 //	GNASH_REPORT_FUNCTION;
@@ -254,7 +254,7 @@ DisplayList::replace_character(
 	int depth,
 	const cxform* color_xform,
 	const matrix* mat,
-	float ratio,
+	int ratio,
 	int clip_depth)
 {
 	//GNASH_REPORT_FUNCTION;
@@ -333,7 +333,7 @@ DisplayList::move_display_object(
 	int depth,
 	const cxform* color_xform,
 	const matrix* mat,
-	float ratio,
+	int ratio,
 	int /* clip_depth */)
 {
 	//GNASH_REPORT_FUNCTION;

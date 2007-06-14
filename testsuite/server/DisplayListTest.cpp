@@ -65,13 +65,13 @@ main(int /*argc*/, char** /*argv*/)
 	boost::intrusive_ptr<character> ch1 ( new DummyCharacter() );
 	boost::intrusive_ptr<character> ch2 ( new DummyCharacter() );
 
-	dlist1.place_character( ch1.get(), 1, color, mat, 0.0f, 0);
-	dlist1.place_character( ch2.get(), 2, color, mat, 0.0f, 0);
+	dlist1.place_character( ch1.get(), 1, color, mat, 0, 0);
+	dlist1.place_character( ch2.get(), 2, color, mat, 0, 0);
 
 	check(dlist1 != dlist2);
 
-	dlist2.place_character( ch2.get(), 1, color, mat, 0.0f, 0);
-	dlist2.place_character( ch1.get(), 2, color, mat, 0.0f, 0);
+	dlist2.place_character( ch2.get(), 1, color, mat, 0, 0);
+	dlist2.place_character( ch1.get(), 2, color, mat, 0, 0);
 
 	// Resort dlist1 as depth of it's chars has been changed
 	// by place_character calls above :/

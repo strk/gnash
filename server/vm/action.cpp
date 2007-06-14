@@ -175,7 +175,7 @@ attach_extern_movie(const char* c_url,
 		const character* tar = (const character*)target;
 		const char* name = tar->get_name().c_str();
 		uint16_t depth = tar->get_depth();
-		float ratio = tar->get_ratio();
+		int ratio = tar->get_ratio();
 		uint16_t clip_depth = tar->get_clip_depth();
 
 		character* parent = tar->get_parent();

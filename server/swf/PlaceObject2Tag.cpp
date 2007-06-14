@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.13 2007/05/24 18:09:58 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.14 2007/06/14 02:03:19 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -239,7 +239,7 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
 		m_color_transform.read_rgba(in);
 	}
 
-	if (has_ratio) m_ratio = (float)in->read_u16() / (float)65535;
+	if (has_ratio) m_ratio = in->read_u16();
 
 	if (has_name) m_name = in->read_string();
 
@@ -283,7 +283,7 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
 			log_parse(_("  cxform:"));
 			m_color_transform.print();
 		}
-		if ( has_ratio ) log_parse(_("  ratio: %f"), m_ratio);
+		if ( has_ratio ) log_parse(_("  ratio: %d"), m_ratio);
 		if ( has_name ) log_parse(_("  name = %s"), m_name ? m_name : "<null>");
 		if ( has_clip_bracket ) log_parse(_("  clip_depth = %d (%d)"), m_clip_depth, m_clip_depth-character::staticDepthOffset);
 		log_parse(_(" m_place_type: %d"), m_place_type);

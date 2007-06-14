@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.81 2007/06/08 12:11:50 zoulunkai Exp $ */
+/* $Id: character.h,v 1.82 2007/06/14 02:03:17 zoulunkai Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -131,7 +131,7 @@ private:
 	int	m_depth;
 	cxform	m_color_transform;
 	matrix	m_matrix;
-	float	m_ratio;
+	int 	m_ratio;
 	int	m_clip_depth;
 	Events  _event_handlers;
 	void	(*m_display_callback)(void*);
@@ -325,7 +325,7 @@ public:
 	:
 	m_id(id),
 	m_depth(0),
-	m_ratio(0.0f),
+	m_ratio(0),
 	m_clip_depth(noClipDepthValue),
 	m_display_callback(NULL),
 	m_display_callback_user_ptr(NULL),
@@ -405,10 +405,10 @@ public:
     }
     void	concatenate_cxform(const cxform& cx) { m_color_transform.concatenate(cx); }
     void	concatenate_matrix(const matrix& m) { m_matrix.concatenate(m); }
-    float	get_ratio() const { return m_ratio; }
-    void	set_ratio(float f) {
-      if (f!=m_ratio) set_invalidated(__FILE__, __LINE__); 
-      m_ratio = f;       
+    int		get_ratio() const { return m_ratio; }
+    void	set_ratio(int r) {
+      if (r!=m_ratio) set_invalidated(__FILE__, __LINE__); 
+      m_ratio = r;       
     }
 
     /// Returns the clipping depth (if any) of this character. The parameter is 
