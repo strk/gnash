@@ -23,19 +23,17 @@
 #include "config.h"
 #endif
 
+#include "network.h"
+
 #include <boost/date_time/posix_time/posix_time.hpp> //include all types plus i/o
 
 #include <string>
 #include <map>
-#include "network.h"
-
-// FIXME: don't use 'using namespace' in headers !
-using namespace std;
 
 namespace cygnal
 {
     
-class HTTP : public Network
+class HTTP : public gnash::Network
 {
 public:
     typedef enum {
