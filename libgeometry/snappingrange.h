@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: snappingrange.h,v 1.22 2007/06/07 12:24:34 strk Exp $
+// $Id: snappingrange.h,v 1.23 2007/06/14 15:55:19 strk Exp $
 
 #ifndef GNASH_SNAPPINGRANGE_H
 #define GNASH_SNAPPINGRANGE_H
@@ -28,8 +28,6 @@
 #include <list>
 #include <vector>
 #include "Range2d.h"
-
-using namespace gnash;
 
 namespace gnash {
 

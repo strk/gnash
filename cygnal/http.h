@@ -29,8 +29,8 @@
 #include <map>
 #include "network.h"
 
+// FIXME: don't use 'using namespace' in headers !
 using namespace std;
-using namespace gnash;
 
 namespace cygnal
 {

@@ -24,8 +24,6 @@
 // This include file used only to make render_handler_agg more readable.
 
 
-using namespace gnash;
-
 namespace gnash {
 
 /// Bitmap class used internally by the AGG renderer. There's no reason to

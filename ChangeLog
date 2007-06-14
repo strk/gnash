@@ -1,5 +1,13 @@
 2007-06-14 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_agg_bitmap.h,
+	  backend/render_handler_agg_style.h,
+	  libgeometry/snappingrange.h,
+	  cygnal/http.h: don't use 'using namespace'
+	  directive in headers !
+
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Function.as: test local vars scope of
 	  outer function to be kept alive by inner functions.
 	* libbase/ref_counted.h: made destructor protected, to ensure no 

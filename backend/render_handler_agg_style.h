@@ -34,8 +34,6 @@
 //#define DEBUG_LIMIT_COLOR_ALPHA 
 
 
-using namespace gnash;
-
 namespace gnash {
 
 /// Internal style class that represents a fill style. Roughly speaking, AGG 
