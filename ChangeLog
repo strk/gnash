@@ -1,5 +1,7 @@
 2007-06-14 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: FREETYPE_{CFLAGS,LIBS} => FREETYPE2_{CFLAGS,LIBS)
+	  in final reports/checks.
 	* testsuite/misc-mtasc.all/Makefile.am: skip all tests if
 	  prebuilt clip are not supported by the detected ming version.
 	* po/: Makefile.am, it.po: initial work on an italian

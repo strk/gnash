@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.342 2007/06/14 07:17:11 strk Exp $
+dnl $Id: configure.ac,v 1.343 2007/06/14 09:43:17 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1770,13 +1770,13 @@ else
   echo "                 It may still be possible to configure without zlib."
 fi
 
-if test x"$FREETYPE_LIBS" != x; then
-  if test x"$FREETYPE_CFLAGS" != x; then
-    echo "        FreeType flags are: $FREETYPE_CFLAGS"
+if test x"$FREETYPE2_LIBS" != x; then
+  if test x"$FREETYPE2_CFLAGS" != x; then
+    echo "        FreeType flags are: $FREETYPE2_CFLAGS"
   else
     echo "        FreeType flags are: default include path"
   fi
-  echo "        FreeType libs are: $FREETYPE_LIBS"
+  echo "        FreeType libs are: $FREETYPE2_LIBS"
 else
   echo "        WARNING: You need to have the freetype development packages installed"
   echo "                 to use device fonts."
