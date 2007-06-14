@@ -146,7 +146,9 @@ noinst_HEADERS = \
 	zlib_adapter.h \
 	URL.h \
 	LoadThread.h \
-	FLVParser.h
+	FLVParser.h \
+	GC.h \
+	$(NULL)
 
 
 

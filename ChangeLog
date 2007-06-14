@@ -1,6 +1,7 @@
 2007-06-14 Sandro Santilli <strk@keybit.net>
 
-	* cyngal/http.h: fix gnash::Network referencing, drop
+	* libbase/: Makefile.am, GC.h: First draft at a garbage collector class.
+	* cygnal/http.h: fix gnash::Network referencing, drop
 	  'using namespace std'
 
 2007-06-14 Sandro Santilli <strk@keybit.net>
