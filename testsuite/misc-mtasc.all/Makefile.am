@@ -20,8 +20,9 @@ AUTOMAKE_OPTIONS = dejagnu
 
 if ENABLE_MTASC
 
-# NOTE: 0.4.0.beta3 is required for prebuilt-clip to work !!
+# NOTE: 0.4.0.beta3 is required for prebuilt-clip to work (PREBUILT_CLIPS) !!
 if ENABLE_MING
+if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 
 DEJAGNU_SO_PATH = ../Dejagnu.swf
 DEJAGNU_SO_FINI = $(srcdir)/../actionscript.all/dejagnu_so_fini.as
@@ -79,5 +80,6 @@ site-update: site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
 
+endif
 endif
 endif
