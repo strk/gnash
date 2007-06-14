@@ -1,3 +1,9 @@
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
+	* po/: Makefile.am, it.po: initial work on an italian
+	  translation (funny for a few minutes, but too boring
+	  after a while ;)
+
 2007-06-14 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/parser/morph2_character_def.h: implement a get_bound() for
