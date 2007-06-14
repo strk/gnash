@@ -23,6 +23,16 @@ namespace gnash {
 		virtual void	display(character* inst);
 		void lerp_matrix(matrix& t, const matrix& m1, const matrix& m2, const float ratio);
 
+		// Question: What is the bound of a morph? Is this conceptually correct?
+		/// TODO: optimize this by take ratio into consideration, to decrease some
+		/// invalidated area when rendering morphs
+		virtual const rect&	get_bound() const 
+		{ 
+			m_bound.expand_to_rect(m_shape1->m_bound);
+			m_bound.expand_to_rect(m_shape2->m_bound);
+			return m_bound;
+		}
+
 	private:
 		shape_character_def* m_shape1;
 		shape_character_def* m_shape2;
@@ -31,6 +41,7 @@ namespace gnash {
 		int line_style_count;
 		float m_last_ratio;
 		mesh_set*	m_mesh;
+		mutable rect m_bound;
 	};
 }
 

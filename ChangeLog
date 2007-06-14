@@ -1,3 +1,8 @@
+2007-06-14 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/parser/morph2_character_def.h: implement a get_bound() for
+	  morphs, should fix an old displaying problem of morphs.
+	  
 2007-06-14 Hubert Figuiere <hfiguiere@novell.com>
 
 	* Makefile.am, configure.ac: look for freetype2, not freetype
