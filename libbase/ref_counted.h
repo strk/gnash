@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ref_counted.h,v 1.5 2007/05/28 15:41:02 ann Exp $ */
+/* $Id: ref_counted.h,v 1.6 2007/06/14 10:57:07 strk Exp $ */
 
 #ifndef GNASH_REF_COUNTED_H
 #define GNASH_REF_COUNTED_H
@@ -41,6 +41,16 @@ class DSOEXPORT ref_counted
 {
 private:
 	mutable int		m_ref_count;
+	
+protected:
+
+	// A ref-counted object only deletes self,
+	// must never be explicitly deleted !
+	virtual ~ref_counted()
+	{
+		assert(m_ref_count == 0);
+	}
+
 public:
 	ref_counted()
 	:
@@ -48,22 +58,19 @@ public:
 	{
 	}
 
-	virtual ~ref_counted()
-	{
-	assert(m_ref_count == 0);
-	}
-
 	void	add_ref() const
 	{
-	assert(m_ref_count >= 0);
-	m_ref_count++;
+		assert(m_ref_count >= 0);
+		m_ref_count++;
 	}
-	void	drop_ref() const {
-	assert(m_ref_count > 0);
-	m_ref_count--;
-	if (m_ref_count <= 0){
-		// Delete me!
-		delete this;
+
+	void	drop_ref() const
+	{
+		assert(m_ref_count > 0);
+		m_ref_count--;
+		if (m_ref_count <= 0){
+			// Delete me!
+			delete this;
 		}
 	}
 

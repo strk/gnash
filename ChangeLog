@@ -1,5 +1,8 @@
 2007-06-14 Sandro Santilli <strk@keybit.net>
 
+	* libbase/ref_counted.h: made destructor protected, to ensure no 
+	  user is explicitly deleting a ref_counted object (propedeutic
+	  to GC)
 	* configure.ac: FREETYPE_{CFLAGS,LIBS} => FREETYPE2_{CFLAGS,LIBS)
 	  in final reports/checks.
 	* testsuite/misc-mtasc.all/Makefile.am: skip all tests if
