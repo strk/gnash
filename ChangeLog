@@ -1,5 +1,7 @@
 2007-06-14 Sandro Santilli <strk@keybit.net>
 
+	* gui/gnash.cpp: add using namespace gnash here, since we're
+	  out of the gnash namespace.
 	* backend/render_handler_agg_bitmap.h,
 	  backend/render_handler_agg_style.h,
 	  libgeometry/snappingrange.h,

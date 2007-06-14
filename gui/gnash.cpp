@@ -49,7 +49,7 @@ extern "C"{
 #include <locale.h>
 #endif
 
-//using namespace gnash; // for dbglogfile
+using namespace gnash; // for log_*
 
 using namespace std;
 
