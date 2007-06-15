@@ -59,15 +59,23 @@ GetterSetter::operator=(const GetterSetter& s)
 {
 	if ( s._getter != _getter )
 	{
+#ifndef GNASH_USE_GC
 		_getter->drop_ref();
+#endif // ndef GNASH_USE_GC
 		_getter = s._getter;
+#ifndef GNASH_USE_GC
 		_getter->add_ref();
+#endif // ndef GNASH_USE_GC
 	}
 	if ( s._setter != _setter )
 	{
+#ifndef GNASH_USE_GC
 		_setter->drop_ref();
+#endif // ndef GNASH_USE_GC
 		_setter = s._setter;
+#ifndef GNASH_USE_GC
 		_setter->add_ref();
+#endif // ndef GNASH_USE_GC
 	}
 	return *this;
 }
@@ -77,8 +85,10 @@ GetterSetter::GetterSetter(const GetterSetter& s)
 	_getter(s._getter),
 	_setter(s._setter)
 {
+#ifndef GNASH_USE_GC
 	_getter->add_ref();
 	_setter->add_ref();
+#endif // ndef GNASH_USE_GC
 }
 
 GetterSetter::
@@ -87,16 +97,28 @@ GetterSetter(as_function& getter, as_function& setter)
 	_getter(&getter),
 	_setter(&setter)
 {
+#ifndef GNASH_USE_GC
 	_getter->add_ref();
 	_setter->add_ref();
+#endif // ndef GNASH_USE_GC
 }
 
 GetterSetter::~GetterSetter()
 {
+#ifndef GNASH_USE_GC
 	_getter->drop_ref();
 	_setter->drop_ref();
+#endif // ndef GNASH_USE_GC
 }
 
+void
+GetterSetter::setReachable() const
+{
+#ifdef GNASH_USE_GC
+	_getter->setReachable();
+	_setter->setReachable();
+#endif
+}
 
 } // end of gnash namespace
 

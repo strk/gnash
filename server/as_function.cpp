@@ -312,7 +312,9 @@ as_function::constructInstance( as_environment& env,
 {
 //	GNASH_REPORT_FUNCTION;
 
+#ifndef GNASH_USE_GC
 	assert(get_ref_count() > 0);
+#endif // GNASH_USE_GC
 
 	int swfversion = VM::get().getSWFVersion();
 

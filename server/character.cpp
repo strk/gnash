@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.42 2007/05/22 14:23:51 udog Exp $ */
+/* $Id: character.cpp,v 1.43 2007/06/15 15:00:28 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -135,7 +135,9 @@ sprite_instance*
 character::get_root_movie()
 {
 	assert(m_parent != NULL);
+#ifndef GNASH_USE_GC
 	assert(m_parent->get_ref_count() > 0);
+#endif // GNASH_USE_GC
 	return m_parent->get_root_movie();
 }
 
@@ -143,7 +145,9 @@ void
 character::get_mouse_state(int& x, int& y, int& buttons)
 {
 	assert(m_parent != NULL);
+#ifndef GNASH_USE_GC
 	assert(m_parent->get_ref_count() > 0);
+#endif // GNASH_USE_GC
 	get_parent()->get_mouse_state(x, y, buttons);
 }
 
@@ -651,7 +655,9 @@ character::get_event_handler(const event_id& id) const
 	Events::const_iterator it = _event_handlers.find(id);
 	if ( it == _event_handlers.end() ) return handler;
 
+#ifndef GNASH_USE_GC
 	assert(get_ref_count() > 0);
+#endif // GNASH_USE_GC
 	boost::intrusive_ptr<character> this_ptr = const_cast<character*>(this);
 
 	handler.reset( new EventCode(this_ptr, it->second) );

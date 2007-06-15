@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.67 2007/06/13 16:52:00 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.68 2007/06/15 15:00:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1155,7 +1155,7 @@ after_x_advance:
 			{
 				// TODO: scan more glyphs till newline and continue
 				bool newlinefound = false;
-				while (code = utf8::decode_next_unicode_character(&text))
+				while ( (code = utf8::decode_next_unicode_character(&text)) )
 				{
 					if (code == 13 || code == 10)
 					{

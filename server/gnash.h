@@ -330,6 +330,10 @@ DSOEXPORT movie_definition* create_library_movie(const URL& url, const char* rea
 /// the halting problem).
 void	precompute_cached_data(movie_definition* movie_def);
 
+/// Initialize gnash core library
+//
+DSOEXPORT void	gnashInit();
+
 /// Maximum release of resources. 
 //
 /// Calls clear_library() and
@@ -339,18 +343,13 @@ void	precompute_cached_data(movie_definition* movie_def);
 /// heap, with the exception of any objects that are still
 /// referenced by the host program and haven't had drop_ref()
 /// called on them.
+///
 DSOEXPORT void	clear();
 
 //
 // Library management
 //
 	
-/// Release any library movies we've cached. 
-//
-/// Do this when you want maximum cleanup.
-void	clear_library();
-	
-//
 // Font library control.  gnash is able to substitute fonts
 // from the font library, in case a movie lacks glyphs for a
 // declared font.  This would come into play since in recent

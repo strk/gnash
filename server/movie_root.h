@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.56 2007/06/08 12:11:50 zoulunkai Exp $ */
+/* $Id: movie_root.h,v 1.57 2007/06/15 15:00:30 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -113,7 +113,7 @@ class KeyListener{
 	};
 #endif 
 
-/// The absolute top level movie
+/// The movie stage (absolute top level node in the characters hierarchy)
 //
 /// This is a wrapper around the top-level movie_instance that is being played.
 /// There is a *single* instance of this class for each run;
@@ -438,6 +438,11 @@ public:
 
 	/// Push a function code to the ActionQueue
 	void pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_ptr<character> target);
+
+#ifdef GNASH_USE_GC
+	/// Mark all reachable resources (for GC)
+	void markReachableResources() const;
+#endif // GNASH_USE_GC
 
 private:
 

@@ -1,3 +1,37 @@
+	* gui/Player.cpp, libbase/GC.h, libbase/Makefile.am,
+	  libbase/ref_counted.h, libbase/smart_ptr.h,
+	  plugin/klash/klash.cpp, plugin/win32/plugin.cpp,
+	  server/GetterSetter.cpp, server/GetterSetter.h,
+	  server/Property.h, server/PropertyList.cpp,
+	  server/PropertyList.h, server/as_environment.cpp,
+	  server/as_environment.h, server/as_function.cpp,
+	  server/as_function.h, server/as_object.cpp,
+	  server/as_object.h, server/as_value.cpp,
+	  server/as_value.h, server/character.cpp, server/character.h,
+	  server/debugger.cpp, server/debugger.h, server/dlist.cpp,
+	  server/dlist.h, server/edit_text_character.cpp,
+	  server/edit_text_character.h, server/font.cpp, server/font.h,
+	  server/fontlib.cpp, server/gnash.h, server/impl.cpp,
+	  server/impl.h, server/mouse_button_state.h,
+	  server/movie_root.cpp, server/movie_root.h,
+	  server/sprite_instance.cpp, server/sprite_instance.h,
+	  server/swf_function.cpp, server/swf_function.h,
+	  server/asobj/Key.h, server/asobj/Mouse.cpp,
+	  server/asobj/Stage.cpp, server/asobj/xmlnode.cpp,
+	  server/parser/BitmapMovieDefinition.cpp,
+	  server/parser/BitmapMovieDefinition.h,
+	  server/parser/movie_def_impl.cpp,
+	  server/parser/movie_def_impl.h,
+	  server/parser/sprite_definition.cpp,
+	  server/parser/sprite_definition.h, server/vm/ASHandlers.cpp,
+	  server/vm/VM.cpp, server/vm/VM.h, utilities/processor.cpp:
+	First big pass on Garbage Collection. We can now use a compile-time
+	define (GNASH_USE_GC) to select wheter GC or RF (ref-counting) is
+	used. By default RC is used as GC is still bogus. Next step would
+	be improving the GC mark functions to ensure needed resources aren't
+	prematurely deleted by the GC. See in GC.h the GcResource class
+	documentation for informations about how to do taht.
+
 2007-06-14 Sandro Santilli <strk@keybit.net>
 
 	* libbase/: Makefile.am, GC.h: First draft at a garbage collector class.

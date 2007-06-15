@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ref_counted.h,v 1.6 2007/06/14 10:57:07 strk Exp $ */
+/* $Id: ref_counted.h,v 1.7 2007/06/15 15:00:26 strk Exp $ */
 
 #ifndef GNASH_REF_COUNTED_H
 #define GNASH_REF_COUNTED_H
@@ -27,20 +27,36 @@
 #include "container.h"
 #include "smart_ptr.h"
 
+// Define the following macro to enable GC verbosity 
+#define GNASH_GC_DEBUG 1
+
+#ifdef GNASH_USE_GC
+# include "GC.h"
+# ifdef GNASH_GC_DEBUG
+#  include "log.h"
+#  include <typeinfo>
+# endif // GNASH_GC_DEBUG
+#endif // GNASH_USE_GC
+
 namespace gnash {
 
 /// \brief
 /// For stuff that's tricky to keep track of w/r/t ownership & cleanup.
 /// The only use for this class seems to be for putting derived
 /// classes in smart_ptr
-/// TODO: remove use of this base class in favor of using
-/// boost::shared_ptr<> ???? boost::intrusive_ptr(?)
 ///
-
+#ifdef GNASH_USE_GC
+class DSOEXPORT ref_counted : public GcResource
+#else
 class DSOEXPORT ref_counted
+#endif
 {
+
 private:
+
+#ifndef GNASH_USE_GC
 	mutable int		m_ref_count;
+#endif // ndef GNASH_USE_GC
 	
 protected:
 
@@ -48,16 +64,21 @@ protected:
 	// must never be explicitly deleted !
 	virtual ~ref_counted()
 	{
+#ifndef GNASH_USE_GC
 		assert(m_ref_count == 0);
+#endif // ndef GNASH_USE_GC
 	}
 
 public:
 	ref_counted()
-	:
-	m_ref_count(0)
+#ifndef GNASH_USE_GC
+		:
+		m_ref_count(0)
+#endif // ndef GNASH_USE_GC
 	{
 	}
 
+#ifndef GNASH_USE_GC
 	void	add_ref() const
 	{
 		assert(m_ref_count >= 0);
@@ -68,13 +89,15 @@ public:
 	{
 		assert(m_ref_count > 0);
 		m_ref_count--;
-		if (m_ref_count <= 0){
+		if (m_ref_count <= 0)
+		{
 			// Delete me!
 			delete this;
 		}
 	}
 
 	int	get_ref_count() const { return m_ref_count; }
+#endif // ndef GNASH_USE_GC
 };
 
 } // namespace gnash

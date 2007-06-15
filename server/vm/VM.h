@@ -1,3 +1,4 @@
+// VM.h: the Virtual Machine class, for Gnash
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -25,6 +26,7 @@
 #include "smart_ptr.h" // for boost::intrusive_ptr
 #include "movie_root.h" // for composition
 #include "tu_types.h"  // for uint64_t
+#include "GC.h" // for ineritance of VmGcRoot
 
 #include <memory> // for auto_ptr
 #include <locale>
@@ -36,6 +38,22 @@ namespace gnash {
 }
 
 namespace gnash {
+
+/// A GC root used to mark all reachable collectable pointers
+class VmGcRoot : public GcRoot 
+{
+	VM& _vm;
+
+public:
+
+	VmGcRoot(VM& vm)
+		:
+		_vm(vm)
+	{
+	}
+
+	virtual void markReachableResources() const;
+};
 
 /// The virtual machine
 //
@@ -59,7 +77,12 @@ namespace gnash {
 ///
 class DSOEXPORT VM {
 
+	friend class VmGcRoot;
+
 	/// Use VM::get() to access the singleton
+	//
+	/// Initializes the GC singleton
+	///
 	VM(movie_definition& movie);
 
 	/// Don't copy
@@ -68,6 +91,8 @@ class DSOEXPORT VM {
 	/// Don't assign
 	VM& operator=(const VM&);
 
+	/// Should deinitialize the GC singleton
+	/// If it doesn't is just because it corrupts memory :)
 	~VM();
 
 	// We use an auto_ptr here to allow constructing
@@ -160,6 +185,9 @@ public:
 
 	/// Get the SWF locale to use 
 	std::locale& getLocale() const;
+
+	/// Mark all reachable resources (for GC)
+	void markReachableResources() const;
 
 };
 

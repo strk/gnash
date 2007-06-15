@@ -77,6 +77,9 @@ public:
 
 	/// invoke the setter function
 	void setValue(as_object* this_ptr, const as_value& val) const;
+
+	/// Mark both getter and setter as being reachable (for GC)
+	void setReachable() const;
 };
 
 

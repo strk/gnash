@@ -117,6 +117,9 @@ public:
 
 	/// is this a Getter/Setter property ?
 	virtual bool isGetterSetter() const { return false; }
+
+	/// Mark this property as being reachable (for the GC)
+	virtual void setReachable() const=0;
 };
 
 /// A simple property, consisting only of an as_value
@@ -163,6 +166,8 @@ public:
 	as_value getValue(as_object&) const { return _value; }
 
 	void setValue(as_object&, const as_value &value)  { _value = value; }
+
+	void setReachable() const { _value.setReachable(); }
 
 };
 
@@ -219,6 +224,12 @@ public:
 
 	/// This *is* a Getter/Setter property !
 	virtual bool isGetterSetter() const { return true; }
+
+	/// Set GetterSetter as reachable (for GC)
+	void setReachable() const
+	{
+		_getset.setReachable();
+	}
 };
 
 

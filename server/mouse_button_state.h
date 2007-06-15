@@ -59,6 +59,14 @@ public:
 	{
 	}
 
+#ifdef GNASH_USE_GC
+	/// Mark reachable objects (active and topmost entities)
+	void markReachableResources() const
+	{
+		if ( m_active_entity.get() ) m_active_entity->setReachable();
+		if ( m_topmost_entity.get() ) m_topmost_entity->setReachable();
+	}
+#endif // GNASH_USE_GC
 };
 
 }	// end namespace gnash

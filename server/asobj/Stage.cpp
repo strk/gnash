@@ -81,8 +81,14 @@ Stage::notifyResize(as_environment* env)
 			itEnd=_listeners.end();
 			it != itEnd; ++it)
 	{
+#ifndef GNASH_USE_GC
 		if ( (*it)->get_ref_count() == 1 ) it=_listeners.erase(it);
-		else notifyResize(*it, env);
+		else
+#endif // ndef GNASH_USE_GC
+		notifyResize(*it, env);
+		// TODO: make sure objects deregister themselve from being listeners
+		//       when deleted by the GC ! (btw, how to ensure the GC didn't 
+		//       delete the Stage first  ? ...)
 	}
 }
 
@@ -138,12 +144,15 @@ Stage::removeListener(boost::intrusive_ptr<as_object> obj)
 void
 Stage::dropDanglingListeners()
 {
+	// TODO: find a way to find dangling listeners
+#ifndef GNASH_USE_GC
 	for (ListenersList::iterator it=_listeners.begin(),
 			itEnd=_listeners.end();
 			it != itEnd; ++it)
 	{
 		if ( (*it)->get_ref_count() == 1 ) it=_listeners.erase(it);
 	}
+#endif
 }
 
 const char*

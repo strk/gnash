@@ -549,7 +549,11 @@ as_object::as_object(boost::intrusive_ptr<as_object> proto)
 
 as_object::as_object(const as_object& other)
 	:
+#ifndef GNASH_USE_GC
 	ref_counted(),
+#else
+	GcResource(), 
+#endif
 	_members(other._members),
 	_vm(VM::get()),
 	m_prototype(other.m_prototype)

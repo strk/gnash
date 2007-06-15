@@ -65,7 +65,9 @@ as_value::as_value(as_function* func)
     m_object_value(func)
 {
     if (m_object_value) {
+#ifndef GNASH_USE_GC
 	m_object_value->add_ref();
+#endif // GNASH_USE_GC
     } else {
         m_type = NULLTYPE;
     }
@@ -605,10 +607,12 @@ as_value::set_as_object(as_object* obj)
 		drop_refs();
 		m_type = OBJECT;
 		m_object_value = obj;
+#ifndef GNASH_USE_GC
 		if (m_object_value)
 		{
 			m_object_value->add_ref();
 		}
+#endif // GNASH_USE_GC
 	}
 }
 
@@ -626,7 +630,9 @@ as_value::set_as_function(as_function* func)
 	m_type = AS_FUNCTION;
 	m_object_value = func;
 	if (m_object_value) {
+#ifndef GNASH_USE_GC
 	    m_object_value->add_ref();
+#endif // GNASH_USE_GC
 	} else {
 	    m_type = NULLTYPE;
 	}
@@ -707,6 +713,7 @@ as_value::string_concat(const std::string& str)
 void
 as_value::drop_refs()
 {
+#ifndef GNASH_USE_GC
     if (m_type == AS_FUNCTION || m_type == OBJECT )
     {
 	if (m_object_value) // should assert here ?
@@ -714,6 +721,7 @@ as_value::drop_refs()
 	    m_object_value->drop_ref();
 	}
     } 
+#endif // GNASH_USE_GC
 }
 
 const char*
@@ -1026,6 +1034,16 @@ as_value::doubleToString(double _val)
 	return std::string(_str);
 }
 
+void
+as_value::setReachable() const
+{
+#ifdef GNASH_USE_GC
+	if ( m_type == OBJECT || m_type == AS_FUNCTION )
+	{
+		m_object_value->setReachable();
+	}
+#endif // GNASH_USE_GC
+}
 
 } // namespace gnash
 

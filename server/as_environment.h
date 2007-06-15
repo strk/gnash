@@ -313,6 +313,16 @@ public:
 	    }
 	}
 
+#ifdef GNASH_USE_GC
+	/// Mark all reachable resources.
+	//
+	/// Reachable resources from an as_environment
+	/// would be global registers, stack (expected to be empty
+	/// actually), stack frames and targets (original and current).
+	///
+	void markReachableResources() const;
+#endif
+
 	/// Find the sprite/movie referenced by the given path.
 	//
 	/// Supports both /slash/syntax and dot.syntax
@@ -430,6 +440,14 @@ public:
 		Registers registers;
 
 		as_function* func;
+
+#ifdef GNASH_USE_GC
+		/// Mark all reachable resources
+		//
+		/// Reachable resources would be registers and
+		/// locals (expected to be empty?) and function.
+		void markReachableResources() const;
+#endif // GNASH_USE_GC
 	};
 
 	/// Push a frame on the calls stack.

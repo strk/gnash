@@ -329,7 +329,9 @@ movie_def_impl::get_character_def(int character_id)
 #endif // not NDEBUG
 
 	boost::intrusive_ptr<character_def> ch = _dictionary.get_character(character_id);
+#ifndef GNASH_USE_GC
 	assert(ch == NULL || ch->get_ref_count() > 1);
+#endif // ndef GNASH_USE_GC
 	return ch.get(); // mm... why don't we return the boost::intrusive_ptr?
 }
 
@@ -353,7 +355,9 @@ font* movie_def_impl::get_font(int font_id)
     FontMap::iterator it = m_fonts.find(font_id);
     if ( it == m_fonts.end() ) return NULL;
     boost::intrusive_ptr<font> f = it->second;
+#ifndef GNASH_USE_GC
     assert(f->get_ref_count() > 1);
+#endif // ndef GNASH_USE_GC
     return f.get();
 }
 
@@ -384,7 +388,9 @@ sound_sample* movie_def_impl::get_sound_sample(int character_id)
     if ( it == m_sound_samples.end() ) return NULL;
 
     boost::intrusive_ptr<sound_sample> ch = it->second;
+#ifndef GNASH_USE_GC
     assert(ch->get_ref_count() > 1);
+#endif // ndef GNASH_USE_GC
 
     return ch.get();
 }
@@ -1101,5 +1107,41 @@ movie_def_impl::get_labeled_frame(const std::string& label, size_t& frame_number
     frame_number = it->second;
     return true;
 }
+
+#ifdef GNASH_USE_GC
+void
+movie_def_impl::markReachableResources() const
+{
+	for (FontMap::const_iterator i=m_fonts.begin(), e=m_fonts.end(); i!=e; ++i)
+	{
+		i->second->setReachable();
+	}
+
+	for (BitmapMap::const_iterator i=m_bitmap_characters.begin(), e=m_bitmap_characters.end(); i!=e; ++i)
+	{
+		i->second->setReachable();
+	}
+
+	for (BitmapVect::const_iterator i=m_bitmap_list.begin(), e=m_bitmap_list.end(); i!=e; ++i)
+	{
+		(*i)->setReachable();
+	}
+
+	for (SoundSampleMap::const_iterator i=m_sound_samples.begin(), e=m_sound_samples.end(); i!=e; ++i)
+	{
+		i->second->setReachable();
+	}
+
+	for (ExportMap::const_iterator i=m_exports.begin(), e=m_exports.end(); i!=e; ++i)
+	{
+		i->second->setReachable();
+	}
+
+	for (ImportVect::const_iterator i=m_import_source_movies.begin(), e=m_import_source_movies.end(); i!=e; ++i)
+	{
+		(*i)->setReachable();
+	}
+}
+#endif // GNASH_USE_GC
 
 } // namespace gnash

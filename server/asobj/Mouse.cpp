@@ -72,6 +72,7 @@ public:
 
 	// override from as_object ?
 	//double get_numeric_value() const { return 0; }
+
 };
 
 as_value mouse_addlistener(const fn_call& fn)

@@ -260,5 +260,14 @@ PropertyList::~PropertyList()
 		delete it->second;
 }
 
+void
+PropertyList::setReachable() const
+{
+	for (const_iterator it = begin(), itEnd = end(); it != itEnd; ++it)
+	{
+		it->second->setReachable();
+	}
+}
+
 } // end of gnash namespace
 

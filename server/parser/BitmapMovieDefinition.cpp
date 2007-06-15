@@ -92,4 +92,13 @@ BitmapMovieDefinition::BitmapMovieDefinition(
 	// Do not create shape_character_def now (why?)
 }
 
+#ifdef GNASH_USE_GC
+void
+BitmapMovieDefinition::markReachableResources() const
+{
+	if ( _shapedef.get() ) _shapedef->setReachable();
+	if ( _bitmap.get() ) _bitmap->setReachable();
+}
+#endif // GNASH_USE_GC
+
 } // namespace gnash

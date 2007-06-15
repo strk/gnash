@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.19 2007/06/08 12:11:50 zoulunkai Exp $ */
+/* $Id: Key.h,v 1.20 2007/06/15 15:00:30 strk Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -128,6 +128,7 @@ public:
 #endif
 
 	int get_last_key_pressed() const;
+
 };
 
 void key_class_init(as_object& global);

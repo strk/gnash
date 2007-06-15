@@ -25,7 +25,8 @@
 #include "tu_config.h"
 
 #include "container.h"
-#include "ref_counted.h" // for inheritance 
+#include "ref_counted.h" // for inheritance  (to drop)
+#include "GC.h" // for inheritance from GcResource (to complete)
 #include "PropertyList.h"
 #include "as_value.h" // for return of get_primitive_value
 #include "smart_ptr.h"
@@ -60,8 +61,13 @@ namespace gnash {
 /// Base-class for ActionScript script-defined objects.
 /// This would likely be ActionScript's 'Object' class.
 ///
-//class as_object : public resource
-class DSOEXPORT as_object : public ref_counted
+class DSOEXPORT as_object
+	:
+#ifdef GNASH_USE_GC
+	public GcResource
+#else
+	public ref_counted
+#endif
 {
 	/// Properties of this objects 
 	PropertyList _members;
@@ -120,12 +126,6 @@ public:
 	/// TODO: write more about this, is it allowed ? is it safe ?
 	///
 	as_object(const as_object& other);
-
-	/// Default destructor for ActionScript objects.
-	//
-	/// Drops reference on prototype member, if any.
-	///
-	virtual ~as_object() {}
 	
 	/// Return a text representation for this object
 	virtual std::string get_text_value() const { return "[object Object]"; }
@@ -436,7 +436,7 @@ public:
 	static as_value valueof_method(const fn_call& fn);
 
 	/// @} Common ActionScript getter-setters for characters
-
+	
 protected:
 
 	/// Get a property value by name
@@ -478,6 +478,29 @@ protected:
 	///	case *sensitive* from SWF7 up.
 	///
 	void set_member_default(const std::string& name, const as_value& val);
+
+#ifdef GNASH_USE_GC
+	/// Mark all reachable resources, override from GcResource.
+	//
+	/// The default implementation marks all properties
+	/// as being reachable, calling markAsObjectReachable().
+	///
+	/// If a derived class provides access to more GC-managed
+	/// resources, it should override this method and call 
+	/// markAsObjectReachable() as the last step.
+	///
+	virtual void markReachableResources() const
+	{
+		markAsObjectReachable();
+	}
+
+	/// Mark properties and __proto__ as reachable (for the GC)
+	void markAsObjectReachable() const
+	{
+		_members.setReachable();
+		if ( m_prototype.get() ) m_prototype->setReachable();
+	}
+#endif // GNASH_USE_GC
 
 	/// The Virtual Machine used to create this object
 	VM& _vm;

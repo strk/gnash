@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.108 2007/06/01 11:02:18 strk Exp $ */
+/* $Id: impl.cpp,v 1.109 2007/06/15 15:00:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -53,6 +53,9 @@
 #include "RemoveObjectTag.h"
 #include "DoActionTag.h"
 #include "sound_handler.h" // for get_sound_handler
+#ifdef GNASH_USE_GC
+#include "GC.h"
+#endif
 
 #include <string>
 #include <map>
@@ -61,6 +64,7 @@
 namespace gnash
 {
 
+static void	clear_library();
 
 /// Namespace for global data (will likely turn into a class)
 namespace globals { // gnash::globals
@@ -538,8 +542,6 @@ movie_definition*	create_movie_no_recurse(
 
     s_no_recurse_while_loading = false;
 
-    //m->add_ref();
-    /
     return m;
 }
 #endif
@@ -578,8 +580,10 @@ void	clear()
     // after it's been de-referenced
     set_sound_handler(NULL);
 
-}
+    GC::get().collect();
 
+    GC::cleanup();
+}
 
 //
 // library stuff, for sharing resources among different movies.
@@ -621,6 +625,17 @@ public:
 		}
 	}
 
+#ifdef GNASH_USE_GC
+	/// Mark all library elements as reachable (for GC)
+	void markReachableResources() const
+	{
+		for ( container::const_iterator i=_map.begin(), e=_map.end(); i!=e; ++i)
+		{
+			i->second->setReachable();
+		}
+	}
+#endif
+
 	void add(const std::string& key, movie_definition* mov)
 	{
 		_map[key] = mov;
@@ -641,25 +656,6 @@ void save_extern_movie(sprite_instance* m)
     s_extern_sprites.push_back(m);
 }
 
-//#if 0
-void delete_unused_root()
-{
-    for (unsigned int i = 0; i < s_extern_sprites.size(); i++)
-	{
-	    sprite_instance* root_m = s_extern_sprites[i];
-	    sprite_instance* m = root_m->get_root_movie();
-      
-	    if (m->get_ref_count() < 2)
-		{
-		    log_action(_("extern movie deleted"));
-		    s_extern_sprites.erase(s_extern_sprites.begin() + i);
-		    i--;
-		    root_m->drop_ref();
-		}
-	}
-}
-//#endif // 0
-
 movie_root*
 get_current_root()
 {
@@ -677,7 +673,7 @@ void set_workdir(const char* dir)
     s_workdir = dir;
 }
 
-void	clear_library()
+static void	clear_library()
     // Drop all library references to movie_definitions, so they
     // can be cleaned up.
 {
@@ -702,8 +698,6 @@ movie_definition* create_library_movie(const URL& url, const char* real_url, boo
 	if ( s_movie_library.get(cache_label, &m) )
 	    {
     		log_msg(_("Movie %s already in library"), cache_label.c_str());
-		// Return cached movie.
-		// m->add_ref(); let caller add the ref, if needed
 		return m.get();
 	    }
     }
@@ -753,7 +747,6 @@ sprite_instance* create_library_movie_inst(movie_definition* md)
 	if (m != NULL)
 	    {
 		// Return cached movie instance.
-		// m->add_ref(); // let caller increment refcount
 		return m.get();
 	    }
     }
@@ -772,7 +765,6 @@ sprite_instance* create_library_movie_inst(movie_definition* md)
 	    s_movie_library_inst.add(md, mov);
 	}
 
-    // mov->add_ref(); // let caller increment refcount
     return mov;
 }
 
@@ -873,8 +865,41 @@ void	precompute_cached_data(movie_definition* movie_def)
 		}
 	}
 
+#ifndef GNASH_USE_GC
     m->drop_ref();
+#endif //ndef GNASH_USE_GC
 }
+
+#ifdef GNASH_USE_GC
+/// A GC root used to mark all reachable collectable pointers
+class GnashGcRoot : public GcRoot 
+{
+
+public:
+
+	GnashGcRoot()
+	{
+	}
+
+	void markReachableResources() const
+	{
+		VM::get().markReachableResources();
+
+		// Mark library movies (TODO: redesign this part)
+		s_movie_library.markReachableResources();
+	}
+};
+#endif
+
+void gnashInit()
+{
+#ifdef GNASH_USE_GC
+	static GnashGcRoot gcRoot;
+	GC::init(gcRoot);
+#endif
+}
+
+
 
 
 } // namespace gnash

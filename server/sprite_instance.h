@@ -657,8 +657,10 @@ public:
 	void testInvariant() const {
 		assert(m_play_state == PLAY || m_play_state == STOP);
 		assert(m_current_frame < m_def->get_frame_count());
+#ifndef GNASH_USE_GC 
 		assert(get_ref_count() > 0); // or we're constructed but
 		                             // not stored in a boost::intrusive_ptr
+#endif
 	}
 
 	/// Set the current m_sound_stream_id
@@ -980,6 +982,18 @@ protected:
 
 	/// Process a completed loadVariables request
 	void processCompletedLoadVariableRequest(LoadVariablesThread& request);
+
+#ifdef GNASH_USE_GC
+	/// Mark sprite-specific reachable resources and invoke
+	/// the parent's class version (markCharacterReachableResources)
+	//
+	/// sprite-specific reachable resources are:
+	/// 	- DisplayList items (both current and backup one)
+	///	- Drawable instance
+	///	- sprite environment
+	///
+	virtual void markReachableResources() const;
+#endif // GNASH_USE_GC
 };
 
 /// Initialize the global MovieClip class

@@ -587,7 +587,9 @@ Debugger::dumpStackFrame(as_environment &env)
 		if (name.size()) {
 		    cerr << " \"" << name << "\"";
 		}
+#ifndef GNASH_USE_GC
 		cerr << " has #" << o->get_ref_count() << " references";
+#endif
 	    }
 	    cerr << endl;
 	}

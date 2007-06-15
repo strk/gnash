@@ -19,6 +19,9 @@
 #include "bitmap_info.h" // for dtor visibility by smart pointer
 #include "FreetypeGlyphsProvider.h" // for device fonts support
 #include "log.h"
+#ifdef GNASH_USE_GC
+# include "GC.h"
+#endif
 
 #include <map>
 
@@ -64,6 +67,15 @@ namespace gnash {
 
 		// the origin of the glyph box, in uv coords
 		point	m_uv_origin;
+	protected:
+
+#ifdef GNASH_USE_GC
+		/// Mark the contained bitmap info as being reachable
+		void markReachableResources() const
+		{
+			if ( m_bitmap_info.get() ) m_bitmap_info->setReachable();
+		}
+#endif
 
 	};
 
@@ -243,9 +255,11 @@ namespace gnash {
 		/// Return true on success, false on error
 		bool initDeviceFontProvider();
 
-		std::vector< boost::intrusive_ptr<shape_character_def> >	m_glyphs;
+		typedef std::vector< boost::intrusive_ptr<shape_character_def> > GlyphVect;
+		GlyphVect m_glyphs;
 
-		std::vector< texture_glyph >	m_texture_glyphs;	// cached info, built by gnash_fontlib.
+		typedef std::vector< texture_glyph > TextureGlyphVect;
+		TextureGlyphVect m_texture_glyphs;	// cached info, built by gnash_fontlib.
 
 		int	m_texture_glyph_nominal_size;
 
@@ -274,6 +288,18 @@ namespace gnash {
 		kernings_table m_kerning_pairs;
 
 		std::auto_ptr<FreetypeGlyphsProvider> _ftProvider;
+
+	protected:
+
+#ifdef GNASH_USE_GC
+		/// Mark reachable resources (for the GC)
+		//
+		/// Reachable resources are:
+		///	- texture_glyphs
+		///	- shape_character_defs (vector glyphs)
+		///
+		void markReachableResources() const;
+#endif // GNASH_USE_GC
 	};
 
 

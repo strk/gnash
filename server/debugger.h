@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: debugger.h,v 1.14 2007/05/28 15:41:05 ann Exp $ */
+/* $Id: debugger.h,v 1.15 2007/06/15 15:00:28 strk Exp $ */
 
 #ifndef __DEBUGGER_H__
 #define __DEBUGGER_H__
@@ -136,6 +136,7 @@ public:
     std::string &callStackFrame() { return _callstack.back(); };
     
     debug_state_e state() { return _state; };
+
 private:
     bool                        _enabled;
     bool			_tracing;

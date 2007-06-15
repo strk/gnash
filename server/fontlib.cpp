@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.28 2007/06/13 02:49:32 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.29 2007/06/15 15:00:29 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -1129,7 +1129,9 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 					h,
 					s_current_cache_image);
 			owner->add_bitmap_info(bi.get());
+#ifndef GNASH_USE_GC
 			assert(bi->get_ref_count() == 2);	// one ref for bi, one for the owner.
+#endif // ndef GNASH_USE_GC
 			}
 			else { 	// Skip image data bytes.
 				in->set_position(in->get_position() + w * h);

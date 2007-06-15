@@ -192,7 +192,9 @@ static as_value sprite_attach_movie(const fn_call& fn)
 	boost::intrusive_ptr<character> newch = exported_movie->create_character_instance(sprite.get(), depth_val);
 	assert( dynamic_cast<sprite_instance*>(newch.get()) );
 	assert( newch.get() > (void*)0xFFFF );
+#ifndef GNASH_USE_GC
 	assert(newch->get_ref_count() > 0);
+#endif // ndef GNASH_USE_GC
 
 	newch->set_name(newname.c_str());
 
@@ -3178,7 +3180,9 @@ sprite_instance::add_display_object(
 		ratio,
 		clip_depth);
 
+#ifndef GNASH_USE_GC
 	assert(ch == NULL || ch->get_ref_count() > 1);
+#endif // ndef GNASH_USE_GC
 	return ch.get();
 }
 
@@ -3812,8 +3816,10 @@ sprite_instance::loadMovie(const URL& url)
 	else
 	{
 		movie_root& root = _vm.getRoot();
+#ifndef GNASH_USE_GC
 		// Make sure we won't kill ourself !
 		assert(get_ref_count() > 1);
+#endif // ndef GNASH_USE_GC
 		root.setRootMovie(extern_movie.get());
 	}
 
@@ -3979,5 +3985,33 @@ sprite_instance::isEnabled() const
 	const_cast<sprite_instance*>(this)->get_member("enabled", &enabled);
 	return enabled.to_bool();
 }
+
+#ifdef GNASH_USE_GC
+struct ReachableMarker {
+	void operator() (character *ch)
+	{
+		ch->setReachable();
+	}
+};
+void
+sprite_instance::markReachableResources() const
+{
+	ReachableMarker marker;
+
+	m_display_list.visitAll(marker);
+
+	oldDisplayList.visitAll(marker);
+
+	_drawable_inst->setReachable();
+
+	m_as_environment.markReachableResources();
+
+	// Mark our own definition
+	if ( m_def.get() ) m_def->setReachable();
+
+	markCharacterReachable();
+
+}
+#endif // GNASH_USE_GC
 
 } // namespace gnash

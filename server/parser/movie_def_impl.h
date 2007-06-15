@@ -215,11 +215,13 @@ private:
 
 	/// Movies we import from; hold a ref on these,
 	/// to keep them alive
-	std::vector<boost::intrusive_ptr<movie_definition> > m_import_source_movies;
+	typedef std::vector<boost::intrusive_ptr<movie_definition> > ImportVect;
+	ImportVect m_import_source_movies;
 
 	/// Bitmaps used in this movie; collected in one place to make
 	/// it possible for the host to manage them as textures.
-	std::vector<boost::intrusive_ptr<bitmap_info> >	m_bitmap_list;
+	typedef std::vector<boost::intrusive_ptr<bitmap_info> >	BitmapVect;
+	BitmapVect m_bitmap_list;
 
 	create_bitmaps_flag	m_create_bitmaps;
 	create_font_shapes_flag	m_create_font_shapes;
@@ -624,6 +626,24 @@ public:
 	{
 		_timeline.getFrameDepths(frameno, depths);
 	}
+
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources of a movie_def_impl
+	//
+	/// Reachable resources are:
+	///	- fonts (m_fonts)
+	///	- bitmap characters (m_bitmap_characters)
+	///	- bitmaps (m_bitmap_list) [ what's the difference with bitmap chracters ?? ]
+	///	- sound samples (m_sound_samples)
+	///	- exports (m_exports)
+	///	- imported movies (m_import_source_movies)
+	///
+	/// TODO: do we really need all this stuff to be a GcResource ??
+	///
+	void markReachableResources() const;
+#endif // GNASH_USE_GC
 
 };
 

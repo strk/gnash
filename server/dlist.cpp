@@ -856,7 +856,9 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force) {
 		it != endIt; ++it)
 	{
     DisplayItem& dobj = *it;
+#ifndef GNASH_USE_GC
     assert(dobj->get_ref_count() > 0);
+#endif // ndef GNASH_USE_GC
     dobj->add_invalidated_bounds(ranges, force);
 	}
 	

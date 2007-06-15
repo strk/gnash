@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.82 2007/06/14 02:03:17 zoulunkai Exp $ */
+/* $Id: character.h,v 1.83 2007/06/15 15:00:28 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -153,6 +153,31 @@ private:
 	std::auto_ptr<TimelineInfo> _timelineInfo;
 
 protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark all reachable resources, override from as_object.
+	//
+	/// The default implementation calls markCharacterReachableResources().
+	///
+	/// If a derived class provides access to more GC-managed
+	/// resources, it should override this method and call 
+	/// markCharacterReachableResources() as the last step.
+	///
+	virtual void markReachableResources() const
+	{
+		markCharacterReachable();
+	}
+
+	/// Mark character-specific reachable resources
+	//
+	/// These are: the character's parent and the defualt
+	/// as_object reachable stuff.
+	void markCharacterReachable() const
+	{
+		if ( m_parent ) m_parent->setReachable();
+		markAsObjectReachable();
+	}
+#endif // GNASH_USE_GC
 
 	const Events& get_event_handlers() const
 	{

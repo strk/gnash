@@ -385,6 +385,17 @@ private:
 	///
 	Timeline _timeline;
 
+protected:
+
+
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources of a sprite_definition
+	//
+	/// Reachable resources are:
+	///	- registered class (registeredClass)
+	///
+	void markReachableResources() const;
+#endif // GNASH_USE_GC
 };
 
 

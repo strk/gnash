@@ -135,6 +135,9 @@ main(int argc, char *argv[])
 {
     assert(tu_types_validate());
 
+    /// Initialize gnash core library
+    gnashInit();
+
     // Enable native language support, i.e. internationalization
     setlocale (LC_MESSAGES, "");
     bindtextdomain (PACKAGE, LOCALEDIR);

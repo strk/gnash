@@ -298,7 +298,6 @@ void nsPluginInstance::main_loop()
 		wglMakeCurrent(mhDC, mhRC);
 
 		gnash::set_current_root(m);
-		gnash::delete_unused_root();
 	
 		uint64_t	ticks;
 		ticks = tu_timer::get_ticks();

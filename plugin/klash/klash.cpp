@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: klash.cpp,v 1.27 2007/04/18 09:35:41 jgilmore Exp $ */
+/* $Id: klash.cpp,v 1.28 2007/06/15 15:00:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -597,7 +597,6 @@ main(int argc, char *argv[])
               break;
         };
         m = gnash::get_current_root();
-        gnash::delete_unused_root();
         
 	movie_root* root = dynamic_cast<movie_root*>(m);
 	assert(root);

@@ -24,13 +24,26 @@
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
-/* $Id: smart_ptr.h,v 1.19 2007/05/28 15:41:02 ann Exp $ */
+/* $Id: smart_ptr.h,v 1.20 2007/06/15 15:00:26 strk Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
 
 #include "tu_config.h"
 #include "utility.h"
+
+// Define the following macro to use garbage collecting rather
+// then ref-counting. Currenlty this would make ref_counted
+// derive from GcResource and intrusive_ptr never really messing
+// with the stored pointer (not calling add_ref/drop_ref, which would
+// be not defined for ref_counted.
+// Is is a temporary hack to allow quick switch between GC and REFCOUNT
+// mechanism till the GC is stable
+//
+//#define GNASH_USE_GC 1
+
+// TODO: if GNASH_USE_GC is defined have smart_ptr map to intrusive_ptr
+//       else have it map to gc_ptr (yet to be defined)
 
 #include <boost/intrusive_ptr.hpp>
 
@@ -45,14 +58,22 @@ template <class T>
 void
 intrusive_ptr_add_ref(T* o)
 {
+#ifndef GNASH_USE_GC
 	o->add_ref();
+#else
+	UNUSED(o);
+#endif // ndef GNASH_USE_GC
 }
 
 template <class T>
 void
 intrusive_ptr_release(T* o)
 {
+#ifndef GNASH_USE_GC
 	o->drop_ref();
+#else
+	UNUSED(o);
+#endif // ndef GNASH_USE_GC
 }
 
 } 

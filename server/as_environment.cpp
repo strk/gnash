@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.78 2007/05/25 13:25:47 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.79 2007/06/15 15:00:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -447,7 +447,9 @@ as_environment::find_target(const as_value& val) const
 		boost::intrusive_ptr<as_object> obj = val.to_object();
 		assert (obj);
 		character* s=dynamic_cast<character*>(obj.get());
+#ifndef GNASH_USE_GC
 		assert(s->get_ref_count() > 1); // or the intrusive_ptr above going out-of-scope will kill it
+#endif // ndef GNASH_USE_GC
 		//log_msg(_("find_target is a character, returning it"));
 		return s; // might be NULL
 	}
@@ -686,7 +688,9 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 	}
 
 	env = tmp.to_object().get();
+#ifndef GNASH_USE_GC
 	assert(env->get_ref_count() > 0); // still alive...
+#endif // ndef GNASH_USE_GC
 
 
 	//@@   _level0 --> root, .. --> parent, . --> this, other == character
@@ -831,7 +835,9 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 		}
 
 		env = tmp.to_object().get();
+#ifndef GNASH_USE_GC
 		assert(env->get_ref_count() > 0);
+#endif // ndef GNASH_USE_GC
 	}
 
 	//@@   _level0 --> root, .. --> parent, . --> this, other == character
@@ -1027,6 +1033,51 @@ as_environment::CallFrame::CallFrame(as_function* funcPtr)
 	func(funcPtr)
 {
 }
+
+#ifdef GNASH_USE_GC
+/// Mark all reachable resources
+//
+/// Reachable resources would be registers and
+/// locals (expected to be empty?) and function.
+void
+as_environment::CallFrame::markReachableResources() const
+{
+	if ( func ) func->setReachable();
+	for (Registers::const_iterator i=registers.begin(), e=registers.end(); i!=e; ++i)
+	{
+		i->setReachable();
+	}
+	locals->setReachable();
+}
+
+void
+as_environment::markReachableResources() const
+{
+	for (size_t i=0, s=4; i<4; ++i)
+	{
+		m_global_register[i].setReachable();
+	}
+
+	if ( m_target ) m_target->setReachable();
+	if ( _original_target ) _original_target->setReachable();
+
+	assert ( _localFrames.empty() );
+#if 1 // I think we expect the stack to be empty !
+	for (CallStack::const_iterator i=_localFrames.begin(), e=_localFrames.end(); i!=e; ++i)
+	{
+		i->markReachableResources();
+	}
+#endif
+
+	assert ( m_stack.empty() );
+#if 1 // I think we expect the stack to be empty !
+	for (std::vector<as_value>::const_iterator i=m_stack.begin(), e=m_stack.end(); i!=e; ++i)
+	{
+		i->setReachable();
+	}
+#endif
+}
+#endif // GNASH_USE_GC
 
 } // end of gnash namespace
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.38 2007/06/13 15:17:30 strk Exp $ */
+/* $Id: font.cpp,v 1.39 2007/06/15 15:00:29 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -617,6 +617,30 @@ namespace gnash {
 		}
 		return true;
 	}
+
+#ifdef GNASH_USE_GC
+/// Mark reachable resources (for the GC)
+//
+/// Reachable resources are:
+///	- texture_glyphs
+///	- shape_character_defs (vector glyphs)
+void
+font::markReachableResources() const
+{
+	// Mark textured glyphs
+	for (TextureGlyphVect::const_iterator i=m_texture_glyphs.begin(), e=m_texture_glyphs.end(); i!=e; ++i)
+	{
+		i->setReachable();
+	}
+
+	// Mark vector glyphs
+	for (GlyphVect::const_iterator i=m_glyphs.begin(), e=m_glyphs.end(); i!=e; ++i)
+	{
+		(*i)->setReachable();
+	}
+
+}
+#endif // GNASH_USE_GC
 
 
 }	// end namespace gnash

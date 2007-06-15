@@ -41,7 +41,9 @@ namespace gnash {
 
 swf_function::~swf_function()
 {
+#ifndef GNASH_USE_GC
 	if ( _properties ) _properties->drop_ref();
+#endif //ndef GNASH_USE_GC
 }
 
 swf_function::swf_function(const action_buffer* ab,
@@ -61,16 +63,6 @@ swf_function::swf_function(const action_buffer* ab,
 {
 	assert(m_action_buffer);
 	assert( m_start_pc < m_action_buffer->size() );
-
-	// Define the 'prototype' member as a new object with
-	// only the 'constructor' element defined.
-	//_properties = new as_object();
-	//as_object* proto = _properties;
-	//proto->add_ref();
-
-	//proto->init_member("constructor", this); 
-
-	//init_member("prototype", as_value(proto));
 
 	init_member("constructor", as_value(as_function::getFunctionConstructor().get()));
 }
@@ -147,10 +139,12 @@ swf_function::getSuper(as_object& obj)
 as_array_object* 
 swf_function::getArguments(swf_function& callee, const fn_call& fn)
 { 
+#ifndef GNASH_USE_GC
 	// We'll be storing the callee as_object into an as_value
 	// so you must make sure you have a reference on it before
 	// callign this function.
 	assert(callee.get_ref_count() > 0);
+#endif // ndef GNASH_USE_GC
 
 	// Super class prototype is : obj.__proto__.constructor.prototype 
 	as_array_object* arguments = new as_array_object();
@@ -343,6 +337,23 @@ swf_function::set_length(int len)
 	assert(m_start_pc+len <= m_action_buffer->size());
 	m_length = len;
 }
+
+#ifdef GNASH_USE_GC
+void
+swf_function::markReachableResources() const
+{
+	// Mark scope stack objects
+	for (ScopeStack::const_iterator i=_scopeStack.begin(), e=_scopeStack.end(); i!=e; ++i)
+	{
+		(*i)->setReachable();
+	}
+
+	if ( m_env ) m_env->markReachableResources();
+
+	// Invoke parent class marker
+	markAsFunctionReachable(); 
+}
+#endif // GNASH_USE_GC
 
 } // end of gnash namespace
 

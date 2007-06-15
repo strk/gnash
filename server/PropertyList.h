@@ -36,8 +36,6 @@ namespace gnash {
 	class as_object;
 	class as_environment;
 	class as_function;
-	//class as_value;
-	//class Property;
 }
 
 namespace gnash {
@@ -354,6 +352,10 @@ public:
 	///	so this method too is non-const.
 	///
 	void dump(as_object& this_ptr);
+
+	/// Mark all simple properties, getters and setters
+	/// as being reachable (for the GC)
+	void setReachable() const;
 };
 
 

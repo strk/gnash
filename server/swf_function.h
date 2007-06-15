@@ -227,6 +227,15 @@ public:
 	as_value	operator()(const fn_call& fn);
 
 	//void	lazy_create_properties();
+
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources. Override from as_function.
+	//
+	/// Reachable resources from this object is it's scope stack
+	/// and the prototype.
+	///
+	virtual void markReachableResources() const;
+#endif // GNASH_USE_GC
 };
 
 

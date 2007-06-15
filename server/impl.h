@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: impl.h,v 1.45 2007/05/28 15:41:06 ann Exp $ */
+/* $Id: impl.h,v 1.46 2007/06/15 15:00:29 strk Exp $ */
 
 #ifndef GNASH_IMPL_H
 #define GNASH_IMPL_H
@@ -67,7 +67,6 @@ DSOEXPORT sprite_instance *create_library_movie_inst(movie_definition* md);
 DSOEXPORT movie_root* get_current_root();
 DSOEXPORT const char* get_workdir();
 DSOEXPORT void set_workdir(const char* dir);
-DSOEXPORT void delete_unused_root();
 
 // Information about how to display a character.
 class display_info

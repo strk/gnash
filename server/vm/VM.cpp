@@ -1,3 +1,4 @@
+// VM.cpp: the Virtual Machine class, for Gnash
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -15,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.9 2007/05/28 15:41:10 ann Exp $ */
+/* $Id: VM.cpp,v 1.10 2007/06/15 15:00:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -145,6 +146,21 @@ uint64_t
 VM::getTime()
 {
   return  (tu_timer::get_ticks() -  _start_time);
+}
+
+void
+VM::markReachableResources() const
+{
+#ifdef GNASH_USE_GC
+	_root_movie->markReachableResources();
+	_global->setReachable();
+#endif
+}
+
+void
+VmGcRoot::markReachableResources() const
+{
+	_vm.markReachableResources();
 }
 
 } // end of namespace gnash

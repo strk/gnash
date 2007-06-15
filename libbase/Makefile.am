@@ -105,7 +105,9 @@ libgnashbase_la_SOURCES = \
 	zlib_adapter.cpp \
 	URL.cpp \
 	LoadThread.cpp \
-	FLVParser.cpp
+	FLVParser.cpp \
+	GC.cpp \
+	$(NULL)
 
 noinst_HEADERS = \
 	$(LIBLTDLHEAD) \

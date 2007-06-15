@@ -185,6 +185,22 @@ private:
 	/// 'TextFields.variable'
 	std::string _variable_name;
 
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark reachable reosurces (for GC)
+	//
+	/// Reachable resource is currenlty just our definition,
+	/// plus common character resources
+	///
+	void markReachableResources() const
+	{
+		if ( m_def.get() ) m_def->setReachable();
+
+		// recurse to parent...
+		markCharacterReachable();
+	}
+#endif
 };
 
 /// Initialize the global TextField class

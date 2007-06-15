@@ -64,6 +64,18 @@ class BitmapMovieDefinition : public movie_definition
 	///
 	shape_character_def* getShapeDef();
 
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources of a BitmapMovieDefinition
+	//
+	/// Reachable resources are:
+	///	- dynamic shape (_shapedef)
+	///	- bitmap (_bitmap)
+	///
+	void markReachableResources() const;
+#endif // GNASH_USE_GC
+
 public:
 
 

@@ -318,7 +318,9 @@ generate_mouse_button_events(mouse_button_state* ms)
 				// onDragOut
 				if (active_entity != NULL)
 				{
+#ifndef GNASH_USE_GC
 					assert(active_entity->get_ref_count() > 1); // we are NOT the only object holder !
+#endif // GNASH_USE_GC
 					active_entity->on_button_event(event_id::DRAG_OUT);
 					// TODO: have on_button_event return
 					//       wheter the action must trigger
@@ -613,6 +615,11 @@ movie_root::advance(float delta_time)
 			prevframe, totframes, curframe, totframes,
 			typeid(*_movie).name(),
 			_movie->get_play_state() == sprite_instance::STOP ? " - now in STOP mode" : "");
+#endif
+
+#ifdef GNASH_USE_GC
+	// Run the garbage collector (step back !!)
+	GC::get().collect();
 #endif
 
 	assert(testInvariant());
@@ -1008,6 +1015,20 @@ movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_
 #endif
 	_actionQueue.push_back(new FunctionCode(func, target));
 }
+
+#ifdef GNASH_USE_GC
+void
+movie_root::markReachableResources() const
+{
+	// Mark root movie as reachable
+	// TODO: mark all levels !!
+	_movie->setReachable();
+
+	// Mark mouse entities 
+	m_mouse_button_state.markReachableResources();
+	
+}
+#endif // GNASH_USE_GC
 
 } // namespace gnash
 

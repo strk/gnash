@@ -26,6 +26,7 @@
 #include <list>
 
 // Define the following macro to enable GC verbosity 
+// Define to > 1 to have info printed about scan of already reachable objects
 #define GNASH_GC_DEBUG 1
 
 #ifdef GNASH_GC_DEBUG
@@ -92,15 +93,15 @@ public:
 
 		if ( _reachable )
 		{
-#ifdef GNASH_GC_DEBUG 
-			log_debug("Instance %p of class %s already reachable, setReachable doing nothing",
+#if GNASH_GC_DEBUG > 1
+			log_debug(_("Instance %p of class %s already reachable, setReachable doing nothing"),
 					(void*)this, typeid(*this).name());
 #endif
 			return;
 		}
 
 #ifdef GNASH_GC_DEBUG 
-		log_debug("Instance %p of class %s set to reachable, scanning reachable resources from it",
+		log_debug(_("Instance %p of class %s set to reachable, scanning reachable resources from it"),
 				(void*)this, typeid(*this).name());
 #endif
 
@@ -134,7 +135,7 @@ protected:
 	{
 		assert(_reachable);
 #ifdef GNASH_GC_DEBUG 
-		log_debug("Class %s didn't override the markReachableResources() method", typeid(*this).name());
+		log_debug(_("Class %s didn't override the markReachableResources() method"), typeid(*this).name());
 #endif
 	}
 
@@ -172,76 +173,23 @@ class GC
 
 public:
 
-	friend class GcResource;
-
-	/// Get the singleton instance of the Garbage Collector
-	static GC& getInstance()
-	{
-		static GC singleton;
-		return singleton;
-	}
-
-	/// Add a root resource to use for mark scanning
+	/// Init the singleton instance using the given GcRoot
 	//
-	/// @param root
-	///     A GcResource to use as a root item to scan
-	///     during the mark phase.
-	///
-	void addRoot(GcRoot* root)
-	{
-		assert(root);
-		_roots.push_back(root);
-#ifdef GNASH_GC_DEBUG
-		log_debug("GC %p: root %p added, num roots: " SIZET_FMT, (void*)this, (void*)root, _roots.size());
-#endif
-	}
+	static GC& init(GcRoot& r);
 
-
-	/// Run the collector
+	/// Delete the singleton. You'll need to call init() again
+	/// after this call, if you want to use the singleton.
 	//
-	/// Find all reachable collectables, destroy all the others.
+	/// See init(GcRoot&)
 	///
-	void collect()
-	{
-#ifdef GNASH_GC_DEBUG 
-		log_debug("Starting collector: " SIZET_FMT " roots, " SIZET_FMT " collectables", _roots.size(), _resList.size());
-#endif // GNASH_GC_DEBUG
+	static void cleanup();
 
-		// Mark all resources as reachable
-		markReachable();
-
-		// clean unreachable resources, and mark them others as reachable again
-		cleanUnreachable();
-
-	}
-
-private:
-
-	/// List of collectables
-	typedef std::list<const GcResource *> ResList;
-
-	/// List of roots
-	typedef std::list<const GcRoot *> RootList;
-
-	/// Create a garbage collector
-	GC()
-	{
-#ifdef GNASH_GC_DEBUG 
-		log_debug("GC %p created", (void*)this);
-#endif
-	}
-
-	/// Destroy the collector, releasing all collectables.
-	~GC()
-	{
-#ifdef GNASH_GC_DEBUG 
-		log_debug("GC %p deleted, cleaning up all managed resources", (void*)this);
-#endif
-		for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; ++i)
-		{
-			delete *i;
-		}
-	}
+	/// Get the singleton 
+	//
+	/// An assertion will fail if the GC has not been initialized yet.
+	/// See init(GcRoot&).
+	///
+	static GC& get();
 
 	/// Add an heap object to the list of managed collectables
 	//
@@ -268,20 +216,68 @@ private:
 
 		_resList.push_back(item);
 #ifdef GNASH_GC_DEBUG 
-		log_debug("GC %p: collectable %p added, num collectables: " SIZET_FMT, (void*)this, (void*)item, _resList.size());
+		log_debug(_("GC %p: collectable %p added, num collectables: " SIZET_FMT), (void*)this, (void*)item, _resList.size());
 #endif
 	}
+
+
+	/// Run the collector
+	//
+	/// Find all reachable collectables, destroy all the others.
+	///
+	void collect()
+	{
+#ifdef GNASH_GC_DEBUG 
+		log_debug(_("Starting collector: " SIZET_FMT " collectables"), _resList.size());
+#endif // GNASH_GC_DEBUG
+
+		// Mark all resources as reachable
+		markReachable();
+
+		// clean unreachable resources, and mark them others as reachable again
+		cleanUnreachable();
+
+	}
+
+private:
+
+	/// Create a garbage collector, using the given root
+	GC(GcRoot& root)
+		:
+		_root(root)
+	{
+#ifdef GNASH_GC_DEBUG 
+		log_debug(_("GC %p created"), (void*)this);
+#endif
+	}
+
+	/// Destroy the collector, releasing all collectables.
+	~GC()
+	{
+#ifdef GNASH_GC_DEBUG 
+		log_debug(_("GC %p deleted, NOT collecting again all managed resources"), (void*)this);
+#endif
+
+#if 0
+		for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; ++i)
+		{
+			delete *i;
+		}
+#endif
+	}
+
+
+	/// List of collectables
+	typedef std::list<const GcResource *> ResList;
+
+	/// List of roots
+	typedef std::list<const GcRoot *> RootList;
 
 	/// Mark all reachable resources
 	void markReachable()
 	{
-		/// By marking the roots as reachable, a chain effect should be
-		/// engaged so that every reachable resource is marked
-		for (RootList::iterator i=_roots.begin(), e=_roots.end(); i!=e; ++i)
-		{
-			const GcRoot* root = *i;
-			root->markReachableResources(); 
-		}
+		log_debug(_("GC %p: MARK SCAN"), (void*)this);
+		_root.markReachableResources();
 	}
 
 	/// Delete all unreachable objects, and mark the others unreachable again
@@ -289,6 +285,7 @@ private:
 	{
 #ifdef GNASH_GC_DEBUG 
 		size_t deleted = 0;
+		log_debug(_("GC %p: SWEEP SCAN"), (void*)this);
 #endif
 		for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; )
 		{
@@ -296,6 +293,8 @@ private:
 			if ( ! res->isReachable() )
 			{
 #ifdef GNASH_GC_DEBUG 
+				log_debug(_("GC %p: cleanUnreachable deleting object %p (%s)"),
+						(void*)this, (void*)res, typeid(*res).name());
 				++deleted;
 #endif
 				delete res;
@@ -308,16 +307,17 @@ private:
 			}
 		}
 #ifdef GNASH_GC_DEBUG 
-		log_debug("GC %p: cleanUnreachable deleted " SIZET_FMT
-				" resources marked as unreachable",
+		log_debug(_("GC %p: cleanUnreachable deleted " SIZET_FMT
+				" resources marked as unreachable"),
 				(void*)this, deleted);
 #endif
 	}
 
 	ResList _resList;
 
-	RootList _roots;
+	GcRoot& _root;
 
+	static GC* _singleton;
 };
 
 
@@ -325,7 +325,7 @@ inline GcResource::GcResource()
 	:
 	_reachable(false)
 {
-	GC::getInstance().addCollectable(this);
+	GC::get().addCollectable(this);
 }
 
 } // namespace gnash

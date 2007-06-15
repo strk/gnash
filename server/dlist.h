@@ -352,6 +352,9 @@ public:
 	template <class V>
 	inline void visitAll(V& visitor);
 
+	template <class V>
+	inline void visitAll(V& visitor) const;
+
 	/// dump list to logfile/stderr
 	void dump() const;
 
@@ -441,6 +444,18 @@ void
 DisplayList::visitAll(V& visitor)
 {
 	for (iterator it = _characters.begin(),
+			itEnd = _characters.end();
+		it != itEnd; ++it)
+	{
+		visitor(it->get());
+	}
+}
+
+template <class V>
+void
+DisplayList::visitAll(V& visitor) const
+{
+	for (const_iterator it = _characters.begin(),
 			itEnd = _characters.end();
 		it != itEnd; ++it)
 	{

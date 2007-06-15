@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.35 2007/05/28 15:41:08 ann Exp $ */
+/* $Id: xmlnode.cpp,v 1.36 2007/06/15 15:00:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -209,14 +209,18 @@ XMLNode::insertBefore(boost::intrusive_ptr<XMLNode> newnode, boost::intrusive_pt
 void
 XMLNode::removeNode()
 {
+#ifndef GNASH_USE_GC
     assert(get_ref_count() > 1);
+#endif
     boost::intrusive_ptr<XMLNode> oldparent = getParent();
     if ( oldparent )
     {
         oldparent->_children.remove(this);
     }
     _parent = NULL;
+#ifndef GNASH_USE_GC
     assert(get_ref_count() > 0);
+#endif
 }
 
 XMLNode *

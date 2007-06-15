@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.107 2007/06/02 06:50:07 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.108 2007/06/15 15:00:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2341,12 +2341,14 @@ SWFHandlers::ActionNew(ActionExec& thread)
 			env, nargs, env.get_top_index());
 
 #ifdef USE_DEBUGGER
+#ifndef GNASH_USE_GC
 	// WARNING: new_obj.to_object() can return a newly allocated
 	//          thing into the intrusive_ptr, so the debugger
 	//          will be left with a deleted object !!
 	//          Rob: we don't want to use void pointers here..
 	newobj->add_ref(); // this will leak, but at least debugger won't end up
 	              	   // with a dandling reference...
+#endif //ndef GNASH_USE_GC
         debugger.addSymbol(newobj.get(), classname);
 #endif
 
@@ -3358,8 +3360,10 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 	//          will be left with a deleted object !!
 	//          Rob: we don't want to use void pointers here..
 	boost::intrusive_ptr<as_object> o = function_value.to_object();
+#ifndef GNASH_USE_GC
 	o->add_ref(); // this will leak, but at least debugger won't end up
 	              // with a dandling reference...
+#endif //ndef GNASH_USE_GC
         debugger.addSymbol(o.get(), name);
 #endif
 }
@@ -3508,8 +3512,10 @@ SWFHandlers::ActionDefineFunction(ActionExec& thread)
 		//          will be left with a deleted object !!
 		//          Rob: we don't want to use void pointers here..
 		boost::intrusive_ptr<as_object> o = function_value.to_object();
+#ifndef GNASH_USE_GC
 		o->add_ref(); // this will leak, but at least debugger won't end up
 	              // with a dandling reference...
+#endif //ndef GNASH_USE_GC
                 debugger.addSymbol(o.get(), name);
 #endif
 	}
