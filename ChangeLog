@@ -3,13 +3,13 @@
 	* server/BitmapMovieInstance.cpp, server/asobj/NetStream.cpp:
 	  More warnings fixes.
 
-2007-06-14 Sandro Santilli <strk@keybit.net>
+2007-06-14 Kris Jurka <jurka@ejurka.com>
 
 	* gui/Player.cpp, gui/gnash.cpp, server/as_environment.cpp,
 	  server/as_function.cpp, server/as_value.cpp,
 	  server/asobj/NetStream.cpp, server/asobj/xml.cpp,
 	  server/parser/shape_character_def.cpp, server/vm/ActionExec.cpp:
-	  Applied patch #5927.
+	  Fix some compiler warnings. Applied patch #5927.
 
 2007-06-14 Sandro Santilli <strk@keybit.net>
 
