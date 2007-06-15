@@ -1,4 +1,6 @@
-	* gui/Player.cpp, libbase/GC.h, libbase/Makefile.am,
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
+	* gui/Player.cpp, libbase/GC.{h,cpp}, libbase/Makefile.am,
 	  libbase/ref_counted.h, libbase/smart_ptr.h,
 	  plugin/klash/klash.cpp, plugin/win32/plugin.cpp,
 	  server/GetterSetter.cpp, server/GetterSetter.h,
