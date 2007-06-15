@@ -1,5 +1,10 @@
 2007-06-14 Sandro Santilli <strk@keybit.net>
 
+	* server/BitmapMovieInstance.cpp, server/asobj/NetStream.cpp:
+	  More warnings fixes.
+
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
 	* gui/Player.cpp, gui/gnash.cpp, server/as_environment.cpp,
 	  server/as_function.cpp, server/as_value.cpp,
 	  server/asobj/NetStream.cpp, server/asobj/xml.cpp,

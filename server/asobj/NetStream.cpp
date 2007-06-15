@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.64 2007/06/15 18:46:59 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.65 2007/06/15 18:51:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -162,7 +162,7 @@ static as_value netstream_seek(const fn_call& fn) {
 	uint32_t time = 0;
 	if (fn.nargs > 0)
 	{
-		time = fn.arg(0).to_number(&fn.env());
+		time = fn.arg(0).to_number<uint32_t>(&fn.env());
 	}
 	ns->seek(static_cast<uint32_t>(time*1000.0));
 
