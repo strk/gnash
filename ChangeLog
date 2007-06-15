@@ -1,5 +1,10 @@
 2007-06-14 Sandro Santilli <strk@keybit.net>
 
+	* libbase/triangulate_impl.h (poly_env<>::init): don't use
+	  backslash to break strings (unneeded). See bug #20138.
+	  
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
 	* gui/Player.cpp, libbase/GC.{h,cpp}, libbase/Makefile.am,
 	  libbase/ref_counted.h, libbase/smart_ptr.h,
 	  plugin/klash/klash.cpp, plugin/win32/plugin.cpp,

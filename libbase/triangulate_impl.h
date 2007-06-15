@@ -24,7 +24,7 @@
 // code, see the FIST web page at:
 // http://www.cosy.sbg.ac.at/~held/projects/triang/triang.html
 
-/* $Id: triangulate_impl.h,v 1.23 2007/04/27 07:51:33 strk Exp $ */
+/* $Id: triangulate_impl.h,v 1.24 2007/06/15 18:26:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1878,7 +1878,7 @@ void	poly_env<coord_t>::init(int path_count, const std::vector<coord_t> paths[])
 		{
 			// Bad input, odd number of coords.
 			assert(0);			
-			fprintf(stderr, "path[%d] has odd number of coords (" SIZET_FMT \
+			fprintf(stderr, "path[%d] has odd number of coords (" SIZET_FMT 
 			        "), dropping last value\n", i, path.size());//xxxx
 			path_size--;
 		}
