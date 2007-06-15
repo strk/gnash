@@ -1,5 +1,14 @@
 2007-06-14 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h} (markReachableResources):
+	  Mark the drawable canvas as reachable !
+	  This fixes the empty movie case (no segfault) and also
+	  the 2-frames simple leaking case reported by UdoG a long
+	  time ago (first frame contains an empty function definition,
+	  second frame is empty).
+
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
 	* server/BitmapMovieInstance.cpp, server/asobj/NetStream.cpp:
 	  More warnings fixes.
 

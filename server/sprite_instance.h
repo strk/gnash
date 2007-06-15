@@ -1,3 +1,4 @@
+// sprite_instance.h:  Stateful live Sprite instance, for Gnash.
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
@@ -989,7 +990,8 @@ protected:
 	//
 	/// sprite-specific reachable resources are:
 	/// 	- DisplayList items (both current and backup one)
-	///	- Drawable instance
+	///	- Canvas for dynamic drawing (_drawable)
+	///	- Drawable instance (_drawable_inst)
 	///	- sprite environment
 	///
 	virtual void markReachableResources() const;

@@ -4002,6 +4002,8 @@ sprite_instance::markReachableResources() const
 
 	oldDisplayList.visitAll(marker);
 
+	_drawable->setReachable();
+
 	_drawable_inst->setReachable();
 
 	m_as_environment.markReachableResources();
