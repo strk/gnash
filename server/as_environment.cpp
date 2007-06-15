@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.79 2007/06/15 15:00:27 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.80 2007/06/15 18:46:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -662,7 +662,7 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Member %s for object %p not found (dotsyntax).  Path was %s"),
-				subpart.c_str(), env, path.c_str());
+				subpart.c_str(), (void *)env, path.c_str());
 			);
 			return NULL;
 		}
@@ -671,7 +671,7 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Element '%s' of variable '%s' not found in object %p nor in _global (dotsyntax)"),
-				subpart.c_str(), path.c_str(), env);
+				subpart.c_str(), path.c_str(), (void *)env);
 			);
 			return NULL;
 		}
@@ -682,7 +682,7 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Member %s of object %p doesn't cast to an Object (%s) "
 			"evaluating target path %s (dotsyntax)"),
-			subpart.c_str(), env, tmp.to_debug_string().c_str(), path.c_str());
+			subpart.c_str(), (void *)env, tmp.to_debug_string().c_str(), path.c_str());
 		);
 		return NULL;
 	}
@@ -779,7 +779,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 		if ( ! ch ) {
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("'..' element in path '%s' follows a non-character object %p"),
-					path.c_str(), env);
+					path.c_str(), (void *)env);
 			);
 			return NULL;
 		}
@@ -788,7 +788,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("'..' in path '%s' follows a character with no parent (%s : %p) (root is %p)"),
-					path.c_str(), ch->get_text_value().c_str(), ch, VM::get().getRoot().get_root_movie());
+					path.c_str(), ch->get_text_value().c_str(), (void *)ch, (void *)VM::get().getRoot().get_root_movie());
 			);
 			// if we override env, getvariable.as fails [line 57]
 			//env = ch;
@@ -809,7 +809,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror(_("Member %s for object %p not found (slashsyntax). Path was %s"),
-					subpart.c_str(), env, path.c_str());
+					subpart.c_str(), (void *)env, path.c_str());
 				);
 				return NULL;
 			}
@@ -818,7 +818,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror(_("Element '%s' of variable '%s' not found in object %p nor in _global (slashsyntax)"),
-					subpart.c_str(), path.c_str(), env);
+					subpart.c_str(), path.c_str(), (void *)env);
 				);
 				return NULL;
 			}
@@ -829,7 +829,7 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Member %s of object %p doesn't cast to an Object (%s) "
 				"evaluating target path %s (slashsyntax)"),
-				subpart.c_str(), env, tmp.to_debug_string().c_str(), path.c_str());
+				subpart.c_str(), (void *)env, tmp.to_debug_string().c_str(), path.c_str());
 				);
 			return NULL;
 		}

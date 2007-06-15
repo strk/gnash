@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.63 2007/06/03 18:17:20 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.64 2007/06/15 18:46:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -159,7 +159,7 @@ static as_value netstream_play(const fn_call& fn)
 static as_value netstream_seek(const fn_call& fn) {
 	boost::intrusive_ptr<NetStream> ns = ensureType<NetStream>(fn.this_ptr);
 
-	double time = 0;
+	uint32_t time = 0;
 	if (fn.nargs > 0)
 	{
 		time = fn.arg(0).to_number(&fn.env());

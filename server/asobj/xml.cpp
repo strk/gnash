@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: xml.cpp,v 1.42 2007/05/14 16:24:44 strk Exp $ */
+/* $Id: xml.cpp,v 1.43 2007/06/15 18:47:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -583,7 +583,7 @@ xml_new(const fn_call& fn)
             xml_obj = boost::dynamic_pointer_cast<XML>(obj);
             if ( xml_obj )
             {
-                log_msg(_("\tCloned the XML object at %p"), xml_obj.get());
+                log_msg(_("\tCloned the XML object at %p"), (void *)xml_obj.get());
                 return as_value(xml_obj->cloneNode(true).get());
             }
         }

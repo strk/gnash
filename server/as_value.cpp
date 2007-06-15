@@ -822,10 +822,10 @@ as_value::to_debug_string() const
 			sprintf(buf, "[bool:%s]", m_boolean_value ? "true" : "false");
 			return buf;
 		case OBJECT:
-			sprintf(buf, "[object:%p]", m_object_value);
+			sprintf(buf, "[object:%p]", (void *)m_object_value);
 			return buf;
 		case AS_FUNCTION:
-			sprintf(buf, "[function:%p]", m_object_value);
+			sprintf(buf, "[function:%p]", (void *)m_object_value);
 			return buf;
 		case STRING:
 			return "[string:" + m_string_value + "]";

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.37 2007/06/01 10:21:01 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.38 2007/06/15 18:47:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -251,7 +251,7 @@ ActionExec::operator() ()
 		if ( ++branchCount > maxBranchCount )
 		{
 			char buf[256];
-			snprintf(buf, 255, _("Loop iterations count exceeded limit of %u"),
+			snprintf(buf, 255, _("Loop iterations count exceeded limit of " SIZET_FMT),
 				maxBranchCount);
 			throw ActionLimitException(buf);
 		}

@@ -311,15 +311,15 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     float movie_fps = _movie_def->get_frame_rate();
 
     if (!width) {
-      width = int(movie_width * scale);
+      width = size_t(movie_width * scale);
     }
     if (!height) {
-      height = int(movie_height * scale);
+      height = size_t(movie_height * scale);
     }
 
     if ( ! width || ! height )
     {
-        log_error(_("Input movie has collapsed dimensions %d/%d. Giving up."), width, height);
+        log_error(_("Input movie has collapsed dimensions " SIZET_FMT "/" SIZET_FMT ". Giving up."), width, height);
 	return EXIT_FAILURE;
     }
 

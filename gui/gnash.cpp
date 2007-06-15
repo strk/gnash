@@ -123,12 +123,12 @@ usage()
         "  CTRL-[ or kp-   Step back one frame\n"
         "  CTRL-] or kp+   Step forward one frame\n"
         "  CTRL-B          Toggle background color\n"
-#if 0
+/*
         "  CTRL-A          Toggle antialiasing (doesn't work)\n"
         "  CTRL-T          Debug.  Test the set_variable() function\n"
         "  CTRL-G          Debug.  Test the get_variable() function\n"
         "  CTRL-M          Debug.  Test the call_method() function\n"
-#endif
+*/
         ));
 }
 

@@ -143,7 +143,7 @@ as_function::getPrototype()
 	{
 		log_debug(_("Exported interface of function %p "
 				"has been overwritten (from %p to %p)"),
-				this, _properties.get(),
+				(void*)this, (void*)_properties.get(),
 				(void*)proto.to_object().get());
 		_properties = proto.to_object();
 	}
