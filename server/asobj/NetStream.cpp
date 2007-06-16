@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.65 2007/06/15 18:51:04 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.66 2007/06/16 09:08:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -461,6 +461,12 @@ NetStream::processStatusNotifications()
 		return;
 	}
 
+	size_t initialStackSize = m_env->stack_size();
+	if ( initialStackSize > 0 )
+	{
+		log_debug("NetStream environment stack not empty at start of processStatusNotifications");
+	}
+
 	StatusCode code;
 	while (1)
 	{
@@ -476,6 +482,14 @@ NetStream::processStatusNotifications()
 
 		m_env->push_val(as_value(o.get()));
 		call_method(status, m_env, this, 1, m_env->get_top_index() );
+
+	}
+
+	// clear the stack after method execution
+	if ( m_env->stack_size() > initialStackSize )
+	{
+		log_debug("NetStream environment stack not empty at end of processStatusNotifications");
+		m_env->drop(m_env->stack_size() - initialStackSize);
 	}
 
 
@@ -628,5 +642,16 @@ NetStream::clearStatusQueue()
 	_statusQueue.clear();
 }
 
+void
+NetStream::markReachableResources() const
+{
+
+	if ( _netCon ) _netCon->setReachable();
+
+	if ( m_statusHandler ) m_statusHandler->setReachable();
+
+	// Invoke generic as_object marker
+	markAsObjectReachable();
+}
 
 } // end of gnash namespace
