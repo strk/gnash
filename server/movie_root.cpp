@@ -1027,6 +1027,12 @@ movie_root::markReachableResources() const
 	// Mark mouse entities 
 	m_mouse_button_state.markReachableResources();
 	
+	// Mark timer targets
+	for (TimerList::const_iterator i=_intervalTimers.begin(), e=_intervalTimers.end();
+			i != e; ++i)
+	{
+		i->markReachableResources();
+	}
 }
 #endif // GNASH_USE_GC
 

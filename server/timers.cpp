@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.33 2007/06/04 08:10:27 strk Exp $ */
+/* $Id: timers.cpp,v 1.34 2007/06/16 09:07:34 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -132,6 +132,21 @@ Timer::operator() ()
 		    _args.size(), firstArgBottomIndex);
 
 }
+
+#ifdef GNASH_USE_GC
+void
+Timer::markReachableResources() const
+{
+	for (ArgsContainer::const_iterator i=_args.begin(), e=_args.end();
+			i!=e; ++i)
+	{
+		i->setReachable();
+	}
+
+	if ( _function ) _function->setReachable();
+	if ( _object ) _object->setReachable();
+}
+#endif // GNASH_USE_GC
 
 // TODO: move to Global.cpp
 as_value

@@ -120,6 +120,31 @@ public:
 		return _loaded;
 	}
 
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark all reachable resources, for the GC
+	//
+	/// Reachable resources are:
+	///	- onLoad event handler (_onLoad)
+	///	- onData event handler (_onLoad)
+	///	- associated environment (_env)
+	///
+	virtual void markReachableResources() const
+	{
+
+		if ( _onLoad ) _onLoad->setReachable();
+
+		if ( _onData ) _onData->setReachable();
+
+		if ( _env ) _env->markReachableResources();
+
+		// Invoke generic as_object marker
+		markAsObjectReachable();
+	}
+
+#endif // GNASH_USE_GC
+
 private:
 
 	/// Forbid copy

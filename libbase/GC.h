@@ -100,7 +100,7 @@ public:
 			return;
 		}
 
-#ifdef GNASH_GC_DEBUG 
+#if GNASH_GC_DEBUG  > 1
 		log_debug(_("Instance %p of class %s set to reachable, scanning reachable resources from it"),
 				(void*)this, typeid(*this).name());
 #endif
@@ -134,7 +134,7 @@ protected:
 	virtual void markReachableResources() const
 	{
 		assert(_reachable);
-#ifdef GNASH_GC_DEBUG 
+#if GNASH_GC_DEBUG > 1
 		log_debug(_("Class %s didn't override the markReachableResources() method"), typeid(*this).name());
 #endif
 	}
@@ -215,7 +215,7 @@ public:
 		assert(std::find(_resList.begin(), _resList.end(), item) == _resList.end());
 
 		_resList.push_back(item);
-#ifdef GNASH_GC_DEBUG 
+#if GNASH_GC_DEBUG > 1
 		log_debug(_("GC %p: collectable %p added, num collectables: " SIZET_FMT), (void*)this, (void*)item, _resList.size());
 #endif
 	}

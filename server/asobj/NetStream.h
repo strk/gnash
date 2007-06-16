@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.45 2007/06/01 11:53:19 strk Exp $ */
+/*  $Id: NetStream.h,v 1.46 2007/06/16 09:07:34 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -165,6 +165,17 @@ protected:
 
 	// The position in the inputfile, only used when not playing a FLV
 	long inputPos;
+
+#ifdef GNASH_USE_GC
+	/// Mark all reachable resources of a NetStream, for the GC
+	//
+	/// Reachable resources are:
+	///	- associated NetConnection object (_netCon)
+	///	- onStatus event handler (m_statusHandler)
+	///
+	virtual void markReachableResources() const;
+
+#endif // GNASH_USE_GC
 
 public:
 

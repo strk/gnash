@@ -200,6 +200,20 @@ public:
 
 	// override from as_object ?
 	//double get_numeric_value() const { return 0; }
+
+protected:
+
+	// override from as_object if storing GC resources beside
+	// the proper propertyes
+	//void markReachableResources() const
+	//{
+	//	// Call setReachable on any stored GcResource member
+	//	// and equivalent functions for containers of GcResources
+	//	// (tipically named markReachableResources)
+	//
+	//	// invoke general as_object marker
+	//	markAsObjectReachable();
+	//}
 };
 
 EOF

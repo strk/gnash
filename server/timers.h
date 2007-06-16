@@ -134,6 +134,17 @@ public:
       /// Arguments list type
       typedef std::vector<as_value> ArgsContainer;
       
+#ifdef GNASH_USE_GC
+	/// Mark all reachable resources (for GC)
+	//
+	/// Resources reachable from Timer are:
+	///
+	///	- Arguments list (_args)
+	///	- Associated function (_function)
+	///	- Target object (_object)
+	///
+	void markReachableResources() const;
+#endif // GNASH_USE_GC
 
 private:
 
