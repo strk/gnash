@@ -1,3 +1,13 @@
+2007-06-16  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gui/gnash.cpp: Add the version of FFMPEG or GST to
+	--version. Add the config options too.
+	* gui/Makefile.am: Extract the config options so we can pass them
+	to GCC, wo they become part of the output from --version.
+	* libbase/image.cpp: Include memory so auto_ptr is defined.
+	* macros/ffmpeg.m4: Define HAVE_FFMPEG_AVCODEC_H eben when not
+	using AC_CHECK_HEADER.
+
 2007-06-16 Sandro Santilli <strk@keybit.net>
 
 	* libbase/: image.{cpp,h}, LoadThread.{cpp,h},

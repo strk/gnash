@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.44 2007/06/07 18:59:51 strk Exp $
+dnl $Id: ffmpeg.m4,v 1.45 2007/06/16 19:03:00 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -53,7 +53,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       topdir=`echo "$topdir" | sed 's:/ffmpeg *$::'`
       # Gets "" if not installed
       if test x"$topdir" != x; then
-	avcodec_h="$topdir/ffmpeg/avcodec.h"
+	      avcodec_h="$topdir/ffmpeg/avcodec.h"
       fi
     fi
   fi
@@ -65,7 +65,7 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
         ac_cv_path_ffmpeg_incl="-I$i"
         CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
         topdir=$i
-	avcodec_h="$i/ffmpeg/avcodec.h"
+	        avcodec_h="$i/ffmpeg/avcodec.h"
         break
       fi
     done
@@ -75,6 +75,8 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
     if test x${cross_compiling} = xno; then
       AC_CHECK_HEADERS(ffmpeg/avcodec.h, [ac_cv_path_ffmpeg_incl=""])
     fi
+  else
+      AC_DEFINE(HAVE_FFMPEG_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
   fi
 
 dnl We need LIBAVCODEC VERSION of at least 51.29.0 to get avcodec_decode_audio2

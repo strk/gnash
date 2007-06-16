@@ -12,8 +12,8 @@
 #include "jpeg.h"
 #include "tu_file.h"
 #include <cstring>
+#include <memory>		// for auto_ptr
 #include <boost/scoped_array.hpp>
-
 
 namespace image
 {

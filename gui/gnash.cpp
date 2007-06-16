@@ -26,6 +26,15 @@
 #include "rc.h" // for use of rcfile
 #include "debugger.h"
 
+#ifdef HAVE_FFMPEG_AVCODEC_H
+# include "ffmpeg/avcodec.h"
+#endif
+
+#ifdef HAVE_GST_GST_H
+# include "gst/gst.h"
+# include "gst/gstversion.h"
+#endif
+
 #if defined(_WIN32) || defined(WIN32)
         #include "getopt_win32.h"
 #else
@@ -148,9 +157,17 @@ static void build_options()
 {
     printf (_("Build options %s\n"
               "   Target: %s\n"
-              "   Renderer: %s   GUI: %s   Media handler: %s\n"),
+              "   Renderer: %s   GUI: %s   Media handler: %s\n"
+              "   Configured with: %s\n"),
 		VERSION, TARGET_CONFIG, RENDERER_CONFIG, GUI_CONFIG,
-		MEDIA_CONFIG);
+                MEDIA_CONFIG, CONFIG_CONFIG);
+#ifdef HAVE_FFMPEG_AVCODEC_H
+    printf(_("Ffmpeg version is: %s\n"), LIBAVCODEC_IDENT);
+#endif
+#ifdef HAVE_GST_GST_H
+    printf(_("Gstreamer version is: %d.%d.%d."), GST_VERSION_MAJOR,
+           GST_VERSION_MINOR, GST_VERSION_MICRO);
+#endif
 }
 
 

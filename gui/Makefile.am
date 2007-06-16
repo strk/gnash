@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.78 2007/06/10 07:36:13 strk Exp $
+# $Id: Makefile.am,v 1.79 2007/06/16 19:03:00 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -184,6 +184,9 @@ AM_CPPFLAGS += $(MAD_CFLAGS)
 endif
 endif
 
+if USE_SOUND_GST
+AM_CPPFLAGS += $(GSTREAMER_CFLAGS)
+endif
 
 if USE_GUI_FLTK
  FLTK_SRCS = fltk.cpp fltksup.h $(FLTK_AGG_SRCS) $(FLTK_CAIRO_SRCS)
@@ -199,6 +202,7 @@ AM_CPPFLAGS += -DRENDERER_CONFIG=\"$(RENDERER_CONFIG)\"
 AM_CPPFLAGS += -DGUI_CONFIG=\"$(GUI_CONFIG)\"
 AM_CPPFLAGS += -DMEDIA_CONFIG=\"$(MEDIA_CONFIG)\"
 AM_CPPFLAGS += -DTARGET_CONFIG=\"$(target)\"
+AM_CPPFLAGS += -DCONFIG_CONFIG="\"$(shell cat .configline)\""
 
 dist_images_DATA = images/gnash_128_96.ico images/GnashG.png
 #dist_images_DATA = images/gnash_G_v3.ico
@@ -263,7 +267,7 @@ libgnashplayer_la_LDFLAGS = \
 gnash_SOURCES = gnash.cpp
 # export our symbols so they can be used by Gnash plugins
 gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-gnash_DEPENDENCIES = $(GNASH_LIBS)
+gnash_DEPENDENCIES = $(GNASH_LIBS)  .configline
 gnash_LDADD = \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS)
@@ -282,7 +286,7 @@ gnash_LDADD = \
 #	$(GNASH_LIBS)
 
 #klash_DEPENDENCIES = \
-#	$(GNASH_LIBS) 
+#	$(GNASH_LIBS)  .configline
 #	 $(LIBLTDL) "-dlopen" self "-dlopen"
 
 CLEANFILES = klash.moc
@@ -294,6 +298,10 @@ klash.moc: $(srcdir)/kdesup.h
 	  echo "WARNING: Install QT's moc tool! Linking to default MOC file"; \
 	  ln -sf $(srcdir)/klash.moc.in klash.moc; \
 	fi
+
+.configline: ../config.log
+	-@rm -f .configline
+	@head ../config.log | grep " .*/configure " | sed -e 's:^  . .*configure ::' > .configline
 
 #noinst_PROGRAMS = guitest # klash flak
 #guitest_SOURCES = guitest.cpp #fltk.cpp #fltksup.h fltksupp.h gnash.cpp gtk.cpp 
