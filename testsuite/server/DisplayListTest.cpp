@@ -48,6 +48,9 @@ main(int /*argc*/, char** /*argv*/)
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity();
 
+	// Initialize gnash lib
+	gnashInit();
+
 	// Initialize a VM
 	boost::intrusive_ptr<movie_definition> md5 ( new DummyMovieDefinition(5) );
 	boost::intrusive_ptr<movie_definition> md6 ( new DummyMovieDefinition(6) );
