@@ -1,5 +1,13 @@
 2007-06-16 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/movie_def_impl.{cpp,h} (markReachableResources):
+	  Set CharacterDictionary items as reachable !
+	  (BTW, why are character defs managed pointers ?!)
+	* testsuite/MovieTester.cpp: initialize gnash code lib so
+	  to work with GC on.
+
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.{cpp,h}: implement
 	  markReachableResources to properly mark the state characters
 	  and the character definition.
