@@ -55,6 +55,10 @@ MovieTester::MovieTester(const std::string& url)
 	:
 	_forceRedraw(true)
 {
+
+	// Initialize gnash code lib
+	gnashInit();
+
 	if ( url == "-" )
 	{
 		std::auto_ptr<tu_file> in (

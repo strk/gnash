@@ -1141,6 +1141,9 @@ movie_def_impl::markReachableResources() const
 	{
 		(*i)->setReachable();
 	}
+
+	_dictionary.markReachableResources();
+
 }
 #endif // GNASH_USE_GC
 

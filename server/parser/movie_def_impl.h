@@ -166,6 +166,18 @@ public:
 
 	/// Dump content of the dictionary (debugging only)
 	void dump_chars(void) const;
+
+#ifdef GNASH_USE_GC
+	/// Mark all dictionary items to be reachable (for GC)
+	void markReachableResources() const
+	{
+		for(const_iterator i=_map.begin(), e=_map.end(); i!=e; ++i)
+		{
+			i->second->setReachable();
+		}
+	}
+#endif // GNASH_USE_GC
+
 private:
 
 	container _map;
@@ -639,6 +651,7 @@ protected:
 	///	- sound samples (m_sound_samples)
 	///	- exports (m_exports)
 	///	- imported movies (m_import_source_movies)
+	///	- character dictionary (_dictionary)
 	///
 	/// TODO: do we really need all this stuff to be a GcResource ??
 	///
