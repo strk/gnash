@@ -6,8 +6,8 @@
 	* server/asobj/LoadVars.cpp: implement markReachableResources
 	  to properly mark event handlers and environment resources.
 	* libbase/GC.h: don't be verbose about objects being marked,
-	  classes not overriding markReachableResources and collectables
-	  registered unless GNASH_GC_DEBUG > 1
+	  classes not overriding markReachableResources, collectables
+	  registered and deleted unless GNASH_GC_DEBUG > 1
 	* server/timers.{cpp,h}: provide a markReachableResources to mark
 	  function, target objet and args.
 	* server/movie_root.{cpp,h} (markReachableResources): mark Timers
