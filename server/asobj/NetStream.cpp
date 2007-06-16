@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.66 2007/06/16 09:08:16 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.67 2007/06/16 09:54:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -642,6 +642,7 @@ NetStream::clearStatusQueue()
 	_statusQueue.clear();
 }
 
+#ifdef GNASH_USE_GC
 void
 NetStream::markReachableResources() const
 {
@@ -653,5 +654,6 @@ NetStream::markReachableResources() const
 	// Invoke generic as_object marker
 	markAsObjectReachable();
 }
+#endif // GNASH_USE_GC
 
 } // end of gnash namespace
