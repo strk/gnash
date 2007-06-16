@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ref_counted.h,v 1.7 2007/06/15 15:00:26 strk Exp $ */
+/* $Id: ref_counted.h,v 1.8 2007/06/16 07:59:19 strk Exp $ */
 
 #ifndef GNASH_REF_COUNTED_H
 #define GNASH_REF_COUNTED_H
@@ -26,9 +26,6 @@
 
 #include "container.h"
 #include "smart_ptr.h"
-
-// Define the following macro to enable GC verbosity 
-#define GNASH_GC_DEBUG 1
 
 #ifdef GNASH_USE_GC
 # include "GC.h"
