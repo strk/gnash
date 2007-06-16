@@ -12,6 +12,7 @@
 #include "jpeg.h"
 #include "tu_file.h"
 #include <cstring>
+#include <boost/scoped_array.hpp>
 
 
 namespace image
@@ -67,14 +68,15 @@ namespace image
 		assert(m_pitch >= m_width * 3);
 		assert((m_pitch & 3) == 0);
 
-//		m_data = (uint8_t*) dlmalloc(m_pitch * m_height);
 		m_data = new uint8_t[m_pitch * m_height];
 	}
 
 	rgb::~rgb()
 	{
-//			dlfree(m_data);
-			delete [] m_data;
+		// TODO FIXME: m_data is a member of image_base, 
+		// so ONLY image_base should delete it !
+		// USE A SCOPED POINTER FOR THIS !
+		delete [] m_data;
 	}
 
 
@@ -107,8 +109,10 @@ namespace image
 
 	rgba::~rgba()
 	{
-//			dlfree(m_data);
-			delete [] m_data;
+		// TODO FIXME: m_data is a member of image_base, 
+		// so ONLY image_base should delete it !
+		// USE A SCOPED POINTER FOR THIS !
+		delete [] m_data;
 	}
 
 
@@ -162,7 +166,6 @@ namespace image
 
 	alpha::~alpha()
 	{
-//			dlfree(m_data);
 			delete [] m_data;
 	}
 
@@ -298,13 +301,12 @@ namespace image
 	void	write_jpeg(tu_file* out, rgb* image, int quality)
 	// Write the given image to the given out stream, in jpeg format.
 	{
-		jpeg::output*	j_out = jpeg::output::create(out, image->m_width, image->m_height, quality);
+		std::auto_ptr<jpeg::output> j_out ( jpeg::output::create(out, image->m_width, image->m_height, quality) );
 
 		for (int y = 0; y < image->m_height; y++) {
 			j_out->write_scanline(scanline(image, y));
 		}
 
-		delete j_out;
 	}
 
 
@@ -323,22 +325,23 @@ namespace image
 	}
 
 
-	rgb*	read_jpeg(tu_file* in)
 	// Create and read a new image from the stream.
+	//
+	// TODO: return by auto_ptr !
+	//
+	rgb*	read_jpeg(tu_file* in)
 	{
-		jpeg::input*	j_in = jpeg::input::create(in);
-		if (j_in == NULL) return NULL;
+		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create(in) );
+		if (!j_in.get()) return 0;
 		
-		rgb*	im = image::create_rgb(j_in->get_width(), j_in->get_height());
+		std::auto_ptr<rgb> im ( image::create_rgb(j_in->get_width(), j_in->get_height()) );
 
 		for (int y = 0; y < j_in->get_height(); y++)
 		{
-			j_in->read_scanline(scanline(im, y));
+			j_in->read_scanline(scanline(im.get(), y));
 		}
 
-		delete j_in;
-
-		return im;
+		return im.release();
 	}
 
 
@@ -363,24 +366,27 @@ namespace image
 	}
 
 
-	rgba*	read_swf_jpeg3(tu_file* in)
 	// For reading SWF JPEG3-style image data, like ordinary JPEG, 
 	// but stores the data in rgba format.
+	//
+	// TODO: return by auto_ptr !
+	//
+	rgba*	read_swf_jpeg3(tu_file* in)
 	{
-		jpeg::input*	j_in = jpeg::input::create_swf_jpeg2_header_only(in);
-		if (j_in == NULL) return NULL;
+		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create_swf_jpeg2_header_only(in) );
+		if ( ! j_in.get() ) return 0;
 		
 		j_in->start_image();
 
-		rgba*	im = image::create_rgba(j_in->get_width(), j_in->get_height());
+		std::auto_ptr<rgba> im ( image::create_rgba(j_in->get_width(), j_in->get_height()) );
 
-		uint8_t*	line = new uint8_t[3*j_in->get_width()];
+		boost::scoped_array<uint8_t> line ( new uint8_t[3*j_in->get_width()] );
 
 		for (int y = 0; y < j_in->get_height(); y++) 
 		{
-			j_in->read_scanline(line);
+			j_in->read_scanline(line.get());
 
-			uint8_t*	data = scanline(im, y);
+			uint8_t*	data = scanline(im.get(), y);
 			for (int x = 0; x < j_in->get_width(); x++) 
 			{
 				data[4*x+0] = line[3*x+0];
@@ -390,12 +396,9 @@ namespace image
 			}
 		}
 
-		delete [] line;
-
 		j_in->finish_image();
-		delete j_in;
 
-		return im;
+		return im.release(); // TODO: return by auto_ptr !
 	}
 
 
@@ -427,37 +430,6 @@ namespace image
 			}
 		}
 	}
-
-
-#if 0
-	SDL_Surface*	create_SDL_Surface(rgb* image)
-	// Steal *image's data to create an SDL_Surface.
-	//
-	// DELETES image!!!
-	{
-		assert(image->m_pitch < 65536);	// SDL_Surface only uses uint16_t for pitch!!!
-
-		SDL_Surface*	s = SDL_CreateRGBSurfaceFrom(image->m_data,
-							     image->m_width, image->m_height, 24, image->m_pitch,
-							     SDL_SwapLE32(0x0FF),
-							     SDL_SwapLE32(0x0FF00),
-							     SDL_SwapLE32(0x0FF0000),
-							     0);
-
-		// s owns *image's data now -- invalidate *image.
-		image->m_data = 0;
-		image->m_height = 0;
-		image->m_width = 0;
-		image->m_pitch = 0;
-		delete image;
-
-		assert(s->pixels);
-		assert(s->format->BytesPerPixel == 3);
-		assert(s->format->BitsPerPixel == 24);
-
-		return s;
-	}
-#endif // 0
 
 	void	make_next_miplevel(rgb* image)
 	// Fast, in-place resample.  For making mip-maps.  Munges the

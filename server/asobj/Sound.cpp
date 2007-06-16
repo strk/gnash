@@ -59,15 +59,15 @@ static as_object* getSoundInterface();
 
 Sound::Sound() 	:
 	as_object(getSoundInterface()),
-	connection(NULL),
+	connection(),
 	soundId(-1),
 	externalSound(false),
 	isStreaming(false)
 {
 }
 
-Sound::~Sound() {
-	if (connection) delete connection;
+Sound::~Sound()
+{
 }
 
 
@@ -140,8 +140,7 @@ Sound::loadSound(std::string file, bool /*streaming*/)
 	log_msg(_("%s is still testing!"), __FUNCTION__);
 
 	if (connection) {
-		log_error(_("%s: This sound already has a connection?  (We try to handle this by deleting the old one...)"), __FUNCTION__);
-		delete connection;
+		log_error(_("%s: This sound already has a connection?  (We try to handle this by overriding the old one...)"), __FUNCTION__);
 	}
 	externalURL = file;
 

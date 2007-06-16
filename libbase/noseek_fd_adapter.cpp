@@ -27,6 +27,8 @@
 #include <unistd.h>
 #include <cstring>
 
+#include <boost/scoped_array.hpp>
+
 //#define GNASH_NOSEEK_FD_VERBOSE 1
 
 // define this if you want seeks back to be reported (on stderr)
@@ -217,15 +219,14 @@ NoSeekFile::fill_cache(size_t size)
 #endif
 
 
-	char* buf = new char[bytes_needed];
-	int bytes_read = read(_fd, (void*)buf, bytes_needed);
+	boost::scoped_array<char> buf ( new char[bytes_needed] );
+	int bytes_read = read(_fd, (void*)buf.get(), bytes_needed);
 	if ( bytes_read < 0 )
 	{
 		fprintf(stderr,
 			"Error reading " SIZET_FMT " bytes from input stream",
 			bytes_needed);
 		_running = false;
-		delete [] buf;
 		// this looks like a CRITICAL error (since we don't handle it..)
 		throw gnash::GnashException("Error reading from input stream");
 		return;
@@ -239,14 +240,12 @@ NoSeekFile::fill_cache(size_t size)
 			fprintf(stderr, "EOF reached\n");
 #endif
 			_running = false;
-			delete [] buf;
 			return;
 		}
 	}
 
-	cache(buf, static_cast<size_t>(bytes_read));
+	cache(buf.get(), static_cast<size_t>(bytes_read));
 
-	delete [] buf;
 }
 
 /*private*/

@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: LoadThread.cpp,v 1.13 2007/05/30 07:28:09 tgc Exp $
+// $Id: LoadThread.cpp,v 1.14 2007/06/16 12:47:53 strk Exp $
 
 #include "LoadThread.h"
 
@@ -33,7 +33,7 @@ LoadThread::LoadThread()
 	_loadPosition(0),
 	_userPosition(0),
 	_actualPosition(0),
-	_cache(NULL),
+	_cache(),
 	_cacheStart(0),
 	_cachedData(0),
 	_cacheSize(0),
@@ -55,7 +55,6 @@ LoadThread::~LoadThread()
 		_thread.reset(NULL);
 	}
 #endif
-	if (_cache) delete[] _cache;
 }
 
 bool LoadThread::setStream(std::auto_ptr<tu_file> stream)
@@ -96,7 +95,7 @@ size_t LoadThread::read(void *dst, size_t bytes)
 
 	// If the data is in the cache we used it
 	if (_cacheStart <= _userPosition && static_cast<long>(bytes) + _userPosition <= _cacheStart + _cachedData) {
-		memcpy(dst, _cache + (_userPosition - _cacheStart), bytes);
+		memcpy(dst, _cache.get() + (_userPosition - _cacheStart), bytes);
 		_userPosition += bytes;
 		return bytes;
 
@@ -144,7 +143,7 @@ size_t LoadThread::read(void *dst, size_t bytes)
 		// buffer, note the new position and return the actual amount read
 		int ret = _stream->read_bytes(dst, bytes);
 
-		memcpy(_cache +(_userPosition - _cacheStart), dst, ret);
+		memcpy(_cache.get() +(_userPosition - _cacheStart), dst, ret);
 		_cachedData = _userPosition - _cacheStart + ret;
 		_userPosition += ret;
 		_actualPosition = _userPosition;
@@ -157,9 +156,8 @@ size_t LoadThread::read(void *dst, size_t bytes)
 
 	// check if the cache is big enough to contain the wanted data
 	if (static_cast<long>(bytes) > _cacheSize-20000) {
-		delete[] _cache;
 		_cacheSize = bytes+20000;
-		_cache = new uint8_t[_cacheSize];
+		_cache.reset( new uint8_t[_cacheSize] );
 	}
 
 	// To avoid recaching all the time, we cache some data from before
@@ -185,7 +183,7 @@ size_t LoadThread::read(void *dst, size_t bytes)
 
 	// Try to read a wanted amount of bytes into the given 
 	// buffer, note the new position and return the actual amount read
-	int ret = _stream->read_bytes(_cache, readdata);
+	int ret = _stream->read_bytes(_cache.get(), readdata);
 
 	_cachedData = ret;
 	_cacheStart = newcachestart;
@@ -197,7 +195,7 @@ size_t LoadThread::read(void *dst, size_t bytes)
 	int newret = bytes;
 	if (static_cast<int>(bytes) > ret) newret = ret - (_userPosition - newcachestart);
 
-	memcpy(dst, _cache + (_userPosition - newcachestart), newret);
+	memcpy(dst, _cache.get() + (_userPosition - newcachestart), newret);
 	_userPosition += newret;
 	_actualPosition = newcachestart + _cachedData;
 	if (newcachestart + _cachedData > _loadPosition)
@@ -242,10 +240,10 @@ void LoadThread::setupCache()
 	boost::mutex::scoped_lock lock(_mutex);
 #endif
 
-	_cache = new uint8_t[1024*500];
+	_cache.reset( new uint8_t[1024*500] );
 	_cacheSize = 1024*500;
 
-	int ret = _stream->read_bytes(_cache, 1024);
+	int ret = _stream->read_bytes(_cache.get(), 1024);
 	_cacheStart = 0;
 	_cachedData = ret;
 	_loadPosition = 1024;
@@ -287,7 +285,7 @@ void LoadThread::fillCache()
 	// the "the edge", and "warm up" the remaining data.
 	int ret;
 	if (_cachedData + _chunkSize > _cacheSize) {
-		ret = _stream->read_bytes(_cache + _cachedData, _cacheSize - _cachedData);
+		ret = _stream->read_bytes(_cache.get() + _cachedData, _cacheSize - _cachedData);
 
 		_cachedData += ret;
 		if (ret != _cacheSize - _cachedData) {
@@ -302,7 +300,7 @@ void LoadThread::fillCache()
 		}
 		
 	} else {
-		ret = _stream->read_bytes(_cache + _cachedData, _chunkSize);
+		ret = _stream->read_bytes(_cache.get() + _cachedData, _chunkSize);
 		if (ret != _chunkSize) {
 			_completed = true;
 		}

@@ -55,6 +55,7 @@
 #endif
 
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/scoped_array.hpp>
 
 #ifndef MAXHOSTNAMELEN
 #define MAXHOSTNAMELEN 256
@@ -200,7 +201,7 @@ XMLSocket::anydata(int fd, MessageList& msgs)
     int                   retries = 10;
     char                  *ptr, *eom;
     int                   cr, index = 0;
-    static char           *leftover = 0;
+    boost::scoped_array<char> leftover;
     int                   adjusted_size;
     
     
@@ -267,12 +268,12 @@ XMLSocket::anydata(int fd, MessageList& msgs)
         while (strchr(ptr, '\n') > 0) {
             if (leftover) {
                 processing(false);
-                //log_msg(_("%s: The remainder is: \"%s\""), __FUNCTION__, leftover);
+                //log_msg(_("%s: The remainder is: \"%s\""), __FUNCTION__, leftover.get());
                 //log_msg(_("%s: The rest of the message is: \"%s\""), __FUNCTION__, ptr);
-                adjusted_size = memadjust(cr + strlen(leftover) + 1);
+                adjusted_size = memadjust(cr + strlen(leftover.get()) + 1);
                 packet = new char[adjusted_size];
                 memset(packet, 0, adjusted_size);
-                strcpy(packet, leftover);
+                strcpy(packet, leftover.get());
                 strcat(packet, ptr);
                 eom = strrchr(packet, '\n'); // drop the CR off the end there is one
                 if (eom) {
@@ -280,8 +281,7 @@ XMLSocket::anydata(int fd, MessageList& msgs)
                 }
                 //log_msg(_("%s: The whole message is: \"%s\""), __FUNCTION__, packet);
                 ptr = strchr(ptr, '\n') + 2; // messages are delimited by a "\n\0"
-                delete leftover;
-                leftover = 0;
+                leftover.reset();
             } else {
                 adjusted_size = memadjust(cr + 1);
                 packet = new char[adjusted_size];
@@ -308,10 +308,10 @@ XMLSocket::anydata(int fd, MessageList& msgs)
         } // end of while (cr)
         
         if (strlen(ptr) > 0) {
-            leftover = new char[strlen(ptr) + 1];
-            strcpy(leftover, ptr);
+            leftover.reset( new char[strlen(ptr) + 1] );
+            strcpy(leftover.get(), ptr);
             processing(true);
-            //log_msg(_("%s: Adding remainder: \"%s\""), __FUNCTION__, leftover);
+            //log_msg(_("%s: Adding remainder: \"%s\""), __FUNCTION__, leftover.get());
         }
         
         processing(false);

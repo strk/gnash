@@ -12,6 +12,8 @@
 #include "tu_config.h"
 #include "tu_types.h"
 
+#include <boost/scoped_array.hpp>
+
 class tu_file;
 namespace jpeg { class input; }
 
@@ -35,7 +37,13 @@ namespace image
 
 		id_image m_type;
 
+		// TODO FIXME: m_data allocation is currently managed
+		// by subclasses (see rgb and rgba), this is really unsafe.
+		// Rather, *this* calss should manage it, using a scoped
+		// pointer
+		// USE A SCOPED POINTER FOR THIS !
 		uint8_t*	m_data;
+
 		int	m_width;
 		int	m_height;
 		int	m_pitch;	// byte offset from one row to the next

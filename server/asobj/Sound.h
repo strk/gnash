@@ -58,13 +58,26 @@ public:
 	std::string soundName;
 
 protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark all reachable resources of a Sound, for the GC
+	//
+	/// Reachable resources are:
+	///	- associated NetConnection object (connection)
+	///
+	void markReachableResources() const
+	{
+		if ( connection ) connection->setReachable();
+	}
+#endif // GNASH_USE_GC
+
 	bool _duration;
 	bool _id3;
 	bool _onID3;
 	bool _onLoad;
 	bool _onComplete;
 	bool _position;
-	NetConnection* connection;
+	boost::intrusive_ptr<NetConnection> connection;
 
 	int soundId;
 	bool externalSound;

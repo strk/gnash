@@ -1,5 +1,17 @@
 2007-06-16 Sandro Santilli <strk@keybit.net>
 
+	* libbase/: image.{cpp,h}, LoadThread.{cpp,h},
+	  image_filters.cpp, noseek_fd_adapter.cpp,
+	  reduce number of explicit deletes by using scoped pointers
+	* server/asobj/Global.cpp: reduce explicit deletes...
+	* server/asobj/: Sound.{cpp,h}, SoundFfmpeg.{cpp,h}, SoundGst.{cpp,h},
+	  SoundMad.{cpp,h}: Use a smart pointer for the NetConnection 
+	  reference, and implement markReachableResources to mark it.
+	* server/asobj/xmlsocket.cpp (anydata): don't use a module-static
+	  to keep track of leftovers !!
+
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ExecutableCode.h: implement markReachableResources
 	  for executable code.
 	* server/movie_root.{cpp,h}: mark resources reachable by 

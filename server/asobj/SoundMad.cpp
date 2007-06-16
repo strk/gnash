@@ -74,7 +74,7 @@ void
 SoundMad::setupDecoder(SoundMad* so)
 {
 
-	NetConnection* nc = so->connection;
+	boost::intrusive_ptr<NetConnection> nc = so->connection;
 	assert(nc);
 
 	// Pass stuff from/to the NetConnection object.
@@ -347,8 +347,7 @@ SoundMad::loadSound(std::string file, bool streaming)
 	remainingLoops = 0;
 
 	if (connection) {
-		log_error(_("This sound already has a connection?  (We try to handle this by deleting the old one...)"));
-		delete connection;
+		log_error(_("This sound already has a connection?  (We try to handle this by overriding the old one...)"));
 	}
 	externalURL = file;
 

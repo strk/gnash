@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.62 2007/06/04 19:21:20 strk Exp $ */
+/* $Id: Global.cpp,v 1.63 2007/06/16 12:47:55 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -72,6 +72,7 @@
 #include "xmlsocket.h"
 
 #include <limits> // for numeric_limits<double>::quiet_NaN
+#include <boost/scoped_array.hpp>
 
 // Common code to warn and return if a required single arg is not present
 // and to warn if there are extra args.
@@ -206,8 +207,8 @@ as_global_parseint(const fn_call& fn)
 
     // Set up some variables
     const string digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    char *input_buffer = new char[fn.arg(0).to_string().size()+1];
-    char *input = input_buffer;
+    boost::scoped_array<char> input_buffer ( new char[fn.arg(0).to_string().size()+1] );
+    char *input = input_buffer.get();
     strcpy(input,fn.arg(0).to_string().c_str());
     int base;
     bool bNegative;
@@ -254,7 +255,6 @@ as_global_parseint(const fn_call& fn)
 
     if (base < 2 || base > 36)
 	{
-	    delete [] input_buffer;
 	    as_value rv;
 	    rv.set_nan();
 	    return rv;
@@ -272,7 +272,6 @@ as_global_parseint(const fn_call& fn)
     // If we didn't get any digits, we should return NaN
     if (numdigits == 0)
 	{
-	    delete [] input_buffer;
 	    as_value rv;
 	    rv.set_nan();
 	    return rv;
@@ -286,8 +285,6 @@ as_global_parseint(const fn_call& fn)
 
     if (bNegative)
 	result = -result;
-    
-    delete [] input_buffer;
     
     // Now return the parsed string
     return as_value(result);

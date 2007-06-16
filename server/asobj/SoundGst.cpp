@@ -62,7 +62,7 @@ SoundGst::readPacket(void* opaque, char* buf, int buf_size)
 {
 
 	SoundGst* so = static_cast<SoundGst*>(opaque);
-	NetConnection* nc = so->connection;
+	boost::intrusive_ptr<NetConnection> nc = so->connection;
 
 	size_t ret = nc->read(static_cast<void*>(buf), buf_size);
 	so->inputPos += ret;
@@ -75,7 +75,7 @@ int
 SoundGst::seekMedia(void *opaque, int offset, int whence){
 
 	SoundGst* so = static_cast<SoundGst*>(opaque);
-	NetConnection* nc = so->connection;
+	boost::intrusive_ptr<NetConnection> nc = so->connection;
 
 
 	// Offset is absolute new position in the file
@@ -133,7 +133,7 @@ void
 SoundGst::setupDecoder(SoundGst* so)
 {
 
-	NetConnection* nc = so->connection;
+	boost::intrusive_ptr<NetConnection> nc = so->connection;
 	assert(nc);
 
 	// Pass stuff from/to the NetConnection object.
@@ -226,8 +226,7 @@ SoundGst::loadSound(std::string file, bool streaming)
 	remainingLoops = 0;
 
 	if (connection) {
-		log_error(_("%s: This sound already has a connection?  (We try to handle this by deleting the old one...)"), __FUNCTION__);
-		delete connection;
+		log_error(_("%s: This sound already has a connection?  (We try to handle this by overriding the old one...)"), __FUNCTION__);
 	}
 	externalURL = file;
 

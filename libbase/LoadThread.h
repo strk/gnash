@@ -25,6 +25,7 @@
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/bind.hpp>
+#include <boost/scoped_array.hpp>
 
 #include <memory>
 
@@ -129,7 +130,7 @@ private:
 	volatile long _actualPosition;
 
 	// Cache...
-	uint8_t* _cache;
+	boost::scoped_array<uint8_t> _cache;
 
 	// The fileposition where the cache start
 	volatile long _cacheStart;

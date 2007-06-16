@@ -11,7 +11,7 @@
 // converted from K&R C to C-like C++, changed the interfaces a bit,
 // etc.
 
-/* $Id: image_filters.cpp,v 1.14 2006/12/01 10:22:12 alexeev Exp $ */
+/* $Id: image_filters.cpp,v 1.15 2007/06/16 12:47:54 strk Exp $ */
 
 #include "image.h"
 #include "utility.h"
@@ -387,8 +387,6 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
     support = filter_table[default_type].support;
 
 
-//    image::rgb*	tmp;		/* intermediate image */
-//    float	xscale, yscale;		/* zoom scale factors */
     int i, k;			/* loop variables */
     unsigned int j;			/* loop variables */
     int n;				/* pixel number */
@@ -412,7 +410,7 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
     int	in_window_h = int(ceilf(in_y1) - floorf(in_y0) + 1);
 
     /* create intermediate image to hold horizontal zoom */
-    image::rgb* tmp = image::create_rgb(out_width, in_window_h);
+    std::auto_ptr<image::rgb> tmp ( image::create_rgb(out_width, in_window_h) );
     float xscale = (float) (out_width - 1) / in_width;
     float yscale = (float) (out_height - 1) / in_height;
 
@@ -467,7 +465,7 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
 		green	+= raster[pixel * 3 + 1] * contrib[i][j].weight;
 		blue	+= raster[pixel * 3 + 2] * contrib[i][j].weight;
 	    }
-	    put_pixel(tmp, i, k, red, green, blue);
+	    put_pixel(tmp.get(), i, k, red, green, blue);
 	}
     }
     my_cfree(raster);
@@ -508,7 +506,7 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
     /* apply filter to zoom vertically from tmp to dst */
     raster = (uint8_t*) my_calloc(tmp->m_height, 3);
     for (k = 0; k < tmp->m_width; ++k) {
-	get_column(raster, tmp, k);
+	get_column(raster, tmp.get(), k);
 	for (i = 0; i < out_height; ++i) {
 	    float	red = 0.0f;
 	    float	green = 0.0f;
@@ -526,7 +524,6 @@ void	resample(image::rgb* out, int out_x0, int out_y0, int out_x1, int out_y1,
 
     contrib.resize(0);
 
-    delete tmp;
 }
 
 
@@ -554,7 +551,6 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
     support = filter_table[default_type].support;
 
 
-    image::rgba*	tmp;		/* intermediate image */
     float	xscale, yscale;		/* zoom scale factors */
     int i, k;			/* loop variables */
     unsigned int j;			/* loop variables */
@@ -579,7 +575,7 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
     int	in_window_h = int(ceilf(in_y1) - floorf(in_y0) + 1);
 
     /* create intermediate image to hold horizontal zoom */
-    tmp = image::create_rgba(out_width, in_window_h);
+    std::auto_ptr<image::rgba>	tmp( image::create_rgba(out_width, in_window_h) );
     xscale = (float) (out_width - 1) / in_width;
     yscale = (float) (out_height - 1) / in_height;
 
@@ -636,7 +632,7 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
 		blue	+= raster[pixel * 4 + 2] * contrib[i][j].weight;
 		alpha	+= raster[pixel * 4 + 3] * contrib[i][j].weight;
 	    }
-	    put_pixel(tmp, i, k, red, green, blue, alpha);
+	    put_pixel(tmp.get(), i, k, red, green, blue, alpha);
 	}
     }
     my_cfree(raster);
@@ -677,7 +673,7 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
     /* apply filter to zoom vertically from tmp to dst */
     raster = (uint8_t*) my_calloc(tmp->m_height, 4);
     for (k = 0; k < tmp->m_width; ++k) {
-	get_column(raster, tmp, k);
+	get_column(raster, tmp.get(), k);
 	for (i = 0; i < out_height; ++i) {
 	    float	red = 0.0f;
 	    float	green = 0.0f;
@@ -697,7 +693,6 @@ void	resample(image::rgba* out, int out_x0, int out_y0, int out_x1, int out_y1,
 
     contrib.resize(0);
 
-    delete tmp;
 }
 
 } // end namespace image
