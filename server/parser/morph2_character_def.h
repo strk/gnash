@@ -33,9 +33,24 @@ namespace gnash {
 			return m_bound;
 		}
 
+	protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark all reachable resources of a morph2_character_def, for the GC
+	//
+	/// Reachable resources are:
+	///	- The start and end shapes (m_shape1, m_shape2)
+	///
+	virtual void markReachableResources() const
+	{
+		if ( m_shape1 ) m_shape1->setReachable();
+		if ( m_shape2 ) m_shape2->setReachable();
+	}
+#endif // GNASH_USE_GC
+
 	private:
-		shape_character_def* m_shape1;
-		shape_character_def* m_shape2;
+		boost::intrusive_ptr<shape_character_def> m_shape1;
+		boost::intrusive_ptr<shape_character_def> m_shape2;
 		unsigned int offset;
 		int fill_style_count;
 		int line_style_count;

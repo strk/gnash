@@ -1,5 +1,11 @@
 2007-06-16 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/morph2_character_def.{cpp,h}: do not explicitly
+	  delete the shape_character_defs, rather keep by intrusive_ptr
+	  (which means leave ownership to the GC in the GC case).
+
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStream.{h,cpp}: implement markReachableResources.
 	* server/asobj/gen-asclass.sh: updated template to include
 	  a sample of a markReachableResources implementation.

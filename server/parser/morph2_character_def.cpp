@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: morph2_character_def.cpp,v 1.9 2007/06/14 02:03:18 zoulunkai Exp $ */
+/* $Id: morph2_character_def.cpp,v 1.10 2007/06/16 10:40:56 strk Exp $ */
 
 // Based on the public domain morph2.cpp of:
 // Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,
@@ -108,8 +108,6 @@ private:
 
 	morph2_character_def::~morph2_character_def()
 	{
-		delete m_shape2;
-		delete m_shape1;
 	}
 
 	void	morph2_character_def::display(character* inst)
