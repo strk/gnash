@@ -21,7 +21,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.21 2007/05/28 15:41:05 ann Exp $ */
+/* $Id: button_character_instance.h,v 1.22 2007/06/16 06:30:29 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -55,7 +55,10 @@ class button_character_instance : public character
 {
 public:
 	button_character_definition*	m_def;
-	std::vector< boost::intrusive_ptr<character> >	m_record_character;
+
+	typedef std::vector< boost::intrusive_ptr<character> > CharsVect;
+
+	CharsVect m_record_character;
 
 	enum mouse_flags
 	{
@@ -147,6 +150,18 @@ public:
 	
 	/// Properly initialize instance names for contained sprites
 	virtual void construct();
+
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark reachabe resources (for the GC)
+	//
+	/// These are:
+	///	- this char's definition (m_def)
+	///	- the vector of state characters (m_record_character)
+	///
+	void markReachableResources() const;
+#endif // GNASH_USE_GC
 
 private:
 	bool m_enabled;

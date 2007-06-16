@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.39 2007/06/15 15:00:29 strk Exp $ */
+/* $Id: font.cpp,v 1.40 2007/06/16 06:30:29 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -630,7 +630,7 @@ font::markReachableResources() const
 	// Mark textured glyphs
 	for (TextureGlyphVect::const_iterator i=m_texture_glyphs.begin(), e=m_texture_glyphs.end(); i!=e; ++i)
 	{
-		i->setReachable();
+		i->markReachableResources();
 	}
 
 	// Mark vector glyphs

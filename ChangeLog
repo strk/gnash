@@ -1,3 +1,13 @@
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
+	* server/button_character_instance.{cpp,h}: implement
+	  markReachableResources to properly mark the state characters
+	  and the character definition.
+	* server/font.{cpp,h}: make texture_glyph a concrete class, no
+	  more managed.
+	* server/generic_character.h: implement markReachableResources to
+	  properly mark the character definition.
+
 2007-06-14 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.{cpp,h} (markReachableResources):

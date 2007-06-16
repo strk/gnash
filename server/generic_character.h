@@ -48,6 +48,21 @@ protected:
 
 	boost::intrusive_ptr<character_def> m_def;
 
+#ifdef GNASH_USE_GC
+	/// Mark reachabe resources (for the GC)
+	//
+	/// These are:
+	///	- this char's definition (m_def)
+	///
+	void markReachableResources() const
+	{
+		assert(isReachable());
+		m_def->setReachable();
+
+		markCharacterReachable();
+	}
+#endif // GNASH_USE_GC
+
 public:
 
 	generic_character(character_def* def, character* parent, int id)

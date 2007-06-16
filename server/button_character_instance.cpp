@@ -897,6 +897,26 @@ button_character_instance::construct()
 	// We'll not call it here..
 }
 
+#ifdef GNASH_USE_GC
+void
+button_character_instance::markReachableResources() const
+{
+	assert(isReachable());
+
+	m_def->setReachable();
+
+	// Markstate characters as reachable
+	for (CharsVect::const_iterator i=m_record_character.begin(), e=m_record_character.end();
+			i!=e; ++i)
+	{
+		(*i)->setReachable();
+	}
+
+	// character class members
+	markCharacterReachable();
+}
+#endif // GNASH_USE_GC
+
 } // end of namespace gnash
 
 

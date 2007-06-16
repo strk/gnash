@@ -34,7 +34,7 @@ namespace gnash {
 
 	
 	/// class for holding (cached) textured glyph info.
-	class texture_glyph : public ref_counted
+	class texture_glyph // : public ref_counted
 	{
 
 	public:
@@ -57,6 +57,15 @@ namespace gnash {
 			m_bitmap_info = bi;
 		}
 
+#ifdef GNASH_USE_GC
+		/// Mark the contained bitmap info as being reachable
+		void markReachableResources() const
+		{
+			if ( m_bitmap_info.get() ) m_bitmap_info->setReachable();
+		}
+#endif
+
+
 	// too early to make these private, fontlib directly accesses
 	// them, postponed.
 	//private:
@@ -67,15 +76,6 @@ namespace gnash {
 
 		// the origin of the glyph box, in uv coords
 		point	m_uv_origin;
-	protected:
-
-#ifdef GNASH_USE_GC
-		/// Mark the contained bitmap info as being reachable
-		void markReachableResources() const
-		{
-			if ( m_bitmap_info.get() ) m_bitmap_info->setReachable();
-		}
-#endif
 
 	};
 
