@@ -276,7 +276,9 @@ private:
 	/// Mark all reachable resources
 	void markReachable()
 	{
+#ifdef GNASH_GC_DEBUG 
 		log_debug(_("GC %p: MARK SCAN"), (void*)this);
+#endif
 		_root.markReachableResources();
 	}
 
