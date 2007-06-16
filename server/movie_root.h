@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.58 2007/06/16 09:07:35 strk Exp $ */
+/* $Id: movie_root.h,v 1.59 2007/06/16 11:27:40 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -447,6 +447,7 @@ public:
 	///	- All _level# movies (_movie)
 	///	- Mouse entities (m_mouse_button_state)
 	///	- Timer targets (_intervalTimers)
+	///	- Resources reachable by ActionQueue code (_actionQueue)
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC

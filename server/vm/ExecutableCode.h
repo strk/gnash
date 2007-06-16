@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ExecutableCode.h,v 1.5 2007/05/28 15:41:10 ann Exp $ */
+/* $Id: ExecutableCode.h,v 1.6 2007/06/16 11:27:40 strk Exp $ */
 
 #ifndef GNASH_EXECUTABLECODE_H
 #define GNASH_EXECUTABLECODE_H
@@ -46,6 +46,11 @@ public:
 	virtual ExecutableCode* clone() const=0;
 
 	virtual ~ExecutableCode() {}
+
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources (for the GC)
+	virtual void markReachableResources() const=0;
+#endif // GNASU_USE_GC
 };
 
 /// Global code (out of any function)
@@ -76,6 +81,18 @@ public:
 			//log_msg("Sprite %s unloaded, won't execute global code in it", target->getTargetPath().c_str());
 		}
 	}
+
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources (for the GC)
+	//
+	/// Reachable resources are:
+	///	 - the action target (target)
+	///
+	virtual void markReachableResources() const
+	{
+		if ( target ) target->setReachable();
+	}
+#endif // GNASU_USE_GC
 
 private:
 
@@ -136,6 +153,18 @@ public:
 		}
 	}
 
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources (for the GC)
+	//
+	/// Reachable resources are:
+	///	 - the action target (_target)
+	///
+	virtual void markReachableResources() const
+	{
+		if ( _target ) _target->setReachable();
+	}
+#endif // GNASU_USE_GC
+
 private:
 
 	boost::intrusive_ptr<character> _target;
@@ -165,6 +194,20 @@ public:
 		as_environment env; env.set_target(target.get());
 		func->call(fn_call(target.get(), &env, 0, 0));
 	}
+
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources (for the GC)
+	//
+	/// Reachable resources are:
+	///	 - the function body (func)
+	///	 - the action target (target)
+	///
+	virtual void markReachableResources() const
+	{
+		if ( func ) func->setReachable();
+		if ( func ) func->setReachable();
+	}
+#endif // GNASU_USE_GC
 
 private:
 

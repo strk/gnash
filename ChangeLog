@@ -1,5 +1,12 @@
 2007-06-16 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ExecutableCode.h: implement markReachableResources
+	  for executable code.
+	* server/movie_root.{cpp,h}: mark resources reachable by 
+	  the executable code in the global action queue.
+
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/morph2_character_def.{cpp,h}: do not explicitly
 	  delete the shape_character_defs, rather keep by intrusive_ptr
 	  (which means leave ownership to the GC in the GC case).

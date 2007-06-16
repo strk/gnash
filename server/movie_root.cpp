@@ -1033,6 +1033,13 @@ movie_root::markReachableResources() const
 	{
 		i->markReachableResources();
 	}
+
+	// Mark resources reachable by queued action code
+	for (ActionQueue::const_iterator i=_actionQueue.begin(), e=_actionQueue.end();
+			i != e; ++i)
+	{
+		(*i)->markReachableResources();
+	}
 }
 #endif // GNASH_USE_GC
 
