@@ -140,18 +140,18 @@ main(int argc, char** argv)
 
       // Depths have not be restored
       // (gnash fails because create new instnaces instead)
-      "xcheck_equals(movieClip1.getDepth(), mc2_depth);" 
-      "xcheck_equals(movieClip2.getDepth(), mc1_depth);"
+      "check_equals(movieClip1.getDepth(), mc2_depth);" 
+      "check_equals(movieClip2.getDepth(), mc1_depth);"
 
       // They are still the same instance
       // (gnash fails because create new instnaces instead)
-      "xcheck_equals(movieClip1.secretCode, 'mc1');" 
-      "xcheck_equals(movieClip2.secretCode, 'mc2');"
+      "check_equals(movieClip1.secretCode, 'mc1');" 
+      "check_equals(movieClip2.secretCode, 'mc2');"
 
       // Chars have not been reconstructed
       // (gnash fails because create new instnaces instead)
-      "xcheck_equals(mc1Constructed, 1);"
-      "xcheck_equals(mc2Constructed, 1);"
+      "check_equals(mc1Constructed, 1);"
+      "check_equals(mc2Constructed, 1);"
 
       "totals();"
 

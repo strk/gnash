@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.10 2007/06/14 02:03:19 zoulunkai Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.11 2007/06/17 09:07:27 zoulunkai Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -98,6 +98,8 @@ public:
 	bool isMove() const { return m_place_type == MOVE; }
 
 	static void loader(stream* in, tag_type tag, movie_definition* m);
+
+    int getRatio() const { return m_ratio;}
 
 private:
 

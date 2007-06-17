@@ -218,12 +218,12 @@ main(int argc, char** argv)
   add_actions(mo, "gotoAndStop(3);");
   
   check_equals(mo, "typeof(mc1)", "'movieclip'");
-  xcheck_equals(mo, "typeof(mc2)", "'undefined'"); 
+  check_equals(mo, "typeof(mc2)", "'undefined'"); 
   check_equals(mo, "typeof(mc3)", "'movieclip'"); 
-  xcheck_equals(mo, "typeof(mc4)", "'movieclip'"); 
+  check_equals(mo, "typeof(mc4)", "'movieclip'"); 
   xcheck_equals(mo, "typeof(mc5)", "'movieclip'"); 
   check_equals(mo, "mc1Constructed", "1");
-  xcheck_equals(mo, "mc2Constructed", "1"); 
+  check_equals(mo, "mc2Constructed", "1"); 
   check_equals(mo, "mc3Constructed", "2"); 
   check_equals(mo, "mc4Constructed", "1");
   check_equals(mo, "mc5Constructed", "1");

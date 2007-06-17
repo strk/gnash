@@ -182,12 +182,12 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)newSWFAction( "gotoAndStop(3);"));
   
   check_equals(mo, "typeof(movieClip1)", "'movieclip'");
-  xcheck_equals(mo, "typeof(movieClip2)", "'undefined'");
+  check_equals(mo, "typeof(movieClip2)", "'undefined'");
   // the difference of movieClip3 and movieClip4 was caused by the ratio value
   check_equals(mo, "typeof(movieClip3)", "'undefined'");
-  xcheck_equals(mo, "typeof(movieClip4)", "'movieclip'");
+  check_equals(mo, "typeof(movieClip4)", "'movieclip'");
   check_equals(mo, "_root.mc1Constructed", "2");
-  xcheck_equals(mo, "_root.mc2Constructed", "1");
+  check_equals(mo, "_root.mc2Constructed", "1");
   check_equals(mo, "_root.mc3Constructed", "1");
   check_equals(mo, "_root.mc4Constructed", "1");
   

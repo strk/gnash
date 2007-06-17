@@ -74,7 +74,7 @@ namespace gnash {
 //#define GNASH_DEBUG_REPLACE 1
 
 // Unfed for original design, 2 for second redesign attempt, 3 for third redesign attempt
-#define NEW_TIMELINE_DESIGN 2
+#define NEW_TIMELINE_DESIGN 3
 
 
 

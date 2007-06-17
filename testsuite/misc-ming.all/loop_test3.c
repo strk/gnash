@@ -143,19 +143,19 @@ main(int argc, char** argv)
       "gotoAndStop(2);"
 
       // Character placed in frame 3 at depth (-16380) was destroyed (placed *after* target frame)
-      "xcheck_equals(typeof(movieClip1), 'undefined');" 
+      "check_equals(typeof(movieClip1), 'undefined');" 
       
       // Depth of character at depth -16380 isn't restored (there's no character at that depth)
       // (gnash fails because create new instances instead)
-      "xcheck_equals(movieClip2.getDepth(), -16381);"
+      "check_equals(movieClip2.getDepth(), -16381);"
 
       // movieClip2 is still the same instance
       // (gnash fails because create new instance instead)
-      "xcheck_equals(movieClip2.secretCode, 'mc2');"
+      "check_equals(movieClip2.secretCode, 'mc2');"
 
       // Chars have been constructed only once
       // (gnash fails because create new movieClip1 instance instead)
-      "xcheck_equals(mc1Constructed, 1);"
+      "check_equals(mc1Constructed, 1);"
       "check_equals(mc2Constructed, 1);"
 
       "totals();"

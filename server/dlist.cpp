@@ -503,10 +503,11 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 
 	// 1. Find all "timeline depth" for the target frame, querying the
 	//    Timeline object in the sprite/movie definition (see implementation details)
-	std::vector<int> save;
+	std::map<int, int>  save;
 	movieDef.getTimelineDepths(tgtFrame, save);
 
-#define GNASH_DEBUG_TIMELINE 1
+//#define GNASH_DEBUG_TIMELINE 1
+#undef GNASH_DEBUG_TIMELINE
 #ifdef GNASH_DEBUG_TIMELINE
 	cout << "Depths found to save: " << endl;
 	std::ostream_iterator<int> ostrIter(cout, "," ) ;
@@ -516,7 +517,7 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 #endif
 
 
-	typedef std::vector<int>::iterator SeekIter;
+	typedef std::map<int, int>::iterator SeekIter;
 
 	SeekIter startSeek = save.begin();
         SeekIter endSeek = save.end();
@@ -559,9 +560,11 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 		}
 #endif
 
-		/// Only remove if not in the save vector
-		SeekIter match = std::find(startSeek, endSeek, di_depth);
-		if ( match == save.end() )
+		/// Only remove if not in the save vector, 
+		/// or in the save vector but has a different ratio value
+		SeekIter match = save.find(di_depth);
+		if( match == save.end() || 
+			( match != save.end() && match->second != di->get_ratio() ))
 		{
 			// Not to be saved, killing
 			if ( call_unload ) di->unload();

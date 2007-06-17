@@ -476,6 +476,17 @@ public:
 	///
 	void	remove_display_object(int depth, int /* id */)
 	{
+      	character* existing_char = m_display_list.get_character_at_depth(depth);
+		if(existing_char && existing_char->getTimelineInfo())
+		{
+  			// Don't remove characters placed after target frame
+  			/// TODO: Don't remove character placed after the this RemoveObject tag
+			if(m_current_frame <= existing_char->getTimelineInfo()->placedInFrame() )
+			{
+				return;
+			}
+		}
+
 	    set_invalidated();
 	    m_display_list.remove_display_object(depth);
 	}

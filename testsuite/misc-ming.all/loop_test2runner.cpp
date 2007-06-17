@@ -132,7 +132,7 @@ main(int /*argc*/, char** /*argv*/)
 	// Check that the black square is still behind the red square
 	check_pixel(x_left, y, 2, white, 2); 
 	check_pixel(x_red, y, 2, red, 2); 
-	xcheck_pixel(x_int, y, 2, red, 2);  // black is *behind* red square
+	check_pixel(x_int, y, 2, red, 2);  // black is *behind* red square
 	check_pixel(x_black, y, 2, black, 2);  
 	check_pixel(x_right, y, 2, white, 2);  
 }

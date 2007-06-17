@@ -168,14 +168,14 @@ main(int argc, char** argv)
     // supposed to be removed on jump back, being on a depth supposed
     // to contain a timeline instance at that time
     // Gnash fails here by removing the instance placed in a later frame
-    "xcheck_equals(_root.depth3Constructed, 2);"
+    "check_equals(_root.depth3Constructed, 2);"
 
     // Gnash fails here by removing the instance placed in a later frame
-    "xcheck_equals(typeof(static1), 'undefined');"
+    "check_equals(typeof(static1), 'undefined');"
 
     // Gnash fails here by removing the instance placed in a later frame
     // (thus placing a new instance)
-    "xcheck_equals(typeof(static2), 'movieclip');"
+    "check_equals(typeof(static2), 'movieclip');"
 
     "totals();"
     );
