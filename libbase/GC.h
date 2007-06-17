@@ -294,9 +294,11 @@ private:
 			const GcResource* res = *i;
 			if ( ! res->isReachable() )
 			{
+#ifdef GNASH_GC_DEBUG 
 #if GNASH_GC_DEBUG > 1
 				log_debug(_("GC %p: cleanUnreachable deleting object %p (%s)"),
 						(void*)this, (void*)res, typeid(*res).name());
+#endif
 				++deleted;
 #endif
 				delete res;

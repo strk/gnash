@@ -1,3 +1,11 @@
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
+	* libbase/GC.h: fixed a misleading delete count for
+	  the debugging mode. You can now see that in the UdoG
+	  leaking case (empty function in first frame, empty second
+	  frame) every GC collect run deletes 2 resources (most
+	  likely an isolated chain of references in the RC case).
+
 2007-06-17 Ann Barcomb <kudra@domaintje.com>
 
 	* plugin/Makefile.am: Removed an incorrect comment.
