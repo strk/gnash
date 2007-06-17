@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.108 2007/06/15 15:00:31 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.109 2007/06/18 00:27:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1220,7 +1220,7 @@ SWFHandlers::ActionTrace(ActionExec& thread)
 
     //std::string val = env.pop().to_string_versioned(VM::get().getSWFVersion(), &env);
     std::string val = env.pop().to_string(&env);
-    log_trace(val.c_str());
+    log_trace("%s", val.c_str());
 }
 
 void

@@ -1,5 +1,12 @@
 2007-06-18 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionTrace): don't use the string value
+	  as a format string !
+	* testsuite/swfdec/PASSING: 31 new tests found in the 'as' branch
+	  of swfdec succeed.
+
+2007-06-18 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.{cpp,h}: (markReachableResources):
 	  mark _frame0_chars as reachable. make check completes
 	  successfully now.
