@@ -105,7 +105,10 @@ Installation Names
 By default, `make install' installs the package's commands under
 `/usr/local/bin', include files under `/usr/local/include', etc.  You
 can specify an installation prefix other than `/usr/local' by giving
-`configure' the option `--prefix=PREFIX'.
+`configure' the option `--prefix=PREFIX'.  Note that Firefox plugin 
+installation is controlled with '--plugin-dir' and are not affected 
+by '--prefix'.  The default directory for the Firefox plugin is 
+`$(HOME)/.firefox/plugins'.
 
    You can specify separate installation prefixes for
 architecture-specific files and architecture-independent files.  If you

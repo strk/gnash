@@ -1,3 +1,10 @@
+2007-06-17 Ann Barcomb <kudra@domaintje.com>
+
+	* doc/C/usermanual/install.xml: Added some information
+	  inspired by the comments made in patch #5772.
+	* INSTALL: Applied a modified version of patch #5772 by
+	  Anders Juel Jensen.  
+
 2007-06-16  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* gui/gnash.cpp: Add the version of FFMPEG or GST to

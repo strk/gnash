@@ -18,7 +18,8 @@
   <link linkend="docinstall">Documentation</link> may also be installed.
   The installation location is controlled with the
   <emphasis>--prefix</emphasis> <link linkend="custompath">configure
-  option</link>.
+  option</link>, except for plugins, which are explicitly set with
+  <emphasis>--plugin-dir</emphasis>.
 </para>
 
 <para>
@@ -68,7 +69,7 @@
     directory of the system
     installed <emphasis>Firefox</emphasis> or <emphasis>Mozilla</emphasis>, 
     if development packages are installed for either of them.
-    Otherwise, the default is <filename>/usr/lib/mozilla/plugins</filename>. 
+    Otherwise, the default is <filename>~/.firefox/plugins</filename>. 
     You may also specify the plugin installation directory by using the 
     <emphasis>--with-plugindir</emphasis> <link linkend="custompath">option 
     to configure</link>.
