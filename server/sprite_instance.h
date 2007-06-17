@@ -1000,7 +1000,7 @@ protected:
 	/// the parent's class version (markCharacterReachableResources)
 	//
 	/// sprite-specific reachable resources are:
-	/// 	- DisplayList items (both current and backup one)
+	/// 	- DisplayList items (current, backup and frame0 ones)
 	///	- Canvas for dynamic drawing (_drawable)
 	///	- Drawable instance (_drawable_inst)
 	///	- sprite environment
