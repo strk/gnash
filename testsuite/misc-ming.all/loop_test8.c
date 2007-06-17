@@ -221,7 +221,7 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(mc2)", "'undefined'"); 
   check_equals(mo, "typeof(mc3)", "'movieclip'"); 
   check_equals(mo, "typeof(mc4)", "'movieclip'"); 
-  xcheck_equals(mo, "typeof(mc5)", "'movieclip'"); 
+  xcheck_equals(mo, "typeof(mc5)", "'movieclip'"); // Gnash fails because of action execution order 
   check_equals(mo, "mc1Constructed", "1");
   check_equals(mo, "mc2Constructed", "1"); 
   check_equals(mo, "mc3Constructed", "2"); 

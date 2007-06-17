@@ -1,5 +1,9 @@
 2007-06-17 Zou Lunkai <zoulunkai@gmail.com>
 
+	* testsuite/misc-ming.all/loop_test8.c: comments
+	
+2007-06-17 Zou Lunkai <zoulunkai@gmail.com>
+
 	* server/parser/movie_definition.h, 
 	  server/parser/movie_def_impl.h,
 	  server/parser/sprite_definition.h,
