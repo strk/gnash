@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.58 2007/01/27 15:30:47 rsavoye Exp $
+# $Id: Makefile.am,v 1.59 2007/06/17 08:34:42 ann Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -93,10 +93,7 @@ else
 libgnashplugin_la_LDFLAGS = -module -avoid-version -L$(plugindir)
 endif
 
-# For now the plugin has to be installed in the root plugin
-# directory for Firefox. For some reason if the same file is
-# installed in the users $(HOME)/.firefox/plugins, the plugin
-# won't load due to errors with an undefined MaiAtkObject.
+# The default directory for the plugin is $(HOME)/.firefox/plugins.
 install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
 #	cp .libs/libgnashplugin.so $(DESTDIR)$(plugindir)/libgnashplugin.so
