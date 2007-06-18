@@ -39,7 +39,6 @@
  *
  * Expected behaviour:
  *
- *   TODO: verify
  *   After jump back, the onConstruct event handler for the red square has been invoked twice.
  *
  * run as ./loop_test7
@@ -117,6 +116,12 @@ main(int argc, char** argv)
 
   // Frame3: Remove red square
   SWFDisplayItem_remove(it1);
+  // After compile, the RemoveObject2 tag is *after* the DoAction tag which 
+  // contains the following check. So it's not surprise that we can still access
+  // "movieClip1" here when considering the gloabal ActionQueue model! If the 
+  // RemoveObject2 is *before* the DoAction, then typeof(movieClip1) will reurn 'undefined'.
+  // So Gnash fails here because of action execution order!
+  // TODO: add testcase for this(DoAction placed *before* RemoveObject2 within the same frame).
   xcheck_equals(mo, "typeof(movieClip1)", "'movieclip'"); // kept alive for calling onUnload!
   check_equals(mo, "_root.mc1Constructed", "1");
   SWFMovie_nextFrame(mo);  
