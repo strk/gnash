@@ -121,7 +121,7 @@ main(int argc, char** argv)
   // "movieClip1" here when considering the gloabal ActionQueue model! If the 
   // RemoveObject2 is *before* the DoAction, then typeof(movieClip1) will reurn 'undefined'.
   // So Gnash fails here because of action execution order!
-  // TODO: add testcase for this(DoAction placed *before* RemoveObject2 within the same frame).
+  // TODO: add testcase for this(RemoveObject2 placed *before* DoAction within the same frame).
   xcheck_equals(mo, "typeof(movieClip1)", "'movieclip'"); // kept alive for calling onUnload!
   check_equals(mo, "_root.mc1Constructed", "1");
   SWFMovie_nextFrame(mo);  
