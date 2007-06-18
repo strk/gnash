@@ -19,7 +19,7 @@
 /*
  *  frame1: set _root.x1 to zero;
  *  frame2: 
- *    create a dynamic movieclip with a user defined onKeyDown event handler;
+ *    create a dynamic movieclip at the static depth zone with a user defined onKeyDown event handler;
  *    increase _root.x1 within the event handler;
  *
  *  KeyDown events are provided by the testrunner.
@@ -55,24 +55,24 @@ main(int argc, char** argv)
   Ming_init();
   mo = newSWFMovieWithVersion(OUTPUT_VERSION);
   SWFMovie_setDimension(mo, 800, 600);
-  SWFMovie_setRate (mo, 12.0);
+  SWFMovie_setRate (mo, 0.5);
 
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  add_actions(mo, "x1=0;");
+  add_actions(mo, "_root.note('at frame1'); x1=0;");
   SWFMovie_nextFrame(mo);  // 1st frame 
-	
- 	add_actions(mo, 
- 		"_root.createEmptyMovieClip('dynamic_mc', 10);"
- 		"dynamic_mc.onKeyDown = function() "
- 		"{"
- 		"  _root.note('KeyDown triggered');"
- 		"  _root.x1++;"
- 		"  _root.note('_root.x1 is: ' + _root.x1);"
- 		"};"
- 		"Key.addListener(dynamic_mc);"
- 	);
-	SWFMovie_nextFrame(mo);  // 2nd frame  
+  
+  add_actions(mo, 
+    "_root.createEmptyMovieClip('dynamic_mc', -10);"
+    "dynamic_mc.onKeyDown = function() "
+    "{"
+    "  _root.note('KeyDown triggered');"
+    "  _root.x1++;"
+    "  _root.note('_root.x1 is: ' + _root.x1);"
+    "};"
+    "Key.addListener(dynamic_mc);"
+  );
+  SWFMovie_nextFrame(mo);  // 2nd frame  
   
   //Output movie
   puts("Saving " OUTPUT_FILENAME );
@@ -80,5 +80,3 @@ main(int argc, char** argv)
 
   return 0;
 }
-
-

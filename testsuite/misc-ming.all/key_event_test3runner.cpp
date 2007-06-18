@@ -73,8 +73,7 @@ main(int /*argc*/, char** /*argv*/)
    tester.releaseKey(key::A);
   // check that no KeyDown was triggered(no key event handler at frame1);
   check(root->get_member("x1", &tmp));
-  // Gnash fails because the key listener didn't get removed by loop-back
-  xcheck_equals(tmp.to_number(), 0); 
+  check_equals(tmp.to_number(), 0); 
 
   tester.advance(); // advance to frame2
   check_equals(root->get_current_frame(), 1);
@@ -85,9 +84,7 @@ main(int /*argc*/, char** /*argv*/)
 
   // check that KeyDown have been triggered
   check(root->get_member("x1", &tmp));
-  // gnash fails because the key listener didn't get removed by loop-back
-  // and get added to the listener list again;
-  xcheck_equals(tmp.to_number(), 1); 
+  check_equals(tmp.to_number(), 1); 
 
   tester.advance(); // loop back to frame1 again
   // press key 'A' and checks
@@ -95,8 +92,7 @@ main(int /*argc*/, char** /*argv*/)
   tester.releaseKey(key::A);
   // check that no KeyDown was triggered(no key event handler at frame1);
   check(root->get_member("x1", &tmp));
-  // Gnash fails because the key listener didn't get removed by loop-back
-  xcheck_equals(tmp.to_number(), 0);
+  check_equals(tmp.to_number(), 0);
 
   tester.advance(); // advance to frame2
   check_equals(root->get_current_frame(), 1);
@@ -107,9 +103,7 @@ main(int /*argc*/, char** /*argv*/)
 
   // check that KeyDown have been triggered
   check(root->get_member("x1", &tmp));
-  // gnash fails because the key listener didn't get removed when loop back
-  // and get added to the list again;
-  xcheck_equals(tmp.to_number(), 1);
+  check_equals(tmp.to_number(), 1);
   
   return 0; 
 }
