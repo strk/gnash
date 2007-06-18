@@ -1,3 +1,10 @@
+2007-06-18 Alexander Sack <asac@jwsdot.com>
+
+	* configure.ac: detect usable pbutils for automatic installation of
+	  missing codecs.
+	* server/asobj/NetStreamGst.cpp: try installing missing codecs
+	  as needed.
+
 2007-06-18 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/: movie_def_impl.h, movie_definition.h,

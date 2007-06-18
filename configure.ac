@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.343 2007/06/14 09:43:17 strk Exp $
+dnl $Id: configure.ac,v 1.344 2007/06/18 19:52:59 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -906,6 +906,20 @@ if test "$media_handler" = "gst"; then
     if test x"$GSTREAMER_LIBS" = x; then
        AC_MSG_WARN([No appropriate gstreamer library found, will try using mad.])
        media_handler=mad
+    fi
+  else
+    AC_MSG_CHECKING([for modern pbutils])
+    save_cflags=$CFLAGS
+    CFLAGS=$GSTREAMER_CFLAGS
+    AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_sync],
+     GSTREAMER_LIBS="$GSTREAMER_LIBS -lgstpbutils-0.10",
+     has_modern_gstpbutils='no')]
+    CFLAGS=$save_cflags
+    if test x$has_modern_gstpbutils = xno; then
+       AC_MSG_RESULT([no {GSTREAMER_CFLAGS=$GSTREAMER_CFLAGS}])
+    else
+       AC_DEFINE([GST_HAS_MODERN_PBUTILS], [], [GStreamer has pbutils with missing codec install routines installed])
+       AC_MSG_RESULT([ok])
     fi
   fi
 fi

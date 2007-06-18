@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.54 2007/06/04 20:55:14 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.55 2007/06/18 19:53:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,6 +36,11 @@
 //#include "action.h"
 
 #include "gstgnashsrc.h"
+
+#ifdef GST_HAS_MODERN_PBUTILS
+#include <gst/pbutils/missing-plugins.h>
+#include <gst/pbutils/install-plugins.h>
+#endif // GST_HAS_MODERN_PBUTILS
 
 #include "URL.h"
 
@@ -525,6 +530,91 @@ NetStreamGst::buildFLVPipeline(bool& video, bool& audio)
 
 }
 
+#ifdef GST_HAS_MODERN_PBUTILS
+
+static void
+GstInstallPluginsResultCb (GstInstallPluginsReturn  result,
+			   gpointer                 user_data)
+{
+  g_debug("JAU RESULTO MENDO");
+}
+
+
+static gboolean
+NetStreamGst_install_missing_codecs(GList *missing_plugin_details)
+{
+
+  GstInstallPluginsReturn rv;
+  int i,c;
+  gchar **details = g_new0(gchar*, c+1);
+  GstInstallPluginsContext *install_ctx = gst_install_plugins_context_new();
+
+  c=g_list_length(missing_plugin_details);
+  
+  for(i=0; i < c; i++)
+  {
+    details[i] = (gchar*) g_list_nth_data(missing_plugin_details, i);
+  }
+
+  rv = gst_install_plugins_sync (details,
+				 install_ctx);
+
+  g_strfreev(details);
+
+  switch(rv) {
+  case GST_INSTALL_PLUGINS_SUCCESS:
+    if(!gst_update_registry())
+      g_warning("we failed to update gst registry for new codecs");
+    else
+      return true;
+    break;
+  case GST_INSTALL_PLUGINS_NOT_FOUND:
+    g_debug("gst_install_plugins_sync -> GST_INSTALL_PLUGINS_NOT_FOUND");
+    break;
+  case GST_INSTALL_PLUGINS_ERROR:
+    g_debug("gst_install_plugins_sync -> GST_INSTALL_PLUGINS_ERROR");
+    break;
+  case GST_INSTALL_PLUGINS_PARTIAL_SUCCESS:
+    g_debug("gst_install_plugins_sync -> GST_INSTALL_PLUGINS_PARTIAL_SUCCESS");
+    break;
+  case GST_INSTALL_PLUGINS_USER_ABORT:
+    g_debug("gst_install_plugins_sync -> GST_INSTALL_PLUGINS_USER_ABORT");
+    break;
+  case GST_INSTALL_PLUGINS_CRASHED:
+    g_debug("gst_install_plugins_sync -> GST_INSTALL_PLUGINS_CRASHED");
+    break;
+  case GST_INSTALL_PLUGINS_INVALID:
+    g_warning("gst_install_plugins_sync -> GST_INSTALL_PLUGINS_INVALID");
+    break;
+  default:
+    g_warning("gst_install_plugins_sync -> UNEXPECTED RESULT (undocumented value)");
+    break;				  
+  };
+
+  return false;
+}
+
+static GList*
+NetStreamGst_append_missing_codec_to_details (GList *list,
+					      GstElement *source,
+					      const GstCaps* caps)
+{
+  GstMessage *missing_msg;
+  missing_msg = gst_missing_decoder_message_new(source,
+						caps);
+  gchar* detail = gst_missing_plugin_message_get_installer_detail(missing_msg);  
+
+  if(!detail)
+  {
+    g_warning("missing message details not found. No details added.");
+    return list;
+  } 
+
+  return g_list_append(list, detail);
+}
+
+#endif // GST_HAS_MODERN_PBUTILS
+
 bool
 NetStreamGst::buildFLVVideoPipeline(bool &video)
 {
@@ -536,6 +626,8 @@ NetStreamGst::buildFLVVideoPipeline(bool &video)
 
 	bool doVideo = video;
 
+	GList *missing_plugin_details = NULL;
+ retry:
 	if (videoInfo) {
 		doVideo = true;
 		videosource = gst_element_factory_make ("fakesrc", NULL);
@@ -578,13 +670,15 @@ NetStreamGst::buildFLVVideoPipeline(bool &video)
 			if ( ! videodecoder )
 			{
 				log_error("Unable to create videodecoder 'ffdec_flv' element");
-				return false;
-			}
 
-			// Check if the element was correctly created
-			if (!videodecoder) {
-				log_error(_("A gstreamer flashvideo (h.263) decoder element could not be created.  You probably need to install gst-ffmpeg."));
+#ifdef GST_HAS_MODERN_PBUTILS
+				missing_plugin_details = NetStreamGst_append_missing_codec_to_details
+				  (missing_plugin_details,
+				   videosource,
+				   videonincaps);
+#else // GST_HAS_MODERN_PBUTILS
 				return false;
+#endif // GST_HAS_MODERN_PBUTILS
 			}
 
 		} else if (videoInfo->codec == VIDEO_CODEC_VP6) {
@@ -597,13 +691,15 @@ NetStreamGst::buildFLVVideoPipeline(bool &video)
 			if ( ! videodecoder )
 			{
 				log_error("Unable to create videodecoder 'ffdec_vp6f' element");
-				return false;
-			}
 
-			// Check if the element was correctly created
-			if (!videodecoder) {
-				log_error(_("A gstreamer flashvideo (VP6) decoder element could not be created! You probably need to install gst-ffmpeg."));
+#ifdef GST_HAS_MODERN_PBUTILS
+				missing_plugin_details = NetStreamGst_append_missing_codec_to_details
+				  (missing_plugin_details,
+				   videosource,
+				   videonincaps);
+#else // GST_HAS_MODERN_PBUTILS
 				return false;
+#endif // GST_HAS_MODERN_PBUTILS
 			}
 
 		} else if (videoInfo->codec == VIDEO_CODEC_SCREENVIDEO) {
@@ -617,7 +713,15 @@ NetStreamGst::buildFLVVideoPipeline(bool &video)
 			// Check if the element was correctly created
 			if (!videodecoder) {
 				log_error(_("A gstreamer flashvideo (ScreenVideo) decoder element could not be created! You probably need to install gst-ffmpeg."));
+
+#ifdef GST_HAS_MODERN_PBUTILS
+				missing_plugin_details = NetStreamGst_append_missing_codec_to_details
+				  (missing_plugin_details,
+				   videosource,
+				   videonincaps);
+#else // GST_HAS_MODERN_PBUTILS
 				return false;
+#endif // GST_HAS_MODERN_PBUTILS
 			}
 
 		} else {
@@ -625,13 +729,36 @@ NetStreamGst::buildFLVVideoPipeline(bool &video)
 			return false;
 		}
 
-		g_object_set (G_OBJECT (videoinputcaps), "caps", videonincaps, NULL);
-		gst_caps_unref (videonincaps);
+		if(g_list_length(missing_plugin_details) == 0)
+		{
+		  g_object_set (G_OBJECT (videoinputcaps), "caps", videonincaps, NULL);
+		  gst_caps_unref (videonincaps);
+		}
 	}
-	video = doVideo;
 
+
+#ifdef GST_HAS_MODERN_PBUTILS
+	if(g_list_length(missing_plugin_details) == 0)
+	{
+	  g_debug("no missing plugins found");
+	  video = doVideo;
+	  return true;
+	}
+
+	g_debug("try to install missing plugins (count=%d)", g_list_length(missing_plugin_details));
+	if(NetStreamGst_install_missing_codecs(missing_plugin_details))
+	{
+	  disconnectVideoHandoffSignal();
+	  g_list_free(missing_plugin_details);
+	  missing_plugin_details = NULL;
+	  g_debug("gst_install_plugins_sync -> GST_INSTALL_PLUGINS_SUCCESS ... one more roundtrip");
+	  goto retry;
+	}
+	g_list_free(missing_plugin_details);
+	return false;
+#else // GST_HAS_MODERN_PBUTILS
 	return true;
-
+#endif // GST_HAS_MODERN_PBUTILS
 }
 
 bool
@@ -642,6 +769,10 @@ NetStreamGst::buildFLVSoundPipeline(bool &sound)
 	FLVAudioInfo* audioInfo = m_parser->getAudioInfo();
 	if (!audioInfo) doSound = false;
 
+#ifdef GST_HAS_MODERN_PBUTILS
+	GList *missing_plugin_details = NULL;
+ retry:
+#endif
 	if (doSound) {
 
 #ifdef GNASH_DEBUG
@@ -677,7 +808,6 @@ NetStreamGst::buildFLVSoundPipeline(bool &sound)
 				if (!audiodecoder)
 				{
 					log_error(_("A gstreamer mp3-decoder element could not be created! You probably need to install a mp3-decoder plugin like gstreamer0.10-mad or gstreamer0.10-fluendo-mp3."));
-					return false;
 				}
 			}
 
@@ -695,6 +825,28 @@ NetStreamGst::buildFLVSoundPipeline(bool &sound)
 				"layer", G_TYPE_INT, 3,
 				"rate", G_TYPE_INT, audioInfo->sampleRate,
 				"channels", G_TYPE_INT, audioInfo->stereo ? 2 : 1, NULL);
+
+			if(!audiodecoder)
+			{
+#ifdef GST_HAS_MODERN_PBUTILS
+			  missing_plugin_details = NetStreamGst_append_missing_codec_to_details
+			    (missing_plugin_details,
+			     audiosource,
+			     audioincaps);
+
+			  if(NetStreamGst_install_missing_codecs(missing_plugin_details))
+			  {
+			    disconnectAudioHandoffSignal();
+			    g_list_free(missing_plugin_details);
+			    missing_plugin_details = NULL;
+			    g_debug("gst_install_plugins_sync -> GST_INSTALL_PLUGINS_SUCCESS ... one more roundtrip");
+			    goto retry;
+			  }
+
+			  g_list_free(missing_plugin_details);
+#endif // GST_HAS_MODERN_PBUTILS
+			  return false;
+			} 
 			g_object_set (G_OBJECT (audioinputcaps), "caps", audioincaps, NULL);
 			gst_caps_unref (audioincaps);
 		} else {
