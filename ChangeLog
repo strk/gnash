@@ -1,6 +1,5 @@
 2007-06-18 Zou Lunkai <zoulunkai@gmail.com>
 
-	* libbase/GC.h: add missing head file
 	* testsuite/misc-ming.all/loop_test7: review and comments
 	
 2007-06-18 Sandro Santilli <strk@keybit.net>
