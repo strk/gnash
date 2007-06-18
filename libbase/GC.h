@@ -1,4 +1,4 @@
-// GC.h: Garbage Collector, for Gnash
+// GC.h: Garbage Collector for Gnash
 // 
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 // 
