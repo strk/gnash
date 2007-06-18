@@ -1,5 +1,10 @@
 2007-06-18 Zou Lunkai <zoulunkai@gmail.com>
 
+	* testsuite/misc-ming.all/shape_test.c: more tests, make the deduction easier.
+	  surprisingly, all succeeded.
+	
+2007-06-18 Zou Lunkai <zoulunkai@gmail.com>
+
 	* testsuite/misc-ming.all/key_event_test3.c,
 	  testsuite/misc-ming.all/key_event_test3runner.cpp: the testrunner was
 	  bogus, fix the testrunner itself.

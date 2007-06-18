@@ -16,6 +16,13 @@
  *
  */ 
 
+/*
+ *  Try to add variables to shapes, observed behavior is that variables are added 
+ *  to _root accidently.
+ *
+ *  TODO: verify this!
+ */
+ 
 #include <stdlib.h>
 #include <stdio.h>
 #include <ming.h>
@@ -69,17 +76,23 @@ main(int argc, char** argv)
   check(mo, "sh2 != undefined");
   
   // Do these checks mean that shapes are movieclips?
+  // seems not.
   check_equals(mo, "typeof(sh1)", "'movieclip'");
   check_equals(mo, "typeof(sh2)", "'movieclip'");
-
+  check_equals(mo, "typeof(_root)", "'movieclip'");
+  
   add_actions(mo, 
     "sh1.var1 = 10;"
     "sh2.var2 = 20;"
     );
 
-    // Do these checks mean that we can add variables to shapes?
+  // Do these checks mean that we can add variables to shapes?
+  // seems not, variable are added to the _root, interesting.
   check_equals(mo, "sh1.var1", "10");
   check_equals(mo, "sh2.var2", "20");
+  check_equals(mo, "_root.var1", "10");
+  check_equals(mo, "_root.var2", "20");
+  
   check_equals(mo, "sh1._x", "0");
   check_equals(mo, "sh2._x", "0");
 
@@ -90,6 +103,7 @@ main(int argc, char** argv)
 
   check_equals(mo, "sh1._x", "400");
   check_equals(mo, "sh2._x", "400");
+  check_equals(mo, "_root._x", "400");
     
   // Do these checks mean that shapes are *not* movieclips?
   check_equals(mo, "typeof(sh1.getDepth())", "'undefined'");
