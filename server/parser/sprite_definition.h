@@ -290,6 +290,7 @@ private:
 		character* parent, int id);
 
 
+	// See dox in movie_definition.h
 	virtual void	add_execute_tag(execute_tag* c)
 	{
 		m_playlist[m_loading_frame].push_back(c);

@@ -470,12 +470,12 @@ public:
 	// See dox in movie_definition.h
 	int get_loading_sound_stream_id() { return m_loading_sound_stream; }
 
-	/// Add an execute_tag to this movie_definition's playlist
-	void	add_execute_tag(execute_tag* e)
+	// See dox in movie_definition.h
+	void	add_execute_tag(execute_tag* tag)
 	{
-	    assert(e);
+	    assert(tag);
 	    if (_frames_loaded < m_playlist.size()) {
-	      m_playlist[_frames_loaded].push_back(e);
+	      m_playlist[_frames_loaded].push_back(tag);
 	    }
 	}
 

@@ -1,3 +1,9 @@
+2007-06-18 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/: movie_def_impl.h, movie_definition.h,
+	  sprite_definition.h: document add_execute_tag ownership
+	  transfer.
+
 2007-06-18 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/shape_test.c: more tests, make the deduction easier.

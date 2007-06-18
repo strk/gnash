@@ -331,9 +331,17 @@ public:
 		return NULL;
 	}
 
-	/// Add an execute_tag to the frame currently being loaded
+	/// Add an execute_tag to this movie_definition's playlist
 	//
 	/// The default implementation is a no-op.
+	///
+	/// @param tag
+	/// 	The tag to add in the list of executable tags for
+	/// 	the frame currently being loaded. Ownership is transferred
+	/// 	to the movie_def_impl.
+	///
+	/// TODO: take an auto_ptr.
+	/// NOTE: the default implementation just let the execute_tag leak.
 	///
 	virtual void	add_execute_tag(execute_tag* /*c*/)
 	{
