@@ -24,6 +24,7 @@
 #endif
 
 #include <list>
+#include <algorithm> //for std::find
 
 // Define the following macro to enable GC verbosity 
 // Define to > 1 to have info printed about scan of already reachable objects
