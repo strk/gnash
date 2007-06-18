@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.55 2007/06/18 19:53:00 strk Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.56 2007/06/18 20:20:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -627,7 +627,9 @@ NetStreamGst::buildFLVVideoPipeline(bool &video)
 	bool doVideo = video;
 
 	GList *missing_plugin_details = NULL;
+#ifdef GST_HAS_MODERN_PBUTILS
  retry:
+#endif
 	if (videoInfo) {
 		doVideo = true;
 		videosource = gst_element_factory_make ("fakesrc", NULL);
