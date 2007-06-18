@@ -124,7 +124,9 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)newSWFAction( "gotoAndStop(4);"));
   check_equals(mo, "typeof(movieClip1)", "'undefined'");
 
-  // Gnash calls onConstruct again !!
+  // onClipConstruct invoked or not during jumping back is dependent 
+  // on whether the onClipUnload has been defined.
+  // Gnash fails by calling onClipConstruct again without considering onClipUnload!!
   xcheck_equals(mo, "_root.mc1Constructed", "1");
 
   SWFMovie_add(mo, (SWFBlock)newSWFAction( "totals(); stop();" ));
@@ -136,4 +138,3 @@ main(int argc, char** argv)
 
   return 0;
 }
-
