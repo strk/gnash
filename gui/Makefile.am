@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.79 2007/06/16 19:03:00 rsavoye Exp $
+# $Id: Makefile.am,v 1.80 2007/06/19 11:54:21 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -289,7 +289,7 @@ gnash_LDADD = \
 #	$(GNASH_LIBS)  .configline
 #	 $(LIBLTDL) "-dlopen" self "-dlopen"
 
-CLEANFILES = klash.moc
+CLEANFILES = klash.moc .configline
 klash.moc: $(srcdir)/kdesup.h
 	@if test x"$(MOC)" != x; then \
 	  echo "Generating MOC file..."; \
@@ -314,5 +314,5 @@ mudflap:
 	$(MAKE) CXXFLAGS="$(CXXFLAGS) -fmudflap" LDFLAGS="$(LDFLAGS) -lmudflap"
 
 clean-hook:
-	-rm -f core.*
+	-rm -f core.* $(CLEANFILES)
 

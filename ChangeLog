@@ -1,5 +1,7 @@
 2007-06-19 Sandro Santilli <strk@keybit.net>
 
+	* gui/Makefile.am: add .configline to CLEANFILES and remove all in
+	  CLEANFILES on make clean (needed for distcheck to complete).
 	* server/generic_character.{cpp,h}: generic character
 	  are not mouse entities by default, so make get_topmost_mouse_entity
 	  return NULL and can_handle_mouse_events return false. Fixes
