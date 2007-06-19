@@ -43,11 +43,6 @@ namespace gnash {
 
 namespace gnash {
   
-  struct variable {
-    std::string name;
-    as_value value;
-  };
-
 /// An interval timer.
 //
 /// This is constructed when _global.setInterval() is called.
