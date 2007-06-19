@@ -1,5 +1,7 @@
 2007-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/bitmap_character_def.h: implement reachable resources
+	  marker.
 	* gui/Makefile.am: add .configline to CLEANFILES and remove all in
 	  CLEANFILES on make clean (needed for distcheck to complete).
 	* server/generic_character.{cpp,h}: generic character

@@ -33,6 +33,7 @@
 #include "utility.h"
 #include "smart_ptr.h"
 #include "bitmap_info.h" // for dtor visibility by intrusive_ptr
+#include "GC.h" // for GcResource (markReachableResources)
 
 #include <cstdarg>
 #include <cassert>
@@ -62,7 +63,7 @@ namespace gnash {
 /// availability of a render_handler in order to transform
 /// image::rgb or image::rgba to a bitmap_info.
 ///
-class bitmap_character_def : public ref_counted
+class bitmap_character_def : public ref_counted // @@ why not character_def ?
 {
 
 public:
@@ -86,6 +87,20 @@ public:
 	bitmap_info* get_bitmap_info() {
 		return _bitmap_info.get();
 	}
+
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources (for GC)
+	//
+	/// Reachable resources are:
+	///	- bitmap info (_bitmap_info)
+	///
+	void markReachableResources() const
+	{
+		if ( _bitmap_info ) _bitmap_info->setReachable();
+	}
+#endif // GNASH_USE_GC
 
 private:
 
