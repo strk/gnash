@@ -73,9 +73,13 @@ public:
 	    assert(m_def);
 	}
 
+	/// generic characters can not handle mouse events, so
+	/// the default implementation returns false.
+	/// override in your subclass to change this
 	virtual bool can_handle_mouse_event() const {
-		assert(m_parent != NULL);
-		return m_parent->can_handle_mouse_event();
+		return false;
+		//assert(m_parent != NULL);
+		//return m_parent->can_handle_mouse_event();
 	}
 
 	virtual void	display()
@@ -91,7 +95,17 @@ public:
 		return m_def->get_bound().getRange();
 	}
 
-	virtual character* get_topmost_mouse_entity(float x, float y);
+	/// Generic character is NEVER a mouse entity by default, so
+	/// the default implementation of this method always returns NULL.
+	/// Override it from subclasses that do can be mouse entities.
+	///
+	/// If you need to check for a generic character to contain a 
+	/// given point, use the pointInShape() function instead.
+	/// 
+	virtual character* get_topmost_mouse_entity(float /*x*/, float /*y*/)
+	{
+		return NULL;
+	}
 
 	// See dox in character.h
 	virtual bool pointInShape(float x, float y) const;

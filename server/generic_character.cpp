@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: generic_character.cpp,v 1.6 2007/04/18 13:24:44 strk Exp $ */
+/* $Id: generic_character.cpp,v 1.7 2007/06/19 10:00:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -56,27 +56,6 @@ generic_character::pointInShape(float x, float y) const
 	point lp(x, y);
 	wm.transform_by_inverse(lp);
 	return m_def->point_test_local(lp.m_x, lp.m_y);
-}
-
-character*
-generic_character::get_topmost_mouse_entity(float x, float y)
-{
-	assert(get_visible());	// caller should check this.
-
-	// @@ is there any generic_character derivate that
-	//    can actually handle mouse events ?
-	if ( ! can_handle_mouse_event() ) return NULL;
-
-	matrix	m = get_matrix();
-	point	p;
-	m.transform_by_inverse(&p, point(x, y));
-
-	if (m_def->point_test_local(p.m_x, p.m_y))
-	{
-		// The mouse is inside the shape.
-		return this;
-	}
-	return NULL;
 }
 
 } // namespace gnash

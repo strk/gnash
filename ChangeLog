@@ -1,5 +1,12 @@
 2007-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/generic_character.{cpp,h}: generic character
+	  are not mouse entities by default, so make get_topmost_mouse_entity
+	  return NULL and can_handle_mouse_events return false. Fixes
+	  bug #20102.
+
+2007-06-19 Sandro Santilli <strk@keybit.net>
+
 	* server/video_stream_instance.{cpp,h}: implement
 	  reachable resources marker.
 
