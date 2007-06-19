@@ -1,3 +1,8 @@
+2007-06-19 Sandro Santilli <strk@keybit.net>
+
+	* server/array.{cpp,h}: implement resource marker
+	  for arrays.
+
 2007-06-18 Alexander Sack <asac@jwsdot.com>
 
 	* configure.ac: detect usable pbutils for automatic installation of

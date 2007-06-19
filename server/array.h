@@ -171,6 +171,18 @@ public:
 	virtual void set_member(const std::string& name,
 		const as_value& val );
 
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark array-specific reachable resources and invoke
+	/// the parent's class version (markAsObjectReachable)
+	//
+	/// array-specific reachable resources are:
+	/// 	- The elements values (elements)
+	///
+	virtual void markReachableResources() const;
+#endif // GNASH_USE_GC
+
 private:
 
 	typedef std::deque<as_value> container;

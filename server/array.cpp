@@ -951,6 +951,17 @@ array_class_init(as_object& glob)
 	glob.init_member("Array", ar.get());
 }
 
+#ifdef GNASH_USE_GC
+void
+as_array_object::markReachableResources() const
+{
+	for (container::const_iterator i=elements.begin(), e=elements.end(); i!=e; ++i)
+	{
+		i->setReachable();
+	}
+	markAsObjectReachable();
+}
+#endif // GNASH_USE_GC
 
 } // end of gnash namespace
 
