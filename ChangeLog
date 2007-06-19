@@ -1,5 +1,7 @@
 2007-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/StreamProvider.cpp (getStream): transfer ownerhip of 
+	  the opened FILE to the tu_file, to plug a memory leak.
 	* server/sprite_instance.{cpp,h}: (markReachableResources):
 	  Mark textfield variables and relative root.
 	  Fixes segfault in movie reported in bug #19883, and also

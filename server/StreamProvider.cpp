@@ -66,7 +66,7 @@ StreamProvider::getStream(const URL& url)
 		if ( path == "-" )
 		{
 			FILE *newin = fdopen(dup(0), "rb");
-			return new tu_file(newin, false);
+			return new tu_file(newin, true); // close by dtor
 		}
 		else
 		{
@@ -74,7 +74,7 @@ StreamProvider::getStream(const URL& url)
 			if (!newin)  { 
 				return NULL;
 			}
-			return new tu_file(newin, false);
+			return new tu_file(newin, true); // close by dtor
 		}
 	}
 	else
