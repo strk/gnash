@@ -44,7 +44,14 @@ public:
 	matrix	m_button_matrix;
 	cxform	m_button_cxform;
 
+
 public:
+
+	button_record()
+		:
+		m_character_def(0)
+	{
+	}
 
 	/// Read a button record from the SWF stream.
 	//
@@ -56,6 +63,18 @@ public:
 	/// A button record is invalid if it refers to a character
 	/// which has not been defined.
 	bool is_valid();
+
+#ifdef GNASH_USE_GC
+	/// Mark all reachable resources (for GC)
+	//
+	/// Reachable resources are:
+	///  - m_character_def (??) what's it !?
+	///
+	void markReachableResources() const
+	{
+		if ( m_character_def ) m_character_def->setReachable();
+	}
+#endif // GNASH_USE_GC
 
 };
 	
@@ -113,18 +132,53 @@ public:
 		uint16_t m_sound_id;
 		sound_sample*	m_sam;
 		sound_info m_sound_style;
+
+		button_sound_info()
+			:
+			m_sam(0)
+		{
+		}
+
+#ifdef GNASH_USE_GC
+		/// Mark all reachable resources (for GC)
+		//
+		/// Reachable resources are:
+		///  - sound sample (m_sam)
+		///
+		void markReachableResources() const;
+#endif // GNASH_USE_GC
 	};
 
 	struct button_sound_def
 	{
 		void	read(stream* in, movie_definition* m);
 		button_sound_info m_button_sounds[4];
+
+#ifdef GNASH_USE_GC
+		/// Mark all reachable resources (for GC)
+		//
+		/// Reachable resources are:
+		///  - button sound infos (m_button_sounds)
+		///
+		void markReachableResources() const
+		{
+			for (int i=0; i<4; ++i)
+			{
+				m_button_sounds[i].markReachableResources();
+			}
+		}
+#endif // GNASH_USE_GC
 	};
 
 
 	bool m_menu;
-	std::vector<button_record>	m_button_records;
-	std::vector<button_action>	m_button_actions;
+
+	typedef std::vector<button_record> ButtonRecVect; 
+	ButtonRecVect m_button_records;
+
+	typedef std::vector<button_action> ButtonActVect;
+	ButtonActVect m_button_actions;
+
 	button_sound_def*	m_sound;
 
 	button_character_definition();
@@ -153,6 +207,25 @@ public:
     assert(0); // not implemented
   }
 	
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark all reachable resources (for GC)
+	//
+	/// Reachable resources are:
+	///  - button records (m_button_records)
+	///  - button sound definition (m_sound)
+	///
+	void markReachableResources() const
+	{
+		assert(isReachable());
+		for (ButtonRecVect::const_iterator i=m_button_records.begin(), e=m_button_records.end(); i!=e; ++i)
+		{
+			i->markReachableResources();
+		}
+		if ( m_sound ) m_sound->markReachableResources();
+	}
+#endif // GNASH_USE_GC
 };
 
 }	// end namespace gnash

@@ -1004,6 +1004,7 @@ protected:
 	///	- Canvas for dynamic drawing (_drawable)
 	///	- Drawable instance (_drawable_inst)
 	///	- sprite environment
+	///	- definition the sprite has been instantiated from
 	///
 	virtual void markReachableResources() const;
 #endif // GNASH_USE_GC

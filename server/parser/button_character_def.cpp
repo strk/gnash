@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.12 2007/05/24 13:46:24 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.13 2007/06/19 18:42:50 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -333,7 +333,15 @@ button_character_definition::create_character_instance(
 	return ch;
 }
 
+#ifdef GNASH_USE_GC
+void
+button_character_definition::button_sound_info::markReachableResources() const
+{
+	if ( m_sam ) m_sam->setReachable();
 }
+#endif // GNASH_USE_GC
+
+} // namespace gnash
 
 // Local Variables:
 // mode: C++

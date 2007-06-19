@@ -211,6 +211,17 @@ public:
     return get_bounds(); 
   }
 	
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark all reachable resources (for GC)
+	//
+	/// Reachable resources are:
+	///  - The root movie definition (m_root_def) @@ what do we use this for ?
+	///  - The font being used (m_font) 
+	///
+	void markReachableResources() const;
+#endif // GNASH_USE_GC
 
 private:
 

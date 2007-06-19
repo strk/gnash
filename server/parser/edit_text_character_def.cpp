@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character_def.cpp,v 1.8 2007/04/18 14:07:32 jgilmore Exp $ */
+/* $Id: edit_text_character_def.cpp,v 1.9 2007/06/19 18:42:50 strk Exp $ */
 
 // Based on the public domain text.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -27,6 +27,7 @@
 
 #include "edit_text_character_def.h"
 #include "edit_text_character.h"
+#include "font.h" // for setReachable call
 
 namespace gnash {
 
@@ -155,6 +156,15 @@ edit_text_character_def::create_character_instance(character* parent,
 
 	return ch;
 }
+
+#ifdef GNASH_USE_GC
+void
+edit_text_character_def::markReachableResources() const
+{
+	if ( m_root_def ) m_root_def->setReachable();
+	if ( m_font ) m_font->setReachable();
+}
+#endif // GNASH_USE_GC
 
 } // namespace gnash
 

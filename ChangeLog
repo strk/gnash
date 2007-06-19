@@ -1,5 +1,14 @@
 2007-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.h: document another
+	  reachable resource (was marked already, just not documented
+	  as such).
+	* server/parser/: button_character_def.{cpp,h},
+	  edit_text_character_def.{cpp,h}:
+	  Implement reachable resources marker.
+
+2007-06-19 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/bitmap_character_def.h: implement reachable resources
 	  marker.
 	* gui/Makefile.am: add .configline to CLEANFILES and remove all in
