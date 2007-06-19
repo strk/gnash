@@ -1,5 +1,10 @@
 2007-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/video_stream_instance.{cpp,h}: implement
+	  reachable resources marker.
+
+2007-06-19 Sandro Santilli <strk@keybit.net>
+
 	* server/array.{cpp,h}: implement resource marker
 	  for arrays.
 
