@@ -4013,6 +4013,21 @@ sprite_instance::markReachableResources() const
 	// Mark our own definition
 	if ( m_def.get() ) m_def->setReachable();
 
+	// Mark textfields in the TextfieldMap
+	if ( _text_variables.get() )
+	{
+		for(TextfieldMap::const_iterator i=_text_variables->begin(),
+					e=_text_variables->end();
+				i!=e; ++i)
+		{
+			i->second->setReachable();
+		}
+	}
+
+	// Mark our relative root
+	assert(m_root != NULL);
+	m_root->setReachable();
+
 	markCharacterReachable();
 
 }

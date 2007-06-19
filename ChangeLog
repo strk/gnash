@@ -1,5 +1,12 @@
 2007-06-19 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: (markReachableResources):
+	  Mark textfield variables and relative root.
+	  Fixes segfault in movie reported in bug #19883, and also
+	  shows that the GC model does it's job in this case.
+
+2007-06-19 Sandro Santilli <strk@keybit.net>
+
 	* gui/NullGui.{cpp,h}: implement setTimeout
 	  call. fixes bug #20118.
 

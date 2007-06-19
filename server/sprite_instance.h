@@ -1005,6 +1005,8 @@ protected:
 	///	- Drawable instance (_drawable_inst)
 	///	- sprite environment
 	///	- definition the sprite has been instantiated from
+	///	- Textfields having an associated variable registered in this instance.
+	///	- Relative root of this instance (m_root)
 	///
 	virtual void markReachableResources() const;
 #endif // GNASH_USE_GC
