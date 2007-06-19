@@ -28,22 +28,17 @@
 
 namespace ACT {
 	//-------------------------
-	template< class T >
-	Scheduling_Queue< T >::
+	template< class T, class Aux >
+	Scheduling_Queue< T, Aux >::
 	Scheduling_Queue()
 		: n_queue_items( 0 )
 	{}
 
 	//-------------------------
-	/*
-The problem here is that the free list isn't ordered as it should be.
-Or else the problem here is that something.
-Blargh.
-	 */
-	template< class T >
-	typename Scheduling_Queue< T >::pointer
-	Scheduling_Queue< T >::
-	push( const_reference item )
+	template< class T, class Aux >
+	typename Scheduling_Queue< T, Aux >::pointer
+	Scheduling_Queue< T, Aux >::
+	push( const_reference item, const typename Aux::constructor_parameter auxiliary )
 	{
 		size_t permutation_index ;
 		// The new queue-index in both cases is n_queue_items, which is incremented afterwards.
@@ -51,26 +46,27 @@ Blargh.
 			// Assert the_queue has no deleted elements
 			// In this case the permutation index is the mutual size of the queue and the permutation.
 			permutation_index = n_queue_items ;
-			the_queue.push_back( Scheduled_Item< T >( item, permutation_index ) ) ;	// operator[] would throw here
-			permutation.push_back( n_queue_items ) ;								// ditto
+			the_queue.push_back( Scheduled_Item< T >( item, permutation_index ) ) ;								// operator[] would throw here
+			permutation.push_back( Auxiliary_Item< Aux >( n_queue_items, permutation_index, auxiliary ) ) ;		// ditto
 		} else {
 			// Assert n_queue_items < the_queue.size()
 			// Assert the_queue has at least one deleted element
 			// In this case the permutation index to use it that of the first deleted element
 			permutation_index = the_queue[ n_queue_items ].permutation_index ;
 			the_queue[ n_queue_items ] = Scheduled_Item< T >( item, permutation_index ) ;	// note that the Scheduled_Item is the same as above
-			permutation[ permutation_index ] = n_queue_items ;
+			// The reconstruct() call is ordinarily a no-op, since a wakeup_listener can be reused.
+			// This call is present to support a possible aspect in the Auxiliary.
+			permutation[ permutation_index ].the_auxiliary.reconstruct( auxiliary ) ;
 		}
 		++ n_queue_items ;
-
 		size_t n = up_heap( n_queue_items - 1 ) ;
-		return pointer( n, this ) ;
+		return pointer( permutation_index, this ) ;
 	}
 
 	//-------------------------
-	template< class T >
+	template< class T, class Aux >
 	void
-	Scheduling_Queue< T >::
+	Scheduling_Queue< T, Aux >::
 	pop()
 	{
 		-- n_queue_items ;
@@ -79,21 +75,33 @@ Blargh.
 	}
 
 	//-------------------------
-	template< class T >
+	template< class T, class Aux >
 	void
-	Scheduling_Queue< T >::
+	Scheduling_Queue< T, Aux >::
 	reorder( pointer p )
 	{
-		size_t z = permutation[ p.index ] ;
+		size_t z = permutation[ p.index ].priority_queue_index ;
 		size_t x = down_heap( z ) ;
 		if ( z != x ) return ;
 		(void) up_heap( z ) ;
 	}
 
 	//-------------------------
-	template< class T >
+	template< class T, class Aux >
 	void
-	Scheduling_Queue< T >::
+	Scheduling_Queue< T, Aux >::
+	reorder( size_t permutation_index )
+	{
+		size_t z( permutation[ permutation_index ].priority_queue_index ) ;
+		size_t x( down_heap( z ) ) ;
+		if ( z != x ) return ;
+		(void) up_heap( z ) ;
+	}
+
+	//-------------------------
+	template< class T, class Aux >
+	void
+	Scheduling_Queue< T, Aux >::
 	swap( size_t x, size_t y )
 	{
 		// Swap the items
@@ -102,17 +110,17 @@ Blargh.
 		the_queue[ y ] = tmp ;
 
 		// Update the permutation
-		permutation[ the_queue[ x ].permutation_index ] = x ;
-		permutation[ the_queue[ y ].permutation_index ] = y ;
+		permutation[ the_queue[ x ].permutation_index ].priority_queue_index = x ;
+		permutation[ the_queue[ y ].permutation_index ].priority_queue_index = y ;
 	}
 
 	//-------------------------
 	/** \par Implementation
 	 *	This algorithm treat the_queue as an implicit binary heap.
 	 */
-	template< class T >
+	template< class T, class Aux >
 	size_t
-	Scheduling_Queue< T >::
+	Scheduling_Queue< T, Aux >::
 	up_heap( size_t item )
 	{
 		//	Guards:
@@ -135,9 +143,9 @@ Blargh.
 	/** \par Implementation
 	 *	This algorithm treat the_queue as an implicit binary heap.
 	 */
-	template< class T >
+	template< class T, class Aux >
 	size_t
-	Scheduling_Queue< T >::
+	Scheduling_Queue< T, Aux >::
 	down_heap( size_t item )
 	{
 		//

@@ -24,7 +24,7 @@
 #ifndef __Listening_Actions_hpp__
 #define __Listening_Actions_hpp__
 
-#include "ACT/ACT.hpp"
+#include "ACT/Scheduler.hpp"
 #include "Action_Tracing.hpp"
 #include <boost/optional.hpp>
 #include <vector>
@@ -40,6 +40,9 @@ namespace ACT {
 	class N_to_completion_Monitor
 		: public simple_act
 	{
+		/// A vector of schedulers
+		static std::vector< wakeup_listener::scheduler_pointer > schedulers ;
+
 		std::vector< wakeup_listener * > listeners ;
 
 		act_state run() ;
@@ -51,7 +54,7 @@ namespace ACT {
 		/// Query whether there are any actions registered for wakeup.
 		inline bool empty() { return listeners.empty() ; }
 
-		void add( N_to_completion *, wakeup_listener * ) ;
+		void add_wakeup_item( N_to_completion *, wakeup_listener * ) ;
 	} ;
 
 	//-------------------------

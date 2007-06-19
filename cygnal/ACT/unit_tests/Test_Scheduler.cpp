@@ -31,8 +31,7 @@ using namespace ACT ;
 
 BOOST_AUTO_UNIT_TEST( null )
 {
-	Basic_Scheduler & b = Basic_Scheduler::obtain_scheduler() ;
-	BOOST_REQUIRE( b.empty() ) ;
+	Basic_Scheduler b ;
 
 	execution_trace tr ;
 	b.add_task( act( new no_action( new simple_tracker( tr, "N" ) ) ) ) ;
@@ -44,12 +43,12 @@ BOOST_AUTO_UNIT_TEST( null )
 	std::string expected( "ABC" ) ;
 	BOOST_CHECK_MESSAGE( tr.result() == expected,
 		"Found result " << tr.result() << ". Expected result " << expected << "." ) ;
+	BOOST_CHECK( b.empty() ) ;
 }
 
 BOOST_AUTO_UNIT_TEST( act_n_interleaved )
 {
-	Basic_Scheduler & b = Basic_Scheduler::obtain_scheduler() ;
-	b.reset() ;
+	Basic_Scheduler b ;
 	BOOST_REQUIRE( b.empty() ) ;
 
 	execution_trace tr ;
@@ -61,6 +60,7 @@ BOOST_AUTO_UNIT_TEST( act_n_interleaved )
 	std::string expected( "ABCABCBCCC" ) ;
 	BOOST_CHECK_MESSAGE( tr.result() == expected,
 		"Found result " << tr.result() << ". Expected result " << expected << "." ) ;
+	BOOST_CHECK( b.empty() ) ;
 }
 
 //--------------------------------------------------
@@ -68,7 +68,7 @@ BOOST_AUTO_UNIT_TEST( act_n_interleaved )
 
 BOOST_AUTO_UNIT_TEST( pause_action )
 {
-	Basic_Scheduler & b = Basic_Scheduler::obtain_scheduler() ;
+	Basic_Scheduler b ;
 	BOOST_REQUIRE( b.empty() ) ;
 
 	Pause_Service x( & b ) ;

@@ -74,19 +74,42 @@ namespace ACT {
 		}
 	} ;
 
+
+	//-------------------------
+	/** \class Scheduled_Item
+	 *	\brief The full data that goes into the scheduling queue.
+	 *		It includes the underlying item plus extra housekeeping information.
+	 */
+	template< class Aux >
+	struct Auxiliary_Item
+	{
+		/// Index into the priority queue.
+		size_t priority_queue_index ;
+
+		/// The auxiliary item held at fixed location.
+		/// Designed for wakeup_listener.
+		Aux the_auxiliary ;
+
+		/// Ordinary constructor
+		Auxiliary_Item( size_t x, size_t permutation_index, typename Aux::constructor_parameter z )
+			: priority_queue_index( x ), 
+			the_auxiliary( permutation_index, z ) 
+		{} ;
+	} ;
+
 	//-------------------------
 	/** \class Scheduled_Item_Pointer
 	 */
-	template< class T >
+	template< class T, class Aux >
 	class Scheduled_Item_Pointer
 	{
-		template< class T > friend class Scheduling_Queue ;
+		template< class T, class Aux > friend class Scheduling_Queue ;
 
 		size_t index ;
 
-		Scheduling_Queue< T > * the_scheduling_queue ;
+		Scheduling_Queue< T, Aux > * the_scheduling_queue ;
 
-		Scheduled_Item_Pointer( size_t x, Scheduling_Queue< T > * y )
+		Scheduled_Item_Pointer( size_t x, Scheduling_Queue< T, Aux > * y )
 			: index( x ), the_scheduling_queue( y ) {}
 	public:
 		inline T & operator*() {
@@ -110,8 +133,8 @@ namespace ACT {
 	 *	These extra permutation indices constitute a "free list" of available permutation slots for the creation of pointers.
 	 *
 	 *	\invariant
-	 *	- (bijective permutation) permutation[ the_queue[ x ].permutation_index ] == x
-	 *	- (bijective permutation) the_queue[ permutation[ y ] ].permutation_index == y
+	 *	- (bijective permutation) permutation[ the_queue[ x ].permutation_index ].priority_queue_index == x
+	 *	- (bijective permutation) the_queue[ permutation[ y ].priority_queue_index ].permutation_index == y
 	 *	- n_queue_items <= the_queue.size
 	 *	- permutation.size() == the_queue.size()
 	 *
@@ -121,10 +144,12 @@ namespace ACT {
 	 *	It might be more efficient later to put them in the same container 
 	 *		and provide adapters to simulate separate arrays.
 	 */
-	template< class T >
+	template< class T, class Aux >
 	class Scheduling_Queue
 	{
-		template< class T > friend class Scheduled_Item_Pointer ;
+		// friends
+		template< class T, class Aux > friend class Scheduled_Item_Pointer ;
+		friend class wakeup_listener ;
 
 		/// The main queue for scheduled items.
 		std::vector< Scheduled_Item< T > > the_queue ;
@@ -134,7 +159,7 @@ namespace ACT {
 		size_t n_queue_items ;
 
 		/// The heap functions maintain a permutation that provide a constant pointer into the item queue.
-		std::vector< size_t > permutation ;
+		std::vector< Auxiliary_Item< Aux > > permutation ;
 
 		/// Swap two elements within the queue.
 		/// Adjust the permutation accordingly.
@@ -155,12 +180,12 @@ namespace ACT {
 
 		/// Item accessor for implementation of indirection in Scheduled_Item_Pointer
 		T & item( size_t x ) {
-			return the_queue[ permutation[ x ] ].the_underlying_item ;
+			return the_queue[ permutation[ x ].priority_queue_index ].the_underlying_item ;
 		}
 
 		/// Item accessor for implementation of indirection in Scheduled_Item_Pointer
 		T * item_ptr( size_t x ) {
-			return & the_queue[ permutation[ x ] ].the_underlying_item ;
+			return & the_queue[ permutation[ x ].priority_queue_index ].the_underlying_item ;
 		}
 
 	public:
@@ -168,7 +193,7 @@ namespace ACT {
 		typedef T value_type ;
 
 		/// We have a pointer type rather than an iterator type, since we cannot increment through the queue.
-		typedef Scheduled_Item_Pointer< T > pointer ;
+		typedef Scheduled_Item_Pointer< T, Aux > pointer ;
 
 		/// A reference to a member of the queue
 		typedef value_type & reference ;
@@ -183,7 +208,7 @@ namespace ACT {
 		///
 		/// Note that the signature of this function differs from that of std::priority_queue, which returns void.
 		/// We require a reference to be able to asynchronously wake up an action.
-		pointer push( const_reference ) ;
+		pointer push( const_reference, const typename Aux::constructor_parameter auxiliary ) ;
 
 		/// Constant access to the top-priority item in the queue.
 		reference top() { return the_queue[ 0 ].the_underlying_item ; }
@@ -194,11 +219,20 @@ namespace ACT {
 		/// Remove the top item from the queue
 		void pop() ;
 
+		/// Reorder the position of the indexed item.  Use this after its priority changes.
+		void reorder( size_t ) ;
+
 		/// Reorder the position of the pointed-to item.  Use this after its priority changes.
 		void reorder( pointer ) ;
 
 		/// Return is true if queue has no items of any kind in it, waiting or not.
 		bool empty() { return n_queue_items == 0 ; }
+
+		///
+		inline Aux & auxiliary( size_t x ) { return permutation[ x ].the_auxiliary ; }
+
+		///
+		inline Aux * auxiliary_top() { return & permutation[ the_queue[ 0 ].permutation_index ].the_auxiliary ; }
 	} ;
 
 } // end namespace ACT

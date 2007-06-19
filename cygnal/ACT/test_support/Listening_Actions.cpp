@@ -28,6 +28,8 @@ namespace ACT {
 	//--------------------------------------------------
 	// N_to_completion_Monitor
 	//--------------------------------------------------
+	std::vector< wakeup_listener::scheduler_pointer > N_to_completion_Monitor::schedulers ;
+
 	N_to_completion_Monitor::
 	N_to_completion_Monitor()
 		: listeners( 0 )
@@ -35,7 +37,7 @@ namespace ACT {
 
 	void
 	N_to_completion_Monitor::
-	add( N_to_completion *, wakeup_listener * w )
+	add_wakeup_item( N_to_completion *, wakeup_listener * w )
 	{
 		// Assert this instance is registered in the scheduler and will eventually run.
 		// Note: as of this writing, there's no way for an object to register itself with the scheduler.
@@ -51,6 +53,11 @@ namespace ACT {
 	N_to_completion_Monitor::
 	run()
 	{
+		if ( listeners.empty() ) {
+			// This monitor is no longer necessary, since there's nothing to wake up.
+			// Therefore we return complete and let the scheduler remove this instance.
+			return Completed ;
+		}
 		while ( ! listeners.empty() ) {
 			( * listeners.back() )() ;
 			listeners.pop_back() ;
@@ -99,12 +106,13 @@ namespace ACT {
 	N_to_completion::
 	register_for_wakeup( wakeup_listener * w )
 	{
+		if ( w == 0 ) return ;
 		if ( the_monitor.get() == 0 ) {
 			the_monitor = shared_ptr< monitor_type >( new monitor_type() ) ;
-			Basic_Scheduler::obtain_scheduler().add_service( act( the_monitor ) ) ;
+			w -> scheduler() -> add_service( act( the_monitor ) ) ;
 		}
 		// Assert monitor exists
-		the_monitor -> add( this, w ) ;
+		the_monitor -> add_wakeup_item( this, w ) ;
 	}
 
 	//-------------------------

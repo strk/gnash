@@ -32,6 +32,6 @@
 
 namespace ACT {
 	// Explicit template instantiation.
-	template Scheduling_Queue< Basic_Scheduled_Item > ;
+	template Basic_Scheduler::queue_type ;
 
 } // end namespace ACT

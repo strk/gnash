@@ -32,27 +32,81 @@
 
 namespace ACT {
 
-	//using boost::posix_time::ptime ;
-
 	//-------------------------
-	/* Forward declarations for Basic_Wakeup_Listener
+	/* Forward declarations for wakeup_listener
 	 */
 	struct Basic_Scheduled_Item ;
+	class Basic_Scheduler ;
+	class wakeup_listener_allocated ;
 
 	//-------------------------
-	class Basic_Wakeup_Listener
-		: public wakeup_listener
+	/**	\class wakeup_listener_allocated
+	 *	\brief A managed-storage wrapper for wakeup listener as it's used with the Scheduling_Queue
+	 *
+	 *	\par Plans
+	 *	This class uses the ordinary heap for allocation on an item-by-item basis.
+	 *	Since we know that we must have one object of this class allocated for each task,
+	 *		we can optimize this memory use by allocating in bulk and providing a custom allocator.
+	 *	On the other hand, since these objects are allocated only during the growth phase,
+	 *		this allocation strategy has no performance penalty in the steady state,
+	 *		except to the extent that excess memory usage causes unnecessary swapping.
+	 */
+	class wakeup_listener_allocated
 	{
 	public:
 		///
-		typedef Scheduling_Queue< Basic_Scheduled_Item >::pointer item_pointer ;
+		typedef Basic_Scheduler * scheduler_pointer ;
+		// typedef wakeup_listener::scheduler_pointer scheduler_pointer ;
 
 		///
-		typedef Scheduling_Queue< Basic_Scheduled_Item > * scheduler_pointer ;
+		typedef scheduler_pointer constructor_parameter ;
 
 	private:
+		/// The wrapped pointer
+		///
+		/// I'm using a shared_ptr here because this class must have a copy constructor for std::vector resizing.
+		/// An auto_ptr won't work with the default copy constructor.
+		boost::shared_ptr< wakeup_listener > the_wakeup_listener ;
+
+	public:
+		/// Ordinary constructor used after item is within a scheduling queue and its storage location is known.
+		wakeup_listener_allocated( size_t x, scheduler_pointer y ) ;
+
+		///
+		wakeup_listener * get() const { return the_wakeup_listener.get() ; }
+
+		///
+		inline void reconstruct( scheduler_pointer ) {} ;
+	} ;
+
+	//-------------------------
+	/** \class wakeup_listener
+	 *	\brief The 'A' in ACT means 'asynchronous', so in general there must be a way of notifying
+	 *		a scheduler that an inactive ACT, one that has a pending sub-action, is ready to proceed.
+	 *	This class is the interface between a scheduler and such an ACT.
+	 *
+	 *	The archetype of a notification is that from an asynchronous system I/O call.
+	 *	These notifications arrive various by event, queue item, callback, signal, and others.
+	 *	Notification is a mechanism crying out for implementation hiding by means of an abstraction.
+	 *	This type provides a standard way to do so.
+	 *
+	 *	The implementation pattern is an ACT call a wakeup_listener and that a scheduler
+	 *		provide the function so called.
+	 *	The scheduler should encapsulate its own notification receiver, however structured,
+	 *		into a function object of this class, say, by binding a member function adapter.
+	 */
+	class wakeup_listener
+	{
+	public:
+		///
+		typedef Basic_Scheduler * scheduler_pointer ;
+
+	private:
+		///
+		typedef Scheduling_Queue< Basic_Scheduled_Item, wakeup_listener_allocated > queue_type ;
+
 		/// A pointer to the item to reschedule.
-		item_pointer the_item ;
+		size_t permutation_index ;
 
 		/// We use the scheduler to reorder an item after we change its priority.
 		scheduler_pointer the_scheduler ;
@@ -61,9 +115,12 @@ namespace ACT {
 		/// The listener body.
 		void operator()() ;
 
+		/// Accessor for the scheduler
+		inline scheduler_pointer scheduler() const { return the_scheduler ; }
+
 		/// Ordinary constructor used after item is within a scheduling queue and its storage location is known.
-		Basic_Wakeup_Listener( item_pointer x, scheduler_pointer y )
-			: the_item( x ), the_scheduler( y ) {}
+		wakeup_listener( size_t x, scheduler_pointer y )
+			: permutation_index( x ), the_scheduler( y ) {}
 	} ;
 
 	//-------------------------
@@ -112,6 +169,9 @@ namespace ACT {
 	//-------------------------
 	struct Basic_Scheduled_Item
 	{
+		///
+		Action_Category action_type ;
+
 		/// 
 		Basic_Priority priority_category ;
 
@@ -122,10 +182,7 @@ namespace ACT {
 		act the_action ;
 
 		///
-		Basic_Scheduled_Item( act, unsigned int, Basic_Priority = Initial ) ;
-
-		///
-		boost::optional< Basic_Wakeup_Listener > listener ;
+		Basic_Scheduled_Item( act x, unsigned int n, Action_Category action_type = Task ) ;
 
 		/// Comparison operator for the priority queue
 		bool operator<( const Basic_Scheduled_Item & ) const ;
@@ -135,7 +192,13 @@ namespace ACT {
 	class Basic_Scheduler
 	{
 		///
-		typedef Scheduling_Queue< Basic_Scheduled_Item >::pointer item_pointer ;
+		friend wakeup_listener ;
+
+		/// The type of our internal queue.
+		typedef Scheduling_Queue< Basic_Scheduled_Item, wakeup_listener_allocated > queue_type ;
+
+		///
+		typedef queue_type::pointer item_pointer ;
 
 		/// Activate the next action once.
 		void activate_one_item() ;
@@ -144,18 +207,18 @@ namespace ACT {
 		bool operating ;
 
 		/// The live activation queue.
-		Scheduling_Queue< Basic_Scheduled_Item > the_queue ;
+		queue_type the_queue ;
+
+		/// Getter method for wakeup_listener
+		inline queue_type & queue() { return the_queue ; }
 
 		/// Increasing sequence numbers upon scheduling implements a kind of LRU activation policy.
 		unsigned int next_sequence_number ;
 
+	public:
 		/// Default constructor is private to enforce singleton
 		Basic_Scheduler() ;
 
-		///
-		static Basic_Scheduler the_instance ;
-
-	public:
 		/// Add an ordinary task into the scheduling queue.
 		void add_task( act ) ;
 
@@ -179,9 +242,6 @@ namespace ACT {
 
 		///
 		void reset() ;
-
-		/// Factory method for singleton pattern
-		static Basic_Scheduler & obtain_scheduler() ;
 	} ;
 
 } // end namespace ACT

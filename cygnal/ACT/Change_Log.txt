@@ -1,0 +1,32 @@
+2007-06-19 Eric Hughes <eh@narthex.us>
+	Added a completion check for the test listening action.
+	All unit tests now fully pass.
+
+2007-06-19 Eric Hughes <eh@narthex.us>
+	Added wakeup_listener_allocated to be the auxiliary object in the scheduling queue.
+	Changed constructor for old auxiliary items into a call to reconstruct on the old object.
+	Eliminated identifier Basic_Wakeup_Listener.
+
+2007-06-18 Eric Hughes <eh@narthex.us>
+	Removed singleton construction for Scheduler.
+	
+2007-06-17 Eric Hughes <eh@narthex.us>
+	Changed activate_one_item to use a queue pointer rather than a reference.  A reference points to a single location in the priority queue (which reorders itself), whereas a pointer points to the same entry as it moves around.
+	Changed index version of reorder to use a permutation_index.
+
+2007-06-17 Eric Hughes <eh@narthex.us>
+	Changed wakeup_listener to store a permutation_index rather than a pointer.  This eliminates an essential duplication, having stored both the scheduler and its queue addresses both.
+	Expanded permutation vector to incorporate an auxiliary object, used to hold wakeup_listener.	
+	Changed interface to push to take this auxiliary object.
+	Added a reorder( size_t ) call that directly takes the permutation_index in wakeup_listener.
+
+2007-06-17 Eric Hughes <eh@narthex.us>
+	Found defect with wakeup_listener allocated with queue_item, so pointers to such aren't stable.
+	Added another class parameter to Scheduling_Queue etc. in preparation for storing wakeup_listener stably.
+
+2007-06-16 Eric Hughes <eh@narthex.us>
+	Added guard for wakeup to require a listener present.
+	Moved wakeup_listener from ACT.hpp to Scheduler.hpp
+	Added scheduler accessor to wakeup_listener.  Will allow removal of singleton.
+	Added action type to scheduled item.  Fixed comparison function.
+	Implemented add_service.

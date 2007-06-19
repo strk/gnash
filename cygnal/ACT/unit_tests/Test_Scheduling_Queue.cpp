@@ -29,40 +29,41 @@
 
 // Include this implementation file in order to instantiate template
 #include "ACT/Scheduling_Queue.cpp"
-namespace ACT {
-	/** A test item to put into a scheduling queue.
-	 */
-	class test_item {
-		size_t it ;
-	public:
-		explicit test_item( size_t x )
-			: it( x ) {}
 
-		bool operator<( const test_item & x ) const { return it < x.it ; }
-		inline bool operator==( unsigned int x ) const { return it == x ; }
-		size_t get() { return it ; }
-		void set( size_t n ) { it = n ; }
-	} ;
+/** A test item to put into a scheduling queue.
+ */
+class test_item {
+	size_t it ;
+public:
+	explicit test_item( size_t x )
+		: it( x ) {}
 
-	// Explicit instantiation
-	template Scheduling_Queue< test_item > ;
-}
+	bool operator<( const test_item & x ) const { return it < x.it ; }
+	inline bool operator==( unsigned int x ) const { return it == x ; }
+	size_t get() { return it ; }
+	void set( size_t n ) { it = n ; }
+} ;
+
+// Explicit instantiation
+template ACT::Scheduling_Queue< test_item, ACT::wakeup_listener_allocated > ;
+
+typedef ACT::Scheduling_Queue< test_item, ACT::wakeup_listener_allocated > queue_type ;
+typedef queue_type::pointer pointer ;
 
 using namespace ACT ;
-typedef Scheduling_Queue< test_item >::pointer pointer ;
 
 //--------------------------------------------------
 BOOST_AUTO_UNIT_TEST( simple_queue_exercise )
 {
-	Scheduling_Queue< test_item > q ;
+	queue_type q ;
 
 	test_item a( 1 ) ;
 	test_item b( 2 ) ;
 	test_item c( 3 ) ;
 
-	q.push( a ) ;
-	q.push( b ) ;
-	q.push( c ) ;
+	q.push( a, 0 ) ;
+	q.push( b, 0 ) ;
+	q.push( c, 0 ) ;
 
 	pointer x( q.top_ptr() ) ;
 	test_item it = * x ;
@@ -80,12 +81,12 @@ BOOST_AUTO_UNIT_TEST( simple_queue_exercise )
 void
 add_then_test_order( permutation_iterator::const_iterator begin, permutation_iterator::const_iterator end )
 {
-	Scheduling_Queue< test_item > q ;
+	queue_type q ;
 	size_t permutation_size = end - begin ;
 
 	size_t j ;
 	for ( j = 0 ; j < permutation_size ; ++ j ) {
-		q.push( test_item( * begin ++ ) ) ;
+		q.push( test_item( * begin ++ ), 0 ) ;
 	}
 	for ( j = 0 ; j < permutation_size ; ++ j ) {
 		pointer p( q.top_ptr() ) ;
@@ -114,15 +115,15 @@ BOOST_AUTO_TEST_GENERATOR( ordering_random1_, random_permutation( add_then_test_
 //--------------------------------------------------
 BOOST_AUTO_UNIT_TEST( another_simple_queue_exercise )
 {
-	Scheduling_Queue< test_item > q ;
+	queue_type q ;
 
 	test_item a( 4 ) ;
 	test_item b( 5 ) ;
 	test_item c( 6 ) ;
 
-	q.push( a ) ;
-	q.push( b ) ;
-	q.push( c ) ;
+	q.push( a, 0 ) ;
+	q.push( b, 0 ) ;
+	q.push( c, 0 ) ;
 
 	pointer x( q.top_ptr() ) ;
 	test_item it = * x ;
@@ -172,7 +173,7 @@ typedef vector_type::const_iterator const_iterator ;
 void
 add_then_reorder( const iterator begin, iterator middle, iterator end )
 {
-	Scheduling_Queue< test_item > q ;
+	queue_type q ;
 
 	size_t n = middle - begin ;
 	size_t n2 = end - middle ;
@@ -183,7 +184,7 @@ add_then_reorder( const iterator begin, iterator middle, iterator end )
 	/* Add elements to the queue from middle to end
 	 */
 	for ( j = 0 ; j < n2 ; ++ j ) {
-		q.push( test_item( * i ++ ) ) ;
+		q.push( test_item( * i ++ ), 0 ) ;
 	}
 	i = begin ;
 	for ( j = 0 ; j < n ; ++ j ) {
@@ -231,14 +232,14 @@ BOOST_AUTO_UNIT_TEST( parametric_add_permuted_reorder_all )
 void
 add_then_wakeup( const iterator begin, const iterator middle, const iterator end )
 {
-	Scheduling_Queue< test_item > q ;
+	queue_type q ;
 	const size_t number_of_elements = middle - begin ;
 	size_t j ;
 	iterator i( begin ) ;
 	std::vector< pointer > pp ;
 
 	while ( i != middle ) {
-		pp.push_back( q.push( test_item( * i ++ ) ) ) ;
+		pp.push_back( q.push( test_item( * i ++ ), 0 ) ) ;
 	}
 	BOOST_REQUIRE( i - begin == number_of_elements ) ;
 

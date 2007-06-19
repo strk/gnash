@@ -28,39 +28,61 @@ namespace ACT {
 	// Basic_Scheduled_Item
 	//--------------------------------------------------
 	Basic_Scheduled_Item::
-	Basic_Scheduled_Item( act x, unsigned int n, Basic_Priority p )
+	Basic_Scheduled_Item( act x, unsigned int n, Action_Category action_type )
 		: the_action( x ),
 		sequence_number( n ),
-		priority_category( p )
-	{}
+		action_type( action_type )
+	{
+		switch ( action_type ) {
+			case Task :
+				priority_category = Initial ;
+				break ;
+			case Service :
+				priority_category = Background ;
+				break ;
+			default :
+				priority_category = Background ;
+				break ;
+		}
+	}
 
 	//-------------------------
 	bool
 	Basic_Scheduled_Item::
 	operator<( const Basic_Scheduled_Item & x ) const
 	{
-		return	priority_category < x.priority_category
-			||	sequence_number > x.sequence_number ;
+		return	priority_category > x.priority_category
+			||	(		priority_category == x.priority_category 
+					&&	sequence_number > x.sequence_number 
+				) ;
+	}
+
+	//--------------------------------------------------
+	// wakeup_listener_allocated
+	//--------------------------------------------------
+	wakeup_listener_allocated::
+	wakeup_listener_allocated( size_t x, scheduler_pointer y )
+		: the_wakeup_listener( new wakeup_listener( x, y ) ) {}
+
+	//--------------------------------------------------
+	// wakeup_listener
+	//--------------------------------------------------
+	void
+	wakeup_listener::
+	operator()()
+	{
+		queue_type & the_queue = the_scheduler -> queue() ;
+		the_queue.item( permutation_index ).priority_category = Ordinary ;
+		the_queue.reorder( permutation_index ) ;
 	}
 
 	//--------------------------------------------------
 	// Basic_Scheduler
 	//--------------------------------------------------
-	// Class member initialization
-	Basic_Scheduler Basic_Scheduler::the_instance ;
-
-	//-------------------------
-	// Class factory function member
-	Basic_Scheduler & 
-	Basic_Scheduler::obtain_scheduler()
-	{
-		return the_instance ;
-	}
-
-	//-------------------------
 	Basic_Scheduler::
 	Basic_Scheduler()
-		: operating( true )
+		: operating( true ),
+		next_sequence_number( 1 )
 	{}
 
 	//-------------------------
@@ -97,14 +119,14 @@ namespace ACT {
 	Basic_Scheduler::
 	add_task( act x )
 	{
-		item_pointer item = the_queue.push( Basic_Scheduled_Item( x, ++ next_sequence_number ) ) ;
-		item -> listener = Basic_Wakeup_Listener( item, & the_queue ) ;
+		item_pointer item = the_queue.push( Basic_Scheduled_Item( x, ++ next_sequence_number ), this ) ;
 	}
 
 	void
 	Basic_Scheduler::
-	add_service( act )
+	add_service( act x )
 	{
+		item_pointer item = the_queue.push( Basic_Scheduled_Item( x, ++ next_sequence_number, Service ), this ) ;
 	}
 
 	void
@@ -130,11 +152,15 @@ namespace ACT {
 		}
 		// Assert the_queue is not empty
 
-		Scheduling_Queue< Basic_Scheduled_Item >::reference item = the_queue.top() ;
-		act_state result = item.the_action( & item.listener.get() ) ;		//.get() because .listener is optional<>
+		queue_type::pointer item = the_queue.top_ptr() ;
+		act_state result = item -> the_action( the_queue.auxiliary_top() -> get() ) ;
 		if ( result == Working ) {
-			item.priority_category = Waiting ;
-			the_queue.reorder( the_queue.top_ptr() ) ;
+			if ( item -> action_type == Task ) {
+				// Assert action is not a service
+				item -> priority_category = Waiting ;
+				the_queue.reorder( item ) ;
+			}
+			// Note service actions do not re-prioritize right now
 		} else {
 			the_queue.pop() ;
 			// Perhaps we might want to log items gone bad here.
@@ -149,17 +175,5 @@ namespace ACT {
 		if ( the_queue.empty() ) return false ;
 		return the_queue.top().priority_category <= Ordinary ;
 	}
-
-	//--------------------------------------------------
-	// Basic_Wakeup_Listener
-	//--------------------------------------------------
-	void
-	Basic_Wakeup_Listener::
-	operator()()
-	{
-		the_item -> priority_category = Ordinary ;
-		the_scheduler -> reorder( the_item ) ;
-	}
-
 
 } // end namespace ACT

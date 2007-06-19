@@ -32,34 +32,7 @@ using boost::shared_ptr ;
 
 namespace ACT {
 
-	//-------------------------
-	/** \class wakeup_listener
-	 *	\brief The 'A' in ACT means 'asynchronous', so in general there must be a way of notifying
-	 *		a scheduler that an inactive ACT, one that has a pending sub-action, is ready to proceed.
-	 *	This class is the interface between a scheduler and such an ACT.
-	 *
-	 *	The archetype of a notification is that from an asynchronous system I/O call.
-	 *	These notifications arrive various by event, queue item, callback, signal, and others.
-	 *	Notification is a mechanism crying out for implementation hiding by means of an abstraction.
-	 *	This type provides a standard way to do so.
-	 *
-	 *	The implementation pattern is an ACT call a wakeup_listener and that a scheduler
-	 *		provide the function so called.
-	 *	The scheduler should encapsulate its own notification receiver, however structured,
-	 *		into a function object of this class, say, by binding a member function adapter.
-	 *
-	 *	Such a function object should be parameter of the ACT constructor, if required.
-	 *
-	 *	An alternate design would have to pass a wakeup_listener with each call.
-	 *	This would be useful if a single ACT were variously handled by different scheduler objects.
-	 *	This may, perhaps, be an opportunity for greater efficiency.
-	 *	It's not clear as of this writing that such an interface is necessary.
-	 */
-	class wakeup_listener
-	{
-	public:
-		virtual void operator()() =0 ;
-	} ;
+	class wakeup_listener ;
 
 	//-------------------------
 	/** \enum act_state
