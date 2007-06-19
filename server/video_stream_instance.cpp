@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.28 2007/06/06 15:41:12 tgc Exp $
+// $Id: video_stream_instance.cpp,v 1.29 2007/06/19 09:26:54 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -158,6 +158,7 @@ video_stream_instance::video_stream_instance(video_stream_definition* def,
 	_ns(NULL),
 	m_decoder(NULL) // don't abort if m_def is null
 {
+	log_debug("video_stream_instance %p ctor", (void*)this);
 	if ( m_def )
 	{
 		m_decoder = m_def->get_decoder();
@@ -276,5 +277,13 @@ void video_class_init(as_object& global)
 	// Register _global.Video
 	global.init_member("Video", cl.get());
 }
+
+#ifdef GNASH_USE_GC
+void
+video_stream_instance::markReachableResources() const
+{
+	if ( _ns ) _ns->setReachable();
+}
+#endif // GNASH_USE_GC
 
 } // end of namespace gnash

@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.15 2007/06/04 19:21:20 strk Exp $
+// $Id: video_stream_instance.h,v 1.16 2007/06/19 09:26:54 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -69,6 +69,18 @@ public:
 
 	/// Set the input stream for this video
 	void setStream(boost::intrusive_ptr<NetStream> ns);
+
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark video-specific reachable resources and invoke
+	/// the parent's class version (markCharacterReachable)
+	//
+	/// video-specific reachable resources are:
+	///	- Associated NetStream if any (_ns) 
+	///
+	virtual void markReachableResources() const;
+#endif // GNASH_USE_GC
 
 private:
 

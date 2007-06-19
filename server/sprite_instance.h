@@ -997,7 +997,7 @@ protected:
 
 #ifdef GNASH_USE_GC
 	/// Mark sprite-specific reachable resources and invoke
-	/// the parent's class version (markCharacterReachableResources)
+	/// the parent's class version (markCharacterReachable)
 	//
 	/// sprite-specific reachable resources are:
 	/// 	- DisplayList items (current, backup and frame0 ones)

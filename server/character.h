@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.83 2007/06/15 15:00:28 strk Exp $ */
+/* $Id: character.h,v 1.84 2007/06/19 09:26:55 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -157,7 +157,7 @@ protected:
 #ifdef GNASH_USE_GC
 	/// Mark all reachable resources, override from as_object.
 	//
-	/// The default implementation calls markCharacterReachableResources().
+	/// The default implementation calls markCharacterReachable().
 	///
 	/// If a derived class provides access to more GC-managed
 	/// resources, it should override this method and call 
