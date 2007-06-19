@@ -54,15 +54,18 @@ NullGui::run()
 
 	while (true)
 	{
-		if (gettimeofday(&tv, NULL))
+		if ( _timeout )
 		{
-			cerr << "Could not get time of day: " << strerror(errno) << endl;
-			return false;
-		}
-		unsigned long int timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
-		if ( timer - start_timer > _timeout)
-		{
-			break;
+			if (gettimeofday(&tv, NULL))
+			{
+				cerr << "Could not get time of day: " << strerror(errno) << endl;
+				return false;
+			}
+			unsigned long int timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
+			if ( timer - start_timer > _timeout)
+			{
+				break;
+			}
 		}
 
 		// sleep for _interval milliseconds

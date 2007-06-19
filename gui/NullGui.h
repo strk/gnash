@@ -38,7 +38,8 @@ public:
 
 	NullGui(bool do_loop)
 		:
-		Gui(0,0,do_loop,0)
+		Gui(0,0,do_loop,0),
+		_timeout(0)
 	{}
 
 	~NullGui() {}
