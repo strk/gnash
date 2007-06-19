@@ -46,8 +46,9 @@ public:
 	{
 		_interval=interval;
 	}
-	void setTimeout(unsigned int)
+	void setTimeout(unsigned int to)
 	{
+		_timeout=to;
 	}
 	bool init(int, char ***) { return true; }
 	bool createWindow(const char* /*title*/, int /*width*/, int /*height*/)
@@ -58,6 +59,11 @@ public:
 	bool createMenu()  { return true; }
 	bool setupEvents()  { return true; }
 	void renderBuffer()  { }
+
+private:
+
+	/// timeout value, in milliseconds
+	unsigned int _timeout;
 };
 
 } // end of gnash namespace

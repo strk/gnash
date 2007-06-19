@@ -32,19 +32,45 @@
 # include <unistd.h> // for usleep
 #endif
 
+#include <sys/time.h> // for gettimeofday
+#include <time.h> // for gettimeofday
+#include <errno.h> // for reporting gettimeofday errors
+
 namespace gnash
 {
 
 bool
 NullGui::run()
 {
-		while (true)
-		{
-			// sleep for _interval milliseconds
-			usleep(_interval*1000);
-			Gui::advance_movie(this);
-		}
+	struct timeval tv;
+
+
+	if (gettimeofday(&tv, NULL))
+	{
+		cerr << "Could not get time of day: " << strerror(errno) << endl;
 		return false;
+	}
+	unsigned long int start_timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
+
+	while (true)
+	{
+		if (gettimeofday(&tv, NULL))
+		{
+			cerr << "Could not get time of day: " << strerror(errno) << endl;
+			return false;
+		}
+		unsigned long int timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
+		if ( timer - start_timer > _timeout)
+		{
+			break;
+		}
+
+		// sleep for _interval milliseconds
+		// TODO: use the timer value to trigger advances
+		usleep(_interval*1000);
+		Gui::advance_movie(this);
+	}
+	return false;
 }
 
 } // end of gnash namespace

@@ -1,5 +1,10 @@
 2007-06-19 Sandro Santilli <strk@keybit.net>
 
+	* gui/NullGui.{cpp,h}: implement setTimeout
+	  call. fixes bug #20118.
+
+2007-06-19 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.h: document another
 	  reachable resource (was marked already, just not documented
 	  as such).
