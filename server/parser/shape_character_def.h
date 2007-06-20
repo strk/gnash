@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape_character_def.h,v 1.12 2007/05/14 17:23:16 strk Exp $ */
+/* $Id: shape_character_def.h,v 1.13 2007/06/20 14:23:50 strk Exp $ */
 
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
@@ -33,6 +33,7 @@ namespace gnash {
 
 		typedef std::vector<fill_style> FillStyleVect;
 		typedef std::vector<line_style> LineStyleVect;
+		typedef std::vector<path> PathVect;
 
 		shape_character_def();
 		virtual ~shape_character_def();
@@ -72,10 +73,20 @@ namespace gnash {
 	protected:
 		friend class morph2_character_def;
 
+#ifdef GNASH_USE_GC
+		/// Mark reachable resources (for the GC)
+		//
+		/// Reachable resources are:
+		///	- Associated fill styles (m_fill_styles).
+		///	  These are not actual resources, but may contain some.
+		///
+		virtual void markReachableResources() const;
+#endif // GNASH_USE_GC
+
 		// derived morph classes changes these
-		std::vector<fill_style>	m_fill_styles;
-		std::vector<line_style>	m_line_styles;
-		std::vector<path>	m_paths;
+		FillStyleVect m_fill_styles;
+		LineStyleVect m_line_styles;
+		PathVect m_paths;
 		rect	m_bound;
 
 		/// Free all meshes

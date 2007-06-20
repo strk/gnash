@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.28 2007/06/15 18:47:00 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.29 2007/06/20 14:23:50 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -821,6 +821,19 @@ void	shape_character_def::input_cached_data(tu_file* in)
 	m_cached_meshes[i] = ms;
     }
 }
+
+#ifdef GNASH_USE_GC
+void
+shape_character_def::markReachableResources() const
+{
+	assert(isReachable());
+	for (FillStyleVect::const_iterator i=m_fill_styles.begin(), e=m_fill_styles.end();
+			i != e; ++i)
+	{
+		i->markReachableResources();
+	}
+}
+#endif // GNASH_USE_GC
 
 }	// end namespace gnash
 

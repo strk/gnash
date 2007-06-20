@@ -253,26 +253,10 @@ private:
 	}
 
 	/// Destroy the collector, releasing all collectables.
-	~GC()
-	{
-#ifdef GNASH_GC_DEBUG 
-		log_debug(_("GC %p deleted, NOT collecting again all managed resources"), (void*)this);
-#endif
-
-#if 0
-		for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; ++i)
-		{
-			delete *i;
-		}
-#endif
-	}
-
+	~GC();
 
 	/// List of collectables
 	typedef std::list<const GcResource *> ResList;
-
-	/// List of roots
-	typedef std::list<const GcRoot *> RootList;
 
 	/// Mark all reachable resources
 	void markReachable()
@@ -284,39 +268,7 @@ private:
 	}
 
 	/// Delete all unreachable objects, and mark the others unreachable again
-	void cleanUnreachable()
-	{
-#ifdef GNASH_GC_DEBUG 
-		size_t deleted = 0;
-		log_debug(_("GC %p: SWEEP SCAN"), (void*)this);
-#endif
-		for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; )
-		{
-			const GcResource* res = *i;
-			if ( ! res->isReachable() )
-			{
-#ifdef GNASH_GC_DEBUG 
-#if GNASH_GC_DEBUG > 1
-				log_debug(_("GC %p: cleanUnreachable deleting object %p (%s)"),
-						(void*)this, (void*)res, typeid(*res).name());
-#endif
-				++deleted;
-#endif
-				delete res;
-				i = _resList.erase(i);
-			}
-			else
-			{
-				res->clearReachable();
-				++i;
-			}
-		}
-#ifdef GNASH_GC_DEBUG 
-		log_debug(_("GC %p: cleanUnreachable deleted " SIZET_FMT
-				" resources marked as unreachable"),
-				(void*)this, deleted);
-#endif
-	}
+	void cleanUnreachable();
 
 	ResList _resList;
 

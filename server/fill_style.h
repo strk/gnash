@@ -17,7 +17,7 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-/* $Id: fill_style.h,v 1.5 2007/05/28 15:41:06 ann Exp $ */
+/* $Id: fill_style.h,v 1.6 2007/06/20 14:23:50 strk Exp $ */
 
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
@@ -117,6 +117,17 @@ public:
 	/// Returns the color stop value at a specified index
 	const gradient_record& get_color_stop(int index) const;
 	
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources (for the GC)
+	//
+	/// fill_style specific reachable resources are:
+	///
+	///	- gradient bitmap info (m_gradient_bitmap_info)
+	///	- bitmap character (m_bitmap_character)
+	///
+	void markReachableResources() const;
+#endif // GNASH_USE_GC
+
 private:
 
 	/// Return the color at the specified ratio into our gradient.

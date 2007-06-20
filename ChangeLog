@@ -1,5 +1,7 @@
 2007-06-20 Sandro Santilli <strk@keybit.net>
 
+	* libbase/GC.{cpp,h}: moved destructor and cleanUnreachable methods
+	  from header to implementation file.
 	* server/fill_style.{cpp,h}: add an markReachableResources()
 	  function to keep alive eventual bitmap and character fills.
 	* server/parser/shape_character_def.{cpp,h}: implement resource

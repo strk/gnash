@@ -457,8 +457,16 @@ fill_style::setSolid(const rgba& color)
 }
 
 
-// end of namespace
+#ifdef GNASH_USE_GC
+void
+fill_style::markReachableResources() const
+{
+	if ( m_gradient_bitmap_info ) m_gradient_bitmap_info->setReachable();
+	if ( m_bitmap_character ) m_bitmap_character->setReachable();
 }
+#endif // GNASH_USE_GC
+
+} // end of namespace
 
 
 // Local Variables:

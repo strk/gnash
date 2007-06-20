@@ -16,13 +16,14 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GC.cpp,v 1.1 2007/06/15 18:16:32 strk Exp $ */
+/* $Id: GC.cpp,v 1.2 2007/06/20 14:27:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "GC.h"
+#include "builtin_function.h"
 
 
 namespace gnash {
@@ -50,6 +51,55 @@ GC::cleanup()
 	assert(_singleton);
 	delete _singleton;
 	_singleton = NULL;
+}
+
+GC::~GC()
+{
+#ifdef GNASH_GC_DEBUG 
+	log_debug(_("GC %p deleted, deleting all managed resources"), (void*)this);
+#endif
+
+#if 1
+	for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; ++i)
+	{
+		delete *i;
+	}
+#endif
+}
+
+void
+GC::cleanUnreachable()
+{
+#ifdef GNASH_GC_DEBUG 
+	size_t deleted = 0;
+	log_debug(_("GC %p: SWEEP SCAN"), (void*)this);
+#endif
+	for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; )
+	{
+		const GcResource* res = *i;
+		if ( ! res->isReachable() )
+		{
+#ifdef GNASH_GC_DEBUG 
+#if GNASH_GC_DEBUG > 1
+			log_debug(_("GC %p: cleanUnreachable deleting object %p (%s)"),
+					(void*)this, (void*)res, typeid(*res).name());
+#endif
+			++deleted;
+#endif
+			delete res;
+			i = _resList.erase(i);
+		}
+		else
+		{
+			res->clearReachable();
+			++i;
+		}
+	}
+#ifdef GNASH_GC_DEBUG 
+	log_debug(_("GC %p: cleanUnreachable deleted " SIZET_FMT
+			" resources marked as unreachable"),
+			(void*)this, deleted);
+#endif
 }
 
 } // end of namespace gnash
