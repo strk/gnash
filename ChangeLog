@@ -1,3 +1,10 @@
+2007-06-20 Sandro Santilli <strk@keybit.net>
+
+	* server/fill_style.{cpp,h}: add an markReachableResources()
+	  function to keep alive eventual bitmap and character fills.
+	* server/parser/shape_character_def.{cpp,h}: implement resource
+	  marking function, marking fill styles.
+
 2007-06-19 Sandro Santilli <strk@keybit.net>
 
 	* server/StreamProvider.cpp (getStream): transfer ownerhip of 
