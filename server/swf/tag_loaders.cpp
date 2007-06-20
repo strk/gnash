@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.114 2007/06/08 00:44:26 tgc Exp $ */
+/* $Id: tag_loaders.cpp,v 1.115 2007/06/20 23:20:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -47,7 +47,6 @@
 #include "movie_def_impl.h"
 #include "swf.h"
 #include "swf/TagLoadersTable.h"
-#include "generic_character.h"
 #include "text_character_def.h"
 #include "edit_text_character_def.h"
 #include "execute_tag.h" // for set_background_color inheritance 
