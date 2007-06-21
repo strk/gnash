@@ -1,5 +1,11 @@
 2007-06-21 Zou Lunkai <zoulunkai@gmail.com>
 
+	* testsuite/misc-ming.all/key_event_test4.c, key_event_test4runner.cpp, Makefile.am:
+	  new testcase for "this" context in a user defined key event handler.
+	* server/movie_root.cpp: correctly set the context.
+	
+2007-06-21 Zou Lunkai <zoulunkai@gmail.com>
+
 	* testsuite/actionscript.all/enumerate.as: new testcase, Gnash fails.
 
 2007-06-20 Sandro Santilli <strk@keybit.net>

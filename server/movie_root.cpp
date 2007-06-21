@@ -741,7 +741,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 						method = ch->getUserDefinedEventHandler("onKeyDown");
 					if ( method )
 					{
-						call_method0(as_value(method.get()), &(_movie->get_environment()), _movie.get());
+						call_method0(as_value(method.get()), &(_movie->get_environment()), ch);
 					}
 				}
 				// invoke onClipKeyPress handler
@@ -759,7 +759,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 						method = ch->getUserDefinedEventHandler("onKeyUp");
 					if ( method )
 					{
-						call_method0(as_value(method.get()), &(_movie->get_environment()), _movie.get());
+						call_method0(as_value(method.get()), &(_movie->get_environment()), ch);
 					}
 				}
 			}
