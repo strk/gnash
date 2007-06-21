@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.48 2007/06/07 12:10:21 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.49 2007/06/21 09:02:05 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,6 +43,8 @@
 #include <gst/gst.h>
 
 #define BUFFER_SIZE 5000
+
+using namespace boost;
 
 GST_sound_handler::GST_sound_handler()
 	: looping(false),
@@ -72,6 +74,8 @@ int	GST_sound_handler::create_sound(
 // Called to create a sample.  We'll return a sample ID that
 // can be use for playing it.
 {
+
+	mutex::scoped_lock lock(_mutex);
 
 	sound_data *sounddata = new sound_data;
 	if (!sounddata) {
@@ -135,7 +139,8 @@ int	GST_sound_handler::create_sound(
 // this gets called when a stream gets more data
 long	GST_sound_handler::fill_stream_data(void* data, int data_bytes, int /*sample_count*/, int handle_id)
 {
-	
+	mutex::scoped_lock lock(_mutex);
+
 	// @@ does a negative handle_id have any meaning ?
 	//    should we change it to unsigned instead ?
 	if (handle_id >= 0 && (unsigned int) handle_id < m_sound_data.size())
@@ -146,15 +151,16 @@ long	GST_sound_handler::fill_stream_data(void* data, int data_bytes, int /*sampl
 		guint8* tmp_data = new guint8[data_bytes + sounddata->data_size];
 		memcpy(tmp_data, sounddata->data, sounddata->data_size);
 		memcpy(tmp_data + sounddata->data_size, data, data_bytes);
-		delete [] sounddata->data;
+		if (sounddata->data_size > 0) delete [] sounddata->data;
 		sounddata->data = tmp_data;
-		
+
 		sounddata->data_size += data_bytes;
 
+		// If playback has already started, we also update the active sounds
 		for (size_t i=0, e=sounddata->m_gst_elements.size(); i < e; ++i) {
 			gst_elements* sound = sounddata->m_gst_elements[i];
 			sound->data_size = sounddata->data_size;
-			sound->data = sounddata->data;
+			sound->set_data(tmp_data);
 		}
 
 		return sounddata->data_size - data_bytes;
@@ -171,10 +177,13 @@ static gboolean sound_killer (gpointer user_data)
 }
 
 // The callback function which refills the buffer with data
-static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
+void GST_sound_handler::callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data)
 {
 	gst_elements *gstelements = static_cast<gst_elements*>(user_data);
-	guint8* data_pos = gstelements->data+gstelements->position;
+
+	mutex::scoped_lock lock(gstelements->handler->_mutex);
+
+	guint8* data_pos = gstelements->get_data_ptr(gstelements->position);
 
 	// First callback
 	if (GST_BUFFER_SIZE(buffer) == 0) {
@@ -218,7 +227,7 @@ static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*p
 		} else {
 			// Copy what's left of the data, and then fill the rest with "new" data.
 			memcpy(GST_BUFFER_DATA(buffer), data_pos,  chunk_size);
-			memcpy(GST_BUFFER_DATA(buffer) + chunk_size, gstelements->data, GST_BUFFER_SIZE(buffer)- chunk_size);
+			memcpy(GST_BUFFER_DATA(buffer) + chunk_size, gstelements->get_data_ptr(0), GST_BUFFER_SIZE(buffer)- chunk_size);
 			gstelements->position = GST_BUFFER_SIZE(buffer) - chunk_size;
 			gstelements->loop_count--;
 
@@ -238,6 +247,7 @@ static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*p
 void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offset*/, long start_position, const std::vector<sound_envelope>* /*envelopes*/)
 // Play the index'd sample.
 {
+	mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists, or if audio is muted
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size() || muted)
@@ -269,9 +279,13 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 		gnash::log_error (_("Could not allocate memory for gst_element"));
 		return;
 	}
+
+	// Set the handler
+	gst_element->handler = this;
+
 	// Copy data-info to the "gst_elements"
 	gst_element->data_size = sounddata->data_size;
-	gst_element->data = sounddata->data;
+	gst_element->set_data(sounddata->data);
 	gst_element->position = start_position;
 
 	// Set number of loop we should do. -1 is infinte loop, 0 plays it once, 1 twice etc.
@@ -440,7 +454,8 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 
 void	GST_sound_handler::stop_sound(int sound_handle)
 {
-	
+	mutex::scoped_lock lock(_mutex);
+
 	// Check if the sound exists.
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
 	{
@@ -479,7 +494,8 @@ void	GST_sound_handler::stop_sound(int sound_handle)
 void	GST_sound_handler::delete_sound(int sound_handle)
 // this gets called when it's done with a sample.
 {
-	
+	mutex::scoped_lock lock(_mutex);
+
 	if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
 	{
 		delete[] m_sound_data[sound_handle]->data;
@@ -503,6 +519,8 @@ void	GST_sound_handler::stop_all_sounds()
 //	where 0 is off and 100 is full volume. The default setting is 100.
 int	GST_sound_handler::get_volume(int sound_handle) {
 
+	mutex::scoped_lock lock(_mutex);
+
 	// Check if the sound exists.
 	if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
 	{
@@ -516,6 +534,8 @@ int	GST_sound_handler::get_volume(int sound_handle) {
 //	A number from 0 to 100 representing a volume level. 
 //	100 is full volume and 0 is no volume. The default setting is 100.
 void	GST_sound_handler::set_volume(int sound_handle, int volume) {
+
+	mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
@@ -542,6 +562,8 @@ void	GST_sound_handler::set_volume(int sound_handle, int volume) {
 }
 
 void GST_sound_handler::get_info(int sound_handle, int* format, bool* stereo) {
+
+	mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
@@ -575,6 +597,16 @@ void GST_sound_handler::attach_aux_streamer(aux_streamer_ptr /*ptr*/, void* /*ow
 void GST_sound_handler::detach_aux_streamer(void* /*owner*/)
 {
 	gnash::log_unimpl(__PRETTY_FUNCTION__);
+}
+
+// Pointer handling and checking functions
+uint8_t* gst_elements::get_data_ptr(unsigned long int pos) {
+	assert(data_size > pos);
+	return data + pos;
+}
+
+void gst_elements::set_data(uint8_t* idata) {
+	data = idata;
 }
 
 gnash::sound_handler*	gnash::create_sound_handler_gst()

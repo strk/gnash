@@ -1,3 +1,10 @@
+2007-06-21 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_gst.{cpp,h}: Made it threadsafe, fixes 
+	  bug #20186. Made the internal variables private.
+	* backend/sound_handler_sdl.{cpp,h}: Made the internal
+	  variables private.
+
 2007-06-21 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/actionscript.all/enumerate.as: more tests.

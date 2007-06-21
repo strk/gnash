@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.25 2007/05/28 15:40:58 ann Exp $
+// $Id: sound_handler_sdl.h,v 1.26 2007/06/21 09:02:06 tgc Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -145,7 +145,7 @@ public:
 // Use SDL and ffmpeg/mad/nothing to handle sounds.
 class SDL_sound_handler : public gnash::sound_handler
 {
-public:
+private:
 	/// NetStream audio callbacks
 	hash_wrapper< void* /* owner */, aux_streamer_ptr /* callback */> m_aux_streamer;	//vv
 
@@ -167,6 +167,7 @@ public:
 	/// Mutex for making sure threads doesn't mess things up
 	boost::mutex _mutex;
 
+public:
 	SDL_sound_handler();
 	virtual ~SDL_sound_handler();
 
@@ -212,6 +213,34 @@ public:
 
 	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner);	//vv
 	virtual void	detach_aux_streamer(void* owner);	//vv
+
+	/// Callback invoked by the SDL audio thread.
+	//
+	/// Refills the output stream/buffer with data.
+	///
+	/// We run trough all the attached auxiliary streamers fetching decoded
+	/// audio blocks and mixing them into the given output stream.
+	///
+	/// If sound is compresssed (mp3) a mp3-frame is decoded into a buffer,
+	/// and resampled if needed. When the buffer has been sampled, another
+	/// frame is decoded until all frames has been decoded.
+	/// If a sound is looping it will be decoded from the beginning again.
+	///
+	/// TODO: make a static method of the SDL_sound_handler class
+	///
+	/// @param udata
+	///	User data pointer (SDL_sound_handler instance in our case).
+	///	We'll lock the SDL_sound_handler::_mutex during operations.
+	///
+	/// @param stream
+	/// 	The output stream/buffer to fill
+	///
+	/// @param buffer_length_in
+	///	Length of the buffer.
+	///	If zero or negative we log an error and return
+	///	(negative is probably an SDL bug, zero dunno yet).
+	///
+	static void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in);
 };
 
 

@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.69 2007/06/08 11:38:17 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.70 2007/06/21 09:02:06 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -33,8 +33,6 @@
 
 using namespace boost;
 
-static void sdl_audio_callback(void *udata, Uint8 *stream, int len); // SDL C audio handler
-
 SDL_sound_handler::SDL_sound_handler()
 	: soundOpened(false),
 		soundsPlaying(0),
@@ -44,7 +42,7 @@ SDL_sound_handler::SDL_sound_handler()
 	audioSpec.freq = 44100;
 	audioSpec.format = AUDIO_S16SYS; // AUDIO_S8 AUDIO_U8;
 	audioSpec.channels = 2;
-	audioSpec.callback = sdl_audio_callback;
+	audioSpec.callback = SDL_sound_handler::sdl_audio_callback;
 	audioSpec.userdata = this;
 	audioSpec.samples = 2048;		//512 - not enough for  videostream
 }
@@ -650,36 +648,8 @@ do_mixing(Uint8* stream, active_sound* sound, Uint8* data, unsigned int mix_leng
 }
 
 
-/// Callback invoked by the SDL audio thread.
-//
-/// Refills the output stream/buffer with data.
-///
-/// We run trough all the attached auxiliary streamers fetching decoded
-/// audio blocks and mixing them into the given output stream.
-///
-/// <UnverifiedComment>
-///   If sound is compresssed (mp3) a mp3-frame is decoded into a buffer,
-///   and resampled if needed. When the buffer has been sampled, another
-///   frame is decoded until all frames has been decoded.
-///   If a sound is looping it will be decoded from the beginning again.
-/// </UnverifiedComment>
-///
-/// TODO: make a static method of the SDL_sound_handler class
-///
-/// @param udata
-///	User data pointer (SDL_sound_handler instance in our case).
-///	We'll lock the SDL_sound_handler::_mutex during operations.
-///
-/// @param stream
-/// 	The output stream/buffer to fill
-///
-/// @param buffer_length_in
-///	Length of the buffer.
-///	If zero or negative we log an error and return
-///	(negative is probably an SDL bug, zero dunno yet).
-///
-static void
-sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
+// Callback invoked by the SDL audio thread.
+void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in)
 {
 	if ( buffer_length_in < 0 )
 	{

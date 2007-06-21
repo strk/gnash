@@ -23,8 +23,14 @@
 #include <vector>
 
 #include <gst/gst.h>
+#include <boost/thread/thread.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread/mutex.hpp>
 
 #define BUFFER_SIZE 5000
+
+// forward declaration
+class GST_sound_handler;
 
 // Used to hold the gstreamer when doing on-demand-decoding
 class gst_elements
@@ -49,9 +55,6 @@ public:
 	// position in the stream
 	long position;
 
-	// The (un)compressed data
-	guint8* data;
-
 	// data size
 	long data_size;
 
@@ -59,6 +62,20 @@ public:
 	
 	// signal id
 	guint handoff_signal_id;
+
+	// The sound handler. Used to get access to the GST_sound_handler->_mutex
+	GST_sound_handler* handler;
+
+	/// Returns the data pointer in the undecoded datastream
+	/// for the given position. Boundaries are checked.
+	uint8_t* get_data_ptr(unsigned long int pos);
+
+	/// Set the undecoded data pointer
+	void set_data(uint8_t*);
+
+private:
+	// The (un)compressed data
+	guint8* data;
 
 };
 
@@ -97,7 +114,7 @@ public:
 // Use gstreamer to handle sounds.
 class GST_sound_handler : public gnash::sound_handler
 {
-public:
+private:
 	/// Vector containing all the sounds
 	std::vector<sound_data*>	m_sound_data;
 	
@@ -106,6 +123,14 @@ public:
 	
 	/// Is the audio muted?
 	bool muted;
+
+	/// Mutex for making sure threads doesn't mess things up
+	boost::mutex _mutex;
+
+public:
+
+	/// Gstreamer callback function
+	static void callback_handoff (GstElement * /*c*/, GstBuffer *buffer, GstPad* /*pad*/, gpointer user_data);
 
 	GST_sound_handler();
 	virtual ~GST_sound_handler();
