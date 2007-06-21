@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.27 2007/05/15 16:31:02 rsavoye Exp $
+# $Id: Makefile.am,v 1.28 2007/06/21 23:47:47 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -35,6 +35,7 @@ lib_LTLIBRARIES = libgnashgeo.la
 
 AM_CPPFLAGS = -I.. -I$(srcdir)	\
         -I$(top_srcdir)/libbase \
+	$(BOOST_CFLAGS)		\
         $(NULL)
 
 #        -I$(top_srcdir) 	\

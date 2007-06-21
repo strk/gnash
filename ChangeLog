@@ -1,3 +1,7 @@
+2007-06-22 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libgeometry/Makefile.am: Fixed building issue on Darwin.
+
 2007-06-21 Antti Ajanki
 
 	* gui/kde.cpp: Fix for agg-render premature initialization.
