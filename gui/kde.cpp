@@ -62,12 +62,18 @@ KdeGui::init(int argc, char **argv[])
 //    GNASH_REPORT_FUNCTION;
     _qapp.reset(new QApplication(argc, *argv));
     _qwidget.reset(new qwidget(this)); 
+
+    _renderer = _glue.createRenderHandler();
+    if ( ! _renderer ) return false;
+    set_render_handler(_renderer);
+
     if (_xid) {
         QXEmbed::initialize();
         QXEmbed::embedClientIntoWindow(_qwidget.get(), _xid);
     }
 
     _glue.init (argc, argv);
+    _glue.prepDrawingArea(_qwidget.get());
     
     return true;
 }
@@ -83,13 +89,10 @@ KdeGui::createWindow(const char* windowtitle, int width, int height)
     _qapp->setMainWidget(_qwidget.get());
     _qwidget->show();
 
-    _glue.prepDrawingArea(_qwidget.get());
-    _renderer = _glue.createRenderHandler();
     _glue.initBuffer(width, height);
     
     _width = width;
     _height = height;
-    set_render_handler(_renderer);
     
     return true;
 }
