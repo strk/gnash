@@ -1,5 +1,9 @@
 2007-06-22 Zou Lunkai <zoulunkai@gmail.com>
 
+	* testsuite/actionscript.all/enumerate.as: more tests.
+	
+2007-06-22 Zou Lunkai <zoulunkai@gmail.com>
+
 	* testsuite/actionscript.all/enumerate.as: cleanups, tests are not
 	  dependent on enumeration order now.
 	* server/movie_root.h: document KeyListener class and related stuff.

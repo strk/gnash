@@ -55,7 +55,12 @@
   xcheck_equals(typeof(recorder['mc3']), 'movieclip');  
   xcheck_equals(typeof(recorder['mc4']), 'movieclip');
   xcheck_equals(typeof(recorder['mc5']), 'movieclip');
-  
+  check_equals(_root.hasOwnProperty('mc0'), false);
+  check_equals(_root.hasOwnProperty('mc1'), false);
+  check_equals(_root.hasOwnProperty('mc2'), false);
+  check_equals(_root.hasOwnProperty('mc3'), false);
+  check_equals(_root.hasOwnProperty('mc4'), false);
+  check_equals(_root.hasOwnProperty('mc5'), false);
   delete recorder;
 }
 
@@ -85,7 +90,9 @@
   check_equals(typeof(recorder['x1']), 'function');
   check_equals(typeof(recorder['x2']), 'number');
   check_equals(typeof(recorder['x3']), 'object');
-  
+  check_equals(obj.hasOwnProperty('x1'), true);
+  check_equals(obj.hasOwnProperty('x2'), true);
+  check_equals(obj.hasOwnProperty('x3'), true);
   delete recorder;
 }
 
