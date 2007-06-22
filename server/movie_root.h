@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.59 2007/06/16 11:27:40 strk Exp $ */
+/* $Id: movie_root.h,v 1.60 2007/06/22 02:11:06 zoulunkai Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -91,9 +91,10 @@ namespace gnash {
 namespace gnash
 {
 
-  #ifdef NEW_KEY_LISTENER_LIST_DESIGN
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
 class KeyListener{
 	public:
+		/// all constructed key listeners are not registered to the global Key object by default.
 		KeyListener(boost::intrusive_ptr<as_object> obj, bool flag=false)
 		: _listener(obj), _user_defined_handler_added(flag)
 		{}
@@ -102,13 +103,23 @@ class KeyListener{
 
 		bool operator == (const KeyListener & rhs ) const { return _listener.get() == rhs.get(); }
 		bool operator != (const KeyListener & rhs ) const { return _listener.get() != rhs.get(); }
-
+	
+		/// \brief
+		/// Return true if the _listener has been registered by Key.addListener(),
+		/// false if the _listener has not been registered or unregistered by Key.removeListener().
+		/// The return value is used to decide if we should invoke the user defined handler.
 		bool isRegistered() const { return _user_defined_handler_added; }
+		
+		/// unregister the key listener
 		void unregisterUserHandler() { _user_defined_handler_added = false; }
+		
+		/// register the key listener
 		void registerUserHandler() { _user_defined_handler_added = true; }
 
 	private:
+		/// the listener object, could be a character or a general as_object
 		boost::intrusive_ptr<as_object> _listener;
+		/// mark if the object has been registered by Key.addListener()
 		bool _user_defined_handler_added;
 	};
 #endif 
@@ -395,7 +406,13 @@ public:
 
 	DSOEXPORT void notify_key_listeners(key::code k, bool down);
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
+	// Push a new key listener to the container if it is not there,
+	// otherwise, just register it.
 	void add_key_listener(const KeyListener& listener);
+	
+	// Unregister the specified key listener, never really remove it.
+	// The name is confusing just that the built-in Key.removeListener() 
+	// does not really remove any thing.
 	void remove_key_listener(const KeyListener& listener);
 #else
 	void add_key_listener(as_object* listener);
@@ -462,9 +479,12 @@ private:
 
 	/// Notify the global Key ActionScript object about a key status change
 	key_as_object * notify_global_key(key::code k, bool down);
-
+	
 	/// Remove all listeners with a ref-count of 1
 	/// (only referenced as key listeners)
+	// in new design:
+	// remove unloaded characters and unregistered as_objects 
+	// from the key listeners container.
 	void cleanup_key_listeners();
 
 	/// Return the current Stage object

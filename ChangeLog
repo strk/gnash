@@ -2,6 +2,7 @@
 
 	* testsuite/actionscript.all/enumerate.as: cleanups, tests are not
 	  dependent on enumeration order now.
+	* server/movie_root.h: document KeyListener class and related stuff.
 	
 2007-06-22 Markus Gothe <nietzsche@lysator.liu.se>
 
