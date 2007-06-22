@@ -17,6 +17,7 @@
 2007-06-22 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libgeometry/Makefile.am: Fixed building issue on Darwin.
+	* ltmain.sh.darwin: We use this one from Darwinports since it works.
 
 2007-06-21 Antti Ajanki
 
