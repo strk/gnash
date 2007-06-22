@@ -20,13 +20,12 @@
 #include "config.h"
 #endif
 
-#include <libintl.h>
-#include <locale.h>
 #include <iostream>
 #include <cstdio>
 #include <sys/time.h>
 #include <time.h>
 
+#include "gettext.h"
 #include "tu_file.h"
 #include "container.h"
 #include "gnash.h"

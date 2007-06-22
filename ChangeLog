@@ -18,6 +18,8 @@
 
 	* libgeometry/Makefile.am: Fixed building issue on Darwin.
 	* ltmain.sh.darwin: We use this one from Darwinports since it works.
+	* utilities/{parser,processor}.cpp: use 'libbase/gettext.h' for conditianal
+	  use of libintl.
 
 2007-06-21 Antti Ajanki
 

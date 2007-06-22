@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: parser.cpp,v 1.39 2007/05/18 04:00:33 martinwguy Exp $ */
+/* $Id: parser.cpp,v 1.40 2007/06/22 22:07:07 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,9 +36,7 @@ extern "C"{
 #endif
 }
 
-#include <libintl.h>
-#include <locale.h>
-
+#include "gettext.h"
 #include "tu_file.h"
 #include "zlib_adapter.h"
 #include "image.h"
