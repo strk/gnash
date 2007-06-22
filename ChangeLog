@@ -1,3 +1,8 @@
+2007-06-21 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/actionscript.all/enumerate.as: cleanups, tests are not
+	  dependent on enumeration order now.
+	
 2007-06-22 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libgeometry/Makefile.am: Fixed building issue on Darwin.
