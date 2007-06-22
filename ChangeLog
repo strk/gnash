@@ -1,4 +1,4 @@
-2007-06-21 Zou Lunkai <zoulunkai@gmail.com>
+2007-06-22 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/actionscript.all/enumerate.as: cleanups, tests are not
 	  dependent on enumeration order now.
