@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: kde.m4,v 1.32 2007/06/04 18:00:09 rsavoye Exp $
+dnl $Id: kde.m4,v 1.33 2007/06/22 14:31:13 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_KDE],
 [
@@ -84,7 +84,7 @@ dnl   # KDE_LIBS =  -lkdeui -lkdecore -lkdeprint -L/usr/lib/qt-3.3/lib -lqt-mt
   AC_ARG_WITH(kde_lib, AC_HELP_STRING([--with-kde-lib], [directory where kde libraries are]), with_kde_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_kde_lib, [
     if test x"${with_kde_lib}" != x ; then
-      if test -f ${with_kde_lib}/libkdeui.a -o -f ${with_kde_lib}/kdeui.${shlibext}; then
+      if test -f ${with_kde_lib}/libkdeui.a -o -f ${with_kde_lib}/libkdeui.${shlibext}; then
 	      ac_cv_path_kde_lib="-L`(cd ${with_kde_lib}; pwd)`"
       else
 	      AC_MSG_ERROR([${with_kde_lib} directory doesn't contain kde libraries.])
@@ -145,12 +145,10 @@ dnl   # KDE_LIBS =  -lkdeui -lkdecore -lkdeprint -L/usr/lib/qt-3.3/lib -lqt-mt
     has_kde=no
   fi
 
-  AC_PATH_PROG(MOC, moc, ,[${pathlist}])
   KLASH_PLUGIN=
   
 
   AC_SUBST(KLASH_PLUGIN)
-  AC_SUBST(MOC)
   AC_SUBST(KDE_CFLAGS)  
   AC_SUBST(KDE_LIBS)
 ])
@@ -255,6 +253,10 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
     QT_LIBS=""
     has_qt="no"
   fi
+
+  AC_PATH_PROG(MOC, moc, ,[${gnash_qt_topdir}/bin ${pathlist}])
+
+  AC_SUBST(MOC)
 
   AC_SUBST(QT_CFLAGS)  
   AC_SUBST(QT_LIBS)

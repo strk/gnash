@@ -1,3 +1,9 @@
+2007-06-22 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* macros/kde.m4: look for libkdeui, not kdeui. Also first check
+	in the QTDIR/bin directory for moc, in case the first moc in PATH
+	is not the qt3 one.
+
 2007-06-22 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/actionscript.all/enumerate.as: more tests.
