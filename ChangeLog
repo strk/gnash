@@ -40,10 +40,6 @@
 	* utilities/{parser,processor}.cpp: use 'libbase/gettext.h' for conditianal
 	  use of libintl.
 
-2007-06-21 Antti Ajanki
-
-	* gui/kde.cpp: Fix for agg-render premature initialization.
-
 2007-06-21 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_gst.{cpp,h}: Made it threadsafe, fixes 
