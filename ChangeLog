@@ -1,3 +1,11 @@
+2007-06-23 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/container.h: Remove home-made container classes in
+	favour of standard containers.
+	* server/{fontlib, impl}.cpp: Switch hash to std::map.
+	* libbase/container.cpp: Remove unused container tests.
+	* libbase/Makefile.am: Disable building of unused container.cpp.
+
 2007-06-22 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* macros/kde.m4: look for libkdeui, not kdeui. Also first check

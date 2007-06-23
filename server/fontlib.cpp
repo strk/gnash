@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.29 2007/06/15 15:00:29 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.30 2007/06/23 12:34:32 bjacques Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -643,7 +643,7 @@ namespace fontlib {
 
 	bool	try_to_reuse_previous_image(
 		const rendered_glyph_info& rgi,
-		const hash<unsigned int, const rendered_glyph_info*>& image_hash)
+		const map<unsigned int, const rendered_glyph_info*>& image_hash)
 	// See if we've already packed an identical glyph image for
 	// another glyph.  If so, then reuse it, and return true.
 	// If no reusable image, return false.
@@ -652,8 +652,16 @@ namespace fontlib {
 	// fonts that use the same dummy glyph for many undefined
 	// characters.
 	{
+		const map<unsigned int, const rendered_glyph_info*>::const_iterator image =
+			image_hash.find(rgi.m_image_hash);
+
+
 		const rendered_glyph_info*	identical_image = NULL;
-		if (image_hash.get(rgi.m_image_hash, &identical_image))
+		if (image != image_hash.end()) {
+		  identical_image = (*image).second;
+		}
+
+		if (identical_image)
 		{
 			// Found a match.  But is it *really* a match?  Do a
 			// bitwise compare.
@@ -783,7 +791,7 @@ namespace fontlib {
 
 		// Share identical texture data where possible, by
 		// doing glyph image comparisons.
-		hash<unsigned int, const rendered_glyph_info*>	image_hash;
+		map<unsigned int, const rendered_glyph_info*>	image_hash;
 
 		// Pack the glyphs.
 		{for (int i = 0, n = glyph_info.size(); i < n; )
@@ -850,9 +858,11 @@ namespace fontlib {
 							tg));
 
 					// Add this into the hash so it can possibly be reused.
-					if (image_hash.get(rgi.m_image_hash, NULL) == false)
+					map<unsigned int, const rendered_glyph_info*>::const_iterator image =
+						image_hash.find(rgi.m_image_hash);
+					if (image == image_hash.end())
 					{
-						image_hash.add(rgi.m_image_hash, &rgi);
+						image_hash[rgi.m_image_hash] = &rgi;
 					}
 
 					packed[index] = true;

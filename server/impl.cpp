@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.109 2007/06/15 15:00:29 strk Exp $ */
+/* $Id: impl.cpp,v 1.110 2007/06/23 12:34:32 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -646,7 +646,8 @@ public:
 
 static MovieLibrary s_movie_library;
 
-static hash< movie_definition*, boost::intrusive_ptr<sprite_instance> >	s_movie_library_inst;
+typedef std::map< movie_definition*, boost::intrusive_ptr<sprite_instance> > library_container_t;
+static library_container_t	s_movie_library_inst;
 static std::vector<sprite_instance*> s_extern_sprites;
 
 static std::string s_workdir;
@@ -742,11 +743,11 @@ sprite_instance* create_library_movie_inst(movie_definition* md)
 {
     // Is the movie instance already in the library?
     {
-	boost::intrusive_ptr<sprite_instance>	m;
-	s_movie_library_inst.get(md, &m);
-	if (m != NULL)
+	library_container_t::const_iterator i = s_movie_library_inst.find(md);
+	if (i != s_movie_library_inst.end())
 	    {
 		// Return cached movie instance.
+		boost::intrusive_ptr<sprite_instance>   m((*i).second);
 		return m.get();
 	    }
     }
@@ -762,7 +763,7 @@ sprite_instance* create_library_movie_inst(movie_definition* md)
 	}
     else
 	{
-	    s_movie_library_inst.add(md, mov);
+	    s_movie_library_inst[md] = mov;
 	}
 
     return mov;

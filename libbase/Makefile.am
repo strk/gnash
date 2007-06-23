@@ -79,7 +79,6 @@ endif
 
 libgnashbase_la_SOURCES = \
 	config.cpp \
-	container.cpp \
 	$(DMALLOC_FILE)	\
 	extension.cpp \
 	image.cpp \
