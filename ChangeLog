@@ -1,3 +1,9 @@
+2007-06-23 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.cpp (get_prototype): don't return the Object
+	  interface when prototype is NULL with SWF version < 5.
+	  Fixes the empty swf3 case with GC.
+
 2007-06-23 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* libbase/container.h: Remove home-made container classes in

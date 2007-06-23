@@ -619,7 +619,10 @@ as_object::get_prototype()
 {
 	if ( m_prototype ) return m_prototype.get();
 	//log_msg(_("as_object::get_prototype(): Hit top of inheritance chain"));
-	return getObjectInterface();
+
+	// if SWF version < 5 the Object interface won't keep alive !
+	if ( _vm.getSWFVersion() > 4 ) return getObjectInterface();
+	return NULL;
 }
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
