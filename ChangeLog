@@ -1,3 +1,8 @@
+2007-06-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk.cpp: Use stock icons for some more menu options. Also,
+	limit several lines to 80 characters.
+
 2007-06-23 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.cpp (get_prototype): don't return the Object

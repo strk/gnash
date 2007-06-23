@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.94 2007/06/13 17:56:18 strk Exp $ */
+/* $Id: gtk.cpp,v 1.95 2007/06/23 18:19:53 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1271,25 +1271,42 @@ GtkGui::createFileMenu(GtkWidget *obj)
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
     
-    GtkWidget *obre1 = gtk_image_menu_item_new_from_stock ("gtk-open", NULL);
+    GtkWidget *obre1 =
+ 	gtk_image_menu_item_new_from_stock ("gtk-open", NULL);
     gtk_widget_show (obre1);
     gtk_container_add (GTK_CONTAINER (menu), obre1);
     
-    GtkWidget *desa1 = gtk_image_menu_item_new_from_stock ("gtk-save", NULL);
+    GtkWidget *desa1 =
+ 	gtk_image_menu_item_new_from_stock ("gtk-save", NULL);
     gtk_widget_show (desa1);
     gtk_container_add (GTK_CONTAINER (menu), desa1);
-    gtk_widget_set_sensitive(desa1,FALSE); // Disabled untill save functionality is implemented.
-    
-    GtkWidget *anomena_i_desa1 = gtk_image_menu_item_new_from_stock ("gtk-save-as", NULL);
+    // Disabled until save functionality is implemented:
+    gtk_widget_set_sensitive(desa1,FALSE); 
+
+    GtkWidget *anomena_i_desa1 =
+ 	gtk_image_menu_item_new_from_stock ("gtk-save-as", NULL);
     gtk_widget_show (anomena_i_desa1);
     gtk_container_add (GTK_CONTAINER (menu), anomena_i_desa1);
-    gtk_widget_set_sensitive(anomena_i_desa1,FALSE); // Disabled untill save-as functionality is implemented.
+    // Disabled until save-as functionality is implemented:
+    gtk_widget_set_sensitive(anomena_i_desa1,FALSE);
     
     GtkWidget *separatormenuitem1 = gtk_separator_menu_item_new ();
     gtk_widget_show (separatormenuitem1);
     gtk_container_add (GTK_CONTAINER (menu), separatormenuitem1);
     gtk_widget_set_sensitive (separatormenuitem1, FALSE);
-    
+
+    GtkWidget *properties1 =
+ 	gtk_image_menu_item_new_from_stock ("gtk-properties", NULL);
+    gtk_widget_show (properties1);
+    gtk_container_add (GTK_CONTAINER (menu), properties1);
+    // Disabled until properties functionality is implemented:
+    gtk_widget_set_sensitive(properties1,FALSE);
+ 
+    GtkWidget *separatormenuitem2 = gtk_separator_menu_item_new ();
+    gtk_widget_show (separatormenuitem2);
+    gtk_container_add (GTK_CONTAINER (menu), separatormenuitem2);
+    gtk_widget_set_sensitive (separatormenuitem2, FALSE);
+
     GtkWidget *surt1 = gtk_image_menu_item_new_from_stock ("gtk-quit", NULL);
     gtk_widget_show (surt1);
     gtk_container_add (GTK_CONTAINER (menu), surt1);
@@ -1315,7 +1332,8 @@ GtkGui::createEditMenu(GtkWidget *obj)
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
 
-    GtkWidget *preferences1 = gtk_menu_item_new_with_label (_("Preferences"));
+    GtkWidget *preferences1 =
+ 	gtk_image_menu_item_new_from_stock ("gtk-preferences", NULL);
     gtk_widget_show (preferences1);
     gtk_container_add (GTK_CONTAINER (menu), preferences1);
 
@@ -1336,7 +1354,7 @@ GtkGui::createHelpMenu(GtkWidget *obj)
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
 
-    GtkWidget *about = gtk_menu_item_new_with_label (_("About"));
+    GtkWidget *about = gtk_image_menu_item_new_from_stock ("gtk-about", NULL);
     gtk_widget_show (about);
     gtk_container_add (GTK_CONTAINER (menu), about);
     
@@ -1350,29 +1368,30 @@ void
 GtkGui::createControlMenu(GtkWidget *obj)
 {
 //    GNASH_REPORT_FUNCTION;
-    GtkWidget *menuitem_control = gtk_menu_item_new_with_label (_("Movie Control"));
+    GtkWidget *menuitem_control =
+	gtk_menu_item_new_with_label (_("Movie Control"));
     gtk_widget_show (menuitem_control);
     gtk_container_add (GTK_CONTAINER (obj), menuitem_control);
     
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem_control), menu);
 
-    GtkMenuItem *menuitem_play =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Play Movie")));
+    GtkMenuItem *menuitem_play = GTK_MENU_ITEM(
+ 	gtk_image_menu_item_new_from_stock ("gtk-media-play", NULL));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_play));
     gtk_widget_show(GTK_WIDGET(menuitem_play));    
     g_signal_connect ((gpointer) menuitem_play, "activate",
         G_CALLBACK (&menuitem_play_callback), this);
 
-    GtkMenuItem *menuitem_pause =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Pause Movie")));
+    GtkMenuItem *menuitem_pause = GTK_MENU_ITEM(
+ 	gtk_image_menu_item_new_from_stock ("gtk-media-pause", NULL));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_pause));
     gtk_widget_show(GTK_WIDGET(menuitem_pause));
     g_signal_connect ((gpointer) menuitem_pause, "activate",
         G_CALLBACK (&menuitem_pause_callback), this);
 
-    GtkMenuItem *menuitem_stop =
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Stop Movie")));
+    GtkMenuItem *menuitem_stop = GTK_MENU_ITEM(
+ 	gtk_image_menu_item_new_from_stock ("gtk-media-stop", NULL));
     gtk_menu_append(menu, GTK_WIDGET(menuitem_stop));
     gtk_widget_show(GTK_WIDGET(menuitem_stop));
     g_signal_connect ((gpointer) menuitem_stop, "activate",
