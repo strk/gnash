@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.54 2007/06/15 15:00:28 strk Exp $ */
+/* $Id: as_value.h,v 1.55 2007/06/24 00:44:56 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -31,6 +31,7 @@
 #include <cmath>
 #include <limits>
 #include <string>
+#include <ostream> // for inlined output operator
 
 namespace gnash {
 
