@@ -75,7 +75,6 @@ main(int argc, char** argv)
   // _root.frame1
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  add_actions(mo, " x1=0; x2=0; x3=0; x4=0; x5=0; x6=0; x7=0; x8=0; x9=0; x10=0; ");
   SWFMovie_nextFrame(mo); 
 
   // _root.frame2, define and place a morph
