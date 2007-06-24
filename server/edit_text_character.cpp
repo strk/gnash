@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.68 2007/06/15 15:00:29 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.69 2007/06/24 12:58:28 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -324,7 +324,7 @@ getTextFieldInterface()
 	{
 		proto = new as_object();
 		attachTextFieldInterface(*proto);
-		proto->init_member("constructor", new builtin_function(textfield_ctor)); 
+		//proto->init_member("constructor", new builtin_function(textfield_ctor)); 
 	}
 	return proto.get();
 }

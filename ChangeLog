@@ -1,3 +1,12 @@
+2007-06-24 Sandro Santilli <strk@keybit.net>
+
+	* server/: edit_text_character.cpp, sprite_instance.cpp,
+	  video_stream_instance.cpp, asobj/System.cpp:
+	  Don't initialize the "constructor" member explicitly as that's
+	  done by the builtin_function class instead. This patch fixes
+	  the useless construction of 7 to 11 objects (otherwise 
+	  deleted by first GC run).
+
 2007-06-24 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/morph_test1.c: first testcase for morphs,

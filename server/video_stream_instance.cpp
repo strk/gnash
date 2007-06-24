@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.29 2007/06/19 09:26:54 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.30 2007/06/24 12:58:28 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -46,7 +46,7 @@ static as_object* getVideoInterface()
 	{
 		proto = new as_object();
 		attachVideoInterface(*proto);
-		proto->init_member("constructor", new builtin_function(video_ctor));
+		//proto->init_member("constructor", new builtin_function(video_ctor));
 	}
 	return proto.get();
 }

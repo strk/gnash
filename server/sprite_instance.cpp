@@ -1628,7 +1628,7 @@ getMovieClipInterface()
 	{
 		proto = new as_object();
 		attachMovieClipInterface(*proto);
-		proto->init_member("constructor", new builtin_function(movieclip_ctor));
+		//proto->init_member("constructor", new builtin_function(movieclip_ctor));
 	}
 	return proto.get();
 }

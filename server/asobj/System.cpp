@@ -116,7 +116,7 @@ getSystemInterface()
 	{
 		proto = new as_object();
 		attachSystemInterface(*proto);
-		proto->init_member("constructor", new builtin_function(system_new)); 
+		//proto->init_member("constructor", new builtin_function(system_new)); 
 	}
 	return proto.get();
 }
