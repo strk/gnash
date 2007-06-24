@@ -1,3 +1,9 @@
+2007-06-24 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/morph_test1.c: first testcase for morphs,
+	  need a testrunner for checking the renderer, but might be enough for
+	  testing GC at the moment.
+	
 2007-06-23 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.h: include <iostream> for proper definition
