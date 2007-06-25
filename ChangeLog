@@ -1,3 +1,7 @@
+2007-06-25 Antti Ajaki <antti.ajanki@iki.fi>
+
+        * gui/kde_glue_agg.cpp: See http://savannah.gnu.org/patch/?6022
+
 2007-06-25 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/morph_test1.c: minor update, reduce a frame for testing.

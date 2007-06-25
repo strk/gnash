@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: kde_glue_agg.cpp,v 1.2 2007/06/10 14:46:44 bjacques Exp $ */
+/* $Id: kde_glue_agg.cpp,v 1.3 2007/06/25 09:55:41 nihilus Exp $ */
 
 #include "kde_glue_agg.h"
 #include "render_handler.h"
@@ -57,7 +57,7 @@ KdeAggGlue::prepDrawingArea(QWidget *drawing_area)
 void
 KdeAggGlue::initBuffer(int width, int height)
 {
-    assert(_renderer);
+    if (!_renderer) return;
 
     int _bpp = 32;
     int depth_bytes = _bpp / 8;
