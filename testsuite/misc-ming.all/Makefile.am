@@ -152,6 +152,8 @@ check_PROGRAMS = \
 	NetStream-SquareTest \
 	NetStream-SquareTestRunner \
 	shape_test \
+	morph_test1 \
+	morph_test1runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -475,6 +477,27 @@ shape_testrunner: $(srcdir)/../generic-testrunner.sh shape_test.swf
 	sh $< -f20 $(top_builddir) shape_test.swf > $@
 	chmod 755 $@
 
+morph_test1_SOURCES = morph_test1.c
+morph_test1_LDADD = libgnashmingutils.la
+
+morph_test1.swf: morph_test1
+	./morph_test1 $(top_srcdir)/testsuite/media
+
+morph_test1runner_SOURCES = \
+	morph_test1runner.cpp \
+	$(NULL)
+morph_test1runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+morph_test1runner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+morph_test1runner_DEPENDENCIES = \
+	morph_test1.swf \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+	
 key_event_test_SOURCES = key_event_test.c
 key_event_test_LDADD = libgnashmingutils.la
 
@@ -1538,6 +1561,7 @@ TEST_CASES = \
 	loop_test7runner \
 	loop_test8runner \
 	shape_testrunner \
+	morph_test1runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS

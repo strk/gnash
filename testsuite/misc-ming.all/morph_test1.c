@@ -70,7 +70,7 @@ main(int argc, char** argv)
   Ming_init();
   mo = newSWFMovieWithVersion(OUTPUT_VERSION);
   SWFMovie_setDimension(mo, 800, 600);
-  SWFMovie_setRate (mo, 12.0);
+  SWFMovie_setRate (mo, 1.0);
 
   // _root.frame1
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
@@ -88,7 +88,7 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); 
   
   // update the morph with different ratios
-  for(ratio=0; ratio<1.01; ratio+=0.2)
+  for(ratio=0.2; ratio<1.01; ratio+=0.2)
   {
      SWFDisplayItem_remove(it);
      it = SWFMovie_add(mo, (SWFBlock)morph);
