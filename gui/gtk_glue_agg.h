@@ -18,10 +18,19 @@
 //
 //
 
+// Define this macro to enable experimental support for MIT-SHM
+// see http://www.xfree86.org/current/mit-shm.html
+//#define ENABLE_MIT_SHM 1
+
 #include "gtk_glue.h"
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
+
+#ifdef ENABLE_MIT_SHM
+#include <X11/extensions/XShm.h>
+#endif
+
 
 namespace gnash
 {
@@ -45,6 +54,29 @@ class GtkAggGlue : public GtkGlue
     int _offscreenbuf_size;
     render_handler *_agg_renderer;
     int _width, _height, _bpp;
+    bool _have_shm;
+#ifdef ENABLE_MIT_SHM
+    XImage *_shm_image;
+    XShmSegmentInfo *_shm_info;
+#endif    
+    
+    /// Checks if the MIT-SHM extension is available (supported by the server)
+    bool check_mit_shm(Display *display);
+    
+    /// Tries to create a SHM image. 
+    ///
+    /// This can still fail even if check_mit_shm() returned true in case
+    /// we have not the appropriate pixel format compiled in or any other
+    /// error happened.  
+    void create_shm_image(unsigned int width, unsigned int height);
+    
+    /// Destroys a previously created SHM image (deals with NULL pointer)
+    void destroy_shm_image();
+    
+    /// Tries to create a AGG render handler based on the X server pixel
+    /// format. Returns NULL on failure.
+    render_handler *create_shm_handler();    
+    
 };
 
 } // namespace gnash

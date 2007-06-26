@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.17 2007/05/28 15:41:00 ann Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.18 2007/06/26 17:40:09 udog Exp $ */
 
 
 /*
@@ -47,6 +47,15 @@ Also worth checking:
 #include "render_handler_agg.h"
 #include "gtk_glue_agg.h"
 
+#ifdef ENABLE_MIT_SHM
+#include <X11/Xlib.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <X11/extensions/XShm.h>
+#include <gdk/gdkprivate.h>
+#endif
+
+
 namespace gnash
 {
 
@@ -63,12 +72,16 @@ GtkAggGlue::GtkAggGlue() :
 GtkAggGlue::~GtkAggGlue()
 {
   free(_offscreenbuf);
+  destroy_shm_image();
 }
 
 bool
 GtkAggGlue::init(int /*argc*/, char **/*argv*/[])
 {
     gdk_rgb_init();
+    
+    _have_shm = check_mit_shm(gdk_display);
+    
 #ifdef PIXELFORMAT_RGB565
     _bpp = 16;
 #else
@@ -79,6 +92,65 @@ GtkAggGlue::init(int /*argc*/, char **/*argv*/[])
     return true;
 }
 
+bool 
+GtkAggGlue::check_mit_shm(Display *display) 
+{
+#ifdef ENABLE_MIT_SHM
+  int major, minor, dummy;
+  Bool pixmaps;
+  
+  log_msg("Checking support for MIT-SHM...");
+  
+  if (!XQueryExtension(display, "MIT-SHM", &dummy, &dummy, &dummy)) 
+  {
+    log_msg("WARNING: No MIT-SHM extension available, using standard XLib "
+      "calls (slower)");
+    return false;
+  }
+  
+  if (XShmQueryVersion(display, &major, &minor, &pixmaps )!=True)
+	{
+    log_msg("WARNING: MIT-SHM not ready (network link?), using standard XLib "
+      "calls (slower)");
+    return false;
+	}
+	
+	log_msg("NOTICE: MIT-SHM available (version %d.%d)!", major, minor);
+	
+	
+#else
+	return false; // !ifdef ENABLE_MIT_SHM
+#endif
+  
+}
+
+void 
+GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
+{
+
+  //Visual xvisual = ((GdkVisualPrivate*) visual)->xvisual; 
+
+  destroy_shm_image();
+  
+  /*if (!_shm_info) {
+    _shm_info = malloc(sizeof XShmSegmentInfo);
+  }*/ 
+  
+  //_shm_image = XShmCreateImage();
+}
+
+void 
+GtkAggGlue::destroy_shm_image()
+{
+#ifdef ENABLE_MIT_SHM
+  if (!_shm_image) return; // not allocated
+  
+  XDestroyImage(_shm_image);
+  _shm_image=NULL;
+  
+#endif
+}
+
 void
 GtkAggGlue::prepDrawingArea(GtkWidget *drawing_area)
 {
@@ -86,8 +158,51 @@ GtkAggGlue::prepDrawingArea(GtkWidget *drawing_area)
 }
 
 render_handler*
+GtkAggGlue::create_shm_handler()
+{
+#ifdef ENABLE_MIT_SHM
+  GdkVisual *visual = gdk_drawable_get_visual(_drawing_area->window);
+  
+  char *pixelformat = agg_detect_pixel_format(
+    visual->red_shift, visual->red_prec,
+    visual->green_shift, visual->green_prec,
+    visual->blue_shift, visual->blue_prec,
+    visual->depth); 
+
+  if (!pixelformat) {
+    log_msg("Pixel format of X server not recognized (%d:%d, %d:%d, %d:%d, %d bpp)",
+      visual->red_shift, visual->red_prec,
+      visual->green_shift, visual->green_prec,
+      visual->blue_shift, visual->blue_prec,
+      visual->depth);
+    return NULL; 
+  }
+  
+  log_msg("X server is using %s pixel format", pixelformat);
+  
+  render_handler* res = create_render_handler_agg(pixelformat);
+  
+  if (!res) 
+    log_msg("Failed creating a renderer instance for this pixel format. "
+      "Most probably Gnash has not compiled in (configured) support "
+      "for this pixel format - using standard pixmaps instead");      
+  
+  
+  return res;
+    
+#else
+  return NULL;
+#endif
+}
+
+render_handler*
 GtkAggGlue::createRenderHandler()
 {
+
+  // try with MIT-SHM
+  _agg_renderer = create_shm_handler();
+  if (_agg_renderer) return _agg_renderer;
+
 #ifdef PIXELFORMAT_RGB565
 #warning A pixel format of RGB565; you must have a (hacked) GTK which supports \
          this format (e.g., GTK on the OLPC).
@@ -106,6 +221,8 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
 	assert(_agg_renderer!=NULL);
 
 	#define CHUNK_SIZE (100*100*(_bpp/8))
+	
+	create_shm_image(width, height);
 
 	if (width == _width && height == _height)
 	   return;

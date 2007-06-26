@@ -67,7 +67,17 @@ public:
 ///
 DSOEXPORT render_handler_agg_base*
   create_render_handler_agg(const char *pixelformat);
+  
+/// Detect pixel format based on bit mask. If the pixel format is unknown,
+/// NULL is returned. Note that a successfully detected pixel format does
+/// not necessarily mean that the pixel format is available (compiled in).
+DSOEXPORT char* agg_detect_pixel_format(unsigned int rofs, unsigned int rsize,
+  unsigned int gofs, unsigned int gsize,
+  unsigned int bofs, unsigned int bsize,
+  unsigned int bpp);
+  
 
 } // namespace gnash
+
 
 #endif // BACKEND_RENDER_HANDLER_CAIRO_H

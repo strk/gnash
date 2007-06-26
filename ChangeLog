@@ -1,3 +1,12 @@
+2007-06-26 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg_style.h: always premultiply image accessors
+	  with alpha channel (partial fix for bug #20257)
+	* backend/render_handler_agg.{cpp,h}, gui/fb.cpp: moved pixel format
+	  detection code to AGG backend files (so it can be used by any GUI)   
+	* gui/gtk_glue_agg.{cpp,h}: initial work for MIT-SHM support (not 
+	  compiled in by default because there is much left to do)
+
 2007-06-26 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/callFunction_test.c: testcase for ActionCallFunction,

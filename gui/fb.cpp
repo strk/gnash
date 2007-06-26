@@ -254,58 +254,16 @@ bool FBGui::initialize_renderer() {
   log_msg("blue channel: %d / %d", var_screeninfo.blue.offset, 
     var_screeninfo.blue.length);
   log_msg("Total bits per pixel: %d", var_screeninfo.bits_per_pixel);
-    
   
-  // 15 bits RGB (hicolor)
-  if ((var_screeninfo.red.offset==10)
-   && (var_screeninfo.red.length==5)
-   && (var_screeninfo.green.offset==5)
-   && (var_screeninfo.green.length==5)
-   && (var_screeninfo.blue.offset==0)
-   && (var_screeninfo.blue.length==5) ) {
-   
-    agg_handler = create_render_handler_agg("RGB555");
-      
-  } else   
-  // 16 bits RGB (hicolor)
-  if ((var_screeninfo.red.offset==11)
-   && (var_screeninfo.red.length==5)
-   && (var_screeninfo.green.offset==5)
-   && (var_screeninfo.green.length==6)
-   && (var_screeninfo.blue.offset==0)
-   && (var_screeninfo.blue.length==5) ) {
-   
-    agg_handler = create_render_handler_agg("RGB565");
-      
-  } else   
+  char* pixelformat = agg_detect_pixel_format(
+    var_screeninfo.red.offset, var_screeninfo.red.length,
+    var_screeninfo.green.offset, var_screeninfo.green.length,
+    var_screeninfo.blue.offset, var_screeninfo.blue.length,
+    _bpp
+  );
   
-  // 24 bits RGB (truecolor)
-  if ((var_screeninfo.red.offset==16)
-   && (var_screeninfo.red.length==8)
-   && (var_screeninfo.green.offset==8)
-   && (var_screeninfo.green.length==8)
-   && (var_screeninfo.blue.offset==0)
-   && (var_screeninfo.blue.length==8) ) {
-   
-    if (_bpp==24)
-      agg_handler = create_render_handler_agg("BGR24");
-    else
-      agg_handler = create_render_handler_agg("BGRA32");
-      
-  } else   
-  // 24 bits BGR (truecolor)
-  if ((var_screeninfo.red.offset==0)
-   && (var_screeninfo.red.length==8)
-   && (var_screeninfo.green.offset==8)
-   && (var_screeninfo.green.length==8)
-   && (var_screeninfo.blue.offset==16)
-   && (var_screeninfo.blue.length==8)) {
-   
-    if (_bpp==24)
-      agg_handler = create_render_handler_agg("RGB24");
-    else
-      agg_handler = create_render_handler_agg("RGBA32");
-      
+  if (pixelformat) {    
+    agg_handler = create_render_handler_agg(pixelformat);      
   } else {
     log_error("The pixel format of your framebuffer is not supported.");
     return false;

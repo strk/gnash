@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.88 2007/06/06 16:15:00 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.89 2007/06/26 17:40:38 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -2078,6 +2078,8 @@ private:  // private variables
 DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelformat)
 {
 
+  if (!pixelformat) return NULL;
+
   log_msg("framebuffer pixel format is %s", pixelformat);
   
 #ifdef PIXELFORMAT_RGB555  
@@ -2119,6 +2121,55 @@ DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelf
   }
   
   return NULL; // avoid compiler warning
+}
+
+DSOEXPORT char *agg_detect_pixel_format(unsigned int rofs, unsigned int rsize,
+  unsigned int gofs, unsigned int gsize,
+  unsigned int bofs, unsigned int bsize,
+  unsigned int bpp) {
+  
+  // 15 bits RGB (hicolor)
+  if ((rofs==10) && (rsize==5)
+   && (gofs==5) && (gsize==5)
+   && (bofs==0) && (bsize==5) ) {
+   
+    return "RGB555";
+      
+  } else   
+  // 16 bits RGB (hicolor)
+  if ((rofs==11) && (rsize==5)
+   && (gofs==5) && (gsize==6)
+   && (bofs==0) && (bsize==5) ) {
+   
+    return "RGB565";
+      
+  } else   
+  
+  // 24 bits RGB (truecolor)
+  if ((rofs==16) && (rsize==8)
+   && (gofs==8) && (gsize==8)
+   && (bofs==0) && (bsize==8) ) {
+   
+    if (bpp==24)
+      return "BGR24";
+    else
+      return "BGRA32";
+      
+  } else   
+  // 24 bits BGR (truecolor)
+  if ((rofs==0) && (rsize==8)
+   && (gofs==8) && (gsize==8)
+   && (bofs==16) && (bsize==8)) {
+   
+    if (bpp==24)
+      return "RGB24";
+    else
+      return "RGBA32";
+      
+  }  
+  
+  return NULL; // unknown format
+  
 }
 
 } // end of namespace gnash
