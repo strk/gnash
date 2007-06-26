@@ -27,7 +27,7 @@
  *  call succeeds.
  *
  * Obeserved behaviour:
- * 	ActionCallFunction supports path prefix before a function name.
+ *  ActionCallFunction supports path prefix before a function name.
  */
 
 #include <stdlib.h>
@@ -64,13 +64,13 @@ main(int argc, char** argv)
   SWFMovie_setDimension(mo, 800, 600);
   SWFMovie_setRate (mo, 12.0);
 
-	// _root.frame1
+  // _root.frame1
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   add_actions(mo, " x1=0; x2=0; x3=0; x4=0; x5=0; x6=0; x7=0; x8=0; x9=0; x10=0; ");
   SWFMovie_nextFrame(mo); 
 
-	//
+  //
   // _root.frame2: define movieclips and some functions.
   //
   // Define mc11
@@ -106,36 +106,36 @@ main(int argc, char** argv)
   // _root.frame3: invoke function calls
   //
   add_actions(mo,  "asm{"
-  								 "push 0 "
+                   "push 0 "
                    "push  '_root.mc1.mc11.func1' " // valid format
                    "callfunction " 
                    "};");
   add_actions(mo,  "asm{"
-  								 "push 2 "
-  								 "push 1 "
+                   "push 2 "
+                   "push 1 "
                    "push  '_root.mc1.mc11.gotoAndStop' " // valid format
                    "callfunction " 
                    "};");
   add_actions(mo,  "asm{"
-  								 "push 0 "
+                   "push 0 "
                    "push  '_root.mc1:func2' " // valid format
                    "callfunction " 
                    "};");
   add_actions(mo,  "asm{"
-  								 "push 2 "
-  								 "push 1 "
+                   "push 2 "
+                   "push 1 "
                    "push  '/mc1/:gotoAndStop' " // valid format
                    "callfunction " 
                    "};");
   add_actions(mo,  "asm{"
-  								 "push 3 "
-  								 "push 1 "
+                   "push 3 "
+                   "push 1 "
                    "push  '/_root/mc1/mc11/gotoAndStop' " // *invalid* format
                    "callfunction " 
                    "};");
  add_actions(mo,  "asm{"
-  								 "push 3 "
-  								 "push 1 "
+                   "push 3 "
+                   "push 1 "
                    "push  '_root:mc1:gotoAndStop' " // valid format
                    "callfunction " 
                    "};");
