@@ -44,7 +44,7 @@ class agg_style_base
 {
 public:
   // for solid styles:
-  bool m_is_solid;
+  bool m_is_solid;   
   agg::rgba8 m_color; // defined here for easy access
   
   // for non-solid styles:
@@ -113,6 +113,8 @@ template <class PixelFormat, class span_allocator_type, class img_source_type,
 class agg_style_bitmap : public agg_style_base
 {
 public:
+
+  bool m_force_premultiply;
     
   agg_style_bitmap(int width, int height, int rowlen, uint8_t* data, 
     gnash::matrix mat, gnash::cxform cx) :
@@ -122,7 +124,8 @@ public:
     m_img_src(m_pixf),
     m_tr(),       // initialize later
     m_interpolator(m_tr),
-    m_sg(m_img_src, m_interpolator)
+    m_sg(m_img_src, m_interpolator),
+    m_force_premultiply(false)
   {
   
     m_is_solid = false;
@@ -146,14 +149,20 @@ public:
   void generate_span(agg::rgba8* span, int x, int y, unsigned len)
   {
     m_sg.generate(span, x, y, len);
-
     // Apply color transform
     // TODO: Check if this can be optimized
-    if (!m_cx.is_identity())      
-    for (unsigned int i=0; i<len; i++) {
-      m_cx.transform(span->r, span->g, span->b, span->a);
-      span->premultiply();
-      ++span;
+    if (!m_cx.is_identity()) {      
+      for (unsigned int i=0; i<len; i++) {
+        m_cx.transform(span->r, span->g, span->b, span->a);
+        span->premultiply();
+        ++span;
+      }
+    } else 
+    if (m_force_premultiply) {
+      for (unsigned int i=0; i<len; i++) { 
+        span->premultiply();
+        span++;
+      }    
     }
   }
     
@@ -309,10 +318,10 @@ public:
     /// Adds a new bitmap fill style
     void add_bitmap(agg_bitmap_info_base* bi, gnash::matrix mat, gnash::cxform cx, 
       bool repeat, bool smooth) {
-      
+
       if (bi==NULL) {
-	// See server/styles.h comments about when NULL return is possible.
-	// Don't warn here, we already warn at parse-time
+        // See server/styles.h comments about when NULL return is possible.
+        // Don't warn here, we already warn at parse-time
         //log_msg("WARNING: add_bitmap called with bi=NULL");
         add_color(agg::rgba8_pre(0,0,0,0));
         return;
@@ -380,7 +389,7 @@ public:
     
 
     void add_bitmap_repeat_nn_rgb24(agg_bitmap_info_base* bi, gnash::matrix mat, gnash::cxform cx) {
-    
+
       // tiled, nearest neighbor method (faster)   
 
       typedef agg::pixfmt_rgb24_pre PixelFormat;
@@ -482,7 +491,9 @@ public:
         interpolator_type, sg_type> st_type;
       
       st_type* st = new st_type(bi->get_width(), bi->get_height(),
-          bi->get_rowlen(), bi->get_data(), mat, cx);       
+          bi->get_rowlen(), bi->get_data(), mat, cx);
+          
+      st->m_force_premultiply = true; // important for alpha channel       
         
       m_styles.push_back(st);
     }
@@ -504,7 +515,9 @@ public:
         interpolator_type, sg_type> st_type;
       
       st_type* st = new st_type(bi->get_width(), bi->get_height(),
-          bi->get_rowlen(), bi->get_data(), mat, cx);       
+          bi->get_rowlen(), bi->get_data(), mat, cx);
+          
+      st->m_force_premultiply = true; // important for alpha channel       
         
       m_styles.push_back(st);
     }
@@ -528,6 +541,8 @@ public:
       st_type* st = new st_type(bi->get_width(), bi->get_height(),
           bi->get_rowlen(), bi->get_data(), mat, cx);       
         
+      st->m_force_premultiply = true; // important for alpha channel       
+
       m_styles.push_back(st);
     }
         
@@ -548,6 +563,8 @@ public:
       st_type* st = new st_type(bi->get_width(), bi->get_height(),
           bi->get_rowlen(), bi->get_data(), mat, cx);       
         
+      st->m_force_premultiply = true; // important for alpha channel       
+
       m_styles.push_back(st);
     }
     
