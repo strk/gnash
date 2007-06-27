@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.19 2007/06/27 14:22:35 udog Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.20 2007/06/27 17:05:31 udog Exp $ */
 
 
 /// \page gtk_shm_support GTK shared memory extension support
@@ -132,6 +132,8 @@ GtkAggGlue::check_mit_shm(Display *display)
 	}
 	
 	log_msg("NOTICE: MIT-SHM available (version %d.%d)!", major, minor);
+	
+	return true;
 	
 	
 #else
