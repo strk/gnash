@@ -2,6 +2,7 @@
 
 	* gui/fb.cpp, gui/fltk_glue_agg.cpp, gui/gtk.cpp, gui/gui.cpp: set
 	  correct _validbounds 	
+	* gui/gtk_glue_agg.{cpp,h}: implemented shared memory image blitting
 
 2007-06-26 Udo Giacomozzi <udo.gnu@nova-sys.net>
 

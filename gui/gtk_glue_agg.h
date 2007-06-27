@@ -20,7 +20,7 @@
 
 // Define this macro to enable experimental support for MIT-SHM
 // see http://www.xfree86.org/current/mit-shm.html
-//#define ENABLE_MIT_SHM 1
+#define ENABLE_MIT_SHM 1
 
 #include "gtk_glue.h"
 
@@ -67,7 +67,8 @@ class GtkAggGlue : public GtkGlue
     ///
     /// This can still fail even if check_mit_shm() returned true in case
     /// we have not the appropriate pixel format compiled in or any other
-    /// error happened.  
+    /// error happened. create_shm_image() replaces (destroys) an already
+    /// allocated SHM image.
     void create_shm_image(unsigned int width, unsigned int height);
     
     /// Destroys a previously created SHM image (deals with NULL pointer)
@@ -76,6 +77,10 @@ class GtkAggGlue : public GtkGlue
     /// Tries to create a AGG render handler based on the X server pixel
     /// format. Returns NULL on failure.
     render_handler *create_shm_handler();    
+    
+    // converts a bitmask to a shift/size information (used for pixel format
+    // detection)
+    void decode_mask(unsigned long mask, unsigned int *shift, unsigned int *size);
     
 };
 
