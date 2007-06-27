@@ -231,7 +231,7 @@ bool FBGui::initialize_renderer() {
   m_stage_width = _width;
   m_stage_height = _height;
   
-  _validbounds.setTo(0, 0, _width, _height);
+  _validbounds.setTo(0, 0, _width-1, _height-1);
     
   
   #ifdef DOUBLE_BUFFER

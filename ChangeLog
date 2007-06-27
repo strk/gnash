@@ -1,3 +1,8 @@
+2007-06-27 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/fb.cpp, gui/fltk_glue_agg.cpp, gui/gtk.cpp, gui/gui.cpp: set
+	  correct _validbounds 	
+
 2007-06-26 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg_style.h: always premultiply image accessors

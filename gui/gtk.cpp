@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.95 2007/06/23 18:19:53 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.96 2007/06/27 09:55:20 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -231,7 +231,7 @@ GtkGui::createWindow(int width, int height)
 	_width = width;
 	_height = height;
 
-	_validbounds.setTo(0, 0, _width, _height);
+	_validbounds.setTo(0, 0, _width-1, _height-1);
     
 	glue.setRenderHandlerSize(_width, _height);
 

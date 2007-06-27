@@ -154,7 +154,7 @@ Gui::resize_view(int width, int height)
 	// set new size ?
 	_width = width;
 	_height = height;
-	_validbounds.setTo(0, 0, _width, _height);
+	_validbounds.setTo(0, 0, _width-1, _height-1);
 	//log_msg(_("new size (in twips) is: %dx%d"), _width*20, _height*20); 
 }
 
