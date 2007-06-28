@@ -1,3 +1,7 @@
+2007-06-27 Petr Pisar <petr.pisar@atlas.cz>
+
+	* po/: Makefile.am, cs.po: Initial Czech translation.
+
 2007-06-27 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/fb.cpp, gui/fltk_glue_agg.cpp, gui/gtk.cpp, gui/gui.cpp: set
