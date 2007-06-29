@@ -278,6 +278,7 @@ FreetypeGlyphsProvider::getFontFilename(const std::string& name,
 			}
 
 			filename = (char *)file;
+			FcFontSetDestroy(fs);
 			return true;
 
 		}

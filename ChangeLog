@@ -1,5 +1,7 @@
 2007-06-28 Sandro Santilli <strk@keybit.net>
 
+	* server/FreetypeGlyphsProvider.cpp (getFontFilename): don't leak
+	  the FcFontSet when finding a match.
 	* server/edit_text_character.{cpp,h}:
 	  Do not call on_event(KILL_FOCUS) in the destructor, do
 	  it on ::unload(). The less things destructors do, the better
