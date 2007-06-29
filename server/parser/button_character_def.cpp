@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.14 2007/06/29 06:31:46 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.15 2007/06/29 20:37:51 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -41,7 +41,17 @@ button_action::~button_action()
 	for (ActionList::iterator i=m_actions.begin(), e=m_actions.end();
 			i != e; ++i)
 	{
-		delete (*i);
+		// We can NOT delete action_buffers here becase they 
+		// may contain the action currently being executed and
+		// triggering the deletion.
+		// I'm not really sure about whether this is the problem,
+		// anyway clip_as_button2.swf fails on segfault when clicking
+		// the upper-right button if we delete here.
+		//
+		// TODO: properly implement management of these resources
+		//       which are otherwise just leaking..
+		//
+		//delete (*i);
 	}
 	m_actions.clear(); // this is useless, will be done automatically
 }

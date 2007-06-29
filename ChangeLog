@@ -1,3 +1,10 @@
+2007-06-29 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/button_character_def.cpp: ok, let action_buffer leak,
+	  as it seems deleting them in button_action dtor introduces a
+	  segfault in our testusuite. Sorry for not running 'make check'
+	  before committing.
+
 2007-06-29 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/gtk_glue_agg.cpp: properly initialize new SHM variables
