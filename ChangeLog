@@ -1,6 +1,8 @@
 2007-06-29 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/gtk_glue_agg.cpp: properly initialize new SHM variables
+	* server/array.{h,cpp}: classes with virtual methods need a destructor,
+	  don't they?   	
 	
 2007-06-28 Sandro Santilli <strk@keybit.net>
 

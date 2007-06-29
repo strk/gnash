@@ -68,6 +68,8 @@ public:
 	as_array_object();
 
 	as_array_object(const as_array_object& other);
+	
+	~as_array_object();
 
 	void push(const as_value& val);
 

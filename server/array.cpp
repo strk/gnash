@@ -164,6 +164,10 @@ as_array_object::as_array_object(const as_array_object& other)
     //)
 }
 
+as_array_object::~as_array_object() 
+{
+}
+
 int
 as_array_object::index_requested(const std::string& name)
 {
