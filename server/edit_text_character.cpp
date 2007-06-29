@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.69 2007/06/24 12:58:28 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.70 2007/06/29 06:05:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -367,6 +367,11 @@ edit_text_character::edit_text_character(character* parent,
 }
 
 edit_text_character::~edit_text_character()
+{
+}
+
+void
+edit_text_character::unload()
 {
 	// TODO: unregisterTextVariable() ?
 	on_event(event_id::KILLFOCUS);

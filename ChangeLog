@@ -1,3 +1,10 @@
+2007-06-28 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.{cpp,h}:
+	  Do not call on_event(KILL_FOCUS) in the destructor, do
+	  it on ::unload(). The less things destructors do, the better
+	  (think GC..)
+
 2007-06-27 Petr Pisar <petr.pisar@atlas.cz>
 
 	* po/: Makefile.am, cs.po: Initial Czech translation.

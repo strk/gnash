@@ -102,6 +102,9 @@ public:
 	// See dox in character.h
 	bool pointInShape(float x, float y) const;
 
+	// See dox in character.h
+	void unload();
+
 private:
 
 	/// The actual text
