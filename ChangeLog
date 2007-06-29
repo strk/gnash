@@ -1,3 +1,7 @@
+2007-06-29 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gtk_glue_agg.cpp: properly initialize new SHM variables
+	
 2007-06-28 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/button_character_def.{cpp,h}: don't let

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.20 2007/06/27 17:05:31 udog Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.21 2007/06/29 07:36:53 udog Exp $ */
 
 
 /// \page gtk_shm_support GTK shared memory extension support
@@ -77,7 +77,12 @@ GtkAggGlue::GtkAggGlue() :
 	_agg_renderer(NULL),
 	_width(0),
 	_height(0),
-	_bpp(0)
+	_bpp(0),
+	_have_shm(false)
+#ifdef ENABLE_MIT_SHM
+  ,_shm_image(NULL)
+  ,_shm_info(NULL)
+#endif	
 {
 }
 
