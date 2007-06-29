@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.13 2007/06/19 18:42:50 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.14 2007/06/29 06:31:46 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -38,7 +38,12 @@ namespace gnash {
 
 button_action::~button_action()
 {
-	m_actions.clear();
+	for (ActionList::iterator i=m_actions.begin(), e=m_actions.end();
+			i != e; ++i)
+	{
+		delete (*i);
+	}
+	m_actions.clear(); // this is useless, will be done automatically
 }
 
 void	button_action::read(stream* in, int tag_type)

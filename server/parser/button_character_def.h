@@ -94,7 +94,9 @@ public:
 		OVER_DOWN_TO_IDLE = 1 << 8
 	};
 	int	m_conditions;
-	std::vector<action_buffer*>	m_actions;
+
+	typedef std::vector<action_buffer*> ActionList;
+	ActionList m_actions;
 
 	~button_action();
 	void	read(stream* in, int tag_type);

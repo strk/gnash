@@ -1,5 +1,7 @@
 2007-06-28 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/button_character_def.{cpp,h}: don't let
+	  gnash::button_action leak action_buffer objects.
 	* server/FreetypeGlyphsProvider.cpp (getFontFilename): don't leak
 	  the FcFontSet when finding a match.
 	* server/edit_text_character.{cpp,h}:
