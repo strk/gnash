@@ -81,6 +81,9 @@ MovieLoader::MovieLoader(movie_def_impl& md)
 
 MovieLoader::~MovieLoader()
 {
+	// we should assert _movie_def._loadingCanceled
+	// but we're not friend yet (anyone introduce us ?)
+	if ( _thread ) _thread->join();
 }
 
 bool
@@ -205,12 +208,16 @@ movie_def_impl::movie_def_impl(create_bitmaps_flag cbf,
 	_frame_reached_condition(),
 	_waiting_for_frame(0),
 	m_jpeg_in(0),
-	_loader(*this)
+	_loader(*this),
+	_loadingCanceled(false)
 {
 }
 
 movie_def_impl::~movie_def_impl()
 {
+	// Request cancelation of the loading thread
+	_loadingCanceled = true;
+
     // Release our playlist data.
     {for (size_t i = m_playlist.size() - 1; i != static_cast<size_t>(-1); i--) // Optimized
         {
@@ -832,6 +839,11 @@ movie_def_impl::read_all_swf()
 	//size_t it=0;
 	while ( (uint32_t) str.get_position() < _swf_end_pos )
 	{
+		if ( _loadingCanceled )
+		{
+			log_debug("Loading thread cancelation requested, returning from read_all_swf");
+			return;
+		}
 
 		//log_msg(_("Loading thread iteration %u"), it++);
 

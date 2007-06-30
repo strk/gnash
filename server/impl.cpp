@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.110 2007/06/23 12:34:32 bjacques Exp $ */
+/* $Id: impl.cpp,v 1.111 2007/06/30 18:22:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -571,7 +571,7 @@ void	clear()
     // See task task #6959 and depending items
     //
     std::cerr << "Any segfault past this message is likely due to improper threads cleanup." << std::endl;
-    exit(EXIT_SUCCESS);
+    //exit(EXIT_SUCCESS);
 
     clear_library();
     fontlib::clear();

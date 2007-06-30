@@ -1,5 +1,15 @@
 2007-06-30 Sandro Santilli <strk@keybit.net>
 
+	* server/impl.cpp (clear): don't exit, try the proper cleanup way;
+	  movie_def_impl loader should be ready, other threads likely aren't,
+	  this patch would expose all places in need for proper implementation
+	  of threads termination.
+	* server/parser/movie_def_impl.{cpp,h}: implement
+	  loader thread cancelation request, wait for the thread
+	  to terminate in MovieLoader destructor.
+
+2007-06-30 Sandro Santilli <strk@keybit.net>
+
 	* libbase/ref_counted.h: remove inheritance of ref_counted
 	  from GcResource, provide temporary isReachable/setReachable
 	  to allow not reverting all GC-related additions to character

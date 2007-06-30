@@ -318,6 +318,9 @@ private:
 	///
 	Timeline _timeline;
 
+	/// A flag set to true when load cancelation is requested
+	bool _loadingCanceled;
+
 public:
 
 	movie_def_impl(create_bitmaps_flag cbf, create_font_shapes_flag cfs);
