@@ -24,7 +24,7 @@
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
-/* $Id: smart_ptr.h,v 1.20 2007/06/15 15:00:26 strk Exp $ */
+/* $Id: smart_ptr.h,v 1.21 2007/06/30 16:52:53 strk Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H
@@ -40,12 +40,16 @@
 // Is is a temporary hack to allow quick switch between GC and REFCOUNT
 // mechanism till the GC is stable
 //
-//#define GNASH_USE_GC 1
+#define GNASH_USE_GC 1
 
 // TODO: if GNASH_USE_GC is defined have smart_ptr map to intrusive_ptr
 //       else have it map to gc_ptr (yet to be defined)
 
+#include "ref_counted.h"
+#include "GC.h"
+
 #include <boost/intrusive_ptr.hpp>
+#include <typeinfo>
 
 #define COMPILER_SUPPORTS_ARGUMENT_DEPENDENT_LOOKUP 1
 #ifdef COMPILER_SUPPORTS_ARGUMENT_DEPENDENT_LOOKUP
@@ -54,27 +58,26 @@ namespace gnash {
 namespace boost {
 #endif
 
-template <class T>
-void
-intrusive_ptr_add_ref(T* o)
+inline void
+intrusive_ptr_add_ref(ref_counted* o)
 {
-#ifndef GNASH_USE_GC
 	o->add_ref();
-#else
-	UNUSED(o);
-#endif // ndef GNASH_USE_GC
 }
 
-template <class T>
-void
-intrusive_ptr_release(T* o)
+inline void
+intrusive_ptr_release(ref_counted* o)
 {
-#ifndef GNASH_USE_GC
 	o->drop_ref();
-#else
-	UNUSED(o);
-#endif // ndef GNASH_USE_GC
 }
+
+// These two should not be needed when we switch all GcResource 
+// pointers to use the gc_ptr instead of the intrusive_ptr
+
+inline void intrusive_ptr_add_ref(GcResource* ) { }
+inline void intrusive_ptr_release(GcResource* ) { }
+
+// The below thing won't work. We'll need a real templated class..
+//template <typename C> typedef C* gc_ptr;
 
 } 
 

@@ -1,3 +1,14 @@
+2007-06-30 Sandro Santilli <strk@keybit.net>
+
+	* libbase/ref_counted.h: remove inheritance of ref_counted
+	  from GcResource, provide temporary isReachable/setReachable
+	  to allow not reverting all GC-related additions to character
+	  definitions and other possibly GcResource objects.
+	* libbase/smart_ptr.h: have two versions of the intrusive_ptr
+	  free functions: one for GcResource (do nothing) and one 
+	  for ref_counted (add/drop ref). Enable GC by default, where
+	  current version uses both RC and GC (GC only used for as_object)
+
 2007-06-29 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/button_character_def.cpp: ok, let action_buffer leak,

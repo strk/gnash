@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ref_counted.h,v 1.8 2007/06/16 07:59:19 strk Exp $ */
+/* $Id: ref_counted.h,v 1.9 2007/06/30 16:52:53 strk Exp $ */
 
 #ifndef GNASH_REF_COUNTED_H
 #define GNASH_REF_COUNTED_H
@@ -25,15 +25,6 @@
 #endif
 
 #include "container.h"
-#include "smart_ptr.h"
-
-#ifdef GNASH_USE_GC
-# include "GC.h"
-# ifdef GNASH_GC_DEBUG
-#  include "log.h"
-#  include <typeinfo>
-# endif // GNASH_GC_DEBUG
-#endif // GNASH_USE_GC
 
 namespace gnash {
 
@@ -42,18 +33,12 @@ namespace gnash {
 /// The only use for this class seems to be for putting derived
 /// classes in smart_ptr
 ///
-#ifdef GNASH_USE_GC
-class DSOEXPORT ref_counted : public GcResource
-#else
 class DSOEXPORT ref_counted
-#endif
 {
 
 private:
 
-#ifndef GNASH_USE_GC
 	mutable int		m_ref_count;
-#endif // ndef GNASH_USE_GC
 	
 protected:
 
@@ -61,21 +46,16 @@ protected:
 	// must never be explicitly deleted !
 	virtual ~ref_counted()
 	{
-#ifndef GNASH_USE_GC
 		assert(m_ref_count == 0);
-#endif // ndef GNASH_USE_GC
 	}
 
 public:
 	ref_counted()
-#ifndef GNASH_USE_GC
 		:
 		m_ref_count(0)
-#endif // ndef GNASH_USE_GC
 	{
 	}
 
-#ifndef GNASH_USE_GC
 	void	add_ref() const
 	{
 		assert(m_ref_count >= 0);
@@ -94,7 +74,16 @@ public:
 	}
 
 	int	get_ref_count() const { return m_ref_count; }
-#endif // ndef GNASH_USE_GC
+
+	// These two methods are defined as a temporary hack to 
+	// easy transition to the GC model. Was added when introducing
+	// mixed ref-counted AND gc-collected classes to avoid touching
+	// all ref-counted classes when GNASH_USE_GC is defined.
+	// If this design convinces us we'll be removing these two
+	// methods and all the calls from ref-counted classes.
+	//
+	void setReachable() { assert(m_ref_count > 0); }
+	bool isReachable() const { return true; }
 };
 
 } // namespace gnash
