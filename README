@@ -1,4 +1,4 @@
-$Id: README,v 1.29 2007/06/04 20:46:03 strk Exp $
+$Id: README,v 1.30 2007/07/01 15:42:43 nihilus Exp $
 
 		    Gnash: the GNU Flash Player
 
@@ -195,6 +195,10 @@ lists are stored at http://mail.gnu.org/pipermail/:
       these changes as they happen,
       http://mail.gnu.org/mailman/listinfo/gnash-commit Volume is
       sporadic, but typically low.
+
+IRC:
+    * #gnash on irc.freenode.net The #gnash channel on irc.freenode.net is 
+      where many of the developers hang out.
 
 If you would like a new feature to be included in future versions of
 Gnash, please send a request to <gnash-dev@gnu.org>. You can also
