@@ -3,7 +3,7 @@
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 // 
 // This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.34 2007/06/16 09:07:34 strk Exp $ */
+/* $Id: timers.cpp,v 1.35 2007/07/01 10:54:25 bjacques Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function

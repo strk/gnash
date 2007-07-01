@@ -2,7 +2,7 @@
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 
 // This program is distributed in the hope that it will be useful,
@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.70 2007/06/21 09:02:06 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.71 2007/07/01 10:53:49 bjacques Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

@@ -3,7 +3,7 @@
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation; either version 2 of the License, or
+#   the Free Software Foundation; either version 3 of the License, or
 #   (at your option) any later version.
 #
 #   This program is distributed in the hope that it will be useful,
@@ -16,7 +16,7 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-# $Id: Makefile.am,v 1.5 2007/04/06 07:58:15 jgilmore Exp $
+# $Id: Makefile.am,v 1.6 2007/07/01 10:53:49 bjacques Exp $
 
 ## Process this file with automake to generate Makefile.in
 

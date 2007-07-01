@@ -3,7 +3,7 @@ dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 dnl
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
-dnl  the Free Software Foundation; either version 2 of the License, or
+dnl  the Free Software Foundation; either version 3 of the License, or
 dnl  (at your option) any later version.
 dnl
 dnl  This program is distributed in the hope that it will be useful,

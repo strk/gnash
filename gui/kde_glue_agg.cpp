@@ -3,7 +3,7 @@
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 //
 // This program is distributed in the hope that it will be useful,
@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: kde_glue_agg.cpp,v 1.3 2007/06/25 09:55:41 nihilus Exp $ */
+/* $Id: kde_glue_agg.cpp,v 1.4 2007/07/01 10:54:03 bjacques Exp $ */
 
 #include "kde_glue_agg.h"
 #include "render_handler.h"

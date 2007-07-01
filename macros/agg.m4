@@ -3,7 +3,7 @@ dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
-dnl  the Free Software Foundation; either version 2 of the License, or
+dnl  the Free Software Foundation; either version 3 of the License, or
 dnl  (at your option) any later version.
 dnl  
 dnl  This program is distributed in the hope that it will be useful,
@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: agg.m4,v 1.28 2007/06/13 17:44:01 strk Exp $
+dnl $Id: agg.m4,v 1.29 2007/07/01 10:54:11 bjacques Exp $
 
 dnl agg_rasterizer_compound_aa.h is a new file included in AGG 2.4,
 dnl but not in AGG 2.3. As we need AGG 2.4, we use this as 

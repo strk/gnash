@@ -3,7 +3,7 @@
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 
 // This program is distributed in the hope that it will be useful,
@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LocalConnection.as,v 1.14 2007/03/20 18:12:30 bjacques Exp $";
+rcsid="$Id: LocalConnection.as,v 1.15 2007/07/01 10:54:39 bjacques Exp $";
 
 #include "dejagnu.as"
 

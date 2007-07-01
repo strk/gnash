@@ -3,7 +3,7 @@
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 // 
 // This program is distributed in the hope that it will be useful,
@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.89 2007/06/26 17:40:38 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.90 2007/07/01 10:53:47 bjacques Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)

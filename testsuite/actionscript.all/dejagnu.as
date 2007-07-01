@@ -3,7 +3,7 @@
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 
 // This program is distributed in the hope that it will be useful,
@@ -31,7 +31,7 @@
 // different folks works for me as long as the standard keywords are
 // used to keep DejaGnu happy.
 
-//rcsid="$Id: dejagnu.as,v 1.8 2006/11/23 14:37:08 strk Exp $";
+//rcsid="$Id: dejagnu.as,v 1.9 2007/07/01 10:54:42 bjacques Exp $";
 
 #include "check.as"
 

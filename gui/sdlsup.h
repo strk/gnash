@@ -3,7 +3,7 @@
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 // 
 // This program is distributed in the hope that it will be useful,
@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sdlsup.h,v 1.21 2007/05/28 15:41:00 ann Exp $ */
+/* $Id: sdlsup.h,v 1.22 2007/07/01 10:54:05 bjacques Exp $ */
 
 #ifndef __SDLSUP_H__
 #define __SDLSUP_H__

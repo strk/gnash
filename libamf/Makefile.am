@@ -4,7 +4,7 @@
 # 
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
+# the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
 # 
 # This program is distributed in the hope that it will be useful,
@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.25 2007/05/14 13:36:08 rsavoye Exp $
+# $Id: Makefile.am,v 1.26 2007/07/01 10:54:05 bjacques Exp $
 
 AUTOMAKE_OPTIONS = 
 

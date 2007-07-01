@@ -3,7 +3,7 @@
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 // 
 // This program is distributed in the hope that it will be useful,
@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.h,v 1.32 2007/05/28 15:41:02 ann Exp $ */
+/* $Id: plugin.h,v 1.33 2007/07/01 10:54:14 bjacques Exp $ */
 
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__

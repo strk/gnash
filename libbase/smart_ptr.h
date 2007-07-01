@@ -3,7 +3,7 @@
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 //
 // This program is distributed in the hope that it will be useful,
@@ -24,7 +24,7 @@
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
-/* $Id: smart_ptr.h,v 1.21 2007/06/30 16:52:53 strk Exp $ */
+/* $Id: smart_ptr.h,v 1.22 2007/07/01 10:54:10 bjacques Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H

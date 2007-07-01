@@ -3,7 +3,7 @@
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 //
 // This program is distributed in the hope that it will be useful,
@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: kde_glue_opengl.cpp,v 1.11 2007/06/09 19:42:05 bjacques Exp $ */
+/* $Id: kde_glue_opengl.cpp,v 1.12 2007/07/01 10:54:03 bjacques Exp $ */
 
 #include "kde_glue_opengl.h"
 #include "tu_opengl_includes.h"

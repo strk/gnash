@@ -4,7 +4,7 @@
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 //
 // This program is distributed in the hope that it will be useful,
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.15 2007/06/29 20:37:51 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.16 2007/07/01 10:54:33 bjacques Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 

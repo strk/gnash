@@ -4,7 +4,7 @@
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 //
 // This program is distributed in the hope that it will be useful,
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: morph2_character_def.cpp,v 1.10 2007/06/16 10:40:56 strk Exp $ */
+/* $Id: morph2_character_def.cpp,v 1.11 2007/07/01 10:54:34 bjacques Exp $ */
 
 // Based on the public domain morph2.cpp of:
 // Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,

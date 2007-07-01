@@ -3,7 +3,7 @@
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 // 
 // This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.15 2007/05/28 15:41:06 ann Exp $ 
+// $Id: matrix.cpp,v 1.16 2007/07/01 10:54:23 bjacques Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H

@@ -3,7 +3,7 @@
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 
 // This program is distributed in the hope that it will be useful,
@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: XML.as,v 1.33 2007/05/22 09:56:25 udog Exp $";
+rcsid="$Id: XML.as,v 1.34 2007/07/01 10:54:41 bjacques Exp $";
 
 #include "dejagnu.as"
 #include "utils.as"

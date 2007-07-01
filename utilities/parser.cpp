@@ -4,7 +4,7 @@
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 // 
 // This program is distributed in the hope that it will be useful,
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: parser.cpp,v 1.40 2007/06/22 22:07:07 nihilus Exp $ */
+/* $Id: parser.cpp,v 1.41 2007/07/01 10:55:16 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

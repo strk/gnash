@@ -3,7 +3,7 @@ dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
-dnl  the Free Software Foundation; either version 2 of the License, or
+dnl  the Free Software Foundation; either version 3 of the License, or
 dnl  (at your option) any later version.
 dnl  
 dnl  This program is distributed in the hope that it will be useful,
@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl: $Id: gtkglext.m4,v 1.34 2007/04/08 23:06:17 rsavoye Exp $
+dnl: $Id: gtkglext.m4,v 1.35 2007/07/01 10:54:12 bjacques Exp $
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [

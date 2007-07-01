@@ -3,7 +3,7 @@ dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
-dnl  the Free Software Foundation; either version 2 of the License, or
+dnl  the Free Software Foundation; either version 3 of the License, or
 dnl  (at your option) any later version.
 dnl  
 dnl  This program is distributed in the hope that it will be useful,
@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.344 2007/06/18 19:52:59 strk Exp $
+dnl $Id: configure.ac,v 1.345 2007/07/01 10:53:46 bjacques Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)

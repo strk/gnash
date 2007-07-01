@@ -4,7 +4,7 @@
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 //
 // This program is distributed in the hope that it will be useful,
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.21 2007/06/04 09:15:41 strk Exp $
+// $Id: FLVParser.cpp,v 1.22 2007/07/01 10:54:06 bjacques Exp $
 
 #include "FLVParser.h"
 #include "amf.h"

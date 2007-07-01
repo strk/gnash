@@ -4,7 +4,7 @@
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 // 
 // This program is distributed in the hope that it will be useful,
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Number.cpp,v 1.30 2007/04/27 08:46:46 strk Exp $ */
+/* $Id: Number.cpp,v 1.31 2007/07/01 10:54:29 bjacques Exp $ */
 
 #include "log.h"
 #include "tu_config.h"

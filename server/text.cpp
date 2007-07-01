@@ -4,7 +4,7 @@
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
+// the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
 // 
 // This program is distributed in the hope that it will be useful,
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.31 2007/06/13 02:49:33 strk Exp $ */
+/* $Id: text.cpp,v 1.32 2007/07/01 10:54:25 bjacques Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
