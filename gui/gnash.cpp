@@ -204,6 +204,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 	      version_and_copyright();
           printf("\n"); 
 	      usage ();
+	      build_options();
           	exit(EXIT_SUCCESS);
 	  case 'v':
               dbglogfile.setVerbosity();
