@@ -81,9 +81,15 @@ MovieLoader::MovieLoader(movie_def_impl& md)
 
 MovieLoader::~MovieLoader()
 {
+	cout << "MovieLoader dtor called" << endl;
+
 	// we should assert _movie_def._loadingCanceled
 	// but we're not friend yet (anyone introduce us ?)
-	if ( _thread ) _thread->join();
+	if ( _thread.get() )
+	{
+		cout << "Joining thread.." << endl;
+		_thread->join();
+	}
 }
 
 bool
@@ -91,7 +97,7 @@ MovieLoader::started() const
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
-	return _thread != NULL;
+	return _thread.get() != NULL;
 }
 
 bool
@@ -99,7 +105,7 @@ MovieLoader::isSelfThread() const
 {
 	boost::mutex::scoped_lock lock(_mutex);
 
-	if (!_thread) {
+	if (!_thread.get()) {
 		return false;
 	}
 	boost::thread this_thread;
@@ -125,7 +131,7 @@ MovieLoader::start()
 	// Those tests do seem a bit redundant, though...
 	boost::mutex::scoped_lock lock(_mutex);
 
-	_thread = new boost::thread(boost::bind(execute, &_movie_def));
+	_thread.reset( new boost::thread(boost::bind(execute, &_movie_def)) );
 
 	return true;
 }
@@ -215,6 +221,8 @@ movie_def_impl::movie_def_impl(create_bitmaps_flag cbf,
 
 movie_def_impl::~movie_def_impl()
 {
+	cout << "movie_def_impl dtor called" << endl;
+
 	// Request cancelation of the loading thread
 	_loadingCanceled = true;
 

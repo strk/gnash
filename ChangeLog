@@ -1,3 +1,11 @@
+2007-07-01 Sandro Santilli <strk@keybit.net>
+
+	* libbase/ref_counted.h: use 'long' for the ref count,
+	  cleanup header inclusion, prepare for using an atomic
+	  counter for thread safety (not enabled yet).
+	* server/parser/movie_def_impl.{cpp,h}: have MovieLoader
+	  keep the boost::thread by auto_ptr for proper destruction.
+
 2007-07-01 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* README: Added note on IRC.

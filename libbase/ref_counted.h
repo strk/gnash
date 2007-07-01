@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ref_counted.h,v 1.10 2007/07/01 10:54:10 bjacques Exp $ */
+/* $Id: ref_counted.h,v 1.11 2007/07/01 17:34:59 strk Exp $ */
 
 #ifndef GNASH_REF_COUNTED_H
 #define GNASH_REF_COUNTED_H
@@ -24,7 +24,10 @@
 #include "config.h"
 #endif
 
-#include "container.h"
+#include "tu_config.h" // for DSOEXPORT (better move that define in some other file?)
+
+#include <cassert>
+#include <boost/detail/atomic_count.hpp>
 
 namespace gnash {
 
@@ -38,7 +41,12 @@ class DSOEXPORT ref_counted
 
 private:
 
-	mutable int		m_ref_count;
+	typedef long Counter;
+	// boost atomic_counter is thread-safe, but doesn't
+	// provide a copy constructor.
+	//typedef mutable boost::detail::atomic_count Counter;
+
+	mutable Counter m_ref_count;
 	
 protected:
 
@@ -59,21 +67,20 @@ public:
 	void	add_ref() const
 	{
 		assert(m_ref_count >= 0);
-		m_ref_count++;
+		++m_ref_count;
 	}
 
 	void	drop_ref() const
 	{
 		assert(m_ref_count > 0);
-		m_ref_count--;
-		if (m_ref_count <= 0)
+		if (!--m_ref_count)
 		{
 			// Delete me!
 			delete this;
 		}
 	}
 
-	int	get_ref_count() const { return m_ref_count; }
+	long	get_ref_count() const { return m_ref_count; }
 
 	// These two methods are defined as a temporary hack to 
 	// easy transition to the GC model. Was added when introducing

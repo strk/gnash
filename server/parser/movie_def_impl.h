@@ -115,7 +115,7 @@ private:
 	movie_def_impl& _movie_def;
 
 	mutable boost::mutex _mutex;
-	boost::thread* _thread;
+	std::auto_ptr<boost::thread> _thread;
 
 	/// Entry point for the actual thread
 	static void execute(movie_def_impl* md);
