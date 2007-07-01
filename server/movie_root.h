@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.61 2007/07/01 10:54:23 bjacques Exp $ */
+/* $Id: movie_root.h,v 1.62 2007/07/02 00:18:25 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -521,13 +521,10 @@ private:
 	bool			m_on_event_xmlsocket_onxml_called;
 	bool			m_on_event_load_progress_called;
 
-	// TODO: should maintain refcount ?
-	// FIXME: std::vector is not an appropriate container
-	//        for timers, as we'll be removing them from the
-	//        list but still want Timer "identifiers" to be
-	//        valid.
-	typedef std::vector<Timer> TimerList;
-	TimerList _intervalTimers;
+	typedef std::map<int, Timer> TimerMap;
+
+	TimerMap _intervalTimers;
+	unsigned int _lastTimerId;
 
 	/// A set of as_objects kept by intrusive_ptr
 	typedef std::set< boost::intrusive_ptr<as_object> > ListenerSet;

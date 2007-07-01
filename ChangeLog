@@ -1,5 +1,13 @@
 2007-07-01 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/simple.exp: increment timeout from 4 to 5 minutes.
+	* server/movie_root.{cpp,h}: store Timers into a map rather then
+	  a vector, to allow for removal w/out loosing the timer identifier.
+	  Scan a *copy* of the container so that clearing or adding new
+	  intervals don't invalidate iterators.
+
+2007-07-01 Sandro Santilli <strk@keybit.net>
+
 	* libbase/ref_counted.h: use 'long' for the ref count,
 	  cleanup header inclusion, prepare for using an atomic
 	  counter for thread safety (not enabled yet).

@@ -70,6 +70,7 @@ movie_root::movie_root()
 	m_on_event_xmlsocket_ondata_called(false),
 	m_on_event_xmlsocket_onxml_called(false),
 	m_on_event_load_progress_called(false),
+	_lastTimerId(0),
 	m_active_input_text(NULL),
 	m_time_remainder(0.0f),
 	m_drag_state(),
@@ -529,20 +530,23 @@ movie_root::add_interval_timer(const Timer& timer)
 {
 	assert(testInvariant());
 			
-	int id = _intervalTimers.size()+1;
+	unsigned int id = ++_lastTimerId;
 	if ( _intervalTimers.size() >= 255 )
 	{
+		// TODO: Why this limitation ? 
 		log_error("FIXME: " SIZET_FMT " timers currently active, won't add another one", _intervalTimers.size());
 	}
 
-	// TODO: find first NULL element in vector for reuse ?
-	_intervalTimers.push_back(timer);
+	assert(_intervalTimers.find(id) == _intervalTimers.end());
+	_intervalTimers[id] = timer; 
 	return id;
 }
 	
 bool
 movie_root::clear_interval_timer(unsigned int x)
 {
+	return _intervalTimers.erase(x);
+#if 0
 	if ( ! x || x > _intervalTimers.size() ) return false;
 
 	Timer& timer = _intervalTimers[x-1];
@@ -553,6 +557,7 @@ movie_root::clear_interval_timer(unsigned int x)
 	assert(testInvariant());
 
 	return true;
+#endif
 }
 	
 void
@@ -560,13 +565,16 @@ movie_root::advance(float delta_time)
 {
 	// GNASH_REPORT_FUNCTION;
 
+	// Copy to avoid timers invalidation.
+	// TODO: we might want to use pointers as elements rather then values,
+	//       so to allow disabling of a timer (ie: should we still execute expired
+	//       timers if a previous timer execution cleared it ?)
 	// TODO: wrap this in a executeTimers() method 
-	for (TimerList::iterator it=_intervalTimers.begin(),
-			itEnd=_intervalTimers.end();
-			it != itEnd;
-			++it)
+	TimerMap timers = _intervalTimers;
+	for (TimerMap::iterator it=timers.begin(), itEnd=timers.end();
+			it != itEnd; ++it)
 	{
-		Timer& timer = *it;
+		Timer& timer = it->second;
 		if ( timer.expired() )
 		{
 			// log_msg("FIXME: Interval Timer Expired!\n");
@@ -574,6 +582,7 @@ movie_root::advance(float delta_time)
 			timer();
 		}
 	}
+
 #ifndef NEW_KEY_LISTENER_LIST_DESIGN
 	// Cleanup key listeners (remove unloaded characters)
 	// FIXME: not all key listeners could be cleaned here!
@@ -1028,10 +1037,10 @@ movie_root::markReachableResources() const
 	m_mouse_button_state.markReachableResources();
 	
 	// Mark timer targets
-	for (TimerList::const_iterator i=_intervalTimers.begin(), e=_intervalTimers.end();
+	for (TimerMap::const_iterator i=_intervalTimers.begin(), e=_intervalTimers.end();
 			i != e; ++i)
 	{
-		i->markReachableResources();
+		i->second.markReachableResources();
 	}
 
 	// Mark resources reachable by queued action code
