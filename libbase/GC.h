@@ -26,6 +26,10 @@
 #include <list>
 #include <algorithm> //for std::find
 
+#ifndef NDEBUG
+# include <boost/thread.hpp>
+#endif
+
 // Define the following macro to enable GC verbosity 
 // Define to > 1 to have info printed about scan of already reachable objects
 #define GNASH_GC_DEBUG 1
@@ -211,9 +215,13 @@ public:
 	///
 	void addCollectable(const GcResource* item)
 	{
+#ifndef NDEBUG
+		boost::thread self;
+		assert(self == mainThread);
 		assert(item);
 		assert(! item->isReachable());
 		assert(std::find(_resList.begin(), _resList.end(), item) == _resList.end());
+#endif
 
 		_resList.push_back(item);
 #if GNASH_GC_DEBUG > 1
@@ -231,6 +239,11 @@ public:
 #ifdef GNASH_GC_DEBUG 
 		log_debug(_("Starting collector: " SIZET_FMT " collectables"), _resList.size());
 #endif // GNASH_GC_DEBUG
+
+#ifndef NDEBUG
+		boost::thread self;
+		assert(self == mainThread);
+#endif
 
 		// Mark all resources as reachable
 		markReachable();
@@ -275,6 +288,13 @@ private:
 	GcRoot& _root;
 
 	static GC* _singleton;
+
+#ifndef NDEBUG
+	/// The thread that initialized the GC is 
+	/// the only one allowed to run the collector
+	/// and to register collectable objects
+	boost::thread mainThread;
+#endif
 };
 
 
