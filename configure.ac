@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.345 2007/07/01 10:53:46 bjacques Exp $
+dnl $Id: configure.ac,v 1.346 2007/07/02 16:31:21 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -122,6 +122,12 @@ fi
 AM_CONDITIONAL(DEBUGGER, test x$debugger = xyes)
 
 AC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval})
+
+AC_ARG_ENABLE(fps-debug,
+  AC_HELP_STRING([--enable-fps-debug],[Enable FPS debugging code]),
+[case "${enableval}" in
+  yes) AC_DEFINE([GNASH_FPS_DEBUG], [1], [Enable FPS debugging code])
+esac])
 
 AC_ARG_WITH(cpu,
   AC_HELP_STRING([--with-cpu],[specify a cpu when cross compiling.]),
