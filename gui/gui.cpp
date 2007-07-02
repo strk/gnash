@@ -511,7 +511,7 @@ Gui::advance_movie(Gui* gui)
 		gnash::sprite_instance* si = m->get_root_movie();
 		if (curframe + 1 >= si->get_frame_count())
 		{
-		    exit(0); // TODO: quit in a more gentile fashion.
+			gui->quit(); 
 		}
 	}
 

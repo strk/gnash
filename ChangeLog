@@ -1,5 +1,10 @@
 2007-07-02 Sandro Santilli <strk@keybit.net>
 
+	* gui/NullGui.{h,cpp}: implement quit(), for clean shutdown.
+	* gui/gui.cpp (advance_movie): use quit() to exit
+
+2007-07-02 Sandro Santilli <strk@keybit.net>
+
 	* gui/gnash.cpp (parseCommandLine): support floating point argument
 	  to -f switch.
 

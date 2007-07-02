@@ -39,7 +39,8 @@ public:
 	NullGui(bool do_loop)
 		:
 		Gui(0,0,do_loop,0),
-		_timeout(0)
+		_timeout(0),
+		_quit(false)
 	{}
 
 	~NullGui() {}
@@ -61,10 +62,15 @@ public:
 	bool setupEvents()  { return true; }
 	void renderBuffer()  { }
 
+	void quit() { _quit = true; }
+
 private:
 
 	/// timeout value, in milliseconds
 	unsigned int _timeout;
+
+	/// True when we quit
+	bool _quit;
 };
 
 } // end of gnash namespace

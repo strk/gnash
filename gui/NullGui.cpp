@@ -72,6 +72,10 @@ NullGui::run()
 		// TODO: use the timer value to trigger advances
 		usleep(_interval*1000);
 		Gui::advance_movie(this);
+
+		// when runnign gnash with -1 switch ::advance_movie() will call ::quit()
+		// at last frame
+		if ( _quit ) break;
 	}
 	return false;
 }
