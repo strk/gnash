@@ -2689,7 +2689,7 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 	newList.reset(*m_def, tgtFrame, true);
 	if ( newList != m_display_list )
 	{
-		cout << "Modified DisplayList: " << newList << endl;
+		//cout << "Modified DisplayList: " << newList << endl;
 		set_invalidated();
 		m_display_list = newList;
 	}
