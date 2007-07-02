@@ -31,7 +31,7 @@
 #include "VM.h"
 
 #ifdef GNASH_FPS_DEBUG
-#include "tu_timer.cpp"
+#include "tu_timer.h"
 #endif
 
 #include <cstdio>
@@ -82,6 +82,12 @@ Gui::Gui() :
     _renderer(NULL),
     _redraw_flag(true),
     _stopped(false)
+#ifdef GNASH_FPS_DEBUG
+    ,fps_counter(0)
+    ,fps_counter_total(0)
+    ,fps_timer(0)
+    ,fps_timer_interval(0.0)
+#endif
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -102,7 +108,8 @@ Gui::Gui(unsigned long xid, float scale, bool loop, unsigned int depth)
 #ifdef GNASH_FPS_DEBUG
     ,fps_counter(0)    
     ,fps_counter_total(0)    
-    ,fps_timer(0.0)
+    ,fps_timer(0)
+    ,fps_timer_interval(0.0)
 #endif        
 {
 }
@@ -111,6 +118,9 @@ Gui::~Gui()
 {
 //    GNASH_REPORT_FUNCTION;
     delete _renderer;
+#ifdef GNASH_FPS_DEBUG
+    printf("Total frame advances: %u\n", fps_counter_total);
+#endif
 }
 
 void
@@ -463,7 +473,7 @@ Gui::advance_movie(Gui* gui)
 	gnash::movie_root* m = gnash::get_current_root();
 	
 #ifdef GNASH_FPS_DEBUG
-	gui->fpsCounterTick(1.0);  // <-- will be based on cmd.line settings
+	gui->fpsCounterTick(); // will be a no-op if fps_timer_interval is zero
 #endif
 
 // Define REVIEW_ALL_FRAMES to have *all* frames
@@ -561,20 +571,30 @@ Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
 #ifdef GNASH_FPS_DEBUG
 void 
-Gui::fpsCounterTick(float interval)
+Gui::fpsCounterTick()
 {
+	GNASH_REPORT_FUNCTION;
+
+  // increment this *before* the early return so that
+  // frame count on exit is still valid
+  ++fps_counter_total;
+
+  if ( ! fps_timer_interval )
+  {
+	  return;
+  }
+
   uint64_t current_timer = tu_timer::get_ticks();
-  uint64_t interval_ms = (int)(interval * 1000.0);
+  uint64_t interval_ms = (uint64_t)(fps_timer_interval * 1000.0);
   
-  fps_counter++;
-  fps_counter_total++;
+  ++fps_counter;
   
   if (current_timer - fps_timer >= interval_ms) {
   
     float secs = (current_timer - fps_timer) / 1000.0;
   
     //log_msg("Effective frame rate: %0.2f fps", (float)(fps_counter/secs));
-    printf("Effective frame rate: %0.2f fps (%d frames total)\n", 
+    printf("Effective frame rate: %0.2f fps (%u frames total)\n", 
       (float)(fps_counter/secs), fps_counter_total);
       
     fps_counter = 0;

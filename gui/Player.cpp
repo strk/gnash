@@ -111,6 +111,9 @@ Player::Player()
 	do_sound(true),
 	exit_timeout(0),
 	_movie_def(0)
+#ifdef GNASH_FPS_DEBUG
+	,_fpsDebugTime(0.0)
+#endif
 {
 	init();
 }
@@ -218,6 +221,13 @@ Player::init_gui()
 		_gui.reset(new NullGui(do_loop));
 	}
 
+#ifdef GNASH_FPS_DEBUG
+	if ( _fpsDebugTime )
+	{
+		log_debug(_("Activating FPS debugging every %g seconds"), _fpsDebugTime);
+		_gui->setFpsTimerInterval(_fpsDebugTime);
+	}
+#endif // def GNASH_FPS_DEBUG
 }
 
 movie_definition* 

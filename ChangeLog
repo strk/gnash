@@ -1,3 +1,16 @@
+2007-07-02 Sandro Santilli <strk@keybit.net>
+
+	* gui/gui.{cpp,h}: add setFpsTimerInterval() public method,
+	  change fpsCounterTick() interface to take no arg. Print total
+	  number of frame advances on destruction. All available ifdef
+	  GNASH_FPS_DEBUG.
+	* gui/Player.{cpp,h}: add a setFpsPrintTime() public method.
+	  Only available ifdef GNASH_FPS_DEBUG.
+	* gui/gnash.cpp: Add -f switch for fps debugging prints
+	  (long option was not trivial so didn't add it).
+	  Note that if GNASH_FPS_DEBUG is not defined the -f switch
+	  triggers an error.
+
 2007-07-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/gui.{cpp,h}: add fpsCounterTick() for FPS profiling

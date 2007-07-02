@@ -81,6 +81,21 @@ public:
 	// milliseconds per frame
 	void setDelay(unsigned int d) { delay=d; }
 
+#ifdef GNASH_FPS_DEBUG
+	/// Set the number of seconds between FPS debugging prints
+	//
+	/// @param time
+	///	Number of seconds between FPS debugging prints.
+	///	A value of 0 disables FPS printing.
+	///	A negative value results in an assertion failure.
+	///
+	void setFpsPrintTime(float time)
+	{
+		assert(time >= 0.0);
+		_fpsDebugTime=time;
+	}
+#endif // def GNASH_FPS_DEBUG
+
 	void setWidth(size_t w) { width=w; }
 	size_t getWidth() { return width; }
 
@@ -178,6 +193,10 @@ private:
 	/// on failure.
 	///
 	movie_definition* load_movie();
+
+#ifdef GNASH_FPS_DEBUG
+	float _fpsDebugTime;
+#endif
 };
 
  

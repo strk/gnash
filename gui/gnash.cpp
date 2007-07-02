@@ -78,7 +78,12 @@ gnash::Debugger& debugger = gnash::Debugger::getDefaultInstance();
 static void
 usage()
 {
-    printf("%s%s%s%s%s%s%s%s", _(
+#ifdef GNASH_FPS_DEBUG
+    printf("%s%s%s%s%s%s%s%s%s",
+#else
+    printf("%s%s%s%s%s%s%s%s",
+#endif
+		    _(
         "usage: gnash [options] movie_file.swf\n"
         "\n"
         "Plays a SWF (Shockwave Flash) movie\n"
@@ -124,6 +129,10 @@ usage()
         "  -P <param>    Set parameter (ie. \"FlashVars=A=1&b=2\")\n"
         "  -V, --version Print gnash's version number and exit\n"
 		), _(
+#ifdef GNASH_FPS_DEBUG
+	"  -f num        Print FPS every num seconds (float)."
+		), _(
+#endif // def GNASH_FPS_DEBUG
         "\n"
         "keys:\n"
         "  CTRL-Q, CTRL-W, ESC   Quit/Exit\n"
@@ -195,7 +204,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         }
     }
     
-    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:g:V")) != -1)
+    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:g:Vf:")) != -1)
     {
 	switch (c) {
     	  // case 'c' (Disable SDL core dumps) is decoded in sdl.cpp:init()
@@ -318,6 +327,17 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               bit_depth = atoi(optarg);
 		player.setBitDepth(bit_depth);
               break;
+          }
+          case 'f':
+          {
+#ifdef GNASH_FPS_DEBUG
+		unsigned int frames=atoi(optarg);
+		player.setFpsPrintTime(frames);
+		break;
+#else // ndef GNASH_FPS_DEBUG
+		printf("FPS debugging disabled at compile time, -f is invalid\n");
+		exit(EXIT_FAILURE);
+#endif // ndef GNASH_FPS_DEBUG
           }
           case 'P':
 		string param = optarg;

@@ -246,6 +246,18 @@ public:
     void menu_toggle_sound();
     /// @}
 
+#ifdef GNASH_FPS_DEBUG
+    /// Set the interval between FPS debugging prints
+    //
+    /// See fpsCounterTick()
+    ///
+    void setFpsTimerInterval(float interval)
+    {
+	    assert(interval >= 0.0);
+	    fps_timer_interval = interval;
+    }
+#endif // def GNASH_FPS_DEBUG
+
 protected:
     /// Determines if playback should restart after the movie ends.
     bool            _loop;
@@ -286,14 +298,28 @@ private:
     
 #ifdef GNASH_FPS_DEBUG
     unsigned int fps_counter;
+
+    // Number of calls to fpsCounterTick, which is also
+    // the number of calls to movie_advance()
     unsigned int fps_counter_total;
+
     uint64_t fps_timer;     
+
+    ///	The time, in seconds, between prints (which also resets the fps counter).
+    //
+    ///	interval must be >= 0
+    ///
+    float fps_timer_interval;
     
-    void fpsCounterTick(float interval);
+    /// \brief
     /// Should be called on every frame advance (including inter-frames caused
-    /// by mouse events). <interval> is the time, in seconds, between log_msg
-    /// prints (which also resets the fps counter). interval must be >= 0
-#endif
+    /// by mouse events).
+    //
+    /// Based on fps-timer_interval. See setFpsTimerInterval.
+    ///
+    void fpsCounterTick();
+
+#endif // def GNASH_FPS_DEBUG
 
 };
 
