@@ -573,7 +573,7 @@ Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 void 
 Gui::fpsCounterTick()
 {
-	GNASH_REPORT_FUNCTION;
+  // GNASH_REPORT_FUNCTION;
 
   // increment this *before* the early return so that
   // frame count on exit is still valid
@@ -585,7 +585,12 @@ Gui::fpsCounterTick()
   }
 
   uint64_t current_timer = tu_timer::get_ticks();
+
+  // TODO: keep fps_timer_interval in milliseconds to avoid the multiplication
+  //       at each fpsCounterTick call...
   uint64_t interval_ms = (uint64_t)(fps_timer_interval * 1000.0);
+
+  if (fps_counter_total==1) fps_timer = current_timer;
   
   ++fps_counter;
   

@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GC.cpp,v 1.3 2007/07/01 10:54:06 bjacques Exp $ */
+/* $Id: GC.cpp,v 1.4 2007/07/02 22:48:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -25,6 +25,9 @@
 #include "GC.h"
 #include "builtin_function.h"
 
+#ifdef GNASH_GC_DEBUG
+# include "log.h"
+#endif
 
 namespace gnash {
 
@@ -56,7 +59,7 @@ GC::cleanup()
 GC::~GC()
 {
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("GC %p deleted, deleting all managed resources"), (void*)this);
+	log_debug(_("GC %p deleted, deleting all managed resources - collector run " SIZET_FMT " times"), (void*)this, _collectorRuns);
 #endif
 
 #if 1
@@ -100,6 +103,40 @@ GC::cleanUnreachable()
 			" resources marked as unreachable"),
 			(void*)this, deleted);
 #endif
+}
+
+void 
+GC::collect()
+{
+	if ( (_resList.size() - _lastResCount) < maxNewCollectablesCount )
+	{
+#if GNASH_GC_DEBUG  > 1
+		log_debug(_("Garbage collection skipped since number of collectables added since last run is too low (" SIZET_FMT ")"),
+			       _resList.size() - _lastResCount);
+#endif // GNASH_GC_DEBUG
+		return;
+	}
+
+#ifdef GNASH_GC_DEBUG 
+	++_collectorRuns;
+#endif
+
+#ifdef GNASH_GC_DEBUG 
+	log_debug(_("Starting collector: " SIZET_FMT " collectables"), _resList.size());
+#endif // GNASH_GC_DEBUG
+
+#ifndef NDEBUG
+	boost::thread self;
+	assert(self == mainThread);
+#endif
+
+	// Mark all resources as reachable
+	markReachable();
+
+	// clean unreachable resources, and mark them others as reachable again
+	cleanUnreachable();
+
+	_lastResCount = _resList.size();
 }
 
 } // end of namespace gnash

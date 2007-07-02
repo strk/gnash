@@ -220,7 +220,8 @@ public:
 		assert(self == mainThread);
 		assert(item);
 		assert(! item->isReachable());
-		assert(std::find(_resList.begin(), _resList.end(), item) == _resList.end());
+		// The following assertion is expensive ...
+		//assert(std::find(_resList.begin(), _resList.end(), item) == _resList.end());
 #endif
 
 		_resList.push_back(item);
@@ -234,31 +235,23 @@ public:
 	//
 	/// Find all reachable collectables, destroy all the others.
 	///
-	void collect()
-	{
-#ifdef GNASH_GC_DEBUG 
-		log_debug(_("Starting collector: " SIZET_FMT " collectables"), _resList.size());
-#endif // GNASH_GC_DEBUG
-
-#ifndef NDEBUG
-		boost::thread self;
-		assert(self == mainThread);
-#endif
-
-		// Mark all resources as reachable
-		markReachable();
-
-		// clean unreachable resources, and mark them others as reachable again
-		cleanUnreachable();
-
-	}
+	void collect();
 
 private:
+
+	/// Number of newly registered collectable since last collection run
+	/// triggering next collection.
+	/// Should be made a parameter ?
+	static const unsigned int maxNewCollectablesCount = 10;
 
 	/// Create a garbage collector, using the given root
 	GC(GcRoot& root)
 		:
-		_root(root)
+		_root(root),
+		_lastResCount(0)
+#ifdef GNASH_GC_DEBUG 
+		, _collectorRuns(0)
+#endif
 	{
 #ifdef GNASH_GC_DEBUG 
 		log_debug(_("GC %p created"), (void*)this);
@@ -294,6 +287,15 @@ private:
 	/// the only one allowed to run the collector
 	/// and to register collectable objects
 	boost::thread mainThread;
+#endif
+
+	/// Number of resources in collectable list at end of last
+	/// collect() call.
+	ResList::size_type _lastResCount;
+
+#ifdef GNASH_GC_DEBUG 
+	/// Number of times the collector runs (stats/profiling)
+	size_t _collectorRuns;
 #endif
 };
 

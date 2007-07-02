@@ -1,5 +1,15 @@
 2007-07-02 Sandro Santilli <strk@keybit.net>
 
+	* libbase/GC.{cpp,h}: Implement an heuristic to reduce
+	  the number of collector runs. It is based on the number
+	  of newly registered collectables since last run.
+	  The threshold is set to 10 with a static const member
+	  of the GC class. See http://gnashdev.org/wiki/index.php/ProfilingGC
+	  for more informations.
+	* gui/gui.cpp (fpsCounterTick): don't report an initial FPS of 0.
+
+2007-07-02 Sandro Santilli <strk@keybit.net>
+
 	* gui/NullGui.{h,cpp}: implement quit(), for clean shutdown.
 	* gui/gui.cpp (advance_movie): use quit() to exit
 
