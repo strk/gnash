@@ -81,13 +81,13 @@ MovieLoader::MovieLoader(movie_def_impl& md)
 
 MovieLoader::~MovieLoader()
 {
-	cout << "MovieLoader dtor called" << endl;
+	//cout << "MovieLoader dtor called" << endl;
 
 	// we should assert _movie_def._loadingCanceled
 	// but we're not friend yet (anyone introduce us ?)
 	if ( _thread.get() )
 	{
-		cout << "Joining thread.." << endl;
+		//cout << "Joining thread.." << endl;
 		_thread->join();
 	}
 }
@@ -221,7 +221,7 @@ movie_def_impl::movie_def_impl(create_bitmaps_flag cbf,
 
 movie_def_impl::~movie_def_impl()
 {
-	cout << "movie_def_impl dtor called" << endl;
+	//cout << "movie_def_impl dtor called" << endl;
 
 	// Request cancelation of the loading thread
 	_loadingCanceled = true;
