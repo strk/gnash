@@ -86,6 +86,13 @@ movie_root::~movie_root()
 	{
 		delete *it;
 	}
+
+	for (TimerMap::iterator it=_intervalTimers.begin(),
+			itE=_intervalTimers.end();
+			it != itE; ++it)
+	{
+		delete it->second;
+	}
 	assert(testInvariant());
 }
 
@@ -508,29 +515,15 @@ movie_root::set_drag_state(const drag_state& st)
 	assert(testInvariant());
 }
 
-#if 0 // see comments in movie_root.h
-void
-movie_root::get_url(const char *url)
-{
-    GNASH_REPORT_FUNCTION;
-
-	// nobody should use this function
-	assert(0);
-    
-    string command = "mozilla -remote \"openurl";
-    command += url;
-    command += ")\"";
-    log_msg (_("Launching URL... %s"), command.c_str());
-    system(command.c_str());
-}
-#endif
-
 unsigned int
-movie_root::add_interval_timer(const Timer& timer)
+movie_root::add_interval_timer(std::auto_ptr<Timer> timer, bool internal)
 {
+	assert(timer.get());
 	assert(testInvariant());
 			
-	unsigned int id = ++_lastTimerId;
+	int id = ++_lastTimerId;
+	if ( internal ) id = -id;
+
 	if ( _intervalTimers.size() >= 255 )
 	{
 		// TODO: Why this limitation ? 
@@ -538,26 +531,27 @@ movie_root::add_interval_timer(const Timer& timer)
 	}
 
 	assert(_intervalTimers.find(id) == _intervalTimers.end());
-	_intervalTimers[id] = timer; 
+	_intervalTimers[id] = timer.release(); 
 	return id;
 }
 	
 bool
 movie_root::clear_interval_timer(unsigned int x)
 {
-	return _intervalTimers.erase(x);
-#if 0
-	if ( ! x || x > _intervalTimers.size() ) return false;
+	TimerMap::iterator it = _intervalTimers.find(x);
+	if ( it == _intervalTimers.end() ) return false;
 
-	Timer& timer = _intervalTimers[x-1];
-
-	// will make sure next expire() will always return false!
-	timer.clearInterval();
-
-	assert(testInvariant());
+	// We do not remove the element here because
+	// we might have been called during execution
+	// of another timer, thus during a scan of the _intervalTimers
+	// container. If we use erase() here, the iterators in executeTimers
+	// would be invalidated. Rather, executeTimers() would check container
+	// elements for being still active and remove the cleared one in a safe way
+	// at each iteration.
+	it->second->clearInterval();
 
 	return true;
-#endif
+
 }
 	
 void
@@ -565,23 +559,8 @@ movie_root::advance(float delta_time)
 {
 	// GNASH_REPORT_FUNCTION;
 
-	// Copy to avoid timers invalidation.
-	// TODO: we might want to use pointers as elements rather then values,
-	//       so to allow disabling of a timer (ie: should we still execute expired
-	//       timers if a previous timer execution cleared it ?)
-	// TODO: wrap this in a executeTimers() method 
-	TimerMap timers = _intervalTimers;
-	for (TimerMap::iterator it=timers.begin(), itEnd=timers.end();
-			it != itEnd; ++it)
-	{
-		Timer& timer = it->second;
-		if ( timer.expired() )
-		{
-			// log_msg("FIXME: Interval Timer Expired!\n");
-			//_movie->on_event_interval_timer();
-			timer();
-		}
-	}
+	// Execute expired timers
+	executeTimers();
 
 #ifndef NEW_KEY_LISTENER_LIST_DESIGN
 	// Cleanup key listeners (remove unloaded characters)
@@ -1025,6 +1004,49 @@ movie_root::pushAction(boost::intrusive_ptr<as_function> func, boost::intrusive_
 	_actionQueue.push_back(new FunctionCode(func, target));
 }
 
+/* private */
+void
+movie_root::executeTimers()
+{
+	for (TimerMap::iterator it=_intervalTimers.begin(), itEnd=_intervalTimers.end();
+			it != itEnd; )
+	{
+		// Get an iterator to next element, as we'll use
+		// erase to drop cleared timers, and that would
+		// invalidate the current iterator.
+		//
+		// FYI: it's been reported on ##iso-c++ that next
+		//      C++ version will fix std::map<>::erase(iterator)
+		//      to return the next valid iterator,
+		//      like std::list<>::erase(iterator) does.
+		//      For now, we'll have to handle this manually)
+		//
+		TimerMap::iterator nextIterator = it;
+		++nextIterator;
+
+		Timer* timer = it->second;
+
+		if ( timer->cleared() )
+		{
+			// this timer was cleared, erase it
+			delete timer;
+			_intervalTimers.erase(it);
+		}
+		else
+		{
+			if ( timer->expired() )
+			{
+				//cout << " EXPIRED, start time is now " << timer.getStart() << endl;
+				//_movie->on_event_interval_timer();
+				(*timer)();
+			}
+		}
+
+		it = nextIterator;
+	}
+
+}
+
 #ifdef GNASH_USE_GC
 void
 movie_root::markReachableResources() const
@@ -1040,7 +1062,7 @@ movie_root::markReachableResources() const
 	for (TimerMap::const_iterator i=_intervalTimers.begin(), e=_intervalTimers.end();
 			i != e; ++i)
 	{
-		i->second.markReachableResources();
+		i->second->markReachableResources();
 	}
 
 	// Mark resources reachable by queued action code

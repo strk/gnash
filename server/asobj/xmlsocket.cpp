@@ -463,11 +463,11 @@ xmlsocket_connect(const fn_call& fn)
     {
         log_msg(_("Setting up timer for calling XMLSocket.onData()"));
 
-        Timer timer;
+	std::auto_ptr<Timer> timer(new Timer);
         boost::intrusive_ptr<builtin_function> ondata_handler = new builtin_function(&xmlsocket_inputChecker, NULL);
         unsigned interval = 50; // just make sure it's expired at every frame iteration (20 FPS used here)
-        timer.setInterval(*ondata_handler, interval, boost::dynamic_pointer_cast<as_object>(ptr));
-        VM::get().getRoot().add_interval_timer(timer);
+        timer->setInterval(*ondata_handler, interval, boost::dynamic_pointer_cast<as_object>(ptr));
+        VM::get().getRoot().add_interval_timer(timer, true);
 
         log_msg(_("Timer set"));
     }

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.62 2007/07/02 00:18:25 strk Exp $ */
+/* $Id: movie_root.h,v 1.63 2007/07/02 03:20:34 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -287,13 +287,16 @@ public:
 	/// Add an interval timer
 	//
 	/// @param timer
-	///	A Timer, will be copied.
+	///	A Timer, ownership will be transferred. Must not be NULL.
+	///
+	/// @param internal
+	///	If true, this is an internal timer, so will get a negative id.
 	///
 	/// @return An integer indentifying the timer
 	///         for subsequent call to clear_interval_timer.
 	///         It will NEVER be zero.
 	///
-	unsigned int add_interval_timer(const Timer& timer);
+	unsigned int add_interval_timer(std::auto_ptr<Timer> timer, bool internal=false);
 
 	/// Remove timer identified by given integer
 	//
@@ -477,6 +480,9 @@ private:
 	/// Forbid assignment
 	movie_root& operator=(const movie_root& ) { assert(0); return *this; }
 
+	/// Execute expired timers
+	void executeTimers();
+
 	/// Notify the global Key ActionScript object about a key status change
 	key_as_object * notify_global_key(key::code k, bool down);
 	
@@ -521,7 +527,7 @@ private:
 	bool			m_on_event_xmlsocket_onxml_called;
 	bool			m_on_event_load_progress_called;
 
-	typedef std::map<int, Timer> TimerMap;
+	typedef std::map<int, Timer*> TimerMap;
 
 	TimerMap _intervalTimers;
 	unsigned int _lastTimerId;

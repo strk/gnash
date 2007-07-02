@@ -32,7 +32,7 @@
 
 // Define the following macro to enable GC verbosity 
 // Define to > 1 to have info printed about scan of already reachable objects
-#define GNASH_GC_DEBUG 1
+//#define GNASH_GC_DEBUG 1
 
 #ifdef GNASH_GC_DEBUG
 # include "log.h"

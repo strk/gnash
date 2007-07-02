@@ -1,5 +1,20 @@
 2007-07-01 Sandro Santilli <strk@keybit.net>
 
+	* libbase/GC.h: don't be verbose about GC by default.
+	* server/movie_root.{cpp,h}: (add_interval_timer): take the Timer by
+	  auto_ptr, add an optional second argument marking the timer as
+	  internal (for use by xmlsocket/LoadVars and whichever other gnash
+	  internal class in need for a timer). Internal timers will get a
+	  negative identifier so to not introduce unexpected gaps in the
+	  user-defined interval timers sequences. Fix bugs introduced in last
+	  commit related to timer expiration and iterators invalidation.
+	* server/timers.{cpp,h}: add some inspector functions, use VM::getTime
+	  for timers (milliseconds).
+	* server/asobj/: LoadVars.cpp, xmlsocket.cpp: update calls to
+	  movie_root::add_interval_timer to mark these timers as internal.
+
+2007-07-01 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/simple.exp: increment timeout from 4 to 5 minutes.
 	* server/movie_root.{cpp,h}: store Timers into a map rather then
 	  a vector, to allow for removal w/out loosing the timer identifier.

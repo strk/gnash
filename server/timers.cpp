@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: timers.cpp,v 1.35 2007/07/01 10:54:25 bjacques Exp $ */
+/* $Id: timers.cpp,v 1.36 2007/07/02 03:20:34 strk Exp $ */
 
 #include "timers.h"
 #include "as_function.h" // for class as_function
@@ -49,22 +49,22 @@ namespace gnash {
   
 
   void
-  Timer::setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr)
+  Timer::setInterval(as_function& method, uint64_t ms, boost::intrusive_ptr<as_object> this_ptr)
   {
     _function = &method;
-    _interval = ms * 1000; // transform to microseconds 
-    //log_msg("_interval microseconds: %lu", _interval);
+    _interval = ms; // keep milliseconds
+    //log_msg("_interval milliseconds: %lu", _interval);
     _object = this_ptr;
     start();
   }
 
   void
-  Timer::setInterval(as_function& method, unsigned ms, boost::intrusive_ptr<as_object> this_ptr, 
+  Timer::setInterval(as_function& method, uint64_t ms, boost::intrusive_ptr<as_object> this_ptr, 
 		  std::vector<as_value>& args)
   {
     _function = &method;
-    _interval = ms * 1000; // transform to microseconds 
-    //log_msg("_interval microseconds: %lu", _interval);
+    _interval = ms; // keep as milliseconds
+    //log_msg("_interval milliseconds: %llu", _interval);
     _object = this_ptr;
     _args = args;
     start();
@@ -80,7 +80,7 @@ namespace gnash {
   void
   Timer::start()
   {
-	_start = tu_timer::get_profile_ticks();
+	_start = VM::get().getTime();
 	//log_msg("_start at seconds %lu", _start);
   }
   
@@ -90,21 +90,23 @@ Timer::expired()
 {
 	if (_start)
 	{
-		uint64_t now = tu_timer::get_profile_ticks();
+		uint64_t now = VM::get().getTime();
 		assert(now >= _start); // it is possible for now to be == _start 
 
-		//printf("FIXME: %s: now is %f, start time is %f, interval is %f\n", __FUNCTION__, now, _start, _interval);
+		//cout << "Start is " << _start << " interval is " << _interval << " now is " << now << endl;
 		if (now > _start + _interval)
 		{
 			_start = now; // reset the timer
+			//cout << " Expired, reset start to " << _start << endl;
 			//log_msg("Timer expired! \n");
 			return true;
 		}
 	}
 	else
 	{
-		//log_msg("Timer not enabled!");
+		log_msg("Timer not enabled!");
 	}
+
 	return false;
 }
 
@@ -227,7 +229,7 @@ timer_setinterval(const fn_call& fn)
 	}
 
 	// Get interval time
-	int ms = int(fn.arg(timer_arg).to_number());
+	uint64_t ms = uint64_t(fn.arg(timer_arg).to_number());
 
 	// Parse arguments 
 	Timer::ArgsContainer args;
@@ -236,8 +238,8 @@ timer_setinterval(const fn_call& fn)
 		args.push_back(fn.arg(i));
 	}
 
-	Timer timer;
-	timer.setInterval(*as_func, ms, fn.this_ptr, args);
+	std::auto_ptr<Timer> timer(new Timer);
+	timer->setInterval(*as_func, ms, fn.this_ptr, args);
     
 	movie_root& root = VM::get().getRoot();
 	int id = root.add_interval_timer(timer);
