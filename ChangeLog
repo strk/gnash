@@ -1,5 +1,7 @@
 2007-07-02 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
+	* server/parser/sprite_definition.h: Allow soundsamples to be added
+	  from sprites. Should the malformed-swf warning be removed?
 	* backend/sound_handler_gst.cpp: Moved creation of a tempoary
 	  variable to avoid an assertion failure.
 	* backend/sound_handler_sdl.cpp: Improved error handling.
