@@ -36,7 +36,7 @@
 2007-07-01 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* README: Added note on IRC.
-	* gui/gnash.cpp: Added -V as shor for --version.
+	* gui/gnash.cpp: Added -V as shor for --version. Clean-up.
 
 2007-07-01 Sandro Santilli <strk@keybit.net>
 

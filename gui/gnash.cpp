@@ -84,45 +84,45 @@ usage()
         "Plays a SWF (Shockwave Flash) movie\n"
         "options:\n"
         "\n"), _(
-        "  -h, --help   Print this info.\n"
-        "  -s <factor>  Scale the movie up/down by the specified factor\n"
-        "  -c           Produce a core file instead of letting SDL trap it\n"
-        "  -d num       Number of milliseconds to delay in main loop\n"
-        "  -v           Be verbose; i.e. print log messages to stdout\n"
+        "  -h, --help    Print this info.\n"
+        "  -s <factor>   Scale the movie up/down by the specified factor\n"
+        "  -c            Produce a core file instead of letting SDL trap it\n"
+        "  -d num        Number of milliseconds to delay in main loop\n"
+        "  -v            Be verbose; i.e. print log messages to stdout\n"
 		),
 #if VERBOSE_ACTION
-      _("  -va          Be verbose about movie Actions\n"),
+      _("  -va           Be verbose about movie Actions\n"),
 #else
 	"",
 #endif
 #if VERBOSE_PARSE
-      _("  -vp          Be verbose about parsing the movie\n"),
+      _("  -vp           Be verbose about parsing the movie\n"),
 #else
 	"",
 #endif
 		  _(
-        "  -m <bias>    Specify the texture LOD bias (float, default is -1.0)\n"
-        "  -x <ID>      X11 Window ID for display\n"
-        "  -w           Produce the disk based debug log\n"
-		"  -j <width>   Set window width\n"
-		"  -k <height>  Set window height\n"
-        "  -1           Play once; exit when/if movie reaches the last frame\n"
+        "  -m <bias>     Specify the texture LOD bias (float, default is -1.0)\n"
+        "  -x <ID>       X11 Window ID for display\n"
+        "  -w            Produce the disk based debug log\n"
+	"  -j <width >   Set window width\n"
+	"  -k <height>   Set window height\n"
+        "  -1            Play once; exit when/if movie reaches the last frame\n"
 		), _(
-        "  -g           Turn on the Flash debugger\n"
+        "  -g            Turn on the Flash debugger\n"
         "  -r <0|1|2|3>\n"
-		"               0 disables both rendering & sound (good for batch tests)\n"
-        "               1 enables rendering & disables sound\n"
-        "               2 enables sound & disables rendering\n"
-        "               3 enables both rendering & sound (default)\n"
+	"                0 disables both rendering & sound (good for batch tests)\n"
+        "                1 enables rendering & disables sound\n"
+        "                2 enables sound & disables rendering\n"
+        "                3 enables both rendering & sound (default)\n"
 		), _(
-        "  -t <sec>     Timeout and exit after the specified number of seconds\n"
-        "  -b <bits>    Bit depth of output window (16 or 32, default is 16)\n"
-        "  -u <url>     Set \"real\" url of the movie\n"
-		"               (useful for downloaded movies)\n"
-        "  -U <url>     Set \"base\" url for this run\n"
-		"               (used to resolve relative urls, defaults to movie url)\n"
-        "  -P <param>   Set parameter (ie. \"FlashVars=A=1&b=2\")\n"
-        "  -V,--version Print gnash's version number and exit\n"
+        "  -t <sec>      Timeout and exit after the specified number of seconds\n"
+        "  -b <bits>     Bit depth of output window (16 or 32, default is 16)\n"
+        "  -u <url>      Set \"real\" url of the movie\n"
+	"                (useful for downloaded movies)\n"
+        "  -U <url>      Set \"base\" url for this run\n"
+	"                (used to resolve relative urls, defaults to movie url)\n"
+        "  -P <param>    Set parameter (ie. \"FlashVars=A=1&b=2\")\n"
+        "  -V, --version Print gnash's version number and exit\n"
 		), _(
         "\n"
         "keys:\n"
@@ -202,7 +202,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 	  // case 'm' (Set LOD bias) is decoded in various GUIs (grep getopt)
 	  case 'h':
 	      version_and_copyright();
-          printf("\n"); 
+              printf("\n"); 
 	      usage ();
 	      build_options();
           	exit(EXIT_SUCCESS);
