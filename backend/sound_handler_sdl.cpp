@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.71 2007/07/01 10:53:49 bjacques Exp $
+// $Id: sound_handler_sdl.cpp,v 1.72 2007/07/02 13:53:19 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -684,7 +684,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 	// call NetStream or Sound audio callbacks
 	if (handler->m_aux_streamer.size() > 0)
 	{
-		Uint8* buf = new Uint8[buffer_length];
+		uint8_t* buf = new uint8_t[buffer_length];
 
 		// Loop through the attached sounds
 		hash_wrapper< void*, gnash::sound_handler::aux_streamer_ptr >::iterator it = handler->m_aux_streamer.begin();
@@ -776,7 +776,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 					long bytes_decoded = 0;
 
-					while (outsize == 0) {
+					while (outsize == 0 && sound->position < sound->data_size) {
 						uint8_t* frame;
 						int framesize;
 
@@ -929,7 +929,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 				} else { 
 					mix_length = decoded_size;
 				}
-
+				if (sound->raw_data_size < 2) continue; // something went terrible wrong
 				do_mixing(stream+index, sound, sound->get_raw_data_ptr(0), mix_length, sounddata->volume);
 
 			// When the current sound has enough decoded data to fill 
@@ -975,8 +975,8 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 				handler->soundsPlaying--;
 			}
 
-		}
-	}
+		} // active sounds loop
+	} // existing sounds loop
 
 }
 

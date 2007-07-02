@@ -1,3 +1,9 @@
+2007-07-02 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_gst.cpp: Moved creation of a tempoary
+	  variable to avoid an assertion failure.
+	* backend/sound_handler_sdl.cpp: Improved error handling.
+
 2007-07-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/gtk_glue_agg.cpp: Disable MIT-SHM when pixel format is not recognized 

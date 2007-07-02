@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.50 2007/07/01 10:53:48 bjacques Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.51 2007/07/02 13:53:19 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -183,8 +183,6 @@ void GST_sound_handler::callback_handoff (GstElement * /*c*/, GstBuffer *buffer,
 
 	mutex::scoped_lock lock(gstelements->handler->_mutex);
 
-	guint8* data_pos = gstelements->get_data_ptr(gstelements->position);
-
 	// First callback
 	if (GST_BUFFER_SIZE(buffer) == 0) {
 		if (gstelements->data_size > BUFFER_SIZE) {
@@ -209,6 +207,8 @@ void GST_sound_handler::callback_handoff (GstElement * /*c*/, GstBuffer *buffer,
 		GST_BUFFER_DATA(buffer) = 0;
 		return;
 	}
+
+	guint8* data_pos = gstelements->get_data_ptr(gstelements->position);
 
 	// Last callback - the last re-fill
 	if (gstelements->position+BUFFER_SIZE > gstelements->data_size) {
