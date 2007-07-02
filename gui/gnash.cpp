@@ -331,7 +331,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
           case 'f':
           {
 #ifdef GNASH_FPS_DEBUG
-		unsigned int frames=atoi(optarg);
+		float frames = strtod(optarg, NULL);
 		player.setFpsPrintTime(frames);
 		break;
 #else // ndef GNASH_FPS_DEBUG
