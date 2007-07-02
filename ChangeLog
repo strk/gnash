@@ -1,3 +1,7 @@
+2007-07-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gtk_glue_agg.cpp: Disable MIT-SHM when pixel format is not recognized 
+
 2007-07-01 Sandro Santilli <strk@keybit.net>
 
 	* libbase/GC.h: don't be verbose about GC by default.

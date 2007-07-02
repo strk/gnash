@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.22 2007/07/01 10:54:02 bjacques Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.23 2007/07/02 08:13:27 udog Exp $ */
 
 
 /// \page gtk_shm_support GTK shared memory extension support
@@ -268,11 +268,15 @@ GtkAggGlue::create_shm_handler()
     green_shift, green_prec,
     blue_shift, blue_prec,
     _shm_image->bits_per_pixel);
-    
+
   destroy_shm_image();
 
   if (!pixelformat) {
     log_msg("Pixel format of X server not recognized!");
+    
+    // disable use of shared memory pixmaps
+    _have_shm = false;
+    
     return NULL; 
   }
 
