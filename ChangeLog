@@ -1,3 +1,7 @@
+2007-07-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gui.{cpp,h}: add fpsCounterTick() for FPS profiling
+
 2007-07-02 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: add --enable-fps-debug switch to define

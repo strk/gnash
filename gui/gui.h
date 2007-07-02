@@ -283,6 +283,17 @@ protected:
 private:
 
     bool display(movie_root* m);
+    
+#ifdef GNASH_FPS_DEBUG
+    unsigned int fps_counter;
+    unsigned int fps_counter_total;
+    uint64_t fps_timer;     
+    
+    void fpsCounterTick(float interval);
+    /// Should be called on every frame advance (including inter-frames caused
+    /// by mouse events). <interval> is the time, in seconds, between log_msg
+    /// prints (which also resets the fps counter). interval must be >= 0
+#endif
 
 };
 
