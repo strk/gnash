@@ -58,6 +58,9 @@
 // Define the following to make outline decomposition verbose
 //#define DEBUG_OUTLINE_DECOMPOSITION 1
 
+// Define the following to make device font handling verbose
+//#define GNASH_DEBUG_DEVICEFONTS 1
+
 namespace gnash {
 
 #ifdef HAVE_FREETYPE2 
@@ -266,14 +269,18 @@ FreetypeGlyphsProvider::getFontFilename(const std::string& name,
 
 	if ( fs )
 	{
+#ifdef GNASH_DEBUG_DEVICEFONTS
 		log_debug("Found %d fonts matching the family %s (using first)", fs->nfont, name.c_str());
+#endif
 
 		for (int j = 0; j < fs->nfont; j++)
 		{
 			FcChar8 *file;
 			if (FcPatternGetString (fs->fonts[j], FC_FILE, 0, &file) != FcResultMatch)
 			{
+#ifdef GNASH_DEBUG_DEVICEFONTS
 		log_debug("Matching font %d has unknown filename, skipping", j);
+#endif
 		continue;
 			}
 
@@ -371,7 +378,9 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bol
 	// we will scale 
 	scale = 1024.0f/m_face->units_per_EM;
 
+#ifdef GNASH_DEBUG_DEVICEFONTS
 	log_debug("EM square for font '%s' is %d, scale is thus %g", name.c_str(), m_face->units_per_EM, scale);
+#endif
 }
 #else // ndef(HAVE_FREETYPE2)
 FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string&, bool, bool)

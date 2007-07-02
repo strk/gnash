@@ -1,5 +1,7 @@
 2007-07-02 Sandro Santilli <strk@keybit.net>
 
+	* server/FreetypeGlyphsProvider.cpp: protect debugging calls
+	  by a GNASH_DEBUG_DEVICEFONTS, defaulting to undefined.
 	* libbase/GC.{cpp,h}: Implement an heuristic to reduce
 	  the number of collector runs. It is based on the number
 	  of newly registered collectables since last run.
