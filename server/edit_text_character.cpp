@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.71 2007/07/01 10:54:22 bjacques Exp $ */
+/* $Id: edit_text_character.cpp,v 1.72 2007/07/03 01:12:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1082,6 +1082,29 @@ edit_text_character::format_text()
 			continue;
 		}
 
+		if (code == '<' && htmlAllowed() )
+		{
+			static bool warned = false;
+			if ( ! warned )
+			{
+				log_debug(_("HTML in a text field is unsupported, gnash will just forget the tags and print their content"));
+				warned = true;
+			}
+
+			// HTML tag, just skip it...
+			bool closingTagFound = false;
+			while ( (code = utf8::decode_next_unicode_character(&text)) )
+			{
+				if (code == '>')
+				{
+					closingTagFound = true;
+					break;
+				}
+			}
+			if ( ! closingTagFound ) break;
+			else continue;
+		}
+
 		if (code == 9) // tab (ASCII HT)
 		{
 			int index = _font->get_glyph_index(32); // ascii SPACE
@@ -1158,7 +1181,6 @@ after_x_advance:
 
 			if ( ! m_def->do_word_wrap() )
 			{
-				// TODO: scan more glyphs till newline and continue
 				bool newlinefound = false;
 				while ( (code = utf8::decode_next_unicode_character(&text)) )
 				{

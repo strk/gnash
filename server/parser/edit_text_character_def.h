@@ -210,6 +210,9 @@ public:
     // there. Should be fixed (remove get_bounds). 
     return get_bounds(); 
   }
+
+	/// Return true if HTML was allowed by definition
+	bool htmlAllowed() const { return m_html; }
 	
 protected:
 

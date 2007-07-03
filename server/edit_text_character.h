@@ -107,6 +107,9 @@ public:
 
 private:
 
+	/// Return true if HTML was allowed by definition
+	bool htmlAllowed() const { return m_def->htmlAllowed(); }
+
 	/// The actual text
 	std::string _text;
 

@@ -1,5 +1,15 @@
 2007-07-02 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/edit_text_character_def.h: add an htmlAllowed()
+	  public inspector.
+	* server/edit_text_character.h: add an htmlAllowed() private
+	  inspector.
+	* server/edit_text_character.cpp (format_text): if HTML is allowed
+	  and found in the textfield text, just skip the tags and show the 
+	  content, logging a debugging info about the fact (only once).
+
+2007-07-02 Sandro Santilli <strk@keybit.net>
+
 	* server/FreetypeGlyphsProvider.cpp: protect debugging calls
 	  by a GNASH_DEBUG_DEVICEFONTS, defaulting to undefined.
 	* libbase/GC.{cpp,h}: Implement an heuristic to reduce
