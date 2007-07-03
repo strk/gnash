@@ -1,3 +1,10 @@
+2007-07-03 Sandro Santilli <strk@keybit.net>
+
+	* backend/render_handler_tri.{cpp,h}: (tri_cache_manager): dont leak
+	  mesh sets.
+	* server/parser/character_def.{cpp,h}: don't leak
+	  render cache managers.
+
 2007-07-02 Sandro Santilli <strk@keybit.net>
 
 	* backend/sound_handler_sdl.{cpp,h}: fix leak of sound_data instances;

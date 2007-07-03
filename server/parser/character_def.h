@@ -61,7 +61,7 @@ public:
 		{
 		}
 	
-	virtual ~character_def() {}
+	virtual ~character_def();
 	
 	virtual void display(character* /*instance_info*/)
 	{
@@ -118,6 +118,11 @@ public:
 public:  
   
   /// Cache holder for renderer (contents depend on renderer handler)
+  /// Will be deleted by destructor of the character_def.
+  /// We could store by auto_ptr, but I'm afraid that would mean
+  /// including render_handler.h in this header, which I don't like.
+  /// (REF: PIMPL)
+  ///
   render_cache_manager* m_render_cache;
 	
 };

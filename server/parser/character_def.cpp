@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character_def.cpp,v 1.6 2007/07/01 10:54:33 bjacques Exp $ */
+/* $Id: character_def.cpp,v 1.7 2007/07/03 05:46:02 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,6 +27,7 @@
 
 #include "character_def.h"
 #include "generic_character.h"
+#include "render_handler.h" // for destruction of render_cache_manager
 
 namespace gnash
 {
@@ -37,7 +38,12 @@ character_def::create_character_instance(character* parent, int id)
 	return new generic_character(this, parent, id);
 }
 
+character_def::~character_def()
+{
+	delete m_render_cache;
 }
+
+} // end of namespace gnash
 
 // Local Variables:
 // mode: C++

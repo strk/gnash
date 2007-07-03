@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.14 2007/07/01 10:53:48 bjacques Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.15 2007/07/03 05:46:02 strk Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -344,6 +344,15 @@ geometry::Range2d<int>
 triangulating_render_handler::world_to_pixel(const rect& /*worldbounds*/)
 {
   assert(0); // not implemented (and currently not required for tri. renderers)
+}
+
+tri_cache_manager::~tri_cache_manager()
+{
+	for (MeshSetList::iterator i=m_cached_meshes.begin(), e=m_cached_meshes.end();
+			i != e; ++i)
+	{
+		delete *i;
+	}
 }
 
 

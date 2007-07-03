@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.h,v 1.11 2007/07/01 10:53:48 bjacques Exp $ */
+/* $Id: render_handler_tri.h,v 1.12 2007/07/03 05:46:02 strk Exp $ */
 
 #ifndef GNASH_RENDER_HANDLER_TRI_H
 #define GNASH_RENDER_HANDLER_TRI_H
@@ -54,20 +54,32 @@ private:
   /// that's still acceptable when viewed.
   /// To draw these meshes they still have to be transformed using the desired
   /// matrix!
-  std::vector <mesh_set*> m_cached_meshes;
+  ///
+  /// This instance owns the mesh_sets
+  ///
+  typedef std::vector <mesh_set*> MeshSetList;
+  MeshSetList m_cached_meshes;
   
 public:  
 
   /// Searches a mesh set with a error tolerance below max_error.
   /// Returns NULL when no candidate could be found.
+  /// Ownership is NOT transferred
   mesh_set* search_candidate(float max_error);
     
   /// Adds a mesh set to the cache. 
+  //
+  /// Transfer ownerhips of the mesh_set.
+  /// TODO: take an auto_ptr
+  ///
   void add(mesh_set* m);
     
   /// Maintain cached meshes. Clean out mesh_sets that haven't been used 
   /// recently, and make sure they're sorted from high error to low error.
   void sort_and_clean_meshes();  
+
+  /// Drop all cached meshes
+  virtual ~tri_cache_manager();
   
 }; // class tri_cache_manager
 
