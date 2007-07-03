@@ -298,12 +298,13 @@ private:
     
 #ifdef GNASH_FPS_DEBUG
     unsigned int fps_counter;
+    float fps_rate_min, fps_rate_max;   
 
     // Number of calls to fpsCounterTick, which is also
     // the number of calls to movie_advance()
     unsigned int fps_counter_total;
 
-    uint64_t fps_timer;     
+    uint64_t fps_timer, fps_start_timer;     
 
     ///	The time, in seconds, between prints (which also resets the fps counter).
     //

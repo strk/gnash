@@ -590,21 +590,38 @@ Gui::fpsCounterTick()
   //       at each fpsCounterTick call...
   uint64_t interval_ms = (uint64_t)(fps_timer_interval * 1000.0);
 
-  if (fps_counter_total==1) fps_timer = current_timer;
+  if (fps_counter_total==1) {
+    fps_timer = current_timer;
+    fps_start_timer = current_timer;
+  }
   
   ++fps_counter;
   
   if (current_timer - fps_timer >= interval_ms) {
   
     float secs = (current_timer - fps_timer) / 1000.0;
+    
+    float rate = fps_counter/secs; 
+     
+    // first FPS message?
+    if (fps_timer == fps_start_timer) {     // they're ints, so we can compare
+      fps_rate_min = rate;
+      fps_rate_max = rate; 
+    } else {
+      fps_rate_min = fmin(fps_rate_min, rate);
+      fps_rate_max = fmax(fps_rate_max, rate);
+    }
+    
+    float avg = fps_counter_total / ((current_timer - fps_start_timer) / 1000.0); 
   
     //log_msg("Effective frame rate: %0.2f fps", (float)(fps_counter/secs));
-    printf("Effective frame rate: %0.2f fps (%u frames total)\n", 
-      (float)(fps_counter/secs), fps_counter_total);
+    printf("Effective frame rate: %0.2f fps (min %0.2f, avg %0.2f, max %0.2f, "
+      "%u frames total)\n", rate, fps_rate_min, avg, fps_rate_max,
+      fps_counter_total);
       
     fps_counter = 0;
     fps_timer = current_timer;
-  
+    
   }
    
 }
