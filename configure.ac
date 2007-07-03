@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.346 2007/07/02 16:31:21 strk Exp $
+dnl $Id: configure.ac,v 1.347 2007/07/03 20:47:44 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -109,12 +109,12 @@ dnl different development
 AC_ARG_WITH(top_level, AC_HELP_STRING([--with-top-level], [top level directory for cross compiling files]), with_top_level=${withval})
 
 AC_ARG_ENABLE(debugger,
-  AC_HELP_STRING([--disable-debugger],[Disable the Flash debugger]),
+  AC_HELP_STRING([--enable-debugger],[Enable the Flash debugger]),
 [case "${enableval}" in
   yes) debugger=yes ;;
   no)  debugger=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-debugger option]) ;;
-esac],debugger=yes)
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debugger option]) ;;
+esac],debugger=no)
 
 if test x"$debugger" = x"yes"; then
   AC_DEFINE([USE_DEBUGGER], [], [Flash Debugger support])
