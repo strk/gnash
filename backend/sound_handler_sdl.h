@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.27 2007/07/01 10:53:49 bjacques Exp $
+// $Id: sound_handler_sdl.h,v 1.28 2007/07/03 04:31:59 strk Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -115,6 +115,8 @@ class sound_data
 {
 public:
 	/// The undecoded data
+	//
+	/// TODO: use boost::scoped_array
 	uint8_t* data;
 
 	/// Format of the sound (MP3, raw, etc).
@@ -137,7 +139,16 @@ public:
 	int volume;
 
 	/// Vector containing the active instances of this sounds being played
+	//
+	/// TODO: define ownership of the active_sound elements
+	///
 	std::vector<active_sound*>	m_active_sounds;
+
+	~sound_data()
+	{
+		// TODO: use boost::scoped_array
+		delete [] data;
+	}
 
 };
 

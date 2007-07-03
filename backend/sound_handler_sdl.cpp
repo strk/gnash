@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.72 2007/07/02 13:53:19 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.73 2007/07/03 04:31:59 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -375,14 +375,15 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 }
 
 
-void	SDL_sound_handler::delete_sound(int sound_handle)
 // this gets called when it's done with a sample.
+void	SDL_sound_handler::delete_sound(int sound_handle)
 {
 	mutex::scoped_lock lock(_mutex);
 
 	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < m_sound_data.size())
 	{
-		delete[] m_sound_data[sound_handle]->data;
+		delete m_sound_data[sound_handle];
+		m_sound_data[sound_handle] = NULL;
 	}
 
 }

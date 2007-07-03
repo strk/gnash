@@ -1,5 +1,10 @@
 2007-07-02 Sandro Santilli <strk@keybit.net>
 
+	* backend/sound_handler_sdl.{cpp,h}: fix leak of sound_data instances;
+	  added a few TODO items.
+
+2007-07-02 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/edit_text_character_def.h: add an htmlAllowed()
 	  public inspector.
 	* server/edit_text_character.h: add an htmlAllowed() private
