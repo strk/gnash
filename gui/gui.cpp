@@ -616,8 +616,8 @@ Gui::fpsCounterTick()
   
     //log_msg("Effective frame rate: %0.2f fps", (float)(fps_counter/secs));
     printf("Effective frame rate: %0.2f fps (min %0.2f, avg %0.2f, max %0.2f, "
-      "%u frames total)\n", rate, fps_rate_min, avg, fps_rate_max,
-      fps_counter_total);
+      "%u frames in %0.1f secs total)\n", rate, fps_rate_min, avg, fps_rate_max,
+      fps_counter_total, (current_timer - fps_start_timer)/1000.0);
       
     fps_counter = 0;
     fps_timer = current_timer;

@@ -1,6 +1,6 @@
 2007-07-03 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
-	* gui/gui.{cpp,h}: add min/avg/max fps printing
+	* gui/gui.{cpp,h}: add min/avg/max fps printing and total play time
 
 2007-07-03 Sandro Santilli <strk@keybit.net>
 
