@@ -26,7 +26,7 @@
 #include "NullGui.h"
 
 #if defined(_WIN32) || defined(WIN32)
-#	include <windows.h>
+# include <windows.h>
 # define usleep(x) Sleep(x/1000)
 #else
 # include <unistd.h> // for usleep
@@ -35,7 +35,6 @@
 #include <sys/time.h> // for gettimeofday
 #include <time.h> // for gettimeofday
 #include <errno.h> // for reporting gettimeofday errors
-#include "tu_timer.h"
 
 namespace gnash
 {
@@ -43,65 +42,65 @@ namespace gnash
 bool
 NullGui::run()
 {
-	struct timeval tv;
+  struct timeval tv;
   unsigned long prevtimer=0;
 
-	if (gettimeofday(&tv, NULL))
-	{
-		cerr << "Could not get time of day: " << strerror(errno) << endl;
-		return false;
-	}
-	unsigned long int start_timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
-	
-	prevtimer = start_timer;
+  if (gettimeofday(&tv, NULL))
+  {
+    cerr << "Could not get time of day: " << strerror(errno) << endl;
+    return false;
+  }
+  unsigned long int start_timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
+  
+  prevtimer = start_timer;
 
-	while (true)
-	{
-	
-	  unsigned long int timer=0;
+  while (true)
+  {
+  
+    unsigned long int timer=0;
 
-	  while (1) 
+    while (1) 
     {
-    	  
-			if (gettimeofday(&tv, NULL))
-			{
-				cerr << "Could not get time of day: " << strerror(errno) << endl;
-				return false;
-			}
-			timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
-			
-			
-  		if ( _timeout )
-  		{
-  			if ( timer - start_timer > _timeout)
-  			{
-  				break;
-  			}
-  		}
-  		
-  		if (_interval==1)
-  		  break; // special exception for 1 ms interval (run as fast as possible)
+        
+      if (gettimeofday(&tv, NULL))
+      {
+        cerr << "Could not get time of day: " << strerror(errno) << endl;
+        return false;
+      }
+      timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
+            
+      if (_interval==1)
+        break; // special exception for 1 ms interval (run as fast as possible)
 
-  		if (timer - prevtimer >= _interval)
-  		  break; // next frame, please!
-  	
+      if (timer - prevtimer >= _interval)
+        break; // next frame, please!
+    
       if (timer < prevtimer) // time glitch protection
         prevtimer = timer;
         
       usleep(1);
-    	
-  	}
-  	
-  	prevtimer = timer;
-				  
+      
+    }
+    
+    if ( _timeout )
+    {
+      if ( timer - start_timer > _timeout)
+      {
+        break;
+      }
+    }
+    
+    
+    prevtimer = timer;
+          
 
-		Gui::advance_movie(this);
+    Gui::advance_movie(this);
 
-		// when runnign gnash with -1 switch ::advance_movie() will call ::quit()
-		// at last frame
-		if ( _quit ) break;
-	}
-	return false;
+    // when runnign gnash with -1 switch ::advance_movie() will call ::quit()
+    // at last frame
+    if ( _quit ) break;
+  }
+  return false;
 }
 
 } // end of gnash namespace
