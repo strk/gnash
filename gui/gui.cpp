@@ -601,8 +601,21 @@ Gui::fpsCounterTick()
   
     float secs = (current_timer - fps_timer) / 1000.0;
     float secs_total = (current_timer - fps_start_timer)/1000.0;
+        
+    float rate = fps_counter/secs;
     
-    float rate = fps_counter/secs; 
+    if (secs > 10000000) {
+      // the timers are unsigned, so when the clock runs "backwards" it leads
+      // to a very high difference value. In theory, this should never happen
+      // with ticks, but it does on my machine (which may have a hw problem?).
+      printf("Time glich detected, need to restart FPS counters, sorry...\n");
+      
+      fps_timer = current_timer;
+      fps_start_timer = current_timer;
+      fps_counter_total = 0;
+      fps_counter = 0;
+      return;
+    } 
      
     // first FPS message?
     if (fps_timer == fps_start_timer) {     // they're ints, so we can compare
