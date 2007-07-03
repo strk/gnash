@@ -31,7 +31,12 @@
 #endif
 
 // Define the following macro to enable GC verbosity 
-// Define to > 1 to have info printed about scan of already reachable objects
+// Verbosity levels:
+//   1 - print stats about how many resources are registered and how many 
+//       are deleted, everytime the GC collector runs.
+//   2 - print a message for every GcResource being registered and being deleted
+//   3 - print info about the mark scan 
+//   
 //#define GNASH_GC_DEBUG 1
 
 #ifdef GNASH_GC_DEBUG
@@ -101,14 +106,14 @@ public:
 
 		if ( _reachable )
 		{
-#if GNASH_GC_DEBUG > 1
+#if GNASH_GC_DEBUG > 2
 			log_debug(_("Instance %p of class %s already reachable, setReachable doing nothing"),
 					(void*)this, typeid(*this).name());
 #endif
 			return;
 		}
 
-#if GNASH_GC_DEBUG  > 1
+#if GNASH_GC_DEBUG  > 2
 		log_debug(_("Instance %p of class %s set to reachable, scanning reachable resources from it"),
 				(void*)this, typeid(*this).name());
 #endif
@@ -270,7 +275,7 @@ private:
 	/// Mark all reachable resources
 	void markReachable()
 	{
-#ifdef GNASH_GC_DEBUG 
+#ifdef GNASH_GC_DEBUG > 2
 		log_debug(_("GC %p: MARK SCAN"), (void*)this);
 #endif
 		_root.markReachableResources();

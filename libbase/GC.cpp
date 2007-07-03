@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GC.cpp,v 1.4 2007/07/02 22:48:20 strk Exp $ */
+/* $Id: GC.cpp,v 1.5 2007/07/03 16:06:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -73,7 +73,7 @@ GC::~GC()
 void
 GC::cleanUnreachable()
 {
-#ifdef GNASH_GC_DEBUG 
+#ifdef GNASH_GC_DEBUG > 1
 	size_t deleted = 0;
 	log_debug(_("GC %p: SWEEP SCAN"), (void*)this);
 #endif
@@ -122,7 +122,7 @@ GC::collect()
 #endif
 
 #ifdef GNASH_GC_DEBUG 
-	log_debug(_("Starting collector: " SIZET_FMT " collectables"), _resList.size());
+	log_debug(_("GC %p Starting collector: " SIZET_FMT " collectables"), (void *)this, _resList.size());
 #endif // GNASH_GC_DEBUG
 
 #ifndef NDEBUG
