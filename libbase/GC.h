@@ -275,7 +275,7 @@ private:
 	/// Mark all reachable resources
 	void markReachable()
 	{
-#ifdef GNASH_GC_DEBUG > 2
+#if GNASH_GC_DEBUG > 2
 		log_debug(_("GC %p: MARK SCAN"), (void*)this);
 #endif
 		_root.markReachableResources();
