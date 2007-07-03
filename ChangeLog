@@ -1,5 +1,13 @@
 2007-07-03 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Global.{cpp,h}: Don't use a module-static
+	  for the Extension instance, when enabled.
+	  Seems to fix bug #20272 when debugger id disabled
+	  (sounds voodoo, but these are the effects of initialization
+	  and deinitialization order for statics...)
+
+2007-07-03 Sandro Santilli <strk@keybit.net>
+
 	* gui/gnash.cpp (parseCommandLine): -g doesn't take an argument.
 	* libbase/GC.{cpp,h}: define 3 verbosity levels for the GC
 

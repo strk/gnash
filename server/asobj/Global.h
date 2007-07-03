@@ -36,6 +36,11 @@ class Global: public as_object
 public:
 	Global(VM& vm);
 	~Global() {}
+private:
+
+#ifdef USE_EXTENSIONS
+	Extension et;
+#endif
 };
 
 } // namespace gnash

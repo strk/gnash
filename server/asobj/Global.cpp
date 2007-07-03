@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.64 2007/07/01 10:54:27 bjacques Exp $ */
+/* $Id: Global.cpp,v 1.65 2007/07/03 16:56:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -91,8 +91,6 @@
 using namespace std;
 
 namespace gnash {
-
-static Extension et;
 
 static as_value
 as_global_trace(const fn_call& fn)
