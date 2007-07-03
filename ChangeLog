@@ -1,5 +1,6 @@
 2007-07-03 Sandro Santilli <strk@keybit.net>
 
+	* gui/gnash.cpp (parseCommandLine): -g doesn't take an argument.
 	* libbase/GC.{cpp,h}: define 3 verbosity levels for the GC
 
 2007-07-03 Udo Giacomozzi <udo.gnu@nova-sys.net>

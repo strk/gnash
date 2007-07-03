@@ -204,7 +204,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         }
     }
     
-    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:g:Vf:")) != -1)
+    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:gVf:")) != -1)
     {
 	switch (c) {
     	  // case 'c' (Disable SDL core dumps) is decoded in sdl.cpp:init()
