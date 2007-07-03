@@ -35,6 +35,7 @@
 #include <sys/time.h> // for gettimeofday
 #include <time.h> // for gettimeofday
 #include <errno.h> // for reporting gettimeofday errors
+#include "tu_timer.h"
 
 namespace gnash
 {
@@ -43,7 +44,7 @@ bool
 NullGui::run()
 {
 	struct timeval tv;
-
+  unsigned long prevtimer=0;
 
 	if (gettimeofday(&tv, NULL))
 	{
@@ -51,26 +52,49 @@ NullGui::run()
 		return false;
 	}
 	unsigned long int start_timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
+	
+	prevtimer = start_timer;
 
 	while (true)
 	{
-		if ( _timeout )
-		{
+	
+	  unsigned long int timer=0;
+
+	  while (1) 
+    {
+    	  
 			if (gettimeofday(&tv, NULL))
 			{
 				cerr << "Could not get time of day: " << strerror(errno) << endl;
 				return false;
 			}
-			unsigned long int timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
-			if ( timer - start_timer > _timeout)
-			{
-				break;
-			}
-		}
+			timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
+			
+			
+  		if ( _timeout )
+  		{
+  			if ( timer - start_timer > _timeout)
+  			{
+  				break;
+  			}
+  		}
+  		
+  		if (_interval==1)
+  		  break; // special exception for 1 ms interval (run as fast as possible)
 
-		// sleep for _interval milliseconds
-		// TODO: use the timer value to trigger advances
-		usleep(_interval*1000);
+  		if (timer - prevtimer >= _interval)
+  		  break; // next frame, please!
+  	
+      if (timer < prevtimer) // time glitch protection
+        prevtimer = timer;
+        
+      usleep(1);
+    	
+  	}
+  	
+  	prevtimer = timer;
+				  
+
 		Gui::advance_movie(this);
 
 		// when runnign gnash with -1 switch ::advance_movie() will call ::quit()

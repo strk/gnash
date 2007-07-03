@@ -1,5 +1,9 @@
 2007-07-03 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
+	* gui/NullGui.cpp: implement correct timing
+
+2007-07-03 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
 	* gui/gui.{cpp,h}: add min/avg/max fps printing and total play time
 	* libbase/GC.h: include assert.h
 
