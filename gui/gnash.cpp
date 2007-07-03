@@ -270,7 +270,8 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 //              debugger.startServer(&debugger);
               debugger.console();
 #else
-              log_error (_("No debugger; disabled at compile time"));
+              printf(_("No debugger; disabled at compile time, -g is invalid\n"));
+              exit(EXIT_FAILURE);
 #endif
               break;
           case 'k':
@@ -335,7 +336,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 		player.setFpsPrintTime(frames);
 		break;
 #else // ndef GNASH_FPS_DEBUG
-		printf("FPS debugging disabled at compile time, -f is invalid\n");
+		printf(_("FPS debugging disabled at compile time, -f is invalid\n"));
 		exit(EXIT_FAILURE);
 #endif // ndef GNASH_FPS_DEBUG
           }
