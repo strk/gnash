@@ -39,11 +39,7 @@
 # include <typeinfo>
 #endif
 
-#if HAVE_ASSERT_H
-#  include <assert.h>
-#else
-#  define assert(arg)	((void) 0)
-#endif
+#include <cassert>
 
 
 namespace gnash {
