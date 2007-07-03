@@ -600,6 +600,7 @@ Gui::fpsCounterTick()
   if (current_timer - fps_timer >= interval_ms) {
   
     float secs = (current_timer - fps_timer) / 1000.0;
+    float secs_total = (current_timer - fps_start_timer)/1000.0;
     
     float rate = fps_counter/secs; 
      
@@ -612,12 +613,12 @@ Gui::fpsCounterTick()
       fps_rate_max = fmax(fps_rate_max, rate);
     }
     
-    float avg = fps_counter_total / ((current_timer - fps_start_timer) / 1000.0); 
+    float avg = fps_counter_total / secs_total; 
   
     //log_msg("Effective frame rate: %0.2f fps", (float)(fps_counter/secs));
     printf("Effective frame rate: %0.2f fps (min %0.2f, avg %0.2f, max %0.2f, "
       "%u frames in %0.1f secs total)\n", rate, fps_rate_min, avg, fps_rate_max,
-      fps_counter_total, (current_timer - fps_start_timer)/1000.0);
+      fps_counter_total, secs_total);
       
     fps_counter = 0;
     fps_timer = current_timer;
