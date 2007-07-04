@@ -32,9 +32,7 @@
 # include <unistd.h> // for usleep
 #endif
 
-#include <sys/time.h> // for gettimeofday
-#include <time.h> // for gettimeofday
-#include <errno.h> // for reporting gettimeofday errors
+#include "tu_timer.h"
 
 namespace gnash
 {
@@ -42,36 +40,23 @@ namespace gnash
 bool
 NullGui::run()
 {
-  struct timeval tv;
-  unsigned long prevtimer=0;
+  uint64_t prevtimer=0;
+  uint64_t start_timer = tu_timer::get_ticks();  // returns milliseconds
 
-  if (gettimeofday(&tv, NULL))
-  {
-    cerr << "Could not get time of day: " << strerror(errno) << endl;
-    return false;
-  }
-  unsigned long int start_timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
-  
   prevtimer = start_timer;
 
   while (true)
   {
   
-    unsigned long int timer=0;
+    uint64_t timer=0;
 
+    // synchronize to frame time 
+    if (_timeout || (_interval>1))  // avoid timing completely for interval==1
     while (1) 
     {
         
-      if (gettimeofday(&tv, NULL))
-      {
-        cerr << "Could not get time of day: " << strerror(errno) << endl;
-        return false;
-      }
-      timer = tv.tv_sec*1000 + tv.tv_usec / 1000;
+      timer = tu_timer::get_ticks();
             
-      if (_interval==1)
-        break; // special exception for 1 ms interval (run as fast as possible)
-
       if (timer - prevtimer >= _interval)
         break; // next frame, please!
     
