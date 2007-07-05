@@ -413,7 +413,8 @@ sound_sample* movie_def_impl::get_sound_sample(int character_id)
 void movie_def_impl::add_sound_sample(int character_id, sound_sample* sam)
 {
     assert(sam);
-	log_msg(_("Add sound sample %d"), character_id);
+	log_msg(_("Add sound sample %d assigning id %d"),
+		character_id, sam->m_sound_handler_id);
     m_sound_samples.insert(make_pair(character_id,
             boost::intrusive_ptr<sound_sample>(sam)));
 }
