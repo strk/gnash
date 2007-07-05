@@ -1,5 +1,8 @@
 2007-07-05 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/sprite_definition.h (add_sound_sample): don't
+	  complain about sound sampes definitions found in a sprite definition
+	  context. That's completely legal.
 	* server/array.cpp (array_concat): fix typo in function argument
 	  access. Fixes bug #20355.
 	* testsuite/actionscript.all/array.as: add more tests for Array.concat()

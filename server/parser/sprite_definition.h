@@ -218,9 +218,9 @@ private:
 	/// Overridden just for complaining  about malformed SWF
 	virtual void add_sound_sample(int id, sound_sample* sam)
 	{
-		IF_VERBOSE_MALFORMED_SWF (
-		log_swferror(_("add sam appears in sprite tags"));
-		);
+		// DEFINESOUND tags *are* allowed in a sprite context,
+		// and it is *expected* for them to be registered into
+		// the main dictionary.
 		m_movie_def->add_sound_sample(id,sam);
 	}
 
