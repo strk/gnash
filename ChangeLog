@@ -1,3 +1,9 @@
+2007-07-05 Sandro Santilli <strk@keybit.net>
+
+	* server/array.cpp (array_concat): fix typo in function argument
+	  access. Fixes bug #20355.
+	* testsuite/actionscript.all/array.as: add more tests for Array.concat()
+
 2007-07-04 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/NullGui.cpp: use tu_timer instead of gettimeofday()

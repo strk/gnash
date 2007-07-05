@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.18 2007/04/30 16:57:40 strk Exp $";
+rcsid="$Id: array.as,v 1.19 2007/07/05 19:03:03 strk Exp $";
 
 #include "check.as"
 
@@ -166,6 +166,10 @@ portion = concatted.slice(-2, -1);
 check_equals ( portion.toString(), "5");
 portion = concatted.slice(-2);
 check_equals ( portion.toString(), "5,6");
+mixed = portion.concat([7,8,9]);
+check_equals ( mixed.toString(), "5,6,7,8,9");
+mixed = mixed.concat([10,11],12,[13]);
+check_equals ( mixed.toString(), "5,6,7,8,9,10,11,12,13");
 
 // invalid calls
 portion = concatted.slice(-18);

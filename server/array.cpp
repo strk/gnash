@@ -749,7 +749,7 @@ array_concat(const fn_call& fn)
 	for (unsigned int i=0; i<fn.nargs; i++)
 	{
 		// Array args get concatenated by elements
-		boost::intrusive_ptr<as_array_object> other = boost::dynamic_pointer_cast<as_array_object>(fn.arg(1).to_object());
+		boost::intrusive_ptr<as_array_object> other = boost::dynamic_pointer_cast<as_array_object>(fn.arg(i).to_object());
 		if ( other )
 		{
 			newarray->concat(*other);
