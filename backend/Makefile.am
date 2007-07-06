@@ -78,6 +78,12 @@ lib_LTLIBRARIES = libgnashbackend.la
 RENDER_SOURCES = render_handler_tri.cpp
 SOUND_SOURCES = sound_handler.cpp
 
+if USE_RENDERER_AGG
+RENDER_SOURCES += render_handler_agg.cpp
+libgnashbackend_LIBS += $(AGG_LIBS)
+AM_CPPFLAGS += $(AGG_CFLAGS)
+endif
+
 if USE_RENDERER_CAIRO
 RENDER_SOURCES += render_handler_cairo.cpp
 libgnashbackend_LIBS += $(CAIRO_LIBS)
@@ -108,12 +114,6 @@ if USE_MAD_ENGINE
 libgnashbackend_LIBS += $(MAD_LIBS)
 AM_CPPFLAGS += $(MAD_CFLAGS)
 endif
-endif
-
-if USE_RENDERER_AGG
-RENDER_SOURCES += render_handler_agg.cpp
-libgnashbackend_LIBS += $(AGG_LIBS)
-AM_CPPFLAGS += $(AGG_CFLAGS)
 endif
 
 libgnashbackend_la_LIBADD = \

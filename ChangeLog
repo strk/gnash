@@ -1,3 +1,7 @@
+2007-07-06 Martin Guy <martinwguy@yahoo.it>
+
+	* backend/Makefile.am: Move a GUI test to its logical place
+
 2007-07-05 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* gui/NullGui.cpp: use boost instead of tu_timer.
