@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.348 2007/07/06 17:49:53 martinwguy Exp $
+dnl $Id: configure.ac,v 1.349 2007/07/06 18:46:12 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1723,9 +1723,9 @@ if test x"$BOOST_LIBS" != x; then
     else
 	# They have some boost libs but no date_time and want to compile cygnal.
 	echo "        ERROR: The BOOST date_time package is needed to compile cygnal!"
-	echo "        Install it from http://boost.org"
-	echo "        or .deb users: apt-get install libboost-date-time-dev"
-	echo "        or --disable-cygnal"
+	echo "               Install it from http://boost.org"
+	echo "               or .deb users: apt-get install libboost-date-time-dev"
+	echo "               or configure --disable-cygnal"
 	nogo=true
     fi
 else

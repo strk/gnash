@@ -6,6 +6,7 @@
 	* gui/gnash.cpp: Reformat crazy indentation and simplify redundant
 	  local variables (no functional change)
 	* configure.ac: Fix typo "handlign" in message
+	* configure.ac: Fix formatting of missing BOOST date_time message
 
 2007-07-05 Markus Gothe <nietzsche@lysator.liu.se>
 
