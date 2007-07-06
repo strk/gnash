@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.347 2007/07/03 20:47:44 strk Exp $
+dnl $Id: configure.ac,v 1.348 2007/07/06 17:49:53 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -938,7 +938,7 @@ if test x"$media_handler" = x"mad"; then
   if test x"${media_handler_specified}" = xfalse; then
     # If the library is not found, we'll disable media handling
     if test x"${ac_cv_path_mad_lib}" = x ; then
-      AC_MSG_WARN([No libmad found, disabling media handlign.])
+      AC_MSG_WARN([No libmad found, disabling media handling.])
       media_handler=none
     fi
   fi
