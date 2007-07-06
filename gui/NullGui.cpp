@@ -43,7 +43,7 @@ bool
 NullGui::run()
 {
   uint64_t prevtimer=0;
-  uint64_t start_timer = time_duration::ticks_per_second();  // returns milliseconds, maybe even ns...
+  uint64_t start_timer = ((microsec_clock::local_time()).time_of_day()).total_milliseconds();  // returns milliseconds
 
   prevtimer = start_timer;
 
@@ -57,7 +57,7 @@ NullGui::run()
     while (1) 
     {
         
-      timer = time_duration::ticks_per_second();
+      timer = ((microsec_clock::local_time()).time_of_day()).total_milliseconds();
             
       if (timer - prevtimer >= _interval)
         break; // next frame, please!
