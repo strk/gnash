@@ -50,8 +50,7 @@ static TestState runtest;
 int
 main(int argc, char *argv[])
 {
-    bool dump = false;
-    int c, retries = 3;
+    int c;
 
     while ((c = getopt (argc, argv, "hdvsm:")) != -1) {
         switch (c) {
@@ -72,7 +71,6 @@ main(int argc, char *argv[])
     AMF amf_obj;
     int fd, ret;
     char buf[AMF_NUMBER_SIZE+1];
-    amfnum_t value = 0xf03fL;
     amfnum_t *num;
     
     memset(buf, 0, AMF_NUMBER_SIZE+1);
@@ -84,25 +82,13 @@ main(int argc, char *argv[])
 
     num = amf_obj.extractNumber(buf);
 
-//     unsigned char hexint[32];
-//     hexify((unsigned char *)hexint, (unsigned char *)num, 8, false);
-//     cerr << "AMF number is: 0x" << hexint << endl;
-//     hexify((unsigned char *)hexint, (unsigned char *)&value, 8, false);
-//     cerr << "AMF value is: 0x" << hexint << endl;
-
     if ((((char *)num)[6] == -16) && (((char *)num)[7] == 0x3f)) {
-//    if (memcmp(num, &value, AMF_NUMBER_SIZE) == 0) {
         runtest.pass("Extracted Number AMF object");
     } else {
         runtest.fail("Extracted Number AMF object");
     }
 
     void *out = amf_obj.encodeNumber(*num);
-//     hexify((unsigned char *)hexint, (unsigned char *)out, 9, false);
-//     cerr << "AMF encoded number is: 0x" << hexint << endl;
-
-//     hexify((unsigned char *)hexint, (unsigned char *)buf, 9, false);
-//     cerr << "AMF buff number is: 0x" << hexint << endl;
 
     if (memcmp(out, buf, 9) == 0) {
         runtest.pass("Encoded AMF Number");
