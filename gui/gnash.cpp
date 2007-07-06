@@ -214,15 +214,15 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               printf("\n"); 
 	      usage ();
 	      build_options();
-          	exit(EXIT_SUCCESS);
+              exit(EXIT_SUCCESS);
 	  case 'v':
               dbglogfile.setVerbosity();
 	      log_msg (_("Verbose output turned on"));
 	      break;
 	  case 'V':
-        version_and_copyright();
-        build_options();
-	    	exit(EXIT_SUCCESS);	      
+              version_and_copyright();
+              build_options();
+	      exit(EXIT_SUCCESS);	      
 	  case 'w':
               dbglogfile.setWriteDisk(true);
 	      log_msg (_("Logging to disk enabled"));
@@ -251,13 +251,10 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               url = optarg;
               log_msg (_("Setting root URL to %s"), url);
               break;
-          case 'U':
-	  {
-		const char* baseurl = optarg;
-		player.setBaseUrl(baseurl);
-		log_msg (_("Setting base URL to %s"), baseurl);
-		break;
-	  }
+          case 'U':	// Set base URL
+	      player.setBaseUrl(optarg);
+	      log_msg (_("Setting base URL to %s"), optarg);
+	      break;
           case 'j':
               width_given = true;
               player.setWidth ( strtol(optarg, NULL, 0) );
@@ -280,18 +277,16 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               log_msg (_("Setting height to " SIZET_FMT), player.getHeight());
               break;
           case 'x':
-              called_by_plugin=true;
+              called_by_plugin = true;
               player.setWindowId(strtol(optarg, NULL, 0));
               break;
           case '1':
               player.setDoLoop(false);
               break;
           case 'r':
-	{
               specified_rendering_flag=true;
 
-              long int render_arg = strtol(optarg, NULL, 0);
-              switch (render_arg) {
+              switch (strtol(optarg, NULL, 0)) {
                 case 0:
                     // Disable both
                     player.setDoRender(false);
@@ -313,34 +308,26 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
                     player.setDoSound(true);
                     break;
                 default:
-                    log_error (_("-r must be followed by 0, 1, 2 or 3 "
-			"(%ld is invalid)"), render_arg);
+                    log_error (_("-r must be followed by 0, 1, 2 or 3 "));
                     break;
               }
               break;
-	}
           case 't':
               player.setExitTimeout( (float) atof(optarg) );
               break;
           case 'b':
-          {
-		int bit_depth;
-              bit_depth = atoi(optarg);
-		player.setBitDepth(bit_depth);
-              break;
-          }
+	      player.setBitDepth(atoi(optarg));
+	      break;
           case 'f':
-          {
 #ifdef GNASH_FPS_DEBUG
-		float frames = strtod(optarg, NULL);
-		player.setFpsPrintTime(frames);
-		break;
+		player.setFpsPrintTime((float)strtod(optarg, NULL));
 #else // ndef GNASH_FPS_DEBUG
 		printf(_("FPS debugging disabled at compile time, -f is invalid\n"));
 		exit(EXIT_FAILURE);
 #endif // ndef GNASH_FPS_DEBUG
-          }
+		break;
           case 'P':
+	    {
 		string param = optarg;
 		size_t eq = param.find("=");
 		string name, value;
@@ -355,6 +342,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
 		player.setParam(name, value);
 		//params[name] = value;
 		break;
+	    }
 	}
     }
 
@@ -367,11 +355,11 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         }
     }
 
-    if (called_by_plugin && height_given && width_given && !player.getHeight() && 
-        !player.getWidth()) {
-        // We were given dimensions of 0x0 to render to (probably the plugin
-        // is playing an "invisible" movie. Disable video rendering.
-        player.setDoRender(false);
+    if (called_by_plugin && height_given && width_given
+	&& !player.getHeight() && !player.getWidth()) {
+            // We were given dimensions of 0x0 to render to (probably the plugin
+            // is playing an "invisible" movie. Disable video rendering.
+            player.setDoRender(false);
     }
 
     // get the file name from the command line
@@ -410,12 +398,10 @@ main(int argc, char *argv[])
 
 	// No file name was supplied
 	if (!infile) {
-		std::cerr << "Error: no input file was specified."
-			<< endl << endl;
-		usage();
-		return EXIT_FAILURE;
+	    std::cerr << "Error: no input file was specified." << endl << endl;
+	    usage();
+	    return EXIT_FAILURE;
 	}
 
 	return player.run(argc, argv, infile, url);
 }
-

@@ -3,6 +3,8 @@
 	* backend/Makefile.am: Move a GUI test to its logical place
 	* testsuite/libamf.all/test_number.cpp: Remove uused variables and
 	  commented-out debugging printfs
+	* gui/gnash.cpp: Reformat crazy indentation and simplify redundant
+	  local variables (no functional change)
 
 2007-07-05 Markus Gothe <nietzsche@lysator.liu.se>
 
