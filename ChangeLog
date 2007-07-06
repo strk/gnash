@@ -7,6 +7,7 @@
 	  local variables (no functional change)
 	* configure.ac: Fix typo "handlign" in message
 	* configure.ac: Fix formatting of missing BOOST date_time message
+	* configure.ac: Fix error message for missing docbook2x tools
 	* server/asobj/SoundFfmpeg.cpp: Fix signed/unsigned compiler warning
 
 2007-07-05 Markus Gothe <nietzsche@lysator.liu.se>
