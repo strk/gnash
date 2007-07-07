@@ -1,5 +1,10 @@
 2007-07-06 Sandro Santilli <strk@keybit.net>
 
+	* libbase/ref_counted.h: use boost's atomic_count
+	  for the reference counter. Should be safer.
+
+2007-07-06 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (CommonGetUrl): use
 	  sprite_instance::loadMovie for target loads.
 	  Fixes bug #20001

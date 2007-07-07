@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ref_counted.h,v 1.11 2007/07/01 17:34:59 strk Exp $ */
+/* $Id: ref_counted.h,v 1.12 2007/07/07 03:49:51 strk Exp $ */
 
 #ifndef GNASH_REF_COUNTED_H
 #define GNASH_REF_COUNTED_H
@@ -41,10 +41,13 @@ class DSOEXPORT ref_counted
 
 private:
 
-	typedef long Counter;
-	// boost atomic_counter is thread-safe, but doesn't
-	// provide a copy constructor.
-	//typedef mutable boost::detail::atomic_count Counter;
+	// We use an atomic counter to make ref-counting 
+	// thread-safe. The drop_ref() method must be
+	// carefully designed for this to be effective
+	// (decrement & check in a single statement)
+	//
+	typedef boost::detail::atomic_count Counter;
+	// typedef long Counter;
 
 	mutable Counter m_ref_count;
 	
