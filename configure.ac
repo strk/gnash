@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.352 2007/07/07 14:58:41 martinwguy Exp $
+dnl $Id: configure.ac,v 1.353 2007/07/07 15:03:05 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1413,7 +1413,7 @@ if test x"$gui" = x"gtk" -a x"$renderer" = xopengl ; then
   fi
 fi
 
-if test x"$gui" = x"gtk"; then #{
+if test x"$gui" = x"gtk"; then
 
   if test x"$GTK2_LIBS" != x; then
     if test x"$GTK2_CFLAGS" != x; then
@@ -1475,7 +1475,7 @@ dnl    nogo=true
 dnl    nogo=true
   fi
 
-fi #}
+fi
 
 if test "$media_handler" = "gst"; then
   if test x"$GSTREAMER_LIBS" != x; then
