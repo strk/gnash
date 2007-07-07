@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Video.as,v 1.9 2007/07/01 10:54:41 bjacques Exp $";
+rcsid="$Id: Video.as,v 1.10 2007/07/07 12:56:09 strk Exp $";
 
 #include "check.as"
 
@@ -30,16 +30,18 @@ check_equals(Video, undefined);
 
 #else
 
-check(Video);
+// test Video class an interface availability
+check_equals(typeof(Video), 'function');
+check_equals(typeof(Video.prototype), 'object');
+check_equals(typeof(Video.prototype.attachVideo), 'function');
+check_equals(typeof(Video.prototype.clear), 'function');
 
+// test Video instance
 var videoObj = new Video;
+check_equals (typeof(videoObj), 'object');
+check_equals (typeof(videoObj.attachVideo), 'function');
+check_equals (typeof(videoObj.clear), 'function');
 
-// test the Video constuctor
-check (videoObj != undefined);
-
-// test the Video::attachVideo method
-check (videoObj.attachVideo != undefined);
-// test the Video::clear method
-check (videoObj.clear != undefined);
+// TODO: test other properties !
 
 #endif
