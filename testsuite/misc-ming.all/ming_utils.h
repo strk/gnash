@@ -28,6 +28,12 @@
 #endif
 
 /*
+ * Add symbol from ming src/movie.h as that header file is missing
+ * from the ming -dev package.
+ */
+void SWFMovie_writeExports(SWFMovie movie);
+
+/*
  * This is to avoid the annoying warnings
  * coming from Ming when using the deprecated
  * compileSWFActionCode interface.

@@ -1,3 +1,8 @@
+2007-07-05 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* testsuite/misc-ming.all/ming_utils.h: Added defintion of
+	  SWFMove_wrteExports().
+
 2007-07-07 Martin Guy <martinwguy@yahoo.it>
 
 	* libbase/network.h,server/shm.{h,cpp}: Remove last remnants of
