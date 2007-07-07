@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: shm.cpp,v 1.32 2007/07/01 10:54:24 bjacques Exp $ */
+/* $Id: shm.cpp,v 1.33 2007/07/07 12:02:45 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -452,7 +452,6 @@ Shm::closeMem()
     return true;    
 }
 
-//#ifdef ENABLE_TESTING
 bool
 Shm::exists()
 {
@@ -523,7 +522,6 @@ as_value shm_exists(const fn_call& fn)
     assert(ptr);
     return as_value(ptr->obj.exists());
 }
-//#endif
 
 } // end of gnash namespace
 

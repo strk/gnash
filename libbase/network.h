@@ -37,10 +37,6 @@
 # include <io.h>
 #endif
 
-#ifdef ENABLE_TESTING 
-#include "impl.h"
-#endif
-
 #include <cassert>
 
 namespace gnash {
