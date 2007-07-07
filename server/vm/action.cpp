@@ -35,7 +35,7 @@
 #include "types.h"
 #include "sprite_instance.h"
 #include "movie_instance.h"
-#include "movie_root.h" // to reset root movie from attach_extern_movie
+//#include "movie_root.h" // to reset root movie from attach_extern_movie
 #include "Global.h"
 #include "swf.h"
 #include "URL.h"
@@ -127,6 +127,7 @@ void register_component(const std::string& name, as_c_function_ptr handler)
 	global->set_member(name, handler);
 }
 
+#if 0 // deprecated, use sprite_instance::loadMovie
 void
 attach_extern_movie(const char* c_url,
 		const sprite_instance* target,
@@ -199,6 +200,7 @@ attach_extern_movie(const char* c_url,
 		clip_depth);
 	}
 }
+#endif
 
 //
 // Function/method dispatch.

@@ -143,7 +143,8 @@ namespace gnash {
 	/// Returns M_INVALID_MEMBER if there's no match.
 	as_standard_member	get_standard_member(const std::string& name);
 
-	void attach_extern_movie(const char* c_url, const sprite_instance* target, const sprite_instance* root_movie);
+	// deprecated, use sprite_instance::loadMovie
+	//void attach_extern_movie(const char* c_url, const sprite_instance* target, const sprite_instance* root_movie);
 
 }	// end namespace gnash
 

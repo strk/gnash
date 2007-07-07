@@ -1,3 +1,12 @@
+2007-07-06 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (CommonGetUrl): use
+	  sprite_instance::loadMovie for target loads.
+	  Fixes bug #20001
+	* server/vm/action.{cpp,h}: obsolete attach_extern_movie
+	  in favor of sprite_instance::loadMovie, known to work
+	  better in at least one case (bug #20001).
+
 2007-07-06 Martin Guy <martinwguy@yahoo.it>
 
 	* backend/Makefile.am: Move a GUI test to its logical place

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.110 2007/07/01 10:54:36 bjacques Exp $ */
+/* $Id: ASHandlers.cpp,v 1.111 2007/07/07 03:37:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1870,8 +1870,7 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 					sendVarsMethod);
 			}
 
-			sprite_instance* root_movie = env.get_target()->get_root_movie();
-			attach_extern_movie(url.str().c_str(), target_movie, root_movie);
+			target_movie->loadMovie(url);
 		}
 	}
 	else
