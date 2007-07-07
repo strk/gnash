@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.351 2007/07/06 20:41:41 martinwguy Exp $
+dnl $Id: configure.ac,v 1.352 2007/07/07 14:58:41 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1192,17 +1192,10 @@ else
   echo "        Intel 810 LOD bias hack disabled (default). Use --enable-i810-lod-bias to enable."
 fi
 
-
 if test x"$pthreads" = x"yes"; then
   echo "        POSIX Threads support enabled (default)"
 else
   echo "        POSIX Thread support disabled."
-fi
-
-if test x"$http" = x"yes"; then
-  echo "        Web server support enabled"
-else
-  echo "        Web server support disabled (default)"
 fi
 
 if test x"$dmalloc" = x"yes"; then

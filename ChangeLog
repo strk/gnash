@@ -2,6 +2,8 @@
 
 	* libbase/network.h,server/shm.{h,cpp}: Remove last remnants of
 	  ENABLE_TESTING ifdef
+	* configure.ac: Remove bogus "Web server support disabled" report,
+	  switched on nonexistent $http variable
 
 2007-07-06 Sandro Santilli <strk@keybit.net>
 
