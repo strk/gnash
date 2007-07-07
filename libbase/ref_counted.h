@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ref_counted.h,v 1.12 2007/07/07 03:49:51 strk Exp $ */
+/* $Id: ref_counted.h,v 1.13 2007/07/07 03:57:24 strk Exp $ */
 
 #ifndef GNASH_REF_COUNTED_H
 #define GNASH_REF_COUNTED_H
@@ -62,6 +62,12 @@ protected:
 
 public:
 	ref_counted()
+		:
+		m_ref_count(0)
+	{
+	}
+
+	ref_counted(const ref_counted&)
 		:
 		m_ref_count(0)
 	{
