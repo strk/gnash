@@ -50,16 +50,6 @@ selected.  The default is FFMPEG with SDL sound.
   </varlistentry>
 
   <varlistentry>
-    <term>--enable-dom</term>
-    <listitem>
-      <para>
-        When using the XML library, parse the messages using a
-        DOM based parser. This is the default.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
     <term>--enable-embedded</term>
     <listitem>
       <para>
@@ -106,46 +96,48 @@ selected.  The default is FFMPEG with SDL sound.
       <para>
         Select the Graphic User Interface to use (just one at a time please).
       </para>
-      <varlistentry>
-        <term>GTK</term>
-        <listitem>
+      <variablelist>
+	<varlistentry>
+	  <term>GTK</term>
+	  <listitem>
     The GTK+ toolkit, which is the default GUI.
     Said to interwork particularly well with firefox.
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>SDL</term>
-        <listitem>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>SDL</term>
+	  <listitem>
     Simple DirectMedia Layer, a simple and portable GUI.
     Its sound facilities are used when --enable-media=ffmpeg|mad
     regoardless of whether it is also in charge of the GUI.
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>KDE</term>
-        <listitem>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>KDE</term>
+	  <listitem>
     An interface adapted to the KDE Desktop Environment.
     This must be selected when building the Konqueror plugin
     "klash". Furthermore, the only renderer that currently
     works with KDE is opengl.
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>FLTK</term>
-        <listitem>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>FLTK</term>
+	  <listitem>
     Fast Light ToolKit, low on resource usage.
     Since all build using fltk are now broken, we declare it
     "for developers".
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>FB</term>
-        <listitem>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>FB</term>
+	  <listitem>
     The Linux Frame Buffer, also known as /dev/fb0.
     AGG is the only renderer that can currently be used
     with the framebuffer GUI.
-        </listitem>
-      </varlistentry>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
     </listitem>
   </varlistentry>
 
