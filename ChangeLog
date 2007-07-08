@@ -11,6 +11,9 @@
 	* gui/gtk_glue_cairo.h: Drop unused variable compiler warnings
 	* backend/sound_handler.h libbase/FLVParser.h:
 	  Document extra NELLYMOSER format code (mentioned in libavcodec/flv.h)
+	* macros/ffmpeg.m4: Don't zero ffmpeg_version if too early; it is used
+	  in the final error report and is always checked against "ok" to see
+	  if there is an acceptable version.
 
 2007-07-07 Markus Gothe <nietzsche@lysator.liu.se>
 
