@@ -1,6 +1,9 @@
 2007-07-08 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac: Say where to get gtkglext source
+	* C/usermanual/installation/feature_configuration.xml:
+	  Add missing <variablelist> </variablelist> round GUI choices item
+	  and remove configure --enable-dom (it has gone)
 
 2007-07-07 Markus Gothe <nietzsche@lysator.liu.se>
 
