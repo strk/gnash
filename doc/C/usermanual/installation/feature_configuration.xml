@@ -158,8 +158,8 @@ selected.  The default is FFMPEG with SDL sound.
     <listitem>
       <para>
         Disable support for Konqueror plugin. If
-        <emphasis>--enable--plugin</emphasis> is  specified, and
-        support for building KDE programs is found, Klash is
+        <emphasis>--disable-plugin</emphasis> is not specified
+        and support for building KDE programs is found, Klash is
         built by default. This option limits the plugin to only
         the Mozilla/Firefox one.
       </para>
@@ -192,8 +192,9 @@ selected.  The default is FFMPEG with SDL sound.
       <para>
         Select the specified media decoder and sound engine.
         FFMPEG and MAD use the SDL sound engine; GST uses its own.
-        Mixing this with --enable-sound=gst is invalid. Using
-        <emphasis>ffmpeg</emphasis> is the default decoder.
+	MAD only decodes MP3 sounds and uses integer arithmetic while
+	the others also decode video files and use floating point.
+        <emphasis>FFMPEG</emphasis> is the default decoder.
       </para>
       <para>
         You should only select one media decoder.
@@ -202,14 +203,14 @@ selected.  The default is FFMPEG with SDL sound.
   </varlistentry>
 
   <varlistentry>
-    <term>--enable-plugin</term>
+    <term>--disable-plugin</term>
     <listitem>
       <para>
         Enable building the plugin. By default the
-        Mozilla Firefox plugin won't be built, even if all the required
+        Mozilla Firefox plugin is built if all the required
         files are found by configure. Configure
         <emphasis>--with-plugindir=</emphasis> to specify where the
-        plugin should be installed. 
+        plugin should be installed.
       </para>
     </listitem>
   </varlistentry>
