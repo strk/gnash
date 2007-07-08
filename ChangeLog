@@ -6,6 +6,9 @@
 	  and remove configure --enable-dom (it has gone)
 	  Remove doc for configure --enable-xmlreader and --enable-testing
 	  (they have gone too)
+	  Remove mention of old --enable-sound, fix default as --enable-plugin
+	  and talk about MAD / GST-FFMPEG differences.
+	* gui/gtk_glue_cairo.h: Drop unused variable compiler warnings
 
 2007-07-07 Markus Gothe <nietzsche@lysator.liu.se>
 
