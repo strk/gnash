@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.h,v 1.17 2007/07/08 20:26:49 martinwguy Exp $
+// $Id: FLVParser.h,v 1.18 2007/07/08 20:27:39 martinwguy Exp $
 
 // Information about the FLV format can be found at http://osflash.org/flv
 
@@ -45,7 +45,7 @@ enum audioCodecType
 	AUDIO_CODEC_ADPCM = 1,	// gnash doesn't pass this through; it uncompresses and sends FORMAT_NATIVE16
 	AUDIO_CODEC_MP3 = 2,
 	AUDIO_CODEC_UNCOMPRESSED = 3,	// 16 bits/sample, little-endian
-	FORMAT_NELLYMOSER_8HZ_MONO = 5,	// According to ffmpeg
+	AUDIO_CODEC_NELLYMOSER_8HZ_MONO = 5,	// According to ffmpeg
 	AUDIO_CODEC_NELLYMOSER = 6	// Mystery proprietary format; see nellymoser.com
 };
 
