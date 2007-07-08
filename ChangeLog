@@ -1,4 +1,8 @@
-2007-07-05 Markus Gothe <nietzsche@lysator.liu.se>
+2007-07-08 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac: Say where to get gtkglext source
+
+2007-07-07 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* testsuite/misc-ming.all/ming_utils.h: Added defintion of
 	  SWFMove_wrteExports().

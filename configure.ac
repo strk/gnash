@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.353 2007/07/07 15:03:05 martinwguy Exp $
+dnl $Id: configure.ac,v 1.354 2007/07/08 13:53:37 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1403,7 +1403,7 @@ if test x"$gui" = x"gtk" -a x"$renderer" = xopengl ; then
       if test x"$renderer" = x"opengl"; then
         echo "        ERROR: No GtkGLExt development package installed!"
 	echo "               It is needed to build the GTK/OpenGL GUI/renderer combination."
-	echo "               Either install it"
+	echo "               Either install it from http://gtkglext.sourceforge.net"
         echo "               or .deb users: apt-get install libgtkglext1-dev"
         echo "               or .rpm users: yum install gtkglext-devel"
         echo "               or --enable-gui=sdl or --enable-renderer=agg"
