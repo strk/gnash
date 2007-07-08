@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.17 2007/07/01 10:53:48 bjacques Exp $ */
+/* $Id: sound_handler.h,v 1.18 2007/07/08 20:26:49 martinwguy Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -77,6 +77,7 @@ public:
 		FORMAT_ADPCM = 1,	// decoded in the tag loader and passed through as NATIVE16
 		FORMAT_MP3 = 2,
 		FORMAT_UNCOMPRESSED = 3,// Little-endian 8- or 16-bit, should be passed through as FORMAT_NATIVE16
+		FORMAT_NELLYMOSER_8HZ_MONO = 5,	// According to ffmpeg
 		FORMAT_NELLYMOSER = 6,	// Mystery proprietary format; see nellymoser.com
 				
 		// gnash tries to convert data to this format when possible:

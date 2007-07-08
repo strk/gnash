@@ -9,6 +9,8 @@
 	  Remove mention of old --enable-sound, fix default as --enable-plugin
 	  and talk about MAD / GST-FFMPEG differences.
 	* gui/gtk_glue_cairo.h: Drop unused variable compiler warnings
+	* backend/sound_handler.h libbase/FLVParser.h:
+	  Document extra NELLYMOSER format code (mentioned in libavcodec/flv.h)
 
 2007-07-07 Markus Gothe <nietzsche@lysator.liu.se>
 
