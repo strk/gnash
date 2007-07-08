@@ -4,6 +4,8 @@
 	* C/usermanual/installation/feature_configuration.xml:
 	  Add missing <variablelist> </variablelist> round GUI choices item
 	  and remove configure --enable-dom (it has gone)
+	  Remove doc for configure --enable-xmlreader and --enable-testing
+	  (they have gone too)
 
 2007-07-07 Markus Gothe <nietzsche@lysator.liu.se>
 

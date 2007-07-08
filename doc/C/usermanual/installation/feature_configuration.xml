@@ -271,23 +271,4 @@ selected.  The default is FFMPEG with SDL sound.
     </listitem>
   </varlistentry>
 
-  <varlistentry>
-    <term>--enable-testing</term>
-    <listitem>
-      <para>
-        Enable testing-specific methods.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-xmlreader</term>
-    <listitem>
-      <para>
-        When using the XML library, parse the messages using a
-        SAX based parser.
-      </para>
-    </listitem>
-  </varlistentry>
-
 </variablelist>
