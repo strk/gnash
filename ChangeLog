@@ -14,6 +14,7 @@
 	* macros/ffmpeg.m4: Don't zero ffmpeg_version if too early; it is used
 	  in the final error report and is always checked against "ok" to see
 	  if there is an acceptable version.
+	* macros/ffmpeg.m4: Add commentary preparing for better version checking
 
 2007-07-07 Markus Gothe <nietzsche@lysator.liu.se>
 

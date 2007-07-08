@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.47 2007/07/08 20:47:13 martinwguy Exp $
+dnl $Id: ffmpeg.m4,v 1.48 2007/07/08 20:49:38 martinwguy Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -79,7 +79,17 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
       AC_DEFINE(HAVE_FFMPEG_AVCODEC_H, 1, [Define if you have avcodec.h installed.])
   fi
 
+dnl Find and check libavcodec version number to make sure we have a usable
+dnl version and to enable/disable features according to version.
 dnl We need LIBAVCODEC VERSION of at least 51.29.0 to get avcodec_decode_audio2
+
+dnl We try to get the avcodec version as a decimal number
+dnl so that we can compare it numerically against what we require.
+dnl
+dnl This previous version makes ffmpeg fail and then grubs the version string
+dnl out of the resulting usage message e.g. "  libavcodec version: 51.40.2"
+dnl Early versions of ffmpeg do not output this string at all.
+dnl
 dnl   AC_PATH_PROG(FFMPEG, ffmpeg, ,[${pathlist}])
 dnl   if test "x$FFMPEG" = "x" ; then
 dnl     ffmpeg_version=`$FFMPEG uglyhack 2>&1 | grep "libavcodec version" | cut -d ' ' -f 5 | tr -d '.'`
@@ -87,8 +97,48 @@ dnl     if test "$ffmpeg_version" -lt 51290; then
 dnl       AC_MSG_ERROR([])
 dnl     fi
 dnl   fi
+dnl
+dnl These days we check avcodec.h and pick the version out of the constants,
+dnl simply throwing away all non-digits.
+dnl
+dnl In earlier versions we have:
+dnl #define FFMPEG_VERSION_INT     0x000409
+dnl #define FFMPEG_VERSION         "0.4.9-pre1"
+dnl #define LIBAVCODEC_BUILD       4731
+dnl #define LIBAVCODEC_VERSION_INT FFMPEG_VERSION_INT
+dnl #define LIBAVCODEC_VERSION     FFMPEG_VERSION
+dnl
+dnl elsewhere, FFMPEG_VERSION may also be the quoted string "CVS"
+dnl
+dnl This changed from the above to
+dnl #define LIBAVCODEC_VERSION_INT ((49<<16)+(0<<8)+0)
+dnl #define LIBAVCODEC_VERSION     49.0.0
+dnl #define LIBAVCODEC_BUILD       LIBAVCODEC_VERSION_INT
+dnl (note, LIBAVCODEC_VERSION also changes from a quoted string to unquoted)
+dnl see http://lists.mplayerhq.hu/pipermail/ffmpeg-cvslog/2005-July/000570.html
+dnl
+dnl Those deb-heads at Debian redefine LIBAVCODEC_VERSION in their versions to
+dnl (e.g.) 1d.51.38.0 or dnl 0d.51.11.0 - we need to discard the prefixed
+dnl rubbish.
+dnl
+dnl Other values or LIBAVCODEC_VERSION spotted in the wild:
+dnl 50.0.0  50.5.0  51.7.0  51.8.0  0d.51.8.0  51.40.4
+dnl presumably this will change to 52.0.0 at some point...
+dnl
+dnl We can ignore the very early versions because 51.10.0 is necessary to decode
+dnl Flash video at all. However the current solution will incorrectly succeed
+dnl on early debian/ubuntu 1d.* version numbers and incorrectly fail
+dnl when 52.0.0 happens.
+dnl
+dnl The most reliable way is to compile a test program to print the value of
+dnl LIBAVCODEC_BUILD, which got up to dnl 4718 at version 0.4.9-pre1,
+dnl then changed to (major<<16 + minor<<8 + micro) from then on.
+dnl There is code to do this in transcode's configure.in, but when
+dnl cross-compiling we cannot run a test program, which suggests that
+dnl a modified form of grepping may be better, making sure all old kinds of
+dnl version numbering fail gracefully.
 
-  # Check avcodec version number, if it was found
+# Check avcodec version number, if it was found
   if test x"${avcodec_h}" != x; then
 
     AC_MSG_CHECKING([for ffmpeg version])
