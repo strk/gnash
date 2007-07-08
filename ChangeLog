@@ -14,6 +14,7 @@
 
 	* libbase/ref_counted.h: use boost's atomic_count
 	  for the reference counter. Should be safer.
+	  Fixed bug #20194.
 
 2007-07-06 Sandro Santilli <strk@keybit.net>
 
