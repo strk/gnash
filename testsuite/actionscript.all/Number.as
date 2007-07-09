@@ -26,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.20 2007/07/01 10:54:40 bjacques Exp $";
+rcsid="$Id: Number.as,v 1.21 2007/07/09 01:59:42 strk Exp $";
 
 #include "check.as"
 
@@ -257,6 +257,9 @@ note(2/Number);
 note(Number/2);
 note(null/2);
 note(2/null);
+
+// ActionNewAdd
+check_equals('0' + -1, '0-1');
 
 check_equals(typeof(Number.prototype.valueOf), 'function'); 
 check_equals(typeof(Number.prototype.toString), 'function'); 

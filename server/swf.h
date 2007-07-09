@@ -291,7 +291,12 @@ typedef enum
     ///
     ACTION_ENUMERATE               = 0x46,
 
+    /// SWF5
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_add_typed
+    ///
     ACTION_NEWADD                  = 0x47,
+
     ACTION_NEWLESSTHAN             = 0x48,
 
     /// ECMA-262 "Abstract Equality Comparison"
