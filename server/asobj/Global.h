@@ -23,6 +23,10 @@
 
 #include "as_object.h" // for inheritance
 
+#ifdef USE_EXTENSIONS
+# include "extension.h" // for composition
+#endif
+
 // Forward declarations
 namespace gnash {
 	class VM;
