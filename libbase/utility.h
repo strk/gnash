@@ -10,11 +10,18 @@
 #define UTILITY_H
 
 #include "tu_config.h"
-#include <cassert>
 #include "tu_math.h"
 #include "tu_types.h"
 #include "tu_swap.h"
+
+#include <cassert>
 #include <cctype>
+#include <string>
+#include <typeinfo>
+
+#if defined(__GNUC__) && __GNUC__ > 2
+#  include <cxxabi.h>
+#endif
 
 #if defined(_WIN32) || defined(WIN32)
 #ifndef NDEBUG
@@ -167,6 +174,26 @@ inline size_t	bernstein_hash_case_insensitive(const void* data_in, int size, uns
 
 /// Dump the internal statistics from malloc() so we can track memory leaks
 void dump_memory_stats(const char *from, int line, const char *label);
+
+/// Return (unmangled) name of this instance type
+template <class T>
+std::string typeName(T& inst)
+{
+	std::string typeName = typeid(inst).name();
+#if defined(__GNUC__) && __GNUC__ > 2
+	int status;
+	char* typeNameUnmangled = 
+		abi::__cxa_demangle (typeName.c_str(), NULL, NULL,
+				     &status);
+	if (status == 0)
+	{
+		typeName = typeNameUnmangled;
+		free(typeNameUnmangled);
+	}
+#endif // __GNUC__ > 2
+	return typeName;
+}
+
 #endif // UTILITY_H
 
 

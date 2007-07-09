@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.44 2007/07/01 10:54:21 bjacques Exp $ */
+/* $Id: character.cpp,v 1.45 2007/07/09 13:00:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -491,7 +491,7 @@ character::width_getset(const fn_call& fn)
 		if ( newwidth <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Setting _width=%g"), newwidth/20);
+			log_aserror(_("Setting _width=%g of character %s (%s)"), newwidth/20, ptr->getTarget().c_str(), typeName(*ptr).c_str());
 			);
 		}
 
@@ -536,7 +536,7 @@ character::height_getset(const fn_call& fn)
 		if ( newheight <= 0 )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("Setting _height=%g"), newheight/20);
+			log_aserror(_("Setting _height=%g of character %s (%s)"), newheight/20, ptr->getTarget().c_str(), typeName(*ptr).c_str());
 			);
 		}
 
