@@ -1,3 +1,8 @@
+2007-07-09 Sandro Santilli <strk@keybit.net>
+
+	* server/swf.h: add defines and links to alexis for SCRIPTLIMITS (SWF8),
+	  DOABCDEFINE and SYMBOLCLASS (SWF9).
+
 2007-07-09 Bernhard Rosenkraenzer <bero@arklinux.org>
 
 	* macros/ffmpeg.m4: don't assume FFMPEG CFLAGS only contain a single

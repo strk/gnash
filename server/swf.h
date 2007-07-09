@@ -101,6 +101,10 @@ typedef enum
     /// See http://sswf.sourceforge.net/SWFalexref.html#tag_protectdebug
     ENABLEDEBUGGER2	  = 64,
 
+    /// SWF_version  >= 7 
+    /// See http://sswf.sourceforge.net/SWFalexref.html#tag_scriptlimits
+    SCRIPTLIMITS          = 65, 
+
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_fileattributes
     FILEATTRIBUTES        = 69,
 
@@ -119,11 +123,19 @@ typedef enum
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_definefont3
     DEFINEFONT3           = 75,
 
+    /// SWF9
+    /// http://sswf.sourceforge.net/SWFalexref.html#tag_symbolclass
+    SYMBOLCLASS           = 76,
+
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_metadata
     METADATA              = 77,
 
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_definescalinggrid
     DEFINESCALINGGRID     = 78,
+
+    /// SWF9
+    /// http://sswf.sourceforge.net/SWFalexref.html#tag_doabcdefine
+    DOABCDEFINE           = 82,
 
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_definemorphshape2
     DEFINESHAPE4          = 83,
