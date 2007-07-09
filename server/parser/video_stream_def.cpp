@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.8 2007/07/01 10:54:34 bjacques Exp $
+// $Id: video_stream_def.cpp,v 1.9 2007/07/09 13:33:30 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -56,8 +56,11 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 
 		m_num_frames = in->read_u16();
 
-		m_width = in->read_u16();
-		m_height = in->read_u16();
+		uint16_t width = in->read_u16();
+		uint16_t height = in->read_u16();
+		m_bound.enclose_point(0, 0);
+		m_bound.expand_to_point(PIXELS_TO_TWIPS(width), PIXELS_TO_TWIPS(height));
+
 		m_reserved_flags = in->read_uint(5);
 		m_deblocking_flags = in->read_uint(2);
 		m_smoothing_flags = in->read_uint(1) ? true : false;
@@ -107,8 +110,8 @@ video_stream_definition::get_decoder()
 #endif
 
 	decoder->createDecoder(
-				m_width,
-				m_height,
+				m_bound.width(), // m_width,
+				m_bound.height(), // m_height,
 				m_deblocking_flags,
 				m_smoothing_flags,
 				m_codec_id,

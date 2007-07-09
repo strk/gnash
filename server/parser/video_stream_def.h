@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.7 2007/07/01 10:54:35 bjacques Exp $
+// $Id: video_stream_def.h,v 1.8 2007/07/09 13:33:30 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -47,9 +47,10 @@ public:
 	character* create_character_instance(character* parent, int id);
 	void	read(stream* in, SWF::tag_type tag, movie_definition* m);
 
-	// TODO: return a rect 0,0,m_width,m_height
-	const rect&	get_bound() const	{
-		return m_unused_rect;
+	/// Return local video bounds in twips
+	const rect&	get_bound() const
+	{
+		return m_bound;
 	}
 
 	/// Return a newly created embedded-video decoder
@@ -69,11 +70,14 @@ public:
 
 	void get_frame_data(int frameNum, uint8_t** data, int* size);
 
-	// TODO: make private
-	uint16_t m_width;
-	uint16_t m_height;
-
 private:
+
+	// TODO: drop, use m_bound
+	//uint16_t m_width;
+
+	// TODO: drop, use m_bound
+	//uint16_t m_height;
+
 
 	uint16_t m_char_id;
 	uint8_t m_reserved_flags;
@@ -88,7 +92,13 @@ private:
 	// 3: screen video (Flash 7+ only)
 	// 4: VP6
 	uint8_t m_codec_id;
-	rect m_unused_rect;
+
+	/// Bounds of the video.
+	//
+	/// This is actually a duplication of m_width, m_height
+	/// members, which are not yet private so we can switch.
+	///
+	rect m_bound;
 
 	/// The undecoded video frames
 	std::vector<uint8_t*>	m_video_frames;

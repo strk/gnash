@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.31 2007/07/01 10:54:26 bjacques Exp $
+// $Id: video_stream_instance.cpp,v 1.32 2007/07/09 13:33:30 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -181,7 +181,7 @@ video_stream_instance::display()
 	assert(m_def);
 
 	matrix m = get_world_matrix();
-	rect bounds(0.0f, 0.0f, PIXELS_TO_TWIPS(m_def->m_width), PIXELS_TO_TWIPS(m_def->m_height));
+	const rect& bounds = m_def->get_bound();
 
 	// If this is a video from a NetStream object, retrieve a video frame from there.
 	if (_ns)
@@ -244,12 +244,8 @@ video_stream_instance::add_invalidated_bounds(InvalidatedRanges& ranges,
 	// case I think add_invalidated_bouns would never be invoked on us...
 	assert ( m_def );
 
-  rect def_bounds(0.0f, 0.0f, 
-    PIXELS_TO_TWIPS(m_def->m_width), PIXELS_TO_TWIPS(m_def->m_height));
-    
 	rect bounds;	
-
-	bounds.expand_to_transformed_rect(get_world_matrix(), def_bounds);
+	bounds.expand_to_transformed_rect(get_world_matrix(), m_def->get_bound());
 	
 	ranges.add(bounds.getRange());            
 }

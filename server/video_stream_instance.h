@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.17 2007/07/01 10:54:26 bjacques Exp $
+// $Id: video_stream_instance.h,v 1.18 2007/07/09 13:33:30 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -53,6 +53,8 @@ public:
 
 	geometry::Range2d<float> getBounds() const
 	{
+		// TODO: return the bounds of the dynamically
+		//       loaded video if not embedded ?
 		return m_def->get_bound().getRange();
 	}
 

@@ -1,5 +1,15 @@
 2007-07-09 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/video_stream_def.{h,cpp}: drop the m_width and m_height
+	  public members, substitute them with a private m_bound (renamed
+	  from m_unused_bound since it is now used). This fixes get_bound
+	  to return a meaningful value.
+	* server/video_stream_instance.{cpp,h}: stop using m_width and m_height
+	  of the definition, rather use the get_bound() method.
+	  Fixes bug #20177 (Youtube: half the video hidden)
+
+2007-07-09 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.cpp (to_debug_string): include object type name.
 	* libbase/utility.h: add a templated typeName() function for
 	  demangling.
