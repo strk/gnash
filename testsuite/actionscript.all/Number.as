@@ -26,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.21 2007/07/09 01:59:42 strk Exp $";
+rcsid="$Id: Number.as,v 1.22 2007/07/09 03:30:50 strk Exp $";
 
 #include "check.as"
 
@@ -90,7 +90,7 @@ check_equals (n1.toString(), "-268");
 check_equals( typeof(NaN), 'number' );
 check_equals( typeof(isNaN), 'function' );
 check_equals( typeof(isNaN(NaN)), 'boolean' );
-check(NaN != NaN);
+check(NaN != NaN); // TODO: this seems a bogus check, the check should actually return false
 check( isNaN(NaN) );
 check_equals( typeof(isNaN(0/0)), 'boolean' );
 check( isNaN(0/0) );
@@ -260,6 +260,9 @@ note(2/null);
 
 // ActionNewAdd
 check_equals('0' + -1, '0-1');
+
+// string:00 number:0 equality
+check_equals('00', 0);
 
 check_equals(typeof(Number.prototype.valueOf), 'function'); 
 check_equals(typeof(Number.prototype.toString), 'function'); 

@@ -1,5 +1,13 @@
 2007-07-08 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.{cpp,h} (equals): don't always force string
+	  comparison if the first argument is a string (matches ECMA spec,
+	  fixes bug #20403).
+	* testsuite/actionscript.all/Number.as: add test for string:00 ==
+	  number:0
+
+2007-07-08 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/Global.h: include extension.h when needed.
 	* server/swf.h: link to info about ActionNewAdd
 	* testsuite/actionscript.all/Number.as: Add a quick testcases

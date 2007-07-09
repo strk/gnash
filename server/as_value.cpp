@@ -658,10 +658,6 @@ as_value::equals(const as_value& v, as_environment* env) const
     if ( obj_or_func && v_obj_or_func ) return m_object_value == v.m_object_value;
     if ( m_type == v.m_type ) return equalsSameType(v);
 
-    else if (m_type == STRING)
-    {
-	return m_string_value == v.to_string(env);
-    }
     else if (m_type == NUMBER && v.m_type == STRING)
     {
 	return equalsSameType(v.to_number(env)); // m_number_value == v.to_number(env);
@@ -671,6 +667,10 @@ as_value::equals(const as_value& v, as_environment* env) const
     {
 	return v.equalsSameType(to_number(env)); // m_number_value == v.to_number(env);
 	//return v.m_number_value == to_number(env);
+    }
+    else if (m_type == STRING)
+    {
+	return m_string_value == v.to_string(env);
     }
     else if (m_type == BOOLEAN)
     {

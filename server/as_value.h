@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.56 2007/07/01 10:54:20 bjacques Exp $ */
+/* $Id: as_value.h,v 1.57 2007/07/09 03:30:50 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -520,6 +520,13 @@ public:
 	/// Return true if this value is abstractly equal to the given one
 	//
 	/// See ECMA-262 abstract equality comparison (sect 11.9.3)
+	///
+	/// NOTE: these invariants should hold 
+	///
+	///	- A != B is equivalent to ! ( A == B )
+	///	- A == B is equivalent to B == A, except for order of
+	///	  evaluation of A and B.
+	///
 	///
 	/// @param env
 	///	The environment to use for running the toString() method
