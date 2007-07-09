@@ -26,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.22 2007/07/09 03:30:50 strk Exp $";
+rcsid="$Id: Number.as,v 1.23 2007/07/09 11:44:31 strk Exp $";
 
 #include "check.as"
 
@@ -380,3 +380,13 @@ check_equals(9, val);
 
 #endif // defined(MING_SUPPORTS_ASM)
 
+//-----------------------------------------------------------
+// Check subtraction operator TODO: create an ops.as file 
+// for testing operators in general ?
+//-----------------------------------------------------------
+
+#if OUTPUT_VERSION > 6
+check( isNaN(450 - undefined) );
+#else
+check_equals(450 - undefined, 450);
+#endif
