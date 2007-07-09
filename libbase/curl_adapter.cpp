@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: curl_adapter.cpp,v 1.37 2007/07/01 10:54:07 bjacques Exp $ */
+/* $Id: curl_adapter.cpp,v 1.38 2007/07/09 07:31:05 martinwguy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -74,6 +74,36 @@ tu_file* make_stream(const char * /*url */)
 #endif
 
 #include <curl/curl.h>
+
+// Adapt to older versions of libcurl.
+//
+// In 7.10.7 and before, CURLINFO_RESPONSE_CODE was called CURLINFO_HTTP_CODE
+//
+#if LIBCURL_VERSION_NUM <= 0x070a07
+# define CURLINFO_RESPONSE_CODE CURLINFO_HTTP_CODE
+#endif
+//
+// curl_multi_strerror() and curl_easy_strerror() came in at 7.12.0
+// Just print the number and tell the user how to decode it.
+//
+#if LIBCURL_VERSION_NUM < 0x070c00
+static char curl_strerror_buf[64];
+static const char *
+curl_easy_strerror(int code)
+{
+	sprintf(curl_strerror_buf,
+		"CurlE error code %d (man libcurl-errors)", code);
+	return curl_strerror_buf;
+}
+
+static const char *
+curl_multi_strerror(int code)
+{
+	sprintf(curl_strerror_buf,
+		"CurlM error code %d (man libcurl-errors)", code);
+	return curl_strerror_buf;
+}
+#endif
 
 namespace curl_adapter
 {

@@ -1,6 +1,7 @@
 2007-07-09 Martin Guy <martinwguy@yahoo.it>
 
 	* gui/gtk_cairo.h: FIx compiler warning about unused params
+	* libbase/curl_adapter.cpp: Workarounds for older versions of curl
 
 2007-07-08 Sandro Santilli <strk@keybit.net>
 
