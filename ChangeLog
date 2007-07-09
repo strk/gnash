@@ -2,7 +2,8 @@
 
 	* doc/C/usermanual/installation/feature_configuration.xml:
 	  the debugger is now off by default, so document --enable-debugger
-	  rather then --disable-debugger.
+	  rather then --disable-debugger; Document --enable-write and
+	  --enable-fps-debug.
 
 2007-07-08 Martin Guy <martinwguy@yahoo.it>
 

@@ -272,4 +272,23 @@ selected.  The default is FFMPEG with SDL sound.
     </listitem>
   </varlistentry>
 
+  <varlistentry>
+    <term>--enable-fps-debug</term>
+    <listitem>
+      <para>
+	Enable FPS debugging code. When this feature is compiled in you can use the -f switch of gnash
+	to have FPS printed at regular intervals.
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>--enable-write</term>
+    <listitem>
+      <para>
+	Makes the Mozilla plugin write the currently playing SWF movie to /tmp.
+      </para>
+    </listitem>
+  </varlistentry>
+
 </variablelist>
