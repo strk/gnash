@@ -1,3 +1,7 @@
+2007-07-09 Martin Guy <martinwguy@yahoo.it>
+
+	* gui/gtk_cairo.h: FIx compiler warning about unused params
+
 2007-07-08 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.{cpp,h} (equals): don't always force string
