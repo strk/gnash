@@ -84,10 +84,6 @@
 	* configure.ac: Add xsltproc to list of docbook required packages
 	* server/asobj/SoundFfmpeg.cpp: Fix signed/unsigned compiler warning
 
-2007-07-05 Markus Gothe <nietzsche@lysator.liu.se>
-
-	* gui/NullGui.cpp: use boost instead of tu_timer.
-
 2007-07-05 Martin Guy <martinwguy@yahoo.it>
 
 	* server/parser/movie_def_impl.cpp: Report internal sample ID too in

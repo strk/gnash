@@ -32,9 +32,7 @@
 # include <unistd.h> // for usleep
 #endif
 
-#include <boost/date_time/posix_time/posix_time_types.hpp>
-
-using namespace boost::posix_time;
+#include "tu_timer.h"
 
 namespace gnash
 {
@@ -43,7 +41,7 @@ bool
 NullGui::run()
 {
   uint64_t prevtimer=0;
-  uint64_t start_timer = ((microsec_clock::local_time()).time_of_day()).total_milliseconds();  // returns milliseconds
+  uint64_t start_timer = tu_timer::get_ticks();  // returns milliseconds
 
   prevtimer = start_timer;
 
@@ -57,7 +55,7 @@ NullGui::run()
     while (1) 
     {
         
-      timer = ((microsec_clock::local_time()).time_of_day()).total_milliseconds();
+      timer = tu_timer::get_ticks();
             
       if (timer - prevtimer >= _interval)
         break; // next frame, please!
