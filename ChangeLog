@@ -1,3 +1,7 @@
+2007-07-09 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.cpp (to_debug_string): include object type name.
+
 2007-07-09 Martin Guy <martinwguy@yahoo.it>
 
 	* gui/gtk_cairo.h: FIx compiler warning about unused params

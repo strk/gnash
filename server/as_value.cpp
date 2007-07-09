@@ -822,8 +822,18 @@ as_value::to_debug_string() const
 			sprintf(buf, "[bool:%s]", m_boolean_value ? "true" : "false");
 			return buf;
 		case OBJECT:
-			sprintf(buf, "[object:%p]", (void *)m_object_value);
+		{
+			std::string typeName = typeid(*m_object_value).name();
+#if defined(__GNUC__) && __GNUC__ > 2
+			int status;
+			char* typeNameDemangled = abi::__cxa_demangle(typeName.c_str(), NULL, NULL, &status);
+			sprintf(buf, "[object(%s):%p]", typeNameDemangled, (void *)m_object_value);
+			free(typeNameDemangled);
+#else
+			sprintf(buf, "[object(%s):%p]", typeName.c_str(), (void *)m_object_value);
+#endif
 			return buf;
+		}
 		case AS_FUNCTION:
 			sprintf(buf, "[function:%p]", (void *)m_object_value);
 			return buf;
