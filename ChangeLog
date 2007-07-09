@@ -1,3 +1,9 @@
+2007-07-08 Sandro Santilli <strk@keybit.net>
+
+	* doc/C/usermanual/installation/feature_configuration.xml:
+	  the debugger is now off by default, so document --enable-debugger
+	  rather then --disable-debugger.
+
 2007-07-08 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac: Say where to get gtkglext source

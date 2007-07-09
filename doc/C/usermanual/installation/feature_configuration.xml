@@ -31,11 +31,11 @@ selected.  The default is FFMPEG with SDL sound.
 
 <variablelist>
   <varlistentry>
-    <term>--disable-debugger</term>
+    <term>--enable-debugger</term>
     <listitem>
       <para>
-        Disable support for the Flash debugger. The debugger is
-        mainly of interest to Flash developers.
+        Enable support for the Flash debugger. The debugger is
+        mainly of interest to Flash developers. 
       </para>
     </listitem>
   </varlistentry>
