@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.48 2007/07/08 20:49:38 martinwguy Exp $
+dnl $Id: ffmpeg.m4,v 1.49 2007/07/09 13:51:08 strk Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -47,8 +47,23 @@ AC_DEFUN([GNASH_PATH_FFMPEG],
 	# Here pkg-config outputs two spaces on the end, so match those too!
 	ac_cv_path_ffmpeg_incl=`$PKG_CONFIG --cflags libavcodec | sed 's:/ffmpeg *$::'`
         CFLAGS="$ac_cv_path_ffmpeg_incl $CFLAGS"
+        # ac_cv_path_ffmpeg_incl might include several paths (e.g. pointers to
+        # external libraries used by ffmpeg). Let's find the right one.
+        for i in `$PKG_CONFIG --cflags-only-I libavcodec |sed -e 's:-I::g'`; do
+          if test -e "$i"/avcodec.h -o -e "$i"/ffmpeg/avcodec.h; then
+            topdir="$i"
+            break
+          fi
+        done
+      else
+        # Let's see if ffmpeg is installed without using pkgconfig...
+        for i in /usr/include /usr/local/include /opt/ffmpeg/include; do
+          if test -e "$i"/ffmpeg/avcodec.h; then
+            topdir="$i"
+            break
+          fi
+        done
       fi
-      topdir=`$PKG_CONFIG --cflags-only-I libavcodec | sed -e 's:-I::g' -e 's:.* /:/:' -e 's: ::g'`
       # Again adjust for ffmpeg/ foolery
       topdir=`echo "$topdir" | sed 's:/ffmpeg *$::'`
       # Gets "" if not installed
