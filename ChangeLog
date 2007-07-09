@@ -1,6 +1,10 @@
 2007-07-09 Sandro Santilli <strk@keybit.net>
 
 	* server/as_value.cpp (to_debug_string): include object type name.
+	* libbase/utility.h: add a templated typeName() function for
+	  demangling.
+	* server/character.cpp (width_getset,height_getset): include
+	  character's type name in aserror.
 
 2007-07-09 Martin Guy <martinwguy@yahoo.it>
 
