@@ -26,7 +26,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.23 2007/07/09 11:44:31 strk Exp $";
+rcsid="$Id: Number.as,v 1.24 2007/07/09 12:05:25 strk Exp $";
 
 #include "check.as"
 
@@ -390,3 +390,5 @@ check( isNaN(450 - undefined) );
 #else
 check_equals(450 - undefined, 450);
 #endif
+
+check( isNaN(0/0) );
