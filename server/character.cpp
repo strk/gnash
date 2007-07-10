@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.46 2007/07/11 00:16:38 strk Exp $ */
+/* $Id: character.cpp,v 1.47 2007/07/11 00:33:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -817,24 +817,49 @@ std::string
 character::getTarget() const
 {
 
-  // TODO: maybe cache computed target?
+	// TODO: check what happens when this character
+	//       is a movie_instance loaded into another
+	//       running movie.
+	
+	typedef std::vector<std::string> Path;
+	Path path;
 
-	std::string target_dot;
-
-	std::string levelString = "_level0"; // TODO: support real levels!
-
-	const std::string& targetPath = getTargetPath();
-	if ( targetPath == "/" ) target_dot = levelString;
-	else
+	// Build parents stack
+	const character* ch = this;
+	for (;;)
 	{
-		target_dot = levelString + targetPath;
-		for (std::string::size_type i=0; i<target_dot.length(); ++i)
+		const character* parent = ch->get_parent();
+
+		// Don't push the _root name on the stack
+		if ( ! parent )
 		{
-			if ( target_dot[i] == '/' ) target_dot[i] = '.';
+			assert(dynamic_cast<const movie_instance*>(ch));
+			std::stringstream ss;
+			ss << "_level" << ch->get_depth();
+			path.push_back(ss.str());
+			// it is completely legal to set root's _name
+			//assert(ch->get_name().empty());
+			break;
 		}
+
+		path.push_back(ch->get_name());
+		ch = parent;
+	} 
+
+	assert ( ! path.empty() );
+
+	// Build the target string from the parents stack
+	std::string target;
+	for ( Path::reverse_iterator
+			it=path.rbegin(), itEnd=path.rend();
+			it != itEnd;
+			++it )
+	{
+		if ( ! target.empty() ) target += ".";
+		target += *it; 
 	}
 
-	return target_dot;
+	return target;
 }
 
 /*public*/
