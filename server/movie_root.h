@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.65 2007/07/10 12:22:34 zoulunkai Exp $ */
+/* $Id: movie_root.h,v 1.66 2007/07/10 21:06:29 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -74,9 +74,10 @@
 
 #include "mouse_button_state.h" // for composition
 #include "drag_state.h" // for composition
-#include "sprite_instance.h" // for inlines
+#include "movie_instance.h" // for inlines
 #include "timers.h" // for composition
 #include "asobj/Key.h"
+#include "smart_ptr.h" // for memory management
 
 #include <vector>
 #include <list>
@@ -136,7 +137,8 @@ class KeyListener{
 
 /// The movie stage (absolute top level node in the characters hierarchy)
 //
-/// This is a wrapper around the top-level movie_instance that is being played.
+/// This is a wrapper around the set of loaded levels being played.
+///
 /// There is a *single* instance of this class for each run;
 /// loading external movies will *not* create a new instance of it.
 ///
@@ -171,20 +173,32 @@ public:
 	/// Note that the display viewport will be updated to match
 	/// the size of given movie.
 	///
+	/// A call to this method is equivalent to a call to setLevel(0, movie).
+	///
 	/// @param movie
 	///	The movie_instance to wrap.
 	///	Will be stored in an intrusive_ptr.
 	///
 	void setRootMovie(movie_instance* movie);
 
-	/// @@ should this delegate to _movie?  probably !
+	/// Return the movie at the given level (0 if unloaded level).
+	boost::intrusive_ptr<movie_instance> getLevel(unsigned int num) const;
+
+	/// Put the given movie at the given level 
+	//
+	/// Note that the display viewport will be updated to reflect
+	/// the new layout.
+	///
+	void setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie);
+
+	/// @@ should this delegate to _level0?  probably !
 	void set_member(
 		const std::string& /*name*/,
 		const as_value& /*val*/)
 	{
 	}
 
-	/// @@ should this delegate to _movie?  probably !
+	/// @@ should this delegate to _level0?  probably !
 	bool get_member(const std::string& /*name*/,
 			as_value* /*val*/)
 	{
@@ -280,8 +294,12 @@ public:
 
 	void set_drag_state(const drag_state& st);
 
-	/// @return current top-level root sprite
-	sprite_instance* get_root_movie() { return _movie.get(); }
+	/// @return current top-level root sprite (_level0)
+	sprite_instance* get_root_movie()
+	{
+		if ( _movies.empty() ) return NULL;
+		return _movies[0].get();
+	}
 
 	void stop_drag()
 	{
@@ -289,9 +307,14 @@ public:
 		m_drag_state.reset();
 	}
 
-	movie_definition* get_movie_definition() const {
-		assert(_movie);
-		return _movie->get_movie_definition();
+	/// Return definition of _level0 
+	//
+	/// TODO: drop this function ?
+	///
+	movie_definition* get_movie_definition() const
+	{
+		assert(!_movies.empty());
+		return getLevel(0)->get_movie_definition(); 
 	}
 
 	/// Add an interval timer
@@ -314,9 +337,14 @@ public:
 	///
 	bool clear_interval_timer(unsigned int x);
 
-	/// 0-based!!
-	size_t get_current_frame() const {
-		return _movie->get_current_frame();
+	/// Return 0-based frame index of _level0
+	//
+	/// TODO: drop this function
+	///
+	size_t get_current_frame() const
+	{
+		assert(!_movies.empty());
+		return getLevel(0)->get_current_frame();
 	}
 
 	// @@ should this be in movie_instance ?
@@ -334,9 +362,12 @@ public:
 	}
 
 	// @@ Is this one necessary?
+	//
+	// TODO: drop this
 	character* get_character(int character_id)
 	{
-	    return _movie->get_character(character_id);
+		assert(!_movies.empty());
+		return getLevel(0)->get_character(character_id);
 	}
 
 	void set_background_color(const rgba& color)
@@ -354,34 +385,44 @@ public:
 	    return m_background_color.m_a / 255.0f;
 	}
 
-	/// Delegate to current top-level root sprite
-	void	restart() { _movie->restart(); }
+	/// Restart all levels
+	void	restart();
 
 	void	advance(float delta_time);
 
-	/// 0-based!!
-	void goto_frame(size_t target_frame_number) {
-		_movie->goto_frame(target_frame_number);
+	/// 0-based!! delegates to _level0
+	void goto_frame(size_t target_frame_number)
+	{
+		getLevel(0)->goto_frame(target_frame_number);
 	}
 
-	bool has_looped() const {
-		return _movie->has_looped();
+#if 0
+	/// delegates to _level0
+	bool has_looped() const
+	{
+		return getLevel(0)->has_looped();
 	}
+#endif
 
 	void display();
 
-	/// Delegate to wrapped movie_instance
+#if 0
+	/// Delegate to _level0
 	bool goto_labeled_frame(const char* label) {
 		return _movie->goto_labeled_frame(label);
 	}
+#endif
 
-	/// Delegate to wrapped movie_instance
-	void set_play_state(sprite_instance::play_state s) {
-		_movie->set_play_state(s);
+	/// Delegate to _level0
+	void set_play_state(sprite_instance::play_state s)
+	{
+		getLevel(0)->set_play_state(s);
 	}
 
-	/// Delegate to wrapped movie_instance
-	sprite_instance::play_state get_play_state() const {
+#if 0
+	/// Delegate to _level0
+	sprite_instance::play_state get_play_state() const
+	{
 		return _movie->get_play_state();
 	}
 
@@ -398,13 +439,27 @@ public:
 	{
 		_movie->set_variable(path_to_var, new_value);
 	}
+#endif
 
 	/// For ActionScript interfacing convenience.
+	//
+	/// TODO: check if we really  need this. I guess we might
+	///       need for fscommand:, but we lack documentation
+	///       about where to find the method (which level?)
+	///
 	const char* call_method(const char* method_name,
 			const char* method_arg_fmt, ...);
+
+	/// For ActionScript interfacing convenience.
+	//
+	/// TODO: check if we really  need this. I guess we might
+	///       need for fscommand:, but we lack documentation
+	///       about where to find the method (which level?)
+	///
 	const char* call_method_args(const char* method_name,
 			const char* method_arg_fmt, va_list args);
 
+#if 0
 	/// Delegate to wrapped movie_instance
 	void set_visible(bool visible) {
 		_movie->set_visible(visible);
@@ -413,6 +468,7 @@ public:
 	bool get_visible() const {
 		return _movie->get_visible();
 	}
+#endif
 
 	void * get_userdata() { return m_userdata; }
 	void set_userdata(void * ud ) { m_userdata = ud;  }
@@ -456,9 +512,8 @@ public:
 
 	bool testInvariant() const;
 
-	void clear_invalidated() {
-		_movie->clear_invalidated();
-	}
+	// Clear invalidated flag for all levels 
+	void clear_invalidated();
 
 	/// Push an executable code to the ActionQueue
 	void pushAction(std::auto_ptr<ExecutableCode> code);
@@ -474,7 +529,7 @@ public:
 	//
 	/// Resources reachable from movie_root are:
 	///
-	///	- All _level# movies (_movie)
+	///	- All _level# movies (_movies)
 	///	- Mouse entities (m_mouse_button_state)
 	///	- Timer targets (_intervalTimers)
 	///	- Resources reachable by ActionQueue code (_actionQueue)
@@ -568,7 +623,8 @@ private:
 	/// to avoid having to replicate all of the base class
 	/// interface to the movie_instance class definition
 	///
-	boost::intrusive_ptr<sprite_instance> _movie;
+	typedef std::vector< boost::intrusive_ptr<sprite_instance> > Levels;
+	Levels _movies;
 
 	/// This function should return TRUE iff any action triggered
 	/// by the event requires redraw, see \ref events_handling for
@@ -579,6 +635,30 @@ private:
 	/// If set to false, no rescale should be performed
 	/// when changing viewport size
 	bool _allowRescale;
+
+	/// \brief
+	/// Return the topmost entity covering the given point
+	/// and enabled to receive mouse events.
+	//
+	/// Return NULL if no "active" entity is found under the pointer.
+	///
+	/// Coordinates of the point are given in world coordinate space.
+	/// (twips)
+	///
+	/// @param x
+	/// 	X ordinate of the pointer, in world coordinate space (twips)
+	///
+	/// @param y
+	/// 	Y ordinate of the pointer, in world coordiante space (twips).
+	///
+	character* getTopmostMouseEntity(float x, float y);
+
+	// Advance all levels
+	void advanceAllLevels(float delta_time);
+
+	// Advance a given level
+	void advanceMovie(boost::intrusive_ptr<sprite_instance> movie, float delta_time);
+
 };
 
 

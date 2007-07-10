@@ -30,9 +30,11 @@
 #include "tu_random.h"
 #include "ExecutableCode.h"
 #include "Stage.h"
+#include "utility.h"
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
   #include "action.h"
 #endif
+
 #include <iostream>
 #include <string>
 #include <typeinfo>
@@ -48,7 +50,7 @@ inline bool
 movie_root::testInvariant() const
 {
 	// TODO: fill this function !
-	assert(_movie.get());
+	assert( ! _movies.empty() );
 
 	return true;
 }
@@ -99,16 +101,53 @@ movie_root::~movie_root()
 void
 movie_root::setRootMovie(movie_instance* movie)
 {
-	assert(movie != NULL);
-	_movie = movie;
+	setLevel(0, movie);
+}
 
-	_movie->set_invalidated();
+void
+movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie)
+{
+	assert(movie != NULL);
+
+	if ( _movies.size() < num+1 ) _movies.resize(num+1);
+	_movies[num] = movie;
+
+	movie->set_invalidated();
 	
 	set_display_viewport(0, 0,
-		(int) _movie->get_movie_definition()->get_width_pixels(),
-		(int) _movie->get_movie_definition()->get_height_pixels());
+		(int) movie->get_movie_definition()->get_width_pixels(),
+		(int) movie->get_movie_definition()->get_height_pixels());
 
 	assert(testInvariant());
+}
+
+boost::intrusive_ptr<movie_instance>
+movie_root::getLevel(unsigned int num) const
+{
+	if ( _movies.size() < num+1 ) return 0;
+	else
+	{
+		assert(boost::dynamic_pointer_cast<movie_instance>(_movies[num]));
+		return boost::static_pointer_cast<movie_instance>(_movies[num]);
+	}
+}
+
+void
+movie_root::restart()
+{
+	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
+	{
+		(*i)->restart();
+	}
+}
+
+void
+movie_root::clear_invalidated()
+{
+	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
+	{
+		(*i)->clear_invalidated();
+	}
 }
 
 boost::intrusive_ptr<Stage>
@@ -137,7 +176,7 @@ movie_root::set_display_viewport(int x0, int y0, int w, int h)
 		//log_msg("Rescaling allowed");
 
 		// should we cache this ? it's immutable after all !
-		const rect& frame_size = _movie->get_frame_size();
+		const rect& frame_size = _movies[0]->get_frame_size();
 
 		float	scale_x = m_viewport_width / TWIPS_TO_PIXELS(frame_size.width());
 		float	scale_y = m_viewport_height / TWIPS_TO_PIXELS(frame_size.height());
@@ -467,8 +506,7 @@ movie_root::fire_mouse_event()
 	assert(testInvariant());
 
     // Generate a mouse event
-    m_mouse_button_state.m_topmost_entity =
-        _movie->get_topmost_mouse_entity(PIXELS_TO_TWIPS(m_mouse_x), PIXELS_TO_TWIPS(m_mouse_y));
+    m_mouse_button_state.m_topmost_entity = getTopmostMouseEntity(PIXELS_TO_TWIPS(m_mouse_x), PIXELS_TO_TWIPS(m_mouse_y));
     m_mouse_button_state.m_mouse_button_state_current = (m_mouse_buttons & 1);
 
     bool need_redraw = generate_mouse_button_events(&m_mouse_button_state);
@@ -573,37 +611,12 @@ movie_root::advance(float delta_time)
 	// 2. by different machines the random gave different numbers
 	tu_random::next_random();
 			
-#ifdef GNASH_DEBUG
-	size_t totframes = _movie->get_frame_count();
-	size_t prevframe = _movie->get_current_frame();
-#endif
+	advanceAllLevels(delta_time);
 
-	// Keep root sprite alive during actions execution.
-	//
-	// This is *very* important, as actions in the movie itself
-	// could get rid of it. A simple example:
-	//
-	// 	_root.loadMovie(other);
-	//
-	boost::intrusive_ptr<sprite_instance> keepMovieAlive(_movie.get());
-
-	_movie->advance(delta_time);
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	cleanup_key_listeners();
 #endif
 	processActionQueue();
-
-#ifdef GNASH_DEBUG
-	size_t curframe = _movie->get_current_frame();
-
-	log_msg("movie_root::advance advanced top-level movie from "
-			SIZET_FMT "/" SIZET_FMT
-			" to " SIZET_FMT "/" SIZET_FMT
-			" (_movie is %s%s)",
-			prevframe, totframes, curframe, totframes,
-			typeid(*_movie).name(),
-			_movie->get_play_state() == sprite_instance::STOP ? " - now in STOP mode" : "");
-#endif
 
 #ifdef GNASH_USE_GC
 	// Run the garbage collector (step back !!)
@@ -621,31 +634,31 @@ movie_root::display()
 
 	assert(testInvariant());
 
-	_movie->clear_invalidated();
+	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
+	{
+		boost::intrusive_ptr<sprite_instance> movie = *i;
 
-//  	    GNASH_REPORT_FUNCTION;
-	if (_movie->get_visible() == false)
-        {
-            // Don't display.
-            return;
-        }
+		movie->clear_invalidated();
 
-	// should we cache this ? it's immutable after all !
-	const rect& frame_size = _movie->get_frame_size();
+		if (movie->get_visible() == false) continue;
 
-	// null frame size ? don't display !
-	if ( frame_size.is_null() ) return;
+		// should we cache this ? it's immutable after all !
+		const rect& frame_size = movie->get_frame_size();
 
-	render::begin_display(
-		m_background_color,
-		m_viewport_x0, m_viewport_y0,
-		m_viewport_width, m_viewport_height,
-		frame_size.get_x_min(), frame_size.get_x_max(),
-		frame_size.get_y_min(), frame_size.get_y_max());
+		// null frame size ? don't display !
+		if ( frame_size.is_null() ) continue;
 
-	_movie->display();
+		render::begin_display(
+			m_background_color,
+			m_viewport_x0, m_viewport_y0,
+			m_viewport_width, m_viewport_height,
+			frame_size.get_x_min(), frame_size.get_x_max(),
+			frame_size.get_y_min(), frame_size.get_y_max());
 
-	render::end_display();
+		movie->display();
+
+		render::end_display();
+	}
 }
 
 
@@ -657,7 +670,7 @@ movie_root::call_method(const char* method_name,
 
 	va_list	args;
 	va_start(args, method_arg_fmt);
-	const char* result = _movie->call_method_args(method_name,
+	const char* result = getLevel(0)->call_method_args(method_name,
 		method_arg_fmt, args);
 	va_end(args);
 
@@ -669,7 +682,7 @@ char* movie_root::call_method_args(const char* method_name,
 		const char* method_arg_fmt, va_list args)
 {
 	assert(testInvariant());
-	return _movie->call_method_args(method_name, method_arg_fmt, args);
+	return getLevel(0)->call_method_args(method_name, method_arg_fmt, args);
 }
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
@@ -711,6 +724,8 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 {
 	//log_msg("Notifying " SIZET_FMT " keypress listeners", _keyListeners.size());
 
+	as_environment env;
+
 	for (std::vector<KeyListener>::iterator iter = _keyListeners.begin();
 		iter != _keyListeners.end(); ++iter)
 	{
@@ -730,7 +745,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 						method = ch->getUserDefinedEventHandler("onKeyDown");
 					if ( method )
 					{
-						call_method0(as_value(method.get()), &(_movie->get_environment()), ch);
+						call_method0(as_value(method.get()), &env, ch);
 					}
 				}
 				// invoke onClipKeyPress handler
@@ -748,7 +763,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 						method = ch->getUserDefinedEventHandler("onKeyUp");
 					if ( method )
 					{
-						call_method0(as_value(method.get()), &(_movie->get_environment()), ch);
+						call_method0(as_value(method.get()), &env, ch);
 					}
 				}
 			}
@@ -949,7 +964,10 @@ movie_root::isMouseOverActiveEntity() const
 void
 movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
-	_movie->add_invalidated_bounds(ranges, force);
+	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+	{
+		(*i)->add_invalidated_bounds(ranges, force);
+	}
 }
 
 void
@@ -1037,7 +1055,6 @@ movie_root::executeTimers()
 			if ( timer->expired() )
 			{
 				//cout << " EXPIRED, start time is now " << timer.getStart() << endl;
-				//_movie->on_event_interval_timer();
 				(*timer)();
 			}
 		}
@@ -1053,7 +1070,10 @@ movie_root::markReachableResources() const
 {
 	// Mark root movie as reachable
 	// TODO: mark all levels !!
-	_movie->setReachable();
+	for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+	{
+		(*i)->setReachable();
+	}
 
 	// Mark mouse entities 
 	m_mouse_button_state.markReachableResources();
@@ -1089,6 +1109,50 @@ movie_root::markReachableResources() const
 #endif
 }
 #endif // GNASH_USE_GC
+
+character *
+movie_root::getTopmostMouseEntity(float x, float y)
+{
+	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+	{
+		character* ret = (*i)->get_topmost_mouse_entity(x, y);
+		if ( ret ) return ret;
+	}
+	return NULL;
+}
+
+void
+movie_root::advanceAllLevels(float delta_time)
+{
+	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+	{
+		advanceMovie(*i, delta_time);
+	}
+}
+
+void
+movie_root::advanceMovie(boost::intrusive_ptr<sprite_instance> movie, float delta_time)
+{
+#ifdef GNASH_DEBUG
+	size_t totframes = movie->get_frame_count();
+	size_t prevframe = movie->get_current_frame();
+#endif
+
+	movie->advance(delta_time);
+
+#ifdef GNASH_DEBUG
+	size_t curframe = movie->get_current_frame();
+
+	log_msg("movie_root::advance advanced level %d movie from "
+			SIZET_FMT "/" SIZET_FMT
+			" to " SIZET_FMT "/" SIZET_FMT
+			" (movie is %s%s)",
+			movie->get_depth(), prevframe, totframes, curframe, totframes,
+			typeName(*movie).c_str(),
+			movie->get_play_state() == sprite_instance::STOP ? " - now in STOP mode" : "");
+#endif
+
+}
 
 } // namespace gnash
 

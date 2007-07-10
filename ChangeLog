@@ -1,5 +1,9 @@
 2007-07-10 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: support multiple levels. Untested.
+
+2007-07-10 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/movie_def_impl.cpp (add_sound_sample): fix verbosity
 	  to use log_parse and depend on IF_VERBOSE_PARSE.
 	* server/button_character_instance.cpp (on_event): don't require a
