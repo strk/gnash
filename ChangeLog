@@ -1,3 +1,8 @@
+2007-07-10 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.{cpp,h}: mark key listeners as reachable.
+	* server/asobj/Key.{cpp,h}: mark key listeners as reachable.
+
 2007-07-10 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/key_event_test5.c: new testcase for key listeners,

@@ -148,6 +148,7 @@ key_as_object::set_key_up(int code)
     m_unreleased_keys[byte_index] &= ~mask;
 }
 
+#ifndef NEW_KEY_LISTENER_LIST_DESIGN
 void 
 key_as_object::notify_listeners(const event_id key_event_type)
 {
@@ -176,6 +177,7 @@ key_as_object::notify_listeners(const event_id key_event_type)
         call_method(method, NULL /* or root? */, listener.get(), 0, 0);
     }
 }
+#endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 void
@@ -411,6 +413,20 @@ void key_class_init(as_object& global)
 
     global.init_member("Key", key_obj);
 }
+
+#ifdef GNASH_USE_GC
+#ifndef NEW_KEY_LISTENER_LIST_DESIGN
+void
+key_as_object::markReachableResources() const
+{
+	for (Listeners::const_iterator i=m_listeners.begin(), e=m_listeners.end();
+			i != e; ++i)
+	{
+		(*i)->setReachable();
+	}
+}
+#endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
+#endif // def GNASH_USE_GC
 
 } // end of gnash namespace
 

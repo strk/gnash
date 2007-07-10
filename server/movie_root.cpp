@@ -673,27 +673,28 @@ char* movie_root::call_method_args(const char* method_name,
 }
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
+
 void movie_root::cleanup_key_listeners()
 {
 #ifdef KEY_LISTENERS_DEBUG
-	size_t prevsize = m_key_listeners.size();
-	log_msg("Cleaning up %u key listeners", m_key_listeners.size());
+	size_t prevsize = _keyListeners.size();
+	log_msg("Cleaning up %u key listeners", _keyListeners.size());
 #endif
 
-	for (std::vector<KeyListener>::iterator iter = _keyListners.begin();
-		 iter != _keyListners.end(); )
+	for (std::vector<KeyListener>::iterator iter = _keyListeners.begin();
+		 iter != _keyListeners.end(); )
 	{
 		
 		character* ch = dynamic_cast<character*>(iter->get());
 		// remove character listener
 		if ( ch && ch->isUnloaded() ) 
 		{
-			iter = _keyListners.erase(iter);
+			iter = _keyListeners.erase(iter);
 		}
 		// remove non-character listener
 		else if(!ch && !iter->isRegistered())
 		{
-			iter = _keyListners.erase(iter);
+			iter = _keyListeners.erase(iter);
 		}
 		else
 			++iter;
@@ -701,17 +702,17 @@ void movie_root::cleanup_key_listeners()
 
 
 #ifdef KEY_LISTENERS_DEBUG
-	size_t currsize = m_key_listeners.size();
+	size_t currsize = _keyListeners.size();
 	log_msg("Cleaned up %u listeners (from %u to %u)", prevsize-currsize, prevsize, currsize);
 #endif
 }
 
 void movie_root::notify_key_listeners(key::code k, bool down)
 {
-	//log_msg("Notifying " SIZET_FMT " keypress listeners", _keyListners.size());
+	//log_msg("Notifying " SIZET_FMT " keypress listeners", _keyListeners.size());
 
-	for (std::vector<KeyListener>::iterator iter = _keyListners.begin();
-		iter != _keyListners.end(); ++iter)
+	for (std::vector<KeyListener>::iterator iter = _keyListeners.begin();
+		iter != _keyListeners.end(); ++iter)
 	{
 		character* ch = dynamic_cast<character*>(iter->get());
 		// notify character listeners
@@ -771,8 +772,8 @@ void movie_root::notify_key_listeners(key::code k, bool down)
 
 void movie_root::add_key_listener(const KeyListener & listener)
 {
-	std::vector<KeyListener>::iterator end = _keyListners.end();
-    for (std::vector<KeyListener>::iterator iter = _keyListners.begin();
+	std::vector<KeyListener>::iterator end = _keyListeners.end();
+    for (std::vector<KeyListener>::iterator iter = _keyListeners.begin();
          iter != end; ++iter) 
 	{
       if ((*iter) == listener) {
@@ -782,15 +783,15 @@ void movie_root::add_key_listener(const KeyListener & listener)
       }
     }
 
-    _keyListners.push_back(listener);
+    _keyListeners.push_back(listener);
 
 	assert(testInvariant());
 }
 
 void movie_root::remove_key_listener(const KeyListener& listener)
 {
-	std::vector<KeyListener>::iterator end = _keyListners.end();
-    for (std::vector<KeyListener>::iterator iter = _keyListners.begin();
+	std::vector<KeyListener>::iterator end = _keyListeners.end();
+    for (std::vector<KeyListener>::iterator iter = _keyListeners.begin();
          iter != end; ++iter) 
 	{
       if ((*iter) == listener) {
@@ -802,17 +803,16 @@ void movie_root::remove_key_listener(const KeyListener& listener)
 	assert(testInvariant());
 }
 
-#else
+#else // ndef NEW_KEY_LISTENER_LIST_DESIGN
 
 void movie_root::cleanup_key_listeners()
 {
 #ifdef KEY_LISTENERS_DEBUG
-	size_t prevsize = m_key_listeners.size();
-	log_msg("Cleaning up %u key listeners", m_key_listeners.size());
+	size_t prevsize = _keyListeners.size();
+	log_msg("Cleaning up %u key listeners", _keyListeners.size());
 #endif
 
-	for (ListenerSet::iterator iter = m_key_listeners.begin();
-			 iter != m_key_listeners.end(); )
+	for (ListenerSet::iterator iter = m_key_listeners.begin(); iter != m_key_listeners.end(); )
 	{
 		// TODO: handle non-character objects too !
 		character* ch = dynamic_cast<character*>(iter->get());
@@ -830,7 +830,7 @@ void movie_root::cleanup_key_listeners()
 	}
 
 #ifdef KEY_LISTENERS_DEBUG
-	size_t currsize = m_key_listeners.size();
+	size_t currsize = _keyListeners.size();
 	log_msg("Cleaned up %u listeners (from %u to %u)", prevsize-currsize, prevsize, currsize);
 #endif
 }
@@ -882,7 +882,7 @@ void movie_root::remove_key_listener(as_object* listener)
 	//log_msg("After removing key listener %p, %u listeners are left", (void*)listener, m_key_listeners.size());
 	assert(testInvariant());
 }
-#endif
+#endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
 
 void movie_root::add_mouse_listener(as_object* listener)
 {
@@ -1071,6 +1071,22 @@ movie_root::markReachableResources() const
 	{
 		(*i)->markReachableResources();
 	}
+
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+	// Mark key listeners
+	for (KeyListeners::const_iterator i=_keyListeners.begin(), e=_keyListeners.end();
+			i != e; ++i)
+	{
+		i->setReachable();
+	}
+#else
+	// Mark key listeners
+	for (ListenerSet::const_iterator i=m_key_listeners.begin(), e=m_key_listeners.end();
+			i != e; ++i)
+	{
+		(*i)->setReachable();
+	}
+#endif
 }
 #endif // GNASH_USE_GC
 

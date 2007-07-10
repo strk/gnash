@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.21 2007/07/01 10:54:27 bjacques Exp $ */
+/* $Id: Key.h,v 1.22 2007/07/10 04:59:24 strk Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -38,9 +38,12 @@
 #endif
 
 namespace gnash {
+
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 class KeyListener; //forward declaration
 #endif
+
+// TODO: drop this, probably unused
 class DSOEXPORT Key {
 public:
     Key();
@@ -100,8 +103,24 @@ class DSOEXPORT key_as_object : public as_object
 private:
 	/// bit-array for recording the unreleased keys
 	uint8_t	m_unreleased_keys[key::KEYCOUNT / 8 + 1];	
-	std::vector<boost::intrusive_ptr<as_object> >	m_listeners;
+
+#ifndef NEW_KEY_LISTENER_LIST_DESIGN
+	typedef std::vector<boost::intrusive_ptr<as_object> > Listeners;
+	Listeners m_listeners;
+#endif
+
 	int	m_last_key_pressed;
+
+protected:
+
+#ifdef GNASH_USE_GC
+#ifndef NEW_KEY_LISTENER_LIST_DESIGN
+	// Mark all key listeners as reachable
+	// (this class has no direct pointer to listeners when
+	//  NEW_KEY_LISTENER_LIST_DESIGN is defined)
+	void markReachableResources() const;
+#endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
+#endif // def GNASH_USE_GC
 
 public:
 
@@ -113,9 +132,11 @@ public:
 
 	void set_key_up(int code);
 	
+#ifndef NEW_KEY_LISTENER_LIST_DESIGN
 	/// responsible for user defined key events handlers only;
 	/// take over both characters and non-characters object.
 	void notify_listeners(const event_id key_event_type);
+#endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	void add_listener(const KeyListener& listener);

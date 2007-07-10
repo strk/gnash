@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.63 2007/07/02 03:20:34 strk Exp $ */
+/* $Id: movie_root.h,v 1.64 2007/07/10 04:59:24 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -116,9 +116,19 @@ class KeyListener{
 		/// register the key listener
 		void registerUserHandler() { _user_defined_handler_added = true; }
 
+#ifdef GNASH_USE_GC
+		/// Mark the wrapped object as reachable
+		void setReachable() const
+		{
+			if ( _listener ) _listener->setReachable();
+		}
+#endif
+
 	private:
+
 		/// the listener object, could be a character or a general as_object
 		boost::intrusive_ptr<as_object> _listener;
+
 		/// mark if the object has been registered by Key.addListener()
 		bool _user_defined_handler_added;
 	};
@@ -468,6 +478,7 @@ public:
 	///	- Mouse entities (m_mouse_button_state)
 	///	- Timer targets (_intervalTimers)
 	///	- Resources reachable by ActionQueue code (_actionQueue)
+	///	- Key listeners (_keyListeners || m_key_listeners)
 	///
 	void markReachableResources() const;
 #endif // GNASH_USE_GC
@@ -537,7 +548,8 @@ private:
 
 	/// Objects listening for key events
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
-	std::vector<KeyListener> _keyListners;
+	typedef std::vector<KeyListener> KeyListeners;
+	KeyListeners _keyListeners;
 #else
 	ListenerSet m_key_listeners;
 #endif
