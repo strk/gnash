@@ -1,3 +1,8 @@
+2007-07-10 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/key_event_test5.c: new testcase for key listeners,
+	  would cause a segfault when any key pressed, so not enabled.
+	  
 2007-07-09 Sandro Santilli <strk@keybit.net>
 
 	* server/swf.h: add defines and links to alexis for SCRIPTLIMITS (SWF8),
