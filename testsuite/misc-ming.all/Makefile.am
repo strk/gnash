@@ -145,7 +145,9 @@ check_PROGRAMS = \
 	key_event_test3 \
 	key_event_test3runner \
 	key_event_test4 \
+	key_event_test4runner \
 	key_event_test5 \
+	key_event_test5runner \
 	static_vs_dynamic1 \
 	static_vs_dynamic2 \
 	getTimer_test \
@@ -569,12 +571,42 @@ key_event_test4_LDADD = libgnashmingutils.la
 key_event_test4.swf: key_event_test4
 	./key_event_test4 $(top_srcdir)/testsuite/media
 
+key_event_test4runner_SOURCES = \
+	key_event_test4runner.cpp \
+	$(NULL)
+key_event_test4runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+key_event_test4runner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+key_event_test4runner_DEPENDENCIES = \
+	key_event_test4.swf \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+	
 key_event_test5_SOURCES = key_event_test5.c
 key_event_test5_LDADD = libgnashmingutils.la
 
 key_event_test5.swf: key_event_test5
 	./key_event_test5 $(top_srcdir)/testsuite/media
 
+key_event_test5runner_SOURCES = \
+	key_event_test5runner.cpp \
+	$(NULL)
+key_event_test5runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+key_event_test5runner_CXXFLAGS = \
+	-DSRCDIR='"$(srcdir)"' \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+key_event_test5runner_DEPENDENCIES = \
+	key_event_test5.swf \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+	
 place_object_test_SOURCES = place_object_test.c	
 place_object_test_LDADD = libgnashmingutils.la
 
@@ -1562,6 +1594,8 @@ TEST_CASES = \
 	key_event_testrunner \
 	key_event_test2runner \
 	key_event_test3runner \
+	key_event_test4runner \
+	key_event_test5runner \
 	static_vs_dynamic1_testrunner \
 	static_vs_dynamic2_testrunner \
 	getTimer_testrunner \

@@ -57,20 +57,22 @@ main(int argc, char** argv)
   // frame1
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
-  add_actions(mo, " hasKeyPressed = false; x1 = 0;" );
+  add_actions(mo, " hasKeyPressed = false; " );
 
   add_actions(mo, " obj = new Object(); "
+  								"	obj.x = 1; "
                   " obj.onKeyDown = function () "
                   " { "
                   "   _root.note('key listener invoked'); "
-                  "   _root.x1 = 1; "
+                  "   hasKeyPressed = true; "
+                  "   _root.objRef = this; "
                   " };" 
                   " Key.addListener(obj); "
                   // After deleting obj, we still have a key listener kept alive!
                   " delete obj; " );
   SWFMovie_nextFrame(mo); 
 
-  for(i=1; i<10; i++)
+  for(i=1; i<5; i++)
   {
     SWFMovie_nextFrame(mo); 
   }
@@ -81,9 +83,33 @@ main(int argc, char** argv)
   
   add_actions(mo, "if(hasKeyPressed)"
                    "{"
-                   "  check_equals(_root.x1, 1); "
-                   "}" );
-                   
+                   "  check_equals(typeof(objRef), 'object');"
+                   "  check_equals(objRef.x, 1);"
+                   // reset testing variables
+                   "	hasKeyPressed = false;"
+                   "	_root.x1 = 0; "
+                   "  objRef.x = 0; "
+                   // remove the key listener from the global key
+                   "	Key.removeListener(objRef); "
+                   // check that objRef is still alive
+                   "  check_equals(typeof(objRef), 'object');"
+                   // delete the objRef, no object and no key listener now.
+                   "	delete objRef;"
+                   "}" 
+                   "else"
+                   "{"
+                   " 	check_equals(typeof(objRef), 'undefined');"
+                   "}");
+  
+  for(i=5; i<10; i++)
+  {
+    SWFMovie_nextFrame(mo); 
+  }          
+  
+  check_equals(mo, "hasKeyPressed", "false");   
+  check_equals(mo, "typeof(obj)", "'undefined'"); 
+  check_equals(mo, "typeof(objRef)", "'undefined'"); 
+  
   add_actions(mo, "stop(); total();");
   SWFMovie_nextFrame(mo);  
   
