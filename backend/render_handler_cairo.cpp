@@ -24,6 +24,25 @@ namespace cairo {
 static cairo_t* g_cr_output = 0;
 static cairo_t* g_cr = 0;
 
+
+// Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
+static void
+rgb_to_cairo_rgb24(uint8_t* dst, const image::rgb* im)
+{
+    for (int y = 0;  y < im->m_height;  y++)
+    {
+	const uint8_t* src = image::scanline(im, y);
+	for (int x = 0;  x < im->m_width;  x++, src += 3)
+	{
+	    *dst++ = src[2]; 	// blue
+	    *dst++ = src[1]; 	// green
+	    *dst++ = src[0];	// red
+	    *dst++;		// alpha not used
+	}
+    }
+}
+
+
 // bitmap_info_cairo declaration
 class bitmap_info_cairo : public gnash::bitmap_info
 {
@@ -52,8 +71,13 @@ class render_handler_cairo : public gnash::triangulating_render_handler
 public:
     // Some renderer state.
     cairo_t*         m_cr_mask;
+    cairo_t*    m_cr_dummy;
     int              m_view_width;
     int              m_view_height;
+    
+    // Video buffer
+    uint8_t*    m_video_buffer;
+    int	        m_video_bufsize;
     
     // Enable/disable antialiasing.
     bool	m_enable_antialias;
@@ -82,7 +106,7 @@ public:
 	};
 	mode	m_mode;
 	gnash::rgba	m_color;
-	const gnash::bitmap_info*	m_bitmap_info;
+	const bitmap_info_cairo*    m_bitmap_info;
 	gnash::matrix	m_bitmap_matrix;
 	gnash::cxform	m_bitmap_color_transform;
 	bool	m_has_nonzero_bitmap_additive_color;
@@ -125,8 +149,7 @@ public:
 			    m_bitmap_color_transform.m_[3][0]);
 		    }
 		    
-		    cairo_pattern_t* pattern =
-		       	(static_cast<const bitmap_info_cairo*>(m_bitmap_info))->m_pattern;
+		    cairo_pattern_t* pattern = m_bitmap_info->m_pattern;
 		    
 		    if (m_mode == BITMAP_CLAMP)
 		    {	
@@ -201,7 +224,7 @@ public:
 	void	set_bitmap(const gnash::bitmap_info* bi, const gnash::matrix& m, bitmap_wrap_mode wm, const gnash::cxform& color_transform)
 	    {
 		m_mode = (wm == WRAP_REPEAT) ? BITMAP_WRAP : BITMAP_CLAMP;
-		m_bitmap_info = bi;
+		m_bitmap_info = static_cast<const bitmap_info_cairo*>(bi);
 		m_bitmap_matrix = m;
 		m_bitmap_color_transform = color_transform;
 		m_bitmap_color_transform.clamp();
@@ -276,14 +299,21 @@ public:
 
     // Constructor
     render_handler_cairo() :
-	m_cr_mask(0), m_view_width(0), m_view_height(0)
+	m_cr_mask(0), m_view_width(0), m_view_height(0),
+	m_video_buffer(0), m_video_bufsize(0)
     {
+	cairo_surface_t* dummy = cairo_image_surface_create(
+	    CAIRO_FORMAT_A8, 1, 1);
+	m_cr_dummy = cairo_create(dummy);
+	cairo_surface_destroy(dummy);
     }
 
     // Destructor
     ~render_handler_cairo()
     {
+	if (m_video_buffer)  delete [] m_video_buffer;
 	if (m_cr_mask)  cairo_destroy(m_cr_mask);
+	cairo_destroy(m_cr_dummy);
     }
 
     void	begin_display(
@@ -304,8 +334,7 @@ public:
 	// coordinates of the movie that correspond to the viewport
 	// bounds.
 	{
-	    assert(g_cr_output);
-	    g_cr = g_cr_output;
+	    g_cr = (g_cr_output ? g_cr_output : m_cr_dummy);
 
 	    m_display_width  = fabsf(x1 - x0);
 	    m_display_height = fabsf(y1 - y0);
@@ -497,9 +526,8 @@ public:
 	    gnash::point a, b, c, d;
 	    m.transform(&a, gnash::point(coords.get_x_min(), coords.get_y_min()));
 	    m.transform(&b, gnash::point(coords.get_x_max(), coords.get_y_min()));
-	    m.transform(&c, gnash::point(coords.get_x_min(), coords.get_y_max()));
-	    d.m_x = b.m_x + c.m_x - a.m_x;
-	    d.m_y = b.m_y + c.m_y - a.m_y;
+	    m.transform(&c, gnash::point(coords.get_x_max(), coords.get_y_max()));
+	    m.transform(&d, gnash::point(coords.get_x_min(), coords.get_y_max()));
 
 	    // FIXME!!! scaling and offset is wrong
 	    cairo_matrix_t mat;
@@ -542,7 +570,7 @@ public:
     void end_submit_mask()
 	{	     
 	    // Finished with the mask.  Now draw to output
-	    g_cr = g_cr_output;
+	    g_cr = (g_cr_output ? g_cr_output : m_cr_dummy);
 	}
 	
     void disable_mask()
@@ -554,7 +582,7 @@ public:
 		m_cr_mask = 0;
 
 		// Prepare to draw to output
-		g_cr = g_cr_output;
+		g_cr = (g_cr_output ? g_cr_output : m_cr_dummy);
 	    }
 	}
 	
@@ -564,8 +592,62 @@ public:
 	}
 	
 	/// Draws the video frames
-	void drawVideoFrame(image::image_base* frame, const matrix* mat, const rect* bounds){
-	//TODO: implement!
+	void drawVideoFrame(image::image_base* baseframe, const matrix* m, const rect* bounds){
+	    // Obtain on-stage bounding rectangle
+	    gnash::point a, b, c, d;
+	    m->transform(&a, gnash::point(bounds->get_x_min(), bounds->get_y_min()));
+	    m->transform(&b, gnash::point(bounds->get_x_max(), bounds->get_y_min()));
+	    m->transform(&c, gnash::point(bounds->get_x_max(), bounds->get_y_max()));
+	    m->transform(&d, gnash::point(bounds->get_x_min(), bounds->get_y_max()));
+
+	    // Extract frame attributes
+	    image::rgb* frame = static_cast<image::rgb*>(baseframe);
+	    int         w = frame->m_width;
+	    int         h = frame->m_height;
+
+	    // Compute video object size relative to bounding rectangle
+	    double w_scale = w / bounds->width();
+	    double h_scale = h / bounds->height();
+
+	    // Prepare transformation matrix for RGB frame
+	    cairo_matrix_t mat;
+	    cairo_matrix_init(&mat,
+		m->m_[0][0], m->m_[1][0],
+		m->m_[0][1], m->m_[1][1],
+		m->m_[0][2], m->m_[1][2]);
+	    cairo_matrix_scale(&mat, w_scale, h_scale);
+
+	    // Convert RGB frame to cairo format
+	    int buf_size = w * h * 4;
+	    if (m_video_bufsize < buf_size)
+	    {
+		if (m_video_buffer)  delete [] m_video_buffer;
+		m_video_buffer  = new unsigned char[buf_size];
+		m_video_bufsize = buf_size;
+	    }
+	    rgb_to_cairo_rgb24(m_video_buffer, frame);
+
+	    // Create a pattern from the the RGB frame
+	    cairo_surface_t* surface = cairo_image_surface_create_for_data(
+		m_video_buffer, CAIRO_FORMAT_RGB24, w, h, w * 4);
+	    cairo_pattern_t* pattern = cairo_pattern_create_for_surface(surface);
+	    cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
+	    cairo_pattern_set_matrix(pattern, &mat);
+
+	    // Draw the frame now
+	    cairo_save(g_cr);
+	    cairo_set_source(g_cr, pattern);
+	    cairo_move_to(g_cr, a.m_x, a.m_y);
+	    cairo_line_to(g_cr, b.m_x, b.m_y);
+	    cairo_line_to(g_cr, c.m_x, c.m_y);
+	    cairo_line_to(g_cr, d.m_x, d.m_y);
+	    cairo_clip(g_cr);
+	    cairo_paint(g_cr);
+	    cairo_restore(g_cr);
+
+	    // Clean up
+	    cairo_pattern_destroy(pattern);
+	    cairo_surface_destroy(surface);
 	}
 
 };	// end class render_handler_cairo
@@ -612,25 +694,12 @@ bitmap_info_cairo::bitmap_info_cairo(image::rgb* im)
 {
     assert(im);
 
-    // Allocate output buffer
+    // Convert 24-bit BGR data to 32-bit RGB
     int buf_size = im->m_width * im->m_height * 4;
     m_buffer = new unsigned char[buf_size];
+    rgb_to_cairo_rgb24(m_buffer, im);
 
-    // Convert 24-bit BGR data to 32-bit RGB
-    unsigned char* dst = m_buffer;
-    for (int y = 0;  y < im->m_height;  y++)
-    {
-	uint8_t* src = image::scanline(im, y);
-	for (int x = 0;  x < im->m_width;  x++, src += 3)
-	{
-	    *dst++ = src[2]; 	// blue
-	    *dst++ = src[1]; 	// green
-	    *dst++ = src[0];	// red
-	    *dst++;		// alpha not used
-	}
-    }
-
-    // Create the image
+    // Create the cairo image
     m_original_width  = im->m_width;
     m_original_height = im->m_height;
     m_image = cairo_image_surface_create_for_data(m_buffer,
@@ -680,7 +749,6 @@ create_handler()
 DSOEXPORT void
 set_handle(cairo_t* handle)
 {
-	assert(handle);
     g_cr_output = handle;
 }
 
