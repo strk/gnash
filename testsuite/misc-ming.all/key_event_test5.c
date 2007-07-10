@@ -60,7 +60,7 @@ main(int argc, char** argv)
   add_actions(mo, " hasKeyPressed = false; " );
 
   add_actions(mo, " obj = new Object(); "
-  								"	obj.x = 1; "
+                  " obj.x = 1; "
                   " obj.onKeyDown = function () "
                   " { "
                   "   _root.note('key listener invoked'); "
@@ -86,19 +86,19 @@ main(int argc, char** argv)
                    "  check_equals(typeof(objRef), 'object');"
                    "  check_equals(objRef.x, 1);"
                    // reset testing variables
-                   "	hasKeyPressed = false;"
-                   "	_root.x1 = 0; "
+                   "  hasKeyPressed = false;"
+                   "  _root.x1 = 0; "
                    "  objRef.x = 0; "
                    // remove the key listener from the global key
-                   "	Key.removeListener(objRef); "
+                   "  Key.removeListener(objRef); "
                    // check that objRef is still alive
                    "  check_equals(typeof(objRef), 'object');"
                    // delete the objRef, no object and no key listener now.
-                   "	delete objRef;"
+                   "  delete objRef;"
                    "}" 
                    "else"
                    "{"
-                   " 	check_equals(typeof(objRef), 'undefined');"
+                   "  check_equals(typeof(objRef), 'undefined');"
                    "}");
   
   for(i=5; i<10; i++)
