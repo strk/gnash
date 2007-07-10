@@ -177,7 +177,7 @@ void dump_memory_stats(const char *from, int line, const char *label);
 
 /// Return (unmangled) name of this instance type
 template <class T>
-std::string typeName(T& inst)
+std::string typeName(const T& inst)
 {
 	std::string typeName = typeid(inst).name();
 #if defined(__GNUC__) && __GNUC__ > 2
