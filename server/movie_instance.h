@@ -60,9 +60,9 @@ public:
 
 	// Could be implemented in sprite_instance too,
 	// returning m_root like it is done for get_root_movie...
-	virtual movie_instance* get_root()
+	virtual movie_instance* get_root() const
 	{
-		return this;
+		return const_cast<movie_instance*>(this);
 	}
 
 	//virtual sprite_instance* get_root_movie()

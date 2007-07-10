@@ -1,5 +1,7 @@
 2007-07-10 Sandro Santilli <strk@keybit.net>
 
+	* server/: movie_instance.h, character.h: make get_root() a const
+	  method.
 	* server/movie_root.{cpp,h}: support multiple levels. Untested.
 
 2007-07-10 Sandro Santilli <strk@keybit.net>

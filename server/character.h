@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.85 2007/07/01 10:54:21 bjacques Exp $ */
+/* $Id: character.h,v 1.86 2007/07/10 21:43:00 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -639,7 +639,7 @@ public:
 	virtual sprite_instance* get_root_movie();
 
 	/// By default call get_root on the parent
-	virtual movie_instance* get_root() {
+	virtual movie_instance* get_root() const {
 		return get_parent()->get_root();
 	}
 
