@@ -788,18 +788,18 @@ void movie_root::add_key_listener(const KeyListener & listener)
 	assert(testInvariant());
 }
 
-void movie_root::remove_key_listener(const KeyListener& listener)
+void movie_root::remove_key_listener(const KeyListener&	listener)
 {
 	std::vector<KeyListener>::iterator end = _keyListeners.end();
-    for (std::vector<KeyListener>::iterator iter = _keyListeners.begin();
-         iter != end; ++iter) 
+		for	(std::vector<KeyListener>::iterator	iter = _keyListeners.begin();
+				 iter	!= end;	++iter)	
 	{
-      if ((*iter) == listener) {
-		  // Found it
-		iter->unregisterUserHandler();
-        return;
-      }
-    }
+			if ((*iter)	== listener) {
+				// If found, then remove it from the container
+				_keyListeners.erase(iter);
+				return;
+			}
+		}
 	assert(testInvariant());
 }
 

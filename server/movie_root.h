@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.64 2007/07/10 04:59:24 strk Exp $ */
+/* $Id: movie_root.h,v 1.65 2007/07/10 12:22:34 zoulunkai Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -423,10 +423,10 @@ public:
 	// otherwise, just register it.
 	void add_key_listener(const KeyListener& listener);
 	
-	// Unregister the specified key listener, never really remove it.
-	// The name is confusing just that the built-in Key.removeListener() 
-	// does not really remove any thing.
+	// remove the specified listener from the container if found
 	void remove_key_listener(const KeyListener& listener);
+	
+	std::vector<KeyListener> & getKeyListeners() { return _keyListeners; }
 #else
 	void add_key_listener(as_object* listener);
 	void remove_key_listener(as_object* listener);

@@ -187,9 +187,20 @@ key_as_object::add_listener(const KeyListener& listener)
 }
 
 void
-key_as_object::remove_listener(const KeyListener& listener)
+key_as_object::remove_listener(const KeyListener&	listener)
 {
-	_vm.getRoot().remove_key_listener(listener);
+	std::vector<KeyListener> & listeners = _vm.getRoot().getKeyListeners();
+
+	std::vector<KeyListener>::iterator end = listeners.end();
+	for	(std::vector<KeyListener>::iterator	iter = listeners.begin();
+				 iter	!= end;	++iter)	
+	{
+			if ((*iter)	== listener) {
+				// Found it
+				iter->unregisterUserHandler();
+				return;
+			}
+	}
 }
 #else
 void
