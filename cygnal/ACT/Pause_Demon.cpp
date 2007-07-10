@@ -18,44 +18,31 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/// \file Pause_Service.hpp
+/// \file Pause_Demon.cpp
 ///	\brief The Pause service suspends itself (and its thread) for a number of milliseconds 
 ///		if the scheduling queue has no high-priority items.
 
-#pragma once
-#ifndef __Pause_Service_hpp__
-#define __Pause_Service_hpp__
-
-#include "ACT.hpp"
-#include "Scheduler.hpp"
+#include "Pause_Demon.hpp"
+#include <boost/thread/thread.hpp>
+#include <boost/thread/xtime.hpp>
 
 namespace ACT {
 	//-------------------------
-	/**	\class Pause_Service
-	 */
-	class Pause_Service
-		: public simple_act
+	ACT_State
+	Pause_Demon::
+	run()
 	{
-		/// Configuration parameter.
-		///
-		/// Should eventually transition to a template parameter.
-		static const unsigned int ms_to_pause = 20 ;
+		if ( the_scheduler -> ordinary_tasks_available() )
+			return ACT_State::Ready ;
 
-		/// Action body.
-		act_state run() ;
-
-		/// Scheduler determines whether pause is necessary or not.
-		Basic_Scheduler * the_scheduler ;
-
-	public:
-		/// 
-		Pause_Service( Basic_Scheduler * sc )
-			: the_scheduler( sc )
-		{}
-
-	} ;
+		boost::xtime t ;
+		if ( 0 == xtime_get( & t, boost::TIME_UTC ) ) {
+			return set_bad() ;
+		}
+		t.nsec += ms_to_pause * 1000 * 1000 ;
+		boost::thread().sleep( t ) ;
+		return ACT_State::Ready ;
+	}
 
 	//-------------------------
 } // end namespace ACT
-
-#endif

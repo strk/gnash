@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/**	\file IO_Device.hpp
+/**	\file Old_Device.hpp
  *	\brief Basic abstractions for handling ACT-based I/O
  *
  *	\par Design Notes

@@ -34,7 +34,7 @@ namespace IO {
 		friend class Null_Device ;
 		template< class S > friend class Source_Adapter ;
 
-		ACT::act_state run( ACT::wakeup_listener * ) ;
+		ACT::ACT_State run( ACT::wakeup_listener * ) ;
 
 	public:
 		/// Only need a default constructor for a source that's always the same.
@@ -57,7 +57,7 @@ namespace IO {
 		template< class In, class Out > friend class Split_Device ;
 
 		/// The write action.
-		ACT::act_state run( ACT::wakeup_listener * ) { return set_completed() ; }
+		ACT::ACT_State run( ACT::wakeup_listener * ) { return set_completed() ; }
 
 		/// [out parameter value]
 		size_t out_n_written ;
@@ -80,8 +80,8 @@ namespace IO {
 		Null_Sink the_sink ;
 		Null_Source the_source ;
 		
-		inline ACT::act_state source_run( ACT::wakeup_listener * w ) { return Device::SSource::set_state( the_source.run( w ) ) ; }
-		inline ACT::act_state sink_run( ACT::wakeup_listener * w ) { return Device::SSink::set_state( the_sink.run( w ) ) ; }
+		inline ACT::ACT_State source_run( ACT::wakeup_listener * w ) { return Device::SSource::set_state( the_source.run( w ) ) ; }
+		inline ACT::ACT_State sink_run( ACT::wakeup_listener * w ) { return Device::SSink::set_state( the_sink.run( w ) ) ; }
 
 	public:
 		///

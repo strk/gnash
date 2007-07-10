@@ -76,7 +76,7 @@ namespace ACT {
 
 
 	//-------------------------
-	/** \class Scheduled_Item
+	/** \class Auxiliary_Item
 	 *	\brief The full data that goes into the scheduling queue.
 	 *		It includes the underlying item plus extra housekeeping information.
 	 */
@@ -99,6 +99,9 @@ namespace ACT {
 
 	//-------------------------
 	/** \class Scheduled_Item_Pointer
+	 *	\brief A pointer into an item within a scheduling queue.
+	 *	Since items within the underlying container of a queue move around,
+	 *		a pointer is necessary to track such motion and provide a stable reference for outsiders.
 	 */
 	template< class T, class Aux >
 	class Scheduled_Item_Pointer
@@ -149,7 +152,7 @@ namespace ACT {
 	{
 		// friends
 		template< class T, class Aux > friend class Scheduled_Item_Pointer ;
-		friend class wakeup_listener ;
+		template< class S > friend class Basic_Wakeup_Listener ;
 
 		/// The main queue for scheduled items.
 		std::vector< Scheduled_Item< T > > the_queue ;

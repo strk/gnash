@@ -49,7 +49,7 @@ namespace IO {
 		contiguous_buffer<> the_next_segment ;
 
 		/// [source] read activation body
-		ACT::act_state source_run( ACT::wakeup_listener * ) ;
+		ACT::ACT_State source_run( ACT::wakeup_listener * ) ;
 
 		/// [sink] This string receives the results of write operations.
 		std::string the_sink_string ;
@@ -61,7 +61,7 @@ namespace IO {
 		buffer next_to_write ;
 
 		/// [sink] activation body
-		ACT::act_state sink_run( ACT::wakeup_listener * ) ;
+		ACT::ACT_State sink_run( ACT::wakeup_listener * ) ;
 
 	public:
 		/// Ordinary constructor

@@ -44,7 +44,7 @@ namespace IO {
 	}
 
 	//---------------
-	ACT::act_state
+	ACT::ACT_State
 	null_read_filter::
 	run( ACT::wakeup_listener * w )
 	{

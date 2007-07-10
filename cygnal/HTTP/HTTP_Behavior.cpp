@@ -33,11 +33,11 @@ namespace cygnal { namespace HTTP {
 	{}
 
 	//-------------------------
-	act_state
+	ACT::ACT_State
 	HTTP_Behavior::
 	run( wakeup_listener * w )
 	{
-		act_state x ;
+		ACT::ACT_State x( ACT::ACT_State::Ready ) ;
 
 		switch ( protocol_state ) {
 			case initial:
@@ -45,8 +45,8 @@ namespace cygnal { namespace HTTP {
 				protocol_state = scanning_request ;
 			case scanning_request:
 				x = scan_request( w ) ;
-				if ( x == Bad ) return set_bad() ;
-				if ( x == Working ) return Working ;
+				if ( x.bad() ) return set_bad() ;
+				if ( x.working() ) return set_state( x ) ;
 				protocol_state = responding ;
 			case responding:
 				// We'll support HTTP/1.0 later.
@@ -71,11 +71,11 @@ namespace cygnal { namespace HTTP {
 				protocol_state = sending_final_message ;
 			case sending_final_message:
 				x = the_device -> Sink::operator()( w ) ;
-				if ( x == Bad ) return set_bad() ;
-				if ( x == Working ) return Working ;
+				if ( x.bad() ) return set_bad() ;
+				if ( x.working() ) return set_state( x ) ;
 				return set_completed() ;
 		} ;
-		return ACT::Working ;
+		return set_would_block() ;
 	}
 
 } } // end namespace cygnal::HTTP

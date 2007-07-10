@@ -189,7 +189,7 @@ namespace Net {
 	 *		in order to support the RAII convention.
 	 *	The resource is the socket handle itself.
 	 *
-	 *	\inv Instance holds an allocated socket.
+	 *	\invariant Instance holds an allocated socket.
 	 *
 	 *	\par Limitations
 	 *	- Class opens sockets in default streaming protocol (meaning TCP) only.

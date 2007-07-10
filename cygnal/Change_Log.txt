@@ -1,0 +1,24 @@
+Change Log for GNU Cygnal
+=========================
+
+2007-07-09 Eric Hughes <eh@narthex.us>
+	* ACT/ACT.hpp: Changed ACT_State::Waiting to Would_Block.  Modified convenience methods accordingly.
+	* ACT/Pause_Service.cpp, ACT/test_support/Listening_Actions.cpp, HTTP/HTTP_Behavior.cpp: followed ACT.hpp changes.
+	* ACT/unit_tests/Test_ACT.cpp: Improved act_twice to ensure guard on run() is in effect.
+	* IO/Stream_Consumer.cpp: Removed defect that was masking failures in scanning.  Change causes an HTTP unit test to fail.
+
+2007-07-06 Eric Hughes <eh@narthex.us>
+	* ACT/ACT.hpp: Converted ACT_State from an enumeration to a class.  Removed convenience typedef.
+	* IO/Stream_Consumer.hpp: Added source_state() to assist in writing parsing filters.
+	* Lots and lots of files: Renamed act_state to ACT_State everywhere.  Changed constant references to Working to either Waiting or Ready, as appropriate.  Changed set_working() to set_ready(), set_waiting(), or source_state(), as appropriate.
+	
+2007-07-06 Eric Hughes <eh@narthex.us>
+	* doc/Doxyfile: Converted all paths to relative form.
+	* doc/mainpage.doxygen.txt: Wrote new main page.
+	* ACT/ACT.doxygen.txt: Wrote new page with overview of ACT.
+
+2007-06-28 Eric Hughes <eh@narthex.us>
+	* doc/Doxyfile: New file.
+
+2007-06-17 Eric Hughes <eh@narthex.us>
+	* ACT/*: Got listener wakeup working correctly in scheduler.

@@ -50,7 +50,7 @@ namespace IO {
 		void add_source( std::string x ) ;
 
 		///
-		ACT::act_state run( ACT::wakeup_listener * ) ;
+		ACT::ACT_State run( ACT::wakeup_listener * ) ;
 
 		/// result accessor
 		shared_ptr< IO::Device > result() ;

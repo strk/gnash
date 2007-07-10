@@ -24,36 +24,34 @@
 #ifndef __Listening_Actions_hpp__
 #define __Listening_Actions_hpp__
 
-#include "ACT/Scheduler.hpp"
+#include "ACT/Listen.hpp"
 #include "Action_Tracing.hpp"
-#include <boost/optional.hpp>
-#include <vector>
 
 namespace ACT {
-	// Forward declaration
+	// Forward
 	class N_to_completion ;
 
 	//-------------------------
 	/**	\class N_to_completion_Monitor
 	 *	\brief A monitor for N_to_completion.
+	 *
+	 *	Note that this class derives from \c simple_act, rather than \c autonomous_act.
+	 *	The monitor that wakes up other actions does not itself sleep.
 	 */
 	class N_to_completion_Monitor
-		: public simple_act
+		: public Basic_Listen_Monitor< N_to_completion >
 	{
-		/// A vector of schedulers
-		static std::vector< wakeup_listener::scheduler_pointer > schedulers ;
+		/// Type of parent monitor class, called often in implementation
+		typedef Basic_Listen_Monitor< N_to_completion > Parent ;
 
-		std::vector< wakeup_listener * > listeners ;
-
-		act_state run() ;
+		/// Action body
+		ACT_State run() ;
 
 	public:
 		/// Default constructor.
-		N_to_completion_Monitor() ;
+		N_to_completion_Monitor() {} ;
 
-		/// Query whether there are any actions registered for wakeup.
-		inline bool empty() { return listeners.empty() ; }
-
+		/// Implementation of specific wake-up preparation
 		void add_wakeup_item( N_to_completion *, wakeup_listener * ) ;
 	} ;
 
@@ -62,14 +60,8 @@ namespace ACT {
 	 *	\brief Action that completes after N activations.
 	 */
 	class N_to_completion
-		: public autonomous_act
+		: public Basic_Listening_Task< N_to_completion, N_to_completion_Monitor >
 	{
-		/// The monitor type for these actions to register with.
-		typedef N_to_completion_Monitor monitor_type ;
-
-		///
-		static shared_ptr< monitor_type > the_monitor ;
-
 		/// Tracking
 		std::auto_ptr< tracking_function > tracker ;
 
@@ -80,19 +72,16 @@ namespace ACT {
 		unsigned int total_number_of_activations ;
 
 		/// Action body, proxied by operator()
-		act_state run( wakeup_listener * ) ;
-
-		/// Register an action for wakeup
-		void register_for_wakeup( wakeup_listener * ) ;
+		ACT_State run( wakeup_listener * ) ;
 
 	public:
 		///
 		N_to_completion( unsigned int n, tracking_function * = 0 ) ;
 
 		void reset() ;
-
 	} ;
 
+	//-------------------------
 } // end namespace ACT
 
 #endif

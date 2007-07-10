@@ -163,7 +163,7 @@ namespace cygnal { namespace HTTP {
 	{}
 
 	//-------------------------
-	ACT::act_state
+	ACT::ACT_State
 	read_single_header::
 	scan( ACT::wakeup_listener * w )
 	{
@@ -289,7 +289,7 @@ namespace cygnal { namespace HTTP {
 		// Assert n_left_to_process == 0 
 
 		end_of_processing_loop:
-		return ACT::Working ;
+		return source_state() ;
 	}
 
 	//-------------------------
@@ -312,7 +312,7 @@ namespace cygnal { namespace HTTP {
 		message_header_size = 0 ;
 		r_field_name.set_begin( next_character ) ;
 		r_field_name.set_length( 0 ) ;
-		set_working() ;
+		set_ready() ;
 	}
 
 	//--------------------------------------------------
@@ -327,7 +327,7 @@ namespace cygnal { namespace HTTP {
 	{} ;
 
 	//-------------------------
-	ACT::act_state
+	ACT::ACT_State
 	read_message_headers_action::
 	scan( ACT::wakeup_listener * waken )
 	{
@@ -342,7 +342,7 @@ namespace cygnal { namespace HTTP {
 					// Our subroutine went bad.  So do we.
 					return set_bad() ;
 				}
-				return ACT::Working ;
+				return source_state() ;
 			}
 			// Assert (postcondition--read_single_header action completed) input processed was "message-header? CR LF"
 			IO::buffer field_name( read_single_header_action.result_field_name() ) ;
@@ -395,7 +395,7 @@ namespace cygnal { namespace HTTP {
 	}
 
 	//-------------------------
-	ACT::act_state
+	ACT::ACT_State
 	Request_Method_Scanner::
 	scan( ACT::wakeup_listener * w )
 	{
@@ -451,34 +451,34 @@ namespace cygnal { namespace HTTP {
 	/**	\par Implementation Notes
 	 *	- The protocol designator "HTTP" is sensitive to case.
 	 */
-	ACT::act_state
+	ACT::ACT_State
 	Request_Version_Scanner::
 	scan( ACT::wakeup_listener * w )
 	{
 		char ch ;
 		switch ( scan_state ) {
 			case initial:
-				if ( n_left_to_process == 0 ) { scan_state = initial ; return Working ; }
+				if ( n_left_to_process == 0 ) { scan_state = initial ; return source_state() ; }
 				ch = * next_character ++ ; -- n_left_to_process ;
 				if ( ch != 'H' ) return syntax_error() ;
 			case seen_H:
-				if ( n_left_to_process == 0 ) { scan_state = seen_H ; return Working ; }
+				if ( n_left_to_process == 0 ) { scan_state = seen_H ; return source_state() ; }
 				ch = * next_character ++ ; -- n_left_to_process ;
 				if ( ch != 'T' ) return syntax_error() ;
 			case seen_HT:
-				if ( n_left_to_process == 0 ) { scan_state = seen_HT ; return Working ; }
+				if ( n_left_to_process == 0 ) { scan_state = seen_HT ; return source_state() ; }
 				ch = * next_character ++ ; -- n_left_to_process ;
 				if ( ch != 'T' ) return syntax_error() ;
 			case seen_HTT:
-				if ( n_left_to_process == 0 ) { scan_state = seen_HTT ; return Working ; }
+				if ( n_left_to_process == 0 ) { scan_state = seen_HTT ; return source_state() ; }
 				ch = * next_character ++ ; -- n_left_to_process ;
 				if ( ch != 'P' ) return syntax_error() ;
 			case seen_HTTP:
-				if ( n_left_to_process == 0 ) { scan_state = seen_HTTP ; return Working ; }
+				if ( n_left_to_process == 0 ) { scan_state = seen_HTTP ; return source_state() ; }
 				ch = * next_character ++ ; -- n_left_to_process ;
 				if ( ch != '/' ) return syntax_error() ;
 			case first_digits_0:
-				if ( n_left_to_process == 0 ) { scan_state = first_digits_0 ; return Working ; }
+				if ( n_left_to_process == 0 ) { scan_state = first_digits_0 ; return source_state() ; }
 				ch = * next_character ++ ; -- n_left_to_process ;
 				if ( ! is_digit( ch ) ) return syntax_error() ;
 				the_result.major_number = ( ch - '0' ) ;
@@ -499,10 +499,10 @@ namespace cygnal { namespace HTTP {
 					}
 				}
 				scan_state = first_digits_0 ; 
-				return Working ;
+				return source_state() ;
 			label_second_digits_0:
 			case second_digits_0:
-				if ( n_left_to_process == 0 ) { scan_state = second_digits_0 ; return Working ; }
+				if ( n_left_to_process == 0 ) { scan_state = second_digits_0 ; return source_state() ; }
 				ch = * next_character ++ ; -- n_left_to_process ;
 				if ( ! is_digit( ch ) ) return syntax_error() ;
 				the_result.minor_number = ( ch - '0' ) ;
@@ -520,7 +520,7 @@ namespace cygnal { namespace HTTP {
 					}
 				}
 				scan_state = first_digits_0 ; 
-				return Working ;
+				return source_state() ;
 		}
 	label_end_of_scan:
 		++ n_left_to_process ;
@@ -541,7 +541,7 @@ namespace cygnal { namespace HTTP {
 	{}
 
 	//-------------------------
-	ACT::act_state
+	ACT::ACT_State
 	Request_Scanner::
 	scan( ACT::wakeup_listener * w )
 	{
@@ -555,31 +555,33 @@ namespace cygnal { namespace HTTP {
 		switch ( current_state ) {
 			case in_method:
 				scan_method( w ) ;
-				if ( scan_method.working() ) return ACT::Working ;
+				if ( scan_method.working() ) { current_state = in_method ; return source_state() ; }
 				if ( scan_method.bad() ) goto label_error ;
-				current_state = in_request_URI ;
 				// fall through
 			case in_request_URI:
 				scan_URI( w ) ;
-				if ( scan_URI.working() ) return ACT::Working ;
+				if ( scan_URI.working() ) { current_state = in_request_URI ; return source_state() ; }
 				if ( scan_URI.bad() ) goto label_error ;
-				current_state = in_HTTP_version ;
+				// fall through
+			case post_request_URI:
+				if ( n_left_to_process == 0 ) { current_state = post_request_URI ; return source_state() ; }
+				-- n_left_to_process ;
+				ch = * next_character ++ ;
+				if ( ch != ' ' ) goto label_error ;
 				// fall through
 			case in_HTTP_version:
 				scan_version( w ) ;
-				if ( scan_version.working() ) return ACT::Working ;
+				if ( scan_version.working() ) { current_state = in_HTTP_version ; return source_state() ; }
 				if ( scan_version.bad() ) goto label_error ;
-				current_state = p_final_CR ;
 				// fall through
 			case p_final_CR:
-				if ( n_left_to_process == 0 ) return ACT::Working ;
+				if ( n_left_to_process == 0 ) { current_state = p_final_CR ; return source_state() ; }
 				-- n_left_to_process ;
 				ch = * next_character ++ ;
 				if ( ch != '\r' ) goto label_error ;
-				current_state = p_final_LF ;
 				// fall through
 			case p_final_LF:
-				if ( n_left_to_process == 0 ) return ACT::Working ;
+				if ( n_left_to_process == 0 ) { current_state = p_final_LF ; return source_state() ; }
 				-- n_left_to_process ;
 				ch = * next_character ++ ;
 				if ( ch != '\n' ) goto label_error ;

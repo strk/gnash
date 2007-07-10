@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/**	\file Stream_Consumer.hpp
+/**	\file Stream_Consumer.cpp
  *	\brief Assistance for treating ACT block readers as a stream.
  *
  *	Implementing a stream model with ACT-based I/O requires resolving a number of competing concerns.
@@ -60,7 +60,7 @@ namespace IO {
 	{}
 
 	//-------------------------
-	ACT::act_state
+	ACT::ACT_State
 	Stream_Consumer::
 	run( ACT::wakeup_listener * w )
 	{
@@ -79,7 +79,7 @@ namespace IO {
 				if ( source_still_working() ) {
 					// Assert our underlying source is still working.
 					// Nothing left to do now.
-					return ACT::Working ; 
+					return the_source -> internal_state() ; 
 				}
 				if ( source_went_bad() ) {
 					// Assert our underlying source went bad.
@@ -105,7 +105,7 @@ namespace IO {
 				if ( source_still_working() ) {
 					// Assert our underlying source is still working.
 					// Nothing left to do now.
-					return ACT::Working ; 
+					return the_source -> internal_state() ; 
 				}
 				if ( source_went_bad() ) {
 					// Assert our underlying source went bad.
@@ -123,10 +123,9 @@ namespace IO {
 					caller_next_character = next_character ;
 					caller_n_left_to_process = n_left_to_process ;
 				}
-				return ACT::Completed ;
-			} else if ( bad() ) {
-				return ACT::Completed ;
 			}
+			if ( ! working() ) return internal_state() ;
+			// Assert scanning remains incomplete
 		}
 	}
 

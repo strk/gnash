@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/**	\file Null_Device.hpp
+/**	\file Null_Device.cpp
  *	\brief 
  */
 
@@ -31,7 +31,7 @@ namespace IO {
 		set_completed() ;
 	}
 
-	ACT::act_state
+	ACT::ACT_State
 	Null_Source::
 	run( ACT::wakeup_listener * )
 	{

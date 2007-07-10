@@ -133,7 +133,7 @@ public:
 } ;
 
 //--------------------------------------------------
-/**	\fn make_generator
+/**	\fn make_generator template< class Gen > auto_generator make_generator( Gen generator_instance, std::string name )
  *	\brief Adapter function allowing use of type inference to initialize test generator.
  */
 template< class Gen >

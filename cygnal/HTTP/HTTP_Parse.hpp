@@ -147,7 +147,7 @@ namespace cygnal { namespace HTTP {
 		IO::result_buffer<> r_field_name ;
 
 		///
-		ACT::act_state scan( ACT::wakeup_listener * ) ;
+		ACT::ACT_State scan( ACT::wakeup_listener * ) ;
 
 	public:
 		/// Ordinary constructor
@@ -196,7 +196,7 @@ namespace cygnal { namespace HTTP {
 		read_single_header read_single_header_action ;
 
 		/// Body of action
-		ACT::act_state scan( ACT::wakeup_listener * ) ;
+		ACT::ACT_State scan( ACT::wakeup_listener * ) ;
 
 	public:
 		/// Ordinary constructor takes a nonblocking device as its source
@@ -250,7 +250,7 @@ namespace cygnal { namespace HTTP {
 		IO::result_buffer<> r_method ;
 
 		///
-		ACT::act_state scan( ACT::wakeup_listener * ) ;
+		ACT::ACT_State scan( ACT::wakeup_listener * ) ;
 
 		///
 		void init() ;
@@ -288,7 +288,7 @@ namespace cygnal { namespace HTTP {
 		HTTP_Version the_result ;
 
 		///
-		ACT::act_state scan( ACT::wakeup_listener * ) ;
+		ACT::ACT_State scan( ACT::wakeup_listener * ) ;
 
 		///
 		void init() ;
@@ -328,6 +328,7 @@ namespace cygnal { namespace HTTP {
 		enum request_parse_state {
 			in_method,
 			in_request_URI,
+			post_request_URI,
 			in_HTTP_version,
 			p_final_CR,
 			p_final_LF,
@@ -347,7 +348,7 @@ namespace cygnal { namespace HTTP {
 		Request_Version_Scanner scan_version ;
 
 		///
-		ACT::act_state scan( ACT::wakeup_listener * ) ;
+		ACT::ACT_State scan( ACT::wakeup_listener * ) ;
 
 	public:
 		/// Ordinary constructor takes a nonblocking device as its source

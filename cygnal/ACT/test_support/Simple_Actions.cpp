@@ -27,7 +27,7 @@ namespace ACT {
 	//--------------------------------------------------
 	// simple_action
 	//--------------------------------------------------
-	act_state
+	ACT_State
 	single_action::
 	run()
 	{
@@ -38,12 +38,12 @@ namespace ACT {
 	//--------------------------------------------------
 	// no_action
 	//--------------------------------------------------
-	act_state
+	ACT_State
 	no_action::
 	run()
 	{
 		if ( tracker.get() != 0 ) ( * tracker )( "" ) ;
-		return Completed ;
+		return set_completed() ;
 	}
 
 } // end namespace ACT

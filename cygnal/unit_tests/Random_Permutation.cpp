@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/// \file Random_Permutation.hpp
+/// \file Random_Permutation.cpp
 /// \brief A permutation generator for test cases.
 
 #include "Random_Permutation.hpp"

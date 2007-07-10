@@ -18,31 +18,40 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/// \file Pause_Service.hpp
-///	\brief The Pause service suspends itself (and its thread) for a number of milliseconds 
-///		if the scheduling queue has no high-priority items.
+/// \file Supplied_Service.cpp
+/// \brief A service that takes an outside supply of actions and supplies them as a service.
 
-#include "Pause_Service.hpp"
-#include <boost/thread/thread.hpp>
-#include <boost/thread/xtime.hpp>
+#include "Supplied_Service.hpp"
 
 namespace ACT {
-	//-------------------------
-	act_state
-	Pause_Service::
-	run()
+	shared_ptr< basic_act >
+	Supplied_Generator::
+	next_action( wakeup_listener * )
 	{
-		if ( the_scheduler -> ordinary_tasks_available() )
-			return Working ;
-
-		boost::xtime t ;
-		if ( 0 == xtime_get( & t, boost::TIME_UTC ) ) {
-			return set_bad() ;
+		if ( ! complete ) {
+			if ( ! the_tasks.empty() ) {
+				shared_ptr< basic_act > x = the_tasks.front() ;
+				the_tasks.pop_front() ;
+				return x ;
+			} else {
+				if ( ! active ) complete = true ;
+			}
+			/// Assert no more tasks left to return
 		}
-		t.nsec += ms_to_pause * 1000 * 1000 ;
-		boost::thread().sleep( t ) ;
-		return Working ;
+		return shared_ptr< basic_act >() ;
 	}
 
-	//-------------------------
+	void
+	Supplied_Generator::
+	add_task( shared_ptr< basic_act > x )
+	{
+		if ( ! active ) throw std::exception( "Not accepting new actions after shutdown" ) ;
+		the_tasks.push_back( x ) ;
+	}
+
 } // end namespace ACT
+
+#include "ACT/Service.cpp"
+namespace ACT {
+	template Service< Supplied_Service_Aspect > ;
+}

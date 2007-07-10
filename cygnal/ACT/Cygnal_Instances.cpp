@@ -18,7 +18,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/**	\file Cygnal_Instance.cpp
+/**	\file Cygnal_Instances.cpp
  *	\brief Template instances of Scheduling_Queue etc. needed for Cygnal.
  *
  *	Because we define the implementations of template functions outside of its declaration in its header,
@@ -28,10 +28,13 @@
  *	Separating definition and instantiation alleviates problems with multiply-defined symbols.
  */
 
+#include "Handle.cpp"
 #include "Scheduling_Queue.cpp"
+#include "Scheduler.T.cpp"
 
 namespace ACT {
-	// Explicit template instantiation.
-	template Basic_Scheduler::queue_type ;
+	// Explicit template instantiations.
+	template Basic_Scheduler< aspect::Null_Aspect_0 >::queue_type ;
+	template Basic_Scheduler< aspect::Null_Aspect_0 > ;
 
 } // end namespace ACT

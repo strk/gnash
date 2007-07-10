@@ -38,7 +38,7 @@ namespace IO {
 		Source * the_source ;
 
 		/// 
-		ACT::act_state run( ACT::wakeup_listener * ) ;
+		ACT::ACT_State run( ACT::wakeup_listener * ) ;
 
 	public:
 		/// Ordinary constructor

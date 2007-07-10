@@ -454,7 +454,13 @@ BOOST_AUTO_TEST_CASE( Bad_Requests )
 }
 
 //---------------------------------------------------------------------------
-BOOST_AUTO_TEST_CASE( Invalid_Version_Request )
+/* Scanning regular URI and "*"-URI are handled differently internally.
+ * This pair of tests once had different outcomes; the first failed and second passed.
+ * URI scanning was consuming an extra character for ordinary URI but not "*".
+ * HTTP-Request scanning wasn't looking for the space after its URI.
+ * In the test that passed, one defect was masking the other.
+ */
+BOOST_AUTO_TEST_CASE( Invalid_Version_Request_1 )
 {
 	char request[] = "GET * HTTP/1.0\r\n" ;
 	IO::String_Device device( request ) ;
@@ -464,6 +470,20 @@ BOOST_AUTO_TEST_CASE( Invalid_Version_Request )
 
 	cygnal::HTTP::HTTP_Behavior behavior( & device ) ;
 	behavior() ;
-	BOOST_CHECK( behavior.completed() ) ;
+	BOOST_REQUIRE( behavior.completed() ) ;
+	BOOST_CHECK( device.string_written() == string( response ) ) ;
+}
+
+BOOST_AUTO_TEST_CASE( Invalid_Version_Request_2 )
+{
+	char request[] = "GET http://foo.com/ HTTP/1.0\r\n" ;
+	IO::String_Device device( request ) ;
+	char response[] = 
+		"HTTP/1.1 505 HTTP Version Not Supported" "\r\n"
+		"Connection: close" "\r\n" ;
+
+	cygnal::HTTP::HTTP_Behavior behavior( & device ) ;
+	behavior() ;
+	BOOST_REQUIRE( behavior.completed() ) ;
 	BOOST_CHECK( device.string_written() == string( response ) ) ;
 }

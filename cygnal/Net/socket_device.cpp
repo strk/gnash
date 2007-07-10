@@ -188,7 +188,7 @@ namespace Net {
 	{}
 
 	//-------------------------
-	ACT::act_state 
+	ACT::ACT_State 
 	read_action::
 	run( ACT::wakeup_listener * waken )
 	{
@@ -218,9 +218,9 @@ namespace Net {
 			} else if ( error == EINTR ) {
 				// Assert the read() call was interrupted.
 				// Rather than enter a loop here, we let the scheduler retry.
-				if ( waken != 0 ) {
-					( * waken )() ;
-				}
+
+				/// \todo Implement a recovery tactic.
+				set_bad() ;
 			} else {
 				// Assert the socket had a non-recoverable error
 				set_bad() ;
@@ -253,7 +253,7 @@ namespace Net {
 	} ;
 
 	//-------------------------
-	ACT::act_state 
+	ACT::ACT_State 
 	write_action::
 	run( ACT::wakeup_listener * waken )
 	{
@@ -289,9 +289,9 @@ namespace Net {
 			} else if ( errno == EINTR ) {
 				// Assert the read() call was interrupted.
 				// Rather than enter a loop here, we let the scheduler retry.
-				if ( waken != 0 ) {
-					( * waken )() ;
-				}
+
+				/// \todo Implement a recovery tactic.
+				set_bad() ;
 			} else {
 				// Assert the socket had a non-recoverable error
 				set_bad() ;

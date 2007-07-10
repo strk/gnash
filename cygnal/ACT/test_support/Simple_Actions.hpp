@@ -28,35 +28,10 @@
 #include "Action_Tracing.hpp"
 
 namespace ACT {
-	//-------------------------
-	/**	\class N_to_completion
-	 *	\brief Action that completes after N activations.
-	 */
-	class N_to_completion
-		: public autonomous_act
-	{
-		/// Tracking
-		std::auto_ptr< tracking_function > tracker ;
-
-		///
-		unsigned int number_of_activations_left ;
-
-		///
-		unsigned int total_number_of_activations ;
-
-		///
-		act_state run( wakeup_listener * ) ;
-
-	public:
-		///
-		N_to_completion( unsigned int n, tracking_function * = 0 ) ;
-
-		void reset() ;
-
-	} ;
 
 	//-------------------------
 	/**	\class single_action
+	 *	\brief An action that always completes at its first activation.
 	 */
 	class single_action
 		: public simple_act
@@ -65,7 +40,7 @@ namespace ACT {
 		std::auto_ptr< tracking_function > tracker ;
 
 		/// Action body
-		act_state run() ;
+		ACT_State run() ;
 	public:
 		///
 		single_action( tracking_function * x = 0 )
@@ -88,7 +63,7 @@ namespace ACT {
 		std::auto_ptr< tracking_function > tracker ;
 
 		/// Action body does very little.
-		act_state run() ;
+		ACT_State run() ;
 
 	public:
 		/// Ordinary constructor.

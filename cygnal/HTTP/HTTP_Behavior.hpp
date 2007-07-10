@@ -57,7 +57,7 @@ namespace cygnal { namespace HTTP {
 		HTTP_Behavior( IO::Device * ) ;
 
 		/// 
-		ACT::act_state run( ACT::wakeup_listener * ) ;
+		ACT::ACT_State run( ACT::wakeup_listener * ) ;
 
 		///
 		static shared_ptr< ACT::autonomous_act > new_HTTP_Behavior( IO::Device * ) ;

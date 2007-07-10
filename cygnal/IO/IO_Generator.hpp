@@ -74,7 +74,7 @@ namespace IO {
 	/**	\class Device_Adapter
 	 */
 	class Device_Adapter
-		: public ACT::Generator
+		: public ACT::Obsolete_Generator		// will rewrite as deriving from ACT::Generator
 	{
 		/// We use shared_ptr here
 		Device_Generator & the_generator ;
@@ -89,7 +89,7 @@ namespace IO {
 		Device_Adapter( Device_Generator & x, Behavior_Factory & y ) ;
 
 		///
-		ACT::act_state run( ACT::wakeup_listener * w ) ;
+		ACT::ACT_State run( ACT::wakeup_listener * w ) ;
 
 		///
 		ACT::act result() ;

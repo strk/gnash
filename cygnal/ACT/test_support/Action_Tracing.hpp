@@ -30,6 +30,7 @@ namespace ACT {
 
 	//-------------------------
 	/** \class execution_trace
+	 *	\brief A wrapper around a string to hold a logging trace of an execution pathway.
 	 */
 	class execution_trace
 	{

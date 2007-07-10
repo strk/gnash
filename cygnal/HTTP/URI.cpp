@@ -99,7 +99,7 @@ namespace cygnal {
 	//--------------------------------------------------
 	// URI_Scanner
 	//--------------------------------------------------
-	ACT::act_state
+	ACT::ACT_State
 	URI_Scanner::
 	scan( ACT::wakeup_listener * ) {
 		// If we are at EOF, some states may accept, some may reject.
@@ -165,7 +165,7 @@ namespace cygnal {
 					}
 				}
 				current_state = scheme_0 ;
-				return ACT::Working ;
+				return source_state() ;
 			label_scheme:
 			case scheme:
 				while ( n_left_to_process > 0 ) {
@@ -184,7 +184,7 @@ namespace cygnal {
 					}
 				}
 				current_state = scheme ;
-				return ACT::Working ;
+				return source_state() ;
 			//-------------------------
 			// hier-part
 			//-------------------------
@@ -208,7 +208,7 @@ namespace cygnal {
 					}
 				}
 				current_state = hier_part_0 ;
-				return ACT::Working ;
+				return source_state() ;
 			//----------
 			label_hier_part_slash:
 			case hier_part_slash:
@@ -237,7 +237,7 @@ namespace cygnal {
 					}
 				}
 				current_state = hier_part_slash ;
-				return ACT::Working ;
+				return source_state() ;
 			//-------------------------
 			// authority
 			//-------------------------
@@ -261,7 +261,7 @@ namespace cygnal {
 					}
 				}
 				current_state = authority_0 ;
-				return ACT::Working ;
+				return source_state() ;
 			//----------
 			label_auth_unknown:
 			case auth_unknown:
@@ -285,7 +285,7 @@ namespace cygnal {
 					}
 				}
 				current_state = auth_unknown ;
-				return ACT::Working ;
+				return source_state() ;
 			//-------------------------
 			// path
 			//-------------------------
@@ -315,7 +315,7 @@ namespace cygnal {
 					}
 				}
 				current_state = path_absolute_0 ;
-				return ACT::Working ;
+				return source_state() ;
 			//----------
 			label_path_absolute:
 			case path_absolute:
@@ -340,7 +340,7 @@ namespace cygnal {
 					}
 				}
 				current_state = path_absolute ;
-				return ACT::Working ;
+				return source_state() ;
 			//----------
 			label_path_abempty_0:
 			case path_abempty_0:
@@ -368,7 +368,7 @@ namespace cygnal {
 					}
 				}
 				current_state = path_absolute_0 ;
-				return ACT::Working ;
+				return source_state() ;
 			//-------------------------
 			// query
 			//-------------------------
@@ -390,7 +390,7 @@ namespace cygnal {
 					}
 				}
 				current_state = query_0 ;
-				return ACT::Working ;
+				return source_state() ;
 			//----------
 			label_query:
 			case query:
@@ -410,7 +410,7 @@ namespace cygnal {
 					}
 				}
 				current_state = query_0 ;
-				return ACT::Working ;
+				return source_state() ;
 			//-------------------------
 			// fragment
 			//-------------------------
@@ -430,7 +430,7 @@ namespace cygnal {
 					}
 				}
 				current_state = fragment_0 ;
-				return ACT::Working ;
+				return source_state() ;
 			//----------
 			label_fragment:
 			case fragment:
@@ -447,7 +447,7 @@ namespace cygnal {
 					}
 				}
 				current_state = fragment ;
-				return ACT::Working ;
+				return source_state() ;
 			//----------
 			label_done_unget_last_character:
 				uri.r_URI.set_length( next_character - URI_begin - 1 ) ;

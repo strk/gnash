@@ -1,0 +1,5 @@
+Change Log for GNU Cygnal, Module Net
+=====================================
+
+2007-07-06 Eric Hughes <eh@narthex.us>
+	* socket_device.cpp: Stubbed out obsolete reaction to EINTR.

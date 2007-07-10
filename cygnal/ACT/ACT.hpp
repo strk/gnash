@@ -19,7 +19,7 @@
 //
 
 /**	\file ACT.hpp
- *	Asynchronous Computation Task
+ *	\brief Asynchronous Computation Task
  */
 
 #pragma once
@@ -31,21 +31,83 @@
 using boost::shared_ptr ;
 
 namespace ACT {
+	//-------------------------
+	/** \class ACT_State
+	 *	\brief Generically state of an ACT as a scheduler and other actions see it.
+	 *
+	 *	This enumeration is at the core of the control flow idiom of the ACT environment.
+	 *	When a scheduler or another action calls an action, the action may complete its call before it completes its embodied operation.
+	 *	The states break down as follows:
+	 *	- Action is not finished.
+	 *		In this case, the operation is not yet finished and is still working.
+	 *		Further calls to this action will be necessary to get to a finished state,
+	 *			which will not happen autonomously.
+	 *		This state comes in two varieties.
+	 *		- Ready. 
+	 *			The action spontaneously yielded control.
+	 *			An immediate call to this action would immediately continue.
+	 *		- Waiting.
+	 *			The action returned because it would block otherwise.
+	 *			An immediate call to this action is unlikely to do anything else.
+	 *	- Action has finished.
+	 *		One way or another, this action has finished its processing.
+	 *		Further calls to this action do nothing.
+	 *		- Completed.  
+	 *			The action has finished and its ordinary postconditions may be relied upon.
+	 *		- Bad.  
+	 *			The action has entered an abnormal state and its ordinary postconditions need not be true.
+	 *			As a rule, actions in this state terminated early.
+	 *
+	 *	An important aspect of the Waiting state is that an action that returns this state
+	 *		has accepted responsibility for setting in motion its own later wake-up.
+	 *	The scheduler does not do this, since it doesn't deal in specifics.
+	 */
+	class ACT_State
+	{
+	public:
+		/// Symbolic names for the return states of an action.
+		enum state {
+			/// Not finished.  Ready to continue immediately.
+			Ready,
+			/// Not finished.  Presumed not ready.
+			Would_Block,
+			/// Finished normally.
+			Completed,
+			/// Abnormal termination; now finished.
+			Bad
+		} ;
 
-	class wakeup_listener ;
+	private:
+		/// This class is a wrapper around this state.
+		state x ;
+
+	public:
+		/// Ordinary constructor
+		ACT_State( state x ) : x( x ) {} ;
+
+		/// Ordinary assignment
+		ACT_State & operator=( state y ) { x = y ; return * this ; }
+
+		/// Convenience test.
+		inline bool ready() const { return x == Ready ; }
+
+		/// Convenience test.
+		inline bool would_block() const { return x == Would_Block ; }
+
+		/// Convenience test.
+		inline bool completed() const { return x == Completed ; }
+
+		/// Convenience test.
+		inline bool bad() const { return x == Bad ; }
+
+		/// Test whether state is an unfinished (i.e. still working) state.
+		/// If true, it's either Ready or Waiting.
+		inline bool working() const { return x <= Would_Block ; }
+	} ;
 
 	//-------------------------
-	/** \enum act_state
-	 *	\brief Generically relevant ACT states.
-	 *
-	 *	There are exactly three generic ACT states.
-	 *	Particular kinds of ACT may refine this set of states, but they must also preserve the meaning of these three.
-	 *	- Working.  Not yet finished.
-	 *	- Completed.  Finished normally.
-	 *	- Bad.  Finished abnormally.
-	 */
-	enum act_state { Working, Completed, Bad } ;
-
+	// Forward
+	class wakeup_listener ;
 	//-------------------------
 	/**	\class basic_act
 	 *	\brief Base class for specific ACT uses.
@@ -72,7 +134,6 @@ namespace ACT {
 	 *	The basic idea of an ACT splits the keyword "return" into two different kinds.
 	 *	- The ordinary "return", which indicates completion of the task.
 	 *		This is represented by the states \c Completed and \c Bad.
-	 *		This kind of
 	 *	- An interruption "yield", which indicates not-yet-completion of the task.
 	 *		This is represented by the state \c Working.
 	 *
@@ -104,47 +165,53 @@ namespace ACT {
 	 */
 	class basic_act {
 		/// Child classes may access and alter the internal state.
-		act_state the_state ;
+		ACT_State the_state ;
 
 	protected:
 		/// Protected constructor for child classes.
 		basic_act() 
-			: the_state( Working )
+			: the_state( ACT_State::Ready )
 		{}
 
 		/// Protected setter for subclass implementation.
-		inline act_state set_working() { return the_state = Working ; }
+		inline ACT_State set_ready() { return the_state = ACT_State::Ready ; }
 
 		/// Protected setter for subclass implementation.
-		inline act_state set_completed() { return the_state = Completed ; }
+		inline ACT_State set_would_block() { return the_state = ACT_State::Would_Block ; }
 
 		/// Protected setter for subclass implementation.
-		inline act_state set_bad() { return the_state = Bad ; }
+		inline ACT_State set_completed() { return the_state = ACT_State::Completed ; }
+
+		/// Protected setter for subclass implementation.
+		inline ACT_State set_bad() { return the_state = ACT_State::Bad ; }
 
 		/// Protected arbitrary setter for subclasses that filter.
-		inline act_state set_state( act_state x ) { return the_state = x ; }
+		inline ACT_State set_state( ACT_State x ) { return the_state = x ; }
 
 	public:
 		///
-		inline act_state internal_state() { return the_state ; }
+		inline ACT_State internal_state() { return the_state ; }
 
 		/// 
-		inline bool working() const { return the_state == Working ; }
+		inline bool ready() const { return the_state.ready() ; }
 
 		/// 
-		inline bool completed() const
-		{
-			return the_state == Completed ;
-		}
+		inline bool would_block() const { return the_state.would_block() ; }
+
+		/// Return is whether this action is in an unfinished state (either Ready or Waiting)
+		inline bool working() const { return the_state.working() ; }
 
 		/// 
-		inline bool bad() const { return the_state == Bad ; }
+		inline bool completed() const { return the_state.completed() ; }
+
+		/// 
+		inline bool bad() const { return the_state.bad() ; }
 
 		///
-		virtual act_state operator()( void ) =0 ;
+		virtual ACT_State operator()( void ) =0 ;
 
 		///
-		virtual act_state operator()( wakeup_listener * ) =0 ;
+		virtual ACT_State operator()( wakeup_listener * ) =0 ;
 
 	} ;
 
@@ -161,13 +228,13 @@ namespace ACT {
 		 *	It is reasonable to consider this as an analogue of a thread body.
 		 *
 		 *	\pre 
-		 *	- the_state == Working.
+		 *	- the_state is working.
 		 *		(Note: operator(), acting as a facade, ensures this predicate.)
 		 *	\post
 		 *	- the_state == Working implies success conditions are not yet met nor are they yet precluded.
 		 *	- return == internal_state().
 		 */
-		virtual act_state run( void ) =0 ;
+		virtual ACT_State run( void ) =0 ;
 
 	public:
 		/**	\brief operator() is a facade for the body of an ACT.
@@ -176,13 +243,13 @@ namespace ACT {
 		 *	- the_state == Working implies success conditions are not yet met nor are they yet precluded.
 		 *	- return == internal_state().
 		 */
-		inline act_state operator()( void )
+		inline ACT_State operator()( void )
 		{
 			if ( ! working() ) return internal_state() ;
 			return run() ;
 		}
 
-		inline act_state operator()( wakeup_listener * )
+		inline ACT_State operator()( wakeup_listener * )
 		{
 			return operator()() ;
 		}
@@ -212,7 +279,7 @@ namespace ACT {
 		 *		wakeup_listener may be called when progress on the ACT is possible.
 		 *
 		 *	\note
-		 *	The postcondition is not a guarantee that a \c wakeup_listener <b>will</b> be called,
+		 *	The postcondition is not a guarantee that a wakeup_listener <b>will</b> be called,
 		 *		but rather that a reliance upon the caller that this instance <b>may</b> call
 		 *		the listener (assuming it's not null).
 		 *	Certain ACT's may provide such a guarantee that they will call.
@@ -220,7 +287,7 @@ namespace ACT {
 		 *		when I/O is available.
 		 *
 		 *	\note
-		 *	The input parameter \c wakeup_listener may indeed be zero.
+		 *	The input parameter wakeup_listener may indeed be zero.
 		 *	The intent behind this choice is to enable a scheduler to forbid an ACT
 		 *		from setting up a background poll or notification.
 		 *	Should a scheduler do this, it must assume the responsibility for checking back later.
@@ -236,19 +303,22 @@ namespace ACT {
 		 *		recently executed" policy for selecting the next ACT to run.
 		 *	Furthermore, these policies might be blended, putting "slow" operations into
 		 *		notification mode and "fast" operations into direct retry mode.
+		 *
+		 *	\sa
+		 *	ACT_State: For more detailed information on the meaning of the return value.
 		 */
-		virtual act_state run( wakeup_listener * ) =0 ;
+		virtual ACT_State run( wakeup_listener * ) =0 ;
 
 	public:
 		///
-		inline act_state operator()( wakeup_listener * w )
+		inline ACT_State operator()( wakeup_listener * w )
 		{
 			if ( ! working() ) return internal_state() ;
 			return run( w ) ;
 		}
 
 		/// Convenience zero-parameter operator() ;
-		inline act_state operator()() { return operator()( 0 ) ; }
+		inline ACT_State operator()() { return operator()( 0 ) ; }
 	} ;
 
 	//-------------------------
@@ -257,7 +327,7 @@ namespace ACT {
 	 *	Allows hiding 'new' allocation and avoiding defective memory management.
 	 *	Enables passing ACT instances by copying pointers.
 	 *
-	 *	\inv
+	 *	\invariant
 	 *		the_body != 0
 	 *
 	 */
@@ -288,7 +358,7 @@ namespace ACT {
 
 		/** Proxy for the body's function operator
 		 */
-		act_state operator()( wakeup_listener * x ) {
+		ACT_State operator()( wakeup_listener * x ) {
 			if ( working() ) {
 				return the_body -> operator()( x ) ;
 			}

@@ -36,11 +36,11 @@ namespace IO {
 	}
 
 	///
-	ACT::act_state 
+	ACT::ACT_State 
 	String_Generator::
 	run( ACT::wakeup_listener * )
 	{
-		if ( the_queue.empty() ) return ACT::Working ;
+		if ( the_queue.empty() ) return ACT::ACT_State( ACT::ACT_State::Ready ) ;
 		the_result = shared_ptr< IO::Device >( new String_Device( the_queue.front() ) ) ;
 		the_queue.pop() ;
 		return set_completed() ;
@@ -65,7 +65,7 @@ namespace IO {
 	reset()
 	{
 		if ( bad() ) return ;
-		set_working() ;
+		set_ready() ;
 	}
 
 } // end namespace IO

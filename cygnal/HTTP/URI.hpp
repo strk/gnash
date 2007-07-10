@@ -70,6 +70,11 @@ namespace cygnal {
 	} ;
 
 	//-------------------------
+	/** \class URI_Scanner
+	 *
+	 *	\todo Fix the silent consumption of the next character after the URI.
+	 *		It interferes with a caller's grammar.
+	 */
 	class URI_Scanner
 		: public IO::Stream_Consumer
 	{
@@ -80,7 +85,7 @@ namespace cygnal {
 		char * component_begin ;
 
 		///
-		ACT::act_state scan( ACT::wakeup_listener * ) ;
+		ACT::ACT_State scan( ACT::wakeup_listener * ) ;
 
 		///
 		void init() ;

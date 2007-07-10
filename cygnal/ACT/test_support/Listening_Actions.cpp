@@ -24,53 +24,33 @@
 #include "Listening_Actions.hpp"
 #include "ACT/Scheduler.hpp"
 
+// Required to obtain instantiation of template base classes
+#include "ACT/Listen.T.cpp"
+
 namespace ACT {
 	//--------------------------------------------------
 	// N_to_completion_Monitor
 	//--------------------------------------------------
-	std::vector< wakeup_listener::scheduler_pointer > N_to_completion_Monitor::schedulers ;
-
-	N_to_completion_Monitor::
-	N_to_completion_Monitor()
-		: listeners( 0 )
-	{}
-
 	void
 	N_to_completion_Monitor::
 	add_wakeup_item( N_to_completion *, wakeup_listener * w )
 	{
-		// Assert this instance is registered in the scheduler and will eventually run.
-		// Note: as of this writing, there's no way for an object to register itself with the scheduler.
-		//		Some other object must do so.
-		//		It's not yet clear whether this is good or not.
-
-		//	We ignore the N_to_completion pointer, since in this test action,
+		//	We ignore the N_to_completion pointer, since, for the purposes of the present test action,
 		//		we consider any background action always ready for wakeup after one cycle of quiescence.
-		listeners.push_back( w ) ;
+
+		Parent::add_ready_listener_task( w ) ;
 	}
 
-	act_state
+	ACT_State
 	N_to_completion_Monitor::
 	run()
 	{
-		if ( listeners.empty() ) {
-			// This monitor is no longer necessary, since there's nothing to wake up.
-			// Therefore we return complete and let the scheduler remove this instance.
-			return Completed ;
-		}
-		while ( ! listeners.empty() ) {
-			( * listeners.back() )() ;
-			listeners.pop_back() ;
-		}
-		return Working ;
+		return Parent::wake_up_ready_tasks() ;
 	}
 
 	//--------------------------------------------------
 	// N_to_completion
 	//--------------------------------------------------
-	boost::shared_ptr< N_to_completion_Monitor > N_to_completion::the_monitor ;
-
-	//-------------------------
 	N_to_completion::
 	N_to_completion( unsigned int n, tracking_function * f )
 		: total_number_of_activations( n ),
@@ -79,7 +59,7 @@ namespace ACT {
 	{}
 
 	//-------------------------
-	act_state
+	ACT_State
 	N_to_completion::
 	run( wakeup_listener * w )
 	{
@@ -88,8 +68,8 @@ namespace ACT {
 		if ( number_of_activations_left == 0 ) return set_completed() ;
 		// Assert we're not done yet.
 		// Register with our monitor before returning.
-		register_for_wakeup( w ) ;
-		return Working ;
+		register_for_wakeup( this, w ) ;
+		return set_would_block() ; ;
 	}
 
 	//-------------------------
@@ -98,22 +78,15 @@ namespace ACT {
 	reset()
 	{
 		number_of_activations_left = total_number_of_activations ;
-		set_working() ;
-	}
-
-	//-------------------------
-	void
-	N_to_completion::
-	register_for_wakeup( wakeup_listener * w )
-	{
-		if ( w == 0 ) return ;
-		if ( the_monitor.get() == 0 ) {
-			the_monitor = shared_ptr< monitor_type >( new monitor_type() ) ;
-			w -> scheduler() -> add_service( act( the_monitor ) ) ;
-		}
-		// Assert monitor exists
-		the_monitor -> add_wakeup_item( this, w ) ;
+		set_ready() ;
 	}
 
 	//-------------------------
 } // end namespace ACT
+
+//-------------------------
+// Instantiate an instance of Handle_Registry_Follower as needed for N_to_Completion
+#include "ACT/Handle.cpp"
+namespace ACT {
+	template Handle_Registry_Follower< shared_ptr< N_to_completion_Monitor >, Scheduler > ;
+}

@@ -125,8 +125,8 @@ namespace IO {
 		: public Source 
 	{
 	protected:
-		virtual ACT::act_state source_run( ACT::wakeup_listener * ) =0 ;
-		inline ACT::act_state run( ACT::wakeup_listener * w ) { return source_run( w ) ; }
+		virtual ACT::ACT_State source_run( ACT::wakeup_listener * ) =0 ;
+		inline ACT::ACT_State run( ACT::wakeup_listener * w ) { return source_run( w ) ; }
 	} ;
 
 	//-------------------------
@@ -140,7 +140,7 @@ namespace IO {
 		: public SSource
 	{
 		S & the_source ;
-		inline ACT::act_state source_run( ACT::wakeup_listener * w ) { return the_source.run( w ) ; }
+		inline ACT::ACT_State source_run( ACT::wakeup_listener * w ) { return the_source.run( w ) ; }
 	public:
 		Source_Adapter( S & source )
 			: the_source( source )
@@ -157,8 +157,8 @@ namespace IO {
 	//-------------------------
 	class SSink : public Sink {
 	protected:
-		virtual ACT::act_state sink_run( ACT::wakeup_listener * ) =0 ;
-		inline ACT::act_state run( ACT::wakeup_listener * w ) { return sink_run( w ) ; }
+		virtual ACT::ACT_State sink_run( ACT::wakeup_listener * ) =0 ;
+		inline ACT::ACT_State run( ACT::wakeup_listener * w ) { return sink_run( w ) ; }
 	} ;
 
 	//-------------------------
@@ -172,7 +172,7 @@ namespace IO {
 		: public SSink
 	{
 		S & the_sink ;
-		inline ACT::act_state sink_run( ACT::wakeup_listener * w ) { return the_sink.run( w ) ; }
+		inline ACT::ACT_State sink_run( ACT::wakeup_listener * w ) { return the_sink.run( w ) ; }
 	public:
 		Sink_Adapter( S & sink )
 			: the_sink( sink )
@@ -206,8 +206,8 @@ namespace IO {
 	{
 		In the_source ;
 		Out the_sink ;
-		inline ACT::act_state sink_run( ACT::wakeup_listener * w ) { return the_sink.run( w ) ; }
-		inline ACT::act_state source_run( ACT::wakeup_listener * w ) { return the_source.run( w ) ; }
+		inline ACT::ACT_State sink_run( ACT::wakeup_listener * w ) { return the_sink.run( w ) ; }
+		inline ACT::ACT_State source_run( ACT::wakeup_listener * w ) { return the_source.run( w ) ; }
 	public:
 		Split_Device( In in, Out out )
 			: the_source( in ), the_sink( out )
@@ -230,7 +230,7 @@ namespace IO {
 		Oldsource & the_source ;
 		Action the_action ;
 
-		inline ACT::act_state run( ACT::wakeup_listener * w ) { return the_action.operator()( w ) ; }
+		inline ACT::ACT_State run( ACT::wakeup_listener * w ) { return the_action.operator()( w ) ; }
 
 		template< class In, class Out > friend class Split_Device ;
 	public:

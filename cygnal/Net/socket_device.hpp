@@ -231,7 +231,7 @@ namespace Net {
 		//---------------
 		/**
 		 */
-		ACT::act_state run( ACT::wakeup_listener * waken ) ;
+		ACT::ACT_State run( ACT::wakeup_listener * waken ) ;
 
 		//---------------
 		/** \brief Ordinary constructor 
@@ -262,7 +262,7 @@ namespace Net {
 
 	public:
 		/// Action operator actually does the write.
-		ACT::act_state run( ACT::wakeup_listener * waken ) ;
+		ACT::ACT_State run( ACT::wakeup_listener * waken ) ;
 
 		/// Ordinary constructor
 		write_action(

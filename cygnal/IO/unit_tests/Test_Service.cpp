@@ -27,7 +27,7 @@ class Null_Behavior
 {
 public:
 	Null_Behavior() { set_completed() ; }
-	ACT::act_state run( ACT::wakeup_listener * ) { return ACT::Completed ; }
+	ACT::ACT_State run( ACT::wakeup_listener * ) { return set_completed() ; }
 } ;
 
 //-------------------------

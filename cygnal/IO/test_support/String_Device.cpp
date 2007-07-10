@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/// \file String_Device.hpp
+/// \file String_Device.cpp
 
 #include "String_Device.hpp"
 #include <string>
@@ -81,7 +81,7 @@ namespace IO {
 	}
 
 	//-------------------------
-	ACT::act_state
+	ACT::ACT_State
 	String_Device::
 	source_run( ACT::wakeup_listener * )
 	{
@@ -110,7 +110,7 @@ namespace IO {
 	String_Device::
 	reset()
 	{
-		SSource::set_working() ;
+		SSource::set_ready() ;
 	}
 
 	//-------------------------
@@ -137,7 +137,7 @@ namespace IO {
 	}
 
 	//-------------------------
-	ACT::act_state
+	ACT::ACT_State
 	String_Device::
 	sink_run( ACT::wakeup_listener * )
 	{

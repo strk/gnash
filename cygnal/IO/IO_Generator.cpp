@@ -15,7 +15,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/// \file IO_Service.cpp
+/// \file IO_Generator.cpp
 
 #include "IO_Generator.hpp"
 
@@ -28,13 +28,13 @@ namespace IO {
 	{}
 
 	//-------------------------
-	ACT::act_state
+	ACT::ACT_State
 	Device_Adapter::
 	run( ACT::wakeup_listener * w )
 	{
 		the_generator( w ) ;
 		if ( the_generator.bad() ) return set_bad() ;
-		if ( the_generator.working() ) return ACT::Working ;
+		if ( the_generator.working() ) return set_ready() ;
 		// Assert the_generator has a result ready for us.
 		
 		the_result = the_behavior_factory( the_generator.result() ) ;

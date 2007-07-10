@@ -25,19 +25,57 @@
 #define __Scheduler_hpp__
 
 #include "ACT.hpp"
+#include "Handle.hpp"
 #include "Scheduling_Queue.hpp"
 #include <boost/optional/optional.hpp>
-
+#include "../Aspect.hpp"
 //#include "boost/date_time/posix_time/posix_time.hpp"
 
+// Declarations within this namespace block intended for a new header file defining only interfaces
 namespace ACT {
+	//-------------------------
+	/**	\class Scheduler
+	 *	\brief Abstract interface to scheduler.
+	 */
+	class Scheduler
+		: public Handled< Scheduler >
+	{
+	public:
+		/// Add a task with bounded lifetime.
+		virtual void add_task( act ) =0 ;
 
+		/// Add a service with indefinite lifetime.
+		virtual void add_service( act ) =0 ;
+
+		///
+		virtual bool ordinary_tasks_available() =0 ;
+
+		///
+		Scheduler( Scheduler * that )
+			: Handled< Scheduler >( that )
+		{} ;
+	} ;
+
+	/** \class wakeup_listener
+	 *	\brief Abstract interface to a function object that wakes up a listener task that's waiting.
+	 */
+	class wakeup_listener
+	{
+	public:
+		/// The listener body.
+		virtual void operator()() =0 ;
+
+		/// Accessor for the scheduler
+		virtual Scheduler * scheduler() const =0 ;
+	} ;
+}
+
+namespace ACT {
 	//-------------------------
 	/* Forward declarations for wakeup_listener
 	 */
 	struct Basic_Scheduled_Item ;
-	class Basic_Scheduler ;
-	class wakeup_listener_allocated ;
+	template< template< class > class > class Basic_Scheduler ;
 
 	//-------------------------
 	/**	\class wakeup_listener_allocated
@@ -51,11 +89,12 @@ namespace ACT {
 	 *		this allocation strategy has no performance penalty in the steady state,
 	 *		except to the extent that excess memory usage causes unnecessary swapping.
 	 */
+	template< class S >
 	class wakeup_listener_allocated
 	{
 	public:
 		///
-		typedef Basic_Scheduler * scheduler_pointer ;
+		typedef S * scheduler_pointer ;
 		// typedef wakeup_listener::scheduler_pointer scheduler_pointer ;
 
 		///
@@ -80,7 +119,7 @@ namespace ACT {
 	} ;
 
 	//-------------------------
-	/** \class wakeup_listener
+	/** \class Basic_Wakeup_Listener
 	 *	\brief The 'A' in ACT means 'asynchronous', so in general there must be a way of notifying
 	 *		a scheduler that an inactive ACT, one that has a pending sub-action, is ready to proceed.
 	 *	This class is the interface between a scheduler and such an ACT.
@@ -95,15 +134,17 @@ namespace ACT {
 	 *	The scheduler should encapsulate its own notification receiver, however structured,
 	 *		into a function object of this class, say, by binding a member function adapter.
 	 */
-	class wakeup_listener
+	template< class S >
+	class Basic_Wakeup_Listener
+		: public wakeup_listener
 	{
 	public:
 		///
-		typedef Basic_Scheduler * scheduler_pointer ;
+		typedef S * scheduler_pointer ;
 
 	private:
 		///
-		typedef Scheduling_Queue< Basic_Scheduled_Item, wakeup_listener_allocated > queue_type ;
+		typedef Scheduling_Queue< Basic_Scheduled_Item, wakeup_listener_allocated< S > > queue_type ;
 
 		/// A pointer to the item to reschedule.
 		size_t permutation_index ;
@@ -119,7 +160,7 @@ namespace ACT {
 		inline scheduler_pointer scheduler() const { return the_scheduler ; }
 
 		/// Ordinary constructor used after item is within a scheduling queue and its storage location is known.
-		wakeup_listener( size_t x, scheduler_pointer y )
+		Basic_Wakeup_Listener( size_t x, scheduler_pointer y )
 			: permutation_index( x ), the_scheduler( y ) {}
 	} ;
 
@@ -147,26 +188,35 @@ namespace ACT {
 	} ;
 
 	//-------------------------
-	///
+	/** \brief Category of actions within Basic_Scheduler.
+	 *		Distinguishes ordinary tasks from services, which have different scheduling policies.
+	 */
 	enum Action_Category
 	{
 		/// An ordinary task, executed until completed, then discarded.
 		Task = 0,
 
-		/**	A service task, reset if completed, discarded if reset does not succeed.
+		/**	A demon task, never expected to complete, but which may complete.
 		 *
-		 *	A service executes with background priority in the scheduling queue.
+		 *	A demon executes with background priority in the scheduling queue.
 		 *	It may also have its own autonomous processing.
-		 *	The select() call behind the wakeup listener for network I/O, for example, is a service.
+		 *	The select() call behind the wakeup listener for network I/O, for example, is somewhere within a certain demon.
 		 */
-		Service,
+		Demon,
 
-		/**	A critical service is one that must be run in order for the scheduler to run.
+		/**	A critical demon is one that must be run in order for the scheduler to run.
 		 */
-		Critical_Service
+		Critical_Demon
 	} ;
 
 	//-------------------------
+	/**	\class Basic_Scheduled_Item
+	 *	\brief Data within the priority queue proper.
+	 *		This data is swapped during priority queue operations, so should remain as small as possible.
+	 *
+	 *	\par Future
+	 *		It seems that \c the_action, which isn't needed for ordering, might be able to move to the auxiliary vector.
+	 */
 	struct Basic_Scheduled_Item
 	{
 		///
@@ -189,16 +239,28 @@ namespace ACT {
 	} ;
 
 	//-------------------------
+	/**	\class Basic_Scheduler
+	 *	\brief A basic implementation of a scheduler.
+	 *
+	 *	This may not be the final production version of a scheduler.
+	 *	Nevertheless, a scheduler which is as simple as possible, but still works as a scheduler,
+	 *		should be retained for testing.
+	 *	In particular, this scheduler does not have a timeout mechanism to detect stalled actions.
+	 *	This would be a defect in a production environment.
+	 *	Such an absence should be retained for the test environment, to be able to isolate defective actions that stall.
+	 */
+	template< template< class > class Aspect = aspect::Null_Aspect_0 >
 	class Basic_Scheduler
+		: public Scheduler
 	{
 		///
-		friend wakeup_listener ;
+		friend Basic_Wakeup_Listener< Basic_Scheduler > ;
 
 		/// The type of our internal queue.
-		typedef Scheduling_Queue< Basic_Scheduled_Item, wakeup_listener_allocated > queue_type ;
+		typedef Scheduling_Queue< Basic_Scheduled_Item, wakeup_listener_allocated< Basic_Scheduler > > queue_type ;
 
 		///
-		typedef queue_type::pointer item_pointer ;
+		typedef typename queue_type::pointer item_pointer ;
 
 		/// Activate the next action once.
 		void activate_one_item() ;
@@ -213,11 +275,20 @@ namespace ACT {
 		inline queue_type & queue() { return the_queue ; }
 
 		/// Increasing sequence numbers upon scheduling implements a kind of LRU activation policy.
-		unsigned int next_sequence_number ;
+		unsigned int next_task_sequence_number ;
+
+		/// A separate sequence for services implements round-robin activation.
+		unsigned int next_service_sequence_number ;
+
+		///
+		typedef Aspect< Basic_Scheduler > aspect_type ;
+
+		///
+		aspect_type aspect ;
 
 	public:
 		/// Default constructor is private to enforce singleton
-		Basic_Scheduler() ;
+		Basic_Scheduler( aspect_type aspect = aspect_type() ) ;
 
 		/// Add an ordinary task into the scheduling queue.
 		void add_task( act ) ;
@@ -231,9 +302,6 @@ namespace ACT {
 		/// The main execution loop.
 		void operator()() ;
 
-		/// The main execution loop with an activation bound.
-		void operator()( unsigned int ) ;
-
 		///
 		bool ordinary_tasks_available() ;
 
@@ -244,6 +312,39 @@ namespace ACT {
 		void reset() ;
 	} ;
 
+	//-------------------------
+	/** \class Basic_Scheduler_Null_Aspect
+	 *	\brief Base class for aspects of \c Basic_Scheduler.
+	 */
+	class Basic_Scheduler_Null_Aspect
+	{
+	public:
+		/// Guard must be true in order for execution loop to continue.
+		inline bool run_guard() { return true ; }
+
+		/// Called before any execution starts.
+		inline void run_begin() {}
+
+		/// Called after execution stops through internal means.
+		inline void run_end_ordinary() {}
+
+		/// Called if execution stop because of guard failure.
+		inline void run_end_guard_violation() {}
+	} ;
+
+	//-------------------------
 } // end namespace ACT
+
+namespace aspect {
+	//-------------------------
+	/** \brief Default null aspect for Basic_Scheduler.
+	 */
+	template<>
+	class Null_Aspect_0< ACT::Basic_Scheduler< Null_Aspect_0 > >
+		: public Null_Aspect_Base< ACT::Basic_Scheduler< Null_Aspect_0 > >,
+		public ACT::Basic_Scheduler_Null_Aspect
+	{} ;
+
+}
 
 #endif

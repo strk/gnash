@@ -26,6 +26,7 @@
 
 #include "../ACT.hpp"
 #include "ACT/test_support/Simple_Actions.hpp"
+#include "ACT/test_support/Listening_Actions.hpp"
 
 using namespace ACT ;
 
@@ -47,17 +48,17 @@ public:
 		: number_of_calls( 0 )
 	{} ;
 
-	act_state run( wakeup_listener * ) 
+	ACT_State run( wakeup_listener * ) 
 	{
 		switch ( number_of_calls ) {
 			case 0 :
 				number_of_calls = 1 ;
-				return ACT::Working ;
+				return internal_state() ;
 			case 1 :
 				number_of_calls = 2 ;
 				return set_completed() ;
-			case 2 :
-				return ACT::Completed ;
+			// Note:
+			// case 2 should never be called, since the guard for calling run requires that the action still be working
 		}
 		throw std::exception( "Not Reached" ) ;
 	}

@@ -63,7 +63,7 @@ namespace IO {
 		unsigned int number_of_lookahead_characters_required ;
 
 		/// Polymorphic scanner.
-		virtual ACT::act_state scan( ACT::wakeup_listener * ) =0 ;
+		virtual ACT::ACT_State scan( ACT::wakeup_listener * ) =0 ;
 
 		/// Initial action
 		virtual void init() {} ;
@@ -98,6 +98,9 @@ namespace IO {
 		/// [replenish result]
 		inline bool source_went_bad() { return the_source -> bad() ; }
 
+		/// [replenish result]
+		inline ACT::ACT_State source_state() { return the_source -> internal_state() ; }
+
 		///
 		inline void require_lookahead( unsigned int n ) { number_of_lookahead_characters_required = n ; }
 
@@ -113,12 +116,12 @@ namespace IO {
 		bool first_time ;
 
 		/// [error] Indicate a syntax error at the current location.
-		ACT::act_state syntax_error() { return set_bad() ; }
+		ACT::ACT_State syntax_error() { return set_bad() ; }
 
 	public:
 		/// The class implements the ACT invocation.
 		/// This function wraps our own polymorphic \c run.
-		ACT::act_state run( ACT::wakeup_listener * ) ;
+		ACT::ACT_State run( ACT::wakeup_listener * ) ;
 
 	} ;
 

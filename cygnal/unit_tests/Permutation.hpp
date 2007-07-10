@@ -107,6 +107,8 @@ public:
 		throw std::exception( "Can only compare against end-iterators in the present implementation." ) ;
 	}
 
+	/**	\class test_function
+	 */
 	boost::function< void( void ) > test_function() const
 	{
 		return boost::bind( f, the_vector.begin(), the_vector.end() ) ;

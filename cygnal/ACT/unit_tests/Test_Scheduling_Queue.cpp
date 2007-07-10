@@ -27,8 +27,6 @@
 #include "unit_tests/Permutation.hpp"
 #include "unit_tests/Random_Permutation.hpp"
 
-// Include this implementation file in order to instantiate template
-#include "ACT/Scheduling_Queue.cpp"
 
 /** A test item to put into a scheduling queue.
  */
@@ -45,9 +43,12 @@ public:
 } ;
 
 // Explicit instantiation
-template ACT::Scheduling_Queue< test_item, ACT::wakeup_listener_allocated > ;
+#include "ACT/Scheduling_Queue.cpp"
+#include "ACT/Scheduler.T.cpp"
+template ACT::wakeup_listener_allocated< ACT::Basic_Scheduler<> > ;
+template ACT::Scheduling_Queue< test_item, ACT::wakeup_listener_allocated< ACT::Basic_Scheduler<> > > ;
 
-typedef ACT::Scheduling_Queue< test_item, ACT::wakeup_listener_allocated > queue_type ;
+typedef ACT::Scheduling_Queue< test_item, ACT::wakeup_listener_allocated< ACT::Basic_Scheduler<> > > queue_type ;
 typedef queue_type::pointer pointer ;
 
 using namespace ACT ;
