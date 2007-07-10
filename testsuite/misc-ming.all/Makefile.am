@@ -144,6 +144,8 @@ check_PROGRAMS = \
 	key_event_test2runner \
 	key_event_test3 \
 	key_event_test3runner \
+	key_event_test4 \
+	key_event_test5 \
 	static_vs_dynamic1 \
 	static_vs_dynamic2 \
 	getTimer_test \
@@ -560,6 +562,18 @@ key_event_test3runner_DEPENDENCIES = \
 	key_event_test3.swf \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
+
+key_event_test4_SOURCES = key_event_test4.c
+key_event_test4_LDADD = libgnashmingutils.la
+
+key_event_test4.swf: key_event_test4
+	./key_event_test4 $(top_srcdir)/testsuite/media
+
+key_event_test5_SOURCES = key_event_test5.c
+key_event_test5_LDADD = libgnashmingutils.la
+
+key_event_test5.swf: key_event_test5
+	./key_event_test5 $(top_srcdir)/testsuite/media
 
 place_object_test_SOURCES = place_object_test.c	
 place_object_test_LDADD = libgnashmingutils.la

@@ -1,5 +1,8 @@
 2007-07-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: add rules for building
+	  key_event_test4.swf and key_event_test5.swf - test *runners* still
+	  missing.
 	* server/movie_root.{cpp,h}: mark key listeners as reachable.
 	* server/asobj/Key.{cpp,h}: mark key listeners as reachable.
 
