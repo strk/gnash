@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.16 2007/07/01 10:54:33 bjacques Exp $ */
+/* $Id: button_character_def.cpp,v 1.17 2007/07/10 16:16:00 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -107,14 +107,23 @@ button_record::read(stream* in, int tag_type,
 
 	// Get character definition now (safer)
 	m_character_def = m->get_character_def(m_character_id);
+
 	// If no character with given ID is found in the movie
 	// definition, we print an error, but keep parsing.
 	if ( ! m_character_def )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("button record refer to "
+		log_swferror(_("   button record refer to "
 			"character with id %d, which is not found "
 			"in the chars dictionary"), m_character_id);
+		);
+	}
+	else
+	{
+		IF_VERBOSE_PARSE(
+		log_parse(_("   button record for states %x contain "
+			"character %d (%s)"), flags, m_character_id,
+		        typeName(*m_character_def).c_str());
 		);
 	}
 

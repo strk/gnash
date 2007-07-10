@@ -1,5 +1,7 @@
 2007-07-10 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/button_character_def.cpp: verbose button_record
+	  parsing.
 	* libbase/utility.h (typeName): arg by *const* ref.
 
 2007-07-10 Timothy Lee <timothy.lee@siriushk.com>
