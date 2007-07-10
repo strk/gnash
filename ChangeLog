@@ -1,5 +1,11 @@
 2007-07-10 Sandro Santilli <strk@keybit.net>
 
+	* server/: as_environment.cpp, character.cpp,
+	  sprite_instance.cpp: properly evaluate _level#
+	  path components.
+
+2007-07-10 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (CommonGetUrl): implement _level loading.
 	  Fixes bug #19968.
 	* server/movie_root.{cpp,h}: add loadLevel() method, store levels in

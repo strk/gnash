@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.81 2007/07/01 10:54:19 bjacques Exp $ */
+/* $Id: as_environment.cpp,v 1.82 2007/07/11 00:16:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -140,9 +140,16 @@ as_environment::get_variable_raw(
     }
 
     // Check built-in constants.
-    if (varname == "_root" || varname == "_level0") {
+    if (varname == "_root") 
+    { 
 	if ( retTarget ) *retTarget = NULL; // correct ??
 	return as_value(m_target->get_root_movie());
+    }
+    else if (varname.compare(0, 6, "_level") == 0 && varname.find_first_not_of("0123456789", 7) == string::npos )
+    {
+       if ( retTarget ) *retTarget = NULL; // correct ??
+       unsigned int levelno = atoi(varname.c_str()+6);
+       return VM::get().getRoot().getLevel(levelno).get();
     }
 
     VM& vm = VM::get();

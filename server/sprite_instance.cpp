@@ -1825,11 +1825,19 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 		val->set_as_object( VM::get().getRoot().get_root_movie() );
 		return true;
 	}
-	if ( name == "_level0" )
+	if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == string::npos )
 	{
-		// TODO: handle _level# (any level)
-		val->set_as_object( VM::get().getRoot().get_root_movie() );
-		return true;
+		unsigned int levelno = atoi(name.c_str()+6);
+		movie_instance* mo = VM::get().getRoot().getLevel(levelno).get();
+		if ( mo )
+		{
+			val->set_as_object(mo);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	if ( name == "this" )
 	{

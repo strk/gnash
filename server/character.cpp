@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.45 2007/07/09 13:00:04 strk Exp $ */
+/* $Id: character.cpp,v 1.46 2007/07/11 00:16:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -179,10 +179,14 @@ character::get_relative_target_common(const std::string& name)
 		}
 		return parent;
 	}
-	else if (name == "_level0"
-	     || name == "_root")
+	else if (name == "_root")
 	{
 		return get_root_movie();
+	}
+	else if (name.compare(0, 6, "_level") == 0 && name.find_first_not_of("0123456789", 7) == string::npos )
+	{
+		unsigned int levelno = atoi(name.c_str()+6);
+		return VM::get().getRoot().getLevel(levelno).get();
 	}
 
 	return NULL;
