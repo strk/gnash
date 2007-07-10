@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.66 2007/07/10 21:06:29 strk Exp $ */
+/* $Id: movie_root.h,v 1.67 2007/07/10 23:48:42 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -87,10 +87,21 @@
 namespace gnash {
 	class ExecutableCode; // for ActionQueue
 	class Stage;
+	class URL;
 }
 
 namespace gnash
 {
+
+struct DepthComparator
+{
+	typedef boost::intrusive_ptr<sprite_instance> LevelMovie;
+
+	bool operator() (const LevelMovie& d1, const LevelMovie& d2)
+	{
+		return d1->get_depth() < d2->get_depth();
+	}
+};
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 class KeyListener{
@@ -178,18 +189,32 @@ public:
 	/// @param movie
 	///	The movie_instance to wrap.
 	///	Will be stored in an intrusive_ptr.
+	///	Must have a depth of 0.
 	///
 	void setRootMovie(movie_instance* movie);
 
 	/// Return the movie at the given level (0 if unloaded level).
+	//
+	/// POST CONDITIONS:
+	///	- The returned character has a depth equal to 'num'
+	///
 	boost::intrusive_ptr<movie_instance> getLevel(unsigned int num) const;
 
-	/// Put the given movie at the given level 
+	/// Load movie at the specified URL in the given level 
 	//
 	/// Note that the display viewport will be updated to reflect
 	/// the new layout.
 	///
-	void setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie);
+	/// @param num
+	///	The level number to load into.
+	///
+	/// @param url
+	///	The url to load the movie from.
+	///	Can contain a query string, which would be parsed.
+	///
+	/// @return false on error, true on success
+	///
+	bool loadLevel(unsigned int num, const URL& url);
 
 	/// @@ should this delegate to _level0?  probably !
 	void set_member(
@@ -298,7 +323,7 @@ public:
 	sprite_instance* get_root_movie()
 	{
 		if ( _movies.empty() ) return NULL;
-		return _movies[0].get();
+		return getLevel(0).get();
 	}
 
 	void stop_drag()
@@ -623,7 +648,12 @@ private:
 	/// to avoid having to replicate all of the base class
 	/// interface to the movie_instance class definition
 	///
-	typedef std::vector< boost::intrusive_ptr<sprite_instance> > Levels;
+	/// TODO: use a different container, to allow for _level0 and _level100
+	///       to exist while just taking 2 elements in the container.
+	///       Appropriate container could be list, set or map (order is important)
+	///
+	typedef boost::intrusive_ptr<sprite_instance> LevelMovie;
+	typedef std::map<unsigned int, LevelMovie> Levels;
 	Levels _movies;
 
 	/// This function should return TRUE iff any action triggered
@@ -659,6 +689,18 @@ private:
 	// Advance a given level
 	void advanceMovie(boost::intrusive_ptr<sprite_instance> movie, float delta_time);
 
+	/// Put the given movie at the given level 
+	//
+	/// Note that the display viewport will be updated to reflect
+	/// the new layout.
+	///
+	/// @param movie
+	///	The movie_instance to store at the given level.
+	///	Will be stored in an intrusive_ptr.
+	///	It's depth will be set to <num> and it's name to
+	///	_level<num>
+	///
+	void setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie);
 };
 
 

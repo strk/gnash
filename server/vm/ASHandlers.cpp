@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.111 2007/07/07 03:37:29 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.112 2007/07/10 23:48:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1774,12 +1774,6 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	if ( ! target.is_undefined() && ! target.is_null() )
 	{
 		target_string = target.to_string(&env);
-		if ( target_string.substr(0, 6) == "_level" )
-		{
-			// Might set loadTargetFlag to true, but _level# would likely not
-			// be resolved anyway
-			log_unimpl(_("GetUrl with target %s unsupported"), target_string.c_str());
-		}
 	}
 
 	// If the url starts with "FSCommand:", then this is
@@ -1827,7 +1821,13 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	log_msg(_("get url: target=%s, url=%s (%s), method=%x"), target_string.c_str(),
 		url.str().c_str(), url_c, method);
 
-	if ( loadTargetFlag )
+	if ( target_string.compare(0, 6, "_level") == 0 && target_string.find_first_not_of("0123456789", 7) == string::npos )
+	{
+		unsigned int levelno = atoi(target_string.c_str()+6);
+		log_debug(_("Testing _level loading (level %u)"), levelno);
+		VM::get().getRoot().loadLevel(levelno, url);
+	}
+	else if ( loadTargetFlag )
 	{
 		character* target_ch = env.find_target(target);
 		if ( ! target_ch )

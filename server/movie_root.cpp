@@ -31,6 +31,7 @@
 #include "ExecutableCode.h"
 #include "Stage.h"
 #include "utility.h"
+#include "URL.h"
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
   #include "action.h"
 #endif
@@ -104,13 +105,19 @@ movie_root::setRootMovie(movie_instance* movie)
 	setLevel(0, movie);
 }
 
+/* private */
 void
 movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie)
 {
 	assert(movie != NULL);
+	assert(static_cast<unsigned int>(movie->get_depth()) == num);
 
-	if ( _movies.size() < num+1 ) _movies.resize(num+1);
-	_movies[num] = movie;
+	//movie->setLevel(num)
+	//movie->set_depth(num);
+	//movie->set_name(ss.str().c_str());
+
+	//if ( _movies.size() < num+1 ) _movies.resize(num+1);
+	_movies[num] = movie; // [num] = movie;
 
 	movie->set_invalidated();
 	
@@ -121,15 +128,49 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 	assert(testInvariant());
 }
 
+bool
+movie_root::loadLevel(unsigned int num, const URL& url)
+{
+	boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
+	if (md == NULL)
+	{
+		log_error(_("can't create movie_definition for %s"),
+			url.str().c_str());
+		return false;
+	}
+
+	boost::intrusive_ptr<movie_instance> extern_movie;
+	extern_movie = md->create_movie_instance();
+	if (extern_movie == NULL)
+	{
+		log_error(_("can't create extern movie_instance "
+			"for %s"), url.str().c_str());
+		return false;
+	}
+
+	// Parse query string
+	sprite_instance::VariableMap vars;
+	url.parse_querystring(url.querystring(), vars);
+	extern_movie->setVariables(vars);
+
+	character* ch = extern_movie.get();
+	ch->set_depth(num);
+
+	save_extern_movie(extern_movie.get());
+
+	setLevel(num, extern_movie);
+
+	return true;
+}
+
 boost::intrusive_ptr<movie_instance>
 movie_root::getLevel(unsigned int num) const
 {
-	if ( _movies.size() < num+1 ) return 0;
-	else
-	{
-		assert(boost::dynamic_pointer_cast<movie_instance>(_movies[num]));
-		return boost::static_pointer_cast<movie_instance>(_movies[num]);
-	}
+	Levels::const_iterator i = _movies.find(num);
+	if ( i == _movies.end() ) return 0;
+
+	assert(boost::dynamic_pointer_cast<movie_instance>(i->second));
+	return boost::static_pointer_cast<movie_instance>(i->second);
 }
 
 void
@@ -137,7 +178,7 @@ movie_root::restart()
 {
 	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
-		(*i)->restart();
+		i->second->restart();
 	}
 }
 
@@ -146,7 +187,7 @@ movie_root::clear_invalidated()
 {
 	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
-		(*i)->clear_invalidated();
+		i->second->clear_invalidated();
 	}
 }
 
@@ -636,7 +677,7 @@ movie_root::display()
 
 	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
-		boost::intrusive_ptr<sprite_instance> movie = *i;
+		boost::intrusive_ptr<sprite_instance> movie = i->second;
 
 		movie->clear_invalidated();
 
@@ -966,7 +1007,7 @@ movie_root::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
 {
 	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{
-		(*i)->add_invalidated_bounds(ranges, force);
+		i->second->add_invalidated_bounds(ranges, force);
 	}
 }
 
@@ -1072,7 +1113,7 @@ movie_root::markReachableResources() const
 	// TODO: mark all levels !!
 	for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{
-		(*i)->setReachable();
+		i->second->setReachable();
 	}
 
 	// Mark mouse entities 
@@ -1115,7 +1156,7 @@ movie_root::getTopmostMouseEntity(float x, float y)
 {
 	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{
-		character* ret = (*i)->get_topmost_mouse_entity(x, y);
+		character* ret = i->second->get_topmost_mouse_entity(x, y);
 		if ( ret ) return ret;
 	}
 	return NULL;
@@ -1124,9 +1165,12 @@ movie_root::getTopmostMouseEntity(float x, float y)
 void
 movie_root::advanceAllLevels(float delta_time)
 {
-	for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+	// scan a backup copy of the levels, so that movies advancement won't
+	// invalidate iterators
+	Levels cached = _movies;
+	for (Levels::reverse_iterator i=cached.rbegin(), e=cached.rend(); i!=e; ++i)
 	{
-		advanceMovie(*i, delta_time);
+		advanceMovie(i->second, delta_time);
 	}
 }
 
