@@ -675,6 +675,17 @@ movie_root::display()
 
 	assert(testInvariant());
 
+	// should we cache this ? it's immutable after all !
+	const rect& frame_size = getLevel(0)->get_frame_size();
+
+	render::begin_display(
+		m_background_color,
+		m_viewport_x0, m_viewport_y0,
+		m_viewport_width, m_viewport_height,
+		frame_size.get_x_min(), frame_size.get_x_max(),
+		frame_size.get_y_min(), frame_size.get_y_max());
+
+
 	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
 	{
 		boost::intrusive_ptr<sprite_instance> movie = i->second;
@@ -683,23 +694,20 @@ movie_root::display()
 
 		if (movie->get_visible() == false) continue;
 
-		// should we cache this ? it's immutable after all !
-		const rect& frame_size = movie->get_frame_size();
-
 		// null frame size ? don't display !
-		if ( frame_size.is_null() ) continue;
+		const rect& sub_frame_size = movie->get_frame_size();
 
-		render::begin_display(
-			m_background_color,
-			m_viewport_x0, m_viewport_y0,
-			m_viewport_width, m_viewport_height,
-			frame_size.get_x_min(), frame_size.get_x_max(),
-			frame_size.get_y_min(), frame_size.get_y_max());
+		if ( frame_size.is_null() )
+		{
+			log_debug("_level%u has null frame size, skipping", i->first);
+			continue;
+		}
 
 		movie->display();
 
-		render::end_display();
 	}
+
+	render::end_display();
 }
 
 
