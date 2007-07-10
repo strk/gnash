@@ -357,10 +357,7 @@ button_character_instance::on_event(const event_id& id)
 
 	bool called = false;
 
-	sprite_instance* parent = get_parent()->to_movie();
-	assert ( parent );
-
-	// Add appropriate actions to the movie's execute list...
+	// Add appropriate actions to the global action list ...
 	// TODO: should we execute immediately instead ?
 	for (size_t i = 0, ie=m_def->m_button_actions.size(); i<ie; ++i)
 	{
@@ -374,7 +371,6 @@ button_character_instance::on_event(const event_id& id)
 			for (size_t j=0, je=ba.m_actions.size(); j<je; ++j)
 			{
 				VM::get().getRoot().pushAction(*(ba.m_actions[j]), boost::intrusive_ptr<character>(this));
-				//parent->add_action_buffer(ba.m_actions[j]);
 			}
 			called = true;
 		}

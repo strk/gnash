@@ -1,5 +1,7 @@
 2007-07-10 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.cpp (on_event): don't require a
+	  button's parent to be a sprite. Fixes bug #20436.
 	* server/parser/button_character_def.cpp: verbose button_record
 	  parsing.
 	* libbase/utility.h (typeName): arg by *const* ref.
