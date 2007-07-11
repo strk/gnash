@@ -345,57 +345,6 @@ DSOEXPORT void	gnashInit();
 /// called on them.
 ///
 DSOEXPORT void	clear();
-
-//
-// Library management
-//
-	
-// Font library control.  gnash is able to substitute fonts
-// from the font library, in case a movie lacks glyphs for a
-// declared font.  This would come into play since in recent
-// versions of SWF, the movie is allowed to use "system
-// fonts".  E.g. it can declare a font named "Arial", but not
-// provide glyphs for it, and then the OS is expected to
-// provide the font or a suitable replacement.
-//
-// gnash does not try to handle this automatically; if your
-// host program wants to emulate this behavior, it needs to
-// load a movie that includes glyph info for the standard
-// fonts you want, and then explicitly pull those fonts out of
-// the movie_def and add them to fontlib.
-//
-// @@ TODO: not all public APIs to enable this are in place
-// yet!  Need md::get_font_count()/get_font(), and
-// fontlib::add_font().
-//
-// Otherwise, text written in a font with no glyphs just
-// doesn't render at all.  (@@ Hm, should probably render it
-// as boxes or something?)
-
-class font;	
-namespace fontlib
-{
-// Controls how large to render textured glyphs.
-// Applies to fonts processed *after* this call only.
-// The "nominal" size is perhaps around twice the
-// average glyph height.
-void	set_nominal_glyph_pixel_size(int pixel_size);
-
-// For accessing the fonts in the library.
-void	clear();
-int	get_font_count();
-font*	get_font(int index);
-font*	get_font(const char* name);
-const char*	get_font_name(const font* f);
-
-// @@ also need to add color controls (or just set the diffuse color
-// in the API?), perhaps matrix xform, and maybe spacing, etc.
-//
-// // For direct text rendering from the host app.
-void	draw_string(const font* f, float x, float y, float size, const char* text);
-// void	draw_string(const font* f, float x, float y, float size, const wchar_t* text);	// wide-char version
-}
-	
 	
 
 //

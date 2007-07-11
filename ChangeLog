@@ -1,5 +1,10 @@
 2007-07-10 Sandro Santilli <strk@keybit.net>
 
+	* server/: fontlib.h, gnash.h: move fontlib namespace
+	  declaration where it belong.
+
+2007-07-10 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp (display): fix calls to
 	  begin_display/end_display. Fixes playback of multi-level movies.
 	* testsuite/swfdec/PASSING: three more tests succeed (name
