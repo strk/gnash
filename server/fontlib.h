@@ -99,6 +99,9 @@ namespace fontlib {
 
 	font*	get_font(const char* name);
 
+	/// Return a default device font.
+	boost::intrusive_ptr<font> get_default_font();
+
 	const char*	get_font_name(const font* f);
 
 	// @@ also need to add color controls (or just set the diffuse color

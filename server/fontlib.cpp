@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.30 2007/06/23 12:34:32 bjacques Exp $ */
+/* $Id: fontlib.cpp,v 1.31 2007/07/11 16:16:51 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -21,10 +21,16 @@
 #include "render.h"
 #include "movie_definition.h"
 
+// Define to the name of a default font.
+#define DEFAULT_FONT_NAME "_sans"
 
 namespace gnash {
 namespace fontlib {
+
+namespace {
 	std::vector< boost::intrusive_ptr<font> >	s_fonts;
+	boost::intrusive_ptr<font> _defaultFont;
+}
 
 	// Size (in TWIPS) of the box that the glyph should
 	// stay within.
@@ -1220,7 +1226,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 					log_error("invalid glyph index %d in cached font data, limit is %d, font is '%s'\n",
 						  glyph_index,
 						  fnt->get_glyph_count(),
-						  fnt->get_name());
+						  fnt->get_name().c_str());
 				}
 				else
 				{
@@ -1244,6 +1250,13 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 		s_fonts.clear();
 	}
 
+boost::intrusive_ptr<font>
+get_default_font()
+{
+	if ( _defaultFont ) return _defaultFont;
+	_defaultFont = new font(DEFAULT_FONT_NAME);
+	return _defaultFont;
+}
 
 	int	get_font_count()
 	// Return the number of fonts in our library.
@@ -1264,7 +1277,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 	}
 
 
-	font*	get_font(const char* name)
+	font*	get_font(const std::string& name)
 	// Return the named font.
 	{
 		// Dumb linear search.
@@ -1273,7 +1286,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 			font*	f = s_fonts[i].get();
 			if (f != NULL)
 			{
-				if (strcmp(f->get_name(), name) == 0)
+				if (f->get_name() == name)
 				{
 					return f;
 				}
@@ -1281,19 +1294,6 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 		}
 		return NULL;
 	}
-			
-
-	const char*	get_font_name(const font* f)
-	// Return the name of the given font.  (This basically exists
-	// so that font* can be opaque to the host app).
-	{
-		if (f == NULL)
-		{
-			return "<null>";
-		}
-		return f->get_name();
-	}
-
 
 	void	add_font(font* f)
 	// Add the given font to our library.

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.72 2007/07/03 01:12:44 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.73 2007/07/11 16:16:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -352,7 +352,9 @@ edit_text_character::edit_text_character(character* parent,
 	set_prototype(getTextFieldInterface());
 
 	// WARNING! remember to set the font *before* setting text value!
-	set_font( m_def->get_font() );
+	const font* definedFont = m_def->get_font();
+	if ( definedFont ) set_font( m_def->get_font() );
+	else set_font( fontlib::get_default_font().get() );
 
 	// set default text *before* calling registerTextVariable
 	// (if the textvariable already exist and has a value
@@ -927,48 +929,6 @@ edit_text_character::format_text()
 		return;
 	}
 
-#if 0 // device fonts has an unknown (unless we scan them) number of glyphs
-	// @@ mostly for debugging
-	// Font substitution -- if the font has no
-	// glyphs, try some other defined font!
-	if (_font->get_glyph_count() == 0)
-	{
-
-		// Find a better font.
-		const font*	newfont = _font;
-		for (int i = 0, n = fontlib::get_font_count(); i < n; i++)
-		{
-			font*	f = fontlib::get_font(i);
-			assert(f);
-
-			if (f->get_glyph_count() > 0)
-			{
-				// This one looks good.
-				newfont = f;
-				break;
-			}
-		}
-
-		if (_font != newfont)
-		{
-			log_error(_("substituting font!  font '%s' has "
-				  "no glyphs, using font '%s'"),
-				  fontlib::get_font_name(_font),
-				  fontlib::get_font_name(newfont)
-			);
-
-			_font = newfont;
-		}
-		else
-		{
-			log_error(_("Current font has no glyphs and I couldn't"
-				  " find another font with glyphs... :("));
-		}
-
-	}
-#endif
-
-
 	float	scale = m_def->get_font_height() / 1024.0f;	// the EM square is 1024 x 1024
 
 	text_glyph_record	rec;	// one to work on
@@ -1115,7 +1075,7 @@ edit_text_character::format_text()
 					    " Make sure character shapes for font %s are being exported "
 					    "into your SWF file."),
 					    __PRETTY_FUNCTION__,
-					    _font->get_name());
+					    _font->get_name().c_str());
 				);
 			}
 			else
@@ -1155,7 +1115,7 @@ edit_text_character::format_text()
 						"into your SWF file"),
 						__PRETTY_FUNCTION__,
 						code,
-						_font->get_name()
+						_font->get_name().c_str()
 				    );
 			    }
 

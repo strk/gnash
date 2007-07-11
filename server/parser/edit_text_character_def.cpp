@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character_def.cpp,v 1.10 2007/07/01 10:54:34 bjacques Exp $ */
+/* $Id: edit_text_character_def.cpp,v 1.11 2007/07/11 16:16:51 strk Exp $ */
 
 // Based on the public domain text.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -118,7 +118,8 @@ edit_text_character_def::get_font()
 		m_font = m_root_def->get_font(m_font_id);
 		if (m_font == NULL)
 		{
-			log_error(_("error: text style with undefined font; font_id = %d"), m_font_id);
+			// this is fine, the textfield would use a default device font
+			log_debug(_("text style with undefined font; font_id = %d"), m_font_id);
 		}
 	}
 

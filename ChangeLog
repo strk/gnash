@@ -1,3 +1,15 @@
+2007-07-11 Sandro Santilli <strk@keybit.net>
+
+	* server/font.{cpp,h}: Store name by std::string
+	  rather then by char*, Provide a constructor for
+	  device-only font.
+	* server/fontlib.{cpp,h}: Add a get_default_font.
+	* server/edit_text_character.cpp: Use the default
+	  font if no font is specified in the definition.
+	* server/parser/edit_text_character_def.cpp: not having
+	  a font in the definition isn't an error, turn it into
+	  a debugging message instead.
+
 2007-07-11 Timothy Lee <timothy.lee@siriushk.com>
 
 	* backend/render_handler_cairo.cpp: correct scaling and offset

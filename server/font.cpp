@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.41 2007/07/01 10:54:22 bjacques Exp $ */
+/* $Id: font.cpp,v 1.42 2007/07/11 16:16:51 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -36,7 +36,7 @@ namespace gnash {
 	font::font()
 		:
 		m_texture_glyph_nominal_size(96),	// Default is not important; gets overridden during glyph generation
-		m_name(NULL),
+		m_name(),
 		m_owning_movie(NULL),
 		m_unicode_chars(false),
 		m_shift_jis_chars(false),
@@ -50,12 +50,32 @@ namespace gnash {
 	{
 	}
 
+	font::font(const std::string& name)
+		:
+		m_texture_glyph_nominal_size(96),	// Default is not important; gets overridden during glyph generation
+		m_name(name),
+		m_owning_movie(NULL),
+		m_unicode_chars(false),
+		m_shift_jis_chars(false),
+		m_ansi_chars(true),
+		m_is_italic(false),
+		m_is_bold(false),
+		m_wide_codes(false),
+		m_ascent(0.0f),
+		m_descent(0.0f),
+		m_leading(0.0f)
+	{
+		assert(!m_name.empty());
+
+		if ( ! initDeviceFontProvider() )
+		{
+			log_error(_("Could not initialize device font face '%s'"), m_name.c_str());
+		}
+	}
+
 	font::~font()
 	{
 		m_glyphs.resize(0); // there's no need for this !
-
-		// Delete the name string.
-		delete [] m_name;
 	}
 
 	shape_character_def*	font::get_glyph(int index) const
@@ -131,9 +151,9 @@ namespace gnash {
 			readDefineFont2_or_3(in, m);
 		}
 
-		if ( m_name && ! initDeviceFontProvider() )
+		if ( ! m_name.empty() && ! initDeviceFontProvider() )
 		{
-			log_error("Could not initialize device font face '%s'", m_name);
+			log_error("Could not initialize device font face '%s'", m_name.c_str());
 		}
 	}
 
@@ -213,7 +233,12 @@ namespace gnash {
 		// Inhibit compiler warning.
 		reserved = reserved;
 
-		m_name = in->read_string_with_length();
+		char* name = in->read_string_with_length();
+		if ( name )
+		{
+			m_name = name;
+			delete [] name;
+		}
 
 		uint16_t glyph_count = in->read_u16();
 		
@@ -385,9 +410,16 @@ namespace gnash {
 			}
 		}
 
-		delete [] m_name;
-		
-		m_name = in->read_string_with_length();
+		char* name = in->read_string_with_length();
+		if ( name )
+		{
+			m_name = name;
+			delete [] name;
+		}
+		else
+		{
+			m_name.clear();
+		}
 
 		unsigned char	flags = in->read_u8();
 
@@ -575,7 +607,7 @@ namespace gnash {
 		{
 			log_error("Could not create shape "
 					"glyph for character code %u (%c) with "
-					"device font %s (%p)", code, code, m_name,
+					"device font %s (%p)", code, code, m_name.c_str(),
 					_ftProvider.get());
 			return -1;
 		}
@@ -603,16 +635,16 @@ namespace gnash {
 	bool
 	font::initDeviceFontProvider()
 	{
-		if ( ! m_name )
+		if ( m_name.empty() )
 		{
 			log_error("No name associated with this font, can't use device fonts (should I use a default one?)");
 			return false;
 		}
 
-		_ftProvider = FreetypeGlyphsProvider::createFace(m_name, m_is_bold, m_is_italic);
+		_ftProvider = FreetypeGlyphsProvider::createFace(m_name.c_str(), m_is_bold, m_is_italic);
 		if ( ! _ftProvider.get() )
 		{
-			log_error("Could not create a freetype face %s", m_name);
+			log_error("Could not create a freetype face %s", m_name.c_str());
 			return false;
 		}
 		return true;

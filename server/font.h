@@ -121,6 +121,10 @@ namespace gnash {
 	{
 	public:
 		font();
+
+		// Create a device-font only font, using the given name to find it
+		font(const std::string& name);
+
 		~font();
 
 		// override from resource.
@@ -133,7 +137,7 @@ namespace gnash {
 			if (m_texture_glyphs.size() != m_advance_table.size())
 			{
 				log_error("Font '%s': Number of texture glyphs: %lu, advance records: %lu",
-						m_name,
+						m_name.c_str(),
 						static_cast<unsigned long>(m_texture_glyphs.size()),
 						static_cast<unsigned long>(m_advance_table.size()));
 				abort();
@@ -191,7 +195,7 @@ namespace gnash {
 		void	wipe_texture_glyphs();
 
 		/// Get name of this font. Warning: can be NULL.
-		const char*	get_name() const { return m_name; }
+		const std::string& get_name() const { return m_name; }
 
 		/// Return the movie_definition "owning" this font
 		movie_definition* get_owning_movie() const { return m_owning_movie; }
@@ -263,7 +267,7 @@ namespace gnash {
 
 		int	m_texture_glyph_nominal_size;
 
-		char*	m_name;
+		std::string	m_name;
 		movie_definition*	m_owning_movie;
 
 		bool	m_has_layout;
