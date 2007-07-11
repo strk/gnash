@@ -2043,13 +2043,19 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
 {
 	matrix txt_matrix;
 
-	// Do I need the smart_ptr.here ?
+	// Create a definition (TODO: cleanup this thing, definitions should be immutable!)
 	boost::intrusive_ptr<edit_text_character_def> txt = new edit_text_character_def(get_movie_definition());
-	boost::intrusive_ptr<character> txt_char = txt->create_character_instance(this, 0);
 
-	// TODO: where to write width and height info ?
-	UNUSED(width);
-	UNUSED(height);
+	// Set textfield bounds
+	txt->set_bounds(rect(0, 0, PIXELS_TO_TWIPS(width), PIXELS_TO_TWIPS(height)));
+
+	// Set font height (shouldn't be dependent on font ?)
+	// TODO: 10 pixels is an arbitrary number here...
+	txt->set_font_height(10*20);
+
+
+	// Create an instance
+	boost::intrusive_ptr<character> txt_char = txt->create_character_instance(this, 0);
 
 	// Give name and mark as dynamic
 	txt_char->set_name(name.c_str());
@@ -2068,13 +2074,6 @@ sprite_instance::add_textfield(const std::string& name, int depth, float x, floa
 		txt_matrix,
 		0,
 		character::noClipDepthValue);
-
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_unimpl("%s unfinished", __PRETTY_FUNCTION__);
-		warned = true;
-	}
 
 	return txt_char;
 }

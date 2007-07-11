@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.73 2007/07/11 16:16:51 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.74 2007/07/11 16:52:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -352,9 +352,7 @@ edit_text_character::edit_text_character(character* parent,
 	set_prototype(getTextFieldInterface());
 
 	// WARNING! remember to set the font *before* setting text value!
-	const font* definedFont = m_def->get_font();
-	if ( definedFont ) set_font( m_def->get_font() );
-	else set_font( fontlib::get_default_font().get() );
+	set_font( m_def->get_font() );
 
 	// set default text *before* calling registerTextVariable
 	// (if the textvariable already exist and has a value
@@ -398,7 +396,7 @@ edit_text_character::show_cursor()
 void
 edit_text_character::display()
 {
-//		GNASH_REPORT_FUNCTION;
+	//GNASH_REPORT_FUNCTION;
 
 	registerTextVariable();
 

@@ -133,6 +133,16 @@ public:
 		return m_rect;
 	}
 
+	/// Set boundaries of this textfield
+	//
+	/// This method is used for dynamic textfields
+	/// (actionscript created)
+	///
+	void set_bounds(const rect& bounds)
+	{
+		m_rect = bounds;
+	}
+
 	/// Get right margin in twips
 	uint16_t get_right_margin() const {
 		return m_right_margin;
@@ -152,6 +162,14 @@ public:
 	// @@ what if has_font is false ??
 	uint16_t get_font_height() const {
 		return m_text_height;
+	}
+
+	/// Set height of font  in twips.
+	// 
+	/// Used by dynamically created textfields.
+	///
+	void set_font_height(uint16_t h) {
+		m_text_height = h;
 	}
 
 	/// Get font.

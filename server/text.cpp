@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.32 2007/07/01 10:54:25 bjacques Exp $ */
+/* $Id: text.cpp,v 1.33 2007/07/11 16:52:47 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -76,7 +76,7 @@ namespace gnash {
 		// root_def was used to resove fonts, now done at parse time
 		movie_definition* /*root_def*/)
 	{
-//		GNASH_REPORT_FUNCTION;
+		//GNASH_REPORT_FUNCTION;
 		
 		static std::vector<fill_style>	s_dummy_style;	// used to pass a color on to shape_character::display()
 		static std::vector<line_style>	s_dummy_line_style;
@@ -110,6 +110,9 @@ namespace gnash {
 			const font*	fnt = rec.m_style.m_font;
 			if (fnt == NULL)
 			{
+#ifdef GNASH_DEBUG_TEXT_RENDERING
+				log_debug("No font in style of record %u", i);
+#endif
 				continue;
 			}
 
@@ -119,6 +122,10 @@ namespace gnash {
 				* 1024.0f
 				/ 20.0f
 				* pixel_scale;
+
+#ifdef GNASH_DEBUG_TEXT_RENDERING
+			log_debug("text_screen_height for record %u == %g", i, text_screen_height);
+#endif
 
 			int	nominal_glyph_height = fnt->get_texture_glyph_nominal_size();
 			float	max_glyph_height = fontlib::get_texture_glyph_max_height(fnt);

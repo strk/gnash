@@ -1,5 +1,16 @@
 2007-07-11 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (remove the "default" font logic,
+	  leave that to edit_text_character_def instead).
+	* server/sprite_instance.cpp (add_textfield): finish implementation,
+	  use an hard-coded 10 pixel of font height.
+	* server/text.cpp: more debugging (when activated)
+	* server/parser/edit_text_character_def.{cpp,h}: add set_bounds
+	  and set_font_height for dynamic textfields, use a default font
+	  when none is specified or the one specified is not found.
+
+2007-07-11 Sandro Santilli <strk@keybit.net>
+
 	* server/font.{cpp,h}: Store name by std::string
 	  rather then by char*, Provide a constructor for
 	  device-only font.
