@@ -2,7 +2,8 @@
 
 	* backend/render_handler_cairo.cpp: correct scaling and offset
 	  in video rendering. Optimize RGB data conversion as suggested
-	  by John Gilmore.
+	  by John Gilmore. Fix a bug in rgba_to_cairo_argb32(), which
+	  incremented only 3 instead of 4 bytes per pixel.
 
 2007-07-11 Udo Giacomozzi <udo.gnu@nova-sys.net>
 

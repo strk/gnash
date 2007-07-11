@@ -25,7 +25,7 @@ static cairo_t* g_cr_output = 0;
 static cairo_t* g_cr = 0;
 
 
-// Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
+// Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
 static void
 rgb_to_cairo_rgb24(uint8_t* dst, const image::rgb* im)
 {
@@ -50,7 +50,7 @@ rgba_to_cairo_argb32(uint8_t* dst, const image::rgba* im)
     for (int y = 0;  y < im->m_height;  y++)
     {
 	const uint8_t* src = image::scanline(im, y);
-	for (int x = 0;  x < im->m_width;  x++, src += 3)
+	for (int x = 0;  x < im->m_width;  x++, src += 4)
 	{
 	    // 32-bit ARGB data in native endian format
 	    *dst32++ = (src[0] << 24) | (src[1] << 16) | (src[2] << 8) | src[3];
