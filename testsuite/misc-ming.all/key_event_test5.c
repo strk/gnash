@@ -110,7 +110,7 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(obj)", "'undefined'"); 
   check_equals(mo, "typeof(objRef)", "'undefined'"); 
   
-  add_actions(mo, "stop(); total();");
+  add_actions(mo, "stop(); totals();");
   SWFMovie_nextFrame(mo);  
   
   //Output movie

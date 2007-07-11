@@ -1,3 +1,10 @@
+2007-07-11 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/key_event_test4.c, key_event_test5.c: call totals()
+	  instead of total() to give a final report, the later one is an undefined function.
+	* testsuite/misc-ming.all/key_event_test5runner.c: add comments why Gnash fails, 
+	  it forgets to do the case conversion, a big bug!
+	  
 2007-07-10 Sandro Santilli <strk@keybit.net>
 
 	* server/: fontlib.h, gnash.h: move fontlib namespace

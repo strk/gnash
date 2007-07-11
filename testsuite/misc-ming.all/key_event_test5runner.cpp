@@ -50,7 +50,8 @@ main(int /*argc*/, char** /*argv*/)
   tester.advance();
   
   as_value tmp;
-  // ???, can not find 'hasKeyPressed'?
+  // Gnash fails because it forget to do the case conversion.
+  // A big old bug!
   xcheck(root->get_member("hasKeyPressed", &tmp));
   check_equals(tmp.to_number(), 0.0);
   
@@ -66,7 +67,8 @@ main(int /*argc*/, char** /*argv*/)
   }
   check_equals(root->get_current_frame(), 8);
   
-  // ???, can not find 'hasKeyPressed'?
+  // Gnash fails because it forget to do the case conversion.
+  // A big old bug!
   xcheck(root->get_member("hasKeyPressed", &tmp));
   xcheck_equals(tmp.to_number(), 1.0);
   

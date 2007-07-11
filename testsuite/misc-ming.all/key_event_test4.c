@@ -71,7 +71,7 @@ main(int argc, char** argv)
                   " { "
                   "   check_equals(thisPtr, _level0.clip); "   
                   " } "
-                  " total();  stop(); ");
+                  " totals();  stop(); ");
   SWFMovie_nextFrame(mo);  
   
   //Output movie
