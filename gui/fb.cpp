@@ -49,6 +49,10 @@
 # include <sys/stat.h>
 # include <fcntl.h>
 #endif
+
+// workaround until we agree that log_error does not rely on -v switch
+#define fatal_error printf  
+
 //--
 
 
@@ -186,7 +190,7 @@ bool FBGui::init(int /*argc*/, char *** /*argv*/)
   // Open the framebuffer device
   fd = open("/dev/fb0", O_RDWR);
   if (fd<0) {
-    log_error("Could not open framebuffer device: %s", strerror(errno));
+    fatal_error("Could not open framebuffer device: %s", strerror(errno));
     return false;
   }
   
@@ -265,7 +269,7 @@ bool FBGui::initialize_renderer() {
   if (pixelformat) {    
     agg_handler = create_render_handler_agg(pixelformat);      
   } else {
-    log_error("The pixel format of your framebuffer is not supported.");
+    fatal_error("The pixel format of your framebuffer is not supported.");
     return false;
   }
 

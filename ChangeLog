@@ -1,3 +1,8 @@
+2007-07-04 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/fb.cpp: print fatal error messages to stdout (workaround),
+	  fixes bug #20012 	
+
 2007-07-11 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/actionscript.all/case.as: add a testcase for testing 
