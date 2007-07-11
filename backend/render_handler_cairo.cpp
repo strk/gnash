@@ -25,19 +25,35 @@ static cairo_t* g_cr_output = 0;
 static cairo_t* g_cr = 0;
 
 
-// Converts from RGB image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
+// Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_RGB24 format
 static void
 rgb_to_cairo_rgb24(uint8_t* dst, const image::rgb* im)
 {
+    uint32_t* dst32 = reinterpret_cast<uint32_t*>(dst);
     for (int y = 0;  y < im->m_height;  y++)
     {
 	const uint8_t* src = image::scanline(im, y);
 	for (int x = 0;  x < im->m_width;  x++, src += 3)
 	{
-	    *dst++ = src[2]; 	// blue
-	    *dst++ = src[1]; 	// green
-	    *dst++ = src[0];	// red
-	    *dst++;		// alpha not used
+	    // 32-bit RGB data in native endian format
+	    *dst32++ = (src[0] << 16) | (src[1] << 8) | src[2];
+	}
+    }
+}
+
+
+// Converts from RGBA image to 32-bit pixels in CAIRO_FORMAT_ARGB32 format
+static void
+rgba_to_cairo_argb32(uint8_t* dst, const image::rgba* im)
+{
+    uint32_t* dst32 = reinterpret_cast<uint32_t*>(dst);
+    for (int y = 0;  y < im->m_height;  y++)
+    {
+	const uint8_t* src = image::scanline(im, y);
+	for (int x = 0;  x < im->m_width;  x++, src += 3)
+	{
+	    // 32-bit ARGB data in native endian format
+	    *dst32++ = (src[0] << 24) | (src[1] << 16) | (src[2] << 8) | src[3];
 	}
     }
 }
@@ -605,17 +621,26 @@ public:
 	    int         w = frame->m_width;
 	    int         h = frame->m_height;
 
-	    // Compute video object size relative to bounding rectangle
-	    double w_scale = w / bounds->width();
-	    double h_scale = h / bounds->height();
+	    // Compute bounding rectangle size relative to video object
+	    double w_scale = bounds->width()  / w;
+	    double h_scale = bounds->height() / h;
 
-	    // Prepare transformation matrix for RGB frame
+	    // Fit video to bounding rectangle
 	    cairo_matrix_t mat;
-	    cairo_matrix_init(&mat,
+	    cairo_matrix_init_scale(&mat, w_scale, h_scale);
+	    cairo_matrix_translate(&mat,
+		bounds->get_x_min(), bounds->get_y_min());
+
+	    // Now apply transformation to video
+	    cairo_matrix_t frame_mat;
+	    cairo_matrix_init(&frame_mat,
 		m->m_[0][0], m->m_[1][0],
 		m->m_[0][1], m->m_[1][1],
 		m->m_[0][2], m->m_[1][2]);
-	    cairo_matrix_scale(&mat, w_scale, h_scale);
+	    cairo_matrix_multiply(&mat, &mat, &frame_mat);
+
+	    // Inverse the matrix for pattern space
+	    cairo_matrix_invert(&mat);
 
 	    // Convert RGB frame to cairo format
 	    int buf_size = w * h * 4;
@@ -631,7 +656,7 @@ public:
 	    cairo_surface_t* surface = cairo_image_surface_create_for_data(
 		m_video_buffer, CAIRO_FORMAT_RGB24, w, h, w * 4);
 	    cairo_pattern_t* pattern = cairo_pattern_create_for_surface(surface);
-	    cairo_pattern_set_extend(pattern, CAIRO_EXTEND_REPEAT);
+	    cairo_pattern_set_extend(pattern, CAIRO_EXTEND_NONE);
 	    cairo_pattern_set_matrix(pattern, &mat);
 
 	    // Draw the frame now
@@ -716,20 +741,7 @@ bitmap_info_cairo::bitmap_info_cairo(image::rgba* im)
     // Allocate output buffer
     int buf_size = im->m_width * im->m_height * 4;
     m_buffer = new unsigned char[buf_size];
-
-    // Convert BGRA data to ARGB
-    unsigned char* dst = m_buffer;
-    for (int y = 0;  y < im->m_height;  y++)
-    {
-	uint8_t* src = image::scanline(im, y);
-	for (int x = 0;  x < im->m_width;  x++, src += 4)
-	{
-	    *dst++ = src[3]; 	// blue
-	    *dst++ = src[2]; 	// green
-	    *dst++ = src[1];	// red
-	    *dst++ = src[0]; 	// alpha
-	}
-    }
+    rgba_to_cairo_argb32(m_buffer, im);
 
     // Create the image
     m_original_width  = im->m_width;

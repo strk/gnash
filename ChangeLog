@@ -1,4 +1,10 @@
-2007-07-04 Udo Giacomozzi <udo.gnu@nova-sys.net>
+2007-07-11 Timothy Lee <timothy.lee@siriushk.com>
+
+	* backend/render_handler_cairo.cpp: correct scaling and offset
+	  in video rendering. Optimize RGB data conversion as suggested
+	  by John Gilmore.
+
+2007-07-11 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/fb.cpp: print fatal error messages to stdout (workaround),
 	  fixes bug #20012 	
