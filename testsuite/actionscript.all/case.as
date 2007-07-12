@@ -36,8 +36,13 @@ check_equals(OBJ.xyz, 100);
 
 #if OUTPUT_VERSION == 6
 // createEmptyMovieClip is supported with swf > 5
+// 
+// create _root.mc0 and _root.mc0.mc1
+// 
 _ROOT.createEmptyMovieClip("mC0", 3);
 check_equals(typeof(mc0), 'movieclip');
+mC0.createEmptyMovieClip("mC1", 3);
+check_equals(typeof(mc0.mc1), 'movieclip');
 
 #ifdef MING_SUPPORTS_ASM
 asm{
@@ -46,7 +51,16 @@ asm{
      push 100
      setproperty
 };
+// check setproperty
 xcheck_equals(mC0._X, 100);
+
+//
+// check _name and _target, they still keep the case
+// 
+check_equals(mC0._name, "mC0");
+check_equals(mC0._target, "/mC0");
+check_equals(mC0.mC1._name, "mC1");
+check_equals(mC0.mC1._target, "/mC0/mC1");
 #endif  // MING_SUPPORTS_ASM
 #endif  // OUTPUT_VERSION == 6
 
