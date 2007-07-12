@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.354 2007/07/08 13:53:37 martinwguy Exp $
+dnl $Id: configure.ac,v 1.355 2007/07/12 09:31:50 martinwguy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1265,7 +1265,7 @@ echo ""
 echo "Configured paths for ${build} are:"
 
 if test x"$docbook" = x"yes"; then
-  echo "        DocBook document processing enabled"
+  echo '        DocBook document processing enabled (for "make html" and "make pdf")'
   if test x"$docbook_styles" != x; then
     echo "        Docbook styles sheets in $docbook_styles"
   fi

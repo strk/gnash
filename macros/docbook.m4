@@ -16,7 +16,7 @@ dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 AC_DEFUN([GNASH_DOCBOOK], [
 
-  AC_ARG_ENABLE(docbook, AC_HELP_STRING([--enable-docbook], [Enable support for building documentation]),
+  AC_ARG_ENABLE(docbook, AC_HELP_STRING([--enable-docbook], [Enable support for building documentation with "make html" and "make pdf"]),
   [case "${enableval}" in
     yes) docbook=yes ;;
     no)  docbook=no ;;

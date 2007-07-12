@@ -1,12 +1,21 @@
+2007-07-12 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac,macros/docbook.m4,:
+	  Document "make pdf and "make html" commands near --enable-docbook
+	* doc/C/usermanual/installation/feature_configuration.xml:
+	  document --enable-docbook configuration flag.
+
 2007-07-12 Zou Lunkai <zoulunkai@gmail.com>
 
-	* testsuite/actionscript.all/case.as: add tests for _name and _target, they
-	are not converted to lower case with swf6.
+	* testsuite/actionscript.all/case.as: add tests for _name and _target,
+	  they are not converted to lower case with swf6.
 
 2007-07-12 Zou Lunkai <zoulunkai@gmail.com>
 
-	* testsuite/actionscript.all/case.as: add macros for version dependent tests.
-	* testsuite/actionscript.all/Makefile.am: activate enumerate.as and case.as.
+	* testsuite/actionscript.all/case.as: add macros for version dependent
+	  tests.
+	* testsuite/actionscript.all/Makefile.am: activate enumerate.as and
+	  case.as.
 
 2007-07-11 Sandro Santilli <strk@keybit.net>
 

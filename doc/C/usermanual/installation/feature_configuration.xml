@@ -50,6 +50,16 @@ selected.  The default is FFMPEG with SDL sound.
   </varlistentry>
 
   <varlistentry>
+    <term>--enable-docbook</term>
+    <listitem>
+      <para>
+        Enable the generation of html and pdf versions of the documentation
+	from the XML. You will then be able to use "make html" and "make pdf".
+      </para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
     <term>--enable-embedded</term>
     <listitem>
       <para>
