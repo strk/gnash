@@ -1,10 +1,12 @@
+#include "check.as"
+
 class Test extends MovieClip
 {
 
 	// constructor
 	function Test()
 	{
-		_root.note("Test constructor called");
+		note("Test constructor called");
 	}
 
 	// Override MovieClip.lineTo
@@ -14,9 +16,9 @@ class Test extends MovieClip
 
 	function test_proto_ext()
 	{
-		_root.note("This is "+this);
+		note("This is "+this);
 		Function.prototype.make = function() { return true; };
-		_root.check(arguments.callee.make());
+		check(arguments.callee.make());
 	}
 
 	function test_laszlo_core()
@@ -29,30 +31,30 @@ class Test extends MovieClip
 		B.prototype = new A();
 
 		B.prototype.test = function () {
-			_root.check( this.constructor.prototype.constructor.prototype.test() );
+			check( this.constructor.prototype.constructor.prototype.test() );
 		}
 
 		var binst = new B();
-		_root.check_equals(typeof(binst), 'object');
-		_root.check_equals(typeof(binst.test), 'function');
-		_root.note("test_laszlo_core called");
+		check_equals(typeof(binst), 'object');
+		check_equals(typeof(binst.test), 'function');
+		note("test_laszlo_core called");
 		binst.test();
 	}
 
 	function test_all()
 	{
-		_root.check_equals(typeof(this.loadMovie), 'function');
-		_root.check_equals(this.loadMovie, super.loadMovie);
-		_root.check(this.lineTo != super.lineTo); // overridden
-		_root.check_equals(typeof(this.test_laszlo_core), 'function');
-		_root.check_equals(typeof(this.test_proto_ext), 'function');
+		check_equals(typeof(this.loadMovie), 'function');
+		check_equals(this.loadMovie, super.loadMovie);
+		check(this.lineTo != super.lineTo); // overridden
+		check_equals(typeof(this.test_laszlo_core), 'function');
+		check_equals(typeof(this.test_proto_ext), 'function');
 		this.test_laszlo_core();
-		_root.check_equals(typeof(this.test_laszlo_core), 'function');
-		_root.check_equals(typeof(this.test_proto_ext), 'function');
+		check_equals(typeof(this.test_laszlo_core), 'function');
+		check_equals(typeof(this.test_proto_ext), 'function');
 		this.test_proto_ext();
-		_root.check_equals(typeof(this.test_laszlo_core), 'function');
-		_root.check_equals(typeof(this.test_proto_ext), 'function');
-		_root.note("This is "+this);
+		check_equals(typeof(this.test_laszlo_core), 'function');
+		check_equals(typeof(this.test_proto_ext), 'function');
+		note("This is "+this);
 
 	}
 
@@ -60,6 +62,8 @@ class Test extends MovieClip
 	{
 		var myTest = new Test;
 		myTest.test_all();
+
+                Dejagnu.done();
 	}
 
 }

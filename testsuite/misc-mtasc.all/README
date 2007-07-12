@@ -5,14 +5,14 @@ of new tests.
 Requirements
 ------------
 
-In order to use the Dejagnu.swf facilities, which have been developed to
-get the same results with both the proprietary player and Gnash (one
-of the problems being embedding fonts) Ming's makeswf utility is used
-to embed the Dejagnu.swf file into the MTASC output.
-All of this is transparent to the user, except that the final SWF version
-might be different then the expected one (until we fix this).
-
-You'll need Ming version 0.4.0.beta3 or higher in order for this to work.
+There is a standalone Dejagnu.as class which provides all the Dejagnu.swf
+facilities. In addition, there is a check.as file which should be included
+in your main .as file, which lets you write
+  check_equals(a,b);
+instead of
+  Dejagnu.check_equals(a,b);
+In addition, it will automatically pass in the filename & line number, so
+that on failure this will get printed out.
 
 How to add a new test
 ---------------------
@@ -22,10 +22,12 @@ filename to the ASTEST variable in the Makefile.am file. Also, remember
 to add any accessory file (additional classes) to the EXTRA_DIST variable,
 so they are properly distributed.
 
-Once you've done so, 'make <yourtestname>.swf' should produce the swf for you,
-with the Dejagnu.swf file already embedded. You can play this movie with any
-player (including the proprietary one) to confirm it passes all checks contained
-in it.
+If your test needs to compile additional SWFs, but they should not be run on
+their own, add the .as files for the additional swfs to AUXMOVIES.
+
+Once you've done so, 'make <yourtestname>.swf' should produce the swf for you
+You can play this movie with any player (including the proprietary one) to 
+confirm it passes all checks contained in it.
 
 Running 'make check' should run all tests, including your new one.
 
@@ -35,8 +37,8 @@ How to write checks
 Take a look at the existing .as files to see how you can use the Dejagnu.swf facilities.
 Basically, you'd be calling the functions:
 
-	_root.check( expression );
-	_root.check_equals( expression, expected ); // uses equality operator ==
+	check( expression );
+	check_equals( expression, expected ); // uses equality operator ==
 
 Or the corresponding versions expecting failures (xcheck, xcheck_equals).
 For more info see the gnash manual in the Testing/Dejagnu.swf section.

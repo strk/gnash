@@ -20,37 +20,42 @@ AUTOMAKE_OPTIONS = dejagnu
 
 if ENABLE_MTASC
 
-# NOTE: 0.4.0.beta3 is required for prebuilt-clip to work (PREBUILT_CLIPS) !!
-if ENABLE_MING
-if MAKESWF_SUPPORTS_PREBUILT_CLIPS
+MTASC_FLAGS = -version 6 -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
+MTASC_CPP = $(CPP) -P -I$(srcdir)
 
-DEJAGNU_SO_PATH = ../Dejagnu.swf
-DEJAGNU_SO_FINI = $(srcdir)/../actionscript.all/dejagnu_so_fini.as
-MTASC_FLAGS= -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
-
+# These will get executed and parsed for test output
 ASTESTS = \
 	hello.as \
 	inheritance.as \
 	function.as \
 	enum.as \
+	levels.as \
 	$(NULL)
 
-EXTRA_DIST = $(ASTESTS) TestClass.as 
+# These will get compiled to SWFs just as above, but will not be executed as a test
+# They are for secondary movies to be loaded by the above tests.
+AUXMOVIES = \
+	    level5.as \
+	    level99.as \
+	    $(NULL)
 
+EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as check.h Dejagnu.as
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)
+
+AUXMOVIES_OUT = $(AUXMOVIES:.as=.swf)
 
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	alltests-runner
 
-alltests-runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_OUT)
-	sh $< $(top_builddir) $(ASTESTS_OUT) > $@
+alltests-runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_OUT) $(AUXMOVIES_OUT)
+	sh $< -r 50 $(top_builddir) $(ASTESTS_OUT) > $@
 	chmod 755 $@
 
 .as.swf:
-	$(MTASC) $(MTASC_FLAGS) -swf mtasc-$@ -main $<
-	$(MAKESWF) -o $@ $(DEJAGNU_SO_PATH) mtasc-$@  $(DEJAGNU_SO_FINI)
+	cat $< | $(MTASC_CPP) - > $(@:%.swf=pp_%.as) 
+	$(MTASC) $(MTASC_FLAGS) -swf $@ -main $(@:%.swf=pp_%.as)
 
 CLEANFILES =  \
 	gnash-dbg.log \
@@ -59,6 +64,7 @@ CLEANFILES =  \
 	testrun.* \
 	*.swf \
 	*.pp \
+	pp_*.as \
 	*_testrunner \
 	*_Runner
 
@@ -80,6 +86,4 @@ site-update: site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
 
-endif
-endif
 endif

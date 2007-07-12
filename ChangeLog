@@ -1,3 +1,11 @@
+2007-07-12 davr <drorex@gmail.com>
+
+	* testsuite/misc-mtasc.all/: Dejagnu.as, Makefile.am,
+	  README, TestClass.as, check.as, enum.as, function.as, hello.as,
+	  inheritance.as, level5.as, level99.as, levels.as:
+	  Reorganized MTASC framework to avoid hackish use of Ming, and using
+	  the new dynamic textfield support. Added test for _level loading.
+
 2007-07-12 Martin Guy <martinwguy@yahoo.it>
 
 	* configure.ac,macros/docbook.m4,:
