@@ -47,8 +47,7 @@ asm{
      setproperty
 };
 xcheck_equals(mC0._X, 100);
-#endif
-
-#endif
+#endif  // MING_SUPPORTS_ASM
+#endif  // OUTPUT_VERSION == 6
 
 #endif  // OUTPUT_VERSION > 5
