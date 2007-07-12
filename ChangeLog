@@ -1,5 +1,7 @@
 2007-07-12 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/libbase/Makefile.am: gnash libs must be in LDADD, not
+	  AM_LDFLAGS, for dependencies to work fine.
 	* server/font.cpp (get_advance): fix passing non-POD type to
 	  printf-like function.
 	* libbase/rc.{cpp,h}: make the constructor and destructor private.
