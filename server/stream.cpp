@@ -312,10 +312,6 @@ namespace gnash {
 		{
 			log_error("Could not seek to end position");
 		}
-		else
-		{
-			assert(m_input->get_position() == end_pos);
-		}
 
 		m_unused_bits = 0;
 	}
