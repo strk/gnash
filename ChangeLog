@@ -1,3 +1,8 @@
+2007-07-12 Sandro Santilli <strk@keybit.net>
+
+	* libbase/rc.{cpp,h}: make the constructor and destructor private.
+	* testsuite/libbase/TCXXRc.cpp: use the default instance.
+
 2007-07-12 davr <drorex@gmail.com>
 
 	* testsuite/misc-mtasc.all/: Dejagnu.as, Makefile.am,

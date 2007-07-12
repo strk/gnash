@@ -73,7 +73,7 @@ TestState runtest;
 
 int
 main (int /*argc*/, char** /*argv*/) {
-    RcInitFile rc;
+    RcInitFile& rc = RcInitFile::getDefaultInstance();
 
     gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
     dbglogfile.setVerbosity();

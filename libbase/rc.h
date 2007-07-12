@@ -35,8 +35,6 @@ namespace gnash {
 class DSOEXPORT RcInitFile 
 {
 public:
-    RcInitFile();
-    ~RcInitFile();
 
     // Return the default instance of RC file,
     static RcInitFile& getDefaultInstance();
@@ -113,6 +111,12 @@ public:
     void dump();
     
 private:
+
+    /// Construct only by getDefaultInstance()
+    RcInitFile();
+
+    /// Never destry (TODO: add a destroyDefaultInstance)
+    ~RcInitFile();
 
     int  _delay;                // the timer delay
     bool _debug;                // enable debugging of this class

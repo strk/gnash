@@ -42,6 +42,8 @@ namespace gnash {
 RcInitFile&
 RcInitFile::getDefaultInstance()
 {
+	// TODO: allocate on the heap and provide a destroyDefaultInstance,
+	//       for finer control of destruction order
 	static RcInitFile rcfile;
 	return rcfile;
 }
