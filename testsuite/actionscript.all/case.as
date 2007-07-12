@@ -19,7 +19,7 @@
 /*
  *  Zou Lunkai, zoulunkai@gmail.com
  *
- *  Test case senstivity 
+ *  Test case sensitivity 
  */
 
 #include "check.as"
@@ -34,17 +34,21 @@ check_equals(ABCD, 100);
 check_equals(typeof(OBJ), 'object');
 check_equals(OBJ.xyz, 100);
 
+#if OUTPUT_VERSION == 6
+// createEmptyMovieClip is supported with swf > 5
 _ROOT.createEmptyMovieClip("mC0", 3);
 check_equals(typeof(mc0), 'movieclip');
 
 #ifdef MING_SUPPORTS_ASM
 asm{
-  push "/_ROOT/MC0/"
-  push 0.0
-  push 100
-  setproperty
+     push "/_ROOT/MC0/"
+     push 0.0
+     push 100
+     setproperty
 };
 xcheck_equals(mC0._X, 100);
+#endif
+
 #endif
 
 #endif  // OUTPUT_VERSION > 5

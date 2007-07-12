@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.73 2007/07/01 10:54:39 bjacques Exp $
+# $Id: Makefile.am,v 1.74 2007/07/12 01:51:06 zoulunkai Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -107,6 +107,8 @@ ASTESTS =			\
 	rtmp.as 		\
 	XMLNode.as		\
 	LocalConnection.as	\
+	enumerate.as		\
+	case.as			\
 	$(NULL)
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)
