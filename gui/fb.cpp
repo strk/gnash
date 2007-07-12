@@ -50,8 +50,20 @@
 # include <fcntl.h>
 #endif
 
-// workaround until we agree that log_error does not rely on -v switch
-#define fatal_error printf  
+// workaround until fatal_error() is implemented
+// that is not silent without -v switch
+//
+// The do { } while (0) strangeness here is the only general way to get a
+// compound statement that is lexically equivalent to a single one. Example:
+//   #define foo() { this(); that(); }
+//   if (a) foo();
+//   else bar();
+// would become
+//   if (a) { this(); that() ; } ; else bar()
+// which is a syntax error.
+
+#define fatal_error(args ...) \
+	do { fprintf(stderr, args); putc('\n', stderr); } while(0)
 
 //--
 

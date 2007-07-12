@@ -4,6 +4,7 @@
 	  Document "make pdf and "make html" commands near --enable-docbook
 	* doc/C/usermanual/installation/feature_configuration.xml:
 	  document --enable-docbook configuration flag.
+	* fb/gui.cpp: Add newline to end of fatal messages.
 
 2007-07-12 Zou Lunkai <zoulunkai@gmail.com>
 
