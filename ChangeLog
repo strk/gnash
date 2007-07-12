@@ -1,5 +1,7 @@
 2007-07-12 Sandro Santilli <strk@keybit.net>
 
+	* server/font.cpp (get_advance): fix passing non-POD type to
+	  printf-like function.
 	* libbase/rc.{cpp,h}: make the constructor and destructor private.
 	* testsuite/libbase/TCXXRc.cpp: use the default instance.
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.42 2007/07/11 16:16:51 strk Exp $ */
+/* $Id: font.cpp,v 1.43 2007/07/12 23:05:56 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -511,7 +511,7 @@ namespace gnash {
 			{
 				s_logged = true;
 				IF_VERBOSE_MALFORMED_SWF(
-				log_swferror(_("empty advance table in font %s"), get_name());
+				log_swferror(_("empty advance table in font %s"), get_name().c_str());
 				);
 			}
 			return 0;
