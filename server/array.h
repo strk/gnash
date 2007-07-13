@@ -153,7 +153,7 @@ public:
 			const std::vector<as_value>& replacement);
 
 	/// Sort the array, using given values comparator
-	void sort(as_function& comparator, uint8_t flags=0);
+	void sort(as_function& comparator, boost::intrusive_ptr<as_object> this_ptr, uint8_t flags=0);
 
 	void sort(uint8_t flags=0);
 

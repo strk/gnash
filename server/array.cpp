@@ -28,6 +28,7 @@
 #include "as_function.h" // for sort user-defined comparator
 #include "fn_call.h"
 #include "GnashException.h"
+#include "action.h" // for call_method
 
 #include <string>
 #include <algorithm>
@@ -119,25 +120,28 @@ class AsValueFuncComparator
 {
 public:
 	as_function& _comp;
+	as_object* _object;
 
-	AsValueFuncComparator(as_function& comparator)
+	AsValueFuncComparator(as_function& comparator, boost::intrusive_ptr<as_object> this_ptr)
 		:
 		_comp(comparator)
 	{
+		_object = this_ptr.get();
 	}
 
 	bool operator() (const as_value& a, const as_value& b)
 	{
-		// Ugly, but I can't see another way to 
-		// provide fn_call a stack to work on
+		as_value cmp_method(&_comp);
 		as_environment env;
+		as_value ret(0);
+		int retval;
+
 		env.push(a);
 		env.push(b);
-
-		as_value ret(false); // bool value
-		fn_call fn(NULL, &env, 2, 0);
-		ret = _comp(fn);
-		return ( ret.to_bool() );
+		ret = call_method(cmp_method, &env, _object, 2, 1);
+		retval = (int)ret.to_number();
+		if (retval > 0) return true;
+		return false;
 	}
 };
 
@@ -492,7 +496,7 @@ as_array_object::sort(uint8_t flags)
 }
 
 void
-as_array_object::sort(as_function& comparator, uint8_t flags)
+as_array_object::sort(as_function& comparator, boost::intrusive_ptr<as_object> this_ptr, uint8_t flags)
 {
 
 	// use sorted_index to use this flag
@@ -501,7 +505,7 @@ as_array_object::sort(as_function& comparator, uint8_t flags)
 	// Other flags are simply NOT used
 	// (or are them ? the descending one could be!)
 	std::sort(elements.begin(), elements.end(),
-		AsValueFuncComparator(comparator));
+		AsValueFuncComparator(comparator, this_ptr));
 
 }
 
@@ -577,25 +581,36 @@ array_sort(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_array_object> array = ensureType<as_array_object>(fn.this_ptr);
 
-	uint8_t flags;
+	uint8_t flags = 0;
 
-	if ( fn.nargs == 1 && fn.arg(0).is_number() )
+	if ( fn.nargs == 0 )
+	{
+		array->sort(flags);
+	}
+	else if ( fn.nargs == 1 && fn.arg(0).is_number() )
 	{
 		flags=static_cast<uint8_t>(fn.arg(0).to_number());
+		array->sort(flags);
 	}
-	else if ( fn.nargs == 0 )
+	else if ( fn.arg(0).is_as_function() )
 	{
-		flags=0;
+		// Get comparison function
+		as_function* as_func = fn.arg(0).to_as_function();
+	
+		if ( fn.nargs == 2 && fn.arg(1).is_number() )
+		{
+			flags=static_cast<uint8_t>(fn.arg(1).to_number());
+		}
+		array->sort(*as_func, fn.this_ptr, flags);
 	}
 	else
 	{
-		log_unimpl("Array.sort(comparator)");
-		return as_value();
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror(_("Sort called with invalid arguments."));
+		)
 	}
 
-	array->sort(flags);
 	return as_value(); // returns void
-
 }
 
 static as_value

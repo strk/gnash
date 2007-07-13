@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.19 2007/07/05 19:03:03 strk Exp $";
+rcsid="$Id: array.as,v 1.20 2007/07/13 01:13:46 strk Exp $";
 
 #include "check.as"
 
@@ -121,6 +121,21 @@ check_equals ( trysortarray.toString() , "alphabet,But,capitalization,Different"
 trysortarray.sort();
 check_equals ( trysortarray.toString() , "But,Different,alphabet,capitalization" );
 // TODO - test sort(Array.RETURNINDEXEDARRAY)
+
+// Test sorting using a custom comparison function
+function testCmp (x,y)
+{
+	// Gnash fails here by *requiring* a not-null 'this_ptr' in fn_call
+	xcheck_equals(typeof(this), 'undefined');
+
+	if (x.length < y.length) { return -1; }
+	if (x.length > y.length) { return 1; }
+	return 0;
+}
+
+check_equals ( trysortarray.toString() , "But,Different,alphabet,capitalization" );
+trysortarray.sort( testCmp );
+check_equals ( trysortarray.toString() , "But,alphabet,Different,capitalization" );
 
 popped=b.pop();
 check ( popped == 12 );

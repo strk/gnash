@@ -1,3 +1,12 @@
+2007-07-12 <meteoryte@yahoo.com.au>
+
+	Applied patch #6081
+	* server/array.{cpp,h}: fix user-defined comparator for sort()
+	  operation. There's a minor failure with definition of 'this'
+	  inside the comparator.
+	* testsuite/actionscript.all/array.as: add test for sort based
+	  on custom function.
+
 2007-07-12 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/libbase/Makefile.am: gnash libs must be in LDADD, not
