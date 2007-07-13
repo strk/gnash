@@ -109,7 +109,7 @@ main(int argc, char** argv)
   //Ming_setScale(20.0); /* so we talk twips */
  
   mo = newSWFMovie();
-  SWFMovie_setRate(mo, 12);
+  SWFMovie_setRate(mo, 1.0);
   SWFMovie_setDimension(mo, 800, 600);
   
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
@@ -148,15 +148,29 @@ main(int argc, char** argv)
   
   check_equals(mo, "typeof(dtext1)", "'object'");
   check_equals(mo, "typeof(dtext1.text)", "'string'");
+  xcheck_equals(mo, "typeof(dtext1.background)", "'boolean'");
+  xcheck_equals(mo, "typeof(dtext1.backgroundColor)", "'number'");
+  check_equals(mo, "typeof(dtext1.textColor)", "'number'");
+  check_equals(mo, "typeof(dtext1._alpha)", "'number'");
+  
   check_equals(mo, "typeof(dtext1.__proto__.text)", "'undefined'");
+  check_equals(mo, "typeof(dtext1.__proto__.background)", "'undefined'");
+  check_equals(mo, "typeof(dtext1.__proto__.backgroundColor)", "'undefined'");
+  check_equals(mo, "typeof(dtext1.__proto__.textColor)", "'undefined'");
+  check_equals(mo, "typeof(dtext1.__proto__.alpha)", "'undefined'");
   
   xcheck_equals(mo, "dtext1.hasOwnProperty('text')", "false");
   xcheck_equals(mo, "dtext1.hasOwnProperty('background')", "false");
   xcheck_equals(mo, "dtext1.hasOwnProperty('backgroundColor')", "false");
+  xcheck_equals(mo, "dtext1.hasOwnProperty('textColor')", "false");
+  xcheck_equals(mo, "dtext1.hasOwnProperty('_alpha')", "false");
   
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('text')", "true");
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('background')", "true");
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('backgroundColor')", "true");
+  xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('textColor')", "true");
+  // ???
+  xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('_alpha')", "false");
   
   check_equals(mo, "dtext1.text", "'Hello'");
   check_equals(mo, "etext1.text", "'Hello'");
@@ -167,6 +181,12 @@ main(int argc, char** argv)
   xcheck_equals(mo, "dtext1.backgroundColor", "0xffffff");
   xcheck_equals(mo, "etext1.backgroundColor", "0xffffff");
   xcheck_equals(mo, "dtext2.backgroundColor", "0xffffff");
+  xcheck_equals(mo, "dtext1.textColor", "0x000000");
+  xcheck_equals(mo, "etext1.textColor", "0x000000");
+  xcheck_equals(mo, "dtext2.textColor", "0x000000");
+  xcheck_equals(mo, "dtext1._alpha", "100");
+  xcheck_equals(mo, "etext1._alpha", "100");
+  xcheck_equals(mo, "dtext2._alpha", "100");
   
   add_actions(mo, "dtext1.background = true;"
                   "etext1.background = true;"
@@ -174,6 +194,9 @@ main(int argc, char** argv)
                   "dtext1.backgroundColor = 0xff0000;"
                   "etext1.backgroundColor = 0x00ff00;"
                   "dtext2.backgroundColor = 0x0000ff;"
+                  "dtext1.textColor = 0x00ffff;"
+                  "etext1.textColor = 0xff00ff;"
+                  "dtext2.textColor = 0xffff00;"
                   "dtext1.text += ' world';"
                   "etext1.text += ' world';"
                   "dtext2.text += ' world';" );
@@ -187,7 +210,14 @@ main(int argc, char** argv)
   check_equals(mo, "dtext1.backgroundColor", "0xff0000");
   check_equals(mo, "etext1.backgroundColor", "0x00ff00");
   check_equals(mo, "dtext2.backgroundColor", "0x0000ff");
+  xcheck_equals(mo, "dtext1.textColor", "0x00ffff");
+  xcheck_equals(mo, "etext1.textColor", "0xff00ff");
+  xcheck_equals(mo, "dtext2.textColor", "0xffff00");
+  SWFMovie_nextFrame(mo); 
   
+  add_actions(mo, "dtext1._alpha = 0;"
+                  "etext1._alpha = 0;"
+                  "dtext2._alpha = 0;" );
   add_actions(mo, "totals(); stop();");
   SWFMovie_nextFrame(mo); 
   /*****************************************************
