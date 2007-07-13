@@ -1,3 +1,8 @@
+2007-07-13 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/DefineEditTextTest.c:
+	  include dejagnuclip, make it to be a self-contained one.
+	  
 2007-07-12 <meteoryte@yahoo.com.au>
 
 	Applied patch #6081
