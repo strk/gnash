@@ -1,5 +1,13 @@
 2007-07-13 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (sprite_create_text_field): when
+	  targetting SWF8, return the newly created TextField.
+	* testsuite/actionscript.all/MovieClip.as: more successes.
+	* testsuite/actionscript.all/TextField.as: more successes; other fixes
+	  to expected results.
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/MovieClip.as: add notes about where we
 	  have been reported differences between proprietary player versions; 
 	  fix check for return code of createTextField for SWF8.

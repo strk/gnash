@@ -800,7 +800,8 @@ sprite_create_text_field(const fn_call& fn)
 			txt_depth, txt_x, txt_y, txt_width, txt_height);
 
 	// createTextField returns void, it seems
-	return as_value(); 
+	if ( VM::get().getSWFVersion() > 7 ) return as_value(txt.get());
+	else return as_value(); 
 }
 
 //getNextHighestDepth() : Number

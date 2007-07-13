@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.5 2007/07/13 20:23:28 strk Exp $";
+rcsid="$Id: TextField.as,v 1.6 2007/07/13 20:32:07 strk Exp $";
 
 #include "check.as"
 
@@ -101,8 +101,8 @@ ret = createTextField("tf", 99, 10, 10, 500, 500);
 #if OUTPUT_VERSION < 8
 check_equals(typeof(ret), 'undefined');
 #else
-xcheck_equals(typeof(ret), 'object');
-xcheck_equals(ret, _root.tf);
+check_equals(typeof(ret), 'object');
+check_equals(ret, _root.tf);
 #endif
 
 check_equals(typeof(tf), 'object');
@@ -197,7 +197,7 @@ tf._highquality = 1;
 check_equals(typeof(tf._height), 'number');
 check(!tf.hasOwnProperty('_height'));
 check(!tf.__proto__.hasOwnProperty('_height'));
-xcheck_equals(tf._height, 500); // as we created it, see createTextField call
+check_equals(tf._height, 500); // as we created it, see createTextField call
 tf._height = 99999;
 xcheck_equals(tf._height, 99999); 
 tf._height = 500;
@@ -483,7 +483,7 @@ tf._visible = true;
 check_equals(typeof(tf._width), 'number');
 check( ! tf.hasOwnProperty('_width') ); 
 check( ! tf.__proto__.hasOwnProperty('_width') ); 
-xcheck_equals(tf._width, 500); // as it was set by createTextField, see above
+check_equals(tf._width, 500); // as it was set by createTextField, see above
 tf._width = 99999;
 xcheck_equals(tf._width, 99999); 
 tf._width = 500;

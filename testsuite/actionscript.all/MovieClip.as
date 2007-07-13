@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.72 2007/07/13 20:23:28 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.73 2007/07/13 20:32:07 strk Exp $";
 
 #include "check.as"
 
@@ -551,8 +551,8 @@ t = createTextField("textfieldTest", 3, 0, 100, 100, 100);
 #if OUTPUT_VERSION < 8
 check_equals(typeof(t), 'undefined');
 #else
-xcheck_equals(typeof(t), 'object');
-xcheck_equals(t, _root.textfieldTest);
+check_equals(typeof(t), 'object');
+check_equals(t, _root.textfieldTest);
 #endif // OUTPUT_VERSION >= 8
 
 #if OUTPUT_VERSION > 5
