@@ -150,7 +150,10 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(dtext1.text)", "'string'");
   check_equals(mo, "typeof(dtext1.__proto__.text)", "'undefined'");
   
-
+  xcheck_equals(mo, "dtext1.hasOwnProperty('text')", "false");
+  xcheck_equals(mo, "dtext1.hasOwnProperty('background')", "false");
+  xcheck_equals(mo, "dtext1.hasOwnProperty('backgroundColor')", "false");
+  
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('text')", "true");
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('background')", "true");
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('backgroundColor')", "true");
