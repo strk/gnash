@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.73 2007/07/13 20:32:07 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.74 2007/07/13 20:40:32 strk Exp $";
 
 #include "check.as"
 
@@ -211,7 +211,6 @@ check_equals(mc.useHandCursor, false);
 check_equals(mc._alpha, 100);
 check(mc._currentframe != undefined);
 
-check_equals(mc._droptarget, "");
 if (typeof(mc._droptarget) != "string")
 {
 	fail("typeof(mc._droptarget) = "+typeof(mc._droptarget)+" (expected 'string') ["+__FILE__+":"+__LINE__+"]");

@@ -1,5 +1,11 @@
 2007-07-13 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (sprite_droptarget_getset): 
+	  Always return a string.
+	* testsuite/actionscript.all/MovieClip.as: fixed expected results.
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (sprite_create_text_field): when
 	  targetting SWF8, return the newly created TextField.
 	* testsuite/actionscript.all/MovieClip.as: more successes.

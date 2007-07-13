@@ -1370,14 +1370,8 @@ sprite_droptarget_getset(const fn_call& fn)
 	}
 
 	VM& vm = VM::get();
-	if ( vm.getSWFVersion() > 5 )
-	{
-		return as_value("");
-	} 
-	else
-	{
-		return as_value();
-	}
+	// NOTE: _droptarget should be set after startDrag() and stopDrag() calls
+	return as_value("");
 }
 
 static as_value
