@@ -1,5 +1,7 @@
 2007-07-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/CustomActions.as: add a note about why
+	  no tests are run.
 	* server/asobj/Mouse.cpp: fix case of addListener and removeListener
 	  methods, add TODO for fixing all.
 	* testsuite/actionscript.all/Mouse.as: fix the test (case issue, and

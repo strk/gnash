@@ -23,11 +23,16 @@
 
 // CustomActions is only intended foro use in the Flash authoring tool,
 // See http://sephiroth.it/reference.php?id=156&cat=1
-#if 0
 
-rcsid="$Id: CustomActions.as,v 1.8 2007/07/01 10:54:38 bjacques Exp $";
+rcsid="$Id: CustomActions.as,v 1.9 2007/07/13 20:04:16 strk Exp $";
 
 #include "check.as"
+
+note();
+note(' CustomActions is only intended foro use in the Flash authoring tool, so this file performs no tests');
+note(' See http://sephiroth.it/reference.php?id=156&cat=1');
+
+#if 0
 
 
 var customactionsObj = new CustomActions;
