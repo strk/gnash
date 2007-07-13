@@ -1,5 +1,9 @@
 2007-07-13 Zou Lunkai <zoulunkai@gmail.com>
 
+	* testsuite/misc-ming.all/DefineEditTextTest.c: more tests.
+	  	  
+2007-07-13 Zou Lunkai <zoulunkai@gmail.com>
+
 	* testsuite/misc-ming.all/DefineEditTextTest.c:
 	  include dejagnuclip, make it to be a self-contained one.
 	  

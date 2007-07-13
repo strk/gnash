@@ -145,8 +145,16 @@ main(int argc, char** argv)
     SWFDisplayItem_moveTo(it, 0, 400);
   }
   SWFMovie_nextFrame(mo); 
+  
+  check_equals(mo, "typeof(dtext1)", "'object'");
+  check_equals(mo, "typeof(dtext1.text)", "'string'");
+  check_equals(mo, "typeof(dtext1.__proto__.text)", "'undefined'");
+  
 
-
+  xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('text')", "true");
+  xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('background')", "true");
+  xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('backgroundColor')", "true");
+  
   check_equals(mo, "dtext1.text", "'Hello'");
   check_equals(mo, "etext1.text", "'Hello'");
   check_equals(mo, "dtext2.text", "'Hello'");
