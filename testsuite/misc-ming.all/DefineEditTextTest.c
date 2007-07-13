@@ -22,6 +22,8 @@
  * Uses both "embedded" font and device fonts.
  * The text written is 'Hello world' in both cases.
  * Text at the bottom is the one with embedded fonts.
+ * 
+ * TODO: add a testrunner for pixel checking.
  *
  * run as ./DefineEditTextTest
  */
@@ -169,7 +171,7 @@ main(int argc, char** argv)
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('background')", "true");
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('backgroundColor')", "true");
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('textColor')", "true");
-  // ???
+  // Why _alpha is special???
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('_alpha')", "false");
   
   check_equals(mo, "dtext1.text", "'Hello'");
@@ -218,6 +220,9 @@ main(int argc, char** argv)
   add_actions(mo, "dtext1._alpha = 0;"
                   "etext1._alpha = 0;"
                   "dtext2._alpha = 0;" );
+  check_equals(mo, "dtext1._alpha", "0");
+  check_equals(mo, "etext1._alpha", "0");
+  check_equals(mo, "dtext2._alpha", "0");
   add_actions(mo, "totals(); stop();");
   SWFMovie_nextFrame(mo); 
   /*****************************************************
