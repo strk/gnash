@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.71 2007/07/01 10:54:39 bjacques Exp $";
+rcsid="$Id: MovieClip.as,v 1.72 2007/07/13 20:23:28 strk Exp $";
 
 #include "check.as"
 
@@ -211,14 +211,16 @@ check_equals(mc.useHandCursor, false);
 check_equals(mc._alpha, 100);
 check(mc._currentframe != undefined);
 
-#if OUTPUT_VERSION > 5
 check_equals(mc._droptarget, "");
-check_equals(typeof(mc._droptarget), "string");
-#else
-//WARNING: we have player 9 succeeds on this, and also player 7 fails on this
-// don't know which one to trust.
-xcheck_equals(mc._droptarget, "");
-#endif
+if (typeof(mc._droptarget) != "string")
+{
+	fail("typeof(mc._droptarget) = "+typeof(mc._droptarget)+" (expected 'string') ["+__FILE__+":"+__LINE__+"]");
+	note(" WARNING: some players have been reported to evaluate _droptarget to undefined, rather then the empty string. Reguardless of SWF target.");
+}
+else
+{
+	pass("typeof(mc._droptarget) = "+typeof(mc._droptarget)+" ["+__FILE__+":"+__LINE__+"]");
+}
 
 check(mc._focusrect != undefined);
 check(mc._framesloaded != undefined);
@@ -487,8 +489,16 @@ asm {
 #if OUTPUT_VERSION > 5
 check_equals(a, "changed");
 #else
-// this check fails with Adobe Flash Player 9
-check_equals(a, undefined);
+if ( a == undefined )
+{
+	pass("<empty>._name (trough getProperty(13)) returns undefined ["+__FILE__+":"+__LINE__+"]");
+}
+else
+{
+	// this check fails with Adobe Flash Player 9
+	fail("<empty>._name (trough getProperty(13)) returns "+a+" (expected undefined) ["+__FILE__+":"+__LINE__+"]");
+	note("Some version of Adobe Flash Player 9 are reported to have this bug");
+}
 #endif
 
 asm {
@@ -510,8 +520,16 @@ asm {
 #if OUTPUT_VERSION > 5
 check_equals(a, "changed");
 #else
-// this check fails with Adobe Flash Player 9
-check_equals(a, undefined);
+if ( a == undefined )
+{
+	pass("_root._name (trough getProperty(13)) returns undefined ["+__FILE__+":"+__LINE__+"]");
+}
+else
+{
+	// this check fails with Adobe Flash Player 9
+	fail("_root._name (trough getProperty(13)) returns "+a+" (expected undefined) ["+__FILE__+":"+__LINE__+"]");
+	note("Some version of Adobe Flash Player 9 are reported to have this bug");
+}
 #endif
 
 asm {
@@ -530,7 +548,13 @@ check_equals(b, "/");
 //------------------------------------------------
 
 t = createTextField("textfieldTest", 3, 0, 100, 100, 100);
+#if OUTPUT_VERSION < 8
 check_equals(typeof(t), 'undefined');
+#else
+xcheck_equals(typeof(t), 'object');
+xcheck_equals(t, _root.textfieldTest);
+#endif // OUTPUT_VERSION >= 8
+
 #if OUTPUT_VERSION > 5
 check_equals(typeof(textfieldTest), 'object');
 check(textfieldTest instanceof TextField);

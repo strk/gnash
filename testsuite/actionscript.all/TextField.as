@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.4 2007/07/13 19:13:47 strk Exp $";
+rcsid="$Id: TextField.as,v 1.5 2007/07/13 20:23:28 strk Exp $";
 
 #include "check.as"
 
@@ -98,7 +98,12 @@ check_equals(typeof(tfObj.getFontList), 'undefined');
 //--------------------------------------------------
 
 ret = createTextField("tf", 99, 10, 10, 500, 500);
-check_equals(typeof(ref), 'undefined');
+#if OUTPUT_VERSION < 8
+check_equals(typeof(ret), 'undefined');
+#else
+xcheck_equals(typeof(ret), 'object');
+xcheck_equals(ret, _root.tf);
+#endif
 
 check_equals(typeof(tf), 'object');
 
@@ -520,7 +525,7 @@ currWidth = tf._width;
 tf._xscale = 200;
 note("textWidth: _xscale=100: "+currTextWidth+"; _xscale=200: "+tf.textWidth);
 // check_equals(tf.textWidth, currTextWidth*2); // not clear what does textWidth depend on
-check_equals(tf._width, currWidth*2);
+xcheck_equals(tf._width, currWidth*2);
 tf._xscale = 100;
 
 // Check TextField._y 
@@ -554,7 +559,7 @@ currHeight = tf._height;
 tf._yscale = 200;
 note("textHeight: _yscale=100: "+currTextHeight+"; _yscale=200: "+tf.textHeight);
 // check_equals(tf.textHeight, currTextHeight*2); // not clear what does textHeight depend on
-check_equals(tf._height, currHeight*2);
+xcheck_equals(tf._height, currHeight*2);
 tf._yscale = 100;
 
 

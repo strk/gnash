@@ -1,5 +1,14 @@
 2007-07-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: add notes about where we
+	  have been reported differences between proprietary player versions; 
+	  fix check for return code of createTextField for SWF8.
+	* testsuite/actionscript.all/TextField.as:
+	  fix check for return code of createTextField for SWF8;
+	  fix expected failures.
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/CustomActions.as: add a note about why
 	  no tests are run.
 	* server/asobj/Mouse.cpp: fix case of addListener and removeListener
