@@ -1,5 +1,12 @@
 2007-07-13 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Mouse.cpp: fix case of addListener and removeListener
+	  methods, add TODO for fixing all.
+	* testsuite/actionscript.all/Mouse.as: fix the test (case issue, and
+	  poor comparisons).
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/TextField.as: an hopefully complete
 	  testcase for the TextField class. Reveals a pattern in the
 	  TextField.prototype properties being created on first call to 

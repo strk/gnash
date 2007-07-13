@@ -39,9 +39,11 @@ as_value mouse_ctor(const fn_call& fn);
 static void
 attachMouseInterface(as_object& o)
 {
-	o.init_member("addlistener", new builtin_function(mouse_addlistener));
+	// TODO: Mouse is an object, not a constructor ! Attach these interface to
+	//       the singleton Mouse object then !
+	o.init_member("addListener", new builtin_function(mouse_addlistener));
 	o.init_member("hide", new builtin_function(mouse_hide));
-	o.init_member("removelistener", new builtin_function(mouse_removelistener));
+	o.init_member("removeListener", new builtin_function(mouse_removelistener));
 	o.init_member("show", new builtin_function(mouse_show));
 }
 
