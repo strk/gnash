@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.42 2007/07/01 10:53:47 bjacques Exp $ */
+/* $Id: render_handler.h,v 1.43 2007/07/13 16:05:08 strk Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -319,11 +319,21 @@ public:
 		
 	/// Bracket the displaying of a frame from a movie.
 	//
-	/// Fill the background color, and set up default
-	/// transforms, etc.
+	/// Set up to render a full frame from a movie and fills the
+	/// background.	Sets up necessary transforms, to scale the
+	/// movie to fit within the given dimensions.  Call
+	/// end_display() when you're done.
+	///
+	/// The rectangle (viewport_x0, viewport_y0, viewport_x0 +
+	/// viewport_width, viewport_y0 + viewport_height) defines the
+	/// window coordinates taken up by the movie.
+	///
+	/// The rectangle (x0, y0, x1, y1) defines the pixel
+	/// coordinates of the movie that correspond to the viewport
+	/// bounds.
 	///
 	virtual void	begin_display(
-		rgba background_color,
+		const rgba& background_color,
 		int viewport_x0, int viewport_y0,
 		int viewport_width, int viewport_height,
 		float x0, float x1, float y0, float y1) = 0;
@@ -340,7 +350,7 @@ public:
 	//
 	/// Can be used to draw empty boxes and cursors.
 	virtual void	draw_line_strip(const void* coords, int vertex_count,
-			const rgba color) = 0;
+			const rgba& color) = 0;
     
 	/// Draw a simple, solid filled polygon (no outline).
 	//
@@ -354,7 +364,7 @@ public:
 	/// add an additional vertex to close it.
 	///
 	virtual void  draw_poly(const point* corners, size_t corner_count, 
-		const rgba fill, const rgba outline) = 0;
+		const rgba& fill, const rgba& outline) = 0;
     
 		
 	/// Set line and fill styles for mesh & line_strip rendering.
@@ -375,7 +385,7 @@ public:
 		const bitmap_info*	bi,
 		const rect&		coords,
 		const rect&		uv_coords,
-		rgba			color) = 0;
+		const rgba&		color) = 0;
 		
 	virtual void	set_antialiased(bool enable) = 0;
 		
@@ -481,7 +491,7 @@ public:
 	/// @param pixel_scale
 	///
 	virtual void draw_glyph(shape_character_def *def, const matrix& mat,
-		rgba color, float pixel_scale) = 0;
+		const rgba& color, float pixel_scale) = 0;
     
 	/// The render handler can choose if it wishes to use textured glyphs 
 	/// (pre-computed bitmaps which are used for small text sizes) or if 

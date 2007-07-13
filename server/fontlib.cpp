@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.31 2007/07/11 16:16:51 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.32 2007/07/13 16:05:08 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -1312,7 +1312,7 @@ get_default_font()
 	}
 
 
-	void	draw_glyph(const matrix& mat, const texture_glyph& tg, rgba color, int nominal_glyph_height)
+	void	draw_glyph(const matrix& mat, const texture_glyph& tg, const rgba& color, int nominal_glyph_height)
 	// Draw the given texture glyph using the given transform, in
 	// the given color.
 	{

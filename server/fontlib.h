@@ -62,7 +62,7 @@ namespace fontlib {
 	void	add_font(font* f);
 
 	// For drawing a textured glyph w/ current render transforms.
-	void	draw_glyph(const matrix& m, const texture_glyph& g, rgba color, int nominal_glyph_height);
+	void	draw_glyph(const matrix& m, const texture_glyph& g, const rgba& color, int nominal_glyph_height);
 
 	// Return the pixel height of text, such that the
 	// texture glyphs are sampled 1-to-1 texels-to-pixels.

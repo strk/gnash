@@ -73,7 +73,7 @@ namespace gnash {
 
 		/// See render_handler::begin_display (in backend/render_handler.h)
 		void	begin_display(
-			rgba background_color,
+			const rgba& background_color,
 			int viewport_x0, int viewport_y0,
 			int viewport_width, int viewport_height,
 			float x0, float x1, float y0, float y1);
@@ -100,11 +100,11 @@ namespace gnash {
 
 		/// See render_handler::draw_line_strip (in backend/render_handler.h)
 		void	draw_line_strip(const int16_t coords[],
-				int vertex_count, const rgba color);
+				int vertex_count, const rgba& color);
 
 		/// See render_handler::draw_poly (in backend/render_handler.h)
 		void  draw_poly(const point* corners, int corner_count,
-				const rgba fill, const rgba outline);
+				const rgba& fill, const rgba& outline);
       
 		/// See render_handler::draw_shape_character (in backend/render_handler.h)
 		void draw_shape_character(shape_character_def *def,
@@ -112,7 +112,7 @@ namespace gnash {
       
 		/// See render_handler::draw_glyph (in backend/render_handler.h)
 		void draw_glyph(shape_character_def *def, const matrix& mat,
-				rgba color, float pixel_scale);
+				const rgba& color, float pixel_scale);
 
 		/// See render_handler::allow_glyph_textures (in backend/render_handler.h)
 		bool allow_glyph_textures();				
@@ -134,7 +134,7 @@ namespace gnash {
 		/// See render_handler::draw_bitmap (in backend/render_handler.h)
 		void	draw_bitmap(const matrix& m, const bitmap_info* bi,
 				const rect& coords,
-				const rect& uv_coords, rgba color);
+				const rect& uv_coords, const rgba& color);
 
 	}	// end namespace render
 

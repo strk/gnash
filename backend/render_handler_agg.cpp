@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.90 2007/07/01 10:53:47 bjacques Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.91 2007/07/13 16:05:08 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -630,7 +630,7 @@ public:
   
 
   void begin_display(
-  gnash::rgba background_color,
+  const gnash::rgba& background_color,
   int /*viewport_x0*/, int /*viewport_y0*/,
   int /*viewport_width*/, int /*viewport_height*/,
   float /*x0*/, float /*x1*/, float /*y0*/, float /*y1*/)
@@ -758,7 +758,7 @@ public:
   }
 
 
-  void  draw_line_strip(const void* coords, int vertex_count, const rgba color)
+  void  draw_line_strip(const void* coords, int vertex_count, const rgba& color)
   // Draw the line strip formed by the sequence of points.
   {
   
@@ -820,7 +820,7 @@ public:
   const gnash::bitmap_info* /*bi*/,
   const gnash::rect& /*coords*/,
   const gnash::rect& /*uv_coords*/,
-  gnash::rgba /*color*/)
+  const gnash::rgba& /*color*/)
   // Draw a rectangle textured with the given bitmap, with the
   // given color.  Apply given transform; ignore any currently
   // set transforms.
@@ -863,7 +863,7 @@ public:
 
 
   void draw_glyph(shape_character_def *def,
-      const matrix& mat, rgba color, float /*pixel_scale*/) {
+      const matrix& mat, const rgba& color, float /*pixel_scale*/) {
       
     // NOTE: def->get_bound() is NULL for glyphs so we can't check the 
     // clipping area (bounds_in_clipping_area):
@@ -1825,8 +1825,8 @@ public:
 
   
   /// Draws the given polygon.
-  void  draw_poly(const point* corners, size_t corner_count, const rgba fill, 
-    const rgba outline) {
+  void  draw_poly(const point* corners, size_t corner_count, const rgba& fill, 
+    const rgba& outline) {
     
     assert(m_pixf != NULL);
 

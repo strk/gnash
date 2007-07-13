@@ -1,5 +1,16 @@
 2007-07-13 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler.h, backend/render_handler_agg.cpp,
+	  backend/render_handler_cairo.cpp,
+	  backend/render_handler_ogl.cpp, backend/render_handler_tri.cpp,
+	  backend/render_handler_tri.h, server/fontlib.cpp,
+	  server/fontlib.h, server/render.cpp, server/render.h:
+	  Updated renderer interface to always take gnash::rgba by const ref
+	  rather then by value. Should improve performance (removes double
+	  copy of 4 float values for each glyph, bitmap, line strip!).
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/TextField.as:
 	  Add test for TextField.prototype.hasOwnProperty('background')
 	  returning false (weird, returns true in

@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.h,v 1.12 2007/07/03 05:46:02 strk Exp $ */
+/* $Id: render_handler_tri.h,v 1.13 2007/07/13 16:05:08 strk Exp $ */
 
 #ifndef GNASH_RENDER_HANDLER_TRI_H
 #define GNASH_RENDER_HANDLER_TRI_H
@@ -123,15 +123,15 @@ public:
 
   /// Triangulating render handlers do not need to support this special version
   /// of draw_line_strip().     
-  void	draw_line_strip(const void* coords, int vertex_count, const rgba color);
+  void	draw_line_strip(const void* coords, int vertex_count, const rgba& color);
   
   /// The given polygon is translated to a mesh strip by this class.
-  void  draw_poly(const point* corners, size_t corner_count, const rgba fill, 
-    const rgba outline);
+  void  draw_poly(const point* corners, size_t corner_count, const rgba& fill, 
+    const rgba& outline);
     
   /// The glyph is drawn just like a normal shape character.
   virtual void draw_glyph(shape_character_def *def,
-    const matrix& mat, rgba color, float pixel_scale);
+    const matrix& mat, const rgba& color, float pixel_scale);
     
   /// Older backends always used glyph textures, so any triangulating render
   /// handler activates glyph textures by default.
@@ -167,7 +167,7 @@ public:
 	virtual void	fill_style_disable(int fill_side) = 0;
 	
 	/// Sets the fill style to the given solid color. 
-	virtual void	fill_style_color(int fill_side, rgba color) = 0;
+	virtual void	fill_style_color(int fill_side, const rgba& color) = 0;
 	
 	/// Sets the fill style to the given bitmap. This is also used for gradients
 	/// which are transformed to a bitmap prior to this call. 
@@ -178,7 +178,7 @@ public:
 	virtual void	line_style_disable() = 0;
 	
 	/// Sets the stroke color for subsequent draw_line_strip() calls 
-	virtual void	line_style_color(rgba color) = 0;
+	virtual void	line_style_color(const rgba& color) = 0;
 	
 	/// Sets the stroke width for subsequent draw_line_strip() calls. When 
   /// width==1.0 a "hairline" should be drawn. 

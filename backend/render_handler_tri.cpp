@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.15 2007/07/03 05:46:02 strk Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.16 2007/07/13 16:05:08 strk Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -119,7 +119,7 @@ const float triangulating_render_handler::s_curve_max_pixel_error = 1.0f;
 
 
 void triangulating_render_handler::draw_glyph(shape_character_def *def,
-    const matrix& mat, rgba color, float pixel_scale) {
+    const matrix& mat, const rgba& color, float pixel_scale) {
     
   // Make sure m_single_fill_styles contains the desired color
   need_single_fill_style(color);
@@ -286,7 +286,7 @@ void triangulating_render_handler::apply_line_style(const line_style& style,
 
 
 void	triangulating_render_handler::draw_line_strip(const void* coords, 
-  int vertex_count, const rgba color) {
+  int vertex_count, const rgba& color) {
   
   line_style_color(color);
   line_style_width(1);
@@ -295,7 +295,7 @@ void	triangulating_render_handler::draw_line_strip(const void* coords,
 }
 
 void  triangulating_render_handler::draw_poly(const point* corners, 
-  size_t corner_count, const rgba fill, const rgba outline) {
+  size_t corner_count, const rgba& fill, const rgba& outline) {
   
   unsigned int vno=0;
   // Create points array to vertex array 

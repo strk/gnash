@@ -5,7 +5,7 @@
 
 // A render_handler that uses SDL & OpenGL
 
-/* $Id: render_handler_ogl.cpp,v 1.74 2007/06/02 09:54:20 tgc Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.75 2007/07/13 16:05:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -288,7 +288,7 @@ public:
 
 
 	void	disable() { m_mode = INVALID; }
-	void	set_color(gnash::rgba color) { m_mode = COLOR; m_color = color; }
+	void	set_color(const gnash::rgba& color) { m_mode = COLOR; m_color = color; }
 	void	set_bitmap(const gnash::bitmap_info* bi, const gnash::matrix& m, bitmap_wrap_mode wm, const gnash::cxform& color_transform)
 	    {
 		m_mode = (wm == WRAP_REPEAT) ? BITMAP_WRAP : BITMAP_CLAMP;
@@ -466,22 +466,10 @@ public:
 	}
 
     void	begin_display(
-	gnash::rgba background_color,
+	const gnash::rgba& background_color,
 	int viewport_x0, int viewport_y0,
 	int viewport_width, int viewport_height,
 	float x0, float x1, float y0, float y1)
-	// Set up to render a full frame from a movie and fills the
-	// background.	Sets up necessary transforms, to scale the
-	// movie to fit within the given dimensions.  Call
-	// end_display() when you're done.
-	//
-	// The rectangle (viewport_x0, viewport_y0, viewport_x0 +
-	// viewport_width, viewport_y0 + viewport_height) defines the
-	// window coordinates taken up by the movie.
-	//
-	// The rectangle (x0, y0, x1, y1) defines the pixel
-	// coordinates of the movie that correspond to the viewport
-	// bounds.
 	{
 //	    GNASH_REPORT_FUNCTION;
 	    
@@ -638,7 +626,7 @@ else {
 	}
 
 
-    void	fill_style_color(int fill_side, gnash::rgba color)
+    void	fill_style_color(int fill_side, const gnash::rgba& color)
 	// Set fill style for the left interior of the shape.  If
 	// enable is false, turn off fill for the left interior.
 	{
@@ -648,7 +636,7 @@ else {
 	}
 
 
-    void	line_style_color(gnash::rgba color)
+    void	line_style_color(const gnash::rgba& color)
 	// Set the line style of the shape.  If enable is false, turn
 	// off lines for following curve segments.
 	{
@@ -823,7 +811,7 @@ else {
 	const gnash::bitmap_info* bi,
 	const gnash::rect& coords,
 	const gnash::rect& uv_coords,
-	gnash::rgba color)
+	const gnash::rgba& color)
 	// Draw a rectangle textured with the given bitmap, with the
 	// given color.	 Apply given transform; ignore any currently
 	// set transforms.

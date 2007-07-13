@@ -111,7 +111,7 @@ namespace gnash {
 		// Fill the background color, and set up default
 		// transforms, etc.
 		void	begin_display(
-			rgba background_color,
+			const rgba& background_color,
 			int viewport_x0, int viewport_y0,
 			int viewport_width, int viewport_height,
 			float x0, float x1, float y0, float y1)
@@ -159,7 +159,7 @@ namespace gnash {
 		}
 
 
-		void	draw_line_strip(const int16_t coords[], int vertex_count, const rgba color)
+		void	draw_line_strip(const int16_t coords[], int vertex_count, const rgba& color)
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
@@ -168,8 +168,8 @@ namespace gnash {
     }
 
 
-    void  draw_poly(const point* corners, int corner_count, const rgba fill, 
-      const rgba outline) 
+    void  draw_poly(const point* corners, int corner_count, const rgba& fill, 
+      const rgba& outline) 
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
@@ -190,7 +190,7 @@ namespace gnash {
     
     void draw_glyph(shape_character_def *def,
       const matrix& mat,
-      rgba color,
+      const rgba& color,
       float pixel_scale) 
     {
 #ifdef DEBUG_RENDER_CALLS
@@ -259,7 +259,7 @@ namespace gnash {
 		// Special function to draw a rectangular bitmap;
 		// intended for textured glyph rendering.  Ignores
 		// current transforms.
-		void	draw_bitmap(const matrix& m, const bitmap_info* bi, const rect& coords, const rect& uv_coords, rgba color)
+		void	draw_bitmap(const matrix& m, const bitmap_info* bi, const rect& coords, const rect& uv_coords, const rgba& color)
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
