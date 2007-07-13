@@ -1,3 +1,9 @@
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am: Fix linking
+	  for DefineEditTextTest, add rule to build the corresponding
+	  SWF file.
+
 2007-07-13 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/DefineEditTextTest.c: more tests.

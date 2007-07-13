@@ -281,8 +281,11 @@ moviecliploader_tests: moviecliploader_test
 	./moviecliploader_test $(top_srcdir)/testsuite/media
 
 
+DefineEditTextTest.swf: DefineEditTextTest
+	./DefineEditTextTest $(top_srcdir)/testsuite/media
+
 DefineEditTextTest_SOURCES =  DefineEditTextTest.c
-DefineEditTextTest_LDADD = $(MING_LIBS)
+DefineEditTextTest_LDADD = libgnashmingutils.la
 
 DefineEditTextVariableNameTest_SOURCES =	\
 	DefineEditTextVariableNameTest.c	\
@@ -322,9 +325,6 @@ eventSoundTest1_Runner_DEPENDENCIES = \
 
 definebitsjpeg2.swf: definebitsjpeg2
 	./definebitsjpeg2 $(srcdir)/../media/lynch.jpg
-
-DefineEditTextTest.swf: DefineEditTextTest
-	./DefineEditTextTest $(top_srcdir)/testsuite/media
 
 DefineEditTextVariableNameTest.swf: DefineEditTextVariableNameTest
 	./DefineEditTextVariableNameTest $(top_srcdir)/testsuite/media
