@@ -1,5 +1,7 @@
 2007-07-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Microphone.as: test cleanup
+	  (see bug #20472).
 	* testsuite/misc-ming.all/Makefile.am: Fix linking
 	  for DefineEditTextTest, add rule to build the corresponding
 	  SWF file.

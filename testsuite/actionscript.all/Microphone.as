@@ -20,24 +20,40 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Microphone.as,v 1.8 2007/07/01 10:54:39 bjacques Exp $";
+rcsid="$Id: Microphone.as,v 1.9 2007/07/13 02:59:15 strk Exp $";
 
 #include "check.as"
 
+// There was no Microphone class in SWF5 or lower
+#if OUTPUT_VERSION > 5
+
+// test the Microphone class
+check_equals(typeof(Microphone), 'function');
+xcheck_equals ( typeof(Microphone.prototype.setGain), 'function' );
+xcheck_equals ( typeof(Microphone.prototype.setRate), 'function' );
+xcheck_equals ( typeof(Microphone.prototype.setSilenceLevel), 'function' );
+xcheck_equals ( typeof(Microphone.prototype.setUseEchoSuppression), 'function' );
+
 // test the Microphone constuctor
 var microphoneObj = Microphone.get();
-xcheck (microphoneObj != undefined);
+xcheck_equals (typeof(microphoneObj), 'object');
 
 // test that Microphone.get() returns a singleton
 check_equals(microphoneObj, Microphone.get());
 
 // test that get() method is NOT exported to instances
-check_equals (microphoneObj.get, undefined);
-// test the Microphone::setgain method
-xcheck (microphoneObj.setgain != undefined);
-// test the Microphone::setrate method
-xcheck (microphoneObj.setrate != undefined);
-// test the Microphone::setsilencelevel method
-xcheck (microphoneObj.setsilencelevel != undefined);
-// test the Microphone::setuseechosuppression method
-xcheck (microphoneObj.setuseechosuppression != undefined);
+check_equals (typeof(microphoneObj.get), 'undefined');
+
+// test the Microphone::setGain method
+xcheck_equals ( typeof(microphoneObj.setGain), 'function' );
+
+// test the Microphone::setRate method
+xcheck_equals ( typeof(microphoneObj.setRate), 'function' );
+
+// test the Microphone::setSilenceLevel method
+xcheck_equals ( typeof(microphoneObj.setSilenceLevel), 'function' );
+
+// test the Microphone::setUseEchoSuppression method
+xcheck_equals ( typeof(microphoneObj.setUseEchoSuppression), 'function' );
+
+#endif // OUTPUT_VERSION > 5
