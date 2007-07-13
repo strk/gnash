@@ -147,6 +147,9 @@ main(int argc, char** argv)
     SWFDisplayItem_moveTo(it, 0, 400);
   }
   SWFMovie_nextFrame(mo); 
+
+  xcheck_equals(mo, "dtext1.__proto__", "TextField.prototype");
+  xcheck(mo, "TextField.prototype.hasOwnProperty('background')");
   
   check_equals(mo, "typeof(dtext1)", "'object'");
   check_equals(mo, "typeof(dtext1.text)", "'string'");
@@ -160,7 +163,7 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(dtext1.__proto__.backgroundColor)", "'undefined'");
   check_equals(mo, "typeof(dtext1.__proto__.textColor)", "'undefined'");
   check_equals(mo, "typeof(dtext1.__proto__.alpha)", "'undefined'");
-  
+
   xcheck_equals(mo, "dtext1.hasOwnProperty('text')", "false");
   xcheck_equals(mo, "dtext1.hasOwnProperty('background')", "false");
   xcheck_equals(mo, "dtext1.hasOwnProperty('backgroundColor')", "false");

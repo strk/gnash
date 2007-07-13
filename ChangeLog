@@ -1,5 +1,15 @@
 2007-07-13 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/TextField.as:
+	  Add test for TextField.prototype.hasOwnProperty('background')
+	  returning false (weird, returns true in
+	  misc.ming-all/DefineEditTestTest.c!)
+	* testsuite/misc-ming.all/DefineEditTextTest.c:
+	  Add test for TextField.prototype.hasOwnProperty('background')
+	  returning true (weird, returns false in actionscript.all/TextField.as!)
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Microphone.as: test cleanup
 	  (see bug #20472).
 	* testsuite/misc-ming.all/Makefile.am: Fix linking

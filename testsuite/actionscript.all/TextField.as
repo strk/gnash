@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.2 2007/07/01 10:54:41 bjacques Exp $";
+rcsid="$Id: TextField.as,v 1.3 2007/07/13 14:50:07 strk Exp $";
 
 #include "check.as"
 
@@ -37,6 +37,8 @@ check_equals(typeof(TextField.prototype.removeListener), 'function');
 check_equals(typeof(TextField.prototype.getDepth), 'function');
 check_equals(typeof(TextField.prototype.removeTextField), 'function');
 check_equals(typeof(TextField.prototype.replaceSel), 'function');
+check(!TextField.prototype.hasOwnProperty('background'));
+
 // this is a static method
 check_equals(typeof(TextField.getFontList), 'function');
 
