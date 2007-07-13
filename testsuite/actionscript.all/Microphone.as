@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Microphone.as,v 1.9 2007/07/13 02:59:15 strk Exp $";
+rcsid="$Id: Microphone.as,v 1.10 2007/07/13 20:37:05 strk Exp $";
 
 #include "check.as"
 
@@ -29,10 +29,10 @@ rcsid="$Id: Microphone.as,v 1.9 2007/07/13 02:59:15 strk Exp $";
 
 // test the Microphone class
 check_equals(typeof(Microphone), 'function');
-xcheck_equals ( typeof(Microphone.prototype.setGain), 'function' );
-xcheck_equals ( typeof(Microphone.prototype.setRate), 'function' );
-xcheck_equals ( typeof(Microphone.prototype.setSilenceLevel), 'function' );
-xcheck_equals ( typeof(Microphone.prototype.setUseEchoSuppression), 'function' );
+check_equals ( typeof(Microphone.prototype.setGain), 'function' );
+check_equals ( typeof(Microphone.prototype.setRate), 'function' );
+check_equals ( typeof(Microphone.prototype.setSilenceLevel), 'function' );
+check_equals ( typeof(Microphone.prototype.setUseEchoSuppression), 'function' );
 
 // test the Microphone constuctor
 var microphoneObj = Microphone.get();
