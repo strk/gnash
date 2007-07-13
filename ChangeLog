@@ -21,7 +21,7 @@
 	* libbase/rc.{cpp,h}: make the constructor and destructor private.
 	* testsuite/libbase/TCXXRc.cpp: use the default instance.
 
-2007-07-12 davr <drorex@gmail.com>
+2007-07-12 David Rorex <drorex@gmail.com>
 
 	* testsuite/misc-mtasc.all/: Dejagnu.as, Makefile.am,
 	  README, TestClass.as, check.as, enum.as, function.as, hello.as,
