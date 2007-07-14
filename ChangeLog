@@ -1,3 +1,7 @@
+2007-07-14  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Add new Cygnal directories.
+
 2007-07-13 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (sprite_droptarget_getset): 
