@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.355 2007/07/12 09:31:50 martinwguy Exp $
+dnl $Id: configure.ac,v 1.356 2007/07/14 19:25:03 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1177,6 +1177,11 @@ extensions/gtk2/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 cygnal/Makefile
+cygnal/ACT/Makefile
+cygnal/IO/Makefile
+cygnal/HTTP/Makefile
+cygnal/Net/Makefile
+cygnal/unit_tests/Makefile
 )
 
 ###
