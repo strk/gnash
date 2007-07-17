@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.82 2007/07/17 23:16:06 strk Exp $
+# $Id: Makefile.am,v 1.83 2007/07/17 23:32:34 nihilus Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -143,7 +143,7 @@ if USE_GUI_RISCOS
  RISCOS_SRCS = riscos.cpp riscossup.h riscos_glue.h $(RISCOS_AGG_SRCS)
  AM_LDFLAGS += -lOSLib32
 else
- RISCS_SRCS =
+ RISCOS_SRCS =
 endif
 
 if USE_GUI_AQUA
