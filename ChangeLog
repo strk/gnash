@@ -1,3 +1,9 @@
+2007-07-17 Nick Warne <nickw>
+
+	* backend/sound_handler_sdl.h, libbase/embedVideoDecoderFfmpeg.{cpp,h},
+	  server/asobj/{Sound, Netstream}Ffmpeg.h, gui/gnash.cpp: Fix for
+	 linking.
+
 2007-07-17 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/actionscript.all/MovieClip.as: more tests, all passed.

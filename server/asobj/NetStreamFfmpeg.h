@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetStreamFfmpeg.h,v 1.47 2007/07/01 10:54:29 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.h,v 1.48 2007/07/17 22:05:03 nihilus Exp $ */
 
 #ifndef __NETSTREAMFFMPEG_H__
 #define __NETSTREAMFFMPEG_H__
@@ -39,7 +39,9 @@
 #include "impl.h"
 #include "video_stream_instance.h"
 
+extern "C" {
 #include <ffmpeg/avformat.h>
+}
 
 #include "image.h"
 #include "StreamProvider.h"	

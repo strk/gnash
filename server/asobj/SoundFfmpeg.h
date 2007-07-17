@@ -32,7 +32,9 @@
 #include <boost/bind.hpp> 
 #include <boost/thread/mutex.hpp>
 
+extern "C" {
 #include <ffmpeg/avformat.h>
+}
 
 namespace gnash {
 

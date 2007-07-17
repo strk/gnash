@@ -27,7 +27,9 @@
 #include "debugger.h"
 
 #ifdef HAVE_FFMPEG_AVCODEC_H
+extern "C" {
 # include "ffmpeg/avcodec.h"
+}
 #endif
 
 #ifdef HAVE_GST_GST_H

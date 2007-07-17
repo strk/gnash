@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderFfmpeg.h,v 1.7 2007/07/01 10:54:08 bjacques Exp $
+// $Id: embedVideoDecoderFfmpeg.h,v 1.8 2007/07/17 22:05:03 nihilus Exp $
 
 #ifndef __EMBEDVIDEODECODERFFMPEG_H__
 #define __EMBEDVIDEODECODERFFMPEG_H__
@@ -28,7 +28,9 @@
 
 #include <vector>
 #include "embedVideoDecoder.h"
+extern "C" {
 #include <ffmpeg/avcodec.h>
+}
 #include "image.h"
 
 namespace gnash {

@@ -26,7 +26,9 @@
 #include "embedVideoDecoderFfmpeg.h"
 
 #ifdef HAVE_SWSCALE_H
+extern "C" {
 #include <ffmpeg/swscale.h>
+}
 #endif
 
 #include <boost/scoped_array.hpp>

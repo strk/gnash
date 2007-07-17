@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.28 2007/07/03 04:31:59 strk Exp $
+// $Id: sound_handler_sdl.h,v 1.29 2007/07/17 22:05:03 nihilus Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -26,7 +26,9 @@
 #include "log.h"
 
 #ifdef USE_FFMPEG
+extern "C" {
 #include <ffmpeg/avcodec.h>
+}
 #elif defined(USE_MAD)
 #include <mad.h>
 #endif
