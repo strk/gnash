@@ -1,5 +1,7 @@
 2007-07-17 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.h: fix comments about case sensitiveness of
+	  get_member* and set_member*.
 	* gui/Makefile.am: add gtk_cairo_create.h in GTK_CAIRO_SRCS.
 
 2007-07-18 Markus Gothe <nietzsche@lysator.liu.se>

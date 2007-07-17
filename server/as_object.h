@@ -166,6 +166,14 @@ public:
 	/// NOTE: This might change in the near future trough use of
 	///       getter/setter properties instead..
 	///
+	/// @param name
+	///	Name of the property. Must be all lowercase
+	///	if the current VM is initialized for a  target
+	///	up to SWF6.
+	///
+	/// @param val
+	///	Value to assign to the named property.
+	///
 	virtual void set_member(const std::string& name, const as_value& val)
 	{
 		return set_member_default(name, val);
@@ -243,13 +251,23 @@ public:
 	/// The default behaviour is to call set_member_default,
 	/// but this function is kept virtual to allow special
 	/// handling of property fetching in derivate class.
-	/// NOTE: This might change in the near future trough use of
-	///       getter/setter properties instead..
 	///
 	/// NOTE that this method is non-const becase a property
 	///      could also be a getter/setter and we can't promise
 	///      that the 'getter' won't change this object trough
-	///	 use of the 'this' reference.
+	///	 use of the 'this' reference. 
+	///
+	/// @param name
+	///	Name of the property. Must be all lowercase
+	///	if the current VM is initialized for a  target
+	///	up to SWF6.
+	///
+	/// @param val
+	///	Variable to assign an existing value to.
+	///	Will be untouched if no property with the given name
+	///	was found.
+	///
+	/// @return true of the named property was found, false otherwise.
 	///
 	virtual bool get_member(const std::string& name, as_value* val)
 	{
@@ -292,10 +310,10 @@ public:
 
 	/// Set member flags (probably used by ASSetPropFlags)
 	//
-	/// @parame name
-	///     Name of the property.
-	///	Case insensitive up to SWF6,
-	///	case *sensitive* from SWF7 up.
+	/// @param name
+	///	Name of the property. Must be all lowercase
+	///	if the current VM is initialized for a  target
+	///	up to SWF6.
 	///
 	/// @param setTrue
 	///	the set of flags to set
@@ -453,11 +471,9 @@ protected:
 	///	 use of the 'this' reference.
 	///
 	/// @param name
-	///     Name of the property.
-	///	Case insensitive up to SWF6,
-	///	case *sensitive* from SWF7 up.
-	///	TODO: be *always* case-sensitive, and delegate
-	///	      convertion to lowercase to callers
+	///	Name of the property. Must be all lowercase
+	///	if the current VM is initialized for a  target
+	///	up to SWF6.
 	///
 	/// @param val
 	///     The as_value to store a found variable's value in.
@@ -472,10 +488,13 @@ protected:
         /// The derived class should not override this method,
         /// but instead implement its own gettersetter properties.
 	///
-	/// @parame name
-	///     Name of the property.
-	///	Case insensitive up to SWF6,
-	///	case *sensitive* from SWF7 up.
+	/// @param name
+	///	Name of the property. Must be all lowercase
+	///	if the current VM is initialized for a  target
+	///	up to SWF6.
+	///
+	/// @param val
+	///	Value to assign to the named property.
 	///
 	void set_member_default(const std::string& name, const as_value& val);
 
