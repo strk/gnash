@@ -1,0 +1,9 @@
+.deps
+.libs
+Makefile
+Makefile.in
+*.lo
+*.la
+gnash.log
+gnash.sum
+site.exp
