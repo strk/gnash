@@ -2,6 +2,8 @@
 
 	* testsuite/misc-ming.all/key_event_test5.c: make tests not dependent
 	  on the time of a key press, better self-contained.
+	* testsuite/actionscript.all/MovieClip.as: fix unsafe floating number
+	  comparison, better self-contained.
 	
 2007-07-17 Zou Lunkai <zoulunkai@gmail.com>
 

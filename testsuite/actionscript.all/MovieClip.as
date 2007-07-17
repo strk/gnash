@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.74 2007/07/13 20:40:32 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.75 2007/07/17 08:00:30 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -614,10 +614,14 @@ check_equals(typeof(b.xMax), 'number');
 check_equals(typeof(b.yMin), 'number');
 check_equals(typeof(b.yMax), 'number');
 // Returned number is (2^28/2)-1 twips : any ringing bell ?
-check_equals(b.xMin, 6710886.35);
-check_equals(b.xMax, 6710886.35);
-check_equals(b.yMin, 6710886.35);
-check_equals(b.yMax, 6710886.35);
+//check_equals(b.xMin, 6710886.35);
+//check_equals(b.xMax, 6710886.35);
+//check_equals(b.yMin, 6710886.35);
+//check_equals(b.yMax, 6710886.35);
+checks(b.xMin-6710886.35 < 0.001);
+checks(b.xMax-6710886.35 < 0.001);
+checks(b.yMin-6710886.35 < 0.001);
+checks(b.yMax-6710886.35 < 0.001);
 
 with (draw)
 {
