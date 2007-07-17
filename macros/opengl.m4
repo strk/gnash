@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: opengl.m4,v 1.34 2007/07/01 10:54:13 bjacques Exp $
+dnl $Id: opengl.m4,v 1.35 2007/07/17 23:07:30 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_OPENGL],
 [
@@ -89,7 +89,7 @@ AC_DEFUN([GNASH_PATH_OPENGL],
     ])
 
     if test x"${darwin}" = xyes; then
-      ac_cv_path_opengl_lib="framework Carbon -framework ApplicationServices -framework OpenGL -framework AGL"
+      ac_cv_path_opengl_lib="-framework Carbon -framework ApplicationServices -framework OpenGL -framework AGL"
     else
       if test x"${ac_cv_path_opengl_lib}" = x; then
         newlist="/System/Library/Frameworks/OpenGL.framework/Libraries ${libslist}"
