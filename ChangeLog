@@ -1,5 +1,10 @@
 2007-07-17 Zou Lunkai <zoulunkai@gmail.com>
 
+	* testsuite/misc-ming.all/key_event_test5.c: make tests not dependent
+	  on the time of a key press, better self-contained.
+	
+2007-07-17 Zou Lunkai <zoulunkai@gmail.com>
+
 	* server/asobj/Key.h, server/asobj/Key.cpp, 
 	  server/button_character_instance.cpp
 	  server/edit_text_character.cpp, server/movie_root.h, 
