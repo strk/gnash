@@ -1,3 +1,7 @@
+2007-07-17 Sandro Santilli <strk@keybit.net>
+
+	* gui/Makefile.am: add gtk_cairo_create.h in GTK_CAIRO_SRCS.
+
 2007-07-18 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* macros/opengl.m4: Typo fix on Darwin.

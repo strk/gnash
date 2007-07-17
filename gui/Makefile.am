@@ -17,7 +17,7 @@
 
 # 
 
-# $Id: Makefile.am,v 1.81 2007/07/01 10:53:59 bjacques Exp $
+# $Id: Makefile.am,v 1.82 2007/07/17 23:16:06 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 localedir = $(datadir)/locale
@@ -102,7 +102,7 @@ endif # ! USE_RENDERER_OPENGL
 
 if USE_RENDERER_CAIRO
  AM_LDFLAGS += $(CAIRO_LIBS) 
- GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h
+ GTK_CAIRO_SRCS = gtk_glue_cairo.cpp gtk_glue_cairo.h gtk_cairo_create.h
  KDE_CAIRO_SRCS = #kde_glue_cairo.cpp kde_glue_cairo.h
  SDL_CAIRO_SRCS = sdl_cairo_glue.cpp sdl_cairo_glue.h
  FLTK_CAIRO_SRCS = fltk_glue_cairo.cpp fltk_glue_cairo.h
