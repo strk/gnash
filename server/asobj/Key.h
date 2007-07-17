@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.22 2007/07/10 04:59:24 strk Exp $ */
+/* $Id: Key.h,v 1.23 2007/07/17 06:04:22 zoulunkai Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -141,7 +141,7 @@ public:
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	void add_listener(const KeyListener& listener);
 
-	void remove_listener(const KeyListener& listener);
+	void remove_listener(boost::intrusive_ptr<as_object> listener);
 #else  
 	void add_listener(boost::intrusive_ptr<as_object> listener);
 

@@ -91,8 +91,8 @@ key_new(const fn_call& /* fn */)
  ************************************************************************/
 
 key_as_object::key_as_object()
-	:
-	m_last_key_pressed(0)
+    :
+    m_last_key_pressed(0)
 {
     memset(m_unreleased_keys, 0, sizeof(m_unreleased_keys));
 }
@@ -100,38 +100,38 @@ key_as_object::key_as_object()
 bool
 key_as_object::is_key_down(int code)
 {
-	if (code < 0 || code >= key::KEYCOUNT) return false;
+    if (code < 0 || code >= key::KEYCOUNT) return false;
 
-	int	byte_index = code >> 3;
-	int	bit_index = code - (byte_index << 3);
-	int	mask = 1 << bit_index;
+    int byte_index = code >> 3;
+    int bit_index = code - (byte_index << 3);
+    int mask = 1 << bit_index;
 
-	assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
+    assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
 
-	if (m_unreleased_keys[byte_index] & mask)
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+    if (m_unreleased_keys[byte_index] & mask)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void
 key_as_object::set_key_down(int code)
 {
-	if (code < 0 || code >= key::KEYCOUNT) return;
+    if (code < 0 || code >= key::KEYCOUNT) return;
 
-	m_last_key_pressed = code;
+    m_last_key_pressed = code;
 
-	int	byte_index = code >> 3;
-	int	bit_index = code - (byte_index << 3);
-	int	mask = 1 << bit_index;
+    int byte_index = code >> 3;
+    int bit_index = code - (byte_index << 3);
+    int mask = 1 << bit_index;
 
-	assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
+    assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
 
-	m_unreleased_keys[byte_index] |= mask;
+    m_unreleased_keys[byte_index] |= mask;
 }
 
 void
@@ -139,9 +139,9 @@ key_as_object::set_key_up(int code)
 {
     if (code < 0 || code >= key::KEYCOUNT) return;
 
-    int	byte_index = code >> 3;
-    int	bit_index = code - (byte_index << 3);
-    int	mask = 1 << bit_index;
+    int byte_index = code >> 3;
+    int bit_index = code - (byte_index << 3);
+    int mask = 1 << bit_index;
 
     assert(byte_index >= 0 && byte_index < int(sizeof(m_unreleased_keys)/sizeof(m_unreleased_keys[0])));
 
@@ -152,17 +152,17 @@ key_as_object::set_key_up(int code)
 void 
 key_as_object::notify_listeners(const event_id key_event_type)
 {
-	
-	std::string funcname = key_event_type.get_function_name();
-	// There is no user defined "onKeyPress" event handler
-	if( ( funcname != "onKeyDown") && (funcname != "onKeyUp") )
-		return;
+    
+    std::string funcname = key_event_type.get_function_name();
+    // There is no user defined "onKeyPress" event handler
+    if( ( funcname != "onKeyDown") && (funcname != "onKeyUp") )
+        return;
 
-	VM& vm = VM::get();
-	if ( vm.getSWFVersion() < 7 )
-	{
-		boost::to_lower(funcname, vm.getLocale());
-	}
+    VM& vm = VM::get();
+    if ( vm.getSWFVersion() < 7 )
+    {
+        boost::to_lower(funcname, vm.getLocale());
+    }
 
     // Notify listeners.
     for (std::vector<boost::intrusive_ptr<as_object> >::iterator iter = m_listeners.begin();
@@ -183,30 +183,30 @@ key_as_object::notify_listeners(const event_id key_event_type)
 void
 key_as_object::add_listener(const KeyListener& listener)
 {
-	_vm.getRoot().add_key_listener(listener);
+    _vm.getRoot().add_key_listener(listener);
 }
 
 void
-key_as_object::remove_listener(const KeyListener&	listener)
+key_as_object::remove_listener(boost::intrusive_ptr<as_object> listener)
 {
-	std::vector<KeyListener> & listeners = _vm.getRoot().getKeyListeners();
+    // Should keep consistent with definiton in movie_root.h
+    typedef std::set<KeyListener> KeyListeners;
 
-	std::vector<KeyListener>::iterator end = listeners.end();
-	for	(std::vector<KeyListener>::iterator	iter = listeners.begin();
-				 iter	!= end;	++iter)	
-	{
-			if ((*iter)	== listener) {
-				// Found it
-				iter->unregisterUserHandler();
-				return;
-			}
-	}
+    KeyListeners & listeners = _vm.getRoot().getKeyListeners();
+    
+    KeyListeners::iterator target = listeners.find(KeyListener(listener));
+
+	KeyListeners::iterator it_end = listeners.end();
+
+    if(target != it_end)
+    {
+        target->unregisterUserHandler();
+    }
 }
 #else
 void
 key_as_object::add_listener(boost::intrusive_ptr<as_object> listener)
 {
-
     // Should we bother doing this every time someone calls add_listener(),
     // or should we perhaps skip this check and use unique later?
     std::vector<boost::intrusive_ptr<as_object> >::const_iterator end = m_listeners.end();
@@ -225,21 +225,21 @@ void
 key_as_object::remove_listener(boost::intrusive_ptr<as_object> listener)
 {
 
-  for (std::vector<boost::intrusive_ptr<as_object> >::iterator iter = m_listeners.begin(); iter != m_listeners.end(); )
-	{
-    if (*iter == listener)
-		{
-      iter = m_listeners.erase(iter);
-			continue;
+    for (std::vector<boost::intrusive_ptr<as_object> >::iterator iter = m_listeners.begin(); iter != m_listeners.end(); )
+    {
+        if (*iter == listener)
+        {
+            iter = m_listeners.erase(iter);
+            continue;
+        }
+        iter++;
     }
-		iter++;
-	}
 }
 #endif
 int
 key_as_object::get_last_key_pressed() const
 {
-	return m_last_key_pressed;
+    return m_last_key_pressed;
 }
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
@@ -247,21 +247,21 @@ as_value
 key_add_listener(const fn_call& fn)
 {
     if (fn.nargs < 1)
-	{
-	    log_error(_("key_add_listener needs one argument (the listener object)"));
-	    return as_value();
-	}
+    {
+        log_error(_("key_add_listener needs one argument (the listener object)"));
+        return as_value();
+    }
 
     boost::intrusive_ptr<as_object> toadd = fn.arg(0).to_object();
     if (toadd == NULL)
-	{
-	    log_error(_("key_add_listener passed a NULL object; ignored"));
-	    return as_value();
-	}
+    {
+        log_error(_("key_add_listener passed a NULL object; ignored"));
+        return as_value();
+    }
 
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
-    ko->add_listener(KeyListener(toadd, true));
+    ko->add_listener(KeyListener(toadd, KeyListener::USER_DEF));
     return as_value();
 }
 #else
@@ -269,17 +269,17 @@ as_value
 key_add_listener(const fn_call& fn)
 {
     if (fn.nargs < 1)
-	{
-	    log_error(_("key_add_listener needs one argument (the listener object)"));
-	    return as_value();
-	}
+    {
+        log_error(_("key_add_listener needs one argument (the listener object)"));
+        return as_value();
+    }
 
     boost::intrusive_ptr<as_object> listener = fn.arg(0).to_object();
     if (listener == NULL)
-	{
-	    log_error(_("key_add_listener passed a NULL object; ignored"));
-	    return as_value();
-	}
+    {
+        log_error(_("key_add_listener passed a NULL object; ignored"));
+        return as_value();
+    }
 
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
@@ -287,95 +287,95 @@ key_add_listener(const fn_call& fn)
     return as_value();
 }
 #endif
-as_value	key_get_ascii(const fn_call& fn)
+as_value    key_get_ascii(const fn_call& fn)
 // Return the ascii value of the last key pressed.
 /// FIXME: return the ascii number(not string) of the last pressed key!
 {
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
-    int	code = ko->get_last_key_pressed();
+    int code = ko->get_last_key_pressed();
     if (code < 0)
         return as_value();
 
     // @@ Crude for now; just jamming the key code in a string, as a character.
     // Need to apply shift/capslock/numlock, etc...
-    char	buf[2];
+    char    buf[2];
     buf[0] = (char) code;
     buf[1] = 0;
 
     return as_value(buf);
 }
 
-as_value	key_get_code(const fn_call& fn)
-    // Returns the keycode of the last key pressed.
+as_value    key_get_code(const fn_call& fn)
+// Returns the keycode of the last key pressed.
 {
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
     return as_value(ko->get_last_key_pressed());
 }
 
-as_value	key_is_down(const fn_call& fn)
-    // Return true if the specified (first arg keycode) key is pressed.
+as_value    key_is_down(const fn_call& fn)
+// Return true if the specified (first arg keycode) key is pressed.
 {
     if (fn.nargs < 1)
-	{
-	    log_error(_("key_is_down needs one argument (the key code)"));
-	    return as_value();
-	}
+    {
+        log_error(_("key_is_down needs one argument (the key code)"));
+        return as_value();
+    }
 
-    int	code = (int) fn.arg(0).to_number();
+    int code = (int) fn.arg(0).to_number();
 
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
     return as_value(ko->is_key_down(code));
 }
 
-as_value	key_is_toggled(const fn_call& /* fn */)
-    // Given the keycode of NUM_LOCK or CAPSLOCK, returns true if
-    // the associated state is on.
+as_value    key_is_toggled(const fn_call& /* fn */)
+// Given the keycode of NUM_LOCK or CAPSLOCK, returns true if
+// the associated state is on.
 {
     // @@ TODO
     return as_value(false);
 }
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
-as_value	
+as_value    
 key_remove_listener(const fn_call& fn)
 // Remove a previously-added listener.
 {
     if (fn.nargs < 1)
-	{
-	    log_error(_("key_remove_listener needs one argument (the listener object)"));
-	    return as_value();
-	}
+    {
+        log_error(_("key_remove_listener needs one argument (the listener object)"));
+        return as_value();
+    }
 
     boost::intrusive_ptr<as_object> toremove = fn.arg(0).to_object();
     if (toremove == NULL)
-	{
-	    log_error(_("key_remove_listener passed a NULL object; ignored"));
-	    return as_value();
-	}
+    {
+        log_error(_("key_remove_listener passed a NULL object; ignored"));
+        return as_value();
+    }
 
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr); 
 
-    ko->remove_listener(KeyListener(toremove));
+    ko->remove_listener(toremove);
     return as_value();
 }
 #else
-as_value	key_remove_listener(const fn_call& fn)
-    // Remove a previously-added listener.
+as_value    key_remove_listener(const fn_call& fn)
+// Remove a previously-added listener.
 {
     if (fn.nargs < 1)
-	{
-	    log_error(_("key_remove_listener needs one argument (the listener object)"));
-	    return as_value();
-	}
+    {
+        log_error(_("key_remove_listener needs one argument (the listener object)"));
+        return as_value();
+    }
 
     boost::intrusive_ptr<as_object> listener = fn.arg(0).to_object();
     if (listener == NULL)
-	{
-	    log_error(_("key_remove_listener passed a NULL object; ignored"));
-	    return as_value();
-	}
+    {
+        log_error(_("key_remove_listener passed a NULL object; ignored"));
+        return as_value();
+    }
 
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr); 
 
@@ -390,7 +390,7 @@ void key_class_init(as_object& global)
 
     // Create built-in key object.
     // NOTE: _global.Key *is* an object, not a constructor
-    as_object*	key_obj = new key_as_object;
+    as_object*  key_obj = new key_as_object;
 
     // constants
 #define KEY_CONST(k) key_obj->set_member(#k, key::k)
@@ -414,12 +414,12 @@ void key_class_init(as_object& global)
     KEY_CONST(UP);
 
     // methods
-	key_obj->init_member("addListener", new builtin_function(key_add_listener));
-	key_obj->init_member("getAscii", new builtin_function(key_get_ascii));
-	key_obj->init_member("getCode", new builtin_function(key_get_code));
-	key_obj->init_member("isDown", new builtin_function(key_is_down));
-	key_obj->init_member("isToggled", new builtin_function(key_is_toggled));
-	key_obj->init_member("removeListener", new builtin_function(key_remove_listener));
+    key_obj->init_member("addListener", new builtin_function(key_add_listener));
+    key_obj->init_member("getAscii", new builtin_function(key_get_ascii));
+    key_obj->init_member("getCode", new builtin_function(key_get_code));
+    key_obj->init_member("isDown", new builtin_function(key_is_down));
+    key_obj->init_member("isToggled", new builtin_function(key_is_toggled));
+    key_obj->init_member("removeListener", new builtin_function(key_remove_listener));
 
 
     global.init_member("Key", key_obj);
@@ -430,11 +430,11 @@ void key_class_init(as_object& global)
 void
 key_as_object::markReachableResources() const
 {
-	for (Listeners::const_iterator i=m_listeners.begin(), e=m_listeners.end();
-			i != e; ++i)
-	{
-		(*i)->setReachable();
-	}
+    for (Listeners::const_iterator i=m_listeners.begin(), e=m_listeners.end();
+            i != e; ++i)
+    {
+        (*i)->setReachable();
+    }
 }
 #endif // ndef NEW_KEY_LISTENER_LIST_DESIGN
 #endif // def GNASH_USE_GC

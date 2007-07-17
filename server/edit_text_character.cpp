@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.74 2007/07/11 16:52:47 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.75 2007/07/17 06:04:22 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -511,7 +511,7 @@ edit_text_character::on_event(const event_id& id)
 			if (m_has_focus == false)
 			{
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
-				_vm.getRoot().add_key_listener(KeyListener(this));
+				_vm.getRoot().add_key_listener(KeyListener(this, KeyListener::ON_CLIP_DEF));
 #else
 				_vm.getRoot().add_key_listener(this);
 #endif
@@ -528,11 +528,7 @@ edit_text_character::on_event(const event_id& id)
 			{
 				movie_root& root = _vm.getRoot();
 				root.set_active_entity(NULL);
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-				root.remove_key_listener(KeyListener(this));
-#else
 				root.remove_key_listener(this);
-#endif
 				m_has_focus = false;
 				format_text();
 			}

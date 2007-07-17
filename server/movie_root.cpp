@@ -739,132 +739,133 @@ char* movie_root::call_method_args(const char* method_name,
 void movie_root::cleanup_key_listeners()
 {
 #ifdef KEY_LISTENERS_DEBUG
-	size_t prevsize = _keyListeners.size();
-	log_msg("Cleaning up %u key listeners", _keyListeners.size());
+    size_t prevsize = _keyListeners.size();
+    log_msg("Cleaning up %u key listeners", _keyListeners.size());
 #endif
 
-	for (std::vector<KeyListener>::iterator iter = _keyListeners.begin();
-		 iter != _keyListeners.end(); )
-	{
-		
-		character* ch = dynamic_cast<character*>(iter->get());
-		// remove character listener
-		if ( ch && ch->isUnloaded() ) 
-		{
-			iter = _keyListeners.erase(iter);
-		}
-		// remove non-character listener
-		else if(!ch && !iter->isRegistered())
-		{
-			iter = _keyListeners.erase(iter);
-		}
-		else
-			++iter;
-	}
-
+    for (KeyListeners::iterator iter = _keyListeners.begin();
+        iter != _keyListeners.end(); )
+    {
+        // The listener object has no registered key event handlers, remove it.
+        if( !iter->hasUserRegistered() && !iter->hasOnClipRegistered() )
+        {
+            _keyListeners.erase(iter++);
+        }
+        else 
+        {
+            boost::intrusive_ptr<as_object> obj = iter->get();
+			character* ch = dynamic_cast<character*>(obj.get());
+            // The listener object is unloaded, remove it.
+            // TODO: Don't do this again in the character destructors. should we?
+            if ( ch && ch->isUnloaded() ) 
+            {
+                _keyListeners.erase(iter++);
+            }
+            else
+                ++iter;
+        }
+    }
 
 #ifdef KEY_LISTENERS_DEBUG
-	size_t currsize = _keyListeners.size();
-	log_msg("Cleaned up %u listeners (from %u to %u)", prevsize-currsize, prevsize, currsize);
+    size_t currsize = _keyListeners.size();
+    log_msg("Cleaned up %u listeners (from %u to %u)", prevsize-currsize, prevsize, currsize);
 #endif
 }
 
 void movie_root::notify_key_listeners(key::code k, bool down)
 {
-	//log_msg("Notifying " SIZET_FMT " keypress listeners", _keyListeners.size());
+    //log_msg("Notifying " SIZET_FMT " keypress listeners", _keyListeners.size());
 
-	as_environment env;
+    as_environment env;
 
-	for (std::vector<KeyListener>::iterator iter = _keyListeners.begin();
-		iter != _keyListeners.end(); ++iter)
-	{
-		character* ch = dynamic_cast<character*>(iter->get());
-		// notify character listeners
-		if ( ch && ! ch->isUnloaded() ) 
-		{
-			if(down)
-			{
-				// invoke onClipKeyDown handler
-				ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID));
-				
-				if(iter->isRegistered())
-				// invoke onKeyDown handler
-				{
-					boost::intrusive_ptr<as_function> 
-						method = ch->getUserDefinedEventHandler("onKeyDown");
-					if ( method )
-					{
-						call_method0(as_value(method.get()), &env, ch);
-					}
-				}
-				// invoke onClipKeyPress handler
-				ch->on_event(event_id(event_id::KEY_PRESS, k));
-			}
-			else
-			{
-				//invoke onClipKeyUp handler
-				ch->on_event(event_id(event_id::KEY_UP, key::INVALID));   
+    for (KeyListeners::iterator iter = _keyListeners.begin();
+        iter != _keyListeners.end(); ++iter)
+    {
+		boost::intrusive_ptr<as_object> obj = iter->get();
+        character* ch = dynamic_cast<character*>(obj.get());
+        // notify character listeners
+        if ( ch && ! ch->isUnloaded() ) 
+        {
+            if(down)
+            {
+                // invoke onClipKeyDown handler
+                ch->on_event(event_id(event_id::KEY_DOWN, key::INVALID));
+                
+                if(iter->hasUserRegistered())
+                // invoke onKeyDown handler
+                {
+                    boost::intrusive_ptr<as_function> 
+                        method = ch->getUserDefinedEventHandler("onKeyDown");
+                    if ( method )
+                    {
+                        call_method0(as_value(method.get()), &env, ch);
+                    }
+                }
+                // invoke onClipKeyPress handler
+                ch->on_event(event_id(event_id::KEY_PRESS, k));
+            }
+            else
+            {
+                //invoke onClipKeyUp handler
+                ch->on_event(event_id(event_id::KEY_UP, key::INVALID));   
 
-				if(iter->isRegistered())
-				// invoke onKeyUp handler
-				{
-					boost::intrusive_ptr<as_function> 
-						method = ch->getUserDefinedEventHandler("onKeyUp");
-					if ( method )
-					{
-						call_method0(as_value(method.get()), &env, ch);
-					}
-				}
-			}
-		}
-		// notify non-character listeners
-		else 
-		{
-			if(down) 
-			{
-				iter->get()->on_event(event_id(event_id::KEY_DOWN, key::INVALID));
-			}
-			else 
-			{
-				iter->get()->on_event(event_id(event_id::KEY_UP, key::INVALID));
-			}
-		}
-	}
-
-	assert(testInvariant());
+                if(iter->hasUserRegistered())
+                // invoke onKeyUp handler
+                {
+                    boost::intrusive_ptr<as_function> 
+                        method = ch->getUserDefinedEventHandler("onKeyUp");
+                    if ( method )
+                    {
+                        call_method0(as_value(method.get()), &env, ch);
+                    }
+                }
+            }
+        }
+        // notify non-character listeners
+        else 
+        {
+            if(down) 
+            {
+                iter->get()->on_event(event_id(event_id::KEY_DOWN, key::INVALID));
+            }
+            else 
+            {
+                iter->get()->on_event(event_id(event_id::KEY_UP, key::INVALID));
+            }
+        }
+    }
+    assert(testInvariant());
 }
 
 void movie_root::add_key_listener(const KeyListener & listener)
 {
-	std::vector<KeyListener>::iterator end = _keyListeners.end();
-    for (std::vector<KeyListener>::iterator iter = _keyListeners.begin();
-         iter != end; ++iter) 
-	{
-      if ((*iter) == listener) {
-        // Already in the list.
-		iter->registerUserHandler();
-        return;
-      }
+    KeyListeners::iterator target = _keyListeners.find(listener);
+    if(target == _keyListeners.end())
+    // The key listener is not in the container, then add it.
+    {
+        _keyListeners.insert(listener);
+    }
+    else
+    // The key listener is already in the container, then register it(again).
+    {
+        if(listener.hasUserRegistered())
+        {
+            target->registerUserHandler();
+        }
+        if(listener.hasOnClipRegistered())
+        {
+            target->registerOnClipHandler();
+        }
     }
 
-    _keyListeners.push_back(listener);
-
-	assert(testInvariant());
+    assert(testInvariant());
 }
 
-void movie_root::remove_key_listener(const KeyListener&	listener)
+void movie_root::remove_key_listener(as_object* listener)
 {
-	std::vector<KeyListener>::iterator end = _keyListeners.end();
-		for	(std::vector<KeyListener>::iterator	iter = _keyListeners.begin();
-				 iter	!= end;	++iter)	
-	{
-			if ((*iter)	== listener) {
-				// If found, then remove it from the container
-				_keyListeners.erase(iter);
-				return;
-			}
-		}
-	assert(testInvariant());
+    _keyListeners.erase(KeyListener(listener));
+
+    assert(testInvariant());
 }
 
 #else // ndef NEW_KEY_LISTENER_LIST_DESIGN

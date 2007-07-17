@@ -269,7 +269,7 @@ button_character_instance::button_character_instance(
 		if (m_def->m_button_actions[i].m_conditions & 0xFE00)	// check up on CondKeyPress: UB[7]
 		{
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
-			_vm.getRoot().add_key_listener(KeyListener(this));
+			_vm.getRoot().add_key_listener(KeyListener(this, KeyListener::ON_CLIP_DEF));
 #else
 			_vm.getRoot().add_key_listener(this);
 #endif
@@ -281,11 +281,7 @@ button_character_instance::button_character_instance(
 
 button_character_instance::~button_character_instance()
 {
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-	_vm.getRoot().remove_key_listener(KeyListener(this));
-#else
 	_vm.getRoot().remove_key_listener(this);
-#endif
 }
 
 

@@ -1782,11 +1782,7 @@ sprite_instance::~sprite_instance()
 
 	if (m_has_key_event)
 	{
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-		_vm.getRoot().remove_key_listener(KeyListener(this));
-#else
 		_vm.getRoot().remove_key_listener(this);
-#endif
 	}
 
 	if (m_has_mouse_event)
@@ -2452,7 +2448,7 @@ void sprite_instance::advance(float delta_time)
 		if (m_has_key_event)
 		{
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
-			_vm.getRoot().add_key_listener(KeyListener(this));
+			_vm.getRoot().add_key_listener(KeyListener(this, KeyListener::ON_CLIP_DEF));
 #else
 			_vm.getRoot().add_key_listener(this);
 #endif

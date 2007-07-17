@@ -1,3 +1,12 @@
+2007-07-17 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/asobj/Key.h, server/asobj/Key.cpp, 
+	  server/button_character_instance.cpp
+	  server/edit_text_character.cpp, server/movie_root.h, 
+	  sever/movie_root.cpp, server/sprite_instance.cpp: key listener
+	  handling cleanups, for better management of key listeners. change
+	  key listeners container from std::vector to std::set. Correct indent.
+	
 2007-07-14  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Add new Cygnal directories.
