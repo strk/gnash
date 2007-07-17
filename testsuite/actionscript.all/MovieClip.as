@@ -22,7 +22,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.75 2007/07/17 08:00:30 zoulunkai Exp $";
+rcsid="$Id: MovieClip.as,v 1.76 2007/07/17 09:33:57 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -95,40 +95,40 @@ check(mc.duplicateMovieClip);
 #endif
 
 #if OUTPUT_VERSION >= 6
-	check_equals(typeof(mc.setMask), 'function');
-	check_equals(typeof(mc.beginFill), 'function');
-	check_equals(typeof(mc.beginGradientFill), 'function');
-        check_equals(typeof(mc.clear), 'function');
-	check_equals(typeof(mc.createEmptyMovieClip), 'function');
-	check_equals(typeof(mc.createTextField), 'function');
-	check_equals(typeof(mc.curveTo), 'function');
-	check_equals(typeof(mc.lineStyle), 'function');
-	check_equals(typeof(mc.lineTo), 'function');
-	check_equals(typeof(mc.moveTo), 'function');
-	check_equals(typeof(mc.attachAudio), 'function');
-	check_equals(typeof(mc.endFill), 'function');
-	check_equals(typeof(mc.getDepth), 'function');
-	check_equals(typeof(mc.getURL), 'function');
-	check_equals(typeof(mc.gotoAndPlay), 'function');
-	check_equals(typeof(mc.gotoAndStop), 'function');
-	check_equals(typeof(mc.hitTest), 'function');
-	check_equals(typeof(mc.nextFrame), 'function');
-	check_equals(typeof(mc.play), 'function');
-	check_equals(typeof(mc.prevFrame), 'function');
-	check_equals(typeof(mc.stop), 'function');
-	check_equals(typeof(mc.swapDepths), 'function');
-    	check_equals(typeof(mc.startDrag), 'function');
-    	check_equals(typeof(mc.stopDrag), 'function');
-	check_equals(typeof(mc.getTextSnapshot), 'function');
+    check_equals(typeof(mc.setMask), 'function');
+    check_equals(typeof(mc.beginFill), 'function');
+    check_equals(typeof(mc.beginGradientFill), 'function');
+    check_equals(typeof(mc.clear), 'function');
+    check_equals(typeof(mc.createEmptyMovieClip), 'function');
+    check_equals(typeof(mc.createTextField), 'function');
+    check_equals(typeof(mc.curveTo), 'function');
+    check_equals(typeof(mc.lineStyle), 'function');
+    check_equals(typeof(mc.lineTo), 'function');
+    check_equals(typeof(mc.moveTo), 'function');
+    check_equals(typeof(mc.attachAudio), 'function');
+    check_equals(typeof(mc.endFill), 'function');
+    check_equals(typeof(mc.getDepth), 'function');
+    check_equals(typeof(mc.getURL), 'function');
+    check_equals(typeof(mc.gotoAndPlay), 'function');
+    check_equals(typeof(mc.gotoAndStop), 'function');
+    check_equals(typeof(mc.hitTest), 'function');
+    check_equals(typeof(mc.nextFrame), 'function');
+    check_equals(typeof(mc.play), 'function');
+    check_equals(typeof(mc.prevFrame), 'function');
+    check_equals(typeof(mc.stop), 'function');
+    check_equals(typeof(mc.swapDepths), 'function');
+    check_equals(typeof(mc.startDrag), 'function');
+    check_equals(typeof(mc.stopDrag), 'function');
+    check_equals(typeof(mc.getTextSnapshot), 'function');
 
-	// These two seem unavailable
-	// when targetting SWF > 6
+    // These two seem unavailable
+    // when targetting SWF > 6
 #if OUTPUT_VERSION > 6
-	check_equals(typeof(mc.loadMovie), 'undefined');
-	check_equals(typeof(mc.removeMovieClip), 'undefined');
+    check_equals(typeof(mc.loadMovie), 'undefined');
+    check_equals(typeof(mc.removeMovieClip), 'undefined');
 #else
-	check_equals(typeof(mc.loadMovie), 'function');
-	check_equals(typeof(mc.removeMovieClip), 'function');
+    check_equals(typeof(mc.loadMovie), 'function');
+    check_equals(typeof(mc.removeMovieClip), 'function');
 #endif
 
 #endif // OUTPUT_VERSION >= 6
@@ -213,12 +213,12 @@ check(mc._currentframe != undefined);
 
 if (typeof(mc._droptarget) != "string")
 {
-	fail("typeof(mc._droptarget) = "+typeof(mc._droptarget)+" (expected 'string') ["+__FILE__+":"+__LINE__+"]");
-	note(" WARNING: some players have been reported to evaluate _droptarget to undefined, rather then the empty string. Reguardless of SWF target.");
+    fail("typeof(mc._droptarget) = "+typeof(mc._droptarget)+" (expected 'string') ["+__FILE__+":"+__LINE__+"]");
+    note(" WARNING: some players have been reported to evaluate _droptarget to undefined, rather then the empty string. Reguardless of SWF target.");
 }
 else
 {
-	pass("typeof(mc._droptarget) = "+typeof(mc._droptarget)+" ["+__FILE__+":"+__LINE__+"]");
+    pass("typeof(mc._droptarget) = "+typeof(mc._droptarget)+" ["+__FILE__+":"+__LINE__+"]");
 }
 
 check(mc._focusrect != undefined);
@@ -253,6 +253,69 @@ check(mc._width != undefined);
 check(mc._x != undefined);
 check(mc._xmouse != undefined);
 check(mc._xscale != undefined);
+
+#if OUTPUT_VERSION >= 6
+
+// focused test on _* properties
+check_equals(typeof(mc._x), 'number');
+checks(!mc.hasOwnProperty("_x"));
+checks(!mc.__proto__.hasOwnProperty("_x"));
+checks(!MovieClip.prototype.hasOwnProperty("_x"));
+
+check_equals(typeof(mc._y), 'number');
+checks(!mc.hasOwnProperty("_y"));
+checks(!mc.__proto__.hasOwnProperty("_y"));
+checks(!MovieClip.prototype.hasOwnProperty("_y"));
+
+check_equals(typeof(mc._height), 'number');
+checks(!mc.hasOwnProperty("_height"));
+checks(!mc.__proto__.hasOwnProperty("_height"));
+checks(!MovieClip.prototype.hasOwnProperty("_height"));
+
+check_equals(typeof(mc._width), 'number');
+checks(!mc.hasOwnProperty("_width"));
+checks(!mc.__proto__.hasOwnProperty("_width"));
+checks(!MovieClip.prototype.hasOwnProperty("_width"));
+
+check_equals(typeof(mc._xscale), 'number');
+checks(!mc.hasOwnProperty("_xscale"));
+checks(!mc.__proto__.hasOwnProperty("_xscale"));
+checks(!MovieClip.prototype.hasOwnProperty("_xscale"));
+
+check_equals(typeof(mc._yscale), 'number');
+checks(!mc.hasOwnProperty("_yscale"));
+checks(!mc.__proto__.hasOwnProperty("_yscale"));
+checks(!MovieClip.prototype.hasOwnProperty("_yscale"));
+
+check_equals(typeof(mc._xmouse), 'number');
+checks(!mc.hasOwnProperty("_xmouse"));
+checks(!mc.__proto__.hasOwnProperty("_xmouse"));
+checks(!MovieClip.prototype.hasOwnProperty("_xmouse"));
+
+check_equals(typeof(mc._ymouse), 'number');
+checks(!mc.hasOwnProperty("_ymouse"));
+checks(!mc.__proto__.hasOwnProperty("_ymouse"));
+checks(!MovieClip.prototype.hasOwnProperty("_ymouse"));
+
+check_equals(typeof(mc._rotation), 'number');
+checks(!mc.hasOwnProperty("_rotation"));
+checks(!mc.__proto__.hasOwnProperty("_rotation"));
+checks(!MovieClip.prototype.hasOwnProperty("_rotation"));
+
+check_equals(typeof(mc._totalframes), 'number');
+checks(!mc.hasOwnProperty("_totalframes"));
+checks(!mc.__proto__.hasOwnProperty("_totalframes"));
+checks(!MovieClip.prototype.hasOwnProperty("_totalframes"));
+
+checks(!mc.hasOwnProperty("_target"));
+checks(!mc.hasOwnProperty("_url"));
+checks(!mc.hasOwnProperty("_target"));
+checks(!mc.hasOwnProperty("_soundbuftime"));
+checks(!mc.hasOwnProperty("_focusrect"));
+checks(!mc.hasOwnProperty("_framesloaded"));
+checks(!mc.hasOwnProperty("_lockroot"));
+checks(!mc.hasOwnProperty("_highquality"));
+#endif //if OUTPUT_VERSION >= 6
 
 //----------------------------------------------
 // Test createEmptyMovieClip
@@ -454,12 +517,12 @@ check_equals(typeof(this.$version), 'string');
 
 function enumerate(obj, enum)
 {
-	var enumlen = 0;
-	for (var i in obj) {
-		enum[i] = obj[i];
-		++enumlen;
-	}
-	return enumlen;
+    var enumlen = 0;
+    for (var i in obj) {
+        enum[i] = obj[i];
+        ++enumlen;
+    }
+    return enumlen;
 }
 
 // Check that $version is enumerable
@@ -479,64 +542,64 @@ check_equals(typeof(this.$version), 'undefined');
 #ifdef MING_SUPPORTS_ASM_GETPROPERTY
 
 asm {
-	push "a"
-	push "" // this doesn't resolve to top of with stack
-	push 13 // _name
-	getproperty
-	setvariable
+    push "a"
+    push "" // this doesn't resolve to top of with stack
+    push 13 // _name
+    getproperty
+    setvariable
 };
 #if OUTPUT_VERSION > 5
 check_equals(a, "changed");
 #else
 if ( a == undefined )
 {
-	pass("<empty>._name (trough getProperty(13)) returns undefined ["+__FILE__+":"+__LINE__+"]");
+    pass("<empty>._name (trough getProperty(13)) returns undefined ["+__FILE__+":"+__LINE__+"]");
 }
 else
 {
-	// this check fails with Adobe Flash Player 9
-	fail("<empty>._name (trough getProperty(13)) returns "+a+" (expected undefined) ["+__FILE__+":"+__LINE__+"]");
-	note("Some version of Adobe Flash Player 9 are reported to have this bug");
+    // this check fails with Adobe Flash Player 9
+    fail("<empty>._name (trough getProperty(13)) returns "+a+" (expected undefined) ["+__FILE__+":"+__LINE__+"]");
+    note("Some version of Adobe Flash Player 9 are reported to have this bug");
 }
 #endif
 
 asm {
-	push "b"
-	push "" // this doesn't resolve to top of with stack
-	push 11 // _target
-	getproperty
-	setvariable
+    push "b"
+    push "" // this doesn't resolve to top of with stack
+    push 11 // _target
+    getproperty
+    setvariable
 };
 check_equals(b, "/");
 
 asm {
-	push "a"
-	push "_root"
-	push 13 // _name
-	getproperty
-	setvariable
+    push "a"
+    push "_root"
+    push 13 // _name
+    getproperty
+    setvariable
 };
 #if OUTPUT_VERSION > 5
 check_equals(a, "changed");
 #else
 if ( a == undefined )
 {
-	pass("_root._name (trough getProperty(13)) returns undefined ["+__FILE__+":"+__LINE__+"]");
+    pass("_root._name (trough getProperty(13)) returns undefined ["+__FILE__+":"+__LINE__+"]");
 }
 else
 {
-	// this check fails with Adobe Flash Player 9
-	fail("_root._name (trough getProperty(13)) returns "+a+" (expected undefined) ["+__FILE__+":"+__LINE__+"]");
-	note("Some version of Adobe Flash Player 9 are reported to have this bug");
+    // this check fails with Adobe Flash Player 9
+    fail("_root._name (trough getProperty(13)) returns "+a+" (expected undefined) ["+__FILE__+":"+__LINE__+"]");
+    note("Some version of Adobe Flash Player 9 are reported to have this bug");
 }
 #endif
 
 asm {
-	push "b"
-	push "_root"
-	push 11 // _target
-	getproperty
-	setvariable
+    push "b"
+    push "_root"
+    push 11 // _target
+    getproperty
+    setvariable
 };
 check_equals(b, "/");
 
@@ -584,11 +647,11 @@ static_clip_name = "__shared_assets";
 static_clip = eval(static_clip_name);
 if ( typeof(static_clip) == 'movieclip' )
 {
-	check_equals(static_clip.getDepth(), -16383);
+    check_equals(static_clip.getDepth(), -16383);
 }
 else
 {
-	note("There is not '"+static_clip_name+"' clip statically-defined, so we could not test getDepth() against it");
+    note("There is not '"+static_clip_name+"' clip statically-defined, so we could not test getDepth() against it");
 
 }
 
@@ -625,12 +688,12 @@ checks(b.yMax-6710886.35 < 0.001);
 
 with (draw)
 {
-	lineStyle(0, 0x000000);
-	moveTo(10, 10);
-	lineTo(10, 30);
-	lineTo(20, 30);
-	lineTo(20, 10);
-	lineTo(10, 10);
+    lineStyle(0, 0x000000);
+    moveTo(10, 10);
+    lineTo(10, 30);
+    lineTo(20, 30);
+    lineTo(20, 10);
+    lineTo(10, 10);
 }
 check_equals(draw._width, 10);
 check_equals(draw._height, 20);
@@ -745,12 +808,12 @@ container.createEmptyMovieClip("draw2", 6);
 draw = container.draw2;
 with (draw)
 {
-	lineStyle(0, 0x000000);
-	moveTo(60, 20);
-	lineTo(60, 40);
-	lineTo(80, 40);
-	lineTo(80, 20);
-	lineTo(60, 20);
+    lineStyle(0, 0x000000);
+    moveTo(60, 20);
+    lineTo(60, 40);
+    lineTo(80, 40);
+    lineTo(80, 20);
+    lineTo(60, 20);
 }
 
 b = container.draw.getBounds(container); 
@@ -818,106 +881,106 @@ static_clip_name = "__shared_assets";
 static_clip = __shared_assets;
 if ( typeof(static_clip) == 'movieclip' )
 {
-	o = {x:0, y:0};
-	static_clip.localToGlobal(o);
-	check_equals(o.x, 0);
-	check_equals(o.y, 0);
-	static_clip.globalToLocal(o);
-	check_equals(o.x, 0);
-	check_equals(o.y, 0);
+    o = {x:0, y:0};
+    static_clip.localToGlobal(o);
+    check_equals(o.x, 0);
+    check_equals(o.y, 0);
+    static_clip.globalToLocal(o);
+    check_equals(o.x, 0);
+    check_equals(o.y, 0);
 
-	static_clip._x += 50;
-	static_clip._y -= 30;
+    static_clip._x += 50;
+    static_clip._y -= 30;
 
-	o = {x:0, y:0};
-	static_clip.localToGlobal(o);
-	check_equals(o.x, 50);
-	check_equals(o.y, -30);
-	static_clip.globalToLocal(o);
-	check_equals(o.x, 0);
-	check_equals(o.y, 0);
+    o = {x:0, y:0};
+    static_clip.localToGlobal(o);
+    check_equals(o.x, 50);
+    check_equals(o.y, -30);
+    static_clip.globalToLocal(o);
+    check_equals(o.x, 0);
+    check_equals(o.y, 0);
 
-	o = {x:1, y:1};
-	static_clip.localToGlobal(o);
-	check_equals(o.x, 51);
-	check_equals(o.y, -29);
-	static_clip.globalToLocal(o);
-	check_equals(o.x, 1);
-	check_equals(o.y, 1);
+    o = {x:1, y:1};
+    static_clip.localToGlobal(o);
+    check_equals(o.x, 51);
+    check_equals(o.y, -29);
+    static_clip.globalToLocal(o);
+    check_equals(o.x, 1);
+    check_equals(o.y, 1);
 
-	static_clip._xscale *= 2;
-	static_clip._yscale *= 0.5;
+    static_clip._xscale *= 2;
+    static_clip._yscale *= 0.5;
 
-	o = {x:0, y:0};
-	static_clip.localToGlobal(o);
-	check_equals(o.x, 50);
-	check_equals(o.y, -30);
-	static_clip.globalToLocal(o);
-	check_equals(o.x, 0);
-	check_equals(o.y, 0);
+    o = {x:0, y:0};
+    static_clip.localToGlobal(o);
+    check_equals(o.x, 50);
+    check_equals(o.y, -30);
+    static_clip.globalToLocal(o);
+    check_equals(o.x, 0);
+    check_equals(o.y, 0);
 
-	o = {x:2, y:2};
-	static_clip.localToGlobal(o);
-	check_equals(o.x, 54);
-	check_equals(o.y, -29);
-	static_clip.globalToLocal(o);
-	check_equals(o.x, 2);
-	check_equals(o.y, 2);
+    o = {x:2, y:2};
+    static_clip.localToGlobal(o);
+    check_equals(o.x, 54);
+    check_equals(o.y, -29);
+    static_clip.globalToLocal(o);
+    check_equals(o.x, 2);
+    check_equals(o.y, 2);
 
-	static_clip._rotation = 90;
+    static_clip._rotation = 90;
 
-	o = {x:0, y:0};
-	static_clip.localToGlobal(o);
-	check_equals(o.x, 50);
-	check_equals(o.y, -30);
-	static_clip.globalToLocal(o);
-	check_equals(o.x, 0);
-	check_equals(o.y, 0);
+    o = {x:0, y:0};
+    static_clip.localToGlobal(o);
+    check_equals(o.x, 50);
+    check_equals(o.y, -30);
+    static_clip.globalToLocal(o);
+    check_equals(o.x, 0);
+    check_equals(o.y, 0);
 
-	o = {x:2, y:2};
-	static_clip.localToGlobal(o);
-	check_equals(o.x, 49);
-	check_equals(o.y, -26);
-	static_clip.globalToLocal(o);
-	check_equals(o.x, 2);
-	check_equals(o.y, 2);
+    o = {x:2, y:2};
+    static_clip.localToGlobal(o);
+    check_equals(o.x, 49);
+    check_equals(o.y, -26);
+    static_clip.globalToLocal(o);
+    check_equals(o.x, 2);
+    check_equals(o.y, 2);
 
-	// omit the 'y' member (invalid call)
-	o = {x:2};
-	static_clip.localToGlobal(o);
-	check_equals(o.x, 2);
-	check_equals(typeof(o.y), 'undefined');
-	static_clip.globalToLocal(o);
-	check_equals(o.x, 2);
-	check_equals(typeof(o.y), 'undefined');
+    // omit the 'y' member (invalid call)
+    o = {x:2};
+    static_clip.localToGlobal(o);
+    check_equals(o.x, 2);
+    check_equals(typeof(o.y), 'undefined');
+    static_clip.globalToLocal(o);
+    check_equals(o.x, 2);
+    check_equals(typeof(o.y), 'undefined');
 
-	// Upper case
-	o = {X:2, Y:2};
-	static_clip.localToGlobal(o);
+    // Upper case
+    o = {X:2, Y:2};
+    static_clip.localToGlobal(o);
 #if OUTPUT_VERSION < 7
-	check_equals(o.X, 49);
-	check_equals(o.Y, -26);
+    check_equals(o.X, 49);
+    check_equals(o.Y, -26);
 #else // OUTPUT_VERSION >= 7
-	check_equals(o.X, 2);
-	check_equals(o.Y, 2);
-	check_equals(typeof(o.x), 'undefined');
-	check_equals(typeof(o.y), 'undefined');
+    check_equals(o.X, 2);
+    check_equals(o.Y, 2);
+    check_equals(typeof(o.x), 'undefined');
+    check_equals(typeof(o.y), 'undefined');
 #endif
-	static_clip.globalToLocal(o);
-	check_equals(o.X, 2);
-	check_equals(o.Y, 2);
+    static_clip.globalToLocal(o);
+    check_equals(o.X, 2);
+    check_equals(o.Y, 2);
 
-	static_clip._rotation = 0;
-	static_clip._x -= 50;
-	static_clip._y += 30;
-	static_clip._xscale *= 0.5;
-	static_clip._yscale *= 2;
+    static_clip._rotation = 0;
+    static_clip._x -= 50;
+    static_clip._y += 30;
+    static_clip._xscale *= 0.5;
+    static_clip._yscale *= 2;
 
-	// TODO: try with x/y being getter-setter of the localToGlobal and globalToLocal parameter
+    // TODO: try with x/y being getter-setter of the localToGlobal and globalToLocal parameter
 }
 else
 {
-	note("There is not '"+static_clip_name+"' clip statically-defined, so we could not test localToGlobal() and globalToLocal() against it");
+    note("There is not '"+static_clip_name+"' clip statically-defined, so we could not test localToGlobal() and globalToLocal() against it");
 
 }
 
