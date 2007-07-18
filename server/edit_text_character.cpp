@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.77 2007/07/18 03:35:38 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.78 2007/07/18 03:47:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -770,13 +770,6 @@ edit_text_character::set_member(const std::string& name,
 	}	// end switch
 
 
-	// TODO: iff background, backgroundColor, border, borderColor or textColor 
-	//       members are changed we should call set_invalidated !
-	//       Note that *deleting* these members might need to have
-	//       the same effect too (to be tested)
-	//
-	log_debug("Calling set_member_default(%s, xxx)", name.c_str());
-
 	set_member_default(name, val);
 }
 
@@ -1414,7 +1407,6 @@ edit_text_character::setDrawBackground(bool val)
 {
 	if ( _drawBackground != val )
 	{
-		log_debug("Setting draw background to %d", val);
 		set_invalidated();
 		_drawBackground = val;
 	}
@@ -1431,7 +1423,6 @@ edit_text_character::setBackgroundColor(const rgba& col)
 {
 	if ( _backgroundColor != col )
 	{
-		log_debug("Setting background color to %s", col.toString().c_str());
 		set_invalidated();
 		_backgroundColor = col;
 	}
