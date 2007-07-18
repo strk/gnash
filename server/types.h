@@ -54,6 +54,19 @@ namespace gnash {
 		{
 		}
 
+		/// \brief
+		/// Parse a 32-bit unsigned integer
+		/// as three packed R,G,B bytes.
+		//
+		/// Alpha will be untouched
+		///
+		void parseRGB(uint32_t rgbCol)
+		{
+			m_r = (uint8_t)(rgbCol>>16);
+			m_g = (uint8_t)(rgbCol>>8);
+			m_b = (uint8_t)(rgbCol);
+		}
+
 		/// Initialize from intput stream.
 		//
 		///
