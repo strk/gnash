@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.68 2007/07/17 06:04:22 zoulunkai Exp $ */
+/* $Id: movie_root.h,v 1.69 2007/07/18 23:31:59 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -448,50 +448,13 @@ public:
         getLevel(0)->goto_frame(target_frame_number);
     }
 
-#if 0
-    /// delegates to _level0
-    bool has_looped() const
-    {
-        return getLevel(0)->has_looped();
-    }
-#endif
-
     void display();
-
-#if 0
-    /// Delegate to _level0
-    bool goto_labeled_frame(const char* label) {
-        return _movie->goto_labeled_frame(label);
-    }
-#endif
 
     /// Delegate to _level0
     void set_play_state(sprite_instance::play_state s)
     {
         getLevel(0)->set_play_state(s);
     }
-
-#if 0
-    /// Delegate to _level0
-    sprite_instance::play_state get_play_state() const
-    {
-        return _movie->get_play_state();
-    }
-
-    /// Delegate to wrapped movie_instance
-    void set_variable(const char* path_to_var,
-            const char* new_value)
-    {
-        _movie->set_variable(path_to_var, new_value);
-    }
-
-    /// Delegate to wrapped movie_instance
-    void set_variable(const char* path_to_var,
-            const wchar_t* new_value)
-    {
-        _movie->set_variable(path_to_var, new_value);
-    }
-#endif
 
     /// For ActionScript interfacing convenience.
     //
@@ -510,17 +473,6 @@ public:
     ///
     const char* call_method_args(const char* method_name,
             const char* method_arg_fmt, va_list args);
-
-#if 0
-    /// Delegate to wrapped movie_instance
-    void set_visible(bool visible) {
-        _movie->set_visible(visible);
-    }
-    /// Delegate to wrapped movie_instance
-    bool get_visible() const {
-        return _movie->get_visible();
-    }
-#endif
 
     void * get_userdata() { return m_userdata; }
     void set_userdata(void * ud ) { m_userdata = ud;  }
