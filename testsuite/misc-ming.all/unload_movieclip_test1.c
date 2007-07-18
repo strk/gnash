@@ -83,7 +83,11 @@ main(int argc, char** argv)
   // Frame 2: Place a static mc and define onUnload for it
   
   it = add_static_mc(mo, "mc", 3);
-  add_actions(mo, "mc.onUnload = function () { _root.x = this._currentframe; };");
+  add_actions(mo, "mc.onUnload = function () { "
+                  "    _root.x = this._currentframe; "
+                  "    _root.check_equals(typeof(this),  'movieclip'); "
+                  "    _root.xcheck_equals(this, _root.mc); "
+                  "};");
   SWFMovie_nextFrame(mo);
   
   // Frame 3: Remove the mc to trigger onUnload
@@ -104,3 +108,4 @@ main(int argc, char** argv)
 
   return 0;
 }
+

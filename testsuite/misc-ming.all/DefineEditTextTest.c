@@ -118,6 +118,13 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); // 1st frame 
 
+  // checks before placing any swf defined TextField
+  check(mo, "!TextField.prototype.hasOwnProperty('background')");
+  check(mo, "!TextField.prototype.hasOwnProperty('backgroundColor')");
+  check(mo, "!TextField.prototype.hasOwnProperty('text')");
+  check(mo, "!TextField.prototype.hasOwnProperty('textColor')");
+  check(mo, "!TextField.prototype.hasOwnProperty('_alpha')");
+
   /*********************************************
    *
    * Add some textfields
@@ -149,7 +156,12 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); 
 
   check_equals(mo, "dtext1.__proto__", "TextField.prototype");
+  // checks after placing some swf defined TextField
   check(mo, "TextField.prototype.hasOwnProperty('background')");
+  check(mo, "TextField.prototype.hasOwnProperty('backgroundColor')");
+  check(mo, "TextField.prototype.hasOwnProperty('text')");
+  check(mo, "TextField.prototype.hasOwnProperty('textColor')");
+  check(mo, "TextField.prototype.hasOwnProperty('_alpha')");
   
   check_equals(mo, "typeof(dtext1)", "'object'");
   check_equals(mo, "typeof(dtext1.text)", "'string'");
@@ -162,7 +174,7 @@ main(int argc, char** argv)
   check_equals(mo, "typeof(dtext1.__proto__.background)", "'undefined'");
   check_equals(mo, "typeof(dtext1.__proto__.backgroundColor)", "'undefined'");
   check_equals(mo, "typeof(dtext1.__proto__.textColor)", "'undefined'");
-  check_equals(mo, "typeof(dtext1.__proto__.alpha)", "'undefined'");
+  check_equals(mo, "typeof(dtext1.__proto__._alpha)", "'undefined'");
 
   check_equals(mo, "dtext1.hasOwnProperty('text')", "false");
   check_equals(mo, "dtext1.hasOwnProperty('background')", "false");

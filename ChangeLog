@@ -1,5 +1,10 @@
 2007-07-18 Zou Lunkai <zoulunkai@gmail.com>
 	
+	* testsuite/misc-ming.all/unload_movieclip_test1.c, DefineEditTextTest.c:
+	  more tests.
+	  
+2007-07-18 Zou Lunkai <zoulunkai@gmail.com>
+	
 	* testsuite/misc-ming.all/Makefile.am, unload_movieclip_test1.c: add
 	  a testcase for unloaded movieclips, Gnash fails.
 	
