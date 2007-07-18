@@ -86,6 +86,7 @@ check_PROGRAMS = \
 	move_object_test \
 	place_and_remove_object_test \
 	place_and_remove_object_insane_test \
+	unload_movieclip_test1 \
 	displaylist_depths_test \
 	displaylist_depths_test2 \
 	displaylist_depths_test3 \
@@ -182,6 +183,7 @@ check_SCRIPTS = \
 	move_object_testrunner \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
+	unload_movieclip_test1runner \
 	goto_frame_testrunner \
 	consecutive_goto_frame_testrunner \
 	multi_doactions_and_goto_frame_testrunner \
@@ -648,6 +650,18 @@ place_and_remove_object_insane_test.swf: place_and_remove_object_insane_test
 
 place_and_remove_object_insane_testrunner: $(srcdir)/../generic-testrunner.sh place_and_remove_object_insane_test.swf
 	sh $< -r5 $(top_builddir) place_and_remove_object_insane_test.swf > $@
+	chmod 755 $@
+
+unload_movieclip_test1_SOURCES =	\
+	unload_movieclip_test1.c	\
+	$(NULL)
+unload_movieclip_test1_LDADD = libgnashmingutils.la
+
+unload_movieclip_test1.swf: unload_movieclip_test1
+	./unload_movieclip_test1 $(top_srcdir)/testsuite/media
+
+unload_movieclip_test1runner: $(srcdir)/../generic-testrunner.sh unload_movieclip_test1.swf
+	sh $< -f10 $(top_builddir) unload_movieclip_test1.swf > $@
 	chmod 755 $@
 
 displaylist_depths_test_SOURCES =	\
@@ -1546,6 +1560,7 @@ TEST_CASES = \
 	move_object_testrunner \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
+	unload_movieclip_test1runner \
 	attachMovieTestRunner \
 	attachMovieLoopingTestRunner \
 	goto_frame_testrunner \

@@ -1,3 +1,8 @@
+2007-07-18 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-ming.all/Makefile.am, unload_movieclip_test1.c: add
+	  a testcase for unloaded movieclips, Gnash fails.
+	
 2007-07-18 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/TextField.as: Updated test results.
