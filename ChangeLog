@@ -1,5 +1,7 @@
 2007-07-18 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_agg_style.h: fixed initialization order
+	  warnings.
 	* backend/render_handler_agg.cpp: signedness and initialization list
 	  order warnings fix. This code is a jungle, would be *really* useful
 	  to split class declarations and definition.

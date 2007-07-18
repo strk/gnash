@@ -119,13 +119,13 @@ public:
   agg_style_bitmap(int width, int height, int rowlen, uint8_t* data, 
     gnash::matrix mat, gnash::cxform cx) :
     
+    m_force_premultiply(false),
     m_rbuf(data, width, height, rowlen),  
     m_pixf(m_rbuf),
     m_img_src(m_pixf),
     m_tr(),       // initialize later
     m_interpolator(m_tr),
-    m_sg(m_img_src, m_interpolator),
-    m_force_premultiply(false)
+    m_sg(m_img_src, m_interpolator)
   {
   
     m_is_solid = false;
