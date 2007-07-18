@@ -61,6 +61,9 @@ namespace gnash {
 		/// Alpha will be untouched.
 		/// Blue is the least significant byte.
 		///
+		/// This function is meant to be used to
+		/// parse ActionScript colors in numeric format.
+		///
 		void parseRGB(uint32_t rgbCol)
 		{
 			m_r = (uint8_t)(rgbCol>>16);
@@ -73,6 +76,9 @@ namespace gnash {
 		/// as four packed R,G,B bytes.
 		//
 		/// Blue is the least significant byte.
+		///
+		/// This function is meant to be used to
+		/// output ActionScript colors in numeric format.
 		///
 		uint32_t toRGB()
 		{
