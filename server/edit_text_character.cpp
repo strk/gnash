@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.75 2007/07/17 06:04:22 zoulunkai Exp $ */
+/* $Id: edit_text_character.cpp,v 1.76 2007/07/18 02:26:53 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,7 +36,6 @@
 #include "VM.h"
 #include "builtin_function.h" // for getter/setter properties
 #include "font.h" // for using the _font member
-#include "VM.h"
 
 #include <algorithm>
 #include <string>
@@ -44,7 +43,6 @@
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
 #define PADDING_TWIPS 40.0f
-
 
 namespace gnash {
 
@@ -64,6 +62,20 @@ static as_value textfield_removeTextField(const fn_call& fn);
 static as_value textfield_replaceSel(const fn_call& fn);
 static as_value textfield_replaceText(const fn_call& fn);
 static as_object* getTextFieldInterface();
+
+	namespace
+	{
+
+		void
+		lowercase_if_needed(std::string& str)
+		{
+			VM& vm = VM::get();
+			if ( vm.getSWFVersion() >= 7 ) return;
+			boost::to_lower(str, vm.getLocale());
+		}
+
+	}
+
 
 
 //
@@ -364,6 +376,7 @@ edit_text_character::edit_text_character(character* parent,
 	registerTextVariable();
 
 	reset_bounding_box(0, 0);
+
 }
 
 edit_text_character::~edit_text_character()
@@ -402,7 +415,9 @@ edit_text_character::display()
 
 	rect def_bounds = m_def->get_bounds();
 
-	if (m_def->has_border())
+	bool drawBorder = hasBorder();
+	bool drawBackground = hasBackground();
+	if ( drawBorder || drawBackground )
 	{
 		matrix	mat = get_world_matrix();
 		
@@ -420,38 +435,11 @@ edit_text_character::display()
 		coords[2] = def_bounds.get_corner(2);
 		coords[3] = def_bounds.get_corner(3);
 		
-		render::draw_poly(&coords[0], 4, rgba(255,255,255,255), rgba(0,0,0,255));
-		
-		
-		// removed by Udo:
-		/*
-		coords[0] = def_bounds.get_corner(0);
-		coords[1] = def_bounds.get_corner(1);
-		coords[2] = def_bounds.get_corner(3);
-		coords[3] = def_bounds.get_corner(2);
+		rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
+		rgba backgroundColor = drawBackground ? getBackgroundColor() : rgba(255,255,255,0);
 
-		int16_t	icoords[18] = 
-		{
-			// strip (fill in)
-			(int16_t) coords[0].m_x, (int16_t) coords[0].m_y,
-			(int16_t) coords[1].m_x, (int16_t) coords[1].m_y,
-			(int16_t) coords[2].m_x, (int16_t) coords[2].m_y,
-			(int16_t) coords[3].m_x, (int16_t) coords[3].m_y,
-
-			// outline
-			(int16_t) coords[0].m_x, (int16_t) coords[0].m_y,
-			(int16_t) coords[1].m_x, (int16_t) coords[1].m_y,
-			(int16_t) coords[3].m_x, (int16_t) coords[3].m_y,
-			(int16_t) coords[2].m_x, (int16_t) coords[2].m_y,
-			(int16_t) coords[0].m_x, (int16_t) coords[0].m_y,
-		};
+		render::draw_poly( &coords[0], 4, backgroundColor, borderColor );
 		
-		render::fill_style_color(0, rgba(255, 255, 255, 255));
-		render::draw_mesh_strip(&icoords[0], 4);
-
-		render::line_style_color(rgba(0,0,0,255));
-		render::draw_line_strip(&icoords[8], 5);
-		*/
 	}
 
 	// Draw our actual text.
@@ -754,6 +742,12 @@ edit_text_character::set_member(const std::string& name,
 	}
 	// @@ TODO see TextField members in Flash MX docs
 	}	// end switch
+
+
+	// TODO: iff background, backgroundColor, border, borderColor or textColor 
+	//       members are changed we should call set_invalidated !
+	//       Note that *deleting* these members might need to have
+	//       the same effect too (to be tested)
 
 	set_member_default(name, val);
 }
@@ -1347,6 +1341,68 @@ edit_text_character::pointInShape(float x, float y) const
 	wm.transform_by_inverse(lp);
 	const rect& def_bounds = m_def->get_bounds();
 	return def_bounds.point_test(lp.m_x, lp.m_y);
+}
+
+bool
+edit_text_character::hasBorder() const
+{
+	// TODO: check the 'border' member too !
+	return m_def->has_border();
+}
+
+rgba
+edit_text_character::getBorderColor() const
+{
+	// Background color is white by default
+	rgba col(0,0,0,255);
+
+	// TODO: define a caching strategy
+	as_value tmp;
+	std::string pname = "borderColor";
+	lowercase_if_needed(pname); // convert to lowercase if SWF < 7
+	if ( ! const_cast<edit_text_character*>(this)->get_member(pname, &tmp) ) return col;
+
+	// Parse color
+	uint32_t rgbCol = tmp.to_number<uint32_t>(); // TODO: pass to_number an as_environment !
+	col.parseRGB(rgbCol);
+	//uint8_t r = (uint8_t)(rgbCol>>16);
+	//uint8_t g = (uint8_t)(rgbCol>>8);
+	//uint8_t b = (uint8_t)(rgbCol);
+	//col.set(r,g,b,255);
+	return col;
+}
+
+bool
+edit_text_character::hasBackground() const
+{
+	// TODO: define a caching strategy
+	as_value tmp;
+	static const char* pname = "background";
+	if ( ! const_cast<edit_text_character*>(this)->get_member(pname, &tmp) ) return false;
+	return tmp.to_bool();
+}
+
+rgba
+edit_text_character::getBackgroundColor() const
+{
+	// Background color is white by default
+	rgba col(255,255,255,255);
+
+	// TODO: define a caching strategy
+	as_value tmp;
+	std::string pname = "backgroundColor";
+	lowercase_if_needed(pname); // convert to lowercase if SWF < 7
+	if ( ! const_cast<edit_text_character*>(this)->get_member(pname, &tmp) ) return col;
+
+	// Parse color
+	uint32_t rgbCol = tmp.to_number<uint32_t>(); // TODO: pass to_number an as_environment !
+	col.parseRGB(rgbCol);
+	//uint8_t r = (uint8_t)(rgbCol>>16);
+	//uint8_t g = (uint8_t)(rgbCol>>8);
+	//uint8_t b = (uint8_t)(rgbCol);
+	//col.set(r,g,b,255);
+
+	return col;
 }
 
 } // namespace gnash

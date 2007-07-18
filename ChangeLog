@@ -1,5 +1,8 @@
 2007-07-17 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.{cpp,h}: Initial support for background,
+	  backgroundColor, border and borderColor. Lacks proper management
+	  of invalidated bounds and class properties. 
 	* server/types.h: Add rgba::parseRGB() for converting an integer
 	  to an rgb value.
 	* server/as_object.h: fix comments about case sensitiveness of

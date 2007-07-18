@@ -110,6 +110,18 @@ private:
 	/// Return true if HTML was allowed by definition
 	bool htmlAllowed() const { return m_def->htmlAllowed(); }
 
+	/// Return true if the 'background' member is set to true
+	bool hasBackground() const;
+
+	/// Return the value of 'backgroundColor', or solid white if undefined.
+	rgba getBackgroundColor() const;
+
+	/// Return true if this TextField should have it's border visible
+	bool hasBorder() const;
+
+	/// Return the value of 'borderColor', or solid black if undefined.
+	rgba getBorderColor() const;
+
 	/// The actual text
 	std::string _text;
 
