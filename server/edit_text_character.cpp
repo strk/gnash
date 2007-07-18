@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.76 2007/07/18 02:26:53 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.77 2007/07/18 03:35:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,6 +62,11 @@ static as_value textfield_removeTextField(const fn_call& fn);
 static as_value textfield_replaceSel(const fn_call& fn);
 static as_value textfield_replaceText(const fn_call& fn);
 static as_object* getTextFieldInterface();
+
+static as_value textfield_background_getset(const fn_call& fn);
+static as_value textfield_border_getset(const fn_call& fn);
+static as_value textfield_backgroundColor_getset(const fn_call& fn);
+static as_value textfield_borderColor_getset(const fn_call& fn);
 
 	namespace
 	{
@@ -290,6 +295,7 @@ attachTextFieldInterface(as_object& o)
 	if ( target_version  < 6 ) return;
 
 	// SWF6 or higher
+
 	boost::intrusive_ptr<builtin_function> variable_getter(new builtin_function(&textfield_get_variable, NULL));
 	boost::intrusive_ptr<builtin_function> variable_setter(new builtin_function(&textfield_set_variable, NULL));
 	o.init_property("variable", *variable_getter, *variable_setter);
@@ -303,6 +309,20 @@ attachTextFieldInterface(as_object& o)
 	o.init_member("getDepth", new builtin_function(textfield_getDepth));
 	o.init_member("removeTextField", new builtin_function(textfield_removeTextField));
 	o.init_member("replaceSel", new builtin_function(textfield_replaceSel));
+
+	// The following properties should only be attached to the prototype
+	// on first textfield creation. We won't get to that detail of compatibility,
+	// seeming not important
+	boost::intrusive_ptr<builtin_function> getset;
+	getset = new builtin_function(textfield_background_getset);
+	o.init_property("background", *getset, *getset);
+	getset = new builtin_function(textfield_backgroundColor_getset);
+	o.init_property("backgroundColor", *getset, *getset);
+	getset = new builtin_function(textfield_borderColor_getset);
+	o.init_property("border", *getset, *getset);
+	getset = new builtin_function(textfield_border_getset);
+	o.init_property("borderColor", *getset, *getset);
+
 	if ( target_version  < 7 ) return;
 
 	// SWF7 or higher
@@ -356,7 +376,11 @@ edit_text_character::edit_text_character(character* parent,
 	m_xcursor(0.0f),
 	m_ycursor(0.0f),
 	_text_variable_registered(false),
-	_variable_name(m_def->get_variable_name())
+	_variable_name(m_def->get_variable_name()),
+	_drawBackground(false),
+	_backgroundColor(255,255,255,255),
+	_drawBorder(m_def->has_border()),
+	_borderColor(0,0,0,255)
 {
 	assert(parent);
 	assert(m_def);
@@ -415,8 +439,8 @@ edit_text_character::display()
 
 	rect def_bounds = m_def->get_bounds();
 
-	bool drawBorder = hasBorder();
-	bool drawBackground = hasBackground();
+	bool drawBorder = getDrawBorder();
+	bool drawBackground = getDrawBackground();
 	if ( drawBorder || drawBackground )
 	{
 		matrix	mat = get_world_matrix();
@@ -437,6 +461,8 @@ edit_text_character::display()
 		
 		rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
 		rgba backgroundColor = drawBackground ? getBackgroundColor() : rgba(255,255,255,0);
+
+		//log_debug("Border color : %s, Background color : %s", borderColor.toString().c_str(), backgroundColor.toString().c_str());
 
 		render::draw_poly( &coords[0], 4, backgroundColor, borderColor );
 		
@@ -748,6 +774,8 @@ edit_text_character::set_member(const std::string& name,
 	//       members are changed we should call set_invalidated !
 	//       Note that *deleting* these members might need to have
 	//       the same effect too (to be tested)
+	//
+	log_debug("Calling set_member_default(%s, xxx)", name.c_str());
 
 	set_member_default(name, val);
 }
@@ -1344,65 +1372,144 @@ edit_text_character::pointInShape(float x, float y) const
 }
 
 bool
-edit_text_character::hasBorder() const
+edit_text_character::getDrawBorder() const
 {
-	// TODO: check the 'border' member too !
-	return m_def->has_border();
+	return _drawBorder;
+}
+
+void
+edit_text_character::setDrawBorder(bool val) 
+{
+	if ( _drawBorder != val )
+	{
+		set_invalidated();
+		_drawBorder = val;
+	}
 }
 
 rgba
 edit_text_character::getBorderColor() const
 {
-	// Background color is white by default
-	rgba col(0,0,0,255);
+	return _borderColor;
+}
 
-	// TODO: define a caching strategy
-	as_value tmp;
-	std::string pname = "borderColor";
-	lowercase_if_needed(pname); // convert to lowercase if SWF < 7
-	if ( ! const_cast<edit_text_character*>(this)->get_member(pname, &tmp) ) return col;
-
-	// Parse color
-	uint32_t rgbCol = tmp.to_number<uint32_t>(); // TODO: pass to_number an as_environment !
-	col.parseRGB(rgbCol);
-	//uint8_t r = (uint8_t)(rgbCol>>16);
-	//uint8_t g = (uint8_t)(rgbCol>>8);
-	//uint8_t b = (uint8_t)(rgbCol);
-	//col.set(r,g,b,255);
-	return col;
+void
+edit_text_character::setBorderColor(const rgba& col)
+{
+	if ( _borderColor != col )
+	{
+		set_invalidated();
+		_borderColor = col;
+	}
 }
 
 bool
-edit_text_character::hasBackground() const
+edit_text_character::getDrawBackground() const
 {
-	// TODO: define a caching strategy
-	as_value tmp;
-	static const char* pname = "background";
-	if ( ! const_cast<edit_text_character*>(this)->get_member(pname, &tmp) ) return false;
-	return tmp.to_bool();
+	return _drawBackground;
+}
+
+void
+edit_text_character::setDrawBackground(bool val) 
+{
+	if ( _drawBackground != val )
+	{
+		log_debug("Setting draw background to %d", val);
+		set_invalidated();
+		_drawBackground = val;
+	}
 }
 
 rgba
 edit_text_character::getBackgroundColor() const
 {
-	// Background color is white by default
-	rgba col(255,255,255,255);
+	return _backgroundColor;
+}
 
-	// TODO: define a caching strategy
-	as_value tmp;
-	std::string pname = "backgroundColor";
-	lowercase_if_needed(pname); // convert to lowercase if SWF < 7
-	if ( ! const_cast<edit_text_character*>(this)->get_member(pname, &tmp) ) return col;
+void
+edit_text_character::setBackgroundColor(const rgba& col)
+{
+	if ( _backgroundColor != col )
+	{
+		log_debug("Setting background color to %s", col.toString().c_str());
+		set_invalidated();
+		_backgroundColor = col;
+	}
+}
 
-	// Parse color
-	uint32_t rgbCol = tmp.to_number<uint32_t>(); // TODO: pass to_number an as_environment !
-	col.parseRGB(rgbCol);
-	//uint8_t r = (uint8_t)(rgbCol>>16);
-	//uint8_t g = (uint8_t)(rgbCol>>8);
-	//uint8_t b = (uint8_t)(rgbCol);
-	//col.set(r,g,b,255);
+static as_value
+textfield_background_getset(const fn_call& fn)
+{
+	GNASH_REPORT_FUNCTION;
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
 
-	return col;
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->getDrawBackground());
+	}
+	else // setter
+	{
+		ptr->setDrawBackground(fn.arg(0).to_bool());
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_border_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->getDrawBorder());
+	}
+	else // setter
+	{
+		ptr->setDrawBorder(fn.arg(0).to_bool());
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_backgroundColor_getset(const fn_call& fn)
+{
+	GNASH_REPORT_FUNCTION;
+
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->getBackgroundColor().toRGB());
+	}
+	else // setter
+	{
+		rgba newColor;
+		newColor.parseRGB( fn.arg(0).to_number<uint32_t>(&fn.env()) );
+		ptr->setBackgroundColor(newColor);
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_borderColor_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->getBorderColor().toRGB());
+	}
+	else // setter
+	{
+		rgba newColor;
+		newColor.parseRGB( fn.arg(0).to_number<uint32_t>(&fn.env()) );
+		ptr->setBorderColor(newColor);
+	}
+
+	return as_value();
 }
 
 } // namespace gnash

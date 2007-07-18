@@ -105,22 +105,45 @@ public:
 	// See dox in character.h
 	void unload();
 
-private:
+	/// Return true if the 'background' should be drawn
+	bool getDrawBackground() const;
 
-	/// Return true if HTML was allowed by definition
-	bool htmlAllowed() const { return m_def->htmlAllowed(); }
+	/// Specify wheter to draw the background
+	void setDrawBackground(bool draw);
 
-	/// Return true if the 'background' member is set to true
-	bool hasBackground() const;
-
-	/// Return the value of 'backgroundColor', or solid white if undefined.
+	/// Return color of the background
 	rgba getBackgroundColor() const;
 
-	/// Return true if this TextField should have it's border visible
-	bool hasBorder() const;
+	/// Set color of the background
+	//
+	/// Use setDrawBackground to actually use this value.
+	///
+	void setBackgroundColor(const rgba& col);
 
-	/// Return the value of 'borderColor', or solid black if undefined.
+	/// Return true if this TextField should have it's border visible
+	bool getDrawBorder() const;
+
+	/// Specify wheter to draw the border
+	void setDrawBorder(bool draw);
+
+	/// Return color of the border
 	rgba getBorderColor() const;
+
+	/// Set color of the border
+	//
+	/// Use setDrawBorder to actually use this value.
+	///
+	void setBorderColor(const rgba& col);
+
+private:
+
+	/// Return true if HTML text is allowed 
+	//
+	/// TODO: use own flag for this, don't query the definition
+	///       everytime. This will allow support for the
+	///	  ActionScript settable 'html' property.
+	///       
+	bool htmlAllowed() const { return m_def->htmlAllowed(); }
 
 	/// The actual text
 	std::string _text;
@@ -202,6 +225,14 @@ private:
 	/// because it can be changed programmatically, by setting
 	/// 'TextFields.variable'
 	std::string _variable_name;
+
+	bool _drawBackground;
+
+	rgba _backgroundColor;
+
+	bool _drawBorder;
+
+	rgba _borderColor;
 
 protected:
 

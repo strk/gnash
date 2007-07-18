@@ -58,13 +58,25 @@ namespace gnash {
 		/// Parse a 32-bit unsigned integer
 		/// as three packed R,G,B bytes.
 		//
-		/// Alpha will be untouched
+		/// Alpha will be untouched.
+		/// Blue is the least significant byte.
 		///
 		void parseRGB(uint32_t rgbCol)
 		{
 			m_r = (uint8_t)(rgbCol>>16);
 			m_g = (uint8_t)(rgbCol>>8);
 			m_b = (uint8_t)(rgbCol);
+		}
+
+		/// \brief
+		/// Return a 32-bit unsigned integer
+		/// as four packed R,G,B bytes.
+		//
+		/// Blue is the least significant byte.
+		///
+		uint32_t toRGB()
+		{
+			return (m_r<<16) + (m_g<<8) + m_b;
 		}
 
 		/// Initialize from intput stream.
@@ -105,6 +117,16 @@ namespace gnash {
 
 		// neater string output (example: "0,0,0,255")
 		std::string toShortString() const;
+
+		bool operator== (const rgba& o) const
+		{
+			return m_r == o.m_r && m_g == o.m_g && m_b == o.m_b && m_a == o.m_a;
+		}
+
+		bool operator!= (const rgba& o) const
+		{
+			return ! ( *this == o );
+		}
 	};
 
 	std::ostream& operator<< (std::ostream& os, const rgba& r);

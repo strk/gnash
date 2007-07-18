@@ -1,3 +1,10 @@
+2007-07-18 Sandro Santilli <strk@keybit.net>
+
+	* server/types.h: Add rgba::toRGB for serializing back to a number.
+	* server/edit_text_character.{cpp,h}: use instance members and
+	  getter-setters to keep info about background and border.
+	  This should fix invalidated bounds computation.
+
 2007-07-18 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/DefineEditTextTest.c: xchecks to checks, more
