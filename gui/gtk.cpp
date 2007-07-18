@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.98 2007/07/18 09:08:31 udog Exp $ */
+/* $Id: gtk.cpp,v 1.99 2007/07/18 09:18:42 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -156,6 +156,13 @@ GtkGui::createWindow(const char *title, int width, int height)
     gtk_window_set_title(GTK_WINDOW(_window), title);
 
     if (!_xid) {
+    
+      // This sets the *minimum* size for the drawing area and thus will
+      // also resize the window. 
+      // Advantage: The window is sized correctly, no matter what other
+      // widgets are visible
+      // Disadvantage: The window cannot be shrinked, which is bad.   
+    
       gtk_widget_set_size_request(_drawing_area, width, height);
     }
 
