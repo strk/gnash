@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.356 2007/07/14 19:25:03 rsavoye Exp $
+dnl $Id: configure.ac,v 1.357 2007/07/19 00:18:54 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -476,15 +476,15 @@ dnl To override thise, use the --with-*-incl= and --with-*-libs=
 dnl options to configure.
 if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([Configuring Gnash for cross compilation])
-  export pkgroot=`$CXX -print-search-dirs | grep "install:" | sed -e 's/install: //' -e 's:/lib/gcc/.*::'`
-  export incllist=`eval echo ${with_top_level}/include ${pkgroot}/${host_alias}/include ${pkgroot}/include`
-  export libslist=`eval echo ${with_top_level}/lib ${pkgroot}/${host_alias}/lib ${pkgroot}/lib64 ${pkgroot}/lib32 ${pkgroot}/lib`
-  export pathlist=`eval echo ${pkgroot}/${host_alias}/bin:${pkgroot}/bin`
+  export pkgroot="`$CXX -print-search-dirs | grep "install:" | sed -e 's/install: //' -e 's:/lib/gcc/.*::'`"
+  export incllist="`eval echo ${with_top_level}/include ${pkgroot}/${host_alias}/include ${pkgroot}/include`"
+  export libslist="`eval echo ${with_top_level}/lib ${pkgroot}/${host_alias}/lib ${pkgroot}/lib64 ${pkgroot}/lib32 ${pkgroot}/lib`"
+  export pathlist="`eval echo ${pkgroot}/${host_alias}/bin:${pkgroot}/bin`"
   plugin=no
 else
   AC_MSG_NOTICE([Configuring Gnash for native compilation])
-  export incllist=`eval cat ${srcdir}/macros/incllist`
-  export libslist=`eval cat ${srcdir}/macros/libslist`
+  export incllist="`eval cat ${srcdir}/macros/incllist`"
+  export libslist="`eval cat ${srcdir}/macros/libslist`"
   export pathlist=$PATH
 fi
 

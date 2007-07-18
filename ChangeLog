@@ -1,5 +1,10 @@
 2007-07-18 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: quote `backticked commands` when assigning to
+	  variables. Should fix bug #20525.
+
+2007-07-18 Sandro Santilli <strk@keybit.net>
+
 	* backend/render_handler_agg_style.h: fixed initialization order
 	  warnings.
 	* backend/render_handler_agg.cpp: signedness and initialization list
