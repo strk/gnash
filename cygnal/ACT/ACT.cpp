@@ -22,6 +22,9 @@
 
 #include "ACT.hpp"
 
+#include <stdexcept>
+#include <string>
+
 namespace ACT {
 	act::
 	act( basic_act * x )
@@ -30,7 +33,7 @@ namespace ACT {
 		if ( x == 0 ) {
 			// The recommended expression for our input parameter is 'new X',
 			//		which motivates the text of the exception
-			throw std::exception( "Probable memory allocation error" ) ;
+			throw std::runtime_error( "Probable memory allocation error" ) ;
 		}
 	}
 

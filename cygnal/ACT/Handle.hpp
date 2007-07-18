@@ -46,7 +46,7 @@ namespace ACT {
 	class Handle
 	{
 		// friend classes
-		template< class T, class Marker > friend class Vector_with_Handle_Index ;
+		template< class nT, class nMarker > friend class Vector_with_Handle_Index ;
 
 		/// A handle is an encapsulated integral type
 		T the_index ;
@@ -81,6 +81,12 @@ namespace ACT {
 		: public std::vector< T >
 	{
 		typedef std::vector< T > Base ;		/// Our base class, defined for legibility.
+
+		// These might not be needed using private inheritance, but didn't try
+		typedef typename Base::reference reference ;
+		typedef typename Base::const_reference const_reference ;
+		typedef typename Base::size_type size_type ;
+
 		inline reference operator[]( size_type n ) { throw std::exception() ; }				/// Prohibit offset operation with unwrapped index
 		inline const_reference operator[]( size_type n ) const { throw std::exception() ; }	/// Prohibit offset operation with unwrapped index
 		inline reference at( size_type n ) { throw std::exception() ; }						/// Prohibit offset operation with unwrapped index
