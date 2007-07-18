@@ -149,12 +149,12 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); 
 
   check_equals(mo, "dtext1.__proto__", "TextField.prototype");
-  xcheck(mo, "TextField.prototype.hasOwnProperty('background')");
+  check(mo, "TextField.prototype.hasOwnProperty('background')");
   
   check_equals(mo, "typeof(dtext1)", "'object'");
   check_equals(mo, "typeof(dtext1.text)", "'string'");
-  xcheck_equals(mo, "typeof(dtext1.background)", "'boolean'");
-  xcheck_equals(mo, "typeof(dtext1.backgroundColor)", "'number'");
+  check_equals(mo, "typeof(dtext1.background)", "'boolean'");
+  check_equals(mo, "typeof(dtext1.backgroundColor)", "'number'");
   check_equals(mo, "typeof(dtext1.textColor)", "'number'");
   check_equals(mo, "typeof(dtext1._alpha)", "'number'");
   
@@ -171,8 +171,8 @@ main(int argc, char** argv)
   check_equals(mo, "dtext1.hasOwnProperty('_alpha')", "false");
   
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('text')", "true");
-  xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('background')", "true");
-  xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('backgroundColor')", "true");
+  check_equals(mo, "dtext1.__proto__.hasOwnProperty('background')", "true");
+  check_equals(mo, "dtext1.__proto__.hasOwnProperty('backgroundColor')", "true");
   xcheck_equals(mo, "dtext1.__proto__.hasOwnProperty('textColor')", "true");
   // Why _alpha is special???
   check_equals(mo, "dtext1.__proto__.hasOwnProperty('_alpha')", "false");
@@ -180,12 +180,12 @@ main(int argc, char** argv)
   check_equals(mo, "dtext1.text", "'Hello'");
   check_equals(mo, "etext1.text", "'Hello'");
   check_equals(mo, "dtext2.text", "'Hello'");
-  xcheck_equals(mo, "dtext1.background", "false");
-  xcheck_equals(mo, "etext1.background", "false");
-  xcheck_equals(mo, "dtext2.background", "false");
-  xcheck_equals(mo, "dtext1.backgroundColor", "0xffffff");
-  xcheck_equals(mo, "etext1.backgroundColor", "0xffffff");
-  xcheck_equals(mo, "dtext2.backgroundColor", "0xffffff");
+  check_equals(mo, "dtext1.background", "false");
+  check_equals(mo, "etext1.background", "false");
+  check_equals(mo, "dtext2.background", "false");
+  check_equals(mo, "dtext1.backgroundColor", "0xffffff");
+  check_equals(mo, "etext1.backgroundColor", "0xffffff");
+  check_equals(mo, "dtext2.backgroundColor", "0xffffff");
   xcheck_equals(mo, "dtext1.textColor", "0x000000");
   xcheck_equals(mo, "etext1.textColor", "0x000000");
   xcheck_equals(mo, "dtext2.textColor", "0x000000");

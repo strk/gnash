@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.6 2007/07/13 20:32:07 strk Exp $";
+rcsid="$Id: TextField.as,v 1.7 2007/07/18 03:39:13 strk Exp $";
 
 #include "check.as"
 
@@ -39,11 +39,11 @@ check_equals(typeof(TextField.prototype.removeTextField), 'function');
 check_equals(typeof(TextField.prototype.replaceSel), 'function');
 
 // NOTE: the following will be true after a call to createTextField ! Seek forward to see..
-check( !TextField.prototype.hasOwnProperty('background'));
-check( !TextField.prototype.hasOwnProperty('backgroundColor'));
+xcheck( !TextField.prototype.hasOwnProperty('background'));
+xcheck( !TextField.prototype.hasOwnProperty('backgroundColor'));
 check( !TextField.prototype.hasOwnProperty('autoSize') );
-check( !TextField.prototype.hasOwnProperty('border') );
-check( !TextField.prototype.hasOwnProperty('borderColor') );
+xcheck( !TextField.prototype.hasOwnProperty('border') );
+xcheck( !TextField.prototype.hasOwnProperty('borderColor') );
 check( !TextField.prototype.hasOwnProperty('bottomScroll') );
 check( !TextField.prototype.hasOwnProperty('embedFonts') );
 check( !TextField.prototype.hasOwnProperty('hscroll') );
@@ -108,11 +108,11 @@ check_equals(ret, _root.tf);
 check_equals(typeof(tf), 'object');
 
 // NOTE: the following were false before the call to createTextField ! Seek backward to see..
-xcheck( TextField.prototype.hasOwnProperty('background'));
-xcheck( TextField.prototype.hasOwnProperty('backgroundColor'));
+check( TextField.prototype.hasOwnProperty('background'));
+check( TextField.prototype.hasOwnProperty('backgroundColor'));
 xcheck( TextField.prototype.hasOwnProperty('autoSize') );
-xcheck( TextField.prototype.hasOwnProperty('border') );
-xcheck( TextField.prototype.hasOwnProperty('borderColor') );
+check( TextField.prototype.hasOwnProperty('border') );
+check( TextField.prototype.hasOwnProperty('borderColor') );
 xcheck( TextField.prototype.hasOwnProperty('bottomScroll') );
 xcheck( TextField.prototype.hasOwnProperty('embedFonts') );
 xcheck( TextField.prototype.hasOwnProperty('hscroll') );
@@ -149,12 +149,12 @@ check(! tf.hasOwnProperty('autoSize'));
 
 // Check TextField.background
 
-xcheck_equals(typeof(tf.background), 'boolean');
+check_equals(typeof(tf.background), 'boolean');
 check(!tf.hasOwnProperty('background'));
 
 // Check TextField.backgroundColor
 
-xcheck_equals(typeof(tf.backgroundColor), 'number');
+check_equals(typeof(tf.backgroundColor), 'number');
 check(!tf.hasOwnProperty('backgroundColor'));
 
 // Check TextField.border

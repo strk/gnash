@@ -1,5 +1,7 @@
 2007-07-18 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/TextField.as: Updated test results.
+	* testsuite/misc-ming.all/DefineEditTextTest.c: Updated test results.
 	* server/types.h: Add rgba::toRGB for serializing back to a number.
 	* server/edit_text_character.{cpp,h}: use instance members and
 	  getter-setters to keep info about background and border.
