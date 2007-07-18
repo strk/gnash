@@ -1,5 +1,10 @@
 2007-07-18 Sandro Santilli <strk@keybit.net>
 
+	* cygnal/Makefile.am : Don't build the cygnal stuff,
+	  it's alpha after all... But still include in distribution.
+
+2007-07-18 Sandro Santilli <strk@keybit.net>
+
 	* cygnal/ACT/ACT.{cpp,hpp}: throw runtime_error if in need for a
 	  message string (std::exception ctor doesn't accept a string arg)
 	* cygnal/ACT/Handle.hpp: fix *a few* build errors, more available.
