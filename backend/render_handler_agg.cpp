@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.93 2007/07/18 10:04:33 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.94 2007/07/18 23:05:49 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -570,10 +570,19 @@ public:
       bpp(bits_per_pixel),
       /*xscale(1.0/20.0),
       yscale(1.0/20.0),*/
+      stage_matrix(),
+      scale_set(false),
       m_enable_antialias(true),
-      m_pixf(NULL),
+      m_display_width(0.0),
+      m_display_height(0.0),
+      m_current_matrix(),
+      m_current_cxform(),
+      m_rbuf(),
+      m_pixf(NULL), // TODO: use an auto_ptr
+      _clipbounds(),
+      _clipbounds_selected(),
       m_drawing_mask(false),
-      scale_set(false)
+      m_alpha_mask()
   {
     // TODO: we really don't want to set the scale here as the core should
     // tell us the right values before rendering anything. However this is
@@ -1025,13 +1034,18 @@ public:
       */
       
       // We need to separate sub-shapes during rendering. 
-      const int subshape_count=count_sub_shapes(paths);
+      const unsigned int subshape_count=count_sub_shapes(paths);
       
-      for (int subshape=0; subshape<subshape_count; subshape++) {
+      for (unsigned int subshape=0; subshape<subshape_count; subshape++)
+      {
         if (have_shape)
+	{
           draw_shape(subshape, paths, agg_paths, sh, true);    
+	}
         if (have_outline)      
+	{
           draw_outlines(subshape, paths, agg_paths_rounded, line_styles, cx, mat);
+	}
       }
       
     } // if not drawing mask
@@ -1126,13 +1140,15 @@ public:
   /// layers of the same frame count. Flash combines them to one single shape.
   /// The problem with sub-shapes is, that outlines can be hidden by other
   /// layers so they must be rendered separately. 
-  unsigned int count_sub_shapes(const std::vector<path> &paths) {
+  unsigned int count_sub_shapes(const std::vector<path> &paths)
+  {
+      //return 3;
   
-    int sscount=1;
+    unsigned int sscount=1;
     
-    int pcount = paths.size();
+    size_t pcount = paths.size();
     
-    for (int pno=0; pno<pcount; pno++) {    // skip first path!
+    for (size_t pno=0; pno<pcount; pno++) {    // skip first path! (but we're not !?)
       const path &this_path = paths[pno];
       
       // Udo said we could comment this out 
@@ -1157,11 +1173,11 @@ public:
     // a pixel is at .5 / .5, ie. it's subpixel center) 
     const float subpixel_offset = 0.5f;
     
-    int pcount = paths.size();
+    size_t pcount = paths.size();
 
     dest.resize(pcount);    
     
-    for (int pno=0; pno<pcount; pno++) {
+    for (size_t pno=0; pno<pcount; pno++) {
       
       const gnash::path& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
@@ -1169,9 +1185,9 @@ public:
       new_path.move_to(this_path.m_ax + subpixel_offset, 
         this_path.m_ay + subpixel_offset);
       
-      int ecount = this_path.m_edges.size();
+      size_t ecount = this_path.m_edges.size();
       
-      for (int eno=0; eno<ecount; eno++) {
+      for (size_t eno=0; eno<ecount; eno++) {
         
         const edge& this_edge = this_path.m_edges[eno];
         
@@ -1209,11 +1225,11 @@ public:
     // a pixel is at .5 / .5, ie. it's subpixel center) 
     const float subpixel_offset = 0.5f;
     
-    int pcount = paths.size();
+    size_t pcount = paths.size();
 
     dest.resize(pcount);    
     
-    for (int pno=0; pno<pcount; pno++) {
+    for (size_t pno=0; pno<pcount; pno++) {
       
       const gnash::path& this_path = paths[pno];
       agg::path_storage& new_path = dest[pno];
@@ -1223,9 +1239,9 @@ public:
       bool prev_align_x = true;
       bool prev_align_y = true;
       
-      int ecount = this_path.m_edges.size();
+      size_t ecount = this_path.m_edges.size();
       
-      for (int eno=0; eno<ecount; eno++) {
+      for (size_t eno=0; eno<ecount; eno++) {
         
         const edge& this_edge = this_path.m_edges[eno];
         
@@ -1330,7 +1346,7 @@ public:
     
     assert(0); // should not be used currently
     
-    int pcount=paths.size(); 
+    size_t pcount=paths.size(); 
     dest.resize(pcount);
     
     // use avg between x and y scale
@@ -1340,7 +1356,7 @@ public:
        / 2.0f
       * get_stroke_scale();   
     
-    for (int pno=0; pno<pcount; pno++) {
+    for (size_t pno=0; pno<pcount; pno++) {
           
       agg::conv_curve<agg::path_storage> curve(agg_paths[pno]);
       stroke_type* this_stroke = new stroke_type(curve);
@@ -1374,8 +1390,8 @@ public:
     matrix inv_stage_matrix;
     inv_stage_matrix.set_inverse(stage_matrix);
     
-    int fcount = fill_styles.size();
-    for (int fno=0; fno<fcount; fno++) {
+    size_t fcount = fill_styles.size();
+    for (size_t fno=0; fno<fcount; fno++) {
     
       bool smooth=false;
       int fill_type = fill_styles[fno].get_type();
@@ -1443,14 +1459,20 @@ public:
   
 
   /// Draws the given path using the given fill style and color transform.
+  //
   /// Normally, Flash shapes are drawn using even-odd filling rule. However,
   /// for glyphs non-zero filling rule should be used (even_odd=0).
   /// Note the paths have already been transformed by the matrix and 
   /// 'subshape_id' defines which sub-shape should be drawn (-1 means all 
   /// subshapes).
+  ///
   /// Note the *coordinates* in "paths" are not used because they are 
   /// already prepared in agg_paths. The (nearly ambiguous) "path" parameter
   /// is used to access other properties like fill styles and subshapes.   
+  ///
+  /// @param subshape_id
+  ///    Defines which subshape to draw. -1 means all subshapes.
+  ///
   void draw_shape(int subshape_id, const std::vector<path> &paths,
     const std::vector<agg::path_storage>& agg_paths,  
     agg_style_handler& sh, int even_odd) {
@@ -1503,10 +1525,6 @@ public:
     
     if ( _clipbounds.size()==0 ) return;
 
-    // Gnash stuff 
-    int pno;
-    int pcount;
-    
     // AGG stuff
     typedef agg::rasterizer_compound_aa<agg::rasterizer_sl_clip_dbl> ras_type;
     renderer_base rbase(*m_pixf);
@@ -1532,9 +1550,9 @@ public:
       int current_subshape=0;
         
       // push paths to AGG
-      pcount = paths.size();
+      size_t pcount = paths.size();
   
-      for (pno=0; pno<pcount; pno++) {
+      for (size_t pno=0; pno<pcount; pno++) {
       
         const gnash::path &this_path_gnash = paths[pno];
         agg::path_storage &this_path_agg = 
@@ -1649,11 +1667,10 @@ public:
       
     
     // push paths to AGG
-    unsigned int pcount = paths.size();
     agg::path_storage path;
     agg::conv_curve< agg::path_storage > curve(path);
 
-    for (unsigned int pno=0; pno < pcount; pno++) {
+    for (size_t pno=0, pcount=paths.size(); pno < pcount; pno++) {
     
       const gnash::path& this_path = paths[pno];
       path.remove_all();
@@ -1744,10 +1761,6 @@ public:
     // has a line style associated, so that we avoid walking the paths again
     // when there really are no outlines to draw...
     
-    // Gnash stuff    
-    int pno;
-    int pcount;
-    
     // use avg between x and y scale
     const float stroke_scale =
       (fabsf(linestyle_matrix.get_x_scale()) + 
@@ -1772,8 +1785,7 @@ public:
       
       int current_subshape=0;
 
-      pcount = paths.size();   
-      for (pno=0; pno<pcount; pno++) {
+      for (size_t pno=0, pcount=paths.size(); pno<pcount; pno++) {
         
         const gnash::path& this_path_gnash = paths[pno];
         agg::path_storage &this_path_agg = 
@@ -1978,9 +1990,10 @@ public:
 
     // TODO: cache 'visiblerect' and maintain in sync with
     //       xres/yres.
-    Range2d<int> visiblerect(0, 0, xres-1, yres-1);
+    Range2d<int> visiblerect;
+    if ( xres && yres ) visiblerect = Range2d<int>(0, 0, xres-1, yres-1);
     
-    for (int rno=0; rno<ranges.size(); rno++) {
+    for (size_t rno=0; rno<ranges.size(); rno++) {
     
       const Range2d<float>& range = ranges.getRange(rno);
 
@@ -2065,6 +2078,8 @@ private:  // private methods
 private:  // private variables
 
   agg::rendering_buffer m_rbuf;  
+
+  // TODO: use an auto_ptr, since we're deleting in the destructor...
   PixelFormat *m_pixf;
   
   /// clipping rectangle
