@@ -82,11 +82,6 @@ namespace ACT {
 	{
 		typedef std::vector< T > Base ;		/// Our base class, defined for legibility.
 
-		// These might not be needed using private inheritance, but didn't try
-		typedef typename Base::reference reference ;
-		typedef typename Base::const_reference const_reference ;
-		typedef typename Base::size_type size_type ;
-
 		inline reference operator[]( size_type n ) { throw std::exception() ; }				/// Prohibit offset operation with unwrapped index
 		inline const_reference operator[]( size_type n ) const { throw std::exception() ; }	/// Prohibit offset operation with unwrapped index
 		inline reference at( size_type n ) { throw std::exception() ; }						/// Prohibit offset operation with unwrapped index
@@ -119,7 +114,7 @@ namespace ACT {
 	 *	Each instance of a class with a handle (that is, deriving from \c Handled) appears within this registry.
 	 *	In other words, this registry provides a mechanism for operationalizing the referent of a handle.
 	 */
-	template< class T, template< class, class > class Aspect = Null_Aspect_1 >
+	template< class T, template< class, class > class Aspect = aspect::Null_Aspect_1 >
 	class Handle_Registry_Leader
 	{
 		/// The aspect type as actually used.
