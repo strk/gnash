@@ -27,24 +27,27 @@
 	The implementation pattern that comes to the fore is the "state of a partial computation".
 	One element of a partial computation state is a record of what I/O operation has been set to operate asynchronously.
 
-\section s_Elements An Oveview of the Elements of the ACT Environment
+\section s_ACT_Elements Elements of the ACT Environment
 	The main elements of the ACT environment the following:
 	- \b Actions.  
 		These are ACT classes that do all the work; it's the equivalent of a thread body.
 		The ultimate purpose of the ACT environment is to provide an execution context for actions.
 		An action runs until it yields (typically because it would block).
 		At such a time it enters a waiting state, waiting to be awakened as a result of further activity.
+		
 	- \b Scheduler.
 		In preemptive multitasking environments, the scheduling function is provided transparently.
 		In the ACT environment, ordinary actions see scheduling as transparent,
 			but the scheduler is visible to certain primitives, particularly those involved with I/O.
 		A scheduler is single-threaded and is designed to be the body of a thread.
 		The scheduler, however, is not a singleton, as the preferred deployment configuration is one-scheduler-per-CPU.
+		
 	- \b Demons.
 		Demons are a category of actions that run persistently in the scheduler.
 		The scheduler views ordinary actions as tasks, which are expected to eventually terminate.
 		The scheduler has different execution policies for demons and tasks.
 		The two most significant kinds of demons are services and monitors.
+		
 	- \b Services.
 		A service is a demon that generates new tasks.
 		A service typically represents some kind of bound input device, activity at which needs some response.
@@ -52,12 +55,14 @@
 		For example, a socket listening at port 80 generates a new HTTP protocol task for each incoming connection. 
 		As a rule, services represent input response, but not as a requirement.
 		A service may generate new tasks based on purely internal considerations as well.
+		
 	- \b Monitors.
 		A monitor is a demon that wakes up tasks from their waiting state.
 		A task, once it yields to wait for new activity, won't be scheduled until something else rouses it.
 		For each waiting task, there is some monitor demon that has responsibility for waking it up.
 		Sensing the activity that triggers a wake-up is domain-specific,
 			so there's a separate monitor class for each kind of waiting, in particular each kind of I/O.
+			
 	- <b>Listener Actions</b>.
 		The code for actions is recursive, one action calling another as needed.
 		This is as for ordinary code, with the distinction that the action invariants must be preserved at each call.
@@ -152,7 +157,7 @@
 	As the proverbial angel-on-pinheads, the choice is between a definite and an indefinite bound.
 	If a definite execution bound is desired, it might be by execution count or by a time limit (or both).
 
-	summarizing, we have the following shutdown algorithm, with its main points of configuration:
+	Summarizing, we have the following shutdown algorithm, with its main points of configuration:
 	- Decide upon a cooperative shutdown.
 	- Construct a shutdown parameter and invoke the scheduler's shutdown function with it.
 	- If the scheduler is immediately suspending, do so now, deleting references if requested.
