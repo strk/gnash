@@ -16,11 +16,13 @@
 #   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-# $Id: Makefile.am,v 1.6 2007/07/01 10:53:49 bjacques Exp $
+# $Id: Makefile.am,v 1.7 2007/07/18 13:47:00 strk Exp $
 
 ## Process this file with automake to generate Makefile.in
 
 AUTOMAKE_OPTIONS = dejagnu
+
+SUBDIRS  = ACT IO HTTP Net unit_tests 
 
 AM_CPPFLAGS = # -Wall
 

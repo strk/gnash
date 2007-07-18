@@ -1,5 +1,9 @@
 2007-07-18 Sandro Santilli <strk@keybit.net>
 
+	* cygnal/Makefile.am: Add all subdirs to SUBDIRS. Fixes bug #20509.
+
+2007-07-18 Sandro Santilli <strk@keybit.net>
+
 	* gui/gtksup.h: Fix extra qualification 'gnash::GtkGui::' on member 'rerenderPixels'
 
 2007-07-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
