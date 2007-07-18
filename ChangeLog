@@ -2,6 +2,9 @@
 	
 	* gui/gtk.cpp: Make the drawing area resize also vertically with the window,
 	  fixes bug #18871
+	* backend/render_handler.h, backend/render_handler_agg.cpp, 
+	  backend/render_handler_tri.{cpp,h}: new methods "pixel_to_world"
+	* gui/gtk.cpp, gui/gtksup.h: Fix re-rendering on expose for scaled movies
 
 2007-07-18 Zou Lunkai <zoulunkai@gmail.com>
 	

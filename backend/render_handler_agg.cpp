@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.91 2007/07/13 16:05:08 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.92 2007/07/18 10:03:04 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1913,8 +1913,8 @@ public:
 		// and Intersect() against valid range instead.
 		point p(world_x, world_y);
 		stage_matrix.transform(p);
-		x = p.m_x;
-		y = p.m_y;
+		x = (int)p.m_x;
+		y = (int)p.m_y;
 	}
 
   geometry::Range2d<int> world_to_pixel(const rect& wb)
@@ -1943,6 +1943,14 @@ public:
 
     return geometry::Range2d<int>(xmin, ymin, xmax, ymax);
   }
+  
+  point 
+  pixel_to_world(int x, int y)
+  {
+    point p(x, y);
+    stage_matrix.transform_by_inverse(p);
+    return p;    
+  };
   
   void set_invalidated_region_world() {
     InvalidatedRanges ranges;

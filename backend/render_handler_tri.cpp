@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.16 2007/07/13 16:05:08 strk Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.17 2007/07/18 10:03:04 udog Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -342,6 +342,12 @@ tri_cache_manager* triangulating_render_handler::get_cache_of(character_def* def
 
 geometry::Range2d<int>
 triangulating_render_handler::world_to_pixel(const rect& /*worldbounds*/)
+{
+  assert(0); // not implemented (and currently not required for tri. renderers)
+}
+
+point 
+triangulating_render_handler::pixel_to_world(int /*x*/, int /*y*/)
 {
   assert(0); // not implemented (and currently not required for tri. renderers)
 }

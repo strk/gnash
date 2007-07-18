@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.43 2007/07/13 16:05:08 strk Exp $ */
+/* $Id: render_handler.h,v 1.44 2007/07/18 10:03:04 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -307,6 +307,18 @@ public:
 	
 	/// Converts world coordinates to pixel coordinates
 	virtual geometry::Range2d<int> world_to_pixel(const rect& worldbounds) = 0;
+	
+	/// Converts pixel coordinates to world coordinates (TWIPS)
+	virtual point pixel_to_world(int x, int y) = 0;
+	
+	virtual geometry::Range2d<float> pixel_to_world(const geometry::Range2d<int>& pixelbounds)
+  {
+    point topleft     = pixel_to_world(pixelbounds.getMinX(), pixelbounds.getMinY());
+    point bottomright = pixel_to_world(pixelbounds.getMaxX(), pixelbounds.getMaxY());
+    
+    return geometry::Range2d<float> (topleft.m_x, topleft.m_y, 
+      bottomright.m_x, bottomright.m_y);
+  }
   
 	virtual geometry::Range2d<int> world_to_pixel(const geometry::Range2d<float>& worldbounds)
 	{
@@ -316,6 +328,7 @@ public:
 		return world_to_pixel(rect(worldbounds.getMinX(), worldbounds.getMinY(),
 		                           worldbounds.getMaxX(), worldbounds.getMaxY()));  
 	}
+	
 		
 	/// Bracket the displaying of a frame from a movie.
 	//

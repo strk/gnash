@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.99 2007/07/18 09:18:42 udog Exp $ */
+/* $Id: gtk.cpp,v 1.100 2007/07/18 10:03:04 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -265,6 +265,31 @@ GtkGui::renderBuffer()
 #else
     glue.render();
 #endif
+}
+
+void
+GtkGui::rerenderPixels(int xmin, int ymin, int xmax, int ymax) 
+{
+
+  // This function is called in expose events to force partly re-rendering
+  // of the window. The coordinates are PIXELS.
+   
+  // The macro PIXELS_TO_TWIPS can't be used since the renderer might do 
+  // scaling.
+   
+#ifdef RENDERER_AGG
+	InvalidatedRanges ranges;
+	
+	geometry::Range2d<int> exposed_pixels(xmin, ymin, xmax, ymax);
+	
+	geometry::Range2d<float> exposed_twips = 
+    _renderer->pixel_to_world(exposed_pixels);	
+	
+	ranges.add(exposed_twips);
+	setInvalidatedRegions(ranges);
+#endif
+  renderBuffer();   
+
 }
 
 #ifdef RENDERER_AGG
@@ -1024,17 +1049,11 @@ GtkGui::expose_event(GtkWidget *const /*widget*/,
 
 	GtkGui* gui = static_cast<GtkGui*>(data);
 
-	InvalidatedRanges ranges;
 
 	int xmin = event->area.x, xmax = event->area.x + event->area.width,
 	    ymin = event->area.y, ymax = event->area.y + event->area.height;
-
-	geometry::Range2d<float> exposed(PIXELS_TO_TWIPS(xmin),
-          PIXELS_TO_TWIPS(ymin), PIXELS_TO_TWIPS(xmax), PIXELS_TO_TWIPS(ymax));
-
-	ranges.add(exposed);
-	gui->setInvalidatedRegions(ranges);
-	gui->renderBuffer();
+          
+  gui->rerenderPixels(xmin, ymin, xmax, ymax);
 
 	return TRUE;
 }

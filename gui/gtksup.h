@@ -136,6 +136,8 @@ class DSOEXPORT GtkGui : public Gui
 
     GdkPixbuf* create_pixbuf(const gchar *filename);
     
+    void GtkGui::rerenderPixels(int xmin, int ymin, int xmax, int ymax);
+    
 #ifdef RENDERER_AGG    
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
     bool want_multiple_regions() { return true; }

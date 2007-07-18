@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.h,v 1.13 2007/07/13 16:05:08 strk Exp $ */
+/* $Id: render_handler_tri.h,v 1.14 2007/07/18 10:03:04 udog Exp $ */
 
 #ifndef GNASH_RENDER_HANDLER_TRI_H
 #define GNASH_RENDER_HANDLER_TRI_H
@@ -139,6 +139,8 @@ public:
 
   /// Translates world coordinates to pixel coordinates
   geometry::Range2d<int> world_to_pixel(const rect& worldbounds);
+  
+  point pixel_to_world(int x, int y);
     
   // --- helper methods --------------------------------------------------------
   // These methods are called by draw_shape_character() and normally don't need
