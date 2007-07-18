@@ -1,3 +1,8 @@
+2007-07-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
+	
+	* gui/gtk.cpp: Make the drawing area resize also vertically with the window,
+	  fixes bug #18871
+
 2007-07-18 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-ming.all/unload_movieclip_test1.c, DefineEditTextTest.c:

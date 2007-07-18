@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.97 2007/07/01 10:54:02 bjacques Exp $ */
+/* $Id: gtk.cpp,v 1.98 2007/07/18 09:08:31 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -103,13 +103,16 @@ GtkGui::init(int argc, char **argv[])
     if (_xid) {
      	gtk_container_add(GTK_CONTAINER(_window), _drawing_area);
     } else {
+
+        // A vertical box is used to allow display of the menu bar
+    
         _vbox = gtk_vbox_new(FALSE, 0);
         gtk_widget_show(_vbox);
         gtk_container_add(GTK_CONTAINER(_window), _vbox);
 #ifdef USE_MENUS
         createMenuBar();
 #endif
-        gtk_box_pack_start(GTK_BOX(_vbox), _drawing_area, FALSE, FALSE, 0);
+        gtk_box_pack_start(GTK_BOX(_vbox), _drawing_area, TRUE, TRUE, 0);
     }
 
     gtk_widget_realize(_window);
@@ -149,7 +152,6 @@ GtkGui::createWindow(const char *title, int width, int height)
 {
 //First call the old createWindow function and then set the title.
 //In case there's some need to not setting the title.
-
     bool ret = createWindow(width, height);
     gtk_window_set_title(GTK_WINDOW(_window), title);
 
@@ -232,7 +234,6 @@ GtkGui::createWindow(int width, int height)
 	_height = height;
 
 	_validbounds.setTo(0, 0, _width-1, _height-1);
-    
 	glue.setRenderHandlerSize(_width, _height);
 
 	return true;
