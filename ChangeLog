@@ -1,5 +1,7 @@
 2007-07-18 Sandro Santilli <strk@keybit.net>
 
+	* server/impl.cpp (clear): don't attempt to cleanup the
+	  GC if no GC is being used.
 	* cygnal/Makefile.am : Don't build the cygnal stuff,
 	  it's alpha after all... But still include in distribution.
 

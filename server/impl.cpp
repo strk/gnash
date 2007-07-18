@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.112 2007/07/01 10:54:23 bjacques Exp $ */
+/* $Id: impl.cpp,v 1.113 2007/07/18 22:17:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -580,9 +580,11 @@ void	clear()
     // after it's been de-referenced
     set_sound_handler(NULL);
 
+#ifdef GNASH_USE_GC 
     GC::get().collect();
 
     GC::cleanup();
+#endif
 }
 
 //
