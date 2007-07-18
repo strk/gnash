@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.92 2007/07/18 10:03:04 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.93 2007/07/18 10:04:33 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -429,7 +429,7 @@ public:
   
 
   void drawVideoFrame(image::image_base* baseframe, const matrix* source_mat, 
-		const rect* bounds) {
+    const rect* bounds) {
   
     // NOTE: Assuming that the source image is RGB 8:8:8
     
@@ -575,12 +575,12 @@ public:
       m_drawing_mask(false),
       scale_set(false)
   {
-  	// TODO: we really don't want to set the scale here as the core should
-  	// tell us the right values before rendering anything. However this is
-  	// currently difficult to implement. Removing the next call will
-  	// lead to an assertion failure in begin_display() because we check
-  	// whether the scale is known there.
-  	set_scale(1.0f, 1.0f);
+    // TODO: we really don't want to set the scale here as the core should
+    // tell us the right values before rendering anything. However this is
+    // currently difficult to implement. Removing the next call will
+    // lead to an assertion failure in begin_display() because we check
+    // whether the scale is known there.
+    set_scale(1.0f, 1.0f);
   }   
 
   // Destructor
@@ -909,10 +909,10 @@ public:
   /// "_clipbounds_selected" is used by draw_shape() and draw_outline() and
   /// *must* be initialized prior to using those function.
   void select_clipbounds(const shape_character_def *def, 
-		const matrix& source_mat) {
-		
-		matrix mat = stage_matrix;
-		mat.concatenate(source_mat);
+    const matrix& source_mat) {
+    
+    matrix mat = stage_matrix;
+    mat.concatenate(source_mat);
   
     _clipbounds_selected.clear();
     _clipbounds_selected.reserve(_clipbounds.size());
@@ -1080,7 +1080,7 @@ public:
     int pcount, ecount;
     int pno, eno;
 
-		matrix mat = stage_matrix;
+    matrix mat = stage_matrix;
     mat.concatenate(source_mat);
     
     // copy path
@@ -1372,7 +1372,7 @@ public:
     const cxform& cx) {
     
     matrix inv_stage_matrix;
-		inv_stage_matrix.set_inverse(stage_matrix);
+    inv_stage_matrix.set_inverse(stage_matrix);
     
     int fcount = fill_styles.size();
     for (int fno=0; fno<fcount; fno++) {
@@ -1901,21 +1901,21 @@ public:
   }
 
 
-	inline float get_stroke_scale() {
-		return (stage_matrix.get_x_scale() + stage_matrix.get_y_scale()) / 2.0f;
-	}                      
+  inline float get_stroke_scale() {
+    return (stage_matrix.get_x_scale() + stage_matrix.get_y_scale()) / 2.0f;
+  }                      
   
-	inline void world_to_pixel(int& x, int& y,
-		float world_x, float world_y)
-	{
-		// negative pixels seems ok here... we don't 
-		// clip to valid range, use world_to_pixel(rect&)
-		// and Intersect() against valid range instead.
-		point p(world_x, world_y);
-		stage_matrix.transform(p);
-		x = (int)p.m_x;
-		y = (int)p.m_y;
-	}
+  inline void world_to_pixel(int& x, int& y,
+    float world_x, float world_y)
+  {
+    // negative pixels seems ok here... we don't 
+    // clip to valid range, use world_to_pixel(rect&)
+    // and Intersect() against valid range instead.
+    point p(world_x, world_y);
+    stage_matrix.transform(p);
+    x = (int)p.m_x;
+    y = (int)p.m_y;
+  }
 
   geometry::Range2d<int> world_to_pixel(const rect& wb)
   {
@@ -2036,7 +2036,7 @@ public:
     scale_set=true;
     
     stage_matrix.set_identity();
-		stage_matrix.set_scale(new_xscale/20.0f, new_yscale/20.0f);
+    stage_matrix.set_scale(new_xscale/20.0f, new_yscale/20.0f);
   }
 
   virtual void get_scale(point& scale) {
