@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.94 2007/07/18 23:05:49 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.95 2007/07/18 23:17:54 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1142,19 +1142,12 @@ public:
   /// layers so they must be rendered separately. 
   unsigned int count_sub_shapes(const std::vector<path> &paths)
   {
-      //return 3;
-  
     unsigned int sscount=1;
     
     size_t pcount = paths.size();
     
-    for (size_t pno=0; pno<pcount; pno++) {    // skip first path! (but we're not !?)
+    for (size_t pno=0; pno<pcount; pno++) {
       const path &this_path = paths[pno];
-      
-      // Udo said we could comment this out 
-      // https://savannah.gnu.org/bugs/?18119#comment2
-      //if (pno==0) 
-      //  assert(!this_path.m_new_shape); // this would break draw_XXX
       
       if (this_path.m_new_shape)
         sscount++;
