@@ -80,8 +80,15 @@ namespace ACT {
 	class Vector_with_Handle_Index
 		: public std::vector< T >
 	{
+	private:
 		typedef std::vector< T > Base ;		/// Our base class, defined for legibility.
 
+	public:
+		typedef typename Base::reference reference ;
+		typedef typename Base::const_reference const_reference ;
+		typedef typename Base::size_type size_type ;
+
+	private:
 		inline reference operator[]( size_type n ) { throw std::exception() ; }				/// Prohibit offset operation with unwrapped index
 		inline const_reference operator[]( size_type n ) const { throw std::exception() ; }	/// Prohibit offset operation with unwrapped index
 		inline reference at( size_type n ) { throw std::exception() ; }						/// Prohibit offset operation with unwrapped index

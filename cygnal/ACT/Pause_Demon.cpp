@@ -18,9 +18,19 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/// \file Pause_Demon.cpp
-///	\brief The Pause service suspends itself (and its thread) for a number of milliseconds 
-///		if the scheduling queue has no high-priority items.
+/**	\file Pause_Demon.cpp
+	\brief The Pause service suspends itself (and its thread) for a number of milliseconds 
+		if the scheduling queue has no high-priority items.
+
+	\par Warning: MSVC portability note
+		The code within this unit should be portable, since in relies upon Boost::Thread.
+		As of this writing, however, there's a flaw when working under MSVC.
+		For some reason, the Boost thread library disables thread support unless language extensions are turned on.
+		[This behavior is true with Boost 1.33.1; perhaps a later version may fix this.]
+		Ordinarily, it's hazardous to portability to enable any kind of extension in a Microsoft product.
+		Unfortunately, it has to be there as of the present writing to get this unit to compile.
+ */
+
 
 #include "Pause_Demon.hpp"
 #include <boost/thread/thread.hpp>

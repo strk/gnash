@@ -1,10 +1,14 @@
 Change Log for GNU Cygnal, Module ACT
 =====================================
 
+2007-07-19 Eric Hughes <eh@narthex.us>
+	* Handle.hpp: Added forwarding typedefs in Vector_with_Handle_Index.
+	* Pause_Demon.cpp: Added important portability note.
+
 2007-07-10 Eric Hughes <eh@narthex.us>
 	* Pause_Demon.[hc]pp: Renamed from Pause_Service.[hc]pp.
-	* ACT/unit_tests/Test_Scheduler.cpp: Added finished_at_bound() to scheduler test aspect.  (Re-)Wrote a proper pause demon test.
-	* ACT/ACT.doxygen.txt: Added more environment documentation.
+	* unit_tests/Test_Scheduler.cpp: Added finished_at_bound() to scheduler test aspect.  (Re-)Wrote a proper pause demon test.
+	* ACT.doxygen.txt: Added more environment documentation.
 
 2007-07-09 Eric Hughes <eh@narthex.us>
 	* Scheduler.hpp, Scheduler.cpp, Scheduler.T.cpp: Renamed scheduler category Service to Demon to get rid of a name collision.
