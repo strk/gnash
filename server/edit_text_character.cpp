@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.79 2007/07/19 15:01:15 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.80 2007/07/20 00:06:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -463,6 +463,16 @@ edit_text_character::display()
 		
 		rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
 		rgba backgroundColor = drawBackground ? getBackgroundColor() : rgba(255,255,255,0);
+
+		if ( 0 ) // should be if ! isDynamic to be PP-compatible (or is it about device font? to be tested)
+		         // Currently disabled due to what looks like a bug in color transform
+		{
+			cxform	cx = get_world_cxform();
+			log_debug("world cxform for textfield %s: %s", getTargetPath().c_str(), cx.toString().c_str());
+			borderColor = cx.transform(borderColor);
+			backgroundColor = cx.transform(backgroundColor);
+		}
+
 
 		render::draw_poly( &coords[0], 4, backgroundColor, borderColor );
 		
