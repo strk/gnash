@@ -30,18 +30,6 @@
 
 namespace ACT {
 	//-------------------------
-	/// \brief still used in IO, for now.
-	class Obsolete_Generator
-		: public ACT::autonomous_act
-	{
-	public:
-		///
-		virtual act result() =0 ;
-
-		void reset() {} ;
-	} ;
-
-	//-------------------------
 	/**	\class Generator
 	 *	\brief A generator of actions, in bursts, used to feed a Service.
 	 *		This class is a base for service implementations.
@@ -97,10 +85,6 @@ namespace ACT {
 	//-------------------------
 	/**	\class Service
 	 *	\brief A service is a persistent action whose result to create new actions and to schedule them for execution.
-	 *
-	 *	NOTE: This class should be "IO_Service", and have a primitive notion of service use ACT::Generator (to be defined) 
-	 *	rather than a device generator.  It might also prove useful to define an ACT trait that means "generates actions".
-	 *	This would be a way of integrating user interface events, for example.
 	 *
 	 *	This generic base class has no result accessor, since services run primarily under the scheduler.
 	 *	The scheduler, which deals with a multiplicity of action types, has no way of dealing with specific results.

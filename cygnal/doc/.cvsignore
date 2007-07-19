@@ -1,10 +1,12 @@
 .svn
+http
 .deps
 .libs
 Makefile
 Makefile.in
 *.lo
 *.la
+cygnal
 gnash.log
 gnash.sum
 site.exp
