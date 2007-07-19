@@ -1369,7 +1369,7 @@ sprite_droptarget_getset(const fn_call& fn)
 		warned=true;
 	}
 
-	VM& vm = VM::get();
+	//VM& vm = VM::get();
 	// NOTE: _droptarget should be set after startDrag() and stopDrag() calls
 	return as_value("");
 }
