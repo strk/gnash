@@ -30,6 +30,8 @@ namespace IO {
 
 	//-------------------------
 	/** \class null_read_filter
+	 *	\brief Should probably be named identity_read_filter.
+	 *		A pass-through for read actions.
 	 */
 	class null_read_filter
 		: public Source

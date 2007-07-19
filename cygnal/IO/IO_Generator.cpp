@@ -21,33 +21,32 @@
 
 namespace IO {
 	//-------------------------
-	Device_Adapter::
-	Device_Adapter( Device_Generator & x, Behavior_Factory & y ) 
+	IO_Generator::
+	IO_Generator( Old_Device_Generator & x, Behavior_Factory & y ) 
 		: the_generator( x ),
-		the_behavior_factory( y )
+		the_behavior_factory( y ),
+		complete( false )
 	{}
 
 	//-------------------------
-	ACT::ACT_State
-	Device_Adapter::
-	run( ACT::wakeup_listener * w )
+	shared_ptr< ACT::basic_act >
+	IO_Generator::
+	next_action( ACT::wakeup_listener * w )
 	{
-		the_generator( w ) ;
-		if ( the_generator.bad() ) return set_bad() ;
-		if ( the_generator.working() ) return set_ready() ;
-		// Assert the_generator has a result ready for us.
-		
-		the_result = the_behavior_factory( the_generator.result() ) ;
-		return set_completed() ;
-	}
+		if ( ! complete ) {
+			the_generator( w ) ;
+			if ( the_generator.completed() ) {
+				// Assert the_generator has a result ready for us.
+				return the_behavior_factory( the_generator.result() ) ;
+			}
+			// Assert no result is ready; return must be null
 
-	//-------------------------
-	ACT::act 
-	Device_Adapter::
-	result()
-	{
-		return the_result ;
+			if ( the_generator.bad() ) {
+				// A good generator is required for continued operation.
+				set_completed() ;
+			}
+		}
+		return shared_ptr< ACT::basic_act >() ;
 	}
-
 
 } // end namespace IO

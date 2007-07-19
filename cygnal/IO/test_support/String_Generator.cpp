@@ -21,15 +21,65 @@
 #include "String_Device.hpp"
 
 namespace IO {
-
 	String_Generator::
 	String_Generator()
-		: the_result( new String_Device( "" ) )
+		: complete( false )
 	{
 	}
 
 	String_Generator::
 	String_Generator( std::string initial )
+		: complete( false )
+	{
+		add_source( initial ) ;
+	}
+
+	void
+	String_Generator::
+	add_source( std::string x )
+	{
+		if ( complete ) {
+			throw std::runtime_error( "May not add sources after shutdown" ) ;
+		}
+		the_list.push_front( x ) ;
+	}
+
+	void 
+	String_Generator::
+	shutdown()
+	{
+		complete = true ;
+	}
+
+	bool
+	String_Generator::
+	completed()
+	{
+		return complete ;
+	}
+
+	shared_ptr< IO::Device >
+	String_Generator::
+	next_device()
+	{
+		if ( the_list.empty() ) return shared_ptr< IO::Device >() ;
+		shared_ptr< IO::Device > x( new String_Device( the_list.back() ) ) ;
+		the_list.pop_back() ;
+		return x ;
+	}
+
+} // end namespace IO
+
+namespace IO {
+
+	Old_String_Generator::
+	Old_String_Generator()
+		: the_result( new String_Device( "" ) )
+	{
+	}
+
+	Old_String_Generator::
+	Old_String_Generator( std::string initial )
 		: the_result( new String_Device( "" ) )
 	{
 		add_source( initial ) ;
@@ -37,7 +87,7 @@ namespace IO {
 
 	///
 	ACT::ACT_State 
-	String_Generator::
+	Old_String_Generator::
 	run( ACT::wakeup_listener * )
 	{
 		if ( the_queue.empty() ) return ACT::ACT_State( ACT::ACT_State::Ready ) ;
@@ -47,21 +97,21 @@ namespace IO {
 	}
 
 	void
-	String_Generator::
+	Old_String_Generator::
 	add_source( std::string x )
 	{
 		the_queue.push( x ) ;
 	}
 
 	shared_ptr< IO::Device >
-	String_Generator::
+	Old_String_Generator::
 	result()
 	{
 		return the_result ;
 	}
 
 	void
-	String_Generator::
+	Old_String_Generator::
 	reset()
 	{
 		if ( bad() ) return ;

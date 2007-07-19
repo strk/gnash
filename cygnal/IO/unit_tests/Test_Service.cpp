@@ -22,6 +22,12 @@
 #include "../test_support/String_Generator.hpp"
 #include "ACT/Service.hpp"
 
+//-------------------------
+/**	\brief A behavior that does nothing.
+ *
+ *	This is different from ACT::no_action only in that it derives from IO::Behavior.
+ *	Well, it also has no tracker, but that's incidental.
+ */
 class Null_Behavior
 	: public IO::Behavior
 {
@@ -37,9 +43,51 @@ Null_Behavior_Factory( shared_ptr< IO::Device > )
 	return shared_ptr< ACT::autonomous_act >( new Null_Behavior() ) ;
 }
 
+//-------------------------
 BOOST_AUTO_UNIT_TEST( Generator_Basic )
 {
 	IO::String_Generator generator( "a" ) ;
+
+	BOOST_CHECK( ! generator.completed() ) ;
+	shared_ptr< IO::Device > device( generator.next_device() ) ;
+	BOOST_CHECK_MESSAGE( ! ! device, "Device should not be null." ) ;
+	// Check contents of source here. Should be "a".
+
+	// Internal queue is empty.
+	BOOST_CHECK( ! generator.completed() ) ;
+	device = generator.next_device() ;
+	// Left negation operator is on shared_ptr, right negation operator is on bool.
+	BOOST_CHECK_MESSAGE( ! device, "Saw non-null device pointer where null expected." ) ;
+	BOOST_CHECK( ! generator.completed() ) ;
+
+	// Add two more sources.
+	generator.add_source( "b" ) ;
+	generator.add_source( "c" ) ;
+
+	BOOST_CHECK( ! generator.completed() ) ;
+	device = generator.next_device() ;
+	BOOST_CHECK_MESSAGE( ! ! device, "Device should not be null." ) ;
+	// Check contents of source here. Should be "b".
+
+	BOOST_CHECK( ! generator.completed() ) ;
+	device = generator.next_device() ;
+	BOOST_CHECK_MESSAGE( ! ! device, "Device should not be null." ) ;
+	// Check contents of source here. Should be "c".
+
+	// Internal queue is empty again.
+	BOOST_CHECK( ! generator.completed() ) ;
+	device = generator.next_device() ;
+	BOOST_CHECK_MESSAGE( ! device, "Saw non-null device pointer where null expected." ) ;
+	BOOST_CHECK( ! generator.completed() ) ;
+
+	// Shut down
+	generator.shutdown() ;
+	BOOST_CHECK( generator.completed() ) ;
+}
+
+BOOST_AUTO_UNIT_TEST( Generator_Basic_Legacy )
+{
+	IO::Old_String_Generator generator( "a" ) ;
 	generator.add_source( "b" ) ;
 	generator.add_source( "c" ) ;
 
@@ -72,7 +120,7 @@ BOOST_AUTO_UNIT_TEST( Generator_Basic )
 
 BOOST_AUTO_UNIT_TEST( Service_Basic )
 {
-	IO::String_Generator x( "" ) ;
+	IO::Old_String_Generator x( "" ) ;
 	x.add_source( "" ) ;
 	x.add_source( "" ) ;
 

@@ -80,6 +80,8 @@ namespace IO {
 
 	//-------------------------
 	/** \class Source
+	 *	\brief A stream source with an asynchronous interface.
+	 *		Abstract base class of an asynchronous I/O device.
 	 */
 	class Source
 		: public ACT::autonomous_act
@@ -98,10 +100,10 @@ namespace IO {
 
 	//-------------------------
 	/** \class Sink
-	 *	\brief Abstract base class of an asynchronous I/O device that acts as a sink.
-	 *	A sink is also an action, in this case a write action to the device it represents.
+	 *	\brief A stream sink with an asynchronous interface.
+	 *		Abstract base class of an asynchronous I/O device.
 	 *
-	 *	The write action
+	 *	
 	 */
 	class Sink
 		: public ACT::autonomous_act
@@ -121,6 +123,9 @@ namespace IO {
 	//-------------------------
 	// SSource
 	//-------------------------
+	/**	\class SSource
+	 *	\brief A renaming wrapper around Source to allow two actions within Device.
+	 */
 	class SSource 
 		: public Source 
 	{
@@ -155,7 +160,12 @@ namespace IO {
 	//-------------------------
 	// SSink
 	//-------------------------
-	class SSink : public Sink {
+	/**	\class SSink
+	 *	\brief A renaming wrapper around Sink to allow two actions within Device.
+	 */
+	class SSink
+		: public Sink
+	{
 	protected:
 		virtual ACT::ACT_State sink_run( ACT::wakeup_listener * ) =0 ;
 		inline ACT::ACT_State run( ACT::wakeup_listener * w ) { return sink_run( w ) ; }
@@ -223,6 +233,8 @@ namespace IO {
 	} ;
 
 	//-------------------------
+	/** \b Obsolescent. Adapter for old-style sources.
+	 */
 	template< class Oldsource, class Action >
 	class adapter_for_old_source
 		: public Source

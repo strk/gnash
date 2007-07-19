@@ -28,6 +28,9 @@
 namespace IO {
 
 	//-------------------------
+	/**	\class Null_Source
+	 *	\brief An eternal source of empty buffers.
+	 */
 	class Null_Source
 		: public Source
 	{
@@ -49,6 +52,9 @@ namespace IO {
 	} ;
 
 	//-------------------------
+	/** \class Null_Sink
+	 *	\brief A sink which is also the bit bucket.
+	 */
 	class Null_Sink
 		: public Sink
 	{
@@ -74,6 +80,9 @@ namespace IO {
 	} ;
 
 	//-------------------------
+	/**	\class Null_Device
+	 *	\brief A device that never has input and write all output to the bit bucket.
+	 */
 	class Null_Device
 		: public Device
 	{

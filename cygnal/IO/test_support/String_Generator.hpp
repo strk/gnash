@@ -26,13 +26,50 @@
 
 #include <string>
 #include <queue>
+#include <list>
 #include <boost/shared_ptr.hpp>
 
 namespace IO {
 
 	//-------------------------
+	/**	\class String_Generator
+	 *	\brief A generator of string devices.
+	 */
 	class String_Generator
 		: public Device_Generator
+	{
+		///
+		std::list< std::string > the_list ;
+
+		/// Received shutdown?
+		bool complete ;
+
+	public:
+		///
+		String_Generator() ;
+
+		///
+		String_Generator( std::string initial ) ;
+
+		///
+		void add_source( std::string x ) ;
+
+		/// Implements Device_Generator::next_device.
+		shared_ptr< IO::Device > next_device() ;
+
+		/// Implements Device_Generator::shutdown.
+		void shutdown() ;
+
+		/// Implements Device_Generator::completed.
+		bool completed() ;
+	} ;
+
+	//-------------------------
+	/**	\class Old_String_Generator
+	 *	\brief A legacy generator of string devices.
+	 */
+	class Old_String_Generator
+		: public Old_Device_Generator
 	{
 		///
 		std::queue< std::string > the_queue ;
@@ -41,10 +78,10 @@ namespace IO {
 
 	public:
 		///
-		String_Generator() ;
+		Old_String_Generator() ;
 
 		///
-		String_Generator( std::string initial ) ;
+		Old_String_Generator( std::string initial ) ;
 
 		///
 		void add_source( std::string x ) ;

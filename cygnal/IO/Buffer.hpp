@@ -85,6 +85,7 @@ namespace IO {
 
 	//-------------------------
 	/**	\class Segment
+	 *	\brief The unit of memory for a buffer, a single contiguous range of memory.
 	 */
 	template< class Ch >
 	struct Segment
@@ -248,6 +249,9 @@ namespace IO {
 	//--------------------------------------------------
 	// Basic_Segment_Iterator_Base
 	//--------------------------------------------------
+	/** \class Basic_Segment_Iterator_Base
+	 *	\brief Base class for segment iterators, whose differences are const-vs.-non-const access.
+	 */
 	template< class Ch >
 	class Basic_Segment_Iterator_Base
 	{
@@ -393,7 +397,7 @@ namespace IO {
 	// E_AV_Buffer
 	//--------------------------------------------------
 	/**	\class E_AV_Buffer_Base
-	 *	\brief 
+	 *	\brief Base class for E_AV_Buffer containing everything not dependent on template parameters, which is almost everything.
 	 */
 	template< class Ch = char >
 	class E_AV_Buffer_Base
@@ -474,6 +478,9 @@ namespace IO {
 	//--------------------------------------------------
 	// Basic_Buffer
 	//--------------------------------------------------
+	/**	\class Basic_Buffer
+	 *	\brief A wrapper around an Abstract_Buffer.
+	 */
 	template< class Ch >
 	class Basic_Buffer
 	{
