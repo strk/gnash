@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.7 2007/07/18 03:39:13 strk Exp $";
+rcsid="$Id: TextField.as,v 1.8 2007/07/19 15:57:18 strk Exp $";
 
 #include "check.as"
 
@@ -159,12 +159,12 @@ check(!tf.hasOwnProperty('backgroundColor'));
 
 // Check TextField.border
 
-xcheck_equals(typeof(tf.border), 'boolean');
+check_equals(typeof(tf.border), 'boolean');
 check(!tf.hasOwnProperty('border'));
 
 // Check TextField.borderColor
 
-xcheck_equals(typeof(tf.borderColor), 'number');
+check_equals(typeof(tf.borderColor), 'number');
 check(!tf.hasOwnProperty('borderColor'));
 
 // Check TextField.bottomScroll

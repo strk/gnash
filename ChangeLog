@@ -1,5 +1,6 @@
 2007-07-19 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/TextField.as: more successes.
 	* server/edit_text_character.cpp (attachTextFieldInterface): 
 	  fix a bug swapping .border and .borderColor semantic (!).
 	* configure.ac: test(1) string equality operator is "=",
