@@ -1,6 +1,9 @@
 Change Log for GNU Cygnal, Module HTTP
 ======================================
 
+2007-07-10 Eric Hughes <eh@narthex.us>
+	* URI.cpp: Fixed defect with URI scanner consuming an extra character at end.
+
 2007-07-09 Eric Hughes <eh@narthex.us>
 	* unit_tests/Test_HTTP.cpp: Duplicated Invalid_Version_Request test into ordinary URI and *-URI forms.
 	* HTTP_Parse.[hc]pp: Fixed defect in Request_Scanner, which wasn't looking explicitly for a space after the URI.  It was relying on the URI scanner to consume the next character, but since the URI scanner is used elsewhere, it should not silently consume anything other than the URI itself.  Fixing this defect allowed the Invalid_Version_Request, *-version, to pass, but unmasked the defect in URI scanning.

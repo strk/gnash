@@ -450,10 +450,9 @@ namespace cygnal {
 				return source_state() ;
 			//----------
 			label_done_unget_last_character:
-				uri.r_URI.set_length( next_character - URI_begin - 1 ) ;
-				if ( uri.r_URI.size() == 0 ) return set_bad() ;
-				return set_completed() ;
-
+				++ n_left_to_process ;
+				-- next_character ;
+				// fall through
 			//----------
 			label_done:
 			case done:
