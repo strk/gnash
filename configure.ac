@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.357 2007/07/19 00:18:54 strk Exp $
+dnl $Id: configure.ac,v 1.358 2007/07/19 14:44:28 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1016,7 +1016,7 @@ AC_SUBST(LIBTOOL_DEPS)
 
 dnl Define winsock if we're on windows. We could do something complicated,
 dnl but since AC_EXEEXT does it for us, we'll do this the easy way.
-if test x"$EXEEXT" == "exe"; then
+if test x"$EXEEXT" = "exe"; then
   AC_DEFINE(HAVE_WINSOCK,1,[This is defined is we are on Win32])
 fi
 
@@ -1718,7 +1718,7 @@ fi
 if test x"$BOOST_LIBS" != x; then
     # Only cygnal requires date_time at present, so it's OK if either
     # you don't want cygnal or do have date_time installed.
-    if test x"$cygnal" == xno -o x"$boost_date_time" = xyes; then
+    if test x"$cygnal" = xno -o x"$boost_date_time" = xyes; then
 	echo "        BOOST flags are: $BOOST_CFLAGS"
 	echo "        BOOST libs are: $BOOST_LIBS"
     else
@@ -1733,7 +1733,7 @@ else
     echo "        ERROR: No BOOST development package installed!"
     echo "               Install it from http://www.boost.org"
     echo "               or .deb users: apt-get install libboost-thread-dev"
-    if test x"$cygnal" == xyes; then
+    if test x"$cygnal" = xyes; then
     echo "                              and libboost-date-time-dev"
     fi
     echo "               or .rpm users: yum install boost-devel"

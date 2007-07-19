@@ -1,3 +1,8 @@
+2007-07-19 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: test(1) string equality operator is "=",
+	  not "==". Other attempt at fixing bug #20525.
+
 2007-07-18 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: quote `backticked commands` when assigning to
