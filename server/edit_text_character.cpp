@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.78 2007/07/18 03:47:31 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.79 2007/07/19 15:01:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -318,10 +318,11 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("background", *getset, *getset);
 	getset = new builtin_function(textfield_backgroundColor_getset);
 	o.init_property("backgroundColor", *getset, *getset);
-	getset = new builtin_function(textfield_borderColor_getset);
-	o.init_property("border", *getset, *getset);
 	getset = new builtin_function(textfield_border_getset);
+	o.init_property("border", *getset, *getset);
+	getset = new builtin_function(textfield_borderColor_getset);
 	o.init_property("borderColor", *getset, *getset);
+
 
 	if ( target_version  < 7 ) return;
 
@@ -441,6 +442,7 @@ edit_text_character::display()
 
 	bool drawBorder = getDrawBorder();
 	bool drawBackground = getDrawBackground();
+
 	if ( drawBorder || drawBackground )
 	{
 		matrix	mat = get_world_matrix();
@@ -461,8 +463,6 @@ edit_text_character::display()
 		
 		rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
 		rgba backgroundColor = drawBackground ? getBackgroundColor() : rgba(255,255,255,0);
-
-		//log_debug("Border color : %s, Background color : %s", borderColor.toString().c_str(), backgroundColor.toString().c_str());
 
 		render::draw_poly( &coords[0], 4, backgroundColor, borderColor );
 		
@@ -1431,7 +1431,6 @@ edit_text_character::setBackgroundColor(const rgba& col)
 static as_value
 textfield_background_getset(const fn_call& fn)
 {
-	GNASH_REPORT_FUNCTION;
 	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter
@@ -1466,8 +1465,6 @@ textfield_border_getset(const fn_call& fn)
 static as_value
 textfield_backgroundColor_getset(const fn_call& fn)
 {
-	GNASH_REPORT_FUNCTION;
-
 	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
 
 	if ( fn.nargs == 0 ) // getter

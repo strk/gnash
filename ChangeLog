@@ -1,5 +1,7 @@
 2007-07-19 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (attachTextFieldInterface): 
+	  fix a bug swapping .border and .borderColor semantic (!).
 	* configure.ac: test(1) string equality operator is "=",
 	  not "==". Other attempt at fixing bug #20525.
 
