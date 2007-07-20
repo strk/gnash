@@ -211,6 +211,9 @@ private:
 	/// display)
 	///
 	void registerTextVariable();
+	
+	// Text fields need to handle cxform specially 
+	cxform	get_world_cxform() const;
 
 	/// The flag keeping status of TextVariable registration
 	//

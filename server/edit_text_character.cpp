@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.83 2007/07/20 16:13:55 udog Exp $ */
+/* $Id: edit_text_character.cpp,v 1.84 2007/07/20 16:42:35 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -464,20 +464,14 @@ edit_text_character::display()
 		rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
 		rgba backgroundColor = drawBackground ? getBackgroundColor() : rgba(0,0,0,0);
 
-		if ( 1 ) // should be if ! isDynamic to be PP-compatible (or is it about device font? to be tested)
-		         // Currently disabled due to what looks like a bug in color transform
-		{
-			cxform	cx = get_world_cxform();
-			log_debug("world cxform for textfield %s: %s", getTargetPath().c_str(), cx.toString().c_str());
+		cxform	cx = get_world_cxform();
 			
-			if (drawBorder)
-				borderColor = cx.transform(borderColor);
-			 
-			if (drawBackground)
-				backgroundColor = cx.transform(backgroundColor);
-		}
-
-
+		if (drawBorder)
+			borderColor = cx.transform(borderColor);
+		 
+		if (drawBackground)
+			backgroundColor = cx.transform(backgroundColor);
+		
 		render::draw_poly( &coords[0], 4, backgroundColor, borderColor );
 		
 	}
@@ -1440,6 +1434,20 @@ edit_text_character::setBackgroundColor(const rgba& col)
 		set_invalidated();
 		_backgroundColor = col;
 	}
+}
+
+cxform	
+edit_text_character::get_world_cxform() const
+{
+  cxform cf = character::get_world_cxform();
+  
+  if ( 0 /* if using a device font (PP compatibility, TODO) */ ) {
+    // set alpha to default values to make the text field opaque
+    cf.m_[3][0] = 1.0f;
+    cf.m_[3][1] = 0.0f;
+  }
+  
+  return cf;
 }
 
 static as_value

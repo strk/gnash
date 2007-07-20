@@ -2,6 +2,9 @@
 
 	* server/edit_text_character.cpp: fix background and cxform for
 	  text fields
+	* server/edit_text_character.{h,cpp}: special get_world_cxform() 
+	  handler to make input fields opaque for device fonts (currently
+    no effect, since it can't be detected yet)
 
 2007-07-20 Sandro Santilli <strk@keybit.net>
 
