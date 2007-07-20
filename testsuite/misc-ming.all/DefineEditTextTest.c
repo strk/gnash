@@ -120,11 +120,13 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); // 1st frame 
 
   // checks before placing any swf defined TextField
-  check(mo, "!TextField.prototype.hasOwnProperty('background')");
-  check(mo, "!TextField.prototype.hasOwnProperty('backgroundColor')");
-  check(mo, "!TextField.prototype.hasOwnProperty('text')");
-  check(mo, "!TextField.prototype.hasOwnProperty('textColor')");
-  check(mo, "!TextField.prototype.hasOwnProperty('_alpha')");
+  // Note: the dejagnuclip already placed some texts, so the following 
+  // does not work.
+  //check(mo, "!TextField.prototype.hasOwnProperty('background')");
+  //check(mo, "!TextField.prototype.hasOwnProperty('backgroundColor')");
+  //check(mo, "!TextField.prototype.hasOwnProperty('text')");
+  //check(mo, "!TextField.prototype.hasOwnProperty('textColor')");
+  //check(mo, "!TextField.prototype.hasOwnProperty('_alpha')");
 
   /*********************************************
    *

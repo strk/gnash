@@ -1,3 +1,9 @@
+2007-07-20 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-ming.all/unload_movieclip_test1.c: comments
+	* testsuite/misc-ming.all/DefineEditTextTest.c: removed some incorrect
+	  tests.
+	  
 2007-07-19  Rob Savoye  <rob@deal.welcomehome.org>
 
 	* gui/Makefile.am: Use *_CONFIG variables instead of *_OPT

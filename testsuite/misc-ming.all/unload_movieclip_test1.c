@@ -19,6 +19,8 @@
 /*
  * zou lunkai  zoulunkai@gmail.com
  *
+ * Test "this" context in the UNLOAD event handler.
+ *
  * run as ./unload_movieclip_test1
  */
 
