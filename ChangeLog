@@ -1,5 +1,8 @@
 2007-07-20 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (display): make the default
+	  background color solid white (but still background is only drawn
+	  if either 'background' or 'border' are set to true).
 	* testsuite/misc-ming.all/DefineEditTextTest.c: don't include gnash
 	  headers from SWF *generators* !
 	* configure.ac: provide a RENDERER_LIBS listing all built renderer
