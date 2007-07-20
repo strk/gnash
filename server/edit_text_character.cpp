@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.81 2007/07/20 15:32:18 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.82 2007/07/20 16:11:02 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -378,7 +378,7 @@ edit_text_character::edit_text_character(character* parent,
 	m_ycursor(0.0f),
 	_text_variable_registered(false),
 	_variable_name(m_def->get_variable_name()),
-	_drawBackground(false),
+	_drawBackground(m_def->has_border()),
 	_backgroundColor(255,255,255,255),
 	_drawBorder(m_def->has_border()),
 	_borderColor(0,0,0,255)
@@ -460,17 +460,23 @@ edit_text_character::display()
 		coords[1] = def_bounds.get_corner(1);
 		coords[2] = def_bounds.get_corner(2);
 		coords[3] = def_bounds.get_corner(3);
-		
+printf("\n\ndrawBorder = %d\n", drawBorder);		
 		rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
-		rgba backgroundColor = drawBackground ? getBackgroundColor() : rgba(255,255,255,255);
+		
+printf("drawBackground = %d\n", drawBackground);		
+		rgba backgroundColor = drawBackground ? getBackgroundColor() : rgba(0,0,0,0);
 
-		if ( 0 ) // should be if ! isDynamic to be PP-compatible (or is it about device font? to be tested)
+		if ( 1 ) // should be if ! isDynamic to be PP-compatible (or is it about device font? to be tested)
 		         // Currently disabled due to what looks like a bug in color transform
 		{
 			cxform	cx = get_world_cxform();
 			log_debug("world cxform for textfield %s: %s", getTargetPath().c_str(), cx.toString().c_str());
-			borderColor = cx.transform(borderColor);
-			backgroundColor = cx.transform(backgroundColor);
+			
+			if (drawBorder)
+				borderColor = cx.transform(borderColor);
+			 
+			if (drawBackground)
+				backgroundColor = cx.transform(backgroundColor);
 		}
 
 

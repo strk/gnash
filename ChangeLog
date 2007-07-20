@@ -1,3 +1,8 @@
+2007-07-20 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/edit_text_character.cpp: fix background and cxform for
+	  text fields
+
 2007-07-20 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp (display): make the default
