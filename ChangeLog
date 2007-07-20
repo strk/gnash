@@ -1,5 +1,7 @@
 2007-07-20 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DefineEditTextTest.c: don't include gnash
+	  headers from SWF *generators* !
 	* configure.ac: provide a RENDERER_LIBS listing all built renderer
 	  libraries
 	* testsuite/Makefile.am: link libgnashtestsuite against all built 

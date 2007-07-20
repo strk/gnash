@@ -33,7 +33,6 @@
 #include <ming.h>
 
 #include "ming_utils.h"
-#include "fontlib.h"
 
 #define OUTPUT_VERSION 7
 #define OUTPUT_FILENAME "DefineEditTextTest.swf"
