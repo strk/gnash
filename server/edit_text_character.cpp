@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.82 2007/07/20 16:11:02 udog Exp $ */
+/* $Id: edit_text_character.cpp,v 1.83 2007/07/20 16:13:55 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -460,10 +460,8 @@ edit_text_character::display()
 		coords[1] = def_bounds.get_corner(1);
 		coords[2] = def_bounds.get_corner(2);
 		coords[3] = def_bounds.get_corner(3);
-printf("\n\ndrawBorder = %d\n", drawBorder);		
+
 		rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
-		
-printf("drawBackground = %d\n", drawBackground);		
 		rgba backgroundColor = drawBackground ? getBackgroundColor() : rgba(0,0,0,0);
 
 		if ( 1 ) // should be if ! isDynamic to be PP-compatible (or is it about device font? to be tested)
