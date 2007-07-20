@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: x11.m4,v 1.12 2007/07/01 10:54:14 bjacques Exp $
+dnl $Id: x11.m4,v 1.13 2007/07/20 01:50:32 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_X11],
 [
@@ -70,12 +70,12 @@ AC_DEFUN([GNASH_PATH_X11],
   if test x"${ac_cv_path_x11_incl}" != x ; then
     newlist="/Developer/SDKs/MacOSX10.4*.sdk/usr/lib /Developer/SDKs/MacOSX10.4*.sdk/usr/X11R6/lib ${libslist}"
     for i in $newlist; do
-     if test -f $i/libX11.a -o -f $i/libX11.${shlibext}; then
-       if test x"${i}" != x"/usr/lib"; then
-         ac_cv_path_x11_lib="-L$i -lX11"
-       else
-         ac_cv_path_x11_lib="-lX11"
-       fi
+      if test -f $i/libX11.a -o -f $i/libX11.${shlibext}; then
+        if test x"${i}" != x"/usr/lib"; then
+          ac_cv_path_x11_lib="-L$i -lX11"
+        else
+          ac_cv_path_x11_lib="-lX11"
+        fi
         if test -f $i/libXinerama.a -o -f $i/libXinerama.${shlibext}; then
           ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lXinerama"
         fi
@@ -86,7 +86,7 @@ AC_DEFUN([GNASH_PATH_X11],
           ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lSM"
         fi
         if test -f $i/libICE.a -o -f $i/libICE.${shlibext}; then
-          ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lICE"
+         ac_cv_path_x11_lib="${ac_cv_path_x11_lib} -lICE"
         fi
         break
       fi
@@ -120,8 +120,6 @@ AC_DEFUN([GNASH_PATH_X11],
   if test -n "$X11_LIBS" -a -n "$X11_CFLAGS"; then
     x11=yes
   fi
-
-  AM_CONDITIONAL(HAVE_X11, [test x$x11 = xyes])
 
   if test "x$x11" = xyes; then
     AC_DEFINE(HAVE_X11, [1], [X11 headers and libraries])

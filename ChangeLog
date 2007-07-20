@@ -1,3 +1,41 @@
+2007-07-19  Rob Savoye  <rob@deal.welcomehome.org>
+
+	* gui/Makefile.am: Use *_CONFIG variables instead of *_OPT
+	ones. Use BUILD_* conditionals instead of USE_GUI.
+	* backend/Makefile.am: Build seperate libraries for each backend.
+	* configure.ac: Don't pass the data to AM_INIT_AUTOMAKE. Don't
+	disable static libs. Add option for dynamically loading
+	guis. (disabled by default for now). Don't build cygnal by
+	default. Remove --enable-gui and --enable-renderer with new
+	options, --with-gui and --with-renderer to list multiple options
+	for guis and renderers. Don't configure cygnal sub directories yet.
+	* Makefile.am: Use *_CONFIG variables instead of *_OPT ones.
+	* extensions/Makefile.am: Use BUILD_* conditionals instead of
+	USE_GUI.
+	* libbase/Makefile.am: Use HAVE_SDL instead of HAS_SDL.
+	* macros/gtkglext.m4: Use --libs-only-l insted of --libs.
+	* testsuite/misc-ming.all/DefineEditTextTest.c: Include fontlib.h.
+	* macros/libltdl.m4: Move the serial numbers to the top to keep
+	automate 1.19 happy.  
+	* macros/x11.m4: Don't put a conditional in an if block.
+
+2007-07-15  Rob Savoye  <rob@deal.welcomehome.org>
+
+	* po/Makefile.am: Add -Wno-portability to AUTOMAKE_OPTIONS to
+	stop complaints we don't care about. 
+	* gui/Makefile.am: Add -Wno-portability to AUTOMAKE_OPTIONS to
+	stop complaints we don't care about. 
+	* testsuite/misc-ming.all/Makefile.am: Add -Wno-portability to
+	AUTOMAKE_OPTIONS to stop complaints we don't care about.
+	* testsuite/misc-swfmill.all/Makefile.am: Add -Wno-portability to
+	AUTOMAKE_OPTIONS to stop complaints we don't care about.
+	* testsuite/swfdec/Makefile.am: Add -Wno-portability to
+	AUTOMAKE_OPTIONS to stop complaints we don't care about.
+
+2007-07-14  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Add new Cygnal directories.
+
 2007-07-19 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/TextField.as: more successes.
@@ -90,6 +128,7 @@
 	  server/asobj/{Sound, Netstream}Ffmpeg.h, gui/gnash.cpp: Fix for
 	 linking.
 
+>>>>>>> 1.3749
 2007-07-17 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/actionscript.all/MovieClip.as: more tests, all passed.
@@ -110,6 +149,7 @@
 	  handling cleanups, for better management of key listeners. change
 	  key listeners container from std::vector to std::set. Correct indent.
 	
+>>>>>>> 1.3745
 2007-07-14  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Add new Cygnal directories.
@@ -240,6 +280,7 @@
 	* testsuite/actionscript.all/Makefile.am: activate enumerate.as and
 	  case.as.
 
+>>>>>>> 1.3741
 2007-07-11 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp (remove the "default" font logic,
@@ -273,7 +314,7 @@
 2007-07-11 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/fb.cpp: print fatal error messages to stdout (workaround),
-	  fixes bug #20012 	
+	  fixes bug #20012
 
 2007-07-11 Zou Lunkai <zoulunkai@gmail.com>
 

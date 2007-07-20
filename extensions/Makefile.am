@@ -32,7 +32,7 @@ OTHER_DIRS += fileio
 endif
 
 if BUILD_GTK_EXT
-if USE_GUI_GTK
+if BUILD_GTK_GUI
 OTHER_DIRS += gtk2
 endif
 endif

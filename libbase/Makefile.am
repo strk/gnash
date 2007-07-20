@@ -70,7 +70,7 @@ libgnashbase_la_LIBADD = \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
-if HAS_SDL
+if HAVE_SDL
 SDL_FILE = tu_file_SDL.cpp
 libgnashbase_la_LIBADD += $(SDL_LIBS)
 else

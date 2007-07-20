@@ -1,5 +1,5 @@
 dnl  
-dnl    Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+dnl    Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 dnl  
 dnl  This program is free software; you can redistribute it and/or modify
 dnl  it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.358 2007/07/19 14:44:28 strk Exp $
+dnl $Id: configure.ac,v 1.359 2007/07/20 01:50:31 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -49,11 +49,12 @@ dnl Get build date for helping us debugging
 BUILDDATE="`date +%Y%m%d`"
 
 dnl These are required by automake
-AM_INIT_AUTOMAKE(gnash, "cvs$BUILDDATE")
+dnl AM_INIT_AUTOMAKE(gnash, "cvs$BUILDDATE")
+AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_PROG_MAKE_SET
 
-AC_DISABLE_STATIC dnl Disable building static libs.
+dnl AC_DISABLE_STATIC dnl Disable building static libs.
 
 AM_GNU_GETTEXT([external])
 AM_CONDITIONAL(HAS_GETTEXT, test x$ac_cv_path_XGETTEXT != x)
@@ -141,6 +142,8 @@ dnl   $CXXFLAGS="$CXXFLAGS -march=${with_cpu}"
    cross_compiling=yes
 fi
 
+dnl Don't add the GUI menu. Some educational systems think this adds
+dnl clutter and confusion, like on the OLPC.
 AC_ARG_ENABLE(menus,
   AC_HELP_STRING([--disable-menus],[Disable the GUI menus]),
 [case "${enableval}" in
@@ -153,6 +156,21 @@ if test x"$menus" = x"yes"; then
   AC_DEFINE([USE_MENUS], [], [GUI Menu support])
 fi
 AM_CONDITIONAL(MENUS, test x$menus = xyes)
+
+dnl Enable building the gui support even when statically
+dnl linking. Normally this is only disabled when building a statically
+dnl linked gnash executable.
+AC_ARG_ENABLE(dynamic-gui,
+  AC_HELP_STRING([--enable-dynamic-gui],[Enable building dynamically loadable GUIs and renderers ]),
+[case "${enableval}" in
+  yes) dynamic_gui=yes ;;
+  no)  dynamic_gui=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-dynamic-gui option]) ;;
+esac],dynamic_gui=no)
+if test x"${dynamic_gui}" = x"yes"; then
+  AC_DEFINE([USE_DYNAMIC_GUI], [], [Dynamically loadable GUI and renderer support])
+fi
+AM_CONDITIONAL(DYNAMIC_GUI, test x${dynamic_gui} = xyes)
 
 dnl Write the file to disk in the plugin, if specified.
 AC_ARG_ENABLE(write,
@@ -174,7 +192,7 @@ AC_ARG_ENABLE(cygnal,
   yes) cygnal=yes ;;
   no)  cygnal=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for disable-cygnal option]) ;;
-esac],cygnal=yes)
+esac],cygnal=no)
 
 AM_CONDITIONAL(CYGNAL, test x$cygnal = xyes)
 
@@ -211,59 +229,124 @@ AC_ARG_ENABLE(klash,
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-klash option]) ;;
 esac],klash=yes)
 
-AC_ARG_ENABLE(gui,
-  AC_HELP_STRING([--enable-gui=TOOLKIT], [Specify GUI toolkit: GTK, FLTK, RISCOS, AQUA (OS X), FB (framebuffer), KDE or SDL[[GTK]] ]),
- [case "${enableval}" in
-   gtk|GTK) gui=gtk ;;
-   sdl|SDL) gui=sdl  ;;
-   aqua|AQUA) gui=aqua  ;;
-   kde|KDE) gui=kde  ;;
-   fb|FB) gui=fb  ;;
-   fltk|FLTK) gui=fltk  ;;
-   riscos|RISCOS) gui=riscos ;;
-   *)      AC_MSG_ERROR([invalid gui ${enableval} given]) ;;
-  esac],
- [gui=gtk]
+addgui=none
+build_fb=no
+build_fltk=no
+build_kde=no
+build_gtk=no
+build_sdl=no
+build_riscos=no
+build_aqua=no
+AC_ARG_WITH(gui,
+  AC_HELP_STRING([--with-gui=], [Use the specified GUI toolkit (default=gtk,kde)]),
+  if test -n ${withval}; then
+    addgui="${withval}"
+    withval=`echo ${withval} | tr '\054' ' ' `
+  fi
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+    [case "${val}" in
+      gtk|GTK|gtk2|GTK2)
+        build_gtk=yes
+        ;;
+      kde|KDE)
+        build_kde=yes
+        ;;
+      qt|QT)
+        build_qt=yes
+        ;;
+      sdl|SDL)
+        build_sdl=yes
+        ;;
+      aqua|AQUA|Aqua)
+        build_aqua=yes
+        ;;
+      riscos|RISCOS|RiscOS)
+        build_riscos=yes
+        ;;
+      fltk|FLTK|fltk2|FLTK2)
+        build_fltk=yes
+        ;;
+      fb|FB)
+        build_fb=yes
+        ;;
+      all|ALL)
+        build_fb=yes
+        build_fltk=yes
+        build_kde=yes
+        build_gtk=yes
+        build_sdl=yes
+dnl        build_riscos=yes
+        ;;
+      *) AC_MSG_ERROR([invalid gui ${withval} given (accept: gtk|kde|fltk|sdl|riscos|aqua|fb)])
+         ;;
+      esac]
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test x$val = x$withval; then
+      break;
+    fi
+  done
 )
 
-dnl if test x"$klash" = xyes -a x"$gui" != xkde; then
-dnl   AC_MSG_ERROR([You must use the kde GUI ( --enable-gui=KDE ) if you enable klash.])
-dnl fi
+if test x$addgui = xnone; then
+   build_gtk=yes
+   build_kde=yes
+dnl   addgui="gtk,kde"
+fi
 
-AC_ARG_ENABLE(renderer,
-  AC_HELP_STRING([--enable-renderer=engine], [Specify rendering engine: OpenGL, Agg or Cairo (experimental) [[OpenGL]] ]),
- [case "${enableval}" in
-   opengl|OpenGL) renderer=opengl ;;
-   cairo|Cairo)  renderer=cairo  ;;
-   agg|Agg|AGG)  renderer=agg  ;;
-   *)      AC_MSG_ERROR([invalid renderer ${enableval} given]) ;;
-  esac],
- [renderer=opengl]
+add_renderer=none
+build_ogl=no
+build_agg=no
+build_cairo=no
+AC_ARG_WITH(renderer,
+  AC_HELP_STRING([--with-renderer=], [Use the specified GUI toolkit (default=ogl,agg)]),
+  if test -n ${withval}; then
+    add_renderer="${withval}"
+    withval=`echo ${withval} | tr '\054' ' ' `
+  fi
+  while test -n "${withval}" ; do
+    val=`echo ${withval} | cut -d ' ' -f 1`
+    [case "${val}" in
+      ogl|OGL|gl|GL|opengl|OPENGL|OpenGL)
+        build_ogl=yes
+        ;;
+      agg|AGG|Agg)
+        build_agg=yes
+        ;;
+      cairo|CAIRO|Cairo)
+        build_cairo=yes
+        ;;
+      all|ALL|All)
+        build_ogl=yes
+        build_agg=yes
+        build_cairo=yes
+        ;;
+      *) AC_MSG_ERROR([invalid renderer ${withval} given (accept: ogl,agg,cairo)])
+         ;;
+      esac]
+    withval=`echo ${withval} | cut -d ' ' -f 2-6`
+    if test x$val = x$withval; then
+      break;
+    fi
+  done
 )
 
-if test x$renderer = xopengl; then
-  if test x"$gui" = xfb -o x"$gui" = xfltk; then
-    AC_MSG_ERROR([OpenGL renderer is not supported by the $gui gui. Try using AGG ( --enable-renderer=AGG ).]);
+if test x$add_renderer = xnone; then
+   build_ogl=yes
+   build_agg=yes
+dnl   add_renderer="ogl,agg"
+fi
+
+if test x$build_ogl = xyes; then
+  if test x$build_fb = xyes -o x$build_fltk = xyes; then
+    AC_MSG_ERROR([OpenGL renderer is not supported by the this gui. Try using AGG ( --enable-renderer=AGG ).]);
   fi
   AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
-AM_CONDITIONAL(USE_RENDERER_OPENGL, test x$renderer = xopengl)
 
-if test x$renderer = xcairo; then
-  if test x"$gui" = xfb; then
-    AC_MSG_ERROR([cairo renderer is not supported by fb gui]);
-  fi
-  AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
-fi
-AM_CONDITIONAL(USE_RENDERER_CAIRO, test x$renderer = xcairo)
-
-if test x$renderer = xagg; then
-  if test x"$gui" != xfb -a x"$gui" != xgtk -a x"$gui" != xsdl -a x"$gui" != xriscos -a x"$gui" != xfltk -a x"$gui" != xkde; then
-    AC_MSG_ERROR([agg renderer is only supported by fb, gtk, riscos, sdl, fltk and kde GUIs]);
-  fi
+if test x$build_agg = xyes; then
   AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
 fi
-AM_CONDITIONAL(USE_RENDERER_AGG, test x$renderer = xagg)
 
 dnl 16 bit: RGB555, RGB565
 dnl 24 bit: RGB24, BGR24
@@ -308,8 +391,8 @@ B565|RGB24|BGR24|BGRA32|RGBA32)])
 )
 
 if test x$pixelformat = xall; then
-  if test x$renderer = xagg; then
-    if test x"$gui" = x"gtk"; then
+  if test x$build_agg = xyes; then
+    if test x$build_gtk = xyes; then
       AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24 pixel format])
       pixelformat="RGB24"
     else
@@ -443,6 +526,99 @@ AC_EXEEXT
 AC_PROG_INSTALL
 AM_COMPILER_LIB
 
+AC_LIBLTDL_INSTALLABLE
+AC_LIBTOOL_DLOPEN
+AC_LIBTOOL_WIN32_DLL
+AC_PROG_LIBTOOL
+AC_C_CONST
+AC_C_INLINE
+AC_SUBST([LIBTOOL_DEPS])
+AC_LIB_LTDL
+
+AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
+AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
+AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
+dnl build a statically linked executable
+if test x"${enable_shared}" = xno; then
+   g=`echo  $addgui | grep -c '\,'`
+   r=`echo  $add_renderer | grep -c '\,'`
+  if test $g -gt 0 -o $r -gt 0 ; then
+     AC_MSG_ERROR([When statically linking, you must pick only one GUI toolkit and one renderer])
+  fi
+  dnl If statically linking, and no gui is specified, force gtk
+  if test x$addgui = xnone; then
+     build_gtk=yes
+     build_kde=no
+     addgui=gtk
+     AC_MSG_NOTICE([Defaulting to GTK as the GUI, use --with-gui= to change])
+  fi
+  dnl If statically linking, and no renderer is specified, force opengl
+  if test x$add_renderer = xnone; then
+     build_agg=no
+     build_ogl=yes
+     add_renderer=ogl
+     AC_MSG_NOTICE([Defaulting to OpenGL as the renderer, use --with-renderer= to change])
+  fi
+else dnl building a dynamically linked executable without loadable GUI plugins
+  dnl If not dynamic loading, and no gui is specified, force gtk
+  if test x"${dynamic_gui}" = xno; then
+    if test x$addgui = xnone; then
+      build_gtk=yes
+      build_kde=no
+      addgui=gtk
+      AC_MSG_NOTICE([Defaulting to GTK as the GUI, use --with-gui= to change])
+    fi
+    dnl If not dynamic loading, and no renderer is specified, force opengl
+    if test x$add_renderer = xnone; then
+      build_agg=no
+      build_ogl=yes
+      add_renderer=ogl
+      AC_MSG_NOTICE([Defaulting to OpenGL as the renderer, use --with-renderer= to change])
+    fi
+  else
+    dnl If dynamically loading and no gui is specified, force gtk and kde
+    if test x$addgui = xnone; then
+      build_gtk=yes
+      build_kde=yes
+      addgui="gtk,kde"
+      AC_MSG_NOTICE([Defaulting to GTK and KDE as the GUIs, use --with-gui= to change])
+    fi
+    dnl If dynamically loading and no renderer is specified, force opengl and agg
+    if test x$add_renderer = xnone; then
+      build_ogl=yes
+      build_agg=yes
+      add_renderer="ogl,agg"
+      AC_MSG_NOTICE([Defaulting to OpenGL and AGG as the renderers, use --with-renderer= to change])
+    fi
+  fi
+fi
+
+AM_CONDITIONAL(BUILD_GTK_GUI, [ test x$build_gtk = xyes ])
+AM_CONDITIONAL(BUILD_KDE_GUI, [ test x$build_kde = xyes ])
+dnl AM_CONDITIONAL(BUILD_QT_GUI, [ test x$build_qt = xyes ])
+AM_CONDITIONAL(BUILD_FLTK_GUI, [ test x$build_fltk = xyes ])
+AM_CONDITIONAL(BUILD_SDL_GUI, [ test x$build_sdl = xyes ])
+AM_CONDITIONAL(BUILD_FB_GUI, [ test x$build_fb = xyes ])
+AM_CONDITIONAL(BUILD_AQUA_GUI, [ test x$build_aqua = xyes ])
+AM_CONDITIONAL(BUILD_RISCOS_GUI, [ test x$build_riscos = xyes ])
+
+AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes ])
+AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
+AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
+
+dnl AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]),
+dnl                                         AC_DEFINE(LT_DLMUTEX, 0, [doesn't have lt_dlmutex_register]) )
+
+DLOPEN="-dlopen"
+DLPREOPEN="-dlpreopen"
+AC_SUBST(DLOPEN)
+AC_SUBST(DLPREOPEN)
+
+dnl dnl Substitute INCLTDL and LIBLTDL in the Makefiles
+AC_SUBST(INCLTDL)
+AC_SUBST(LIBLTDL)
+AC_SUBST(LIBTOOL_DEPS)
+
 dnl Darwin uses libtool instead of ar to produce libraries. We determine which one
 dnl we have here now. For some reason on Darwin, we don't get the
 dnl count from grep via stdin correctly. Writing a temp file does the
@@ -506,7 +682,6 @@ AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
 
 AC_CHECK_FUNCS(mallinfo)
 PKG_PROG_PKG_CONFIG
-dnl LIBS+="-L/usr/lib64"
 AC_PATH_TOOL([AUTOTRACE], [autotrace])
 AC_HEADER_DIRENT
 
@@ -546,19 +721,23 @@ case $host in
   LIBS=$save_LIBS
   ;;
 esac
-dnl AC_PATH_XTRA
-GNASH_PATH_X11
 
 AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)
+AC_CHECK_LIB(m, sqrt)
 
-dnl seems unused
+dnl don't look for X11 when using a raw framebuffer for the GUI
+if test x$build_gtk = xyes -o x$build_kde = xyes -o x$build_fltk = xyes -o x$build_sdl = xyes; then
+dnl AC_PATH_XTRA
 dnl AC_CHECK_LIB(Xmu, XmuCvtStringToOrientation)
 dnl AC_CHECK_LIB(gmp, _gmp_get_memory_functions)
-AC_CHECK_LIB(m, sqrt)
-AC_CHECK_LIB(Xi, XInput_find_display)
-AC_CHECK_LIB(X11, XDisableAccessControl)
+  GNASH_PATH_X11
+  AC_CHECK_LIB(Xi, XInput_find_display)
+  AC_CHECK_LIB(X11, XDisableAccessControl)
+fi
+AM_CONDITIONAL(HAVE_X11, [test x$x11 = xyes])
+
 AC_CHECK_LIB(rt, shm_unlink)
 AC_CHECK_FUNCS(shm_open shm_unlink)
 AC_TRY_COMPILE([#include <strings.h>], [
@@ -594,42 +773,39 @@ fi
 
 AC_LANG_PUSH(C++)
 AC_CACHE_CHECK([whether $CXX implements __PRETTY_FUNCTION__], ac_cv_implements___PRETTY_FUNCTION__, [
-        AC_TRY_LINK([
-#include <cstdio>
+  AC_TRY_LINK([#include <cstdio>
 ], 
-                [ std::printf("%s", __PRETTY_FUNCTION__); ], 
-                [ ac_cv_implements___PRETTY_FUNCTION__="yes" ],
-                [ ac_cv_implements___PRETTY_FUNCTION__="no" ]
-        )
+    [ std::printf("%s", __PRETTY_FUNCTION__); ], 
+    [ ac_cv_implements___PRETTY_FUNCTION__="yes" ],
+    [ ac_cv_implements___PRETTY_FUNCTION__="no" ]
+  )
 ])
 if test "x$ac_cv_implements___PRETTY_FUNCTION__" = "xyes" ; then
-        AC_DEFINE(HAVE_PRETTY_FUNCTION, [1], [__PRETTY_FUNCTION__ is defined])
+  AC_DEFINE(HAVE_PRETTY_FUNCTION, [1], [__PRETTY_FUNCTION__ is defined])
 fi
 
 AC_CACHE_CHECK([whether $CXX implements __FUNCTION__], ac_cv_implements___FUNCTION__, [
-        AC_TRY_LINK([
-#include <cstdio>
+  AC_TRY_LINK([#include <cstdio>
 ], 
-                [ std::printf("%s", __FUNCTION__); ], 
-                [ ac_cv_implements___FUNCTION__="yes" ],
-                [ ac_cv_implements___FUNCTION__="no" ]
-        )
+    [ std::printf("%s", __FUNCTION__); ], 
+    [ ac_cv_implements___FUNCTION__="yes" ],
+    [ ac_cv_implements___FUNCTION__="no" ]
+  )
 ])
 if test "x$ac_cv_implements___FUNCTION__" = "xyes" ; then
-        AC_DEFINE(HAVE_FUNCTION, [1], [__FUNCTION__ is defined])
+  AC_DEFINE(HAVE_FUNCTION, [1], [__FUNCTION__ is defined])
 fi
 
 AC_CACHE_CHECK([whether $CXX implements __func__], ac_cv_implements___func__, [
-        AC_TRY_LINK([
-#include <cstdio>
+  AC_TRY_LINK([#include <cstdio>
 ], 
-                [ std::printf("%s", __func__); ], 
-                [ ac_cv_implements___func__="yes" ],
-                [ ac_cv_implements___func__="no" ]
-        )
+    [ std::printf("%s", __func__); ], 
+    [ ac_cv_implements___func__="yes" ],
+    [ ac_cv_implements___func__="no" ]
+  )
 ])
 if test "x$ac_cv_implements___func__" = "xyes" ; then
-        AC_DEFINE(HAVE_func, [1], [__func__ is defined])
+  AC_DEFINE(HAVE_func, [1], [__func__ is defined])
 fi
 AC_LANG_POP(C++)
 AC_REPLACE_FUNCS(getopt)
@@ -671,16 +847,15 @@ AC_CACHE_CHECK([whether timezone is a long], ac_cv_long_timezone, [
 #include <stdio.h>
 #include <time.h>
 extern long timezone;
-], 
-                [ printf("%ld", timezone); ], 
-                [ ac_cv_long_timezone="yes" ],
-                [ ac_cv_long_timezone="no" ]
-        )
+  ], 
+    [ printf("%ld", timezone); ], 
+    [ ac_cv_long_timezone="yes" ],
+    [ ac_cv_long_timezone="no" ]
+   )
 ])
 if test "x$ac_cv_long_timezone" = "xyes" ; then
-        AC_DEFINE(HAVE_LONG_TIMEZONE, [1], [extern timezone is a long integer, not a function])
+  AC_DEFINE(HAVE_LONG_TIMEZONE, [1], [extern timezone is a long integer, not a function])
 fi
-
 
 AC_CHECK_FUNCS(sysconf)
 AC_CHECK_FUNCS(shmget shmat shmdt mmap)
@@ -717,7 +892,9 @@ dnl Find freetype and fontconfig
 GNASH_PKG_FIND(freetype2, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
 GNASH_PKG_FIND(fontconfig, [fontconfig/fontconfig.h], [fontconfig library], FcFontMatch)
 
-AC_PATH_MING
+if test x$cross_compiling = xno; then
+  AC_PATH_MING
+fi
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
 AM_CONDITIONAL(MAKESWF_SUPPORTS_PREBUILT_CLIPS,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040002  ])
@@ -726,33 +903,36 @@ AM_CONDITIONAL(MING_SUPPORTS_INIT_ACTIONS,
 AM_CONDITIONAL(MING_SUPPORTS_REPLACE_TAG,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040005 ])
 
-AC_ARG_WITH([swfdec_testsuite],
-	AC_HELP_STRING([--with-swfdec-testsuite],
-		[directory where swfdec testsuite (the 'test' dir) is]),
+if test x$cross_compiling = xno; then
+  AC_ARG_WITH([swfdec_testsuite],
+	  AC_HELP_STRING([--with-swfdec-testsuite],
+		  [directory where swfdec testsuite (the 'test' dir) is]),
 	SWFDEC_TESTSUITE=${withval})
-AC_SUBST(SWFDEC_TESTSUITE)
+  AC_SUBST(SWFDEC_TESTSUITE)
+fi
 AM_CONDITIONAL(ENABLE_SWFDEC_TESTSUITE, [ test x"$SWFDEC_TESTSUITE" != x ])
 
 dnl
-dnl See if we can use the swfmill based testsuite
+dnl See if we can use the swfmill and mtasc based testsuites 
 dnl
-AC_PATH_PROG(SWFMILL, swfmill)
+if test x$cross_compiling = xno; then
+  AC_PATH_PROG(SWFMILL, swfmill)
+  AC_PATH_MTASC
+fi
 AM_CONDITIONAL(ENABLE_SWFMILL, [ test x"$SWFMILL" != x ])
+AM_CONDITIONAL(ENABLE_MTASC, [ test x"$MTASC" != x ])
 
 AC_PATH_PROG(DOXYGEN, doxygen)
 AM_CONDITIONAL(ENABLE_DOXYGEN, [ test x"$DOXYGEN" != x ])
 
-AC_PATH_MTASC
-AM_CONDITIONAL(ENABLE_MTASC, [ test x"$MTASC" != x ])
-
 dnl currently unused
 dnl GNASH_PKG_FIND(ogg, [ogg.h], [decode ogg streams], ogg_stream_init)
 
-if test x"$gui" = xsdl -o x"$media_handler" = xffmpeg -o x"$media_handler" = xmad; then
+if test x$build_sdl = xyes -o x"$media_handler" = xffmpeg -o x"$media_handler" = xmad; then
   GNASH_PATH_SDL
 fi
 
-AM_CONDITIONAL(HAS_SDL, [ test x$has_SDL = xyes ])
+AM_CONDITIONAL(HAVE_SDL, [ test x$has_SDL = xyes ])
 
 GNASH_PATH_BOOST
 GNASH_PATH_LIBXML
@@ -774,7 +954,7 @@ if test x"$plugin" = xno; then
 fi
 
 dnl # Check KDE if kde gui or klash were requested
-if test x"$gui" = xkde -o x$klash = xyes; then
+if test x$build_kde = xyes -o x$klash = xyes -o x$plugin = xno; then
   kde=yes
   qt=yes
   GNASH_PATH_KDE
@@ -801,27 +981,27 @@ AM_CONDITIONAL(KLASH, [test x$klash = xyes])
 
 AC_SUBST(KDE_CFLAGS)
 AC_SUBST(KDE_LIBS)
-if test x$renderer = xopengl; then
+if test x$build_ogl = xyes; then
   GNASH_PATH_OPENGL
 fi
 
-AM_CONDITIONAL(opengl, [test x$opengl = xyes])
-
 dnl Need GLIB for both GTK and GST
-if test x${gui} = "xgtk" -o x${media_handler} = "xgst"; then
+if test x$build_gtk = xyes -o x${media_handler} = "xgst"; then
   GNASH_PATH_GLIB
 fi
 
 AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
 
-if test x$gui = xgtk; then
-  if test x$renderer = xopengl; then
-    GNASH_PATH_GLEXT
-  fi
-  GNASH_PATH_GTK2
-  GNASH_PATH_PANGO
-  GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
+if test x$build_ogl = xyes -a x$build_gtk = xyes; then
+   GNASH_PATH_GLEXT
+fi
+if test x$build_gtk = xyes; then
+   GNASH_PATH_GTK2
+   GNASH_PATH_PANGO
+   GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
+fi
 
+if test x$build_gtk = xyes; then
   AC_ARG_ENABLE(ghelp,
     AC_HELP_STRING([--enable-ghelp], [Enable support for the GNOME help system]),
     [case "${enableval}" in
@@ -843,9 +1023,8 @@ if test x$gui = xgtk; then
   fi
 fi
 AM_CONDITIONAL(GHELP, [test x$ghelp = xyes])
-AM_CONDITIONAL(HAVE_AGG, [test x${ac_cv_path_agg_lib} != x])
 
-if test x"$gui" = x"fltk"; then
+if test x$build_fltk = xyes; then
   GNASH_PKG_FIND(Xft, [Xft.h], [xft library], XftGlyphRender)
 fi
 
@@ -865,34 +1044,15 @@ AM_CONDITIONAL(HAVE_GTK2, [ test x$has_gtk2 = xyes ])
 AM_CONDITIONAL(HAVE_GLEXT, [test x$glext = xyes])
 
 dnl We don't have GTKGLExt, so default to SDL, and don't build the Firefox plugin
-if test x$glext = xno -a x$renderer = xopengl; then
-  if test x$gtk2 = xyes -a x$gui = xgtk; then
+if test x$glext = xno -a x$build_ogl = xyes; then
+  if test x$gtk2 = xyes -a x$build_gtk = xyes; then
     AC_ERROR([You have GTK installed, but not GtkGLExt. You need GtkGLExt to use the OpenGL renderer. Attempting to build SDL version])
   fi
   gui=sdl
   plugin=no
   AC_MSG_WARN([GTK2 specified for the GUI, but GtkGlExt is not present. Trying SDL instead.])
 fi
-
 AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
-AM_CONDITIONAL(USE_GUI_GTK, test x$gui = xgtk)
-AM_CONDITIONAL(USE_GUI_SDL, test x$gui = xsdl)
-AM_CONDITIONAL(USE_GUI_AQUA, test x$gui = xaqua)
-AM_CONDITIONAL(USE_GUI_KDE, test x$gui = xkde)
-AM_CONDITIONAL(USE_GUI_FLTK, test x$gui = xfltk)
-AM_CONDITIONAL(USE_GUI_FB, test x$gui = xfb)
-AM_CONDITIONAL(USE_GUI_RISCOS, test x$gui = xriscos)
-
-case "${gui}" in
-  gtk)  AC_DEFINE([GUI_GTK],  [1], [Use GTK gui toolkit]) ;;
-  sdl)  AC_DEFINE([GUI_SDL],  [1], [Use SDL gui toolkit]) ;;
-  aqua)  AC_DEFINE([GUI_AQUA],[1], [Use AQUA (OS X) gui toolkit]) ;;
-  kde)  AC_DEFINE([GUI_KDE],  [1], [Use KDE gui toolkit]) ;;
-  fltk) AC_DEFINE([GUI_FLTK], [1], [Use FLTK gui toolkit]) ;;
-  fb) AC_DEFINE([GUI_FB], [1], [Use Framebuffer, no gui toolkit]) ;;
-  riscos) AC_DEFINE([GUI_RISCOS], [1], [Use RISC OS gui toolkit]) ;;
-  *)
-esac
 
 if test x"$media_handler" = x"ffmpeg"; then
   GNASH_PATH_FFMPEG
@@ -918,18 +1078,17 @@ if test "$media_handler" = "gst"; then
     save_cflags=$CFLAGS
     CFLAGS=$GSTREAMER_CFLAGS
     AC_TRY_COMPILE([#include <gst/pbutils/install-plugins.h>],[void* pointer = &gst_install_plugins_sync],
-     GSTREAMER_LIBS="$GSTREAMER_LIBS -lgstpbutils-0.10",
-     has_modern_gstpbutils='no')]
-    CFLAGS=$save_cflags
+      GSTREAMER_LIBS="$GSTREAMER_LIBS -lgstpbutils-0.10",
+      has_modern_gstpbutils='no')]
+      CFLAGS=$save_cflags
     if test x$has_modern_gstpbutils = xno; then
-       AC_MSG_RESULT([no {GSTREAMER_CFLAGS=$GSTREAMER_CFLAGS}])
+      AC_MSG_RESULT([no {GSTREAMER_CFLAGS=$GSTREAMER_CFLAGS}])
     else
-       AC_DEFINE([GST_HAS_MODERN_PBUTILS], [], [GStreamer has pbutils with missing codec install routines installed])
-       AC_MSG_RESULT([ok])
+      AC_DEFINE([GST_HAS_MODERN_PBUTILS], [], [GStreamer has pbutils with missing codec install routines installed])
+      AC_MSG_RESULT([ok])
     fi
   fi
 fi
-
 
 if test x"$media_handler" = x"mad"; then
   dnl Will set MAD_LIBS and MAD_CFLAGS.
@@ -944,6 +1103,20 @@ if test x"$media_handler" = x"mad"; then
   fi
 fi
 
+if test x$build_cairo = xyes; then
+  GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
+dnl   if test x"${CAIRO_CFLAGS}" != x; then
+dnl      CAIRO_CFLAGS=`echo ${CAIRO_CFLAGS} | sed -e 's/ *//'`
+dnl      CAIRO_CFLAGS="${CAIRO_CFLAGS} ${CAIRO_CFLAGS}/cairo"
+dnl   fi
+  if test x$build_fb = xyes; then
+    AC_MSG_ERROR([cairo renderer is not supported by fb gui]);
+  fi
+  AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
+fi
+
+AM_CONDITIONAL(HAVE_CAIRO, [test x"${CAIRO_LIBS}" != x])
+
 dnl I'm kinda lazy, get rid of this later... //Markus
 AM_CONDITIONAL(HAVE_MAD, test x"$media_handler" = xmad)
 
@@ -951,6 +1124,7 @@ AM_CONDITIONAL(USE_SOUND_GST, test x$media_handler = xgst)
 AM_CONDITIONAL(USE_SOUND_SDL, test x"$media_handler" = xmad -o x"$media_handler" = xffmpeg)
 AM_CONDITIONAL(USE_FFMPEG_ENGINE, test x"$media_handler" = xffmpeg)
 AM_CONDITIONAL(USE_MAD_ENGINE, test x"$media_handler" = xmad)
+AM_CONDITIONAL(HAVE_OPENGL, test x"${OPENGL_LIBS}" != x)
 
 dnl AM_CONDITIONAL(HAVE_FFMPEG, [test x"${FFMPEG_LIBS}" != x])
 
@@ -970,49 +1144,22 @@ esac
 dnl I'm kinda lazy, get rid of this later... //Markus
 AM_CONDITIONAL(HAVE_GST, test x$media_handler = xgst)
 
-if test x$gui = xfltk; then
+if test x$build_fltk = xyes; then
   GNASH_PKG_FIND(fltk2, [fltk/FL_API.h], [Fast Light Toolkit], fl_window_flush)
 fi
 
-AM_CONDITIONAL(HAS_FLTK2, [ test x$has_fltk2 = xyes ])
+AM_CONDITIONAL(HAVE_FLTK2, [ test x$has_fltk2 = xyes ])
 AM_CONDITIONAL(HAS_XFT, [ test x$has_xft = xyes ])
 
-
-if test x$renderer = xagg; then
-  GNASH_PATH_AGG
-fi
-
-if test x$renderer = xcairo -o x$gui = xgtk; then
-  dnl Cairo renderer and GTK gui always need Cairo
-  GNASH_PKG_FIND(cairo, [cairo.h], [cairo render library], cairo_status)
+if test x$build_agg = xyes; then
+   GNASH_PATH_AGG
 fi
 
 GNASH_DOCBOOK
 AM_CONDITIONAL(DOCBOOK, test x$docbook = xyes)
+AM_CONDITIONAL(HAVE_AGG, [test x"${AGG_LIBS}" != x])
 
 GNASH_PATH_CURL
-
-AC_LIBLTDL_INSTALLABLE
-AC_LIBTOOL_DLOPEN
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
-AC_C_CONST
-AC_C_INLINE
-AC_SUBST([LIBTOOL_DEPS])
-AC_LIB_LTDL
-
-dnl AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]),
-dnl                                         AC_DEFINE(LT_DLMUTEX, 0, [doesn't have lt_dlmutex_register]) )
-
-DLOPEN="-dlopen"
-DLPREOPEN="-dlpreopen"
-AC_SUBST(DLOPEN)
-AC_SUBST(DLPREOPEN)
-
-dnl dnl Substitute INCLTDL and LIBLTDL in the Makefiles
-AC_SUBST(INCLTDL)
-AC_SUBST(LIBLTDL)
-AC_SUBST(LIBTOOL_DEPS)
 
 dnl Define winsock if we're on windows. We could do something complicated,
 dnl but since AC_EXEEXT does it for us, we'll do this the easy way.
@@ -1077,7 +1224,7 @@ AC_ARG_ENABLE([strict],
   [strict=no]
 )
 
-if test x"$strict" = x"yes" -a x"$renderer" = x"agg"; then
+if test x"$strict" = x"yes" -a x$build_agg = xyes; then
   AC_MSG_ERROR([agg renderer will fail with --enable-strict.]);	
 fi
 
@@ -1131,11 +1278,11 @@ dnl fi
 
 dnl Define convienience constants so Gnash can print out the
 dnl default configuration of the build.
-RENDERER_CONFIG=$renderer
+RENDERER_CONFIG=${add_renderer}
 AC_SUBST(RENDERER_CONFIG)
-GUI_CONFIG=$gui
+GUI_CONFIG=${addgui}
 AC_SUBST(GUI_CONFIG)
-MEDIA_CONFIG=$media_handler
+MEDIA_CONFIG=${media_handler}
 AC_SUBST(MEDIA_CONFIG)
 
 dnl AC_CONFIG_LINKS(doc/C/images)
@@ -1177,11 +1324,11 @@ extensions/gtk2/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 cygnal/Makefile
-cygnal/ACT/Makefile
-cygnal/IO/Makefile
-cygnal/HTTP/Makefile
-cygnal/Net/Makefile
-cygnal/unit_tests/Makefile
+dnl cygnal/ACT/Makefile
+dnl cygnal/IO/Makefile
+dnl cygnal/HTTP/Makefile
+dnl cygnal/Net/Makefile
+dnl cygnal/unit_tests/Makefile
 )
 
 ###
@@ -1222,6 +1369,12 @@ else
   echo "        Konqueror plugin disabled."
 fi
 
+if test x"${dynamic_gui}" = x"yes"; then
+  echo "        Loadable GUI & renderer enabled (default). Use --disable-dynamic-gui to disable"
+else
+  echo "        Loadable GUI & renderer disabled."
+fi
+
 if test x"$ghelp" = x"yes"; then
   echo "        GNOME help enabled"
 else
@@ -1250,7 +1403,7 @@ if test x"$with-top_level" != x; then
   echo "        Top level for cross compiling support files is: $with_top_level"
 fi
 
-if test x"$gui" = xgtk -a x"$pixelformat" = xrgb565; then
+if test x$build_gtk = xyes -a x$pixelformat = xrgb565; then
   echo "        WARNING: Pixel format RGB565 selected in combination with the"
   echo "                 GTK GUI. Only a hacked GTK will work (e.g. on the OLPC)."
 fi
@@ -1258,9 +1411,8 @@ fi
 if test x"$extensions_list" != x; then
   echo "        Building extensions: ${extensions_list}"
 fi
-
-echo "        Renderer engine: "$renderer
-echo "        GUI: "$gui
+echo "        GUI toolkits supported: ${addgui}"
+echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
 if test x"$media_handler" = xffmpeg -o x"$media_handler" = xmad; then
 echo "        Using SDL for sound handling"
@@ -1301,7 +1453,7 @@ if test x$kde = xyes -o x$klash = xyes; then
     echo "        KDE flags are: $KDE_CFLAGS"
     echo "        KDE libs are: $KDE_LIBS"
   else
-    if test x$gui = xkde -o x$klash = xyes ; then
+    if test x$build_kde = xyes -o x$klash = xyes ; then
       echo "        ERROR: No KDE development package installed!"
       echo "               Reconfigure with --disable-klash and/or"
       echo "               change to a different gui with --enable-gui=..."
@@ -1315,7 +1467,7 @@ if test x$kde = xyes -o x$klash = xyes; then
     echo "        QT flags are: $QT_CFLAGS"
     echo "        QT libs are: $QT_LIBS"
   else
-    if test x$gui = xkde -o x$klash = xyes ; then
+    if test x$build_kde = xyes -o x$klash = xyes ; then
       if test x"$has_kde" != xyes; then
 	# We have already moaned about KDE absence, so presumably they'll get
 	# QT-dev when they install KDE-dev
@@ -1328,8 +1480,8 @@ if test x$kde = xyes -o x$klash = xyes; then
 	if test x$klash = xyes; then
           echo "               or reconfigure with --disable-klash"
 	fi
-	if test x$gui = xkde; then
-          echo "               or change to a different gui with --enable-gui=..."
+	if test x$build_kde = xyes; then
+          echo "               or change to a different gui with --with-gui=..."
 	fi
       fi
       nogo=true
@@ -1395,7 +1547,7 @@ if test x"$opengl" = x"yes"; then
 fi
 
 dnl GLEXT is only needed for GTK/OpenGL
-if test x"$gui" = x"gtk" -a x"$renderer" = xopengl ; then
+if test x$build_gtk = xyes -a x$build_ogl = xyes ; then
   if test x"$GLEXT_LIBS" != x; then
     if test x"$GLEXT_CFLAGS" != x; then
       echo "        GtkGLExt flags are: $GLEXT_CFLAGS"
@@ -1404,8 +1556,8 @@ if test x"$gui" = x"gtk" -a x"$renderer" = xopengl ; then
     fi
       echo "        GtkGLExt libs are: $GLEXT_LIBS"
   else
-    if test x"$gui" = x"gtk"; then
-      if test x"$renderer" = x"opengl"; then
+    if test x$build_gtk = xyes; then
+      if test x$build_ogl = xyes; then
         echo "        ERROR: No GtkGLExt development package installed!"
 	echo "               It is needed to build the GTK/OpenGL GUI/renderer combination."
 	echo "               Either install it from http://gtkglext.sourceforge.net"
@@ -1418,8 +1570,7 @@ if test x"$gui" = x"gtk" -a x"$renderer" = xopengl ; then
   fi
 fi
 
-if test x"$gui" = x"gtk"; then
-
+if test x$build_gtk = xyes; then #{
   if test x"$GTK2_LIBS" != x; then
     if test x"$GTK2_CFLAGS" != x; then
       echo "        GTK2 flags are: $GTK2_CFLAGS"
@@ -1554,7 +1705,7 @@ fi
     fi
   fi
 
-if test "$renderer" = "cairo"; then
+if test x$build_cairo = xyes; then
   if test x"$CAIRO_LIBS" != x; then
     if test x"$CAIRO_CFLAGS" != x; then
       echo "        Cairo flags are: $CAIRO_CFLAGS"
@@ -1573,7 +1724,7 @@ if test "$renderer" = "cairo"; then
   fi
 fi
 
-if test x$gui = xfltk; then
+if test x$build_fltk = xyes; then
   if test x"$FLTK2_LIBS" != x; then
     if test x"$FLTK2_CFLAGS" != x; then
       echo "        FLTK flags are: $FLTK2_CFLAGS"
@@ -1592,7 +1743,7 @@ dnl    echo "               or .rpm users: yum install fltk-devel"
   fi
 fi
 
-if test x"$gui" = x"fltk"; then
+if test x$build_fltk = xyes; then
   if test x"$XFT_LIBS" != x; then
     if test x"$XFT_CFLAGS" != x; then
       echo "        Xft flags are: $XFT_CFLAGS"
@@ -1611,7 +1762,7 @@ fi
 
 # See whether SDL is required
 need_sdl=false
-test x"$gui" = x"sdl"			&& need_sdl=true
+test x$build_sdl = xyes			&& need_sdl=true
 test x"$media_handler" = x"ffmpeg"	&& need_sdl=true
 test x"$media_handler" = x"mad"		&& need_sdl=true
 
@@ -1624,7 +1775,7 @@ if $need_sdl; then
     echo "               Install it from http://www.libsdl.org/download-1.2.php"
     echo "               or .deb users: apt-get install libsdl1.2-dev"
     echo "               or .rpm users: yum install SDL-devel"
-    [ x"$gui" == x"sdl" ] &&
+    [ x$build_sdl == xyes ] &&
 	echo "               or select a different GUI with --enable-gui= "
     [ x"$media_handler" = x"ffmpeg" -o x"$media_handler" = x"mad" ] &&
 	echo "               or use --enable-media=gst"
@@ -1689,7 +1840,7 @@ else
   echo "                 or .rpm users: yum install curl-devel"
 fi
 
-if test x$renderer = xagg; then
+if test x$build_agg = xyes; then
   echo "        AGG Pixel format is: $pixelformat"
   if test x"${agg25}" = xyes; then
     if test x"$AGG_LIBS" != x; then
@@ -1740,7 +1891,9 @@ else
  nogo=true
 fi
 
-if test x"$MING_LIBS" != x; then
+dnl don't look for the flash compilers when cross compiling.
+if test x$cross_compiling = xno; then
+  if test x"$MING_LIBS" != x; then
     echo "        MING version code is $MING_VERSION_CODE"
     echo "        MING flags are $MING_CFLAGS"
     echo "        MING libs are $MING_LIBS"
@@ -1750,28 +1903,29 @@ else
     echo "                 installed to run most of the tests in Gnash testsuite."
     echo "                 Install it from http://ming.sourceforge.net"
     echo "                 or .deb users: apt-get install libming-dev"
-fi
+  fi
 
-if test x"$SWFDEC_TESTSUITE" != x; then
+  if test x"$SWFDEC_TESTSUITE" != x; then
     echo "        SWFDEC testsuite dir is $SWFDEC_TESTSUITE"
-fi
+  fi
 
-if test x"$MTASC" != x; then
+  if test x"$MTASC" != x; then
     echo "        MTASC is $MTASC"
     echo "        MTASC CLASSPATH is $MTASC_CLASSPATH"
-else
+  else
     echo "        WARNING: You need to have the MTASC compiler packages installed"
     echo "                 to run some of the tests in Gnash testsuite."
     echo "                 You can install it from http://mtasc.org"
     echo "                 or .deb users: apt-get install mtasc"
-fi
+  fi
 
-if test x"$SWFMILL" != x; then
+  if test x"$SWFMILL" != x; then
     echo "        SWFMILL is $SWFMILL"
-else
+  else
     echo "        WARNING: You need to have the 'swfmill' tool installed"
     echo "                 to run some of the tests in Gnash testsuite."
     echo "                 You can install it from http://iterative.org/swfmill/"
+  fi
 fi
 
 if test x"$Z_LIBS" != x; then

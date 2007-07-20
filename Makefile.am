@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.79 2007/07/01 10:53:46 bjacques Exp $
+# $Id: Makefile.am,v 1.80 2007/07/20 01:50:31 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -100,38 +100,6 @@ mudflap-check:
 
 # Set a few variables to what features we selected so we can dump it with the
 # test of the config
-if USE_SOUND_GST
-  MEDIA_OPT=gst
-endif
-
-if USE_MAD_ENGINE
-  MEDIA_OPT=mad
-endif
-if USE_FFMPEG_ENGINE
-  MEDIA_OPT=ffmpeg
-endif
-
-if USE_GUI_GTK
-  GUI_OPT=gtk2
-endif
-if USE_GUI_SDL
-  GUI_OPT=sdl
-endif
-if USE_GUI_KDE
-  GUI_OPT=kde
-endif
-if USE_GUI_FLTK
-  GUI_OPT=fltk2
-endif
-if USE_RENDERER_OPENGL
-  RENDER_OPT=opengl
-endif
-if USE_RENDERER_CAIRO
-  RENDER_OPT=cairo
-endif
-if USE_RENDERER_AGG
-  RENDER_OPT=agg
-endif
 
 dumpconfig:
 	@echo ""
@@ -168,13 +136,13 @@ if HAVE_QT
 	@echo "	QT_CFLAGS is $(QT_CFLAGS)"
 	@echo "	QT_LIBS is $(QT_LIBS)"
 endif
-if USE_GUI_FLTK
+if BUILD_FLTK_GUI
 	@echo "	FLTK2_CFLAGS is $(FLTK2_CFLAGS)"
 	@echo "	FLTK2_LIBS is $(FLTK2_LIBS)"
 	@echo "	XFT_CFLAGS is $(XFT_CFLAGS)"
 	@echo "	XFT_LIBS is $(XFT_LIBS)"
 endif
-if USE_GUI_GTK
+if BUILD_GTK_GUI
 	@echo "	GTK2_CFLAGS is $(GTK2_CFLAGS)"
 	@echo "	GTK2_LIBS is $(GTK2_LIBS)"
 	@echo "	PANGO_CFLAGS is $(PANGO_CFLAGS)"
@@ -234,13 +202,13 @@ endif
 	@echo "Graphics support..."	
 	@echo "	CAIRO_CFLAGS is $(CAIRO_CFLAGS)"
 	@echo "	CAIRO_LIBS is $(CAIRO_LIBS)"
-if USE_RENDERER_OPENGL
+if BUILD_OGL_RENDERER
 	@echo "	GLEXT_CFLAGS is $(GLEXT_CFLAGS)"
 	@echo "	GLEXT_LIBS is $(GLEXT_LIBS)"
 	@echo "	OPENGL_CFLAGS is $(OPENGL_CFLAGS)"
 	@echo "	OPENGL_LIBS is $(OPENGL_LIBS)"
 endif
-if USE_RENDERER_AGG
+if BUILD_AGG_RENDERER
 	@echo "	AGG_CFLAGS is $(AGG_CFLAGS)"
 	@echo "	AGG_LIBS is $(AGG_LIBS)"
 endif
@@ -249,10 +217,10 @@ endif
 	@echo "legit value"
 	@echo ""
 	@echo "Configurable options are:"
-	@echo "Media handler: $(MEDIA_OPT)"
-	@echo "Renderer engine: $(RENDER_OPT)"
-	@echo "GUI: $(GUI_OPT)"
-	@echo "Extensions: $(EXTENSIONS_LIST)"
+	@echo "Media handler: $(MEDIA_CONFIG)"
+	@echo "Renderer engine: $(RENDERER_CONFIG)"
+	@echo "GUI: $(GUI_CONFIG)"
+#	@echo "Extensions: "
 
 check: check-recursive anal
 

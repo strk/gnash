@@ -22,6 +22,9 @@ AUTOMAKE_OPTIONS =
 
 #AM_CPPFLAGS = # -Wall
 
+# this is where Gnash plugins get installed
+pluginsdir = $(libdir)/gnash/plugins
+
 ## WARNING: make sure GLIB_LIBS appears first
 ## See: http://lists.gnu.org/archive/html/gnash-dev/2006-07/msg00076.html
 libgnashbackend_LIBS =  \
@@ -56,6 +59,9 @@ AM_CPPFLAGS = -I.. \
 	$(JPEG_CFLAGS) \
 	$(OGG_CFLAGS) \
 	$(BOOST_CFLAGS) \
+	$(OPENGL_CFLAGS) \
+	$(AGG_CFLAGS) \
+	$(CAIRO_CFLAGS) \
 	$(NULL)
 
 noinst_HEADERS = \
@@ -72,29 +78,10 @@ noinst_HEADERS = \
 
 # bin_PROGRAMS = gnash
 
-#noinst_LTLIBRARIES = libgbackend.la
 lib_LTLIBRARIES = libgnashbackend.la
 
-RENDER_SOURCES = render_handler_tri.cpp
+# RENDER_SOURCES = render_handler_tri.cpp
 SOUND_SOURCES = sound_handler.cpp
-
-if USE_RENDERER_AGG
-RENDER_SOURCES += render_handler_agg.cpp
-libgnashbackend_LIBS += $(AGG_LIBS)
-AM_CPPFLAGS += $(AGG_CFLAGS)
-endif
-
-if USE_RENDERER_CAIRO
-RENDER_SOURCES += render_handler_cairo.cpp
-libgnashbackend_LIBS += $(CAIRO_LIBS)
-AM_CPPFLAGS += $(CAIRO_CFLAGS)
-endif
-
-if USE_RENDERER_OPENGL
-RENDER_SOURCES += render_handler_ogl.cpp
-libgnashbackend_LIBS += $(OPENGL_LIBS) # $(GLEXT_LIBS)		
-AM_CPPFLAGS += $(OPENGL_CFLAGS) # $(GLEXT_CFLAGS)	
-endif
 
 if USE_SOUND_GST
 SOUND_SOURCES += sound_handler_gst.cpp sound_handler_gst.h 
@@ -121,11 +108,35 @@ libgnashbackend_la_LIBADD = \
 	$(top_builddir)/server/libgnashserver.la  \
 	$(libgnashbackend_LIBS)
 
-libgnashbackend_la_SOURCES = \
-	$(RENDER_SOURCES) \
-	$(SOUND_SOURCES)
+libgnashbackend_la_SOURCES = $(SOUND_SOURCES)
 
 libgnashbackend_la_LDFLAGS = -release $(VERSION)
+
+noinst_LTLIBRARIES =		# set later on by conditionals
+if HAVE_OPENGL
+noinst_LTLIBRARIES += libgnashogl.la
+#plugins_LTLIBRARIES += libgnashogl.la
+libgnashogl_la_SOURCES = render_handler_tri.cpp render_handler_ogl.cpp 
+#libgnashogl_la_LDFLAGS = -module -avoid-version -no-undefined
+libgnashogl_la_LDFLAGS =
+endif
+
+if HAVE_AGG
+noinst_LTLIBRARIES += libgnashagg.la
+#plugins_LTLIBRARIES += libgnashagg.la
+libgnashagg_la_SOURCES = render_handler_tri.cpp render_handler_agg.cpp 
+#libgnashagg_la_LDFLAGS = -module -avoid-version -no-undefined
+libgnashagg_la_LDFLAGS = 
+libgnashagg_la_LIBADD = $(AGG_LIBS)
+endif
+
+if HAVE_CAIRO
+noinst_LTLIBRARIES += libgnashcairo.la
+# plugins_LTLIBRARIES += libgnashcairo.la
+libgnashcairo_la_SOURCES = render_handler_tri.cpp  render_handler_cairo.cpp
+#libgnashcairo_la_LDFLAGS = -module -avoid-version -no-undefined
+libgnashcairo_la_LDFLAGS =
+endif
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:
@@ -134,3 +145,9 @@ mudflap:
 
 clean-hook:
 	-rm -f core.*
+
+# install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
+# 	test -d "$(DESTDIR)$(pluginsdir)" || $(mkinstalldirs) "$(DESTDIR)$(pluginsdir)"
+# 	for i in $(plugins_LTLIBRARIES); do \
+# 	  $(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$i "$(DESTDIR)$(pluginsdir)/$$i" ; \
+# 	done
