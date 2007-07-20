@@ -1,3 +1,9 @@
+2007-07-20 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: rename the gui/renderer selection switch
+	  back to --enable-{gui,renderer} so we don't need to update
+	  our existing configuration wrapper scripts.
+
 2007-07-20 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-ming.all/unload_movieclip_test1.c: comments

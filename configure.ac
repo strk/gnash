@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.359 2007/07/20 01:50:31 rsavoye Exp $
+dnl $Id: configure.ac,v 1.360 2007/07/20 03:15:15 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -237,14 +237,14 @@ build_gtk=no
 build_sdl=no
 build_riscos=no
 build_aqua=no
-AC_ARG_WITH(gui,
-  AC_HELP_STRING([--with-gui=], [Use the specified GUI toolkit (default=gtk,kde)]),
-  if test -n ${withval}; then
-    addgui="${withval}"
-    withval=`echo ${withval} | tr '\054' ' ' `
+AC_ARG_ENABLE(gui,
+  AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde)]),
+  if test -n ${enableval}; then
+    addgui="${enableval}"
+    enableval=`echo ${enableval} | tr '\054' ' ' `
   fi
-  while test -n "${withval}" ; do
-    val=`echo ${withval} | cut -d ' ' -f 1`
+  while test -n "${enableval}" ; do
+    val=`echo ${enableval} | cut -d ' ' -f 1`
     [case "${val}" in
       gtk|GTK|gtk2|GTK2)
         build_gtk=yes
@@ -278,11 +278,11 @@ AC_ARG_WITH(gui,
         build_sdl=yes
 dnl        build_riscos=yes
         ;;
-      *) AC_MSG_ERROR([invalid gui ${withval} given (accept: gtk|kde|fltk|sdl|riscos|aqua|fb)])
+      *) AC_MSG_ERROR([invalid gui ${enableval} given (accept: gtk|kde|fltk|sdl|riscos|aqua|fb)])
          ;;
       esac]
-    withval=`echo ${withval} | cut -d ' ' -f 2-6`
-    if test x$val = x$withval; then
+    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+    if test x$val = x$enableval; then
       break;
     fi
   done
@@ -298,14 +298,14 @@ add_renderer=none
 build_ogl=no
 build_agg=no
 build_cairo=no
-AC_ARG_WITH(renderer,
-  AC_HELP_STRING([--with-renderer=], [Use the specified GUI toolkit (default=ogl,agg)]),
-  if test -n ${withval}; then
-    add_renderer="${withval}"
-    withval=`echo ${withval} | tr '\054' ' ' `
+AC_ARG_ENABLE(renderer,
+  AC_HELP_STRING([--enable-renderer=], [Use the specified GUI toolkit (default=ogl,agg)]),
+  if test -n ${enableval}; then
+    add_renderer="${enableval}"
+    enableval=`echo ${enableval} | tr '\054' ' ' `
   fi
-  while test -n "${withval}" ; do
-    val=`echo ${withval} | cut -d ' ' -f 1`
+  while test -n "${enableval}" ; do
+    val=`echo ${enableval} | cut -d ' ' -f 1`
     [case "${val}" in
       ogl|OGL|gl|GL|opengl|OPENGL|OpenGL)
         build_ogl=yes
@@ -321,11 +321,11 @@ AC_ARG_WITH(renderer,
         build_agg=yes
         build_cairo=yes
         ;;
-      *) AC_MSG_ERROR([invalid renderer ${withval} given (accept: ogl,agg,cairo)])
+      *) AC_MSG_ERROR([invalid renderer ${enableval} given (accept: ogl,agg,cairo)])
          ;;
       esac]
-    withval=`echo ${withval} | cut -d ' ' -f 2-6`
-    if test x$val = x$withval; then
+    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+    if test x$val = x$enableval; then
       break;
     fi
   done
