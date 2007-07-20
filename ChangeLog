@@ -2,7 +2,9 @@
 
 	* configure.ac: rename the gui/renderer selection switch
 	  back to --enable-{gui,renderer} so we don't need to update
-	  our existing configuration wrapper scripts.
+	  our existing configuration wrapper scripts; dynamic loading
+	  of gui/renderer is disabled by default, so advertise the switch
+	  to enable.
 
 2007-07-20 Zou Lunkai <zoulunkai@gmail.com>
 	

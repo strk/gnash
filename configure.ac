@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.360 2007/07/20 03:15:15 strk Exp $
+dnl $Id: configure.ac,v 1.361 2007/07/20 03:19:48 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1370,9 +1370,9 @@ else
 fi
 
 if test x"${dynamic_gui}" = x"yes"; then
-  echo "        Loadable GUI & renderer enabled (default). Use --disable-dynamic-gui to disable"
+  echo "        Loadable GUI & renderer enabled."
 else
-  echo "        Loadable GUI & renderer disabled."
+  echo "        Loadable GUI & renderer disabled (default). Use --enable-dynamic-gui to enable."
 fi
 
 if test x"$ghelp" = x"yes"; then
