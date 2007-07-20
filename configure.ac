@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.361 2007/07/20 03:19:48 strk Exp $
+dnl $Id: configure.ac,v 1.362 2007/07/20 14:28:34 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1279,6 +1279,11 @@ dnl fi
 dnl Define convienience constants so Gnash can print out the
 dnl default configuration of the build.
 RENDERER_CONFIG=${add_renderer}
+RENDERER_LIBS=
+for rend in `echo "${add_renderer}" | tr ',' ' '`; do
+	RENDERER_LIBS="${RENDERER_LIBS} \$(top_builddir)/backend/libgnash${rend}.la"
+done
+AC_SUBST(RENDERER_LIBS)
 AC_SUBST(RENDERER_CONFIG)
 GUI_CONFIG=${addgui}
 AC_SUBST(GUI_CONFIG)

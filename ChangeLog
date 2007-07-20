@@ -1,5 +1,12 @@
 2007-07-20 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: provide a RENDERER_LIBS listing all built renderer
+	  libraries
+	* testsuite/Makefile.am: link libgnashtestsuite against all built 
+	  renderer libraries.
+
+2007-07-20 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: rename the gui/renderer selection switch
 	  back to --enable-{gui,renderer} so we don't need to update
 	  our existing configuration wrapper scripts; dynamic loading

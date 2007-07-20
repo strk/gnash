@@ -30,6 +30,7 @@ libtestsuite_la_SOURCES = \
 	FuzzyPixel.h \
 	$(NULL)
 libtestsuite_la_LIBADD = \
+	$(RENDERER_LIBS) \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libbase/libgnashbase.la \
