@@ -15,6 +15,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
+# $Id: Makefile.am,v 1.85 2007/07/21 01:08:38 nihilus Exp $
+
 AUTOMAKE_OPTIONS = -Wno-portability
 
 localedir = $(datadir)/locale
@@ -102,6 +104,21 @@ endif # ENABLE_SHARED
 else # make shared libraries suitable for linking.
      LIB_FLAGS = -release $(VERSION)
 endif # DYNAMIC_GUI
+
+# AQUA Toolkit
+if BUILD_AQUA_GUI
+if  HAVE_OPENGL
+     plugins_LTLIBRARIES += libgnashaqua_gl.la
+     libgnashaqua_gl_la_CPPFLAGS = -DGUI_AQUA $(AM_CPPFLAGS) \
+	$(OPENGL_CFLAGS)
+     libgnashaqua_gl_la_SOURCES = $(PLAYER_SRCS) \
+	aqua_ogl_glue.cpp aqua_ogl_glue.h \
+	aqua.cpp aquasup.h aqua_glue.h
+     libgnashaqua_gl_la_LDFLAGS = $(LIB_FLAGS)
+     libgnashaqua_gl_la_LIBADD = \
+	$(top_builddir)/backend/libgnashogl.la libgnashgui.la
+endif # HAVE_OPENGL
+endif # BUILD_AQUA_GUI
 
 # GTK2 Toolkit
 if BUILD_GTK_GUI

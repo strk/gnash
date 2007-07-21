@@ -1,3 +1,7 @@
+2007-07-21 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* gui/Makefile.am: Added BUILD_GUI_AQUA.
+
 2007-07-20 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/edit_text_character.cpp: fix background and cxform for
