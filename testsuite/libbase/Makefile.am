@@ -33,6 +33,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/testsuite \
         $(MING_CFLAGS) \
 	$(LIBXML_CFLAGS) \
+	$(BOOST_CFLAGS) \
 	$(NULL)
 
 abs_builddir=`(cd $(top_builddir)/testsuite/libbase; pwd)`
