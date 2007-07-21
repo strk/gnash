@@ -1,0 +1,5 @@
+Change Log for GNU Cygnal, Module ACT
+=====================================
+
+2007-07-21 Eric Hughes <eh@narthex.us>
+	* cygnal_test.hpp: New file with all ordinary inclusions.  Includes MSVC warning suppression.

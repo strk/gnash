@@ -21,8 +21,7 @@
 /// \file Test_ACT.cpp
 /// \brief Tests of the simple actions, exercising the basic ACT model.
 
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/test_tools.hpp>
+#include "unit_tests/cygnal_test.hpp"
 
 #include "../ACT.hpp"
 #include "ACT/test_support/Simple_Actions.hpp"

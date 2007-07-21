@@ -21,8 +21,8 @@
 /// \file Test_Scheduling_Queue.cpp
 /// \brief Tests of the Scheduling Queue
 
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/test_tools.hpp>
+#include "unit_tests/cygnal_test.hpp"
+
 #include "unit_tests/Test_Support.hpp"
 #include "unit_tests/Permutation.hpp"
 #include "unit_tests/Random_Permutation.hpp"

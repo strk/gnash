@@ -21,8 +21,7 @@
 /// \file Test_Scheduler.cpp
 /// \brief Tests of the Scheduler
 
-#include <boost/test/auto_unit_test.hpp>
-#include <boost/test/test_tools.hpp>
+#include "unit_tests/cygnal_test.hpp"
 
 #include "ACT/Scheduler.hpp"
 #include "ACT/test_support/Simple_Actions.hpp"
@@ -94,11 +93,16 @@ namespace ACT_Test {
 		: public Null_Aspect_Handled< T >,
 		public aspect::Aspect_Has_Access_To_Owner< Handled< T, test_aspect > >
 	{
-		// The explicit namespace qualification distinguishes the generic declaration from this specialization.
+		/// The explicit namespace qualification distinguishes the generic declaration from this specialization.
 		typedef Handled< test, ACT_Test::test_aspect > owner_type ;
 
+		///
+		typedef aspect::Aspect_Has_Access_To_Owner< Handled< T, ACT_Test::test_aspect > > access_base_type ;
+
 	public:
-		std::string result() const { return owner() -> our_registry.aspect.result() ; }
+		std::string result() const {
+			return access_base_type::owner() -> our_registry.aspect.result() ;
+		}
 	} ;
 
 	//---------------

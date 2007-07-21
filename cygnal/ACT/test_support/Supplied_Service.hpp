@@ -79,7 +79,7 @@ namespace ACT {
 		public aspect::Aspect_Has_Access_To_Owner< Service< Supplied_Service_Aspect > >
 	{
 		/// Tracking
-		std::auto_ptr< tracking_function > tracker ;
+		shared_ptr< tracking_function > tracker ;
 
 	public:
 		Supplied_Service_Aspect( tracking_function * t )

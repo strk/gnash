@@ -61,12 +61,12 @@ namespace ACT {
 		explicit Handle( T x )
 			: the_index( x ) {}
 
-		inline bool operator<( Handle & x ) { return the_index < x.the_index ; }
-		inline bool operator<=( Handle & x ) { return the_index <= x.the_index ; }
-		inline bool operator==( Handle & x ) { return the_index == x.the_index ; }
-		inline bool operator>=( Handle & x ) { return the_index >= x.the_index ; }
-		inline bool operator>( Handle & x ) { return the_index > x.the_index ; }
-		inline bool operator!=( Handle & x ) { return the_index != x.the_index ; }
+		inline bool operator<( Handle x ) { return the_index < x.the_index ; }
+		inline bool operator<=( Handle x ) { return the_index <= x.the_index ; }
+		inline bool operator==( Handle x ) { return the_index == x.the_index ; }
+		inline bool operator>=( Handle x ) { return the_index >= x.the_index ; }
+		inline bool operator>( Handle x ) { return the_index > x.the_index ; }
+		inline bool operator!=( Handle x ) { return the_index != x.the_index ; }
 
 		/// Addition is not Handle-to-Handle, but Handle-to-integer, because Handle is ordinal.
 		inline Handle operator+( unsigned int n ) { return Handle( the_index + n ) ; }

@@ -1,6 +1,12 @@
 Change Log for GNU Cygnal, Module ACT
 =====================================
 
+2007-07-21 Eric Hughes <eh@narthex.us>
+	* Handle.hpp: Changed operator declarations in Handled from references to values.
+	* test_support/Supplied_Service.hpp: Changed auto_ptr to shared_ptr to enable implicit copy constructor.
+	* unit_tests/Test_{Scheduler,ACT,Scheduling_Queue}.cpp: Changed test inclusions to use new header that suppresses spurious MSVC warnings.
+	* unit_tests/Test_Scheduler.cpp: Added typedef test aspect for Handled that refers to access-to-owner base class.  It required explicit namespace qualification.
+
 2007-07-19 Eric Hughes <eh@narthex.us>
 	* Handle.hpp: Added forwarding typedefs in Vector_with_Handle_Index.
 	* Pause_Demon.cpp: Added important portability note.
