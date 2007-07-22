@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.cpp,v 1.10 2007/07/22 23:28:05 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.cpp,v 1.11 2007/07/23 00:00:51 nihilus Exp $ */
 
 
 #include "aqua_ogl_glue.h"
@@ -48,47 +48,24 @@ AquaOglGlue::~AquaOglGlue()
 
 bool AquaOglGlue::init(int, char***)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
 
     return true;
 }
 
 
-render_handler* AquaOglGlue::createRenderHandler(int depth)
+render_handler* AquaOglGlue::createRenderHandler()
 {
-//    GNASH_REPORT_FUNCTION;
-
-    _bpp = depth;
+    GNASH_REPORT_FUNCTION;
     render_handler* renderer = create_render_handler_ogl();
-
+#ifdef FIX_I810_LOD_BIAS
+    glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
+#endif
     return renderer;
 }
 
 bool AquaOglGlue::prepDrawingArea(int width, int height)
 {
-    if (_bpp == 16) {
-      // 16-bit color, surface creation is likely to succeed.
-      /*SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-      SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
-      SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
-      SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 15);
-      SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-      SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);*/
-    } else {
-      assert(_bpp == 32);
-
-      // 32-bit color etc, for getting dest alpha,
-      // for MULTIPASS_ANTIALIASING (see
-      // render_handler_ogl.cpp).
-      /*SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-      SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-      SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-      SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-      SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-      SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-      SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 1);*/
-    }
-
     //SDL_SetVideoMode(width, height, _bpp, sdl_flags | SDL_OPENGL);
 
      // Turn on alpha blending.

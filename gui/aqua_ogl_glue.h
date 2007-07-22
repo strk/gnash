@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.h,v 1.5 2007/07/01 10:54:00 bjacques Exp $ */
+/* $Id: aqua_ogl_glue.h,v 1.6 2007/07/23 00:00:51 nihilus Exp $ */
 
 #ifndef AQUA_OGL_GLUE_H
 #define AQUA_OGL_GLUE_H
@@ -37,7 +37,7 @@ class AquaOglGlue : public AquaGlue
     virtual ~AquaOglGlue();
 
     bool init(int argc, char ***argv);
-    render_handler* createRenderHandler( int depth);
+    render_handler* createRenderHandler();
     bool prepDrawingArea(int width, int height);
     void render();
   private:

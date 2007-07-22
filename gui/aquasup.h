@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aquasup.h,v 1.8 2007/07/22 23:40:09 nihilus Exp $ */
+/* $Id: aquasup.h,v 1.9 2007/07/23 00:00:51 nihilus Exp $ */
 
 #ifndef __AQUASUP_H__
 #define __AQUASUP_H__
@@ -54,12 +54,12 @@ class AquaGui : public Gui
 #if defined(RENDERER_OPENGL)
     AquaOglGlue		_glue;
 #endif
-	  	
+  	
 	public:
-		AquaGui();
-		AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+	AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth);
     virtual ~AquaGui();
     virtual bool init(int argc, char ***argv);
+    virtual void setCursor(gnash_cursor_type newcursor);
     virtual bool createWindow(const char* title, int width, int height);
     virtual bool run();
     virtual bool createMenu();

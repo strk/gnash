@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.12 2007/07/22 23:40:09 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.13 2007/07/23 00:00:51 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -69,12 +69,6 @@ static pascal OSStatus SimpleWindowEventHandlerProc(EventHandlerCallRef inCallRe
 
 namespace gnash {
 	
-AquaGui::AquaGui()
-: Gui() 
-{
-
-}
-
 AquaGui::AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth)
 	: Gui(xid, scale, loop, depth)
 {
@@ -107,6 +101,7 @@ void AquaGui::renderBuffer()
 void
 AquaGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
+	GNASH_REPORT_FUNCTION;
     _glue.setInvalidatedRegions(ranges);
 }
 
@@ -114,7 +109,9 @@ bool AquaGui::init(int argc, char ***argv) /* Self-explainatory */
 {
   OSErr 						err;
   static const EventTypeSpec	sApplicationEvents[] =  {  {kEventClassCommand, kEventCommandProcess}  };
-
+  
+  GNASH_REPORT_FUNCTION;
+  
   BlockZero(&g, sizeof(g));
     
   g.mainBundle = CFBundleGetMainBundle();
@@ -150,7 +147,11 @@ bool AquaGui::init(int argc, char ***argv) /* Self-explainatory */
   SendWindowGroupBehind(g.windowGroups[1], g.windowGroups[2]);
   SendWindowGroupBehind(g.windowGroups[0], g.windowGroups[1]);
   
-  _glue.init (argc, argv);
+	_glue.init (argc, argv);
+
+    _renderer = _glue.createRenderHandler();
+    if(!_renderer)return false;    
+    return true;
 
 
 Bail:  
@@ -168,8 +169,9 @@ void AquaGui::key_event(int key, bool down)
 
 bool AquaGui::createWindow(const char* title, int width, int height)
 {
-
-    return false;
+	_glue.prepDrawingArea(_width, _height);
+    set_render_handler(_renderer);
+    return true;
 }
 
 bool AquaGui::createMenu()
