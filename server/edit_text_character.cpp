@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.85 2007/07/22 03:29:25 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.86 2007/07/22 12:22:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1414,7 +1414,17 @@ edit_text_character::setTextColor(const rgba& col)
 	if ( _textColor != col )
 	{
 		set_invalidated();
+
 		_textColor = col;
+
+		// Change color of all current glyph records
+		for (TextGlyphRecords::iterator i=m_text_glyph_records.begin(),
+			e=m_text_glyph_records.end(); i!=e; ++i)
+		{
+		 	text_glyph_record& rec=*i;
+			rec.m_style.m_color = _textColor;
+		}
+
 	}
 }
 
