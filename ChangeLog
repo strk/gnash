@@ -1,3 +1,9 @@
+2007-07-21 Sandro Santilli <strk@keybit.net>
+
+	* server/types.h (rgba::toRGB): const-corrected.
+	* server/edit_text_character.{cpp,h}: Add a member for text color,
+	  make 'textColor' a proper property.
+
 2007-07-21 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* gui/Makefile.am: Added BUILD_GUI_AQUA.

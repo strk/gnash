@@ -135,6 +135,16 @@ public:
 	///
 	void setBorderColor(const rgba& col);
 
+	/// Return color of the text
+	const rgba& getTextColor() const 
+	{
+		return _textColor;
+	}
+
+	/// Set color of the text
+	void setTextColor(const rgba& col);
+
+
 private:
 
 	/// Return true if HTML text is allowed 
@@ -236,6 +246,8 @@ private:
 	bool _drawBorder;
 
 	rgba _borderColor;
+
+	rgba _textColor;
 
 protected:
 

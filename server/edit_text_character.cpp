@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.84 2007/07/20 16:42:35 udog Exp $ */
+/* $Id: edit_text_character.cpp,v 1.85 2007/07/22 03:29:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -67,6 +67,7 @@ static as_value textfield_background_getset(const fn_call& fn);
 static as_value textfield_border_getset(const fn_call& fn);
 static as_value textfield_backgroundColor_getset(const fn_call& fn);
 static as_value textfield_borderColor_getset(const fn_call& fn);
+static as_value textfield_textColor_getset(const fn_call& fn);
 
 	namespace
 	{
@@ -322,6 +323,8 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("border", *getset, *getset);
 	getset = new builtin_function(textfield_borderColor_getset);
 	o.init_property("borderColor", *getset, *getset);
+	getset = new builtin_function(textfield_textColor_getset);
+	o.init_property("textColor", *getset, *getset);
 
 
 	if ( target_version  < 7 ) return;
@@ -381,7 +384,8 @@ edit_text_character::edit_text_character(character* parent,
 	_drawBackground(m_def->has_border()),
 	_backgroundColor(255,255,255,255),
 	_drawBorder(m_def->has_border()),
-	_borderColor(0,0,0,255)
+	_borderColor(0,0,0,255),
+	_textColor(m_def->get_text_color())
 {
 	assert(parent);
 	assert(m_def);
@@ -446,16 +450,9 @@ edit_text_character::display()
 	if ( drawBorder || drawBackground )
 	{
 		matrix	mat = get_world_matrix();
-		
-		// @@ hm, should we apply the color xform?  It seems logical; need to test.
-		// cxform	cx = get_world_cxform();
-
-		// Show white background + black bounding box.
 		render::set_matrix(mat);
-		//mat.print();
 
 		point	coords[4];
-		
 		coords[0] = def_bounds.get_corner(0);
 		coords[1] = def_bounds.get_corner(1);
 		coords[2] = def_bounds.get_corner(2);
@@ -760,20 +757,6 @@ edit_text_character::set_member(const std::string& name,
 		set_cxform(cx);
 		return;
 	}
-	case M_TEXTCOLOR:
-		//else if (name == "textColor")
-	{	
-		// The arg is 0xRRGGBB format.
-		uint32_t	rgb = (uint32_t) val.to_number();
-
-		cxform	cx = get_cxform();
-		cx.m_[0][0] = fclamp(((rgb >> 16) & 255) / 255.0f, 0, 1);
-		cx.m_[1][0] = fclamp(((rgb >>  8) & 255) / 255.0f, 0, 1);
-		cx.m_[2][0] = fclamp(((rgb      ) & 255) / 255.0f, 0, 1);
-		set_cxform(cx);
-
-		return;
-	}
 	// @@ TODO see TextField members in Flash MX docs
 	}	// end switch
 
@@ -813,17 +796,6 @@ edit_text_character::get_member(const std::string& name, as_value* val)
 		// @@ TODO this should be generic to class character!
 		const cxform&	cx = get_cxform();
 		val->set_double(cx.m_[3][0] * 100.f);
-		return true;
-	}
-	case M_TEXTCOLOR:
-		//else if (name == "textColor")
-	{
-		// Return color in 0xRRGGBB format
-		const cxform&	cx = get_cxform();
-		int	r = iclamp(int(cx.m_[0][0] * 255), 0, 255);
-		int	g = iclamp(int(cx.m_[0][0] * 255), 0, 255);
-		int	b = iclamp(int(cx.m_[0][0] * 255), 0, 255);
-		val->set_int((r << 16) + (g << 8) + b);
 		return true;
 	}
 	case M_X:
@@ -950,7 +922,7 @@ edit_text_character::format_text()
 
 	text_glyph_record	rec;	// one to work on
 	rec.m_style.m_font = _font;
-	rec.m_style.m_color = m_def->get_text_color();
+	rec.m_style.m_color = getTextColor(); 
 	rec.m_style.m_x_offset = PADDING_TWIPS + std::max(0, m_def->get_left_margin() + m_def->get_indent());
 	rec.m_style.m_y_offset = PADDING_TWIPS + m_def->get_font_height()
 		+ (_font->get_leading() - _font->get_descent()) * scale;
@@ -1436,6 +1408,16 @@ edit_text_character::setBackgroundColor(const rgba& col)
 	}
 }
 
+void
+edit_text_character::setTextColor(const rgba& col)
+{
+	if ( _textColor != col )
+	{
+		set_invalidated();
+		_textColor = col;
+	}
+}
+
 cxform	
 edit_text_character::get_world_cxform() const
 {
@@ -1517,6 +1499,25 @@ textfield_borderColor_getset(const fn_call& fn)
 		rgba newColor;
 		newColor.parseRGB( fn.arg(0).to_number<uint32_t>(&fn.env()) );
 		ptr->setBorderColor(newColor);
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_textColor_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->getTextColor().toRGB());
+	}
+	else // setter
+	{
+		rgba newColor;
+		newColor.parseRGB( fn.arg(0).to_number<uint32_t>(&fn.env()) );
+		ptr->setTextColor(newColor);
 	}
 
 	return as_value();

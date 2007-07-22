@@ -184,6 +184,11 @@ public:
 		return m_color;
 	}
 
+	/// Set color of the text
+	void set_text_color(const rgba& col) {
+		m_color = col;
+	}
+
 	/// \brief
 	/// Get extra space between lines (in twips).
 	//

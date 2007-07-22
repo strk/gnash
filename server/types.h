@@ -80,7 +80,7 @@ namespace gnash {
 		/// This function is meant to be used to
 		/// output ActionScript colors in numeric format.
 		///
-		uint32_t toRGB()
+		uint32_t toRGB() const
 		{
 			return (m_r<<16) + (m_g<<8) + m_b;
 		}
