@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.13 2007/07/23 00:00:51 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.14 2007/07/23 00:37:19 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -165,6 +165,23 @@ void AquaGui::setTimeout(unsigned int timeout)
 
 void AquaGui::key_event(int key, bool down)
 {
+}
+
+void AquaGui::setCursor(gnash_cursor_type newcursor)
+{
+	  GNASH_REPORT_FUNCTION;
+#if 0	  
+	  switch(newcursor) {
+	  	case gnash::CURSOR_HAND:	  		
+			setCursor();
+        	break;
+      	case gnash::CURSOR_INPUT:
+      		setCursor()
+        	break;
+      	default:
+      	setCursor();
+        }
+#endif        
 }
 
 bool AquaGui::createWindow(const char* title, int width, int height)

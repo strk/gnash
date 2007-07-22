@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.cpp,v 1.11 2007/07/23 00:00:51 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.cpp,v 1.12 2007/07/23 00:37:19 nihilus Exp $ */
 
 
 #include "aqua_ogl_glue.h"
@@ -46,12 +46,24 @@ AquaOglGlue::~AquaOglGlue()
 
 }
 
-bool AquaOglGlue::init(int, char***)
-{
-    GNASH_REPORT_FUNCTION;
 
+bool
+#ifdef FIX_I810_LOD_BIAS
+AquaOglGlue::init(int argc, char** argv[])
+#else
+AquaOglGlue::init(int, char***)
+#endif
+{
+//    GNASH_REPORT_FUNCTION;
+#ifdef FIX_I810_LOD_BIAS
+    int c = getopt (argc, *argv, "m:");
+    if (c == 'm') {
+      _tex_lod_bias = (float) atof(optarg);
+    }
+#endif
     return true;
 }
+
 
 
 render_handler* AquaOglGlue::createRenderHandler()
