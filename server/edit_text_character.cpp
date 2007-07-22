@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.86 2007/07/22 12:22:00 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.87 2007/07/22 12:47:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1431,15 +1431,14 @@ edit_text_character::setTextColor(const rgba& col)
 cxform	
 edit_text_character::get_world_cxform() const
 {
-  cxform cf = character::get_world_cxform();
-  
-  if ( 0 /* if using a device font (PP compatibility, TODO) */ ) {
-    // set alpha to default values to make the text field opaque
-    cf.m_[3][0] = 1.0f;
-    cf.m_[3][1] = 0.0f;
+  if ( 0 /* if using a device font (PP compatibility, TODO) */ )
+  {
+	return cxform();
   }
-  
-  return cf;
+  else
+  {
+     return character::get_world_cxform();
+  }
 }
 
 static as_value

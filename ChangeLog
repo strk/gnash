@@ -1,3 +1,9 @@
+2007-07-22 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp: (get_world_cxform):
+	  return the identity transform in the (disabled) 
+	  "device font" section.
+
 2007-07-22 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* testsuite/samples/input-fields.swf: sample movie
