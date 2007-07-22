@@ -1,6 +1,6 @@
 2007-07-22 Sandro Santilli <strk@keybit.net>
 
-	* server/edit_text_character.cpp (setTextColor): 
+	* server/edit_text_character.{cpp,h} (setTextColor): 
 	  update text glyph records color.
 
 2007-07-21 Sandro Santilli <strk@keybit.net>

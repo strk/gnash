@@ -172,7 +172,8 @@ private:
 		m_text_bounding_box.enclose_point(x,y);
 	}
 
-	std::vector<text_glyph_record>	m_text_glyph_records;
+	typedef std::vector<text_glyph_record> TextGlyphRecords;
+	TextGlyphRecords m_text_glyph_records;
 
 	/// used to pass a color on to shape_character::display()
 	std::vector<fill_style>	m_dummy_style;
