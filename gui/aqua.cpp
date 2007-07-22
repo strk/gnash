@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.10 2007/07/01 10:54:00 bjacques Exp $ */
+/* $Id: aqua.cpp,v 1.11 2007/07/22 23:28:05 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -41,6 +41,31 @@ extern "C"{
 #include "render_handler.h"
 
 #include <Carbon/Carbon.h>
+
+struct GlobalAppInfo  
+{
+  CFBundleRef		mainBundle;
+  IBNibRef			mainNib;
+  WindowGroupRef	windowGroups[3];
+};
+typedef struct GlobalAppInfo GlobalAppInfo;
+
+GlobalAppInfo  g;
+
+static pascal OSStatus AppEventHandlerProc(EventHandlerCallRef inCallRef, EventRef inEvent, void* inUserData)
+{
+  #pragma unused (inCallRef)
+  HICommand        		command;
+  WindowGroupRef		windowGroup;
+  WindowGroupAttributes windowGroupAttributes;
+  UInt32	eventKind 	= GetEventKind(inEvent);
+  UInt32	eventClass	= GetEventClass(inEvent);
+  WindowRef	window 		= (WindowRef) inUserData;
+  OSStatus	err 		= eventNotHandledErr;
+ 
+  return err;	
+}
+static pascal OSStatus SimpleWindowEventHandlerProc(EventHandlerCallRef inCallRef, EventRef inEvent, void* inUserData);
 
 namespace gnash {
 	
@@ -68,19 +93,58 @@ void AquaGui::setInterval(unsigned int interval)
 bool AquaGui::run()
 {
     GNASH_REPORT_FUNCTION;
-    return false;
+    
+    RunApplicationEventLoop();
+    return true;
 }
 
 void AquaGui::renderBuffer()
 {
-    //GNASH_REPORT_FUNCTION;
-
-    _glue.render();
+    GNASH_REPORT_FUNCTION;
 }
 
 bool AquaGui::init(int /*argc*/, char *** /*argv*/) /* Self-explainatory */
 {
-	return true;
+  OSErr 						err;
+  static const EventTypeSpec	sApplicationEvents[] =  {  {kEventClassCommand, kEventCommandProcess}  };
+
+  BlockZero(&g, sizeof(g));
+    
+  g.mainBundle = CFBundleGetMainBundle();
+  if (g.mainBundle == NULL) 
+  {
+  	 err = -1;  
+  	 goto Bail;
+  }
+  
+  err  = CreateNibReferenceWithCFBundle(g.mainBundle, CFSTR("aqua"), &g.mainNib);
+  if (err != noErr)goto Bail;
+  if (g.mainNib == NULL)
+  {
+  	err = -1;
+  	goto Bail;
+  }
+
+  err = SetMenuBarFromNib(g.mainNib, CFSTR("MenuBar"));
+  if (err != noErr)goto Bail;
+
+  InstallApplicationEventHandler(NewEventHandlerUPP(AppEventHandlerProc), GetEventTypeCount(sApplicationEvents), sApplicationEvents, 0, NULL);
+
+  //  Force the document group to be created first, so we can position our groups between the floating and document groups
+  (void) GetWindowGroupOfClass(kDocumentWindowClass);
+  
+  //  Create our default WindowGroups and set their z-order
+  err = CreateWindowGroup(0, &g.windowGroups[0]);
+  err = CreateWindowGroup(0, &g.windowGroups[1]);
+  err = CreateWindowGroup(0, &g.windowGroups[2]);
+
+  //  Position our groups behind the floating group and in front of the document group
+  SendWindowGroupBehind(g.windowGroups[2], GetWindowGroupOfClass(kDocumentWindowClass));
+  SendWindowGroupBehind(g.windowGroups[1], g.windowGroups[2]);
+  SendWindowGroupBehind(g.windowGroups[0], g.windowGroups[1]);
+
+Bail:  
+  return err;	
 }
 
 void AquaGui::setTimeout(unsigned int timeout)
@@ -92,9 +156,10 @@ void AquaGui::key_event(int key, bool down)
 {
 }
 
-bool AquaGui::createWindow(const char* /*title*/, int /*width*/, int /*height*/)
+bool AquaGui::createWindow(const char* title, int width, int height)
 {
-	return true;
+
+    return false;
 }
 
 bool AquaGui::createMenu()

@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.cpp,v 1.9 2007/07/01 10:54:00 bjacques Exp $ */
+/* $Id: aqua_ogl_glue.cpp,v 1.10 2007/07/22 23:28:05 nihilus Exp $ */
 
 
 #include "aqua_ogl_glue.h"
@@ -116,8 +116,9 @@ bool AquaOglGlue::prepDrawingArea(int width, int height)
 void
 AquaOglGlue::render()
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     //SDL_GL_SwapBuffers();
+    glFlush();
 }
 
 } // namespace gnash
