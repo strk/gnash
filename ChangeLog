@@ -1,5 +1,7 @@
 2007-07-21 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/TextField.as: update expected
+	  results for 'textColor' member.
 	* server/types.h (rgba::toRGB): const-corrected.
 	* server/edit_text_character.{cpp,h}: Add a member for text color,
 	  make 'textColor' a proper property.

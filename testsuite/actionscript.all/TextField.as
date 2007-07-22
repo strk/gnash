@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.8 2007/07/19 15:57:18 strk Exp $";
+rcsid="$Id: TextField.as,v 1.9 2007/07/22 03:37:57 strk Exp $";
 
 #include "check.as"
 
@@ -59,7 +59,7 @@ check( !TextField.prototype.hasOwnProperty('restrict') );
 check( !TextField.prototype.hasOwnProperty('scroll') );
 check( !TextField.prototype.hasOwnProperty('selectable') );
 check( !TextField.prototype.hasOwnProperty('text') );
-check( !TextField.prototype.hasOwnProperty('textColor') );
+xcheck( !TextField.prototype.hasOwnProperty('textColor') );
 check( !TextField.prototype.hasOwnProperty('textHeight') );
 check( !TextField.prototype.hasOwnProperty('textWidth') );
 check( !TextField.prototype.hasOwnProperty('type') );
@@ -128,7 +128,7 @@ xcheck( TextField.prototype.hasOwnProperty('restrict') );
 xcheck( TextField.prototype.hasOwnProperty('scroll') );
 xcheck( TextField.prototype.hasOwnProperty('selectable') );
 xcheck( TextField.prototype.hasOwnProperty('text') );
-xcheck( TextField.prototype.hasOwnProperty('textColor') );
+check( TextField.prototype.hasOwnProperty('textColor') );
 xcheck( TextField.prototype.hasOwnProperty('textHeight') );
 xcheck( TextField.prototype.hasOwnProperty('textWidth') );
 xcheck( TextField.prototype.hasOwnProperty('type') );
@@ -412,9 +412,9 @@ xcheck_equals(tf.length, 11); // number of characters in "hello world"
 
 check_equals(typeof(tf.textColor), 'number');
 check( ! tf.hasOwnProperty('textColor') ); 
-xcheck_equals(tf.textColor, 0);
+check_equals(tf.textColor, 0);
 tf.textColor = 0xFF0000;
-xcheck_equals(tf.textColor, 0xFF0000);
+check_equals(tf.textColor, 0xFF0000);
 // TODO: check color (use misc-ming.all/DefineEditTextTest.swf and a test runner with check_pixel)
 
 // Check TextField.textHeight (height of the bounding box)
