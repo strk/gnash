@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.11 2007/07/22 23:28:05 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.12 2007/07/22 23:40:09 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -101,9 +101,16 @@ bool AquaGui::run()
 void AquaGui::renderBuffer()
 {
     GNASH_REPORT_FUNCTION;
+    _glue.render();
 }
 
-bool AquaGui::init(int /*argc*/, char *** /*argv*/) /* Self-explainatory */
+void
+AquaGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
+{
+    _glue.setInvalidatedRegions(ranges);
+}
+
+bool AquaGui::init(int argc, char ***argv) /* Self-explainatory */
 {
   OSErr 						err;
   static const EventTypeSpec	sApplicationEvents[] =  {  {kEventClassCommand, kEventCommandProcess}  };
@@ -142,6 +149,9 @@ bool AquaGui::init(int /*argc*/, char *** /*argv*/) /* Self-explainatory */
   SendWindowGroupBehind(g.windowGroups[2], GetWindowGroupOfClass(kDocumentWindowClass));
   SendWindowGroupBehind(g.windowGroups[1], g.windowGroups[2]);
   SendWindowGroupBehind(g.windowGroups[0], g.windowGroups[1]);
+  
+  _glue.init (argc, argv);
+
 
 Bail:  
   return err;	

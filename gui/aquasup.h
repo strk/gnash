@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aquasup.h,v 1.7 2007/07/01 10:54:00 bjacques Exp $ */
+/* $Id: aquasup.h,v 1.8 2007/07/22 23:40:09 nihilus Exp $ */
 
 #ifndef __AQUASUP_H__
 #define __AQUASUP_H__
@@ -65,6 +65,7 @@ class AquaGui : public Gui
     virtual bool createMenu();
     virtual bool setupEvents();
     virtual void renderBuffer();
+    virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);
 };
