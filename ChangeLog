@@ -1,5 +1,6 @@
 2007-07-23 Sandro Santilli <strk@keybit.net>
 
+	* autogen.sh: libtoolize is in the 'libtool' package.
 	* plugin/plugin.h: remove unneeded include.
 
 2007-07-22 Sandro Santilli <strk@keybit.net>
