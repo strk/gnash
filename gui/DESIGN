@@ -1,28 +1,27 @@
-$Id: DESIGN,v 1.1 2006/05/10 14:34:37 strk Exp $
+$Id: DESIGN,v 1.2 2007/07/23 15:50:03 strk Exp $
 
 Overview
 ========
 
-Frontend is the window creation, borders, events, etc.
-Backend is what we use to draw graphics onto the drawing area
+GUI is the window creation, borders, events, etc.
+Renderer is what we use to draw graphics onto the drawing area
 
-Frontend
-========
+GUI
+===
 
 Frontends are modeled by the gnash::Gui class.
 
-They take care of initializing the Backend module for use
-in rendering.
+They take care of initializing the Backend module for use in rendering.
 
-For the frontend we have GTK or SDL (or future QT, FLTK, Xlib..)
+For the frontend we have GTK, SDL, KDE(QT), FLTK2, Aqua, Framebuffer.
 
 
-Backend
-=======
+Renderer
+========
 
 Backends modeled by the gnash::render_handler class.
 
 They are the actual renderers, drawing to a memory buffer.
 
-For the backend we have OpenGL or Cairo,
+For the renderers we have Antigrain (AGG), OpenGL or Cairo.
 
