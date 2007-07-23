@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.18 2007/07/08 20:26:49 martinwguy Exp $ */
+/* $Id: sound_handler.h,v 1.19 2007/07/23 22:07:58 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -253,41 +253,6 @@ public:
 	///	TODO: get the aux_streamer_ptr as key !!
 	///
 	virtual void	detach_aux_streamer(void* udata) = 0;
-
-	/// VERY crude sample-rate and steroe conversion. Converts input data to 
-	/// output format.
-	//
-	/// @param adjusted_data
-	/// Where the converted data is placed.
-	///
-	/// @param adjusted_size
-	/// The size of the converted data.
-	///
-	/// @param data
-	/// Data that needs to be converted.
-	///
-	/// @param sample_count
-	/// The datas current sample count.
-	/// 
-	/// @param sample_size
-	/// The datas current sample size.
-	///
-	/// @param sample_rate
-	/// The datas current sample rate.
-	///
-	/// @param stereo
-	/// Whether the current data is in stereo
-	///
-	/// @param m_sample_rate
-	/// The samplerate we which to convert to.
-	///
-	/// @param m_stereo
-	/// Do we want the output data to be in stereo?
-	///
-	static void	convert_raw_data(int16_t** adjusted_data,
-			  int* adjusted_size, void* data, int sample_count,
-			  int sample_size, int sample_rate, bool stereo,
-			  int m_sample_rate, bool m_stereo);
 
 	sound_handler()
 		:

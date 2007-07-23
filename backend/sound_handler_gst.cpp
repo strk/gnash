@@ -20,11 +20,13 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.51 2007/07/02 13:53:19 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.52 2007/07/23 22:07:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+
+#include "utility.h" // for convert_raw_data
 
 // Assume people running --enable-media=gst know what they are doing
 // (HAVE_GST_GST_H seems broken atm, specifically when an older glib

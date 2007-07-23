@@ -81,7 +81,7 @@ noinst_HEADERS = \
 lib_LTLIBRARIES = libgnashbackend.la
 
 # RENDER_SOURCES = render_handler_tri.cpp
-SOUND_SOURCES = sound_handler.cpp
+SOUND_SOURCES = 
 
 if USE_SOUND_GST
 SOUND_SOURCES += sound_handler_gst.cpp sound_handler_gst.h 

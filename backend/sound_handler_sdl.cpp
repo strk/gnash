@@ -18,13 +18,14 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.73 2007/07/03 04:31:59 strk Exp $
+// $Id: sound_handler_sdl.cpp,v 1.74 2007/07/23 22:07:58 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "sound_handler_sdl.h"
+#include "utility.h" // for convert_raw_data
 
 #include "log.h"
 #include <cmath>
@@ -884,7 +885,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 						int sample_count = outsize / ((sounddata->stereo == true) ? 4 : 2);
 
 						// Convert to needed samplerate
-						handler->convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 
+						convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 
 								sounddata->sample_rate, sounddata->stereo,
 								handler->audioSpec.freq, (handler->audioSpec.channels == 2 ? true : false));
 

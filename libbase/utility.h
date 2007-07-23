@@ -1,9 +1,21 @@
-// utility.h	-- by Thatcher Ulrich <tu@tulrich.com>
+// utility.h --	Various little utility functions, macros & typedefs.
+// 
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// This source code has been donated to the Public Domain.  Do
-// whatever you want with it.
-
-// Various little utility functions, macros & typedefs.
 
 
 #ifndef UTILITY_H
@@ -193,6 +205,44 @@ std::string typeName(const T& inst)
 #endif // __GNUC__ > 2
 	return typeName;
 }
+
+namespace gnash {
+
+/// VERY crude sample-rate and steroe conversion. Converts input data to 
+/// output format.
+//
+/// @param adjusted_data
+/// Where the converted data is placed.
+///
+/// @param adjusted_size
+/// The size of the converted data.
+///
+/// @param data
+/// Data that needs to be converted.
+///
+/// @param sample_count
+/// The datas current sample count.
+/// 
+/// @param sample_size
+/// The datas current sample size.
+///
+/// @param sample_rate
+/// The datas current sample rate.
+///
+/// @param stereo
+/// Whether the current data is in stereo
+///
+/// @param m_sample_rate
+/// The samplerate we which to convert to.
+///
+/// @param m_stereo
+/// Do we want the output data to be in stereo?
+///
+void	convert_raw_data(int16_t** adjusted_data,
+		  int* adjusted_size, void* data, int sample_count,
+		  int sample_size, int sample_rate, bool stereo,
+		  int m_sample_rate, bool m_stereo);
+} // namespace gnash 
 
 #endif // UTILITY_H
 

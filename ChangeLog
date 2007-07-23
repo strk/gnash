@@ -1,5 +1,13 @@
 2007-07-23 Sandro Santilli <strk@keybit.net>
 
+	* backend/: sound_handler.{cpp,h}, Makefile.am,
+	  sound_handler_gst.cpp, sound_handler_sdl.cpp,
+	  libbase/: utility.{cpp,h}, server/asobj/SoundMad.cpp:
+	  Moved convert_raw_data from libgnashbackend
+	  to libgnashbase. Should fix bug #20110.
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: still create Makefile under cygnal
 	  subdirs, or 'dist' rule will fail.
 
