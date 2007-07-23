@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.363 2007/07/23 16:41:31 strk Exp $
+dnl $Id: configure.ac,v 1.364 2007/07/23 17:40:09 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -344,10 +344,6 @@ if test x$build_ogl = xyes; then
   AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
 
-if test x$build_agg = xyes; then
-  AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
-fi
-
 dnl 16 bit: RGB555, RGB565
 dnl 24 bit: RGB24, BGR24
 dnl 32 bit: RGBA32, BGRA32
@@ -608,6 +604,10 @@ AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
 
 dnl AC_CHECK_LIB(ltdl, lt_dlmutex_register, AC_DEFINE(LT_DLMUTEX, 1, [Has lt_dlmutex_register]),
 dnl                                         AC_DEFINE(LT_DLMUTEX, 0, [doesn't have lt_dlmutex_register]) )
+
+if test x$build_agg = xyes; then
+  AC_DEFINE([RENDERER_AGG], [], [Use AntiGrain renderer])
+fi
 
 DLOPEN="-dlopen"
 DLPREOPEN="-dlpreopen"

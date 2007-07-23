@@ -1,5 +1,11 @@
 2007-07-23 Sandro Santilli <strk@keybit.net>
 
+        * configure.ac: don't define RENDERER_AGG *before* the build_agg
+	  variable it is based on has a chance to change value.
+	  Fixes bug #20563
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: Fix help strings: --with-{gui,renderer} => --enable-{gui,renderer}
 	* plugin/klash/klash_part.cpp: invoke "klash", not "gnash".
 	  Allow KLASH_PLAYER environment variable to change what's
