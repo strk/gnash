@@ -1,5 +1,10 @@
 2007-07-23 Sandro Santilli <strk@keybit.net>
 
+	* plugin/klash/Makefile.am: fix uninstall rule.
+	  Make distcheck works fine on gnashdev now.
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
 	* libbase/embedVideoDecoderGst.cpp (createDecoder): fix use of
 	  possibly undefined variable warning, added a couple of assertions
 	  and comments about the why.

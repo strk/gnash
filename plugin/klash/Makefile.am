@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.31 2007/07/23 18:22:33 strk Exp $
+# $Id: Makefile.am,v 1.32 2007/07/23 22:20:48 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -65,6 +65,8 @@ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 
 uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.so
+	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.la
+	$(RM) -f $(DESTDIR)$(plugindir)/libklashpart.a
 
 else
 all:
