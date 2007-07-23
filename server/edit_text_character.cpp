@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.88 2007/07/23 04:34:26 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.89 2007/07/23 14:02:55 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1431,14 +1431,19 @@ edit_text_character::setTextColor(const rgba& col)
 cxform	
 edit_text_character::get_world_cxform() const
 {
-  if ( 0 /* if using a device font (PP compatibility, TODO) */ )
-  {
-	return cxform();
+  cxform cf = character::get_world_cxform();
+  
+  if ( 0 /* if using a device font (PP compatibility, TODO) */ ) {
+    // set alpha to default values to make the text field opaque
+    cf.m_[3][0] = 1.0f;
+    cf.m_[3][1] = 0.0f;
+    
+    // NOTE: Linux version of Adobe's player also ignores tint
+    // transform, so we should (or not) return an identity cxform
+    // here. This has to be discussed...
   }
-  else
-  {
-     return character::get_world_cxform();
-  }
+  
+  return cf;
 }
 
 static as_value
