@@ -39,7 +39,7 @@ AUXMOVIES = \
 	    level99.as \
 	    $(NULL)
 
-EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as check.h Dejagnu.as
+EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as check.as Dejagnu.as
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)
 

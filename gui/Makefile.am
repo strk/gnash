@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.85 2007/07/21 01:08:38 nihilus Exp $
+# $Id: Makefile.am,v 1.86 2007/07/23 13:49:43 strk Exp $
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
@@ -166,7 +166,7 @@ if  HAVE_OPENGL
      libgnashkde_gl_la_CPPFLAGS = -DGUI_KDE $(AM_CPPFLAGS) \
 	$(OPENGL_FLAGS) $(KDE_CFLAGS) $(QT_CFLAGS)
      libgnashkde_gl_la_SOURCES = $(PLAYER_SRCS) \
-	kde_glue_opengl.cpp kde_glue_.h \
+	kde_glue_opengl.cpp kde_glue.h \
 	kde.cpp kdesup.h kde_glue.h
      libgnashkde_gl_la_LDFLAGS = $(LIB_FLAGS)
      libgnashkde_gl_la_LIBADD = libgnashgui.la \
@@ -206,7 +206,7 @@ if  HAVE_AGG
      libgnashsdl_agg_la_CPPFLAGS = -DGUI_SDL $(AM_CPPFLAGS) \
 	$(SDL_CFLAGS) $(AGG_CFLAGS)
      libgnashsdl_agg_la_SOURCES = $(PLAYER_SRCS) \
-	sdl_glue_agg.cpp sdl_glue_agg.h \
+	sdl_agg_glue.cpp sdl_agg_glue.h \
 	sdl.cpp sdlsup.h sdl_glue.h
      libgnashsdl_agg_la_LDFLAGS = $(LIB_FLAGS)
      libgnashsdl_agg_la_LIBADD = \
@@ -235,7 +235,7 @@ if  HAVE_AGG
 	$(FLTK2_CFLAGS) $(AGG_CFLAGS)
      libgnashfltk_agg_la_SOURCES = $(PLAYER_SRCS) \
 	fltk_glue_agg.cpp fltk_glue_agg.h \
-	fltk.cpp fltksup.h fltk_glue.h
+	fltk.cpp fltksup.h 
      libgnashfltk_agg_la_LDFLAGS = $(LIB_FLAGS)
      libgnashfltk_agg_la_LIBADD = \
 	$(top_builddir)/backend/libgnashagg.la libgnashgui.la \
@@ -247,7 +247,7 @@ if  HAVE_CAIRO
 	$(FLTK2_CFLAGS) $(CAIRO_CFLAGS)
      libgnashfltk_cairo_la_SOURCES = $(PLAYER_SRCS) \
 	fltk_glue_cairo.cpp fltk_glue_cairo.h \
-	fltk.cpp fltksup.h fltk_glue.h
+	fltk.cpp fltksup.h 
      libgnashfltk_cairo_la_LDFLAGS = $(LIB_FLAGS)
      libgnashfltk_cairo_la_LIBADD = \
 	$(top_builddir)/backend/libgnashcairo.la libgnashgui.la \
@@ -260,10 +260,10 @@ if BUILD_FB_GUI
 if  HAVE_AGG
      libgnashsdl_agg_la_CPPFLAGS = -DGUI_FB $(AM_CPPFLAGS) $(SDL_CFLAGS)
      plugins_LTLIBRARIES += libgnashfb_agg.la
-     libgnashsdl_agg_la_SOURCES = $(PLAYER_SRCS) \
+     libgnashfb_agg_la_SOURCES = $(PLAYER_SRCS) \
 	fb.cpp fbsup.h
-     libgnashsdl_agg_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashsdl_agg_la_LIBADD = \
+     libgnashfb_agg_la_LDFLAGS = $(LIB_FLAGS)
+     libgnashfb_agg_la_LIBADD = \
 	$(top_builddir)/backend/libgnashagg.la libgnashgui.la \
 	$(SDL_LIBS) $(AGG_LIBS)
 endif # HAVE_AGG

@@ -1,5 +1,7 @@
 2007-07-23 Sandro Santilli <strk@keybit.net>
 
+	* gui/Makefile.am, testsuite/misc-mtasc.all/Makefile.am:
+	  Fix 'dist' rule.
 	* testsuite/misc-ming.all/: DefineEditTextTest-Runner.cpp,
 	  Makefile.am: skeleton for a MovieTester based runner.
 	* testsuite/misc-ming.all/DefineEditTextTest.c: fixed expected
