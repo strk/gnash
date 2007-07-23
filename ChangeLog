@@ -1,5 +1,11 @@
 2007-07-23 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: make sure $add_renderer contain
+	  well-defined values (not arbitrary ones). This is
+	  to make sure RENDERER_LIBS is always meaningful.
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
 	* plugin/klash/Makefile.am: define GNASHBINDIR.
         * configure.ac: don't define RENDERER_AGG *before* the build_agg
 	  variable it is based on has a chance to change value.

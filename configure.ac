@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.364 2007/07/23 17:40:09 strk Exp $
+dnl $Id: configure.ac,v 1.365 2007/07/23 19:51:14 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -294,7 +294,7 @@ if test x$addgui = xnone; then
 dnl   addgui="gtk,kde"
 fi
 
-add_renderer=none
+add_renderer=
 build_ogl=no
 build_agg=no
 build_cairo=no
@@ -309,17 +309,21 @@ AC_ARG_ENABLE(renderer,
     [case "${val}" in
       ogl|OGL|gl|GL|opengl|OPENGL|OpenGL)
         build_ogl=yes
+	add_renderer="ogl"
         ;;
       agg|AGG|Agg)
         build_agg=yes
+	add_renderer="agg"
         ;;
       cairo|CAIRO|Cairo)
         build_cairo=yes
+	add_renderer="cairo"
         ;;
       all|ALL|All)
         build_ogl=yes
         build_agg=yes
         build_cairo=yes
+	add_renderer="ogl,agg,cairo"
         ;;
       *) AC_MSG_ERROR([invalid renderer ${enableval} given (accept: ogl,agg,cairo)])
          ;;
@@ -331,7 +335,7 @@ AC_ARG_ENABLE(renderer,
   done
 )
 
-if test x$add_renderer = xnone; then
+if test x$add_renderer = x; then
    build_ogl=yes
    build_agg=yes
 dnl   add_renderer="ogl,agg"
@@ -549,7 +553,7 @@ if test x"${enable_shared}" = xno; then
      AC_MSG_NOTICE([Defaulting to GTK as the GUI, use --enable-gui= to change])
   fi
   dnl If statically linking, and no renderer is specified, force opengl
-  if test x$add_renderer = xnone; then
+  if test x$add_renderer = x; then
      build_agg=no
      build_ogl=yes
      add_renderer=ogl
@@ -565,7 +569,7 @@ else dnl building a dynamically linked executable without loadable GUI plugins
       AC_MSG_NOTICE([Defaulting to GTK as the GUI, use --enable-gui= to change])
     fi
     dnl If not dynamic loading, and no renderer is specified, force opengl
-    if test x$add_renderer = xnone; then
+    if test x$add_renderer = x; then
       build_agg=no
       build_ogl=yes
       add_renderer=ogl
@@ -580,7 +584,7 @@ else dnl building a dynamically linked executable without loadable GUI plugins
       AC_MSG_NOTICE([Defaulting to GTK and KDE as the GUIs, use --enable-gui= to change])
     fi
     dnl If dynamically loading and no renderer is specified, force opengl and agg
-    if test x$add_renderer = xnone; then
+    if test x$add_renderer = x; then
       build_ogl=yes
       build_agg=yes
       add_renderer="ogl,agg"
