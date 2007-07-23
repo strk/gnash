@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.362 2007/07/20 14:28:34 strk Exp $
+dnl $Id: configure.ac,v 1.363 2007/07/23 16:41:31 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -550,14 +550,14 @@ if test x"${enable_shared}" = xno; then
      build_gtk=yes
      build_kde=no
      addgui=gtk
-     AC_MSG_NOTICE([Defaulting to GTK as the GUI, use --with-gui= to change])
+     AC_MSG_NOTICE([Defaulting to GTK as the GUI, use --enable-gui= to change])
   fi
   dnl If statically linking, and no renderer is specified, force opengl
   if test x$add_renderer = xnone; then
      build_agg=no
      build_ogl=yes
      add_renderer=ogl
-     AC_MSG_NOTICE([Defaulting to OpenGL as the renderer, use --with-renderer= to change])
+     AC_MSG_NOTICE([Defaulting to OpenGL as the renderer, use --enable-renderer= to change])
   fi
 else dnl building a dynamically linked executable without loadable GUI plugins
   dnl If not dynamic loading, and no gui is specified, force gtk
@@ -566,14 +566,14 @@ else dnl building a dynamically linked executable without loadable GUI plugins
       build_gtk=yes
       build_kde=no
       addgui=gtk
-      AC_MSG_NOTICE([Defaulting to GTK as the GUI, use --with-gui= to change])
+      AC_MSG_NOTICE([Defaulting to GTK as the GUI, use --enable-gui= to change])
     fi
     dnl If not dynamic loading, and no renderer is specified, force opengl
     if test x$add_renderer = xnone; then
       build_agg=no
       build_ogl=yes
       add_renderer=ogl
-      AC_MSG_NOTICE([Defaulting to OpenGL as the renderer, use --with-renderer= to change])
+      AC_MSG_NOTICE([Defaulting to OpenGL as the renderer, use --enable-renderer= to change])
     fi
   else
     dnl If dynamically loading and no gui is specified, force gtk and kde
@@ -581,14 +581,14 @@ else dnl building a dynamically linked executable without loadable GUI plugins
       build_gtk=yes
       build_kde=yes
       addgui="gtk,kde"
-      AC_MSG_NOTICE([Defaulting to GTK and KDE as the GUIs, use --with-gui= to change])
+      AC_MSG_NOTICE([Defaulting to GTK and KDE as the GUIs, use --enable-gui= to change])
     fi
     dnl If dynamically loading and no renderer is specified, force opengl and agg
     if test x$add_renderer = xnone; then
       build_ogl=yes
       build_agg=yes
       add_renderer="ogl,agg"
-      AC_MSG_NOTICE([Defaulting to OpenGL and AGG as the renderers, use --with-renderer= to change])
+      AC_MSG_NOTICE([Defaulting to OpenGL and AGG as the renderers, use --enable-renderer= to change])
     fi
   fi
 fi
@@ -1486,7 +1486,7 @@ if test x$kde = xyes -o x$klash = xyes; then
           echo "               or reconfigure with --disable-klash"
 	fi
 	if test x$build_kde = xyes; then
-          echo "               or change to a different gui with --with-gui=..."
+          echo "               or change to a different gui with --enable-gui=..."
 	fi
       fi
       nogo=true

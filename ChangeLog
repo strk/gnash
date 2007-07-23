@@ -1,5 +1,6 @@
 2007-07-23 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: Fix help strings: --with-{gui,renderer} => --enable-{gui,renderer}
 	* plugin/klash/klash_part.cpp: invoke "klash", not "gnash".
 	  Allow KLASH_PLAYER environment variable to change what's
 	  invoked. The plan is that "klash" would be an alias for
