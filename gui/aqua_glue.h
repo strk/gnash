@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua_glue.h,v 1.7 2007/07/23 00:00:51 nihilus Exp $ */
+/* $Id: aqua_glue.h,v 1.8 2007/07/24 00:04:39 nihilus Exp $ */
 
 #ifndef AQUA_GLUE_H
 #define AQUA_GLUE_H
@@ -34,7 +34,6 @@ class AquaGlue
   public:
     virtual ~AquaGlue() { }
     virtual bool init(int argc, char **argv[]) = 0;
-    virtual void setInvalidatedRegions(const InvalidatedRanges& /* ranges */) {}
     virtual bool prepDrawingArea(int width, int height) = 0;
     virtual render_handler* createRenderHandler() = 0;
     virtual void render() = 0;

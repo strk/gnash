@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.cpp,v 1.14 2007/07/23 01:13:10 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.cpp,v 1.15 2007/07/24 00:04:39 nihilus Exp $ */
 
 
 #include "aqua_ogl_glue.h"
@@ -79,8 +79,9 @@ render_handler* AquaOglGlue::createRenderHandler()
 
 bool AquaOglGlue::prepDrawingArea(int width, int height)
 {
+	GNASH_REPORT_FUNCTION;
     //SDL_SetVideoMode(width, height, _bpp, sdl_flags | SDL_OPENGL);
-
+#if 0
      // Turn on alpha blending.
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -99,7 +100,7 @@ bool AquaOglGlue::prepDrawingArea(int width, int height)
     // We don't need lighting effects
     glDisable(GL_LIGHTING);
     glPushAttrib (GL_ALL_ATTRIB_BITS);         
-
+#endif
 #ifdef FIX_I810_LOD_BIAS
     glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
 #endif

@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.16 2007/07/23 01:13:10 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.17 2007/07/24 00:04:39 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,31 +42,70 @@ extern "C"{
 
 #include <Carbon/Carbon.h>
 
-struct GlobalAppInfo  
+ToolboxObjectClassRef customWindow;
+WindowRef myWindow;
+WindowDefSpec myCustomWindowSpec;
+EventHandlerUPP myCustomWindowUPP;
+Rect theBounds = {200,200,400,400};
+ 
+EventTypeSpec eventList[] = {{kEventClassWindow, kEventWindowDrawFrame},
+                            {kEventClassWindow, kEventWindowHitTest}};
+
+static pascal OSStatus MyCustomWindowEventHandler (
+                                EventHandlerCallRef myHandler,
+                                EventRef theEvent, void* userData)
 {
-  CFBundleRef		mainBundle;
-  IBNibRef			mainNib;
-  WindowGroupRef	windowGroups[3];
-};
-typedef struct GlobalAppInfo GlobalAppInfo;
+ 
+    #pragma unused (myHandler,userData)
+ 
+    OSStatus result = eventNotHandledErr;
+ 
+    UInt32 whatHappened;
+    WindowDefPartCode where;
+ 
+    GrafPtr thePort;
+    Rect windBounds;
+ 
+    whatHappened = GetEventKind (theEvent);
+ 
+    switch (whatHappened)
+    {
+        case kEventWindowInit:
+ 
+            GetEventParameter (theEvent, kEventParamDirectObject,
+            					typeWindowRef, NULL, sizeof(WindowRef),
+           						NULL, &myWindow);
+           						
+            SetThemeWindowBackground (myWindow, kThemeBrushMovableModalBackground, true);	// 1
+            result = noErr;
+            break;
+ 
+        case kEventWindowDrawFrame:	// 2
+ 
+            GetPort(&thePort);		// 3
+            GetPortBounds(thePort, &windBounds);
 
-GlobalAppInfo  g;
-
-static pascal OSStatus AppEventHandlerProc(EventHandlerCallRef inCallRef, EventRef inEvent, void* inUserData)
-{
-  #pragma unused (inCallRef)
-  HICommand        		command;
-  WindowGroupRef		windowGroup;
-  WindowGroupAttributes windowGroupAttributes;
-  UInt32	eventKind 	= GetEventKind(inEvent);
-  UInt32	eventClass	= GetEventClass(inEvent);
-  WindowRef	window 		= (WindowRef) inUserData;
-  OSStatus	err 		= eventNotHandledErr;
-
-  GNASH_REPORT_FUNCTION;
-  return err;	
+            PenNormal();			// 4
+            PenSize (10,10);
+            FrameRect(&windBounds);	// 5
+ 
+            result = noErr;
+            break;
+ 
+        case kEventWindowHitTest:	// 6
+ 
+            /* determine what part of the window the user hit */
+            where = wInDrag;
+            SetEventParameter (theEvent, kEventParamWindowDefPart,	// 7
+                                typeWindowDefPartCode,
+                                sizeof(WindowDefPartCode), &where);
+ 
+            result = noErr;
+            break;
+    }
+ 
+    return (result);
 }
-static pascal OSStatus SimpleWindowEventHandlerProc(EventHandlerCallRef inCallRef, EventRef inEvent, void* inUserData);
 
 namespace gnash {
 	
@@ -87,50 +126,9 @@ void AquaGui::setInterval(unsigned int interval)
 
 bool AquaGui::run()
 {
-	OSErr 						err;
-  	static const EventTypeSpec	sApplicationEvents[] =  {  {kEventClassCommand, kEventCommandProcess}  };
-  
-	GNASH_REPORT_FUNCTION;
-	BlockZero(&g, sizeof(g));
-
-  	g.mainBundle = CFBundleGetMainBundle();
-  	if (g.mainBundle == NULL) 
-  	{
-  		err = false;
-  	 	goto Bail;
-  	}
-  
-	err = CreateNibReferenceWithCFBundle(g.mainBundle, CFSTR("aqua"), &g.mainNib);
-	if (err != noErr)goto Bail;
-	if (g.mainNib == NULL)
-	{
-  		err = false;
-  		goto Bail;
-  	}
-  		
-  	err = SetMenuBarFromNib(g.mainNib, CFSTR("aqua"));
-  	if (err != noErr)goto Bail;
-
-  	InstallApplicationEventHandler(NewEventHandlerUPP(AppEventHandlerProc), GetEventTypeCount(sApplicationEvents), sApplicationEvents, 0, NULL);
-
-  	//  Force the document group to be created first, so we can position our groups between the floating and document groups
-  	(void) GetWindowGroupOfClass(kDocumentWindowClass);
-  
-  	//  Create our default WindowGroups and set their z-order
-  	err = CreateWindowGroup(0, &g.windowGroups[0]);
-  	err = CreateWindowGroup(0, &g.windowGroups[1]);
-  	err = CreateWindowGroup(0, &g.windowGroups[2]);
-
-  	//  Position our groups behind the floating group and in front of the document group
-  	SendWindowGroupBehind(g.windowGroups[2], GetWindowGroupOfClass(kDocumentWindowClass));
-  	SendWindowGroupBehind(g.windowGroups[1], g.windowGroups[2]);
-  	SendWindowGroupBehind(g.windowGroups[0], g.windowGroups[1]);
-    
-	RunApplicationEventLoop();
+  	GNASH_REPORT_FUNCTION;
+    ShowWindow(myWindow);
     return true;
-
-Bail:
-	return err;    
 }
 
 void AquaGui::renderBuffer()
@@ -143,18 +141,36 @@ void
 AquaGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
 	GNASH_REPORT_FUNCTION;
+#if 0	
     _glue.setInvalidatedRegions(ranges);
+#endif
 }
 
 bool AquaGui::init(int argc, char ***argv) /* Self-explainatory */
 {
-  	GNASH_REPORT_FUNCTION;
   
-  	_glue.init (argc, argv);
+	GNASH_REPORT_FUNCTION;
+ 	
+ 	myCustomWindowUPP = NewEventHandlerUPP(MyCustomWindowEventHandler);
+ 
+	RegisterToolboxObjectClass(CFSTR("com.myCompany.myApp.customWindow"),	// 2
+								NULL, GetEventTypeCount(eventList), eventList,
+                        		myCustomWindowUPP, NULL, &customWindow);
+ 
+	myCustomWindowSpec.defType = kWindowDefObjectClass; // 3
+	myCustomWindowSpec.u.classRef = customWindow; // 4
+ 
+	CreateCustomWindow (&myCustomWindowSpec,kMovableModalWindowClass,	// 5
+                    	kWindowStandardHandlerAttribute,
+                    	&theBounds,
+                    	&myWindow);
+                    
+  	_glue.init(argc, argv);
 
     _renderer = _glue.createRenderHandler();
     if(!_renderer)return false;    
-    return true;	
+    return true;
+
 }
 
 void AquaGui::setTimeout(unsigned int timeout)
@@ -182,6 +198,7 @@ void AquaGui::setCursor(gnash_cursor_type newcursor)
         }
 #endif        
 }
+
 
 bool AquaGui::createWindow(const char* title, int width, int height)
 {
