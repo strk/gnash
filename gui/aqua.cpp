@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.17 2007/07/24 00:04:39 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.18 2007/07/24 00:08:15 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -128,6 +128,7 @@ bool AquaGui::run()
 {
   	GNASH_REPORT_FUNCTION;
     ShowWindow(myWindow);
+    while(1);
     return true;
 }
 
@@ -164,11 +165,12 @@ bool AquaGui::init(int argc, char ***argv) /* Self-explainatory */
                     	kWindowStandardHandlerAttribute,
                     	&theBounds,
                     	&myWindow);
-                    
+#if 0                    
   	_glue.init(argc, argv);
 
     _renderer = _glue.createRenderHandler();
-    if(!_renderer)return false;    
+    if(!_renderer)return false;
+#endif    
     return true;
 
 }
