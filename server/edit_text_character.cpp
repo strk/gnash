@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.87 2007/07/22 12:47:38 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.88 2007/07/23 04:34:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -992,7 +992,7 @@ edit_text_character::format_text()
 			// Start a new record on the next line.
 			rec.m_glyphs.resize(0);
 			rec.m_style.m_font = _font;
-			rec.m_style.m_color = m_def->get_text_color();
+			rec.m_style.m_color = getTextColor();
 			rec.m_style.m_x_offset = x;
 			rec.m_style.m_y_offset = y;
 			rec.m_style.m_text_height = m_def->get_font_height();
@@ -1153,7 +1153,7 @@ after_x_advance:
 			// Start a new record on the next line.
 			rec.m_glyphs.resize(0);
 			rec.m_style.m_font = _font;
-			rec.m_style.m_color = m_def->get_text_color();
+			rec.m_style.m_color = getTextColor();
 			rec.m_style.m_x_offset = x;
 			rec.m_style.m_y_offset = y;
 			rec.m_style.m_text_height = m_def->get_font_height();
