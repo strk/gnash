@@ -195,7 +195,6 @@
 	  server/asobj/{Sound, Netstream}Ffmpeg.h, gui/gnash.cpp: Fix for
 	 linking.
 
->>>>>>> 1.3749
 2007-07-17 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/actionscript.all/MovieClip.as: more tests, all passed.
@@ -216,7 +215,6 @@
 	  handling cleanups, for better management of key listeners. change
 	  key listeners container from std::vector to std::set. Correct indent.
 	
->>>>>>> 1.3745
 2007-07-14  Rob Savoye  <rob@bertha.welcomehome.org>
 
 	* configure.ac: Add new Cygnal directories.
@@ -347,7 +345,6 @@
 	* testsuite/actionscript.all/Makefile.am: activate enumerate.as and
 	  case.as.
 
->>>>>>> 1.3741
 2007-07-11 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp (remove the "default" font logic,
