@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.14 2007/07/23 00:37:19 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.15 2007/07/23 01:01:31 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,7 +62,8 @@ static pascal OSStatus AppEventHandlerProc(EventHandlerCallRef inCallRef, EventR
   UInt32	eventClass	= GetEventClass(inEvent);
   WindowRef	window 		= (WindowRef) inUserData;
   OSStatus	err 		= eventNotHandledErr;
- 
+
+  GNASH_REPORT_FUNCTION;
   return err;	
 }
 static pascal OSStatus SimpleWindowEventHandlerProc(EventHandlerCallRef inCallRef, EventRef inEvent, void* inUserData);
@@ -86,10 +87,50 @@ void AquaGui::setInterval(unsigned int interval)
 
 bool AquaGui::run()
 {
-    GNASH_REPORT_FUNCTION;
+	OSErr 						err;
+  	static const EventTypeSpec	sApplicationEvents[] =  {  {kEventClassCommand, kEventCommandProcess}  };
+  
+	GNASH_REPORT_FUNCTION;
+	BlockZero(&g, sizeof(g));
     
-    RunApplicationEventLoop();
+  	g.mainBundle = CFBundleGetMainBundle();
+  	if (g.mainBundle == NULL) 
+  	{
+  		err = false;
+  	 	goto Bail;
+  	}
+  
+	err = CreateNibReferenceWithCFBundle(g.mainBundle, CFSTR("aqua"), &g.mainNib);
+	if (err != noErr)goto Bail;
+	if (g.mainNib == NULL)
+	{
+  		err = false;
+  		goto Bail;
+  	}
+  		
+  	err = SetMenuBarFromNib(g.mainNib, CFSTR("aqua"));
+  	if (err != noErr)goto Bail;
+
+  	InstallApplicationEventHandler(NewEventHandlerUPP(AppEventHandlerProc), GetEventTypeCount(sApplicationEvents), sApplicationEvents, 0, NULL);
+
+  	//  Force the document group to be created first, so we can position our groups between the floating and document groups
+  	(void) GetWindowGroupOfClass(kDocumentWindowClass);
+  
+  	//  Create our default WindowGroups and set their z-order
+  	err = CreateWindowGroup(0, &g.windowGroups[0]);
+  	err = CreateWindowGroup(0, &g.windowGroups[1]);
+  	err = CreateWindowGroup(0, &g.windowGroups[2]);
+
+  	//  Position our groups behind the floating group and in front of the document group
+  	SendWindowGroupBehind(g.windowGroups[2], GetWindowGroupOfClass(kDocumentWindowClass));
+  	SendWindowGroupBehind(g.windowGroups[1], g.windowGroups[2]);
+  	SendWindowGroupBehind(g.windowGroups[0], g.windowGroups[1]);
+    
+	RunApplicationEventLoop();
     return true;
+
+Bail:
+	return err;    
 }
 
 void AquaGui::renderBuffer()
@@ -107,55 +148,13 @@ AquaGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
 bool AquaGui::init(int argc, char ***argv) /* Self-explainatory */
 {
-  OSErr 						err;
-  static const EventTypeSpec	sApplicationEvents[] =  {  {kEventClassCommand, kEventCommandProcess}  };
-  
   GNASH_REPORT_FUNCTION;
   
-  BlockZero(&g, sizeof(g));
-    
-  g.mainBundle = CFBundleGetMainBundle();
-  if (g.mainBundle == NULL) 
-  {
-  	 err = -1;  
-  	 goto Bail;
-  }
-  
-  err  = CreateNibReferenceWithCFBundle(g.mainBundle, CFSTR("aqua"), &g.mainNib);
-  if (err != noErr)goto Bail;
-  if (g.mainNib == NULL)
-  {
-  	err = -1;
-  	goto Bail;
-  }
-
-  err = SetMenuBarFromNib(g.mainNib, CFSTR("MenuBar"));
-  if (err != noErr)goto Bail;
-
-  InstallApplicationEventHandler(NewEventHandlerUPP(AppEventHandlerProc), GetEventTypeCount(sApplicationEvents), sApplicationEvents, 0, NULL);
-
-  //  Force the document group to be created first, so we can position our groups between the floating and document groups
-  (void) GetWindowGroupOfClass(kDocumentWindowClass);
-  
-  //  Create our default WindowGroups and set their z-order
-  err = CreateWindowGroup(0, &g.windowGroups[0]);
-  err = CreateWindowGroup(0, &g.windowGroups[1]);
-  err = CreateWindowGroup(0, &g.windowGroups[2]);
-
-  //  Position our groups behind the floating group and in front of the document group
-  SendWindowGroupBehind(g.windowGroups[2], GetWindowGroupOfClass(kDocumentWindowClass));
-  SendWindowGroupBehind(g.windowGroups[1], g.windowGroups[2]);
-  SendWindowGroupBehind(g.windowGroups[0], g.windowGroups[1]);
-  
-	_glue.init (argc, argv);
+  	_glue.init (argc, argv);
 
     _renderer = _glue.createRenderHandler();
     if(!_renderer)return false;    
-    return true;
-
-
-Bail:  
-  return err;	
+    return true;	
 }
 
 void AquaGui::setTimeout(unsigned int timeout)

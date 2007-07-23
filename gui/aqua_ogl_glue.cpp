@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.cpp,v 1.12 2007/07/23 00:37:19 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.cpp,v 1.13 2007/07/23 01:01:31 nihilus Exp $ */
 
 
 #include "aqua_ogl_glue.h"
@@ -36,6 +36,9 @@ namespace gnash
 {
 
 AquaOglGlue::AquaOglGlue()
+#ifdef FIX_I810_LOD_BIAS
+  : _tex_lod_bias(-1.2f)
+#endif
 {
 //    GNASH_REPORT_FUNCTION;
 }
@@ -63,8 +66,6 @@ AquaOglGlue::init(int, char***)
 #endif
     return true;
 }
-
-
 
 render_handler* AquaOglGlue::createRenderHandler()
 {
@@ -99,11 +100,13 @@ bool AquaOglGlue::prepDrawingArea(int width, int height)
     glDisable(GL_LIGHTING);
     glPushAttrib (GL_ALL_ATTRIB_BITS);         
 
+#ifdef FIX_I810_LOD_BIAS
+    glTexEnvf(GL_TEXTURE_FILTER_CONTROL_EXT, GL_TEXTURE_LOD_BIAS_EXT, _tex_lod_bias);
+#endif
     return true;
 }
 
-void
-AquaOglGlue::render()
+void AquaOglGlue::render()
 {
     GNASH_REPORT_FUNCTION;
     //SDL_GL_SwapBuffers();

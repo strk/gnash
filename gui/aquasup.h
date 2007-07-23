@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aquasup.h,v 1.9 2007/07/23 00:00:51 nihilus Exp $ */
+/* $Id: aquasup.h,v 1.10 2007/07/23 01:01:31 nihilus Exp $ */
 
 #ifndef __AQUASUP_H__
 #define __AQUASUP_H__
@@ -37,7 +37,7 @@
 
 namespace gnash {
 
-class AquaGui : public Gui
+class DSOEXPORT AquaGui : public Gui
 {
 	private:
 	
@@ -53,6 +53,9 @@ class AquaGui : public Gui
 
 #if defined(RENDERER_OPENGL)
     AquaOglGlue		_glue;
+#ifdef FIX_I810_LOD_BIAS
+    float			_tex_lod_bias;
+#endif
 #endif
   	
 	public:
