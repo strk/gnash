@@ -15,12 +15,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.30 2007/07/01 10:54:15 bjacques Exp $
+# $Id: Makefile.am,v 1.31 2007/07/23 18:22:33 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
 if KLASH
-AM_CPPFLAGS= $(KDE_CFLAGS) $(QT_CFLAGS)
+AM_CPPFLAGS= $(KDE_CFLAGS) $(QT_CFLAGS) -DGNASHBINDIR=\"$(GNASHEXE)\"
 
 plugindir   = $(libdir)/kde3
 kde_servicesdir = $(prefix)/share/services
