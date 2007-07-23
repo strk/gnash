@@ -1,5 +1,11 @@
 2007-07-23 Sandro Santilli <strk@keybit.net>
 
+	* libbase/embedVideoDecoderGst.cpp (createDecoder): fix use of
+	  possibly undefined variable warning, added a couple of assertions
+	  and comments about the why.
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
 	* backend/: sound_handler.{cpp,h}, Makefile.am,
 	  sound_handler_gst.cpp, sound_handler_sdl.cpp,
 	  libbase/: utility.{cpp,h}, server/asobj/SoundMad.cpp:

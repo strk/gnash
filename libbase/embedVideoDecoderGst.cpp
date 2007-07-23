@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderGst.cpp,v 1.8 2007/07/01 10:54:08 bjacques Exp $
+// $Id: embedVideoDecoderGst.cpp,v 1.9 2007/07/23 22:09:49 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -82,7 +82,7 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 
 	// Setup the input capsfilter
 	inputcaps = gst_element_factory_make ("capsfilter", NULL);
-	GstCaps* caps;
+	GstCaps* caps = NULL;
 	if (format == CODEC_H263) {
 		caps = gst_caps_new_simple ("video/x-flash-video",
 			"width", G_TYPE_INT, width,
@@ -103,16 +103,36 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 			"framerate", GST_TYPE_FRACTION, 25, 1,
 			NULL);
 	}
-	g_object_set (G_OBJECT (inputcaps), "caps", caps, NULL);
-	gst_caps_unref (caps);
+
+	if ( caps ) 
+	{
+		g_object_set (G_OBJECT (inputcaps), "caps", caps, NULL);
+		gst_caps_unref (caps);
+#ifndef NDEBUG
+		caps = NULL; // to check it is not null on next use ...
+#endif
+	}
+	else
+	{
+		log_error("Unknown codec format %d", format);
+	}
 
 	// Setup the capsfilter which demands either YUV or RGB videoframe format
 	videocaps = gst_element_factory_make ("capsfilter", NULL);
 	if (outputFormat == YUV) {
 		caps = gst_caps_new_simple ("video/x-raw-yuv", NULL);
 	} else {
+		assert(outputFormat == RGB);
 		caps = gst_caps_new_simple ("video/x-raw-rgb", NULL);
 	}
+
+	assert(caps); // ok, this is a silly assertion *now*, but as long as 
+	              // the code is implemented with such long function bodies
+	              // a day will come in which someone will change something
+	              // a few screefulls above and the assertion would make
+	              // sense (maybe boost compile-time assertions could help
+	              // in this reguard).
+
 	g_object_set (G_OBJECT (videocaps), "caps", caps, NULL);
 	gst_caps_unref (caps);
 
