@@ -405,4 +405,13 @@ but not by the gray rectangle.
 
 == Description ==
 
+= [input-fields.swf] =
 
+== Origin ==
+
+Self-made by Udo Giacomozzi, Gnash developer
+
+== Description ==
+
+Various tests to check correct rendering of text fields.
+Both dynamic and static textfields tested, using embedded and device fonts.
