@@ -1,3 +1,7 @@
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
+	* plugin/plugin.h: remove unneeded include.
+
 2007-07-22 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp: (get_world_cxform):

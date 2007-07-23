@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.h,v 1.33 2007/07/01 10:54:14 bjacques Exp $ */
+/* $Id: plugin.h,v 1.34 2007/07/23 04:08:08 strk Exp $ */
 
 #ifndef __PLUGIN_H__
 #define __PLUGIN_H__
@@ -40,7 +40,7 @@
 
 /* Xlib/Xt stuff */
 #include <X11/Xlib.h>
-#include <X11/Intrinsic.h>
+//#include <X11/Intrinsic.h>
 #include <X11/cursorfont.h>
 #ifdef HAVE_GTK2
 #include <gtk/gtk.h>
