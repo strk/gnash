@@ -1,5 +1,10 @@
 2007-07-23 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: still create Makefile under cygnal
+	  subdirs, or 'dist' rule will fail.
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: make sure $add_renderer contain
 	  well-defined values (not arbitrary ones). This is
 	  to make sure RENDERER_LIBS is always meaningful.
