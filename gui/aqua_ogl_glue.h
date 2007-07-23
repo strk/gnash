@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.h,v 1.7 2007/07/23 01:01:31 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.h,v 1.8 2007/07/23 01:04:18 nihilus Exp $ */
 
 #ifndef AQUA_OGL_GLUE_H
 #define AQUA_OGL_GLUE_H
@@ -39,6 +39,7 @@ class AquaOglGlue : public AquaGlue
     bool init(int argc, char ***argv);
     render_handler* createRenderHandler();
     bool prepDrawingArea(int width, int height);
+    void setInvalidatedRegions(const InvalidatedRanges& /* ranges */);
     void render();
    private:
 #ifdef FIX_I810_LOD_BIAS
