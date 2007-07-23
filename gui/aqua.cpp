@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.15 2007/07/23 01:01:31 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.16 2007/07/23 01:13:10 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -92,7 +92,7 @@ bool AquaGui::run()
   
 	GNASH_REPORT_FUNCTION;
 	BlockZero(&g, sizeof(g));
-    
+
   	g.mainBundle = CFBundleGetMainBundle();
   	if (g.mainBundle == NULL) 
   	{
@@ -148,7 +148,7 @@ AquaGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
 bool AquaGui::init(int argc, char ***argv) /* Self-explainatory */
 {
-  GNASH_REPORT_FUNCTION;
+  	GNASH_REPORT_FUNCTION;
   
   	_glue.init (argc, argv);
 

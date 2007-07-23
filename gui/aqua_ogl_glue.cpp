@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua_ogl_glue.cpp,v 1.13 2007/07/23 01:01:31 nihilus Exp $ */
+/* $Id: aqua_ogl_glue.cpp,v 1.14 2007/07/23 01:13:10 nihilus Exp $ */
 
 
 #include "aqua_ogl_glue.h"
@@ -110,7 +110,7 @@ void AquaOglGlue::render()
 {
     GNASH_REPORT_FUNCTION;
     //SDL_GL_SwapBuffers();
-    glFlush();
+    aglUpdateContext(aglGetCurrentContext());
 }
 
 } // namespace gnash
