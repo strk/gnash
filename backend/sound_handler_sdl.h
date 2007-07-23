@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.29 2007/07/17 22:05:03 nihilus Exp $
+// $Id: sound_handler_sdl.h,v 1.30 2007/07/23 22:22:25 strk Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -39,6 +39,8 @@ extern "C" {
 #include <boost/thread/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread/mutex.hpp>
+
+namespace gnash {
 
 /// Used to hold the info about active sounds
 class active_sound
@@ -256,5 +258,6 @@ public:
 	static void sdl_audio_callback (void *udata, Uint8 *stream, int buffer_length_in);
 };
 
+} // namespace gnash
 
 #endif // SOUND_HANDLER_SDL_H

@@ -29,6 +29,8 @@
 
 #define BUFFER_SIZE 5000
 
+namespace gnash {
+
 // forward declaration
 class GST_sound_handler;
 
@@ -178,6 +180,8 @@ public:
 	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner);	//vv
 	virtual void	detach_aux_streamer(void* owner);	//vv
 };
+
+} // namespace gnash
 
 #endif // SOUND_HANDLER_GST_H
 

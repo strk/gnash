@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.52 2007/07/23 22:07:58 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.53 2007/07/23 22:22:25 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,6 +34,7 @@
 //
 
 #ifdef SOUND_GST
+
 #include "sound_handler_gst.h"
 #include "gnash.h"
 #include "container.h"
@@ -47,6 +48,8 @@
 #define BUFFER_SIZE 5000
 
 using namespace boost;
+
+namespace gnash {
 
 GST_sound_handler::GST_sound_handler()
 	: looping(false),
@@ -617,8 +620,9 @@ gnash::sound_handler*	gnash::create_sound_handler_gst()
 	return new GST_sound_handler;
 }
 
+} // namespace gnash
 
-#endif
+#endif // SOUND_GST
 
 // Local Variables:
 // mode: C++
