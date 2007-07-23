@@ -156,7 +156,18 @@ KDE_NO_EXPORT bool KlashPart::allowRedir (const KURL & url) const {
     return kapp->authorizeURLAction ("redirect", m_docbase, url);
 }
 
-KDE_NO_EXPORT void KlashPart::play () {
+KDE_NO_EXPORT void KlashPart::play ()
+{
+
+    QString procname;
+    char *gnash_env = getenv("KLASH_PLAYER");
+    if (!gnash_env) {
+      procname = GNASHBINDIR;
+      procname += "/klash";
+    } else {
+      procname = gnash_env;
+    }
+
     stop ();
     if (m_src_url.isEmpty ())
         return;
@@ -167,7 +178,7 @@ KDE_NO_EXPORT void KlashPart::play () {
     if (m_width > 0 && m_height > 0)
         dim = QString ("-j ") + QString::number (m_width) +
             QString (" -k ") + QString::number (m_height);
-    QString cmd = QString ("gnash -x ") +
+    QString cmd = procname + QString (" -x ") +
         QString::number (static_cast <KlashView *> (widget ())->embedId()) +
         QChar (' ') + dim +
         QChar (' ') + KProcess::quote (m_src_url);

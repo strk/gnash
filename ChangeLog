@@ -1,3 +1,10 @@
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
+	* plugin/klash/klash_part.cpp: invoke "klash", not "gnash".
+	  Allow KLASH_PLAYER environment variable to change what's
+	  invoked. The plan is that "klash" would be an alias for
+	  "gnash --gui=kde".
+
 2007-07-23 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/edit_text_character.cpp: make get_world_cxform() again
