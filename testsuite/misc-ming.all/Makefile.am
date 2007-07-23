@@ -58,6 +58,7 @@ check_PROGRAMS = \
 	SpriteButtonEventsTest \
 	SpriteButtonEventsTest-Runner \
 	DefineEditTextTest \
+	DefineEditTextTest-Runner \
 	DefineEditTextVariableNameTest \
 	DefineEditTextVariableNameTest-Runner \
 	Dejagnu \
@@ -285,6 +286,20 @@ DefineEditTextTest.swf: DefineEditTextTest
 
 DefineEditTextTest_SOURCES =  DefineEditTextTest.c
 DefineEditTextTest_LDADD = libgnashmingutils.la
+
+DefineEditTextTest_Runner_SOURCES = \
+	DefineEditTextTest-Runner.cpp \
+	$(NULL)
+DefineEditTextTest_Runner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+DefineEditTextTest_Runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+DefineEditTextTest_Runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	DefineEditTextTest.swf      \
+	$(NULL)
 
 DefineEditTextVariableNameTest_SOURCES =	\
 	DefineEditTextVariableNameTest.c	\
@@ -1550,6 +1565,7 @@ clean-local:
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	DefineEditTextVariableNameTest-Runner \
+	DefineEditTextTest-Runner \
 	RollOverOutTest-Runner \
 	ButtonEventsTest-Runner \
 	SpriteButtonEventsTest-Runner \

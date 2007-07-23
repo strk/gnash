@@ -1,5 +1,9 @@
 2007-07-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: DefineEditTextTest-Runner.cpp,
+	  Makefile.am: skeleton for a MovieTester based runner.
+	* testsuite/misc-ming.all/DefineEditTextTest.c: fixed expected
+	  results.
 	* autogen.sh: libtoolize is in the 'libtool' package.
 	* plugin/plugin.h: remove unneeded include.
 
