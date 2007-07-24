@@ -1,3 +1,8 @@
+2007-07-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/parser/video_stream_def.cpp: Convert width and height to
+	  the correct format before using them. Fixes bug #20526 and #20440.
+
 2007-07-23 Sandro Santilli <strk@keybit.net>
 
 	* backend/: sound_handler_gst.{cpp,h},

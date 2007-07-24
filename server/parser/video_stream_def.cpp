@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.9 2007/07/09 13:33:30 strk Exp $
+// $Id: video_stream_def.cpp,v 1.10 2007/07/24 11:09:06 tgc Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -110,8 +110,8 @@ video_stream_definition::get_decoder()
 #endif
 
 	decoder->createDecoder(
-				m_bound.width(), // m_width,
-				m_bound.height(), // m_height,
+				static_cast<int>(TWIPS_TO_PIXELS(m_bound.width())),// m_width,
+				static_cast<int>(TWIPS_TO_PIXELS(m_bound.height())), // m_height,
 				m_deblocking_flags,
 				m_smoothing_flags,
 				m_codec_id,
