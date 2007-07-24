@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.10 2007/07/24 11:09:06 tgc Exp $
+// $Id: video_stream_def.cpp,v 1.11 2007/07/24 22:48:12 tgc Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -39,6 +39,10 @@ video_stream_definition::video_stream_definition(uint16_t char_id)
 
 video_stream_definition::~video_stream_definition()
 {
+	for (int32_t size = m_video_frames.size()-1; size >= 0; size--) {
+		delete m_video_frames[size];
+	}
+	m_video_frames.clear();
 }
 
 
@@ -71,9 +75,21 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 	else if (tag == SWF::VIDEOFRAME)
 	{
 		in->skip_bytes(2); //int frameNum = in->read_u16();
-		int size = in->get_tag_end_position() - in->get_position();
+
+		// We need to make the buffer a bit bigger than the data
+		// to avoid libavcodec (ffmpeg) making illegal reads.
+		// The reason is a bit sketchy, but it seems that the h263
+		// decoder (perhaps other decoders as well) assumes that the
+		// buffer with the data is bigger than the data it contains.
+		// We make the buffer 4 bytes bigger than the data, and set
+		// them to 0.
+
+		// The data size is 4 bytes smaller than this, but because of 
+		// what is mentioned above we don't subtract the 4 bytes.
+		int size = in->get_tag_length();
 		uint8_t* data = new uint8_t[size];
-		for (int i = 0; i < size; i++)
+		memset(data, 0, size);
+		for (int i = 0; i < size-4; i++) // The size-variable 4 bytes bigger than the data
 		{
 			data[i] = in->read_u8();
 		}

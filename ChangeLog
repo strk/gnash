@@ -1,3 +1,10 @@
+2007-07-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/parser/video_stream_def.cpp: Free the video frames
+	  when deleting the video_stream_def object. Make the buffer
+	  containing the video data 4 bytes bigger than needed to avoid
+	  illegal reads from ffmpeg. Fixes bug #20440.
+
 2007-07-24 Sandro Santilli <strk@keybit.net>
 
 	* Makefile.am: define PHONY rules.
