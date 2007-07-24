@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.92 2007/07/24 19:51:27 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.93 2007/07/24 21:58:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,6 +43,11 @@
 
 // Text fields have a fixed 2 pixel padding for each side (regardless of border)
 #define PADDING_TWIPS 40.0f
+
+// Define the following macro to maintain compatibility with the proprietary
+// player when it comes to opacity of textfields using device fonts.
+// See http://gnashdev.org/wiki/index.php/DeviceFonts#Differences_with_proprietary_player_implementation
+#define PP_COMPATIBLE_DEVICE_FONT_HANDLING 1
 
 namespace gnash {
 
@@ -1464,7 +1469,9 @@ edit_text_character::get_world_cxform() const
 {
   cxform cf = character::get_world_cxform();
   
-  if ( 0 /* if using a device font (PP compatibility, TODO) */ ) {
+#ifdef PP_COMPATIBLE_DEVICE_FONT_HANDLING
+  if ( ! getEmbedFonts() ) /* if using a device font (PP compatibility) */ 
+  {
     // set alpha to default values to make the text field opaque
     cf.m_[3][0] = 1.0f;
     cf.m_[3][1] = 0.0f;
@@ -1473,6 +1480,7 @@ edit_text_character::get_world_cxform() const
     // transform, so we should (or not) return an identity cxform
     // here. This has to be discussed...
   }
+#endif
   
   return cf;
 }
