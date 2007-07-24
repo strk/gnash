@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.19 2007/07/24 13:04:42 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.20 2007/07/24 13:41:34 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,11 +42,9 @@ extern "C"{
 
 #include <Carbon/Carbon.h>
 
-ToolboxObjectClassRef customWindow;
 WindowRef myWindow;
-WindowDefSpec myCustomWindowSpec;
 EventHandlerUPP myCustomWindowUPP;
-Rect theBounds = {200,200,400,400};
+Rect theBounds;
  
 EventTypeSpec eventList[] = {{kEventClassWindow, kEventWindowDrawFrame},
                             {kEventClassWindow, kEventWindowHitTest}};
@@ -67,7 +65,7 @@ static pascal OSStatus MyCustomWindowEventHandler (
     Rect windBounds;
  
     whatHappened = GetEventKind (theEvent);
- 
+  	GNASH_REPORT_FUNCTION; 
     switch (whatHappened)
     {
         case kEventWindowInit:
@@ -127,6 +125,12 @@ void AquaGui::setInterval(unsigned int interval)
 bool AquaGui::run()
 {
   	GNASH_REPORT_FUNCTION;
+  	CreateNewWindow (kDocumentWindowClass,
+                    	 kWindowStandardDocumentAttributes 
+                       | kWindowStandardHandlerAttribute
+                       | kWindowInWindowMenuAttribute,
+                    	&theBounds,
+                    	&myWindow);
     ShowWindow(myWindow);
     RunApplicationEventLoop();
     return true;
@@ -151,20 +155,7 @@ bool AquaGui::init(int argc, char ***argv) /* Self-explainatory */
 {
   
 	GNASH_REPORT_FUNCTION;
- 	
- 	myCustomWindowUPP = NewEventHandlerUPP(MyCustomWindowEventHandler);
  
-	RegisterToolboxObjectClass(CFSTR("com.myCompany.myApp.customWindow"),	// 2
-								NULL, GetEventTypeCount(eventList), eventList,
-                        		myCustomWindowUPP, NULL, &customWindow);
- 
-	myCustomWindowSpec.defType = kWindowDefObjectClass; // 3
-	myCustomWindowSpec.u.classRef = customWindow; // 4
- 
-	CreateCustomWindow (&myCustomWindowSpec,kMovableModalWindowClass,	// 5
-                    	kWindowStandardHandlerAttribute,
-                    	&theBounds,
-                    	&myWindow);
 #if 0                    
   	_glue.init(argc, argv);
 
@@ -205,8 +196,8 @@ void AquaGui::setCursor(gnash_cursor_type newcursor)
 bool AquaGui::createWindow(const char* title, int width, int height)
 {
 	GNASH_REPORT_FUNCTION;
-	theBounds.top = height;
-	theBounds.right = width;
+
+	SetRect(&theBounds, 0, 0, width, height);
 	_glue.prepDrawingArea(_width, _height);
     set_render_handler(_renderer);
     return true;
