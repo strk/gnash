@@ -1,5 +1,12 @@
 2007-07-24 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/SoundFfmpeg.h: Provide a constructor
+	  for proper initialization of members.
+	  YOU CAN NOT ASSUME POINTERS WILL BE INITIALIZED TO NULL.
+	  Fixes bug #20578.
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
 	* server/text.cpp (display_glyph_records): don't render invalid glyphs
 	  as empty boxes, unless a DRAW_INVALID_GLYPHS_AS_EMPTY_BOXES macro
 	  is defined.

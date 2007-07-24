@@ -44,6 +44,24 @@ class fn_call;
 class SoundFfmpeg : public Sound {
 public:
 
+	SoundFfmpeg()
+		: // REMEMBER TO ALWAYS INITIALIZE ALL MEMBERS !
+		audioCodecCtx(NULL),
+		audioStream(NULL),
+		formatCtx(NULL),
+		audioFrame(NULL),
+		resampleCtx(NULL),
+		setupThread(NULL),
+		lock(NULL), 
+		inputPos(0),
+		ByteIOCxt(), // ?
+		audioIndex(-1),
+		leftOverData(NULL),
+		leftOverSize(0),
+		isAttached(false),
+		remainingLoops(0)
+	{}
+
 	~SoundFfmpeg();
 
 	void loadSound(std::string file, bool streaming);
@@ -72,6 +90,8 @@ private:
 
 	boost::thread *setupThread;
 	boost::mutex setupMutex;
+
+	// TODO: it makes NO SENSE for a scoped_lock to be allocated on the heap !
 	boost::mutex::scoped_lock *lock;
 
 	long inputPos;
