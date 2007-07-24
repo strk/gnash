@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.18 2007/07/24 00:08:15 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.19 2007/07/24 13:04:42 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -128,7 +128,7 @@ bool AquaGui::run()
 {
   	GNASH_REPORT_FUNCTION;
     ShowWindow(myWindow);
-    while(1);
+    RunApplicationEventLoop();
     return true;
 }
 
@@ -204,6 +204,9 @@ void AquaGui::setCursor(gnash_cursor_type newcursor)
 
 bool AquaGui::createWindow(const char* title, int width, int height)
 {
+	GNASH_REPORT_FUNCTION;
+	theBounds.top = height;
+	theBounds.right = width;
 	_glue.prepDrawingArea(_width, _height);
     set_render_handler(_renderer);
     return true;
