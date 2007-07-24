@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.366 2007/07/23 21:19:36 strk Exp $
+dnl $Id: configure.ac,v 1.367 2007/07/24 22:55:26 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1849,31 +1849,31 @@ else
   echo "                 or .rpm users: yum install curl-devel"
 fi
 
-if test x$build_agg = xyes; then
+if test x$build_agg = xyes; then # {
   echo "        AGG Pixel format is: $pixelformat"
-  if test x"${agg25}" = xyes; then
-    if test x"$AGG_LIBS" != x; then
-      if test x"$AGG_CFLAGS" != x; then
-        echo "        AGG flags are: $AGG_CFLAGS"
-      else
-        echo "        AGG flags are: default include path"
-      fi
-      echo "        AGG libs are: $AGG_LIBS"
-dnl      echo "          needs compatibility layer: $agg_need_compatibility_layer"
-    else
+    if test x"$AGG_LIBS" != x; then # {
+      if test x"${agg25}" != xyes; then # {
+        echo "        WARNING: Your installation of AGG appears to be version 2.4 or older."
+        echo "                 Please upgrade to AGG 2.5 or greater"
+        echo "                 or .deb users: apt-get install libagg-dev"
+        echo "                 or .rpm users: yum install agg-devel"
+        nogo=true
+      else # }{
+        if test x"$AGG_CFLAGS" != x; then # {
+          echo "        AGG flags are: $AGG_CFLAGS"
+        else # }{
+          echo "        AGG flags are: default include path"
+        fi # }
+        echo "        AGG libs are: $AGG_LIBS"
+      fi # }
+    else # }{
       echo "        ERROR: No AGG development package installed!"
       echo "               Install it from http://www.antigrain.com"
       echo "               or .deb users: apt-get install libagg-dev"
       echo "               or .rpm users: yum install agg-devel"
       nogo=true
-    fi
-  else
-    echo "        WARNING: Your installation of AGG appears to be version 2.4 or older."
-    echo "                 Please upgrade to AGG 2.5 or greater"
-    echo "                 or .deb users: apt-get install libagg-dev"
-    echo "                 or .rpm users: yum install agg-devel"
-  fi
-fi
+    fi # }
+fi # }
 
 if test x"$BOOST_LIBS" != x; then
     # Only cygnal requires date_time at present, so it's OK if either

@@ -1,3 +1,8 @@
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: don't take absence of libAGG as if an
+	  old version was found. Fixes bug #20011.
+
 2007-07-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* server/parser/video_stream_def.cpp: Free the video frames
