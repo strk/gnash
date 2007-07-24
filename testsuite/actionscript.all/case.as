@@ -22,6 +22,8 @@
  *  Test case sensitivity 
  */
 
+rcsid="$Id: case.as,v 1.5 2007/07/24 13:13:27 strk Exp $";
+
 #include "check.as"
 
 #if OUTPUT_VERSION <= 6
@@ -53,6 +55,7 @@ asm{
 };
 // check setproperty
 xcheck_equals(mC0._X, 100);
+xcheck_equals(mC0._x, 100);
 
 //
 // check _name and _target, they still keep the case

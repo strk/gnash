@@ -22,6 +22,8 @@
  *  Test ActionEnumerate/2
  */
 
+rcsid="$Id: enumerate.as,v 1.7 2007/07/24 13:13:27 strk Exp $";
+
 #include "check.as"
 
 #if OUTPUT_VERSION > 5
