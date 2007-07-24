@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.34 2007/07/24 19:43:30 strk Exp $ */
+/* $Id: text.cpp,v 1.35 2007/07/24 19:57:10 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -37,6 +37,11 @@
 // Define the following macro to get debugging messages
 // for text rendering
 //#define GNASH_DEBUG_TEXT_RENDERING 1
+
+// Define the following macro to have invalid glyphs drawn as
+// empty boxes
+//#define DRAW_INVALID_GLYPHS_AS_EMPTY_BOXES 1
+
 
 namespace gnash {
 
@@ -161,8 +166,10 @@ namespace gnash {
 				if (index == -1)
 				{
 #ifdef GNASH_DEBUG_TEXT_RENDERING
-log_error(_("invalid glyph, render as an empty box"));
+log_error(_("invalid glyph (-1)"));
 #endif
+
+#ifdef DRAW_INVALID_GLYPHS_AS_EMPTY_BOXES
 					render::set_matrix(mat);
 
 					// The EM square is 1024x1024, but usually isn't filled up.
@@ -178,6 +185,8 @@ log_error(_("invalid glyph, render as an empty box"));
 						 32,   32
 					};
 					render::draw_line_strip(s_empty_char_box, 5, transformed_color);  
+#endif
+
 				}
 				else
 				{

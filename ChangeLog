@@ -1,5 +1,8 @@
 2007-07-24 Sandro Santilli <strk@keybit.net>
 
+	* server/text.cpp (display_glyph_records): don't render invalid glyphs
+	  as empty boxes, unless a DRAW_INVALID_GLYPHS_AS_EMPTY_BOXES macro
+	  is defined.
 	* server/edit_text_character.cpp (setEmbedFonts):
 	  Set _embedFonts *before* calling format_text, or
 	  glyph indexes will be messed up.
