@@ -804,7 +804,8 @@ DisplayList::display()
 		}
 
 		// check whether this object should become mask
-		if (ch->isMask())
+		// (see bug #20527 for the "&& !masked" condition)
+		if (ch->isMask() && !masked)
 		{
 			//log_msg(_("begin submit mask"));
 			render::begin_submit_mask();
@@ -815,7 +816,7 @@ DisplayList::display()
 		// if this object should have become a mask,
 		// inform the renderer that it now has all
 		// information about it
-		if (ch->isMask())
+		if (ch->isMask() && !masked)
 		{
 			//log_msg(_("end submit mask"));
 			render::end_submit_mask();
