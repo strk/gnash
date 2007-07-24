@@ -1,3 +1,14 @@
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
+	* server/gnash.h: fix PGDN and PGUP key constants
+	* server/asobj/Global.cpp: initialize the "Key" class
+	  even in SWF5.
+	* server/asobj/Key.cpp: use init_member rather then set_member
+	  when initializing constants, reduce complexity of compile-time
+	  switches for NEW_KEY_LISTENER_LIST_DESIGN, general cleanups.
+	* testsuite/actionscript.all/: Makefile.am, Key.as: new testcase
+	  for Key object
+
 2007-07-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/dlist.cpp: handle masks of certain malformed(?) movies correctly

@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.23 2007/07/17 06:04:22 zoulunkai Exp $ */
+/* $Id: Key.h,v 1.24 2007/07/24 14:19:32 strk Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -42,53 +42,6 @@ namespace gnash {
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 class KeyListener; //forward declaration
 #endif
-
-// TODO: drop this, probably unused
-class DSOEXPORT Key {
-public:
-    Key();
-    ~Key();
-   void addListener();
-   void getAscii();
-   void getCode();
-   void isDown();
-   void isToggled();
-   void removeListener();
-private:
-    bool _BACKSPACE;
-    bool _CAPSLOCK;
-    bool _CONTROL;
-    bool _DELETEKEY;
-    bool _DOWN;
-    bool _END;
-    bool _ENTER;
-    bool _ESCAPE;
-    bool _HOME;
-    bool _INSERT;
-    bool _LEFT;
-    bool _onKeyDown;
-    bool _onKeyUp;
-    bool _PGDN;
-    bool _PGUP;
-    bool _RIGHT;
-    bool _SHIFT;
-    bool _SPACE;
-    bool _TAB;
-    bool _UP;
-};
-
-//class key_as_object : public as_object
-//{
-//public:
-    //Key obj;
-//};
-
-as_value key_addlistener(const fn_call& fn);
-as_value key_getascii(const fn_call& fn);
-as_value key_getcode(const fn_call& fn);
-as_value key_isdown(const fn_call& fn);
-as_value key_istoggled(const fn_call& fn);
-as_value key_removelistener(const fn_call& fn);
 
 /************************************************************************
  *

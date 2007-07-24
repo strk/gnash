@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.65 2007/07/03 16:56:19 strk Exp $ */
+/* $Id: Global.cpp,v 1.66 2007/07/24 14:19:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -424,6 +424,7 @@ Global::Global(VM& vm)
 	number_class_init(*this); 
 	string_class_init(*this); 
 	array_class_init(*this);
+	key_class_init(*this); // Key
 	init_member("escape", new builtin_function(as_global_escape));
 	init_member("unescape", new builtin_function(as_global_unescape));
 	init_member("parseFloat", new builtin_function(as_global_parsefloat));
@@ -446,7 +447,6 @@ Global::Global(VM& vm)
 	textsnapshot_class_init(*this);
 	init_member("LocalConnection", new builtin_function(localconnection_new));
 	init_member("TextFormat", new builtin_function(textformat_new));
-	key_class_init(*this); // Key
 	video_class_init(*this); // Video
 	camera_class_init(*this); // Camera
 	microphone_class_init(*this); // Microphone
