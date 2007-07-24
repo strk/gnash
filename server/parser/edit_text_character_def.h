@@ -62,10 +62,14 @@ public:
 		m_no_select(false),
 		m_border(false),
 		m_html(false),
-		m_use_outlines(false),
+		m_use_outlines(true), // For an SWF-defined textfield we'll read
+		                      // this from the tag. Dynamic textfields should
+		                      // use device fonts by default.
 		m_font_id(-1),
 		m_font(NULL),
-		m_text_height(1),
+		m_text_height(1), // TODO: initialize to a meaningful value (see sprite_instance::add_textfield)
+		                  //       and make sure get_font_height is not called for rendering purposes
+		                  //       (instead call a method of edit_text_character_def)
 		m_max_length(0),
 		m_alignment(ALIGN_LEFT),
 		m_left_margin(0),
@@ -236,6 +240,15 @@ public:
 
 	/// Return true if HTML was allowed by definition
 	bool htmlAllowed() const { return m_html; }
+
+	/// Return true if this character definition requested use of device fonts
+	// 
+	/// Used by edit_text_character constructor to set it's default.
+	///
+	bool getUseEmbeddedGlyphs() const 
+	{
+		return m_use_outlines;
+	}
 	
 protected:
 
@@ -299,8 +312,11 @@ private:
 
 
 	/// \brief
-	/// When true, use specified SWF internal font. 
-	/// Otherwise, renderer picks a default font
+	/// When true, use specified SWF internal font (embed fonts)
+	/// Otherwise, use specified device font (or a default one if m_font_id is -1)
+	///
+	/// Also known as USE_GLYPH (from Ming)
+	///
 	bool	m_use_outlines;
 
 	int	m_font_id;

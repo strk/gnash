@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.10 2007/07/24 16:14:13 strk Exp $";
+rcsid="$Id: TextField.as,v 1.11 2007/07/24 17:41:34 strk Exp $";
 
 #include "check.as"
 
@@ -45,7 +45,7 @@ check( !TextField.prototype.hasOwnProperty('autoSize') );
 xcheck( !TextField.prototype.hasOwnProperty('border') );
 xcheck( !TextField.prototype.hasOwnProperty('borderColor') );
 check( !TextField.prototype.hasOwnProperty('bottomScroll') );
-check( !TextField.prototype.hasOwnProperty('embedFonts') );
+xcheck( !TextField.prototype.hasOwnProperty('embedFonts') );
 check( !TextField.prototype.hasOwnProperty('hscroll') );
 check( !TextField.prototype.hasOwnProperty('html') );
 check( !TextField.prototype.hasOwnProperty('htmlText') );
@@ -114,7 +114,7 @@ xcheck( TextField.prototype.hasOwnProperty('autoSize') );
 check( TextField.prototype.hasOwnProperty('border') );
 check( TextField.prototype.hasOwnProperty('borderColor') );
 xcheck( TextField.prototype.hasOwnProperty('bottomScroll') );
-xcheck( TextField.prototype.hasOwnProperty('embedFonts') );
+check( TextField.prototype.hasOwnProperty('embedFonts') );
 xcheck( TextField.prototype.hasOwnProperty('hscroll') );
 xcheck( TextField.prototype.hasOwnProperty('html') );
 xcheck( TextField.prototype.hasOwnProperty('htmlText') );
@@ -177,17 +177,17 @@ xcheck_equals(tf.bottomScroll, 1);
 
 // Check TextField.embedFonts
 
-xcheck_equals(typeof(tf.embedFonts), 'boolean');
+check_equals(typeof(tf.embedFonts), 'boolean');
 check(!tf.hasOwnProperty('embedFonts'));
 xcheck_equals(tf.embedFonts, false);
 tf.embedFonts = true;
 check_equals(tf.embedFonts, true);
 tf.embedFonts = new Number(0); // will be converted to bool (true)
-xcheck_equals(typeof(tf.embedFonts), 'boolean');
-xcheck_equals(tf.embedFonts, true);
+check_equals(typeof(tf.embedFonts), 'boolean');
+check_equals(tf.embedFonts, true);
 tf.embedFonts = ""; // will be converted to bool (false);
-xcheck_equals(typeof(tf.embedFonts), 'boolean');
-xcheck_equals(tf.embedFonts, false);
+check_equals(typeof(tf.embedFonts), 'boolean');
+check_equals(tf.embedFonts, false);
 // TODO: do this test with really embedded fonts, in misc-ming.all/DefineEditTextTest.c
 
 // Check TextField._highquality

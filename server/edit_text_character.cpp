@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.89 2007/07/23 14:02:55 udog Exp $ */
+/* $Id: edit_text_character.cpp,v 1.90 2007/07/24 17:41:34 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -68,6 +68,7 @@ static as_value textfield_border_getset(const fn_call& fn);
 static as_value textfield_backgroundColor_getset(const fn_call& fn);
 static as_value textfield_borderColor_getset(const fn_call& fn);
 static as_value textfield_textColor_getset(const fn_call& fn);
+static as_value textfield_embedFonts_getset(const fn_call& fn);
 
 	namespace
 	{
@@ -325,6 +326,8 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("borderColor", *getset, *getset);
 	getset = new builtin_function(textfield_textColor_getset);
 	o.init_property("textColor", *getset, *getset);
+	getset = new builtin_function(textfield_embedFonts_getset);
+	o.init_property("embedFonts", *getset, *getset);
 
 
 	if ( target_version  < 7 ) return;
@@ -385,7 +388,8 @@ edit_text_character::edit_text_character(character* parent,
 	_backgroundColor(255,255,255,255),
 	_drawBorder(m_def->has_border()),
 	_borderColor(0,0,0,255),
-	_textColor(m_def->get_text_color())
+	_textColor(m_def->get_text_color()),
+	_embedFont(m_def->getUseEmbeddedGlyphs())
 {
 	assert(parent);
 	assert(m_def);
@@ -1428,6 +1432,17 @@ edit_text_character::setTextColor(const rgba& col)
 	}
 }
 
+void
+edit_text_character::setEmbedFonts(bool use)
+{
+	if ( _embedFont != use )
+	{
+		set_invalidated();
+		format_text();
+		_embedFont=use;
+	}
+}
+
 cxform	
 edit_text_character::get_world_cxform() const
 {
@@ -1532,6 +1547,23 @@ textfield_textColor_getset(const fn_call& fn)
 		rgba newColor;
 		newColor.parseRGB( fn.arg(0).to_number<uint32_t>(&fn.env()) );
 		ptr->setTextColor(newColor);
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_embedFonts_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->getEmbedFonts());
+	}
+	else // setter
+	{
+		ptr->setEmbedFonts( fn.arg(0).to_bool() );
 	}
 
 	return as_value();

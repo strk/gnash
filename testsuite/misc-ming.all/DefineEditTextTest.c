@@ -157,8 +157,8 @@ main(int argc, char** argv)
   }
   SWFMovie_nextFrame(mo); 
 
-  xcheck_equals(mo, "dtext1.embedFonts", "false");
-  xcheck_equals(mo, "etext1.embedFonts", "true");
+  check_equals(mo, "dtext1.embedFonts", "false");
+  check_equals(mo, "etext1.embedFonts", "true");
 
   check_equals(mo, "dtext1.__proto__", "TextField.prototype");
   // checks after placing some swf defined TextField

@@ -144,6 +144,19 @@ public:
 	/// Set color of the text
 	void setTextColor(const rgba& col);
 
+	/// \brief
+	/// Return true if this TextField should use embedded font glyphs,
+	/// false if it should use device font glyphs
+	bool getEmbedFonts() const {
+		return _embedFont;
+	}
+
+	/// \brief
+	/// Set whether this TextField should use embedded font glyphs,
+	/// or use device font glyphs
+	//
+	/// @param use
+	void setEmbedFonts(bool use);
 
 private:
 
@@ -249,6 +262,8 @@ private:
 	rgba _borderColor;
 
 	rgba _textColor;
+
+	bool _embedFont;
 
 protected:
 
