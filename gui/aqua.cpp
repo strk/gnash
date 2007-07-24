@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.22 2007/07/24 14:18:08 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.23 2007/07/25 00:32:02 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,8 +42,14 @@ extern "C"{
 
 #include <Carbon/Carbon.h>
 
-WindowRef myWindow;
- 
+WindowRef	myWindow;
+
+pascal OSStatus DoWindowClose (EventHandlerCallRef  nextHandler,
+                               EventRef             theEvent,
+                               void*                userData){
+	exit(0);
+}
+
 namespace gnash {
 	
 AquaGui::AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth)
@@ -65,7 +71,7 @@ bool AquaGui::run()
 {
   	GNASH_REPORT_FUNCTION;
   	
-	RepositionWindow(myWindow, NULL, kWindowCascadeOnMainScreen);
+	RepositionWindow(myWindow, NULL, kWindowCenterOnMainScreen);
     ShowWindow(myWindow);
     RunApplicationEventLoop();
     return true;
@@ -90,7 +96,7 @@ bool AquaGui::init(int argc, char ***argv) /* Self-explainatory */
 {
   
 	GNASH_REPORT_FUNCTION;
- 
+	InitCursor();
 #if 0                    
   	_glue.init(argc, argv);
 
@@ -133,13 +139,17 @@ bool AquaGui::createWindow(const char* title, int width, int height)
 	CFStringRef	windowTitle;
 	OSStatus	result;
 	Rect		theBounds;
-	
+	EventTypeSpec     eventType;                 // Specifier for event type
+	EventHandlerUPP   handlerUPP;                // Pointer to event handler routine
+ 
 	GNASH_REPORT_FUNCTION;
 
 	SetRect(&theBounds, 0, 0, width, height);
 	CreateNewWindow (kDocumentWindowClass,
                     	 kWindowStandardDocumentAttributes 
                        | kWindowStandardHandlerAttribute
+                       | kWindowMetalAttribute
+                       | kWindowCompositingAttribute
                        | kWindowInWindowMenuAttribute,
                     	&theBounds,
                     	&myWindow);
@@ -147,19 +157,37 @@ bool AquaGui::createWindow(const char* title, int width, int height)
 	windowTitle = CFStringCreateWithCString(NULL, title, NULL);
 	result = SetWindowTitleWithCFString(myWindow, windowTitle);
 	CFRelease (windowTitle);                    	
+
+	createMenu();
 	
+	eventType.eventClass = kEventClassWindow;          // Set event class
+	eventType.eventKind  = kEventWindowClose;          // Set event kind
+	handlerUPP = NewEventHandlerUPP(DoWindowClose);    // Point to handler
+	InstallWindowEventHandler (myWindow, handlerUPP,  // Install handler
+                                 1, &eventType,
+                                 NULL, NULL);
 	_glue.prepDrawingArea(_width, _height);
     set_render_handler(_renderer);
     return true;
 }
 
 bool AquaGui::createMenu()
-{ 
+{ 	
+	MenuRef	specialmenuRef;
+
+	GNASH_REPORT_FUNCTION;
+	
+	CreateNewMenu(202, 0, &specialmenuRef); // 202 is an arbitrary ID
+	SetMenuTitleWithCFString(specialmenuRef, CFSTR("Special"));	
+	InsertMenu(specialmenuRef, 0);
+	
 	return true;
 }
 
 bool AquaGui::setupEvents()
-{
+{	
+	GNASH_REPORT_FUNCTION;
+
 	return true;
 }
 
