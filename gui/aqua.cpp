@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.20 2007/07/24 13:41:34 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.21 2007/07/24 14:02:27 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -125,12 +125,8 @@ void AquaGui::setInterval(unsigned int interval)
 bool AquaGui::run()
 {
   	GNASH_REPORT_FUNCTION;
-  	CreateNewWindow (kDocumentWindowClass,
-                    	 kWindowStandardDocumentAttributes 
-                       | kWindowStandardHandlerAttribute
-                       | kWindowInWindowMenuAttribute,
-                    	&theBounds,
-                    	&myWindow);
+  	
+	RepositionWindow (myWindow, NULL, kWindowCascadeOnMainScreen);
     ShowWindow(myWindow);
     RunApplicationEventLoop();
     return true;
@@ -195,9 +191,23 @@ void AquaGui::setCursor(gnash_cursor_type newcursor)
 
 bool AquaGui::createWindow(const char* title, int width, int height)
 {
+	CFStringRef	windowTitle;
+	OSStatus	result;
+	
 	GNASH_REPORT_FUNCTION;
 
 	SetRect(&theBounds, 0, 0, width, height);
+	CreateNewWindow (kDocumentWindowClass,
+                    	 kWindowStandardDocumentAttributes 
+                       | kWindowStandardHandlerAttribute
+                       | kWindowInWindowMenuAttribute,
+                    	&theBounds,
+                    	&myWindow);
+                    	
+	windowTitle = CFStringCreateWithCString(NULL, title, NULL);
+	result = SetWindowTitleWithCFString(myWindow, windowTitle);
+	CFRelease (windowTitle);                    	
+	
 	_glue.prepDrawingArea(_width, _height);
     set_render_handler(_renderer);
     return true;
