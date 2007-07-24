@@ -1,5 +1,11 @@
 2007-07-24 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (setEmbedFonts):
+	  Set _embedFonts *before* calling format_text, or
+	  glyph indexes will be messed up.
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
 	* server/font.{cpp,h}: Refactor class definition
 	  to maintain two separate glyph information sets:
 	  one for device and one for embedded glyphs. Added

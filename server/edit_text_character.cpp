@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.91 2007/07/24 19:43:30 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.92 2007/07/24 19:51:27 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1454,8 +1454,8 @@ edit_text_character::setEmbedFonts(bool use)
 	if ( _embedFonts != use )
 	{
 		set_invalidated();
-		format_text();
 		_embedFonts=use;
+		format_text();
 	}
 }
 
