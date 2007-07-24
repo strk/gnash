@@ -1,5 +1,10 @@
 2007-07-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/TextField.as: more tests
+	  for embedFont member.
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
 	* server/font.cpp: more parser verbosity.
 	* server/movie_root.cpp (notify_global_key): Key object
 	  existed since SWF5, not SWF6. Fixes pacman-flash.swf.
