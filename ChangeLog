@@ -1,5 +1,15 @@
 2007-07-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
+	* server/as_object.{cpp,h}: Add a virtual enumerateNonProperties,
+	  called by enumerateProperties, to allow for enumeration of non-proper
+	  properties (in particular sprite childs).
+	* server/sprite_instance.{cpp,h}: Implement enumerateNonProperties to
+	  enumerate child characters.
+	* testsuite/actionscript.all/enumerate.as: don't expect failures while
+	  enumerating childs.
+
+2007-07-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
 	* server/parser/video_stream_def.cpp: Convert width and height to
 	  the correct format before using them. Fixes bug #20526 and #20440.
 

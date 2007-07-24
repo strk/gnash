@@ -490,6 +490,8 @@ as_object::enumerateProperties(as_environment& env) const
 {
 	assert( env.top(0).is_null() );
 
+	enumerateNonProperties(env);
+
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
 	std::set<const as_object*> visited;

@@ -49,12 +49,12 @@
   } 
 
   // Test what we got in the above step. Tests show that characters were also got enumerated!
-  xcheck_equals(typeof(recorder['mc0']), 'movieclip');
-  xcheck_equals(typeof(recorder['mc1']), 'movieclip');
-  xcheck_equals(typeof(recorder['mc2']), 'movieclip');
-  xcheck_equals(typeof(recorder['mc3']), 'movieclip');  
-  xcheck_equals(typeof(recorder['mc4']), 'movieclip');
-  xcheck_equals(typeof(recorder['mc5']), 'movieclip');
+  check_equals(typeof(recorder['mc0']), 'movieclip');
+  check_equals(typeof(recorder['mc1']), 'movieclip');
+  check_equals(typeof(recorder['mc2']), 'movieclip');
+  check_equals(typeof(recorder['mc3']), 'movieclip');  
+  check_equals(typeof(recorder['mc4']), 'movieclip');
+  check_equals(typeof(recorder['mc5']), 'movieclip');
   check_equals(_root.hasOwnProperty('mc0'), false);
   check_equals(_root.hasOwnProperty('mc1'), false);
   check_equals(_root.hasOwnProperty('mc2'), false);

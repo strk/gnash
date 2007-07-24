@@ -3984,6 +3984,29 @@ sprite_instance::isEnabled() const
 	return enabled.to_bool();
 }
 
+class EnumerateVisitor {
+
+	as_environment& _env;
+
+public:
+	EnumerateVisitor(as_environment& env)
+		:
+		_env(env)
+	{}
+
+	void operator() (character* ch)
+	{
+		_env.push(ch->get_name());
+	}
+};
+
+void
+sprite_instance::enumerateNonProperties(as_environment& env) const
+{
+	EnumerateVisitor visitor(env);
+	m_display_list.visitAll(visitor);
+}
+
 #ifdef GNASH_USE_GC
 struct ReachableMarker {
 	void operator() (character *ch)

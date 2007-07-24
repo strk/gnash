@@ -762,6 +762,12 @@ public:
 	/// Set all variables in the given map with their corresponding values
 	DSOEXPORT void setVariables(VariableMap& vars);
 
+	/// Enumerate child characters
+	//
+	/// See as_object::enumerateNonProperties(as_environment&) for more info.
+	///
+	virtual void enumerateNonProperties(as_environment&) const;
+
 private:
 
 	/// \brief

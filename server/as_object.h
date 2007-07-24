@@ -389,6 +389,18 @@ public:
 	///
 	void enumerateProperties(as_environment& env) const;
 
+	/// Enumerate any non-proper properties
+	//
+	/// This function is called by enumerateProperties(as_environment&) 
+	/// to allow for enumeration of properties that are not "proper"
+	/// (not contained in the as_object PropertyList).
+	///
+	/// The default implementation adds nothing
+	///
+	virtual void enumerateNonProperties(as_environment&) const
+	{
+	}
+
 	/// \brief
 	/// Enumerate all non-hidden properties inserting
 	/// their name/value pair to the given map.
