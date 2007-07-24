@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.43 2007/07/12 23:05:56 strk Exp $ */
+/* $Id: font.cpp,v 1.44 2007/07/24 15:40:53 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -229,6 +229,17 @@ namespace gnash {
 		m_is_italic = (in->read_uint(1) != 0);
 		m_is_bold = (in->read_uint(1) != 0);
 		uint8_t	reserved = in->read_u8();
+
+		IF_VERBOSE_PARSE (
+		log_parse(" has_layout = %d", has_layout);
+		log_parse(" shift_jis_chars = %d", m_shift_jis_chars);
+		log_parse(" m_unicode_chars = %d", m_unicode_chars);
+		log_parse(" m_ansi_chars = %d", m_ansi_chars);
+		log_parse(" wide_offsets = %d", wide_offsets);
+		log_parse(" wide_codes = %d", m_wide_codes);
+		log_parse(" is_italic = %d", m_is_italic);
+		log_parse(" is_bold = %d", m_is_bold);
+		);
 
 		// Inhibit compiler warning.
 		reserved = reserved;
