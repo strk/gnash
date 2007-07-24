@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.21 2007/07/24 14:02:27 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.22 2007/07/24 14:18:08 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -43,68 +43,7 @@ extern "C"{
 #include <Carbon/Carbon.h>
 
 WindowRef myWindow;
-EventHandlerUPP myCustomWindowUPP;
-Rect theBounds;
  
-EventTypeSpec eventList[] = {{kEventClassWindow, kEventWindowDrawFrame},
-                            {kEventClassWindow, kEventWindowHitTest}};
-
-static pascal OSStatus MyCustomWindowEventHandler (
-                                EventHandlerCallRef myHandler,
-                                EventRef theEvent, void* userData)
-{
- 
-    #pragma unused (myHandler,userData)
- 
-    OSStatus result = eventNotHandledErr;
- 
-    UInt32 whatHappened;
-    WindowDefPartCode where;
- 
-    GrafPtr thePort;
-    Rect windBounds;
- 
-    whatHappened = GetEventKind (theEvent);
-  	GNASH_REPORT_FUNCTION; 
-    switch (whatHappened)
-    {
-        case kEventWindowInit:
- 
-            GetEventParameter (theEvent, kEventParamDirectObject,
-            					typeWindowRef, NULL, sizeof(WindowRef),
-           						NULL, &myWindow);
-           						
-            SetThemeWindowBackground (myWindow, kThemeBrushMovableModalBackground, true);	// 1
-            result = noErr;
-            break;
- 
-        case kEventWindowDrawFrame:	// 2
- 
-            GetPort(&thePort);		// 3
-            GetPortBounds(thePort, &windBounds);
-
-            PenNormal();			// 4
-            PenSize (10,10);
-            FrameRect(&windBounds);	// 5
- 
-            result = noErr;
-            break;
- 
-        case kEventWindowHitTest:	// 6
- 
-            /* determine what part of the window the user hit */
-            where = wInDrag;
-            SetEventParameter (theEvent, kEventParamWindowDefPart,	// 7
-                                typeWindowDefPartCode,
-                                sizeof(WindowDefPartCode), &where);
- 
-            result = noErr;
-            break;
-    }
- 
-    return (result);
-}
-
 namespace gnash {
 	
 AquaGui::AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth)
@@ -126,7 +65,7 @@ bool AquaGui::run()
 {
   	GNASH_REPORT_FUNCTION;
   	
-	RepositionWindow (myWindow, NULL, kWindowCascadeOnMainScreen);
+	RepositionWindow(myWindow, NULL, kWindowCascadeOnMainScreen);
     ShowWindow(myWindow);
     RunApplicationEventLoop();
     return true;
@@ -193,6 +132,7 @@ bool AquaGui::createWindow(const char* title, int width, int height)
 {
 	CFStringRef	windowTitle;
 	OSStatus	result;
+	Rect		theBounds;
 	
 	GNASH_REPORT_FUNCTION;
 
