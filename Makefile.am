@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.80 2007/07/20 01:50:31 rsavoye Exp $
+# $Id: Makefile.am,v 1.81 2007/07/24 22:32:33 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -227,3 +227,4 @@ check: check-recursive anal
 anal testreport checksum:
 	$(srcdir)/testsuite/anaylse-results.sh
 
+.PHONY : dumpconfig anal testreport checksum check mudflap mudflap-check snapshot deb debian rmp redhat

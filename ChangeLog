@@ -1,5 +1,9 @@
 2007-07-24 Sandro Santilli <strk@keybit.net>
 
+	* Makefile.am: define PHONY rules.
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
 	* server/edit_text_character.cpp: add a
 	  PP_COMPATIBLE_DEVICE_FONT_HANDLING macro to mimic
 	  limitation of proprietary player in handling textfields
