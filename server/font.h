@@ -128,6 +128,29 @@ inline bool operator < (const kerning_pair& p1, const kerning_pair& p2)
 	}
 }
 
+/// Glyph info structure
+struct GlyphInfo
+{
+	// no glyph, default textured glyph, 0 advance
+	GlyphInfo();
+
+	// given glyph and advance, default textured glyph
+	GlyphInfo(boost::intrusive_ptr<shape_character_def> nGlyph, float nAdvance);
+
+	GlyphInfo(const GlyphInfo&);
+
+#ifdef GNASH_USE_GC
+	/// Mark any glyph and texture glyph resources as reachable
+	void markReachableResources() const;
+#endif
+
+	boost::intrusive_ptr<shape_character_def> glyph;
+
+	texture_glyph textureGlyph;
+
+	float advance;
+};
+
 /// \brief
 /// A 'font' definition as read from SWF::DefineFont,
 /// SWF::DefineFont2 or SWF::DefineFont3 tags.
@@ -148,6 +171,7 @@ public:
 
 	void testInvariant()
 	{
+#if 0
 		assert(m_texture_glyphs.size() == m_glyphs.size());
 #ifndef NDEBUG
 		if (m_texture_glyphs.size() != m_advance_table.size())
@@ -159,28 +183,36 @@ public:
 			abort();
 		}
 #endif
+#endif
 	}
 
-	/// Get number of glyphs defined for this font
+	/// Get number of embedded glyphs defined for this font
 	//
-	/// NOTE: for device fonts, this method will returns whatever
-	///       number of glyphs the cache happens to have at time of
-	///	  calls. Anyway, the cache will grow if any font user
-	///	  requests more glyphs... 
-	///	  
 	/// Callers of this function are:
 	///
 	///	- fontlib, for writing cache data (known to be not working anyway).
 	///	- edit_text_character, for validating the font (obsoleted too).
 	///
-	int	get_glyph_count() const
+	int	getEmbedGlyphCount() const
 	{
-		log_error("FIXME: font::get_glyph_count() is a deprecated method");
-		return m_glyphs.size();
+		return _embedGlyphTable.size();
 	}
 
-	/// Get glyph by index. Return NULL if out of range
-	shape_character_def*	get_glyph(int glyph_index) const;
+	/// Get glyph by index.
+	//
+	/// @param glyph_index
+	///	Index of the glyph. See get_glyph_index() to obtain by character code.
+	///
+	/// @param embedded
+	///	If true, queries the 'embedded' glyphs table, 
+	///	otherwise, looks in the 'device' font table.
+	///
+	/// @return
+	///	The glyph outline, or NULL if out of range.
+	///	(would be a programming error most likely)
+	///
+	///
+	shape_character_def*	get_glyph(int glyph_index, bool embedded) const;
 
 	/// Read a DefineFont or DefineFont2 tag from an SWF stream 
 	//
@@ -207,7 +239,7 @@ public:
 	/// Read our cached data from the given stream.
 	void	input_cached_data(tu_file* in);
 
-	/// Delete all our texture glyph info.
+	/// Delete all our texture glyph info (both embedded and device)
 	void	wipe_texture_glyphs();
 
 	/// Get name of this font. Warning: can be NULL.
@@ -221,37 +253,88 @@ public:
 	/// corresponding to the given glyph_index, if we
 	/// have one.  Otherwise return a "dummy" texture_glyph.
 	//
+	/// @param glyph_index
+	///	Index of the glyph. See get_glyph_index() to obtain by character code.
+	///
+	/// @param embedded
+	///	If true, queries the 'embedded' glyphs table, 
+	///	otherwise, looks in the 'device' font table.
+	///
 	/// Note: the "dummy" texture_glyph is a default-constructed
 	/// texture_glyph.
 	///
-	const texture_glyph&	get_texture_glyph(int glyph_index) const;
+	const texture_glyph& get_texture_glyph(int glyph_index, bool embedded) const;
 
 	/// \brief
 	/// Register some texture info for the glyph at the specified
 	/// index.  The texture_glyph can be used later to render the
 	/// glyph.
 	//
+	/// @param glyph_index
+	///	Index of the glyph. See get_glyph_index() to obtain by character code.
+	///
+	/// @param glyph
+	///	The textured glyph.
+	///
+	/// @param embedded
+	///	If true, queries the 'embedded' glyphs table, 
+	///	otherwise, looks in the 'device' font table.
+	///
 	/// TODO: deprecate this, probably only used by the caching mechanism
 	///
-	void	add_texture_glyph(int glyph_index, const texture_glyph& glyph);
+	void	add_texture_glyph(int glyph_index, const texture_glyph& glyph, bool embedded);
 
 	void	set_texture_glyph_nominal_size(int size) { m_texture_glyph_nominal_size = imax(1, size); }
 	int	get_texture_glyph_nominal_size() const { return m_texture_glyph_nominal_size; }
 
-	int	get_glyph_index(uint16_t code) const;
-	float	get_advance(int glyph_index) const;
+	/// Return the glyph index for a given character code
+	//
+	/// @param code
+	///	Character code to fetch the corresponding glyph index of.
+	///
+	/// @param embedded
+	///	If true, queries the 'embedded' glyphs table, 
+	///	otherwise, looks in the 'device' font table.
+	///
+	/// Note, when querying device fonts, glyphs are created on demand,
+	/// this never happens for embedded fonts, in which case an unexistent
+	/// glyph results in a return of -1
+	///
+	/// @return -1 if there is no glyph for the specified code or a valid
+	///         positive index to use in subsequent calls to other glyph-index-based
+	///	    methods.
+	///
+	int	get_glyph_index(uint16_t code, bool embedded) const;
+
+	/// Return the advance value for the given glyph index
+	//
+	/// @param glyph_index
+	///	Index of the glyph. See get_glyph_index() to obtain by character code.
+	///
+	/// @param embedded
+	///	If true, queries the 'embedded' glyphs table, 
+	///	otherwise, looks in the 'device' font table.
+	///
+	float	get_advance(int glyph_index, bool embedded) const;
 
 	/// \brief
 	/// Return the adjustment in advance between the given two
-	/// characters. 
+	/// characters (makes sense for embedded glyphs only)
 	//
 	/// Normally this will be 0
 	///
+	/// NOTE: don't call this method when willing to work with device
+	///       fonts, or you'll end up mixing information from device fonts
+	///	  with information from embedded fonts.
+	///
 	float	get_kerning_adjustment(int last_code, int this_code) const;
+
 	float	get_leading() const { return m_leading; }
 	float	get_descent() const { return m_descent; }
 
 private:
+
+	/// Read the table that maps from glyph indices to character codes.
 	void	read_code_table(stream* in);
 
 	/// Read a DefineFont2 or DefineFont3 tag
@@ -260,7 +343,7 @@ private:
 	/// Read a DefineFont tag
 	void readDefineFont(stream* in, movie_definition* m);
 
-	/// Add a glyph from the os font.
+	/// Add a glyph from the os font into the device glyphs table
 	//
 	/// It is assumed that the glyph tables do NOT contain
 	/// an entry for the given code.
@@ -275,11 +358,13 @@ private:
 	/// Return true on success, false on error
 	bool initDeviceFontProvider();
 
-	typedef std::vector< boost::intrusive_ptr<shape_character_def> > GlyphVect;
-	GlyphVect m_glyphs;
+	typedef std::vector< GlyphInfo > GlyphInfoVect;
 
-	typedef std::vector< texture_glyph > TextureGlyphVect;
-	TextureGlyphVect m_texture_glyphs;	// cached info, built by gnash_fontlib.
+	// Embedded glyphs
+	GlyphInfoVect _embedGlyphTable;
+
+	// Device glyphs
+	GlyphInfoVect _deviceGlyphTable;
 
 	int	m_texture_glyph_nominal_size;
 
@@ -296,13 +381,18 @@ private:
 
 	// This table maps from Unicode character number to glyph index.
 	typedef std::map<uint16_t, int> code_table;
-	code_table m_code_table; 
+
+	/// Code to index table for embedded glyphs
+	code_table _embedded_code_table; 
+
+	/// Code to index table for device glyphs
+	code_table _device_code_table; 
 
 	// Layout stuff.
 	float	m_ascent;
 	float	m_descent;
 	float	m_leading;
-	std::vector<float>	m_advance_table;
+	//std::vector<float>	m_advance_table;
 
 	typedef std::map<kerning_pair, float> kernings_table;
 	kernings_table m_kerning_pairs;

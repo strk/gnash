@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.32 2007/07/13 16:05:08 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.33 2007/07/24 19:43:30 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -231,6 +231,9 @@ namespace {
 
 	void	finish_current_texture(movie_definition* owner)
 	{
+
+		bool embed=true; // use embedded fonts
+
 		if (s_pending_glyphs.size() == 0)
 		{
 			return;
@@ -297,7 +300,7 @@ namespace {
 			assert(pgi->m_source_font != NULL);
 
 			pgi->m_texture_glyph.set_bitmap_info(bi.get());
-			pgi->m_source_font->add_texture_glyph(pgi->m_glyph_index, pgi->m_texture_glyph);
+			pgi->m_source_font->add_texture_glyph(pgi->m_glyph_index, pgi->m_texture_glyph, embed);
 			//s_pending_glyphs[i]->set_bitmap_info(bi.get());
 			}
 		}
@@ -658,6 +661,8 @@ namespace {
 	// fonts that use the same dummy glyph for many undefined
 	// characters.
 	{
+		bool embed=true; // use embedded fonts
+
 		const map<unsigned int, const rendered_glyph_info*>::const_iterator image =
 			image_hash.find(rgi.m_image_hash);
 
@@ -678,7 +683,7 @@ namespace {
 				texture_glyph	identical_tg =
 					identical_image->
 					m_source_font->
-					get_texture_glyph(identical_image->m_glyph_index);
+					get_texture_glyph(identical_image->m_glyph_index, embed); 
 
 				if (identical_tg.is_renderable() == false)
 				{
@@ -720,7 +725,7 @@ namespace {
 				{
 					// This image is already packed and has a valid bitmap_info.
 					// Push straight into our font.
-					rgi.m_source_font->add_texture_glyph(rgi.m_glyph_index, tg);
+					rgi.m_source_font->add_texture_glyph(rgi.m_glyph_index, tg, embed); // embed font only
 				}
 				else
 				{
@@ -904,13 +909,15 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 	{
 		assert(f);
 
+		bool embed=true; // use embedded fonts
+
 		f->set_texture_glyph_nominal_size(s_glyph_nominal_size);
 
-		for (int i = 0, n = f->get_glyph_count(); i < n; i++)
+		for (int i = 0, n = f->getEmbedGlyphCount(); i < n; i++)
 		{
-			if (f->get_texture_glyph(i).is_renderable() == false)
+			if (f->get_texture_glyph(i, embed).is_renderable() == false) 
 			{
-				shape_character_def*	sh = f->get_glyph(i);
+				shape_character_def*	sh = f->get_glyph(i, embed); 
 				if (sh)
 				{
 					rect	glyph_bounds;
@@ -1014,6 +1021,8 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 	{
 		assert(out);
 
+		bool embed=true; // use embedded glyphs
+
 		// skip number of bitmaps.
 		int	bitmaps_used_base = owner->get_bitmap_info_count();
 		int	size_pos = out->get_position();
@@ -1050,7 +1059,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 			out->write_le16(nominal_glyph_size);
 
 			// skip number of glyphs.
-			int ng = fonts[f]->get_glyph_count();
+			int ng = fonts[f]->getEmbedGlyphCount();
 			int ng_position = out->get_position();
 			out->write_le32(0);
 			
@@ -1059,7 +1068,7 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 			// save texture glyphs:
 			for (int g = 0; g < ng; g++)
 			{
-				const texture_glyph& tg = fonts[f]->get_texture_glyph(g);
+				const texture_glyph& tg = fonts[f]->get_texture_glyph(g, embed);
 				if (tg.is_renderable())
 				{
 					// save glyph index.
@@ -1113,6 +1122,8 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 	void	input_cached_data(tu_file* in, const std::vector<font*>& fonts, movie_definition* owner)
 	// Load a stream containing previously-saved font glyph textures.
 	{
+		bool embed=true; // use embedded glyphs
+
 		// load number of bitmaps.
 		int nb = in->read_le16();
 
@@ -1220,17 +1231,17 @@ static void	generate_font_bitmaps(std::vector<rendered_glyph_info>& glyph_info, 
 				tg.m_uv_origin.m_x = in->read_float32();
 				tg.m_uv_origin.m_y = in->read_float32();
 
-				if (glyph_index < 0 || glyph_index >= fnt->get_glyph_count())
+				if (glyph_index < 0 || glyph_index >= fnt->getEmbedGlyphCount())
 				{
 					// Cached data doesn't match this font!
 					log_error("invalid glyph index %d in cached font data, limit is %d, font is '%s'\n",
 						  glyph_index,
-						  fnt->get_glyph_count(),
+						  fnt->getEmbedGlyphCount(),
 						  fnt->get_name().c_str());
 				}
 				else
 				{
-					fnt->add_texture_glyph(glyph_index, tg);
+					fnt->add_texture_glyph(glyph_index, tg, embed);
 				}
 			}
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.33 2007/07/11 16:52:47 strk Exp $ */
+/* $Id: text.cpp,v 1.34 2007/07/24 19:43:30 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -74,7 +74,7 @@ namespace gnash {
 		character* inst,
 		const std::vector<text_glyph_record>& records,
 		// root_def was used to resove fonts, now done at parse time
-		movie_definition* /*root_def*/)
+		movie_definition* /*root_def*/, bool useEmbeddedGlyphs)
 	{
 		//GNASH_REPORT_FUNCTION;
 		
@@ -181,8 +181,8 @@ log_error(_("invalid glyph, render as an empty box"));
 				}
 				else
 				{
-					const texture_glyph&	tg = fnt->get_texture_glyph(index);
-					shape_character_def*	glyph = fnt->get_glyph(index);
+					const texture_glyph&	tg = fnt->get_texture_glyph(index, useEmbeddedGlyphs);
+					shape_character_def*	glyph = fnt->get_glyph(index, useEmbeddedGlyphs);
 
 					if (tg.is_renderable()
 					    && (use_glyph_textures || glyph == NULL))

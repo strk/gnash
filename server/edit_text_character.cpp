@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.90 2007/07/24 17:41:34 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.91 2007/07/24 19:43:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -389,7 +389,7 @@ edit_text_character::edit_text_character(character* parent,
 	_drawBorder(m_def->has_border()),
 	_borderColor(0,0,0,255),
 	_textColor(m_def->get_text_color()),
-	_embedFont(m_def->getUseEmbeddedGlyphs())
+	_embedFonts(m_def->getUseEmbeddedGlyphs())
 {
 	assert(parent);
 	assert(m_def);
@@ -491,7 +491,7 @@ edit_text_character::display()
 	
 	
 	display_glyph_records(m, this, m_text_glyph_records,
-			      m_def->get_root_def());
+			      m_def->get_root_def(), _embedFonts);
 
 	if (m_has_focus)
 	{
@@ -944,7 +944,7 @@ edit_text_character::format_text()
 	float	leading = m_def->get_leading();
 	leading += _font->get_leading() * scale;
 
-	int	last_code = -1;
+	int	last_code = -1; // only used if _embedFonts
 	int	last_space_glyph = -1;
 	int	last_line_start_record = 0;
 
@@ -968,8 +968,11 @@ edit_text_character::format_text()
 
 		//uint16_t	code = m_text[j];
 
-		x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
-		last_code = static_cast<int>(code);
+		if ( _embedFonts )
+		{
+			x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
+			last_code = static_cast<int>(code);
+		}
 
 		// Expand the bounding-box to the lower-right corner of each glyph as
 		// we generate it.
@@ -1060,7 +1063,7 @@ edit_text_character::format_text()
 
 		if (code == 9) // tab (ASCII HT)
 		{
-			int index = _font->get_glyph_index(32); // ascii SPACE
+			int index = _font->get_glyph_index(32, _embedFonts); // ascii SPACE
 			if ( index == -1 )
 			{
 				IF_VERBOSE_MALFORMED_SWF (
@@ -1075,7 +1078,7 @@ edit_text_character::format_text()
 			{
 				text_glyph_record::glyph_entry	ge;
 				ge.m_glyph_index = index;
-				ge.m_glyph_advance = scale * _font->get_advance(index);
+				ge.m_glyph_advance = scale * _font->get_advance(index, _embedFonts);
 
 				const int tabstop=8;
 				rec.m_glyphs.insert(rec.m_glyphs.end(), tabstop, ge);
@@ -1092,7 +1095,8 @@ edit_text_character::format_text()
 
 		{ // need a sub-scope to avoid the 'goto' in TAB handling to cross
 		  // initialization of the 'index' variable
-		int index = _font->get_glyph_index((uint16_t) code);
+		int index = _font->get_glyph_index((uint16_t) code, _embedFonts);
+
 		IF_VERBOSE_MALFORMED_SWF (
 		    if (index == -1)
 		    {
@@ -1103,22 +1107,34 @@ edit_text_character::format_text()
 			    if (s_log_count < 10)
 			    {
 				    s_log_count++;
-				    log_swferror(_("%s -- missing glyph for char %d. "
+		
+					if ( _embedFonts )
+					{
+				    log_swferror(_("%s -- missing embedded glyph for char %d. "
 						" Make sure character shapes for font %s are being exported "
 						"into your SWF file"),
 						__PRETTY_FUNCTION__,
 						code,
-						_font->get_name().c_str()
-				    );
+						_font->get_name().c_str());
+					}
+					else
+					{
+				    log_swferror(_("%s -- missing device glyph for char %d. "
+						" Maybe you don't have font '%s' installed in your system?"),
+						__PRETTY_FUNCTION__,
+						code,
+						_font->get_name().c_str());
+					}
 			    }
 
 			    // Drop through and use index == -1; this will display
 			    // using the empty-box glyph
 		    }
-		);
+		); // IF_VERBOSE_MALFORMED_SWF
+
 		text_glyph_record::glyph_entry	ge;
 		ge.m_glyph_index = index;
-		ge.m_glyph_advance = scale * _font->get_advance(index);
+		ge.m_glyph_advance = scale * _font->get_advance(index, _embedFonts);
 
 		rec.m_glyphs.push_back(ge);
 
@@ -1435,11 +1451,11 @@ edit_text_character::setTextColor(const rgba& col)
 void
 edit_text_character::setEmbedFonts(bool use)
 {
-	if ( _embedFont != use )
+	if ( _embedFonts != use )
 	{
 		set_invalidated();
 		format_text();
-		_embedFont=use;
+		_embedFonts=use;
 	}
 }
 

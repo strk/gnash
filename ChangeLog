@@ -1,5 +1,22 @@
 2007-07-24 Sandro Santilli <strk@keybit.net>
 
+	* server/font.{cpp,h}: Refactor class definition
+	  to maintain two separate glyph information sets:
+	  one for device and one for embedded glyphs. Added
+	  a parameter to glyph-related accessors and mutators
+	  to specify which set to use.
+	* server/edit_text_character.{cpp,h}: update gnash::font
+	  services call to select embedded or device fonts.
+	* server/fontlib.cpp: updated calls to gnash::font so
+	  to always use embedded ones (mostly caching stuff, which
+	  is currently disabled)
+	* server/text.{cpp,h}: add a boolean parameter to
+	  display_glyph_records to specify wheter to use embedded
+	  or device glyphs when fetching them from the font.
+	* server/parser/text_character_def.cpp: use embedded glyphs.
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/edit_text_character_def.h:
 	  initialize m_use_outlines to true (so dynamically-created
 	  textfields will use device fonts by default), provide

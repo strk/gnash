@@ -148,7 +148,7 @@ public:
 	/// Return true if this TextField should use embedded font glyphs,
 	/// false if it should use device font glyphs
 	bool getEmbedFonts() const {
-		return _embedFont;
+		return _embedFonts;
 	}
 
 	/// \brief
@@ -263,7 +263,7 @@ private:
 
 	rgba _textColor;
 
-	bool _embedFont;
+	bool _embedFonts;
 
 protected:
 

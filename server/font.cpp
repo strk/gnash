@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.44 2007/07/24 15:40:53 strk Exp $ */
+/* $Id: font.cpp,v 1.45 2007/07/24 19:43:30 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -33,6 +33,37 @@
 #include <utility> // for std::make_pair
 
 namespace gnash {
+
+GlyphInfo::GlyphInfo()
+	:
+	glyph(),
+	textureGlyph(),
+	advance(0)
+{}
+
+GlyphInfo::GlyphInfo(boost::intrusive_ptr<shape_character_def> nGlyph, float nAdvance)
+	:
+	glyph(nGlyph.get()),
+	textureGlyph(),
+	advance(nAdvance)
+{}
+
+GlyphInfo::GlyphInfo(const GlyphInfo& o)
+	:
+	glyph(o.glyph.get()),
+	textureGlyph(o.textureGlyph),
+	advance(o.advance)
+{}
+
+#ifdef GNASH_USE_GC
+void
+GlyphInfo::markReachableResources() const
+{
+	textureGlyph.markReachableResources();
+	if ( glyph ) glyph->setReachable();
+}
+#endif
+
 	font::font()
 		:
 		m_texture_glyph_nominal_size(96),	// Default is not important; gets overridden during glyph generation
@@ -75,62 +106,65 @@ namespace gnash {
 
 	font::~font()
 	{
-		m_glyphs.resize(0); // there's no need for this !
+		//m_glyphs.resize(0); // there's no need for this !
 	}
 
-	shape_character_def*	font::get_glyph(int index) const
+	shape_character_def*	font::get_glyph(int index, bool embedded) const
 	{
-		if (index >= 0 && index < (int) m_glyphs.size())
+		const GlyphInfoVect& lookup = embedded ? _embedGlyphTable : _deviceGlyphTable;
+
+		if (index >= 0 && (size_t)index < lookup.size())
 		{
-			return m_glyphs[index].get();
+			return lookup[index].glyph.get();
 		}
 		else
 		{
+			// TODO: should we log an error here ?
 			return NULL;
 		}
 	}
 
 
-	const texture_glyph&	font::get_texture_glyph(int glyph_index) const
-	// Return a pointer to a texture_glyph struct corresponding to
-	// the given glyph_index, if we have one.  
-	// Otherwise return a "dummy" texture_glyph.
+	const texture_glyph&	font::get_texture_glyph(int glyph_index, bool embedded) const
 	{
-		if (glyph_index < 0 || glyph_index >= (int) m_texture_glyphs.size())
+		const GlyphInfoVect& lookup = embedded ? _embedGlyphTable : _deviceGlyphTable;
+
+		if (glyph_index < 0 || (size_t)glyph_index >= lookup.size())
 		{
+			// TODO: should we log an error here ?
 			static const texture_glyph	s_dummy_texture_glyph;
 			return s_dummy_texture_glyph;
 		}
 
-		return m_texture_glyphs[glyph_index];
+		return lookup[glyph_index].textureGlyph;
 	}
 
 
-	void	font::add_texture_glyph(int glyph_index, const texture_glyph& glyph)
-	// Register some texture info for the glyph at the specified
-	// index.  The texture_glyph can be used later to render the
-	// glyph.
+	void	font::add_texture_glyph(int glyph_index, const texture_glyph& glyph, bool embedded)
 	{
-		assert(glyph_index >= 0 && glyph_index < (int) m_glyphs.size());
-		assert(m_texture_glyphs.size() == m_glyphs.size());
+		GlyphInfoVect& lookup = embedded ? _embedGlyphTable : _deviceGlyphTable;
+
+		assert(glyph_index >= 0 && (size_t)glyph_index < lookup.size());
 		assert(glyph.is_renderable());
 
-		assert(m_texture_glyphs[glyph_index].is_renderable() == false);
+		assert(lookup[glyph_index].textureGlyph.is_renderable() == false);
 
-		m_texture_glyphs[glyph_index] = glyph;
+		lookup[glyph_index].textureGlyph = glyph;
 	}
 
 
 	void	font::wipe_texture_glyphs()
-	// Delete all our texture glyph info.
 	{
-		assert(m_texture_glyphs.size() == m_glyphs.size());
 
 		// Replace with default (empty) glyph info.
 		texture_glyph	default_tg;
-		for (int i = 0, n = m_texture_glyphs.size(); i < n; i++)
+		for (size_t i = 0, n = _embedGlyphTable.size(); i < n; i++)
 		{
-			m_texture_glyphs[i] = default_tg;
+			_embedGlyphTable[i].textureGlyph = default_tg;
+		}
+		for (size_t i = 0, n = _deviceGlyphTable.size(); i < n; i++)
+		{
+			_deviceGlyphTable[i].textureGlyph = default_tg;
 		}
 	}
 
@@ -186,10 +220,7 @@ namespace gnash {
 			);
 		}
 
-		// TODO: use a structure to hold all of these ?
-		m_glyphs.resize(count);
-		m_texture_glyphs.resize(count);
-		m_advance_table.resize(count);
+		_embedGlyphTable.resize(count);
 
 		if (m->get_create_font_shapes() == DO_LOAD_FONT_SHAPES)
 		{
@@ -208,7 +239,7 @@ namespace gnash {
 				shape_character_def* s = new shape_character_def;
 				s->read(in, SWF::DEFINEFONT, false, m); 
 
-				m_glyphs[i] = s;
+				_embedGlyphTable[i].glyph = s;
 			}}
 		}
 	}
@@ -291,10 +322,7 @@ namespace gnash {
 			font_code_offset = in->read_u16();
 		}
 
-		// TODO: use a structure to hold all of these ?
-		m_glyphs.resize(glyph_count);
-		m_texture_glyphs.resize(glyph_count);
-		m_advance_table.resize(glyph_count);
+		_embedGlyphTable.resize(glyph_count);
 
 		if (m->get_create_font_shapes() == DO_LOAD_FONT_SHAPES)
 		{
@@ -317,7 +345,7 @@ namespace gnash {
 				shape_character_def* s = new shape_character_def;
 				s->read(in, SWF::DEFINEFONT2, false, m); // .. or DEFINEFONT3 actually..
 
-				m_glyphs[i] = s;
+				_embedGlyphTable[i].glyph = s;
 			}}
 
 			unsigned long current_position = in->get_position();
@@ -353,15 +381,15 @@ namespace gnash {
 			m_leading = (float) in->read_s16();
 			
 			// Advance table; i.e. how wide each character is.
-			for (int i = 0, n = m_advance_table.size(); i < n; i++)
+			for (int i = 0, n = _embedGlyphTable.size(); i < n; i++)
 			{
-				m_advance_table[i] = (float) in->read_s16();
+				_embedGlyphTable[i].advance = (float) in->read_s16();
 			}
 
 			// Bounds table.
 			//m_bounds_table.resize(m_glyphs.size());	// kill
 			rect	dummy_rect;
-			{for (int i = 0, n = m_glyphs.size(); i < n; i++)
+			{for (size_t i = 0, n = _embedGlyphTable.size(); i < n; i++)
 			{
 				//m_bounds_table[i].read(in);	// kill
 				dummy_rect.read(in);
@@ -450,42 +478,40 @@ namespace gnash {
 	}
 
 	void	font::read_code_table(stream* in)
-	// Read the table that maps from glyph indices to character
-	// codes.
 	{
 		IF_VERBOSE_PARSE (
 		log_parse(_("reading code table at offset %lu"), in->get_position());
 		);
 
-		assert(m_code_table.empty());
+		assert(_embedded_code_table.empty());
 
 		if (m_wide_codes)
 		{
 			// Code table is made of uint16_t's.
-			for (int i=0, n=m_glyphs.size(); i<n; ++i)
+			for (size_t i=0, n=_embedGlyphTable.size(); i<n; ++i)
 			{
 				uint16_t code = in->read_u16();
-				//m_code_table.add(code, i);
-				m_code_table.insert(std::make_pair(code, i));
+				_embedded_code_table.insert(std::make_pair(code, i));
 			}
 		}
 		else
 		{
 			// Code table is made of bytes.
-			for (int i=0, n=m_glyphs.size(); i<n; ++i)
+			for (int i=0, n=_embedGlyphTable.size(); i<n; ++i)
 			{
 				uint8_t code = in->read_u8();
-				//m_code_table.add(code, i);
-				m_code_table.insert(std::make_pair(code, i));
+				_embedded_code_table.insert(std::make_pair(code, i));
 			}
 		}
 	}
 
-	int	font::get_glyph_index(uint16_t code) const
+	int	font::get_glyph_index(uint16_t code, bool embedded) const
 	{
+		const code_table& ctable = embedded ? _embedded_code_table : _device_code_table;
+
 		int glyph_index = -1;
-		code_table::const_iterator it = m_code_table.find(code);
-		if ( it != m_code_table.end() )
+		code_table::const_iterator it = ctable.find(code);
+		if ( it != ctable.end() )
 		{
 			glyph_index = it->second;
 #if 0
@@ -496,7 +522,7 @@ namespace gnash {
 		}
 
 		// Try adding an os font, of possible
-		if ( _ftProvider.get() )
+		if ( ! embedded && _ftProvider.get() )
 		{
 			glyph_index = const_cast<font*>(this)->add_os_glyph(code);
 		}
@@ -506,32 +532,20 @@ namespace gnash {
 		return glyph_index;
 	}
 
-	float	font::get_advance(int glyph_index) const
+	float	font::get_advance(int glyph_index, bool embedded) const
 	{
-		if (glyph_index == -1)
+		const GlyphInfoVect& lookup = embedded ? _embedGlyphTable : _deviceGlyphTable;
+
+		if (glyph_index <= -1)
 		{
 			// Default advance.
 			return 512.0f;
 		}
 
-		if (m_advance_table.size() == 0)
-		{
-			// No layout info for this font!!!
-			static bool	s_logged = false;
-			if (s_logged == false)
-			{
-				s_logged = true;
-				IF_VERBOSE_MALFORMED_SWF(
-				log_swferror(_("empty advance table in font %s"), get_name().c_str());
-				);
-			}
-			return 0;
-		}
-
-		if (glyph_index < (int) m_advance_table.size())
+		if ((size_t)glyph_index < lookup.size())
 		{
 			assert(glyph_index >= 0);
-			return m_advance_table[glyph_index];
+			return lookup[glyph_index].advance;
 		}
 		else
 		{
@@ -607,7 +621,7 @@ namespace gnash {
 	font::add_os_glyph(uint16_t code)
 	{
 		assert ( _ftProvider.get() );
-		assert(m_code_table.find(code) == m_code_table.end());
+		assert(_device_code_table.find(code) == _device_code_table.end());
 
 		float advance;
 
@@ -624,19 +638,12 @@ namespace gnash {
 		}
 
 		// Find new glyph offset
-		int newOffset = m_texture_glyphs.size();
+		int newOffset = _deviceGlyphTable.size();
 
 		// Add the new glyph id
-		m_code_table[code] = newOffset;
+		_device_code_table[code] = newOffset;
 
-		// Add advance info
-		m_advance_table.push_back(advance);
-
-		// Add dummy textured glyph
-		m_texture_glyphs.push_back(texture_glyph());
-
-		// Add vector glyph
-		m_glyphs.push_back(sh);
+		_deviceGlyphTable.push_back(GlyphInfo(sh, advance));
 
 		testInvariant();
 
@@ -670,16 +677,16 @@ namespace gnash {
 void
 font::markReachableResources() const
 {
-	// Mark textured glyphs
-	for (TextureGlyphVect::const_iterator i=m_texture_glyphs.begin(), e=m_texture_glyphs.end(); i!=e; ++i)
+	// Mark embed glyphs (textured and vector)
+	for (GlyphInfoVect::const_iterator i=_embedGlyphTable.begin(), e=_embedGlyphTable.end(); i!=e; ++i)
 	{
 		i->markReachableResources();
 	}
 
-	// Mark vector glyphs
-	for (GlyphVect::const_iterator i=m_glyphs.begin(), e=m_glyphs.end(); i!=e; ++i)
+	// Mark device glyphs (textured and vector)
+	for (GlyphInfoVect::const_iterator i=_deviceGlyphTable.begin(), e=_deviceGlyphTable.end(); i!=e; ++i)
 	{
-		(*i)->setReachable();
+		i->markReachableResources();
 	}
 
 }

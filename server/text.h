@@ -84,11 +84,16 @@ namespace gnash {
 	};
 
 	/// Render the given glyph records.
+	//
+	/// @param useEmbeddedGlyphs
+	///	If true, the font will be queried for embedded glyphs.
+	///	Otherwise, the font will be queried for device fonts.
+	///
 	void display_glyph_records(
 		const matrix& this_mat,
 		character* inst,
 		const std::vector<text_glyph_record>& records,
-		movie_definition* root_def);
+		movie_definition* root_def, bool useEmbeddedGlyphs);
 
 } // namespace gnash
 

@@ -148,8 +148,11 @@ void text_character_def::read(stream* in, int tag_type,
 void text_character_def::display(character* inst)
 {
 //	GNASH_REPORT_FUNCTION;
+
+	bool useEmbeddedGlyphs = true;
+
 	display_glyph_records(m_matrix, inst,
-		m_text_glyph_records, m_root_def);
+		m_text_glyph_records, m_root_def, useEmbeddedGlyphs); 
 }
 
 }	// end namespace gnash
