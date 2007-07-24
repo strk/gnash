@@ -253,9 +253,9 @@ key_as_object *
 movie_root::notify_global_key(key::code k, bool down)
 {
 	VM& vm = VM::get();
-	if ( vm.getSWFVersion() < 6 )
+	if ( vm.getSWFVersion() < 5 )
 	{
-		// _global.Key was added in SWF6
+		// Key was added in SWF5
 		return NULL; 
 	}
 
