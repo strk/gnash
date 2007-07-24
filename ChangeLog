@@ -1,5 +1,8 @@
 2007-07-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/: DefineEditTextTest.c,
+	  DefineEditTextTest-Runner.cpp: a small additional
+	  test for runtime-changing the .embedFont member of a TextField.
 	* testsuite/actionscript.all/TextField.as: more tests
 	  for embedFont member.
 

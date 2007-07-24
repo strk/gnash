@@ -157,6 +157,9 @@ main(int argc, char** argv)
   }
   SWFMovie_nextFrame(mo); 
 
+  xcheck_equals(mo, "dtext1.embedFonts", "false");
+  xcheck_equals(mo, "etext1.embedFonts", "true");
+
   check_equals(mo, "dtext1.__proto__", "TextField.prototype");
   // checks after placing some swf defined TextField
   check(mo, "TextField.prototype.hasOwnProperty('background')");
@@ -240,8 +243,18 @@ main(int argc, char** argv)
   check_equals(mo, "dtext1._alpha", "0");
   check_equals(mo, "etext1._alpha", "0");
   check_equals(mo, "dtext2._alpha", "0");
+  SWFMovie_nextFrame(mo); 
+
+  add_actions(mo, "dtext1._alpha = 100; dtext1.embedFonts=true; dtext1.text = 'embedFonts';"
+                  "etext1._alpha = 100; etext1.embedFonts=false; etext1.text = '!embedFonts';"
+                  "dtext2._alpha = 100;" );
+
+  check_equals(mo, "dtext1.embedFonts", "true");
+  check_equals(mo, "etext1.embedFonts", "false");
+
   add_actions(mo, "totals(); stop();");
   SWFMovie_nextFrame(mo); 
+
   /*****************************************************
    *
    * Output movie
