@@ -404,6 +404,9 @@ FreetypeGlyphsProvider::getGlyph(uint16_t code, float& advance)
 
 	// Scale advance by current scale, to match expected output coordinate space
 	advance = m_face->glyph->metrics.horiAdvance * scale;
+#ifdef GNASH_DEBUG_DEVICEFONTS 
+	log_debug("Advance value for glyph '%c' is %g (horiAdvance:%ld, scale:%g)", code, advance, m_face->glyph->metrics.horiAdvance, scale);
+#endif
 
 	assert(m_face->glyph->format == FT_GLYPH_FORMAT_OUTLINE);
 
