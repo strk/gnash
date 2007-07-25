@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.93 2007/07/24 21:58:43 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.94 2007/07/25 01:28:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -47,7 +47,14 @@
 // Define the following macro to maintain compatibility with the proprietary
 // player when it comes to opacity of textfields using device fonts.
 // See http://gnashdev.org/wiki/index.php/DeviceFonts#Differences_with_proprietary_player_implementation
-#define PP_COMPATIBLE_DEVICE_FONT_HANDLING 1
+//
+// This is now disabled by default because INCOMPLETE and unclean
+// A clean implementation (IMHO) would warn user about the fact
+// it is doing a stupid thing for compatibilty reason.
+// Also, for good compatibility, we should skip rendering
+// of rotated or skewed text.
+//
+//#define PP_COMPATIBLE_DEVICE_FONT_HANDLING 1
 
 namespace gnash {
 

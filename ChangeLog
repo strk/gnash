@@ -1,5 +1,9 @@
 2007-07-24 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp: make the
+	  PP_COMPATIBLE_DEVICE_FONT_HANDLING back to undefined
+	  by default. It's incomplete and premature to attempt
+	  limitation-level compatibility.
 	* configure.ac: don't take absence of libAGG as if an
 	  old version was found. Fixes bug #20011.
 
