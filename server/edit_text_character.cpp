@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.94 2007/07/25 01:28:43 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.95 2007/07/25 14:20:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -81,20 +81,6 @@ static as_value textfield_backgroundColor_getset(const fn_call& fn);
 static as_value textfield_borderColor_getset(const fn_call& fn);
 static as_value textfield_textColor_getset(const fn_call& fn);
 static as_value textfield_embedFonts_getset(const fn_call& fn);
-
-	namespace
-	{
-
-		void
-		lowercase_if_needed(std::string& str)
-		{
-			VM& vm = VM::get();
-			if ( vm.getSWFVersion() >= 7 ) return;
-			boost::to_lower(str, vm.getLocale());
-		}
-
-	}
-
 
 
 //
