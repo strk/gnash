@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.86 2007/07/23 13:49:43 strk Exp $
+# $Id: Makefile.am,v 1.87 2007/07/25 13:38:29 strk Exp $
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
@@ -75,6 +75,13 @@ AM_LDFLAGS =  \
 	$(NULL)
 
 GNASH_LIBS = \
+	$(top_builddir)/libamf/libgnashamf.la \
+	$(top_builddir)/backend/libgnashbackend.la \
+	$(top_builddir)/server/libgnashserver.la \
+	$(top_builddir)/libgeometry/libgnashgeo.la \
+	$(top_builddir)/libbase/libgnashbase.la
+
+KLASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
@@ -290,6 +297,7 @@ if   BUILD_SDL_GUI
 endif # BUILD_SDL_GUI
 if BUILD_KDE_GUI
      GNASH_LIBS += libgnashkde_gl.la $(KDE_LIBS) $(QT_LIBS) $(OPENGL_LIBS)
+     KLASH_LIBS += libgnashkde_gl.la $(KDE_LIBS) $(QT_LIBS) $(OPENGL_LIBS)
 endif # BUILD_KDE_GUI
 endif # BUILD_OPENGL_RENDERER
 
@@ -326,6 +334,7 @@ if  BUILD_FLTK_GUI
 endif # BUILD_FLTK_GUI
 if  BUILD_KDE_GUI
      GNASH_LIBS += libgnashkde_agg.la $(KDE_LIBS) $(QT_LIBS) $(AGG_LIBS)
+     KLASH_LIBS += libgnashkde_agg.la $(KDE_LIBS) $(QT_LIBS) $(AGG_LIBS)
 endif # BUILD_KDE_GUI
 if  BUILD_RISCOS_GUI
      GNASH_LIBS += libgnashriscos_agg.la $(RISCOS_LIBS) $(AGG_LIBS)
@@ -385,6 +394,20 @@ libgnashgui_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 bin_PROGRAMS = gnash
+
+if KLASH
+ bin_PROGRAMS += klash
+
+ klash_SOURCES = gnash.cpp
+ # export our symbols so they can be used by Gnash plugins
+ klash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+ klash_DEPENDENCIES = libgnashgui.la .configline
+ klash_LDADD = \
+	libgnashgui.la \
+	$(MYSQL_LIBS) \
+	$(KLASH_LIBS) \
+	$(AM_LDFLAGS)
+endif # KLASH
 
 gnash_SOURCES = gnash.cpp
 # export our symbols so they can be used by Gnash plugins

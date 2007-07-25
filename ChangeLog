@@ -1,5 +1,6 @@
 2007-07-25 Sandro Santilli <strk@keybit.net>
 
+	* gui/Makefile.am: build klash when conditinally enabled
 	* gui/gnash.cpp: add missing newline after Gstreamer version
 	  (--version).
 
