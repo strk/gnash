@@ -3,7 +3,8 @@
 	* server/as_value.h: remove unneeded "container.h" include.
 	* server/as_value.cpp (equalsSameType): fixed nan comparison.
 	* testsuite/actionscript.all/Number.as: fixed NaN != NaN test
-	  (should return false). Add NaN == NaN test (should return true)
+	  (should return false). Add NaN == NaN test (should return true);
+	  Add (0/2) == (0/5) (shoudl return true).
 
 2007-07-25 Sandro Santilli <strk@keybit.net>
 
