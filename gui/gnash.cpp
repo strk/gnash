@@ -176,7 +176,7 @@ static void build_options()
     printf(_("Ffmpeg version is: %s\n"), LIBAVCODEC_IDENT);
 #endif
 #ifdef HAVE_GST_GST_H
-    printf(_("Gstreamer version is: %d.%d.%d."), GST_VERSION_MAJOR,
+    printf(_("Gstreamer version is: %d.%d.%d.\n"), GST_VERSION_MAJOR,
            GST_VERSION_MINOR, GST_VERSION_MICRO);
 #endif
 }
