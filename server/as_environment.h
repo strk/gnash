@@ -130,6 +130,10 @@ public:
 	/// @param varname 
 	///	Variable name. Can contain path elements.
 	///	TODO: should be case-insensitive up to SWF6.
+	///	NOTE: no case conversion is performed currently,
+	///	      so make sure you do it yourself. Note that
+	///	      ActionExec performs the conversion
+	///	      before calling this method.
 	///
 	as_value get_variable(const std::string& varname) const;
 
@@ -140,6 +144,10 @@ public:
 	/// @param varname 
 	///	Variable name. Can not contain path elements.
 	///	TODO: should be case-insensitive up to SWF6.
+	///	NOTE: no case conversion is performed currently,
+	///	      so make sure you do it yourself. Note that
+	///	      ActionExec performs the conversion
+	///	      before calling this method.
 	///
 	/// @param scopeStack
 	///	The Scope stack to use for lookups.
@@ -152,6 +160,10 @@ public:
 	/// @param varname 
 	///	Variable name. Can contain path elements.
 	///	TODO: should be case-insensitive up to SWF6.
+	///	NOTE: no case conversion is performed currently,
+	///	      so make sure you do it yourself. Note that
+	///	      ActionExec performs the conversion
+	///	      before calling this method.
 	///
 	/// @param scopeStack
 	///	The Scope stack to use for lookups.
@@ -170,6 +182,10 @@ public:
 	/// @param path 
 	///	Variable path.
 	///	TODO: should be case-insensitive up to SWF6.
+	///	NOTE: no case conversion is performed currently,
+	///	      so make sure you do it yourself. Note that
+	///	      ActionExec performs the conversion
+	///	      before calling this method.
 	///
 	/// @param val
 	///	The value to assign to the variable, if found.
@@ -514,7 +530,8 @@ private:
 	//
 	/// @param varname 
 	///	Variable name. Can not contain path elements.
-	///	TODO: should be case-insensitive up to SWF6.
+	///	NOTE: no case conversion is performed currently,
+	///	      so make sure you do it yourself. 
 	///
 	as_value get_variable_raw(const std::string& varname) const;
 

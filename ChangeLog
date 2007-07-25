@@ -1,5 +1,7 @@
 2007-07-25 Sandro Santilli <strk@keybit.net>
 
+	* server/as_environment.h: added some notes about variable name
+	  case conversion.
 	* server/edit_text_character.cpp: removed unused lowercase_if_needed
 	  function.
 	* gui/Makefile.am: build klash when conditinally enabled
