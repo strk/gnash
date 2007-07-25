@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.59 2007/07/25 16:08:23 strk Exp $ */
+/* $Id: as_value.h,v 1.60 2007/07/25 16:27:55 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -24,7 +24,7 @@
 #include "config.h"
 #endif
 
-#include "container.h"
+//#include "container.h"
 #include "tu_config.h"
 #include "smart_ptr.h"
 

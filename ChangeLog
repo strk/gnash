@@ -1,5 +1,12 @@
 2007-07-25 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.h: remove unneeded "container.h" include.
+	* server/as_value.cpp (equalsSameType): fixed nan comparison.
+	* testsuite/actionscript.all/Number.as: fixed NaN != NaN test
+	  (should return false). Add NaN == NaN test (should return true)
+
+2007-07-25 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.cpp: drop lowercase_if_needed, substitute with
 	  the PROPNAME macro.
 	* server/as_value.h: add a PROPNAME macro to perform the lowercase

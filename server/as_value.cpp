@@ -777,7 +777,9 @@ as_value::equalsSameType(const as_value& v) const
 			double b = v.m_number_value;
 
 			// Nan != NaN
-			if ( isnan(a) || isnan(b) ) return false;
+			//if ( isnan(a) || isnan(b) ) return false;
+
+			if ( isnan(a) && isnan(b) ) return true;
 
 			// -0.0 == 0.0
 			if ( (a == -0 && b == 0) || (a == 0 && b == -0) ) return true;
