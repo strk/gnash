@@ -1,5 +1,7 @@
 2007-07-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: minor test for
+	  proper properties 'loadMovie' and 'loadMovieNum'.
 	* server/edit_text_character.cpp: make the
 	  PP_COMPATIBLE_DEVICE_FONT_HANDLING back to undefined
 	  by default. It's incomplete and premature to attempt
