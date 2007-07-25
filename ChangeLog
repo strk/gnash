@@ -1,5 +1,7 @@
 2007-07-25 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp: drop lowercase_if_needed, substitute with
+	  the PROPNAME macro.
 	* server/as_value.h: add a PROPNAME macro to perform the lowercase
 	  conversion of property names when needed (copies arg)
 	* server/as_environment.h: added some notes about variable name

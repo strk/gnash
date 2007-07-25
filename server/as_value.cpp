@@ -52,14 +52,6 @@ namespace gnash {
 // as_value -- ActionScript value type
 //
 
-static void
-lowercase_if_needed(std::string& str)
-{
-	VM& vm = VM::get();
-	if ( vm.getSWFVersion() >= 7 ) return;
-	boost::to_lower(str, vm.getLocale());
-}
-
 as_value::as_value(as_function* func)
     :
     m_type(AS_FUNCTION),
@@ -135,8 +127,7 @@ as_value::to_string(as_environment* env) const
 			bool gotValidToStringResult = false;
 			if ( env )
 			{
-				std::string methodname = "toString";
-				lowercase_if_needed(methodname);
+				std::string methodname = PROPNAME("toString"); 
 				as_value method;
 				if ( obj->get_member(methodname, &method) )
 				{
@@ -212,8 +203,7 @@ as_value::to_primitive(as_environment& env) const
 	if ( m_type == OBJECT || m_type == AS_FUNCTION )
 	{
 		as_object* obj = m_object_value;
-		std::string methodname = "valueOf";
-		lowercase_if_needed(methodname);
+		std::string methodname = PROPNAME("valueOf"); 
 		as_value method;
 		if ( obj->get_member(methodname, &method) )
 		{
@@ -292,8 +282,7 @@ as_value::to_number(as_environment* env) const
 			as_object* obj = m_object_value; 
 			if ( env )
 			{
-				std::string methodname = "valueOf";
-				lowercase_if_needed(methodname);
+				std::string methodname = PROPNAME("valueOf"); 
 				as_value method;
 				if ( obj->get_member(methodname, &method) )
 				{
