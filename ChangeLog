@@ -1,5 +1,9 @@
 2007-07-25 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: set the BUILD_<gui> conditionals *after* giving kde
+	  gui a chance to be picked back as a dependency of 'klash'.
+	  This fixes a buil bug when klash is enabled by only gtk gui is
+	  selected.
 	* lots of files : fixed Copyright info (delete spurious empty line,
 	  add year 2007).
 

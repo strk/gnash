@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.367 2007/07/24 22:55:26 strk Exp $
+dnl $Id: configure.ac,v 1.368 2007/07/26 04:05:50 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -593,15 +593,6 @@ else dnl building a dynamically linked executable without loadable GUI plugins
   fi
 fi
 
-AM_CONDITIONAL(BUILD_GTK_GUI, [ test x$build_gtk = xyes ])
-AM_CONDITIONAL(BUILD_KDE_GUI, [ test x$build_kde = xyes ])
-dnl AM_CONDITIONAL(BUILD_QT_GUI, [ test x$build_qt = xyes ])
-AM_CONDITIONAL(BUILD_FLTK_GUI, [ test x$build_fltk = xyes ])
-AM_CONDITIONAL(BUILD_SDL_GUI, [ test x$build_sdl = xyes ])
-AM_CONDITIONAL(BUILD_FB_GUI, [ test x$build_fb = xyes ])
-AM_CONDITIONAL(BUILD_AQUA_GUI, [ test x$build_aqua = xyes ])
-AM_CONDITIONAL(BUILD_RISCOS_GUI, [ test x$build_riscos = xyes ])
-
 AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes ])
 AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
 AM_CONDITIONAL(BUILD_CAIRO_RENDERER, [ test x$build_cairo = xyes ])
@@ -961,11 +952,22 @@ dnl # Check KDE if kde gui or klash were requested
 if test x$build_kde = xyes -o x$klash = xyes -o x$plugin = xno; then
   kde=yes
   qt=yes
+  build_kde=yes
   GNASH_PATH_KDE
   GNASH_PATH_QT
 fi
 AM_CONDITIONAL(HAVE_KDE, [test x$has_kde = xyes])
 AM_CONDITIONAL(HAVE_QT, [test x$has_qt = xyes])
+
+AM_CONDITIONAL(BUILD_GTK_GUI, [ test x$build_gtk = xyes ])
+AM_CONDITIONAL(BUILD_KDE_GUI, [ test x$build_kde = xyes ])
+dnl AM_CONDITIONAL(BUILD_QT_GUI, [ test x$build_qt = xyes ])
+AM_CONDITIONAL(BUILD_FLTK_GUI, [ test x$build_fltk = xyes ])
+AM_CONDITIONAL(BUILD_SDL_GUI, [ test x$build_sdl = xyes ])
+AM_CONDITIONAL(BUILD_FB_GUI, [ test x$build_fb = xyes ])
+AM_CONDITIONAL(BUILD_AQUA_GUI, [ test x$build_aqua = xyes ])
+AM_CONDITIONAL(BUILD_RISCOS_GUI, [ test x$build_riscos = xyes ])
+
 
 dnl # NO kde ? NO klash !
 if test x$has_kde != xyes; then
