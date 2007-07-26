@@ -5,7 +5,7 @@
 
 // A render_handler that uses SDL & OpenGL
 
-/* $Id: render_handler_ogl.cpp,v 1.75 2007/07/13 16:05:08 strk Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.76 2007/07/26 19:25:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -42,18 +42,6 @@
 #  define APIENTRY
 # endif
 #endif
-
-/*
-#if !defined(WIN32) || defined(GUI_GTK)
-# define GL_GLEXT_PROTOTYPES
-# include <GL/gl.h>
-# include <GL/glx.h>
-# include <GL/glu.h>
-# ifndef APIENTRY
-#  define APIENTRY
-# endif
-#endif // no WIN32 or OSX
-*/
 
 using namespace gnash;
 
