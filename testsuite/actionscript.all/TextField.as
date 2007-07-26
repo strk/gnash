@@ -12,7 +12,6 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-//
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
@@ -20,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.11 2007/07/24 17:41:34 strk Exp $";
+rcsid="$Id: TextField.as,v 1.12 2007/07/26 03:41:19 strk Exp $";
 
 #include "check.as"
 

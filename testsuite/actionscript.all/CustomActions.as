@@ -1,20 +1,21 @@
 // 
-//   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
-
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-
+//
 // You should have received a copy of the GNU General Public License
-
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
+
 
 // Test case for CustomActions ActionScript class
 // compile this test case with Ming makeswf, and then
@@ -24,7 +25,7 @@
 // CustomActions is only intended foro use in the Flash authoring tool,
 // See http://sephiroth.it/reference.php?id=156&cat=1
 
-rcsid="$Id: CustomActions.as,v 1.9 2007/07/13 20:04:16 strk Exp $";
+rcsid="$Id: CustomActions.as,v 1.10 2007/07/26 03:41:18 strk Exp $";
 
 #include "check.as"
 

@@ -1,5 +1,10 @@
 2007-07-25 Sandro Santilli <strk@keybit.net>
 
+	* lots of files : fixed Copyright info (delete spurious empty line,
+	  add year 2007).
+
+2007-07-25 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.h: remove unneeded "container.h" include.
 	* server/as_value.cpp (equalsSameType): fixed nan comparison.
 	* testsuite/actionscript.all/Number.as: fixed NaN != NaN test
