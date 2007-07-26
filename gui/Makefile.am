@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.88 2007/07/26 14:39:09 strk Exp $
+# $Id: Makefile.am,v 1.89 2007/07/26 15:40:35 strk Exp $
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
@@ -429,7 +429,7 @@ endif
 
 AM_CPPFLAGS += -DPKGDATADIR=\"$(pkgdatadir)\"
 AM_CPPFLAGS += -DRENDERER_CONFIG=\"$(RENDERER_CONFIG)\"
-AM_CPPFLAGS += -DGUI_CONFIG=\"$(GUI_CONFIG)\"
+AM_CPPFLAGS += -DGUI_CONFIG=\"$(GUI_CONFIG)\" -DDEFAULT_GUI=\"$(DEFAULT_GUI)\"
 AM_CPPFLAGS += -DMEDIA_CONFIG=\"$(MEDIA_CONFIG)\"
 AM_CPPFLAGS += -DTARGET_CONFIG=\"$(target)\"
 AM_CPPFLAGS += -DCONFIG_CONFIG="\"$(shell cat .configline)\""

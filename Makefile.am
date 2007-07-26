@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.81 2007/07/24 22:32:33 strk Exp $
+# $Id: Makefile.am,v 1.82 2007/07/26 15:40:35 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -219,7 +219,7 @@ endif
 	@echo "Configurable options are:"
 	@echo "Media handler: $(MEDIA_CONFIG)"
 	@echo "Renderer engine: $(RENDERER_CONFIG)"
-	@echo "GUI: $(GUI_CONFIG)"
+	@echo "Supported GUI: $(GUI_CONFIG) ( default $(DEFAULT_GUI) )"
 #	@echo "Extensions: "
 
 check: check-recursive anal

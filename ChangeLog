@@ -1,3 +1,14 @@
+2007-07-25 Sandro Santilli <strk@keybit.net>
+
+	* Makefile.am, configure.ac, gui/Makefile.am:
+	  Don't miss to list 'kde' as a gui when built as a side-effect
+	  of enabling klash: fixes proper report of which GUI have been
+	  compiled-in; Take first gui given to --enable-gui as the default
+	  one.
+	* gui/Player.cpp: don't force a default gui, take the one defined
+	  by build line (or default to nullGui).
+	* gui/gnash.cpp: print default gui from --version.
+
 2007-07-26 Alexander Sack <asac@jwsdot.com>
 
 	* server/asobj/NetStreamGst.cpp: Don't use a variable before it 

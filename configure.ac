@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.368 2007/07/26 04:05:50 strk Exp $
+dnl $Id: configure.ac,v 1.369 2007/07/26 15:40:35 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -953,6 +953,7 @@ if test x$build_kde = xyes -o x$klash = xyes -o x$plugin = xno; then
   kde=yes
   qt=yes
   build_kde=yes
+  addgui="${addgui},kde"
   GNASH_PATH_KDE
   GNASH_PATH_QT
 fi
@@ -1293,6 +1294,8 @@ AC_SUBST(RENDERER_LIBS)
 AC_SUBST(RENDERER_CONFIG)
 GUI_CONFIG=${addgui}
 AC_SUBST(GUI_CONFIG)
+DEFAULT_GUI=`echo "${GUI_CONFIG}" | cut -d',' -f1`
+AC_SUBST(DEFAULT_GUI)
 MEDIA_CONFIG=${media_handler}
 AC_SUBST(MEDIA_CONFIG)
 
@@ -1422,7 +1425,7 @@ fi
 if test x"$extensions_list" != x; then
   echo "        Building extensions: ${extensions_list}"
 fi
-echo "        GUI toolkits supported: ${addgui}"
+echo "        GUI toolkits supported: ${GUI_CONFIG} (default gui: ${DEFAULT_GUI})"
 echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
 if test x"$media_handler" = xffmpeg -o x"$media_handler" = xmad; then

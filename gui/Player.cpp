@@ -21,32 +21,8 @@
 #include "config.h"
 #endif
 
-#ifdef GUI_GTK
-# define DEFAULT_GUI guiGTK
-#endif
-
-#ifdef GUI_SDL
-# define DEFAULT_GUI guiSDL
-#endif
-
-#ifdef GUI_AQUA
-# define DEFAULT_GUI guiAQUA
-#endif
-
-#ifdef GUI_RISCOS
-# define DEFAULT_GUI guiRISCOS
-#endif
-
-#ifdef GUI_FLTK
-# define DEFAULT_GUI guiFLTK
-#endif
-
-#ifdef GUI_KDE
-# define DEFAULT_GUI guiKDE
-#endif
-
-#ifdef GUI_FB
-# define DEFAULT_GUI guiFB
+#ifndef DEFAULT_GUI
+# define DEFAULT_GUI guiNull
 #endif
 
 #include "gui.h"
@@ -112,7 +88,7 @@ Player::Player()
 #ifdef GNASH_FPS_DEBUG
 	,_fpsDebugTime(0.0)
 #endif
-	,_guiFlavor(DEFAULT_GUI)
+	,_guiFlavor(parseGuiFlavorByName(DEFAULT_GUI))
 {
 	init();
 }
