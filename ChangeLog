@@ -1,5 +1,7 @@
 2007-07-26 Sandro Santilli <strk@keybit.net>
 
+	* gui/kde.cpp (createWindow): return false if renderer creation
+	  failed.
 	* gui/kde_glue_agg.cpp (createRenderHandler): throw an exception if
 	  render handler could not be created.
 	

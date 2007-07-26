@@ -85,6 +85,11 @@ KdeGui::createWindow(const char* windowtitle, int width, int height)
 
     _glue.prepDrawingArea(_qwidget.get());
     _renderer = _glue.createRenderHandler();
+    if ( ! _renderer )
+    {
+        // something went wrong
+        return false;
+    }
     _glue.initBuffer(width, height);
     
     _width = width;
