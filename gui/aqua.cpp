@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.23 2007/07/25 00:32:02 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.24 2007/07/26 07:27:29 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -47,7 +47,7 @@ WindowRef	myWindow;
 pascal OSStatus DoWindowClose (EventHandlerCallRef  nextHandler,
                                EventRef             theEvent,
                                void*                userData){
-	exit(0);
+	QuitApplicationEventLoop();
 }
 
 namespace gnash {
