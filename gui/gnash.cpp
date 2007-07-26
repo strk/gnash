@@ -93,6 +93,7 @@ usage()
         "\n"), _(
         "  -h, --help    Print this info.\n"
         "  -s <factor>   Scale the movie up/down by the specified factor\n"
+	"  -G <guiname>  Use specified gui (gtk|kde|fltk|aqua|riscos|fb)\n"
         "  -c            Produce a core file instead of letting SDL trap it\n"
         "  -d num        Number of milliseconds to delay in main loop\n"
         "  -v            Be verbose; i.e. print log messages to stdout\n"
@@ -206,7 +207,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         }
     }
     
-    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:gVf:")) != -1)
+    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:gVf:G:")) != -1)
     {
 	switch (c) {
     	  // case 'c' (Disable SDL core dumps) is decoded in sdl.cpp:init()
@@ -317,6 +318,9 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
           case 't':
               player.setExitTimeout( (float) atof(optarg) );
               break;
+          case 'G':
+              player.setGuiFlavor(optarg);
+              break;
           case 'b':
 	      player.setBitDepth(atoi(optarg));
 	      break;
@@ -396,7 +400,17 @@ main(int argc, char *argv[])
 
 	rcfile.loadFiles();
 
-	parseCommandLine(argc, argv, player);
+	try { parseCommandLine(argc, argv, player); }
+	catch (const std::exception& ex)
+	{
+		cerr << ex.what() << endl;
+		exit(EXIT_FAILURE);
+	}
+	catch (...)
+	{
+		cerr << "Exception thrown during parseCommandLine" << endl;
+		exit(EXIT_FAILURE);
+	}
 
 	// No file name was supplied
 	if (!infile) {

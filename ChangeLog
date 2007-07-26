@@ -1,5 +1,14 @@
 2007-07-25 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.{cpp,h}: add support for multiple GUI libs.
+	  They can be statically or dynamically linked (not loaded as plugins
+	  yet).
+	* gui/gnash.cpp: add a -G switch to select GUI. If the gui wasn't
+	  compiled in an exception will be thrown (and dunno why not propery
+	  cought..).
+
+2007-07-25 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: set the BUILD_<gui> conditionals *after* giving kde
 	  gui a chance to be picked back as a dependency of 'klash'.
 	  This fixes a buil bug when klash is enabled by only gtk gui is
