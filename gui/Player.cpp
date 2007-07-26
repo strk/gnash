@@ -22,40 +22,34 @@
 #endif
 
 #ifdef GUI_GTK
-# include "gtksup.h"
 # define DEFAULT_GUI guiGTK
 #endif
 
 #ifdef GUI_SDL
-# include "sdlsup.h"
 # define DEFAULT_GUI guiSDL
 #endif
 
 #ifdef GUI_AQUA
-# include "aquasup.h"
 # define DEFAULT_GUI guiAQUA
 #endif
 
 #ifdef GUI_RISCOS
-# include "riscossup.h"
 # define DEFAULT_GUI guiRISCOS
 #endif
 
 #ifdef GUI_FLTK
-# include "fltksup.h"
 # define DEFAULT_GUI guiFLTK
 #endif
 
 #ifdef GUI_KDE
-# include "kdesup.h"
 # define DEFAULT_GUI guiKDE
 #endif
 
 #ifdef GUI_FB
-# include "fbsup.h"
 # define DEFAULT_GUI guiFB
 #endif
 
+#include "gui.h"
 #include "NullGui.h"
 
 #include "gnash.h" // still needed ?
@@ -210,8 +204,11 @@ Player::init_sound()
 void
 Player::init_gui()
 {
+	std::cout << "init_gui called - gui flavor : " << _guiFlavor << std::endl;
 	if ( do_render )
 	{
+		std::cout << "Gui flavor is " << _guiFlavor << std::endl;
+
 		_gui = getGui(_guiFlavor); // throws on unsupported gui
 
 		RcInitFile& rcfile = RcInitFile::getDefaultInstance();
@@ -400,55 +397,33 @@ Player::fs_callback(gnash::sprite_instance* movie, const char* command, const ch
 std::auto_ptr<Gui>
 Player::getGui(GuiFlavor which)
 {
+	std::cout << "getGui(" << which << ") called " << std::endl;
 	switch (which)
 	{
 
 		case guiGTK:
-#ifdef GUI_GTK // if we've been built with support for GTK
-			return std::auto_ptr<Gui>(new GtkGui(windowid, scale, do_loop, bit_depth));
-#endif
+			return createGTKGui(windowid, scale, do_loop, bit_depth);
 
 		case guiKDE:
-#ifdef GUI_KDE // if we've been built with support for KDE
-			return std::auto_ptr<Gui>(new KdeGui(windowid, scale, do_loop, bit_depth));
-#else
-			throw GnashException("Support for KDE gui was not compiled in");
-#endif
+			return createKDEGui(windowid, scale, do_loop, bit_depth);
 
 		case guiSDL:
-#ifdef GUI_SDL // if we've been built with support for SDL
-			return std::auto_ptr<Gui>(new SDLGui(windowid, scale, do_loop, bit_depth));
-#else
-			throw GnashException("Support for SDL gui was not compiled in");
-#endif
+			return createSDLGui(windowid, scale, do_loop, bit_depth);
 
 		case guiAQUA:
-#ifdef GUI_AQUA // if we've been built with support for AQUA
-			return std::auto_ptr<Gui>(new AquaGui(windowid, scale, do_loop, bit_depth));
-#else
-			throw GnashException("Support for AQUA gui was not compiled in");
-#endif
+			return createAQUAGui(windowid, scale, do_loop, bit_depth);
 
 		case guiRISCOS:
-#ifdef GUI_RISCOS // if we've been built with support for RISCOS
-			return std::auto_ptr<Gui>(new RiscosGui(windowid, scale, do_loop, bit_depth));
-#else
-			throw GnashException("Support for RISCOS gui was not compiled in");
-#endif
+			return createRISCOSGui(windowid, scale, do_loop, bit_depth);
 
 		case guiFLTK:
-#ifdef GUI_FLTK // if we've been built with support for FLTK
-			return std::auto_ptr<Gui>(new FltkGui(windowid, scale, do_loop, bit_depth));
-#else
-			throw GnashException("Support for FLTK gui was not compiled in");
-#endif
+			return createFLTKGui(windowid, scale, do_loop, bit_depth);
 
 		case guiFB:
-#ifdef GUI_FB // if we've been built with support for FB
-			return std::auto_ptr<Gui>(new FBGui(windowid, scale, do_loop, bit_depth));
-#else
-			throw GnashException("Support for FB gui was not compiled in");
-#endif
+			return createFBGui(windowid, scale, do_loop, bit_depth);
+
+		case guiNull:
+			return std::auto_ptr<Gui>(new NullGui(do_loop));
 
 	}
 
@@ -469,6 +444,7 @@ Player::parseGuiFlavorByName(const std::string& flavorName)
 	if ( match(flavorName, "FB") ) return guiFB;
 	if ( match(flavorName, "AQUA") ) return guiAQUA;
 	if ( match(flavorName, "RISCOS") ) return guiRISCOS;
+	if ( match(flavorName, "NULL") ) return guiNull;
 
 	std::stringstream ss;
 	ss << "Unknown Gui flavor " << flavorName;

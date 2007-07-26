@@ -33,6 +33,7 @@
 
 #include <string>
 #include <map>
+#include <iostream> // debugging...
 
 // Forward declarations
 namespace gnash
@@ -54,6 +55,9 @@ class DSOEXPORT Player
 public:
 
 	enum GuiFlavor {
+
+		/// Null gui
+		guiNull,
 
 		/// GTK gui
 		guiGTK,
@@ -139,7 +143,10 @@ public:
 	/// Throws an exception if gui name is invalid
 	///
 	void setGuiFlavor(const std::string& flavorName) {
-		setGuiFlavor(parseGuiFlavorByName(flavorName));
+		GuiFlavor flav = parseGuiFlavorByName(flavorName);
+		std::cout << "Flavor '" << flavorName << "' parsed as " << flav << std::endl;
+		//setGuiFlavor(parseGuiFlavorByName(flavorName));
+		setGuiFlavor(flav);
 	}
 
 	void setGuiFlavor(GuiFlavor which) { _guiFlavor = which; }

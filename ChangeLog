@@ -1,5 +1,20 @@
 2007-07-25 Sandro Santilli <strk@keybit.net>
 
+	* gui/Makefile.am: build libgnashplayer again,
+	  linked against libgnashgui, which is linked
+	  against any gui/renderer specific lib that was
+	  built
+	* gui/Player.{cpp,h}: use named constructors to create
+	  guis, so to avoid the need of including GUI-specific
+	  headers (which do conflict).
+	* gui/gui.h: make constructors protected, provide named
+	  (free functions) constructors for the different guis.
+	* gui/: gui_aqua.cpp, gui_fb.cpp, gui_fltk.cpp, gui_gtk.cpp,
+	  gui_kde.cpp, gui_riscos.cpp, gui_sdl.cpp: modules implementing
+	  the GUI named constructors.
+
+2007-07-25 Sandro Santilli <strk@keybit.net>
+
 	* gui/Player.{cpp,h}: add support for multiple GUI libs.
 	  They can be statically or dynamically linked (not loaded as plugins
 	  yet).

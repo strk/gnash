@@ -52,25 +52,8 @@ enum gnash_cursor_type {
 
 /// Parent class from which all GUI implementations will depend.
 class DSOEXPORT Gui {
-public:
-    /// Default constructor. Initialises members to safe defaults.
-    Gui();
 
-    /** \brief
-     * Expanded constructor for more control over member values.
-     *
-     * @param xid The X11 Window ID to attach to. If this is argument is zero,
-     * a new window is created.
-     *
-     * @param scale The scale used to resize the window size, which has been
-     * established by extracting information from the SWF file.
-     * 
-     * @param loop Defines whether or not the movie should be played once or
-     * looped indefinitely.
-     *
-     * @param depth Colour depth to be used in the client area of our window.
-     */
-    Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
+public:
 
     virtual ~Gui();
 
@@ -259,6 +242,25 @@ public:
 #endif // def GNASH_FPS_DEBUG
 
 protected:
+
+    /// Default constructor. Initialises members to safe defaults.
+    Gui();
+
+    /** \brief
+     * Expanded constructor for more control over member values.
+     *
+     * @param xid The X11 Window ID to attach to. If this is argument is zero,
+     * a new window is created.
+     *
+     * @param scale The scale used to resize the window size, which has been
+     * established by extracting information from the SWF file.
+     * 
+     * @param loop Defines whether or not the movie should be played once or
+     * looped indefinitely.
+     *
+     * @param depth Colour depth to be used in the client area of our window.
+     */
+    Gui(unsigned long xid, float scale, bool loop, unsigned int depth);
     /// Determines if playback should restart after the movie ends.
     bool            _loop;
     /// The X Window ID to attach to. If zero, we create a new window.
@@ -323,6 +325,15 @@ private:
 #endif // def GNASH_FPS_DEBUG
 
 };
+
+/// Named constructors
+std::auto_ptr<Gui> createGTKGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+std::auto_ptr<Gui> createKDEGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+std::auto_ptr<Gui> createSDLGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+std::auto_ptr<Gui> createFLTKGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+std::auto_ptr<Gui> createFBGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+std::auto_ptr<Gui> createAQUAGui(unsigned long xid, float scale, bool loop, unsigned int depth);
+std::auto_ptr<Gui> createRISCOSGui(unsigned long xid, float scale, bool loop, unsigned int depth);
 
  
 } // end of gnash namespace
