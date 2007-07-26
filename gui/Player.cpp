@@ -279,6 +279,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 	// which is *required* during movie loading
 	if ( ! _gui->init(argc, &argv) )
 	{
+    		std::cerr << "Could not initialize gui " <<  guiName(_guiFlavor) << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -406,6 +407,44 @@ Player::getGui(GuiFlavor which)
 	std::stringstream ss;
 	ss << "Unknown gui flavor " << which << " requested";
 	throw GnashException(ss.str());
+}
+
+/* public */
+std::string
+Player::guiName(GuiFlavor which)
+{
+	switch (which)
+	{
+
+		case guiGTK:
+			return "GTK";
+
+		case guiKDE:
+			return "KDE";
+
+		case guiSDL:
+			return "SDL";
+
+		case guiAQUA:
+			return "AQUA";
+
+		case guiRISCOS:
+			return "RISCOS";
+
+		case guiFLTK:
+			return "FLTK";
+
+		case guiFB:
+			return "FB";
+
+		case guiNull:
+			return "NULL";
+
+	}
+
+	std::stringstream ss;
+	ss << "unknown(" << which << ")";
+	return ss.str();
 }
 
 Player::GuiFlavor

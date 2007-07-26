@@ -1,5 +1,6 @@
 2007-07-26 Sandro Santilli <strk@keybit.net>
 
+	* gui/Player.{cpp,h}: Be more verbose on gui initialization error.
 	* gui/kde.cpp (createWindow): return false if renderer creation
 	  failed.
 	* gui/kde_glue_agg.cpp (createRenderHandler): throw an exception if
