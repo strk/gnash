@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.57 2007/07/01 10:54:29 bjacques Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.58 2007/07/26 14:40:42 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -546,10 +546,10 @@ NetStreamGst_install_missing_codecs(GList *missing_plugin_details)
 
   GstInstallPluginsReturn rv;
   int i,c;
-  gchar **details = g_new0(gchar*, c+1);
   GstInstallPluginsContext *install_ctx = gst_install_plugins_context_new();
 
   c=g_list_length(missing_plugin_details);
+  gchar **details = g_new0(gchar*, c+1);
   
   for(i=0; i < c; i++)
   {

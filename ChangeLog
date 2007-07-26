@@ -1,3 +1,8 @@
+2007-07-26 Alexander Sack <asac@jwsdot.com>
+
+	* server/asobj/NetStreamGst.cpp: Don't use a variable before it 
+	  has been initialized.
+
 2007-07-25 Sandro Santilli <strk@keybit.net>
 
 	* gui/Makefile.am: build libgnashplayer again,
