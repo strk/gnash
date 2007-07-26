@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: kde_glue_agg.cpp,v 1.4 2007/07/01 10:54:03 bjacques Exp $ */
+/* $Id: kde_glue_agg.cpp,v 1.5 2007/07/26 19:41:37 strk Exp $ */
 
 #include "kde_glue_agg.h"
 #include "render_handler.h"
@@ -138,6 +138,10 @@ KdeAggGlue::createRenderHandler()
 {
     // QT requires the use of this pixel format...
     _renderer = create_render_handler_agg("BGRA32");
+    if ( ! _renderer )
+    {
+        throw GnashException("Could not create AGG renderer with pixelformat BGRA32");
+    }
     return _renderer;
 }
 
