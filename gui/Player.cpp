@@ -180,7 +180,7 @@ Player::init_sound()
 void
 Player::init_gui()
 {
-	std::cout << "init_gui called - gui flavor : " << _guiFlavor << std::endl;
+	std::cout << "init_gui called - gui flavor : " << guiName(_guiFlavor) << " (" << _guiFlavor << ")" << std::endl;
 	if ( do_render )
 	{
 		std::cout << "Gui flavor is " << _guiFlavor << std::endl;
