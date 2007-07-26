@@ -1,5 +1,8 @@
 2007-07-26 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: don't assume that if GTK gui is used only the
+	  GTK-pixelformat is needed (other GUIs might be built).
+	  Fixes bug #20586.
 	* gui/Player.{cpp,h}: Be more verbose on gui initialization error.
 	* gui/kde.cpp (createWindow): return false if renderer creation
 	  failed.

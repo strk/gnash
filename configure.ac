@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.369 2007/07/26 15:40:35 strk Exp $
+dnl $Id: configure.ac,v 1.370 2007/07/26 22:07:28 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -392,17 +392,19 @@ B565|RGB24|BGR24|BGRA32|RGBA32)])
 
 if test x$pixelformat = xall; then
   if test x$build_agg = xyes; then
-    if test x$build_gtk = xyes; then
-      AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24 pixel format])
-      pixelformat="RGB24"
-    else
+    ### The fact that we're building GTK doesn't mean we're not also
+    ### building KDE or SDL, each needing its own pixel format !
+    #if test x$build_gtk = xyes; then
+    #  AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24 pixel format])
+    #  pixelformat="RGB24"
+    #else
       AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555 pixel format])
       AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565 pixel format])
       AC_DEFINE(PIXELFORMAT_RGB24,  [1], [RGB24 pixel format])
       AC_DEFINE(PIXELFORMAT_BGR24,  [1], [BGR24 pixel format])
       AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32 pixel format])
       AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32 pixel format])
-    fi
+    #fi
   fi
 fi
 
