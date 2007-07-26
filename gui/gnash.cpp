@@ -190,6 +190,12 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     bool called_by_plugin=false;
     bool width_given=false, height_given=false;
 
+    // Check our name, if 'klash' we'll set KDE gui
+    if ( strstr(argv[0], "klash") != NULL )
+    {
+        player.setGuiFlavor("kde");
+    }
+   
     int c = 0;
     // scan for the two main long GNU options
     for (; c < argc; c++) {

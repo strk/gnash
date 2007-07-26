@@ -1,5 +1,7 @@
 2007-07-25 Sandro Santilli <strk@keybit.net>
 
+	* gui/gnash.cpp: scan argv[0] and select KDE gui if it contains
+	  the string 'klash'.
 	* Makefile.am, configure.ac, gui/Makefile.am:
 	  Don't miss to list 'kde' as a gui when built as a side-effect
 	  of enabling klash: fixes proper report of which GUI have been
