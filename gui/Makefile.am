@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.89 2007/07/26 15:40:35 strk Exp $
+# $Id: Makefile.am,v 1.90 2007/07/27 14:13:01 strk Exp $
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
@@ -219,7 +219,7 @@ if  HAVE_OPENGL
      libgnashkde_ogl_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	$(OPENGL_FLAGS) $(KDE_CFLAGS) $(QT_CFLAGS)
      libgnashkde_ogl_la_SOURCES = \
-	kde_glue_opengl.cpp kde_glue.h \
+	kde_glue_opengl.cpp kde_glue_opengl.h kde_glue.h \
 	kde.cpp kdesup.h kde_glue.h
      libgnashkde_ogl_la_LDFLAGS = $(LIB_FLAGS)
      libgnashkde_ogl_la_LIBADD = \
