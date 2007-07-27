@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.20 2007/07/27 15:09:41 tgc Exp $ */
+/* $Id: sound_handler.h,v 1.21 2007/07/27 15:16:43 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -262,18 +262,20 @@ public:
 
 	virtual ~sound_handler() {};
 	
+	/// \brief
 	/// Gets the duration in milliseconds of an event sound connected
 	/// to an AS Sound obejct.
-	///
+	//
 	/// @param sound_handle
 	/// The id of the event sound
 	///
 	/// @return the duration of the sound in milliseconds
 	virtual unsigned int get_duration(int sound_handle) = 0;
 
+	/// \brief
 	/// Gets the playhead position in milliseconds of an event sound connected
 	/// to an AS Sound obejct.
-	///
+	//
 	/// @param sound_handle
 	/// The id of the event sound
 	///
