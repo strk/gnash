@@ -1,3 +1,7 @@
+2007-07-27 Nick Warne <nick@ukfsn.org>
+
+	* plugin/klash/klash_part.cpp: typo (0l => 0L)
+
 2007-07-27 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler.h, backend/sound_handler_gst.{cpp,h},

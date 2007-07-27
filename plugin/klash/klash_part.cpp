@@ -212,7 +212,7 @@ KDE_NO_EXPORT void KlashPart::stop () {
             m_process->wait(2);
         }
         delete m_process;
-        m_process = 0l;
+        m_process = 0L;
     }
 }
 
