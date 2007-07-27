@@ -641,10 +641,6 @@ static as_value sprite_hit_test(const fn_call& fn)
 	boost::intrusive_ptr<sprite_instance> sprite = ensureType<sprite_instance>(fn.this_ptr);
 	UNUSED(sprite);
 
-	static bool warned_1_arg = false;
-	static bool warned_2_arg = false;
-	static bool warned_3_arg = false;
-
 	as_environment& env = fn.env();
 
 	switch (fn.nargs)
@@ -670,11 +666,6 @@ static as_value sprite_hit_test(const fn_call& fn)
 			matrix tgtmat = target->get_world_matrix();
 			tgtmat.transform(tgtbounds);
 
-			if ( ! warned_1_arg ) {
-				log_debug("MovieClip.hitTest(%s) TESTING", tgt_val.to_debug_string().c_str());
-				warned_1_arg=true;
-			}
-
 			return thisbounds.intersects(tgtbounds);
 
 			break;
@@ -685,11 +676,6 @@ static as_value sprite_hit_test(const fn_call& fn)
 			float x = PIXELS_TO_TWIPS(fn.arg(0).to_number(&env));
 			float y = PIXELS_TO_TWIPS(fn.arg(1).to_number(&env));
 
-			if ( ! warned_2_arg ) {
-				log_debug("MovieClip.hitTest(%g,%g) TESTING", x,y);
-				warned_2_arg=true;
-			}
-
 			return sprite->pointInBounds(x, y);
 		}
 
@@ -698,11 +684,6 @@ static as_value sprite_hit_test(const fn_call& fn)
 			double x = PIXELS_TO_TWIPS(fn.arg(0).to_number(&env));
 			double y = PIXELS_TO_TWIPS(fn.arg(1).to_number(&env));
 			bool shapeFlag = fn.arg(2).to_bool();
-
-			if ( ! warned_3_arg ) {
-				log_msg("MovieClip.hitTest(%g,%g,%d) TESTING", x,y,shapeFlag);
-				warned_3_arg=true;
-			}
 
 			if ( ! shapeFlag ) return sprite->pointInBounds(x, y);
 			else return sprite->pointInVisibleShape(x, y);
@@ -989,13 +970,6 @@ sprite_globalToLocal(const fn_call& fn)
 	obj->set_member("x", TWIPS_TO_PIXELS(round(pt.m_x)));
 	obj->set_member("y", TWIPS_TO_PIXELS(round(pt.m_y)));
 
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_msg("MovieClip.globalToLocal() TESTING");
-		warned=true;
-	}
-
 	return ret;
 }
 
@@ -1057,13 +1031,6 @@ sprite_localToGlobal(const fn_call& fn)
 
 	obj->set_member("x", TWIPS_TO_PIXELS(round(pt.m_x)));
 	obj->set_member("y", TWIPS_TO_PIXELS(round(pt.m_y)));
-
-	static bool warned = false;
-	if ( ! warned )
-	{
-		log_msg("MovieClip.localToGlobal() TESTING");
-		warned=true;
-	}
 
 	return ret;
 
