@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.116 2007/07/01 10:54:36 bjacques Exp $ */
+/* $Id: tag_loaders.cpp,v 1.117 2007/07/27 15:09:42 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1233,6 +1233,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     case sound_handler::FORMAT_MP3:
     case sound_handler::FORMAT_NELLYMOSER:
     case sound_handler::FORMAT_NATIVE16:
+    case sound_handler::FORMAT_NELLYMOSER_8HZ_MONO:
 	break;
     }
 
@@ -1389,6 +1390,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	in->read((char *)data, data_bytes);
 	break;
 
+    case sound_handler::FORMAT_NELLYMOSER_8HZ_MONO:
     case sound_handler::FORMAT_NELLYMOSER:
 	// One day...
 	in->skip_bytes(data_bytes);

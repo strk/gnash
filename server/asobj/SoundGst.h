@@ -40,7 +40,20 @@ class fn_call;
   
 class SoundGst : public Sound {
 public:
-
+	SoundGst()
+		:
+		pipeline(NULL),
+		audiosink(NULL),
+		source(NULL),
+		decoder(NULL),
+		volume(NULL),
+		audioconv(NULL),
+		setupThread(NULL),
+		lock(NULL), 
+		inputPos(0),
+		isAttached(false),
+		remainingLoops(0)
+	{}
 	~SoundGst();
 
 	void loadSound(std::string file, bool streaming);

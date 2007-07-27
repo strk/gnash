@@ -40,7 +40,17 @@ class fn_call;
   
 class SoundMad : public Sound {
 public:
-
+	SoundMad()
+		:
+		inputPos(0),
+		setupThread(NULL),
+		lock(NULL), 
+		bitrate(0),
+		leftOverData(NULL),
+		leftOverSize(0),
+		isAttached(false),
+		remainingLoops(0)
+	{}
 	~SoundMad();
 
 	void loadSound(std::string file, bool streaming);

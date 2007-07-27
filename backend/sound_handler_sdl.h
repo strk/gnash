@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.30 2007/07/23 22:22:25 strk Exp $
+// $Id: sound_handler_sdl.h,v 1.31 2007/07/27 15:09:41 tgc Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -226,6 +226,12 @@ public:
 	/// Gnash calls this to get the mute state.
 	virtual bool	is_muted();
 
+	/// Gets the duration in milliseconds of an event sound connected to an AS Sound obejct.
+	virtual unsigned int get_duration(int sound_handle);
+
+	/// Gets the playhead position in milliseconds of an event sound connected to an AS Soound obejct.
+	virtual unsigned int get_position(int sound_handle);
+	
 	virtual void	attach_aux_streamer(aux_streamer_ptr ptr, void* owner);	//vv
 	virtual void	detach_aux_streamer(void* owner);	//vv
 

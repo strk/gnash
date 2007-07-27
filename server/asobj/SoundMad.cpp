@@ -327,11 +327,11 @@ bool SoundMad::getAudio(void* owner, uint8_t* stream, int len)
 SoundMad::~SoundMad() {
 	if (leftOverData && leftOverSize) delete[] leftOverData;
 
-	mad_synth_finish(&synth);
-	mad_frame_finish(&frame);
-	mad_stream_finish(&stream);
-
 	if (isAttached) {
+		mad_synth_finish(&synth);
+		mad_frame_finish(&frame);
+		mad_stream_finish(&stream);
+
 		sound_handler* s = get_sound_handler();
 		if (s) {
 			s->detach_aux_streamer(this);
@@ -400,7 +400,7 @@ SoundMad::stop(int si)
 	sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
-	    if (si > -1) {
+	    if (si < 0) {
 	    	if (externalSound) {
 	    		s->detach_aux_streamer(this);
 	    	} else {
@@ -415,6 +415,16 @@ SoundMad::stop(int si)
 unsigned int
 SoundMad::getDuration()
 {
+	// If this is a event sound get the info from the soundhandler
+	if (!externalSound) {
+		sound_handler* s = get_sound_handler();
+		if (s) {		
+	    	return (s->get_duration(soundId));
+	    } else {
+	    	return 0; // just in case
+		}
+	}
+
 	// Return the duration of the file in milliseconds
 /*	if (formatCtx && audioIndex) {
 		return static_cast<unsigned int>(formatCtx->duration * 1000);
@@ -427,12 +437,19 @@ SoundMad::getDuration()
 unsigned int
 SoundMad::getPosition()
 {
-	// Return the position in the file in milliseconds
-	if (1) {
-		return inputPos/bitrate/8*1000;
-	} else {
-		return 0;
+
+	// If this is a event sound get the info from the soundhandler
+	if (!externalSound) {
+		sound_handler* s = get_sound_handler();
+		if (s) {
+			return s->get_position(soundId);	
+	    } else {
+	    	return 0; // just in case
+		}
 	}
+
+	// Return the position in the file in milliseconds
+	return inputPos/bitrate/8*1000;
 }
 
 } // end of gnash namespace

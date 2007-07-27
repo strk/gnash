@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.19 2007/07/23 22:07:58 strk Exp $ */
+/* $Id: sound_handler.h,v 1.20 2007/07/27 15:09:41 tgc Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -261,6 +261,24 @@ public:
 	{}
 
 	virtual ~sound_handler() {};
+	
+	/// Gets the duration in milliseconds of an event sound connected
+	/// to an AS Sound obejct.
+	///
+	/// @param sound_handle
+	/// The id of the event sound
+	///
+	/// @return the duration of the sound in milliseconds
+	virtual unsigned int get_duration(int sound_handle) = 0;
+
+	/// Gets the playhead position in milliseconds of an event sound connected
+	/// to an AS Sound obejct.
+	///
+	/// @param sound_handle
+	/// The id of the event sound
+	///
+	/// @return the duration of the sound in milliseconds
+	virtual unsigned int get_position(int sound_handle) = 0;
 
 	/// Special test-fuction. Reports how many times a sound has been started
 	size_t numSoundsStarted() const { return _soundsStarted; }

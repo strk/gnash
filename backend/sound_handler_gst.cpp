@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.54 2007/07/23 22:23:33 strk Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.55 2007/07/27 15:09:41 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -602,6 +602,63 @@ void GST_sound_handler::attach_aux_streamer(aux_streamer_ptr /*ptr*/, void* /*ow
 void GST_sound_handler::detach_aux_streamer(void* /*owner*/)
 {
 	log_unimpl(__PRETTY_FUNCTION__);
+}
+
+unsigned int GST_sound_handler::get_duration(int sound_handle)
+{
+	mutex::scoped_lock lock(_mutex);
+
+	// Check if the sound exists.
+	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
+	{
+		// Invalid handle.
+		return 0;
+	}
+
+	sound_data* sounddata = m_sound_data[sound_handle];
+
+	// Return the sound duration in milliseconds
+	if (sounddata->sample_count > 0 && sounddata->sample_rate > 0) {
+		unsigned int ret = sounddata->sample_count / sounddata->sample_rate * 100;
+		if (sounddata->stereo) ret = ret / 2;
+		return ret;
+	} else {
+		return 0;
+	}
+}
+
+unsigned int GST_sound_handler::get_position(int sound_handle)
+{
+	mutex::scoped_lock lock(_mutex);
+
+	// Check if the sound exists.
+	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
+	{
+		// Invalid handle.
+		return 0;
+	}
+
+	sound_data* sounddata = m_sound_data[sound_handle];
+
+	// return the position of the last element added
+	GstElement *pipeline,*audiosink;
+	GstStateChangeReturn ret;
+	GstState current, pending;
+	int64_t pos;
+	GstFormat fmt = GST_FORMAT_TIME;
+	
+	pipeline=sounddata->m_gst_elements[sounddata->m_gst_elements.size()-1]->pipeline;
+	
+	ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
+
+	if (current != GST_STATE_NULL) {
+		audiosink=sounddata->m_gst_elements[sounddata->m_gst_elements.size()-1]->audiosink;
+		if (gst_element_query_position (pipeline, &fmt, &pos)) {
+			return static_cast<unsigned int>(pos / GST_MSECOND);
+		} else {
+			return 0;
+		}
+	}
 }
 
 // Pointer handling and checking functions

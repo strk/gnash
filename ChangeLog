@@ -1,3 +1,12 @@
+2007-07-27 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler.h, backend/sound_handler_gst.{cpp,h},
+	backend/sound_handler_sdl.{cpp,h}, server/asobj/SoundFfmpeg.{h,cpp},
+	server/asobj/SoundGst.{h,cpp}, server/asobj/SoundMad.{h,cpp}:
+	Implement duration and position properties when using Sound objects
+	to control an eventsound, patch partly by Sergio Costas.
+	* server/swf/tag_loaders.cpp: Fix warnings.
+
 2007-07-27 Sandro Santilli <strk@keybit.net>
 
 	* gui/Makefile.am: distribute kde_glue_opengl.h.

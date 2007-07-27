@@ -284,7 +284,7 @@ SoundGst::stop(int si)
 	sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
-	    if (si > -1) {
+	    if (si < 0) {
 	    	if (externalSound) {
 				gst_element_set_state (GST_ELEMENT (pipeline), GST_STATE_NULL);
 	    	} else {
@@ -300,6 +300,17 @@ unsigned int
 SoundGst::getDuration()
 {
 	// Return the duration of the file in milliseconds
+	
+	// If this is a event sound get the info from the soundhandler
+	if (!externalSound) {
+		sound_handler* s = get_sound_handler();
+		if (s) {		
+	    	return (s->get_duration(soundId));
+	    } else {
+	    	return 0; // just in case
+		}
+	}
+	
 	GstFormat fmt = GST_FORMAT_TIME;
 	int64_t len;
 
@@ -314,6 +325,17 @@ unsigned int
 SoundGst::getPosition()
 {
 	// Return the position in the file in milliseconds
+	
+	// If this is a event sound get the info from the soundhandler
+	if (!externalSound) {
+		sound_handler* s = get_sound_handler();
+		if (s) {
+			return s->get_position(soundId);	
+	    } else {
+	    	return 0; // just in case
+		}
+	}
+	
 	if (!pipeline) return 0;
 
 	GstFormat fmt = GST_FORMAT_TIME;

@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.75 2007/07/23 22:22:25 strk Exp $
+// $Id: sound_handler_sdl.cpp,v 1.76 2007/07/27 15:09:41 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -535,6 +535,53 @@ void	SDL_sound_handler::detach_aux_streamer(void* owner)
 
 }
 
+unsigned int SDL_sound_handler::get_duration(int sound_handle)
+{
+	mutex::scoped_lock lock(_mutex);
+
+	// Check if the sound exists.
+	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
+	{
+		// Invalid handle.
+		return 0;
+	}
+
+	sound_data* sounddata = m_sound_data[sound_handle];
+
+	// Return the sound duration in milliseconds
+	if (sounddata->sample_count > 0 && sounddata->sample_rate > 0) {
+		unsigned int ret = sounddata->sample_count / sounddata->sample_rate * 100;
+		if (sounddata->stereo) ret = ret / 2;
+		return ret;
+	} else {
+		return 0;
+	}
+}
+
+unsigned int SDL_sound_handler::get_position(int sound_handle)
+{
+	mutex::scoped_lock lock(_mutex);
+
+	// Check if the sound exists.
+	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
+	{
+		// Invalid handle.
+		return 0;
+	}
+
+	sound_data* sounddata = m_sound_data[sound_handle];
+
+	// If there is no active sounds, return 0
+	if (sounddata->m_active_sounds.size() == 0) return 0;
+
+	// We use the first active sound of this.
+	active_sound* asound = sounddata->m_active_sounds[0];
+
+	// Return the playhead position in milliseconds
+	unsigned int ret = asound->samples_played / sounddata->sample_rate * 100;
+	if (sounddata->stereo) ret = ret / 2;
+	return ret;
+}
 
 sound_handler*
 create_sound_handler_sdl()
@@ -714,10 +761,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 		delete [] buf;
 	}
 
-#ifdef WIN32	// hack
-	return;
-#endif
-
+	// Run through all the sounds.
 	for(uint32_t i=0; i < handler->m_sound_data.size(); i++) {
 		sound_data* sounddata = handler->m_sound_data[i];
 		for(uint32_t j = 0; j < sounddata->m_active_sounds.size(); j++) {
@@ -747,6 +791,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 					if (index < buffer_length) {
 						sound->loop_count--;
 						sound->raw_position = 0;
+						sound->samples_played = 0;
 						unsigned int mix_length = ((buffer_length - index) > sound->raw_data_size ? sound->raw_data_size : (buffer_length - index));
 						do_mixing(stream+index, sound, sound->get_raw_data_ptr(sound->raw_position), 
 							mix_length, sounddata->volume);
@@ -765,6 +810,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 					if (sound->data_size == sound->position && sound->loop_count != 0) {
 						sound->loop_count--;
 						sound->position = 0;
+						sound->samples_played = 0;
 					}
 
 					// Test if we will get problems... Should not happen...

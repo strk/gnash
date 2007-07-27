@@ -165,10 +165,7 @@ SoundFfmpeg::setupDecoder(SoundFfmpeg* so)
 				}
 				break;
 
-			case CODEC_TYPE_VIDEO:
-			case CODEC_TYPE_DATA:
-			case CODEC_TYPE_SUBTITLE:
-			case CODEC_TYPE_UNKNOWN:
+			default:
 				log_error(_("Non-audio data (type %d) found in file %s"),
 				   enc->codec_type, so->externalURL.c_str());
 		
@@ -430,7 +427,7 @@ SoundFfmpeg::stop(int si)
 	sound_handler* s = get_sound_handler();
 	if (s != NULL)
 	{
-	    if (si > -1) {
+	    if (si < 0) {
 	    	if (externalSound) {
 	    		s->detach_aux_streamer(this);
 	    	} else {
@@ -445,6 +442,17 @@ SoundFfmpeg::stop(int si)
 unsigned int
 SoundFfmpeg::getDuration()
 {
+
+	// If this is a event sound get the info from the soundhandler
+	if (!externalSound) {
+		sound_handler* s = get_sound_handler();
+		if (s) {		
+	    	return (s->get_duration(soundId));
+	    } else {
+	    	return 0; // just in case
+		}
+	}
+
 	// Return the duration of the file in milliseconds
 	if (formatCtx && audioIndex) {
 		return static_cast<unsigned int>(formatCtx->duration * 1000);
@@ -456,6 +464,16 @@ SoundFfmpeg::getDuration()
 unsigned int
 SoundFfmpeg::getPosition()
 {
+	// If this is a event sound get the info from the soundhandler
+	if (!externalSound) {
+		sound_handler* s = get_sound_handler();
+		if (s) {
+			return s->get_position(soundId);
+	    } else {
+	    	return 0; // just in case
+		}
+	}
+
 	// Return the position in the file in milliseconds
 	if (formatCtx && audioIndex) {
 		double time = (double)formatCtx->streams[audioIndex]->time_base.num / formatCtx->streams[audioIndex]->time_base.den * (double)formatCtx->streams[audioIndex]->cur_dts;
