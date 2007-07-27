@@ -1,5 +1,10 @@
 2007-07-26 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: Don't threat static linking specially, multiple
+	  GUIs can still be supported by that.
+
+2007-07-26 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: don't assume that if GTK gui is used only the
 	  GTK-pixelformat is needed (other GUIs might be built).
 	  Fixes bug #20586.

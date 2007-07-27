@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.370 2007/07/26 22:07:28 strk Exp $
+dnl $Id: configure.ac,v 1.371 2007/07/27 03:28:56 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -540,8 +540,11 @@ AC_LIB_LTDL
 AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
 AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
+
 dnl build a statically linked executable
-if test x"${enable_shared}" = xno; then
+dnl We don't have anything special to do in this case
+if false; then # test x"${enable_shared}" = xno; then
+
    g=`echo  $addgui | grep -c '\,'`
    r=`echo  $add_renderer | grep -c '\,'`
   if test $g -gt 0 -o $r -gt 0 ; then
@@ -561,7 +564,9 @@ if test x"${enable_shared}" = xno; then
      add_renderer=ogl
      AC_MSG_NOTICE([Defaulting to OpenGL as the renderer, use --enable-renderer= to change])
   fi
+
 else dnl building a dynamically linked executable without loadable GUI plugins
+
   dnl If not dynamic loading, and no gui is specified, force gtk
   if test x"${dynamic_gui}" = xno; then
     if test x$addgui = xnone; then
@@ -593,6 +598,7 @@ else dnl building a dynamically linked executable without loadable GUI plugins
       AC_MSG_NOTICE([Defaulting to OpenGL and AGG as the renderers, use --enable-renderer= to change])
     fi
   fi
+
 fi
 
 AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes ])
