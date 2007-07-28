@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.374 2007/07/28 01:59:15 nihilus Exp $
+dnl $Id: configure.ac,v 1.375 2007/07/28 21:00:36 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -229,7 +229,6 @@ AC_ARG_ENABLE(klash,
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-klash option]) ;;
 esac],klash=yes)
 
-addgui=none
 build_fb=no
 build_fltk=no
 build_kde=no
@@ -240,7 +239,6 @@ build_aqua=no
 AC_ARG_ENABLE(gui,
   AC_HELP_STRING([--enable-gui=], [Use the specified GUI toolkit (default=gtk,kde)]),
   if test -n ${enableval}; then
-    addgui="${enableval}"
     enableval=`echo ${enableval} | tr '\054' ' ' `
   fi
   while test -n "${enableval}" ; do
@@ -248,27 +246,51 @@ AC_ARG_ENABLE(gui,
     [case "${val}" in
       gtk|GTK|gtk2|GTK2)
         build_gtk=yes
+        if test "x$DEFAULT_GUI" = "x"; then
+          DEFAULT_GUI=gtk
+        fi
         ;;
       kde|KDE)
         build_kde=yes
+        if test "x$DEFAULT_GUI" = "x"; then
+          DEFAULT_GUI=kde
+        fi
         ;;
       qt|QT)
         build_qt=yes
+        if test "x$DEFAULT_GUI" = "x"; then
+          DEFAULT_GUI=kde
+        fi
         ;;
       sdl|SDL)
         build_sdl=yes
+        if test "x$DEFAULT_GUI" = "x"; then
+          DEFAULT_GUI=sdl
+        fi
         ;;
       aqua|AQUA|Aqua)
         build_aqua=yes
+        if test "x$DEFAULT_GUI" = "x"; then
+          DEFAULT_GUI=aqua
+        fi
         ;;
       riscos|RISCOS|RiscOS)
         build_riscos=yes
+        if test "x$DEFAULT_GUI" = "x"; then
+          DEFAULT_GUI=riscos
+        fi
         ;;
       fltk|FLTK|fltk2|FLTK2)
         build_fltk=yes
+        if test "x$DEFAULT_GUI" = "x"; then
+          DEFAULT_GUI=fltk
+        fi
         ;;
       fb|FB)
         build_fb=yes
+        if test "x$DEFAULT_GUI" = "x"; then
+          DEFAULT_GUI=fb
+        fi
         ;;
       all|ALL)
         build_fb=yes
@@ -287,12 +309,6 @@ dnl        build_riscos=yes
     fi
   done
 )
-
-if test x$addgui = xnone; then
-   build_gtk=yes
-   build_kde=yes
-dnl   addgui="gtk,kde"
-fi
 
 add_renderer=
 build_ogl=no
@@ -540,66 +556,6 @@ AC_LIB_LTDL
 AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
 AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
-
-dnl build a statically linked executable
-dnl We don't have anything special to do in this case
-if false; then # test x"${enable_shared}" = xno; then
-
-   g=`echo  $addgui | grep -c '\,'`
-   r=`echo  $add_renderer | grep -c '\,'`
-  if test $g -gt 0 -o $r -gt 0 ; then
-     AC_MSG_ERROR([When statically linking, you must pick only one GUI toolkit and one renderer])
-  fi
-  dnl If statically linking, and no gui is specified, force gtk
-  if test x$addgui = xnone; then
-     build_gtk=yes
-     build_kde=no
-     addgui=gtk
-     AC_MSG_NOTICE([Defaulting to GTK as the GUI, use --enable-gui= to change])
-  fi
-  dnl If statically linking, and no renderer is specified, force opengl
-  if test x$add_renderer = x; then
-     build_agg=no
-     build_ogl=yes
-     add_renderer=ogl
-     AC_MSG_NOTICE([Defaulting to OpenGL as the renderer, use --enable-renderer= to change])
-  fi
-
-else dnl building a dynamically linked executable without loadable GUI plugins
-
-  dnl If not dynamic loading, and no gui is specified, force gtk
-  if test x"${dynamic_gui}" = xno; then
-    if test x$addgui = xnone; then
-      build_gtk=yes
-      build_kde=no
-      addgui=gtk
-      AC_MSG_NOTICE([Defaulting to GTK as the GUI, use --enable-gui= to change])
-    fi
-    dnl If not dynamic loading, and no renderer is specified, force opengl
-    if test x$add_renderer = x; then
-      build_agg=no
-      build_ogl=yes
-      add_renderer=ogl
-      AC_MSG_NOTICE([Defaulting to OpenGL as the renderer, use --enable-renderer= to change])
-    fi
-  else
-    dnl If dynamically loading and no gui is specified, force gtk and kde
-    if test x$addgui = xnone; then
-      build_gtk=yes
-      build_kde=yes
-      addgui="gtk,kde"
-      AC_MSG_NOTICE([Defaulting to GTK and KDE as the GUIs, use --enable-gui= to change])
-    fi
-    dnl If dynamically loading and no renderer is specified, force opengl and agg
-    if test x$add_renderer = x; then
-      build_ogl=yes
-      build_agg=yes
-      add_renderer="ogl,agg"
-      AC_MSG_NOTICE([Defaulting to OpenGL and AGG as the renderers, use --enable-renderer= to change])
-    fi
-  fi
-
-fi
 
 AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes ])
 AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
@@ -975,7 +931,6 @@ if test x$build_kde = xyes -o x"$klash" = xyes -o x"$plugin" = xno; then
   kde=yes
   qt=yes
   build_kde=yes
-  addgui="${addgui},kde"
   GNASH_PATH_KDE
   GNASH_PATH_QT
 fi
@@ -1299,9 +1254,35 @@ for rend in `echo "${add_renderer}" | tr ',' ' '`; do
 done
 AC_SUBST(RENDERER_LIBS)
 AC_SUBST(RENDERER_CONFIG)
-GUI_CONFIG=${addgui}
+
+GUI_CONFIG=
+if test x$build_fb = xyes; then
+  GUI_CONFIG="${GUI_CONFIG},fb"
+fi
+if test x$build_fltk = xyes; then
+  GUI_CONFIG="${GUI_CONFIG},fltk"
+fi
+if test x$build_kde = xyes; then
+  GUI_CONFIG="${GUI_CONFIG},kde"
+fi
+if test x$build_gtk = xyes; then
+  GUI_CONFIG="${GUI_CONFIG},gtk"
+fi
+if test x$build_sdl = xyes; then
+  GUI_CONFIG="${GUI_CONFIG},sdl"
+fi
+if test x$build_riscos = xyes; then
+  GUI_CONFIG="${GUI_CONFIG},riscos"
+fi
+if test x$build_aqua = xyes; then
+  GUI_CONFIG="${GUI_CONFIG},aqua"
+fi
+GUI_CONFIG="`echo ${GUI_CONFIG} | sed 's/,//'`" # Strip leading comma
 AC_SUBST(GUI_CONFIG)
-DEFAULT_GUI=`echo "${GUI_CONFIG}" | cut -d',' -f1`
+
+if test "x$DEFAULT_GUI" = "x"; then
+  DEFAULT_GUI=gtk
+fi
 AC_SUBST(DEFAULT_GUI)
 MEDIA_CONFIG=${media_handler}
 AC_SUBST(MEDIA_CONFIG)
