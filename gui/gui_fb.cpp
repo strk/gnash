@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gui_fb.cpp,v 1.1 2007/07/26 14:39:09 strk Exp $ */
+/* $Id: gui_fb.cpp,v 1.2 2007/07/28 20:10:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,7 +34,7 @@ namespace gnash {
 #ifdef GUI_FB
 std::auto_ptr<Gui> createFBGui(unsigned long windowid, float scale, bool do_loop, unsigned int bit_depth)
 {
-	return std::auto_ptr<Gui>(new FbGui(windowid, scale, do_loop, bit_depth));
+	return std::auto_ptr<Gui>(new FBGui(windowid, scale, do_loop, bit_depth));
 }
 #else // ! GUI_FB
 std::auto_ptr<Gui> createFBGui(unsigned long , float , bool , unsigned int )

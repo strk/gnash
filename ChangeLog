@@ -1,5 +1,6 @@
 2007-07-28 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui_fb.cpp: typo fix (FbGui => FBGui).
 	* testsuite/misc-mtasc.all/Makefile.am: distribute
 	  mtasc related files even if mtasc is not detected.
 
