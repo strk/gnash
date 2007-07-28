@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.372 2007/07/28 01:39:04 nihilus Exp $
+dnl $Id: configure.ac,v 1.373 2007/07/28 01:40:41 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -982,14 +982,12 @@ dnl # NO kde ? NO klash !
 if test x$has_kde != xyes; then
   if test x$klash = xyes; then
     echo "WARNING: No KDE development package installed, disabling klash"
-    klash=no
   fi
   klash=no
 fi
 if test x$has_qt != xyes; then
   if test x$klash = xyes; then
     echo "WARNING: No QT development package installed, disabling klash"
-    klash=no
   fi
   klash=no
 fi
