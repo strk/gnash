@@ -6,6 +6,9 @@
 2007-07-28 Markus Gothe <nietzsche@lysator.liu.se>
 	
 	* configure.ac: Don't try building KDE/Klash if we'vent got the libs...
+	* gui/aqua*, gui/Info.pist, gui/images/GnashG.icns, gui/Makefile.am: 
+	  Now we can build a bundle by running 'make bundle', albeit I must
+	  fix the linkage.
 
 2007-07-27 Nick Warne <nick@ukfsn.org>
 

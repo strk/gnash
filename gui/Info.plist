@@ -6,8 +6,24 @@
 	<string>English</string>
 	<key>CFBundleExecutable</key>
 	<string>gnash</string>
+	<key>CFBundleGetInfoString</key>
+	<string>0.8.1, Copyright (C) 2005-2007 Free Software Foundation, Inc.</string>
+	<key>CFBundleTypeExtensions</key>
+	<array>
+	<string>swf</string>
+    <string>SWF</string>
+    </array>
+    <key>CFBundleTypeName</key>
+	<string>Flash File</string>
+	<key>CFBundleTypeOSTypes</key>
+	<array>
+	<string>swf</string>
+    <string>SWF</string>
+	</array>
+    <key>CFBundleGetInfoString</key>
+	<string>gnash Version 0.8.1</string>
 	<key>CFBundleIconFile</key>
-	<string></string>
+	<string>GnashG.icns</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.gnash.aqua</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -18,6 +34,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
+	<key>SUFeedURL</key>
+	<string>http://www.gnashdev.org/update.xml</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
 </dict>

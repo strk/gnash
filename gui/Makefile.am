@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.90 2007/07/27 14:13:01 strk Exp $
+# $Id: Makefile.am,v 1.91 2007/07/28 14:55:28 nihilus Exp $
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
@@ -153,7 +153,23 @@ endif # DYNAMIC_GUI
 
 # AQUA Toolkit
 if BUILD_AQUA_GUI
+
+#OS X stuff goes here...
+
      GUI_CPPFLAGS += -DGUI_AQUA
+
+bundle_name = gnash.app
+
+bundle: Info.plist $(ICONFILE)
+	@echo " Building: $(bundle_name)" 
+	-rm -rf $(bundle_name)/Contents
+	mkdir -p $(bundle_name)/Contents/MacOS
+	mkdir -p $(bundle_name)/Contents/Resources
+	echo "APPL????" > $(bundle_name)/Contents/PkgInfo
+	cp Info.plist $(bundle_name)/Contents/Info.plist
+	cp -f gnash $(bundle_name)/Contents/MacOS
+	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
+     
 if  HAVE_OPENGL
      plugins_LTLIBRARIES += libgnashaqua_ogl.la
      libgnashaqua_ogl_la_CPPFLAGS = $(AM_CPPFLAGS) \
