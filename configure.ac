@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.373 2007/07/28 01:40:41 nihilus Exp $
+dnl $Id: configure.ac,v 1.374 2007/07/28 01:59:15 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -956,8 +956,22 @@ if test x"$plugin" = xno; then
   klash=no
 fi
 
+dnl # NO kde ? NO klash !
+if test x$has_kde != xyes; then
+  if test x$klash = xyes; then
+    echo "WARNING: No KDE development package installed, disabling klash"
+    klash=no
+  fi
+fi
+if test x$has_qt != xyes; then
+  if test x$klash = xyes; then
+    echo "WARNING: No QT development package installed, disabling klash"
+    klash=no
+  fi
+fi
+
 dnl # Check KDE if kde gui or klash were requested
-if test x$build_kde = xyes -o x$klash = xyes -o x$plugin = xno; then
+if test x$build_kde = xyes -o x"$klash" = xyes -o x"$plugin" = xno; then
   kde=yes
   qt=yes
   build_kde=yes
@@ -976,21 +990,6 @@ AM_CONDITIONAL(BUILD_SDL_GUI, [ test x$build_sdl = xyes ])
 AM_CONDITIONAL(BUILD_FB_GUI, [ test x$build_fb = xyes ])
 AM_CONDITIONAL(BUILD_AQUA_GUI, [ test x$build_aqua = xyes ])
 AM_CONDITIONAL(BUILD_RISCOS_GUI, [ test x$build_riscos = xyes ])
-
-
-dnl # NO kde ? NO klash !
-if test x$has_kde != xyes; then
-  if test x$klash = xyes; then
-    echo "WARNING: No KDE development package installed, disabling klash"
-  fi
-  klash=no
-fi
-if test x$has_qt != xyes; then
-  if test x$klash = xyes; then
-    echo "WARNING: No QT development package installed, disabling klash"
-  fi
-  klash=no
-fi
 
 AM_CONDITIONAL(KLASH, [test x$klash = xyes])
 
