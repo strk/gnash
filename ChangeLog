@@ -1,3 +1,7 @@
+2007-07-28 Markus Gothe <nietzsche@lysator.liu.se>
+	
+	* configure.ac: Don't try building KDE/Klash if we'vent got the libs...
+
 2007-07-27 Nick Warne <nick@ukfsn.org>
 
 	* plugin/klash/klash_part.cpp: typo (0l => 0L)
