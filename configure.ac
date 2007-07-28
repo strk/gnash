@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.375 2007/07/28 21:00:36 strk Exp $
+dnl $Id: configure.ac,v 1.376 2007/07/28 22:01:56 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -304,7 +304,7 @@ dnl        build_riscos=yes
          ;;
       esac]
     enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
-    if test x$val = x$enableval; then
+    if test "x$val" = "x$enableval"; then
       break;
     fi
   done
