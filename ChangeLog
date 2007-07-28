@@ -1,3 +1,8 @@
+2007-07-28 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-mtasc.all/Makefile.am: distribute
+	  mtasc related files even if mtasc is not detected.
+
 2007-07-28 Markus Gothe <nietzsche@lysator.liu.se>
 	
 	* configure.ac: Don't try building KDE/Klash if we'vent got the libs...

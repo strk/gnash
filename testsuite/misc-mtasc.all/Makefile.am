@@ -18,11 +18,6 @@
 
 AUTOMAKE_OPTIONS = dejagnu
 
-if ENABLE_MTASC
-
-MTASC_FLAGS = -version 6 -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
-MTASC_CPP = $(CPP) -P -I$(srcdir)
-
 # These will get executed and parsed for test output
 ASTESTS = \
 	hello.as \
@@ -39,7 +34,13 @@ AUXMOVIES = \
 	    level99.as \
 	    $(NULL)
 
+
 EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as check.as Dejagnu.as
+
+if ENABLE_MTASC
+
+MTASC_FLAGS = -version 6 -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
+MTASC_CPP = $(CPP) -P -I$(srcdir)
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)
 
