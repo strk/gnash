@@ -1,5 +1,6 @@
 2007-07-28 Sandro Santilli <strk@keybit.net>
 
+	* po/Makefile.am: use GMSGFMT, rather then verbatim 'msgfmt'.
 	* configure.ac: simplify gui selection code, fix bug listing
 	  same gui twice.
 	* gui/gui_fb.cpp: typo fix (FbGui => FBGui).

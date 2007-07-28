@@ -48,6 +48,7 @@ EXTRA_DIST = $(gmofiles)
 all: $(gmofiles)
 
 if HAS_GETTEXT
+
 POTFILES: $(srcfiles)
 	@echo "Building POTFILES..."
 	@rm -f POTFILES
@@ -72,13 +73,16 @@ $(gmofiles): #update-po
 
 SUFFIXES = .po .gmo
 .po.gmo:
-	msgfmt --statistics --directory=$(srcdir) -o $*.gmo $(@:%.gmo=%.po) 
-else
+	$(GMSGFMT) --statistics --directory=$(srcdir) -o $*.gmo $(@:%.gmo=%.po) 
+
+else # not HAS_GETTEXT
+
 $(gmofiles): force
 	@for i in $(gmofiles); do \
 	  ln -fs $(srcdir)/$$i.in $$i; \
 	done
-endif
+
+endif # not HAS_GETTEXT
 
 force:
 
