@@ -1,4 +1,4 @@
-$Id: DESIGN,v 1.3 2007/07/27 13:52:17 nihilus Exp $
+$Id: DESIGN,v 1.4 2007/07/28 01:18:33 nihilus Exp $
 
 Overview
 ========
@@ -22,6 +22,9 @@ This funtion is run first to initialize GUI-specific parameters/variables.
 
 createWindow(const char* title, int width, int height): 
 Here we create a window-widget with calling parameters.
+
+setCursor(gnash_cursor_type newcursor):
+This function is called when the cursor-type is changed.
 
 run(): 
 This is the main()-call for the GUI.

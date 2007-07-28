@@ -22,7 +22,7 @@
 #endif
 
 #ifndef DEFAULT_GUI
-# define DEFAULT_GUI guiNull
+# define DEFAULT_GUI "NULL"
 #endif
 
 #include "gui.h"

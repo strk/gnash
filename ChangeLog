@@ -18,6 +18,7 @@
 2007-07-27 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* gui/DESIGN: Added some docmentation on the GUI-API.
+	* gui/Player.cpp: define DEAFULT_GUI as a string instead of enum.
 
 2007-07-26 Sandro Santilli <strk@keybit.net>
 
