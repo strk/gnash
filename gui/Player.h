@@ -53,6 +53,7 @@ class DSOEXPORT Player
 {
 public:
 
+	/// A GUI to use as frontend
 	enum GuiFlavor {
 
 		/// Null gui
