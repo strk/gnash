@@ -1,11 +1,11 @@
-2007-07-29 <meteoryte@yahoo.com.au>
+2007-07-29 Ivor Blockley <meteoryte@yahoo.com.au>
 
 	* server/array.{cpp,h}: implement remaining array.sort(..) functionality
 	  (flags UNIQUE and RETURNINDEXEDARRAY) all of array.sortOn(...)
 	* testsuite/actionscript.all/array.as: test for Array.sort and
 	  Array.sortOn
 
-2007-07-29 <meteoryte@yahoo.com.au>
+2007-07-29 Ivor Blockley <meteoryte@yahoo.com.au>
 
 	* server/array.cpp: Fix bug in the array.splice(index) method to
 	  prevent an incorrect number of elements being spliced; fix bug
@@ -647,7 +647,7 @@
 	* testsuite/misc-ming.all/DefineEditTextTest.c:
 	  include dejagnuclip, make it to be a self-contained one.
 	  
-2007-07-12 <meteoryte@yahoo.com.au>
+2007-07-12 Ivor Blockley <meteoryte@yahoo.com.au>
 
 	Applied patch #6081
 	* server/array.{cpp,h}: fix user-defined comparator for sort()
