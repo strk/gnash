@@ -1,5 +1,12 @@
 2007-07-29 <meteoryte@yahoo.com.au>
 
+	* server/array.{cpp,h}: implement remaining array.sort(..) functionality
+	  (flags UNIQUE and RETURNINDEXEDARRAY) all of array.sortOn(...)
+	* testsuite/actionscript.all/array.as: test for Array.sort and
+	  Array.sortOn
+
+2007-07-29 <meteoryte@yahoo.com.au>
+
 	* server/array.cpp: Fix bug in the array.splice(index) method to
 	  prevent an incorrect number of elements being spliced; fix bug
 	  in the array.slice(startindex, endindex) method for certain

@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.21 2007/07/29 12:45:25 strk Exp $";
+rcsid="$Id: array.as,v 1.22 2007/07/29 12:57:01 strk Exp $";
 
 #include "check.as"
 
@@ -347,4 +347,431 @@ xcheck(c.hasOwnProperty('0'));
 check(!c.hasOwnProperty('1'));
 xcheck(c.hasOwnProperty('2'));
 #endif
+
+//-------------------------------
+// Test sort
+//-------------------------------
+
+function cmp_fn(x,y)
+{
+	if (x.length < y.length) { return -1; }
+	if (x.length > y.length) { return 1; }
+	return 0;
+}
+
+function tolen(x)
+{
+	var i;
+	str = "[";
+	for (i = 0; i < x.length; i++) 
+	{
+		str += String(x[i].length);
+		if (i != x.length - 1) str += ", ";
+	}
+	str += "]";
+	return str;
+}
+
+a = ["ed", "emacs", "", "vi", "nano", "Jedit"];
+b = [8, 1, -2, 5, -7, -9, 3, 0];
+c = [7.2, 2.0, -0.5, 3/0, 0.0, 8.35, 0.001, -3.7];
+d = [];
+e = ["singleton"];
+
+trace(" -- Basic Sort Tests -- ");
+
+r = a.sort( Array.NUMERIC );
+check_equals( r.toString(), ",Jedit,ed,emacs,nano,vi" );
+check_equals( a.toString(), ",Jedit,ed,emacs,nano,vi" );
+a.sort( Array.NUMERIC | Array.CASEINSENSITIVE );
+check_equals( a.toString(), ",ed,emacs,Jedit,nano,vi" );
+a.sort();
+check_equals( a.toString(), ",Jedit,ed,emacs,nano,vi" );
+a.sort( Array.CASEINSENSITIVE );
+check_equals( a.toString(), ",ed,emacs,Jedit,nano,vi" );
+a.sort( Array.UNIQUESORT );
+check_equals( a.toString(), ",Jedit,ed,emacs,nano,vi" );
+r = a.sort( Array.DESCENDING );
+check_equals( r.toString(), "vi,nano,emacs,ed,Jedit," );
+check_equals( a.toString(), "vi,nano,emacs,ed,Jedit," );
+
+r = b.sort();
+check_equals( r.toString(), "-2,-7,-9,0,1,3,5,8" );
+check_equals( b.toString(), "-2,-7,-9,0,1,3,5,8" );
+b.sort( Array.NUMERIC );
+check_equals( b.toString(), "-9,-7,-2,0,1,3,5,8" );
+b.sort( Array.UNIQUESORT );
+check_equals( b.toString(), "-2,-7,-9,0,1,3,5,8" );
+b.sort( Array.DESCENDING );
+check_equals( b.toString(), "8,5,3,1,0,-9,-7,-2" );
+r = b.sort( Array.DESCENDING | Array.NUMERIC );
+check_equals( r.toString(), "8,5,3,1,0,-2,-7,-9" );
+check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
+
+r = c.sort();
+check_equals( r.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity" );
+check_equals( c.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity" );
+c.sort( Array.CASEINSENSITIVE );
+check_equals( c.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity" );
+c.sort( Array.NUMERIC );
+check_equals( c.toString(), "-3.7,-0.5,0,0.001,2,7.2,8.35,Infinity" );
+r = c.sort( Array.UNIQUESORT );
+check_equals( c.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity" );
+r = c.sort( Array.DESCENDING | Array.NUMERIC );
+check_equals( c.toString(), "Infinity,8.35,7.2,2,0.001,0,-0.5,-3.7" );
+
+r = d.sort();
+check_equals( r.toString(), "" );
+check_equals( d.toString(), "" );
+d.sort( Array.UNIQUESORT );
+check_equals( d.toString(), "" );
+d.sort( Array.DESCENDING | Array.NUMERIC );
+check_equals( d.toString(), "" );
+
+r = e.sort();
+check_equals( r.toString(), "singleton" );
+check_equals( e.toString(), "singleton" );
+e.sort( Array.UNIQUESORT );
+check_equals( e.toString(), "singleton" );
+e.sort( Array.DESCENDING | Array.CASEINSENSITIVE );
+check_equals( e.toString(), "singleton" );
+
+trace(" -- Return Indexed Array Tests -- ");
+
+r = a.sort( Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "5,4,3,2,1,0" );
+check_equals( a.toString(), "vi,nano,emacs,ed,Jedit," );
+r = a.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING | Array.CASEINSENSITIVE );
+check_equals( r.toString(), "0,1,4,2,3,5" );
+check_equals( a.toString(), "vi,nano,emacs,ed,Jedit," );
+r = b.sort( Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "5,6,7,4,3,2,1,0" );
+r = b.sort( Array.RETURNINDEXEDARRAY | Array.NUMERIC );
+check_equals( r.toString(), "7,6,5,4,3,2,1,0" );
+r = b.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING | Array.CASEINSENSITIVE );
+check_equals( r.toString(), "0,1,2,3,4,7,6,5" );
+r = c.sort( Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "6,7,5,4,3,2,1,0" );
+r = c.sort( Array.RETURNINDEXEDARRAY | Array.NUMERIC );
+check_equals( r.toString(), "7,6,5,4,3,2,1,0" );
+r = c.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING | Array.CASEINSENSITIVE );
+check_equals( r.toString(), "0,1,2,3,4,5,7,6" );
+r = d.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+check_equals( r.toString(), "" );
+check_equals( d.toString(), "" );
+r = d.sort( Array.NUMERIC | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "" );
+check_equals( d.toString(), "" );
+r = e.sort( Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0" );
+check_equals( e.toString(), "singleton" );
+r = e.sort( Array.NUMERIC | Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+check_equals( r.toString(), "0" );
+
+trace(" -- Custom AS function tests -- ");
+r = a.sort( cmp_fn, Array.UNIQUE );
+check_equals( r.toString(), ",vi,ed,nano,emacs,Jedit" );
+check_equals( a.toString(), ",vi,ed,nano,emacs,Jedit" );
+r = a.sort( something_undefined );
+check_equals(typeof(r), 'undefined');
+r = a.sort( cmp_fn, Array.DESCENDING );
+check_equals( tolen(r), "[5, 5, 4, 2, 2, 0]" );
+check_equals( tolen(a), "[5, 5, 4, 2, 2, 0]" );
+a.sort( cmp_fn, Array.CASEINSENSITIVE | Array.NUMERIC );
+check_equals( tolen(a), "[0, 2, 2, 4, 5, 5]" );
+r = a.sort( cmp_fn, Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0,1,2,3,4,5" );
+r = a.sort( cmp_fn, Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+check_equals( r.toString(), "5,4,3,2,1,0" );
+r = d.sort( cmp_fn );
+check_equals( r.toString(), "" );
+check_equals( d.toString(), "" );
+r = d.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE );
+check_equals( r.toString(), "" );
+check_equals( d.toString(), "" );
+r = e.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE );
+check_equals( r.toString(), "singleton" );
+check_equals( e.toString(), "singleton" );
+
+a.push("ED");
+b.push(3.0);
+c.push(9/0);
+
+trace(" -- UNIQUESORT tests -- ");
+
+r = a.sort( Array.UNIQUESORT );
+check_equals( r.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
+check_equals( a.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
+r = a.sort( Array.UNIQUESORT | Array.CASEINSENSITIVE );
+check_equals( r.toString(), "0" );
+check_equals( a.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
+r = a.sort( Array.UNIQUESORT | Array.CASEINSENSITIVE | Array.DESCENDING );
+check_equals( r.toString(), "0" );
+check_equals( a.toString(), ",ED,Jedit,ed,emacs,nano,vi" );
+r = a.sort( Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0,1,2,3,4,5,6" );
+r = a.sort( Array.UNIQUESORT | Array.CASEINSENSITIVE | Array.DESCENDING | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0" );
+
+r = b.sort( Array.UNIQUESORT );
+check_equals( r.toString(), "0" );
+check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9,3" );
+r = b.sort( Array.UNIQUESORT | Array.NUMERIC );
+check_equals( r.toString(), "0" );
+r = b.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING );
+check_equals( r.toString(), "0" );
+r = b.sort( Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0" );
+r = b.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0" );
+
+r = c.sort( Array.UNIQUESORT );
+check_equals( r.toString(), "0" );
+check_equals( c.toString(), "Infinity,8.35,7.2,2,0.001,0,-0.5,-3.7,Infinity" );
+r = c.sort( Array.UNIQUESORT | Array.NUMERIC );
+check_equals( r.toString(), "0" );
+r = c.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING );
+check_equals( r.toString(), "0" );
+r = c.sort( Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0" );
+r = c.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0" );
+r = a.sort( cmp_fn, Array.UNIQUE | Array.CASEINSENSITIVE );
+check_equals( tolen(r), "[0, 2, 2, 2, 4, 5, 5]" );
+check_equals( tolen(a), "[0, 2, 2, 2, 4, 5, 5]" );
+r = a.sort( cmp_fn, Array.UNIQUE | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0,1,2,3,4,5,6" ); 
+r = a.sort( cmp_fn, Array.UNIQUE | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+check_equals( r.toString(), "6,5,4,3,2,1,0" );
+
+trace(" -- Array with null value  -- ");
+c.push(null);
+
+r = c.sort();
+check_equals( r.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity,Infinity,null" ); 
+check_equals( c.toString(), "-0.5,-3.7,0,0.001,2,7.2,8.35,Infinity,Infinity,null" );
+c.sort( Array.NUMERIC );
+check_equals( c.toString(), "-3.7,-0.5,0,0.001,2,7.2,8.35,Infinity,Infinity,null" );
+c.sort( Array.DESCENDING | Array.NUMERIC );
+check_equals( c.toString(), "null,Infinity,Infinity,8.35,7.2,2,0.001,0,-0.5,-3.7" );
+r = c.sort( Array.RETURNINDEXEDARRAY | Array.NUMERIC );
+check_equals( r.toString(), "9,8,7,6,5,4,3,1,2,0" );
+r = c.sort( Array.RETURNINDEXEDARRAY | Array.DESCENDING | Array.CASEINSENSITIVE );
+check_equals( r.toString(), "0,1,2,3,4,5,6,7,9,8" );
+r = c.sort( Array.UNIQUESORT );
+check_equals( r.toString(), "0" );
+r = c.sort( Array.UNIQUESORT | Array.NUMERIC );
+check_equals( r.toString(), "0" );
+r = c.sort( Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0" );
+r = c.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0" );
+
+trace(" -- Array with 2 null values  -- ");
+c = [7.2, 2.0, null, -0.5, 3/0, 0.0, null, 8.35, 0.001, -3.7];
+c.sort( Array.NUMERIC );
+check_equals( c.toString(), "-3.7,-0.5,0,0.001,2,7.2,8.35,Infinity,null,null" );
+c.sort( Array.DESCENDING | Array.NUMERIC );
+check_equals( c.toString(), "null,null,Infinity,8.35,7.2,2,0.001,0,-0.5,-3.7" );
+r = c.sort( Array.RETURNINDEXEDARRAY | Array.NUMERIC );
+check_equals( r.toString(), "9,8,7,6,5,4,3,2,0,1" );
+check_equals( c.toString(), "null,null,Infinity,8.35,7.2,2,0.001,0,-0.5,-3.7" );
+r = c.sort( Array.UNIQUESORT );
+check_equals( r.toString(), "0" );
+r = c.sort( Array.UNIQUESORT | Array.NUMERIC );
+check_equals( r.toString(), "0" );
+
+trace(" -- Array with 2 undefined values  -- ");
+c = [7.2, 2.0, undefined, -0.5, 3/0, 0.0, undefined, 8.35, 0.001, -3.7];
+r = c.sort( Array.UNIQUESORT );
+check_equals( r.toString(), "0" );
+r = c.sort( Array.UNIQUESORT | Array.NUMERIC );
+check_equals( r.toString(), "0" );
+
+trace(" -- Array with 2 NaN values  -- ");
+c = [7.2, 2.0, NaN, -0.5, 3/0, 0.0, NaN, 8.35, 0.001, -3.7];
+r = c.sort( Array.UNIQUESORT );
+check_equals( r.toString(), "0" );
+r = c.sort( Array.UNIQUESORT | Array.NUMERIC );
+check_equals( r.toString(), "0" );
+
+//-------------------------------
+// Test sortOn
+//-------------------------------
+
+a = [];
+a.push({Name: "Zuse Z3", Year: 1941, Electronic: false});
+a.push({Name: "Colossus", Year: 1943, Electronic: true});
+a.push({Name: "ENIAC", Year: 1944, Electronic: true});
+
+function tostr(x)
+{
+	var i;
+	str = "";
+	for(i = 0; i < x.length; i++)
+	{
+		y = a[i];
+		str += (y.Name + "," + y.Year + "," + y.Electronic );
+		if (i != x.length - 1) str += " | ";
+	}
+	return str;
+}
+
+trace("sortOn a single property ");
+r = a.sortOn( "Name" );
+check_equals( tostr(r), "Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+check_equals( tostr(a), "Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+r = a.sortOn( "Year" );
+check_equals( tostr(r), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+check_equals( tostr(a), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+
+a.sortOn( "Electronic" );
+check_equals( tostr(a), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+
+a.sortOn("Year", Array.NUMERIC );
+check_equals( tostr(a), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+
+a.sortOn("Year", Array.NUMERIC | Array.DESCENDING );
+check_equals ( tostr(a), "ENIAC,1944,true | Colossus,1943,true | Zuse Z3,1941,false" );
+
+r = a.sortOn("Year", Array.UNIQUESORT | Array.NUMERIC );
+check_equals ( tostr(r), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+check_equals ( tostr(a), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+
+r = a.sortOn("Year", Array.RETURNINDEXEDARRAY | Array.NUMERIC );
+check_equals( r.toString(), "0,1,2" );
+check_equals ( tostr(a), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+
+r = a.sortOn("Name", Array.UNIQUESORT );
+check_equals( tostr(r), "Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+check_equals( tostr(a), "Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+r = a.sortOn("Name", Array.UNIQUESORT | Array.DESCENDING );
+check_equals( tostr(r), "Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true" );
+
+r = a.sortOn("Name", Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "2,1,0" );
+
+r = a.sortOn("Electronic", Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0" );
+check_equals( tostr(a), "Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true");
+
+trace("sortOn multiple properties");
+a.push({Name: "Atanasoff-Berry", Year: 1941, Electronic: true, Mass: 320});
+
+r = a.sortOn( ["Name", "Year"] );
+check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+a.sortOn( ["Electronic", "Year"] );
+check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
+
+a.sortOn( ["Electronic", "Year"], [Array.DESCENDING, Array.NUMERIC] );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+r = a.sortOn( ["Name", "Year"], [Array.UNIQUESORT, Array.NUMERIC] );
+check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+r = a.sortOn( ["Electronic", "Name"], [Array.UNIQUESORT, Array.NUMERIC] );
+check_equals( tostr(r), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
+
+
+trace("sortOn missing properties" );
+r = a.sortOn(["Megaflops"] );
+check_equals( tostr(r), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
+check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
+
+a.sortOn(["Binary", "Turing complete"] );
+check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
+
+a.sortOn(["Inventor", "Cost"], [Array.DESCENDING, 0] );
+check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
+
+r = a.sortOn(["Name", "Year", "Cost"], [Array.DESCENDING, Array.NUMERIC, 0] );
+check_equals( tostr(a), "Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true" );
+
+r = a.sortOn(["Name", "Cost", "Year"], [0, 0, Array.NUMERIC] );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+r = a.sortOn(["Electronic", "Year", "Cost"], [Array.UNIQUESORT, Array.NUMERIC, Array.NUMERIC] );
+check_equals( tostr(r), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
+check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
+
+r = a.sortOn(["Electronic", "Cost" ], [Array.UNIQUESORT, Array.NUMERIC] );
+check_equals( r.toString(), "0" );
+
+trace("sortOn with mismatching array lengths");
+r = a.sortOn( ["Name", "Year"], [0] );
+check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+r = a.sortOn( ["Name", "Year"], [Array.DESCENDING] );
+check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+a.sortOn(["Name", "Electronic"], [Array.DESCENDING] );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+r = a.sortOn(["Name", "Year"], [Array.RETURNINDEXEDARRAY] );
+check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+trace("sortOn, undocumented invocation");
+r = a.sortOn( ["Name", "Year"], Array.DESCENDING );
+check_equals( tostr(r), "Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true" );
+check_equals( tostr(a), "Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true" );
+
+a.sortOn( ["Year", "Name"], Array.NUMERIC );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+
+a.sortOn( ["Electronic", "Year", "Name"], Array.NUMERIC | Array.DESCENDING );
+check_equals( tostr(a), "ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true | Zuse Z3,1941,false" );
+
+#if OUTPUT_VERSION > 6
+trace("sortOn partially missing properties");
+
+r = a.sortOn(["Name", "Electronic"], [Array.DESCENDING] );
+check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+r = a.sortOn(["Name", "Year"], [Array.RETURNINDEXEDARRAY]);
+check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+trace("sortOn partially missing properties");
+a.push({Name: "Harvard Mark I", Year: 1944, Mass: 4500});
+
+a.sortOn(["Electronic", "Year"], Array.DESCENDING | Array.IGNORECASE );
+check_equals( tostr(a), "Harvard Mark I,1944,undefined | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true | Zuse Z3,1941,false" );
+
+a.sortOn( ["Electronic", "Name"], [Array.NUMERIC, Array.DESCENDING] );
+check_equals( tostr(a), "Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined" );
+
+r = a.sortOn( ["Electronic", "Name"], [Array.UNIQUESORT, Array.NUMERIC] );
+check_equals( tostr(r), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Harvard Mark I,1944,undefined" );
+check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Harvard Mark I,1944,undefined" );
+
+a.sortOn( ["Mass", "Name"], [0, 0] );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+a.sortOn( ["Mass", "Year", "Name"], [Array.NUMERIC | Array.DESCENDING, Array.NUMERIC | Array.DESCENDING | 0] );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+
+a.sortOn( ["Mass", "Name"], [Array.UNIQUE, Array.DESCENDING] );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined | Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true" );
+
+a.sortOn( ["Electronic", "Mass", "Name"], [0, Array.NUMERIC | Array.DESCENDING, 0] );
+check_equals( tostr(a), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true | Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined" );
+
+r = a.sortOn( ["Electronic", "Mass", "Year", "Name"], [Array.RETURNINDEXEDARRAY, Array.NUMERIC, Array.NUMERIC, Array.DESCENDING] );
+check_equals( r.toString(), "0,3,1,2,4");
+#endif // OUTPUT_VERSION > 6
+
+#if OUTPUT_VERSION < 7
+trace("sortOn property name case-mismatch");
+a.sortOn( ["name"] );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+a.sortOn( ["year", "name"], Array.NUMERIC );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+#endif // OUTPUT_VERSION < 7
 

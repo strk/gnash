@@ -38,6 +38,17 @@ namespace gnash {
 
 namespace gnash {
 
+struct indexed_as_value : public as_value
+{
+	int vec_index;
+
+	indexed_as_value(const as_value& val, int index)
+	: as_value(val)
+	{
+		vec_index = index;
+	}
+};
+
 /// The Array ActionScript object
 class as_array_object : public as_object
 {
@@ -53,7 +64,10 @@ public:
 		/// Descending order (b precedes a)
 		fDescending		= (1<<1), // 2
 
-		/// Remove consecutive equal elements
+		/// If two or more elements in the array
+		/// have identical sort fields, return 0
+		/// and don't modify the array.
+		/// Otherwise proceed to sort the array.
 		fUniqueSort		= (1<<2), // 4
 
 		/// Don't modify the array, rather return
@@ -68,8 +82,14 @@ public:
 	as_array_object();
 
 	as_array_object(const as_array_object& other);
-	
+
 	~as_array_object();
+
+	std::deque<indexed_as_value> get_indexed_elements();
+
+	std::deque<as_value>::const_iterator begin();
+
+	std::deque<as_value>::const_iterator end();
 
 	void push(const as_value& val);
 
@@ -80,6 +100,8 @@ public:
 	as_value pop();
 
 	as_value at(unsigned int index);
+
+	as_array_object* get_indices(std::deque<indexed_as_value> origElems);
 
 	void reverse();
 
@@ -152,17 +174,84 @@ public:
 	std::auto_ptr<as_array_object> splice(unsigned start, unsigned len,
 			const std::vector<as_value>& replacement);
 
+	/// \brief
 	/// Sort the array, using given values comparator
-	void sort(as_function& comparator, boost::intrusive_ptr<as_object> this_ptr, uint8_t flags=0);
+	///
+	/// @param avc
+	///	boolean functor or function comparing two as_value& objects
+	///
+	template <class AVCMP>
+	void sort(AVCMP* avc)
+	{
+		std::sort(elements.begin(), elements.end(), *avc);
+	}
 
-	void sort(uint8_t flags=0);
+	/// \brief
+	/// Attempt to sort the array using given values comparator, avc.
+	/// If two or more elements in the array are equal, as determined
+	/// by the equality comparator ave, then the array is not sorted
+	/// and 0 is returned. Otherwise the array is sorted and returned.
+	///
+	/// @param avc
+	///	boolean functor or function comparing two as_value& objects
+	///     used to determine sort-order
+	///
+	/// @param ave
+	///	boolean functor or function comparing two as_value& objects
+	///     used to determine equality
+	///
+	template <class AVCMP, class AVEQ>
+	as_value sort(AVCMP* avc, AVEQ* ave)
+	{
+		std::deque<as_value> nelem = std::deque<as_value>(elements);
 
+		std::sort(nelem.begin(), nelem.end(), *avc);
+		if (adjacent_find(nelem.begin(), nelem.end(), *ave) != nelem.end() )
+			return as_value(0);
+
+		elements = nelem;
+		return as_value(this);
+	}
+
+	/// \brief
 	/// Return a new array containing sorted index of this array
-	//
-	/// NOTE: assert(flags & Array::fReturnIndexedArray)
-	std::auto_ptr<as_array_object> sorted_indexes(uint8_t flags);
+	///
+	/// @param avc
+	///	boolean functor or function comparing two as_value& objects
+	///
+	template <class AVCMP>
+	as_array_object* sort_indexed(AVCMP* avc)
+	{
+		std::deque<indexed_as_value> ielem = get_indexed_elements();
+		std::sort(ielem.begin(), ielem.end(), *avc);
+		return get_indices(ielem);
+	}
 
-	std::auto_ptr<as_array_object> sorted_indexes(as_function& comparator, uint8_t flags);
+	/// \brief
+	/// Return a new array containing sorted index of this array.
+	/// If two or more elements in the array are equal, as determined
+	/// by the equality comparator ave, then 0 is returned instead.
+	///
+	/// @param avc
+	///	boolean functor or function comparing two as_value& objects
+	///     used to determine sort-order
+	///
+	/// @param ave
+	///	boolean functor or function comparing two as_value& objects
+	///     used to determine equality
+	///
+	template <class AVCMP, class AVEQ>
+	as_value sort_indexed(AVCMP* avc, AVEQ* ave)
+	{
+		std::deque<indexed_as_value> ielem = get_indexed_elements();
+
+		std::sort(ielem.begin(), ielem.end(), *avc);
+
+		if (adjacent_find(ielem.begin(), ielem.end(), *ave) != ielem.end() )
+			return as_value(0);
+
+		return get_indices(ielem);
+	}
 
 	/// Overridden to provide 'length' member
 	//
