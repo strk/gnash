@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.49 2007/07/09 13:51:08 strk Exp $
+dnl $Id: ffmpeg.m4,v 1.50 2007/07/29 04:40:34 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -411,6 +411,30 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
       AC_MSG_RESULT(${libdc})
       ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libdc}"
     fi
+
+    dnl Look for the swscale library, which is required on some system if ffmpeg is
+    dnl configured with --enable-gpl --enable-swscale.
+    AC_MSG_CHECKING([for libswscale library])
+    if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
+      $PKG_CONFIG --exists libswscale  && libsws=`$PKG_CONFIG --libs libswscale`
+    else
+      libsws=""
+    fi
+    if test x"${libsws}" = x; then
+      if test -f ${topdir}/libswscale.a -o -f ${topdir}/libswscale.${shlibext}; then
+        ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lswscale"
+        AC_MSG_RESULT(yes)
+      else
+        AC_MSG_RESULT(no)
+        if test x${cross_compiling} = xno; then
+          AC_CHECK_LIB(swscale, sws_scale, [ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} -lswscale"])
+        fi
+      fi
+    else
+      AC_MSG_RESULT(${libsws})
+      ac_cv_path_ffmpeg_lib="${ac_cv_path_ffmpeg_lib} ${libsws}"
+    fi
+
   fi                            dnl end of all optional library tests
 
   # Set final compilation flags, eliminating the pointless "-I/usr/include"
