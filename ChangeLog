@@ -1,8 +1,9 @@
 2007-07-28 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: don't miss to set add_renderer when no
-	  --enable-renderer is given, and don't abort if flkt or fb
-	  guis are picked up with opengl renderer.
+	  --enable-renderer is given, and only abort complaining if NO
+	  GUI supporting opengl is built while also requesting to build opengl
+	  renderer.
 
 2007-07-28 Sandro Santilli <strk@keybit.net>
 
