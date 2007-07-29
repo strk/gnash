@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.381 2007/07/29 16:35:43 strk Exp $
+dnl $Id: configure.ac,v 1.382 2007/07/29 17:33:23 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -229,7 +229,6 @@ AC_ARG_ENABLE(klash,
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-klash option]) ;;
 esac],klash=yes)
 
-add_gui=
 build_fb=no
 build_fltk=no
 build_kde=no
@@ -308,14 +307,8 @@ dnl        build_riscos=yes
     if test "x$val" = "x$enableval"; then
       break;
     fi
-  done
+  done,build_gtk=yes;build_kde=yes;
 )
-
-if test x$add_gui = x; then
-   build_gtk=yes
-   build_kde=yes
-   add_gui="gtk,kde"
-fi
 
 add_renderer=
 build_ogl=no
