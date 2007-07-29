@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.382 2007/07/29 17:33:23 strk Exp $
+dnl $Id: configure.ac,v 1.383 2007/07/29 22:04:52 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -359,7 +359,7 @@ fi
 
 if test x$build_ogl = xyes; then
 dnl   if test x$build_fb = xyes -o x$build_fltk = xyes; then
-   if test x$build_gtk != xyes -a x$build_fltk != xyes -a x$build_kde != xyes; then
+   if test x$build_gtk != xyes -a x$build_fltk != xyes -a x$build_kde != xyes -a x$build_aqua != xyes; then
      AC_MSG_ERROR([OpenGL renderer needs one of gtk,fltk or kde guis. Try enabling any of them ( --enable-gui=gtk|kde|fltk ) or using AGG ( --enable-renderer=AGG ).]);
    fi
    AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
@@ -1320,6 +1320,7 @@ testsuite/movies.all/Makefile
 testsuite/server/Makefile
 testsuite/libamf.all/Makefile
 gui/Makefile
+gui/Info.plist
 extensions/Makefile
 extensions/dejagnu/Makefile
 extensions/mysql/Makefile

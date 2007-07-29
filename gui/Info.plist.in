@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>gnash</string>
 	<key>CFBundleGetInfoString</key>
-	<string>0.8.1, Copyright (C) 2005-2007 Free Software Foundation, Inc.</string>
+	<string>@VERSION@, Copyright (C) 2005-2007 Free Software Foundation, Inc.</string>
 	<key>CFBundleTypeExtensions</key>
 	<array>
 	<string>swf</string>
@@ -21,7 +21,7 @@
     <string>SWF</string>
 	</array>
     <key>CFBundleGetInfoString</key>
-	<string>gnash Version 0.8.1</string>
+	<string>gnash version: @VERSION@</string>
 	<key>CFBundleIconFile</key>
 	<string>GnashG.icns</string>
 	<key>CFBundleIdentifier</key>
