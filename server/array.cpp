@@ -206,7 +206,7 @@ as_value
 as_array_object::pop()
 {
 	// If the array is empty, report an error and return undefined!
-	if (elements.size() <= 0)
+	if ( elements.empty() ) 
 	{
 	    log_error(_("tried to pop element from back of empty array, returning undef"));
 		return as_value(); // undefined
@@ -222,7 +222,7 @@ as_value
 as_array_object::shift()
 {
 	// If the array is empty, report an error and return undefined!
-	if (elements.size() <= 0)
+	if ( elements.empty() ) 
 	{
 		log_error(_("tried to shift element from front of empty array, returning undef"));
 		return as_value(); // undefined
@@ -367,7 +367,7 @@ as_array_object::splice(unsigned start, unsigned len,
 	}
 
 	// Now insert the new stuff, if needed
-	if ( replace.size() )
+	if ( ! replace.empty() )
 	{
 		container::iterator itStart = elements.begin()+start;
 		elements.insert(itStart, replace.begin(), replace.end());
@@ -545,7 +545,7 @@ array_splice(const fn_call& fn)
 	//----------------
 	// Get length
 	//----------------
-	unsigned len = 0;
+	unsigned len = origlen - start;
 	if (fn.nargs > 1)
 	{
 		int lenval = fn.arg(1).to_number<int>(&(fn.env()));
@@ -787,6 +787,7 @@ array_slice(const fn_call& fn)
 
 	// start and end index of the part we're slicing
 	int startindex, endindex;
+	unsigned int arraysize = array->size();
 
 	if (fn.nargs > 2)
 	{
@@ -810,7 +811,7 @@ array_slice(const fn_call& fn)
 
 	// if the index is negative, it means "places from the end"
 	// where -1 is the last element
-	if (startindex < 0) startindex = startindex + array->size();
+	if (startindex < 0) startindex = startindex + arraysize;
 
 	// if we sent at least two arguments, setup endindex
 	if (fn.nargs >= 2)
@@ -819,26 +820,25 @@ array_slice(const fn_call& fn)
 
 		// if the index is negative, it means
 		// "places from the end" where -1 is the last element
-		if (endindex < 0) endindex = endindex + array->size();
+		if (endindex < 0) endindex = endindex + arraysize;
 	}
 	else
 	{
 		// They didn't specify where to end,
 		// so choose the end of the array
-		endindex = array->size();
+		endindex = arraysize;
 	}
 
 	if ( startindex < 0 ) startindex = 0;
-	else if ( static_cast<size_t>(startindex)  > array->size() ) startindex = array->size();
+	else if ( static_cast<size_t>(startindex) > arraysize ) startindex = arraysize;
 
-	if ( endindex < 1 ) endindex = 1;
-	else if ( static_cast<size_t>(endindex)  > array->size() ) endindex = array->size();
+	if ( endindex < startindex ) endindex = startindex;
+	else if ( static_cast<size_t>(endindex)  > arraysize ) endindex = arraysize;
 
 	std::auto_ptr<as_array_object> newarray(array->slice(
 		startindex, endindex));
 
 	return as_value(newarray.release());		
-
 }
 
 static as_value
@@ -874,13 +874,13 @@ array_new(const fn_call& fn)
 	{
 		// Create an empty array with the given number of undefined elements.
 		//
-		as_value	index_number;
-		as_value null_value;
-		null_value.set_null();
+		as_value index_number, undef_value;
+
+		undef_value.set_undefined();
 		for (int i = 0; i < int(fn.arg(0).to_number()); i++)
 		{
 			index_number.set_int(i);
-			ao->set_member(index_number.to_string().c_str(), null_value);
+			ao->set_member(index_number.to_string().c_str(), undef_value);
 		}
 	}
 	else

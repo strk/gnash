@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.20 2007/07/13 01:13:46 strk Exp $";
+rcsid="$Id: array.as,v 1.21 2007/07/29 12:45:25 strk Exp $";
 
 #include "check.as"
 
@@ -59,6 +59,14 @@ check_equals ( typeof(a), "object" );
 // reference at sephiroth.it/reference.php says (under "==")
 // that two arrays are always considered NOT equal - need to verify
 check ( a != b ); 
+
+
+tmp = new Array(2);
+#if OUTPUT_VERSION > 6
+check_equals ( tmp.toString(), "undefined,undefined" );
+#else
+check_equals ( tmp.toString(), "," );
+#endif
 
 check_equals ( a.length, 3 );
 check_equals ( a[2], 12 );
@@ -187,6 +195,8 @@ mixed = mixed.concat([10,11],12,[13]);
 check_equals ( mixed.toString(), "5,6,7,8,9,10,11,12,13");
 
 // invalid calls
+portion = concatted.slice(0, -8);
+check_equals ( portion.toString(), "");
 portion = concatted.slice(-18);
 check_equals ( portion.toString(), "0,1,2,3,4,5,6");
 portion = concatted.slice(-18, 3);
@@ -285,6 +295,11 @@ check_equals ( ary.toString(), "1,2,3,4,5,6" );
 check_equals ( ary.length, 4 ); // don't be fooled by toString output !
 check_equals ( spliced.toString(), '2,a,b,10,11,12,8' );
 
+// Finally, ensure the simplest usage cases are correct!
+spliced = ary.splice(1);
+check_equals ( spliced.toString(), "3,4,5,6");
+spliced = ary.splice(0);
+check_equals ( spliced.toString(), "1,2");
 
 //-------------------------------
 // Test single parameter constructor, and implicitly expanding array

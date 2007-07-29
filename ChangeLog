@@ -1,3 +1,13 @@
+2007-07-29 <meteoryte@yahoo.com.au>
+
+	* server/array.cpp: Fix bug in the array.splice(index) method to
+	  prevent an incorrect number of elements being spliced; fix bug
+	  in the array.slice(startindex, endindex) method for certain
+	  negative endindexes; elements in a newly created array with
+	  non-zero size are now assigned a value of 'undefined' rather
+	  than 'null'; trivial optimizations/clean-ups.
+	* testsuite/actionscript.all/array.as: more tests.
+
 2007-07-28  Rob Savoye  <rob@deal.welcomehome.org>
 
 	* macros/ffmpeg.m4: Add test for libswscale, which is needed if
