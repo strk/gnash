@@ -54,13 +54,11 @@ dnl   esac], plugin=yes)
     else
       GNASHEXE=${gnashbindir}
     fi
-    dnl Always install the plugin in the users home directory.
+    dnl Always install the plugin in the users home directory. We
+    dnl always use .mozilla instead of .firefox, as this directoryis
+    dnl used by all mozilla derived browsers.
     if test x"${FIREFOX_PLUGINS}" = "x" ; then
-      if test -d $HOME/.mozilla/plugins; then
-        FIREFOX_PLUGINS=$HOME/.mozilla/plugins
-      else
-        FIREFOX_PLUGINS=$HOME/.firefox/plugins
-      fi
+       FIREFOX_PLUGINS=$HOME/.mozilla/plugins
     fi
   fi
 

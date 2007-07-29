@@ -1,3 +1,7 @@
+2007-07-29  Rob Savoye  <rob@deal.welcomehome.org>
+
+	* macros/firefox.m4: Always install the plugin in ~/.mozilla/plugins.
+
 2007-07-29 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: drop add_gui variable again, use another way to
