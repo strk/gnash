@@ -1,3 +1,7 @@
+2007-07-29 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: don't force KDE gui everytime plugin is disabled (sic).
+
 2007-07-29 Nick Warne <nick@ukfsn.org>
 
 	* configure.ac: don't rely on has_kde *before* it is attempted to be

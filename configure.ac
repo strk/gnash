@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.380 2007/07/29 16:18:17 strk Exp $
+dnl $Id: configure.ac,v 1.381 2007/07/29 16:35:43 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -921,7 +921,7 @@ if test x"$plugin" = xno; then
 fi
 
 dnl # Check KDE if kde gui or klash were requested
-if test x$build_kde = xyes -o x"$klash" = xyes -o x"$plugin" = xno; then
+if test x$build_kde = xyes -o x"$klash" = xyes; then
   kde=yes
   qt=yes
   build_kde=yes
