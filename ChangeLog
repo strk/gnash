@@ -1,5 +1,11 @@
 2007-07-28 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: don't miss to set add_renderer when no
+	  --enable-renderer is given, and don't abort if flkt or fb
+	  guis are picked up with opengl renderer.
+
+2007-07-28 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: proper quote args given to test (in the code
 	  snippet handling --enable-gui)
 

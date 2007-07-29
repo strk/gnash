@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.376 2007/07/28 22:01:56 strk Exp $
+dnl $Id: configure.ac,v 1.377 2007/07/29 03:22:04 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -354,15 +354,15 @@ AC_ARG_ENABLE(renderer,
 if test x$add_renderer = x; then
    build_ogl=yes
    build_agg=yes
-dnl   add_renderer="ogl,agg"
+   add_renderer="ogl,agg"
 fi
 
-if test x$build_ogl = xyes; then
-  if test x$build_fb = xyes -o x$build_fltk = xyes; then
-    AC_MSG_ERROR([OpenGL renderer is not supported by the this gui. Try using AGG ( --enable-renderer=AGG ).]);
-  fi
-  AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
-fi
+dnl if test x$build_ogl = xyes; then
+dnl   if test x$build_fb = xyes -o x$build_fltk = xyes; then
+dnl     AC_MSG_ERROR([OpenGL renderer is not supported by the this gui. Try using AGG ( --enable-renderer=AGG ).]);
+dnl   fi
+dnl   AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
+dnl fi
 
 dnl 16 bit: RGB555, RGB565
 dnl 24 bit: RGB24, BGR24
@@ -1252,6 +1252,7 @@ RENDERER_LIBS=
 for rend in `echo "${add_renderer}" | tr ',' ' '`; do
 	RENDERER_LIBS="${RENDERER_LIBS} \$(top_builddir)/backend/libgnash${rend}.la"
 done
+dnl echo "RENDERER_LIBS=$RENDERER_LIBS"
 AC_SUBST(RENDERER_LIBS)
 AC_SUBST(RENDERER_CONFIG)
 
