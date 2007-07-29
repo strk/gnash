@@ -1,5 +1,13 @@
 2007-07-28 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: re-introduce the $add_gui variable, so that a vanilla
+	  configuration still tries to build gtk and kde guis; don't make fb
+	  renderer and cairo gui incompatible (other guis might be requested,
+	  we'd need a better test to check that at least one compatible with
+	  cairo is there)
+
+2007-07-28 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: don't miss to set add_renderer when no
 	  --enable-renderer is given, and only abort complaining if NO
 	  GUI supporting opengl is built while also requesting to build opengl
