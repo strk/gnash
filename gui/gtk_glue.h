@@ -18,6 +18,9 @@
 //
 //
 
+#ifndef __GTK_GLUE_H__
+#define __GTK_GLUE_H__
+
 #include "gnash.h"
 
 #include <gtk/gtk.h>
@@ -45,3 +48,6 @@ class GtkGlue
 };
 
 } // namespace gnash
+
+// end of __GTK_GLUE_H__
+#endif

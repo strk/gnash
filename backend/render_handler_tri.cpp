@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.17 2007/07/18 10:03:04 udog Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.18 2007/07/30 21:26:39 strk Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -29,6 +29,8 @@
 #ifndef GNASH_RENDER_HANDLER_TRI_H
 #error missing includes!
 #endif
+
+#include "log.h"
 
 namespace gnash {
 
@@ -341,15 +343,19 @@ tri_cache_manager* triangulating_render_handler::get_cache_of(character_def* def
  
 
 geometry::Range2d<int>
-triangulating_render_handler::world_to_pixel(const rect& /*worldbounds*/)
+triangulating_render_handler::world_to_pixel(const rect& worldbounds)
 {
-  assert(0); // not implemented (and currently not required for tri. renderers)
+  // TODO: verify this is correct
+  geometry::Range2d<int> ret(worldbounds.getRange());
+  ret.scale(20); // twips to pixels
+  return ret;
 }
 
 point 
-triangulating_render_handler::pixel_to_world(int /*x*/, int /*y*/)
+triangulating_render_handler::pixel_to_world(int x, int y)
 {
-  assert(0); // not implemented (and currently not required for tri. renderers)
+  // TODO: verify this is correct
+  return point(PIXELS_TO_TWIPS(x), PIXELS_TO_TWIPS(y));
 }
 
 tri_cache_manager::~tri_cache_manager()

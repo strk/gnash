@@ -26,24 +26,11 @@
 #endif
 
 #include "gnash.h"
-#include "tu_config.h"
+#include "tu_config.h" // for DSOEXPORT
+#include "gtk_glue.h"
 
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
-
-#ifdef RENDERER_OPENGL
-#include <gtk/gtkgl.h>
-#include "gtk_glue_gtkglext.h"
-#elif defined(RENDERER_CAIRO)
-#include <cairo.h>
-#include "gtk_glue_cairo.h"
-#elif defined(RENDERER_AGG)
-#include "gtk_glue_agg.h"
-#endif
-
-#include <gtk/gtk.h>
-
-#include "gui.h"
 
 
 namespace gnash
@@ -138,10 +125,9 @@ class DSOEXPORT GtkGui : public Gui
     
     void rerenderPixels(int xmin, int ymin, int xmax, int ymax);
     
-#ifdef RENDERER_AGG    
     void setInvalidatedRegions(const InvalidatedRanges& ranges);
+
     bool want_multiple_regions() { return true; }
-#endif    
 
     virtual void setCursor(gnash_cursor_type newcursor);
     GtkWidget *getWindow() { return _window; };
@@ -154,15 +140,7 @@ class DSOEXPORT GtkGui : public Gui
     GtkWidget   *_vbox;
     std::vector< geometry::Range2d<int> > _drawbounds;
 
-#ifdef RENDERER_CAIRO
-    cairo_t     *_cairo_handle;
-    GtkCairoGlue glue;
-#elif defined(RENDERER_OPENGL)
-    GdkGLConfig *_glconfig;
-    GtkGlExtGlue glue;
-#elif defined(RENDERER_AGG)
-    GtkAggGlue  glue;
-#endif
+    std::auto_ptr<GtkGlue>     _glue;
 
     static gnash::key::code gdk_to_gnash_key(guint key);
     static int gdk_to_gnash_modifier(int state);

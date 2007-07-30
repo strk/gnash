@@ -1,5 +1,18 @@
 2007-07-29 Sandro Santilli <strk@keybit.net>
 
+	* backend/render_handler_tri.cpp: implemented world_to_pixel and
+	  pixel_to_world (to check, UdoG, can you ?)
+	* gui/gtksup.h: remove any use of RENDERER_XXY defines, use 
+	  the GtkGlue interface only (keep by auto_ptr)
+	* gui/gtk_glue.h: header guard (no code was including this :/)
+	* gui/gtk.cpp: updated use of the glue, remove as much as possible
+	  uses of RENDERER_XXY, the only left are for glue initialization
+	  (headers and constructions) and for the call to prepDrawingArea
+	  which needs to be ordered differently for OGL and for other
+	  renderers.
+
+2007-07-29 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: Change --enable-renderer to accept a *single* renderer
 	  as the gui code / build scripts are not ready to handle multiple ones
 	  currently (temp hack for 0.8.1). By default, renderer is AGG now.

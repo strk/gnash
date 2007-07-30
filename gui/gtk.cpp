@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.100 2007/07/18 10:03:04 udog Exp $ */
+/* $Id: gtk.cpp,v 1.101 2007/07/30 21:26:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -40,6 +40,17 @@
 #include <gdk/gdkkeysyms.h>
 #include <string>
 
+#ifdef RENDERER_OPENGL
+#include "gtk_glue_gtkglext.h"
+#endif
+
+#ifdef RENDERER_CAIRO
+#include "gtk_glue_cairo.h"
+#endif
+
+#ifdef RENDERER_AGG
+#include "gtk_glue_agg.h"
+#endif
 
 using namespace std;
 
@@ -70,7 +81,15 @@ GtkGui::init(int argc, char **argv[])
 
     gtk_init (&argc, argv);
 
-    glue.init (argc, argv);
+    // TODO: don't rely on a macro to select renderer
+#ifdef RENDERER_CAIRO
+    _glue.reset(new GtkCairoGlue);
+#elif defined(RENDERER_OPENGL)
+    _glue.reset(new GtkGlExtGlue);
+#elif defined(RENDERER_AGG)
+    _glue.reset(new GtkAggGlue);
+#endif
+    _glue->init (argc, argv);
 
     add_pixmap_directory (PKGDATADIR);
 
@@ -94,9 +113,10 @@ GtkGui::init(int argc, char **argv[])
 
     createMenu();
 #ifdef RENDERER_OPENGL
-    // OpenGL glue needs to prepare the drawing area for OpenGL rendering before
+    // OpenGL _glue needs to prepare the drawing area for OpenGL rendering before
     // widgets are realized and before the configure event is fired.
-    glue.prepDrawingArea(_drawing_area);
+    // TODO: find a way to make '_glue' use independent from actual renderer in use
+    _glue->prepDrawingArea(_drawing_area);
 #endif
     setupEvents();
 
@@ -121,10 +141,11 @@ GtkGui::init(int argc, char **argv[])
 
 #if defined(RENDERER_CAIRO) || defined(RENDERER_AGG)
     // cairo needs the _drawing_area.window to prepare it ..
-    glue.prepDrawingArea(_drawing_area);
+    // TODO: find a way to make '_glue' use independent from actual renderer in use
+    _glue->prepDrawingArea(_drawing_area);
 #endif
 
-    _renderer = glue.createRenderHandler();
+    _renderer = _glue->createRenderHandler();
     if ( ! _renderer ) return false;
     set_render_handler(_renderer);
 
@@ -241,7 +262,7 @@ GtkGui::createWindow(int width, int height)
 	_height = height;
 
 	_validbounds.setTo(0, 0, _width-1, _height-1);
-	glue.setRenderHandlerSize(_width, _height);
+	_glue->setRenderHandlerSize(_width, _height);
 
 	return true;
 }
@@ -249,8 +270,7 @@ GtkGui::createWindow(int width, int height)
 void
 GtkGui::renderBuffer()
 {
-#ifdef RENDERER_AGG
-  if ( _drawbounds.size() == 0 ) return; // nothing to do..
+	if ( _drawbounds.size() == 0 ) return; // nothing to do..
 
 	for (unsigned bno=0; bno < _drawbounds.size(); bno++) {
 	
@@ -258,41 +278,36 @@ GtkGui::renderBuffer()
 		
 		assert ( bounds.isFinite() );
 		
-		glue.render(bounds.getMinX(), bounds.getMinY(),
+		_glue->render(bounds.getMinX(), bounds.getMinY(),
 		  bounds.getMaxX(), bounds.getMaxY());
 	
 	}
-#else
-    glue.render();
-#endif
 }
 
 void
 GtkGui::rerenderPixels(int xmin, int ymin, int xmax, int ymax) 
 {
 
-  // This function is called in expose events to force partly re-rendering
-  // of the window. The coordinates are PIXELS.
+	// This function is called in expose events to force partly re-rendering
+	// of the window. The coordinates are PIXELS.
+
+	// The macro PIXELS_TO_TWIPS can't be used since the renderer might do 
+	// scaling.
    
-  // The macro PIXELS_TO_TWIPS can't be used since the renderer might do 
-  // scaling.
-   
-#ifdef RENDERER_AGG
 	InvalidatedRanges ranges;
 	
 	geometry::Range2d<int> exposed_pixels(xmin, ymin, xmax, ymax);
 	
 	geometry::Range2d<float> exposed_twips = 
-    _renderer->pixel_to_world(exposed_pixels);	
+		_renderer->pixel_to_world(exposed_pixels);	
 	
 	ranges.add(exposed_twips);
 	setInvalidatedRegions(ranges);
-#endif
-  renderBuffer();   
+
+	renderBuffer();   
 
 }
 
-#ifdef RENDERER_AGG
 void
 GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 {
@@ -311,11 +326,12 @@ GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 	
 	_drawbounds.clear();
 		
-	for (unsigned rno=0; rno<ranges.size(); rno++) {
+	for (unsigned rno=0; rno<ranges.size(); rno++)
+	{
 	
 		geometry::Range2d<int> bounds = Intersection(
-	    _renderer->world_to_pixel(ranges.getRange(rno)),
-	    _validbounds);
+			_renderer->world_to_pixel(ranges.getRange(rno)),
+			_validbounds);
 			
 		// it may happen that a particular range is out of the screen, which 
 		// will lead to bounds==null. 
@@ -328,7 +344,6 @@ GtkGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 	}
 
 }
-#endif
 
 void
 GtkGui::setTimeout(unsigned int timeout)
@@ -1077,15 +1092,9 @@ GtkGui::configure_event(GtkWidget *const widget,
 {
 //    GNASH_REPORT_FUNCTION;
 
-	GtkGui* obj = static_cast<GtkGui*>(data);
+    GtkGui* obj = static_cast<GtkGui*>(data);
 
-#ifdef RENDERER_CAIRO
-    GtkCairoGlue& glue = obj->glue;
-#elif defined(RENDERER_OPENGL)
-    GtkGlExtGlue& glue = obj->glue;
-#elif defined(RENDERER_AGG)
-    GtkAggGlue& glue = obj->glue;
-#endif
+    GtkGlue& glue = *(obj->_glue);
 
     glue.configure(widget, event);
     obj->resize_view(event->width, event->height);
