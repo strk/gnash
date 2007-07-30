@@ -1,5 +1,10 @@
 2007-07-29 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: Change --enable-renderer to accept a *single* renderer
+	  as the gui code / build scripts are not ready to handle multiple ones
+	  currently (temp hack for 0.8.1). By default, renderer is AGG now.
+
+2007-07-29 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/SoundGst.cpp (getPosition): fix typo (len=>pos).
 	* server/parser/edit_text_character_def.h: use device fonts

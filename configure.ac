@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.383 2007/07/29 22:04:52 nihilus Exp $
+dnl $Id: configure.ac,v 1.384 2007/07/30 19:55:07 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -316,13 +316,13 @@ build_agg=no
 build_cairo=no
 AC_ARG_ENABLE(renderer,
   AC_HELP_STRING([--enable-renderer=], [Use the specified GUI toolkit (default=ogl,agg)]),
-  if test -n ${enableval}; then
-    add_renderer="${enableval}"
-    enableval=`echo ${enableval} | tr '\054' ' ' `
-  fi
-  while test -n "${enableval}" ; do
-    val=`echo ${enableval} | cut -d ' ' -f 1`
-    [case "${val}" in
+dnl  if test -n ${enableval}; then
+dnl    add_renderer="${enableval}"
+dnl    enableval=`echo ${enableval} | tr '\054' ' ' `
+dnl  fi
+dnl  while test -n "${enableval}" ; do
+dnl    val=`echo ${enableval} | cut -d ' ' -f 1`
+    [case "${enableval}" in
       ogl|OGL|gl|GL|opengl|OPENGL|OpenGL)
         build_ogl=yes
 	add_renderer="ogl"
@@ -335,27 +335,29 @@ AC_ARG_ENABLE(renderer,
         build_cairo=yes
 	add_renderer="cairo"
         ;;
-      all|ALL|All)
-        build_ogl=yes
-        build_agg=yes
-        build_cairo=yes
-	add_renderer="ogl,agg,cairo"
-        ;;
+dnl       all|ALL|All)
+dnl         build_ogl=yes
+dnl         build_agg=yes
+dnl         build_cairo=yes
+dnl 	add_renderer="ogl,agg,cairo"
+dnl         ;;
       *) AC_MSG_ERROR([invalid renderer ${enableval} given (accept: ogl,agg,cairo)])
          ;;
-      esac]
-    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
-    if test x$val = x$enableval; then
-      break;
-    fi
-  done
+      esac],
+	build_agg=yes
+	add_renderer=agg
+dnl    enableval=`echo ${enableval} | cut -d ' ' -f 2-6`
+dnl    if test x$val = x$enableval; then
+dnl      break;
+dnl    fi
+dnl  done
 )
 
-if test x$add_renderer = x; then
-   build_ogl=yes
-   build_agg=yes
-   add_renderer="ogl,agg"
-fi
+dnl if test x$add_renderer = x; then
+dnl    build_ogl=yes
+dnl    build_agg=yes
+dnl    add_renderer="ogl,agg"
+dnl fi
 
 if test x$build_ogl = xyes; then
 dnl   if test x$build_fb = xyes -o x$build_fltk = xyes; then
