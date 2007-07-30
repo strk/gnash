@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.92 2007/07/30 05:23:17 nihilus Exp $
+# $Id: Makefile.am,v 1.93 2007/07/30 05:40:28 nihilus Exp $
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
@@ -160,7 +160,7 @@ if BUILD_AQUA_GUI
 
 bundle_name = gnash.app
 
-bundle: Info.plist gnash
+bundle: Info.plist
 	@echo " Building: $(bundle_name)" 
 	-rm -rf $(bundle_name)/Contents
 	mkdir -p $(bundle_name)/Contents/MacOS
