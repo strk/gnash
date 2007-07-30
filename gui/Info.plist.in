@@ -11,14 +11,14 @@
 	<key>CFBundleTypeExtensions</key>
 	<array>
 	<string>swf</string>
-    <string>SWF</string>
-    </array>
-    <key>CFBundleTypeName</key>
+	<string>SWF</string>
+	</array>
+	<key>CFBundleTypeName</key>
 	<string>Flash File</string>
 	<key>CFBundleTypeOSTypes</key>
 	<array>
 	<string>swf</string>
-    <string>SWF</string>
+	<string>SWF</string>
 	</array>
 	<key>CFBundleIconFile</key>
 	<string>GnashG.icns</string>
@@ -31,10 +31,8 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0</string>
+	<string>@VERSION@</string>
 	<key>SUFeedURL</key>
 	<string>http://www.gnashdev.org/update.xml</string>
-	<key>CSResourcesFileMapped</key>
-	<true/>
 </dict>
 </plist>
