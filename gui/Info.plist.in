@@ -20,8 +20,6 @@
 	<string>swf</string>
     <string>SWF</string>
 	</array>
-    <key>CFBundleGetInfoString</key>
-	<string>@VERSION@</string>
 	<key>CFBundleIconFile</key>
 	<string>GnashG.icns</string>
 	<key>CFBundleIdentifier</key>
