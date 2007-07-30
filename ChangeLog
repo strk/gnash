@@ -1,3 +1,8 @@
+2007-07-30 Alexander Sack <asac@jwsdot.com>
+
+	* server/asobj/NetStreamGst.cpp: Fix plugin loading
+	  for non-modern Gstreamer versions.
+
 2007-07-30 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* gui/Info.plist.in: Tidy up the version info.
