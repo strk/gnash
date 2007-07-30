@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.25 2007/07/30 17:07:01 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.26 2007/07/30 17:22:01 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -188,15 +188,19 @@ bool AquaGui::createWindow(const char* title, int width, int height)
 }
 
 bool AquaGui::createMenu()
-{ 	  
+{ 	
+	MenuRef rApplicationMenu;
+	MenuItemIndex outIndex[1];	  
+	
 	GNASH_REPORT_FUNCTION;
-#if 0	
-	/* Enable 'About' */
-	EnableMenuCommand(NULL, kHICommandAbout);	   
+	
 	/* Enable 'Prefereces...' */
 	EnableMenuCommand(NULL, kHICommandPreferences);
-#endif
-	
+
+	GetIndMenuItemWithCommandID(NULL, kHICommandPreferences, 1, &rApplicationMenu, outIndex);
+
+	/* Enable 'About' */
+	InsertMenuItemTextWithCFString(rApplicationMenu, CFSTR("About gnash"), (short) 0, 0, kHICommandAbout);
 
 	//HIAboutBox(NULL);	
 	return true;

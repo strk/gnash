@@ -15,6 +15,7 @@
 	* gui/Info.plist.in: Tidy up the version info, fixed icon.
 	* gui/Makefile.am: Build OS X bundle if GUI == AQUA.
 	* gui/aqua.cpp: Implemented OS-version checking and setCursor.
+	  Added 'About' and 'Preferences...' menus.
 
 2007-07-29  Rob Savoye  <rob@deal.welcomehome.org>
 
