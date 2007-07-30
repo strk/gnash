@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: aqua.cpp,v 1.24 2007/07/26 07:27:29 nihilus Exp $ */
+/* $Id: aqua.cpp,v 1.25 2007/07/30 17:07:01 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,7 +49,7 @@ pascal OSStatus DoWindowClose (EventHandlerCallRef  nextHandler,
                                void*                userData){
 	QuitApplicationEventLoop();
 }
-
+  
 namespace gnash {
 	
 AquaGui::AquaGui(unsigned long xid, float scale, bool loop, unsigned int depth)
@@ -70,7 +70,7 @@ void AquaGui::setInterval(unsigned int interval)
 bool AquaGui::run()
 {
   	GNASH_REPORT_FUNCTION;
-  	
+
 	RepositionWindow(myWindow, NULL, kWindowCenterOnMainScreen);
     ShowWindow(myWindow);
     RunApplicationEventLoop();
@@ -94,9 +94,26 @@ AquaGui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 
 bool AquaGui::init(int argc, char ***argv) /* Self-explainatory */
 {
+
+	OSErr err;
+	long response;
+	Str255 text = " OS X version lower than 10.4 is not supported!", tmp = "";
   
 	GNASH_REPORT_FUNCTION;
+	
+	/* Version check */
+	err = Gestalt(gestaltSystemVersion, &response);
+	Boolean ok = ((err == noErr) && (response >= 0x00001040));
+	
+   	if (!ok)
+      {
+      StandardAlert(kAlertStopAlert, text, tmp, NULL, NULL);
+      ExitToShell();
+      }
+      	
+	/* Initialize the cursor */
 	InitCursor();
+		
 #if 0                    
   	_glue.init(argc, argv);
 
@@ -119,18 +136,17 @@ void AquaGui::key_event(int key, bool down)
 void AquaGui::setCursor(gnash_cursor_type newcursor)
 {
 	  GNASH_REPORT_FUNCTION;
-#if 0	  
+
 	  switch(newcursor) {
 	  	case gnash::CURSOR_HAND:	  		
-			setCursor();
+				SetThemeCursor(kThemePointingHandCursor);
         	break;
       	case gnash::CURSOR_INPUT:
-      		setCursor()
-        	break;
+      			SetThemeCursor(kThemeCrossCursor);
+      		break;
       	default:
-      	setCursor();
-        }
-#endif        
+      	        SetThemeCursor(kThemeArrowCursor);
+        }        
 }
 
 
@@ -172,15 +188,17 @@ bool AquaGui::createWindow(const char* title, int width, int height)
 }
 
 bool AquaGui::createMenu()
-{ 	
-	MenuRef	specialmenuRef;
-
+{ 	  
 	GNASH_REPORT_FUNCTION;
+#if 0	
+	/* Enable 'About' */
+	EnableMenuCommand(NULL, kHICommandAbout);	   
+	/* Enable 'Prefereces...' */
+	EnableMenuCommand(NULL, kHICommandPreferences);
+#endif
 	
-	CreateNewMenu(202, 0, &specialmenuRef); // 202 is an arbitrary ID
-	SetMenuTitleWithCFString(specialmenuRef, CFSTR("Special"));	
-	InsertMenu(specialmenuRef, 0);
-	
+
+	//HIAboutBox(NULL);	
 	return true;
 }
 
