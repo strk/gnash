@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.94 2007/07/30 06:12:31 nihilus Exp $
+# $Id: Makefile.am,v 1.95 2007/07/30 14:27:08 nihilus Exp $
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
@@ -458,6 +458,7 @@ imagesdir = $(pkgdatadir)
 bin_PROGRAMS = gnash
 if BUILD_AQUA_GUI
 bin_PROGRAMS += bundle
+bundle_SOURCES = $(NULL)
 endif
 
 gnash_SOURCES = gnash.cpp
