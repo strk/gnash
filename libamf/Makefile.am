@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.26 2007/07/01 10:54:05 bjacques Exp $
+# $Id: Makefile.am,v 1.27 2007/07/30 22:48:19 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -31,6 +31,8 @@ AM_CPPFLAGS = -I.. -I$(srcdir) \
 	-I$(top_srcdir)/libbase \
 	$(BOOST_CFLAGS) \
         $(LIBXML_CFLAGS)
+
+AM_LDFLAGS = $(BOOST_LIBS)
 
 noinst_HEADERS = amfutf8.h amf.h rtmp.h protocol.h
 

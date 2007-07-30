@@ -1,5 +1,6 @@
 2007-07-29 Sandro Santilli <strk@keybit.net>
 
+	* libamf/Makefile.am: add BOOST libs
 	* testsuite/samples/Makefile.am: link in
 	  libgnashserver.la, libgnashbase.la and
 	  libgnashamf.la.
