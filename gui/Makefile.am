@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.93 2007/07/30 05:40:28 nihilus Exp $
+# $Id: Makefile.am,v 1.94 2007/07/30 06:12:31 nihilus Exp $
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
@@ -167,6 +167,7 @@ bundle: Info.plist
 	mkdir -p $(bundle_name)/Contents/Resources
 	echo "APPL????" > $(bundle_name)/Contents/PkgInfo
 	cp Info.plist $(bundle_name)/Contents/Info.plist
+	strip -S gnash
 	cp -f gnash $(bundle_name)/Contents/MacOS
 	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
      
