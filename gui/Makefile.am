@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.91 2007/07/28 14:55:28 nihilus Exp $
+# $Id: Makefile.am,v 1.92 2007/07/30 05:23:17 nihilus Exp $
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
@@ -160,7 +160,7 @@ if BUILD_AQUA_GUI
 
 bundle_name = gnash.app
 
-bundle: Info.plist $(ICONFILE)
+bundle: Info.plist gnash
 	@echo " Building: $(bundle_name)" 
 	-rm -rf $(bundle_name)/Contents
 	mkdir -p $(bundle_name)/Contents/MacOS
@@ -455,6 +455,9 @@ dist_images_DATA = images/gnash_128_96.ico images/GnashG.png
 imagesdir = $(pkgdatadir)
 
 bin_PROGRAMS = gnash
+if BUILD_AQUA_GUI
+bin_PROGRAMS += bundle
+endif
 
 gnash_SOURCES = gnash.cpp
 # export our symbols so they can be used by Gnash plugins
@@ -469,6 +472,7 @@ gnash_LDADD = \
 #	$(LIBLTDL) "-dlopen" self "-dlopen"
 
 CLEANFILES = klash.moc .configline
+
 klash.moc: $(srcdir)/kdesup.h
 	@if test x"$(MOC)" != x; then \
 	  echo "Generating MOC file..."; \

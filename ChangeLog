@@ -1,6 +1,7 @@
 2007-07-30 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* gui/Info.plist.in: Tidy up the version info.
+	* gui/Makefile.am: Build OS X bundle if GUI == AQUA.
 
 2007-07-29  Rob Savoye  <rob@deal.welcomehome.org>
 
