@@ -62,9 +62,9 @@ public:
 		m_no_select(false),
 		m_border(false),
 		m_html(false),
-		m_use_outlines(true), // For an SWF-defined textfield we'll read
-		                      // this from the tag. Dynamic textfields should
-		                      // use device fonts by default.
+		m_use_outlines(false), // For an SWF-defined textfield we'll read
+		                       // this from the tag. Dynamic textfields should
+		                       // use device fonts by default (so not use outline ones)
 		m_font_id(-1),
 		m_font(NULL),
 		m_text_height(1), // TODO: initialize to a meaningful value (see sprite_instance::add_textfield)

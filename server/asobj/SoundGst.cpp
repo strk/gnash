@@ -346,7 +346,7 @@ SoundGst::getPosition()
 	ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
 
 	if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
-		return static_cast<unsigned int>(len / GST_MSECOND);
+		return static_cast<unsigned int>(pos / GST_MSECOND);
 	} else {
 		return 0;
 	}

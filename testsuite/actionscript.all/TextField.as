@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.12 2007/07/26 03:41:19 strk Exp $";
+rcsid="$Id: TextField.as,v 1.13 2007/07/30 18:38:15 strk Exp $";
 
 #include "check.as"
 
@@ -178,7 +178,7 @@ xcheck_equals(tf.bottomScroll, 1);
 
 check_equals(typeof(tf.embedFonts), 'boolean');
 check(!tf.hasOwnProperty('embedFonts'));
-xcheck_equals(tf.embedFonts, false);
+check_equals(tf.embedFonts, false);
 tf.embedFonts = true;
 check_equals(tf.embedFonts, true);
 tf.embedFonts = new Number(0); // will be converted to bool (true)

@@ -1,3 +1,13 @@
+2007-07-29 Sandro Santilli <strk@keybit.net>
+
+
+	* server/asobj/SoundGst.cpp (getPosition): fix typo (len=>pos).
+	* server/parser/edit_text_character_def.h: use device fonts
+	  by default (matches the comment near it, was just a typo).
+	  Fixes dynamic textfields using device fonts.
+	* testsuite/actionscript.all/TextField.as: expect one failure
+	  less.
+
 2007-07-30 Sergio Costas
 
 	* backend/sound_handler_gst.cpp: Use the audioconverter element
