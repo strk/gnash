@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.55 2007/07/27 15:09:41 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.56 2007/07/30 09:05:51 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -641,19 +641,19 @@ unsigned int GST_sound_handler::get_position(int sound_handle)
 	sound_data* sounddata = m_sound_data[sound_handle];
 
 	// return the position of the last element added
-	GstElement *pipeline,*audiosink;
+	GstElement *pipeline,*audioconvert;
 	GstStateChangeReturn ret;
 	GstState current, pending;
 	int64_t pos;
 	GstFormat fmt = GST_FORMAT_TIME;
 	
-	pipeline=sounddata->m_gst_elements[sounddata->m_gst_elements.size()-1]->pipeline;
+	pipeline = sounddata->m_gst_elements[sounddata->m_gst_elements.size()-1]->pipeline;
 	
 	ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
 
 	if (current != GST_STATE_NULL) {
-		audiosink=sounddata->m_gst_elements[sounddata->m_gst_elements.size()-1]->audiosink;
-		if (gst_element_query_position (pipeline, &fmt, &pos)) {
+		audioconvert = sounddata->m_gst_elements[sounddata->m_gst_elements.size()-1]->audioconvert;
+		if (gst_element_query_position (audioconvert, &fmt, &pos)) {
 			return static_cast<unsigned int>(pos / GST_MSECOND);
 		} else {
 			return 0;

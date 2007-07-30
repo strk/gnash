@@ -1,3 +1,10 @@
+2007-07-30 Sergio Costas
+
+	* backend/sound_handler_gst.cpp: Use the audioconverter element
+	  to get the current position, to avoid delay.
+	* server/asobj/SoundGst.cpp: Fixed some faulty conversions to
+	  milliseconds.
+
 2007-07-30 Alexander Sack <asac@jwsdot.com>
 
 	* server/asobj/NetStreamGst.cpp: Fix plugin loading

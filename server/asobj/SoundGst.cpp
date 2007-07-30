@@ -315,7 +315,7 @@ SoundGst::getDuration()
 	int64_t len;
 
 	if (pipeline && gst_element_query_duration (pipeline, &fmt, &len)) {
-		return static_cast<unsigned int>(len*1000);
+		return static_cast<unsigned int>(len / GST_MSECOND);
 	} else {
 		return 0;
 	}
@@ -346,7 +346,7 @@ SoundGst::getPosition()
 	ret = gst_element_get_state (GST_ELEMENT (pipeline), &current, &pending, 0);
 
 	if (current != GST_STATE_NULL && gst_element_query_position (pipeline, &fmt, &pos)) {
-		return static_cast<unsigned int>(pos * 1000);
+		return static_cast<unsigned int>(len / GST_MSECOND);
 	} else {
 		return 0;
 	}
