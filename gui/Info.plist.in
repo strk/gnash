@@ -8,18 +8,6 @@
 	<string>gnash</string>
 	<key>CFBundleGetInfoString</key>
 	<string>Copyright (C) 2005-2007 Free Software Foundation, Inc.</string>
-	<key>CFBundleTypeExtensions</key>
-	<array>
-	<string>swf</string>
-	<string>SWF</string>
-	</array>
-	<key>CFBundleTypeName</key>
-	<string>Flash File</string>
-	<key>CFBundleTypeOSTypes</key>
-	<array>
-	<string>swf</string>
-	<string>SWF</string>
-	</array>
 	<key>CFBundleIconFile</key>
 	<string>GnashG.icns</string>
 	<key>CFBundleIdentifier</key>
@@ -30,6 +18,18 @@
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleTypeExtensions</key>
+	<array>
+		<string>swf</string>
+		<string>SWF</string>
+	</array>
+	<key>CFBundleTypeName</key>
+	<string>Flash File</string>
+	<key>CFBundleTypeOSTypes</key>
+	<array>
+		<string>swf</string>
+		<string>SWF</string>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>@VERSION@</string>
 	<key>SUFeedURL</key>
