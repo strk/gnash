@@ -1,5 +1,11 @@
 2007-07-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/samples/Makefile.am: link in
+	  libgnashserver.la, libgnashbase.la and
+	  libgnashamf.la.
+
+2007-07-29 Sandro Santilli <strk@keybit.net>
+
 	* backend/render_handler_tri.cpp: implemented world_to_pixel and
 	  pixel_to_world (to check, UdoG, can you ?)
 	* gui/gtksup.h: remove any use of RENDERER_XXY defines, use 
