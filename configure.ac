@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.387 2007/07/31 19:29:42 strk Exp $
+dnl $Id: configure.ac,v 1.388 2007/07/31 21:59:49 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -157,20 +157,20 @@ if test x"$menus" = x"yes"; then
 fi
 AM_CONDITIONAL(MENUS, test x$menus = xyes)
 
-dnl Enable building the gui support even when statically
-dnl linking. Normally this is only disabled when building a statically
-dnl linked gnash executable.
-AC_ARG_ENABLE(dynamic-gui,
-  AC_HELP_STRING([--enable-dynamic-gui],[Enable building dynamically loadable GUIs and renderers ]),
-[case "${enableval}" in
-  yes) dynamic_gui=yes ;;
-  no)  dynamic_gui=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-dynamic-gui option]) ;;
-esac],dynamic_gui=no)
-if test x"${dynamic_gui}" = x"yes"; then
-  AC_DEFINE([USE_DYNAMIC_GUI], [], [Dynamically loadable GUI and renderer support])
-fi
-AM_CONDITIONAL(DYNAMIC_GUI, test x${dynamic_gui} = xyes)
+dnl -- dnl Enable building the gui support even when statically
+dnl -- dnl linking. Normally this is only disabled when building a statically
+dnl -- dnl linked gnash executable.
+dnl -- AC_ARG_ENABLE(dynamic-gui,
+dnl --   AC_HELP_STRING([--enable-dynamic-gui],[Enable building dynamically loadable GUIs and renderers ]),
+dnl -- [case "${enableval}" in
+dnl --   yes) dynamic_gui=yes ;;
+dnl --   no)  dynamic_gui=no ;;
+dnl --   *)   AC_MSG_ERROR([bad value ${enableval} for --enable-dynamic-gui option]) ;;
+dnl -- esac],dynamic_gui=no)
+dnl -- if test x"${dynamic_gui}" = x"yes"; then
+dnl --   AC_DEFINE([USE_DYNAMIC_GUI], [], [Dynamically loadable GUI and renderer support])
+dnl -- fi
+dnl -- AM_CONDITIONAL(DYNAMIC_GUI, test x${dynamic_gui} = xyes)
 
 dnl Write the file to disk in the plugin, if specified.
 AC_ARG_ENABLE(write,
@@ -549,7 +549,7 @@ AC_LIB_LTDL
 
 AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
-AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
+dnl -- AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
 
 AM_CONDITIONAL(BUILD_OGL_RENDERER, [ test x$build_ogl = xyes ])
 AM_CONDITIONAL(BUILD_AGG_RENDERER, [ test x$build_agg = xyes ])
@@ -1369,11 +1369,11 @@ else
   echo "        Konqueror plugin disabled."
 fi
 
-if test x"${dynamic_gui}" = x"yes"; then
-  echo "        Loadable GUI & renderer enabled."
-else
-  echo "        Loadable GUI & renderer disabled (default). Use --enable-dynamic-gui to enable."
-fi
+dnl -- if test x"${dynamic_gui}" = x"yes"; then
+dnl --   echo "        Loadable GUI & renderer enabled."
+dnl -- else
+dnl --   echo "        Loadable GUI & renderer disabled (default). Use --enable-dynamic-gui to enable."
+dnl -- fi
 
 if test x"$ghelp" = x"yes"; then
   echo "        GNOME help enabled"

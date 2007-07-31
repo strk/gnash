@@ -1,5 +1,10 @@
 2007-07-31 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac, gui/Makefile.am: comment out --enable-dynamic-gui
+	  and related conditionals use.
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/array.as: more tests for Array.sort()
 	  and Array.sortOn(). These tests are mainly to explore the behavior
 	  of sorting arrays of objects that override the toString() method and
