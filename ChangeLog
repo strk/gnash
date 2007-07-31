@@ -1,5 +1,10 @@
 2007-07-31 Sandro Santilli <strk@keybit.net>
 
+	* gui/: Makefile.am, gnash.in:
+	  Initial draft of a 'gnash' wrapper.
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: rename GUI_CONFIG to SUPPORTED_GUIS to
 	  avoid confusion with the define later set by gui/Makefile.am
 	* gui/Makefile.am: build an executable for each supported

@@ -1,0 +1,49 @@
+# gnash:  Wrapper script for running the different GUI versions of gnash 
+# 
+#   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+#
+
+
+#
+# TODO:
+#	Handle --version on your own (or GUI config reported would be the one of the default executable)
+#
+
+
+
+#!/bin/sh
+
+GUIS="gtk kde sdl fltk aqua riscos fb"
+THIS_DIR="`dirname $0`"
+
+if test "$1" = "-G"; then
+	gui="$2"
+	if ! test -e ${THIS_DIR}/${gui}-gnash; then
+		echo "Can't find ${gui}-gnash." >&2
+		exit 1
+	fi
+fi
+
+for gui in ${gui} ${GUIS}; do
+	exe=${THIS_DIR}/${gui}-gnash
+	if test -x ${exe}; then
+		exec ${exe} $*
+	fi
+done
+
+echo "Could not find any <gui>-gnash executable under directory ${THIS_DIR}, with <gui> in $GUI_DIR" >&2
+exit 1

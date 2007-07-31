@@ -163,7 +163,12 @@ dist_images_DATA = images/gnash_128_96.ico images/GnashG.png
 #dist_images_DATA = images/gnash_G_v3.ico
 imagesdir = $(pkgdatadir)
 
+bin_SCRIPTS = gnash
 bin_PROGRAMS = 
+
+gnash: gnash.in
+	cp $< $@
+	chmod +x $@
 
 GUI_SRCS = gnash.cpp \
 	gui.cpp gui.h \
