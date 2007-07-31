@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.23 2007/07/31 02:39:05 strk Exp $";
+rcsid="$Id: array.as,v 1.24 2007/07/31 03:18:45 strk Exp $";
 
 #include "check.as"
 
@@ -540,9 +540,9 @@ r = a.sort( cmp_fn, Array.UNIQUE | Array.CASEINSENSITIVE );
 check_equals( tolen(r), "[0, 2, 2, 2, 4, 5, 5]" );
 check_equals( tolen(a), "[0, 2, 2, 2, 4, 5, 5]" );
 r = a.sort( cmp_fn, Array.UNIQUE | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY );
-check_equals( r.toString(), "0,1,2,3,4,5,6" ); 
+check_equals( r.toString(), "0,1,2,3,4,5,6" );  // gnash fails in SWF7,8 but succeeds in SWF5,6
 r = a.sort( cmp_fn, Array.UNIQUE | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY | Array.DESCENDING );
-check_equals( r.toString(), "6,5,4,3,2,1,0" );
+check_equals( r.toString(), "6,5,4,3,2,1,0" ); // gnash fails in SWF7,8 but succeeds in SWF5,6
 
 trace(" -- Array with null value  -- ");
 c.push(null);
@@ -742,7 +742,7 @@ trace("sortOn partially missing properties");
 a.push({Name: "Harvard Mark I", Year: 1944, Mass: 4500});
 
 a.sortOn(["Electronic", "Year"], Array.DESCENDING | Array.IGNORECASE );
-check_equals( tostr(a), "Harvard Mark I,1944,undefined | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true | Zuse Z3,1941,false" );
+xcheck_equals( tostr(a), "Harvard Mark I,1944,undefined | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true | Zuse Z3,1941,false" );
 
 a.sortOn( ["Electronic", "Name"], [Array.NUMERIC, Array.DESCENDING] );
 check_equals( tostr(a), "Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined" );

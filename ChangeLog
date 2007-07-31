@@ -1,5 +1,10 @@
 2007-07-31 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/array.as: expect a failure
+	  in the case-insensitive descending sort tested for SWF>6
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
 	* server/array.cpp (join): use the SWF-version aware version
 	  of as_value to string conversion. Add TODO items.
 	* testsuite/actionscript.all/array.as: don't expect a failure
