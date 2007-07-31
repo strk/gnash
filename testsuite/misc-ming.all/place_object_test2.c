@@ -19,8 +19,7 @@
 /*
  *
  * observed behaviour(SWF6,7,8):
- *   if the given depth is occupied by a sprite, PlaceObjec2(PLACE) tag will not
- *   place another sprite into the same depth or replace the original one.  
+ *   if the given depth is occupied, PlaceObjec2(PLACE) tag won't replace the orginal one.
  * 
  * observed behaviour(SWF5):
  *   too odd to understand :(
@@ -86,7 +85,7 @@ main(int argc, char** argv)
   SWFDisplayItem_setDepth(it1, 3); 
   SWFDisplayItem_setName(it1, "static_mc1");
   
-  it2 = SWFMovie_add(mo, (SWFBlock)mc1); 
+  it2 = SWFMovie_add(mo, (SWFBlock)mc2); 
   SWFDisplayItem_setDepth(it2, 3); 
   SWFDisplayItem_setName(it2, "static_mc2");
   
@@ -125,13 +124,13 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); // frame4
   
   //
-  // Place mc1 at depth 3 again with ratio set to 2.0
+  // Place mc1 at depth 3 again with ratio set to 0.2
   // Observed behaviour: no new character get placed(created).
   //
   it2 = SWFMovie_add(mo, (SWFBlock)mc1); 
   SWFDisplayItem_setDepth(it2, 3); 
   SWFDisplayItem_setName(it2, "static_mc4");
-  SWFDisplayItem_setRatio(it2, 2.0); 
+  SWFDisplayItem_setRatio(it2, 0.2); 
   
   check_equals(mo, "typeof(static_mc1)", "'movieclip'");
   if(OUTPUT_VERSION > 5)
@@ -147,13 +146,13 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); // frame5
   
   //
-  // Place mc2 at depth 3 again with ratio set to 2.0
+  // Place mc2 at depth 3 again with ratio set to 0.2
   // Observed behaviour: no new character get placed(created).
   //
   it2 = SWFMovie_add(mo, (SWFBlock)mc2); 
   SWFDisplayItem_setDepth(it2, 3); 
   SWFDisplayItem_setName(it2, "static_mc5");
-  SWFDisplayItem_setRatio(it2, 2.0); 
+  SWFDisplayItem_setRatio(it2, 0.2); 
   
   check_equals(mo, "typeof(static_mc1)", "'movieclip'");
   if(OUTPUT_VERSION > 5)
@@ -192,3 +191,4 @@ main(int argc, char** argv)
 
   return 0;
 }
+

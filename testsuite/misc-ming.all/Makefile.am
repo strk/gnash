@@ -84,6 +84,7 @@ check_PROGRAMS = \
 	loop_test8 \
 	loop_test-Runner \
 	place_object_test \
+	place_object_test2 \
 	move_object_test \
 	place_and_remove_object_test \
 	place_and_remove_object_insane_test \
@@ -181,6 +182,7 @@ endif
 check_SCRIPTS = \
 	timeline_var_test-Runner \
 	place_object_testrunner \
+	place_object_test2runner \
 	move_object_testrunner \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
@@ -629,6 +631,17 @@ place_object_test.swf: place_object_test
 
 place_object_testrunner: $(srcdir)/../generic-testrunner.sh place_object_test.swf
 	sh $< -r5 $(top_builddir) place_object_test.swf > $@
+	chmod 755 $@
+
+	
+place_object_test2_SOURCES = place_object_test2.c	
+place_object_test2_LDADD = libgnashmingutils.la
+
+place_object_test2.swf: place_object_test2
+	./place_object_test2 $(top_srcdir)/testsuite/media
+
+place_object_test2runner: $(srcdir)/../generic-testrunner.sh place_object_test2.swf
+	sh $< -r5 $(top_builddir) place_object_test2.swf > $@
 	chmod 755 $@
 
 move_object_test_SOURCES =	\
@@ -1573,6 +1586,7 @@ TEST_CASES = \
 	root_stop_testrunner \
 	loop_test-Runner \
 	place_object_testrunner \
+	place_object_test2runner \
 	move_object_testrunner \
 	place_and_remove_object_testrunner \
 	place_and_remove_object_insane_testrunner \
