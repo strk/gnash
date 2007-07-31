@@ -1,5 +1,12 @@
 2007-07-31 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionBitwiseAnd):
+	  take nan operands as zero.
+	* testsuite/actionscript.all/: Makefile.am, ops.as:
+	  new testcase for primitive operations (to complete)
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionBitwiseXor, ActionBitwiseOr): 
 	  take nan operands as zero.
 	* testsuite/actionscript.all/array.as: expect less failures.

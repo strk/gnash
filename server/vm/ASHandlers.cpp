@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.113 2007/07/31 04:25:59 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.114 2007/07/31 15:30:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3075,7 +3075,10 @@ SWFHandlers::ActionBitwiseAnd(ActionExec& thread)
 	double operand1 = env.top(1).to_number(&env);
 	double operand2 = env.top(0).to_number(&env);
 
-	env.top(1) = int(operand1)&int(operand2);
+	if ( isnan(operand1) ) operand1 = 0;
+	if ( isnan(operand2) ) operand2 = 0;
+
+	env.top(1) = int(operand1) & int(operand2);
 	env.drop(1);
 }
 
