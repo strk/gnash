@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.22 2007/07/29 12:57:01 strk Exp $";
+rcsid="$Id: array.as,v 1.23 2007/07/31 02:39:05 strk Exp $";
 
 #include "check.as"
 
@@ -120,7 +120,7 @@ a.sort( Array.NUMERIC );
 check_equals ( a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
 
 a.sort( Array.UNIQUESORT | Array.DESCENDING | Array.NUMERIC);
-xcheck_equals (a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
+check_equals (a.toString() , "7,7,7,7,7,8,8,8,9,200,200,200,200,551,551" );
 
 // Test multi-parameter constructor, and keep testing sort cases
 var trysortarray = new Array("But", "alphabet", "Different", "capitalization");

@@ -61,18 +61,21 @@ inline static bool int_gt (int a)
 inline static bool
 as_value_lt (const as_value& a, const as_value& b)
 {
+	// TODO: pass env, use versioned (to_string)
 	return a.to_string().compare(b.to_string()) < 0;
 }
 
 inline static bool
 as_value_gt (const as_value& a, const as_value& b)
 {
+	// TODO: pass env, use versioned (to_string)
 	return a.to_string().compare(b.to_string()) > 0;
 }
 
 inline static bool
 as_value_eq (const as_value& a, const as_value& b)
 {
+	// TODO: pass env, use versioned (to_string)
 	return a.to_string().compare(b.to_string()) == 0;
 }
 
@@ -81,6 +84,7 @@ as_value_StrNoCaseCmp (const as_value& a, const as_value& b)
 {
 	using namespace boost::algorithm;
 
+	// TODO: pass env, use versioned (to_string)
 	std::string strA = to_upper_copy(a.to_string());
 	std::string strB = to_upper_copy(b.to_string());
 
@@ -563,6 +567,8 @@ as_array_object::join(const std::string& separator, as_environment* env) const
 	std::string temp;
 	//std::string temp = "("; // SWF > 7
 
+	int swfversion = _vm.getSWFVersion();
+
 	if ( ! elements.empty() ) 
 	{
 		std::deque<as_value>::const_iterator
@@ -570,12 +576,12 @@ as_array_object::join(const std::string& separator, as_environment* env) const
 			itEnd=elements.end();
 
 		// print first element w/out separator prefix
-		temp += (*it++).to_string(env);
+		temp += (*it++).to_string_versioned(swfversion, env);
 
 		// print subsequent elements with separator prefix
 		while ( it != itEnd )
 		{
-			temp += separator + (*it++).to_string(env);
+			temp += separator + (*it++).to_string_versioned(swfversion, env);
 		}
 	}
 
@@ -881,7 +887,7 @@ array_sortOn(const fn_call& fn)
 	// case: sortOn("prop")
 	if ( fn.nargs == 1 && fn.arg(0).is_string() )
 	{
-		std::string propField = PROPNAME(fn.arg(0).to_string());
+		std::string propField = PROPNAME(fn.arg(0).to_string()); // TODO: pass env, use versioned 
 		as_value_prop avc = as_value_prop(propField, &as_value_lt);
 		array->sort(&avc);
 		return as_value((boost::intrusive_ptr<as_object>)array);
@@ -891,7 +897,7 @@ array_sortOn(const fn_call& fn)
 	bool do_unique = false, do_index = false;
 	if ( fn.nargs == 2 && fn.arg(0).is_string() )
 	{
-		std::string propField = PROPNAME(fn.arg(0).to_string());
+		std::string propField = PROPNAME(fn.arg(0).to_string()); // TODO: pass env, use versioned
 		if ( fn.arg(1).is_number() )
 		{
 			uint8_t flags = 
@@ -927,7 +933,7 @@ array_sortOn(const fn_call& fn)
 		for (std::deque<as_value>::const_iterator it = props->begin();
 			it != props->end(); ++it)
 		{
-			std::string s = PROPNAME((*it).to_string());
+			std::string s = PROPNAME((*it).to_string()); // TODO: pass env, use versioned
 			prp.push_back(s);
 		}
 		
@@ -1052,7 +1058,7 @@ array_pop(const fn_call& fn)
 
 	IF_VERBOSE_ACTION (
 	log_action(_("calling array pop, result:%s, new array size:%d"),
-		rv.to_string().c_str(), array->size());
+		rv.to_debug_string().c_str(), array->size());
 	);
         return rv;
 }
@@ -1068,7 +1074,7 @@ array_shift(const fn_call& fn)
 
 	IF_VERBOSE_ACTION (
 	log_action(_("calling array shift, result:%s, new array size:%d"),
-		rv.to_string().c_str(), array->size());
+		rv.to_debug_string().c_str(), array->size());
 	);
 	return rv;
 }
@@ -1085,7 +1091,7 @@ array_reverse(const fn_call& fn)
 
 	IF_VERBOSE_ACTION (
 	log_action(_("called array reverse, result:%s, new array size:%d"),
-		rv.to_string().c_str(), array->size());
+		rv.to_debug_string().c_str(), array->size());
 	);
 	return rv;
 }
@@ -1099,7 +1105,7 @@ array_join(const fn_call& fn)
 	std::string separator = ",";
 
 	if (fn.nargs > 0)
-		separator = fn.arg(0).to_string();
+		separator = fn.arg(0).to_string(); // TODO: pass env, use versioned
 
 	std::string ret = array->join(separator, &(fn.env()));
 
@@ -1266,6 +1272,7 @@ array_new(const fn_call& fn)
 		for (int i = 0; i < int(fn.arg(0).to_number()); i++)
 		{
 			index_number.set_int(i);
+			// TODO: pass env, use versioned (to_string)
 			ao->set_member(index_number.to_string().c_str(), undef_value);
 		}
 	}
