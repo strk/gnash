@@ -42,10 +42,10 @@ fi
 
 for gui in ${gui} ${GUIS}; do
 	exe=${THIS_DIR}/${gui}-gnash
-	if test -x ${exe}; then
+	if test -e ${exe}; then
 		exec ${exe} $*
 	fi
 done
 
-echo "Could not find any <gui>-gnash executable under directory ${THIS_DIR}, with <gui> in $GUI_DIR" >&2
+echo "Could not find any <gui>-gnash executable under directory ${THIS_DIR}, with <gui> in $GUI_DIR." >&2
 exit 1
