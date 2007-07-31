@@ -1,3 +1,7 @@
+2007-07-31 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gtk_glue_agg.h: disable MIT-SHM by default (see bug #20301)
+
 2007-07-31 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ASHandlers.cpp (ActionBitwiseAnd):
