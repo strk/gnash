@@ -21,9 +21,10 @@
  *
  * Test for tag PlaceObject2 
  * 
- * To see what happen if places a character at the same depth twice.
+ * To see what happens if placing two shapes at the same depths.
  *
- * Normally, you will see the red square.
+ * Obeserved behaviour:
+ *    *both* shapes get rendered!
  *
  * run as ./place_object_test
  */

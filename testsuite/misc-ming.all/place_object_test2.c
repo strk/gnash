@@ -19,7 +19,8 @@
 /*
  *
  * observed behaviour(SWF6,7,8):
- *   if the given depth is occupied, PlaceObjec2(PLACE) tag won't replace the orginal one.
+ *   if the given depth is occupied by a sprite, PlaceObjec2(PLACE) tag will not
+ *   place another sprite into the same depth or replace the original one.  
  * 
  * observed behaviour(SWF5):
  *   too odd to understand :(
@@ -85,7 +86,7 @@ main(int argc, char** argv)
   SWFDisplayItem_setDepth(it1, 3); 
   SWFDisplayItem_setName(it1, "static_mc1");
   
-  it2 = SWFMovie_add(mo, (SWFBlock)mc2); 
+  it2 = SWFMovie_add(mo, (SWFBlock)mc1); 
   SWFDisplayItem_setDepth(it2, 3); 
   SWFDisplayItem_setName(it2, "static_mc2");
   

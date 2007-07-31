@@ -100,14 +100,14 @@ main(int argc, char** argv)
   check_equals(mo, "mc1.getDepth()", "-16374");
   /* user defined property will not be duplicated */
   check_equals(mo, "dup1.prop1", "undefined");  
-  /* user defined event will not be duplicated */
+  /* user defined event handler will not be duplicated */
   check_equals(mo, "typeof(dup1.onLoad)", "'undefined'"); 
   check_equals(mo, "dup1.getDepth()", "1");
   /* check user defined onLoad */
   check_equals(mo, "typeof(mc2.onLoad)", "'function'");
   /* onClipEvent does not define a function */
   check_equals(mo, "typeof(mc2.onEnterFrame)", "'undefined'");
-  /* user defined event will not be duplicated */
+  /* user defined event handler will not be duplicated */
   check_equals(mo, "typeof(dup2.onLoad)", "'undefined'"); 
   check_equals(mo, "_root.x1", "2");
   check_equals(mo, "_root.x2", "2");

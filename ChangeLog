@@ -1,3 +1,8 @@
+2007-07-31 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-ming.all/duplicate_movie_clip_test.c, place_object_test.c,
+	  place_object_test2.c: trivial comments cleanups.
+	  
 2007-07-29 Sandro Santilli <strk@keybit.net>
 
 	* libamf/Makefile.am: add BOOST libs
