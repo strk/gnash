@@ -15,7 +15,9 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.95 2007/07/30 14:27:08 nihilus Exp $
+# 
+# build gtk-gnash, kde-gnash, sdl-gnash, fltk-gnash, aqua-gnash, fb-gnash and riscos-gnash
+#
 
 AUTOMAKE_OPTIONS = -Wno-portability
 
@@ -24,9 +26,10 @@ localedir = $(datadir)/locale
 # this is where Gnash plugins get installed
 pluginsdir = $(libdir)/gnash/plugins
 
-lib_LTLIBRARIES = libgnashgui.la libgnashplayer.la
+# noinst_LTLIBRARIES = libgnashgui.la
 BUILT_SOURCES = klash.moc .configline
 
+noinst_LTLIBRARIES = 
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir) \
         -I$(top_srcdir)/server \
@@ -77,68 +80,13 @@ AM_LDFLAGS =  \
 	$(PTHREAD_LIBS) \
 	$(NULL)
 
-libgnashgui_la_SOURCES = \
-	gui.cpp gui.h \
-	NullGui.cpp \
-	gui_gtk.cpp \
-	gui_kde.cpp \
-	gui_sdl.cpp \
-	gui_fb.cpp \
-	gui_fltk.cpp \
-	gui_aqua.cpp \
-	gui_riscos.cpp \
-	NullGui.h
-
-libgnashgui_la_LIBADD = \
-	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/backend/libgnashbackend.la \
-	$(top_builddir)/libamf/libgnashamf.la 
-
-# is LDFLAGS still needed when AM_LDFLAGS is defined already ?
-libgnashgui_la_LDFLAGS = \
-	-release $(VERSION) \
-	$(AM_LDFLAGS)
-
-libgnashgui_la_CPPFLAGS = $(AM_CPPFLAGS) $(GUI_CPPFLAGS)
-
-
-libgnashplayer_la_SOURCES = \
-        Player.cpp Player.h
-
-libgnashplayer_la_LIBADD = \
-        $(top_builddir)/server/libgnashserver.la \
-        $(top_builddir)/backend/libgnashbackend.la \
-        libgnashgui.la
-
-libgnashplayer_la_CPPFLAGS = $(AM_CPPFLAGS) $(GUI_CPPFLAGS)
-libgnashplayer_la_LDFLAGS = \
-        -release $(VERSION) \
-        -no-undefined \
-        -export-dynamic \
-        $(AM_LDFLAGS)
-
 GNASH_LIBS = \
 	$(top_builddir)/libamf/libgnashamf.la \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \
-	$(top_builddir)/libbase/libgnashbase.la
-
-KLASH_LIBS = \
-	$(top_builddir)/libamf/libgnashamf.la \
-	$(top_builddir)/backend/libgnashbackend.la \
-	$(top_builddir)/server/libgnashserver.la \
-	$(top_builddir)/libgeometry/libgnashgeo.la \
-	$(top_builddir)/libbase/libgnashbase.la
-
-#
-# Build the libraries that hold the combined GUI toolkit and
-# renderer. These are built as static libraries if doing a static
-# build for debugging. Otherwise they are built as a loadable shared
-# library module so we can dlopen() them at runtime.
-#
-
-plugins_LTLIBRARIES =		# set later on by conditionals
+	$(top_builddir)/libbase/libgnashbase.la \
+	$(MYSQL_LIBS)
 
 # Only build loadable modules unless statically linking
 if DYNAMIC_GUI # make shared libraries suitable for dlopen().
@@ -153,10 +101,8 @@ endif # DYNAMIC_GUI
 
 # AQUA Toolkit
 if BUILD_AQUA_GUI
-
 #OS X stuff goes here...
-
-     GUI_CPPFLAGS += -DGUI_AQUA
+GUI_CPPFLAGS += -DGUI_AQUA
 
 bundle_name = gnash.app
 
@@ -170,255 +116,19 @@ bundle: Info.plist
 	strip -S gnash
 	cp -f gnash $(bundle_name)/Contents/MacOS
 	cp -f images/GnashG.icns $(bundle_name)/Contents/Resources/
-     
+
 if  HAVE_OPENGL
-     plugins_LTLIBRARIES += libgnashaqua_ogl.la
-     libgnashaqua_ogl_la_CPPFLAGS = $(AM_CPPFLAGS) \
+noinst_LTLIBRARIES += libgnashaqua_ogl.la
+libgnashaqua_ogl_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	$(OPENGL_CFLAGS)
-     libgnashaqua_ogl_la_SOURCES = \
+libgnashaqua_ogl_la_SOURCES = \
 	aqua_ogl_glue.cpp aqua_ogl_glue.h \
 	aqua.cpp aquasup.h aqua_glue.h
-     libgnashaqua_ogl_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashaqua_ogl_la_LIBADD = \
+libgnashaqua_ogl_la_LDFLAGS = $(LIB_FLAGS)
+libgnashaqua_ogl_la_LIBADD = \
 	$(top_builddir)/backend/libgnashogl.la 
-     libgnashgui_la_LIBADD += libgnashaqua_ogl.la
 endif # HAVE_OPENGL
 endif # BUILD_AQUA_GUI
-
-# GTK2 Toolkit
-if BUILD_GTK_GUI
-     GUI_CPPFLAGS += -DGUI_GTK $(GTK_CFLAGS)
-if  HAVE_OPENGL
-     plugins_LTLIBRARIES += libgnashgtk_ogl.la
-     libgnashgtk_ogl_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(GTK_CFLAGS) $(OPENGL_CFLAGS)
-     libgnashgtk_ogl_la_SOURCES = \
-	gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
-	gtk.cpp gtksup.h gtk_glue.h
-     libgnashgtk_ogl_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashgtk_ogl_la_LIBADD = \
-	$(top_builddir)/backend/libgnashogl.la $(GTK_LIBS)
-     libgnashgui_la_LIBADD += libgnashgtk_ogl.la
-endif # HAVE_OPENGL
-if  HAVE_AGG
-     plugins_LTLIBRARIES += libgnashgtk_agg.la
-     libgnashgtk_agg_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(GTK_CFLAGS) $(AGG_CFLAGS)
-     libgnashgtk_agg_la_SOURCES = \
-	gtk_glue_agg.cpp gtk_glue_agg.h \
-	gtk.cpp gtksup.h gtk_glue.h
-     libgnashgtk_agg_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashgtk_agg_la_LIBADD = \
-	$(top_builddir)/backend/libgnashagg.la \
-	$(GTK_LIBS) $(AGG_LIBS)
-     libgnashgui_la_LIBADD += libgnashgtk_agg.la
-endif # HAVE_AGG
-if  HAVE_CAIRO
-     plugins_LTLIBRARIES += libgnashgtk_cairo.la
-     libgnashgtk_cairo_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(GTK_CFLAGS) $(CAIRO_CFLAGS)
-     libgnashgtk_cairo_la_SOURCES = \
-	gtk_glue_cairo.cpp gtk_glue_cairo.h \
-	gtk.cpp gtksup.h gtk_glue.h
-     libgnashgtk_cairo_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashgtk_cairo_la_LIBADD = \
-	$(top_builddir)/backend/libgnashcairo.la \
-	$(GTK_LIBS) $(CAIRO_LIBS)
-     libgnashgui_la_LIBADD += libgnashgtk_cairo.la
-endif # HAVE_CAIRO
-endif # BUILD_GTK_GUI
-
-# KDE/QT Toolkit
-if BUILD_KDE_GUI
-     GUI_CPPFLAGS += -DGUI_KDE $(KDE_CFLAGS) $(QT_CFLAGS)
-if  HAVE_OPENGL
-     plugins_LTLIBRARIES += libgnashkde_ogl.la
-     libgnashkde_ogl_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(OPENGL_FLAGS) $(KDE_CFLAGS) $(QT_CFLAGS)
-     libgnashkde_ogl_la_SOURCES = \
-	kde_glue_opengl.cpp kde_glue_opengl.h kde_glue.h \
-	kde.cpp kdesup.h kde_glue.h
-     libgnashkde_ogl_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashkde_ogl_la_LIBADD = \
-	$(top_builddir)/backend/libgnashogl.la \
-	$(KDE_LIBS) $(QT_LIBS) $(OPENGL_LIBS)
-     libgnashgui_la_LIBADD += libgnashkde_ogl.la
-endif # HAVE_OPENGL
-if  HAVE_AGG
-     plugins_LTLIBRARIES += libgnashkde_agg.la
-     libgnashkde_agg_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(AGG_CFLAGS) $(KDE_CFLAGS) $(QT_CFLAGS)
-     libgnashkde_agg_la_SOURCES = \
-	kde_glue_agg.cpp kde_glue_agg.h \
-	kde.cpp kdesup.h kde_glue.h
-     libgnashkde_agg_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashkde_agg_la_LIBADD = \
-	$(top_builddir)/backend/libgnashagg.la \
-	$(KDE_LIBS) $(QT_LIBS) $(AGG_LIBS)
-     libgnashgui_la_LIBADD += libgnashkde_agg.la
-endif # HAVE_AGG
-endif # BUILD_KDE_GUI
-
-# SDL Toolkit
-if BUILD_SDL_GUI
-     GUI_CPPFLAGS += -DGUI_SDL $(SDL_CFLAGS)
-if  HAVE_OPENGL
-     plugins_LTLIBRARIES += libgnashsdl_ogl.la
-     libgnashsdl_ogl_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(SDL_CFLAGS) $(OPENGL_CFLAGS)
-     libgnashsdl_ogl_la_SOURCES = \
-	sdl_ogl_glue.cpp sdl_ogl_glue.h \
-	sdl.cpp sdlsup.h sdl_glue.h
-     libgnashsdl_ogl_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashsdl_ogl_la_LIBADD = \
-	$(top_builddir)/backend/libgnashogl.la \
-	$(SDL_LIBS) $(OPENGL_LIBS)
-     libgnashgui_la_LIBADD += libgnashsdl_ogl.la
-endif # HAVE_OPENGL
-if  HAVE_AGG
-     plugins_LTLIBRARIES += libgnashsdl_agg.la
-     libgnashsdl_agg_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(SDL_CFLAGS) $(AGG_CFLAGS)
-     libgnashsdl_agg_la_SOURCES = \
-	sdl_agg_glue.cpp sdl_agg_glue.h \
-	sdl.cpp sdlsup.h sdl_glue.h
-     libgnashsdl_agg_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashsdl_agg_la_LIBADD = \
-	$(top_builddir)/backend/libgnashagg.la \
-	$(SDL_LIBS) $(AGG_LIBS) 
-     libgnashgui_la_LIBADD += libgnashsdl_agg.la
-endif # HAVE_AGG
-if  HAVE_CAIRO
-     plugins_LTLIBRARIES += libgnashsdl_cairo.la
-     libgnashsdl_cairo_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(SDL_CFLAGS) $(CAIRO_CFLAGS)
-     libgnashsdl_cairo_la_SOURCES = \
-	sdl_cairo_glue.cpp sdl_cairo_glue.h \
-	sdl.cpp sdlsup.h sdl_glue.h
-     libgnashsdl_cairo_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashsdl_cairo_la_LIBADD = \
-	$(top_builddir)/backend/libgnashcairo.la \
-	$(SDL_LIBS) $(CAIRO_LIBS)
-     libgnashgui_la_LIBADD += libgnashsdl_cairo.la
-endif # HAVE_CAIRO
-endif # BUILD_SDL_GUI
-
-# FLTK2 Toolkit
-if BUILD_FLTK_GUI
-
-     GUI_CPPFLAGS += -DGUI_FLTK $(FLTK2_CFLAGS)
-if  HAVE_AGG
-     plugins_LTLIBRARIES += libgnashfltk_agg.la
-     libgnashfltk_agg_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(FLTK2_CFLAGS) $(AGG_CFLAGS)
-     libgnashfltk_agg_la_SOURCES = \
-	fltk_glue_agg.cpp fltk_glue_agg.h \
-	fltk.cpp fltksup.h 
-     libgnashfltk_agg_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashfltk_agg_la_LIBADD = \
-	$(top_builddir)/backend/libgnashagg.la \
-	$(FLTK2_LIBS) $(AGG_LIBS) $(XFT_LIBS) $(X11_LIBS)
-     libgnashgui_la_LIBADD += libgnashfltk_agg.la
-endif # HAVE_AGG
-
-if  HAVE_CAIRO
-     plugins_LTLIBRARIES += libgnashfltk_cairo.la
-     libgnashfltk_cairo_la_CPPFLAGS = $(AM_CPPFLAGS) \
-	$(FLTK2_CFLAGS) $(CAIRO_CFLAGS)
-     libgnashfltk_cairo_la_SOURCES = \
-	fltk_glue_cairo.cpp fltk_glue_cairo.h \
-	fltk.cpp fltksup.h 
-     libgnashfltk_cairo_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashfltk_cairo_la_LIBADD = \
-	$(top_builddir)/backend/libgnashcairo.la \
-	$(FLTK2_LIBS) $(CAIRO_LIBS) $(XFT_LIBS) $(X11_LIBS)
-     libgnashgui_la_LIBADD += libgnashfltk_cairo.la
-endif # HAVE_CAIRO
-
-endif # BUILD_FLTK_GUI
-
-# Framebuffer, no toolkit
-if BUILD_FB_GUI
-     GUI_CPPFLAGS += -DGUI_FB
-if  HAVE_AGG
-     libgnashsdl_agg_la_CPPFLAGS = $(AM_CPPFLAGS) $(SDL_CFLAGS)
-     plugins_LTLIBRARIES += libgnashfb_agg.la
-     libgnashfb_agg_la_SOURCES = \
-	fb.cpp fbsup.h
-     libgnashfb_agg_la_LDFLAGS = $(LIB_FLAGS)
-     libgnashfb_agg_la_LIBADD = \
-	$(top_builddir)/backend/libgnashagg.la \
-	$(SDL_LIBS) $(AGG_LIBS)
-     libgnashgui_la_LIBADD += libgnashfb_agg.la
-endif # HAVE_AGG
-endif # BUILD_FB_GUI
-
-#
-# When static linking, we have to link in the correct library. These
-# are built as static libraries by the above section,
-#
-
-#
-# Setup the GUIs that have OpenGL support
-#
-if STATIC_GUI
-if  BUILD_OGL_RENDERER
-if   BUILD_GTK_GUI
-      GNASH_LIBS += libgnashgtk_ogl.la $(GTK_LIBS) $(OPENGL_LIBS)
-endif # BUILD_GTK_GUI
-if   BUILD_AQUA_GUI
-      GNASH_LIBS += libgnashaqua_ogl.la $(AQUA_LIBS) $(OPENGL_LIBS)
-endif # BUILD_AQUA_GUI
-if   BUILD_SDL_GUI
-      GNASH_LIBS += libgnashsdl_ogl.la $(SDL_LIBS) $(OPENGL_LIBS)
-endif # BUILD_SDL_GUI
-if BUILD_KDE_GUI
-     GNASH_LIBS += libgnashkde_ogl.la $(KDE_LIBS) $(QT_LIBS) $(OPENGL_LIBS)
-     KLASH_LIBS += libgnashkde_ogl.la $(KDE_LIBS) $(QT_LIBS) $(OPENGL_LIBS)
-endif # BUILD_KDE_GUI
-endif # BUILD_OPENGL_RENDERER
-
-#
-# Setup the GUIs that have Cairo support
-#
-if  BUILD_CAIRO_RENDERER
-if   BUILD_GTK_GUI
-      GNASH_LIBS += libgnashgtk_cairo.la $(GTK_LIBS) $(CAIRO_LIBS)
-endif # BUILD_GTK_GUI
-if   BUILD_SDL_GUI
-      GNASH_LIBS += libgnashsdl_cairo.la $(SDL_LIBS) $(CAIRO_LIBS)
-endif # BUILD_SDL
-if   BUILD_FLTK_GUI
-      GNASH_LIBS += libgnashfltk_cairo.la $(FLTK2_LIBS) $(CAIRO_LIBS) $(XFT_LIBS) $(X11_LIBS)
-endif # BUILD_FLTK_GUI
-endif # BUILD_CAIRO_RENDERER
-
-#
-# Setup the GUIs that have AntiGrain (AGG) support
-#
-if  BUILD_AGG_RENDERER
-if   BUILD_GTK_GUI
-      GNASH_LIBS += libgnashgtk_agg.la $(AGG_LIBS) $(GTK_LIBS)
-endif # BUILD_GTK_GUI
-if  BUILD_AQUA_GUI
-     GNASH_LIBS += libgnashaqua_agg.la $(AQUA_LIBS) $(AGG_LIBS)
-endif # BUILD_AQUA_GUI
-if  BUILD_SDL_GUI
-     GNASH_LIBS += libgnashsdl_agg.la $(SDL_LIBS) $(AGG_LIBS)
-endif # BUILD_SDL_GUI
-if  BUILD_FLTK_GUI
-     GNASH_LIBS += libgnashfltk_agg.la $(FLTK2_LIBS) $(AGG_LIBS) $(XFT_LIBS) $(X11_LIBS)
-endif # BUILD_FLTK_GUI
-if  BUILD_KDE_GUI
-     GNASH_LIBS += libgnashkde_agg.la $(KDE_LIBS) $(QT_LIBS) $(AGG_LIBS)
-     KLASH_LIBS += libgnashkde_agg.la $(KDE_LIBS) $(QT_LIBS) $(AGG_LIBS)
-endif # BUILD_KDE_GUI
-if  BUILD_RISCOS_GUI
-     GNASH_LIBS += libgnashriscos_agg.la $(RISCOS_LIBS) $(AGG_LIBS)
-     AM_LDFLAGS += -lOSLib32
-endif # BUILD_RISCOS_GUI
-endif # BUILD_AGG_RENDERER
-endif # STATIC_GUI
 
 if USE_SOUND_SDL
 if USE_FFMPEG_ENGINE
@@ -443,10 +153,8 @@ endif
 #  FLTK_SRCS = 
 # endif
 
-
 AM_CPPFLAGS += -DPKGDATADIR=\"$(pkgdatadir)\"
 AM_CPPFLAGS += -DRENDERER_CONFIG=\"$(RENDERER_CONFIG)\"
-AM_CPPFLAGS += -DGUI_CONFIG=\"$(GUI_CONFIG)\" -DDEFAULT_GUI=\"$(DEFAULT_GUI)\"
 AM_CPPFLAGS += -DMEDIA_CONFIG=\"$(MEDIA_CONFIG)\"
 AM_CPPFLAGS += -DTARGET_CONFIG=\"$(target)\"
 AM_CPPFLAGS += -DCONFIG_CONFIG="\"$(shell cat .configline)\""
@@ -455,23 +163,208 @@ dist_images_DATA = images/gnash_128_96.ico images/GnashG.png
 #dist_images_DATA = images/gnash_G_v3.ico
 imagesdir = $(pkgdatadir)
 
-bin_PROGRAMS = gnash
+bin_PROGRAMS = 
+
+GUI_SRCS = gnash.cpp \
+	gui.cpp gui.h \
+	Player.cpp Player.h \
+	NullGui.cpp NullGui.h
+
 if BUILD_AQUA_GUI
 bin_PROGRAMS += bundle
 bundle_SOURCES = $(NULL)
 endif
 
-gnash_SOURCES = gnash.cpp
-# export our symbols so they can be used by Gnash plugins
-gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-gnash_DEPENDENCIES = libgnashgui.la .configline
-gnash_LDADD = \
-	libgnashgui.la \
-	libgnashplayer.la \
+#
+# Build the KDE gui
+# 
+if BUILD_KDE_GUI
+bin_PROGRAMS += kde-gnash
+kde_gnash_CPPFLAGS = -DGUI_KDE -DGUI_CONFIG=\"KDE\" \
+	 $(AM_CPPFLAGS) $(KDE_CFLAGS) $(QT_CFLAGS)
+kde_gnash_SOURCES = $(GUI_SRCS) gui_kde.cpp
+kde_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+kde_gnash_DEPENDENCIES = .configline
+kde_gnash_LDADD = \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
 	$(AM_LDFLAGS)
-#	$(LIBLTDL) "-dlopen" self "-dlopen"
+if BUILD_OGL_RENDERER
+kde_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+kde_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
+	$(KDE_LIBS) $(QT_LIBS) $(OPENGL_LIBS)
+kde_gnash_SOURCES += kde_glue_opengl.cpp kde_glue_opengl.h kde_glue.h \
+	 	kde.cpp kdesup.h kde_glue.h
+endif
+if BUILD_AGG_RENDERER
+kde_gnash_CPPFLAGS += $(AGG_CFLAGS)
+kde_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
+	$(KDE_LIBS) $(QT_LIBS) $(AGG_LIBS)
+kde_gnash_SOURCES += kde_glue_agg.cpp kde_glue_agg.h \
+	 	kde.cpp kdesup.h kde_glue.h
+endif
+endif
+
+#
+# Build the SDL gui
+#
+if BUILD_SDL_GUI
+bin_PROGRAMS += sdl-gnash
+sdl_gnash_CPPFLAGS = -DGUI_SDL -DGUI_CONFIG=\"SDL\" \
+	 $(AM_CPPFLAGS) $(SDL_CFLAGS) 
+sdl_gnash_SOURCES = $(GUI_SRCS) gui_sdl.cpp
+sdl_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+sdl_gnash_DEPENDENCIES = .configline
+sdl_gnash_LDADD = \
+	$(MYSQL_LIBS) \
+	$(GNASH_LIBS) \
+	$(AM_LDFLAGS)
+if BUILD_OGL_RENDERER
+sdl_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+sdl_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
+	$(SDL_LIBS) $(OPENGL_LIBS)
+sdl_gnash_SOURCES += sdl_ogl_glue.cpp sdl_ogl_glue.h \
+	 	sdl.cpp sdlsup.h sdl_glue.h
+endif
+if BUILD_AGG_RENDERER
+sdl_gnash_CPPFLAGS += $(AGG_CFLAGS)
+sdl_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
+	$(SDL_LIBS) $(AGG_LIBS)
+sdl_gnash_SOURCES += sdl_agg_glue.cpp sdl_agg_glue.h \
+	 	sdl.cpp sdlsup.h sdl_glue.h
+endif
+endif
+
+#
+# Build the FLTK gui
+#
+if BUILD_FLTK_GUI
+bin_PROGRAMS += fltk-gnash
+fltk_gnash_CPPFLAGS = -DGUI_FLTK -DGUI_CONFIG=\"FLTK\" \
+	$(AM_CPPFLAGS) $(FLTK2_CFLAGS)
+fltk_gnash_SOURCES = $(GUI_SRCS) gui_fltk.cpp
+fltk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+fltk_gnash_DEPENDENCIES = .configline
+fltk_gnash_LDADD = \
+	$(MYSQL_LIBS) \
+	$(GNASH_LIBS) \
+	$(AM_LDFLAGS)
+# if BUILD_OGL_RENDERER
+#	fltk_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+# 	fltk_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la
+#	$(SDL_LIBS) $(OPENGL_LIBS)
+# 	fltk_gnash_SOURCES += fltk_glue_ogl.cpp fltk_glue_ogl.h \
+# 	 	fltk.cpp fltksup.h 
+# endif
+if BUILD_AGG_RENDERER
+fltk_gnash_CPPFLAGS += $(AGG_CFLAGS)
+fltk_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
+	$(FLTK2_LIBS) $(AGG_LIBS) $(XFT_LIBS) $(X11_LIBS)
+fltk_gnash_SOURCES += fltk_glue_agg.cpp fltk_glue_agg.h \
+	 	fltk.cpp fltksup.h 
+endif
+endif
+
+#
+# Build the AQUA gui
+#
+if BUILD_AQUA_GUI
+bin_PROGRAMS += aqua-gnash
+aqua_gnash_CPPFLAGS = -DGUI_AQUA $(AM_CPPFLAGS) -DGUI_CONFIG=\"AQUA\"
+aqua_gnash_SOURCES = $(GUI_SRCS) gui_aqua.cpp
+aqua_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
+aqua_gnash_DEPENDENCIES = .configline
+aqua_gnash_LDADD = \
+	$(MYSQL_LIBS) \
+	$(GNASH_LIBS) \
+	$(AM_LDFLAGS)
+if BUILD_OGL_RENDERER
+aqua_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+aqua_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
+	$(AQUA_LIBS) $(OPENGL_LIBS)
+aqua_gnash_SOURCES += aqua_ogl_glue.cpp aqua_ogl_glue.h \
+	aqua.cpp aquasup.h aqua_glue.h
+endif
+# if BUILD_AGG_RENDERER
+#	aqua_gnash_CPPFLAGS += $(AGG_CFLAGS)
+# 	aqua_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
+#	$(AQUA_LIBS) $(AGG_LIBS)
+# 	aqua_gnash_SOURCES += aqua_agg_glue.cpp aqua_agg_glue.h \
+# 	aqua.cpp aquasup.h aqua_glue.h
+# endif
+endif
+
+#
+# Build the GTK gui
+#
+if BUILD_GTK_GUI
+bin_PROGRAMS += gtk-gnash
+gtk_gnash_SOURCES = $(GUI_SRCS) gui_gtk.cpp
+gtk_gnash_CPPFLAGS = -DGUI_GTK -DGUI_CONFIG=\"GTK\" \
+	$(AM_CPPFLAGS) $(GTK_CFLAGS)
+gtk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+gtk_gnash_DEPENDENCIES = .configline
+
+if BUILD_OGL_RENDERER
+gtk_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
+gtk_gnash_SOURCES += gtk_glue_gtkglext.cpp gtk_glue_gtkglext.h \
+		gtk.cpp gtksup.h gtk_glue.h
+gtk_gnash_LDADD = $(top_builddir)/backend/libgnashogl.la \
+		$(GNASH_LIBS) $(GTK_LIBS) $(OPENGL_LIBS)
+endif				# BUILD_OGL_RENDERER
+if BUILD_AGG_RENDERER
+gtk_gnash_CPPFLAGS += $(AGG_CFLAGS)
+gtk_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
+		gtk.cpp gtksup.h gtk_glue.h
+gtk_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
+		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS)
+endif				# BUILD_AGG_RENDERER
+if BUILD_CAIRO_RENDERER
+gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
+gtk_gnash_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
+		gtk.cpp gtksup.h gtk_glue.h
+gtk_gnash_LDADD = $(top_builddir)/backend/libgnashcairo.la
+		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS)
+endif				# BUILD_CAIRO_RENDERER
+endif				# BUILD_GTK_GUI
+
+#
+# Build the FB gui
+#
+if BUILD_FB_GUI
+bin_PROGRAMS += fb-gnash
+fb_gnash_SOURCES = $(GUI_SRCS) gui_fb.cpp fb.cpp fbsup.h
+fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
+	$(AM_CPPFLAGS) 
+fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+fb_gnash_DEPENDENCIES = .configline
+
+if BUILD_AGG_RENDERER
+fb_gnash_CPPFLAGS += $(AGG_CFLAGS)
+fb_gnash_SOURCES += 
+fb_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
+		$(GNASH_LIBS) $(AGG_LIBS)
+endif				# BUILD_AGG_RENDERER
+endif				# BUILD_FB_GUI
+
+#
+# Build the RISCOS gui
+#
+if BUILD_RISCOS_GUI
+bin_PROGRAMS += riscos-gnash
+riscos_gnash_SOURCES = $(GUI_SRCS) gui_riscos.cpp riscos.cpp riscos_glue.h riscossup.h
+riscos_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
+	$(AM_CPPFLAGS) 
+riscos_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
+riscos_gnash_DEPENDENCIES = .configline
+
+if BUILD_AGG_RENDERER
+riscos_gnash_CPPFLAGS += $(AGG_CFLAGS)
+riscos_gnash_SOURCES += riscos_glue_agg.cpp  riscos_glue_agg.h   
+riscos_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
+		$(GNASH_LIBS) $(AGG_LIBS)
+endif				# BUILD_AGG_RENDERER
+endif				# BUILD_FB_GUI
 
 CLEANFILES = klash.moc .configline
 
@@ -501,10 +394,10 @@ mudflap:
 clean-hook:
 	-rm -f core.* $(CLEANFILES)
 
-if DYNAMIC_GUI
-install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
-	test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
-	for i in $(plugins_LTLIBRARIES); do \
-	  $(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$i "$(DESTDIR)$(plugindir)/$$i" ; \
-	done
-endif
+# if DYNAMIC_GUI
+# install-pluginsLTLIBRARIES: $(plugins_LTLIBRARIES)
+# 	test -d "$(DESTDIR)$(plugindir)" || $(mkinstalldirs) "$(DESTDIR)$(plugindir)"
+# 	for i in $(plugins_LTLIBRARIES); do \
+# 	  $(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$i "$(DESTDIR)$(plugindir)/$$i" ; \
+# 	done
+# endif

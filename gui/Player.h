@@ -53,34 +53,6 @@ class DSOEXPORT Player
 {
 public:
 
-	/// A GUI to use as frontend
-	enum GuiFlavor {
-
-		/// Null gui
-		guiNull,
-
-		/// GTK gui
-		guiGTK,
-
-		/// QT/KDE gui
-		guiKDE,
-
-		/// SDL gui
-		guiSDL,
-
-		/// AQUA gui (for OS/X)
-		guiAQUA,
-
-		/// RISCOS gui
-		guiRISCOS,
-
-		/// FLTK2 gui
-		guiFLTK,
-
-		/// Framebuffer (no gui actually)
-		guiFB
-	};
-
 	Player();
 
 	~Player() {}
@@ -138,22 +110,6 @@ public:
 
 	void setDoSound(bool b) { do_sound=b; }
 
-	/// Set gui flavor by name
-	//
-	/// Throws an exception if gui name is invalid
-	///
-	void setGuiFlavor(const std::string& flavorName) {
-		GuiFlavor flav = parseGuiFlavorByName(flavorName);
-		std::cout << "Flavor '" << flavorName << "' parsed as " << flav << std::endl;
-		//setGuiFlavor(parseGuiFlavorByName(flavorName));
-		setGuiFlavor(flav);
-	}
-
-	/// Return name of given Gui flavor
-	std::string guiName(GuiFlavor which);
-
-	void setGuiFlavor(GuiFlavor which) { _guiFlavor = which; }
-
 	/// Set the base url for this run.
 	//
 	/// The base url will be used to resolve relative
@@ -181,13 +137,6 @@ public:
 	
 private:
 
-	/// Parse gui by name
-	//
-	/// Throws an exception if gui name is invalid
-	///
-	GuiFlavor parseGuiFlavorByName(const std::string& flavorName);
-
-
 	void init();
 
 	void init_sound();
@@ -196,10 +145,11 @@ private:
 
 	void init_gui();
 
-	/// Initialize the given gui with parameters stored so far
+	/// Create the gui instance
 	//
-	/// Throws GnashException if the gui flavor provided isn't supported
-	std::auto_ptr<Gui> getGui(GuiFlavor which);
+	/// Uses the USE_<guiname> macros to find out which one
+	///
+	std::auto_ptr<Gui> getGui();
 
 	static void setFlashVars(sprite_instance& m, const std::string& varstr);
 
@@ -253,8 +203,6 @@ private:
 #ifdef GNASH_FPS_DEBUG
 	float _fpsDebugTime;
 #endif
-
-	GuiFlavor _guiFlavor;
 
 };
 

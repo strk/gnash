@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.386 2007/07/31 16:43:31 strk Exp $
+dnl $Id: configure.ac,v 1.387 2007/07/31 19:29:42 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -246,51 +246,27 @@ AC_ARG_ENABLE(gui,
     [case "${val}" in
       gtk|GTK|gtk2|GTK2)
         build_gtk=yes
-        if test "x$DEFAULT_GUI" = "x"; then
-          DEFAULT_GUI=gtk
-        fi
         ;;
       kde|KDE)
         build_kde=yes
-        if test "x$DEFAULT_GUI" = "x"; then
-          DEFAULT_GUI=kde
-        fi
         ;;
       qt|QT)
         build_qt=yes
-        if test "x$DEFAULT_GUI" = "x"; then
-          DEFAULT_GUI=kde
-        fi
         ;;
       sdl|SDL)
         build_sdl=yes
-        if test "x$DEFAULT_GUI" = "x"; then
-          DEFAULT_GUI=sdl
-        fi
         ;;
       aqua|AQUA|Aqua)
         build_aqua=yes
-        if test "x$DEFAULT_GUI" = "x"; then
-          DEFAULT_GUI=aqua
-        fi
         ;;
       riscos|RISCOS|RiscOS)
         build_riscos=yes
-        if test "x$DEFAULT_GUI" = "x"; then
-          DEFAULT_GUI=riscos
-        fi
         ;;
       fltk|FLTK|fltk2|FLTK2)
         build_fltk=yes
-        if test "x$DEFAULT_GUI" = "x"; then
-          DEFAULT_GUI=fltk
-        fi
         ;;
       fb|FB)
         build_fb=yes
-        if test "x$DEFAULT_GUI" = "x"; then
-          DEFAULT_GUI=fb
-        fi
         ;;
       all|ALL)
         build_fb=yes
@@ -1274,35 +1250,31 @@ dnl echo "RENDERER_LIBS=$RENDERER_LIBS"
 AC_SUBST(RENDERER_LIBS)
 AC_SUBST(RENDERER_CONFIG)
 
-GUI_CONFIG=
+SUPPORTED_GUIS=
 if test x$build_fb = xyes; then
-  GUI_CONFIG="${GUI_CONFIG},fb"
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},fb"
 fi
 if test x$build_fltk = xyes; then
-  GUI_CONFIG="${GUI_CONFIG},fltk"
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},fltk"
 fi
 if test x$build_kde = xyes; then
-  GUI_CONFIG="${GUI_CONFIG},kde"
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},kde"
 fi
 if test x$build_gtk = xyes; then
-  GUI_CONFIG="${GUI_CONFIG},gtk"
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},gtk"
 fi
 if test x$build_sdl = xyes; then
-  GUI_CONFIG="${GUI_CONFIG},sdl"
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},sdl"
 fi
 if test x$build_riscos = xyes; then
-  GUI_CONFIG="${GUI_CONFIG},riscos"
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},riscos"
 fi
 if test x$build_aqua = xyes; then
-  GUI_CONFIG="${GUI_CONFIG},aqua"
+  SUPPORTED_GUIS="${SUPPORTED_GUIS},aqua"
 fi
-GUI_CONFIG="`echo ${GUI_CONFIG} | sed 's/,//'`" # Strip leading comma
-AC_SUBST(GUI_CONFIG)
+SUPPORTED_GUIS="`echo ${SUPPORTED_GUIS} | sed 's/,//'`" # Strip leading comma
+AC_SUBST(SUPPORTED_GUIS)
 
-if test "x$DEFAULT_GUI" = "x"; then
-  DEFAULT_GUI=gtk
-fi
-AC_SUBST(DEFAULT_GUI)
 MEDIA_CONFIG=${media_handler}
 AC_SUBST(MEDIA_CONFIG)
 
@@ -1439,7 +1411,7 @@ fi
 if test x"$extensions_list" != x; then
   echo "        Building extensions: ${extensions_list}"
 fi
-echo "        GUI toolkits supported: ${GUI_CONFIG} (default gui: ${DEFAULT_GUI})"
+echo "        GUI toolkits supported: ${SUPPORTED_GUIS}"
 echo "        Renderers supported: ${add_renderer}"
 echo "        Media handler: "$media_handler
 if test x"$media_handler" = xffmpeg -o x"$media_handler" = xmad; then

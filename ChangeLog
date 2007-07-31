@@ -1,5 +1,16 @@
 2007-07-31 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: rename GUI_CONFIG to SUPPORTED_GUIS to
+	  avoid confusion with the define later set by gui/Makefile.am
+	* gui/Makefile.am: build an executable for each supported
+	  GUI, named <gui>-gnash
+	* gui/Player.{cpp,h}: drop runtime parsing of gui name, just
+	  use whatever gui is specified by the GUI_CONFIG macro set
+	  by the Makefile.
+	* gui/gnash.cpp: drop runtime GUI selection  (and -G switch).
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/ming_utils.c: add word wrapping
 	  to the xtrace window.
 

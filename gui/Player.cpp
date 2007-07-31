@@ -88,7 +88,6 @@ Player::Player()
 #ifdef GNASH_FPS_DEBUG
 	,_fpsDebugTime(0.0)
 #endif
-	,_guiFlavor(parseGuiFlavorByName(DEFAULT_GUI))
 {
 	init();
 }
@@ -180,12 +179,9 @@ Player::init_sound()
 void
 Player::init_gui()
 {
-	std::cout << "init_gui called - gui flavor : " << guiName(_guiFlavor) << " (" << _guiFlavor << ")" << std::endl;
 	if ( do_render )
 	{
-		std::cout << "Gui flavor is " << _guiFlavor << std::endl;
-
-		_gui = getGui(_guiFlavor); // throws on unsupported gui
+		_gui = getGui(); 
 
 		RcInitFile& rcfile = RcInitFile::getDefaultInstance();
 		if ( rcfile.startStopped() )
@@ -279,7 +275,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
 	// which is *required* during movie loading
 	if ( ! _gui->init(argc, &argv) )
 	{
-    		std::cerr << "Could not initialize gui " <<  guiName(_guiFlavor) << std::endl;
+    		std::cerr << "Could not initialize gui." << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -372,96 +368,36 @@ Player::fs_callback(gnash::sprite_instance* movie, const char* command, const ch
 
 /* private */
 std::auto_ptr<Gui>
-Player::getGui(GuiFlavor which)
+Player::getGui()
 {
-	std::cout << "getGui(" << which << ") called " << std::endl;
-	switch (which)
-	{
+#ifdef GUI_GTK
+	return createGTKGui(windowid, scale, do_loop, bit_depth);
+#endif
 
-		case guiGTK:
-			return createGTKGui(windowid, scale, do_loop, bit_depth);
+#ifdef GUI_KDE
+	return createKDEGui(windowid, scale, do_loop, bit_depth);
+#endif
 
-		case guiKDE:
-			return createKDEGui(windowid, scale, do_loop, bit_depth);
+#ifdef GUI_SDL
+	return createSDLGui(windowid, scale, do_loop, bit_depth);
+#endif
 
-		case guiSDL:
-			return createSDLGui(windowid, scale, do_loop, bit_depth);
+#ifdef GUI_AQUA
+	return createAQUAGui(windowid, scale, do_loop, bit_depth);
+#endif
 
-		case guiAQUA:
-			return createAQUAGui(windowid, scale, do_loop, bit_depth);
+#ifdef GUI_RISCOS
+	return createRISCOSGui(windowid, scale, do_loop, bit_depth);
+#endif
 
-		case guiRISCOS:
-			return createRISCOSGui(windowid, scale, do_loop, bit_depth);
+#ifdef GUI_FLTK
+	return createFLTKGui(windowid, scale, do_loop, bit_depth);
+#endif
 
-		case guiFLTK:
-			return createFLTKGui(windowid, scale, do_loop, bit_depth);
+#ifdef GUI_FB
+	return createFBGui(windowid, scale, do_loop, bit_depth);
+#endif
 
-		case guiFB:
-			return createFBGui(windowid, scale, do_loop, bit_depth);
-
-		case guiNull:
-			return std::auto_ptr<Gui>(new NullGui(do_loop));
-
-	}
-
-	std::stringstream ss;
-	ss << "Unknown gui flavor " << which << " requested";
-	throw GnashException(ss.str());
+	return std::auto_ptr<Gui>(new NullGui(do_loop));
 }
 
-/* public */
-std::string
-Player::guiName(GuiFlavor which)
-{
-	switch (which)
-	{
-
-		case guiGTK:
-			return "GTK";
-
-		case guiKDE:
-			return "KDE";
-
-		case guiSDL:
-			return "SDL";
-
-		case guiAQUA:
-			return "AQUA";
-
-		case guiRISCOS:
-			return "RISCOS";
-
-		case guiFLTK:
-			return "FLTK";
-
-		case guiFB:
-			return "FB";
-
-		case guiNull:
-			return "NULL";
-
-	}
-
-	std::stringstream ss;
-	ss << "unknown(" << which << ")";
-	return ss.str();
-}
-
-Player::GuiFlavor
-Player::parseGuiFlavorByName(const std::string& flavorName)
-{
-	StringNoCaseEqual match;
-
-	if ( match(flavorName, "GTK") ) return guiGTK;
-	if ( match(flavorName, "KDE") ) return guiKDE;
-	if ( match(flavorName, "SDL") ) return guiSDL;
-	if ( match(flavorName, "FLTK") ) return guiFLTK;
-	if ( match(flavorName, "FB") ) return guiFB;
-	if ( match(flavorName, "AQUA") ) return guiAQUA;
-	if ( match(flavorName, "RISCOS") ) return guiRISCOS;
-	if ( match(flavorName, "NULL") ) return guiNull;
-
-	std::stringstream ss;
-	ss << "Unknown Gui flavor " << flavorName;
-	throw GnashException(ss.str());
-}

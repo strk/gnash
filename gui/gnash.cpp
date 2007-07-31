@@ -93,7 +93,6 @@ usage()
         "\n"), _(
         "  -h, --help    Print this info.\n"
         "  -s <factor>   Scale the movie up/down by the specified factor\n"
-	"  -G <guiname>  Use specified gui (gtk|kde|fltk|aqua|riscos|fb)\n"
         "  -c            Produce a core file instead of letting SDL trap it\n"
         "  -d num        Number of milliseconds to delay in main loop\n"
         "  -v            Be verbose; i.e. print log messages to stdout\n"
@@ -169,10 +168,10 @@ static void build_options()
 {
     printf (_("Build options %s\n"
               "   Target: %s\n"
-              "   Renderer: %s - GUI: %s (default %s) - Media handler: %s\n"
+              "   Renderer: %s - GUI: %s - Media handler: %s\n"
               "   Configured with: %s\n"),
 		VERSION, TARGET_CONFIG, RENDERER_CONFIG, GUI_CONFIG,
-		DEFAULT_GUI, MEDIA_CONFIG, CONFIG_CONFIG);
+		MEDIA_CONFIG, CONFIG_CONFIG);
 #ifdef HAVE_FFMPEG_AVCODEC_H
     printf(_("Ffmpeg version is: %s\n"), LIBAVCODEC_IDENT);
 #endif
@@ -190,12 +189,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
     bool called_by_plugin=false;
     bool width_given=false, height_given=false;
 
-    // Check our name, if 'klash' we'll set KDE gui
-    if ( strstr(argv[0], "klash") != NULL )
-    {
-        player.setGuiFlavor("kde");
-    }
-   
     int c = 0;
     // scan for the two main long GNU options
     for (; c < argc; c++) {
@@ -213,7 +206,7 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
         }
     }
     
-    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:gVf:G:")) != -1)
+    while ((c = getopt (argc, argv, "hvaps:cd:x:r:t:b:1wj:k:u:P:U:gVf:")) != -1)
     {
 	switch (c) {
     	  // case 'c' (Disable SDL core dumps) is decoded in sdl.cpp:init()
@@ -323,9 +316,6 @@ parseCommandLine(int argc, char* argv[], gnash::Player& player)
               break;
           case 't':
               player.setExitTimeout( (float) atof(optarg) );
-              break;
-          case 'G':
-              player.setGuiFlavor(optarg);
               break;
           case 'b':
 	      player.setBitDepth(atoi(optarg));
