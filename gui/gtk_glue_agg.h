@@ -18,16 +18,14 @@
 //
 //
 
-// Define this macro to enable experimental support for MIT-SHM
-// see http://www.xfree86.org/current/mit-shm.html
-// currently has some problems, see https://savannah.gnu.org/bugs/?20301
-//#define ENABLE_MIT_SHM 1
-
 #include "gtk_glue.h"
 
 #include <gtk/gtk.h>
 #include <gdk/gdk.h>
 
+// Experimental support for MIT-SHM
+// see http://www.xfree86.org/current/mit-shm.html
+// currently has some problems, see https://savannah.gnu.org/bugs/?20301
 #ifdef ENABLE_MIT_SHM
 #include <X11/extensions/XShm.h>
 #endif

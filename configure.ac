@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.384 2007/07/30 19:55:07 strk Exp $
+dnl $Id: configure.ac,v 1.385 2007/07/31 16:16:08 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -425,6 +425,21 @@ if test x$pixelformat = xall; then
       AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32 pixel format])
     #fi
   fi
+fi
+
+dnl --------------------------------------------------------
+dnl  Toggle support for MIT-SHM extension to the X server
+dnl --------------------------------------------------------
+
+AC_ARG_ENABLE(mit-shm,
+  AC_HELP_STRING([--enable-mit-shm], [Enable support for the MIT-SHM X extension]),
+[case "${enableval}" in
+  yes) xmitshm=yes ;;
+  no)  xmitshm=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --enable-mit-shm option]) ;;
+esac],xmitshm=no)
+if test "x${xmitshm}" = "xyes"; then
+	AC_DEFINE(ENABLE_MIT_SHM, [1], [Use MIT-SHM X extension if available])
 fi
 
 dnl --------------------------------------------------------
