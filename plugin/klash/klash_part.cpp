@@ -163,7 +163,7 @@ KDE_NO_EXPORT void KlashPart::play ()
     char *gnash_env = getenv("KLASH_PLAYER");
     if (!gnash_env) {
       procname = GNASHBINDIR;
-      procname += "/klash";
+      procname += "/kde-gnash";
     } else {
       procname = gnash_env;
     }

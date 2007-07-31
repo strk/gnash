@@ -1,5 +1,7 @@
 2007-07-31 Sandro Santilli <strk@keybit.net>
 
+	* plugin/klash/klash_part.cpp: run 'kde-gnash' by default
+	  (not 'klash')
 	* gui/gnash.in: don't pass -G over to the actual executable;
 	  translate gui name to lowercase.
 
