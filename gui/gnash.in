@@ -31,7 +31,9 @@ GUIS="gtk kde sdl fltk aqua riscos fb"
 THIS_DIR="`dirname $0`"
 
 if test "$1" = "-G"; then
-	gui="$2"
+	shift
+	gui=`echo "$1" | tr '[A-Z]' '[a-z]'`
+	shift
 	if ! test -e ${THIS_DIR}/${gui}-gnash; then
 		echo "Can't find ${gui}-gnash." >&2
 		exit 1
