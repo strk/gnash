@@ -34,13 +34,18 @@ add_xtrace_function_clip(SWFMovieClip mc, SWFBlock font, int depth, int x, int y
 {
 	SWFTextField tf;
 	SWFDisplayItem it;
+	int flags;
 
 	tf = newSWFTextField();
 
 	SWFTextField_setFont(tf, font);
 
 	/* setting flags seem unneeded */
-	/*SWFTextField_setFlags(tf, SWFTEXTFIELD_USEFONT|SWFTEXTFIELD_NOEDIT);*/
+	flags = 0;
+	//flags |= SWFTEXTFIELD_USEFONT;
+	flags |= SWFTEXTFIELD_WORDWRAP;
+	//flags |= SWFTEXTFIELD_NOEDIT;
+	SWFTextField_setFlags(tf, flags);
 
 	/* Add all ascii chars */
 	SWFTextField_addChars(tf, asciichars);

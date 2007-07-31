@@ -1,5 +1,10 @@
 2007-07-31 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/ming_utils.c: add word wrapping
+	  to the xtrace window.
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
 	* doc/C/usermanual/installation/feature_configuration.xml:
 	  Document --enable-mit-shm
 	* configure.ac: add --enable-mit-shm
