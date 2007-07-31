@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.385 2007/07/31 16:16:08 strk Exp $
+dnl $Id: configure.ac,v 1.386 2007/07/31 16:43:31 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1364,6 +1364,12 @@ if test x"$i810lodbias" = x"yes"; then
   echo "        Intel 810 LOD bias hack enabled"
 else
   echo "        Intel 810 LOD bias hack disabled (default). Use --enable-i810-lod-bias to enable."
+fi
+
+if test x"$xmitshm" = x"yes"; then
+  echo "        MIT-SHM X extension support enabled"
+else
+  echo "        MIT-SHM X extension support disabled (default). Use --enable-mit-shm to enable."
 fi
 
 if test x"$pthreads" = x"yes"; then
