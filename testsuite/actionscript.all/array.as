@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.24 2007/07/31 03:18:45 strk Exp $";
+rcsid="$Id: array.as,v 1.25 2007/07/31 04:25:59 strk Exp $";
 
 #include "check.as"
 
@@ -103,6 +103,22 @@ check_equals ( Array.DESCENDING , 2 );
 check_equals ( Array.UNIQUESORT , 4 );
 check_equals ( Array.RETURNINDEXEDARRAY , 8 );
 check_equals ( Array.NUMERIC , 16 );
+
+check_equals( typeof(Array.UNIQUE), 'undefined' );
+
+// the following tests do not belong here, but
+// better somewhere then nowhere (are here due to
+// a typo in this testcase triggering this bug)
+//
+check_equals( (undefined|1), 1 );
+check_equals( (1|undefined), 1 );
+check_equals( (undefined&1), 0 );
+check_equals( (1&undefined), 0 );
+check_equals( (undefined^1), 1 );
+check_equals( (1^undefined), 1 );
+
+
+check_equals( Array.UNIQUE | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY, 9 );
 
 // Check sort functions
 a.sort();
@@ -742,7 +758,7 @@ trace("sortOn partially missing properties");
 a.push({Name: "Harvard Mark I", Year: 1944, Mass: 4500});
 
 a.sortOn(["Electronic", "Year"], Array.DESCENDING | Array.IGNORECASE );
-xcheck_equals( tostr(a), "Harvard Mark I,1944,undefined | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true | Zuse Z3,1941,false" );
+check_equals( tostr(a), "Harvard Mark I,1944,undefined | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true | Zuse Z3,1941,false" );
 
 a.sortOn( ["Electronic", "Name"], [Array.NUMERIC, Array.DESCENDING] );
 check_equals( tostr(a), "Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined" );

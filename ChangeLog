@@ -1,3 +1,9 @@
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionBitwiseXor, ActionBitwiseOr): 
+	  take nan operands as zero.
+	* testsuite/actionscript.all/array.as: expect less failures.
+
 2007-07-31 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-ming.all/place_object_test2.c, Makefile.am
