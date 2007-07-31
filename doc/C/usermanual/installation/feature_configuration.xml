@@ -301,4 +301,15 @@ selected.  The default is FFMPEG with SDL sound.
     </listitem>
   </varlistentry>
 
+  <varlistentry>
+    <term>--enable-mit-shm</term>
+    <listitem>
+      <para>
+	Add support for using the MIT-SHM X extensions when available. 
+	Currently only available using GTK gui and AGG renderer, and known to be
+	bogus in handling of expose events (http://savannah.gnu.org/bugs/?20301).
+      </para>
+    </listitem>
+  </varlistentry>
+
 </variablelist>

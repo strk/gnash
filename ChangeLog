@@ -1,5 +1,7 @@
 2007-07-31 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/usermanual/installation/feature_configuration.xml:
+	  Document --enable-mit-shm
 	* configure.ac: add --enable-mit-shm
 	* gui/gtk_glue_agg.h: don't redefine ENABLE_MIT_SHM, use definition
 	  from config.h
