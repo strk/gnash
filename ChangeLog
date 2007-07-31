@@ -1,5 +1,13 @@
 2007-07-31 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/array.as: more tests for Array.sort()
+	  and Array.sortOn(). These tests are mainly to explore the behavior
+	  of sorting arrays of objects that override the toString() method and
+	  sortOn using properties specified by such objects. 
+	  Tests provided by Ivor Blockley and cleaned up/fixed by me.
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
 	* plugin/klash/klash_part.cpp: run 'kde-gnash' by default
 	  (not 'klash')
 	* gui/gnash.in: don't pass -G over to the actual executable;

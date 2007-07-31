@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.25 2007/07/31 04:25:59 strk Exp $";
+rcsid="$Id: array.as,v 1.26 2007/07/31 20:42:07 strk Exp $";
 
 #include "check.as"
 
@@ -388,11 +388,17 @@ function tolen(x)
 	return str;
 }
 
+id = new Object();
+id.toString = function () { return "Name"; };
+yr = new Object();
+yr.toString = function () { return "Year"; };
+
 a = ["ed", "emacs", "", "vi", "nano", "Jedit"];
 b = [8, 1, -2, 5, -7, -9, 3, 0];
 c = [7.2, 2.0, -0.5, 3/0, 0.0, 8.35, 0.001, -3.7];
 d = [];
 e = ["singleton"];
+f = [id, yr, id];
 
 trace(" -- Basic Sort Tests -- ");
 
@@ -451,6 +457,14 @@ e.sort( Array.UNIQUESORT );
 check_equals( e.toString(), "singleton" );
 e.sort( Array.DESCENDING | Array.CASEINSENSITIVE );
 check_equals( e.toString(), "singleton" );
+
+r = f.sort();
+xcheck_equals( r.toString(), "Name,Name,Year" );
+xcheck_equals( f.toString(), "Name,Name,Year" );
+r = f.sort( Array.UNIQUESORT );
+check_equals( r.toString(), "0" );
+f.sort( Array.DESCENDING | Array.CASEINSENSITIVE );
+xcheck_equals( f.toString(), "Year,Name,Name" );
 
 trace(" -- Return Indexed Array Tests -- ");
 
@@ -743,9 +757,6 @@ check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Coloss
 a.sortOn( ["Electronic", "Year", "Name"], Array.NUMERIC | Array.DESCENDING );
 check_equals( tostr(a), "ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true | Zuse Z3,1941,false" );
 
-#if OUTPUT_VERSION > 6
-trace("sortOn partially missing properties");
-
 r = a.sortOn(["Name", "Electronic"], [Array.DESCENDING] );
 check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
 check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
@@ -754,7 +765,8 @@ r = a.sortOn(["Name", "Year"], [Array.RETURNINDEXEDARRAY]);
 check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
 check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
 
-trace("sortOn partially missing properties");
+#if OUTPUT_VERSION > 6
+trace("sortOn with some properties undefined");
 a.push({Name: "Harvard Mark I", Year: 1944, Mass: 4500});
 
 a.sortOn(["Electronic", "Year"], Array.DESCENDING | Array.IGNORECASE );
@@ -785,9 +797,58 @@ check_equals( r.toString(), "0,3,1,2,4");
 
 #if OUTPUT_VERSION < 7
 trace("sortOn property name case-mismatch");
-a.sortOn( ["name"] );
+a.sortOn( "name" );
 check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
 a.sortOn( ["year", "name"], Array.NUMERIC );
 check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
 #endif // OUTPUT_VERSION < 7
+
+trace("sortOn invalid calls");
+r = a.sortOn();
+check( r == undefined );
+#if OUTPUT_VERSION < 7
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+#else // OUTPUT_VERSION >= 7
+check_equals( tostr(a), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true | Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined" );
+#endif // OUTPUT_VERSION >= 7
+
+r = a.sortOn(undefined);
+xcheck_equals( typeof(r) , 'object' );
+xcheck( r instanceof Array );
+#if OUTPUT_VERSION < 7
+xcheck_equals( tostr(r) , "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+#else // OUTPUT_VERSION >= 7
+xcheck_equals( tostr(r) , "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true | Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined" );
+#endif // OUTPUT_VERSION >= 7
+
+trace("sortOn using an object implementing/over-riding the toString() method as the property argument");
+
+r = a.sortOn( id );
+#if OUTPUT_VERSION < 7
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+#else // OUTPUT_VERSION >= 7
+check_equals( tostr(a), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true | Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined" );
+#endif // OUTPUT_VERSION >= 7
+
+a.sortOn( id, Array.CASEINSENSITIVE | Array.DESCENDING );
+#if OUTPUT_VERSION < 7
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+#else // OUTPUT_VERSION >= 7
+check_equals( tostr(a), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true | Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined");
+#endif // OUTPUT_VERSION >= 7
+
+
+r = a.sortOn( [id], 0 );
+#if OUTPUT_VERSION < 7
+xcheck_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+#else // OUTPUT_VERSION >= 7
+xcheck_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Harvard Mark I,1944,undefined | Zuse Z3,1941,false" );
+#endif // OUTPUT_VERSION >= 7
+
+r = a.sortOn( [yr, id], [Array.NUMERIC, Array.DESCENDING] );
+#if OUTPUT_VERSION < 7
+xcheck_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
+#else // OUTPUT_VERSION >= 7
+xcheck_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | Harvard Mark I,1944,undefined | ENIAC,1944,true" );
+#endif // OUTPUT_VERSION >= 7
 
