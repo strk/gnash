@@ -1,44 +1,165 @@
-<sect1 id="build">
+<chapter id="build">
   <title>Installing and Configuring &app;</title>
 
   <para>
     There are two ways of installing &app;:
     <link linkend="packagemanager">using a package manager</link>
-    or <link linkend="building_overview">installing from source</link>.
+    or <link linkend="gettingsource">installing from source</link>.
   </para>
+
+<sect1 id="requirements">
+<title>Requirements</title>
+
+<para>
+Before downloading and installing &app;, check that your hardware and software meet the following requirements.
+</para>
+
+<sect2 id="software">
+<title>Software Requirements</title>
+
+<para>
+The 0.8.0 release of &app; has been designed to run on UNIX/Linux variants, and has been run on most of the free ones.  However, &app; hassucessfully run on Windows, Darwin (Mac OS X), Iris, Solaris, BeOs, OS/2, and Haiku.  &app; has also run on the following 64-bit systems: PowerPC, Itanium, UltraSparc, and AMD64.   For now, it is important to be sure that the following code, testing, and documentation dependencies are met before installing &app;.  If you will be downloading &app; with a package manager, these dependencies may be solved by the pacakge manager.  Otherwise, you must first verify that each of these dependencies are installed on the target system.
+</para>
+
+ <sect3 id="codedepend">
+       &codedependencies;
+    </sect3>
+
+ <sect3 id="testdepend">
+       &testdependencies;
+    </sect3>
+
+<sect3 id="docdepend">
+       &docdependencies;
+    </sect3>
+</sect2>
+
+<sect2 id="hardware">
+<title>Hardware Requirements</title>
+
+<para>
+One of the goals of &app; is to make it portable enough to install on small devices.  As a result, the hardware requirements are minimal. &app; has even run on an ARM9 at 200 MHz with 64 MB of RAM ! (It ran without video support in this case.)   While firm minimums have not been established, &app; has been shown to run successfully with the following:
+</para>
+
+<itemizedlist>
+<listitem>
+<para>
+336 MHz processor
+</para>
+</listitem>
+<listitem>
+<para>
+256 MB RAM
+</para>
+</listitem>
+<listitem>
+<para>
+Video &mdash; &app; will run on anything from a raw frame buffer up to an OpenGL-supporting graphics card.
+</para>
+</listitem>
+</itemizedlist>
+</sect2>
+
+</sect1>
+
+<sect1 id="downloading">
+<title>Downloading &app;</title>
+
+<para>
+There are two ways to download &app;: using a package manager or by downloading the source code and building it on your system.  If a package exists for your operating system and you do not need the very latest version of &app;, it is advisable to use a package manager, which can resolve dependencies.  However, if you want the very latest features, or a &app; package is not available for your operating system, it is better to download the source code and build &app; locally.
+</para>
 
   <sect2 id="packagemanager">
     &pkgmanager;
   </sect2>
 
-  <sect2 id="building_overview">
-    &sources;
-        
-    <sect3 id="codedepend">
-       &codedependencies;
-    </sect3>
-        
-    <sect3 id="docdepend">
-       &docdependencies;
-    </sect3>
+ <sect2 id="gettingsource">
+  <title>Getting the Source</title>
 
-    <sect3 id="testdepend">
-       &testdependencies;
-    </sect3>
+  <para>
+    &app; is available as a <link linkend="sourcereleases">release
+    tarball</link>, a <link linkend="sourcerepo">development 
+    checkout</link>, or a <link linkend="sourcesnapshot">development
+    snapshot</link>.
+  </para>
 
-        
-    <sect3 id="configure">
-      &configuration;
-    </sect3>
-    
-    <sect3 id="building">
-      &building; 
-    </sect3>
-    
-    <sect3 id="install">
-      &install; 
-    </sect3>
+  <sect3 id="sourcereleases">
+    <title>Releases</title>
 
-  </sect2>
+    <para>
+      The source can be acquired from a
+      <ulink type="http" 
+      url="http://www.gnu.org/prep/ftp.html">GNU FTP
+      Mirror</ulink>.  The release version is intended to be
+      stable, and is probably your best choice if the release took
+      place recently.  If you need features or fixes which were
+      introduced after the release, consider a 
+      <link linkend="sourcerepo">CVS checkout</link> or the
+      <link linkend="sourcesnapshot">daily snapshot</link>.
+    </para>
+    <para>
+      To download, select a mirror near you, then choose the
+      <filename>gnash</filename> directory.
+    </para>
+  </sect3>
+
+  <sect3 id="sourcerepo">
+    <title>Repository</title>
+
+    <para>
+      The latest development sources are available via
+      anonymous CVS (leave the password blank).  This is recommended
+      if you need features or bug fixes which were introduced after
+      the <link linkend="sourcereleases">last release</link>.  Look at
+      the <link linkend="sourcesnapshot">daily snapshot</link> if you
+      experience difficulty accessing the repository.
+    </para>
+    <para>
+      First set the
+      environment variable <emphasis>CVS_RSH</emphasis> to 'ssh', as shown
+      in this example, which uses the GNU Bourne-Again shell (bash):
+      <programlisting>
+  export CVS_RSH="ssh"
+  cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/gnash co gnash
+      </programlisting>
+      It is also possible to
+      <ulink url="http://cvs.savannah.gnu.org/viewcvs/gnash/?root=gnash"
+      type="http">browse the repository</ulink> on the web.
+    </para>
+  </sect3>
+
+  <sect3 id="sourcesnapshot">
+    <title>Snapshot</title>
+
+    <para>
+      The daily development snapshot can be downloaded from
+      <ulink url="http://www.gnashdev.org/dev_snapshots/"
+      type="http">http://www.gnashdev.org/dev_snapshots/</ulink>.
+      This is the best option if you need changes which were introduced
+      after the <link linkend="sourcereleases">last release</link> of
+      &app;, but are unable to <link linkend="sourcerepo">download
+      directly from the repository.</link>
+    </para>
+  </sect3>
+
+</sect2>
+   
 </sect1>
+
+<sect1 id="pre-configuration">
+<title>Pre-Compile Configuration</title>
+
+&configuration;
+
+</sect1>
+    
+    <sect1 id="compiling">
+      &building; 
+    </sect1>
+    
+    <sect1 id="install">
+      &install; 
+    </sect1>
+
+</chapter>
 
