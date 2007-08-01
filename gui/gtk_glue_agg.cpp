@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.25 2007/08/01 13:16:40 udog Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.26 2007/08/01 16:47:04 udog Exp $ */
 
 
 /// \page gtk_shm_support GTK shared memory extension support
@@ -238,16 +238,29 @@ bool
 GtkAggGlue::detect_pixelformat() 
 {
 
-  // <UdoG>: Currently there is NO detection of the pixel format used by the 
-  // X server. I tried with gdk_visual_get_system() and gdk_visual_get_best() 
-  // but they return the /hardware/ pixel format, which is not what we want.
-  // Normally any X server will use RGB24, regardless of video hardware.
-  // Only the OLPC has a hacked(?) X server that expects RGB565 data.
-  // I dropped support for the OLPC to make GTK-AGG work for normal X servers.
-  // We need to find a detection method that works in both cases...  
+  // By definition, GTK/GDK *always* expects RGB24 data for 
+  // gdk_draw_rgb_image(). However, we want to support the OLPC which uses a 
+  // hacked GTK that works with RGB565 data.
+  
+#ifdef PIXELFORMAT_RGB24   // normal case 
   
   _bpp = 24;
   strcpy(_pixelformat, "RGB24");
+  
+#else
+
+#ifdef PIXELFORMAT_RGB565  // OLPC
+
+  _bpp = 16;
+  strcpy(_pixelformat, "RGB565");
+  
+#else
+
+#error Missing a supported pixel format for GTK GUI. You probably want to configure --with-pixelformat=RGB24   
+
+#endif  //ifdef PIXELFORMAT_RGB565   
+ 
+#endif  //ifdef PIXELFORMAT_RGB24
   
   return true;
   
