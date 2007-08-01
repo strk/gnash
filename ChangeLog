@@ -1,5 +1,12 @@
 2007-08-01 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp: completely remove the bogus assertion
+	  about the required input bytes in relation to the number of samples.
+	  Rather, add more ensureBytes() uses, closer to where the data is
+	  actually read from the stream.
+
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/tag_loaders.cpp (sound_expand): fix assertion
 	  checking; added some uses of the new stream::ensureBytes() method;
 	  add more scoped_array uses.

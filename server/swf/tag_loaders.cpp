@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.119 2007/08/01 21:03:12 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.120 2007/08/01 21:31:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1054,12 +1054,15 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	sound_handler* handler = get_sound_handler();
 
+	in->ensureBytes(2+1+4); // character id + flags + sample count
+
 	uint16_t	character_id = in->read_u16();
 
 	sound_handler::format_type	format = (sound_handler::format_type) in->read_uint(4);
 	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
 	bool	sample_16bit = in->read_uint(1) ? true : false;
 	bool	stereo = in->read_uint(1) ? true : false;
+
 	unsigned int	sample_count = in->read_u32();
 
 	IF_VERBOSE_PARSE
@@ -1085,17 +1088,6 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	    unsigned char *data; // Expanded audio data ready for playing
     	    unsigned data_bytes; // First it is the amount of data from file,
 			// then the amount allocated at *data (it may grow)
-
-	    data_bytes = in->get_tag_end_position() - in->get_position();
-
-	    if ( sample_count > data_bytes )
-	    {
-		IF_VERBOSE_MALFORMED_SWF(
-		    log_swferror(_("Samples count (%u) exceed the number of bytes available in the DefineSound tag containing it (%u)"),
-			sample_count, data_bytes);
-		);
-		return;
-	    }
 
 	    // sound_expand allocates storage for data[].
 	    // and modifies 3 parameters: format, data and data_bytes.
@@ -1316,7 +1308,6 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	bool sample_16bit, bool stereo, unsigned int &sample_count,
 	unsigned char* &data, unsigned &data_bytes)
 {
-    assert(sample_count < data_bytes);
 
     // Make sure that an unassigned pointer cannot get through
     data = NULL;
@@ -1337,6 +1328,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	// Convert to 16-bit host-endian
 	if (sample_16bit) {
 	    // FORMAT_RAW 16-bit is exactly what we want!
+	    in->ensureBytes(data_bytes); 
 	    data = new unsigned char[data_bytes];
 	    in->read((char *)data, data_bytes);
 	} else {
@@ -1362,6 +1354,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
 
 	} else {
 	    // Read 16-bit data into buffer
+	    in->ensureBytes(data_bytes); 
 	    data = new unsigned char[data_bytes];
 	    in->read((char *)data, data_bytes);
 
@@ -1399,6 +1392,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
 
     case sound_handler::FORMAT_MP3:
 	// Decompressed elsewhere
+	in->ensureBytes(data_bytes); 
 	data = new unsigned char[data_bytes];
 	in->read((char *)data, data_bytes);
 	break;
@@ -1406,6 +1400,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
     case sound_handler::FORMAT_NELLYMOSER_8HZ_MONO:
     case sound_handler::FORMAT_NELLYMOSER:
 	// One day...
+	in->ensureBytes(data_bytes); 
 	in->skip_bytes(data_bytes);
 	data = NULL;
 	break;
@@ -1560,6 +1555,8 @@ static void u8_expand(
 	bool stereo)
 {
 	unsigned total_samples = stereo ? sample_count*2 : sample_count;
+
+	in->ensureBytes(total_samples); 
 
 	boost::scoped_array<uint8_t> in_data ( new uint8_t[total_samples] );
 	int16_t	*out_data = new int16_t[total_samples];
@@ -1728,11 +1725,17 @@ static void adpcm_expand(
 	data = reinterpret_cast<unsigned char *>(out_data);
 
 	// Read header.
+	in->ensureBytes(2);   // header size
 	int	n_bits = in->read_uint(2) + 2;	// 2 to 5 bits
+
+	// 4 is the fixed header for each sample ( 16bit sample id, 6bit stepsize_index )
+	// nbits is the number of bits for each sample
+	in->ensureBytes( sample_count * ( 3 + ceil(n_bits/8) ) );
 
 	while (sample_count)
 	{
 		// Read initial sample & index values.
+
 		int	sample = in->read_sint(16);
 
 		int	stepsize_index = in->read_uint(6);
