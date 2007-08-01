@@ -43,7 +43,7 @@ fi
 for gui in ${gui} ${GUIS}; do
 	exe=${THIS_DIR}/${gui}-gnash
 	if test -e ${exe}; then
-		exec ${exe} $*
+		exec ${exe} "$@"
 	fi
 done
 
