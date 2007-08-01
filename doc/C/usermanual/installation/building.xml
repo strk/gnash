@@ -1,12 +1,12 @@
 <title>Building from Source</title>
 
 <para>
-  Once you have <link linkend="configure">configured</link> &app;,
+  Once you have <link linkend="pre-configuration">configured</link> &app;,
   you are ready to build the code.  &app; is built using
   <emphasis>GNU make</emphasis>.
 </para>
 
-<sect3 id="compile">
+<sect2 id="compile">
   <title>Compiling the Code</title>
 
   <para>
@@ -27,18 +27,16 @@
     The default value for both of these variables is
     <emphasis>-O2 -g</emphasis>.  A list of influential 
     environment variables can be seen in the configuration help:
-    <programlisting>
-  ./configure --help
-    </programlisting>
+</para>
+<para><userinput>./configure --help</userinput></para>
+<para>
     In the following example, debugging is enabled and optimization is
     disabled:
-    <programlisting>
-  make CFLAGS=-g CXXFLAGS=-g
-    </programlisting>
-  </para>
-</sect3>
+</para>
+<para><userinput>make CFLAGS=-g CXXFLAGS=-g</userinput></para>
+</sect2>
 
-<sect3 id="processdoc">
+<sect2 id="processdoc">
   <title>Creating the Documentation</title>
 
   <para>
@@ -79,10 +77,10 @@
   make apidoc
     </programlisting>
   </para>
-</sect3>
+</sect2>
 
 
-<sect3 id="runtests">
+<sect2 id="runtests">
   <title>Running the Tests</title>
 
   <para>
@@ -90,7 +88,7 @@
     <link linkend="bugreport">instructions for reporting a bug</link>.
   </para>
 
-  <sect4 id="dejagnu">
+  <sect3 id="dejagnu">
     <title>Using DejaGnu</title>
 
     <para>
@@ -106,7 +104,7 @@
       </programlisting>
     </para>
   
-    <sect5 id="testing_verbosity">
+    <sect4 id="testing_verbosity">
       <title>Increasing Verbosity</title>
       <para>
         If you encounter a problem with a test, increasing the
@@ -120,9 +118,9 @@
   make check RUNTESTFLAGS="-v -a"
         </programlisting>
       </para> 
-    </sect5>
+    </sect4>
      
-    <sect5 id="running_some_tests">
+    <sect4 id="running_some_tests">
       <title>Running Some Tests</title>
       <para>
         It is possible to run just a particular test, or 
@@ -151,10 +149,10 @@
   make -C testsuite/movies.all check
         </programlisting>
       </para>
-    </sect5>
+    </sect4>
      
-  </sect4>
-  <sect4 id="manually">
+  </sect3>
+  <sect3 id="manually">
     <title>Running The Tests Manually</title>
      
     <para>
@@ -174,7 +172,7 @@
       </programlisting>
     </para>
   
-    <sect5 id="manual_compiled_tests">
+    <sect4 id="manual_compiled_tests">
     <title>Movie tests</title>
       <para>
         This creates a Flash movie version of the test case, which
@@ -184,9 +182,9 @@
    gnash -v XML-v6.swf
         </programlisting>
       </para>
-    </sect5>
+    </sect4>
   
-    <sect5 id="manual_actionscript_tests">
+    <sect4 id="manual_actionscript_tests">
       <title>ActionScript Unit Tests</title>
       <para>
         Unit tests for ActionScript classes in 'testsuite/actionscript.all'
@@ -195,9 +193,9 @@
   gprocessor -v XML-v6.swf
         </programlisting>
       </para>
-    </sect5>
-  </sect4>
+    </sect4>
+  </sect3>
 
 
 
-</sect3>
+</sect2>
