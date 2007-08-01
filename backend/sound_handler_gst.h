@@ -55,10 +55,10 @@ public:
 	GstPad     *addersinkpad;
 	
 	// position in the stream
-	long position;
+	unsigned long position;
 
 	// data size
-	long data_size;
+	unsigned long data_size;
 
 	long loop_count;
 	
@@ -127,7 +127,7 @@ private:
 	bool muted;
 
 	/// Mutex for making sure threads doesn't mess things up
-	boost::mutex _mutex;
+	boost::try_mutex _mutex;
 
 public:
 

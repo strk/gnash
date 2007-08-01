@@ -1,3 +1,9 @@
+2007-08-01 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_gst.{h,cpp}: Switch to try_mutex, and in 
+	  callback_handoff only try to lock, and return if unsuccesfull
+	  to avoid a potential deadlock, fixes bug #20596. Warning fixes.
+
 2007-08-01 Sandro Santilli <strk@keybit.net>
 
 	* plugin/plugin.cpp: run 'gtk-gnash' by default.
@@ -125,7 +131,7 @@
 	* testsuite/actionscript.all/TextField.as: expect one failure
 	  less.
 
-2007-07-30 Sergio Costas
+2007-07-30 Sergio Costas <raster (at) rastersoft.com>
 
 	* backend/sound_handler_gst.cpp: Use the audioconverter element
 	  to get the current position, to avoid delay.

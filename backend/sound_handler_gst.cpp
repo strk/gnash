@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.56 2007/07/30 09:05:51 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.57 2007/08/01 10:09:23 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -80,7 +80,7 @@ int	GST_sound_handler::create_sound(
 // can be use for playing it.
 {
 
-	mutex::scoped_lock lock(_mutex);
+	try_mutex::scoped_lock lock(_mutex);
 
 	sound_data *sounddata = new sound_data;
 	if (!sounddata) {
@@ -144,7 +144,7 @@ int	GST_sound_handler::create_sound(
 // this gets called when a stream gets more data
 long	GST_sound_handler::fill_stream_data(void* data, int data_bytes, int /*sample_count*/, int handle_id)
 {
-	mutex::scoped_lock lock(_mutex);
+	try_mutex::scoped_lock lock(_mutex);
 
 	// @@ does a negative handle_id have any meaning ?
 	//    should we change it to unsigned instead ?
@@ -186,9 +186,20 @@ void GST_sound_handler::callback_handoff (GstElement * /*c*/, GstBuffer *buffer,
 {
 	gst_elements *gstelements = static_cast<gst_elements*>(user_data);
 
-	mutex::scoped_lock lock(gstelements->handler->_mutex);
+	try_mutex::scoped_try_lock lock(gstelements->handler->_mutex);
 
-	// First callback
+	// If we couldn't obtain a lock return to avoid a deadlock
+	if (!lock.locked()) {
+
+		// We return nothing in this case to avoid noise being decoded and played
+		if (GST_BUFFER_SIZE(buffer) != 0 && GST_BUFFER_DATA(buffer)) {
+			GST_BUFFER_DATA(buffer) = 0;
+			GST_BUFFER_SIZE(buffer) = 0;
+		}
+		return;
+	}
+
+	// First callback or after a couldn't-get-lock-return 
 	if (GST_BUFFER_SIZE(buffer) == 0) {
 		if (gstelements->data_size > BUFFER_SIZE) {
 			GST_BUFFER_SIZE(buffer) = BUFFER_SIZE;
@@ -252,7 +263,7 @@ void GST_sound_handler::callback_handoff (GstElement * /*c*/, GstBuffer *buffer,
 void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offset*/, long start_position, const std::vector<sound_envelope>* /*envelopes*/)
 // Play the index'd sample.
 {
-	mutex::scoped_lock lock(_mutex);
+	try_mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists, or if audio is muted
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size() || muted)
@@ -459,7 +470,7 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 
 void	GST_sound_handler::stop_sound(int sound_handle)
 {
-	mutex::scoped_lock lock(_mutex);
+	try_mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
@@ -499,7 +510,7 @@ void	GST_sound_handler::stop_sound(int sound_handle)
 void	GST_sound_handler::delete_sound(int sound_handle)
 // this gets called when it's done with a sample.
 {
-	mutex::scoped_lock lock(_mutex);
+	try_mutex::scoped_lock lock(_mutex);
 
 	if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
 	{
@@ -524,7 +535,7 @@ void	GST_sound_handler::stop_all_sounds()
 //	where 0 is off and 100 is full volume. The default setting is 100.
 int	GST_sound_handler::get_volume(int sound_handle) {
 
-	mutex::scoped_lock lock(_mutex);
+	try_mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
@@ -540,7 +551,7 @@ int	GST_sound_handler::get_volume(int sound_handle) {
 //	100 is full volume and 0 is no volume. The default setting is 100.
 void	GST_sound_handler::set_volume(int sound_handle, int volume) {
 
-	mutex::scoped_lock lock(_mutex);
+	try_mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
@@ -568,7 +579,7 @@ void	GST_sound_handler::set_volume(int sound_handle, int volume) {
 
 void GST_sound_handler::get_info(int sound_handle, int* format, bool* stereo) {
 
-	mutex::scoped_lock lock(_mutex);
+	try_mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
@@ -606,7 +617,7 @@ void GST_sound_handler::detach_aux_streamer(void* /*owner*/)
 
 unsigned int GST_sound_handler::get_duration(int sound_handle)
 {
-	mutex::scoped_lock lock(_mutex);
+	try_mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
@@ -629,7 +640,7 @@ unsigned int GST_sound_handler::get_duration(int sound_handle)
 
 unsigned int GST_sound_handler::get_position(int sound_handle)
 {
-	mutex::scoped_lock lock(_mutex);
+	try_mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
@@ -659,6 +670,7 @@ unsigned int GST_sound_handler::get_position(int sound_handle)
 			return 0;
 		}
 	}
+	return 0;
 }
 
 // Pointer handling and checking functions
