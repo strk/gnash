@@ -1,3 +1,9 @@
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
+	* backend/sound_handler.h (create_sound): document ownership
+	  of the 'data' argument, and add a TODO item about changing
+	  the interface.
+
 2007-08-01 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/gtk_glue_agg.cpp: Support the OLPC again

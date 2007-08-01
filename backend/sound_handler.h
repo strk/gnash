@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.21 2007/07/27 15:16:43 strk Exp $ */
+/* $Id: sound_handler.h,v 1.22 2007/08/01 16:49:20 strk Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -88,7 +88,9 @@ public:
 	/// gnash's parser calls this to create sounds to be played later.
 	//
 	/// @param data
-	/// The data to be stored. For soundstream this is NULL.
+	/// 	The data to be stored. For soundstream this is NULL.
+	/// 	If not NULL, the data is currently *copied*
+	/// 	TODO: avoid the copy, if possible, getting ownership transferred instead
 	///
 	/// @param data_bytes
 	/// The size of the data to be stored. For soundstream this is 0.
