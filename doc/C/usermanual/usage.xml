@@ -1,4 +1,4 @@
-<sect1 id="usage">
+<chapter id="usage">
     <title>Using &app;</title>
     
     <para>
@@ -9,8 +9,7 @@
       just play the movie using the default actions. So if you type:
     </para>
       
-
-    <para>
+<para>
       <emphasis>gnash samples/car_smash.swf</emphasis>
     </para>
 
@@ -26,7 +25,7 @@
       
     </para>
 
-    <sect2 id="options">
+    <sect1 id="options">
       <title>&app; Command Line Options</title>
 
       <para>
@@ -290,9 +289,9 @@
 	
       </variablelist>
       
-    </sect2>
+    </sect1>
 
-    <sect2 id="keys">
+    <sect1 id="keys">
       <title>&app; Interactive Control Keys</title>
 
       <para>
@@ -412,8 +411,8 @@
 	  </listitem>
 	</varlistentry>
       </variablelist>
-    </sect2>
+    </sect1>
 
     &gnashrc;
 
-  </sect1>
+  </chapter>
