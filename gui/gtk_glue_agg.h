@@ -56,6 +56,7 @@ class GtkAggGlue : public GtkGlue
     int _offscreenbuf_size;
     render_handler *_agg_renderer;
     int _width, _height, _bpp;
+    char _pixelformat[16];
     bool _have_shm;
 #ifdef ENABLE_MIT_SHM
     XImage *_shm_image;
@@ -80,9 +81,14 @@ class GtkAggGlue : public GtkGlue
     /// format. Returns NULL on failure.
     render_handler *create_shm_handler();    
     
-    // converts a bitmask to a shift/size information (used for pixel format
-    // detection)
+    /// converts a bitmask to a shift/size information (used for pixel format
+    /// detection)
     void decode_mask(unsigned long mask, unsigned int *shift, unsigned int *size);
+    
+    /// Tries to detect the pixel format used by the X server (usually RGB24).
+    /// It does not have to match the hardware pixel format, just the one
+    /// expected for pixmaps. This function is /not/ used for MIT-SHM!
+    bool detect_pixelformat();
     
 };
 

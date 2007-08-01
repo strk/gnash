@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.23 2007/07/02 08:13:27 udog Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.24 2007/08/01 12:06:30 udog Exp $ */
 
 
 /// \page gtk_shm_support GTK shared memory extension support
@@ -103,13 +103,14 @@ GtkAggGlue::init(int /*argc*/, char **/*argv*/[])
     
     _have_shm = check_mit_shm(gdk_display);
     
-#ifdef PIXELFORMAT_RGB565
-    _bpp = 16;
-#else
-    // GDK's gdk_draw_rgb_image() needs 24-bit RGB data, so we initialize the
-    // AGG renderer with RGB24 and let GTK take care of the proper pixel format.
-    _bpp = 24;
-#endif
+    if (!detect_pixelformat()) {
+      printf("FATAL: Could not detect the pixel format used by your X server.\n");
+      printf("Please report this problem to the Gnash developer team.\n");
+      return false;
+    }
+    
+    log_msg("Your X server expects %s pixmap data.", _pixelformat);
+    
     return true;
 }
 
@@ -233,6 +234,25 @@ GtkAggGlue::prepDrawingArea(GtkWidget *drawing_area)
     _drawing_area = drawing_area;
 }
 
+bool 
+GtkAggGlue::detect_pixelformat() 
+{
+
+  // <UdoG>: Currently there is NO detection of the pixel format used by the 
+  // X server. I tried with gdk_visual_get_system() and gdk_visual_get_best() 
+  // but they return the /hardware/ pixel format, which is not what we want.
+  // Normally any X server will use RGB24, regardless of video hardware.
+  // Only the OLPC has a hacked(?) X server that expects RGB565 data.
+  // I dropped support for the OLPC to make GTK-AGG work for normal X servers.
+  // We need to find a detection method that works in both cases...  
+  
+  _bpp = 24;
+  strcpy(_pixelformat, "RGB24");
+  
+  return true;
+  
+}
+
 render_handler*
 GtkAggGlue::create_shm_handler()
 {
@@ -311,14 +331,8 @@ GtkAggGlue::createRenderHandler()
     if (_agg_renderer) return _agg_renderer;
   }
 
-#ifdef PIXELFORMAT_RGB565
-#warning A pixel format of RGB565; you must have a (hacked) GTK which supports \
-         this format (e.g., GTK on the OLPC).
-    _agg_renderer = create_render_handler_agg("RGB565");
-#else
-    _agg_renderer = create_render_handler_agg("RGB24");
-#endif
-    return _agg_renderer;
+  _agg_renderer = create_render_handler_agg(_pixelformat);
+  return _agg_renderer;
 }
 
 void

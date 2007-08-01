@@ -1,3 +1,8 @@
+2007-08-01 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gtk_glue_agg.{cpp,h}: stubbed pixel format detection. Will
+	  break OLPC support but fix bug #20649 for all others.
+
 2007-08-01 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_gst.{h,cpp}: Switch to try_mutex, and in 
