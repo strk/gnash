@@ -1,6 +1,6 @@
 2007-08-01 Sandro Santilli <strk@keybit.net>
 
-	* backend/sound_handler.h (create_sound): document ownership
+	* backend/sound_handler.h (create_sound, fill_stream_data): document ownership
 	  of the 'data' argument, and add a TODO item about changing
 	  the interface.
 
