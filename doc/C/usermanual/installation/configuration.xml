@@ -1,6 +1,5 @@
-<title>Configuration</title>
 <para>
-  &app; uses <ulink type="http"
+&app;, like most GNU projects, allows a user to select various options before compiling its source code. These options include selecting from the available features, specifying custom paths for installation, and cross compiling.  &app; uses <ulink type="http"
   url="http://www.gnu.org/software/autoconf/">GNU Autoconf</ulink>
   for configuration.
 </para>
@@ -42,19 +41,23 @@
   which create the smallest working standalone version of &app;.  In
   this example, <emphasis>configure</emphasis> is being run from the
   source root directory:
-  <programlisting>
-  ./configure --disable-debugger --disable-cygnal --disable-docbook --disable-plugin --enable-media=mad --enable-gui=sdl
-  </programlisting>
 </para>
 
-<sect4 id="features">
-  &featureoptions;
-</sect4>
-         
-<sect4 id="custompath">
-  &custompath;
-</sect4>
+<screen>
+<userinput>
+./configure --disable-debugger --disable-cygnal --disable-docbook \
+--disable-plugin --enable-media=mad --enable-gui=sdl
+</userinput>
+</screen>
 
-<sect4 id="crosscompilingconfiguration">
+<sect2 id="features">
+  &featureoptions;
+</sect2>
+         
+<sect2 id="custompath">
+  &custompath;
+</sect2>
+
+<sect2 id="crosscompilingconfiguration">
   &cross_compiling;
-</sect4>
+</sect2>
