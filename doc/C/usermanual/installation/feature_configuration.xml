@@ -27,8 +27,6 @@ selected.  The default is FFMPEG with SDL sound.
   A complete list of available features follows.
 </para>
 
-<!-- <para>TODO - review this section</para> -->
-
 <variablelist>
   <varlistentry>
     <term>--enable-debugger</term>
@@ -110,41 +108,51 @@ selected.  The default is FFMPEG with SDL sound.
 	<varlistentry>
 	  <term>GTK</term>
 	  <listitem>
+<para>
     The GTK+ toolkit, which is the default GUI.
     Said to interwork particularly well with firefox.
+</para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
 	  <term>SDL</term>
 	  <listitem>
+<para>
     Simple DirectMedia Layer, a simple and portable GUI.
     Its sound facilities are used when --enable-media=ffmpeg|mad
     regoardless of whether it is also in charge of the GUI.
+</para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
 	  <term>KDE</term>
 	  <listitem>
+<para>
     An interface adapted to the KDE Desktop Environment.
     This must be selected when building the Konqueror plugin
     "klash". Furthermore, the only renderer that currently
     works with KDE is opengl.
+</para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
 	  <term>FLTK</term>
 	  <listitem>
+<para>
     Fast Light ToolKit, low on resource usage.
     Since all build using fltk are now broken, we declare it
     "for developers".
+</para>
 	  </listitem>
 	</varlistentry>
 	<varlistentry>
 	  <term>FB</term>
 	  <listitem>
+<para>
     The Linux Frame Buffer, also known as /dev/fb0.
     AGG is the only renderer that can currently be used
     with the framebuffer GUI.
+</para>
 	  </listitem>
 	</varlistentry>
       </variablelist>
