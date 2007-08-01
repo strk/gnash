@@ -30,14 +30,14 @@
   platform-dependent executables and libraries are installed.
 </para>
   
-<sect4 id="libinstall">
+<sect2 id="libinstall">
   <title>Libraries</title>
   
   <para>
     Installed libraries are located in 
     <filename>/usr/local/lib</filename> by default.
     If the <emphasis>--prefix</emphasis> option was used in
-    <link linkend="configure">configuration</link>, the libraries will
+    <link linkend="pre-configuration">configuration</link>, the libraries will
     be installed in the directory <filename>lib</filename> inside the
     path you specified.  If the libraries are stored in a non-standard
     location, you need to identify the path in one of two ways.
@@ -59,9 +59,9 @@
     run <emphasis>ldconfig</emphasis> as root to update the runtime
     cache.
   </para>
-</sect4>
+</sect2>
 
-<sect4 id="appinstall">
+<sect2 id="appinstall">
   <title>Executables</title>
 
   <para>
@@ -81,9 +81,9 @@
     If no path was specified, the default is 
     <filename>/usr/local/bin</filename>.
   </para>
-</sect4>
+</sect2>
 
-<sect4 id="docinstall">
+<sect2 id="docinstall">
   <title>Documentation</title>
 
   <para>
@@ -108,4 +108,4 @@
     which menu item &app; appears in the <emphasis>GNOME help</emphasis>
     system.
   </para>
-</sect4>
+</sect2>
