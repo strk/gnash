@@ -415,6 +415,8 @@ Gui::display(movie_root* m)
 		setInvalidatedRegions(changed_ranges);
 #endif
 
+    beforeRendering();
+
 		// render the frame.
 		// It's up to the GUI/renderer combination
 		// to do any clipping, if desired.     

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.101 2007/07/30 21:26:39 strk Exp $ */
+/* $Id: gtk.cpp,v 1.102 2007/08/01 13:16:39 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -265,6 +265,12 @@ GtkGui::createWindow(int width, int height)
 	_glue->setRenderHandlerSize(_width, _height);
 
 	return true;
+}
+
+void
+GtkGui::beforeRendering()
+{
+  _glue->beforeRendering();
 }
 
 void

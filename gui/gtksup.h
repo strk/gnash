@@ -53,6 +53,7 @@ class DSOEXPORT GtkGui : public Gui
 
     virtual bool createMenu();
     virtual bool setupEvents();
+    virtual void beforeRendering();
     virtual void renderBuffer();
     virtual void setInterval(unsigned int interval);
     virtual void setTimeout(unsigned int timeout);

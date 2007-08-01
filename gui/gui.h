@@ -131,6 +131,10 @@ public:
     virtual void setInvalidatedRegion(const rect& bounds);
     virtual void setInvalidatedRegions(const InvalidatedRanges& ranges);
     
+    // Called right before rendering anything (after setInvalidatedRegion).
+    // Used by GTK-AGG.
+    virtual void beforeRendering() { /* nop */ };
+    
     // Should return TRUE when the GUI/Renderer combination supports multiple
     // invalidated bounds regions. 
     virtual bool want_multiple_regions() { return false; }

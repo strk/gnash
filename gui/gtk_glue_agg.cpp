@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.24 2007/08/01 12:06:30 udog Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.25 2007/08/01 13:16:40 udog Exp $ */
 
 
 /// \page gtk_shm_support GTK shared memory extension support
@@ -109,7 +109,7 @@ GtkAggGlue::init(int /*argc*/, char **/*argv*/[])
       return false;
     }
     
-    log_msg("Your X server expects %s pixmap data.", _pixelformat);
+    log_msg("Your X server expects %s pixmap data for standard mode.", _pixelformat);
     
     return true;
 }
@@ -418,6 +418,24 @@ GtkAggGlue::setRenderHandlerSize(int width, int height)
 	
 }
 
+void 
+GtkAggGlue::beforeRendering()
+{
+#ifdef ENABLE_MIT_SHM
+  if (_shm_image) {
+    // The shared memory buffer is copied in background(!) since the X 
+    // calls are executed asynchroneously. This is dangerous because it
+    // may happen that the renderer updates the buffer while the X server
+    // still copies the data to the VRAM (flicker can occurr).
+    // Instead of using the XShmCompletionEvent for this we just call XSync
+    // right before writing to the shared memory again. This will make sure
+    // that the X server finishes to copy the data to VRAM before we
+    // change it again.
+    XSync(gdk_display, False);
+  }
+#endif  
+}
+
 void
 GtkAggGlue::render()
 {
@@ -435,23 +453,8 @@ GtkAggGlue::render()
       _width, _height,
       False); 
       
-      // <Udo>:
-      // The shared memory buffer is copied in background(!) since the X 
-      // calls are executed asynchroneously. This is dangerous because it
-      // may happen that the renderer updates the buffer while the X server
-      // still copies the data to the VRAM (flicker can occurr).
-      // Normally this is avoided using the XShmCompletionEvent which is sent
-      // to the client once the buffer has been copied. The last argument to
-      // XShmPutImage must be set to True for this. 
-      // We'd need to wait for this event before calling the renderer again.
-      // I know nothing about X event handling and so I just call XSync here
-      // to wait until all commands have been executed. This has the 
-      // disadvantage that we can't leave the X server some time till the core 
-      // is ready to *render* the next frame. I don't think it would make a 
-      // significant performance difference unless data to video ram is very 
-      // slow (could be the case for old / embedded computers, though).       
-      XSync(gdk_display, False);
-
+      // NOTE: Data will be copied in background, see beforeRendering()
+      
   } else {
 #endif  
 
@@ -491,7 +494,7 @@ GtkAggGlue::render(int minx, int miny, int maxx, int maxy)
   		maxx-minx+1, maxy-miny+1,
       False);
       
-    XSync(gdk_display, False); // see GtkAggGlue::render(void)
+    // NOTE: Data will be copied in background, see beforeRendering()
   
   } else {
 #endif       

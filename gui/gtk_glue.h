@@ -43,6 +43,7 @@ class GtkGlue
 			{ render();	};
     virtual void configure(GtkWidget *const widget,
                            GdkEventConfigure *const event) = 0;
+    virtual void beforeRendering() { /* nop */ };
   protected:
     GtkWidget *_drawing_area;
 };
