@@ -29,6 +29,8 @@ pluginsdir = $(libdir)/gnash/plugins
 # noinst_LTLIBRARIES = libgnashgui.la
 BUILT_SOURCES = klash.moc .configline
 
+EXTRA_DIST = gnash.in
+
 noinst_LTLIBRARIES = 
 AM_CPPFLAGS = -I.. \
         -I$(top_srcdir) \
