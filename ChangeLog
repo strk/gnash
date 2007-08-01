@@ -1,5 +1,11 @@
 2007-08-01 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (sound_expand): fix assertion
+	  checking; added some uses of the new stream::ensureBytes() method;
+	  add more scoped_array uses.
+
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
 	* server/stream.h: add ensureBytes() method to verify
 	  SWF integrity.
 
