@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.79 2007/07/01 10:54:14 bjacques Exp $ */
+/* $Id: plugin.cpp,v 1.80 2007/08/01 04:02:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -473,7 +473,7 @@ nsPluginInstance::startProc(Window win)
     char *gnash_env = getenv("GNASH_PLAYER");
     if (!gnash_env) {
       procname = GNASHBINDIR;
-      procname += "/gnash";
+      procname += "/gtk-gnash";
     } else {
       procname = gnash_env;
     }
