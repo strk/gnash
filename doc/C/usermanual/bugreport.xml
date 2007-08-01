@@ -1,4 +1,4 @@
-<sect1 id="bugreport">
+<chapter id="bugreport">
   <title>Reporting Bugs</title>
 
   <para>
@@ -22,13 +22,13 @@
     </orderedlist>
   </para>
 
-  <sect2 id="bugstep_newcheckout">
+  <sect1 id="bugstep_newcheckout">
     <title>Compile the latest &app; build</title>
     <para>
       Obtain a copy of the latest <link linkend="sourcerepo">development
       checkout</link> or <link linkend="sourcesnapshot">development
       snapshot</link>.  Put the source in an empty directory, then
-      <link linkend="configure">configure</link> and 
+      <link linkend="pre-configuration">configure</link> and 
       <link linkend="compile">compile</link> &app;.
     </para>
     <para>
@@ -48,9 +48,9 @@
       your environment.  Try to determine the source of the conflict
       so that you can include this information in your bug report.
     </para>
-  </sect2>
+  </sect1>
 
-  <sect2 id="bugstep_search">
+  <sect1 id="bugstep_search">
     <title>Determine if the bug was previously reported</title>
     <para>
       Search the <ulink type="https"
@@ -66,48 +66,64 @@
       your stacktrace would be useful.  Conversely, adding a "me too"
       note to a feature request is not helpful.
     </para>
-  </sect2>
+  </sect1>
 
-  <sect2 id="bugstep_guidelines">
+  <sect1 id="bugstep_guidelines">
     <title>Review the bug writing guidelines</title>
     <para>
       A good bug report should be precise, explicit, and discrete.
       This means that there should be just one bug per ticket, and
       that a ticket should contain the following information:
+</para>
       <itemizedlist mark="opencircle">
         <listitem>
+<para>
           An overview of the problem;
+</para>
         </listitem> 
         <listitem>
+<para>
           Instructions on how to replicate the bug;
+</para>
         </listitem> 
         <listitem>
+<para>
           A description of what happened when you performed the steps
           to replicate the bug, and what you expected to happen;
+</para>
         </listitem> 
         <listitem>
+<para>
           Your system information: operating system name and version, as
           well as the versions of major <link 
           linkend="codedepend">dependencies</link>;
+</para>
         </listitem> 
         <listitem>
+<para>
           The release number or checkout timestamp for the version of &app;
           where you observe the problem;
+</para>
         </listitem> 
         <listitem>
+<para>
           The file <filename>config.log</filename>, which should be
           attached as a file; and
+</para>
         </listitem> 
         <listitem>
+<para>
           A descriptive title.
+</para>
         </listitem> 
       </itemizedlist>
+<para>
       Include any additional information that you feel might be useful
       to the developers.
     </para>
-  </sect2>
+  </sect1>
 
-  <sect2 id="bugstep_file">
+  <sect1 id="bugstep_file">
     <title>Filing a bug report</title>
     <para>
       After following the steps described above, you can
@@ -115,7 +131,7 @@
       url="https://savannah.gnu.org/bugs/?group=gnash">file a
       bug report</ulink>.
     </para>
-  </sect2>
+  </sect1>
 
-</sect1>
+</chapter>
     
