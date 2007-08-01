@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
     <!ENTITY legal SYSTEM "legal.xml">
     <!ENTITY fdl-app SYSTEM "fdl-appendix.xml">
@@ -36,12 +36,12 @@
 
 
 <!-- TRANSLATOR NOTE: do not change the id, just the lang -->
-<article id="index" lang="en">
+<book id="index" lang="en">
 
 <!-- =============Document Header ============================ -->
 
-  <articleinfo>
-      <title>&app; Manual version &manrevision;</title>
+  <bookinfo>
+      <title>&app; Developer's Guide version &manrevision;</title>
       <copyright>
          <year>2005, 2006, 2007</year>
          <holder>Free Software Foundation</holder>
@@ -64,19 +64,19 @@
         This manual describes version &appversion; of &appname;.
     </releaseinfo>
 
-  </articleinfo>
+  </bookinfo>
 
-  <indexterm zone="index"> 
-      <primary>Gnash</primary> 
-  </indexterm>
-
-
+  
 <!-- ============= Introduction ============================== -->
   &introduction;
 
 <!-- ============= Document Body ============================= -->
-  &usage;
+
+<!-- Logically, you must install Gnash 
+     before you can use it. -->
+
   &installation;
+  &usage;
   &bugreport;
   &glossary;
 
@@ -86,4 +86,4 @@
 <!-- ============= Application License ======================= -->
   &fdl-app;
 
-</article>
+</book>
