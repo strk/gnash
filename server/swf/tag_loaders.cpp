@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.117 2007/07/27 15:09:42 tgc Exp $ */
+/* $Id: tag_loaders.cpp,v 1.118 2007/08/01 18:57:03 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1086,6 +1086,15 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	    data_bytes = in->get_tag_end_position() - in->get_position();
 
+	    if ( sample_count > data_bytes )
+	    {
+		IF_VERBOSE_MALFORMED_SWF(
+		    log_swferror(_("Samples count (%u) exceed the number of bytes available in the DefineSound tag containing it (%u)"),
+			sample_count, data_bytes);
+		);
+		return;
+	    }
+
 	    // sound_expand allocates storage for data[].
 	    // and modifies 3 parameters: format, data and data_bytes.
 	    sound_expand(in, format, sample_16bit, stereo, sample_count, data, data_bytes);
@@ -1305,6 +1314,8 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	bool sample_16bit, bool stereo, unsigned int &sample_count,
 	unsigned char* &data, unsigned &data_bytes)
 {
+    assert(data_bytes < sample_count);
+
     // Make sure that an unassigned pointer cannot get through
     data = NULL;
 
@@ -1547,21 +1558,20 @@ static void u8_expand(
 	bool stereo)
 {
 	unsigned total_samples = stereo ? sample_count*2 : sample_count;
-	uint8_t *in_data = new uint8_t[total_samples];
+
+	boost::scoped_array<uint8_t> in_data ( new uint8_t[total_samples] );
 	int16_t	*out_data = new int16_t[total_samples];
 
-	in->read((char *)in_data, total_samples); // Read 8-bit samples
+	in->read((char *)in_data.get(), total_samples); // Read 8-bit samples
 
 	// Convert 8-bit to 16
-	uint8_t *inp = in_data;
+	uint8_t *inp = in_data.get();
 	int16_t *outp = out_data;
 	for (unsigned i=total_samples; i>0; i--) {
 		*outp++ = ((int16_t)(*inp++) - 128) * 256;
 	}
 	
 	data = (unsigned char *)out_data;
-
-	delete [] in_data;
 }
 
 //

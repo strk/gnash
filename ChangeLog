@@ -1,5 +1,9 @@
 2007-08-01 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp: (define_sound_loader) check if number of
+	  samples exceed available bytes in the tag. (sound_expand) assertion
+	  checking. (u8_expand) use a scoped_array in the easy case (we'll
+	  need more smart pointers in general).
 	* backend/sound_handler.h (create_sound, fill_stream_data): document ownership
 	  of the 'data' argument, and add a TODO item about changing
 	  the interface.
