@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.33 2007/07/01 10:54:32 bjacques Exp $ */
+/* $Id: string.cpp,v 1.34 2007/08/01 15:56:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -32,7 +32,7 @@
 #include "as_value.h"
 #include "GnashException.h"
 #include <boost/algorithm/string/case_conv.hpp>
-#include "VM.h"
+#include "VM.h" // for registering static GcResources (constructor and prototype)
 
 #define ENSURE_FN_ARGS(min, max, rv)                                    \
     if (fn.nargs < min) {                                               \
@@ -98,8 +98,11 @@ getStringInterface()
 {
     static boost::intrusive_ptr<as_object> o;
 
-    if ( o == NULL ) {
+    if ( o == NULL )
+    {
         o = new as_object();
+	VM::get().addStatic(o.get());
+
         attachStringInterface(*o);
     }
 
@@ -530,8 +533,11 @@ getStringConstructor()
 
     static boost::intrusive_ptr<builtin_function> cl;
 
-    if ( cl == NULL ) {
+    if ( cl == NULL )
+    {
         cl=new builtin_function(&string_ctor, getStringInterface());
+	VM::get().addStatic(cl.get());
+
         // replicate all interface to class, to be able to access
         // all methods as static functions
         attachStringInterface(*cl);
@@ -549,11 +555,9 @@ void string_class_init(as_object& global)
 
     // Register _global.String
     global.init_member("String", cl.get());
-
 }
 
 boost::intrusive_ptr<as_object>
-
 init_string_instance(const char* val)
 {
     boost::intrusive_ptr<builtin_function> cl = getStringConstructor();

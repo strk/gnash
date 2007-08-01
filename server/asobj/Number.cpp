@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Number.cpp,v 1.31 2007/07/01 10:54:29 bjacques Exp $ */
+/* $Id: Number.cpp,v 1.32 2007/08/01 15:56:54 strk Exp $ */
 
 #include "log.h"
 #include "tu_config.h"
@@ -27,6 +27,7 @@
 #include "as_object.h" // for inheritance
 #include "as_value.h" // for doubleToString
 #include "builtin_function.h" // need builtin_function
+#include "VM.h" // for registering static GcResources (constructor and prototype)
 
 #include <sstream>
 #include <cmath>
@@ -80,6 +81,8 @@ getNumberInterface()
 	if ( o == NULL )
 	{
 		o = new as_object();
+		VM::get().addStatic(o.get());
+
 		attachNumberInterface(*o);
 	}
 	return o.get();
@@ -146,6 +149,8 @@ getNumberConstructor()
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&number_ctor, getNumberInterface());
+		VM::get().addStatic(cl.get());
+
 		// We don't want to attach Number prototype methods to the Number
 		// class itself.
 		//attachNumberInterface(*cl); 

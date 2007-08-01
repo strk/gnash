@@ -27,6 +27,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h"
+#include "VM.h" // for registering static GcResources (constructor and prototype)
 
 namespace gnash {
 
@@ -48,6 +49,8 @@ getBooleanInterface()
 	if ( ! o )
 	{
 		o = new as_object();
+		VM::get().addStatic(o.get());
+
 		attachBooleanInterface(*o);
 	}
 	return o.get();
@@ -122,6 +125,8 @@ getBooleanConstructor()
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&boolean_ctor, getBooleanInterface());
+		VM::get().addStatic(cl.get());
+
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachBooleanInterface(*cl);

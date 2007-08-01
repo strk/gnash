@@ -127,6 +127,13 @@ class DSOEXPORT VM {
 	/// 
 	void setGlobal(as_object*);
 
+	/// A vector of static GcResources (tipically used for built-in class constructors)
+	//
+	/// The resources in this list will always be marked as reachable
+	///
+	typedef std::vector< boost::intrusive_ptr<GcResource> > ResVect;
+	ResVect _statics;
+
 public:
 
 	/// \brief
@@ -187,7 +194,18 @@ public:
 	std::locale& getLocale() const;
 
 	/// Mark all reachable resources (for GC)
+	//
+	/// - root movie / stage (_root_movie)
+	/// - Global object (_global)
+	/// - registered static GcResources (_statics)
+	///
+	///
 	void markReachableResources() const;
+
+	void addStatic(GcResource* res)
+	{
+		_statics.push_back(res);
+	}
 
 };
 

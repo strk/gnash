@@ -1,5 +1,13 @@
 2007-08-01 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/: Boolean.cpp, Number.cpp, string.cpp:
+	  register static constructors and prototypes with the VM.
+	* server/vm/VM.{cpp,h}: Add support for registering
+	  arbitrary as_object for reachability. Intended to
+	  be used whenever a static as_object pointer is allocated.
+
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
 	* gui/gnash.in: don't loose parameters layout. Fixes bug #20651.
 	* gui/Makefile.am: distribute gnash.in
 

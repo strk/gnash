@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.11 2007/07/01 10:54:37 bjacques Exp $ */
+/* $Id: VM.cpp,v 1.12 2007/08/01 15:56:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -152,9 +152,18 @@ void
 VM::markReachableResources() const
 {
 #ifdef GNASH_USE_GC
+
 	_root_movie->markReachableResources();
+
 	_global->setReachable();
+
+	/// Mark all static GcResources
+	for (ResVect::const_iterator i=_statics.begin(), e=_statics.end(); i!=e; ++i)
+	{
+		(*i)->setReachable();
+	}
 #endif
+
 }
 
 void
