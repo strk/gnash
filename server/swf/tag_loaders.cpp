@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.120 2007/08/01 21:31:57 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.121 2007/08/01 21:36:58 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1086,8 +1086,10 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	    }
 
 	    unsigned char *data; // Expanded audio data ready for playing
-    	    unsigned data_bytes; // First it is the amount of data from file,
-			// then the amount allocated at *data (it may grow)
+
+	    // First it is the amount of data from file,
+	    // then the amount allocated at *data (it may grow)
+            unsigned data_bytes = in->get_tag_end_position() - in->get_position();
 
 	    // sound_expand allocates storage for data[].
 	    // and modifies 3 parameters: format, data and data_bytes.

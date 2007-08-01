@@ -1,5 +1,10 @@
 2007-08-01 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (define_sound_loader): fix a bug
+	  introduced by last commit (sorry)
+
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
 	* server/swf/tag_loaders.cpp: completely remove the bogus assertion
 	  about the required input bytes in relation to the number of samples.
 	  Rather, add more ensureBytes() uses, closer to where the data is
