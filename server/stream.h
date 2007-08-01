@@ -12,6 +12,8 @@
 #include "container.h"
 #include "swf.h"
 #include "tu_config.h"
+#include "GnashException.h"
+
 #include <string>
 
 class tu_file;
@@ -153,6 +155,22 @@ namespace gnash {
 		void skip_to_tag_end()
 		{
 			set_position(get_tag_end_position());
+		}
+
+		/// \brief
+		/// Ensure the requested number of bytes are available in the
+		/// currently opened tag.
+		//
+		/// Throws an exception on a short count.
+		/// This method should be called before any attempt to read
+		/// fields from the SWF.
+		///
+		void ensureBytes(unsigned long needed)
+		{
+			if ( get_tag_end_position() - get_position() < needed )
+			{
+				throw ParserException("premature end of tag");
+			}
 		}
 
 	private:
