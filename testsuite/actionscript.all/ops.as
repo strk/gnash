@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.4 2007/08/02 09:33:40 zoulunkai Exp $";
+rcsid="$Id: ops.as,v 1.5 2007/08/02 17:21:37 strk Exp $";
 
 #include "check.as"
 
@@ -370,7 +370,7 @@ check_equals( (8^12), 4 );
 
 x = 1;
 y = x << 2;
-xcheck_equals(y, 4);
+check_equals(y, 4);
 
 x = 0xffffffff;
 y = x << 16;
@@ -378,23 +378,27 @@ xcheck_equals(y, -65536);
 
 x = 1.9;
 y = x << 2;
-xcheck_equals(y, 4);
+check_equals(y, 4);
 
 x= undefined;
 y = x << 1;
+check_equals(typeof(y), 'number');
+check(! isnan(y) );
 check_equals(y, 0);
+
+check_equals(0 << 1, 0);
 
 x= NaN;
 y = x << 1;
-xcheck_equals(y, 0);
+check_equals(y, 0);
 
 x = "abcd";
 y = x << 1;
-xcheck_equals(y, 0);
+check_equals(y, 0);
 
 x = "3";
 y = x << 1;
-xcheck_equals(y, 6);
+check_equals(y, 6);
 
 x = String("3");
 y = x << 1;
@@ -426,11 +430,11 @@ check_equals(y, 0);
 
 x= NaN;
 y = x >> 1;
-xcheck_equals(y, 0);
+check_equals(y, 0);
 
 x = "abcd";
 y = x >> 1;
-xcheck_equals(y, 0);
+check_equals(y, 0);
 
 x = "7";
 y = x >> 1;

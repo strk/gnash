@@ -1,5 +1,12 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp: shift right/left : take undefined
+	  values as zeroes.
+	* testsuite/actionscript.all/ops.as: minor additions, xcheck to
+	  check.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
 	* server/PropertyList.cpp: add compile-time macro for debugging
 	  property allocations.
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.114 2007/07/31 15:30:29 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.115 2007/08/02 17:21:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3075,6 +3075,7 @@ SWFHandlers::ActionBitwiseAnd(ActionExec& thread)
 	double operand1 = env.top(1).to_number(&env);
 	double operand2 = env.top(0).to_number(&env);
 
+	// TODO: have as_value::to_number<int> handle this ?
 	if ( isnan(operand1) ) operand1 = 0;
 	if ( isnan(operand2) ) operand2 = 0;
 
@@ -3092,6 +3093,7 @@ SWFHandlers::ActionBitwiseOr(ActionExec& thread)
 	double operand1 = env.top(1).to_number(&env);
 	double operand2 = env.top(0).to_number(&env);
 
+	// TODO: have as_value::to_number<int> handle this ?
 	if ( isnan(operand1) ) operand1 = 0;
 	if ( isnan(operand2) ) operand2 = 0;
 
@@ -3110,6 +3112,7 @@ SWFHandlers::ActionBitwiseXor(ActionExec& thread)
 	double operand1 = env.top(1).to_number(&env);
 	double operand2 = env.top(0).to_number(&env);
 
+	// TODO: have as_value::to_number<int> handle this ?
 	if ( isnan(operand1) ) operand1 = 0;
 	if ( isnan(operand2) ) operand2 = 0;
 
@@ -3130,7 +3133,10 @@ SWFHandlers::ActionShiftLeft(ActionExec& thread)
 	double operand1 = env.top(1).to_number(&env);
 	double operand2 = env.top(0).to_number(&env);
 
-	env.top(1) = int(operand1) >> int(operand2);
+	// TODO: have as_value::to_number<int> handle this ?
+	if ( isnan(operand1) ) operand1=0;
+
+	env.top(1) = int16_t(operand1) << int(operand2);
 	env.drop(1);
 }
 
@@ -3147,7 +3153,10 @@ SWFHandlers::ActionShiftRight(ActionExec& thread)
 	double operand1 = env.top(1).to_number(&env);
 	double operand2 = env.top(0).to_number(&env);
 
-	env.top(1) = int(operand1) >> int(operand2);
+	// TODO: have as_value::to_number<int> handle this ?
+	if ( isnan(operand1) ) operand1=0;
+
+	env.top(1) = int16_t(operand1) >> int(operand2);
 	env.drop(1);
 }
 
@@ -3162,6 +3171,9 @@ SWFHandlers::ActionShiftRight2(ActionExec& thread)
 
 	double operand1 = env.top(1).to_number(&env);
 	double operand2 = env.top(0).to_number(&env);
+
+	// TODO: have as_value::to_number<int> handle this ?
+	if ( isnan(operand1) ) operand1=0;
 
 	env.top(1) = uint32_t(operand1) >> int(operand2);
 	env.drop(1);
