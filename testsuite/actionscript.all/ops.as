@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.8 2007/08/02 20:11:35 strk Exp $";
+rcsid="$Id: ops.as,v 1.9 2007/08/02 21:08:01 strk Exp $";
 
 #include "check.as"
 
@@ -38,6 +38,12 @@ check(null == null);
 check(undefined == undefined);
 check(null==undefined); 
 check(undefined==null); 
+check(! (NaN == 0) );
+check(! (0 == NaN) );
+check(! ('string' == 0) );
+check(! (0 == 'string') );
+check(! ('string' == NaN) );
+check(! (NaN == 'string') );
 check(1==true);
 check(true==1);
 check(2!=true);

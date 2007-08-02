@@ -1,5 +1,6 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/ops.as: more tests for 'string' == NaN.
 	* server/as_value.cpp (equals): yet another pass at
 	  abstract equality operator. We're still not there, but
 	  getting closer.
