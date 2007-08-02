@@ -1,3 +1,8 @@
+2007-08-02 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/actionscript.all/ops.as: more tests and more failures. still
+	  need more, we don't want fail on those basic logical operations.
+	  
 2007-08-01 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (define_sound_loader): fix a bug
