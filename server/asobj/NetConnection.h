@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: NetConnection.h,v 1.35 2007/07/01 10:54:29 bjacques Exp $ */
+/* $Id: NetConnection.h,v 1.36 2007/08/02 06:03:43 strk Exp $ */
 
 #ifndef __NETCONNECTION_H__
 #define __NETCONNECTION_H__
@@ -148,9 +148,6 @@ private:
 
 	/// the complete url of the file
 	std::string _completeUrl;
-
-	/// the as_object which owns the connection
-	boost::intrusive_ptr<as_object> _owner;
 
 	/// The file/stream loader thread and interface
 	std::auto_ptr<LoadThread> _loader;
