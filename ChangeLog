@@ -1,3 +1,8 @@
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* server/PropertyList.cpp: add compile-time macro for debugging
+	  property allocations.
+
 2007-08-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/gtk_glue_agg.cpp: Warn when compiling for OLPC, change compile-time

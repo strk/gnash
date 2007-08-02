@@ -33,6 +33,9 @@
 
 #include <utility> // for std::make_pair
 
+// Define the following to enable printing address of each property added
+//#define DEBUG_PROPERTY_ALLOC
+
 namespace gnash {
 
 PropertyList::PropertyList()
@@ -82,7 +85,11 @@ PropertyList::setValue(const std::string& key, const as_value& val,
 	if ( found == _props.end() )
 	{
 		// create a new member
-		_props[key] = new SimpleProperty(val);
+		SimpleProperty* prop = new SimpleProperty(val);
+#ifdef DEBUG_PROPERTY_ALLOC
+		log_debug("SimpleProperty %s = %p", key.c_str(), (void*)prop);
+#endif // DEBUG_PROPERTY_ALLOC
+		_props[key] = prop;
 		return true;
 	}
 
@@ -242,7 +249,11 @@ PropertyList::addGetterSetter(const std::string& key, as_function& getter,
 	iterator found = _props.find( key );
 	if ( found != _props.end() ) return false; // already exists !!
 
-	_props[key] = new GetterSetterProperty(GetterSetter(getter, setter));
+	GetterSetterProperty* prop = new GetterSetterProperty(GetterSetter(getter, setter));
+#ifdef DEBUG_PROPERTY_ALLOC
+	log_debug("GetterSetterProperty %s = %p", key.c_str(), (void*)prop);
+#endif // DEBUG_PROPERTY_ALLOC
+	_props[key] = prop;
 	return true;
 }
 
