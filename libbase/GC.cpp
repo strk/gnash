@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GC.cpp,v 1.7 2007/08/02 06:14:55 strk Exp $ */
+/* $Id: GC.cpp,v 1.8 2007/08/02 06:30:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -26,6 +26,7 @@
 #include "builtin_function.h"
 
 #ifdef GNASH_GC_DEBUG
+# include "utility.h" // for typeName()
 # include "log.h"
 #endif
 
@@ -88,7 +89,7 @@ GC::cleanUnreachable()
 #ifdef GNASH_GC_DEBUG 
 #if GNASH_GC_DEBUG > 1
 			log_debug(_("GC %p: cleanUnreachable deleting object %p (%s)"),
-					(void*)this, (void*)res, typeid(*res).name());
+					(void*)this, (void*)res, typeName(*res).c_str());
 #endif
 			++deleted;
 #endif
