@@ -630,7 +630,7 @@ as_value::set_as_function(as_function* func)
 }
 
 bool
-as_value::equals(const as_value& v, as_environment* env) const
+as_value::equals(const as_value& v, as_environment& env) const
 {
     //log_msg("equals(%s, %s) called", to_debug_string().c_str(), v.to_debug_string().c_str());
 
@@ -650,31 +650,30 @@ as_value::equals(const as_value& v, as_environment* env) const
 
     else if (m_type == NUMBER && v.m_type == STRING)
     {
-	return equalsSameType(v.to_number(env)); // m_number_value == v.to_number(env);
+	return equalsSameType(v.to_number(&env)); 
     }
     else if (v.m_type == NUMBER && m_type == STRING)
     {
-	return v.equalsSameType(to_number(env)); // v.m_number_value == to_number(env);
+	return v.equalsSameType(to_number(&env)); 
     }
     else if (m_type == STRING)
     {
-	return m_string_value == v.to_string(env);
+	return m_string_value == v.to_string(&env);
     }
     else if (m_type == BOOLEAN)
     {
-	return as_value(to_number(env)).equals(v); // m_boolean_value == v.to_bool();
+	return as_value(to_number(&env)).equals(v, env); // m_boolean_value == v.to_bool();
     }
     else if (v.m_type == BOOLEAN)
     {
-	return as_value(v.to_number()).equals(*this); 
+	return as_value(v.to_number(&env)).equals(*this, env); 
     }
 
     else if (m_type == OBJECT || m_type == AS_FUNCTION)
     {
     	assert ( ! (v.m_type == OBJECT || v.m_type == AS_FUNCTION) );
 	// convert this value to a primitive and recurse
-	if ( ! env ) return false;
-	as_value v2 = to_primitive(*env); 
+	as_value v2 = to_primitive(env); 
 	if ( v2.m_type == OBJECT || v2.m_type == AS_FUNCTION ) return false; // no valid conversion 
 	else return v2.equals(v, env);
     }
@@ -683,8 +682,7 @@ as_value::equals(const as_value& v, as_environment* env) const
     {
     	assert ( ! (m_type == OBJECT || m_type == AS_FUNCTION) );
 	// convert this value to a primitive and recurse
-	if ( ! env ) return false;
-	as_value v2 = v.to_primitive(*env); 
+	as_value v2 = v.to_primitive(env); 
 	if ( v2.m_type == OBJECT || v2.m_type == AS_FUNCTION ) return false; // no valid conversion 
 	else return equals(v2, env);
     }

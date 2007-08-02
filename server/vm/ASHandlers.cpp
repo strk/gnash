@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.115 2007/08/02 17:21:37 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.116 2007/08/02 18:28:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2614,7 +2614,7 @@ SWFHandlers::ActionNewEquals(ActionExec& thread)
     thread.ensureStack(2);
 
     /// ECMA-262 abstract equality comparison (sect 11.9.3)
-    env.top(1).set_bool(env.top(1).equals(env.top(0), &env));
+    env.top(1).set_bool(env.top(1).equals(env.top(0), env));
     env.drop(1);
 }
 

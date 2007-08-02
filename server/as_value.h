@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.60 2007/07/25 16:27:55 strk Exp $ */
+/* $Id: as_value.h,v 1.61 2007/08/02 18:28:42 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -533,12 +533,11 @@ public:
 	///	- A == B is equivalent to B == A, except for order of
 	///	  evaluation of A and B.
 	///
-	///
 	/// @param env
-	///	The environment to use for running the toString() method
-	///	for object values. If NULL, toString() won't be run.
+	///	The environment to use for running the toString() and valueOf()
+	///	methods for object values. 
 	///
-	bool equals(const as_value& v, as_environment* env=NULL) const;
+	bool equals(const as_value& v, as_environment& env) const;
 
 	/// Sets this value to this string plus the given string.
 	void	string_concat(const std::string& str);
