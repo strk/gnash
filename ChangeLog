@@ -1,5 +1,6 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: test MovieClip.valueOf().
 	* server/as_value.{cpp,h}: as_environment parameter made mandatory
 	  for the equals() method.
 	* server/vm/ASHandlers.cpp (ActionEquals): update calls to
