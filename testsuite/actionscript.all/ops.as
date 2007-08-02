@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.2 2007/08/02 03:48:32 zoulunkai Exp $";
+rcsid="$Id: ops.as,v 1.3 2007/08/02 05:46:39 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -38,6 +38,10 @@ check(null == null);
 check(undefined == undefined);
 check(null==undefined); 
 check(undefined==null); 
+xcheck(1==true);
+check(true==1);
+check(2!=true);
+xcheck(true!=2);
 
 // for Arrays
 ary1 = [1,2,3];
@@ -276,19 +280,19 @@ check_equals(x&y, 1);
 
 x = new String("1");
 y = new String("3");
-check_equals(x&y, 1); 
+xcheck_equals(x&y, 1); 
 
 x = new String("1.0");
 y = new String("3.0");
-check_equals(x&y, 1); 
+xcheck_equals(x&y, 1); 
 
 x = new String("1.999");
 y = new String("3.999");
-check_equals(x&y, 1); 
+xcheck_equals(x&y, 1); 
 
 x = new String("3.999");
 y = 7;
-check_equals(x&y, 3); 
+xcheck_equals(x&y, 3); 
 
 x = Number("7.999");
 y = 3;
@@ -320,11 +324,11 @@ check_equals(x|y, 9);
 
 x = new String("1.999");
 y = 8.999;
-check_equals(x|y, 9); 
+xcheck_equals(x|y, 9); 
 
 x = String("1.999");
 y = String("8.999");
-check_equals(x|y, 9); 
+xcheck_equals(x|y, 9); 
 
 x = 9;
 y = String("1.5");
