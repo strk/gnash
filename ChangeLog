@@ -1,5 +1,6 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/array.as: add test for Array.valueOf().
 	* server/as_value.cpp (equals) : fix true==1 and true!=2
 	  (was failing).
 	* server/vm/ASHandlers.cpp: shift right/left : take undefined

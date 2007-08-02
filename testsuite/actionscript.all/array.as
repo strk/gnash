@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.26 2007/07/31 20:42:07 strk Exp $";
+rcsid="$Id: array.as,v 1.27 2007/08/02 18:16:18 strk Exp $";
 
 #include "check.as"
 
@@ -39,6 +39,7 @@ check(Array.prototype.hasOwnProperty('splice'));
 check(Array.prototype.hasOwnProperty('unshift'));
 check(Array.prototype.hasOwnProperty('toString'));
 check(!Array.prototype.hasOwnProperty('length'));
+check(!Array.prototype.hasOwnProperty('valueOf'));
 #endif // OUTPUT_VERSION >= 6
 
 var a;
@@ -49,6 +50,13 @@ check (a instanceOf Array);
 check_equals(a.length, 3);
 #if OUTPUT_VERSION >= 6
 check(a.hasOwnProperty('length'));
+#endif
+
+primitiveArrayValue = a.valueOf();
+check_equals(typeof(primitiveArrayValue), 'object');
+check_equals( primitiveArrayValue, a );
+#if OUTPUT_VERSION > 5
+check( primitiveArrayValue === a );
 #endif
 
 b=[];
