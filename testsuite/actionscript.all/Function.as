@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.52 2007/07/26 03:41:18 strk Exp $";
+rcsid="$Id: Function.as,v 1.53 2007/08/02 19:10:51 strk Exp $";
 
 #include "check.as"
 
@@ -673,12 +673,6 @@ function testInFunctionContext(o)
 
 o.num = 5;
 testInFunctionContext(o);
-
-// Quick test to verify that a movieclip is never equal to an object, despite it's primitive value
-o = new Object();
-o.valueOf = function() { return _root; };
-check_equals(_root, o);
-check_equals(o, _root);
 
 //-----------------------------------------------------------------------------
 // Test local vars scope of outer function to be kept alive by inner functions

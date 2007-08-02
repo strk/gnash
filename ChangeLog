@@ -1,5 +1,11 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: Function.as, ops.as:
+	  Moved tests for equality operator against MovieClip where
+	  it belongs.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/MovieClip.as: test MovieClip.valueOf().
 	* server/as_value.{cpp,h}: as_environment parameter made mandatory
 	  for the equals() method.

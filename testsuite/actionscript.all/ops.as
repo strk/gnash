@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.6 2007/08/02 17:35:57 strk Exp $";
+rcsid="$Id: ops.as,v 1.7 2007/08/02 19:10:51 strk Exp $";
 
 #include "check.as"
 
@@ -78,6 +78,13 @@ xcheck( ! (str1 == NaN) ); // str1 (object) is NOT converted to a number (due to
   xcheck( str1 == str2 );  // SWF5 automatically converts to a string for comparison !
 #endif // OUTPUT_VERSION <= 5
 
+// for MovieClip
+
+check("_root" != _root);
+check(_root != "_root");
+o = new Object(); o.valueOf = function() { return _root; };
+check_equals(_root, o);
+check_equals(o, _root);
 
 //---------------------------------------------
 // Less then operator (ACTION_LESSTHAN : 0x0F)
