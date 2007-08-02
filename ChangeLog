@@ -1,5 +1,8 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp: register statics.
+	* server/sprite_instance.cpp: register statics.
+	* server/video_stream_instance.cpp: register statics.
 	* server/array.cpp: register static constructor and prototype,
 	  since arrays are used by the core independentely of their
 	  availability as global classes (function arguments are arrays).

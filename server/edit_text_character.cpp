@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.95 2007/07/25 14:20:14 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.96 2007/08/02 21:23:42 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -360,6 +360,8 @@ getTextFieldInterface()
 	if ( proto == NULL )
 	{
 		proto = new as_object();
+		VM::get().addStatic(proto.get());
+
 		attachTextFieldInterface(*proto);
 		//proto->init_member("constructor", new builtin_function(textfield_ctor)); 
 	}
@@ -1342,6 +1344,8 @@ textfield_class_init(as_object& global)
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&textfield_ctor, getTextFieldInterface());
+		VM::get().addStatic(cl.get());
+
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachTextFieldStaticMembers(*cl);

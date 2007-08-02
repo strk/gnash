@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.32 2007/07/09 13:33:30 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.33 2007/08/02 21:23:42 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -45,6 +45,8 @@ static as_object* getVideoInterface()
 	if ( proto == NULL )
 	{
 		proto = new as_object();
+		VM::get().addStatic(proto.get());
+
 		attachVideoInterface(*proto);
 		//proto->init_member("constructor", new builtin_function(video_ctor));
 	}
@@ -265,6 +267,8 @@ void video_class_init(as_object& global)
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&video_ctor, getVideoInterface());
+		VM::get().addStatic(cl.get());
+
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		//attachVideoInterface(*cl);

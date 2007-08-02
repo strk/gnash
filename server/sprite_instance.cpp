@@ -1589,6 +1589,8 @@ getMovieClipInterface()
 	if ( proto == NULL )
 	{
 		proto = new as_object();
+		VM::get().addStatic(proto.get());
+
 		attachMovieClipInterface(*proto);
 		//proto->init_member("constructor", new builtin_function(movieclip_ctor));
 	}
@@ -1604,6 +1606,8 @@ movieclip_class_init(as_object& global)
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&movieclip_ctor, getMovieClipInterface());
+		VM::get().addStatic(cl.get());
+
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attachMovieClipInterface(*cl);
