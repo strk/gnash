@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GC.cpp,v 1.6 2007/07/03 19:44:07 nihilus Exp $ */
+/* $Id: GC.cpp,v 1.7 2007/08/02 06:14:55 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -73,10 +73,13 @@ GC::~GC()
 void
 GC::cleanUnreachable()
 {
-#if (GNASH_GC_DEBUG > 1)
+#ifdef GNASH_GC_DEBUG
 	size_t deleted = 0;
+#if (GNASH_GC_DEBUG > 1)
 	log_debug(_("GC %p: SWEEP SCAN"), (void*)this);
 #endif
+#endif
+
 	for (ResList::iterator i=_resList.begin(), e=_resList.end(); i!=e; )
 	{
 		const GcResource* res = *i;
