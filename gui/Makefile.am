@@ -191,7 +191,7 @@ kde_gnash_CPPFLAGS = -DGUI_KDE -DGUI_CONFIG=\"KDE\" \
 	 $(AM_CPPFLAGS) $(KDE_CFLAGS) $(QT_CFLAGS)
 kde_gnash_SOURCES = $(GUI_SRCS) gui_kde.cpp
 kde_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-kde_gnash_DEPENDENCIES = .configline
+#kde_gnash_DEPENDENCIES = .configline
 kde_gnash_LDADD = \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
@@ -221,7 +221,7 @@ sdl_gnash_CPPFLAGS = -DGUI_SDL -DGUI_CONFIG=\"SDL\" \
 	 $(AM_CPPFLAGS) $(SDL_CFLAGS) 
 sdl_gnash_SOURCES = $(GUI_SRCS) gui_sdl.cpp
 sdl_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-sdl_gnash_DEPENDENCIES = .configline
+#sdl_gnash_DEPENDENCIES = .configline
 sdl_gnash_LDADD = \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
@@ -251,7 +251,7 @@ fltk_gnash_CPPFLAGS = -DGUI_FLTK -DGUI_CONFIG=\"FLTK\" \
 	$(AM_CPPFLAGS) $(FLTK2_CFLAGS)
 fltk_gnash_SOURCES = $(GUI_SRCS) gui_fltk.cpp
 fltk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-fltk_gnash_DEPENDENCIES = .configline
+#fltk_gnash_DEPENDENCIES = .configline
 fltk_gnash_LDADD = \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
@@ -280,7 +280,7 @@ bin_PROGRAMS += aqua-gnash
 aqua_gnash_CPPFLAGS = -DGUI_AQUA $(AM_CPPFLAGS) -DGUI_CONFIG=\"AQUA\"
 aqua_gnash_SOURCES = $(GUI_SRCS) gui_aqua.cpp
 aqua_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
-aqua_gnash_DEPENDENCIES = .configline
+#aqua_gnash_DEPENDENCIES = .configline
 aqua_gnash_LDADD = \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
@@ -310,7 +310,7 @@ gtk_gnash_SOURCES = $(GUI_SRCS) gui_gtk.cpp
 gtk_gnash_CPPFLAGS = -DGUI_GTK -DGUI_CONFIG=\"GTK\" \
 	$(AM_CPPFLAGS) $(GTK_CFLAGS)
 gtk_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
-gtk_gnash_DEPENDENCIES = .configline
+#gtk_gnash_DEPENDENCIES = .configline
 
 if BUILD_OGL_RENDERER
 gtk_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
@@ -344,7 +344,7 @@ fb_gnash_SOURCES = $(GUI_SRCS) gui_fb.cpp fb.cpp fbsup.h
 fb_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
 	$(AM_CPPFLAGS) 
 fb_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
-fb_gnash_DEPENDENCIES = .configline
+#fb_gnash_DEPENDENCIES = .configline
 
 if BUILD_AGG_RENDERER
 fb_gnash_CPPFLAGS += $(AGG_CFLAGS)
@@ -363,7 +363,7 @@ riscos_gnash_SOURCES = $(GUI_SRCS) gui_riscos.cpp riscos.cpp riscos_glue.h risco
 riscos_gnash_CPPFLAGS = -DGUI_FB -DGUI_CONFIG=\"FB\" \
 	$(AM_CPPFLAGS) 
 riscos_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic $(AM_LDFLAGS)
-riscos_gnash_DEPENDENCIES = .configline
+#riscos_gnash_DEPENDENCIES = .configline
 
 if BUILD_AGG_RENDERER
 riscos_gnash_CPPFLAGS += $(AGG_CFLAGS)

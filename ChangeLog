@@ -1,5 +1,9 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* gui/Makefile.am: comment out the _DEPENDENCIES lines. Properly
+	  rebuilds the binaries when needed (might be breaking another kind
+	  of dependency, but this one was pretty disturbing for me in that
+	  it didn't trigger rebuil when _LIBS changed)
 	* server/asobj/MovieClipLoader.cpp: implement reachable resources
 	  marker (listeners).
 	* server/movie_root.cpp: set background to white by default.
