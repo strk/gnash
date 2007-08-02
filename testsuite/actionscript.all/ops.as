@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.5 2007/08/02 17:21:37 strk Exp $";
+rcsid="$Id: ops.as,v 1.6 2007/08/02 17:35:57 strk Exp $";
 
 #include "check.as"
 
@@ -38,10 +38,10 @@ check(null == null);
 check(undefined == undefined);
 check(null==undefined); 
 check(undefined==null); 
-xcheck(1==true);
+check(1==true);
 check(true==1);
 check(2!=true);
-xcheck(true!=2);
+check(true!=2);
 check_equals(1+true, 2);
 check_equals(true+1, 2);
 check_equals(1+false, 1);
@@ -199,7 +199,7 @@ check_equals(z, y);
 x = 0;
 y = 0.0001;
 z = x || y;
-xcheck(z!=y); 
+check(z!=y); 
 check_equals(z, true); 
 
 x = 0;
@@ -258,7 +258,7 @@ z = x || y;
 x = 0;
 y = new String("0");
 z = x || y;
-xcheck(z!=y);
+check(z!=y);
 check_equals(z, true);
 
 

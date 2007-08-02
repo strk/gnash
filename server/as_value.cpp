@@ -651,12 +651,10 @@ as_value::equals(const as_value& v, as_environment* env) const
     else if (m_type == NUMBER && v.m_type == STRING)
     {
 	return equalsSameType(v.to_number(env)); // m_number_value == v.to_number(env);
-	//return m_number_value == v.to_number(env);
     }
     else if (v.m_type == NUMBER && m_type == STRING)
     {
-	return v.equalsSameType(to_number(env)); // m_number_value == v.to_number(env);
-	//return v.m_number_value == to_number(env);
+	return v.equalsSameType(to_number(env)); // v.m_number_value == to_number(env);
     }
     else if (m_type == STRING)
     {
@@ -664,7 +662,11 @@ as_value::equals(const as_value& v, as_environment* env) const
     }
     else if (m_type == BOOLEAN)
     {
-	return m_boolean_value == v.to_bool();
+	return as_value(to_number(env)).equals(v); // m_boolean_value == v.to_bool();
+    }
+    else if (v.m_type == BOOLEAN)
+    {
+	return as_value(v.to_number()).equals(*this); 
     }
 
     else if (m_type == OBJECT || m_type == AS_FUNCTION)
