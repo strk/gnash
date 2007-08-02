@@ -180,6 +180,8 @@ get${asname}Interface()
 	if ( ! o )
 	{
 		o = new as_object();
+		VM::get().addStatic(o.get());
+
 		attach${asname}Interface(*o);
 	}
 	return o.get();
@@ -252,6 +254,8 @@ void ${lowname}_class_init(as_object& global)
 	if ( cl == NULL )
 	{
 		cl=new builtin_function(&${lowname}_ctor, get${asname}Interface());
+		VM::get().addStatic(cl.get());
+
 		// replicate all interface to class, to be able to access
 		// all methods as static functions
 		attach${asname}Interface(*cl);

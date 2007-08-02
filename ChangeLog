@@ -1,5 +1,6 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/gen-asclass.sh: add the addStatic call to statics.
 	* server/movie_root.{cpp,h}: use a member (and a getter) for the global
 	  key object, and properly mark it as alive.
 
