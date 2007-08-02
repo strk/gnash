@@ -1,3 +1,8 @@
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.cpp: set background to white by default.
+	  Should fix bug #20655.
+
 2007-08-02 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/actionscript.all/ops.as: more tests and more failures. still
