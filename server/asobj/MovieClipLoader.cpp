@@ -132,6 +132,18 @@ public:
 
 	/// @ }
 
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark MovieClipLoader-specific reachable resources and invoke
+	/// the parent's class version (markAsObjectReachable)
+	//
+	/// MovieClipLoader-specific reachable resources are:
+	/// 	- The listeners (_listeners)
+	///
+	virtual void markReachableResources() const;
+#endif // GNASH_USE_GC
+
 private:
 
 	typedef std::set< boost::intrusive_ptr<as_object> > Listeners;
@@ -288,6 +300,21 @@ log_msg(_("Listener %p doesn't have an %s event to listen for, skipped"),
 	}
 
 }
+
+#ifdef GNASH_USE_GC
+void
+MovieClipLoader::markReachableResources() const
+{
+	assert(isReachable());
+
+	// mark listeners
+	for(Listeners::iterator i=_listeners.begin(), e=_listeners.end(); i!=e; ++i)
+	{
+		(*i)->setReachable();
+	}
+	markAsObjectReachable();
+}
+#endif // GNASH_USE_GC
 
 static as_value
 moviecliploader_loadclip(const fn_call& fn)

@@ -1,5 +1,7 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/MovieClipLoader.cpp: implement reachable resources
+	  marker (listeners).
 	* server/movie_root.cpp: set background to white by default.
 	  Should fix bug #20655.
 
