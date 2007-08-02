@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.69 2007/07/18 23:31:59 strk Exp $ */
+/* $Id: movie_root.h,v 1.70 2007/08/02 22:07:26 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -539,6 +539,7 @@ public:
     /// - Timer targets (_intervalTimers)
     /// - Resources reachable by ActionQueue code (_actionQueue)
     /// - Key listeners (_keyListeners || m_key_listeners)
+    /// - global Key object (_keyobject)
     ///
     void markReachableResources() const;
 #endif // GNASH_USE_GC
@@ -612,6 +613,9 @@ private:
 #else
     ListenerSet m_key_listeners;
 #endif
+
+    boost::intrusive_ptr<key_as_object> _keyobject;
+
     /// Objects listening for mouse events (down,up,move)
     ListenerSet m_mouse_listeners;
 
@@ -680,6 +684,13 @@ private:
     /// _level<num>
     ///
     void setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movie);
+
+    /// Return the global Key object 
+    //
+    /// @@ might be worth making public
+    ///
+    boost::intrusive_ptr<key_as_object> getKeyObject();
+
 };
 
 

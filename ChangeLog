@@ -1,5 +1,10 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h}: use a member (and a getter) for the global
+	  key object, and properly mark it as alive.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
 	* server/edit_text_character.cpp: register statics.
 	* server/sprite_instance.cpp: register statics.
 	* server/video_stream_instance.cpp: register statics.

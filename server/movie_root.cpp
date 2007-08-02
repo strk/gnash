@@ -247,23 +247,19 @@ movie_root::notify_mouse_moved(int x, int y)
 
 }
 
-
-
-key_as_object *
-movie_root::notify_global_key(key::code k, bool down)
+boost::intrusive_ptr<key_as_object>
+movie_root::getKeyObject()
 {
 	VM& vm = VM::get();
-	if ( vm.getSWFVersion() < 5 )
-	{
-		// Key was added in SWF5
-		return NULL; 
-	}
 
-	static boost::intrusive_ptr<key_as_object> keyobject = NULL;
-	if ( ! keyobject )
+	// TODO: test what happens with the global "Key" object
+	//       is removed or overridden by the user
+
+	if ( ! _keyobject )
 	{
-		// This isn't very performant... do we allow user override
-		// of _global.Key, btw ?
+		// This isn't very performant... 
+		// it will keep trying to find it even if impossible
+		// to find.
 
 		as_value kval;
 		as_object* global = VM::get().getGlobal();
@@ -278,21 +274,36 @@ movie_root::notify_global_key(key::code k, bool down)
 			//log_msg("Found member 'Key' in _global: %s", kval.to_string());
 			boost::intrusive_ptr<as_object> obj = kval.to_object();
 			//log_msg("_global.Key to_object() : %s @ %p", typeid(*obj).name(), obj);
-			keyobject = boost::dynamic_pointer_cast<key_as_object>( obj );
+			_keyobject = boost::dynamic_pointer_cast<key_as_object>( obj );
 		}
 	}
 
+	return _keyobject;
+}
+
+
+key_as_object *
+movie_root::notify_global_key(key::code k, bool down)
+{
+	VM& vm = VM::get();
+	if ( vm.getSWFVersion() < 5 )
+	{
+		// Key was added in SWF5
+		return NULL; 
+	}
+
+	boost::intrusive_ptr<key_as_object> keyobject = getKeyObject();
 	if ( keyobject )
 	{
-		if (down) keyobject->set_key_down(k);
-		else keyobject->set_key_up(k);
+		if (down) _keyobject->set_key_down(k);
+		else _keyobject->set_key_up(k);
 	}
 	else
 	{
 		log_error("gnash::notify_key_event(): _global.Key doesn't exist, or isn't the expected built-in\n");
 	}
 
-	return keyobject.get();
+	return _keyobject.get();
 }
 
 bool
@@ -1118,8 +1129,7 @@ movie_root::executeTimers()
 void
 movie_root::markReachableResources() const
 {
-	// Mark root movie as reachable
-	// TODO: mark all levels !!
+	// Mark movie levels as reachable
 	for (Levels::const_reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
 	{
 		i->second->setReachable();
@@ -1157,6 +1167,9 @@ movie_root::markReachableResources() const
 		(*i)->setReachable();
 	}
 #endif
+
+	// Mark global key object
+	if ( _keyobject ) _keyobject->setReachable();
 }
 #endif // GNASH_USE_GC
 
