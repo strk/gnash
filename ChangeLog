@@ -1,5 +1,15 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* server/array.cpp: register static constructor and prototype,
+	  since arrays are used by the core independentely of their
+	  availability as global classes (function arguments are arrays).
+	* server/as_function.cpp: register static constructor and prototype,
+	  since functions are used by the core independently of their
+	  availability as global classes (each function uses the Function
+	  prototype).
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/ops.as: more tests for 'string' == NaN.
 	* server/as_value.cpp (equals): yet another pass at
 	  abstract equality operator. We're still not there, but

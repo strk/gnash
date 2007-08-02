@@ -1335,6 +1335,8 @@ getArrayInterface()
 	if ( proto == NULL )
 	{
 		proto = new as_object();
+		VM::get().addStatic(proto.get());
+
 		attachArrayInterface(*proto);
 	}
 	return proto.get();
@@ -1354,6 +1356,7 @@ array_class_init(as_object& glob)
 	if ( ar == NULL )
 	{
 		ar = new builtin_function(&array_new, getArrayInterface());
+		VM::get().addStatic(ar.get());
 
 		// We replicate interface to the Array class itself
 		attachArrayInterface(*ar);
