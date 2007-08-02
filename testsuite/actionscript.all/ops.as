@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.7 2007/08/02 19:10:51 strk Exp $";
+rcsid="$Id: ops.as,v 1.8 2007/08/02 20:11:35 strk Exp $";
 
 #include "check.as"
 
@@ -56,7 +56,7 @@ ary1 = [1,2,3];
 ary2 = [1,2,3];
 check( ! (ary1 == ary2) ); // two different objects
 check( ! (ary1 == "1,2,3") ); // the array doesn't get converted to a string
-xcheck( ! ("1,2,3" == ary1) ); // the array doesn't get converted to a string
+check( ! ("1,2,3" == ary1) ); // the array doesn't get converted to a string
 
 // for String
 str1 = new String("hello");

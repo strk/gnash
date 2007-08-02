@@ -1,5 +1,12 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (equals): yet another pass at
+	  abstract equality operator. We're still not there, but
+	  getting closer.
+	* testsuite/actionscript.all/ops.as: xcheck -> check.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/: Function.as, ops.as:
 	  Moved tests for equality operator against MovieClip where
 	  it belongs.

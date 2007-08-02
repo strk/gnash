@@ -46,6 +46,9 @@ using namespace std;
 // rather then by "target" ref.
 #define MOVIECLIP_AS_SOFTREF
 
+// Define the macro below to make abstract equality operator verbose
+//#define GNASH_DEBUG_EQUALITY
+
 namespace gnash {
 
 //
@@ -632,13 +635,18 @@ as_value::set_as_function(as_function* func)
 bool
 as_value::equals(const as_value& v, as_environment& env) const
 {
-    //log_msg("equals(%s, %s) called", to_debug_string().c_str(), v.to_debug_string().c_str());
+    // Comments starting with numbers refer to the ECMA-262 document
+
+#ifdef GNASH_DEBUG_EQUALITY
+    static int count=0;
+    log_debug("equals(%s, %s) called [%d]", to_debug_string().c_str(), v.to_debug_string().c_str(), count++);
+#endif
 
     bool this_nulltype = (m_type == UNDEFINED || m_type == NULLTYPE);
     bool v_nulltype = (v.get_type() == UNDEFINED || v.get_type() == NULLTYPE);
     if (this_nulltype || v_nulltype)
     {
-	return this_nulltype == v_nulltype;
+        return this_nulltype == v_nulltype;
     }
 
     bool obj_or_func = (m_type == OBJECT || m_type == AS_FUNCTION);
@@ -648,46 +656,82 @@ as_value::equals(const as_value& v, as_environment& env) const
     if ( obj_or_func && v_obj_or_func ) return m_object_value == v.m_object_value;
     if ( m_type == v.m_type ) return equalsSameType(v);
 
+    // 16. If Type(x) is Number and Type(y) is String,
+    //    return the result of the comparison x == ToNumber(y).
     else if (m_type == NUMBER && v.m_type == STRING)
     {
-	return equalsSameType(v.to_number(&env)); 
+        return equalsSameType(v.to_number(&env)); 
     }
+
+    // 17. If Type(x) is String and Type(y) is Number,
+    //     return the result of the comparison ToNumber(x) == y.
     else if (v.m_type == NUMBER && m_type == STRING)
     {
-	return v.equalsSameType(to_number(&env)); 
+        return v.equalsSameType(to_number(&env)); 
     }
-    else if (m_type == STRING)
-    {
-	return m_string_value == v.to_string(&env);
-    }
+
+    // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.
     else if (m_type == BOOLEAN)
     {
-	return as_value(to_number(&env)).equals(v, env); // m_boolean_value == v.to_bool();
+        return as_value(to_number(&env)).equals(v, env); // m_boolean_value == v.to_bool();
     }
+
+    // 19. If Type(y) is Boolean, return the result of the comparison x == ToNumber(y).
     else if (v.m_type == BOOLEAN)
     {
-	return as_value(v.to_number(&env)).equals(*this, env); 
+        return as_value(v.to_number(&env)).equals(*this, env); 
     }
 
-    else if (m_type == OBJECT || m_type == AS_FUNCTION)
+    // 20. If Type(x) is either String or Number and Type(y) is Object,
+    //     return the result of the comparison x == ToPrimitive(y).
+    else if ( (m_type == STRING || m_type == NUMBER ) && ( v.is_object() ) ) // v.m_type == OBJECT || v.m_type == AS_FUNCTION ) )
     {
-    	assert ( ! (v.m_type == OBJECT || v.m_type == AS_FUNCTION) );
-	// convert this value to a primitive and recurse
-	as_value v2 = to_primitive(env); 
-	if ( v2.m_type == OBJECT || v2.m_type == AS_FUNCTION ) return false; // no valid conversion 
-	else return v2.equals(v, env);
+        // convert this value to a primitive and recurse
+        as_value v2 = v.to_primitive(env); 
+#ifdef GNASH_DEBUG_EQUALITY
+       log_debug(" convertion to primitive : %s -> %s", v.to_debug_string().c_str(), v2.to_debug_string().c_str());
+#endif
+        if ( v.strictly_equals(v2) ) // returned self ?
+        {
+            return false; // no valid conversion  
+        }
+        else return equals(v2, env);
     }
 
-    else if (v.m_type == OBJECT || v.m_type == AS_FUNCTION)
+    // 21. If Type(x) is Object and Type(y) is either String or Number,
+    //    return the result of the comparison ToPrimitive(x) == y.
+    else if ( (v.m_type == STRING || v.m_type == NUMBER ) && ( is_object() ) ) // m_type == OBJECT || m_type == AS_FUNCTION ) )
     {
-    	assert ( ! (m_type == OBJECT || m_type == AS_FUNCTION) );
-	// convert this value to a primitive and recurse
-	as_value v2 = v.to_primitive(env); 
-	if ( v2.m_type == OBJECT || v2.m_type == AS_FUNCTION ) return false; // no valid conversion 
-	else return equals(v2, env);
+        // convert this value to a primitive and recurse
+        as_value v2 = to_primitive(env); 
+#ifdef GNASH_DEBUG_EQUALITY
+       log_debug(" convertion to primitive : %s -> %s", to_debug_string().c_str(), v2.to_debug_string().c_str());
+#endif
+        if ( strictly_equals(v2) ) // returned self ?
+        {
+            return false; // no valid conversion 
+        }
+        else return v2.equals(v, env);
     }
 
-    return false;
+    // Both operands are objects (OBJECT,AS_FUNCTION,MOVIECLIP)
+    assert(is_object() && v.is_object());
+
+    // If any of the two converts to a primitive, we recurse
+
+    as_value p = to_primitive(env); 
+    as_value vp = v.to_primitive(env); 
+#ifdef GNASH_DEBUG_EQUALITY
+    log_debug(" convertion to primitive (this): %s -> %s", to_debug_string().c_str(), p.to_debug_string().c_str());
+    log_debug(" convertion to primitive (that): %s -> %s", v.to_debug_string().c_str(), vp.to_debug_string().c_str());
+#endif
+    if ( strictly_equals(p) && v.strictly_equals(vp) ) // both returned self ?
+    {
+            return false; // no valid conversion 
+    }
+
+    return p.equals(vp, env);
+
 }
 	
 // Sets *this to this string plus the given string.
