@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.26 2007/08/01 16:47:04 udog Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.27 2007/08/02 07:54:33 udog Exp $ */
 
 
 /// \page gtk_shm_support GTK shared memory extension support
@@ -246,23 +246,31 @@ GtkAggGlue::detect_pixelformat()
   
   _bpp = 24;
   strcpy(_pixelformat, "RGB24");
-  
+  return true;
+
 #else
 
 #ifdef PIXELFORMAT_RGB565  // OLPC
 
+#warning A pixel format of RGB565; you must have a (hacked) GTK which supports \
+         this format (e.g., GTK on the OLPC).
+                  
   _bpp = 16;
   strcpy(_pixelformat, "RGB565");
+  return true;
   
 #else
 
-#error Missing a supported pixel format for GTK GUI. You probably want to configure --with-pixelformat=RGB24   
+#warning GTK GUI requires --with-pixelformat=RGB24 for AGG renderer
+ 
+  printf("Missing a supported pixel format for GTK GUI. You probably want to "
+    "configure --with-pixelformat=RGB24\n");
+  return false;   
 
 #endif  //ifdef PIXELFORMAT_RGB565   
  
 #endif  //ifdef PIXELFORMAT_RGB24
   
-  return true;
   
 }
 

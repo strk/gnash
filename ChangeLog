@@ -1,3 +1,8 @@
+2007-08-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gtk_glue_agg.cpp: Warn when compiling for OLPC, change compile-time
+	  error to runtime error to be multi-GUI friendly.
+
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetConnection.h: remove the unused _owner method.
