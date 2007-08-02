@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.3 2007/08/02 05:46:39 zoulunkai Exp $";
+rcsid="$Id: ops.as,v 1.4 2007/08/02 09:33:40 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -42,6 +42,14 @@ xcheck(1==true);
 check(true==1);
 check(2!=true);
 xcheck(true!=2);
+check_equals(1+true, 2);
+check_equals(true+1, 2);
+check_equals(1+false, 1);
+check_equals(false+1, 1);
+check_equals(true+true, 2);
+check_equals(true+false, 1);
+check_equals(false, 0);
+check_equals(false+false, 0);
 
 // for Arrays
 ary1 = [1,2,3];
@@ -360,13 +368,81 @@ check_equals( (8^12), 4 );
 // Shift left operator (ACTION_SHIFTLEFT : 0x63)
 //------------------------------------------------
 
-// TODO ... 
+x = 1;
+y = x << 2;
+xcheck_equals(y, 4);
+
+x = 0xffffffff;
+y = x << 16;
+xcheck_equals(y, -65536);
+
+x = 1.9;
+y = x << 2;
+xcheck_equals(y, 4);
+
+x= undefined;
+y = x << 1;
+check_equals(y, 0);
+
+x= NaN;
+y = x << 1;
+xcheck_equals(y, 0);
+
+x = "abcd";
+y = x << 1;
+xcheck_equals(y, 0);
+
+x = "3";
+y = x << 1;
+xcheck_equals(y, 6);
+
+x = String("3");
+y = x << 1;
+xcheck_equals(y, 6);
+
+x = new String("3");
+y = x << 1;
+xcheck_equals(y, 6); 
 
 //------------------------------------------------
 // Shift right operator (ACTION_SHIFTRIGHT : 0x64)
 //------------------------------------------------
 
-// TODO ... 
+x = 7;
+y = x >> 2;
+check_equals(y, 1);
+
+x = 0xffffffff;
+y = x >> 16;
+check_equals(y, -1);
+
+x = 7.9;
+y = x >> 2;
+check_equals(y, 1);
+
+x= undefined;
+y = x >> 1;
+check_equals(y, 0);
+
+x= NaN;
+y = x >> 1;
+xcheck_equals(y, 0);
+
+x = "abcd";
+y = x >> 1;
+xcheck_equals(y, 0);
+
+x = "7";
+y = x >> 1;
+check_equals(y, 3);
+
+x = String("7");
+y = x >> 1;
+xcheck_equals(y, 3);
+
+x = new String("7");
+y = x >> 1;
+xcheck_equals(y, 3);
 
 //-------------------------------------------------
 // Shift right2 operator (ACTION_SHIFTRIGHT2 : 0x65)
