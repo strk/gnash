@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.85 2007/08/03 18:28:38 strk Exp $
+# $Id: Makefile.am,v 1.86 2007/08/03 19:27:29 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -41,11 +41,15 @@ if CYGNAL
 CYGNAL_DIRS = cygnal
 endif
 
-SUBDIRS      = $(STD_DIRS) $(CYGNAL_DIRS)
+if DOCBOOK
+DOC_DIRS = doc
+endif
+
+SUBDIRS      = $(STD_DIRS) $(CYGNAL_DIRS) $(DOC_DIRS)
 
 man_MANS = doc/gnash.1
 
-DIST_SUBDIRS = $(STD_DIRS) cygnal 
+DIST_SUBDIRS = $(STD_DIRS) cygnal doc
 
 EXTRA_DIST = config.rpath $(man_MANS) macros/incllist macros/libslist 
 
