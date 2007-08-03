@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.84 2007/08/03 04:37:44 strk Exp $
+# $Id: Makefile.am,v 1.85 2007/08/03 18:28:38 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -228,9 +228,9 @@ if BUILD_FB_GUI
 endif
 
 if KPARTS
-	@echo "	Konqueror (kparts) plugin enabled"
+	@echo "	Konqueror (KPARTS) plugin enabled"
 else
-	@echo "	Konqueror (kparts) plugin disabled"
+	@echo "	Konqueror (KPARTS) plugin disabled"
 endif
 
 if NSAPI
