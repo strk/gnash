@@ -1,5 +1,11 @@
 2007-08-03 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/Stage.{cpp,h}: Mark all listeners as reachable,
+	  drop the unused dropDanglingListeners (since it's verified
+	  the Stage doesn't store *weak* pointers).
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp (getStage): properly convert case when
 	  fetching the "Stage" object from SWF6 or lower.
 	* server/asobj/Stage.cpp (onResize): properly convert case

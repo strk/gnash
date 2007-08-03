@@ -137,25 +137,6 @@ Stage::removeListener(boost::intrusive_ptr<as_object> obj)
 	_listeners.remove(obj);
 }
 
-/// Remove listeners with a refcount == 1
-//
-/// This function should be called before marking
-/// objects to keep alive (when GC gets in effect)
-///
-void
-Stage::dropDanglingListeners()
-{
-	// TODO: find a way to find dangling listeners
-#ifndef GNASH_USE_GC
-	for (ListenersList::iterator it=_listeners.begin(),
-			itEnd=_listeners.end();
-			it != itEnd; ++it)
-	{
-		if ( (*it)->get_ref_count() == 1 ) it=_listeners.erase(it);
-	}
-#endif
-}
-
 const char*
 Stage::getScaleModeString()
 {
@@ -301,5 +282,19 @@ void stage_class_init(as_object& global)
 	static boost::intrusive_ptr<as_object> obj = new Stage();
 	global.init_member("Stage", obj.get());
 }
+
+#ifdef GNASH_USE_GC
+void
+Stage::markReachableResources() const
+{
+        for (ListenersList::const_iterator i=_listeners.begin(), e=_listeners.end(); i!=e; ++i)
+        {
+                (*i)->setReachable();
+        }
+
+	// Invoke generic as_object marker
+	markAsObjectReachable();
+}
+#endif // def GNASH_USE_GC
 
 } // end of gnash namespace

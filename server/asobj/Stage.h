@@ -86,6 +86,13 @@ public:
 	///
 	const char* getScaleModeString();
 
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark all Stage listeners as reachable
+	void markReachableResources() const;
+#endif 
+
 private:
 
 	/// Notify all listeners about a resize event
@@ -98,13 +105,6 @@ private:
 
 	/// Notify an object about an resize event
 	void notifyResize(boost::intrusive_ptr<as_object> obj, as_environment* env);
-
-	/// Remove listeners with a refcount == 1
-	//
-	/// This function should be called before marking
-	/// objects to keep alive (when GC gets in effect)
-	///
-	void dropDanglingListeners();
 
 	typedef std::list<boost::intrusive_ptr<as_object> > ListenersList;
 
