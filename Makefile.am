@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.83 2007/08/03 03:01:15 rsavoye Exp $
+# $Id: Makefile.am,v 1.84 2007/08/03 04:37:44 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -30,33 +30,22 @@ STD_DIRS = \
 	backend \
 	utilities \
 	gui \
+	extensions \
+	plugin \
 	testsuite \
 	po \
+	doc \
 	$(NULL)
-
-if NSAPI
-PLUGIN_DIRS = plugin
-endif
-
-if KPARTS
-PLUGIN_DIRS = plugin
-endif
-
-if DOCBOOK
-DOC_DIRS = doc
-endif
 
 if CYGNAL
 CYGNAL_DIRS = cygnal
 endif
 
-EXTEND_DIRS = extensions
-
-SUBDIRS      = $(STD_DIRS) $(DOC_DIRS) $(PLUGIN_DIRS) $(EXTEND_DIRS) $(CYGNAL_DIRS)
+SUBDIRS      = $(STD_DIRS) $(CYGNAL_DIRS)
 
 man_MANS = doc/gnash.1
 
-DIST_SUBDIRS = $(STD_DIRS) doc plugin cygnal extensions
+DIST_SUBDIRS = $(STD_DIRS) cygnal 
 
 EXTRA_DIST = config.rpath $(man_MANS) macros/incllist macros/libslist 
 
@@ -210,31 +199,44 @@ if BUILD_AGG_RENDERER
 	@echo "	AGG_CFLAGS is $(AGG_CFLAGS)"
 	@echo "	AGG_LIBS is $(AGG_LIBS)"
 endif
+	@echo ""
 	@echo "A blank value for CFLAGS means the header is installed in the"
 	@echo "default system header location. All the LIBS should have a"
 	@echo "legit value"
 	@echo ""
 	@echo "Configurable options are:"
-	@echo "Media handler: $(MEDIA_CONFIG)"
-	@echo "Renderer engine: $(RENDERER_CONFIG)"
+	@echo "	Media handler: $(MEDIA_CONFIG)"
+	@echo "	Renderer engine: $(RENDERER_CONFIG)"
 
 if BUILD_GTK_GUI
-	@echo "Supported GUI: GTK"
+	@echo "	Supported GUI: GTK"
 endif
 if BUILD_KDE_GUI
-	@echo "Supported GUI: KDE"
+	@echo "	Supported GUI: KDE"
 endif
 if BUILD_SDL_GUI
-	@echo "Supported GUI: SDL"
+	@echo "	Supported GUI: SDL"
 endif
 if BUILD_FLTK_GUI
-	@echo "Supported GUI: FLTK"
+	@echo "	Supported GUI: FLTK"
 endif
 if BUILD_AQUA_GUI
-	@echo "Supported GUI: AQUA"
+	@echo "	Supported GUI: AQUA"
 endif
 if BUILD_FB_GUI
-	@echo "Supported GUI: FB"
+	@echo "	Supported GUI: FB"
+endif
+
+if KPARTS
+	@echo "	Konqueror (kparts) plugin enabled"
+else
+	@echo "	Konqueror (kparts) plugin disabled"
+endif
+
+if NSAPI
+	@echo "	Firefox (NSAPI) plugin enabled"
+else
+	@echo "	Firefox (NSAPI) plugin disabled"
 endif
 
 check: check-recursive anal
