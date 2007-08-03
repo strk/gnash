@@ -1,3 +1,20 @@
+2007-08-02  Rob Savoye  <rob@deal.welcomehome.org>
+
+	* plugin/Makefile.am: Use BUILD_KDE_GUI instead of KLASH. Use
+	NSAPI instead of PLUGIN, KPARTS instead of KLASH.
+	* Makefile.am: Change from PLUGIN to NSAPI and KPARTS for conditionals. 
+	* configure.ac: Change --disable-klash to --disable-kparts, add
+	--disable-nsapi to replace the older --disable-plugin
+	setting. Make building the plugins conditional on the gui being
+	selected and if the development libraries exist.
+	* gui/Makefile.am: Comment out the dyna,ic vs static support, it's
+	uneeded for now.
+	* macros/firefox.m4: Use nsapi instead of plugin as the
+	conditional.
+	* macros/kde.m4: set has_kde to yes by default. It can get
+	disabled later.
+	* plugin/klash/Makefile.am: Use KPARTS instead of KLASH.
+
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/gen-asclass.sh: add the addStatic call to statics.

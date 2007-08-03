@@ -15,14 +15,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.60 2007/07/01 10:54:14 bjacques Exp $
+# $Id: Makefile.am,v 1.61 2007/08/03 03:01:15 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
-if KLASH
+if BUILD_KDE_GUI
 KLASH = klash
 endif
-SUBDIRS = $(KLASH) # test mozilla-sdk
+SUBDIRS = $(KLASH)
 
 # if DMALLOC
 # MALL_CFLAGS = $(DMALLOC_CFLAGS)
@@ -79,6 +79,7 @@ noinst_HEADERS = plugin.h \
 	 mozilla-sdk/include/prwin16.h \
          mozilla-sdk/include/obsolete/protypes.h 
 
+if NSAPI
 libgnashplugin_la_SOURCES  = plugin.cpp \
 	mozilla-sdk/npn_gate.cpp \
         mozilla-sdk/npp_gate.cpp \
@@ -114,3 +115,5 @@ install-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 
 uninstall-pluginLTLIBRARIES: $(plugin_LTLIBRARIES)
 	$(RM) -f $(DESTDIR)$(plugindir)/libgnashplugin.so
+
+endif

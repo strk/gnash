@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.388 2007/07/31 21:59:49 strk Exp $
+dnl $Id: configure.ac,v 1.389 2007/08/03 03:01:15 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -220,15 +220,8 @@ esac], sdkinstall=no)
 
 AM_CONDITIONAL(SDKINSTALL, test x$sdkinstall = xyes)
 
-dnl Add KFLASH support, if specified.
-AC_ARG_ENABLE(klash,
-  AC_HELP_STRING([--disable-klash], [Disable support for Konqueror plugin]),
-[case "${enableval}" in
-  yes) klash=yes ;;
-  no)  klash=no ;;
-  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-klash option]) ;;
-esac],klash=yes)
-
+has_kde=no
+has_gtk2=no
 build_fb=no
 build_fltk=no
 build_kde=no
@@ -609,7 +602,7 @@ if test x$cross_compiling = xyes; then
   export incllist="`eval echo ${with_top_level}/include ${pkgroot}/${host_alias}/include ${pkgroot}/include`"
   export libslist="`eval echo ${with_top_level}/lib ${pkgroot}/${host_alias}/lib ${pkgroot}/lib64 ${pkgroot}/lib32 ${pkgroot}/lib`"
   export pathlist="`eval echo ${pkgroot}/${host_alias}/bin:${pkgroot}/bin`"
-  plugin=no
+  nsapi=no
 else
   AC_MSG_NOTICE([Configuring Gnash for native compilation])
   export incllist="`eval cat ${srcdir}/macros/incllist`"
@@ -638,20 +631,56 @@ PKG_PROG_PKG_CONFIG
 AC_PATH_TOOL([AUTOTRACE], [autotrace])
 AC_HEADER_DIRENT
 
+dnl Add KFLASH support, if specified.
+
+AC_ARG_ENABLE(kparts,
+  AC_HELP_STRING([--disable-kparts], [Disble support for Konqueror plugin (default=no)]),
+[case "${enableval}" in
+  yes) kparts=yes ;;
+  no)  kparts=no ;;
+  *)   AC_MSG_ERROR([bad value ${enableval} for --disable-kpart option]) ;;
+esac],kparts=yes)
+
 dnl
-dnl !! This has been moved here to make --enable-plugin work
+dnl !! This has been moved here to make --enable-nsapi work
 dnl !! All of plugin-related macro calls could be moved into
 dnl !! a specialized macros/plugin.m4
 dnl
-AC_ARG_ENABLE(plugin,
-  AC_HELP_STRING([--disable-plugin], [Disable plugins build]),
+AC_ARG_ENABLE(nsapi,
+  AC_HELP_STRING([--disable-nsapi], [Disable NSAPI plugin build (default=no)]),
   [case "${enableval}" in
-    yes) plugin=yes ;;
-    no)  plugin=no ;;
-    *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugin option]) ;;
+    yes) nsapi=yes ;;
+    no)  nsapi=no ;;
+    *)   AC_MSG_ERROR([bad value ${enableval} for disable-nsapi option]) ;;
   esac],
-  plugin=yes
+  nsapi=yes
 )
+
+dnl dnl  Enable us to disable building all browser plugins in one command.
+dnl AC_ARG_ENABLE(plugins,
+dnl   AC_HELP_STRING([--disable-plugins], [Disable all browser plugins from building (default=no)]),
+dnl   [case "${enableval}" in
+dnl     yes) plugins=yes ;;
+dnl     no)  plugins=no ;;
+dnl     *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugins option]) ;;
+dnl   esac],
+dnl   plugins=yes
+dnl )
+dnl if test x$plugins = xno; then
+dnl   nsapi=no
+dnl   kparts=no
+dnl fi
+
+dnl if test x$build_gtk = xyes; then
+dnl   if test x$plugins = xyes; then
+dnl     nsapi=yes
+dnl   fi
+dnl fi
+dnl if test x$build_kde = xyes; then
+dnl   if test x$plugins = xyes; then
+dnl     kparts=yes
+dnl   fi
+dnl fi
 
 GNASH_PATH_FIREFOX
 
@@ -900,53 +929,15 @@ AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(short)
 
-dnl # NO plugin ? NO klash !
-if test x"$plugin" = xno; then
-  echo "WARNING: plugin disabled, klash disabled accordingly"
-  klash=no
-fi
-
-dnl # Check KDE if kde gui or klash were requested
-if test x$build_kde = xyes -o x"$klash" = xyes; then
+dnl # Check KDE if kde gui or kparts were requested
+if test x$build_kde = xyes -o x"$kparts" = xyes; then
   kde=yes
   qt=yes
-  build_kde=yes
   GNASH_PATH_KDE
   GNASH_PATH_QT
 fi
 AM_CONDITIONAL(HAVE_KDE, [test x$has_kde = xyes])
 AM_CONDITIONAL(HAVE_QT, [test x$has_qt = xyes])
-
-dnl # NO kde ? NO klash !
-if test x$has_kde != xyes; then
-  if test x$klash = xyes; then
-    echo "WARNING: No KDE development package installed, disabling klash"
-    klash=no
-  fi
-fi
-if test x$has_qt != xyes; then
-  if test x$klash = xyes; then
-    echo "WARNING: No QT development package installed, disabling klash"
-    klash=no
-  fi
-fi
-
-AM_CONDITIONAL(BUILD_GTK_GUI, [ test x$build_gtk = xyes ])
-AM_CONDITIONAL(BUILD_KDE_GUI, [ test x$build_kde = xyes ])
-dnl AM_CONDITIONAL(BUILD_QT_GUI, [ test x$build_qt = xyes ])
-AM_CONDITIONAL(BUILD_FLTK_GUI, [ test x$build_fltk = xyes ])
-AM_CONDITIONAL(BUILD_SDL_GUI, [ test x$build_sdl = xyes ])
-AM_CONDITIONAL(BUILD_FB_GUI, [ test x$build_fb = xyes ])
-AM_CONDITIONAL(BUILD_AQUA_GUI, [ test x$build_aqua = xyes ])
-AM_CONDITIONAL(BUILD_RISCOS_GUI, [ test x$build_riscos = xyes ])
-
-AM_CONDITIONAL(KLASH, [test x$klash = xyes])
-
-AC_SUBST(KDE_CFLAGS)
-AC_SUBST(KDE_LIBS)
-if test x$build_ogl = xyes; then
-  GNASH_PATH_OPENGL
-fi
 
 dnl Need GLIB for both GTK and GST
 if test x$build_gtk = xyes -o x${media_handler} = "xgst"; then
@@ -962,6 +953,43 @@ if test x$build_gtk = xyes; then
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
    GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
+fi
+
+if test x$has_gtk2 = xyes; then
+  nsapi=yes
+fi
+
+dnl if gtk isn't installed, even if it's specified, don't try to build
+dnl the NSAPI plugin, which is GTK based.
+if test x$has_gtk2 = xno; then
+  nsapi=no
+  AC_MSG_WARN(["No GTK development package installed, disabling NSAPI plugin"])
+fi
+
+dnl if kde isn't installed, even if it's specified, don't try to build
+dnl the KPARTS plugin, which is KDE based.
+if test x$has_kde = xno; then
+  kparts=no
+  AC_MSG_WARN(["No KDE development package installed, disabling KPARTS plugin"])
+fi
+
+AM_CONDITIONAL(BUILD_GTK_GUI, [ test x$build_gtk = xyes ])
+AM_CONDITIONAL(BUILD_KDE_GUI, [ test x$build_kde = xyes ])
+dnl AM_CONDITIONAL(BUILD_QT_GUI, [ test x$build_qt = xyes ])
+AM_CONDITIONAL(BUILD_FLTK_GUI, [ test x$build_fltk = xyes ])
+AM_CONDITIONAL(BUILD_SDL_GUI, [ test x$build_sdl = xyes ])
+AM_CONDITIONAL(BUILD_FB_GUI, [ test x$build_fb = xyes ])
+AM_CONDITIONAL(BUILD_AQUA_GUI, [ test x$build_aqua = xyes ])
+AM_CONDITIONAL(BUILD_RISCOS_GUI, [ test x$build_riscos = xyes ])
+
+# plugin building flags
+AM_CONDITIONAL(NSAPI, [test x$nsapi = xyes])
+AM_CONDITIONAL(KPARTS, [test x$kparts = xyes])
+
+AC_SUBST(KDE_CFLAGS)
+AC_SUBST(KDE_LIBS)
+if test x$build_ogl = xyes; then
+  GNASH_PATH_OPENGL
 fi
 
 if test x$build_gtk = xyes; then
@@ -997,7 +1025,7 @@ dnl library, but this is the easy wind to find it.
 GNASH_PKG_FIND(expat, [expat.h], [Expat library], XML_ErrorString)
 
 dnl these conditionals were moved out of kde.m4
-AM_CONDITIONAL(HAS_KDE, [test x$kde = xyes])
+AM_CONDITIONAL(HAS_KDE, [test x$has_kde = xyes])
 # used to disable x11-specific stuff on special platforms
 AM_CONDITIONAL(include_x11, test "$kde_use_qt_emb" = "no" && test "$kde_use_qt_mac" = "no")
 AM_CONDITIONAL(include_ARTS, test "$build_arts" '!=' "no")
@@ -1012,10 +1040,9 @@ if test x$glext = xno -a x$build_ogl = xyes; then
     AC_ERROR([You have GTK installed, but not GtkGLExt. You need GtkGLExt to use the OpenGL renderer. Attempting to build SDL version])
   fi
   gui=sdl
-  plugin=no
+  nsapi=no
   AC_MSG_WARN([GTK2 specified for the GUI, but GtkGlExt is not present. Trying SDL instead.])
 fi
-AM_CONDITIONAL(PLUGIN, [test x$plugin = xyes])
 
 if test x"$media_handler" = x"ffmpeg"; then
   GNASH_PATH_FFMPEG
@@ -1357,14 +1384,14 @@ else
   echo "        DMalloc support disabled (default). Use --enable-dmalloc to enable."
 fi
 
-if test x"$plugin" = x"yes"; then
-  echo "        Firefox plugin enabled (default). Use --disable-plugin to disable."
+if test x"$nsapi" = x"yes"; then
+  echo "        Firefox plugin enabled (default). Use --disable-nsapi to disable."
 else
   echo "        Firefox plugin disabled."
 fi
 
-if test x"$klash" = x"yes"; then
-  echo "        Konqueror plugin enabled (default). Use --disable-klash to disable"
+if test x"$kparts" = x"yes"; then
+  echo "        Konqueror plugin enabled (default). Use --disble-kparts to disable"
 else
   echo "        Konqueror plugin disabled."
 fi
@@ -1448,14 +1475,14 @@ if test x$xml != xno; then
   fi
 fi
 
-if test x$kde = xyes -o x$klash = xyes; then
+if test x$kde = xyes -o x$kparts = xyes; then
   if test x"$has_kde" = xyes; then
     echo "        KDE flags are: $KDE_CFLAGS"
     echo "        KDE libs are: $KDE_LIBS"
   else
-    if test x$build_kde = xyes -o x$klash = xyes ; then
+    if test x$build_kde = xyes -o x$parts = xyes ; then
       echo "        ERROR: No KDE development package installed!"
-      echo "               Reconfigure with --disable-klash and/or"
+      echo "               Reconfigure with --disable-kparts and/or"
       echo "               change to a different gui with --enable-gui=..."
       echo "               or install the KDE development environment from http://kde.org"
       echo "               or .deb users: apt-get install kdelibs-dev"
@@ -1467,7 +1494,7 @@ if test x$kde = xyes -o x$klash = xyes; then
     echo "        QT flags are: $QT_CFLAGS"
     echo "        QT libs are: $QT_LIBS"
   else
-    if test x$build_kde = xyes -o x$klash = xyes ; then
+    if test x$build_kde = xyes -o x$kparts = xyes ; then
       if test x"$has_kde" != xyes; then
 	# We have already moaned about KDE absence, so presumably they'll get
 	# QT-dev when they install KDE-dev
@@ -1477,8 +1504,8 @@ if test x$kde = xyes -o x$klash = xyes; then
         echo "        ERROR: No QT development package installed!"
         echo "               Install a QT development environment from http://trolltech.com"
         echo "               or .deb users: apt-get install libqt3-mt-dev"
-	if test x$klash = xyes; then
-          echo "               or reconfigure with --disable-klash"
+	if test x$kparts = xyes; then
+          echo "               or reconfigure with --disable-kparts"
 	fi
 	if test x$build_kde = xyes; then
           echo "               or change to a different gui with --enable-gui=..."
@@ -1784,7 +1811,7 @@ if $need_sdl; then
 fi
 unset need_sdl
 
-if test x"$plugin" = x"yes"; then
+if test x"$nsapi" = x"yes"; then
 dnl  if test x"$FIREFOX_CFLAGS" != x; then
 dnl    echo "        Firefox flags are: $FIREFOX_CFLAGS"
 dnl    echo "        Firefox libs are: $FIREFOX_LIBS"

@@ -15,11 +15,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.32 2007/07/23 22:20:48 strk Exp $
+# $Id: Makefile.am,v 1.33 2007/08/03 03:01:16 rsavoye Exp $
 
 AUTOMAKE_OPTIONS = 
 
-if KLASH
+if KPARTS
 AM_CPPFLAGS= $(KDE_CFLAGS) $(QT_CFLAGS) -DGNASHBINDIR=\"$(GNASHEXE)\"
 
 plugindir   = $(libdir)/kde3

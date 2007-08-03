@@ -98,7 +98,7 @@ GNASH_LIBS = \
 #      LIB_FLAGS = -release $(VERSION)
 # endif # ENABLE_SHARED
 # else # make shared libraries suitable for linking.
-#      LIB_FLAGS = -release $(VERSION)
+      LIB_FLAGS = -release $(VERSION)
 # endif # DYNAMIC_GUI
 
 # AQUA Toolkit

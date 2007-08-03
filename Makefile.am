@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.82 2007/07/26 15:40:35 strk Exp $
+# $Id: Makefile.am,v 1.83 2007/08/03 03:01:15 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -34,14 +34,12 @@ STD_DIRS = \
 	po \
 	$(NULL)
 
-if PLUGIN
-if HAVE_GTK2
-PLUGIN_DIRS = plugin
-else
-if KLASH
+if NSAPI
 PLUGIN_DIRS = plugin
 endif
-endif
+
+if KPARTS
+PLUGIN_DIRS = plugin
 endif
 
 if DOCBOOK
@@ -219,8 +217,25 @@ endif
 	@echo "Configurable options are:"
 	@echo "Media handler: $(MEDIA_CONFIG)"
 	@echo "Renderer engine: $(RENDERER_CONFIG)"
-	@echo "Supported GUI: $(GUI_CONFIG) ( default $(DEFAULT_GUI) )"
-#	@echo "Extensions: "
+
+if BUILD_GTK_GUI
+	@echo "Supported GUI: GTK"
+endif
+if BUILD_KDE_GUI
+	@echo "Supported GUI: KDE"
+endif
+if BUILD_SDL_GUI
+	@echo "Supported GUI: SDL"
+endif
+if BUILD_FLTK_GUI
+	@echo "Supported GUI: FLTK"
+endif
+if BUILD_AQUA_GUI
+	@echo "Supported GUI: AQUA"
+endif
+if BUILD_FB_GUI
+	@echo "Supported GUI: FB"
+endif
 
 check: check-recursive anal
 

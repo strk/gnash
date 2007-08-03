@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: kde.m4,v 1.34 2007/07/01 10:54:12 bjacques Exp $
+dnl $Id: kde.m4,v 1.35 2007/08/03 03:01:16 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_KDE],
 [
@@ -31,7 +31,7 @@ AC_DEFUN([GNASH_PATH_KDE],
   ])
 
   kde_prefix="/usr"
-  has_kde=yes
+  has_kde=no
   if test x"${ac_cv_path_kde_incl}" = x; then
     AC_PATH_PROG(KDE_CONFIG, kde-config, ,[${pathlist}])
     if test "x$KDE_CONFIG" != "x" ; then
