@@ -1,3 +1,7 @@
+2007-08-03 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	* server/array.cpp: fix iterators invalidation (bug #20667).
+
 2007-08-03  Rob Savoye  <rob@deal.welcomehome.org>
 
 	* configure.ac: Fix typo so --disable-nsapi works. Cleanup the

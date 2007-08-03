@@ -329,14 +329,12 @@ class as_value_multiprop
 {
 public:
 	const as_cmp_fn* _cmps;
-	std::deque<std::string>::const_iterator _pBegin, _pEnd, pit;
+	std::deque<std::string>& _prps;
 
 	// Note: all as_cmp_fns in *cmps must implement strict weak ordering
-	as_value_multiprop(std::deque<std::string>::const_iterator pBegin,
-		std::deque<std::string>::const_iterator pEnd,
-		as_cmp_fn* cmps)
+	as_value_multiprop(std::deque<std::string>& prps, as_cmp_fn* cmps)
 		:
-		_pBegin(pBegin), _pEnd(pEnd)
+		_prps(prps)
 	{
 		_cmps = cmps;
 	}
@@ -344,8 +342,9 @@ public:
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		const as_cmp_fn* cmp = _cmps;
+		std::deque<std::string>::iterator pit;
 		
-		for (pit = _pBegin; pit != _pEnd; ++pit, ++cmp)
+		for (pit = _prps.begin(); pit != _prps.end(); ++pit, ++cmp)
 		{
 			as_value av, bv;
 			boost::intrusive_ptr<as_object> ao = a.to_object();
@@ -367,18 +366,17 @@ public:
 class as_value_multiprop_eq : public as_value_multiprop
 {
 public:
-	as_value_multiprop_eq(std::deque<std::string>::const_iterator pBegin,
-		std::deque<std::string>::const_iterator pEnd,
-		as_cmp_fn* eq)
-		: as_value_multiprop(pBegin, pEnd, eq)
+	as_value_multiprop_eq(std::deque<std::string>& prps, as_cmp_fn* eq)
+		: as_value_multiprop(prps, eq)
 	{
 	}
 
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		const as_cmp_fn* cmp = _cmps;
+		std::deque<std::string>::iterator pit;
 		
-		for (pit = _pBegin; pit != _pEnd; ++pit, ++cmp)
+		for (pit = _prps.begin(); pit != _prps.end(); ++pit, ++cmp)
 		{
 			as_value av, bv;
 			boost::intrusive_ptr<as_object> ao = a.to_object();
@@ -993,12 +991,12 @@ array_sortOn(const fn_call& fn)
 		}
 
 		as_value_multiprop avc = 
-			as_value_multiprop(prp.begin(), prp.end(), cmp);
+			as_value_multiprop(prp, cmp);
 
 		if (do_unique)
 		{
 			as_value_multiprop_eq ave = 
-				as_value_multiprop_eq(prp.begin(), prp.end(), eq);
+				as_value_multiprop_eq(prp, eq);
 			if (do_index)
 				return array->sort_indexed(&avc, &ave);
 			return array->sort(&avc, &ave);
