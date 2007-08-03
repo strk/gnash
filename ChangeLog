@@ -1,5 +1,10 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: fix automatic kparts/nsapi plugin build
+	  based on gui availability.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: fix misleading warning about KDE/GTK gui 
 	  not being built while KPARTS/NSAPI plugin is when instead
 	  the guis are actually being built.

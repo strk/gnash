@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.391 2007/08/03 18:17:22 strk Exp $
+dnl $Id: configure.ac,v 1.392 2007/08/03 18:31:59 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -634,12 +634,12 @@ AC_HEADER_DIRENT
 dnl Add KFLASH support, if specified.
 
 AC_ARG_ENABLE(kparts,
-  AC_HELP_STRING([--disable-kparts], [Disble support for Konqueror plugin (default=no)]),
+  AC_HELP_STRING([--disable-kparts], [Disble support for Konqueror plugin (default: enabled if kde gui is)]),
 [case "${enableval}" in
   yes) kparts=yes ;;
   no)  kparts=no ;;
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-kpart option]) ;;
-esac],kparts=yes)
+esac],kparts=$build_kde)
 
 dnl
 dnl !! This has been moved here to make --enable-nsapi work
@@ -647,13 +647,13 @@ dnl !! All of plugin-related macro calls could be moved into
 dnl !! a specialized macros/plugin.m4
 dnl
 AC_ARG_ENABLE(nsapi,
-  AC_HELP_STRING([--disable-nsapi], [Disable NSAPI plugin build (default=no)]),
+  AC_HELP_STRING([--disable-nsapi], [Disable NSAPI plugin build (default: enabled if gtk gui is)]),
   [case "${enableval}" in
     yes) nsapi=yes ;;
     no)  nsapi=no ;;
     *)   AC_MSG_ERROR([bad value ${enableval} for disable-nsapi option]) ;;
   esac],
-  nsapi=yes
+  nsapi=$build_gtk
 )
 
 dnl dnl  Enable us to disable building all browser plugins in one command.
