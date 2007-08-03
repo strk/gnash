@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: gtk2.m4,v 1.41 2007/07/01 10:54:12 bjacques Exp $
+dnl $Id: gtk2.m4,v 1.42 2007/08/03 19:58:12 strk Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -62,10 +62,10 @@ AC_DEFUN([GNASH_PATH_GTK2],
     done
   fi
   if test x"${ac_cv_path_gtk2_incl}" = x; then
+    AC_MSG_RESULT([not found, trying again])
     AC_CHECK_HEADERS(gtk/gtk.h)
-    AC_MSG_RESULT($ac_cv_path_gtk2_incl)
   else
-    AC_MSG_WARN([not sure])
+    AC_MSG_RESULT($ac_cv_path_gtk2_incl)
   fi
 
   dnl Look for the library
