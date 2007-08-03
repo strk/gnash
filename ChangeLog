@@ -1,3 +1,8 @@
+2007-08-03  Rob Savoye  <rob@deal.welcomehome.org>
+
+	* configure.ac: Fix typo so --disable-nsapi works. Cleanup the
+	logic of what gets built when. Add a few warnings.
+
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
 	* Makefile.am: add plugins info to 'dumpconfig' output,

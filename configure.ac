@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.389 2007/08/03 03:01:15 rsavoye Exp $
+dnl $Id: configure.ac,v 1.390 2007/08/03 17:23:23 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -930,9 +930,7 @@ AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(short)
 
 dnl # Check KDE if kde gui or kparts were requested
-if test x$build_kde = xyes -o x"$kparts" = xyes; then
-  kde=yes
-  qt=yes
+if test x$build_kde = xyes -o x$kparts = xyes; then
   GNASH_PATH_KDE
   GNASH_PATH_QT
 fi
@@ -949,28 +947,34 @@ AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
 if test x$build_ogl = xyes -a x$build_gtk = xyes; then
    GNASH_PATH_GLEXT
 fi
-if test x$build_gtk = xyes; then
+if test x$build_gtk = xyes -o x$nsapi = xyes; then
    GNASH_PATH_GTK2
    GNASH_PATH_PANGO
    GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
-fi
-
-if test x$has_gtk2 = xyes; then
-  nsapi=yes
 fi
 
 dnl if gtk isn't installed, even if it's specified, don't try to build
 dnl the NSAPI plugin, which is GTK based.
 if test x$has_gtk2 = xno; then
   nsapi=no
-  AC_MSG_WARN(["No GTK development package installed, disabling NSAPI plugin"])
+dnl  build_gtk=no
+  AC_MSG_WARN(["Disabling NSAPI plugin, no GTK development tools found"])
+fi
+
+if test x$build_gtk = xno -o x$nsapi = xyes; then
+  AC_MSG_WARN(["Enabled NSAPI plugin, but you aren't building a GTK based GUI!"])
 fi
 
 dnl if kde isn't installed, even if it's specified, don't try to build
 dnl the KPARTS plugin, which is KDE based.
-if test x$has_kde = xno; then
+if test x$has_kde = xno -a x$kparts = xyes; then
   kparts=no
-  AC_MSG_WARN(["No KDE development package installed, disabling KPARTS plugin"])
+dnl  build_kde=no
+  AC_MSG_WARN(["Disabling KPARTS plugin, no KDE development found"])
+fi
+
+if test x$build_kde = xno -o x$kparts = xyes; then
+  AC_MSG_WARN(["Enabled KPARTS plugin, but you aren't building a KDE based GUI!"])
 fi
 
 AM_CONDITIONAL(BUILD_GTK_GUI, [ test x$build_gtk = xyes ])
@@ -1391,7 +1395,7 @@ else
 fi
 
 if test x"$kparts" = x"yes"; then
-  echo "        Konqueror plugin enabled (default). Use --disble-kparts to disable"
+  echo "        Konqueror plugin enabled (default). Use --disable-kparts to disable"
 else
   echo "        Konqueror plugin disabled."
 fi
