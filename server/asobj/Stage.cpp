@@ -82,14 +82,7 @@ Stage::notifyResize(as_environment* env)
 			itEnd=_listeners.end();
 			it != itEnd; ++it)
 	{
-#ifndef GNASH_USE_GC
-		if ( (*it)->get_ref_count() == 1 ) it=_listeners.erase(it);
-		else
-#endif // ndef GNASH_USE_GC
 		notifyResize(*it, env);
-		// TODO: make sure objects deregister themselve from being listeners
-		//       when deleted by the GC ! (btw, how to ensure the GC didn't 
-		//       delete the Stage first  ? ...)
 	}
 }
 
@@ -97,7 +90,7 @@ Stage::notifyResize(as_environment* env)
 void
 Stage::notifyResize(boost::intrusive_ptr<as_object> obj, as_environment* env)
 {
-	const std::string eventname = "onResize";
+	std::string eventname = PROPNAME("onResize");
 
 	as_value method;
 	if ( ! obj->get_member(eventname, &method) ) {
