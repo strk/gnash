@@ -1,39 +1,47 @@
-2007-08-02 Sandro Santilli <strk@keybit.net>
+2007-08-03 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	* server/array.{cpp,h}: fixes previously identified issues with
+	  array.cpp involving functions that needed to be environment and
+	  SWF-version aware (mainly functions involved in sorting). 
+	* testsuite/actionscript.all/array.as: xcheck->check, few more
+	  tests.
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/NetStream.{cpp,h}: mark associated as_environment
 	  as reachable (but I think there are ownership problem there,
 	  the as_environment might be deleted before the NetStream object
 	  is, in which case we'd access random memory).
 
-2007-08-02 Sandro Santilli <strk@keybit.net>
+2007-08-03 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: make sure PKG_CONFIG is defined before calling 
 	  GNAH_PATH_XXX. Made the notice clearer about GNASH_PATH_XX
 	  need to be put after it.
 
-2007-08-02 Sandro Santilli <strk@keybit.net>
+2007-08-03 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: move GTK detection code *after* the cross-compiling
 	  section, so that $incllist is properly set. Add notice about
 	  the fact that any GNASH_PATH_XX must be invoked after that one.
 
-2007-08-02 Sandro Santilli <strk@keybit.net>
+2007-08-03 Sandro Santilli <strk@keybit.net>
 
 	* Makefile.am: only descend in doc/ subdir if DOCBOOK is enabled.
 
-2007-08-02 Sandro Santilli <strk@keybit.net>
+2007-08-03 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: check GTK dependencies only if $build_gtk=yes.
 	  print a WARNING and set $build_gtk=no if deps are not met.
 	  All of this is done *before* NSAPI is checked, so it would
 	  correctly be built or not depending on $build_gtk only.
 
-2007-08-02 Sandro Santilli <strk@keybit.net>
+2007-08-03 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: fix automatic kparts/nsapi plugin build
 	  based on gui availability.
 
-2007-08-02 Sandro Santilli <strk@keybit.net>
+2007-08-03 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: fix misleading warning about KDE/GTK gui 
 	  not being built while KPARTS/NSAPI plugin is when instead

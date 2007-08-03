@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.27 2007/08/02 18:16:18 strk Exp $";
+rcsid="$Id: array.as,v 1.28 2007/08/03 21:10:19 strk Exp $";
 
 #include "check.as"
 
@@ -467,12 +467,12 @@ e.sort( Array.DESCENDING | Array.CASEINSENSITIVE );
 check_equals( e.toString(), "singleton" );
 
 r = f.sort();
-xcheck_equals( r.toString(), "Name,Name,Year" );
-xcheck_equals( f.toString(), "Name,Name,Year" );
+check_equals( r.toString(), "Name,Name,Year" );
+check_equals( f.toString(), "Name,Name,Year" );
 r = f.sort( Array.UNIQUESORT );
 check_equals( r.toString(), "0" );
 f.sort( Array.DESCENDING | Array.CASEINSENSITIVE );
-xcheck_equals( f.toString(), "Year,Name,Name" );
+check_equals( f.toString(), "Year,Name,Name" );
 
 trace(" -- Return Indexed Array Tests -- ");
 
@@ -507,7 +507,7 @@ r = e.sort( Array.NUMERIC | Array.RETURNINDEXEDARRAY | Array.DESCENDING );
 check_equals( r.toString(), "0" );
 
 trace(" -- Custom AS function tests -- ");
-r = a.sort( cmp_fn, Array.UNIQUE );
+r = a.sort( cmp_fn, Array.UNIQUESORT );
 check_equals( r.toString(), ",vi,ed,nano,emacs,Jedit" );
 check_equals( a.toString(), ",vi,ed,nano,emacs,Jedit" );
 r = a.sort( something_undefined );
@@ -574,13 +574,13 @@ r = c.sort( Array.UNIQUESORT | Array.RETURNINDEXEDARRAY );
 check_equals( r.toString(), "0" );
 r = c.sort( Array.UNIQUESORT | Array.NUMERIC | Array.DESCENDING | Array.RETURNINDEXEDARRAY );
 check_equals( r.toString(), "0" );
-r = a.sort( cmp_fn, Array.UNIQUE | Array.CASEINSENSITIVE );
+r = a.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE );
 check_equals( tolen(r), "[0, 2, 2, 2, 4, 5, 5]" );
 check_equals( tolen(a), "[0, 2, 2, 2, 4, 5, 5]" );
-r = a.sort( cmp_fn, Array.UNIQUE | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY );
-check_equals( r.toString(), "0,1,2,3,4,5,6" );  // gnash fails in SWF7,8 but succeeds in SWF5,6
-r = a.sort( cmp_fn, Array.UNIQUE | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY | Array.DESCENDING );
-check_equals( r.toString(), "6,5,4,3,2,1,0" ); // gnash fails in SWF7,8 but succeeds in SWF5,6
+r = a.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0,1,2,3,4,5,6" ); 
+r = a.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE | Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+check_equals( r.toString(), "6,5,4,3,2,1,0" );
 
 trace(" -- Array with null value  -- ");
 c.push(null);
@@ -642,13 +642,17 @@ a.push({Name: "Zuse Z3", Year: 1941, Electronic: false});
 a.push({Name: "Colossus", Year: 1943, Electronic: true});
 a.push({Name: "ENIAC", Year: 1944, Electronic: true});
 
+b = [];
+b.push({Name: id, Year: yr, Electronic: yr});
+b.push({Name: yr, Year: id, Electronic: yr});
+
 function tostr(x)
 {
 	var i;
 	str = "";
 	for(i = 0; i < x.length; i++)
 	{
-		y = a[i];
+		y = x[i];
 		str += (y.Name + "," + y.Year + "," + y.Electronic );
 		if (i != x.length - 1) str += " | ";
 	}
@@ -773,6 +777,48 @@ r = a.sortOn(["Name", "Year"], [Array.RETURNINDEXEDARRAY]);
 check_equals( tostr(r), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
 check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
 
+trace("sortOn using an object implementing/over-riding the toString() method as the property argument");
+
+a.sortOn( id );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+a.sortOn( id, Array.CASEINSENSITIVE | Array.DESCENDING );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+a.sortOn( [id], 0 );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+
+a.sortOn( [yr, id], [Array.NUMERIC, Array.DESCENDING] );
+check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
+
+trace("sortOn with properties that are objects implementing the toString() method");
+
+r = b.sortOn( "Name" );
+check_equals( tostr(r), "Name,Year,Year | Year,Name,Year");
+check_equals( tostr(b), "Name,Year,Year | Year,Name,Year");
+b.sortOn( "Year" );
+check_equals( tostr(b), "Year,Name,Year | Name,Year,Year");
+b.sortOn( ["Year", "Name"], [Array.NUMERIC | Array.DESCENDING, 0] );
+check_equals( tostr(b), "Name,Year,Year | Year,Name,Year");
+
+trace("sortOn invalid calls");
+r = a.sortOn();
+check( r == undefined );
+check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
+
+r = a.sortOn(undefined);
+check_equals( typeof(r) , 'object' );
+check( r instanceof Array );
+check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
+
+#if OUTPUT_VERSION < 7
+trace("sortOn property name case-mismatch");
+a.sortOn( "name" );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
+a.sortOn( ["year", "name"], Array.NUMERIC );
+check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
+#endif // OUTPUT_VERSION < 7
+
 #if OUTPUT_VERSION > 6
 trace("sortOn with some properties undefined");
 a.push({Name: "Harvard Mark I", Year: 1944, Mass: 4500});
@@ -803,60 +849,4 @@ r = a.sortOn( ["Electronic", "Mass", "Year", "Name"], [Array.RETURNINDEXEDARRAY,
 check_equals( r.toString(), "0,3,1,2,4");
 #endif // OUTPUT_VERSION > 6
 
-#if OUTPUT_VERSION < 7
-trace("sortOn property name case-mismatch");
-a.sortOn( "name" );
-check_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
-a.sortOn( ["year", "name"], Array.NUMERIC );
-check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
-#endif // OUTPUT_VERSION < 7
-
-trace("sortOn invalid calls");
-r = a.sortOn();
-check( r == undefined );
-#if OUTPUT_VERSION < 7
-check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
-#else // OUTPUT_VERSION >= 7
-check_equals( tostr(a), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true | Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined" );
-#endif // OUTPUT_VERSION >= 7
-
-r = a.sortOn(undefined);
-xcheck_equals( typeof(r) , 'object' );
-xcheck( r instanceof Array );
-#if OUTPUT_VERSION < 7
-xcheck_equals( tostr(r) , "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
-#else // OUTPUT_VERSION >= 7
-xcheck_equals( tostr(r) , "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true | Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined" );
-#endif // OUTPUT_VERSION >= 7
-
-trace("sortOn using an object implementing/over-riding the toString() method as the property argument");
-
-r = a.sortOn( id );
-#if OUTPUT_VERSION < 7
-check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
-#else // OUTPUT_VERSION >= 7
-check_equals( tostr(a), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true | Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined" );
-#endif // OUTPUT_VERSION >= 7
-
-a.sortOn( id, Array.CASEINSENSITIVE | Array.DESCENDING );
-#if OUTPUT_VERSION < 7
-check_equals( tostr(a), "Atanasoff-Berry,1941,true | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
-#else // OUTPUT_VERSION >= 7
-check_equals( tostr(a), "Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true | Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined");
-#endif // OUTPUT_VERSION >= 7
-
-
-r = a.sortOn( [id], 0 );
-#if OUTPUT_VERSION < 7
-xcheck_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Zuse Z3,1941,false" );
-#else // OUTPUT_VERSION >= 7
-xcheck_equals( tostr(a), "Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true | Harvard Mark I,1944,undefined | Zuse Z3,1941,false" );
-#endif // OUTPUT_VERSION >= 7
-
-r = a.sortOn( [yr, id], [Array.NUMERIC, Array.DESCENDING] );
-#if OUTPUT_VERSION < 7
-xcheck_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
-#else // OUTPUT_VERSION >= 7
-xcheck_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | Harvard Mark I,1944,undefined | ENIAC,1944,true" );
-#endif // OUTPUT_VERSION >= 7
 

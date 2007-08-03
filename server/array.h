@@ -181,9 +181,9 @@ public:
 	///	boolean functor or function comparing two as_value& objects
 	///
 	template <class AVCMP>
-	void sort(AVCMP* avc)
+	void sort(AVCMP avc)
 	{
-		std::sort(elements.begin(), elements.end(), *avc);
+		std::sort(elements.begin(), elements.end(), avc);
 	}
 
 	/// \brief
@@ -201,12 +201,12 @@ public:
 	///     used to determine equality
 	///
 	template <class AVCMP, class AVEQ>
-	as_value sort(AVCMP* avc, AVEQ* ave)
+	as_value sort(AVCMP avc, AVEQ ave)
 	{
 		std::deque<as_value> nelem = std::deque<as_value>(elements);
 
-		std::sort(nelem.begin(), nelem.end(), *avc);
-		if (adjacent_find(nelem.begin(), nelem.end(), *ave) != nelem.end() )
+		std::sort(nelem.begin(), nelem.end(), avc);
+		if (adjacent_find(nelem.begin(), nelem.end(), ave) != nelem.end() )
 			return as_value(0);
 
 		elements = nelem;
@@ -220,10 +220,10 @@ public:
 	///	boolean functor or function comparing two as_value& objects
 	///
 	template <class AVCMP>
-	as_array_object* sort_indexed(AVCMP* avc)
+	as_array_object* sort_indexed(AVCMP avc)
 	{
 		std::deque<indexed_as_value> ielem = get_indexed_elements();
-		std::sort(ielem.begin(), ielem.end(), *avc);
+		std::sort(ielem.begin(), ielem.end(), avc);
 		return get_indices(ielem);
 	}
 
@@ -241,13 +241,13 @@ public:
 	///     used to determine equality
 	///
 	template <class AVCMP, class AVEQ>
-	as_value sort_indexed(AVCMP* avc, AVEQ* ave)
+	as_value sort_indexed(AVCMP avc, AVEQ ave)
 	{
 		std::deque<indexed_as_value> ielem = get_indexed_elements();
 
-		std::sort(ielem.begin(), ielem.end(), *avc);
+		std::sort(ielem.begin(), ielem.end(), avc);
 
-		if (adjacent_find(ielem.begin(), ielem.end(), *ave) != ielem.end() )
+		if (adjacent_find(ielem.begin(), ielem.end(), ave) != ielem.end() )
 			return as_value(0);
 
 		return get_indices(ielem);
