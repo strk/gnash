@@ -1,3 +1,9 @@
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* plugin/Makefile.am: don't build libgnashplugin if NSAPI
+	  conditional is false.
+	* plugin/klash/Makefile.am: don't override the 'all' target.
+
 2007-08-02  Rob Savoye  <rob@deal.welcomehome.org>
 
 	* plugin/Makefile.am: Use BUILD_KDE_GUI instead of KLASH. Use

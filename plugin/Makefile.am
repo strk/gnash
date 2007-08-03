@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.61 2007/08/03 03:01:15 rsavoye Exp $
+# $Id: Makefile.am,v 1.62 2007/08/03 04:22:55 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -53,8 +53,6 @@ AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"$(GNASHEXE)\" \
 
 # AM_CXXFLAGS = $(AM_CPPFLAGS)
 
-plugin_LTLIBRARIES = libgnashplugin.la
-
 noinst_HEADERS = plugin.h \
 	 mozilla-sdk/pluginbase.h \
 	 mozilla-sdk/npplat.h \
@@ -80,6 +78,9 @@ noinst_HEADERS = plugin.h \
          mozilla-sdk/include/obsolete/protypes.h 
 
 if NSAPI
+
+plugin_LTLIBRARIES = libgnashplugin.la
+
 libgnashplugin_la_SOURCES  = plugin.cpp \
 	mozilla-sdk/npn_gate.cpp \
         mozilla-sdk/npp_gate.cpp \
