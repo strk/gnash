@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.68 2007/07/01 10:54:29 bjacques Exp $ */
+/* $Id: NetStream.cpp,v 1.69 2007/08/03 20:54:47 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -650,6 +650,8 @@ NetStream::markReachableResources() const
 	if ( _netCon ) _netCon->setReachable();
 
 	if ( m_statusHandler ) m_statusHandler->setReachable();
+
+	if ( m_env ) m_env->markReachableResources();
 
 	// Invoke generic as_object marker
 	markAsObjectReachable();

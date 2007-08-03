@@ -1,5 +1,12 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStream.{cpp,h}: mark associated as_environment
+	  as reachable (but I think there are ownership problem there,
+	  the as_environment might be deleted before the NetStream object
+	  is, in which case we'd access random memory).
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: make sure PKG_CONFIG is defined before calling 
 	  GNAH_PATH_XXX. Made the notice clearer about GNASH_PATH_XX
 	  need to be put after it.

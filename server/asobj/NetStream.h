@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.47 2007/07/01 10:54:29 bjacques Exp $ */
+/*  $Id: NetStream.h,v 1.48 2007/08/03 20:54:47 strk Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -121,7 +121,13 @@ protected:
 	///
 	void processStatusNotifications();
 
-	// The actionscript enviroment for the AS callbacks
+	/// The actionscript enviroment for the AS callbacks
+	//
+	/// TODO: research on safety of this: who's the owner of the as_environment ?
+	///       can we be sure that the environment won't be prematurely deleted ?
+	///       We'd need an as_environment::testInvariant() to call in our own
+	///       testInvariant() method (also TODO).
+	///
 	as_environment* m_env;
 
 	// The size of the buffer in milliseconds
@@ -172,6 +178,7 @@ protected:
 	/// Reachable resources are:
 	///	- associated NetConnection object (_netCon)
 	///	- onStatus event handler (m_statusHandler)
+	///	- The associated as_environment (m_env)
 	///
 	virtual void markReachableResources() const;
 
@@ -234,6 +241,7 @@ public:
 	/// Sets the AS Enviroment needed for eventhandlers
 	//
 	/// @param enviroment
+	///	TODO: document ownership !!
 	///
 	void setEnvironment(as_environment* env)
 	{
