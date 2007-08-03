@@ -30,6 +30,7 @@
 #include "VM.h"
 
 #include <string>
+#include <boost/algorithm/string/case_conv.hpp> // for using PROPNAME
 
 namespace gnash {
 
@@ -68,7 +69,7 @@ void
 Stage::onResize(as_environment* env)
 {
 	as_value v;
-	if ( get_member("scaleMode", &v) && v.to_string(env) == "noScale" )
+	if ( get_member(PROPNAME("scaleMode"), &v) && v.to_string(env) == "noScale" )
 	{
 		notifyResize(env);
 	}

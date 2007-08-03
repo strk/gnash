@@ -198,7 +198,7 @@ movie_root::getStageObject()
 	if ( ! VM::isInitialized() ) return NULL;
 	as_object* global = VM::get().getGlobal();
 	if ( ! global ) return NULL;
-	if ( ! global->get_member("Stage", &v) ) return NULL;
+	if ( ! global->get_member(PROPNAME("Stage"), &v) ) return NULL;
 	return boost::dynamic_pointer_cast<Stage>(v.to_object());
 }
 		

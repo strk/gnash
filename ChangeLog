@@ -1,5 +1,12 @@
 2007-08-03 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp (getStage): properly convert case when
+	  fetching the "Stage" object from SWF6 or lower.
+	* server/asobj/Stage.cpp (onResize): properly convert case
+	  when fetching the "scaleMode" property from SWF6 or lower.
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Stage.as: test deleting an object
 	  which is also a listener (Gnash segfaults).
 
