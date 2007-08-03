@@ -1,5 +1,11 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: move GTK detection code *after* the cross-compiling
+	  section, so that $incllist is properly set. Add notice about
+	  the fact that any GNASH_PATH_XX must be invoked after that one.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
 	* Makefile.am: only descend in doc/ subdir if DOCBOOK is enabled.
 
 2007-08-02 Sandro Santilli <strk@keybit.net>

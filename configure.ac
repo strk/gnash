@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.393 2007/08/03 18:48:38 strk Exp $
+dnl $Id: configure.ac,v 1.394 2007/08/03 19:42:02 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -540,23 +540,6 @@ AC_C_INLINE
 AC_SUBST([LIBTOOL_DEPS])
 AC_LIB_LTDL
 
-if test x$build_gtk = xyes; then
-   GNASH_PATH_GTK2
-   GNASH_PATH_PANGO
-   GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
-   if test x$build_ogl = xyes; then
-      GNASH_PATH_GLEXT
-   fi
-
-   dnl if gtk isn't installed, even if it's specified, don't try to build
-   dnl the GTK gui. 
-   if test x$has_gtk2 = xno; then
-      build_gtk=no
-      AC_MSG_WARN(["Disabling GTK GUI, no GTK development tools found"])
-   fi
-fi
-
-
 
 AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
@@ -614,6 +597,18 @@ dnl are exported, so all the other configure tests in macros/*.m4 use
 dnl these same settings rather than duplicating them like we used to.
 dnl To override thise, use the --with-*-incl= and --with-*-libs=
 dnl options to configure.
+dnl
+dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+dnl !! 
+dnl !! IMPORTANT NOTICE 
+dnl !!
+dnl !!  Any call to GNASH_PATH_XXX must be be given *after*
+dnl !!  this snippet, or incllist would not be set resulting
+dnl !!  in header detection to malfunction
+dnl !! 
+dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+dnl
+dnl
 if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([Configuring Gnash for cross compilation])
   export pkgroot="`$CXX -print-search-dirs | grep "install:" | sed -e 's/install: //' -e 's:/lib/gcc/.*::'`"
@@ -628,7 +623,33 @@ else
   export pathlist=$PATH
 fi
 
+dnl -----------------------------------------------------------
+dnl   Verify dependencies for requested GUIs are met, and
+dnl   disable build of the GUIS for which deps are NOT met
+dnl ------------------------------------------------------------
+
+if test x$build_gtk = xyes; then
+   GNASH_PATH_GTK2
+   GNASH_PATH_PANGO
+   GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
+   if test x$build_ogl = xyes; then
+      GNASH_PATH_GLEXT
+   fi
+
+   dnl if gtk isn't installed, even if it's specified, don't try to build
+   dnl the GTK gui. 
+   if test x$has_gtk2 = xno; then
+      build_gtk=no
+      AC_MSG_WARN(["Disabling GTK GUI, no GTK development tools found"])
+   fi
+fi
+
+dnl TODO: add checks for all other GUIs
+
+
+dnl -----------------------------------------------------------
 dnl Try to ignore stupid dependencies
+dnl -----------------------------------------------------------
 
 AC_MSG_CHECKING(linker --as-needed support)
 gcc_cv_ld_as_needed=no
