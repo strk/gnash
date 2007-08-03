@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.390 2007/08/03 17:23:23 rsavoye Exp $
+dnl $Id: configure.ac,v 1.391 2007/08/03 18:17:22 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -961,7 +961,7 @@ dnl  build_gtk=no
   AC_MSG_WARN(["Disabling NSAPI plugin, no GTK development tools found"])
 fi
 
-if test x$build_gtk = xno -o x$nsapi = xyes; then
+if test x$build_gtk = xno -a x$nsapi = xyes; then
   AC_MSG_WARN(["Enabled NSAPI plugin, but you aren't building a GTK based GUI!"])
 fi
 
@@ -973,7 +973,7 @@ dnl  build_kde=no
   AC_MSG_WARN(["Disabling KPARTS plugin, no KDE development found"])
 fi
 
-if test x$build_kde = xno -o x$kparts = xyes; then
+if test x$build_kde = xno -a x$kparts = xyes; then
   AC_MSG_WARN(["Enabled KPARTS plugin, but you aren't building a KDE based GUI!"])
 fi
 
