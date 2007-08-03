@@ -1,5 +1,11 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: make sure PKG_CONFIG is defined before calling 
+	  GNAH_PATH_XXX. Made the notice clearer about GNASH_PATH_XX
+	  need to be put after it.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: move GTK detection code *after* the cross-compiling
 	  section, so that $incllist is properly set. Add notice about
 	  the fact that any GNASH_PATH_XX must be invoked after that one.

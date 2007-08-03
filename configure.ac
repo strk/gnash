@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.395 2007/08/03 19:45:26 strk Exp $
+dnl $Id: configure.ac,v 1.396 2007/08/03 20:25:30 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -598,16 +598,6 @@ dnl these same settings rather than duplicating them like we used to.
 dnl To override thise, use the --with-*-incl= and --with-*-libs=
 dnl options to configure.
 dnl
-dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-dnl !! 
-dnl !! IMPORTANT NOTICE 
-dnl !!
-dnl !!  Any call to GNASH_PATH_XXX must be be given *after*
-dnl !!  this snippet, or incllist would not be set resulting
-dnl !!  in header detection to malfunction
-dnl !! 
-dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-dnl
 dnl
 if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([Configuring Gnash for cross compilation])
@@ -622,6 +612,19 @@ else
   export libslist="`eval cat ${srcdir}/macros/libslist`"
   export pathlist=$PATH
 fi
+
+dnl Check for PKG_CONFIG before any GNASH_PATH call
+PKG_PROG_PKG_CONFIG
+
+dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+dnl !! 
+dnl !! IMPORTANT NOTICE 
+dnl !!
+dnl !!  Any call to GNASH_PATH_XXX must be be given *after* this snippet.
+dnl !!  This is to ensure that PKG_CONFIG, cross_compiling and incllist are
+dnl !!  properly set at the time of call.
+dnl !! 
+dnl !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 dnl -----------------------------------------------------------
 dnl   Verify dependencies for requested GUIs are met, and
@@ -666,7 +669,6 @@ dnl GNASH_PKG_FIND(dmalloc, [dmalloc.h], [dmalloc], mallinfo)
 AM_CONDITIONAL(HAVE_DMALLOC, [ test x$has_dmalloc = xyes ])
 
 AC_CHECK_FUNCS(mallinfo)
-PKG_PROG_PKG_CONFIG
 AC_PATH_TOOL([AUTOTRACE], [autotrace])
 AC_HEADER_DIRENT
 
