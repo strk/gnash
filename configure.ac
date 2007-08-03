@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.392 2007/08/03 18:31:59 strk Exp $
+dnl $Id: configure.ac,v 1.393 2007/08/03 18:48:38 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -540,6 +540,24 @@ AC_C_INLINE
 AC_SUBST([LIBTOOL_DEPS])
 AC_LIB_LTDL
 
+if test x$build_gtk = xyes; then
+   GNASH_PATH_GTK2
+   GNASH_PATH_PANGO
+   GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
+   if test x$build_ogl = xyes; then
+      GNASH_PATH_GLEXT
+   fi
+
+   dnl if gtk isn't installed, even if it's specified, don't try to build
+   dnl the GTK gui. 
+   if test x$has_gtk2 = xno; then
+      build_gtk=no
+      AC_MSG_WARN(["Disabling GTK GUI, no GTK development tools found"])
+   fi
+fi
+
+
+
 AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
 dnl -- AM_CONDITIONAL(STATIC_GUI, test x"${dynamic_gui}" = xno -o x"${enable_shared}" = xno)
@@ -943,23 +961,6 @@ if test x$build_gtk = xyes -o x${media_handler} = "xgst"; then
 fi
 
 AM_CONDITIONAL(HAVE_GLIB, [ test x$has_glib = xyes ])
-
-if test x$build_ogl = xyes -a x$build_gtk = xyes; then
-   GNASH_PATH_GLEXT
-fi
-if test x$build_gtk = xyes -o x$nsapi = xyes; then
-   GNASH_PATH_GTK2
-   GNASH_PATH_PANGO
-   GNASH_PKG_FIND(atk, [atk/atk.h], [atk library], atk_focus_tracker_init, [1.0])
-fi
-
-dnl if gtk isn't installed, even if it's specified, don't try to build
-dnl the NSAPI plugin, which is GTK based.
-if test x$has_gtk2 = xno; then
-  nsapi=no
-dnl  build_gtk=no
-  AC_MSG_WARN(["Disabling NSAPI plugin, no GTK development tools found"])
-fi
 
 if test x$build_gtk = xno -a x$nsapi = xyes; then
   AC_MSG_WARN(["Enabled NSAPI plugin, but you aren't building a GTK based GUI!"])

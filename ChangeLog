@@ -1,5 +1,12 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: check GTK dependencies only if $build_gtk=yes.
+	  print a WARNING and set $build_gtk=no if deps are not met.
+	  All of this is done *before* NSAPI is checked, so it would
+	  correctly be built or not depending on $build_gtk only.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: fix automatic kparts/nsapi plugin build
 	  based on gui availability.
 
