@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.394 2007/08/03 19:42:02 strk Exp $
+dnl $Id: configure.ac,v 1.395 2007/08/03 19:45:26 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -670,7 +670,17 @@ PKG_PROG_PKG_CONFIG
 AC_PATH_TOOL([AUTOTRACE], [autotrace])
 AC_HEADER_DIRENT
 
-dnl Add KFLASH support, if specified.
+dnl -----------------------------------------------------------------
+dnl PLUGIN RELATED STUFF
+dnl -----------------------------------------------------------------
+
+dnl !! This has been moved here to make --enable-nsapi work
+dnl !! All of plugin-related macro calls could be moved into
+dnl !! a specialized macros/plugin.m4
+
+dnl ----------------------------------------------------
+dnl Add KPARTS support, if specified or KDE gui is built
+dnl ----------------------------------------------------
 
 AC_ARG_ENABLE(kparts,
   AC_HELP_STRING([--disable-kparts], [Disble support for Konqueror plugin (default: enabled if kde gui is)]),
@@ -680,11 +690,10 @@ AC_ARG_ENABLE(kparts,
   *)   AC_MSG_ERROR([bad value ${enableval} for --disable-kpart option]) ;;
 esac],kparts=$build_kde)
 
-dnl
-dnl !! This has been moved here to make --enable-nsapi work
-dnl !! All of plugin-related macro calls could be moved into
-dnl !! a specialized macros/plugin.m4
-dnl
+dnl ----------------------------------------------------
+dnl Add NSAPI support, if specified or GTK gui is built
+dnl ----------------------------------------------------
+
 AC_ARG_ENABLE(nsapi,
   AC_HELP_STRING([--disable-nsapi], [Disable NSAPI plugin build (default: enabled if gtk gui is)]),
   [case "${enableval}" in
@@ -695,7 +704,10 @@ AC_ARG_ENABLE(nsapi,
   nsapi=$build_gtk
 )
 
-dnl dnl  Enable us to disable building all browser plugins in one command.
+dnl -----------------------------------------------------------------
+dnl Enable us to disable building all browser plugins in one command.
+dnl -----------------------------------------------------------------
+
 dnl AC_ARG_ENABLE(plugins,
 dnl   AC_HELP_STRING([--disable-plugins], [Disable all browser plugins from building (default=no)]),
 dnl   [case "${enableval}" in
@@ -722,6 +734,10 @@ dnl   fi
 dnl fi
 
 GNASH_PATH_FIREFOX
+
+dnl -----------------------------------------------------------------
+dnl END OF PLUGIN RELATED STUFF
+dnl -----------------------------------------------------------------
 
 dnl IRIX-hack.
 case $host in
