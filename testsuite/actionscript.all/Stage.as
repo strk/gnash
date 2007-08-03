@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Stage.as,v 1.12 2007/07/26 03:41:19 strk Exp $";
+rcsid="$Id: Stage.as,v 1.13 2007/08/03 21:26:12 strk Exp $";
 
 #include "check.as"
 
@@ -53,6 +53,13 @@ Stage.addListener(listener);
 Stage.scaleMode = 5;
 check_equals(Stage.scaleMode, "showAll");
 Stage.scaleMode = "noScale";
+
+o = new Object();
+o.onResize = function() {
+	_root.note("Resize event received by deleted object");
+};
+Stage.addListener(o);
+delete o;
 
 #else // OUTPUT_VERSION <= 5
 
