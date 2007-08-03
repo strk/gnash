@@ -1,7 +1,8 @@
 2007-08-02 Sandro Santilli <strk@keybit.net>
 
 	* plugin/Makefile.am: don't build libgnashplugin if NSAPI
-	  conditional is false.
+	  conditional is false; always descend to klash/ subdir
+	  and let the inner Makefile.am handle conditionals for KPARTS.
 	* plugin/klash/Makefile.am: don't override the 'all' target.
 
 2007-08-02  Rob Savoye  <rob@deal.welcomehome.org>

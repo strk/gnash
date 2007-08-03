@@ -15,14 +15,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.62 2007/08/03 04:22:55 strk Exp $
+# $Id: Makefile.am,v 1.63 2007/08/03 04:27:39 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
-if BUILD_KDE_GUI
-KLASH = klash
-endif
-SUBDIRS = $(KLASH)
+SUBDIRS = klash
 
 # if DMALLOC
 # MALL_CFLAGS = $(DMALLOC_CFLAGS)
