@@ -58,12 +58,14 @@ inline static bool int_gt (int a)
 }
 
 // simple as_value strict-weak-ordering comparison functors:
+
+// string comparison, ascending (default sort method)
 struct as_value_lt
 {
-	as_environment* _env;
+	as_environment& _env;
 	int _sv;
 
-	as_value_lt(as_environment* env)
+	as_value_lt(as_environment& env)
 		: _env(env)
 	{
 		_sv = VM::get().getSWFVersion();
@@ -71,16 +73,16 @@ struct as_value_lt
 
 	inline int str_cmp(const as_value& a, const as_value& b)
 	{
-		std::string s = a.to_string_versioned(_sv, _env);
-		return s.compare(b.to_string_versioned(_sv, _env));
+		std::string s = a.to_string_versioned(_sv, &_env);
+		return s.compare(b.to_string_versioned(_sv,& _env));
 	}
 
 	inline int str_nocase_cmp(const as_value& a, const as_value& b)
 	{
 		using namespace boost::algorithm;
 
-		std::string c = to_upper_copy(a.to_string_versioned(_sv, _env));
-		std::string d = to_upper_copy(b.to_string_versioned(_sv, _env));
+		std::string c = to_upper_copy(a.to_string_versioned(_sv, &_env));
+		std::string d = to_upper_copy(b.to_string_versioned(_sv, &_env));
 		return c.compare(d);
 	}
 
@@ -90,8 +92,8 @@ struct as_value_lt
 		if (b.is_undefined()) return true;
 		if (a.is_null()) return false;
 		if (b.is_null()) return true;
-		double aval = a.to_number(_env);
-		double bval = b.to_number(_env);
+		double aval = a.to_number(&_env);
+		double bval = b.to_number(&_env);
 		if (isnan(aval)) return false;
 		if (isnan(bval)) return true;
 		return aval < bval;
@@ -103,8 +105,8 @@ struct as_value_lt
 		if (a.is_undefined()) return true;
 		if (b.is_null()) return false;
 		if (a.is_null()) return true;
-		double aval = a.to_number(_env);
-		double bval = b.to_number(_env);
+		double aval = a.to_number(&_env);
+		double bval = b.to_number(&_env);
 		if (isnan(bval)) return false;
 		if (isnan(aval)) return true;
 		return aval > bval;
@@ -114,8 +116,8 @@ struct as_value_lt
 	{
 		if (a.is_undefined() && b.is_undefined()) return true;
 		if (a.is_null() && b.is_null()) return true;
-		double aval = a.to_number(_env);
-		double bval = b.to_number(_env);
+		double aval = a.to_number(&_env);
+		double bval = b.to_number(&_env);
 		if (isnan(aval) && isnan(bval)) return true;
 		return aval == bval;
 	}
@@ -126,54 +128,60 @@ struct as_value_lt
 	}
 };
 
-struct as_value_gt : public as_value_lt
+// string comparison, descending
+struct as_value_gt : public as_value_lt 
 {
-	as_value_gt(as_environment* env) : as_value_lt(env) {}
+	as_value_gt(as_environment& env) : as_value_lt(env) {}
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		return str_cmp(a, b) > 0;
 	}
 };
 
+// string equality
 struct as_value_eq : public as_value_lt
 {
-	as_value_eq(as_environment* env) : as_value_lt(env) {}
+	as_value_eq(as_environment& env) : as_value_lt(env) {}
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		return str_cmp(a, b) == 0;
 	}
 };
 
+// case-insensitive string comparison, ascending
 struct as_value_nocase_lt : public as_value_lt
 {
-	as_value_nocase_lt(as_environment* env) : as_value_lt(env) {}
+	as_value_nocase_lt(as_environment& env) : as_value_lt(env) {}
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		return str_nocase_cmp(a, b) < 0;
 	}
 };
 
+// case-insensitive string comparison, descending
 struct as_value_nocase_gt : public as_value_lt
 {
-	as_value_nocase_gt(as_environment* env) : as_value_lt(env) {}
+	as_value_nocase_gt(as_environment& env) : as_value_lt(env) {}
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		return str_nocase_cmp(a, b) > 0;
 	}
 };
 
+// case-insensitive string equality
 struct as_value_nocase_eq : public as_value_lt
 {
-	as_value_nocase_eq(as_environment* env) : as_value_lt(env) {}
+	as_value_nocase_eq(as_environment& env) : as_value_lt(env) {}
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		return str_nocase_cmp(a, b) == 0;
 	}
 };
 
+// numeric comparison, ascending
 struct as_value_num_lt : public as_value_lt
 {
-	as_value_num_lt(as_environment* env) : as_value_lt(env) {}
+	as_value_num_lt(as_environment& env) : as_value_lt(env) {}
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		if (a.is_string() || b.is_string())
@@ -182,9 +190,10 @@ struct as_value_num_lt : public as_value_lt
 	}
 };
 
+// numeric comparison, descending
 struct as_value_num_gt : public as_value_lt
 {
-	as_value_num_gt(as_environment* env) : as_value_lt(env) {}
+	as_value_num_gt(as_environment& env) : as_value_lt(env) {}
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		if (a.is_string() || b.is_string())
@@ -193,9 +202,10 @@ struct as_value_num_gt : public as_value_lt
 	}
 };
 
+// numeric equality
 struct as_value_num_eq : public as_value_lt
 {
-	as_value_num_eq(as_environment* env) : as_value_lt(env) {}
+	as_value_num_eq(as_environment& env) : as_value_lt(env) {}
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		if (a.is_string() || b.is_string())
@@ -204,9 +214,10 @@ struct as_value_num_eq : public as_value_lt
 	}
 };
 
+// case-insensitive numeric comparison, ascending
 struct as_value_num_nocase_lt : public as_value_lt
 {
-	as_value_num_nocase_lt(as_environment* env) : as_value_lt(env) {}
+	as_value_num_nocase_lt(as_environment& env) : as_value_lt(env) {}
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		if (a.is_string() || b.is_string())
@@ -215,9 +226,10 @@ struct as_value_num_nocase_lt : public as_value_lt
 	}
 };
 
+// case-insensitive numeric comparison, descending
 struct as_value_num_nocase_gt : public as_value_lt
 {
-	as_value_num_nocase_gt(as_environment* env) : as_value_lt(env) {}
+	as_value_num_nocase_gt(as_environment& env) : as_value_lt(env) {}
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		if (a.is_string() || b.is_string())
@@ -226,9 +238,10 @@ struct as_value_num_nocase_gt : public as_value_lt
 	}
 };
 
+// case-insensitive numeric equality
 struct as_value_num_nocase_eq : public as_value_lt
 {
-	as_value_num_nocase_eq(as_environment* env) : as_value_lt(env) {}
+	as_value_num_nocase_eq(as_environment& env) : as_value_lt(env) {}
 	bool operator() (const as_value& a, const as_value& b)
 	{
 		if (a.is_string() || b.is_string())
@@ -241,7 +254,7 @@ struct as_value_num_nocase_eq : public as_value_lt
 // Note:
 // fUniqueSort and fReturnIndexedArray must first be stripped from the flag
 as_cmp_fn
-get_basic_cmp(uint8_t flags, as_environment* env)
+get_basic_cmp(uint8_t flags, as_environment& env)
 {
 	as_cmp_fn f;
 
@@ -290,11 +303,11 @@ get_basic_cmp(uint8_t flags, as_environment* env)
 	}
 }
 
-// Return basic as_value equality function for corresponding sort flag
+// Return basic as_value equality functor for corresponding sort flag
 // Note:
 // fUniqueSort and fReturnIndexedArray must first be stripped from the flag
 as_cmp_fn
-get_basic_eq(uint8_t flags, as_environment* env)
+get_basic_eq(uint8_t flags, as_environment& env)
 {
 	as_cmp_fn f;
 	flags &= ~(as_array_object::fDescending);
@@ -316,6 +329,7 @@ get_basic_eq(uint8_t flags, as_environment* env)
 		case as_array_object::fCaseInsensitive | 
 				as_array_object::fNumeric:
 			f = as_value_num_nocase_eq(env);
+			return f;
 
 		default:
 			f = as_value_eq(env);
@@ -877,7 +891,7 @@ array_sort(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_array_object> array = 
 		ensureType<as_array_object>(fn.this_ptr);
-	as_environment* env = &(fn.env());
+	as_environment& env = fn.env();
 	uint8_t flags = 0;
 
 	if ( fn.nargs == 0 )
@@ -939,7 +953,7 @@ array_sortOn(const fn_call& fn)
 {
 	boost::intrusive_ptr<as_array_object> array = 
 		ensureType<as_array_object>(fn.this_ptr);
-	as_environment* env = &(fn.env());
+	as_environment& env = fn.env();
 	bool do_unique = false, do_index = false;
 	uint8_t flags = 0;
 	int sv = VM::get().getSWFVersion();
@@ -948,7 +962,7 @@ array_sortOn(const fn_call& fn)
 	if ( fn.nargs > 0 && fn.arg(0).is_string() )
 	{
 		std::string propField = 
-			PROPNAME(fn.arg(0).to_string_versioned(sv, env));
+			PROPNAME(fn.arg(0).to_string_versioned(sv, &env));
 
 		if ( fn.nargs > 1 && fn.arg(1).is_number() )
 		{
@@ -985,7 +999,7 @@ array_sortOn(const fn_call& fn)
 			it != props->end(); ++it)
 		{
 			std::string s = 
-				PROPNAME((*it).to_string_versioned(sv, env));
+				PROPNAME((*it).to_string_versioned(sv, &env));
 			prp.push_back(s);
 		}
 		

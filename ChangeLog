@@ -1,3 +1,15 @@
+2007-08-04 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	* server/array.cpp:
+	  Pointers to the as_environment object in the as_value comparison
+	  functors are now references.
+	  Fix a bug caused by a missing return statement in the get_basic_eq
+	  function.
+	* testsuite/actionscript.all/array.as:
+	  UNIQUE -> UNIQUESORT flag.
+	  add some tests to see how AS objects implementing the valueOf method
+	  interact with array class methods.
+
 2007-08-04 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/xmlnode.{cpp,h}: mark reachable resources

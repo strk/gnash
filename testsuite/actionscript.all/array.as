@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.28 2007/08/03 21:10:19 strk Exp $";
+rcsid="$Id: array.as,v 1.29 2007/08/04 04:23:32 strk Exp $";
 
 #include "check.as"
 
@@ -42,6 +42,19 @@ check(!Array.prototype.hasOwnProperty('length'));
 check(!Array.prototype.hasOwnProperty('valueOf'));
 #endif // OUTPUT_VERSION >= 6
 
+neg = new Object();
+neg.valueOf = function () { return -1; };
+zero = new Object();
+zero.valueOf = function () { return 0; };
+pos = new Object();
+pos.valueOf = function () { return 1; };
+two = new Object();
+two.valueOf = function () { return 2; };
+numeric = new Object();
+numeric.valueOf = function () { return Array.NUMERIC; };
+numericRev = new Object();
+numericRev.valueOf = function () { return (Array.NUMERIC | Array.DESCENDING); };
+
 var a;
 var popped;
 a=[551,"asdf",12];
@@ -75,6 +88,9 @@ check_equals ( tmp.toString(), "undefined,undefined" );
 #else
 check_equals ( tmp.toString(), "," );
 #endif
+
+tmp = new Array(two);
+check_equals ( tmp.length, 2 );
 
 check_equals ( a.length, 3 );
 check_equals ( a[2], 12 );
@@ -227,6 +243,10 @@ portion = concatted.slice(-18, 3);
 check_equals ( portion.toString(), "0,1,2");
 portion = concatted.slice(18);
 check_equals ( portion.toString(), "");
+
+// using objects that implement valueOf as index positions
+portion = concatted.slice(zero, two);
+check_equals ( portion.toString(), "0,1");
 
 //-------------------------------
 // Test splice
@@ -383,6 +403,13 @@ function cmp_fn(x,y)
 	return 0;
 }
 
+function cmp_fn_obj(x,y)
+{
+	if (x.length < y.length) { return neg; }
+	if (x.length > y.length) { return pos; }
+	return zero;
+}
+
 function tolen(x)
 {
 	var i;
@@ -436,6 +463,13 @@ b.sort( Array.DESCENDING );
 check_equals( b.toString(), "8,5,3,1,0,-9,-7,-2" );
 r = b.sort( Array.DESCENDING | Array.NUMERIC );
 check_equals( r.toString(), "8,5,3,1,0,-2,-7,-9" );
+check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
+r = b.sort( zero );
+check_equals( r.toString(), "-2,-7,-9,0,1,3,5,8" );
+check_equals( b.toString(), "-2,-7,-9,0,1,3,5,8" );
+b.sort( numeric );
+check_equals( b.toString(), "-9,-7,-2,0,1,3,5,8" );
+b.sort( numericRev );
 check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
 
 r = c.sort();
@@ -529,6 +563,19 @@ check_equals( r.toString(), "" );
 check_equals( d.toString(), "" );
 r = e.sort( cmp_fn, Array.UNIQUESORT | Array.CASEINSENSITIVE );
 check_equals( r.toString(), "singleton" );
+check_equals( e.toString(), "singleton" );
+
+trace(" -- Custom AS function tests using an AS comparator that returns objects -- ");
+r = a.sort( cmp_fn_obj, Array.DESCENDING );
+check_equals( tolen(r), "[5, 5, 4, 2, 2, 0]" );
+check_equals( tolen(a), "[5, 5, 4, 2, 2, 0]" );
+a.sort( cmp_fn_obj, Array.CASEINSENSITIVE | Array.NUMERIC );
+check_equals( tolen(a), "[0, 2, 2, 4, 5, 5]" );
+r = a.sort( cmp_fn_obj, Array.RETURNINDEXEDARRAY );
+check_equals( r.toString(), "0,1,2,3,4,5" );
+r = a.sort( cmp_fn_obj, Array.RETURNINDEXEDARRAY | Array.DESCENDING );
+check_equals( r.toString(), "5,4,3,2,1,0" );
+e.sort( cmp_fn_obj, Array.UNIQUESORT | Array.CASEINSENSITIVE );
 check_equals( e.toString(), "singleton" );
 
 a.push("ED");
@@ -811,6 +858,10 @@ check_equals( typeof(r) , 'object' );
 check( r instanceof Array );
 check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
 
+trace("sortOn with flag as an object overriding the valueOf method");
+a.sortOn( ["Year", "Electronic", "Name"], numeric );
+check_equals( tostr(a), "ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true | Zuse Z3,1941,false" );
+
 #if OUTPUT_VERSION < 7
 trace("sortOn property name case-mismatch");
 a.sortOn( "name" );
@@ -839,7 +890,7 @@ check_equals( tostr(a), "Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefin
 a.sortOn( ["Mass", "Year", "Name"], [Array.NUMERIC | Array.DESCENDING, Array.NUMERIC | Array.DESCENDING | 0] );
 check_equals( tostr(a), "Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined | Zuse Z3,1941,false | Colossus,1943,true | ENIAC,1944,true" );
 
-a.sortOn( ["Mass", "Name"], [Array.UNIQUE, Array.DESCENDING] );
+a.sortOn( ["Mass", "Name"], [Array.UNIQUESORT, Array.DESCENDING] );
 check_equals( tostr(a), "Atanasoff-Berry,1941,true | Harvard Mark I,1944,undefined | Zuse Z3,1941,false | ENIAC,1944,true | Colossus,1943,true" );
 
 a.sortOn( ["Electronic", "Mass", "Name"], [0, Array.NUMERIC | Array.DESCENDING, 0] );
