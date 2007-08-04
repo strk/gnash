@@ -1,3 +1,8 @@
+2007-08-04 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/xmlnode.{cpp,h}: mark reachable resources
+	  (childs and parent).
+
 2007-08-03 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/Stage.cpp (notifyResize): use PROPNAME()

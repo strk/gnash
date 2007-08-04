@@ -237,6 +237,19 @@ public:
     ChildList       _children;
     AttribList      _attributes;
 
+protected:
+
+#ifdef GNASH_USE_GC
+	/// Mark XMLNode-specific reachable resources and invoke
+	/// the parent's class version (markAsObjectReachable)
+	//
+	/// XMLNode-specific reachable resources are:
+	/// 	- The child elements (_children)
+	/// 	- The parent elements (_parent)
+	///
+	virtual void markReachableResources() const;
+#endif // GNASH_USE_GC
+
 private:
 
     // TODO: make a lot more things private !

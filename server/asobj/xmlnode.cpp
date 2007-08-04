@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.37 2007/07/01 10:54:32 bjacques Exp $ */
+/* $Id: xmlnode.cpp,v 1.38 2007/08/04 04:19:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -762,6 +762,23 @@ void xmlnode_class_init(as_object& global)
     global.init_member("XMLNode", cl.get());
 
 }
+
+#ifdef GNASH_USE_GC
+void
+XMLNode::markReachableResources() const
+{
+	// Mark childs
+	for (ChildList::const_iterator i=_children.begin(), e=_children.end(); i!=e; ++i)
+	{
+		(*i)->setReachable();
+	}
+
+	// Mark parent
+	if ( _parent ) _parent->setReachable();
+
+	markAsObjectReachable();
+}
+#endif // GNASH_USE_GC
 
 } // end of gnash namespace
 
