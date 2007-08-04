@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.29 2007/08/04 04:23:32 strk Exp $";
+rcsid="$Id: array.as,v 1.30 2007/08/04 21:34:14 strk Exp $";
 
 #include "check.as"
 
@@ -90,7 +90,7 @@ check_equals ( tmp.toString(), "," );
 #endif
 
 tmp = new Array(two);
-check_equals ( tmp.length, 2 );
+check_equals ( tmp.length, 1 );
 
 check_equals ( a.length, 3 );
 check_equals ( a[2], 12 );
@@ -246,7 +246,7 @@ check_equals ( portion.toString(), "");
 
 // using objects that implement valueOf as index positions
 portion = concatted.slice(zero, two);
-check_equals ( portion.toString(), "0,1");
+xcheck_equals ( portion.toString(), "0,1");
 
 //-------------------------------
 // Test splice
@@ -465,10 +465,10 @@ r = b.sort( Array.DESCENDING | Array.NUMERIC );
 check_equals( r.toString(), "8,5,3,1,0,-2,-7,-9" );
 check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
 r = b.sort( zero );
-check_equals( r.toString(), "-2,-7,-9,0,1,3,5,8" );
-check_equals( b.toString(), "-2,-7,-9,0,1,3,5,8" );
+xcheck_equals( r.toString(), "8,5,3,1,0,-2,-7,-9" );
+check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
 b.sort( numeric );
-check_equals( b.toString(), "-9,-7,-2,0,1,3,5,8" );
+check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
 b.sort( numericRev );
 check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
 
@@ -570,7 +570,7 @@ r = a.sort( cmp_fn_obj, Array.DESCENDING );
 check_equals( tolen(r), "[5, 5, 4, 2, 2, 0]" );
 check_equals( tolen(a), "[5, 5, 4, 2, 2, 0]" );
 a.sort( cmp_fn_obj, Array.CASEINSENSITIVE | Array.NUMERIC );
-check_equals( tolen(a), "[0, 2, 2, 4, 5, 5]" );
+xcheck_equals( tolen(a), "[0, 2, 2, 4, 5, 5]" );
 r = a.sort( cmp_fn_obj, Array.RETURNINDEXEDARRAY );
 check_equals( r.toString(), "0,1,2,3,4,5" );
 r = a.sort( cmp_fn_obj, Array.RETURNINDEXEDARRAY | Array.DESCENDING );
@@ -860,7 +860,7 @@ check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Coloss
 
 trace("sortOn with flag as an object overriding the valueOf method");
 a.sortOn( ["Year", "Electronic", "Name"], numeric );
-check_equals( tostr(a), "ENIAC,1944,true | Colossus,1943,true | Atanasoff-Berry,1941,true | Zuse Z3,1941,false" );
+check_equals( tostr(a), "Zuse Z3,1941,false | Atanasoff-Berry,1941,true | Colossus,1943,true | ENIAC,1944,true" );
 
 #if OUTPUT_VERSION < 7
 trace("sortOn property name case-mismatch");
