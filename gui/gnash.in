@@ -1,3 +1,6 @@
+#!/bin/sh
+
+#
 # gnash:  Wrapper script for running the different GUI versions of gnash 
 # 
 #   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
