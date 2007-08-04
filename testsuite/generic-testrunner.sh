@@ -38,7 +38,7 @@ echo "#!/bin/sh"
 echo
 
 echo "# Environment"
-env | grep GNASH | while read; do
+env | grep GNASH | while read REPLY; do
 	echo "export ${REPLY}"
 done
 
