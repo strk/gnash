@@ -180,7 +180,7 @@ y = mc1.valueOf();
 #if OUTPUT_VERSION > 5
   check(typeof(x) == 'string'); 
   check(typeof(y) == 'movieclip');  
-  check(x == '[object Object]'); 
+  xcheck(x == '[object Object]'); 
   check(y == _level0.mc1); 
 #else
   check(typeof(x) == 'undefined'); 
@@ -226,11 +226,11 @@ _root.createEmptyMovieClip("mc2", 2);
   check(!TextField.prototype.hasOwnProperty('toString'));
   check(!TextField.prototype.hasOwnProperty('valueOf'));
   check(typeof(TextField.prototype.toString) == 'function' );
-	check(typeof(TextField.prototype.valueOf) == 'function' );
+  check(typeof(TextField.prototype.valueOf) == 'function' );
 #else
-	// TextField in swf5 does not have toString and valueOf methods(to be checked).
-	xcheck(typeof(TextField.prototype.toString) == 'undefined' );
-	xcheck(typeof(TextField.prototype.valueOf) == 'undefined' );
+  // TextField in swf5 does not have toString and valueOf methods(to be checked).
+  xcheck(typeof(TextField.prototype.toString) == 'undefined' );
+  xcheck(typeof(TextField.prototype.valueOf) == 'undefined' );
 #endif
 
 // For TextFields, this true from swf5~swf8!
@@ -337,8 +337,8 @@ check(y == 0);
 d2 = new Date(1);
 d3 = d1 + d2;
 #if OUTPUT_VERSION > 5 
-  check(typeof(d3) == 'string');
-  check(d3 == "Thu Jan 1 08:00:00 GMT+0800 1970Thu Jan 1 08:00:00 GMT+0800 1970");
+  xcheck(typeof(d3) == 'string');
+  xcheck(d3 == "Thu Jan 1 08:00:00 GMT+0800 1970Thu Jan 1 08:00:00 GMT+0800 1970");
 #else
   check(typeof(d3) == 'number');
   check(d3 == 1);
@@ -349,8 +349,8 @@ d3 = d1 + d2;
 //
 
 #if OUTPUT_VERSION > 5 
-	check(Array.prototype.hasOwnProperty('toString'));
-	check(!Array.prototype.hasOwnProperty('valueOf'));
+  check(Array.prototype.hasOwnProperty('toString'));
+  check(!Array.prototype.hasOwnProperty('valueOf'));
   check(Array.prototype.toString != Object.prototype.toString);
 #else
   xcheck(Array.prototype.toString == Object.prototype.toString);
