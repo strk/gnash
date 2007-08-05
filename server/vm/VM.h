@@ -127,12 +127,14 @@ class DSOEXPORT VM {
 	/// 
 	void setGlobal(as_object*);
 
+#ifdef GNASH_USE_GC
 	/// A vector of static GcResources (tipically used for built-in class constructors)
 	//
 	/// The resources in this list will always be marked as reachable
 	///
 	typedef std::vector< boost::intrusive_ptr<GcResource> > ResVect;
 	ResVect _statics;
+#endif
 
 public:
 
@@ -202,10 +204,16 @@ public:
 	///
 	void markReachableResources() const;
 
+#ifdef GNASH_USE_GC
 	void addStatic(GcResource* res)
 	{
 		_statics.push_back(res);
 	}
+#else  // ndef GNASH_USE_GC
+	// placeholder to avoid adding lots of
+	// compile-time switches in callers
+	void addStatic(as_object*) {}
+#endif
 
 };
 
