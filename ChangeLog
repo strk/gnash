@@ -1,3 +1,8 @@
+2007-08-05 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/actionscript.all/toString_valueOf.as, Makefile.am: focused tests, 
+	  hopefully helps the model("String" object is not bogus, and "trace" is also sane).
+	
 2007-08-04 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/array.as: fixed testcase.
