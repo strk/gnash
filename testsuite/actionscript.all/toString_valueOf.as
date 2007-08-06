@@ -326,13 +326,13 @@ xcheck(b3 == 1);
 #endif
 
 d1 = new Date(0);
-check(typeof(d1) == "object");
+check_equals(typeof(d1), "object");
 x = d1.toString();
 y = d1.valueOf();
-check(typeof(x) == "string");  
-check(typeof(y) == "number");   
-check(x == "Thu Jan 1 08:00:00 GMT+0800 1970");
-check(y == 0);
+check_equals(typeof(x), "string");  
+check_equals(typeof(y), "number");   
+check_equals(x, "Thu Jan 1 08:00:00 GMT+0800 1970");
+check_equals(y, 0);
 
 d2 = new Date(1);
 d3 = d1 + d2;
