@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.117 2007/08/06 18:24:19 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.118 2007/08/06 20:42:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -867,7 +867,7 @@ SWFHandlers::ActionSubString(ActionExec& thread)
 
     int size = unsigned(size_val.to_number(&env));
 
-    int	base = int(base_val.to_number(&env));
+    int	base = int(base_val.to_number(&env)); // TODO: use to_int ?
     int version = env.get_version();
     const std::string& str = string_val.to_string_versioned(version);
 
@@ -950,7 +950,7 @@ SWFHandlers::ActionInt(ActionExec& thread)
 //    GNASH_REPORT_FUNCTION;
     as_environment& env = thread.env;
     thread.ensureStack(1);
-    env.top(0).set_int(int(floor(env.top(0).to_number(&env))));
+    env.top(0).set_int(int(floor(env.top(0).to_number(&env)))); // TODO: use to_int ?
 }
 
 void
@@ -1146,7 +1146,7 @@ SWFHandlers::ActionDuplicateClip(ActionExec& thread)
 
 	thread.ensureStack(3);
 
-	int depth = int(env.top(0).to_number(&env))+character::staticDepthOffset;
+	int depth = int(env.top(0).to_number(&env))+character::staticDepthOffset; // TODO: use to_int ?
 	const std::string& newname = env.top(1).to_string(&env);
 	const std::string& path = env.top(2).to_string(&env);
 
@@ -1379,7 +1379,7 @@ SWFHandlers::ActionRandom(ActionExec& thread)
 
 	thread.ensureStack(1);  // max
 
-	int	max = int(env.top(0).to_number(&env));
+	int	max = int(env.top(0).to_number(&env)); // TODO: use to_int ?
 	if (max < 1) max = 1;
 	env.top(0).set_int(tu_random::next_random() % max);
 }
@@ -1416,7 +1416,7 @@ SWFHandlers::ActionChr(ActionExec& thread)
     as_environment& env = thread.env;
     thread.ensureStack(1);
     char	buf[2];
-    buf[0] = int(env.top(0).to_number(&env));
+    buf[0] = int(env.top(0).to_number(&env)); // TODO: use to_int() ?
     buf[1] = 0;
     env.top(0).set_string(buf);
 }
@@ -3072,14 +3072,10 @@ SWFHandlers::ActionBitwiseAnd(ActionExec& thread)
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	double operand1 = env.top(1).to_number(&env);
-	double operand2 = env.top(0).to_number(&env);
+	int operand1 = env.top(1).to_int(env);
+	int operand2 = env.top(0).to_int(env);
 
-	// TODO: have as_value::to_number<int> handle this ?
-	if ( isnan(operand1) ) operand1 = 0;
-	if ( isnan(operand2) ) operand2 = 0;
-
-	env.top(1) = int(operand1) & int(operand2);
+	env.top(1) = operand1 & operand2;
 	env.drop(1);
 }
 
@@ -3090,14 +3086,10 @@ SWFHandlers::ActionBitwiseOr(ActionExec& thread)
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	double operand1 = env.top(1).to_number(&env);
-	double operand2 = env.top(0).to_number(&env);
+	int operand1 = env.top(1).to_int(env);
+	int operand2 = env.top(0).to_int(env);
 
-	// TODO: have as_value::to_number<int> handle this ?
-	if ( isnan(operand1) ) operand1 = 0;
-	if ( isnan(operand2) ) operand2 = 0;
-
-	env.top(1) = int(operand1)|int(operand2);
+	env.top(1) = operand1|operand2;
 	env.drop(1);
 }
 
@@ -3109,14 +3101,10 @@ SWFHandlers::ActionBitwiseXor(ActionExec& thread)
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	double operand1 = env.top(1).to_number(&env);
-	double operand2 = env.top(0).to_number(&env);
+	int operand1 = env.top(1).to_int(env);
+	int operand2 = env.top(0).to_int(env);
 
-	// TODO: have as_value::to_number<int> handle this ?
-	if ( isnan(operand1) ) operand1 = 0;
-	if ( isnan(operand2) ) operand2 = 0;
-
-	env.top(1) = int(operand1)^int(operand2);
+	env.top(1) = operand1^operand2;
 	env.drop(1);
 }
 
@@ -3130,13 +3118,10 @@ SWFHandlers::ActionShiftLeft(ActionExec& thread)
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	double operand1 = env.top(1).to_number(&env);
-	double operand2 = env.top(0).to_number(&env);
+	int16_t operand1 = env.top(1).to_int(env);
+	int16_t operand2 = env.top(0).to_int(env);
 
-	// TODO: have as_value::to_number<int> handle this ?
-	if ( isnan(operand1) ) operand1=0;
-
-	env.top(1) = int16_t(operand1) << int(operand2);
+	env.top(1) = operand1 << operand2;
 	env.drop(1);
 }
 
@@ -3150,13 +3135,10 @@ SWFHandlers::ActionShiftRight(ActionExec& thread)
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	double operand1 = env.top(1).to_number(&env);
-	double operand2 = env.top(0).to_number(&env);
+	int16_t operand1 = env.top(1).to_int(env);
+	int operand2 = env.top(0).to_int(env);
 
-	// TODO: have as_value::to_number<int> handle this ?
-	if ( isnan(operand1) ) operand1=0;
-
-	env.top(1) = int16_t(operand1) >> int(operand2);
+	env.top(1) = operand1 >> operand2;
 	env.drop(1);
 }
 
@@ -3169,13 +3151,10 @@ SWFHandlers::ActionShiftRight2(ActionExec& thread)
 	as_environment& env = thread.env;
 	thread.ensureStack(2);
 
-	double operand1 = env.top(1).to_number(&env);
-	double operand2 = env.top(0).to_number(&env);
+	uint32_t operand1 = env.top(1).to_int(env);
+	int operand2 = env.top(0).to_int(env);
 
-	// TODO: have as_value::to_number<int> handle this ?
-	if ( isnan(operand1) ) operand1=0;
-
-	env.top(1) = uint32_t(operand1) >> int(operand2);
+	env.top(1) = operand1 >> operand2;
 	env.drop(1);
 }
 

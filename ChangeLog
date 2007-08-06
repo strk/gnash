@@ -1,5 +1,15 @@
 2007-08-06 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.{cpp,h}: add a to_int() method taking
+	  care of compatible integer conversion. Add note about
+	  deprecation of templated to_number<>.
+	* server/vm/ASHandlers.cpp: explicitly use to_int() in bitwise
+	  ops. Fixes ops.as testcases built with newer Ming. Add TODO
+	  lines about possible other uses.
+	* testsuite/swfdec/PASSING: bitwise-{5,6,7}.swf now pass.
+
+2007-08-06 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/ops.as: add test for 0xffffffff
 	  conversion to integer needing to be -1 (gnash fails, need Ming head
 	  to reproduce)

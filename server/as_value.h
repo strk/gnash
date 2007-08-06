@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.61 2007/08/02 18:28:42 strk Exp $ */
+/* $Id: as_value.h,v 1.62 2007/08/06 20:42:57 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -330,7 +330,7 @@ public:
 	///
 	const std::string&	to_string_versioned(int version, as_environment* env=NULL) const;
 
-	/// Conversion to number 
+	/// Conversion to number (double)
 	//
 	/// @param env
 	///	The environment to use for running the valueOf() method
@@ -338,10 +338,26 @@ public:
 	///
 	double	to_number(as_environment* env=NULL) const;
 
+	/// Conversion to 32bit integer
+	//
+	/// Use this conversion whenever an int is needed.
+	/// This is NOT the same as calling to_number<int32_t>().
+	///
+	/// @param env
+	///	The environment to use for running the valueOf() method
+	///	for object values. 
+	///
+	int32_t	to_int(as_environment& env) const;
+
 	/// Shorthand: casts the result of to_number() to the requested number
 	/// type.
 	//
 	/// Parameter identical to that of to_number().
+	///
+	/// TODO: deprecate this function, it gets confusing as when an integer
+	///       is needed the caller should invoke to_int() rather then to_number().
+	///       Implementing specializations for *all* integer types might be tedious
+	///
 	template <typename T>
 	T to_number (as_environment* env=NULL) const
 	{

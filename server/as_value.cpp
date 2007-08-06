@@ -330,6 +330,26 @@ as_value::to_number(as_environment* env) const
 	/* NOTREACHED */
 }
 
+int32_t
+as_value::to_int(as_environment& env) const
+{
+	double d = to_number(&env);
+	int i=0;
+
+	if ( ! isfinite(d) ) return 0;
+
+	if (d < 0)
+	{
+		i = - (uint32_t) fmod (-d, 4294967296.0);
+	}
+	else
+	{
+		i = (uint32_t) fmod (d, 4294967296.0);
+	}
+
+	return i;
+}
+
 // Conversion to boolean for SWF7 and up
 bool
 as_value::to_bool_v7() const
