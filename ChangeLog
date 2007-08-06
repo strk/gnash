@@ -1,5 +1,17 @@
 2007-08-05 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/character_def.h: provide a protected copy constructor
+	  resetting the render_cache_manager to NULL in the copy, to avoid
+	  multiple destruction of the same object. Add private and aborting
+	  assignment operator. Fixes bug #20694.
+	* server/parser/shape_character_def.{cpp,h}: implement copy
+	  constructor. Add private and aborting assignment operator.
+	  Deprecate input/output cache methods and data.
+	* server/DynamicShape.cpp: update after deprecation of cache
+	  data for input/output stuff.
+
+2007-08-05 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/VM.h: make gnash buildable with GC unused.
 
 2007-08-05 Zou Lunkai <zoulunkai@gmail.com>

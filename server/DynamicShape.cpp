@@ -17,7 +17,7 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.8 2007/07/01 10:54:18 bjacques Exp $ */
+/* $Id: DynamicShape.cpp,v 1.9 2007/08/06 03:30:18 strk Exp $ */
 
 #include "DynamicShape.h"
 
@@ -41,7 +41,7 @@ DynamicShape::DynamicShape()
 void
 DynamicShape::clear()
 {
-    clear_meshes();
+    //clear_meshes();
     m_paths.clear();
     m_fill_styles.clear();
     m_line_styles.clear();

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.30 2007/07/01 10:54:34 bjacques Exp $ */
+/* $Id: shape_character_def.cpp,v 1.31 2007/08/06 03:30:19 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -145,27 +145,31 @@ read_line_styles(std::vector<line_style>& styles, stream* in, int tag_type)
 
 shape_character_def::shape_character_def()
 	:
+	character_def(),
 	m_fill_styles(),
 	m_line_styles(),
 	m_paths(),
-	m_bound(),
-	m_cached_meshes()
+	m_bound()
+	//,m_cached_meshes()
 {
 }
 
-
-void
-shape_character_def::clear_meshes()
+shape_character_def::shape_character_def(const shape_character_def& o)
+	:
+	character_def(o),
+	tesselate::tesselating_shape(o),
+	m_fill_styles(o.m_fill_styles),
+	m_line_styles(o.m_line_styles),
+	m_paths(o.m_paths),
+	m_bound(o.m_bound)
+	//,m_cached_meshes()
 {
-    // Free our mesh_sets.
-    for (unsigned int i = 0; i < m_cached_meshes.size(); i++) {
-	delete m_cached_meshes[i];
-    }
 }
+
 
 shape_character_def::~shape_character_def()
 {
-	clear_meshes();
+	//clear_meshes();
 }
 
 
@@ -796,6 +800,17 @@ void	shape_character_def::compute_bound(rect* r) const
 }
 
 
+#if 0 // deprecated
+
+void
+shape_character_def::clear_meshes()
+{
+    // Free our mesh_sets.
+    for (unsigned int i = 0; i < m_cached_meshes.size(); i++) {
+	delete m_cached_meshes[i];
+    }
+}
+
 void	shape_character_def::output_cached_data(tu_file* out, const cache_options& /* options */)
     // Dump our precomputed mesh data to the given stream.
 {
@@ -821,6 +836,8 @@ void	shape_character_def::input_cached_data(tu_file* in)
 	m_cached_meshes[i] = ms;
     }
 }
+
+#endif // deprecated cached data
 
 #ifdef GNASH_USE_GC
 void

@@ -53,6 +53,8 @@ class character_def : public resource
 private:
 	int	m_id;
 		
+	// don't assign-to
+	character_def& operator= (const character_def&) { abort(); return *this; }
 public:
 	character_def()
 		:
@@ -60,6 +62,7 @@ public:
 		m_render_cache(NULL)
 		{
 		}
+
 	
 	virtual ~character_def();
 	
@@ -124,6 +127,38 @@ public:
   /// (REF: PIMPL)
   ///
   render_cache_manager* m_render_cache;
+
+protected:
+
+	/// Copy a character definition
+	//
+	/// The copy will have a NULL render cache object.
+	/// The only known use of copy constructor is from
+	/// duplicateMovieClip, in particular during copy
+	/// of the drawable object, which is a subclass
+	/// of a shape_character_def
+	///
+	/// The choice of NOT copying the cache manager
+	/// is a choice of simplicity. We can't copy the
+	/// pointer as the character_def destructor will
+	/// destroy it, and we don't want to destroy it twice.
+	/// We don't want to make a copy of the whole cache
+	/// as it might be a waste of resource, we don't want
+	/// to share ownership as some character_def ended up
+	/// NOT being immutable any more !! :(
+	///
+	/// By setting the cache to NULL we'll leave reconstruction
+	/// of a cache to the renderers.
+	///
+	/// TODO: improve by implementing copy on write for the cache ?
+	///
+	character_def(const character_def& o)
+		:
+		resource(), // this is a new resource, nothing to copy
+		m_id(o.m_id),
+		m_render_cache(NULL)
+	{}
+
 	
 };
 

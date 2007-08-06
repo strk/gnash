@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape_character_def.h,v 1.13 2007/06/20 14:23:50 strk Exp $ */
+/* $Id: shape_character_def.h,v 1.14 2007/08/06 03:30:19 strk Exp $ */
 
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
@@ -27,6 +27,10 @@ namespace gnash {
 	/// \brief
 	/// Represents the outline of one or more shapes, along with
 	/// information on fill and line styles.
+	//
+	/// Inheritance from tesselating_shape is only needed to expose a known interface
+	/// for mesh_set class use.
+	///
 	class shape_character_def : public character_def, public tesselate::tesselating_shape
 	{
 	public:
@@ -59,8 +63,9 @@ namespace gnash {
 		/// Compute bounds by looking at the component paths
 		void	compute_bound(rect* r) const;
 
-		void	output_cached_data(tu_file* out, const cache_options& options);
-		void	input_cached_data(tu_file* in);
+		// deprecated
+		//void	output_cached_data(tu_file* out, const cache_options& options);
+		//void	input_cached_data(tu_file* in);
 
 		const FillStyleVect& get_fill_styles() const { return m_fill_styles; }
 		const LineStyleVect& get_line_styles() const { return m_line_styles; }
@@ -89,8 +94,11 @@ namespace gnash {
 		PathVect m_paths;
 		rect	m_bound;
 
-		/// Free all meshes
-		void clear_meshes();
+		/// Free all meshes (deprecated)
+		//void clear_meshes();
+
+		/// Copy a shape character definition
+		shape_character_def(const shape_character_def& o);
 
 	private:
 
@@ -106,9 +114,15 @@ namespace gnash {
 
 		void	sort_and_clean_meshes() const;
 		
+		// Don't assign to a shape character definition
+		shape_character_def& operator= (const shape_character_def&)
+		{
+			abort();
+			return *this;
+		}
 
-		// Cached pre-tesselated meshes.
-		mutable std::vector<mesh_set*>	m_cached_meshes;
+		// Cached pre-tesselated meshes. (deprecated)
+		//mutable std::vector<mesh_set*>	m_cached_meshes;
 	};
 
 }	// end namespace gnash
