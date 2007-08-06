@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.11 2007/08/06 07:22:29 zoulunkai Exp $";
+rcsid="$Id: ops.as,v 1.12 2007/08/06 07:40:22 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -387,7 +387,7 @@ check_equals(y, 4);
 
 x = 0xffffffff;
 y = x << 16;
-xcheck_equals(Math.round(y), -65536);
+check_equals(Math.round(y), -65536);
 
 x = 1.9;
 y = x << 2;
