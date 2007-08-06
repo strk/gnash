@@ -1,3 +1,7 @@
+2007-08-06 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/actionscript.all/ops.as: xcheck to check, it passed here.
+	  
 2007-08-05 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/character_def.h: provide a protected copy constructor
