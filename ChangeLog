@@ -1,5 +1,8 @@
 2007-08-06 Sandro Santilli <strk@keybit.net>
 
+	* doc/C/Makefile.am, doc/C/asspec/Makefile.am: don't list entities
+	  twice for distribution (fixed make uninstall for the most part,
+	  needs some other tweak for png files)
 	* testsuite/actionscript.all/toString_valueOf.as: fix some
 	  of the tests, disable a test depending on timezone. Please
 	  further tests on Date go to the Date.as file.

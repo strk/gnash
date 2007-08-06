@@ -106,7 +106,7 @@ entities = \
 	logging.xml	\
 	$(NULL)
 
-xml_files = $(entities) $(docname).xml actionscript.xml
+xml_files = $(docname).xml actionscript.xml
 
 #noinst_SCRIPT = gen-doc.sh
 dist_man_MANS = gnash.1
@@ -116,13 +116,14 @@ pdf:  gnash.pdf actionscript.pdf
 man:  gnash.1 
 texi: gnash.texi actionscript.texi
 info: gnash.info actionscript.info
-gnash.pdf gnash.html gnash.texi: $(xml_files)
+gnash.pdf gnash.html gnash.texi: $(xml_files) $(entities)
 actionscript.pdf actionscript.html actionscript.texi: actionscript.xml actionscript/main.xml actionscript/as_value.xml actionscript/new_as_class.xml
 
 SUFFIXES = .xml .html .texi .pdf .info .1 .fo
 
 EXTRA_DIST = \
 	$(xml_files) \
+	$(entities) \
 	$(omffile) \
 	gnash.texi \
 	actionscript.texi \
@@ -225,3 +226,6 @@ install-info-hook: gnash.info
 uninstall-info-hook:
 	$(RM) $(DESTDIR)$(infodir)/gnash.info
 
+#app-dist-hook:
+
+#dist-hook: app-dist-hook

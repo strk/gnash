@@ -62,19 +62,20 @@ entities = \
 	xmlnode.xml \
 	xmlsocket.xml
 
-xml_files = $(entities) $(docname).xml
+xml_files = $(docname).xml
 
 html: asspec.html
 pdf:  asspec.pdf
 man:  asspec.1 
 texi: asspec.texi
 info: asspec.info
-asspec.pdf asspec.html asspec.texi: $(xml_files)
+asspec.pdf asspec.html asspec.texi: $(xml_files) $(entities)
 
 SUFFIXES = .xml .html .texi .pdf .info .1 .fo
 
 EXTRA_DIST = \
 	$(xml_files) \
+	$(entities) \
 	$(omffile) \
 	asspec.texi \
 	asspec.info \
@@ -172,3 +173,6 @@ install-info-hook: asspec.info
 uninstall-info-hook:
 	$(RM) $(DESTDIR)$(infodir)/asspec.info
 
+#app-dist-hook:
+
+#dist-hook: app-dist-hook
