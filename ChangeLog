@@ -1,5 +1,8 @@
 2007-08-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/toString_valueOf.as: fix some
+	  of the tests, disable a test depending on timezone. Please
+	  further tests on Date go to the Date.as file.
 	* server/as_value.{cpp,h}: add a to_int() method taking
 	  care of compatible integer conversion. Add note about
 	  deprecation of templated to_number<>.

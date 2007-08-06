@@ -331,18 +331,25 @@ x = d1.toString();
 y = d1.valueOf();
 check_equals(typeof(x), "string");  
 check_equals(typeof(y), "number");   
-check_equals(x, "Thu Jan 1 08:00:00 GMT+0800 1970");
+// NOTE: the value of toString() here depends on timezone !
+//       It's the epoch, but depending on timezone the GMT+<x> and actual hour change
+//       For this reason the test is disabled till a solution is found.
+//check_equals(x, "Thu Jan 1 08:00:00 GMT+0800 1970"); 
 check_equals(y, 0);
 
 d2 = new Date(1);
-d3 = d1 + d2;
+d3 = d1 + d2; // in SWF5 this should result in a number, in SWF6 or higher, in a string
+exp = d1.toString() + d2.toString();
 #if OUTPUT_VERSION > 5 
-  xcheck(typeof(d3) == 'string');
-  xcheck(d3 == "Thu Jan 1 08:00:00 GMT+0800 1970Thu Jan 1 08:00:00 GMT+0800 1970");
+  xcheck_equals(typeof(d3), 'string');
+  xcheck_equals(d3, exp);
 #else
-  check(typeof(d3) == 'number');
-  check(d3 == 1);
+  check_equals(typeof(d3), 'number');
+  check_equals(d3, 1);
 #endif
+
+// Date(0) == Date(1) 
+check_equals(d1.toString(), d2.toString());
 
 //
 //Testing toString and valueOf of Array
