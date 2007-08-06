@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.116 2007/08/02 18:28:42 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.117 2007/08/06 18:24:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2734,9 +2734,9 @@ SWFHandlers::ActionSetMember(ActionExec& thread)
 	{
 		// Malformed SWF ? (don't think this is possible to do with ActionScript syntax)
 		// FIXME, should this be log_swferror?
-		IF_VERBOSE_ACTION (
+		IF_VERBOSE_ASCODING_ERRORS (
 			// Invalid object, can't set.
-			log_action(_("-- set_member %s.%s=%s on invalid object!"),
+			log_aserror(_("-- set_member %s.%s=%s on invalid object!"),
 				env.top(2).to_debug_string().c_str(),
 				member_name.c_str(),
 				member_value.to_debug_string().c_str());
