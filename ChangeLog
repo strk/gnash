@@ -1,5 +1,8 @@
-2007-08-06 Zou Lunkai <zoulunkai@gmail.com>
+2007-08-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/ops.as: add test for 0xffffffff
+	  conversion to integer needing to be -1 (gnash fails, need Ming head
+	  to reproduce)
 	* server/video_stream_instance.cpp (markReachableResources): don't
 	  forget to call the character's version of resource marking !!
 	  Fixes bug #20657.

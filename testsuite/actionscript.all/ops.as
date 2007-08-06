@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.12 2007/08/06 07:40:22 zoulunkai Exp $";
+rcsid="$Id: ops.as,v 1.13 2007/08/06 19:30:47 strk Exp $";
 
 #include "check.as"
 
@@ -375,6 +375,11 @@ check_equals( (null^1), 1 );
 check_equals( (1^null), 1 );
 check_equals( (null^null), 0 );
 check_equals( (8^12), 4 );
+
+// The check below will fail if Ming converts the long int to a double
+// (only with Gnash, it works fine with the proprietary player)
+check_equals((0xffffffff|0), -1);
+
 // TODO ... 
 
 //------------------------------------------------
@@ -385,9 +390,16 @@ x = 1;
 y = x << 2;
 check_equals(y, 4);
 
-x = 0xffffffff;
+x = 0xffffffff; // Ming up to 0.4.0.beta4 will convert this to -1 !
+                // Newer Ming will store it as a double. Still, the
+                // player itself converts it back to -1 as an integer
+                // prior to applying the bitwise operator.
 y = x << 16;
-check_equals(Math.round(y), -65536);
+check_equals(y, -65536);
+
+x = -1;
+y = x << 16;
+check_equals(y, -65536);
 
 x = 1.9;
 y = x << 2;
