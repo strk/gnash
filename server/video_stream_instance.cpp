@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.33 2007/08/02 21:23:42 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.34 2007/08/06 18:28:41 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -283,6 +283,9 @@ void
 video_stream_instance::markReachableResources() const
 {
 	if ( _ns ) _ns->setReachable();
+
+	// Invoke character's version of reachability mark
+	markCharacterReachable();
 }
 #endif // GNASH_USE_GC
 
