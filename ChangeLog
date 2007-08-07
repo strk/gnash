@@ -1,3 +1,11 @@
+2007-08-07 Sergio Costas <raster (at) rastersoft.com>
+
+	* backend/sound_handler_gst.cpp: Fix returns from getPosition
+	  (patch #6140), and fix a segfault when asking for position
+	  before sound has been started (patch #6138).
+	* backend/sound_handler_sdl.cpp: Fix returns from getPosition
+	  (patch #6140).
+
 2007-08-06 Sandro Santilli <strk@keybit.net>
 
 	* doc/xmldocs.make: fix uninstall rule to properly remove images

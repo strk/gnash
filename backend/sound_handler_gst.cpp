@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.57 2007/08/01 10:09:23 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.58 2007/08/07 16:27:37 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -630,7 +630,8 @@ unsigned int GST_sound_handler::get_duration(int sound_handle)
 
 	// Return the sound duration in milliseconds
 	if (sounddata->sample_count > 0 && sounddata->sample_rate > 0) {
-		unsigned int ret = sounddata->sample_count / sounddata->sample_rate * 100;
+		unsigned int ret = sounddata->sample_count / sounddata->sample_rate * 1000;
+		ret += ((sounddata->sample_count % sounddata->sample_rate) * 1000) / sounddata->sample_rate;
 		if (sounddata->stereo) ret = ret / 2;
 		return ret;
 	} else {
@@ -650,6 +651,11 @@ unsigned int GST_sound_handler::get_position(int sound_handle)
 	}
 
 	sound_data* sounddata = m_sound_data[sound_handle];
+
+	// If there is no active sounds, return 0
+	if (sounddata->m_gst_elements.size() == 0) {
+		return 0;
+	}
 
 	// return the position of the last element added
 	GstElement *pipeline,*audioconvert;
