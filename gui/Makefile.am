@@ -373,7 +373,7 @@ riscos_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
 endif				# BUILD_AGG_RENDERER
 endif				# BUILD_FB_GUI
 
-CLEANFILES = klash.moc .configline
+CLEANFILES = klash.moc .configline gnash
 
 klash.moc: $(srcdir)/kdesup.h
 	@if test x"$(MOC)" != x; then \
