@@ -1,5 +1,7 @@
 2007-08-06 Sandro Santilli <strk@keybit.net>
 
+	* doc/xmldocs.make: fix uninstall rule to properly remove images
+	  of the manual.
 	* doc/C/Makefile.am, doc/C/asspec/Makefile.am: don't list entities
 	  twice for distribution (fixed make uninstall for the most part,
 	  needs some other tweak for png files)

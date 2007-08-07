@@ -13,7 +13,7 @@
 #     4) Figures must go under $(figdir)/ and be in PNG format
 #     5) You should only have one document per directory 
 #     6) Note that the figure directory, $(figdir)/, should not have its
-#        own Ma fdl-appendix.xmlkefile since this Makefile installs those figures.
+#        own Makefile since this Makefile installs those figures.
 #
 # example Makefile.am:
 #   figdir = figures
@@ -85,7 +85,7 @@ uninstall-local:
 	-if test "$(figdir)"; then \
 	  for file in $(srcdir)/$(figdir)/*.png; do \
 	    basefile=`echo $$file | sed -e  's,^.*/,,'`; \
-	    rm -f $(DESTDIR)/$(figdir)/$$basefile; \
+	    rm -f $(DESTDIR)$(docdir)/$(figdir)/$$basefile; \
 	  done; \
 	  rmdir $(DESTDIR)$(docdir)/$(figdir); \
 	fi
