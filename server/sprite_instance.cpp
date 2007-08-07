@@ -3851,13 +3851,17 @@ sprite_instance::processCompletedLoadVariableRequests()
 	if ( _loadVariableRequests.empty() ) return;
 
 	for (LoadVariablesThreads::iterator it=_loadVariableRequests.begin();
-			it != _loadVariableRequests.end(); ++it)
+			it != _loadVariableRequests.end(); )
 	{
 		LoadVariablesThread& request = *(*it);
 		if ( request.completed() )
 		{
 			processCompletedLoadVariableRequest(request);
 			it = _loadVariableRequests.erase(it);
+		}
+		else
+		{
+			++it;
 		}
 	}
 }

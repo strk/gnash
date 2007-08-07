@@ -5,7 +5,7 @@
 
 // line style types.
 
-/* $Id: styles.h,v 1.19 2007/02/14 01:40:27 strk Exp $ */
+/* $Id: styles.h,v 1.20 2007/08/07 20:53:10 strk Exp $ */
 
 #ifndef GNASH_STYLES_H
 #define GNASH_STYLES_H
@@ -53,6 +53,9 @@ public:
 	//
 	/// Stream is assumed to be positioned at 
 	/// the right place.
+	///
+	/// Throw a ParserException if there's no enough bytes in the
+	/// currently opened tag for reading. See stream::ensureBytes()
 	///
 	void	read(stream* in, int tag_type);
 	

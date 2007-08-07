@@ -30,6 +30,11 @@ namespace gnash {
 
 void	rect::read(stream* in)
 {
+	// TODO: find how many bytes are required to 
+	//       read the whole rect and ensure they
+	//       are available in the current tag
+	//       using in->ensureBytes(x)
+	//
 	in->align();
 	int	nbits = in->read_uint(5);
 	float xmin = (float) in->read_sint(nbits);

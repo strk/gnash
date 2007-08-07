@@ -17,7 +17,7 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-/* $Id: fill_style.h,v 1.7 2007/07/01 10:54:22 bjacques Exp $ */
+/* $Id: fill_style.h,v 1.8 2007/08/07 20:53:10 strk Exp $ */
 
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
@@ -70,6 +70,9 @@ public:
 	/// Read the fill style from a stream
 	//
 	/// TODO: use a subclass for this (swf_fill_style?)
+	///
+	/// Throw a ParserException if there's no enough bytes in the
+	/// currently opened tag for reading. See stream::ensureBytes()
 	///
 	void	read(stream* in, int tag_type, movie_definition* m);
 

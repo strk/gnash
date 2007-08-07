@@ -16,6 +16,17 @@
 
 #include <string>
 
+// Define the following macro if you want to want Gnash parser
+// to assume the underlying SWF is well-formed. It would make
+// parsing faster, but might result in horrible behaviour with
+// malformed SWFs (like taking up all system memory, keeping
+// CPU busy for a long long time, or simply corrupting memory)
+//
+// This might be eventually set by a --disable-swf-checks or similar
+// configure switch...
+//
+//#define GNASH_TRUST_SWF_INPUT
+
 class tu_file;
 
 namespace gnash {
@@ -49,11 +60,24 @@ namespace gnash {
 		int16_t  read_s16();
 		uint32_t read_u32();
 		int32_t  read_s32();
+
+		/// \brief
+		/// Read a length in a byte or three.
+		//
+		/// If the byte == 0xff, read the lenght in 
+		/// next two bytes.
+		//
+		/// Takes care of integrity check (ensureByte)
+		///
 		unsigned read_variable_count()
 		{
+			ensureBytes(1);
 			unsigned count = read_u8();
 			if (count == 0xFF)
+			{
+				ensureBytes(2);
 				count = read_u16();
+			}
 			return count;
 		};
 
@@ -165,12 +189,16 @@ namespace gnash {
 		/// This method should be called before any attempt to read
 		/// fields from the SWF.
 		///
+		/// NOTE: if GNASH_TRUST_SWF_INPUT is defined this function is a no-op 
+		///
 		void ensureBytes(unsigned long needed)
 		{
+#ifndef GNASH_TRUST_SWF_INPUT
 			if ( get_tag_end_position() - get_position() < needed )
 			{
 				throw ParserException("premature end of tag");
 			}
+#endif
 		}
 
 	private:

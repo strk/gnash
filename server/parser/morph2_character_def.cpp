@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: morph2_character_def.cpp,v 1.11 2007/07/01 10:54:34 bjacques Exp $ */
+/* $Id: morph2_character_def.cpp,v 1.12 2007/08/07 20:53:10 strk Exp $ */
 
 // Based on the public domain morph2.cpp of:
 // Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,
@@ -227,13 +227,16 @@ private:
 		m_shape1->set_bound(bound1);
 		m_shape2->set_bound(bound2);
 
+		in->ensureBytes(4);
 		offset = in->read_u32();
 
+		// Next line will throw ParserException on malformed SWF
 		fill_style_count = in->read_variable_count();
 		int i;
 		for (i = 0; i < fill_style_count; i++) {
 			fill_style fs1, fs2;
 
+			in->ensureBytes(1);
 			fs1.m_type = in->read_u8();
 			fs2.m_type = fs1.m_type;
 
@@ -285,6 +288,7 @@ private:
 				fs2.m_gradient_matrix.concatenate(m2);
 
 				// GRADIENT
+				in->ensureBytes(1);
 				int	num_gradients = in->read_u8();
 				assert(num_gradients >= 1 && num_gradients <= 8);
 
@@ -312,6 +316,7 @@ private:
 			else if (fs1.m_type == 0x40 || fs1.m_type == 0x41)
 			{
 
+				in->ensureBytes(2);
 				int	bitmap_char_id = in->read_u16();
 				IF_VERBOSE_PARSE(
 				  log_parse(_("morph fsr bitmap_char = %d"),
@@ -338,6 +343,7 @@ private:
 		line_style_count = in->read_variable_count();
 		for (i = 0; i < line_style_count; i++) {
 			line_style ls1, ls2;
+			in->ensureBytes(4);
 			ls1.m_width = in->read_u16();
 			ls2.m_width = in->read_u16();
 			ls1.m_color.read(in, tag_type);

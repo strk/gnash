@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.31 2007/08/06 03:30:19 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.32 2007/08/07 20:53:10 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -30,7 +30,6 @@
 #include "render.h"
 #include "stream.h"
 #include "sprite_instance.h"
-#include "GnashException.h"
 
 #include "tu_file.h"
 
@@ -72,11 +71,13 @@ read_fill_styles(std::vector<fill_style>& styles, stream* in,
 {
 
 	// Get the count.
+	in->ensureBytes(1);
 	uint16_t fill_style_count = in->read_u8();
 	if (tag_type > 2)
 	{
 		if (fill_style_count == 0xFF)
 		{
+			in->ensureBytes(2);
 			fill_style_count = in->read_u16();
 		}
 	}
@@ -92,16 +93,7 @@ read_fill_styles(std::vector<fill_style>& styles, stream* in,
 		// TODO: add a fill_style constructor directly
 		//       reading from stream
 		fill_style fs;
-		try
-		{
-			fs.read(in, tag_type, m);
-		}
-		catch (ParserException& e)
-		{
-			IF_VERBOSE_MALFORMED_SWF(
-				log_swferror("%s", e.what());
-			);
-		}
+		fs.read(in, tag_type, m);
 		// Push a style anyway, so any path referring to
 		// it still finds it..
 		styles.push_back(fs);
@@ -115,6 +107,7 @@ read_line_styles(std::vector<line_style>& styles, stream* in, int tag_type)
     // Read line styles and push them onto the back of the given array.
 {
     // Get the count.
+    in->ensureBytes(1);
     int	line_style_count = in->read_u8();
 
 		IF_VERBOSE_PARSE
@@ -126,6 +119,7 @@ read_line_styles(std::vector<line_style>& styles, stream* in, int tag_type)
     // if (tag_type > 2)
     // {
     if (line_style_count == 0xFF) {
+        in->ensureBytes(2);
 	line_style_count = in->read_u16();
 		IF_VERBOSE_PARSE
 		(

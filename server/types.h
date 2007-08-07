@@ -96,9 +96,16 @@ namespace gnash {
 		///	a value <= 22 makes it read RGB
 		///	and value > 22 makes it read RGBA
 		///
+		/// Throw a ParserException if there's no enough bytes in the
+		/// currently opened tag for reading. See stream::ensureBytes()
+		///
 		void	read(stream* in, int tag_type);
 
 		/// Initialize from intput stream (reads RGBA)
+		//
+		/// Throw a ParserException if there's no enough bytes in the
+		/// currently opened tag for reading. See stream::ensureBytes()
+		///
 		void	read_rgba(stream* in);
 
 		/// Initialize from intput stream (reads RGB)

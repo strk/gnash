@@ -75,7 +75,11 @@ movie_instance::advance(float delta_time)
 	if ( get_frame_count() == 0 )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror("The movie contains NO frames!");
+		static bool warned=false;
+		if ( ! warned ) {
+			log_swferror(_("The movie with url %s has NO frames!"), m_def->get_url().c_str());
+			warned=true;
+		}
 		);
 		return;
 	}

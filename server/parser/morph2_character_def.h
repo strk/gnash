@@ -19,7 +19,30 @@ namespace gnash {
 	public:
 		morph2_character_def();
 		virtual ~morph2_character_def();
+
+		/// Read a DefineMorphShape tag from stream
+		//
+		/// Throw ParserException if the tag is malformed
+		///
+		/// @param in
+		///	The stream to read the definition from.
+		///	Tag type is assumed to have been read already
+		///
+		/// @param tag_type
+		///	Type of the tag.
+		///	Need be SWF::DEFINEMORPHSHAPE or an assertion would fail.
+		///	TODO: drop ?
+		///
+		/// @param with_style
+		///	Unused. TODO: drop.
+		///
+		/// @param md
+		///	Movie definition. Used to resolv character ids for fill styles.
+		///	Must be not-null or would segfault. 
+		///	TODO: take by reference !
+		///
 		void	read(stream* in, int tag_type, bool with_style, movie_definition* m);
+
 		virtual void	display(character* inst);
 		void lerp_matrix(matrix& t, const matrix& m1, const matrix& m2, const float ratio);
 

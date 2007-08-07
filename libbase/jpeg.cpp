@@ -11,6 +11,7 @@
 #include "jpeg.h"
 #include "tu_file.h"
 #include "log.h"
+#include "GnashException.h"
 
 #include <cstdio>
 
@@ -270,12 +271,7 @@ namespace jpeg
 
 
 	// Called when jpeglib has a fatal error.
-	static void	jpeg_error_exit(j_common_ptr cinfo)
-	{
-		gnash::log_swferror("Internal jpeg error: %s", cinfo->err->jpeg_message_table[cinfo->err->msg_code]);
-		// TODO: set a flag to stop parsing !!
-	}
-
+	static void	jpeg_error_exit(j_common_ptr cinfo);
 
 	// Set up some error handlers for the jpeg lib.
 	static void	setup_jpeg_err(jpeg_error_mgr* jerr)
@@ -302,6 +298,11 @@ namespace jpeg
 
 		bool	m_compressor_opened;
 
+		/// This flag will be set to true by the error callback
+		/// invoked by jpeg lib. Will be later used to throw
+		/// a ParserException.
+		///
+		bool errorOccurred;
 
 		enum SWF_DEFINE_BITS_JPEG2 { SWF_JPEG2 };
 		enum SWF_DEFINE_BITS_JPEG2_HEADER_ONLY { SWF_JPEG2_HEADER_ONLY };
@@ -310,10 +311,12 @@ namespace jpeg
 		// prepare to read data.
 		input_impl(tu_file* in)
 			:
-			m_compressor_opened(false)
+			m_compressor_opened(false),
+			errorOccurred(false)
 		{
 			setup_jpeg_err(&m_jerr);
 			m_cinfo.err = &m_jerr;
+			m_cinfo.client_data = this;
 
 			// Initialize decompression object.
 			jpeg_create_decompress(&m_cinfo);
@@ -333,10 +336,12 @@ namespace jpeg
 		//
 		input_impl(SWF_DEFINE_BITS_JPEG2_HEADER_ONLY /* e */, tu_file* in)
 			:
-			m_compressor_opened(false)
+			m_compressor_opened(false),
+			errorOccurred(false)
 		{
 			setup_jpeg_err(&m_jerr);
 			m_cinfo.err = &m_jerr;
+			m_cinfo.client_data = this;
 
 			// Initialize decompression object.
 			jpeg_create_decompress(&m_cinfo);
@@ -393,10 +398,37 @@ namespace jpeg
 			static const int stateReady = 202;	/* found SOS, ready for start_decompress */
 			while (m_cinfo.global_state != stateReady)
 			{
-				jpeg_read_header(&m_cinfo, FALSE);
+				int ret = jpeg_read_header(&m_cinfo, FALSE);
+				switch (ret)
+				{
+					case JPEG_SUSPENDED: // suspended due to lack of data
+						throw gnash::ParserException("lack of data during JPEG header parsing");
+						//log_debug("jpeg_read_header returned JPEG_SUSPENDED");
+						break;
+					case JPEG_HEADER_OK: // Found valid image datastream
+						//log_debug("jpeg_read_header returned JPEG_HEADER_OK");
+						break;
+					case JPEG_HEADER_TABLES_ONLY: // Found valid table-specs-only datastream
+						//log_debug("jpeg_read_header returned JPEG_HEADER_TABLES_ONLY");
+						break;
+					default:
+						//log_debug("jpeg_read_header returned %d", ret);
+						break;
+				}
+			}
+
+			if ( errorOccurred )
+			{
+				throw gnash::ParserException("errors during JPEG header parsing");
 			}
 
 			jpeg_start_decompress(&m_cinfo);
+
+			if ( errorOccurred )
+			{
+				throw gnash::ParserException("errors during JPEG decompression");
+			}
+
 			m_compressor_opened = true;
 		}
 
@@ -460,6 +492,16 @@ namespace jpeg
 			}	
 		}
 	};
+
+	static void	jpeg_error_exit(j_common_ptr cinfo)
+	{
+		gnash::log_swferror("Internal jpeg error: %s", cinfo->err->jpeg_message_table[cinfo->err->msg_code]);
+
+		// Set a flag to stop parsing 
+		input_impl* impl = static_cast<input_impl*>(cinfo->client_data);
+		impl->errorOccurred = true;
+	}
+
 
 
 	/*static*/

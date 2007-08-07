@@ -44,6 +44,7 @@ gradient_record::gradient_record()
 void
 gradient_record::read(stream* in, int tag_type)
 {
+    in->ensureBytes(1);
     m_ratio = in->read_u8();
     m_color.read(in, tag_type);
 }
@@ -72,6 +73,7 @@ fill_style::~fill_style()
 void
 fill_style::read(stream* in, int tag_type, movie_definition* md)
 {
+    in->ensureBytes(1);
     m_type = in->read_u8();
 
 		IF_VERBOSE_PARSE
@@ -126,6 +128,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         m_gradient_matrix.concatenate(m);
 				
         // GRADIENT
+        in->ensureBytes(1);
         uint8_t num_gradients = in->read_u8();
         if ( ! num_gradients )
 	{
@@ -174,6 +177,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         // 0x42: tiled bitmap fill with hard edges
         // 0x43: clipped bitmap fill with hard edges
 
+        in->ensureBytes(2);
         int	bitmap_char_id = in->read_u16();
 	IF_VERBOSE_PARSE
 	(
@@ -214,10 +218,12 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
     }
     else
     {
-        log_unimpl("Unsupported fill style type: 0x%X", m_type);
+	stringstream ss;
+	ss << "Unknown fill style type " << m_type;
+        //log_unimpl("Unsupported fill style type: 0x%X", m_type);
         // This is a fatal error, we'll be leaving the stream
         // read pointer in an unknown position.
-        throw ParserException("Unsupported fill style (Malformed SWF?)");
+        throw ParserException(ss.str()); // "Unsupported fill style (Malformed SWF?)");
     }
 }
 

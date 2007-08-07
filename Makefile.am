@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.86 2007/08/03 19:27:29 strk Exp $
+# $Id: Makefile.am,v 1.87 2007/08/07 20:53:09 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -34,7 +34,6 @@ STD_DIRS = \
 	plugin \
 	testsuite \
 	po \
-	doc \
 	$(NULL)
 
 if CYGNAL

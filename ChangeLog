@@ -1,3 +1,29 @@
+2007-08-07 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (processCompletedLoadVariableRequest):
+	  fix attempt to increment past-the-end iterator.
+	* libbase/zlib_adaptar.cpp: don't hang on corrupted input.
+	* libbase/jpeg.{cpp,h}: don't segfault on corrupted input.
+	* server/matrix.cpp (read): add TODO item (check input)
+	* server/rect.cpp (read): add TODO item (check input)
+	* server/movie_instance.cpp (advance): warn only once about movie
+	  containing no frames.
+	* server/parser/morph2_character_def.{cpp,h} (read): document,
+	  don't read past end of tag.
+	* server/stream.h (read_variable_count): document and add
+	  integrity checks. Add a GNASH_TRUST_SWF macro to turn ensureBytes
+	  to a no-op.
+	* server/parser/shape_character_def.cpp (read_fill_styles,
+	  read_line_styles, read): don't read past end of tag. Don't try to
+	  recover if an exception is thrown by fill style parser.
+	* server/styles.{cpp,h} (line_style::read): don't read past end of tag.
+	* server/fill_style.{cpp,h} (read): don't read past end of tag.
+	* server/types.{cpp,h} (rgba::read_rgba, rgbe::read): don't read past end
+	  of tag.
+	* server/parser/action_buffer.cpp (read): don't read past end of tag.
+	* Makefile.am: don't list 'doc' twice in subdirs. Fixes 'distclean'
+	  rule.
+
 2007-08-07 Sergio Costas <raster (at) rastersoft.com>
 
 	* backend/sound_handler_gst.cpp: Fix returns from getPosition

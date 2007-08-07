@@ -11,6 +11,7 @@
 #include "tu_file.h"
 #include "utility.h"
 #include "log.h"
+#include "GnashException.h"
 
 #include <memory>
 
@@ -121,6 +122,8 @@ namespace zlib_adapter
 
 		int	inflate_from_stream(void* dst, int bytes)
 		{
+			using gnash::ParserException;
+
 			if (m_error)
 			{
 				return 0;
@@ -160,11 +163,23 @@ namespace zlib_adapter
 					//m_error = 1;
 					break;
 				}
+				if (err == Z_DATA_ERROR)
+				{
+					throw ParserException("Data error inflating input");
+					break;
+				}
+				if (err == Z_MEM_ERROR)
+				{
+					throw ParserException("Memory error inflating input");
+					break;
+				}
 				if (err != Z_OK)
 				{
 					// something's wrong.
-					gnash::log_error("inflater_impl::inflate_from_stream() inflate() returned %d", err);
-					m_error = 1;
+					std::stringstream ss;
+					ss << "inflater_impl::inflate_from_stream() inflate() returned " << err;
+					throw ParserException(ss.str());
+					//m_error = 1;
 					break;
 				}
 
@@ -172,6 +187,11 @@ namespace zlib_adapter
 				{
 					break;
 				}
+			}
+
+			if (m_error)
+			{
+				return 0;
 			}
 
 			int	bytes_read = bytes - m_zstream.avail_out;
@@ -267,6 +287,7 @@ namespace zlib_adapter
 
 	int	inflate_seek_to_end(void* appdata)
 	{
+		GNASH_REPORT_FUNCTION;
 		inflater_impl*	inf = (inflater_impl*) appdata;
 		if (inf->m_error)
 		{

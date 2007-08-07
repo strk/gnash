@@ -33,6 +33,7 @@ line_style::line_style()
 void
 line_style::read(stream* in, int tag_type)
 {
+    in->ensureBytes(2);
     m_width = in->read_u16();
     m_color.read(in, tag_type);
 }

@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.16 2007/07/01 10:54:23 bjacques Exp $ 
+// $Id: matrix.cpp,v 1.17 2007/08/07 20:53:10 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -206,6 +206,9 @@ void
 matrix::read(stream* in)
 // Initialize from the stream.
 {
+	// TODO: compute number of bytes needed to read the matrix
+	//       and ensure their availability using stream::ensureBytes
+
 	in->align();
 
 	set_identity();
