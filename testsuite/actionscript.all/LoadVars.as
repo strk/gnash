@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: LoadVars.as,v 1.13 2007/07/26 03:41:18 strk Exp $";
+rcsid="$Id: LoadVars.as,v 1.14 2007/08/08 19:53:03 strk Exp $";
 
 #include "check.as"
 
@@ -35,8 +35,6 @@ var loadvarsObj = new LoadVars;
 xcheck_equals (typeof(loadvarsObj), 'object');
 
 #else // OUTPUT_VERSION >= 6
-
-#if 0 // STRK REMOVEME
 
 check_equals(typeof(LoadVars), 'function');
 
@@ -62,7 +60,6 @@ check_equals (typeof(loadvarsObj.sendAndLoad), 'function');
 // test the LoadVars::tostring method
 check_equals (typeof(loadvarsObj.toString), 'function');
 
-#endif // 0 // STRK REMOVEME
 var loadvarsObj = new LoadVars; // STRK REMOVEME
 
 //--------------------------------------------------------------------------
