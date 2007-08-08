@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.78 2007/08/08 09:14:14 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.79 2007/08/08 10:39:50 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -244,8 +244,12 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 	// If this is called from a streamsoundblocktag, we only start if this
 	// sound isn't already playing. If a active_sound-struct is existing we
-	// assume it is also playing.
+	// assume it is also playing. If necessary we do some sync'ing
 	if (start_position > 0 && sounddata->m_active_sounds.size() > 0) {
+		// This is the ugly sync'ing. If the renderer-sync'ing  to the timeline
+		// works, this should only be needed when we're position-jumping in streams.
+		int diff = abs(sounddata->m_active_sounds[0]->position - start_position);
+		if (diff > 2000) sounddata->m_active_sounds[0]->position = start_position;
 		return;
 	}
 

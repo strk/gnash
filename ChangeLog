@@ -1,5 +1,11 @@
 2007-08-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
+	* backend/sound_handler_{sdl,gst}.cpp: Detect and fix if a soundstream
+	  is out of sync (after position-jump or general out of sync issue),
+	  fixes bug #20681.
+
+2007-08-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
 	* backend/sound_handler_sdl.cpp: Fix counting of samples played,
 	  and use the output samplerate to calculate the playhead position
 	  in time, fixes/improves bug #20684.
