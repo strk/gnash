@@ -1,3 +1,9 @@
+2007-08-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Fix counting of samples played,
+	  and use the output samplerate to calculate the playhead position
+	  in time, fixes/improves bug #20684.
+
 2007-08-07 Sandro Santilli <strk@keybit.net>
 
 	* gui/Makefile.am: clean the 'gnash' script on make clean. 

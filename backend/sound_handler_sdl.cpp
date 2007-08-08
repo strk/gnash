@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.77 2007/08/07 16:27:37 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.78 2007/08/08 09:14:14 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -579,9 +579,9 @@ unsigned int SDL_sound_handler::get_position(int sound_handle)
 	active_sound* asound = sounddata->m_active_sounds[0];
 
 	// Return the playhead position in milliseconds
-	unsigned int ret = asound->samples_played / sounddata->sample_rate * 100;
-	ret += ((asound->samples_played % sounddata->sample_rate) * 100) / sounddata->sample_rate;
-	if (sounddata->stereo) ret = ret / 2;
+	unsigned int ret = asound->samples_played / audioSpec.freq * 1000;
+	ret += ((asound->samples_played % audioSpec.freq) * 1000) / audioSpec.freq;
+	if (audioSpec.channels > 1) ret = ret / audioSpec.channels;
 	return ret;
 }
 
@@ -698,7 +698,9 @@ do_mixing(Uint8* stream, active_sound* sound, Uint8* data, unsigned int mix_leng
 
 	// Update sound info
 	sound->raw_position += mix_length;
-	sound->samples_played += mix_length;
+
+	// Sample size is always 2
+	sound->samples_played += mix_length / 2;
 }
 
 
