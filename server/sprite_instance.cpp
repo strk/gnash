@@ -2236,52 +2236,6 @@ log_msg(_("sprite[%p]::set_member(%s, %s)"), (void*)this, name.c_str(), val.to_d
 
 }
 
-void sprite_instance::set_variable(const char* path_to_var,
-		const wchar_t* new_value)
-{
-	if (path_to_var == NULL)
-	{
-		log_error(_("NULL path_to_var passed to set_variable()"));
-		return;
-	}
-	if (new_value == NULL)
-	{
-		log_error(_("NULL passed to set_variable('%s',"
-			" NULL)"), path_to_var);
-		return;
-	}
-
-	// should only be called on the root movie.
-	assert(m_parent == NULL);
-
-	std::string path(path_to_var);
-	as_value val(new_value);
-
-	m_as_environment.set_variable(path, val);
-}
-
-void sprite_instance::set_variable(const char* path_to_var,
-		const char* new_value)
-{
-	    assert(m_parent == NULL);	// should only be called on the root movie.
-
-	    if (path_to_var == NULL)
-		{
-		    log_error(_("NULL path_to_var passed to set_variable()"));
-		    return;
-		}
-	    if (new_value == NULL)
-		{
-		    log_error(_("NULL passed to set_variable('%s', NULL)"), path_to_var);
-		    return;
-		}
-
-	    std::string path(path_to_var);
-	    as_value val(new_value);
-
-	    m_as_environment.set_variable(path, val);
-}
-
 void sprite_instance::advance_sprite(float delta_time)
 {
 	//GNASH_REPORT_FUNCTION;
@@ -3874,7 +3828,7 @@ sprite_instance::setVariables(VariableMap& vars)
 	{
 		const string& name = it->first;
 		const string& val = it->second;
-		set_variable(name.c_str(), val.c_str());
+		set_member(name, val.c_str());
 	}
 }
 

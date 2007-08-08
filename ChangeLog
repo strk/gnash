@@ -1,5 +1,13 @@
 2007-08-08 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: drop set_variable() methods.
+	  Have setVariables() call set_member directly (might change in the
+	  future to call as_environment's set_variable, if we find out
+	  variables in query string, FlashParams and loadVariable loaded text
+	  files can contain path elements).
+
+2007-08-08 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/LoadVars.as: enabled tests erroneously
 	  committed disabled.
 	* server/sprite_instance.cpp (processCompletedLoadVariableRequests):

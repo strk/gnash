@@ -541,20 +541,8 @@ public:
 	// ActionScript support
 	//
 
-
-	/// Set the named variable to the value
-	virtual void set_variable(const char* path_to_var,
-		const char* new_value);
-
-	/// Set the named variable to the wide value
-	//
-	/// TODO: check if worth deprecating
-	virtual void set_variable(const char* path_to_var,
-		const wchar_t* new_value);
-
 	// See dox in as_object.h
 	bool get_member(const std::string& name, as_value* val);
-
 		
 	/// Set the named member to the value. 
 	//
