@@ -1,6 +1,8 @@
 2007-08-08 Sandro Santilli <strk@keybit.net>
 
-
+	* server/sprite_instance.cpp (processCompletedLoadVariableRequests):
+	  use set_member, not set_variable - the latter is only meant to be
+	  called on the root movie.
 	* server/impl.cpp, server/swf/tag_loaders.{cpp,h}: stub parsing
 	  of REFLEX tag.
 	* server/asobj/Mouse.cpp: make the global Mouse symbol point

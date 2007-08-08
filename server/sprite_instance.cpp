@@ -3838,8 +3838,8 @@ sprite_instance::processCompletedLoadVariableRequest(LoadVariablesThread& reques
 	{
 		const string& name = it->first;
 		const string& val = it->second;
-		log_msg(_("Setting variable '%s' to value '%s'"), name.c_str(), val.c_str());
-		set_variable(name.c_str(), val.c_str()); // should it be set_member ?
+		//log_msg(_("Setting variable '%s' to value '%s'"), name.c_str(), val.c_str());
+		set_member(name.c_str(), val.c_str());
 	}
 }
 
