@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.121 2007/08/01 21:36:58 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.122 2007/08/08 18:26:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1519,6 +1519,24 @@ serialnumber_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     // attach to movie_definition ?
 }
 
+void
+reflex_loader(stream* in, tag_type tag, movie_definition* /*m*/)
+{
+    assert(tag == SWF::REFLEX); // 777
+
+    in->ensureBytes(3);
+    uint8_t first = in->read_u8();
+    uint8_t second = in->read_u8();
+    uint8_t third = in->read_u8();
+
+    IF_VERBOSE_PARSE (
+	log_parse(_("  reflex = \"%c%c%c\""), first, second, third);
+    );
+
+    log_unimpl(_("REFLEX tag parsed (\"%c%c%c\") but unused"), first, second, third);
+
+}
+
 
 } // namespace gnash::SWF::tag_loaders
 } // namespace gnash::SWF
@@ -1732,7 +1750,7 @@ static void adpcm_expand(
 
 	// 4 is the fixed header for each sample ( 16bit sample id, 6bit stepsize_index )
 	// nbits is the number of bits for each sample
-	in->ensureBytes( sample_count * ( 3 + ceil(n_bits/8) ) );
+	in->ensureBytes( sample_count * ( 3 + (int)ceil(n_bits/8) ) );
 
 	while (sample_count)
 	{

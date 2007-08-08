@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.113 2007/07/18 22:17:16 strk Exp $ */
+/* $Id: impl.cpp,v 1.114 2007/08/08 18:26:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -237,6 +237,8 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
 	register_tag_loader(SWF::DEFINESHAPE4, fixme_loader); // 83
 	register_tag_loader(SWF::DEFINEMORPHSHAPE2, fixme_loader); // 84
+
+	register_tag_loader(SWF::REFLEX, reflex_loader); // 777
 }
 
 

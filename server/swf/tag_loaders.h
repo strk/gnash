@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: tag_loaders.h,v 1.19 2007/07/01 10:54:36 bjacques Exp $ */
+/* $Id: tag_loaders.h,v 1.20 2007/08/08 18:26:38 strk Exp $ */
 
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
@@ -77,6 +77,10 @@ void	define_shape_morph_loader(stream*, tag_type, movie_definition*);
 /// Load a font and adds it the the movie definition.
 ///
 void	define_font_loader(stream*, tag_type, movie_definition*);
+
+/// SWF Tags Reflex (777)
+//
+void	reflex_loader(stream*, tag_type, movie_definition*);
 
 /// SWF Tag DefineFontInfo (13 or 62) 
 //
