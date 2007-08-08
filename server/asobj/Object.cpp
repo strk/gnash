@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.25 2007/07/01 10:54:30 bjacques Exp $ */
+/* $Id: Object.cpp,v 1.26 2007/08/08 20:17:28 strk Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -250,7 +250,7 @@ object_registerClass(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Invalid call to Object.registerClass() - "
-			"empty symbol id"));
+			"empty symbol id (%s)"), fn.arg(0).to_debug_string().c_str());
 		);
 		return as_value(false);
 	}
@@ -260,7 +260,7 @@ object_registerClass(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Invalid call to Object.registerClass() - "
-			"class is not a function"));
+			"class is not a function (%s)"), fn.arg(1).to_debug_string().c_str());
 		);
 		return as_value(false);
 	}
