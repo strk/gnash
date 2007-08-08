@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.80 2007/08/01 04:02:13 strk Exp $ */
+/* $Id: plugin.cpp,v 1.81 2007/08/08 20:51:39 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,7 +35,7 @@
   <a href=\"http://www.gnu.org/licenses/gpl.html\">GNU General Public License \
   </a>. For more information about Gnash, see <a \
   href=\"http://www.gnu.org/software/gnash/\"> \
-  http://www.gnu.org/software/gnash</a>."
+  http://www.gnu.org/software/gnash</a>. Compatible Shockwave Flash 8.0 r99."
 
 #include <sys/param.h>
 #include "plugin.h" //Fixes Warning on redef of MIN/MAX

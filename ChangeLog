@@ -1,3 +1,8 @@
+2007-08-08 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* plugin/plugin.cpp: replicate compatibility version to the end, to
+	  make UFO flash version detector happy. Fixes bug #20696.
+
 2007-08-08 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp: drop set_variable() methods.
