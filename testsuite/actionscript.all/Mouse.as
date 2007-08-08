@@ -20,15 +20,15 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Mouse.as,v 1.10 2007/07/26 03:41:19 strk Exp $";
+rcsid="$Id: Mouse.as,v 1.11 2007/08/08 16:26:45 strk Exp $";
 
 #include "check.as"
 
-xcheck_equals ( typeof(Mouse), 'object' );
+check_equals ( typeof(Mouse), 'object' );
 
 // Mouse object can't be instanciated !
 var mouseObj = new Mouse;
-xcheck_equals(mouseObj, undefined);
+check_equals(mouseObj, undefined);
 
 // test the Mouse::hide method
 check_equals ( typeof(Mouse.hide), 'function' );

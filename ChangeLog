@@ -1,3 +1,9 @@
+2007-08-08 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Mouse.cpp: make the global Mouse symbol point
+	  to an object, not a constructor.
+	* testsuite/actionscript.all/Mouse.as: xcheck -> check.
+
 2007-08-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_{sdl,gst}.cpp: Detect and fix if a soundstream

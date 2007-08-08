@@ -27,6 +27,7 @@
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
+//#include "VM.h" // for registering static
 
 namespace gnash {
 
@@ -145,19 +146,18 @@ mouse_ctor(const fn_call& /* fn */)
 void mouse_class_init(as_object& global)
 {
 	// This is going to be the global Mouse "class"/"function"
-	static boost::intrusive_ptr<builtin_function> cl;
+	static boost::intrusive_ptr<as_object> obj;
 
-	if ( cl == NULL )
+	if ( ! obj )
 	{
-		cl=new builtin_function(&mouse_ctor, getMouseInterface());
-		// replicate all interface to class, to be able to access
-		// all methods as static functions
-		attachMouseInterface(*cl);
-		     
+		obj = new mouse_as_object();
+		// we shouldn't keep the Mouse object
+		// alive, I think.
+		//VM::get().addStatic(obj.get());
 	}
 
 	// Register _global.Mouse
-	global.init_member("Mouse", cl.get());
+	global.init_member("Mouse", obj.get());
 
 }
 
