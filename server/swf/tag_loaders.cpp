@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.123 2007/08/09 04:18:38 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.124 2007/08/09 17:01:19 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1751,27 +1751,47 @@ static void adpcm_expand(
 	data = reinterpret_cast<unsigned char *>(out_data);
 
 	// Read header.
-	in->ensureBytes(2);   // header size
+	in->ensureBytes(1); // nbits
 	unsigned int n_bits = in->read_uint(2) + 2;	// 2 to 5 bits (TODO: use unsigned...)
 
 
 #ifndef GNASH_TRUST_SWF_INPUT
 
-	// bitsPerSample is the number of bits for each sample
-	unsigned int bitsPerSample = n_bits;
-	if (stereo) bitsPerSample *= 2;
+	// bitsPerCompSample is the number of bits for each comp sample
+	unsigned int bitsPerCompSample = n_bits;
+	if (stereo) bitsPerCompSample *= 2;
 
-	// There's going to be one block every 4096 samples (or fraction)
-	unsigned int blocksCount = (unsigned int)ceil(sample_count/4096);
+	// There's going to be one block every 4096 samples ...
+	unsigned int blocksCount = sample_count/4096;
 
-	// Every block will have an header of 22 bits
-	unsigned int bitsPerBlock = 22;
+	// ... or fraction
+	if ( sample_count%4096 ) ++blocksCount;
 
-	unsigned long bytesNeeded = (unsigned long)ceil( ( (sample_count*bitsPerSample) + (bitsPerBlock * blocksCount) ) / 8 );
+	// Of the total samples, all but the first sample in a block are comp
+	unsigned int compSamples = sample_count - blocksCount;
 
-	//log_debug("adpcm_expand, stereo:%d, sample_count:%d, nbits:%d, bytesNeeded:%d", stereo, sample_count, n_bits, bytesNeeded);
+	// From every block, a fixed 22 bits will be read (16 of which are the uncomp sample)
+	unsigned int fixedBitsPerBlock = 22;
+
+	// Total bits needed from stream
+	unsigned long bitsNeeded = (compSamples*bitsPerCompSample) + (fixedBitsPerBlock*blocksCount);
+
+	// 2 bits have been read already, so the stream position is now one byte after the
+	// next 6 bits we're going to read, so we strip those 6 bits from the count of bits
+	// we still need
+	bitsNeeded -= (8-2);
+
+	// Now, we convert this number to bytes, requiring one more if any 
+	unsigned int excessBits = bitsNeeded%8;
+	unsigned long bytesNeeded = bitsNeeded/8;
+	if ( excessBits ) ++bytesNeeded;
+
+	//log_debug("adpcm_expand, stereo:%d, sample_count:%u, bitsPerSample:%u, "
+	//	"blocksCount:%u, bitsPerBlock:%u, bitsNeeded:%lu, excessBits:%u, bytesNeeded:%lu",
+	//	stereo, sample_count, bitsPerCompSample, blocksCount, fixedBitsPerBlock, bitsNeeded, excessBits, bytesNeeded);
 
 	in->ensureBytes(bytesNeeded);
+
 #endif // GNASH_TRUST_SWF_INPUT
 
 	while (sample_count)
