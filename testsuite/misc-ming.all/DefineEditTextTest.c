@@ -125,7 +125,6 @@ main(int argc, char** argv)
   //check(mo, "!TextField.prototype.hasOwnProperty('backgroundColor')");
   //check(mo, "!TextField.prototype.hasOwnProperty('text')");
   //check(mo, "!TextField.prototype.hasOwnProperty('textColor')");
-  //check(mo, "!TextField.prototype.hasOwnProperty('_alpha')");
 
   /*********************************************
    *
@@ -166,7 +165,6 @@ main(int argc, char** argv)
   check(mo, "TextField.prototype.hasOwnProperty('backgroundColor')");
   xcheck(mo, "TextField.prototype.hasOwnProperty('text')");
   check(mo, "TextField.prototype.hasOwnProperty('textColor')");
-  //check(mo, "TextField.prototype.hasOwnProperty('_alpha')");
   
   check_equals(mo, "typeof(dtext1)", "'object'");
   check_equals(mo, "typeof(dtext1.text)", "'string'");
