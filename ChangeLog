@@ -1,5 +1,7 @@
 2007-08-09 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.cpp (construct): properly construct
+	  all button child characters. Fixes bug #20729.
 	* server/swf/tag_loaders.cpp (adpcm_expand): another try at fixing the
 	  needed bytes count for compressed adpcm samples. Also, remove call
 	  to ceil.

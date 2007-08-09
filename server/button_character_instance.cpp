@@ -871,6 +871,7 @@ button_character_instance::construct()
 
 		// we don't need an id here, do we ?
 		boost::intrusive_ptr<character> ch = bdef.m_character_def->create_character_instance(this, 0);
+		ch->construct(); // give this character life
 		m_record_character[r] = ch;
 		ch->set_matrix(mat);
 		ch->set_cxform(cx);
