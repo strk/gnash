@@ -408,7 +408,13 @@ FreetypeGlyphsProvider::getGlyph(uint16_t code, float& advance)
 	log_debug("Advance value for glyph '%c' is %g (horiAdvance:%ld, scale:%g)", code, advance, m_face->glyph->metrics.horiAdvance, scale);
 #endif
 
-	assert(m_face->glyph->format == FT_GLYPH_FORMAT_OUTLINE);
+	if ( m_face->glyph->format != FT_GLYPH_FORMAT_OUTLINE )
+	{
+		log_unimpl("FT_Load_Char() returned a glyph format != FT_GLYPH_FORMAT_OUTLINE (%d)",
+			m_face->glyph->format);
+		return 0;
+	}
+	//assert(m_face->glyph->format == FT_GLYPH_FORMAT_OUTLINE);
 
 	FT_Outline* outline = &(m_face->glyph->outline);
 
