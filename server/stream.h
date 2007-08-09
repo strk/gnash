@@ -15,6 +15,7 @@
 #include "GnashException.h"
 
 #include <string>
+#include <sstream>
 
 // Define the following macro if you want to want Gnash parser
 // to assume the underlying SWF is well-formed. It would make
@@ -194,9 +195,12 @@ namespace gnash {
 		void ensureBytes(unsigned long needed)
 		{
 #ifndef GNASH_TRUST_SWF_INPUT
-			if ( get_tag_end_position() - get_position() < needed )
+			unsigned long int left = get_tag_end_position() - get_position();
+			if ( left < needed )
 			{
-				throw ParserException("premature end of tag");
+				std::stringstream ss;
+				ss << "premature end of tag: need to read " << needed << " bytes, but only " << left << " left in this tag";
+				throw ParserException(ss.str());
 			}
 #endif
 		}

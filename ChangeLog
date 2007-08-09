@@ -1,3 +1,10 @@
+2007-08-09 Sandro Santilli <strk@keybit.net>
+
+	* server/stream.h (ensureBytes): be more verbose about the lack of
+	  data. Fix signed/unsigned comparison.
+	* server/swf/tag_loaders.cpp (adpcm_expand): fix count of needed
+	  bytes. Fixes bug #20725.
+
 2007-08-08 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* plugin/plugin.cpp: replicate compatibility version to the end, to

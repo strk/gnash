@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.122 2007/08/08 18:26:38 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.123 2007/08/09 04:18:38 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1054,7 +1054,7 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	sound_handler* handler = get_sound_handler();
 
-	in->ensureBytes(2+1+4); // character id + flags + sample count
+	in->ensureBytes(2+4+1+4); // character id + flags + sample count
 
 	uint16_t	character_id = in->read_u16();
 
@@ -1318,6 +1318,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
 
     case sound_handler::FORMAT_ADPCM:
       {
+	//log_debug("ADPCM format");
 	// Uncompress the ADPCM before handing data to host.
 	if (sample_count == 0) sample_count = data_bytes / ( stereo ? 4 : 2 );
 	adpcm_expand(data, in, sample_count, stereo);
@@ -1326,6 +1327,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	break;
       }
     case sound_handler::FORMAT_RAW:
+	//log_debug("RAW format");
 	// 8- or 16-bit mono or stereo host-endian audio
 	// Convert to 16-bit host-endian
 	if (sample_16bit) {
@@ -1344,6 +1346,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	break;
 
     case sound_handler::FORMAT_UNCOMPRESSED:
+	//log_debug("UNCOMPRESSED format");
 	// 8- or 16-bit mono or stereo little-endian audio
 	// Convert to 16-bit host-endian.
 	if (!sample_16bit)
@@ -1393,6 +1396,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
 	break;
 
     case sound_handler::FORMAT_MP3:
+	//log_debug("MP3 format");
 	// Decompressed elsewhere
 	in->ensureBytes(data_bytes); 
 	data = new unsigned char[data_bytes];
@@ -1401,6 +1405,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
 
     case sound_handler::FORMAT_NELLYMOSER_8HZ_MONO:
     case sound_handler::FORMAT_NELLYMOSER:
+	//log_debug("NELLYMOSER format");
 	// One day...
 	in->ensureBytes(data_bytes); 
 	in->skip_bytes(data_bytes);
@@ -1410,6 +1415,7 @@ sound_expand(stream *in, sound_handler::format_type &format,
     // This is impossible as an input but stops fussy compilers
     // complaining about unhandled enum values.
     case sound_handler::FORMAT_NATIVE16:
+	//log_debug("NATIVE16 format");
 	break;
     }
 }
@@ -1738,7 +1744,7 @@ public:
 static void adpcm_expand(
 	unsigned char* &data,
 	stream* in,
-	int sample_count,	// in stereo, this is number of *pairs* of samples
+	int sample_count,	// in stereo, this is number of *pairs* of samples (TODO: why is this signed at all ??)
 	bool stereo)
 {
 	int16_t* out_data = new int16_t[stereo ? sample_count*2 : sample_count];
@@ -1746,11 +1752,27 @@ static void adpcm_expand(
 
 	// Read header.
 	in->ensureBytes(2);   // header size
-	int	n_bits = in->read_uint(2) + 2;	// 2 to 5 bits
+	unsigned int n_bits = in->read_uint(2) + 2;	// 2 to 5 bits (TODO: use unsigned...)
 
-	// 4 is the fixed header for each sample ( 16bit sample id, 6bit stepsize_index )
-	// nbits is the number of bits for each sample
-	in->ensureBytes( sample_count * ( 3 + (int)ceil(n_bits/8) ) );
+
+#ifndef GNASH_TRUST_SWF_INPUT
+
+	// bitsPerSample is the number of bits for each sample
+	unsigned int bitsPerSample = n_bits;
+	if (stereo) bitsPerSample *= 2;
+
+	// There's going to be one block every 4096 samples (or fraction)
+	unsigned int blocksCount = (unsigned int)ceil(sample_count/4096);
+
+	// Every block will have an header of 22 bits
+	unsigned int bitsPerBlock = 22;
+
+	unsigned long bytesNeeded = (unsigned long)ceil( ( (sample_count*bitsPerSample) + (bitsPerBlock * blocksCount) ) / 8 );
+
+	//log_debug("adpcm_expand, stereo:%d, sample_count:%d, nbits:%d, bytesNeeded:%d", stereo, sample_count, n_bits, bytesNeeded);
+
+	in->ensureBytes(bytesNeeded);
+#endif // GNASH_TRUST_SWF_INPUT
 
 	while (sample_count)
 	{
