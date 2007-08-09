@@ -1,3 +1,9 @@
+2007-08-09 David Rorex  <drorex@gmail.com>
+
+	* testsuite/misc-swfc.all: new directory for testcases.
+	* testsuite/misc-swfc.all/check.sc, Dejagnu.sc, sound.sc, hello.sc,
+	  sound.wav, Makefile.am: new test framework by using swfc.
+
 2007-08-09 Sandro Santilli <strk@keybit.net>
 
 	* server/stream.h (ensureBytes): be more verbose about the lack of
