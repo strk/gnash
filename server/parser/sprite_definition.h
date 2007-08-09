@@ -86,9 +86,9 @@ public:
 	//
 	// TODO: implement in base class ?
 	//
-	void addTimelineDepth(int depth, int ratio)
+	void addTimelineDepth(int depth)
 	{
-		_timeline.addDepth(depth, ratio);
+		_timeline.addDepth(depth);
 	}
 
 	// See dox in base class
@@ -104,7 +104,7 @@ public:
 	//
 	// TODO: implement in base class ?
 	//
-	void getTimelineDepths(size_t frameno, std::map<int, int>& depths)
+	void getTimelineDepths(size_t frameno, std::vector<int>& depths)
 	{
 		_timeline.getFrameDepths(frameno, depths);
 	}

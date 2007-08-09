@@ -25,7 +25,7 @@
 #endif
 
 #include <vector>
-#include <map>
+#include <set>
 #include <boost/thread/mutex.hpp>
 
 namespace gnash
@@ -58,7 +58,7 @@ public:
 	/// Construct a Timeline instance 
 	Timeline()
 	{
-		_frameDepths.push_back(DepthMap());
+		_frameDepths.push_back(DepthSet());
 	}
 
 	/// Destroy a Timeline instance
@@ -94,7 +94,7 @@ public:
 	///
 	void closeFrame()
 	{
-		boost::mutex::scoped_lock lock(_frameDepthsMutex);
+		//boost::mutex::scoped_lock lock(_frameDepthsMutex);
 
 		// Copy depth set from previous frame
 		_frameDepths.push_back(_frameDepths.back());
@@ -106,9 +106,6 @@ public:
 	///	Depth of an instance placed by PlaceObject* tag.
 	///	Assumed to be in the static zone (an assertion would fail otherwise).
 	///
-	/// @param ratio
-	/// Ratio of an instance defined by PlaceObject* tag, default to zero.
-	///
 	/// Does NOT lock the mutex as this function is intended to be 
 	/// called by a single thread (the loader/parser).
 	///
@@ -116,11 +113,11 @@ public:
 	///	Depth of an instance placed by PlaceObject* tag.
 	///	Assumed to be in the static zone (an assertion would fail otherwise).
 	///
-	void addDepth(int depth, int ratio=0)
+	void addDepth(int depth)
 	{
 		assert(depth < 0 && depth >= -16384); // or should be > -16384 (not ==?)
 
-		_frameDepths.back().insert(DRPair(depth, ratio));
+		_frameDepths.back().insert(depth);
 	}
 
 	/// Remove a timeline depth from the current frame 
@@ -166,24 +163,21 @@ public:
 	///	
 	///	
 	///
-	void getFrameDepths(size_t frameno, std::map<int, int>& depths)
+	void getFrameDepths(size_t frameno, std::vector<int>& depths)
 	{
 		assert(frameno < _frameDepths.size());
 
-		DepthMap& from = _frameDepths[frameno];
-		depths.insert(from.begin(), from.end());
+		DepthSet& from = _frameDepths[frameno];
+		depths.assign(from.begin(), from.end());
 	}
 
 private:
 
-	/// A pair of depth value and ratio ralue
-	typedef std::map<int, int>::value_type DRPair;
+	/// A set of depths in the static zone
+	typedef std::set<int> DepthSet;
 
-	/// A set of depth-ratio-pairs in the static zone
-	typedef std::map<int, int> DepthMap;
-
-	/// A vector of depth maps (one for each frame)
-	typedef std::vector<DepthMap> FrameDepths;
+	/// A vector of depth sets (one for each frame)
+	typedef std::vector<DepthSet> FrameDepths;
 
 	/// Return the number of frames completely defined
 	//
@@ -223,10 +217,10 @@ operator<< (std::ostream& os, const Timeline& t)
 	for (Timeline::FrameDepths::const_iterator it=t._frameDepths.begin(), itEnd=t._frameDepths.end(); it!=itEnd; ++it)
 	{
 		os << "[";
-		for (Timeline::DepthMap::const_iterator di=it->begin(), de=it->end(); di!=de; ++di)
+		for (Timeline::DepthSet::const_iterator di=it->begin(), de=it->end(); di!=de; ++di)
 		{
-			if ( di != it->begin() ) os << ", ";
-			os << "<" << di->first << ", " << di->second << ">";
+			if ( di != it->begin() ) os << ",";
+			os << *di;
 		}
 		os << "]";
 		os << "\n";

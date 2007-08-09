@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.16 2007/07/01 10:54:35 bjacques Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.17 2007/08/09 12:18:07 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -239,7 +239,10 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
 		m_color_transform.read_rgba(in);
 	}
 
-	if (has_ratio) m_ratio = in->read_u16();
+	if (has_ratio) 
+		m_ratio = in->read_u16();
+	else
+		m_ratio = character::noRatioValue;
 
 	if (has_name) m_name = in->read_string();
 
@@ -380,7 +383,7 @@ PlaceObject2Tag::loader(stream* in, tag_type tag, movie_definition* m)
 	int ratio = ch->getRatio();
     if ( depth < 0 && depth >= character::staticDepthOffset )
     {
-    	m->addTimelineDepth(depth, ratio);
+    	m->addTimelineDepth(depth);
     }
     else
     {

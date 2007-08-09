@@ -111,9 +111,9 @@ main(int argc, char** argv)
                         check_equals(_root.mc_blue._x, 0); \
                     }else if(counter == 1)  \
                     { \
-                        xcheck_equals(_root.mc_blue._x, 60); \
-                        xcheck_equals(typeof(_root.mc_black), 'undefined'); \
-                        xcheck_equals(typeof(_root.mc_black_name_changed), 'movieclip'); \
+                        check_equals(_root.mc_blue._x, 60); \
+                        check_equals(typeof(_root.mc_black), 'undefined'); \
+                        check_equals(typeof(_root.mc_black_name_changed), 'movieclip'); \
                     } ");
   // This one is normal. mc_red._x should *not* be 20 when restart.
   // Note that mc_red has been removed at the 2nd frame, so when

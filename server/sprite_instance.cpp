@@ -73,11 +73,6 @@ namespace gnash {
 //#define GNASH_DEBUG_TIMELINE 1
 //#define GNASH_DEBUG_REPLACE 1
 
-// Unfed for original design, 2 for second redesign attempt, 3 for third redesign attempt
-#define NEW_TIMELINE_DESIGN 3
-
-
-
 // Forward declarations
 static as_object* getMovieClipInterface();
 static void attachMovieClipInterface(as_object& o);
@@ -1723,6 +1718,7 @@ sprite_instance::sprite_instance(
 	m_play_state(PLAY),
 	m_current_frame(0),
 	m_has_looped(false),
+	is_jumping_back(false),
 	m_init_actions_executed(),
 	m_as_environment(),
 	m_has_key_event(false),
@@ -2289,7 +2285,8 @@ void sprite_instance::advance_sprite(float delta_time)
 				// TODO: check why this would be any different
 				//       then calling restoreDisplayList(0) instead..
 				//       Ah! I think I know..
-				resetDisplayList();
+				//resetDisplayList();
+				restoreDisplayList(0); // seems OK to me.
 			}
 
 			// TODO: Make sure m_current_frame is 0-based during execution of DLIST tags
@@ -2373,6 +2370,9 @@ void sprite_instance::advance(float delta_time)
 		if (m_has_key_event)
 		{
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
+			// TODO: Don't do this at every advancement
+			// OnClip key handlers should be registered at construction time, 
+			// User defined handlers should be registered explicitly by Key.addListener();
 			_vm.getRoot().add_key_listener(KeyListener(this, KeyListener::ON_CLIP_DEF));
 #else
 			_vm.getRoot().add_key_listener(this);
@@ -2448,113 +2448,6 @@ sprite_instance::resetDisplayList()
 	};
 }
 
-#if NEW_TIMELINE_DESIGN == 2 // 2nd redesign attempt
-
-/// A DisplayList visitor used to extract timeline instances that
-/// should be removed when rewinding playhead to a given frame
-///
-///
-/// See http://www.gnashdev.org/wiki/index.php/TimelineControl for
-/// more informations.
-///
-class TimelineInstanceFinder {
-
-	std::vector<character*> _toRemove;
-
-	// target frame, 0-based
-	size_t _frame;
-
-public:
-
-	/// @param tgtFrame
-	///	The frame to which we're rewinding. 0-based.
-	///
-	TimelineInstanceFinder(size_t tgtFrame)
-		:
-		_frame(tgtFrame)
-	{
-	}
-
-	/// Return a vector of characters to remove
-	std::vector<character*>& toRemove() { return _toRemove; }
-
-	bool operator() (character* ch) 
-	{
-		int depth = ch->get_depth();
-
-		// Timeline instances are always initially placed
-		// at negative depths and we don't want to remove those
-		// moved to different depths, so when depth 0 is
-		// reached our scan is complete.
-		if ( depth >= 0 )
-		{
-#ifdef GNASH_DEBUG_TIMELINE
-			cout << this << "] Char at depth " << depth << " reached, end scan" << endl;
-#endif
-			return false;
-		}
-
-		TimelineInfo* info = ch->getTimelineInfo();
-		if ( ! info )
-		{
-#ifdef GNASH_DEBUG_TIMELINE
-			cout << this << "] Char at depth " << depth
-				<< " is not a timeline, will remove" << endl;
-#endif
-			// non-timeline instances in static depth zone
-			// needs to be removed
-			_toRemove.push_back(ch);
-		}
-		else
-		{
-#ifdef GNASH_DEBUG_TIMELINE
-			cout << this << "] Char at depth " << depth
-				<< " is a timeline instance, placed originally in frame "
-				<< info->placedInFrame() << " at depth "
-				<< info->placedAtDepth() << endl;
-#endif
-
-			// timeline instances created after the target frame
-			// are always removed (those in the 'dynamic depth zone'
-			// won't get to this point)
-			if ( info->placedInFrame() > _frame )
-			{
-#ifdef GNASH_DEBUG_TIMELINE
-			        cout << this << "] will remove "
-					<< "(placed after target frame "
-					<< _frame << ")" << endl;
-#endif
-				_toRemove.push_back(ch);
-			}
-
-			// timeline instances created before or at the target frame
-			// are only removed if they are no more at the original depth
-			else if ( info->placedAtDepth() != depth )
-			{
-#ifdef GNASH_DEBUG_TIMELINE
-			        cout << this << "] will remove "
-					<< "(originally at a different depth)"
-					<< endl;
-#endif
-				_toRemove.push_back(ch);
-			}
-
-#ifdef GNASH_DEBUG_TIMELINE
-			else
-			{
-			        cout << this << "] will keep "
-					<< "(none of the above applied)"
-					<< endl;
-			}
-#endif
-		}
-
-		return true;
-	}
-};
-
-#endif // NEW_TIMELINE_DESIGN == 2
-
 /*private*/
 void
 sprite_instance::restoreDisplayList(size_t tgtFrame)
@@ -2564,47 +2457,14 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 	//       for jump-forwards would do
 	assert(tgtFrame <= m_current_frame);
 
-#if NEW_TIMELINE_DESIGN == 2 // 2nd redesign attempt
-
-	// 1. Remove from current DisplayList:
-	// 	- Timeline instances constructed after target frame are always removed.
-	// 	- Timeline instances constructed before or at the target frame but no more at the original depth are removed.
-	//  	- Dynamic instances found in the static depth zone 
-	
-	TimelineInstanceFinder finder(tgtFrame);
-#ifdef GNASH_DEBUG_TIMELINE
-	cout << "TimelineInstanceFinder " << &finder << " created for target frame " << tgtFrame << " from frame " << m_current_frame << endl;
-#endif
-	const_cast<DisplayList&>(m_display_list).visitForward(finder);
-	std::vector<character*>& toRemove = finder.toRemove();
-
-#ifdef GNASH_DEBUG_TIMELINE
-	cout << toRemove.size() << " chars found to remove." << endl;
-#endif
-	if ( ! toRemove.empty() )
-	{
-#ifdef GNASH_DEBUG_TIMELINE
-		cout << "Found to remove: " << endl;
-		std::ostream_iterator<as_value> ostrIter(cout, "," ) ;
-		std::copy(toRemove.begin(), toRemove.end(), ostrIter);
-		cout << "Current DisplayList: " << m_display_list << endl;
-#endif
-
-		set_invalidated(); 
-		m_display_list.clear(toRemove, true); // call onUnload
-
-#ifdef GNASH_DEBUG_TIMELINE
-		cout << "DisplayList after removal: " << m_display_list << endl;
-#endif
-	}
-
-#elif NEW_TIMELINE_DESIGN == 3 // 3rd redesign attempt
+	is_jumping_back = true; //remember we are jumping back
 
 	// 1. Find all "timeline depth" for the target frame, querying the
 	//    Timeline object in the sprite/movie definition (see implementation details)
 	// 2. Remove step 
-	// 2.1 Remove all current dynamic instances found in static depth zone 
-	// 2.2 Remove all current timeline instances at a depth NOT in the set found in step 1 
+	//	2.1 Remove all current dynamic instances found in static depth zone 
+	//	2.2 Remove all current timeline instances at a depth NOT in the set found in step 1 
+	//  2.3 Remove all non-script-referencable instances, suboptimal!
 
 	// TODO: try to optize by avoid calling set_invalidated
 	DisplayList newList = m_display_list;
@@ -2617,10 +2477,7 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 		m_display_list = newList;
 	}
 
-#endif // NEW_TIMELINE_DESIGN == 3
-
-
-	// 2. Execute all displaylist tags from first to target frame 
+	// 3. Execute all displaylist tags from first to target frame 
 
 	for (size_t f = 0; f<=tgtFrame; ++f)
 	{
@@ -2633,6 +2490,7 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 		execute_frame_tags(f, TAG_DLIST);
 	}
 
+	is_jumping_back = false; // finished jumping back
 }
 
 // 0-based frame number !
@@ -2708,178 +2566,138 @@ void
 sprite_instance::goto_frame(size_t target_frame_number)
 {
 #if defined(DEBUG_GOTOFRAME) || defined(GNASH_DEBUG_TIMELINE)
-	log_msg(_("sprite %s ::goto_frame(" SIZET_FMT ") - current frame is "
-		SIZET_FMT),
-		getTargetPath().c_str(), target_frame_number, m_current_frame);
+    log_msg(_("sprite %s ::goto_frame(" SIZET_FMT ") - current frame is "
+        SIZET_FMT),
+        getTargetPath().c_str(), target_frame_number, m_current_frame);
 #endif
 
-	// TODO: the assertion fails against all.swf with NEW_TIMELINE_DESIGN 
-	//       (swf from http://www.ferryhalim.com/orisinal/)
-	//assert(! isUnloaded() );
-	if ( isUnloaded() )
+    // TODO: the assertion fails against all.swf with NEW_TIMELINE_DESIGN 
+    //       (swf from http://www.ferryhalim.com/orisinal/)
+    //assert(! isUnloaded() );
+    if ( isUnloaded() )
+    {
+        log_error("Sprite %s unloaded on gotoFrame call... let Gnash developers know please", getTarget().c_str());
+    }
+
+    // goto_frame stops by default.
+    // ActionGotoFrame tells the movieClip to go to the target frame 
+    // and stop at that frame. 
+    set_play_state(STOP);
+
+    if(target_frame_number == m_current_frame)
+    {
+        // don't push actions
+        return;
+    }
+    if(target_frame_number > m_def->get_frame_count() - 1)
+    {
+        m_current_frame = m_def->get_frame_count() - 1;
+        // don't push actions
+        return;
+    }
+
+    // Unless the target frame is the next one, stop playback of soundstream
+    int stream_id = get_sound_stream_id();
+    if (target_frame_number != m_current_frame+1 && stream_id != -1) 
 	{
-		log_error("Sprite %s unloaded on gotoFrame call... let Gnash developers know please", getTarget().c_str());
-	}
+        sound_handler* sh = get_sound_handler();
+        if (sh != NULL) sh->stop_sound(stream_id);
+        set_sound_stream_id(-1);
+    }
 
-	// goto_frame stops by default.
-	// ActionGotoFrame tells the movieClip to go to the target frame 
-	// and stop at that frame. 
-	set_play_state(STOP);
+    size_t loaded_frames = get_loaded_frames();
+    // target_frame_number is 0-based, get_loaded_frames() is 1-based
+    // so in order to goto_frame(3) loaded_frames must be at least 4
+    // if goto_frame(4) is called, and loaded_frames is 4 we're jumping
+    // forward
+    if ( target_frame_number >= loaded_frames )
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("GotoFrame(" SIZET_FMT ") targets a yet "
+                "to be loaded frame (" SIZET_FMT ") loaded). "
+                "We'll wait for it but a more correct form "
+                "is explicitly using WaitForFrame instead"),
+                target_frame_number+1,
+                loaded_frames);
 
-	if(target_frame_number == m_current_frame)
-	{
-		// don't push actions
-		return;
-	}
-	if(target_frame_number > m_def->get_frame_count() - 1)
-	{
-		m_current_frame = m_def->get_frame_count() - 1;
-		// don't push actions
-		return;
-	}
-
-	// Unless the target frame is the next one, stop playback of soundstream
-	int stream_id = get_sound_stream_id();
-	if (target_frame_number != m_current_frame+1 && stream_id != -1) {
-		sound_handler* sh = get_sound_handler();
-		if (sh != NULL) sh->stop_sound(stream_id);
-		set_sound_stream_id(-1);
-	}
-
-	size_t loaded_frames = get_loaded_frames();
-	// target_frame_number is 0-based, get_loaded_frames() is 1-based
-	// so in order to goto_frame(3) loaded_frames must be at least 4
-	// if goto_frame(4) is called, and loaded_frames is 4 we're jumping
-	// forward
-	if ( target_frame_number >= loaded_frames )
-	{
-		IF_VERBOSE_ASCODING_ERRORS(
-			log_aserror(_("GotoFrame(" SIZET_FMT ") targets a yet "
-				"to be loaded frame (" SIZET_FMT ") loaded). "
-				"We'll wait for it but a more correct form "
-				"is explicitly using WaitForFrame instead"),
-				target_frame_number+1,
-				loaded_frames);
-
-		);
-		m_def->ensure_frame_loaded(target_frame_number+1);
-	}
+        );
+        m_def->ensure_frame_loaded(target_frame_number+1);
+    }
 
 
-	//
-	// Construct the DisplayList of the target frame
-	//
-	
-	if (target_frame_number < m_current_frame)
-	// Go backward to a previous frame
-	{
-#ifdef NEW_TIMELINE_DESIGN // new design
-		// restoreDisplayList takes care of properly setting the m_current_frame variable
-		restoreDisplayList(target_frame_number);
-		assert(m_current_frame == target_frame_number);
-#else // old design
+    //
+    // Construct the DisplayList of the target frame
+    //
+    
+    if (target_frame_number < m_current_frame)
+    // Go backward to a previous frame
+    {
+        // restoreDisplayList takes care of properly setting the m_current_frame variable
+        restoreDisplayList(target_frame_number);
+        assert(m_current_frame == target_frame_number);
 
-		set_invalidated(); 
-
-  // <UdoG> current design is sub-optimal because it causes unnecessary 
-  // redraw. Consider a static graphic that stays at it's position all
-  // the time. When looping betwen two frames 
-  //  gotoAndPlay(_currentframe-1);
-  // then resetDisplayList() will remove that character and 
-  // execute_frame_tags() will insert it again. So the next 
-  // set_invalidated() call (which currently *is* correct) will cause
-  // redraw of the whole sprite even if it doesn't change visually
-  // at all.
-
-
-		resetDisplayList();
-		for (size_t f = 0; f<=target_frame_number; f++)
-		{
-			execute_frame_tags(f, TAG_DLIST);
-		}
-#endif
-	}
-	else
-	// Go forward to a later frame
-	{
-		// We'd immediately return if target_frame_number == m_current_frame
-		assert(target_frame_number > m_current_frame);
-
-		// Construct the DisplayList of the target frame
-#ifdef NEW_TIMELINE_DESIGN
-		while (m_current_frame++ < target_frame_number)
-		{
-#ifdef GNASH_DEBUG_TIMELINE
-			cout << "Executing tags in frame " << m_current_frame << endl;
-#endif
-			// Second argument requests that only "DisplayList" tags
-			// are executed. This means NO actions will be
-			// pushed on m_action_list.
-			execute_frame_tags(m_current_frame, TAG_DLIST);
-		}
-		--m_current_frame; // as we might h
-		assert(m_current_frame == target_frame_number);
-#ifdef GNASH_DEBUG_TIMELINE
-		cout << "At end of loop, m_current_frame is " << m_current_frame << endl;
-#endif
-
-#else // ! defined (NEW_TIMELINE_DESIGN)
-
-		for (size_t f = m_current_frame+1; f<=target_frame_number; ++f)
-		{
-			// Second argument requests that only "DisplayList" tags
-			// are executed. This means NO actions will be
-			// pushed on m_action_list.
-			execute_frame_tags(f, TAG_DLIST);
-		}
-#endif
-
-	}
+       // <UdoG> current design is sub-optimal because it causes unnecessary 
+       // redraw. Consider a static graphic that stays at it's position all
+       // the time. When looping betwen two frames 
+       // gotoAndPlay(_currentframe-1);
+       // then resetDisplayList() will remove that character and 
+       // execute_frame_tags() will insert it again. So the next 
+       // set_invalidated() call (which currently *is* correct) will cause
+       // redraw of the whole sprite even if it doesn't change visually
+       // at all.
+    }
+    else
+    // Go forward to a later frame
+    {
+        // We'd immediately return if target_frame_number == m_current_frame
+        assert(target_frame_number > m_current_frame);
+        for (size_t f = m_current_frame+1; f<=target_frame_number; ++f)
+        {
+            // Second argument requests that only "DisplayList" tags
+            // are executed. This means NO actions will be
+            // pushed on m_action_list.
+            execute_frame_tags(f, TAG_DLIST);
+        }
+        m_current_frame = target_frame_number;
+    }
 
 #if defined(GNASH_DEBUG_TIMELINE)
-	cout << "At end of DisplayList reconstruction, m_current_frame is " << m_current_frame << endl;
+    cout << "At end of DisplayList reconstruction, m_current_frame is " << m_current_frame << endl;
 #endif
 
-	/// Backup current action list, as we're going to use it
-	/// to fetch actions in the target frame
-	ActionList actionListBackup = m_action_list;
+    /// Backup current action list, as we're going to use it
+    /// to fetch actions in the target frame
+    ActionList actionListBackup = m_action_list;
 
-	// m_action_list contains actions from frame 'target_frame_number'
-	// to frame 'm_current_frame', too much than needed, clear it first.
-	// TODO: check this, we didn't execute TAG_ACTION tags...
-	//       Can it be we're cleaning up too many actions here ?
-	m_action_list.clear();
+    // m_action_list contains actions from frame 'target_frame_number'
+    // to frame 'm_current_frame', too much than needed, clear it first.
+    // TODO: check this, we didn't execute TAG_ACTION tags...
+    //       Can it be we're cleaning up too many actions here ?
+    m_action_list.clear();
 
-	// Get the actions of target frame.(We don't have a direct way to
-	// do this, so use execute_frame_tags instead).
-	execute_frame_tags(target_frame_number, TAG_ACTION);
+    // Get the actions of target frame.(We don't have a direct way to
+    // do this, so use execute_frame_tags instead).
+    execute_frame_tags(target_frame_number, TAG_ACTION);
 
-#ifndef NEW_TIMELINE_DESIGN
-	//FIXME: set m_current_frame to the target frame;
-	//  I think it's too early to do it here! Later actions in the 
-	//  current frame should also be executed(Zou)
-	m_current_frame = target_frame_number;      
-#else
-	assert(m_current_frame == target_frame_number);
-#endif
+    assert(m_current_frame == target_frame_number);
 
 
-	// After entering to advance_sprite() m_current_frame points to frame
-	// that already is executed. 
-	// Macromedia Flash do goto_frame then run actions from this frame.
-	// We do too.
+    // After entering to advance_sprite() m_current_frame points to frame
+    // that already is executed. 
+    // Macromedia Flash do goto_frame then run actions from this frame.
+    // We do too.
 
-	// Stores the target frame actions to m_goto_frame_action_list, which
-	// will be executed in after advancing child characters.
-	// When actions execution order will be fixed all of this might
-	// become obsoleted and the target frame actions could be pushed
-	// directly on the preexisting m_action_list (and no need to back it up).
-	//
-	//m_goto_frame_action_list = m_action_list; 
-	queueActions(m_action_list);
+    // Stores the target frame actions to m_goto_frame_action_list, which
+    // will be executed in after advancing child characters.
+    // When actions execution order will be fixed all of this might
+    // become obsoleted and the target frame actions could be pushed
+    // directly on the preexisting m_action_list (and no need to back it up).
+    //
+    //m_goto_frame_action_list = m_action_list; 
+    queueActions(m_action_list);
 
-	// Restore ActionList  from backup
-	m_action_list = actionListBackup;
+    // Restore ActionList  from backup
+    m_action_list = actionListBackup;
 
 }
 
@@ -2959,257 +2777,166 @@ sprite_instance::attachCharacter(character& newch, int depth)
 
 character*
 sprite_instance::add_display_object(
-		uint16_t character_id,
-		const char* name,
-		const std::vector<swf_event*>& event_handlers,
-		int depth, 
-		bool replace_if_depth_is_occupied,
-		const cxform& color_transform, const matrix& mat,
-		int ratio, int clip_depth)
+    uint16_t character_id,
+    const char* name,
+    const std::vector<swf_event*>& event_handlers,
+    int depth, 
+    bool replace_if_depth_is_occupied,
+    const cxform& color_transform, const matrix& mat,
+    int ratio, int clip_depth)
 {
-//	    GNASH_REPORT_FUNCTION;
-	assert(m_def != NULL);
+//GNASH_REPORT_FUNCTION;
+    assert(m_def != NULL);
 
-	character_def*	cdef = m_def->get_character_def(character_id);
-	if (cdef == NULL)
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-			log_swferror(_("sprite_instance::add_display_object(): "
-				"unknown cid = %d"), character_id);
-		);
-		return NULL;
-	}
+    character_def*  cdef = m_def->get_character_def(character_id);
+    if (cdef == NULL)
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("sprite_instance::add_display_object(): "
+                "unknown cid = %d"), character_id);
+        );
+        return NULL;
+    }
 
-	character* existing_char = m_display_list.get_character_at_depth(depth);
+    character* existing_char = m_display_list.get_character_at_depth(depth);
+    
+    boost::intrusive_ptr<character> ch;
+    
+    // Create a new instance and syntetize an instance name if scriptable when:
+    //  (1) target depth is empty 
+    //  (2) we are in jump-back-mode
+    if(!existing_char || is_jumping_back)
+    {
+        ch = cdef->create_character_instance(this, character_id);
+        ch->setTimelineInfo(depth, m_current_frame, false);
 
-	if (existing_char)
-	{
-#ifdef GNASH_DEBUG_PLACE
-		log_debug("Another character exists in depth %d", depth);
-#endif
+        if(name)
+        {
+            ch->set_name(name);
+        }
+        else if(!name && ch->wantsInstanceName())
+        {
+            std::string instance_name = getNextUnnamedInstanceName();
+            ch->set_name(instance_name.c_str());
+        }
+    }
 
-		// If we already have this object on this
-		// plane, then move it instead of replacing it.
-		// NOTE: move_display_object() will take care of NOT moving the
-		//       character if get_accept_anim_moves() returns false.
-		//       ... I guess it's checked inside move_display_object ...
-		if ( existing_char->get_id() == character_id )
-		{
-#ifdef GNASH_DEBUG_PLACE
-			log_debug("Char has same id (%d), moving ", character_id);
-#endif
+    bool is_ratio_compatible=true;
+    if(existing_char)
+    {
+     is_ratio_compatible= (ratio == existing_char->get_ratio())
+        || (ratio==character::noRatioValue && existing_char->get_ratio()==0)
+        || (ratio==0 && existing_char->get_ratio()==character::noRatioValue);
+    }
 
-			// TODO: update name ?
-			move_display_object(depth, &color_transform,
-				&mat, ratio, clip_depth);
-			return NULL;
-		}
+    // Place a new character if:
+    //  (1)target depth is empty 
+    //  (2)target depth is not empty but the character has a different ratio 
+    // in jump-back-mode.
+    if(!existing_char || (is_jumping_back && !is_ratio_compatible))
+    {
+        // Attach event handlers (if any).
+        for (size_t i = 0, n = event_handlers.size(); i < n; i++)
+        {
+            swf_event* ev = event_handlers[i];
+            ch->add_event_handler(ev->event(), ev->action());
+        }
 
+        m_display_list.place_character(
+            ch.get(),
+            depth,
+            color_transform,
+            mat,
+            ratio,
+            clip_depth);
 
-#if 1 // snipped based on deduction based on testcases:
-      // replace_sprites1test.swf, replace_shapes1test.swf and clip_as_button2.swf
+        return ch.get();
+    }
+    
+    // move the existing charater if has same ratio in jump-back-mode
+    if(existing_char && is_jumping_back && is_ratio_compatible)
+    {
+        // remove the created character from the key listener list,
+        // it might be there(eg. button_character).
+        _vm.getRoot().remove_key_listener(ch.get());
 
-		TimelineInfo* info = existing_char->getTimelineInfo();
-		if ( info && info->placedByReplaceTag() && info->placedInFrame() > m_current_frame )
-		{
-#ifdef GNASH_DEBUG_PLACE
-			log_debug("Char was placed by REPLACE tag in frame %d (now in frame %d)", info->placedInFrame(), m_current_frame);
-#endif
+        move_display_object(depth, &color_transform, &mat, ratio, clip_depth);
+    }
 
-			if ( existing_char->to_movie() )
-			{
-#ifdef GNASH_DEBUG_PLACE
-				log_debug("Char is a sprite, moving");
-#endif
-				// If it's a sprite we move it.
-				// See replace_sprites1test.swf
-				move_display_object(depth, &color_transform, &mat, ratio, clip_depth);
-			}
-			else
-			{
-#ifdef GNASH_DEBUG_PLACE
-				log_debug("Char is NOT a sprite, replacing");
-#endif
-				// If it's something else (a shape?) replace it
-				replace_display_object(character_id, name, depth, &color_transform,
-						&mat, ratio, clip_depth);
-			}
-			return NULL;
-		}
-#endif
-
-#if 0 // still not sure here...
-		// See loop_test5.swf (maybe should compare against *this* ratio instead...
-		if ( existing_char->get_ratio() > 0 )
-		{
-#ifdef GNASH_DEBUG_PLACE
-			log_debug("Char has ratio==%g (> 0). Replacing it.", existing_char->get_ratio());
-#endif
-
-			replace_display_object(character_id, name, depth, &color_transform, &mat,
-					ratio, clip_depth);
-			return NULL;
-		}
-#endif
-
-		// If we've been asked NOT to replace existing chars just
-		// return NULL now
-		if ( ! replace_if_depth_is_occupied )
-		{
-			return NULL;
-		}
-	}
-	//printf("%s: character %s, id is %d, count is %d\n", __FUNCTION__, existing_char->get_name(), character_id,m_display_list.get_character_count()); 
-
-	assert(cdef);
-	boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, character_id);
-	assert(ch.get() != NULL);
-
-	// Make a timeline instance, passing it lifetime information
-	// We're assuming m_current_frame is 0-based, and correct at time of tags execution
-	// TODO: make sure this is true when executing tags from goto_frame !
-#ifdef GNASH_DEBUG_TIMELINE
-	cout << " Placing timeline char " << character_id << " at depth " << depth << " in frame " << m_current_frame << " of sprite " << getTarget() << endl;
-#endif
-	ch->setTimelineInfo(depth, m_current_frame, false);
-
-	if ( name )
-	{
-		ch->set_name(name);
-	}
-	else if ( ch->wantsInstanceName() )
-	{
-		// MovieClip instances *need* a name, to properly setup
-		// an as_value for them (values are kept by "target path"
-		// reference.  We syntetize an instance name in this case.
-		// TODO: check if we need to do this for other character types
-		std::string instance_name = getNextUnnamedInstanceName();
-		ch->set_name(instance_name.c_str());
-	}
-
-	// Attach event handlers (if any).
-	for (size_t i = 0, n = event_handlers.size(); i < n; i++)
-	{
-		swf_event* ev = event_handlers[i];
-		ch->add_event_handler(ev->event(), ev->action());
-		//event_handlers[i]->attach_to(*ch);
-	}
-
-	m_display_list.place_character(
-		ch.get(),
-		depth,
-		color_transform,
-		mat,
-		ratio,
-		clip_depth);
-
-#ifndef GNASH_USE_GC
-	assert(ch == NULL || ch->get_ref_count() > 1);
-#endif // ndef GNASH_USE_GC
-	return ch.get();
+    return NULL;
 }
 
 void
 sprite_instance::replace_display_object(
-		uint16_t character_id,
-		const char* name,
-		int depth,
-		const cxform* color_transform,
-		const matrix* mat,
-		int ratio,
-		int clip_depth)
+        uint16_t character_id,
+        const char* name,
+        int depth,
+        const cxform* color_transform,
+        const matrix* mat,
+        int ratio,
+        int clip_depth)
 {
-	assert(m_def != NULL);
-	//log_msg(_("%s: character %s, id is %d, depth is %d"), __FUNCTION__, name, character_id, depth); // FIXME: debugging crap
+    assert(m_def != NULL);
 
-	character_def*	cdef = m_def->get_character_def(character_id);
-	if (cdef == NULL)
-	{
-		log_error(_("sprite::replace_display_object(): "
-			"unknown cid = %d"), character_id);
-		return;
-	}
-	assert(cdef);
+    character_def*  cdef = m_def->get_character_def(character_id);
+    if (cdef == NULL)
+    {
+        log_error(_("sprite::replace_display_object(): "
+            "unknown cid = %d"), character_id);
+        return;
+    }
+    assert(cdef);
 
-#define MOVE_NONSHAPES_ON_REPLACE
-#ifdef MOVE_NONSHAPES_ON_REPLACE
-	character* existing_char = m_display_list.get_character_at_depth(depth);
-	if (existing_char)
-	{
-#ifdef GNASH_DEBUG_REPLACE
-		log_debug("Another character exists in depth %d", depth);
-#endif
-		if ( existing_char->isActionScriptReferenceable() )
-		{
-#ifdef GNASH_DEBUG_PLACE
-			log_debug("Char is a scriptable instance, moving rather then replace");
-#endif
-			// If it's a sprite we move it.
-			// See replace_sprites1test.swf and replace_buttons1test.swf
-			// Note that for buttons, it seems we should also wipe out the members !
-			// Maybe this is not the this we're supposed to do here, rather some weird
-			// simptom from implementation of a proper displaylist reconstruction.
-			// For example, the REPLACE tag might act like a PLACE tag when executed
-			// alone, looking for missing info (character_id, name) in the previous 
-			// PLACE tag affecting this same depth..
-			//
-			move_display_object(depth, color_transform, mat, ratio, clip_depth);
-			return;
-		}
-	}
-	else
-	{
-#ifdef GNASH_DEBUG_REPLACE
-		log_debug("REPLACE: no character exists in depth %d - should add ?", depth);
-#endif
-	}
-#endif // MOVE_NONSHAPES_ON_REPLACE
+    character* existing_char = m_display_list.get_character_at_depth(depth);
+    if (existing_char)
+    {
+        // if the existing character is not a shape, move it instead of replace
+        if ( existing_char->isActionScriptReferenceable() )
+        {
+            move_display_object(depth, color_transform, mat, ratio, clip_depth);
+            return;
+        }
+        else
+        {
+            boost::intrusive_ptr<character> ch = cdef->create_character_instance(this, character_id);
 
-	boost::intrusive_ptr<character> ch = cdef->create_character_instance(this,
-			character_id);
-
-	// Make a timeline instance, passing it lifetime information
-	// We're assuming m_current_frame is 0-based, and correct at time of tags execution
-	// TODO: make sure this is true when executing tags from goto_frame !
-#ifdef GNASH_DEBUG_TIMELINE
-	cout << " Replacing timeline char at depth " << depth << " in frame " << m_current_frame << " of sprite " << getTarget() << " with char " << character_id << endl;
-#endif
-	ch->setTimelineInfo(depth, m_current_frame, true);
-
-	replace_display_object(
-		ch.get(), name, depth,
-		color_transform,
-		mat,
-		ratio, clip_depth
-		);
+            ch->setTimelineInfo(depth, m_current_frame, true);
+    
+            replace_display_object(
+                ch.get(), name, depth,
+                color_transform,
+                mat,
+                ratio, clip_depth);
+        }
+    } // end of if(existing_char)
 }
 
 void sprite_instance::replace_display_object(
-		character* ch,
-		const char* name,
-		int depth,
-		const cxform* color_transform,
-		const matrix* mat,
-		int ratio,
-		int clip_depth)
+        character* ch,
+        const char* name,
+        int depth,
+        const cxform* color_transform,
+        const matrix* mat,
+        int ratio,
+        int clip_depth)
 {
     //printf("%s: character %s, id is %d\n", __FUNCTION__, name, ch->get_id()); // FIXME:
 
     assert(ch != NULL);
 
     if (name != NULL && name[0] != 0)
-	{
-	    ch->set_name(name);
-	}
+    {
+        ch->set_name(name);
+    }
 
     m_display_list.replace_character(
-	ch,
-	depth,
-	color_transform,
-	mat,
-	ratio,
-	clip_depth);
-	
+    ch,
+    depth,
+    color_transform,
+    mat,
+    ratio,
+    clip_depth);
+    
 }
 
 int sprite_instance::get_id_at_depth(int depth)
@@ -3538,9 +3265,15 @@ sprite_instance::set_textfield_variable(const std::string& name,
 	{
 		_text_variables.reset(new TextfieldMap);
 	}
-
+	
 	// TODO: should variable name be considered case-insensitive ?
-	_text_variables->operator[] (name) = ch;
+	TextfieldMap::iterator it = _text_variables->find(name);
+	// Don't replace the original textfiled character
+	// TODO: more tests for TextField variables.
+	if ( it == _text_variables->end() )
+	{
+		_text_variables->operator[] (name) = ch;
+	}
 }
 
 /* private */

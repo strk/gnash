@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.86 2007/07/10 21:43:00 strk Exp $ */
+/* $Id: character.h,v 1.87 2007/08/09 12:18:05 zoulunkai Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -343,6 +343,9 @@ public:
     /// the character is not a mask. Depths below -16384 are illegal, so this
     /// value should not collide with real depths.  
     static const int noClipDepthValue = -1000000;
+	
+	// Maybe it's better to move all these constants to DisplayListTag
+	static const int noRatioValue = -1;
 
     ~character();
 

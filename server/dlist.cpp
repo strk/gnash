@@ -263,7 +263,10 @@ DisplayList::replace_character(
 	ch->set_depth(depth);
 	if ( color_xform ) ch->set_cxform(*color_xform);
 	if ( mat ) ch->set_matrix(*mat);
-	ch->set_ratio(ratio);
+	if(ratio != character::noRatioValue)
+	{
+		ch->set_ratio(ratio);
+	}
 	ch->set_clip_depth(clip_depth);
 	ch->restart();
 
@@ -367,7 +370,10 @@ DisplayList::move_display_object(
 	{
 		ch->set_matrix(*mat);
 	}
-	ch->set_ratio(ratio);
+	if(ratio != character::noRatioValue)
+	{
+		ch->set_ratio(ratio);
+	}
 }
 	
 	
@@ -503,7 +509,7 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 
 	// 1. Find all "timeline depth" for the target frame, querying the
 	//    Timeline object in the sprite/movie definition (see implementation details)
-	std::map<int, int>  save;
+	std::vector<int>  save;
 	movieDef.getTimelineDepths(tgtFrame, save);
 
 //#define GNASH_DEBUG_TIMELINE 1
@@ -517,10 +523,10 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 #endif
 
 
-	typedef std::map<int, int>::iterator SeekIter;
+	typedef std::vector<int>::iterator SeekIter;
 
 	SeekIter startSeek = save.begin();
-        SeekIter endSeek = save.end();
+    SeekIter endSeek = save.end();
 
 	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
 	{
@@ -543,28 +549,19 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 			it = _characters.erase(it);
 			continue;
 		}
-
-#if 0 // let's handle this at PlaceObject2 execution time... an instance placed by REPLACE tag
-      // in a subsequent frame will be replaced again rather then left untouched.
-      // This is to allow later fixing of REPLACE tag to avoid creation of a new instance
-      // (see replace_shapes1test.swf and replace_sprites1test.swf)
-
-		// Remove if placed by REPLACE tag in a later frame
-		if ( info->placedByReplaceTag() && info->placedInFrame() > tgtFrame )
+		
+		// remove all shapes and morphs, it should be safe and correct.
+		// but suboptimal when considering the invalidated bound.
+		// we need to do this in some corner cases. 
+		if(!di->isActionScriptReferenceable())
 		{
-			// Not to be saved, killing
-			// [ replace_sprites1test.swf and replace_shapes1test.swf seems to not want the replace ... ]
-			if ( call_unload ) di->unload();
 			it = _characters.erase(it);
 			continue;
 		}
-#endif
 
 		/// Only remove if not in the save vector, 
-		/// or in the save vector but has a different ratio value
-		SeekIter match = save.find(di_depth);
-		if( match == save.end() || 
-			( match != save.end() && match->second != di->get_ratio() ))
+		SeekIter match = std::find(startSeek, endSeek, di_depth);
+		if( match == save.end())
 		{
 			// Not to be saved, killing
 			if ( call_unload ) di->unload();

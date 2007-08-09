@@ -57,7 +57,7 @@
 
 #include <string>
 #include <memory> // for auto_ptr
-#include <map>
+#include <set> 
 
 // Forward declarations
 namespace gnash {
@@ -578,9 +578,7 @@ public:
 	///	Depth of an instance placed by PlaceObject* tag.
 	///	Assumed to be in the static zone (an assertion would fail otherwise).
 	///
-	/// @param ratio
-	/// Ratio of an instance defined by PlaceObject2 tag, ranges from 0 to 65535
-	virtual void addTimelineDepth(int /*depth*/, int /*ratio*/) {}
+	virtual void addTimelineDepth(int /*depth*/) {}
 
 	/// Remove a depth from the timeline depth set in current frame 
 	//
@@ -612,7 +610,7 @@ public:
 	/// @param depths
 	///	A vector to copy all frame depths to.
 	///
-	virtual void getTimelineDepths(size_t /*frameno*/, std::map<int, int>& /*depths*/) 
+	virtual void getTimelineDepths(size_t /*frameno*/, std::vector<int>& /*depths*/) 
 	{}
     
 };
