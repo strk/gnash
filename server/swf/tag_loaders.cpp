@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.125 2007/08/09 21:56:30 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.126 2007/08/09 23:24:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -226,21 +226,22 @@ public:
 		// Total bits needed from stream
 		unsigned long bitsNeeded = (compSamples*bitsPerCompSample) + (fixedBitsPerBlock*blocksCount);
 
-		// 2 bits have been read already, so the stream position is now one byte after the
-		// next 6 bits we're going to read, so we strip those 6 bits from the count of bits
-		// we still need
-		bitsNeeded -= (8-2);
-
-		// Now, we convert this number to bytes, requiring one more if any 
-		unsigned int excessBits = bitsNeeded%8;
+		// Now, we convert this number to bytes...
 		unsigned long bytesNeeded = bitsNeeded/8;
-		if ( excessBits ) ++bytesNeeded;
+		// ... requiring one more if the bits in excess are more then
+		//     the ones still available in last byte read 
+		unsigned int excessBits = bitsNeeded%8;
+		if ( excessBits > 6 ) ++bytesNeeded;
 
-		//log_debug("adpcm_expand, stereo:%d, sample_count:%u, bitsPerSample:%u, "
-		//	"blocksCount:%u, bitsPerBlock:%u, bitsNeeded:%lu, excessBits:%u, bytesNeeded:%lu",
-		//	stereo, sample_count, bitsPerCompSample, blocksCount, fixedBitsPerBlock, bitsNeeded, excessBits, bytesNeeded);
+		// Take note of the current position to later verify if we got the 
+		// number of required bytes right
+		unsigned long prevPosition = in->get_position();
 
-		in->ensureBytes(bytesNeeded);
+		// We substract 1 byte as the 6 excessive of a byte are already in the stream,
+		// and we won't require another one unless more then 6 excessive bits are needed
+		// WARNING: this is currently disabled due to a bug in this function often resulting
+		//          in reads past the end of the stream
+		//in->ensureBytes(bytesNeeded-1);
 
 #endif // GNASH_TRUST_SWF_INPUT
 
@@ -296,6 +297,39 @@ public:
 				}
 			}
 		}
+
+#ifndef GNASH_TRUST_SWF_INPUT
+		unsigned long curPos = in->get_position();
+		unsigned long bytesRead = curPos - prevPosition;
+		if ( bytesRead != bytesNeeded )
+		{
+			// This would happen if the computation of bytesNeeded doesn't match the current
+			// implementation.
+			// NOTE That the current implementation seems pretty much bogus as we *often* end
+			// up reading past the end of the tag. Once we fix the decoding we shoudl also fix
+			// the computation of bytes needed
+			log_error("admcp_expand: we expected to read %lu bytes, but we read %lu instead (%ld error)",
+				bytesNeeded, bytesRead, bytesNeeded-bytesRead);
+			// abort();
+		}
+
+		unsigned long endTagPos = in->get_tag_end_position();
+		if ( curPos > endTagPos )
+		{
+			// This happens when our decoder reads past the end of the tag.
+			// In general, we should aborth parsing of the current tag when this happens,
+			// anyway, it seems that *some* sound can be heard nonetheless so we keep going.
+			log_error("admcp_expand: read past tag boundary: current position: %lu, end of tag position: %lu (overflow: %lu bytes)",
+				curPos, endTagPos, curPos-endTagPos);
+
+#if 0
+			log_debug("      stereo:%d, sample_count:%u, compressedSamples:%d, bitsPerCompSample:%u, "
+				"blocksCount:%u, bitsPerBlock:%u, bitsNeeded:%lu, excessBits:%u, bytesNeeded:%lu, bytesLeft:%lu",
+				stereo, sample_count, compSamples, bitsPerCompSample, blocksCount, fixedBitsPerBlock,
+				bitsNeeded, excessBits, bytesNeeded, in->get_tag_end_position()-in->get_position());
+#endif
+		}
+#endif // GNASH_TRUST_SWF_INPUT
 
 	}
 
