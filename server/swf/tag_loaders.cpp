@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.126 2007/08/09 23:24:44 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.127 2007/08/10 03:54:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1543,8 +1543,10 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
-    // discard garbage data
-    in->skip_bytes(4);
+    // discard garbage data (MP3 only)
+    // TODO: stop using statics (stream_input_format) for stream sounds..
+    //       tgc should be working on this
+    if ( stream_input_format == sound_handler::FORMAT_MP3) in->skip_bytes(4);
 
     // If we don't have a sound_handler registered stop here
     if (!handler) return;
