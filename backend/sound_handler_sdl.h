@@ -14,7 +14,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: sound_handler_sdl.h,v 1.31 2007/07/27 15:09:41 tgc Exp $
+// $Id: sound_handler_sdl.h,v 1.32 2007/08/10 10:24:11 tgc Exp $
 
 #ifndef SOUND_HANDLER_SDL_H
 #define SOUND_HANDLER_SDL_H
@@ -123,20 +123,11 @@ public:
 	/// TODO: use boost::scoped_array
 	uint8_t* data;
 
-	/// Format of the sound (MP3, raw, etc).
-	int format;
+	/// Object holding information about the sound
+	std::auto_ptr<SoundInfo> soundinfo;
 
 	/// The size of the undecoded data
-	long data_size;
-
-	/// Stereo or not
-	bool stereo;
-
-	/// Number of samples
-	int sample_count;
-
-	/// Sample rate
-	int sample_rate;
+	unsigned int data_size;
 
 	/// Volume for AS-sounds, range: 0-100.
 	/// It's the SWF range that is represented here.
@@ -187,13 +178,11 @@ public:
 	virtual ~SDL_sound_handler();
 
 	/// Called to create a sound.
-	virtual int	create_sound(void* data, int data_bytes,
-				     int sample_count, format_type format,
-				     int sample_rate, bool stereo);
+	virtual int	create_sound(void* data, unsigned int data_bytes, std::auto_ptr<SoundInfo> sinfo);
 
 	/// this gets called when a stream gets more data
-	virtual long	fill_stream_data(void* data, int data_bytes,
-					 int sample_count, int handle_id);
+	virtual long	fill_stream_data(void* data, unsigned int data_bytes,
+					 unsigned int sample_count, int handle_id);
 
 	/// Play the index'd sample.
 	virtual void	play_sound(int sound_handle, int loop_count, int offset,
@@ -215,7 +204,7 @@ public:
 	virtual void	set_volume(int sound_handle, int volume);
 		
 	/// Gnash uses this to get info about a sound. Used when a stream needs more data.
-	virtual void	get_info(int sound_handle, int* format, bool* stereo);
+	virtual SoundInfo* get_sound_info(int sound_handle);
 
 	/// Gnash calls this to mute audio.
 	virtual void	mute();

@@ -89,20 +89,11 @@ public:
 	// The (un)compressed data
 	guint8* data;
 
-	// data format
-	int format;
-
 	// data size
 	long data_size;
 
-	// stereo or not
-	bool stereo;
-
-	// number of samples
-	int sample_count;
-
-	// sample rate
-	int sample_rate;
+	// Object holding information about the sound
+	std::auto_ptr<SoundInfo> soundinfo;
 
 	// Volume, SWF range: 0-100, GST range 0-10 (we only use 0-1, the rest is amplified)
 	// It's the SWF range that is represented here
@@ -111,6 +102,11 @@ public:
 	// gstreamer objects
 	std::vector<gst_elements*>	m_gst_elements;
 
+	~sound_data()
+	{
+		// TODO: use boost::scoped_array
+		delete [] data;
+	}
 };
 
 // Use gstreamer to handle sounds.
@@ -138,13 +134,12 @@ public:
 	virtual ~GST_sound_handler();
 
 	/// Called to create a sound.
-	virtual int	create_sound(void* data, int data_bytes,
-				     int sample_count, format_type format,
-				     int sample_rate, bool stereo);
+	virtual int	create_sound(void* data, unsigned int data_bytes,
+				     std::auto_ptr<SoundInfo> sinfo);
 
 	/// this gets called when a stream gets more data
-	virtual long	fill_stream_data(void* data, int data_bytes,
-					 int sample_count, int handle_id);
+	virtual long	fill_stream_data(void* data, unsigned int data_bytes,
+					 unsigned int sample_count, int handle_id);
 
 	/// Play the index'd sample.
 	virtual void	play_sound(int sound_handle, int loop_count, int offset,
@@ -166,7 +161,7 @@ public:
 	virtual void	set_volume(int sound_handle, int volume);
 		
 	/// Gnash uses this to get info about a sound. Used when a stream needs more data.
-	virtual void	get_info(int sound_handle, int* format, bool* stereo);
+	virtual SoundInfo* get_sound_info(int sound_handle);
 
 	/// Gnash calls this to mute audio.
 	virtual void	mute();

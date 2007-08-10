@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.127 2007/08/10 03:54:16 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.128 2007/08/10 10:24:11 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1339,7 +1339,8 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 
 	uint16_t	character_id = in->read_u16();
 
-	sound_handler::format_type	format = (sound_handler::format_type) in->read_uint(4);
+	sound_handler::format_type	format = static_cast<sound_handler::format_type>(in->read_uint(4));
+	sound_handler::format_type	orgFormat = format;
 	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
 	bool	sample_16bit = in->read_uint(1) ? true : false;
 	bool	stereo = in->read_uint(1) ? true : false;
@@ -1376,13 +1377,13 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	    // and modifies 3 parameters: format, data and data_bytes.
 	    sound_expand(in, format, sample_16bit, stereo, sample_count, data, data_bytes);
 
-	    int	handler_id = handler->create_sound(
-		data,
-		data_bytes,
-		sample_count,
-		format,
-		s_sample_rate_table[sample_rate],
-		stereo);
+	    // Store all the data in a SoundInfo object
+	    std::auto_ptr<SoundInfo> sinfo;
+	    sinfo.reset(new SoundInfo(format, orgFormat, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
+
+	    // Stores the sounddata in the soundhandler, and the ID returned
+		// can be used to starting, stopping and deleting that sound
+	    int	handler_id = handler->create_sound(data, data_bytes, sinfo);
 
 	    if (handler_id >= 0)
 	    {
@@ -1436,14 +1437,6 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
     }
 }
 
-// There is only one soundstream active per movie, so we cache the extra data
-// we need to be able to decode subsequent soundstreamblocks here.
-//
-static sound_handler::format_type stream_input_format;
-static bool stream_input_is16bit;
-static bool stream_input_stereo;
-static unsigned int stream_input_sample_count;
-
 // Load a SoundStreamHead(2) tag.
 void
 sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
@@ -1466,6 +1459,7 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     int	garbage = in->read_uint(8);
 
     sound_handler::format_type format = static_cast<sound_handler::format_type>(in->read_uint(4));
+	sound_handler::format_type orgFormat = format;
     int sample_rate = in->read_uint(2);	// multiples of 5512.5
     bool sample_16bit = in->read_uint(1) ? true : false;
     bool stereo = in->read_uint(1) ? true : false;
@@ -1500,13 +1494,6 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	return;
     }
 
-    // Remember settings for decoding of subsequent blocks.
-    // "stereo" is also in the sound object, 16bit no, format get stomped.
-    stream_input_format = format;
-    stream_input_is16bit = sample_16bit;
-    stream_input_stereo = stereo;
-	stream_input_sample_count = sample_count;
-
     // Tell create_sound what format it will be receiving, in case it cares
     // at this stage.
     switch (format) {
@@ -1523,13 +1510,13 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 	break;
     }
 
-    int	handler_id = handler->create_sound(
-	NULL,
-	data_bytes,
-	sample_count,
-	format,
-	s_sample_rate_table[sample_rate],
-	stereo);
+	// Store all the data in a SoundInfo object
+	std::auto_ptr<SoundInfo> sinfo;
+	sinfo.reset(new SoundInfo(format, orgFormat, stereo, s_sample_rate_table[sample_rate], sample_count, sample_16bit));
+
+	// Stores the sounddata in the soundhandler, and the ID returned
+	// can be used to starting, stopping and deleting that sound
+	int	handler_id = handler->create_sound(NULL, data_bytes, sinfo);
 
     m->set_loading_sound_stream_id(handler_id);
 }
@@ -1539,30 +1526,34 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
 void
 sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    sound_handler* handler = get_sound_handler();
-
     assert(tag == SWF::SOUNDSTREAMBLOCK); // 19
 
-    // discard garbage data (MP3 only)
-    // TODO: stop using statics (stream_input_format) for stream sounds..
-    //       tgc should be working on this
-    if ( stream_input_format == sound_handler::FORMAT_MP3) in->skip_bytes(4);
+    sound_handler* handler = get_sound_handler();
 
     // If we don't have a sound_handler registered stop here
     if (!handler) return;
 
+	// Get the ID of the sound stream currently being loaded
     int handle_id = m->get_loading_sound_stream_id();
 
+	// Get the SoundInfo object that contains info about the sound stream.
+	// Ownership of the object is in the soundhandler
+	SoundInfo* sinfo = handler->get_sound_info(handle_id);
+
+    // If there is no SoundInfo something is wrong...
+    if (!sinfo) return;
+
+    sound_handler::format_type format = sinfo->getOrgFormat();
+    unsigned int sample_count = sinfo->getSampleCount();
+
+	// discard garbage data if format is MP3
+    if (format == sound_handler::FORMAT_MP3) in->skip_bytes(4);
+
     unsigned char *data;	// Storage is allocated by sound_expand()
-    unsigned data_bytes = in->get_tag_end_position() - in->get_position();
-
-    // The format in the input file is in stream_input_*
-    sound_handler::format_type format = stream_input_format;
-
-    unsigned int sample_count = stream_input_sample_count;
+    unsigned int data_bytes = in->get_tag_end_position() - in->get_position();
 
     sound_expand(in, format,
-		 stream_input_is16bit, stream_input_stereo, sample_count,
+		 sinfo->is16bit(), sinfo->isStereo(), sample_count,
 		 data, data_bytes);
     // "format" now reflects what we hand(ed) to the sound drivers.
     // "data_bytes" now reflects the size of the uncompressed data.
@@ -1591,7 +1582,7 @@ sound_stream_block_loader(stream* in, tag_type tag, movie_definition* m)
 static void
 sound_expand(stream *in, sound_handler::format_type &format,
 	bool sample_16bit, bool stereo, unsigned int &sample_count,
-	unsigned char* &data, unsigned &data_bytes)
+	unsigned char* &data, unsigned int &data_bytes)
 {
 
     // Make sure that an unassigned pointer cannot get through

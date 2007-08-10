@@ -1,3 +1,13 @@
+2007-08-10 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler.h, backend/sound_handler_{sdl,gst}.{h,cpp},
+	  server/swf/tag_loaders.cpp: Introduce the SoundInfo class which 
+	  contains the properties of the sound (format, samplerate, etc.).
+	  When parsing a sound-tag the SoundInfo-object is created and
+	  passed to the soundhandler along with the audio data, and the
+	  parser can later ask for the SoundInfo-object for a specific
+	  sound, which is needed when parsing sound-streams.
+
 2007-08-10 Alexander Sack <asac@jwsdot.com>
 
 	* backend/Makefile.am, libamf/Makefile.am, libbase/Makefile.am,

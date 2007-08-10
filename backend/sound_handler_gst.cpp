@@ -20,7 +20,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-/* $Id: sound_handler_gst.cpp,v 1.59 2007/08/08 10:39:50 tgc Exp $ */
+/* $Id: sound_handler_gst.cpp,v 1.60 2007/08/10 10:24:11 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -71,31 +71,26 @@ GST_sound_handler::~GST_sound_handler()
 
 int	GST_sound_handler::create_sound(
 	void* data,
-	int data_bytes,
-	int sample_count,
-	format_type format,
-	int sample_rate,
-	bool stereo)
+	unsigned int data_bytes,
+	std::auto_ptr<SoundInfo> sinfo)
 // Called to create a sample.  We'll return a sample ID that
 // can be use for playing it.
 {
 
 	try_mutex::scoped_lock lock(_mutex);
 
+	assert(sinfo.get());
 	sound_data *sounddata = new sound_data;
 	if (!sounddata) {
-		log_error(_("Could not allocate memory for sound data"));
+		log_error(_("could not allocate memory for sound data"));
 		return -1;
 	}
 
-	sounddata->format = format;
 	sounddata->data_size = data_bytes;
-	sounddata->stereo = stereo;
-	sounddata->sample_count = sample_count;
-	sounddata->sample_rate = sample_rate;
 	sounddata->volume = 100;
+	sounddata->soundinfo = sinfo;
 
-	switch (format)
+	switch (sounddata->soundinfo->getFormat())
 	{
 	case FORMAT_NATIVE16:
 		sounddata->data = new guint8[data_bytes];
@@ -131,7 +126,7 @@ int	GST_sound_handler::create_sound(
 
 	default:
 		// Unhandled format.
-		log_error(_("Unknown sound format %d requested; gnash does not handle it"), (int)format);
+		log_error(_("Unknown sound format %d requested; gnash does not handle it"), (int)sounddata->soundinfo->getFormat());
 		return -1; // Unhandled format, set to NULL.
 	}
 
@@ -142,7 +137,7 @@ int	GST_sound_handler::create_sound(
 
 
 // this gets called when a stream gets more data
-long	GST_sound_handler::fill_stream_data(void* data, int data_bytes, int /*sample_count*/, int handle_id)
+long	GST_sound_handler::fill_stream_data(void* data, unsigned int data_bytes, unsigned int /*sample_count*/, int handle_id)
 {
 	try_mutex::scoped_lock lock(_mutex);
 
@@ -359,7 +354,12 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 
 	// Create a gstreamer decoder for the chosen sound.
 
-	if (sounddata->format == FORMAT_MP3) { // || sounddata->format == FORMAT_VORBIS) {
+	// Temp variables to make the code simpler and easier to read
+	format_type soundFormat = sounddata->soundinfo->getFormat();
+	bool soundStereo = sounddata->soundinfo->isStereo();
+	uint32_t soundSampleRate = sounddata->soundinfo->getSampleRate();
+
+	if (soundFormat == FORMAT_MP3) {
 
 		gst_element->decoder = gst_element_factory_make ("mad", NULL);
 		if (gst_element->decoder == NULL) {
@@ -386,8 +386,8 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 		GstCaps *caps = gst_caps_new_simple ("audio/mpeg",
 			"mpegversion", G_TYPE_INT, 1,
 			"layer", G_TYPE_INT, 3,
-			"rate", G_TYPE_INT, sounddata->sample_rate,
-			"channels", G_TYPE_INT, sounddata->stereo ? 2 : 1, NULL);
+			"rate", G_TYPE_INT, soundSampleRate,
+			"channels", G_TYPE_INT, soundStereo ? 2 : 1, NULL);
 		g_object_set (G_OBJECT (gst_element->capsfilter), "caps", caps, NULL);
 		gst_caps_unref (caps);
 
@@ -406,12 +406,12 @@ void	GST_sound_handler::play_sound(int sound_handle, int loop_count, int /*offse
 						gst_element->audioresample, 
 						gst_element->volume, NULL);
 
-	} else if (sounddata->format == FORMAT_NATIVE16) {
+	} else if (soundFormat == FORMAT_NATIVE16) {
 
 		// Set the info about the stream so that gstreamer knows what it is.
 		GstCaps *caps = gst_caps_new_simple ("audio/x-raw-int",
-			"rate", G_TYPE_INT, sounddata->sample_rate,
-			"channels", G_TYPE_INT, sounddata->stereo ? 2 : 1,
+			"rate", G_TYPE_INT, soundSampleRate,
+			"channels", G_TYPE_INT, soundStereo ? 2 : 1,
 			"endianness", G_TYPE_INT, G_BIG_ENDIAN,
 			"width", G_TYPE_INT, 16,
 			"depth", G_TYPE_INT, 16,
@@ -517,7 +517,6 @@ void	GST_sound_handler::delete_sound(int sound_handle)
 
 	if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
 	{
-		delete[] m_sound_data[sound_handle]->data;
 		delete m_sound_data[sound_handle];
 		m_sound_data.erase (m_sound_data.begin() + sound_handle);
 	}
@@ -580,16 +579,17 @@ void	GST_sound_handler::set_volume(int sound_handle, int volume) {
 
 }
 
-void GST_sound_handler::get_info(int sound_handle, int* format, bool* stereo) {
+SoundInfo* GST_sound_handler::get_sound_info(int sound_handle) {
 
 	try_mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
-	if (sound_handle >= 0 && (unsigned int) sound_handle < m_sound_data.size())
+	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < m_sound_data.size())
 	{
-		*format = m_sound_data[sound_handle]->format;
-		*stereo = m_sound_data[sound_handle]->stereo;
-	} 
+		return m_sound_data[sound_handle]->soundinfo.get();
+	} else {
+		return NULL;
+	}
 
 }
 
@@ -631,11 +631,14 @@ unsigned int GST_sound_handler::get_duration(int sound_handle)
 
 	sound_data* sounddata = m_sound_data[sound_handle];
 
+	uint32_t sampleCount = sounddata->soundinfo->getSampleCount();
+	uint32_t sampleRate = sounddata->soundinfo->getSampleRate();
+
 	// Return the sound duration in milliseconds
-	if (sounddata->sample_count > 0 && sounddata->sample_rate > 0) {
-		unsigned int ret = sounddata->sample_count / sounddata->sample_rate * 1000;
-		ret += ((sounddata->sample_count % sounddata->sample_rate) * 1000) / sounddata->sample_rate;
-		if (sounddata->stereo) ret = ret / 2;
+	if (sampleCount > 0 && sampleRate > 0) {
+		unsigned int ret = sampleCount / sampleRate * 1000;
+		ret += ((sampleCount % sampleRate) * 1000) / sampleRate;
+		if (sounddata->soundinfo->isStereo()) ret = ret / 2;
 		return ret;
 	} else {
 		return 0;

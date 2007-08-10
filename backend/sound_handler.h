@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: sound_handler.h,v 1.23 2007/08/01 16:53:47 strk Exp $ */
+/* $Id: sound_handler.h,v 1.24 2007/08/10 10:24:11 tgc Exp $ */
 
 /// \page sound_handler_intro Sound handler introduction
 ///
@@ -36,9 +36,11 @@
 #include "tu_types.h"
 
 #include <vector>
+#include <memory>
 
 namespace gnash {
 	class stream;
+	class SoundInfo;
 }
 
 namespace gnash {
@@ -95,27 +97,16 @@ public:
 	/// @param data_bytes
 	/// The size of the data to be stored. For soundstream this is 0.
 	///
-	/// @param sample_count
-	/// Number of samples in the data.
-	///
-	/// @param format
-	/// Defines what sound type the data is.
-	///
-	/// @param sample_rate
-	/// The sample rate of the sound.
-	///
-	/// @param stereo
-	/// Defines whether the sound is in stereo.
+	/// @param sinfo
+	/// A SoundInfo object contained in an auto_ptr, which contains info about samplerate,
+	/// samplecount, stereo and more. The SoundObject must be not-NULL!
 	///
 	/// @return the id given by the soundhandler for later identification.
 	///
 	virtual int	create_sound(
 		void*		data,
-		int		data_bytes,
-		int		sample_count,
-		format_type	format,
-		int		sample_rate,	/* one of 5512, 11025, 22050, 44100 */
-		bool		stereo
+		unsigned int	data_bytes,
+		std::auto_ptr<SoundInfo> sinfo
 		) = 0;
 
 	/// gnash's parser calls this to fill up soundstreams data
@@ -133,20 +124,17 @@ public:
 	/// @param handle_id
 	/// The soundhandlers id of the sound we want some info about.
 	///
-	virtual long	fill_stream_data(void* data, int data_bytes, int sample_count, int handle_id) = 0;
+	virtual long	fill_stream_data(void* data, unsigned int data_bytes, unsigned int sample_count, int handle_id) = 0;
 
-	/// Gives info about the format, samplerate and stereo of the sound in question.
+	/// Returns a pointer to the SoundInfo object for the sound with the given id.
+	/// The SoundInfo object is still owned by the soundhandler.
 	//
 	/// @param soundhandle
 	/// The soundhandlers id of the sound we want some info about.
 	///
-	/// @param format
-	/// Here the format id will be placed.
+	/// @return a pointer to the SoundInfo object for the sound with the given id.
 	///
-	/// @param stereo
-	/// Here will be placed whether or not the sound is stereo.
-	///
-	virtual void get_info(int sound_handle, int* format, bool* stereo) = 0;
+	virtual SoundInfo* get_sound_info(int sound_handle) = 0;
 
 	/// gnash calls this when it wants you to play the defined sound.
 	//
@@ -298,6 +286,97 @@ protected:
 
 	/// Special test-member. Stores count of stopped sounds.
 	size_t _soundsStopped;
+};
+
+///
+/// Class containing information about a sound. Is created by the parser while
+/// parsing, and ownership is then transfered to sound_data. When the parser is
+/// parsing streams, it will ask the soundhandler for this to know what properties
+/// the stream has.
+///
+class SoundInfo {
+public:
+	/// Constructor
+	//
+	/// @param format
+	/// The format of the sound. Can be MP3, ADPCM, uncompressed or Nellymoser
+	///
+	/// @param stero
+	/// Defines whether the sound is in stereo.
+	///
+	/// @param sampleRate
+	/// The sample rate of the sound.
+	///
+	/// @param sampleCount
+	/// The sample count in the sound. In soundstreams this is an average for each frame.
+	///
+	/// @param is16bit
+	/// Defines whether the sound is in stereo.
+	/// Defines whether the sound is in 16bit format (samplesize == 2)? else it 
+	/// is 8bit (samplesize == 1). Used for streams when decoding adpcm.
+	///
+	SoundInfo(sound_handler::format_type format, sound_handler::format_type orgFormat, bool stereo, uint32_t sampleRate, uint32_t sampleCount, bool is16bit)
+	:	_format(format),
+		_orgFormat(orgFormat),
+		_stereo(stereo),
+		_sampleRate(sampleRate),
+		_sampleCount(sampleCount),
+		_is16bit(is16bit)
+	{
+	}
+
+	/// Returns the current format of the sound
+	///
+	/// @return the current format of the sound
+	sound_handler::format_type getFormat() { return _format; }
+
+	/// Returns the original format of the sound
+	///
+	/// @return the original format of the sound
+	sound_handler::format_type getOrgFormat() { return _orgFormat; }
+
+	/// Returns the stereo status of the sound
+	///
+	/// @return the stereo status of the sound
+	bool isStereo() { return _stereo; }
+
+	/// Returns the samplerate of the sound
+	///
+	/// @return the samplerate of the sound
+	unsigned long getSampleRate() { return _sampleRate; }
+
+	/// Returns the samplecount of the sound
+	///
+	/// @return the samplecount of the sound
+	unsigned long getSampleCount() { return _sampleCount; }
+
+	/// Returns the 16bit status of the sound
+	///
+	/// @return the 16bit status of the sound
+	bool is16bit() { return _is16bit; }
+
+private:
+	/// Current format of the sound (MP3, raw, etc).
+	sound_handler::format_type _format;
+
+	/// Original format of the sound (ADPCM, etc).
+	sound_handler::format_type _orgFormat;
+
+	/// The size of the undecoded data
+	unsigned long _dataSize;
+
+	/// Stereo or not
+	bool _stereo;
+
+	/// Sample rate, one of 5512, 11025, 22050, 44100
+	uint32_t _sampleRate;
+
+	/// Number of samples
+	uint32_t _sampleCount;
+
+	/// Is the audio in 16bit format (samplesize == 2)? else it 
+	/// is 8bit (samplesize == 1). Used for streams when decoding adpcm.
+	bool _is16bit;
 };
 
 // TODO: move to appropriate specific sound handlers

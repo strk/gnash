@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.79 2007/08/08 10:39:50 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.80 2007/08/10 10:24:11 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -63,46 +63,42 @@ SDL_sound_handler::~SDL_sound_handler()
 
 int	SDL_sound_handler::create_sound(
 	void* data,
-	int data_bytes,
-	int sample_count,
-	format_type format,
-	int sample_rate,
-	bool stereo)
+	unsigned int data_bytes,
+	std::auto_ptr<SoundInfo> sinfo)
 // Called to create a sample.  We'll return a sample ID that
 // can be use for playing it.
 {
 
+	assert(sinfo.get());
 	sound_data *sounddata = new sound_data;
 	if (!sounddata) {
 		log_error(_("could not allocate memory for sound data"));
 		return -1;
 	}
 
-	sounddata->format = format;
 	sounddata->data_size = data_bytes;
-	sounddata->stereo = stereo;
-	sounddata->sample_count = sample_count;
-	sounddata->sample_rate = sample_rate;
 	sounddata->volume = 100;
+	sounddata->soundinfo = sinfo;
 
 	int16_t*	adjusted_data = 0;
 	int	adjusted_size = 0;
 
         mutex::scoped_lock lock(_mutex);
 
-	switch (format)
+	switch (sounddata->soundinfo->getFormat())
 	{
 	case FORMAT_NATIVE16:
 
-		if (data_bytes > 0) {
-			convert_raw_data(&adjusted_data, &adjusted_size, data, sample_count, 2, sample_rate, stereo,
+		if (sounddata->data_size > 0) {
+			convert_raw_data(&adjusted_data, &adjusted_size, data, sounddata->soundinfo->getSampleCount(), 
+					2, sounddata->soundinfo->getSampleRate(), sounddata->soundinfo->isStereo(),
 					 audioSpec.freq, (audioSpec.channels == 2 ? true : false));
 			if (!adjusted_data) {
 				log_error(_("Some kind of error occurred with sound data"));
 				return -1;
 			}
 			sounddata->data_size = adjusted_size;
-			sounddata->data = (Uint8*) adjusted_data;
+			sounddata->data = reinterpret_cast<uint8_t*>(adjusted_data);
 		}
 		break;
 
@@ -137,7 +133,7 @@ int	SDL_sound_handler::create_sound(
 
 	default:
 		// Unhandled format.
-		log_error(_("unknown sound format %d requested; gnash does not handle it"), (int)format);
+		log_error(_("unknown sound format %d requested; gnash does not handle it"), (int)sounddata->soundinfo->getFormat());
 		return -1; // Unhandled format, set to NULL.
 	}
 
@@ -149,7 +145,7 @@ int	SDL_sound_handler::create_sound(
 }
 
 // this gets called when a stream gets more data
-long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_count, int handle_id)
+long	SDL_sound_handler::fill_stream_data(void* data, unsigned int data_bytes, unsigned int sample_count, int handle_id)
 {
 
 	mutex::scoped_lock lock(_mutex);
@@ -162,7 +158,7 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 	sound_data* sounddata = m_sound_data[handle_id];
 
 	// Handling of the sound data
-	switch (sounddata->format) {
+	switch (sounddata->soundinfo->getFormat()) {
 	case FORMAT_NATIVE16:
 	    {
 		int16_t*	adjusted_data = 0;
@@ -170,7 +166,7 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 
 		convert_raw_data(&adjusted_data, &adjusted_size,
 				 data, sample_count, 2 /*sample size*/,
-				 sounddata->sample_rate, sounddata->stereo,
+				 sounddata->soundinfo->getSampleRate(), sounddata->soundinfo->isStereo(),
 				 audioSpec.freq, (audioSpec.channels == 2));
 		if (!adjusted_data || adjusted_size < 1) {
 			log_error(_("Some kind of error with resampling sound data"));
@@ -199,6 +195,7 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 
 	case FORMAT_MP3:
 	    {
+
 		// Reallocate the required memory.
 		Uint8* tmp_data = new Uint8[data_bytes + sounddata->data_size];
 		memcpy(tmp_data, sounddata->data, sounddata->data_size);
@@ -221,7 +218,7 @@ long	SDL_sound_handler::fill_stream_data(void* data, int data_bytes, int sample_
 	    break;
 
 	default:
-		log_error(_("Behavior for this audio codec %d is unknown.  Please send this SWF to the developers"), (int)(sounddata->format));
+		log_error(_("Behavior for this audio codec %d is unknown.  Please send this SWF to the developers"), (int)(sounddata->soundinfo->getFormat()));
 	}
 
 	return start_size;
@@ -273,7 +270,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	else sound->position = start_position;
 
 	if (offset < 0) sound->offset = 0;
-	else sound->offset = (sounddata->stereo ? offset : offset*2); // offset is stored as stereo
+	else sound->offset = (sounddata->soundinfo->isStereo() ? offset : offset*2); // offset is stored as stereo
 
 	sound->envelopes = envelopes;
 	sound->current_env = 0;
@@ -282,7 +279,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 	// Set number of loop we should do. -1 is infinte loop, 0 plays it once, 1 twice etc.
 	sound->loop_count = loop_count;
 
-	if (sounddata->format == FORMAT_MP3) {
+	if (sounddata->soundinfo->getFormat() == FORMAT_MP3) {
 
 #ifdef USE_FFMPEG
 		// Init the avdecoder-decoder
@@ -358,7 +355,7 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 			active_sound* sound = sounddata->m_active_sounds[i];
 
 			// Stop sound, remove it from the active list (mp3)
-			if (sounddata->format == 2) {
+			if (sounddata->soundinfo->getFormat() == FORMAT_MP3) {
 #ifdef USE_FFMPEG
 				avcodec_close(sound->cc);
 				av_parser_close(sound->parser);
@@ -411,7 +408,7 @@ void	SDL_sound_handler::stop_all_sounds()
 			active_sound* sound = sounddata->m_active_sounds[i];
 
 			// Stop sound, remove it from the active list (mp3)
-			if (sounddata->format == 2) {
+			if (sounddata->soundinfo->getFormat() == FORMAT_MP3) {
 #ifdef USE_FFMPEG
 				avcodec_close(sound->cc);
 				av_parser_close(sound->parser);
@@ -471,15 +468,16 @@ void	SDL_sound_handler::set_volume(int sound_handle, int volume) {
 
 }
 	
-void SDL_sound_handler::get_info(int sound_handle, int* format, bool* stereo) {
+SoundInfo* SDL_sound_handler::get_sound_info(int sound_handle) {
 
 	mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < m_sound_data.size())
 	{
-		*format = m_sound_data[sound_handle]->format;
-		*stereo = m_sound_data[sound_handle]->stereo;
+		return m_sound_data[sound_handle]->soundinfo.get();
+	} else {
+		return NULL;
 	}
 
 }
@@ -552,11 +550,14 @@ unsigned int SDL_sound_handler::get_duration(int sound_handle)
 
 	sound_data* sounddata = m_sound_data[sound_handle];
 
+	uint32_t sampleCount = sounddata->soundinfo->getSampleCount();
+	uint32_t sampleRate = sounddata->soundinfo->getSampleRate();
+
 	// Return the sound duration in milliseconds
-	if (sounddata->sample_count > 0 && sounddata->sample_rate > 0) {
-		unsigned int ret = sounddata->sample_count / sounddata->sample_rate * 1000;
-		ret += ((sounddata->sample_count % sounddata->sample_rate) * 1000) / sounddata->sample_rate;
-		if (sounddata->stereo) ret = ret / 2;
+	if (sampleCount > 0 && sampleRate > 0) {
+		unsigned int ret = sampleCount / sampleRate * 1000;
+		ret += ((sampleCount % sampleRate) * 1000) / sampleRate;
+		if (sounddata->soundinfo->isStereo()) ret = ret / 2;
 		return ret;
 	} else {
 		return 0;
@@ -774,7 +775,11 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 		sound_data* sounddata = handler->m_sound_data[i];
 		for(uint32_t j = 0; j < sounddata->m_active_sounds.size(); j++) {
 
+			// Temp variables to make the code simpler and easier to read
 			active_sound* sound = sounddata->m_active_sounds[j];
+			format_type soundFormat = sounddata->soundinfo->getFormat();
+			bool soundStereo = sounddata->soundinfo->isStereo();
+			uint32_t soundSampleRate = sounddata->soundinfo->getSampleRate();
 
 			// When the current sound dont have enough decoded data to fill the buffer, 
 			// we first mix what is already decoded, then decode some more data, and
@@ -795,7 +800,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 				// If this isn't MP3 (which means its NATIVE16) there is nothing to decode,
 				// reusing the available data is the only option.
-				if (sounddata->format != 2) {
+				if (soundFormat != FORMAT_MP3) {
 					if (index < buffer_length) {
 						sound->loop_count--;
 						sound->raw_position = 0;
@@ -902,7 +907,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 					mad_synth_frame (&sound->synth, &sound->frame);
 					
-					outsize = sound->synth.pcm.length * ((sounddata->stereo == true) ? 4 : 2);
+					outsize = sound->synth.pcm.length * ((soundStereo() == true) ? 4 : 2);
 
 					tmp_raw_buffer = new Uint8[outsize];
 					int sample;
@@ -913,7 +918,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 					// scaling while we're at it.
 					for(int f = 0; f < sound->synth.pcm.length; f++)
 					{
-						for (int e = 0; e < ((sounddata->stereo == true) ? 2 : 1); e++){ // channels (stereo/mono)
+						for (int e = 0; e < ((soundStereo() == true) ? 2 : 1); e++){ // channels (stereo/mono)
 
 							mad_fixed_t mad_sample = sound->synth.pcm.samples[e][f];
 
@@ -935,15 +940,15 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 #endif
 
 					// If we need to convert samplerate or/and from mono to stereo...
-					if (outsize > 0 && (sounddata->sample_rate != handler->audioSpec.freq || !sounddata->stereo)) {
+					if (outsize > 0 && (static_cast<int>(soundSampleRate) != handler->audioSpec.freq || !soundStereo)) {
 
 						int16_t* adjusted_data = 0;
 						int	adjusted_size = 0;
-						int sample_count = outsize / ((sounddata->stereo == true) ? 4 : 2);
+						int sample_count = outsize / ((soundStereo == true) ? 4 : 2);
 
 						// Convert to needed samplerate
 						convert_raw_data(&adjusted_data, &adjusted_size, tmp_raw_buffer, sample_count, 0, 
-								sounddata->sample_rate, sounddata->stereo,
+								soundSampleRate, soundStereo,
 								handler->audioSpec.freq, (handler->audioSpec.channels == 2 ? true : false));
 
 						// Hopefully this wont happen
@@ -1011,7 +1016,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 			} 
 
 			// Sound is done, remove it from the active list (mp3)
-			if (sound->position == sound->data_size && sound->loop_count == 0 && sounddata->format == 2) {
+			if (sound->position == sound->data_size && sound->loop_count == 0 && soundFormat == FORMAT_MP3) {
 #ifdef USE_FFMPEG
 				avcodec_close(sound->cc);
 				av_parser_close(sound->parser);
@@ -1026,7 +1031,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 
 			// Sound is done, remove it from the active list (adpcm/native16)
-			} else if (sound->loop_count == 0 && sounddata->format == 7 && sound->raw_position >= sound->raw_data_size && sound->raw_data_size != 0) {
+			} else if (sound->loop_count == 0 && soundFormat == FORMAT_NATIVE16 && sound->raw_position >= sound->raw_data_size && sound->raw_data_size != 0) {
 				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + j);
 				handler->soundsPlaying--;
 			} else if (sound->raw_position == 0 && sound->raw_data_size == 0) {
