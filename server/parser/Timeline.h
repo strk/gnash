@@ -94,7 +94,7 @@ public:
 	///
 	void closeFrame()
 	{
-		//boost::mutex::scoped_lock lock(_frameDepthsMutex);
+		boost::mutex::scoped_lock lock(_frameDepthsMutex);
 
 		// Copy depth set from previous frame
 		_frameDepths.push_back(_frameDepths.back());

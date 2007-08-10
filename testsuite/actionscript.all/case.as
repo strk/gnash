@@ -22,12 +22,11 @@
  *  Test case sensitivity 
  */
 
-rcsid="$Id: case.as,v 1.5 2007/07/24 13:13:27 strk Exp $";
+rcsid="$Id: case.as,v 1.6 2007/08/10 08:34:32 zoulunkai Exp $";
 
 #include "check.as"
 
 #if OUTPUT_VERSION <= 6
-
 aBcD = 100;
 oBj = new Object();
 obj.xYZ = 100;
@@ -35,9 +34,13 @@ obj.xYZ = 100;
 check_equals(ABCD, 100);
 check_equals(typeof(OBJ), 'object');
 check_equals(OBJ.xyz, 100);
+#else
+//swf7 and above are case sensitive
+check_equals(ABCD, undefined);
+check_equals(OBJ, undefined);
+#endif 
 
 #if OUTPUT_VERSION == 6
-// createEmptyMovieClip is supported with swf > 5
 // 
 // create _root.mc0 and _root.mc0.mc1
 // 
@@ -67,4 +70,63 @@ check_equals(mC0.mC1._target, "/mC0/mC1");
 #endif  // MING_SUPPORTS_ASM
 #endif  // OUTPUT_VERSION == 6
 
-#endif  // OUTPUT_VERSION > 5
+#if OUTPUT_VERSION >= 6
+//
+// creat two movieclips named by same letters but different cases
+//
+mcRef = new Array(10);
+i = 0;
+MovieClip.prototype.onConstruct = function ()
+{
+	mcRef[i++] = this;
+};
+
+_root.createEmptyMovieClip("clip", 6); //this will invoke the onConstruct listener
+_root.createEmptyMovieClip("CLIP", 7); //this will invoke the onConstruct listener
+
+// support visual checks
+with(mcRef[0])
+{
+	beginFill(0xff0000, 100);
+	moveTo(100, 100);
+	lineTo(200,100);
+	lineTo(200,200);
+	lineTo(100,200);
+	lineTo(100,100);
+	endFill();
+}
+
+// support visual checks
+with(mcRef[1])
+{
+	beginFill(0x00ff00, 100);
+	moveTo(100, 100);
+	lineTo(200,100);
+	lineTo(200,200);
+	lineTo(100,200);
+	lineTo(100,100);
+	endFill();
+}
+mcRef[1]._x += 100;
+
+check(mcRef[0]!= mcRef[1]);
+check_equals(mcRef[0].getDepth(), 6);
+check_equals(mcRef[1].getDepth(), 7);
+check_equals(mcRef[0]._name, "clip");
+check_equals(mcRef[1]._name, "CLIP");
+check_equals(mcRef[0]._target, "/clip");
+check_equals(mcRef[1]._target, "/CLIP");
+#endif
+
+#if OUTPUT_VERSION <= 6
+//case insensitive, so they reference the same movieclip.
+//Or both are undefined with OUTPUT_VERSION <= 5
+check(clip == CLIP); 
+#else 
+//case sensitive, so they are different
+xcheck(clip != CLIP);
+check_equals(clip.getDepth(), 6);
+xcheck_equals(CLIP.getDepth(), 7);
+#endif 
+
+_root.totals();
