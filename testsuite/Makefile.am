@@ -12,6 +12,7 @@ SUBDIRS = \
 	misc-ming.all \
 	misc-mtasc.all \
 	misc-swfmill.all \
+	misc-swfc.all \
 	movies.all \
 	actionscript.all \
 	$(NULL)

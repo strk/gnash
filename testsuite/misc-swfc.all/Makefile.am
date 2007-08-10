@@ -34,7 +34,7 @@ EXTRA_DIST = $(SCTESTS) $(AUXMOVIES) check.sc Dejagnu.sc
 
 #if ENABLE_SWFC
 
-SWFC = swfc
+#SWFC = swfc # this is set by ./configure
 SWFC_FLAGS = 
 SWFC_CPP = cpp -P -I$(srcdir)
 
