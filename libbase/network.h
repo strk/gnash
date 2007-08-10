@@ -26,7 +26,7 @@
 
 #include <string>
 
-#ifndef HAVE_WINSOCK_H
+#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
 # include <netinet/in.h>
 # include <arpa/inet.h>
 #else
@@ -46,7 +46,12 @@ const short RTMP = 1935;
 const short RTMPT = 80;
 const short RTMPTS = 443;
 
-#ifdef HAVE_WINSOCK_H
+#ifdef __OS2__
+	typedef int    socklen_t;
+	#define SHUT_RDWR 0x2
+#endif
+
+#if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
 	typedef long   in_addr_t;
 #	define inet_lnaof(x) inet_addr(inet_ntoa(x))
 	typedef int    socklen_t;

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.118 2007/08/06 20:42:57 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.119 2007/08/10 14:06:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1887,7 +1887,18 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 				sendVarsMethod);
 		}
 
+#ifndef __OS2__x
 		string command = "firefox -remote \"openurl(";
+#else
+static char browserExe[ 255 ] = "";
+
+    if ( browserExe[0] == 0 ) {
+        PrfQueryProfileString( HINI_USER, (PSZ) "WPURLDEFAULTSETTINGS", (PSZ) "DefaultBrowserExe", NULL,
+                               (PVOID) browserExe, (LONG)sizeof(browserExe) );
+    }
+		string command = browserExe;
+		command += " -remote \"openurl(";
+#endif
 		command += url.str();
 #if 0 // target testing
 		if ( ! target_string.empty() )

@@ -32,10 +32,10 @@
 #include "as_object.h" // for inheritance
 
 #include <sys/types.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__)
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__)
 # include <sys/ipc.h>
 # include <sys/shm.h>
-#elif !defined(__riscos__)
+#elif !defined(__riscos__) && !defined(__OS2__)
 # include <windows.h>
 # include <process.h>
 # include <fcntl.h>
@@ -90,7 +90,7 @@ protected:
     long        _alloced;
     size_t      _size;
     char        _filespec[MAX_SHM_NAME_SIZE];
-#ifndef HAVE_WINSOCK_H
+#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
     key_t	_shmkey;
 #else
     long	_shmkey;

@@ -30,7 +30,7 @@
 #include <cstdio>
 #include <cerrno>
 #include <fcntl.h>
-#ifdef HAVE_WINSOCK_H
+#if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
 # include <winsock2.h>
 # include <windows.h>
 # include <sys/stat.h>
@@ -74,7 +74,7 @@ Network::Network()
 	_timeout(5)
 {
     //GNASH_REPORT_FUNCTION;
-#ifdef HAVE_WINSOCK_H
+#if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
     WORD wVersionRequested;
     WSADATA wsaData;
     wVersionRequested = MAKEWORD(1, 1);		// Windows Sockets 1.1
@@ -89,7 +89,7 @@ Network::Network()
 Network::~Network()
 {
     //GNASH_REPORT_FUNCTION;
-#ifdef HAVE_WINSOCK_H
+#if defined(HAVE_WINSOCK_H) && !defined(__OS2__)
     WSACleanup();
 #else
     closeNet();

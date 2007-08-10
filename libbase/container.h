@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: container.h,v 1.59 2007/07/01 10:54:07 bjacques Exp $ */
+/* $Id: container.h,v 1.60 2007/08/10 14:06:35 strk Exp $ */
 
 #ifndef __CONTAINER_H__
 #define __CONTAINER_H__
@@ -40,7 +40,7 @@
 // corrent paths supplied, this one file barfs with GCC 3.3.3 on
 // NetBSD, so screw it, and just hack it for now. We hope this entire
 // file will be gone soon anyway.
-#ifndef HAVE_WINSOCK_H
+#if !defined(HAVE_WINSOCK_H) || defined(__OS2__)
 #define _LIB_PTHREAD_ 1
 #ifndef _LIB_PTHREAD_TYPES_H
 #  define _LIB_PTHREAD_TYPES_H 1

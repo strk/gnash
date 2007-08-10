@@ -57,6 +57,16 @@
 	#endif
 
 	#define DSOLOCAL
+#elif defined(__OS2__)
+	#ifdef BUILDING_DLL
+		#define DSOEXPORT __declspec(dllexport)
+	#else
+		// Temporarily commented because of VC++ compiler problems 
+		#define DSOEXPORT // __declspec(dllimport)
+	#endif
+
+	#define DSOLOCAL
+
 #else
 	#ifdef HAVE_GNUC_VISIBILITY
 		#define DSOEXPORT __attribute__ ((visibility("default")))

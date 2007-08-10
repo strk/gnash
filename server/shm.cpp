@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: shm.cpp,v 1.33 2007/07/07 12:02:45 martinwguy Exp $ */
+/* $Id: shm.cpp,v 1.34 2007/08/10 14:06:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,11 +30,11 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <fcntl.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__)
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__)
 #include <sys/mman.h>
 #include <sys/shm.h>
 #include <sys/ipc.h>
-#elif !defined(__riscos__)
+#elif !defined(__riscos__) && !defined(__OS2__)
 #include <windows.h>
 #include <process.h>
 #include <io.h>

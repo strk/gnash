@@ -148,7 +148,7 @@ void
 URL::normalize_path(std::string& path)
 {
 
-#if defined(_WIN32) || defined(WIN32) 
+#if defined(_WIN32) || defined(WIN32) || defined(__OS2__)
 	return;
 #endif
 
@@ -277,9 +277,11 @@ URL::init_relative(const std::string& relative_url, const URL& baseurl)
 
 		assert(basedir[0] == '/'
 			|| basedir[1] == ':');	// for WIN32
+#ifndef __OS2__
+		// On OS/2 - a filepath such as x:file.swf is acceptable.......
 		assert(*(basedir.rbegin()) == '/' 
 			|| *(basedir.rbegin()) == '\\'); 	// for WIN32
-
+#endif
 		string::size_type lpos =  basedir.size()-1;
 		for (int i=0; i<dirsback; ++i)
 		{

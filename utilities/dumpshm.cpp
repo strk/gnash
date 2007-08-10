@@ -20,7 +20,7 @@
 //
 
 
-/* $Id: dumpshm.cpp,v 1.12 2007/07/01 10:55:16 bjacques Exp $ */
+/* $Id: dumpshm.cpp,v 1.13 2007/08/10 14:06:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,6 +28,7 @@
 
 #include <stdarg.h>
 #include <sys/stat.h>
+
 extern "C"{
 	#include <unistd.h>
 #ifdef HAVE_GETOPT_H
@@ -40,11 +41,11 @@ extern "C"{
 }
 #include <dirent.h>
 #include <sys/types.h>
-#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__)
+#if !defined(HAVE_WINSOCK_H) && !defined(__riscos__) && !defined(__OS2__)
 #include <sys/mman.h>
 #include <sys/shm.h>
 #include <sys/ipc.h>
-#elif !defined(__riscos__)
+#elif !defined(__riscos__) && !defined(__OS2__)
 #include <windows.h>
 #include <process.h>
 #include <io.h>

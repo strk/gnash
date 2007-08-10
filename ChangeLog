@@ -1,3 +1,10 @@
+2007-08-10 Paul Smedley <paul@smedley.info>
+
+	* libbase/URL.cpp, libbase/container.h, libbase/network.cpp,
+	  libbase/network.h, libbase/tu_config.h, libbase/tu_timer.cpp,
+	  server/shm.cpp, server/shm.h, server/vm/ASHandlers.cpp,
+	  utilities/dumpshm.cpp: Build support for OS/2.
+
 2007-08-10 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/Timeline.h (getFrameDepths): lock the mutex, as
