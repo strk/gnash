@@ -88,6 +88,13 @@ public:
 	///
 	static std::auto_ptr<FreetypeGlyphsProvider> createFace(const std::string& name, bool bold, bool italic);
 
+	/// Destructor
+	//
+	/// Release face resources
+	///
+	~FreetypeGlyphsProvider();
+
+
 	/// Return the given character glyph as a shape character definition in 1024 EM coordinates.
 	//
 	///

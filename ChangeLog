@@ -1,5 +1,7 @@
 2007-08-10 Sandro Santilli <strk@keybit.net>
 
+	* server/FreetypeGlyphsProvider.{cpp,h}: add a destructor getting
+	  rid of the resources associated with a face.
 	* configure.ac: FLTK/OGL isn't supported, while SDL/OGL is !
 	* testsuite/media/: README, sound1.wav:
 	  Moved sound1.wav data from swfc dir to media dir,

@@ -457,5 +457,18 @@ FreetypeGlyphsProvider::getGlyph(uint16_t, float& advance)
 }
 #endif // ndef(HAVE_FREETYPE2)
 
+FreetypeGlyphsProvider::~FreetypeGlyphsProvider()
+{
+#ifdef HAVE_FREETYPE2 
+	if ( m_face )
+	{
+		if ( FT_Done_Face(m_face) != 0 )
+		{
+			log_error("Could not release FT face resources");
+		}
+	}
+#endif // ndef(HAVE_FREETYPE2)
+}
+
 } // namespace gnash
 
