@@ -1,3 +1,8 @@
+2007-08-09 David Rorex  <drorex@gmail.com>
+
+	* server/FreetypeGlyphsProvider.cpp: minor change to print the
+	  freetype glyph format in human readable form. patch #6148.
+
 2007-08-10 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ActionExec.{cpp,h}: refactor the check for call stack
