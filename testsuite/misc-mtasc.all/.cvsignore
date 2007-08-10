@@ -9,3 +9,4 @@ site.exp
 testrun.*
 alltests-runner
 gmon.out
+pp_*.as
