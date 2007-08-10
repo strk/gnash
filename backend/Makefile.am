@@ -78,7 +78,7 @@ noinst_HEADERS = \
 
 # bin_PROGRAMS = gnash
 
-lib_LTLIBRARIES = libgnashbackend.la
+pkglib_LTLIBRARIES = libgnashbackend.la
 
 # RENDER_SOURCES = render_handler_tri.cpp
 SOUND_SOURCES = 

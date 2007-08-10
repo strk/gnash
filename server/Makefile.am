@@ -18,14 +18,14 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.120 2007/07/01 10:54:18 bjacques Exp $
+# $Id: Makefile.am,v 1.121 2007/08/10 04:36:13 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
 SUBDIRS = asobj parser vm
 
 # noinst_LTLIBRARIES = libserver.la 
-lib_LTLIBRARIES = libgnashserver.la
+pkglib_LTLIBRARIES = libgnashserver.la
 # noinst_SCRIPTS = gen-files.sh
 
 # TODO: use a conditional to optionally link ?

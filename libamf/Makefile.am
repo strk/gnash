@@ -15,11 +15,11 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.27 2007/07/30 22:48:19 strk Exp $
+# $Id: Makefile.am,v 1.28 2007/08/10 04:36:13 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
-lib_LTLIBRARIES = libgnashamf.la
+pkglib_LTLIBRARIES = libgnashamf.la
 libgnashamf_la_SOURCES = amf.cpp rtmp.cpp
 
 libgnashamf_la_LIBADD = $(top_builddir)/libbase/libgnashbase.la

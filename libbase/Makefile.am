@@ -29,7 +29,7 @@ endif
 
 # If we are using an installable libltdl, then it needs to be built
 # before libgnash, as libgnash depends on it for extensions.
-lib_LTLIBRARIES =  $(LIBLTDLLIB) libgnashbase.la
+pkglib_LTLIBRARIES =  $(LIBLTDLLIB) libgnashbase.la
 
 libgnashbase_la_CPPFLAGS = -DPLUGINSDIR=\"$(pluginsdir)\" \
 	-I.. -I$(srcdir) \
@@ -186,9 +186,9 @@ libltdl_la_LIBADD = $(LIBADD_DL)
 #noinst_PROGRAMS = demo
 #demo_SOURCES = demo.cpp
 #demo_LDADD = libgnashbase.la
-demo$(EXEEXT): demo.o $(lib_LTLIBRARIES)
+demo$(EXEEXT): demo.o $(pkglib_LTLIBRARIES)
 # 	@$(RM) demo$(EXEEXT)
-# 	$(CXXLINK) $(AM_LDFLAGS) demo.o $(lib_LTLIBRARIES) $(LIBS)
+# 	$(CXXLINK) $(AM_LDFLAGS) demo.o $(pkglib_LTLIBRARIES) $(LIBS)
 
 # Rebuild with GCC 4.x Mudflap support
 mudflap:

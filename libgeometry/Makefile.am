@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.30 2007/07/01 10:54:11 bjacques Exp $
+# $Id: Makefile.am,v 1.31 2007/08/10 04:36:13 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -27,7 +27,7 @@ AUTOMAKE_OPTIONS =
 # AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
 
 # noinst_LTLIBRARIES = libgeometry.la
-lib_LTLIBRARIES = libgnashgeo.la
+pkglib_LTLIBRARIES = libgnashgeo.la
 # noinst_LIBRARIES = libgeometry.a
 
 # These headers get installed
