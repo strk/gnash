@@ -330,7 +330,7 @@ if BUILD_CAIRO_RENDERER
 gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
 gtk_gnash_SOURCES += gtk_glue_cairo.cpp gtk_glue_cairo.h \
 		gtk.cpp gtksup.h gtk_glue.h
-gtk_gnash_LDADD = $(top_builddir)/backend/libgnashcairo.la
+gtk_gnash_LDADD = $(top_builddir)/backend/libgnashcairo.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(CAIRO_LIBS)
 endif				# BUILD_CAIRO_RENDERER
 endif				# BUILD_GTK_GUI

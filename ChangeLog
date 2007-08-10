@@ -1,5 +1,6 @@
 2007-08-10 Sandro Santilli <strk@keybit.net>
 
+	* gui/Makefile.am: typo preventing gtk/cairo combination from building
 	* server/FreetypeGlyphsProvider.{cpp,h}: add a destructor getting
 	  rid of the resources associated with a face.
 	* configure.ac: FLTK/OGL isn't supported, while SDL/OGL is !
