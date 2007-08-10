@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.40 2007/08/10 14:24:57 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.41 2007/08/10 15:17:44 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -144,6 +144,8 @@ ActionExec::operator() ()
     _original_target = env.get_target();
 
     _initial_stack_size = env.stack_size();
+
+    _initialCallStackDepth = env.callStackDepth();
 
 #if DEBUG_STACK
 	IF_VERBOSE_ACTION (
@@ -284,19 +286,32 @@ ActionExec::cleanupAfterRun()
     env.set_target(_original_target);
     _original_target = NULL;
 
-    // check the call stack if not in a function context
-    if ( ! isFunction() && env.callStackDepth() > 0 )
+    // Check the call stack depth to be the same as the one we started with
+    // TODO: should this check be switched off based on GNASH_TRUST_SWF_INPUT ?
+    size_t currCallStackDepth = env.callStackDepth();
+    if ( currCallStackDepth != _initialCallStackDepth )
     {
-	log_error(_("Call stack non-empty at end of ExecutableCode run (limits hit?)"));
-	// TOOD:
-	// bug #20740 contains a movie that fails an assertion if we clean the call stack here
-	// maybe global code was executed as effect of a function code (think gotoFrame, attachMovie ?)
-	// We'll keep the verbose error for now, but let's not clean the call frame, shouldn't
-	// hurt anyway..
-	// A better implementation would likely be taking note of the callStackDepth at startup
-	// (like for _initial_stack_size) and check it here for consistency (and proper cleanup
-	// on limits hit).
-	//env.clearCallFrames();
+	if ( currCallStackDepth > _initialCallStackDepth )
+	{
+		// TODO: try to produce this error hitting script limits
+		log_error(_("Call stack at end of ActionScript execution "
+			"(" SIZET_FMT ") exceeds call stack depth at start "
+			"of it (" SIZET_FMT ") - limits hit ?"),
+			 currCallStackDepth, _initialCallStackDepth);
+		size_t diff = currCallStackDepth-_initialCallStackDepth;
+		while (diff--)
+		{
+			env.popCallFrame();
+		}
+	}
+	else
+	{
+		// TODO: make this an assertion ?
+		log_error(_("Call stack at end of ActionScript execution "
+			"(" SIZET_FMT ") less then call stack depth at start "
+			"of it (" SIZET_FMT ") - bad bug !"),
+			 currCallStackDepth, _initialCallStackDepth);
+	}
     }
 
     // check if the stack was smashed

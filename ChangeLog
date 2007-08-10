@@ -1,5 +1,11 @@
 2007-08-10 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ActionExec.{cpp,h}: refactor the check for call stack
+	  depth at end of execution to take depth at *start* of execution
+	  into account.
+
+2007-08-10 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ActionExec.cpp (cleanupAfterRun): don't assume the call
 	  stack should be empty at the end of global code execution. Still
 	  print an error as we need further investigation about it. Fixes

@@ -100,7 +100,11 @@ private:
 	/// The 'this' pointer, if this is a function call
 	boost::intrusive_ptr<as_object> _this_ptr;
 
+	/// Stack size at start of execution
 	size_t _initial_stack_size;
+
+	/// Call stack depth at start of execution
+	size_t _initialCallStackDepth;
 
 	character* _original_target;
 
