@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.397 2007/08/10 18:31:01 strk Exp $
+dnl $Id: configure.ac,v 1.398 2007/08/10 19:38:26 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -330,8 +330,8 @@ dnl fi
 
 if test x$build_ogl = xyes; then
 dnl   if test x$build_fb = xyes -o x$build_fltk = xyes; then
-   if test x$build_gtk != xyes -a x$build_fltk != xyes -a x$build_kde != xyes -a x$build_aqua != xyes; then
-     AC_MSG_ERROR([OpenGL renderer needs one of gtk,fltk or kde guis. Try enabling any of them ( --enable-gui=gtk|kde|fltk ) or using AGG ( --enable-renderer=AGG ).]);
+   if test x$build_gtk != xyes -a x$build_sdl != xyes -a x$build_kde != xyes -a x$build_aqua != xyes; then
+     AC_MSG_ERROR([OpenGL renderer needs one of gtk,sdl or kde guis. Try enabling any of them ( --enable-gui=gtk|kde|sdl ) or using AGG ( --enable-renderer=AGG ).]);
    fi
    AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
