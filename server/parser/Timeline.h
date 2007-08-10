@@ -165,6 +165,8 @@ public:
 	///
 	void getFrameDepths(size_t frameno, std::vector<int>& depths)
 	{
+		boost::mutex::scoped_lock lock(_frameDepthsMutex);
+
 		assert(frameno < _frameDepths.size());
 
 		DepthSet& from = _frameDepths[frameno];

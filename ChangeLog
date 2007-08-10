@@ -1,3 +1,8 @@
+2007-08-10 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/Timeline.h (getFrameDepths): lock the mutex, as
+	  documented in method description.
+
 2007-08-10 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler.h, backend/sound_handler_{sdl,gst}.{h,cpp},
