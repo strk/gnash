@@ -36,7 +36,7 @@ EXTRA_DIST = $(SCTESTS) $(AUXMOVIES) check.sc Dejagnu.sc
 
 #SWFC = swfc # this is set by ./configure
 SWFC_FLAGS = 
-SWFC_CPP = cpp -P -I$(srcdir)
+SWFC_CPP = cpp -P -I$(srcdir) -DMEDIADIR='$(srcdir)/../media'
 
 SCTESTS_OUT = $(SCTESTS:.sc=.swf)
 

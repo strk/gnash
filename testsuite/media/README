@@ -7,3 +7,20 @@ Bitstream Vera Sans.fdb
 	Font Definition Block (fdb) for embedding in SWF.
 	Taken from http://ming.sf.net. Copyright is in
 	Bitstream.COPYRIGHT
+
+sound1.wav
+
+	(tick, tick)
+	Sample Size    : 16-bits
+	Sample Encoding: signed (2's complement)
+	Channels       : 1
+	Sample Rate    : 8000
+
+sound1.mp3
+
+	(bip bip)
+	Sample Size    : 16-bits
+	Sample Encoding: MPEG audio (layer I, II or III)
+	Channels       : 1
+	Sample Rate    : 22050
+

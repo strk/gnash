@@ -1,5 +1,18 @@
 2007-08-10 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/media/: README, sound1.wav:
+	  Moved sound1.wav data from swfc dir to media dir,
+	  add some info about it and sound1.mp3.
+	* testsuite/misc-swfc.all/sound.wav: moved to
+	  media/sound1.wav
+	* testsuite/misc-swfc.all/Makefile.am: define MEDIADIR
+	* testsuite/misc-swfc.all/check.sc: define a MEDIA
+	  macro
+	* testsuite/misc-swfc.all/sound.sc: use the MEDIA macro
+	  to find media stuff.
+
+2007-08-10 Sandro Santilli <strk@keybit.net>
+
 	* Makefile.am, configure.ac, testsuite/Makefile.am,
 	  testsuite/misc-swfc.all/Makefile.am:
 	  Enable swfc testsuite if 'swfc' is found on the system.

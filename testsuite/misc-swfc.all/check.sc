@@ -44,5 +44,6 @@
 
 #define note(text) Dejagnu.note(text + _INFO_);
 
+#define MEDIA(x) MEDIADIR/x
 
 #endif

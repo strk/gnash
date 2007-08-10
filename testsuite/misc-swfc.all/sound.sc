@@ -1,6 +1,8 @@
 .flash bbox=200x200 filename="sound_test.swf" version=6 fps=30
 
-.sound audio "sound.wav"
+#include "check.sc"
+
+.sound audio MEDIA(sound1.wav)
 
 .box b1 100 100 color=yellow fill=red
 
