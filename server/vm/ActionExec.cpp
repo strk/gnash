@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.39 2007/07/01 10:54:36 bjacques Exp $ */
+/* $Id: ActionExec.cpp,v 1.40 2007/08/10 14:24:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -288,7 +288,15 @@ ActionExec::cleanupAfterRun()
     if ( ! isFunction() && env.callStackDepth() > 0 )
     {
 	log_error(_("Call stack non-empty at end of ExecutableCode run (limits hit?)"));
-	env.clearCallFrames();
+	// TOOD:
+	// bug #20740 contains a movie that fails an assertion if we clean the call stack here
+	// maybe global code was executed as effect of a function code (think gotoFrame, attachMovie ?)
+	// We'll keep the verbose error for now, but let's not clean the call frame, shouldn't
+	// hurt anyway..
+	// A better implementation would likely be taking note of the callStackDepth at startup
+	// (like for _initial_stack_size) and check it here for consistency (and proper cleanup
+	// on limits hit).
+	//env.clearCallFrames();
     }
 
     // check if the stack was smashed
