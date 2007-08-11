@@ -1,5 +1,6 @@
 2007-08-10 Sandro Santilli <strk@keybit.net>
 
+	* gui/Makefile.am: fix build of sdl/cairo
 	* configure.ac: abort if a requested renderer/gui combination
 	  isn't supported (checked for gtk/kde/sdl/fb/fltk)
 

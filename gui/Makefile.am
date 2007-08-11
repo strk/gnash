@@ -219,26 +219,34 @@ if BUILD_SDL_GUI
 bin_PROGRAMS += sdl-gnash
 sdl_gnash_CPPFLAGS = -DGUI_SDL -DGUI_CONFIG=\"SDL\" \
 	 $(AM_CPPFLAGS) $(SDL_CFLAGS) 
-sdl_gnash_SOURCES = $(GUI_SRCS) gui_sdl.cpp
+sdl_gnash_SOURCES = $(GUI_SRCS) gui_sdl.cpp sdl.cpp sdlsup.h sdl_glue.h
 sdl_gnash_LDFLAGS = $(LIBLTDL) -export-dynamic 
 #sdl_gnash_DEPENDENCIES = .configline
 sdl_gnash_LDADD = \
 	$(MYSQL_LIBS) \
 	$(GNASH_LIBS) \
-	$(AM_LDFLAGS)
+	$(AM_LDFLAGS) \
+	$(SDL_LIBS)
+
 if BUILD_OGL_RENDERER
 sdl_gnash_CPPFLAGS += $(OPENGL_CFLAGS)
 sdl_gnash_LDADD += $(top_builddir)/backend/libgnashogl.la \
-	$(SDL_LIBS) $(OPENGL_LIBS)
-sdl_gnash_SOURCES += sdl_ogl_glue.cpp sdl_ogl_glue.h \
-	 	sdl.cpp sdlsup.h sdl_glue.h
+	$(OPENGL_LIBS)
+sdl_gnash_SOURCES += sdl_ogl_glue.cpp sdl_ogl_glue.h 
 endif
+
 if BUILD_AGG_RENDERER
 sdl_gnash_CPPFLAGS += $(AGG_CFLAGS)
 sdl_gnash_LDADD += $(top_builddir)/backend/libgnashagg.la \
-	$(SDL_LIBS) $(AGG_LIBS)
-sdl_gnash_SOURCES += sdl_agg_glue.cpp sdl_agg_glue.h \
-	 	sdl.cpp sdlsup.h sdl_glue.h
+	$(AGG_LIBS)
+sdl_gnash_SOURCES += sdl_agg_glue.cpp sdl_agg_glue.h 
+endif
+
+if BUILD_CAIRO_RENDERER
+sdl_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
+sdl_gnash_LDADD += $(top_builddir)/backend/libgnashcairo.la \
+	$(CAIRO_LIBS) 
+sdl_gnash_SOURCES += sdl_cairo_glue.cpp sdl_cairo_glue.h 
 endif
 endif
 
