@@ -249,6 +249,9 @@ FltkGui::createWindow(const char* title, int width, int height)
 #elif defined(RENDERER_CAIRO)
 #error FLTK/Cairo is currently broken. Please try again soon... 
     FltkCairoGlue _glue;
+#elif defined(RENDERER_OPENGL)
+#error FLTK/OpenGL is currently broken. Please try again soon... 
+    FltkCairoGlue _glue;
 #endif
     createMenu();
     end();

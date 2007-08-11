@@ -1,5 +1,10 @@
 2007-08-10 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: abort if a requested renderer/gui combination
+	  isn't supported (checked for gtk/kde/sdl/fb/fltk)
+
+2007-08-10 Sandro Santilli <strk@keybit.net>
+
 	* gui/Makefile.am: typo preventing gtk/cairo combination from building
 	* server/FreetypeGlyphsProvider.{cpp,h}: add a destructor getting
 	  rid of the resources associated with a face.

@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.398 2007/08/10 19:38:26 strk Exp $
+dnl $Id: configure.ac,v 1.399 2007/08/11 01:44:15 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -329,10 +329,12 @@ dnl    add_renderer="ogl,agg"
 dnl fi
 
 if test x$build_ogl = xyes; then
-dnl   if test x$build_fb = xyes -o x$build_fltk = xyes; then
-   if test x$build_gtk != xyes -a x$build_sdl != xyes -a x$build_kde != xyes -a x$build_aqua != xyes; then
-     AC_MSG_ERROR([OpenGL renderer needs one of gtk,sdl or kde guis. Try enabling any of them ( --enable-gui=gtk|kde|sdl ) or using AGG ( --enable-renderer=AGG ).]);
-   fi
+  if test x$build_fb = xyes; then
+    AC_MSG_ERROR([OpenGL renderer is not supported by FB gui. Use --enable-renderer=AGG]);
+  fi
+  if test x$build_fltk = xyes; then
+    AC_MSG_ERROR([OpenGL renderer is not supported by FLTK gui. Use --enable-renderer=AGG]);
+  fi
    AC_DEFINE([RENDERER_OPENGL], [], [Use OpenGL renderer])
 fi
 
@@ -1145,9 +1147,15 @@ dnl   if test x"${CAIRO_CFLAGS}" != x; then
 dnl      CAIRO_CFLAGS=`echo ${CAIRO_CFLAGS} | sed -e 's/ *//'`
 dnl      CAIRO_CFLAGS="${CAIRO_CFLAGS} ${CAIRO_CFLAGS}/cairo"
 dnl   fi
-dnl  if test x$build_fb = xyes; then
-dnl   AC_MSG_ERROR([cairo renderer is not supported by fb gui]);
-dnl  fi
+  if test x$build_fb = xyes; then
+    AC_MSG_ERROR([Cairo renderer is not supported by FB gui. Use --enable-renderer=AGG]);
+  fi
+  if test x$build_fltk = xyes; then
+    AC_MSG_ERROR([Cairo renderer is not supported by FLTK gui. Use --enable-renderer=AGG]);
+  fi
+  if test x$build_kde = xyes; then
+    AC_MSG_ERROR([Cairo renderer is not supported by KDE gui. Use --enable-renderer=AGG]);
+  fi
   AC_DEFINE([RENDERER_CAIRO], [], [Use cairo renderer])
 fi
 
