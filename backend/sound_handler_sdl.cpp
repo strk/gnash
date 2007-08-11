@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.80 2007/08/10 10:24:11 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.81 2007/08/11 05:25:04 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -907,7 +907,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 
 					mad_synth_frame (&sound->synth, &sound->frame);
 					
-					outsize = sound->synth.pcm.length * ((soundStereo() == true) ? 4 : 2);
+					outsize = sound->synth.pcm.length * ((soundStereo == true) ? 4 : 2);
 
 					tmp_raw_buffer = new Uint8[outsize];
 					int sample;
@@ -918,7 +918,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 					// scaling while we're at it.
 					for(int f = 0; f < sound->synth.pcm.length; f++)
 					{
-						for (int e = 0; e < ((soundStereo() == true) ? 2 : 1); e++){ // channels (stereo/mono)
+						for (int e = 0; e < ((soundStereo == true) ? 2 : 1); e++){ // channels (stereo/mono)
 
 							mad_fixed_t mad_sample = sound->synth.pcm.samples[e][f];
 
@@ -937,7 +937,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 							*dst++ = sample;
 						}
 					}
-#endif
+#endif // defined(USE_MAD)
 
 					// If we need to convert samplerate or/and from mono to stereo...
 					if (outsize > 0 && (static_cast<int>(soundSampleRate) != handler->audioSpec.freq || !soundStereo)) {

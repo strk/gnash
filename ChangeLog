@@ -1,5 +1,6 @@
 2007-08-10 Sandro Santilli <strk@keybit.net>
 
+	* backend/sound_handler_sdl.cpp: fix build for MAD media handler.
 	* server/shape.cpp: remove useless include of hash_wrapper.h
 	* gui/Makefile.am: fix build of sdl/cairo
 	* configure.ac: abort if a requested renderer/gui combination
