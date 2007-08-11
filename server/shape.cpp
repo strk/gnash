@@ -23,9 +23,6 @@
 #include "tu_file.h"
 #include "tesselate.h"
 
-#include "hash_wrapper.h"
-#include "tu_file.h"
-
 #include <cfloat>
 #include <map>
 
@@ -618,7 +615,6 @@ m_error_tolerance(error_tolerance)
 
 	// strips-in-progress.
 	typedef std::map<int, tri_stripper*> StripsMap;
-	//typedef hash_wrapper<int, tri_stripper*> StripsMap; 
 	StripsMap m_strips;
 
 	collect_traps(mesh_set* set) : m(set) {}
