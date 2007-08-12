@@ -1,3 +1,8 @@
+2007-08-12 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.h (getBounds): add TODO item
+	  (I belive is a fix for bug #20760)
+
 2007-08-10 Sandro Santilli <strk@keybit.net>
 
 	* backend/sound_handler_sdl.cpp: fix build for MAD media handler.

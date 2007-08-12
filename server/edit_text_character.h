@@ -96,6 +96,10 @@ public:
 
 	geometry::Range2d<float> getBounds() const
 	{
+		// TODO: keep an instance member for encoding
+		//       the bounding box, as it might be 
+		//       dynamically updated if the textfield
+		//       is editable and auto-resizes.
 		return m_def->get_bounds().getRange();
 	}
 
