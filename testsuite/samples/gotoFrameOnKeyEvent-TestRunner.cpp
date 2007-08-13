@@ -38,45 +38,105 @@ using namespace std;
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	string filename = string(SRCDIR) + string("/") + string(INPUT_FILENAME);
-	auto_ptr<MovieTester> t;
+  string filename = string(SRCDIR) + string("/") + string(INPUT_FILENAME);
+  auto_ptr<MovieTester> t;
 
-	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
-	dbglogfile.setVerbosity(1);
+  gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+  dbglogfile.setVerbosity(1);
 
-	try
-	{
-		t.reset(new MovieTester(filename));
-	}
-	catch (const GnashException& e)
-	{
-		std::cerr << "Error initializing MovieTester: " << e.what() << std::endl;
-		exit(EXIT_FAILURE);
-	}
-	
-	MovieTester& tester = *t;
+  try
+  {
+    t.reset(new MovieTester(filename));
+  }
+  catch (const GnashException& e)
+  {
+    std::cerr << "Error initializing MovieTester: " << e.what() << std::endl;
+    exit(EXIT_FAILURE);
+  }
+  
+  MovieTester& tester = *t;
 
-	// TODO: check why we need this !!
-	//       I wouldn't want the first advance to be needed
-	tester.advance();
+  // TODO: check why we need this !!
+  //       I wouldn't want the first advance to be needed
+  tester.advance();
 
-	sprite_instance* root = tester.getRootMovie();
-	assert(root);
+  sprite_instance* root = tester.getRootMovie();
+  assert(root);
 
-	check_equals(root->get_frame_count(), 7);
+  check_equals(root->get_frame_count(), 7);
 
-	check_equals(root->get_current_frame(), 0);
-	tester.advance();
-	check_equals(root->get_current_frame(), 0);
+  check_equals(root->get_current_frame(), 0);
+  tester.advance();
+  check_equals(root->get_current_frame(), 0);
 
-	tester.pressKey(key::_1);
+  // press key 1 four times
+  for(int i=1; i<=4; i++)
+  {
+    tester.pressKey(key::_1);
+    tester.releaseKey(key::_1);
+    check_equals(root->get_current_frame(), i);
+    tester.advance();
+    check_equals(root->get_current_frame(), i);
+  }
+  
+  // press key 0 four times
+  for(int i=3; i>=0; i--)
+  {
+    tester.pressKey(key::_0);
+    tester.releaseKey(key::_0);
+    check_equals(root->get_current_frame(), i);
+    tester.advance();
+    check_equals(root->get_current_frame(), i);
+  }
 
-	// TODO: check if it is correct to wait for next ::advance before expecting gotoFrame actions
-	//       execution !!
+  // press key 1 two times
+  for(int i=1; i<=2; i++)
+  {
+    tester.pressKey(key::_1);
+    tester.releaseKey(key::_1);
+    check_equals(root->get_current_frame(), i);
+    tester.advance();
+    check_equals(root->get_current_frame(), i);
+  }
+  
+  // press key DOWN two times
+  {
+    tester.pressKey(key::DOWN);
+    tester.releaseKey(key::DOWN);
+    check_equals(root->get_current_frame(), 5);
+    tester.advance();
+    check_equals(root->get_current_frame(), 5);
 
-	check_equals(root->get_current_frame(), 1);
-	tester.advance();
-	check_equals(root->get_current_frame(), 1);
+    tester.pressKey(key::DOWN);
+    tester.releaseKey(key::DOWN);
+    check_equals(root->get_current_frame(), 6);
+    tester.advance();
+    check_equals(root->get_current_frame(), 6);
+  }
 
+  // press key UP two times
+  {
+    tester.pressKey(key::UP);
+    tester.releaseKey(key::UP);
+    check_equals(root->get_current_frame(), 5);
+    tester.advance();
+    check_equals(root->get_current_frame(), 5);
+
+    tester.pressKey(key::UP);
+    tester.releaseKey(key::UP);
+    check_equals(root->get_current_frame(), 2);
+    tester.advance();
+    check_equals(root->get_current_frame(), 2);
+  }
+
+  // press key 0 two times, now should be back to the first frame
+  for(int i=1; i>=0; i--)
+  {
+    tester.pressKey(key::_0);
+    tester.releaseKey(key::_0);
+    check_equals(root->get_current_frame(), i);
+    tester.advance();
+    check_equals(root->get_current_frame(), i);
+  }
 }
 

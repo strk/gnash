@@ -3,6 +3,7 @@
 	* server/sprite_instance.{h,cpp}: deprecate clone_display_object(), use 
 	  duplicateMovieClip() instead.
 	* testsuite/actionscript.all/ops.as: more tests.
+	* testsuite/samples/gotoFrameOnKeyEvent-TestRunner.cpp: finish the test runner.
 
 2007-08-12 Sandro Santilli <strk@keybit.net>
 
