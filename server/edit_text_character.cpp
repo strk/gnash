@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.97 2007/08/13 03:26:09 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.98 2007/08/13 03:26:33 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1626,7 +1626,7 @@ textfield_autoSize_getset(const fn_call& fn)
 		{
 			std::string strval = arg.to_string(&(fn.env()));
 			edit_text_character::AutoSizeValue val = ptr->parseAutoSizeValue(strval);
-			log_debug("%s => %d", strval.c_str(), val);
+			//log_debug("%s => %d", strval.c_str(), val);
 			ptr->setAutoSize( val );
 		}
 	}
