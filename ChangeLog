@@ -10,7 +10,7 @@
 	* server/edit_text_character.{cpp,h}: add autoSize getter/setter
 	  (still not used)
 	* testsuite/actionscript.all/TextField.as: add tests for autoSize
-    member.
+	  member.
 	* testsuite/misc-ming.all/DefineEditTextTest.c: add TODO items.
 
 2007-08-12 Sandro Santilli <strk@keybit.net>
