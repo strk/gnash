@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.14 2007/08/07 03:32:21 zoulunkai Exp $";
+rcsid="$Id: ops.as,v 1.15 2007/08/13 07:20:09 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -362,7 +362,10 @@ check_equals( (null|1), 1 );
 check_equals( (1|null), 1 );
 check_equals( (null|null), 0 );
 check_equals( (8|4), 12 );
-// TODO ... 
+
+// The check below will fail if Ming converts the long int to a double
+// (only with Gnash, it works fine with the proprietary player)
+check_equals((0xffffffff|0), -1); 
 
 //------------------------------------------------
 // Bitwise XOR operator (ACTION_BITWISEOR : 0x62)
@@ -376,11 +379,30 @@ check_equals( (1^null), 1 );
 check_equals( (null^null), 0 );
 check_equals( (8^12), 4 );
 
-// The check below will fail if Ming converts the long int to a double
-// (only with Gnash, it works fine with the proprietary player)
-check_equals((0xffffffff|0), -1);
+x = 1;
+y = 2;
+check_equals(x^y, 3);
 
-// TODO ... 
+x = 1.1;
+y = 2.1;
+check_equals(x^y, 3);
+
+x = 1.999;
+y = 2.999;
+check_equals(x^y, 3);
+
+x = new String("1.999");
+y = new String("2.999");
+xcheck_equals(x^y, 3);
+
+x = new String("1.999");
+y = 2.999;
+xcheck_equals(x^y, 3);
+
+x = 1.999;
+y = new String("2.999");
+xcheck_equals(x^y, 3);
+
 
 //------------------------------------------------
 // Shift left operator (ACTION_SHIFTLEFT : 0x63)
@@ -492,3 +514,57 @@ xcheck_equals(y, 3);
 //-------------------------------------------------
 
 // TODO ...  
+
+
+//------------------------------------------------
+// Decrement Operator (ACTION_DECREMENT: 0x51)
+//------------------------------------------------
+
+x = 1;
+y = --x;
+check_equals(y, 0);
+
+x = 0;
+y = --x;
+check_equals(y, -1);
+
+x = new String("1.9");
+y = --x;
+//xcheck_equals(y, 0.9);
+xcheck( (y-0.9) < 0.001 );
+
+x = new String("0.0");
+y = --x;
+//xcheck_equals(y, -1.0);
+xcheck( (y+1.0) < 0.001 );
+
+x = new String("a");
+y = --x;
+xcheck(y!=NaN);
+check(isNaN(y));
+
+//------------------------------------------------
+// Increment Operator (ACTION_DECREMENT: 0x50)
+//------------------------------------------------
+
+x = 0;
+y = ++x;
+check_equals(y, 1);
+
+x = -1;
+y = ++x;
+check_equals(y, 0);
+
+x = new String("1.9");
+y = ++x;
+//xcheck_equals(y, 2.9);
+check( (y-2.9) < 0.001 );
+
+x = new String("0.0");
+y = ++x;
+xcheck_equals(y, 1);
+
+x = new String("a");
+y = ++x;
+xcheck(y!=NaN);
+check(isNaN(y));

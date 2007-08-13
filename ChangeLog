@@ -1,14 +1,13 @@
+2007-08-13 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/sprite_instance.{h,cpp}: deprecate clone_display_object(), use 
+	  duplicateMovieClip() instead.
+	* testsuite/actionscript.all/ops.as: more tests.
+
+
 2007-08-12 Sandro Santilli <strk@keybit.net>
 
-	* server/edit_text_character.{cpp,h}: add autoSize getter/setter
-	  (still not used)
-	* testsuite/actionscript.all/TextField.as: add tests for autoSize
-	  member.
-	* testsuite/misc-ming.all/DefineEditTextTest.c: add TODO items.
 	* server/as_value.h: add is_bool()
-
-2007-08-12 Sandro Santilli <strk@keybit.net>
-
 	* server/edit_text_character.h (getBounds): add TODO item
 	  (I belive is a fix for bug #20760)
 

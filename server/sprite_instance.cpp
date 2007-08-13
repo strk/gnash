@@ -2080,6 +2080,7 @@ sprite_instance::duplicateMovieClip(const std::string& newname, int depth,
 	return newsprite;
 }
 
+#if 0
 void sprite_instance::clone_display_object(const std::string& name,
 	const std::string& newname, int depth)
 {
@@ -2110,6 +2111,7 @@ void sprite_instance::clone_display_object(const std::string& name,
 			    name.c_str(), newname.c_str(), depth, name.c_str());
     }
 }
+#endif
 
 /* private */
 void
