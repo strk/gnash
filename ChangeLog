@@ -1,5 +1,6 @@
 2007-08-12 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.h: add is_bool()
 	* server/edit_text_character.h (getBounds): add TODO item
 	  (I belive is a fix for bug #20760)
 

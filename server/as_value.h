@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.62 2007/08/06 20:42:57 strk Exp $ */
+/* $Id: as_value.h,v 1.63 2007/08/13 02:47:58 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -531,6 +531,8 @@ public:
 	bool	is_undefined() const { return (m_type == UNDEFINED); }
 
 	bool	is_null() const { return (m_type == NULLTYPE); }
+
+	bool	is_bool() const { return (m_type == BOOLEAN); }
 
 	/// Return true if this value is strictly equal to the given one
 	//
