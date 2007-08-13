@@ -46,6 +46,22 @@ class edit_text_character : public character
 
 public:
 
+	/// Possible autoSize values
+	enum AutoSizeValue {
+
+		/// Do not automatically resize TextField as text grow/shrink
+		autoSizeNone,
+
+		/// Expand TextField, anchor the top-left side
+		autoSizeLeft,
+
+		/// Expand TextField, anchor the horizontal center
+		autoSizeCenter,
+
+		/// Expand TextField, anchor the top-right side
+		autoSizeRight
+	};
+
 	edit_text_character(
 			character* parent,
 			edit_text_character_def* def,
@@ -162,6 +178,38 @@ public:
 	/// @param use
 	void setEmbedFonts(bool use);
 
+	/// Get autoSize value 
+	AutoSizeValue getAutoSize() const
+	{
+		return _autoSize;
+	}
+
+	/// Set autoSize value 
+	//
+	/// @param val
+	/// 	The AutoSizeValue to use
+	///
+	void setAutoSize(AutoSizeValue val);
+
+	/// Parse autoSize string value
+	//
+	/// @param val
+	/// 	Auto size value as a string (one of none, left, center, right)
+	///
+	/// @return an AutoSizeValue identifier. autoSizeNone if invalid
+	///
+	static AutoSizeValue parseAutoSizeValue(const string& val);
+
+	/// Return autoSize value as a string
+	//
+	/// @param val
+	/// 	Auto size value 
+	///
+	/// @return a C-string representation of the autoSize value.
+	///	The returns is *never* NULL.
+	///
+	static const char* autoSizeValueName(AutoSizeValue val);
+
 private:
 
 	/// Return true if HTML text is allowed 
@@ -268,6 +316,8 @@ private:
 	rgba _textColor;
 
 	bool _embedFonts;
+
+	AutoSizeValue _autoSize;
 
 protected:
 

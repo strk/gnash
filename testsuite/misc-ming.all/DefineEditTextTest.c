@@ -24,6 +24,7 @@
  * Text at the bottom is the one with embedded fonts.
  * 
  * TODO: add a testrunner for pixel checking.
+ * TODO: test autoSize and wordWrap interaction (what takes precedence?)
  *
  * run as ./DefineEditTextTest
  */

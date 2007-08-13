@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.13 2007/07/30 18:38:15 strk Exp $";
+rcsid="$Id: TextField.as,v 1.14 2007/08/13 03:26:10 strk Exp $";
 
 #include "check.as"
 
@@ -40,7 +40,7 @@ check_equals(typeof(TextField.prototype.replaceSel), 'function');
 // NOTE: the following will be true after a call to createTextField ! Seek forward to see..
 xcheck( !TextField.prototype.hasOwnProperty('background'));
 xcheck( !TextField.prototype.hasOwnProperty('backgroundColor'));
-check( !TextField.prototype.hasOwnProperty('autoSize') );
+xcheck( !TextField.prototype.hasOwnProperty('autoSize') );
 xcheck( !TextField.prototype.hasOwnProperty('border') );
 xcheck( !TextField.prototype.hasOwnProperty('borderColor') );
 check( !TextField.prototype.hasOwnProperty('bottomScroll') );
@@ -109,7 +109,7 @@ check_equals(typeof(tf), 'object');
 // NOTE: the following were false before the call to createTextField ! Seek backward to see..
 check( TextField.prototype.hasOwnProperty('background'));
 check( TextField.prototype.hasOwnProperty('backgroundColor'));
-xcheck( TextField.prototype.hasOwnProperty('autoSize') );
+check( TextField.prototype.hasOwnProperty('autoSize') );
 check( TextField.prototype.hasOwnProperty('border') );
 check( TextField.prototype.hasOwnProperty('borderColor') );
 xcheck( TextField.prototype.hasOwnProperty('bottomScroll') );
@@ -142,9 +142,28 @@ check( ! tf.__proto__.hasOwnProperty('_alpha') ); // why ??
 
 // Check TextField.autoSize
 
-xcheck_equals(typeof(tf.autoSize), 'string');
-xcheck_equals(tf.autoSize, 'none'); // TODO: research which valid values we have
+check_equals(typeof(tf.autoSize), 'string');
+check_equals(tf.autoSize, 'none'); // TODO: research which valid values we have
 check(! tf.hasOwnProperty('autoSize'));
+tf.autoSize = false;
+check_equals(tf.autoSize, 'none'); // false is a synonim for 'none'
+tf.autoSize = true;
+check_equals(tf.autoSize, 'left'); // true is a synonim for 'left'
+tf.autoSize = 'true';
+check_equals(tf.autoSize, 'none'); // 'true' (as a string) is invalid, thus equivalent to 'none'
+tf.autoSize = 'center';
+check_equals(tf.autoSize, 'center'); // 'center' is a valid value
+tf.autoSize = 'right';
+check_equals(tf.autoSize, 'right'); // 'right' is a valid value
+o = new Object(); o.toString = function() { return 'center'; };
+tf.autoSize = o;
+check_equals(tf.autoSize, 'center'); // toString is called for object args
+tf.autoSize = 'lEft';
+xcheck_equals(tf.autoSize, 'left'); // arg is not case sensitive 
+tf.autoSize = new Boolean(true);
+check_equals(tf.autoSize, 'none'); // a Boolean is the same as any other object
+
+tf.autoSize = 'none';
 
 // Check TextField.background
 

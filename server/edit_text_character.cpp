@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.96 2007/08/02 21:23:42 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.97 2007/08/13 03:26:09 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -81,6 +81,7 @@ static as_value textfield_backgroundColor_getset(const fn_call& fn);
 static as_value textfield_borderColor_getset(const fn_call& fn);
 static as_value textfield_textColor_getset(const fn_call& fn);
 static as_value textfield_embedFonts_getset(const fn_call& fn);
+static as_value textfield_autoSize_getset(const fn_call& fn);
 
 
 //
@@ -326,6 +327,8 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("textColor", *getset, *getset);
 	getset = new builtin_function(textfield_embedFonts_getset);
 	o.init_property("embedFonts", *getset, *getset);
+	getset = new builtin_function(textfield_autoSize_getset);
+	o.init_property("autoSize", *getset, *getset);
 
 
 	if ( target_version  < 7 ) return;
@@ -389,7 +392,8 @@ edit_text_character::edit_text_character(character* parent,
 	_drawBorder(m_def->has_border()),
 	_borderColor(0,0,0,255),
 	_textColor(m_def->get_text_color()),
-	_embedFonts(m_def->getUseEmbeddedGlyphs())
+	_embedFonts(m_def->getUseEmbeddedGlyphs()),
+	_autoSize(autoSizeNone)
 {
 	assert(parent);
 	assert(m_def);
@@ -1148,6 +1152,11 @@ after_x_advance:
 			// Whoops, we just exceeded the box width. 
 			// Do word-wrap if requested to do so.
 
+			// TODO: don't query the definition about wordWrap,
+			//       we should have a wordWrap getter/setter instead !
+			//       Also, we should check autoSize (getAutoSize) and
+			//       behave accordingly
+			//
 			if ( ! m_def->do_word_wrap() )
 			{
 				bool newlinefound = false;
@@ -1588,6 +1597,98 @@ textfield_embedFonts_getset(const fn_call& fn)
 	}
 
 	return as_value();
+}
+
+static as_value
+textfield_autoSize_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return ptr->autoSizeValueName(ptr->getAutoSize());
+	}
+	else // setter
+	{
+		as_value& arg = fn.arg(0);
+		if ( arg.is_bool() )
+		{
+			if ( arg.to_bool() ) // true == left
+			{
+				ptr->setAutoSize( edit_text_character::autoSizeLeft );
+			}
+			else
+			{
+				ptr->setAutoSize( edit_text_character::autoSizeNone );
+			}
+		}
+		else
+		{
+			std::string strval = arg.to_string(&(fn.env()));
+			edit_text_character::AutoSizeValue val = ptr->parseAutoSizeValue(strval);
+			log_debug("%s => %d", strval.c_str(), val);
+			ptr->setAutoSize( val );
+		}
+	}
+
+	return as_value();
+}
+
+/* public static */
+edit_text_character::AutoSizeValue
+edit_text_character::parseAutoSizeValue(const string& val)
+{
+	if ( val == "left" )
+	{
+		return autoSizeLeft;
+	}
+	if ( val == "right" )
+	{
+		return autoSizeRight;
+	}
+	if ( val == "center" )
+	{
+		return autoSizeCenter;
+	}
+	return autoSizeNone;
+
+}
+
+/* public static */
+const char*
+edit_text_character::autoSizeValueName(AutoSizeValue val)
+{
+	switch (val)
+	{
+		case autoSizeLeft:
+			return "left";
+		case autoSizeRight:
+			return "right";
+		case autoSizeCenter:
+			return "center";
+		case autoSizeNone:
+		default:
+			return "none";
+	}
+
+}
+
+void
+edit_text_character::setAutoSize(AutoSizeValue val)
+{
+	if ( val == _autoSize ) return;
+
+	static bool warned = false;
+	if ( ! warned ) {
+		log_unimpl(_("TextField.autoSize unused"));
+		warned = true;
+	}
+
+	
+	set_invalidated();
+
+	_autoSize = val; 
+	format_text();
 }
 
 } // namespace gnash
