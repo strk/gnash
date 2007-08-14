@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.14 2007/08/13 03:26:10 strk Exp $";
+rcsid="$Id: TextField.as,v 1.15 2007/08/14 03:04:29 strk Exp $";
 
 #include "check.as"
 
@@ -169,11 +169,38 @@ tf.autoSize = 'none';
 
 check_equals(typeof(tf.background), 'boolean');
 check(!tf.hasOwnProperty('background'));
+check_equals(tf.background, false);
+tf.background = true;
+check_equals(tf.background, true);
+tf.background = 0;
+check_equals(tf.background, false);
+check_equals(typeof(tf.background), 'boolean');
+tf.background = 54.3;
+check_equals(typeof(tf.background), 'boolean');
+check_equals(tf.background, true);
+o = new Object; o.valueOf = function() { return 0x0000FF; };
+tf.background = o;
+check_equals(tf.background, true);
+o = new Object; o.valueOf = function() { return 'string'; };
+tf.background = o;
+check_equals(typeof(tf.background), 'boolean');
+check_equals(tf.background, true); // 'string' evaluates to true
+tf.background = new Boolean(false);
+check_equals(typeof(tf.background), 'boolean');
+check_equals(tf.background, true);  // dunno why, but Boolean evaluates to false 
+tf.background = false;
 
 // Check TextField.backgroundColor
 
 check_equals(typeof(tf.backgroundColor), 'number');
 check(!tf.hasOwnProperty('backgroundColor'));
+tf.backgroundColor = 0x00FF00;
+check_equals(tf.backgroundColor, 0x00FF00);
+tf.backgroundColor = 'red';
+check_equals(tf.backgroundColor, 0x000000); // string value evaluates to NaN thus 0
+o = new Object; o.valueOf = function() { return 0x0000FF; };
+tf.backgroundColor = o;
+check_equals(tf.backgroundColor, 0x0000FF); // valueOf is invoked
 
 // Check TextField.border
 
@@ -588,5 +615,12 @@ note("textHeight: _yscale=100: "+currTextHeight+"; _yscale=200: "+tf.textHeight)
 xcheck_equals(tf._height, currHeight*2);
 tf._yscale = 100;
 
+// Check interaction between autoSize and _width
+tf._width = 10; // "hello world" text should overflow this
+tf.text = "Hello world";
+tf.autoSize = 'none';
+xcheck_equals(tf._width, 10);
+tf.autoSize = 'center';
+check(tf._width > 10);
 
 #endif // OUTPUT_VERSION > 5

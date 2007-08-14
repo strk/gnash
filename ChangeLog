@@ -1,3 +1,9 @@
+2007-08-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/TextField.as: add more tests for
+	  background, backgroundColor and interaction between _width and
+	  autoSize.
+
 2007-08-13 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/sprite_instance.{h,cpp}: deprecate clone_display_object(), use 
