@@ -1,3 +1,9 @@
+2007-08-14 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Also count sounds who stops
+	  because the reached the end. Fixes random eventSoundTest1
+	  failures.
+
 2007-08-14 Ivor Blockley <meteoryte@yahoo.com.au>
 
 	* server/array.cpp: replace VLAs with std containers.

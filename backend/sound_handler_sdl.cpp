@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.81 2007/08/11 05:25:04 strk Exp $
+// $Id: sound_handler_sdl.cpp,v 1.82 2007/08/14 09:29:12 tgc Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1028,15 +1028,18 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 				sound->delete_raw_data();
 				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + j);
 				handler->soundsPlaying--;
+				handler->_soundsStopped++;
 
 
 			// Sound is done, remove it from the active list (adpcm/native16)
 			} else if (sound->loop_count == 0 && soundFormat == FORMAT_NATIVE16 && sound->raw_position >= sound->raw_data_size && sound->raw_data_size != 0) {
 				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + j);
 				handler->soundsPlaying--;
+				handler->_soundsStopped++;
 			} else if (sound->raw_position == 0 && sound->raw_data_size == 0) {
 				sounddata->m_active_sounds.erase(sounddata->m_active_sounds.begin() + j);
 				handler->soundsPlaying--;
+				handler->_soundsStopped++;
 			}
 
 		} // active sounds loop
