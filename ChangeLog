@@ -1,3 +1,7 @@
+2007-08-14 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	* server/array.cpp: replace VLAs with std containers.
+	  
 2007-08-13 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/TextField.as: add more tests for

@@ -399,20 +399,21 @@ public:
 class as_value_multiprop
 {
 public:
-	const as_cmp_fn* _cmps;
+	std::deque<as_cmp_fn>& _cmps;
 	std::deque<std::string>& _prps;
 
 	// Note: all as_cmp_fns in *cmps must implement strict weak ordering
-	as_value_multiprop(std::deque<std::string>& prps, as_cmp_fn* cmps)
+	as_value_multiprop(std::deque<std::string>& prps, 
+		std::deque<as_cmp_fn>& cmps)
 		:
+		_cmps(cmps),
 		_prps(prps)
 	{
-		_cmps = cmps;
 	}
 
 	bool operator() (const as_value& a, const as_value& b)
 	{
-		const as_cmp_fn* cmp = _cmps;
+		std::deque<as_cmp_fn>::iterator cmp = _cmps.begin();
 		std::deque<std::string>::iterator pit;
 		
 		for (pit = _prps.begin(); pit != _prps.end(); ++pit, ++cmp)
@@ -437,14 +438,15 @@ public:
 class as_value_multiprop_eq : public as_value_multiprop
 {
 public:
-	as_value_multiprop_eq(std::deque<std::string>& prps, as_cmp_fn* eq)
-		: as_value_multiprop(prps, eq)
+	as_value_multiprop_eq(std::deque<std::string>& prps, 
+		std::deque<as_cmp_fn>& cmps)
+		: as_value_multiprop(prps, cmps)
 	{
 	}
 
 	bool operator() (const as_value& a, const as_value& b)
 	{
-		const as_cmp_fn* cmp = _cmps;
+		std::deque<as_cmp_fn>::iterator cmp = _cmps.begin();
 		std::deque<std::string>::iterator pit;
 		
 		for (pit = _prps.begin(); pit != _prps.end(); ++pit, ++cmp)
@@ -476,20 +478,19 @@ flag_preprocess(uint8_t flgs, bool* douniq, bool* doindex)
 
 // Convenience function to process and extract flags from an as_value array
 // of flags (as passed to sortOn when sorting on multiple properties)
-static void
+std::deque<uint8_t> 
 get_multi_flags(std::deque<as_value>::const_iterator itBegin, 
-	std::deque<as_value>::const_iterator itEnd, 
-	uint8_t* flgs, bool* uniq, bool* index)
+	std::deque<as_value>::const_iterator itEnd, bool* uniq, bool* index)
 {
 	std::deque<as_value>::const_iterator it = itBegin;
-	int i = 0;
+	std::deque<uint8_t> flgs;
 
 	// extract fUniqueSort and fReturnIndexedArray from first flag
 	if (it != itEnd)
 	{
 		uint8_t flag = static_cast<uint8_t>((*it).to_number());
 		flag = flag_preprocess(flag, uniq, index);
-		flgs[i++] = flag;
+		flgs.push_back(flag);
 		++it;
 	}
 
@@ -498,9 +499,10 @@ get_multi_flags(std::deque<as_value>::const_iterator itBegin,
 		uint8_t flag = static_cast<uint8_t>((*it).to_number());
 		flag &= ~(as_array_object::fReturnIndexedArray);
 		flag &= ~(as_array_object::fUniqueSort);
-		flgs[i++] = flag;
+		flgs.push_back(flag);
 		++it;
 	}
+	return flgs;
 }
 
 as_array_object::as_array_object()
@@ -992,8 +994,8 @@ array_sortOn(const fn_call& fn)
 			ensureType<as_array_object>(fn.arg(0).to_object());
 		std::deque<std::string> prp;
 		unsigned int optnum = props->size();
-		as_cmp_fn cmp[optnum];
-		as_cmp_fn eq[optnum];
+		std::deque<as_cmp_fn> cmp;
+		std::deque<as_cmp_fn> eq;
 
 		for (std::deque<as_value>::const_iterator it = props->begin();
 			it != props->end(); ++it)
@@ -1008,8 +1010,7 @@ array_sortOn(const fn_call& fn)
 		{
 			// assign each cmp function to the standard cmp fn
 			as_cmp_fn c = get_basic_cmp(0, env);
-			for (unsigned int i = 0; i < optnum; i++)
-				cmp[i] = c;
+			cmp.assign(optnum, c);
 		}
 		// case: sortOn(["prop1", "prop2"], [Array.FLAG1, Array.FLAG2])
 		else if ( fn.arg(1).is_object() )
@@ -1018,28 +1019,31 @@ array_sortOn(const fn_call& fn)
 				ensureType<as_array_object>(fn.arg(1).to_object());
 			if (farray->size() == optnum)
 			{
-				uint8_t flgs[optnum];
 				std::deque<as_value>::const_iterator 
 					fBegin = farray->begin(),
 					fEnd = farray->end();
 
-				get_multi_flags(fBegin, fEnd, flgs, 
-					&do_unique, &do_index);
+				std::deque<uint8_t> flgs = 
+					get_multi_flags(fBegin, fEnd, 
+						&do_unique, &do_index);
 
-				for (unsigned int i = 0; i < optnum; i++)
-					cmp[i] = get_basic_cmp(flgs[i], env);
+				std::deque<uint8_t>::const_iterator it = 
+					flgs.begin();
+
+				while (it != flgs.end())
+					cmp.push_back(get_basic_cmp(*it++, env));
 
 				if (do_unique)
 				{
-					for (unsigned int i = 0; i < optnum; i++)
-						eq[i] = get_basic_eq(flgs[i], env);
+					it = flgs.begin();
+					while (it != flgs.end())
+						eq.push_back(get_basic_eq(*it++, env));
 				}
 			}
 			else
 			{
 				as_cmp_fn c = get_basic_cmp(0, env);
-				for (unsigned int i = 0; i < optnum; i++)
-					cmp[i] = c;
+				cmp.assign(optnum, c);
 			}
 		}
 		// case: sortOn(["prop1", "prop2"], Array.FLAG)
@@ -1050,14 +1054,12 @@ array_sortOn(const fn_call& fn)
 			flag_preprocess(flags, &do_unique, &do_index);
 			as_cmp_fn c = get_basic_cmp(flags, env);
 
-			for (unsigned int i = 0; i < optnum; i++)
-				cmp[i] = c;
+			cmp.assign(optnum, c);
 			
 			if (do_unique)
 			{
 				as_cmp_fn e = get_basic_eq(flags, env);
-				for (unsigned int i = 0; i < optnum; i++)
-					eq[i] = e;
+				eq.assign(optnum, e);
 			}
 		}
 
