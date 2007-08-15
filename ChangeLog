@@ -1,3 +1,7 @@
+2007-08-15 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/actionscript.all/Object.as: more tests and new failures.
+	  
 2007-08-14 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_sdl.cpp: Also count sounds who stops

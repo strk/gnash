@@ -20,16 +20,67 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.26 2007/07/26 03:41:19 strk Exp $";
+rcsid="$Id: Object.as,v 1.27 2007/08/15 06:52:19 zoulunkai Exp $";
 
 #include "check.as"
 
 // Test existance of methods
 check_equals(typeof(Object), 'function');
 check_equals(typeof(Object.prototype), 'object');
+check_equals(typeof(Object.registerClass), 'function');
 check_equals(typeof(Object.prototype.toString), 'function');
 check_equals(typeof(Object.prototype.valueOf), 'function');
+check_equals(typeof(Object.prototype.constructor), 'function'); 
+check_equals(Object.prototype.prototype, undefined);
+xcheck_equals(Object.prototype.__proto__, undefined);
+xcheck_equals(Object.prototype.registerClass, undefined);
+
 #if OUTPUT_VERSION > 5
+
+// Through test of existance of methods!
+
+O = Object;
+check_equals(O, Object);
+
+// found 4 methods in Object
+xcheck(O.hasOwnProperty('__proto__'));
+check(O.hasOwnProperty('registerClass'));
+check(O.hasOwnProperty('constructor'));
+check(O.hasOwnProperty('prototype'));
+
+// fount 4 methods in Object.__proto__
+xcheck(O.__proto__.hasOwnProperty('__proto__'));
+check(O.__proto__.hasOwnProperty('apply'));
+check(O.__proto__.hasOwnProperty('call'));
+check(O.__proto__.hasOwnProperty('constructor'));
+
+check(O.__proto__ != Object.prototype);
+check(O.__proto__.__proto__ == Object.prototype);
+
+// found 3 methods in Object.constructor
+xcheck(O.constructor.hasOwnProperty('__proto__'));
+check(O.constructor.hasOwnProperty('constructor'));
+check(O.constructor.hasOwnProperty('prototype'));
+
+// found 9 methods in Object.prototype
+check(O.prototype.hasOwnProperty('addProperty'));
+check(O.prototype.hasOwnProperty('constructor'));
+check(O.prototype.hasOwnProperty('hasOwnProperty'));
+check(O.prototype.hasOwnProperty('isPropertyEnumerable'));
+check(O.prototype.hasOwnProperty('isPrototypeOf'));
+check(O.prototype.hasOwnProperty('toString'));
+check(O.prototype.hasOwnProperty('valueOf'));
+check(O.prototype.hasOwnProperty('unwatch'));
+check(O.prototype.hasOwnProperty('watch'));
+
+// found 3 methods in Object.prototype.constructor
+xcheck(O.prototype.constructor.hasOwnProperty('__proto__'));
+check(O.prototype.constructor.hasOwnProperty('constructor'));
+check(O.prototype.constructor.hasOwnProperty('prototype'));
+
+check_equals(O.prototype.constructor, Object);
+xcheck(O.constructor != Object);
+
 check_equals(typeof(Object.prototype.addProperty), 'function');
 check_equals(typeof(Object.prototype.hasOwnProperty), 'function');
 check_equals(typeof(Object.prototype.isPropertyEnumerable), 'function');
@@ -49,15 +100,37 @@ check_equals(typeof(Object.prototype.unwatch), 'undefined');
 var obj = new Object; // uses SWFACTION_NEWOBJECT
 check (obj != undefined);
 check (typeof(obj) == "object");
+
+check(obj.__proto__ == Object.prototype);
+check(obj.prototype == undefined);
+check(obj.__proto__.prototype == undefined);
+
+#if OUTPUT_VERSION == 5
+// Gnash fails on swf5 but succeeds on swf6,7,8
+xcheck(obj.__constructor__ == Object);
+#else
+check(obj.__constructor__ == Object);
+#endif
+
+check(obj.constructor == Object);
+check(Object.prototype.constructor == Object); 
 check (obj.__proto__.constructor == Object);
 
 // Test instantiated Object methods
 check_equals(typeof(obj.toString), 'function');
 check_equals(typeof(obj.valueOf), 'function');
 #if OUTPUT_VERSION > 5
-check_equals(typeof(obj.addProperty), 'function');
+  check_equals(typeof(obj.addProperty), 'function');
+  check(Object.hasOwnProperty('constructor')); 
+#if OUTPUT_VERSION == 6
+    // bug in swf6???
+    check(obj.hasOwnProperty('constructor')); 
 #else
-check_equals(typeof(obj.addProperty), 'undefined');
+    check(!obj.hasOwnProperty('constructor')); 
+#endif
+  check(obj.hasOwnProperty('__constructor__')); 
+#else
+  check_equals(typeof(obj.addProperty), 'undefined');
 #endif
 
 // Test instantiated Object members
@@ -113,12 +186,12 @@ check (copy.__proto__.constructor == Object);
 
 // the 'getter' function
 function getLen() {
-	return this._len;
+  return this._len;
 }
 
 // the 'setter' function
 function setLen(l) {
-	this._len = l;
+  this._len = l;
 }
 
 // add the "len" property
@@ -206,12 +279,12 @@ Object.prototype.toString = backup;
 
 function enumerate(obj, enum)
 {
-	var enumlen = 0;
-	for (var i in obj) {
-		enum[i] = obj[i];
-		++enumlen;
-	}
-	return enumlen;
+  var enumlen = 0;
+  for (var i in obj) {
+    enum[i] = obj[i];
+    ++enumlen;
+  }
+  return enumlen;
 }
 
 var l0 = new Object({a:1, b:2});
@@ -275,9 +348,9 @@ check( ret );
 
 function enumerableThings()
 {
-	this.member1 = "a string";
-	this.member2 = 3;
-	ASSetPropFlags(this, "member2", 1); // hide member2
+  this.member1 = "a string";
+  this.member2 = 3;
+  ASSetPropFlags(this, "member2", 1); // hide member2
 }
 enumerableThings.prototype.member3 = new Object;
 
