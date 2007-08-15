@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.15 2007/08/14 03:04:29 strk Exp $";
+rcsid="$Id: TextField.as,v 1.16 2007/08/15 23:00:15 strk Exp $";
 
 #include "check.as"
 
@@ -619,8 +619,17 @@ tf._yscale = 100;
 tf._width = 10; // "hello world" text should overflow this
 tf.text = "Hello world";
 tf.autoSize = 'none';
+tf.wordWrap = false;
 xcheck_equals(tf._width, 10);
+origTextWidth = tf.textWidth;
 tf.autoSize = 'center';
 check(tf._width > 10);
+check_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by autoSize 
+tf.autoSize = 'none';
+tf.wordWrap = true;
+tf._width = 10;
+// Gnash ignores assigments to _width (should change TextField rendering area bounds instead)
+xcheck_equals(tf._width, 10);
+check_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by wordWrap
 
 #endif // OUTPUT_VERSION > 5
