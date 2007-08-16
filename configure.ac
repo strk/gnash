@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.399 2007/08/11 01:44:15 strk Exp $
+dnl $Id: configure.ac,v 1.400 2007/08/16 23:26:02 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1926,10 +1926,10 @@ if test x$build_agg = xyes; then # {
   echo "        AGG Pixel format is: $pixelformat"
     if test x"$AGG_LIBS" != x; then # {
       if test x"${agg25}" != xyes; then # {
-        echo "        WARNING: Your installation of AGG appears to be version 2.4 or older."
-        echo "                 Please upgrade to AGG 2.5 or greater"
-        echo "                 or .deb users: apt-get install libagg-dev"
-        echo "                 or .rpm users: yum install agg-devel"
+        echo "        ERROR: Your installation of AGG appears to be version 2.4 or older."
+        echo "               Please upgrade to AGG 2.5 or greater"
+        echo "               or .deb users: apt-get install libagg-dev"
+        echo "               or .rpm users: yum install agg-devel"
         nogo=true
       else # }{
         if test x"$AGG_CFLAGS" != x; then # {
