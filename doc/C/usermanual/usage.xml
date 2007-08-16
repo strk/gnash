@@ -204,16 +204,28 @@ Note that this will not work with every website; some embedded Flash files are d
 	  <option>-r [0|1|2|3]</option>
 	  </entry>
 	    <entry>
+<itemizedlist>
+<listitem>
+<para>
 	      0 disables rendering and sound (good for batch tests).
-	    </entry>
-	    <entry>
+</para>
+</listitem>
+<listitem>
+<para>
 	      1 enables rendering and disables sound (default setting).
-	    </entry>
-	    <entry>
+</para>
+</listitem>
+<listitem>
+<para>
 	      2 enables sound and disables rendering.
-	    </entry>
-	    <entry>
+</para>
+</listitem>
+<listitem>
+<para>
 	      3 enables rendering and sound.
+</para>
+</listitem>
+</itemizedlist>
 	    </entry>
 	  </row>
 	<row>
