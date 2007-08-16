@@ -5,6 +5,8 @@
 	* testsuite/misc-ming.all/registerClassTest.c, 
 	  testsuite/actionscript.all/Object.as, toString_valueOf.as: testcases review,
 	  minor comments or changes.
+	* testsuite/actionscript.all/Inheritance.as: more tests. testing for inheritance
+	  never stops:)
 	
 2007-08-15 Sandro Santilli <strk@keybit.net>
 

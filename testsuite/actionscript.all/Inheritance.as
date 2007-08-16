@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.33 2007/08/16 09:19:24 zoulunkai Exp $";
+rcsid="$Id: Inheritance.as,v 1.34 2007/08/16 09:29:33 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -273,7 +273,7 @@ check(! DerivedClass1.prototype.hasOwnProperty('var3'));
 check_equals(DerivedClass1.var3, undefined);
 check(! DerivedClass1.prototype.hasOwnProperty('toString'));
 check(! DerivedClass1.prototype.hasOwnProperty('valueOf'));
-
+xcheck(! DerivedClass1.prototype.hasOwnProperty('constructor'));
 check(DerivedClass1.hasOwnProperty('constructor'));
 #endif
 check_equals(DerivedClass1.constructor, Function);
