@@ -1,11 +1,14 @@
 <chapter id="bugreport">
   <title>Reporting Bugs</title>
 
+<para>
+The &app; project relies on the community to use and test the player; feedback is critical to any successful project.  Not only does it let us know that people use &app;, but it helps us understand the community's needs.  &app; uses a bug tracker on <ulink url="http://savannah.gnu.org" /> to manage these reports.
+</para>
+
   <para>
-    The better your bug report is, the easier it will be for the
+When filing a report, please follow the guidelines below. The better your bug report is, the easier it will be for the
     developers to address the issue.
-    Please follow the three steps described below before filing a bug
-    report:
+</para>
     <orderedlist>
       <listitem><para>
         <link linkend="bugstep_newcheckout">Compile the latest
@@ -20,7 +23,7 @@
         guidelines.</link>
       </para></listitem>
     </orderedlist>
-  </para>
+
 
   <sect1 id="bugstep_newcheckout">
     <title>Compile the latest &app; build</title>
@@ -31,23 +34,19 @@
       <link linkend="pre-configuration">configure</link> and 
       <link linkend="compile">compile</link> &app;.
     </para>
+
     <para>
-      If you are able to replicate the bug, 
-      <link linkend="bugstep_search">proceed to the next step</link>.
+      If you are able to replicate the bug in the latest version, 
+      <link linkend="bugstep_search">proceed to the next step</link>.  If you cannot replicate the bug with the newer version, the problem may have been solved, or the issue may involve your environment
     </para>
+
     <para>
-      If the bug does not persist, the problem may have been solved, or
-      the issue may involve your environment.  By creating a fresh build
-      of your original version and trying to replicate the bug you
-      can determine if it is an environmental issue or a resolved bug.
-      If you are able to replicate the bug, the problem has been fixed
-      and there is no need to file a bug report.
-    </para>
-    <para>
-      If the bug is no longer visible, the problem may be related to
-      your environment.  Try to determine the source of the conflict
-      so that you can include this information in your bug report.
-    </para>
+To check this, create a fresh build of the version in which you encountered the bug.  If you can reproduce the bug with the fresh copy of the original version, but cannot with the latest version, this is most likely a resolved bug.
+</para>
+
+<para>
+If you cannot reproduce the bug, it may still be unclear whether the bug is related to your environment or a &app; bug.  Try to determine the source of the problem.  &app; offers several helpful debugging options in the configure stage, and many verbosity options at the command line to help.
+</para>
   </sect1>
 
   <sect1 id="bugstep_search">
@@ -126,10 +125,9 @@
   <sect1 id="bugstep_file">
     <title>Filing a bug report</title>
     <para>
-      After following the steps described above, you can
+      After following the steps described above, you can file a bug report at 
       <ulink type="https"
-      url="https://savannah.gnu.org/bugs/?group=gnash">file a
-      bug report</ulink>.
+      url="https://savannah.gnu.org/bugs/?group=gnash" />.
     </para>
   </sect1>
 
