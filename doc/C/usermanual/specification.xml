@@ -18,7 +18,7 @@ The following table indicates how fully various &AS; classes have been implement
 
 <table frame='all'>
 <title>&AS; Classes</title>
-<tgroup cols='2' align='left' colsep='5' rowsep='1'>
+<tgroup cols='2' align='left' colsep='1' rowsep='1'>
 <colspec colname='Class'/>
 <colspec colname='Status'/>
 <thead>
