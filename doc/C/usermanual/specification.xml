@@ -16,9 +16,9 @@ As stated in the section <xref linkend="flashsupport" />, &app; has implemented 
 The following table indicates how fully various &AS; classes have been implemented:
 </para>
 
-<table id="tb-actionscript-classes">
+<table frame='all'>
 <title>&AS; Classes</title>
-<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+<tgroup cols='2' align='left' colsep='5' rowsep='1'>
 <colspec colname='Class'/>
 <colspec colname='Status'/>
 <thead>
@@ -128,7 +128,7 @@ The following table indicates how fully various &AS; classes have been implement
 The next table indicates which opcodes have been implemented:
 </para>
 
-<table id="tb-opcodes">
+<table frame='all'>
 <title>Opcodes</title>
 <tgroup cols='2' align='left' colsep='1' rowsep='1'>
 <colspec colname='Opcode'/>
@@ -233,7 +233,7 @@ The collector is a conservative collector.  Any object on the collectibles list 
 This garbage collector has reduced the memory footprint of &app;.  However, the most current, available test data indicated the following runtime memory footprint:
 </para>
 
-<table id="tb-memory-footprint">
+<table frame='all'>
 <title>Memory Footprint</title>
 <tgroup cols='4' align='left' colsep='1' rowsep='1'>
 <colspec colname='Render GUI' />
