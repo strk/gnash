@@ -63,21 +63,12 @@ The list of successful &app; deployments grows every day.  At this time, &app; h
 <title>Audience</title>
 
 <para>
-This manual is primarily focused on developers interested in contributing to or building from the &app; project.  IT serves as a detailed reference guide, including a catalog and explanation of all options and features.  This level of detail may make this guide cumbersome for the average user, although advanced users may find it helpful.
+This manual is primarily focused on developers interested in contributing to or building from the &app; project.  It serves as a detailed reference guide, including a catalog and explanation of all options and features.  This level of detail may make this guide cumbersome for the average user, although advanced users may find it helpful.
 </para>
 
 <para>
 Those who are new to &app; will find the <citetitle>&app; User's Guide</citetitle>, currently under development, to be more useful when learning to use &app;.
 </para>
-</sect1>
-
-<sect1 id="Organization">
-<title>Organization of This Guide</title>
-
-<para>
-Written Last
-</para>
-
 </sect1>
 
 <sect1 id="guide-conventions">
@@ -169,10 +160,10 @@ This formatting indicates a set of keys to be pressed at the same time.  A famil
 </listitem>
 </varlistentry>
 <varlistentry>
-<term><replaceable>[replaceable]</replaceable></term>
+<term><replaceable>&lt;replaceable&gt;</replaceable></term>
 <listitem>
 <para>
-Whenever a general term is included in an example as a placeholder, it will be signaled by this formatting.  This formatting will usually appear inside other formatting.  For example, <filename>/home/<replaceable>[username]</replaceable></filename> indicates the home directory of a user, whose actual username would be substituted in for <replaceable>[username]</replaceable>.
+Whenever a general term is included in an example as a placeholder, it will be signaled by this formatting.  This formatting will usually appear inside other formatting.  For example, <filename>/home/<replaceable>&lt;username&gt;</replaceable></filename> indicates the home directory of a user, whose actual username would be substituted in for <replaceable>&lt;username&gt;</replaceable>.
 </para>
 </listitem>
 </varlistentry>
@@ -188,19 +179,19 @@ This typeface indicates anything that the user must enter, whether that is at a 
 
 </sect1>
 
-<sect1 id="Acknowledgements">
-<title>Acknowledgements</title>
+<sect1 id="Acknowledgments">
+<title>Acknowledgments</title>
 
 <para>
-The first version of this guide was written by Rob Savoye.  If not for his tireless efforst, this book - and this project - would never have come this far.
+The first version of this guide was written by Rob Savoye.  If not for his tireless efforts, this book - and this project - would never have come this far.
 </para>
 
 <para>
-John Gilmore has also been dedicated to the project from the beginning. I have shamelessly plagiarized one of his early announcement emails in the early part of this chapter.
+John Steinhart has also been dedicated to the project from the beginning. I have shamelessly plagiarized one of his early announcement emails in the early part of this chapter.
 </para>
 
 <para>
-Ann Barcomb was instrumental in taking this guide from the 0.3.0 to the 0.4.0 version, incorporating the many changes that came wth &app; version 0.8.0.
+Ann Barcomb was instrumental in taking this guide from the 0.3.0 to the 0.4.0 version, incorporating the many changes that came with &app; version 0.8.0.
 </para>
 
 <para>
