@@ -2,18 +2,22 @@
 
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
  "http://www.oasis-open.org/docbook/xml/4.1.2/docbookx.dtd" [
-    <!ENTITY legal SYSTEM "legal.xml">
-    <!ENTITY fdl-app SYSTEM "fdl-appendix.xml">
-    <!ENTITY appversion "0.8.0">
-    <!ENTITY manrevision "0.4.0">
-    <!ENTITY date "June 2007">
+    
+    <!ENTITY appversion "0.8.1">
+    <!ENTITY manrevision "0.4.1">
+    <!ENTITY date "August 2007">
     <!ENTITY app "<application>Gnash</application>">
     <!ENTITY appname "Gnash">
+    <!ENTITY AS "ActionScript">
+
+    <!ENTITY legal           SYSTEM "legal.xml">
+    <!ENTITY fdl-app         SYSTEM "fdl-appendix.xml"> 
 
     <!ENTITY programmers     SYSTEM "app_authors.xml">
     <!ENTITY writers         SYSTEM "usermanual/doc_authors.xml">
     <!ENTITY revisionhistory SYSTEM "usermanual/revisions.xml">
     <!ENTITY introduction    SYSTEM "usermanual/introduction.xml">
+    <!ENTITY specification   SYSTEM "usermanual/specification.xml">
     <!ENTITY installation    SYSTEM "usermanual/installation.xml">
     <!ENTITY usage           SYSTEM "usermanual/usage.xml">
     <!ENTITY glossary        SYSTEM "usermanual/glossary.xml">
@@ -69,6 +73,8 @@
   
 <!-- ============= Introduction ============================== -->
   &introduction;
+  &specification;    
+
 
 <!-- ============= Document Body ============================= -->
 
