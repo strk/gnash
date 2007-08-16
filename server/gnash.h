@@ -352,21 +352,38 @@ DSOEXPORT void	clear();
 //
 
 
+/// Point class
+//
+/// TODO: move in libgeometry/point2d.{cpp,h}, provide a gnash::point2d typedef
+/// TODO: make m_x and m_y members private ? (or rename to x,y)
+/// TODO: provide a toString() and an output operator
+///
 class DSOLOCAL point
 {
 public:
 	float	m_x, m_y;
 
+	/// Construct a point with X and Y values set to 0
 	point() : m_x(0), m_y(0) {}
+
+	/// Construct a point with X and Y values set to the given values
 	point(float x, float y) : m_x(x), m_y(y) {}
 
+	/// Set X and Y values of the point
+	void set(float x, float y)
+	{
+		m_x = x;
+		m_y = y;
+	}
+
+	/// Set to a + (b - a) * t
 	void	set_lerp(const point& a, const point& b, float t)
-		// Set to a + (b - a) * t
 		{
 			m_x = a.m_x + (b.m_x - a.m_x) * t;
 			m_y = a.m_y + (b.m_y - a.m_y) * t;
 		}
 
+	/// Compare two points for 2d equality
 	bool operator==(const point& p) const { return m_x == p.m_x && m_y == p.m_y; }
 
 	/// Return the square of the distance between this and other point.
@@ -375,6 +392,10 @@ public:
 	/// Return the distance between this and other point.
 	float distance(const point& other) const;
 
+	/// Compare two points for bitwise equality
+	//
+	/// TODO: (should this really be different by normal equality?)
+	///
 	bool	bitwise_equal(const point& p) const;
 };
 

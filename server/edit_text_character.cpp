@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.98 2007/08/13 03:26:33 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.99 2007/08/16 10:31:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -393,7 +393,8 @@ edit_text_character::edit_text_character(character* parent,
 	_borderColor(0,0,0,255),
 	_textColor(m_def->get_text_color()),
 	_embedFonts(m_def->getUseEmbeddedGlyphs()),
-	_autoSize(autoSizeNone)
+	_autoSize(autoSizeNone),
+	_bounds(m_def->get_bounds().getRange())
 {
 	assert(parent);
 	assert(m_def);
@@ -450,21 +451,26 @@ edit_text_character::display()
 
 	registerTextVariable();
 
-	rect def_bounds = m_def->get_bounds();
+	//rect def_bounds = m_def->get_bounds();
 
 	bool drawBorder = getDrawBorder();
 	bool drawBackground = getDrawBackground();
 
-	if ( drawBorder || drawBackground )
+	if ( (drawBorder || drawBackground) && _bounds.isFinite() )
 	{
 		matrix	mat = get_world_matrix();
 		render::set_matrix(mat);
 
 		point	coords[4];
-		coords[0] = def_bounds.get_corner(0);
-		coords[1] = def_bounds.get_corner(1);
-		coords[2] = def_bounds.get_corner(2);
-		coords[3] = def_bounds.get_corner(3);
+		float xmin = _bounds.getMinX();
+		float xmax = _bounds.getMaxX();
+		float ymin = _bounds.getMinY();
+		float ymax = _bounds.getMaxY();
+
+		coords[0].set(xmin, ymin); // = def_bounds.get_corner(0);
+		coords[1].set(xmax, ymin); // = def_bounds.get_corner(1);
+		coords[2].set(xmax, ymax); // = def_bounds.get_corner(2);
+		coords[3].set(xmin, ymax); // = def_bounds.get_corner(3);
 
 		rgba borderColor = drawBorder ? getBorderColor() : rgba(0,0,0,0);
 		rgba backgroundColor = drawBackground ? getBackgroundColor() : rgba(0,0,0,0);
@@ -477,6 +483,11 @@ edit_text_character::display()
 		if (drawBackground)
 			backgroundColor = cx.transform(backgroundColor);
 		
+#ifdef GNASH_DEBUG_TEXTFIELDS
+	std::stringstream ss; ss << _bounds;
+	log_debug("rendering a Pol composed by corners %s", ss.str().c_str());
+#endif
+
 		render::draw_poly( &coords[0], 4, backgroundColor, borderColor );
 		
 	}
@@ -488,9 +499,9 @@ edit_text_character::display()
 	// Anyway, see bug #17954 for a testcase.
 	matrix m;
 
-	if ( ! def_bounds.is_null() && ! def_bounds.is_world() )
+	if ( _bounds.isFinite() ) // ! def_bounds.is_null() && ! def_bounds.is_world() 
 	{
-		m.concatenate_translation(def_bounds.get_x_min(), def_bounds.get_y_min());
+		m.concatenate_translation(_bounds.getMinX(), _bounds.getMinY()); // def_bounds.get_x_min(), def_bounds.get_y_min()
 	}
 	
 	
@@ -655,8 +666,9 @@ edit_text_character::get_topmost_mouse_entity(float x, float y)
 	point	p;
 	m.transform_by_inverse(&p, point(x, y));
 
-	const rect& def_bounds = m_def->get_bounds();
-	if (def_bounds.point_test(p.m_x, p.m_y))
+	//const rect& def_bounds = m_def->get_bounds();
+	//if (def_bounds.point_test(p.m_x, p.m_y))
+	if ( _bounds.contains(p.m_x, p.m_y) )
 	{
 		return this;
 	}
@@ -749,6 +761,76 @@ edit_text_character::set_member(const std::string& name,
 		
 		return;
 	}
+	case M_WIDTH: // _width
+	{
+		float nw = PIXELS_TO_TWIPS(val.to_number()); // TODO: pass an as_environment !
+		if ( _bounds.width() == nw )
+		{
+#ifdef GNASH_DEBUG_TEXTFIELDS
+			log_debug("TextField width already == %g, nothing to do to change it", nw);
+#endif
+			return; // nothing to do
+		}
+		if ( ! _bounds.isFinite() )
+		{
+#ifdef GNASH_DEBUG_TEXTFIELDS
+			stringstream ss; ss<<_bounds;
+			log_debug("Non-finite TextField bounds : %s", ss.str().c_str());
+#endif
+			return;
+		}
+
+#ifdef GNASH_DEBUG_TEXTFIELDS
+		log_debug("Chaging TextField width to %g", nw);
+#endif
+
+		set_invalidated();
+
+		// Modify TextField drawing rectangle
+		// TODO: check which anchor point we should use !
+		float xmin = _bounds.getMinX();
+		float ymin = _bounds.getMinY();
+		float ymax = _bounds.getMaxY();
+		_bounds.setTo(xmin, ymin, xmin+nw, ymax);
+		assert(_bounds.width() == nw);
+
+		return;
+	}
+	case M_HEIGHT: // _height
+	{
+		float nh = PIXELS_TO_TWIPS(val.to_number()); // TODO: pass an as_environment !
+		if ( _bounds.height() == nh )
+		{
+#ifdef GNASH_DEBUG_TEXTFIELDS
+			log_debug("TextField height already == %g, nothing to do to change it", nh);
+#endif // GNASH_DEBUG_TEXTFIELDS
+			return; // nothing to do
+		}
+		if ( ! _bounds.isFinite() )
+		{
+#ifdef GNASH_DEBUG_TEXTFIELDS
+			stringstream ss; ss<<_bounds;
+			log_debug("Non-finite TextField bounds : %s", ss.str().c_str());
+#endif // GNASH_DEBUG_TEXTFIELDS
+			return;
+		}
+
+#ifdef GNASH_DEBUG_TEXTFIELDS
+		log_debug("Chaging TextField height to %g", nh);
+#endif // GNASH_DEBUG_TEXTFIELDS
+		set_invalidated();
+
+		// Modify TextField drawing rectangle
+		// TODO: check which anchor point we should use !
+		float xmin = _bounds.getMinX();
+		float xmax = _bounds.getMaxX();
+		float ymin = _bounds.getMinY();
+		_bounds.setTo(xmin, ymin, xmax, ymin+nh);
+
+		assert(_bounds.height() == nh);
+
+		return;
+	}
 	case M_VISIBLE:
 		//else if (name == "_visible")
 	{
@@ -823,11 +905,17 @@ edit_text_character::get_member(const std::string& name, as_value* val)
 	case M_WIDTH: // _width
 	{
 		val->set_double(TWIPS_TO_PIXELS(get_width()));
+#ifdef GNASH_DEBUG_TEXTFIELDS
+		log_debug("Got TextField width == %s", val->to_debug_string().c_str());
+#endif // GNASH_DEBUG_TEXTFIELDS
 		return true;
 	}
 	case M_HEIGHT: // _height
 	{
 		val->set_double(TWIPS_TO_PIXELS(get_height()));
+#ifdef GNASH_DEBUG_TEXTFIELDS
+		log_debug("Got TextField height == %s", val->to_debug_string().c_str());
+#endif // GNASH_DEBUG_TEXTFIELDS
 		return true;
 	}
 	case M_TEXTWIDTH:
@@ -856,15 +944,17 @@ edit_text_character::align_line(
 	//GNASH_REPORT_FUNCTION;
 	assert(m_def);
 
-	float	extra_space = (m_def->width() -
-			m_def->get_right_margin()) - x - PADDING_TWIPS;
+	float width = _bounds.width(); // m_def->width()
+	float right_margin = m_def->get_right_margin();
+
+	float	extra_space = (width - right_margin) - x - PADDING_TWIPS;
 
 	//assert(extra_space >= 0.0f);
 	if (extra_space <= 0.0f)
 	{
 		log_debug(_("TextField text doesn't fit in its boundaries: "
 			    "width %g, margin %d - nothing to align"),
-			    m_def->width(), m_def->get_right_margin());
+			    width, right_margin);
 		return 0.0f;
 	}
 
@@ -1147,7 +1237,10 @@ edit_text_character::format_text()
 		
 after_x_advance:
 
-		if (x >= m_def->width() - m_def->get_right_margin() - PADDING_TWIPS)
+		float width = _bounds.width(); // m_def->width()
+		float right_margin = m_def->get_right_margin();
+
+		if (x >= width - right_margin - PADDING_TWIPS)
 		{
 			// Whoops, we just exceeded the box width. 
 			// Do word-wrap if requested to do so.
@@ -1371,8 +1464,9 @@ edit_text_character::pointInShape(float x, float y) const
 	matrix wm = get_world_matrix();
 	point lp(x, y);
 	wm.transform_by_inverse(lp);
-	const rect& def_bounds = m_def->get_bounds();
-	return def_bounds.point_test(lp.m_x, lp.m_y);
+	return _bounds.contains(lp.m_x, lp.m_y);
+	//const rect& def_bounds = m_def->get_bounds();
+	//return def_bounds.point_test(lp.m_x, lp.m_y);
 }
 
 bool

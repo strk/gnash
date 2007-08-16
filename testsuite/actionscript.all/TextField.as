@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.16 2007/08/15 23:00:15 strk Exp $";
+rcsid="$Id: TextField.as,v 1.17 2007/08/16 10:31:51 strk Exp $";
 
 #include "check.as"
 
@@ -252,7 +252,7 @@ check(!tf.hasOwnProperty('_height'));
 check(!tf.__proto__.hasOwnProperty('_height'));
 check_equals(tf._height, 500); // as we created it, see createTextField call
 tf._height = 99999;
-xcheck_equals(tf._height, 99999); 
+check_equals(tf._height, 99999); 
 tf._height = 500;
 
 // Check TextField.hscroll
@@ -538,7 +538,7 @@ check( ! tf.hasOwnProperty('_width') );
 check( ! tf.__proto__.hasOwnProperty('_width') ); 
 check_equals(tf._width, 500); // as it was set by createTextField, see above
 tf._width = 99999;
-xcheck_equals(tf._width, 99999); 
+check_equals(tf._width, 99999); 
 tf._width = 500;
 
 // Check TextField.wordWrap (should text wrap when bbox limit is hit?)
@@ -620,16 +620,16 @@ tf._width = 10; // "hello world" text should overflow this
 tf.text = "Hello world";
 tf.autoSize = 'none';
 tf.wordWrap = false;
-xcheck_equals(tf._width, 10);
+check_equals(tf._width, 10);
 origTextWidth = tf.textWidth;
 tf.autoSize = 'center';
-check(tf._width > 10);
+xcheck(tf._width > 10);
 check_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by autoSize 
 tf.autoSize = 'none';
 tf.wordWrap = true;
 tf._width = 10;
 // Gnash ignores assigments to _width (should change TextField rendering area bounds instead)
-xcheck_equals(tf._width, 10);
+check_equals(tf._width, 10);
 check_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by wordWrap
 
 #endif // OUTPUT_VERSION > 5

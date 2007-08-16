@@ -112,11 +112,7 @@ public:
 
 	geometry::Range2d<float> getBounds() const
 	{
-		// TODO: keep an instance member for encoding
-		//       the bounding box, as it might be 
-		//       dynamically updated if the textfield
-		//       is editable and auto-resizes.
-		return m_def->get_bounds().getRange();
+		return _bounds;
 	}
 
 	// See dox in character.h
@@ -318,6 +314,14 @@ private:
 	bool _embedFonts;
 
 	AutoSizeValue _autoSize;
+
+	/// Area in which the text is drawn. 
+	//
+	/// This area encloses all the text, can be automatically
+	/// extended to fit text or hide text overflowing it.
+	/// See the setAutoSize() method to change that.
+	///
+	geometry::Range2d<float> _bounds;
 
 protected:
 
