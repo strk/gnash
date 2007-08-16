@@ -86,12 +86,11 @@ main(int argc, char** argv)
 	puts("Setting things up");
 
 	Ming_init();
-        Ming_useSWFVersion (OUTPUT_VERSION);
+  Ming_useSWFVersion (OUTPUT_VERSION);
 	Ming_setScale(20.0); /* let's talk pixels */
  
 	mo = newSWFMovie();
 	SWFMovie_setRate(mo, 12);
-	//SWFMovie_setDimension(mo, 6400, 4000);
 	SWFMovie_setDimension(mo, 640, 400);
 
 	/*********************************************

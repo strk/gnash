@@ -43,7 +43,7 @@ check(typeof(x) == "string");
 check(typeof(y) == "object");
 check(x == "[object Object]"); 
 check(y == obj); //true
-//trace(obj); //output [object Object]
+//trace(obj); //invoke obj.toString(), output [object Object]
 #if OUTPUT_VERSION > 5
   check(obj.toString == Object.prototype.toString);
   check(obj.valueOf == Object.prototype.valueOf);
@@ -65,7 +65,7 @@ y = obj.valueOf();
 check(x=="TO_STRING");
 check(y=="TO_VALUE");
 check(typeof(obj)=="object"); 
-//trace(obj); // output TO_STRING
+//trace(obj); //invoke obj.toString(), output TO_STRING
 check(typeof(y) == "string");
 check(obj == y); 
 
@@ -107,6 +107,7 @@ check(typeof(x)=="string");
 check(typeof(y)=="string"); 
 check(x=="TO_STRING"); 
 check(y=="TO_VALUE");  
+//trace(num1); // invoke num1.toString(), output TO_STRING
 
 //
 //Testing toString and valueOf of String
@@ -149,7 +150,8 @@ str3 =  str1 + str2;
 xcheck(typeof(str3) == "string");
 //valueOf called
 check(str3 == "TO_VALUETO_VALUE"); 
-//trace a string won't invoke the toString method
+// trace a string Object won't invoke the toString method.
+// I don't think it's a bug.
 //trace(str1); //output 10 !
 
 x = str1.toString();
@@ -189,8 +191,8 @@ y = mc1.valueOf();
   check(y == undefined); 
 #endif
 check(y == _level0.mc1);  
-//trace a movieclip doesn't invoke the toString method
-//trace(mc1); //_level0.mc
+//trace a movieclip doesn't invoke the toString method, either.
+//trace(mc1); //output _level0.mc
 
 MovieClip.prototype.toString = function () {return "TO_STRING";};
 MovieClip.prototype.valueOf = function () {return "TO_VALUE";};
@@ -284,7 +286,7 @@ xcheck(y.toString() == "[object Object]");
 xcheck(typeof(y.valueOf()) == "object");  
 xcheck(typeof(btn1) == "object");
 check(y == btn1);
-//trace(btn1); //output [object Object]
+//trace(btn1); // invoke btn1.toString(), output [object Object]
 
 //
 //Testing toString and valueOf of Boolean
@@ -306,6 +308,7 @@ check(typeof(x) == "string");
 check(typeof(y) == "boolean");  
 check(x == "false");
 check(y == false);
+//trace(b1); // invoke b1.toString(), output false 
 
 b2 = new Boolean(true);
 b3 = b1 + b2;
@@ -372,7 +375,8 @@ y = a1.valueOf();
 check(typeof(x) == "string");  
 check(typeof(y) == "object");   
 check(x == "1,2,3,4");  
-check(y == a1);        
+check(y == a1);   
+//trace(a1); // invoke a1.toString(), output 1,2,3,4     
 
 a2 = new Array(2,3,4,5);
 a3 = a1 + a2;

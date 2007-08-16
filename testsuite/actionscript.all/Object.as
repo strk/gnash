@@ -20,13 +20,14 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.27 2007/08/15 06:52:19 zoulunkai Exp $";
+rcsid="$Id: Object.as,v 1.28 2007/08/16 06:09:14 zoulunkai Exp $";
 
 #include "check.as"
 
 // Test existance of methods
 check_equals(typeof(Object), 'function');
 check_equals(typeof(Object.prototype), 'object');
+// registerClass is a public static function of Object
 check_equals(typeof(Object.registerClass), 'function');
 check_equals(typeof(Object.prototype.toString), 'function');
 check_equals(typeof(Object.prototype.valueOf), 'function');
@@ -119,15 +120,16 @@ check (obj.__proto__.constructor == Object);
 // Test instantiated Object methods
 check_equals(typeof(obj.toString), 'function');
 check_equals(typeof(obj.valueOf), 'function');
+
 #if OUTPUT_VERSION > 5
   check_equals(typeof(obj.addProperty), 'function');
   check(Object.hasOwnProperty('constructor')); 
-#if OUTPUT_VERSION == 6
+  #if OUTPUT_VERSION == 6
     // bug in swf6???
     check(obj.hasOwnProperty('constructor')); 
-#else
+  #else
     check(!obj.hasOwnProperty('constructor')); 
-#endif
+  #endif
   check(obj.hasOwnProperty('__constructor__')); 
 #else
   check_equals(typeof(obj.addProperty), 'undefined');

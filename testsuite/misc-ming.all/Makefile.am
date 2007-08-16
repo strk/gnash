@@ -107,6 +107,7 @@ check_PROGRAMS = \
 	attachMovieLoopingTestRunner \
 	registerClassTest \
 	registerClassTestRunner \
+	registerClassTest2 \
 	goto_frame_test \
 	consecutive_goto_frame_test \
 	matrix_test \
@@ -232,6 +233,7 @@ check_SCRIPTS = \
 	loop_test7runner \
 	loop_test8runner \
 	shape_testrunner \
+	registerClassTest2runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -1277,6 +1279,18 @@ registerClassTestRunner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	$(NULL)
 
+registerClassTest2_SOURCES =	\
+	registerClassTest2.c	\
+	$(NULL)
+registerClassTest2_LDADD = libgnashmingutils.la
+
+registerClassTest2.swf: registerClassTest2
+	./registerClassTest2 $(top_srcdir)/testsuite/media
+
+registerClassTest2runner: $(srcdir)/../generic-testrunner.sh registerClassTest2.swf
+	sh $< $(top_builddir) registerClassTest2.swf > $@
+	chmod 755 $@
+
 spritehier.swf: spritehier
 	./spritehier
 
@@ -1597,7 +1611,7 @@ TEST_CASES = \
 	consecutive_goto_frame_testrunner \
 	multi_doactions_and_goto_frame_testrunner \
 	registerClassTestRunner \
-	action_execution_order_testrunner \
+        action_execution_order_testrunner \
 	action_execution_order_extend_testrunner \
 	simple_loop_testrunner \
 	loadMovieTestRunner \
@@ -1652,6 +1666,7 @@ TEST_CASES = \
 	loop_test8runner \
 	shape_testrunner \
 	morph_test1runner \
+	registerClassTest2runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
