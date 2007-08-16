@@ -8,6 +8,13 @@
   the headers &app; needs to compile.
 </para>
 
+<note>
+<title>Note</title>
+<para>
+If you want to install the &app; plugin for one of the browsers listed in the <xref linkend="intro" />, be sure to install the development package for that browser before configuring.  The &app; <command>configure</command> script searches for the devel packages before building the plugin.
+</para>
+</note>
+
 <table frame='all'>
   <title>Code Dependency Table</title>
   <tgroup cols='7' align='left' colsep='1' rowsep='1'>

@@ -17,17 +17,17 @@
   autogen.
 </para>
 <para>
-  All the standard <emphasis>configure</emphasis> options
-  are avaiable.  In addition, &app; has two types of
-  options: those which <link linkend="features">enable or disable 
+  All the standard <command>configure</command> options
+  are available.  In addition, &app; has two types of
+  options: those that <link linkend="features">enable or disable 
   features</link>, and
-  those which <link linkend="custompath">specify custom paths for 
+  those that <link linkend="custompath">specify custom paths for 
   development packages</link>
-  which aren't found during the default search.  A complete
+  which are not found during the default search.  A complete
   list of <emphasis>all</emphasis> configuration options, including
   standard ones, can be seen by typing:
   <programlisting>
-  ./configure --help
+  ./configure --help |less
   </programlisting>
   Read further for a more detailed explanation of &app;-specific
   options.
@@ -35,20 +35,18 @@
 <para>
   The syntax for running <emphasis>configure</emphasis> is as follows:
   <programlisting>
-  configure &lt;options&gt;
+  configure <replaceable>&lt;options&gt;</replaceable>
   </programlisting>
-  The example below shows the <emphasis>configure</emphasis> options
+  The example below shows the <command>configure</command> options
   which create the smallest working standalone version of &app;.  In
-  this example, <emphasis>configure</emphasis> is being run from the
+  this example, <command>configure</command> is being run from the
   source root directory:
 </para>
 
-<screen>
-<userinput>
+<programlisting>
 ./configure --disable-debugger --disable-cygnal --disable-docbook \
 --disable-plugin --enable-media=mad --enable-gui=sdl
-</userinput>
-</screen>
+</programlisting>
 
 <sect2 id="features">
   &featureoptions;

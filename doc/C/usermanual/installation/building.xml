@@ -16,7 +16,7 @@
     </programlisting>
     If the compilation ends with an error, check the output of 
     <emphasis>configure</emphasis> and ensure that you are not missing 
-    any required prerequisites.
+    any required prerequisites.  The output of <command>make</command> can be verbose; you may wish to pipe the output to a file.
   </para>
 
   <para>
@@ -28,37 +28,37 @@
     <emphasis>-O2 -g</emphasis>.  A list of influential 
     environment variables can be seen in the configuration help:
 </para>
-<para><userinput>./configure --help</userinput></para>
+<programlisting>./configure --help</programlisting>
 <para>
     In the following example, debugging is enabled and optimization is
     disabled:
 </para>
-<para><userinput>make CFLAGS=-g CXXFLAGS=-g</userinput></para>
+<programlisting>make CFLAGS=-g CXXFLAGS=-g</programlisting>
 </sect2>
 
 <sect2 id="processdoc">
   <title>Creating the Documentation</title>
 
   <para>
-    By default, documentation isn't built, even when you
+    By default, documentation is not built when you
     <link linkend="install">install</link> &app;.  This is because
     there are a number of <link linkend="docdepend">dependencies 
     for the documentation</link>.  Documentation is built when it
     is specified with a specific target in the generated 
-    <emphasis>Makefile</emphasis> in the <filename>doc/C</filename>
-    sub-directory.  If you type <emphasis>make install</emphasis> in
+    <command>Makefile</command> in the <filename>doc/C</filename>
+    sub-directory.  If you type <command>make install</command> in
     this directory, all documents will be built.
   </para>
 
   <para>
-    You need to specify a target output format when you wish to create
-    documentation.  The available output formats are: <emphasis>html</emphasis>,
-    <emphasis>pdf</emphasis>, <emphasis>info</emphasis>, 
-    <emphasis>man</emphasis>, and <emphasis>alldocs</emphasis>.  
-    It is also possible to output <emphasis>GNOME help</emphasis> if
+    You must specify a target output format when you wish to create
+    documentation.  The available output formats are: <command>html</command>,
+    <command>pdf</command>, <command>info</command>, 
+    <command>man</command>, and <command>alldocs</command>.  
+    It is also possible to output <command>GNOME help</command> if
     the <link linkend="features">configure option</link>
-    <emphasis>--enable-ghelp</emphasis> was used.  
-    The <emphasis>alldocs</emphasis> target will build all output formats
+    <option>--enable-ghelp</option> was used.  
+    The <command>alldocs</command> target will build all output formats
     except <emphasis>GNOME help</emphasis>.
     For example, to create HTML output, type:
     <programlisting>
@@ -84,7 +84,7 @@
   <title>Running the Tests</title>
 
   <para>
-    If a test fails, please report it by following the
+    Before beginning the potentially lengthy install, it is wise to test the installation.  If a test fails, please report it by following the
     <link linkend="bugreport">instructions for reporting a bug</link>.
   </para>
 
@@ -112,8 +112,8 @@
         Additional details are visible when 
         <emphasis>RUNTESTFLAGS</emphasis> are used to add the 
         <emphasis>verbose</emphasis> and <emphasis>all</emphasis> options.
-        Verbose prints more information about the testing process, while
-        all includes details on passing tests.  
+        The <option>verbose</option> option prints more information about the testing process, while
+        the <option>all</option> option includes details on passing tests.  
         <programlisting>
   make check RUNTESTFLAGS="-v -a"
         </programlisting>
@@ -123,27 +123,27 @@
     <sect4 id="running_some_tests">
       <title>Running Some Tests</title>
       <para>
-        It is possible to run just a particular test, or 
-        subdirectory of tests, by specifying the directory or 
+        It is possible to run just a single test, or 
+        a subdirectory of tests, by specifying the directory or 
         compiled test file.
       </para>
       <para>
         Some tests rely on <emphasis>testsuite/Dejagnu.swf</emphasis>,
         which in turn relies on <emphasis>Ming</emphasis>.
-        This file is created when you run 'make check' for the entire
+        This file is created when you run <command>make check</command> for the entire
         testsuite, and can also be created on demand:
         <programlisting>
   make -C testsuite Dejagnu.swf 
         </programlisting>
       </para>
       <para>
-        In this example, the 'clip_as_button2' test is compiled and
+        In this example, the <command>clip_as_button2</command> test is compiled and
         run:
         <programlisting>
   make -C testsuite/samples clip_as_button2-TestRunner 
   cd testsuite/samples &amp;&amp; ./clip_as_button2-TestRunner
         </programlisting>
-        This would create and run all the tests in the directory
+        This creates and runs all the tests in the directory
         <filename>movies.all</filename>:
         <programlisting>
   make -C testsuite/movies.all check
@@ -187,7 +187,7 @@
     <sect4 id="manual_actionscript_tests">
       <title>ActionScript Unit Tests</title>
       <para>
-        Unit tests for ActionScript classes in 'testsuite/actionscript.all'
+        Unit tests for ActionScript classes in <command>testsuite/actionscript.all</command>
         are run without a graphical display:
         <programlisting>
   gprocessor -v XML-v6.swf

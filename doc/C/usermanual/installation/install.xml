@@ -1,10 +1,11 @@
 <title>Installation</title>
 
 <para>
-  Installation is done with the command:
+Now that &app; has been compiled and tested, use the following command to install it:
   <programlisting>
   make install
   </programlisting>
+The above command installs the standalone player.  If the correct files were found by <command>configure</command> and if the <option>--disable-plugin</option> option was not specified, the &app; browser plugin is also installed.
 </para>
 
 <para>
@@ -40,7 +41,7 @@
     <link linkend="pre-configuration">configuration</link>, the libraries will
     be installed in the directory <filename>lib</filename> inside the
     path you specified.  If the libraries are stored in a non-standard
-    location, you need to identify the path in one of two ways.
+    location, you must identify the path in one of two ways.
   </para>
 
   <para>
@@ -65,18 +66,14 @@
   <title>Executables</title>
 
   <para>
-    The Mozilla plugin is installed into the <filename>plugins</filename>
-    directory of the system
-    installed <emphasis>Firefox</emphasis> or <emphasis>Mozilla</emphasis>, 
-    if development packages are installed for either of them.
-    Otherwise, the default is <filename>~/.firefox/plugins</filename>. 
+   The Mozilla plugin is installed in the <filename>plugins/</filename> subdirectory of the Mozilla or Firefox application location if development packages are installed for either browser.  For example, if Firefox is installed in the <filename>/usr/lib/firefox-<replaceable>&lt;version&gt;</replaceable></filename> directory, the plugin will be installed in <filename>/usr/lib/firefox-<replaceable>&lt;version&gt;</replaceable>/plugins/</filename> directory.  If development packages are not installed for either, the default location is <filename>~/.firefox/plugins</filename>. 
     You may also specify the plugin installation directory by using the 
-    <emphasis>--with-plugindir</emphasis> <link linkend="custompath">option 
-    to configure</link>.
+    <option>--with-plugindir</option> <link linkend="custompath">option 
+    at configuration time</link>.
   </para>
 
   <para>
-    The remaining executables will be installed in the <filename>bin</filename>
+    The remaining executables are installed in the <filename>bin</filename>
     subdirectory of the directory specified by during configuration.
     If no path was specified, the default is 
     <filename>/usr/local/bin</filename>.
@@ -93,10 +90,10 @@
   </para>
 
   <para>
-    <emphasis>man</emphasis> and <emphasis>info</emphasis> 
-    will be installed in <filename>/usr/local/share/man</filename>
+    <command>man</command> and <command>info</command> 
+    are installed in <filename>/usr/local/share/man</filename>
     and <filename>/usr/local/share/info</filename> respectively, unless
-    the <emphasis>--mandif</emphasis> or <emphasis>--infodir</emphasis>
+    the <option>--mandif</option> or <option>--infodir</option>
     <link linkend="custompath">configuration options</link> are used.
   </para>
 

@@ -9,448 +9,365 @@
 </para>
 <para>
   The following custom path options are available:
-<!-- TODO - review this section -->
 </para>
 
-<variablelist>
 
-  <varlistentry>
-    <term>--x-includes=DIR</term>
-    <listitem>
-      <para>
+<table id="tb-configure-paths">
+<title>Custom Path Options</title>
+<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+<colspec colname='Option' />
+<colspec colname='Function' />
+<thead>
+<row>
+  <entry>Option</entry>
+  <entry>Function</entry>
+</row>
+</thead>
+<tbody>
+<row>
+  <entry>
+    <option>--x-includes=DIR</option>
+    </entry>
+      <entry>
         X include files are in DIR.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--x-libraries=DIR</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--x-libraries=DIR</option>
+    </entry>
+      <entry>
         X library files are in DIR.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-libxml=PFX</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-libxml=PFX</option>
+    </entry>
+      <entry>
         Prefix to where libxml is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-libxml-libraries=DIR</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-libxml-libraries=DIR</option>
+    </entry>
+      <entry>
         Directory where libxml library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-libxml-includes=DIR</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-libxml-includes=DIR</option>
+    </entry>
+      <entry>
         Directory where libxml header files are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-docbook=DIR</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-docbook=DIR</option>
+    </entry>
+      <entry>
         Directory where the DocBook style-sheets are installed.        
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-sdl-prefix=PFX</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-sdl-prefix=PFX</option>
+    </entry>
+      <entry>
         Prefix where SDL is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-zlib-incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-zlib-incl</option>
+    </entry>
+      <entry>
         Directory where zlib header is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-zlib-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-zlib-lib</option>
+    </entry>
+      <entry>
         Directory where zlib library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-jpeg-incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-jpeg-incl</option>
+    </entry>
+      <entry>
         Directory where jpeg header is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-jpeg-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-jpeg-lib</option>
+    </entry>
+      <entry>
         Directory where jpeg library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-png-incl</term>
-    <listitem>
-      <para>
+     </entry>
+  </row><row>
+  <entry>
+    <option>--with-png-incl</option>
+    </entry>
+      <entry>
         Directory where png header is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-png-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-png-lib</option>
+    </entry>
+      <entry>
         Directory where png library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-qt-dir</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-qt-dir</option>
+    </entry>
+      <entry>
         Directory where QT is installed. This is only used by
         the Klash plugin.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-qt-includes</term>
-    <listitem>
-      <para>
+    </entry>
+  </row><row>
+  <entry>
+    <option>--with-qt-includes</option>
+    </entry>
+      <entry>
         Directory where the QT header files are installed. This
         is only used by the Klash plugin.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-qt-libraries</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-qt-libraries</option>
+    </entry>
+      <entry>
         Directory where the QT libraries are installed. This is
         only used by the Klash plugin.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-plugindir</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-plugindir</option>
+    </entry>
+      <entry>
         This is the directory to install the Firefox plugin in.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-ming</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-ming</option>
+    </entry>
+      <entry>
         Ming is used to build test cases, but not by the Gnash
         player itself.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-mad_incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-mad_incl</option>
+    </entry>
+      <entry>
         Directory where libmad header is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-mad_lib</term>
-    <listitem>
-      <para>
+      </entry>
+ </row><row>
+  <entry>
+    <option>--with-mad_lib</option>
+    </entry>
+      <entry>
         Directory where libmad library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-ogg_incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-ogg_incl</option>
+    </entry>
+      <entry>
         Directory where the libogg headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-ogg_lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-ogg_lib</option>
+    </entry>
+      <entry>
         Directory where the libogg library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-gstreamer-incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-gstreamer-incl</option>
+    </entry>
+      <entry>
         Directory where the Gstreamer headers are
         installed. Gstreamer version 0.10 or greater must be used.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-gstreamer-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-gstreamer-lib</option>
+    </entry>
+      <entry>
         Directory where the Gstreamer library is
         installed. Gstreamer version 0.10 or greater must be used.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-opengl-includes</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-opengl-includes</option>
+    </entry>
+      <entry>
         Directory where OpenGL (libMesa) headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-opengl-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-opengl-lib</option>
+    </entry>
+      <entry>
         Directory where the OpenGL (libMesa) library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-glext-incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-glext-incl</option>
+    </entry>
+      <entry>
         Directory where GtkGlExt headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-glext-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-glext-lib</option>
+    </entry>
+      <entry>
         Directory where the GtkGlExt library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-gtk2-incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-gtk2-incl</option>
+    </entry>
+      <entry>
         Directory where the Gtk2 headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-gtk2-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-gtk2-lib</option>
+    </entry>
+      <entry>
         Directory where the Gtk2 library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-cairo_incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-cairo_incl</option>
+    </entry>
+      <entry>
         Directory where the Cairo headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-cairo-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-cairo-lib</option>
+    </entry>
+      <entry>
         Directory where the Cairo library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-glib-incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-glib-incl</option>
+    </entry>
+      <entry>
         Directory where the Glib headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-glib-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-glib-lib</option>
+    </entry>
+      <entry>
         Directory where the Glib library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-pango-incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-pango-incl</option>
+    </entry>
+      <entry>
         Directory where the Pango headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-pango-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-pango-lib</option>
+    </entry>
+      <entry>
         Directory where the Pango library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-atk-incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-atk-incl</option>
+    </entry>
+      <entry>
         Directory where the ATK headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-atk-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-atk-lib</option>
+    </entry>
+      <entry>
         Directory where the ATK library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-pthread-incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-pthread-incl</option>
+    </entry>
+      <entry>
         Directory where the Pthread headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-pthread-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-pthread-lib</option>
+    </entry>
+      <entry>
         Directory where the Pthread library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-agg-incl</term>
-    <listitem>
-      <para>
+   </entry>
+  </row><row>
+  <entry>
+    <option>--with-agg-incl</option>
+    </entry>
+      <entry>
         Directory where the AGG (Antigrain) headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-agg-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-agg-lib</option>
+    </entry>
+      <entry>
         Directory where the AGG (Antigrain) library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-ffmpeg-incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-ffmpeg-incl</option>
+    </entry>
+      <entry>
         Directory where the FFMPEG headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-ffmpeg-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-ffmpeg-lib</option>
+    </entry>
+      <entry>
         Directory where the FFMPEG library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-boost-incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-boost-incl</option>
+    </entry>
+      <entry>
         Directory where the Boost headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-boost-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-boost-lib</option>
+    </entry>
+      <entry>
         Directory where the Boost library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-curl-incl</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-curl-incl</option>
+    </entry>
+      <entry>
         Directory where the libCurl headers are installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--with-curl-lib</term>
-    <listitem>
-      <para>
+      </entry>
+  </row><row>
+  <entry>
+    <option>--with-curl-lib</option>
+    </entry>
+      <entry>
         Directory where the libCurl library is installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-</variablelist>
+      </entry>
+</row>
+</tbody>
+</tgroup>
+</table>
 

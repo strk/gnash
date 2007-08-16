@@ -67,6 +67,7 @@
   in <filename>/usr/arm</filename> and other required libraries were 
   cross compiled.
   <programlisting>
-  ./configure -target=arm-unknown-linux-gnu --prefix=/usr/arm --host=arm-unknown-linux-gnu --build=i686-pc-linux-gnu --disable-plugin
+./configure -target=arm-unknown-linux-gnu --prefix=/usr/arm \
+--host=arm-unknown-linux-gnu --build=i686-pc-linux-gnu --disable-plugin
   </programlisting>
 </para>

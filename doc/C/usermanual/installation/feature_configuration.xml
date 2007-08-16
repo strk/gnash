@@ -2,109 +2,87 @@
 
 <para>
   Some switches can be used during configuration to enable or disable
-  features of &app;.  Some of the most important configuration options
+  features of &app;. Some of the most important configuration options
   are:
+</para>
+
   <itemizedlist mark="opencircle">
     <listitem>
     <para>
-<emphasis>--enable-gui</emphasis> lets you specify your GUI of choice.
+<option>--enable-gui</option> lets you specify your GUI of choice.
 The default option is GTK.
     </para>
     </listitem>
     <listitem>
     <para>
-<emphasis>--enable-renderer</emphasis> allows a renderer to be
+<option>--enable-renderer</option> allows a renderer to be
 chosen.  The default renderer is OpenGL.
     </para>
     </listitem>
     <listitem>
     <para>
-<emphasis>--enable-media</emphasis> permits a media handler to be
+<option>--enable-media</option> permits a media handler to be
 selected.  The default is FFMPEG with SDL sound.
     </para>
     </listitem>
   </itemizedlist>
+<para>
   A complete list of available features follows.
 </para>
 
-<variablelist>
-  <varlistentry>
-    <term>--enable-debugger</term>
-    <listitem>
-      <para>
-        Enable support for the Flash debugger. The debugger is
-        mainly of interest to Flash developers. 
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-dmalloc</term>
-    <listitem>
-      <para>
-        Enable support for the DMalloc memory debugging tool.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-docbook</term>
-    <listitem>
-      <para>
-        Enable the generation of html and pdf versions of the documentation
-	from the XML. You will then be able to use "make html" and "make pdf".
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-embedded</term>
-    <listitem>
-      <para>
-        Link to Qt-embedded, don't use X. This is only used by
-        Klash.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--disable-fork</term>
-    <listitem>
-      <para>
-        Disable the plugin forking the standalone player, and
+<table id="tb-config-features">
+<title>Configuration Options - Features</title>
+<tgroup cols='2' align='left' colsep='1' rowsep='1'>
+<colspec colname='Option' />
+<colspec colname='Function' />
+<thead>
+<row>
+  <entry>Option</entry>
+  <entry>Function</entry>
+</row>
+</thead>
+<tbody>
+<row>
+  <entry><option>--enable-debugger</option></entry>
+  <entry>Enable support for the Flash debugger. The debugger is
+        mainly of interest to Flash developers.</entry>
+</row>
+<row>
+  <entry><option>--enable-dmalloc</option></entry>
+  <entry>Enable support for the DMalloc memory debugging tool.</entry>
+</row>
+<row>
+  <entry> <option>--enable-docbook</option></entry>
+  <entry>  Enable the generation of HTML and PDF versions of the documentation
+	from the XML. You will then be able to use <command>make html</command> and <command>make pdf</command>.</entry>
+</row>
+<row>
+  <entry>  <option>--enable-embedded</option></entry>
+  <entry> Link to Qt-embedded, do not use X. This is only used by
+        Klash</entry>
+</row>
+<row>
+  <entry> <option>--disable-fork</option></entry>
+  <entry>Disable the plugin from forking the standalone player, and
         using a thread for the player instead. Currently forking
-        the standalone player will give you the best results.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-ghelp</term>
-    <listitem>
-      <para>
-        Enable support for the GNOME help system.
-      </para>
-    </listitem>
-  </varlistentry>
-  
-  <varlistentry>
-    <term>--disable-glext</term>
-    <listitem>
-      <para>
-        Disable using GtkGlExt, which forces the use of SDL
+        the standalone player gives you the best results.</entry>
+</row>
+<row>
+  <entry><option>--enable-ghelp</option>
+</entry>
+  <entry>Enable support for the GNOME help system.</entry>
+</row>
+<row>
+  <entry><option>--disable-glext</option>
+</entry>
+  <entry>Disable using GtkGlExt, which forces the use of SDL
         instead. By default if the GtkGL extension for Gtk is found
-        by configure, the GTK enabled GUI is built.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-gui=gtk|sdl|kde|fltk|fb</term>
-    <listitem>
-      <para>
-        Select the Graphic User Interface to use (just one at a time please).
-      </para>
-      <variablelist>
+        by the configure script, the GTK-enabled GUI is built.</entry>
+</row>
+<row>
+  <entry><option>--enable-gui=gtk|sdl|kde|fltk|fb</option></entry>
+  <entry><para>Select the Graphic User Interface to use (choose one).</para>
+ <variablelist>
 	<varlistentry>
 	  <term>GTK</term>
 	  <listitem>
@@ -120,7 +98,7 @@ selected.  The default is FFMPEG with SDL sound.
 <para>
     Simple DirectMedia Layer, a simple and portable GUI.
     Its sound facilities are used when --enable-media=ffmpeg|mad
-    regoardless of whether it is also in charge of the GUI.
+    regardless of whether it is also in charge of the GUI.
 </para>
 	  </listitem>
 	</varlistentry>
@@ -156,168 +134,115 @@ selected.  The default is FFMPEG with SDL sound.
 	  </listitem>
 	</varlistentry>
       </variablelist>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-i810-lod-bias</term>
-    <listitem>
-      <para>
-        Enable fix for Intel 810 LOD bias problem. Older versions
+</entry>
+</row>
+<row>
+  <entry><option>--enable-i810-lod-bias</option>
+</entry>
+  <entry>Enable fix for Intel 810 LOD bias problem. Older versions
         of libMesa on the Intel i810 or i815 graphics processor
         need this flag or Gnash will core dump. This has been
-        fixed in newer versions (summer 2005) of libMesa.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--disable-klash</term>
-    <listitem>
-      <para>
-        Disable support for Konqueror plugin. If
-        <emphasis>--disable-plugin</emphasis> is not specified
+        fixed in newer versions (summer 2005) of libMesa.</entry>
+</row>
+<row>
+  <entry><option>--disable-klash</option></entry>
+  <entry>Disable support for Konqueror plugin. If
+        <option>--disable-plugin</option> is not specified
         and support for building KDE programs is found, Klash is
         built by default. This option limits the plugin to only
-        the Mozilla/Firefox one.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-libsuffix</term>
-    <listitem>
-      <para>
-        /lib directory suffix (64,32,none=default). This is only
-        used by Klash.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-mac</term>
-    <listitem>
-      <para>
-        Link to Qt/Mac (don't use X). This is only used by
-        Klash. 
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-media=ffmpeg|mad|gst</term>
-    <listitem>
-      <para>
+        the Mozilla/Firefox one.</entry>
+</row>
+<row>
+  <entry><option>--enable-libsuffix</option>
+</entry>
+  <entry><filename>/lib</filename> directory suffix (64,32,none=default). This is only
+        used by Klash.</entry>
+</row>
+<row>
+  <entry><option>--enable-mac</option>
+</entry>
+  <entry>Link to Qt/Mac (don't use X). This is only used by
+        Klash.</entry>
+</row>
+<row>
+  <entry><option>--enable-media=ffmpeg|mad|gst</option>
+</entry>
+  <entry>  <para>
         Select the specified media decoder and sound engine.
         FFMPEG and MAD use the SDL sound engine; GST uses its own.
 	MAD only decodes MP3 sounds and uses integer arithmetic while
 	the others also decode video files and use floating point.
-        <emphasis>FFMPEG</emphasis> is the default decoder.
+        <option>FFMPEG</option> is the default decoder.
       </para>
       <para>
         You should only select one media decoder.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--disable-plugin</term>
-    <listitem>
-      <para>
-        Enable building the plugin. By default the
+      </para></entry>
+</row>
+<row>
+  <entry><option>--disable-plugin</option>
+</entry>
+  <entry>Enable building the plugin. By default the
         Mozilla Firefox plugin is built if all the required
-        files are found by configure. Configure
-        <emphasis>--with-plugindir=</emphasis> to specify where the
-        plugin should be installed.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-qtopia</term>
-    <listitem>
-      <para>
-        Link to Qt-embedded, link to the Qtopia
-        Environment. This is only used by Klash.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-renderer=opengl|cairo|agg</term>
-    <listitem>
-      <para>
-        Enable support for the a graphics backend. Currently
-        only <emphasis>opengl</emphasis> and
-        <emphasis>agg</emphasis> work sufficiently. OpenGL is
+        files are found by configure. Specify the 
+        <option>--with-plugindir=</option> option to specify where the
+        plugin should be installed.</entry>
+</row>
+<row>
+  <entry>    <option>--enable-qtopia</option>
+</entry>
+  <entry>  Link to Qt-embedded, link to the Qtopia
+        Environment. This is only used by Klash.</entry>
+</row>
+<row>
+  <entry><option>--enable-renderer=opengl|cairo|agg</option>
+</entry>
+  <entry>Enable support for the a graphics backend. Currently
+        only <option>opengl</option> and
+        <option>agg</option> work sufficiently. OpenGL is
         used when you have hardware accelerated graphics. AGG i
-        used when you don't have hardware accelerated
+        used when you do not have hardware accelerated
         graphics. Typically most desktop machines have OpenGL
-        support, and most embedded systems don't. OpenGl is the
+        support, and most embedded systems do not. OpenGl is the
         default when building Gnash, although the quality of AGG's
-        rendering is currently superior to OpenGL.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-sdk-install</term>
-    <listitem>
-      <para>
-        Enable installing the libraries and headers as an SDK.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--disable-shared</term>
-    <listitem>
-      <para>
-        Enable installing the shared libraries and headers.
+        rendering is currently superior to OpenGL.</entry>
+</row>
+<row>
+  <entry><option>--enable-sdk-install</option>
+</entry>
+  <entry>Enable installing the libraries and headers as an SDK.
+</entry>
+</row>
+<row>
+  <entry><option>--disable-shared</option>
+</entry>
+  <entry>Enable installing the shared libraries and headers.
         Note that the extensions mechanism may not work if shared
-        libraries are disabled.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-strict</term>
-    <listitem>
-      <para>
-        Turn on tons of GCC compiler warnings. By default only
-        <emphasis>-Wall</emphasis> is used with GCC.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-fps-debug</term>
-    <listitem>
-      <para>
-	Enable FPS debugging code. When this feature is compiled in you can use the -f switch of gnash
-	to have FPS printed at regular intervals.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-write</term>
-    <listitem>
-      <para>
-	Makes the Mozilla plugin write the currently playing SWF movie to /tmp.
-      </para>
-    </listitem>
-  </varlistentry>
-
-  <varlistentry>
-    <term>--enable-mit-shm</term>
-    <listitem>
-      <para>
-	Add support for using the MIT-SHM X extensions when available. 
+        libraries are disabled.</entry>
+</row>
+<row>
+  <entry><option>--enable-strict</option>
+</entry>
+  <entry>Turn verbose GCC compiler warnings. By default only
+        <option>-Wall</option> is used with GCC.</entry>
+</row>
+<row>
+  <entry><option>--enable-fps-debug</option>
+</entry>
+  <entry>Enable FPS debugging code. When this feature is compiled in you can use the -f switch of &app;
+	to have FPS printed at regular intervals.</entry>
+</row>
+<row>
+  <entry><option>--enable-write</option></entry>
+  <entry>Makes the Mozilla plugin write the currently playing SWF movie to <filename>/tmp</filename>.
+</entry>
+</row>
+<row>
+  <entry><option>--enable-mit-shm</option>
+</entry>
+  <entry>Add support for using the MIT-SHM X extensions when available. 
 	Currently only available using GTK gui and AGG renderer, and known to be
-	bogus in handling of expose events (http://savannah.gnu.org/bugs/?20301).
-      </para>
-    </listitem>
-  </varlistentry>
-
-</variablelist>
+	bogus in handling of expose events (http://savannah.gnu.org/bugs/?20301).</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
