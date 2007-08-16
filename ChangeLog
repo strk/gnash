@@ -1,3 +1,8 @@
+2007-08-16 Takashi Iwai <tiwai@suse.de>
+
+	* libbase/network.cpp (Network::createServer): fix a bug making
+	  the test for DEFAULTPROTO == "udp" always fail.
+
 2007-08-16 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.{cpp,h}: have a Range2d member to express

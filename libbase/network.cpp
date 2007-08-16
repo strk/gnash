@@ -149,7 +149,7 @@ Network::createServer(short port)
     }
 
     // set protocol type
-    if (DEFAULTPROTO == "udp") {
+    if ( strcmp(DEFAULTPROTO, "udp") == 0) {
         type = SOCK_DGRAM;
     } else {
         type = SOCK_STREAM;
