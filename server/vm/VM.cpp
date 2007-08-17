@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.12 2007/08/01 15:56:54 strk Exp $ */
+/* $Id: VM.cpp,v 1.13 2007/08/17 13:57:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -104,11 +104,16 @@ VM::getSWFVersion() const
 const std::string&
 VM::getPlayerVersion() const
 {
-	// TODO: find a "compatible" representation so that
-	//       player version checkers (javascript or similar)
-	//       will accept Gnash as a working player.
-	//       
-	static const std::string version("Gnash-" VERSION);
+	// Expected Form: UNIX|WIN|WINCE|MAC (major version),(minor version),(revision),0
+	//    Used in _ActionScript_ version detection, not Javascript
+	//    ActionScript detection often looks for the commas, so
+	//    the last ,0 is necessary, even if it doesn't appear
+	//    to mean anything.
+	//    
+	// TODO: use config.h for the default, query RcInit file for an override
+	//
+#define FLASH_VERSION "GSH 8,0,99,0"
+	static const std::string version(FLASH_VERSION);
 	return version;
 }
 

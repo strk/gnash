@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.81 2007/08/08 20:51:39 strk Exp $ */
+/* $Id: plugin.cpp,v 1.82 2007/08/17 13:57:36 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,15 +27,22 @@
 #define PLUGIN_NAME     "Shockwave Flash"
 #define MIME_TYPES_DESCRIPTION  MIME_TYPES_HANDLED":swf:"PLUGIN_NAME
 
+//Some javascript plugin detectors use the description
+//to decide the flash version to display. They expect the
+//form (major version).(minor version) r(revision).
+#define FLASH_VERSION "8.0 r99."
+
 #define PLUGIN_DESCRIPTION \
-  "Shockwave Flash 8.0 - Gnash " VERSION ", the GNU Flash Player. Copyright   \
-  &copy; 2006 <a href=\"http://www.fsf.org\">Free Software Foundation</a>,    \
-  Inc.<br> Gnash comes with NO WARRANTY, to the extent permitted by law.  You \
-  may redistribute copies of Gnash under the terms of the                     \
-  <a href=\"http://www.gnu.org/licenses/gpl.html\">GNU General Public License \
-  </a>. For more information about Gnash, see <a \
+  "Shockwave Flash "FLASH_VERSION" Gnash "VERSION", the GNU Flash Player. \
+  Copyright &copy; 2006 <a href=\"http://www.fsf.org\">Free Software \
+  Foundation</a>, Inc. <br> \
+  Gnash comes with NO WARRANTY, to the extent permitted by law. \
+  You may redistribute copies of Gnash under the terms of the \
+  <a href=\"http://www.gnu.org/licenses/gpl.html\">GNU General Public \
+  License</a>. For more information about Gnash, see <a \
   href=\"http://www.gnu.org/software/gnash/\"> \
-  http://www.gnu.org/software/gnash</a>. Compatible Shockwave Flash 8.0 r99."
+  http://www.gnu.org/software/gnash</a>. \
+  Compatible Shockwave Flash "FLASH_VERSION
 
 #include <sys/param.h>
 #include "plugin.h" //Fixes Warning on redef of MIN/MAX
