@@ -3563,7 +3563,7 @@ sprite_instance::setVariables(VariableMap& vars)
 	{
 		const string& name = it->first;
 		const string& val = it->second;
-		set_member(name, val.c_str());
+		set_member(PROPNAME(name), val.c_str());
 	}
 }
 

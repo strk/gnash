@@ -1,3 +1,11 @@
+2007-08-17 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (setVariables):
+	  Convert variable names to lowercase when needed.
+	* testsuite/misc-ming.all/: Makefile.am, FlashVarsTest.{as,html}:
+	  Test that parameter names are converted to lowercase when target
+	  SWF is < 7.
+
 2007-08-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/vm/VM.cpp (getPlayerVersion): define FLASH_VERSION as

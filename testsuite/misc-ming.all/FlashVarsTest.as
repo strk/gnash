@@ -19,8 +19,8 @@
 // and url querystring.
 //
 // execute the movie by passing:
-//	QueryString="?a=a_in_qstring&q=q_in_qstring"
-//	FlashVars="?a=a_in_fvars&q=q_in_fvars"
+//	QueryString="?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQstr"
+//	FlashVars="?a=a_in_fvars&q=q_in_fvars&MixCaseFvars=mixFvars"
 //
 // QueryString is what appears embedded in the url,
 // FlashVars can be given as an attribute of the <embed> tag
@@ -28,7 +28,8 @@
 //
 // Example:
 //
-// gnash -P "FlashVars=?a=a_in_fvars&v=v_in_fvars" "FlashParamTest.swf?a=a_in_qstring&q=q_in_qstring"
+// gnash -P "FlashVars=?a=a_in_fvars&v=v_in_fvars&MixCaseFvars=mixFvars"  
+//	"FlashParamTest.swf?a=a_in_qstring&q=q_in_qstring&MixCaseQstr=mixQst"
 //
 // See FlashVarsTest.html for a way to test with a plugin
 //
@@ -50,5 +51,19 @@ note("v="+v);
 note("_root.v="+_root.v);
 check(_root.hasOwnProperty('v'));
 check_equals(_root.v, "v_in_fvars");
+
+#if OUTPUT_VERSION < 7
+	// The following tests assume target SWF version is < 7
+	check_equals(_root.mixcaseqstr, "mixQstr");
+	check_equals(_root.mixcasefvars, "mixFvars");
+#else // OUTPUT_VERSION >= 7
+	// This is currently not used, would need a bit of work
+	// in the Makefile.am to be used
+	// (build both v6 and v7 versions of this test)
+	check_equals(typeof(_root.mixcaseqstr), "undefined");
+	check_equals(typeof(_root.mixcasefvars), "undefined");
+	check_equals(_root.MixCaseQstr, "mixQstr");
+	check_equals(_root.MixCaseFvars, "mixFvars");
+#endif // OUTPUT_VERSION >= 7
 
 totals();
