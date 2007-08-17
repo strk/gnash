@@ -1,4 +1,9 @@
-2007-08-13  Alfred M. Szmidt  <ams@gnu.org>
+2007-08-17 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/as_function.cpp: initialize '__proto__' instead of 'constructor'.
+	* testsuite/actionscript.all/Inheritance.as: more passes.
+
+2007-08-17  Alfred M. Szmidt  <ams@gnu.org>
 
 	* configure.ac: State that a <= 2.4 version of AGG is an error.
 

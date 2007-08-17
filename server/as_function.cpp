@@ -124,7 +124,7 @@ void
 as_function::extends(as_function& superclass)
 {
 	_properties = new as_object(superclass.getPrototype());
-	_properties->init_member("constructor", &superclass); 
+	_properties->init_member("__proto__", superclass.getPrototype());
 	if ( VM::get().getSWFVersion() > 5 )
 	{
 		_properties->init_member("__constructor__", &superclass); 

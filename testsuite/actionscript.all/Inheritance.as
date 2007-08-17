@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.34 2007/08/16 09:29:33 zoulunkai Exp $";
+rcsid="$Id: Inheritance.as,v 1.35 2007/08/17 03:21:47 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -264,7 +264,7 @@ check_equals(typeof(DerivedClass1.prototype.__constructor__), 'undefined');
 check_equals(typeof(DerivedClass1.prototype.constructor), 'function');
 check_equals(typeof(DerivedClass1.constructor), 'function');
 #if OUTPUT_VERSION >= 6
-xcheck(DerivedClass1.prototype.hasOwnProperty('__proto__'));
+check(DerivedClass1.prototype.hasOwnProperty('__proto__'));
 check(DerivedClass1.prototype.hasOwnProperty('__constructor__'));
 check(DerivedClass1.prototype.__proto__.hasOwnProperty('var1'));
 
@@ -273,12 +273,12 @@ check(! DerivedClass1.prototype.hasOwnProperty('var3'));
 check_equals(DerivedClass1.var3, undefined);
 check(! DerivedClass1.prototype.hasOwnProperty('toString'));
 check(! DerivedClass1.prototype.hasOwnProperty('valueOf'));
-xcheck(! DerivedClass1.prototype.hasOwnProperty('constructor'));
+check(! DerivedClass1.prototype.hasOwnProperty('constructor'));
 check(DerivedClass1.hasOwnProperty('constructor'));
 #endif
 check_equals(DerivedClass1.constructor, Function);
 check_equals(DerivedClass1.prototype.__proto__.constructor, BaseClass1);
-//check_equals(DerivedClass1.prototype.constructor, BaseClass1);
+check_equals(DerivedClass1.prototype.__proto__, BaseClass1.prototype);
 
 DerivedClass1.prototype.var2 = "var_in_Derived_prototype";
 var obj = new DerivedClass1;
