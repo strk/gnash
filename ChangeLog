@@ -1,3 +1,12 @@
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
+	* libbase/jpeg.cpp (jpeg_error_exit): only print SWF errors if
+	  configured to do so; (input_impl): throw an exception if
+	  jpeg_read_header detected errors.
+	* server/swf/tag_loaders.cpp (jpeg_tables_loader,
+	  define_bits_jpeg_loader): early exception checking to avoid
+	  parser interruption on malformed embedded jpeg.
+
 2007-08-18 Nick Warne <nick@ukfsn.org>
 
 	* plugin/klash/klash_part.cpp: use the -u switch when invoking

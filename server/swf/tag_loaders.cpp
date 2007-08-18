@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.128 2007/08/10 10:24:11 tgc Exp $ */
+/* $Id: tag_loaders.cpp,v 1.129 2007/08/18 05:04:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -476,16 +476,29 @@ set_background_color_loader(stream* in, tag_type tag, movie_definition* m)
 void
 jpeg_tables_loader(stream* in, tag_type tag, movie_definition* m)
 {
+    //GNASH_REPORT_FUNCTION;
     assert(tag == SWF::JPEGTABLES);
 
     IF_VERBOSE_PARSE
     (
-	log_parse(_("  jpeg_tables_loader"));
+        log_parse(_("  jpeg_tables_loader"));
     );
 
-    std::auto_ptr<jpeg::input> j_in(jpeg::input::create_swf_jpeg2_header_only(in->get_underlying_stream()));
-    assert(j_in.get());
+    std::auto_ptr<jpeg::input> j_in;
 
+    try
+    {
+        j_in.reset(jpeg::input::create_swf_jpeg2_header_only(in->get_underlying_stream()));
+    }
+    catch (std::exception& e)
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror("Error creating header-only jpeg2 input: %s", e.what());
+        );
+        return;
+    }
+
+    log_debug("Setting jpeg loader to %p", j_in.get());
     m->set_jpeg_loader(j_in);
 }
 
@@ -504,31 +517,45 @@ define_bits_jpeg_loader(stream* in, tag_type tag, movie_definition* m)
     // Read the image data.
     //
 
-    if (m->get_create_bitmaps() == DO_LOAD_BITMAPS)
+    if (m->get_create_bitmaps() != DO_LOAD_BITMAPS) return;
+
+    jpeg::input*	j_in = m->get_jpeg_loader();
+    if ( ! j_in )
     {
-	//bitmap_info*	bi = NULL;
-	jpeg::input*	j_in = m->get_jpeg_loader();
-	assert(j_in);
-	j_in->discard_partial_buffer();
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("DEFINEBITS: No jpeg loader registered in movie definition - discarding bitmap character %d"), character_id);
+        );
+        return;
+    }
 
-	std::auto_ptr<image::rgb> im ( image::read_swf_jpeg2_with_tables(j_in) );
-	//bi = render::create_bitmap_info_rgb(im);
-	//delete im;
-
-	//assert(im->get_ref_count() == 0);
-
-	bitmap_character_def* ch = new bitmap_character_def(im);
-
-	if ( m->get_bitmap_character_def(character_id) )
-	{
-	    IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("DEFINEBITS: Duplicate id (%d) for bitmap character - discarding it"), character_id);
-	    );
-	}
-	else
-	{
-	    m->add_bitmap_character_def(character_id, ch);
-	}
+    assert(j_in);
+    j_in->discard_partial_buffer();
+    
+    std::auto_ptr<image::rgb> im;
+    try
+    {
+        im.reset ( image::read_swf_jpeg2_with_tables(j_in) );
+    }
+    catch (std::exception& e)
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror("Error reading jpeg2 with headers for character id %d: %s", character_id, e.what());
+        );
+        return;
+    }
+    
+    
+    bitmap_character_def* ch = new bitmap_character_def(im);
+    
+    if ( m->get_bitmap_character_def(character_id) )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("DEFINEBITS: Duplicate id (%d) for bitmap character - discarding it"), character_id);
+        );
+    }
+    else
+    {
+        m->add_bitmap_character_def(character_id, ch);
     }
 }
 

@@ -349,7 +349,28 @@ namespace jpeg
 			setup_rw_source(&m_cinfo, in);
 
 			// Read the encoding tables.
-			jpeg_read_header(&m_cinfo, FALSE);
+			int ret = jpeg_read_header(&m_cinfo, FALSE);
+			switch (ret)
+			{
+				case JPEG_SUSPENDED: // suspended due to lack of data
+					throw gnash::ParserException("lack of data during JPEG header parsing");
+					//log_debug("jpeg_read_header returned JPEG_SUSPENDED");
+					break;
+				case JPEG_HEADER_OK: // Found valid image datastream
+					//gnash::log_debug("unexpected: jpeg_read_header returned JPEG_HEADER_OK [%s:%d]", __FILE__, __LINE__);
+					break;
+				case JPEG_HEADER_TABLES_ONLY: // Found valid table-specs-only datastream
+					//log_debug("jpeg_read_header returned JPEG_HEADER_TABLES_ONLY");
+					break;
+				default:
+					gnash::log_debug("unexpected: jpeg_read_header returned %d [%s:%d]", ret, __FILE__, __LINE__);
+					break;
+			}
+
+			if ( errorOccurred )
+			{
+				throw gnash::ParserException("errors during JPEG header parsing");
+			}
 
 			// Don't start reading any image data!
 			// App does that manually using start_image.
@@ -409,10 +430,10 @@ namespace jpeg
 						//log_debug("jpeg_read_header returned JPEG_HEADER_OK");
 						break;
 					case JPEG_HEADER_TABLES_ONLY: // Found valid table-specs-only datastream
-						//log_debug("jpeg_read_header returned JPEG_HEADER_TABLES_ONLY");
+						//gnash::log_debug("unexpected: jpeg_read_header returned JPEG_HEADER_TABLES_ONLY [%s:%d]", __FILE__, __LINE__);
 						break;
 					default:
-						//log_debug("jpeg_read_header returned %d", ret);
+						gnash::log_debug("unexpected: jpeg_read_header returned %d [%s:%d]", ret, __FILE__, __LINE__);
 						break;
 				}
 			}
@@ -495,7 +516,9 @@ namespace jpeg
 
 	static void	jpeg_error_exit(j_common_ptr cinfo)
 	{
+        IF_VERBOSE_MALFORMED_SWF(
 		gnash::log_swferror("Internal jpeg error: %s", cinfo->err->jpeg_message_table[cinfo->err->msg_code]);
+        );
 
 		// Set a flag to stop parsing 
 		input_impl* impl = static_cast<input_impl*>(cinfo->client_data);
