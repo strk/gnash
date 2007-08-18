@@ -1,5 +1,10 @@
 2007-08-18 Sandro Santilli <strk@keybit.net>
 
+	* macros/firefox.m4: don't substitute GNASHEXE at all, it's not
+	  used anymore.
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
 	* server/text.{cpp,h}: make text_style class store only the font
 	  pointer, w/out the font_id, provide setFont and getFont
 	  methods, the former always performing a lookup.

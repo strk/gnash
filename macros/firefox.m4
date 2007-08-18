@@ -34,13 +34,13 @@ dnl     *)   AC_MSG_ERROR([bad value ${enableval} for disable-plugin option]) ;;
 dnl   esac], plugin=yes)
 
   FIREFOX_PLUGINS=""
-  GNASHEXE=""
   if test x"${nsapi}" = x"yes"; then
 
     AC_ARG_WITH(plugindir, AC_HELP_STRING([--with-plugindir=DIR], [Directory to install Firefox plugin in]),
       [FIREFOX_PLUGINS=$withval]
     )
 
+dnl  GNASHEXE=""
 dnl     dnl Allow setting a path for the Gnash executable to be different from the prefix. This
 dnl     dnl is mostly only used for cross compiling.
 dnl     AC_ARG_WITH(gnashexe, AC_HELP_STRING([--with-gnashexe=DIR], [Directory to where the gnash executable is]),
@@ -54,6 +54,7 @@ dnl       GNASHEXE="\${prefix}/bin"
 dnl     else
 dnl       GNASHEXE=${gnashbindir}
 dnl     fi
+dnl  AC_SUBST(GNASHEXE)
 
     dnl Always install the plugin in the users home directory. We
     dnl always use .mozilla instead of .firefox, as this directoryis
@@ -63,7 +64,6 @@ dnl     fi
     fi
   fi
 
-  AC_SUBST(GNASHEXE)
   AC_SUBST(FIREFOX_PLUGINS)
 
 ])dnl end of GNASH_PATH_FIREFOX
