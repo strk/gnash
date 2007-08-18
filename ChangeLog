@@ -1,5 +1,8 @@
 2007-08-18 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (CommonGetUrl): always check
+	  for URL (security). Give precedence to loadVariable calls
+	  even if target is _level#. Fixes load of uptoten.com.
 	* plugin/plugin.cpp: Use the environmental variable
 	  GNASH_PLUGIN_DESCRIPTION for the plugin description
 	  (when set).

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.119 2007/08/10 14:06:36 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.120 2007/08/18 17:47:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1818,18 +1818,21 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 	const URL& baseurl = get_base_url();
 	URL url(url_s, baseurl);
 
-	log_msg(_("get url: target=%s, url=%s (%s), method=%x"), target_string.c_str(),
-		url.str().c_str(), url_c, method);
+	log_msg(_("get url: target=%s, url=%s (%s), method=%x (sendVars:%X, loadTarget:%d, loadVariable:%d)"), target_string.c_str(),
+		url.str().c_str(), url_c, method, sendVarsMethod, loadTargetFlag, loadVariableFlag);
 
-	if ( target_string.compare(0, 6, "_level") == 0 && target_string.find_first_not_of("0123456789", 7) == string::npos )
+	if ( ! URLAccessManager::allow(url) )
 	{
-		unsigned int levelno = atoi(target_string.c_str()+6);
-		log_debug(_("Testing _level loading (level %u)"), levelno);
-		VM::get().getRoot().loadLevel(levelno, url);
+		return;
 	}
-	else if ( loadTargetFlag )
+
+	character* target_ch = env.find_target(target);
+	sprite_instance* target_movie = target_ch ? target_ch->to_movie() : 0;
+
+	if ( loadVariableFlag )
 	{
-		character* target_ch = env.find_target(target);
+		log_msg(_("getURL2 loadVariable"));
+
 		if ( ! target_ch )
 		{
 			log_error(_("get url: target %s not found"),
@@ -1837,7 +1840,6 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			return;
 		}
 
-		sprite_instance* target_movie = target_ch->to_movie();
 		if ( ! target_movie )
 		{
 			log_error(_("get url: target %s is not a sprite"),
@@ -1845,71 +1847,84 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 			return;
 		}
 
-		if ( loadVariableFlag )
-		{
-			log_msg(_("getURL2 loadVariable"));
+		target_movie->loadVariables(url, sendVarsMethod);
 
-			//log_unimpl("Unhandled GetUrl2 loadVariable flag. loadTargetFlag=%d, target=%s (%s)", loadTargetFlag, target.typeOf(), target.to_string(&env).c_str());
-			target_movie->loadVariables(url, sendVarsMethod);
-		}
-		else
-		{
-			log_msg(_("getURL2 target load"));
-
-			// Check host security
-			if ( ! URLAccessManager::allow(url) )
-			{
-				return;
-			}
-
-
-			if ( sendVarsMethod )
-			{
-				log_unimpl(_("Unhandled GetUrl2 sendVariableMethod (%d)"
-					" with loadTargetFlag and ! loadVariablesFlag"),
-					sendVarsMethod);
-			}
-
-			target_movie->loadMovie(url);
-		}
+		return;
 	}
-	else
+
+	if ( loadTargetFlag )
 	{
-		if ( ! URLAccessManager::allow(url) )
-		{
-			return;
-		}
+		log_msg(_("getURL2 target load"));
 
 		if ( sendVarsMethod )
 		{
-			log_unimpl (_("Unhandled GetUrl2 sendVariableMethod (%d)"
-				" with no loadTargetFlag"),
+			log_unimpl(_("Unhandled GetUrl2 sendVariableMethod (%d)"
+				" with loadTargetFlag and ! loadVariablesFlag"),
 				sendVarsMethod);
 		}
 
-#ifndef __OS2__x
-		string command = "firefox -remote \"openurl(";
-#else
-static char browserExe[ 255 ] = "";
-
-    if ( browserExe[0] == 0 ) {
-        PrfQueryProfileString( HINI_USER, (PSZ) "WPURLDEFAULTSETTINGS", (PSZ) "DefaultBrowserExe", NULL,
-                               (PVOID) browserExe, (LONG)sizeof(browserExe) );
-    }
-		string command = browserExe;
-		command += " -remote \"openurl(";
-#endif
-		command += url.str();
-#if 0 // target testing
-		if ( ! target_string.empty() )
+		if ( ! target_ch )
 		{
-			command += ", " + target_string;
+			if ( target_string.compare(0, 6, "_level") == 0 && target_string.find_first_not_of("0123456789", 7) == string::npos )
+			{
+				unsigned int levelno = atoi(target_string.c_str()+6);
+				log_debug(_("Testing _level loading (level %u)"), levelno);
+				VM::get().getRoot().loadLevel(levelno, url);
+				return;
+			}
+
+			log_error(_("get url: target %s not found"),
+				target_string.c_str());
+			return;
 		}
-#endif
-		command += ")\"";
-		log_msg (_("Launching URL... %s"), command.c_str());
-		system(command.c_str());
+
+		if ( ! target_movie )
+		{
+			log_error(_("get url: target %s is not a sprite"),
+				target_string.c_str());
+			return;
+		}
+
+		target_movie->loadMovie(url);
+
+		return;
 	}
+
+	if ( sendVarsMethod )
+	{
+		log_unimpl (_("Unhandled GetUrl2 sendVariableMethod (%d)"
+			" with no loadTargetFlag"),
+			sendVarsMethod);
+	}
+
+#ifndef __OS2__x
+	string command = "firefox -remote \"openurl(";
+#else // def __OS2__x
+	static char browserExe[ 255 ] = "";
+
+	if ( browserExe[0] == 0 )
+	{
+		PrfQueryProfileString( HINI_USER, (PSZ) "WPURLDEFAULTSETTINGS",
+			(PSZ) "DefaultBrowserExe", NULL,
+			(PVOID) browserExe, (LONG)sizeof(browserExe) );
+	}
+
+	string command = browserExe;
+	command += " -remote \"openurl(";
+#endif // def __OS2__x
+
+	command += url.str();
+
+#if 0 // target testing TODO: should we enable this by default?
+	if ( ! target_string.empty() )
+	{
+		command += ", " + target_string;
+	}
+#endif
+	command += ")\"";
+	log_msg (_("Launching URL... %s"), command.c_str());
+	system(command.c_str());
+
 }
 
 // Common code for SetTarget and SetTargetExpression. See:
