@@ -10,6 +10,7 @@
 #include "stream.h"
 #include "log.h"
 #include "text_character_def.h"
+#include "swf.h"
 
 namespace gnash {
 
@@ -17,7 +18,7 @@ void text_character_def::read(stream* in, int tag_type,
 		movie_definition* m)
 {
 	assert(m != NULL);
-	assert(tag_type == 11 || tag_type == 33);
+	assert(tag_type == SWF::DEFINETEXT || tag_type == SWF::DEFINETEXT2);
 
 	m_rect.read(in);
 	m_matrix.read(in);
@@ -26,7 +27,7 @@ void text_character_def::read(stream* in, int tag_type,
 	int	advance_bits = in->read_u8();
 
 	IF_VERBOSE_PARSE(
-	log_parse(_("begin text records"));
+	log_parse(_("begin text records for text_character_def %p"), (void*)this);
 	);
 
 	bool	last_record_was_style_change = false;
@@ -34,7 +35,7 @@ void text_character_def::read(stream* in, int tag_type,
 	text_style	style;
 	for (;;)
 	{
-		int	first_byte = in->read_u8();
+		unsigned int first_byte = in->read_u8();
 		
 		if (first_byte == 0)
 		{
@@ -73,13 +74,13 @@ void text_character_def::read(stream* in, int tag_type,
 			}
 			if (has_color)
 			{
-				if (tag_type == 11)
+				if (tag_type == SWF::DEFINETEXT)
 				{
 					style.m_color.read_rgb(in);
 				}
 				else
 				{
-					assert(tag_type == 33);
+					assert(tag_type == SWF::DEFINETEXT2);
 					style.m_color.read_rgba(in);
 				}
 				IF_VERBOSE_PARSE(
@@ -126,20 +127,26 @@ void text_character_def::read(stream* in, int tag_type,
 
 			last_record_was_style_change = false;
 
-			int	glyph_count = first_byte;
+			unsigned int glyph_count = first_byte;
 
-// 					if (! last_record_was_style_change)
-// 					{
-// 						glyph_count &= 0x7F;
-// 					}
-// 					// else { Don't mask the top bit; the first record is allowed to have > 127 glyphs. }
+// 			if (! last_record_was_style_change)
+// 			{
+// 				glyph_count &= 0x7F;
+// 			}
+// 			// else { Don't mask the top bit; the first record is allowed to have > 127 glyphs. }
 
 			m_text_glyph_records.resize(m_text_glyph_records.size() + 1);
-			m_text_glyph_records.back().m_style = style;
-			m_text_glyph_records.back().read(in, glyph_count, glyph_bits, advance_bits);
+			text_glyph_record& grecord = m_text_glyph_records.back();
+			grecord.m_style = style;
+			grecord.read(in, glyph_count, glyph_bits, advance_bits);
 
 			IF_VERBOSE_PARSE(
 			log_parse(_("  glyph_records: count = %d"), glyph_count);
+			for (unsigned int i = 0; i < glyph_count; i++)
+			{
+				text_glyph_record::glyph_entry& ge = grecord.m_glyphs[i];
+				log_parse(_("   glyph%d: index=%d, advance=%g"), i, ge.m_glyph_index, ge.m_glyph_advance);
+			}
 			);
 		}
 	}

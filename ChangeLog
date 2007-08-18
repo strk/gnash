@@ -1,5 +1,10 @@
 2007-08-18 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/text_character_def.cpp: use symbolic names for
+	  tag types, more verbose parsing.
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
 	* libbase/jpeg.cpp (jpeg_error_exit): only print SWF errors if
 	  configured to do so; (input_impl): throw an exception if
 	  jpeg_read_header detected errors.
