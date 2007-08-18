@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.34 2007/08/06 18:28:41 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.35 2007/08/18 16:12:38 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -147,7 +147,8 @@ video_ctor(const fn_call& /* fn */)
 
 	// I'm not sure We can rely on the def and parent values being accepted  as NULL
 	// Not till we add some testing...
-	boost::intrusive_ptr<as_object> obj = new video_stream_instance(NULL, NULL, -1);
+	boost::intrusive_ptr<character> obj = new video_stream_instance(NULL, NULL, -1);
+	obj->setDynamic();
 	return as_value(obj.get()); // will keep alive
 }
 

@@ -1,3 +1,8 @@
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
+	* server/character.h (isDynamic): remove bogus assertion
+	  failing for dynamically-loaded movies.
+
 2007-08-18 Petr Pisar <petr.pisar@atlas.cz>
 
 	* po/cs.po: updated to version of 20070804

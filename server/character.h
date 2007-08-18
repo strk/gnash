@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.87 2007/08/09 12:18:05 zoulunkai Exp $ */
+/* $Id: character.h,v 1.88 2007/08/18 16:12:38 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -714,23 +714,32 @@ public:
 
 	/// Was this character dynamically created ?
 	//
-	/// "Dynamically created" means created trough ActionScript
+	/// "Dynamically created" means created trough ActionScript.
+	///
+	/// NOTE, With current code:
+	///	- Characters created by means of a loadMovie are 
+	///	  NOT set as dynamic (should check if they should)
+	///	- Characters created by attachMovie ARE dynamic
+	///	- Characters created by duplicateMovieClip ARE dynamic
+	///	- Characters created by new Video ARE dynamic
+	///	- Characters created by createTextField ARE dynamic
+	///
 	///
 	bool isDynamic() const {
-		// TODO: return _timelineInfo.get() == NULL
+
 		// WARNING: cannot use _timelinInfo for this, unless 
 		// we'll provide a TimelineInfo object for top level movies
-		// (_level#) too... which would have no use except implementing
+		// (_level#) and dynamically loaded movies too...
+		// which would have no use except implementing
 		// isDynamic(). Note that we have NO automated test for this, but
 		// the "Magical Trevor 2" movie aborts due to a call to getBytesTotal
-		// against the root movie.
-#ifndef NDEBUG
-		if ( ! m_parent || _timelineInfo.get() ) assert(!_dynamicallyCreated);
-		else assert(_dynamicallyCreated);
-#endif
-		// TODO: _parent && !_timelineInfo.get() might work..
-		assert((m_parent && !_timelineInfo.get()) == _dynamicallyCreated);
-		//assert(_timelineInfo.get() ? !_dynamicallyCreated : _dynamicallyCreated);
+		// against the root movie, and bug #19844 show the effect with dynamically
+		// loaded movies.
+
+		// Anyway, any dynamically created character must NOT have a
+		// _timelineInfo object (see setDynamic)
+		assert(_dynamicallyCreated ? (_timelineInfo.get() == 0) : 1 );
+
 		return _dynamicallyCreated;
 	}
 
