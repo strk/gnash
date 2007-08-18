@@ -557,7 +557,7 @@ ensureType (boost::intrusive_ptr<as_object> obj)
 
 	if (!ret) {
 		std::string     target = typeid(T).name(),
-				source = typeid(obj.get()).name();
+				source = typeid(*obj.get()).name();
 #if defined(__GNUC__) && __GNUC__ > 2
 		int status;
 		char* target_unmangled = 

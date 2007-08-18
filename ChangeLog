@@ -1,5 +1,7 @@
 2007-08-18 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.h (ensureType): fix printing of *source* type
+	  name.
 	* macros/firefox.m4: don't substitute GNASHEXE at all, it's not
 	  used anymore.
 
