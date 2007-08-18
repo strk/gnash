@@ -178,9 +178,14 @@ KDE_NO_EXPORT void KlashPart::play ()
     if (m_width > 0 && m_height > 0)
         dim = QString ("-j ") + QString::number (m_width) +
             QString (" -k ") + QString::number (m_height);
+    QString url = m_url.url();
+    QString url_param;
+    if (!url.isEmpty())
+        url_param = QString ("-u ") + KProcess::quote (url);
     QString cmd = procname + QString (" -x ") +
         QString::number (static_cast <KlashView *> (widget ())->embedId()) +
         QChar (' ') + dim +
+        QChar (' ') + url_param +
         QChar (' ') + KProcess::quote (m_src_url);
     kdDebug () << cmd << endl;
     *m_process << cmd;

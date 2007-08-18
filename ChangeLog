@@ -1,3 +1,9 @@
+2007-08-18 Nick Warne <nick@ukfsn.org>
+
+	* plugin/klash/klash_part.cpp: use the -u switch when invoking
+	  the standalone gnash. Fixes youtube playback for konqueror.
+	  Still missing -U and -P switches.
+
 2007-08-18 Sandro Santilli <strk@keybit.net>
 
 	* macros/firefox.m4: drop --with-gnashexe and GNASHEXE macro
