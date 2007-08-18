@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.99 2007/08/16 10:31:51 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.100 2007/08/18 08:04:59 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1019,7 +1019,7 @@ edit_text_character::format_text()
 	float	scale = m_def->get_font_height() / 1024.0f;	// the EM square is 1024 x 1024
 
 	text_glyph_record	rec;	// one to work on
-	rec.m_style.m_font = _font;
+	rec.m_style.setFont(_font);
 	rec.m_style.m_color = getTextColor(); 
 	rec.m_style.m_x_offset = PADDING_TWIPS + std::max(0, m_def->get_left_margin() + m_def->get_indent());
 	rec.m_style.m_y_offset = PADDING_TWIPS + m_def->get_font_height()
@@ -1092,7 +1092,7 @@ edit_text_character::format_text()
 
 			// Start a new record on the next line.
 			rec.m_glyphs.resize(0);
-			rec.m_style.m_font = _font;
+			rec.m_style.setFont(_font); 
 			rec.m_style.m_color = getTextColor();
 			rec.m_style.m_x_offset = x;
 			rec.m_style.m_y_offset = y;
@@ -1274,7 +1274,7 @@ after_x_advance:
 
 			// Start a new record on the next line.
 			rec.m_glyphs.resize(0);
-			rec.m_style.m_font = _font;
+			rec.m_style.setFont(_font);
 			rec.m_style.m_color = getTextColor();
 			rec.m_style.m_x_offset = x;
 			rec.m_style.m_y_offset = y;

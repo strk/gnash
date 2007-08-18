@@ -66,10 +66,13 @@ void text_character_def::read(stream* in, int tag_type,
 			if (has_font)
 			{
 				uint16_t	font_id = in->read_u16();
-				style.m_font_id = font_id;
-				style.resolve_font(m);
+				if ( ! style.setFont(font_id, *m) )
+				{
+					// setFont would have already printed an swferror on failure
+				}
+
 				IF_VERBOSE_PARSE(
-				log_parse(_("  has_font: font id = %d"), font_id);
+				log_parse(_("  has_font: font id = %d (%p)"), font_id, (void*)style.getFont());
 				);
 			}
 			if (has_color)
@@ -137,7 +140,7 @@ void text_character_def::read(stream* in, int tag_type,
 
 			m_text_glyph_records.resize(m_text_glyph_records.size() + 1);
 			text_glyph_record& grecord = m_text_glyph_records.back();
-			grecord.m_style = style;
+			grecord.m_style = style; // copy current style
 			grecord.read(in, glyph_count, glyph_bits, advance_bits);
 
 			IF_VERBOSE_PARSE(

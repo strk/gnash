@@ -249,7 +249,7 @@ movie_def_impl::~movie_def_impl()
 	//assert(m_jpeg_in.get() == NULL);
 }
 
-bool movie_def_impl::in_import_table(int character_id)
+bool movie_def_impl::in_import_table(int character_id) const
 {
     for (size_t i = 0, n = m_imports.size(); i < n; i++)
         {
@@ -356,7 +356,7 @@ void movie_def_impl::add_font(int font_id, font* f)
     m_fonts.insert(make_pair(font_id, boost::intrusive_ptr<font>(f)));
 }
 
-font* movie_def_impl::get_font(int font_id)
+font* movie_def_impl::get_font(int font_id) const
 {
 #ifndef NDEBUG
     // make sure font_id is resolved
@@ -367,12 +367,10 @@ font* movie_def_impl::get_font(int font_id)
         }
 #endif // not NDEBUG
 
-    FontMap::iterator it = m_fonts.find(font_id);
+    FontMap::const_iterator it = m_fonts.find(font_id);
     if ( it == m_fonts.end() ) return NULL;
     boost::intrusive_ptr<font> f = it->second;
-#ifndef GNASH_USE_GC
     assert(f->get_ref_count() > 1);
-#endif // ndef GNASH_USE_GC
     return f.get();
 }
 

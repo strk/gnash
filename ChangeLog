@@ -1,5 +1,21 @@
 2007-08-18 Sandro Santilli <strk@keybit.net>
 
+	* server/text.{cpp,h}: make text_style class store only the font
+	  pointer, w/out the font_id, provide setFont and getFont
+	  methods, the former always performing a lookup.
+	* server/parser/text_character_def.cpp (read): use
+	  text_style::setFont() to set the font this properly updates
+	  the actual font pointer in the text_format, fixing bug #20812.
+	* server/edit_text_character.cpp: use text_style::setFont() to
+	  set font by pointer.
+	* server/parser/: movie_definition.h, movie_def_impl.{h,cpp},
+	  sprite_definition.h: const-correct get_font() method.
+	* server/parser/movie_def_impl.{h,cpp}: const-corrected
+	  in_import_table(), made private and re-activated assertion
+	  checking temporarly removed during to GC layout changes.
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/text_character_def.cpp: use symbolic names for
 	  tag types, more verbose parsing.
 

@@ -189,7 +189,7 @@ private:
 	}
 
 	/// Delegate call to associated root movie
-	virtual font* get_font(int id)
+	virtual font* get_font(int id) const
 	{
 		return m_movie_def->get_font(id);
 	}

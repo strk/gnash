@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.35 2007/07/24 19:57:10 strk Exp $ */
+/* $Id: text.cpp,v 1.36 2007/08/18 08:04:59 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -45,20 +45,23 @@
 
 namespace gnash {
 
-	void text_style::resolve_font(movie_definition* root_def) const
+	bool text_style::setFont(int id, movie_definition& root_def) 
 	{
+		return resolve_font(id, root_def);
+	}
+
+	bool text_style::resolve_font(int id, const movie_definition& root_def)
+	{
+		assert(id >= 0);
+
+		m_font = root_def.get_font(id);
 		if (m_font == NULL)
 		{
-			assert(m_font_id >= 0);
-
-			m_font = root_def->get_font(m_font_id);
-			if (m_font == NULL)
-			{
-				IF_VERBOSE_MALFORMED_SWF(
-	log_error(_("text style references unknown font (id = %d)"),
-		m_font_id);
-				);
-			}
+			IF_VERBOSE_MALFORMED_SWF(
+			log_error(_("text style references unknown font (id = %d)"),
+				id);
+			);
+			return false;
 		}
 	}
 
@@ -112,7 +115,7 @@ namespace gnash {
 
 			//rec.m_style.resolve_font(root_def);
 
-			const font*	fnt = rec.m_style.m_font;
+			const font*	fnt = rec.m_style.getFont();
 			if (fnt == NULL)
 			{
 #ifdef GNASH_DEBUG_TEXT_RENDERING
@@ -130,6 +133,7 @@ namespace gnash {
 
 #ifdef GNASH_DEBUG_TEXT_RENDERING
 			log_debug("text_screen_height for record %u == %g", i, text_screen_height);
+			log_debug("font for record %u == %p", i, (const void*)rec.m_style.getFont());
 #endif
 
 			int	nominal_glyph_height = fnt->get_texture_glyph_nominal_size();

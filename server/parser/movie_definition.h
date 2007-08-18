@@ -326,7 +326,7 @@ public:
 	///
 	/// @see add_font
 	///
-	virtual font* get_font(int /*id*/)
+	virtual font* get_font(int /*id*/) const
 	{
 		return NULL;
 	}

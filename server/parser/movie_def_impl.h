@@ -321,6 +321,10 @@ private:
 	/// A flag set to true when load cancelation is requested
 	bool _loadingCanceled;
 
+	/// Debug helper; returns true if the given
+	/// character_id is listed in the import table.
+	bool in_import_table(int character_id) const;
+
 public:
 
 	movie_def_impl(create_bitmaps_flag cbf, create_font_shapes_flag cfs);
@@ -425,10 +429,6 @@ public:
 	    m_imports.push_back(import_info(source_url, id, symbol));
 	}
 
-	/// Debug helper; returns true if the given
-	/// character_id is listed in the import table.
-	bool in_import_table(int character_id);
-
 	/// \brief
 	/// Calls back the visitor for each movie that we
 	/// import symbols from.
@@ -453,7 +453,7 @@ public:
 
 	void	add_font(int font_id, font* f);
 
-	font*	get_font(int font_id);
+	font*	get_font(int font_id) const;
 
 	// See dox in movie_definition.h
 	bitmap_character_def*	get_bitmap_character_def(int character_id);

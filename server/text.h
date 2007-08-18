@@ -40,8 +40,6 @@ namespace gnash {
 	class text_style
 	{
 	public:
-		int	m_font_id;
-		mutable const font*	m_font;
 		rgba	m_color;
 		float	m_x_offset;
 		float	m_y_offset;
@@ -51,17 +49,67 @@ namespace gnash {
 
 		text_style()
 			:
-			m_font_id(-1),
-			m_font(NULL),
 			m_x_offset(0),
 			m_y_offset(0),
 			m_text_height(1.0f),
 			m_has_x_offset(false),
-			m_has_y_offset(false)
+			m_has_y_offset(false),
+			m_font(NULL)
 		{
 		}
 
-		void	resolve_font(movie_definition* root_def) const;
+		/// Set font by id and movie_definition
+		//
+		/// This method will perform a lookup from the movie_definition
+		/// and appropriately set the m_font member.
+		///
+		/// @param id
+		///	The font id.
+		///
+		/// @param root_def
+		///	The movie_definition used for looking up font by id
+		///
+		/// @return true on success, false on error (unknown font id)
+		///
+		bool setFont(int id, movie_definition& def);
+
+		/// Set font by font pointer.
+		//
+		/// @param fnt
+		///	The font pointer.
+		///	Must not be NULL or an assertion will fail.
+		///
+		bool setFont(const font* fnt)
+		{
+			assert(fnt);
+			m_font = fnt;
+		}
+
+		/// Return the associated font (possibly NULL).
+		//
+		/// @return 
+		///	The font associated with this style. 
+		///	NOTE: it may be NULL if a font set by id/movie_definition
+		///	      could not be resolved.
+		///
+		const font* getFont() const
+		{
+			return m_font;
+		}
+
+	private:
+
+		const font* m_font;
+
+		/// Set m_font based on m_font_id.
+		//
+		/// @param root_def
+		///	The movie_definition used for looking up font by id
+		///
+		/// @return true on success, false on error
+		///	(unknown font id, would print an swferror about it)
+		///
+		bool	resolve_font(int id, const movie_definition& root_def);
 	};
 
 
