@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.129 2007/08/18 05:04:00 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.130 2007/08/18 22:07:17 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -721,7 +721,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
     // tags 20 || 36
     assert(tag == SWF::DEFINELOSSLESS || tag == SWF::DEFINELOSSLESS2);
 
-    in->ensureBytes(16+16+16+8); // the initial header 
+    in->ensureBytes(2+2+2+1); // the initial header 
 
     uint16_t	character_id = in->read_u16();
     uint8_t	bitmap_format = in->read_u8();	// 3 == 8 bit, 4 == 16 bit, 5 == 32 bit

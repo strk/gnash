@@ -1,5 +1,7 @@
 2007-08-18 Sandro Santilli <strk@keybit.net>
 
+	* server/swf/tag_loaders.cpp (define_bits_lossless_2_loader):
+	  ensure bytes, not bits!
 	* server/vm/ASHandlers.cpp (CommonGetUrl): always check
 	  for URL (security). Give precedence to loadVariable calls
 	  even if target is _level#. Fixes load of uptoten.com.
