@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.63 2007/08/03 04:27:39 strk Exp $
+# $Id: Makefile.am,v 1.64 2007/08/18 02:54:22 strk Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -31,7 +31,7 @@ plugindir   = $(FIREFOX_PLUGINS)
 # XP_UNIX	This needs to get defined for npapi.h on unix platforms.
 # PLUGIN_TRACE	Enable this define to get debug prints whenever the plugin
 #		api gets control.
-AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"$(GNASHEXE)\" \
+AM_CPPFLAGS = -DPLUGIN_TRACE -DXP_UNIX -DMOZ_X11 -DGNASHBINDIR=\"${bindir}\" \
         -I.. \
         -I$(srcdir) \
         -I$(top_srcdir)/server \

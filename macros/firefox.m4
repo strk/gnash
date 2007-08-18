@@ -41,19 +41,20 @@ dnl   esac], plugin=yes)
       [FIREFOX_PLUGINS=$withval]
     )
 
-    dnl Allow setting a path for the Gnash executable to be different from the prefix. This
-    dnl is mostly only used for cross compiling.
-    AC_ARG_WITH(gnashexe, AC_HELP_STRING([--with-gnashexe=DIR], [Directory to where the gnash executable is]),
-      [gnashbindir=$withval]
-    )
+dnl     dnl Allow setting a path for the Gnash executable to be different from the prefix. This
+dnl     dnl is mostly only used for cross compiling.
+dnl     AC_ARG_WITH(gnashexe, AC_HELP_STRING([--with-gnashexe=DIR], [Directory to where the gnash executable is]),
+dnl       [gnashbindir=$withval]
+dnl     )
+dnl 
+dnl     dnl default to the prefix if no path is specified. As $prefix isn't set at this time by
+dnl     dnl configure, we set this to the variable itself so it gets resolved at make time.
+dnl     if test x"${gnashbindir}" = "x" ; then
+dnl       GNASHEXE="\${prefix}/bin"
+dnl     else
+dnl       GNASHEXE=${gnashbindir}
+dnl     fi
 
-    dnl default to the prefix if no path is specified. As $prefix isn't set at this time by
-    dnl configure, we set this to the variable itself so it gets resolved at make time.
-    if test x"${gnashbindir}" = "x" ; then
-      GNASHEXE="\${prefix}/bin"
-    else
-      GNASHEXE=${gnashbindir}
-    fi
     dnl Always install the plugin in the users home directory. We
     dnl always use .mozilla instead of .firefox, as this directoryis
     dnl used by all mozilla derived browsers.

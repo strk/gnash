@@ -1,3 +1,9 @@
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
+	* macros/firefox.m4: drop --with-gnashexe and GNASHEXE macro
+	* plugin/Makefile.am: define GNASHBINDIR based on ${bindir}
+	* plugin/klash/Makefile.am: define GNASHBINDIR based on ${bindir}
+
 2007-08-17 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (setVariables):
