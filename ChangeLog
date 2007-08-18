@@ -12,7 +12,7 @@
 	  define_bits_jpeg_loader): early exception checking to avoid
 	  parser interruption on malformed embedded jpeg.
 
-2007-08-18 Nick Warne <nick@ukfsn.org>
+2007-08-18 Felix Eckhofer <tribut>
 
 	* plugin/klash/klash_part.cpp: use the -u switch when invoking
 	  the standalone gnash. Fixes youtube playback for konqueror.
