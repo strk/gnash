@@ -63,6 +63,7 @@ class DSOEXPORT GtkGui : public Gui
     bool createMenuBar();
     void createFileMenu(GtkWidget *obj);
     void createEditMenu(GtkWidget *obj);
+    void createViewMenu(GtkWidget *obj);
     void createHelpMenu(GtkWidget *obj);
     void createControlMenu(GtkWidget *obj);
 
@@ -93,6 +94,10 @@ class DSOEXPORT GtkGui : public Gui
     static void menuitem_openfile_callback(GtkMenuItem *menuitem,
                                            gpointer instance);
     static void menuitem_preferences_callback(GtkMenuItem *menuitem,
+                                              gpointer instance);
+
+    /// Show info about the movie currently being played
+    static void menuitem_movieinfo_callback(GtkMenuItem *menuitem,
                                               gpointer instance);
  
     // GTK Event handlers

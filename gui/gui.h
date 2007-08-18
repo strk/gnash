@@ -245,6 +245,16 @@ public:
     }
 #endif // def GNASH_FPS_DEBUG
 
+    // TODO: use a tree-like structure (tree.hh?)
+    typedef std::pair<std::string,std::string> StringPair;
+    typedef std::vector<StringPair> InfoTable;
+
+    /// \brief
+    /// Return a table containing informations about the movie
+    /// currently being played (or NULL, if the VM isn't initialized yet)
+    ///
+    std::auto_ptr<InfoTable> getMovieInfo() const;
+
 protected:
 
     /// Default constructor. Initialises members to safe defaults.

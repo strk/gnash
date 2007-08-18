@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.102 2007/08/01 13:16:39 udog Exp $ */
+/* $Id: gtk.cpp,v 1.103 2007/08/18 13:08:15 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,6 +31,7 @@
 #include "sound_handler.h"
 #include "gnash.h" // for get_sound_handler
 #include "render_handler.h"
+#include "VM.h"
 
 #include <iostream>
 #include <X11/keysym.h>
@@ -162,6 +163,7 @@ GtkGui::createMenuBar()
 
     createFileMenu(_menubar);
     createEditMenu(_menubar);
+    createViewMenu(_menubar);
     createControlMenu(_menubar);
     createHelpMenu(_menubar);
     
@@ -391,6 +393,7 @@ GtkGui::createMenu()
 #ifdef USE_MENUS
     createFileMenu(GTK_WIDGET(_popup_menu));
     createEditMenu(GTK_WIDGET(_popup_menu));
+    createViewMenu(GTK_WIDGET(_popup_menu));
     createControlMenu(GTK_WIDGET(_popup_menu));
 #endif
     createHelpMenu(GTK_WIDGET(_popup_menu));
@@ -939,6 +942,71 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
                    NULL);
 }
 
+void
+GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
+{
+//    GNASH_REPORT_FUNCTION;
+
+    Gui* gui = static_cast<Gui*>(data);
+    assert(gui);
+
+    GtkWidget* label;
+
+    GtkWidget* window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title (GTK_WINDOW (window), _("Movie info"));
+    gtk_widget_show (window);
+
+    std::auto_ptr<InfoTable> infoptr = gui->getMovieInfo();
+    if ( ! infoptr.get() )
+    {
+            label = gtk_label_new (_("VM not initialized yet"));
+            gtk_widget_show (label);
+            gtk_table_attach_defaults (GTK_TABLE (window), label, 0, 1, 0, 1);
+            return;
+    }
+
+    InfoTable& info = *infoptr;
+    
+#if 1
+    size_t size = info.size();
+    GtkWidget* table1 = gtk_table_new (size, 2, TRUE);
+    gtk_widget_show (table1);
+    gtk_container_add (GTK_CONTAINER (window), table1);
+
+    for (InfoTable::reverse_iterator i=info.rbegin(), e=info.rend(); i!=e; ++i)
+    {
+        StringPair& p = *i;
+        guint up = size;
+        guint bot = size-1;
+
+        label = gtk_label_new (p.first.c_str());
+        gtk_widget_show (label);
+        gtk_table_attach_defaults (GTK_TABLE (table1), label, 0, 1, bot, up);
+
+        label = gtk_label_new (p.second.c_str());
+        gtk_widget_show (label);
+        gtk_table_attach_defaults (GTK_TABLE (table1), label, 1, 2, bot, up);
+
+        --size;
+    }
+#else
+    GtkWidget* box = gtk_vbox_new (FALSE, 2);
+    gtk_widget_show (box);
+    gtk_container_add (GTK_CONTAINER (window), box);
+
+    for (InfoTable::reverse_iterator i=info.rbegin(), e=info.rend(); i!=e; ++i)
+    {
+        StringPair& p = *i;
+
+        string text = p.first + string(" = ") + p.second;
+        label = gtk_label_new (text.c_str());
+        gtk_widget_show (label);
+        gtk_box_pack_start (GTK_BOX (box), label, TRUE, FALSE, 3);
+    }
+#endif
+    
+}
+
 
 // This pops up the menu when the right mouse button is clicked
 gint
@@ -1402,6 +1470,27 @@ GtkGui::createHelpMenu(GtkWidget *obj)
     
     g_signal_connect ((gpointer) about, "activate",
                       G_CALLBACK (&menuitem_about_callback),
+                      this);
+}
+
+// Create a View menu that can be used from the menu bar or the popup.
+void
+GtkGui::createViewMenu(GtkWidget *obj)
+{
+//    GNASH_REPORT_FUNCTION;
+    GtkWidget *menuitem = gtk_menu_item_new_with_label (_("View"));
+    gtk_widget_show (menuitem);
+    gtk_container_add (GTK_CONTAINER (obj), menuitem);
+    
+    GtkWidget *menu = gtk_menu_new ();
+    gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
+
+    GtkMenuItem *menuitem_movieinfo = 
+ 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Movie info")));
+    gtk_menu_append(menu, GTK_WIDGET(menuitem_movieinfo));
+    gtk_widget_show(GTK_WIDGET(menuitem_movieinfo));
+    g_signal_connect ((gpointer) menuitem_movieinfo, "activate",
+                      G_CALLBACK (&menuitem_movieinfo_callback),
                       this);
 }
 

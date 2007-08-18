@@ -571,6 +571,38 @@ Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 	setInvalidatedRegion(bounds);
 }
 
+std::auto_ptr<Gui::InfoTable>
+Gui::getMovieInfo() const
+{
+    std::auto_ptr<InfoTable> ret;
+
+    if ( ! VM::isInitialized() )
+    {
+        return ret;
+    }
+
+    ret.reset(new InfoTable());
+
+    VM& vm = VM::get();
+
+    // Print VM version
+    int vmSWFVersion = vm.getSWFVersion();
+    char buf[16];
+    snprintf(buf, 16, "SWF%d", vmSWFVersion); buf[15] = '\0';
+    ret->push_back(StringPair("VM", buf));
+
+    // Print info about levels (only level0 for now, then will be extended)
+    movie_root& stage = vm.getRoot();
+    boost::intrusive_ptr<movie_instance> level0 = stage.getLevel(0);
+    movie_definition* def0 = level0->get_movie_definition();
+    assert(def0);
+    snprintf(buf, 16, "SWF%d", def0->get_version()); buf[15] = '\0';
+    ret->push_back(StringPair("_level0 SWFVersion", string(buf)));
+    ret->push_back(StringPair("_level0 URL", def0->get_url()));
+
+    return ret;
+}
+
 #ifdef GNASH_FPS_DEBUG
 void 
 Gui::fpsCounterTick()
