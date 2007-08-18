@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.400 2007/08/16 23:26:02 strk Exp $
+dnl $Id: configure.ac,v 1.401 2007/08/18 12:24:40 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -25,6 +25,13 @@ AM_CONFIG_HEADER(config.h)
 dnl AC_CANONICAL_TARGET
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
+
+dnl Set the default values for Flash Version. These are converted into
+dnl various strings to make JavaScript or ActionScript detectors
+dnl recognize Gnash as a Flash Player.
+AC_DEFINE([DEFAULT_FLASH_MAJOR_VERSION], ["8"], [Default Flash major version])
+AC_DEFINE([DEFAULT_FLASH_MINOR_VERSION], ["0"], [Default Flash minor version])
+AC_DEFINE([DEFAULT_FLASH_REV_NUMBER], ["99"], [Default Flash revision number])
 
 dnl Some things you can only do by looking at the platform name.
 case "${host}" in

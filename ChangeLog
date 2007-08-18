@@ -1,3 +1,12 @@
+2007-08-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* configure.ac: define flash player version macros
+	  for compatibility detectors.
+	* plugin/plugin.cpp: build the flash player version
+	  using provided macros.
+	* server/vm/VM.cpp: buil flash player version using
+	  provided macros.
+
 2007-08-18 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.h (ensureType): fix printing of *source* type

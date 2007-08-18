@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.13 2007/08/17 13:57:36 strk Exp $ */
+/* $Id: VM.cpp,v 1.14 2007/08/18 12:24:41 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -110,9 +110,11 @@ VM::getPlayerVersion() const
 	//    the last ,0 is necessary, even if it doesn't appear
 	//    to mean anything.
 	//    
-	// TODO: use config.h for the default, query RcInit file for an override
+	// TODO: query RcInit file for an override
 	//
-#define FLASH_VERSION "GSH 8,0,99,0"
+#define FLASH_VERSION "GSH "DEFAULT_FLASH_MAJOR_VERSION","\
+        DEFAULT_FLASH_MINOR_VERSION","DEFAULT_FLASH_REV_NUMBER",0"
+
 	static const std::string version(FLASH_VERSION);
 	return version;
 }

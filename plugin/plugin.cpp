@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.82 2007/08/17 13:57:36 strk Exp $ */
+/* $Id: plugin.cpp,v 1.83 2007/08/18 12:24:40 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -30,7 +30,9 @@
 //Some javascript plugin detectors use the description
 //to decide the flash version to display. They expect the
 //form (major version).(minor version) r(revision).
-#define FLASH_VERSION "8.0 r99."
+//e.g. "8.0 r99."
+#define FLASH_VERSION DEFAULT_FLASH_MAJOR_VERSION"."\
+	DEFAULT_FLASH_MINOR_VERSION" r"DEFAULT_FLASH_REV_NUMBER"."
 
 #define PLUGIN_DESCRIPTION \
   "Shockwave Flash "FLASH_VERSION" Gnash "VERSION", the GNU Flash Player. \
@@ -58,6 +60,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+
 
 // Mozilla SDK headers
 #include "prinit.h"
