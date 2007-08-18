@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: plugin.cpp,v 1.83 2007/08/18 12:24:40 strk Exp $ */
+/* $Id: plugin.cpp,v 1.84 2007/08/18 16:48:43 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -77,6 +77,8 @@ extern NPNetscapeFuncs NPNFuncs;
 NPBool      plugInitialized = FALSE;
 
 static bool  waitforgdb = false;
+
+static const char* getPluginDescription();
 
 void
 PR_CALLBACK Destructor(void * /* data */)
@@ -192,7 +194,7 @@ NS_PluginGetValue(NPPVariable aVariable, void *aValue)
       // This becomes the description field you see below the opening
       // text when you type about:plugins
       case NPPVpluginDescriptionString:
-          *static_cast<char **>(aValue) = PLUGIN_DESCRIPTION;
+          *static_cast<const char **>(aValue) = getPluginDescription();
           break;
 
       case NPPVpluginNeedsXEmbed:
@@ -691,6 +693,17 @@ nsPluginInstance::getCurrentPageURL() const
         const NPString& propValue = NPVARIANT_TO_STRING(vProp);
 
         return propValue.utf8characters; // const char *
+}
+
+static const char* getPluginDescription() 
+{
+	static const char* desc = NULL;
+	if ( ! desc )
+	{
+    		desc = getenv("GNASH_PLUGIN_DESCRIPTION");
+		if ( ! desc ) desc = PLUGIN_DESCRIPTION;
+	}
+	return desc;
 }
 
 // Local Variables:

@@ -1,5 +1,11 @@
 2007-08-18 Sandro Santilli <strk@keybit.net>
 
+	* plugin/plugin.cpp: Use the environmental variable
+	  GNASH_PLUGIN_DESCRIPTION for the plugin description
+	  (when set).
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
 	* server/video_stream_instance.cpp: mark characters created
 	  using new Video as dynamic.
 	* server/character.h (isDynamic): remove bogus assertion
