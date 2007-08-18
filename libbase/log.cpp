@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.54 2007/07/01 10:54:09 bjacques Exp $ */
+/* $Id: log.cpp,v 1.55 2007/08/18 13:45:20 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -265,7 +265,7 @@ log_unimpl(const char* fmt, ...)
     vsnprintf (tmp, BUFFER_SIZE-1, fmt, ap);
     tmp[BUFFER_SIZE-1] = '\0';
 
-    dbglogfile.log(_("ERROR: Unimplemented"), tmp);
+    dbglogfile.log(_("UNIMPLEMENTED"), tmp);
 
     va_end (ap);
 }

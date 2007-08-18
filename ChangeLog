@@ -1,5 +1,6 @@
 2007-08-18 Sandro Santilli <strk@keybit.net>
 
+	* libbase/log.cpp: change the log_unimpl label to UNIMPLEMENTED.
 	* server/text.cpp (resolve_font): fix missing return.
 	* server/parser/text_character_def.cpp: fix compiler warnings.
 
