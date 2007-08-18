@@ -72,7 +72,7 @@ void text_character_def::read(stream* in, int tag_type,
 				}
 
 				IF_VERBOSE_PARSE(
-				log_parse(_("  has_font: font id = %d (%p)"), font_id, (void*)style.getFont());
+				log_parse(_("  has_font: font id = %d (%p)"), font_id, (const void*)style.getFont());
 				);
 			}
 			if (has_color)

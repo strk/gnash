@@ -1,5 +1,10 @@
 2007-08-18 Sandro Santilli <strk@keybit.net>
 
+	* server/text.cpp (resolve_font): fix missing return.
+	* server/parser/text_character_def.cpp: fix compiler warnings.
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
 	* gui/gui.{cpp,h}: add a getMovieInfo() function as a quick hack
 	  to print movie information.
 	* gui/: gtk.cpp, gtksup.h: add a View->movieInfo menu item.

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.36 2007/08/18 08:04:59 strk Exp $ */
+/* $Id: text.cpp,v 1.37 2007/08/18 13:24:14 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -63,6 +63,8 @@ namespace gnash {
 			);
 			return false;
 		}
+
+		return true;
 	}
 
 	void text_glyph_record::read(stream* in, int glyph_count,
