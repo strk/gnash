@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.4 2007/07/01 10:54:43 bjacques Exp $
+# $Id: Makefile.am,v 1.5 2007/08/19 20:07:42 nihilus Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -27,6 +27,7 @@ AM_LDFLAGS = \
 	$(LIBXML_LIBS) \
 	$(CURL_LIBS) \
 	$(BOOST_LIBS) \
+	$(DEJAGNU_CFLAGS) \
 	$(PTHREAD_LIBS)
 
 AM_CPPFLAGS = -DSRCDIR=\"$(srcdir)\"
@@ -40,6 +41,7 @@ INCLUDES = -I.. \
 	$(DMALLOC_CFLAGS) \
 	$(CURL_CFLAGS) \
 	$(BOOST_CFLAGS) \
+	$(DEJAGNU_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
 # AM_LDFLAGS  = $(OPENGL_LIBNS) $(SDL_LIBS)
