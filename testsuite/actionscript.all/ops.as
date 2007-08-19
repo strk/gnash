@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.16 2007/08/13 08:00:44 zoulunkai Exp $";
+rcsid="$Id: ops.as,v 1.17 2007/08/19 23:34:55 strk Exp $";
 
 #include "check.as"
 
@@ -119,6 +119,12 @@ xcheck(x<y);
 x=String("0.999");
 y=1.0;
 xcheck(x<y);
+
+check(! (NaN < NaN) );
+check(! (undefined < undefined) );
+
+check(! (NaN < undefined) );
+check(! (undefined < NaN) );
 
 //------------------------------------------------
 // Logical AND operator (ACTION_LOGICALAND : 0x10)

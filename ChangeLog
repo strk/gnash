@@ -1,5 +1,7 @@
 2007-08-19 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/ops.as: test that NaN and undefined are
+	  not less one other.
 	* server/vm/ASHandlers.cpp (ActionGetVariables): simplify debugging
 	  output.
 
