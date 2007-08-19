@@ -1,5 +1,10 @@
 2007-08-19 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionGetVariables): simplify debugging
+	  output.
+
+2007-08-19 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (CommonGetUrl): check for _level#
 	  loading even when loadTargetFlag is clear.
 	* server/FreetypeGlyphsProvider.cpp: remove compiler warnings.

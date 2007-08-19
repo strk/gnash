@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.121 2007/08/19 20:28:35 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.122 2007/08/19 22:50:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -973,17 +973,9 @@ SWFHandlers::ActionGetVariable(ActionExec& thread)
 
 	IF_VERBOSE_ACTION
 	(
-	        boost::intrusive_ptr<as_object> obj=top_value.to_object();
-		if (obj == NULL) {
-			log_action(_("-- get var: %s=%s"),
+		log_action(_("-- get var: %s=%s"),
 				var_string.c_str(),
 				top_value.to_debug_string().c_str());
-		} else {
-			log_action(_("-- get var: %s=%s at %p"),
-				var_string.c_str(),
-				top_value.to_string(&env).c_str(),
-				(void*)obj.get());
-		}
 	);
 #ifdef USE_DEBUGGER
 	debugger.matchWatchPoint(var_string, Debugger::READS);
