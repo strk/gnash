@@ -412,7 +412,10 @@ FreetypeGlyphsProvider::getGlyph(uint16_t code, float& advance)
 	{
 		unsigned long gf = m_face->glyph->format;
 		log_unimpl("FT_Load_Char() returned a glyph format != FT_GLYPH_FORMAT_OUTLINE (%c%c%c%c)",
-			(gf>>24)&0xff, (gf>>16)&0xff, (gf>>8)&0xff, gf&0xff);
+			static_cast<char>((gf>>24)&0xff),
+			static_cast<char>((gf>>16)&0xff),
+			static_cast<char>((gf>>8)&0xff),
+			static_cast<char>(gf&0xff));
 		return 0;
 	}
 	//assert(m_face->glyph->format == FT_GLYPH_FORMAT_OUTLINE);
