@@ -134,6 +134,22 @@ The variables in the <filename>.gnashrc</filename> file support three types of a
 	    for the plugin, so you have to explicitly start any movie on a webpage. This option is <emphasis>off</emphasis> by default.
 	  </entry>
 </row>
+<row>
+<entry>flashVersionString</entry>
+<entry>string</entry>
+<entry>Set the string returned by $version and System.capabilities.version.
+       Useful to get around some flash version detection movies.
+       Note that the version advertised by the plugin is NOT affected by this setting,
+       instead you need to set the GNASH_FLASH_VERSION environment variable for
+       the latter (which doesn't affect $version and System.capabilities.version).</entry>
+</row>
+<row>
+<entry>StartStopped</entry>
+<entry>on/off</entry>
+<entry>Set to <emphasis>on</emphasis> to have the GUI start in "stop" mode. This is useful in particular
+	    for the plugin, so you have to explicitly start any movie on a webpage. This option is <emphasis>off</emphasis> by default.
+	  </entry>
+</row>
 </tbody>
 </tgroup>
 </table>

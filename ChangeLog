@@ -1,3 +1,18 @@
+2007-08-19 Sandro Santilli <strk@keybit.net>
+
+	* doc/C/usermanual/usage/gnashrc.xml: document
+	  flashVersionString variable.
+
+2007-08-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.{cpp,h}: Avoid string copies in inspectors;
+	  add getFlashVersionString (support for
+	  "set flashVersionString Bla bla bla" in gnashrc).
+	* server/vm/VM.cpp (getPlayerVersion): Query RcInit for version
+	  string
+	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in:
+	  Add test for 
+
 2007-08-19 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* testsuite/libbase/Makefile.am: Added DEJAGNU_CFLAGS.

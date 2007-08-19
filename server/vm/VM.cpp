@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.14 2007/08/18 12:24:41 strk Exp $ */
+/* $Id: VM.cpp,v 1.15 2007/08/19 20:01:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,9 +28,13 @@
 #include "movie_root.h"
 #include "Global.h"
 #include "tu_timer.h" // for tu_timer::get_ticks()
+#include "rc.h" //for overriding default version string with rcfile
 
 #include <memory>
 
+namespace {
+gnash::RcInitFile& rcfile = gnash::RcInitFile::getDefaultInstance();
+}
 
 namespace gnash {
 
@@ -104,18 +108,8 @@ VM::getSWFVersion() const
 const std::string&
 VM::getPlayerVersion() const
 {
-	// Expected Form: UNIX|WIN|WINCE|MAC (major version),(minor version),(revision),0
-	//    Used in _ActionScript_ version detection, not Javascript
-	//    ActionScript detection often looks for the commas, so
-	//    the last ,0 is necessary, even if it doesn't appear
-	//    to mean anything.
-	//    
-	// TODO: query RcInit file for an override
-	//
-#define FLASH_VERSION "GSH "DEFAULT_FLASH_MAJOR_VERSION","\
-        DEFAULT_FLASH_MINOR_VERSION","DEFAULT_FLASH_REV_NUMBER",0"
-
-	static const std::string version(FLASH_VERSION);
+	//From rcfile
+	static const std::string version(rcfile.getFlashVersionString());
 	return version;
 }
 

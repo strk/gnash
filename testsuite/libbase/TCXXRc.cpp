@@ -158,6 +158,12 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("enableExtensions");
     }
 
+    if (rc.getFlashVersionString() == "GSH 9,0,99,0") {
+        runtest.pass ("getFlashVersionString");
+    } else {
+        runtest.fail ("getFlashVersionString");
+    }
+
     if (rc.startStopped() == 1) {
         runtest.pass ("startStopped");
     } else {
@@ -175,7 +181,7 @@ main (int /*argc*/, char** /*argv*/) {
         }
         runtest.pass ("rc.getWhiteList() has elements");
     } else {
-        runtest.fail ("rc.getWhiteList() doesn't has elements");        
+        runtest.fail ("rc.getWhiteList() doesn't have elements");        
     }
         
     std::vector<std::string> blacklist = rc.getBlackList();
@@ -188,7 +194,7 @@ main (int /*argc*/, char** /*argv*/) {
         }
         runtest.pass ("rc.getBlackList() has elements");
     } else {
-        runtest.fail ("rc.getBlackList() doesn't has elements");        
+        runtest.fail ("rc.getBlackList() doesn't have elements");        
     }
 }
 

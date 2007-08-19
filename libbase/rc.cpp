@@ -53,6 +53,10 @@ RcInitFile::RcInitFile() : _delay(0),
                            _debug(false),
                            _debugger(false),
                            _verbosity(-1),
+                           _flashVersionString("GSH "\
+				DEFAULT_FLASH_MAJOR_VERSION","\
+				DEFAULT_FLASH_MINOR_VERSION","\
+				DEFAULT_FLASH_REV_NUMBER ",0"),
                            _actiondump(false),
                            _parserdump(false),
 			   _verboseASCodingErrors(false),
@@ -60,6 +64,7 @@ RcInitFile::RcInitFile() : _delay(0),
                            _splash_screen(true),
                            _localdomain_only(false),
                            _localhost_only(false),
+                           _log("gnash-dbg.log"),
                            _sound(true),
                            _plugin_sound(true),
 			   _extensionsEnabled(false),
@@ -128,8 +133,8 @@ RcInitFile::extractSetting(bool *var, const char *pattern, std::string &variable
 }
 
 int
-RcInitFile::extractNumber(int *num, const char *pattern, std::string &variable,
-                           std::string &value)
+RcInitFile::extractNumber(int *num, const char *pattern, string &variable,
+                           string &value)
 {      
 //    GNASH_REPORT_FUNCTION;
 //        log_msg ("%s: %s", variable.c_str(), value.c_str());
@@ -176,7 +181,11 @@ RcInitFile::parseFile(const std::string& filespec)
                 continue;
             }
             
-            in >> variable >> value;
+            in >> variable;
+            getline(in, value);
+            string::size_type position = value.find_first_not_of(' ');
+            if(position != string::npos) value.erase(0, position);
+
             //      log_msg ("%s %s %s", action, variable, value);
             
             if (action == "set") {
@@ -196,7 +205,15 @@ RcInitFile::parseFile(const std::string& filespec)
                 
                 extractNumber(&_delay, "delay", variable, value);
                 extractNumber(&_verbosity, "verbosity", variable, value);
-                
+
+                if (variable == "flashVersionString") {
+                    _flashVersionString = value;
+                }
+
+                if (variable == "debuglog") {
+                    _log = value;
+                }
+
                 if (variable == "documentroot") {
                     _wwwroot = value;
                 }
@@ -334,6 +351,9 @@ RcInitFile::dump()
          << ((_extensionsEnabled)?"enabled":"disabled") << endl;
     if (_log.size()) {
         cerr << "\tDebug Log name is: " << _log << endl;
+    }
+    if (_flashVersionString.size()) {
+        cerr << "\tFlash Version String is: " << _flashVersionString << endl;
     }
     
 //     std::vector<std::string> _whitelist;

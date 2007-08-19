@@ -76,7 +76,7 @@ public:
     int verbosityLevel() const { return _verbosity; }
     void verbosityLevel(int value) { _verbosity = value; }
     
-    std::string getDebugLog() const { return _log; }
+    const std::string& getDebugLog() const { return _log; }
     std::string getDocumentRoot() { return _wwwroot; }
     
     bool useDebugger() const { return _debugger; }
@@ -101,9 +101,11 @@ public:
     
     static int extractNumber(int *num, const char *pattern, std::string &variable,
                         std::string &value);
-    
+
     const std::vector<std::string>& getWhiteList() const { return _whitelist; }
     const std::vector<std::string>& getBlackList() const { return _blacklist; }
+
+    const std::string& getFlashVersionString() const { return _flashVersionString; }
 
     int getRetries() const { return _retries; }
     void setRetries(int x) { _retries = x; }
@@ -122,6 +124,7 @@ private:
     bool _debug;                // enable debugging of this class
     bool _debugger;             // enable the Flash movie debugger
     int  _verbosity;
+    std::string  _flashVersionString;   //String to pass as $version in Actionscript
     bool _actiondump;           // enable dumping actionscript classes
     bool _parserdump;           // enable dumping parser data
 

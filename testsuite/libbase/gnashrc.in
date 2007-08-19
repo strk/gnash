@@ -28,6 +28,9 @@ set parserDump off
 # The full path to the debug log
 set debuglog ~/gnash-dbg.log
 
+# Version string to pass to ActionScript
+set flashVersionString GSH 9,0,99,0
+
 # Enable the debugger
 set debugger off
 
