@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.120 2007/08/18 17:47:31 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.121 2007/08/19 20:28:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1731,6 +1731,9 @@ SWFHandlers::ActionBranchAlways(ActionExec& thread)
 //   NOTE: this is affected by the GetUrl bug reported with an excerpt
 //         from Colin Moock book, see below. (won't work, and won't fix)
 //
+// - http://www.uptoten.com
+//   Should load in _level0, with loadTargetFlag set.
+//
 void
 SWFHandlers::CommonGetUrl(as_environment& env,
 		as_value target, // the target window, or _level1..10
@@ -1895,6 +1898,14 @@ SWFHandlers::CommonGetUrl(as_environment& env,
 		log_unimpl (_("Unhandled GetUrl2 sendVariableMethod (%d)"
 			" with no loadTargetFlag"),
 			sendVarsMethod);
+	}
+
+	if ( target_string.compare(0, 6, "_level") == 0 && target_string.find_first_not_of("0123456789", 7) == string::npos )
+	{
+		unsigned int levelno = atoi(target_string.c_str()+6);
+		log_debug(_("Testing _level loading (level %u)"), levelno);
+		VM::get().getRoot().loadLevel(levelno, url);
+		return;
 	}
 
 #ifndef __OS2__x

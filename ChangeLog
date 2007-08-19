@@ -1,5 +1,7 @@
 2007-08-19 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (CommonGetUrl): check for _level#
+	  loading even when loadTargetFlag is clear.
 	* server/FreetypeGlyphsProvider.cpp: remove compiler warnings.
 	* doc/C/usermanual/usage/gnashrc.xml: document
 	  flashVersionString variable.
