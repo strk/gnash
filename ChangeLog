@@ -1,3 +1,7 @@
+2007-08-19 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* testsuite/libbase/Makefile.am: Added DEJAGNU_CFLAGS.
+
 2007-08-18 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp (define_bits_lossless_2_loader):
