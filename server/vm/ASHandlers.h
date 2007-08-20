@@ -49,6 +49,12 @@ typedef enum {
     ARG_FUNCTION2
 } as_arg_t;
 
+typedef enum {
+    ENCGUESS_UNICODE = 0,
+    ENCGUESS_JIS = 1,
+    ENCGUESS_OTHER = 2
+} as_encoding_guess_t;
+
 // @@strk@@ should we move this to .cpp file ? it's only
 // use is within SWFHandlers, anyway...
 typedef void (*action_callback_t)(ActionExec& thread);
@@ -153,6 +159,13 @@ private:
 	///
 	static void CommonSetTarget(as_environment& env, 
 			const std::string& target_name);
+
+        /// Common code for guessing at the encoding of random text, between
+        // Shift-Jis, UTF8, and other. Puts the character count in length,
+        // and the offsets to the characters in offsets, if offsets is not NULL.
+        // If not NULL, offsets should be at least s.length().
+        // offsets are not accurate if the return value is GUESSENC_OTHER
+        static as_encoding_guess_t GuessEncoding(std::string& s, int& length, int *offsets);
 
 	static void ActionEnd(ActionExec& thread);
 	static void ActionNextFrame(ActionExec& thread);

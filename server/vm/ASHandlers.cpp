@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.122 2007/08/19 22:50:16 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.123 2007/08/20 03:25:09 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -55,6 +55,7 @@
 #include <set>
 #include <vector>
 #include <utility> // for std::pair
+#include <locale.h>
 
 using namespace std;
 
@@ -1376,12 +1377,115 @@ SWFHandlers::ActionRandom(ActionExec& thread)
 	env.top(0).set_int(tu_random::next_random() % max);
 }
 
+as_encoding_guess_t
+SWFHandlers::GuessEncoding(std::string &str, int &length, int *offsets)
+{
+    const char *cstr = str.c_str();
+    const char *i = cstr;
+    int width = 0; // The remaining width, not the total.
+    bool is_sought = true;
+    int j;
+    int index = 0;
+
+    length = 0;
+    // First, assume it's UTF8 and try to be wrong.
+    for (index = 0; is_sought && *i != '\0'; ++i, ++index)
+    {
+        j = static_cast<int> (*i);
+
+        if (width)
+        {
+            --width;
+            if ((j & 0xB0) != 0x80)
+                is_sought = false;
+            continue;
+        }
+        ++length;
+        *(offsets + length - 1) = index;
+
+        if ((j & 0xC0) == 0x80)
+            continue; // A 1 byte character.
+        else if ((j & 0xE0) == 0xC0)
+            width = 1;
+        else if ((j & 0xF0) == 0xE0)
+            width = 2;
+        else if ((j & 0xF8) == 0xF0)
+            width = 3;
+        else if (j & 0x80)
+            is_sought = false;
+    }
+    *(offsets + length - 1) = index;
+    if (!width && is_sought) // No width left, so it's almost certainly UTF8.
+        return ENCGUESS_UNICODE;
+
+    is_sought = true;
+    width = 0;
+    length = 0;
+    bool was_odd = true;
+    bool was_even = true;
+    // Now, assume it's SHIFT_JIS and try to be wrong.
+    for (index = 0, i = cstr; is_sought && (*i != '\0'); ++i, ++index)
+    {
+        j = static_cast<int> (*i);
+
+        if (width)
+        {
+            --width;
+            if ((j < 0x40) || ((j < 0x9F) && was_even) ||
+                ((j > 0x9E) && was_odd) || (j == 0x7F))
+            {
+                is_sought = false;
+            }
+            continue;
+        }
+
+        ++length;
+        *(offsets + length - 1) = index;
+
+        if ((j == 0x80) || (j == 0xA0) || (j >= 0xF0))
+        {
+            is_sought = false;
+            break;
+        }
+
+        if (((j >= 0x81) && (j <= 0x9F)) || ((j >= 0xE0) && (j <= 0xEF)))
+        {
+            width = 1;
+            was_odd = j & 0x01;
+            was_even = !was_odd;
+        }
+        
+    }
+    *(offsets + length - 1) = index;
+    if (!width && is_sought) // No width left, so it's probably SHIFT_JIS.
+        return ENCGUESS_JIS;
+
+    // It's something else.
+    length = mbstowcs(NULL, cstr, 0);
+    if (length == -1)
+        length = strlen(cstr);
+    return ENCGUESS_OTHER;
+}
+
 void
-SWFHandlers::ActionMbLength(ActionExec& /*thread*/)
+SWFHandlers::ActionMbLength(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-//    as_environment& env = thread.env;
-    log_unimpl (__PRETTY_FUNCTION__);
+    as_environment& env = thread.env;
+
+    thread.ensureStack(1);
+    string str = env.top(0).to_string(&env);
+
+    if (str.empty())
+    {
+        env.top(0).set_int(0);
+    }
+    else
+    {
+        int length;
+        (void) GuessEncoding(str, length, NULL);
+        env.top(0).set_int(length);
+    }
 }
 
 void
@@ -1423,11 +1527,76 @@ SWFHandlers::ActionGetTimer(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionMbSubString(ActionExec& /*thread*/)
+SWFHandlers::ActionMbSubString(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-//    as_environment& env = thread.env;
-    log_unimpl (__PRETTY_FUNCTION__);
+    as_environment& env = thread.env;
+
+    thread.ensureStack(3);
+
+    int size = env.top(0).to_int(env);
+    int start = env.top(1).to_int(env);
+    as_value& string_val = env.top(2);
+
+    env.drop(2);
+
+    if (string_val.is_undefined() || string_val.is_null())
+    {
+        log_error(_("Undefined or null string passed to ActionMBSubString, "
+            "returning undefined"));
+        env.top(0).set_undefined();
+        return;
+    }
+
+    if (size < 1)
+    {
+        if (size < 0)
+        {
+            IF_VERBOSE_ASCODING_ERRORS(
+            log_aserror(_("Length is less than 1 in ActionMbSubString, "
+                "returning empty string."));
+            );
+        }
+        env.top(0).set_string("");
+        return;
+    }
+
+    string str = string_val.to_string(&env);
+    int length = 0;
+    int offsets[str.length() + 1];
+
+    as_encoding_guess_t encoding = GuessEncoding(str, length, offsets);
+
+    if (start < 1)
+    {
+	IF_VERBOSE_ASCODING_ERRORS(
+    	log_aserror(_("Base is less then 1 in ActionMbSubString, "
+		"setting to 1."));
+	);
+        start = 1;
+    }
+
+    // Adjust the start for our own use.
+    --start;
+
+    if (size + start - 1 > length)
+    {
+        IF_VERBOSE_ASCODING_ERRORS(
+        log_aserror(_("base+size goes beyond input string in ActionMbSubString, "
+            "adjusting size"));
+        );
+        size = length - start;
+    }
+
+    if (encoding == ENCGUESS_OTHER)
+    {
+        env.top(0).set_string(str.substr(start, size));
+    }
+    else
+    {
+        env.top(0).set_string(str.substr(offsets[start], offsets[size] - offsets[start] + 1));
+    }
+    return;
 }
 
 void
@@ -1439,11 +1608,26 @@ SWFHandlers::ActionMbOrd(ActionExec& /*thread*/)
 }
 
 void
-SWFHandlers::ActionMbChr(ActionExec& /*thread*/)
+SWFHandlers::ActionMbChr(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-//    as_environment& env = thread.env;
-    log_unimpl (__PRETTY_FUNCTION__);
+//    The correctness of this depends on the locale being correct,
+//    which it should be far more often than not, by choosing UTF8.
+    as_environment& env = thread.env;
+
+    thread.ensureStack(1);
+
+    wchar_t i = static_cast<wchar_t> (env.top(0).to_int(env));
+    char str[MB_CUR_MAX + 1];
+    memset(str, '\0', MB_CUR_MAX + 1);
+    if (wctomb(str, i) == -1)
+    {
+        env.top(0).set_undefined();
+    }
+    else
+    {
+        env.top(0).set_string(str);
+    }
 }
 
 // also known as WaitForFrame2
