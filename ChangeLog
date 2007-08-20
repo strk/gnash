@@ -1,3 +1,9 @@
+2007-08-21 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-swfc.all/Makefile.am: use an absolute
+	  path for MEDIADIR to make swfc happy; don't do anything
+	  on make check if SWFC is not enabled.
+
 2007-08-21 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/rc.{cpp,h}: Fixes a typo, matches the whole username if

@@ -32,11 +32,13 @@ AUXMOVIES = \
 
 EXTRA_DIST = $(SCTESTS) $(AUXMOVIES) check.sc Dejagnu.sc
 
-#if ENABLE_SWFC
+if ENABLE_SWFC
+
+abs_mediadir = $(shell cd $(srcdir)/../media; pwd)
 
 #SWFC = swfc # this is set by ./configure
 SWFC_FLAGS = 
-SWFC_CPP = cpp -P -I$(srcdir) -DMEDIADIR='$(srcdir)/../media'
+SWFC_CPP = cpp -P -I$(srcdir) -DMEDIADIR='$(abs_mediadir)'
 
 SCTESTS_OUT = $(SCTESTS:.sc=.swf)
 
@@ -83,4 +85,4 @@ site-update: site.exp
 	@echo "# This is a list of the pre-compiled testcases" >> site.exp
 	@echo "set testcases \"$(TEST_CASES)\"" >> site.exp
 
-#endif
+endif # ENABLE_SWFC
