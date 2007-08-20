@@ -1,5 +1,7 @@
 2007-08-21 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp (add_invalidated_bounds): use
+	  instance bounds, not definition ones.
 	* testsuite/misc-swfc.all/Makefile.am: use an absolute
 	  path for MEDIADIR to make swfc happy; don't do anything
 	  on make check if SWFC is not enabled.

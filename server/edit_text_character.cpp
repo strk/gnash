@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.100 2007/08/18 08:04:59 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.101 2007/08/21 00:07:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -526,12 +526,10 @@ edit_text_character::add_invalidated_bounds(InvalidatedRanges& ranges,
     
 	ranges.add(m_old_invalidated_ranges);
 
-	rect bounds;	
+	geometry::Range2d<float> bounds = getBounds();
+	get_world_matrix().transform(bounds);
 
-	bounds.expand_to_transformed_rect(get_world_matrix(),
-    				       m_def->get_bound());
-
-	ranges.add(bounds.getRange());            
+	ranges.add(bounds);            
 }
 
 bool
@@ -953,7 +951,7 @@ edit_text_character::align_line(
 	if (extra_space <= 0.0f)
 	{
 		log_debug(_("TextField text doesn't fit in its boundaries: "
-			    "width %g, margin %d - nothing to align"),
+			    "width %g, margin %g - nothing to align"),
 			    width, right_margin);
 		return 0.0f;
 	}
