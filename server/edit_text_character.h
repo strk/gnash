@@ -225,12 +225,12 @@ private:
 	boost::intrusive_ptr<edit_text_character_def>	m_def;
 
 	/// bounds of dynamic text, as laid out
-	rect	m_text_bounding_box;
+	geometry::Range2d<float> m_text_bounding_box;
 
 	/// Reset our text bounding box to the given point.
 	void	reset_bounding_box(float x, float y)
 	{
-		m_text_bounding_box.enclose_point(x,y);
+		m_text_bounding_box.setTo(x,y);
 	}
 
 	typedef std::vector<text_glyph_record> TextGlyphRecords;

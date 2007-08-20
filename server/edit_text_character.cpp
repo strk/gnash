@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.101 2007/08/21 00:07:22 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.102 2007/08/21 00:33:13 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -526,9 +526,11 @@ edit_text_character::add_invalidated_bounds(InvalidatedRanges& ranges,
     
 	ranges.add(m_old_invalidated_ranges);
 
-	geometry::Range2d<float> bounds = getBounds();
-	get_world_matrix().transform(bounds);
+	matrix wm = get_world_matrix();
 
+	geometry::Range2d<float> bounds = getBounds();
+	bounds.expandTo(m_text_bounding_box); // add text bounds
+	wm.transform(bounds);
 	ranges.add(bounds);            
 }
 
@@ -792,6 +794,11 @@ edit_text_character::set_member(const std::string& name,
 		_bounds.setTo(xmin, ymin, xmin+nw, ymax);
 		assert(_bounds.width() == nw);
 
+		// previously truncated text might get visible now
+		// TODO: if nested masks were implemented we would 
+		// not need to reformat text here
+		format_text();
+
 		return;
 	}
 	case M_HEIGHT: // _height
@@ -826,6 +833,11 @@ edit_text_character::set_member(const std::string& name,
 		_bounds.setTo(xmin, ymin, xmax, ymin+nh);
 
 		assert(_bounds.height() == nh);
+
+		// previously truncated text might get visible now
+		// TODO: if nested masks were implemented we would 
+		// not need to reformat text here
+		format_text();
 
 		return;
 	}
@@ -1068,7 +1080,7 @@ edit_text_character::format_text()
 
 		// Expand the bounding-box to the lower-right corner of each glyph as
 		// we generate it.
-		m_text_bounding_box.expand_to_point(x, y + _font->get_descent() * scale);
+		m_text_bounding_box.expandTo(x, y + _font->get_descent() * scale);
 
 		if (code == 13 || code == 10)
 		{
