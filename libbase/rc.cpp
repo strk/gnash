@@ -22,6 +22,10 @@
 # include "config.h"
 #endif
 
+#ifdef HAVE_PWD_H
+# include <pwd.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -144,6 +148,65 @@ RcInitFile::extractNumber(int *num, const char *pattern, string &variable,
     return *num;
 }
 
+string
+RcInitFile::expandTilde (std::string& unixpath)
+
+{
+string _expanded;
+
+              //Only if path starts with "~"
+             if (unixpath.substr(0,1) == "~") {
+             const char *home = getenv("HOME");
+                     if (unixpath.substr(1,2) == "/") {
+                          // Initial "~" followed by "/"
+                          if (home) {
+                               // if HOME set in env, replace ~ with HOME
+                               _expanded = unixpath.replace(0,1,home);
+                          }
+                          //HOME not set in env: try using pwd
+                          else { 
+                               struct passwd *password = getpwuid(getuid());
+                               const char *pwdhome = password->pw_dir;
+                               if (home) { _expanded = unixpath.replace(0,1,pwdhome); }
+                               //If all that fails, leave path alone
+                               else _expanded = unixpath;
+                          }
+                     }
+
+                     //Initial "~" is not followed by "/"
+                     else {
+                          const char *userhome = NULL;
+                          string::size_type first_slash = unixpath.find_first_of("/");
+                          string user;
+                          if (first_slash != string::npos) {
+                              // everything between initial ~ and / 
+                              user = unixpath.substr(1, first_slash - 1 );
+                          }
+
+                          //find user using pwd    
+                          struct passwd *password = getpwnam(user.c_str());
+                          if (password) {
+                              //User found
+                              userhome = password->pw_dir;
+                          }
+                          if (userhome) {
+                               string foundhome(userhome);
+                               _expanded = unixpath.replace(0,first_slash,foundhome);
+                          }
+                          else {
+                               //User not found and/or pwd doesn't return homedir:
+                               //Leave path alone.
+                               _expanded = unixpath;
+                          }
+                      }
+                 }
+                 //Path doesn't start with ~, leave it alone.
+                 else {
+                      _expanded = unixpath;
+                 }
+     return _expanded;
+}
+
 // Parse the config file and set the variables.
 bool
 RcInitFile::parseFile(const std::string& filespec)
@@ -211,7 +274,14 @@ RcInitFile::parseFile(const std::string& filespec)
                 }
 
                 if (variable == "debuglog") {
-                    _log = value;
+
+#ifdef HAVE_PWD_H
+	             _log = expandTilde (value);
+#else
+//For non-UNIX systems
+                     _log = value;
+#endif
+
                 }
 
                 if (variable == "documentroot") {

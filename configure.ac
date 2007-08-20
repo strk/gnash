@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.401 2007/08/18 12:24:40 strk Exp $
+dnl $Id: configure.ac,v 1.402 2007/08/20 17:48:09 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -773,6 +773,7 @@ esac
 AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)
+AC_CHECK_HEADERS(pwd.h)
 AC_CHECK_LIB(m, sqrt)
 
 dnl don't look for X11 when using a raw framebuffer for the GUI

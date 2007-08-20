@@ -97,7 +97,9 @@ The variables in the <filename>.gnashrc</filename> file support three types of a
 <entry>debuglog</entry>
 <entry>Absolute path</entry>
 <entry>This is the full path and name of debug logfile as
-	    produced by &app;.</entry>
+	produced by &app;. On systems with a UNIX-type shell,
+        a tilde prefix (~) will be expanded as by Posix shell requirements
+        (see http://www.opengroup.org/onlinepubs/009695399/utilities/xcu_chap02.html#tag_02_06_01).</entry>
 </row>
 <row>
 <entry>writelog</entry>

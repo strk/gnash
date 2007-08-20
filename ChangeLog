@@ -1,3 +1,10 @@
+2007-08-20 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* configure.ac: look for the pwd.h header
+	* doc/C/usermanual/usage/gnashrc.xml: add info about tilde expansion.
+	* libbase/rc.{cpp,h}: add support for tilde expansion in debugLog
+	  value.
+
 2007-08-20 Sandro Santilli <strk@keybit.net>
 
 	* libbase/log.{cpp,h}: print an error on stderr of the debug log file
