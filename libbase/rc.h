@@ -102,8 +102,6 @@ public:
     static int extractNumber(int *num, const char *pattern, std::string &variable,
                         std::string &value);
 
-    static std::string expandTilde(std::string& unixpath);
-
     const std::vector<std::string>& getWhiteList() const { return _whitelist; }
     const std::vector<std::string>& getBlackList() const { return _blacklist; }
 
@@ -156,6 +154,9 @@ private:
     bool _extensionsEnabled;	// wheter to scan plugin path for extensions
 
     bool _startStopped;		// whether to start the gui in "stop" mode
+
+    static std::string expandPath(std::string& unixpath);
+
 };
 
 //extern DSOEXPORT RcInitFile rcfile;

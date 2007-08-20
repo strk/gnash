@@ -149,7 +149,7 @@ RcInitFile::extractNumber(int *num, const char *pattern, string &variable,
 }
 
 string
-RcInitFile::expandTilde (std::string& unixpath)
+RcInitFile::expandPath (std::string& unixpath)
 
 {
 string _expanded;
@@ -157,7 +157,7 @@ string _expanded;
               //Only if path starts with "~"
              if (unixpath.substr(0,1) == "~") {
              const char *home = getenv("HOME");
-                     if (unixpath.substr(1,2) == "/") {
+                     if (unixpath.substr(1,1) == "/") {
                           // Initial "~" followed by "/"
                           if (home) {
                                // if HOME set in env, replace ~ with HOME
@@ -181,7 +181,7 @@ string _expanded;
                           if (first_slash != string::npos) {
                               // everything between initial ~ and / 
                               user = unixpath.substr(1, first_slash - 1 );
-                          }
+                          } else user = unixpath.substr(1);
 
                           //find user using pwd    
                           struct passwd *password = getpwnam(user.c_str());
@@ -276,7 +276,7 @@ RcInitFile::parseFile(const std::string& filespec)
                 if (variable == "debuglog") {
 
 #ifdef HAVE_PWD_H
-	             _log = expandTilde (value);
+	             _log = expandPath (value);
 #else
 //For non-UNIX systems
                      _log = value;
