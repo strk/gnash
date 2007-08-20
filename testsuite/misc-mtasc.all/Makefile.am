@@ -24,6 +24,7 @@ ASTESTS = \
 	inheritance.as \
 	function.as \
 	enum.as \
+	exception.as \
 	levels.as \
 	$(NULL)
 

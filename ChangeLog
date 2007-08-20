@@ -1,9 +1,14 @@
-2007-08-19 Sandro Santilli <strk@keybit.net>
+2007-08-20 Asger Ottar Alstrup <asger@area9.dk>
+
+	* testsuite/misc-mtasc.all/: Makefile.am, exception.as:
+	  Test for try/catch (gnash fails).
+
+2007-08-20 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in:
 	  Test 'set debuglog' directive.
 
-2007-08-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+2007-08-20 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* libbase/log.cpp: fix 'set debuglog' directive.
 
