@@ -99,10 +99,30 @@ public:
 
     const char *getEntry(void);
     
+    /// Open the specified file to write logs on disk
+    //
+    /// Locks _ioMutex to prevent race conditions accessing _outstream
+    ///
+    /// @return true on success, false on failure
+    ///
+    bool openLog(const std::string& filespec)
+    {
+        return openLog(filespec.c_str());
+    }
+
+    /// See openLog(const std::string&) 
     bool openLog(const char *filespec);
+
+    /// Remove the log file
+    //
+    /// Does NOT lock _ioMutex (should it?)
+    ///
     bool removeLog(void);
 
-    // locks _ioMutex to prevent race conditions accessing _outstream
+    /// Close the log file
+    //
+    /// Locks _ioMutex to prevent race conditions accessing _outstream
+    ///
     bool closeLog(void);
 
     // accessors for the verbose level

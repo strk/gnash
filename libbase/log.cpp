@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: log.cpp,v 1.56 2007/08/20 10:39:23 strk Exp $ */
+/* $Id: log.cpp,v 1.57 2007/08/20 16:21:04 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -340,10 +340,12 @@ LogFile::log(const char* label, const char* msg)
 }
 
 // Default constructor
-LogFile::LogFile (void): _state(OPEN),
-			 _stamp(true),
-			 _write(true),
-			 _trace(false)
+LogFile::LogFile (void)
+	:
+	_state(CLOSED),
+	_stamp(true),
+	_write(true),
+	_trace(false)
 {
     string loadfile;
 
@@ -374,31 +376,35 @@ LogFile::LogFile (void): _state(OPEN),
 
     // TODO: expand ~ to getenv("HOME") !!
 
-    _outstream.open (loadfile.c_str(), ios::out);
-    _filespec = loadfile;
-    _state = OPEN;
+    openLog(loadfile);
 }
 
-LogFile::LogFile (const char *filespec): _stamp(true), _write(true)
+LogFile::LogFile (const char *filespec)
+	:
+	_state(CLOSED),
+	_stamp(true),
+	_write(true)
 {
-    if (_state == OPEN) {
-	_outstream.close ();
-    }
-
-    _filespec = filespec;
-    _outstream.open (filespec, ios::out);
-    _state = OPEN;
+    openLog(filespec);
 }
 
-/// \brief open the log file
 bool
 LogFile::openLog (const char *filespec)
 {
+    boost::mutex::scoped_lock lock(_ioMutex);
     if (_state == OPEN) {
 	_outstream.close ();
+	_state = CLOSED;
     }
 
     _outstream.open (filespec, ios::out);
+    if( ! _outstream ) {
+	// Can't use log_error here...
+        std::cerr << "ERROR: can't open debug log file " << filespec << " for writing." << std::endl;
+        return false;
+    }       
+
+    _filespec = filespec;
     _state = OPEN;
 
   // LogFile::outstream << "Opened " << filespec << endl;
@@ -406,7 +412,6 @@ LogFile::openLog (const char *filespec)
   return true;
 }
 
-/// \brief close the log file
 bool
 LogFile::closeLog (void)
 {
@@ -420,7 +425,6 @@ LogFile::closeLog (void)
     return true;
 }
 
-/// \brief remove the log file
 bool
 LogFile::removeLog (void)
 {

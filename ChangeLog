@@ -1,5 +1,10 @@
 2007-08-20 Sandro Santilli <strk@keybit.net>
 
+	* libbase/log.{cpp,h}: print an error on stderr of the debug log file
+	  can not be opened for writing. Minor cleanups (including dox).
+
+2007-08-20 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ExecutableCode.h (FunctionCode::markReachableResources):
 	  Don't mark the function twice, and most importantly don't forget
 	  to mark the target character !!
