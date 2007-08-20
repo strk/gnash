@@ -164,6 +164,12 @@ main (int /*argc*/, char** /*argv*/) {
         runtest.fail ("getFlashVersionString");
     }
 
+    if (rc.getDebugLog() == "/tmp/gnash-dbg.log") {
+        runtest.pass ("getDebugLog");
+    } else {
+        runtest.fail ("getDebugLog");
+    }
+
     if (rc.startStopped() == 1) {
         runtest.pass ("startStopped");
     } else {
