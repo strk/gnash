@@ -1,3 +1,9 @@
+2007-08-20 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ExecutableCode.h (FunctionCode::markReachableResources):
+	  Don't mark the function twice, and most importantly don't forget
+	  to mark the target character !!
+
 2007-08-20 Asger Ottar Alstrup <asger@area9.dk>
 
 	* testsuite/misc-mtasc.all/: Makefile.am, exception.as:

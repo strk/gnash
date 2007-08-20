@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ExecutableCode.h,v 1.7 2007/07/01 10:54:36 bjacques Exp $ */
+/* $Id: ExecutableCode.h,v 1.8 2007/08/20 15:15:29 strk Exp $ */
 
 #ifndef GNASH_EXECUTABLECODE_H
 #define GNASH_EXECUTABLECODE_H
@@ -205,7 +205,7 @@ public:
 	virtual void markReachableResources() const
 	{
 		if ( func ) func->setReachable();
-		if ( func ) func->setReachable();
+		if ( target ) target->setReachable();
 	}
 #endif // GNASU_USE_GC
 
