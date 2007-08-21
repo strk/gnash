@@ -1,3 +1,8 @@
+2007-08-21 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk.cpp: rename View->MovieInfo to View->Properties,
+	  make layout nicer and labels selectable.
+
 2007-08-21 Sandro Santilli <strk@keybit.net>
 
 	* libbase/embedVideoDecoderGst.cpp (createDecoder): don't

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.103 2007/08/18 13:08:15 strk Exp $ */
+/* $Id: gtk.cpp,v 1.104 2007/08/21 23:38:35 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -942,6 +942,12 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
                    NULL);
 }
 
+
+//Movie information / properties dialogue
+//
+//
+//
+
 void
 GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
@@ -952,16 +958,33 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 
     GtkWidget* label;
 
-    GtkWidget* window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title (GTK_WINDOW (window), _("Movie info"));
-    gtk_widget_show (window);
+    GtkWidget* window1 = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title (GTK_WINDOW (window1), _("Movie Properties"));
+
+    GtkWidget *main_vbox = gtk_vbox_new(FALSE, 2);
+    gtk_container_add (GTK_CONTAINER (window1), main_vbox);
+
+    GtkWidget *frame1 = gtk_frame_new("Movie Properties");
+    gtk_box_pack_start (GTK_BOX (main_vbox), frame1, FALSE, FALSE, 0);
+
+    GtkWidget *vbox1 = gtk_vbox_new (FALSE, 3);
+    gtk_container_add (GTK_CONTAINER (frame1), vbox1);
+
+    GtkWidget *vbox2 = gtk_vbox_new (FALSE, 2);
+    gtk_box_pack_start (GTK_BOX (vbox1), vbox2, FALSE, FALSE, 0);
+
+    GtkWidget *label_vbox2 = gtk_label_new("VM Properties");
+    gtk_box_pack_start (GTK_BOX (vbox2), label_vbox2, FALSE, FALSE, 0);
+
+    GtkWidget *table1 = gtk_table_new(4, 2, FALSE);
+    gtk_box_pack_start (GTK_BOX (vbox2), table1, FALSE, FALSE, 0);
 
     std::auto_ptr<InfoTable> infoptr = gui->getMovieInfo();
     if ( ! infoptr.get() )
     {
             label = gtk_label_new (_("VM not initialized yet"));
             gtk_widget_show (label);
-            gtk_table_attach_defaults (GTK_TABLE (window), label, 0, 1, 0, 1);
+            gtk_table_attach_defaults (GTK_TABLE (table1), label, 0, 1, 0, 1);
             return;
     }
 
@@ -969,9 +992,6 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     
 #if 1
     size_t size = info.size();
-    GtkWidget* table1 = gtk_table_new (size, 2, TRUE);
-    gtk_widget_show (table1);
-    gtk_container_add (GTK_CONTAINER (window), table1);
 
     for (InfoTable::reverse_iterator i=info.rbegin(), e=info.rend(); i!=e; ++i)
     {
@@ -979,20 +999,46 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
         guint up = size;
         guint bot = size-1;
 
-        label = gtk_label_new (p.first.c_str());
-        gtk_widget_show (label);
-        gtk_table_attach_defaults (GTK_TABLE (table1), label, 0, 1, bot, up);
+        GtkWidget *label_table11 = gtk_label_new(p.first.c_str());
+        gtk_table_attach (GTK_TABLE (table1), label_table11, 0, 1, bot, up,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+        gtk_misc_set_alignment (GTK_MISC (label_table11), 0.0, 1.0);
+        gtk_widget_show (label_table11);
 
-        label = gtk_label_new (p.second.c_str());
-        gtk_widget_show (label);
-        gtk_table_attach_defaults (GTK_TABLE (table1), label, 1, 2, bot, up);
+        GtkWidget *label_table12 = gtk_label_new(p.second.c_str());
+        gtk_table_attach (GTK_TABLE (table1), label_table12, 1, 2, bot, up,
+                      (GtkAttachOptions) (GTK_FILL),
+                      (GtkAttachOptions) (0), 0, 0);
+        gtk_label_set_selectable (GTK_LABEL (label_table12), TRUE);
+        gtk_widget_show (label_table12);
 
         --size;
     }
+
+     GtkWidget *bbox1 = gtk_hbutton_box_new ();
+     gtk_box_pack_start (
+	GTK_BOX (main_vbox), bbox1, FALSE, FALSE, 0);
+
+     gtk_box_pack_start (
+	GTK_BOX (vbox1), gtk_hseparator_new (), FALSE, FALSE, 0);
+
+     GtkWidget *vbox3 = gtk_vbox_new (FALSE, 3);
+     gtk_box_pack_start (
+	GTK_BOX (vbox1), vbox3, FALSE, FALSE, 0);
+
+
+     GtkWidget *button_ok = gtk_button_new_from_stock (GTK_STOCK_OK);
+     gtk_box_pack_end (GTK_BOX (bbox1), button_ok, FALSE, FALSE, 0);
+     g_signal_connect_swapped (button_ok, "clicked",
+             G_CALLBACK(gtk_widget_destroy), window1);
+
+     gtk_widget_show_all (window1);
+
 #else
     GtkWidget* box = gtk_vbox_new (FALSE, 2);
     gtk_widget_show (box);
-    gtk_container_add (GTK_CONTAINER (window), box);
+    gtk_container_add (GTK_CONTAINER (window1), box);
 
     for (InfoTable::reverse_iterator i=info.rbegin(), e=info.rend(); i!=e; ++i)
     {
@@ -1405,18 +1451,6 @@ GtkGui::createFileMenu(GtkWidget *obj)
     gtk_container_add (GTK_CONTAINER (menu), separatormenuitem1);
     gtk_widget_set_sensitive (separatormenuitem1, FALSE);
 
-    GtkWidget *properties1 =
- 	gtk_image_menu_item_new_from_stock ("gtk-properties", NULL);
-    gtk_widget_show (properties1);
-    gtk_container_add (GTK_CONTAINER (menu), properties1);
-    // Disabled until properties functionality is implemented:
-    gtk_widget_set_sensitive(properties1,FALSE);
- 
-    GtkWidget *separatormenuitem2 = gtk_separator_menu_item_new ();
-    gtk_widget_show (separatormenuitem2);
-    gtk_container_add (GTK_CONTAINER (menu), separatormenuitem2);
-    gtk_widget_set_sensitive (separatormenuitem2, FALSE);
-
     GtkWidget *surt1 = gtk_image_menu_item_new_from_stock ("gtk-quit", NULL);
     gtk_widget_show (surt1);
     gtk_container_add (GTK_CONTAINER (menu), surt1);
@@ -1485,13 +1519,15 @@ GtkGui::createViewMenu(GtkWidget *obj)
     GtkWidget *menu = gtk_menu_new ();
     gtk_menu_item_set_submenu (GTK_MENU_ITEM (menuitem), menu);
 
-    GtkMenuItem *menuitem_movieinfo = 
- 	GTK_MENU_ITEM(gtk_menu_item_new_with_label(_("Movie info")));
-    gtk_menu_append(menu, GTK_WIDGET(menuitem_movieinfo));
-    gtk_widget_show(GTK_WIDGET(menuitem_movieinfo));
-    g_signal_connect ((gpointer) menuitem_movieinfo, "activate",
+    GtkWidget *properties1 =
+ 	gtk_image_menu_item_new_from_stock ("gtk-properties", NULL);
+    gtk_widget_show (properties1);
+    gtk_container_add (GTK_CONTAINER (menu), properties1);
+    // Disabled until properties functionality is implemented:
+    g_signal_connect ((gpointer) properties1, "activate",
                       G_CALLBACK (&menuitem_movieinfo_callback),
                       this);
+
 }
 
 // Create a Help menu that can be used from the menu bar or the popup.
