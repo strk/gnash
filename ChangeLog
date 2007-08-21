@@ -1,4 +1,4 @@
-2007-08-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
+2007-08-21 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_tri.cpp: fix world_to_pixel() so that OpenGL
 	  works again 	
