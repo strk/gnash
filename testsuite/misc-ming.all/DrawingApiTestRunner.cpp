@@ -47,6 +47,7 @@ inscribedRect(int x, int y, int radius)
 	float halfside = ((float)radius * sqrt(2.0f))/2.0f;
 	ret.expandTo(int(round(x-halfside)), int(round(y-halfside)));
 	ret.expandTo(int(round(x+halfside)), int(round(y+halfside)));
+        fprintf(stderr, ".");
 	return ret;
 }
 
