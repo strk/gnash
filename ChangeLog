@@ -13,6 +13,14 @@
 	  there's no slash (following POSIX) and makes expandPath
 	  (not expandTilde) private.
 
+2007-08-20 Chad Musick <chadmusick@msbx.net>
+
+	* server/vm/ASHandlers.h: Add helper function for multi-byte
+	  string handling
+	* server/vm/ASHandlers.cpp: Implement helper function for multi-
+	  byte strings and implement multi-byte versions of strlen,
+	  substr, and chr
+
 2007-08-20 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* configure.ac: look for the pwd.h header
