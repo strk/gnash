@@ -27,6 +27,7 @@
 #include <typeinfo>
 #include <iostream>
 #include <algorithm>
+#include <stack>
 
 namespace gnash {
 
@@ -761,74 +762,55 @@ DisplayList::advance(float delta_time)
 void
 DisplayList::display()
 {
-	//GNASH_REPORT_FUNCTION;
-	
-//		printf(".");
+    //GNASH_REPORT_FUNCTION;
+    std::stack<int> clipDepthStack;
+    
+    for( iterator it = _characters.begin(), endIt = _characters.end();
+                  it != endIt; ++it)
+    {
+        character* ch = it->get();
+        assert(ch);
 
-	bool masked = false;
-	int highest_masked_layer = 0;
-	
-	//log_msg(_("number of objects to be drawn %d"), m_display_object_array.size());
-	
-	for( iterator it = _characters.begin(),
-			endIt = _characters.end();
-		it != endIt; ++it)
-	{
-		DisplayItem& dobj = *it;
+        if (ch->get_visible() == false)
+        {
+            // avoid stale old_invalidated_rect
+            ch->clear_invalidated(); 
+            // Don't display.
+            // TODO: test invisible characters as masks
+            continue;
+        }
+    
+        int depth = ch->get_depth();
+        // Discard useless masks
+        while(!clipDepthStack.empty() && (depth > clipDepthStack.top()))
+        {
+            clipDepthStack.pop();
+            render::disable_mask();
+        }
 
-		//character*	ch = dobj.m_character.get();
-		character*	ch = dobj.get();
+        int clipDepth = ch->get_clip_depth();
+        // Push a new mask to the masks stack
+        if(clipDepth != character::noClipDepthValue)
+        {
+            clipDepthStack.push(clipDepth);
+            render::begin_submit_mask();
+        }
+        
+        ch->display();
+        
+        // Notify the renderer that mask drawing has finished.
+        if (ch->isMask())
+        {
+            render::end_submit_mask();
+        }
+    } //end of for
 
-		assert(ch);
-
-		if (ch->get_visible() == false)
-		{
-			// Don't display.
-			ch->clear_invalidated(); // avoid stale old_invalidated_rect
-			continue;
-		}
-
-		// check whether a previous mask should be disabled
-		if (masked)
-		{
-			if (ch->get_depth() > highest_masked_layer)
-			{
-//					log_msg(_("disabled mask before drawing depth %d"), ch->get_depth());
-				masked = false;
-				// turn off mask
-				render::disable_mask();
-			}
-		}
-
-		// check whether this object should become mask
-		// (see bug #20527 for the "&& !masked" condition)
-		if (ch->isMask() && !masked)
-		{
-			//log_msg(_("begin submit mask"));
-			render::begin_submit_mask();
-		}
-		
-		ch->display();
-
-		// if this object should have become a mask,
-		// inform the renderer that it now has all
-		// information about it
-		if (ch->isMask() && !masked)
-		{
-			//log_msg(_("end submit mask"));
-			render::end_submit_mask();
-			highest_masked_layer = ch->get_clip_depth();
-			masked = true;
-		}
-	}
-	
-	if (masked)
-	{
-		// If a mask masks the scene all the way up to the highest
-		// layer, it will not be disabled at the end of drawing
-		// the display list, so disable it manually.
-		render::disable_mask();
-	}
+    // Discard any remaining masks
+    while(!clipDepthStack.empty())
+    {
+        clipDepthStack.pop();
+        render::disable_mask();
+    }
 }
 
 /*public*/
