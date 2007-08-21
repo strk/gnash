@@ -1,3 +1,9 @@
+2007-08-21 Sandro Santilli <strk@keybit.net>
+
+	* libbase/embedVideoDecoderGst.cpp (createDecoder): don't
+	  abort if outputFormat is NONE (renderer missing).
+	  Fixes bug bug #20852.
+
 2007-08-21 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* configure.ac: look for getpwnam

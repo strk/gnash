@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderGst.cpp,v 1.9 2007/07/23 22:09:49 strk Exp $
+// $Id: embedVideoDecoderGst.cpp,v 1.10 2007/08/21 17:12:42 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -121,9 +121,13 @@ embedVideoDecoderGst::createDecoder(int widthi, int heighti, int deblockingi, bo
 	videocaps = gst_element_factory_make ("capsfilter", NULL);
 	if (outputFormat == YUV) {
 		caps = gst_caps_new_simple ("video/x-raw-yuv", NULL);
-	} else {
-		assert(outputFormat == RGB);
+	} else if ( outputFormat == RGB ) {
 		caps = gst_caps_new_simple ("video/x-raw-rgb", NULL);
+	}
+	else
+	{
+		assert(outputFormat == NONE);
+		return; // nothing to do, right ? TODO: some cleanup ?
 	}
 
 	assert(caps); // ok, this is a silly assertion *now*, but as long as 
