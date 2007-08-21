@@ -39,7 +39,7 @@
 
 /// Define this to make sure each frame is fully rendered from ground up
 /// even if no motion has been detected in the movie.
-//#define FORCE_REDRAW
+//#define FORCE_REDRAW 1
 
 /// Define this to have updated regions enclosed in a red rectangle.
 /// In the future, enabling this might actually use a runtime flag
