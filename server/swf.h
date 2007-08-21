@@ -46,6 +46,7 @@ typedef enum
     DEFINEFONTINFO        = 13,
     DEFINESOUND           = 14,
     STARTSOUND            = 15,
+    STOPSOUND             = 16, // SWF 9
     DEFINEBUTTONSOUND     = 17,
     SOUNDSTREAMHEAD       = 18,
     SOUNDSTREAMBLOCK      = 19,
@@ -74,6 +75,7 @@ typedef enum
     SERIALNUMBER          = 41,
     DEFINETEXTFORMAT	  = 42,
     FRAMELABEL            = 43,
+    DEFINEBEHAVIOR        = 44, // SWF 9
     SOUNDSTREAMHEAD2      = 45,
     DEFINEMORPHSHAPE      = 46,
     FRAMETAG		  = 47,
@@ -82,6 +84,9 @@ typedef enum
     DEFINECOMMANDOBJ	  = 50,
     CHARACTERSET	  = 51,
     FONTREF		  = 52,
+    DEFINEFUNCTION        = 53, // SWF 9
+    PLACEFUNCTION         = 54, // SWF 9
+    GENTAGOBJECT          = 55, // SWF 9
     EXPORTASSETS          = 56,
     IMPORTASSETS          = 57,
 
@@ -97,6 +102,8 @@ typedef enum
     /// DefineFontInfo2 (swf6)
     DEFINEFONTINFO2       = 62,
 
+    DEBUGID               = 63, // SWF 9
+
     /// See http://flasm.sourceforge.net/#protect
     /// See http://sswf.sourceforge.net/SWFalexref.html#tag_protectdebug
     ENABLEDEBUGGER2	  = 64,
@@ -104,6 +111,10 @@ typedef enum
     /// SWF_version  >= 7 
     /// See http://sswf.sourceforge.net/SWFalexref.html#tag_scriptlimits
     SCRIPTLIMITS          = 65, 
+
+    SETTABINDEX           = 66, // SWF 9
+    DEFINESHAPE4_         = 67, // SWF 9
+    DEFINEMORPHSHAPE2_    = 68, // SWF 9
 
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_fileattributes
     FILEATTRIBUTES        = 69,
@@ -113,6 +124,8 @@ typedef enum
 
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_import2
     IMPORTASSETS2         = 71,
+
+    DOABC                 = 72,
 
     /// http://sswf.sourceforge.net/SWFalexref.html#tag_definefontalignzones
     DEFINEALIGNZONES      = 73,

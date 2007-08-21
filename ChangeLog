@@ -1,3 +1,7 @@
+2007-08-22 Chad Musick <chadmusick@msbx.net>
+
+        * server/swf.h: Add new tag values for SWF 9 support.
+
 2007-08-21 Sandro Santilli <strk@keybit.net>
 
 	* server/edit_text_character.cpp (add_invalidated_bounds): use
