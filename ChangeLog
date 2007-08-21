@@ -1,3 +1,9 @@
+2007-08-21 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* configure.ac: look for getpwnam
+	* libbase/rc.cpp (expandPath): don't try to use getpwnam
+	  if not provided by OS.
+
 2007-08-21 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* gui/gui.cpp: Introduce FORCE_REDRAW macro

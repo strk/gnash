@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.402 2007/08/20 17:48:09 strk Exp $
+dnl $Id: configure.ac,v 1.403 2007/08/21 15:18:36 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -775,6 +775,7 @@ AC_CHECK_HEADERS(getopt.h)
 AC_CHECK_HEADERS(libgen.h)
 AC_CHECK_HEADERS(pwd.h)
 AC_CHECK_LIB(m, sqrt)
+AC_CHECK_LIB(c, getpwnam,AC_DEFINE(HAVE_GETPWNAM, 1, [Has getpwnam] ))
 
 dnl don't look for X11 when using a raw framebuffer for the GUI
 if test x$build_gtk = xyes -o x$build_kde = xyes -o x$build_fltk = xyes -o x$build_sdl = xyes; then

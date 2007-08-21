@@ -152,6 +152,8 @@ string
 RcInitFile::expandPath (std::string& unixpath)
 
 {
+
+//Don't break build on systems without passwd / getpwnam
 string _expanded;
 
               //Only if path starts with "~"
@@ -163,7 +165,10 @@ string _expanded;
                                // if HOME set in env, replace ~ with HOME
                                _expanded = unixpath.replace(0,1,home);
                           }
+
+#ifdef HAVE_GETPWNAM
                           //HOME not set in env: try using pwd
+
                           else { 
                                struct passwd *password = getpwuid(getuid());
                                const char *pwdhome = password->pw_dir;
@@ -171,6 +176,7 @@ string _expanded;
                                //If all that fails, leave path alone
                                else _expanded = unixpath;
                           }
+
                      }
 
                      //Initial "~" is not followed by "/"
@@ -201,9 +207,22 @@ string _expanded;
                       }
                  }
                  //Path doesn't start with ~, leave it alone.
+
+#else
+//For systems with pwd.h but not getpwnam, nothing to do if HOME not set.
+                          else _expanded = unixpath;
+                      }
+                      else _expanded = unixpath;
+                 }
+#endif
+
+
                  else {
                       _expanded = unixpath;
                  }
+
+
+
      return _expanded;
 }
 
