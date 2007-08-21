@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.18 2007/07/30 21:26:39 strk Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.19 2007/08/21 13:21:27 udog Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -347,7 +347,7 @@ triangulating_render_handler::world_to_pixel(const rect& worldbounds)
 {
   // TODO: verify this is correct
   geometry::Range2d<int> ret(worldbounds.getRange());
-  ret.scale(20); // twips to pixels
+  ret.scale(1.0/20.0); // twips to pixels
   return ret;
 }
 

@@ -1,3 +1,8 @@
+2007-08-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_tri.cpp: fix world_to_pixel() so that OpenGL
+	  works again 	
+
 2007-08-22 Chad Musick <chadmusick@msbx.net>
 
 	* server/swf.h: Add new tag values for SWF 9 support.
