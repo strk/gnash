@@ -229,14 +229,15 @@ public:
 	bool get_no_select() const 
 	{
 	  return m_no_select;
-  }
+	}
 	
-	const rect&	get_bound() const {
-	  // I know it's stupid to have an alias that's nearly the same name but
-    // get_bound() is required by the base class and get_bounds() was already
-    // there. Should be fixed (remove get_bounds). 
-    return get_bounds(); 
-  }
+	const rect&	get_bound() const
+	{
+		// I know it's stupid to have an alias that's nearly the same name but
+		// get_bound() is required by the base class and get_bounds() was already
+		// there. Should be fixed (remove get_bounds). 
+		return get_bounds(); 
+	}
 
 	/// Return true if HTML was allowed by definition
 	bool htmlAllowed() const { return m_html; }
@@ -338,15 +339,12 @@ private:
 	
 	/// extra space between box's left border and text (in twips)
 	uint16_t m_left_margin;
-	//float	m_left_margin;
 
 	/// extra space between box's right border and text (in twips)
 	uint16_t m_right_margin;
-	//float	m_right_margin;
 
 	/// how much to indent the first line of multiline text (in twips)
 	uint16_t	m_indent;
-	//float	m_indent;
 
 	/// \brief
 	/// Extra space between lines

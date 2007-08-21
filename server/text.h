@@ -113,8 +113,10 @@ namespace gnash {
 	};
 
 
-	// Helper class.
-	// @@ text_character_def friend ?
+	/// A vector of glyphs sharing the same text_style
+	//
+	/// For each glyph, this class stores index and advance values
+	///
 	class text_glyph_record
 	{
 	public:

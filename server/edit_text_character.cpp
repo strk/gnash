@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.102 2007/08/21 00:33:13 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.103 2007/08/21 14:42:12 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -82,6 +82,7 @@ static as_value textfield_borderColor_getset(const fn_call& fn);
 static as_value textfield_textColor_getset(const fn_call& fn);
 static as_value textfield_embedFonts_getset(const fn_call& fn);
 static as_value textfield_autoSize_getset(const fn_call& fn);
+static as_value textfield_wordWrap_getset(const fn_call& fn);
 
 
 //
@@ -329,6 +330,8 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("embedFonts", *getset, *getset);
 	getset = new builtin_function(textfield_autoSize_getset);
 	o.init_property("autoSize", *getset, *getset);
+	getset = new builtin_function(textfield_wordWrap_getset);
+	o.init_property("wordWrap", *getset, *getset);
 
 
 	if ( target_version  < 7 ) return;
@@ -393,6 +396,7 @@ edit_text_character::edit_text_character(character* parent,
 	_borderColor(0,0,0,255),
 	_textColor(m_def->get_text_color()),
 	_embedFonts(m_def->getUseEmbeddedGlyphs()),
+	_wordWrap(m_def->do_word_wrap()),
 	_autoSize(autoSizeNone),
 	_bounds(m_def->get_bounds().getRange())
 {
@@ -962,9 +966,11 @@ edit_text_character::align_line(
 	//assert(extra_space >= 0.0f);
 	if (extra_space <= 0.0f)
 	{
+#ifdef GNASH_DEBUG_TEXTFIELDS
 		log_debug(_("TextField text doesn't fit in its boundaries: "
 			    "width %g, margin %g - nothing to align"),
 			    width, right_margin);
+#endif
 		return 0.0f;
 	}
 
@@ -1026,15 +1032,21 @@ edit_text_character::format_text()
 		return;
 	}
 
-	float	scale = m_def->get_font_height() / 1024.0f;	// the EM square is 1024 x 1024
+	float scale = m_def->get_font_height() / 1024.0f;	// the EM square is 1024 x 1024
+	float fontDescent = _font->get_descent() * scale;
+	float fontLeading = _font->get_leading() * scale;
+	uint16_t fontHeight = m_def->get_font_height();
+	uint16_t leftMargin = m_def->get_left_margin();
+	uint16_t rightMargin = m_def->get_right_margin();
+	uint16_t indent = m_def->get_indent();
 
 	text_glyph_record	rec;	// one to work on
 	rec.m_style.setFont(_font);
 	rec.m_style.m_color = getTextColor(); 
-	rec.m_style.m_x_offset = PADDING_TWIPS + std::max(0, m_def->get_left_margin() + m_def->get_indent());
-	rec.m_style.m_y_offset = PADDING_TWIPS + m_def->get_font_height()
-		+ (_font->get_leading() - _font->get_descent()) * scale;
-	rec.m_style.m_text_height = m_def->get_font_height();
+	rec.m_style.m_x_offset = PADDING_TWIPS + std::max(0, leftMargin + indent); 
+	rec.m_style.m_y_offset = PADDING_TWIPS + fontHeight
+		+ (fontLeading - fontDescent);
+	rec.m_style.m_text_height = fontHeight;
 	rec.m_style.m_has_x_offset = true;
 	rec.m_style.m_has_y_offset = true;
 
@@ -1043,10 +1055,10 @@ edit_text_character::format_text()
 	
 
 	// Start the bbox at the upper-left corner of the first glyph.
-	reset_bounding_box(x, y - _font->get_descent() * scale + m_def->get_font_height());
+	reset_bounding_box(x, y - fontDescent + fontHeight); 
 
 	float	leading = m_def->get_leading();
-	leading += _font->get_leading() * scale;
+	leading += fontLeading * scale;
 
 	int	last_code = -1; // only used if _embedFonts
 	int	last_space_glyph = -1;
@@ -1060,18 +1072,6 @@ edit_text_character::format_text()
 	const char*	text = &_text[0]; 
 	while (uint32_t code = utf8::decode_next_unicode_character(&text))
 	{
-// @@ try to truncate overflow text??
-#if 0
-		if (y + _font->get_descent() * scale > m_def->height())
-		{
-			// Text goes below the bottom of our bounding box.
-			rec.m_glyphs.resize(0);
-			break;
-		}
-#endif // 0
-
-		//uint16_t	code = m_text[j];
-
 		if ( _embedFonts )
 		{
 			x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
@@ -1080,7 +1080,7 @@ edit_text_character::format_text()
 
 		// Expand the bounding-box to the lower-right corner of each glyph as
 		// we generate it.
-		m_text_bounding_box.expandTo(x, y + _font->get_descent() * scale);
+		m_text_bounding_box.expandTo(x, y + fontDescent);
 
 		if (code == 13 || code == 10)
 		{
@@ -1096,9 +1096,8 @@ edit_text_character::format_text()
 			align_line(m_def->get_alignment(), last_line_start_record, x);
 
 			// new paragraphs get the indent.
-			x = std::max(0, m_def->get_left_margin() + m_def->get_indent()) + 
-			  PADDING_TWIPS;
-			y += m_def->get_font_height() + leading;
+			x = std::max(0, leftMargin + indent) + PADDING_TWIPS;
+			y += fontHeight + leading;
 
 			// Start a new record on the next line.
 			rec.m_glyphs.resize(0);
@@ -1106,7 +1105,7 @@ edit_text_character::format_text()
 			rec.m_style.m_color = getTextColor();
 			rec.m_style.m_x_offset = x;
 			rec.m_style.m_y_offset = y;
-			rec.m_style.m_text_height = m_def->get_font_height();
+			rec.m_style.m_text_height = fontHeight; 
 			rec.m_style.m_has_x_offset = true;
 			rec.m_style.m_has_y_offset = true;
 
@@ -1248,82 +1247,117 @@ edit_text_character::format_text()
 after_x_advance:
 
 		float width = _bounds.width(); // m_def->width()
-		float right_margin = m_def->get_right_margin();
+		//float right_margin = m_def->get_right_margin();
 
-		if (x >= width - right_margin - PADDING_TWIPS)
+		if (x >= width - rightMargin - PADDING_TWIPS)
 		{
+			//log_debug("Text in character %s exceeds margins", getTarget().c_str());
 			// Whoops, we just exceeded the box width. 
 			// Do word-wrap if requested to do so.
 
-			// TODO: don't query the definition about wordWrap,
-			//       we should have a wordWrap getter/setter instead !
-			//       Also, we should check autoSize (getAutoSize) and
-			//       behave accordingly
-			//
-			if ( ! m_def->do_word_wrap() )
+			if ( ! doWordWrap() )
 			{
-				bool newlinefound = false;
-				while ( (code = utf8::decode_next_unicode_character(&text)) )
+				//log_debug(" No word wrapping");
+				AutoSizeValue autoSize = getAutoSize();
+				if ( autoSize != autoSizeNone )
 				{
-					if (code == 13 || code == 10)
-					{
-						newlinefound = true;
-						break;
+					static bool warned = false;
+					if ( ! warned ) {
+						log_debug(_("TextField.autoSize != 'none' TESTING"));
+						warned = true;
 					}
 				}
-				if ( ! newlinefound ) break;
-			}
-
-			// Insert newline.
-
-			// Close out this stretch of glyphs.
-			m_text_glyph_records.push_back(rec);
-			float	previous_x = x;
-			x = m_def->get_left_margin() + PADDING_TWIPS;
-			y += m_def->get_font_height() + leading;
-
-			// Start a new record on the next line.
-			rec.m_glyphs.resize(0);
-			rec.m_style.setFont(_font);
-			rec.m_style.m_color = getTextColor();
-			rec.m_style.m_x_offset = x;
-			rec.m_style.m_y_offset = y;
-			rec.m_style.m_text_height = m_def->get_font_height();
-			rec.m_style.m_has_x_offset = true;
-			rec.m_style.m_has_y_offset = true;
-			
-			text_glyph_record&	last_line = m_text_glyph_records.back();
-			if (last_space_glyph == -1)
-			{
-				// Pull the previous glyph down onto the
-				// new line.
-				if (last_line.m_glyphs.size() > 0)
+				else
 				{
-					rec.m_glyphs.push_back(last_line.m_glyphs.back());
-					x += last_line.m_glyphs.back().m_glyph_advance;
-					previous_x -= last_line.m_glyphs.back().m_glyph_advance;
-					last_line.m_glyphs.resize(last_line.m_glyphs.size() - 1);
+					//log_debug(" autoSize=NONE!");
+					// truncate long line, but keep expanding text box
+					bool newlinefound = false;
+					while ( (code = utf8::decode_next_unicode_character(&text)) )
+					{
+						if ( _embedFonts )
+						{
+							x += _font->get_kerning_adjustment(last_code, (int) code) * scale;
+							last_code = static_cast<int>(code);
+						}
+						// Expand the bounding-box to the lower-right corner of each glyph,
+						// even if we don't display it 
+						m_text_bounding_box.expandTo(x, y + fontDescent);
+#ifdef GNASH_DEBUG_TEXTFIELDS
+						std::stringstream ss;
+						ss << "Text bbox expanded to " << m_text_bounding_box << "(width: " << m_text_bounding_box.width() << ")";
+						log_debug("%s", ss.str().c_str());
+#endif
+
+						if (code == 13 || code == 10)
+						{
+							newlinefound = true;
+							break;
+						}
+
+						int index = _font->get_glyph_index((uint16_t) code, _embedFonts);
+						x += scale * _font->get_advance(index, _embedFonts);
+
+					}
+					if ( ! newlinefound ) break;
 				}
 			}
-			else
+			else // do word wrap
 			{
-				// Move the previous word down onto the next line.
 
-				previous_x -= last_line.m_glyphs[last_space_glyph].m_glyph_advance;
+				// Insert newline.
 
-				for (unsigned int i = last_space_glyph + 1; i < last_line.m_glyphs.size(); i++)
+				// Close out this stretch of glyphs.
+				m_text_glyph_records.push_back(rec);
+				float	previous_x = x;
+				x = m_def->get_left_margin() + PADDING_TWIPS;
+				y += m_def->get_font_height() + leading;
+
+
+				// Start a new record on the next line.
+				rec.m_glyphs.resize(0);
+				rec.m_style.setFont(_font);
+				rec.m_style.m_color = getTextColor();
+				rec.m_style.m_x_offset = x;
+				rec.m_style.m_y_offset = y;
+				rec.m_style.m_text_height = m_def->get_font_height();
+				rec.m_style.m_has_x_offset = true;
+				rec.m_style.m_has_y_offset = true;
+				
+				// TODO : what if m_text_glyph_records is empty ? Is it possible ?
+				assert(!m_text_glyph_records.empty());
+				text_glyph_record&	last_line = m_text_glyph_records.back();
+				if (last_space_glyph == -1)
 				{
-					rec.m_glyphs.push_back(last_line.m_glyphs[i]);
-					x += last_line.m_glyphs[i].m_glyph_advance;
-					previous_x -= last_line.m_glyphs[i].m_glyph_advance;
+					// Pull the previous glyph down onto the
+					// new line.
+					if (last_line.m_glyphs.size() > 0)
+					{
+						rec.m_glyphs.push_back(last_line.m_glyphs.back());
+						x += last_line.m_glyphs.back().m_glyph_advance;
+						previous_x -= last_line.m_glyphs.back().m_glyph_advance;
+						last_line.m_glyphs.resize(last_line.m_glyphs.size() - 1);
+					}
 				}
-				last_line.m_glyphs.resize(last_space_glyph);
+				else
+				{
+					// Move the previous word down onto the next line.
+
+					previous_x -= last_line.m_glyphs[last_space_glyph].m_glyph_advance;
+
+					for (unsigned int i = last_space_glyph + 1; i < last_line.m_glyphs.size(); i++)
+					{
+						rec.m_glyphs.push_back(last_line.m_glyphs[i]);
+						x += last_line.m_glyphs[i].m_glyph_advance;
+						previous_x -= last_line.m_glyphs[i].m_glyph_advance;
+					}
+					last_line.m_glyphs.resize(last_space_glyph);
+				}
+
+				align_line(m_def->get_alignment(), last_line_start_record, previous_x);
+
+				last_space_glyph = -1;
+				last_line_start_record = m_text_glyph_records.size();
 			}
-
-			align_line(m_def->get_alignment(), last_line_start_record, previous_x);
-
-			last_space_glyph = -1;
-			last_line_start_record = m_text_glyph_records.size();
 		}
 
 		if (m_cursor > character_idx)
@@ -1336,13 +1370,23 @@ after_x_advance:
 		// TODO: HTML markup
 	}
 
+	// Expand bounding box to include the whole text (if autoSize)
+	if ( _autoSize != autoSizeNone )
+	{
+		_bounds.expandTo(x+PADDING_TWIPS, y);
+	}
+	else
+	{
+		_bounds.expandTo(_bounds.getMaxX(), y);
+	}
+
 	// Add this line to our output.
 	m_text_glyph_records.push_back(rec);
 
 	float extra_space = align_line(m_def->get_alignment(), last_line_start_record, x);
 
 	m_xcursor += static_cast<int>(extra_space);
-	m_ycursor -= m_def->get_font_height() + (_font->get_leading() - _font->get_descent()) * scale;
+	m_ycursor -= fontHeight + (fontLeading - fontDescent);
 }
 
 void
@@ -1574,6 +1618,17 @@ edit_text_character::setEmbedFonts(bool use)
 	}
 }
 
+void
+edit_text_character::setWordWrap(bool on)
+{
+	if ( _wordWrap != on )
+	{
+		set_invalidated();
+		_wordWrap=on;
+		format_text();
+	}
+}
+
 cxform	
 edit_text_character::get_world_cxform() const
 {
@@ -1704,6 +1759,23 @@ textfield_embedFonts_getset(const fn_call& fn)
 }
 
 static as_value
+textfield_wordWrap_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->doWordWrap());
+	}
+	else // setter
+	{
+		ptr->setWordWrap( fn.arg(0).to_bool() );
+	}
+
+	return as_value();
+}
+
+static as_value
 textfield_autoSize_getset(const fn_call& fn)
 {
 	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
@@ -1782,13 +1854,6 @@ edit_text_character::setAutoSize(AutoSizeValue val)
 {
 	if ( val == _autoSize ) return;
 
-	static bool warned = false;
-	if ( ! warned ) {
-		log_unimpl(_("TextField.autoSize unused"));
-		warned = true;
-	}
-
-	
 	set_invalidated();
 
 	_autoSize = val; 

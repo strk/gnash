@@ -206,6 +206,24 @@ public:
 	///
 	static const char* autoSizeValueName(AutoSizeValue val);
 
+	/// \brief
+	/// Return true if text should continue to next available line
+	/// when hitting end of bounding box.
+	///
+	bool doWordWrap() const {
+		return _wordWrap;
+	}
+
+	/// Set wordWrap parameter 
+	//
+	/// @param on
+	///	If true text hitting bounding box limits will continue
+	///	to next line.
+	///	If false, either text will be truncated or bounding box
+	///	expanded, depending on autoSize (see getAutoSize)
+	///
+	void setWordWrap(bool on);
+
 private:
 
 	/// Return true if HTML text is allowed 
@@ -312,6 +330,8 @@ private:
 	rgba _textColor;
 
 	bool _embedFonts;
+
+	bool _wordWrap;
 
 	AutoSizeValue _autoSize;
 

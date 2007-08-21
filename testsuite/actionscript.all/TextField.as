@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.17 2007/08/16 10:31:51 strk Exp $";
+rcsid="$Id: TextField.as,v 1.18 2007/08/21 14:42:12 strk Exp $";
 
 #include "check.as"
 
@@ -63,7 +63,7 @@ check( !TextField.prototype.hasOwnProperty('textHeight') );
 check( !TextField.prototype.hasOwnProperty('textWidth') );
 check( !TextField.prototype.hasOwnProperty('type') );
 xcheck( !TextField.prototype.hasOwnProperty('variable') );
-check( !TextField.prototype.hasOwnProperty('wordWrap') );
+xcheck( !TextField.prototype.hasOwnProperty('wordWrap') );
 
 // this is a static method
 check_equals(typeof(TextField.getFontList), 'function');
@@ -132,7 +132,7 @@ xcheck( TextField.prototype.hasOwnProperty('textHeight') );
 xcheck( TextField.prototype.hasOwnProperty('textWidth') );
 xcheck( TextField.prototype.hasOwnProperty('type') );
 check( TextField.prototype.hasOwnProperty('variable') );
-xcheck( TextField.prototype.hasOwnProperty('wordWrap') );
+check( TextField.prototype.hasOwnProperty('wordWrap') );
 
 // Check TextField._alpha
 
@@ -543,9 +543,10 @@ tf._width = 500;
 
 // Check TextField.wordWrap (should text wrap when bbox limit is hit?)
 
-xcheck_equals(typeof(tf.wordWrap), 'boolean');
+check_equals(typeof(tf.wordWrap), 'boolean');
 check( ! tf.hasOwnProperty('wordWrap') ); 
-xcheck_equals(tf.wordWrap, false);
+check_equals(tf.wordWrap, false);
+// TODO: check what can be assigned to wordWrap and what not...
 
 // Check TextField._x 
 
@@ -623,13 +624,13 @@ tf.wordWrap = false;
 check_equals(tf._width, 10);
 origTextWidth = tf.textWidth;
 tf.autoSize = 'center';
-xcheck(tf._width > 10);
+check(tf._width > 10);
 check_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by autoSize 
 tf.autoSize = 'none';
 tf.wordWrap = true;
+check_equals(origTextWidth, tf.textWidth); 
 tf._width = 10;
-// Gnash ignores assigments to _width (should change TextField rendering area bounds instead)
 check_equals(tf._width, 10);
-check_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by wordWrap
+xcheck_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by wordWrap
 
 #endif // OUTPUT_VERSION > 5
