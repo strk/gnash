@@ -1,3 +1,7 @@
+2007-08-21 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gui.cpp: Introduce FORCE_REDRAW macro
+
 2007-08-21 Sandro Santilli <strk@keybit.net>
 
 	* server/text.h: documentation bits for text_glyph_record

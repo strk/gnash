@@ -37,9 +37,16 @@
 #include <cstdio>
 #include <cstring>
 
-/// Define this to have updated regions enclosed in a red rectangle
+/// Define this to make sure each frame is fully rendered from ground up
+/// even if no motion has been detected in the movie.
+//#define FORCE_REDRAW
+
+/// Define this to have updated regions enclosed in a red rectangle.
 /// In the future, enabling this might actually use a runtime flag
 /// as an additional conditional.
+/// This has the side effect that all frames will be re-rendered completely
+/// but in contrast to FORCE_REDRAW it won't re-render when no motion
+/// has been detected in the movie (for example when the movie is stopped).
 ///
 //#define ENABLE_REGION_UPDATES_DEBUGGING 1
 
@@ -355,7 +362,11 @@ Gui::display(movie_root* m)
 	bool redraw_flag;
 
 	// Should the frame be rendered completely, even if it did not change?
+#ifdef FORCE_REDRAW
+  redraw_flag = true;
+#else	
 	redraw_flag = _redraw_flag || want_redraw();
+#endif	
 	
 	// reset class member if we do a redraw now
 	if (redraw_flag) _redraw_flag=false;
