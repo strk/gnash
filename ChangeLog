@@ -1,5 +1,8 @@
 2007-08-23 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-mtasc.all/Makefile.am: specify input language 
+	  in MTASC_CPP, so we can use a filename again (rather then
+	  get meaningless <stdin> printed for __FILE__).
 	* gui/gui.{cpp,h}: Use kasper's tree class for getMovieInfo
 	  (InfoTable is now an InfoTree)
 	* gui/gtk.cpp (menuitem_movieinfo_callback): fix to use

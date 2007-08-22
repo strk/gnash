@@ -41,7 +41,7 @@ EXTRA_DIST = $(ASTESTS) $(AUXMOVIES) TestClass.as check.as Dejagnu.as
 if ENABLE_MTASC
 
 MTASC_FLAGS = -version 6 -cp $(MTASC_CLASSPATH) -cp $(srcdir) -v -header 800:600:20
-MTASC_CPP = $(CPP) -P -I$(srcdir)
+MTASC_CPP = $(CPP) -x c -P -I$(srcdir)
 
 ASTESTS_OUT = $(ASTESTS:.as=.swf)
 
@@ -56,7 +56,7 @@ alltests-runner: $(srcdir)/../generic-testrunner.sh $(ASTESTS_OUT) $(AUXMOVIES_O
 	chmod 755 $@
 
 .as.swf:
-	cat $< | $(MTASC_CPP) - > $(@:%.swf=pp_%.as) 
+	$(MTASC_CPP) $< > $(@:%.swf=pp_%.as) 
 	$(MTASC) $(MTASC_FLAGS) -swf $@ -main $(@:%.swf=pp_%.as)
 
 CLEANFILES =  \
