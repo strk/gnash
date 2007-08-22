@@ -1,5 +1,11 @@
 2007-08-22 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: bail out if kde gui or kparts plugin are
+	  requested but kde/qt deps are not met. Should fix bug
+	  #20848.
+
+2007-08-22 Sandro Santilli <strk@keybit.net>
+
 	* configure.ac: bail out if boost_thread is not set to yes.
 	* macros/boost.m4: check for boost/thread.hpp. Should fix
 	  bug #20847.

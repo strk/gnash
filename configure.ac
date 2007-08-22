@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.404 2007/08/22 10:52:51 strk Exp $
+dnl $Id: configure.ac,v 1.405 2007/08/22 11:20:29 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1539,20 +1539,18 @@ if test x$xml != xno; then
   fi
 fi
 
-if test x$kde = xyes -o x$kparts = xyes; then
+if test x$build_kde = xyes -o x$kparts = xyes; then
   if test x"$has_kde" = xyes; then
     echo "        KDE flags are: $KDE_CFLAGS"
     echo "        KDE libs are: $KDE_LIBS"
   else
-    if test x$build_kde = xyes -o x$parts = xyes ; then
       echo "        ERROR: No KDE development package installed!"
       echo "               Reconfigure with --disable-kparts and/or"
-      echo "               change to a different gui with --enable-gui=..."
+      echo "               omit 'kde' from the guis listed with --enable-gui=..."
       echo "               or install the KDE development environment from http://kde.org"
       echo "               or .deb users: apt-get install kdelibs-dev"
       echo "               or .rpm users: yum install <something-else>."
       nogo=true
-    fi
   fi
   if test x"$has_qt" = xyes; then
     echo "        QT flags are: $QT_CFLAGS"
