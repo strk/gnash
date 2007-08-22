@@ -30,6 +30,7 @@
 #include "check.h"
 #include <string>
 #include <cassert>
+#include <sstream>
 
 using namespace gnash;
 using namespace gnash::geometry;
