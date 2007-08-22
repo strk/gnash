@@ -582,17 +582,17 @@ Gui::setInvalidatedRegions(const InvalidatedRanges& ranges)
 	setInvalidatedRegion(bounds);
 }
 
-std::auto_ptr<Gui::InfoTable>
+std::auto_ptr<Gui::InfoTree>
 Gui::getMovieInfo() const
 {
-    std::auto_ptr<InfoTable> ret;
+    std::auto_ptr<InfoTree> ret;
 
     if ( ! VM::isInitialized() )
     {
         return ret;
     }
 
-    ret.reset(new InfoTable());
+    ret.reset(new InfoTree());
 
     VM& vm = VM::get();
 
@@ -600,7 +600,7 @@ Gui::getMovieInfo() const
     int vmSWFVersion = vm.getSWFVersion();
     char buf[16];
     snprintf(buf, 16, "SWF%d", vmSWFVersion); buf[15] = '\0';
-    ret->push_back(StringPair("VM", buf));
+    ret->insert(ret->begin(), StringPair("VM", buf));
 
     // Print info about levels (only level0 for now, then will be extended)
     movie_root& stage = vm.getRoot();
@@ -608,8 +608,8 @@ Gui::getMovieInfo() const
     movie_definition* def0 = level0->get_movie_definition();
     assert(def0);
     snprintf(buf, 16, "SWF%d", def0->get_version()); buf[15] = '\0';
-    ret->push_back(StringPair("_level0 SWFVersion", string(buf)));
-    ret->push_back(StringPair("_level0 URL", def0->get_url()));
+    ret->insert(ret->begin(), StringPair("_level0 SWFVersion", string(buf)));
+    ret->insert(ret->begin(), StringPair("_level0 URL", def0->get_url()));
 
     return ret;
 }

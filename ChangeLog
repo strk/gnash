@@ -1,5 +1,12 @@
 2007-08-23 Sandro Santilli <strk@keybit.net>
 
+	* gui/gui.{cpp,h}: Use kasper's tree class for getMovieInfo
+	  (InfoTable is now an InfoTree)
+	* gui/gtk.cpp (menuitem_movieinfo_callback): fix to use
+	  an InfoTree - just a leaf-iteration.
+
+2007-08-23 Sandro Santilli <strk@keybit.net>
+
 	* libbase/tree.hh: include generic tree class by
 	  Kasper Peeters <kasper.peeters@aei.mpg.de>
 

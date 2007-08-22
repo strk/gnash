@@ -29,6 +29,7 @@
 #include "rect.h"  // for composition
 #include "snappingrange.h"  // for InvalidatedRanges
 #include "gnash.h" // for gnash::key::code type
+#include "tree.hh" // for tree
 
 #include <string>
 
@@ -247,13 +248,13 @@ public:
 
     // TODO: use a tree-like structure (tree.hh?)
     typedef std::pair<std::string,std::string> StringPair;
-    typedef std::vector<StringPair> InfoTable;
+    typedef tree<StringPair> InfoTree;
 
     /// \brief
-    /// Return a table containing informations about the movie
+    /// Return a tree containing informations about the movie
     /// currently being played (or NULL, if the VM isn't initialized yet)
     ///
-    std::auto_ptr<InfoTable> getMovieInfo() const;
+    std::auto_ptr<InfoTree> getMovieInfo() const;
 
 protected:
 

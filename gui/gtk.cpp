@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.104 2007/08/21 23:38:35 strk Exp $ */
+/* $Id: gtk.cpp,v 1.105 2007/08/22 21:38:22 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -979,7 +979,7 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     GtkWidget *table1 = gtk_table_new(4, 2, FALSE);
     gtk_box_pack_start (GTK_BOX (vbox2), table1, FALSE, FALSE, 0);
 
-    std::auto_ptr<InfoTable> infoptr = gui->getMovieInfo();
+    std::auto_ptr<InfoTree> infoptr = gui->getMovieInfo();
     if ( ! infoptr.get() )
     {
             label = gtk_label_new (_("VM not initialized yet"));
@@ -988,12 +988,11 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
             return;
     }
 
-    InfoTable& info = *infoptr;
+    InfoTree& info = *infoptr;
     
-#if 1
     size_t size = info.size();
 
-    for (InfoTable::reverse_iterator i=info.rbegin(), e=info.rend(); i!=e; ++i)
+    for (InfoTree::leaf_iterator i=info.begin_leaf(), e=info.end_leaf(); i!=e; ++i)
     {
         StringPair& p = *i;
         guint up = size;
@@ -1035,22 +1034,6 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 
      gtk_widget_show_all (window1);
 
-#else
-    GtkWidget* box = gtk_vbox_new (FALSE, 2);
-    gtk_widget_show (box);
-    gtk_container_add (GTK_CONTAINER (window1), box);
-
-    for (InfoTable::reverse_iterator i=info.rbegin(), e=info.rend(); i!=e; ++i)
-    {
-        StringPair& p = *i;
-
-        string text = p.first + string(" = ") + p.second;
-        label = gtk_label_new (text.c_str());
-        gtk_widget_show (label);
-        gtk_box_pack_start (GTK_BOX (box), label, TRUE, FALSE, 3);
-    }
-#endif
-    
 }
 
 
