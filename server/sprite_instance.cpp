@@ -2723,14 +2723,13 @@ void sprite_instance::display()
 {
 	//GNASH_REPORT_FUNCTION;
 
-	if (get_visible() == false)
-	{
-		// We're invisible, so don't display!
-		
-		// Note: dlist.cpp will avoid to even call display() so this will probably
-		// never happen.
-		return;
-	}
+	// Note: 
+	// DisplayList::Display() will take care of the visibility checking.
+	//
+	// Whether a character should be rendered or not is dependent on its paraent.
+	// i.e. if its parent is a mask, this character should be rendered to the mask
+	// buffer even it is invisible.
+	//
 	
 	// check if the sprite (and it's childs) needs to be drawn
 	InvalidatedRanges ranges;

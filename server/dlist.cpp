@@ -771,12 +771,23 @@ DisplayList::display()
         character* ch = it->get();
         assert(ch);
 
-        if (ch->get_visible() == false)
+        // Check if this charater or any of its parents is a mask.
+        // Characters act as masks should always be rendered to the
+        // mask buffer despite their visibility.
+        character * parent = ch->get_parent();
+        bool renderAsMask = ch->isMask();
+        while(!renderAsMask && parent)
         {
-            // avoid stale old_invalidated_rect
+            renderAsMask = parent->isMask();
+            parent = parent->get_parent();
+        }
+        
+        // check for non-mask hiden characters
+        if( !renderAsMask && (ch->get_visible() == false))
+        {
+            // Avoid stale old_invalidated_rect
             ch->clear_invalidated(); 
-            // Don't display.
-            // TODO: test invisible characters as masks
+            // Don't display non-mask hiden characters
             continue;
         }
     
