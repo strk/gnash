@@ -1,5 +1,8 @@
 2007-08-22 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp:
+	  Try another work-around to gcc-4.1.2 bug, commented
+	  this time.
 	* testsuite/actionscript.all/MovieClip.as:
 	  Modify syntax used to test for functions availability
 	  to cope with a bug in Ming < 00040005.

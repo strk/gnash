@@ -44,10 +44,26 @@ Range2d<int>
 inscribedRect(int x, int y, int radius)
 {
 	Range2d<int> ret;
-	float halfside = ((float)radius * sqrt(2.0f))/2.0f;
-	ret.expandTo(int(round(x-halfside)), int(round(y-halfside)));
-	ret.expandTo(int(round(x+halfside)), int(round(y+halfside)));
-        fprintf(stderr, ".");
+
+	int side = int(round((float)radius * sqrt(2.0f))); 
+	int halfside = int(side/2.0); // round toward zero
+
+	// Simply constructing a stringstream fixes an optimization
+	// bug with GCC-4.1.2 resulting in absurd values !
+	// See https://savannah.gnu.org/bugs/?20853
+	std::stringstream work_around_GCC_412_bug;
+
+	// upper-left corner
+	int ULx = x-halfside;
+	int ULy = y-halfside;
+
+	// lower-right corner
+	int LRx = x+halfside;
+	int LRy = y+halfside;
+
+	ret.expandTo(ULx, ULy);
+	ret.expandTo(LRx, LRy);
+
 	return ret;
 }
 
