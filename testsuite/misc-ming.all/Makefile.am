@@ -101,6 +101,8 @@ check_PROGRAMS = \
 	displaylist_depths_test10 \
 	displaylist_depths_test11 \
 	masks_test \
+	masks_test2 \
+	masks_test2runner \
 	attachMovieTest \
 	attachMovieTestRunner \
 	attachMovieLoopingTest \
@@ -908,6 +910,29 @@ masks_testrunner_DEPENDENCIES = \
 	masks_test.swf      \
 	$(NULL)
 
+
+masks_test2_SOURCES =	\
+	masks_test2.c	\
+	$(NULL)
+masks_test2_LDADD = libgnashmingutils.la
+
+masks_test2.swf: masks_test2
+	./masks_test2 $(top_srcdir)/testsuite/media
+
+masks_test2runner_SOURCES = \
+	masks_test2runner.cpp \
+	$(NULL)
+masks_test2runner_CXXFLAGS = \
+	-DTGTDIR='"$(abs_builddir)"' \
+	$(NULL)
+masks_test2runner_LDADD = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	$(NULL)
+masks_test2runner_DEPENDENCIES = \
+	$(top_builddir)/testsuite/libtestsuite.la \
+	masks_test2.swf      \
+	$(NULL)
+
 matrix_test_SOURCES =	\
 	matrix_test.c	\
 	$(NULL)
@@ -1647,6 +1672,7 @@ TEST_CASES = \
 	duplicate_movie_clip_test2runner \
 	event_handler_scope_testrunner \
 	masks_testrunner \
+	masks_test2runner \
 	key_event_testrunner \
 	key_event_test2runner \
 	key_event_test3runner \

@@ -1,3 +1,14 @@
+2007-08-22 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-ming.all/masks_test2.c, 
+	  testsuite/misc-ming.all/masks_test2runner.cpp, 
+	  testsuite/misc-ming.all/Makefile.am: new testcase for nested masks.
+	  
+2007-08-22 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/dlist.cpp, server/sprite_instance.cpp: handle hiden characters
+	  as masks, passed UdoG's test files.
+	
 2007-08-22 Chad Musick <chadmusick@msbx.net>
 
 	* server/impl.cpp: Add tag loaders (default loaders)
