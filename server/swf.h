@@ -211,6 +211,11 @@ typedef enum
     ACTION_STARTDRAGMOVIE          = 0x27,
     ACTION_STOPDRAGMOVIE           = 0x28,
     ACTION_STRINGCOMPARE           = 0x29,
+
+    /// SWF7
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_throw
+    ///
     ACTION_THROW                   = 0x2A,
 
     /// SWF7
@@ -493,7 +498,12 @@ typedef enum
     ///
     ACTION_DEFINEFUNCTION2         = 0x8E,
 
+    /// SWF7
+    ///
+    /// http://sswf.sourceforge.net/SWFalexref.html#action_try
+    ///
     ACTION_TRY                     = 0x8F,
+
     ACTION_WITH                    = 0x94,
     ACTION_DEFINEFUNCTION          = 0x9B,
 

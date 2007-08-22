@@ -33,17 +33,59 @@ class Test
 		note("Test constructor called");
 	}
 
+	function addOneOnFinal(o)
+	{
+		try {
+			return 'try';
+		}
+		finally {
+			o.num += 1;
+			return 'finally';
+		}
+	}
+
 	function test_all()
 	{
-		var res;
+		var res = 'string';
 		try {
 			throw(1);
 			res = 0;
 		} catch (e) {
 			res = e;
 		}
-
+		check_equals(typeof(res), 'number');
 		xcheck_equals(res, 1);
+
+		res = 'string';
+		try {
+			throw('thrown');
+			res = 0;
+		} catch(e) {
+			res = e;
+		}
+		finally {
+			res += '_finally';
+		}
+		check_equals(typeof(res), 'string');
+		xcheck_equals(res, 'thrown_finally');
+
+		res = 'string';
+		try {
+			res = 0;
+		} catch(e) {
+			res = e;
+		}
+		finally {
+			res = 3;
+		}
+		check_equals(typeof(res), 'number');
+		check_equals(res, 3);
+
+		var o = new Object();
+		o.num = 1;
+		var ret = addOneOnFinal(o);
+		xcheck_equals(ret, 'finally');
+		xcheck_equals(o.num, 2);
 	}
 
 	static function main(mc)

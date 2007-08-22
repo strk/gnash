@@ -1,5 +1,15 @@
 2007-08-22 Sandro Santilli <strk@keybit.net>
 
+	* server/swf.h: add version and reference url to
+	  ACTION_TRY and ACTION_THROW
+	* server/parser/action_buffer.h: add read_uint8() method.
+	* server/vm/ASHandlers.cpp: stub ACTION_TRY handler
+	  (parsed the tag, doesn't do anything with the info yet).
+	* testsuite/misc-mtasc.all/exception.as: more tests for
+	  try/catch/finally.
+
+2007-08-22 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp:
 	  Try another work-around to gcc-4.1.2 bug, commented
 	  this time.

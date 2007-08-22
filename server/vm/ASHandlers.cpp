@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.123 2007/08/20 03:25:09 cmusick Exp $ */
+/* $Id: ASHandlers.cpp,v 1.124 2007/08/22 17:32:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -3581,10 +3581,48 @@ SWFHandlers::ActionDefineFunction2(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionTry(ActionExec& /*thread*/)
+SWFHandlers::ActionTry(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    log_unimpl (__PRETTY_FUNCTION__);
+
+	as_environment& env = thread.env;
+	const action_buffer& code = thread.code;
+	size_t pc = thread.pc;
+
+	assert( code[pc] == SWF::ACTION_TRY );
+
+        size_t i = thread.pc + 3; // skip tag id and length
+
+	uint8_t flags = code[i];
+	++i;
+
+	bool doCatch = flags & 1;
+	bool doFinally = flags & (1<<1);
+	bool catchInRegister = flags&(1<<2);
+	uint8_t reserved = flags&0xE0;
+
+	uint16_t trySize = code.read_uint16(i); i += 2;
+	uint16_t catchSize = code.read_uint16(i); i += 2;
+	uint16_t finallySize = code.read_uint16(i); i += 2;
+
+	const char* catchName = NULL;
+	uint8_t catchRegister = 0;
+
+	if ( catchInRegister )
+	{
+		catchName = code.read_string(i);
+	}
+	else
+	{
+		catchRegister = code[i];
+	}
+
+	IF_VERBOSE_ACTION(
+	log_action(_("ActionTry: reserved:%x doFinally:%d doCatch:%d trySize:%u catchSize:%u finallySize:%u catchName:%s catchRegister:%u"),
+		reserved, doFinally, doCatch, trySize, catchSize, finallySize, catchName ? catchName : "(null)", catchRegister);
+	);
+
+	log_unimpl (__PRETTY_FUNCTION__);
 }
 
 /// See: http://sswf.sourceforge.net/SWFalexref.html#action_with

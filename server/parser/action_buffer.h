@@ -139,7 +139,7 @@ public:
 		return (const unsigned char*)(&m_buffer[pc]);
 	}
 
-	/// Get an integer value from given offset
+	/// Get a signed integer value from given offset
 	//
 	/// Useful to hide complexity of underlying buffer access.
 	///
@@ -147,6 +147,15 @@ public:
 	{
 		int16_t ret = m_buffer[pc] | (m_buffer[pc + 1] << 8);
 		return ret;
+	}
+
+	/// Get an unsigned short integer value from given offset
+	//
+	/// Useful to hide complexity of underlying buffer access.
+	///
+	uint16_t read_uint16(size_t pc) const
+	{
+		return static_cast<uint16_t>(read_int16(pc));
 	}
 
 	/// Read a 32-bit integer starting at given offset.
