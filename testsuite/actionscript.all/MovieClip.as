@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.79 2007/08/02 18:57:00 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.80 2007/08/22 14:29:29 strk Exp $";
 
 #include "check.as"
 
@@ -98,13 +98,9 @@ check_equals(typeof(mc.enabled), 'string'); // yes, we can set to arbitrary valu
 check_equals(mc.enabled, 'a string'); // yes, we can set to arbitrary values
 mc.__proto__.enabled = true; // better keep as it was initially, who knows what it would do...
 
-// This seems unavailable
-// when targetting SWF > 6
-#if OUTPUT_VERSION > 6
-check_equals(mc.duplicateMovieClip, undefined);
-#else
-check(mc.duplicateMovieClip);
-#endif
+// NOTE: due to a bug in Ming < 00040005, mc.loadMovie would
+//       be converted to lowercase, so we use the [] hack
+check_equals(typeof(mc['duplicateMovieClip']), 'function');
 
 #if OUTPUT_VERSION >= 6
     check_equals(typeof(mc.setMask), 'function');
@@ -133,15 +129,10 @@ check(mc.duplicateMovieClip);
     check_equals(typeof(mc.stopDrag), 'function');
     check_equals(typeof(mc.getTextSnapshot), 'function');
 
-    // These two seem unavailable
-    // when targetting SWF > 6
-#if OUTPUT_VERSION > 6
-    check_equals(typeof(mc.loadMovie), 'undefined');
-    check_equals(typeof(mc.removeMovieClip), 'undefined');
-#else
-    check_equals(typeof(mc.loadMovie), 'function');
-    check_equals(typeof(mc.removeMovieClip), 'function');
-#endif
+    // NOTE: due to a bug in Ming < 00040005, mc.loadMovie would
+    //       be converted to lowercase, so we use the [] hack
+    check_equals(typeof(mc['loadMovie']), 'function');
+    check_equals(typeof(mc['removeMovieClip']), 'function');
 
 #endif // OUTPUT_VERSION >= 6
 

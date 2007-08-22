@@ -1,3 +1,10 @@
+2007-08-22 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClip.as:
+	  Modify syntax used to test for functions availability
+	  to cope with a bug in Ming < 00040005.
+	  Should fix bug #20867.
+
 2007-08-22 Chad Musick <chadmusick@msbx.net>
 
 	* server/font.h, server/font.cpp: Define
