@@ -1,3 +1,9 @@
+2007-08-22 Chad Musick <chadmusick@msbx.net>
+
+	* server/impl.cpp: Add tag loaders (default loaders)
+	  for SWF9 opcodes, plus some older opcodes which were
+	  not present.
+
 2007-08-21 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp: rename View->MovieInfo to View->Properties,

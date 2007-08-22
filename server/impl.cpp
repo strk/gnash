@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.114 2007/08/08 18:26:38 strk Exp $ */
+/* $Id: impl.cpp,v 1.115 2007/08/22 04:27:02 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -163,11 +163,13 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::DEFINETEXT,	define_text_loader);
 	register_tag_loader(SWF::DOACTION,	DoActionTag::doActionLoader);
 	register_tag_loader(SWF::DEFINEFONTINFO, define_font_info_loader);
-	register_tag_loader(SWF::DEFINEFONTINFO2, define_font_info_loader);
+	register_tag_loader(SWF::DEFINEFONTINFO2, define_font_info_loader); // 62
 	register_tag_loader(SWF::DEFINESOUND,	define_sound_loader);
 	register_tag_loader(SWF::STARTSOUND,	start_sound_loader);
-	// 16 _UNKNOWN_ unimplemented
-	register_tag_loader(SWF::DEFINEBUTTONSOUND, button_sound_loader);
+
+        register_tag_loader(SWF::STOPSOUND,     fixme_loader); // 16
+	
+        register_tag_loader(SWF::DEFINEBUTTONSOUND, button_sound_loader);
 	register_tag_loader(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader); // 18
 	register_tag_loader(SWF::SOUNDSTREAMBLOCK, sound_stream_block_loader); // 19
 	register_tag_loader(SWF::DEFINELOSSLESS, define_bits_lossless_2_loader);
@@ -196,7 +198,10 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::SERIALNUMBER,  serialnumber_loader); // 41
 	register_tag_loader(SWF::DEFINETEXTFORMAT, fixme_loader); // 42
 	register_tag_loader(SWF::FRAMELABEL,	frame_label_loader); // 43
-	// 44 - _UNKNOWN_ unimplemented
+
+        // TODO: Implement, but fixme_loader breaks tests.
+        register_tag_loader(SWF::DEFINEBEHAVIOR, fixme_loader); // 44
+
 	register_tag_loader(SWF::SOUNDSTREAMHEAD2, sound_stream_head_loader); // 45
 	register_tag_loader(SWF::DEFINEMORPHSHAPE, define_shape_morph_loader);
 	register_tag_loader(SWF::FRAMETAG,	fixme_loader); // 47
@@ -205,9 +210,12 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::DEFINECOMMANDOBJ, fixme_loader); // 50
 	register_tag_loader(SWF::CHARACTERSET,  fixme_loader); // 51
 	register_tag_loader(SWF::FONTREF,	fixme_loader); // 52
-	// 53 - _UNKNOWN_ unimplemented
-	// 54 - _UNKNOWN_ unimplemented
-	// 55 - _UNKNOWN_ unimplemented
+
+        // TODO: Implement, but fixme_loader breaks tests.
+        register_tag_loader(SWF::DEFINEFUNCTION, fixme_loader); // 53 
+        register_tag_loader(SWF::PLACEFUNCTION, fixme_loader); // 54 
+        register_tag_loader(SWF::GENTAGOBJECT, fixme_loader); // 55 
+
 	register_tag_loader(SWF::EXPORTASSETS,	export_loader); // 56
 	register_tag_loader(SWF::IMPORTASSETS,  import_loader); // 57
 
@@ -219,28 +227,44 @@ static void	ensure_loaders_registered()
 
 	register_tag_loader(SWF::DEFINEVIDEOSTREAM, define_video_loader); // 60
 	register_tag_loader(SWF::VIDEOFRAME, video_loader); // 61
-	// 62 - _UNKNOWN_ unimplemented
-	// 63 - _UNKNOWN_ unimplemented
+
+        // 62, DEFINEFONTINFO2 is done above.
+        // We're not an authoring tool.
+        register_tag_loader(SWF::DEBUGID, null_loader); // 63
+
 	//  We're not an authoring tool so we don't care.
 	// (might be nice to dump the password instead..)
 	register_tag_loader(SWF::ENABLEDEBUGGER2, null_loader);    // 64
-	
+        
+        // TODO: Fix this to load the limits, or decide we will ignore them.	
+        register_tag_loader(SWF::SCRIPTLIMITS, fixme_loader); //65
+
+        // TODO: Fix this, but probably not critical.
+        register_tag_loader(SWF::SETTABINDEX, fixme_loader); //66 
+
+        // TODO: Alexis reference says these are 83, 84. The 67,68 comes from Tamarin.
+        // Figure out which one is correct (possibly both are).
+        register_tag_loader(SWF::DEFINESHAPE4_, fixme_loader); // 67
+        register_tag_loader(SWF::DEFINEMORPHSHAPE2_, fixme_loader); // 68
+
 	register_tag_loader(SWF::FILEATTRIBUTES, file_attributes_loader); // 69
 	register_tag_loader(SWF::PLACEOBJECT3, fixme_loader); // 70
 	register_tag_loader(SWF::IMPORTASSETS2, import_loader); // 71
 
+        register_tag_loader(SWF::DOABC, fixme_loader); // 72 -- AS3 codeblock.
 	register_tag_loader(SWF::DEFINEALIGNZONES, DefineFontAlignZonesTag::loader); // 73
 
 	register_tag_loader(SWF::CSMTEXTSETTINGS, fixme_loader); // 74
 	register_tag_loader(SWF::DEFINEFONT3, define_font_loader); // 75
+        register_tag_loader(SWF::SYMBOLCLASS, fixme_loader); // 76 Chad
 	register_tag_loader(SWF::METADATA, metadata_loader); // 77
 	register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
+        register_tag_loader(SWF::DOABCDEFINE, fixme_loader); // 79 -- AS3 codeblock.
 	register_tag_loader(SWF::DEFINESHAPE4, fixme_loader); // 83
 	register_tag_loader(SWF::DEFINEMORPHSHAPE2, fixme_loader); // 84
 
 	register_tag_loader(SWF::REFLEX, reflex_loader); // 777
 }
-
 
 
 #if 0 // deprecated
