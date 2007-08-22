@@ -10,8 +10,8 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
+ * 
+ * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  *
@@ -53,8 +53,8 @@ main(int /*argc*/, char** /*argv*/)
   check_equals(root->get_frame_count(), 2);
   // FRAME 1
   check_pixel(15, 15, 30, red, 2); 
-  // visual checks succeed with AGG pixel format RGB24
-  // don't know why this check fails with AGG and pixel foramt AGG_RGB555
+  // visual check succeeds with AGG pixel format RGB24
+  // don't know why this check fails with AGG pixel format AGG_RGB555
   xcheck_pixel(40, 40, 10, white, 3); 
   
   // FRAME 2 

@@ -1,5 +1,5 @@
 /*
- *   Copyright (C) 2005, 2006 Free Software Foundation, Inc.
+ *   Copyright (C) 2007 Free Software Foundation, Inc.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  */ 
 
 /*
- * Zou Lunkai, zoulunkai@gmail.com
+ *  Zou Lunkai, zoulunkai@gmail.com
  *
  *  Test for nested masks
  */
@@ -35,13 +35,13 @@ SWFMovieClip defineMovieclip(int x, int y, int w, int h);
 
 SWFMovieClip defineMovieclip(int x, int y, int w, int h)
 {
-		SWFMovieClip mc;
-		SWFShape  sh;
-	  mc = newSWFMovieClip();
-  	sh = make_fill_square (x, y, w, h, 255, 0, 0, 255, 0, 0);
- 	 	SWFMovieClip_add(mc, (SWFBlock)sh);  
-  	SWFMovieClip_nextFrame(mc);
-  	return mc;
+    SWFMovieClip mc;
+    SWFShape  sh;
+    mc = newSWFMovieClip();
+    sh = make_fill_square (x, y, w, h, 255, 0, 0, 255, 0, 0);
+    SWFMovieClip_add(mc, (SWFBlock)sh);  
+    SWFMovieClip_nextFrame(mc);
+    return mc;
 }
 
 int
@@ -50,7 +50,7 @@ main(int argc, char** argv)
   SWFMovie mo;
   SWFMovieClip  mc1, mc2, mc3, mc4, mc5, mc6, mc7, dejagnuclip;
   SWFDisplayItem it;
-	
+  
   Ming_init();
   mo = newSWFMovieWithVersion(OUTPUT_VERSION);
   SWFMovie_setDimension(mo, 800, 600);
@@ -89,9 +89,9 @@ main(int argc, char** argv)
   it = SWFMovie_add(mo, (SWFBlock)mc6);  
   SWFDisplayItem_setDepth(it, 6); 
 
-	SWFMovie_nextFrame(mo); 
+  SWFMovie_nextFrame(mo); 
 
-	it = SWFMovie_add(mo, (SWFBlock)mc7);  
+  it = SWFMovie_add(mo, (SWFBlock)mc7);  
   SWFDisplayItem_setDepth(it, 7); 
                     
   SWFMovie_nextFrame(mo); 
