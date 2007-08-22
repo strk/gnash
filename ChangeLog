@@ -1,3 +1,14 @@
+2007-08-22 Chad Musick <chadmusick@msbx.net>
+
+	* server/font.h, server/font.cpp: Define
+	  m_display_name and m_copyright_name for the
+	  DefineFontName tag (88) of SWF 9, reader
+	  for the tag.
+	* server/swf.h Add DEFINEFONTNAME tag to list.
+	* server/impl.cpp Set loader for DefineFontName
+	* server/swf/tag_loaders.h,.cpp Add loader for
+	  DefineFontName tag.
+
 2007-08-22 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: bail out if kde gui or kparts plugin are

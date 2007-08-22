@@ -233,6 +233,15 @@ public:
 	///
 	void	read_font_info(stream* in, SWF::tag_type tag, movie_definition* m);
 
+        /// \brief
+        /// Read the name of this font, from a DEFINEFONTNAME tag.
+        //
+        /// The caller has already read the tag type and font id.
+        //
+        /// @see SWF::define_font_name_loader
+        ///
+        void read_font_name(stream* in, SWF::tag_type tag, movie_definition* m);
+
 	/// Dump our cached data into the given stream.
 	void	output_cached_data(tu_file* out, const cache_options& options);
 
@@ -369,6 +378,9 @@ private:
 	int	m_texture_glyph_nominal_size;
 
 	std::string	m_name;
+        std::string     m_display_name;
+        std::string     m_copyright_name;
+
 	movie_definition*	m_owning_movie;
 
 	bool	m_has_layout;

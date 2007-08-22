@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.45 2007/07/24 19:43:30 strk Exp $ */
+/* $Id: font.cpp,v 1.46 2007/08/22 13:09:10 cmusick Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -68,6 +68,8 @@ GlyphInfo::markReachableResources() const
 		:
 		m_texture_glyph_nominal_size(96),	// Default is not important; gets overridden during glyph generation
 		m_name(),
+                m_display_name(),
+                m_copyright_name(),
 		m_owning_movie(NULL),
 		m_unicode_chars(false),
 		m_shift_jis_chars(false),
@@ -85,6 +87,8 @@ GlyphInfo::markReachableResources() const
 		:
 		m_texture_glyph_nominal_size(96),	// Default is not important; gets overridden during glyph generation
 		m_name(name),
+                m_display_name(),
+                m_copyright_name(),
 		m_owning_movie(NULL),
 		m_unicode_chars(false),
 		m_shift_jis_chars(false),
@@ -429,6 +433,18 @@ GlyphInfo::markReachableResources() const
 		}
 	}
 
+        // Read the font name, display and legal, from a DefineFontName tag.
+        void font::read_font_name(stream* in, SWF::tag_type tag,
+            movie_definition* /*m*/) 
+        {
+            assert(tag == SWF::DEFINEFONTNAME);
+            char* disp_name = in->read_string();
+            char* copy_name = in->read_string();
+            m_display_name = disp_name;
+            delete [] disp_name;
+            m_copyright_name = copy_name;
+            delete [] copy_name;
+        }
 
 	// Read additional information about this font, from a
 	// DefineFontInfo tag.  The caller has already read the tag

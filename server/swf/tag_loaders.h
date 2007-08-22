@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: tag_loaders.h,v 1.20 2007/08/08 18:26:38 strk Exp $ */
+/* $Id: tag_loaders.h,v 1.21 2007/08/22 13:09:10 cmusick Exp $ */
 
 #ifndef GNASH_SWF_TAG_LOADERS_H
 #define GNASH_SWF_TAG_LOADERS_H
@@ -88,6 +88,11 @@ void	reflex_loader(stream*, tag_type, movie_definition*);
 /// This adds information to an existing font.
 ///
 void	define_font_info_loader(stream*, tag_type, movie_definition*);
+
+/// SWF Tag DefineFontName (88)
+//  Load the display name and copyright string of a font.
+//  This adds to an existing font.
+void define_font_name_loader(stream*, tag_type, movie_definition*);
 
 /// Read SWF::DEFINETEXT and SWF::DEFINETEXT2 tags.
 void	define_text_loader(stream*, tag_type, movie_definition*);

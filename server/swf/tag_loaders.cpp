@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.130 2007/08/18 22:07:17 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.131 2007/08/22 13:09:10 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1063,6 +1063,27 @@ void	define_font_info_loader(stream* in, tag_type tag, movie_definition* m)
     }
 }
 
+// Set font name for a font.
+void define_font_name_loader(stream* in, tag_type tag, movie_definition* m)
+{
+    assert(tag == SWF::DEFINEFONTNAME);
+
+    uint16_t font_id = in->read_u16();
+
+    font* f = m->get_font(font_id);
+    if (f)
+    {
+        f->read_font_name(in, tag, m);
+    }
+    else
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+            log_swferror(_("define_font_name_loader: "
+                           "can't find font w/ id %d"), font_id);
+        );
+    }
+}
+
 // Create and initialize a sprite, and add it to the movie.
 void
 sprite_loader(stream* in, tag_type tag, movie_definition* m)
@@ -1437,7 +1458,7 @@ start_sound_loader(stream* in, tag_type tag, movie_definition* m)
 {
     sound_handler* handler = get_sound_handler();
 
-    assert(tag == SWF::STARTSOUND); // 15
+    assert(tag == SWF::STARTSOUND); // 15 
 
     uint16_t	sound_id = in->read_u16();
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.115 2007/08/22 04:27:02 cmusick Exp $ */
+/* $Id: impl.cpp,v 1.116 2007/08/22 13:09:10 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -167,7 +167,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::DEFINESOUND,	define_sound_loader);
 	register_tag_loader(SWF::STARTSOUND,	start_sound_loader);
 
-        register_tag_loader(SWF::STOPSOUND,     fixme_loader); // 16
+        register_tag_loader(SWF::STOPSOUND,     fixme_loader); // 16 
 	
         register_tag_loader(SWF::DEFINEBUTTONSOUND, button_sound_loader);
 	register_tag_loader(SWF::SOUNDSTREAMHEAD, sound_stream_head_loader); // 18
@@ -256,12 +256,14 @@ static void	ensure_loaders_registered()
 
 	register_tag_loader(SWF::CSMTEXTSETTINGS, fixme_loader); // 74
 	register_tag_loader(SWF::DEFINEFONT3, define_font_loader); // 75
-        register_tag_loader(SWF::SYMBOLCLASS, fixme_loader); // 76 Chad
+        register_tag_loader(SWF::SYMBOLCLASS, fixme_loader); // 76 
 	register_tag_loader(SWF::METADATA, metadata_loader); // 77
 	register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
         register_tag_loader(SWF::DOABCDEFINE, fixme_loader); // 79 -- AS3 codeblock.
 	register_tag_loader(SWF::DEFINESHAPE4, fixme_loader); // 83
 	register_tag_loader(SWF::DEFINEMORPHSHAPE2, fixme_loader); // 84
+
+        register_tag_loader(SWF::DEFINEFONTNAME, define_font_name_loader); // 88
 
 	register_tag_loader(SWF::REFLEX, reflex_loader); // 777
 }
