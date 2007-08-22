@@ -1,3 +1,8 @@
+2007-08-23 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-mtasc.all/exception.as: more tests for
+	  try/catch/finally.
+
 2007-08-22 Sandro Santilli <strk@keybit.net>
 
 	* server/swf.h: add version and reference url to

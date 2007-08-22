@@ -44,6 +44,47 @@ class Test
 		}
 	}
 
+	function throwAndCatchAddingOne(o)
+	{
+		try {
+			throw 'catch';
+			return 'try';
+		}
+		catch (e) {
+			return e;
+		}
+		finally {
+			o.num += 1;
+		}
+	}
+
+	function throwFromCatchAddingOne(o)
+	{
+		try {
+			throw 'catch';
+			return 'try';
+		}
+		catch (e) {
+			o.num += 1;
+			note("Catch inside, throwing again (not expected to survive after finally)!");
+			throw e; // double throw not supported ?
+			return 'catch';
+		}
+		finally {
+			return 'finally';
+		}
+	}
+
+	function throwNested(o)
+	{
+		try {
+			throw 'throw';
+		} catch (e) {
+			note("Catch inside, throwing again!");
+			throw e;
+		}
+	}
+
 	function test_all()
 	{
 		var res = 'string';
@@ -86,6 +127,36 @@ class Test
 		var ret = addOneOnFinal(o);
 		xcheck_equals(ret, 'finally');
 		xcheck_equals(o.num, 2);
+
+		ret = throwAndCatchAddingOne(o);
+		xcheck_equals(ret, 'catch');
+		xcheck_equals(o.num, 3);
+
+		try {
+			ret = throwAndCatchAddingOne(o);
+		} catch (e) {
+			ret = 'catch_outside';
+		}
+		xcheck_equals(ret, 'catch');
+		xcheck_equals(o.num, 4);
+
+		try {
+			ret = throwFromCatchAddingOne(o);
+		} catch (e) {
+			note("Catch outside");
+			o.num += 1;
+			ret += e+'_outside';
+		}
+		xcheck_equals(ret, 'finally');
+		xcheck_equals(o.num, 5);
+
+		try {
+			throwNested();
+		} catch (e) {
+			note("Catch outside");
+			o.num = e;
+		}
+		xcheck_equals(o.num, 'throw');
 	}
 
 	static function main(mc)
