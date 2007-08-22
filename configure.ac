@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.403 2007/08/21 15:18:36 strk Exp $
+dnl $Id: configure.ac,v 1.404 2007/08/22 10:52:51 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1958,6 +1958,14 @@ if test x$build_agg = xyes; then # {
 fi # }
 
 if test x"$BOOST_LIBS" != x; then
+
+    if test x"$boost_thread" != xyes; then
+	echo "        ERROR: The BOOST thread package is needed to compile cygnal!"
+	echo "               Install it from http://boost.org"
+	echo "               or .deb users: apt-get install libboost-thread-dev"
+	nogo=true
+    fi
+
     # Only cygnal requires date_time at present, so it's OK if either
     # you don't want cygnal or do have date_time installed.
     if test x"$cygnal" = xno -o x"$boost_date_time" = xyes; then
@@ -1974,9 +1982,9 @@ if test x"$BOOST_LIBS" != x; then
 else
     echo "        ERROR: No BOOST development package installed!"
     echo "               Install it from http://www.boost.org"
-    echo "               or .deb users: apt-get install libboost-thread-dev"
+    echo "               or .deb users: apt-get install libboost-dev libboost-thread-dev"
     if test x"$cygnal" = xyes; then
-    echo "                              and libboost-date-time-dev"
+    echo "                              and libboost-date-time-dev (for cygnal)"
     fi
     echo "               or .rpm users: yum install boost-devel"
  nogo=true

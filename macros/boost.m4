@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.47 2007/07/01 10:54:11 bjacques Exp $
+dnl $Id: boost.m4,v 1.48 2007/08/22 10:52:52 strk Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -26,10 +26,10 @@ AC_DEFUN([GNASH_PATH_BOOST],
   AC_ARG_WITH(boost_incl, AC_HELP_STRING([--with-boost-incl], [directory where boost headers are]), with_boost_incl=${withval})
   AC_CACHE_VAL(ac_cv_path_boost_incl, [
     if test x"${with_boost_incl}" != x ; then
-      if test -f ${with_boost_incl}/boost/detail/lightweight_mutex.hpp ; then
+      if test -f ${with_boost_incl}/boost/thread.hpp ; then
         ac_cv_path_boost_incl=-I`(cd ${with_boost_incl}; pwd)`
       else
-        AC_MSG_ERROR([${with_boost_incl} directory doesn't contain any headers])
+        AC_MSG_ERROR([${with_boost_incl} directory doesn't contain boost/thread.hpp])
       fi
     fi
   ])
@@ -49,14 +49,9 @@ AC_DEFUN([GNASH_PATH_BOOST],
     gnash_boost_version=""
     for i in $incllist; do
       for j in `ls -dr $i/boost* 2>/dev/null`; do
-        if test -f ${j}/boost/detail/lightweight_mutex.hpp; then
+        if test -f ${j}/boost/detail/lightweight_mutex.hpp -a -f ${j}/boost/thread.hpp; then
           gnash_boost_topdir=`basename $j`
           ac_cv_path_boost_incl="-I${j}"
-          break
-        fi
-        if test -f ${j}/detail/lightweight_mutex.hpp; then
-          gnash_boost_topdir=`basename $j`
-          ac_cv_path_boost_incl="-I${i}"
           break
         fi
       done
@@ -68,17 +63,13 @@ AC_DEFUN([GNASH_PATH_BOOST],
   fi
 
   if test x"${gnash_boost_version}" = x; then
-    AC_MSG_RESULT([no version needed])
+    AC_MSG_RESULT([no version found/needed])
   else
    AC_MSG_RESULT(${gnash_boost_version})
   fi
 
-  if test x"${ac_cv_path_boost_incl}" = x ; then
-    AC_CHECK_HEADERS(boost/detail/lightweight_mutex.hpp, [ac_cv_path_boost_incl="-I/usr/include"])
-  fi
-
-  AC_MSG_CHECKING([for boost header])
-  AC_MSG_RESULT(${ac_cv_path_boost_incl})
+  dnl AC_MSG_CHECKING([for boost header])
+  dnl AC_MSG_RESULT(${ac_cv_path_boost_incl})
 
   dnl Look for the library
   AC_ARG_WITH(boost_lib, AC_HELP_STRING([--with-boost-lib], [directory where boost libraries are]), with_boost_lib=${withval})
@@ -87,9 +78,6 @@ AC_DEFUN([GNASH_PATH_BOOST],
       ac_cv_path_boost_lib="-L`(cd ${with_boost_lib}; pwd)`"
     fi
   ])
-
-  AC_LANG_PUSH(C++)
-  save_LIBS="$LIBS"
 
   dnl Specify the list of probable names. Boost creates 8 identical
   dnl libraries with different names. The prefered order is to always
@@ -144,18 +132,47 @@ AC_DEFUN([GNASH_PATH_BOOST],
   done
   AC_MSG_RESULT(${ac_cv_path_boost_lib})
 
-  dnl we don't want any boost libraries in LIBS, we prefer to keep it seperate.
-  AC_LANG_POP(C++)  
-  LIBS="$save_LIBS"
-
   BOOST_CFLAGS="$ac_cv_path_boost_incl"
-  AC_SUBST(BOOST_CFLAGS)
-
   BOOST_LIBS="$ac_cv_path_boost_lib" 
+
+  dnl ---------------------------------------
+  dnl Check actual usability of headers
+  dnl (if not cross-compiling)
+  dnl ---------------------------------------
+
+  if test x${cross_compiling} = xno; then
+    AC_LANG_PUSH(C++)  
+    save_CFLAGS="$CFLAGS"
+    CFLAGS="$CFLAGS $BOOST_CFLAGS"
+    AC_CHECK_HEADERS([boost/thread.hpp], [], [boost_thread=no]) 
+    CFLAGS="$save_CFLAGS"
+    AC_LANG_POP(C++)  
+  fi # if not cross-compiling
+
+  dnl ---------------------------------------
+  dnl TODO: Check actual usability of libs
+  dnl ---------------------------------------
+
+  if test x${cross_compiling} = xno; then
+    dnl Two problems:
+    dnl   1) knowing the name of the required libs
+    dnl      (needs storing the name when finding it
+    dnl      at the beginning of this macro)
+    dnl   2) check how to use AC_CHECK_LIB for C++ libs
+    :
+  fi # if not cross-compiling
+
+
+  dnl ------------------------------------------------------------------
+  dnl Set HAVE_BOOST conditional, BOOST_CFLAGS and BOOST_LIBS variables
+  dnl ------------------------------------------------------------------
+
+  AC_SUBST(BOOST_CFLAGS)
   AC_SUBST(BOOST_LIBS)
 
   # This isn't right: you don't need boot date-time installed unless u build
   # cygnal, and it is sometimes a separate package from Boost core and thread.
+  # TODO: why is this needed, lack of boost being a fatal error?
   AM_CONDITIONAL(HAVE_BOOST, [test x${boost_date_time} = xyes && test x${boost_thread} = xyes])
 ])
 

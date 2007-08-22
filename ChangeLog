@@ -1,3 +1,9 @@
+2007-08-22 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: bail out if boost_thread is not set to yes.
+	* macros/boost.m4: check for boost/thread.hpp. Should fix
+	  bug #20847.
+
 2007-08-22 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-ming.all/masks_test2.c, 
