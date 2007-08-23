@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.40 2007/08/23 01:57:02 nihilus Exp $ */
+/* $Id: amf.cpp,v 1.41 2007/08/23 14:10:54 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -293,14 +293,15 @@ AMF::readElement(void *in)
 /// normal ASCII. It may be that these need to be converted to wide
 /// characters, but for now we just leave them as standard multibyte
 /// characters.
-void *
+byte*
 AMF::encodeElement(astype_e type, const void *in, int nbytes)
 {
     GNASH_REPORT_FUNCTION;
 
-    char *out = NULL, *x;
     amfnum_t num;
-    int pktsize = -1;
+    int pktsize = 0;
+    byte* out = NULL;
+    byte* x = NULL;
 
     // Packets are of varying length. A few pass in a byte count, but
     // most packets have a hardcoded size.
@@ -360,12 +361,17 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
           pktsize = 0;          // look for the terminator
           break;
 // FIXME, shouldn't there be a default case here?
+      default:
+          log_error("Unknown AMF packet type %d", type);
+          return 0;
     };
+
+    log_debug("pktsize:%d, nbytes:%d", pktsize, nbytes);
     
     switch (type) {
-        // Encode the data as a 64 bit, big-endian, numeric value
       case NUMBER:
-          x = out = new char[pktsize];
+          // Encode the data as a 64 bit, big-endian, numeric value
+          x = out = new byte[pktsize];
           memset(x, 0, pktsize);
           *x++ = (char)AMF::NUMBER;
           memcpy(&num, in, AMF_NUMBER_SIZE);
@@ -374,7 +380,7 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
           break;
       case BOOLEAN:
           // Encode a boolean value. 0 for false, 1 for true
-          out = new char[pktsize];
+          out = new byte[pktsize];
           x = out;    
           *x++ = (char)AMF::BOOLEAN;
           *x = *static_cast<const char *>(in);
@@ -382,11 +388,13 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
       case STRING:
           // Encode a string value. The data follows a 2 byte length
           // field. (which must be big-endian)
-          x = out = new char[pktsize];
+          x = out = new byte[pktsize];
           memset(x, 0, pktsize);
           *x++ = AMF::STRING;
           num = nbytes;
+          log_debug("Encoded data size is going to be " AMFNUM_F, num);
           swapBytes(&num, 2);
+          log_debug("After swapping, it's " AMFNUM_F, num);
           memcpy(x, &num, 2);
           x+=2;
           memcpy(x, in, nbytes);
@@ -401,7 +409,7 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
           log_unimpl("Null AMF encoder");
           break;
       case UNDEFINED:
-          x = out = new char[pktsize];
+          x = out = new byte[pktsize];
           memset(x, 0, pktsize);
           *x++ = AMF::UNDEFINED;
           num = nbytes;
@@ -424,7 +432,7 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
           break;
           // Encode the date as a 64 bit, big-endian, numeric value
       case DATE:
-          x = out = new char[pktsize];
+          x = out = new byte[pktsize];
           memset(x, 0, pktsize);
           *x++ = AMF::DATE;
           num = *static_cast<const amfnum_t*>(in);
@@ -443,7 +451,7 @@ AMF::encodeElement(astype_e type, const void *in, int nbytes)
       case XML_OBJECT:
           // Encode an XML object. The data follows a 4 byte length
           // field. (which must be big-endian)
-          x = out = new char[pktsize];
+          x = out = new byte[pktsize];
           memset(x, 0, pktsize);
           *x++ = AMF::STRING;
           num = nbytes;
@@ -712,20 +720,21 @@ AMF::extractElementLength(void *in)
 }
 
 char *
-AMF::extractString(const char *in)
+AMF::extractString(const byte *in)
 {
     GNASH_REPORT_FUNCTION;
     char *buf = NULL;
-    char *x = const_cast<char*>(in);
-    short length;
+    const byte *x = in;
     
     if (*x == AMF::STRING) {
         x++;
-        length = *(reinterpret_cast<short *>(x));
+        short length = *(reinterpret_cast<const short *>(x));
+        swapBytes(&length, 2);
+	log_debug("Encoded length of string: %hd", length);
         x += sizeof(short);
         buf = new char[length+1];
         memset(buf, 0, length+1);
-        strncpy(buf, x, length); /* memcpy() does memory access violation on Darwin! */
+        memcpy(buf, x, length); /* x is not long enough */
     } else {
         log_error("Tried to extract AMF string from non String object!");
     }
@@ -739,7 +748,7 @@ AMF::extractNumber(const char *in)
     GNASH_REPORT_FUNCTION;    
     char *x = const_cast<char *>(in);
     amfnum_t *num = new amfnum_t;
-    memset(num, 0, AMF_NUMBER_SIZE+1);
+    memset(num, 0, AMF_NUMBER_SIZE);
     
     if (*x == AMF::NUMBER) {
         x++;
@@ -752,29 +761,29 @@ AMF::extractNumber(const char *in)
     return num;
 }
 
-void *
+byte *
 AMF::encodeVariable(amf_element_t & /* el */)
 {
     GNASH_REPORT_FUNCTION;
     return NULL;
 }
 
-void *
+byte *
 AMF::encodeVariable(const char *name, bool flag)
 {
     GNASH_REPORT_FUNCTION;
     
     int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
-    char *out = new char[outsize];
-    char *tmpptr = out;
-    short length;
+    byte *out = new byte[outsize];
+    byte *tmpptr = out;
 
-    length = strlen(name);
-    swapBytes(&length, 2);
-    memcpy(tmpptr, &length, 2);
+    size_t length = strlen(name);
+    short enclength = length;
+    swapBytes(&enclength, 2);
+    memcpy(tmpptr, &enclength, 2);
     tmpptr += 2;
-    strcpy(tmpptr, name);
-    tmpptr += strlen(name);
+    memcpy(tmpptr, name, length);
+    tmpptr += length;
     *tmpptr = AMF::BOOLEAN;
     tmpptr++;
     *tmpptr = flag;
@@ -782,44 +791,44 @@ AMF::encodeVariable(const char *name, bool flag)
     return out;    
 }
 
-void *
+byte *
 AMF::encodeVariable(const char *name)
 {
     GNASH_REPORT_FUNCTION;
-    int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
-    char *out = new char[outsize];
-    char *tmpptr = out;
-    short length;
+    size_t outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
+    byte *out = new byte[outsize];
+    byte *tmpptr = out;
 
-    length = strlen(name);
-    swapBytes(&length, 2);
-    memcpy(tmpptr, &length, 2);
+    size_t length = strlen(name);
+    short enclength = length;
+    swapBytes(&enclength, 2);
+    memcpy(tmpptr, &enclength, 2);
     tmpptr += 2;
-    strcpy(tmpptr, name);
-    tmpptr += strlen(name);
+    memcpy(tmpptr, name, length);
+    tmpptr += length;
     *tmpptr = AMF::UNDEFINED;
     tmpptr++;
 
     return out;    
 }
 
-void *
+byte *
 AMF::encodeVariable(const char *name, amfnum_t bignum)
 {
     GNASH_REPORT_FUNCTION;
     int outsize = strlen(name) + AMF_NUMBER_SIZE + 5;
-    char *out = new char[outsize];
-    char *tmpptr = out;
-    short length;
+    byte *out = new byte[outsize];
+    byte *tmpptr = out;
     amfnum_t newnum = bignum;
     char *numptr = (char *)&newnum;
 
-    length = strlen(name);
-    swapBytes(&length, 2);
-    memcpy(tmpptr, &length, 2);
+    size_t length = strlen(name);
+    short enclength = length;
+    swapBytes(&enclength, 2);
+    memcpy(tmpptr, &enclength, 2);
     tmpptr += 2;
-    strcpy(tmpptr, name);
-    tmpptr += strlen(name);
+    memcpy(tmpptr, name, length);
+    tmpptr += length;
     *tmpptr = AMF::NUMBER;
     tmpptr++;
 //    swapBytes(numptr, AMF_NUMBER_SIZE);
@@ -828,41 +837,42 @@ AMF::encodeVariable(const char *name, amfnum_t bignum)
     return out;    
 }
 
-void *
+byte *
 AMF::encodeVariable(const char *name, const char *val)
 {
     GNASH_REPORT_FUNCTION;
 
     int outsize = strlen(name) + strlen(val) + 5;
-    char *out = new char[outsize];
-    char *tmpptr = out;
-    short length;
+    byte *out = new byte[outsize];
+    byte *tmpptr = out;
 
-    length = strlen(name);
-    swapBytes(&length, 2);
-    memcpy(tmpptr, &length, 2);
+    size_t length = strlen(name);
+    short enclength = length;
+    swapBytes(&enclength, 2);
+    memcpy(tmpptr, &enclength, 2);
     tmpptr += 2;
-    strcpy(tmpptr, name);
-    tmpptr += strlen(name);
+    memcpy(tmpptr, name, length);
+    tmpptr += length;
     *tmpptr = AMF::STRING;
     tmpptr++;
     length = strlen(val);
-    swapBytes(&length, 2);
-    memcpy(tmpptr, &length, 2);
+    enclength = length;
+    swapBytes(&enclength, 2);
+    memcpy(tmpptr, &enclength, 2);
     tmpptr += 2;
-    strcpy(tmpptr, val);
+    memcpy(tmpptr, val, length);
 
     return out;
 }
 
-void *
+byte *
 AMF::encodeVariable(std::string &name, std::string &val)
 {
     GNASH_REPORT_FUNCTION;
 
     int outsize = name.size() + val.size() + 5;
-    unsigned char *out = new unsigned char[outsize];
-    unsigned char *tmpptr = out;
+    byte *out = new unsigned char[outsize];
+    byte *tmpptr = out;
     short length;
 
     length = name.size() && 0xffff;
@@ -1188,27 +1198,30 @@ AMF::extractVariable(amf_element_t *el, unsigned char *in)
 	  break;
         }
       case STRING:
+      {
 	  length = ntohs((*(const short *)tmpptr) & 0xffff);
           tmpptr += sizeof(short);
           el->data = (const unsigned char*)tmpptr; 
-          log_msg(_("Variable \"%s\" is: %s"), el->name.c_str(), el->data);
+          std::string v((char*)el->data, length);
+          log_msg(_("Variable \"%s\" is: %s"), el->name.c_str(), v.c_str()); // el->data);
           tmpptr += length;
           el->length = length;
           break;
+      }
       case OBJECT:
       case MOVIECLIP:
       case NULL_VALUE:
 	  // Undefined types have a name, but no value
 		//FIXME this shouldn't fall through!
       case UNDEFINED:
+      {
           log_msg(_("Undefined type"));
-	  length = ntohs((*(const short *)tmpptr) & 0xffff);
-          el->data = (const unsigned char*)tmpptr; 
-          log_msg(_("Variable \"%s\" is: %s"), el->name.c_str(), el->data);
-//          tmpptr += length;
-          el->length = length;
+          el->data = 0; // (const unsigned char*)tmpptr; 
+          //log_msg(_("Variable \"%s\" is of undefined type"), el->name.c_str());
+          el->length = 0;
           el->type = AMF::UNDEFINED;
           break;
+      }
       case REFERENCE:
       case ECMA_ARRAY:
 			// FIXME this shouldn't fall thru

@@ -71,7 +71,7 @@ main(int argc, char *argv[])
 
     AMF amf_obj;
     int fd, ret;
-    char buf[AMF_VIDEO_PACKET_SIZE+1];
+    byte buf[AMF_VIDEO_PACKET_SIZE+1];
 
     // First see if we can read strings. This file is produced by
     // using a network packet sniffer, and should be binary correct.
@@ -99,7 +99,7 @@ main(int argc, char *argv[])
         runtest.fail("Encoded \"connect\" string");
     }
 
-    delete str;
+    delete [] str;
 }
 
 static void

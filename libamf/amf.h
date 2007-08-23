@@ -39,6 +39,8 @@ typedef long amfnum_t;
 typedef long long amfnum_t;
 #define AMFNUM_F "%lld"
 #endif
+// TIDO FIXME: this will be longer then the actual amfnum_t 
+//             if __WORDSIZE != 64 !!
 const char AMF_NUMBER_SIZE = 0x08;
 
 // These are the data types defined by AMF
@@ -47,6 +49,8 @@ typedef short AMF_Int_t ;
 typedef char * AMF_MediumInt_t;
 typedef int AMF_Long_t;
 typedef double AMF_Double_t;
+
+typedef unsigned char byte;
 
 // FIXME: These are probably bogus, and need to be a UTF-8 type.
 typedef char *AMF_UTF8_t;
@@ -74,15 +78,15 @@ const char TERMINATOR = 0x09;
 //
 // The first byte of the AMF file/stream is believed to be a version
 // indicator. So far the only valid value for this field that has been
-// found is 0×00. If it is anything other than 0×00 (zero), your
+// found is 0x00. If it is anything other than 0x00 (zero), your
 // system should consider the AMF file/stream to be
 // 'cmalformed'd. This can happen in the IDE if AMF calls are put
 // on the stack but never executed and the user exits the movie from the
 // IDE; the two top bytes will be random and the number of headers will
 // be unreliable.
 
-// The second byte of the AMF file/stream is appears to be 0×00 if the
-// client is the Flash Player and 0×01 if the client is the FlashCom
+// The second byte of the AMF file/stream is appears to be 0x00 if the
+// client is the Flash Player and 0x01 if the client is the FlashCom
 // server. 
 
 // The third and fourth bytes form an integer value that specifies the
@@ -166,39 +170,100 @@ public:
         DELETE_ATTRIBYTE = 0x0a,
         INITIAL_DATA = 0x0b
     } shared_obj_types_e;
-    typedef struct {
+
+    struct amf_element_t {
         astype_e       type;
         short          length;
         std::string     name;
         const unsigned char   *data;
-    } amf_element_t;
+
+        amf_element_t()
+                :
+                type(NUMBER),
+                length(0),
+                name(),
+                data(NULL)
+        {}
+
+    };
 
     AMF();
     AMF(int size);
     ~AMF();
     size_t size() { return _total_size; };
 
-    // encode an element
-    void *encodeElement(astype_e type, const void *in, int nbytes);
-    // encode a string
-    void *encodeString(char *str)  {
+    /// Encode an element
+    //
+    /// @param type
+    ///		Type of element
+    ///
+    /// @param in
+    ///		Input stream
+    ///
+    /// @param nbytes
+    ///		Lenght of data packet (not including header).
+    ///
+    /// @return an amf packet (header,data)
+    ///
+    byte* encodeElement(astype_e type, const void *in, int nbytes);
+
+    /// Encode a string
+    ///
+    /// @return an amf packet (header,data)
+    ///
+    byte* encodeString(const char *str)  {
         return encodeElement (STRING, str, strlen(str));
     };
-    void *encodeString(std::string &str) {
-        return encodeElement (STRING, static_cast<const void *>(str.c_str()), str.size());
-    };
-    // encode a 64 bit number
-    void *encodeNumber(amfnum_t num)  {
+
+    /// Encode a 64 bit number
+    ///
+    /// @return an amf packet (header,data)
+    ///
+    byte* encodeNumber(amfnum_t num)  {
         return encodeElement (NUMBER, &num, AMF_NUMBER_SIZE);
     };
 
-    // encode a variable. These are a name, followed by a string or number
-    void *encodeVariable(const char *name);
-    void *encodeVariable(amf_element_t &el);
-    void *encodeVariable(const char *name, bool flag);
-    void *encodeVariable(const char *name, amfnum_t num);
-    void *encodeVariable(std::string &name, std::string &val);
-    void *encodeVariable(const char *name, const char *val);
+    /// Encode a variable. These are a name, followed by a string or number
+    //
+    /// @return a newly allocated byte array,
+    /// to be deleted by caller using delete [] operator, or NULL
+    ///
+    byte* encodeVariable(const char *name);
+
+    /// Encode a variable. 
+    //
+    /// @return a newly allocated byte array,
+    /// to be deleted by caller using delete [] operator, or NULL
+    ///
+    byte* encodeVariable(amf_element_t &el);
+
+    /// Encode a boolean variable. This is a name followed by a boolean value.
+    //
+    /// @return a newly allocated byte array,
+    /// to be deleted by caller using delete [] operator, or NULL
+    ///
+    byte* encodeVariable(const char *name, bool flag);
+
+    /// Encode a variable. 
+    //
+    /// @return a newly allocated byte array,
+    /// to be deleted by caller using delete [] operator, or NULL
+    ///
+    byte* encodeVariable(const char *name, amfnum_t num);
+
+    /// Encode a variable. 
+    //
+    /// @return a newly allocated byte array,
+    /// to be deleted by caller using delete [] operator, or NULL
+    ///
+    byte* encodeVariable(std::string &name, std::string &val);
+
+    /// Encode a variable. 
+    //
+    /// @return a newly allocated byte array,
+    /// to be deleted by caller using delete [] operator, or NULL
+    ///
+    byte* encodeVariable(const char *name, const char *val);
 
     void *encodeRTMPHeader(int amf_index, amf_headersize_e head_size, int total_size,
                            content_types_e type, amfsource_e routing);
@@ -208,9 +273,15 @@ public:
 
     char *readElement(void *in);
     
-    astype_e extractElementHeader(void *in);
-    int extractElementLength(void *in);
-    char *extractString(const char *in);
+    /// Extract the string from a string-type AMF packet
+    //
+    /// Return a newly allocated char[],
+    /// or NULL if the given AMF packet is not a string type
+    ///
+    /// Caller is responsible for deletion using delete [] operator.
+    ///
+    char *extractString(const byte* in);
+
     amfnum_t *extractNumber(const char *in);
     amf_element_t *extractObject(const char *in);
 
@@ -242,6 +313,11 @@ public:
     }
         
  private:
+
+    astype_e extractElementHeader(void *in);
+
+    int extractElementLength(void *in);
+
     content_types_e     _type;
     std::map<std::string, amf_element_t *> _elements;
     int                 _amf_index;

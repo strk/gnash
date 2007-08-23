@@ -31,9 +31,10 @@
 #include <iostream>
 #include <string>
 
-#include "dejagnu.h"
+//#include "dejagnu.h"
 #include "rtmp.h"
 #include "amf.h"
+#include "check.h"
 
 using namespace amf;
 using namespace gnash;
@@ -71,6 +72,9 @@ main(int argc, char *argv[])
 {
     char buffer[300];
     int c;
+
+    //gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
+    //dbglogfile.setVerbosity(1);
 
     memset(buffer, 0, 300);
     
@@ -142,7 +146,7 @@ main(int argc, char *argv[])
     // This extracts a "connect" message from the RTMP data stream. We
     // look for everything ourselves to be the most accurate.
     tmpptr = buf  + amf_obj.getHeaderSize();
-    char *str = amf_obj.extractString((char *)tmpptr);
+    char *str = amf_obj.extractString(tmpptr);
     if (strcmp(str, "connect") == 0) {
         runtest.pass("Extracted \"connect\" string");
     } else {
@@ -278,10 +282,20 @@ main(int argc, char *argv[])
         runtest.fail("New Message Routing");
     }
 
+    check_equals(rtmp.getHeaderSize(), 12);
+
     if (memcmp(out, buf, 12) == 0) {
         runtest.pass("RTMP Headers match");
     } else {
-        runtest.fail("RTMP Headers match");
+        size_t s = 12;
+        runtest.fail("RTMP Headers mismatch");
+        unsigned char hexint[(s*2)+1];
+        hexify((unsigned char *)hexint, (unsigned char *)buf, s, true);
+	hexint[s*2] = '\0';
+        cerr << "buf is: 0x" << hexint << endl;
+        hexify((unsigned char *)hexint, (unsigned char *)out, s, true);
+	hexint[s*2] = '\0';
+        cerr << "out is: 0x" << hexint << endl;
     }
 
     tmpptr += rtmp.getHeaderSize();
@@ -290,13 +304,25 @@ main(int argc, char *argv[])
     unsigned char *var;
 
     var = (unsigned char *)rtmp.encodeString("connect");
-    if (strncmp(rtmp.extractString((char *)var), "connect", strlen("connect")) == 0) {
-        runtest.pass("Encoded \"connect\" string");
-    } else {
-        runtest.fail("Encoded \"connect\" string");
+    char* c_out = rtmp.extractString(var);
+    if ( ! c_out )
+    {
+        runtest.fail("Encoded \"connect\" string could not be extracted");
+    }
+    else
+    {
+        std::string s_in("connect");
+        std::string s_out(c_out);
+
+        if (s_in == s_out) {
+            runtest.pass("Encoded \"connect\" string");
+        } else {
+            runtest.fail("Encoded \"connect\" string");
+            cerr << "Encoded 'connect' returned as as" << s_out << endl;
+        }
     }
     tmpptr = rtmp.appendPtr(tmpptr, var, strlen("connect") + 3);
-    delete var;
+    delete [] var;
 
     amfnum_t bignum = 0x3ff0000000000000LL;
     numptr = (char *)&bignum;
@@ -308,7 +334,7 @@ main(int argc, char *argv[])
     }
 
     tmpptr = rtmp.appendPtr(tmpptr, var, AMF_NUMBER_SIZE + 1);
-    delete var;
+    delete [] var;
 
     // Start the object
     *tmpptr++ = AMF::OBJECT;
@@ -321,7 +347,7 @@ main(int argc, char *argv[])
         runtest.fail("Encoded \"app\" variable");
     }
     tmpptr = rtmp.appendPtr(tmpptr, var, el.length + strlen("app") + 5);
-    delete var;
+    delete [] var;
     
     var = (unsigned char *)rtmp.encodeVariable("flashVer", "LNX 9,0,31,0");
     rtmp.extractVariable(&el, var);
@@ -331,7 +357,7 @@ main(int argc, char *argv[])
         runtest.fail("Encoded \"flashVer\" variable");
     }
     tmpptr = rtmp.appendPtr(tmpptr, var, el.length + strlen("flashVer") + 5);
-    delete var;
+    delete [] var;
     
     var = (unsigned char *)rtmp.encodeVariable("swfUrl", "http://www.red5.nl/tools/publisher/publisher.swf");
     rtmp.extractVariable(&el, var);
@@ -341,7 +367,7 @@ main(int argc, char *argv[])
         runtest.fail("Encoded \"swfUrl\" variable");
     }
     tmpptr = rtmp.appendPtr(tmpptr, var, el.length + strlen("swfUrl") + 5);
-    delete var;
+    delete [] var;
     
     var = (unsigned char *)rtmp.encodeVariable("tcUrl", "rtmp://localhost/oflaDemo");
     rtmp.extractVariable(&el, var);
@@ -351,7 +377,7 @@ main(int argc, char *argv[])
         runtest.fail("Encoded \"tcUrl\" variable");
     }
     tmpptr = rtmp.appendPtr(tmpptr, var, el.length + strlen("tcUrl") + 5);
-    delete var;
+    delete [] var;
 
     var = (unsigned char *)rtmp.encodeVariable("fpad", false);
     rtmp.extractVariable(&el, var);
@@ -361,7 +387,7 @@ main(int argc, char *argv[])
         runtest.fail("Encoded \"fpad\" Boolean variable");
     }
     tmpptr = rtmp.appendPtr(tmpptr, var, 1 + strlen("fpad") + 3);
-    delete var;
+    delete [] var;
     
     bignum = 0x388340LL;
     numptr = (char *)&bignum;
@@ -378,7 +404,7 @@ main(int argc, char *argv[])
         runtest.fail("Encoded \"audioCodecs\" variable");
     }
     tmpptr = rtmp.appendPtr(tmpptr, var, el.name.size() + AMF_NUMBER_SIZE + 3);
-    delete var;
+    delete [] var;
     
     bignum = 0x5f40LL;
     numptr = (char *)&bignum;
@@ -394,7 +420,7 @@ main(int argc, char *argv[])
         runtest.fail("Encoded \"videoCodecs\" variable");
     }
     tmpptr = rtmp.appendPtr(tmpptr, var, el.name.size() + AMF_NUMBER_SIZE + 3);
-    delete var;
+    delete [] var;
     
     bignum = 0xf03fLL;
     numptr = (char *)&bignum;
@@ -410,7 +436,7 @@ main(int argc, char *argv[])
         runtest.fail("Encoded \"videoFunction\" variable");
     }
     tmpptr = rtmp.appendPtr(tmpptr, var, el.name.size() + AMF_NUMBER_SIZE + 3);
-    delete var;
+    delete [] var;
     
     var = (unsigned char *)rtmp.encodeVariable("pageUrl");
     rtmp.extractVariable(&el, var);
@@ -421,7 +447,7 @@ main(int argc, char *argv[])
         runtest.fail("Encoded \"pageUrl\" undefined variable");
     }
     tmpptr = rtmp.appendPtr(tmpptr, var, el.name.size() + 3);
-    delete var;
+    delete [] var;
     
     bignum = 0x0;
     numptr = (char *)&bignum;
@@ -437,7 +463,7 @@ main(int argc, char *argv[])
         runtest.fail("Encoded \"objectEncoding\" variable");
     }
     tmpptr = rtmp.appendPtr(tmpptr, var, el.name.size() + AMF_NUMBER_SIZE + 3);
-    delete var;
+    delete [] var;
 
     // Start the object
     *tmpptr++ = AMF::OBJECT_END;
@@ -445,13 +471,16 @@ main(int argc, char *argv[])
     if (memcmp(buf, out, amf_obj.getTotalSize()) == 0) {
         runtest.pass("Object Packets match");
     } else {
-        runtest.fail("Object Packets match");
+        runtest.fail("Object Packets mismatch");
     }    
 
-    unsigned char hexint[AMF_PACKET_SIZE];
+    size_t hexsize = std::max(AMF_PACKET_SIZE, amf_obj.getTotalSize())*2;
+    unsigned char hexint[hexsize+1];
     hexify((unsigned char *)hexint, (unsigned char *)buf, amf_obj.getTotalSize() + 10, true);
+    hexint[hexsize] = '\0';
     cerr << "buf is: 0x" << hexint << ", size is: " << amf_obj.getTotalSize() << endl;
     hexify((unsigned char *)hexint, (unsigned char *)out, rtmp.getTotalSize() + 10, true);
+    hexint[hexsize] = '\0';
     cerr << "out is: 0x" << hexint << ", size is: " << rtmp.getTotalSize() << endl;
     
 //    delete out;

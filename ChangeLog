@@ -1,3 +1,12 @@
+2007-08-23 Sandro Santilli <strk@keybit.net>
+
+	* libamf/amf.{cpp,h}: fixed a bunch of memory errors, added
+	  some dox, first pass to interface clean ups.
+	* testsuite/libamf.all/Makefile.am: add testsuite/ to the 
+	  include dir, to allow for using our check_equals functions.
+	* testsuite/libamf.all/: test_object.cpp, test_string.cpp,
+	  test_variable.cpp: fixed new[]/delete mismatches.
+
 2007-08-23 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: Initial support for glyphs

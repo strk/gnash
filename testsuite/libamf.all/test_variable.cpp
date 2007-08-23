@@ -127,7 +127,7 @@ main(int argc, char *argv[])
         runtest.fail("Got String element data");
     }  
 
-    char *out = (char *)amf_obj.encodeVariable("tcUrl", "rtmp://localhost/oflaDemo");
+    char *out = (char*)amf_obj.encodeVariable("tcUrl", "rtmp://localhost/oflaDemo");
     if ((out[1] == 0x5)
         && (out[2] == 't')
         && (out[3] == 'c')
@@ -158,7 +158,7 @@ main(int argc, char *argv[])
         runtest.fail("String Packets match");
     }
     
-    delete out;
+    delete [] out;
     
     // Test number fields
     memset(buf, 0, AMF_PACKET_SIZE+1);
@@ -185,7 +185,7 @@ main(int argc, char *argv[])
     }
     
     amfnum_t bignum = 0x388340L;
-    out = (char *)amf_obj.encodeVariable("audioCodecs", bignum);
+    out = (char*)amf_obj.encodeVariable("audioCodecs", bignum);
     if ((out[1] == 11)
         && (out[2] == 'a')
         && (out[3] == 'u')
@@ -212,7 +212,7 @@ main(int argc, char *argv[])
         runtest.fail("Number Packets match");
     }
 
-    delete out;
+    delete [] out;
 }
 
 static void

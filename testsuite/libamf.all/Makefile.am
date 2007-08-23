@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.5 2007/08/19 20:07:42 nihilus Exp $
+# $Id: Makefile.am,v 1.6 2007/08/23 14:10:54 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -37,6 +37,7 @@ INCLUDES = -I.. \
         -I$(top_srcdir)/libamf \
         -I$(top_srcdir)/libbase \
         -I$(top_srcdir)/server \
+	-I$(top_srcdir)/testsuite \
         $(LIBXML_CFLAGS) \
 	$(DMALLOC_CFLAGS) \
 	$(CURL_CFLAGS) \
