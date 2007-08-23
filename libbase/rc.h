@@ -96,12 +96,6 @@ public:
     bool useLocalHost() const { return _localhost_only; }
     void useLocalHost(bool value);
 
-    static bool extractSetting(bool *var, const char *pattern, std::string &variable,
-                        std::string &value);
-    
-    static int extractNumber(int *num, const char *pattern, std::string &variable,
-                        std::string &value);
-
     const std::vector<std::string>& getWhiteList() const { return _whitelist; }
     const std::vector<std::string>& getBlackList() const { return _blacklist; }
 
@@ -117,7 +111,7 @@ private:
     /// Construct only by getDefaultInstance()
     RcInitFile();
 
-    /// Never destry (TODO: add a destroyDefaultInstance)
+    /// Never destroy (TODO: add a destroyDefaultInstance)
     ~RcInitFile();
 
     int  _delay;                // the timer delay
@@ -151,11 +145,17 @@ private:
     bool _sound;		// whether sound is enable or not
     bool _plugin_sound;		// whether sound is desired for the plugin
 
-    bool _extensionsEnabled;	// wheter to scan plugin path for extensions
+    bool _extensionsEnabled;	// whether to scan plugin path for extensions
 
     bool _startStopped;		// whether to start the gui in "stop" mode
 
-    static std::string expandPath(std::string& unixpath);
+    static std::string expandPath(std::string _path); //path string operations
+
+    static bool extractSetting(bool *var, const char *pattern,
+                        std::string &variable, std::string &value);
+    
+    static int extractNumber(int *num, const char *pattern,
+                        std::string &variable, std::string &value);
 
 };
 

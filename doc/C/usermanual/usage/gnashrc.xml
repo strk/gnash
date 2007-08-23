@@ -54,13 +54,13 @@ The variables in the <filename>.gnashrc</filename> file support three types of a
 <row>
 <entry>whitelist</entry>
 <entry>hostnames</entry>
-<entry>This is a list of hostnames, separated by a colon (:). If this list is populated, &app; will only load external Flash movies from the specified hosts.  The whitelist takes precedence over the blacklist.</entry>
+<entry>This is a list of hostnames, separated by spaces. If this list is populated, &app; will only load external Flash movies from the specified hosts.  The whitelist takes precedence over the blacklist.</entry>
 </row>
 <row>
 <entry>blacklist</entry>
 <entry>hostnames</entry>
-<entry>This is a list of hostnames, separated by a colon
-	    <emphasis>:</emphasis>.  External flash movies from these
+<entry>This is a list of hostnames, separated by spaces.
+	    External flash movies from these
             domains are never allowed to load. If whitelist is present
 	    and not empty, blacklist is not used.</entry>
 </row>
@@ -176,10 +176,10 @@ The following example <filename>.gnashrc</filename> file allows a user to only p
     # These sites are OK
     # uncommenting the following line will allow load of external
     # movies *only* from the specified hosts.
-    #set whitelist www.doonesbury.com:www.cnn.com:www.9news.com
+    #set whitelist www.doonesbury.com www.cnn.com www.9news.com
 
     # Don't access content from these sites
-    set blacklist www.doubleclick.com:mochibot.com
+    set blacklist www.doubleclick.com mochibot.com
 
     # The delay between timer interrupts
     set delay 50

@@ -117,19 +117,21 @@ RcInitFile::loadFiles()
 }
 
 bool
-RcInitFile::extractSetting(bool *var, const char *pattern, std::string &variable,
-                           std::string &value)
+RcInitFile::extractSetting(bool *var, const char *pattern,
+                           std::string &variable, std::string &value)
 {
 //    GNASH_REPORT_FUNCTION;
     //log_msg ("%s: %s", variable, value);
     
 	StringNoCaseEqual noCaseCompare;
     if ( noCaseCompare(variable, pattern) ) {
-        if ( noCaseCompare(value, "on") || noCaseCompare(value, "yes") || noCaseCompare(value, "true")) {
+        if ( noCaseCompare(value, "on") || noCaseCompare(value, "yes") ||
+             noCaseCompare(value, "true")) {
             //log_msg ("%s: Enabled", variable);
             *var = true;
         }
-        if (noCaseCompare(value, "off") || noCaseCompare(value, "no") || noCaseCompare(value, "false")) {
+        if (noCaseCompare(value, "off") || noCaseCompare(value, "no") ||
+            noCaseCompare(value, "false")) {
             //log_msg ("%s: Disabled", variable);
             *var = false;
         }
@@ -150,45 +152,52 @@ RcInitFile::extractNumber(int *num, const char *pattern, string &variable,
 }
 
 string
-RcInitFile::expandPath (std::string& unixpath)
+RcInitFile::expandPath (std::string _path)
 
 {
 
-//Don't break build on systems without passwd / getpwnam
-string _expanded;
+//Returns what's passed to it on systems without
+//POSIX tilde expansion, but is still called to prepare
+//for other operations on the path string
+
+#ifdef HAVE_PWD_H
+//Don't build tilde expansion on systems without pwd.h
 
               //Only if path starts with "~"
-             if (unixpath.substr(0,1) == "~") {
+             if (_path.substr(0,1) == "~") {
              const char *home = getenv("HOME");
-                     if (unixpath.substr(1,1) == "/") {
+                     if (_path.substr(1,1) == "/") {
                           // Initial "~" followed by "/"
                           if (home) {
                                // if HOME set in env, replace ~ with HOME
-                               _expanded = unixpath.replace(0,1,home);
+                               _path = _path.replace(0,1,home);
                           }
 
-#ifdef HAVE_GETPWNAM
+# ifdef HAVE_GETPWNAM
+//Don't try this on systems without getpwnam
+
                           //HOME not set in env: try using pwd
 
                           else { 
                                struct passwd *password = getpwuid(getuid());
                                const char *pwdhome = password->pw_dir;
-                               if (home) { _expanded = unixpath.replace(0,1,pwdhome); }
+                               if (home) {
+                                   _path = _path.replace(0,1,pwdhome);
+                               }
                                //If all that fails, leave path alone
-                               else _expanded = unixpath;
                           }
-
                      }
 
                      //Initial "~" is not followed by "/"
                      else {
                           const char *userhome = NULL;
-                          string::size_type first_slash = unixpath.find_first_of("/");
+                          string::size_type first_slash =
+                              _path.find_first_of("/");
                           string user;
                           if (first_slash != string::npos) {
                               // everything between initial ~ and / 
-                              user = unixpath.substr(1, first_slash - 1 );
-                          } else user = unixpath.substr(1);
+                              user = _path.substr(1, first_slash - 1 );
+                          } else user = _path.substr(1);
 
                           //find user using pwd    
                           struct passwd *password = getpwnam(user.c_str());
@@ -198,33 +207,14 @@ string _expanded;
                           }
                           if (userhome) {
                                string foundhome(userhome);
-                               _expanded = unixpath.replace(0,first_slash,foundhome);
+                               _path = _path.replace(0,first_slash,foundhome);
                           }
-                          else {
-                               //User not found and/or pwd doesn't return homedir:
-                               //Leave path alone.
-                               _expanded = unixpath;
-                          }
+# endif
                       }
-                 }
-                 //Path doesn't start with ~, leave it alone.
-
-#else
-//For systems with pwd.h but not getpwnam, nothing to do if HOME not set.
-                          else _expanded = unixpath;
-                      }
-                      else _expanded = unixpath;
                  }
 #endif
 
-
-                 else {
-                      _expanded = unixpath;
-                 }
-
-
-
-     return _expanded;
+     return _path;
 }
 
 // Parse the config file and set the variables.
@@ -272,18 +262,24 @@ RcInitFile::parseFile(const std::string& filespec)
             //      log_msg ("%s %s %s", action, variable, value);
             
             if (action == "set") {
-                extractSetting(&_splash_screen, "splash_screen", variable, value);
-                extractSetting(&_localhost_only, "localhost", variable, value);
-                extractSetting(&_localdomain_only, "localdomain", variable, value);
+                extractSetting(&_splash_screen, "splash_screen", variable,
+                               value);
+                extractSetting(&_localhost_only, "localhost", variable,
+                               value);
+                extractSetting(&_localdomain_only, "localdomain", variable,
+                               value);
                 extractSetting(&_debugger, "debugger", variable, value);
                 extractSetting(&_actiondump, "actionDump", variable, value);
                 extractSetting(&_parserdump, "parserDump", variable, value);
                 extractSetting(&_writelog, "writelog", variable, value);
                 extractSetting(&_sound, "sound", variable, value);
                 extractSetting(&_plugin_sound, "pluginsound", variable, value);
-                extractSetting(&_verboseASCodingErrors, "ASCodingErrorsVerbosity", variable, value);
-                extractSetting(&_verboseMalformedSWF, "MalformedSWFVerbosity", variable, value);
-                extractSetting(&_extensionsEnabled, "EnableExtensions", variable, value);
+                extractSetting(&_verboseASCodingErrors,
+                               "ASCodingErrorsVerbosity", variable, value);
+                extractSetting(&_verboseMalformedSWF, "MalformedSWFVerbosity",
+                               variable, value);
+                extractSetting(&_extensionsEnabled, "EnableExtensions",
+                               variable, value);
                 extractSetting(&_startStopped, "StartStopped", variable, value);
                 
                 extractNumber(&_delay, "delay", variable, value);
@@ -291,39 +287,54 @@ RcInitFile::parseFile(const std::string& filespec)
 
                 if (variable == "flashVersionString") {
                     _flashVersionString = value;
+                    continue;
                 }
 
                 if (variable == "debuglog") {
-
-#ifdef HAVE_PWD_H
-	             _log = expandPath (value);
-#else
-//For non-UNIX systems
-                     _log = value;
-#endif
-
+                    _log = expandPath (value);
+                    continue;
                 }
 
                 if (variable == "documentroot") {
                     _wwwroot = value;
+                    continue;
                 }
                 
                 if (variable == "blacklist") {
                     string::size_type pos;
-                    while ((pos = value.find(':', 0)) != string::npos) {
+                    //This is an ugly way to avoid breaking lists
+                    //Lists will work if they worked before, but
+                    //combining the two separators will not.
+                    //The colon way must be removed before protocols
+                    //(http://, https:// can be included in lists).
+                    char separator;
+                    if (value.find(':') != string::npos) separator = ':';
+                    else separator = ' ';
+                    while (value.size()) {
+                        pos = value.find(separator, 0);
                         _blacklist.push_back(value.substr(0, pos));
-                        value.erase(0, pos+1);
+                        value.erase(0, pos);
+                        if (value.size()) value.erase(0, value.find_first_not_of(separator)); 
                     }
-                    _blacklist.push_back(value);
                     continue;
                 }
+
                 if (variable == "whitelist") {
                     string::size_type pos;
-                    while ((pos = value.find(':', 0)) != string::npos) {
+                    //This is an ugly way to avoid breaking lists
+                    //Lists will work if they worked before, but
+                    //combining the two separators will not.
+                    //The colon way must be removed before protocols
+                    //(http://, https:// can be included in lists).
+                    char separator;
+                    if (value.find(':') != string::npos) separator = ':';
+                    else separator = ' ';
+                    while (value.size()) {
+                        pos = value.find(separator, 0);
                         _whitelist.push_back(value.substr(0, pos));
-                        value.erase(0, pos+1);
+                        value.erase(0, pos);
+                        if (value.size()) value.erase(0, value.find_first_not_of(separator)); 
                     }
-                    _whitelist.push_back(value);
                     continue;
                 }
             }
