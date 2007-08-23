@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler.h,v 1.45 2007/07/18 10:06:13 udog Exp $ */
+/* $Id: render_handler.h,v 1.46 2007/08/23 09:53:02 udog Exp $ */
 
 #ifndef RENDER_HANDLER_H
 #define RENDER_HANDLER_H
@@ -376,8 +376,11 @@ public:
   /// The polygon need NOT be closed (ie: this function will automatically
   /// add an additional vertex to close it.
   ///
+  /// When masked==false, then any potential mask currently active will be
+  /// ignored, otherwise it is respected.
+  ///
   virtual void  draw_poly(const point* corners, size_t corner_count, 
-    const rgba& fill, const rgba& outline) = 0;
+    const rgba& fill, const rgba& outline, bool masked) = 0;
     
     
   /// Set line and fill styles for mesh & line_strip rendering.

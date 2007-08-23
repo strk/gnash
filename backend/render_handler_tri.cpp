@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.19 2007/08/21 13:21:27 udog Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.20 2007/08/23 09:53:03 udog Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -297,7 +297,10 @@ void	triangulating_render_handler::draw_line_strip(const void* coords,
 }
 
 void  triangulating_render_handler::draw_poly(const point* corners, 
-  size_t corner_count, const rgba& fill, const rgba& outline) {
+  size_t corner_count, const rgba& fill, const rgba& outline, bool /*masked*/) {
+  
+  // TODO: The current implementation is only correct when masked==true,
+  // ie. it will always be masked.
   
   unsigned int vno=0;
   // Create points array to vertex array 

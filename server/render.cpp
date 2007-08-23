@@ -169,13 +169,13 @@ namespace gnash {
 
 
     void  draw_poly(const point* corners, int corner_count, const rgba& fill, 
-      const rgba& outline) 
+      const rgba& outline, bool masked) 
 		{
 #ifdef DEBUG_RENDER_CALLS
 			GNASH_REPORT_FUNCTION;
 #endif
 			if (s_render_handler) s_render_handler->draw_poly(corners, corner_count,
-        fill, outline);
+        fill, outline, masked);
     }
     
     

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.103 2007/08/21 14:42:12 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.104 2007/08/23 09:53:03 udog Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -492,7 +492,7 @@ edit_text_character::display()
 	log_debug("rendering a Pol composed by corners %s", ss.str().c_str());
 #endif
 
-		render::draw_poly( &coords[0], 4, backgroundColor, borderColor );
+		render::draw_poly( &coords[0], 4, backgroundColor, borderColor, true);
 		
 	}
 

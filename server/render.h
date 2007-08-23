@@ -104,7 +104,7 @@ namespace gnash {
 
 		/// See render_handler::draw_poly (in backend/render_handler.h)
 		void  draw_poly(const point* corners, int corner_count,
-				const rgba& fill, const rgba& outline);
+				const rgba& fill, const rgba& outline, bool masked);
       
 		/// See render_handler::draw_shape_character (in backend/render_handler.h)
 		void draw_shape_character(shape_character_def *def,

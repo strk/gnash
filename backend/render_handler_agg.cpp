@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.95 2007/07/18 23:17:54 strk Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.96 2007/08/23 09:53:03 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1830,8 +1830,9 @@ public:
 
   
   /// Draws the given polygon.
-  void  draw_poly(const point* corners, size_t corner_count, const rgba& fill, 
-    const rgba& outline) {
+  template <class scanline_type>
+  void draw_poly_impl(const point* corners, size_t corner_count, const rgba& fill, 
+    const rgba& outline, scanline_type& sl) {
     
     assert(m_pixf != NULL);
 
@@ -1842,44 +1843,44 @@ public:
     matrix mat = stage_matrix;
     mat.concatenate(m_current_matrix);
     
-    // TODO: Use aliased scanline renderer instead of anti-aliased one since
-    // it is undesired anyway.
     typedef agg::rasterizer_scanline_aa<> ras_type;
     renderer_base rbase(*m_pixf);
-    agg::scanline_p8 sl;
     ras_type ras;
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase);
-
+      
+    // -- create path --
+    agg::path_storage path;
+    point pnt, origin;
+    
+    
+    // Note: The coordinates are rounded and 0.5 is added to snap them to the 
+    // center of the pixel. This avoids blurring caused by anti-aliasing.
+    
+    mat.transform(&origin, 
+      point(trunc(corners[0].m_x), trunc(corners[0].m_y)));
+    path.move_to(trunc(origin.m_x)+0.5, trunc(origin.m_y)+0.5);
+    
+    for (unsigned int i=1; i<corner_count; i++) {
+    
+      mat.transform(&pnt, point(corners[i].m_x, corners[i].m_y));
+        
+      path.line_to(trunc(pnt.m_x)+0.5, trunc(pnt.m_y)+0.5);
+    }
+    
+    // close polygon
+    path.line_to(trunc(origin.m_x)+0.5, trunc(origin.m_y)+0.5);
+    
+    
+    
+    // -- render --
+      
+    // iterate through clipping bounds
     for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
     
-      const geometry::Range2d<int>& bounds = _clipbounds[cno];
-         
-      apply_clip_box<ras_type> (ras, bounds); 
-
-          // TODO: what do do if _clipbox.isNull() or _clipbox.isWorld() ?
-    //       currently an assertion will fail when get{Min,Max}{X,Y}
-    //       are called below
-  
-      agg::path_storage path;
-      point pnt, origin;
-      
-      // Note: The coordinates are rounded and 0.5 is added to snap them to the 
-      // center of the pixel. This avoids blurring caused by anti-aliasing.
-      
-      mat.transform(&origin, 
-        point(trunc(corners[0].m_x), trunc(corners[0].m_y)));
-      path.move_to(trunc(origin.m_x)+0.5, trunc(origin.m_y)+0.5);
-      
-      for (unsigned int i=1; i<corner_count; i++) {
-      
-        mat.transform(&pnt, point(corners[i].m_x, corners[i].m_y));
-          
-        path.line_to(trunc(pnt.m_x)+0.5, trunc(pnt.m_y)+0.5);
-      }
-      
-      // close polygon
-      path.line_to(trunc(origin.m_x)+0.5, trunc(origin.m_y)+0.5);
+      const geometry::Range2d<int>& bounds = _clipbounds[cno];         
+      apply_clip_box<ras_type> (ras, bounds);     
+            
       
       // fill polygon
       if (fill.m_a>0) {
@@ -1901,6 +1902,34 @@ public:
         
         agg::render_scanlines(ras, sl, ren_sl);
       }
+    }
+    
+  } //draw_poly_impl
+  
+  
+  void draw_poly(const point* corners, size_t corner_count, const rgba& fill, 
+    const rgba& outline, bool masked) {
+    
+    if (masked && !m_alpha_mask.empty()) {
+    
+      // apply mask
+      
+      typedef agg::scanline_u8_am<agg::alpha_mask_gray8> sl_type; 
+      
+      sl_type sl(m_alpha_mask.back()->get_amask());
+         
+      draw_poly_impl<sl_type> (corners, corner_count, fill, outline, sl);       
+    
+    } else {
+    
+      // no mask
+      
+      typedef agg::scanline_p8 sl_type; // packed scanline (faster for solid fills)
+      
+      sl_type sl;
+         
+      draw_poly_impl<sl_type> (corners, corner_count, fill, outline, sl);
+    
     }
     
   }
