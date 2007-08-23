@@ -1,3 +1,7 @@
+2007-08-23 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: remove need_shape_bounds()
+	
 2007-08-23 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/shape_character_def.{cpp,h}: document

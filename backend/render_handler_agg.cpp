@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.100 2007/08/23 15:26:26 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.101 2007/08/23 15:27:59 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -905,28 +905,9 @@ public:
   }
   
 
-
-
-
-  // ensures that the bounds of the character definiton are known
-  inline void need_shape_bounds(shape_character_def *def) {
-  
-    // TO BE REMOVED - does not work
-  
-    if (def->get_bound().is_null()) {
-      printf("Calculating bounds for %p\n", def);
-      rect temp;
-      def->compute_bound(&temp);
-      def->set_bound(temp);
-    }
-  
-  }
-
   void draw_glyph(shape_character_def *def,
       const matrix& mat, const rgba& color, float /*pixel_scale*/) {
     
-    //need_shape_bounds(def);    
-      
     std::vector<path> paths;    
     apply_matrix_to_path(def->get_paths(), paths, mat);
     
