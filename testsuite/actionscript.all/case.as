@@ -22,7 +22,7 @@
  *  Test case sensitivity 
  */
 
-rcsid="$Id: case.as,v 1.6 2007/08/10 08:34:32 zoulunkai Exp $";
+rcsid="$Id: case.as,v 1.7 2007/08/23 09:55:55 strk Exp $";
 
 #include "check.as"
 
@@ -94,6 +94,7 @@ with(mcRef[0])
 	lineTo(100,200);
 	lineTo(100,100);
 	endFill();
+	_alpha = 20;
 }
 
 // support visual checks
@@ -106,6 +107,7 @@ with(mcRef[1])
 	lineTo(100,200);
 	lineTo(100,100);
 	endFill();
+	_alpha = 20;
 }
 mcRef[1]._x += 100;
 
@@ -129,4 +131,4 @@ check_equals(clip.getDepth(), 6);
 xcheck_equals(CLIP.getDepth(), 7);
 #endif 
 
-_root.totals();
+//_root.totals(); // this is done by dejagnu_so_fini.as
