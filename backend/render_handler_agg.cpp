@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.97 2007/08/23 10:11:47 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.98 2007/08/23 13:04:09 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -49,15 +49,17 @@ Status
     linear gradients  COMPLETE
     radial gradients  COMPLETE
     focal gradients   NOT IMPLEMENTED *
+    ext. spread modes NOT IMPLEMENTED *
+    linear RGB mode   NOT IMPLEMENTED *
     bitmaps, tiled    COMPLETE
     bitmaps, clipped  COMPLETE
     bitmaps, smooth   COMPLETE
     bitmaps, hard     COMPLETE    
     color xform       COMPLETE
     
-    * focal gradients (introduced in Flash 7, I think) are not yet supported 
-    by Gnash itself AFAIK, but AGG supports them and it should be easy to add 
-    them.    
+    * focal gradients (introduced in Flash 8) and similar special fill styles
+    are not yet supported by Gnash itself AFAIK, but AGG supports them and it 
+    should be easy to add them.    
     
   fonts               COMPLETE
     
