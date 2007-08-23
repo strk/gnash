@@ -1,4 +1,4 @@
-2007-08-19 Markus Gothe <nietzsche@lysator.liu.se>
+2007-08-23 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libamf/amf.cpp: memcpy -> strncpy, since it does a memory 
 	access violation on Darwin (and porbably other OSes).
