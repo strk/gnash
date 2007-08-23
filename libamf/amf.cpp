@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: amf.cpp,v 1.39 2007/07/01 10:54:05 bjacques Exp $ */
+/* $Id: amf.cpp,v 1.40 2007/08/23 01:57:02 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -725,7 +725,7 @@ AMF::extractString(const char *in)
         x += sizeof(short);
         buf = new char[length+1];
         memset(buf, 0, length+1);
-        memcpy(buf, x, length);
+        strncpy(buf, x, length); /* memcpy() does memory access violation on Darwin! */
     } else {
         log_error("Tried to extract AMF string from non String object!");
     }

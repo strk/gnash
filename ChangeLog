@@ -1,3 +1,8 @@
+2007-08-19 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libamf/amf.cpp: memcpy -> strncpy, since it does a memory 
+	access violation on Darwin (and porbably other OSes).
+
 2007-08-23 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-mtasc.all/Makefile.am: specify input language 
