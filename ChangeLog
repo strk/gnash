@@ -1,3 +1,13 @@
+2007-08-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.{cpp,h}: expandPath called on non-POSIX systems
+	  for other path operations. Whitelist and blacklist now space
+          not colon separated. NOTE: old lists still work, but should
+          be deprecated. Made private: extractSetting, extractNumber.
+          Minor code cleanups.
+	* docs/C/usermanual/usage/gnashrc.xml: add info about black-
+          and whitelists.
+
 2007-08-23 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: move BOOST macro detector invocation after
