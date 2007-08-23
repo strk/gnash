@@ -9,8 +9,9 @@
 	* backend/render_handler.h, backend/render_handler_agg.cpp, 
 	  backend/render_handler_tri.{cpp,h}, server/edit_text_character.cpp,
 	  server/render.cpp, server/render.h: add parameter "masked" to 
-	  draw_poly(), adjust calls to this function and implement (un)masked
-	  polygons in AGG renderer (see bug #20655).
+    draw_poly(), adjust calls to this function and implement (un)masked
+    polygons in AGG renderer (see bug #20655).
+	* backend/render_handler_agg.cpp: draw_line_strip() now applies masks 
 
 2007-08-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 

@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.96 2007/08/23 09:53:03 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.97 2007/08/23 10:11:47 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -767,6 +767,7 @@ public:
   }
 
 
+  
   void  draw_line_strip(const void* coords, int vertex_count, const rgba& color)
   // Draw the line strip formed by the sequence of points.
   {
@@ -784,41 +785,76 @@ public:
     
     typedef agg::rasterizer_scanline_aa<> ras_type;
 
-    ras_type ras;
-    agg::scanline_p8 sl;
+    ras_type ras;    
     agg::renderer_scanline_aa_solid<
       agg::renderer_base<PixelFormat> > ren_sl(rbase);
       
-    for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+    // -- create path --
+    agg::path_storage path;
+    agg::conv_stroke<agg::path_storage> stroke(path);
+    stroke.width(1);
+    stroke.line_cap(agg::round_cap);
+    stroke.line_join(agg::round_join);
+    path.remove_all(); // Not obligatory in this case
+
+    const int16_t *vertex = static_cast<const int16_t*>(coords);
     
-      const geometry::Range2d<int>& bounds = _clipbounds[cno];
-            
-      apply_clip_box<ras_type> (ras, bounds);
-          
-      agg::path_storage path;
-      agg::conv_stroke<agg::path_storage> stroke(path);
-      stroke.width(1);
-      stroke.line_cap(agg::round_cap);
-      stroke.line_join(agg::round_join);
-      path.remove_all(); // Not obligatory in this case
-  
-      const int16_t *vertex = static_cast<const int16_t*>(coords);
-      
+    mat.transform(&pnt, point(vertex[0], vertex[1]));
+    path.move_to(pnt.m_x, pnt.m_y);
+
+    for (vertex += 2;  vertex_count > 1;  vertex_count--, vertex += 2) {
       mat.transform(&pnt, point(vertex[0], vertex[1]));
-      path.move_to(pnt.m_x, pnt.m_y);
-  
-      for (vertex += 2;  vertex_count > 1;  vertex_count--, vertex += 2) {
-        mat.transform(&pnt, point(vertex[0], vertex[1]));
-        path.line_to(pnt.m_x, pnt.m_y);
-      }
-      // The vectorial pipeline
-      ras.add_path(stroke);
-  
-      // Set the color and render the scanlines
-      ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
-  
+      path.line_to(pnt.m_x, pnt.m_y);
+    }
     
-      agg::render_scanlines(ras, sl, ren_sl);
+    // -- render --
+    
+    if (m_alpha_mask.empty()) {
+    
+      // No mask active
+      
+      agg::scanline_p8 sl;      
+      
+      for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+      
+        const geometry::Range2d<int>& bounds = _clipbounds[cno];
+              
+        apply_clip_box<ras_type> (ras, bounds);
+        
+        // The vectorial pipeline
+        ras.add_path(stroke);
+    
+        // Set the color and render the scanlines
+        ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
+        
+        agg::render_scanlines(ras, sl, ren_sl);     
+        
+      }
+      
+    } else {
+    
+      // Mask is active!
+
+      typedef agg::scanline_u8_am<agg::alpha_mask_gray8> sl_type;
+      
+      sl_type sl(m_alpha_mask.back()->get_amask());      
+      
+      for (unsigned int cno=0; cno<_clipbounds.size(); cno++) {
+      
+        const geometry::Range2d<int>& bounds = _clipbounds[cno];
+              
+        apply_clip_box<ras_type> (ras, bounds);
+        
+        // The vectorial pipeline
+        ras.add_path(stroke);
+    
+        // Set the color and render the scanlines
+        ren_sl.color(agg::rgba8_pre(color.m_r, color.m_g, color.m_b, color.m_a));
+        
+        agg::render_scanlines(ras, sl, ren_sl);     
+        
+      }
+    
     }
 
   } // draw_line_strip
