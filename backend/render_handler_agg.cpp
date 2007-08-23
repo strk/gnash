@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.98 2007/08/23 13:04:09 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.99 2007/08/23 14:06:54 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -908,13 +908,25 @@ public:
 
 
 
+  // ensures that the bounds of the character definiton are known
+  inline void need_shape_bounds(shape_character_def *def) {
+  
+    // TO BE REMOVED - does not work
+  
+    if (def->get_bound().is_null()) {
+      printf("Calculating bounds for %p\n", def);
+      rect temp;
+      def->compute_bound(&temp);
+      def->set_bound(temp);
+    }
+  
+  }
 
   void draw_glyph(shape_character_def *def,
       const matrix& mat, const rgba& color, float /*pixel_scale*/) {
+    
+    //need_shape_bounds(def);    
       
-    // NOTE: def->get_bound() is NULL for glyphs so we can't check the 
-    // clipping area (bounds_in_clipping_area):
-    // create a new path with the matrix applied   
     std::vector<path> paths;    
     apply_matrix_to_path(def->get_paths(), paths, mat);
     
@@ -928,14 +940,15 @@ public:
     // prepare style handler
     agg_style_handler sh;
     build_agg_styles(sh, m_single_fill_styles, mat, m_neutral_cxform);
+
+    // select relevant clipping bounds
+    if (def->get_bound().is_null())   // currently true for all glyphs
+      select_all_clipbounds();
+    else
+      select_clipbounds(def, mat);
     
-    // select all clipping ranges. 
-    // NOTE: Glyphs are loaded like normal shape definitons, but w/o style
-    // definitons, which unfortunately include shape bounds. So "def" has
-    // no bounds (isNull) and thus select_clipbounds() won't work.
-    // TODO: Find a different solution since it's suboptimal to render in
-    // all clipping bounds.
-    select_all_clipbounds();
+    
+    if (_clipbounds_selected.empty()) return; // nothing to draw
       
     // draw the shape
     if (m_drawing_mask)

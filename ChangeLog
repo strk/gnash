@@ -1,3 +1,8 @@
+2007-08-23 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: Initial support for glyphs
+	  with known bounds
+
 2007-08-23 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/case.as: reduce alpha of clips used
