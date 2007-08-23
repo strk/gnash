@@ -1,3 +1,13 @@
+2007-08-23 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: move BOOST macro detector invocation after
+	  PTHREAD one, as the former requires the latter.
+
+2007-08-23 Deanna Phillips <deanna>
+
+	* macros/pthreads.m4: set pthread flags to -pthread for openbsd.
+	* libbase/rc.cpp: include unistd.h for getuid()
+
 2007-08-23 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libamf/amf.cpp: memcpy -> strncpy, since it does a memory 

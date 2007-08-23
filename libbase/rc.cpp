@@ -27,6 +27,7 @@
 #endif
 
 #include <sys/types.h>
+#include <unistd.h> // for getuid()
 #include <sys/stat.h>
 
 #include <cctype>  // for toupper

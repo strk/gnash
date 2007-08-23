@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.405 2007/08/22 11:20:29 strk Exp $
+dnl $Id: configure.ac,v 1.406 2007/08/23 09:26:50 strk Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -986,7 +986,6 @@ fi
 
 AM_CONDITIONAL(HAVE_SDL, [ test x$has_SDL = xyes ])
 
-GNASH_PATH_BOOST
 GNASH_PATH_LIBXML
 
 dnl
@@ -1264,6 +1263,8 @@ if test x"$pthreads" = x"yes"; then
     CXX="$PTHREAD_CXX"
   fi
 fi
+
+GNASH_PATH_BOOST
 
 AX_GCC_ARCHFLAG(no)
 
