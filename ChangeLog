@@ -1,3 +1,16 @@
+2007-08-23 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.h: document case-sensitiveness of
+	  find_target.
+	* server/character.{h,cpp} (get_relative_target_common):
+	  document and fix case-sensitiveness.
+	* server/vm/ASHandlers.cpp (ActionSetProperty): log a actionscript
+	  error if trying to set the property of an unknown target.
+	* server/sprite_instance.cpp (get_member, get_relative_target): be
+	  case sensitive/insensitive based on SWF target version.
+	* testsuite/actionscript.all/case.as: more tests; some unexpected
+	  successes, some unexpected failures.
+
 2007-08-23 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* backend/render_handler_agg.cpp: remove need_shape_bounds()

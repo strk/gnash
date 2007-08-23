@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.124 2007/08/22 17:32:45 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.125 2007/08/23 16:50:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1126,6 +1126,14 @@ SWFHandlers::ActionSetProperty(ActionExec& thread)
 	    log_swferror(_("invalid set_property, property number %d"), prop_number);
 	    )
 	}
+
+    }
+    else
+    {
+	IF_VERBOSE_ASCODING_ERRORS (
+	log_aserror(_("ActionSetProperty: can't find target %s for setting property %s"),
+		env.top(2).to_debug_string().c_str(), get_property_names()[prop_number].c_str());
+	)
 
     }
     env.drop(3);
@@ -3585,7 +3593,7 @@ SWFHandlers::ActionTry(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
 
-	as_environment& env = thread.env;
+	//as_environment& env = thread.env;
 	const action_buffer& code = thread.code;
 	size_t pc = thread.pc;
 

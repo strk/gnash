@@ -342,6 +342,7 @@ public:
 	/// Find the sprite/movie referenced by the given path.
 	//
 	/// Supports both /slash/syntax and dot.syntax
+	/// Case insensitive for SWF up to 6, sensitive from 7 up
 	///
 	character* find_target(const std::string& path) const;
 

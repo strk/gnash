@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.47 2007/07/11 00:33:57 strk Exp $ */
+/* $Id: character.cpp,v 1.48 2007/08/23 16:50:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -152,8 +152,9 @@ character::get_mouse_state(int& x, int& y, int& buttons)
 }
 
 character*
-character::get_relative_target_common(const std::string& name)
+character::get_relative_target_common(const std::string& name_orig)
 {
+	string name = PROPNAME(name_orig); // convert name to lowercase in SWF<6
 	if (name == "." || name == "this")
 	{
 	    return this;

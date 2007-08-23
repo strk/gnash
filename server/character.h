@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.88 2007/08/18 16:12:38 strk Exp $ */
+/* $Id: character.h,v 1.89 2007/08/23 16:50:56 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -213,6 +213,9 @@ protected:
 	void do_mouse_drag();
 
 	/// look for '.', 'this',  '..', '_parent', '_level0' and '_root'
+	//
+	/// NOTE: case insensitive up to SWF6, sensitive from SWF7 up
+	///
 	character* get_relative_target_common(const std::string& name);
 
 	/// \brief
@@ -664,6 +667,7 @@ public:
 	///
 	/// In ActionScript 1.0, everything seems to be CASE
 	/// INSENSITIVE.
+	///
 	virtual character* get_relative_target(const std::string& name)
 	{
 		return get_relative_target_common(name);

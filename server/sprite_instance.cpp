@@ -1841,7 +1841,10 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 
 
 	// Try items on our display list.
-	character* ch = m_display_list.get_character_by_name_i(name);
+	character* ch;
+	if ( _vm.getSWFVersion() >= 7 ) ch =  m_display_list.get_character_by_name(name);
+	else ch = m_display_list.get_character_by_name_i(name);
+
 	if (ch)
 	{
 	    // Found object.
@@ -2179,7 +2182,9 @@ sprite_instance::get_relative_target(const std::string& name)
 	if ( ch ) return ch;
 
 	// See if we have a match on the display list.
-	ch =  m_display_list.get_character_by_name(name);
+	if ( _vm.getSWFVersion() >= 7 ) ch =  m_display_list.get_character_by_name(name);
+	else ch = m_display_list.get_character_by_name_i(name);
+
     	// TODO: should we check for isActionScriptReferenceable here ?
 	if ( ch )
 	{
