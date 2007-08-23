@@ -1,5 +1,11 @@
 2007-08-23 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/shape_character_def.{cpp,h}: document
+	  the read function; compute bound when not available
+	  in the SWF (glyphs in DEFINEFONT*).
+
+2007-08-23 Sandro Santilli <strk@keybit.net>
+
 	* libamf/amf.{cpp,h}: fixed a bunch of memory errors, added
 	  some dox, first pass to interface clean ups.
 	* testsuite/libamf.all/Makefile.am: add testsuite/ to the 

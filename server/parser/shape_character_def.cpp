@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.32 2007/08/07 20:53:10 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.33 2007/08/23 15:10:51 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -36,6 +36,9 @@
 #include <cfloat>
 #include <algorithm>
 
+// Define the macro below to always compute bounds for shape characters
+// and compare them with the bounds encoded in the SWF
+//#define GNASH_DEBUG_SHAPE_BOUNDS 1
 
 //#define DEBUG_DISPLAY_SHAPE_PATHS    // won't probably work anymore (Udo)
 #ifdef DEBUG_DISPLAY_SHAPE_PATHS
@@ -481,6 +484,25 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 	    }
 	}
     }
+
+    if ( ! with_style )
+    {
+        // TODO: performance would be improved by computing 
+        //       the bounds as edges are parsed.
+        compute_bound(&m_bound);
+    }
+#ifdef GNASH_DEBUG_SHAPE_BOUNDS
+    else
+    {
+        rect computedBounds;
+        compute_bound(&computedBounds);
+        if ( computedBounds != m_bounds )
+        {
+            log_debug("Shape character read for tag %d contained embedded bounds %s, while we computed bounds %s",
+                tag_type, m_bound.toString().c_str(), computedBounds.toString().c_str());
+        }
+    }
+#endif // GNASH_DEBUG_SHAPE_BOUNDS
 }
 
 

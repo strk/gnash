@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape_character_def.h,v 1.14 2007/08/06 03:30:19 strk Exp $ */
+/* $Id: shape_character_def.h,v 1.15 2007/08/23 15:10:51 strk Exp $ */
 
 #ifndef GNASH_SHAPE_CHARACTER_DEF_H
 #define GNASH_SHAPE_CHARACTER_DEF_H
@@ -48,7 +48,31 @@ namespace gnash {
 		float	get_height_local() const;
 		float	get_width_local() const;
 
+		/// \brief
+		/// Read a shape definition as included in DEFINEFONT*,
+		/// DEFINESHAPE* or DEFINEMORPH* tag
+		//
+		/// @param in
+		///	The stream to read the shape from
+		///
+		/// @param tag_type
+		///	The SWF::tag_type this shape definition is read for.
+		///	TODO: change to an actual SWF::tag_type type
+		///
+		/// @param with_style
+		///	If true, this definition includes bounds, fill styles and line styles.
+		///	Tipically, this is only false for DEFINEFONT* tags.
+		///	NOTE: if with_style is false, bounds of the shape will be computed
+		///	      rather then read.
+		///	TODO: drop this function, set based on tag_type ?
+		///
+		/// @param m
+		///	The movie definition corresponding to the SWF we/re parsing.
+		///	This is used to resolve bitmap characters for fill styles, never
+		///	used if with_style is false.
+		///
 		void	read(stream* in, int tag_type, bool with_style, movie_definition* m);
+
 		void	display(
 			const matrix& mat,
 			const cxform& cx,
