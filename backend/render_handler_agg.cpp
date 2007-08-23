@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.99 2007/08/23 14:06:54 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.100 2007/08/23 15:26:26 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -940,9 +940,9 @@ public:
     // prepare style handler
     agg_style_handler sh;
     build_agg_styles(sh, m_single_fill_styles, mat, m_neutral_cxform);
-
+    
     // select relevant clipping bounds
-    if (def->get_bound().is_null())   // currently true for all glyphs
+    if (def->get_bound().is_null())   // can happen (spaces? to be investigated..)
       select_all_clipbounds();
     else
       select_clipbounds(def, mat);
