@@ -1691,6 +1691,7 @@ typedef enum {
 	FILL_SOLID                   = 0x00,
 	FILL_LINEAR_GRADIENT         = 0x10,
 	FILL_RADIAL_GRADIENT         = 0x12,
+	FILL_FOCAL_GRADIENT	     = 0x13,
 	FILL_TILED_BITMAP            = 0x40,
 	FILL_CLIPPED_BITMAP          = 0x41,
 

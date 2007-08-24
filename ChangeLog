@@ -1,5 +1,9 @@
 2007-08-24 Chad Musick <chadmusick@msbx.net>
 
+	* server/swf.h: Add FOCAL_GRADIENT to fill styles.
+
+2007-08-24 Chad Musick <chadmusick@msbx.net>
+
 	* server/stream.cpp,h: Add read_short_fixed() function for
 	  what short fixed values (16 bits) are needed rather than
 	  long fixed values (32 bits) from the SWF stream.
