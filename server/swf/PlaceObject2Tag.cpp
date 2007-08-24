@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.18 2007/08/24 05:55:52 cmusick Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.19 2007/08/24 10:46:11 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -419,7 +419,6 @@ PlaceObject2Tag::loader(stream* in, tag_type tag, movie_definition* m)
     m->add_execute_tag(ch);
 
     int depth = ch->getDepth();
-	int ratio = ch->getRatio();
     if ( depth < 0 && depth >= character::staticDepthOffset )
     {
     	m->addTimelineDepth(depth);
