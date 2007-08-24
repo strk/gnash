@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.121 2007/08/10 04:36:13 strk Exp $
+# $Id: Makefile.am,v 1.122 2007/08/24 05:57:09 cmusick Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -65,6 +65,7 @@ libgnashserver_la_SOURCES = \
 	cxform.cpp \
 	DynamicShape.cpp	\
 	edit_text_character.cpp \
+        filters.cpp \
 	generic_character.cpp \
 	matrix.cpp \
 	movie_instance.cpp \
@@ -128,6 +129,7 @@ noinst_HEADERS = \
 	event_id.h \
 	execute_tag.h \
 	fill_style.h \
+        filters.h \
 	font.h \
 	fontlib.h \
 	generic_character.h \
