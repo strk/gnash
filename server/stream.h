@@ -52,6 +52,7 @@ namespace gnash {
 		int	read_sint(unsigned short bitcount);
 
 		float	read_fixed();
+                float   read_short_fixed();
 		void	align();
 
 		unsigned read(char *buf, unsigned count);

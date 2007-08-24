@@ -1,5 +1,11 @@
 2007-08-24 Chad Musick <chadmusick@msbx.net>
 
+	* server/stream.cpp,h: Add read_short_fixed() function for
+	  what short fixed values (16 bits) are needed rather than
+	  long fixed values (32 bits) from the SWF stream.
+
+2007-08-24 Chad Musick <chadmusick@msbx.net>
+
 	* server/filters.cpp,h: Effect filters for PlaceObject3 and
 	  for buttons. No current effect, but it parses correctly from SWF.
 	* Makefile.am: Add the filters files.

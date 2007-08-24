@@ -120,6 +120,11 @@ namespace gnash {
 		int32_t	val = m_input->read_le32();
 		return (float) val / 65536.0f;
 	}
+        float   stream::read_short_fixed()
+        {
+                m_unused_bits = 0;
+                return (float) m_input->read_le16();
+        }
 
 	void	stream::align() { m_unused_bits = 0; m_current_byte = 0; }
 
