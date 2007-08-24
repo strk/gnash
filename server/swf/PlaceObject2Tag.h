@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: PlaceObject2Tag.h,v 1.12 2007/07/01 10:54:35 bjacques Exp $ */
+/* $Id: PlaceObject2Tag.h,v 1.13 2007/08/24 05:55:52 cmusick Exp $ */
 
 #ifndef GNASH_SWF_PLACEOBJECT2TAG_H
 #define GNASH_SWF_PLACEOBJECT2TAG_H
@@ -97,6 +97,10 @@ public:
 	/// Return true if this tag transforms a character
 	bool isMove() const { return m_place_type == MOVE; }
 
+        /// Return true if this tag removes a character.
+        //  This is set by having no char and no place in the place tag.
+        bool isRemove() const { return m_place_type == REMOVE; }
+
 	static void loader(stream* in, tag_type tag, movie_definition* m);
 
     int getRatio() const { return m_ratio;}
@@ -118,7 +122,8 @@ private:
 	{
 		PLACE,
 		MOVE,
-		REPLACE
+		REPLACE,
+                REMOVE
 	} m_place_type;
 
 	const movie_definition& _movie_def;
@@ -131,8 +136,8 @@ private:
 	// read placeObject2 actions
 	void readPlaceActions(stream* in, int movie_version);
 
-	// read SWF::PLACEOBJECT2
-	void readPlaceObject2(stream* in, int movie_version);
+	// read SWF::PLACEOBJECT2 or SWF::PLACEOBJECT3
+	void readPlaceObject2(stream* in, int movie_version, bool place_2);
 
 };
 

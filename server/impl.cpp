@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: impl.cpp,v 1.116 2007/08/22 13:09:10 cmusick Exp $ */
+/* $Id: impl.cpp,v 1.117 2007/08/24 05:55:51 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -244,11 +244,11 @@ static void	ensure_loaders_registered()
 
         // TODO: Alexis reference says these are 83, 84. The 67,68 comes from Tamarin.
         // Figure out which one is correct (possibly both are).
-        register_tag_loader(SWF::DEFINESHAPE4_, fixme_loader); // 67
+        register_tag_loader(SWF::DEFINESHAPE4_, fixme_loader /*define_shape_loader*/); // 67
         register_tag_loader(SWF::DEFINEMORPHSHAPE2_, fixme_loader); // 68
 
 	register_tag_loader(SWF::FILEATTRIBUTES, file_attributes_loader); // 69
-	register_tag_loader(SWF::PLACEOBJECT3, fixme_loader); // 70
+	register_tag_loader(SWF::PLACEOBJECT3, PlaceObject2Tag::loader); // 70
 	register_tag_loader(SWF::IMPORTASSETS2, import_loader); // 71
 
         register_tag_loader(SWF::DOABC, fixme_loader); // 72 -- AS3 codeblock.
@@ -260,7 +260,7 @@ static void	ensure_loaders_registered()
 	register_tag_loader(SWF::METADATA, metadata_loader); // 77
 	register_tag_loader(SWF::DEFINESCALINGGRID, fixme_loader); // 78
         register_tag_loader(SWF::DOABCDEFINE, fixme_loader); // 79 -- AS3 codeblock.
-	register_tag_loader(SWF::DEFINESHAPE4, fixme_loader); // 83
+	register_tag_loader(SWF::DEFINESHAPE4, fixme_loader /*define_shape_loader*/); // 83
 	register_tag_loader(SWF::DEFINEMORPHSHAPE2, fixme_loader); // 84
 
         register_tag_loader(SWF::DEFINEFONTNAME, define_font_name_loader); // 88

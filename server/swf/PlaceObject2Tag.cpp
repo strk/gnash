@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.17 2007/08/09 12:18:07 zoulunkai Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.18 2007/08/24 05:55:52 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,6 +29,7 @@
 #include "swf_event.h"
 #include "log.h"
 #include "stream.h"
+#include "filters.h"
 
 namespace gnash {
 namespace SWF {
@@ -210,9 +211,15 @@ PlaceObject2Tag::readPlaceActions(stream* in, int movie_version)
 
 // read SWF::PLACEOBJECT2
 void
-PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
+PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version, bool place_2)
 {
 	in->align();
+
+        uint8_t blend_mode = 0;
+        uint8_t bitmask = 0;
+        bool has_bitmap_caching = false;
+        bool has_blend_mode = false;
+        bool has_filters = false;
 
 	bool	has_actions = in->read_uint(1) ? true : false;
 	bool	has_clip_bracket = in->read_uint(1) ? true : false;
@@ -222,6 +229,14 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
 	bool	has_matrix = in->read_uint(1) ? true : false;
 	bool	has_char = in->read_uint(1) ? true : false;
 	bool	flag_move = in->read_uint(1) ? true : false;
+
+        if (!place_2 && movie_version >= 8)
+        {
+            static_cast<void> (in->read_uint(5)); // Ignore on purpose.
+            has_bitmap_caching = in->read_uint(1) ? true : false;
+            has_blend_mode = in->read_uint(1) ? true : false;
+            has_filters = in->read_uint(1) ? true : false;
+        }
 
 	m_depth = in->read_u16()+character::staticDepthOffset;
 
@@ -251,11 +266,28 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
 	else
 		m_clip_depth = character::noClipDepthValue;
 
+        if (has_filters)
+        {
+            effect_filters::effect_filters_vec v; // TODO: Something should be done with the filters...
+            effect_filters::filter_factory::read(in, movie_version, true, &v);
+        }
+
+        if (has_blend_mode)
+        {
+            blend_mode = in->read_u8();
+        }
+
+        if (has_bitmap_caching)
+        {
+            // It is not certain that this actually exists, so if this reader
+            // is broken, it is probably here!
+            bitmask = in->read_u8();
+        }
+
 	if (has_actions)
 	{
 		readPlaceActions(in, movie_version);
 	}
-
 
 	if (has_char == true && flag_move == true)
 	{
@@ -272,6 +304,10 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version)
 		// Put m_character at m_depth.
 		m_place_type = PLACE;
 	}
+        else if (has_char == false && flag_move == false)
+        {
+             m_place_type = REMOVE;
+        }
 
 	IF_VERBOSE_PARSE (
 		log_parse(_("  PLACEOBJECT2: depth = %d (%d)"), m_depth, m_depth-character::staticDepthOffset);
@@ -307,7 +343,7 @@ PlaceObject2Tag::read(stream* in, tag_type tag, int movie_version)
 	}
 	else
 	{
-		readPlaceObject2(in, movie_version);
+		readPlaceObject2(in, movie_version, tag == SWF::PLACEOBJECT3 ? false : true);
 	}
 }
 
@@ -349,6 +385,9 @@ PlaceObject2Tag::execute(sprite_instance* m) const
 	      m_ratio,
 	      m_clip_depth);
 	  break;
+
+      case REMOVE:
+          m->remove_display_object(m_depth, 0); // 0 since it is unused.
     }
 }
 
@@ -366,7 +405,7 @@ PlaceObject2Tag::~PlaceObject2Tag()
 void
 PlaceObject2Tag::loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2);
+    assert(tag == SWF::PLACEOBJECT || tag == SWF::PLACEOBJECT2 || tag == SWF::PLACEOBJECT3);
 
     IF_VERBOSE_PARSE
     (
