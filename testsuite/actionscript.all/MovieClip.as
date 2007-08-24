@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.81 2007/08/24 10:05:58 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.82 2007/08/24 13:52:24 strk Exp $";
 
 #include "check.as"
 
@@ -34,7 +34,7 @@ note();
 
 // Get a reference to a MovieClip
 var mc = _root;
-check(typeof(mc)=="movieclip");
+check_equals(typeof(mc), "movieclip");
 
 // Check some references
 check_equals(typeof(this), 'movieclip');
