@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.82 2007/07/11 00:16:38 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.83 2007/08/24 10:05:57 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -219,8 +219,9 @@ as_environment::del_variable_raw(
 		return ret.second;
 	}
 
+	// TODO: try 'this' ? Add a testcase for it !
 
-	// Try _global
+	// Try _global 
 	return VM::get().getGlobal()->delProperty(varname).second;
 }
 
@@ -664,7 +665,8 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 	// TODO: make sure sprite_instances know about ".."
 	if ( ! env->get_member(subpart.c_str(), &tmp) )
 	{
-		// Try _global, but only at first iteration...
+		// Try this and _global, but only at first iteration...
+
 		if ( depth > 0 ) 
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
@@ -674,7 +676,11 @@ as_environment::find_object_dotsyntax(const std::string& path) const
 			return NULL;
 		}
 
-		if ( ! VM::get().getGlobal()->get_member(subpart.c_str(), &tmp) )
+		if ( subpart == "this" )
+		{
+			tmp.set_as_object(m_target);
+		}
+		else if ( ! VM::get().getGlobal()->get_member(subpart.c_str(), &tmp) )
 		{
 			IF_VERBOSE_ASCODING_ERRORS(
 			log_aserror(_("Element '%s' of variable '%s' not found in object %p nor in _global (dotsyntax)"),
@@ -811,7 +817,8 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 		// TODO: make sure sprite_instances know about ".."
 		if ( ! env->get_member(subpart.c_str(), &tmp) )
 		{
-			// Try _global, but only at first iteration...
+			// Try this and _global, but only at first iteration...
+
 			if ( depth > 0 ) 
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
@@ -821,7 +828,12 @@ as_environment::find_object_slashsyntax(const std::string& path) const
 				return NULL;
 			}
 
-			if ( ! VM::get().getGlobal()->get_member(subpart.c_str(), &tmp) )
+			if ( subpart == "this" )
+			{
+				tmp.set_as_object(m_target);
+			}
+
+			else if ( ! VM::get().getGlobal()->get_member(subpart.c_str(), &tmp) )
 			{
 				IF_VERBOSE_ASCODING_ERRORS(
 				log_aserror(_("Element '%s' of variable '%s' not found in object %p nor in _global (slashsyntax)"),

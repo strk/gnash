@@ -1777,6 +1777,10 @@ character* sprite_instance::get_character_at_depth(int depth)
 bool sprite_instance::get_member(const std::string& name, as_value* val)
 {
 	// FIXME: use addProperty interface for these !!
+	// TODO: or at least have a character:: protected method take
+	//       care of these ?
+	//       Duplicates code in character::get_relative_target_common too..
+	//
 	if ( name == "_root" )
 	{
 		// TODO: handle lockroot
@@ -1797,11 +1801,13 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 			return false;
 		}
 	}
+#if 0 // see MovieClip.as
 	if ( name == "this" )
 	{
 		val->set_as_object( this );
 		return true;
 	}
+#endif
 
 	// Try variables.
 	if ( m_as_environment.get_member(name, val) )

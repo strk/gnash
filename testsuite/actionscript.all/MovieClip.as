@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.80 2007/08/22 14:29:29 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.81 2007/08/24 10:05:58 strk Exp $";
 
 #include "check.as"
 
@@ -40,6 +40,9 @@ check(typeof(mc)=="movieclip");
 check_equals(typeof(this), 'movieclip');
 check_equals(typeof(_parent), 'undefined');
 check_equals(_root, this);
+check_equals(typeof(this['_root']), 'movieclip');
+check_equals(typeof(this['_level0']), 'movieclip');
+check_equals(typeof(this['this']), 'undefined');
 
 // Check inheritance
 check(MovieClip);

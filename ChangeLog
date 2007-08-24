@@ -1,3 +1,17 @@
+2007-08-24 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClip.as: test that '_root' and
+	  '_level0' can be accessed as members of a movieclip, while 'this'
+	  cannot.
+	* testsuite/actionscript.all/delete.as: add TODO request for testing
+	  variable access by path
+	* testsuite/actionscript.all/getvariable.as: add test for accessing
+	  slash-based paths starting with 'this'
+	* server/sprite_instance.cpp (get_member): don't consider 'this' as
+	  a member.
+	* server/as_environment.cpp (find_object_{slash,dot}syntax): handle
+	  paths starting with 'this'.
+
 2007-08-24 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-ming.all/DefineEditTextVariableNameTest2.c: add a new 

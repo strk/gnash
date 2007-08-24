@@ -1,4 +1,4 @@
-rcsid="$Id: delete.as,v 1.10 2007/04/24 20:38:26 strk Exp $";
+rcsid="$Id: delete.as,v 1.11 2007/08/24 10:05:58 strk Exp $";
 
 #include "check.as"
 
@@ -71,3 +71,6 @@ check(!delete obj.a);
 check(!delete unexistent.a);
 
 // TODO: try other malformed ActionDelete calls
+
+// TODO: test deletion of variables referenced by path (slash-based or dot-based)
+//       make sure to test use of 'this' here too !
