@@ -69,14 +69,6 @@ as_value::as_value(as_function* func)
     }
 }
 
-#if 0
-std::string
-as_value::to_std_string(as_environment* env) const
-{
-    return to_string(env);
-}
-#endif
-
 // Conversion to const std::string&.
 const std::string&
 as_value::to_string(as_environment* env) const
@@ -85,9 +77,22 @@ as_value::to_string(as_environment* env) const
 	{
 
 		case STRING:
-		case MOVIECLIP:
 			/* don't need to do anything */
 			break;
+
+		case MOVIECLIP:
+		{
+#ifdef MOVIECLIP_AS_SOFTREF
+			/* don't need to do anything */
+#else
+			sprite_instance* sp = m_object_value->to_movie();
+			assert(sp); // or return as in to_sprite() ?
+			if ( sp ) {
+				m_string_value = sp->getTarget();
+			}
+#endif
+			break;
+		}
 
 		case NUMBER:
 			m_string_value = doubleToString(m_number_value);
@@ -503,7 +508,7 @@ as_value::to_sprite() const
 
 #ifndef MOVIECLIP_AS_SOFTREF
 	sprite_instance* sp = m_object_value->to_movie();
-	if ( ! sp ) return NULL;
+	if ( ! sp ) return NULL; // shoudl we assert(sp) instead ?
 	if ( sp->isUnloaded() )
 	{
 		log_error(_("MovieClip value is a dangling reference: "
@@ -817,6 +822,10 @@ as_value::typeOf() const
 bool
 as_value::equalsSameType(const as_value& v) const
 {
+#ifdef GNASH_DEBUG_EQUALITY
+    static int count=0;
+    log_debug("equalsSameType(%s, %s) called [%d]", to_debug_string().c_str(), v.to_debug_string().c_str(), count++);
+#endif
 	assert(m_type == v.m_type);
 	switch (m_type)
 	{
@@ -832,8 +841,14 @@ as_value::equalsSameType(const as_value& v) const
 			return m_boolean_value == v.m_boolean_value;
 
 		case STRING:
-		case MOVIECLIP:
 			return m_string_value == v.m_string_value;
+
+		case MOVIECLIP:
+#ifdef MOVIECLIP_AS_SOFTREF
+			return m_string_value == v.m_string_value;
+#else
+			return m_object_value == v.m_object_value;
+#endif
 
 		case NUMBER:
 		{
@@ -912,7 +927,9 @@ as_value::operator=(const as_value& v)
 	else if (v.m_type == MOVIECLIP)
 	{
 #ifndef MOVIECLIP_AS_SOFTREF
-		set_sprite(*(v.to_sprite()));
+		sprite_instance* sp = dynamic_cast<sprite_instance*>(v.m_object_value);
+		assert(sp);
+		set_sprite(*sp);
 #else
 		set_sprite(v.m_string_value);
 #endif
@@ -1094,7 +1111,11 @@ void
 as_value::setReachable() const
 {
 #ifdef GNASH_USE_GC
+#ifdef MOVIECLIP_AS_SOFTREF
 	if ( m_type == OBJECT || m_type == AS_FUNCTION )
+#else
+	if ( m_type == OBJECT || m_type == AS_FUNCTION || m_type == MOVIECLIP)
+#endif
 	{
 		m_object_value->setReachable();
 	}
