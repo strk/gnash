@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.82 2007/08/24 13:52:24 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.83 2007/08/24 15:05:23 strk Exp $";
 
 #include "check.as"
 
@@ -437,10 +437,31 @@ check_equals(typeof(hardref), 'undefined');
 check_equals(typeof(softref), 'movieclip');
 check_equals(typeof(softref.member), 'undefined');
 check_equals(typeof(softref._target), 'undefined');
-_root.createEmptyMovieClip("hardref", 61);
+hardref = 4;
+check_equals(typeof(softref), 'movieclip'); // hardref doesn't hide this
+// Delete is needed, or further inspection functions will hit the variable before the character
+delete hardref;
+sr61 = _root.createEmptyMovieClip("hardref", 61);
 hardref.member = 2;
 check_equals(typeof(softref.member), 'number');
 check_equals(softref.member, 2);
+
+// Two movieclips can have the same name
+sr62 = _root.createEmptyMovieClip("hardref", 62);
+// Still, soft references correctly point each to
+// it's distinct clip !
+sr61.member = 6;
+check_equals(sr61.member, 6);
+xcheck_equals(typeof(sr62.member), 'undefined');
+check_equals(sr61._name, "hardref");
+check_equals(sr62._name, "hardref");
+
+// When getting a member by name, the one with lowest
+// depth comes up first
+check_equals(hardref.member, 6); // depth 61 < 62
+sr60 = _root.createEmptyMovieClip("hardref", 60);
+sr60.member = 60;
+check_equals(hardref.member, 60); // depth 60 < 61 < 62
 
 #endif // OUTPUT_VERSION >= 6
 

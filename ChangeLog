@@ -1,5 +1,7 @@
 2007-08-24 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/MovieClip.as: more test for 
+	  soft references.
 	* server/as_value.cpp: fix build when MOVIECLIP_AS_SOFTREF is
 	  undefined.
 	* server/swf/PlaceObject2Tag.cpp (loader): remove unused variable.
