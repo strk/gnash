@@ -1,5 +1,11 @@
 2007-08-24 Sandro Santilli <strk@keybit.net>
 
+	* libbase/: tree.hpp => tree.hh: don't change original name of
+	  external source code.
+	* libbase/Makefile.am: distribute tree.hh
+
+2007-08-24 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/MovieClip.as: test that '_root' and
 	  '_level0' can be accessed as members of a movieclip, while 'this'
 	  cannot.

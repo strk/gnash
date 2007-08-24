@@ -130,6 +130,7 @@ noinst_HEADERS = \
 	ref_counted.h \
 	smart_ptr.h \
 	sharedlib.h \
+	tree.hh \
 	triangulate.h \
 	triangulate_impl.h \
 	tu_config.h \
