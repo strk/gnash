@@ -44,7 +44,7 @@ using namespace std;
 
 // Undefine this to keep MOVIECLIP values by pointer
 // rather then by "target" ref.
-#define MOVIECLIP_AS_SOFTREF
+//#define MOVIECLIP_AS_SOFTREF
 
 // Define the macro below to make abstract equality operator verbose
 //#define GNASH_DEBUG_EQUALITY
@@ -512,9 +512,11 @@ as_value::to_sprite() const
 	if ( sp->isUnloaded() )
 	{
 		log_error(_("MovieClip value is a dangling reference: "
-				"target %s was unloaded (should set to NULL?)"),
+				"target %s was unloaded (looking for a substitute on the same target))"),
 				sp->getTarget().c_str());
-		return NULL; 
+		sp = find_sprite_by_target(sp->getTarget());
+		return sp;
+		//return NULL;
 	}
 	return sp;
 #else
@@ -847,7 +849,7 @@ as_value::equalsSameType(const as_value& v) const
 #ifdef MOVIECLIP_AS_SOFTREF
 			return m_string_value == v.m_string_value;
 #else
-			return m_object_value == v.m_object_value;
+			return to_sprite() == v.to_sprite(); // m_object_value == v.m_object_value;
 #endif
 
 		case NUMBER:

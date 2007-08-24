@@ -98,6 +98,8 @@ public:
 	/// Puts a new character at the specified depth, replacing any
 	/// existing character.
 	//
+	/// Calls unload on the removed character.
+	///
 	/// If use_cxform or use_matrix are false, and a character is
 	/// present at the given depth, then keep those respective
 	/// properties from the existing character.

@@ -311,6 +311,9 @@ DisplayList::replace_character(
 		// remember bounds of old char
 		oldch->add_invalidated_bounds(old_ranges, true);		
 
+		// Unload old char
+		(*it)->unload();
+
 		// replace existing char		
 		*it = di;
 		

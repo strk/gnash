@@ -188,8 +188,8 @@ main(int argc, char** argv)
 		//       existance of the old (dynamicized) instance by looking
 		//       at the real DisplayList and at the rendered buffer
 		//
-		"xcheck_equals(dynRef.myThing, 'guess');"
-		"xcheck_equals(dynRef.getDepth(), 10);" 
+		"check_equals(dynRef.myThing, 'guess');"
+		"check_equals(dynRef.getDepth(), 10);" 
 
 		// Luckly we can query for depth chars with getInstanceAtDepth
 		"check_equals(typeof(getInstanceAtDepth(-16381)), 'movieclip');"

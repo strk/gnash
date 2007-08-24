@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.83 2007/08/24 15:05:23 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.84 2007/08/24 16:07:27 strk Exp $";
 
 #include "check.as"
 
@@ -393,10 +393,10 @@ check_equals(typeof(mc4_mc.mc5_mc), 'undefined');
 check_equals(typeof(mc4), 'movieclip');
 check_equals(typeof(mc5), 'movieclip');
 // gah.. our "soft references" are bogus :(
-xcheck_equals(mc4._target, "/changed");
-xcheck_equals(mc5._target, "/changed/mc5_mc");
-xcheck_equals(targetPath(mc4), "_level0.changed");
-xcheck_equals(targetPath(mc5), "_level0.changed.mc5_mc");
+check_equals(mc4._target, "/changed");
+check_equals(mc5._target, "/changed/mc5_mc");
+check_equals(targetPath(mc4), "_level0.changed");
+check_equals(targetPath(mc5), "_level0.changed.mc5_mc");
 xcheck_equals(mc4.toString(), "[object Object]");
 xcheck_equals(mc5.toString(), "[object Object]");
 check_equals(changed._target, "/changed");
@@ -452,7 +452,7 @@ sr62 = _root.createEmptyMovieClip("hardref", 62);
 // it's distinct clip !
 sr61.member = 6;
 check_equals(sr61.member, 6);
-xcheck_equals(typeof(sr62.member), 'undefined');
+check_equals(typeof(sr62.member), 'undefined');
 check_equals(sr61._name, "hardref");
 check_equals(sr62._name, "hardref");
 

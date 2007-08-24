@@ -22,7 +22,7 @@
  *  Test case sensitivity 
  */
 
-rcsid="$Id: case.as,v 1.8 2007/08/23 16:50:56 strk Exp $";
+rcsid="$Id: case.as,v 1.9 2007/08/24 16:07:27 strk Exp $";
 
 #include "check.as"
 
@@ -133,15 +133,15 @@ check_equals(mcRef[1].getDepth(), 7);
 check_equals(mcRef[1]._name, "CLIP"); 
 check_equals(mcRef[1]._target, "/CLIP"); 
 #else // OUTPUT_VERSION <= 6
-// Gnash fails these due to "soft references"
+// Gnash used to fail these due to "soft references"
 // Basically, a MOVIECLIP as_value stores the clip
 // target, but in SWF<7 the target is insensitive
 // so /clip and /CLIP both resolve to the *same*
 // character.
 //
-xcheck_equals(mcRef[1].getDepth(), 7);
-xcheck_equals(mcRef[1]._name, "CLIP"); 
-xcheck_equals(mcRef[1]._target, "/CLIP"); 
+check_equals(mcRef[1].getDepth(), 7);
+check_equals(mcRef[1]._name, "CLIP"); 
+check_equals(mcRef[1]._target, "/CLIP"); 
 #endif // OUTPUT_VERSION <= 6
 
 
