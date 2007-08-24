@@ -512,6 +512,8 @@ public:
 
 private:
 
+	static const short unsigned int numGlobalRegisters = 4;
+
 	typedef std::vector<CallFrame> CallStack;
 		
 	CallStack _localFrames;
@@ -519,7 +521,7 @@ private:
 	/// Variables available in this environment
 	Variables _variables;
 
-	as_value m_global_register[4];
+	as_value m_global_register[numGlobalRegisters];
 
 	/// Movie target. 
 	character* m_target;

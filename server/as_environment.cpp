@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.83 2007/08/24 10:05:57 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.84 2007/08/24 10:37:56 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -938,7 +938,7 @@ as_environment::dump_global_registers(std::ostream& out) const
 {
 	std::string registers;
 	int defined=0;
-	for (unsigned int i=0; i<4; ++i)
+	for (unsigned int i=0; i<numGlobalRegisters; ++i)
 	{
 		if (i) registers += std::string(" | ");
 		registers += std::string("\"") +
@@ -1072,7 +1072,7 @@ as_environment::CallFrame::markReachableResources() const
 void
 as_environment::markReachableResources() const
 {
-	for (size_t i=0, s=4; i<4; ++i)
+	for (size_t i=0; i<4; ++i)
 	{
 		m_global_register[i].setReachable();
 	}
