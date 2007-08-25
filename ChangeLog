@@ -1,5 +1,11 @@
 2007-08-25 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ASHandlers.cpp (ActionNewLessThan): convert operands to
+	  primitive value before proceeding.
+	* testsuite/actionscript.all/ops.as: xcheck => check
+
+2007-08-25 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionNewAdd): convert operands to
 	  primitive value before proceeding.
 	* server/as_value.h: make to_primitive() public

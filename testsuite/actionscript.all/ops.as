@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.18 2007/08/25 14:15:51 strk Exp $";
+rcsid="$Id: ops.as,v 1.19 2007/08/25 16:10:37 strk Exp $";
 
 #include "check.as"
 
@@ -110,11 +110,11 @@ check(x<y);
 
 x=String("A");
 y=String("a");
-xcheck(x<y);
+check(x<y);
 
 x=String("abc");
 y=String("abcd");
-xcheck(x<y);
+check(x<y);
 
 x=0.999;
 y=String("1.000");

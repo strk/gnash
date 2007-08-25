@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.126 2007/08/25 14:15:51 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.127 2007/08/25 16:10:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2805,8 +2805,11 @@ SWFHandlers::ActionNewLessThan(ActionExec& thread)
 
 	thread.ensureStack(2);
 
-	as_value& operand1 = env.top(1);
-	as_value& operand2 = env.top(0);
+	as_value& op1_in = env.top(1);
+	as_value& op2_in = env.top(0);
+
+	as_value operand1 = op1_in.to_primitive(env);
+	as_value operand2 = op2_in.to_primitive(env);
 
 	if ( operand1.is_string() && operand2.is_string() )
 	{
