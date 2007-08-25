@@ -1,5 +1,10 @@
 2007-08-25 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/ops.as: more tests about isNaN(x) when
+	  x != NaN (odd)
+
+2007-08-25 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/ASHandlers.cpp (ActionNewLessThan): convert operands to
 	  primitive value before proceeding.
 	* testsuite/actionscript.all/ops.as: xcheck => check

@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.19 2007/08/25 16:10:37 strk Exp $";
+rcsid="$Id: ops.as,v 1.20 2007/08/25 19:07:46 strk Exp $";
 
 #include "check.as"
 
@@ -550,8 +550,11 @@ check( (y+1.0) < 0.001 );
 
 x = new String("a");
 y = --x;
-xcheck(y!=NaN);
+check_equals(typeof(y), 'number');
+xcheck(y!=NaN); // uh ? is it a different NaN ?
+check(! (NaN!=NaN));
 check(isNaN(y));
+check(isNaN(NaN));
 
 //------------------------------------------------
 // Increment Operator (ACTION_DECREMENT: 0x50)
