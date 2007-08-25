@@ -56,9 +56,10 @@ obj.valueOf = function () {return "TO_VALUE";};
   check(obj.toString != Object.prototype.toString);
   check(obj.valueOf != Object.prototype.valueOf);
 #else
-  // this is true only in swf5
+  // this is true only in swf5 (any function is equal to any other in SWF5)
   xcheck(obj.toString == Object.prototype.toString);
   xcheck(obj.valueOf == Object.prototype.valueOf);
+  xcheck(obj.toString == obj.valueOf);
 #endif
 x = obj.toString();
 y = obj.valueOf();
