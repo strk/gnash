@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.34 2007/08/01 15:56:54 strk Exp $ */
+/* $Id: string.cpp,v 1.35 2007/08/25 23:11:00 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -223,7 +223,10 @@ string_split(const fn_call& fn)
 
     boost::intrusive_ptr<as_array_object> array(new as_array_object());
 
-    if (fn.nargs == 0) {
+    int SWFVersion = fn.env().get_version();
+
+    if (fn.nargs == 0)
+    {
         val.set_std_string(str);
         array->push(val);
 
@@ -233,7 +236,7 @@ string_split(const fn_call& fn)
     const std::string& delim = fn.arg(0).to_string(&(fn.env()));
 
     // SWF5 didn't support multichar or empty delimiter
-    if ( fn.env().get_version() < 6 )
+    if ( SWFVersion < 6 )
     {
 	    if ( delim.size() != 1 )
 	    {
@@ -245,9 +248,24 @@ string_split(const fn_call& fn)
 
     size_t max = str.size();
 
-    if (fn.nargs >= 2) {
-        max = iclamp(fn.arg(1).to_number<size_t>(), 0, str.size());
+    if (fn.nargs >= 2)
+    {
+	int max_in = fn.arg(1).to_number<int>();
+	if ( SWFVersion < 6 && max_in < 1 )
+	{
+		return as_value(array.get());
+	}
+        max = iclamp((size_t)max_in, 0, str.size());
     }
+
+    if ( str.empty() )
+    {
+        val.set_std_string(str);
+        array->push(val);
+
+        return as_value(array.get());
+    }
+
 
     //if (delim == "") {
     if ( delim.empty() ) {

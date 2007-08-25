@@ -1,3 +1,11 @@
+2007-08-26 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/string.cpp (string_split): correctly handle some more
+	  corner cases.
+	* testsuite/swfdec/PASSING: string-split-empty-*.swf tests succeed.
+	* testsuite/actionscript.all/String.as: some more testing for
+	  String.split
+
 2007-08-25 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/toString_valueOf.as: note that any

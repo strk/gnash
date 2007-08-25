@@ -16,7 +16,7 @@
 
 // Original author: Mike Carlson - June 19th, 2006
 
-rcsid="$Id: String.as,v 1.19 2007/07/01 10:54:40 bjacques Exp $";
+rcsid="$Id: String.as,v 1.20 2007/08/25 23:11:00 strk Exp $";
 
 #include "check.as"
 
@@ -75,13 +75,60 @@ check_equals ( a.split("la")[2], undefined );
 check_equals ( a.split("la").length, 1 );
 #endif
 
+// TODO: test String.split(delim, limit)  [ second arg ]
+
+primitiveString = '';
+ret = primitiveString.split('x');
+check_equals(typeof(ret), 'object');
+check_equals(ret.length, 1);
+check_equals(typeof(ret[0]), 'string');
+check_equals(ret[0], '');
+
+ret = primitiveString.split('x', -1);
+#if OUTPUT_VERSION < 6
+	check_equals(ret.length, 0); 
+#else // OUTPUT_VERSION >= 6
+	check_equals(ret.length, 1); 
+#endif // OUTPUT_VERSION >= 6
+ret = primitiveString.split('x', 0);
+#if OUTPUT_VERSION < 6
+	check_equals(ret.length, 0); 
+#else // OUTPUT_VERSION >= 6
+	check_equals(ret.length, 1); 
+#endif // OUTPUT_VERSION >= 6
+ret = primitiveString.split('x', 1);
+check_equals(ret.length, 1);
+ret = primitiveString.split('x', 2);
+check_equals(ret.length, 1);
+
+primitiveString = 'abcde';
+ret = primitiveString.split('x');
+check_equals(typeof(ret), 'object');
+check_equals(ret.length, 1);
+check_equals(typeof(ret[0]), 'string');
+check_equals(ret[0], 'abcde');
+
+
+//----------------------------------------
+// Check String.fromCharCode
+//-----------------------------------------
+
 
 // This is the correct usage pattern
 var b = String.fromCharCode(97,98,99,100);
 check_equals ( b, "abcd" );
 
+//-------------------------------------------
+// Check String.toUpperCase and toLowerCase
+//-------------------------------------------
+
 check_equals ( a.toUpperCase(), "WALLAWALLAWASHINGTON" );
 check_equals ( a.toLowerCase(), "wallawallawashington" );
+
+//-------------------------------------------
+// Check substr / slice / substring
+//-------------------------------------------
+
 a = new String("abcdefghijklmnopqrstuvwxyz");
 check_equals ( a.substr(5,2), "fg" );
 check_equals ( a.substr(5,7), "fghijkl" );
