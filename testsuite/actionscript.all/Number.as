@@ -27,7 +27,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.27 2007/07/26 03:41:19 strk Exp $";
+rcsid="$Id: Number.as,v 1.28 2007/08/25 14:15:51 strk Exp $";
 
 #include "check.as"
 
@@ -344,6 +344,9 @@ asm { push 'val','2E1' tonumber setvariable };
 check_equals(val, 20);
 
 asm { push 'val','2p' tonumber setvariable };
+check(isNaN(val));
+
+asm { push 'val','string' tonumber setvariable };
 check(isNaN(val));
 
 asm { push 'val','NaN' tonumber setvariable };

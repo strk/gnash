@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.125 2007/08/23 16:50:56 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.126 2007/08/25 14:15:51 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2765,18 +2765,21 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 
     thread.ensureStack(2);
 
-    as_value& v1 = env.top(0);
-    as_value& v2 = env.top(1);
+    as_value& v1_in = env.top(0);
+    as_value& v2_in = env.top(1);
 
-    //log_msg(_("ActionNewAdd(%s, %s) called"), v1.to_debug_string().c_str(), v2.to_debug_string().c_str());
+    as_value v1 = v1_in.to_primitive(env);
+    as_value v2 = v2_in.to_primitive(env);
+
+    //log_msg(_("ActionNewAdd(%s, %s) [prim %s, %s] called"), v1_in.to_debug_string().c_str(), v2_in.to_debug_string().c_str(), v1.to_debug_string().c_str(), v2.to_debug_string().c_str());
 
 
     if (v1.is_string() || v2.is_string() )
     {
     	int version = env.get_version();
-        // modify env.top(1)
         v2.convert_to_string_versioned(version, &env);
         v2.string_concat(v1.to_string_versioned(version, &env));
+	v2_in = v2; // modify env.top(1)
     }
     else
     {
@@ -2786,7 +2789,9 @@ SWFHandlers::ActionNewAdd(ActionExec& thread)
 	double v1num = v1.to_number(&env);
 	//log_msg(_("v1 num = %g"), v1num);
 
-        v2.set_double(v2num + v1num); // modify env.top(1)
+        v2.set_double(v2num + v1num); 
+
+	v2_in = v2; // modify env.top(1)
     }
     env.drop(1);
 }

@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.17 2007/08/19 23:34:55 strk Exp $";
+rcsid="$Id: ops.as,v 1.18 2007/08/25 14:15:51 strk Exp $";
 
 #include "check.as"
 
@@ -42,8 +42,12 @@ check(! (NaN == 0) );
 check(! (0 == NaN) );
 check(! ('string' == 0) );
 check(! (0 == 'string') );
-xcheck(! ('string' == NaN) );
-xcheck(! (NaN == 'string') );
+check(! ('string' == NaN) );
+check(! (NaN == 'string') );
+check(! (Infinite == 'Infinite') );
+check(! ('Infinite' == Infinite) );
+check(! (-Infinite == '-Infinite') );
+check(! ('-Infinite' == -Infinite) );
 check(1==true);
 check(true==1);
 check(2!=true);
@@ -76,7 +80,7 @@ check_equals( str3, 3.0 ); // str3 (object) is automatically converted to a numb
 check_equals( str3.toString(), 3.0 ); // str3 (primitive string) is automatically converted to a number 
 
 check( ! (str1 == 0) ); // str1 (object) is NOT converted to a number (due to NaN?)
-xcheck( ! (str1 == NaN) ); // str1 (object) is NOT converted to a number (due to NaN?)
+check( ! (str1 == NaN) ); // str1 (object) is NOT converted to a number (due to NaN?)
 
 #if OUTPUT_VERSION > 5
   check( ! (str1 == str2) ); // they are not the same object
@@ -102,7 +106,7 @@ check(x<y);
 
 x=String("0.999");
 y=String("1.0");
-xcheck(x<y);
+check(x<y);
 
 x=String("A");
 y=String("a");
@@ -114,11 +118,11 @@ xcheck(x<y);
 
 x=0.999;
 y=String("1.000");
-xcheck(x<y);
+check(x<y);
 
 x=String("0.999");
 y=1.0;
-xcheck(x<y);
+check(x<y);
 
 check(! (NaN < NaN) );
 check(! (undefined < undefined) );
@@ -307,19 +311,19 @@ check_equals(x&y, 1);
 
 x = new String("1");
 y = new String("3");
-xcheck_equals(x&y, 1); 
+check_equals(x&y, 1); 
 
 x = new String("1.0");
 y = new String("3.0");
-xcheck_equals(x&y, 1); 
+check_equals(x&y, 1); 
 
 x = new String("1.999");
 y = new String("3.999");
-xcheck_equals(x&y, 1); 
+check_equals(x&y, 1); 
 
 x = new String("3.999");
 y = 7;
-xcheck_equals(x&y, 3); 
+check_equals(x&y, 3); 
 
 x = Number("7.999");
 y = 3;
@@ -351,11 +355,11 @@ check_equals(x|y, 9);
 
 x = new String("1.999");
 y = 8.999;
-xcheck_equals(x|y, 9); 
+check_equals(x|y, 9); 
 
 x = String("1.999");
 y = String("8.999");
-xcheck_equals(x|y, 9); 
+check_equals(x|y, 9); 
 
 x = 9;
 y = String("1.5");
@@ -399,15 +403,15 @@ check_equals(x^y, 3);
 
 x = new String("1.999");
 y = new String("2.999");
-xcheck_equals(x^y, 3);
+check_equals(x^y, 3);
 
 x = new String("1.999");
 y = 2.999;
-xcheck_equals(x^y, 3);
+check_equals(x^y, 3);
 
 x = 1.999;
 y = new String("2.999");
-xcheck_equals(x^y, 3);
+check_equals(x^y, 3);
 
 
 //------------------------------------------------
@@ -463,11 +467,11 @@ check_equals(y, 6);
 
 x = String("3");
 y = x << 1;
-xcheck_equals(y, 6);
+check_equals(y, 6);
 
 x = new String("3");
 y = x << 1;
-xcheck_equals(y, 6); 
+check_equals(y, 6); 
 
 //------------------------------------------------
 // Shift right operator (ACTION_SHIFTRIGHT : 0x64)
@@ -503,11 +507,11 @@ check_equals(y, 3);
 
 x = String("7");
 y = x >> 1;
-xcheck_equals(y, 3);
+check_equals(y, 3);
 
 x = new String("7");
 y = x >> 1;
-xcheck_equals(y, 3);
+check_equals(y, 3);
 
 //-------------------------------------------------
 // Shift right2 operator (ACTION_SHIFTRIGHT2 : 0x65)
@@ -537,12 +541,12 @@ check_equals(y, -1);
 x = new String("1.9");
 y = --x;
 //xcheck_equals(y, 0.9);
-xcheck( (y-0.9) < 0.001 );
+check( (y-0.9) < 0.001 );
 
 x = new String("0.0");
 y = --x;
 //xcheck_equals(y, -1.0);
-xcheck( (y+1.0) < 0.001 );
+check( (y+1.0) < 0.001 );
 
 x = new String("a");
 y = --x;
@@ -564,11 +568,11 @@ check_equals(y, 0);
 x = new String("1.9");
 y = ++x;
 //xcheck_equals(y, 2.9);
-xcheck( (y-2.9) < 0.001 );
+check( (y-2.9) < 0.001 );
 
 x = new String("0.0");
 y = ++x;
-xcheck_equals(y, 1);
+check_equals(y, 1);
 
 x = new String("a");
 y = ++x;

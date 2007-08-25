@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.63 2007/08/13 02:47:58 strk Exp $ */
+/* $Id: as_value.h,v 1.64 2007/08/25 14:15:51 strk Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -424,6 +424,16 @@ public:
 	/// or NULL if it is not an ActionScript function.
 	as_function*	to_as_function() const;
 
+	/// Return value as a primitive type
+	//
+	/// Primitive types are: undefined, null, boolean, string, number.
+	/// See ECMA-2.6.2 (section 4.3.2).
+	///
+	/// @param env
+	/// 	The environment to use for calling the valueOf method.
+	///
+	as_value to_primitive(as_environment& env) const;
+
 	/// Force type to number.
 	//
 	/// @param env
@@ -572,16 +582,6 @@ private:
 
 	void	set_sprite(const std::string& path);
 
-
-	/// Return value as a primitive type
-	//
-	/// Primitive types are: undefined, null, boolean, string, number.
-	/// See ECMA-2.6.2 (section 4.3.2).
-	///
-	/// @param env
-	/// 	The environment to use for calling the valueOf method.
-	///
-	as_value to_primitive(as_environment& env) const;
 
 	/// Compare values of the same type
 	//

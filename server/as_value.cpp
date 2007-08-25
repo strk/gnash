@@ -299,6 +299,10 @@ as_value::to_number(as_environment* env) const
 					{
 						return ret.m_number_value;
 					}
+					else if ( ret.is_string() )
+					{
+						return ret.to_number();
+					}
 					else
 					{
 						log_msg(_("[object %p].%s() did not return a number: %s"),
@@ -687,14 +691,18 @@ as_value::equals(const as_value& v, as_environment& env) const
     //    return the result of the comparison x == ToNumber(y).
     else if (m_type == NUMBER && v.m_type == STRING)
     {
-        return equalsSameType(v.to_number(&env)); 
+	double n = v.to_number(&env); // no need for the env actually
+	if ( ! isfinite(n) ) return false;
+        return equalsSameType(n);
     }
 
     // 17. If Type(x) is String and Type(y) is Number,
     //     return the result of the comparison ToNumber(x) == y.
     else if (v.m_type == NUMBER && m_type == STRING)
     {
-        return v.equalsSameType(to_number(&env)); 
+	double n = to_number(&env); // no need for the env actually
+	if ( ! isfinite(n) ) return false;
+        return v.equalsSameType(n); 
     }
 
     // 18. If Type(x) is Boolean, return the result of the comparison ToNumber(x) == y.

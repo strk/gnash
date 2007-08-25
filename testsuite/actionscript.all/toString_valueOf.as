@@ -99,7 +99,7 @@ Number.prototype.valueOf = function () {return "TO_VALUE"; };
 num2 = new Number(2);
 num3 = num1 + num2;
 //valueOf called;
-check(num3 == "TO_VALUETO_VALUE");
+check_equals(num3, "TO_VALUETO_VALUE");
 
 x = num1.toString();
 y = num1.valueOf();
@@ -138,8 +138,8 @@ check(y == "10");
 
 str2 = new String("2");
 str3 = str1+str2;
-xcheck(str3 == "102"); 
-xcheck(str3 == 102); 
+check(str3 == "102"); 
+check(str3 == 102); 
 
 String.prototype.toString = function () {return "TO_STRING";};
 String.prototype.valueOf = function () {return "TO_VALUE";};
@@ -147,9 +147,9 @@ String.prototype.valueOf = function () {return "TO_VALUE";};
 xcheck(parseInt(str1) == 10); 
 xcheck(parseInt(str2) == 2);  
 str3 =  str1 + str2;
-xcheck(typeof(str3) == "string");
+check(typeof(str3) == "string");
 //valueOf called
-check(str3 == "TO_VALUETO_VALUE"); 
+check_equals(str3, "TO_VALUETO_VALUE"); 
 // trace a string Object won't invoke the toString method.
 // I don't think it's a bug.
 //trace(str1); //output 10 !
@@ -313,7 +313,7 @@ check(y == false);
 b2 = new Boolean(true);
 b3 = b1 + b2;
 check(typeof(b3) == 'number');
-xcheck(b3 == 1);
+check_equals(b3, 1);
 
 
 //

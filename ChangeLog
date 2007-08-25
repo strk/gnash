@@ -1,3 +1,17 @@
+2007-08-25 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionNewAdd): convert operands to
+	  primitive value before proceeding.
+	* server/as_value.h: make to_primitive() public
+	* server/as_value.cpp (to_number): if valueOf returned a string value
+	  call to_number() again on it; (equals): if one operand is a string
+	  and the other is a number, don't compare unless the string converts
+	  to a non-infinite number.
+	* testsuite/actionscript.all/Number.as: add test for 'string'
+	  convertion to number returning NaN
+	* testsuite/actionscript.all/ops.as: xcheck => check
+	* testsuite/actionscript.all/toString_valueOf.as xcheck => check
+
 2007-08-24 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.{h,cpp} (replace_character): call unload() on replaced
