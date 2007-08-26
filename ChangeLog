@@ -1,3 +1,7 @@
+2007-08-26 Deanna Phillips <deanna>
+
+	* doc/gnash.1: Updated.
+
 2007-08-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp, gui/gtksup.h: Add treeview to Movie Properties
