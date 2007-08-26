@@ -116,15 +116,44 @@ namespace gnash {
 
 	float	stream::read_fixed()
 	{
+#if 0 /* Chad */
 		m_unused_bits = 0;
 		int32_t	val = m_input->read_le32();
 		return (float) val / 65536.0f;
+#else
+		align();
+		return static_cast<float> (static_cast<double> (static_cast<long int> (m_input->read_le32())) / 65536.0f);
+#endif /* Chad */
 	}
-        float   stream::read_short_fixed()
-        {
-                m_unused_bits = 0;
-                return (float) m_input->read_le16();
+
+	// float is not large enough to hold a 32 bit value without doing the wrong thing with the sign.
+	// So we upgrade to double for the calculation and then resize when we know it's small enough.
+	float	stream::read_ufixed()
+	{
+		align();
+		return static_cast<float> (static_cast<double> (static_cast<unsigned long int> (m_input->read_le32())) / 65536.0f);
         }
+
+	// Read a short fixed value, unsigned.
+        float   stream::read_short_ufixed()
+        {
+		align();
+		return static_cast<float> (static_cast<uint16_t> (m_input->read_le16())) / 256.0f;
+        }
+
+	// Read a short fixed value, signed.
+	float	stream::read_short_sfixed()
+	{
+		align();
+		return static_cast<float> (static_cast<int16_t> (m_input->read_le16())) / 256.0f;
+	}
+
+	// Read a signed float value.
+	float	stream::read_float()
+	{
+		align();
+		return static_cast<float> (m_input->read_le32());
+	}
 
 	void	stream::align() { m_unused_bits = 0; m_current_byte = 0; }
 

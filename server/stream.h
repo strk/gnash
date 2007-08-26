@@ -51,8 +51,23 @@ namespace gnash {
 		/// number of bits to read.
 		int	read_sint(unsigned short bitcount);
 
+		/// \brief
+		/// Reads a little-endian decimal point value in the
+		/// format that the first half is before the decimal
+		/// point and the second half is after the decimal.
+		/// _fixed is 32 bits, short_fixed is 16. The _sfixed
+		/// versions read a signed fixed value.
 		float	read_fixed();
-                float   read_short_fixed();
+		float	read_ufixed();
+                float   read_short_ufixed();
+		float	read_short_sfixed();
+
+		/// \brief
+		/// Read floating point values, not in the fixed format.
+		float	read_float();
+
+		/// \brief
+		/// Correct for any unused bits from a uint read.
 		void	align();
 
 		unsigned read(char *buf, unsigned count);

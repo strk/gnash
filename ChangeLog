@@ -1,3 +1,21 @@
+2007-08-26 Chad Musick <chadmusick@msbx.net>
+
+	* server/Makefile.am: Add new files, remove obsolete ones.
+	* server/BevelFilter.h,.cpp: A Bevel display object filter
+	* server/BitmapFilter.h: Base class for other filters
+	* server/BlurFilter.h,.cpp: A Blur display object filter
+	* server/ColorMatrixFilter.h,.cpp: A color matrix display filter
+	* server/ConvolutionFilter.h,.cpp: A convolution display filter
+	* server/DropShadowFilter.h,.cpp: A drop shadow display filter
+	* server/GlowFilter.h,.cpp: A glow display filter
+	* server/GradientBevelFilter.h,.cpp: A gradient bevel filter
+	* server/GradientGlowFilter.h,.cpp: A gradient glow filter
+	* server/filters.h,.cpp: Removed (split to other files)
+	* server/stream.h,stream.cpp: Added read_float, read_short_ufixed,
+	  fixed calculation of value in read_short_fixed, added read_ufixed
+	* server/parser/filter_factory.h,.cpp: parsing code of filters
+	* server/swf/PlaceObject2Tag.cpp: Changed to use new filters
+
 2007-08-26 Sandro Santilli <strk@keybit.net>
 
 	* configure.ac: keep mit-shm enabled by default (use --disable-mit-shm

@@ -1,0 +1,72 @@
+// 
+//   Copyright (C) 2007 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+/* $Id: ConvolutionFilter.h,v 1.1 2007/08/26 15:14:11 cmusick Exp $ */
+
+#ifndef GNASH_CONVOLUTIONFILTER_H
+#define GNASH_CONVOLUTIONFILTER_H
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "array.h"
+#include "BitmapFilter.h"
+
+namespace gnash {
+
+// A convolution effect filter.
+class ConvolutionFilter : public BitmapFilter
+{
+public:
+    // Fill from a stream. See parser/filter_factory.cpp for the implementations.
+    virtual bool read(stream* in);
+
+    virtual ~ConvolutionFilter() { return; }
+
+    // Clone this object and return a copy of it. (AS accessible function.)
+    // Guaranteed to return an object which can be cast to BlurFilter
+    Filter const clone();
+
+    ConvolutionFilter() : 
+        m_matrixX(), m_matrixY(), m_matrix(), m_divisor(), m_bias(),
+        m_preserveAlpha(false), m_clamp(false), m_color(), m_alpha()
+    { return; }
+
+    ConvolutionFilter(uint8_t matrixX, uint8_t matrixY, as_array_object a_matrix,
+        float divisor, float bias, bool preserveAlpha, bool clamp, uint32_t color,
+        uint8_t alpha) :
+        m_matrixX(matrixX), m_matrixY(matrixY), m_matrix(a_matrix),
+        m_divisor(divisor), m_bias(bias), m_preserveAlpha(preserveAlpha),
+        m_clamp(clamp), m_color(color), m_alpha(alpha)
+    { return; }
+
+private:
+    uint8_t m_matrixX; // Number of columns
+    uint8_t m_matrixY; // Number of rows
+    as_array_object m_matrix; // The convolution matrix
+    float m_divisor;
+    float m_bias;
+    bool m_preserveAlpha; // If true, don't convolute the alpha channel
+    bool m_clamp; // Whether or not to clamp
+    uint32_t m_color; // For off-image pixels
+    uint8_t m_alpha; // For off-image pixels
+};
+
+} // Namespace gnash
+
+#endif // GNASH_CONVOLUTIONFILTER_H

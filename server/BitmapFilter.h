@@ -1,0 +1,51 @@
+// 
+//   Copyright (C) 2007 Free Software Foundation, Inc.
+// 
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+// 
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+/* $Id: BitmapFilter.h,v 1.1 2007/08/26 15:14:10 cmusick Exp $ */
+
+#ifndef GNASH_BITMAPFILTER_H
+#define GNASH_BITMAPFILTER_H
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "as_object.h"
+
+namespace gnash {
+
+class stream;
+class BitmapFilter;
+
+typedef boost::intrusive_ptr<BitmapFilter> Filter;
+
+// The common base class for AS display filters.
+class BitmapFilter : public as_object
+{
+public:
+    // Fill from a stream. See parser/filter_factory.cpp for the implementations.
+    virtual bool read(stream* in) = 0;
+
+    virtual ~BitmapFilter() { return; }
+
+    // Clone this object and return a copy of it. (AS accessible function.)
+    Filter const clone();
+};
+
+} // Namespace gnash
+
+#endif // GNASH_BITMAPFILTER_H

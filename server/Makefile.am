@@ -18,7 +18,7 @@
 # 
 #
 
-# $Id: Makefile.am,v 1.122 2007/08/24 05:57:09 cmusick Exp $
+# $Id: Makefile.am,v 1.123 2007/08/26 15:14:10 cmusick Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -65,7 +65,15 @@ libgnashserver_la_SOURCES = \
 	cxform.cpp \
 	DynamicShape.cpp	\
 	edit_text_character.cpp \
-        filters.cpp \
+        BlurFilter.cpp \
+        GlowFilter.cpp \
+        DropShadowFilter.cpp \
+        ConvolutionFilter.cpp \
+        ColorMatrixFilter.cpp \
+        GradientGlowFilter.cpp \
+        BevelFilter.cpp \
+        GradientBevelFilter.cpp \
+        parser/filter_factory.cpp \
 	generic_character.cpp \
 	matrix.cpp \
 	movie_instance.cpp \
@@ -129,7 +137,16 @@ noinst_HEADERS = \
 	event_id.h \
 	execute_tag.h \
 	fill_style.h \
-        filters.h \
+        BitmapFilter.h \
+        BlurFilter.h \
+        BevelFilter.h \
+        GradientBevelFilter.h \
+        GlowFilter.h \
+        GradientGlowFilter.h \
+        DropShadowFilter.h \
+        ConvolutionFilter.h \
+        ColorMatrixFilter.h \
+        parser/filter_factory.h \
 	font.h \
 	fontlib.h \
 	generic_character.h \

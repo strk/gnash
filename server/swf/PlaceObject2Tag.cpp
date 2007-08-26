@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.19 2007/08/24 10:46:11 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.20 2007/08/26 15:14:13 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,7 +29,7 @@
 #include "swf_event.h"
 #include "log.h"
 #include "stream.h"
-#include "filters.h"
+#include "filter_factory.h"
 
 namespace gnash {
 namespace SWF {
@@ -268,8 +268,8 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version, bool place_2)
 
         if (has_filters)
         {
-            effect_filters::effect_filters_vec v; // TODO: Something should be done with the filters...
-            effect_filters::filter_factory::read(in, movie_version, true, &v);
+            Filters v; // TODO: Attach the filters to the display object.
+            filter_factory::read(in, movie_version, true, &v);
         }
 
         if (has_blend_mode)
