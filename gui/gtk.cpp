@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.105 2007/08/22 21:38:22 strk Exp $ */
+/* $Id: gtk.cpp,v 1.106 2007/08/26 15:46:32 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -942,12 +942,7 @@ GtkGui::menuitem_about_callback(GtkMenuItem* /*menuitem*/, gpointer /*data*/)
                    NULL);
 }
 
-
-//Movie information / properties dialogue
-//
-//
-//
-
+//Movie Properties dialogue
 void
 GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 {
@@ -965,7 +960,7 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     gtk_container_add (GTK_CONTAINER (window1), main_vbox);
 
     GtkWidget *frame1 = gtk_frame_new("Movie Properties");
-    gtk_box_pack_start (GTK_BOX (main_vbox), frame1, FALSE, FALSE, 0);
+    gtk_box_pack_start (GTK_BOX (main_vbox), frame1, TRUE, TRUE, 0);
 
     GtkWidget *vbox1 = gtk_vbox_new (FALSE, 3);
     gtk_container_add (GTK_CONTAINER (frame1), vbox1);
@@ -979,7 +974,23 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
     GtkWidget *table1 = gtk_table_new(4, 2, FALSE);
     gtk_box_pack_start (GTK_BOX (vbox2), table1, FALSE, FALSE, 0);
 
+
+    gtk_box_pack_start (
+	GTK_BOX (vbox1), gtk_hseparator_new (), FALSE, FALSE, 0);
+
+    GtkWidget *vbox3 = gtk_vbox_new (FALSE, 3);
+    gtk_box_pack_start (
+	GTK_BOX (vbox1), vbox3, TRUE, TRUE, 0);
+
+    GtkWidget *scrollwindow1 = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrollwindow1),
+				      GTK_POLICY_AUTOMATIC,
+				      GTK_POLICY_AUTOMATIC);
+    gtk_box_pack_start (
+	 GTK_BOX (vbox3), scrollwindow1, TRUE, TRUE, 0);
+
     std::auto_ptr<InfoTree> infoptr = gui->getMovieInfo();
+
     if ( ! infoptr.get() )
     {
             label = gtk_label_new (_("VM not initialized yet"));
@@ -988,43 +999,114 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
             return;
     }
 
-    InfoTree& info = *infoptr;
-    
-    size_t size = info.size();
+    else {
 
-    for (InfoTree::leaf_iterator i=info.begin_leaf(), e=info.end_leaf(); i!=e; ++i)
-    {
-        StringPair& p = *i;
-        guint up = size;
-        guint bot = size-1;
+            // Table display
+            // This left in while tree information isn't selectable
 
-        GtkWidget *label_table11 = gtk_label_new(p.first.c_str());
-        gtk_table_attach (GTK_TABLE (table1), label_table11, 0, 1, bot, up,
-                      (GtkAttachOptions) (GTK_FILL),
-                      (GtkAttachOptions) (0), 0, 0);
-        gtk_misc_set_alignment (GTK_MISC (label_table11), 0.0, 1.0);
-        gtk_widget_show (label_table11);
+            InfoTree& info = *infoptr;
 
-        GtkWidget *label_table12 = gtk_label_new(p.second.c_str());
-        gtk_table_attach (GTK_TABLE (table1), label_table12, 1, 2, bot, up,
-                      (GtkAttachOptions) (GTK_FILL),
-                      (GtkAttachOptions) (0), 0, 0);
-        gtk_label_set_selectable (GTK_LABEL (label_table12), TRUE);
-        gtk_widget_show (label_table12);
+            size_t size = info.size();
 
-        --size;
-    }
+            for (InfoTree::leaf_iterator i=info.begin_leaf(), e=info.end_leaf();
+                 i!=e; ++i)
+            {
+                StringPair& p = *i;
+                guint up = size;
+                guint bot = size-1;
+
+                GtkWidget *label_table11 = gtk_label_new(p.first.c_str());
+                gtk_table_attach (GTK_TABLE (table1), label_table11, 0, 1, bot, up,
+                             (GtkAttachOptions) (GTK_FILL),
+                             (GtkAttachOptions) (0), 0, 0);
+                gtk_misc_set_alignment (GTK_MISC (label_table11), 0.0, 1.0);
+                gtk_widget_show (label_table11);
+
+                GtkWidget *label_table12 = gtk_label_new(p.second.c_str());
+                gtk_table_attach (GTK_TABLE (table1), label_table12, 1, 2, bot, up,
+                                 (GtkAttachOptions) (GTK_FILL),
+                                 (GtkAttachOptions) (0), 0, 0);
+                gtk_label_set_selectable (GTK_LABEL (label_table12), TRUE);
+                gtk_widget_show (label_table12);
+
+                --size;
+            }
+
+            // Tree display
+            // Should replace table display when proper
+            // InfoTrees are available 
+
+            enum
+            {
+                NODENAME_COLUMN = 0,
+                STRING1_COLUMN,
+                STRING2_COLUMN,
+                COMMENT_COLUMN,
+                NUM_COLUMNS
+            };
+
+            GtkTreeModel *model = makeTreeModel(infoptr);
+
+            GtkWidget *treeview = gtk_tree_view_new_with_model (model);
+
+            g_object_unref (model);
+
+            gint col_offset;
+            GtkCellRenderer *renderer;
+            GtkTreeViewColumn *column;
+
+            //Add columns:
+            //First column:
+            renderer = gtk_cell_renderer_text_new ();
+            g_object_set (renderer, "xalign", 0.0, NULL);
+            col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
+	       						       -1, "Node",
+							       renderer, "text",
+							       NODENAME_COLUMN,
+							       NULL);
+            column = gtk_tree_view_get_column (GTK_TREE_VIEW(treeview), col_offset - 1);
+
+            //Second column:
+
+            renderer = gtk_cell_renderer_text_new ();
+            g_object_set (renderer, "xalign", 0.0, NULL);
+            col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
+							       -1, "Variable",
+							       renderer, "text",
+							       STRING1_COLUMN,
+							       NULL);
+            column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
+
+            //Third column:
+
+            renderer = gtk_cell_renderer_text_new ();
+            g_object_set (renderer, "xalign", 0.0, NULL);
+            col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
+							       -1, "Value",
+							       renderer, "text",
+							       STRING2_COLUMN,
+							       NULL);
+            column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
+
+            //Third column:
+
+            renderer = gtk_cell_renderer_text_new ();
+            g_object_set (renderer, "xalign", 0.0, NULL);
+            col_offset = gtk_tree_view_insert_column_with_attributes (GTK_TREE_VIEW(treeview),
+							       -1, "Comment",
+							       renderer, "text",
+							       COMMENT_COLUMN,
+							       NULL);
+            column = gtk_tree_view_get_column (GTK_TREE_VIEW (treeview), col_offset - 1);
+
+            //Add tree to scrollwindow.
+            gtk_container_add (GTK_CONTAINER (scrollwindow1), treeview);
+
+            }
 
      GtkWidget *bbox1 = gtk_hbutton_box_new ();
      gtk_box_pack_start (
 	GTK_BOX (main_vbox), bbox1, FALSE, FALSE, 0);
-
-     gtk_box_pack_start (
-	GTK_BOX (vbox1), gtk_hseparator_new (), FALSE, FALSE, 0);
-
-     GtkWidget *vbox3 = gtk_vbox_new (FALSE, 3);
-     gtk_box_pack_start (
-	GTK_BOX (vbox1), vbox3, FALSE, FALSE, 0);
 
 
      GtkWidget *button_ok = gtk_button_new_from_stock (GTK_STOCK_OK);
@@ -1036,6 +1118,71 @@ GtkGui::menuitem_movieinfo_callback(GtkMenuItem* /*menuitem*/, gpointer data)
 
 }
 
+
+GtkTreeModel*
+GtkGui::makeTreeModel (std::auto_ptr<InfoTree> treepointer)
+
+{
+
+     InfoTree& info = *treepointer;
+
+     enum
+     {
+       NODENAME_COLUMN = 0,
+       STRING1_COLUMN,
+       STRING2_COLUMN,
+       COMMENT_COLUMN,
+       NUM_COLUMNS
+     };
+    
+     GtkTreeStore *model = gtk_tree_store_new (NUM_COLUMNS,
+                          G_TYPE_STRING,
+                          G_TYPE_STRING,
+                          G_TYPE_STRING,
+                          G_TYPE_STRING);
+    
+     GtkTreeIter iter;
+     GtkTreeIter child_iter;
+     GtkTreeIter parent_iter;
+
+     int depth = 0;                    // Depth within the gtk tree.    
+
+     for (InfoTree::iterator i=info.begin_leaf(), e=info.end_leaf(); i!=e; ++i)
+     {
+          StringPair& p = *i;
+
+          int infotreedepth = info.depth(i);  
+          char buf[8];
+          sprintf(buf, "%d", infotreedepth);
+          buf[7] = '\0';                     
+
+          if (info.depth(i) > depth) {          // Align Gtk tree depth.
+               depth++;                   
+               iter=child_iter;                  
+          }
+
+          if (info.depth(i) < depth) {        // Align Gtk tree depth.
+               depth -= (depth - info.depth(i));
+               gtk_tree_model_iter_parent (GTK_TREE_MODEL(model), &parent_iter, &iter);  // Get parent iter.
+               iter = parent_iter;
+          }
+
+          //Read in data from present node
+          if (depth == 0) gtk_tree_store_append (model, &child_iter, NULL);
+          else gtk_tree_store_append (model, &child_iter, &iter);
+
+          gtk_tree_store_set (model, &child_iter,
+                            NODENAME_COLUMN, buf,   //infotree
+                            STRING1_COLUMN, p.first.c_str(),     //infotree
+    		            STRING2_COLUMN, p.second.c_str(),     //infotree
+                            COMMENT_COLUMN, "Comment",     //infotree
+			    -1);
+
+     }
+
+     return GTK_TREE_MODEL(model);
+
+}
 
 // This pops up the menu when the right mouse button is clicked
 gint
@@ -1055,8 +1202,6 @@ GtkGui::popup_handler(GtkWidget *widget, GdkEvent *event)
     }
     return FALSE;
 }
-
-
 
 /// \brief Toggle the sound on or off
 void
@@ -1204,7 +1349,6 @@ GtkGui::configure_event(GtkWidget *const widget,
 
     return TRUE;
 }
-
 
 gboolean
 GtkGui::realize_event(GtkWidget* /*widget*/, GdkEvent* /*event*/,

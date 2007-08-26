@@ -137,6 +137,7 @@ class DSOEXPORT GtkGui : public Gui
 
     virtual void setCursor(gnash_cursor_type newcursor);
     GtkWidget *getWindow() { return _window; };
+
  private:
     GtkWidget   *_window;
     GdkPixbuf 	*_window_icon_pixbuf;
@@ -151,6 +152,8 @@ class DSOEXPORT GtkGui : public Gui
     static gnash::key::code gdk_to_gnash_key(guint key);
     static int gdk_to_gnash_modifier(int state);
     static void             open_file(GtkWidget* dialog, gpointer data);
+
+    static GtkTreeModel* makeTreeModel (std::auto_ptr<InfoTree> treepointer);
 
 };
 

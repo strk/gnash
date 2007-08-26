@@ -1,3 +1,8 @@
+2007-08-26 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk.cpp, gui/gtksup.h: Add treeview to Movie Properties
+          ready for InfoTree display.
+
 2007-08-26 Chad Musick <chadmusick@msbx.net>
 
 	* server/Makefile.am: Add new files, remove obsolete ones.
