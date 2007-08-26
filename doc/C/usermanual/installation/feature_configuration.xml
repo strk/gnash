@@ -237,11 +237,13 @@ selected.  The default is FFMPEG with SDL sound.
 </entry>
 </row>
 <row>
-  <entry><option>--enable-mit-shm</option>
+  <entry><option>--disable-mit-shm</option>
 </entry>
-  <entry>Add support for using the MIT-SHM X extensions when available. 
-	Currently only available using GTK gui and AGG renderer, and known to be
-	bogus in handling of expose events (http://savannah.gnu.org/bugs/?20301).</entry>
+  <entry>Disable support for the MIT-SHM X extensions.
+	Currently support is only available using GTK gui and AGG renderer.
+	Keeping it enabled is not a problem as it will not be used if not
+	available in the current X session.
+	</entry>
 </row>
 </tbody>
 </tgroup>

@@ -18,7 +18,7 @@
 //
 //
 
-/* $Id: gtk_glue_agg.cpp,v 1.27 2007/08/02 07:54:33 udog Exp $ */
+/* $Id: gtk_glue_agg.cpp,v 1.28 2007/08/26 10:23:48 strk Exp $ */
 
 
 /// \page gtk_shm_support GTK shared memory extension support
@@ -206,8 +206,11 @@ GtkAggGlue::create_shm_image(unsigned int width, unsigned int height)
     return;
   }
   
+  // Disable double buffering, otherwise gtk tries to update widget
+  // contents from offscreen buffer at the end of expose event
+  gtk_widget_set_double_buffered(_drawing_area, FALSE);
   //log_msg("create_shm_image() OK"); // <-- remove this
-#endif
+#endif // ENABLE_MIT_SHM
    
 }
 

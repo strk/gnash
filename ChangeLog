@@ -1,5 +1,17 @@
 2007-08-26 Sandro Santilli <strk@keybit.net>
 
+	* configure.ac: keep mit-shm enabled by default (use --disable-mit-shm
+	  to disable).
+	* doc/C/usermanual/installation/feature_configuration.xml: update
+	  documentation about --disable-mit-shm.
+
+2007-08-26 Lauri Myllari    <lauri.myllari@gmail.com>
+
+	* gui/gtk_glue_agg.cpp: fix expose events with mit-shm, by
+	  disabling double buffering for _drawing_are
+
+2007-08-26 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/string.cpp (string_split): correctly handle some more
 	  corner cases.
 	* testsuite/swfdec/PASSING: string-split-empty-*.swf tests succeed.
