@@ -1,5 +1,9 @@
 2007-08-27 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/server/StreamTest.cpp: more read_uint() tests.
+
+2007-08-27 Sandro Santilli <strk@keybit.net>
+
 	* server/cxform.cpp, server/font.cpp, server/matrix.cpp,
 	  server/stream.h, server/parser/button_character_def.cpp,
 	  server/parser/edit_text_character_def.cpp,

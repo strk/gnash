@@ -64,10 +64,13 @@ struct ByteReader
 
 	static int readFunc(void* dst, int bytes, void* appdata) 
 	{
-	    assert(bytes == 1);
-	    ByteReader* br = (ByteReader*) appdata;
-	    
-	    memcpy(dst, &(br->b), sizeof(unsigned char));
+		ByteReader* br = (ByteReader*) appdata;
+
+		unsigned char* ptr = static_cast<unsigned char*>(dst);
+		for (int i=0; i<bytes; ++i)
+		{
+			memcpy(ptr+i, &(br->b), sizeof(unsigned char));
+		}
 
 		return 1;
 	}
@@ -246,6 +249,45 @@ main(int /*argc*/, char** /*argv*/)
 	ret = s.read_bit(); check_equals(ret, 0);
 	ret = s.read_bit(); check_equals(ret, 0);
 	ret = s.read_bit(); check_equals(ret, 1);
+
+	/// bits: 10011001 10011001 (0x999999)
+
+	int16_t s16 = s.read_s16(); check_equals(s16, (int16_t)0x9999);
+	uint16_t u16 = s.read_u16(); check_equals(u16, (uint16_t)0x9999);
+	int32_t s32 = s.read_s32(); check_equals(s32, (int32_t)0x99999999);
+	uint32_t u32 = s.read_u32(); check_equals(u32, (uint32_t)0x99999999);
+
+	/// bits: 10011001 10011001 10011001 10011001 (0x99999999)
+	///       -
+	///        ------- -------- --
+	///                           --------
+
+	s.align();
+	ret = s.read_bit(); check_equals(ret, 1);
+	u16 = s.read_uint(17); check_equals(u16, 26214);
+	u16 = s.read_uint(7); check_equals(u16, 51);
+
+	/// bits: 10011001 10011001 10011001 10011001 (0x99999999)
+	///       -
+	///        ------- --------   
+	///                         ----------
+
+	s.align();
+	ret = s.read_bit(); check_equals(ret, 1);
+	u16 = s.read_uint(15); check_equals(u16, 6553);
+	u16 = s.read_uint(9); check_equals(u16, 307);
+
+	/// bits: 10011001 10011001 10011001 10011001 (0x99999999)
+	///       -
+	///        ------- -------- ---       
+	///                            ----- -----
+	///                                       ---
+
+	s.align();
+	ret = s.read_bit(); check_equals(ret, 1);
+	u32 = s.read_uint(18); check_equals(u32, 52428);
+	u16 = s.read_uint(10); check_equals(u16, 819);
+	u16 = s.read_uint(3); check_equals(u16, 1);
 
 	return 0;
 }
