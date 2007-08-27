@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.46 2007/08/22 13:09:10 cmusick Exp $ */
+/* $Id: font.cpp,v 1.47 2007/08/27 12:44:28 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -255,14 +255,14 @@ GlyphInfo::markReachableResources() const
 		log_parse(_("reading DefineFont2 or DefineFont3"));
 		);
 
-		bool	has_layout = (in->read_uint(1) != 0);
-		m_shift_jis_chars = (in->read_uint(1) != 0);
-		m_unicode_chars = (in->read_uint(1) != 0);
-		m_ansi_chars = (in->read_uint(1) != 0);
-		bool	wide_offsets = (in->read_uint(1) != 0);
-		m_wide_codes = (in->read_uint(1) != 0);
-		m_is_italic = (in->read_uint(1) != 0);
-		m_is_bold = (in->read_uint(1) != 0);
+		bool	has_layout = in->read_bit();
+		m_shift_jis_chars = in->read_bit();
+		m_unicode_chars = in->read_bit();
+		m_ansi_chars = in->read_bit();
+		bool	wide_offsets = in->read_bit();
+		m_wide_codes = in->read_bit();
+		m_is_italic = in->read_bit();
+		m_is_bold = in->read_bit();
 		uint8_t	reserved = in->read_u8();
 
 		IF_VERBOSE_PARSE (

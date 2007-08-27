@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: filter_factory.cpp,v 1.2 2007/08/27 03:06:42 cmusick Exp $ */
+/* $Id: filter_factory.cpp,v 1.3 2007/08/27 12:44:28 strk Exp $ */
 
 #include "filter_factory.h"
 #include "BitmapFilter.h"
@@ -123,9 +123,9 @@ bool DropShadowFilter::read(stream* in)
 
     m_strength = in->read_short_sfixed();
 
-    m_inner = in->read_uint(1) ? true : false;
-    m_knockout = in->read_uint(1) ? true : false;
-    m_hideObject = in->read_uint(1) ? true : false;
+    m_inner = in->read_bit(); 
+    m_knockout = in->read_bit(); 
+    m_hideObject = in->read_bit(); 
 
     static_cast<void> (in->read_uint(5)); // Throw these away on purpose.
 
@@ -154,8 +154,8 @@ bool GlowFilter::read(stream* in)
 
     m_strength = in->read_short_sfixed();
 
-    m_inner = in->read_uint(1) ? true : false;
-    m_knockout = in->read_uint(1) ? true : false;
+    m_inner = in->read_bit(); 
+    m_knockout = in->read_bit(); 
 
     static_cast<void> (in->read_uint(6)); // Throw these away.
 
@@ -181,10 +181,10 @@ bool BevelFilter::read(stream* in)
     
     m_strength = in->read_short_sfixed();
 
-    bool inner_shadow = in->read_uint(1) ? true : false;
-    m_knockout = in->read_uint(1) ? true : false;
-    static_cast<void> (in->read_uint(1));
-    bool on_top = in->read_uint(1) ? true : false;
+    bool inner_shadow = in->read_bit(); 
+    m_knockout = in->read_bit(); 
+    in->read_bit();  // reserved ?
+    bool on_top = in->read_bit(); 
 
     // Set the bevel type. top and inner is full, top is outer, inner is inner
     m_type = on_top ? (inner_shadow ? FULL_BEVEL : OUTER_BEVEL) : INNER_BEVEL;
@@ -217,10 +217,10 @@ bool GradientGlowFilter::read(stream* in)
 
     m_strength = in->read_short_sfixed();
 
-    bool inner = in->read_uint(1) ? true : false;
-    m_knockout = in->read_uint(1) ? true : false;
-    static_cast<void> (in->read_uint(1));
-    bool outer = in->read_uint(1) ? true : false;
+    bool inner = in->read_bit();
+    m_knockout = in->read_bit();
+    in->read_bit(); // reserved ?
+    bool outer = in->read_bit(); 
 
     m_type = outer ? (inner ? FULL_GLOW : OUTER_GLOW) : INNER_GLOW;
 
@@ -247,8 +247,8 @@ bool ConvolutionFilter::read(stream* in)
 
     static_cast<void> (in->read_uint(6)); // Throw away.
 
-    m_clamp = in->read_uint(1) ? true : false;
-    m_preserveAlpha = in->read_uint(1) ? true : false;
+    m_clamp = in->read_bit(); 
+    m_preserveAlpha = in->read_bit(); 
 
     return true;
 }
@@ -286,10 +286,10 @@ bool GradientBevelFilter::read(stream* in)
 
     m_strength = in->read_short_sfixed();
 
-    bool inner = in->read_uint(1) ? true : false;
-    m_knockout = in->read_uint(1) ? true : false;
-    static_cast<void> (in->read_uint(1));
-    bool outer = in->read_uint(1) ? true : false;
+    bool inner = in->read_bit();
+    m_knockout = in->read_bit();
+    in->read_bit(); // reserved ?
+    bool outer = in->read_bit();
 
     m_type = outer ? (inner ? FULL_BEVEL : OUTER_BEVEL) : INNER_BEVEL;
 

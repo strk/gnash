@@ -1,5 +1,19 @@
 2007-08-27 Sandro Santilli <strk@keybit.net>
 
+	* server/cxform.cpp, server/font.cpp, server/matrix.cpp,
+	  server/stream.h, server/parser/button_character_def.cpp,
+	  server/parser/edit_text_character_def.cpp,
+	  server/parser/filter_factory.cpp,
+	  server/parser/sound_definition.cpp,
+	  server/parser/video_stream_def.cpp,
+	  server/swf/PlaceObject2Tag.cpp, server/swf/tag_loaders.cpp,
+	  utilities/parser.cpp: read_uint(1) => read_bit();
+	* server/stream.cpp (read_uint): htf_sweet.swf aborts if we
+	  assert bit_count <= 24, so change this base to <= 32 (will
+	  inspect later).
+
+2007-08-27 Sandro Santilli <strk@keybit.net>
+
 	* server/stream.{cpp,h}: add read_bit(), optimize read_uint()
 	  a little-bit (there are likely more optimization options).
 	* server/parser/shape_character_def.cpp (read): use read_bit()

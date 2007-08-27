@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: button_character_def.cpp,v 1.17 2007/07/10 16:16:00 strk Exp $ */
+/* $Id: button_character_def.cpp,v 1.18 2007/08/27 12:44:28 strk Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -163,12 +163,12 @@ void button_character_definition::sound_info::read(stream* in)
 {
 	m_in_point = m_out_point = m_loop_count = 0;
 	in->read_uint(2);	// skip reserved bits.
-	m_stop_playback = in->read_uint(1) ? true : false;
-	m_no_multiple = in->read_uint(1) ? true : false;
-	m_has_envelope = in->read_uint(1) ? true : false;
-	m_has_loops = in->read_uint(1) ? true : false;
-	m_has_out_point = in->read_uint(1) ? true : false;
-	m_has_in_point = in->read_uint(1) ? true : false;
+	m_stop_playback = in->read_bit(); 
+	m_no_multiple = in->read_bit(); 
+	m_has_envelope = in->read_bit();
+	m_has_loops = in->read_bit(); 
+	m_has_out_point = in->read_bit();
+	m_has_in_point = in->read_bit(); 
 	if (m_has_in_point) m_in_point = in->read_u32();
 	if (m_has_out_point) m_out_point = in->read_u32();
 	if (m_has_loops) m_loop_count = in->read_u16();

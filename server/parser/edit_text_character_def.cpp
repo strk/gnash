@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character_def.cpp,v 1.12 2007/07/11 16:52:47 strk Exp $ */
+/* $Id: edit_text_character_def.cpp,v 1.13 2007/08/27 12:44:28 strk Exp $ */
 
 // Based on the public domain text.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -44,23 +44,23 @@ edit_text_character_def::read(stream* in, int tag_type,
 	m_rect.read(in);
 
 	in->align();
-	bool	has_text = in->read_uint(1) ? true : false;
-	m_word_wrap = in->read_uint(1) ? true : false;
-	m_multiline = in->read_uint(1) ? true : false;
-	m_password = in->read_uint(1) ? true : false;
-	m_readonly = in->read_uint(1) ? true : false;
-	bool	has_color = in->read_uint(1) ? true : false;
-	bool	has_max_length = in->read_uint(1) ? true : false;
-	bool	has_font = in->read_uint(1) ? true : false;
+	bool	has_text = in->read_bit();
+	m_word_wrap = in->read_bit();
+	m_multiline = in->read_bit();
+	m_password = in->read_bit();
+	m_readonly = in->read_bit(); 
+	bool	has_color = in->read_bit(); 
+	bool	has_max_length = in->read_bit(); 
+	bool	has_font = in->read_bit(); 
 
-	in->read_uint(1);	// reserved
-	m_auto_size = in->read_uint(1) ? true : false;
-	bool	has_layout = in->read_uint(1) ? true : false;
-	m_no_select = in->read_uint(1) ? true : false;
-	m_border = in->read_uint(1) ? true : false;
-	in->read_uint(1);	// reserved
-	m_html = in->read_uint(1) ? true : false;
-	m_use_outlines = in->read_uint(1) ? true : false;
+	in->read_bit();	// reserved
+	m_auto_size = in->read_bit(); 
+	bool	has_layout = in->read_bit(); 
+	m_no_select = in->read_bit(); 
+	m_border = in->read_bit(); 
+	in->read_bit(); // reserved
+	m_html = in->read_bit(); 
+	m_use_outlines = in->read_bit(); 
 
 	if (has_font)
 	{

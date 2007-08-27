@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: parser.cpp,v 1.41 2007/07/01 10:55:16 bjacques Exp $ */
+/* $Id: parser.cpp,v 1.42 2007/08/27 12:44:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -116,13 +116,13 @@ struct matrix
 	    m_[0][0] = 1;
 	    m_[1][1] = 1;
       
-	    int	has_scale = in->read_uint(1);
+	    bool has_scale = in->read_bit();
 	    if (has_scale) {
 		int	scale_nbits = in->read_uint(5);
 		m_[0][0] = in->read_sint(scale_nbits) / 65536.0f;
 		m_[1][1] = in->read_sint(scale_nbits) / 65536.0f;
 	    }
-	    int	has_rotate = in->read_uint(1);
+	    bool has_rotate = in->read_bit();
 	    if (has_rotate) {
 		int	rotate_nbits = in->read_uint(5);
 		m_[1][0] = in->read_sint(rotate_nbits) / 65536.0f;
@@ -224,8 +224,8 @@ struct cxform
 	{
 	    in->align();
 	    
-	    int	has_add = in->read_uint(1);
-	    int	has_mult = in->read_uint(1);
+	    bool has_add = in->read_bit();
+	    bool has_mult = in->read_bit();
 	    int	nbits = in->read_uint(4);
 	    
 	    if (has_mult) {
@@ -251,8 +251,8 @@ struct cxform
 	{
 	    in->align();
 	    
-	    int	has_add = in->read_uint(1);
-	    int	has_mult = in->read_uint(1);
+	    bool has_add = in->read_bit();
+	    bool has_mult = in->read_bit();
 	    int	nbits = in->read_uint(4);
 	    
 	    if (has_mult) {
@@ -357,14 +357,14 @@ void parse_place_object12(stream* input, int tag_type)
 	log_msg("place_object2:\n");
 	ident++;
 	
-	bool	has_actions = input->read_uint(1) ? true : false;
-	bool	has_clip_depth = input->read_uint(1) ? true : false;
-	bool	has_name = input->read_uint(1) ? true : false;
-	bool	has_ratio = input->read_uint(1) ? true : false;
-	bool	has_cxform = input->read_uint(1) ? true : false;
-	bool	has_matrix = input->read_uint(1) ? true : false;
-	bool	has_char = input->read_uint(1) ? true : false;
-	bool	flag_move = input->read_uint(1) ? true : false;
+	bool	has_actions = input->read_bit();
+	bool	has_clip_depth = input->read_bit();
+	bool	has_name = input->read_bit();
+	bool	has_ratio = input->read_bit();
+	bool	has_cxform = input->read_bit();
+	bool	has_matrix = input->read_bit();
+	bool	has_char = input->read_bit();
+	bool	flag_move = input->read_bit();
 	
 	UNUSED(has_actions);
 	

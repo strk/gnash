@@ -19,7 +19,7 @@
 //
 // Original author: Thatcher Ulrich <tu@tulrich.com> 2003
 //
-// $Id: matrix.cpp,v 1.17 2007/08/07 20:53:10 strk Exp $ 
+// $Id: matrix.cpp,v 1.18 2007/08/27 12:44:28 strk Exp $ 
 //
 
 #ifdef HAVE_CONFIG_H
@@ -213,14 +213,14 @@ matrix::read(stream* in)
 
 	set_identity();
 
-	int	has_scale = in->read_uint(1);
+	bool	has_scale = in->read_bit(); 
 	if (has_scale)
 	{
 		int	scale_nbits = in->read_uint(5);
 		m_[0][0] = in->read_sint(scale_nbits) / 65536.0f;
 		m_[1][1] = in->read_sint(scale_nbits) / 65536.0f;
 	}
-	int	has_rotate = in->read_uint(1);
+	bool	has_rotate = in->read_bit();
 	if (has_rotate)
 	{
 		int	rotate_nbits = in->read_uint(5);

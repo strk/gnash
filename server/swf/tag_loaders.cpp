@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.131 2007/08/22 13:09:10 cmusick Exp $ */
+/* $Id: tag_loaders.cpp,v 1.132 2007/08/27 12:44:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1390,8 +1390,8 @@ define_sound_loader(stream* in, tag_type tag, movie_definition* m)
 	sound_handler::format_type	format = static_cast<sound_handler::format_type>(in->read_uint(4));
 	sound_handler::format_type	orgFormat = format;
 	int	sample_rate = in->read_uint(2);	// multiples of 5512.5
-	bool	sample_16bit = in->read_uint(1) ? true : false;
-	bool	stereo = in->read_uint(1) ? true : false;
+	bool	sample_16bit = in->read_bit(); 
+	bool	stereo = in->read_bit(); 
 
 	unsigned int	sample_count = in->read_u32();
 
@@ -1509,8 +1509,8 @@ sound_stream_head_loader(stream* in, tag_type tag, movie_definition* m)
     sound_handler::format_type format = static_cast<sound_handler::format_type>(in->read_uint(4));
 	sound_handler::format_type orgFormat = format;
     int sample_rate = in->read_uint(2);	// multiples of 5512.5
-    bool sample_16bit = in->read_uint(1) ? true : false;
-    bool stereo = in->read_uint(1) ? true : false;
+    bool sample_16bit = in->read_bit(); 
+    bool stereo = in->read_bit(); 
 
     // checks if this is a new streams header or just one in the row
     if (format == 0 && sample_rate == 0 && !sample_16bit && !stereo) return;
@@ -1786,9 +1786,9 @@ file_attributes_loader(stream* in, tag_type tag, movie_definition* /*m*/)
     file_attrs_flags flags;
 
     flags.reserved1 = in->read_uint(3);
-    flags.has_metadata = in->read_uint(1);
+    flags.has_metadata = in->read_bit(); 
     flags.reserved2 = in->read_uint(3);
-    flags.use_network = in->read_uint(1);
+    flags.use_network = in->read_bit(); 
     flags.reserved3 = in->read_uint(24);
 
     IF_VERBOSE_PARSE

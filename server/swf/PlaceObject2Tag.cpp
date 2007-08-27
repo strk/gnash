@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.20 2007/08/26 15:14:13 cmusick Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.21 2007/08/27 12:44:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -221,21 +221,21 @@ PlaceObject2Tag::readPlaceObject2(stream* in, int movie_version, bool place_2)
         bool has_blend_mode = false;
         bool has_filters = false;
 
-	bool	has_actions = in->read_uint(1) ? true : false;
-	bool	has_clip_bracket = in->read_uint(1) ? true : false;
-	bool	has_name = in->read_uint(1) ? true : false;
-	bool	has_ratio = in->read_uint(1) ? true : false;
-	bool	has_cxform = in->read_uint(1) ? true : false;
-	bool	has_matrix = in->read_uint(1) ? true : false;
-	bool	has_char = in->read_uint(1) ? true : false;
-	bool	flag_move = in->read_uint(1) ? true : false;
+	bool	has_actions = in->read_bit(); 
+	bool	has_clip_bracket = in->read_bit(); 
+	bool	has_name = in->read_bit();
+	bool	has_ratio = in->read_bit();
+	bool	has_cxform = in->read_bit();
+	bool	has_matrix = in->read_bit(); 
+	bool	has_char = in->read_bit(); 
+	bool	flag_move = in->read_bit(); 
 
         if (!place_2 && movie_version >= 8)
         {
-            static_cast<void> (in->read_uint(5)); // Ignore on purpose.
-            has_bitmap_caching = in->read_uint(1) ? true : false;
-            has_blend_mode = in->read_uint(1) ? true : false;
-            has_filters = in->read_uint(1) ? true : false;
+            in->read_uint(5); // Ignore on purpose.
+            has_bitmap_caching = in->read_bit(); 
+            has_blend_mode = in->read_bit(); 
+            has_filters = in->read_bit(); 
         }
 
 	m_depth = in->read_u16()+character::staticDepthOffset;

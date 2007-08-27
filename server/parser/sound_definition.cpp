@@ -37,12 +37,12 @@ start_sound_tag::read(stream* in, int /* tag_type */, movie_definition* m,
 	assert(sam);
 
 	in->read_uint(2);	// skip reserved bits.
-	m_stop_playback = in->read_uint(1) ? true : false;
-	bool	no_multiple = in->read_uint(1) ? true : false;
-	bool	has_envelope = in->read_uint(1) ? true : false;
-	bool	has_loops = in->read_uint(1) ? true : false;
-	bool	has_out_point = in->read_uint(1) ? true : false;
-	bool	has_in_point = in->read_uint(1) ? true : false;
+	m_stop_playback = in->read_bit(); 
+	bool	no_multiple = in->read_bit(); 
+	bool	has_envelope = in->read_bit();
+	bool	has_loops = in->read_bit(); 
+	bool	has_out_point = in->read_bit(); 
+	bool	has_in_point = in->read_bit(); 
 
 	UNUSED(no_multiple);
 	UNUSED(has_envelope);

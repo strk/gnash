@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.11 2007/07/24 22:48:12 tgc Exp $
+// $Id: video_stream_def.cpp,v 1.12 2007/08/27 12:44:29 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -67,7 +67,7 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 
 		m_reserved_flags = in->read_uint(5);
 		m_deblocking_flags = in->read_uint(2);
-		m_smoothing_flags = in->read_uint(1) ? true : false;
+		m_smoothing_flags = in->read_bit(); 
 
 		m_codec_id = in->read_u8();
 
