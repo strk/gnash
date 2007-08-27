@@ -1,4 +1,3 @@
-<<<<<<< ChangeLog
 2007-08-28 Chad Musick <chadmusick@msbx.net>
 
 	* server/asobj/BlurFilter_as.cpp,.h
@@ -25,14 +24,12 @@
 	* server/asobj/Makefile.am
 	  Add new files
 	 
-=======
 2007-08-27 Sandro Santilli <strk@keybit.net>
 
 	* libbase/utility.h: don't define exp2(), it's going to clash
 	  with existing symbol on most systems (except some BSDen)...
 	  Please provide a better patch for BSD.
 
->>>>>>> 1.4123
 2007-08-27 Deanna Phillips <deanna>
 
 	* testsuite/misc-ming.all/NetStream-SquareTestRunner.cpp: include
