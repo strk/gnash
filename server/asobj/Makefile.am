@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.42 2007/08/27 03:06:42 cmusick Exp $
+# $Id: Makefile.am,v 1.43 2007/08/27 18:13:43 cmusick Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -46,13 +46,20 @@ libgnashasobjs_la_SOURCES = \
         BevelFilter_as.cpp \
         BitmapFilter_as.cpp \
 	Boolean.cpp	\
+        BlurFilter_as.cpp \
 	Camera.cpp	\
 	Color.cpp	\
+	ColorMatrixFilter_as.cpp \
 	ContextMenu.cpp	\
+	ConvolutionFilter_as.cpp \
 	CustomActions.cpp\
 	Date.cpp	\
+	DropShadowFilter_as.cpp \
 	Error.cpp	\
 	Global.cpp	\
+	GlowFilter_as.cpp \
+	GradientBevelFilter_as.cpp \
+	GradientGlowFilter_as.cpp \
 	Key.cpp		\
 	LoadVars.cpp	\
 	LocalConnection.cpp\
@@ -81,14 +88,21 @@ noinst_HEADERS = \
         BevelFilter_as.h \
         BitmapFilter_as.h \
 	Boolean.h	\
+	BlurFilter_as.h \
 	Camera.h	\
 	Color.h		\
+	ColorMatrixFilter_as.h \
 	ContextMenu.h	\
+	ConvolutionFilter_as.h \
 	CustomActions.h	\
 	Date.h		\
+	DropShadowFilter_as.h \
 	Error.h		\
 	GMath.h		\
 	Global.h	\
+	GlowFilter_as.h \
+	GradientBevelFilter_as.h \
+	GradientGlowFilter_as.h \
 	Key.h 		\
 	LoadVars.h	\
 	LocalConnection.h\
@@ -101,6 +115,7 @@ noinst_HEADERS = \
 	NetStreamGst.h \
 	Number.h	\
 	Object.h	\
+	prophelper.h \
 	Selection.h	\
 	SharedObject.h	\
 	Sound.h 	\

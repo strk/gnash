@@ -1,38 +1,37 @@
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: BlurFilter.cpp,v 1.2 2007/08/27 18:13:39 cmusick Exp $ */
+#ifndef __GNASH_ASOBJ_COLORMATRIXFILTER_H__
+#define __GNASH_ASOBJ_COLORMATRIXFILTER_H__
 
-#include "BlurFilter.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 namespace gnash {
 
-// See parser/filter_factory.cpp for the implementation. Purposefully not here.
-//bool BlurFilter::read(stream* in);
+class as_object;
 
-Filter const
-BlurFilter::clone()
-{
-    Filter p(new BlurFilter(m_blurX, m_blurY, m_quality));
-    p->set_prototype(get_prototype());
-    p->copyProperties(*this);
+/// Initialize the global ColorMatrixFilter class
+void ColorMatrixFilter_class_init(as_object& global);
 
-    return p;
-}
+} // end of gnash namespace
 
-} // Namespace gnash
+// __GNASH_ASOBJ_COLORMATRIXFILTER_H__
+#endif
 

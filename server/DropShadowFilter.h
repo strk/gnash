@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: DropShadowFilter.h,v 1.1 2007/08/26 15:14:11 cmusick Exp $ */
+/* $Id: DropShadowFilter.h,v 1.2 2007/08/27 18:13:40 cmusick Exp $ */
 
 #ifndef GNASH_DROPSHADOWFILTER_H
 #define GNASH_DROPSHADOWFILTER_H
@@ -28,10 +28,14 @@
 
 namespace gnash {
 
+class DropShadowFilter_as;
+
 // A drop shadow effect filter.
 class DropShadowFilter : public BitmapFilter
 {
 public:
+    friend class DropShadowFilter_as;
+
     // Fill from a stream. See parser/filter_factory.cpp for the implementations.
     virtual bool read(stream* in);
 
@@ -40,6 +44,12 @@ public:
     // Clone this object and return a copy of it. (AS accessible function.)
     // Guaranteed to return an object which can be cast to BlurFilter
     Filter const clone();
+
+    DropShadowFilter(as_object* obj) : BitmapFilter(obj),
+        m_distance(0.0f), m_angle(0.0f), m_color(0), m_alpha(0),
+        m_blurX(0.0f), m_blurY(0.0f),  m_strength(0.0f), m_quality(0),
+        m_inner(false), m_knockout(false), m_hideObject(false)
+    { return; }
 
     DropShadowFilter() : 
         m_distance(0.0f), m_angle(0.0f), m_color(0), m_alpha(0),

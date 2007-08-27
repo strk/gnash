@@ -28,7 +28,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global BitmapFilter class
-void bitmapFilter_class_init(as_object& global);
+void BitmapFilter_class_init(as_object& global);
 
 /// Get the interface, for inheritance.
 as_object *bitmapFilter_interface();

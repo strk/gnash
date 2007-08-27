@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GradientGlowFilter.cpp,v 1.1 2007/08/26 15:14:12 cmusick Exp $ */
+/* $Id: GradientGlowFilter.cpp,v 1.2 2007/08/27 18:13:40 cmusick Exp $ */
 
 #include "GradientGlowFilter.h"
 
@@ -28,7 +28,9 @@ Filter const
 GradientGlowFilter::clone()
 {
     Filter p(new GradientGlowFilter(m_distance, m_angle, m_colors, m_alphas,
-        m_blurX, m_blurY, m_strength, m_quality, m_type, m_knockout));
+        m_ratios, m_blurX, m_blurY, m_strength, m_quality, m_type, m_knockout));
+    p->set_prototype(get_prototype());
+    p->copyProperties(*this);
     return p;
 }
 

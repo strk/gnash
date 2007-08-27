@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BevelFilter.h,v 1.2 2007/08/27 03:06:41 cmusick Exp $ */
+/* $Id: BevelFilter.h,v 1.3 2007/08/27 18:13:39 cmusick Exp $ */
 
 #ifndef GNASH_BEVELFILTER_H
 #define GNASH_BEVELFILTER_H
@@ -49,7 +49,7 @@ public:
     virtual ~BevelFilter() { return; }
 
     // Clone this object and return a copy of it. (AS accessible function.)
-    // Guaranteed to return an object which can be cast to BlurFilter
+    // Guaranteed to return an object which can be cast to BevelFilter
     Filter const clone();
 
     BevelFilter(as_object* o) : BitmapFilter(o),

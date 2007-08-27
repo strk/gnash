@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ColorMatrixFilter.cpp,v 1.1 2007/08/26 15:14:11 cmusick Exp $ */
+/* $Id: ColorMatrixFilter.cpp,v 1.2 2007/08/27 18:13:39 cmusick Exp $ */
 
 #include "ColorMatrixFilter.h"
 
@@ -28,6 +28,9 @@ Filter const
 ColorMatrixFilter::clone()
 {
     Filter p(new ColorMatrixFilter(m_matrix));
+    p->set_prototype(get_prototype());
+    p->copyProperties(*this);
+
     return p;
 }
 

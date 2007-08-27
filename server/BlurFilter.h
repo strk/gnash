@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BlurFilter.h,v 1.1 2007/08/26 15:14:11 cmusick Exp $ */
+/* $Id: BlurFilter.h,v 1.2 2007/08/27 18:13:39 cmusick Exp $ */
 
 #ifndef GNASH_BLURFILTER_H
 #define GNASH_BLURFILTER_H
@@ -28,10 +28,14 @@
 
 namespace gnash {
 
+class BlurFilter_as; // Adapater for ActionScript
+
 // A blur effect filter.
 class BlurFilter : public BitmapFilter
 {
 public:
+    friend class BlurFilter_as;
+
     // Fill from a stream. See parser/filter_factory.cpp for the implementations.
     virtual bool read(stream* in);
 
@@ -40,6 +44,10 @@ public:
     // Clone this object and return a copy of it. (AS accessible function.)
     // Guaranteed to return an object which can be cast to BlurFilter
     Filter const clone();
+
+    BlurFilter(as_object* obj) : BitmapFilter(obj),
+        m_blurX(0.0f), m_blurY(0.0f), m_quality(0)
+    { return; }
 
     BlurFilter() : 
         m_blurX(0.0f), m_blurY(0.0f), m_quality(0)

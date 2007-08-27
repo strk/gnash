@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: DropShadowFilter.cpp,v 1.1 2007/08/26 15:14:11 cmusick Exp $ */
+/* $Id: DropShadowFilter.cpp,v 1.2 2007/08/27 18:13:39 cmusick Exp $ */
 
 #include "DropShadowFilter.h"
 
@@ -30,6 +30,8 @@ DropShadowFilter::clone()
     Filter p(new DropShadowFilter(m_distance, m_angle, m_color, m_alpha,
         m_blurX, m_blurY, m_strength, m_quality, m_inner, m_knockout,
         m_hideObject));
+    p->set_prototype(get_prototype());
+    p->copyProperties(*this);
     return p;
 }
 

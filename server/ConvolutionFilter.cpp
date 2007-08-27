@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ConvolutionFilter.cpp,v 1.1 2007/08/26 15:14:11 cmusick Exp $ */
+/* $Id: ConvolutionFilter.cpp,v 1.2 2007/08/27 18:13:39 cmusick Exp $ */
 
 #include "ConvolutionFilter.h"
 
@@ -29,6 +29,9 @@ ConvolutionFilter::clone()
 {
     Filter p(new ConvolutionFilter(m_matrixX, m_matrixY, m_matrix,
         m_divisor, m_bias, m_preserveAlpha, m_clamp, m_color, m_alpha));
+    p->set_prototype(get_prototype());
+    p->copyProperties(*this);
+
     return p;
 }
 

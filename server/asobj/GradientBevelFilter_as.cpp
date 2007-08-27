@@ -15,40 +15,39 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BevelFilter_as.cpp,v 1.2 2007/08/27 18:13:40 cmusick Exp $ */
+/* $Id: GradientBevelFilter_as.cpp,v 1.1 2007/08/27 18:13:43 cmusick Exp $ */
 
 #include "BitmapFilter_as.h"
-#include "BevelFilter.h"
+#include "GradientBevelFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
 
 // These _must_ be defined for prophelpers to work correctly.
 // This is enforced by the file itself.
-#define phelp_helper BevelFilter_as
-#define phelp_class BevelFilter
+#define phelp_helper GradientBevelFilter_as
+#define phelp_class GradientBevelFilter
 #include "prophelper.h"
 
 namespace gnash {
 
-class BevelFilter_as
+class GradientBevelFilter_as
 {
     phelp_base_def;
 public:
     phelp_gs(distance);
     phelp_gs(angle);
-    phelp_gs(highlightColor);
-    phelp_gs(highlightAlpha);
-    phelp_gs(shadowColor);
-    phelp_gs(shadowAlpha);
+    phelp_gs(colors);
+    phelp_gs(alphas);
+    phelp_gs(ratios);
     phelp_gs(blurX);
     phelp_gs(blurY);
     phelp_gs(strength);
     phelp_gs(quality);
-    phelp_gs(type);
+    phelp_gs(type); // No automation
     phelp_gs(knockout);
 };
 
-phelp_base_imp((bitmapFilter_interface()), BevelFilter);
+phelp_base_imp((bitmapFilter_interface()), GradientBevelFilter);
 
 // Filters are purely property based.
 phelp_i_attach_empty
@@ -57,10 +56,9 @@ phelp_i_attach_empty
 phelp_gs_attach_begin
 phelp_gs_attach(distance);
 phelp_gs_attach(angle);
-phelp_gs_attach(highlightColor);
-phelp_gs_attach(highlightAlpha);
-phelp_gs_attach(shadowColor);
-phelp_gs_attach(shadowAlpha);
+phelp_gs_attach(colors);
+phelp_gs_attach(alphas);
+phelp_gs_attach(ratios);
 phelp_gs_attach(blurX);
 phelp_gs_attach(blurY);
 phelp_gs_attach(strength);
@@ -71,33 +69,33 @@ phelp_gs_attach_end
 
 phelp_property(float, number<float>, distance)
 phelp_property(float, number<float>, angle)
-phelp_property(uint32_t, number<uint32_t>, highlightColor)
-phelp_property(uint8_t, number<uint8_t>, highlightAlpha)
-phelp_property(uint32_t, number<uint32_t>, shadowColor)
-phelp_property(uint8_t, number<uint8_t>, shadowAlpha)
+phelp_array_property(colors)
+phelp_array_property(alphas)
+phelp_array_property(ratios)
 phelp_property(float, number<float>, blurX)
 phelp_property(float, number<float>, blurY)
 phelp_property(float, number<float>, strength)
 phelp_property(uint8_t, number<uint8_t>, quality)
+// Type is not automatable.
 phelp_property(bool, bool, knockout)
 
 as_value
-BevelFilter_as::type_gs(const fn_call& fn)
+GradientBevelFilter_as::type_gs(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter> ptr = ensureType<BevelFilter>(fn.this_ptr);
+    boost::intrusive_ptr<GradientBevelFilter> ptr = ensureType<GradientBevelFilter>(fn.this_ptr);
 
     if (fn.nargs == 0) // getter
     {
         switch (ptr->m_type)
         {
-            case BevelFilter::FULL_BEVEL:
+            case GradientBevelFilter::FULL_BEVEL:
                 return as_value("full");
                 break;
             default:
-            case BevelFilter::INNER_BEVEL:
+            case GradientBevelFilter::INNER_BEVEL:
                 return as_value("inner");
                 break;
-            case BevelFilter::OUTER_BEVEL:
+            case GradientBevelFilter::OUTER_BEVEL:
                 return as_value("outer");
                 break;
         }
@@ -105,20 +103,20 @@ BevelFilter_as::type_gs(const fn_call& fn)
     // setter
     string type = fn.arg(0).to_string();
     if (type == "outer")
-        ptr->m_type = BevelFilter::OUTER_BEVEL;
+        ptr->m_type = GradientBevelFilter::OUTER_BEVEL;
     if (type == "inner")
-        ptr->m_type = BevelFilter::INNER_BEVEL;
+        ptr->m_type = GradientBevelFilter::INNER_BEVEL;
     if (type == "full")
-        ptr->m_type = BevelFilter::FULL_BEVEL;
+        ptr->m_type = GradientBevelFilter::FULL_BEVEL;
 
     return as_value();
 }
 
 as_value
-BevelFilter_as::ctor(const fn_call& /*fn*/)
+GradientBevelFilter_as::ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new BevelFilter(BevelFilter_as::Interface());
-    BevelFilter_as::attachProperties(*obj);
+    boost::intrusive_ptr<as_object> obj = new GradientBevelFilter(GradientBevelFilter_as::Interface());
+    GradientBevelFilter_as::attachProperties(*obj);
 
     return as_value(obj.get());
 }

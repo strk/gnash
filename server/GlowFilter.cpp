@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GlowFilter.cpp,v 1.1 2007/08/26 15:14:12 cmusick Exp $ */
+/* $Id: GlowFilter.cpp,v 1.2 2007/08/27 18:13:40 cmusick Exp $ */
 
 #include "GlowFilter.h"
 
@@ -29,6 +29,8 @@ GlowFilter::clone()
 {
     Filter p(new GlowFilter(m_color, m_alpha,
         m_blurX, m_blurY, m_strength, m_quality, m_inner, m_knockout));
+    p->set_prototype(get_prototype());
+    p->copyProperties(*this);
     return p;
 }
 

@@ -15,51 +15,51 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BitmapFilter_as.cpp,v 1.2 2007/08/27 18:13:40 cmusick Exp $ */
+/* $Id: BlurFilter_as.cpp,v 1.1 2007/08/27 18:13:41 cmusick Exp $ */
 
-#include "BitmapFilter.h"
+#include "BitmapFilter_as.h"
+#include "BlurFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
 
-#define phelp_helper BitmapFilter_as
-#define phelp_class BitmapFilter
+// These _must_ be defined.
+#define phelp_helper BlurFilter_as
+#define phelp_class BlurFilter
 #include "prophelper.h"
 
 namespace gnash {
 
-class BitmapFilter_as
+class BlurFilter_as
 {
     phelp_base_def;
 public:
-    phelp_i(bitmap_clone);
+    phelp_gs(blurX);
+    phelp_gs(blurY);
+    phelp_gs(quality);
 };
 
-phelp_base_imp( , BitmapFilter);
+phelp_base_imp((bitmapFilter_interface()), BlurFilter);
 
-phelp_i_attach_begin
-phelp_i_attach(clone, bitmap_clone);
-phelp_i_attach_end
+// Filters are property based.
+phelp_i_attach_empty
+
+phelp_gs_attach_begin
+phelp_gs_attach(blurX);
+phelp_gs_attach(blurY);
+phelp_gs_attach(quality);
+phelp_gs_attach_end
+
+phelp_property(float, number<float>, blurX)
+phelp_property(float, number<float>, blurY)
+phelp_property(uint8_t, number<uint8_t>, quality)
 
 as_value
-BitmapFilter_as::ctor(const fn_call& /*fn*/)
+BlurFilter_as::ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new BitmapFilter(BitmapFilter_as::Interface());
+    boost::intrusive_ptr<as_object> obj = new BlurFilter(BlurFilter_as::Interface());
+    BlurFilter_as::attachProperties(*obj);
+
     return as_value(obj.get());
-}
-
-as_value BitmapFilter_as::bitmap_clone(const fn_call& fn)
-{
-    boost::intrusive_ptr<BitmapFilter> filter = ensureType<BitmapFilter> (fn.this_ptr);
-    boost::intrusive_ptr<as_object> retval = filter->clone();
-    retval->set_prototype(filter->get_prototype());
-
-    return as_value(retval);
-}
-
-as_object*
-bitmapFilter_interface()
-{
-    return BitmapFilter_as::Interface();
 }
 
 } // Namespace gnash

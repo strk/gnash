@@ -1,9 +1,38 @@
+<<<<<<< ChangeLog
+2007-08-28 Chad Musick <chadmusick@msbx.net>
+
+	* server/asobj/BlurFilter_as.cpp,.h
+	* server/asobj/ColorMatrixFilter_as.cpp,.h
+	* server/asobj/ConvolutionFilter_as.cpp,.h
+	* server/asobj/DropShadowFilter_as.cpp,.h
+	* server/asobj/GlowFilter_as.cpp,.h
+	* server/asobj/GradientBevelFilter_as.cpp,.h
+	* server/asobj/GradientGlowFilter_as.cpp,.h
+	* server/asobj/BevelFilter_as.cpp,.h
+	* server/asobj/BitmapFilter_as.cpp,.h
+	  Make ActionScript compatible filters
+	* server/BevelFilter.h,.cpp
+	* server/BlurFilter.h,.cpp
+	* server/ColorMatrixFilter.h,.cpp
+	* server/ConvolutionFilter.h,.cpp
+	* server/DropShadowFilter.h,.cpp
+	* server/GlowFilter.h,.cpp
+	* server/GradientBevelFilter.h,.cpp
+	* server/GradientGlowFilter.h,.cpp
+	  Changes necessary for adapter compatibility
+	* server/asobj/prophelper.h
+	  File to make writing AS classes easier using an adapter
+	* server/asobj/Makefile.am
+	  Add new files
+	 
+=======
 2007-08-27 Sandro Santilli <strk@keybit.net>
 
 	* libbase/utility.h: don't define exp2(), it's going to clash
 	  with existing symbol on most systems (except some BSDen)...
 	  Please provide a better patch for BSD.
 
+>>>>>>> 1.4123
 2007-08-27 Deanna Phillips <deanna>
 
 	* testsuite/misc-ming.all/NetStream-SquareTestRunner.cpp: include

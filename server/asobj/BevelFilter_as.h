@@ -28,7 +28,7 @@ namespace gnash {
 class as_object;
 
 /// Initialize the global BitmapFilter class
-void bevelFilter_class_init(as_object& global);
+void BevelFilter_class_init(as_object& global);
 
 } // end of gnash namespace
 

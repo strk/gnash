@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ConvolutionFilter.h,v 1.1 2007/08/26 15:14:11 cmusick Exp $ */
+/* $Id: ConvolutionFilter.h,v 1.2 2007/08/27 18:13:39 cmusick Exp $ */
 
 #ifndef GNASH_CONVOLUTIONFILTER_H
 #define GNASH_CONVOLUTIONFILTER_H
@@ -29,25 +29,35 @@
 
 namespace gnash {
 
+class ConvolutionFilter_as; // Adapter to ActionScript
+
 // A convolution effect filter.
 class ConvolutionFilter : public BitmapFilter
 {
 public:
+    friend class ConvolutionFilter_as;
+
     // Fill from a stream. See parser/filter_factory.cpp for the implementations.
     virtual bool read(stream* in);
 
     virtual ~ConvolutionFilter() { return; }
 
     // Clone this object and return a copy of it. (AS accessible function.)
-    // Guaranteed to return an object which can be cast to BlurFilter
+    // Guaranteed to return an object which can be cast to ConvolutionFilter
     Filter const clone();
+
+    ConvolutionFilter(as_object* obj) : BitmapFilter(obj),
+        m_matrixX(), m_matrixY(), m_matrix(), m_divisor(), m_bias(),
+        m_preserveAlpha(false), m_clamp(false), m_color(), m_alpha()
+    { return; }
 
     ConvolutionFilter() : 
         m_matrixX(), m_matrixY(), m_matrix(), m_divisor(), m_bias(),
         m_preserveAlpha(false), m_clamp(false), m_color(), m_alpha()
     { return; }
 
-    ConvolutionFilter(uint8_t matrixX, uint8_t matrixY, as_array_object a_matrix,
+    ConvolutionFilter(uint8_t matrixX, uint8_t matrixY, 
+        boost::intrusive_ptr<as_array_object> a_matrix,
         float divisor, float bias, bool preserveAlpha, bool clamp, uint32_t color,
         uint8_t alpha) :
         m_matrixX(matrixX), m_matrixY(matrixY), m_matrix(a_matrix),
@@ -58,7 +68,7 @@ public:
 private:
     uint8_t m_matrixX; // Number of columns
     uint8_t m_matrixY; // Number of rows
-    as_array_object m_matrix; // The convolution matrix
+    boost::intrusive_ptr<as_array_object> m_matrix; // The convolution matrix
     float m_divisor;
     float m_bias;
     bool m_preserveAlpha; // If true, don't convolute the alpha channel
