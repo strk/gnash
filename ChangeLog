@@ -1,3 +1,7 @@
+2007-08-27 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libbase/utility.h: defined exp2() as it's missing on some BSDen.
+
 2007-08-27 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-ming.all/DefineEditTextVariableNameTest2.c,
