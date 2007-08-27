@@ -1,3 +1,9 @@
+2007-08-28 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/shape_character_def.cpp (read): use ints for twips
+	  values, convert to float only when needed (construction of the
+	  edges and paths). [last patch was bogus]
+
 2007-08-28 Chad Musick <chadmusick@msbx.net>
 
 	* server/asobj/BlurFilter_as.cpp,.h

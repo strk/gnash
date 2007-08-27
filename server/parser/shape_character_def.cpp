@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.36 2007/08/27 17:28:02 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.37 2007/08/27 18:39:19 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -219,7 +219,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     // is simple but not optimally efficient.
     int	fill_base = 0;
     int	line_base = 0;
-    float	x = 0, y = 0;
+    int		x = 0, y = 0;
     path	current_path;
 
 #define SHAPE_LOG 0
@@ -255,8 +255,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		int	move_x = in->read_sint(num_move_bits);
 		int	move_y = in->read_sint(num_move_bits);
 
-		x = (float) move_x;
-		y = (float) move_y;
+		x = move_x;
+		y = move_y;
 
 		// Set the beginning of the path.
 		current_path.m_ax = x;
@@ -434,10 +434,10 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 	    if (edge_flag == 0) {
 		// curved edge
 		int num_bits = 2 + in->read_uint(4);
-		float	cx = x + in->read_sint(num_bits);
-		float	cy = y + in->read_sint(num_bits);
-		float	ax = cx + in->read_sint(num_bits);
-		float	ay = cy + in->read_sint(num_bits);
+		int	cx = x + in->read_sint(num_bits);
+		int	cy = y + in->read_sint(num_bits);
+		int	ax = cx + in->read_sint(num_bits);
+		int	ay = cy + in->read_sint(num_bits);
 
 #if SHAPE_LOG
 		IF_VERBOSE_PARSE (
@@ -452,20 +452,20 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 	    } else {
 		// straight edge
 		int	num_bits = 2 + in->read_uint(4);
-		int	line_flag = in->read_uint(1);
-		float	dx = 0, dy = 0;
+		bool	line_flag = in->read_bit();
+		int	dx = 0, dy = 0;
 		if (line_flag) {
 		    // General line.
-		    dx = (float) in->read_sint(num_bits);
-		    dy = (float) in->read_sint(num_bits);
+		    dx = in->read_sint(num_bits);
+		    dy = in->read_sint(num_bits);
 		} else {
-		    int	vert_flag = in->read_uint(1);
+		    bool vert_flag = in->read_bit();
 		    if (vert_flag == 0) {
 			// Horizontal line.
-			dx = (float) in->read_sint(num_bits);
+			dx = in->read_sint(num_bits);
 		    } else {
 			// Vertical line.
-			dy = (float) in->read_sint(num_bits);
+			dy = in->read_sint(num_bits);
 		    }
 		}
 
