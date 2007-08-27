@@ -39,6 +39,8 @@
   
   check(Function.prototype.__proto__.hasOwnProperty('toString'));
   check(Function.prototype.__proto__.hasOwnProperty('valueOf'));
+  check_equals(Function.prototype.__proto__, Object.prototype);
+  xcheck_equals(Object.prototype.__proto__, undefined);
   
   check_equals(typeof(Function.prototype['toString']), 'function');
   check_equals(typeof(Function.prototype['valueOf']), 'function');
