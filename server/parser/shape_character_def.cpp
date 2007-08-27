@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.34 2007/08/27 12:09:05 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.35 2007/08/27 16:52:28 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -453,14 +453,14 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 	    } else {
 		// straight edge
 		int	num_bits = 2 + in->read_uint(4);
-		bool line_flag = in->read_bit();
+		int	line_flag = in->read_uint(1);
 		float	dx = 0, dy = 0;
 		if (line_flag) {
 		    // General line.
 		    dx = (float) in->read_sint(num_bits);
 		    dy = (float) in->read_sint(num_bits);
 		} else {
-		    bool vert_flag = in->read_bit();
+		    int	vert_flag = in->read_uint(1);
 		    if (vert_flag == 0) {
 			// Horizontal line.
 			dx = (float) in->read_sint(num_bits);

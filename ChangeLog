@@ -1,5 +1,11 @@
 2007-08-27 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/shape_character_def.cpp (read): use ints for twips
+	  values, convert to float only when needed (construction of the
+	  edges and paths).
+
+2007-08-27 Sandro Santilli <strk@keybit.net>
+
 	* server/stream.cpp (read_sint): remove useless assertion.
 
 2007-08-27 Sandro Santilli <strk@keybit.net>
