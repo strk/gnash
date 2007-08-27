@@ -1,6 +1,7 @@
 2007-08-27 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/actionscript.all/ops.as: more tests about NaN.
+	* testsuite/actionscript.all/toString_valueOf.as: more tests for deduction.
 	  
 2007-08-27 Chad Musick <chadmusick@msbx.net>
 

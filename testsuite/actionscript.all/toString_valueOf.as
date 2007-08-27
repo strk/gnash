@@ -24,6 +24,38 @@
 #include "check.as"
 
 //
+//Testing toString and valueOf of Function
+//
+#if OUTPUT_VERSION > 5
+	check_equals(typeof(Function), 'function');
+	
+	check(Function.prototype.hasOwnProperty('apply'));
+	check(Function.prototype.hasOwnProperty('call'));
+	xcheck(Function.prototype.hasOwnProperty('__proto__'));
+	check(Function.prototype.hasOwnProperty('constructor'));
+	
+	check(!Function.prototype.hasOwnProperty('toString'));
+	check(!Function.prototype.hasOwnProperty('valueOf'));
+	
+	check(Function.prototype.__proto__.hasOwnProperty('toString'));
+	check(Function.prototype.__proto__.hasOwnProperty('valueOf'));
+	
+  check_equals(typeof(Function.prototype['toString']), 'function');
+  check_equals(typeof(Function.prototype['valueOf']), 'function');
+#else
+	// No Function Object in swf5???
+	xcheck_equals(typeof(Function), 'undefined');
+	
+	// Function Object in swf5 does not support toString and valueOf
+	xcheck_equals(Function.prototype['toString'], undefined);
+  xcheck_equals(Function.prototype['valueOf'], undefined);
+  
+  // test 'function' is supported in swf5:)
+  x = function () {};
+	check_equals(typeof(x), 'function');
+#endif
+
+//
 //Testing toString and valueOf of Object
 //
 #if OUTPUT_VERSION > 5
@@ -32,8 +64,13 @@
 #else
   // swf5 does not support hasOwnProperty method
   check(typeof(hasOwnProperty) == 'undefined');
-  check(!Object.prototype.hasOwnProperty('toString'));
-  check(!Object.prototype.hasOwnProperty('valueOf'));
+  // Object object still supports toString and valueOf in swf5
+  check_equals(typeof(Object.prototype['toString']), 'function');
+  check_equals(typeof(Object.prototype['valueOf']), 'function');
+  // this is true because Function object in swf5 does not 
+  // support toString and valueOf.
+  xcheck_equals(Object.prototype.toString, undefined);
+  xcheck_equals(Object.prototype.valueOf,  undefined);
 #endif
 
 obj = new Object();
@@ -57,9 +94,11 @@ obj.valueOf = function () {return "TO_VALUE";};
   check(obj.valueOf != Object.prototype.valueOf);
 #else
   // this is true only in swf5 (any function is equal to any other in SWF5)
-  xcheck(obj.toString == Object.prototype.toString);
-  xcheck(obj.valueOf == Object.prototype.valueOf);
+  xcheck(obj.toString == undefined);
+  xcheck(obj.valueOf == undefined);
   xcheck(obj.toString == obj.valueOf);
+  xcheck(Object.prototype.toString == undefined);
+  xcheck(Object.prototype.valueOf == undefined);
 #endif
 x = obj.toString();
 y = obj.valueOf();
@@ -81,8 +120,8 @@ check(obj == y);
   check(Number.prototype.valueOf != Object.prototype.valueOf);
 #else
   // this is true only in swf5
-  xcheck(Number.prototype.toString == Object.prototype.toString);
-  xcheck(Number.prototype.valueOf == Object.prototype.valueOf);
+  xcheck(Number.prototype.toString == undefined);
+  xcheck(Number.prototype.valueOf == undefined);
 #endif
 
 
@@ -121,8 +160,8 @@ check(y=="TO_VALUE");
   check(String.prototype.valueOf != Object.prototype.valueOf);
 #else
   // this is true only in swf5
-  xcheck(String.prototype.toString == Object.prototype.toString);
-  xcheck(String.prototype.valueOf == Object.prototype.valueOf);
+  xcheck(String.prototype.toString == undefined);
+  xcheck(String.prototype.valueOf == undefined);
 #endif
 
 str1 = new String("10");
@@ -275,6 +314,10 @@ xcheck(typeof(Button.prototype.valueOf) == 'function' );
 // For Buttons, this true from swf5~swf8!
 xcheck(Button.prototype.toString == Object.prototype.toString);
 xcheck(Button.prototype.valueOf == Object.prototype.valueOf);
+#if OUTPUT_VERSION == 5
+check_equals(Button.prototype.toString, undefined);
+check_equals(Button.prototype.valueOf, undefined);
+#endif
 
 btn1 = new Button();
 xcheck(typeof(btn1) == "object");
@@ -297,8 +340,8 @@ check(y == btn1);
   check(Boolean.prototype.toString != Object.prototype.toString);
   check(Boolean.prototype.valueOf != Object.prototype.valueOf);
 #else
-  xcheck(Boolean.prototype.toString == Object.prototype.toString);
-  xcheck(Boolean.prototype.valueOf == Object.prototype.valueOf);
+  xcheck(Boolean.prototype.toString == undefined);
+  xcheck(Boolean.prototype.valueOf == undefined);
 #endif
 
 b1 = new Boolean(false);
@@ -325,8 +368,8 @@ check_equals(b3, 1);
   check(Date.prototype.toString != Object.prototype.toString);
   check(Date.prototype.valueOf != Object.prototype.valueOf);
 #else
-  xcheck(Date.prototype.toString == Object.prototype.toString);
-  xcheck(Date.prototype.valueOf == Object.prototype.valueOf);
+  xcheck(Date.prototype.toString == undefined);
+  xcheck(Date.prototype.valueOf == undefined);
 #endif
 
 d1 = new Date(0);
@@ -364,7 +407,7 @@ check_equals(d1.toString(), d2.toString());
   check(!Array.prototype.hasOwnProperty('valueOf'));
   check(Array.prototype.toString != Object.prototype.toString);
 #else
-  xcheck(Array.prototype.toString == Object.prototype.toString);
+  xcheck(Array.prototype.toString == undefined);
 #endif
 
 check(Array.prototype.valueOf == Object.prototype.valueOf);
