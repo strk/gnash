@@ -61,6 +61,8 @@ check_PROGRAMS = \
 	DefineEditTextTest-Runner \
 	DefineEditTextVariableNameTest \
 	DefineEditTextVariableNameTest-Runner \
+	DefineEditTextVariableNameTest2 \
+	DefineEditTextVariableNameTest2-Runner \
 	Dejagnu \
 	Dejagnu.swf \
 	PlaceObject2Test \
@@ -236,6 +238,7 @@ check_SCRIPTS = \
 	loop_test8runner \
 	shape_testrunner \
 	registerClassTest2runner \
+	DefineEditTextVariableNameTest-Runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
@@ -271,6 +274,8 @@ libgnashmingutils_la_SOURCES =	\
 
 definebitsjpeg2_SOURCES = definebitsjpeg2.c
 definebitsjpeg2_LDADD = $(MING_LIBS)
+definebitsjpeg2.swf: definebitsjpeg2
+	./definebitsjpeg2 $(srcdir)/../media/lynch.jpg
 
 moviecliploader_test_SOURCES =  moviecliploader_test.c
 moviecliploader_test_LDADD = $(MING_LIBS)
@@ -307,11 +312,6 @@ DefineEditTextTest_Runner_DEPENDENCIES = \
 	DefineEditTextTest.swf      \
 	$(NULL)
 
-DefineEditTextVariableNameTest_SOURCES =	\
-	DefineEditTextVariableNameTest.c	\
-	$(NULL)
-DefineEditTextVariableNameTest_LDADD = libgnashmingutils.la
-
 spritehier_SOURCES =  spritehier.c
 spritehier_LDADD = $(MING_LIBS)
 
@@ -343,8 +343,10 @@ eventSoundTest1_Runner_DEPENDENCIES = \
 	eventSoundTest1.swf      \
 	$(NULL)
 
-definebitsjpeg2.swf: definebitsjpeg2
-	./definebitsjpeg2 $(srcdir)/../media/lynch.jpg
+DefineEditTextVariableNameTest_SOURCES =	\
+	DefineEditTextVariableNameTest.c	\
+	$(NULL)
+DefineEditTextVariableNameTest_LDADD = libgnashmingutils.la
 
 DefineEditTextVariableNameTest.swf: DefineEditTextVariableNameTest
 	./DefineEditTextVariableNameTest $(top_srcdir)/testsuite/media
@@ -359,6 +361,19 @@ DefineEditTextVariableNameTest_Runner_DEPENDENCIES = \
 	$(top_builddir)/testsuite/libtestsuite.la \
 	DefineEditTextVariableNameTest.swf      \
 	$(NULL)
+
+
+DefineEditTextVariableNameTest2_SOURCES =	\
+	DefineEditTextVariableNameTest2.c	\
+	$(NULL)
+DefineEditTextVariableNameTest2_LDADD = libgnashmingutils.la
+
+DefineEditTextVariableNameTest2.swf: DefineEditTextVariableNameTest2
+	./DefineEditTextVariableNameTest2 $(top_srcdir)/testsuite/media
+
+DefineEditTextVariableNameTest2-Runner: $(srcdir)/../generic-testrunner.sh DefineEditTextVariableNameTest2.swf
+	sh $< $(top_builddir) DefineEditTextVariableNameTest2.swf > $@
+	chmod 755 $@
 
 timeline_var_test_SOURCES =	\
 	timeline_var_test.c	\
@@ -1617,6 +1632,7 @@ clean-local:
 TEST_DRIVERS = ../simple.exp
 TEST_CASES = \
 	DefineEditTextVariableNameTest-Runner \
+	DefineEditTextVariableNameTest2-Runner \
 	DefineEditTextTest-Runner \
 	RollOverOutTest-Runner \
 	ButtonEventsTest-Runner \

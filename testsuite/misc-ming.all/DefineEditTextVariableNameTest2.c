@@ -1,5 +1,5 @@
 /* 
- *   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+ *   Copyright (C)  2007 Free Software Foundation, Inc.
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,22 @@
  *
  * Test DefineEditText tag with VariableName
  *
- * TODO: review this testcase later.
+ * Description:
+ *  Frame2: add dtext1, associate it with a variable 'edit_text_var'
+ *  Frame3: add dtext2, associate it with a variable 'edit_text_var' again
+ *  Frame4: add dtext2, associate it with a variable 'edit_text_var' again
+ *  Frame5: set edit_text_var to 'Hahaha'
+ *  Frame6: remove dtext1
+ *  Frame7: remove dtext2
+ *  Frame8: remove dtext3
+ *  Frame 9: add dtext4, associate it with a variable 'edit_text_var' again
+ *  Frame 10: set edit_text_var to a new Object
+ *  Frame 11: provide a user defined toString for edit_text_var
+ *  Frame 12: some checks
+ *  Frame 13: set edit_text_var to a new Object again
+ *  Frame 14: end  
  *
- * run as ./DefineEditTextVariableNameTest2
+ *  run as ./DefineEditTextVariableNameTest2
  */
 
 #include <stdlib.h>
@@ -141,24 +154,28 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); 
   
   // Frame6: remove dtext1
+  
   SWFDisplayItem_remove(it1);
   check_equals(mo, "typeof(edit_text_var)", "'string'" );
   check_equals(mo, "edit_text_var", "'Hahaha'");
   SWFMovie_nextFrame(mo); 
   
   // Frame7: remove dtext2
+  
   SWFDisplayItem_remove(it2);
   check_equals(mo, "typeof(edit_text_var)", "'string'" );
   check_equals(mo, "edit_text_var", "'Hahaha'");
   SWFMovie_nextFrame(mo); 
 
   // Frame8: remove dtext3
+  
   SWFDisplayItem_remove(it3);
   check_equals(mo, "typeof(edit_text_var)", "'string'" );
   check_equals(mo, "edit_text_var", "'Hahaha'");
   SWFMovie_nextFrame(mo); 
   
   // Frame 9: add dtext4, associate it with a variable 'edit_text_var' again. 
+  
   it4 = add_text_field(mo, (SWFBlock)bfont, "edit_text_var",  "Hello");
   SWFDisplayItem_setName(it4, "dtext4");
   SWFDisplayItem_moveTo(it4, 0, 400);
@@ -167,35 +184,41 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); 
   
   // Frame10: set edit_text_var to a new Object
+  
   add_actions(mo, "edit_text_var = new Object();");
   check_equals(mo, "typeof(edit_text_var)", "'object'");
   check_equals(mo, "typeof(dtext4.text)", "'string'");
-  // dtext4.text == Object.toString() 
   xcheck_equals(mo, "dtext4.text", "'[object Object]'");
   SWFMovie_nextFrame(mo);
   
   // Frame 11: provide a user defined toString for edit_text_var
-  //
-  add_actions(mo, "Object.prototype.toString = function() {return 'Hello world';}; ");
+
+  add_actions(mo, "Object.prototype.toString = function() {return 'TO_STRING';}; ");
   check_equals(mo, "typeof(dtext4.text)", "'string'");
-  // Object.prototype.toString not invoked here!
-  // Strange!!!
+  // Object.prototype.toString not invoked for dtext4.text!
   xcheck_equals(mo, "dtext4.text", "'[object Object]'");
   check_equals(mo, "typeof(dtext4.text.toString)", "'function'");
   xcheck_equals(mo, "dtext4.text.toString()", "'[object Object]'");
   xcheck_equals(mo, "dtext4.text.valueOf()", "'[object Object]'");
   SWFMovie_nextFrame(mo);
   
-  // Frame 13: prints 'Hello world', but the text in dtext4 is '[object Object]'
-  // Strange!!!
-  add_actions(mo, "_root.note(edit_text_var);");
+  // Frame 12: dtext4.text still not updated
+  // Deduction: dtext4.text won't update if edit_text_var is untouched.
+  check_equals(mo, "edit_text_var.toString()", "'TO_STRING'");
+  xcheck_equals(mo, "dtext4.text", "'[object Object]'");
+  SWFMovie_nextFrame(mo);
+  
+  // Frame 13: dtext4.text updated. 
+  // Deduction: setting edit_text_var triggered updating dtext4.text.
+  add_actions(mo, "edit_text_var = new Object();");
+  check_equals(mo, "edit_text_var.toString()", "'TO_STRING'");
+  xcheck_equals(mo, "dtext4.text", "'TO_STRING'");
   SWFMovie_nextFrame(mo);
   
   // Frame 14: end
   add_actions(mo, "totals(); stop();");
   SWFMovie_nextFrame(mo); 
  
-
   // Output movie
   puts("Saving " OUTPUT_FILENAME );
   SWFMovie_save(mo, OUTPUT_FILENAME);
