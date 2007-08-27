@@ -1,5 +1,7 @@
 2007-08-27 Sandro Santilli <strk@keybit.net>
 
+	* server/stream.cpp (read_uint): optimize multi-byte reads:
+	  less read_byte(), more read_bytes().
 	* testsuite/server/StreamTest.cpp: more read_uint() tests.
 
 2007-08-27 Sandro Santilli <strk@keybit.net>

@@ -14,6 +14,7 @@
 #include "tu_file.h"
 #include "swf.h"
 #include <cstring>
+//#include <iostream> // debugging only
 
 namespace gnash {
 	
@@ -74,18 +75,85 @@ namespace gnash {
 		// should be 24, check why htf_sweet.swf fails this assertion
 		assert(bitcount <= 32);
 
-		if (!m_unused_bits)
+		uint32_t value = 0;
+
+#define OPTIMIZE_FOR_MULTIBYTE_BITS_READ 1
+
+#ifdef OPTIMIZE_FOR_MULTIBYTE_BITS_READ
+		// Optimization for multibyte read
+		if ( bitcount > m_unused_bits )
 		{
-			m_current_byte = m_input->read_byte();
-			m_unused_bits = 8;
+			typedef unsigned char byte;
+
+			if (m_unused_bits) // Consume all the unused bits.
+			{
+				int unusedMask = (1 << m_unused_bits)-1;
+				bitcount -= m_unused_bits; 
+				value |= ((m_current_byte&unusedMask) << bitcount);
+			}
+
+			int bytesToRead = bitcount/8;
+			int spareBits = bitcount%8; // additional bits to read
+
+			//std::cerr << "BytesToRead: " << bytesToRead << " spareBits: " << spareBits << " unusedBits: " << (int)m_unused_bits << std::endl;
+
+			byte cache[4]; // at most 4 bytes in the cache
+
+			if ( spareBits ) m_input->read_bytes(&cache, bytesToRead+1);
+			else m_input->read_bytes(&cache, bytesToRead);
+
+			for (int i=0; i<bytesToRead; ++i)
+			{
+				bitcount -= 8;
+				value |= cache[i] << bitcount; 
+			}
+
+			//assert(bitcount == spareBits);
+			if ( bitcount )
+			{
+				m_current_byte = cache[bytesToRead];
+				m_unused_bits = 8-bitcount;
+				value |= m_current_byte >> m_unused_bits;
+			}
+			else
+			{
+				m_unused_bits = 0;
+			}
+			
+		}
+		else
+		{
+			if (!m_unused_bits)
+			{
+				m_current_byte = m_input->read_byte();
+				m_unused_bits = 8;
+			}
+
+			// TODO: optimize unusedMask creation ?
+			//       (it's 0xFF if ! m_unused_bits above)
+			int unusedMask = (1 << m_unused_bits)-1;
+
+			if (bitcount == m_unused_bits)
+			{
+				// Consume all the unused bits.
+				value |= (m_current_byte&unusedMask);
+				m_unused_bits = 0;
+			}
+			else
+			{
+				assert(bitcount < m_unused_bits);
+				// Consume some of the unused bits.
+
+				m_unused_bits -= bitcount;
+				value |= ((m_current_byte&unusedMask) >> m_unused_bits);
+			}
 		}
 
-		uint32_t value = 0;
+#else // ndef OPTIMIZE_FOR_MULTIBYTE_BITS_READ
 
 		unsigned short bits_needed = bitcount;
 		do
 		{
-			// TODO: cache this mask instead of m_unused_bits ?
 			int unusedMask = (1 << m_unused_bits)-1;
 
 			if (bits_needed == m_unused_bits)
@@ -96,7 +164,7 @@ namespace gnash {
 				break;
 
 			}
-			else if (bits_needed > m_unused_bits)
+			else if (bits_needed > m_unused_bits) // TODO: obsolete this !!
 			{
 				// Consume all the unused bits.
 
@@ -110,6 +178,7 @@ namespace gnash {
 			}
 			else
 			{
+				assert(bits_needed <= m_unused_bits);
 				// Consume some of the unused bits.
 
 				m_unused_bits -= bits_needed;
@@ -121,7 +190,9 @@ namespace gnash {
 			}
 		}
 		while (bits_needed > 0);
+#endif // ndef OPTIMIZE_FOR_MULTIBYTE_BITS_READ
 
+		//std::cerr << "Returning value: " << value << " unused bits: " << (int)m_unused_bits << std::endl;
 		return value;
 	}
 
