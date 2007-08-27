@@ -20,7 +20,7 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.20 2007/08/25 19:07:46 strk Exp $";
+rcsid="$Id: ops.as,v 1.21 2007/08/27 03:41:43 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -60,6 +60,17 @@ check_equals(true+true, 2);
 check_equals(true+false, 1);
 check_equals(false, 0);
 check_equals(false+false, 0);
+
+// for Number
+x = new Number(3);
+y = 3;
+check(x == y);
+
+x = new Number(NaN);
+y = NaN;
+check(isNaN(x));
+check(isNaN(y));
+xcheck(x != y);
 
 // for Arrays
 ary1 = [1,2,3];
