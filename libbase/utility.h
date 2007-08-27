@@ -92,11 +92,8 @@ void	operator delete[](void* ptr);
 //
 
 inline float infinite_to_fzero(float x) {	return isfinite(x) ? x : 0.0f; }
-inline int	iabs(int i) { if (i < 0) return -i; else return i; }
 inline int	imax(int a, int b) { if (a < b) return b; else return a; }
-inline float	fmax(float a, float b) { if (a < b) return b; else return a; }
 inline int	imin(int a, int b) { if (a < b) return a; else return b; }
-inline float	fmin(float a, float b) { if (a < b) return a; else return b; }
 
 inline int	iclamp(int i, int min, int max) {
 	assert( min <= max );
@@ -114,14 +111,13 @@ inline float flerp(float a, float b, float f) { return (b - a) * f + a; }
 const float LN_2 = 0.693147180559945f;
 // the overridden log(f) will use logf IFF f is a float
 #ifndef HAVE_LOG2
-inline float	log2(float f) { return std::log(f) / LN_2; }
+inline double	log2(double f) { return std::log(f) / LN_2; }
 #endif
 //exp2 might be missing on Net-/OpenBSD.
 #ifndef HAVE_EXP2
-inline float	exp2(double x) { return std::pow((double)2, double(x)); }
+inline double	exp2(double x) { return std::pow((double)2, double(x)); }
 #endif
-inline int	fchop( float f ) { return (int) f; }	// replace w/ inline asm if desired
-inline int	frnd(float f) { return fchop(f + 0.5f); }	// replace with inline asm if desired
+inline int	frnd(float f) { return (int)rint(f + 0.5f); }	// replace with inline asm if desired
 
 
 // Handy macro to quiet compiler warnings about unused parameters/variables.
