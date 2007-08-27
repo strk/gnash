@@ -201,6 +201,18 @@ main(int /*argc*/, char** /*argv*/)
 	s.align();
 	ret = s.read_uint(16); check_equals(ret, 43690);
 
+	/// bits: 101010 10101010101010 1010 (0xAAAAAA)
+
+	s.align();
+	ret = s.read_uint(6); check_equals(ret, 42);
+	ret = s.read_uint(14); check_equals(ret, 10922);
+	ret = s.read_uint(4); check_equals(ret, 10);
+
+	/// bits: 101010101010101010101010 (0xAAAAAA)
+
+	s.align();
+	ret = s.read_uint(24); check_equals(ret, 11184810);
+
 	return 0;
 }
 
