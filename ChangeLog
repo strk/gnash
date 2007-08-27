@@ -1,3 +1,8 @@
+2007-08-27 Deanna Phillips <deanna>
+
+	* testsuite/misc-ming.all/NetStream-SquareTestRunner.cpp: include
+	  <unistd.h>
+
 2007-08-27 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/shape_character_def.cpp (read): make effective
