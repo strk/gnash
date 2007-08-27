@@ -34,6 +34,7 @@ AM_CPPFLAGS = -I.. \
 	$(NULL)
 
 check_PROGRAMS = \
+	StreamTest \
 	MatrixTest \
 	PointTest \
 	EdgeTest \
@@ -60,6 +61,11 @@ GNASH_LIBS = \
 if USE_FFMPEG_ENGINE
 	GNASH_LIBS += $(FFMPEG_LIBS)
 endif
+
+StreamTest_SOURCES = StreamTest.cpp
+StreamTest_LDADD = \
+	$(GNASH_LIBS) \
+	$(NULL)
 
 MatrixTest_SOURCES = MatrixTest.cpp
 MatrixTest_LDADD = \

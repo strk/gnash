@@ -1,3 +1,9 @@
+2007-08-27 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/server/: Makefile.am, StreamTest.cpp:
+	  gnash::stream testing (for now it's just bit streaming, as a tool
+	  for optimization of the read_uint)
+
 2007-08-27 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/actionscript.all/ops.as: more tests about NaN.
