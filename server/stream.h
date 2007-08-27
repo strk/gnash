@@ -72,8 +72,12 @@ namespace gnash {
 		float	read_float();
 
 		/// \brief
-		/// Correct for any unused bits from a uint read.
-		void	align();
+		/// Discard any left-over bits from previous bit reads
+		void	align()
+		{
+			m_unused_bits=0;
+			// m_current_byte = 0; // this is not needed
+		}
 
 		unsigned read(char *buf, unsigned count);
 		uint8_t  read_u8();

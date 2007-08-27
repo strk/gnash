@@ -75,15 +75,17 @@ namespace gnash {
 		// should be 24, check why htf_sweet.swf fails this assertion
 		assert(bitcount <= 32);
 
-		uint32_t value = 0;
 
 #define OPTIMIZE_FOR_MULTIBYTE_BITS_READ 1
 
 #ifdef OPTIMIZE_FOR_MULTIBYTE_BITS_READ
+
 		// Optimization for multibyte read
 		if ( bitcount > m_unused_bits )
 		{
 			typedef unsigned char byte;
+
+			uint32_t value = 0;
 
 			if (m_unused_bits) // Consume all the unused bits.
 			{
@@ -119,37 +121,39 @@ namespace gnash {
 			{
 				m_unused_bits = 0;
 			}
+
+			return value;
 			
+		}
+
+		if (!m_unused_bits)
+		{
+			m_current_byte = m_input->read_byte();
+			m_unused_bits = 8;
+		}
+
+		// TODO: optimize unusedMask creation ?
+		//       (it's 0xFF if ! m_unused_bits above)
+		int unusedMask = (1 << m_unused_bits)-1;
+
+		if (bitcount == m_unused_bits)
+		{
+			// Consume all the unused bits.
+			m_unused_bits = 0;
+			return (m_current_byte&unusedMask);
 		}
 		else
 		{
-			if (!m_unused_bits)
-			{
-				m_current_byte = m_input->read_byte();
-				m_unused_bits = 8;
-			}
+			assert(bitcount < m_unused_bits);
+			// Consume some of the unused bits.
 
-			// TODO: optimize unusedMask creation ?
-			//       (it's 0xFF if ! m_unused_bits above)
-			int unusedMask = (1 << m_unused_bits)-1;
-
-			if (bitcount == m_unused_bits)
-			{
-				// Consume all the unused bits.
-				value |= (m_current_byte&unusedMask);
-				m_unused_bits = 0;
-			}
-			else
-			{
-				assert(bitcount < m_unused_bits);
-				// Consume some of the unused bits.
-
-				m_unused_bits -= bitcount;
-				value |= ((m_current_byte&unusedMask) >> m_unused_bits);
-			}
+			m_unused_bits -= bitcount;
+			return ((m_current_byte&unusedMask) >> m_unused_bits);
 		}
 
 #else // ndef OPTIMIZE_FOR_MULTIBYTE_BITS_READ
+
+		uint32_t value = 0;
 
 		unsigned short bits_needed = bitcount;
 		do
@@ -190,10 +194,11 @@ namespace gnash {
 			}
 		}
 		while (bits_needed > 0);
-#endif // ndef OPTIMIZE_FOR_MULTIBYTE_BITS_READ
 
 		//std::cerr << "Returning value: " << value << " unused bits: " << (int)m_unused_bits << std::endl;
 		return value;
+#endif // ndef OPTIMIZE_FOR_MULTIBYTE_BITS_READ
+
 	}
 
 
@@ -248,8 +253,6 @@ namespace gnash {
 		align();
 		return static_cast<float> (m_input->read_le32());
 	}
-
-	void	stream::align() { m_unused_bits = 0; m_current_byte = 0; }
 
 	uint8_t	stream::read_u8() { align(); return m_input->read_byte(); }
 	int8_t	stream::read_s8() { align(); return m_input->read_byte(); }

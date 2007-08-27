@@ -1,5 +1,9 @@
 2007-08-28 Sandro Santilli <strk@keybit.net>
 
+	* server/stream.{cpp,h}: inlined align(), cleanups in read_uint().
+
+2007-08-28 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/shape_character_def.cpp (read): use ints for twips
 	  values, convert to float only when needed (construction of the
 	  edges and paths). [last patch was bogus]
