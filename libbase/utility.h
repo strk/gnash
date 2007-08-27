@@ -115,7 +115,8 @@ const float LN_2 = 0.693147180559945f;
 // the overridden log(f) will use logf IFF f is a float
 inline float	log2(float f) { return std::log(f) / LN_2; }
 //exp2 might be missing on Net-/OpenBSD.
-inline float	exp2(double x) { return std::pow((double)2, double(x)); }
+// TODO: check availability with a configure macro 
+//inline float	exp2(double x) { return std::pow((double)2, double(x)); }
 inline int	fchop( float f ) { return (int) f; }	// replace w/ inline asm if desired
 inline int	frnd(float f) { return fchop(f + 0.5f); }	// replace with inline asm if desired
 
