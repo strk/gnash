@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.35 2007/08/27 16:52:28 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.36 2007/08/27 17:28:02 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -262,11 +262,12 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		current_path.m_ax = x;
 		current_path.m_ay = y;
 
+#if SHAPE_LOG
 		IF_VERBOSE_PARSE
 		(
-		if (SHAPE_LOG)
 		    log_parse(_("  shape_character read: moveto %4g %4g"), x, y);
 		);
+#endif
 	    }
 	    if ((flags & flagFillStyle0Change) && num_fill_bits > 0)
 	    {
@@ -304,11 +305,11 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		}
 
 		current_path.setLeftFill(style);
+#if SHAPE_LOG
 		IF_VERBOSE_PARSE(
-		if (SHAPE_LOG) {
 		    log_parse(_("  shape_character read: fill0 (left) = %d"), current_path.getLeftFill());
-		}
 		);
+#endif
 
 	    }
 	    if ((flags & flagFillStyle1Change) && num_fill_bits > 0)
@@ -346,11 +347,11 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 			}
 		}
 		current_path.setRightFill(style); // getRightFill() = style;
+#if SHAPE_LOG
 		IF_VERBOSE_PARSE (
-		if (SHAPE_LOG) {
 		    log_parse(_("  shape_character read: fill1 (right) = %d"), current_path.getRightFill());
-		}
 		)
+#endif
 	    }
 	    if ((flags & flagLineStyleChange) && num_line_bits > 0)
 	    {
@@ -386,12 +387,11 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 			}
 		}
 		current_path.setLineStyle(style);
+#if SHAPE_LOG
 		IF_VERBOSE_PARSE (
-		if (SHAPE_LOG)
-		{
 		    log_parse(_("  shape_character_read: line = %d"), current_path.getLineStyle());
-		}
 		)
+#endif
 	    }
 	    if (flags & flagHasNewStyles)
 	    {
@@ -439,12 +439,11 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		float	ax = cx + in->read_sint(num_bits);
 		float	ay = cy + in->read_sint(num_bits);
 
+#if SHAPE_LOG
 		IF_VERBOSE_PARSE (
-		if (SHAPE_LOG)
-		{
 		    log_parse(_("  shape_character read: curved edge   = %4g %4g - %4g %4g - %4g %4g"), x, y, cx, cy, ax, ay);
-		}
 		);
+#endif
 
 		current_path.m_edges.push_back(edge(cx, cy, ax, ay));
 
@@ -470,12 +469,11 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		    }
 		}
 
+#if SHAPE_LOG
 		IF_VERBOSE_PARSE (
-		if (SHAPE_LOG)
-		{
 		    log_parse(_("  shape_character_read: straight edge = %4g %4g - %4g %4g"), x, y, x + dx, y + dy);
-		}
 		);
+#endif
 
 		current_path.m_edges.push_back(edge(x + dx, y + dy, x + dx, y + dy));
 

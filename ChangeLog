@@ -1,5 +1,11 @@
 2007-08-27 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/shape_character_def.cpp (read): make effective
+	  use of the SHAPE_LOG compile-time macro, by removing any overhead
+	  associated with it, when set to something != 0.
+
+2007-08-27 Sandro Santilli <strk@keybit.net>
+
 	* server/parser/shape_character_def.cpp (read): use ints for twips
 	  values, convert to float only when needed (construction of the
 	  edges and paths).
