@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BitmapFilter.h,v 1.1 2007/08/26 15:14:10 cmusick Exp $ */
+/* $Id: BitmapFilter.h,v 1.2 2007/08/27 03:06:41 cmusick Exp $ */
 
 #ifndef GNASH_BITMAPFILTER_H
 #define GNASH_BITMAPFILTER_H
@@ -30,20 +30,26 @@ namespace gnash {
 
 class stream;
 class BitmapFilter;
-
+class BitmapFilter_as; // Adapter pattern to ActionScript
 typedef boost::intrusive_ptr<BitmapFilter> Filter;
 
 // The common base class for AS display filters.
 class BitmapFilter : public as_object
 {
 public:
-    // Fill from a stream. See parser/filter_factory.cpp for the implementations.
-    virtual bool read(stream* in) = 0;
+    friend class BitmapFilter_as;
 
+    // Fill from a stream. See parser/filter_factory.cpp for the implementations.
+    virtual bool read(stream* /*in*/) { return true; }
+
+    // Pass the interface up the chain.
+    BitmapFilter(as_object *interface) : as_object(interface) { return; }
+    // For non-ActionScript use.
+    BitmapFilter() { return; }
     virtual ~BitmapFilter() { return; }
 
     // Clone this object and return a copy of it. (AS accessible function.)
-    Filter const clone();
+    virtual Filter const clone() { return NULL; }
 };
 
 } // Namespace gnash

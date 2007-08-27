@@ -1,3 +1,17 @@
+2007-08-27 Chad Musick <chadmusick@msbx.net>
+
+	* server/BevelFilter.cpp,.h: Fuller conversion to AS compatible
+	* server/BitmapFilter.h: Fuller conversion to AS compatible
+	* server/stream.cpp: Remove dead code from read_fixed
+	* server/asobj/Makefile.am Add new files
+	* server/parser/filter_factory.cpp: Removed typo bug pointed out by
+	  Zou.
+	* server/vm/ASHandlers.cpp,.h: Remove use of variable sized array.
+	* server/asobj/BevelFilter_as.cpp,.h: Adapter pattern object for using
+	  BevelFilter inside of ActionScript (not yet put in global)
+	* server/asobj/BitmapFilter_as.cpp,.h: Adapater pattern object for
+	  using BitmapFilter inside of ActionScript (not yet put in global)
+
 2007-08-26 Deanna Phillips <deanna>
 
 	* doc/gnash.1: Updated.

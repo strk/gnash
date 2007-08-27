@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: filter_factory.cpp,v 1.1 2007/08/26 15:14:13 cmusick Exp $ */
+/* $Id: filter_factory.cpp,v 1.2 2007/08/27 03:06:42 cmusick Exp $ */
 
 #include "filter_factory.h"
 #include "BitmapFilter.h"
@@ -196,7 +196,7 @@ bool BevelFilter::read(stream* in)
 
 bool GradientGlowFilter::read(stream* in)
 {
-    bool count = in->read_u8(); // How many colorings.
+    uint8_t count = in->read_u8(); // How many colorings.
 
     for (int i = 0; i < count; ++i)
     {
@@ -265,7 +265,7 @@ bool ColorMatrixFilter::read(stream* in)
 
 bool GradientBevelFilter::read(stream* in)
 {
-    bool count = in->read_u8(); // How many colorings.
+    uint8_t count = in->read_u8(); // How many colorings.
 
     for (int i = 0; i < count; ++i)
     {

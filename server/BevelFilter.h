@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BevelFilter.h,v 1.1 2007/08/26 15:14:10 cmusick Exp $ */
+/* $Id: BevelFilter.h,v 1.2 2007/08/27 03:06:41 cmusick Exp $ */
 
 #ifndef GNASH_BEVELFILTER_H
 #define GNASH_BEVELFILTER_H
@@ -28,10 +28,14 @@
 
 namespace gnash {
 
+class BevelFilter_as; // Adapter class for AS use.
+
 // A bevel effect filter.
 class BevelFilter : public BitmapFilter
 {
 public:
+    friend class BevelFilter_as;
+
     typedef enum
     {
         OUTER_BEVEL = 1,
@@ -47,6 +51,13 @@ public:
     // Clone this object and return a copy of it. (AS accessible function.)
     // Guaranteed to return an object which can be cast to BlurFilter
     Filter const clone();
+
+    BevelFilter(as_object* o) : BitmapFilter(o),
+        m_distance(0.0f), m_angle(0.0f), m_highlightColor(0),
+        m_highlightAlpha(0), m_shadowColor(0), m_shadowAlpha(0),
+        m_blurX(0.0f), m_blurY(0.0f),  m_strength(0.0f), m_quality(0),
+        m_type(FULL_BEVEL), m_knockout(false)
+    { return; }
 
     BevelFilter() : 
         m_distance(0.0f), m_angle(0.0f), m_highlightColor(0),

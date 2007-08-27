@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.127 2007/08/25 16:10:37 strk Exp $ */
+/* $Id: ASHandlers.cpp,v 1.128 2007/08/27 03:06:42 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1386,7 +1386,7 @@ SWFHandlers::ActionRandom(ActionExec& thread)
 }
 
 as_encoding_guess_t
-SWFHandlers::GuessEncoding(std::string &str, int &length, int *offsets)
+SWFHandlers::GuessEncoding(std::string &str, int &length, std::vector<int>& offsets)
 {
     const char *cstr = str.c_str();
     const char *i = cstr;
@@ -1409,7 +1409,7 @@ SWFHandlers::GuessEncoding(std::string &str, int &length, int *offsets)
             continue;
         }
         ++length;
-        *(offsets + length - 1) = index;
+        offsets[length - 1] = index;
 
         if ((j & 0xC0) == 0x80)
             continue; // A 1 byte character.
@@ -1422,7 +1422,7 @@ SWFHandlers::GuessEncoding(std::string &str, int &length, int *offsets)
         else if (j & 0x80)
             is_sought = false;
     }
-    *(offsets + length - 1) = index;
+    offsets[length - 1] = index;
     if (!width && is_sought) // No width left, so it's almost certainly UTF8.
         return ENCGUESS_UNICODE;
 
@@ -1448,7 +1448,7 @@ SWFHandlers::GuessEncoding(std::string &str, int &length, int *offsets)
         }
 
         ++length;
-        *(offsets + length - 1) = index;
+        offsets[length - 1] = index;
 
         if ((j == 0x80) || (j == 0xA0) || (j >= 0xF0))
         {
@@ -1464,7 +1464,7 @@ SWFHandlers::GuessEncoding(std::string &str, int &length, int *offsets)
         }
         
     }
-    *(offsets + length - 1) = index;
+    offsets[length - 1] = index;
     if (!width && is_sought) // No width left, so it's probably SHIFT_JIS.
         return ENCGUESS_JIS;
 
@@ -1491,7 +1491,8 @@ SWFHandlers::ActionMbLength(ActionExec& thread)
     else
     {
         int length;
-        (void) GuessEncoding(str, length, NULL);
+        std::vector<int> unused;
+        (void) GuessEncoding(str, length, unused);
         env.top(0).set_int(length);
     }
 }
@@ -1571,7 +1572,8 @@ SWFHandlers::ActionMbSubString(ActionExec& thread)
 
     string str = string_val.to_string(&env);
     int length = 0;
-    int offsets[str.length() + 1];
+    std::vector<int> offsets;
+    offsets.reserve(str.length() + 1);
 
     as_encoding_guess_t encoding = GuessEncoding(str, length, offsets);
 

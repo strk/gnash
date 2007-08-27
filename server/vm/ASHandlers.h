@@ -165,7 +165,8 @@ private:
         // and the offsets to the characters in offsets, if offsets is not NULL.
         // If not NULL, offsets should be at least s.length().
         // offsets are not accurate if the return value is GUESSENC_OTHER
-        static as_encoding_guess_t GuessEncoding(std::string& s, int& length, int *offsets);
+        static as_encoding_guess_t GuessEncoding(std::string& s, int& length,
+            std::vector<int>& offsets);
 
 	static void ActionEnd(ActionExec& thread);
 	static void ActionNextFrame(ActionExec& thread);

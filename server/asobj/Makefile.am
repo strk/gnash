@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.41 2007/07/01 10:54:28 bjacques Exp $
+# $Id: Makefile.am,v 1.42 2007/08/27 03:06:42 cmusick Exp $
 
 AUTOMAKE_OPTIONS = 
 
@@ -43,6 +43,8 @@ AM_CPPFLAGS = \
 
 
 libgnashasobjs_la_SOURCES = \
+        BevelFilter_as.cpp \
+        BitmapFilter_as.cpp \
 	Boolean.cpp	\
 	Camera.cpp	\
 	Color.cpp	\
@@ -76,6 +78,8 @@ libgnashasobjs_la_SOURCES = \
 	$(NULL)
 
 noinst_HEADERS = \
+        BevelFilter_as.h \
+        BitmapFilter_as.h \
 	Boolean.h	\
 	Camera.h	\
 	Color.h		\

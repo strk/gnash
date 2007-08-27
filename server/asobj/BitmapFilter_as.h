@@ -1,40 +1,40 @@
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
-// 
+//
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-/* $Id: BevelFilter.cpp,v 1.2 2007/08/27 03:06:41 cmusick Exp $ */
+#ifndef __GNASH_ASOBJ_BITMAPFILTER_H__
+#define __GNASH_ASOBJ_BITMAPFILTER_H__
 
-#include "BevelFilter.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 namespace gnash {
 
-// See parser/filter_factory.cpp for the implementation. Purposefully not here.
-//bool BevelFilter::read(stream* in);
+class as_object;
 
-Filter const
-BevelFilter::clone()
-{
-    Filter p(new BevelFilter(m_distance, m_angle, m_highlightColor,
-        m_highlightAlpha, m_shadowColor, m_shadowAlpha,
-        m_blurX, m_blurY, m_strength, m_quality, m_type, m_knockout));
-    p->set_prototype(get_prototype());
-    p->copyProperties(*this);
+/// Initialize the global BitmapFilter class
+void bitmapFilter_class_init(as_object& global);
 
-    return p;
-}
+/// Get the interface, for inheritance.
+as_object *bitmapFilter_interface();
 
-} // Namespace gnash
+} // end of gnash namespace
+
+// __GNASH_ASOBJ_BITMAPFILTER_H__
+#endif
 

@@ -116,14 +116,8 @@ namespace gnash {
 
 	float	stream::read_fixed()
 	{
-#if 0 /* Chad */
-		m_unused_bits = 0;
-		int32_t	val = m_input->read_le32();
-		return (float) val / 65536.0f;
-#else
 		align();
 		return static_cast<float> (static_cast<double> (static_cast<long int> (m_input->read_le32())) / 65536.0f);
-#endif /* Chad */
 	}
 
 	// float is not large enough to hold a 32 bit value without doing the wrong thing with the sign.
