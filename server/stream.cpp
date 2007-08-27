@@ -199,7 +199,7 @@ namespace gnash {
 
 	int	stream::read_sint(unsigned short bitcount)
 	{
-		assert(bitcount <= 32);
+		//assert(bitcount <= 32); // already asserted in read_uint
 
 		int32_t	value = int32_t(read_uint(bitcount));
 
