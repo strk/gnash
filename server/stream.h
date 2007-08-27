@@ -46,6 +46,11 @@ namespace gnash {
 		unsigned read_uint(unsigned short bitcount);
 
 		/// \brief
+		/// Reads a single bit off the stream
+		/// and returns it.  
+		bool read_bit();
+
+		/// \brief
 		/// Reads a bit-packed little-endian signed integer
 		/// from the stream.  The given bitcount determines the
 		/// number of bits to read.

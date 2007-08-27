@@ -57,6 +57,11 @@ struct ByteReader
 		b(by)
 	{}
 
+	void setByte(unsigned char by)
+	{
+		b=by;
+	}
+
 	static int readFunc(void* dst, int bytes, void* appdata) 
 	{
 	    assert(bytes == 1);
@@ -97,10 +102,6 @@ main(int /*argc*/, char** /*argv*/)
 	ret = s.read_uint(1); check_equals(ret, 0);
 	ret = s.read_uint(1); check_equals(ret, 1);
 	ret = s.read_uint(1); check_equals(ret, 0);
-
-	/// bits: 10101010 (0xAA)
-
-	s.align();
 	ret = s.read_uint(1); check_equals(ret, 1);
 	ret = s.read_uint(1); check_equals(ret, 0);
 	ret = s.read_uint(1); check_equals(ret, 1);
@@ -212,6 +213,39 @@ main(int /*argc*/, char** /*argv*/)
 
 	s.align();
 	ret = s.read_uint(24); check_equals(ret, 11184810);
+
+	/// bits: 1010101010101010 (0xAAAA)
+
+	s.align();
+	ret = s.read_bit(); check_equals(ret, 1);
+	ret = s.read_bit(); check_equals(ret, 0);
+	ret = s.read_bit(); check_equals(ret, 1);
+	ret = s.read_bit(); check_equals(ret, 0);
+	ret = s.read_bit(); check_equals(ret, 1);
+	ret = s.read_bit(); check_equals(ret, 0);
+	ret = s.read_bit(); check_equals(ret, 1);
+	ret = s.read_bit(); check_equals(ret, 0);
+	ret = s.read_bit(); check_equals(ret, 1);
+	ret = s.read_bit(); check_equals(ret, 0);
+	ret = s.read_bit(); check_equals(ret, 1);
+	ret = s.read_bit(); check_equals(ret, 0);
+	ret = s.read_bit(); check_equals(ret, 1);
+	ret = s.read_bit(); check_equals(ret, 0);
+	ret = s.read_bit(); check_equals(ret, 1);
+	ret = s.read_bit(); check_equals(ret, 0);
+
+	/// bits: 10011001 (0x99)
+
+	br.setByte(0x99);
+	s.align();
+	ret = s.read_bit(); check_equals(ret, 1);
+	ret = s.read_bit(); check_equals(ret, 0);
+	ret = s.read_bit(); check_equals(ret, 0);
+	ret = s.read_bit(); check_equals(ret, 1);
+	ret = s.read_bit(); check_equals(ret, 1);
+	ret = s.read_bit(); check_equals(ret, 0);
+	ret = s.read_bit(); check_equals(ret, 0);
+	ret = s.read_bit(); check_equals(ret, 1);
 
 	return 0;
 }

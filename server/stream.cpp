@@ -54,44 +54,71 @@ namespace gnash {
 // 	}
 
 	
+	bool stream::read_bit()
+	{
+		if (!m_unused_bits)
+		{
+			m_current_byte = m_input->read_byte();
+			m_unused_bits = 7;
+			return (m_current_byte&0x80);
+		}
+		else
+		{
+			return ( m_current_byte & (1<<(--m_unused_bits)) );
+		}
+	}
+
 	unsigned stream::read_uint(unsigned short bitcount)
 	{
-		assert(bitcount <= 32);
-			
-		uint32_t	value = 0;
+		assert(bitcount <= 24);
 
-		unsigned short bits_needed = bitcount;
-		while (bits_needed > 0)
+		if (!m_unused_bits)
 		{
-			if (m_unused_bits) {
-				if (bits_needed >= m_unused_bits) {
-					// Consume all the unused bits.
-					value |= (m_current_byte << (bits_needed - m_unused_bits));
-
-					bits_needed -= m_unused_bits;
-
-					m_current_byte = 0;
-					m_unused_bits = 0;
-
-				} else {
-					// Consume some of the unused bits.
-					value |= (m_current_byte >> (m_unused_bits - bits_needed));
-
-					// mask off the bits we consumed.
-					m_current_byte &= ((1 << (m_unused_bits - bits_needed)) - 1);
-
-					m_unused_bits -= bits_needed;
-
-					// We're done.
-					bits_needed = 0;
-				}
-			} else {
-				m_current_byte = m_input->read_byte();
-				m_unused_bits = 8;
-			}
+			m_current_byte = m_input->read_byte();
+			m_unused_bits = 8;
 		}
 
-		assert(bits_needed == 0);
+		uint32_t value = 0;
+
+		unsigned short bits_needed = bitcount;
+		do
+		{
+			// TODO: cache this mask instead of m_unused_bits ?
+			int unusedMask = (1 << m_unused_bits)-1;
+
+			if (bits_needed == m_unused_bits)
+			{
+				// Consume all the unused bits.
+				value |= (m_current_byte&unusedMask);
+				m_unused_bits = 0;
+				break;
+
+			}
+			else if (bits_needed > m_unused_bits)
+			{
+				// Consume all the unused bits.
+
+				bits_needed -= m_unused_bits; // assert(bits_needed>0)
+
+				value |= ((m_current_byte&unusedMask) << bits_needed);
+
+				m_current_byte = m_input->read_byte();
+				m_unused_bits = 8;
+
+			}
+			else
+			{
+				// Consume some of the unused bits.
+
+				m_unused_bits -= bits_needed;
+
+				value |= ((m_current_byte&unusedMask) >> m_unused_bits);
+
+				// We're done.
+				break;
+			}
+		}
+		while (bits_needed > 0);
 
 		return value;
 	}

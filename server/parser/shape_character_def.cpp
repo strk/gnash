@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.33 2007/08/23 15:10:51 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.34 2007/08/27 12:09:05 strk Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -226,8 +226,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 
     // SHAPERECORDS
     for (;;) {
-	int	type_flag = in->read_uint(1);
-	if (type_flag == 0) {
+	bool isEdgeRecord = in->read_bit();
+	if (!isEdgeRecord) {
 	    // Parse the record.
 	    int	flags = in->read_uint(5);
 	    if (flags == flagEnd) {
@@ -430,7 +430,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 	    }
 	} else {
 	    // EDGERECORD
-	    int	edge_flag = in->read_uint(1);
+	    bool edge_flag = in->read_bit();
 	    if (edge_flag == 0) {
 		// curved edge
 		int num_bits = 2 + in->read_uint(4);
@@ -453,14 +453,14 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 	    } else {
 		// straight edge
 		int	num_bits = 2 + in->read_uint(4);
-		int	line_flag = in->read_uint(1);
+		bool line_flag = in->read_bit();
 		float	dx = 0, dy = 0;
 		if (line_flag) {
 		    // General line.
 		    dx = (float) in->read_sint(num_bits);
 		    dy = (float) in->read_sint(num_bits);
 		} else {
-		    int	vert_flag = in->read_uint(1);
+		    bool vert_flag = in->read_bit();
 		    if (vert_flag == 0) {
 			// Horizontal line.
 			dx = (float) in->read_sint(num_bits);

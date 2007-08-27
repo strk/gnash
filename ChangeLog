@@ -1,3 +1,11 @@
+2007-08-27 Sandro Santilli <strk@keybit.net>
+
+	* server/stream.{cpp,h}: add read_bit(), optimize read_uint()
+	  a little-bit (there are likely more optimization options).
+	* server/parser/shape_character_def.cpp (read): use read_bit()
+	  instead of read_uint(1).
+	* testsuite/server/StreamTest.cpp: more tests for read_bit().
+
 2007-08-27 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/utility.h: defined exp2() as it's missing on some BSDen.
