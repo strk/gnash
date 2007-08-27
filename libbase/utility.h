@@ -113,10 +113,13 @@ inline float flerp(float a, float b, float f) { return (b - a) * f + a; }
 //This is from C99.
 const float LN_2 = 0.693147180559945f;
 // the overridden log(f) will use logf IFF f is a float
+#ifndef HAVE_LOG2
 inline float	log2(float f) { return std::log(f) / LN_2; }
+#endif
 //exp2 might be missing on Net-/OpenBSD.
-// TODO: check availability with a configure macro 
-//inline float	exp2(double x) { return std::pow((double)2, double(x)); }
+#ifndef HAVE_EXP2
+inline float	exp2(double x) { return std::pow((double)2, double(x)); }
+#endif
 inline int	fchop( float f ) { return (int) f; }	// replace w/ inline asm if desired
 inline int	frnd(float f) { return fchop(f + 0.5f); }	// replace with inline asm if desired
 
