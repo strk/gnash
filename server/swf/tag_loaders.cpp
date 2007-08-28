@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.132 2007/08/27 12:44:29 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.133 2007/08/28 12:01:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -602,12 +602,11 @@ define_bits_jpeg2_loader(stream* in, tag_type tag, movie_definition* m)
 
 
 #ifdef HAVE_ZLIB_H
-void inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
+void inflate_wrapper(stream& in, void* buffer, int buffer_bytes)
     // Wrapper function -- uses Zlib to uncompress in_bytes worth
     // of data from the input file into buffer_bytes worth of data
     // into *buffer.
 {
-    assert(in);
     assert(buffer);
     assert(buffer_bytes > 0);
 
@@ -635,7 +634,8 @@ void inflate_wrapper(tu_file* in, void* buffer, int buffer_bytes)
 
     for (;;) {
 	// Fill a one-byte (!) buffer.
-	buf[0] = in->read_byte();
+	// TODO: sub-optimal, read_u8 also calls align needlessly
+	buf[0] = in.read_u8();
 	d_stream.next_in = &buf[0];
 	d_stream.avail_in = 1;
 
@@ -697,7 +697,7 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 	int	buffer_bytes = im->m_width * im->m_height;
 	uint8_t*      buffer = new uint8_t[buffer_bytes];
 
-	inflate_wrapper(in->get_underlying_stream(), buffer, buffer_bytes);
+	inflate_wrapper(*in, buffer, buffer_bytes);
 
 	for (int i = 0; i < buffer_bytes; i++)
 	{
@@ -765,7 +765,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		int buffer_bytes = color_table_size * 3 + pitch * height;
 		boost::scoped_array<uint8_t> buffer ( new uint8_t[buffer_bytes] );
 
-		inflate_wrapper(in->get_underlying_stream(), buffer.get(), buffer_bytes);
+		inflate_wrapper(*in, buffer.get(), buffer_bytes);
 		assert(in->get_position() <= in->get_tag_end_position());
 
 		uint8_t* color_table = buffer.get();
@@ -793,7 +793,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		int buffer_bytes = pitch * height;
 		boost::scoped_array<uint8_t> buffer ( new uint8_t[buffer_bytes] );
 
-		inflate_wrapper(in->get_underlying_stream(), buffer.get(), buffer_bytes);
+		inflate_wrapper(*in, buffer.get(), buffer_bytes);
 		assert(in->get_position() <= in->get_tag_end_position());
 
 		for (int j = 0; j < height; j++)
@@ -821,7 +821,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		int buffer_bytes = pitch * height;
 		boost::scoped_array<uint8_t> buffer ( new uint8_t[buffer_bytes] );
 
-		inflate_wrapper(in->get_underlying_stream(), buffer.get(), buffer_bytes);
+		inflate_wrapper(*in, buffer.get(), buffer_bytes);
 		assert(in->get_position() <= in->get_tag_end_position());
 
 		// Need to re-arrange ARGB into RGB.
@@ -879,7 +879,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		int buffer_bytes = color_table_size * 4 + pitch * height;
 		boost::scoped_array<uint8_t> buffer ( new uint8_t[buffer_bytes] );
 
-		inflate_wrapper(in->get_underlying_stream(), buffer.get(), buffer_bytes);
+		inflate_wrapper(*in, buffer.get(), buffer_bytes);
 		assert(in->get_position() <= in->get_tag_end_position());
 
 		uint8_t* color_table = buffer.get();
@@ -908,7 +908,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		int buffer_bytes = pitch * height;
 		boost::scoped_array<uint8_t> buffer ( new uint8_t[buffer_bytes] );
 
-		inflate_wrapper(in->get_underlying_stream(), buffer.get(), buffer_bytes);
+		inflate_wrapper(*in, buffer.get(), buffer_bytes);
 		assert(in->get_position() <= in->get_tag_end_position());
 
 		for (int j = 0; j < height; j++)
@@ -932,7 +932,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 	    {
 		// 32 bits / pixel, input is ARGB format
 
-		inflate_wrapper(in->get_underlying_stream(), image->m_data, width * height * 4);
+		inflate_wrapper(*in, image->m_data, width * height * 4);
 		assert(in->get_position() <= in->get_tag_end_position());
 
 		// Need to re-arrange ARGB into RGBA.
