@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.88 2007/08/10 18:31:01 strk Exp $
+# $Id: Makefile.am,v 1.89 2007/08/29 00:58:02 strk Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -50,7 +50,7 @@ man_MANS = doc/gnash.1
 
 DIST_SUBDIRS = $(STD_DIRS) cygnal doc
 
-EXTRA_DIST = config.rpath $(man_MANS) macros/incllist macros/libslist 
+EXTRA_DIST = config.rpath $(man_MANS) macros/incllist macros/libslist ChangeLog-0.8.0 ChangeLog-0.8.1
 
 noinst_HEADERS = compatibility_include.h
 
