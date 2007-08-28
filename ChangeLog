@@ -1,3 +1,7 @@
+2007-08-28 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/sprite_instance.cpp: comment unused parameter 	
+
 2007-08-28 Sandro Santilli <strk@keybit.net>
 
 	* libbase/jpeg.{cpp,h}: cleanups, aimed at eventually implement

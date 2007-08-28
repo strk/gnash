@@ -2793,7 +2793,7 @@ sprite_instance::add_display_object(
     const char* name,
     const std::vector<swf_event*>& event_handlers,
     int depth, 
-    bool replace_if_depth_is_occupied,
+    bool /*replace_if_depth_is_occupied*/,
     const cxform& color_transform, const matrix& mat,
     int ratio, int clip_depth)
 {
