@@ -23,23 +23,30 @@ extern "C" {
 
 namespace jpeg
 {
-	// jpeglib data source constructors, for using tu_file* instead
-	// of stdio for jpeg IO.
-	void	setup_rw_source(jpeg_decompress_struct* cinfo, tu_file* instream);
-	void	setup_rw_dest(jpeg_compress_struct* cinfo, tu_file* outstream);
 
+
+// Called when jpeglib has a fatal error.
+static void	jpeg_error_exit(j_common_ptr cinfo);
+
+// Set up some error handlers for the jpeg lib.
+static void	setup_jpeg_err(jpeg_error_mgr* jerr);
+
+
+/// input/output wrappers for tu_file
+namespace tu_file_wrappers
+{
 
 	// Helper object for reading jpeg image data.  Basically a thin
 	static const int	IO_BUF_SIZE = 4096;
 
 	// A jpeglib source manager that reads from a tu_file.  Paraphrased
 	// from IJG jpeglib jdatasrc.c.
-	class rw_source
+	class rw_source_tu_file
 	{
 	public:
 		struct jpeg_source_mgr	m_pub;		/* public fields */
 
-		rw_source(tu_file* in)
+		rw_source_tu_file(tu_file* in)
 			:
 			m_in_stream(in),
 			m_start_of_file(true)
@@ -58,7 +65,7 @@ namespace jpeg
 
 		static void init_source(j_decompress_ptr cinfo)
 		{
-			rw_source*	src = (rw_source*) cinfo->src;
+			rw_source_tu_file*	src = (rw_source_tu_file*) cinfo->src;
 			src->m_start_of_file = true;
 		}
 
@@ -66,7 +73,7 @@ namespace jpeg
 		// when it needs more data from the file.
 		static boolean fill_input_buffer(j_decompress_ptr cinfo)
 		{
-			rw_source*	src = (rw_source*) cinfo->src;
+			rw_source_tu_file*	src = (rw_source_tu_file*) cinfo->src;
 
 			size_t	bytes_read = src->m_in_stream->read_bytes(src->m_buffer, IO_BUF_SIZE);
 
@@ -112,7 +119,7 @@ namespace jpeg
 		// uninteresting data.
 		static void	skip_input_data(j_decompress_ptr cinfo, long num_bytes)
 		{
-			rw_source*	src = (rw_source*) cinfo->src;
+			rw_source_tu_file*	src = (rw_source_tu_file*) cinfo->src;
 
 			// According to jpeg docs, large skips are
 			// infrequent.  So let's just do it the simple
@@ -131,7 +138,7 @@ namespace jpeg
 		static void term_source(j_decompress_ptr /* cinfo */)
 		// Terminate the source.  Make sure we get deleted.
 		{
-			/*rw_source*	src = (rw_source*) cinfo->src;
+			/*rw_source_tu_file*	src = (rw_source_tu_file*) cinfo->src;
 			assert(src);
 
 			// @@ it's kind of bogus to be deleting here
@@ -151,25 +158,29 @@ namespace jpeg
 			m_pub.bytes_in_buffer = 0;
 			m_pub.next_input_byte = NULL;
 		}
+
+		// Set up the given decompress object to read from the given
+		// stream.
+		static void setup(jpeg_decompress_struct* cinfo, tu_file* instream)
+		{
+			// assert(cinfo->src == NULL);
+			cinfo->src = (jpeg_source_mgr*) (new rw_source_tu_file(instream));
+		}
+
 	private:
 		tu_file*	m_in_stream;		/* source stream */
 		bool	m_start_of_file;		/* have we gotten any data yet? */
 		JOCTET	m_buffer[IO_BUF_SIZE];		/* start of buffer */
+
+
 	};
 
 	
-	void	setup_rw_source(jpeg_decompress_struct* cinfo, tu_file* instream)
-	// Set up the given decompress object to read from the given
-	// stream.
-	{
-		// assert(cinfo->src == NULL);
-		cinfo->src = (jpeg_source_mgr*) (new rw_source(instream));
-	}
 
 
 	// A jpeglib destination manager that writes to a tu_file.
 	// Paraphrased from IJG jpeglib jdatadst.c.
-	class rw_dest
+	class rw_dest_tu_file
 	{
 	public:
 		struct jpeg_destination_mgr	m_pub;	/* public fields */
@@ -182,7 +193,7 @@ namespace jpeg
 		/// @param out
 		///	The output stream, externally owned.
 		///
-		rw_dest(tu_file* out)
+		rw_dest_tu_file(tu_file* out)
 			:
 			m_out_stream(out)
 		{
@@ -197,24 +208,31 @@ namespace jpeg
 
 		static void init_destination(j_compress_ptr cinfo)
 		{
-			rw_dest*	dest = (rw_dest*) cinfo->dest;
+			rw_dest_tu_file*	dest = (rw_dest_tu_file*) cinfo->dest;
 			assert(dest);
 
 			dest->m_pub.next_output_byte = dest->m_buffer;
 			dest->m_pub.free_in_buffer = IO_BUF_SIZE;
 		}
 
+		// Set up the given compress object to write to the given
+		// output stream.
+		static void setup(j_compress_ptr cinfo, tu_file* outstream)
+		{
+			cinfo->dest = (jpeg_destination_mgr*) (new rw_dest_tu_file(outstream));
+		}
+
 		/// Write the output buffer into the stream.
 		static boolean	empty_output_buffer(j_compress_ptr cinfo)
 		{
-			rw_dest*	dest = (rw_dest*) cinfo->dest;
+			rw_dest_tu_file*	dest = (rw_dest_tu_file*) cinfo->dest;
 			assert(dest);
 
 			if (dest->m_out_stream->write_bytes(dest->m_buffer, IO_BUF_SIZE) != IO_BUF_SIZE)
 			{
 				// Error.
 				// @@ bah, exceptions suck.  TODO consider alternatives.
-				gnash::log_error("jpeg::rw_dest couldn't write data.");
+				gnash::log_error("jpeg::rw_dest_tu_file couldn't write data.");
 				return false;
 			}
 
@@ -230,7 +248,7 @@ namespace jpeg
 		///
 		static void term_destination(j_compress_ptr cinfo)
 		{
-			rw_dest*	dest = (rw_dest*) cinfo->dest;
+			rw_dest_tu_file*	dest = (rw_dest_tu_file*) cinfo->dest;
 			assert(dest);
 
 			// Write any remaining data.
@@ -239,7 +257,7 @@ namespace jpeg
 				if (dest->m_out_stream->write_bytes(dest->m_buffer, datacount) != datacount)
 				{
 					// Error.
-					gnash::log_error("jpeg::rw_dest::term_destination couldn't write data.");
+					gnash::log_error("jpeg::rw_dest_tu_file::term_destination couldn't write data.");
 				}
 			}
 
@@ -254,42 +272,11 @@ namespace jpeg
 		tu_file*	m_out_stream;	
 
 		JOCTET	m_buffer[IO_BUF_SIZE];		/* start of buffer */
+
 	};
 
-
-	// Set up the given compress object to write to the given
-	// output stream.
-	void	setup_rw_dest(j_compress_ptr cinfo, tu_file* outstream)
-	{
-		cinfo->dest = (jpeg_destination_mgr*) (new rw_dest(outstream));
-	}
-
-
-	//
-	// Error handler
-	//
-
-
-	// Called when jpeglib has a fatal error.
-	static void	jpeg_error_exit(j_common_ptr cinfo);
-
-	// Set up some error handlers for the jpeg lib.
-	static void	setup_jpeg_err(jpeg_error_mgr* jerr)
-	{
-		// Set up defaults.
-		jpeg_std_error(jerr);
-
-		jerr->error_exit = jpeg_error_exit;
-	}
-
-
-	//
-	// wrappers
-	//
-
-
 	/// Bascially this is a thin wrapper around jpeg_decompress object.
-	class input_impl : public input
+	class input_tu_file : public input
 	{
 	public:
 		// State needed for input.
@@ -298,21 +285,14 @@ namespace jpeg
 
 		bool	m_compressor_opened;
 
-		/// This flag will be set to true by the error callback
-		/// invoked by jpeg lib. Will be later used to throw
-		/// a ParserException.
-		///
-		bool errorOccurred;
-
 		enum SWF_DEFINE_BITS_JPEG2 { SWF_JPEG2 };
 		enum SWF_DEFINE_BITS_JPEG2_HEADER_ONLY { SWF_JPEG2_HEADER_ONLY };
 
 		// Constructor.  Read the header data from in, and
 		// prepare to read data.
-		input_impl(tu_file* in)
+		input_tu_file(tu_file* in)
 			:
-			m_compressor_opened(false),
-			errorOccurred(false)
+			m_compressor_opened(false)
 		{
 			setup_jpeg_err(&m_jerr);
 			m_cinfo.err = &m_jerr;
@@ -321,7 +301,7 @@ namespace jpeg
 			// Initialize decompression object.
 			jpeg_create_decompress(&m_cinfo);
 
-			setup_rw_source(&m_cinfo, in);
+			rw_source_tu_file::setup(&m_cinfo, in);
 
 			start_image();
 		}
@@ -334,10 +314,9 @@ namespace jpeg
 		// start_image() and finish_image() around any calls
 		// to get_width/height/components and read_scanline.
 		//
-		input_impl(SWF_DEFINE_BITS_JPEG2_HEADER_ONLY /* e */, tu_file* in)
+		input_tu_file(SWF_DEFINE_BITS_JPEG2_HEADER_ONLY /* e */, tu_file* in)
 			:
-			m_compressor_opened(false),
-			errorOccurred(false)
+			m_compressor_opened(false)
 		{
 			setup_jpeg_err(&m_jerr);
 			m_cinfo.err = &m_jerr;
@@ -346,7 +325,7 @@ namespace jpeg
 			// Initialize decompression object.
 			jpeg_create_decompress(&m_cinfo);
 
-			setup_rw_source(&m_cinfo, in);
+			rw_source_tu_file::setup(&m_cinfo, in);
 
 			// Read the encoding tables.
 			int ret = jpeg_read_header(&m_cinfo, FALSE);
@@ -367,7 +346,7 @@ namespace jpeg
 					break;
 			}
 
-			if ( errorOccurred )
+			if ( _errorOccurred )
 			{
 				throw gnash::ParserException("errors during JPEG header parsing");
 			}
@@ -377,11 +356,11 @@ namespace jpeg
 		}
 
 		// Destructor.  Clean up our jpeg reader state.
-		~input_impl()
+		~input_tu_file()
 		{
 			finish_image();
 
-			rw_source* src = (rw_source*) m_cinfo.src;
+			rw_source_tu_file* src = (rw_source_tu_file*) m_cinfo.src;
 			delete src;
 			m_cinfo.src = NULL;
 
@@ -395,7 +374,7 @@ namespace jpeg
 		// data, to avoid screwing up future reads.
 		void	discard_partial_buffer()
 		{
-			rw_source* src = (rw_source*) m_cinfo.src;
+			rw_source_tu_file* src = (rw_source_tu_file*) m_cinfo.src;
 
 			// We only have to discard the input buffer after reading the tables.
 			if (src)
@@ -438,14 +417,14 @@ namespace jpeg
 				}
 			}
 
-			if ( errorOccurred )
+			if ( _errorOccurred )
 			{
 				throw gnash::ParserException("errors during JPEG header parsing");
 			}
 
 			jpeg_start_decompress(&m_cinfo);
 
-			if ( errorOccurred )
+			if ( _errorOccurred )
 			{
 				throw gnash::ParserException("errors during JPEG decompression");
 			}
@@ -514,43 +493,9 @@ namespace jpeg
 		}
 	};
 
-	static void	jpeg_error_exit(j_common_ptr cinfo)
-	{
-        IF_VERBOSE_MALFORMED_SWF(
-		gnash::log_swferror("Internal jpeg error: %s", cinfo->err->jpeg_message_table[cinfo->err->msg_code]);
-        );
-
-		// Set a flag to stop parsing 
-		input_impl* impl = static_cast<input_impl*>(cinfo->client_data);
-		impl->errorOccurred = true;
-	}
-
-
-
-	/*static*/
-	input*
-	input::create(tu_file* in)
-	{
-		input* ret = new input_impl(in);
-		return ret;
-	}
-
-	/*static*/
-	input*
-	input::create_swf_jpeg2_header_only(tu_file* in)
-	{
-		input* ret = new input_impl(input_impl::SWF_JPEG2_HEADER_ONLY, in);
-		return ret;
-	}
-
-
-	// Default destructor.
-	input::~input() {}
-
-
-	class output_impl : public output
 	// Basically this is a thin wrapper around jpeg_compress
 	// object.
+	class output_tu_file : public output
 	{
 	public:
 		// State needed for output.
@@ -561,14 +506,14 @@ namespace jpeg
 		//
 		/// Read the header data from in, and
 		///  prepare to read data.
-		output_impl(tu_file* out, int width, int height, int quality)
+		output_tu_file(tu_file* out, int width, int height, int quality)
 		{
 			m_cinfo.err = jpeg_std_error(&m_jerr);
 
 			// Initialize decompression object.
 			jpeg_create_compress(&m_cinfo);
 
-			setup_rw_dest(&m_cinfo, out);
+			rw_dest_tu_file::setup(&m_cinfo, out);
 			m_cinfo.image_width = width;
 			m_cinfo.image_height = height;
 			m_cinfo.input_components = 3;
@@ -580,12 +525,12 @@ namespace jpeg
 		}
 
 
-		~output_impl()
+		~output_tu_file()
 		// Destructor.  Clean up our jpeg reader state.
 		{
 			jpeg_finish_compress(&m_cinfo);
 /*
-			rw_dest* src = (rw_source*) m_cinfo.dest;
+			rw_dest_tu_file* src = (rw_source_tu_file*) m_cinfo.dest;
 			delete dest;
 			m_cinfo.dest = NULL;
 */
@@ -601,17 +546,60 @@ namespace jpeg
 	};
 
 
-	/*static*/ output*	output::create(tu_file* in, int width, int height, int quality)
-	// Create and return a jpeg-input object that will read from the
-	// given input stream.
-	{
-		return new output_impl(in, width, height, quality);
-	}
+
+} // namespace tu_file_wrappers
 
 
-	// Default constructor.
-	output::~output() {}
+// Set up some error handlers for the jpeg lib.
+static void	setup_jpeg_err(jpeg_error_mgr* jerr)
+{
+	// Set up defaults.
+	jpeg_std_error(jerr);
+
+	jerr->error_exit = jpeg_error_exit;
 }
+
+
+static void	jpeg_error_exit(j_common_ptr cinfo)
+{
+	IF_VERBOSE_MALFORMED_SWF(
+	gnash::log_swferror(_("Internal jpeg error: %s"),
+		cinfo->err->jpeg_message_table[cinfo->err->msg_code]);
+	);
+
+	// Set a flag to stop parsing 
+	input* in = static_cast<input*>(cinfo->client_data);
+	in->errorOccurred(); 
+}
+
+
+
+/*static*/
+input*
+input::create(tu_file* in)
+{
+	input* ret = new tu_file_wrappers::input_tu_file(in);
+	return ret;
+}
+
+/*static*/
+input*
+input::create_swf_jpeg2_header_only(tu_file* in)
+{
+	using tu_file_wrappers::input_tu_file;
+	input* ret = new input_tu_file(input_tu_file::SWF_JPEG2_HEADER_ONLY, in);
+	return ret;
+}
+
+
+/*static*/
+output*
+output::create(tu_file* in, int width, int height, int quality)
+{
+	return new tu_file_wrappers::output_tu_file(in, width, height, quality);
+}
+
+} // namespace jpeg
 
 
 // Local Variables:

@@ -29,8 +29,20 @@ namespace jpeg
 
 	public:
 
-		/// Read header and create a jpeg input object.
+		input()
+			:
+			_errorOccurred(false)
+		{}
+
+		virtual ~input() {}
+
+
+		/// \brief
+		/// Create and return a jpeg-input object that will read from the
+		/// given input stream.
 		//
+		/// The created input reads the jpeg header
+		///
 		/// @return NULL on error
 		///
 		DSOEXPORT static input*	create(tu_file* in);
@@ -45,8 +57,6 @@ namespace jpeg
 		///
 		DSOEXPORT static input*	create_swf_jpeg2_header_only(tu_file* in);
 
-		virtual ~input();
-
 		/// Discard existing bytes in our buffer.
 		virtual void	discard_partial_buffer() = 0;
 
@@ -56,6 +66,19 @@ namespace jpeg
 		virtual int	get_height() const = 0;
 		virtual int	get_width() const = 0;
 		virtual void	read_scanline(unsigned char* rgb_data) = 0;
+
+		void    errorOccurred()
+		{
+			_errorOccurred = true;
+		}
+
+	protected:
+
+		/// This flag will be set to true by the error callback
+		/// invoked by jpeg lib. Will be later used to throw
+		/// a ParserException.
+		///
+		bool _errorOccurred;
 	};
 
 
@@ -63,15 +86,20 @@ namespace jpeg
 	class output
 	{
 	public:
-		// Create an output object.   Quality goes from 1-100.
+		/// Create an output object bount to a tu_file
+		//
+		/// @param quality
+		///	Quality goes from 1-100.
+		///
 		DSOEXPORT static output*	create(tu_file* out, int width, int height, int quality);
 
-		virtual ~output();
+		virtual ~output() {}
 
 		// ...
 		virtual void	write_scanline(unsigned char* rgb_data) = 0;
 	};
-}
+
+} // namespace jpeg
 
 
 #endif // JPEG_H

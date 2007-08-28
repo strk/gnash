@@ -1,3 +1,8 @@
+2007-08-28 Sandro Santilli <strk@keybit.net>
+
+	* libbase/jpeg.{cpp,h}: cleanups, aimed at eventually implement
+	  different inputs then tu_file (stream, buffer).
+
 2007-08-28 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/actionscript.all/case.as: more tests.
