@@ -35,6 +35,7 @@ AM_CPPFLAGS = -I.. \
 
 check_PROGRAMS = \
 	StreamTest \
+	BitsReaderTest \
 	MatrixTest \
 	PointTest \
 	EdgeTest \
@@ -61,6 +62,11 @@ GNASH_LIBS = \
 if USE_FFMPEG_ENGINE
 	GNASH_LIBS += $(FFMPEG_LIBS)
 endif
+
+BitsReaderTest_SOURCES = BitsReaderTest.cpp
+BitsReaderTest_LDADD = \
+	$(GNASH_LIBS) \
+	$(NULL)
 
 StreamTest_SOURCES = StreamTest.cpp
 StreamTest_LDADD = \
