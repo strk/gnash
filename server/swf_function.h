@@ -25,8 +25,10 @@
 #include "impl.h"
 #include "as_function.h" // for inheritance
 #include "as_object.h" // for composition (vector element)
+#include "VM.h" //fow SWF version
 //#include "with_stack_entry.h" // for composition (vector element)
 
+#include <boost/algorithm/string/case_conv.hpp> 
 #include <cassert>
 #include <string>
 
@@ -218,7 +220,7 @@ public:
 		assert(arg_register == 0 || m_is_function2 == true);
 		m_args.resize(m_args.size() + 1);
 		m_args.back().m_register = arg_register;
-		m_args.back().m_name = name;
+		m_args.back().m_name = PROPNAME(name);
 	}
 
 	void	set_length(int len);

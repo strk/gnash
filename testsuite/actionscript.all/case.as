@@ -22,7 +22,7 @@
  *  Test case sensitivity 
  */
 
-rcsid="$Id: case.as,v 1.9 2007/08/24 16:07:27 strk Exp $";
+rcsid="$Id: case.as,v 1.10 2007/08/28 09:38:02 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -89,8 +89,8 @@ mcRef = new Array(10);
 i = 0;
 MovieClip.prototype.onConstruct = function ()
 {
-	mcRef[i++] = this;
-	note("Constructed "+this+" in depth "+this.getDepth()+" and assigned to mcRef["+(i-1)+"]");
+  mcRef[i++] = this;
+  note("Constructed "+this+" in depth "+this.getDepth()+" and assigned to mcRef["+(i-1)+"]");
 };
 
 _root.createEmptyMovieClip("clip", 6); //this will invoke the onConstruct listener
@@ -99,27 +99,27 @@ _root.createEmptyMovieClip("CLIP", 7); //this will invoke the onConstruct listen
 // support visual checks
 with(mcRef[0])
 {
-	beginFill(0xff0000, 100);
-	moveTo(100, 100);
-	lineTo(200,100);
-	lineTo(200,200);
-	lineTo(100,200);
-	lineTo(100,100);
-	endFill();
-	_alpha = 20;
+  beginFill(0xff0000, 100);
+  moveTo(100, 100);
+  lineTo(200,100);
+  lineTo(200,200);
+  lineTo(100,200);
+  lineTo(100,100);
+  endFill();
+  _alpha = 20;
 }
 
 // support visual checks
 with(mcRef[1])
 {
-	beginFill(0x00ff00, 100);
-	moveTo(100, 100);
-	lineTo(200,100);
-	lineTo(200,200);
-	lineTo(100,200);
-	lineTo(100,100);
-	endFill();
-	_alpha = 20;
+  beginFill(0x00ff00, 100);
+  moveTo(100, 100);
+  lineTo(200,100);
+  lineTo(200,200);
+  lineTo(100,200);
+  lineTo(100,100);
+  endFill();
+  _alpha = 20;
 }
 mcRef[1]._x += 100;
 
@@ -171,3 +171,30 @@ check_equals(CLIP2.getDepth(), 8);
 #endif
 
 #endif // OUTPUT_VERSION >= 6 }
+
+//
+// Test function args
+//
+func = function (xYz)
+{
+  check_equals(xYz, 100);
+#if OUTPUT_VERSION < 7
+  check_equals(xyz, 100);
+#endif 
+  this.testVar = xYz;
+  check_equals(this.testVar, 100);
+#if OUTPUT_VERSION < 7
+  check_equals(this.testvar, 100);
+#endif 
+};
+// call the function above,
+// trigger tests in it.
+func(100);
+
+#if OUTPUT_VERSION > 5
+  mcRef = _root.createEmptyMovieClip("mc_XYZ", 3);
+  check_equals(typeof(_root['mc_XYZ']), 'movieclip');
+  check_equals(typeof(_root['mcRef']), 'movieclip');
+  check_equals(typeof(mcRef['gotoAndStop']), 'function');
+#endif 
+

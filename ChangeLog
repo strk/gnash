@@ -1,3 +1,9 @@
+2007-08-28 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/actionscript.all/case.as: more tests.
+	* server/swf_function.h: set function args to lower case when needed.
+	  fix bug #20833.
+	  
 2007-08-28 Sandro Santilli <strk@keybit.net>
 
 	* server/: Makefile.am, BitsReader.{cpp,h}: new memory bits reader.
@@ -6,9 +12,9 @@
 
 2007-08-28 Deanna Phillips <deanna>
 
-        * libbase/utility.h: define exp2 and log2 if not available
-          based on HAVE_LOG2 and HAVE_EXP2
-        * configure.ac: detect availability of log2 and exp2
+	* libbase/utility.h: define exp2 and log2 if not available
+    based on HAVE_LOG2 and HAVE_EXP2
+	* configure.ac: detect availability of log2 and exp2
 
 2007-08-28 Sandro Santilli <strk@keybit.net>
 
