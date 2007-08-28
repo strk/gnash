@@ -1,0 +1,2983 @@
+2007-08-28 Deanna Phillips <deanna>
+
+	* libbase/utility.h: define exp2 and log2 if not available
+	  based on HAVE_LOG2 and HAVE_EXP2
+	* configure.ac: detect availability of log2 and exp2
+
+2007-08-27 Sandro Santilli <strk@keybit.net>
+
+	* libbase/utility.h: don't define exp2(), it's going to clash
+	  with existing symbol on most systems (except some BSDen)...
+	  Please provide a better patch for BSD.
+
+2007-08-27 Deanna Phillips <deanna>
+
+        * testsuite/misc-ming.all/NetStream-SquareTestRunner.cpp: include
+	  <unistd.h>
+
+2007-08-27 Deanna Philips <deanna>
+
+        * libbase/utility.h: defined exp2() as it's missing on some BSDen.
+
+2007-08-24 Miriam Ruiz <little_miry@yahoo.es>
+
+	* plugin/klash/klash_part.cpp: Patch for GNASHEXE.
+
+2007-08-23 Sandro Santilli <strk@keybit.net>
+
+	* libamf/amf.{cpp,h}: fixed a bunch of memory errors, added
+	  some dox, first pass to interface clean ups.
+	* testsuite/libamf.all/Makefile.am: add testsuite/ to the 
+	  include dir, to allow for using our check_equals functions.
+	* testsuite/libamf.all/: test_object.cpp, test_string.cpp,
+	  test_variable.cpp: fixed new[]/delete mismatches.
+
+2007-08-23 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: move BOOST macro detector invocation after
+	  PTHREAD one, as the former requires the latter.
+
+2007-08-23 Deanna Phillips <deanna>
+
+	* macros/pthreads.m4: set pthread flags to -pthread for openbsd.
+	* libbase/rc.cpp: include unistd.h for getuid()
+
+2007-08-23 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libamf/amf.cpp: memcpy -> strncpy, since it does a memory 
+	access violation on Darwin (and porbably other OSes).
+	
+
+2007-08-22 Sandro Santilli <strk@keybit.net>
+
+	* NEWS: add note about the 'debugLog' gnashrc fix and set
+	  release date to Aug 23 (tomorrow).
+	* Makefile.am: distribute autogen.sh.
+
+2007-08-22 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/DrawingApiTestRunner.cpp:
+	  Try another work-around to gcc-4.1.2 bug, commented
+	  this time.
+	* testsuite/actionscript.all/MovieClip.as:
+	  Modify syntax used to test for functions availability
+	  to cope with a bug in Ming < 00040005.
+	  Should fix bug #20867.
+
+2007-08-22 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: bail out if kde gui or kparts plugin are
+	  requested but kde/qt deps are not met. Should fix bug
+	  #20848; bail out if boost_thread is not set to yes.
+	* macros/boost.m4: check for boost/thread.hpp. Should fix
+	  bug #20847.
+
+2007-08-21 Sandro Santilli <strk@keybit.net>
+
+	* libbase/embedVideoDecoderGst.cpp (createDecoder): don't
+	  abort if outputFormat is NONE (renderer missing).
+	  Fixes bug bug #20852.
+
+2007-08-21 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* configure.ac: look for getpwnam
+	* libbase/rc.cpp (expandPath): don't try to use getpwnam
+	  if not provided by OS.
+
+2007-08-21 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_tri.cpp: fix world_to_pixel() so that OpenGL
+	  works again 	
+
+2007-08-20 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* configure.ac: look for the pwd.h header
+	* doc/C/usermanual/usage/gnashrc.xml: add info about tilde expansion.
+	* libbase/rc.{cpp,h}: add support for tilde expansion in debugLog
+	  value.
+
+2007-08-20 Sandro Santilli <strk@keybit.net>
+
+	* libbase/log.{cpp,h}: print an error on stderr of the debug log file
+	  can not be opened for writing. Minor cleanups (including dox).
+
+2007-08-20 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ExecutableCode.h (FunctionCode::markReachableResources):
+	  Don't mark the function twice, and most importantly don't forget
+	  to mark the target character !!
+
+2007-08-20 Asger Ottar Alstrup <asger@area9.dk>
+
+	* testsuite/misc-mtasc.all/: Makefile.am, exception.as:
+	  Test for try/catch (gnash fails).
+
+2007-08-20 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in:
+	  Test 'set debuglog' directive.
+
+2007-08-20 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/log.cpp: fix 'set debuglog' directive.
+
+2007-08-19 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionGetVariables): simplify debugging
+	  output.
+
+2007-08-19 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (CommonGetUrl): backport a copy from
+	  head.
+
+2007-08-19 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* testsuite/libbase/Makefile.am,
+	testsuite/libamf.all/Makefile.am: Added DEJAGNU_CFLAGS.
+
+2007-08-19 Sandro Santilli <strk@keybit.net>
+
+	* server/FreetypeGlyphsProvider.cpp: remove compiler warnings.
+	* doc/C/usermanual/usage/gnashrc.xml: document
+	  flashVersionString variable.
+
+2007-08-19 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* libbase/rc.{cpp,h}: Avoid string copies in inspectors;
+	  add getFlashVersionString (support for
+	  "set flashVersionString Bla bla bla" in gnashrc).
+	* server/vm/VM.cpp (getPlayerVersion): Query RcInit for version
+	  string
+	* testsuite/libbase/: TCXXRc.cpp, gnashrc.in:
+	  Add test for 
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loaders.cpp (define_bits_lossless_2_loader):
+	  ensure bytes, not bits!
+	* server/vm/ASHandlers.cpp (CommonGetUrl): always check
+	  for URL (security). Give precedence to loadVariable
+	  calls even if target is _level#. Fixes load of
+	  uptoten.com.
+	* plugin/plugin.cpp: Use the environmental variable
+	  GNASH_PLUGIN_DESCRIPTION for the plugin description
+	  (when set).
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
+	* server/video_stream_instance.cpp: mark characters created
+	  using new Video as dynamic.
+	* server/character.h (isDynamic): remove bogus assertion
+	  failing for dynamically-loaded movies.
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
+	* server/text.cpp (resolve_font): fix missing return.
+	* server/parser/text_character_def.cpp: fix compiler warnings.
+
+2007-08-18 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* configure.ac: define flash player version macros
+	  for compatibility detectors.
+	* plugin/plugin.cpp: build the flash player version
+	  using provided macros.
+	* server/vm/VM.cpp: buil flash player version using
+	  provided macros.
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.h (ensureType): fix printing of *source* type
+	  name.
+	* macros/firefox.m4: don't substitute GNASHEXE at all, it's not
+	  used anymore.
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
+	* server/text.{cpp,h}: make text_style class store only the font
+	  pointer, w/out the font_id, provide setFont and getFont
+	  methods, the former always performing a lookup.
+	* server/parser/text_character_def.cpp (read): use
+	  text_style::setFont() to set the font this properly updates
+	  the actual font pointer in the text_format, fixing bug #20812.
+	* server/edit_text_character.cpp: use text_style::setFont() to
+	  set font by pointer.
+	* server/parser/: movie_definition.h, movie_def_impl.{h,cpp},
+	  sprite_definition.h: const-correct get_font() method.
+	* server/parser/movie_def_impl.{h,cpp}: const-corrected
+	  in_import_table(), made private and re-activated assertion
+	  checking temporarly removed during to GC layout changes.
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/text_character_def.cpp: use symbolic names for
+	  tag types, more verbose parsing.
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
+	* libbase/jpeg.cpp (jpeg_error_exit): only print SWF errors if
+	  configured to do so; (input_impl): throw an exception if
+	  jpeg_read_header detected errors.
+	* server/swf/tag_loaders.cpp (jpeg_tables_loader,
+	  define_bits_jpeg_loader): early exception checking to avoid
+	  parser interruption on malformed embedded jpeg.
+
+2007-08-18 Felix Eckhofer <felix@tribut.de>
+
+	* plugin/klash/klash_part.cpp: use the -u switch when invoking
+	  the standalone gnash. Fixes youtube playback for konqueror.
+	  Still missing -U and -P switches.
+
+2007-08-18 Sandro Santilli <strk@keybit.net>
+
+	* macros/firefox.m4: drop --with-gnashexe and GNASHEXE macro
+	* plugin/Makefile.am: define GNASHBINDIR based on ${bindir}
+	* plugin/klash/Makefile.am: define GNASHBINDIR based on ${bindir}
+
+2007-08-17 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (setVariables):
+	  Convert variable names to lowercase when needed.
+	* testsuite/misc-ming.all/: Makefile.am, FlashVarsTest.{as,html}:
+	  Test that parameter names are converted to lowercase when target
+	  SWF is < 7.
+
+2007-08-17 Sandro Santilli <strk@keybit.net>
+
+	* NEWS: Better support for flash player detection
+
+2007-08-17 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/vm/VM.cpp (getPlayerVersion): define FLASH_VERSION as
+	  a compatibility version for use by $version or
+	  System.capabilities.version based version detection kits.
+	  (TODO items added for a cleaner handling of this).
+	* plugin/plugin.cpp: define FLASH_VERSION as a compatibility version
+	  for use by javascript-based flash version detection kits.
+
+2007-08-13  Alfred M. Szmidt  <ams@gnu.org>
+
+	* configure.ac: State that a <= 2.4 version of AGG is an error.
+
+2007-08-16 Takashi Iwai <tiwai@suse.de>
+
+	* libbase/network.cpp (Network::createServer): fix a bug making
+	  the test for DEFAULTPROTO == "udp" always fail.
+
+2007-08-15 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_{sdl,gst}.cpp: Removed primitive
+	  sync'ing code since it resulted in bad audio.
+
+2007-08-10 Sandro Santilli <strk@keybit.net>
+
+	* gui/Makefile.am: fix build of sdl/cairo
+	* configure.ac: abort if a requested renderer/gui combination
+	  isn't supported (checked for gtk/kde/sdl/fb/fltk)
+
+2007-08-10 Sandro Santilli <strk@keybit.net>
+
+	* gui/Makefile.am: typo preventing gtk/cairo combination from building
+	* server/FreetypeGlyphsProvider.{cpp,h}: add a destructor getting
+	  rid of the resources associated with a face.
+	* configure.ac: FLTK/OGL isn't supported, while SDL/OGL is !
+
+2007-08-09 David Rorex  <drorex@gmail.com>
+
+	* server/FreetypeGlyphsProvider.cpp: minor change to print the
+	  freetype glyph format in human readable form. patch #6148.
+
+2007-08-10 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ActionExec.{cpp,h}: refactor the check for call stack
+	  depth at end of execution to take depth at *start* of execution
+	  into account.
+
+2007-08-10 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ActionExec.cpp (cleanupAfterRun): don't assume the call
+	  stack should be empty at the end of global code execution. Still
+	  print an error as we need further investigation about it. Fixes
+	  bug #20740.
+
+2007-08-10 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* server/dlist.cpp: revert mask related code, fix bug#20655, which is
+	  a blocker.
+	
+2007-08-10 Alexander Sack <asac@jwsdot.com>
+
+	* backend/Makefile.am, libamf/Makefile.am, libbase/Makefile.am,
+	  libgeometry/Makefile.am, plugin/mozilla-sdk/Makefile.am,
+	  server/Makefile.am: use $pkglibdir for unversioned libs.
+
+2007-08-09 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loaders.cpp (sound_stream_block_loader): don't
+	  discard the first 4 bytes if not reading an MP3. Makes ADPCM
+	  sound better for the feed.swf case (but ADPCM decoder needs
+	  lot more work to be correct)
+
+2007-08-09 Sandro Santilli <strk@keybit.net>
+
+	* server/FreetypeGlyphsProvider.cpp (getGlyph): don't abort if
+	  FT_Load_Char doesn't return an outline glyph, rather print
+	  an UNIMPLEMENTED message and the type of glyph you got.
+	* server/swf/tag_loaders.cpp (ADPCMDecoder::adpcm_expand):
+	  Rather then throwing a ParseException, just print an error
+	  as it's much likely the error is in Gnash parser, rather
+	  then in a malformed SWF, and tests show we do a better
+	  job like that then by stopping the parser.
+	  Also, print an error if the bytesNeeded computation doesn't
+	  match the actual number of bytes read.
+
+2007-08-09 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loaders.cpp: move all ADPCM-related code in an
+	  ADPCMDecoder class.
+	* server/button_character_instance.cpp (construct): properly construct
+	  all button child characters. Fixes bug #20729.
+	* server/swf/tag_loaders.cpp (adpcm_expand): another try at fixing the
+	  needed bytes count for compressed adpcm samples. Also, remove call
+	  to ceil.
+
+2007-08-09 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: set version to 0.8.1
+
+2007-08-09 Sandro Santilli <strk@keybit.net>
+
+	* server/stream.h (ensureBytes): be more verbose about the lack of
+	  data. Fix signed/unsigned comparison.
+	* server/swf/tag_loaders.cpp (adpcm_expand): fix count of needed
+	  bytes. Fixes bug #20725.
+
+2007-08-08 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* plugin/plugin.cpp: replicate compatibility version to the end, to
+	  make UFO flash version detector happy. Fixes bug #20696.
+
+2007-08-08 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp: drop set_variable() methods.
+	  Have setVariables() call set_member directly (might change in the
+	  future to call as_environment's set_variable, if we find out
+	  variables in query string, FlashParams and loadVariable loaded text
+	  files can contain path elements).
+
+2007-08-08 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/LoadVars.as: enabled tests erroneously
+	  committed disabled.
+	* server/sprite_instance.cpp (processCompletedLoadVariableRequests):
+	  use set_member, not set_variable - the latter is only meant to be
+	  called on the root movie.
+	* server/impl.cpp, server/swf/tag_loaders.{cpp,h}: stub parsing
+	  of REFLEX tag.
+	* server/asobj/Mouse.cpp: make the global Mouse symbol point
+	  to an object, not a constructor.
+	* testsuite/actionscript.all/Mouse.as: xcheck -> check.
+
+2007-08-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_{sdl,gst}.cpp: Detect and fix if a soundstream
+	  is out of sync (after position-jump or general out of sync issue),
+	  fixes bug #20681.
+
+2007-08-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Fix counting of samples played,
+	  and use the output samplerate to calculate the playhead position
+	  in time, fixes/improves bug #20684.
+
+2007-08-07 Sandro Santilli <strk@keybit.net>
+
+	* gui/Makefile.am: clean the 'gnash' script on make clean. 
+	* server/sprite_instance.cpp (processCompletedLoadVariableRequest):
+	  fix attempt to increment past-the-end iterator.
+	* libbase/zlib_adaptar.cpp: don't hang on corrupted input.
+	* libbase/jpeg.{cpp,h}: don't segfault on corrupted input.
+	* server/matrix.cpp (read): add TODO item (check input)
+	* server/rect.cpp (read): add TODO item (check input)
+	* server/movie_instance.cpp (advance): warn only once about movie
+	  containing no frames.
+	* server/parser/morph2_character_def.{cpp,h} (read): document,
+	  don't read past end of tag.
+	* server/stream.h (read_variable_count): document and add
+	  integrity checks. Add a GNASH_TRUST_SWF macro to turn ensureBytes
+	  to a no-op.
+	* server/parser/shape_character_def.cpp (read_fill_styles,
+	  read_line_styles, read): don't read past end of tag. Don't try to
+	  recover if an exception is thrown by fill style parser.
+	* server/styles.{cpp,h} (line_style::read): don't read past end of tag.
+	* server/fill_style.{cpp,h} (read): don't read past end of tag.
+	* server/types.{cpp,h} (rgba::read_rgba, rgbe::read): don't read past end
+	  of tag.
+	* server/parser/action_buffer.cpp (read): don't read past end of tag.
+	* Makefile.am: don't list 'doc' twice in subdirs. Fixes 'distclean'
+	  rule.
+
+2007-08-07 Sergio Costas <raster (at) rastersoft.com>
+
+	* backend/sound_handler_gst.cpp: Fix returns from getPosition
+	  (patch #6140), and fix a segfault when asking for position
+	  before sound has been started (patch #6138).
+	* backend/sound_handler_sdl.cpp: Fix returns from getPosition
+	  (patch #6140).
+
+2007-08-06 Sandro Santilli <strk@keybit.net>
+
+	* doc/xmldocs.make: fix uninstall rule to properly remove images
+	  of the manual.
+	* doc/C/Makefile.am, doc/C/asspec/Makefile.am: don't list entities
+	  twice for distribution (fixed make uninstall for the most part,
+	  needs some other tweak for png files)
+	* testsuite/actionscript.all/toString_valueOf.as: fix some
+	  of the tests, disable a test depending on timezone. Please
+	  further tests on Date go to the Date.as file.
+	* server/as_value.{cpp,h}: add a to_int() method taking
+	  care of compatible integer conversion. Add note about
+	  deprecation of templated to_number<>.
+	* server/vm/ASHandlers.cpp: explicitly use to_int() in bitwise
+	  ops. Fixes ops.as testcases built with newer Ming. Add TODO
+	  lines about possible other uses.
+	* testsuite/swfdec/PASSING: bitwise-{5,6,7}.swf now pass.
+
+2007-08-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/ops.as: add test for 0xffffffff
+	  conversion to integer needing to be -1 (gnash fails, need Ming head
+	  to reproduce)
+	* server/video_stream_instance.cpp (markReachableResources): don't
+	  forget to call the character's version of resource marking !!
+	  Fixes bug #20657.
+
+2007-08-06 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/actionscript.all/ops.as: xcheck to check, it passed here.
+	  
+2007-08-05 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/character_def.h: provide a protected copy constructor
+	  resetting the render_cache_manager to NULL in the copy, to avoid
+	  multiple destruction of the same object. Add private and aborting
+	  assignment operator. Fixes bug #20694.
+	* server/parser/shape_character_def.{cpp,h}: implement copy
+	  constructor. Add private and aborting assignment operator.
+	  Deprecate input/output cache methods and data.
+	* server/DynamicShape.cpp: update after deprecation of cache
+	  data for input/output stuff.
+
+2007-08-05 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/VM.h: make gnash buildable with GC unused.
+
+2007-08-05 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/actionscript.all/toString_valueOf.as, Makefile.am: focused tests, 
+	  hopefully helps the model("String" object is not bogus, and "trace" is also sane).
+	
+2007-08-04 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/array.as: fixed testcase.
+
+2007-08-04 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/generic-testrunner.sh: it seems 'read' w/out arg
+	  starts being a problem with some shells.
+
+2007-08-04 Sandro Santilli <strk@keybit.net>
+
+	* gui/gnash.in: add missing she bang.
+
+2007-08-04 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	* server/array.cpp:
+	  Pointers to the as_environment object in the as_value comparison
+	  functors are now references.
+	  Fix a bug caused by a missing return statement in the get_basic_eq
+	  function.
+	* testsuite/actionscript.all/array.as:
+	  UNIQUE -> UNIQUESORT flag.
+	  add some tests to see how AS objects implementing the valueOf method
+	  interact with array class methods.
+
+2007-08-04 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/xmlnode.{cpp,h}: mark reachable resources
+	  (childs and parent).
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Stage.cpp (notifyResize): use PROPNAME()
+	  for proper case of notification event. Finish the dangling
+	  referneces drop thing.
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Stage.{cpp,h}: Mark all listeners as reachable,
+	  drop the unused dropDanglingListeners (since it's verified
+	  the Stage doesn't store *weak* pointers).
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.cpp (getStage): properly convert case when
+	  fetching the "Stage" object from SWF6 or lower.
+	* server/asobj/Stage.cpp (onResize): properly convert case
+	  when fetching the "scaleMode" property from SWF6 or lower.
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Stage.as: test deleting an object
+	  which is also a listener (Gnash segfaults).
+
+2007-08-03 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	* server/array.{cpp,h}: fixes previously identified issues with
+	  array.cpp involving functions that needed to be environment and
+	  SWF-version aware (mainly functions involved in sorting). 
+	* testsuite/actionscript.all/array.as: xcheck->check, few more
+	  tests.
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStream.{cpp,h}: mark associated as_environment
+	  as reachable (but I think there are ownership problem there,
+	  the as_environment might be deleted before the NetStream object
+	  is, in which case we'd access random memory).
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: make sure PKG_CONFIG is defined before calling 
+	  GNAH_PATH_XXX. Made the notice clearer about GNASH_PATH_XX
+	  need to be put after it.
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: move GTK detection code *after* the cross-compiling
+	  section, so that $incllist is properly set. Add notice about
+	  the fact that any GNASH_PATH_XX must be invoked after that one.
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
+	* Makefile.am: only descend in doc/ subdir if DOCBOOK is enabled.
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: check GTK dependencies only if $build_gtk=yes.
+	  print a WARNING and set $build_gtk=no if deps are not met.
+	  All of this is done *before* NSAPI is checked, so it would
+	  correctly be built or not depending on $build_gtk only.
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: fix automatic kparts/nsapi plugin build
+	  based on gui availability.
+
+2007-08-03 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: fix misleading warning about KDE/GTK gui 
+	  not being built while KPARTS/NSAPI plugin is when instead
+	  the guis are actually being built.
+
+2007-08-03 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	* server/array.cpp: fix iterators invalidation (bug #20667).
+
+2007-08-03  Rob Savoye  <rob@deal.welcomehome.org>
+
+	* configure.ac: Fix typo so --disable-nsapi works. Cleanup the
+	logic of what gets built when. Add a few warnings.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* Makefile.am: add plugins info to 'dumpconfig' output,
+	  simplify the SUBDIR construction (side-effect is we always
+	  descend to most subdirs, even if there's nothing to do in them)
+	* plugin/Makefile.am: don't build libgnashplugin if NSAPI
+	  conditional is false; always descend to klash/ subdir
+	  and let the inner Makefile.am handle conditionals for KPARTS.
+	* plugin/klash/Makefile.am: don't override the 'all' target.
+
+2007-08-02  Rob Savoye  <rob@deal.welcomehome.org>
+
+	* plugin/Makefile.am: Use BUILD_KDE_GUI instead of KLASH. Use
+	NSAPI instead of PLUGIN, KPARTS instead of KLASH.
+	* Makefile.am: Change from PLUGIN to NSAPI and KPARTS for conditionals. 
+	* configure.ac: Change --disable-klash to --disable-kparts, add
+	--disable-nsapi to replace the older --disable-plugin
+	setting. Make building the plugins conditional on the gui being
+	selected and if the development libraries exist.
+	* gui/Makefile.am: Comment out the dyna,ic vs static support, it's
+	uneeded for now.
+	* macros/firefox.m4: Use nsapi instead of plugin as the
+	conditional.
+	* macros/kde.m4: set has_kde to yes by default. It can get
+	disabled later.
+	* plugin/klash/Makefile.am: Use KPARTS instead of KLASH.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/gen-asclass.sh: add the addStatic call to statics.
+	* server/movie_root.{cpp,h}: use a member (and a getter) for the global
+	  key object, and properly mark it as alive.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp: register statics.
+	* server/sprite_instance.cpp: register statics.
+	* server/video_stream_instance.cpp: register statics.
+	* server/array.cpp: register static constructor and prototype,
+	  since arrays are used by the core independentely of their
+	  availability as global classes (function arguments are arrays).
+	* server/as_function.cpp: register static constructor and prototype,
+	  since functions are used by the core independently of their
+	  availability as global classes (each function uses the Function
+	  prototype).
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/ops.as: more tests for 'string' == NaN.
+	* server/as_value.cpp (equals): yet another pass at
+	  abstract equality operator. We're still not there, but
+	  getting closer.
+	* testsuite/actionscript.all/ops.as: xcheck -> check.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/: Function.as, ops.as:
+	  Moved tests for equality operator against MovieClip where
+	  it belongs.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClip.as: test MovieClip.valueOf().
+	* server/as_value.{cpp,h}: as_environment parameter made mandatory
+	  for the equals() method.
+	* server/vm/ASHandlers.cpp (ActionEquals): update calls to
+	  as_value::equals().
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/array.as: add test for Array.valueOf().
+	* server/as_value.cpp (equals) : fix true==1 and true!=2
+	  (was failing).
+	* server/vm/ASHandlers.cpp: shift right/left : take undefined
+	  values as zeroes.
+	* testsuite/actionscript.all/ops.as: minor additions, xcheck to
+	  check.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* server/PropertyList.cpp: add compile-time macro for debugging
+	  property allocations.
+
+2007-08-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gtk_glue_agg.cpp: Warn when compiling for OLPC, change compile-time
+	  error to runtime error to be multi-GUI friendly.
+
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetConnection.h: remove the unused _owner method.
+
+2007-08-02 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/actionscript.all/ops.as: more tests, checks to xchecks.
+	  
+2007-08-02 Sandro Santilli <strk@keybit.net>
+
+	* gui/Makefile.am: comment out the _DEPENDENCIES lines. Properly
+	  rebuilds the binaries when needed (might be breaking another kind
+	  of dependency, but this one was pretty disturbing for me in that
+	  it didn't trigger rebuil when _LIBS changed)
+	* server/asobj/MovieClipLoader.cpp: implement reachable resources
+	  marker (listeners).
+	* server/movie_root.cpp: set background to white by default.
+	  Should fix bug #20655.
+
+2007-08-02 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/actionscript.all/ops.as: more tests and more failures. still
+	  need more, we don't want fail on those basic logical operations.
+	  
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loaders.cpp (define_sound_loader): fix a bug
+	  introduced by last commit (sorry)
+
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loaders.cpp: completely remove the bogus assertion
+	  about the required input bytes in relation to the number of samples.
+	  Rather, add more ensureBytes() uses, closer to where the data is
+	  actually read from the stream.
+
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loaders.cpp (sound_expand): fix assertion
+	  checking; added some uses of the new stream::ensureBytes() method;
+	  add more scoped_array uses.
+
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
+	* server/stream.h: add ensureBytes() method to verify
+	  SWF integrity.
+
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loaders.cpp: (define_sound_loader) check if number of
+	  samples exceed available bytes in the tag. (sound_expand) assertion
+	  checking. (u8_expand) use a scoped_array in the easy case (we'll
+	  need more smart pointers in general).
+	* backend/sound_handler.h (create_sound, fill_stream_data): document ownership
+	  of the 'data' argument, and add a TODO item about changing
+	  the interface.
+
+2007-08-01 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gtk_glue_agg.cpp: Support the OLPC again
+
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/: Boolean.cpp, Number.cpp, string.cpp:
+	  register static constructors and prototypes with the VM.
+	* server/vm/VM.{cpp,h}: Add support for registering
+	  arbitrary as_object for reachability. Intended to
+	  be used whenever a static as_object pointer is allocated.
+
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
+	* gui/gnash.in: don't loose parameters layout. Fixes bug #20651.
+	* gui/Makefile.am: distribute gnash.in
+
+2007-08-01 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gtk_glue_agg.{cpp,h}: stubbed pixel format detection. Will
+	  break OLPC support but fix bug #20649 for all others.
+
+2007-08-01 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_gst.{h,cpp}: Switch to try_mutex, and in 
+	  callback_handoff only try to lock, and return if unsuccesfull
+	  to avoid a potential deadlock, fixes bug #20596. Warning fixes.
+
+2007-08-01 Sandro Santilli <strk@keybit.net>
+
+	* plugin/plugin.cpp: run 'gtk-gnash' by default.
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac, gui/Makefile.am: comment out --enable-dynamic-gui
+	  and related conditionals use.
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/array.as: more tests for Array.sort()
+	  and Array.sortOn(). These tests are mainly to explore the behavior
+	  of sorting arrays of objects that override the toString() method and
+	  sortOn using properties specified by such objects. 
+	  Tests provided by Ivor Blockley and cleaned up/fixed by me.
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
+	* plugin/klash/klash_part.cpp: run 'kde-gnash' by default
+	  (not 'klash')
+	* gui/gnash.in: don't pass -G over to the actual executable;
+	  translate gui name to lowercase.
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
+	* gui/: Makefile.am, gnash.in:
+	  Initial draft of a 'gnash' wrapper.
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: rename GUI_CONFIG to SUPPORTED_GUIS to
+	  avoid confusion with the define later set by gui/Makefile.am
+	* gui/Makefile.am: build an executable for each supported
+	  GUI, named <gui>-gnash
+	* gui/Player.{cpp,h}: drop runtime parsing of gui name, just
+	  use whatever gui is specified by the GUI_CONFIG macro set
+	  by the Makefile.
+	* gui/gnash.cpp: drop runtime GUI selection  (and -G switch).
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/ming_utils.c: add word wrapping
+	  to the xtrace window.
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
+	* doc/C/usermanual/installation/feature_configuration.xml:
+	  Document --enable-mit-shm
+	* configure.ac: add --enable-mit-shm
+	* gui/gtk_glue_agg.h: don't redefine ENABLE_MIT_SHM, use definition
+	  from config.h
+
+2007-07-31 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gtk_glue_agg.h: disable MIT-SHM by default (see bug #20301)
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionBitwiseAnd):
+	  take nan operands as zero.
+	* testsuite/actionscript.all/: Makefile.am, ops.as:
+	  new testcase for primitive operations (to complete)
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionBitwiseXor, ActionBitwiseOr): 
+	  take nan operands as zero.
+	* testsuite/actionscript.all/array.as: expect less failures.
+
+2007-07-31 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-ming.all/place_object_test2.c, Makefile.am
+	  activate the testcase, fix setting the ratio value(0~1.0 in Ming).
+	  
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/array.as: expect a failure
+	  in the case-insensitive descending sort tested for SWF>6
+
+2007-07-31 Sandro Santilli <strk@keybit.net>
+
+	* server/array.cpp (join): use the SWF-version aware version
+	  of as_value to string conversion. Add TODO items.
+	* testsuite/actionscript.all/array.as: don't expect a failure
+	  in the descending numeric sort
+
+2007-07-31 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-ming.all/duplicate_movie_clip_test.c, place_object_test.c,
+	  place_object_test2.c: trivial comments cleanups.
+	  
+2007-07-30 Sandro Santilli <strk@keybit.net>
+
+	* libamf/Makefile.am: add BOOST libs
+	* testsuite/samples/Makefile.am: link in
+	  libgnashserver.la, libgnashbase.la and
+	  libgnashamf.la.
+
+2007-07-29 Sandro Santilli <strk@keybit.net>
+
+	* backend/render_handler_tri.cpp: implemented world_to_pixel and
+	  pixel_to_world (to check, UdoG, can you ?)
+	* gui/gtksup.h: remove any use of RENDERER_XXY defines, use 
+	  the GtkGlue interface only (keep by auto_ptr)
+	* gui/gtk_glue.h: header guard (no code was including this :/)
+	* gui/gtk.cpp: updated use of the glue, remove as much as possible
+	  uses of RENDERER_XXY, the only left are for glue initialization
+	  (headers and constructions) and for the call to prepDrawingArea
+	  which needs to be ordered differently for OGL and for other
+	  renderers.
+
+2007-07-29 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: Change --enable-renderer to accept a *single* renderer
+	  as the gui code / build scripts are not ready to handle multiple ones
+	  currently (temp hack for 0.8.1). By default, renderer is AGG now.
+
+2007-07-29 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/SoundGst.cpp (getPosition): fix typo (len=>pos).
+	* server/parser/edit_text_character_def.h: use device fonts
+	  by default (matches the comment near it, was just a typo).
+	  Fixes dynamic textfields using device fonts.
+	* testsuite/actionscript.all/TextField.as: expect one failure
+	  less.
+
+2007-07-30 Sergio Costas <raster (at) rastersoft.com>
+
+	* backend/sound_handler_gst.cpp: Use the audioconverter element
+	  to get the current position, to avoid delay.
+	* server/asobj/SoundGst.cpp: Fixed some faulty conversions to
+	  milliseconds.
+
+2007-07-30 Alexander Sack <asac@jwsdot.com>
+
+	* server/asobj/NetStreamGst.cpp: Fix plugin loading
+	  for non-modern Gstreamer versions.
+
+2007-07-30 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* gui/Info.plist.in: Tidy up the version info, fixed icon.
+	* gui/Makefile.am: Build OS X bundle if GUI == AQUA.
+	* gui/aqua.cpp: Implemented OS-version checking and setCursor.
+	  Added 'About' and 'Preferences...' menus.
+
+2007-07-29  Rob Savoye  <rob@deal.welcomehome.org>
+
+	* macros/firefox.m4: Always install the plugin in ~/.mozilla/plugins.
+
+2007-07-29 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: drop add_gui variable again, use another way to
+	  handle a missing --enable-gui.
+
+2007-07-29 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: don't force KDE gui everytime plugin is disabled (sic).
+
+2007-07-29 Nick Warne <nick@ukfsn.org>
+
+	* configure.ac: don't rely on has_kde *before* it is attempted to be
+	  set.
+
+2007-07-29 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	* server/array.{cpp,h}: implement remaining array.sort(..) functionality
+	  (flags UNIQUE and RETURNINDEXEDARRAY) all of array.sortOn(...)
+	* testsuite/actionscript.all/array.as: test for Array.sort and
+	  Array.sortOn
+
+2007-07-29 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	* server/array.cpp: Fix bug in the array.splice(index) method to
+	  prevent an incorrect number of elements being spliced; fix bug
+	  in the array.slice(startindex, endindex) method for certain
+	  negative endindexes; elements in a newly created array with
+	  non-zero size are now assigned a value of 'undefined' rather
+	  than 'null'; trivial optimizations/clean-ups.
+	* testsuite/actionscript.all/array.as: more tests.
+
+2007-07-28  Rob Savoye  <rob@deal.welcomehome.org>
+
+	* macros/ffmpeg.m4: Add test for libswscale, which is needed if
+	ffmpeg is configured with --enable-gpl --enable-swscale. bug #20002.
+
+2007-07-28 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: re-introduce the $add_gui variable, so that a vanilla
+	  configuration still tries to build gtk and kde guis; don't make fb
+	  renderer and cairo gui incompatible (other guis might be requested,
+	  we'd need a better test to check that at least one compatible with
+	  cairo is there)
+
+2007-07-28 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: don't miss to set add_renderer when no
+	  --enable-renderer is given, and only abort complaining if NO
+	  GUI supporting opengl is built while also requesting to build opengl
+	  renderer.
+
+2007-07-28 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: proper quote args given to test (in the code
+	  snippet handling --enable-gui)
+
+2007-07-28 Sandro Santilli <strk@keybit.net>
+
+	* po/Makefile.am: use GMSGFMT, rather then verbatim 'msgfmt'.
+	* configure.ac: simplify gui selection code, fix bug listing
+	  same gui twice.
+	* gui/gui_fb.cpp: typo fix (FbGui => FBGui).
+	* testsuite/misc-mtasc.all/Makefile.am: distribute
+	  mtasc related files even if mtasc is not detected.
+
+2007-07-28 Markus Gothe <nietzsche@lysator.liu.se>
+	
+	* configure.ac: Don't try building KDE/Klash if we'vent got the libs...
+	* gui/aqua*, gui/Info.pist, gui/images/GnashG.icns, gui/Makefile.am: 
+	  Now we can build a bundle by running 'make bundle', albeit I must
+	  fix the linkage.
+
+2007-07-27 Nick Warne <nick@ukfsn.org>
+
+	* plugin/klash/klash_part.cpp: typo (0l => 0L)
+
+2007-07-27 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler.h, backend/sound_handler_gst.{cpp,h},
+	backend/sound_handler_sdl.{cpp,h}, server/asobj/SoundFfmpeg.{h,cpp},
+	server/asobj/SoundGst.{h,cpp}, server/asobj/SoundMad.{h,cpp}:
+	Implement duration and position properties when using Sound objects
+	to control an eventsound, patch partly by Sergio Costas.
+	* server/swf/tag_loaders.cpp: Fix warnings.
+
+2007-07-27 Sandro Santilli <strk@keybit.net>
+
+	* gui/Makefile.am: distribute kde_glue_opengl.h.
+
+2007-07-27 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* gui/DESIGN: Added some docmentation on the GUI-API.
+	* gui/Player.cpp: define DEAFULT_GUI as a string instead of enum.
+
+2007-07-26 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: Don't threat static linking specially, multiple
+	  GUIs can still be supported by that.
+
+2007-07-26 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: don't assume that if GTK gui is used only the
+	  GTK-pixelformat is needed (other GUIs might be built).
+	  Fixes bug #20586.
+	* gui/Player.{cpp,h}: Be more verbose on gui initialization error.
+	* gui/kde.cpp (createWindow): return false if renderer creation
+	  failed.
+	* gui/kde_glue_agg.cpp (createRenderHandler): throw an exception if
+	  render handler could not be created.
+	
+2007-07-26 Sandro Santilli <strk@keybit.net>
+
+	* gui/gnash.cpp: scan argv[0] and select KDE gui if it contains
+	  the string 'klash'.
+	* Makefile.am, configure.ac, gui/Makefile.am:
+	  Don't miss to list 'kde' as a gui when built as a side-effect
+	  of enabling klash: fixes proper report of which GUI have been
+	  compiled-in; Take first gui given to --enable-gui as the default
+	  one.
+	* gui/Player.cpp: don't force a default gui, take the one defined
+	  by build line (or default to nullGui).
+	* gui/gnash.cpp: print default gui from --version.
+
+2007-07-26 Alexander Sack <asac@jwsdot.com>
+
+	* server/asobj/NetStreamGst.cpp: Don't use a variable before it 
+	  has been initialized.
+
+2007-07-25 Sandro Santilli <strk@keybit.net>
+
+	* gui/Makefile.am: build libgnashplayer again,
+	  linked against libgnashgui, which is linked
+	  against any gui/renderer specific lib that was
+	  built
+	* gui/Player.{cpp,h}: use named constructors to create
+	  guis, so to avoid the need of including GUI-specific
+	  headers (which do conflict).
+	* gui/gui.h: make constructors protected, provide named
+	  (free functions) constructors for the different guis.
+	* gui/: gui_aqua.cpp, gui_fb.cpp, gui_fltk.cpp, gui_gtk.cpp,
+	  gui_kde.cpp, gui_riscos.cpp, gui_sdl.cpp: modules implementing
+	  the GUI named constructors.
+
+2007-07-25 Sandro Santilli <strk@keybit.net>
+
+	* gui/Player.{cpp,h}: add support for multiple GUI libs.
+	  They can be statically or dynamically linked (not loaded as plugins
+	  yet).
+	* gui/gnash.cpp: add a -G switch to select GUI. If the gui wasn't
+	  compiled in an exception will be thrown (and dunno why not propery
+	  cought..).
+
+2007-07-25 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: set the BUILD_<gui> conditionals *after* giving kde
+	  gui a chance to be picked back as a dependency of 'klash'.
+	  This fixes a buil bug when klash is enabled by only gtk gui is
+	  selected.
+	* lots of files : fixed Copyright info (delete spurious empty line,
+	  add year 2007).
+
+2007-07-25 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.h: remove unneeded "container.h" include.
+	* server/as_value.cpp (equalsSameType): fixed nan comparison.
+	* testsuite/actionscript.all/Number.as: fixed NaN != NaN test
+	  (should return false). Add NaN == NaN test (should return true);
+	  Add (0/2) == (0/5) (shoudl return true).
+
+2007-07-25 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.cpp: drop lowercase_if_needed, substitute with
+	  the PROPNAME macro.
+	* server/as_value.h: add a PROPNAME macro to perform the lowercase
+	  conversion of property names when needed (copies arg)
+	* server/as_environment.h: added some notes about variable name
+	  case conversion.
+	* server/edit_text_character.cpp: removed unused lowercase_if_needed
+	  function.
+	* gui/Makefile.am: build klash when conditinally enabled
+	* gui/gnash.cpp: add missing newline after Gstreamer version
+	  (--version).
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClip.as: minor test for
+	  proper properties 'loadMovie' and 'loadMovieNum'.
+	* server/edit_text_character.cpp: make the
+	  PP_COMPATIBLE_DEVICE_FONT_HANDLING back to undefined
+	  by default. It's incomplete and premature to attempt
+	  limitation-level compatibility.
+	* configure.ac: don't take absence of libAGG as if an
+	  old version was found. Fixes bug #20011.
+
+2007-07-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/parser/video_stream_def.cpp: Free the video frames
+	  when deleting the video_stream_def object. Make the buffer
+	  containing the video data 4 bytes bigger than needed to avoid
+	  illegal reads from ffmpeg. Fixes bug #20440.
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
+	* Makefile.am: define PHONY rules.
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp: add a
+	  PP_COMPATIBLE_DEVICE_FONT_HANDLING macro to mimic
+	  limitation of proprietary player in handling textfields
+	  using device fonts. See DeviceFonts wiki page for more
+	  information. (The macro defaults to being defined)
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/SoundFfmpeg.h: Provide a constructor
+	  for proper initialization of members.
+	  YOU CAN NOT ASSUME POINTERS WILL BE INITIALIZED TO NULL.
+	  Fixes bug #20578.
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
+	* server/text.cpp (display_glyph_records): don't render invalid glyphs
+	  as empty boxes, unless a DRAW_INVALID_GLYPHS_AS_EMPTY_BOXES macro
+	  is defined.
+	* server/edit_text_character.cpp (setEmbedFonts):
+	  Set _embedFonts *before* calling format_text, or
+	  glyph indexes will be messed up.
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
+	* server/font.{cpp,h}: Refactor class definition
+	  to maintain two separate glyph information sets:
+	  one for device and one for embedded glyphs. Added
+	  a parameter to glyph-related accessors and mutators
+	  to specify which set to use.
+	* server/edit_text_character.{cpp,h}: update gnash::font
+	  services call to select embedded or device fonts.
+	* server/fontlib.cpp: updated calls to gnash::font so
+	  to always use embedded ones (mostly caching stuff, which
+	  is currently disabled)
+	* server/text.{cpp,h}: add a boolean parameter to
+	  display_glyph_records to specify wheter to use embedded
+	  or device glyphs when fetching them from the font.
+	* server/parser/text_character_def.cpp: use embedded glyphs.
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/edit_text_character_def.h:
+	  initialize m_use_outlines to true (so dynamically-created
+	  textfields will use device fonts by default), provide
+	  a getUseEmbeddedGlyphs() public method.
+	* server/edit_text_character.{cpp,h}: add an _embedFonts member
+	  initialized using edit_text_character_def::getUseEmbeddedGlyphs(),
+	  provide the "embedFonts" getter-setter for it.
+	* testsuite/: actionscript.all/TextField.as,
+	  misc-ming.all/DefineEditTextTest.c: less failures.
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/: DefineEditTextTest.c,
+	  DefineEditTextTest-Runner.cpp: a small additional
+	  test for runtime-changing the .embedFont member of a TextField.
+	* testsuite/actionscript.all/TextField.as: more tests
+	  for embedFont member.
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
+	* server/font.cpp: more parser verbosity.
+	* server/movie_root.cpp (notify_global_key): Key object
+	  existed since SWF5, not SWF6. Fixes pacman-flash.swf.
+	* server/gnash.h: fix PGDN and PGUP key constants
+	* server/asobj/Global.cpp: initialize the "Key" class
+	  even in SWF5.
+	* server/asobj/Key.cpp: use init_member rather then set_member
+	  when initializing constants, reduce complexity of compile-time
+	  switches for NEW_KEY_LISTENER_LIST_DESIGN, general cleanups.
+	* testsuite/actionscript.all/: Makefile.am, Key.as: new testcase
+	  for Key object
+
+2007-07-24 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/dlist.cpp: handle masks of certain malformed(?) movies correctly
+	  (see bug #20527)	
+
+2007-07-24 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/: case.as, enumerate.as: add rcsid.
+	* server/as_object.{cpp,h}: Add a virtual enumerateNonProperties,
+	  called by enumerateProperties, to allow for enumeration of non-proper
+	  properties (in particular sprite childs).
+	* server/sprite_instance.{cpp,h}: Implement enumerateNonProperties to
+	  enumerate child characters.
+	* testsuite/actionscript.all/enumerate.as: don't expect failures while
+	  enumerating childs.
+
+2007-07-24 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/parser/video_stream_def.cpp: Convert width and height to
+	  the correct format before using them. Fixes bug #20526 and #20440.
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
+	* backend/: sound_handler_gst.{cpp,h},
+	  sound_handler_sdl.{cpp,h}:
+	  Define sound handlers inside the gnash namespace.
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
+	* plugin/klash/Makefile.am: fix uninstall rule.
+	  Make distcheck works fine on gnashdev now.
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
+	* libbase/embedVideoDecoderGst.cpp (createDecoder): fix use of
+	  possibly undefined variable warning, added a couple of assertions
+	  and comments about the why.
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
+	* backend/: sound_handler.{cpp,h}, Makefile.am,
+	  sound_handler_gst.cpp, sound_handler_sdl.cpp,
+	  libbase/: utility.{cpp,h}, server/asobj/SoundMad.cpp:
+	  Moved convert_raw_data from libgnashbackend
+	  to libgnashbase. Should fix bug #20110.
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: still create Makefile under cygnal
+	  subdirs, or 'dist' rule will fail.
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: make sure $add_renderer contain
+	  well-defined values (not arbitrary ones). This is
+	  to make sure RENDERER_LIBS is always meaningful.
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
+	* plugin/klash/Makefile.am: define GNASHBINDIR.
+        * configure.ac: don't define RENDERER_AGG *before* the build_agg
+	  variable it is based on has a chance to change value.
+	  Fixes bug #20563
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: Fix help strings: --with-{gui,renderer} => --enable-{gui,renderer}
+	* plugin/klash/klash_part.cpp: invoke "klash", not "gnash".
+	  Allow KLASH_PLAYER environment variable to change what's
+	  invoked. The plan is that "klash" would be an alias for
+	  "gnash --gui=kde".
+
+2007-07-23 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/edit_text_character.cpp: make get_world_cxform() again
+	  Windows-compatible (relevant code is still disabled, so no
+	  visible difference until we have finished discussing this)
+
+2007-07-23 Sandro Santilli <strk@keybit.net>
+
+	* gui/Makefile.am, testsuite/misc-mtasc.all/Makefile.am:
+	  Fix 'dist' rule.
+	* testsuite/misc-ming.all/: DefineEditTextTest-Runner.cpp,
+	  Makefile.am: skeleton for a MovieTester based runner.
+	* testsuite/misc-ming.all/DefineEditTextTest.c: fixed expected
+	  results.
+	* autogen.sh: libtoolize is in the 'libtool' package.
+	* plugin/plugin.h: remove unneeded include.
+
+2007-07-22 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp: (get_world_cxform):
+	  return the identity transform in the (disabled) 
+	  "device font" section.
+
+2007-07-22 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* testsuite/samples/input-fields.swf: sample movie
+	  for textfields.
+
+2007-07-22 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.{cpp,h} (setTextColor): 
+	  update text glyph records color.
+
+2007-07-21 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/TextField.as: update expected
+	  results for 'textColor' member.
+	* server/types.h (rgba::toRGB): const-corrected.
+	* server/edit_text_character.{cpp,h}: Add a member for text color,
+	  make 'textColor' a proper property.
+
+2007-07-21 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* gui/Makefile.am: Added BUILD_GUI_AQUA.
+
+2007-07-20 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/edit_text_character.cpp: fix background and cxform for
+	  text fields
+	* server/edit_text_character.{h,cpp}: special get_world_cxform() 
+	  handler to make input fields opaque for device fonts (currently
+    no effect, since it can't be detected yet)
+
+2007-07-20 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp (display): make the default
+	  background color solid white (but still background is only drawn
+	  if either 'background' or 'border' are set to true).
+	* testsuite/misc-ming.all/DefineEditTextTest.c: don't include gnash
+	  headers from SWF *generators* !
+	* configure.ac: provide a RENDERER_LIBS listing all built renderer
+	  libraries
+	* testsuite/Makefile.am: link libgnashtestsuite against all built 
+	  renderer libraries.
+
+2007-07-20 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: rename the gui/renderer selection switch
+	  back to --enable-{gui,renderer} so we don't need to update
+	  our existing configuration wrapper scripts; dynamic loading
+	  of gui/renderer is disabled by default, so advertise the switch
+	  to enable.
+
+2007-07-20 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-ming.all/unload_movieclip_test1.c: comments
+	* testsuite/misc-ming.all/DefineEditTextTest.c: removed some incorrect
+	  tests.
+	  
+2007-07-19  Rob Savoye  <rob@deal.welcomehome.org>
+
+	* gui/Makefile.am: Use *_CONFIG variables instead of *_OPT
+	ones. Use BUILD_* conditionals instead of USE_GUI.
+	* backend/Makefile.am: Build seperate libraries for each backend.
+	* configure.ac: Don't pass the data to AM_INIT_AUTOMAKE. Don't
+	disable static libs. Add option for dynamically loading
+	guis. (disabled by default for now). Don't build cygnal by
+	default. Remove --enable-gui and --enable-renderer with new
+	options, --with-gui and --with-renderer to list multiple options
+	for guis and renderers. Don't configure cygnal sub directories yet.
+	* Makefile.am: Use *_CONFIG variables instead of *_OPT ones.
+	* extensions/Makefile.am: Use BUILD_* conditionals instead of
+	USE_GUI.
+	* libbase/Makefile.am: Use HAVE_SDL instead of HAS_SDL.
+	* macros/gtkglext.m4: Use --libs-only-l insted of --libs.
+	* testsuite/misc-ming.all/DefineEditTextTest.c: Include fontlib.h.
+	* macros/libltdl.m4: Move the serial numbers to the top to keep
+	automate 1.19 happy.  
+	* macros/x11.m4: Don't put a conditional in an if block.
+
+2007-07-15  Rob Savoye  <rob@deal.welcomehome.org>
+
+	* po/Makefile.am: Add -Wno-portability to AUTOMAKE_OPTIONS to
+	stop complaints we don't care about. 
+	* gui/Makefile.am: Add -Wno-portability to AUTOMAKE_OPTIONS to
+	stop complaints we don't care about. 
+	* testsuite/misc-ming.all/Makefile.am: Add -Wno-portability to
+	AUTOMAKE_OPTIONS to stop complaints we don't care about.
+	* testsuite/misc-swfmill.all/Makefile.am: Add -Wno-portability to
+	AUTOMAKE_OPTIONS to stop complaints we don't care about.
+	* testsuite/swfdec/Makefile.am: Add -Wno-portability to
+	AUTOMAKE_OPTIONS to stop complaints we don't care about.
+
+2007-07-14  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Add new Cygnal directories.
+
+2007-07-19 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/TextField.as: more successes.
+	* server/edit_text_character.cpp (attachTextFieldInterface): 
+	  fix a bug swapping .border and .borderColor semantic (!).
+	* configure.ac: test(1) string equality operator is "=",
+	  not "==". Other attempt at fixing bug #20525.
+
+2007-07-18 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: quote `backticked commands` when assigning to
+	  variables. Should fix bug #20525.
+
+2007-07-18 Sandro Santilli <strk@keybit.net>
+
+	* backend/render_handler_agg_style.h: fixed initialization order
+	  warnings.
+	* backend/render_handler_agg.cpp: signedness and initialization list
+	  order warnings fix. This code is a jungle, would be *really* useful
+	  to split class declarations and definition.
+
+2007-07-18 Sandro Santilli <strk@keybit.net>
+
+	* server/impl.cpp (clear): don't attempt to cleanup the
+	  GC if no GC is being used.
+	* cygnal/Makefile.am : Don't build the cygnal stuff,
+	  it's alpha after all... But still include in distribution.
+
+2007-07-18 Sandro Santilli <strk@keybit.net>
+
+	* cygnal/ACT/ACT.{cpp,hpp}: throw runtime_error if in need for a
+	  message string (std::exception ctor doesn't accept a string arg)
+	* cygnal/ACT/Handle.hpp: fix *a few* build errors, more available.
+	* cygnal/Makefile.am: Add all subdirs to SUBDIRS. Fixes bug #20509.
+
+2007-07-18 Sandro Santilli <strk@keybit.net>
+
+	* gui/gtksup.h: Fix extra qualification 'gnash::GtkGui::' on member 'rerenderPixels'
+
+2007-07-18 Udo Giacomozzi <udo.gnu@nova-sys.net>
+	
+	* gui/gtk.cpp: Make the drawing area resize also vertically with the window,
+	  fixes bug #18871
+	* backend/render_handler.h, backend/render_handler_agg.cpp, 
+	  backend/render_handler_tri.{cpp,h}: new methods "pixel_to_world"
+	* gui/gtk.cpp, gui/gtksup.h: Fix re-rendering on expose for scaled movies
+
+2007-07-18 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-ming.all/unload_movieclip_test1.c, DefineEditTextTest.c:
+	  more tests.
+	  
+2007-07-18 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-ming.all/Makefile.am, unload_movieclip_test1.c: add
+	  a testcase for unloaded movieclips, Gnash fails.
+	
+2007-07-18 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/TextField.as: Updated test results.
+	* testsuite/misc-ming.all/DefineEditTextTest.c: Updated test results.
+	* server/types.h: Add rgba::toRGB for serializing back to a number.
+	* server/edit_text_character.{cpp,h}: use instance members and
+	  getter-setters to keep info about background and border.
+	  This should fix invalidated bounds computation.
+
+2007-07-18 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/DefineEditTextTest.c: xchecks to checks, more
+	  passed.
+	
+2007-07-17 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.{cpp,h}: Initial support for background,
+	  backgroundColor, border and borderColor. Lacks proper management
+	  of invalidated bounds and class properties. 
+	* server/types.h: Add rgba::parseRGB() for converting an integer
+	  to an rgb value.
+	* server/as_object.h: fix comments about case sensitiveness of
+	  get_member* and set_member*.
+	* gui/Makefile.am: add gtk_cairo_create.h in GTK_CAIRO_SRCS.
+
+2007-07-18 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* macros/opengl.m4: Typo fix on Darwin.
+
+2007-07-17 Nick Warne <nickw>
+
+	* backend/sound_handler_sdl.h, libbase/embedVideoDecoderFfmpeg.{cpp,h},
+	  server/asobj/{Sound, Netstream}Ffmpeg.h, gui/gnash.cpp: Fix for
+	 linking.
+
+2007-07-17 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/actionscript.all/MovieClip.as: more tests, all passed.
+	  
+2007-07-17 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/key_event_test5.c: make tests not dependent
+	  on the time of a key press, better self-contained.
+	* testsuite/actionscript.all/MovieClip.as: fix unsafe floating number
+	  comparison, better self-contained.
+	
+2007-07-17 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/asobj/Key.h, server/asobj/Key.cpp, 
+	  server/button_character_instance.cpp
+	  server/edit_text_character.cpp, server/movie_root.h, 
+	  sever/movie_root.cpp, server/sprite_instance.cpp: key listener
+	  handling cleanups, for better management of key listeners. change
+	  key listeners container from std::vector to std::set. Correct indent.
+	
+2007-07-14  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* configure.ac: Add new Cygnal directories.
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (sprite_droptarget_getset): 
+	  Always return a string.
+	* testsuite/actionscript.all/MovieClip.as: fixed expected results.
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (sprite_create_text_field): when
+	  targetting SWF8, return the newly created TextField.
+	* testsuite/actionscript.all/MovieClip.as: more successes.
+	* testsuite/actionscript.all/TextField.as: more successes; other fixes
+	  to expected results.
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClip.as: add notes about where we
+	  have been reported differences between proprietary player versions; 
+	  fix check for return code of createTextField for SWF8.
+	* testsuite/actionscript.all/TextField.as:
+	  fix check for return code of createTextField for SWF8;
+	  fix expected failures.
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/CustomActions.as: add a note about why
+	  no tests are run.
+	* server/asobj/Mouse.cpp: fix case of addListener and removeListener
+	  methods, add TODO for fixing all.
+	* testsuite/actionscript.all/Mouse.as: fix the test (case issue, and
+	  poor comparisons).
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/TextField.as: an hopefully complete
+	  testcase for the TextField class. Reveals a pattern in the
+	  TextField.prototype properties being created on first call to 
+	  createTextField() which looks interesting. Gnash fails about
+	  half of the over 250 tests.
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
+	* backend/render_handler.h, backend/render_handler_agg.cpp,
+	  backend/render_handler_cairo.cpp,
+	  backend/render_handler_ogl.cpp, backend/render_handler_tri.cpp,
+	  backend/render_handler_tri.h, server/fontlib.cpp,
+	  server/fontlib.h, server/render.cpp, server/render.h:
+	  Updated renderer interface to always take gnash::rgba by const ref
+	  rather then by value. Should improve performance (removes double
+	  copy of 4 float values for each glyph, bitmap, line strip!).
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/TextField.as:
+	  Add test for TextField.prototype.hasOwnProperty('background')
+	  returning false (weird, returns true in
+	  misc.ming-all/DefineEditTestTest.c!)
+	* testsuite/misc-ming.all/DefineEditTextTest.c:
+	  Add test for TextField.prototype.hasOwnProperty('background')
+	  returning true (weird, returns false in actionscript.all/TextField.as!)
+
+2007-07-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Microphone.as: test cleanup
+	  (see bug #20472).
+	* testsuite/misc-ming.all/Makefile.am: Fix linking
+	  for DefineEditTextTest, add rule to build the corresponding
+	  SWF file.
+
+2007-07-13 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/DefineEditTextTest.c: more tests.
+	  	  
+2007-07-13 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/DefineEditTextTest.c:
+	  include dejagnuclip, make it to be a self-contained one.
+	  
+2007-07-12 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	Applied patch #6081
+	* server/array.{cpp,h}: fix user-defined comparator for sort()
+	  operation. There's a minor failure with definition of 'this'
+	  inside the comparator.
+	* testsuite/actionscript.all/array.as: add test for sort based
+	  on custom function.
+
+2007-07-12 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/libbase/Makefile.am: gnash libs must be in LDADD, not
+	  AM_LDFLAGS, for dependencies to work fine.
+	* server/font.cpp (get_advance): fix passing non-POD type to
+	  printf-like function.
+	* libbase/rc.{cpp,h}: make the constructor and destructor private.
+	* testsuite/libbase/TCXXRc.cpp: use the default instance.
+
+2007-07-12 David Rorex <drorex@gmail.com>
+
+	* testsuite/misc-mtasc.all/: Dejagnu.as, Makefile.am,
+	  README, TestClass.as, check.as, enum.as, function.as, hello.as,
+	  inheritance.as, level5.as, level99.as, levels.as:
+	  Reorganized MTASC framework to avoid hackish use of Ming, and using
+	  the new dynamic textfield support. Added test for _level loading.
+
+2007-07-12 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac,macros/docbook.m4,:
+	  Document "make pdf and "make html" commands near --enable-docbook
+	* doc/C/usermanual/installation/feature_configuration.xml:
+	  document --enable-docbook configuration flag.
+	* fb/gui.cpp: Add newline to end of fatal messages.
+	* server/stream.cpp: Remove silly assert to remove compiler warning
+	  about signed/unsigned
+
+2007-07-12 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/actionscript.all/case.as: add tests for _name and _target,
+	  they are not converted to lower case with swf6.
+
+2007-07-12 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/actionscript.all/case.as: add macros for version dependent
+	  tests.
+	* testsuite/actionscript.all/Makefile.am: activate enumerate.as and
+	  case.as.
+
+2007-07-11 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp (remove the "default" font logic,
+	  leave that to edit_text_character_def instead).
+	* server/sprite_instance.cpp (add_textfield): finish implementation,
+	  use an hard-coded 10 pixel of font height.
+	* server/text.cpp: more debugging (when activated)
+	* server/parser/edit_text_character_def.{cpp,h}: add set_bounds
+	  and set_font_height for dynamic textfields, use a default font
+	  when none is specified or the one specified is not found.
+
+2007-07-11 Sandro Santilli <strk@keybit.net>
+
+	* server/font.{cpp,h}: Store name by std::string
+	  rather then by char*, Provide a constructor for
+	  device-only font.
+	* server/fontlib.{cpp,h}: Add a get_default_font.
+	* server/edit_text_character.cpp: Use the default
+	  font if no font is specified in the definition.
+	* server/parser/edit_text_character_def.cpp: not having
+	  a font in the definition isn't an error, turn it into
+	  a debugging message instead.
+
+2007-07-11 Timothy Lee <timothy.lee@siriushk.com>
+
+	* backend/render_handler_cairo.cpp: correct scaling and offset
+	  in video rendering. Optimize RGB data conversion as suggested
+	  by John Gilmore. Fix a bug in rgba_to_cairo_argb32(), which
+	  incremented only 3 instead of 4 bytes per pixel.
+
+2007-07-11 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/fb.cpp: print fatal error messages to stdout (workaround),
+	  fixes bug #20012
+
+2007-07-11 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/actionscript.all/case.as: add a testcase for testing 
+	  case senstivity for SWF < 7.
+	  
+2007-07-11 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/key_event_test4.c, key_event_test5.c: call totals()
+	  instead of total() to give a final report, the later one is an undefined function.
+	* testsuite/misc-ming.all/key_event_test5runner.c: add comments why Gnash fails, 
+	  it forgets to do the case conversion, a big bug!
+	  
+2007-07-10 Sandro Santilli <strk@keybit.net>
+
+	* server/: fontlib.h, gnash.h: move fontlib namespace
+	  declaration where it belong.
+
+2007-07-10 Sandro Santilli <strk@keybit.net>
+
+	* server/movie_root.cpp (display): fix calls to
+	  begin_display/end_display. Fixes playback of multi-level movies.
+	* testsuite/swfdec/PASSING: three more tests succeed (name
+	  of loaded instances).
+	* server/character.cpp (getTarget): remove the hard-coded
+	  _level0 lead, substitute with a correct level number.
+	* server/: as_environment.cpp, character.cpp,
+	  sprite_instance.cpp: properly evaluate _level#
+	  path components.
+
+2007-07-10 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (CommonGetUrl): implement _level loading.
+	  Fixes bug #19968.
+	* server/movie_root.{cpp,h}: add loadLevel() method, store levels in
+	  a map rather then a vector.
+
+2007-07-10 Sandro Santilli <strk@keybit.net>
+
+	* server/: movie_instance.h, character.h: make get_root() a const
+	  method.
+	* server/movie_root.{cpp,h}: support multiple levels. Untested.
+
+2007-07-10 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_def_impl.cpp (add_sound_sample): fix verbosity
+	  to use log_parse and depend on IF_VERBOSE_PARSE.
+	* server/button_character_instance.cpp (on_event): don't require a
+	  button's parent to be a sprite. Fixes bug #20436.
+	* server/parser/button_character_def.cpp: verbose button_record
+	  parsing.
+	* libbase/utility.h (typeName): arg by *const* ref.
+
+2007-07-10 Timothy Lee <timothy.lee@siriushk.com>
+
+	* backend/render_handler_cairo.cpp: initial pass at video rendering for cairo.
+	  (scale and offset don't work consistently yet).
+
+2007-07-10 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/movie_root.cpp: remove the key listener from the listener container, 
+	  not just unregister it.
+	* server/movie_root.h: add a public getKeyListeners() to return the key listener set.
+	* server/asobj/key.cpp: unregister the key listener. Hopefully fix bug #20317, will
+	  do more tests later.
+	  
+2007-07-10 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/key_event_test5.c: more tests.
+	* testsuite/misc-ming.all/key_event_test5runner.c: add a testrunner.
+	* testsuite/misc-ming.all/Makefile.am: enable key_event_test4runner,
+	  enable key_event_test5runner
+	  
+2007-07-10 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/Makefile.am: add rules for building
+	  key_event_test4.swf and key_event_test5.swf - test *runners* still
+	  missing.
+	* server/movie_root.{cpp,h}: mark key listeners as reachable.
+	* server/asobj/Key.{cpp,h}: mark key listeners as reachable.
+
+2007-07-10 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/key_event_test5.c: new testcase for key listeners,
+	  would cause a segfault when any key pressed, so not enabled.
+	  
+2007-07-09 Sandro Santilli <strk@keybit.net>
+
+	* server/swf.h: add defines and links to alexis for SCRIPTLIMITS (SWF8),
+	  DOABCDEFINE and SYMBOLCLASS (SWF9).
+
+2007-07-09 Bernhard Rosenkraenzer <bero@arklinux.org>
+
+	* macros/ffmpeg.m4: don't assume FFMPEG CFLAGS only contain a single
+	  -I switch.
+
+2007-07-09 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/video_stream_def.{h,cpp}: drop the m_width and m_height
+	  public members, substitute them with a private m_bound (renamed
+	  from m_unused_bound since it is now used). This fixes get_bound
+	  to return a meaningful value.
+	* server/video_stream_instance.{cpp,h}: stop using m_width and m_height
+	  of the definition, rather use the get_bound() method.
+	  Fixes bug #20177 (Youtube: half the video hidden)
+
+2007-07-09 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.cpp (to_debug_string): include object type name.
+	* libbase/utility.h: add a templated typeName() function for
+	  demangling.
+	* server/character.cpp (width_getset,height_getset): include
+	  character's type name in aserror.
+
+2007-07-09 Martin Guy <martinwguy@yahoo.it>
+
+	* gui/gtk_cairo.h: FIx compiler warning about unused params
+	* libbase/curl_adapter.cpp: Workarounds for older versions of curl
+
+2007-07-08 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.{cpp,h} (equals): don't always force string
+	  comparison if the first argument is a string (matches ECMA spec,
+	  fixes bug #20403).
+	* testsuite/actionscript.all/Number.as: add test for string:00 ==
+	  number:0
+
+2007-07-08 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Global.h: include extension.h when needed.
+	* server/swf.h: link to info about ActionNewAdd
+	* testsuite/actionscript.all/Number.as: Add a quick testcases
+	  for using ActionNewAdd with a string and a number parameters
+	  (see bug #20403).
+
+2007-07-08 Sandro Santilli <strk@keybit.net>
+
+	* doc/C/usermanual/installation/feature_configuration.xml:
+	  the debugger is now off by default, so document --enable-debugger
+	  rather then --disable-debugger; Document --enable-write and
+	  --enable-fps-debug.
+
+2007-07-08 Martin Guy <martinwguy@yahoo.it>
+
+	* configure.ac: Say where to get gtkglext source
+	* C/usermanual/installation/feature_configuration.xml:
+	  Add missing <variablelist> </variablelist> round GUI choices item
+	  and remove configure --enable-dom (it has gone)
+	  Remove doc for configure --enable-xmlreader and --enable-testing
+	  (they have gone too)
+	  Remove mention of old --enable-sound, fix default as --enable-plugin
+	  and talk about MAD / GST-FFMPEG differences.
+	* gui/gtk_glue_cairo.h: Drop unused variable compiler warnings
+	* backend/sound_handler.h libbase/FLVParser.h:
+	  Document extra NELLYMOSER format code (mentioned in libavcodec/flv.h)
+	* macros/ffmpeg.m4: Don't zero ffmpeg_version if too early; it is used
+	  in the final error report and is always checked against "ok" to see
+	  if there is an acceptable version.
+	* macros/ffmpeg.m4: Add commentary preparing for better version checking
+
+2007-07-07 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* testsuite/misc-ming.all/ming_utils.h: Added defintion of
+	  SWFMove_wrteExports().
+
+2007-07-07 Martin Guy <martinwguy@yahoo.it>
+
+	* libbase/network.h,server/shm.{h,cpp}: Remove last remnants of
+	  ENABLE_TESTING ifdef
+	* configure.ac: Remove bogus "Web server support disabled" report,
+	  switched on nonexistent $http variable
+
+2007-07-06 Sandro Santilli <strk@keybit.net>
+
+	* libbase/ref_counted.h: use boost's atomic_count
+	  for the reference counter. Should be safer.
+	  Fixed bug #20194.
+
+2007-07-06 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (CommonGetUrl): use
+	  sprite_instance::loadMovie for target loads.
+	  Fixes bug #20001
+	* server/vm/action.{cpp,h}: obsolete attach_extern_movie
+	  in favor of sprite_instance::loadMovie, known to work
+	  better in at least one case (bug #20001).
+
+2007-07-06 Martin Guy <martinwguy@yahoo.it>
+
+	* backend/Makefile.am: Move a GUI test to its logical place
+	* testsuite/libamf.all/test_number.cpp: Remove uused variables and
+	  commented-out debugging printfs
+	* gui/gnash.cpp: Reformat crazy indentation and simplify redundant
+	  local variables (no functional change)
+	* configure.ac: Fix typo "handlign" in message
+	* configure.ac: Fix formatting of missing BOOST date_time message
+	* configure.ac: Fix error message for missing docbook2x tools
+	* configure.ac: Add xsltproc to list of docbook required packages
+	* server/asobj/SoundFfmpeg.cpp: Fix signed/unsigned compiler warning
+
+2007-07-05 Martin Guy <martinwguy@yahoo.it>
+
+	* server/parser/movie_def_impl.cpp: Report internal sample ID too in
+	  verbose parse log message
+
+2007-07-05 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/sprite_definition.h (add_sound_sample): don't
+	  complain about sound sampes definitions found in a sprite definition
+	  context. That's completely legal.
+	* server/array.cpp (array_concat): fix typo in function argument
+	  access. Fixes bug #20355.
+	* testsuite/actionscript.all/array.as: add more tests for Array.concat()
+
+2007-07-04 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/NullGui.cpp: use tu_timer instead of gettimeofday()
+
+2007-07-03 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: disable debugger by default. Use --enable-debugger
+	  to enable.
+
+2007-07-03 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/Global.{cpp,h}: Don't use a module-static
+	  for the Extension instance, when enabled.
+	  Seems to fix bug #20272 when debugger id disabled
+	  (sounds voodoo, but these are the effects of initialization
+	  and deinitialization order for statics...)
+
+2007-07-03 Sandro Santilli <strk@keybit.net>
+
+	* gui/gnash.cpp (parseCommandLine): -g doesn't take an argument.
+	* libbase/GC.{cpp,h}: define 3 verbosity levels for the GC
+
+2007-07-03 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/NullGui.cpp: implement correct timing
+
+2007-07-03 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gui.{cpp,h}: add min/avg/max fps printing and total play time
+	* libbase/GC.h: include assert.h
+
+2007-07-03 Sandro Santilli <strk@keybit.net>
+
+	* backend/render_handler_tri.{cpp,h}: (tri_cache_manager): dont leak
+	  mesh sets.
+	* server/parser/character_def.{cpp,h}: don't leak
+	  render cache managers.
+
+2007-07-02 Sandro Santilli <strk@keybit.net>
+
+	* backend/sound_handler_sdl.{cpp,h}: fix leak of sound_data instances;
+	  added a few TODO items.
+
+2007-07-02 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/edit_text_character_def.h: add an htmlAllowed()
+	  public inspector.
+	* server/edit_text_character.h: add an htmlAllowed() private
+	  inspector.
+	* server/edit_text_character.cpp (format_text): if HTML is allowed
+	  and found in the textfield text, just skip the tags and show the 
+	  content, logging a debugging info about the fact (only once).
+
+2007-07-02 Sandro Santilli <strk@keybit.net>
+
+	* server/FreetypeGlyphsProvider.cpp: protect debugging calls
+	  by a GNASH_DEBUG_DEVICEFONTS, defaulting to undefined.
+	* libbase/GC.{cpp,h}: Implement an heuristic to reduce
+	  the number of collector runs. It is based on the number
+	  of newly registered collectables since last run.
+	  The threshold is set to 10 with a static const member
+	  of the GC class. See http://gnashdev.org/wiki/index.php/ProfilingGC
+	  for more informations.
+	* gui/gui.cpp (fpsCounterTick): don't report an initial FPS of 0.
+
+2007-07-02 Sandro Santilli <strk@keybit.net>
+
+	* gui/NullGui.{h,cpp}: implement quit(), for clean shutdown.
+	* gui/gui.cpp (advance_movie): use quit() to exit
+
+2007-07-02 Sandro Santilli <strk@keybit.net>
+
+	* gui/gnash.cpp (parseCommandLine): support floating point argument
+	  to -f switch.
+
+2007-07-02 Sandro Santilli <strk@keybit.net>
+
+	* gui/gui.{cpp,h}: add setFpsTimerInterval() public method,
+	  change fpsCounterTick() interface to take no arg. Print total
+	  number of frame advances on destruction. All available ifdef
+	  GNASH_FPS_DEBUG.
+	* gui/Player.{cpp,h}: add a setFpsPrintTime() public method.
+	  Only available ifdef GNASH_FPS_DEBUG.
+	* gui/gnash.cpp: Add -f switch for fps debugging prints
+	  (long option was not trivial so didn't add it).
+	  Note that if GNASH_FPS_DEBUG is not defined the -f switch
+	  triggers an error.
+
+2007-07-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gui.{cpp,h}: add fpsCounterTick() for FPS profiling
+
+2007-07-02 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: add --enable-fps-debug switch to define
+	  GNASH_FPS_DEBUG macro, to use for fuzy speed profiling.
+
+2007-07-02 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/parser/sprite_definition.h: Allow soundsamples to be added
+	  from sprites. Should the malformed-swf warning be removed?
+	* backend/sound_handler_gst.cpp: Moved creation of a tempoary
+	  variable to avoid an assertion failure.
+	* backend/sound_handler_sdl.cpp: Improved error handling.
+
+2007-07-02 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gtk_glue_agg.cpp: Disable MIT-SHM when pixel format is not recognized 
+
+2007-07-01 Sandro Santilli <strk@keybit.net>
+
+	* libbase/GC.h: don't be verbose about GC by default.
+	* server/movie_root.{cpp,h}: (add_interval_timer): take the Timer by
+	  auto_ptr, add an optional second argument marking the timer as
+	  internal (for use by xmlsocket/LoadVars and whichever other gnash
+	  internal class in need for a timer). Internal timers will get a
+	  negative identifier so to not introduce unexpected gaps in the
+	  user-defined interval timers sequences. Fix bugs introduced in last
+	  commit related to timer expiration and iterators invalidation.
+	* server/timers.{cpp,h}: add some inspector functions, use VM::getTime
+	  for timers (milliseconds).
+	* server/asobj/: LoadVars.cpp, xmlsocket.cpp: update calls to
+	  movie_root::add_interval_timer to mark these timers as internal.
+
+2007-07-01 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/simple.exp: increment timeout from 4 to 5 minutes.
+	* server/movie_root.{cpp,h}: store Timers into a map rather then
+	  a vector, to allow for removal w/out loosing the timer identifier.
+	  Scan a *copy* of the container so that clearing or adding new
+	  intervals don't invalidate iterators.
+
+2007-07-01 Sandro Santilli <strk@keybit.net>
+
+	* libbase/ref_counted.h: use 'long' for the ref count,
+	  cleanup header inclusion, prepare for using an atomic
+	  counter for thread safety (not enabled yet).
+	* server/parser/movie_def_impl.{cpp,h}: have MovieLoader
+	  keep the boost::thread by auto_ptr for proper destruction.
+
+2007-07-01 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* README: Added note on IRC.
+	* gui/gnash.cpp: Added -V as shor for --version. Clean-up.
+
+2007-07-01 Sandro Santilli <strk@keybit.net>
+
+	* COPYING: update to GPL version 3
+
+2007-07-01 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* all over the place: Update to GPL version 3.
+
+2007-07-01 Sandro Santilli <strk@keybit.net>
+
+	* libbase/GC.h: assert that only the main thread registers collectable
+	  objects with the GC, or runs the collector.
+
+2007-06-30 Sandro Santilli <strk@keybit.net>
+
+	* server/impl.cpp (clear): don't exit, try the proper cleanup way;
+	  movie_def_impl loader should be ready, other threads likely aren't,
+	  this patch would expose all places in need for proper implementation
+	  of threads termination.
+	* server/parser/movie_def_impl.{cpp,h}: implement
+	  loader thread cancelation request, wait for the thread
+	  to terminate in MovieLoader destructor.
+
+2007-06-30 Sandro Santilli <strk@keybit.net>
+
+	* libbase/ref_counted.h: remove inheritance of ref_counted
+	  from GcResource, provide temporary isReachable/setReachable
+	  to allow not reverting all GC-related additions to character
+	  definitions and other possibly GcResource objects.
+	* libbase/smart_ptr.h: have two versions of the intrusive_ptr
+	  free functions: one for GcResource (do nothing) and one 
+	  for ref_counted (add/drop ref). Enable GC by default, where
+	  current version uses both RC and GC (GC only used for as_object)
+
+2007-06-29 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/button_character_def.cpp: ok, let action_buffer leak,
+	  as it seems deleting them in button_action dtor introduces a
+	  segfault in our testusuite. Sorry for not running 'make check'
+	  before committing.
+
+2007-06-29 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/gtk_glue_agg.cpp: properly initialize new SHM variables
+	* server/array.{h,cpp}: classes with virtual methods need a destructor,
+	  don't they?   	
+	
+2007-06-28 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/button_character_def.{cpp,h}: don't let
+	  gnash::button_action leak action_buffer objects.
+	* server/FreetypeGlyphsProvider.cpp (getFontFilename): don't leak
+	  the FcFontSet when finding a match.
+	* server/edit_text_character.{cpp,h}:
+	  Do not call on_event(KILL_FOCUS) in the destructor, do
+	  it on ::unload(). The less things destructors do, the better
+	  (think GC..)
+
+2007-06-27 Petr Pisar <petr.pisar@atlas.cz>
+
+	* po/: Makefile.am, cs.po: Initial Czech translation.
+
+2007-06-27 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* gui/fb.cpp, gui/fltk_glue_agg.cpp, gui/gtk.cpp, gui/gui.cpp: set
+	  correct _validbounds 	
+	* gui/gtk_glue_agg.{cpp,h}: implemented shared memory image blitting
+
+2007-06-26 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg_style.h: always premultiply image accessors
+	  with alpha channel (partial fix for bug #20257)
+	* backend/render_handler_agg.{cpp,h}, gui/fb.cpp: moved pixel format
+	  detection code to AGG backend files (so it can be used by any GUI)   
+	* gui/gtk_glue_agg.{cpp,h}: initial work for MIT-SHM support (not 
+	  compiled in by default because there is much left to do)
+
+2007-06-26 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/callFunction_test.c: testcase for ActionCallFunction,
+	  Gnash fails.
+
+2007-06-25 Antti Ajaki <antti.ajanki@iki.fi>
+
+	* gui/kde_glue_agg.cpp: See http://savannah.gnu.org/patch/?6022
+
+2007-06-25 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/morph_test1.c: minor update, reduce a frame for testing.
+	* testsuite/misc-ming.all/morph_test1runner.cpp, Makefile.am: add a testrunner for
+	  morph_test1.swf.
+	  
+2007-06-24 Sandro Santilli <strk@keybit.net>
+
+	* server/: edit_text_character.cpp, sprite_instance.cpp,
+	  video_stream_instance.cpp, asobj/System.cpp:
+	  Don't initialize the "constructor" member explicitly as that's
+	  done by the builtin_function class instead. This patch fixes
+	  the useless construction of 7 to 11 objects (otherwise 
+	  deleted by first GC run).
+
+2007-06-24 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/morph_test1.c: first testcase for morphs,
+	  need a testrunner for checking the renderer, but might be enough for
+	  testing GC at the moment.
+	
+2007-06-23 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.h: include <iostream> for proper definition
+	  of output operator.
+
+2007-06-23 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk.cpp: Use stock icons for some more menu options. Also,
+	limit several lines to 80 characters.
+
+2007-06-23 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.cpp (get_prototype): don't return the Object
+	  interface when prototype is NULL with SWF version < 5.
+	  Fixes the empty swf3 case with GC.
+
+2007-06-23 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* libbase/container.h: Remove home-made container classes in
+	favour of standard containers.
+	* server/{fontlib, impl}.cpp: Switch hash to std::map.
+	* libbase/container.cpp: Remove unused container tests.
+	* libbase/Makefile.am: Disable building of unused container.cpp.
+
+2007-06-22 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* macros/kde.m4: look for libkdeui, not kdeui. Also first check
+	in the QTDIR/bin directory for moc, in case the first moc in PATH
+	is not the qt3 one.
+
+2007-06-22 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/actionscript.all/enumerate.as: more tests.
+	
+2007-06-22 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/actionscript.all/enumerate.as: cleanups, tests are not
+	  dependent on enumeration order now.
+	* server/movie_root.h: document KeyListener class and related stuff.
+	
+2007-06-22 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* libgeometry/Makefile.am: Fixed building issue on Darwin.
+	* ltmain.sh.darwin: We use this one from Darwinports since it works.
+	* utilities/{parser,processor}.cpp: use 'libbase/gettext.h' for conditianal
+	  use of libintl.
+
+2007-06-21 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_gst.{cpp,h}: Made it threadsafe, fixes 
+	  bug #20186. Made the internal variables private.
+	* backend/sound_handler_sdl.{cpp,h}: Made the internal
+	  variables private.
+
+2007-06-21 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/actionscript.all/enumerate.as: more tests.
+	
+2007-06-21 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/key_event_test4.c, key_event_test4runner.cpp, Makefile.am:
+	  new testcase for "this" context in a user defined key event handler.
+	* server/movie_root.cpp: correctly set the context.
+	
+2007-06-21 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/actionscript.all/enumerate.as: new testcase, Gnash fails.
+
+2007-06-20 Sandro Santilli <strk@keybit.net>
+
+	* libbase/GC.{cpp,h}: moved destructor and cleanUnreachable methods
+	  from header to implementation file.
+	* server/fill_style.{cpp,h}: add an markReachableResources()
+	  function to keep alive eventual bitmap and character fills.
+	* server/parser/shape_character_def.{cpp,h}: implement resource
+	  marking function, marking fill styles.
+
+2007-06-19 Sandro Santilli <strk@keybit.net>
+
+	* server/StreamProvider.cpp (getStream): transfer ownerhip of 
+	  the opened FILE to the tu_file, to plug a memory leak.
+	* server/sprite_instance.{cpp,h}: (markReachableResources):
+	  Mark textfield variables and relative root.
+	  Fixes segfault in movie reported in bug #19883, and also
+	  shows that the GC model does it's job in this case.
+
+2007-06-19 Sandro Santilli <strk@keybit.net>
+
+	* gui/NullGui.{cpp,h}: implement setTimeout
+	  call. fixes bug #20118.
+
+2007-06-19 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.h: document another
+	  reachable resource (was marked already, just not documented
+	  as such).
+	* server/parser/: button_character_def.{cpp,h},
+	  edit_text_character_def.{cpp,h}:
+	  Implement reachable resources marker.
+
+2007-06-19 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/bitmap_character_def.h: implement reachable resources
+	  marker.
+	* gui/Makefile.am: add .configline to CLEANFILES and remove all in
+	  CLEANFILES on make clean (needed for distcheck to complete).
+	* server/generic_character.{cpp,h}: generic character
+	  are not mouse entities by default, so make get_topmost_mouse_entity
+	  return NULL and can_handle_mouse_events return false. Fixes
+	  bug #20102.
+
+2007-06-19 Sandro Santilli <strk@keybit.net>
+
+	* server/video_stream_instance.{cpp,h}: implement
+	  reachable resources marker.
+
+2007-06-19 Sandro Santilli <strk@keybit.net>
+
+	* server/array.{cpp,h}: implement resource marker
+	  for arrays.
+
+2007-06-18 Alexander Sack <asac@jwsdot.com>
+
+	* configure.ac: detect usable pbutils for automatic installation of
+	  missing codecs.
+	* server/asobj/NetStreamGst.cpp: try installing missing codecs
+	  as needed.
+
+2007-06-18 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/: movie_def_impl.h, movie_definition.h,
+	  sprite_definition.h: document add_execute_tag ownership
+	  transfer.
+
+2007-06-18 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/shape_test.c: more tests, make the deduction easier.
+	  surprisingly, all succeeded.
+	
+2007-06-18 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/key_event_test3.c,
+	  testsuite/misc-ming.all/key_event_test3runner.cpp: the testrunner was
+	  bogus, fix the testrunner itself.
+	
+2007-06-18 Zou Lunkai <zoulunkai@gmail.com>
+
+	* libbase/GC.h: add missing head file.
+	
+2007-06-18 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/loop_test7: review and comments
+	* testsuite/misc-ming.all/loop_test6: review and comments
+	
+2007-06-18 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ASHandlers.cpp (ActionTrace): don't use the string value
+	  as a format string !
+	* testsuite/swfdec/PASSING: 31 new tests found in the 'as' branch
+	  of swfdec succeed.
+
+2007-06-18 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.{cpp,h}: (markReachableResources):
+	  mark _frame0_chars as reachable. make check completes
+	  successfully now.
+
+2007-06-17 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/loop_test8.c: comments
+	
+2007-06-17 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/parser/movie_definition.h, 
+	  server/parser/movie_def_impl.h,
+	  server/parser/sprite_definition.h,
+	  server/parser/Timeline.h,
+	  server/swf/PlaceObject2Tag.h,
+	  server/swf/PlaceObject2Tag.cpp,
+	  server/dlist.cpp, 
+	  server/sprite_instance.h, server/sprite_instance.cpp:
+	  enable and improve the 3rd attempt of timeline-control design, take 
+	  ratio into consideration, which is not only used for morphs but also
+	  for general characters in lots of swf files. Got 20 more successes, 
+	  still need more tests and cleanups. see wiki.
+	* testsuite/misc-ming.all/displaylist_depths_test11.c,
+	  testsuite/misc-ming.all/loop_test2.c, 
+	  testsuite/misc-ming.all/loop_test2runner.cpp,
+	  testsuite/misc-ming.all/loop_test3.c,
+	  testsuite/misc-ming.all/loop_test5.c,
+	  testsuite/misc-ming.all/loop_test8.c:
+	  xchecks to checks.
+	  
+2007-06-17 Sandro Santilli <strk@keybit.net>
+
+	* libbase/GC.h: fixed a misleading delete count for
+	  the debugging mode. You can now see that in the UdoG
+	  leaking case (empty function in first frame, empty second
+	  frame) every GC collect run deletes 2 resources (most
+	  likely an isolated chain of references in the RC case).
+
+2007-06-17 Ann Barcomb <kudra@domaintje.com>
+
+	* plugin/Makefile.am: Removed an incorrect comment.
+	* doc/C/usermanual/install.xml: Added some information
+	  inspired by the comments made in patch #5772.
+	* INSTALL: Applied a modified version of patch #5772 by
+	  Anders Juel Jensen.  
+
+2007-06-16  Rob Savoye  <rob@bertha.welcomehome.org>
+
+	* gui/gnash.cpp: Add the version of FFMPEG or GST to
+	--version. Add the config options too.
+	* gui/Makefile.am: Extract the config options so we can pass them
+	to GCC, wo they become part of the output from --version.
+	* libbase/image.cpp: Include memory so auto_ptr is defined.
+	* macros/ffmpeg.m4: Define HAVE_FFMPEG_AVCODEC_H eben when not
+	using AC_CHECK_HEADER.
+
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
+	* libbase/: image.{cpp,h}, LoadThread.{cpp,h},
+	  image_filters.cpp, noseek_fd_adapter.cpp,
+	  reduce number of explicit deletes by using scoped pointers
+	* server/asobj/Global.cpp: reduce explicit deletes...
+	* server/asobj/: Sound.{cpp,h}, SoundFfmpeg.{cpp,h}, SoundGst.{cpp,h},
+	  SoundMad.{cpp,h}: Use a smart pointer for the NetConnection 
+	  reference, and implement markReachableResources to mark it.
+	* server/asobj/xmlsocket.cpp (anydata): don't use a module-static
+	  to keep track of leftovers !!
+
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ExecutableCode.h: implement markReachableResources
+	  for executable code.
+	* server/movie_root.{cpp,h}: mark resources reachable by 
+	  the executable code in the global action queue.
+
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/morph2_character_def.{cpp,h}: do not explicitly
+	  delete the shape_character_defs, rather keep by intrusive_ptr
+	  (which means leave ownership to the GC in the GC case).
+
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
+	* server/asobj/NetStream.{h,cpp}: implement markReachableResources.
+	* server/asobj/gen-asclass.sh: updated template to include
+	  a sample of a markReachableResources implementation.
+	* server/asobj/LoadVars.cpp: implement markReachableResources
+	  to properly mark event handlers and environment resources.
+	* libbase/GC.h: don't be verbose about objects being marked,
+	  classes not overriding markReachableResources, collectables
+	  registered and deleted unless GNASH_GC_DEBUG > 1
+	* server/timers.{cpp,h}: provide a markReachableResources to mark
+	  function, target objet and args.
+	* server/movie_root.{cpp,h} (markReachableResources): mark Timers
+	  resources as being reachable; document what's marked in the function
+	  declaration documentation.
+
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/server/: DisplayListTest.cpp, GetterSetterTest.cpp,
+	  PropertyListTest.cpp: initialize gnash lib.
+
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/movie_def_impl.{cpp,h} (markReachableResources):
+	  Set CharacterDictionary items as reachable !
+	  (BTW, why are character defs managed pointers ?!)
+	* testsuite/MovieTester.cpp: initialize gnash code lib so
+	  to work with GC on.
+
+2007-06-16 Sandro Santilli <strk@keybit.net>
+
+	* server/button_character_instance.{cpp,h}: implement
+	  markReachableResources to properly mark the state characters
+	  and the character definition.
+	* server/font.{cpp,h}: make texture_glyph a concrete class, no
+	  more managed.
+	* server/generic_character.h: implement markReachableResources to
+	  properly mark the character definition.
+
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.{cpp,h} (markReachableResources):
+	  Mark the drawable canvas as reachable !
+	  This fixes the empty movie case (no segfault) and also
+	  the 2-frames simple leaking case reported by UdoG a long
+	  time ago (first frame contains an empty function definition,
+	  second frame is empty).
+
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
+	* server/BitmapMovieInstance.cpp, server/asobj/NetStream.cpp:
+	  More warnings fixes.
+
+2007-06-14 Kris Jurka <jurka@ejurka.com>
+
+	* gui/Player.cpp, gui/gnash.cpp, server/as_environment.cpp,
+	  server/as_function.cpp, server/as_value.cpp,
+	  server/asobj/NetStream.cpp, server/asobj/xml.cpp,
+	  server/parser/shape_character_def.cpp, server/vm/ActionExec.cpp:
+	  Fix some compiler warnings. Applied patch #5927.
+
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
+	* libbase/triangulate_impl.h (poly_env<>::init): don't use
+	  backslash to break strings (unneeded). See bug #20138.
+	  
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
+	* gui/Player.cpp, libbase/GC.{h,cpp}, libbase/Makefile.am,
+	  libbase/ref_counted.h, libbase/smart_ptr.h,
+	  plugin/klash/klash.cpp, plugin/win32/plugin.cpp,
+	  server/GetterSetter.cpp, server/GetterSetter.h,
+	  server/Property.h, server/PropertyList.cpp,
+	  server/PropertyList.h, server/as_environment.cpp,
+	  server/as_environment.h, server/as_function.cpp,
+	  server/as_function.h, server/as_object.cpp,
+	  server/as_object.h, server/as_value.cpp,
+	  server/as_value.h, server/character.cpp, server/character.h,
+	  server/debugger.cpp, server/debugger.h, server/dlist.cpp,
+	  server/dlist.h, server/edit_text_character.cpp,
+	  server/edit_text_character.h, server/font.cpp, server/font.h,
+	  server/fontlib.cpp, server/gnash.h, server/impl.cpp,
+	  server/impl.h, server/mouse_button_state.h,
+	  server/movie_root.cpp, server/movie_root.h,
+	  server/sprite_instance.cpp, server/sprite_instance.h,
+	  server/swf_function.cpp, server/swf_function.h,
+	  server/asobj/Key.h, server/asobj/Mouse.cpp,
+	  server/asobj/Stage.cpp, server/asobj/xmlnode.cpp,
+	  server/parser/BitmapMovieDefinition.cpp,
+	  server/parser/BitmapMovieDefinition.h,
+	  server/parser/movie_def_impl.cpp,
+	  server/parser/movie_def_impl.h,
+	  server/parser/sprite_definition.cpp,
+	  server/parser/sprite_definition.h, server/vm/ASHandlers.cpp,
+	  server/vm/VM.cpp, server/vm/VM.h, utilities/processor.cpp:
+	First big pass on Garbage Collection. We can now use a compile-time
+	define (GNASH_USE_GC) to select wheter GC or RF (ref-counting) is
+	used. By default RC is used as GC is still bogus. Next step would
+	be improving the GC mark functions to ensure needed resources aren't
+	prematurely deleted by the GC. See in GC.h the GcResource class
+	documentation for informations about how to do taht.
+
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
+	* libbase/: Makefile.am, GC.h: First draft at a garbage collector class.
+	* cygnal/http.h: fix gnash::Network referencing, drop
+	  'using namespace std'
+
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
+	* gui/gnash.cpp: add using namespace gnash here, since we're
+	  out of the gnash namespace.
+	* backend/render_handler_agg_bitmap.h,
+	  backend/render_handler_agg_style.h,
+	  libgeometry/snappingrange.h,
+	  cygnal/http.h: don't use 'using namespace'
+	  directive in headers !
+
+2007-06-14 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Function.as: test local vars scope of
+	  outer function to be kept alive by inner functions.
+	* libbase/ref_counted.h: made destructor protected, to ensure no 
+	  user is explicitly deleting a ref_counted object (propedeutic
+	  to GC)
+	* configure.ac: FREETYPE_{CFLAGS,LIBS} => FREETYPE2_{CFLAGS,LIBS)
+	  in final reports/checks.
+	* testsuite/misc-mtasc.all/Makefile.am: skip all tests if
+	  prebuilt clip are not supported by the detected ming version.
+	* po/: Makefile.am, it.po: initial work on an italian
+	  translation (funny for a few minutes, but too boring
+	  after a while ;)
+
+2007-06-14 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/parser/morph2_character_def.h: implement a get_bound() for
+	  morphs, should fix an old displaying problem of morphs.
+	  
+2007-06-14 Hubert Figuiere <hfiguiere@novell.com>
+
+	* Makefile.am, configure.ac: look for freetype2, not freetype
+	  (for pkg-config to be effective). Rename _CFLAGS and _LIBS
+	  to be FREETYPE2, not FREETYPE
+	* server/Makefile.am, server/parser/Makefile.am: 
+	  Use FREETYPE2_{CFLAGS,LIBS}
+	* server/FreetypeGlyphsProvider.cpp: use an FT_CONST macro
+	  to switch between constness of Outline walker func between
+	  freetype 2.1 (wants non-const) and 2.2 (wants const).
+
+2007-06-14 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/character.h, 
+	  server/dlist.h,
+	  server/dlist.cpp, 
+	  server/sprite_instance.h,
+	  server/sprite_instance.cpp,
+	  server/parser/morph2_character_def.cpp,
+	  server/swf/PlaceObject2Tag.h,
+	  server/swf/PlaceObject2Tag.cpp,
+	  server/vm/action.cpp,
+	  testsuite/server/DisplayListTest.cpp,
+	  change type of "ratio" from float to integer, don't re-interpret the definition.
+	  
+2007-06-13 Petr Pisar <petr.pisar@atlas.cz>
+
+	* gui/gtk.cpp: internationalize menus. (patch #6006).
+
+2007-06-13 Andrew Guertin <bugzilla@dolphinling.net>
+
+	* configure.ac: removes the duplicate "Checking" and adds the missing
+	  newline while checking for archiver type.
+	* macros/agg.m4: print the missing "checking for AGG headers" line.
+	  (patch #5933)
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/DefineEditTextTest.c: put reduced margins
+	  back, to verify no word wrap works.
+	* server/edit_text_character.cpp (format_text): implement no word wra
+	* server/FreetypeGlyphsProvider.{cpp,h}: document coordinate space of
+	  getGlyph output values and implement proper scaling between freetype
+	  glyph EM units and our 1024 EM square.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* server/: font.{cpp,h}, Makefile.am, FreetypeRasterizer.{cpp,h},
+	  FreetypeGlyphsProvider.{cpp,h}: renamed file and class since
+	  we won't serve rendered glyphs anymore. Rendered glyphs can
+	  always be obtained by rendering the shape_character_def,
+	  the code should be buried somewhere in fontlib.cpp.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* server/font.cpp (add_os_font): use the advance value
+	  computed by getGlyph, not getRenderedGlyph (the latter
+	  is bogus).
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/loop_test8.c: xchec -> check.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* server/font.{cpp,h}: always maintain m_advance_table of the 
+	  same size of the other two glyph info containers (should really
+	  make a structure keeping all of them..). Fixes an testInvariant
+	  failure with the device font selector (see DeviceFonts page
+	  on wiki).
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: look for libfontconfig
+	* Makefile.am: print fontconfig info on 'dumpconfig'
+	* server/FreetypeRasterizer.{cpp,h}: implement font name
+	  to filename matching using fontconfig, when available;
+	  updated copyright info (enough hacking on it now..)
+	* server/Makefile.am: add FONTCONFIG cflags and libs.
+	* testsuite/misc-ming.all/DefineEditTextTest.c: add another
+	  text field using 'times' font.
+
+2007-06-13 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/Makefile.am:
+	  fix a typo(thank strk).
+	  
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: newlines are tokens with bourne shell !
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* server/FreetypeRasterizer.cpp: fix build w/out libfreetype.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/DefineEditTextTest.c:
+	  Apply transformation to text characters.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* gui/gtk.cpp, server/FreetypeRasterizer.cpp,
+	  server/fontlib.cpp, server/movie_root.cpp,
+	  server/text.cpp: Reduced verbosity.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* server/FreetypeRasterizer.{cpp,h}: Implement shape_character_def
+	  output using DynamicShape; changed getGlyph method to also take
+	  an 'advance' output parameter (toward deprecation of bitmap output).
+	* server/font.cpp (add_os_glyph): update call to ::getGlyph.
+
+2007-06-13 Sandro Santilli <strk@keybit.net>
+
+	* server/FreetypeRasterizer.{cpp,h}: added interface
+	  to fetch vectorial glyph (just a stub).
+	* server/font.cpp (add_os_glyph): fetch both rasterized
+	  and vectorial glyphs, survive to texture glyphs with a null
+	  bound (space is one such glyph).
+	* server/fontlib.cpp (draw_glyph): skip rendering of textured
+	  glyphs with null bounds.
+	* server/text.cpp (display_glyph_records): enable debugging by
+	  default.
+
+2007-06-12 Sandro Santilli <strk@keybit.net>
+
+	* server/FreetypeRasterizer.cpp (getRenderedGlyph): don't assume
+	  "suspeded_image" is not-null after creation of the bitmap_info_alpha
+	  instance (those bitmap interfaces needs a big cleanup really...).
+	* testsuite/misc-ming.all/DefineEditTextTest.c:
+	  Test both embedded and device fonts.
+
+2007-06-12 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: Look for libfreetype using GNASH_PKG_FIND
+	* server/FreetypeRasterizer.{cpp,h}: use HAVE_FREETYPE_H,
+	  use intrusive_ptr for bitmap_info, not auto_ptr; add missing
+	  includes, make it actually buildable.
+	* server/Makefile.am: Build FreetypeRasterizer
+	* server/parser/Makefile.am: add FREETYPE_CFLAGS
+	* server/edit_text_character.cpp (format_text): stop relying
+	  on font::get_glyph_count, as for device fonts count of glyph
+	  is not known in advance (grows as needed).
+	* server/font.{cpp,h}: Add private methods for initialization
+	  and use of a freetype rasterizer; get_glyph_index() will now
+	  try to create a missing glyph.
+	* server/parser/bitmap_character_def.h: add forward declaration
+	  for image::rgb
+
+2007-06-12 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/loop_test8.c:
+	  correctly set ratio, forgot in last commit.
+	  
+2007-06-12 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/loop_test8.c, Makefile.am:
+	  new testcase for timeline control, focus on ratio.
+	  
+2007-06-11 Sandro Santilli <strk@keybit.net>
+
+	* server/FreetypeRasterizer.{cpp,h}: 
+	  Add missing stub for font filename finder method.
+
+2007-06-11 Zou Lunkai <zoulunkai@gmail.com>
+
+	* gui/sdl_agg_glue.cpp: initialize member variables at construction, 
+	  fix an abortion when loading nonexistent swf files.
+	
+2007-06-10 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* gui/kde{sup.h, .cpp}: Comment out debugging statements. Make
+	setTimeout work. Quit KdeGui gracefully rather than calling
+	exit(0). Avoid conversion compiler warnings. Switch class
+	pointers to auto_ptr. Small code cleanups.
+	* gui/kde_glue_agg{.cpp, .h}: Contain the rendering buffer in
+	a scoped_array.
+
+2007-06-10 Sandro Santilli <strk@keybit.net>
+
+	* gui/Makefile.am: klash.moc is a source file for the kde
+	  gui.
+
+2007-06-09 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* configure.ac: Allow the KDE GUI to be compiled against AGG.
+	* gui/Makefile.am: Compile KDE/AGG files when requested.
+	* gui/kde.cpp: Make the KDE GUI compatible with AGG by moving
+	OpenGL-specific code into its respective glue. Also fix mouse
+	movement in combination with scaling.
+	* gui/kde_glue.h: Add stubs for AGG compatibility.
+	* gui/kde_glue_opengl.cpp: run makeCurrent in the glue.
+	* gui/kdesup.h: Allow the AGG glue to be used.
+	* gui/kde_glue_agg{.cpp, .h}: Initial implementation of AGG
+	glue for QT/KDE.
+
+2007-06-09 Sandro Santilli <strk@keybit.net>
+
+	* libbase/embedVideoDecoderFfmpeg.cpp (decodeFrame): do not
+	  access a null decodedFrame (tgc: please check).
+
+2007-06-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/embedVideoDecoderFfmpeg.{cpp,h}: Store decodedFrame
+	  in an auto_ptr to avoid possible leaks.
+
+2007-06-08 Sandro Santilli <strk@keybit.net>
+
+	* server/FreetypeRasterizer.{cpp,h}: Ported truetype
+	  rasterizer from gameswf, cleaned up and documented
+	  (as far as understood).
+
+2007-06-08 Sandro Santilli <strk@keybit.net>
+
+	* libbase/embedVideoDecoderGst.{cpp,h}: Store decodedFrame
+	  in an auto_ptr to avoid leaks. Fix the case in which
+	  there's NO decoded frame (ie: no gst-ffmpeg installed)
+	  previously segfaulting by simply running
+	  Video-EmbedSquareTestRunner.
+
+2007-06-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/asobj/NetStreamFfmpeg.cpp: Don't leave the decoding
+	  loop/thread until the queues are empty, or the media left
+	  in the queues wont get played.
+	* server/movie_root.cpp: Include action.h, not Action.h.
+	* libbase/embedVideoDecoderFfmpeg.cpp: Changed the image copying,
+	  and check if the decoded videoframe is bigger than expected.
+
+
+2007-06-08 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/as_object.{h,cpp}: add a virtual on_event() for event handler. 
+	* movie_root.{h,cpp}: add a new KeyListener class.
+	* server/asobj/Key.{h ,cpp}, sprite_instance.cpp, edit_text_character.cpp,
+	  button_character_instance.cpp: adopt new KeyListener interface.
+	* server/character.h: change getUserDefinedEventHandler() from private to public.
+	  all in all, merged two listener lists into one.
+	  
+2007-06-08 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler_sdl.cpp: Fixed an assertion fault
+	  when non-mp3 audio was looping.
+
+2007-06-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/embedVideoDecoderFfmpeg.cpp: Free the av_frame after use.
+	* server/swf/tag_loaders.cpp: Adjust size of audio after decoding.
+
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
+	* macros/ffmpeg.m4: check for libgsm and add to FFMPEG_LIBS if
+	  available.
+	* testsuite/anaylse-results.sh: don't forget to initialize
+	  total_untested.
+
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
+	* doc/C/Makefile.am: distribute all XML files.
+	* macros/docbook.m4: advertise --enable-docbook, not
+	  --disable-docbook since it's disabled by default.
+
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: disable klash if QT lib aren't found.
+	* gui/Makefile.am: add kde_glue.h  in KDE_SRCS (hopefully this adds
+	  to distribution).
+
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: hint user about using AGG if framebuffer gui is
+	  requested.
+	* server/Makefile.am, utilities/Makefile.am:
+	  Moved the libgnashbackend dependency out of libgnashserver
+	  and into the utilities/ dir. This is to avoid a circular
+	  dependency I erroneously introduced with my last 
+	  commit aimed at fixing bug #20110. This should be a better
+	  fix.
+
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/MovieTester.{cpp,h}: add a canTestVideo() method.
+	* testsuite/misc-ming.all/NetStream-SquareTestRunner.cpp: don't
+	  wait for Play.Stop event to be sent if video can't be tested
+	  (ie: not supported by mad).
+
+2007-06-07 Ann Barcomb <kudra@domaintje.com>
+
+	* doc/C/usermanual/installation/building.xml: mention that
+	  GNOME help is a possible documentation make target.  Completed
+	  instructions for building documentation; added instructions for 
+	  testing from old manual.
+	* doc/C/usermanual/installation/feature_configuration.xml: The
+	  default renderer isn't AGG. FLTK works. Spelling fixes.
+	  Comment out TODO/FIXME sections, so that they are not visible 
+	  to users, but can still be searched.
+	* doc/C/usermanual/installation.xml: Changed the title of this
+	  section.
+	* doc/C/usermanual/installation/install.xml: Added information on
+	   where Gnash installs.
+	* doc/C/usermanual/installation/custompath_configuration.xml,
+	   doc/C/usermanual/usage.xml: Comment out TODO/FIXME sections, 
+	  so that they are not visible to users, but can still be searched.
+	* doc/C/usermanual/installation/testing_dependencies.xml,
+	   doc/C/usermanual/installation/documentation_dependencies.xml,
+	   doc/C/usermanual/installation/code_dependencies.xml: Resolved
+	   TODO items in the dependency tables (package names).
+	* doc/C/usermanual/bugreport.xml: Described how to make a bug
+	  report.
+	* doc/C/usermanual/glossary.xml: Created the glossary.
+	* doc/C/sources.xml: Removed file; the replacement is
+	   doc/C/usermanual/installation/sources.xml.
+	* doc/C/gnashrc.xml: Removed file; it has been moved to
+	  doc/C/usermanual/usage/gnashrc.xml.
+	* doc/C/gnash.xml: Replace the old usermanual + developer
+	  information with the new usermanual.
+
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
+	* server/Makefile.am: add libgnashbackend to libserver LDADD.
+	  Fixes bug #20110.
+
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/MovieTester.cpp (checkPixel): print an UNTESTED
+	  message if no renderers were initialized. This gives you
+	  a feel about how many tests are we failign to run when building
+	  with a renderer that doesn't provide testing facilities.
+	* testsuite/anaylse-results.sh: print untested in report.
+	* testsuite/MovieTester.h: add a canTestRendering() method.
+	* testsuite/misc-ming.all/Video-EmbedSquareTestRunner.cpp: 
+	  Don't run the pixel checking part if MovieTester can't test
+	  rendering. Raise an UNTESTED label instead, so it's reported.
+
+2007-06-07 Sandro Santilli <strk@keybit.net>
+
+	* libgeometry/snappingrange.h: initialize all members in the
+	  templated copy ctor.
+
+2007-06-07 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* backend/sound_handler.cpp: Fixed a warning.
+	* backend/sound_handler_gst.cpp: Small cleanup.
+	* libbase/embedVideoDecoder{Ffmpeg, Gst}.cpp: Made more robust, can
+	  now handle if render image format is NONE. Should fix bug #20111.
+
+2007-06-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/edit_text_character.cpp: better version of previous patch;
+	  gets rid of WIDTH_FUDGE too 	
+
+2007-06-07 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/edit_text_character.cpp: shift text by 2 pixels, 
+	  fixes bug #17954
+
+2007-06-07 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/sprite_instance.cpp: improved call_frame_actions(), 
+	  avoid using possibly invalidated interators.
+	
+2007-06-06 Sandro Santilli <strk@keybit.net>
+
+	* server/swf/tag_loader.cpp (fixme_loader): warn only once for each
+	  unimplemented tag found in SWF streams during a run.
+
+2007-06-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: add checks for known scale 	
+	  and preset scale to 1:1 so that "make check" succeeds again
+
+2007-06-06 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/embedVideoDecoder.h: Added docs and made decodeFrame 
+	  return a auto_ptr.
+	* libbase/embedVideoDecoderFfmpeg.{cpp,h}: Made decodeFrame 
+	  return a auto_ptr.
+	* libbase/embedVideoDecoderGst.{cpp,h}: Made decodeFrame 
+	  return a auto_ptr, and fixed a deadlock.
+	* server/video_stream_instance.cpp: embedVideoDecoder::decodeFrame 
+	  now returns a auto_ptr, adjust to that.
+
+2007-06-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: dynamic cast check 	
+
+2007-06-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/eventSoundTest1-Runner.cpp: don't test sound
+	  if sound is not supported.
+
+2007-06-06 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: apply stage scaling to matrix,
+	  don't multiply each coordinate (should improve rendering performance) 	
+
+2007-06-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/MovieTester.{cpp,h}: Don't abort if sound support wasn't
+	  compiled in. Add a canTestSound() method to query that capability.
+
+2007-06-06 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: If no --enable-media was specified, use the first
+	  detected one in this order: ffmpeg/gst/mad. This is to allow
+	  ./configure with no args to be more failsafe (useful on 'make
+	  distcheck'). If you guys like this patch I'd backport to 0.8 branch.
+
+2007-06-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/samples/Makefile.am: distribute subshapes.swf, as we're
+	  now using it for testing purposes.
+	* testsuite/misc-ming.all/Makefile.am: VideoEmbed-SquareTest.swf
+	  depends on testsuite/media/square.flv ! Fixes bug #20090.
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: Fixed test for
+	  bytesTotal since the .flv was actually updated... Fixes bug #20096.
+	* configure.ac: don't set CXXFLAGS as a side-effect of the SIZET_FMT
+	  tests if not already set by user.
+	* Makefile.am: Add print of CXXFLAGS at 'make dumpconfig' time.
+
+2007-06-05 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* testsuite/media/square.flv: Changed the movements in the movie to
+	  be more fluent so that testing is easier.
+	* testsuite/misc-ming.all/Video-EmbedSquareTestRunner.cpp: Check if
+	  the video really does play.
+
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
+	* configure.ac: support --without-extensions.
+	* testsuite/samples/: Makefile.am, subshapes-TestRunner.cpp:
+	  Test runner for subshapes.swf (see bug #20084).
+	* testsuite/MovieTester.cpp (addTestingRenderer): register the first
+	  and only tested renderer immediately, to be more tolerant about
+	  limitations in the core lib preveing hot-swap of renderers.
+
+2007-06-05 Ann Barcomb <kudra@domaintje.com>
+
+	* doc/C/usermanual/usage/gnashrc.xml: Copy Sandro's commit
+	  1.3435 of doc/C/gnashrc.xml to the new gnashrc.xml
+	* many files: Changed my email address
+
+2007-06-05 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* backend/render_handler_agg.cpp: correct matrix transformation
+	  for rotated video; switch to /cloning/ image accessor to
+	  make edges smooth for rotated video	
+	
+2007-06-05 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/as_object.h: change operator "==" to "=", should fix a typo.
+	  
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
+	* README: some opcode and classes are actually implemented now.
+
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
+	* server/video_stream_instance.{cpp,h}: register Video AS class
+	  interface and provide class initialization.
+	* server/asobj/: Global.cpp, Makefile.am, Video.{cpp,h}: Drop Video file, video
+	  class is now implemented in video_stream_instance.cpp
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: don't expect
+	  failures due to video stream character NOT being a real Video
+	  object.
+
+2007-06-04 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/NetStream-SquareTest.c: set SWF rate back to
+	  an high value to allow for testing pixel color and also testing with
+	  eyes what's hard to test when nothing is shown due to Gnash not
+	  supporting sub-SWF rate videos; Scale video by 120% and rotate 45
+	  degrees clockwise to verify video transform
+	  bugs (not automated yet); documented expected behaviour; add 
+	  tests for matrix transforming properties.
