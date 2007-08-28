@@ -79,12 +79,33 @@ namespace gnash {
 			// m_current_byte = 0; // this is not needed
 		}
 
+		/// \brief
+		/// Read <count> bytes from the source stream and copy that data to <buf>.
+		/// Implicitely aligns to the next byte.
 		unsigned read(char *buf, unsigned count);
+		
+		/// \brief
+		/// Read a aligned unsigned 8-bit value from the stream.		
 		uint8_t  read_u8();
+
+		/// \brief
+		/// Read a aligned signed 8-bit value from the stream.		
 		int8_t   read_s8();
+
+		/// \brief
+		/// Read a aligned unsigned 16-bit value from the stream.		
 		uint16_t read_u16();
+
+		/// \brief
+		/// Read a aligned signed 16-bit value from the stream.		
 		int16_t  read_s16();
+
+		/// \brief
+		/// Read a aligned unsigned 32-bit value from the stream.		
 		uint32_t read_u32();
+
+		/// \brief
+		/// Read a aligned signed 32-bit value from the stream.		
 		int32_t  read_s32();
 
 		/// \brief

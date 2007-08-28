@@ -1,3 +1,7 @@
+2007-08-28 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* server/stream.h: documented some functions
+	
 2007-08-28 Sandro Santilli <strk@keybit.net>
 
 	* server/swf/tag_loaders.cpp: remove all bug jpeg-related
