@@ -1,3 +1,13 @@
+2007-08-28 Sandro Santilli <strk@keybit.net>
+
+	* libbase/: image.{cpp,h}, jpeg.{cpp,h}: extend interface
+	  for jpeg creators taking tu_file to specify
+	  ownership of the input stream.
+	* server/swf/tag_loaders.cpp: substitute calls to
+	  stream::get_underlying_stream with use of a quick&dirty
+	  tu_file adpater using stream underneath.
+	* server/stream.h: remove get_underlying_stream method.
+
 2007-08-28 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* server/stream.h: documented some functions

@@ -203,7 +203,7 @@ namespace gnash {
 		/// Seek to the end of the most-recently-opened tag.
 		void	close_tag();
 
-		tu_file*	get_underlying_stream() { return m_input; }
+		//tu_file*	get_underlying_stream() { return m_input; }
 
 		/// Discard given number of bytes
 		//

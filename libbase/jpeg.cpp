@@ -46,21 +46,29 @@ namespace tu_file_wrappers
 	public:
 		struct jpeg_source_mgr	m_pub;		/* public fields */
 
-		rw_source_tu_file(tu_file* in)
-			:
-			m_in_stream(in),
-			m_start_of_file(true)
 		// Constructor.  The caller is responsible for closing the input stream
 		// after it's done using us.
+		//
+		rw_source_tu_file(tu_file* in)
+			:
+			_ownSourceStream(false),
+			m_in_stream(in),
+			m_start_of_file(true)
 		{
-			// fill in function pointers...
-			m_pub.init_source = init_source;
-			m_pub.fill_input_buffer = fill_input_buffer;
-			m_pub.skip_input_data = skip_input_data;
-			m_pub.resync_to_restart = jpeg_resync_to_restart;	// use default method
-			m_pub.term_source = term_source;
-			m_pub.bytes_in_buffer = 0;
-			m_pub.next_input_byte = NULL;
+			init();
+		}
+
+		void takeStreamOwnership()
+		{
+			_ownSourceStream=true;
+		}
+
+		~rw_source_tu_file()
+		{
+			if ( _ownSourceStream )
+			{
+				delete m_in_stream;
+			}
 		}
 
 		static void init_source(j_decompress_ptr cinfo)
@@ -159,15 +167,40 @@ namespace tu_file_wrappers
 			m_pub.next_input_byte = NULL;
 		}
 
-		// Set up the given decompress object to read from the given
-		// stream.
-		static void setup(jpeg_decompress_struct* cinfo, tu_file* instream)
+		/// Set up the given decompress object to read from the given
+		/// stream.
+		///
+		/// @param instream
+		/// 	Stream to read from. Ownership decided by last arg.
+		///
+		/// @param takeOwnership
+		///	If false, ownership of the stream 
+		///	is left to caller, otherwise we take it.
+		//
+		static void setup(jpeg_decompress_struct* cinfo, tu_file* instream,
+			bool takeOwnership=false)
 		{
 			// assert(cinfo->src == NULL);
-			cinfo->src = (jpeg_source_mgr*) (new rw_source_tu_file(instream));
+			rw_source_tu_file* source = new rw_source_tu_file(instream);
+			if ( takeOwnership ) source->takeStreamOwnership();
+			cinfo->src = (jpeg_source_mgr*)source;
 		}
 
 	private:
+
+		void init()
+		{
+			// fill in function pointers...
+			m_pub.init_source = init_source;
+			m_pub.fill_input_buffer = fill_input_buffer;
+			m_pub.skip_input_data = skip_input_data;
+			m_pub.resync_to_restart = jpeg_resync_to_restart;	// use default method
+			m_pub.term_source = term_source;
+			m_pub.bytes_in_buffer = 0;
+			m_pub.next_input_byte = NULL;
+		}
+
+		bool _ownSourceStream;
 		tu_file*	m_in_stream;		/* source stream */
 		bool	m_start_of_file;		/* have we gotten any data yet? */
 		JOCTET	m_buffer[IO_BUF_SIZE];		/* start of buffer */
@@ -288,9 +321,18 @@ namespace tu_file_wrappers
 		enum SWF_DEFINE_BITS_JPEG2 { SWF_JPEG2 };
 		enum SWF_DEFINE_BITS_JPEG2_HEADER_ONLY { SWF_JPEG2_HEADER_ONLY };
 
-		// Constructor.  Read the header data from in, and
-		// prepare to read data.
-		input_tu_file(tu_file* in)
+		/// \brief
+		/// Constructor.  Read the header data from in, and
+		/// prepare to read data.
+		//
+		/// @param in
+		/// 	The stream to read from. Ownership specified by
+		///	second argument.
+		///
+		/// @param takeOwnership
+		///	If true, we take ownership of the input stream. 
+		///
+		input_tu_file(tu_file* in, bool takeOwnership=false)
 			:
 			m_compressor_opened(false)
 		{
@@ -301,7 +343,7 @@ namespace tu_file_wrappers
 			// Initialize decompression object.
 			jpeg_create_decompress(&m_cinfo);
 
-			rw_source_tu_file::setup(&m_cinfo, in);
+			rw_source_tu_file::setup(&m_cinfo, in, takeOwnership);
 
 			start_image();
 		}
@@ -314,7 +356,15 @@ namespace tu_file_wrappers
 		// start_image() and finish_image() around any calls
 		// to get_width/height/components and read_scanline.
 		//
-		input_tu_file(SWF_DEFINE_BITS_JPEG2_HEADER_ONLY /* e */, tu_file* in)
+		/// @param in
+		/// 	The stream to read from. Ownership specified by
+		///	last argument.
+		///
+		/// @param takeOwnership
+		///	If true, we take ownership of the input stream. 
+		///
+		input_tu_file(SWF_DEFINE_BITS_JPEG2_HEADER_ONLY /* e */, tu_file* in,
+				bool takeOwnership=false)
 			:
 			m_compressor_opened(false)
 		{
@@ -325,7 +375,7 @@ namespace tu_file_wrappers
 			// Initialize decompression object.
 			jpeg_create_decompress(&m_cinfo);
 
-			rw_source_tu_file::setup(&m_cinfo, in);
+			rw_source_tu_file::setup(&m_cinfo, in, takeOwnership);
 
 			// Read the encoding tables.
 			int ret = jpeg_read_header(&m_cinfo, FALSE);
@@ -363,7 +413,6 @@ namespace tu_file_wrappers
 			rw_source_tu_file* src = (rw_source_tu_file*) m_cinfo.src;
 			delete src;
 			m_cinfo.src = NULL;
-
 
 			jpeg_destroy_decompress(&m_cinfo);
 		}
@@ -576,18 +625,18 @@ static void	jpeg_error_exit(j_common_ptr cinfo)
 
 /*static*/
 input*
-input::create(tu_file* in)
+input::create(tu_file* in, bool takeOwnership)
 {
-	input* ret = new tu_file_wrappers::input_tu_file(in);
+	input* ret = new tu_file_wrappers::input_tu_file(in, takeOwnership);
 	return ret;
 }
 
 /*static*/
 input*
-input::create_swf_jpeg2_header_only(tu_file* in)
+input::create_swf_jpeg2_header_only(tu_file* in, bool takeOwnership)
 {
 	using tu_file_wrappers::input_tu_file;
-	input* ret = new input_tu_file(input_tu_file::SWF_JPEG2_HEADER_ONLY, in);
+	input* ret = new input_tu_file(input_tu_file::SWF_JPEG2_HEADER_ONLY, in, takeOwnership);
 	return ret;
 }
 

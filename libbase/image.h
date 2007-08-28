@@ -155,6 +155,11 @@ public:
 	DSOEXPORT rgb*	read_jpeg(const char* filename);
 
 	/// Create and read a new image from the stream.
+	//
+	/// @param in
+	/// 	Stream to read from. Ownership to the caller,
+	///	not needed after return.
+	///
 	DSOEXPORT rgb*	read_jpeg(tu_file* in);
 
 	/// \brief

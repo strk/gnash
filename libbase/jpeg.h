@@ -43,9 +43,19 @@ namespace jpeg
 		//
 		/// The created input reads the jpeg header
 		///
+		/// @param in
+		///	The stream to read from. Ownership specified by last arg.
+		///
+		/// @param takeOwnership
+		///	If false, ownership of the stream 
+		///	is left to caller, otherwise we take it.
+		///	NOTE: In case the caller retains ownership, it must
+		///	make sure the stream is alive and not modified
+		///	for the whole lifetime of the returned instance.
+		///
 		/// @return NULL on error
 		///
-		DSOEXPORT static input*	create(tu_file* in);
+		DSOEXPORT static input*	create(tu_file* in, bool takeOwnership=false);
 
 		/// Read SWF JPEG2-style header. 
 		//
@@ -53,9 +63,21 @@ namespace jpeg
 		/// image data.  Multiple images can be loaded by
 		/// bracketing within start_image()/finish_image() pairs.
 		///
+		/// @param in
+		///	The tu_file to use for input. Ownership specified
+		///	by last arg.
+		///
+		/// @param takeOwnership
+		///	If false, ownership of the stream 
+		///	is left to caller, otherwise we take it.
+		///	NOTE: In case the caller retains ownership, it must
+		///	make sure the stream is alive and not modified
+		///	for the whole lifetime of the returned instance.
+		///
 		/// @return NULL on error
 		///
-		DSOEXPORT static input*	create_swf_jpeg2_header_only(tu_file* in);
+		DSOEXPORT static input*	create_swf_jpeg2_header_only(tu_file* in,
+				bool takeOwnership=false);
 
 		/// Discard existing bytes in our buffer.
 		virtual void	discard_partial_buffer() = 0;
