@@ -1,3 +1,8 @@
+2007-08-29 Sandro Santilli <strk@keybit.net>
+
+	* server/text.h: fix signature of setFont(font*):
+	  return void.
+
 2007-08-28 Sandro Santilli <strk@keybit.net>
 
 	* libbase/: image.{cpp,h}, jpeg.{cpp,h}: extend interface

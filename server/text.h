@@ -79,7 +79,7 @@ namespace gnash {
 		///	The font pointer.
 		///	Must not be NULL or an assertion will fail.
 		///
-		bool setFont(const font* fnt)
+		void setFont(const font* fnt)
 		{
 			assert(fnt);
 			m_font = fnt;
