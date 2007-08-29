@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.18 2007/08/21 14:42:12 strk Exp $";
+rcsid="$Id: TextField.as,v 1.19 2007/08/29 18:38:35 strk Exp $";
 
 #include "check.as"
 
@@ -36,6 +36,12 @@ check_equals(typeof(TextField.prototype.removeListener), 'function');
 check_equals(typeof(TextField.prototype.getDepth), 'function');
 check_equals(typeof(TextField.prototype.removeTextField), 'function');
 check_equals(typeof(TextField.prototype.replaceSel), 'function');
+
+ // TextField.prototype was implicitly initialized by ASBroadcaster.initialize !
+ // See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
+ xcheck(TextField.prototype.hasOwnProperty("_listeners"));
+ xcheck_equals(typeof(TextField.prototype._listeners), 'object');
+ xcheck(TextField.prototype._listeners instanceof Array);
 
 // NOTE: the following will be true after a call to createTextField ! Seek forward to see..
 xcheck( !TextField.prototype.hasOwnProperty('background'));
@@ -631,6 +637,11 @@ tf.wordWrap = true;
 check_equals(origTextWidth, tf.textWidth); 
 tf._width = 10;
 check_equals(tf._width, 10);
-xcheck_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by wordWrap
+
+#if OUTPUT_VERSION < 8
+ xcheck_equals(origTextWidth, tf.textWidth); // textWidth isn't influenced by wordWrap
+#else
+ check(origTextWidth > tf.textWidth); 
+#endif
 
 #endif // OUTPUT_VERSION > 5

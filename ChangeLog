@@ -1,5 +1,14 @@
 2007-08-29 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/: Key.as, Mouse.as, Selection.as,
+	  Stage.as, TextField.as: check elements supposedly created
+	  by implicit call to ASBroadcaster.initialize().
+	  See bug #20832.
+	  NOTE: for TextField.as also fixed a wrong expected result for
+	  targets SWF8+
+
+2007-08-29 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/MovieTester.cpp (initTestingRenderers): add ARGB32 and
 	  ABGR32 renderers.
 

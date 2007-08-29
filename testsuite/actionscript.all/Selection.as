@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Selection.as,v 1.10 2007/07/26 03:41:19 strk Exp $";
+rcsid="$Id: Selection.as,v 1.11 2007/08/29 18:38:35 strk Exp $";
 
 #include "check.as"
 
@@ -60,6 +60,12 @@ check_equals (typeof(Selection.addListener), 'function');
 
 // test the Selection::removeListener method
 check_equals (typeof(Selection.removeListener), 'function'); 
+
+ // Selection was implicitly initialized by ASBroadcaster.initialize !
+ // See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
+ xcheck(Selection.hasOwnProperty("_listeners"));
+ xcheck_equals(typeof(Selection._listeners), 'object');
+ xcheck(Selection._listeners instanceof Array);
 
 #endif // OUTPUT_VERSION >= 6
 

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Key.as,v 1.1 2007/07/24 14:19:32 strk Exp $";
+rcsid="$Id: Key.as,v 1.2 2007/08/29 18:38:35 strk Exp $";
 
 #include "check.as"
 
@@ -33,12 +33,23 @@ check_equals(Key.__proto__, Object.prototype);
 
 // Methods
 #if OUTPUT_VERSION > 5
-check_equals(typeof(Key.addListener), 'function');
-check_equals(typeof(Key.removeListener), 'function');
+
+ check_equals(typeof(Key.addListener), 'function');
+ check_equals(typeof(Key.removeListener), 'function');
+
+ // Key was implicitly initialized by ASBroadcaster.initialize !
+ // See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
+ xcheck(Key.hasOwnProperty("_listeners"));
+ xcheck_equals(typeof(Key._listeners), 'object');
+ xcheck(Key._listeners instanceof Array);
+
 #else // OUTPUT_VERSION <= 5
-check_equals(typeof(Key.addListener), 'undefined');
-check_equals(typeof(Key.removeListener), 'undefined');
+
+ check_equals(typeof(Key.addListener), 'undefined');
+ check_equals(typeof(Key.removeListener), 'undefined');
+
 #endif // OUTPUT_VERSION <= 5
+
 check_equals(typeof(Key.getAscii), 'function');
 check_equals(typeof(Key.getCode), 'function');
 check_equals(typeof(Key.isDown), 'function');
