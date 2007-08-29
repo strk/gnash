@@ -69,6 +69,27 @@
     check(typeof(mcRef)=='movieclip'); 
     check(mc == _level0.mc);    
     xcheck(mcRef == _level0.mc);
+  .end
+
+.frame 7
+  .action:
+    // change the instance name again
+    mc._name = "changed_again";
+    
+    check(typeof(changed_again)=='movieclip'); 
+    
+    check(mc == undefined); 
+    check(typeof(mcRef)=='movieclip'); 
+    check(mcRef.valueOf() == null);
+    
+    // change the instance name back
+    mc._name = "mc";
+    check(typeof(mc)=='undefined'); 
+    check(mc == undefined); 
+
+    check(typeof(mcRef)=='movieclip'); 
+    check(mcRef.valueOf() == null); 
+    
     totals();
     stop();
   .end
