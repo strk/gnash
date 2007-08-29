@@ -71,7 +71,7 @@
     // Gnash bug:
     //   Target of the sprite mcRef points to changed, so seeking
     //   for the new target fails (_level0.changed doesn't exist)
-    xcheck(mcRef == _level0.mc);
+    check(mcRef == _level0.mc);
   .end
 
 .frame 7
@@ -123,7 +123,7 @@
     //   Thus, when finding a *new* character (the old one was unloaded)
     //   we find the *new* _level0.mc2.
     //   Should be fixed in the same way as for the bug exposed in frame 5
-    xcheck(mcRef.valueOf() == null) 
+    check(mcRef.valueOf() == null) 
     
     // release resources after testing
     delete mcRef;
@@ -161,7 +161,7 @@
     // Gnash bug:
     //   Still the same bug: the ref uses *current* target instead of the one
     //   as of creation time.
-    xcheck(mcRef == _level0.mc1);
+    check(mcRef == _level0.mc1);
     
     _root.totals();
     stop(); 

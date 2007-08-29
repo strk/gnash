@@ -513,12 +513,14 @@ as_value::to_sprite() const
 #ifndef MOVIECLIP_AS_SOFTREF
 	sprite_instance* sp = m_object_value->to_movie();
 	if ( ! sp ) return NULL; // shoudl we assert(sp) instead ?
+
 	if ( sp->isUnloaded() )
+	// TODO: we should also check if the unload event handlers have been invoked or not, or references to 'this' in unload handlers will be bogus !
 	{
 		log_error(_("MovieClip value is a dangling reference: "
 				"target %s was unloaded (looking for a substitute on the same target))"),
 				sp->getTarget().c_str());
-		sp = find_sprite_by_target(sp->getTarget());
+		sp = find_sprite_by_target(sp->getOrigTarget());
 		return sp;
 		//return NULL;
 	}

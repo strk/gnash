@@ -745,6 +745,17 @@ public:
 	///
 	virtual void enumerateNonProperties(as_environment&) const;
 
+	/// Return original target path to this object, in dot notation
+	/// as of at construction time.
+	//
+	/// This is needed to properly dereference dangling soft-references
+	/// See testcase misc-swfc.all/soft_reference_test1.sc
+	///
+	const std::string& getOrigTarget() const
+	{
+		return _origTarget;
+	}
+
 private:
 
 	/// \brief
@@ -929,6 +940,8 @@ private:
 	/// See execute_frame_tags.
 	///
 	DisplayList _frame0_chars;
+
+	std::string _origTarget;
 
 protected:
 

@@ -3359,8 +3359,10 @@ sprite_instance::call_method_args(const char* method_name,
 void
 sprite_instance::construct()
 {
+	_origTarget = getTarget();
+
 #ifdef GNASH_DEBUG
-	log_msg(_("Constructing sprite '%s'"), getTargetPath().c_str());
+	log_msg(_("Constructing sprite '%s'"), _origTarget.c_str());
 #endif
 
 	// We *might* avoid this, but better safe then sorry

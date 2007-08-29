@@ -1,5 +1,15 @@
 2007-08-29 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (to_sprite): use original target, not current
+	  one, for dereferencing danglign MOVIECLIP refs; add TODO item about
+	  the onUnload problem.
+	* server/sprite_instance.{h,cpp}: add a getOrigTarget() to return original
+	  target of a sprite (the target it got when first constructed, immune
+	  from _name changes).
+	* testsuite/misc-swfc.all/soft_reference_test1.sc: xcheck => check
+
+2007-08-29 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-swfc.all/soft_reference_test1.sc: add some
 	  comments as to why Gnash fails.
 
