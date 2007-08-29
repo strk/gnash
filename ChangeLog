@@ -1,6 +1,15 @@
+2007-08-29 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* configure.ac: added pixel formats ARGB32 and ABGR32; allow "all" value for
+	  --with-pixelformat
+	* backend/render_handler_agg.cpp: implement the two new pixel formats and
+	  check for the host endianess; some initial changes in AGG cache class which
+    currently is not used, however
+	* backend/render_handler_agg.h, gui/fb.cpp: updated comments
+	
 2007-08-29 Sandro Santilli <strk@keybit.net>
 
-        * server/as_environment.cpp (get_variable): more verbosity in
+	* server/as_environment.cpp (get_variable): more verbosity in
 	  debugging messages.
 
 2007-08-29 Sandro Santilli <strk@keybit.net>

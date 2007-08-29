@@ -271,6 +271,11 @@ bool FBGui::initialize_renderer() {
     var_screeninfo.blue.length);
   log_msg("Total bits per pixel: %d", var_screeninfo.bits_per_pixel);
   
+  /* NOTE: agg_detect_pixel_format() assumes bit positions in host byte order.
+  I don't know if this matches the information provided by var_screeninfo, so
+  you know what to do when colors look wrong (or pixel format can't be detected)
+  on big-endian machines! - Udo */   
+  
   char* pixelformat = agg_detect_pixel_format(
     var_screeninfo.red.offset, var_screeninfo.red.length,
     var_screeninfo.green.offset, var_screeninfo.green.length,

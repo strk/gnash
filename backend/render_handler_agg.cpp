@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.102 2007/08/29 04:30:37 nihilus Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.103 2007/08/29 17:34:06 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -189,6 +189,7 @@ using namespace gnash;
 
 namespace gnash {
 
+
 // --- CACHE -------------------------------------------------------------------
 /// This class holds a completely transformed path (fixed position). Speeds
 /// up characters that stay fixed on a certain position on the stage. 
@@ -196,21 +197,48 @@ namespace gnash {
 
 class agg_transformed_path 
 {
+public:
   /// Original transformation matrix 
   matrix m_mat;  
   
+  /// Normal or rounded coordinates?
+  bool m_rounded;
+  
   /// Number of cache hits 
-  int hits;
+  int m_hits;
   
-  /// Number of cache misses
-  int misses;
-  
-  /// Contents of this cache item. First dimension is fill style 
-  std::vector <std::vector <agg::path_storage> > data;
+  /// Contents of this cache item (AGG path).  
+  std::vector <agg::path_storage> m_data;
 };
 
 class agg_cache_manager : private render_cache_manager
 {
+
+  std::vector <agg_transformed_path> m_items;
+
+  /// Looks for a matching pre-computed path in the cache list
+  /// Returns NULL if no cache item matches 
+  std::vector <agg::path_storage>* search(const matrix& mat, bool rounded) {
+  
+    size_t ccount = m_items.size();
+    
+    for (size_t cno=0; cno<ccount; cno++) {    
+      agg_transformed_path& item = m_items[cno];
+          
+      if ((item.m_mat == mat) && (item.m_rounded == rounded)) {
+      
+        // Found it!
+        return &item.m_data;
+      
+      }    
+    }
+    
+    // could not find a matching item
+    return NULL;
+  
+  }
+  
+
 };
 
 
@@ -661,18 +689,11 @@ public:
     assert(m_pixf != NULL);
     
     assert(scale_set);
-
     // clear the stage using the background color
     for (unsigned int i=0; i<_clipbounds.size(); i++) 
       clear_framebuffer(_clipbounds[i], agg::rgba8_pre(background_color.m_r,
         background_color.m_g, background_color.m_b,
-        background_color.m_a));
-        
-    // calculate final pixel scale
-    /*double scaleX, scaleY;
-    scaleX = (double)xres / (double)viewport_width / 20.0;  // 20=TWIPS
-    scaleY = (double)yres / (double)viewport_height / 20.0;
-    scale = scaleX<scaleY ? scaleX : scaleY;*/
+        background_color.m_a));        
     
     // reset status variables
     m_drawing_mask = false;
@@ -2149,15 +2170,35 @@ private:  // private variables
 
 
 
+// detect the endianess of the host (would prefer to NOT have this function
+// here)
+bool is_little_endian_host() {
 
-// TODO: Replace "pixelformat" with a enum!
+  union {
+    uint16_t word;
+    struct {
+      uint8_t b1;
+      uint8_t b2;
+    };
+  } u;
+    
+  u.b1 = 1;
+  u.b2 = 2;
+  
+  return u.word == 0x0201;
+
+}
+
 
 DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelformat)
 {
 
   if (!pixelformat) return NULL;
 
-  log_msg("framebuffer pixel format is %s", pixelformat);
+  if (is_little_endian_host())
+    log_msg("framebuffer pixel format is %s (little-endian host)", pixelformat);
+  else
+    log_msg("framebuffer pixel format is %s (big-endian host)", pixelformat);
   
 #ifdef PIXELFORMAT_RGB555  
   if (!strcmp(pixelformat, "RGB555"))
@@ -2188,6 +2229,15 @@ DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelf
 #ifdef PIXELFORMAT_BGRA32  
   if (!strcmp(pixelformat, "BGRA32"))
     return new render_handler_agg<agg::pixfmt_bgra32_pre> (32);
+#endif   
+#ifdef PIXELFORMAT_RGBA32 
+  if (!strcmp(pixelformat, "ARGB32"))
+    return new render_handler_agg<agg::pixfmt_argb32_pre> (32);
+  else 
+#endif   
+#ifdef PIXELFORMAT_BGRA32  
+  if (!strcmp(pixelformat, "ABGR32"))
+    return new render_handler_agg<agg::pixfmt_abgr32_pre> (32);
         
   else 
 #endif
@@ -2200,10 +2250,22 @@ DSOEXPORT render_handler_agg_base*  create_render_handler_agg(const char *pixelf
   return NULL; // avoid compiler warning
 }
 
+
 DSOEXPORT char *agg_detect_pixel_format(unsigned int rofs, unsigned int rsize,
   unsigned int gofs, unsigned int gsize,
   unsigned int bofs, unsigned int bsize,
   unsigned int bpp) {
+  
+  if (!is_little_endian_host()) {
+  
+    // Swap bits for big endian hosts, because the following tests assume
+    // little endians. The pixel format string matches the bytes in memory.
+    
+    rofs = bpp - rofs - rsize;
+    gofs = bpp - gofs - gsize;
+    bofs = bpp - bofs - bsize; 
+  
+  }
   
   // 15 bits RGB (hicolor)
   if ((rofs==10) && (rsize==5)
@@ -2243,7 +2305,23 @@ DSOEXPORT char *agg_detect_pixel_format(unsigned int rofs, unsigned int rsize,
     else
       return "RGBA32";
       
-  }  
+  } else
+  // special 32 bits (mostly on big endian hosts)
+  if ((rofs==8) && (rsize==8)
+   && (gofs==16) && (gsize==8)
+   && (bofs==24) && (bsize==8)) {
+   
+   return "ARGB32";
+   
+  } else
+  // special 32 bits (mostly on big endian hosts)
+  if ((rofs==24) && (rsize==8)
+   && (gofs==16) && (gsize==8)
+   && (bofs==8) && (bsize==8)) {
+   
+   return "ABGR32";
+   
+  }
   
   return NULL; // unknown format
   

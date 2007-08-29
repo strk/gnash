@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.408 2007/08/27 21:15:10 nihilus Exp $
+dnl $Id: configure.ac,v 1.409 2007/08/29 17:34:06 udog Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -358,11 +358,20 @@ AC_ARG_WITH(pixelformat,
   while test -n "${withval}" ; do
     val=`echo ${withval} | cut -d ' ' -f 1`
     [case "${val}" in
+      all)
+        # allow special value "all" set by user (handled below)
+        ;; 
       rgba32|RGBA32)
         AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32])
         ;;
       bgra32|BGRA32)
         AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
+        ;;
+      argb32|ARGB32)
+        AC_DEFINE(PIXELFORMAT_ARGB32, [1], [ARGB32])
+        ;;
+      abgr32|ABGR32)
+        AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32])
         ;;
       rgb24|RGB24)
         AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24])
@@ -376,8 +385,7 @@ AC_ARG_WITH(pixelformat,
       rgb565|RGB565)
         AC_DEFINE(PIXELFORMAT_RGB565, [1], [RGB565])
         ;;
-      *) AC_MSG_ERROR([invalid pixel format ${withval} given (accept: RGB555|RG
-B565|RGB24|BGR24|BGRA32|RGBA32)])
+      *) AC_MSG_ERROR([invalid pixel format ${withval} given (accept: all|RGB555|RGB565|RGB24|BGR24|BGRA32|RGBA32|ARGB32|ABGR32)])
          ;;
       esac]
     withval=`echo ${withval} | cut -d ' ' -f 2-6`
@@ -401,6 +409,8 @@ if test x$pixelformat = xall; then
       AC_DEFINE(PIXELFORMAT_BGR24,  [1], [BGR24 pixel format])
       AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32 pixel format])
       AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32 pixel format])
+      AC_DEFINE(PIXELFORMAT_ARGB32, [1], [ARGB32 pixel format])
+      AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32 pixel format])
     #fi
   fi
 fi
