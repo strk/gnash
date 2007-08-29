@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Stage.as,v 1.14 2007/08/29 18:38:35 strk Exp $";
+rcsid="$Id: Stage.as,v 1.15 2007/08/29 18:50:20 strk Exp $";
 
 #include "check.as"
 
@@ -33,13 +33,12 @@ check_equals(Stage.__proto__, Object.prototype);
 
 #if OUTPUT_VERSION > 5
 
-// test the Stage::addlistener method
-check_equals (typeof(Stage.addListener), 'function');
-// test the Stage::removelistener method
-check_equals (typeof(Stage.removeListener), 'function');
-
 // Stage was implicitly initialized by ASBroadcaster.initialize !
 // See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
+check_equals (typeof(Stage.addListener), 'function');
+check_equals (typeof(Stage.removeListener), 'function');
+xcheck_equals(typeof(Stage.broadcastMessage), 'function');
+
 xcheck(Stage.hasOwnProperty("_listeners"));
 xcheck_equals(typeof(Stage._listeners), 'object');
 xcheck(Stage._listeners instanceof Array);

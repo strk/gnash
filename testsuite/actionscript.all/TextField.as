@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.19 2007/08/29 18:38:35 strk Exp $";
+rcsid="$Id: TextField.as,v 1.20 2007/08/29 18:50:20 strk Exp $";
 
 #include "check.as"
 
@@ -31,14 +31,15 @@ check_equals(typeof(TextField.prototype.setTextFormat), 'function');
 check_equals(typeof(TextField.prototype.getTextFormat), 'function');
 check_equals(typeof(TextField.prototype.setNewTextFormat), 'function');
 check_equals(typeof(TextField.prototype.getNewTextFormat), 'function');
-check_equals(typeof(TextField.prototype.addListener), 'function');
-check_equals(typeof(TextField.prototype.removeListener), 'function');
 check_equals(typeof(TextField.prototype.getDepth), 'function');
 check_equals(typeof(TextField.prototype.removeTextField), 'function');
 check_equals(typeof(TextField.prototype.replaceSel), 'function');
 
  // TextField.prototype was implicitly initialized by ASBroadcaster.initialize !
  // See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
+ check_equals(typeof(TextField.prototype.addListener), 'function');
+ check_equals(typeof(TextField.prototype.removeListener), 'function');
+ xcheck_equals(typeof(TextField.prototype.broadcastMessage), 'function');
  xcheck(TextField.prototype.hasOwnProperty("_listeners"));
  xcheck_equals(typeof(TextField.prototype._listeners), 'object');
  xcheck(TextField.prototype._listeners instanceof Array);

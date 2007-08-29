@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Mouse.as,v 1.12 2007/08/29 18:38:35 strk Exp $";
+rcsid="$Id: Mouse.as,v 1.13 2007/08/29 18:50:20 strk Exp $";
 
 #include "check.as"
 
@@ -35,12 +35,11 @@ check_equals ( typeof(Mouse.hide), 'function' );
 
 #if OUTPUT_VERSION > 5
 
-// test addListner/removeListener, added in SWF6
-check_equals ( typeof(Mouse.removeListener), 'function' );
-check_equals ( typeof(Mouse.addListener), 'function' );
-
  // Mouse was implicitly initialized by ASBroadcaster.initialize !
  // See http://www.senocular.com/flash/tutorials/listenersasbroadcaster/?page=2
+ check_equals ( typeof(Mouse.removeListener), 'function' );
+ check_equals ( typeof(Mouse.addListener), 'function' );
+ xcheck_equals( typeof(Mouse.broadcastMessage), 'function' );
  xcheck(Mouse.hasOwnProperty("_listeners"));
  xcheck_equals(typeof(Mouse._listeners), 'object');
  xcheck(Mouse._listeners instanceof Array);
