@@ -3,7 +3,8 @@
 	* configure.ac, libbase/utility.h, server/asobj/Date.cpp,
 	backend/render_handler_agg.cpp: Unified trunc() and added
 	checking.
-	* configure.ac, macros/libexe.m4: keep bourne-sh, /bin/sh, happy.
+	* configure.ac, macros/libexe.m4, macros/kde.m4: 
+	keep bourne-sh, /bin/sh, happy.
 
 2007-08-29 Sandro Santilli <strk@keybit.net>
 

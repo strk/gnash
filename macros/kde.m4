@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: kde.m4,v 1.35 2007/08/03 03:01:16 rsavoye Exp $
+dnl $Id: kde.m4,v 1.36 2007/08/29 22:34:38 nihilus Exp $
 
 AC_DEFUN([GNASH_PATH_KDE],
 [
@@ -192,7 +192,7 @@ dnl On Debian the dir is /usr/include/qt3 with /usr/lib/libqt-mt.*
 dnl so we set topdir to /usr so that $topdir/lib/libqt-mt.* works below,
 dnl and version to 3 or whatever.
 dnl incllist is inherited from configure.ac.
-  if test "x$gnash_qt_version" == x; then
+  if test "x$gnash_qt_version" = x; then
     for i in $incllist; do
       for j in `ls -dr $i/qt[[0-9]] 2>/dev/null`; do
         if test -f $j/qobject.h; then
