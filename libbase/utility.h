@@ -119,7 +119,7 @@ inline double	exp2(double x) { return std::pow((double)2, double(x)); }
 #endif
 inline int	frnd(float f) { return (int)(f + 0.5f); }	// replace with inline asm if desired
 #ifndef HAVE_TRUNC
-inline double trunc(x) ( x < 0 ?  -(std::floor(-x)) : std::floor(x) )
+inline double trunc(double x) ( x < 0 ?  -(std::floor(-x)) : std::floor(x) )
 #endif
 
 // Handy macro to quiet compiler warnings about unused parameters/variables.
