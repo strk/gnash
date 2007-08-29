@@ -5,6 +5,7 @@
 	checking.
 	* configure.ac, macros/libexe.m4, macros/kde.m4: 
 	keep bourne-sh, /bin/sh, happy.
+	* macros/boost.m4: Fixed issue with lib-checking.
 
 2007-08-29 Sandro Santilli <strk@keybit.net>
 

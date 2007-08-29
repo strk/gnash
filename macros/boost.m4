@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.48 2007/08/22 10:52:52 strk Exp $
+dnl $Id: boost.m4,v 1.49 2007/08/29 23:29:54 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -90,7 +90,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
   boost_thread="no"
   AC_MSG_CHECKING([for Boost libraries])
   for i in $libslist; do
-    if test x${boost_date_time} = xyes && test x${boost_thread} = xyes; then
+    if test x${boost_date_time} = xyes -a x${boost_thread} = xyes; then
       break;
     fi
     dirs=`ls -dr $i/libboost_date_time*.${shlibext} $i/libboost_date_time*.${shlibext}.* $i/libboost_date_time*.a 2>/dev/null`
@@ -120,7 +120,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
         lfile=`basename ${libname} | eval sed -e 's:^lib::'  -e 's:.a$::' -e 's:\.${shlibext}.*::'`
         ldir=`dirname ${libname}`
         if test -f ${ldir}/lib${lfile}-mt.${shlibext}; then
-          lfile=${lfile}-mt
+          lfile="${lfile}-mt"
         fi
         boost_thread=yes
         ac_cv_path_boost_lib="${ac_cv_path_boost_lib} -l${lfile}"
@@ -142,10 +142,8 @@ AC_DEFUN([GNASH_PATH_BOOST],
 
   if test x${cross_compiling} = xno; then
     AC_LANG_PUSH(C++)  
-    save_CFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS $BOOST_CFLAGS"
+    CXXFLAGS="$CFLAGS $BOOST_CFLAGS"
     AC_CHECK_HEADERS([boost/thread.hpp], [], [boost_thread=no]) 
-    CFLAGS="$save_CFLAGS"
     AC_LANG_POP(C++)  
   fi # if not cross-compiling
 
