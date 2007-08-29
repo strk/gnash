@@ -28,7 +28,7 @@
  */
 
 
-.flash  bbox=200x200 filename="soft_reference_test1.swf" version=6 fps=12
+.flash  bbox=800x600 filename="soft_reference_test1.swf" background=white version=6 fps=12
 
 .frame 1
   .action:
@@ -91,8 +91,66 @@
     check(typeof(mcRef)=='movieclip'); 
     check(mcRef.valueOf() == null); 
     
-    totals();
-    stop();
+    // Release resources after testing
+    delete mc;
+    delete mcRef;
+    changed_again.removeMovieClip();
+  .end
+
+
+// seperate tests in frame9
+.frame 9
+  .action:
+    _root.createEmptyMovieClip("mc1", 30);
+    mc1._name = "mc2";
+    mcRef = mc2;
+    
+    check(typeof(mcRef)=='movieclip');
+    check_equals(mcRef.getDepth(), 30);
+    check(mcRef == _level0.mc2);
+    
+    mc2.removeMovieClip();
+    _root.createEmptyMovieClip("mc2", 40);
+
+    check(typeof(mcRef)=='movieclip');
+    xcheck(mcRef.valueOf() == null) 
+    
+    // release resources after testing
+    delete mcRef;
+    mc2.removeMovieClip();
+  .end
+
+// seperate tests in frame11
+.frame 11
+  .action:
+    mcContainer = new Array(10);
+    i = 0;
+    MovieClip.prototype.onConstruct = function ()
+    {
+      mcContainer[i++] = this;
+      note("Constructed "+this+" in depth "+this.getDepth()+" and assigned to mcContainer["+(i-1)+"]");
+    };
+    _root.createEmptyMovieClip("mc1", 50);
+    _root.createEmptyMovieClip("mc1", 51);
+    check_equals(mcContainer[0].getDepth(), 50);
+    check_equals(mcContainer[1].getDepth(), 51);
+    check_equals(mc1.getDepth(), 50);
+    
+    mc1._name = "mc2";
+    mcRef = mc2;
+    
+    check(typeof(mcRef)=='movieclip');
+    check_equals(mcRef.getDepth(), 50);
+    check(mcRef == _level0.mc2);
+    
+    mc2.removeMovieClip();
+    _root.createEmptyMovieClip("mc2", 60);
+
+    check(typeof(mcRef)=='movieclip');
+    xcheck(mcRef == _level0.mc1);
+    
+    _root.totals();
+    stop(); 
   .end
   
 .end
