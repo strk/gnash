@@ -23,8 +23,8 @@
  *
  * Description:
  *  frame1: create an movieclip and rename it;
- *  frame2: remove the movieclip;
- *  frame3: re-create an movieclip with the original name.
+ *  frame3: remove the movieclip;
+ *  frame5: re-create an movieclip with the original name.
  */
 
 
