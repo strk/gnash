@@ -391,7 +391,8 @@ MovieTester::initTestingRenderers()
 	// Initialize AGG
 	static const char* aggPixelFormats[] = {
 		"RGB555", "RGB565", "RGBA16",
-		"RGB24", "BGR24", "RGBA32", "BGRA32"
+		"RGB24", "BGR24", "RGBA32", "BGRA32",
+		"ARGB32", "ABGR32"
 	};
 
 	for (unsigned i=0; i<sizeof(aggPixelFormats)/sizeof(*aggPixelFormats); ++i)
