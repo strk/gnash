@@ -1,3 +1,28 @@
+2007-08-29 Chad Musick <chadmusick@msbx.net>
+
+	* server/asobj/BlurFilter_as.cpp,.h
+	* server/asobj/ColorMatrixFilter_as.cpp,.h
+	* server/asobj/ConvolutionFilter_as.cpp,.h
+	* server/asobj/DropShadowFilter_as.cpp,.h
+	* server/asobj/GlowFilter_as.cpp,.h
+	* server/asobj/GradientBevelFilter_as.cpp,.h
+	* server/asobj/GradientGlowFilter_as.cpp,.h
+	* server/asobj/BevelFilter_as.cpp,.h
+	* server/asobj/BitmapFilter_as.cpp,.h
+	  Change to use multiple inheritance for adaptation
+	* server/BevelFilter.h,.cpp
+	* server/BlurFilter.h,.cpp
+	* server/ColorMatrixFilter.h,.cpp
+	* server/ConvolutionFilter.h,.cpp
+	* server/DropShadowFilter.h,.cpp
+	* server/GlowFilter.h,.cpp
+	* server/GradientBevelFilter.h,.cpp
+	* server/GradientGlowFilter.h,.cpp
+	  Changing to use multiple inheritance for adaptation
+	* server/asobj/prophelper.h Update for using multiple inheritance
+	* server/parser/filter_factory.cpp
+	  Change to use correct type of operator for array pushes.
+
 2007-08-29 Sandro Santilli <strk@keybit.net>
 
 	* libbase/utility.h: fix the frnd() function to behave as

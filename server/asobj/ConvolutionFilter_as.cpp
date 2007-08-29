@@ -15,9 +15,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ConvolutionFilter_as.cpp,v 1.1 2007/08/27 18:13:41 cmusick Exp $ */
+/* $Id: ConvolutionFilter_as.cpp,v 1.2 2007/08/29 03:32:58 cmusick Exp $ */
 
-#include "BitmapFilter_as.h"
+#include "as_object.h"
 #include "ConvolutionFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
@@ -25,10 +25,11 @@
 #define phelp_helper ConvolutionFilter_as
 #define phelp_class ConvolutionFilter
 #include "prophelper.h"
+#include "BitmapFilter_as.h"
 
 namespace gnash {
 
-class ConvolutionFilter_as
+class ConvolutionFilter_as : public as_object, public ConvolutionFilter
 {
     phelp_base_def;
 public:
@@ -41,11 +42,15 @@ public:
     phelp_gs(clamp);
     phelp_gs(color);
     phelp_gs(alpha);
+
+    phelp_i(bitmap_clone);
 };
 
 phelp_base_imp((bitmapFilter_interface()), ConvolutionFilter);
 
-phelp_i_attach_empty
+phelp_i_attach_begin
+phelp_i_replace(clone, bitmap_clone);
+phelp_i_attach_end
 
 phelp_gs_attach_begin
 phelp_gs_attach(matrixX);
@@ -69,10 +74,12 @@ phelp_property(uint32_t, number<uint32_t>, color)
 phelp_property(uint8_t, number<uint8_t>, alpha)
 phelp_array_property(matrix)
 
+easy_clone(ConvolutionFilter_as)
+
 as_value
 ConvolutionFilter_as::ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new ConvolutionFilter(ConvolutionFilter_as::Interface());
+    boost::intrusive_ptr<as_object> obj = new ConvolutionFilter_as(ConvolutionFilter_as::Interface());
     ConvolutionFilter_as::attachProperties(*obj);
 
     return as_value(obj.get());

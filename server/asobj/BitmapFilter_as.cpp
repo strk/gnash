@@ -15,8 +15,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BitmapFilter_as.cpp,v 1.2 2007/08/27 18:13:40 cmusick Exp $ */
+/* $Id: BitmapFilter_as.cpp,v 1.3 2007/08/29 03:32:58 cmusick Exp $ */
 
+#include "as_object.h"
 #include "BitmapFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
@@ -27,11 +28,13 @@
 
 namespace gnash {
 
-class BitmapFilter_as
+class BitmapFilter_as : public as_object, public BitmapFilter
 {
     phelp_base_def;
 public:
     phelp_i(bitmap_clone);
+
+    virtual boost::intrusive_ptr<as_object> clone();
 };
 
 phelp_base_imp( , BitmapFilter);
@@ -40,20 +43,29 @@ phelp_i_attach_begin
 phelp_i_attach(clone, bitmap_clone);
 phelp_i_attach_end
 
+// Clone this object.
+boost::intrusive_ptr<as_object> BitmapFilter_as::clone()
+{
+    boost::intrusive_ptr<as_object> o = new BitmapFilter_as(BitmapFilter_as::Interface());
+    return o;
+}
+
 as_value
 BitmapFilter_as::ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new BitmapFilter(BitmapFilter_as::Interface());
-    return as_value(obj.get());
+    boost::intrusive_ptr<as_object> obj = new BitmapFilter_as(BitmapFilter_as::Interface());
+    return as_value(obj);
 }
 
 as_value BitmapFilter_as::bitmap_clone(const fn_call& fn)
 {
-    boost::intrusive_ptr<BitmapFilter> filter = ensureType<BitmapFilter> (fn.this_ptr);
-    boost::intrusive_ptr<as_object> retval = filter->clone();
-    retval->set_prototype(filter->get_prototype());
+    boost::intrusive_ptr<BitmapFilter_as> to_copy = ensureType<BitmapFilter_as> (fn.this_ptr);
+    boost::intrusive_ptr<BitmapFilter_as> filter = new BitmapFilter_as(*to_copy);
+    filter->set_prototype(filter->get_prototype());
+    filter->copyProperties(*filter);
+    boost::intrusive_ptr<as_object> r = filter;
 
-    return as_value(retval);
+    return as_value(r);
 }
 
 as_object*

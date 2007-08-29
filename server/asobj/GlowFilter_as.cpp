@@ -15,9 +15,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GlowFilter_as.cpp,v 1.1 2007/08/27 18:13:42 cmusick Exp $ */
+/* $Id: GlowFilter_as.cpp,v 1.2 2007/08/29 03:32:58 cmusick Exp $ */
 
-#include "BitmapFilter_as.h"
+#include "as_object.h"
 #include "GlowFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
@@ -26,10 +26,11 @@
 #define phelp_helper GlowFilter_as
 #define phelp_class GlowFilter
 #include "prophelper.h"
+#include "BitmapFilter_as.h"
 
 namespace gnash {
 
-class GlowFilter_as
+class GlowFilter_as : public as_object, public GlowFilter
 {
     phelp_base_def;
 public:
@@ -41,12 +42,16 @@ public:
     phelp_gs(quality);
     phelp_gs(inner); 
     phelp_gs(knockout);
+
+    phelp_i(bitmap_clone);
 };
 
 phelp_base_imp((bitmapFilter_interface()), GlowFilter);
 
 // Filters are property based.
-phelp_i_attach_empty
+phelp_i_attach_begin
+phelp_i_replace(clone, bitmap_clone);
+phelp_i_attach_end
 
 phelp_gs_attach_begin
 phelp_gs_attach(color);
@@ -68,10 +73,12 @@ phelp_property(uint8_t, number<uint8_t>, quality)
 phelp_property(bool, bool, inner)
 phelp_property(bool, bool, knockout)
 
+easy_clone(GlowFilter_as)
+
 as_value
 GlowFilter_as::ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new GlowFilter(GlowFilter_as::Interface());
+    boost::intrusive_ptr<as_object> obj = new GlowFilter_as(GlowFilter_as::Interface());
     GlowFilter_as::attachProperties(*obj);
 
     return as_value(obj.get());

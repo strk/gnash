@@ -38,3 +38,19 @@ as_object *bitmapFilter_interface();
 // __GNASH_ASOBJ_BITMAPFILTER_H__
 #endif
 
+#ifdef phelp_helper
+#ifndef easy_clone
+#define easy_clone(sp_name) \
+as_value \
+sp_name::bitmap_clone(const fn_call& fn) \
+{ \
+    boost::intrusive_ptr<sp_name> ptr = ensureType<sp_name>(fn.this_ptr); \
+    boost::intrusive_ptr<sp_name> obj = new sp_name(*ptr); \
+    boost::intrusive_ptr<as_object> r = obj; \
+    r->set_prototype(ptr->get_prototype()); \
+    r->copyProperties(*ptr); \
+\
+    return as_value(r); \
+}
+#endif /* easy_clone */
+#endif /* phelp_helper */

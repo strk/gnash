@@ -15,33 +15,37 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BlurFilter_as.cpp,v 1.1 2007/08/27 18:13:41 cmusick Exp $ */
+/* $Id: BlurFilter_as.cpp,v 1.2 2007/08/29 03:32:58 cmusick Exp $ */
 
-#include "BitmapFilter_as.h"
+#include "as_object.h"
 #include "BlurFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
 
 // These _must_ be defined.
 #define phelp_helper BlurFilter_as
-#define phelp_class BlurFilter
 #include "prophelper.h"
+#include "BitmapFilter_as.h"
 
 namespace gnash {
 
-class BlurFilter_as
+class BlurFilter_as : public as_object, public BlurFilter
 {
     phelp_base_def;
 public:
     phelp_gs(blurX);
     phelp_gs(blurY);
     phelp_gs(quality);
+
+    phelp_i(bitmap_clone);
 };
 
 phelp_base_imp((bitmapFilter_interface()), BlurFilter);
 
 // Filters are property based.
-phelp_i_attach_empty
+phelp_i_attach_begin
+phelp_i_replace(clone, bitmap_clone);
+phelp_i_attach_end
 
 phelp_gs_attach_begin
 phelp_gs_attach(blurX);
@@ -53,13 +57,15 @@ phelp_property(float, number<float>, blurX)
 phelp_property(float, number<float>, blurY)
 phelp_property(uint8_t, number<uint8_t>, quality)
 
+easy_clone(BlurFilter_as)
+
 as_value
 BlurFilter_as::ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new BlurFilter(BlurFilter_as::Interface());
+    boost::intrusive_ptr<as_object> obj = new BlurFilter_as(BlurFilter_as::Interface());
     BlurFilter_as::attachProperties(*obj);
 
-    return as_value(obj.get());
+    return as_value(obj);
 }
 
 } // Namespace gnash

@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GradientBevelFilter.h,v 1.2 2007/08/27 18:13:40 cmusick Exp $ */
+/* $Id: GradientBevelFilter.h,v 1.3 2007/08/29 03:32:58 cmusick Exp $ */
 
 #ifndef GNASH_GRADIENTBEVELFILTER_H
 #define GNASH_GRADIENTBEVELFILTER_H
@@ -24,19 +24,16 @@
 #include "config.h"
 #endif
 
-#include "array.h"
+#include <vector>
+
 #include "BitmapFilter.h"
 
 namespace gnash {
-
-class GradientBevelFilter_as;
 
 // A gradient bevel effect filter.
 class GradientBevelFilter : public BitmapFilter
 {
 public:
-    friend class GradientBevelFilter_as;
-
     typedef enum
     {
         INNER_BEVEL = 2,
@@ -49,16 +46,6 @@ public:
 
     virtual ~GradientBevelFilter() { return; }
 
-    // Clone this object and return a copy of it. (AS accessible function.)
-    // Guaranteed to return an object which can be cast to BlurFilter
-    Filter const clone();
-
-    GradientBevelFilter(as_object *obj) : BitmapFilter(obj),
-        m_distance(0.0f), m_angle(0.0f), m_colors(), m_alphas(), m_ratios(),
-        m_blurX(0.0f), m_blurY(0.0f),  m_strength(0.0f), m_quality(0),
-        m_type(INNER_BEVEL), m_knockout(false)
-    { return; }
-
     GradientBevelFilter() : 
         m_distance(0.0f), m_angle(0.0f), m_colors(), m_alphas(), m_ratios(),
         m_blurX(0.0f), m_blurY(0.0f),  m_strength(0.0f), m_quality(0),
@@ -66,9 +53,9 @@ public:
     { return; }
 
     GradientBevelFilter(float distance, float angle,
-        boost::intrusive_ptr<as_array_object> colors,
-        boost::intrusive_ptr<as_array_object> alphas,
-        boost::intrusive_ptr<as_array_object> ratios,
+        std::vector<uint32_t> colors,
+        std::vector<uint8_t> alphas,
+        std::vector<uint8_t> ratios,
         float blurX, float blurY, float strength,
         uint8_t quality, glow_types type, bool knockout) :
         m_distance(distance), m_angle(angle),
@@ -77,12 +64,12 @@ public:
         m_quality(quality), m_type(type), m_knockout(knockout)
     { return; }
 
-private:
+protected:
     float m_distance; // Distance of the filter in pixels.
     float m_angle; // Angle of the filter.
-    boost::intrusive_ptr<as_array_object> m_colors; // Colors of the gradients.
-    boost::intrusive_ptr<as_array_object> m_alphas; // Alphas of the gradients.
-    boost::intrusive_ptr<as_array_object> m_ratios; // Ratios of the gradients.
+    std::vector<uint32_t> m_colors; // Colors of the gradients.
+    std::vector<uint8_t> m_alphas; // Alphas of the gradients.
+    std::vector<uint8_t> m_ratios; // Ratios of the gradients.
     float m_blurX; // horizontal blur
     float m_blurY; // vertical blur
     float m_strength; // How strong is the filter.

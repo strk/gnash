@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BevelFilter.h,v 1.3 2007/08/27 18:13:39 cmusick Exp $ */
+/* $Id: BevelFilter.h,v 1.4 2007/08/29 03:32:57 cmusick Exp $ */
 
 #ifndef GNASH_BEVELFILTER_H
 #define GNASH_BEVELFILTER_H
@@ -28,14 +28,10 @@
 
 namespace gnash {
 
-class BevelFilter_as; // Adapter class for AS use.
-
 // A bevel effect filter.
 class BevelFilter : public BitmapFilter
 {
 public:
-    friend class BevelFilter_as;
-
     typedef enum
     {
         OUTER_BEVEL = 1,
@@ -47,17 +43,6 @@ public:
     virtual bool read(stream* in);
 
     virtual ~BevelFilter() { return; }
-
-    // Clone this object and return a copy of it. (AS accessible function.)
-    // Guaranteed to return an object which can be cast to BevelFilter
-    Filter const clone();
-
-    BevelFilter(as_object* o) : BitmapFilter(o),
-        m_distance(0.0f), m_angle(0.0f), m_highlightColor(0),
-        m_highlightAlpha(0), m_shadowColor(0), m_shadowAlpha(0),
-        m_blurX(0.0f), m_blurY(0.0f),  m_strength(0.0f), m_quality(0),
-        m_type(FULL_BEVEL), m_knockout(false)
-    { return; }
 
     BevelFilter() : 
         m_distance(0.0f), m_angle(0.0f), m_highlightColor(0),
@@ -76,7 +61,7 @@ public:
         m_quality(quality), m_type(type), m_knockout(knockout)
     { return; }
 
-private:
+protected:
     float m_distance; // Distance of the filter in pixels.
     float m_angle; // Angle of the filter.
     uint32_t m_highlightColor; // Color of the highlight.

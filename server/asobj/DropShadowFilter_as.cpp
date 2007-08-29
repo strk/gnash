@@ -15,9 +15,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: DropShadowFilter_as.cpp,v 1.1 2007/08/27 18:13:42 cmusick Exp $ */
+/* $Id: DropShadowFilter_as.cpp,v 1.2 2007/08/29 03:32:58 cmusick Exp $ */
 
-#include "BitmapFilter_as.h"
+#include "as_object.h"
 #include "DropShadowFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
@@ -26,10 +26,11 @@
 #define phelp_helper DropShadowFilter_as
 #define phelp_class DropShadowFilter
 #include "prophelper.h"
+#include "BitmapFilter_as.h"
 
 namespace gnash {
 
-class DropShadowFilter_as
+class DropShadowFilter_as : public as_object, public DropShadowFilter
 {
     phelp_base_def;
 public:
@@ -44,12 +45,16 @@ public:
     phelp_gs(inner); 
     phelp_gs(knockout);
     phelp_gs(hideObject);
+
+    phelp_i(bitmap_clone);
 };
 
 phelp_base_imp((bitmapFilter_interface()), DropShadowFilter);
 
 // Filters are property based.
-phelp_i_attach_empty
+phelp_i_attach_begin
+phelp_i_replace(clone, bitmap_clone);
+phelp_i_attach_end
 
 phelp_gs_attach_begin
 phelp_gs_attach(distance);
@@ -77,10 +82,12 @@ phelp_property(bool, bool, inner)
 phelp_property(bool, bool, knockout)
 phelp_property(bool, bool, hideObject)
 
+easy_clone(DropShadowFilter_as)
+
 as_value
 DropShadowFilter_as::ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new DropShadowFilter(DropShadowFilter_as::Interface());
+    boost::intrusive_ptr<as_object> obj = new DropShadowFilter_as(DropShadowFilter_as::Interface());
     DropShadowFilter_as::attachProperties(*obj);
 
     return as_value(obj.get());

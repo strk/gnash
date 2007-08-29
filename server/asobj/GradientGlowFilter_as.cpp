@@ -15,9 +15,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GradientGlowFilter_as.cpp,v 1.1 2007/08/27 18:13:43 cmusick Exp $ */
+/* $Id: GradientGlowFilter_as.cpp,v 1.2 2007/08/29 03:32:58 cmusick Exp $ */
 
-#include "BitmapFilter_as.h"
+#include "as_object.h"
 #include "GradientGlowFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
@@ -27,10 +27,11 @@
 #define phelp_helper GradientGlowFilter_as
 #define phelp_class GradientGlowFilter
 #include "prophelper.h"
+#include "BitmapFilter_as.h"
 
 namespace gnash {
 
-class GradientGlowFilter_as
+class GradientGlowFilter_as : public as_object, public GradientGlowFilter
 {
     phelp_base_def;
 public:
@@ -45,12 +46,16 @@ public:
     phelp_gs(quality);
     phelp_gs(type); // No automation
     phelp_gs(knockout);
+
+    phelp_i(bitmap_clone);
 };
 
 phelp_base_imp((bitmapFilter_interface()), GradientGlowFilter);
 
 // Filters are purely property based.
-phelp_i_attach_empty
+phelp_i_attach_begin
+phelp_i_replace(clone, bitmap_clone);
+phelp_i_attach_end
 
 // Begin attaching properties, then attach them, then end.
 phelp_gs_attach_begin
@@ -79,10 +84,12 @@ phelp_property(uint8_t, number<uint8_t>, quality)
 // Type is not automatable.
 phelp_property(bool, bool, knockout)
 
+easy_clone(GradientGlowFilter_as)
+
 as_value
 GradientGlowFilter_as::type_gs(const fn_call& fn)
 {
-    boost::intrusive_ptr<GradientGlowFilter> ptr = ensureType<GradientGlowFilter>(fn.this_ptr);
+    boost::intrusive_ptr<GradientGlowFilter_as> ptr = ensureType<GradientGlowFilter_as>(fn.this_ptr);
 
     if (fn.nargs == 0) // getter
     {
@@ -115,7 +122,7 @@ GradientGlowFilter_as::type_gs(const fn_call& fn)
 as_value
 GradientGlowFilter_as::ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new GradientGlowFilter(GradientGlowFilter_as::Interface());
+    boost::intrusive_ptr<as_object> obj = new GradientGlowFilter_as(GradientGlowFilter_as::Interface());
     GradientGlowFilter_as::attachProperties(*obj);
 
     return as_value(obj.get());

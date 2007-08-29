@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ConvolutionFilter.cpp,v 1.2 2007/08/27 18:13:39 cmusick Exp $ */
+/* $Id: ConvolutionFilter.cpp,v 1.3 2007/08/29 03:32:58 cmusick Exp $ */
 
 #include "ConvolutionFilter.h"
 
@@ -23,17 +23,6 @@ namespace gnash {
 
 // See parser/filter_factory.cpp for the implementation. Purposefully not here.
 //bool ConvolutionFilter::read(stream* in);
-
-Filter const
-ConvolutionFilter::clone()
-{
-    Filter p(new ConvolutionFilter(m_matrixX, m_matrixY, m_matrix,
-        m_divisor, m_bias, m_preserveAlpha, m_clamp, m_color, m_alpha));
-    p->set_prototype(get_prototype());
-    p->copyProperties(*this);
-
-    return p;
-}
 
 } // Namespace gnash
 

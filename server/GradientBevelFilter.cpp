@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GradientBevelFilter.cpp,v 1.2 2007/08/27 18:13:40 cmusick Exp $ */
+/* $Id: GradientBevelFilter.cpp,v 1.3 2007/08/29 03:32:58 cmusick Exp $ */
 
 #include "GradientBevelFilter.h"
 
@@ -23,16 +23,6 @@ namespace gnash {
 
 // See parser/filter_factory.cpp for the implementation. Purposefully not here.
 //bool GradientBevelFilter::read(stream* in);
-
-Filter const
-GradientBevelFilter::clone()
-{
-    Filter p(new GradientBevelFilter(m_distance, m_angle, m_colors, m_alphas,
-        m_ratios, m_blurX, m_blurY, m_strength, m_quality, m_type, m_knockout));
-    p->set_prototype(get_prototype());
-    p->copyProperties(*this);
-    return p;
-}
 
 } // Namespace gnash
 

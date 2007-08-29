@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: GlowFilter.h,v 1.2 2007/08/27 18:13:40 cmusick Exp $ */
+/* $Id: GlowFilter.h,v 1.3 2007/08/29 03:32:58 cmusick Exp $ */
 
 #ifndef GNASH_GLOWFILTER_H
 #define GNASH_GLOWFILTER_H
@@ -28,28 +28,14 @@
 
 namespace gnash {
 
-class GlowFilter_as;
-
 // A glow effect filter.
 class GlowFilter : public BitmapFilter
 {
 public:
-    friend class GlowFilter_as;
-
     // Fill from a stream. See parser/filter_factory.cpp for the implementations.
     virtual bool read(stream* in);
 
     virtual ~GlowFilter() { return; }
-
-    // Clone this object and return a copy of it. (AS accessible function.)
-    // Guaranteed to return an object which can be cast to BlurFilter
-    Filter const clone();
-
-    GlowFilter(as_object* obj) : BitmapFilter(obj),
-        m_color(0), m_alpha(0),
-        m_blurX(0.0f), m_blurY(0.0f),  m_strength(0.0f), m_quality(0),
-        m_inner(false), m_knockout(false)
-    { return; }
 
     GlowFilter() : 
         m_color(0), m_alpha(0),
@@ -65,7 +51,7 @@ public:
         m_quality(quality), m_inner(inner), m_knockout(knockout)
     { return; }
 
-private:
+protected:
     uint32_t m_color; // RGB color.
     uint8_t m_alpha; // Alpha strength, as a percentage(?)
     float m_blurX; // horizontal blur

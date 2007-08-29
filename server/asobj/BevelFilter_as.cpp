@@ -15,9 +15,9 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BevelFilter_as.cpp,v 1.2 2007/08/27 18:13:40 cmusick Exp $ */
+/* $Id: BevelFilter_as.cpp,v 1.3 2007/08/29 03:32:58 cmusick Exp $ */
 
-#include "BitmapFilter_as.h"
+#include "as_object.h"
 #include "BevelFilter.h"
 #include "VM.h"
 #include "builtin_function.h"
@@ -25,12 +25,12 @@
 // These _must_ be defined for prophelpers to work correctly.
 // This is enforced by the file itself.
 #define phelp_helper BevelFilter_as
-#define phelp_class BevelFilter
 #include "prophelper.h"
+#include "BitmapFilter_as.h"
 
 namespace gnash {
 
-class BevelFilter_as
+class BevelFilter_as : public as_object, public BevelFilter
 {
     phelp_base_def;
 public:
@@ -46,12 +46,16 @@ public:
     phelp_gs(quality);
     phelp_gs(type);
     phelp_gs(knockout);
+
+    phelp_i(bitmap_clone);
 };
 
 phelp_base_imp((bitmapFilter_interface()), BevelFilter);
 
-// Filters are purely property based.
-phelp_i_attach_empty
+// Replace BitmapFilter clone.
+phelp_i_attach_begin
+phelp_i_replace(clone, bitmap_clone);
+phelp_i_attach_end
 
 // Begin attaching properties, then attach them, then end.
 phelp_gs_attach_begin
@@ -81,10 +85,12 @@ phelp_property(float, number<float>, strength)
 phelp_property(uint8_t, number<uint8_t>, quality)
 phelp_property(bool, bool, knockout)
 
+easy_clone(BevelFilter_as)
+
 as_value
 BevelFilter_as::type_gs(const fn_call& fn)
 {
-    boost::intrusive_ptr<BevelFilter> ptr = ensureType<BevelFilter>(fn.this_ptr);
+    boost::intrusive_ptr<BevelFilter_as> ptr = ensureType<BevelFilter_as>(fn.this_ptr);
 
     if (fn.nargs == 0) // getter
     {
@@ -117,7 +123,7 @@ BevelFilter_as::type_gs(const fn_call& fn)
 as_value
 BevelFilter_as::ctor(const fn_call& /*fn*/)
 {
-    boost::intrusive_ptr<as_object> obj = new BevelFilter(BevelFilter_as::Interface());
+    boost::intrusive_ptr<as_object> obj = new BevelFilter_as(BevelFilter_as::Interface());
     BevelFilter_as::attachProperties(*obj);
 
     return as_value(obj.get());

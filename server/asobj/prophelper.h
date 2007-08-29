@@ -30,7 +30,6 @@
 //
 #ifdef phelp_done
 #undef phelp_helper
-#undef phelp_class
 #undef phelp_property
 #undef phelp_array_property
 #undef phelp_base_def
@@ -47,13 +46,12 @@
 #undef phelp_i_attach_empty
 #else /* phelp_done */
 #ifdef phelp_helper
-#ifdef phelp_class
 
 #define phelp_property(sp_type, sp_convert, sp_name) \
 as_value \
 phelp_helper::sp_name##_gs(const fn_call& fn) \
 { \
-    boost::intrusive_ptr<phelp_class> ptr = ensureType<phelp_class>(fn.this_ptr); \
+    boost::intrusive_ptr<phelp_helper> ptr = ensureType<phelp_helper>(fn.this_ptr); \
 \
     if (fn.nargs == 0) /* getter */ \
     { \
@@ -70,7 +68,11 @@ phelp_helper::sp_name##_gs(const fn_call& fn) \
 as_value \
 phelp_helper::sp_name##_gs(const fn_call& fn) \
 { \
-    boost::intrusive_ptr<phelp_class> ptr = ensureType<phelp_class>(fn.this_ptr); \
+    boost::intrusive_ptr<phelp_helper> ptr = ensureType<phelp_helper>(fn.this_ptr); \
+    return as_value(); \
+}
+#if 0
+    boost::intrusive_ptr<phelp_helper> ptr = ensureType<phelp_helper>(fn.this_ptr); \
 \
     if (fn.nargs == 0) /* getter */ \
     { \
@@ -84,9 +86,11 @@ phelp_helper::sp_name##_gs(const fn_call& fn) \
 \
     return as_value(); \
 }
+#endif /* 0 */
 
 #define phelp_base_def \
 public: \
+    phelp_helper(as_object *obj) : as_object(obj) { return; } \
     static as_object* Interface(); \
     static void attachInterface(as_object& o); \
     static void attachProperties(as_object& o); \
@@ -181,9 +185,9 @@ phelp_helper::attachInterface(as_object& /* o */) \
 #define phelp_i_attach(sp_name, sp_code_name) \
     o.init_member(#sp_name , new builtin_function(sp_code_name))
 
-#else /* phelp_class */
-#error phelp_class must be defined.
-#endif /* phelp_class */
+#define phelp_i_replace(sp_name, sp_code_name) \
+    o.set_member(#sp_name , new builtin_function(sp_code_name))
+
 #else /* phelp_helper */
 #error phelp_helper must be defined.
 #endif /* phelp_helper */

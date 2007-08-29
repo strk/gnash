@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BevelFilter.cpp,v 1.2 2007/08/27 03:06:41 cmusick Exp $ */
+/* $Id: BevelFilter.cpp,v 1.3 2007/08/29 03:32:57 cmusick Exp $ */
 
 #include "BevelFilter.h"
 
@@ -23,18 +23,6 @@ namespace gnash {
 
 // See parser/filter_factory.cpp for the implementation. Purposefully not here.
 //bool BevelFilter::read(stream* in);
-
-Filter const
-BevelFilter::clone()
-{
-    Filter p(new BevelFilter(m_distance, m_angle, m_highlightColor,
-        m_highlightAlpha, m_shadowColor, m_shadowAlpha,
-        m_blurX, m_blurY, m_strength, m_quality, m_type, m_knockout));
-    p->set_prototype(get_prototype());
-    p->copyProperties(*this);
-
-    return p;
-}
 
 } // Namespace gnash
 

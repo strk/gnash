@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: filter_factory.cpp,v 1.4 2007/08/27 18:13:43 cmusick Exp $ */
+/* $Id: filter_factory.cpp,v 1.5 2007/08/29 03:32:59 cmusick Exp $ */
 
 #include "filter_factory.h"
 #include "BitmapFilter.h"
@@ -198,15 +198,18 @@ bool GradientGlowFilter::read(stream* in)
 {
     uint8_t count = in->read_u8(); // How many colorings.
 
+    m_colors.reserve(count);
+    m_alphas.reserve(count);
+    m_ratios.reserve(count);
     for (int i = 0; i < count; ++i)
     {
-        m_colors->push(as_value(in->read_u8() << 16 + in->read_u8() << 8 + in->read_u8()));
-        m_alphas->push(as_value(in->read_u8()));
+        m_colors.push_back(in->read_u8() << 16 + in->read_u8() << 8 + in->read_u8());
+        m_alphas.push_back(in->read_u8());
     }
 
     for (int i = 0; i < count; ++i)
     {
-        m_ratios->push(as_value(in->read_u8()));
+        m_ratios.push_back(in->read_u8());
     }
 
     m_blurX = in->read_fixed();
@@ -237,14 +240,10 @@ bool ConvolutionFilter::read(stream* in)
     m_divisor = in->read_float();
     m_bias = in->read_float();
 
-    if (m_matrix == NULL)
-    {
-        m_matrix = new as_array_object;
-    }
-
+    m_matrix.reserve(m_matrixX * m_matrixY);
     for (int i = 0; i < m_matrixX * m_matrixY; ++i)
     {
-        m_matrix->push(as_value(in->read_float()));
+        m_matrix.push_back(in->read_float());
     }
 
     m_color = in->read_u8() << 16 + in->read_u8() << 8 + in->read_u8();
@@ -260,12 +259,10 @@ bool ConvolutionFilter::read(stream* in)
 
 bool ColorMatrixFilter::read(stream* in)
 {
-    if (m_matrix == NULL)
-        m_matrix = new as_array_object;
-
+    m_matrix.reserve(20);
     for (int i = 0; i < 20; ++i)
     {
-        m_matrix->push(in->read_float());
+        m_matrix.push_back(in->read_float());
     }
 
     return true;
@@ -275,15 +272,18 @@ bool GradientBevelFilter::read(stream* in)
 {
     uint8_t count = in->read_u8(); // How many colorings.
 
+    m_colors.reserve(count);
+    m_alphas.reserve(count);
+    m_ratios.reserve(count);
     for (int i = 0; i < count; ++i)
     {
-        m_colors->push(as_value(in->read_u8() << 16 + in->read_u8() << 8 + in->read_u8()));
-        m_alphas->push(as_value(in->read_u8()));
+        m_colors.push_back(in->read_u8() << 16 + in->read_u8() << 8 + in->read_u8());
+        m_alphas.push_back(in->read_u8());
     }
 
     for (int i = 0; i < count; ++i)
     {
-        m_ratios->push(as_value(in->read_u8()));
+        m_ratios.push_back(in->read_u8());
     }
 
     m_blurX = in->read_fixed();

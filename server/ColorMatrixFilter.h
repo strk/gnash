@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ColorMatrixFilter.h,v 1.2 2007/08/27 18:13:39 cmusick Exp $ */
+/* $Id: ColorMatrixFilter.h,v 1.3 2007/08/29 03:32:58 cmusick Exp $ */
 
 #ifndef GNASH_COLORMATRIXFILTER_H
 #define GNASH_COLORMATRIXFILTER_H
@@ -24,42 +24,30 @@
 #include "config.h"
 #endif
 
-#include "array.h"
 #include "BitmapFilter.h"
+#include <vector>
 
 namespace gnash {
-
-class ColorMatrixFilter_as; // Adapter for ActionScript
 
 // A color matrix effect filter.
 class ColorMatrixFilter : public BitmapFilter
 {
 public:
-    friend class ColorMatrixFilter_as;
-
     // Fill from a stream. See parser/filter_factory.cpp for the implementations.
     virtual bool read(stream* in);
 
     virtual ~ColorMatrixFilter() { return; }
 
-    // Clone this object and return a copy of it. (AS accessible function.)
-    // Guaranteed to return an object which can be cast to ColorMatrixFilter
-    Filter const clone();
-
-    ColorMatrixFilter(as_object* obj) : BitmapFilter(obj),
-        m_matrix()
-    { return; }
-
     ColorMatrixFilter() : 
         m_matrix()
     { return; }
 
-    ColorMatrixFilter(boost::intrusive_ptr<as_array_object> a_matrix) :
+    ColorMatrixFilter(std::vector<float> a_matrix) :
         m_matrix(a_matrix)
     { return; }
 
-private:
-    boost::intrusive_ptr<as_array_object> m_matrix; // The color matrix
+protected:
+    std::vector<float> m_matrix; // The color matrix
 };
 
 } // Namespace gnash

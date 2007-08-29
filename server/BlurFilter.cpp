@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BlurFilter.cpp,v 1.2 2007/08/27 18:13:39 cmusick Exp $ */
+/* $Id: BlurFilter.cpp,v 1.3 2007/08/29 03:32:57 cmusick Exp $ */
 
 #include "BlurFilter.h"
 
@@ -23,16 +23,6 @@ namespace gnash {
 
 // See parser/filter_factory.cpp for the implementation. Purposefully not here.
 //bool BlurFilter::read(stream* in);
-
-Filter const
-BlurFilter::clone()
-{
-    Filter p(new BlurFilter(m_blurX, m_blurY, m_quality));
-    p->set_prototype(get_prototype());
-    p->copyProperties(*this);
-
-    return p;
-}
 
 } // Namespace gnash
 
