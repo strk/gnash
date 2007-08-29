@@ -1,3 +1,9 @@
+2007-08-30 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* configure.ac, libbase/utility.h, server/asobj/Date.cpp,
+	backend/render_handler_agg.cpp: Unified trunc() and added
+	checking.
+
 2007-08-29 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/: Key.as, Mouse.as, Selection.as,
