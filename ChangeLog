@@ -1,3 +1,8 @@
+2007-08-29 Sandro Santilli <strk@keybit.net>
+
+	* libbase/utility.h: fix the frnd() function to behave as
+	  intended by original author. Fixed bug #20920.
+
 2007-08-29 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/component_hackery.cpp: Removed crufty file.

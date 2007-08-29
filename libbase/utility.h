@@ -117,7 +117,7 @@ inline double	log2(double f) { return std::log(f) / LN_2; }
 #ifndef HAVE_EXP2
 inline double	exp2(double x) { return std::pow((double)2, double(x)); }
 #endif
-inline int	frnd(float f) { return (int)rint(f + 0.5f); }	// replace with inline asm if desired
+inline int	frnd(float f) { return (int)(f + 0.5f); }	// replace with inline asm if desired
 
 
 // Handy macro to quiet compiler warnings about unused parameters/variables.
