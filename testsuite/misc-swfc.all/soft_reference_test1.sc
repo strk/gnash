@@ -77,6 +77,7 @@
     mc._name = "changed_again";
     
     check(typeof(changed_again)=='movieclip'); 
+    check(mcRef != _level0.changed_again);
     
     check(mc == undefined); 
     check(typeof(mcRef)=='movieclip'); 
