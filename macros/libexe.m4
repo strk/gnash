@@ -27,13 +27,13 @@ AC_DEFUN([AM_COMPILER_LIB],
   LIBPRE="lib"
 
   if test "x$LIBPRE" != "x" ; then
-    if test x"$EXEEXT"	== "exe"; then
+    if test x"$EXEEXT"	= "exe"; then
       LIBPRE="lib"
     fi
   fi
 
   if test "x$LIBEXT" != "x" ; then
-    if test x"$EXEEXT"	== "exe"; then
+    if test x"$EXEEXT"	= "exe"; then
       LIBEXT="dll"
     fi
   fi
