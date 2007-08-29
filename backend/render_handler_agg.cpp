@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.101 2007/08/23 15:27:59 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.102 2007/08/29 04:30:37 nihilus Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -175,7 +175,7 @@ AGG ressources
 #include "render_handler_agg_style.h"
 
 #ifndef trunc
-#define trunc(x) ( x < 0 ?  -floor(-x) : floor(x) )
+#define trunc(x) ( x < 0 ?  -(std::floor(-x)) : std::floor(x) )
 #endif
 
 #ifndef round

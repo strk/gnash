@@ -31,6 +31,8 @@
 2007-08-29 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* libbase/component_hackery.cpp: Removed crufty file.
+	* backend/render_handler_agg.cpp: Made trunc() uniform with the
+	  one in Date.cpp.
 
 2007-08-29 Sandro Santilli <strk@keybit.net>
 
