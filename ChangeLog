@@ -1,5 +1,10 @@
 2007-08-29 Sandro Santilli <strk@keybit.net>
 
+        * server/as_environment.cpp (get_variable): more verbosity in
+	  debugging messages.
+
+2007-08-29 Sandro Santilli <strk@keybit.net>
+
 	* server/as_value.cpp (to_sprite): use original target, not current
 	  one, for dereferencing danglign MOVIECLIP refs; add TODO item about
 	  the onUnload problem.
