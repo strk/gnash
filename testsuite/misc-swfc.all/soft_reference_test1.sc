@@ -68,6 +68,9 @@
     check(typeof(mc)=='movieclip');  
     check(typeof(mcRef)=='movieclip'); 
     check(mc == _level0.mc);    
+    // Gnash bug:
+    //   Target of the sprite mcRef points to changed, so seeking
+    //   for the new target fails (_level0.changed doesn't exist)
     xcheck(mcRef == _level0.mc);
   .end
 
@@ -113,6 +116,13 @@
     _root.createEmptyMovieClip("mc2", 40);
 
     check(typeof(mcRef)=='movieclip');
+    // Gnash bug:
+    //   Target of the sprite pointed to by mcRef is
+    //   not the one used on creation (_level0.mc1) but the one
+    //   subsequently changed to by effect of _name assignment: _level0.mc2.
+    //   Thus, when finding a *new* character (the old one was unloaded)
+    //   we find the *new* _level0.mc2.
+    //   Should be fixed in the same way as for the bug exposed in frame 5
     xcheck(mcRef.valueOf() == null) 
     
     // release resources after testing
@@ -136,8 +146,8 @@
     check_equals(mcContainer[1].getDepth(), 51);
     check_equals(mc1.getDepth(), 50);
     
-    mc1._name = "mc2";
-    mcRef = mc2;
+    mc1._name = "mc2"; // char at depth 50 changes name
+    mcRef = mc2; // mcRef now points to char at depth 50, and target _level0.mc2
     
     check(typeof(mcRef)=='movieclip');
     check_equals(mcRef.getDepth(), 50);
@@ -147,6 +157,10 @@
     _root.createEmptyMovieClip("mc2", 60);
 
     check(typeof(mcRef)=='movieclip');
+
+    // Gnash bug:
+    //   Still the same bug: the ref uses *current* target instead of the one
+    //   as of creation time.
     xcheck(mcRef == _level0.mc1);
     
     _root.totals();
