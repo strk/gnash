@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.411 2007/08/29 22:29:40 nihilus Exp $
+dnl $Id: configure.ac,v 1.412 2007/08/30 00:12:18 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
