@@ -79,6 +79,7 @@
 #endif
 
 #include "log.h"
+#include "utility.h"
 #include "Date.h"
 #include "fn_call.h"
 #include "GnashException.h"
@@ -92,10 +93,6 @@
 # include <sys/time.h>
 #else
 # include <sys/time.h>
-#endif
-
-#ifndef trunc
-#define trunc(x) ( x < 0 ?  -(std::floor(-x)) : std::floor(x) )
 #endif
 
 
