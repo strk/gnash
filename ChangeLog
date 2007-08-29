@@ -1,3 +1,9 @@
+2007-08-29 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* testsuite/misc-swfc.all/soft_reference_test1.sc: new focused
+	  testcase about soft reference, still got an xcheck.
+	* testsuite/misc-swfc.all/Makefile.am: enable testcase.
+	  
 2007-08-29 Chad Musick <chadmusick@msbx.net>
 
 	* server/asobj/BlurFilter_as.cpp,.h
