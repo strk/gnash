@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.84 2007/08/24 10:37:56 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.85 2007/08/29 13:50:09 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -80,7 +80,7 @@ as_environment::get_variable(const std::string& varname,
 	    if ( ! tmp.is_undefined() )
 	    {
 	    IF_VERBOSE_ASCODING_ERRORS(
-		    log_aserror(_("...but get_variable_raw(%s, <scopeStack>) succeeded!"), path.c_str());
+		    log_aserror(_("...but get_variable_raw(%s, <scopeStack>) succeeded (%s)!"), path.c_str(), tmp.to_debug_string().c_str());
 	    )
 	    }
 	    return as_value();
