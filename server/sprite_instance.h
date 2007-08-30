@@ -314,10 +314,10 @@ public:
 	///
 	/// If the specified depth is already occupied by an instance of a different
 	/// character (including any dynamically-created instance), the behaviour is
-	/// controlled by the replace_if_depth_is_occupied parameter. If false, this
+	/// controlled by the is_jumping_back flag. If false, this
 	/// call will result in a no-op. If true, the previously existing character
 	/// will be replaced by the new one, with unload() method invoked on the
-	/// removed character.
+	/// removed character. (zou: correct?)
 	///
 	/// Any successful new placement triggers invokation of the newly created
 	/// instance's LOAD event.
@@ -338,12 +338,6 @@ public:
 	/// @param depth
 	///	The depth to assign to the newly created instance.
 	///
-	/// @param replace_if_depth_is_occupied
-	///	This parameter control behaviour in case an existing instance is found at
-	///	the given depth but is NOT an instance of the given character_id.
-	///	In this case: if this paremeter is true, the old instance will be replaced by
-	///	the new one, otherwise nothing happens and this function returns NULL.
-	///
 	/// @param color_transform
 	///	The color transform to apply to the newly created instance.
 	///
@@ -361,15 +355,14 @@ public:
 	/// @return 
 	///	A pointer to the character being added or NULL
 	///	if this call results in a move of an existing character 
-	///	or in a no-op due to replace_if_depth_is_occupied being
-	///	false.
+	///	or in a no-op due to is_jumping_back being
+	///	false. (zou: correct?)
 	///       
 	character* add_display_object(
 		uint16_t character_id,
 		const char* name,
 		const SWFEventsVector& event_handlers,
 		int depth,
-		bool replace_if_depth_is_occupied,
 		const cxform& color_transform,
 		const matrix& matrix,
 		int ratio,
@@ -797,11 +790,6 @@ private:
 	void clone_display_object(const std::string& name,
 		const std::string& newname, int depth);
 #endif
-	/// Reset the DisplayList for proper loop-back or goto_frame
-	//
-	/// The DisplayList is cleared by all but dynamic characters
-	///
-	void resetDisplayList();
 
 	/// Reconstruct the DisplayList for proper loop-back operations
 	//
@@ -933,14 +921,6 @@ private:
 	/// soundid for current playing stream. If no stream set to -1
 	int m_sound_stream_id;
 
-
-	/// The DisplayList resulting by execution of tags in first frame.
-	//
-	/// It will be used to reinitialized actual DisplayList on restart.
-	/// See execute_frame_tags.
-	///
-	DisplayList _frame0_chars;
-
 	std::string _origTarget;
 
 protected:
@@ -953,14 +933,6 @@ protected:
 	}
 
 	/// Execute the tags associated with the specified frame.
-	//
-	/// Execution of 1st frame tags is specially handled:
-	///
-	/// - After executing them for the first time
-	///   the DisplayList state is saved into the _frame0_chars
-	///   member, which is used by resetDisplayList() on loop-back
-	///   TODO: drop this _frame0_chars thing ? See comments in
-	///   resetDisplayList()
 	///
 	/// @param frame
 	///	Frame number. 0-based
@@ -969,7 +941,7 @@ protected:
 	///     Which kind of control tags we want to execute. 
 	///	See control_tag_type enum.
 	///
-	void execute_frame_tags(size_t frame, int typeflags=TAG_DLIST|TAG_ACTION); // bool state_only = false;
+	void execute_frame_tags(size_t frame, int typeflags=TAG_DLIST|TAG_ACTION); 
 
 	/// \brief
 	/// This is either sprite_definition (for sprites defined by

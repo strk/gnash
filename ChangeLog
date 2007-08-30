@@ -1,5 +1,12 @@
 2007-08-30 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: cleanups: 
+	  drop resetDisplayList, _frame0 and replace_if_depth_is_occupied
+	  parameter of add_display_object.
+	* server/swf/PlaceObject2Tag.cpp: update call to add_display_object
+
+2007-08-30 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/Makefile.am: don't try to build
 	  DefineEditTextVariableNameTest2-Runner from an non-existent .c
 	  file (fixes 'make dist').
@@ -176,7 +183,7 @@
 2007-08-28 Deanna Phillips <deanna>
 
 	* libbase/utility.h: define exp2 and log2 if not available
-    based on HAVE_LOG2 and HAVE_EXP2
+	  based on HAVE_LOG2 and HAVE_EXP2
 	* configure.ac: detect availability of log2 and exp2
 
 2007-08-28 Sandro Santilli <strk@keybit.net>

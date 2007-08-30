@@ -2119,7 +2119,6 @@ void sprite_instance::clone_display_object(const std::string& name,
 		newname.c_str(),
 		dummy_event_handlers,
 		depth,
-		true, // replace if depth is occupied (to drop)
 		ch->get_cxform(),
 		ch->get_matrix(),
 		ch->get_ratio(),
@@ -2311,7 +2310,6 @@ void sprite_instance::advance_sprite(float delta_time)
 				// TODO: check why this would be any different
 				//       then calling restoreDisplayList(0) instead..
 				//       Ah! I think I know..
-				//resetDisplayList();
 				restoreDisplayList(0); // seems OK to me.
 			}
 
@@ -2356,8 +2354,8 @@ void sprite_instance::advance_sprite(float delta_time)
 	do_actions();
 
 	// Call UNLOAD event of just removed chars !
-	DisplayList justRemoved = oldDisplayList;
-	justRemoved.clear_except(m_display_list, false); // true;
+	//DisplayList justRemoved = oldDisplayList;
+	//justRemoved.clear_except(m_display_list, false); // true;
 	// No, dont' call UNLOAD event, as it should be called by remove_display_object!
 
 	// Finally, execute actions in newly added childs
@@ -2435,43 +2433,6 @@ sprite_instance::execute_action(const action_buffer& ab)
 	exec();
 
 	//env.set_local_frame_top(local_stack_top);
-}
-
-void
-sprite_instance::resetDisplayList()
-{
-	// TODO: see if/how this can be merged with restoreDisplayList !
-
-	assert(m_current_frame == 0);
-
-	// Add script objects in current DisplayList
-	std::vector<character*> charsToAdd; 
-	std::vector<character*> charsToKeep; 
-	ScriptObjectsFinder scriptObjFinder(charsToAdd, charsToKeep);
-	m_display_list.visitAll(scriptObjFinder);
-
-	// Resort frame0 DisplayList as depth of
-	// characters in it might have been
-	// externally changed.
-	_frame0_chars.sort();
-
-	// Remove characters which have been removed
-	_frame0_chars.clear_except(charsToKeep);
-
-	// NOTE: script objects are *not* allowed to replace depths
-	//       of static objects (change second argument to switch)
-	_frame0_chars.addAll(charsToAdd, false);
-	
-	if ( ! (m_display_list == _frame0_chars) )
-	{
-
-		// Set this character as invalidated *before*
-		// actually updating the displaylist !
-		set_invalidated(); 
-
-		//m_display_list = _frame0_chars;	
-		m_display_list.clear_except(_frame0_chars, true); // call unload
-	};
 }
 
 /*private*/
@@ -2577,14 +2538,6 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 		if ( typeflags & TAG_ACTION ) tag->execute_action(this);
 	}
 
-	// TODO: do _frame0_chars still make sense ?
-	//       Should we use the same algorithm in restoreDisplayList instead ?
-	if ( frame == 0 && ! has_looped() )
-	{
-		// Save DisplayList state
-		_frame0_chars = m_display_list;
-	}
-
 	testInvariant();
 }
 
@@ -2666,7 +2619,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
        // redraw. Consider a static graphic that stays at it's position all
        // the time. When looping betwen two frames 
        // gotoAndPlay(_currentframe-1);
-       // then resetDisplayList() will remove that character and 
+       // then restoreDisplayList() will remove that character and 
        // execute_frame_tags() will insert it again. So the next 
        // set_invalidated() call (which currently *is* correct) will cause
        // redraw of the whole sprite even if it doesn't change visually
@@ -2806,7 +2759,6 @@ sprite_instance::add_display_object(
     const char* name,
     const std::vector<swf_event*>& event_handlers,
     int depth, 
-    bool /*replace_if_depth_is_occupied*/,
     const cxform& color_transform, const matrix& mat,
     int ratio, int clip_depth)
 {
@@ -3712,8 +3664,6 @@ sprite_instance::markReachableResources() const
 	m_display_list.visitAll(marker);
 
 	oldDisplayList.visitAll(marker);
-
-	_frame0_chars.visitAll(marker);
 
 	_drawable->setReachable();
 

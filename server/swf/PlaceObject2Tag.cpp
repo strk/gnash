@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: PlaceObject2Tag.cpp,v 1.21 2007/08/27 12:44:29 strk Exp $ */
+/* $Id: PlaceObject2Tag.cpp,v 1.22 2007/08/30 18:19:16 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -359,7 +359,6 @@ PlaceObject2Tag::execute(sprite_instance* m) const
 	      m_name,
 	      m_event_handlers,
 	      m_depth,
-	      false, // don't replace characters at target depth (TODO: check if a general rule!)
 	      m_color_transform,
 	      m_matrix,
 	      m_ratio,
