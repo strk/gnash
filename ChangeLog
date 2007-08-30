@@ -1,5 +1,8 @@
 2007-08-30 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/Makefile.am: don't try to build
+	  DefineEditTextVariableNameTest2-Runner from an non-existent .c
+	  file (fixes 'make dist').
 	* server/: character.{cpp,h}, edit_text_character.{cpp,h},
 	  sprite_instance.{cpp,h}: change signature of character::unload()
 	  to return a boolean value stating wheter any onUnload event was

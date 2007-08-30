@@ -62,7 +62,6 @@ check_PROGRAMS = \
 	DefineEditTextVariableNameTest \
 	DefineEditTextVariableNameTest-Runner \
 	DefineEditTextVariableNameTest2 \
-	DefineEditTextVariableNameTest2-Runner \
 	Dejagnu \
 	Dejagnu.swf \
 	PlaceObject2Test \
@@ -239,6 +238,7 @@ check_SCRIPTS = \
 	shape_testrunner \
 	registerClassTest2runner \
 	DefineEditTextVariableNameTest-Runner \
+	DefineEditTextVariableNameTest2-Runner \
 	$(NULL)
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
