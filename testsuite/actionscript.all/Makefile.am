@@ -16,7 +16,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-# $Id: Makefile.am,v 1.77 2007/08/05 06:04:58 zoulunkai Exp $
+# $Id: Makefile.am,v 1.78 2007/08/30 09:47:36 strk Exp $
 
 AUTOMAKE_OPTIONS = dejagnu
 
@@ -68,6 +68,7 @@ AM_CPPFLAGS = -I.. \
 
 ## These are needed to properly set dependencies
 ASTESTS =			\
+	AsBroadcaster.as	\
 	array.as		\
 	delete.as		\
 	getvariable.as		\

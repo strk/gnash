@@ -1,3 +1,8 @@
+2007-08-30 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/: Makefile.am, AsBroadcaster.as:
+	  new test for AsBroadcaster.
+
 2007-08-30 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: testcase about
