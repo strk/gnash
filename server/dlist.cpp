@@ -414,29 +414,6 @@ DisplayList::remove_display_object(int depth)
 	//log_msg(_("Done removing, list is:"));
 	//dump();
 }
-	
-	
-// clear the display list.
-void
-DisplayList::clear(bool call_unload)
-{
-	//GNASH_REPORT_FUNCTION;
-
-	// This might eventually become obsoleted
-	if ( call_unload )
-	{
-		for (iterator it = _characters.begin(),
-				itEnd = _characters.end();
-			it != itEnd; ++it)
-		{
-			DisplayItem& di = *it;
-			if ( ! it->get() ) continue;
-			di->unload(); // if call_unload
-		}
-	}
-		
-	_characters.clear();
-}
 
 void
 DisplayList::swapDepths(character* ch1, int newdepth)
@@ -585,34 +562,6 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 	}
 }
 
-void
-DisplayList::clear_except(std::vector<character*>& exclude, bool call_unload)
-{
-	//GNASH_REPORT_FUNCTION;
-
-	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
-	{
-		DisplayItem& di = *it;
-
-		bool is_affected = false;
-		for (size_t i=0, n=exclude.size(); i<n; ++i)
-		{
-			if (exclude[i] == di.get())
-			{
-				is_affected = true;
-				break;
-			}
-		}
-
-		if (is_affected == false)
-		{
-			if ( call_unload ) di->unload();
-			it = _characters.erase(it);
-			continue;
-		}
-		it++;
-	}
-}
 
 void
 DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
@@ -637,35 +586,6 @@ DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 		}
 
 		if (is_affected == false)
-		{
-			if ( call_unload ) di->unload();
-			it = _characters.erase(it);
-			continue;
-		}
-		it++;
-	}
-}
-
-void
-DisplayList::clear(std::vector<character*>& which, bool call_unload)
-{
-	//GNASH_REPORT_FUNCTION;
-
-	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
-	{
-		DisplayItem& di = *it;
-
-		bool is_affected = false;
-		for (size_t i=0, n=which.size(); i<n; ++i)
-		{
-			if (which[i] == di.get())
-			{
-				is_affected = true;
-				break;
-			}
-		}
-
-		if (is_affected)
 		{
 			if ( call_unload ) di->unload();
 			it = _characters.erase(it);

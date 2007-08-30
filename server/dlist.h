@@ -173,12 +173,10 @@ public:
 	void	remove_display_object(int depth);
 
 	/// Clear the display list.
-	//
-	/// @param call_unload
-	///	If true, UNLOAD event will be invoked on the characters being
-	///	removed. False by default.
-	///
-	void clear(bool call_unload=false);
+	void clear()
+	{
+		_characters.clear();
+	}
 
 	/// \brief
 	/// Clear all characters in this DisplayList that are also found
@@ -193,35 +191,6 @@ public:
 	///	removed. False by default.
 	///
 	void clear(const DisplayList& from, bool call_unload=false);
-
-	/// \brief
-	/// Clear all characters in the display list also found in the given vector.
-	//
-	/// @param which
-	///	A vector containing character instances to remove.
-	///	Any instance found in the vector will be removed
-	///	from this DisplayList.
-	///
-	/// @param call_unload
-	///	If true, UNLOAD event will be invoked on the characters being
-	///	removed. False by default.
-	///
-	void clear(std::vector<character*>& which, bool call_unload=false);
-
-	/// \brief
-	/// Clear all characters in the display list except the ones
-	/// contained in the given vector.
-	//
-	/// @param exclude
-	///	A vector containing character instances to keep.
-	///	Any instance not found in the vector will be removed
-	///	from this DisplayList.
-	///
-	/// @param call_unload
-	///	If true, UNLOAD event will be invoked on the characters being
-	///	removed. False by default.
-	///
-	void clear_except(std::vector<character*>& exclude, bool call_unload=false);
 
 	/// \brief
 	/// Clear all characters in this DisplayList except the ones
