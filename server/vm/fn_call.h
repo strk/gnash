@@ -32,6 +32,7 @@
 
 #include <cassert> // for inlines (arg)
 #include <ostream> // for inlines (dump_args)
+#include <sstream> // for inlines (dump_args)
 
 namespace gnash {
 
@@ -106,6 +107,14 @@ public:
 			if ( i ) os << ", ";
 			os << arg(i).to_string();
 		}
+	}
+
+	/// Return arguments as a string (for debugging)
+	std::string dump_args() const
+	{
+		std::stringstream ss;
+		dump_args(ss);
+		return ss.str();
 	}
 
 private:

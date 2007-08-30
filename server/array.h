@@ -55,6 +55,12 @@ class as_array_object : public as_object
 
 public:
 
+	typedef std::deque<as_value> container;
+
+	typedef container::const_iterator const_iterator;
+	typedef container::iterator iterator;
+
+
 	/// Sort flags
 	enum SortFlags {
 
@@ -87,10 +93,15 @@ public:
 
 	std::deque<indexed_as_value> get_indexed_elements();
 
-	std::deque<as_value>::const_iterator begin();
+	const_iterator begin();
 
-	std::deque<as_value>::const_iterator end();
+	const_iterator end();
 
+	/// Push an element to the end of the array
+	//
+	/// @param val
+	/// 	The element to add 
+	///
 	void push(const as_value& val);
 
 	void unshift(const as_value& val);
@@ -275,8 +286,6 @@ protected:
 #endif // GNASH_USE_GC
 
 private:
-
-	typedef std::deque<as_value> container;
 
 	container elements;
 

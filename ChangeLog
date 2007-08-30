@@ -1,3 +1,9 @@
+2007-08-30 Sandro Santilli <strk@keybit.net>
+
+	* server/array.h: document the push method, use some typedefs for
+	  semplicity (iterators).
+	* server/vm/fn_call.h: add string-returning dump_args().
+
 2007-08-30 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac, libbase/utility.h, server/asobj/Date.cpp,
