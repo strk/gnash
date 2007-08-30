@@ -373,7 +373,7 @@ namespace image
 	//
 	rgba*	read_swf_jpeg3(tu_file* in)
 	{
-		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create_swf_jpeg2_header_only(in) );
+		std::auto_ptr<jpeg::input> j_in ( jpeg::input::create_swf_jpeg2_header_only(in, false) );
 		if ( ! j_in.get() ) return 0;
 		
 		j_in->start_image();

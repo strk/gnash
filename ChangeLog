@@ -1,3 +1,8 @@
+2007-08-31 Zou Lunkai <zoulunkai@gmail.com>
+	
+	* libbase/image.cpp: don't ommit the default parameter, should fix 
+	  the building, please check.
+	
 2007-08-30 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.{cpp,h}: drop unused methods and optional args.
