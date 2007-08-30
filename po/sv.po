@@ -59,24 +59,24 @@ msgstr "FFMPEG byggt utan mp3-stöd?"
 #: backend/sound_handler_sdl.cpp:304
 #, c-format
 msgid "Unable to start SDL sound: %s"
-msgstr "Kann SDL-Audioausgabe nicht starten: %s"
+msgstr "Kan inte spela ljud via SDL: %s"
 
 #: backend/sound_handler_sdl.cpp:496
 #, c-format
 msgid "Unable to start aux SDL sound: %s"
-msgstr "Kann Aux-SDL-Audioausgabe nicht starten: %s"
+msgstr "Kan inte spela ljud via aux: %s"
 
 #: backend/sound_handler_sdl.cpp:717
 #, c-format
 msgid "Negative buffer length in sdl_audio_callback (%d)"
-msgstr "Negative PufferlÃ¤nge in sdl_audio_callback (%d)"
+msgstr "Negativ bufferlängd i sdl_audio_callback (%d)"
 
 #: backend/sound_handler_sdl.cpp:834
 msgid ""
 "Error while decoding MP3-stream.  Upgrading ffmpeg/libavcodec might fix this "
 "issue."
-msgstr "Fehler beim Dekodieren des MP3-Streams. Eine Aktualisierung von "
-"ffmpeg/libavcodec kÃ¶nnte dieses Problem beheben."
+msgstr "Fel uppstod under avkodandet av MP3-ström. En uppgradering av"
+"ffmpeg/libavcodec kan åtgärda problemet."
 
 #: backend/sound_handler_sdl.cpp:864
 #, c-format
@@ -90,7 +90,7 @@ msgstr "Nicht behebbarer Fehler beim Dekodieren des MP3-Streams, MAD-Fehler: %s"
 
 #: backend/sound_handler_sdl.cpp:929
 msgid "Error in sound sample conversion"
-msgstr "Fehler bei Audio-Sample-Umwandlung"
+msgstr "Fel i sampling av ljudet"
 
 #: extensions/mysql/mysql_db.cpp:186
 msgid "Couldn't initialize database"
@@ -119,7 +119,7 @@ msgstr ""
 #: extensions/mysql/mysql_db.cpp:265
 #, c-format
 msgid "Field name is: %s: "
-msgstr "Feldname ist: %s: "
+msgstr "Fältnamnet är: %s: "
 
 #: gui/gnash.cpp:73
 msgid ""
@@ -255,7 +255,7 @@ msgstr "AusfÃ¼hrliche Ausgabe eingeschaltet"
 
 #: gui/gnash.cpp:194
 msgid "Logging to disk enabled"
-msgstr "Logging auf Festplatte aktiviert"
+msgstr "Logging till disk aktiverat"
 
 #: gui/gnash.cpp:200
 msgid "No verbose actions; disabled at compile time"
@@ -268,7 +268,7 @@ msgstr "Kein ausfÃ¼hrlicher Modus beim Parsen. Bei der Kompilierung deaktivier
 #: gui/gnash.cpp:218
 #, c-format
 msgid "Setting root URL to %s"
-msgstr "Setze Root-URL auf %s"
+msgstr "Sätter root-URL till %s"
 
 #: gui/gnash.cpp:224
 #, c-format
@@ -310,7 +310,7 @@ msgstr ""
 #: gui/gui.cpp:460
 #, c-format
 msgid "Frame %d"
-msgstr "Bild %d"
+msgstr "Ruta %d"
 
 #: gui/Player.cpp:187
 msgid "Sound requested but no sound support compiled in"
@@ -333,12 +333,12 @@ msgstr "Zahl ist "
 #: libamf/amf.cpp:189
 #, c-format
 msgid "Boolean is %d"
-msgstr "Boolean ist %d"
+msgstr "Boolean är %d"
 
 #: libamf/amf.cpp:202 libamf/amf.cpp:241
 #, c-format
 msgid "String is %s"
-msgstr "String ist %s"
+msgstr "String är %s"
 
 #: libamf/amf.cpp:218
 msgid "Undefined element"
@@ -346,11 +346,11 @@ msgstr "Undefiniertes Element"
 
 #: libamf/amf.cpp:234
 msgid "Date is "
-msgstr "Datum ist "
+msgstr "Datum är "
 
 #: libamf/amf.cpp:234
 msgid " nanoseconds"
-msgstr " Nanosekunden"
+msgstr " nanosekunder"
 
 #: libamf/amf.cpp:884
 #, c-format
@@ -524,7 +524,7 @@ msgstr ""
 
 #: libbase/log.cpp:344
 msgid "ACTIONSCRIPT ERROR: "
-msgstr "ACTIONSCRIPT FEHLER: "
+msgstr "ACTIONSCRIPT FEL: "
 
 #: libbase/network.cpp:85
 msgid "Could not find a usable WinSock DLL"
@@ -675,23 +675,23 @@ msgstr "Film neu starten"
 
 #: plugin/klash/klash.cpp:105
 msgid "Step Forward"
-msgstr "Vorspulen"
+msgstr "Spela framåt"
 
 #: plugin/klash/klash.cpp:106
 msgid "Step Backward"
-msgstr "ZurÃ¼ckspulen"
+msgstr "Spela bakåt"
 
 #: plugin/klash/klash.cpp:107
 msgid "Jump Forward"
-msgstr "VorwÃ¤rts springen"
+msgstr "Hoppa framåt"
 
 #: plugin/klash/klash.cpp:108
 msgid "Jump Backward"
-msgstr "ZurÃ¼ck springen"
+msgstr "Hoppa bakåt"
 
 #: plugin/klash/klash.cpp:109
 msgid "Quit Gnash"
-msgstr "Gnash beenden"
+msgstr "Avsluta Gnash"
 
 #: plugin/klash/klash.cpp:147
 msgid "Klash"
@@ -1870,7 +1870,7 @@ msgstr ""
 #: server/asobj/xml.cpp:97 server/asobj/xml.cpp:115
 #, c-format
 msgid "Creating XML data at %p"
-msgstr ""
+msgstr "Skapar XML-data på %p"
 
 #: server/asobj/xml.cpp:130
 #, c-format
@@ -2290,7 +2290,7 @@ msgstr ""
 #: server/edit_text_character.cpp:1254
 #, c-format
 msgid "VariableName: %s"
-msgstr ""
+msgstr "Variabelnamn: %s"
 
 #: server/edit_text_character.cpp:1269
 #, c-format
