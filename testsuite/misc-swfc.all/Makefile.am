@@ -23,6 +23,7 @@ SCTESTS = \
 	hello.sc \
 	sound.sc \
 	soft_reference_test1.sc \
+	movieclip_destruction_test1.sc \
 	$(NULL)
 
 # These will get compiled to SWFs just as above, but will not be executed as a test
