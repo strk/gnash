@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.84 2007/08/24 16:07:27 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.85 2007/08/30 13:32:05 strk Exp $";
 
 #include "check.as"
 
@@ -418,25 +418,45 @@ check_equals(typeof(_global.removeMovieClip), 'undefined');
 #if OUTPUT_VERSION >= 6
 
 softref = _root.createEmptyMovieClip("hardref", 60);
+softref2 = _root.createEmptyMovieClip("hardref2", 70);
+hardref2.onUnload = function() { /*note(this+".onUnload called");*/ };
 check_equals(typeof(hardref), 'movieclip');
 check_equals(typeof(softref), 'movieclip');
+check_equals(typeof(hardref2), 'movieclip');
+check_equals(typeof(softref2), 'movieclip');
 softref.member = 1;
+softref2.member = 2;
 check_equals(typeof(softref.member), 'number');
+check_equals(typeof(softref2.member), 'number');
 check_equals(softref.member, 1);
+check_equals(softref2.member, 2);
 check_equals(softref._target, "/hardref");
+check_equals(softref2._target, "/hardref2");
 #if OUTPUT_VERSION > 6
-check_equals(getInstanceAtDepth(60), hardref);
-removeMovieClip(hardref); // using ActionRemoveClip (0x25)
-check_equals(getInstanceAtDepth(60), undefined);
+ check_equals(getInstanceAtDepth(60), hardref);
+ check_equals(getInstanceAtDepth(70), hardref2);
+ check_equals(hardref.getDepth(), 60);
+ check_equals(hardref2.getDepth(), 70);
+ removeMovieClip(hardref); // using ActionRemoveClip (0x25)
+ removeMovieClip(hardref2); // using ActionRemoveClip (0x25)
+ check_equals(getInstanceAtDepth(60), undefined);
+ check_equals(getInstanceAtDepth(-32839), hardref2);
 #else
-// just to test another way, ActionRemoveClip in SWF6 will work as well
-hardref.removeMovieClip(); // using the sprite's removeMovieClip 
-//softref.removeMovieClip(); // use the softref's removeMovieClip 
+ // just to test another way, ActionRemoveClip in SWF6 will work as well
+ hardref.removeMovieClip(); // using the sprite's removeMovieClip 
+ hardref2.removeMovieClip(); // using the sprite's removeMovieClip
+ //softref.removeMovieClip(); // use the softref's removeMovieClip 
 #endif
+
 check_equals(typeof(hardref), 'undefined');
+xcheck_equals(typeof(hardref2), 'movieclip');
+xcheck_equals(hardref2.getDepth(), -32839);
 check_equals(typeof(softref), 'movieclip');
+check_equals(typeof(softref2), 'movieclip');
 check_equals(typeof(softref.member), 'undefined');
 check_equals(typeof(softref._target), 'undefined');
+xcheck_equals(softref2.member, 2);
+xcheck_equals(softref2._target, '/hardref2');
 hardref = 4;
 check_equals(typeof(softref), 'movieclip'); // hardref doesn't hide this
 // Delete is needed, or further inspection functions will hit the variable before the character

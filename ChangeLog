@@ -1,5 +1,8 @@
 2007-08-30 Sandro Santilli <strk@keybit.net>
 
+	* server/character.h: add const for removed clips depth offset.
+	* testsuite/actionscript.all/MovieClip.as: test for depth shift when
+	  onUnload method is defined and a clip is removed.
 	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: expect
 	  gnash failures.
 	* testsuite/actionscript.all/: Makefile.am, AsBroadcaster.as:

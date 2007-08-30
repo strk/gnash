@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.89 2007/08/23 16:50:56 strk Exp $ */
+/* $Id: character.h,v 1.90 2007/08/30 13:32:05 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -341,6 +341,16 @@ public:
     /// See: http://www.senocular.com/flash/tutorials/depths/?page=2
     ///
     static const int staticDepthOffset = -16384;
+
+    /// This is the offset at which character's depth is
+    /// shifted when a character is removed from stage but
+    /// an onUnload event handler is defined.
+    ///
+    /// Example: a character at depth 60 gets moved to
+    ///          depth -32829 (-32769-60) when unloaded and
+    ///          an onUnload event handler is defined for it.
+    ///
+    static const int removedDepthOffset = -32769; // -32769;
     
     /// This value is used for m_clip_depth when the value has no meaning, ie.
     /// the character is not a mask. Depths below -16384 are illegal, so this
