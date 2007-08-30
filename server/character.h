@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.90 2007/08/30 13:32:05 strk Exp $ */
+/* $Id: character.h,v 1.91 2007/08/30 14:13:07 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -848,7 +848,10 @@ public:
 	}
 
 	/// Queue event handler(s), if any.
-	void queueEventHandler(const event_id& id);
+	//
+	/// @return true if any event handler was queued, false otherwise.
+	///
+	bool queueEventHandler(const event_id& id);
 
 	virtual void on_button_event(const event_id& id)
 	{
@@ -988,11 +991,15 @@ public:
 	//
 	/// This function must be called when the character is removed
 	/// from the stage.
-	/// stage for the first time. It will take care of properly
-	/// unloading any child characters and queuing the 'UNLOAD'
-	/// event handler.
+	/// It will take care of properly calling
+	/// unload against any child characters and queuing the
+	/// 'UNLOAD' event handler.
 	///
-	virtual void unload();
+	/// @return true if any onUnload event handler was defined
+	///         by either this or any child characters, false
+	///         otherwise.
+	///
+	virtual bool unload();
 
 	bool isUnloaded() { return _unloaded; }
 	

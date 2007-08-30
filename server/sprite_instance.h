@@ -407,7 +407,7 @@ public:
 
 	/// Unload all contents in the displaylist and this instance
 	/// See character::unload for more info
-	void unload();
+	bool unload();
 
 	/// See DisplayList::move_display_object, this method is just a proxy to that...
 	//

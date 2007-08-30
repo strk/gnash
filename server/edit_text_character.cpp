@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.104 2007/08/23 09:53:03 udog Exp $ */
+/* $Id: edit_text_character.cpp,v 1.105 2007/08/30 14:13:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -425,11 +425,13 @@ edit_text_character::~edit_text_character()
 {
 }
 
-void
+bool
 edit_text_character::unload()
 {
 	// TODO: unregisterTextVariable() ?
 	on_event(event_id::KILLFOCUS);
+
+	return false;  // assuming TextField never has onUnload ...
 }
 
 void

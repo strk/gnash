@@ -118,8 +118,13 @@ public:
 	// See dox in character.h
 	bool pointInShape(float x, float y) const;
 
-	// See dox in character.h
-	void unload();
+	/// See dox in character::unload (character.h)
+	//
+	/// NOTE: edit_text_character (TextField) never has
+	///       an onUnload event, so we always return false
+	///	  here. (TODO: verify this)
+	///
+	bool unload();
 
 	/// Return true if the 'background' should be drawn
 	bool getDrawBackground() const;

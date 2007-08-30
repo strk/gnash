@@ -1690,11 +1690,24 @@ public:
 };
 
 /// A DisplayList visitor used to unload all characters
-struct UnloaderVisitor {
+class UnloaderVisitor {
+	int unloadEvents;
+
+public:
+	UnloaderVisitor()
+		:
+		unloadEvents(0)
+	{}
+
 	bool operator() (character* ch)
 	{
-		ch->unload();
+		if ( ch->unload() ) ++unloadEvents;
 		return true;
+	}
+
+	bool foundUnloadEvents() const 
+	{
+		return unloadEvents != 0;
 	}
 };
 
@@ -3409,7 +3422,7 @@ sprite_instance::construct()
 	}
 }
 
-void
+bool
 sprite_instance::unload()
 {
 #ifdef GNASH_DEBUG
@@ -3418,7 +3431,8 @@ sprite_instance::unload()
 
 	UnloaderVisitor visitor;
 	m_display_list.visitForward(visitor);
-	character::unload();
+
+	return character::unload() || visitor.foundUnloadEvents();
 
 }
 

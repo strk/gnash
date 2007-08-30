@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.48 2007/08/23 16:50:56 strk Exp $ */
+/* $Id: character.cpp,v 1.49 2007/08/30 14:13:07 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -673,16 +673,16 @@ character::~character()
 {
 }
 
-void
+bool
 character::unload()
 {
 	_unloaded = true;
 	//log_msg(_("Queuing unload event for character %p"), this);
-	queueEventHandler(event_id::UNLOAD);
+	return queueEventHandler(event_id::UNLOAD);
 	//on_event(event_id::UNLOAD);
 }
 
-void
+bool
 character::queueEventHandler(const event_id& id)
 {
 	bool called=false;
@@ -708,7 +708,10 @@ character::queueEventHandler(const event_id& id)
 	if ( method )
 	{
 		root.pushAction(method, boost::intrusive_ptr<character>(this));
+		called = true;
 	}
+
+	return called;
 
 }
 
