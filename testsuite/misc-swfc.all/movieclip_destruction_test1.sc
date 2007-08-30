@@ -41,8 +41,9 @@
  *  frame6: 
  * 
  * Expected behaviour:
- *    (1) only part of the AS in a single action_buffer get executed;
- *    (2) character get destroied at frame 4.
+ *    (1) only part of the AS in a single action_buffer(in the 2nd frame of mc1) 
+ *        get executed;
+ *    (2) character mc1 get destroied at frame 4.
  * 
  */
 
@@ -81,8 +82,6 @@
   .action:
     check_equals(typeof(mc1), 'movieclip');
     check_equals(mc1.getDepth(), -16383);
-    mc.onLoad = function () {};
-    mc.onUnload = function () {trace('haha');};
   .end
 
 
@@ -92,7 +91,7 @@
       .put b2 x = 300 y = 300
   .end
   
-	.initaction mc2: // Add initactions for mc2(mc2 is not placed)
+  .initaction mc2: // Add initactions for mc2(mc2 is not placed)
     check_equals(typeof(mc1), 'movieclip');
     check_equals(mc1.getDepth(), -16383);
   .end
