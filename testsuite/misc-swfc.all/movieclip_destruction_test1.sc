@@ -105,8 +105,8 @@
   .end
   
   .initaction mc3: // Add initactions for mc3(mc3 is not placed)
-    _root.check_equals(mc1, null);
-    _root.check_equals(typeof(mc1), 'undefined');
+    _root.xcheck_equals(mc1, null);
+    _root.xcheck_equals(typeof(mc1), 'undefined');
   .end
 
   .del mc1  // Remove sprite mc1  
@@ -114,7 +114,7 @@
 
 .frame 6 // target frame
   .action:
-    check_equals(_root.x, 0);
+    xcheck_equals(_root.x, 0);
     stop();
   .end
   
