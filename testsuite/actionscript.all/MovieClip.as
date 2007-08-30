@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.85 2007/08/30 13:32:05 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.86 2007/08/30 13:49:57 strk Exp $";
 
 #include "check.as"
 
@@ -417,48 +417,86 @@ check_equals(typeof(_global.removeMovieClip), 'undefined');
 
 #if OUTPUT_VERSION >= 6
 
+// Here we create 3 clips
+//	- hardref has no onUnload
+//	- hardref2 has an onUnload
+//	- hardref3 has no onUnload but a child with onUnload
+// We'll see that when the three clips are removed from the stage
+// those with any onUnload handler (either theirs or in their childrens)
+// will still be on the stage, only with their depth shifted at -32769-depth
+// (see character::removedRepthOffset)
+
 softref = _root.createEmptyMovieClip("hardref", 60);
 softref2 = _root.createEmptyMovieClip("hardref2", 70);
+softref3 = _root.createEmptyMovieClip("hardref3", 80);
+softref3child = softref3.createEmptyMovieClip("hardref3child", 1);
+softref3child.onUnload = function() { /* note(this+".onUnload called");*/ };
 hardref2.onUnload = function() { /*note(this+".onUnload called");*/ };
 check_equals(typeof(hardref), 'movieclip');
 check_equals(typeof(softref), 'movieclip');
 check_equals(typeof(hardref2), 'movieclip');
 check_equals(typeof(softref2), 'movieclip');
+check_equals(typeof(hardref3), 'movieclip');
+check_equals(typeof(softref3), 'movieclip');
+check_equals(typeof(hardref3.hardref3child), 'movieclip');
+check_equals(typeof(softref3child), 'movieclip');
 softref.member = 1;
 softref2.member = 2;
+softref3.member = 3;
+softref3child.member = '3child';
 check_equals(typeof(softref.member), 'number');
 check_equals(typeof(softref2.member), 'number');
+check_equals(typeof(softref3.member), 'number');
+check_equals(typeof(softref3child.member), 'string');
 check_equals(softref.member, 1);
 check_equals(softref2.member, 2);
+check_equals(softref3.member, 3);
+check_equals(softref3child.member, '3child');
 check_equals(softref._target, "/hardref");
 check_equals(softref2._target, "/hardref2");
+check_equals(softref3._target, "/hardref3");
+check_equals(softref3child._target, "/hardref3/hardref3child");
+check_equals(hardref.getDepth(), 60);
+check_equals(hardref2.getDepth(), 70);
+check_equals(hardref3.getDepth(), 80);
+check_equals(softref3child.getDepth(), 1);
 #if OUTPUT_VERSION > 6
  check_equals(getInstanceAtDepth(60), hardref);
  check_equals(getInstanceAtDepth(70), hardref2);
- check_equals(hardref.getDepth(), 60);
- check_equals(hardref2.getDepth(), 70);
+ check_equals(getInstanceAtDepth(80), hardref3);
+ check_equals(hardref3.getInstanceAtDepth(1), hardref3.hardref3child);
  removeMovieClip(hardref); // using ActionRemoveClip (0x25)
  removeMovieClip(hardref2); // using ActionRemoveClip (0x25)
+ removeMovieClip(hardref3); // using ActionRemoveClip (0x25)
  check_equals(getInstanceAtDepth(60), undefined);
  check_equals(getInstanceAtDepth(-32839), hardref2);
 #else
  // just to test another way, ActionRemoveClip in SWF6 will work as well
  hardref.removeMovieClip(); // using the sprite's removeMovieClip 
  hardref2.removeMovieClip(); // using the sprite's removeMovieClip
+ hardref3.removeMovieClip(); // using the sprite's removeMovieClip
  //softref.removeMovieClip(); // use the softref's removeMovieClip 
 #endif
 
 check_equals(typeof(hardref), 'undefined');
 xcheck_equals(typeof(hardref2), 'movieclip');
+xcheck_equals(typeof(hardref3), 'movieclip'); // still accessible due to onUnload defined for its child
 xcheck_equals(hardref2.getDepth(), -32839);
+xcheck_equals(hardref3.getDepth(), -32849);
+xcheck_equals(hardref3.hardref3child.getDepth(), 1);
 check_equals(typeof(softref), 'movieclip');
 check_equals(typeof(softref2), 'movieclip');
+check_equals(typeof(softref3), 'movieclip');
+check_equals(typeof(softref3child), 'movieclip');
 check_equals(typeof(softref.member), 'undefined');
 check_equals(typeof(softref._target), 'undefined');
 xcheck_equals(softref2.member, 2);
 xcheck_equals(softref2._target, '/hardref2');
+xcheck_equals(softref3.member, 3);
+xcheck_equals(softref3._target, '/hardref3');
+xcheck_equals(softref3child.member, '3child');
+xcheck_equals(softref3child._target, '/hardref3/hardref3child');
 hardref = 4;
-check_equals(typeof(softref), 'movieclip'); // hardref doesn't hide this
 // Delete is needed, or further inspection functions will hit the variable before the character
 delete hardref;
 sr61 = _root.createEmptyMovieClip("hardref", 61);
