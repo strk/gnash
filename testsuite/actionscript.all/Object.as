@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.29 2007/08/31 18:10:54 strk Exp $";
+rcsid="$Id: Object.as,v 1.30 2007/08/31 18:20:30 strk Exp $";
 
 #include "check.as"
 
@@ -28,19 +28,19 @@ rcsid="$Id: Object.as,v 1.29 2007/08/31 18:10:54 strk Exp $";
 check_equals(typeof(Object), 'function');
 check_equals(typeof(Object.prototype), 'object');
 
-// The bug below (no end in the inheritance chain) triggers endless
-// recursions during run of the trace_properties() function defined
-// in trace_properties.as from swfdec testsuite.
-// WE WANT THIS FIXED !!
-xcheck_equals(typeof(Object.prototype.__proto__), 'undefined');
-
 // registerClass is a public static function of Object
 check_equals(typeof(Object.registerClass), 'function');
 check_equals(typeof(Object.prototype.toString), 'function');
 check_equals(typeof(Object.prototype.valueOf), 'function');
 check_equals(typeof(Object.prototype.constructor), 'function'); 
 check_equals(Object.prototype.prototype, undefined);
+
+// The bug below (no end in the inheritance chain) triggers endless
+// recursions during run of the trace_properties() function defined
+// in trace_properties.as from swfdec testsuite.
+// WE WANT THIS FIXED !!
 xcheck_equals(Object.prototype.__proto__, undefined);
+
 xcheck_equals(Object.prototype.registerClass, undefined);
 
 #if OUTPUT_VERSION > 5
@@ -107,11 +107,11 @@ check_equals(typeof(Object.prototype.unwatch), 'undefined');
 // Test Object creation using 'new'
 var obj = new Object; // uses SWFACTION_NEWOBJECT
 check (obj != undefined);
-check (typeof(obj) == "object");
+check_equals (typeof(obj), "object");
 
-check(obj.__proto__ == Object.prototype);
-check(obj.prototype == undefined);
-check(obj.__proto__.prototype == undefined);
+check_equals(obj.__proto__, Object.prototype);
+check_equals(typeof(obj.prototype), 'undefined');
+xcheck_equals(typeof(obj.__proto__), 'undefined');
 
 #if OUTPUT_VERSION == 5
 // Gnash fails on swf5 but succeeds on swf6,7,8
