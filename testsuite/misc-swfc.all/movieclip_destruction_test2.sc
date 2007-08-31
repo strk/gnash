@@ -35,7 +35,7 @@
  *    (1) mc1Ref in frame3 is dangling.
  *    (2) mc2Ref, mc3Ref, mc2 and mc3 are still accessible in frame3.
  *    (3) Movieclip.swapDepths() does not work for mc2 and mc3 in frame3.
- *    (4) mc2.testvar keeps alive after onUnload, mc3.testvar gets destroyed before entering onUnload handler.
+ *    (4) 'testvar' of mc2 and mc3 keep alive after onUnload called.
  *    (5) mc2Ref, mc3Ref are dangling at frame4.
  * 
  */
@@ -92,12 +92,11 @@
     mc3.onUnload = function ()  
     { 
        _root.mc3UnlaodedCount++; 
-       // mc3.testvar get destroyed before entering onUnload
-       _root.check_equals(mc3.testvar, undefined);
+       _root.xcheck_equals(mc3.testvar, 100);
     };
     
     mc2.testvar = 100;
-    mc2.testvar = new Number(100);
+    mc3.testvar = new Number(100);
     
     // Create soft references for mc1 and mc2 and mc3
     mc1Ref = mc1;
@@ -134,8 +133,7 @@
     xcheck_equals(mc3.getDepth(), -16388);  // depth not change after swapDepths
     
     xcheck_equals(mc2.testvar, 100);       
-    check_equals(mc3.testvar, undefined); 
-    check_equals(typeof(mc3.testvar), 'undefined'); 
+    xcheck_equals(mc3.testvar, 100); 
     mc2.removMovieClip();
     mc3.removMovieClip();
     xcheck_equals(mc2UnlaodedCount, 1); //mc2.onUnload not triggered again
@@ -147,8 +145,7 @@
     xcheck_equals(mc2._x, 200); 
     xcheck_equals(mc3._y, 300);  
     xcheck_equals(mc2.testvar, 100); 
-    check_equals(mc3.testvar, undefined); 
-    check_equals(typeof(mc3.testvar), 'undefined'); 
+    xcheck_equals(mc3.testvar, 100); 
     
     mc2.onUnload();
     mc3.onUnload();
@@ -173,7 +170,7 @@
     .action:
       check_equals(mc1.getDepth(), -16380);
       mc1.swapDepths(-16400); // doesn't work, can't swap mc1 to a depth below -16384
-      check_equals(mc1.getDepth(), -16380);
+      xcheck_equals(mc1.getDepth(), -16380);
     .end
 
 .frame 6
