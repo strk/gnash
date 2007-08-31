@@ -67,7 +67,7 @@
   
   .sprite mc3 // Define a sprite mc3
     .frame 1
-      .put b2 x = 0 y = 0
+      .put b3 x = 0 y = 0
   .end
   
   .put mc1 x = 100 y = 300 // Place mc1
@@ -167,8 +167,16 @@
     check_equals(mc3Ref.valueOf(), null);
   .end
   
+// Seperate tests for Movieclip.swapDepths
+.frame 5 
+    .put mc1 x = 100 y = 300 // Place mc1
+    .action:
+      check_equals(mc1.getDepth(), -16380);
+      mc1.swapDepths(-16400); // doesn't work, can't swap mc1 to a depth below -16384
+      check_equals(mc1.getDepth(), -16380);
+    .end
 
-.frame 5
+.frame 6
   .action:
     totals();
     stop();
