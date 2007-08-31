@@ -1,5 +1,7 @@
 2007-08-31 Sandro Santilli <strk@keybit.net>
 
+	* server/character.cpp (unload): assert the character wasn't already
+	  unloaded.
 	* macros/boost.m4: don't trash user-defined CXXFLAGS, and don't
 	  provide one if not user-specified initially.
 	* testsuite/misc-swfc.all/check.sc: ops, last totals() define
