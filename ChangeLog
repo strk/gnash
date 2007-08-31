@@ -1,5 +1,8 @@
 2007-08-31 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Object.as: add test for
+	  Object.prototype.__proto__ expected to be undefined (bad bug
+	  in Gnash!).
 	* server/array.cpp (array_length): handle attempts to set a negative
 	  length as if length=0 was set, and log an AS error.
 	  Still not correct, but saves a memory fill with swfdec testsuite.

@@ -20,13 +20,20 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.28 2007/08/16 06:09:14 zoulunkai Exp $";
+rcsid="$Id: Object.as,v 1.29 2007/08/31 18:10:54 strk Exp $";
 
 #include "check.as"
 
 // Test existance of methods
 check_equals(typeof(Object), 'function');
 check_equals(typeof(Object.prototype), 'object');
+
+// The bug below (no end in the inheritance chain) triggers endless
+// recursions during run of the trace_properties() function defined
+// in trace_properties.as from swfdec testsuite.
+// WE WANT THIS FIXED !!
+xcheck_equals(typeof(Object.prototype.__proto__), 'undefined');
+
 // registerClass is a public static function of Object
 check_equals(typeof(Object.registerClass), 'function');
 check_equals(typeof(Object.prototype.toString), 'function');
