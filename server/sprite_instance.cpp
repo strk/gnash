@@ -1670,25 +1670,6 @@ public:
 	}
 };
 
-/// A DisplayList visitor used to extract all characters
-//
-/// Script characters are characters created or transformed
-/// by ActionScript
-///
-class CharactersExtractor {
-	std::vector<character*>& _chars;
-public:
-	CharactersExtractor(std::vector<character*>& chars)
-		:
-		_chars(chars)
-	{}
-
-	void operator() (character* ch) 
-	{
-		_chars.push_back(ch);
-	}
-};
-
 /// A DisplayList visitor used to unload all characters
 class UnloaderVisitor {
 	int unloadEvents;

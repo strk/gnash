@@ -1,5 +1,6 @@
 2007-08-31 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: removed more dead code.
 	* server/dlist.cpp (swapDeptsh): don't swap to depths in the
 	  deleted characters zone.
 	* testsuite/misc-swfc.all/movieclip_destruction_test2.sc:
