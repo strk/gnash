@@ -2784,6 +2784,12 @@ sprite_instance::add_display_object(
     //  (2) we are in jump-back-mode
     if(!existing_char || is_jumping_back)
     {
+        // TODO: Optimize this.
+        // Create_character_instance() is too expensive for some characters.
+        // All I need to do here might be just syntetize a new instance name,
+        // the real character is not needed.
+        // To decide whether a new instance name is needed for static characters, 
+        // a single character_id should be enough. 
         ch = cdef->create_character_instance(this, character_id);
         ch->setTimelineInfo(depth, m_current_frame, false);
 
@@ -2835,6 +2841,8 @@ sprite_instance::add_display_object(
     {
         // remove the created character from the key listener list,
         // it might be there(eg. button_character).
+		// TODO: optimize this.  This is not necessary if we don't create
+		// instances blindly above.
         _vm.getRoot().remove_key_listener(ch.get());
 
         move_display_object(depth, &color_transform, &mat, ratio, clip_depth);

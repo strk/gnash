@@ -317,7 +317,7 @@ public:
 	/// controlled by the is_jumping_back flag. If false, this
 	/// call will result in a no-op. If true, the previously existing character
 	/// will be replaced by the new one, with unload() method invoked on the
-	/// removed character. (zou: correct?)
+	/// removed character. 
 	///
 	/// Any successful new placement triggers invokation of the newly created
 	/// instance's LOAD event.
@@ -355,8 +355,7 @@ public:
 	/// @return 
 	///	A pointer to the character being added or NULL
 	///	if this call results in a move of an existing character 
-	///	or in a no-op due to is_jumping_back being
-	///	false. (zou: correct?)
+	///	or in a no-op due to is_jumping_back being false. 
 	///       
 	character* add_display_object(
 		uint16_t character_id,
