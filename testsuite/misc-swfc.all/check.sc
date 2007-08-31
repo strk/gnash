@@ -44,7 +44,7 @@
 
 #define note(text) Dejagnu.note(text + _INFO_);
 
-#define totals Dejagnu.totals
+#define totals() Dejagnu.totals()
 
 #define MEDIA(x) MEDIADIR/x
 
