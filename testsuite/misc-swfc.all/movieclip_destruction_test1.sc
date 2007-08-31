@@ -48,7 +48,7 @@
  */
 
 
-.flash  bbox=800x600 filename="movieclip_destruction_test1.swf" background=white version=6 fps=12
+.flash  bbox=800x600 filename="movieclip_destruction_test1.swf" background=white version=7 fps=12
 
 .frame 1
   .action:
@@ -68,6 +68,7 @@
       .put b1 x = 300 y = 300
     .frame 2    
       .action:
+        check_equals(mc1.getDepth(), -16383);
         _root.x = 0;
         _root.gotoAndStop(6);
         // AS below have no chance to be executed.
@@ -92,6 +93,8 @@
   .end
   
   .initaction mc2: // Add initactions for mc2(mc2 is not placed)
+    // mc1 is still alive here, _root.gotoAndStop(6) hasn't been executed yet.
+    // Note mc1 has 2 frames.
     check_equals(typeof(mc1), 'movieclip');
     check_equals(mc1.getDepth(), -16383);
   .end
@@ -107,6 +110,7 @@
   .initaction mc3: // Add initactions for mc3(mc3 is not placed)
     _root.xcheck_equals(mc1, null);
     _root.xcheck_equals(typeof(mc1), 'undefined');
+    _root.check_equals(typeof(_root.getInstanceAtDepth(-16386)), 'undefined');
   .end
 
   .del mc1  // Remove sprite mc1  
