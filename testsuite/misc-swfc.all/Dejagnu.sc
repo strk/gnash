@@ -76,7 +76,7 @@
             xcheck_equals: function (obt, exp, msg) {
                 if(msg == null) msg = "";
                 if ( obt == exp ) 
-                    this.xpass(obt+' == '+exp);
+                    this.xpass(obt+' == '+exp+" "+msg);
                 else 
                     this.xfail('expected: '+exp+' , obtained: '+obt+" "+msg);
             },

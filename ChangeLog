@@ -1,5 +1,11 @@
 2007-08-31 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.cpp (swapDeptsh): don't swap to depths in the
+	  deleted characters zone.
+	* testsuite/misc-swfc.all/movieclip_destruction_test2.sc:
+	  less failures, few more tests.
+	* testsuite/misc-swfc.all/Dejagnu.sc: include file:line info
+	  in xpass too...
 	* testsuite/misc-swfc.all/check.sc: define totals().
 
 2007-08-31 Zou Lunkai <zoulunkai@gmail.com>

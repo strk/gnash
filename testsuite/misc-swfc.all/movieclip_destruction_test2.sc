@@ -41,7 +41,7 @@
  */
 
 
-.flash  bbox=800x600 filename="movieclip_destruction_test2.swf" background=white version=7 fps=1
+.flash  bbox=800x600 filename="movieclip_destruction_test2.swf" background=white version=7 fps=12
 
 .frame 1
   .action:
@@ -169,8 +169,14 @@
     .put mc1 x = 100 y = 300 // Place mc1
     .action:
       check_equals(mc1.getDepth(), -16380);
-      mc1.swapDepths(-16400); // doesn't work, can't swap mc1 to a depth below -16384
-      xcheck_equals(mc1.getDepth(), -16380);
+      mc1.swapDepths(-16385); // doesn't work, can't swap mc1 to a depth below -16384
+      check_equals(mc1.getDepth(), -16380);
+      mc1.swapDepths(-16384); // works
+      check_equals(mc1.getDepth(), -16384);
+      mc1.swapDepths(-32769); // doesn't work, can't swap mc1 to a depth below -16384 
+      check_equals(mc1.getDepth(), -16384);
+      mc1.swapDepths(-402770); // doesn't work, can't swap mc1 to a depth below -16384 
+      check_equals(mc1.getDepth(), -16384);
     .end
 
 .frame 6

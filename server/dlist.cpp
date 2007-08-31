@@ -415,9 +415,19 @@ DisplayList::remove_display_object(int depth)
 	//dump();
 }
 
+// TODO: take character by ref ?
 void
 DisplayList::swapDepths(character* ch1, int newdepth)
 {
+
+	if ( newdepth < character::staticDepthOffset )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_aserror("%s.swapDepth(%d) : ignored call with target depth less then %d",
+			ch1->getTarget().c_str(), newdepth, character::staticDepthOffset);
+		);
+		return;
+	}
 
 	assert(ch1->get_depth() != newdepth);
 
