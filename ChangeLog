@@ -1,3 +1,7 @@
+2007-08-31 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-swfc.all/check.sc: define totals().
+
 2007-08-31 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: few more tests.
