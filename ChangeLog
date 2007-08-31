@@ -1,5 +1,11 @@
 2007-08-31 Zou Lunkai <zoulunkai@gmail.com>
 	
+	* testsuite/misc-swfc.all/movieclip_destruction_test2.sc: testcase about
+	  movieclip destruction and soft references, more failures.
+	* testsuite/misc-swfc.all/Makefile.am: enable testcase.
+	  
+2007-08-31 Zou Lunkai <zoulunkai@gmail.com>
+	
 	* libbase/image.cpp: don't ommit the default parameter, should fix 
 	  the building, please check.
 	
