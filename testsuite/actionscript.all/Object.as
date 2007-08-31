@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.30 2007/08/31 18:20:30 strk Exp $";
+rcsid="$Id: Object.as,v 1.31 2007/08/31 19:05:48 strk Exp $";
 
 #include "check.as"
 
@@ -40,6 +40,9 @@ check_equals(Object.prototype.prototype, undefined);
 // in trace_properties.as from swfdec testsuite.
 // WE WANT THIS FIXED !!
 xcheck_equals(Object.prototype.__proto__, undefined);
+#if OUTPUT_VERSION > 5
+ check(!Object.prototype.hasOwnProperty("__proto__"));
+#endif 
 
 xcheck_equals(Object.prototype.registerClass, undefined);
 
@@ -111,7 +114,7 @@ check_equals (typeof(obj), "object");
 
 check_equals(obj.__proto__, Object.prototype);
 check_equals(typeof(obj.prototype), 'undefined');
-xcheck_equals(typeof(obj.__proto__), 'undefined');
+check_equals(typeof(obj.__proto__), 'object');
 
 #if OUTPUT_VERSION == 5
 // Gnash fails on swf5 but succeeds on swf6,7,8
@@ -152,9 +155,12 @@ check_equals(obj.valueOf(), obj);
 
 // Test Object creation using literal initialization
 var obj2 = { member:1 }; // uses SWFACTION_INITOBJECT
-check (obj2 != undefined );
-check (typeof(obj2) == "object");
-check (obj2.__proto__.constructor == Object);
+check_equals(typeof(obj2), "object");
+check_equals(typeof(obj2.__proto__), 'object');
+check_equals(obj2.__proto__, Object.prototype);
+check_equals(obj2.__proto__.constructor, Object);
+check_equals(typeof(obj2.prototype), 'undefined');
+
 
 // Test initialized object members
 check ( obj2.member == 1 )
