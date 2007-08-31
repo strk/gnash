@@ -5,7 +5,7 @@
 // Updated with sort functions, and to use check() macro
 // by Mike Carlson Feb. 14th, 2006
 
-rcsid="$Id: array.as,v 1.30 2007/08/04 21:34:14 strk Exp $";
+rcsid="$Id: array.as,v 1.31 2007/08/31 17:07:36 strk Exp $";
 
 #include "check.as"
 
@@ -362,10 +362,16 @@ check_equals ( c.length, 1001 );
 
 // Test that the 'length' property is overridable
 c[8] = 'eight';
+c[0] = 'zero';
 check_equals(c[8], 'eight');
 c.length = 2;
 check_equals(c.length, 2);
 check_equals(c[8], undefined);
+check_equals(c[0], 'zero');
+c.length = -1;
+// it seems Gnash needs to store the 'length' property as a normal property
+xcheck_equals(c.length, -1);
+check_equals(c[0], undefined);
 
 //-------------------------------
 // Test deleting an array element

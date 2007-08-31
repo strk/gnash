@@ -1,5 +1,13 @@
 2007-08-31 Sandro Santilli <strk@keybit.net>
 
+	* server/array.cpp (array_length): handle attempts to set a negative
+	  length as if length=0 was set, and log an AS error.
+	  Still not correct, but saves a memory fill with swfdec testsuite.
+	* testsuite/actionscript.all/array.as: add test for setting a negative
+	  length.
+
+2007-08-31 Sandro Santilli <strk@keybit.net>
+
 	* server/character.cpp (unload): assert the character wasn't already
 	  unloaded.
 	* macros/boost.m4: don't trash user-defined CXXFLAGS, and don't

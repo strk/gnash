@@ -1316,7 +1316,16 @@ array_length(const fn_call& fn)
 
 	if ( fn.nargs ) // setter
 	{
-		array->resize(unsigned(fn.arg(0).to_number(&(fn.env()))));
+		int length = fn.arg(0).to_int(fn.env());
+		if ( length < 0 ) // TODO: set a max limit too ?
+		{
+			IF_VERBOSE_ASCODING_ERRORS(
+			log_aserror("Attempt to set Array.length to a negative value %d", length);
+			)
+			length = 0;
+		}
+
+		array->resize(length);
 		return as_value();
 	}
 	else // getter
