@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.26 2007/08/08 20:17:28 strk Exp $ */
+/* $Id: Object.cpp,v 1.27 2007/08/31 21:53:32 strk Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -79,7 +79,7 @@ getObjectInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( o == NULL )
 	{
-		o = new as_object();
+		o = new as_object(); // end of the inheritance chain
 		attachObjectInterface(*o);
 		o->set_prototype(o.get());
 	}

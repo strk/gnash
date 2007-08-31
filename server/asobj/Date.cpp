@@ -84,6 +84,7 @@
 #include "fn_call.h"
 #include "GnashException.h"
 #include "builtin_function.h"
+#include "Object.h" // for getObjectInterface
 
 #include <ctime>
 #include <cmath>
@@ -319,7 +320,7 @@ getDateInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( o == NULL )
 	{
-		o = new as_object();
+		o = new as_object(getObjectInterface());
 		attachDateInterface(*o);
 	}
 	return o.get();

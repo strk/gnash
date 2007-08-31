@@ -106,9 +106,12 @@ as_object::get_member_default(const std::string& name, as_value* val)
 	if (name == "__proto__")
 	{
 		as_object* p = get_prototype();
-		assert(p);
-		val->set_as_object(get_prototype());
-		return true;
+		if ( p ) {
+			val->set_as_object(p);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	Property* prop = findProperty(name);
@@ -622,8 +625,14 @@ as_object::get_prototype()
 	if ( m_prototype ) return m_prototype.get();
 	//log_msg(_("as_object::get_prototype(): Hit top of inheritance chain"));
 
+#if 0 // the inheritance chain MUST end somewhere, handle the SWF4 thing in some other way
 	// if SWF version < 5 the Object interface won't keep alive !
-	if ( _vm.getSWFVersion() > 4 ) return getObjectInterface();
+	if ( _vm.getSWFVersion() > 4 )
+	{
+		return getObjectInterface();
+	}
+#endif
+
 	return NULL;
 }
 

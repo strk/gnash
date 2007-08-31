@@ -37,6 +37,7 @@
 #include "timers.h"
 #include "VM.h"
 #include "LoadVariablesThread.h"
+#include "Object.h" // for getObjectInterface
 
 #include <list>
 
@@ -336,7 +337,7 @@ LoadVars::getLoadVarsInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object();
+		o = new as_object(getObjectInterface());
 		attachLoadVarsInterface(*o);
 	}
 	return o.get();

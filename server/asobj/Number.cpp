@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Number.cpp,v 1.32 2007/08/01 15:56:54 strk Exp $ */
+/* $Id: Number.cpp,v 1.33 2007/08/31 21:53:32 strk Exp $ */
 
 #include "log.h"
 #include "tu_config.h"
@@ -28,6 +28,7 @@
 #include "as_value.h" // for doubleToString
 #include "builtin_function.h" // need builtin_function
 #include "VM.h" // for registering static GcResources (constructor and prototype)
+#include "Object.h" // for getObjectInterface
 
 #include <sstream>
 #include <cmath>
@@ -80,7 +81,7 @@ getNumberInterface()
 	static boost::intrusive_ptr<as_object> o=NULL;
 	if ( o == NULL )
 	{
-		o = new as_object();
+		o = new as_object(getObjectInterface());
 		VM::get().addStatic(o.get());
 
 		attachNumberInterface(*o);

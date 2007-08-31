@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.69 2007/08/03 20:54:47 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.70 2007/08/31 21:53:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -37,6 +37,7 @@
 #include "NetConnection.h"
 #include "action.h" // for call_method
 #include "render.h"	// for gnash::render::videoFrameFormat()
+#include "Object.h" // for getObjectInterface
 
 #include "movie_root.h"
 
@@ -422,7 +423,7 @@ getNetStreamInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( o == NULL )
 	{
-		o = new as_object();
+		o = new as_object(getObjectInterface());
 		attachNetStreamInterface(*o);
 	}
 
@@ -612,7 +613,7 @@ NetStream::getStatusObject(StatusCode code)
 	// code, level
 	std::pair<const char*, const char*> info = getStatusCodeInfo(code);
 
-	boost::intrusive_ptr<as_object> o = new as_object();
+	boost::intrusive_ptr<as_object> o = new as_object(getObjectInterface());
 	o->init_member("code",  info.first,  1);
 	o->init_member("level", info.second, as_prop_flags::dontDelete|as_prop_flags::dontEnum);
 

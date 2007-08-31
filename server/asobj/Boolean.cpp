@@ -28,6 +28,7 @@
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h"
 #include "VM.h" // for registering static GcResources (constructor and prototype)
+#include "Object.h" // for getObjectInterface
 
 namespace gnash {
 
@@ -48,7 +49,7 @@ getBooleanInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object();
+		o = new as_object(getObjectInterface());
 		VM::get().addStatic(o.get());
 
 		attachBooleanInterface(*o);

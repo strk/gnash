@@ -28,6 +28,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "VM.h"
+#include "Object.h" // for getObjectInterface()
 
 #include <string>
 #include <boost/algorithm/string/case_conv.hpp> // for using PROPNAME
@@ -60,6 +61,7 @@ attachStageInterface(as_object& o)
 
 Stage::Stage()
 	:
+	as_object(getObjectInterface()),
 	_scaleMode(showAll)
 {
 	attachStageInterface(*this);

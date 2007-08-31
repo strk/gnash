@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.20 2007/08/29 18:50:20 strk Exp $";
+rcsid="$Id: TextField.as,v 1.21 2007/08/31 21:53:33 strk Exp $";
 
 #include "check.as"
 
@@ -27,6 +27,8 @@ rcsid="$Id: TextField.as,v 1.20 2007/08/29 18:50:20 strk Exp $";
 
 check_equals(typeof(TextField), 'function');
 check_equals(typeof(TextField.prototype), 'object');
+check_equals(typeof(TextField.prototype.__proto__), 'object');
+check_equals(TextField.prototype.__proto__, Object.prototype);
 check_equals(typeof(TextField.prototype.setTextFormat), 'function');
 check_equals(typeof(TextField.prototype.getTextFormat), 'function');
 check_equals(typeof(TextField.prototype.setNewTextFormat), 'function');

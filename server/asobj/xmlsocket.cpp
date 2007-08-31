@@ -31,6 +31,7 @@
 #include "VM.h"
 #include "builtin_function.h" // for setting timer, should likely avoid that..
 #include "URLAccessManager.h"
+#include "Object.h" // for getObjectInterface
 
 #include "log.h"
 
@@ -592,7 +593,7 @@ getXMLSocketInterface()
     static boost::intrusive_ptr<as_object> o;
     if ( o == NULL )
     {
-        o = new as_object();
+        o = new as_object(getObjectInterface());
         attachXMLSocketInterface(*o);
     }
     return o.get();

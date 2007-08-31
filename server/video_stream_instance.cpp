@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-// $Id: video_stream_instance.cpp,v 1.35 2007/08/18 16:12:38 strk Exp $
+// $Id: video_stream_instance.cpp,v 1.36 2007/08/31 21:53:31 strk Exp $
 
 #include "sprite_instance.h"
 #include "video_stream_instance.h"
@@ -29,6 +29,7 @@
 #include "Range2d.h"
 #include "builtin_function.h" // for getter/setter properties
 #include "VM.h"
+#include "Object.h"
 
 namespace gnash {
 
@@ -44,7 +45,7 @@ static as_object* getVideoInterface()
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
-		proto = new as_object();
+		proto = new as_object(getObjectInterface());
 		VM::get().addStatic(proto.get());
 
 		attachVideoInterface(*proto);

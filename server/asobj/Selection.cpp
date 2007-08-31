@@ -27,6 +27,7 @@
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
+#include "Object.h" // for getObjectInterface
 
 namespace gnash {
 
@@ -59,7 +60,7 @@ getSelectionInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object();
+		o = new as_object(getObjectInterface());
 		attachSelectionInterface(*o);
 	}
 	return o.get();
@@ -129,7 +130,7 @@ selection_class_init(as_object& global)
 {
 	// Selection is NOT a class, but a simple object, see Selection.as
 
-	static boost::intrusive_ptr<as_object> obj = new as_object();
+	static boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
 	attachSelectionInterface(*obj);
 	global.init_member("Selection", obj.get());
 

@@ -28,6 +28,7 @@
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 //#include "VM.h" // for registering static
+#include "Object.h" // for getObjectInterface
 
 namespace gnash {
 
@@ -54,7 +55,7 @@ getMouseInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object();
+		o = new as_object(getObjectInterface());
 		attachMouseInterface(*o);
 	}
 	return o.get();

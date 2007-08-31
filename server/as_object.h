@@ -440,6 +440,8 @@ public:
 	/// The __proto__ member is the exported interface ('prototype')
 	/// of the class this object is an instance of.
 	///
+	/// NOTE: can return NULL (and it is expected to do for Object.prototype)
+	///
 	as_object* get_prototype();
 
 	const as_object* get_prototype() const {

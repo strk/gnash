@@ -51,6 +51,7 @@
 #include "ExecutableCode.h"
 #include "gnash.h" // for point class !
 #include "Timeline.h" // for restoreDisplayList
+#include "Object.h" // for getObjectInterface
 
 #include <vector>
 #include <string>
@@ -1583,7 +1584,7 @@ getMovieClipInterface()
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
-		proto = new as_object();
+		proto = new as_object(getObjectInterface());
 		VM::get().addStatic(proto.get());
 
 		attachMovieClipInterface(*proto);

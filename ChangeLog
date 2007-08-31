@@ -1,5 +1,36 @@
 2007-08-31 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.{cpp,h}: changed get_prototype to always return
+	  the actual prototype (rather then returning the Object prototype
+	  if unset).
+	* server/: array.cpp, as_function.cpp, edit_text_character.cpp,
+	  sprite_instance.cpp, video_stream_instance.cpp:
+	  Initialize AS class interfaces (prototype) as being subclasses of
+	  the Object class.
+	* server/asobj/: Boolean.cpp, Camera.cpp, Color.cpp,
+	  ContextMenu.cpp, CustomActions.cpp, Date.cpp, Error.cpp, Key.cpp,
+	  LoadVars.cpp, Microphone.cpp, Mouse.cpp, MovieClipLoader.cpp,
+	  NetConnection.cpp, NetStream.cpp, Number.cpp, Object.cpp,
+	  Selection.cpp, SharedObject.cpp, Sound.cpp, Stage.cpp, System.cpp,
+	  TextSnapshot.cpp, string.cpp, xmlnode.cpp, xmlsocket.cpp
+	  Initialize AS class interfaces (prototype) as being subclasses of
+	  the Object class.
+	* testsuite/actionscript.all/Global.as: more successes.
+	* testsuite/actionscript.all/Function.as: one more test for
+	  Function.prototype.__proto__
+	* testsuite/actionscript.all/MovieClip.as: more tests for
+	  MovieClip.prototype.__proto__
+	* testsuite/actionscript.all/TextField.as: more tests for
+	  TextField.prototype.__proto__
+	* testsuite/actionscript.all/Video.as: more tests for
+	  Video.prototype.__proto__
+	* testsuite/actionscript.all/array.as: more tests for
+	  Array.prototype.__proto__
+	* testsuite/swfdec/PASSING: successes from latest swfdec
+	  testsuite.
+
+2007-08-31 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Object.as: add test for
 	  Object.prototype.__proto__ expected to be undefined (bad bug
 	  in Gnash!).

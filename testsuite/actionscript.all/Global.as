@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Global.as,v 1.26 2007/07/26 03:41:18 strk Exp $";
+rcsid="$Id: Global.as,v 1.27 2007/08/31 21:53:33 strk Exp $";
 
 #include "check.as"
 
@@ -37,9 +37,9 @@ check_equals(typeof(this.__proto__._global), 'undefined');
 // odd stuff.. not every value of type 'object' is an instance of Object :!!
 check_equals(typeof(_global), 'object');
 check_equals(typeof(_global._global), 'undefined');
-xcheck( ! _global instanceof Object );
-xcheck_equals( typeof(_global.__proto__), 'undefined' );
-xcheck_equals(typeof(_global.toString), 'undefined');
+check( ! _global instanceof Object );
+check_equals( typeof(_global.__proto__), 'undefined' );
+check_equals(typeof(_global.toString), 'undefined');
 
 #else
 check_equals ( typeof(_global.parseInt), 'undefined' );
@@ -47,7 +47,7 @@ check_equals ( typeof(_global.parseInt), 'undefined' );
 
 check_equals(typeof(isNaN), 'function');
 #if OUTPUT_VERSION > 5
-xcheck(!_global.hasOwnProperty('isNaN'));
+check(!_global.hasOwnProperty('isNaN'));
 #endif
 
 // Test parseInt

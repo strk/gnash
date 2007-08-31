@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: string.cpp,v 1.35 2007/08/25 23:11:00 strk Exp $ */
+/* $Id: string.cpp,v 1.36 2007/08/31 21:53:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,8 +31,10 @@
 #include "array.h"
 #include "as_value.h"
 #include "GnashException.h"
-#include <boost/algorithm/string/case_conv.hpp>
 #include "VM.h" // for registering static GcResources (constructor and prototype)
+#include "Object.h" // for getObjectInterface
+
+#include <boost/algorithm/string/case_conv.hpp>
 
 #define ENSURE_FN_ARGS(min, max, rv)                                    \
     if (fn.nargs < min) {                                               \
@@ -100,7 +102,7 @@ getStringInterface()
 
     if ( o == NULL )
     {
-        o = new as_object();
+        o = new as_object(getObjectInterface());
 	VM::get().addStatic(o.get());
 
         attachStringInterface(*o);

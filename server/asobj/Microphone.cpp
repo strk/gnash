@@ -27,6 +27,7 @@
 #include "fn_call.h"
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
+#include "Object.h" // for getObjectInterface
 
 namespace gnash {
 
@@ -53,7 +54,7 @@ getMicrophoneInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object();
+		o = new as_object(getObjectInterface());
 		attachMicrophoneInterface(*o);
 	}
 	return o.get();

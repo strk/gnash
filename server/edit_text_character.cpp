@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.105 2007/08/30 14:13:07 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.106 2007/08/31 21:53:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -36,6 +36,7 @@
 #include "VM.h"
 #include "builtin_function.h" // for getter/setter properties
 #include "font.h" // for using the _font member
+#include "Object.h" // for getObjectInterface
 
 #include <algorithm>
 #include <string>
@@ -365,7 +366,7 @@ getTextFieldInterface()
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
-		proto = new as_object();
+		proto = new as_object(getObjectInterface());
 		VM::get().addStatic(proto.get());
 
 		attachTextFieldInterface(*proto);

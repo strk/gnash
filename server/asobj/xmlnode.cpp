@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: xmlnode.cpp,v 1.38 2007/08/04 04:19:29 strk Exp $ */
+/* $Id: xmlnode.cpp,v 1.39 2007/08/31 21:53:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -29,6 +29,9 @@
 #include "array.h" // for childNodes
 #include "xmlnode.h"
 #include "log.h"
+#include "Object.h" // for getObjectInterface
+
+#include <boost/algorithm/string/case_conv.hpp>
 
 #include <string>
 #include <sstream>
@@ -422,7 +425,7 @@ getXMLNodeInterface()
 {
     static boost::intrusive_ptr<as_object> o;
     if ( o == NULL ) {
-        o = new as_object();
+        o = new as_object(getObjectInterface());
         attachXMLNodeInterface(*o);
     }
     return o.get();
@@ -632,7 +635,7 @@ xmlnode_attributes(const fn_call& fn)
     boost::intrusive_ptr<XMLNode> ptr = ensureType<XMLNode>(fn.this_ptr);
 
     XMLNode::AttribList& attrs = ptr->attributes();
-    boost::intrusive_ptr<as_object> ret = new as_object();
+    boost::intrusive_ptr<as_object> ret = new as_object(getObjectInterface());
     for (XMLNode::AttribList::const_iterator it=attrs.begin(),
          itEnd=attrs.end(); it != itEnd; ++it) {
 

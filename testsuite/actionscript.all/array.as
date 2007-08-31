@@ -1,16 +1,31 @@
-// Mike Carlson's test program for actionscript arrays
-// (initialization, 
-// Jan. 17th, 2006
+// 
+//   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
+//
+// This program is free software; you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation; either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+//
 
-// Updated with sort functions, and to use check() macro
-// by Mike Carlson Feb. 14th, 2006
+// Initial test written by Mike Carlson
 
-rcsid="$Id: array.as,v 1.31 2007/08/31 17:07:36 strk Exp $";
+rcsid="$Id: array.as,v 1.32 2007/08/31 21:53:33 strk Exp $";
 
 #include "check.as"
 
 check_equals(typeof(Array), 'function');
 check_equals(typeof(Array.prototype), 'object');
+check_equals(typeof(Array.prototype.__proto__), 'object');
+check_equals(Array.prototype.__proto__, Object.prototype);
 check_equals(typeof(Array.prototype.concat), 'function');
 check_equals(typeof(Array.prototype.join), 'function');
 check_equals(typeof(Array.prototype.pop), 'function');

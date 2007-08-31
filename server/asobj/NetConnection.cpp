@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetConnection.cpp,v 1.49 2007/07/01 10:54:29 bjacques Exp $ */
+/* $Id: NetConnection.cpp,v 1.50 2007/08/31 21:53:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,6 +31,7 @@
 #include "GnashException.h"
 #include "builtin_function.h"
 #include "movie_root.h"
+#include "Object.h" // for getObjectInterface
 
 #include "StreamProvider.h"
 #include "URLAccessManager.h"
@@ -347,7 +348,7 @@ NetConnection::getNetConnectionInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( o == NULL )
 	{
-		o = new as_object();
+		o = new as_object(getObjectInterface());
 		NetConnection::attachNetConnectionInterface(*o);
 	}
 

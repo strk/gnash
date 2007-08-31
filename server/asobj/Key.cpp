@@ -29,6 +29,7 @@
 #include "action.h" // for call_method
 #include "VM.h"
 #include "builtin_function.h"
+#include "Object.h" // for getObjectInterface()
 
 #include <boost/algorithm/string/case_conv.hpp>
 
@@ -43,6 +44,7 @@ namespace gnash {
 
 key_as_object::key_as_object()
     :
+    as_object(getObjectInterface()),
     m_last_key_pressed(0)
 {
     memset(m_unreleased_keys, 0, sizeof(m_unreleased_keys));

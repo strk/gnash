@@ -21,9 +21,13 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.53 2007/08/02 19:10:51 strk Exp $";
+rcsid="$Id: Function.as,v 1.54 2007/08/31 21:53:33 strk Exp $";
 
 #include "check.as"
+
+#if OUTPUT_VERSION > 6
+check_equals(Function.prototype.__proto__, Object.prototype);
+#endif
 
 // Define a function returning 'this'.name and the given args
 function getThisName(a,b,c) { return this.name+a+b+c; }

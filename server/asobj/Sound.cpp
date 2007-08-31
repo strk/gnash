@@ -29,6 +29,7 @@
 #include "fn_call.h"
 #include "GnashException.h"
 #include "builtin_function.h"
+#include "Object.h" // for getObjectInterface
 
 #ifdef SOUND_GST
 #include "SoundGst.h"
@@ -556,7 +557,7 @@ getSoundInterface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( o == NULL )
 	{
-		o = new as_object();
+		o = new as_object(getObjectInterface());
 		attachSoundInterface(*o);
 	}
 

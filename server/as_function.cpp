@@ -30,6 +30,7 @@
 #include "fn_call.h"
 #include "GnashException.h"
 #include "VM.h"
+#include "Object.h" // for getObjectInterface
 
 #include <typeinfo>
 #include <iostream>
@@ -73,7 +74,7 @@ static as_object* getFunctionPrototype()
 	if ( proto.get() == NULL ) {
 
 		// Initialize Function prototype
-		proto = new as_object();
+		proto = new as_object(getObjectInterface());
 		VM::get().addStatic(proto.get());
 
 		if ( VM::get().getSWFVersion() >= 6 )
@@ -107,7 +108,7 @@ as_function::as_function(as_object* iface)
 	/// TODO: create properties lazily, on getPrototype() call
 	if ( ! _properties )
 	{
-		_properties = new as_object();
+		_properties = new as_object(getObjectInterface());
 	}
 	_properties->init_member("constructor", this); 
 	init_member("prototype", as_value(_properties.get()));

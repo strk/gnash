@@ -26,6 +26,7 @@
 #include "fn_call.h"
 #include "builtin_function.h"
 #include "VM.h" // for getPlayerVersion() 
+#include "Object.h" // for getObjectInterface
 
 namespace gnash {
 
@@ -75,7 +76,7 @@ getSystemSecurityInterface()
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
-		proto = new as_object();
+		proto = new as_object(getObjectInterface());
 		proto->init_member("allowDomain", new builtin_function(system_security_allowdomain));
 
 		// TODO: only available when SWF >= 7 
@@ -92,7 +93,7 @@ getSystemCapabilitiesInterface()
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
-		proto = new as_object();
+		proto = new as_object(getObjectInterface());
 		proto->init_member("version", VM::get().getPlayerVersion() );
 	}
 	return proto.get();
@@ -114,7 +115,7 @@ getSystemInterface()
 	static boost::intrusive_ptr<as_object> proto;
 	if ( proto == NULL )
 	{
-		proto = new as_object();
+		proto = new as_object(getObjectInterface());
 		attachSystemInterface(*proto);
 		//proto->init_member("constructor", new builtin_function(system_new)); 
 	}
@@ -165,7 +166,7 @@ system_class_init(as_object& global)
 {
 	// _global.System is NOT a class, but a simple object, see System.as
 
-	static boost::intrusive_ptr<as_object> obj = new as_object();
+	static boost::intrusive_ptr<as_object> obj = new as_object(getObjectInterface());
 	attachSystemInterface(*obj);
 	global.init_member("System", obj.get());
 }

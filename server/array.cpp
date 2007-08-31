@@ -30,6 +30,7 @@
 #include "GnashException.h"
 #include "action.h" // for call_method
 #include "VM.h" // for PROPNAME macro to work
+#include "Object.h" // for getObjectInterface()
 
 #include <string>
 #include <algorithm>
@@ -1420,7 +1421,7 @@ getArrayInterface()
 	static boost::intrusive_ptr<as_object> proto = NULL;
 	if ( proto == NULL )
 	{
-		proto = new as_object();
+		proto = new as_object(getObjectInterface());
 		VM::get().addStatic(proto.get());
 
 		attachArrayInterface(*proto);
