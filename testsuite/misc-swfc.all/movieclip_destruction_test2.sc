@@ -107,9 +107,9 @@
 
 
 .frame 3
-  .del mc1 // Remove mc1
-  .del mc2 // Remove mc1
-  .del mc3 // Remove mc1
+  .del mc1 // Remove mc1 by RemoveObject2
+  .del mc2 // Remove mc2 by RemoveObject2
+  .del mc3 // Remove mc3 by RemoveObject2
 
   .action: 
     xcheck_equals(mc2UnlaodedCount, 1); //mc2.onUnload triggered
@@ -121,17 +121,17 @@
     check_equals(typeof(mc1), 'undefined'); //cann't access the hard reference
     xcheck_equals(typeof(mc2), 'movieclip'); // mc2 is still accessable
     xcheck_equals(typeof(mc3), 'movieclip'); // mc3 is still accessable
-    xcheck_equals(mc2.getDepth(), -16387);   // mc2's depths changed
-    xcheck_equals(mc3.getDepth(), -16388);   // mc3's depths changed
+    xcheck_equals(mc2.getDepth(), -16387);   // depth of mc2 changed after onUnload
+    xcheck_equals(mc3.getDepth(), -16388);   // depth of mc3 changed after onUnload
     
     mc2.swapDepths(mc3);      
-    xcheck_equals(mc2.getDepth(), -16387);  // Depths not change after swapDepths
-    xcheck_equals(mc3.getDepth(), -16388);  // Depths not change after swapDepths
+    xcheck_equals(mc2.getDepth(), -16387);  // depth not change after swapDepths
+    xcheck_equals(mc3.getDepth(), -16388);  // depth not change after swapDepths
     
     mc2.swapDephts(-10);
     mc2.swapDephts(10);
-    xcheck_equals(mc2.getDepth(), -16387);  // Depths not change after swapDepths
-    xcheck_equals(mc3.getDepth(), -16388);  // Depths not change after swapDepths
+    xcheck_equals(mc2.getDepth(), -16387);  // depth not change after swapDepths
+    xcheck_equals(mc3.getDepth(), -16388);  // depth not change after swapDepths
     
     xcheck_equals(mc2.testvar, 100);       
     check_equals(mc3.testvar, undefined); 
