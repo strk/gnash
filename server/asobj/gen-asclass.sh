@@ -144,6 +144,8 @@ cat <<EOF>>${srcname}
 #include "smart_ptr.h" // for boost intrusive_ptr
 #include "builtin_function.h" // need builtin_function
 #include "GnashException.h" // for ActionException
+#include "Object.h" // for getObjectInterface,
+                    // change if you don't need to inherit from Object
 
 namespace gnash {
 
@@ -179,7 +181,11 @@ get${asname}Interface()
 	static boost::intrusive_ptr<as_object> o;
 	if ( ! o )
 	{
-		o = new as_object();
+		// properly setup inheritance chain
+		// (this one is to inherit from Object class)
+		as_object* superClassInterface = getObjectInterface();
+
+		o = new as_object(superClassInterface);
 		VM::get().addStatic(o.get());
 
 		attach${asname}Interface(*o);

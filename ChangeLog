@@ -1,5 +1,10 @@
 2007-08-31 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/gen-asclass.sh: add the getObjectInterface call.
+	  (btw, gen-asclass.pl is being left behind).
+
+2007-08-31 Sandro Santilli <strk@keybit.net>
+
 	* server/as_object.{cpp,h}: changed get_prototype to always return
 	  the actual prototype (rather then returning the Object prototype
 	  if unset).
