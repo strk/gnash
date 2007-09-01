@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.31 2007/08/31 19:05:48 strk Exp $";
+rcsid="$Id: Object.as,v 1.32 2007/09/01 09:40:06 strk Exp $";
 
 #include "check.as"
 
@@ -33,13 +33,17 @@ check_equals(typeof(Object.registerClass), 'function');
 check_equals(typeof(Object.prototype.toString), 'function');
 check_equals(typeof(Object.prototype.valueOf), 'function');
 check_equals(typeof(Object.prototype.constructor), 'function'); 
+#if OUTPUT_VERSION > 5
+ check(Object.prototype.hasOwnProperty('toString'));
+ check(Object.prototype.hasOwnProperty('valueOf'));
+#endif
 check_equals(Object.prototype.prototype, undefined);
 
 // The bug below (no end in the inheritance chain) triggers endless
 // recursions during run of the trace_properties() function defined
 // in trace_properties.as from swfdec testsuite.
 // WE WANT THIS FIXED !!
-xcheck_equals(Object.prototype.__proto__, undefined);
+check_equals(Object.prototype.__proto__, undefined);
 #if OUTPUT_VERSION > 5
  check(!Object.prototype.hasOwnProperty("__proto__"));
 #endif 
@@ -49,6 +53,8 @@ xcheck_equals(Object.prototype.registerClass, undefined);
 #if OUTPUT_VERSION > 5
 
 // Through test of existance of methods!
+
+xcheck(Object.hasOwnProperty('__proto__'));
 
 O = Object;
 check_equals(O, Object);

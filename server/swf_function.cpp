@@ -29,6 +29,7 @@
 #include "ActionExec.h" // for operator()
 #include "VM.h" // for storing _global in a local register
 #include "builtin_function.h" // for Function constructor
+#include "Object.h" // for getObjectInterface
 
 #include <typeinfo>
 #include <iostream>
@@ -50,7 +51,7 @@ swf_function::swf_function(const action_buffer* ab,
 			as_environment* env,
 			size_t start, const ScopeStack& scopeStack)
 	:
-	as_function(NULL),
+	as_function(new as_object(getObjectInterface())),
 	//ctor(0),
 	m_action_buffer(ab),
 	m_env(env),

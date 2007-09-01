@@ -1,3 +1,16 @@
+2007-09-01 Sandro Santilli <strk@keybit.net>
+
+	* server/swf_function.cpp (ctor): make sure user-defined
+	  function's initial prototype inherits from Object.
+	* server/asobj/Object.cpp (getObjectInterface): really
+	  end the inheritance chain (ie: don't override __proto__).
+	* testsuite/actionscript.all/Inheritance.as: a couple tests
+	  added.
+	* testsuite/actionscript.all/Object.as: more successes, and 
+	  an additional (still failing due to non-proper __proto__ member)
+	  test.
+	* testsuite/actionscript.all/toString_valueOf.as: one more success.
+
 2007-09-01 Ivor Blockley <meteoryte@yahoo.com.au>
 
 	* server/array.cpp: make to_number calls environment-aware.

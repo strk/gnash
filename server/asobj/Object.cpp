@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.27 2007/08/31 21:53:32 strk Exp $ */
+/* $Id: Object.cpp,v 1.28 2007/09/01 09:40:05 strk Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -81,7 +81,7 @@ getObjectInterface()
 	{
 		o = new as_object(); // end of the inheritance chain
 		attachObjectInterface(*o);
-		o->set_prototype(o.get());
+		//o->set_prototype(o.get()); // proto is self ?
 	}
 	return o.get();
 }
