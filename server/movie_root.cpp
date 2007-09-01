@@ -670,6 +670,10 @@ movie_root::advance(float delta_time)
 #endif
 	processActionQueue();
 
+	// Delete characters removed from the stage
+	// from the display lists
+	cleanupDisplayList();
+
 #ifdef GNASH_USE_GC
 	// Run the garbage collector (step back !!)
 	GC::get().collect();
@@ -1193,6 +1197,18 @@ movie_root::advanceAllLevels(float delta_time)
 	for (Levels::reverse_iterator i=cached.rbegin(), e=cached.rend(); i!=e; ++i)
 	{
 		advanceMovie(i->second, delta_time);
+	}
+}
+
+void
+movie_root::cleanupDisplayList()
+{
+	// scan a backup copy of the levels, so that movies advancement won't
+	// invalidate iterators
+	Levels cached = _movies;
+	for (Levels::reverse_iterator i=cached.rbegin(), e=cached.rend(); i!=e; ++i)
+	{
+		i->second->cleanupDisplayList();
 	}
 }
 

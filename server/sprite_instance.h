@@ -748,6 +748,10 @@ public:
 		return _origTarget;
 	}
 
+	/// Delete characters removed from the stage
+	/// from the display lists
+	void cleanupDisplayList();
+
 private:
 
 	/// \brief

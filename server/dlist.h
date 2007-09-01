@@ -28,6 +28,10 @@
 
 #include <list>
 #include <iosfwd>
+#ifndef NDEBUG
+#include "log.h"
+#include <set>  // for testInvariant
+#endif
 
 namespace gnash {
 	class cxform;
@@ -48,6 +52,27 @@ typedef boost::intrusive_ptr<character> DisplayItem;
 class DisplayList {
 
 public:
+
+	void testInvariant() const
+	{
+#ifndef NDEBUG
+		DisplayList sorted = *this;
+		// check no duplicated depths in list
+		std::set<int> depths;
+		for (const_iterator it=_characters.begin(), itEnd=_characters.end(); it!=itEnd; ++it)
+		{
+			boost::intrusive_ptr<character> ch = *it;
+			int depth = ch->get_depth();
+			if ( ! depths.insert(depth).second )
+			{
+				log_debug("Depth %d is duplicated in DisplayList %p", depth, (void*)this);
+				abort();
+			}
+		}
+		sorted.sort();
+		assert(*this == sorted); // check we didn't screw up ordering
+#endif
+	}
 
 	/// Output operator
 	friend std::ostream& operator<< (std::ostream&, const DisplayList&);
@@ -172,6 +197,17 @@ public:
 	///
 	void	remove_display_object(int depth);
 
+	/// Remove all unloaded character from the list
+	//
+	/// Removed characters still in the list are those
+	/// on which onUnload event handlers were defined..
+	///
+	/// NOTE: we don't call the function recursively in the 
+	///       contained elements, as that should not be needed
+	///	  (ie: any inned thing will not be accessible anyway)
+	///
+	void removeUnloaded();
+
 	/// Clear the display list.
 	void clear()
 	{
@@ -194,7 +230,7 @@ public:
 
 	/// \brief
 	/// Clear all characters in this DisplayList except the ones
-	/// contained in the given DisplayList
+	/// contained in the given DisplayList and not unloaded
 	//
 	/// @param exclude
 	///	A DisplayList containing character instances to keep.
@@ -298,6 +334,11 @@ public:
 	/// The visitor functor will 
 	/// receive a character pointer; must return true if
 	/// it wants next item or false to exit the loop.
+	///
+	/// NOTE: all elements in the list are visited, even
+	///       the removed ones (unloaded)
+	/// TODO: inspect if worth providing an arg to skip removed
+	///
 	template <class V>
 	inline void visitForward(V& visitor);
 
@@ -309,6 +350,11 @@ public:
 	/// will receive a character pointer; must return true if
 	/// it wants next item or false
 	/// to exit the loop.
+	///
+	/// NOTE: all elements in the list are visited, even
+	///       the removed ones (unloaded)
+	/// TODO: inspect if worth providing an arg to skip removed
+	///
 	template <class V>
 	inline void visitBackward(V& visitor);
 
@@ -320,6 +366,11 @@ public:
 	///
 	/// The visitor functor will receive a character pointer,
 	/// it's return value is not used so can return void.
+	///
+	/// NOTE: all elements in the list are visited, even
+	///       the removed ones (unloaded)
+	/// TODO: inspect if worth providing an arg to skip removed
+	///
 	template <class V>
 	inline void visitAll(V& visitor);
 
@@ -378,6 +429,24 @@ private:
 	typedef container_type::const_iterator const_iterator;
 	typedef container_type::reverse_iterator reverse_iterator;
 	typedef container_type::const_reverse_iterator const_reverse_iterator;
+
+	/// Return an iterator to the first element of the container NOT in the "removed" depth zone
+	static iterator beginNonRemoved(container_type& c);
+
+	/// Return an iterator to the first element of the container NOT in the "removed" depth zone
+	static const_iterator beginNonRemoved(const container_type& c);
+
+	/// Re-insert a removed-from-stage character after appropriately
+	/// shifting its depth based on the character::removedDepthOffset
+	/// value.
+	//
+	/// PRE-CONDITIONS 
+	///	- ch::isUnloaded() returns true (assertion fails otherwise)
+	///	- ch is not already in the list (assertion fails otherwise)
+	///
+	/// TODO: inspect what should happen if the target depth is already occupied
+	///
+	void reinsertRemovedCharacter(boost::intrusive_ptr<character> ch);
 
 	container_type _characters;
 

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.87 2007/08/31 21:53:33 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.88 2007/09/01 01:20:47 strk Exp $";
 
 #include "check.as"
 
@@ -481,23 +481,23 @@ check_equals(softref3child.getDepth(), 1);
 #endif
 
 check_equals(typeof(hardref), 'undefined');
-xcheck_equals(typeof(hardref2), 'movieclip');
-xcheck_equals(typeof(hardref3), 'movieclip'); // still accessible due to onUnload defined for its child
-xcheck_equals(hardref2.getDepth(), -32839);
-xcheck_equals(hardref3.getDepth(), -32849);
-xcheck_equals(hardref3.hardref3child.getDepth(), 1);
+check_equals(typeof(hardref2), 'movieclip');
+check_equals(typeof(hardref3), 'movieclip'); // still accessible due to onUnload defined for its child
+check_equals(hardref2.getDepth(), -32839);
+check_equals(hardref3.getDepth(), -32849);
+check_equals(hardref3.hardref3child.getDepth(), 1);
 check_equals(typeof(softref), 'movieclip');
 check_equals(typeof(softref2), 'movieclip');
 check_equals(typeof(softref3), 'movieclip');
 check_equals(typeof(softref3child), 'movieclip');
 check_equals(typeof(softref.member), 'undefined');
 check_equals(typeof(softref._target), 'undefined');
-xcheck_equals(softref2.member, 2);
-xcheck_equals(softref2._target, '/hardref2');
-xcheck_equals(softref3.member, 3);
-xcheck_equals(softref3._target, '/hardref3');
-xcheck_equals(softref3child.member, '3child');
-xcheck_equals(softref3child._target, '/hardref3/hardref3child');
+check_equals(softref2.member, 2);
+check_equals(softref2._target, '/hardref2');
+check_equals(softref3.member, 3);
+check_equals(softref3._target, '/hardref3');
+check_equals(softref3child.member, '3child');
+check_equals(softref3child._target, '/hardref3/hardref3child');
 hardref = 4;
 // Delete is needed, or further inspection functions will hit the variable before the character
 delete hardref;

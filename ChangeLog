@@ -1,3 +1,30 @@
+2007-09-01 Sandro Santilli <strk@keybit.net>
+
+	* server/dlist.{cpp,h}: when unloaded character's unload() method
+	  returns true (character or any of its childs has onUnload methods to
+	  be run) don't really remove it from the list, but just shift it
+	  down to the "removed" zone. Advance and display only non-removed
+	  characters (depth-zone based for now, possibly too weak).
+	  Add lots of paranoid invariant testing (not enough, missing the
+	  one for no unloaded characters out of "removed" depth zone).
+	* server/character.{cpp,h}: more info about removedDepthOffset,
+	  assertion preveing double unload of a character (this can be 
+	  probably easily broken by a focused testcase using removeMovieClip
+	  on a removed but still-reachable character).
+	* server/movie_root.{cpp,h}: added cleanupDisplayList() method, and
+	  call it at the end of actions execution to properly cleanup removed
+	  but still-reachable characters.
+	* server/sprite_instance.{cpp,h}: implement a cleanupDisplayList, to
+	  be called by movie_root, make sure to not include unloaded
+	  characters when visiting the DisplayList for bounds extractions and
+	  similar.
+	* testsuite/actionscript.all/MovieClip.as: soft-references successes
+	* testsuite/misc-ming.all/: loop_test7.c, loop_test8.c:
+	  keep-alive-for-onUnload successes
+	* testsuite/misc-ming.all/unload_movieclip_test1.c: successes
+	* testsuite/misc-swfc.all/movieclip_destruction_test2.sc: successes
+	* testsuite/swfdec/PASSING: remove-depths-*.swf successes
+
 2007-08-31 Sandro Santilli <strk@keybit.net>
 
 	* server/asobj/gen-asclass.sh: add the getObjectInterface call.

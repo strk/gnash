@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.91 2007/08/30 14:13:07 strk Exp $ */
+/* $Id: character.h,v 1.92 2007/09/01 01:20:46 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -349,6 +349,13 @@ public:
     /// Example: a character at depth 60 gets moved to
     ///          depth -32829 (-32769-60) when unloaded and
     ///          an onUnload event handler is defined for it.
+    ///
+    /// So, to recap:
+    ///		1:  -32769 to -16385 are removed
+    ///		2:  -16384 to      0 are statics
+    ///		3:  Max depth for a PlaceoObject call is 16384 (which becomes 0 in the statics)
+    ///	(all of the above correct?)
+    ///
     ///
     static const int removedDepthOffset = -32769; // -32769;
     

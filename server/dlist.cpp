@@ -28,6 +28,7 @@
 #include <iostream>
 #include <algorithm>
 #include <stack>
+#include <boost/bind.hpp>
 
 namespace gnash {
 
@@ -98,6 +99,8 @@ public:
 int
 DisplayList::getNextHighestDepth() const
 {
+	testInvariant();
+
 	int nexthighestdepth=0;
 	for (const_iterator it = _characters.begin(),
 			itEnd = _characters.end();
@@ -118,6 +121,8 @@ DisplayList::getNextHighestDepth() const
 character*
 DisplayList::get_character_at_depth(int depth)
 {
+	testInvariant();
+
 	//GNASH_REPORT_FUNCTION;
 	//dump();
 
@@ -143,6 +148,8 @@ DisplayList::get_character_at_depth(int depth)
 character*
 DisplayList::get_character_by_name(const std::string& name)
 {
+	testInvariant();
+
 	container_type::iterator it = find_if(
 			_characters.begin(),
 			_characters.end(),
@@ -156,6 +163,8 @@ DisplayList::get_character_by_name(const std::string& name)
 character*
 DisplayList::get_character_by_name_i(const std::string& name)
 {
+	testInvariant();
+
 	container_type::iterator it = find_if(
 			_characters.begin(),
 			_characters.end(),
@@ -182,6 +191,7 @@ DisplayList::place_character(
 	//dump();
 
 	assert(ch);
+	assert(!ch->isUnloaded());
 	ch->set_invalidated();
 	ch->set_depth(depth);
 	ch->set_cxform(color_xform);
@@ -208,9 +218,14 @@ DisplayList::place_character(
 		InvalidatedRanges old_ranges;	
 		(*it)->add_invalidated_bounds(old_ranges, true);	
 	
-		(*it)->unload();
+		boost::intrusive_ptr<character> oldCh = *it;
+		bool hasUnloadEvent = oldCh->unload();
+
 		// replace existing char
 		*it = DisplayItem(ch);
+
+		// reinsert removed character if needed
+		if ( hasUnloadEvent ) reinsertRemovedCharacter(oldCh);
 		
 		// extend invalidated bounds
 		ch->extend_invalidated_bounds(old_ranges); 				
@@ -218,6 +233,8 @@ DisplayList::place_character(
 
 	// Give life to this instance
 	ch->construct();
+
+	testInvariant();
 }
 
 void
@@ -236,17 +253,23 @@ DisplayList::add(character* ch, bool replace)
 	{
 		*it = DisplayItem(ch);
 	}
+
+	testInvariant();
 }
 
 void
 DisplayList::addAll(std::vector<character*>& chars, bool replace)
 {
+	testInvariant();
+
 	for (std::vector<character*>::iterator it=chars.begin(),
 			itEnd=chars.end();
 			it != itEnd; ++it)
 	{
 		add(*it, replace);
 	}
+
+	testInvariant();
 }
 
 void
@@ -258,7 +281,11 @@ DisplayList::replace_character(
 	int ratio,
 	int clip_depth)
 {
+	testInvariant();
+
 	//GNASH_REPORT_FUNCTION;
+	assert(ch);
+	assert(!ch->isUnloaded());
 
 	ch->set_invalidated();
 	ch->set_depth(depth);
@@ -292,7 +319,7 @@ DisplayList::replace_character(
 	}
 	else
 	{
-		character* oldch = it->get();
+		boost::intrusive_ptr<character> oldch = *it;
 
 		InvalidatedRanges old_ranges;
 	
@@ -312,10 +339,13 @@ DisplayList::replace_character(
 		oldch->add_invalidated_bounds(old_ranges, true);		
 
 		// Unload old char
-		(*it)->unload();
+		bool hasUnloadEvent = oldch->unload();
 
 		// replace existing char		
 		*it = di;
+
+		// reinsert removed character if needed
+		if ( hasUnloadEvent ) reinsertRemovedCharacter(oldch);
 		
 		// extend invalidated bounds
 		// WARNING: when a new Button character is added,
@@ -330,6 +360,8 @@ DisplayList::replace_character(
 
 	// Give life to this instance
 	ch->construct();
+
+	testInvariant();
 }
 	
 	
@@ -343,6 +375,8 @@ DisplayList::move_display_object(
 	int ratio,
 	int /* clip_depth */)
 {
+	testInvariant();
+
 	//GNASH_REPORT_FUNCTION;
 	//IF_VERBOSE_DEBUG(log_msg(_("dl::move(%d)"), depth));
 
@@ -356,6 +390,12 @@ DisplayList::move_display_object(
 			depth);
 		);
 		return;
+	}
+
+	if ( ch->isUnloaded() )
+	{
+		log_error("Request to move an unloaded character");
+		assert(!ch->isUnloaded());
 	}
 
 	// TODO: is sign of depth related to accepting anim moves ?
@@ -378,6 +418,8 @@ DisplayList::move_display_object(
 	{
 		ch->set_ratio(ratio);
 	}
+
+	testInvariant();
 }
 	
 	
@@ -387,6 +429,8 @@ DisplayList::remove_display_object(int depth)
 {
 	//GNASH_REPORT_FUNCTION;
 
+	testInvariant();
+
 	//log_msg(_("Before removing, list is:"));
 	//dump();
 
@@ -394,6 +438,8 @@ DisplayList::remove_display_object(int depth)
 	container_type::size_type size = _characters.size();
 #endif
 
+	// TODO: would it be legal to call remove_display_object with a depth
+	//       in the "removed" zone ?
 	// TODO: optimize to take by-depth order into account
 	container_type::iterator it = find_if(
 			_characters.begin(),
@@ -402,14 +448,24 @@ DisplayList::remove_display_object(int depth)
 
 	if ( it != _characters.end() )
 	{
-		(*it)->unload();
+		boost::intrusive_ptr<character> oldCh = *it;
+		bool hasUnloadEvent = oldCh->unload();
+
 		_characters.erase(it);
 
+		// reinsert removed character if needed
+		// NOTE: could be optimized if we knew exactly how
+		//       to handle the case in which the target depth
+		//       (after the shift) is occupied already
+		//
+		if ( hasUnloadEvent ) reinsertRemovedCharacter(oldCh);
 	}
 
 #ifndef NDEBUG
 	assert(size >= _characters.size());
 #endif
+
+	testInvariant();
 
 	//log_msg(_("Done removing, list is:"));
 	//dump();
@@ -419,6 +475,7 @@ DisplayList::remove_display_object(int depth)
 void
 DisplayList::swapDepths(character* ch1, int newdepth)
 {
+	testInvariant();
 
 	if ( newdepth < character::staticDepthOffset )
 	{
@@ -429,8 +486,14 @@ DisplayList::swapDepths(character* ch1, int newdepth)
 		return;
 	}
 
-	assert(ch1->get_depth() != newdepth);
+	int srcdepth = ch1->get_depth();
 
+	// what if source char is at a lower depth ?
+	assert(srcdepth >= character::staticDepthOffset);
+
+	assert(srcdepth != newdepth);
+
+	// TODO: optimize this scan by taking ch1 depth into account ?
 	container_type::iterator it1 = find(_characters.begin(), _characters.end(), ch1);
 
 	// upper bound ...
@@ -447,8 +510,6 @@ DisplayList::swapDepths(character* ch1, int newdepth)
 	if ( it2 != _characters.end() && (*it2)->get_depth() == newdepth )
 	{
 		DisplayItem ch2 = *it2;
-
-		int srcdepth = ch1->get_depth();
 
 		ch2->set_depth(srcdepth);
 
@@ -485,17 +546,14 @@ DisplayList::swapDepths(character* ch1, int newdepth)
 	// See displaylist_depths_test6.swf for more info.
 	ch1->transformedByScript();
 
-#ifndef NDEBUG
-	// TODO: make this a testInvariant() method for DisplayList
-	DisplayList sorted = *this;
-	sorted.sort();
-	assert(*this == sorted); // check we didn't screw up ordering
-#endif
+	testInvariant();
 
 }
 	
 void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_unload)
 {
+	testInvariant();
+
 	//GNASH_REPORT_FUNCTION;
 
 	// 1. Find all "timeline depth" for the target frame, querying the
@@ -513,20 +571,24 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 	cout << "Current DisplayList: " << *this << endl;
 #endif
 
-
 	typedef std::vector<int>::iterator SeekIter;
 
 	SeekIter startSeek = save.begin();
-    SeekIter endSeek = save.end();
+	SeekIter endSeek = save.end();
 
-	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
+	std::vector<DisplayItem> toReinsert;
+
+	iterator it = beginNonRemoved(_characters);
+	for (iterator itEnd = _characters.end(); it != itEnd; )
 	{
+		testInvariant();
+
 		DisplayItem& di = *it;
 
 		int di_depth = di->get_depth();
 
 		/// We won't scan chars in the dynamic depth zone
-		if ( di_depth >= 0 ) return;
+		if ( di_depth >= 0 ) break;
 
 		/// Always remove non-timeline instances ?
 		/// Seems so, at least for duplicateMovieClip
@@ -536,7 +598,13 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 		if ( ! info )
 		{
 			// Not to be saved, killing
-			if ( call_unload ) di->unload();
+			if ( call_unload )
+			{
+				if ( di->unload() )
+				{
+					toReinsert.push_back(di);
+				}
+			}
 			it = _characters.erase(it);
 			continue;
 		}
@@ -546,6 +614,10 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 		// we need to do this in some corner cases. 
 		if(!di->isActionScriptReferenceable())
 		{
+			// TODO: no unload() call needed here ? would help GC ?
+			// (I guess there can't be any as_value pointing at this
+			// if it's not ActionScriptReferenceable after all...)
+			//
 			it = _characters.erase(it);
 			continue;
 		}
@@ -555,7 +627,13 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 		if( match == save.end())
 		{
 			// Not to be saved, killing
-			if ( call_unload ) di->unload();
+			if ( call_unload )
+			{
+				if ( di->unload() )
+				{
+					toReinsert.push_back(di);
+				}
+			}
 			it = _characters.erase(it);
 			continue;
 		}
@@ -570,23 +648,44 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 
 		++it;
 	}
-}
 
+	testInvariant();
+
+	std::for_each(toReinsert.begin(), toReinsert.end(),
+		boost::bind(&DisplayList::reinsertRemovedCharacter, this, _1));
+
+	testInvariant();
+}
 
 void
 DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 {
+	//log_debug("clear_except(DislpayList, %d) called", call_unload);
 	//GNASH_REPORT_FUNCTION;
+
+	testInvariant();
+	//log_debug("First invariant test worked");
+
 
 	assert(&exclude != this);
 	const container_type& keepchars = exclude._characters;
 
+	std::vector<DisplayItem> toReinsert;
+
+	const_iterator keepStart = beginNonRemoved(keepchars);
+	const_iterator keepEnd = keepchars.end();
+
+	//int called=0;
 	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
 	{
+		
+		testInvariant(); // TODO: expensive
+		//log_debug("Invariant test in iteration %d worked", called++);
+
 		DisplayItem& di = *it;
 
 		bool is_affected = false;
-		for (const_iterator kit = keepchars.begin(), kitEnd = keepchars.end(); kit != kitEnd; ++kit)
+		for (const_iterator kit = keepStart; kit != keepEnd; ++kit)
 		{
 			if ( *kit == di )
 			{
@@ -597,12 +696,27 @@ DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 
 		if (is_affected == false)
 		{
-			if ( call_unload ) di->unload();
+			if ( call_unload )
+			{
+				if ( di->unload() )
+				{
+					toReinsert.push_back(di);
+				}
+			}
 			it = _characters.erase(it);
 			continue;
 		}
 		it++;
 	}
+
+	testInvariant();
+	//log_debug("Invariant test after cleanup worked");
+
+	std::for_each(toReinsert.begin(), toReinsert.end(),
+		boost::bind(&DisplayList::reinsertRemovedCharacter, this, _1));
+
+	testInvariant();
+	//log_debug("Invariant test after reinsertion worked");
 }
 
 void
@@ -610,7 +724,11 @@ DisplayList::clear(const DisplayList& from, bool call_unload)
 {
 	//GNASH_REPORT_FUNCTION;
 
+	testInvariant();
+
 	const container_type dropchars = from._characters;
+
+	std::vector<DisplayItem> toReinsert;
 
 	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
 	{
@@ -628,12 +746,25 @@ DisplayList::clear(const DisplayList& from, bool call_unload)
 
 		if (is_affected)
 		{
-			if ( call_unload ) di->unload();
+			if ( call_unload )
+			{
+				if ( di->unload() )
+				{
+					toReinsert.push_back(di);
+				}
+			}
 			it = _characters.erase(it);
 			continue;
 		}
 		it++;
 	}
+
+	testInvariant();
+
+	std::for_each(toReinsert.begin(), toReinsert.end(),
+		boost::bind(&DisplayList::reinsertRemovedCharacter, this, _1));
+
+	testInvariant();
 }
 	
 void
@@ -642,14 +773,22 @@ DisplayList::advance(float delta_time)
 {
 	//GNASH_REPORT_FUNCTION;
 
+	testInvariant(); 
+
 //	container_type::size_type size = _characters.size();
 
 	// That there was no crash gnash we iterate through the copy
 	std::list<DisplayItem> tmp_list = _characters;
 
-	for (iterator it = tmp_list.begin(), itEnd = tmp_list.end();
-		it != itEnd; ++it)
+        // We only advance characters which are out of the "removed" zone (or should we check isUnloaded?)
+        // TODO: remove when copying _character to tmp_list directly ?
+	iterator it = beginNonRemoved(tmp_list);
+	//if ( it != tmp_list.end() ) log_debug("First non-removed char at depth %d", (*it)->get_depth());
+	//iterator it = tmp_list.begin();
+	for (iterator itEnd = tmp_list.end(); it != itEnd; ++it)
 	{
+		testInvariant(); // expensive !!
+
 		// @@@@ TODO FIX: If array changes size due to
 		// character actions, the iteration may not be
 		// correct!
@@ -684,9 +823,18 @@ DisplayList::advance(float delta_time)
 		boost::intrusive_ptr<character> ch = *it;
 		assert(ch!=NULL);
 
+		if ( ch->isUnloaded() ) // debugging
+		{
+			log_error("character at depth %d is unloaded", ch->get_depth());
+			abort();
+		}
+		assert(! ch->isUnloaded() ); // we don't advance unloaded chars
+
+
 		ch->advance(delta_time);
 	}
 
+	testInvariant();
 }
 	
 	
@@ -695,14 +843,26 @@ DisplayList::advance(float delta_time)
 void
 DisplayList::display()
 {
+	testInvariant();
+
     //GNASH_REPORT_FUNCTION;
     std::stack<int> clipDepthStack;
     
-    for( iterator it = _characters.begin(), endIt = _characters.end();
-                  it != endIt; ++it)
+    // We only advance characters which are out of the "removed" zone (or should we check isUnloaded?)
+    iterator it = beginNonRemoved(_characters);
+    //iterator it = _characters.begin();
+    for(iterator endIt = _characters.end(); it != endIt; ++it)
     {
         character* ch = it->get();
         assert(ch);
+
+	if ( ch->isUnloaded() ) // debugging
+	{
+		log_error("character at depth %d is unloaded", ch->get_depth());
+		abort();
+	}
+	assert(! ch->isUnloaded() ); // we don't advance unloaded chars
+
 
         // Check if this charater or any of its parents is a mask.
         // Characters act as masks should always be rendered to the
@@ -761,32 +921,36 @@ DisplayList::display()
 void
 DisplayList::dump() const
 {
+	//testInvariant();
+
 	int num=0;
 	for( const_iterator it = _characters.begin(),
 			endIt = _characters.end();
 		it != endIt; ++it)
 	{
 		const DisplayItem& dobj = *it;
-		log_msg(_("Item %d at depth %d (char id %d, name %s, type %s"),
+		log_msg(_("Item %d at depth %d (char id %d, name %s, type %s)"),
 			num, dobj->get_depth(), dobj->get_id(),
-			dobj->get_name().c_str(), typeid(*dobj).name());
+			dobj->get_name().c_str(), typeName(*dobj).c_str());
 		num++;
 	}
 }
 
 
 void 
-DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force) {
+DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
+{
     
-	for( iterator it = _characters.begin(),
-			endIt = _characters.end();
-		it != endIt; ++it)
+	testInvariant();
+
+	iterator it = beginNonRemoved(_characters);
+	for( iterator endIt = _characters.end(); it != endIt; ++it)
 	{
-    DisplayItem& dobj = *it;
+		DisplayItem& dobj = *it;
 #ifndef GNASH_USE_GC
-    assert(dobj->get_ref_count() > 0);
+		assert(dobj->get_ref_count() > 0);
 #endif // ndef GNASH_USE_GC
-    dobj->add_invalidated_bounds(ranges, force);
+		dobj->add_invalidated_bounds(ranges, force);
 	}
 	
 }
@@ -823,6 +987,69 @@ std::ostream& operator<< (std::ostream& os, const DisplayList& dl)
 	}
 
 	return os;
+}
+
+void
+DisplayList::reinsertRemovedCharacter(boost::intrusive_ptr<character> ch)
+{
+	assert(ch->isUnloaded());
+
+	// TODO: have this done by character::unload() instead ?
+	int oldDepth = ch->get_depth();
+	int newDepth = character::removedDepthOffset - oldDepth;
+	ch->set_depth(newDepth);
+
+	testInvariant();
+
+	container_type::iterator it = find_if(
+			_characters.begin(), _characters.end(),
+			DepthGreaterOrEqual(newDepth));
+	if ( it == _characters.end() || (*it)->get_depth() != newDepth )
+	{
+		// add the new char
+		_characters.insert(it, DisplayItem(ch));
+	}
+	else
+	{
+		// the character should not be in the displaylist already !
+		assert(it->get() != ch.get());
+
+		log_error("DisplayList::insertCharacter: target depth (%d) is occupied, and we don't know what we're supposed to do - we'll avoid inserting the character for now", newDepth);
+	}
+
+	testInvariant();
+}
+
+/*private static*/
+DisplayList::iterator
+DisplayList::beginNonRemoved(container_type& c)
+{
+	return std::find_if(c.begin(), c.end(),
+			DepthGreaterOrEqual(character::removedDepthOffset - character::staticDepthOffset));
+}
+
+/*private static*/
+DisplayList::const_iterator
+DisplayList::beginNonRemoved(const container_type& c)
+{
+	return std::find_if(c.begin(), c.end(), DepthGreaterOrEqual(character::removedDepthOffset+1));
+}
+
+void
+DisplayList::removeUnloaded()
+{
+	// TODO: erase from begin() to beginNonRemoved()-1 ?
+	//log_debug("removeUnloaded called (dlist:%p)", (void*)this);
+	testInvariant();
+	//log_debug(" first invTest passed, _characters have %d entries", _characters.size());
+	//dump();
+	iterator last = std::remove_if(_characters.begin(), _characters.end(), boost::bind(&character::isUnloaded, _1));
+	_characters.erase(last, _characters.end());
+	//log_debug(" After remove_if, _characters have %d entries - dumping them", _characters.size());
+	//dump();
+	//log_debug(" Now testing invariant again");
+	testInvariant();
+	//log_debug(" second invTest passed");
 }
 
 } // namespace gnash

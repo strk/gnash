@@ -1630,6 +1630,8 @@ public:
 	{}
 	void operator() (character* ch)
 	{
+		// don't include bounds of unloaded characters
+		if ( ch->isUnloaded() ) return;
 		geometry::Range2d<float> chb = ch->getBounds();
 		matrix m = ch->get_matrix();
 		m.transform(chb);
@@ -1655,6 +1657,9 @@ public:
 
 	void operator() (character* ch) 
 	{
+		// don't include bounds of unloaded characters
+		if ( ch->isUnloaded() ) return;
+
 		// TODO: Are script-transformed object to be kept ?
 		//       Need a testcase for this
 		//if ( ! ch->get_accept_anim_moves() )
@@ -1681,10 +1686,12 @@ public:
 		unloadEvents(0)
 	{}
 
-	bool operator() (character* ch)
+	void operator() (character* ch)
 	{
+		// don't unload already unloaded characters
+		if ( ch->isUnloaded() ) return;
+
 		if ( ch->unload() ) ++unloadEvents;
-		return true;
 	}
 
 	bool foundUnloadEvents() const 
@@ -2325,6 +2332,8 @@ void sprite_instance::advance_sprite(float delta_time)
 	// to need oldDisplayList again later, to extract the list of
 	// newly added characters
 	//
+	//oldDisplayList.removeUnloaded(); // TODO: clean oldDisplayList here instead than in cleanupDisplayList ?
+	oldDisplayList.sort(); // this is to avoid failing assertions, since we know characters might have changed depth...
 	DisplayList stillAlive = oldDisplayList;
 	stillAlive.clear_except(m_display_list, false);
 	//log_msg(_("Advancing %d pre-existing children of %s"), stillAlive.size(), getTargetPath().c_str());
@@ -2335,15 +2344,12 @@ void sprite_instance::advance_sprite(float delta_time)
 	//log_msg(_("Executing actions in %s timeline"), getTargetPath().c_str());
 	do_actions();
 
-	// Call UNLOAD event of just removed chars !
-	//DisplayList justRemoved = oldDisplayList;
-	//justRemoved.clear_except(m_display_list, false); // true;
-	// No, dont' call UNLOAD event, as it should be called by remove_display_object!
-
-	// Finally, execute actions in newly added childs
+	// Finally, execute actions in (we actually "advance") newly added
+	// (and not unloaded) childs
 	//
 	// These are elements in the current DisplayList, cleared
-	// by all elements in oldDisplayList.
+	// by all unloaded elements and by non-unloaded elements in
+	// oldDisplayList.
 	//
 	// Of course we do NOT call UNLOAD events here, as
 	// the chars we're clearing have *not* been removed:
@@ -2351,6 +2357,7 @@ void sprite_instance::advance_sprite(float delta_time)
 	//
 	DisplayList newlyAdded = m_display_list;
 	//log_msg(_("%s has %d current children and %d old children"), getTargetPath().c_str(), m_display_list.size(), oldDisplayList.size());
+	newlyAdded.removeUnloaded();
 	newlyAdded.clear(oldDisplayList, false);
 	//log_msg(_("Advancing %d newly-added (after clearing) children of %s"), newlyAdded.size(), getTargetPath().c_str());
 	newlyAdded.advance(delta_time);
@@ -3372,7 +3379,7 @@ sprite_instance::unload()
 #endif
 
 	UnloaderVisitor visitor;
-	m_display_list.visitForward(visitor);
+	m_display_list.visitAll(visitor);
 
 	return character::unload() || visitor.foundUnloadEvents();
 
@@ -3628,6 +3635,9 @@ public:
 
 	void operator() (character* ch)
 	{
+		// don't enumerate unloaded characters
+		if ( ch->isUnloaded() ) return;
+
 		_env.push(ch->get_name());
 	}
 };
@@ -3637,6 +3647,14 @@ sprite_instance::enumerateNonProperties(as_environment& env) const
 {
 	EnumerateVisitor visitor(env);
 	m_display_list.visitAll(visitor);
+}
+
+void
+sprite_instance::cleanupDisplayList()
+{
+        //log_debug("%s.cleanDisplayList() called, current dlist is %p, old is %p", getTarget().c_str(), (void*)&m_display_list, (void*)&oldDisplayList);
+	m_display_list.removeUnloaded();
+	oldDisplayList.removeUnloaded(); // TODO: move unloaded-cleanup of oldDisplayList in advance_sprite ?
 }
 
 #ifdef GNASH_USE_GC

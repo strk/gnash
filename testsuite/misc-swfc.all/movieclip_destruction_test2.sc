@@ -87,12 +87,12 @@
     { 
        _root.mc2UnlaodedCount++;     
        // mc2.testvar keeps alive as long as mc2 is alive
-       _root.xcheck_equals(mc2.testvar, 100); 
+       _root.check_equals(mc2.testvar, 100); 
     };
     mc3.onUnload = function ()  
     { 
        _root.mc3UnlaodedCount++; 
-       _root.xcheck_equals(mc3.testvar, 100);
+       _root.check_equals(mc3.testvar, 100);
     };
     
     mc2.testvar = 100;
@@ -114,38 +114,38 @@
     xcheck_equals(mc2UnlaodedCount, 1); //mc2.onUnload triggered
     xcheck_equals(mc2UnlaodedCount, 1); //mc3.onUnload triggered
     check_equals(mc1Ref.valueOf(), null);
-    xcheck_equals(mc2Ref, mc2);
-    xcheck_equals(mc3Ref, mc3);
+    check_equals(mc2Ref, mc2);
+    check_equals(mc3Ref, mc3);
     
     check_equals(typeof(mc1), 'undefined'); //cann't access the hard reference
-    xcheck_equals(typeof(mc2), 'movieclip'); // mc2 is still accessable
-    xcheck_equals(typeof(mc3), 'movieclip'); // mc3 is still accessable
-    xcheck_equals(mc2.getDepth(), -16387);   // depth of mc2 changed after onUnload
-    xcheck_equals(mc3.getDepth(), -16388);   // depth of mc3 changed after onUnload
+    check_equals(typeof(mc2), 'movieclip'); // mc2 is still accessable
+    check_equals(typeof(mc3), 'movieclip'); // mc3 is still accessable
+    check_equals(mc2.getDepth(), -16387);   // depth of mc2 changed after onUnload
+    check_equals(mc3.getDepth(), -16388);   // depth of mc3 changed after onUnload
     
     mc2.swapDepths(mc3);      
-    xcheck_equals(mc2.getDepth(), -16387);  // depth not change after swapDepths
-    xcheck_equals(mc3.getDepth(), -16388);  // depth not change after swapDepths
+    check_equals(mc2.getDepth(), -16387);  // depth not change after swapDepths
+    check_equals(mc3.getDepth(), -16388);  // depth not change after swapDepths
     
     mc2.swapDephts(-10);
     mc2.swapDephts(10);
-    xcheck_equals(mc2.getDepth(), -16387);  // depth not change after swapDepths
-    xcheck_equals(mc3.getDepth(), -16388);  // depth not change after swapDepths
+    check_equals(mc2.getDepth(), -16387);  // depth not change after swapDepths
+    check_equals(mc3.getDepth(), -16388);  // depth not change after swapDepths
     
-    xcheck_equals(mc2.testvar, 100);       
-    xcheck_equals(mc3.testvar, 100); 
+    check_equals(mc2.testvar, 100);       
+    check_equals(mc3.testvar, 100); 
     mc2.removMovieClip();
     mc3.removMovieClip();
     xcheck_equals(mc2UnlaodedCount, 1); //mc2.onUnload not triggered again
     xcheck_equals(mc2UnlaodedCount, 1); //mc3.onUnload not triggered again
-    xcheck_equals(typeof(mc2), 'movieclip'); // mc2 is still accessible
-    xcheck_equals(typeof(mc3), 'movieclip'); // mc3 is still accessible
-    xcheck_equals(mc2.getDepth(), -16387); 
-    xcheck_equals(mc3.getDepth(), -16388);  
-    xcheck_equals(mc2._x, 200); 
-    xcheck_equals(mc3._y, 300);  
-    xcheck_equals(mc2.testvar, 100); 
-    xcheck_equals(mc3.testvar, 100); 
+    check_equals(typeof(mc2), 'movieclip'); // mc2 is still accessible
+    check_equals(typeof(mc3), 'movieclip'); // mc3 is still accessible
+    check_equals(mc2.getDepth(), -16387); 
+    check_equals(mc3.getDepth(), -16388);  
+    check_equals(mc2._x, 200); 
+    check_equals(mc3._y, 300);  
+    check_equals(mc2.testvar, 100); 
+    check_equals(mc3.testvar, 100); 
     
     mc2.onUnload();
     mc3.onUnload();

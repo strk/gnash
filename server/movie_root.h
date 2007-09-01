@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.70 2007/08/02 22:07:26 strk Exp $ */
+/* $Id: movie_root.h,v 1.71 2007/09/01 01:20:46 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -668,6 +668,10 @@ private:
 
     // Advance all levels
     void advanceAllLevels(float delta_time);
+
+    /// Delete characters removed from the stage
+    /// from the display lists
+    void cleanupDisplayList();
 
     // Advance a given level
     void advanceMovie(boost::intrusive_ptr<sprite_instance> movie, float delta_time);

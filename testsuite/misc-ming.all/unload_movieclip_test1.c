@@ -88,7 +88,7 @@ main(int argc, char** argv)
   add_actions(mo, "mc.onUnload = function () { "
                   "    _root.x = this._currentframe; "
                   "    _root.check_equals(typeof(this),  'movieclip'); "
-                  "    _root.xcheck_equals(this, _root.mc); "
+                  "    _root.check_equals(this, _root.mc); "
                   "};");
   SWFMovie_nextFrame(mo);
   
@@ -99,7 +99,7 @@ main(int argc, char** argv)
   
   // Frame 4: checks
   
-  xcheck_equals(mo, "_root.x", "1");
+  check_equals(mo, "_root.x", "1");
   
   add_actions(mo, "_root.totals(); stop(); ");
   SWFMovie_nextFrame(mo);
