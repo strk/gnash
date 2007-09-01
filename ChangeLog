@@ -1,3 +1,9 @@
+2007-09-01 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	* server/array.cpp: make to_number calls environment-aware.
+	* testsuite/actionscript.all/array.as: success in invalid array.sort()
+	  calls
+
 2007-09-01 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.{cpp,h}: when unloaded character's unload() method

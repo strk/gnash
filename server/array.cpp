@@ -75,7 +75,7 @@ struct as_value_lt
 	inline int str_cmp(const as_value& a, const as_value& b)
 	{
 		std::string s = a.to_string_versioned(_sv, &_env);
-		return s.compare(b.to_string_versioned(_sv,& _env));
+		return s.compare(b.to_string_versioned(_sv, &_env));
 	}
 
 	inline int str_nocase_cmp(const as_value& a, const as_value& b)
@@ -345,12 +345,14 @@ public:
 	as_function& _comp;
 	as_object* _object;
 	bool (*_zeroCmp)(const int);
+	as_environment& _env;
 
 	as_value_custom(as_function& comparator, bool (*zc)(const int), 
-		boost::intrusive_ptr<as_object> this_ptr)
+		boost::intrusive_ptr<as_object> this_ptr, as_environment& env)
 		:
 		_comp(comparator),
-		_zeroCmp(zc)
+		_zeroCmp(zc),
+		_env(env)
 	{
 		_object = this_ptr.get();
 	}
@@ -364,7 +366,7 @@ public:
 		env.push(a);
 		env.push(b);
 		ret = call_method(cmp_method, &env, _object, 2, 1);
-		return (*_zeroCmp)((int)ret.to_number());
+		return (*_zeroCmp)((int)ret.to_number(&_env));
 	}
 };
 
@@ -919,7 +921,7 @@ array_sort(const fn_call& fn)
 		else icmp = &int_gt;
 
 		as_value_custom avc = 
-			as_value_custom(*as_func, icmp, fn.this_ptr);
+			as_value_custom(*as_func, icmp, fn.this_ptr, env);
 
 		if ( (flags & as_array_object::fReturnIndexedArray) )
 			return as_value(array->sort_indexed(avc));
@@ -933,7 +935,8 @@ array_sort(const fn_call& fn)
 		IF_VERBOSE_ASCODING_ERRORS(
 		log_aserror(_("Sort called with invalid arguments."));
 		)
-		return as_value();
+		if ( fn.arg(0).is_undefined() ) return as_value();
+		return as_value((boost::intrusive_ptr<as_object>)array);
 	}
 	bool do_unique, do_index;
 	flags = flag_preprocess(flags, &do_unique, &do_index);
@@ -969,7 +972,7 @@ array_sortOn(const fn_call& fn)
 
 		if ( fn.nargs > 1 && fn.arg(1).is_number() )
 		{
-			flags = static_cast<uint8_t>(fn.arg(1).to_number());
+			flags = static_cast<uint8_t>(fn.arg(1).to_number(&env));
 			flags = flag_preprocess(flags, &do_unique, &do_index);
 		}
 		as_value_prop avc = as_value_prop(propField, 
@@ -1257,6 +1260,7 @@ array_slice(const fn_call& fn)
 	// start and end index of the part we're slicing
 	int startindex, endindex;
 	unsigned int arraysize = array->size();
+	as_environment& env = fn.env();
 
 	if (fn.nargs > 2)
 	{
@@ -1276,7 +1280,7 @@ array_slice(const fn_call& fn)
 	}
 
 
-	startindex = int(fn.arg(0).to_number());
+	startindex = int(fn.arg(0).to_number(&env));
 
 	// if the index is negative, it means "places from the end"
 	// where -1 is the last element
@@ -1285,7 +1289,7 @@ array_slice(const fn_call& fn)
 	// if we sent at least two arguments, setup endindex
 	if (fn.nargs >= 2)
 	{
-		endindex = int(fn.arg(1).to_number());
+		endindex = int(fn.arg(1).to_number(&env));
 
 		// if the index is negative, it means
 		// "places from the end" where -1 is the last element

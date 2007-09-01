@@ -18,7 +18,7 @@
 
 // Initial test written by Mike Carlson
 
-rcsid="$Id: array.as,v 1.32 2007/08/31 21:53:33 strk Exp $";
+rcsid="$Id: array.as,v 1.33 2007/09/01 01:59:33 strk Exp $";
 
 #include "check.as"
 
@@ -261,7 +261,7 @@ check_equals ( portion.toString(), "");
 
 // using objects that implement valueOf as index positions
 portion = concatted.slice(zero, two);
-xcheck_equals ( portion.toString(), "0,1");
+check_equals ( portion.toString(), "0,1");
 
 //-------------------------------
 // Test splice
@@ -486,7 +486,7 @@ r = b.sort( Array.DESCENDING | Array.NUMERIC );
 check_equals( r.toString(), "8,5,3,1,0,-2,-7,-9" );
 check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
 r = b.sort( zero );
-xcheck_equals( r.toString(), "8,5,3,1,0,-2,-7,-9" );
+check_equals( r.toString(), "8,5,3,1,0,-2,-7,-9" );
 check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
 b.sort( numeric );
 check_equals( b.toString(), "8,5,3,1,0,-2,-7,-9" );
@@ -591,7 +591,7 @@ r = a.sort( cmp_fn_obj, Array.DESCENDING );
 check_equals( tolen(r), "[5, 5, 4, 2, 2, 0]" );
 check_equals( tolen(a), "[5, 5, 4, 2, 2, 0]" );
 a.sort( cmp_fn_obj, Array.CASEINSENSITIVE | Array.NUMERIC );
-xcheck_equals( tolen(a), "[0, 2, 2, 4, 5, 5]" );
+check_equals( tolen(a), "[0, 2, 2, 4, 5, 5]" );
 r = a.sort( cmp_fn_obj, Array.RETURNINDEXEDARRAY );
 check_equals( r.toString(), "0,1,2,3,4,5" );
 r = a.sort( cmp_fn_obj, Array.RETURNINDEXEDARRAY | Array.DESCENDING );
