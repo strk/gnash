@@ -13,6 +13,8 @@
 2007-09-01 Markus Gothe <nietzsche@lysator.liu.se> 
 
 	* macros/boost.m4: push/pop CXXFLAGS/CPPFLAGS.
+	* libbase/utility.h: Fixed a C++98/C99 incompt. error
+	* libbase/utility.cpp: Use boost/cstdint.hpp instead of stdint.h.
 
 2007-09-01 Sandro Santilli <strk@keybit.net>
 

@@ -22,7 +22,7 @@
 #include "config.h"
 #endif
 
-#include <stdint.h> // for int16_t
+#include <boost/cstdint.hpp> // for int16_t
 #include <cstring> // for memcpy
 
 
