@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Object.cpp,v 1.28 2007/09/01 09:40:05 strk Exp $ */
+/* $Id: Object.cpp,v 1.29 2007/09/01 10:32:44 strk Exp $ */
 
 #include "tu_config.h"
 #include "Object.h"
@@ -55,7 +55,6 @@ attachObjectInterface(as_object& o)
 
 	// FIXME: add Object interface here:
 	o.init_member("registerClass", new builtin_function(object_registerClass));
-	o.set_member_flags("registerClass", 1); // hidden
 
 	// Object.valueOf()
 	o.init_member("valueOf", new builtin_function(as_object::valueof_method));
