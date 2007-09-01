@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.50 2007/08/31 15:38:41 strk Exp $
+dnl $Id: boost.m4,v 1.51 2007/09/01 23:44:23 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -141,17 +141,14 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl ---------------------------------------
 
   if test x${cross_compiling} = xno; then
-    AC_LANG_PUSH(C++)  
-    dnl # Save value of current CXXFLAGS
+    AC_LANG_PUSH(C++)
     save_CXXFLAGS="$CXXFLAGS"
-    CXXFLAGS="$CFLAGS $BOOST_CFLAGS" dnl # SHOULDN'T WE INCLUDE $CXXFLAGS TOO THEN ?
+    save_CPPFLAGS="$CPPFLAGS"
+    CXXFLAGS="$CFLAGS $BOOST_CFLAGS"
+    CPPFLAGS="$CXXFLAGS"
     AC_CHECK_HEADERS([boost/thread.hpp], [], [boost_thread=no]) 
-    dnl # Do not force setting CXXFLAGS if it wasn't set before
-    if test x"$ac_env_CXXFLAGS_set" = "xset"; then
-      CXXFLAGS="$save_CXXFLAGS"
-    else
-      unset CXXFLAGS; 
-    fi
+    CXXFLAGS="$save_CXXFLAGS"
+    CPPFLAGS="$save_CPPFLAGS"
     AC_LANG_POP(C++)  
   fi # if not cross-compiling
 
