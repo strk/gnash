@@ -333,8 +333,6 @@ public:
 	/// Cast to a as_function, or return NULL
 	virtual as_function* to_function() { return NULL; }
 
-	void	clear();
-
 	/// \brief
 	/// Check whether this object is an instance of the given
 	/// as_function constructor

@@ -346,13 +346,6 @@ as_object::set_member_flags(const std::string& name,
 	return _members.setFlags(name, setTrue, setFalse);
 }
 
-void
-as_object::clear()
-{
-	_members.clear();
-	m_prototype = NULL;
-}
-
 bool
 as_object::instanceOf(as_function* ctor)
 {

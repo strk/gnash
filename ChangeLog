@@ -1,5 +1,9 @@
 2007-09-01 Sandro Santilli <strk@keybit.net>
 
+	* server/as_object.{cpp,h}: removed dead code (clear)
+
+2007-09-01 Sandro Santilli <strk@keybit.net>
+
 	* server/swf_function.cpp (ctor): make sure user-defined
 	  function's initial prototype inherits from Object.
 	* server/asobj/Object.cpp (getObjectInterface): really
