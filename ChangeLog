@@ -1,3 +1,15 @@
+2007-09-01 Sandro Santilli <strk@keybit.net>
+
+	* server/as_object.{h,cpp}: handle __proto__ has a normal property.
+	* server/sprite_instance.cpp (replace_display_object): log an error
+	  if the character to be replaced is not found.
+	* server/dlist.cpp (replace_character): don't restart the character
+	  being added (fixes a problem with the ::restart function itself, in
+	  that it also cleans up all properties, which now include the
+	  __proto__ member).
+	* testsuite/actionscript.all/toString_valueOf.as: more successes.
+	* testsuite/actionscript.all/Object.as: more successes.
+
 2007-09-01 Markus Gothe <nietzsche@lysator.liu.se> 
 
 	* macros/boost.m4: push/pop CXXFLAGS/CPPFLAGS.

@@ -31,7 +31,7 @@
   
   check(Function.prototype.hasOwnProperty('apply'));
   check(Function.prototype.hasOwnProperty('call'));
-  xcheck(Function.prototype.hasOwnProperty('__proto__'));
+  check(Function.prototype.hasOwnProperty('__proto__'));
   check(Function.prototype.hasOwnProperty('constructor'));
   
   check(!Function.prototype.hasOwnProperty('toString'));

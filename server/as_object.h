@@ -440,9 +440,9 @@ public:
 	///
 	/// NOTE: can return NULL (and it is expected to do for Object.prototype)
 	///
-	as_object* get_prototype();
+	boost::intrusive_ptr<as_object> get_prototype();
 
-	const as_object* get_prototype() const {
+	const boost::intrusive_ptr<as_object> get_prototype() const {
 		// cast away constness
 		return const_cast<as_object*>(this)->get_prototype();
 	}
@@ -454,7 +454,7 @@ public:
 	/// public: set_member("__proto__", <anyting>)
 	/// will do just the same
 	///
-	void set_prototype(boost::intrusive_ptr<as_object> proto);
+	void set_prototype(boost::intrusive_ptr<as_object> proto, int flags=as_prop_flags::dontDelete|as_prop_flags::dontEnum);
 
 	std::string asPropName(std::string name);
 	
@@ -529,7 +529,7 @@ protected:
 	void markAsObjectReachable() const
 	{
 		_members.setReachable();
-		if ( m_prototype.get() ) m_prototype->setReachable();
+		//if ( m_prototype.get() ) m_prototype->setReachable();
 	}
 #endif // GNASH_USE_GC
 
@@ -539,7 +539,7 @@ protected:
 private:
 
 	/// Reference to this object's '__proto__'
-	boost::intrusive_ptr<as_object> m_prototype;
+	//boost::intrusive_ptr<as_object> m_prototype;
 
 };
 

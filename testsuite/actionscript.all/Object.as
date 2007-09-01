@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Object.as,v 1.32 2007/09/01 09:40:06 strk Exp $";
+rcsid="$Id: Object.as,v 1.33 2007/09/02 00:12:48 strk Exp $";
 
 #include "check.as"
 
@@ -31,6 +31,9 @@ check_equals(typeof(Object.prototype), 'object');
 // registerClass is a public static function of Object
 check_equals(typeof(Object.registerClass), 'function');
 check_equals(typeof(Object.prototype.toString), 'function');
+#if OUTPUT_VERSION > 5
+ check(Object.prototype.hasOwnProperty('toString'));
+#endif
 check_equals(typeof(Object.prototype.valueOf), 'function');
 check_equals(typeof(Object.prototype.constructor), 'function'); 
 #if OUTPUT_VERSION > 5
@@ -54,19 +57,19 @@ xcheck_equals(Object.prototype.registerClass, undefined);
 
 // Through test of existance of methods!
 
-xcheck(Object.hasOwnProperty('__proto__'));
+check(Object.hasOwnProperty('__proto__'));
 
 O = Object;
 check_equals(O, Object);
 
 // found 4 methods in Object
-xcheck(O.hasOwnProperty('__proto__'));
+check(O.hasOwnProperty('__proto__'));
 check(O.hasOwnProperty('registerClass'));
 check(O.hasOwnProperty('constructor'));
 check(O.hasOwnProperty('prototype'));
 
 // fount 4 methods in Object.__proto__
-xcheck(O.__proto__.hasOwnProperty('__proto__'));
+check(O.__proto__.hasOwnProperty('__proto__'));
 check(O.__proto__.hasOwnProperty('apply'));
 check(O.__proto__.hasOwnProperty('call'));
 check(O.__proto__.hasOwnProperty('constructor'));
@@ -75,7 +78,7 @@ check(O.__proto__ != Object.prototype);
 check(O.__proto__.__proto__ == Object.prototype);
 
 // found 3 methods in Object.constructor
-xcheck(O.constructor.hasOwnProperty('__proto__'));
+check(O.constructor.hasOwnProperty('__proto__'));
 check(O.constructor.hasOwnProperty('constructor'));
 check(O.constructor.hasOwnProperty('prototype'));
 
@@ -91,7 +94,7 @@ check(O.prototype.hasOwnProperty('unwatch'));
 check(O.prototype.hasOwnProperty('watch'));
 
 // found 3 methods in Object.prototype.constructor
-xcheck(O.prototype.constructor.hasOwnProperty('__proto__'));
+check(O.prototype.constructor.hasOwnProperty('__proto__'));
 check(O.prototype.constructor.hasOwnProperty('constructor'));
 check(O.prototype.constructor.hasOwnProperty('prototype'));
 

@@ -2882,7 +2882,11 @@ sprite_instance::replace_display_object(
                 mat,
                 ratio, clip_depth);
         }
-    } // end of if(existing_char)
+    }
+    else // non-existing character
+    {
+	log_error("sprite_instance::replace_display_object: could not find any character at depth %d", depth);
+    } 
 }
 
 void sprite_instance::replace_display_object(

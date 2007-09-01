@@ -98,22 +98,6 @@ as_object::get_member_default(const std::string& name, as_value* val)
 {
 	assert(val);
 
-	//log_msg(_("Getting member %s (SWF version:%d)"), name.c_str(), vm.getSWFVersion());
-
-	// TODO: inspect wheter it is possible to make __proto__ a
-	//       getter/setter property instead, to take this into account
-	//
-	if (name == "__proto__")
-	{
-		as_object* p = get_prototype();
-		if ( p ) {
-			val->set_as_object(p);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	Property* prop = findProperty(name);
 	if ( ! prop ) return false;
 
@@ -135,12 +119,18 @@ as_object::get_member_default(const std::string& name, as_value* val)
 Property*
 as_object::findProperty(const std::string& key)
 {
+	// don't enter an infinite loop looking for __proto__ ...
+	if ( key == "__proto__" )
+	{
+		return _members.getProperty(key);
+	}
+
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set<const as_object*> visited;
+	std::set< as_object* > visited;
 
-	as_object* obj = this;
-	while ( obj && visited.insert(obj).second )
+	boost::intrusive_ptr<as_object> obj = this;
+	while ( obj && visited.insert(obj.get()).second )
 	{
 		Property* prop = obj->_members.getProperty(key);
 		if ( prop ) return prop;
@@ -156,12 +146,21 @@ as_object::findProperty(const std::string& key)
 Property*
 as_object::findGetterSetter(const std::string& key)
 {
+	// don't enter an infinite loop looking for __proto__ ...
+	if ( key == "__proto__" )
+	{
+		Property* prop = _members.getProperty(key);
+		if ( ! prop ) return NULL;
+		if ( ! prop->isGetterSetter() ) return NULL;
+		return prop;
+	}
+
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set<const as_object*> visited;
+	std::set< as_object* > visited;
 
-	as_object* obj = this;
-	while ( obj && visited.insert(obj).second )
+	boost::intrusive_ptr<as_object> obj = this;
+	while ( obj && visited.insert(obj.get()).second )
 	{
 		Property* prop = obj->_members.getProperty(key);
 		if ( prop && prop->isGetterSetter() )
@@ -180,23 +179,22 @@ as_object::findGetterSetter(const std::string& key)
 
 /*protected*/
 void
-as_object::set_prototype(boost::intrusive_ptr<as_object> proto)
+as_object::set_prototype(boost::intrusive_ptr<as_object> proto, int flags)
 {
-	m_prototype = proto;
+	static std::string key ( "__proto__" );
+
+	// TODO: check what happens if __proto__ is set as a user-defined getter/setter
+	if ( _members.setValue(key, as_value(proto.get()), *this) )
+	{
+		// TODO: optimize this, don't scan again !
+		_members.setFlags(key, flags, 0);
+	}
 }
 
 void
 as_object::set_member_default(const std::string& key, const as_value& val )
 {
-
 	//log_msg(_("set_member_default(%s)"), key.c_str());
-
-	// TODO: make __proto__ a getter/setter?
-	if (key == "__proto__") 
-	{
-		set_prototype(val.to_object());
-		return;
-	}
 
 	// found a getter/setter property in the inheritance chain
 	// so set that and return
@@ -349,11 +347,11 @@ as_object::set_member_flags(const std::string& name,
 bool
 as_object::instanceOf(as_function* ctor)
 {
-	const as_object* obj = this;
+	boost::intrusive_ptr<as_object> obj = this;
 
-	std::set<const as_object*> visited;
+	std::set< as_object* > visited;
 
-	while (obj && visited.insert(obj).second )
+	while (obj && visited.insert(obj.get()).second )
 	{
 		if ( obj->get_prototype() == ctor->getPrototype() ) return true;
 		obj = obj->get_prototype(); 
@@ -370,11 +368,11 @@ as_object::instanceOf(as_function* ctor)
 bool
 as_object::prototypeOf(as_object& instance)
 {
-	const as_object* obj = &instance;
+	boost::intrusive_ptr<as_object> obj = &instance;
 
-	std::set<const as_object*> visited;
+	std::set< as_object* > visited;
 
-	while (obj && visited.insert(obj).second )
+	while (obj && visited.insert(obj.get()).second )
 	{
 		if ( obj->get_prototype() == this ) return true;
 		obj = obj->get_prototype(); 
@@ -458,11 +456,12 @@ as_object::setPropFlags(as_value& props_val, int set_false, int set_true)
 
 		// Are we sure we need to descend to __proto__ ?
 		// should we recurse then ?
-
+#if 0
 		if (m_prototype)
 		{
 			m_prototype->_members.setFlagsAll(set_true, set_false);
 		}
+#endif
 	}
 	else
 	{
@@ -490,10 +489,10 @@ as_object::enumerateProperties(as_environment& env) const
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set<const as_object*> visited;
+	std::set< as_object* > visited;
 
-	const as_object* obj = this;
-	while ( obj && visited.insert(obj).second )
+	boost::intrusive_ptr<as_object> obj = const_cast<as_object*>(this);
+	while ( obj && visited.insert(obj.get()).second )
 	{
 		obj->_members.enumerateKeys(env);
 		obj = obj->get_prototype();
@@ -510,10 +509,10 @@ as_object::enumerateProperties(std::map<std::string, std::string>& to)
 
 	// this set will keep track of visited objects,
 	// to avoid infinite loops
-	std::set<const as_object*> visited;
+	std::set< as_object* > visited;
 
-	as_object* obj = this;
-	while ( obj && visited.insert(obj).second )
+	boost::intrusive_ptr<as_object> obj = this;
+	while ( obj && visited.insert(obj.get()).second )
 	{
 		obj->_members.enumerateKeyValue(*this, to);
 		obj = obj->get_prototype();
@@ -524,25 +523,28 @@ as_object::enumerateProperties(std::map<std::string, std::string>& to)
 as_object::as_object()
 	:
 	_members(),
-	_vm(VM::get()),
-	m_prototype(NULL)
+	_vm(VM::get())
+	//, m_prototype(NULL)
 {
 }
 
 as_object::as_object(as_object* proto)
 	:
 	_members(),
-	_vm(VM::get()),
-	m_prototype(proto)
+	_vm(VM::get())
+	//, m_prototype(proto)
 {
+	init_member("__proto__", as_value(proto));
 }
 
 as_object::as_object(boost::intrusive_ptr<as_object> proto)
 	:
 	_members(),
-	_vm(VM::get()),
-	m_prototype(proto)
+	_vm(VM::get())
+	//, m_prototype(proto)
 {
+	//set_prototype(proto);
+	init_member("__proto__", as_value(proto));
 }
 
 as_object::as_object(const as_object& other)
@@ -553,8 +555,8 @@ as_object::as_object(const as_object& other)
 	GcResource(), 
 #endif
 	_members(other._members),
-	_vm(VM::get()),
-	m_prototype(other.m_prototype)
+	_vm(VM::get())
+	//, m_prototype(other.m_prototype) // done by _members copy
 {
 }
 
@@ -612,21 +614,28 @@ as_object::valueof_method(const fn_call& fn)
 	return obj->get_primitive_value();
 }
 
-as_object*
+boost::intrusive_ptr<as_object>
 as_object::get_prototype()
 {
+	static std::string key ( "__proto__" );
+	as_value tmp;
+	// I don't think any subclass should override getting __proto__ anyway...
+	//if ( ! get_member(key, &tmp) ) return NULL;
+	if ( ! _members.getValue(key, tmp, *this) ) return NULL;
+	return tmp.to_object();
+
+#if 0 // the inheritance chain MUST end somewhere, handle the SWF4 thing in some other way
 	if ( m_prototype ) return m_prototype.get();
 	//log_msg(_("as_object::get_prototype(): Hit top of inheritance chain"));
 
-#if 0 // the inheritance chain MUST end somewhere, handle the SWF4 thing in some other way
 	// if SWF version < 5 the Object interface won't keep alive !
 	if ( _vm.getSWFVersion() > 4 )
 	{
 		return getObjectInterface();
 	}
-#endif
 
 	return NULL;
+#endif
 }
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
