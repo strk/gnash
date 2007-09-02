@@ -15,6 +15,7 @@
 
 #include <memory>
 
+using namespace gnash;
 
 #ifndef HAVE_ZLIB_H
 
