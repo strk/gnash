@@ -1,3 +1,8 @@
+2007-09-03 Markus Gothe <nietzsche@lysator.liu.se> 
+
+	* macros/boost.m4: Commented out bogus check and improved the
+	  checking of BOOST_CFLAGS.
+
 2007-09-03 Chad Musick <chadmusick@msbx.net>
 
 	* server/fill_style.h,.cpp -- Add recording of focal point for focal

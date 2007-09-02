@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.51 2007/09/01 23:44:23 nihilus Exp $
+dnl $Id: boost.m4,v 1.52 2007/09/02 23:43:24 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -48,10 +48,17 @@ AC_DEFUN([GNASH_PATH_BOOST],
     gnash_boost_topdir=""
     gnash_boost_version=""
     for i in $incllist; do
-      for j in `ls -dr $i/boost* 2>/dev/null`; do
-        if test -f ${j}/boost/detail/lightweight_mutex.hpp -a -f ${j}/boost/thread.hpp; then
-          gnash_boost_topdir=`basename $j`
-          ac_cv_path_boost_incl="-I${j}"
+      for j in `ls -dr $i/boost* | grep boost 2>/dev/null`; do
+	
+	dnl Fix for packaging systems not adding extra fluff to the path-name.
+	i=`dirname ${j}`
+        
+	if test -f ${j}/boost/detail/lightweight_mutex.hpp -a -f ${j}/boost/thread.hpp ;then
+	  gnash_boost_topdir=`basename $j`
+	  ac_cv_path_boost_incl="-I${j}"
+	  break;
+	elif test -f ${i}/boost/detail/lightweight_mutex.hpp -a -f ${i}/boost/thread.hpp ; then
+          ac_cv_path_boost_incl="-I${i}"
           break
         fi
       done
@@ -140,17 +147,18 @@ AC_DEFUN([GNASH_PATH_BOOST],
   dnl (if not cross-compiling)
   dnl ---------------------------------------
 
-  if test x${cross_compiling} = xno; then
-    AC_LANG_PUSH(C++)
-    save_CXXFLAGS="$CXXFLAGS"
-    save_CPPFLAGS="$CPPFLAGS"
-    CXXFLAGS="$CFLAGS $BOOST_CFLAGS"
-    CPPFLAGS="$CXXFLAGS"
-    AC_CHECK_HEADERS([boost/thread.hpp], [], [boost_thread=no]) 
-    CXXFLAGS="$save_CXXFLAGS"
-    CPPFLAGS="$save_CPPFLAGS"
-    AC_LANG_POP(C++)  
-  fi # if not cross-compiling
+  dnl Bogus testing
+  dnl if test x${cross_compiling} = xno; then
+  dbl  AC_LANG_PUSH(C++)
+  dnl  save_CXXFLAGS="$CXXFLAGS"
+  dnl  save_CPPFLAGS="$CPPFLAGS"
+  dnl  CXXFLAGS="$CFLAGS $BOOST_CFLAGS"
+  dnl  CPPFLAGS="$CXXFLAGS"
+  dnl  AC_CHECK_HEADERS([boost/thread.hpp], [], [boost_thread=no]) 
+  dnl  CXXFLAGS="$save_CXXFLAGS"
+  dnl  CPPFLAGS="$save_CPPFLAGS"
+  dnl  AC_LANG_POP(C++)  
+  dnl fi # if not cross-compiling
 
   dnl ---------------------------------------
   dnl TODO: Check actual usability of libs
