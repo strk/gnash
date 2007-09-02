@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.104 2007/08/29 22:20:10 nihilus Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.105 2007/09/02 17:01:59 cmusick Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -1463,6 +1463,18 @@ public:
           sh.add_gradient_radial(fill_styles[fno], m, cx);
           break;
         } 
+
+	case SWF::FILL_FOCAL_GRADIENT:
+	{
+	    matrix m = fill_styles[fno].get_gradient_matrix();
+	    matrix cm;
+	    cm.set_inverse(fillstyle_matrix);
+	    m.concatenate(cm);
+	    m.concatenate(inv_stage_matrix);
+
+	    sh.add_gradient_focal(fill_styles[fno], m, cx);
+	    break;
+	}
 
         case SWF::FILL_TILED_BITMAP:
         case SWF::FILL_CLIPPED_BITMAP:

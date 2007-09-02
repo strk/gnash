@@ -17,7 +17,7 @@
 
 // Based on work of Thatcher Ulrich <tu@tulrich.com> 2003
 
-/* $Id: fill_style.h,v 1.8 2007/08/07 20:53:10 strk Exp $ */
+/* $Id: fill_style.h,v 1.9 2007/09/02 17:01:59 cmusick Exp $ */
 
 #ifndef GNASH_FILL_STYLE_H
 #define GNASH_FILL_STYLE_H
@@ -119,7 +119,13 @@ public:
 	
 	/// Returns the color stop value at a specified index
 	const gradient_record& get_color_stop(int index) const;
-	
+
+	/// Get and set the focal point for gradient focal fills.
+	/// This should be from -1.0 to 1.0, representing the left
+	/// and right edges of the rectangle.
+	float get_focal_point() const { return m_focal_point; }
+	void set_focal_point(float f) { m_focal_point = f; }
+
 #ifdef GNASH_USE_GC
 	/// Mark reachable resources (for the GC)
 	//
@@ -147,6 +153,7 @@ private:
 	int	m_type;
 	rgba	m_color;
 	matrix	m_gradient_matrix;
+    float m_focal_point; // For focal fill gradients.
 	std::vector<gradient_record>	m_gradients;
 	boost::intrusive_ptr<gnash::bitmap_info>	m_gradient_bitmap_info;
 	boost::intrusive_ptr<bitmap_character_def>	m_bitmap_character;

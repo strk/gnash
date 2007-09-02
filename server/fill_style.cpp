@@ -124,12 +124,14 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         {
             m_gradient_matrix.concatenate_translation(32.f, 32.f);
             m_gradient_matrix.concatenate_scale(1.0f / 512.0f);
-			// TODO: Obviously, a focal gradient isn't a radial
-			// gradient, but how _should_ this be handled?
+			// A focal gradient also has a focal point.
 			if (m_type == SWF::FILL_FOCAL_GRADIENT)
 			{
-				/* float focal_point = */
-				static_cast<void>(in->read_short_sfixed());
+				m_focal_point = in->read_short_sfixed();
+				if (m_focal_point < -1.0f)
+					m_focal_point = -1.0f;
+				else if (m_focal_point > 1.0f)
+					m_focal_point = 1.0f;
 			}
         }
 
@@ -148,8 +150,8 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 		return;
 	}
 
-        if ( num_gradients > 8 ) // SWF::DEFINESHAPE4 should support up to 15 !
-	                         // and we don't have this limitation anyway
+        if ( num_gradients > 8 + (tag_type == SWF::DEFINESHAPE4 ||
+			tag_type == SWF::DEFINESHAPE4_) ? 7 : 0)
         {
             // see: http://sswf.sourceforge.net/SWFalexref.html#swf_gradient
             log_error(_("Unexpected num gradients (%d), expected 1 to 8"),

@@ -627,7 +627,32 @@ public:
         
       m_styles.push_back(st);
     }
-    
+
+void add_gradient_focal(const gnash::fill_style& fs, gnash::matrix mat, gnash::cxform cx)
+{
+	typedef agg::rgba8 color_type;
+	typedef agg::span_allocator<color_type> span_allocator_type;
+	typedef agg::span_interpolator_linear<agg::trans_affine> interpolator_type;
+	typedef agg::gradient_radial_focus gradient_func_type;
+    typedef gradient_func_type gradient_adaptor_type;
+    typedef agg::gradient_lut<agg::color_interpolator<color_type>, 256> color_func_type;
+    typedef agg::span_gradient<color_type, interpolator_type,
+		gradient_adaptor_type, color_func_type> sg_type;
+
+	typedef agg_style_gradient<color_type, span_allocator_type,
+		interpolator_type, gradient_func_type, gradient_adaptor_type,
+		color_func_type, sg_type> st_type;
+
+    // move the focal fill to where it should be.
+    gnash::matrix transl;
+	// TODO: Is this right?
+    transl.concatenate_translation(fs.get_focal_point() * 32.0f, 0.0f);
+	transl.concatenate(mat);
+
+	st_type* st = new st_type(fs, transl, cx, 64/2);
+
+	m_styles.push_back(st);
+}
 
     /// Returns the color of a certain fill style (solid)
     const agg::rgba8& color(unsigned style) const 

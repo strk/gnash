@@ -1,3 +1,11 @@
+2007-09-03 Chad Musick <chadmusick@msbx.net>
+
+	* server/fill_style.h,.cpp -- Add recording of focal point for focal
+	  gradient fill.
+	* backend/render_handler_agg.cpp, backend/render_handler_agg_style.h
+	  Adding gradient focal fill. I'm not sure if I've done this correctly,
+	  but it didn't break anything.
+
 2007-09-02 Chad Musick <chadmusick@msbx.net>
 
 	* server/fill_style.cpp -- Update the allow focal gradient fill style,
