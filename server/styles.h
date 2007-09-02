@@ -5,7 +5,7 @@
 
 // line style types.
 
-/* $Id: styles.h,v 1.20 2007/08/07 20:53:10 strk Exp $ */
+/* $Id: styles.h,v 1.21 2007/09/02 12:57:01 cmusick Exp $ */
 
 #ifndef GNASH_STYLES_H
 #define GNASH_STYLES_H
@@ -18,7 +18,7 @@
 namespace gnash {
 
 class stream;
-
+class movie_definition;
 
 class base_line_style
 {
@@ -57,7 +57,7 @@ public:
 	/// Throw a ParserException if there's no enough bytes in the
 	/// currently opened tag for reading. See stream::ensureBytes()
 	///
-	void	read(stream* in, int tag_type);
+	void	read(stream* in, int tag_type, movie_definition *md);
 	
 	/// Return thickness of the line, in TWIPS
 	uint16_t	get_width() const { return m_width; }

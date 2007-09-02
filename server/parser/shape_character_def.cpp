@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.37 2007/08/27 18:39:19 strk Exp $ */
+/* $Id: shape_character_def.cpp,v 1.38 2007/09/02 12:57:01 cmusick Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -106,7 +106,8 @@ read_fill_styles(std::vector<fill_style>& styles, stream* in,
 
 
 static void
-read_line_styles(std::vector<line_style>& styles, stream* in, int tag_type)
+read_line_styles(std::vector<line_style>& styles, stream* in, int tag_type,
+	movie_definition *md)
     // Read line styles and push them onto the back of the given array.
 {
     // Get the count.
@@ -135,7 +136,7 @@ read_line_styles(std::vector<line_style>& styles, stream* in, int tag_type)
     for (int i = 0; i < line_style_count; i++) {
 	styles.resize(styles.size() + 1);
 	//styles[styles.size() - 1].read(in, tag_type);
-	styles.back().read(in, tag_type);
+	styles.back().read(in, tag_type, md);
     }
 }
 
@@ -184,8 +185,16 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
     log_parse(_("  bound rect: %s"), b.c_str());
     		);
 
+	// TODO: Store and use these.  Unfinished.
+	if (tag_type == SWF::DEFINESHAPE4 || tag_type == SWF::DEFINESHAPE4_)
+	{
+		rect tbound;
+		tbound.read(in);
+		/*uint8_t scales =*/static_cast<void>(in->read_u8());
+	}
+
 	read_fill_styles(m_fill_styles, in, tag_type, m);
-	read_line_styles(m_line_styles, in, tag_type);
+	read_line_styles(m_line_styles, in, tag_type, m);
     }
 
     /// Adding a dummy fill style is just needed to make the
@@ -424,7 +433,7 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 		fill_base = m_fill_styles.size();
 		line_base = m_line_styles.size();
 		read_fill_styles(m_fill_styles, in, tag_type, m);
-		read_line_styles(m_line_styles, in, tag_type);
+		read_line_styles(m_line_styles, in, tag_type, m);
 		num_fill_bits = in->read_uint(4);
 		num_line_bits = in->read_uint(4);
 	    }

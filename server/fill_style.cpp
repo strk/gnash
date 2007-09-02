@@ -84,7 +84,8 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
     if (m_type == SWF::FILL_SOLID)
     {
         // 0x00: solid fill
-        if ( tag_type == SWF::DEFINESHAPE3 )
+        if ( tag_type == SWF::DEFINESHAPE3 || tag_type == SWF::DEFINESHAPE4
+			|| tag_type == SWF::DEFINESHAPE4_)
         {
             m_color.read_rgba(in);
         }
@@ -102,10 +103,12 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 		);
     }
     else if (m_type == SWF::FILL_LINEAR_GRADIENT
-            || m_type == SWF::FILL_RADIAL_GRADIENT)
+            || m_type == SWF::FILL_RADIAL_GRADIENT
+			|| m_type == SWF::FILL_FOCAL_GRADIENT)
     {
         // 0x10: linear gradient fill
         // 0x12: radial gradient fill
+        // 0x13: focal gradient fill
 
         matrix	input_matrix;
         input_matrix.read(in);
@@ -121,6 +124,13 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         {
             m_gradient_matrix.concatenate_translation(32.f, 32.f);
             m_gradient_matrix.concatenate_scale(1.0f / 512.0f);
+			// TODO: Obviously, a focal gradient isn't a radial
+			// gradient, but how _should_ this be handled?
+			if (m_type == SWF::FILL_FOCAL_GRADIENT)
+			{
+				/* float focal_point = */
+				static_cast<void>(in->read_short_sfixed());
+			}
         }
 
         matrix	m;

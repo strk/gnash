@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.134 2007/08/28 13:12:38 strk Exp $ */
+/* $Id: tag_loaders.cpp,v 1.135 2007/09/02 12:57:01 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1046,7 +1046,8 @@ void define_shape_loader(stream* in, tag_type tag, movie_definition* m)
 {
     assert(tag == SWF::DEFINESHAPE
 	   || tag == SWF::DEFINESHAPE2
-	   || tag == SWF::DEFINESHAPE3);
+	   || tag == SWF::DEFINESHAPE3
+	   || tag == SWF::DEFINESHAPE4 || tag == SWF::DEFINESHAPE4_);
 
     uint16_t	character_id = in->read_u16();
     IF_VERBOSE_PARSE

@@ -1,3 +1,19 @@
+2007-09-02 Chad Musick <chadmusick@msbx.net>
+
+	* server/fill_style.cpp -- Update the allow focal gradient fill style,
+	  and to accomodate some format changes for SWF8+ tags.  Focal
+	  gradients are not implemented yet -- I don't yet know how to do this.
+	* server/impl.cpp -- Update DefineShape4 loader function from fixme_loader
+	  to shape loader.
+	* server/styles.h -- Change signature of read function to include the
+	  movie definition since it may be part of a fill style, which needs this.
+	* server/styles.cpp -- Change read function to read new line styles
+	  allowed in newer SWF files.
+	* server/parser/shape_character_def.cpp -- Change loader to know how
+	  to read a DefineShape4 tag.
+	* server/swf/tag_loaders.cpp -- Let the shape_loader be able to load
+	  a DefineShape4 tag.
+
 2007-09-02 Zou Lunkai <zoulunkai@gmail.com>
 	
 	* testsuite/misc-swfc.all/movieclip_destruction_test2.sc: one more test.
