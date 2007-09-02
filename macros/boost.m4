@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.52 2007/09/02 23:43:24 nihilus Exp $
+dnl $Id: boost.m4,v 1.53 2007/09/02 23:48:37 nihilus Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -48,7 +48,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
     gnash_boost_topdir=""
     gnash_boost_version=""
     for i in $incllist; do
-      for j in `ls -dr $i/boost* | grep boost 2>/dev/null`; do
+      for j in `ls -dr $i/boost* 2>/dev/null`; do
 	
 	dnl Fix for packaging systems not adding extra fluff to the path-name.
 	i=`dirname ${j}`
@@ -149,7 +149,7 @@ AC_DEFUN([GNASH_PATH_BOOST],
 
   dnl Bogus testing
   dnl if test x${cross_compiling} = xno; then
-  dbl  AC_LANG_PUSH(C++)
+  dnl  AC_LANG_PUSH(C++)
   dnl  save_CXXFLAGS="$CXXFLAGS"
   dnl  save_CPPFLAGS="$CPPFLAGS"
   dnl  CXXFLAGS="$CFLAGS $BOOST_CFLAGS"
