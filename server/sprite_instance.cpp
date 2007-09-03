@@ -1700,6 +1700,25 @@ public:
 	}
 };
 
+/// A DisplayList visitor used to advance all non-unloaded characters
+class AdvancerVisitor {
+
+	float delta_time;
+
+public:
+	AdvancerVisitor(float dt)
+		:
+		delta_time(dt)
+	{}
+
+	void operator() (character* ch)
+	{
+		// don't unload already unloaded characters
+		if ( ! ch->isUnloaded() ) ch->advance(delta_time);
+	}
+
+};
+
 
 //------------------------------------------------
 // sprite_instance
@@ -2332,12 +2351,11 @@ void sprite_instance::advance_sprite(float delta_time)
 	// to need oldDisplayList again later, to extract the list of
 	// newly added characters
 	//
-	//oldDisplayList.removeUnloaded(); // don't call removeUnloaded
-	oldDisplayList.sort(); // this is to avoid failing assertions, since we know characters might have changed depth...
-	DisplayList stillAlive = oldDisplayList;
-	stillAlive.clear_except(m_display_list, false);
-	//log_msg(_("Advancing %d pre-existing children of %s"), stillAlive.size(), getTargetPath().c_str());
-	stillAlive.advance(delta_time);
+	{
+		AdvancerVisitor visitor(delta_time);
+		DisplayList stillAlive = oldDisplayList;
+		stillAlive.visitAll(visitor);
+	}
 	
 	// Now execute actions on this timeline, after actions
 	// in old childs timelines have been executed.
@@ -2355,12 +2373,12 @@ void sprite_instance::advance_sprite(float delta_time)
 	// the chars we're clearing have *not* been removed:
 	// we're simply doing internal work here...
 	//
-	DisplayList newlyAdded = m_display_list;
-	//log_msg(_("%s has %d current children and %d old children"), getTargetPath().c_str(), m_display_list.size(), oldDisplayList.size());
-	//newlyAdded.removeUnloaded();
-	newlyAdded.clear(oldDisplayList, false);
-	//log_msg(_("Advancing %d newly-added (after clearing) children of %s"), newlyAdded.size(), getTargetPath().c_str());
-	newlyAdded.advance(delta_time);
+	{
+		AdvancerVisitor visitor(delta_time);
+		DisplayList newlyAdded = m_display_list;
+		newlyAdded.clear(oldDisplayList, false); // keep only newly added
+		newlyAdded.visitAll(visitor); 
+	}
 
 	// Remember current state of the DisplayList for next iteration
 	oldDisplayList = m_display_list;
