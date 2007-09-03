@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: tu_types.h,v 1.39 2007/07/01 10:54:10 bjacques Exp $ */
+/* $Id: tu_types.h,v 1.40 2007/09/03 22:49:58 nihilus Exp $ */
 
 #ifndef TU_TYPES_H
 #define TU_TYPES_H
@@ -41,7 +41,7 @@ typedef signed int int32_t;
 typedef unsigned __int64 uint64_t;
 typedef __int64 int64_t;
 #else
-# include <inttypes.h>
+# include <boost/cstdint.hpp>
 
 #ifndef HAVE_FUNCTION
 	#ifndef HAVE_func

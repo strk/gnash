@@ -62,6 +62,7 @@
 
 	* macros/boost.m4: Commented out bogus check and improved the
 	  checking of BOOST_CFLAGS.
+	* libbase/tu_types.h: Use boost/cstdint.hpp instead of inttypes.h
 
 2007-09-03 Chad Musick <chadmusick@msbx.net>
 
