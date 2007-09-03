@@ -390,10 +390,11 @@ main(int argc, char *argv[])
 	gnash::Player player;
 
 	// Enable native language support, i.e. internationalization
+#ifdef ENABLE_NLS
 	setlocale (LC_MESSAGES, "");
 	bindtextdomain (PACKAGE, LOCALEDIR);
 	textdomain (PACKAGE);
-
+#endif
 	rcfile.loadFiles();
 
 	try { parseCommandLine(argc, argv, player); }

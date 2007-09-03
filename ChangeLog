@@ -64,6 +64,7 @@
 	  checking of BOOST_CFLAGS.
 	* libbase/tu_types.h: Use boost/cstdint.hpp instead of inttypes.h
 	* server/vm/action.h: __SGI_LIBC_USING_FROM_STD(va_list)
+	* gui/gnash.cpp: setlocale() IFF #ENABLE_NLS.
 
 2007-09-03 Chad Musick <chadmusick@msbx.net>
 
