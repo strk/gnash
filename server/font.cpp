@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: font.cpp,v 1.47 2007/08/27 12:44:28 strk Exp $ */
+/* $Id: font.cpp,v 1.48 2007/09/03 16:50:09 cmusick Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -77,6 +77,7 @@ GlyphInfo::markReachableResources() const
 		m_is_italic(false),
 		m_is_bold(false),
 		m_wide_codes(false),
+		m_subpixel_font(false),
 		m_ascent(0.0f),
 		m_descent(0.0f),
 		m_leading(0.0f)
@@ -96,6 +97,7 @@ GlyphInfo::markReachableResources() const
 		m_is_italic(false),
 		m_is_bold(false),
 		m_wide_codes(false),
+		m_subpixel_font(false),
 		m_ascent(0.0f),
 		m_descent(0.0f),
 		m_leading(0.0f)
@@ -187,6 +189,8 @@ GlyphInfo::markReachableResources() const
 		{
 			assert (tag == SWF::DEFINEFONT2 || tag == SWF::DEFINEFONT3);
 			readDefineFont2_or_3(in, m);
+			if (tag == SWF::DEFINEFONT3)
+				m_subpixel_font = true;
 		}
 
 		if ( ! m_name.empty() && ! initDeviceFontProvider() )

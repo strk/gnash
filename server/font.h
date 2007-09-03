@@ -341,6 +341,8 @@ public:
 	float	get_leading() const { return m_leading; }
 	float	get_descent() const { return m_descent; }
 
+	bool	is_subpixel_font() const { return m_subpixel_font; }
+	void	set_subpixel_font(bool isit) { m_subpixel_font = isit; }
 private:
 
 	/// Read the table that maps from glyph indices to character codes.
@@ -390,6 +392,7 @@ private:
 	bool	m_is_italic;
 	bool	m_is_bold;
 	bool	m_wide_codes;
+	bool	m_subpixel_font;
 
 	// This table maps from Unicode character number to glyph index.
 	typedef std::map<uint16_t, int> code_table;

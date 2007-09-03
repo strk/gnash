@@ -1,3 +1,9 @@
+2007-09-04 Chad Musick <chadmusick@msbx.net>
+
+	* server/font.cpp,.h: Add is_subpixel_font flag for DefineFont3 tag.
+	* server/text.cpp: Size SWF8, SWF9 fonts correctly -- they use subpixel
+	  shapes, so they need to be scaled when displayed.
+
 2007-09-03 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (advance_sprite): don't use

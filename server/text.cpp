@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: text.cpp,v 1.37 2007/08/18 13:24:14 strk Exp $ */
+/* $Id: text.cpp,v 1.38 2007/09/03 16:50:09 cmusick Exp $ */
 
 // Based on the public domain work of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -167,7 +167,11 @@ namespace gnash {
 					
 				mat = base_matrix;
 				mat.concatenate_translation(x, y);
-				mat.concatenate_scale(scale);
+				//mat.concatenate_scale(scale);
+				if (fnt->is_subpixel_font())
+					mat.concatenate_scale(0.05f * scale);
+				else
+					mat.concatenate_scale(scale);
 
 				if (index == -1)
 				{
