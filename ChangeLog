@@ -1,3 +1,9 @@
+2007-09-03 Sandro Santilli <strk@keybit.net>
+
+	* server/edit_text_character.cpp (unload): don't forget to call
+	  the base class version of the method (properly setting _unload
+	  flag).
+
 2007-09-03 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* doc/C/usermanual/usage/gnashrc.xml: Warn in docs about including
