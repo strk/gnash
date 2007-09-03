@@ -1,3 +1,8 @@
+2007-09-03 Sandro Santilli <strk@keybit.net>
+
+	* server/as_value.cpp (to_sprite): make the dangling reference a
+	  debugging info, not an error.
+
 2007-09-03 Udo Giacomozzi <udo.gnu@nova-sys.net>
 
 	* render_handler_agg_style.h: Some fixes for focal gradients
