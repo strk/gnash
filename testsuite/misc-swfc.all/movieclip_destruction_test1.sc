@@ -35,7 +35,7 @@
  * Description:
  * 
  *  frame2: character mc1 placed at depth -16381.
- *          mc1 has two frams, _root.gotoAndStop(6) get executed in it's 2nd frame.
+ *          mc1 has two frams, _root.gotoAndPlay(6) get executed in it's 2nd frame.
  *  frame3: 
  *  frame4: remove character -16381 
  *  frame6: 
@@ -70,7 +70,7 @@
       .action:
         check_equals(mc1.getDepth(), -16383);
         _root.x = 0;
-        _root.gotoAndStop(6);
+        _root.gotoAndPlay(6);
         // AS below have no chance to be executed.
         // Since mc1 will get removed during gotoFrame above.
         _root.x = 100; 
@@ -86,7 +86,7 @@
   .end
 
 
-.frame 3
+.frame 3 
   .sprite mc2 // Define mc2 and add init_actions for it
     .frame 1
       .put b2 x = 300 y = 300
@@ -119,8 +119,40 @@
 .frame 6 // target frame
   .action:
     xcheck_equals(_root.x, 0);
-    stop();
   .end
-  
+
+
+// seperate tests to see if the whole function body get executed?
+// yes in this case.
+.frame 8
+  .action:
+    _root.createEmptyMovieClip("mc4", 100);
+    
+    check_equals(typeof(_root.mc4), 'movieclip');
+    
+    mc4.func = function (clip)
+    {
+    	_root.check_equals(this.valueOf(), mc4);
+      _root.testvar1 = 100;
+      clip.removeMovieClip(); 
+      _root.xcheck_equals(typeof(_root.mc4), 'undefined');
+      _root.xcheck_equals(typeof(this), 'movieclip');
+      _root.xcheck_equals(this.valueOf(), null);  // this pointer is null!
+      _root.testvar2 = 200;
+    };
+    
+    mc4.fun(mc4); // invoke the function and remove mc
+    
+    xcheck_equals(_root.testvar1, 100);
+    xcheck_equals(_root.testvar2, 200);
+    xcheck_equals(typeof(_root.mc4), 'undefined');
+    
+    _root.note(mc4);
+    
+    stop();
+    totals();
+  .end
+ 
+
 .end
 
