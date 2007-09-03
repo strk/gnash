@@ -830,7 +830,9 @@ DisplayList::advance(float delta_time)
 		if ( ch->isUnloaded() ) // debugging
 		{
 			log_error("character at depth %d is unloaded", ch->get_depth());
-			abort();
+			// No need to advance an unloaded character. It would be better
+			// if unloaded characters are not even in this list.
+			continue; 
 		}
 		assert(! ch->isUnloaded() ); // we don't advance unloaded chars
 
@@ -1005,6 +1007,7 @@ DisplayList::reinsertRemovedCharacter(boost::intrusive_ptr<character> ch)
 
 	testInvariant();
 
+	// TODO: optimize this by searching from the end(lowest depth).
 	container_type::iterator it = find_if(
 			_characters.begin(), _characters.end(),
 			DepthGreaterOrEqual(newDepth));
