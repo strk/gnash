@@ -1,5 +1,8 @@
 2007-09-03 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (advance_sprite): don't call
+	  removeUnloaded on DisplayList copies (their ::advance will skip
+	  unloaded elements, anyway).
 	* server/as_value.cpp (to_sprite): make the dangling reference a
 	  debugging info, not an error.
 

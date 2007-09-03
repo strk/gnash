@@ -2332,7 +2332,7 @@ void sprite_instance::advance_sprite(float delta_time)
 	// to need oldDisplayList again later, to extract the list of
 	// newly added characters
 	//
-	//oldDisplayList.removeUnloaded(); // TODO: clean oldDisplayList here instead than in cleanupDisplayList ?
+	//oldDisplayList.removeUnloaded(); // don't call removeUnloaded
 	oldDisplayList.sort(); // this is to avoid failing assertions, since we know characters might have changed depth...
 	DisplayList stillAlive = oldDisplayList;
 	stillAlive.clear_except(m_display_list, false);
@@ -2357,7 +2357,7 @@ void sprite_instance::advance_sprite(float delta_time)
 	//
 	DisplayList newlyAdded = m_display_list;
 	//log_msg(_("%s has %d current children and %d old children"), getTargetPath().c_str(), m_display_list.size(), oldDisplayList.size());
-	newlyAdded.removeUnloaded();
+	//newlyAdded.removeUnloaded();
 	newlyAdded.clear(oldDisplayList, false);
 	//log_msg(_("Advancing %d newly-added (after clearing) children of %s"), newlyAdded.size(), getTargetPath().c_str());
 	newlyAdded.advance(delta_time);
@@ -3658,7 +3658,7 @@ sprite_instance::cleanupDisplayList()
 {
         //log_debug("%s.cleanDisplayList() called, current dlist is %p, old is %p", getTarget().c_str(), (void*)&m_display_list, (void*)&oldDisplayList);
 	m_display_list.removeUnloaded();
-	oldDisplayList.removeUnloaded(); // TODO: move unloaded-cleanup of oldDisplayList in advance_sprite ?
+	oldDisplayList = m_display_list; // TODO: move unloaded-cleanup of oldDisplayList in advance_sprite ?
 }
 
 #ifdef GNASH_USE_GC
