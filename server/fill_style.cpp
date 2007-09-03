@@ -120,19 +120,10 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
             m_gradient_matrix.concatenate_translation(128.f, 0.f);
             m_gradient_matrix.concatenate_scale(1.0f / 128.0f);
         }
-        else
+        else // FILL_RADIAL_GRADIENT or FILL_FOCAL_GRADIENT
         {
             m_gradient_matrix.concatenate_translation(32.f, 32.f);
             m_gradient_matrix.concatenate_scale(1.0f / 512.0f);
-			// A focal gradient also has a focal point.
-			if (m_type == SWF::FILL_FOCAL_GRADIENT)
-			{
-				m_focal_point = in->read_short_sfixed();
-				if (m_focal_point < -1.0f)
-					m_focal_point = -1.0f;
-				else if (m_focal_point > 1.0f)
-					m_focal_point = 1.0f;
-			}
         }
 
         matrix	m;
@@ -141,7 +132,10 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 				
         // GRADIENT
         in->ensureBytes(1);
-        uint8_t num_gradients = in->read_u8();
+		// num_gradients is not 8 bits, it is only the last 4.
+		// at the moment, the first four are unused, so we may
+		// mask, but this needs to be changed.
+        uint8_t num_gradients = in->read_u8() & 15;
         if ( ! num_gradients )
 	{
 		IF_VERBOSE_MALFORMED_SWF(
@@ -150,8 +144,8 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 		return;
 	}
 
-        if ( num_gradients > 8 + (tag_type == SWF::DEFINESHAPE4 ||
-			tag_type == SWF::DEFINESHAPE4_) ? 7 : 0)
+        if ( num_gradients > 8 + ((tag_type == SWF::DEFINESHAPE4 ||
+			tag_type == SWF::DEFINESHAPE4_) ? 7 : 0))
         {
             // see: http://sswf.sourceforge.net/SWFalexref.html#swf_gradient
             log_error(_("Unexpected num gradients (%d), expected 1 to 8"),
@@ -162,6 +156,16 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         for (int i = 0; i < num_gradients; i++)	{
             m_gradients[i].read(in, tag_type);
         }
+
+		// A focal gradient also has a focal point.
+		if (m_type == SWF::FILL_FOCAL_GRADIENT)
+		{
+			m_focal_point = in->read_short_sfixed();
+			if (m_focal_point < -1.0f)
+				m_focal_point = -1.0f;
+			else if (m_focal_point > 1.0f)
+				m_focal_point = 1.0f;
+		}
 
 		IF_VERBOSE_PARSE
 		(
@@ -285,7 +289,8 @@ rgba
 fill_style::sample_gradient(uint8_t ratio) const
 {
 	assert(m_type == SWF::FILL_LINEAR_GRADIENT
-		|| m_type == SWF::FILL_RADIAL_GRADIENT);
+		|| m_type == SWF::FILL_RADIAL_GRADIENT
+		|| m_type == SWF::FILL_FOCAL_GRADIENT);
 
 	assert(m_gradients.size());
 
@@ -353,7 +358,8 @@ gnash::bitmap_info*
 fill_style::create_gradient_bitmap() const
 {
     assert(m_type == SWF::FILL_LINEAR_GRADIENT
-        || m_type == SWF::FILL_RADIAL_GRADIENT);
+        || m_type == SWF::FILL_RADIAL_GRADIENT
+		|| m_type == SWF::FILL_FOCAL_GRADIENT);
 
     image::rgba*	im = NULL;
 
@@ -386,6 +392,30 @@ fill_style::create_gradient_bitmap() const
             }
         }
     }
+	else if (m_type == SWF::FILL_FOCAL_GRADIENT)
+	{
+		// Focal gradient.
+		im = image::create_rgba(64, 64);
+
+		for (int j = 0; j < im->m_height; j++)
+		{
+			for (int i = 0; i < im->m_width; i++)
+			{
+				float radiusy = (im->m_height - 1) / 2.0f;
+				float radiusx = radiusy + abs(radiusy * m_focal_point);
+				float y = (j - radiusy) / radiusy;
+				float x = (i - radiusx) / radiusx;
+				int ratio = (int) floorf(255.5f * sqrt(x*x + y*y));
+				if (ratio > 255)
+				{
+					ratio = 255;
+				}
+				rgba sample = sample_gradient(ratio);
+				im->set_pixel(i, j, sample.m_r, sample.m_g, sample.m_b, sample.m_a);
+			}
+		}
+	}
+		
     gnash::bitmap_info*	bi = gnash::render::create_bitmap_info_rgba(im);
     delete im;
 

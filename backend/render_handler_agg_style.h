@@ -646,7 +646,7 @@ void add_gradient_focal(const gnash::fill_style& fs, gnash::matrix mat, gnash::c
     // move the focal fill to where it should be.
     gnash::matrix transl;
 	// TODO: Is this right?
-    transl.concatenate_translation(fs.get_focal_point() * 32.0f, 0.0f);
+    transl.concatenate_translation(fs.get_focal_point() * 32.0f - 32.0f, -32.0f);
 	transl.concatenate(mat);
 
 	st_type* st = new st_type(fs, transl, cx, 64/2);

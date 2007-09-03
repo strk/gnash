@@ -1,3 +1,11 @@
+2007-09-03 Chad Musick <chadmusick@msbx.net>
+
+	* backend/render_handler_agg_style.h Correct(maybe) the placement of the
+	  focal point for focal gradient fills.
+	* server/fill_style.cpp Read focal gradient fills in the right place
+	  (after gradient records, not before), also added focal gradients to
+	  known bitmap transforms.
+
 2007-09-03 Markus Gothe <nietzsche@lysator.liu.se> 
 
 	* macros/boost.m4: Commented out bogus check and improved the
