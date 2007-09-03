@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.92 2007/09/01 01:20:46 strk Exp $ */
+/* $Id: character.h,v 1.93 2007/09/03 07:42:59 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -358,6 +358,18 @@ public:
     ///
     ///
     static const int removedDepthOffset = -32769; // -32769;
+
+    /// Return true if the given depth is in the removed zone
+    static bool depthInRemovedZone(int depth)
+    {
+        return depth < staticDepthOffset;
+    }
+
+    /// Return true if this character's depth is in the removed zone
+    bool depthInRemovedZone()
+    {
+        return depthInRemovedZone(get_depth());
+    }
     
     /// This value is used for m_clip_depth when the value has no meaning, ie.
     /// the character is not a mask. Depths below -16384 are illegal, so this

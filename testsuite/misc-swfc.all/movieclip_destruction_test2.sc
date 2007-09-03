@@ -85,6 +85,8 @@
     // Define a onUnload for mc2 and mc3
     mc2.onUnload = function ()  
     { 
+       _root.check_equals(mc2.getDepth(), -16387); // already shifted inside unload handler !
+       _root.check_equals(this.getDepth(), -16387); // ...
        _root.mc2UnlaodedCount++;     
        // mc2.testvar keeps alive as long as mc2 is alive
        _root.check_equals(mc2.testvar, 100); 
@@ -112,7 +114,7 @@
 
   .action: 
     xcheck_equals(mc2UnlaodedCount, 1); // mc2.onUnload triggered
-    xcheck_equals(mc2UnlaodedCount, 1); // mc3.onUnload triggered
+    xcheck_equals(mc3UnlaodedCount, 1); // mc3.onUnload triggered
     check_equals(mc1Ref.valueOf(), null);
     check_equals(mc2Ref, mc2);
     check_equals(mc3Ref, mc3);
