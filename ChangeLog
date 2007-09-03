@@ -1,3 +1,7 @@
+2007-09-03 Udo Giacomozzi <udo.gnu@nova-sys.net>
+
+	* render_handler_agg_style.h: focal gradients now render correctly
+
 2007-09-03 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (advance_sprite): don't call

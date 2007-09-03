@@ -655,17 +655,14 @@ public:
       // move the center of the focal fill (not it's focal point) to where it 
       // should be.
       gnash::matrix transl;      
-      transl.concatenate_translation(32.0f, -32.0f);
+      transl.concatenate_translation(-32.0f, -32.0f);
       transl.concatenate(mat);
       
-      // TODO: There seems to be something wrong with the translation,
-      // needs to be fixed (see focal-gradient.swf)
-    
       st_type* st = new st_type(fs, transl, cx, 64/2); 
       
       // re-initialize focal gradient settings
       gradient_adaptor_type& adaptor = st->get_gradient_adaptor();
-      adaptor.init(100.0, fs.get_focal_point()*100.0, 0.0);
+      adaptor.init(32.0, fs.get_focal_point()*32.0, 0.0);
     
       m_styles.push_back(st);
     }
