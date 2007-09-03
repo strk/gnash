@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.105 2007/09/02 17:01:59 cmusick Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.106 2007/09/03 10:09:42 udog Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -48,7 +48,7 @@ Status
     solid fills       COMPLETE
     linear gradients  COMPLETE
     radial gradients  COMPLETE
-    focal gradients   NOT IMPLEMENTED *
+    focal gradients   IN PROGRESS
     ext. spread modes NOT IMPLEMENTED *
     linear RGB mode   NOT IMPLEMENTED *
     bitmaps, tiled    COMPLETE
@@ -1088,13 +1088,13 @@ public:
       for (unsigned int subshape=0; subshape<subshape_count; subshape++)
       {
         if (have_shape)
-	{
+  {
           draw_shape(subshape, paths, agg_paths, sh, true);    
-	}
+  }
         if (have_outline)      
-	{
+  {
           draw_outlines(subshape, paths, agg_paths_rounded, line_styles, cx, mat);
-	}
+  }
       }
       
     } // if not drawing mask
@@ -1464,17 +1464,17 @@ public:
           break;
         } 
 
-	case SWF::FILL_FOCAL_GRADIENT:
-	{
-	    matrix m = fill_styles[fno].get_gradient_matrix();
-	    matrix cm;
-	    cm.set_inverse(fillstyle_matrix);
-	    m.concatenate(cm);
-	    m.concatenate(inv_stage_matrix);
-
-	    sh.add_gradient_focal(fill_styles[fno], m, cx);
-	    break;
-	}
+        case SWF::FILL_FOCAL_GRADIENT:
+        {
+          matrix m = fill_styles[fno].get_gradient_matrix();
+          matrix cm;
+          cm.set_inverse(fillstyle_matrix);
+          m.concatenate(cm);
+          m.concatenate(inv_stage_matrix);
+          
+          sh.add_gradient_focal(fill_styles[fno], m, cx);
+          break;
+        }
 
         case SWF::FILL_TILED_BITMAP:
         case SWF::FILL_CLIPPED_BITMAP:
