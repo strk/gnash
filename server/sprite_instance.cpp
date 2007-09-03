@@ -1713,7 +1713,7 @@ public:
 
 	void operator() (character* ch)
 	{
-		// don't unload already unloaded characters
+		// don't advance unloaded characters
 		if ( ! ch->isUnloaded() ) ch->advance(delta_time);
 	}
 
