@@ -1,3 +1,10 @@
+2007-09-03 Sandro Santilli <strk@keybit.net>
+
+	* server/character.cpp (unload): call queueEventHandler before setting
+	  _unloaded to true.
+	* server/dlist.cpp (wherever characters are unloaded): call unload() after
+	  removing the character.
+
 2007-09-04 Chad Musick <chadmusick@msbx.net>
 
 	* server/font.cpp,.h: Add is_subpixel_font flag for DefineFont3 tag.

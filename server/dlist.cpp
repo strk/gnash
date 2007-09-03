@@ -217,15 +217,18 @@ DisplayList::place_character(
 		// remember bounds of old char
 		InvalidatedRanges old_ranges;	
 		(*it)->add_invalidated_bounds(old_ranges, true);	
-	
+
+		// make a copy (before replacing)
 		boost::intrusive_ptr<character> oldCh = *it;
-		bool hasUnloadEvent = oldCh->unload();
 
-		// replace existing char
+		// replace existing char (before calling unload!)
 		*it = DisplayItem(ch);
-
-		// reinsert removed character if needed
-		if ( hasUnloadEvent ) reinsertRemovedCharacter(oldCh);
+	
+		if ( oldCh->unload() )
+		{
+			// reinsert removed character if needed
+			reinsertRemovedCharacter(oldCh);
+		}
 		
 		// extend invalidated bounds
 		ch->extend_invalidated_bounds(old_ranges); 				
@@ -323,6 +326,7 @@ DisplayList::replace_character(
 	}
 	else
 	{
+		// Make a copy (before replacing)
 		boost::intrusive_ptr<character> oldch = *it;
 
 		InvalidatedRanges old_ranges;
@@ -342,14 +346,15 @@ DisplayList::replace_character(
 		// remember bounds of old char
 		oldch->add_invalidated_bounds(old_ranges, true);		
 
-		// Unload old char
-		bool hasUnloadEvent = oldch->unload();
-
-		// replace existing char		
+		// replace existing char (before calling unload)
 		*it = di;
 
-		// reinsert removed character if needed
-		if ( hasUnloadEvent ) reinsertRemovedCharacter(oldch);
+		// Unload old char
+		if ( oldch->unload() )
+		{
+			// reinsert removed character if needed
+			reinsertRemovedCharacter(oldch);
+		}
 		
 		// extend invalidated bounds
 		// WARNING: when a new Button character is added,
@@ -452,17 +457,21 @@ DisplayList::remove_display_object(int depth)
 
 	if ( it != _characters.end() )
 	{
+		// Make a copy (before erasing)
 		boost::intrusive_ptr<character> oldCh = *it;
-		bool hasUnloadEvent = oldCh->unload();
 
+		// Erase (before callign unload)
 		_characters.erase(it);
 
-		// reinsert removed character if needed
-		// NOTE: could be optimized if we knew exactly how
-		//       to handle the case in which the target depth
-		//       (after the shift) is occupied already
-		//
-		if ( hasUnloadEvent ) reinsertRemovedCharacter(oldCh);
+		if ( oldCh->unload() )
+		{
+			// reinsert removed character if needed
+			// NOTE: could be optimized if we knew exactly how
+			//       to handle the case in which the target depth
+			//       (after the shift) is occupied already
+			//
+			reinsertRemovedCharacter(oldCh);
+		}
 	}
 
 #ifndef NDEBUG
@@ -587,7 +596,8 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 	{
 		testInvariant();
 
-		DisplayItem& di = *it;
+		// Make a copy here, in case we're going to replace it
+		DisplayItem di = *it;
 
 		int di_depth = di->get_depth();
 
@@ -601,7 +611,9 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 		//if ( di->isDynamic() )
 		if ( ! info )
 		{
-			// Not to be saved, killing
+			// Replace (before calling unload)
+			it = _characters.erase(it);
+
 			if ( call_unload )
 			{
 				if ( di->unload() )
@@ -609,7 +621,7 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 					toReinsert.push_back(di);
 				}
 			}
-			it = _characters.erase(it);
+
 			continue;
 		}
 		
@@ -631,6 +643,10 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 		if( match == save.end())
 		{
 			// Not to be saved, killing
+
+			// Replace (before calling unload)
+			it = _characters.erase(it);
+
 			if ( call_unload )
 			{
 				if ( di->unload() )
@@ -638,7 +654,7 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 					toReinsert.push_back(di);
 				}
 			}
-			it = _characters.erase(it);
+
 			continue;
 		}
 
@@ -686,7 +702,8 @@ DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 		testInvariant(); // TODO: expensive
 		//log_debug("Invariant test in iteration %d worked", called++);
 
-		DisplayItem& di = *it;
+		// make a copy of the pointer here, don't take a reference
+		DisplayItem di = *it;
 
 		bool is_affected = false;
 		for (const_iterator kit = keepStart; kit != keepEnd; ++kit)
@@ -700,6 +717,10 @@ DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 
 		if (is_affected == false)
 		{
+			bool needReinsert = false;
+
+			it = _characters.erase(it);
+
 			if ( call_unload )
 			{
 				if ( di->unload() )
@@ -707,7 +728,7 @@ DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 					toReinsert.push_back(di);
 				}
 			}
-			it = _characters.erase(it);
+
 			continue;
 		}
 		it++;
@@ -736,7 +757,8 @@ DisplayList::clear(const DisplayList& from, bool call_unload)
 
 	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
 	{
-		DisplayItem& di = *it;
+		// make a copy
+		DisplayItem di = *it;
 
 		bool is_affected = false;
 		for (const_iterator kit = dropchars.begin(), kitEnd = dropchars.end(); kit != kitEnd; ++kit)
@@ -750,6 +772,8 @@ DisplayList::clear(const DisplayList& from, bool call_unload)
 
 		if (is_affected)
 		{
+			it = _characters.erase(it);
+
 			if ( call_unload )
 			{
 				if ( di->unload() )
@@ -757,7 +781,6 @@ DisplayList::clear(const DisplayList& from, bool call_unload)
 					toReinsert.push_back(di);
 				}
 			}
-			it = _characters.erase(it);
 			continue;
 		}
 		it++;

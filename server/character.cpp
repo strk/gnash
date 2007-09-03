@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.51 2007/09/01 01:20:46 strk Exp $ */
+/* $Id: character.cpp,v 1.52 2007/09/03 17:37:37 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -677,11 +677,14 @@ bool
 character::unload()
 {
 	assert(!_unloaded); // don't unload characters twice !
-	_unloaded = true;
 
 	//log_msg(_("Queuing unload event for character %p"), this);
-	return queueEventHandler(event_id::UNLOAD);
+	bool hasEvent =  queueEventHandler(event_id::UNLOAD);
 	//on_event(event_id::UNLOAD);
+
+	_unloaded = true;
+
+	return hasEvent;
 }
 
 bool
