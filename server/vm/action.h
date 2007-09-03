@@ -38,7 +38,10 @@
 #include "smart_ptr.h"
 
 #include <cwchar>
-__SGI_LIBC_USING_FROM_STD(va_list) 
+
+#ifdef __sgi
+	__SGI_LIBC_USING_FROM_STD(va_list) 
+#endif
 
 namespace gnash {
 	class sprite_instance;
