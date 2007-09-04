@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: character.cpp,v 1.52 2007/09/03 17:37:37 strk Exp $ */
+/* $Id: character.cpp,v 1.53 2007/09/04 21:50:21 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -679,45 +679,35 @@ character::unload()
 	assert(!_unloaded); // don't unload characters twice !
 
 	//log_msg(_("Queuing unload event for character %p"), this);
-	bool hasEvent =  queueEventHandler(event_id::UNLOAD);
 	//on_event(event_id::UNLOAD);
+	//bool hasEvent = queueEventHandler(event_id::UNLOAD);
+	queueEvent(event_id::UNLOAD);
+	bool hasEvent = hasEventHandler(event_id::UNLOAD);
 
 	_unloaded = true;
 
 	return hasEvent;
 }
 
-bool
-character::queueEventHandler(const event_id& id)
+void
+character::queueEvent(const event_id& id)
 {
-	bool called=false;
 
-	movie_root& root = VM::get().getRoot();
+	movie_root& root = _vm.getRoot();
+	std::auto_ptr<ExecutableCode> event(new QueuedEvent(boost::intrusive_ptr<character>(this), id));
+	root.pushAction(event);
+}
 
-	std::auto_ptr<ExecutableCode> code ( get_event_handler(id) );
-	if ( code.get() )
-	{
-		root.pushAction(code);
-		called=true;
-	}
+bool
+character::hasEventHandler(const event_id& id) const
+{
+	Events::const_iterator it = _event_handlers.find(id);
+	if ( it != _event_handlers.end() ) return true;
 
-	// This is likely wrong, we use it as a workaround
-	// to the fact that we don't distinguish between
-	// ActionScript and SWF defined events
-	// (for example: onClipLoad vs. onLoad)
-	//
-	//if (called) return;
-
-	// Check for member function.
 	boost::intrusive_ptr<as_function> method = getUserDefinedEventHandler(id.get_function_name());
-	if ( method )
-	{
-		root.pushAction(method, boost::intrusive_ptr<character>(this));
-		called = true;
-	}
+	if (method) return true;
 
-	return called;
-
+	return false;
 }
 
 boost::intrusive_ptr<as_function>

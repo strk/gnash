@@ -1,5 +1,13 @@
 2007-09-04 Sandro Santilli <strk@keybit.net>
 
+	* server/character.{cpp,h}: add hasEventHandler() and queueEvent()
+	  methods. Implement ::unload by queuing the UNLOAD event (not its
+	  handlers
+	* server/vm/ExecutableCode.h: Add QueuedEvent "executable code", for
+	  queuing events rather then handlers.
+
+2007-09-04 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.h: make execute_action() public, for use
 	  by DoActionTag (for init actions).
 	* server/swf/DoActionTag.h: execute init actions by directly

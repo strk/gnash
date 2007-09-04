@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ExecutableCode.h,v 1.9 2007/09/04 10:19:01 strk Exp $ */
+/* $Id: ExecutableCode.h,v 1.10 2007/09/04 21:50:21 strk Exp $ */
 
 #ifndef GNASH_EXECUTABLECODE_H
 #define GNASH_EXECUTABLECODE_H
@@ -170,6 +170,48 @@ private:
 	boost::intrusive_ptr<character> _target;
 
 	BufferList _buffers;
+
+};
+
+/// Generic event  (constructed by id, invoked using on_event
+class QueuedEvent: public ExecutableCode {
+
+public:
+
+	QueuedEvent(boost::intrusive_ptr<character> nTarget, const event_id& id)
+		:
+		_target(nTarget),
+		_eventId(id)
+	{}
+
+
+	ExecutableCode* clone() const
+	{
+		return new QueuedEvent(*this);
+	}
+
+	virtual void execute()
+	{
+		_target->on_event(_eventId);
+	}
+
+#ifdef GNASH_USE_GC
+	/// Mark reachable resources (for the GC)
+	//
+	/// Reachable resources are:
+	///	 - the action target (_target)
+	///
+	virtual void markReachableResources() const
+	{
+		if ( _target ) _target->setReachable();
+	}
+#endif // GNASU_USE_GC
+
+private:
+
+	boost::intrusive_ptr<character> _target;
+
+	const event_id _eventId;
 
 };
 

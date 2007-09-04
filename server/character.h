@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: character.h,v 1.93 2007/09/03 07:42:59 strk Exp $ */
+/* $Id: character.h,v 1.94 2007/09/04 21:50:21 strk Exp $ */
 
 #ifndef GNASH_CHARACTER_H
 #define GNASH_CHARACTER_H
@@ -866,11 +866,22 @@ public:
 		return false;
 	}
 
-	/// Queue event handler(s), if any.
+	/// Queue event in the global action queue.
 	//
-	/// @return true if any event handler was queued, false otherwise.
+	/// on_event(id) will be called by execution of the queued
+	/// action
 	///
-	bool queueEventHandler(const event_id& id);
+	void queueEvent(const event_id& id);
+
+	/// Return true if an handler for the given event is defined
+	//
+	/// NOTE that we look for both clip-defined and user-defined
+	/// handlers, which is likely error prone since we're doing
+	/// this in a non-virtual function. Main use for this method
+	/// is for being called by ::unload() to verify an Unload handler
+	/// is available.
+	///
+	bool hasEventHandler(const event_id& id) const;
 
 	virtual void on_button_event(const event_id& id)
 	{
