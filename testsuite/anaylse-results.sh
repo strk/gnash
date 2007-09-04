@@ -38,6 +38,10 @@ for dir in `find . -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
 	echo -n " $nofail real failures"
 	total_fail=`expr $total_fail + $nofail`
     fi
+    if test $noxpass -gt 0; then
+	echo -n " $noxpass unexpected successes"
+	total_xpass=`expr $total_xpass + $noxpass`
+    fi
     if test $nopass -gt 0; then
 	if test $nofail -gt 0; then
 	    echo -n ", $nopass passes"
@@ -86,6 +90,9 @@ if test ${total_unresolved} -gt 0; then
 fi
 if test ${total_xfail} -gt 0; then
     echo "	Total expected failures: ${total_xfail}"
+fi
+if test ${total_xpass} -gt 0; then
+    echo "	Total unexpected successes: ${total_xpass}"
 fi
 if test ${total_untested} -gt 0; then
     echo "	Total untested: ${total_untested}"

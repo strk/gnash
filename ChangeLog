@@ -1,3 +1,7 @@
+2007-09-04 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/anaylse-results.sh: print also unexpected successes.
+
 2007-09-04 Asger Ottar Alstrup <asger@area9.dk>
 
 	* server/edit_text_character.cpp: add minimal support for htmlText.
