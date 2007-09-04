@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.135 2007/09/02 12:57:01 cmusick Exp $ */
+/* $Id: tag_loaders.cpp,v 1.136 2007/09/04 11:27:43 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1063,7 +1063,10 @@ void define_shape_loader(stream* in, tag_type tag, movie_definition* m)
 
 void define_shape_morph_loader(stream* in, tag_type tag, movie_definition* m)
 {
-    assert(tag == SWF::DEFINEMORPHSHAPE); // 46
+    assert(tag == SWF::DEFINEMORPHSHAPE
+		|| tag == SWF::DEFINEMORPHSHAPE2
+		|| tag == SWF::DEFINEMORPHSHAPE2_); 
+
     uint16_t character_id = in->read_u16();
 
     IF_VERBOSE_PARSE

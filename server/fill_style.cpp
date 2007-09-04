@@ -71,10 +71,15 @@ fill_style::~fill_style()
 }
 
 void
-fill_style::read(stream* in, int tag_type, movie_definition* md)
+fill_style::read(stream* in, int tag_type, movie_definition* md,
+	fill_style *pOther)
 {
+	const bool is_morph = pOther != NULL;
+
     in->ensureBytes(1);
     m_type = in->read_u8();
+	if (is_morph)
+		pOther->m_type = m_type;
 
 		IF_VERBOSE_PARSE
 		(
@@ -85,9 +90,11 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
     {
         // 0x00: solid fill
         if ( tag_type == SWF::DEFINESHAPE3 || tag_type == SWF::DEFINESHAPE4
-			|| tag_type == SWF::DEFINESHAPE4_)
+			|| tag_type == SWF::DEFINESHAPE4_ || is_morph)
         {
             m_color.read_rgba(in);
+			if (is_morph)
+				pOther->m_color.read_rgba(in);
         }
         else 
         {
@@ -128,8 +135,20 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 
         matrix	m;
         m.set_inverse(input_matrix);
+
+		if (is_morph)
+		{
+			pOther->m_gradient_matrix = m_gradient_matrix;
+		}
         m_gradient_matrix.concatenate(m);
-				
+		
+		if (is_morph)
+		{
+			input_matrix.read(in);
+			m.set_inverse(input_matrix);
+			pOther->m_gradient_matrix.concatenate(m);
+		}
+		
         // GRADIENT
         in->ensureBytes(1);
 		// num_gradients is not 8 bits, it is only the last 4.
@@ -152,9 +171,14 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
                     num_gradients);
         }			
 
+		if (is_morph)
+			pOther->m_gradients.resize(num_gradients);
+
         m_gradients.resize(num_gradients);
-        for (int i = 0; i < num_gradients; i++)	{
-            m_gradients[i].read(in, tag_type);
+   	    for (int i = 0; i < num_gradients; i++)	{
+       	    m_gradients[i].read(in, tag_type);
+			if (is_morph)
+				pOther->m_gradients[i].read(in, tag_type);
         }
 
 		// A focal gradient also has a focal point.
@@ -167,6 +191,9 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
 				m_focal_point = 1.0f;
 		}
 
+		if (is_morph)
+			pOther->m_focal_point = m_focal_point;
+
 		IF_VERBOSE_PARSE
 		(
         log_parse("  gradients: num_gradients = %d", num_gradients);
@@ -175,10 +202,18 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         // @@ hack.
         if (num_gradients > 0) {
             m_color = m_gradients[0].m_color;
+			if (is_morph)
+				pOther->m_color = m_gradients[0].m_color;
         }
 
         if (md->get_create_bitmaps() == DO_LOAD_BITMAPS) {
             m_gradient_bitmap_info = create_gradient_bitmap();
+			if (is_morph)
+			{
+				pOther->m_gradient_bitmap_info = 
+					pOther->create_gradient_bitmap();
+				md->add_bitmap_info(pOther->m_gradient_bitmap_info.get());
+			}
         // Make sure our movie_def_impl knows about this bitmap.
         md->add_bitmap_info(m_gradient_bitmap_info.get());
         }
@@ -228,6 +263,11 @@ fill_style::read(stream* in, int tag_type, movie_definition* md)
         // TWIPS-to-texcoords matrix.
         m_bitmap_matrix.set_inverse(m);
 
+		if (is_morph)
+		{
+			m.read(in);
+			pOther->m_bitmap_matrix.set_inverse(m);
+		}
         IF_VERBOSE_PARSE(
             m_bitmap_matrix.print();
         );

@@ -5,7 +5,7 @@
 
 // line style types.
 
-/* $Id: styles.h,v 1.21 2007/09/02 12:57:01 cmusick Exp $ */
+/* $Id: styles.h,v 1.22 2007/09/04 11:27:42 cmusick Exp $ */
 
 #ifndef GNASH_STYLES_H
 #define GNASH_STYLES_H
@@ -59,6 +59,11 @@ public:
 	///
 	void	read(stream* in, int tag_type, movie_definition *md);
 	
+	/// Read two lines styles from the SWF stream
+	/// at the same time -- this is used in morphing.
+	void read_morph(stream* in, int tag_type, movie_definition *md,
+		line_style *pOther);
+
 	/// Return thickness of the line, in TWIPS
 	uint16_t	get_width() const { return m_width; }
 

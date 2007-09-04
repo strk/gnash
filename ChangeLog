@@ -1,3 +1,15 @@
+2007-09-04 Chad Musick <chadmusick@msbx.net>
+
+	* server/fill_style.cpp,.h: Let fill style know how to read
+	  morph (2) type styles as well, to avoid duplicating lots
+	  of code.
+	* server/styles.cpp,.h: Fill line style know how to read
+	  morph2 tags for the same reason.
+	* server/impl.cpp: Change MORPHSHAPE2 loader to activate it.
+	* server/parser/morph2_character_def.cpp: Parse MorphShape2
+	  tags as well as MorphShape.
+	* server/swf/tag_loaders.cpp: Recognize MorphShape2 tags.
+
 2007-09-04 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ActionExec.{cpp,h}: add an _abortOnUnload flag

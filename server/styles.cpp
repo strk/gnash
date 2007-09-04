@@ -29,6 +29,54 @@ line_style::line_style()
 {
 }
 
+void
+line_style::read_morph(stream* in, int tag_type, movie_definition *md,
+	line_style *pOther)
+{
+	if (tag_type == SWF::DEFINEMORPHSHAPE)
+	{
+		m_width = in->read_u16();
+		pOther->m_width = in->read_u16();
+		m_color.read(in, tag_type);
+		pOther->m_color.read(in, tag_type);
+		return;
+	}
+
+	// MorphShape 2 from here down.
+	in->ensureBytes(4);
+	m_width = in->read_u16();
+	pOther->m_width = in->read_u16();
+	// TODO: Same as in read(...), use these.
+	// 0 -- Round caps, 1 -- No caps, 2 -- square caps
+	uint8_t caps = in->read_uint(2);
+	// 0 -- Round join, 1 -- Bevel join, 2 -- Miter join
+	uint8_t joins = in->read_uint(2);
+	bool has_fill = in->read_uint(1);
+	bool no_hscale = in->read_uint(1);
+	bool no_vscale = in->read_uint(1);
+	bool pixel_hinting = in->read_uint(1);
+	static_cast<void> (in->read_uint(5));
+	bool no_close = in->read_uint(1);
+	bool end_cap_style = in->read_uint(2); // As caps above.
+	if (joins == 2)
+	{
+		float f_miter = in->read_short_ufixed();
+	}
+	if (has_fill)
+	{
+		// TODO: Throwing this away is not the right thing.
+		// What is?
+		// A fill style is here.
+		fill_style f, g;
+		f.read(in, tag_type, md, &g);
+		m_color = f.get_color();
+	}
+	else
+	{
+		m_color.read(in, tag_type);
+		pOther->m_color.read(in, tag_type);
+	}
+}
 
 void
 line_style::read(stream* in, int tag_type, movie_definition *md)
@@ -57,6 +105,10 @@ line_style::read(stream* in, int tag_type, movie_definition *md)
 	bool no_close = in->read_uint(1);
 	bool end_cap_style = in->read_uint(2); // As caps above.
 	if (joins == 2)
+	{
+		/*float f_miter =*/static_cast<void>(in->read_short_ufixed());
+	}
+	if (has_fill)
 	{
 		// TODO: Throwing this away is not the right thing.
 		// What is?
