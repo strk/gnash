@@ -2269,6 +2269,8 @@ void sprite_instance::advance_sprite(float delta_time)
 {
 	//GNASH_REPORT_FUNCTION;
 
+	assert(!isUnloaded());
+
 	// Process any pending loadVariables request
 	processCompletedLoadVariableRequests();
 
@@ -2278,6 +2280,13 @@ void sprite_instance::advance_sprite(float delta_time)
 	if (m_on_event_load_called)
 	{
 		on_event(event_id::ENTER_FRAME);
+		if ( isUnloaded() )
+		{
+			log_debug("%s enterFrame event handler unloaded self", getTarget().c_str());
+			// TODO: check if we should still advance the frame counter
+			//       can be checked, if we're still reachable, by fetching _currentframe.
+			return;
+		}
 	}
 
 #ifdef GNASH_DEBUG
@@ -2397,6 +2406,11 @@ void sprite_instance::advance(float delta_time)
 		log_msg(_("Calling ONLOAD event"));
 #endif
 		on_event(event_id::LOAD);	// clip onload
+		if (isUnloaded())
+		{
+			log_debug("%s load event handler unloaded self", getTarget().c_str());
+			return;
+		}
 
 		if (m_has_key_event)
 		{
@@ -3343,6 +3357,8 @@ sprite_instance::call_method_args(const char* method_name,
 void
 sprite_instance::construct()
 {
+	assert(!isUnloaded());
+
 	_origTarget = getTarget();
 
 #ifdef GNASH_DEBUG
@@ -3356,6 +3372,12 @@ sprite_instance::construct()
 	assert( oldDisplayList.empty() );
 
 	on_event(event_id::CONSTRUCT);
+	if (isUnloaded())
+	{
+		log_debug("%s construct event handler unloaded self", getTarget().c_str());
+		// TODO: check if we should still execute frame tags (dlist ones in particular)
+		return;
+	}
 
 	execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
 
