@@ -1,5 +1,6 @@
 2007-09-04 Sandro Santilli <strk@keybit.net>
 
+	* NEWS: updated by copying from 0.8.1
 	* server/edit_text_character.cpp: support case-insensitive
 	  htmlText property (for SWF6).
 	* testsuite/actionscript.all/TextField.as: fix expected results

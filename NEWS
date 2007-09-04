@@ -1,4 +1,24 @@
-2007-06-XX  Rob Savoye  <rob@darkstar.welcomehome.org>
+2007-08-29  Sandro Santilli <strk@keybit.net>
+
+Fourth alpha release of Gnash (0.8.1).
+Improvements since 0.8.0 release are:
+
+	- Garbage Collector
+	- Support for device fonts
+	- Support for dynamic text fields
+	- Better key handling
+	- Support for FFMPEG SVN
+	- Support for on-demand install of needed Gstreamer codec plugins.
+	- Debugger off by default (improves performance and memory use)
+	- AGG renderer by default 
+	- Support for KDE/AGG combination
+	- Layout change : we'll now build <gui>-gnash and 'gnash' is a shell
+	  script with gui selection capabilities (-G)
+	- More robust parser 
+	- Better support for flash player detection
+	- Fix for 'debugLog' directive in gnashrc
+
+07-06-XX  Rob Savoye  <rob@darkstar.welcomehome.org>
 
 The third alpha release of Gnash. Improvements since the 0.7.2 release
 are: 
