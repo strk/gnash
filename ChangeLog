@@ -1,3 +1,8 @@
+2007-09-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* configure.ac: make kde development package advice
+	  accurate (see bug #20908).
+
 2007-09-04 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.cpp (reset): don't ::unload() again
