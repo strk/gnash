@@ -86,8 +86,6 @@ sprite_definition::read(stream* in)
 	{
 		SWF::tag_type tag_type = in->open_tag();
 
-parse_tag:
-
 		SWF::TagLoadersTable::loader_function lf = NULL;
 
 		IF_VERBOSE_MALFORMED_SWF(
