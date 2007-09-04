@@ -85,6 +85,14 @@
     check_equals(mc1.getDepth(), -16383);
   .end
 
+// No matter onUnload defined or not, the above actions still got skipped.
+//#define DEFINE_ONUNLOAD
+#ifdef DEFINE_ONUNLOAD
+  .action:
+    // Define onUnload(for deduction)
+     mc1.onUnload = function () {};
+  .end
+#endif
 
 .frame 3 
   .sprite mc2 // Define mc2 and add init_actions for it
