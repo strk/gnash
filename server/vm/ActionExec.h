@@ -118,6 +118,8 @@ private:
 	///
 	void fixStackUnderrun(size_t required);
 
+	bool _abortOnUnload;
+
 public:
 
 	/// \brief
@@ -176,7 +178,11 @@ public:
 	/// @param newEnv
 	///	the execution environment (variables scope, stack etc.)
 	///
-	ActionExec(const action_buffer& abuf, as_environment& newEnv);
+	/// @param abortOnUnloaded
+	///	If true (the default) execution aborts as soon as the target sprite is unloaded.
+	///	NOTE: original target is fetched from the environment.
+	///
+	ActionExec(const action_buffer& abuf, as_environment& newEnv, bool abortOnUnloaded=true);
 
 	/// Create an execution thread for a function call.
 	//

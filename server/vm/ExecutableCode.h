@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ExecutableCode.h,v 1.8 2007/08/20 15:15:29 strk Exp $ */
+/* $Id: ExecutableCode.h,v 1.9 2007/09/04 10:19:01 strk Exp $ */
 
 #ifndef GNASH_EXECUTABLECODE_H
 #define GNASH_EXECUTABLECODE_H
@@ -148,7 +148,7 @@ public:
 		for (BufferList::iterator it=_buffers.begin(), itEnd=_buffers.end();
 				it != itEnd; ++it)
 		{
-			ActionExec exec(*(*it), _target->get_environment());
+			ActionExec exec(*(*it), _target->get_environment(), false);
 			exec();
 		}
 	}

@@ -1,3 +1,17 @@
+2007-09-04 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/ActionExec.{cpp,h}: add an _abortOnUnload flag
+	  for premature abortion of action buffers being executed,
+	  always false for functions and true by default for
+	  global code (overridable by a third optional constructor
+	  argument). Check target for being unloaded (if _abortOnUnload)
+	  at opcode-level.
+	* server/vm/ExecutableCode.h (EventCode): set _abortOnUnload
+	  to false when constructing ActionExec for event code.
+	* testsuite/misc-swfc.all/: movieclip_destruction_test1.sc,
+	  movieclip_destruction_test3.sc: successes with premature
+	  abortion of action buffers.
+
 2007-09-04 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* configure.ac: make kde development package advice

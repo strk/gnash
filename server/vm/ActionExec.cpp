@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.41 2007/08/10 15:17:44 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.42 2007/09/04 10:19:01 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -85,7 +85,8 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 	stop_pc(pc+func.getLength()),
 	next_pc(pc),
 	env(newEnv),
-	retval(nRetVal)
+	retval(nRetVal),
+	_abortOnUnload(false)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -106,7 +107,7 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 	}
 }
 
-ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
+ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool abortOnUnloaded)
 	:
 	with_stack(),
 	_scopeStack(), // TODO: initialize the scope stack somehow
@@ -118,7 +119,8 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv)
 	stop_pc(code.size()),
 	next_pc(0),
 	env(newEnv),
-	retval(0)
+	retval(0),
+	_abortOnUnload(abortOnUnloaded)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -166,6 +168,11 @@ ActionExec::operator() ()
 	try {
 	while (pc<stop_pc)
 	{
+		if ( _abortOnUnload && _original_target->isUnloaded() )
+		{
+			log_debug("Target of action_buffer unloaded during execution, discarding %d remaining opcodes", stop_pc-pc);
+			break;
+		}
 
 	    // Cleanup any expired "with" blocks.
 	    while ( ! with_stack.empty() && pc >= with_stack.back().end_pc() ) {
