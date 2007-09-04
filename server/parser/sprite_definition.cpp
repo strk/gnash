@@ -86,6 +86,8 @@ sprite_definition::read(stream* in)
 	{
 		SWF::tag_type tag_type = in->open_tag();
 
+parse_tag:
+
 		SWF::TagLoadersTable::loader_function lf = NULL;
 
 		IF_VERBOSE_MALFORMED_SWF(
@@ -118,18 +120,17 @@ sprite_definition::read(stream* in)
 				// better break then sorry
 
 				in->close_tag();
-				while ( in->open_tag() != SWF::END )
+				if ( in->open_tag() != SWF::END )
 				{
 					IF_VERBOSE_MALFORMED_SWF(
 					log_swferror(_("last SHOWFRAME of a "
 						"DEFINESPRITE tag "
 						"isn't followed by an END."
-						" Seeking to next END tag."));
+						" Stopping for safety."));
 					);
 					in->close_tag();
+					return;
 				}
-
-				break;
 			}
 		}
 		else if (_tag_loaders.get(tag_type, &lf))

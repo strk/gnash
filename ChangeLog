@@ -1,5 +1,12 @@
 2007-09-04 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/sprite_definition.cpp (read): simplify handling of
+	  malformed sprite definition (last SHOWFRAME not followed by END).
+	  Fixes high CPU use and inresponsiveness while playing
+	  gnashcrash.swf.
+
+2007-09-04 Sandro Santilli <strk@keybit.net>
+
 	* server/character.{cpp,h}: add hasEventHandler() and queueEvent()
 	  methods. Implement ::unload by queuing the UNLOAD event (not its
 	  handlers
