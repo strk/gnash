@@ -150,7 +150,8 @@
     
     check_equals(_root.testvar1, 100);
     check_equals(_root.testvar2, 200);
-    check_equals(typeof(_root.mc4), 'undefined');  
+    check_equals(typeof(_root.mc4Ref), 'movieclip');  
+    check_equals(_root.mc4Ref.valueOf(), undefined);
   .end
 
 //
