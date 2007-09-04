@@ -1,5 +1,15 @@
 2007-09-04 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.h: make execute_action() public, for use
+	  by DoActionTag (for init actions).
+	* server/swf/DoActionTag.h: execute init actions by directly
+	  execute them (opposed to use add_action_buffer which queues them)
+	* server/sprite_instance.cpp (execute_frame_tags): simplify execution
+	  of init tag (simply execute them rather then have them queue and
+	  then execute the queue).
+
+2007-09-04 Sandro Santilli <strk@keybit.net>
+
 	* NEWS: updated by copying from 0.8.1
 	* server/edit_text_character.cpp: support case-insensitive
 	  htmlText property (for SWF6).

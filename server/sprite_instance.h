@@ -481,6 +481,8 @@ public:
 	    m_action_list.push_back(a);
 	}
 
+	/// Execute a single action buffer (DOACTION block)
+	void execute_action(const action_buffer& ab);
 
 	/// For debugging -- return the id of the character
 	/// at the specified depth.
@@ -827,9 +829,6 @@ private:
 	/// global list (see movie_root).
 	///
 	void queueActions(ActionList& action_list);
-
-	/// Execute a single action buffer (DOACTION block)
-	void execute_action(const action_buffer& ab);
 
 	/// Execute the actions in the action list
 	//

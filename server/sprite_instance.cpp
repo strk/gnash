@@ -2515,7 +2515,7 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 			);
 
 
-			// Need to execute these actions.
+			// Need to execute these actions (init actions should be executed immediately)
 			std::for_each(init_actions->begin(), init_actions->end(),
 				std::bind2nd(std::mem_fun(&execute_tag::execute), this));
 
@@ -2523,7 +2523,7 @@ sprite_instance::execute_frame_tags(size_t frame, int typeflags)
 			// init actions again.
 			m_init_actions_executed[frame] = true;
 
-			do_actions();
+			//do_actions();
 		}
 	}
 

@@ -19,7 +19,7 @@
 //
 //
 
-/* $Id: DoActionTag.h,v 1.3 2007/07/01 10:54:35 bjacques Exp $ */
+/* $Id: DoActionTag.h,v 1.4 2007/09/04 20:50:00 strk Exp $ */
 
 #ifndef GNASH_SWF_DOACTIONTAG_H
 #define GNASH_SWF_DOACTIONTAG_H
@@ -51,6 +51,11 @@ class DoActionTag : public execute_tag
 {
 public:
 
+	DoActionTag(bool isInitAction)
+		:
+		_isInitAction(isInitAction)
+	{}
+
 	/// Read a DoAction block from the stream
 	//
 	void read(stream* in)
@@ -60,7 +65,15 @@ public:
 
 	virtual void execute(sprite_instance* m) const
 	{
-	    m->add_action_buffer(&m_buf);
+		if ( _isInitAction )
+		{
+			m->execute_action(m_buf);
+		}
+		else
+		{
+			//m->queueActions(m_buf);
+	    		m->add_action_buffer(&m_buf);
+		}
 	}
 
 	// Tell the caller that we are an action tag.
@@ -71,7 +84,7 @@ public:
 
 	static void doActionLoader(stream* in, tag_type tag, movie_definition* m)
 	{
-		DoActionTag* da = new DoActionTag;
+		DoActionTag* da = new DoActionTag(false);
 		da->read(in);
 
 		IF_VERBOSE_PARSE (
@@ -84,7 +97,7 @@ public:
 
 	static void doInitActionLoader(stream* in, tag_type tag, movie_definition* m)
 	{
-		DoActionTag* da = new DoActionTag;
+		DoActionTag* da = new DoActionTag(true);
 		int cid = in->read_u16();
     		UNUSED(cid);
 		da->read(in);
@@ -98,6 +111,8 @@ public:
 	}
 
 private:
+
+	bool _isInitAction;
 
 	action_buffer m_buf;
 };
