@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.412 2007/08/30 00:12:18 nihilus Exp $
+dnl $Id: configure.ac,v 1.413 2007/09/04 08:21:41 bwy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1560,8 +1560,8 @@ if test x$build_kde = xyes -o x$kparts = xyes; then
     echo "        KDE libs are: $KDE_LIBS"
   else
       echo "        ERROR: No KDE development package installed!"
-      echo "               Reconfigure with --disable-kparts and/or"
-      echo "               omit 'kde' from the guis listed with --enable-gui=..."
+      echo "               Reconfigure using --enable-gui=..."
+      echo "               to choose a different gui"
       echo "               or install the KDE development environment from http://kde.org"
       echo "               or .deb users: apt-get install kdelibs-dev"
       echo "               or .rpm users: yum install <something-else>."
