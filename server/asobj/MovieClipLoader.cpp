@@ -309,7 +309,7 @@ MovieClipLoader::markReachableResources() const
 	assert(isReachable());
 
 	// mark listeners
-	for(Listeners::iterator i=_listeners.begin(), e=_listeners.end(); i!=e; ++i)
+	for(Listeners::const_iterator i=_listeners.begin(), e=_listeners.end(); i!=e; ++i)
 	{
 		(*i)->setReachable();
 	}
