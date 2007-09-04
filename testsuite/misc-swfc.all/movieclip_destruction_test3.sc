@@ -99,11 +99,23 @@
     check_equals(typeof(nestedMovieClip.mc11), 'movieclip');
     check_equals(typeof(nestedMovieClip.mc11.mc111), 'movieclip');
     check_equals(typeof(nestedMovieClip.mc11.mc111.mc1111), 'movieclip');
-    
-    // Define onUnload(for deduction)
-    // nestedMovieClip.onUnload = function () {};
-    // nestedMovieClip.mc11.mc111.mc1111 = function () {};
   .end
+
+#define DEFINE_ONUNLOAD
+#ifdef DEFINE_ONUNLOAD
+  .action:
+    // Define onUnload(for deduction)
+     nestedMovieClip.onUnload = function () {};
+     nestedMovieClip.mc11.mc111.onUnload = function () {};
+     nestedMovieClip.mc11.mc111.mc1111.onUnload = function () {};
+  .end
+
+.frame 10
+	.action:
+		// Check 'nestedMovieClip' has unloaded but not destroyed
+		 check_equals(nestedMovieClip.getDepth(), -32779);
+	.end
+#endif 
 
 .frame 20
   .action:  
