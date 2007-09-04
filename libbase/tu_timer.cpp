@@ -31,6 +31,7 @@ uint64_t	tu_timer::get_profile_ticks()
 {
 	// @@ use rdtsc?
 
+	//Nano-second timer.
 	LARGE_INTEGER	li;
 	QueryPerformanceCounter(&li);
 
