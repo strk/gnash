@@ -1,3 +1,7 @@
+2007-09-04 Asger Ottar Alstrup <asger@area9.dk>
+
+	* server/edit_text_character.cpp: add minimal support for htmlText.
+
 2007-09-04 Chad Musick <chadmusick@msbx.net>
 
 	* server/fill_style.cpp,.h: Let fill style know how to read

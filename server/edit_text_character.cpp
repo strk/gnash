@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.107 2007/09/03 09:40:20 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.108 2007/09/04 16:00:38 meteoryte Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -737,8 +737,30 @@ edit_text_character::set_member(const std::string& name,
 	switch (std_member)
 	{
 	default:
-	case M_INVALID_MEMBER:
 		break;
+	case M_INVALID_MEMBER:
+	{
+		if (name == "htmlText")
+		{	// Minimal parsing of HTML: Strip all tags
+			int version = get_parent()->get_movie_definition()->get_version();
+			std::string html = val.to_string_versioned(version);
+			std::string textOnly = std::string();
+			bool inTag = false;
+			for (unsigned int i = 0; i < html.length(); ++i)
+			{
+				if (inTag)
+				{
+					inTag = html[i] != '>';
+				} else {
+					inTag = html[i] == '<';
+					if (!inTag) textOnly += html[i];
+				}
+			}
+			set_text_value(textOnly.c_str());
+			return;
+		}
+		break;
+	}
 	case M_TEXT:
 		//if (name == "text")
 	{
@@ -883,7 +905,12 @@ edit_text_character::get_member(const std::string& name, as_value* val)
 	switch (std_member)
 	{
 	default:
+		break;
 	case M_INVALID_MEMBER:
+		if (name == "htmlText") {
+			val->set_string(get_text_value());
+			return true;
+		}
 		break;
 	case M_TEXT:
 		//if (name == "text")
