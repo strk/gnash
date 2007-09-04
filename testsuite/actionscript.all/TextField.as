@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.21 2007/08/31 21:53:33 strk Exp $";
+rcsid="$Id: TextField.as,v 1.22 2007/09/04 19:33:09 strk Exp $";
 
 #include "check.as"
 
@@ -284,20 +284,20 @@ tf.html = false;
 
 // Check TextField.htmlText (the displayed text in explicit HTML)
 
-xcheck_equals(typeof(tf.htmlText), 'string');
+check_equals(typeof(tf.htmlText), 'string');
 check(!tf.hasOwnProperty('htmlText'));
-xcheck_equals(tf.htmlText, '');
+check_equals(tf.htmlText, '');
 tf.htmlText = new Array;
-xcheck_equals(typeof(tf.htmlText), 'string'); // forced cast to string
+check_equals(typeof(tf.htmlText), 'string'); // forced cast to string
 xcheck_equals(tf.htmlText, ''); 
 check_equals(tf.html, false);
 tf.htmlText = "Hello <b>html</b> world";
 check_equals(tf.html, false); // assigning to htmlText doesn't change the 'html' flag
-check_equals(tf.htmlText, 'Hello <b>html</b> world');
+xcheck_equals(tf.htmlText, 'Hello <b>html</b> world'); // gnash fails by stripping the html tags
 // Changing htmlText also changes text
-xcheck_equals(tf.text, 'Hello <b>html</b> world');
+xcheck_equals(tf.text, 'Hello <b>html</b> world'); // gnash likely succeeds here, but strips html tags...
 tf.text = "Hello world";
-xcheck_equals(tf.htmlText, 'Hello world');
+check_equals(tf.htmlText, 'Hello world');
 
 // Check TextField.length  (number of characters in text)
 

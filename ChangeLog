@@ -1,5 +1,9 @@
 2007-09-04 Sandro Santilli <strk@keybit.net>
 
+	* server/edit_text_character.cpp: support case-insensitive
+	  htmlText property (for SWF6).
+	* testsuite/actionscript.all/TextField.as: fix expected results
+	  (more successes, one failure which only worked by luck before).
 	* testsuite/anaylse-results.sh: print also unexpected successes.
 
 2007-09-04 Asger Ottar Alstrup <asger@area9.dk>

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.108 2007/09/04 16:00:38 meteoryte Exp $ */
+/* $Id: edit_text_character.cpp,v 1.109 2007/09/04 19:33:08 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -740,7 +740,7 @@ edit_text_character::set_member(const std::string& name,
 		break;
 	case M_INVALID_MEMBER:
 	{
-		if (name == "htmlText")
+		if (name == PROPNAME("htmlText"))
 		{	// Minimal parsing of HTML: Strip all tags
 			int version = get_parent()->get_movie_definition()->get_version();
 			std::string html = val.to_string_versioned(version);
@@ -907,7 +907,7 @@ edit_text_character::get_member(const std::string& name, as_value* val)
 	default:
 		break;
 	case M_INVALID_MEMBER:
-		if (name == "htmlText") {
+		if (name == PROPNAME("htmlText")) {
 			val->set_string(get_text_value());
 			return true;
 		}
