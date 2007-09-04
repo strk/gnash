@@ -1,3 +1,12 @@
+2007-09-04 Sandro Santilli <strk@keybit.net>
+
+	* server/dlist.cpp (reset): don't ::unload() again
+	  on already unloaded characters. They might still be
+	  in the list (and not in the removed zone) due to their
+	  having an onUnload handler to be invoked when their parent
+	  was unloaded. Fixes last assertion failure in bug #20949
+	  (copter.swf)
+
 2007-09-04 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-swfc.all/movieclip_destruction_test{1,3,4}.sc: more tests.

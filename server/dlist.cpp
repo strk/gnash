@@ -599,6 +599,13 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 		// Make a copy here, in case we're going to replace it
 		DisplayItem di = *it;
 
+		// Character already unloaded, leave it where it is
+		if ( di->isUnloaded() )
+		{
+			++it;
+			continue;
+		}
+
 		int di_depth = di->get_depth();
 
 		/// We won't scan chars in the dynamic depth zone
