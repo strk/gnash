@@ -18,7 +18,7 @@
 // 
 //
 
-/* $Id: render_handler_tri.cpp,v 1.20 2007/08/23 09:53:03 udog Exp $ */
+/* $Id: render_handler_tri.cpp,v 1.21 2007/09/04 02:12:55 cmusick Exp $ */
 
 #include "render_handler_tri.h"
 
@@ -226,7 +226,8 @@ void triangulating_render_handler::apply_fill_style(const fill_style& style,
     fill_style_color(fill_side, style.m_color); 
   }
   else if (style.m_type == SWF::FILL_LINEAR_GRADIENT
-    || style.m_type == SWF::FILL_RADIAL_GRADIENT)
+    || style.m_type == SWF::FILL_RADIAL_GRADIENT
+	|| style.m_type == SWF::FILL_FOCAL_GRADIENT)
   {
     // 0x10: linear gradient fill
     // 0x12: radial gradient fill

@@ -1,3 +1,8 @@
+2007-09-04 Chad Musick <chadmusick@msbx.net>
+
+	* backend/render_handler_tri.cpp: Enabling focal gradient fills on
+	  renderers other than AGG.
+
 2007-09-04 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: fix some bogus tests
