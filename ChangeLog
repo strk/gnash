@@ -1,3 +1,8 @@
+2007-09-04 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: fix some bogus tests
+	  caused by bogus compiler convertion, and a few more tests, all passed.
+	  
 2007-09-03 Sandro Santilli <strk@keybit.net>
 
 	* server/character.cpp (unload): call queueEventHandler before setting

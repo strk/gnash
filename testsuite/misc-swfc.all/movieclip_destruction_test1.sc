@@ -122,37 +122,68 @@
   .end
 
 
-// seperate tests to see if the whole function body get executed?
-// yes in this case.
+//
+// Seperate tests.
+// Test that the whole function body still get executed even when
+// 'this' object is null(removed by MovieClip.removeMovieClip()).
 .frame 8
   .action:
     _root.createEmptyMovieClip("mc4", 100);
-    
+    mc4Ref = mc4;
     check_equals(typeof(_root.mc4), 'movieclip');
-    
+        
     mc4.func = function (clip)
     {
-    	_root.check_equals(this.valueOf(), mc4);
+      _root.check_equals(this.valueOf(), mc4);
       _root.testvar1 = 100;
-      clip.removeMovieClip(); 
-      _root.xcheck_equals(typeof(_root.mc4), 'undefined');
-      _root.xcheck_equals(typeof(this), 'movieclip');
-      _root.xcheck_equals(this.valueOf(), null);  // this pointer is null!
+      // don't use clip.removeMovieClip here, to avoid bogus compiler conversion.
+      // 'removeMovieClip' is converted to lower case with the above format.
+      // This is a swf7 file.
+      clip['removeMovieClip']();  
+      _root.check_equals(typeof(_root.mc4), 'undefined');
+      _root.check_equals(typeof(this), 'movieclip');
+      _root.check_equals(this.valueOf(), null);  // this pointer is null!
       _root.testvar2 = 200;
     };
     
-    mc4.fun(mc4); // invoke the function and remove mc
+    mc4.func(mc4); // invoke the function and remove mc4
     
-    xcheck_equals(_root.testvar1, 100);
-    xcheck_equals(_root.testvar2, 200);
-    xcheck_equals(typeof(_root.mc4), 'undefined');
+    check_equals(_root.testvar1, 100);
+    check_equals(_root.testvar2, 200);
+    check_equals(typeof(_root.mc4), 'undefined');  
+  .end
+
+//
+// seperate tests.
+// similar to tests in frame8, but onUnload is defined for the given movieClip
+.frame 10
+  .action:  
+    _root.createEmptyMovieClip("mc5", 200);
+    check_equals(typeof(_root.mc5), 'movieclip');
     
-    _root.note(mc4);
+    mc5.onUnload = function () {}; // Define onUnload for mc5
+    
+    mc5.func = function (clip)
+    {
+      _root.check_equals(this.valueOf(), mc5);
+      _root.testvar1 = 300;
+      clip['removeMovieClip']();
+      _root.check_equals(typeof(_root.mc5), 'movieclip');
+      _root.check_equals(typeof(this), 'movieclip');
+      _root.check_equals(this, _root.mc5);  
+      _root.testvar2 = 400;
+    };
+    
+    mc5.func(mc5); // invoke the function and remove mc5
+    
+    check_equals(_root.testvar1, 300);
+    check_equals(_root.testvar2, 400);
+    check_equals(typeof(_root.mc5), 'movieclip');  
+    check_equals(mc5.getDepth(), -32969); 
     
     stop();
     totals();
   .end
- 
 
 .end
 
