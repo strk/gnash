@@ -1,6 +1,9 @@
 2007-09-05 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/asobj/MovieClipLoader.cpp: iterator -> const_iterator.
+	* libbase/timer.cpp: Added commentary.
+	* backend/sound_handler_sdl.cpp: Fixed conflict with namespaces from
+	 booost/cstdint.hpp.
 
 2007-09-04 Sandro Santilli <strk@keybit.net>
 

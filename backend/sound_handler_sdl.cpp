@@ -18,7 +18,7 @@
 // Based on sound_handler_sdl.cpp by Thatcher Ulrich http://tulrich.com 2003
 // which has been donated to the Public Domain.
 
-// $Id: sound_handler_sdl.cpp,v 1.82 2007/08/14 09:29:12 tgc Exp $
+// $Id: sound_handler_sdl.cpp,v 1.83 2007/09/05 01:41:25 nihilus Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -31,8 +31,6 @@
 #include <cmath>
 #include <vector>
 #include <SDL.h>
-
-using namespace boost;
 
 namespace gnash {
 
@@ -83,7 +81,7 @@ int	SDL_sound_handler::create_sound(
 	int16_t*	adjusted_data = 0;
 	int	adjusted_size = 0;
 
-        mutex::scoped_lock lock(_mutex);
+        boost::mutex::scoped_lock lock(_mutex);
 
 	switch (sounddata->soundinfo->getFormat())
 	{
@@ -148,7 +146,7 @@ int	SDL_sound_handler::create_sound(
 long	SDL_sound_handler::fill_stream_data(void* data, unsigned int data_bytes, unsigned int sample_count, int handle_id)
 {
 
-	mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 	// @@ does a negative handle_id have any meaning ?
 	//    should we change it to unsigned instead ?
 	if (handle_id < 0 || (unsigned int) handle_id+1 > m_sound_data.size()) {
@@ -228,7 +226,7 @@ long	SDL_sound_handler::fill_stream_data(void* data, unsigned int data_bytes, un
 void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset, long start_position, const std::vector<sound_envelope>* envelopes)
 // Play the index'd sample.
 {
-	mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists, or if audio is muted
 	if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= m_sound_data.size() || muted)
@@ -340,7 +338,7 @@ void	SDL_sound_handler::play_sound(int sound_handle, int loop_count, int offset,
 
 void	SDL_sound_handler::stop_sound(int sound_handle)
 {
-	mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
@@ -382,7 +380,7 @@ void	SDL_sound_handler::stop_sound(int sound_handle)
 // this gets called when it's done with a sample.
 void	SDL_sound_handler::delete_sound(int sound_handle)
 {
-	mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 
 	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < m_sound_data.size())
 	{
@@ -397,7 +395,7 @@ void	SDL_sound_handler::delete_sound(int sound_handle)
 // for what sounds is associated with what SWF.
 void	SDL_sound_handler::stop_all_sounds()
 {
-	mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 
 	int32_t num_sounds = (int32_t) m_sound_data.size()-1;
 	for (int32_t j = num_sounds; j > -1; j--) {//Optimized
@@ -435,7 +433,7 @@ void	SDL_sound_handler::stop_all_sounds()
 //	where 0 is off and 100 is full volume. The default setting is 100.
 int	SDL_sound_handler::get_volume(int sound_handle) {
 
-	mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 
 	int ret;
 	// Check if the sound exists.
@@ -453,7 +451,7 @@ int	SDL_sound_handler::get_volume(int sound_handle) {
 //	100 is full volume and 0 is no volume. The default setting is 100.
 void	SDL_sound_handler::set_volume(int sound_handle, int volume) {
 
-	mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle < 0 || static_cast<unsigned int>(sound_handle) >= m_sound_data.size())
@@ -470,7 +468,7 @@ void	SDL_sound_handler::set_volume(int sound_handle, int volume) {
 	
 SoundInfo* SDL_sound_handler::get_sound_info(int sound_handle) {
 
-	mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle >= 0 && static_cast<unsigned int>(sound_handle) < m_sound_data.size())
@@ -500,7 +498,7 @@ bool SDL_sound_handler::is_muted()
 
 void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 {
-	mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 	assert(owner);
 	assert(ptr);
 
@@ -527,7 +525,7 @@ void	SDL_sound_handler::attach_aux_streamer(aux_streamer_ptr ptr, void* owner)
 
 void	SDL_sound_handler::detach_aux_streamer(void* owner)
 {
-	mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 	aux_streamer_ptr p;	
 	if (m_aux_streamer.get(owner, &p))
 	{
@@ -539,7 +537,7 @@ void	SDL_sound_handler::detach_aux_streamer(void* owner)
 
 unsigned int SDL_sound_handler::get_duration(int sound_handle)
 {
-	mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
@@ -566,7 +564,7 @@ unsigned int SDL_sound_handler::get_duration(int sound_handle)
 
 unsigned int SDL_sound_handler::get_position(int sound_handle)
 {
-	mutex::scoped_lock lock(_mutex);
+	boost::mutex::scoped_lock lock(_mutex);
 
 	// Check if the sound exists.
 	if (sound_handle < 0 || (unsigned int) sound_handle >= m_sound_data.size())
@@ -736,7 +734,7 @@ void SDL_sound_handler::sdl_audio_callback (void *udata, Uint8 *stream, int buff
 		return;
 	}
 
-	mutex::scoped_lock lock(handler->_mutex);
+	boost::mutex::scoped_lock lock(handler->_mutex);
 
 	// Mixed sounddata buffer
 	Uint8* buffer = stream;
