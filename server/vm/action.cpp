@@ -538,6 +538,7 @@ get_standard_member(const std::string& name)
 		membersMap["_ymouse"] = M_YMOUSE;
 		membersMap["_parent"] = M_PARENT;
 		membersMap["text"] = M_TEXT;
+		membersMap["htmlText"] = M_HTMLTEXT;
 		membersMap["textWidth"] = M_TEXTWIDTH;
 		membersMap["textColor"] = M_TEXTCOLOR;
 		membersMap["onLoad"] = M_ONLOAD;

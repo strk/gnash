@@ -133,6 +133,7 @@ namespace gnash {
 		M_YMOUSE,
 		M_PARENT,
 		M_TEXT,
+		M_HTMLTEXT,
 		M_TEXTWIDTH,
 		M_TEXTCOLOR,
 		M_ONLOAD,

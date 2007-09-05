@@ -229,15 +229,22 @@ public:
 	///
 	void setWordWrap(bool on);
 
-private:
+	/// \brief
+	/// Return true if HTML markup in text should be rendered.
+	///
+	bool doHtml() const {
+		return _html;
+	}
 
-	/// Return true if HTML text is allowed 
+	/// Set html parameter
 	//
-	/// TODO: use own flag for this, don't query the definition
-	///       everytime. This will allow support for the
-	///	  ActionScript settable 'html' property.
-	///       
-	bool htmlAllowed() const { return m_def->htmlAllowed(); }
+	/// @param on
+	///	If true HTML tags in the text will be parsed and rendered
+	void setHtml(bool on) {
+		_html = on;
+	}
+
+private:
 
 	/// The actual text
 	std::string _text;
@@ -337,6 +344,8 @@ private:
 	bool _embedFonts;
 
 	bool _wordWrap;
+
+	bool _html;
 
 	AutoSizeValue _autoSize;
 

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.109 2007/09/04 19:33:08 strk Exp $ */
+/* $Id: edit_text_character.cpp,v 1.110 2007/09/05 16:47:55 meteoryte Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -84,6 +84,7 @@ static as_value textfield_textColor_getset(const fn_call& fn);
 static as_value textfield_embedFonts_getset(const fn_call& fn);
 static as_value textfield_autoSize_getset(const fn_call& fn);
 static as_value textfield_wordWrap_getset(const fn_call& fn);
+static as_value textfield_html_getset(const fn_call& fn);
 
 
 //
@@ -333,7 +334,8 @@ attachTextFieldInterface(as_object& o)
 	o.init_property("autoSize", *getset, *getset);
 	getset = new builtin_function(textfield_wordWrap_getset);
 	o.init_property("wordWrap", *getset, *getset);
-
+	getset = new builtin_function(textfield_html_getset);
+	o.init_property("html", *getset, *getset);
 
 	if ( target_version  < 7 ) return;
 
@@ -398,6 +400,7 @@ edit_text_character::edit_text_character(character* parent,
 	_textColor(m_def->get_text_color()),
 	_embedFonts(m_def->getUseEmbeddedGlyphs()),
 	_wordWrap(m_def->do_word_wrap()),
+	_html(m_def->htmlAllowed()),
 	_autoSize(autoSizeNone),
 	_bounds(m_def->get_bounds().getRange())
 {
@@ -739,33 +742,20 @@ edit_text_character::set_member(const std::string& name,
 	default:
 		break;
 	case M_INVALID_MEMBER:
-	{
-		if (name == PROPNAME("htmlText"))
-		{	// Minimal parsing of HTML: Strip all tags
-			int version = get_parent()->get_movie_definition()->get_version();
-			std::string html = val.to_string_versioned(version);
-			std::string textOnly = std::string();
-			bool inTag = false;
-			for (unsigned int i = 0; i < html.length(); ++i)
-			{
-				if (inTag)
-				{
-					inTag = html[i] != '>';
-				} else {
-					inTag = html[i] == '<';
-					if (!inTag) textOnly += html[i];
-				}
-			}
-			set_text_value(textOnly.c_str());
-			return;
-		}
 		break;
-	}
 	case M_TEXT:
 		//if (name == "text")
 	{
 		int version = get_parent()->get_movie_definition()->get_version();
 		set_text_value(val.to_string_versioned(version).c_str());
+		return;
+	}
+	case M_HTMLTEXT:
+		//if (name == "htmlText")
+	{
+		int version = get_parent()->get_movie_definition()->get_version();
+		set_text_value(val.to_string_versioned(version).c_str());
+		format_text();
 		return;
 	}
 	case M_X:
@@ -914,6 +904,12 @@ edit_text_character::get_member(const std::string& name, as_value* val)
 		break;
 	case M_TEXT:
 		//if (name == "text")
+	{
+		val->set_string(get_text_value());
+		return true;
+	}
+	case M_HTMLTEXT:
+		//if (name == "htmlText")
 	{
 		val->set_string(get_text_value());
 		return true;
@@ -1171,7 +1167,7 @@ edit_text_character::format_text()
 			continue;
 		}
 
-		if (code == '<' && htmlAllowed() )
+		if (code == '<' && _html )
 		{
 			static bool warned = false;
 			if ( ! warned )
@@ -1800,6 +1796,23 @@ textfield_wordWrap_getset(const fn_call& fn)
 	else // setter
 	{
 		ptr->setWordWrap( fn.arg(0).to_bool() );
+	}
+
+	return as_value();
+}
+
+static as_value
+textfield_html_getset(const fn_call& fn)
+{
+	boost::intrusive_ptr<edit_text_character> ptr = ensureType<edit_text_character>(fn.this_ptr);
+
+	if ( fn.nargs == 0 ) // getter
+	{
+		return as_value(ptr->doHtml());
+	}
+	else // setter
+	{
+		ptr->setHtml( fn.arg(0).to_bool() );
 	}
 
 	return as_value();

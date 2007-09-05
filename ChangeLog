@@ -1,3 +1,11 @@
+2007-09-05 Ivor Blockley <meteoryte@yahoo.com.au>
+
+	* server/vm/action.{cpp,h}: add htmlText property to 
+	as_standard_member ENUM
+	* server/edit_text_character.{cpp,h}: add html property and cleanup
+	handling of htmlText (note: still just strips tags at the moment).
+	* testsuite/actionscript.all/TextField.as: 5 new passes, 1 new failure
+
 2007-09-05 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.{cpp,h}: also maintain a list of characters by

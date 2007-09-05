@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.22 2007/09/04 19:33:09 strk Exp $";
+rcsid="$Id: TextField.as,v 1.23 2007/09/05 16:47:55 meteoryte Exp $";
 
 #include "check.as"
 
@@ -55,7 +55,7 @@ xcheck( !TextField.prototype.hasOwnProperty('borderColor') );
 check( !TextField.prototype.hasOwnProperty('bottomScroll') );
 xcheck( !TextField.prototype.hasOwnProperty('embedFonts') );
 check( !TextField.prototype.hasOwnProperty('hscroll') );
-check( !TextField.prototype.hasOwnProperty('html') );
+xcheck( !TextField.prototype.hasOwnProperty('html') );
 check( !TextField.prototype.hasOwnProperty('htmlText') );
 check( !TextField.prototype.hasOwnProperty('length') );
 check( !TextField.prototype.hasOwnProperty('maxChars') );
@@ -124,7 +124,7 @@ check( TextField.prototype.hasOwnProperty('borderColor') );
 xcheck( TextField.prototype.hasOwnProperty('bottomScroll') );
 check( TextField.prototype.hasOwnProperty('embedFonts') );
 xcheck( TextField.prototype.hasOwnProperty('hscroll') );
-xcheck( TextField.prototype.hasOwnProperty('html') );
+check( TextField.prototype.hasOwnProperty('html') );
 xcheck( TextField.prototype.hasOwnProperty('htmlText') );
 xcheck( TextField.prototype.hasOwnProperty('length') );
 xcheck( TextField.prototype.hasOwnProperty('maxChars') );
@@ -275,9 +275,9 @@ tf.hscroll = 0;
 
 // Check TextField.html
 
-xcheck_equals(typeof(tf.html), 'boolean');
+check_equals(typeof(tf.html), 'boolean');
 check(!tf.hasOwnProperty('html'));
-xcheck_equals(tf.html, false);
+check_equals(tf.html, false);
 tf.html = true;
 check_equals(tf.html, true);
 tf.html = false;
@@ -293,9 +293,9 @@ xcheck_equals(tf.htmlText, '');
 check_equals(tf.html, false);
 tf.htmlText = "Hello <b>html</b> world";
 check_equals(tf.html, false); // assigning to htmlText doesn't change the 'html' flag
-xcheck_equals(tf.htmlText, 'Hello <b>html</b> world'); // gnash fails by stripping the html tags
+check_equals(tf.htmlText, 'Hello <b>html</b> world');
 // Changing htmlText also changes text
-xcheck_equals(tf.text, 'Hello <b>html</b> world'); // gnash likely succeeds here, but strips html tags...
+check_equals(tf.text, 'Hello <b>html</b> world');
 tf.text = "Hello world";
 check_equals(tf.htmlText, 'Hello world');
 
