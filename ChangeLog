@@ -1,3 +1,13 @@
+2007-09-05 Sandro Santilli <strk@keybit.net>
+
+	* server/dlist.{cpp,h}: also maintain a list of characters by
+	  placement and provide a visitByPlacement for visiting them.
+	* server/sprite_instance.cpp: (advance_sprite): visit DisplayList
+	  in reverse-placement order when advancing old and newly added
+	  characters.
+	* testsuite/misc-ming.all/action_execution_order_test2.c: one success
+	  in action execution order.
+
 2007-09-05 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* backend/sound_handler_{sdl,gst}.cpp: Remove primitive

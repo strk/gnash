@@ -59,7 +59,7 @@ public:
 		DisplayList sorted = *this;
 		// check no duplicated depths in list
 		std::set<int> depths;
-		for (const_iterator it=_characters.begin(), itEnd=_characters.end(); it!=itEnd; ++it)
+		for (const_iterator it=_charsByDepth.begin(), itEnd=_charsByDepth.end(); it!=itEnd; ++it)
 		{
 			boost::intrusive_ptr<character> ch = *it;
 			int depth = ch->get_depth();
@@ -211,7 +211,8 @@ public:
 	/// Clear the display list.
 	void clear()
 	{
-		_characters.clear();
+		_charsByDepth.clear();
+		_timelineChars.clear();
 	}
 
 	/// Unload the characters in this DisplayList removing
@@ -306,7 +307,7 @@ public:
 		clear();
 	}
 
-	/// advance referenced characters.
+	/// advance referenced characters, by reverse-placement order
 	void advance(float delta_time);
 
 	/// \brief
@@ -386,6 +387,10 @@ public:
 	template <class V>
 	inline void visitAll(V& visitor) const;
 
+	/// Visit each and all character in the list in reverse-placement order
+	template <class V>
+	inline void visitByReversePlacement(V& visitor) const;
+
 	/// dump list to logfile/stderr
 	void dump() const;
 
@@ -397,13 +402,13 @@ public:
 	/// Return number of elements in the list
 	size_t size() const
 	{ 
-		return _characters.size();
+		return _charsByDepth.size();
 	}
 
 	/// Return true if the list contains no elements 
 	bool empty() const 
 	{
-		return _characters.empty();
+		return _charsByDepth.empty();
 	}
 
 	/// Return the next highest available depth
@@ -427,9 +432,9 @@ public:
 	///
 	void sort ();
 	
-	bool operator==(const DisplayList& other) const { return _characters == other._characters; }
+	bool operator==(const DisplayList& other) const { return _charsByDepth == other._charsByDepth; }
 
-	bool operator!=(const DisplayList& other) const { return _characters != other._characters; }
+	bool operator!=(const DisplayList& other) const { return _charsByDepth != other._charsByDepth; }
 
 private:
 
@@ -457,7 +462,10 @@ private:
 	///
 	void reinsertRemovedCharacter(boost::intrusive_ptr<character> ch);
 
-	container_type _characters;
+	container_type _charsByDepth;
+
+	// Stored by placement order (first placed first)
+	container_type _timelineChars;
 
 
 };
@@ -466,8 +474,8 @@ template <class V>
 void
 DisplayList::visitForward(V& visitor)
 {
-	for (iterator it = _characters.begin(),
-			itEnd = _characters.end();
+	for (iterator it = _charsByDepth.begin(),
+			itEnd = _charsByDepth.end();
 		it != itEnd; ++it)
 	{
 		DisplayItem& di = *it;
@@ -479,8 +487,8 @@ template <class V>
 void
 DisplayList::visitBackward(V& visitor)
 {
-	for (reverse_iterator it = _characters.rbegin(),
-			itEnd = _characters.rend();
+	for (reverse_iterator it = _charsByDepth.rbegin(),
+			itEnd = _charsByDepth.rend();
 		it != itEnd; ++it)
 	{
 		DisplayItem& di = *it;
@@ -492,8 +500,8 @@ template <class V>
 void
 DisplayList::visitAll(V& visitor)
 {
-	for (iterator it = _characters.begin(),
-			itEnd = _characters.end();
+	for (iterator it = _charsByDepth.begin(),
+			itEnd = _charsByDepth.end();
 		it != itEnd; ++it)
 	{
 		visitor(it->get());
@@ -504,8 +512,20 @@ template <class V>
 void
 DisplayList::visitAll(V& visitor) const
 {
-	for (const_iterator it = _characters.begin(),
-			itEnd = _characters.end();
+	for (const_iterator it = _charsByDepth.begin(),
+			itEnd = _charsByDepth.end();
+		it != itEnd; ++it)
+	{
+		visitor(it->get());
+	}
+}
+
+template <class V>
+void
+DisplayList::visitByReversePlacement(V& visitor) const
+{
+	for (const_iterator it = _timelineChars.begin(),
+			itEnd = _timelineChars.end();
 		it != itEnd; ++it)
 	{
 		visitor(it->get());

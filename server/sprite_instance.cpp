@@ -2338,8 +2338,7 @@ void sprite_instance::advance_sprite(float delta_time)
 	//
 	{
 		AdvancerVisitor visitor(delta_time);
-		DisplayList stillAlive = oldDisplayList;
-		stillAlive.visitAll(visitor);
+		oldDisplayList.visitByReversePlacement(visitor);
 	}
 	
 	// Now execute actions on this timeline, after actions
@@ -3690,7 +3689,11 @@ sprite_instance::markReachableResources() const
 
 	m_display_list.visitAll(marker);
 
+	m_display_list.visitByReversePlacement(marker);
+
 	oldDisplayList.visitAll(marker);
+
+	oldDisplayList.visitByReversePlacement(marker);
 
 	_drawable->setReachable();
 

@@ -102,8 +102,8 @@ DisplayList::getNextHighestDepth() const
 	testInvariant();
 
 	int nexthighestdepth=0;
-	for (const_iterator it = _characters.begin(),
-			itEnd = _characters.end();
+	for (const_iterator it = _charsByDepth.begin(),
+			itEnd = _charsByDepth.end();
 		it != itEnd; ++it)
 	{
 		character* ch = it->get();
@@ -126,8 +126,8 @@ DisplayList::get_character_at_depth(int depth)
 	//GNASH_REPORT_FUNCTION;
 	//dump();
 
-	for (iterator it = _characters.begin(),
-			itEnd = _characters.end();
+	for (iterator it = _charsByDepth.begin(),
+			itEnd = _charsByDepth.end();
 		it != itEnd; ++it)
 	{
 		character* ch = it->get();
@@ -151,11 +151,11 @@ DisplayList::get_character_by_name(const std::string& name)
 	testInvariant();
 
 	container_type::iterator it = find_if(
-			_characters.begin(),
-			_characters.end(),
+			_charsByDepth.begin(),
+			_charsByDepth.end(),
 			NameEquals(name));
 
-	if ( it == _characters.end() ) return NULL;
+	if ( it == _charsByDepth.end() ) return NULL;
 	else return it->get();
 
 }
@@ -166,11 +166,11 @@ DisplayList::get_character_by_name_i(const std::string& name)
 	testInvariant();
 
 	container_type::iterator it = find_if(
-			_characters.begin(),
-			_characters.end(),
+			_charsByDepth.begin(),
+			_charsByDepth.end(),
 			NameEqualsNoCase(name));
 
-	if ( it == _characters.end() ) return NULL;
+	if ( it == _charsByDepth.end() ) return NULL;
 	else return it->get();
 }
 
@@ -200,15 +200,15 @@ DisplayList::place_character(
 	ch->set_clip_depth(clip_depth);
 
 	container_type::iterator it = find_if(
-			_characters.begin(), _characters.end(),
+			_charsByDepth.begin(), _charsByDepth.end(),
 			DepthGreaterOrEqual(depth));
 
-	if ( it == _characters.end() || (*it)->get_depth() != depth )
+	if ( it == _charsByDepth.end() || (*it)->get_depth() != depth )
 	{
 		//log_msg(_("place_character: new character at depth %d"), depth);
 		
 		// add the new char
-		_characters.insert(it, DisplayItem(ch));
+		_charsByDepth.insert(it, DisplayItem(ch));
 	}
 	else
 	{
@@ -220,6 +220,8 @@ DisplayList::place_character(
 
 		// make a copy (before replacing)
 		boost::intrusive_ptr<character> oldCh = *it;
+
+		_timelineChars.remove(oldCh);
 
 		// replace existing char (before calling unload!)
 		*it = DisplayItem(ch);
@@ -236,6 +238,7 @@ DisplayList::place_character(
 
 	// Give life to this instance
 	ch->construct();
+	_timelineChars.push_front(DisplayItem(ch));
 
 	testInvariant();
 }
@@ -246,16 +249,19 @@ DisplayList::add(character* ch, bool replace)
 	int depth = ch->get_depth();
 
 	container_type::iterator it = find_if(
-			_characters.begin(), _characters.end(),
+			_charsByDepth.begin(), _charsByDepth.end(),
 			DepthGreaterOrEqual(depth));
-	if ( it == _characters.end() || (*it)->get_depth() != depth )
+	if ( it == _charsByDepth.end() || (*it)->get_depth() != depth )
 	{
-		_characters.insert(it, DisplayItem(ch));
+		_charsByDepth.insert(it, DisplayItem(ch));
 	}
 	else if ( replace )
 	{
+		_timelineChars.remove(*it);
 		*it = DisplayItem(ch);
 	}
+
+	_timelineChars.push_front(DisplayItem(ch));
 
 	testInvariant();
 }
@@ -306,12 +312,12 @@ DisplayList::replace_character(
 	// ch->restart();
 
 	container_type::iterator it = find_if(
-			_characters.begin(), _characters.end(),
+			_charsByDepth.begin(), _charsByDepth.end(),
 			DepthGreaterOrEqual(depth));
 
 	DisplayItem di(ch);
 
-	if ( it == _characters.end() || (*it)->get_depth() != depth )
+	if ( it == _charsByDepth.end() || (*it)->get_depth() != depth )
 	{
 
 		// Error, no existing object found at depth.
@@ -321,7 +327,7 @@ DisplayList::replace_character(
 //		);
 
 		// add the new char
-		_characters.insert(it, di);
+		_charsByDepth.insert(it, di);
 
 	}
 	else
@@ -346,6 +352,8 @@ DisplayList::replace_character(
 		// remember bounds of old char
 		oldch->add_invalidated_bounds(old_ranges, true);		
 
+		_timelineChars.remove(oldch);
+
 		// replace existing char (before calling unload)
 		*it = di;
 
@@ -369,6 +377,7 @@ DisplayList::replace_character(
 
 	// Give life to this instance
 	ch->construct();
+	_timelineChars.push_front(DisplayItem(ch));
 
 	testInvariant();
 }
@@ -444,24 +453,24 @@ DisplayList::remove_display_object(int depth)
 	//dump();
 
 #ifndef NDEBUG
-	container_type::size_type size = _characters.size();
+	container_type::size_type size = _charsByDepth.size();
 #endif
 
 	// TODO: would it be legal to call remove_display_object with a depth
 	//       in the "removed" zone ?
 	// TODO: optimize to take by-depth order into account
 	container_type::iterator it = find_if(
-			_characters.begin(),
-			_characters.end(),
+			_charsByDepth.begin(),
+			_charsByDepth.end(),
 			DepthEquals(depth));
 
-	if ( it != _characters.end() )
+	if ( it != _charsByDepth.end() )
 	{
 		// Make a copy (before erasing)
 		boost::intrusive_ptr<character> oldCh = *it;
 
 		// Erase (before callign unload)
-		_characters.erase(it);
+		_charsByDepth.erase(it);
 
 		if ( oldCh->unload() )
 		{
@@ -475,7 +484,7 @@ DisplayList::remove_display_object(int depth)
 	}
 
 #ifndef NDEBUG
-	assert(size >= _characters.size());
+	assert(size >= _charsByDepth.size());
 #endif
 
 	testInvariant();
@@ -507,20 +516,20 @@ DisplayList::swapDepths(character* ch1, int newdepth)
 	assert(srcdepth != newdepth);
 
 	// TODO: optimize this scan by taking ch1 depth into account ?
-	container_type::iterator it1 = find(_characters.begin(), _characters.end(), ch1);
+	container_type::iterator it1 = find(_charsByDepth.begin(), _charsByDepth.end(), ch1);
 
 	// upper bound ...
-	container_type::iterator it2 = find_if(_characters.begin(), _characters.end(),
+	container_type::iterator it2 = find_if(_charsByDepth.begin(), _charsByDepth.end(),
 			DepthGreaterOrEqual(newdepth));
 
-	if ( it1 == _characters.end() )
+	if ( it1 == _charsByDepth.end() )
 	{
 		log_error("First argument to DisplayList::swapDepth() is NOT a character in the list. Call ignored.");
 		return;
 	}
 
 	// Found another character at the given depth
-	if ( it2 != _characters.end() && (*it2)->get_depth() == newdepth )
+	if ( it2 != _charsByDepth.end() && (*it2)->get_depth() == newdepth )
 	{
 		DisplayItem ch2 = *it2;
 
@@ -543,8 +552,8 @@ DisplayList::swapDepths(character* ch1, int newdepth)
 		// Move the character to the new position
 		// NOTE: insert *before* erasing, in case the list is
 		//       the only referer of the ref-counted character
-		_characters.insert(it2, ch1);
-		_characters.erase(it1);
+		_charsByDepth.insert(it2, ch1);
+		_charsByDepth.erase(it1);
 	}
 
 	// don't change depth before the iter_swap case above, as
@@ -591,8 +600,8 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 
 	std::vector<DisplayItem> toReinsert;
 
-	iterator it = beginNonRemoved(_characters);
-	for (iterator itEnd = _characters.end(); it != itEnd; )
+	iterator it = beginNonRemoved(_charsByDepth);
+	for (iterator itEnd = _charsByDepth.end(); it != itEnd; )
 	{
 		testInvariant();
 
@@ -619,7 +628,7 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 		if ( ! info )
 		{
 			// Replace (before calling unload)
-			it = _characters.erase(it);
+			it = _charsByDepth.erase(it);
 
 			if ( call_unload )
 			{
@@ -641,7 +650,7 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 			// (I guess there can't be any as_value pointing at this
 			// if it's not ActionScriptReferenceable after all...)
 			//
-			it = _characters.erase(it);
+			it = _charsByDepth.erase(it);
 			continue;
 		}
 
@@ -652,7 +661,7 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 			// Not to be saved, killing
 
 			// Replace (before calling unload)
-			it = _characters.erase(it);
+			it = _charsByDepth.erase(it);
 
 			if ( call_unload )
 			{
@@ -695,7 +704,7 @@ DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 
 
 	assert(&exclude != this);
-	const container_type& keepchars = exclude._characters;
+	const container_type& keepchars = exclude._charsByDepth;
 
 	std::vector<DisplayItem> toReinsert;
 
@@ -703,7 +712,7 @@ DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 	const_iterator keepEnd = keepchars.end();
 
 	//int called=0;
-	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
+	for (iterator it = _charsByDepth.begin(),	itEnd = _charsByDepth.end(); it != itEnd; )
 	{
 		
 		testInvariant(); // TODO: expensive
@@ -724,9 +733,7 @@ DisplayList::clear_except(const DisplayList& exclude, bool call_unload)
 
 		if (is_affected == false)
 		{
-			bool needReinsert = false;
-
-			it = _characters.erase(it);
+			it = _charsByDepth.erase(it);
 
 			if ( call_unload )
 			{
@@ -758,11 +765,11 @@ DisplayList::clear(const DisplayList& from, bool call_unload)
 
 	testInvariant();
 
-	const container_type dropchars = from._characters;
+	const container_type dropchars = from._charsByDepth;
 
 	std::vector<DisplayItem> toReinsert;
 
-	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
+	for (iterator it = _charsByDepth.begin(), itEnd = _charsByDepth.end(); it != itEnd; )
 	{
 		// make a copy
 		DisplayItem di = *it;
@@ -779,7 +786,8 @@ DisplayList::clear(const DisplayList& from, bool call_unload)
 
 		if (is_affected)
 		{
-			it = _characters.erase(it);
+			_timelineChars.remove(*it);
+			it = _charsByDepth.erase(it);
 
 			if ( call_unload )
 			{
@@ -808,14 +816,15 @@ DisplayList::unload()
 
 	testInvariant();
 
-	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
+	for (iterator it = _charsByDepth.begin(),	itEnd = _charsByDepth.end(); it != itEnd; )
 	{
 		// make a copy
 		DisplayItem di = *it;
 
 		if ( ! di->unload() ) // no event handler queued, we remove
 		{
-			it = _characters.erase(it);
+			_timelineChars.remove(*it); // or we might simply .clear() it at the end, since we don't need them for ::advance anymore
+			it = _charsByDepth.erase(it);
 		}
 		else
 		{
@@ -825,7 +834,7 @@ DisplayList::unload()
 
 	testInvariant();
 
-	return ! _characters.empty();
+	return ! _charsByDepth.empty();
 
 }
 	
@@ -837,16 +846,17 @@ DisplayList::advance(float delta_time)
 
 	testInvariant(); 
 
-//	container_type::size_type size = _characters.size();
+//	container_type::size_type size = _charsByDepth.size();
 
 	// That there was no crash gnash we iterate through the copy
-	std::list<DisplayItem> tmp_list = _characters;
+	//std::list<DisplayItem> tmp_list = _charsByDepth;
+	std::list<DisplayItem> tmp_list = _timelineChars;
 
         // We only advance characters which are out of the "removed" zone (or should we check isUnloaded?)
         // TODO: remove when copying _character to tmp_list directly ?
-	iterator it = beginNonRemoved(tmp_list);
+	//iterator it = beginNonRemoved(tmp_list);
 	//if ( it != tmp_list.end() ) log_debug("First non-removed char at depth %d", (*it)->get_depth());
-	//iterator it = tmp_list.begin();
+	iterator it = tmp_list.begin();
 	for (iterator itEnd = tmp_list.end(); it != itEnd; ++it)
 	{
 		testInvariant(); // expensive !!
@@ -874,7 +884,7 @@ DisplayList::advance(float delta_time)
 		//
 		// Need to test to see what Flash does.
 
-//		if (_characters.size() != size)
+//		if (_charsByDepth.size() != size)
 //		{
 //			log_error(_("gnash bug: dlist size changed due to character actions, bailing on update"));
 //			break;
@@ -913,9 +923,9 @@ DisplayList::display()
     std::stack<int> clipDepthStack;
     
     // We only advance characters which are out of the "removed" zone (or should we check isUnloaded?)
-    iterator it = beginNonRemoved(_characters);
-    //iterator it = _characters.begin();
-    for(iterator endIt = _characters.end(); it != endIt; ++it)
+    iterator it = beginNonRemoved(_charsByDepth);
+    //iterator it = _charsByDepth.begin();
+    for(iterator endIt = _charsByDepth.end(); it != endIt; ++it)
     {
         character* ch = it->get();
         assert(ch);
@@ -988,8 +998,8 @@ DisplayList::dump() const
 	//testInvariant();
 
 	int num=0;
-	for( const_iterator it = _characters.begin(),
-			endIt = _characters.end();
+	for( const_iterator it = _charsByDepth.begin(),
+			endIt = _charsByDepth.end();
 		it != endIt; ++it)
 	{
 		const DisplayItem& dobj = *it;
@@ -1007,8 +1017,8 @@ DisplayList::add_invalidated_bounds(InvalidatedRanges& ranges, bool force)
     
 	testInvariant();
 
-	iterator it = beginNonRemoved(_characters);
-	for( iterator endIt = _characters.end(); it != endIt; ++it)
+	iterator it = beginNonRemoved(_charsByDepth);
+	for( iterator endIt = _charsByDepth.end(); it != endIt; ++it)
 	{
 		DisplayItem& dobj = *it;
 #ifndef GNASH_USE_GC
@@ -1033,19 +1043,33 @@ struct DisplayItemDepthLess {
 void
 DisplayList::sort()
 {
-	_characters.sort(DisplayItemDepthLess());
+	_charsByDepth.sort(DisplayItemDepthLess());
 }
 
 std::ostream& operator<< (std::ostream& os, const DisplayList& dl)
 {
-	for (DisplayList::const_iterator it = dl._characters.begin(),
-			itEnd = dl._characters.end();
+	os << "By depth: ";
+	for (DisplayList::const_iterator it = dl._charsByDepth.begin(),
+			itEnd = dl._charsByDepth.end();
 			it != itEnd;
 			++it)
 	{
 		const DisplayItem& item = *it; 
-		if ( it != dl._characters.begin() ) os << " | ";
-		os << "Character id:" << item->get_id()
+		if ( it != dl._charsByDepth.begin() ) os << " | ";
+		os << "ch id:" << item->get_id()
+			<< " name:" << item->get_name()
+			<< " depth:" << item->get_depth();
+	}
+
+	os << " =|= By placement: ";
+	for (DisplayList::const_iterator it = dl._timelineChars.begin(),
+			itEnd = dl._timelineChars.end();
+			it != itEnd;
+			++it)
+	{
+		const DisplayItem& item = *it; 
+		if ( it != dl._charsByDepth.begin() ) os << " | ";
+		os << "ch id:" << item->get_id()
 			<< " name:" << item->get_name()
 			<< " depth:" << item->get_depth();
 	}
@@ -1067,12 +1091,12 @@ DisplayList::reinsertRemovedCharacter(boost::intrusive_ptr<character> ch)
 
 	// TODO: optimize this by searching from the end(lowest depth).
 	container_type::iterator it = find_if(
-			_characters.begin(), _characters.end(),
+			_charsByDepth.begin(), _charsByDepth.end(),
 			DepthGreaterOrEqual(newDepth));
-	if ( it == _characters.end() || (*it)->get_depth() != newDepth )
+	if ( it == _charsByDepth.end() || (*it)->get_depth() != newDepth )
 	{
 		// add the new char
-		_characters.insert(it, DisplayItem(ch));
+		_charsByDepth.insert(it, DisplayItem(ch));
 	}
 	else
 	{
@@ -1106,11 +1130,11 @@ DisplayList::removeUnloaded()
 	// TODO: erase from begin() to beginNonRemoved()-1 ?
 	//log_debug("removeUnloaded called (dlist:%p)", (void*)this);
 	testInvariant();
-	//log_debug(" first invTest passed, _characters have %d entries", _characters.size());
+	//log_debug(" first invTest passed, _charsByDepth have %d entries", _charsByDepth.size());
 	//dump();
-	iterator last = std::remove_if(_characters.begin(), _characters.end(), boost::bind(&character::isUnloaded, _1));
-	_characters.erase(last, _characters.end());
-	//log_debug(" After remove_if, _characters have %d entries - dumping them", _characters.size());
+	iterator last = std::remove_if(_charsByDepth.begin(), _charsByDepth.end(), boost::bind(&character::isUnloaded, _1));
+	_charsByDepth.erase(last, _charsByDepth.end());
+	//log_debug(" After remove_if, _charsByDepth have %d entries - dumping them", _charsByDepth.size());
 	//dump();
 	//log_debug(" Now testing invariant again");
 	testInvariant();

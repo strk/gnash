@@ -134,7 +134,7 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); /* 4th frame */
 
 
-  xcheck_equals(mo, "_root.x2", "'depth11+depth12+depth10+depth9+depth13+'");
+  check_equals(mo, "_root.x2", "'depth11+depth12+depth10+depth9+depth13+'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 5th frame */
   
