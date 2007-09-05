@@ -1127,18 +1127,16 @@ DisplayList::beginNonRemoved(const container_type& c)
 void
 DisplayList::removeUnloaded()
 {
-	// TODO: erase from begin() to beginNonRemoved()-1 ?
-	//log_debug("removeUnloaded called (dlist:%p)", (void*)this);
 	testInvariant();
-	//log_debug(" first invTest passed, _charsByDepth have %d entries", _charsByDepth.size());
-	//dump();
+
+	// TODO: erase from begin() to beginNonRemoved()-1 ?
 	iterator last = std::remove_if(_charsByDepth.begin(), _charsByDepth.end(), boost::bind(&character::isUnloaded, _1));
 	_charsByDepth.erase(last, _charsByDepth.end());
-	//log_debug(" After remove_if, _charsByDepth have %d entries - dumping them", _charsByDepth.size());
-	//dump();
-	//log_debug(" Now testing invariant again");
+
+	last = std::remove_if(_timelineChars.begin(), _timelineChars.end(), boost::bind(&character::isUnloaded, _1));
+	_timelineChars.erase(last, _timelineChars.end());
+
 	testInvariant();
-	//log_debug(" second invTest passed");
 }
 
 } // namespace gnash

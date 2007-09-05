@@ -1,5 +1,9 @@
 2007-09-05 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.cpp (removeUnloaded): also remove from _timelineChars.
+
+2007-09-05 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-ming.all/action_execution_order_test3.c: attempt
 	  to test REMOVEOBJECT before DOACTION (failed though, as Ming seems
 	  to keep placing REMOVEOBJECT tags adjacent instead).
