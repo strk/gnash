@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: cygnal.cpp,v 1.13 2007/07/01 10:53:49 bjacques Exp $ */
+/* $Id: cygnal.cpp,v 1.14 2007/09/05 16:53:34 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -116,10 +116,11 @@ int
 main(int argc, char *argv[])
 {
     // Initialize national language support
+#ifdef ENABLE_NLS
     setlocale (LC_MESSAGES, "");
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
-
+#endif
     // scan for the two main long GNU options
     int c;
     for (c=0; c<argc; c++) {

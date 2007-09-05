@@ -1,3 +1,7 @@
+2009-09-05 Markus Gothe
+
+	* cygnal.cpp: Added a #ifdef ENABLE_NLS.
+
 2007-07-14  Rob Savoye  <rob@bertha.welcomehome.org>
 	* ACT/Makefile.am: New Makefile.
 	* HTTP/Makefile.am: New Makefile.
