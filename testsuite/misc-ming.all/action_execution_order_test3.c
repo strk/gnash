@@ -62,12 +62,14 @@ main(int argc, char** argv)
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   SWFMovie_nextFrame(mo); /* 1st frame */
 
-  add_actions(mo, "_root.x1 += \"as_in_DoAction+\"; ");
+  add_actions(mo, "_root.x1 += \"as_in_DoAction1+\"; ");
   
   mc_red1 = newSWFMovieClip();
   sh_red = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc_red1, (SWFBlock)sh_red);  
   SWFMovieClip_nextFrame(mc_red1); /* mc_red1, 1st frame */
+
+  add_actions(mo, "_root.x1 += \"as_in_DoAction2+\"; ");
    
   /* add mc_red1 to _root and name it as "mc_red1" */
   SWFDisplayItem it_red1, it_red2, it_red3;
@@ -81,13 +83,26 @@ main(int argc, char** argv)
     SWFACTION_UNLOAD);
   SWFDisplayItem_setName(it_red1, "mc_red1"); 
 
+  /* add mc_red1 to _root and name it as "mc_red2" */
+  it_red2 = SWFMovie_add(mo, (SWFBlock)mc_red1);  
+  SWFDisplayItem_setDepth(it_red2, 11); 
+  SWFDisplayItem_addAction(it_red2,
+    compileSWFActionCode("_root.x1 += \"onLoadRed2+\";"),
+    SWFACTION_ONLOAD);
+  SWFDisplayItem_addAction(it_red2,
+    compileSWFActionCode("_root.x1 += \"onUnloadRed2+\";"),
+    SWFACTION_UNLOAD);
+  SWFDisplayItem_setName(it_red2, "mc_red2"); 
+
   SWFMovie_nextFrame(mo); /* 2nd frame */
 
-  add_actions(mo, "_root.x1 += \"as_in_DoAction+\"; ");
+  SWFDisplayItem_remove(it_red2);
+  add_actions(mo, "_root.x1 += \"as_in_DoAction3+\"; ");
   SWFDisplayItem_remove(it_red1);
   SWFMovie_nextFrame(mo); /* 3th frame */
   
-  check_equals(mo, "_root.x1", "'as_in_DoAction+onLoad+as_in_DoAction+onUnload+'");
+  // could this be due to Ming reordering tags ?
+  check_equals(mo, "_root.x1", "'as_in_DoAction1+as_in_DoAction2+onLoad+onLoadRed2+as_in_DoAction3+onUnload+onUnloadRed2+'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 4th frame */
 

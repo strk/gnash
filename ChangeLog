@@ -1,3 +1,12 @@
+2007-09-05 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/action_execution_order_test3.c: attempt
+	  to test REMOVEOBJECT before DOACTION (failed though, as Ming seems
+	  to keep placing REMOVEOBJECT tags adjacent instead).
+	  This test is reported as an evidence of behaviour 2 in
+	  ActionsExecutionOrder#Verified_behaviour wiki page, so we either
+	  need another or that behaviour is not verified !!
+
 2007-09-05 Ivor Blockley <meteoryte@yahoo.com.au>
 
 	* server/vm/action.{cpp,h}: add htmlText property to 
