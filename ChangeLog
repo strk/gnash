@@ -4,6 +4,7 @@
 	* libbase/timer.cpp: Added commentary.
 	* backend/sound_handler_sdl.cpp: Fixed conflict with namespaces from
 	 booost/cstdint.hpp.
+	* utilities/*.cpp: #ifdef ENABLE_NLS.
 
 2007-09-04 Sandro Santilli <strk@keybit.net>
 

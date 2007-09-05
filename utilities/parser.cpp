@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: parser.cpp,v 1.42 2007/08/27 12:44:29 strk Exp $ */
+/* $Id: parser.cpp,v 1.43 2007/09/05 01:51:32 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -35,6 +35,10 @@ extern "C"{
 	extern int optind, getopt(int, char *const *, const char *);
 #endif
 }
+
+#ifdef ENABLE_NLS
+#include <locale.h>
+#endif
 
 #include "gettext.h"
 #include "tu_file.h"
@@ -610,10 +614,11 @@ main(int argc, char *argv[])
     int c;
 
     // Enable native language support, i.e. internationalization
+#ifdef ENABLE_NLS
     setlocale (LC_MESSAGES, "");
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
-
+#endif
     // scan for the two main standard GNU options
     for (c = 0; c < argc; c++) {
 	if (strcmp("--help", argv[c]) == 0) {

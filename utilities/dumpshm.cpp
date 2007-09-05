@@ -20,7 +20,7 @@
 //
 
 
-/* $Id: dumpshm.cpp,v 1.13 2007/08/10 14:06:36 strk Exp $ */
+/* $Id: dumpshm.cpp,v 1.14 2007/09/05 01:51:32 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -62,6 +62,10 @@ extern "C"{
 #endif
 #include <cstdio>
 
+#ifdef ENABLE_NLS
+#include <locale.h>
+#endif
+
 #include "log.h"
 #include "rc.h"
 #include "shm.h"
@@ -100,10 +104,11 @@ main(int argc, char *argv[])
 // #endif
 
     // Enable native language support, i.e. internationalization
+#ifdef ENABLE_NLS
     setlocale (LC_MESSAGES, "");
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
-
+#endif
     /* This initializes the DBG_MSG macros */ 
     while ((c = getopt (argc, argv, "hdnl:if")) != -1) {
         switch (c) {

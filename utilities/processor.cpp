@@ -25,6 +25,10 @@
 #include <sys/time.h>
 #include <time.h>
 
+#ifdef ENABLE_NLS
+#include <locale.h>
+#endif
+
 #include "gettext.h"
 #include "tu_file.h"
 #include "container.h"
@@ -138,10 +142,11 @@ main(int argc, char *argv[])
     gnashInit();
 
     // Enable native language support, i.e. internationalization
+#ifdef ENABLE_NLS
     setlocale (LC_MESSAGES, "");
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
-
+#endif
     int c;
 
     // scan for the two main standard GNU options
