@@ -2,6 +2,8 @@
 
 	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: more tests about 
 	  initactions, gnash fails by not respecting the actions order.
+	* testsuite/misc-swfc.all/movieclip_destruction_test4.sc: more tests for 
+	  catching unloaded character bug, got a xcheck.
 	
 2007-09-05 Markus Gothe <nietzsche@lysator.liu.se>
 
