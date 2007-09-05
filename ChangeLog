@@ -5,6 +5,7 @@
 	* backend/sound_handler_sdl.cpp: Fixed conflict with namespaces from
 	 booost/cstdint.hpp.
 	* utilities/*.cpp: #ifdef ENABLE_NLS.
+	* testsuit/libamf.all/*.cpp: Fixed GNUisms.
 
 2007-09-04 Sandro Santilli <strk@keybit.net>
 

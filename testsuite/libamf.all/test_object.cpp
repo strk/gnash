@@ -22,7 +22,15 @@
 #ifdef HAVE_DEJAGNU_H
 
 #include <sys/types.h>
-#include <unistd.h>
+extern "C"{
+        #include <unistd.h>
+#ifdef HAVE_GETOPT_H
+        #include <getopt.h>
+#endif
+#ifndef __GNUC__
+        extern int optind, getopt(int, char *const *, const char *);
+#endif
+}
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
