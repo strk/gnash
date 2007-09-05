@@ -195,8 +195,12 @@
 // Seperate tests for DoInitAction.
 //
 .frame 12
-  .sprite mc6  // Define a movieclip
+  .sprite mc61  // Define a movieclip
     .frame 1  b3
+  .end
+  
+  .sprite mc6
+    .frame 1  .put mc61
   .end
   
   .put mc6    // Place the movieclip
@@ -204,6 +208,7 @@
   .initaction mc6: // Add initactions for mc6
     // Gnash fails by not respecting actions order for initactions
     _root.xcheck_equals(typeof(mc6), 'movieclip');
+    _root.xcheck_equals(typeof(mc6.mc61), 'movieclip');
     _root.xcheck_equals(typeof(mc7), 'movieclip');
   .end
   
