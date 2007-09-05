@@ -1,3 +1,8 @@
+2007-09-05 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: more tests about 
+	  initactions, gnash fails by not respecting the actions order.
+	
 2007-09-05 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* server/asobj/MovieClipLoader.cpp: iterator -> const_iterator.

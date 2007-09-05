@@ -101,7 +101,7 @@
   .end
   
   .initaction mc2: // Add initactions for mc2(mc2 is not placed)
-    // mc1 is still alive here, _root.gotoAndStop(6) hasn't been executed yet.
+    // mc1 is still alive here, _root.gotoAndPlay(6) hasn't been executed yet.
     // Note mc1 has 2 frames.
     check_equals(typeof(mc1), 'movieclip');
     check_equals(mc1.getDepth(), -16383);
@@ -189,10 +189,34 @@
     check_equals(_root.testvar2, 400);
     check_equals(typeof(_root.mc5), 'movieclip');  
     check_equals(mc5.getDepth(), -32969); 
-    
+  .end
+
+//
+// Seperate tests for DoInitAction.
+//
+.frame 12
+  .sprite mc6  // Define a movieclip
+    .frame 1  b3
+  .end
+  
+  .put mc6    // Place the movieclip
+  
+  .initaction mc6: // Add initactions for mc6
+    // Gnash fails by not respecting actions order for initactions
+    _root.xcheck_equals(typeof(mc6), 'movieclip');
+    _root.xcheck_equals(typeof(mc7), 'movieclip');
+  .end
+  
+  .sprite mc7  // Define a movieclip
+    .frame 1  b3
+  .end
+  
+  .put mc7    // Place the movieclip
+  
+  .action:
     stop();
     totals();
   .end
-
-.end
+  
+.end  // file end
 
