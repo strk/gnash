@@ -102,7 +102,7 @@
       _root.check_equals(this.getDepth(), -32809);
       // child mc31 has no onUnload defined. child mc31 has been destroyed.
       // Gnash fails by keeping the child alive(referenceable)
-      _root.xcheck_equals(typeof(this.mc31), 'undefined');
+      _root.check_equals(typeof(this.mc31), 'undefined');
     };
     
     // Define child onUnload

@@ -800,6 +800,34 @@ DisplayList::clear(const DisplayList& from, bool call_unload)
 
 	testInvariant();
 }
+
+bool
+DisplayList::unload()
+{
+	//GNASH_REPORT_FUNCTION;
+
+	testInvariant();
+
+	for (iterator it = _characters.begin(),	itEnd = _characters.end(); it != itEnd; )
+	{
+		// make a copy
+		DisplayItem di = *it;
+
+		if ( ! di->unload() ) // no event handler queued, we remove
+		{
+			it = _characters.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	testInvariant();
+
+	return ! _characters.empty();
+
+}
 	
 void
 DisplayList::advance(float delta_time)

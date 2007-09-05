@@ -1676,30 +1676,6 @@ public:
 	}
 };
 
-/// A DisplayList visitor used to unload all characters
-class UnloaderVisitor {
-	int unloadEvents;
-
-public:
-	UnloaderVisitor()
-		:
-		unloadEvents(0)
-	{}
-
-	void operator() (character* ch)
-	{
-		// don't unload already unloaded characters
-		if ( ch->isUnloaded() ) return;
-
-		if ( ch->unload() ) ++unloadEvents;
-	}
-
-	bool foundUnloadEvents() const 
-	{
-		return unloadEvents != 0;
-	}
-};
-
 /// A DisplayList visitor used to advance all non-unloaded characters
 class AdvancerVisitor {
 
@@ -3422,10 +3398,9 @@ sprite_instance::unload()
 	log_msg(_("Unloading sprite '%s'"), getTargetPath().c_str());
 #endif
 
-	UnloaderVisitor visitor;
-	m_display_list.visitAll(visitor);
+	bool childHaveUnloadHandler = m_display_list.unload();
 
-	return character::unload() || visitor.foundUnloadEvents();
+	return character::unload() || childHaveUnloadHandler;
 
 }
 

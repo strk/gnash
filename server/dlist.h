@@ -214,6 +214,15 @@ public:
 		_characters.clear();
 	}
 
+	/// Unload the characters in this DisplayList removing
+	/// all but the ones with on onUnload event defined
+	/// (checked by calling ::unload on them) and keeping
+	/// the others, w/out depth-shifting them.
+	///
+	/// Return true if any child was kept (as they had onUnload defined)
+	///
+	bool unload();
+
 	/// \brief
 	/// Clear all characters in this DisplayList that are also found
 	/// in the given DisplayList

@@ -1,3 +1,11 @@
+2007-09-05 Sandro Santilli <strk@keybit.net>
+
+	* server/dlist.{cpp,h}: add ::unload method for taking
+	  care of unloads triggered by parent unload.
+	* server/sprite_instance.cpp (unload): use DisplayList::unload
+	* testsuite/misc-swfc.all/movieclip_destruction_test4.sc: fix
+	  destruction of childs w/out onUnload event handler defined.
+
 2007-09-05 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: more tests about 
