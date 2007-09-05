@@ -218,6 +218,16 @@
   
   .put mc7    // Place the movieclip
   
+
+.frame 15
+  .initaction mc6: //Add initactions for mc6 again.
+    x = 0;
+    // This check should not be executed.
+    // We should ignore the second init actions for the same sprite.
+    // It is here just for detecting some bogus implementation
+    _root.xcheck_equals(x, 1);
+  .end
+
   .action:
     stop();
     totals();
