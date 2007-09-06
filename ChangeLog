@@ -1,5 +1,8 @@
 2007-09-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/action_execution_order_test4.c: more
+	  explicit test showing that defining onLoad for _root in first
+	  frame works, while doesn't work for child sprites.
 	* server/sprite_instance.cpp (add_display_object): only syntetize 
 	  and instance name when actually placing a new character (simplifies
 	  the code and fixes a case related to ratio compatibility).

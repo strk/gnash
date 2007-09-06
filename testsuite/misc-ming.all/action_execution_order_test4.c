@@ -97,6 +97,8 @@ main(int argc, char** argv)
   sh_red = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc1, (SWFBlock)sh_red);  
   add_clip_actions(mc1, " _root.note('actions in 1st frame of mc1'); "
+			// Defining onLoad in first frame of a sprite doesn't work, but works for root
+			" this.onLoad = function() { _root.note('mc1 onLoad called'); _root.x1 += 'YY'; };"
                         " _root.x1 += '2+'; ");
   SWFMovieClip_nextFrame(mc1); /* mc1, 1st frame */
   add_clip_actions(mc1, " _root.note('actions in 2nd frame of mc1'); "
@@ -108,6 +110,8 @@ main(int argc, char** argv)
   sh_red = make_fill_square (80, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc2, (SWFBlock)sh_red); 
   add_clip_actions(mc2, " _root.note('actions in 1st frame of mc2'); "
+			// Defining onLoad in first frame of a sprite doesn't work, but works for root
+			" this.onLoad = function() { _root.note('mc2 onLoad called'); _root.x1 += 'XX'; };"
                         " _root.x1 += '4+'; "); 
   SWFMovieClip_nextFrame(mc2); /* mc2, 1st frame */
   add_clip_actions(mc2, " _root.note('actions in 2nd frame of mc2'); "
@@ -119,6 +123,8 @@ main(int argc, char** argv)
   sh_red = make_fill_square (160, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc3, (SWFBlock)sh_red);  
   add_clip_actions(mc3, " _root.note('actions in 1st frame of mc3'); "
+			// Defining onLoad in first frame of a sprite doesn't work, but works for root
+			" this.onLoad = function() { _root.note('mc3 onLoad called'); _root.x1 += 'ZZ'; };"
                         " _root.x1 += '6+';"); 
   SWFMovieClip_nextFrame(mc3); /* mc3, 1st frame */
   add_clip_actions(mc3, " _root.note('actions in 2nd frame of mc3'); "
