@@ -82,6 +82,7 @@ main(int argc, char** argv)
   it_red = SWFMovie_add(mo, (SWFBlock)mc_red);  
   SWFDisplayItem_addAction(it_red,
     compileSWFActionCode(
+	"_root.mcRedLoadCalls++;"
 	"_root.typeofMcBluFromMcRedLoad = typeof(_root.mc_blu);"
     	"_root.typeofMcRedFromMcRedLoad = typeof(_root.mc_red);"
 	), SWFACTION_ONLOAD);
@@ -95,6 +96,7 @@ main(int argc, char** argv)
   it_blu = SWFMovie_add(mo, (SWFBlock)mc_blu);  
   SWFDisplayItem_addAction(it_blu,
     compileSWFActionCode(
+	"_root.mcBluLoadCalls++;"
 	"_root.typeofMcRedFromMcBluLoad = typeof(_root.mc_red);"
     	"_root.typeofMcBluFromMcBluLoad = typeof(_root.mc_blu);"
 	), SWFACTION_ONLOAD);
@@ -115,6 +117,10 @@ main(int argc, char** argv)
 
   // onLoad handler for mc_blu DO can see itself 
   check_equals(mo, "_root.typeofMcBluFromMcBluLoad", "'movieclip'");
+
+  // onLoad handlers of mc_red and mc_blu called once
+  check_equals(mo, "_root.mcBluLoadCalls", "1");
+  check_equals(mo, "_root.mcRedLoadCalls", "1");
 
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 3rd frame */
