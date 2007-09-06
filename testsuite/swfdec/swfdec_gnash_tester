@@ -22,6 +22,10 @@ if [ -e "${in}.trace.org" ]; then
 	use_orig=1
 fi
 
+# NOTE: We're supposed to advance 10 frames.
+#       We advance 11 times as for Gnash the first call to ::advance
+#       simply constructs the root movie (will be fixed eventually)
+#
 ${GPROCESSOR} -r11 -f11 -v "$in"  | grep TRACE | sed 's/.*TRACE: //' | fromdos > $out
 if test "$?" != 0; then
 	echo "gprocessor returned an error"
