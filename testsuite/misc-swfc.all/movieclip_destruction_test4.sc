@@ -53,11 +53,18 @@
 .frame 2
  
   .sprite mc11
+    .frame 1 
+      .action:
+        _root.note("Running frame1["+this._currentframe+"] actions of mc11["+this._target+"] (adding green square @ 400,200)");
+      .end
     .put green_square x=400 y=200
   .end
   
   .sprite mc1
     .frame 1 
+      .action:
+        _root.note("Running frame1["+this._currentframe+"] actions of mc1["+this._target+"] (adding green square @ 300,200 and mc11)");
+      .end
       .put green_square x=300 y=200
       .put mc11
     .frame 6
@@ -90,6 +97,9 @@
   
   .sprite mc3
     .frame 1 
+      .action:
+        _root.note("Running frame1["+this._currentframe+"] actions of mc3["+this._target+"] (adding blue square)");
+      .end
       .put blue_square x=300 y=400
       .put mc31
     .frame 6
