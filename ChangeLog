@@ -1,3 +1,9 @@
+2007-09-06 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (add_display_object): only syntetize 
+	  and instance name when actually placing a new character (simplifies
+	  the code and fixes a case related to ratio compatibility).
+
 2007-09-06 Tomas Groth Christensen <tomasgroth@yahoo.dk>
 
 	* libbase/FLVParser.cpp: Made it more robust by accepting empty

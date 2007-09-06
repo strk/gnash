@@ -2775,10 +2775,19 @@ sprite_instance::add_display_object(
     
     boost::intrusive_ptr<character> ch;
     
-    // Create a new instance and syntetize an instance name if scriptable when:
-    //  (1) target depth is empty 
-    //  (2) we are in jump-back-mode
-    if(!existing_char || is_jumping_back)
+    bool is_ratio_compatible=true;
+    if(existing_char)
+    {
+     is_ratio_compatible= (ratio == existing_char->get_ratio())
+        || (ratio==character::noRatioValue && existing_char->get_ratio()==0)
+        || (ratio==0 && existing_char->get_ratio()==character::noRatioValue);
+    }
+
+    // Place a new character if:
+    //  (1)target depth is empty 
+    //  (2)target depth is not empty but the character has a different ratio 
+    // in jump-back-mode.
+    if(!existing_char || (is_jumping_back && !is_ratio_compatible))
     {
         // TODO: Optimize this.
         // Create_character_instance() is too expensive for some characters.
@@ -2798,22 +2807,7 @@ sprite_instance::add_display_object(
             std::string instance_name = getNextUnnamedInstanceName();
             ch->set_name(instance_name.c_str());
         }
-    }
 
-    bool is_ratio_compatible=true;
-    if(existing_char)
-    {
-     is_ratio_compatible= (ratio == existing_char->get_ratio())
-        || (ratio==character::noRatioValue && existing_char->get_ratio()==0)
-        || (ratio==0 && existing_char->get_ratio()==character::noRatioValue);
-    }
-
-    // Place a new character if:
-    //  (1)target depth is empty 
-    //  (2)target depth is not empty but the character has a different ratio 
-    // in jump-back-mode.
-    if(!existing_char || (is_jumping_back && !is_ratio_compatible))
-    {
         // Attach event handlers (if any).
         for (size_t i = 0, n = event_handlers.size(); i < n; i++)
         {
