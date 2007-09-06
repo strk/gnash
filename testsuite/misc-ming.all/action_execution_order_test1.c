@@ -19,8 +19,11 @@
 /*
  * Zou Lunkai, zoulunkai@gmail.com
  *
- * Within the same frame, ActionScripts in DoAction tags can referance movieClip 
+ * Within the same frame, ActionScript in DoAction tags can referance movieClip 
  * placed after DoAction tags. 
+ *
+ * Within the same frame, ActionScript in onClipLoad handlers can referance
+ * movieClip placed after the PlaceObject2 tag defining the clip event. 
  *
  * The actual order of tags are dependent on compiler, so you need to 
  * verify first if the order of tags is what you expect.
