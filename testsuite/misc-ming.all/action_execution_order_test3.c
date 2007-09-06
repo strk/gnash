@@ -63,28 +63,27 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); /* 1st frame */
 
   add_actions(mo, "_root.x1 += \"as_in_DoAction1+\"; ");
+  add_actions(mo, "_root.x1 += \"as_in_DoAction2+\"; ");
   
   mc_red1 = newSWFMovieClip();
   sh_red = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc_red1, (SWFBlock)sh_red);  
   SWFMovieClip_nextFrame(mc_red1); /* mc_red1, 1st frame */
-
-  add_actions(mo, "_root.x1 += \"as_in_DoAction2+\"; ");
    
   /* add mc_red1 to _root and name it as "mc_red1" */
   SWFDisplayItem it_red1, it_red2, it_red3;
-  it_red1 = SWFMovie_add(mo, (SWFBlock)mc_red1);  
+  it_red1 = SWFMovie_add(mo, (SWFBlock)mc_red1);  // PlaceObject2
   SWFDisplayItem_setDepth(it_red1, 10); 
   SWFDisplayItem_addAction(it_red1,
-    compileSWFActionCode("_root.x1 += \"onLoad+\";"),
+    compileSWFActionCode("_root.x1 += \"onLoadRed1+\";"),
     SWFACTION_ONLOAD);
   SWFDisplayItem_addAction(it_red1,
-    compileSWFActionCode("_root.x1 += \"onUnload+\";"),
+    compileSWFActionCode("_root.x1 += \"onUnloadRed1+\";"),
     SWFACTION_UNLOAD);
   SWFDisplayItem_setName(it_red1, "mc_red1"); 
 
   /* add mc_red1 to _root and name it as "mc_red2" */
-  it_red2 = SWFMovie_add(mo, (SWFBlock)mc_red1);  
+  it_red2 = SWFMovie_add(mo, (SWFBlock)mc_red1);  // PlaceObject2
   SWFDisplayItem_setDepth(it_red2, 11); 
   SWFDisplayItem_addAction(it_red2,
     compileSWFActionCode("_root.x1 += \"onLoadRed2+\";"),
@@ -96,13 +95,14 @@ main(int argc, char** argv)
 
   SWFMovie_nextFrame(mo); /* 2nd frame */
 
-  SWFDisplayItem_remove(it_red2);
   add_actions(mo, "_root.x1 += \"as_in_DoAction3+\"; ");
-  SWFDisplayItem_remove(it_red1);
+  // Don't try to remove mc_red2 before mc_red1, you *can not* control
+  // this in the source level! Or at least it is more difficult than you imagine.
+  SWFDisplayItem_remove(it_red1); // RemoveObject2
+  SWFDisplayItem_remove(it_red2); // RemoveObject2
   SWFMovie_nextFrame(mo); /* 3th frame */
   
-  // could this be due to Ming reordering tags ?
-  check_equals(mo, "_root.x1", "'as_in_DoAction1+as_in_DoAction2+onLoad+onLoadRed2+as_in_DoAction3+onUnload+onUnloadRed2+'");
+  check_equals(mo, "_root.x1", "'as_in_DoAction1+as_in_DoAction2+onLoadRed1+onLoadRed2+as_in_DoAction3+onUnloadRed1+onUnloadRed2+'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 4th frame */
 
@@ -112,6 +112,3 @@ main(int argc, char** argv)
 
   return 0;
 }
-
-
-
