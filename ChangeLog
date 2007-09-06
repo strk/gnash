@@ -1,3 +1,9 @@
+2007-09-06 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/misc-ming.all/action_execution_order_test1.c: Add tests
+	  showing that onClipLoad event can reference self and characters placed 
+	  either before or after the character carrying that event.
+
 2007-09-06 Zou Lunkai <zoulunkai@gmail.com>
 
 	* testsuite/misc-ming.all/action_execution_order_test3.c: Reorganize and recomment

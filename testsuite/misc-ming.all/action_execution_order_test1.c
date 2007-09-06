@@ -40,8 +40,9 @@ int
 main(int argc, char** argv)
 {
   SWFMovie mo;
-  SWFMovieClip  mc_red, dejagnuclip;
-  SWFShape  sh_red;
+  SWFMovieClip  mc_red, mc_blu, dejagnuclip;
+  SWFShape  sh_red, sh_blu;
+  SWFDisplayItem it_red, it_blu;
 
   const char *srcdir=".";
   if ( argc>1 ) 
@@ -68,14 +69,52 @@ main(int argc, char** argv)
   sh_red = make_fill_square (0, 300, 60, 60, 255, 0, 0, 255, 0, 0);
   SWFMovieClip_add(mc_red, (SWFBlock)sh_red);  
   SWFMovieClip_nextFrame(mc_red);//1st frame
+
+  mc_blu = newSWFMovieClip();
+  sh_blu = make_fill_square (0, 300, 60, 60, 0, 0, 255, 0, 0, 255);
+  SWFMovieClip_add(mc_blu, (SWFBlock)sh_blu);  
+  SWFMovieClip_nextFrame(mc_blu);//1st frame
  
-  /* add mc_red to _root and name it as "mc_red" */
-  SWFDisplayItem it_red;
+  /*
+   * Add mc_red to _root and name it as "mc_red"
+   * Have onClipLoad reference mc_blu (yet to be placed)
+   */
   it_red = SWFMovie_add(mo, (SWFBlock)mc_red);  
+  SWFDisplayItem_addAction(it_red,
+    compileSWFActionCode(
+	"_root.typeofMcBluFromMcRedLoad = typeof(_root.mc_blu);"
+    	"_root.typeofMcRedFromMcRedLoad = typeof(_root.mc_red);"
+	), SWFACTION_ONLOAD);
   SWFDisplayItem_setDepth(it_red, 3); 
   SWFDisplayItem_setName(it_red, "mc_red"); 
+
+  /*
+   * Add mc_blu to _root and name it as "mc_blu"
+   * Have onClipLoad reference mc_red (placed before)
+   */
+  it_blu = SWFMovie_add(mo, (SWFBlock)mc_blu);  
+  SWFDisplayItem_addAction(it_blu,
+    compileSWFActionCode(
+	"_root.typeofMcRedFromMcBluLoad = typeof(_root.mc_red);"
+    	"_root.typeofMcBluFromMcBluLoad = typeof(_root.mc_blu);"
+	), SWFACTION_ONLOAD);
+  SWFDisplayItem_setDepth(it_blu, 4); 
+  SWFDisplayItem_setName(it_blu, "mc_blu"); 
+  SWFDisplayItem_moveTo(it_blu, 200, 0);
+
   SWFMovie_nextFrame(mo); /* 2nd frame */
 
+  // onLoad handler for mc_red DO can see mc_blu (not yet placed)
+  check_equals(mo, "_root.typeofMcBluFromMcRedLoad", "'movieclip'");
+
+  // onLoad handler for mc_red DO can see itself 
+  check_equals(mo, "_root.typeofMcRedFromMcRedLoad", "'movieclip'");
+
+  // onLoad handler for mc_blu DO can see mc_red (placed before)
+  check_equals(mo, "_root.typeofMcRedFromMcBluLoad", "'movieclip'");
+
+  // onLoad handler for mc_blu DO can see itself 
+  check_equals(mo, "_root.typeofMcBluFromMcBluLoad", "'movieclip'");
 
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); /* 3rd frame */
