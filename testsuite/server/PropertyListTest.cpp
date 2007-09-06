@@ -52,6 +52,7 @@ main(int /*argc*/, char** /*argv*/)
 	boost::intrusive_ptr<movie_definition> md6 ( new DummyMovieDefinition(6) );
 
 	VM& vm = VM::init(*md5);
+    	vm.getRoot().setRootMovie( md5->create_movie_instance() );
 
 	log_debug("VM version %d", vm.getSWFVersion());
 

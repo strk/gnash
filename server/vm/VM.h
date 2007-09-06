@@ -66,7 +66,7 @@ public:
 /// the operation, as depending on that version the Virtual
 /// Machine acts differently, for backward compatibility.
 /// 
-/// The VM is initialized once for each *main* movie.
+/// The VM is initialized once for each "stage" (main movie).
 /// Gnash currently only supports a *single* VM as it uses
 /// gloabls a lot. Definition of this class is aimed at
 /// grouping the globals into a specific VM instance that
@@ -100,10 +100,7 @@ class DSOEXPORT VM {
 	friend class std::auto_ptr<VM>;
 	static std::auto_ptr<VM> _singleton;
 
-	/// \brief
-	/// Root movie, will be instantiated from the definition
-	/// given to the init() function.
-	///
+	/// Stage associated with this VM
 	std::auto_ptr<movie_root> _root_movie;
 
 	/// The _global ActionScript object
@@ -114,12 +111,6 @@ class DSOEXPORT VM {
 
 	/// Time when the VM get started
 	uint64_t _start_time;
-
-	/// Set the current Root movie.
-	//
-	/// Will be called by the init() function
-	///
-	void setRoot(movie_instance*);
 
 	/// Set the _global Object for actions run by Virtual Machine
 	//
@@ -142,19 +133,15 @@ public:
 	/// Initialize the virtual machine singleton with the given
 	/// movie definition and return a reference to it.
 	//
-	/// An instance of the given movie will become the absolute
-	/// root of the application (ActionScript's _level0)
+	/// The given movie will be only used to fetch SWF version from.
 	///
 	/// Don't call this function twice, and make sure you have
 	/// called this *before* you call VM::get()
 	///
 	/// @param movie
-	///	The definition for the root movie.
-	///	It is required that the given definition's
-	///	create_movie_instance() method returns
-	///	not NULL, or an assertion will fail.
-	///	See movie_definition::create_root_instance()
-	///	for more info.
+	///	The definition for the root movie, only
+	///	used to fetch SWF version from.
+	///	TODO: take SWF version directly ?
 	///
 	static VM& init(movie_definition& movie);
 
@@ -186,7 +173,7 @@ public:
 	///
 	const std::string& getPlayerVersion() const;
 
-	/// Get a pointer to this VM's Root movie 
+	/// Get a pointer to this VM's Root movie (stage)
 	movie_root& getRoot() const;
 
 	/// Get a pointer to this VM's _global Object

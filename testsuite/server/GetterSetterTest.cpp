@@ -87,7 +87,8 @@ main(int /*argc*/, char** /*argv*/)
 	gnashInit();
 
 	boost::intrusive_ptr<movie_definition> md6 ( new DummyMovieDefinition(6) );
-	VM::init(*md6);
+	VM& vm = VM::init(*md6);
+    	vm.getRoot().setRootMovie( md6->create_movie_instance() );
 
 	boost::intrusive_ptr<test_object> obj(new test_object("initial text"));
 	boost::intrusive_ptr<test_object> obj2(new test_object("other obj"));

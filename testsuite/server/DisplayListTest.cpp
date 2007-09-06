@@ -54,7 +54,9 @@ main(int /*argc*/, char** /*argv*/)
 	// Initialize a VM
 	boost::intrusive_ptr<movie_definition> md5 ( new DummyMovieDefinition(5) );
 	boost::intrusive_ptr<movie_definition> md6 ( new DummyMovieDefinition(6) );
-	VM::init(*md5);
+
+	VM& vm = VM::init(*md5);
+    	vm.getRoot().setRootMovie( md5->create_movie_instance() );
 
 	DisplayList dlist1;
 

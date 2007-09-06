@@ -95,6 +95,7 @@ MovieTester::MovieTester(const std::string& url)
 	// Now complete load of the movie
 	_movie_def->completeLoad();
 	_movie_def->ensure_frame_loaded(_movie_def->get_frame_count());
+        _movie_root->setRootMovie( _movie_def->create_movie_instance() );
 
 	_movie = _movie_root->get_root_movie();
 	assert(_movie);

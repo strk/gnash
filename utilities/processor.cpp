@@ -332,6 +332,10 @@ play_movie(const char* filename)
     gnash::movie_root& m = VM::init(*md).getRoot();
 
     md->completeLoad();
+
+    std::auto_ptr<movie_instance> mi ( md->create_movie_instance() );
+
+    m.setRootMovie( mi.release() );
     
     resetLastAdvanceTimer();
     int	kick_count = 0;

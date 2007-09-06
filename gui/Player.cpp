@@ -312,7 +312,9 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     _gui->createWindow(_url.c_str(), width, height);
 
     movie_root& root = VM::init(*_movie_def).getRoot();
-    sprite_instance* m = root.get_root_movie();
+
+    std::auto_ptr<movie_instance> mr ( _movie_def->create_movie_instance() );
+    sprite_instance* m = mr.get();
 
     // Start loader thread
     _movie_def->completeLoad();
@@ -336,6 +338,7 @@ Player::run(int argc, char* argv[], const char* infile, const char* url)
     // Parse querystring
     setFlashVars(*m, URL(_url).querystring());
 
+    root.setRootMovie( mr.release() ); // will construct the instance
     root.set_display_viewport(0, 0, width, height);
     root.set_background_alpha(background ? 1.0f : 0.05f);
 

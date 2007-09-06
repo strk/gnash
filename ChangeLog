@@ -1,3 +1,17 @@
+2007-09-07 Sandro Santilli <strk@keybit.net>
+
+	* server/vm/VM.{cpp,h}: change the VM::init() functionality
+	  to NOT instantiate the movie definition. This is propedeutic
+	  for a cleanup in movie_instance construction, which will be
+	  performed by movie_root::setLevel in next patch.
+	* gui/Player.cpp, testsuite/MovieTester.cpp,
+	  testsuite/server/DisplayListTest.cpp,
+	  testsuite/server/GetterSetterTest.cpp,
+	  testsuite/server/PropertyListTest.cpp,
+	  utilities/processor.cpp:
+	  Update VM & stage (movie_root) initialization calls
+	  to take into account VM::init() semantic change.
+
 2007-09-06 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-ming.all/action_execution_order_test4.c: more

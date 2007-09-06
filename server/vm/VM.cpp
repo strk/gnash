@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.15 2007/08/19 20:01:13 strk Exp $ */
+/* $Id: VM.cpp,v 1.16 2007/09/07 00:11:26 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -51,10 +51,6 @@ VM::init(movie_definition& movie)
 
 	assert(_singleton.get());
 
-	std::auto_ptr<movie_instance> inst ( movie.create_movie_instance() );
-	assert(inst.get()); // or an invalid movie_definition was given
-	_singleton->setRoot(inst.release()); // transfer ownership
-
 	_singleton->setGlobal(new Global(*_singleton));
 	assert(_singleton->getGlobal());
 
@@ -77,6 +73,7 @@ VM::isInitialized()
 
 VM::VM(movie_definition& topmovie)
 	:
+	_root_movie(new movie_root()),
 	_swfversion(topmovie.get_version()),
 	_start_time(tu_timer::get_ticks())
 {
@@ -117,15 +114,6 @@ movie_root&
 VM::getRoot() const
 {
 	return *_root_movie;
-}
-
-/*private*/
-void
-VM::setRoot(movie_instance* root)
-{
-	assert(!_root_movie.get());
-	_root_movie.reset(new movie_root());
-	_root_movie->setRootMovie(root);
 }
 
 /*public*/
