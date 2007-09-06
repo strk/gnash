@@ -90,7 +90,7 @@
     mc2.onLoad = function () {_root.as_order += 'YY+';};
     
     mc1.onUnload = function () {_root.as_order += '7+';};
-    mc2.onUnload = function () {_root.as_order += '8+';};
+    mc2.onUnload = function () {_root.as_order += '9+';};
     
     _root.as_order += "1+";
   .end
@@ -116,7 +116,7 @@
   .del mc1 // delete mc1 by RemoveObject2
 
   .action:
-    _root.as_order += "9+";
+    _root.as_order += "8+";
   .end
   
   .del mc2 // delete mc2 by RemoveObject2
@@ -128,6 +128,7 @@
 .frame 6
   .action:
     xcheck_equals(_root.as_order, '0+1+2+3+4+5+6+7+8+9+10+');
+    _root.note(_root.as_order);
     totals();
     stop();
   .end
