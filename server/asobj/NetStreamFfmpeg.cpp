@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.88 2007/07/01 10:54:29 bjacques Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.89 2007/09/06 12:21:06 tgc Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -413,12 +413,14 @@ NetStreamFfmpeg::startPlayback()
 		m_VCodecCtx = initFlvVideo(m_parser.get());
 		if (!m_VCodecCtx) {
 			log_msg(_("Failed to initialize FLV video codec"));
-			return false;
 		}
 
 		m_ACodecCtx = initFlvAudio(m_parser.get());
 		if (!m_ACodecCtx) {
 			log_msg(_("Failed to initialize FLV audio codec"));
+		}
+
+		if (!m_ACodecCtx && !m_VCodecCtx) {
 			return false;
 		}
 
@@ -642,7 +644,7 @@ void NetStreamFfmpeg::av_streamer(NetStreamFfmpeg* ns)
 
 		if (ns->m_isFLV) {
 			// If queues are full then don't bother filling it
-			if (ns->m_qvideo.size() < 20 || ns->m_qvideo.size() < 20) {
+			if ((ns->m_VCodecCtx && ns->m_qvideo.size() < 20) || (ns->m_ACodecCtx && ns->m_qaudio.size() < 20)) {
 
 				// If we have problems with decoding - break
 				if (!ns->decodeFLVFrame() && ns->m_start_onbuffer == false && ns->m_qvideo.size() == 0 && ns->m_qaudio.size() == 0)
@@ -716,10 +718,10 @@ bool NetStreamFfmpeg::decodeFLVFrame()
 {
 	AVPacket packet;
 
-	FLVFrame* frame;
-	if (m_qvideo.size() < m_qaudio.size()) {
+	FLVFrame* frame = NULL;
+	if (m_qvideo.size() < m_qaudio.size() && m_VCodecCtx) {
 		frame = m_parser->nextVideoFrame();
-	} else {
+	} else if (m_ACodecCtx) {
 		frame = m_parser->nextAudioFrame();
 	}
 
@@ -1215,7 +1217,7 @@ void NetStreamFfmpeg::unpausePlayback()
 	// Re-connect to the soundhandler.
 	// It was disconnected to avoid to keep playing sound while paused
 	sound_handler* s = get_sound_handler();
-	if (s) s->attach_aux_streamer(audio_streamer, (void*) this);
+	if (s && m_ACodecCtx) s->attach_aux_streamer(audio_streamer, (void*) this);
 }
 
 

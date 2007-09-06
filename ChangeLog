@@ -1,3 +1,11 @@
+2007-09-06 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* libbase/FLVParser.cpp: Made it more robust by accepting empty
+	   tags, fixing bug #20889.
+	* server/video_stream_instance.cpp: Check for data being NULL.
+	* server/asobj/NetStreamFfmpeg.cpp: A few changes to make it
+	  work better with only video or audio - not complete yet.
+
 2007-09-06 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/misc-swfc.all/: Dejagnu.sc, check.sc:

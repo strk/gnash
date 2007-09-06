@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-// $Id: FLVParser.cpp,v 1.22 2007/07/01 10:54:06 bjacques Exp $
+// $Id: FLVParser.cpp,v 1.23 2007/09/06 12:21:06 tgc Exp $
 
 #include "FLVParser.h"
 #include "amf.h"
@@ -530,6 +530,11 @@ bool FLVParser::parseNextFrame()
 	// Check if there is enough data to parse the body of the frame
 	if (!_lt.isPositionConfirmed(_lastParsedPosition+15+bodyLength)) return false;
 
+	_lastParsedPosition += 15 + bodyLength;
+
+	// check for empty tag
+	if (bodyLength == 0) return true;
+
 	if (tag[0] == AUDIO_TAG) {
 		FLVAudioFrame* frame = new FLVAudioFrame;
 		frame->dataSize = bodyLength - 1;
@@ -552,7 +557,7 @@ bool FLVParser::parseNextFrame()
 
 			_audioInfo = new FLVAudioInfo((tag[11] & 0xf0) >> 4, samplerate, samplesize, (tag[11] & 0x01) >> 0, 0);
 		}
-		_lastParsedPosition += 15 + bodyLength;
+
 
 	} else if (tag[0] == VIDEO_TAG) {
 		FLVVideoFrame* frame = new FLVVideoFrame;
@@ -615,7 +620,6 @@ bool FLVParser::parseNextFrame()
 			// Create the videoinfo
 			_videoInfo = new FLVVideoInfo(codec, width, height, 0 /*frameRate*/, 0 /*duration*/);
 		}
-		_lastParsedPosition += 15 + bodyLength;
 
 	} else if (tag[0] == META_TAG) {
 		// Extract information from the meta tag
@@ -625,7 +629,6 @@ bool FLVParser::parseNextFrame()
 		amf::AMF* amfParser = new amf::AMF();
 		amfParser->parseAMF(metaTag);*/
 
-		_lastParsedPosition += 15 + bodyLength;
 	} else {
 		_parsingComplete = true;
 		return false;
