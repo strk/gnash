@@ -1,5 +1,7 @@
 2007-09-06 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/: Dejagnu.sc, check.sc:
+	  Also print expression being tested with {x}check_equals 
 	* testsuite/misc-ming.all/action_execution_order_test1.c: Add tests
 	  showing that onClipLoad event can reference self and characters placed 
 	  either before or after the character carrying that event.

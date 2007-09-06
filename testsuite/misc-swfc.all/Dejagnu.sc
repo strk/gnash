@@ -65,20 +65,20 @@
            
             },
 
-            check_equals: function (obt, exp, msg) {
+            check_equals: function (obt, exp, msg, expression) {
                 if(msg == null) msg = "";
                 if ( obt == exp ) 
-                    this.pass(obt+' == '+exp);
+                    this.pass(expression+' == '+exp);
                 else 
-                    this.fail('expected: "'+exp+'" , obtained: "'+obt+'" '+msg);
+                    this.fail(expression+': expected: "'+exp+'" , obtained: "'+obt+'" '+msg);
             },
 
-            xcheck_equals: function (obt, exp, msg) {
+            xcheck_equals: function (obt, exp, msg, expression) {
                 if(msg == null) msg = "";
                 if ( obt == exp ) 
-                    this.xpass(obt+' == '+exp+" "+msg);
+                    this.xpass(expression+' == '+exp+" "+msg);
                 else 
-                    this.xfail('expected: '+exp+' , obtained: '+obt+" "+msg);
+                    this.xfail(expression+': expected: '+exp+' , obtained: '+obt+" "+msg);
             },
 
             check: function (a, msg) {
