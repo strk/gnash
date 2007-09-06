@@ -1,7 +1,10 @@
 #!/bin/sh 
 
-# Get this from environment if available
-GPROCESSOR=${GPROCESSOR:=gprocessor}
+# Get this from environment if available, or use a default working
+# when invoked by build-dir.
+# Better yet might be generating this file on make check..
+#
+GPROCESSOR=${GPROCESSOR:=../../utilities/gprocessor}
 
 if [ -z "$1" ]; then
 	echo "Usage: `basename $0` <swffile>" >&2
