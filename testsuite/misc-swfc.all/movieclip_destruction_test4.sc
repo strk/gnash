@@ -65,9 +65,17 @@
    
   .sprite mc2
     .frame 1 
+      .action:
+        _root.note("Running frame1["+this._currentframe+"] actions of mc2["+this._target+"] (adding red square)");
+      .end
       .put red_square x=300 y=300
+    .frame 2 
+      .action:
+        _root.note("Running frame2["+this._currentframe+"] actions of mc2["+this._target+"] (nothing new)");
+      .end
     .frame 3
       .action:
+        _root.note("Running frame3["+this._currentframe+"] actions of mc2["+this._target+"] (removing brothers 1,3,4,5,6)");
         _root.brother1['removeMovieClip']();
         _root.brother3['removeMovieClip']();
         _root.brother4['removeMovieClip']();
@@ -90,6 +98,7 @@
   
 .frame 3
   .action:
+    _root.note("Running frame3 actions of _root (attach brothers)");
     _root.attachMovie("mc1", "brother1", 10);
     _root.attachMovie("mc2", "brother2", 20);
     _root.attachMovie("mc3", "brother3", 30);
@@ -130,9 +139,15 @@
     };
   .end
 
+.frame 4
+  .action:
+    _root.note("Running frame3 actions of _root (nothing new)");
+  .end
+
 
 .frame 5
   .action:
+    _root.note("Running frame5 actions of _root");
     check_equals(typeof(brother1), 'undefined');
     check_equals(typeof(brother2), 'movieclip');
     check_equals(typeof(brother3), 'undefined');
