@@ -87,7 +87,7 @@ main(int argc, char** argv)
   dejagnuclip = get_dejagnu_clip((SWFBlock)get_default_font(srcdir), 10, 0, 0, 800, 600);
   SWFMovie_add(mo, (SWFBlock)dejagnuclip);
   add_actions(mo, " x2 += 'as_start+'; "
-                  " _root.OnLoad = function () { x2 += 'load_called+'; }; "
+                  " _root.OnLoad = function () { _root.note('_root onLoad called'); x2 += 'load_called+'; }; "
                   " x2 += 'as_end+'; "
                   " _root.onEnterFrame = function () { x3 += 'enterFrame_called+'; }; ");
   SWFMovie_nextFrame(mo); /* 1st frame */
