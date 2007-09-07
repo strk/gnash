@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.12 2007/08/27 12:44:29 strk Exp $
+// $Id: video_stream_def.cpp,v 1.13 2007/09/07 22:24:41 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -137,12 +137,21 @@ video_stream_definition::get_decoder()
 }
 
 void 
-video_stream_definition::get_frame_data(int frameNum, uint8_t** data, int* size){
-	if (m_video_frames.size() == 0) return;
+video_stream_definition::get_frame_data(int frameNum, uint8_t** data, int* size)
+{
 	int cur_frame = frameNum - m_start_frame;
+	if ( cur_frame < 0 || cur_frame >= m_video_frames.size() )
+	{
+		log_error(_("No video data available for frame %d."), frameNum);
+		*data = 0;
+		*size = 0;
+		return;
+	}
+
+	assert( cur_frame < m_video_frames_size.size() );
 	*size = m_video_frames_size[cur_frame];
 	*data = m_video_frames[cur_frame];
 }
 
-}
+} // namespace gnash
 

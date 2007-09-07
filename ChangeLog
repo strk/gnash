@@ -1,5 +1,14 @@
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
+	* server/video_stream_instance.h: keep definition by 
+	  intrusive_ptr (just for consistency with other
+	  character instances)
+	* server/parser/video_stream_def.cpp (get_frame_data):
+	  always set output parameters to 0 if requested frame
+	  number is not available.
+
+2007-09-07 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.{cpp,h}: change signature of .reset() to
 	  take a sprite_instance for calling set_invalidated() when
 	  needed.

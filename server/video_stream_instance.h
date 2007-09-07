@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.18 2007/07/09 13:33:30 strk Exp $
+// $Id: video_stream_instance.h,v 1.19 2007/09/07 22:24:41 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -44,7 +44,7 @@ class video_stream_instance : public character
 
 public:
 
-	video_stream_definition*	m_def;
+	boost::intrusive_ptr<video_stream_definition>	m_def;
 	
 	video_stream_instance(video_stream_definition* def,
 			character* parent, int id);
