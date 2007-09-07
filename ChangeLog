@@ -1,5 +1,8 @@
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-mtasc.all/: level5.as, level99.as: check
+	  that at time of first-frame actions execution for loaded movies,
+	  _currentframe is set to 1.
 	* server/sprite_instance.cpp (loadMovie): don't use
 	  movie_root::setRootMovie for loading external movies,
 	  as that method is meant for kick-start only.

@@ -26,6 +26,8 @@ class Level99
 {
 	static function main(mc)
 	{
+                check_equals(mc._currentframe, 1);
+
                 // The ""+ is there to force conversion to a string
                 check_equals(""+mc, "_level99");
 
