@@ -1,5 +1,18 @@
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/Makefile.am,
+	  testsuite/misc-ming.all/Makefile.am,
+	  testsuite/misc-mtasc.all/Makefile.am,
+	  testsuite/misc-swfc.all/Makefile.am,
+	  testsuite/misc-swfmill.all/Makefile.am,
+	  testsuite/swfdec/Makefile.am:
+	  Don't have 'make check' fail here, rely
+	  on analyzer to tell if something went unexpected.
+	  This is to help with intermittent failures forcing
+	  running the expensinve check over and over again.
+
+2007-09-07 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/anaylse-results.sh: exit with a failure if any real
 	  failure or unexpected success is found in the logs. Cleanup
 	  presentation code and output (the latter to now which subdirs have
