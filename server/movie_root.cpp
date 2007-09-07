@@ -125,6 +125,9 @@ movie_root::setLevel(unsigned int num, boost::intrusive_ptr<movie_instance> movi
 		(int) movie->get_movie_definition()->get_width_pixels(),
 		(int) movie->get_movie_definition()->get_height_pixels());
 
+	/// Give life to this instance
+	movie->construct();
+
 	assert(testInvariant());
 }
 

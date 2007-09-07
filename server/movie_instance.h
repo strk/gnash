@@ -65,10 +65,14 @@ public:
 		return const_cast<movie_instance*>(this);
 	}
 
-	//virtual sprite_instance* get_root_movie()
-	//{
-		//return this;
-	//}
+	/// Construct a top-level movie
+	//
+	/// This method will just ensure first frame is loaded
+	/// and then call sprite_instance::construct.
+	///
+	/// It's intended to be called by movie_root::setLevel().
+	///
+	void construct();
 
 private:
 

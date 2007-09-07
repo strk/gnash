@@ -44,6 +44,45 @@ movie_instance::movie_instance(movie_definition* def, character* parent)
 {
 }
 
+void
+movie_instance::construct()
+{
+	//GNASH_REPORT_FUNCTION;
+
+	assert ( get_root()->get_root_movie() == this );
+
+	//_def->stopLoader();
+
+	// Load first frame  (1-based index)
+	size_t nextframe = 1;
+	if ( !_def->ensure_frame_loaded(nextframe) )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		log_swferror("Frame " SIZET_FMT " never loaded. Total frames: "
+				SIZET_FMT ".", nextframe, get_frame_count());
+		);
+	}
+
+	// The parser might have reset the total frame count
+	// due to SWF malformation, so we check this *after*
+	// the ensure_frame_loaded call above.
+	//
+	if ( get_frame_count() == 0 )
+	{
+		IF_VERBOSE_MALFORMED_SWF(
+		static bool warned=false;
+		if ( ! warned ) {
+			log_swferror(_("The movie with url %s has NO frames!"), m_def->get_url().c_str());
+			warned=true;
+		}
+		);
+		return;
+	}
+
+	// Invoke proper constructor
+	sprite_instance::construct();  
+}
+
 // Advance of an SWF-defined movie instance
 void
 movie_instance::advance(float delta_time)
@@ -84,12 +123,7 @@ movie_instance::advance(float delta_time)
 		return;
 	}
 
-	if (m_on_event_load_called == false)
-	{
-		construct();
-	}
-
-	advance_sprite(delta_time);
+	advance_sprite(delta_time); 
 
 	if (m_on_event_load_called == false)
 	{

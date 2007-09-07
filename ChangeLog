@@ -1,5 +1,13 @@
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_instance.{cpp,h}: add overridden ::construct
+	  method, taking care of ensuring frame1 is completely loaded
+	  and calling the superclass version of it. 
+	* server/movie_root.cpp (setLevel): call ::construct on newly
+	  added levels (including level0).
+
+2007-09-07 Sandro Santilli <strk@keybit.net>
+
 	* server/vm/VM.{cpp,h}: change the VM::init() functionality
 	  to NOT instantiate the movie definition. This is propedeutic
 	  for a cleanup in movie_instance construction, which will be
