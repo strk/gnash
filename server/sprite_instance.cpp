@@ -2388,15 +2388,8 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 	//  2.3 Remove all non-script-referencable instances, suboptimal!
 
 	// TODO: try to optize by avoid calling set_invalidated
-	DisplayList newList = m_display_list;
-	assert( newList == m_display_list );
-	newList.reset(*m_def, tgtFrame, true);
-	if ( newList != m_display_list )
-	{
-		//cout << "Modified DisplayList: " << newList << endl;
-		set_invalidated();
-		m_display_list = newList;
-	}
+	set_invalidated();
+	m_display_list.reset(*m_def, tgtFrame, true);
 
 	// 3. Execute all displaylist tags from first to target frame, with
 	//    target frame tag execution including ACTION tags

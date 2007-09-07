@@ -1,5 +1,17 @@
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (restoreDisplayList): don't use
+	  a copy of the display_list to optimize the call to set_invalidated.
+	  Removing characters from the copy would shift unloaded characters
+	  to a different depth, which in turn would fail an assertion
+	  (which is *needed* or set_invalidated would not include invalidated
+	  bounds of just-unloaded characters).
+	  BTW, this suggests me we need a lot of tests for inv.bounds. as the
+	  latest changes for depth swap on unload did likely break a few
+	  cases.
+
+2007-09-07 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp: disable the too many debugging
 	  prints left over from the big action order commit.
 
