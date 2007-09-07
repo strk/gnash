@@ -538,7 +538,7 @@ static as_value sprite_load_movie(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_msg(_("First argument of MovieClip.loadMovie(%s) "
+		log_aserror(_("First argument of MovieClip.loadMovie(%s) "
 			"evaluates to an empty string - "
 			"returning undefined"),
 			ss.str().c_str());
@@ -574,7 +574,7 @@ static as_value sprite_load_variables(const fn_call& fn)
 	if (fn.nargs < 1) // url
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg(_("MovieClip.loadVariables() "
+		log_aserror(_("MovieClip.loadVariables() "
 			"expected 1 or 2 args, got %d - returning undefined"),
 			fn.nargs);
 		);
@@ -586,7 +586,7 @@ static as_value sprite_load_variables(const fn_call& fn)
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
 		std::stringstream ss; fn.dump_args(ss);
-		log_msg(_("First argument passed to MovieClip.loadVariables(%s) "
+		log_aserror(_("First argument passed to MovieClip.loadVariables(%s) "
 			"evaluates to an empty string - "
 			"returning undefined"),
 			ss.str().c_str());
@@ -607,7 +607,7 @@ static as_value sprite_load_variables(const fn_call& fn)
 	}
 
 	sprite->loadVariables(url, method);
-	log_msg("MovieClip.loadVariables(%s) - TESTING ", url.str().c_str());
+	log_debug("MovieClip.loadVariables(%s) - TESTING ", url.str().c_str());
 
 
 	//log_unimpl(__PRETTY_FUNCTION__);
@@ -707,7 +707,7 @@ sprite_create_text_field(const fn_call& fn)
 	if (fn.nargs != 6) // name, depth, x, y, width, height
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg(_("createTextField called with %d args, "
+		log_error(_("createTextField called with %d args, "
 			"expected 6 - returning undefined"), fn.nargs);
 		);
 		return as_value();
@@ -716,7 +716,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(0).is_string() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg(_("First argument of createTextField is not a string"
+		log_error(_("First argument of createTextField is not a string"
 			" - returning undefined"));
 		);
 		return as_value();
@@ -726,7 +726,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(1).is_number() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg(_("Second argument of createTextField is not a number"
+		log_error(_("Second argument of createTextField is not a number"
 			" - returning undefined"));
 		);
 		return as_value();
@@ -736,7 +736,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(2).is_number() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg(_("Third argument of createTextField is not a number"
+		log_error(_("Third argument of createTextField is not a number"
 			" - returning undefined"));
 		);
 		return as_value();
@@ -746,7 +746,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(3).is_number() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg(_("Fourth argument of createTextField is not a number"
+		log_error(_("Fourth argument of createTextField is not a number"
 			" - returning undefined"));
 		);
 		return as_value();
@@ -756,7 +756,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(4).is_number() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg(_("Fifth argument of createTextField is not a number"
+		log_error(_("Fifth argument of createTextField is not a number"
 			" - returning undefined"));
 		);
 		return as_value();
@@ -766,7 +766,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(5).is_number() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_msg(_("Fifth argument of createTextField is not a number"
+		log_error(_("Fifth argument of createTextField is not a number"
 			" - returning undefined"));
 		);
 		return as_value();
@@ -2115,14 +2115,18 @@ sprite_instance::on_event(const event_id& id)
 	// We do not execute ENTER_FRAME if unloaded
 	if ( id.m_id == event_id::ENTER_FRAME && isUnloaded() )
 	{
+#ifdef GNASH_DEBUG
 		log_debug("Sprite %s ignored ENTER_FRAME event (is unloaded)", getTarget().c_str());
+#endif
 		return false;
 	}
 
 	if ( id.is_button_event() && ! isEnabled() )
 	{
+#ifdef GNASH_DEBUG
 		log_debug("Sprite %s ignored button-like event %s as not 'enabled'",
 			getTarget().c_str(), id.get_function_name().c_str());
+#endif
 		return false;
 	}
 
@@ -2153,8 +2157,10 @@ sprite_instance::on_event(const event_id& id)
 	{
 		if ( get_parent() && ! called )
 		{
+#ifdef GNASH_DEBUG
 			log_debug("Sprite %s won't check for user-defined LOAD event (didn't have a clipLoad event defined)", getTarget().c_str());
 			testInvariant();
+#endif
 			return false;
 		}
 	}
@@ -2203,7 +2209,7 @@ void sprite_instance::set_member(const std::string& name,
 		const as_value& val)
 {
 #ifdef DEBUG_DYNTEXT_VARIABLES
-log_msg(_("sprite[%p]::set_member(%s, %s)"), (void*)this, name.c_str(), val.to_debug_string().c_str());
+	log_debug(_("sprite[%p]::set_member(%s, %s)"), (void*)this, name.c_str(), val.to_debug_string().c_str());
 #endif
 
 	if ( val.is_function() )
@@ -2224,7 +2230,7 @@ log_msg(_("sprite[%p]::set_member(%s, %s)"), (void*)this, name.c_str(), val.to_d
 	if ( etc )
 	{
 #ifdef DEBUG_DYNTEXT_VARIABLES
-		log_msg(_("it's a Text Variable"));
+		log_debug(_("it's a Text Variable"));
 #endif
 		as_environment* env = const_cast<as_environment*>(&m_as_environment);
 		etc->set_text_value(val.to_string(env).c_str());
@@ -2232,7 +2238,7 @@ log_msg(_("sprite[%p]::set_member(%s, %s)"), (void*)this, name.c_str(), val.to_d
 #ifdef DEBUG_DYNTEXT_VARIABLES
 	else
 	{
-		log_msg(_("it's NOT a Text Variable"));
+		log_debug(_("it's NOT a Text Variable"));
 	}
 #endif
 
@@ -2257,7 +2263,7 @@ void sprite_instance::advance_sprite(float delta_time)
 #ifdef GNASH_DEBUG
 	size_t frame_count = m_def->get_frame_count();
 
-	log_msg(_("Advance_sprite for sprite '%s' - frame %u/%u "
+	log_debug(_("Advance_sprite for sprite '%s' - frame %u/%u "
 		"- oldDIsplayList has %d elements"),
 		getTarget().c_str(), m_current_frame,
 		frame_count, oldDisplayList.size());
@@ -2266,9 +2272,9 @@ void sprite_instance::advance_sprite(float delta_time)
 	// Advance DisplayList elements already placed (even if looping back ?)
 	{
 #ifdef GNASH_DEBUG
-		log_msg("Advancing %d childs of sprite %s in current DisplayList:", m_display_list.size(), getTarget().c_str());
-#endif
+		log_debug("Advancing %d childs of sprite %s in current DisplayList:", m_display_list.size(), getTarget().c_str());
 		m_display_list.dump();
+#endif
 		AdvancerVisitor visitor(delta_time);
 		m_display_list.visitByReversePlacement(visitor);
 	}
@@ -2280,17 +2286,17 @@ void sprite_instance::advance_sprite(float delta_time)
 	if (m_play_state == PLAY)
 	{
 #ifdef GNASH_DEBUG
-		log_msg(_("sprite_instance::advance_sprite we're in PLAY mode"));
+		log_debug(_("sprite_instance::advance_sprite we're in PLAY mode"));
 #endif
 
 		int prev_frame = m_current_frame;
 
 #ifdef GNASH_DEBUG
-		log_msg(_("on_event_load called, incrementing"));
+		log_debug(_("on_event_load called, incrementing"));
 #endif
 		increment_frame_and_check_for_loop();
 #ifdef GNASH_DEBUG
-		log_msg(_("after increment we are at frame %u/%u"), m_current_frame, frame_count);
+		log_debug(_("after increment we are at frame %u/%u"), m_current_frame, frame_count);
 #endif
 
 		// Execute the current frame's tags.
@@ -2317,7 +2323,7 @@ void sprite_instance::advance_sprite(float delta_time)
 #ifdef GNASH_DEBUG
 	else
 	{
-		log_msg(_("sprite_instance::advance_sprite we're in STOP mode"));
+		log_debug(_("sprite_instance::advance_sprite we're in STOP mode"));
 		// shouldn't we execute frame tags anyway when in STOP mode ?
 		//execute_frame_tags(m_current_frame);
 	}
@@ -2332,10 +2338,12 @@ void sprite_instance::advance(float delta_time)
 {
 //	GNASH_REPORT_FUNCTION;
 
-	log_msg(_("Advance sprite '%s' at frame %u/%u "
+#ifdef GNASH_DEBUG
+	log_debug(_("Advance sprite '%s' at frame %u/%u "
 		"- oldDIsplayList has %d elements"),
 		getTargetPath().c_str(), m_current_frame,
 		get_frame_count(), oldDisplayList.size());
+#endif
 
 	// child movieclip frame rate is the same the root movieclip frame rate
 	// that's why it is not needed to analyze 'm_time_remainder'
@@ -2482,7 +2490,7 @@ void
 sprite_instance::goto_frame(size_t target_frame_number)
 {
 #if defined(DEBUG_GOTOFRAME) || defined(GNASH_DEBUG_TIMELINE)
-    log_msg(_("sprite %s ::goto_frame(" SIZET_FMT ") - current frame is "
+    log_debug(_("sprite %s ::goto_frame(" SIZET_FMT ") - current frame is "
         SIZET_FMT),
         getTargetPath().c_str(), target_frame_number, m_current_frame);
 #endif
@@ -2858,7 +2866,7 @@ void sprite_instance::increment_frame_and_check_for_loop()
 	}
 
 #if 0 // debugging
-	log_msg(_("Frame %u/%u, bytes %u/%u"),
+	log_debug(_("Frame %u/%u, bytes %u/%u"),
 		m_current_frame, frame_count,
 		get_bytes_loaded(), get_bytes_total());
 #endif
@@ -3271,7 +3279,7 @@ sprite_instance::construct()
 	assert(!isUnloaded());
 
 #ifdef GNASH_DEBUG
-	log_msg(_("Constructing sprite '%s'"), _origTarget.c_str());
+	log_debug(_("Constructing sprite '%s'"), _origTarget.c_str());
 #endif
 
 	// Take note of our original target (for soft references)
@@ -3372,7 +3380,7 @@ sprite_instance::unload()
 {
 	assert(!isUnloaded());
 #ifdef GNASH_DEBUG
-	log_msg(_("Unloading sprite '%s'"), getTargetPath().c_str());
+	log_debug(_("Unloading sprite '%s'"), getTargetPath().c_str());
 #endif
 
 	bool childHaveUnloadHandler = m_display_list.unload();

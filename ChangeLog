@@ -1,5 +1,10 @@
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp: disable the too many debugging
+	  prints left over from the big action order commit.
+
+2007-09-07 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/anaylse-results.sh: add detailed report
 	  of unexpected successes and failures.
 
