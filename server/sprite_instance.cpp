@@ -3407,44 +3407,44 @@ sprite_instance::set_name(const char* name)
 bool
 sprite_instance::loadMovie(const URL& url)
 {
-	boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
-	if (md == NULL)
-	{
-		log_error(_("can't create movie_definition for %s"),
-			url.str().c_str());
-		return false;
-	}
-
-	boost::intrusive_ptr<movie_instance> extern_movie;
-	extern_movie = md->create_movie_instance();
-	if (extern_movie == NULL)
-	{
-		log_error(_("can't create extern movie_instance "
-			"for %s"), url.str().c_str());
-		return false;
-	}
-
-	// Parse query string
-	VariableMap vars;
-	url.parse_querystring(url.querystring(), vars);
-	extern_movie->setVariables(vars);
-
-	save_extern_movie(extern_movie.get());
-
-	const char* name = get_name().c_str();
-	int depth = get_depth();
-	bool use_cxform = false;
-	cxform color_transform = get_cxform();
-	bool use_matrix = false;
-	matrix mat = get_matrix();
-	int ratio = get_ratio();
-	int clip_depth = get_clip_depth();
-	//character* new_movie = extern_movie->get_root_movie();
-
 	// Get a pointer to our own parent 
 	character* parent = get_parent();
 	if ( parent )
 	{
+		boost::intrusive_ptr<movie_definition> md ( create_library_movie(url) );
+		if (md == NULL)
+		{
+			log_error(_("can't create movie_definition for %s"),
+				url.str().c_str());
+			return false;
+		}
+
+		boost::intrusive_ptr<movie_instance> extern_movie;
+		extern_movie = md->create_movie_instance();
+		if (extern_movie == NULL)
+		{
+			log_error(_("can't create extern movie_instance "
+				"for %s"), url.str().c_str());
+			return false;
+		}
+
+		// Parse query string
+		VariableMap vars;
+		url.parse_querystring(url.querystring(), vars);
+		extern_movie->setVariables(vars);
+
+		save_extern_movie(extern_movie.get());
+
+		const char* name = get_name().c_str();
+		int depth = get_depth();
+		bool use_cxform = false;
+		cxform color_transform = get_cxform();
+		bool use_matrix = false;
+		matrix mat = get_matrix();
+		int ratio = get_ratio();
+		int clip_depth = get_clip_depth();
+		//character* new_movie = extern_movie->get_root_movie();
+
 		extern_movie->set_parent(parent);
 
 		sprite_instance* parent_sp = parent->to_movie();
@@ -3461,11 +3461,14 @@ sprite_instance::loadMovie(const URL& url)
 	else
 	{
 		movie_root& root = _vm.getRoot();
+		unsigned int level = get_depth();
+		
 #ifndef GNASH_USE_GC
 		// Make sure we won't kill ourself !
 		assert(get_ref_count() > 1);
 #endif // ndef GNASH_USE_GC
-		root.setRootMovie(extern_movie.get());
+
+		root.loadLevel(level, url); // extern_movie.get());
 	}
 
 	return true;
