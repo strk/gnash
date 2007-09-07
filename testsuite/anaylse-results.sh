@@ -39,11 +39,15 @@ for dir in `find . -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
 	total_fail=`expr $total_fail + $nofail`
     fi
     if test $noxpass -gt 0; then
-	echo -n " $noxpass unexpected successes"
+	if test $nofail -gt 0; then
+	    echo -n ", $noxpass unexpected successes"
+	else
+	    echo -n " $noxpass unexpected successes"
+	fi
 	total_xpass=`expr $total_xpass + $noxpass`
     fi
     if test $nopass -gt 0; then
-	if test $nofail -gt 0; then
+	if test $noxpass -gt 0; then
 	    echo -n ", $nopass passes"
 	else
 	    echo -n "$nopass passes"
