@@ -1,5 +1,8 @@
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-swfc.all/action_execution_order_test10.sc:
+	  check that _currentframe is 1 when actions in first frame of
+	  _root are executed
 	* server/movie_instance.{cpp,h}: add overridden ::construct
 	  method, taking care of ensuring frame1 is completely loaded
 	  and calling the superclass version of it. 

@@ -52,6 +52,7 @@
    #include "Dejagnu.sc"
    
    _root.as_order = '0+';
+    check_equals(_root._currentframe, 1);
   .end
   
   // Define 3 shapes(b1, b2, b3)
