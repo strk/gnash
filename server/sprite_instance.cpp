@@ -2387,9 +2387,8 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 	//	2.2 Remove all current timeline instances at a depth NOT in the set found in step 1 
 	//  2.3 Remove all non-script-referencable instances, suboptimal!
 
-	// TODO: try to optize by avoid calling set_invalidated
-	set_invalidated();
-	m_display_list.reset(*m_def, tgtFrame, true);
+	// NOTE: reset() will call our set_invalidated() before making any change
+	m_display_list.reset(*m_def, tgtFrame, *this);
 
 	// 3. Execute all displaylist tags from first to target frame, with
 	//    target frame tag execution including ACTION tags

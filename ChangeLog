@@ -1,5 +1,16 @@
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.{cpp,h}: change signature of .reset() to
+	  take a sprite_instance for calling set_invalidated() when
+	  needed.
+	* server/sprite_instance.cpp (restoreDisplayList): update
+	  call to DisplayList::reset() - this optimizes loop-backs
+	  and fixes a failure introduced by previous commit
+	  (it's nice to see that performance issues are also tested
+	  by our testsuite - we'd just need some more)
+
+2007-09-07 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (restoreDisplayList): don't use
 	  a copy of the display_list to optimize the call to set_invalidated.
 	  Removing characters from the copy would shift unloaded characters

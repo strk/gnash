@@ -296,11 +296,11 @@ public:
 	/// @param targetFrame
 	///	0-based frame number we are jumping back to.
 	///
-	/// @param call_unload
-	///	If true, UNLOAD event will be invoked on the characters being
-	///	removed. 
+	/// @param owner
+	///	The owner of this DisplayList, for calling set_invalidated() on it before
+	///	making any modification to the list.
 	///
-	void reset(movie_definition& movieDef, size_t targetFrame, bool call_unload);
+	void reset(movie_definition& movieDef, size_t targetFrame, sprite_instance& owner);
 
 	/// Just an alias for clear()
 	void reset() {

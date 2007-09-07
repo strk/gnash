@@ -572,9 +572,11 @@ DisplayList::swapDepths(character* ch1, int newdepth)
 
 }
 	
-void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_unload)
+void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, sprite_instance& owner)
 {
 	testInvariant();
+
+	bool call_unload = true;
 
 	//GNASH_REPORT_FUNCTION;
 
@@ -627,15 +629,15 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 		//if ( di->isDynamic() )
 		if ( ! info )
 		{
+			// Call set_invalidated before changing the DisplayList
+			owner.set_invalidated();
+
 			// Replace (before calling unload)
 			it = _charsByDepth.erase(it);
 
-			if ( call_unload )
+			if ( di->unload() )
 			{
-				if ( di->unload() )
-				{
-					toReinsert.push_back(di);
-				}
+				toReinsert.push_back(di);
 			}
 
 			continue;
@@ -646,6 +648,9 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 		// we need to do this in some corner cases. 
 		if(!di->isActionScriptReferenceable())
 		{
+			// Call set_invalidated before changing the DisplayList
+			owner.set_invalidated();
+
 			// TODO: no unload() call needed here ? would help GC ?
 			// (I guess there can't be any as_value pointing at this
 			// if it's not ActionScriptReferenceable after all...)
@@ -660,15 +665,15 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 		{
 			// Not to be saved, killing
 
+			// Call set_invalidated before changing the DisplayList
+			owner.set_invalidated();
+
 			// Replace (before calling unload)
 			it = _charsByDepth.erase(it);
 
-			if ( call_unload )
+			if ( di->unload() )
 			{
-				if ( di->unload() )
-				{
-					toReinsert.push_back(di);
-				}
+				toReinsert.push_back(di);
 			}
 
 			continue;
@@ -684,8 +689,6 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, bool call_u
 
 		++it;
 	}
-
-	testInvariant();
 
 	std::for_each(toReinsert.begin(), toReinsert.end(),
 		boost::bind(&DisplayList::reinsertRemovedCharacter, this, _1));
