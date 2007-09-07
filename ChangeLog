@@ -1,5 +1,10 @@
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/anaylse-results.sh: add detailed report
+	  of unexpected successes and failures.
+
+2007-09-07 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/actionscript.all/Makefile.am,
 	  testsuite/misc-ming.all/Makefile.am,
 	  testsuite/misc-mtasc.all/Makefile.am,

@@ -23,6 +23,8 @@ echo
 # TODO2: increment -maxdepth in case we add subdirs to our testsuites ?
 
 #for dir in `find . -maxdepth 1 -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
+suitefail=
+suitexpass=
 for dir in `find . -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
     if test ! -f "${dir}/testrun.sum" ; then
 	continue
@@ -36,11 +38,13 @@ for dir in `find . -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
     echo -n "Test suite $dir: "
     someprint=0
     if test $nofail -gt 0; then
+	suitefail="${suitefail} ${dir}"
 	echo -n "$nofail real failures"
 	total_fail=`expr $total_fail + $nofail`
 	someprint=1
     fi
     if test $noxpass -gt 0; then
+	suitexpass="${suitexpass} ${dir}"
 	if test $someprint -gt 0; then echo -n ", "; fi
 	echo -n "$noxpass unexpected successes"
 	total_xpass=`expr $total_xpass + $noxpass`
@@ -99,6 +103,24 @@ echo
 
 # For now, return a failure if any XPASS or FAIL occurred
 if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
+
+	if test ${total_fail} -gt 0; then
+		echo "Unexpected failures follow:"
+		for s in ${suitefail}; do
+			echo -n "	${s}: "
+			grep -w FAIL ${s}/testrun.sum;
+		done
+		echo
+	fi
+
+	if test ${total_xpass} -gt 0; then
+		echo "Unexpected successes follow:"
+		for s in ${suitexpass}; do
+			echo -n "	${s}: "
+			grep -w FAIL ${s}/testrun.sum; done
+		echo
+	fi
+
 	exit 1
 else
 	exit 0
