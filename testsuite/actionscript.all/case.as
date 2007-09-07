@@ -1,4 +1,4 @@
- // 
+// 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 //
 // This program is free software; you can redistribute it and/or modchecky
@@ -22,7 +22,7 @@
  *  Test case sensitivity 
  */
 
-rcsid="$Id: case.as,v 1.10 2007/08/28 09:38:02 zoulunkai Exp $";
+rcsid="$Id: case.as,v 1.11 2007/09/07 12:56:31 strk Exp $";
 
 #include "check.as"
 
