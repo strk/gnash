@@ -125,12 +125,6 @@ movie_instance::advance(float delta_time)
 
 	advance_sprite(delta_time); 
 
-	if (m_on_event_load_called == false)
-	{
-		on_event(event_id::LOAD);	// root onload
-		m_on_event_load_called = true;
-	}
-
 	//_def->resumeLoader();
 }
 

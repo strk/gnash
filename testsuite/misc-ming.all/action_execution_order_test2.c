@@ -106,7 +106,7 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); /* 2nd frame */
 
   /* Action order is not dependent on DisplayList depth here! */
-  xcheck_equals(mo, "_root.x1", "'depth10+depth12+depth11+'");
+  check_equals(mo, "_root.x1", "'depth10+depth12+depth11+'");
   SWFMovie_nextFrame(mo); /* 3rd frame */
 
   mc_red4 = newSWFMovieClip();

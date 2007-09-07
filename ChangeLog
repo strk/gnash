@@ -1,5 +1,40 @@
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.cpp (output operator): don't compare iterators from
+	  different sequences !
+	* server/movie_instance.cpp (advance): don't invoke ONLOAD event
+	  handler, the event will be queued by ::construct instead
+	* server/movie_root.cpp (setRootMovie): process actions
+	  queued by effect of root movie construction.
+	* server/sprite_instance.{cpp,h}:
+	  - Drop do_action(), m_action_list and m_on_event_load_called members.
+	  - Make ::construct virtual so it can be overridden by movie_instance.
+	  - Have add_action_buffer queue globally or execute actions immediately depending
+	    on a new (misnamed) _callingFrameActions flag (I want to cleanup this part next).
+	    Basically, all actions are queued to the global list, with two
+	    exceptions:  init actions and callFrame actions.
+	  - Expose a new public queueAction(action_buf&) method, currenly
+	    unused but possibly for use in a cleanup of the preceding queue-or-execute
+	    actions handling.
+	  - Move registration as core broadcaster listener code into its own
+	    function (registerAsListener).
+	  - Refactor restoreDisplayList() to also execute *action* tags of
+	    target frame, so to get order right.
+	  - Far cleaner advance_sprite() implementation.
+	* testsuite/MovieTester.cpp (ctor): properly construct root movie,
+	  and render after construction.
+	* testsuite/swfdec/swfdec_gnash_tester: advance 10 times as intended
+	  by swfdec testsuite, not 11 as we needed to do due to gnash bugs.
+	* testsuite/misc-ming.all/: action_execution_order_extend_test.c,
+	  action_execution_order_test2.c, action_execution_order_test4.c,
+	  action_execution_order_test5.c, action_execution_order_test7.c,
+	  action_execution_order_test9.c, action_execution_order_test10.sc:
+	  SUCCESSES !
+	* testsuite/misc-swfc.all/movieclip_destruction_test2.sc: SUCCESSES !
+	* testsuite/swfdec/PASSING: SUCCESSES !
+
+2007-09-07 Sandro Santilli <strk@keybit.net>
+
 	* testsuite/misc-mtasc.all/: level5.as, level99.as: check
 	  that at time of first-frame actions execution for loaded movies,
 	  _currentframe is set to 1.

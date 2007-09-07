@@ -1710,20 +1710,19 @@ sprite_instance::sprite_instance(
 	oldDisplayList(),
 	_drawable(new DynamicShape),
 	_drawable_inst(_drawable->create_character_instance(this, 0)),
-	m_action_list(),
 	//m_goto_frame_action_list(),
 	m_play_state(PLAY),
 	m_current_frame(0),
 	m_has_looped(false),
 	is_jumping_back(false),
+	_callingFrameActions(false),
 	m_init_actions_executed(),
 	m_as_environment(),
 	m_has_key_event(false),
 	m_has_mouse_event(false),
 	_text_variables(),
 	m_sound_stream_id(-1),
-	m_def(def),
-	m_on_event_load_called(false)
+	m_def(def)
 {
 	assert(m_def != NULL);
 	assert(m_root != NULL);
@@ -1878,25 +1877,6 @@ bool sprite_instance::get_member(const std::string& name, as_value* val)
 
 }
 
-// Take care of this frame's actions.
-void sprite_instance::do_actions()
-{
-	testInvariant();
-
-	IF_VERBOSE_ACTION(
-		log_action(_("Executing " SIZET_FMT " actions in frame " SIZET_FMT
-			"/" SIZET_FMT " of sprite %s"),
-			m_action_list.size(),
-			m_current_frame+1,
-			m_def->get_frame_count(), getTargetPath().c_str());
-	);
-
-	execute_actions(m_action_list);
-	assert(m_action_list.empty());
-
-	testInvariant();
-}
-
 bool
 sprite_instance::get_frame_number(const as_value& frame_spec, size_t& frameno) const
 {
@@ -1940,39 +1920,24 @@ void sprite_instance::call_frame_actions(const as_value& frame_spec)
 		return;
 	}
 
-	size_t original_size = m_action_list.size();
-
 	// Set the current sound_stream_id to -1, meaning that no stream are
 	// active. If there are an active stream it will be updated while
 	// executing the execute_tags.
 	set_sound_stream_id(-1);
 
 	// Execute the execute_tag actions
-
+	// We set _callingFrameActions to true so that add_action_buffer
+	// will execute immediately instead of queuing them.
+	// NOTE: in case gotoFrame is executed by code in the called frame
+	//       we'll temporarly clear the _callingFrameActions flag
+	//       to properly queue actions back on the global queue.
+	//
+	_callingFrameActions=true;
 	const PlayList& playlist = m_def->get_playlist(frame_number);
-	for (size_t i=0, n=playlist.size(); i<n; ++i)
-	{
-		execute_tag*	e = playlist[i];
-		if (e->is_action_tag())
-		{
-			e->execute(this);
-		}
-	}
+	std::for_each(playlist.begin(), playlist.end(),
+		boost::bind(&execute_tag::execute_action, _1, this)); 
+	_callingFrameActions=false;
 
-	//
-	// exetract target frame actions and execute them
-	//
-	ActionList::iterator it = m_action_list.begin();
-	for(size_t i =0; i<original_size; i++) { it++; }
-	ActionList::iterator original_end = it;
-	
-	ActionList frame_actions(original_end, m_action_list.end());
-	// erase the target frame actions from the orignal list
-	m_action_list.erase(original_end, m_action_list.end());
-	// Note: this function may invalidate the iterators above
-	execute_actions(frame_actions);
-
-	assert(m_action_list.size() == original_size);
 }
 
 character* sprite_instance::add_empty_movieclip(const char* name, int depth)
@@ -2118,16 +2083,23 @@ void sprite_instance::clone_display_object(const std::string& name,
 }
 #endif
 
+/* public */
+void
+sprite_instance::queueAction(const action_buffer& action)
+{
+	movie_root& root = _vm.getRoot();
+	root.pushAction(action, boost::intrusive_ptr<sprite_instance>(this));
+}
+
 /* private */
 void
 sprite_instance::queueActions(ActionList& actions)
 {
-	movie_root& root = VM::get().getRoot();
 	for(ActionList::iterator it=actions.begin(), itEnd=actions.end();
 		       it != itEnd; ++it)
 	{
 		const action_buffer* buf = *it;
-		root.pushAction(*buf, boost::intrusive_ptr<sprite_instance>(this));
+		queueAction(*buf);
 	}
 }
 
@@ -2135,6 +2107,17 @@ bool
 sprite_instance::on_event(const event_id& id)
 {
 	testInvariant();
+
+#ifdef GNASH_DEBUG
+	log_debug("Event %s invoked for sprite %s", id.get_function_name().c_str(), getTarget().c_str());
+#endif
+
+	// We do not execute ENTER_FRAME if unloaded
+	if ( id.m_id == event_id::ENTER_FRAME && isUnloaded() )
+	{
+		log_debug("Sprite %s ignored ENTER_FRAME event (is unloaded)", getTarget().c_str());
+		return false;
+	}
 
 	if ( id.is_button_event() && ! isEnabled() )
 	{
@@ -2158,6 +2141,23 @@ sprite_instance::on_event(const event_id& id)
 	}
 
 	// Fall through and call the function also, if it's defined!
+
+	// NOTE: user-defined onLoad is not invoked if the corresponding
+	//       clip-defined onLoad is not present (zou mentions if
+	//       NO clip-defined events are instead)
+	//
+	//	 Note that this can't be true for sprites
+	//	 not placed by PlaceObject
+	//
+	if ( id.m_id == event_id::LOAD )
+	{
+		if ( get_parent() && ! called )
+		{
+			log_debug("Sprite %s won't check for user-defined LOAD event (didn't have a clipLoad event defined)", getTarget().c_str());
+			testInvariant();
+			return false;
+		}
+	}
 
 	// Check for member function.
 	if( ! id.is_key_event ())
@@ -2246,6 +2246,7 @@ void sprite_instance::advance_sprite(float delta_time)
 	//GNASH_REPORT_FUNCTION;
 
 	assert(!isUnloaded());
+	assert(!_callingFrameActions); // call_frame shoudl never trigger advance_sprite
 
 	// Process any pending loadVariables request
 	processCompletedLoadVariableRequests();
@@ -2253,26 +2254,27 @@ void sprite_instance::advance_sprite(float delta_time)
 	// mouse drag.
 	character::do_mouse_drag();
 
-	if (m_on_event_load_called)
-	{
-		on_event(event_id::ENTER_FRAME);
-		if ( isUnloaded() )
-		{
-			log_debug("%s enterFrame event handler unloaded self", getTarget().c_str());
-			// TODO: check if we should still advance the frame counter
-			//       can be checked, if we're still reachable, by fetching _currentframe.
-			return;
-		}
-	}
-
 #ifdef GNASH_DEBUG
 	size_t frame_count = m_def->get_frame_count();
 
-	log_msg(_("sprite '%s' ::advance_sprite is at frame %u/%u "
-		"- onload called: %d - oldDIsplayList has %d elements"),
-		getTargetPath().c_str(), m_current_frame,
-		frame_count, m_on_event_load_called, oldDisplayList.size());
+	log_msg(_("Advance_sprite for sprite '%s' - frame %u/%u "
+		"- oldDIsplayList has %d elements"),
+		getTarget().c_str(), m_current_frame,
+		frame_count, oldDisplayList.size());
 #endif
+
+	// Advance DisplayList elements already placed (even if looping back ?)
+	{
+#ifdef GNASH_DEBUG
+		log_msg("Advancing %d childs of sprite %s in current DisplayList:", m_display_list.size(), getTarget().c_str());
+#endif
+		m_display_list.dump();
+		AdvancerVisitor visitor(delta_time);
+		m_display_list.visitByReversePlacement(visitor);
+	}
+
+
+	queueEvent(event_id::ENTER_FRAME);
 
 	// Update current and next frames.
 	if (m_play_state == PLAY)
@@ -2283,16 +2285,13 @@ void sprite_instance::advance_sprite(float delta_time)
 
 		int prev_frame = m_current_frame;
 
-		if (m_on_event_load_called)
-		{
 #ifdef GNASH_DEBUG
-			log_msg(_("on_event_load called, incrementing"));
+		log_msg(_("on_event_load called, incrementing"));
 #endif
-			increment_frame_and_check_for_loop();
+		increment_frame_and_check_for_loop();
 #ifdef GNASH_DEBUG
-			log_msg(_("after increment we are at frame %u/%u"), m_current_frame, frame_count);
+		log_msg(_("after increment we are at frame %u/%u"), m_current_frame, frame_count);
 #endif
-		}
 
 		// Execute the current frame's tags.
 		// First time execute_frame_tags(0) executed in dlist.cpp(child) or movie_def_impl(root)
@@ -2300,14 +2299,19 @@ void sprite_instance::advance_sprite(float delta_time)
 		{
 			if ( m_current_frame == 0 && has_looped() )
 			{
-				// TODO: check why this would be any different
-				//       then calling restoreDisplayList(0) instead..
-				//       Ah! I think I know..
+#ifdef GNASH_DEBUG
+				log_debug("Jumping back to frame 0 of sprite %s", getTarget().c_str());
+#endif
 				restoreDisplayList(0); // seems OK to me.
 			}
-
-			// TODO: Make sure m_current_frame is 0-based during execution of DLIST tags
-			execute_frame_tags(m_current_frame, TAG_DLIST|TAG_ACTION);
+			else
+			{
+#ifdef GNASH_DEBUG
+				log_debug("Executing frame%d (0-based) tags of sprite %s", m_current_frame, getTarget().c_str());
+#endif
+				// Make sure m_current_frame is 0-based during execution of DLIST tags
+				execute_frame_tags(m_current_frame, TAG_DLIST|TAG_ACTION);
+			}
 		}
 	}
 #ifdef GNASH_DEBUG
@@ -2319,51 +2323,6 @@ void sprite_instance::advance_sprite(float delta_time)
 	}
 #endif
 
-	// Advance DisplayList elements which has not been just-added.
-	// 
-	// These are elements in oldDisplayList cleared of all but elements
-	// still in current DisplayList (the other must have been removed
-	// by RemoveObject tags). I'm not sure we should do this actually,
-	// as maybe we need to execute actions in removed objects *before*
-	// we drop them...
-	//
-	// We do *not* dispatch UNLOAD event on the removed objects here
-	// as we assume the event was dispatched by execution of the
-	// RemoveObject tag itself. I might be wrong though, will come
-	// back to this issue later.
-	//
-	// Note that we work on a *copy* of oldDisplayList as we're going
-	// to need oldDisplayList again later, to extract the list of
-	// newly added characters
-	//
-	{
-		AdvancerVisitor visitor(delta_time);
-		oldDisplayList.visitByReversePlacement(visitor);
-	}
-	
-	// Now execute actions on this timeline, after actions
-	// in old childs timelines have been executed.
-	//log_msg(_("Executing actions in %s timeline"), getTargetPath().c_str());
-	do_actions();
-
-	// Finally, execute actions in (we actually "advance") newly added
-	// (and not unloaded) childs
-	//
-	// These are elements in the current DisplayList, cleared
-	// by all unloaded elements and by non-unloaded elements in
-	// oldDisplayList.
-	//
-	// Of course we do NOT call UNLOAD events here, as
-	// the chars we're clearing have *not* been removed:
-	// we're simply doing internal work here...
-	//
-	{
-		AdvancerVisitor visitor(delta_time);
-		DisplayList newlyAdded = m_display_list;
-		newlyAdded.clear(oldDisplayList, false); // keep only newly added
-		newlyAdded.visitAll(visitor); 
-	}
-
 	// Remember current state of the DisplayList for next iteration
 	oldDisplayList = m_display_list;
 }
@@ -2373,45 +2332,16 @@ void sprite_instance::advance(float delta_time)
 {
 //	GNASH_REPORT_FUNCTION;
 
-	// child movieclip frame rate is the same the root movieclip frame rate
-	// that's why it is not needed to analyze 'm_time_remainder' 
-	if (m_on_event_load_called == false)
-	{
-#ifdef GNASH_DEBUG
-		log_msg(_("Calling ONLOAD event"));
-#endif
-		on_event(event_id::LOAD);	// clip onload
-		if (isUnloaded())
-		{
-			log_debug("%s load event handler unloaded self", getTarget().c_str());
-			return;
-		}
+	log_msg(_("Advance sprite '%s' at frame %u/%u "
+		"- oldDIsplayList has %d elements"),
+		getTargetPath().c_str(), m_current_frame,
+		get_frame_count(), oldDisplayList.size());
 
-		if (m_has_key_event)
-		{
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-			// TODO: Don't do this at every advancement
-			// OnClip key handlers should be registered at construction time, 
-			// User defined handlers should be registered explicitly by Key.addListener();
-			_vm.getRoot().add_key_listener(KeyListener(this, KeyListener::ON_CLIP_DEF));
-#else
-			_vm.getRoot().add_key_listener(this);
-#endif
-		}
-		// Mouse events listening is done in has_mouse_event directly.
-		// This shows to work better for attachMovieTest.swf,
-		// but might actually be a completely unrelated issue.
-		// In particular, copying event handlers in attachMovie should
-		// be more closely inspected (and need more ad-hoc testcases)
-		//if (m_has_mouse_event)
-		//{
-			//_vm.getRoot().add_mouse_listener(this);
-		//}
-	}
-	
+	// child movieclip frame rate is the same the root movieclip frame rate
+	// that's why it is not needed to analyze 'm_time_remainder'
+
 	advance_sprite(delta_time);
 
-	m_on_event_load_called = true;
 }
 
 void
@@ -2460,9 +2390,10 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 		m_display_list = newList;
 	}
 
-	// 3. Execute all displaylist tags from first to target frame 
+	// 3. Execute all displaylist tags from first to target frame, with
+	//    target frame tag execution including ACTION tags
 
-	for (size_t f = 0; f<=tgtFrame; ++f)
+	for (size_t f = 0; f<tgtFrame; ++f)
 	{
 		//
 		// Set m_current_frame so it is correct (0-based) during
@@ -2472,6 +2403,16 @@ sprite_instance::restoreDisplayList(size_t tgtFrame)
 		m_current_frame = f;
 		execute_frame_tags(f, TAG_DLIST);
 	}
+
+	// call_frame (setting _callignFrameActions) should never trigger ::advance,
+	// at most it shoudl trigger goto_frame which would temporarly set _callingFrameAction to false
+	// ::advance and ::goto_frame are supposedly the only callers to restoreDisplayList
+	//
+	assert(!_callingFrameActions);
+
+	// Finally, execute target frame tags, both ACTION and DLIST
+	m_current_frame = tgtFrame;
+	execute_frame_tags(tgtFrame, TAG_DLIST|TAG_ACTION);
 
 	is_jumping_back = false; // finished jumping back
 }
@@ -2626,7 +2567,7 @@ sprite_instance::goto_frame(size_t target_frame_number)
     {
         // We'd immediately return if target_frame_number == m_current_frame
         assert(target_frame_number > m_current_frame);
-        for (size_t f = m_current_frame+1; f<=target_frame_number; ++f)
+        for (size_t f = m_current_frame+1; f<target_frame_number; ++f)
         {
             // Second argument requests that only "DisplayList" tags
             // are executed. This means NO actions will be
@@ -2634,46 +2575,21 @@ sprite_instance::goto_frame(size_t target_frame_number)
             execute_frame_tags(f, TAG_DLIST);
         }
         m_current_frame = target_frame_number;
-    }
 
 #if defined(GNASH_DEBUG_TIMELINE)
     cout << "At end of DisplayList reconstruction, m_current_frame is " << m_current_frame << endl;
 #endif
 
-    /// Backup current action list, as we're going to use it
-    /// to fetch actions in the target frame
-    ActionList actionListBackup = m_action_list;
-
-    // m_action_list contains actions from frame 'target_frame_number'
-    // to frame 'm_current_frame', too much than needed, clear it first.
-    // TODO: check this, we didn't execute TAG_ACTION tags...
-    //       Can it be we're cleaning up too many actions here ?
-    m_action_list.clear();
-
-    // Get the actions of target frame.(We don't have a direct way to
-    // do this, so use execute_frame_tags instead).
-    execute_frame_tags(target_frame_number, TAG_ACTION);
+       // Now execute target frame tags (queuing actions)
+       // NOTE: just in case we're being called by code in a called frame
+       //       we'll backup and resume the _callingFrameActions flag
+       bool callingFrameActionsBackup = _callingFrameActions;
+       _callingFrameActions = false;
+       execute_frame_tags(target_frame_number, TAG_DLIST|TAG_ACTION);
+       _callingFrameActions = callingFrameActionsBackup;
+    }
 
     assert(m_current_frame == target_frame_number);
-
-
-    // After entering to advance_sprite() m_current_frame points to frame
-    // that already is executed. 
-    // Macromedia Flash do goto_frame then run actions from this frame.
-    // We do too.
-
-    // Stores the target frame actions to m_goto_frame_action_list, which
-    // will be executed in after advancing child characters.
-    // When actions execution order will be fixed all of this might
-    // become obsoleted and the target frame actions could be pushed
-    // directly on the preexisting m_action_list (and no need to back it up).
-    //
-    //m_goto_frame_action_list = m_action_list; 
-    queueActions(m_action_list);
-
-    // Restore ActionList  from backup
-    m_action_list = actionListBackup;
-
 }
 
 bool sprite_instance::goto_labeled_frame(const std::string& label)
@@ -3319,6 +3235,32 @@ sprite_instance::call_method_args(const char* method_name,
 		method_name, method_arg_fmt, args);
 }
 
+void
+sprite_instance::registerAsListener()
+{
+	if (m_has_key_event)
+	{
+#ifdef NEW_KEY_LISTENER_LIST_DESIGN
+		// TODO: Don't do this at every advancement
+		// OnClip key handlers should be registered at construction time, 
+		// User defined handlers should be registered explicitly by Key.addListener();
+		_vm.getRoot().add_key_listener(KeyListener(this, KeyListener::ON_CLIP_DEF));
+#else
+		_vm.getRoot().add_key_listener(this);
+#endif
+	}
+	// Mouse events listening is done in has_mouse_event directly.
+	// This shows to work better for attachMovieTest.swf,
+	// but might actually be a completely unrelated issue.
+	// In particular, copying event handlers in attachMovie should
+	// be more closely inspected (and need more ad-hoc testcases)
+	//if (m_has_mouse_event)
+	//{
+		//_vm.getRoot().add_mouse_listener(this);
+	//}
+}
+	
+
 
 // WARNING: THIS SNIPPET NEEDS THE CHARACTER TO BE "INSTANTIATED", which is
 //          it's target path needs to exist, or any as_value for it will be
@@ -3328,18 +3270,24 @@ sprite_instance::construct()
 {
 	assert(!isUnloaded());
 
-	_origTarget = getTarget();
-
 #ifdef GNASH_DEBUG
 	log_msg(_("Constructing sprite '%s'"), _origTarget.c_str());
 #endif
+
+	// Take note of our original target (for soft references)
+	_origTarget = getTarget();
+
+	// Register this sprite as a core broadcasters listener
+	registerAsListener();
 
 	// We *might* avoid this, but better safe then sorry
 	m_def->ensure_frame_loaded(0);
 
 	// Backup the DisplayList *before* manipulating it !
+	// TODO: still needed ? what for ?
 	assert( oldDisplayList.empty() );
 
+	// Execute CONSTRUCT event immediately
 	on_event(event_id::CONSTRUCT);
 	if (isUnloaded())
 	{
@@ -3348,7 +3296,41 @@ sprite_instance::construct()
 		return;
 	}
 
-	execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
+	// Now execute frame tags and take care of queuing the LOAD event.
+	//
+	// DLIST tags are executed immediately while ACTION tags are queued.
+	//
+	// For _root movie, LOAD event is invoked *after* actions in first frame
+	// See misc-ming.all/action_execution_order_test4.{c,swf}
+	//
+	assert(!_callingFrameActions); // or will not be queuing actions
+	if ( get_parent() == 0 )
+	{
+
+#ifdef GNASH_DEBUG
+		log_debug(_("Executing tags of frame0 in sprite %s"), getTarget().c_str());
+#endif
+		execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
+
+#ifdef GNASH_DEBUG
+		log_debug(_("Queuing ONLOAD event for sprite %s"), getTarget().c_str());
+#endif
+		queueEvent(event_id::LOAD);
+
+	}
+	else
+	{
+
+#ifdef GNASH_DEBUG
+		log_debug(_("Queuing ONLOAD event for sprite %s"), getTarget().c_str());
+#endif
+		queueEvent(event_id::LOAD);
+
+#ifdef GNASH_DEBUG
+		log_debug(_("Executing tags of frame0 in sprite %s"), getTarget().c_str());
+#endif
+		execute_frame_tags(0, TAG_DLIST|TAG_ACTION);
+	}
 
 	if ( _name.empty() )
 	{
@@ -3357,6 +3339,7 @@ sprite_instance::construct()
 		// If the instance doesn't have a name, it will NOT be
 		// an ActionScript referenciable object so we don't have
 		// anything more to do.
+
 		return;
 	}
 
@@ -3387,6 +3370,7 @@ sprite_instance::construct()
 bool
 sprite_instance::unload()
 {
+	assert(!isUnloaded());
 #ifdef GNASH_DEBUG
 	log_msg(_("Unloading sprite '%s'"), getTargetPath().c_str());
 #endif

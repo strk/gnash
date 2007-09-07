@@ -245,9 +245,6 @@ public:
 	//virtual void	advance_root(float delta_time);
 	virtual void	advance_sprite(float delta_time);
 
-	/// Take care of this frame's actions.
-	void do_actions();
-
 	/// Set the sprite state at the specified frame number.
 	//
 	/// 0-based frame numbers!! 
@@ -392,10 +389,9 @@ public:
 	/// when calling user-defined constructors).
 	///
 	/// TODO: check if we only need to construct "named" instances
-	/// TODO: consider moving this function up to the 'character' class.
 	/// TODO: possibly have this function call the onConstruct() event handler
 	///
-	void construct();
+	virtual void construct();
 
 	/// Unload all contents in the displaylist and this instance
 	/// See character::unload for more info
@@ -478,7 +474,8 @@ public:
 	/// frame advance.
 	void	add_action_buffer(const action_buffer* a)
 	{
-	    m_action_list.push_back(a);
+		if ( ! _callingFrameActions ) queueAction(*a);
+		else execute_action(*a);
 	}
 
 	/// Execute a single action buffer (DOACTION block)
@@ -754,7 +751,22 @@ public:
 	/// from the display lists
 	void cleanupDisplayList();
 
+        /// Queue the given action buffer
+        //
+        /// The action will be pushed on the current
+        /// global list (see movie_root).
+        ///
+        void queueAction(const action_buffer& buf);
+
 private:
+
+	/// Register this sprite as a listener of core broadcasters
+	//
+	/// This is currently only used for key events broadcaster
+	/// and it's supposed to be called only once (or should we
+	/// also call it whenever onKey* user-defined function is defined ?
+	///
+	void registerAsListener();
 
 	/// \brief
 	/// Return value of the 'enabled' property, casted to a boolean value.
@@ -796,15 +808,25 @@ private:
 		const std::string& newname, int depth);
 #endif
 
-	/// Reconstruct the DisplayList for proper loop-back operations
+	/// Advance to a previous frame.
 	//
-	/// This function will:
+	/// This function will basically restore the DisplayList as it supposedly
+	/// was *before* executing tags in target frame and then execute target
+	/// frame tags (both DLIST and ACTION ones).
+	///
+	/// In practice, it will:
 	///
 	/// - Remove from current DisplayList:
 	///	- Timeline instances constructed after target frame 
 	///	- Timeline instances constructed before or at the target frame but no more at the original depth
 	///	- Dynamic instances found in the static depth zone
-	/// - Execute all displaylist tags from first to target frame, incrementing m_current_frame as it goes
+	/// - Execute all displaylist tags from first to one-before target frame,
+	///   appropriately setting m_current_frame as it goes, finally execute both displaylist and action
+	///   tags for target frame.
+	///
+	/// Callers of this methods are:
+	///	- goto_frame (for jump-backs)
+	///	- advance_sprite (for loop-back)
 	///
 	/// See: http://www.gnashdev.org/wiki/index.php/TimelineControl#Timeline_instances
 	///
@@ -815,8 +837,6 @@ private:
 	/// POSTCONDITIONS:
 	///
 	///	- m_current_frame == targetFrame
-	///
-	/// NOTES: resetDisplayList() above should likely just call restoreDisplayList(0);
 	///
 	/// TODO: consider using this same function for jump-forward too,
 	///       with some modifications...
@@ -868,8 +888,6 @@ private:
 	///
 	boost::intrusive_ptr<character> _drawable_inst;
 
-	ActionList	m_action_list;
-
 	// this is deprecated, we'll be pushing gotoframe target
 	// actions to the global action queue
 	//ActionList	m_goto_frame_action_list;
@@ -884,6 +902,9 @@ private:
 
 	// true is the sprite is jumping back.
 	bool		is_jumping_back;
+
+	// true is we're calling frame actions
+	bool _callingFrameActions;
 
 	// a bit-array class would be ideal for this
 	std::vector<bool>	m_init_actions_executed;
@@ -949,8 +970,6 @@ protected:
 	/// This is either sprite_definition (for sprites defined by
 	/// DefineSprite tag) or movie_def_impl (for the top-level movie).
 	boost::intrusive_ptr<movie_definition>	m_def;
-
-	bool m_on_event_load_called;
 
 	/// List of loadVariables requests
 	typedef std::list<LoadVariablesThread*> LoadVariablesThreads;

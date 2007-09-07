@@ -1068,7 +1068,7 @@ std::ostream& operator<< (std::ostream& os, const DisplayList& dl)
 			++it)
 	{
 		const DisplayItem& item = *it; 
-		if ( it != dl._charsByDepth.begin() ) os << " | ";
+		if ( it != dl._timelineChars.begin() ) os << " | ";
 		os << "ch id:" << item->get_id()
 			<< " name:" << item->get_name()
 			<< " depth:" << item->get_depth();

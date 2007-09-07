@@ -95,24 +95,30 @@ MovieTester::MovieTester(const std::string& url)
 	// Now complete load of the movie
 	_movie_def->completeLoad();
 	_movie_def->ensure_frame_loaded(_movie_def->get_frame_count());
-        _movie_root->setRootMovie( _movie_def->create_movie_instance() );
-
-	_movie = _movie_root->get_root_movie();
-	assert(_movie);
 
 	// Activate verbosity so that self-contained testcases are
 	// also used 
 	gnash::LogFile& dbglogfile = gnash::LogFile::getDefaultInstance();
 	dbglogfile.setVerbosity(1);
 
+	
+	auto_ptr<movie_instance> mi ( _movie_def->create_movie_instance() );
 
-	// Now place the root movie on the stage
-	advance();
+	// Set _movie before calling ::render
+	_movie = mi.get();
+
+	// Finally, place the root movie on the stage ...
+        _movie_root->setRootMovie( mi.release() );
+
+	// ... and render it
+	render();
 }
 
 void
 MovieTester::render(render_handler& h, InvalidatedRanges& invalidated_regions) 
 {
+	assert(_movie);
+
 	set_render_handler(&h);
 
 	h.set_invalidated_regions(invalidated_regions);

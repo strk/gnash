@@ -113,8 +113,8 @@
   .del mc3 // Remove mc3 by RemoveObject2
 
   .action: 
-    xcheck_equals(mc2UnlaodedCount, 1); // mc2.onUnload triggered
-    xcheck_equals(mc3UnlaodedCount, 1); // mc3.onUnload triggered
+    check_equals(mc2UnlaodedCount, 1); // mc2.onUnload triggered
+    check_equals(mc3UnlaodedCount, 1); // mc3.onUnload triggered
     check_equals(mc1Ref.valueOf(), null);
     check_equals(mc2Ref, mc2);
     check_equals(mc3Ref, mc3);
@@ -140,8 +140,8 @@
     check_equals(mc3.testvar, 100); 
     mc2.removMovieClip();
     mc3.removMovieClip();
-    xcheck_equals(mc2UnlaodedCount, 1); // mc2.onUnload not triggered again
-    xcheck_equals(mc2UnlaodedCount, 1); // mc3.onUnload not triggered again
+    check_equals(mc2UnlaodedCount, 1); // mc2.onUnload not triggered again
+    check_equals(mc2UnlaodedCount, 1); // mc3.onUnload not triggered again
     check_equals(typeof(mc2), 'movieclip'); // mc2 is still accessible
     check_equals(typeof(mc3), 'movieclip'); // mc3 is still accessible
     check_equals(mc2.getDepth(), -16387); 
@@ -153,8 +153,8 @@
     
     mc2.onUnload();
     mc3.onUnload();
-    xcheck_equals(mc2UnlaodedCount, 2);  // we can still invoke onUnload
-    xcheck_equals(mc2UnlaodedCount, 2);  // we can still invoke onUnload
+    check_equals(mc2UnlaodedCount, 2);  // we can still invoke onUnload
+    check_equals(mc2UnlaodedCount, 2);  // we can still invoke onUnload
   .end
 
 

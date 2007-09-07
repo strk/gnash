@@ -93,7 +93,7 @@ main(int argc, char** argv)
 
   SWFDisplayItem_remove(it2);
   // Gnash fails because actions in "mc1" got executed, see expected behaviour
-  xcheck_equals(mo, "typeof(_root.x)", "'undefined'");
+  check_equals(mo, "typeof(_root.x)", "'undefined'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); // 6th frame 
   

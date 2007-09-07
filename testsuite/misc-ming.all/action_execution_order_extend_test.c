@@ -168,7 +168,7 @@ main(int argc, char** argv)
      with Ming)?? */
   check_equals(mo, "_root.y3", "'mc_red onUnload called'");
   /* mc_blu Onload is not called */
-  xcheck_equals(mo, "_root.y4", "undefined");
+  check_equals(mo, "_root.y4", "undefined");
   /* actions in main timeline is executed *after* mc_blu.onEnterFrame */
   check_equals(mo, "_root.y5", "'as_in_root'");
   /* actions in main timeline is executed *before* mc_blu.onUnload */

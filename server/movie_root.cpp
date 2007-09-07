@@ -103,6 +103,10 @@ void
 movie_root::setRootMovie(movie_instance* movie)
 {
 	setLevel(0, movie);
+
+	// actions in first frame of _level0 must execute now, before next advance,
+	// or they'll be executed with _currentframe being set to 2
+	processActionQueue();
 }
 
 /* private */
