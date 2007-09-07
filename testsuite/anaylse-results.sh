@@ -34,58 +34,48 @@ for dir in `find . -type d | egrep -v ".libs|.deps" | grep "./" | sort`; do
     nounresolved=`grep -c "^UNRESOLVED: " ${dir}/testrun.sum`
     nountested=`grep -c "^UNTESTED: " ${dir}/testrun.sum`
     echo -n "Test suite $dir: "
+    someprint=0
     if test $nofail -gt 0; then
-	echo -n " $nofail real failures"
+	echo -n "$nofail real failures"
 	total_fail=`expr $total_fail + $nofail`
+	someprint=1
     fi
     if test $noxpass -gt 0; then
-	if test $nofail -gt 0; then
-	    echo -n ", $noxpass unexpected successes"
-	else
-	    echo -n " $noxpass unexpected successes"
-	fi
+	if test $someprint -gt 0; then echo -n ", "; fi
+	echo -n "$noxpass unexpected successes"
 	total_xpass=`expr $total_xpass + $noxpass`
+	someprint=1
     fi
     if test $nopass -gt 0; then
-	if test $noxpass -gt 0; then
-	    echo -n ", $nopass passes"
-	else
-	    echo -n "$nopass passes"
-	fi
+	if test $someprint -gt 0; then echo -n ", "; fi
+	echo -n "$nopass passes"
 	total_pass=`expr $total_pass + $nopass`
+	someprint=1
     fi
     if test $noxfail -gt 0; then
-	if test $nofail -gt 0 -o $nopass -gt 0; then
-	    echo -n ", ${noxfail} expected failures"
-	else
-	    echo -n "${noxfail} expected failure"
-	fi
+	if test $someprint -gt 0; then echo -n ", "; fi
+	echo -n "${noxfail} expected failure"
 	total_xfail=`expr $total_xfail + $noxfail`
+	someprint=1
     fi
     if test ${nounresolved} -gt 0; then
-	if test $nofail -gt 0 -o $nopass -gt 0 -o $noxfail -gt 0; then
-	    echo -n ", ${nounresolved} unresolved"
-	else
-	    echo -n "${nounresolved} unresolved"
-	fi
+	if test $someprint -gt 0; then echo -n ", "; fi
+	echo -n "${nounresolved} unresolved"
 	total_unresolved=`expr ${total_unresolved} + ${nounresolved}`
+	someprint=1
     fi
     if test ${nountested} -gt 0; then
-	if test $nofail -gt 0 -o $nopass -gt 0 -o $noxfail -gt 0 -o $nounresolved -gt 0; then
-	    echo -n ", ${nountested} untested"
-	else
-	    echo -n "${nountested} untested"
-	fi
+	if test $someprint -gt 0; then echo -n ", "; fi
+	echo -n "${nountested} untested"
 	total_untested=`expr ${total_untested} + ${nountested}`
+	someprint=1
     fi
+    if test ${nofail} -gt 0 || test ${noxpass} -gt 0; then echo -n " *"; fi
     echo
 done
 
 echo
 echo "Test Result Totals:"
-if test ${total_fail} -gt 0; then
-    echo "	Total real failures: $total_fail"
-fi
 if test ${total_pass} -gt 0; then
     echo "	Total passes: $total_pass"
 fi
@@ -95,14 +85,24 @@ fi
 if test ${total_xfail} -gt 0; then
     echo "	Total expected failures: ${total_xfail}"
 fi
-if test ${total_xpass} -gt 0; then
-    echo "	Total unexpected successes: ${total_xpass}"
-fi
 if test ${total_untested} -gt 0; then
     echo "	Total untested: ${total_untested}"
 fi
+if test ${total_fail} -gt 0; then
+    echo "	* Total real failures: $total_fail"
+fi
+if test ${total_xpass} -gt 0; then
+    echo "	--> Total unexpected successes: ${total_xpass}"
+fi
 
 echo
+
+# For now, return a failure if any XPASS or FAIL occurred
+if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
+	exit 1
+else
+	exit 0
+fi
 
 #
 # Look for regressions

@@ -1,5 +1,12 @@
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/anaylse-results.sh: exit with a failure if any real
+	  failure or unexpected success is found in the logs. Cleanup
+	  presentation code and output (the latter to now which subdirs have
+	  failures or unexpected successes).
+
+2007-09-07 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.cpp (output operator): don't compare iterators from
 	  different sequences !
 	* server/movie_instance.cpp (advance): don't invoke ONLOAD event
