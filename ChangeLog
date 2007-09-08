@@ -1,3 +1,10 @@
+2007-09-08 Sandro Santilli <strk@keybit.net>
+
+	* server/parser/video_stream_def.h: document class members,
+	  add some notes or todo items
+	* server/parser/video_stream_def.cpp (read): add a TODO item
+	  as I think we're misreading the VIDEOFRAME tag.
+
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
 	* server/video_stream_instance.h: keep definition by 

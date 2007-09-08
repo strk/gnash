@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.13 2007/09/07 22:24:41 strk Exp $
+// $Id: video_stream_def.cpp,v 1.14 2007/09/08 11:19:50 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -74,6 +74,10 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 	}
 	else if (tag == SWF::VIDEOFRAME)
 	{
+		// TODO: do *not* skip the frame number !
+		//       The SWF may not contain a video frame for
+		//       each SWF frame, in which case we make a mess
+		//
 		in->skip_bytes(2); //int frameNum = in->read_u16();
 
 		// We need to make the buffer a bit bigger than the data
