@@ -1,3 +1,10 @@
+<<<<<<< ChangeLog
+2007-09-09  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* macros/kde.m4: Look for shared libraries that don't end in
+	.so. patch #6191.
+
+=======
 2007-09-08 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/video_stream_def.h: document class members,
@@ -14,6 +21,7 @@
 	  always set output parameters to 0 if requested frame
 	  number is not available.
 
+>>>>>>> 1.4254
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.{cpp,h}: change signature of .reset() to
