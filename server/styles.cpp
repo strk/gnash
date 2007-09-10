@@ -70,6 +70,7 @@ line_style::read_morph(stream* in, int tag_type, movie_definition *md,
 		fill_style f, g;
 		f.read(in, tag_type, md, &g);
 		m_color = f.get_color();
+		pOther->m_color = g.get_color();
 	}
 	else
 	{

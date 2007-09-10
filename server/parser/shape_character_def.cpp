@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: shape_character_def.cpp,v 1.38 2007/09/02 12:57:01 cmusick Exp $ */
+/* $Id: shape_character_def.cpp,v 1.39 2007/09/10 04:29:54 cmusick Exp $ */
 
 // Based on the public domain shape.cpp of Thatcher Ulrich <tu@tulrich.com> 2003
 
@@ -211,8 +211,10 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 
     //log_msg("Read %u fill styles, %u line styles", m_fill_styles.size(), m_line_styles.size());
 
-    int	num_fill_bits = in->read_uint(4);
-    int	num_line_bits = in->read_uint(4);
+	// Use read_u8 to force alignment.
+	uint8_t num_bits = in->read_u8();
+	int num_fill_bits = (num_bits & 0xF0) >> 4;
+	int num_line_bits = (num_bits & 0x0F);
 
 		IF_VERBOSE_PARSE
 		(
@@ -441,8 +443,8 @@ shape_character_def::read(stream* in, int tag_type, bool with_style,
 	    // EDGERECORD
 	    bool edge_flag = in->read_bit();
 	    if (edge_flag == 0) {
-		// curved edge
 		int num_bits = 2 + in->read_uint(4);
+		// curved edge
 		int	cx = x + in->read_sint(num_bits);
 		int	cy = y + in->read_sint(num_bits);
 		int	ax = cx + in->read_sint(num_bits);

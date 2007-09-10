@@ -203,7 +203,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
         if (num_gradients > 0) {
             m_color = m_gradients[0].m_color;
 			if (is_morph)
-				pOther->m_color = m_gradients[0].m_color;
+				pOther->m_color = pOther->m_gradients[0].m_color;
         }
 
         if (md->get_create_bitmaps() == DO_LOAD_BITMAPS) {
@@ -265,6 +265,7 @@ fill_style::read(stream* in, int tag_type, movie_definition* md,
 
 		if (is_morph)
 		{
+			pOther->m_bitmap_character = m_bitmap_character;
 			m.read(in);
 			pOther->m_bitmap_matrix.set_inverse(m);
 		}

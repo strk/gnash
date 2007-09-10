@@ -1,10 +1,18 @@
-<<<<<<< ChangeLog
+2007-09-10 Chad Musick <chadmusick@msbx.net>
+
+	* server/fill_style.cpp: Correct handling of morph fills.
+	* server/styles.cpp: Correct handling of morph colors.
+	* server/parser/morph2_character_def.cpp: Remove @@hack
+	*   line, and fix underlying problem instead. Should fix
+	*   bug #19085. Morph and Morph2 shapes now work correctly.
+	* server/parser/shape_character_def.cpp: Be sure to read
+	*   on alignment where needed.
+
 2007-09-09  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* macros/kde.m4: Look for shared libraries that don't end in
 	.so. patch #6191.
 
-=======
 2007-09-08 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/video_stream_def.h: document class members,
@@ -21,7 +29,6 @@
 	  always set output parameters to 0 if requested frame
 	  number is not available.
 
->>>>>>> 1.4254
 2007-09-07 Sandro Santilli <strk@keybit.net>
 
 	* server/dlist.{cpp,h}: change signature of .reset() to
