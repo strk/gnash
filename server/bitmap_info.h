@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-/* $Id: bitmap_info.h,v 1.4 2007/07/01 10:54:20 bjacques Exp $ */
+/* $Id: bitmap_info.h,v 1.5 2007/09/10 16:53:29 strk Exp $ */
 
 #ifndef GNASH_BITMAP_INFO_H
 #define GNASH_BITMAP_INFO_H
@@ -43,8 +43,8 @@ namespace gnash {
 class DSOEXPORT bitmap_info : public ref_counted
 {
 public:
-	virtual void layout_image(image::image_base* /*im*/) { };
-	image::image_base*  m_suspended_image;
+//	virtual void layout_image(image::image_base* /*im*/) { };
+//	image::image_base*  m_suspended_image;
 
 	unsigned int	m_texture_id;		// nuke?
 	int		m_original_width;	// nuke?
@@ -52,7 +52,7 @@ public:
 		
 	bitmap_info()
 		:
-		m_suspended_image(NULL),
+//		m_suspended_image(NULL),
 		m_texture_id(0),
 		m_original_width(0),
 		m_original_height(0)

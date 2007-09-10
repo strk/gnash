@@ -5,7 +5,7 @@
 
 // A module to take care of all of gnash's loaded fonts.
 
-/* $Id: fontlib.cpp,v 1.33 2007/07/24 19:43:30 strk Exp $ */
+/* $Id: fontlib.cpp,v 1.34 2007/09/10 16:53:29 strk Exp $ */
 
 #include "container.h"
 #include "tu_file.h"
@@ -58,7 +58,7 @@ namespace {
 	static const int	OVERSAMPLE_FACTOR = (1 << OVERSAMPLE_BITS);
 
 	// The dimensions of the textures that the glyphs get packed into.
-	static const int	GLYPH_CACHE_TEXTURE_SIZE = 256;
+	static const size_t	GLYPH_CACHE_TEXTURE_SIZE = 256;
 
 	// How much space to leave around the individual glyph image.
 	// This should be at least 1.  The bigger it is, the smoother
@@ -71,10 +71,10 @@ namespace {
 	static int	s_glyph_render_size = s_glyph_nominal_size << OVERSAMPLE_BITS;
 
 	
-	void	set_nominal_glyph_pixel_size(int pixel_size)
+	void	set_nominal_glyph_pixel_size(size_t pixel_size)
 	{
-		static const int	MIN_SIZE = 4;
-		static const int	MAX_SIZE = GLYPH_CACHE_TEXTURE_SIZE / 2;
+		static const size_t	MIN_SIZE = 4;
+		static const size_t	MAX_SIZE = GLYPH_CACHE_TEXTURE_SIZE / 2;
 
 		if (pixel_size < MIN_SIZE)
 		{
@@ -249,7 +249,7 @@ namespace {
 		if (fp)
 		{
 			fprintf(fp, "P6\n%d %d\n255\n", GLYPH_CACHE_TEXTURE_SIZE, GLYPH_CACHE_TEXTURE_SIZE);
-			for (int i = 0; i < GLYPH_CACHE_TEXTURE_SIZE * GLYPH_CACHE_TEXTURE_SIZE; i++)
+			for (size_t i = 0; i < GLYPH_CACHE_TEXTURE_SIZE * GLYPH_CACHE_TEXTURE_SIZE; i++)
 			{
 				fputc(s_current_cache_image[i], fp);
 				fputc(s_current_cache_image[i], fp);
@@ -271,8 +271,8 @@ namespace {
 			}
 			else
 			{
-				int w = GLYPH_CACHE_TEXTURE_SIZE;
-				int h = GLYPH_CACHE_TEXTURE_SIZE;
+				size_t w = GLYPH_CACHE_TEXTURE_SIZE;
+				size_t h = GLYPH_CACHE_TEXTURE_SIZE;
 
 				// save bitmap size
 				s_file->write_le16(w);
@@ -317,8 +317,8 @@ namespace {
 		assert(r.m_x_min >= 0);
 		assert(r.m_y_min >= 0);
 
-		if (r.m_x_max > GLYPH_CACHE_TEXTURE_SIZE
-		    || r.m_y_max > GLYPH_CACHE_TEXTURE_SIZE)
+		if ((size_t)r.m_x_max > GLYPH_CACHE_TEXTURE_SIZE
+		    || (size_t)r.m_y_max > GLYPH_CACHE_TEXTURE_SIZE)
 		{
 			// Rect overflows the texture bounds.
 			return false;
@@ -380,7 +380,7 @@ namespace {
 	}
 
 
-	bool	pack_rectangle(int* px, int* py, int width, int height)
+	bool	pack_rectangle(int* px, int* py, size_t width, size_t height)
 	// Find a spot for the rectangle in the current cache image.
 	// Return true if there's a spot; false if there's no room.
 	{
@@ -627,13 +627,13 @@ namespace {
 			rgi.m_offset_y = offset_y / s_rendering_box * s_glyph_nominal_size - min_y;
 
 			// Copy the rendered glyph into the new image.
-			{for (int j = 0, n = rgi.m_image->m_height; j < n; j++)
+			for (size_t j = 0, n = rgi.m_image->height(); j < n; j++)
 			{
 				memcpy(
-					image::scanline(rgi.m_image, j),
+					rgi.m_image->scanline(j),
 					output + (min_y + j) * s_glyph_nominal_size + min_x,
-					rgi.m_image->m_width);
-			}}
+					rgi.m_image->width());
+			}
 		}
 		else
 		{
@@ -786,8 +786,8 @@ namespace {
 				const rendered_glyph_info*	ga = (const rendered_glyph_info*) a;
 				const rendered_glyph_info*	gb = (const rendered_glyph_info*) b;
 
-				int	a_size = ga->m_image->m_width + ga->m_image->m_height;
-				int	b_size = gb->m_image->m_width + gb->m_image->m_height;
+				int	a_size = ga->m_image->width() + ga->m_image->height();
+				int	b_size = gb->m_image->width() + gb->m_image->height();
 
 				return b_size - a_size;
 			}
@@ -822,12 +822,12 @@ namespace {
 					break;
 				}
 
-				int	raw_width = rgi.m_image->m_width;
-				int	raw_height = rgi.m_image->m_height;
+				size_t	raw_width = rgi.m_image->width();
+				size_t	raw_height = rgi.m_image->height();
 
 				// Need to pad around the outside.
-				int	width = raw_width + (PAD_PIXELS * 2);
-				int	height = raw_height + (PAD_PIXELS * 2);
+				size_t	width = raw_width + (PAD_PIXELS * 2);
+				size_t	height = raw_height + (PAD_PIXELS * 2);
 
 				assert(width < GLYPH_CACHE_TEXTURE_SIZE);
 				assert(height < GLYPH_CACHE_TEXTURE_SIZE);
@@ -839,12 +839,12 @@ namespace {
 				{
 					// Fits!
 					// Blit the output image into its new spot.
-					for (int j = 0; j < raw_height; j++)
+					for (size_t j = 0; j < raw_height; j++)
 					{
 						memcpy(s_current_cache_image
 						       + (pack_y + PAD_PIXELS + j) * GLYPH_CACHE_TEXTURE_SIZE
 						       + pack_x + PAD_PIXELS,
-						       image::scanline(rgi.m_image, j),
+						       rgi.m_image->scanline(j),
 						       raw_width);
 					}
 

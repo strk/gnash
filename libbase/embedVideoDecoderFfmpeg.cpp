@@ -87,6 +87,9 @@ embedVideoDecoderFfmpeg::createDecoder(int widthi, int heighti, int deblockingi,
 	cc->width = width;
 	cc->height = height;
 
+	assert(cc->width > 0);
+	assert(cc->height > 0);
+
 	// Determine required buffer size and allocate buffer
 	if (outputFormat == YUV) {
 		decodedFrame.reset(new image::yuv(width, height));
@@ -172,7 +175,8 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 			return ret_image;
 		}
 
-		ret_image->update(decodedFrame->m_data);
+		// clone decodedFrame instead ?
+		ret_image->update(*decodedFrame);
 		return ret_image;
 	}
 
@@ -199,11 +203,12 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 	}
 	
 	if (got) {
+		log_debug("Got");
 		boost::scoped_array<uint8_t> buffer;
 
 		if (outputFormat == NONE) { // NullGui?
 			av_free(frame);
-			ret_image->update(decodedFrame->m_data);
+			ret_image->update(*decodedFrame);
 			return ret_image;
 
 		} else if (outputFormat == YUV && cc->pix_fmt != PIX_FMT_YUV420P) {
@@ -217,8 +222,8 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 
 		if (outputFormat == YUV) {
 			image::yuv* yuvframe = static_cast<image::yuv*>(decodedFrame.get());
-			int copied = 0;
-			uint8_t* ptr = yuvframe->m_data;
+			size_t copied = 0;
+			uint8_t* ptr = yuvframe->data();
 			for (int i = 0; i < 3 ; i++)
 			{
 				int shift = (i == 0 ? 0 : 1);
@@ -234,15 +239,20 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 					ptr += w;
 				}
 			}
-			yuvframe->m_size = copied;
+			//yuvframe->m_size = copied;
+			assert(yuvframe->size() == copied); // correct ?
 		} else if (outputFormat == RGB) {
+
+		log_debug("updating decodedFrame with data from ffmpeg");
 
 			uint8_t* srcptr = frame->data[0];
 			uint8_t* srcend = frame->data[0] + frame->linesize[0] * cc->height;
-			uint8_t* dstptr = decodedFrame->m_data;
+			uint8_t* dstptr = decodedFrame->data();
+			uint8_t* dstend = decodedFrame->data()+decodedFrame->size();
 			unsigned int srcwidth = cc->width * 3;
 
 			while (srcptr < srcend) {
+				assert( dstptr < dstend );
 				memcpy(dstptr, srcptr, srcwidth);
 				srcptr += frame->linesize[0];
 				dstptr += srcwidth;
@@ -250,6 +260,7 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 
 		}
 	}
+	else log_debug("Didn't get");
 
 	av_free(frame);
 	// If haven't decoded any frame yet, return
@@ -259,8 +270,11 @@ embedVideoDecoderFfmpeg::decodeFrame(uint8_t* data, int size)
 		ret_image.reset(NULL);
 		return ret_image;
 	}
-	ret_image->update(decodedFrame->m_data);
-	return ret_image;
+
+	log_debug("Returning a clone of decodedFrame");
+	return decodedFrame->clone();
+	//ret_image->update(*decodedFrame);
+	//return ret_image;
 }
 
 } // end of gnash namespace

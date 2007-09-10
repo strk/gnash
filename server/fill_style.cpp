@@ -409,7 +409,8 @@ fill_style::create_gradient_bitmap() const
         // Linear gradient.
         im = image::create_rgba(256, 1);
 
-        for (int i = 0; i < im->m_width; i++) {
+        for (size_t i = 0; i < im->width(); i++)
+	{
             rgba	sample = sample_gradient(i);
             im->set_pixel(i, 0, sample.m_r, sample.m_g, sample.m_b, sample.m_a);
         }
@@ -419,9 +420,9 @@ fill_style::create_gradient_bitmap() const
         // Radial gradient.
         im = image::create_rgba(64, 64);
 
-        for (int j = 0; j < im->m_height; j++) {
-            for (int i = 0; i < im->m_width; i++) {
-                float	radius = (im->m_height - 1) / 2.0f;
+        for (size_t j = 0; j < im->height(); j++) {
+            for (size_t i = 0; i < im->width(); i++) {
+                float	radius = (im->height() - 1) / 2.0f;
                 float	y = (j - radius) / radius;
                 float	x = (i - radius) / radius;
                 int	ratio = (int) floorf(255.5f * sqrt(x * x + y * y));
@@ -438,11 +439,11 @@ fill_style::create_gradient_bitmap() const
 		// Focal gradient.
 		im = image::create_rgba(64, 64);
 
-		for (int j = 0; j < im->m_height; j++)
+		for (size_t j = 0; j < im->height(); j++)
 		{
-			for (int i = 0; i < im->m_width; i++)
+			for (size_t i = 0; i < im->width(); i++)
 			{
-				float radiusy = (im->m_height - 1) / 2.0f;
+				float radiusy = (im->height() - 1) / 2.0f;
 				float radiusx = radiusy + abs(radiusy * m_focal_point);
 				float y = (j - radiusy) / radiusy;
 				float x = (i - radiusx) / radiusx;

@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStream.cpp,v 1.70 2007/08/31 21:53:32 strk Exp $ */
+/* $Id: NetStream.cpp,v 1.71 2007/09/10 16:53:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -556,20 +556,10 @@ NetStream::get_video()
 {
 	boost::mutex::scoped_lock lock(image_mutex);
 
+	if (!m_imageframe) return std::auto_ptr<image::image_base>(0);
+
 	// TODO: inspect if we could return m_imageframe directly...
-
-	std::auto_ptr<image::image_base> ret_image;
-
-	if (!m_imageframe) return ret_image;
-
-	if (m_videoFrameFormat == render::YUV) {
-		ret_image.reset(new image::yuv(m_imageframe->m_width, m_imageframe->m_height));
-	} else if (m_videoFrameFormat == render::RGB) {
-		ret_image.reset(new image::rgb(m_imageframe->m_width, m_imageframe->m_height));
-	} 
-
-	ret_image->update(m_imageframe->m_data);
-	return ret_image;
+	return m_imageframe->clone();
 }
 
 std::pair<const char*, const char*>

@@ -1,4 +1,4 @@
-// BitmapMovieDefinition.cpp:  , for Gnash.
+// BitmapMovieDefinition.cpp:  Bitmap movie definition, for Gnash.
 // 
 //   Copyright (C) 2007 Free Software Foundation, Inc.
 // 
@@ -82,7 +82,7 @@ BitmapMovieDefinition::BitmapMovieDefinition(
 	:
 	_version(6),
 	// image::rgb size is in pixels
-	_framesize(0, 0, image->m_width*20, image->m_height*20),
+	_framesize(0, 0, image->width()*20, image->height()*20),
 	_framecount(1),
 	_playlist(_framecount),
 	_framerate(12),

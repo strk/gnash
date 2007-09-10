@@ -20,9 +20,12 @@ namespace image
 	//
 	// image_base
 	//
+
+	/// Create an image taking ownership of the given buffer, supposedly of height*pitch bytes
 	image_base::image_base(uint8_t* data, int width, int height, int pitch, id_image type)
 		:
 		m_type(type),
+		m_size(height*pitch),
 		m_data(data),
 		m_width(width),
 		m_height(height),
@@ -30,24 +33,36 @@ namespace image
 	{
 	}
 
+	/// Create an image allocating a buffer of height*pitch bytes
+	image_base::image_base(int width, int height, int pitch, id_image type)
+		:
+		m_type(type),
+		m_size(height*pitch),
+		m_data(new uint8_t[m_size]),
+		m_width(width),
+		m_height(height),
+		m_pitch(pitch)
+	{
+		assert(pitch >= width);
+	}
+
 	void image_base::update(uint8_t* data)
 	{
-		memcpy(m_data, data, m_pitch * m_height);
+		memcpy(m_data.get(), data, m_size);
 	}
 
-	uint8_t*	scanline(image_base* surf, int y)
+	void image_base::update(const image_base& from)
 	{
-		assert(surf);
-		assert(y >= 0 && y < surf->m_height);
-		return ((uint8_t*) surf->m_data) + surf->m_pitch * y;
+		assert(from.m_pitch == m_pitch);
+		assert(m_size <= from.m_size);
+		assert(m_type == from.m_type);
+		memcpy(m_data.get(), from.m_data.get(), m_size);
 	}
 
-
-	const uint8_t*	scanline(const image_base* surf, int y)
+	uint8_t* image_base::scanline(size_t y)
 	{
-		assert(surf);
-		assert(y >= 0 && y < surf->m_height);
-		return ((const uint8_t*) surf->m_data) + surf->m_pitch * y;
+		assert(y < m_height);
+		return m_data.get() + m_pitch * y;
 	}
 
 
@@ -57,26 +72,18 @@ namespace image
 
 	rgb::rgb(int width, int height)
 		:
-		image_base(
-			0,
-			width,
-			height,
-			(width * 3 + 3) & ~3, RGB)	// round pitch up to nearest 4-byte boundary
+		image_base( width, height,
+			(width * 3 + 3) & ~3, // round pitch up to nearest 4-byte boundary
+			RGB)
 	{
 		assert(width > 0);
 		assert(height > 0);
 		assert(m_pitch >= m_width * 3);
 		assert((m_pitch & 3) == 0);
-
-		m_data = new uint8_t[m_pitch * m_height];
 	}
 
 	rgb::~rgb()
 	{
-		// TODO FIXME: m_data is a member of image_base, 
-		// so ONLY image_base should delete it !
-		// USE A SCOPED POINTER FOR THIS !
-		delete [] m_data;
 	}
 
 
@@ -88,6 +95,66 @@ namespace image
 		return new rgb(width, height);
 	}
 
+	bool rgb::make_next_miplevel()
+	{
+		assert(m_data.get());
+		assert(m_type == RGB);
+
+		size_t imWidth = m_width;
+		size_t imHeight = m_height;
+
+		size_t new_w = imWidth >> 1;
+		size_t new_h = imHeight >> 1;
+		if (new_w < 1) new_w = 1;
+		if (new_h < 1) new_h = 1;
+
+		if (new_w * 2 != imWidth  || new_h * 2 != imHeight)
+		{
+			// Image can't be shrunk along (at least) one
+			// of its dimensions, so don't bother
+			// resampling.  Technically we should, but
+			// it's pretty useless at this point.  Just
+			// change the image dimensions and leave the
+			// existing pixels.
+			return false;
+		}
+
+		size_t new_pitch = new_w * 3;
+
+		// Round pitch up to the nearest 4-byte boundary.
+		new_pitch = (new_pitch + 3) & ~3;
+
+		// Resample.  Simple average 2x2 --> 1, in-place.
+		size_t	pitch = m_pitch;
+		for (size_t j = 0; j < new_h; j++) {
+			uint8_t*	out = m_data.get() + j * new_pitch;
+			uint8_t*	in = m_data.get() + (j << 1) * pitch;
+			for (size_t i = 0; i < new_w; i++) {
+				int	r, g, b;
+				r = (*(in + 0) + *(in + 3) + *(in + 0 + pitch) + *(in + 3 + pitch));
+				g = (*(in + 1) + *(in + 4) + *(in + 1 + pitch) + *(in + 4 + pitch));
+				b = (*(in + 2) + *(in + 5) + *(in + 2 + pitch) + *(in + 5 + pitch));
+				*(out + 0) = r >> 2;
+				*(out + 1) = g >> 2;
+				*(out + 2) = b >> 2;
+				out += 3;
+				in += 6;
+			}
+		}
+
+		// Munge image's members to reflect the shrunken image.
+		m_width = new_w;
+		m_height = new_h;
+		m_pitch = new_pitch;
+		m_size = m_height*m_pitch;
+
+		assert(m_pitch >= m_width);
+
+		return true;
+	}
+
+
+
 
 	//
 	// rgba
@@ -96,23 +163,16 @@ namespace image
 
 	rgba::rgba(int width, int height)
 		:
-		image_base(0, width, height, width * 4, RGBA)
+		image_base(width, height, width * 4, RGBA)
 	{
 		assert(width > 0);
 		assert(height > 0);
 		assert(m_pitch >= m_width * 4);
 		assert((m_pitch & 3) == 0);
-
-//		m_data = (uint8_t*) dlmalloc(m_pitch * m_height);
-		m_data = new uint8_t[m_pitch * m_height];
 	}
 
 	rgba::~rgba()
 	{
-		// TODO FIXME: m_data is a member of image_base, 
-		// so ONLY image_base should delete it !
-		// USE A SCOPED POINTER FOR THIS !
-		delete [] m_data;
 	}
 
 
@@ -125,13 +185,13 @@ namespace image
 	}
 
 
-	void	rgba::set_pixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+	void	rgba::set_pixel(size_t x, size_t y, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 	// Set the pixel at the given position.
 	{
-		assert(x >= 0 && x < m_width);
-		assert(y >= 0 && y < m_height);
+		assert(x < m_width);
+		assert(y < m_height);
 
-		uint8_t*	data = scanline(this, y) + 4 * x;
+		uint8_t*	data = scanline(y) + 4 * x;
 
 		data[0] = r;
 		data[1] = g;
@@ -139,6 +199,70 @@ namespace image
 		data[3] = a;
 	}
 
+	// Set alpha value for given pixel 
+	void	rgba::set_alpha(size_t x, size_t y, uint8_t a)
+	{
+		assert(x < m_width);
+		assert(y < m_height);
+
+		uint8_t*	data = scanline(y) + 4 * x;
+
+		data[3] = a;
+	}
+
+	bool	rgba::make_next_miplevel()
+	{
+		assert(m_data.get());
+		assert(m_type == RGBA);
+
+		size_t	new_w = m_width >> 1;
+		size_t	new_h = m_height >> 1;
+		if (new_w < 1) new_w = 1;
+		if (new_h < 1) new_h = 1;
+
+		if (new_w * 2 != m_width  || new_h * 2 != m_height)
+		{
+			// Image can't be shrunk along (at least) one
+			// of its dimensions, so don't bother
+			// resampling.  Technically we should, but
+			// it's pretty useless at this point.  Just
+			// change the image dimensions and leave the
+			// existing pixels.
+			return false;
+		}
+
+		size_t	new_pitch = new_w * 4;
+
+		// Resample.  Simple average 2x2 --> 1, in-place.
+		size_t	pitch = m_pitch;
+		for (size_t j = 0; j < new_h; j++) {
+			uint8_t*	out = ((uint8_t*) m_data.get()) + j * new_pitch;
+			uint8_t*	in = ((uint8_t*) m_data.get()) + (j << 1) * pitch;
+			for (size_t i = 0; i < new_w; i++) {
+				int	r, g, b, a;
+				r = (*(in + 0) + *(in + 4) + *(in + 0 + pitch) + *(in + 4 + pitch));
+				g = (*(in + 1) + *(in + 5) + *(in + 1 + pitch) + *(in + 5 + pitch));
+				b = (*(in + 2) + *(in + 6) + *(in + 2 + pitch) + *(in + 6 + pitch));
+				a = (*(in + 3) + *(in + 7) + *(in + 3 + pitch) + *(in + 7 + pitch));
+				*(out + 0) = r >> 2;
+				*(out + 1) = g >> 2;
+				*(out + 2) = b >> 2;
+				*(out + 3) = a >> 2;
+				out += 4;
+				in += 8;
+			}
+		}
+
+		// Munge image's members to reflect the shrunken image.
+		m_width = new_w;
+		m_height = new_h;
+		m_pitch = new_pitch;
+		m_size = m_height*m_pitch;
+
+		assert(m_pitch >= m_width);
+
+		return true;
+	}
 
 	//
 	// alpha
@@ -154,29 +278,73 @@ namespace image
 
 	alpha::alpha(int width, int height)
 		:
-		image_base(0, width, height, width, ALPHA)
+		image_base(width, height, width, ALPHA)
 	{
 		assert(width > 0);
 		assert(height > 0);
 
-//		m_data = (uint8_t*) dlmalloc(m_pitch * m_height);
-		m_data = new uint8_t[m_pitch * m_height];
+		//m_data = new uint8_t[m_pitch * m_height];
 	}
 
 
 	alpha::~alpha()
 	{
-			delete [] m_data;
+	}
+
+	bool alpha::make_next_miplevel()
+	{
+		assert(m_data.get());
+		assert(m_type == ALPHA);
+
+		size_t	new_w = m_width >> 1;
+		size_t	new_h = m_height >> 1;
+		if (new_w < 1) new_w = 1;
+		if (new_h < 1) new_h = 1;
+
+		if (new_w * 2 != m_width || new_h * 2 != m_height)
+		{
+			// Image can't be shrunk along (at least) one
+			// of its dimensions, so don't bother
+			// resampling.	Technically we should, but
+			// it's pretty useless at this point.  Just
+			// change the image dimensions and leave the
+			// existing pixels.
+			return false;
+		}
+
+		// Resample.  Simple average 2x2 --> 1, in-place.
+		for (size_t j = 0; j < new_h; j++)
+		{
+			uint8_t* out = m_data.get() + j * new_w;
+			uint8_t* in = m_data.get() + (j << 1) * m_width;
+			for (size_t i = 0; i < new_w; i++)
+			{
+				int	a;
+				a = (*(in + 0) + *(in + 1) + *(in + 0 + m_width) + *(in + 1 + m_width));
+				*(out) = a >> 2;
+				out++;
+				in += 2;
+			}
+		}
+
+		// Munge parameters to reflect the shrunken image.
+		m_width = m_pitch = new_w;
+		m_height = new_h;
+		m_size = m_height*m_pitch;
+
+		assert(m_pitch >= m_width);
+
+		return true;
 	}
 
 
-	void	alpha::set_pixel(int x, int y, uint8_t a)
+	void	alpha::set_pixel(size_t x, size_t y, uint8_t a)
 	// Set the pixel at the given position.
 	{
-		assert(x >= 0 && x < m_width);
-		assert(y >= 0 && y < m_height);
+		assert(x < m_width);
+		assert(y < m_height);
 
-		uint8_t*	data = scanline(this, y) + x;
+		uint8_t*	data = scanline(y) + x;
 
 		data[0] = a;
 	}
@@ -193,7 +361,7 @@ namespace image
 
 		for (int j = 0, n = m_height; j < n; j++)
 		{
-			if (memcmp(scanline(this, j), scanline(&a, j), m_width))
+			if (memcmp(scanline(j), a.scanline(j), m_width))
 			{
 				// Mismatch.
 				return false;
@@ -214,7 +382,7 @@ namespace image
 
 		for (int i = 0, n = m_height; i < n; i++)
 		{
-			h = bernstein_hash(scanline(this, i), m_width, h);
+			h = bernstein_hash(scanline(i), m_width, h);
 		}
 
 		return h;
@@ -224,7 +392,7 @@ namespace image
 	// yuv
 	//
 	yuv::yuv(int w, int h) :
-		image_base(0, w, h, w, YUV)
+		image_base(0, w, h, w, YUV) // pitch initialized to wrong value, will fix m_size below
 
 	{
 		planes[Y].w = m_width;
@@ -265,13 +433,13 @@ namespace image
 			planes[i].coords[3][1] = th;
 		}
 
-		m_data = new uint8_t[m_size];
+		m_data.reset( new uint8_t[m_size] );
 
 	//		m_bounds->m_x_min = 0.0f;
 	//		m_bounds->m_x_max = 1.0f;
 	//		m_bounds->m_y_min = 0.0f;
 	//		m_bounds->m_y_max = 1.0f;
-	}	
+	}
 
 	unsigned int yuv::video_nlpo2(unsigned int x) const
 	{
@@ -283,28 +451,21 @@ namespace image
 		return x + 1;
 	}
 
-	int yuv::size() const
-	{
-		return m_size;
-	}
-
-	void yuv::update(uint8_t* data)
-	{
-		memcpy(m_data, data, m_size);
-	}
-
 	//
 	// utility
 	//
 
 
-	void	write_jpeg(tu_file* out, rgb* image, int quality)
 	// Write the given image to the given out stream, in jpeg format.
+	void	write_jpeg(tu_file* out, rgb* image, int quality)
 	{
-		std::auto_ptr<jpeg::output> j_out ( jpeg::output::create(out, image->m_width, image->m_height, quality) );
+		size_t height = image->height();
 
-		for (int y = 0; y < image->m_height; y++) {
-			j_out->write_scanline(scanline(image, y));
+		std::auto_ptr<jpeg::output> j_out ( jpeg::output::create(out, image->width(), height, quality) );
+
+		for (size_t y = 0; y < height; ++y)
+		{
+			j_out->write_scanline(image->scanline(y));
 		}
 
 	}
@@ -338,7 +499,7 @@ namespace image
 
 		for (int y = 0; y < j_in->get_height(); y++)
 		{
-			j_in->read_scanline(scanline(im.get(), y));
+			j_in->read_scanline(im->scanline(y));
 		}
 
 		return im.release();
@@ -357,7 +518,7 @@ namespace image
 		rgb*	im = image::create_rgb(j_in->get_width(), j_in->get_height());
 
 		for (int y = 0; y < j_in->get_height(); y++) {
-			j_in->read_scanline(scanline(im, y));
+			j_in->read_scanline(im->scanline(y));
 		}
 
 		j_in->finish_image();
@@ -386,7 +547,7 @@ namespace image
 		{
 			j_in->read_scanline(line.get());
 
-			uint8_t*	data = scanline(im.get(), y);
+			uint8_t*	data = im->scanline(y);
 			for (int x = 0; x < j_in->get_width(); x++) 
 			{
 				data[4*x+0] = line[3*x+0];
@@ -402,9 +563,12 @@ namespace image
 	}
 
 
-	void	write_tga(tu_file* out, rgba* im)
 	// Write a 32-bit Targa format bitmap.  Dead simple, no compression.
+	void	write_tga(tu_file* out, rgba* im)
 	{
+		size_t imWidth = im->width();
+		size_t imHeight = im->height();
+
 		out->write_byte(0);
 		out->write_byte(0);
 		out->write_byte(2);	/* uncompressed RGB */
@@ -413,15 +577,15 @@ namespace image
 		out->write_byte(0);
 		out->write_le16(0);	/* X origin */
 		out->write_le16(0);	/* y origin */
-		out->write_le16(im->m_width);
-		out->write_le16(im->m_height);
+		out->write_le16(imWidth);
+		out->write_le16(imHeight);
 		out->write_byte(32);	/* 32 bit bitmap */
 		out->write_byte(0);
 
-		for (int y = 0; y < im->m_height; y++)
+		for (size_t y = 0; y < imHeight; y++)
 		{
-			uint8_t*	p = scanline(im, y);
-			for (int x = 0; x < im->m_width; x++)
+			uint8_t*	p = im->scanline(y);
+			for (size_t x = 0; x < imWidth; x++)
 			{
 				out->write_byte(p[x * 4]);
 				out->write_byte(p[x * 4 + 1]);
@@ -431,108 +595,6 @@ namespace image
 		}
 	}
 
-	void	make_next_miplevel(rgb* image)
-	// Fast, in-place resample.  For making mip-maps.  Munges the
-	// input image to produce the output image.
-	{
-		assert(image->m_data);
-
-		int	new_w = image->m_width >> 1;
-		int	new_h = image->m_height >> 1;
-		if (new_w < 1) new_w = 1;
-		if (new_h < 1) new_h = 1;
-
-		int	new_pitch = new_w * 3;
-		// Round pitch up to the nearest 4-byte boundary.
-		new_pitch = (new_pitch + 3) & ~3;
-
-		if (new_w * 2 != image->m_width  || new_h * 2 != image->m_height)
-		{
-			// Image can't be shrunk along (at least) one
-			// of its dimensions, so don't bother
-			// resampling.  Technically we should, but
-			// it's pretty useless at this point.  Just
-			// change the image dimensions and leave the
-			// existing pixels.
-		}
-		else
-		{
-			// Resample.  Simple average 2x2 --> 1, in-place.
-			int	pitch = image->m_pitch;
-			for (int j = 0; j < new_h; j++) {
-				uint8_t*	out = ((uint8_t*) image->m_data) + j * new_pitch;
-				uint8_t*	in = ((uint8_t*) image->m_data) + (j << 1) * pitch;
-				for (int i = 0; i < new_w; i++) {
-					int	r, g, b;
-					r = (*(in + 0) + *(in + 3) + *(in + 0 + pitch) + *(in + 3 + pitch));
-					g = (*(in + 1) + *(in + 4) + *(in + 1 + pitch) + *(in + 4 + pitch));
-					b = (*(in + 2) + *(in + 5) + *(in + 2 + pitch) + *(in + 5 + pitch));
-					*(out + 0) = r >> 2;
-					*(out + 1) = g >> 2;
-					*(out + 2) = b >> 2;
-					out += 3;
-					in += 6;
-				}
-			}
-		}
-
-		// Munge image's members to reflect the shrunken image.
-		image->m_width = new_w;
-		image->m_height = new_h;
-		image->m_pitch = new_pitch;
-	}
-
-
-	void	make_next_miplevel(rgba* image)
-	// Fast, in-place resample.  For making mip-maps.  Munges the
-	// input image to produce the output image.
-	{
-		assert(image->m_data);
-
-		int	new_w = image->m_width >> 1;
-		int	new_h = image->m_height >> 1;
-		if (new_w < 1) new_w = 1;
-		if (new_h < 1) new_h = 1;
-
-		int	new_pitch = new_w * 4;
-
-		if (new_w * 2 != image->m_width  || new_h * 2 != image->m_height)
-		{
-			// Image can't be shrunk along (at least) one
-			// of its dimensions, so don't bother
-			// resampling.  Technically we should, but
-			// it's pretty useless at this point.  Just
-			// change the image dimensions and leave the
-			// existing pixels.
-		}
-		else
-		{
-			// Resample.  Simple average 2x2 --> 1, in-place.
-			int	pitch = image->m_pitch;
-			for (int j = 0; j < new_h; j++) {
-				uint8_t*	out = ((uint8_t*) image->m_data) + j * new_pitch;
-				uint8_t*	in = ((uint8_t*) image->m_data) + (j << 1) * pitch;
-				for (int i = 0; i < new_w; i++) {
-					int	r, g, b, a;
-					r = (*(in + 0) + *(in + 4) + *(in + 0 + pitch) + *(in + 4 + pitch));
-					g = (*(in + 1) + *(in + 5) + *(in + 1 + pitch) + *(in + 5 + pitch));
-					b = (*(in + 2) + *(in + 6) + *(in + 2 + pitch) + *(in + 6 + pitch));
-					a = (*(in + 3) + *(in + 7) + *(in + 3 + pitch) + *(in + 7 + pitch));
-					*(out + 0) = r >> 2;
-					*(out + 1) = g >> 2;
-					*(out + 2) = b >> 2;
-					*(out + 3) = a >> 2;
-					out += 4;
-					in += 8;
-				}
-			}
-		}
-
-		// Munge image's members to reflect the shrunken image.
-		image->m_width = new_w;
-		image->m_height = new_h;
-		image->m_pitch = new_pitch;
-	}
 }
 
 

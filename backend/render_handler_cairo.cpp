@@ -30,10 +30,10 @@ static void
 rgb_to_cairo_rgb24(uint8_t* dst, const image::rgb* im)
 {
     uint32_t* dst32 = reinterpret_cast<uint32_t*>(dst);
-    for (int y = 0;  y < im->m_height;  y++)
+    for (size_t y = 0;  y < im->height();  y++)
     {
-	const uint8_t* src = image::scanline(im, y);
-	for (int x = 0;  x < im->m_width;  x++, src += 3)
+	const uint8_t* src = im->scanline(y);
+	for (size_t x = 0;  x < im->width();  x++, src += 3)
 	{
 	    // 32-bit RGB data in native endian format
 	    *dst32++ = (src[0] << 16) | (src[1] << 8) | src[2];
@@ -47,10 +47,10 @@ static void
 rgba_to_cairo_argb32(uint8_t* dst, const image::rgba* im)
 {
     uint32_t* dst32 = reinterpret_cast<uint32_t*>(dst);
-    for (int y = 0;  y < im->m_height;  y++)
+    for (size_t y = 0;  y < im->height();  y++)
     {
-	const uint8_t* src = image::scanline(im, y);
-	for (int x = 0;  x < im->m_width;  x++, src += 4)
+	const uint8_t* src = im->scanline(y);
+	for (size_t x = 0;  x < im->width();  x++, src += 4)
 	{
 	    // 32-bit ARGB data in native endian format
 	    *dst32++ = (src[0] << 24) | (src[1] << 16) | (src[2] << 8) | src[3];
@@ -618,8 +618,8 @@ public:
 
 	    // Extract frame attributes
 	    image::rgb* frame = static_cast<image::rgb*>(baseframe);
-	    int         w = frame->m_width;
-	    int         h = frame->m_height;
+	    int         w = frame->width();
+	    int         h = frame->height();
 
 	    // Compute bounding rectangle size relative to video object
 	    double w_scale = bounds->width()  / w;
@@ -720,15 +720,15 @@ bitmap_info_cairo::bitmap_info_cairo(image::rgb* im)
     assert(im);
 
     // Convert 24-bit BGR data to 32-bit RGB
-    int buf_size = im->m_width * im->m_height * 4;
+    int buf_size = im->width() * im->height() * 4;
     m_buffer = new unsigned char[buf_size];
     rgb_to_cairo_rgb24(m_buffer, im);
 
     // Create the cairo image
-    m_original_width  = im->m_width;
-    m_original_height = im->m_height;
+    m_original_width  = im->width();
+    m_original_height = im->height();
     m_image = cairo_image_surface_create_for_data(m_buffer,
-	CAIRO_FORMAT_RGB24, im->m_width, im->m_height, im->m_width * 4);
+	CAIRO_FORMAT_RGB24, im->width(), im->height(), im->width() * 4);
     m_pattern = cairo_pattern_create_for_surface(m_image);
 }
 
@@ -739,15 +739,17 @@ bitmap_info_cairo::bitmap_info_cairo(image::rgba* im)
     assert(im);
 
     // Allocate output buffer
-    int buf_size = im->m_width * im->m_height * 4;
+    size_t buf_size = im->size(); 
+
+    // TODO: who owns this buffer ??
     m_buffer = new unsigned char[buf_size];
     rgba_to_cairo_argb32(m_buffer, im);
 
     // Create the image
-    m_original_width  = im->m_width;
-    m_original_height = im->m_height;
+    m_original_width  = im->width();
+    m_original_height = im->height();
     m_image = cairo_image_surface_create_for_data(m_buffer,
-	CAIRO_FORMAT_ARGB32, im->m_width, im->m_height, im->m_width * 4);
+	CAIRO_FORMAT_ARGB32, im->width(), im->height(), im->width() * 4);
     m_pattern = cairo_pattern_create_for_surface(m_image);
 }
 

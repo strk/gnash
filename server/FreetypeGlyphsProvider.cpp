@@ -213,13 +213,14 @@ FreetypeGlyphsProvider::draw_bitmap(const FT_Bitmap& bitmap)
 
 	std::auto_ptr<image::alpha> alpha ( image::create_alpha(w, h) );
 
-	memset(alpha->m_data, 0, alpha->m_width * alpha->m_height);
+	// TODO: replace with image_base::clear(byte value)
+	memset(alpha->data(), 0, alpha->size());
 
 	// copy image to alpha
 	for (int i = 0; i < bitmap.rows; i++)
 	{
 		uint8_t*	src = bitmap.buffer + bitmap.pitch * i;
-		uint8_t*	dst = alpha->m_data + alpha->m_pitch * i;
+		uint8_t*	dst = alpha->scanline(i); 
 		int	x = bitmap.width;
 		while (x-- > 0)
 		{

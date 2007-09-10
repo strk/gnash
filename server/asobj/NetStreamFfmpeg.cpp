@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamFfmpeg.cpp,v 1.89 2007/09/06 12:21:06 tgc Exp $ */
+/* $Id: NetStreamFfmpeg.cpp,v 1.90 2007/09/10 16:53:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -582,8 +582,11 @@ NetStreamFfmpeg::startPlayback()
 static void
 rgbcopy(image::rgb* dst, raw_mediadata_t* src, int width)
 {
-	assert(src->m_size <= static_cast<uint32_t>(dst->m_width * dst->m_height * 3));
+	assert( dst->size() >= src->m_size ); 
+	assert( dst->pitch() >= width );
+	dst->update(src->m_data);
 
+#if 0
 	uint8_t* dstptr = dst->m_data;
 
 	uint8_t* srcptr = src->m_data;
@@ -594,6 +597,7 @@ rgbcopy(image::rgb* dst, raw_mediadata_t* src, int width)
 		dstptr += dst->m_pitch;
 		srcptr += width;
 	}
+#endif
 }
 
 // decoder thread
@@ -859,7 +863,7 @@ bool NetStreamFfmpeg::decodeVideo(AVPacket* packet)
 			video->m_data = new uint8_t[static_cast<image::yuv*>(m_imageframe)->size()];
 		} else if (m_videoFrameFormat == render::RGB) {
 			image::rgb* tmp = static_cast<image::rgb*>(m_imageframe);
-			video->m_data = new uint8_t[tmp->m_pitch * tmp->m_height];
+			video->m_data = new uint8_t[m_imageframe->size()]; // tmp->m_pitch * tmp->m_height];
 		}
 
 		video->m_ptr = video->m_data;

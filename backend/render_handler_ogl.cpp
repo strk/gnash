@@ -5,7 +5,7 @@
 
 // A render_handler that uses SDL & OpenGL
 
-/* $Id: render_handler_ogl.cpp,v 1.76 2007/07/26 19:25:35 strk Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.77 2007/09/10 16:53:29 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -56,10 +56,10 @@ using namespace gnash;
 class bitmap_info_ogl : public gnash::bitmap_info
 {
 public:
-    bitmap_info_ogl();
-    bitmap_info_ogl(int width, int height, uint8_t* data);
-    bitmap_info_ogl(image::rgb* im);
-    bitmap_info_ogl(image::rgba* im);
+	bitmap_info_ogl();
+	bitmap_info_ogl(int width, int height, uint8_t* data);
+	bitmap_info_ogl(image::rgb* im);
+	bitmap_info_ogl(image::rgba* im);
 
 	~bitmap_info_ogl() {
 		if (m_texture_id > 0) {
@@ -67,7 +67,9 @@ public:
 		}
 	}
 
-	virtual void layout_image(image::image_base* im);
+	void layout_image(image::image_base* im);
+
+	std::auto_ptr<image::image_base>  m_suspended_image;
 };
 
 // static GLint iquad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
@@ -145,7 +147,7 @@ public:
 	};
 	mode	m_mode;
 	gnash::rgba	m_color;
-	gnash::bitmap_info*	m_bitmap_info;
+	bitmap_info_ogl*	m_bitmap_info;
 	gnash::matrix	m_bitmap_matrix;
 	gnash::cxform	m_bitmap_color_transform;
 	bool	m_has_nonzero_bitmap_additive_color;
@@ -153,6 +155,7 @@ public:
 	fill_style()
 	    :
 	    m_mode(INVALID),
+            m_bitmap_info(0),
 	    m_has_nonzero_bitmap_additive_color(false)
 	    {
 	    }
@@ -168,11 +171,11 @@ public:
 		glDisable(GL_TEXTURE_2D);
 	    } else if (m_mode == BITMAP_WRAP
 		       || m_mode == BITMAP_CLAMP) {
-		assert(m_bitmap_info != NULL);
+		assert(m_bitmap_info != 0);
 		
 		apply_color(m_color);
 		
-		if (m_bitmap_info == NULL) {
+		if (m_bitmap_info == 0) {
 		    glDisable(GL_TEXTURE_2D);
 		} else {
 		    // Set up the texture for rendering.
@@ -188,11 +191,10 @@ public:
 			    );
 		    }
 		    
-				if (m_bitmap_info->m_texture_id == 0 && m_bitmap_info->m_suspended_image != NULL)
+				if (m_bitmap_info->m_texture_id == 0 && m_bitmap_info->m_suspended_image.get() )
 				{
-					m_bitmap_info->layout_image(m_bitmap_info->m_suspended_image);
-					delete m_bitmap_info->m_suspended_image;
-					m_bitmap_info->m_suspended_image = NULL;
+					m_bitmap_info->layout_image(m_bitmap_info->m_suspended_image.get());
+					m_bitmap_info->m_suspended_image.reset();
 				}
 
 				// assert(m_bitmap_info->m_texture_id);
@@ -277,10 +279,14 @@ public:
 
 	void	disable() { m_mode = INVALID; }
 	void	set_color(const gnash::rgba& color) { m_mode = COLOR; m_color = color; }
-	void	set_bitmap(const gnash::bitmap_info* bi, const gnash::matrix& m, bitmap_wrap_mode wm, const gnash::cxform& color_transform)
+	void	set_bitmap(const gnash::bitmap_info* bi_, const gnash::matrix& m, bitmap_wrap_mode wm, const gnash::cxform& color_transform)
 	    {
 		m_mode = (wm == WRAP_REPEAT) ? BITMAP_WRAP : BITMAP_CLAMP;
-		m_bitmap_info = const_cast<gnash::bitmap_info*> ( bi );
+
+		bitmap_info* bi = const_cast<bitmap_info*>(bi_);
+
+		assert( dynamic_cast<bitmap_info_ogl*> ( bi ) );
+		m_bitmap_info = static_cast<bitmap_info_ogl*> ( bi );
 		m_bitmap_matrix = m;
 		m_bitmap_color_transform = color_transform;
 		m_bitmap_color_transform.clamp();
@@ -404,7 +410,7 @@ public:
 		float w_bounds = TWIPS_TO_PIXELS(b.m_x - a.m_x);
 		float h_bounds = TWIPS_TO_PIXELS(c.m_y - a.m_y);
 
-		unsigned char*   ptr = frame->m_data;
+		unsigned char*   ptr = frame->data();
 		float xpos = a.m_x < 0 ? 0.0f : a.m_x;	//hack
 		float ypos = a.m_y < 0 ? 0.0f : a.m_y;	//hack
 		glRasterPos2f(xpos, ypos);	//hack
@@ -428,8 +434,8 @@ public:
 			ptr += frame->planes[i].size;
 		}
 #else
-		int height = frame->m_height;
-		int width = frame->m_width;
+		size_t height = frame->height();
+		size_t width = frame->width();
 		float zx = w_bounds / (float) width;
 		float zy = h_bounds / (float) height;
 		glPixelZoom(zx,  -zy);	// flip & zoom image
@@ -796,7 +802,7 @@ else {
 
     void	draw_bitmap(
 	const gnash::matrix& m,
-	const gnash::bitmap_info* bi,
+	const gnash::bitmap_info* bi_,
 	const gnash::rect& coords,
 	const gnash::rect& uv_coords,
 	const gnash::rgba& color)
@@ -807,7 +813,7 @@ else {
 	// Intended for textured glyph rendering.
 	{
 //	    GNASH_REPORT_FUNCTION;
-	    assert(bi);
+	    assert(bi_);
 
 	    apply_color(color);
 
@@ -818,11 +824,15 @@ else {
 	    d.m_x = b.m_x + c.m_x - a.m_x;
 	    d.m_y = b.m_y + c.m_y - a.m_y;
 
-			if (bi->m_texture_id == 0 && bi->m_suspended_image != NULL)
+		gnash::bitmap_info* cbi_ = const_cast<gnash::bitmap_info*>(bi_);
+
+		assert(dynamic_cast<bitmap_info_ogl*>(cbi_));
+		bitmap_info_ogl* bi = static_cast<bitmap_info_ogl*>(cbi_);
+
+			if (bi->m_texture_id == 0 && bi->m_suspended_image.get() )
 			{
-				const_cast<bitmap_info*>(bi)->layout_image(bi->m_suspended_image);
-				delete bi->m_suspended_image;
-				const_cast<bitmap_info*>(bi)->m_suspended_image = NULL;
+				bi->layout_image(bi->m_suspended_image.get());
+				bi->m_suspended_image.reset();
 			}
 
 			// assert(bi->m_texture_id);
@@ -1064,7 +1074,7 @@ bitmap_info_ogl::bitmap_info_ogl()
     m_original_height = 0;
 }
 
-void bitmap_info_ogl::layout_image(image::image_base* im)
+void bitmap_info_ogl::layout_image(image::image_base* im) 
 {
 
 	assert(im);
@@ -1078,8 +1088,8 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	m_original_width = im->m_width;
-	m_original_height = im->m_height;
+	m_original_width = im->width();
+	m_original_height = im->height();
 
 	switch (im->m_type)
 	{
@@ -1088,10 +1098,10 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-			int	w = 1; while (w < im->m_width) { w <<= 1; }
-			int	h = 1; while (h < im->m_height) { h <<= 1; }
+			size_t	w = 1; while (w < im->width()) { w <<= 1; }
+			size_t	h = 1; while (h < im->height()) { h <<= 1; }
 
-			if (w != im->m_width	|| h != im->m_height)
+			if (w != im->width() || h != im->height())
 			{
 #if (RESAMPLE_METHOD == 1)
 				int	viewport_dim[2] = { 0, 0 };
@@ -1104,34 +1114,33 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 					// buffer isn't big enough to fit the source
 					// texture, or the source data isn't padded
 					// quite right.
-					software_resample(3, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
+					software_resample(3, im->width(), im->height(), im->pitch(), im->data(), w, h);
 			}
 				else
 			{
-					hardware_resample(3, im->m_width, im->m_height, im->m_data, w, h);
+					hardware_resample(3, im->width(), im->height(), im->data(), w, h);
 			}
 #elif (RESAMPLE_METHOD == 2)
 				{
 			// Faster/simpler software bilinear rescale.
-			software_resample(3, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
+			software_resample(3, im->width(), im->height(), im->pitch(), im->data(), w, h);
 				}
 #else
 				{
 			// Fancy but slow software resampling.
-			image::rgb*	rescaled = image::create_rgb(w, h);
-			image::resample(rescaled, 0, 0, w - 1, h - 1,
+			std::auto_ptr<image::rgb> rescaled ( image::create_rgb(w, h) );
+			image::resample(rescaled.get(), 0, 0, w - 1, h - 1,
 					im, 0, 0, (float) im->m_width, (float) im->m_height);
 
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, rescaled->m_data);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, rescaled->data());
 
-			delete rescaled;
 				}
 #endif
 			}
 			else
 			{
 				// Use original image directly.
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, im->m_data);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, im->data());
 			}
 
 			break;
@@ -1141,10 +1150,10 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-			int	w = 1; while (w < im->m_width) { w <<= 1; }
-			int	h = 1; while (h < im->m_height) { h <<= 1; }
+			size_t	w = 1; while (w < im->width()) { w <<= 1; }
+			size_t	h = 1; while (h < im->height()) { h <<= 1; }
 
-			if (w != im->m_width	|| h != im->m_height)
+			if (w != im->width() || h != im->height())
 			{
 #if (RESAMPLE_METHOD == 1)
 				int	viewport_dim[2] = { 0, 0 };
@@ -1157,16 +1166,16 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 					// buffer isn't big enough to fit the source
 					// texture, or the source data isn't padded
 					// quite right.
-					software_resample(4, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
+					software_resample(4, im->width(), im->height(), im->pitch(), im->data(), w, h);
 			}
 				else
 			{
-					hardware_resample(4, im->m_width, im->m_height, im->m_data, w, h);
+					hardware_resample(4, im->width(), im->height(), im->data(), w, h);
 			}
 #elif (RESAMPLE_METHOD == 2)
 				{
 			// Faster/simpler software bilinear rescale.
-			software_resample(4, im->m_width, im->m_height, im->m_pitch, im->m_data, w, h);
+			software_resample(4, im->width(), im->height(), im->pitch(), im->data(), w, h);
 				}
 #else
 				{
@@ -1184,33 +1193,33 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 			else
 			{
 				// Use original image directly.
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, im->m_data);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, im->data());
 			}
 
 			break;
 		}
-		case image::image_base::ROW:
+		case image::image_base::ALPHA:
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 #ifndef NDEBUG
 			// You must use power-of-two dimensions!!
-			int	w = 1; while (w < im->m_width) { w <<= 1; }
-			int	h = 1; while (h < im->m_height) { h <<= 1; }
-			assert(w == im->m_width);
-			assert(h == im->m_height);
+			size_t	w = 1; while (w < im->width()) { w <<= 1; }
+			size_t	h = 1; while (h < im->height()) { h <<= 1; }
+			assert(w == im->width());
+			assert(h == im->height());
 #endif // not NDEBUG
 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA,
-				im->m_width, im->m_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, im->m_data);
+				im->width(), im->height(), 0, GL_ALPHA, GL_UNSIGNED_BYTE, im->data());
 
 			// Build mips.
 			int	level = 1;
-			while (im->m_width > 1 || im->m_height > 1)
+			while (im->width() > 1 || im->height() > 1)
 			{
-				render_handler_ogl::make_next_miplevel(&im->m_width, &im->m_height, im->m_data);
+				im->make_next_miplevel();
 				glTexImage2D(GL_TEXTURE_2D, level, GL_ALPHA, 
-					im->m_width, im->m_height, 0, GL_ALPHA, GL_UNSIGNED_BYTE, im->m_data);
+					im->width(), im->height(), 0, GL_ALPHA, GL_UNSIGNED_BYTE, im->data());
 				level++;
 			}
 
@@ -1218,11 +1227,12 @@ void bitmap_info_ogl::layout_image(image::image_base* im)
 		}
 
 		default:
-//			printf("unsupported image type\n");
+//			log_error("Unsupported image type");
 			break;
 	}
 
 }
+
 inline bool opengl_accessible()
 {
 #if defined(_WIN32) || defined(WIN32)
@@ -1246,16 +1256,17 @@ bitmap_info_ogl::bitmap_info_ogl(int width, int height, uint8_t* data)
 	assert(data);
 
 	// TODO optimization
-	image::image_base* im = new image::image_base(data, width, height, 1, image::image_base::ROW);
-	memcpy(im->m_data, data, width * height);
+	//image::image_base* im = new image::image_base(data, width, height, 1, image::image_base::ALPHA);
+	//memcpy(im->data(), data, width * height);
+	std::auto_ptr<image::image_base> im ( image::create_alpha(width, height) );
+	im->update(data);
 
 	if (opengl_accessible() == false) 
 	{
 		m_suspended_image = im;
 		return;
 	}
-	layout_image(im);
-	delete im;
+	layout_image(im.get());
 }
 
 
@@ -1267,8 +1278,7 @@ bitmap_info_ogl::bitmap_info_ogl(image::rgb* im)
 
 	if (opengl_accessible() == false) 
 	{
-		m_suspended_image = image::create_rgb(im->m_width, im->m_height);
-		memcpy(m_suspended_image->m_data, im->m_data, im->m_pitch * im->m_height);
+		m_suspended_image = im->clone();
 		return;
 	}
 	layout_image(im);
@@ -1284,8 +1294,7 @@ bitmap_info_ogl::bitmap_info_ogl(image::rgba* im)
 
 	if (opengl_accessible() == false) 
 	{
-		m_suspended_image = image::create_rgba(im->m_width, im->m_height);
-		memcpy(m_suspended_image->m_data, im->m_data, im->m_pitch * im->m_height);
+		m_suspended_image = im->clone();
 		return;
 	}
 	layout_image(im);

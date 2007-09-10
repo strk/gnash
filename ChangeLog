@@ -1,5 +1,24 @@
 2007-09-10 Sandro Santilli <strk@keybit.net>
 
+	* server/bitmap_info.h: drop OGL-specific members.
+	* libbase/image.{cpp,h}: cleanup the image_base interface:
+	  - make more members private to reduce chaces of buffer size
+	    and associated size-describing members mismatch (still more
+	    to do)
+	  - add more methods from statics which do not have access
+	    to now-private members 
+	* backend/render_handler_ogl.cpp: add OGL-specific members
+	  to bitmap_info_ogl, update uses of image_base.
+	* backend/render_handler_agg.cpp, libbase/embedVideoDecoderFfmpeg.cpp,
+	  libbase/embedVideoDecoderGst.cpp, libbase/image_filters.cpp,
+	  server/FreetypeGlyphsProvider.cpp, fill_style.cpp,
+	  server/fontlib.{cpp,h}, server/parser/BitmapMovieDefinition.cpp,
+	  server/swf/tag_loaders.cpp, server/asobj/NetStream.cpp,
+	  server/asobj/NetStreamFfmpeg.cpp, backend/render_handler_cairo.cpp:
+	  Update uses of image_base
+
+2007-09-10 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/NetStreamGst.cpp (GstInstallPluginsResultCb): comment
 	  out unused parameter and garbage message.
 	* server/parser/video_stream_def.cpp (dtor): delete [] since we

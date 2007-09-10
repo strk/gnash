@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-// $Id: embedVideoDecoderGst.cpp,v 1.10 2007/08/21 17:12:42 strk Exp $
+// $Id: embedVideoDecoderGst.cpp,v 1.11 2007/09/10 16:53:29 strk Exp $
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -221,7 +221,9 @@ embedVideoDecoderGst::decodeFrame(uint8_t* data, int size)
 			ret_image.reset(NULL);
 			return ret_image;
 		}
-		ret_image->update(decodedFrame->m_data);
+
+		// return decodedFrame->clone() ?
+		ret_image->update(*decodedFrame);
 		return ret_image;
 	}
 
@@ -239,8 +241,9 @@ embedVideoDecoderGst::decodeFrame(uint8_t* data, int size)
 		ret_image.reset(NULL);
 		return ret_image;
 	}
-	ret_image->update(decodedFrame->m_data);
 
+	// return decodedFrame->clone() ?
+	ret_image->update(*decodedFrame);
 	return ret_image;
 }
 

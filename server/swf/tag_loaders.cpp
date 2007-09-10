@@ -1,4 +1,4 @@
-// tag_loaders.cpp:  for Gnash.
+// tag_loaders.cpp: SWF tags loaders, for Gnash.
 //
 //   Copyright (C) 2005, 2006, 2007 Free Software Foundation, Inc.
 //
@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: tag_loaders.cpp,v 1.136 2007/09/04 11:27:43 cmusick Exp $ */
+/* $Id: tag_loaders.cpp,v 1.137 2007/09/10 16:53:30 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -748,22 +748,28 @@ define_bits_jpeg3_loader(stream* in, tag_type tag, movie_definition* m)
 	// Read rgb data.
 	std::auto_ptr<tu_file> ad( StreamAdapter::getFile(*in) );
 	std::auto_ptr<image::rgba> im( image::read_swf_jpeg3(ad.get()) );
-	//std::auto_ptr<image::rgba> im( image::read_swf_jpeg3(in->get_underlying_stream()) );
 
 	// Read alpha channel.
 	in->set_position(alpha_position);
 
-	int	buffer_bytes = im->m_width * im->m_height;
-	uint8_t*      buffer = new uint8_t[buffer_bytes];
+	size_t imWidth = im->width();
+	size_t imHeight = im->height();
 
-	inflate_wrapper(*in, buffer, buffer_bytes);
+	size_t	buffer_bytes = imWidth * imHeight;
 
+	boost::scoped_array<uint8_t> buffer ( new uint8_t[buffer_bytes] );
+
+	inflate_wrapper(*in, buffer.get(), buffer_bytes);
+
+	// TESTING:
+	// magical trevor contains this tag
+	//  ea8bbad50ccbc52dd734dfc93a7f06a7  6964trev3c.swf
+	//
+	uint8_t* data = im->data();
 	for (int i = 0; i < buffer_bytes; i++)
 	{
-	    im->m_data[4*i+3] = buffer[i];
+	    data[4*i+3] = buffer[i];
 	}
-
-	delete [] buffer;
 
 	// Create bitmap character.
 	bitmap_character_def* ch = new bitmap_character_def(im);
@@ -832,7 +838,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		for (int j = 0; j < height; j++)
 		{
 		    uint8_t*	image_in_row = buffer.get() + color_table_size * 3 + j * pitch;
-		    uint8_t*	image_out_row = image::scanline(image.get(), j);
+		    uint8_t*	image_out_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
 			uint8_t	pixel = image_in_row[i * bytes_per_pixel];
@@ -858,7 +864,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		for (int j = 0; j < height; j++)
 		{
 		    uint8_t*	image_in_row = buffer.get() + j * pitch;
-		    uint8_t*	image_out_row = image::scanline(image.get(), j);
+		    uint8_t*	image_out_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
 			uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
@@ -887,7 +893,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		for (int j = 0; j < height; j++)
 		{
 		    uint8_t*	image_in_row = buffer.get() + j * pitch;
-		    uint8_t*	image_out_row = image::scanline(image.get(), j);
+		    uint8_t*	image_out_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
 			uint8_t a = image_in_row[i * 4 + 0];
@@ -946,7 +952,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		for (int j = 0; j < height; j++)
 		{
 		    uint8_t*	image_in_row = buffer.get() + color_table_size * 4 + j * pitch;
-		    uint8_t*	image_out_row = image::scanline(image.get(), j);
+		    uint8_t*	image_out_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
 			uint8_t	pixel = image_in_row[i * bytes_per_pixel];
@@ -973,7 +979,7 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 		for (int j = 0; j < height; j++)
 		{
 		    uint8_t*	image_in_row = buffer.get() + j * pitch;
-		    uint8_t*	image_out_row = image::scanline(image.get(), j);
+		    uint8_t*	image_out_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
 		        uint16_t	pixel = image_in_row[i * 2] | (image_in_row[i * 2 + 1] << 8);
@@ -991,13 +997,13 @@ define_bits_lossless_2_loader(stream* in, tag_type tag, movie_definition* m)
 	    {
 		// 32 bits / pixel, input is ARGB format
 
-		inflate_wrapper(*in, image->m_data, width * height * 4);
+		inflate_wrapper(*in, image->data(), width * height * 4);
 		assert(in->get_position() <= in->get_tag_end_position());
 
 		// Need to re-arrange ARGB into RGBA.
 		for (int j = 0; j < height; j++)
 		{
-		    uint8_t*	image_row = image::scanline(image.get(), j);
+		    uint8_t*	image_row = image->scanline(j);
 		    for (int i = 0; i < width; i++)
 		    {
 			uint8_t	a = image_row[i * 4 + 0];

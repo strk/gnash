@@ -88,7 +88,7 @@ namespace fontlib {
 	// Applies to fonts processed *after* this call only.
 	// The "nominal" size is perhaps around twice the
 	// average glyph height.
-	void	set_nominal_glyph_pixel_size(int pixel_size);
+	void	set_nominal_glyph_pixel_size(size_t pixel_size);
 
 	/// Clean up the font library
 	void	clear();

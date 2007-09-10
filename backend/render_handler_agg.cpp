@@ -17,7 +17,7 @@
 
  
 
-/* $Id: render_handler_agg.cpp,v 1.107 2007/09/03 11:46:42 udog Exp $ */
+/* $Id: render_handler_agg.cpp,v 1.108 2007/09/10 16:53:29 strk Exp $ */
 
 // Original version by Udo Giacomozzi and Hannes Mayr, 
 // INDUNET GmbH (www.indunet.it)
@@ -397,8 +397,8 @@ public:
   // that can later be passed to fill_styleX_bitmap(), to set a
   // bitmap fill style.
   {    
-    return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (im->m_width, im->m_height,
-      im->m_pitch, im->m_data, 24);
+    return new agg_bitmap_info<agg::pixfmt_rgb24_pre> (im->width(), im->height(),
+      im->pitch(), im->data(), 24);
     assert(0); 
   }
 
@@ -410,8 +410,8 @@ public:
   //
   // This version takes an image with an alpha channel.
   {
-    return new agg_bitmap_info<agg::pixfmt_rgba32_pre> (im->m_width, im->m_height,
-      im->m_pitch, im->m_data, 32); 
+    return new agg_bitmap_info<agg::pixfmt_rgba32_pre> (im->width(), im->height(),
+      im->pitch(), im->data(), 32); 
   }
 
 
@@ -479,8 +479,8 @@ public:
     mat.concatenate(*source_mat);
     
     // compute video scaling relative to video obejct size
-    double vscaleX = TWIPS_TO_PIXELS(bounds->width())  / frame->m_width;
-    double vscaleY = TWIPS_TO_PIXELS(bounds->height()) / frame->m_height;
+    double vscaleX = TWIPS_TO_PIXELS(bounds->width())  / frame->width();
+    double vscaleY = TWIPS_TO_PIXELS(bounds->height()) / frame->height();
     
     // convert Gnash matrix to AGG matrix and scale down to pixel coordinates
     // while we're at it
@@ -507,8 +507,8 @@ public:
     typedef agg::image_accessor_clone<baseformat> img_source_type;
     
     // rendering buffer is used to access the frame pixels here        
-    agg::rendering_buffer img_buf(frame->m_data, frame->m_width, frame->m_height,
-      frame->m_width*3);
+    agg::rendering_buffer img_buf(frame->data(), frame->width(), frame->height(),
+      frame->pitch());
          
     baseformat img_pixf(img_buf);
     
