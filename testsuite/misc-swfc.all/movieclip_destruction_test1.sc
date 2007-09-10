@@ -228,6 +228,20 @@
     _root.xcheck_equals(x, 1);
   .end
 
+
+.frame 16
+  .sprite mc8
+  .end
+  
+  .sprite mc9
+    .put mc8
+  .end
+  
+  // test initactions for child sprite.
+  .initaction mc8:
+    _root.check_equals(this, _root);
+  .end
+   
   .action:
     stop();
     totals();

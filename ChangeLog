@@ -1,3 +1,9 @@
+2007-09-10 Zou Lunkai <zoulunkai@gmail.com>
+
+	* testsuite/misc-ming.all/Makefile.am: enable tow old testcases.
+	* testsuite/misc-swfc.all/movieclip_destruction_test1.sc: one more
+	  test about init actions.
+	  
 2007-09-10 Chad Musick <chadmusick@msbx.net>
 
 	* server/fill_style.cpp: Correct handling of morph fills.

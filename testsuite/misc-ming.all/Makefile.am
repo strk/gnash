@@ -128,6 +128,7 @@ check_PROGRAMS = \
 	action_execution_order_test7 \
 	action_execution_order_test8 \
 	action_execution_order_test9 \
+	action_execution_order_test11 \
 	reverse_execute_PlaceObject2_test1 \
 	reverse_execute_PlaceObject2_test2 \
 	loadMovieTest \
@@ -138,6 +139,7 @@ check_PROGRAMS = \
 	get_frame_number_test \
 	frame_label_test \
 	path_format_test \
+        callFunction_test \
 	duplicate_movie_clip_test \
 	duplicate_movie_clip_test2 \
 	event_handler_scope_test \
@@ -206,6 +208,7 @@ check_SCRIPTS = \
 	action_execution_order_test7runner \
 	action_execution_order_test8runner \
 	action_execution_order_test9runner \
+	action_execution_order_test11runner \
 	reverse_execute_PlaceObject2_test1runner \
 	reverse_execute_PlaceObject2_test2runner \
 	displaylist_depths_testrunner \
@@ -222,6 +225,7 @@ check_SCRIPTS = \
 	get_frame_number_testrunner \
 	frame_label_testrunner \
 	path_format_testrunner \
+	callFunction_testrunner \
 	duplicate_movie_clip_testrunner \
 	duplicate_movie_clip_test2runner \
 	event_handler_scope_testrunner \
@@ -996,6 +1000,18 @@ path_format_testrunner: $(srcdir)/../generic-testrunner.sh path_format_test.swf
 	sh $< -r5 $(top_builddir) path_format_test.swf > $@
 	chmod 755 $@
 
+callFunction_test_SOURCES =	\
+	callFunction_test.c	\
+	$(NULL)
+callFunction_test_LDADD = libgnashmingutils.la
+
+callFunction_test.swf: callFunction_test
+	./callFunction_test $(top_srcdir)/testsuite/media
+
+callFunction_testrunner: $(srcdir)/../generic-testrunner.sh callFunction_test.swf
+	sh $< -r5 $(top_builddir) callFunction_test.swf > $@
+	chmod 755 $@
+
 duplicate_movie_clip_test_SOURCES =	\
 	duplicate_movie_clip_test.c	\
 	$(NULL)
@@ -1258,6 +1274,18 @@ action_execution_order_test9.swf: action_execution_order_test9
 
 action_execution_order_test9runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test9.swf
 	sh $< -f8 $(top_builddir) action_execution_order_test9.swf > $@
+	chmod 755 $@
+
+action_execution_order_test11_SOURCES =	\
+	action_execution_order_test11.c	\
+	$(NULL)
+action_execution_order_test11_LDADD = libgnashmingutils.la
+
+action_execution_order_test11.swf: action_execution_order_test11
+	./action_execution_order_test11 $(top_srcdir)/testsuite/media
+
+action_execution_order_test11runner: $(srcdir)/../generic-testrunner.sh action_execution_order_test11.swf
+	sh $< -f10 $(top_builddir) action_execution_order_test11.swf > $@
 	chmod 755 $@
 
 reverse_execute_PlaceObject2_test1_SOURCES =	\
@@ -1667,6 +1695,7 @@ TEST_CASES = \
 	action_execution_order_test7runner \
 	action_execution_order_test8runner \
 	action_execution_order_test9runner \
+	action_execution_order_test11runner \
 	reverse_execute_PlaceObject2_test1runner \
 	reverse_execute_PlaceObject2_test2runner \
 	displaylist_depths_testrunner \
@@ -1684,6 +1713,7 @@ TEST_CASES = \
 	get_frame_number_testrunner \
 	frame_label_testrunner \
 	path_format_testrunner \
+	callFunction_testrunner \
 	duplicate_movie_clip_testrunner \
 	duplicate_movie_clip_test2runner \
 	event_handler_scope_testrunner \
