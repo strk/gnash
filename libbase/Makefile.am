@@ -82,7 +82,6 @@ libgnashbase_la_SOURCES = \
 	$(DMALLOC_FILE)	\
 	extension.cpp \
 	image.cpp \
-	image_filters.cpp \
 	jpeg.cpp \
 	log.cpp	\
 	membuf.cpp \

@@ -1,5 +1,6 @@
 2007-09-10 Sandro Santilli <strk@keybit.net>
 
+	* libbase/Makefile.am: drop image_filters.cpp (seems unused)
 	* server/dlist.cpp (reset): remove unused variable.
 	
 2007-09-10 Zou Lunkai <zoulunkai@gmail.com>
