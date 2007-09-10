@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.14 2007/09/08 11:19:50 strk Exp $
+// $Id: video_stream_def.cpp,v 1.15 2007/09/10 14:09:30 strk Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -40,7 +40,7 @@ video_stream_definition::video_stream_definition(uint16_t char_id)
 video_stream_definition::~video_stream_definition()
 {
 	for (int32_t size = m_video_frames.size()-1; size >= 0; size--) {
-		delete m_video_frames[size];
+		delete [] m_video_frames[size];
 	}
 	m_video_frames.clear();
 }
