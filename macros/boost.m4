@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: boost.m4,v 1.53 2007/09/02 23:48:37 nihilus Exp $
+dnl $Id: boost.m4,v 1.54 2007/09/11 00:17:43 rsavoye Exp $
 
 dnl Boost modules are:
 dnl date-time, filesystem. graph. iostreams, program options, python,
@@ -109,11 +109,11 @@ AC_DEFUN([GNASH_PATH_BOOST],
           lfile="${lfile}-mt"
         fi
         boost_date_time=yes
-	if test x"${ldir}" != "x/usr/lib"; then
+	      if test x"${ldir}" != "x/usr/lib"; then
         	ac_cv_path_boost_lib="-L${ldir} -l${lfile}"
-	else
+	      else
         	ac_cv_path_boost_lib="-l${lfile}"
-	fi
+	      fi
         break
       else
         break
@@ -141,38 +141,6 @@ AC_DEFUN([GNASH_PATH_BOOST],
 
   BOOST_CFLAGS="$ac_cv_path_boost_incl"
   BOOST_LIBS="$ac_cv_path_boost_lib" 
-
-  dnl ---------------------------------------
-  dnl Check actual usability of headers
-  dnl (if not cross-compiling)
-  dnl ---------------------------------------
-
-  dnl Bogus testing
-  dnl if test x${cross_compiling} = xno; then
-  dnl  AC_LANG_PUSH(C++)
-  dnl  save_CXXFLAGS="$CXXFLAGS"
-  dnl  save_CPPFLAGS="$CPPFLAGS"
-  dnl  CXXFLAGS="$CFLAGS $BOOST_CFLAGS"
-  dnl  CPPFLAGS="$CXXFLAGS"
-  dnl  AC_CHECK_HEADERS([boost/thread.hpp], [], [boost_thread=no]) 
-  dnl  CXXFLAGS="$save_CXXFLAGS"
-  dnl  CPPFLAGS="$save_CPPFLAGS"
-  dnl  AC_LANG_POP(C++)  
-  dnl fi # if not cross-compiling
-
-  dnl ---------------------------------------
-  dnl TODO: Check actual usability of libs
-  dnl ---------------------------------------
-
-  if test x${cross_compiling} = xno; then
-    dnl Two problems:
-    dnl   1) knowing the name of the required libs
-    dnl      (needs storing the name when finding it
-    dnl      at the beginning of this macro)
-    dnl   2) check how to use AC_CHECK_LIB for C++ libs
-    :
-  fi # if not cross-compiling
-
 
   dnl ------------------------------------------------------------------
   dnl Set HAVE_BOOST conditional, BOOST_CFLAGS and BOOST_LIBS variables

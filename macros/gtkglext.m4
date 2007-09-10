@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl: $Id: gtkglext.m4,v 1.35 2007/07/01 10:54:12 bjacques Exp $
+dnl: $Id: gtkglext.m4,v 1.36 2007/09/11 00:17:44 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GLEXT],
 [
@@ -108,7 +108,7 @@ fi
 ])
 
 if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_glext_lib}" = x; then
-	$PKG_CONFIG --exists gtkglext-1.0 && ac_cv_path_glext_lib=`$PKG_CONFIG --libs gtkglext-1.0`
+	$PKG_CONFIG --exists gtkglext-1.0 && ac_cv_path_glext_lib=`$PKG_CONFIG --libs-only-l gtkglext-1.0`
 fi
 
 ac_cv_path_glext_incl_config=""

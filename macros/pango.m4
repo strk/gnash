@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: pango.m4,v 1.25 2007/07/01 10:54:13 bjacques Exp $
+dnl $Id: pango.m4,v 1.26 2007/09/11 00:17:44 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_PANGO],
 [
@@ -90,7 +90,7 @@ AC_DEFUN([GNASH_PATH_PANGO],
   
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_pango_lib}" = x; then
-      $PKG_CONFIG --exists pangox && ac_cv_path_pango_lib=`$PKG_CONFIG --libs pangox`
+      $PKG_CONFIG --exists pangox && ac_cv_path_pango_lib=`$PKG_CONFIG --libs-only-l pangox`
     fi
   fi
 

@@ -1,3 +1,12 @@
+2007-09-10  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* macros/curl.m4: sed any "-L/usr/lib" off the output of
+	curl-config. This breaks some 64 bit systems.
+	* macros/kde.m4: Do an ls instead of a test to find kde libraries.
+	* macros/pango.m4, gtk2.m4, gnashpkgtool.m4, ffmpeg.m4: Use
+	--libs-only-l with pkg-config as sometimes the path is wrong for
+	64bit systems.
+
 2007-09-10 Sandro Santilli <strk@keybit.net>
 
 	* server/parser/morph2_character_def.cpp (read):

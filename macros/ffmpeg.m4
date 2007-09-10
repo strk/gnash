@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: ffmpeg.m4,v 1.50 2007/07/29 04:40:34 rsavoye Exp $
+dnl $Id: ffmpeg.m4,v 1.51 2007/09/11 00:17:44 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_FFMPEG],
 [
@@ -221,7 +221,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
   dnl Try with pkg-config
   if test x"${cross_compiling}" = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_ffmpeg_lib}" = x; then
-      $PKG_CONFIG --exists libavcodec && libavcodec=`$PKG_CONFIG --libs libavcodec`
+      $PKG_CONFIG --exists libavcodec && libavcodec=`$PKG_CONFIG --libs-only-l libavcodec`
     fi
   fi
 
@@ -261,7 +261,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
   if test x"${ac_cv_path_ffmpeg_lib}" != x; then
     AC_MSG_CHECKING([for libdts library])
     if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
-      $PKG_CONFIG --exists libdts && libdts=`$PKG_CONFIG --libs libdts`
+      $PKG_CONFIG --exists libdts && libdts=`$PKG_CONFIG --libs-only-l libdts`
     else
       libdts=""
     fi
@@ -283,7 +283,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     dnl Look for the VORBISENC library, which is required on some systems.
     AC_MSG_CHECKING([for libvorbisenc library])
     if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
-      $PKG_CONFIG --exists vorbisenc && libvorbisenc=`$PKG_CONFIG --libs vorbisenc`
+      $PKG_CONFIG --exists vorbisenc && libvorbisenc=`$PKG_CONFIG --libs-only-l vorbisenc`
     else
       libvorbisenc=""
     fi
@@ -305,7 +305,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     dnl Look for the AVFORMAT library, which is required on some systems.
     AC_MSG_CHECKING([for libavformat library])
     if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
-      $PKG_CONFIG --exists libavformat && libavformat=`$PKG_CONFIG --libs libavformat`
+      $PKG_CONFIG --exists libavformat && libavformat=`$PKG_CONFIG --libs-only-l libavformat`
     else
       libavformat=""
     fi
@@ -327,7 +327,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     dnl Look for the AVUTIL library, which is required on some systems.
     AC_MSG_CHECKING([for libavutil library])
     if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
-      $PKG_CONFIG --exists libavutil && libavutil=`$PKG_CONFIG --libs libavutil`
+      $PKG_CONFIG --exists libavutil && libavutil=`$PKG_CONFIG --libs-only-l libavutil`
     else
       libavutil=""
     fi
@@ -349,7 +349,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     dnl Look for the THEORA library, which is required on some systems.
     AC_MSG_CHECKING([for libtheora library])
     if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
-      $PKG_CONFIG --exists theora && libtheora=`$PKG_CONFIG --libs theora`
+      $PKG_CONFIG --exists theora && libtheora=`$PKG_CONFIG --libs-only-l theora`
     else
       libtheora=""
     fi
@@ -371,7 +371,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     dnl Look for the GSM library, which is required on some systems.
     AC_MSG_CHECKING([for libgsm library])
     if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
-      $PKG_CONFIG --exists gsm && libgsm=`$PKG_CONFIG --libs gsm`
+      $PKG_CONFIG --exists gsm && libgsm=`$PKG_CONFIG --libs-only-l gsm`
     else
       libgsm=""
     fi
@@ -393,7 +393,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     dnl Look for the DC1394 library, which is required on some systems.
     AC_MSG_CHECKING([for libdc1394 library])
     if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
-      $PKG_CONFIG --exists libdc  && libdc=`$PKG_CONFIG --libs libdc1394`
+      $PKG_CONFIG --exists libdc  && libdc=`$PKG_CONFIG --libs-only-l libdc1394`
     else
       libtdc=""
     fi
@@ -416,7 +416,7 @@ dnl   AC_EGREP_HEADER(avcodec_decode_audio2, ${avcodec_h}, [avfound=yes], [avfou
     dnl configured with --enable-gpl --enable-swscale.
     AC_MSG_CHECKING([for libswscale library])
     if test x"$PKG_CONFIG" != x -a x${cross_compiling} = xno; then
-      $PKG_CONFIG --exists libswscale  && libsws=`$PKG_CONFIG --libs libswscale`
+      $PKG_CONFIG --exists libswscale  && libsws=`$PKG_CONFIG --libs-only-l libswscale`
     else
       libsws=""
     fi

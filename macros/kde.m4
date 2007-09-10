@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: kde.m4,v 1.38 2007/09/10 14:34:10 rsavoye Exp $
+dnl $Id: kde.m4,v 1.39 2007/09/11 00:17:44 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_KDE],
 [
@@ -84,7 +84,7 @@ dnl   # KDE_LIBS =  -lkdeui -lkdecore -lkdeprint -L/usr/lib/qt-3.3/lib -lqt-mt
   AC_ARG_WITH(kde_lib, AC_HELP_STRING([--with-kde-lib], [directory where kde libraries are]), with_kde_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_kde_lib, [
     if test x"${with_kde_lib}" != x ; then
-      if test -f ${with_kde_lib}/libkdeui.a -o -f ${with_kde_lib}/libkdeui.${shlibext}; then
+      if test `ls -C1 ${with_kde_lib}/libkdeui.* | wc -l` -gt 0; then
 	      ac_cv_path_kde_lib="-L`(cd ${with_kde_lib}; pwd)`"
       else
 	      AC_MSG_ERROR([${with_kde_lib} directory doesn't contain kde libraries.])
@@ -114,7 +114,7 @@ dnl   # KDE_LIBS =  -lkdeui -lkdecore -lkdeprint -L/usr/lib/qt-3.3/lib -lqt-mt
   dnl Look for the kdecore library, which is required
   if test x"${ac_cv_path_kde_lib}" != x; then
     AC_MSG_CHECKING([for kdecore library])
-    if test -f ${topdir}/libkdecore.a -o -f ${topdir}/libkdecore.${shlibext}; then
+    if test `ls -C1 ${topdir}/libkdecore.* | wc -l` -gt 0; then
       ac_cv_path_kde_lib="${ac_cv_path_kde_lib} -lkdecore"
       AC_MSG_RESULT(${topdir}/libkdecore)
     else

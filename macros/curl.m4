@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: curl.m4,v 1.17 2007/07/01 10:54:11 bjacques Exp $
+dnl $Id: curl.m4,v 1.18 2007/09/11 00:17:43 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_CURL],
 [
@@ -94,7 +94,7 @@ AC_DEFUN([GNASH_PATH_CURL],
       dnl curl-config gives us way to many libraries, which create nasty linking
       dnl dependancy issue, so we strip them off here. The real dependencies are
       dnl are taken care of by other config tests.
-      ac_cv_path_curl_lib=`${curlconfig} --libs | sed -e 's/lcurl.*/lcurl/'`
+      ac_cv_path_curl_lib=`${curlconfig} --libs | sed -e 's/lcurl.*/lcurl/' -e 's:-L/usr/lib ::'`
     else # }{
       AC_MSG_CHECKING([for libcurl library])
       for i in $libslist; do # {

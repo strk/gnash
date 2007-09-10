@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
-dnl $Id: gtk2.m4,v 1.42 2007/08/03 19:58:12 strk Exp $
+dnl $Id: gtk2.m4,v 1.43 2007/09/11 00:17:44 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_GTK2],
 [
@@ -89,7 +89,7 @@ AC_DEFUN([GNASH_PATH_GTK2],
 
   if test x$cross_compiling = xno; then
     if test x"$PKG_CONFIG" != x -a x"${ac_cv_path_gtk2_lib}" = x; then
-      $PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_lib=`$PKG_CONFIG --libs gtk+-2.0`
+      $PKG_CONFIG --exists gtk+-2.0 && ac_cv_path_gtk2_lib=`$PKG_CONFIG --libs-only-l gtk+-2.0`
     fi
   fi
 
