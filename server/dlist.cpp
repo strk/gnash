@@ -576,8 +576,6 @@ void DisplayList::reset(movie_definition& movieDef, size_t tgtFrame, sprite_inst
 {
 	testInvariant();
 
-	bool call_unload = true;
-
 	//GNASH_REPORT_FUNCTION;
 
 	// 1. Find all "timeline depth" for the target frame, querying the
