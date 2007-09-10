@@ -1,5 +1,7 @@
 2007-09-10 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/NetStreamGst.cpp (GstInstallPluginsResultCb): comment
+	  out unused parameter and garbage message.
 	* server/parser/video_stream_def.cpp (dtor): delete [] since we
 	  allocated with new [].
 	* libbase/Makefile.am: drop image_filters.cpp (seems unused)

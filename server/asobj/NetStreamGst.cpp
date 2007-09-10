@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: NetStreamGst.cpp,v 1.59 2007/07/30 08:45:30 tgc Exp $ */
+/* $Id: NetStreamGst.cpp,v 1.60 2007/09/10 14:27:45 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -534,9 +534,9 @@ NetStreamGst::buildFLVPipeline(bool& video, bool& audio)
 
 static void
 GstInstallPluginsResultCb (GstInstallPluginsReturn  result,
-			   gpointer                 user_data)
+			   gpointer                 /*user_data*/)
 {
-  g_debug("JAU RESULTO MENDO");
+  //g_debug("JAU RESULTO MENDO");
 }
 
 
