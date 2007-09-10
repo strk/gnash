@@ -1,5 +1,11 @@
 2007-09-10 Sandro Santilli <strk@keybit.net>
 
+	* server/parser/morph2_character_def.cpp (read):
+	  Set shapes bounds *after* calling ::read() on them.
+	  Fixes bug #21020.
+
+2007-09-10 Sandro Santilli <strk@keybit.net>
+
 	* server/bitmap_info.h: drop OGL-specific members.
 	* libbase/image.{cpp,h}: cleanup the image_base interface:
 	  - make more members private to reduce chaces of buffer size

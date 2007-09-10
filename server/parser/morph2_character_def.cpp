@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: morph2_character_def.cpp,v 1.15 2007/09/10 04:29:54 cmusick Exp $ */
+/* $Id: morph2_character_def.cpp,v 1.16 2007/09/10 17:15:01 strk Exp $ */
 
 // Based on the public domain morph2.cpp of:
 // Thatcher Ulrich <tu@tulrich.com>, Mike Shaver <shaver@off.net> 2003,
@@ -219,8 +219,6 @@ private:
 		rect	bound1, bound2;
 		bound1.read(in);
 		bound2.read(in);
-		m_shape1->set_bound(bound1);
-		m_shape2->set_bound(bound2);
 
 	if (tag_type == SWF::DEFINEMORPHSHAPE2 || tag_type == SWF::DEFINEMORPHSHAPE2_)
 	{
@@ -259,6 +257,12 @@ private:
 		m_shape1->read(in, tag_type, false, md);
 		in->align();
 		m_shape2->read(in, tag_type, false, md);
+
+		// Set bounds as read in *this* tags rather then
+		// the one computed from shape_character_def parser
+		// (does it make sense ?)
+		m_shape1->set_bound(bound1);
+		m_shape2->set_bound(bound2);
 
 		assert(m_shape1->m_fill_styles.size() == m_shape2->m_fill_styles.size());
 		assert(m_shape1->m_line_styles.size() == m_shape2->m_line_styles.size());
