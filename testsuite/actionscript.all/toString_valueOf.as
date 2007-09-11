@@ -46,11 +46,11 @@
   check_equals(typeof(Function.prototype['valueOf']), 'function');
 #else
   // No Function Object in swf5???
-  xcheck_equals(typeof(Function), 'undefined');
+  check_equals(typeof(Function), 'undefined');
   
   // Function Object in swf5 does not support toString and valueOf
-  xcheck_equals(Function.prototype['toString'], undefined);
-  xcheck_equals(Function.prototype['valueOf'], undefined);
+  check_equals(Function.prototype['toString'], undefined);
+  check_equals(Function.prototype['valueOf'], undefined);
   
   // test 'function' is supported in swf5:)
   x = function () {};

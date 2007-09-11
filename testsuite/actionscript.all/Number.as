@@ -27,7 +27,7 @@
 // TODO: test with SWF target != 6 (the only one tested so far)
 //	
 
-rcsid="$Id: Number.as,v 1.28 2007/08/25 14:15:51 strk Exp $";
+rcsid="$Id: Number.as,v 1.29 2007/09/11 05:46:32 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -288,7 +288,7 @@ check_equals(typeof(Number), 'function');
 xcheck_equals(typeof(Number.valueOf), 'undefined'); 
 xcheck_equals(typeof(Number.__proto__), 'undefined'); 
 xcheck_equals(typeof(Number.toString), 'undefined'); 
-xcheck_equals(typeof(Function), 'undefined');
+check_equals(typeof(Function), 'undefined');
 #endif
 
 a = 1;

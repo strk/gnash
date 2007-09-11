@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Function.as,v 1.54 2007/08/31 21:53:33 strk Exp $";
+rcsid="$Id: Function.as,v 1.55 2007/09/11 05:46:31 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -545,13 +545,19 @@ check_equals(typeof(Email.prototype.__constructor__), 'undefined');
 
 // Email is a Function instance, and it's "constructor" property
 // tells us so
+#if OUTPUT_VERSION == 5
+// Function is supported in SWF6 and above
+xcheck_equals(Email.constructor.toString(), undefined);
+check_equals(Function, undefined);
+#endif
 check_equals(typeof(Email.constructor), 'function');
-check_equals(Email.constructor, Function);
 check_equals(typeof(Email.constructor.constructor), 'function');
-check_equals(Email.constructor.constructor, Function);
 check_equals(typeof(Email.constructor.constructor.constructor), 'function');
-check_equals(Email.constructor.constructor.constructor, Function);
 #if OUTPUT_VERSION > 5
+check_equals(Email.constructor, Function);
+check_equals(Email.constructor.constructor, Function);
+check_equals(Email.constructor.constructor.constructor, Function);
+
 check(Email.hasOwnProperty('constructor'));
 check(Email.constructor.hasOwnProperty('constructor'));
 check(Email.constructor.constructor.hasOwnProperty('constructor'));

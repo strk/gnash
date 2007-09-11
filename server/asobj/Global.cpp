@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.66 2007/07/24 14:19:31 strk Exp $ */
+/* $Id: Global.cpp,v 1.67 2007/09/11 05:46:31 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -377,11 +377,10 @@ Global::Global(VM& vm)
 	init_member("setInterval", new builtin_function(timer_setinterval));
 	init_member("clearInterval", new builtin_function(timer_clearinterval));
 
-	// System and Function were added in Player Version 6, but
+	// System was added in Player Version 6, but
 	// seem to be available even if SWF target version is
 	// inferior
 	system_class_init(*this); // System and System.capabilities
-	function_class_init(*this);
 
 	// I find Stage object used in SWF5 movies, don't
 	// see a good reason not to enable this always
@@ -442,7 +441,7 @@ Global::Global(VM& vm)
 	//-----------------------
 	// SWF6
 	//-----------------------
-
+	function_class_init(*this);
 	// See: http://sephiroth.it/reference.php?id=717&cat=1
 	textsnapshot_class_init(*this);
 	init_member("LocalConnection", new builtin_function(localconnection_new));

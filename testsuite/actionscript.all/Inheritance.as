@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.36 2007/09/01 09:40:06 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.37 2007/09/11 05:46:32 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -52,7 +52,8 @@ check_equals(functionObject.__constructor__, Function);
 //       rather then on *SWF* version, in which case
 //       we should completely avoid testing it.
 //       Can anyone confirm ?
-xcheck_equals(typeof(functionObject), 'undefined');
+// This is because SWF5 does not support Function class.
+check_equals(typeof(functionObject), 'undefined');
 #endif
 
 // functionObject '__proto__' is a reference to
@@ -79,7 +80,9 @@ check_equals(functionObject.prototype.a, 1);
 
 // Make 'userFunc' be a function (should inherit Function things)
 var userFunc = function() {};
+#if OUTPUT_VERSION > 5
 check_equals (userFunc.__proto__, Function.prototype);
+#endif
 check_equals (userFunc.prototype.constructor, userFunc);
 check_equals (userFunc.prototype.apply, undefined);
 check_equals (userFunc.apply, Function.prototype.apply);
@@ -125,7 +128,9 @@ function TypeChanger(changeit)
 {
 	if ( changeit ) this.__constructor__ = Object;
 }
+#if OUTPUT_VERSION > 5
 check_equals(TypeChanger.__proto__, Function.prototype);
+#endif
 
 o1 = new TypeChanger(false);
 check_equals(o1.__proto__, TypeChanger.prototype);
@@ -232,7 +237,9 @@ check(sobj1 instanceOf SubObj1);
 check(SubObj1.prototype != undefined);
 check_equals(SubObj1.prototype.constructor, SubObj1);
 
+#if OUTPUT_VERSION > 5
 check_equals(SubObj1.prototype.constructor.__proto__.constructor, Function);
+#endif 
 
 //------------------------------------------------
 // Test the 'extends' tag (require ming > 0.4.0.beta3)
@@ -277,8 +284,9 @@ check(! DerivedClass1.prototype.hasOwnProperty('toString'));
 check(! DerivedClass1.prototype.hasOwnProperty('valueOf'));
 check(! DerivedClass1.prototype.hasOwnProperty('constructor'));
 check(DerivedClass1.hasOwnProperty('constructor'));
-#endif
 check_equals(DerivedClass1.constructor, Function);
+#endif
+
 check_equals(DerivedClass1.prototype.__proto__.constructor, BaseClass1);
 check_equals(DerivedClass1.prototype.__proto__, BaseClass1.prototype);
 

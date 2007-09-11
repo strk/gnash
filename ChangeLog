@@ -1,3 +1,12 @@
+2007-09-11 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/asobj/Global.cpp: don't initialize Function class for SWF < 6.
+	* testsuite/actionscript.all/Inheritance.as, 
+	  testsuite/actionscript.all/Function.as: disable a few confusing
+	  and duplicated(but correct) tests for SWF5. more passes.
+	* testsuite/actionscript.all/Number.as, 
+	  testsuite/actionscript.all/toString_valueOf.as: more passes.
+	  
 2007-09-10  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* macros/curl.m4: sed any "-L/usr/lib" off the output of
