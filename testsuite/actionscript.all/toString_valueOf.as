@@ -45,7 +45,7 @@
   check_equals(typeof(Function.prototype['toString']), 'function');
   check_equals(typeof(Function.prototype['valueOf']), 'function');
 #else
-  // No Function Object in swf5???
+  // No Function Class in swf5
   check_equals(typeof(Function), 'undefined');
   
   // Function Object in swf5 does not support toString and valueOf

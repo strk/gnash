@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.37 2007/09/11 05:46:32 zoulunkai Exp $";
+rcsid="$Id: Inheritance.as,v 1.38 2007/09/11 05:58:54 zoulunkai Exp $";
 
 #include "check.as"
 
@@ -48,10 +48,6 @@ check_equals(typeof(functionObject), 'object');
 check(functionObject.hasOwnProperty('__constructor__'));
 check_equals(functionObject.__constructor__, Function);
 #else
-// TODO: this is likely dependent on *player* version 
-//       rather then on *SWF* version, in which case
-//       we should completely avoid testing it.
-//       Can anyone confirm ?
 // This is because SWF5 does not support Function class.
 check_equals(typeof(functionObject), 'undefined');
 #endif
