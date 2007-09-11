@@ -1,5 +1,10 @@
 2007-09-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/actionscript.all/AsBroadcaster.as: a couple more tests
+	  for return from broadcastMessage.
+	* server/asobj/AsBroadcaster.cpp: fix return from broadcastMessage.
+	* testsuite/swfdec/PASSING: asbroadcaster-broadcastMessage-retval-*.swf 
+	  all pass now.
 	* server/as_value.cpp (to_debug_string): fix debug print for movieclip
 	  values.
 

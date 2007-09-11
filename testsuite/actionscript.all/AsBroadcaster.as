@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: AsBroadcaster.as,v 1.2 2007/09/11 17:01:23 strk Exp $";
+rcsid="$Id: AsBroadcaster.as,v 1.3 2007/09/11 17:41:11 strk Exp $";
 
 #include "check.as"
 
@@ -223,6 +223,12 @@ check_equals(bcast._listeners.length, 3); // expect: a,a,b
 bcast.broadcastMessage('onTest');
 check_equals(a.order, 22); 
 check_equals(b.order, 23);
+
+ret = bcast.broadcastMessage('onUnexistent');
+check_equals(ret, true);
+bcast._listeners.length=0;
+ret = bcast.broadcastMessage('onUnexistent');
+check_equals(typeof(ret), 'undefined');
 
 // TODO: test broadcastMessage with additional arguments
 //       and effects of overriding Function.apply

@@ -48,6 +48,9 @@ class BroadcasterVisitor
 	//size_t _origEnvStackSize;
 	//size_t _origEnvCallStackSize;
 
+	/// Number of event dispatches
+	unsigned int _dispatched;
+
 public:
 
 	/// @param eName name of event, will be converted to lowercase if needed
@@ -58,7 +61,8 @@ public:
 	BroadcasterVisitor(const std::string& eName, as_environment& env)
 		:
 		_eventName(PROPNAME(eName)),
-		_env(env)
+		_env(env),
+		_dispatched(0)
 	{
 	}
 
@@ -73,7 +77,14 @@ public:
 #endif
 		/*as_value ret =*/ o->callMethod(_eventName, _env);
 		assert ( _env.stack_size() == oldStackSize );
+		++_dispatched;
 	}
+
+	/// Return number of events dispached since last reset()
+	unsigned int eventsDispatched() const { return _dispatched; }
+
+	/// Reset count od dispatched events
+	void reset() { _dispatched=0; }
 };
 
 void 
@@ -321,9 +332,13 @@ AsBroadcaster::broadcastMessage_method(const fn_call& fn)
 	BroadcasterVisitor visitor(fn.arg(0).to_string(), fn.env());
 	listeners->visitAll(visitor);
 
-	log_debug("AsBroadcaster.broadcastMessage TESTING");
+	unsigned int dispatched = visitor.eventsDispatched();
 
-	return as_value(true);
+	log_debug("AsBroadcaster.broadcastMessage() dispatched %u events", dispatched);
+
+	if ( dispatched ) return as_value(true);
+	else return as_value(); // undefined
+
 }
 
 static as_object*
