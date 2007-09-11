@@ -1,5 +1,10 @@
 2007-09-11 Sandro Santilli <strk@keybit.net>
 
+	* server/as_value.cpp (to_debug_string): fix debug print for movieclip
+	  values.
+
+2007-09-11 Sandro Santilli <strk@keybit.net>
+
 	* server/array.{cpp,h}: add removeFirst and visitAll methods.
 	* server/as_object.{cpp,h}: add getMember and callMethod memebers
 	  for ActionScript-like coding.

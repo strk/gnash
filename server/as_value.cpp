@@ -919,7 +919,13 @@ as_value::to_debug_string() const
 			return "[number:" + stream.str() + "]";
 		}
 		case MOVIECLIP:
-			return "[movieclip:" + m_string_value + "]";
+		{
+			sprite_instance* sp = m_object_value->to_movie();
+			assert(sp); // will change in case we'll have better management :)
+			snprintf(buf, 511, "[%smovieclip(%s):%p]", sp->isUnloaded() ? "dangling " : "", sp->getOrigTarget().c_str(), (void *)sp);
+			buf[511] = '\0';
+			return buf;
+		}
 		default:
 			assert(0);
 			return NULL;
