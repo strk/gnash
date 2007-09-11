@@ -1,5 +1,7 @@
 2007-09-11 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/swfdec/PASSING: super-this-5.swf passes (probably since
+	  zou commit).
 	* testsuite/anaylse-results.sh: fix print of unexpected successes.
 
 2007-09-11 Bastiaan Jacques <bastiaan@bjacques.org>
