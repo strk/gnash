@@ -64,7 +64,8 @@ public:
 	///
 	void operator() (const std::string& name, const as_value& val)
 	{
-		//log_msg(_("Setting member '%s' to value '%s'"), name.c_str(), val.to_string());
+		if ( name == "__proto__" ) return;
+		//log_msg(_("Setting member '%s' to value '%s'"), name.c_str(), val.to_debug_string().c_str());
 		_tgt.set_member(name, val);
 	}
 };

@@ -410,7 +410,11 @@ public:
 	/// Get the properties of this objects 
 	PropertyList &get_properties() { return _members; };
 #endif
+
 	/// Copy properties from the given object
+	//
+	/// NOTE: the __proto__ member will NOT be copied.
+	///
 	void copyProperties(const as_object& o);
 
 	/// Drop all properties from this object
