@@ -1,3 +1,10 @@
+2007-09-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* server/gnash.h: add more keycodes.
+	* gui/gtk.cpp: pass more keystrokes.
+	* server/edit_text_character.cpp: do not add character to string
+	  when shift pressed.
+
 2007-09-11 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/swfdec/PASSING: super-this-5.swf passes (probably since

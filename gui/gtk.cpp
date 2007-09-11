@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.106 2007/08/26 15:46:32 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.107 2007/09/11 15:35:42 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1378,10 +1378,29 @@ GtkGui::gdk_to_gnash_key(guint key)
     
     if (key >= GDK_0 && key <= GDK_9)	{
         c = (gnash::key::code) ((key - GDK_0) + gnash::key::_0);
-	} else if (key >= GDK_a && key <= GDK_z) {
+    } else if (key >= GDK_a && key <= GDK_z) {
         c = (gnash::key::code) ((key - GDK_a) + gnash::key::A);
+    } else if (key >= GDK_A && key <= GDK_Z) {			
+        c = (gnash::key::code) ((key - GDK_A) + gnash::key::A); // a-z and A-Z return same AS key codes.
     } else if (key >= GDK_F1 && key <= GDK_F15)	{
         c = (gnash::key::code) ((key - GDK_F1) + gnash::key::F1);
+    } 
+
+    // actionscript key codes for non-standard ASCII characters
+    // correspond to extended ASCII
+    // GDK is in the same order, but occasionally has an
+    // extra character that we have to miss out.
+
+      else if (key >= GDK_nobreakspace && key <= GDK_Idiaeresis) {
+        c = (gnash::key::code) ((key - GDK_nobreakspace) + gnash::key::NOBREAKSPACE); 
+    } else if (key >= GDK_Ntilde && key <= GDK_ETH ) {
+        c = (gnash::key::code) ((key - GDK_Ntilde) + gnash::key::NTILDE);
+    } else if (key >= GDK_Ugrave && key <= GDK_THORN) {
+        c = (gnash::key::code) ((key - GDK_Ugrave) + gnash::key::UGRAVE);
+    } else if (key >= GDK_ssharp && key <= GDK_oslash) {
+        c = (gnash::key::code) ((key - GDK_ssharp) + gnash::key::SSHARPSMALL);
+    } else if (key >= GDK_ugrave && key <= GDK_ydiaeresis) {
+        c = (gnash::key::code) ((key - GDK_ugrave) + gnash::key::UGRAVESMALL);
     } else if (key >= GDK_KP_0 && key <= GDK_KP_9) {
         c = (gnash::key::code) ((key - GDK_KP_0) + gnash::key::KP_0);
     } else {
@@ -1424,10 +1443,35 @@ GtkGui::gdk_to_gnash_key(guint key)
             { GDK_minus, gnash::key::MINUS },
             { GDK_slash, gnash::key::SLASH },
             /* Backtick */
-            { GDK_bracketleft, gnash::key::LEFT_BRACKET },
+            { GDK_question, gnash::key::QUESTION },
             { GDK_backslash, gnash::key::BACKSLASH },
+            { GDK_apostrophe, gnash::key::APOSTROPHE },
+            { GDK_comma, gnash::key::COMMA },
+            { GDK_period, gnash::key::PERIOD },
+            { GDK_bracketleft, gnash::key::LEFT_BRACKET },
+            { GDK_backslash, gnash::key::SLASH },
             { GDK_bracketright, gnash::key::RIGHT_BRACKET },
             { GDK_quotedbl, gnash::key::QUOTE },
+	    { GDK_colon, gnash::key::COLON },
+	    { GDK_parenright, gnash::key::PAREN_RIGHT },
+	    { GDK_exclam, gnash::key::EXCLAM },
+	    { GDK_at, gnash::key::AT },
+	    { GDK_numbersign, gnash::key::HASH }, 
+	    { GDK_dollar, gnash::key::DOLLAR }, 
+	    { GDK_percent, gnash::key::PERCENT }, 
+	    { GDK_asciicircum, gnash::key::ASCIICIRCUM }, 
+	    { GDK_ampersand, gnash::key::AMPERSAND  },
+	    { GDK_asterisk, gnash::key::ASTERISK }, 
+	    { GDK_parenleft, gnash::key::PAREN_LEFT }, 
+	    { GDK_plus, gnash::key::PLUS }, 
+	    { GDK_less, gnash::key::LESSTHAN },
+	    { GDK_underscore, gnash::key::UNDERSCORE },
+	    { GDK_greater, gnash::key::MORETHAN },
+	    { GDK_asciitilde, gnash::key::ASCIITILDE },
+	    { GDK_leftmiddlecurlybrace, gnash::key::CURLYLEFT },
+	    { GDK_bar, gnash::key::PIPE },
+	    { GDK_rightmiddlecurlybrace, gnash::key::CURLYRIGHT },
+
             { GDK_VoidSymbol, gnash::key::INVALID }
         };
         
