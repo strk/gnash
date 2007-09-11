@@ -14,7 +14,7 @@ dnl  You should have received a copy of the GNU General Public License
 dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-dnl $Id: kde.m4,v 1.39 2007/09/11 00:17:44 rsavoye Exp $
+dnl $Id: kde.m4,v 1.40 2007/09/11 04:17:17 rsavoye Exp $
 
 AC_DEFUN([GNASH_PATH_KDE],
 [
@@ -225,7 +225,7 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
   AC_ARG_WITH(qt_lib, AC_HELP_STRING([--with-qt-lib], [directory where qt libraries are]), with_qt_lib=${withval})
   AC_CACHE_VAL(ac_cv_path_qt_lib, [
     if test x"${with_qt_lib}" != x ; then
-      if test -f ${with_qt_lib}/libqt-mt.q -o -f ${with_qt_lib}/libqt-mt.${shlibext}; then
+      if test `ls -C1 ${gnash_qt_topdir}/lib/libqt-mt.*| wc -l` -gt 0 ; then
 	      ac_cv_path_qt_lib="-L`(cd ${with_qt_lib}; pwd)` -lqt-mt"
       else
 	      AC_MSG_ERROR([${with_qt_lib} directory doesn't contain qt libraries.])
@@ -235,7 +235,7 @@ dnl   # QT_LIBS =  -lqtui -lqtcore -lqtprint -L/usr/lib/qt-3.3/lib -lqt-mt
 
   if test x"${ac_cv_path_qt_lib}" = x; then
     AC_MSG_CHECKING([for qt library])
-    if test -f ${gnash_qt_topdir}/lib/libqt-mt.a -o -f ${gnash_qt_topdir}/lib/libqt-mt.${shlibext} ; then
+    if test `ls -C1 ${gnash_qt_topdir}/lib/libqt-mt.*| wc -l` -gt 0 ; then
       ac_cv_path_qt_lib="-L${gnash_qt_topdir}/lib -lqt-mt"
     fi
     if test x"${ac_cv_path_qt_lib}" != x; then
