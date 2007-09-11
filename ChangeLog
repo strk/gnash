@@ -1,3 +1,11 @@
+2007-09-11 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_ogl.cpp: GL_MODELVIEW is the default matrix
+	mode, so don't bother setting it at every opportunity. Rather, reset it
+	to the standard value after it is changed to something else. Round
+	lines by drawing a round point on the end of every line (fixes
+	#18014). Enable pologon smoothing (anti-aliasing).
+
 2007-09-11 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/asobj/Global.cpp: don't initialize Function class for SWF < 6.

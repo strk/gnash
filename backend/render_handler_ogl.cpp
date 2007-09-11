@@ -5,7 +5,7 @@
 
 // A render_handler that uses SDL & OpenGL
 
-/* $Id: render_handler_ogl.cpp,v 1.77 2007/09/10 16:53:29 strk Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.78 2007/09/11 08:07:02 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -442,10 +442,12 @@ public:
 		glDrawPixels(width, height, GL_RGB, GL_UNSIGNED_BYTE, ptr);
 #endif
 
-		glMatrixMode(GL_COLOR);
 		glPopMatrix();
 
 		glPopAttrib();
+
+		// Restore the default matrix mode.
+		glMatrixMode(GL_MODELVIEW);
 	
 	}
    
@@ -472,7 +474,6 @@ public:
 
 	    glViewport(viewport_x0, viewport_y0, viewport_width, viewport_height);
 
-	    glMatrixMode(GL_MODELVIEW);
 	    glPushMatrix();
 	    glOrtho(x0, x1, y0, y1, -1, 1);
 
@@ -564,7 +565,6 @@ else {
 	{
 //	    GNASH_REPORT_FUNCTION;
 	    
-	    glMatrixMode(GL_MODELVIEW);
 	    glPopMatrix();
 	}
 
@@ -646,6 +646,8 @@ else {
 	
     void	line_style_width(float width)
 	{
+
+//	GNASH_REPORT_FUNCTION;
 		if ( width == 1.0 ) // "hairline", see render_handler_tri.h
 		{
 			glLineWidth(1); // expected: 1 pixel
@@ -657,6 +659,7 @@ else {
 			// enabled
 			// But this is a start (20 TWIPS' width = 1 pixel's)
 			glLineWidth(TWIPS_TO_PIXELS(width));
+			glPointSize(TWIPS_TO_PIXELS(width));
 		}
 	}
 
@@ -672,7 +675,6 @@ else {
 	    // Set up current style.
 	    m_current_styles[LEFT_STYLE].apply();
 
-	    glMatrixMode(GL_MODELVIEW);
 	    glPushMatrix();
 	    apply_matrix(m_current_matrix);
 
@@ -736,7 +738,6 @@ else {
 	    glBlendFunc(GL_ONE, GL_ONE);	// additive blending
 	    glColor4f(0, 0, 0, m_current_styles[LEFT_STYLE].m_color.m_a / 255.0f);
 
-	    glMatrixMode(GL_MODELVIEW);
 	    glPushMatrix();
 	    apply_matrix(m_current_matrix);
 
@@ -786,16 +787,24 @@ else {
 	    // Set up current style.
 	    m_current_styles[LINE_STYLE].apply();
 
-	    glMatrixMode(GL_MODELVIEW);
 	    glPushMatrix();
 	    apply_matrix(m_current_matrix);
 
 	    // Send the line-strip to OpenGL
 	    glEnableClientState(GL_VERTEX_ARRAY);
-	    glVertexPointer(2, GL_SHORT, sizeof(int16_t) * 2, coords);
+	    glVertexPointer(2, GL_SHORT, 0 /* tight packing */, coords);
 	    glDrawArrays(GL_LINE_STRIP, 0, vertex_count);
-	    glDisableClientState(GL_VERTEX_ARRAY);
 
+
+	    // Draw a dot on the beginning and end coordinates to round lines.
+	    //   glVertexPointer: skip all but the first and last coordinates in the line.
+	    glVertexPointer(2, GL_SHORT, (sizeof(int16_t) * 2) * (vertex_count - 1), coords);
+	    glEnable(GL_POINT_SMOOTH); // Draw a round (antialiased) point.
+	    glDrawArrays(GL_POINTS, 0, 2);
+	    glDisable(GL_POINT_SMOOTH);
+	    glPointSize(1); // return to default
+
+	    glDisableClientState(GL_VERTEX_ARRAY);
 	    glPopMatrix();
 	}
 
@@ -1316,20 +1325,21 @@ gnash::render_handler*	gnash::create_render_handler_ogl()
 #endif    
         // Turn on alpha blending.
         glEnable(GL_BLEND);
+	// This blend operation is best for rendering antialiased points and lines in 
+	// no particular order.
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-;        
+ 
         // Turn on line smoothing.  Antialiased lines can be used to
         // smooth the outsides of shapes.
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);	// GL_NICEST, GL_FASTEST, GL_DONT_CARE
+        glEnable (GL_POLYGON_SMOOTH);
         
         glMatrixMode(GL_PROJECTION);
         glOrtho(-OVERSIZE, OVERSIZE, OVERSIZE, -OVERSIZE, -1, 1);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         
-        // We don't need lighting effects
-        glDisable(GL_LIGHTING);
         // glColorPointer(4, GL_UNSIGNED_BYTE, 0, *);
         // glInterleavedArrays(GL_T2F_N3F_V3F, 0, *)
         glPushAttrib (GL_ALL_ATTRIB_BITS);
