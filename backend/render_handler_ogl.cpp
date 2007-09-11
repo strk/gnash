@@ -5,7 +5,7 @@
 
 // A render_handler that uses SDL & OpenGL
 
-/* $Id: render_handler_ogl.cpp,v 1.78 2007/09/11 08:07:02 bjacques Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.79 2007/09/11 08:23:31 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1333,7 +1333,12 @@ gnash::render_handler*	gnash::create_render_handler_ogl()
         // smooth the outsides of shapes.
         glEnable(GL_LINE_SMOOTH);
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);	// GL_NICEST, GL_FASTEST, GL_DONT_CARE
+
+#if 0
+        // Enabling polygon smoothing has a side effect of filled "surfaces" gain some
+	// transparency. So let's disable this for now.
         glEnable (GL_POLYGON_SMOOTH);
+#endif
         
         glMatrixMode(GL_PROJECTION);
         glOrtho(-OVERSIZE, OVERSIZE, OVERSIZE, -OVERSIZE, -1, 1);

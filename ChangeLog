@@ -1,5 +1,10 @@
 2007-09-11 Bastiaan Jacques <bastiaan@bjacques.org>
 
+	* backend/render_handler_ogl.cpp: Disable polygon smoothing for now as
+	it has some unwanted side effects.
+
+2007-09-11 Bastiaan Jacques <bastiaan@bjacques.org>
+
 	* backend/render_handler_ogl.cpp: GL_MODELVIEW is the default matrix
 	mode, so don't bother setting it at every opportunity. Rather, reset it
 	to the standard value after it is changed to something else. Round
