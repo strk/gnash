@@ -30,9 +30,7 @@
 #include "GnashException.h"
 #include "fn_call.h" // for generic methods
 #include "Object.h" // for getObjectInterface
-#ifdef NEW_KEY_LISTENER_LIST_DESIGN
-  #include "action.h" // for call_method
-#endif					
+#include "action.h" // for call_method
 #include <set>
 #include <string>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -660,5 +658,68 @@ as_object::on_event(const event_id& id )
 	return false;
 }
 #endif 
+
+as_value
+as_object::getMember(const std::string& name)
+{
+	as_value ret;
+	get_member(PROPNAME(name), &ret);
+	return ret;
+}
+
+as_value
+as_object::callMethod(const std::string& methodName, as_environment& env)
+{
+	as_value ret;
+	as_value method;
+
+	if ( ! get_member(methodName, &method) )
+	{
+		return ret;
+	}
+
+	return call_method(method, &env, this, 0, env.stack_size());
+}
+
+as_value
+as_object::callMethod(const std::string& methodName, as_environment& env, const as_value& arg0)
+{
+	as_value ret;
+	as_value method;
+
+	if ( ! get_member(methodName, &method) )
+	{
+		return ret;
+	}
+
+	env.push(arg0);
+
+	ret = call_method(method, &env, this, 1, env.stack_size()-1);
+
+	env.drop(1);
+
+	return ret;
+}
+
+as_value
+as_object::callMethod(const std::string& methodName, as_environment& env, const as_value& arg0, const as_value& arg1)
+{
+	as_value ret;
+	as_value method;
+
+	if ( ! get_member(methodName, &method) )
+	{
+		return ret;
+	}
+
+	env.push(arg0);
+	env.push(arg1);
+
+	ret = call_method(method, &env, this, 2, env.stack_size()-2);
+
+	env.drop(2);
+
+	return ret;
+}
 
 } // end of gnash namespace

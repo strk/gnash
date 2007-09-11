@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: Global.cpp,v 1.67 2007/09/11 05:46:31 zoulunkai Exp $ */
+/* $Id: Global.cpp,v 1.68 2007/09/11 17:01:23 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -28,6 +28,7 @@
 #include "as_value.h"
 #include "as_function.h" // for function_class_init
 #include "array.h"
+#include "AsBroadcaster.h"
 #include "Boolean.h"
 #include "Camera.h"
 #include "Color.h"
@@ -436,6 +437,10 @@ Global::Global(VM& vm)
 	// reference at all, most likely.
 	init_member("NaN", as_value(NAN));
 	init_member("Infinity", as_value(INFINITY));
+
+	// TODO: check if this is available in SWF4
+	// (for SWF5 it just exists as a useless function, it seems)
+	AsBroadcaster_init(*this);
 
 	if ( vm.getSWFVersion() < 6 ) goto extscan;
 	//-----------------------

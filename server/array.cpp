@@ -765,6 +765,20 @@ as_array_object::splice(unsigned start, unsigned len,
 	return ret;
 }
 
+bool
+as_array_object::removeFirst(const as_value& v, as_environment& env)
+{
+	for (iterator it = elements.begin(); it != elements.end(); ++it)
+	{
+		if ( v.equals(*it, env) )
+		{
+			elements.erase(it);
+			return true;
+		}
+	}
+	return false;
+}
+
 /* virtual public, overriding as_object::get_member */
 bool
 as_array_object::get_member(const std::string& name, as_value *val)

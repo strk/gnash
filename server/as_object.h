@@ -274,6 +274,49 @@ public:
 		return get_member_default(name, val);
 	}
 
+	/// Get a member as_value by name in an AS-compatible way
+	//
+	/// NOTE that this method is non-const becase a property
+	///      could also be a getter/setter and we can't promise
+	///      that the 'getter' won't change this object trough
+	///	 use of the 'this' reference. 
+	///
+	/// @param name
+	///	Name of the property. Will be converted to lowercase
+	///	if the current VM is initialized for a  target
+	///	up to SWF6.
+	///
+	/// @return value of the member (possibly undefined),
+	///	or undefined if not found. Use get_member if you
+	///	need to know wheter it was found or not.
+	///
+	as_value getMember(const std::string& name);
+
+	/// Call a method of this object in an AS-compatible way
+	//
+	/// @param name
+	///	Name of the method. Will be converted to lowercase
+	///	if the current VM is initialized for a  target
+	///	up to SWF6.
+	///
+	/// @param env
+	///	The environment to use for setting up call frame stack
+	///
+	/// @param nargs
+	///	Number of arguments
+	///
+	/// @param ...
+	///	nargs as_value references
+	///
+	/// @return value of the member (possibly undefined),
+	///	or undefined if not found. Use get_member if you
+	///	need to know wheter it was found or not.
+	///
+	as_value callMethod(const std::string& name, as_environment& env);
+	as_value callMethod(const std::string& name, as_environment& env, const as_value& arg0);
+	as_value callMethod(const std::string& name, as_environment& env, const as_value& arg0, const as_value& arg1);
+	as_value callMethod(const std::string& name, as_environment& env, const as_value& arg0, const as_value& arg1, const as_value& arg2);
+
 	/// Delete a property of this object, unless protected from deletion.
 	//
 	/// This function does *not* recurse in this object's prototype.

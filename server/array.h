@@ -60,6 +60,17 @@ public:
 	typedef container::const_iterator const_iterator;
 	typedef container::iterator iterator;
 
+	/// Visit all elements 
+	//
+	/// The visitor class will have to expose a visit(as_value&) method
+	///
+	template<class V> void visitAll(V& v)
+	{
+		for (iterator i=elements.begin(), ie=elements.end(); i!=ie; ++i)
+		{
+			v.visit(*i);
+		}
+	}
 
 	/// Sort flags
 	enum SortFlags {
@@ -161,6 +172,18 @@ public:
 	///
 	std::auto_ptr<as_array_object> slice(
 		unsigned int start, unsigned int one_past_end);
+
+	/// Remove first element matching the given value
+	//
+	/// Return true if any element was removed, false otherwise
+	///
+	/// @param v
+	///	The value to compare elements against
+	///
+	/// @param env
+	///	The environment to use when comparing (needed by as_value::equals)
+	///
+	bool removeFirst(const as_value& v, as_environment& env);
 
 	/// \brief
 	/// Substitute 'len' elements from 'start' with elements from

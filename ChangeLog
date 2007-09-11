@@ -1,3 +1,14 @@
+2007-09-11 Sandro Santilli <strk@keybit.net>
+
+	* server/array.{cpp,h}: add removeFirst and visitAll methods.
+	* server/as_object.{cpp,h}: add getMember and callMethod memebers
+	  for ActionScript-like coding.
+	* server/asobj/: Makefile.am, Global.cpp, AsBroadcaster.{cpp,h}:
+	  First draft at AsBroadcaster. NOTE: this is not 100% compatible
+	  but contains some special code to handle corner cases for compatbility
+	  sake (mostly to avoid breaking swfdec testcases). The normal case
+	  will still be faster then the average one.
+
 2007-09-11 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* server/gnash.h: add more keycodes.
