@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.128 2007/08/27 03:06:42 cmusick Exp $ */
+/* $Id: ASHandlers.cpp,v 1.129 2007/09/11 22:03:05 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1312,11 +1312,16 @@ SWFHandlers::ActionStringCompare(ActionExec& thread)
 }
 
 void
-SWFHandlers::ActionThrow(ActionExec& /*thread*/)
+SWFHandlers::ActionThrow(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
-    //as_environment& env = thread.env;
-    log_unimpl (__PRETTY_FUNCTION__);
+    as_environment& env = thread.env;
+
+	// Throw the value on the top of the stack.
+	env.top(0).flag_exception();
+
+	// Proceed to the end of the code block to throw.
+	thread.next_pc = thread.stop_pc;
 }
 
 void
@@ -2469,6 +2474,11 @@ SWFHandlers::ActionCallFunction(ActionExec& thread)
 	env.drop(nargs + 1);
 	env.top(0) = result;
 
+	// If the function threw an exception, do so here.
+	if (result.is_exception())
+	{
+		thread.next_pc = thread.stop_pc;
+	}
 
 	//cerr << "After ActionCallFunction:"<<endl;
 	//env.dump_stack();
@@ -2479,7 +2489,6 @@ SWFHandlers::ActionReturn(ActionExec& thread)
 {
 //        GNASH_REPORT_FUNCTION;
 	as_environment& env = thread.env;
-	as_value* retval = thread.retval;
 
 	//log_msg(_("Before top/drop (retval=%p)"), (void*)retval);
 	//env.dump_stack();
@@ -2488,9 +2497,7 @@ SWFHandlers::ActionReturn(ActionExec& thread)
 
 	// Put top of stack in the provided return slot, if
 	// it's not NULL.
-	if (retval) {
-		*retval = env.top(0);
-	}
+	thread.pushReturn(env.top(0));
 	env.drop(1);
 
 #ifdef USE_DEBUGGER
@@ -3140,6 +3147,11 @@ SWFHandlers::ActionCallMethod(ActionExec& thread)
 	env.drop(nargs + 2);
 	env.top(0) = result;
 
+	// Now, if there was an exception, proceed to the end of the block.
+	if (result.is_exception())
+	{
+		thread.next_pc = thread.stop_pc;
+	}
 	// This is to check stack status after call method
 	//log_msg(_("at doActionCallMethod() end, stack: ")); env.dump_stack();
 
@@ -3603,13 +3615,13 @@ SWFHandlers::ActionTry(ActionExec& thread)
 {
 //    GNASH_REPORT_FUNCTION;
 
-	//as_environment& env = thread.env;
+	as_environment& env = thread.env;
 	const action_buffer& code = thread.code;
 	size_t pc = thread.pc;
 
 	assert( code[pc] == SWF::ACTION_TRY );
 
-        size_t i = thread.pc + 3; // skip tag id and length
+	size_t i = thread.pc + 3; // skip tag id and length
 
 	uint8_t flags = code[i];
 	++i;
@@ -3626,21 +3638,34 @@ SWFHandlers::ActionTry(ActionExec& thread)
 	const char* catchName = NULL;
 	uint8_t catchRegister = 0;
 
-	if ( catchInRegister )
+	if (!doFinally)
+		finallySize = 0;
+	if (!doCatch)
+		catchSize = 0;
+
+	if (!catchInRegister)
 	{
 		catchName = code.read_string(i);
+		i += strlen(catchName) + 1;
+		tryBlock t(i, trySize, catchSize, finallySize, catchName, 
+			env.stack_size());
+		thread.pushTryBlock(t);
 	}
 	else
 	{
 		catchRegister = code[i];
+		++i;
+		tryBlock t(i, trySize, catchSize, finallySize, catchRegister,
+			env.stack_size());
+		thread.pushTryBlock(t);
 	}
+
+	thread.next_pc = i; // Proceed into the try block.
 
 	IF_VERBOSE_ACTION(
 	log_action(_("ActionTry: reserved:%x doFinally:%d doCatch:%d trySize:%u catchSize:%u finallySize:%u catchName:%s catchRegister:%u"),
 		reserved, doFinally, doCatch, trySize, catchSize, finallySize, catchName ? catchName : "(null)", catchRegister);
 	);
-
-	log_unimpl (__PRETTY_FUNCTION__);
 }
 
 /// See: http://sswf.sourceforge.net/SWFalexref.html#action_with

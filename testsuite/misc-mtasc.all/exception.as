@@ -95,7 +95,7 @@ class Test
 			res = e;
 		}
 		check_equals(typeof(res), 'number');
-		xcheck_equals(res, 1);
+		check_equals(res, 1);
 
 		res = 'string';
 		try {
@@ -108,7 +108,7 @@ class Test
 			res += '_finally';
 		}
 		check_equals(typeof(res), 'string');
-		xcheck_equals(res, 'thrown_finally');
+		check_equals(res, 'thrown_finally');
 
 		res = 'string';
 		try {
@@ -125,20 +125,20 @@ class Test
 		var o = new Object();
 		o.num = 1;
 		var ret = addOneOnFinal(o);
-		xcheck_equals(ret, 'finally');
-		xcheck_equals(o.num, 2);
+		check_equals(ret, 'finally');
+		check_equals(o.num, 2);
 
 		ret = throwAndCatchAddingOne(o);
-		xcheck_equals(ret, 'catch');
-		xcheck_equals(o.num, 3);
+		check_equals(ret, 'catch');
+		check_equals(o.num, 3);
 
 		try {
 			ret = throwAndCatchAddingOne(o);
 		} catch (e) {
 			ret = 'catch_outside';
 		}
-		xcheck_equals(ret, 'catch');
-		xcheck_equals(o.num, 4);
+		check_equals(ret, 'catch');
+		check_equals(o.num, 4);
 
 		try {
 			ret = throwFromCatchAddingOne(o);
@@ -147,8 +147,8 @@ class Test
 			o.num += 1;
 			ret += e+'_outside';
 		}
-		xcheck_equals(ret, 'finally');
-		xcheck_equals(o.num, 5);
+		check_equals(ret, 'finally');
+		check_equals(o.num, 5);
 
 		try {
 			throwNested();
@@ -156,7 +156,7 @@ class Test
 			note("Catch outside");
 			o.num = e;
 		}
-		xcheck_equals(o.num, 'throw');
+		check_equals(o.num, 'throw');
 	}
 
 	static function main(mc)

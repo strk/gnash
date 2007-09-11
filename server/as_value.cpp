@@ -935,14 +935,18 @@ as_value::to_debug_string() const
 void
 as_value::operator=(const as_value& v)
 {
-	if (v.m_type == UNDEFINED) set_undefined();
-	else if (v.m_type == NULLTYPE) set_null();
-	else if (v.m_type == BOOLEAN) set_bool(v.m_boolean_value);
-	else if (v.m_type == STRING) set_string(v.m_string_value);
-	else if (v.m_type == NUMBER) set_double(v.m_number_value);
-	else if (v.m_type == OBJECT) set_as_object(v.m_object_value);
+	type the_type = v.m_type;
+	if (v.is_exception())
+		the_type = (type) ((int) the_type - 1);
 
-	else if (v.m_type == MOVIECLIP)
+	if (the_type == UNDEFINED) set_undefined();
+	else if (the_type == NULLTYPE) set_null();
+	else if (the_type == BOOLEAN) set_bool(v.m_boolean_value);
+	else if (the_type == STRING) set_string(v.m_string_value);
+	else if (the_type == NUMBER) set_double(v.m_number_value);
+	else if (the_type == OBJECT) set_as_object(v.m_object_value);
+
+	else if (the_type == MOVIECLIP)
 	{
 #ifndef MOVIECLIP_AS_SOFTREF
 		sprite_instance* sp = dynamic_cast<sprite_instance*>(v.m_object_value);
@@ -953,8 +957,12 @@ as_value::operator=(const as_value& v)
 #endif
 	}
 
-	else if (v.m_type == AS_FUNCTION) set_as_function(v.m_object_value->to_function());
-	else assert(0);
+	else if (the_type == AS_FUNCTION) set_as_function(v.m_object_value->to_function());
+	else 
+		assert(0);
+
+	if (v.is_exception())
+		flag_exception();
 }
 
 as_value::as_value(boost::intrusive_ptr<as_object> obj)

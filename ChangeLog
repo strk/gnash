@@ -1,3 +1,10 @@
+2007-09-12 Chad Musick <chadmusick@msbx.net>
+
+	* server/as_value.cpp,h: Add exception types to as_value.
+	* server/vm/ASHandlers.cpp: Implement try and throw
+	* server/vm/ActionExec.cpp,h: Support for try and throw
+	* testsuite/misc-mtasc.all/exception.as: Exceptions now work.
+
 2007-09-11 Sandro Santilli <strk@keybit.net>
 
 	* server/as_object.{cpp,h} (copyProperties): don't copy __proto__.

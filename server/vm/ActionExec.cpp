@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.42 2007/09/04 10:19:01 strk Exp $ */
+/* $Id: ActionExec.cpp,v 1.43 2007/09/11 22:03:06 cmusick Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -86,6 +86,7 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 	next_pc(pc),
 	env(newEnv),
 	retval(nRetVal),
+	mReturning(false),
 	_abortOnUnload(false)
 {
 	//GNASH_REPORT_FUNCTION;
@@ -120,6 +121,7 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool a
 	next_pc(0),
 	env(newEnv),
 	retval(0),
+	mReturning(false),
 	_abortOnUnload(abortOnUnloaded)
 {
 	//GNASH_REPORT_FUNCTION;
@@ -166,8 +168,111 @@ ActionExec::operator() ()
 
 	size_t branchCount = 0;
 	try {
-	while (pc<stop_pc)
+	while (1) // We might not stop at stop_pc, if we are trying.
 	{
+		if (!(pc < stop_pc))
+		{
+			// Handle try/catch/finally blocks.
+			if (mTryList.empty())
+				break; // No try block.
+			// If we are in a try block, check to see if we have thrown.
+			tryBlock& t = mTryList.back();
+			if (t.mState == tryBlock::TRY_TRY)
+			{
+				if (env.top(0).is_exception()) // We have an exception. Catch.
+				{
+					as_value exc = env.pop();
+					pc = t.mCatchOffset;
+					// Save the exception to the requested place.
+					exc.unflag_exception();
+					if (t.mNamed)
+						setLocalVariable(t.mName, exc);
+					else
+					{
+						if (isFunction2() && t.mReg < env.num_local_registers())
+						{
+							env.local_register(t.mReg) = exc;
+						}
+						else if (t.mReg < 4)
+						{
+							env.global_register(t.mReg) = exc;
+						}
+					}
+
+					// Set a new stop.
+					stop_pc = t.mFinallyOffset;
+					t.mState = tryBlock::TRY_CATCH;
+				}
+				else // No exception. Finally.
+				{
+					pc = t.mFinallyOffset;
+					stop_pc = t.mAfterTriedOffset;
+					t.mState = tryBlock::TRY_FINALLY;
+				}
+			}
+			else if (t.mState == tryBlock::TRY_CATCH) // We've caught. Finally.
+			{
+				// Here's a fine mess. We've thrown, but we still need to
+				// go to finally.
+
+				if (env.top(0).is_exception())
+				{
+					// If we set a variable, erase it.
+					if (t.mNamed)
+						delVariable(t.mName);
+					// Save this for 'finally'.
+					t.mThrownFromCatch = env.pop();
+					pc = t.mFinallyOffset;
+					stop_pc = t.mAfterTriedOffset;
+					t.mState = tryBlock::TRY_FINALLY;
+				}
+				else // No exception. Finally.
+				{
+					pc = t.mFinallyOffset;
+					stop_pc = t.mAfterTriedOffset;
+					t.mState = tryBlock::TRY_FINALLY;
+				}
+			}
+			else // TRY_FINALLY
+			{
+				// No matter how we reached this, this try block is done.
+				tryBlock ts = t;
+				mTryList.pop_back();
+
+				// If there is an exception, we're throwing from finally.
+				if (env.top(0).is_exception())
+				{
+					continue; // Leaving it does right.
+				}
+				else
+				{
+					// If we have an exception from catch and no finally
+					// block, throw it.
+					if (ts.mThrownFromCatch.is_exception() &&
+						ts.mFinallyOffset == ts.mSavedEndOffset)
+					{
+						env.push(ts.mThrownFromCatch);
+						if (retval)
+						{
+							*retval = ts.mThrownFromCatch;
+						}
+						continue;
+					}
+					else
+					{
+						pc = ts.mAfterTriedOffset;
+						stop_pc = ts.mSavedEndOffset;
+						if (mReturning)
+						{
+							mReturning = false;
+							break;
+						}
+					}
+				}
+			}
+			continue; // Walk up the try chain if necessary.
+		} // end of try checking.
+
 		if ( _abortOnUnload && _original_target->isUnloaded() )
 		{
 			log_debug("Target of action_buffer unloaded during execution, discarding %d remaining opcodes", stop_pc-pc);
@@ -550,6 +655,26 @@ ActionExec::getTarget()
 	{
 		return env.get_target();
 	}
+}
+
+void
+ActionExec::pushTryBlock(tryBlock& t)
+{
+	// The current block should end at the end of the try block.
+	t.mSavedEndOffset = stop_pc;
+	stop_pc = t.mCatchOffset;
+
+	mTryList.push_back(t);
+}
+
+void
+ActionExec::pushReturn(const as_value& t)
+{
+	if (retval)
+	{
+    	*retval = t;
+	}
+    mReturning = true;
 }
 
 } // end of namespace gnash

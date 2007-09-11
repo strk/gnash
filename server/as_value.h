@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: as_value.h,v 1.64 2007/08/25 14:15:51 strk Exp $ */
+/* $Id: as_value.h,v 1.65 2007/09/11 22:03:05 cmusick Exp $ */
 
 #ifndef GNASH_AS_VALUE_H
 #define GNASH_AS_VALUE_H
@@ -94,29 +94,39 @@ class DSOEXPORT as_value
 public:
 	enum type
 	{
+		// Always make the exception type one greater than the normal type.
+		
 		/// Undefined value
 		UNDEFINED,
+		UNDEFINED_EXCEPT,
 
 		/// NULL value
 		NULLTYPE,
+		NULLTYPE_EXCEPT,
 
 		/// Boolean value
 		BOOLEAN,
+		BOOLEAN_EXCEPT,
 
 		/// String value
 		STRING,
+		STRING_EXCEPT,
 
 		/// Number value
 		NUMBER, 
+		NUMBER_EXCEPT,
 
 		/// Object reference
 		OBJECT,
+		OBJECT_EXCEPT,
 
 		/// ActionScript function reference
 		AS_FUNCTION,
+		AS_FUNCTION_EXCEPT,
 
 		/// MovieClip reference
-		MOVIECLIP
+		MOVIECLIP,
+		MOVIECLIP_EXCEPT
 	};
 
 	/// Construct an UNDEFINED value
@@ -543,6 +553,20 @@ public:
 	bool	is_null() const { return (m_type == NULLTYPE); }
 
 	bool	is_bool() const { return (m_type == BOOLEAN); }
+
+	bool	is_exception() const
+	{ return (m_type == UNDEFINED_EXCEPT || m_type == NULLTYPE_EXCEPT
+		|| m_type == BOOLEAN_EXCEPT || m_type == NUMBER_EXCEPT
+		|| m_type == OBJECT_EXCEPT || m_type == AS_FUNCTION_EXCEPT
+		|| m_type == MOVIECLIP_EXCEPT || m_type == STRING_EXCEPT);
+	}
+
+	// Flag or unflag an as_value as an exception -- this gets flagged
+	// when an as_value is 'thrown'.
+	void	flag_exception() 
+	{ if (!is_exception()) m_type = (type) ((int) m_type + 1); }
+	void	unflag_exception()
+	{ if (is_exception()) m_type = (type) ((int) m_type - 1); }
 
 	/// Return true if this value is strictly equal to the given one
 	//
