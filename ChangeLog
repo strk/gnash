@@ -1,3 +1,7 @@
+2007-09-11 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/anaylse-results.sh: fix print of unexpected successes.
+
 2007-09-11 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_ogl.cpp: Disable polygon smoothing for now as

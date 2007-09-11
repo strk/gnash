@@ -117,7 +117,7 @@ if test ${total_fail} -gt 0 || test ${total_xpass} -gt 0; then
 		echo "Unexpected successes follow:"
 		for s in ${suitexpass}; do
 			echo -n "	${s}: "
-			grep -w FAIL ${s}/testrun.sum; done
+			grep -w XPASS ${s}/testrun.sum; done
 		echo
 	fi
 
