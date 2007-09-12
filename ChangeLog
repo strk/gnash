@@ -1,5 +1,12 @@
 2007-09-12 Sandro Santilli <strk@keybit.net>
 
+	* server/asobj/AsBroadcaster.cpp: add support for passing arguments
+	  for broadcasted message handlers.
+	* testsuite/actionscript.all/AsBroadcaster.as: add tests for arguments
+	  passed to broadcasted messages.
+
+2007-09-12 Sandro Santilli <strk@keybit.net>
+
 	* server/as_function.{cpp,h}: make 'prototype' a proper property,
 	  change getPrototype() to return by intrusive_ptr.
 	* server/sprite_instance.cpp: update call to getPrototype().

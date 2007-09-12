@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: AsBroadcaster.as,v 1.3 2007/09/11 17:41:11 strk Exp $";
+rcsid="$Id: AsBroadcaster.as,v 1.4 2007/09/12 16:17:05 strk Exp $";
 
 #include "check.as"
 
@@ -230,10 +230,37 @@ bcast._listeners.length=0;
 ret = bcast.broadcastMessage('onUnexistent');
 check_equals(typeof(ret), 'undefined');
 
-// TODO: test broadcastMessage with additional arguments
-//       and effects of overriding Function.apply
-//	 (should have no effects, being broadcastMessage
-//        a native functioN)
+//--------------------------------
+// broadcaseMessage with args
+//--------------------------------
+
+_root.total = 0;
+o = {};
+o.addThis = function(what)
+{
+	//note("Arg0 is "+what);
+	_root.total += what;
+};
+o.setSum = function()
+{
+	_root.total = 0;
+	for (var i=0; i< arguments.length; ++i)
+	{
+		//note("Arg "+i+" is "+arguments[i]);
+		_root.total += arguments[i];
+	}
+};
+bcast.addListener(o);
+bcast.broadcastMessage('addThis', 3);
+check_equals(_root.total, 3);
+bcast.broadcastMessage('addThis', 2);
+check_equals(_root.total, 5);
+bcast.broadcastMessage('setSum', 1, 2, 3, 4);
+check_equals(_root.total, 10);
+bcast.broadcastMessage('setSum', 1, 2, 3, 4, 5, 6, 7, 8);
+check_equals(_root.total, 36);
+bcast.broadcastMessage('setSum', 'one', 'two', 'three');
+check_equals(_root.total, '0onetwothree');
 
 #endif // OUTPUT_VERSION >= 6
 

@@ -28,6 +28,7 @@
 #include "builtin_function.h"
 #include "VM.h" // for getPlayerVersion() 
 #include "Object.h" // for getObjectInterface
+#include "action.h" // for call_method
 
 #include <boost/algorithm/string/case_conv.hpp> // for PROPNAME
 
@@ -41,7 +42,7 @@ class BroadcasterVisitor
 	/// of the current VM
 	std::string _eventName;
 
-	/// Environment to use for marhalling and functions invokation
+	/// Environment to use for marshalling and functions invokation
 	as_environment& _env;
 
 	// These two will be needed for consistency checking
@@ -51,6 +52,8 @@ class BroadcasterVisitor
 	/// Number of event dispatches
 	unsigned int _dispatched;
 
+	const fn_call& _fn;
+
 public:
 
 	/// @param eName name of event, will be converted to lowercase if needed
@@ -58,11 +61,12 @@ public:
 	/// @param env Environment to use for marhalling and functions invocation.
 	///	   Note that visit() will push values on it !
 	///
-	BroadcasterVisitor(const std::string& eName, as_environment& env)
+	BroadcasterVisitor(const fn_call& fn)
 		:
-		_eventName(PROPNAME(eName)),
-		_env(env),
-		_dispatched(0)
+		_eventName(PROPNAME(fn.arg(0).to_string())),
+		_env(fn.env()),
+		_dispatched(0),
+		_fn(fn)
 	{
 	}
 
@@ -72,11 +76,21 @@ public:
 		boost::intrusive_ptr<as_object> o = v.to_object();
 		if ( ! o ) return;
 
+		as_value method;
+		o->get_member(_eventName, &method);
+
+		if ( method.is_function() )
+		{
+
 #ifndef NDEBUG
-		size_t oldStackSize = _env.stack_size();
+			size_t oldStackSize = _env.stack_size();
 #endif
-		/*as_value ret =*/ o->callMethod(_eventName, _env);
-		assert ( _env.stack_size() == oldStackSize );
+			call_method(method, &_env, o.get(), _fn.nargs-1, _fn.offset()-1);
+
+			assert ( _env.stack_size() == oldStackSize );
+
+		}
+
 		++_dispatched;
 	}
 
@@ -329,7 +343,7 @@ AsBroadcaster::broadcastMessage_method(const fn_call& fn)
 		return as_value();
 	}
 
-	BroadcasterVisitor visitor(fn.arg(0).to_string(), fn.env());
+	BroadcasterVisitor visitor(fn); 
 	listeners->visitAll(visitor);
 
 	unsigned int dispatched = visitor.eventsDispatched();
