@@ -102,38 +102,37 @@ function_ctor(const fn_call& /* fn */)
 as_function::as_function(as_object* iface)
 	:
 	// all functions inherit from global Function class
-	as_object(getFunctionPrototype()),
-	_properties(iface)
+	as_object(getFunctionPrototype())
 {
 	/// TODO: create properties lazily, on getPrototype() call
-	if ( ! _properties )
+	if ( ! iface )
 	{
-		_properties = new as_object(getObjectInterface());
+		iface = new as_object(getObjectInterface());
 	}
-	_properties->init_member("constructor", this); 
-	init_member("prototype", as_value(_properties.get()));
+	iface->init_member("constructor", this); 
+	init_member("prototype", as_value(iface));
 }
 
 void
 as_function::setPrototype(as_object* proto)
 {
-	_properties = proto;
-	init_member("prototype", as_value(_properties.get()));
+	//_properties = proto;
+	init_member("prototype", as_value(proto));
 }
 
 void
 as_function::extends(as_function& superclass)
 {
-	_properties = new as_object(superclass.getPrototype());
-	_properties->init_member("__proto__", superclass.getPrototype());
+	as_object* newproto = new as_object(superclass.getPrototype().get());
+	newproto->init_member("__proto__", superclass.getPrototype().get());
 	if ( VM::get().getSWFVersion() > 5 )
 	{
-		_properties->init_member("__constructor__", &superclass); 
+		newproto->init_member("__constructor__", &superclass); 
 	}
-	init_member("prototype", as_value(_properties.get()));
+	init_member("prototype", as_value(newproto));
 }
 
-as_object*
+boost::intrusive_ptr<as_object>
 as_function::getPrototype()
 {
 	// TODO: create if not available ?
@@ -142,15 +141,7 @@ as_function::getPrototype()
 	//               prototype, not the old !!
 	as_value proto;
 	get_member("prototype", &proto);
-	if ( proto.to_object() != _properties.get() )
-	{
-		log_debug(_("Exported interface of function %p "
-				"has been overwritten (from %p to %p)"),
-				(void*)this, (void*)_properties.get(),
-				(void*)proto.to_object().get());
-		_properties = proto.to_object();
-	}
-	return _properties.get();
+	return proto.to_object();
 }
 
 /* static public */

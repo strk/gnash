@@ -3356,7 +3356,7 @@ sprite_instance::construct()
 	if ( ctor && ! ctor->isBuiltin() )
 	{
 		// Set the new prototype *after* the constructor was called
-		as_object* proto = ctor->getPrototype();
+		boost::intrusive_ptr<as_object> proto = ctor->getPrototype();
 		set_prototype(proto);
 
 		//log_msg(_("Calling the user-defined constructor against this sprite_instance"));

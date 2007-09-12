@@ -103,11 +103,8 @@ public:
 			unsigned nargs, unsigned first_arg_index);
 
 	/// Get this function's "prototype" member (exported interface).
-	//
-	/// This is never NULL, and created on purpose if not provided
-	/// at construction time. 
 	///
-	as_object* getPrototype();
+	boost::intrusive_ptr<as_object> getPrototype();
 
 	/// Make this function a subclass of the given as_function
 	void extends(as_function& superclass);
@@ -152,7 +149,7 @@ protected:
 	///
 	void markAsFunctionReachable() const
 	{
-		_properties->setReachable();
+		//_properties->setReachable();
 
 		markAsObjectReachable();
 	}
@@ -178,7 +175,7 @@ protected:
 	/// to be inherited by instances of this
 	/// "Function" (class)
 	///
-	boost::intrusive_ptr<as_object>	_properties;
+	//boost::intrusive_ptr<as_object>	_properties;
 
 private:
 
