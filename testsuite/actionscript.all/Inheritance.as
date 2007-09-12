@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.39 2007/09/12 10:46:06 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.40 2007/09/12 11:55:53 strk Exp $";
 
 #include "check.as"
 
@@ -204,6 +204,43 @@ var greeting = derived.saySuperHello();
 check_equals(greeting, "Hello from BaseClass");
 #endif // OUTPUT_VERSION > 5
 check_equals(super, undefined);
+
+function A() {}
+A.prototype.whoami = function() {
+	return "A";
+};
+function B() {}
+B.prototype = new A;
+bo = new B;
+check_equals(bo.whoami(), "A");
+B.prototype.whoami = function() {
+	return super.whoami()+"."+"B";
+};
+#if OUTPUT_VERSION < 6
+ check_equals(bo.whoami(), ".B");
+#else
+ check_equals(bo.whoami(), "A.B");
+#endif
+function C() {}
+C.prototype = new B;
+co = new C;
+#if OUTPUT_VERSION > 6
+ xcheck_equals(co.whoami(), "A.B"); // gnash fails returning undefined.B.B
+#else
+# if OUTPUT_VERSION == 6
+   xcheck_equals(co.whoami(), "A.B.B"); // gnash fails returning .B.B
+# else
+   check_equals(co.whoami(), ".B");
+# endif
+#endif
+C.prototype.whoami = function() {
+	return super.whoami()+"."+"C";
+};
+#if OUTPUT_VERSION > 5
+  xcheck_equals(co.whoami(), "A.B.C"); // gnash fails returning .B.C (SWF6) or undefined.B.C (SWF>6)
+#else
+  check_equals(co.whoami(), ".C");
+#endif
 
 //------------------------------------------------
 //

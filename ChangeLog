@@ -1,3 +1,8 @@
+2007-09-12 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Inheritance.as: more tests for double
+	  inheritance.
+
 2007-09-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp, gui/gui.{cpp,h},server/movie_root{cpp,h}
