@@ -1,3 +1,7 @@
+2007-09-12 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/Inheritance.as: more tests for 'super'.
+
 2007-09-12 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_ogl.cpp: Use the average of X and Y scaling

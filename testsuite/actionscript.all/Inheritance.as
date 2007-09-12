@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.40 2007/09/12 11:55:53 strk Exp $";
+rcsid="$Id: Inheritance.as,v 1.41 2007/09/12 17:15:11 strk Exp $";
 
 #include "check.as"
 
@@ -202,8 +202,34 @@ DerivedClass.prototype.saySuperHello = function () {
 var derived = new DerivedClass();
 var greeting = derived.saySuperHello();
 check_equals(greeting, "Hello from BaseClass");
+
+DerivedClass.prototype.typeofSuper = function() { return typeof(super); };
+check_equals(derived.typeofSuper(), 'object');
+xcheck_equals(DerivedClass.prototype.typeofSuper(), 'object');
+
+DerivedClass.prototype.getSuper = function() { return super; };
+s = derived.getSuper();
+check_equals(typeof(s), 'object');
+check_equals(s.sayHello, BaseClass.prototype.sayHello);
+xcheck(!s.hasOwnProperty('sayHello')); // sayHello is not copied to 's'
+check_equals(s.__proto__, Object.prototype); // nor it's found in __proto__
+check_equals(typeof(s.prototype), 'undefined');
+check_equals(typeof(s.constructor), 'function');
+check_equals(s.constructor, BaseClass); // maybe sayHello is looked for here...
+check_equals(typeof(s.__constructor__), 'undefined');
+xcheck(s != BaseClass.prototype);
+
+DerivedClass.prototype.typeofThis = function() { return typeof(this); };
+check_equals(derived.typeofThis(), 'object');
+check_equals(DerivedClass.prototype.typeofThis(), 'object');
+
+DerivedClass.prototype.getThis = function() { return this; };
+check_equals(derived.getThis(), derived);
+check_equals(DerivedClass.prototype.getThis(), DerivedClass.prototype);
+
 #endif // OUTPUT_VERSION > 5
 check_equals(super, undefined);
+
 
 function A() {}
 A.prototype.whoami = function() {
