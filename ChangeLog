@@ -1,3 +1,7 @@
+2007-09-12 Chad Musick <chadmusick@msbx.net>
+
+	* server/as_value.cpp: Move test to silence compiler warnings.
+
 2007-09-12 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (construct): properly initialize

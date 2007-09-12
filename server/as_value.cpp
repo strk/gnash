@@ -883,10 +883,11 @@ as_value::equalsSameType(const as_value& v) const
 
 			return a == b;
 		}
+		default:
+			if (is_exception())
+				return false; // Exceptions equal nothing.
 
 	}
-	if (is_exception())
-		return false; // Exceptions equal nothing.
 	assert(0);
 	return false;
 }
