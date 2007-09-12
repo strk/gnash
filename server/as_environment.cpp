@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: as_environment.cpp,v 1.85 2007/08/29 13:50:09 strk Exp $ */
+/* $Id: as_environment.cpp,v 1.86 2007/09/12 09:03:30 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -381,47 +381,68 @@ as_environment::set_member(const std::string& varname, const as_value& val)
 /* public static */
 bool
 as_environment::parse_path(const std::string& var_path,
-		std::string& path, std::string& var, bool* is_slash_based) 
+                           std::string& path, std::string& var, bool* is_slash_based) 
 {
-//log_msg(_("parse_path(%s)"), var_path.c_str());
-    // Search for colon.
-    int	colon_index = 0;
-    int	var_path_length = var_path.length();
-    for ( ; colon_index < var_path_length; colon_index++) {
-	if (var_path[colon_index] == ':') {
-            if ( is_slash_based ) *is_slash_based = true;
-	    // Found it.
-	    break;
-	}
+    //log_msg(_("parse_path(%s)"), var_path.c_str());
+
+    bool slash_based = false;
+    std::string::size_type var_path_length = var_path.length();
+    std::string::size_type separator_index = var_path_length - 1;
+    for( ; separator_index > 0; separator_index--)
+    {
+        if(var_path[separator_index] == ':')
+        {
+            slash_based = true;
+            break;
+        }
+        else if(var_path[separator_index] == '.')
+        {
+            slash_based = false;
+            break;
+        }
     }
-    
-    if (colon_index >= var_path_length)	{
-	// No colon.  Is there a '.'?  Find the last
-	// one, if any.
-	for (colon_index = var_path_length - 1; colon_index >= 0; colon_index--) {
-	    if (var_path[colon_index] == '.') {
-		// Found it.
-                if ( is_slash_based ) *is_slash_based = false;
-		break;
-	    }
-	}
-	if (colon_index < 0) {
-//log_msg(_(" no colon index"));
-	    return false;
-	}
+
+    if(separator_index == 0)
+    // if no path, only raw variable.
+    {
+        return false;
     }
-    
+
     // Make the subparts.
-    
+
     // Var.
-    var = &var_path[colon_index + 1];
-    
+    var = &var_path[separator_index + 1];
+
     // @@ could be better. 
     path = var_path;
-    path.resize(colon_index);
-    
-//log_msg(_(" path=%s var=%s"), path.c_str(), var.c_str());
+    path.resize(separator_index);
 
+    if(is_slash_based)
+    {
+        *is_slash_based = slash_based;
+    }
+
+//#define SUPPORT_IRREGULAR_PATH
+// enable this would give 3 more xpasses for callFunction_test.c,
+// but also slow down lots of things.
+// TODO: optimize all parse_path() related functions
+#ifdef SUPPORT_IRREGULAR_PATH
+    if(slash_based)
+    {
+        // make sure the path is slash_based, see testcase callFunction_test.swf
+        for(std::string::size_type index=0; index < separator_index; index++)
+        {
+            // Replace dot and colon with slash in a "slash based" path 
+            // But don't replace ".."
+            if((path[index] == ':') || (path[index] == '.' && path[index+1] != '.'))
+            {
+                path[index] = '/';
+            }
+        }
+    }
+#endif
+
+    //log_msg(_(" path=%s var=%s"), path.c_str(), var.c_str());
     return true;
 }
 

@@ -1,3 +1,7 @@
+2007-09-12 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/as_environment.cpp: parse_path() cleanups.
+	
 2007-09-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* gui/gtk.cpp: pass unicode of key event when notifying gui.
