@@ -5,7 +5,7 @@
 
 // A render_handler that uses SDL & OpenGL
 
-/* $Id: render_handler_ogl.cpp,v 1.82 2007/09/12 14:51:10 bjacques Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.83 2007/09/12 17:13:29 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -105,6 +105,9 @@ public:
 	
     gnash::matrix	m_current_matrix;
     gnash::cxform	m_current_cxform;
+
+    gnash::point _scale;
+
     void set_antialiased(bool enable) {
 	m_enable_antialias = enable;
     }
@@ -567,6 +570,18 @@ else {
 #endif // 0
 	}
 
+    /// Sets the x/y scale for the movie
+    void set_scale(float xscale, float yscale)
+    {
+      _scale.set(xscale, yscale);
+    }
+
+    void get_scale(point& scale) 
+    {
+      scale = _scale;
+    }
+
+
     bool getPixel(rgba& color_out, int x, int y)
     {
        if (x < 0 || y < 0) {
@@ -698,8 +713,11 @@ else {
 			// low-width lines well, even with anti-aliasing
 			// enabled
 			// But this is a start (20 TWIPS' width = 1 pixel's)
-			glLineWidth(TWIPS_TO_PIXELS(norm_width));
-			glPointSize(TWIPS_TO_PIXELS(norm_width));
+			float resized_width = 
+			  norm_width * ( (_scale.m_x + _scale.m_y) / 2.0 );
+
+			glLineWidth(TWIPS_TO_PIXELS(resized_width));
+			glPointSize(TWIPS_TO_PIXELS(resized_width));
 		}
 	}
 

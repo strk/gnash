@@ -1,3 +1,8 @@
+2007-09-12 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_ogl.cpp: Use the average of X and Y scaling
+	to determine the proper line thickness.
+
 2007-09-12 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (sprite_create_text_field): check for
