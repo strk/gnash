@@ -1,3 +1,9 @@
+2007-09-12 Bastiaan Jacques <bastiaan@bjacques.org
+
+	* backend/render_handler_ogl.cpp: Add a debugging function
+	called check_error(), enabled by toggling the DEBUG_OPENGL
+	macro. Don't bother setting variables to their defaults.
+
 2007-09-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
 
 	* testsuite/MovieTester{cpp,h}: remove utf8 from keypress,

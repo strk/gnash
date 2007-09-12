@@ -5,7 +5,7 @@
 
 // A render_handler that uses SDL & OpenGL
 
-/* $Id: render_handler_ogl.cpp,v 1.79 2007/09/11 08:23:31 bjacques Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.80 2007/09/12 10:26:09 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -51,6 +51,8 @@ using namespace gnash;
 // 3 = use image::resample(), slow software resampling
 #define RESAMPLE_METHOD 2
 
+#define DEBUG_OPENGL 0
+
 
 // bitmap_info_ogl declaration
 class bitmap_info_ogl : public gnash::bitmap_info
@@ -73,6 +75,20 @@ public:
 };
 
 // static GLint iquad[] = {-1, 1, 1, 1, 1, -1, -1, -1};
+
+#ifdef DEBUG_OPENGL
+static void check_error()
+{
+    GLenum error = glGetError();
+
+    while (error != GL_NO_ERROR) {
+      
+      std::cerr << "OpenGL error: " << (const char*) gluErrorString(error)
+                << std::endl;
+      error = glGetError();
+    }
+}
+#endif // DEBUG_OPENGL
 
 class render_handler_ogl : public gnash::triangulating_render_handler
 {
@@ -462,7 +478,7 @@ public:
 	}
 
     void	begin_display(
-	const gnash::rgba& background_color,
+	const gnash::rgba& bg_color,
 	int viewport_x0, int viewport_y0,
 	int viewport_width, int viewport_height,
 	float x0, float x1, float y0, float y1)
@@ -477,25 +493,18 @@ public:
 	    glPushMatrix();
 	    glOrtho(x0, x1, y0, y1, -1, 1);
 
-	    glEnable(GL_BLEND);
-	    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);	// GL_MODULATE
-
-	    glDisable(GL_TEXTURE_2D);
-
 	    // Clear the background, if background color has alpha > 0.
-	    if (background_color.m_a > 0)
-		{
-		    // Draw a big quad.
-		    apply_color(background_color);
-		    glBegin(GL_QUADS);
-		    glVertex2f(x0, y0);
-		    glVertex2f(x1, y0);
-		    glVertex2f(x1, y1);
-		    glVertex2f(x0, y1);
-		    glEnd();
-		}
+	    if (bg_color.m_a > 0)
+	    {
+	        // Setup the clearing color.
+            	glClearColor(bg_color.m_r / 255, bg_color.m_g / 255, bg_color.m_b / 255, 
+	 	             bg_color.m_a / 255);
+		glClear(GL_COLOR_BUFFER_BIT);
+	    }
+
+#ifdef DEBUG_OPENGL
+	    check_error();
+#endif
 
 	    // Markus: Implement anti-aliasing here...
 #if 0
@@ -563,8 +572,12 @@ else {
 	// Clean up after rendering a frame.  Client program is still
 	// responsible for calling glSwapBuffers() or whatever.
 	{
-//	    GNASH_REPORT_FUNCTION;
-	    
+//	    GNASH_REPORT_FUNCTION
+
+#ifdef DEBUG_OPENGL
+	    check_error();
+#endif // DEBUG_OPENGL
+
 	    glPopMatrix();
 	}
 
@@ -1317,7 +1330,7 @@ gnash::render_handler*	gnash::create_render_handler_ogl()
 
     // Do some initialisation.
 #define OVERSIZE	1.0f
-    
+ 
     //This makes fonts look nice (actually!)
 #if 0
     glEnable(GL_POLYGON_SMOOTH);
@@ -1341,7 +1354,9 @@ gnash::render_handler*	gnash::create_render_handler_ogl()
 #endif
         
         glMatrixMode(GL_PROJECTION);
+	// Flip the image
         glOrtho(-OVERSIZE, OVERSIZE, OVERSIZE, -OVERSIZE, -1, 1);
+	// Restore the matrix mode to the default.
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         
