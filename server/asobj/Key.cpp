@@ -72,13 +72,11 @@ key_as_object::is_key_down(int code)
 }
 
 void
-key_as_object::set_key_down(int code, uint32_t utf_8)
+key_as_object::set_key_down(int code)
 {
     if (code < 0 || code >= key::KEYCOUNT) return;
 
     m_last_key_pressed = code;
-
-    m_last_unicode = utf_8;
 
     int byte_index = code >> 3;
     int bit_index = code - (byte_index << 3);
@@ -200,11 +198,6 @@ key_as_object::get_last_key_pressed() const
     return m_last_key_pressed;
 }
 
-uint32_t
-key_as_object::get_last_unicode() const
-{
-    return m_last_unicode;
-}
 
 as_value
 key_add_listener(const fn_call& fn)
@@ -250,13 +243,19 @@ key_get_ascii(const fn_call& fn)
 {
     boost::intrusive_ptr<key_as_object> ko = ensureType<key_as_object>(fn.this_ptr);
 
-    if (ko->get_last_key_pressed() < 0 ) return as_value();
+    int code = ko->get_last_key_pressed();
+    if (code < 0)
+        return as_value();
 
-    int utf8 = ko->get_last_unicode();
+    // @@ Crude for now; just jamming the key code in a string, as a character.
+    // Need to apply shift/capslock/numlock, etc...
+    char    buf[2];
+    buf[0] = (char) code;
+    buf[1] = 0;
 
-    if (utf8 < 0 || utf8 > 255) return as_value();
+    log_unimpl("Key.getAscii partially implemented");
 
-    return as_value(int(utf8));
+    return as_value(buf);
 }
 
 // Returns the keycode of the last key pressed.

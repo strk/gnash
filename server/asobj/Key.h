@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 
-/* $Id: Key.h,v 1.25 2007/09/12 08:25:38 bwy Exp $ */
+/* $Id: Key.h,v 1.26 2007/09/12 10:57:06 bwy Exp $ */
 
 #ifndef __KEY_H__
 #define __KEY_H__
@@ -63,7 +63,6 @@ private:
 #endif
 
 	int	m_last_key_pressed;
-	uint32_t m_last_unicode;
 
 protected:
 
@@ -82,7 +81,7 @@ public:
 
 	bool is_key_down(int code);
 
-	void set_key_down(int code, uint32_t utf_8);
+	void set_key_down(int code);
 
 	void set_key_up(int code);
 	
@@ -103,8 +102,6 @@ public:
 #endif
 
 	int get_last_key_pressed() const;
-
-	uint32_t get_last_unicode() const;
 
 };
 

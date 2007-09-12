@@ -312,11 +312,11 @@ Gui::notify_mouse_clicked(bool mouse_pressed, int mask)
 }
 
 void
-Gui::notify_key_event(gnash::key::code k, uint32_t utf_8, int modifier, bool pressed) 
+Gui::notify_key_event(gnash::key::code k, int modifier, bool pressed) 
 {
 	movie_root* m = get_current_root();
 
-	if ( m->notify_key_event(k, utf_8, pressed) )
+	if ( m->notify_key_event(k, pressed) )
 	{
 		// any action triggered by the
 		// event required screen refresh

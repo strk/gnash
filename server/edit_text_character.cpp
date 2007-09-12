@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: edit_text_character.cpp,v 1.111 2007/09/12 08:25:37 bwy Exp $ */
+/* $Id: edit_text_character.cpp,v 1.112 2007/09/12 10:57:05 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -586,15 +586,13 @@ edit_text_character::on_event(const event_id& id)
 		case event_id::KEY_PRESS:
 		{
 			std::string s(_text);
-			int c;
-			std::string uc;
-			c = id.m_key_code;
-			uc = (char) id.m_unicode;
+			std::string c;
+			c = (char) id.m_key_code;
 
 			// may be _text is changed in ActionScript
 			m_cursor = imin(m_cursor, _text.size());
 
-			switch (c)
+			switch (c[0])
 			{
 				case key::BACKSPACE:
 					if (m_cursor > 0)
@@ -642,7 +640,7 @@ edit_text_character::on_event(const event_id& id)
 
 				default:
 				{
-					s.insert(m_cursor, uc);
+					s.insert(m_cursor, c);
 					m_cursor++;
 					set_text_value(s.c_str());
 					break;

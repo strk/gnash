@@ -95,15 +95,13 @@ public:
 
 	id_code	m_id;
 	unsigned char	m_key_code;
-	uint32_t m_unicode;
 
-	event_id() : m_id(INVALID), m_key_code(key::INVALID), m_unicode(0) {}
+	event_id() : m_id(INVALID), m_key_code(key::INVALID) {}
 
-	event_id(id_code id, key::code c = key::INVALID, uint32_t utf_8 = 0)
+	event_id(id_code id, key::code c = key::INVALID)
 		:
 		m_id(id),
-		m_key_code((unsigned char) c),
-		m_unicode ((uint32_t) utf_8)
+		m_key_code((unsigned char) c)
 	{
 		// you must supply a key code for KEY_PRESS event
 		// 

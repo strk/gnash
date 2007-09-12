@@ -334,7 +334,7 @@ MovieTester::click()
 void
 MovieTester::pressKey(key::code code)
 {
-	if ( _movie_root->notify_key_event(code, 0, true) )
+	if ( _movie_root->notify_key_event(code, true) )
 	{
 		render();
 	}
@@ -343,7 +343,7 @@ MovieTester::pressKey(key::code code)
 void
 MovieTester::releaseKey(key::code code)
 {
-	if ( _movie_root->notify_key_event(code, 0, false) )
+	if ( _movie_root->notify_key_event(code, false) )
 	{
 		render();
 	}
