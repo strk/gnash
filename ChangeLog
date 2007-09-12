@@ -1,3 +1,13 @@
+2007-09-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk.cpp: pass unicode of key event when notifying gui.
+	* gui/gui.{cpp,h}: pass unicode to movie_root.
+	* server/movie_root{cpp,h}: notify key listeners of unicode.
+	* server/event_id.h: add m_unicode.
+	* server/asobj/Key.{cpp,h}: fix getAscii().
+	* server/edit_text_character.cpp: read unicode, not swf keycode.
+	* testsuite/MovieTester{cpp,h}: update notify_key_event test.
+
 2007-09-12 Chad Musick <chadmusick@msbx.net>
 
 	* server/as_value.cpp: Move test to silence compiler warnings.

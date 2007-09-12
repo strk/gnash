@@ -182,7 +182,7 @@ public:
     /// @param pressed Determines whether the key is being
     ///           pressed (true) or being released (false)
     ///
-    void notify_key_event(gnash::key::code k, int modifier, bool pressed);
+    void notify_key_event(gnash::key::code k, uint32_t utf_8, int modifier, bool pressed);
 
     /// Resize the client area view and the window accordingly.
     //

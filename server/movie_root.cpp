@@ -290,7 +290,7 @@ movie_root::getKeyObject()
 
 
 key_as_object *
-movie_root::notify_global_key(key::code k, bool down)
+movie_root::notify_global_key(key::code k, uint32_t utf_8, bool down)
 {
 	VM& vm = VM::get();
 	if ( vm.getSWFVersion() < 5 )
@@ -302,7 +302,7 @@ movie_root::notify_global_key(key::code k, bool down)
 	boost::intrusive_ptr<key_as_object> keyobject = getKeyObject();
 	if ( keyobject )
 	{
-		if (down) _keyobject->set_key_down(k);
+		if (down) _keyobject->set_key_down(k, utf_8);
 		else _keyobject->set_key_up(k);
 	}
 	else
@@ -314,17 +314,17 @@ movie_root::notify_global_key(key::code k, bool down)
 }
 
 bool
-movie_root::notify_key_event(key::code k, bool down)
+movie_root::notify_key_event(key::code k, uint32_t utf_8, bool down)
 {
 //GNASH_REPORT_FUNCTION;
 
 	//
 	// First of all, notify the _global.Key object about key event
 	//
-	key_as_object * global_key = notify_global_key(k, down);
+	key_as_object * global_key = notify_global_key(k, utf_8, down);
 
 	// Notify character key listeners.
-	notify_key_listeners(k, down);
+	notify_key_listeners(k, utf_8, down);
 
 #ifndef NEW_KEY_LISTENER_LIST_DESIGN
 	// Notify both character and non-character Key listeners
@@ -794,7 +794,7 @@ void movie_root::cleanup_key_listeners()
 #endif
 }
 
-void movie_root::notify_key_listeners(key::code k, bool down)
+void movie_root::notify_key_listeners(key::code k, uint32_t utf_8, bool down)
 {
     //log_msg("Notifying " SIZET_FMT " keypress listeners", _keyListeners.size());
 
@@ -824,7 +824,7 @@ void movie_root::notify_key_listeners(key::code k, bool down)
                     }
                 }
                 // invoke onClipKeyPress handler
-                ch->on_event(event_id(event_id::KEY_PRESS, k));
+                ch->on_event(event_id(event_id::KEY_PRESS, k, utf_8));
             }
             else
             {
@@ -922,7 +922,7 @@ void movie_root::cleanup_key_listeners()
 #endif
 }
 
-void movie_root::notify_key_listeners(key::code k, bool down)
+void movie_root::notify_key_listeners(key::code k, uint32_t utf_8, bool down)
 {
 	log_msg("Notifying " SIZET_FMT " keypress listeners", 
 		m_key_listeners.size());

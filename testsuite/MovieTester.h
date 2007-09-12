@@ -197,7 +197,7 @@ public:
 	//
 	/// See key codes in namespace gnash::key (gnash.h)
 	///
-	void pressKey(key::code k);
+	void pressKey(key::code k, uint32_t utf_8);
 
 	/// Notify key release
 	//

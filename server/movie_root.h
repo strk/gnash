@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.71 2007/09/01 01:20:46 strk Exp $ */
+/* $Id: movie_root.h,v 1.72 2007/09/12 08:25:38 bwy Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -332,7 +332,7 @@ public:
     /// by the event requires redraw, see \ref events_handling for
     /// more info.
     ///
-    bool notify_key_event(key::code k, bool down);
+    bool notify_key_event(key::code k, uint32_t utf_8, bool down);
 
     /// \brief
     /// Use this to retrieve the last state of the mouse, as set via
@@ -477,7 +477,7 @@ public:
     void * get_userdata() { return m_userdata; }
     void set_userdata(void * ud ) { m_userdata = ud;  }
 
-    DSOEXPORT void notify_key_listeners(key::code k, bool down);
+    DSOEXPORT void notify_key_listeners(key::code k, uint32_t utf_8, bool down);
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
     // Push a new key listener to the container if it is not there,
     // otherwise, just register it.
@@ -556,7 +556,7 @@ private:
     void executeTimers();
 
     /// Notify the global Key ActionScript object about a key status change
-    key_as_object * notify_global_key(key::code k, bool down);
+    key_as_object * notify_global_key(key::code k, uint32_t utf_8, bool down);
     
     /// Remove all listeners with a ref-count of 1
     /// (only referenced as key listeners)

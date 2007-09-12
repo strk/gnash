@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: gtk.cpp,v 1.107 2007/09/11 15:35:42 bwy Exp $ */
+/* $Id: gtk.cpp,v 1.108 2007/09/12 08:25:37 bwy Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1518,7 +1518,7 @@ GtkGui::key_press_event(GtkWidget *const /*widget*/,
     int mod = gdk_to_gnash_modifier(event->state);
     
     if (c != gnash::key::INVALID) {
-        gui->notify_key_event(c, mod, true);
+        gui->notify_key_event(c, gdk_keyval_to_unicode(event->keyval), mod, true);
     }
         
     return true;
@@ -1539,7 +1539,7 @@ GtkGui::key_release_event(GtkWidget *const /*widget*/,
     int mod = gdk_to_gnash_modifier(event->state);
     
     if (c != gnash::key::INVALID) {
-        gui->notify_key_event(c, mod, false);
+        gui->notify_key_event(c, gdk_keyval_to_unicode(event->keyval), mod, false);
     }
     
     return true;
