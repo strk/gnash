@@ -1,3 +1,9 @@
+2007-09-12 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/vm/ASHandlers.cpp: drop parse_path for ActionCallFunction, it's
+	  unnecessary and has case sensitiviness issue.
+	* testsuite/misc-ming.all/callFunction_test.c: two more passes.
+	
 2007-09-12 Chad Musick <chadmusick@msbx.net>
 
 	* server/as_value.cpp,h: Add exception types to as_value.

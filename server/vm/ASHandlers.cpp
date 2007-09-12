@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.129 2007/09/11 22:03:05 cmusick Exp $ */
+/* $Id: ASHandlers.cpp,v 1.130 2007/09/12 05:04:16 zoulunkai Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -2407,81 +2407,75 @@ void
 SWFHandlers::ActionCallFunction(ActionExec& thread)
 {
 //        GNASH_REPORT_FUNCTION;
-	as_environment& env = thread.env;
-        string function_name;
+    as_environment& env = thread.env;
+    string function_name;
 
-	thread.ensureStack(2); // func name, nargs
+    thread.ensureStack(2); // func name, nargs
 
-	//cerr << "At ActionCallFunction enter:"<<endl;
-	//env.dump_stack();
+    //cerr << "At ActionCallFunction enter:"<<endl;
+    //env.dump_stack();
 
-	// Let's consider it a as a string and lookup the function.
-        const std::string& funcname = env.top(0).to_string(&env);
+    // Let's consider it a as a string and lookup the function.
+    const std::string& funcname = env.top(0).to_string(&env);
+    as_object* this_ptr = thread.getThisPointer();
 
-        as_value function;
+    as_value function = thread.getVariable(funcname, &this_ptr);
 
-        as_object* this_ptr = thread.getThisPointer();
-        if ( ! env.parse_path(funcname, &this_ptr, function) )
+    if ( ! function.is_object() )
+    {
+        IF_VERBOSE_ASCODING_ERRORS (
+        log_aserror(_("ActionCallFunction: %s is not an object"), env.top(0).to_string(&env).c_str());
+        )
+    }
+    else if ( ! function.is_function() )
+    {
+        // Calling super ? 
+        boost::intrusive_ptr<as_object> obj = function.to_object();
+            this_ptr = thread.getThisPointer();
+        if ( ! obj->get_member("constructor", &function) )
         {
-                //function = thread.getVariable(funcname);
-                function = thread.getVariable(funcname, &this_ptr);
+            IF_VERBOSE_ASCODING_ERRORS (
+            log_aserror(_("Object doensn't have a constructor"));
+            )
         }
+    }
 
-	if ( ! function.is_object() )
-	{
-		IF_VERBOSE_ASCODING_ERRORS (
-		log_aserror(_("ActionCallFunction: %s is not an object"), env.top(0).to_string(&env).c_str());
-		)
-	}
-	else if ( ! function.is_function() )
-	{
-		// Calling super ? 
-		boost::intrusive_ptr<as_object> obj = function.to_object();
-        	this_ptr = thread.getThisPointer();
-		if ( ! obj->get_member("constructor", &function) )
-		{
-			IF_VERBOSE_ASCODING_ERRORS (
-			log_aserror(_("Object doensn't have a constructor"));
-			)
-		}
-	}
+    // Get number of args, modifying it if not enough values are on the stack.
+    unsigned nargs = unsigned(env.top(1).to_number(&env));
+    unsigned available_args = env.stack_size()-2; // 2 for func name and nargs
+    if ( available_args < nargs )
+    {
+        IF_VERBOSE_MALFORMED_SWF(
+        log_swferror(_("Attempt to call a function with %u arguments "
+            "while only %u are available on the stack."),
+            nargs, available_args);
+        );
+        nargs = available_args;
+    }
 
-	// Get number of args, modifying it if not enough values are on the stack.
-	unsigned nargs = unsigned(env.top(1).to_number(&env));
-	unsigned available_args = env.stack_size()-2; // 2 for func name and nargs
-	if ( available_args < nargs )
-	{
-		IF_VERBOSE_MALFORMED_SWF(
-		log_swferror(_("Attempt to call a function with %u arguments "
-			"while only %u are available on the stack."),
-			nargs, available_args);
-		);
-		nargs = available_args;
-	}
-
-	//log_msg(_("Function's nargs: %d"), nargs);
+    //log_msg(_("Function's nargs: %d"), nargs);
 
 #ifdef USE_DEBUGGER
 //        cerr << "entering function: " << function_name << endl;
-        debugger.callStackPush(function_name);
-	debugger.matchBreakPoint(function_name, true);
+    debugger.callStackPush(function_name);
+    debugger.matchBreakPoint(function_name, true);
 #endif
-	as_value result = call_method(function, &env, this_ptr,
-				  nargs, env.get_top_index() - 2);
+    as_value result = call_method(function, &env, this_ptr,
+                  nargs, env.get_top_index() - 2);
 
-	//log_msg(_("Function's result: %s"), result.to_string(&env));
+    //log_msg(_("Function's result: %s"), result.to_string(&env));
 
-	env.drop(nargs + 1);
-	env.top(0) = result;
+    env.drop(nargs + 1);
+    env.top(0) = result;
 
-	// If the function threw an exception, do so here.
-	if (result.is_exception())
-	{
-		thread.next_pc = thread.stop_pc;
-	}
+    // If the function threw an exception, do so here.
+    if (result.is_exception())
+    {
+        thread.next_pc = thread.stop_pc;
+    }
 
-	//cerr << "After ActionCallFunction:"<<endl;
-	//env.dump_stack();
+    //cerr << "After ActionCallFunction:"<<endl;
+    //env.dump_stack();
 }
 
 void
