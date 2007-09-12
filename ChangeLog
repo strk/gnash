@@ -1,5 +1,7 @@
 2007-09-12 Sandro Santilli <strk@keybit.net>
 
+	* server/vm/ActionExec.cpp: cleanup variables initialization
+	  order.
 	* testsuite/actionscript.all/MovieClip.as: minor tests for
 	  removeMovieClip
 

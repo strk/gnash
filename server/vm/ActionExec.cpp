@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ActionExec.cpp,v 1.43 2007/09/11 22:03:06 cmusick Exp $ */
+/* $Id: ActionExec.cpp,v 1.44 2007/09/12 06:02:14 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -80,14 +80,18 @@ ActionExec::ActionExec(const swf_function& func, as_environment& newEnv, as_valu
 	_function_var(func.isFunction2() ? 2 : 1),
 	_func(&func),
 	_this_ptr(this_ptr),
+	_initial_stack_size(0),
+	_initialCallStackDepth(0),
+	_original_target(0),
+	mTryList(),
+	mReturning(false),
+	_abortOnUnload(false),
 	code(func.getActionBuffer()),
 	pc(func.getStartPC()),
 	stop_pc(pc+func.getLength()),
 	next_pc(pc),
 	env(newEnv),
-	retval(nRetVal),
-	mReturning(false),
-	_abortOnUnload(false)
+	retval(nRetVal)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -115,14 +119,18 @@ ActionExec::ActionExec(const action_buffer& abuf, as_environment& newEnv, bool a
 	_with_stack_limit(7),
 	_function_var(0),
 	_func(NULL),
+	_initial_stack_size(0),
+	_initialCallStackDepth(0),
+	_original_target(0),
+	mTryList(),
+	mReturning(false),
+	_abortOnUnload(abortOnUnloaded),
 	code(abuf),
 	pc(0),
 	stop_pc(code.size()),
 	next_pc(0),
 	env(newEnv),
-	retval(0),
-	mReturning(false),
-	_abortOnUnload(abortOnUnloaded)
+	retval(0)
 {
 	//GNASH_REPORT_FUNCTION;
 
