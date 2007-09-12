@@ -1,3 +1,11 @@
+2007-09-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* gui/gtk.cpp, gui/gui.{cpp,h},server/movie_root{cpp,h}
+	* server/event_id.h, server/asobj/Key.{cpp,h}
+        * server/edit_text_character.cpp
+	* testsuite/MovieTester.cpp: Revert changes because
+	  it causes too many problems. There is a better way.	  
+
 2007-09-12 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Inheritance.as: few more tests (maybe
