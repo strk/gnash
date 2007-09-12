@@ -5,7 +5,7 @@
 
 // A render_handler that uses SDL & OpenGL
 
-/* $Id: render_handler_ogl.cpp,v 1.80 2007/09/12 10:26:09 bjacques Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.81 2007/09/12 12:53:55 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -566,6 +566,32 @@ else {
  		}
 #endif // 0
 	}
+
+    bool getPixel(rgba& color_out, int x, int y)
+    {
+       if (x < 0 || y < 0) {
+         return false;
+       }
+
+       GLint viewport[4];
+       glGetIntegerv( GL_VIEWPORT, viewport);
+       GLint buf_width = viewport[2], buf_height = viewport[3];
+
+       if (x >= buf_width || y >= buf_height) {
+         // X/Y coordinates are outside of the framebuffer.
+         return false;
+       }
+
+       char buf[4];
+
+       // Note that (0,0) in OpenGL is the lower left corner, while in Gnash
+       // it is the top left corner.
+       glReadPixels(x, buf_height - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+
+       color_out.set(buf[0], buf[1], buf[2], buf[3]);
+       return true;
+    }
+
 
 
     void	end_display()

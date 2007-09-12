@@ -1,3 +1,7 @@
+2007-09-12 Bastiaan Jacques <bastiaan@bjacques.org>
+
+	* backend/render_handler_ogl.cpp: Implement getPixel().
+
 2007-09-12 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Inheritance.as: more tests for double
@@ -7,7 +11,7 @@
 
 	* gui/gtk.cpp, gui/gui.{cpp,h},server/movie_root{cpp,h}
 	* server/event_id.h, server/asobj/Key.{cpp,h}
-        * server/edit_text_character.cpp
+	* server/edit_text_character.cpp
 	* testsuite/MovieTester.cpp: Revert changes because
 	  it causes too many problems. There is a better way.	  
 
@@ -16,7 +20,7 @@
 	* testsuite/actionscript.all/Inheritance.as: few more tests (maybe
 	  redundant) for constructor and __constructor__
 
-2007-09-12 Bastiaan Jacques <bastiaan@bjacques.org
+2007-09-12 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_ogl.cpp: Add a debugging function
 	called check_error(), enabled by toggling the DEBUG_OPENGL
