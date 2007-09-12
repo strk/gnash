@@ -1,3 +1,10 @@
+2007-09-12 Chad Musick <chadmusick@msbx.net>
+
+	* server/as_value.cpp: Make sure that exceptions don't
+	  cause asserts, even if they escape into the wild.
+	  (This escape is an error, but perhaps it should not
+	  be fatal.)
+
 2007-09-12 Sandro Santilli <strk@keybit.net>
 
 	* server/vm/ActionExec.cpp: cleanup variables initialization

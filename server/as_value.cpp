@@ -173,8 +173,8 @@ as_value::to_string(as_environment* env) const
 		}
 
 		default:
-			m_string_value = "<bad type> "+m_type;
-			assert(0);
+			m_string_value = "[exception]";
+			break;
     }
     
     return m_string_value;
@@ -378,7 +378,8 @@ as_value::to_bool_v7() const
 		case MOVIECLIP:
 			return true;
 		default:
-			assert(m_type == UNDEFINED || m_type == NULLTYPE);
+			assert(m_type == UNDEFINED || m_type == NULLTYPE ||
+				is_exception());
 			return false;
 	}
 }
@@ -412,7 +413,8 @@ as_value::to_bool_v5() const
 		case MOVIECLIP:
 			return true;
 		default:
-			assert(m_type == UNDEFINED || m_type == NULLTYPE);
+			assert(m_type == UNDEFINED || m_type == NULLTYPE ||
+				is_exception());
 			return false;
 	}
 }
@@ -446,7 +448,8 @@ as_value::to_bool_v6() const
 		case MOVIECLIP:
 			return true;
 		default:
-			assert(m_type == UNDEFINED || m_type == NULLTYPE);
+			assert(m_type == UNDEFINED || m_type == NULLTYPE ||
+				is_exception());
 			return false;
 	}
 }
@@ -488,6 +491,7 @@ as_value::to_object() const
 			return init_boolean_instance(m_boolean_value);
 
 		default:
+			// Invalid to convert exceptions.
 			return NULL;
 	}
 }
@@ -825,6 +829,8 @@ as_value::typeOf() const
 			return "function";
 
 		default:
+			if (is_exception())
+				return "exception";
 			assert(0);
 			return NULL;
 	}
@@ -879,6 +885,8 @@ as_value::equalsSameType(const as_value& v) const
 		}
 
 	}
+	if (is_exception())
+		return false; // Exceptions equal nothing.
 	assert(0);
 	return false;
 }
@@ -927,6 +935,8 @@ as_value::to_debug_string() const
 			return buf;
 		}
 		default:
+			if (is_exception())
+				return "[exception]";
 			assert(0);
 			return NULL;
 	}
@@ -1138,9 +1148,11 @@ as_value::setReachable() const
 {
 #ifdef GNASH_USE_GC
 #ifdef MOVIECLIP_AS_SOFTREF
-	if ( m_type == OBJECT || m_type == AS_FUNCTION )
+	if ( m_type == OBJECT || m_type == AS_FUNCTION ||
+		m_type == OBJECT_EXCEPT)
 #else
-	if ( m_type == OBJECT || m_type == AS_FUNCTION || m_type == MOVIECLIP)
+	if ( m_type == OBJECT || m_type == AS_FUNCTION || m_type == MOVIECLIP
+		|| m_type == OBJECT_EXCEPT)
 #endif
 	{
 		m_object_value->setReachable();
