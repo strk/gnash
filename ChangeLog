@@ -1,3 +1,10 @@
+2007-09-12 Sandro Santilli <strk@keybit.net>
+
+	* server/sprite_instance.cpp (construct): properly initialize
+	  the '__constructor__' and 'constructor' members when a class
+	  was registered with our definition.
+	* testsuite/misc-ming.all/registerClassTest2.c: no more failures here.
+
 2007-09-12 Chad Musick <chadmusick@msbx.net>
 
 	* server/as_value.cpp: Make sure that exceptions don't

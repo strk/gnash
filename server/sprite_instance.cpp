@@ -3364,6 +3364,22 @@ sprite_instance::construct()
 
 		// we don't use the constructor return (should we?)
 		(*ctor)(call);
+
+		int swfversion = _vm.getSWFVersion();
+
+		// Set the '__constructor__' and 'constructor' members
+		// TODO: this would be best done by an as_function::constructInstance()
+		//       method. We have one but it returns a new object rather then
+		//       initializing a given object, we just need to add another one...
+		//
+		if ( swfversion > 5 )
+		{
+			set_member("__constructor__", ctor);
+			if ( swfversion == 6 )
+			{
+				set_member("constructor", ctor);
+			}
+		}
 	}
 }
 

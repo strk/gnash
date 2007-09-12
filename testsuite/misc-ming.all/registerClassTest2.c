@@ -106,11 +106,11 @@ main(int argc, char** argv)
   // succeed in swf7 and swf8
   check_equals(mo, "clip1.constructor", "MovieClip");
 #else if OUTPUT_VERSION == 6
-  xcheck_equals(mo, "clip1.constructor", "theClass1");
+  check_equals(mo, "clip1.constructor", "theClass1");
 #endif
-  xcheck_equals(mo, "clip1.__constructor__", "theClass1");
+  check_equals(mo, "clip1.__constructor__", "theClass1");
   check_equals(mo, "clip2.constructor", "theClass2");
-  xcheck_equals(mo, "clip2.__constructor__", "theClass2");
+  check_equals(mo, "clip2.__constructor__", "theClass2");
   check_equals(mo, "clip1.x", "60");
   check_equals(mo, "clip2.x", "600");
   check_equals(mo, "clip1._x", "0");
