@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: MovieClip.as,v 1.88 2007/09/01 01:20:47 strk Exp $";
+rcsid="$Id: MovieClip.as,v 1.89 2007/09/12 05:43:44 strk Exp $";
 
 #include "check.as"
 
@@ -138,6 +138,9 @@ check_equals(typeof(mc['duplicateMovieClip']), 'function');
     //       be converted to lowercase, so we use the [] hack
     check_equals(typeof(mc['loadMovie']), 'function');
     check_equals(typeof(mc['removeMovieClip']), 'function');
+
+    check(MovieClip.prototype.hasOwnProperty('removeMovieClip'));
+    check(!mc.hasOwnProperty('removeMovieClip'));
 
 #endif // OUTPUT_VERSION >= 6
 

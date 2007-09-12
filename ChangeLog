@@ -1,3 +1,8 @@
+2007-09-12 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/MovieClip.as: minor tests for
+	  removeMovieClip
+
 2007-09-12 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/vm/ASHandlers.cpp: drop parse_path for ActionCallFunction, it's
