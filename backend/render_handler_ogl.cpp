@@ -5,7 +5,7 @@
 
 // A render_handler that uses SDL & OpenGL
 
-/* $Id: render_handler_ogl.cpp,v 1.81 2007/09/12 12:53:55 bjacques Exp $ */
+/* $Id: render_handler_ogl.cpp,v 1.82 2007/09/12 14:51:10 bjacques Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -51,7 +51,7 @@ using namespace gnash;
 // 3 = use image::resample(), slow software resampling
 #define RESAMPLE_METHOD 2
 
-#define DEBUG_OPENGL 0
+//#define DEBUG_OPENGL 1
 
 
 // bitmap_info_ogl declaration
@@ -685,9 +685,10 @@ else {
 	
     void	line_style_width(float width)
 	{
+		float norm_width = std::max(1.0f, width); // TODO: stroke scaling
 
 //	GNASH_REPORT_FUNCTION;
-		if ( width == 1.0 ) // "hairline", see render_handler_tri.h
+		if ( norm_width == 1.0 ) // "hairline", see render_handler_tri.h
 		{
 			glLineWidth(1); // expected: 1 pixel
 		}
@@ -697,8 +698,8 @@ else {
 			// low-width lines well, even with anti-aliasing
 			// enabled
 			// But this is a start (20 TWIPS' width = 1 pixel's)
-			glLineWidth(TWIPS_TO_PIXELS(width));
-			glPointSize(TWIPS_TO_PIXELS(width));
+			glLineWidth(TWIPS_TO_PIXELS(norm_width));
+			glPointSize(TWIPS_TO_PIXELS(norm_width));
 		}
 	}
 
