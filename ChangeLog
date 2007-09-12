@@ -1,3 +1,8 @@
+2007-09-12 Sandro Santilli <strk@keybit.net>
+
+	* server/as_environment.cpp (parse_path): revert zou change as it
+	  breaks callFunction_testrunner (assertion failure).
+
 2007-09-12 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* backend/render_handler_ogl.cpp: Implement getPixel().
