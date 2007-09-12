@@ -2,6 +2,7 @@
 
 	* testsuite/MovieTester{cpp,h}: remove utf8 from keypress,
 	  pass default value.
+	* gui/kde.cpp: Add default value to utf8.
 
 2007-09-12 Zou Lunkai <zoulunkai@gmail.com>
 

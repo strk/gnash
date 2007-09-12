@@ -246,7 +246,7 @@ KdeGui::handleKeyEvent(QKeyEvent *event, bool down)
 {
     gnash::key::code c = qtToGnashKey(event);
     int mod = qtToGnashModifier(event->state());
-    notify_key_event(c, mod, down);
+    notify_key_event(c, 0, mod, down);
 }
 
 void
