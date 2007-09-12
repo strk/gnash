@@ -332,9 +332,9 @@ MovieTester::click()
 }
 
 void
-MovieTester::pressKey(key::code code, uint32_t utf_8)
+MovieTester::pressKey(key::code code)
 {
-	if ( _movie_root->notify_key_event(code, utf_8, true) )
+	if ( _movie_root->notify_key_event(code, 0, true) )
 	{
 		render();
 	}

@@ -1,3 +1,8 @@
+2007-09-12 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* testsuite/MovieTester{cpp,h}: remove utf8 from keypress,
+	  pass default value.
+
 2007-09-12 Zou Lunkai <zoulunkai@gmail.com>
 
 	* server/as_environment.cpp: parse_path() cleanups.
