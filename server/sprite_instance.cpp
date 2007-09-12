@@ -761,17 +761,33 @@ sprite_create_text_field(const fn_call& fn)
 		);
 		return as_value();
 	}
-	float txt_width = fn.arg(4).to_number();
+	float txt_width = fn.arg(4).to_number(&fn.env());
+	if ( txt_width < 0 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_error(_("createTextField: negative width (%g)"
+			" - reverting sign"));
+		);
+		txt_width = -txt_width;
+	}
 
 	if ( ! fn.arg(5).is_number() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error(_("Fifth argument of createTextField is not a number"
-			" - returning undefined"));
+		log_error(_("Sixth argument of createTextField is not a number"
+			" - returning undefined"), txt_width);
 		);
 		return as_value();
 	}
-	float txt_height = fn.arg(5).to_number();
+	float txt_height = fn.arg(5).to_number(&fn.env());
+	if ( txt_height < 0 )
+	{
+		IF_VERBOSE_ASCODING_ERRORS(
+		log_error(_("createTextField: negative height (%g)"
+			" - reverting sign"), txt_height);
+		);
+		txt_height = -txt_height;
+	}
 
 	boost::intrusive_ptr<character> txt = sprite->add_textfield(txt_name,
 			txt_depth, txt_x, txt_y, txt_width, txt_height);

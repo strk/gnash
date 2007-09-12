@@ -1,5 +1,12 @@
 2007-09-12 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (sprite_create_text_field): check for
+	  negative dimensions. Fixes bug #21021.
+	* testsuite/actionscript.all/TextField.as: Add test for negative
+	  dimensions given to createTextField().
+
+2007-09-12 Sandro Santilli <strk@keybit.net>
+
 	* server/asobj/AsBroadcaster.cpp: add support for passing arguments
 	  for broadcasted message handlers.
 	* testsuite/actionscript.all/AsBroadcaster.as: add tests for arguments

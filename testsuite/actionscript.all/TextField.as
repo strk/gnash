@@ -19,7 +19,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: TextField.as,v 1.23 2007/09/05 16:47:55 meteoryte Exp $";
+rcsid="$Id: TextField.as,v 1.24 2007/09/12 16:47:34 strk Exp $";
 
 #include "check.as"
 
@@ -646,5 +646,18 @@ check_equals(tf._width, 10);
 #else
  check(origTextWidth > tf.textWidth); 
 #endif
+
+
+//------------------------------------------------------------
+// Test insane calls
+//------------------------------------------------------------
+
+ret = createTextField("tf2", 99, 5, 6, -1, -2);
+check_equals(typeof(tf2), 'object');
+check_equals(tf2._width, 1);
+check_equals(tf2._height, 2);
+check_equals(tf2._x, 5);
+check_equals(tf2._y, 6);
+
 
 #endif // OUTPUT_VERSION > 5
