@@ -21,7 +21,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: Inheritance.as,v 1.38 2007/09/11 05:58:54 zoulunkai Exp $";
+rcsid="$Id: Inheritance.as,v 1.39 2007/09/12 10:46:06 strk Exp $";
 
 #include "check.as"
 
@@ -189,6 +189,10 @@ BaseClass.prototype.sayHello = function () {
 };
 function DerivedClass() {}
 DerivedClass.prototype = new BaseClass();
+check_equals(typeof(DerivedClass.prototype.__constructor__), 'function');
+check(DerivedClass.prototype.hasOwnProperty('__constructor__'));
+check_equals(DerivedClass.prototype.__constructor__, BaseClass);
+check(DerivedClass.prototype.__constructor__ != DerivedClass);
 DerivedClass.prototype.sayHello = function () {
   return "Hello from DerivedClass"; 
 };
