@@ -3037,36 +3037,13 @@ sprite_instance::can_handle_mouse_event() const
 		
 void sprite_instance::restart()
 {
-	//GNASH_REPORT_FUNCTION;
-
-    m_current_frame = 0;
-
-    m_has_looped = false;
-    m_play_state = PLAY;
-
 	// Stop all sounds
 	sound_handler* sh = get_sound_handler();
 	if (sh != NULL) sh->stop_all_sounds();
 
-    // We're about to reset the displayList,
-    // so take note of the current bounds
-    // for the renderer to know what to 
-    // redraw.
-    set_invalidated(); 
+	restoreDisplayList(0); // seems OK to me.
 
-    // Clear current display list and 
-    // its backup
-    m_display_list.clear();
-
-    // TODO: wipe out all members !!
-    clearProperties();
-
-    // Construct the sprite again
-    construct();
-    
-    // re-assign standard properties
-    attachMovieClipProperties(*this);
-
+	m_play_state = PLAY;
 }
 
 character*

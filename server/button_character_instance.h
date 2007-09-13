@@ -21,7 +21,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.24 2007/09/13 15:41:49 strk Exp $ */
+/* $Id: button_character_instance.h,v 1.25 2007/09/13 16:26:13 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -129,8 +129,6 @@ public:
 	virtual character* get_relative_target(const std::string& name);
 
 	virtual void	on_button_event(const event_id& event);
-
-	void restart_characters(int condition);
 
 	//
 	// ActionScript overrides

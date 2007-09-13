@@ -1,5 +1,15 @@
 2007-09-13 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.cpp (restart): don't call construct again, to
+	  avoid re-registering with the global instance list.
+	* server/movie_root.h (addLiveChar): assert the character being
+	  registered is not already in the list
+	* server/button_character_instance.{cpp,h}: remove dead code
+	  (restart_characters); (construct): don't call restart right
+	  after construct.
+
+2007-09-13 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.cpp: cleanup debugging of ever growing list
 
 2007-09-13 Sandro Santilli <strk@keybit.net>

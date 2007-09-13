@@ -593,9 +593,6 @@ button_character_instance::on_button_event(const event_id& event)
 	//IDLE_TO_OVER_DOWN = 1 << 7,
 	//OVER_DOWN_TO_IDLE = 1 << 8,
 
-	// restart the characters of the new state.
-	//restart_characters(c);  --> <Udo> done by set_current_state() now
-
 	// From: "ActionScript - The Definiteve Guide" by Colin Moock
 	// (chapter 10: Events and Event Handlers)
 
@@ -715,40 +712,6 @@ button_character_instance::set_current_state(e_mouse_state new_state)
 	// effectively change state
 	m_mouse_state=new_state;
 	 
-}
-
-void
-button_character_instance::restart_characters(int condition)
-{
-	// Restart our relevant characters
-	for (size_t i = 0; i < m_def->m_button_records.size(); i++)
-	{
-		bool	restart = false;
-		button_record* rec = &m_def->m_button_records[i];
-
-		switch (m_mouse_state)
-		{
-		case OVER:
-		{
-			if ((rec->m_over) && (condition & button_action::IDLE_TO_OVER_UP))
-			{
-				restart = true;
-			}
-			break;
-		}
-		// @@ Hm, are there other cases where we restart stuff?
-		default:
-		{
-			break;
-		}
-		}
-
-		if (restart == true)
-		{
-			assert(m_record_character.size() > i);
-			m_record_character[i]->restart();
-		}
-	}
 }
 
 //
@@ -885,8 +848,6 @@ button_character_instance::construct()
 			ch->set_name(instance_name.c_str());
 		}
 
-		ch->restart();
-		
 	}
 
 	// does a CONSTRUCT event even exist ?

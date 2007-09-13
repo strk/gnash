@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.75 2007/09/13 14:39:21 strk Exp $ */
+/* $Id: movie_root.h,v 1.76 2007/09/13 16:26:13 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -574,6 +574,8 @@ public:
     ///
     void addLiveChar(boost::intrusive_ptr<character> ch)
     {
+	// Don't register the object in the list twice 
+	assert(std::find(_liveChars.begin(), _liveChars.end(), ch) == _liveChars.end());
         _liveChars.push_front(ch);
     }
 
