@@ -1,5 +1,20 @@
 2007-09-13 Sandro Santilli <strk@keybit.net>
 
+	* server/button_character_instance.{cpp,h}: implement unload() in an
+	  attempt to properly mark as unloaded any character registered in the
+	  global instance list (could happen for child sprites).
+	* server/movie_root.cpp (markReachableResources): mark all characters
+	  in the _liveChars. This makes Gnash more robust, but hides a problem
+	  with the global instance list always growing. A proper fix would be
+	  making sure that for *all* characters removed from a displaylist the
+	  character::unload() is called, which marks the character as unloaded
+	  and thus removes it from the global instance list. The change above
+	  to button_character_instance seems not enough. I left debugging
+	  output here so you can see how the list keeps growing.
+
+
+2007-09-13 Sandro Santilli <strk@keybit.net>
+
 	* server/movie_root.{cpp,h} (restart): properly cleanup
 	  action queue and instances list, reset levels so that
 	  only _level0 is kept. Still not 100% correct but fixes

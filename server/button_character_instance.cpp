@@ -913,6 +913,25 @@ button_character_instance::markReachableResources() const
 }
 #endif // GNASH_USE_GC
 
+bool
+button_character_instance::unload()
+{
+	bool childsHaveUnload = false;
+
+	// We need to unload all childs, or the global instance list will keep growing forever !
+	//std::for_each(m_record_character.begin(), m_record_character.end(), boost::bind(&character::unload, _1));
+	for (CharsVect::iterator i=m_record_character.begin(), e=m_record_character.end(); i!=e; ++i)
+	{
+		boost::intrusive_ptr<character> ch = *i;
+		if ( ch->unload() ) childsHaveUnload = true;
+		//log_debug("Button child %s (%s) unloaded", ch->getTarget().c_str(), typeName(*ch).c_str());
+	}
+
+	bool hasUnloadEvent = character::unload();
+
+	return hasUnloadEvent || childsHaveUnload;
+}
+
 } // end of namespace gnash
 
 

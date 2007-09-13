@@ -21,7 +21,7 @@
 
 // SWF buttons.  Mouse-sensitive update/display, actions, etc.
 
-/* $Id: button_character_instance.h,v 1.23 2007/07/01 10:54:21 bjacques Exp $ */
+/* $Id: button_character_instance.h,v 1.24 2007/09/13 15:41:49 strk Exp $ */
 
 #ifndef GNASH_BUTTON_CHARACTER_INSTANCE_H
 #define GNASH_BUTTON_CHARACTER_INSTANCE_H
@@ -150,6 +150,9 @@ public:
 	
 	/// Properly initialize instance names for contained sprites
 	virtual void construct();
+
+	/// Properly unload contained characters
+	bool unload();
 
 protected:
 
