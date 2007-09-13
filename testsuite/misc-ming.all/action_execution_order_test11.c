@@ -233,10 +233,10 @@ main(int argc, char** argv)
   SWFMovie_nextFrame(mo); // _root frame7
   
   check_equals(mo, "_root.loadOrder", "'0+1+2+3+4+5+'");
-  xcheck_equals(mo, "_root.enterFrameOrder", "'0+2+1+3+2+1+4+3+2+1+5+4+3+2+1+'");
+  check_equals(mo, "_root.enterFrameOrder", "'0+2+1+3+2+1+4+3+2+1+5+4+3+2+1+'");
   check_equals(mo, "_root.unloadOrder", "'0+1+2+3+4+5+'");
-  xcheck_equals(mo, "_root.doActionOrder", "'0+1+2+3+4+5+'");
-  xcheck_equals(mo, "_root.asOrder", "'0+1+2+3+4+5+6+3+8+4+10+6+3+4+14+15+25+10+26+6+27+3+28+4+29+20+21+22+23+24+'");
+  check_equals(mo, "_root.doActionOrder", "'0+1+2+3+4+5+'");
+  check_equals(mo, "_root.asOrder", "'0+1+2+3+4+5+6+3+8+4+10+6+3+4+14+15+25+10+26+6+27+3+28+4+29+20+21+22+23+24+'");
   add_actions(mo, " _root.totals(); stop(); ");
   SWFMovie_nextFrame(mo); // _root frame8
   

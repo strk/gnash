@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: movie_root.h,v 1.73 2007/09/12 10:57:05 bwy Exp $ */
+/* $Id: movie_root.h,v 1.74 2007/09/13 13:57:49 strk Exp $ */
 
 /// \page events_handling Handling of user events
 ///
@@ -440,9 +440,23 @@ public:
     /// Restart all levels
     void restart();
 
+    /// Entry point for movie advancement
+    //
+    /// This function does:
+    ///     - Execute all timers
+    ///     - Reset the next Random number
+    ///     - Advance all advanceable characters in reverse-placement order
+    ///     - Cleanup key listeners
+    ///     - Process all queued actions
+    ///     - Remove unloaded characters from the advanceable characters list.
+    ///     - Run the GC collector
+    ///
     void advance(float delta_time);
 
     /// 0-based!! delegates to _level0
+    //
+    /// TODO: drop this method ?
+    ///
     void goto_frame(size_t target_frame_number)
     {
         getLevel(0)->goto_frame(target_frame_number);
@@ -544,7 +558,35 @@ public:
     void markReachableResources() const;
 #endif // GNASH_USE_GC
 
+    /// \brief
+    /// Register a newly born advanceable character to the
+    /// list of characters to be advanced on next ::advance call.
+    //
+    /// The character will only be advanced if not unloaded when
+    /// its turn comes. Characters are advanced in reverse-placement
+    /// order (first registered is advanced last)
+    ///
+    void addLiveChar(boost::intrusive_ptr<character> ch)
+    {
+        _liveChars.push_front(ch);
+    }
+
 private:
+
+    /// An element of the advanceable characters
+    typedef boost::intrusive_ptr<character> AdvanceableCharacter;
+
+    /// A list of AdvanceableCharacters
+    //
+    /// This is a list (not a vector) as we want to allow
+    /// ::advance of each element to insert new characters before
+    /// the start w/out invalidating iterators scanning the
+    /// list forward for proper movie advancement
+    ///
+    typedef std::list<AdvanceableCharacter> LiveChars;
+
+    /// The list of advanceable character, in placement order
+    LiveChars _liveChars;
 
     /// Forbid copy 
     movie_root(const movie_root& ) { assert(0); }
@@ -666,15 +708,23 @@ private:
     ///
     character* getTopmostMouseEntity(float x, float y);
 
-    // Advance all levels
-    void advanceAllLevels(float delta_time);
-
     /// Delete characters removed from the stage
     /// from the display lists
     void cleanupDisplayList();
 
-    // Advance a given level
-    void advanceMovie(boost::intrusive_ptr<sprite_instance> movie, float delta_time);
+    /// Advance a live character
+    //
+    /// @param ch
+    ///     The character to advance, will NOT be advanced if unloaded
+    ///
+    /// @param delta_time
+    ///     A left-over parameter from the ancient times... will be forwarded
+    ///     to the calls to ::advance
+    ///
+    static void advanceLiveChar(boost::intrusive_ptr<character> ch, float delta_time);
+
+    /// Advance all non-unloaded live chars
+    void advanceLiveChars(float delta_time);
 
     /// Put the given movie at the given level 
     //

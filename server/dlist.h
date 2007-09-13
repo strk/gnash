@@ -212,7 +212,6 @@ public:
 	void clear()
 	{
 		_charsByDepth.clear();
-		_timelineChars.clear();
 	}
 
 	/// Unload the characters in this DisplayList removing
@@ -307,9 +306,6 @@ public:
 		clear();
 	}
 
-	/// advance referenced characters, by reverse-placement order
-	void advance(float delta_time);
-
 	/// \brief
 	/// Display the referenced characters.
 	/// Lower depths are obscured by higher depths.
@@ -387,10 +383,6 @@ public:
 	template <class V>
 	inline void visitAll(V& visitor) const;
 
-	/// Visit each and all character in the list in reverse-placement order
-	template <class V>
-	inline void visitByReversePlacement(V& visitor) const;
-
 	/// dump list to logfile/stderr
 	void dump() const;
 
@@ -464,10 +456,6 @@ private:
 
 	container_type _charsByDepth;
 
-	// Stored by placement order (first placed first)
-	container_type _timelineChars;
-
-
 };
 
 template <class V>
@@ -514,18 +502,6 @@ DisplayList::visitAll(V& visitor) const
 {
 	for (const_iterator it = _charsByDepth.begin(),
 			itEnd = _charsByDepth.end();
-		it != itEnd; ++it)
-	{
-		visitor(it->get());
-	}
-}
-
-template <class V>
-void
-DisplayList::visitByReversePlacement(V& visitor) const
-{
-	for (const_iterator it = _timelineChars.begin(),
-			itEnd = _timelineChars.end();
 		it != itEnd; ++it)
 	{
 		visitor(it->get());

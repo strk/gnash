@@ -859,6 +859,9 @@ button_character_instance::get_relative_target(const std::string& name)
 void
 button_character_instance::construct()
 {
+    // Register this button instance as a live character
+    _vm.getRoot().addLiveChar(this);
+
 	size_t r, r_num =  m_def->m_button_records.size();
 	m_record_character.resize(r_num);
 

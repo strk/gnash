@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_instance.h,v 1.19 2007/09/07 22:24:41 strk Exp $
+// $Id: video_stream_instance.h,v 1.20 2007/09/13 13:57:49 strk Exp $
 
 #ifndef GNASH_VIDEO_STREAM_INSTANCE_H
 #define GNASH_VIDEO_STREAM_INSTANCE_H
@@ -58,7 +58,13 @@ public:
 		return m_def->get_bound().getRange();
 	}
 
+	/// We use the call to ::advance to properly set invalidated status
 	virtual void	advance(float delta_time);
+
+	/// construct is needed to register this instance as an "advanceable" character
+	/// with movie_root
+	virtual void construct();
+
 	void	display();
 
 	// For sure isActionScriptReferenceable...

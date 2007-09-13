@@ -41,6 +41,7 @@
 #include <typeinfo>
 #include <cassert>
 #include <boost/algorithm/string/case_conv.hpp>
+#include <boost/bind.hpp>
 
 using namespace std;
 
@@ -670,7 +671,9 @@ movie_root::advance(float delta_time)
 	// 2. by different machines the random gave different numbers
 	tu_random::next_random();
 			
-	advanceAllLevels(delta_time);
+	// Advance all non-unloaded characters in the LiveChars list
+	// in reverse order (last added, first advanced)
+	advanceLiveChars(delta_time);
 
 #ifdef NEW_KEY_LISTENER_LIST_DESIGN
 	cleanup_key_listeners();
@@ -1181,6 +1184,15 @@ movie_root::markReachableResources() const
 
 	// Mark global key object
 	if ( _keyobject ) _keyobject->setReachable();
+
+    // TODO: check if we need to mark _liveChars too
+    //       it should be checked that all characters there
+    //       are NOT unloaded as GC collector is run *after*
+    //       cleanup of the list (supposedly).
+    //       Also, it's likely that any non-unloaded character
+    //       will be also marked as reachable by scanning the
+    //       DisplayList...
+    //
 }
 #endif // GNASH_USE_GC
 
@@ -1196,51 +1208,58 @@ movie_root::getTopmostMouseEntity(float x, float y)
 }
 
 void
-movie_root::advanceAllLevels(float delta_time)
-{
-	// scan a backup copy of the levels, so that movies advancement won't
-	// invalidate iterators
-	Levels cached = _movies;
-	for (Levels::reverse_iterator i=cached.rbegin(), e=cached.rend(); i!=e; ++i)
-	{
-		advanceMovie(i->second, delta_time);
-	}
-}
-
-void
 movie_root::cleanupDisplayList()
 {
-	// scan a backup copy of the levels, so that movies advancement won't
-	// invalidate iterators
-	Levels cached = _movies;
-	for (Levels::reverse_iterator i=cached.rbegin(), e=cached.rend(); i!=e; ++i)
+	// Remove unloaded characters from the _liveChars list
+	_liveChars.remove_if(boost::bind(&character::isUnloaded, _1));
+
+	// Let every sprite cleanup the local DisplayList
+        //
+        // TODO: we might skip this additinal scan by delegating
+        //       cleanup of the local DisplayLists in the ::display
+        //       method of each sprite, but that will introduce 
+        //       problems when we'll implement skipping ::display()
+        //       when late on FPS. Alternatively we may have the
+        //       sprite_instance::markReachableResources take care
+        //       of cleaning up unloaded... but that will likely
+        //       introduce problems when allowing the GC to run
+        //       at arbitrary times.
+        //       The invariant to keep is that cleanup of unloaded characters
+        //       in local display lists must happen at the *end* of global action
+        //       queue processing.
+        //
+        for (Levels::reverse_iterator i=_movies.rbegin(), e=_movies.rend(); i!=e; ++i)
+        {
+                i->second->cleanupDisplayList();
+        }
+}
+
+/*static private*/
+void
+movie_root::advanceLiveChar(boost::intrusive_ptr<character> ch, float delta_time)
+{
+	if ( ! ch->isUnloaded() )
 	{
-		i->second->cleanupDisplayList();
+#ifdef GNASH_DEBUG
+		log_debug("    advancing character %s", ch->getTarget().c_str());
+#endif
+		ch->advance(delta_time);
 	}
+#ifdef GNASH_DEBUG
+	else {
+		log_debug("    character %s is unloaded, not advancing it", ch->getTarget().c_str());
+	}
+#endif
 }
 
 void
-movie_root::advanceMovie(boost::intrusive_ptr<sprite_instance> movie, float delta_time)
+movie_root::advanceLiveChars(float delta_time)
 {
 #ifdef GNASH_DEBUG
-	size_t totframes = movie->get_frame_count();
-	size_t prevframe = movie->get_current_frame();
+	log_debug("---- movie_root::advance: %d live characters in the global list", _liveChars.size());
 #endif
 
-	movie->advance(delta_time);
-
-#ifdef GNASH_DEBUG
-	size_t curframe = movie->get_current_frame();
-
-	log_msg("movie_root::advance advanced level %d movie from "
-			SIZET_FMT "/" SIZET_FMT
-			" to " SIZET_FMT "/" SIZET_FMT
-			" (movie is %s%s)",
-			movie->get_depth(), prevframe, totframes, curframe, totframes,
-			typeName(*movie).c_str(),
-			movie->get_play_state() == sprite_instance::STOP ? " - now in STOP mode" : "");
-#endif
-
+	std::for_each(_liveChars.begin(), _liveChars.end(), boost::bind(advanceLiveChar, _1, delta_time));
 }
 
 } // namespace gnash

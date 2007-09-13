@@ -1692,26 +1692,6 @@ public:
 	}
 };
 
-/// A DisplayList visitor used to advance all non-unloaded characters
-class AdvancerVisitor {
-
-	float delta_time;
-
-public:
-	AdvancerVisitor(float dt)
-		:
-		delta_time(dt)
-	{}
-
-	void operator() (character* ch)
-	{
-		// don't advance unloaded characters
-		if ( ! ch->isUnloaded() ) ch->advance(delta_time);
-	}
-
-};
-
-
 //------------------------------------------------
 // sprite_instance
 //------------------------------------------------
@@ -2262,7 +2242,7 @@ void sprite_instance::set_member(const std::string& name,
 
 }
 
-void sprite_instance::advance_sprite(float delta_time)
+void sprite_instance::advance_sprite(float /*delta_time*/)
 {
 	//GNASH_REPORT_FUNCTION;
 
@@ -2282,17 +2262,6 @@ void sprite_instance::advance_sprite(float delta_time)
 		getTarget().c_str(), m_current_frame,
 		frame_count);
 #endif
-
-	// Advance DisplayList elements already placed (even if looping back ?)
-	{
-#ifdef GNASH_DEBUG
-		log_debug("Advancing %d childs of sprite %s in current DisplayList:", m_display_list.size(), getTarget().c_str());
-		m_display_list.dump();
-#endif
-		AdvancerVisitor visitor(delta_time);
-		m_display_list.visitByReversePlacement(visitor);
-	}
-
 
 	queueEvent(event_id::ENTER_FRAME);
 
@@ -3283,6 +3252,9 @@ sprite_instance::construct()
 	log_debug(_("Constructing sprite '%s'"), _origTarget.c_str());
 #endif
 
+    // Register this sprite as a live one
+    _vm.getRoot().addLiveChar(this);
+
 	// Take note of our original target (for soft references)
 	_origTarget = getTarget();
 
@@ -3689,8 +3661,6 @@ sprite_instance::markReachableResources() const
 	ReachableMarker marker;
 
 	m_display_list.visitAll(marker);
-
-	m_display_list.visitByReversePlacement(marker);
 
 	_drawable->setReachable();
 

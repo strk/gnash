@@ -1,5 +1,23 @@
 2007-09-13 Sandro Santilli <strk@keybit.net>
 
+	* server/dlist.{cpp,h}: drop the second list only used for
+	  chils advancement (_timelineChars) and associated accessors
+	  (visitAllByReversePlacement).
+	* server/movie_root.{cpp,h}: Add a global "advanceable" characters
+	  list, used for advancement (in ::advance); provide an addLiveChar()
+	  method to add characters that are willing to be advanced there.
+	* server/button_character_instance.cpp (construct): register as
+	  live character with the movie_root.
+	* server/video_stream_instance.{cpp,h}: add a ::construct() method
+	  to properly register as live character with the movie_root
+	* server/sprite_instance.cpp (advance_sprite): forget about advancing
+	  childs, movie_root will take care of that; (construct): register
+	  self as a live character with the movie_root.
+	* testsuite/misc-ming.all/action_execution_order_test11.c: no more
+	  expected failures here.
+
+2007-09-13 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.{cpp,h}: drop obsoleted oldDisplayList.
 
 2007-09-13 Sandro Santilli <strk@keybit.net>

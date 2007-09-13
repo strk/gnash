@@ -221,8 +221,6 @@ DisplayList::place_character(
 		// make a copy (before replacing)
 		boost::intrusive_ptr<character> oldCh = *it;
 
-		_timelineChars.remove(oldCh);
-
 		// replace existing char (before calling unload!)
 		*it = DisplayItem(ch);
 	
@@ -238,7 +236,6 @@ DisplayList::place_character(
 
 	// Give life to this instance
 	ch->construct();
-	_timelineChars.push_front(DisplayItem(ch));
 
 	testInvariant();
 }
@@ -257,11 +254,8 @@ DisplayList::add(character* ch, bool replace)
 	}
 	else if ( replace )
 	{
-		_timelineChars.remove(*it);
 		*it = DisplayItem(ch);
 	}
-
-	_timelineChars.push_front(DisplayItem(ch));
 
 	testInvariant();
 }
@@ -352,8 +346,6 @@ DisplayList::replace_character(
 		// remember bounds of old char
 		oldch->add_invalidated_bounds(old_ranges, true);		
 
-		_timelineChars.remove(oldch);
-
 		// replace existing char (before calling unload)
 		*it = di;
 
@@ -377,7 +369,6 @@ DisplayList::replace_character(
 
 	// Give life to this instance
 	ch->construct();
-	_timelineChars.push_front(DisplayItem(ch));
 
 	testInvariant();
 }
@@ -787,7 +778,6 @@ DisplayList::clear(const DisplayList& from, bool call_unload)
 
 		if (is_affected)
 		{
-			_timelineChars.remove(*it);
 			it = _charsByDepth.erase(it);
 
 			if ( call_unload )
@@ -824,7 +814,6 @@ DisplayList::unload()
 
 		if ( ! di->unload() ) // no event handler queued, we remove
 		{
-			_timelineChars.remove(*it); // or we might simply .clear() it at the end, since we don't need them for ::advance anymore
 			it = _charsByDepth.erase(it);
 		}
 		else
@@ -838,80 +827,6 @@ DisplayList::unload()
 	return ! _charsByDepth.empty();
 
 }
-	
-void
-DisplayList::advance(float delta_time)
-// advance referenced characters.
-{
-	//GNASH_REPORT_FUNCTION;
-
-	testInvariant(); 
-
-//	container_type::size_type size = _charsByDepth.size();
-
-	// That there was no crash gnash we iterate through the copy
-	//std::list<DisplayItem> tmp_list = _charsByDepth;
-	std::list<DisplayItem> tmp_list = _timelineChars;
-
-        // We only advance characters which are out of the "removed" zone (or should we check isUnloaded?)
-        // TODO: remove when copying _character to tmp_list directly ?
-	//iterator it = beginNonRemoved(tmp_list);
-	//if ( it != tmp_list.end() ) log_debug("First non-removed char at depth %d", (*it)->get_depth());
-	iterator it = tmp_list.begin();
-	for (iterator itEnd = tmp_list.end(); it != itEnd; ++it)
-	{
-		testInvariant(); // expensive !!
-
-		// @@@@ TODO FIX: If array changes size due to
-		// character actions, the iteration may not be
-		// correct!
-		//
-		// What's the correct thing to do here?  Options:
-		//
-		// * copy the display list at the beginning,
-		// iterate through the copy
-		//
-		// * use (or emulate) a linked list instead of
-		// an array (still has problems; e.g. what
-		// happens if the next or current object gets
-		// removed from the dlist?)
-		//
-		// * iterate through current array in depth
-		// order.  Always find the next object using a
-		// search of current array (but optimize the
-		// common case where nothing has changed).
-		//
-		// * ???
-		//
-		// Need to test to see what Flash does.
-
-//		if (_charsByDepth.size() != size)
-//		{
-//			log_error(_("gnash bug: dlist size changed due to character actions, bailing on update"));
-//			break;
-//		}
-
-		// keep the character alive in case actions in it
-		// will remove it from displaylist.
-		boost::intrusive_ptr<character> ch = *it;
-		assert(ch!=NULL);
-
-		if ( ch->isUnloaded() ) // debugging
-		{
-			log_error("character at depth %d is unloaded", ch->get_depth());
-			// No need to advance an unloaded character. It would be better
-			// if unloaded characters are not even in this list.
-			continue; 
-		}
-		assert(! ch->isUnloaded() ); // we don't advance unloaded chars
-
-
-		ch->advance(delta_time);
-	}
-
-	testInvariant();
-}
-	
 	
 // Display the referenced characters. Lower depths
 // are obscured by higher depths.
@@ -1062,19 +977,6 @@ std::ostream& operator<< (std::ostream& os, const DisplayList& dl)
 			<< " depth:" << item->get_depth();
 	}
 
-	os << " =|= By placement: ";
-	for (DisplayList::const_iterator it = dl._timelineChars.begin(),
-			itEnd = dl._timelineChars.end();
-			it != itEnd;
-			++it)
-	{
-		const DisplayItem& item = *it; 
-		if ( it != dl._timelineChars.begin() ) os << " | ";
-		os << "ch id:" << item->get_id()
-			<< " name:" << item->get_name()
-			<< " depth:" << item->get_depth();
-	}
-
 	return os;
 }
 
@@ -1133,9 +1035,6 @@ DisplayList::removeUnloaded()
 	// TODO: erase from begin() to beginNonRemoved()-1 ?
 	iterator last = std::remove_if(_charsByDepth.begin(), _charsByDepth.end(), boost::bind(&character::isUnloaded, _1));
 	_charsByDepth.erase(last, _charsByDepth.end());
-
-	last = std::remove_if(_timelineChars.begin(), _timelineChars.end(), boost::bind(&character::isUnloaded, _1));
-	_timelineChars.erase(last, _timelineChars.end());
 
 	testInvariant();
 }
