@@ -1214,23 +1214,14 @@ movie_root::markReachableResources() const
 	// Mark global key object
 	if ( _keyobject ) _keyobject->setReachable();
 
-	// TODO: check if we need to mark _liveChars too
-	//       it should be checked that all characters there
-	//       are NOT unloaded as GC collector is run *after*
-	//       cleanup of the list (supposedly).
-	//       Also, it's likely that any non-unloaded character
-	//       will be also marked as reachable by scanning the
-	//       DisplayList...
+	// TODO: we should theoretically NOT need to mark _liveChars here
+	// 	 as any element in this list should be NOT unloaded and
+	// 	 thus marked as reachable by it's parent or properly unloaded
+	// 	 and thus removed from this list by cleanupDisplayList.
+	// 	 Due to some bug I'm researching on, we'll mark them for now...
+	// 	 See http://savannah.gnu.org/bugs/index.php?21070
 	//
-	// Well, playing SimGirl.swf and hanging out with cheeks triggers
-	// exactly this problem, one of the registered live movies are not marked
-	// Dunno exactly why, since none of them should be marked as unloaded, thus
-	// reachable somewhere...  anyway let's do it
-	//
-	// WARNING: this list will keeps growing, as we don't properly unload()
-	// 	    all characters...
-	//
-	log_debug("Marking %d live chars", _liveChars.size());
+	//log_debug("Marking %d live chars", _liveChars.size());
 	for (LiveChars::const_iterator i=_liveChars.begin(), e=_liveChars.end();
 			i != e; ++i)
 	{
@@ -1255,8 +1246,24 @@ movie_root::getTopmostMouseEntity(float x, float y)
 void
 movie_root::cleanupDisplayList()
 {
+
+#define GNASH_DEBUG_INSTANCE_LIST 1
+
+#ifdef GNASH_DEBUG_INSTANCE_LIST
+	// This 
+	static size_t maxLiveChars = 0;
+#endif
+
 	// Remove unloaded characters from the _liveChars list
 	_liveChars.remove_if(boost::bind(&character::isUnloaded, _1));
+
+#ifdef GNASH_DEBUG_INSTANCE_LIST
+	if ( _liveChars.size() > maxLiveChars )
+	{
+		maxLiveChars = _liveChars.size();
+		log_debug("Global instance list grew to %d entries", maxLiveChars);
+	}
+#endif
 
 	// Let every sprite cleanup the local DisplayList
         //

@@ -1,5 +1,9 @@
 2007-09-13 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.cpp: cleanup debugging of ever growing list
+
+2007-09-13 Sandro Santilli <strk@keybit.net>
+
 	* server/button_character_instance.{cpp,h}: implement unload() in an
 	  attempt to properly mark as unloaded any character registered in the
 	  global instance list (could happen for child sprites).
