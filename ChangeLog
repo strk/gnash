@@ -1,5 +1,12 @@
 2007-09-13 Sandro Santilli <strk@keybit.net>
 
+	* server/movie_root.{cpp,h} (restart): properly cleanup
+	  action queue and instances list, reset levels so that
+	  only _level0 is kept. Still not 100% correct but fixes
+	  bug #21068.
+
+2007-09-13 Sandro Santilli <strk@keybit.net>
+
 	* server/dlist.{cpp,h}: drop the second list only used for
 	  chils advancement (_timelineChars) and associated accessors
 	  (visitAllByReversePlacement).

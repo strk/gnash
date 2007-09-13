@@ -184,10 +184,39 @@ movie_root::getLevel(unsigned int num) const
 void
 movie_root::restart()
 {
-	for (Levels::iterator i=_movies.begin(), e=_movies.end(); i!=e; ++i)
-	{
-		i->second->restart();
-	}
+	// wipe out live chars
+	_liveChars.clear();
+
+	// wipe out queued actions
+	_actionQueue.clear();
+
+	// take a copy of _level0 
+	boost::intrusive_ptr<movie_instance> level0 = getLevel(0);
+
+	// wipe out all levels
+	_movies.clear();
+
+	// Restart the level0 movie
+	// TODO: instead, take it's definition and re-instantiate
+	// a new movie here ! The only problem would be re-setting
+	// externally set variables
+	level0->restart(); // NOTE: restart() will call construct
+
+	// Add level0 back in place
+	// NOTE: we don't call setLevel to avoid calling ::construct again
+	_movies[0] = level0; 
+
+	// Process actions queued by restart/construct
+	processActionQueue();
+
+	// Delete characters removed from the stage
+	// from the display lists
+	cleanupDisplayList();
+
+#ifdef GNASH_USE_GC
+	// Run the garbage collector again
+	GC::get().collect();
+#endif
 }
 
 void
