@@ -707,7 +707,7 @@ sprite_create_text_field(const fn_call& fn)
 	if (fn.nargs != 6) // name, depth, x, y, width, height
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error(_("createTextField called with %d args, "
+		log_aserror(_("createTextField called with %d args, "
 			"expected 6 - returning undefined"), fn.nargs);
 		);
 		return as_value();
@@ -716,7 +716,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(0).is_string() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error(_("First argument of createTextField is not a string"
+		log_aserror(_("First argument of createTextField is not a string"
 			" - returning undefined"));
 		);
 		return as_value();
@@ -726,7 +726,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(1).is_number() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error(_("Second argument of createTextField is not a number"
+		log_aserror(_("Second argument of createTextField is not a number"
 			" - returning undefined"));
 		);
 		return as_value();
@@ -736,7 +736,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(2).is_number() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error(_("Third argument of createTextField is not a number"
+		log_aserror(_("Third argument of createTextField is not a number"
 			" - returning undefined"));
 		);
 		return as_value();
@@ -746,7 +746,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(3).is_number() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error(_("Fourth argument of createTextField is not a number"
+		log_aserror(_("Fourth argument of createTextField is not a number"
 			" - returning undefined"));
 		);
 		return as_value();
@@ -756,7 +756,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(4).is_number() )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error(_("Fifth argument of createTextField is not a number"
+		log_aserror(_("Fifth argument of createTextField is not a number"
 			" - returning undefined"));
 		);
 		return as_value();
@@ -765,8 +765,8 @@ sprite_create_text_field(const fn_call& fn)
 	if ( txt_width < 0 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error(_("createTextField: negative width (%g)"
-			" - reverting sign"));
+		log_aserror(_("createTextField: negative width (%g)"
+			" - reverting sign"), txt_width);
 		);
 		txt_width = -txt_width;
 	}
@@ -774,8 +774,8 @@ sprite_create_text_field(const fn_call& fn)
 	if ( ! fn.arg(5).is_number() ) 
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error(_("Sixth argument of createTextField is not a number"
-			" - returning undefined"), txt_width);
+		log_aserror(_("Sixth argument of createTextField is not a number"
+			" - returning undefined"));
 		);
 		return as_value();
 	}
@@ -783,7 +783,7 @@ sprite_create_text_field(const fn_call& fn)
 	if ( txt_height < 0 )
 	{
 		IF_VERBOSE_ASCODING_ERRORS(
-		log_error(_("createTextField: negative height (%g)"
+		log_aserror(_("createTextField: negative height (%g)"
 			" - reverting sign"), txt_height);
 		);
 		txt_height = -txt_height;
