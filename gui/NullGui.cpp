@@ -32,7 +32,8 @@
 # include <unistd.h> // for usleep
 #endif
 
-#include "tu_timer.h"
+#include <boost/timer.hpp>
+using boost::timer;
 
 namespace gnash
 {
@@ -40,27 +41,27 @@ namespace gnash
 bool
 NullGui::run()
 {
-  uint64_t prevtimer=0;
-  uint64_t start_timer = tu_timer::get_ticks();  // returns milliseconds
+  timer prevtimer;
+  timer start_timer;  // returns milliseconds
 
   prevtimer = start_timer;
 
   while (true)
   {
   
-    uint64_t timer=0;
+    timer timer;
 
     // synchronize to frame time 
     if (_timeout || (_interval>1))  // avoid timing completely for interval==1
     while (1) 
     {
         
-      timer = tu_timer::get_ticks();
+      timer.restart();
             
-      if (timer - prevtimer >= _interval)
+      if (timer.elapsed_min() - prevtimer.elapsed() >= _interval)
         break; // next frame, please!
     
-      if (timer < prevtimer) // time glitch protection
+      if (timer.elapsed() < prevtimer.elapsed()) // time glitch protection
         prevtimer = timer;
         
       usleep(1);
@@ -69,7 +70,7 @@ NullGui::run()
     
     if ( _timeout )
     {
-      if ( timer - start_timer > _timeout)
+      if ( timer.elapsed() - start_timer.elapsed() > _timeout)
       {
         break;
       }

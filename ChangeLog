@@ -1,3 +1,16 @@
+2007-09-13 Markus Gothe <nietzsche@lysator.liu.se>
+
+	* gui/NullGui.cpp libbase/Makefile.am libbase/triangulate_impl.h 
+	server/timers.h server/asobj/NetStream.h 
+	server/asobj/NetStreamFfmpeg.cpp 
+	server/vm/VM.cpp utilities/processor.cpp
+       
+	* Removed Files:
+        libbase/tu_timer.cpp libbase/tu_timer.h
+
+	Overhauled tu_timer with the se of std::clock and boost/timer.hpp.
+	Might, break things, but it better get fixed this way.
+
 2007-09-12 Sandro Santilli <strk@keybit.net>
 
 	* testsuite/actionscript.all/Inheritance.as: more tests for 'super'.

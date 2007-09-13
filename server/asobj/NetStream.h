@@ -19,7 +19,7 @@
 //
 //
 
-/*  $Id: NetStream.h,v 1.48 2007/08/03 20:54:47 strk Exp $ */
+/*  $Id: NetStream.h,v 1.49 2007/09/13 01:12:20 nihilus Exp $ */
 
 #ifndef __NETSTREAM_H__
 #define __NETSTREAM_H__
@@ -187,9 +187,9 @@ protected:
 public:
 
 	NetStream();
-
+#if defined(USE_FFMEPG) || defined(SOUND_GST)
 	virtual ~NetStream(){}
-
+#endif
 	/// Closes the video session and frees all ressources used for decoding
 	/// except the FLV-parser (this might not be correct).
 	virtual void close(){}

@@ -94,7 +94,6 @@ libgnashbase_la_SOURCES = \
 	tu_file.cpp \
 	$(SDL_FILE) \
 	tu_random.cpp \
-	tu_timer.cpp \
 	tu_types.cpp \
 	utf8.cpp \
 	utility.cpp \
@@ -138,7 +137,6 @@ noinst_HEADERS = \
 	tu_opengl_includes.h \
 	tu_random.h \
 	tu_swap.h \
-	tu_timer.h \
 	tu_types.h \
 	utf8.h \
 	utility.h \
