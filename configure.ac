@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.414 2007/09/13 18:33:19 bwy Exp $
+dnl $Id: configure.ac,v 1.415 2007/09/13 19:32:49 rsavoye Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -25,6 +25,17 @@ AM_CONFIG_HEADER(config.h)
 dnl AC_CANONICAL_TARGET
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
+
+dnl --------------------------------------------------------
+dnl Figure out development tool stuff
+dnl --------------------------------------------------------
+
+AC_PROG_CC
+AC_PROG_CXX
+AC_EXEEXT
+AC_PROG_INSTALL
+AM_COMPILER_LIB
+
 
 dnl Set the default values for Flash Version. These are converted into
 dnl various strings to make JavaScript or ActionScript detectors
@@ -37,11 +48,12 @@ dnl Some things you can only do by looking at the platform name.
 case "${host}" in
   powerpc-apple-darwin*)
     AC_DEFINE([__powerpc64__], [], [this is a 64 bit powerpc])
-    ;;
-  i[34567]86-apple-darwin*)
     darwin=yes
     ;;
-  i[34567]86-*-openbsd*)
+  i*86-apple-darwin*)
+    darwin=yes
+    ;;
+  i*86-*-openbsd*)
     openbsd_os=openbsd
     ;;
   *64-*-openbsd*)
@@ -104,11 +116,7 @@ AC_TRY_COMPILE([#include <sys/types.h>
   AC_DEFINE(SIZET_FMT, ["%ld"], [size_t printf modifier is ld])
 )
 
-if test x"$ac_env_CXXFLAGS_set" = "xset"; then
-	CXXFLAGS="$save_CXXFLAGS"
-else
-	unset CXXFLAGS; 
-fi
+CXXFLAGS="$save_CXXFLAGS"
 AC_LANG_POP(C++)
 
 dnl This is primarily used when compiling for a similar architecture,
@@ -301,15 +309,15 @@ dnl    val=`echo ${enableval} | cut -d ' ' -f 1`
     [case "${enableval}" in
       ogl|OGL|gl|GL|opengl|OPENGL|OpenGL)
         build_ogl=yes
-	add_renderer="ogl"
+	      add_renderer="ogl"
         ;;
       agg|AGG|Agg)
         build_agg=yes
-	add_renderer="agg"
+	      add_renderer="agg"
         ;;
       cairo|CAIRO|Cairo)
         build_cairo=yes
-	add_renderer="cairo"
+	      add_renderer="cairo"
         ;;
 dnl       all|ALL|All)
 dnl         build_ogl=yes
@@ -361,23 +369,23 @@ AC_ARG_WITH(pixelformat,
       all)
         # allow special value "all" set by user (handled below)
         ;; 
-      rgba32|RGBA32)
-        AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32])
-        ;;
-      bgra32|BGRA32)
-        AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
-        ;;
       argb32|ARGB32)
         AC_DEFINE(PIXELFORMAT_ARGB32, [1], [ARGB32])
         ;;
       abgr32|ABGR32)
         AC_DEFINE(PIXELFORMAT_ABGR32, [1], [ABGR32])
         ;;
-      rgb24|RGB24)
-        AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24])
+      bgra32|BGRA32)
+        AC_DEFINE(PIXELFORMAT_BGRA32, [1], [BGRA32])
         ;;
       bgr24|BGR24)
         AC_DEFINE(PIXELFORMAT_BGR24, [1], [BGR24])
+        ;;
+      rgba32|RGBA32)
+        AC_DEFINE(PIXELFORMAT_RGBA32, [1], [RGBA32])
+        ;;
+      rgb24|RGB24)
+        AC_DEFINE(PIXELFORMAT_RGB24, [1], [RGB24])
         ;;
       rgb555|RGB555)
         AC_DEFINE(PIXELFORMAT_RGB555, [1], [RGB555])
@@ -468,6 +476,8 @@ ext_dejagnu=no
 ext_mysql=no
 ext_fileio=no
 ext_gtk=no
+ext_lirc=no
+ext_dbus=no
 ext_all=no
 AC_ARG_WITH(extensions,
   AC_HELP_STRING([--with-extensions=], [Specify which extensions to build]),
@@ -508,16 +518,28 @@ AC_ARG_WITH(extensions,
         ext_gtk=yes
         nextensions=$((nextensions+1))
         ;;
+      lirc|LIRC)
+        AC_DEFINE(USE_LIRC_EXT, [1], [Build the LIRC extension])
+        ext_lirc=yes
+        nextensions=$((nextensions+1))
+        ;;
+      dbus|DBUS)
+        AC_DEFINE(USE_DBUS_EXT, [1], [Build the DBUS extension])
+        ext_dbus=yes
+        nextensions=$((nextensions+1))
+        ;;
       all|ALL)
         AC_DEFINE(USE_GTK_EXT, [1], [Build all the extensions])
         ext_dejagnu=yes
         ext_mysql=yes
         ext_fileio=yes
         ext_gtk=yes
+        ext_lirc=no
+        ext_dbus=no
         ext_all=yes
         nextensions=5
         ;;
-      *) AC_MSG_ERROR([invalid extension specified: ${withval} given (accept: MYSQL|DEJAGNU|FILEIO|GTK|ALL)])
+      *) AC_MSG_ERROR([invalid extension specified: ${withval} given (accept: MYSQL|DEJAGNU|FILEIO|GTK|LIRC|DBUS|ALL)])
          ;;
       esac]
     withval=`echo ${withval} | cut -d ' ' -f 2-6`
@@ -536,19 +558,16 @@ AM_CONDITIONAL(BUILD_DEJAGNU_EXT, [ test x$ext_dejagnu = xyes ])
 AM_CONDITIONAL(BUILD_FILEIO_EXT, [ test x$ext_fileio = xyes ])
 AM_CONDITIONAL(BUILD_MYSQL_EXT, [ test x$ext_mysql = xyes ])
 AM_CONDITIONAL(BUILD_GTK_EXT, [ test x$ext_gtk = xyes ])
+AM_CONDITIONAL(BUILD_LIRC_EXT, [ test x$ext_lirc = xyes ])
+AM_CONDITIONAL(BUILD_DBUS_EXT, [ test x$ext_dbus = xyes ])
 if test x$ext_mysql = xyes; then
   GNASH_PATH_MYSQL
 fi
 
-dnl --------------------------------------------------------
-dnl Figure out development tool stuff
-dnl --------------------------------------------------------
-
-AC_PROG_CC
-AC_PROG_CXX
-AC_EXEEXT
-AC_PROG_INSTALL
-AM_COMPILER_LIB
+dnl force lirc to be enabled
+if test x"${ext_lirc}" = x"yes"; then
+  lirc=yes
+fi
 
 AC_LIBLTDL_INSTALLABLE
 AC_LIBTOOL_DLOPEN
@@ -558,7 +577,6 @@ AC_C_CONST
 AC_C_INLINE
 AC_SUBST([LIBTOOL_DEPS])
 AC_LIB_LTDL
-
 
 AM_CONDITIONAL(ENABLE_SHARED, [test x"${enable_shared}" = xyes])
 AM_CONDITIONAL(ENABLE_STATIC, [test x"${enable_shared}" = xno])
@@ -616,8 +634,6 @@ dnl are exported, so all the other configure tests in macros/*.m4 use
 dnl these same settings rather than duplicating them like we used to.
 dnl To override thise, use the --with-*-incl= and --with-*-libs=
 dnl options to configure.
-dnl
-dnl
 if test x$cross_compiling = xyes; then
   AC_MSG_NOTICE([Configuring Gnash for cross compilation])
   export pkgroot="`$CXX -print-search-dirs | grep "install:" | sed -e 's/install: //' -e 's:/lib/gcc/.*::'`"
@@ -779,6 +795,10 @@ case $host in
   LIBS=$save_LIBS
   ;;
 esac
+
+dnl Look for LIRC, which i sused if there is a remote control
+GNASH_PATH_LIRC
+AM_CONDITIONAL(LIRC, [test -n "$LIRC_LIBS"])
 
 AC_CHECK_HEADERS(malloc.h)
 AC_CHECK_HEADERS(getopt.h)
@@ -953,7 +973,8 @@ GNASH_PKG_FIND(jpeg, [jpeglib.h], [jpeg images], jpeg_mem_init)
 GNASH_PKG_INCLUDES([dejagnu], [dejagnu.h])
 
 dnl Find freetype and fontconfig
-GNASH_PKG_FIND(freetype2, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
+dnl GNASH_PKG_FIND(freetype2, [freetype/freetype.h], [freetype2 font library], FT_Load_Char)
+GNASH_PATH_FREETYPE2
 GNASH_PKG_FIND(fontconfig, [fontconfig/fontconfig.h], [fontconfig library], FcFontMatch)
 
 if test x$cross_compiling = xno; then
@@ -1424,6 +1445,7 @@ extensions/dejagnu/Makefile
 extensions/mysql/Makefile
 extensions/fileio/Makefile
 extensions/gtk2/Makefile
+extensions/lirc/Makefile
 plugin/Makefile
 plugin/klash/Makefile
 cygnal/Makefile
@@ -1945,6 +1967,22 @@ else
   echo "                 Why not install libcurl from http://curl.haxx.se/libcurl"
   echo "                 or .deb users: apt-get install libcurl3-dev"
   echo "                 or .rpm users: yum install curl-devel"
+fi
+
+
+if test x"$LIRC_LIBS" != x; then
+  if test x"$LIRC_CFLAGS" != x; then
+    echo "        LIRC flags are: $LIRC_CFLAGS"
+  else
+    echo "        LIRC flags are: default include path"
+  fi
+    echo "        LIRC libs are: $LIRC_LIBS"
+else
+  echo "        WARNING: LIRC library not found."
+  echo "                 Gnash will be built without support for remote controls."
+  echo "                 Why not install liblirc from http://www.lirc.org"
+  echo "                 or .deb users: apt-get install lirc-dev"
+  echo "                 or .rpm users: yum install lirc-devel"
 fi
 
 if test x$build_agg = xyes; then # {
