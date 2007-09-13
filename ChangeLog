@@ -1,3 +1,9 @@
+2007-09-13 Tomas Groth Christensen <tomasgroth@yahoo.dk>
+
+	* server/parser/video_stream_def.{h,cpp}: Tie embedded video
+	  frames to the swf-frame it is embedded in. The containers the
+	  video frame is stored in was merged into one.
+
 2007-09-13  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* macros/lirc.m4: Search for lirc files, so we can support a

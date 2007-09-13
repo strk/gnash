@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.cpp,v 1.15 2007/09/10 14:09:30 strk Exp $
+// $Id: video_stream_def.cpp,v 1.16 2007/09/13 20:54:42 tgc Exp $
 
 #include "video_stream_def.h"
 #include "video_stream_instance.h"
@@ -39,9 +39,6 @@ video_stream_definition::video_stream_definition(uint16_t char_id)
 
 video_stream_definition::~video_stream_definition()
 {
-	for (int32_t size = m_video_frames.size()-1; size >= 0; size--) {
-		delete [] m_video_frames[size];
-	}
 	m_video_frames.clear();
 }
 
@@ -74,10 +71,9 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 	}
 	else if (tag == SWF::VIDEOFRAME)
 	{
-		// TODO: do *not* skip the frame number !
-		//       The SWF may not contain a video frame for
-		//       each SWF frame, in which case we make a mess
-		//
+		// We don't use the videoframe number, but instead
+		// each video frame is tied to the swf-frame where
+		// it belongs.
 		in->skip_bytes(2); //int frameNum = in->read_u16();
 
 		// We need to make the buffer a bit bigger than the data
@@ -97,9 +93,8 @@ video_stream_definition::read(stream* in, SWF::tag_type tag, movie_definition* m
 		{
 			data[i] = in->read_u8();
 		}
-		m_video_frames.push_back(data);
-		m_video_frames_size.push_back(size);
 
+		m_video_frames[m->get_loading_frame()] = embedFrame(boost::shared_array<uint8_t>(data), size);
 	}
 
 }
@@ -143,18 +138,17 @@ video_stream_definition::get_decoder()
 void 
 video_stream_definition::get_frame_data(int frameNum, uint8_t** data, int* size)
 {
-	int cur_frame = frameNum - m_start_frame;
-	if ( cur_frame < 0 || cur_frame >= m_video_frames.size() )
+	embedFrameMap::iterator it = m_video_frames.find(frameNum);
+	if( it != m_video_frames.end() )
 	{
+		*data = it->second.first.get();
+		*size = it->second.second;
+	} else {
 		log_error(_("No video data available for frame %d."), frameNum);
 		*data = 0;
 		*size = 0;
 		return;
 	}
-
-	assert( cur_frame < m_video_frames_size.size() );
-	*size = m_video_frames_size[cur_frame];
-	*data = m_video_frames[cur_frame];
 }
 
 } // namespace gnash

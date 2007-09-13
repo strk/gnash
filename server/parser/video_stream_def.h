@@ -16,7 +16,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // 
-// $Id: video_stream_def.h,v 1.9 2007/09/08 11:19:50 strk Exp $
+// $Id: video_stream_def.h,v 1.10 2007/09/13 20:54:42 tgc Exp $
 
 #ifndef GNASH_VIDEO_STREAM_DEF_H
 #define GNASH_VIDEO_STREAM_DEF_H
@@ -33,6 +33,8 @@
 #include "execute_tag.h"
 #include "embedVideoDecoder.h"
 #include "image.h"
+#include <map>
+#include <boost/shared_array.hpp>
 
 namespace gnash {
 
@@ -155,20 +157,14 @@ private:
 	/// Bounds of the video, as read from the DEFINEVIDEOSTREAM tag.
 	rect m_bound;
 
-	/// The undecoded video frames associated with frames starting at m_start_frame
+	/// The undecoded video frames and its size, using the swf-frame number as key
 	//
-	/// Elements of this vector are owned by this instance, and will be deleted 
+	/// Elements of this map are owned by this instance, and will be deleted 
 	/// at instance destruction time.
 	///
-	/// TODO: encode size with each video frame instead (use a vector of vectors ?)
-	///
-	std::vector<uint8_t *> m_video_frames;
-
-	/// Size of each element of m_video_frames above
-	//
-	/// TODO: encode size with each video frame instead (use a vector of vectors ?)
-	///
-	std::vector<int>        m_video_frames_size;
+	typedef std::pair< boost::shared_array<uint8_t>, uint32_t> embedFrame;
+	typedef std::map<uint32_t, embedFrame > embedFrameMap;
+	embedFrameMap m_video_frames;
 
 };
 
