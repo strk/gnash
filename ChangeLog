@@ -1,5 +1,9 @@
 2007-09-13 Sandro Santilli <strk@keybit.net>
 
+	* server/sprite_instance.{cpp,h}: drop obsoleted oldDisplayList.
+
+2007-09-13 Sandro Santilli <strk@keybit.net>
+
 	* server/sprite_instance.cpp (sprite_create_text_field):
 	  fix log_aserror calls (too few, too many args and
 	  log_error to log_aserror).

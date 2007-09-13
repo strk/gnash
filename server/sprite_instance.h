@@ -863,13 +863,6 @@ private:
 	/// Current Display List contents.
 	DisplayList	m_display_list;
 
-	/// oldDisplayList is a backup of current DisplayList
-	/// (m_display_list) updated at each call to ::advance
-	/// and at first call to ::construct (it's empty in
-	/// this latter case).
-	/// It will be used to control actions execution order.
-	DisplayList	oldDisplayList;
-
 	/// The canvas for dynamic drawing
 	//
 	/// WARNING: since DynamicShape is a character_def, which is

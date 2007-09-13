@@ -1723,7 +1723,6 @@ sprite_instance::sprite_instance(
 	character(parent, id),
 	m_root(r),
 	m_display_list(),
-	oldDisplayList(),
 	_drawable(new DynamicShape),
 	_drawable_inst(_drawable->create_character_instance(this, 0)),
 	//m_goto_frame_action_list(),
@@ -2279,10 +2278,9 @@ void sprite_instance::advance_sprite(float delta_time)
 #ifdef GNASH_DEBUG
 	size_t frame_count = m_def->get_frame_count();
 
-	log_debug(_("Advance_sprite for sprite '%s' - frame %u/%u "
-		"- oldDIsplayList has %d elements"),
+	log_debug(_("Advance_sprite for sprite '%s' - frame %u/%u "),
 		getTarget().c_str(), m_current_frame,
-		frame_count, oldDisplayList.size());
+		frame_count);
 #endif
 
 	// Advance DisplayList elements already placed (even if looping back ?)
@@ -2344,9 +2342,6 @@ void sprite_instance::advance_sprite(float delta_time)
 		//execute_frame_tags(m_current_frame);
 	}
 #endif
-
-	// Remember current state of the DisplayList for next iteration
-	oldDisplayList = m_display_list;
 }
 
 // child movieclip advance
@@ -2355,10 +2350,9 @@ void sprite_instance::advance(float delta_time)
 //	GNASH_REPORT_FUNCTION;
 
 #ifdef GNASH_DEBUG
-	log_debug(_("Advance sprite '%s' at frame %u/%u "
-		"- oldDIsplayList has %d elements"),
+	log_debug(_("Advance sprite '%s' at frame %u/%u"),
 		getTargetPath().c_str(), m_current_frame,
-		get_frame_count(), oldDisplayList.size());
+		get_frame_count());
 #endif
 
 	// child movieclip frame rate is the same the root movieclip frame rate
@@ -3094,7 +3088,6 @@ void sprite_instance::restart()
     // Clear current display list and 
     // its backup
     m_display_list.clear();
-    oldDisplayList.clear();
 
     // TODO: wipe out all members !!
     clearProperties();
@@ -3298,10 +3291,6 @@ sprite_instance::construct()
 
 	// We *might* avoid this, but better safe then sorry
 	m_def->ensure_frame_loaded(0);
-
-	// Backup the DisplayList *before* manipulating it !
-	// TODO: still needed ? what for ?
-	assert( oldDisplayList.empty() );
 
 	// Execute CONSTRUCT event immediately
 	on_event(event_id::CONSTRUCT);
@@ -3683,9 +3672,8 @@ sprite_instance::enumerateNonProperties(as_environment& env) const
 void
 sprite_instance::cleanupDisplayList()
 {
-        //log_debug("%s.cleanDisplayList() called, current dlist is %p, old is %p", getTarget().c_str(), (void*)&m_display_list, (void*)&oldDisplayList);
+        //log_debug("%s.cleanDisplayList() called, current dlist is %p", getTarget().c_str(), (void*)&m_display_list);
 	m_display_list.removeUnloaded();
-	oldDisplayList = m_display_list; // TODO: move unloaded-cleanup of oldDisplayList in advance_sprite ?
 }
 
 #ifdef GNASH_USE_GC
@@ -3703,10 +3691,6 @@ sprite_instance::markReachableResources() const
 	m_display_list.visitAll(marker);
 
 	m_display_list.visitByReversePlacement(marker);
-
-	oldDisplayList.visitAll(marker);
-
-	oldDisplayList.visitByReversePlacement(marker);
 
 	_drawable->setReachable();
 
