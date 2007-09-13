@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.413 2007/09/04 08:21:41 bwy Exp $
+dnl $Id: configure.ac,v 1.414 2007/09/13 18:33:19 bwy Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -960,6 +960,9 @@ if test x$cross_compiling = xno; then
   AC_PATH_MING
 fi
 AM_CONDITIONAL(ENABLE_MING, [ test x"$MAKESWF" != x ])
+
+AM_CONDITIONAL(MING_VERSION_0_4,
+        [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040000  ])
 AM_CONDITIONAL(MAKESWF_SUPPORTS_PREBUILT_CLIPS,
         [ test x"$MAKESWF" != x && test $MING_VERSION_CODE -ge 00040002  ])
 AM_CONDITIONAL(MING_SUPPORTS_INIT_ACTIONS,

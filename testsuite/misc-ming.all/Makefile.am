@@ -136,7 +136,6 @@ check_PROGRAMS = \
 	eventSoundTest1 \
 	eventSoundTest1-Runner \
 	DrawingApiTestRunner \
-	get_frame_number_test \
 	frame_label_test \
 	path_format_test \
         callFunction_test \
@@ -165,6 +164,11 @@ check_PROGRAMS = \
 	morph_test1 \
 	morph_test1runner \
 	$(NULL)
+
+if MING_VERSION_0_4
+check_PROGRAMS += \
+	get_frame_number_test
+endif
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 check_PROGRAMS += KeyTest-Runner \
@@ -222,7 +226,6 @@ check_SCRIPTS = \
 	displaylist_depths_test9runner \
 	displaylist_depths_test10runner \
 	displaylist_depths_test11runner \
-	get_frame_number_testrunner \
 	frame_label_testrunner \
 	path_format_testrunner \
 	callFunction_testrunner \
@@ -249,6 +252,12 @@ if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 check_SCRIPTS += VarAndCharClashTest-Runner \
 	gotoFrame2Test-Runner \
 	FlashVarsTest-Runner
+endif
+
+if MING_VERSION_0_4
+check_SCRIPTS += \
+	get_frame_number_testrunner \
+	$(NULL)	
 endif
 
 if MING_SUPPORTS_INIT_ACTIONS
@@ -1740,6 +1749,11 @@ TEST_CASES = \
 	morph_test1runner \
 	registerClassTest2runner \
 	$(NULL)
+
+if MING_VERSION_0_4
+TEST_CASES += \
+	get_frame_number_testrunner
+endif
 
 if MAKESWF_SUPPORTS_PREBUILT_CLIPS
 TEST_CASES += KeyTest-Runner \

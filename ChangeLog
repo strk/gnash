@@ -1,3 +1,10 @@
+2007-09-13 Benjamin Wolsey <benjamin_pelican@yahoo.co.uk>
+
+	* configure.ac, testsuite/misc-ming.all/Makefile.am: add conditional
+	  for Ming version at least 0.4 before building get_frame test.
+	* libbase/rc.cpp: set writelog off by default (bug #21037).
+
+
 2007-09-13 Sandro Santilli <strk@keybit.net>
 
 	* server/sprite_instance.cpp (restart): don't call construct again, to
