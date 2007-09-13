@@ -43,9 +43,6 @@
 #include "debugger.h"
 #include "VM.h"
 
-#include <boost/timer.hpp>
-using boost::timer;
-
 extern "C"{
 	#include <unistd.h>
 #ifdef HAVE_GETOPT_H
@@ -119,18 +116,21 @@ static bool s_stop_on_errors = true;
 // How many time do we allow to hit the end ?
 static size_t allowed_end_hits = 1;
 
-timer lastAdvanceTimer;
+double lastAdvanceTimer;
 
 void
 resetLastAdvanceTimer()
 {
-	lastAdvanceTimer.restart();
+	using namespace tu_timer;
+	lastAdvanceTimer = ticks_to_seconds(get_ticks());
 }
 
 double
 secondsSinceLastAdvance()
 {
-	return (lastAdvanceTimer.elapsed());
+	using namespace tu_timer;
+	double now = ticks_to_seconds(get_ticks());
+	return ( now - lastAdvanceTimer);
 }
 
 int

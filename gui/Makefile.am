@@ -109,7 +109,7 @@ GUI_CPPFLAGS += -DGUI_AQUA
 bundle_name = gnash.app
 
 bundle: Info.plist
-	@echo "Building: $(bundle_name)" 
+	@echo " Building: $(bundle_name)" 
 	-rm -rf $(bundle_name)/Contents
 	mkdir -p $(bundle_name)/Contents/MacOS
 	mkdir -p $(bundle_name)/Contents/Resources

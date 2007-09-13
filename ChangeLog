@@ -1,3 +1,14 @@
+2007-09-13 Sandro Santilli <strk@keybit.net>
+
+	* gui/Makefile.am, gui/NullGui.cpp, libbase/Makefile.am,
+	  libbase/triangulate_impl.h, libbase/tu_timer.cpp,
+	  libbase/tu_timer.h, server/timers.h, server/asobj/NetStream.h,
+	  server/asobj/NetStreamFfmpeg.cpp, server/vm/VM.cpp,
+	  utilities/processor.cpp:
+	  Revert Markus changes, as they introduce too many obvious failures.
+	  Please avoid commits triggering failures on 'make check' and do
+	  your best to have 'make check' run as many tests as possible.
+
 2007-09-13 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* gui/NullGui.cpp libbase/Makefile.am libbase/triangulate_impl.h 

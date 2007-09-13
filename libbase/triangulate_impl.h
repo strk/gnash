@@ -24,7 +24,7 @@
 // code, see the FIST web page at:
 // http://www.cosy.sbg.ac.at/~held/projects/triang/triang.html
 
-/* $Id: triangulate_impl.h,v 1.25 2007/09/13 01:12:19 nihilus Exp $ */
+/* $Id: triangulate_impl.h,v 1.26 2007/09/13 09:47:31 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -38,8 +38,7 @@
 
 #define PROFILE_TRIANGULATE
 #ifdef PROFILE_TRIANGULATE
-#include <boost/timer.hpp>
-using boost::timer;
+#include "tu_timer.h"
 #endif // PROFILE_TRIANGULATE
 
 // Template this whole thing on coord_t, so int16_t and float versions
@@ -2227,7 +2226,7 @@ static void compute_triangulation(
 	}
 
 #ifdef PROFILE_TRIANGULATE
-	timer start;
+	uint64_t	start_ticks = tu_timer::get_profile_ticks();
 #endif // PROFILE_TRIANGULATE
 
 	// Local generator, for some parts of the algo that need random numbers.
@@ -2249,8 +2248,8 @@ static void compute_triangulation(
 	}
 
 #ifdef PROFILE_TRIANGULATE
-	fprintf(stderr, "join poly = %1.6f sec\n", start.elapsed());
-	timer join;
+	uint64_t	join_ticks = tu_timer::get_profile_ticks();
+	fprintf(stderr, "join poly = %1.6f sec\n", tu_timer::profile_ticks_to_seconds(join_ticks - start_ticks));
 #endif // PROFILE_TRIANGULATE
 
 // Debugging only: dump coords of joined poly.
@@ -2382,12 +2381,12 @@ static void compute_triangulation(
 	}
 	
 #ifdef PROFILE_TRIANGULATE
-	timer clip;
-	fprintf(stderr, "clip poly = %1.6f sec\n", (clip.elapsed_min() - join.elapsed()));
-	fprintf(stderr, "total for poly = %1.6f sec\n", (clip.elapsed_min() - start.elapsed()));
+	uint64_t	clip_ticks = tu_timer::get_profile_ticks();
+	fprintf(stderr, "clip poly = %1.6f sec\n", tu_timer::profile_ticks_to_seconds(clip_ticks - join_ticks));
+	fprintf(stderr, "total for poly = %1.6f sec\n", tu_timer::profile_ticks_to_seconds(clip_ticks - start_ticks));
 	fprintf(stderr, "vert count = %d, verts clipped / sec = %f\n",
 		input_vert_count,
-		input_vert_count / (clip.elapsed_min() - join.elapsed()));
+		input_vert_count / tu_timer::profile_ticks_to_seconds(clip_ticks - join_ticks));
 #endif // PROFILE_TRIANGULATE
 
 	assert(penv.m_polys.size() == 0);

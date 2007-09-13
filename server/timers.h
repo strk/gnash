@@ -31,8 +31,7 @@
 #include "as_function.h" // for visibility of destructor by intrusive_ptr
 #include "smart_ptr.h"
 
-#include <boost/timer.hpp>
-using boost::timer;
+#include "tu_timer.h"
 
 #include <string>
 

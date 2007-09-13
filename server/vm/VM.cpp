@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: VM.cpp,v 1.17 2007/09/13 01:12:20 nihilus Exp $ */
+/* $Id: VM.cpp,v 1.18 2007/09/13 09:47:32 strk Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -27,7 +27,7 @@
 #include "movie_instance.h"
 #include "movie_root.h"
 #include "Global.h"
-#include <ctime> // for std::clocks()
+#include "tu_timer.h" // for tu_timer::get_ticks()
 #include "rc.h" //for overriding default version string with rcfile
 
 #include <memory>
@@ -75,7 +75,7 @@ VM::VM(movie_definition& topmovie)
 	:
 	_root_movie(new movie_root()),
 	_swfversion(topmovie.get_version()),
-	_start_time(std::clock())
+	_start_time(tu_timer::get_ticks())
 {
 }
 
@@ -134,7 +134,7 @@ VM::setGlobal(as_object* o)
 uint64_t
 VM::getTime()
 {
-  return  (std::clock() -  _start_time);
+  return  (tu_timer::get_ticks() -  _start_time);
 }
 
 void
