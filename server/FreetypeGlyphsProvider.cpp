@@ -28,7 +28,7 @@
 #include "DynamicShape.h"
 #include "log.h"
 
-#ifdef HAVE_FREETYPE2 
+#ifdef USE_FREETYPE 
 # include <ft2build.h>
 # include FT_OUTLINE_H
 # include FT_BBOX_H
@@ -63,7 +63,7 @@
 
 namespace gnash {
 
-#ifdef HAVE_FREETYPE2 
+#ifdef USE_FREETYPE 
 
 /// Outline glyph walker/decomposer, for drawing an FT_Outline to DynamicShape
 //
@@ -305,9 +305,9 @@ FreetypeGlyphsProvider::getFontFilename(const std::string& name,
 #endif
 }
 
-#endif // HAVE_FREETYPE2 
+#endif // USE_FREETYPE 
 
-#ifdef HAVE_FREETYPE2 
+#ifdef USE_FREETYPE 
 // static
 std::auto_ptr<FreetypeGlyphsProvider>
 FreetypeGlyphsProvider::createFace(const std::string& name, bool bold, bool italic)
@@ -325,16 +325,16 @@ FreetypeGlyphsProvider::createFace(const std::string& name, bool bold, bool ital
 	return ret;
 
 }
-#else // ndef HAVE_FREETYPE2 
+#else // ndef USE_FREETYPE 
 std::auto_ptr<FreetypeGlyphsProvider>
 FreetypeGlyphsProvider::createFace(const std::string&, bool, bool)
 {
 	log_error("Freetype not supported");
 	return std::auto_ptr<FreetypeGlyphsProvider>(NULL);
 }
-#endif // ndef HAVE_FREETYPE2 
+#endif // ndef USE_FREETYPE 
 
-#ifdef HAVE_FREETYPE2 
+#ifdef USE_FREETYPE 
 FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bold, bool italic)
 	:
 	m_face(NULL)
@@ -383,14 +383,14 @@ FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string& name, bool bol
 	log_debug("EM square for font '%s' is %d, scale is thus %g", name.c_str(), m_face->units_per_EM, scale);
 #endif
 }
-#else // ndef(HAVE_FREETYPE2)
+#else // ndef(USE_FREETYPE)
 FreetypeGlyphsProvider::FreetypeGlyphsProvider(const std::string&, bool, bool)
 {
 	assert(0); // should never be called
 }
-#endif // ndef HAVE_FREETYPE2 
+#endif // ndef USE_FREETYPE 
 
-#ifdef HAVE_FREETYPE2
+#ifdef USE_FREETYPE
 boost::intrusive_ptr<shape_character_def>
 FreetypeGlyphsProvider::getGlyph(uint16_t code, float& advance)
 {
@@ -453,17 +453,17 @@ FreetypeGlyphsProvider::getGlyph(uint16_t code, float& advance)
 
 	return sh.get();
 }
-#else // ndef(HAVE_FREETYPE2)
+#else // ndef(USE_FREETYPE)
 boost::intrusive_ptr<shape_character_def>
 FreetypeGlyphsProvider::getGlyph(uint16_t, float& advance)
 {
 	assert(0); // should never be called... 
 }
-#endif // ndef(HAVE_FREETYPE2)
+#endif // ndef(USE_FREETYPE)
 
 FreetypeGlyphsProvider::~FreetypeGlyphsProvider()
 {
-#ifdef HAVE_FREETYPE2 
+#ifdef USE_FREETYPE 
 	if ( m_face )
 	{
 		if ( FT_Done_Face(m_face) != 0 )
@@ -471,7 +471,7 @@ FreetypeGlyphsProvider::~FreetypeGlyphsProvider()
 			log_error("Could not release FT face resources");
 		}
 	}
-#endif // ndef(HAVE_FREETYPE2)
+#endif // ndef(USE_FREETYPE)
 }
 
 } // namespace gnash

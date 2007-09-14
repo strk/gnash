@@ -1,5 +1,7 @@
 2007-09-14 Sandro Santilli <strk@keybit.net>
 
+	* server/FreetypeGlyphsProvider.{cpp,h}: use USE_FREETYPE instead
+	  of HAVE_FREETYPE2 ..
 	* macros/freetype.m4: don't miss to add a -I to cflags; add a note
 	  about the non-sense of the way we check for /usr/include.
 

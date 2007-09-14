@@ -23,18 +23,13 @@
 #include "config.h"
 #endif
 
-
-#ifdef HAVE_FREETYPE_FREETYPE_H
-# define HAVE_FREETYPE2 1
-#endif
-
 #include "rect.h"
 #include "smart_ptr.h" // for intrusive_ptr
 
 #include <string>
 #include <memory> // for auto_ptr
 
-#ifdef HAVE_FREETYPE2 
+#ifdef USE_FREETYPE 
 # include <ft2build.h>
 # include FT_FREETYPE_H
 # include FT_GLYPH_H
@@ -121,7 +116,7 @@ private:
 	///
 	FreetypeGlyphsProvider(const std::string& fontname, bool bold, bool italic);
 
-#ifdef HAVE_FREETYPE2 
+#ifdef USE_FREETYPE 
 
 	/// Scale factor to make the freetype glyph metrix match our 1024 EM square
 	/// coordinate space. Not all font faces have am EM square of 1024, so we
@@ -165,7 +160,7 @@ private:
 	static FT_Library	m_lib;
 	FT_Face	m_face;
 
-#endif // HAVE_FREETYPE2
+#endif // USE_FREETYPE
 
 };
 
