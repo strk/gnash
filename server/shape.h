@@ -5,7 +5,7 @@
 
 // Quadratic bezier outline shapes, the basis for most SWF rendering.
 
-/* $Id: shape.h,v 1.23 2007/04/24 10:01:46 strk Exp $ */
+/* $Id: shape.h,v 1.24 2007/09/14 16:02:51 strk Exp $ */
 
 #ifndef GNASH_SHAPE_H
 #define GNASH_SHAPE_H
@@ -256,6 +256,17 @@ namespace gnash {
 		///
 		bool withinSquareDistance(const point& p, float dist) const;
 
+
+		/// Expand given rect to include bounds of this path
+		//
+		/// @param r
+		///	The rectangle to expand with our own bounds
+		///
+		/// @param thickness
+		///	The thickess of our lines, half the thickness will
+		///	be added in all directions
+		///
+		void expandBounds(rect& r, unsigned int thickness) const;
 
 	//private:
 

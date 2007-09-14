@@ -1,5 +1,12 @@
 2007-09-14 Sandro Santilli <strk@keybit.net>
 
+	* server/shape.{cpp,h}: add path::expandBounds to compute bounds
+	  of a path locally.
+	* server/parser/shape_character_def.cpp (compute_bound): delegate
+	  computation of path bounds to the new path method.
+
+2007-09-14 Sandro Santilli <strk@keybit.net>
+
 	* server/FreetypeGlyphsProvider.{cpp,h}: use USE_FREETYPE instead
 	  of HAVE_FREETYPE2 ..
 	* macros/freetype.m4: don't miss to add a -I to cflags; add a note

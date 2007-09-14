@@ -22,6 +22,7 @@
 
 #include "tu_file.h"
 #include "tesselate.h"
+#include "rect.h"
 
 #include <cfloat>
 #include <map>
@@ -153,6 +154,39 @@ bool	path::is_empty() const
     // Return true if we have no edges.
 {
     return m_edges.size() == 0;
+}
+
+void
+path::expandBounds(rect& r, unsigned int thickness) const
+{
+        const path&	p = *this;
+
+        size_t nedges = m_edges.size();
+        if ( ! nedges ) return; // this path adds nothing
+
+        if (thickness)
+	{
+		// NOTE: Half of thickness would be enough (and correct) for
+		// radius, but that would not match how Flash calculates the
+		// bounds using the drawing API.                        
+		float radius = thickness;
+
+		r.expand_to_circle(m_ax, m_ay, radius);
+		for (unsigned int j = 0; j<nedges; j++)
+		{
+			r.expand_to_circle(m_edges[j].m_ax, m_edges[j].m_ay, radius);
+			r.expand_to_circle(m_edges[j].m_cx, m_edges[j].m_cy, radius);
+		}
+
+		return;
+	}
+
+	r.expand_to_point(m_ax, m_ay);
+	for (unsigned int j = 0; j<nedges; j++)
+	{
+		r.expand_to_point(m_edges[j].m_ax, p.m_edges[j].m_ay);
+                r.expand_to_point(m_edges[j].m_cx, p.m_edges[j].m_cy);
+	}
 }
 
 
