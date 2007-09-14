@@ -21,7 +21,7 @@ AC_DEFUN([GNASH_PATH_FREETYPE2],
     AC_CACHE_VAL(ac_cv_path_freetype_incl,[
     if test x"${with_freetype_incl}" != x ; then
       if test -f ${with_freetype_incl}/freetype/freetype.h ; then
-	      ac_cv_path_freetype_incl=`(cd ${with_freetype_incl}; pwd)`
+	      ac_cv_path_freetype_incl=-I`(cd ${with_freetype_incl}; pwd)`
       else
 	      AC_MSG_ERROR([${with_freetype_incl} directory doesn't contain freetype/freetype.h])
       fi
@@ -56,6 +56,8 @@ AC_DEFUN([GNASH_PATH_FREETYPE2],
   fi
 
 
+  dnl This check is bogus, ac_cv_path_freetype_incl will have -I too, and possibly multiple things too
+  dnl so at most we can try to *strip* any -I/usr/include
   if test x"${ac_cv_path_freetype_incl}" != x"/usr/include"; then
     ac_cv_path_freetype_incl="${ac_cv_path_freetype_incl}"
   else
