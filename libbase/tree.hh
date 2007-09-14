@@ -1,6 +1,6 @@
 /* 
 
-   $Id: tree.hh,v 1.3 2007/08/24 10:07:41 strk Exp $
+   $Id: tree.hh,v 1.4 2007/09/14 03:24:15 nihilus Exp $
 
    STL-like templated tree class.
    Copyright (C) 2001-2006  Kasper Peeters <kasper.peeters@aei.mpg.de>.
@@ -91,7 +91,7 @@ void destructor(T1* p)
    p->~T1();
    }
 
-};
+}
 
 /// A node in the tree, combining links to other nodes as well as the actual data.
 template<class T>
