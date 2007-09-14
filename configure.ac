@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.418 2007/09/14 07:25:33 nihilus Exp $
+dnl $Id: configure.ac,v 1.419 2007/09/14 07:33:51 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1360,7 +1360,7 @@ fi
 dnl /* http://gcc.gnu.org/bugzilla/show_bug.cgi?id=19664 */
 AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
   [
-    AC_CACHE_CHECK([for gcc -fvisibility-inlines-hidden bug], gcc_visibility_bug, [
+    AC_CACHE_CHECK([if -fvisibility-inlines-hidden works], gcc_visibility_bug, [
         AC_LANG_PUSH(C++)
         save_CXXFLAGS=$CXXFLAGS
         save_LDFLAGS=$LDFLAGS

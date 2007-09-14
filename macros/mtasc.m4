@@ -54,7 +54,13 @@ AC_DEFUN([AC_PATH_MTASC], [
 
   if test x"$MTASC" != "x" -a x"$MTASC_CLASSPATH" = "x"; then
     # cross your fingers !
-    MTASC_CLASSPATH=`dirname ${MTASC}`/std
+    if test -d x"`dirname ${MTASC}`/std"; then
+    dir="`dirname ${MTASC}`/std"
+    else
+    dnl FIXME
+    dir="/usr/share/ocaml/mtasc/std"
+    fi
+    MTASC_CLASSPATH=$dir/std
   fi
 
 

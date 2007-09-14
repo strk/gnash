@@ -6,6 +6,7 @@
 2007-09-14 Markus Gothe <nietzsche@lysator.liu.se>
 
 	* configure.ac: Look for broken -fvisibility-inlines-hidden.
+	* macros/mtasc.m4: Added fallback path to /usr/share/ocaml/mtasc/std.
 
 2007-09-14 Markus Gothe <nietzsche@lysator.liu.se>
 
