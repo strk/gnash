@@ -60,7 +60,7 @@ AC_DEFUN([AC_PATH_MTASC], [
     dnl FIXME
     dir="/usr/share/ocaml/mtasc/std"
     fi
-    MTASC_CLASSPATH=$dir/std
+    MTASC_CLASSPATH=$dir
   fi
 
 
