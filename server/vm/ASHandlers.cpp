@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.131 2007/09/14 03:10:02 nihilus Exp $ */
+/* $Id: ASHandlers.cpp,v 1.132 2007/09/14 06:34:08 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -56,6 +56,7 @@
 #include <vector>
 #include <utility> // for std::pair
 #include <locale.h>
+#include <boost/scoped_array.hpp>
 
 using namespace std;
 
@@ -1633,7 +1634,8 @@ SWFHandlers::ActionMbChr(ActionExec& thread)
     thread.ensureStack(1);
 
     wchar_t i = static_cast<wchar_t> (env.top(0).to_int(env));
-    char *str = new char[MB_CUR_MAX + 1];
+    boost::scoped_array<char> strng(new char [MB_CUR_MAX + 1]);
+    char *str = strng.get();
     memset(str, '\0', MB_CUR_MAX + 1);
     if (wctomb(str, i) == -1)
     {
@@ -1643,7 +1645,6 @@ SWFHandlers::ActionMbChr(ActionExec& thread)
     {
         env.top(0).set_string(str);
     }
-    delete[] str;
 }
 
 // also known as WaitForFrame2
