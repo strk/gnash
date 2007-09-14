@@ -1,5 +1,6 @@
 2007-09-14 Sandro Santilli <strk@keybit.net>
 
+	* testsuite/misc-ming.all/DrawingApiTest.as: add bounds tests.
 	* server/shape.{cpp,h}: add path::expandBounds to compute bounds
 	  of a path locally.
 	* server/parser/shape_character_def.cpp (compute_bound): delegate
