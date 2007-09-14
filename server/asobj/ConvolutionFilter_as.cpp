@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ConvolutionFilter_as.cpp,v 1.2 2007/08/29 03:32:58 cmusick Exp $ */
+/* $Id: ConvolutionFilter_as.cpp,v 1.3 2007/09/14 01:39:31 nihilus Exp $ */
 
 #include "as_object.h"
 #include "ConvolutionFilter.h"
@@ -31,7 +31,6 @@ namespace gnash {
 
 class ConvolutionFilter_as : public as_object, public ConvolutionFilter
 {
-    phelp_base_def;
 public:
     phelp_gs(matrixX);
     phelp_gs(matrixY);
@@ -44,9 +43,11 @@ public:
     phelp_gs(alpha);
 
     phelp_i(bitmap_clone);
+private:
+    phelp_base_def;
 };
 
-phelp_base_imp((bitmapFilter_interface()), ConvolutionFilter);
+phelp_base_imp((bitmapFilter_interface()), ConvolutionFilter)
 
 phelp_i_attach_begin
 phelp_i_replace(clone, bitmap_clone);

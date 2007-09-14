@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: ColorMatrixFilter_as.cpp,v 1.2 2007/08/29 03:32:58 cmusick Exp $ */
+/* $Id: ColorMatrixFilter_as.cpp,v 1.3 2007/09/14 01:39:31 nihilus Exp $ */
 
 #include "as_object.h"
 #include "ColorMatrixFilter.h"
@@ -30,14 +30,16 @@ namespace gnash {
 
 class ColorMatrixFilter_as : public as_object, public ColorMatrixFilter
 {
-    phelp_base_def;
 public:
     phelp_gs(matrix);
 
     phelp_i(bitmap_clone);
+
+private:
+    phelp_base_def;
 };
 
-phelp_base_imp((bitmapFilter_interface()), ColorMatrixFilter);
+phelp_base_imp((bitmapFilter_interface()), ColorMatrixFilter)
 
 // Filters are purely property based.
 phelp_i_attach_begin
