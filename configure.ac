@@ -15,7 +15,7 @@ dnl  along with this program; if not, write to the Free Software
 dnl  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 dnl  
 
-dnl $Id: configure.ac,v 1.417 2007/09/13 23:36:22 nihilus Exp $
+dnl $Id: configure.ac,v 1.418 2007/09/14 07:25:33 nihilus Exp $
 
 AC_PREREQ(2.50)
 AC_INIT(gnash, cvs)
@@ -1357,17 +1357,48 @@ if test x"$GCC" = x"yes"; then
   fi
 fi
 
-dnl FIXME: this GCC feature isn't fully debugged yet, so we don't want
-dnl to use it by default.
-dnl if test "$GCC" = "yes"; then
-dnl   AC_COMPILE_IFELSE([
-dnl   #if __GNUC__ < 4
-dnl   #error
-dnl   #endif],gccvisibility=yes,)
-dnl   if test x"$gccvisibility" = x"yes"; then
-dnl     CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"
-dnl   fi
-dnl fi
+dnl /* http://gcc.gnu.org/bugzilla/show_bug.cgi?id=19664 */
+AC_DEFUN([CHECK_VISIBILITY_GCC_BUG],
+  [
+    AC_CACHE_CHECK([for gcc -fvisibility-inlines-hidden bug], gcc_visibility_bug, [
+        AC_LANG_PUSH(C++)
+        save_CXXFLAGS=$CXXFLAGS
+        save_LDFLAGS=$LDFLAGS
+        CXXFLAGS="-fPIC -fvisibility-inlines-hidden -O0"
+        LDFLAGS="$LDFLAGS -shared -fPIC"
+
+        AC_TRY_LINK(
+        [          
+          template<typename CharT>
+          struct VisTest
+          {
+            inline VisTest ();
+          };
+          template<typename CharT>
+          inline VisTest<CharT>::VisTest()
+        {}
+        extern template class VisTest<char>;  // It works if we drop that line
+        int some_function( int do_something ) __attribute__((visibility("default")));
+	int some_function( int )
+          {
+            VisTest<char> a;
+            return 0;
+          }
+        ], [],
+        gcc_visibility_bug=no, gcc_visibility_bug=yes)
+
+        CXXFLAGS=$save_CXXFLAGS
+        LDFLAGS=$save_LDFLAGS
+        AC_LANG_POP(C++)
+      ]
+    )
+    if test x$gcc_visibility_bug = xno; then
+      CXXFLAGS="$CXXFLAGS -fvisibility-inlines-hidden"
+    fi
+  ]
+)
+
+CHECK_VISIBILITY_GCC_BUG
 
 dnl Define convienience constants so Gnash can print out the
 dnl default configuration of the build.

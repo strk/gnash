@@ -5,6 +5,10 @@
 
 2007-09-14 Markus Gothe <nietzsche@lysator.liu.se>
 
+	* configure.ac: Look for broken -fvisibility-inlines-hidden.
+
+2007-09-14 Markus Gothe <nietzsche@lysator.liu.se>
+
 	* server/asobj/BevelFilter_as.cpp, server/asobj/BitMapFilter_as.cpp,
 	server/asobj/BlurFilter_as.cpp, server/asobj/ColorMatrixFilter_as.cpp,
 	server/asobj/ConvolutionFilter_as.cpp,
