@@ -17,7 +17,7 @@
 
 
 
-/* $Id: DynamicShape.cpp,v 1.9 2007/08/06 03:30:18 strk Exp $ */
+/* $Id: DynamicShape.cpp,v 1.10 2007/09/14 17:15:58 strk Exp $ */
 
 #include "DynamicShape.h"
 
@@ -41,10 +41,11 @@ DynamicShape::DynamicShape()
 void
 DynamicShape::clear()
 {
-    //clear_meshes();
-    m_paths.clear();
-    m_fill_styles.clear();
-    m_line_styles.clear();
+	//clear_meshes();
+	m_paths.clear();
+	m_fill_styles.clear();
+	m_line_styles.clear();
+	m_bound.set_null();
 }
 
 void
@@ -52,7 +53,7 @@ DynamicShape::add_path(const path& pth)
 {
 	m_paths.push_back(pth);
 	_currpath = &(m_paths.back());
-	compute_bound(&m_bound);
+	//compute_bound(&m_bound);
 }
 
 void
@@ -145,8 +146,14 @@ DynamicShape::lineTo(float x, float y)
 	assert(_currpath);
 
 	_currpath->drawLineTo(x, y);
-	// recompute bounds
-	compute_bound(&m_bound);
+
+	// Update bounds 
+	unsigned thickness = _currline ? m_line_styles[_currline-1].get_width() : 0;
+	if ( _currpath->size() == 1 ) {
+		_currpath->expandBounds(m_bound, thickness);
+	} else {
+		m_bound.expand_to_circle(x, y, thickness);
+	}
 
 	// Update current pen position
 	_x = x;
@@ -163,8 +170,15 @@ DynamicShape::curveTo(float cx, float cy, float ax, float ay)
 	assert(_currpath);
 
 	_currpath->drawCurveTo(cx, cy, ax, ay);
-	// recompute bounds
-	compute_bound(&m_bound);
+
+	// Update bounds 
+	unsigned thickness = _currline ? m_line_styles[_currline-1].get_width() : 0;
+	if ( _currpath->size() == 1 ) {
+		_currpath->expandBounds(m_bound, thickness);
+	} else {
+		m_bound.expand_to_circle(ax, ay, thickness);
+		m_bound.expand_to_circle(cx, cy, thickness);
+	}
 
 	// Update current pen position
 	_x = ax;
