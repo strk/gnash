@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BlurFilter_as.cpp,v 1.2 2007/08/29 03:32:58 cmusick Exp $ */
+/* $Id: BlurFilter_as.cpp,v 1.3 2007/09/14 01:26:40 nihilus Exp $ */
 
 #include "as_object.h"
 #include "BlurFilter.h"
@@ -31,16 +31,17 @@ namespace gnash {
 
 class BlurFilter_as : public as_object, public BlurFilter
 {
-    phelp_base_def;
 public:
     phelp_gs(blurX);
     phelp_gs(blurY);
     phelp_gs(quality);
 
     phelp_i(bitmap_clone);
+private:
+    phelp_base_def;
 };
 
-phelp_base_imp((bitmapFilter_interface()), BlurFilter);
+phelp_base_imp((bitmapFilter_interface()), BlurFilter)
 
 // Filters are property based.
 phelp_i_attach_begin

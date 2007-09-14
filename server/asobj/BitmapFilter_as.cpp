@@ -15,7 +15,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: BitmapFilter_as.cpp,v 1.3 2007/08/29 03:32:58 cmusick Exp $ */
+/* $Id: BitmapFilter_as.cpp,v 1.4 2007/09/14 01:23:56 nihilus Exp $ */
 
 #include "as_object.h"
 #include "BitmapFilter.h"
@@ -30,14 +30,16 @@ namespace gnash {
 
 class BitmapFilter_as : public as_object, public BitmapFilter
 {
-    phelp_base_def;
 public:
     phelp_i(bitmap_clone);
 
     virtual boost::intrusive_ptr<as_object> clone();
+
+private:
+    phelp_base_def;
 };
 
-phelp_base_imp( , BitmapFilter);
+phelp_base_imp( , BitmapFilter)
 
 phelp_i_attach_begin
 phelp_i_attach(clone, bitmap_clone);
