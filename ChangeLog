@@ -5,7 +5,8 @@
 	server/asobj/ConvolutionFilter_as.cpp,
 	server/asobj/DropShadowFilter_as.cpp, server/asobj/GlowFilter_as.cpp,
 	server/asobj/GradientBevelFilter_as.cpp,
-	server/asobj/GradientGlowFilter_as.cpp
+	server/asobj/GradientGlowFilter_as.cpp,
+	server/vm/ASHandlers.cpp
 
 	Fixes for compilation with --enable-strict.
 

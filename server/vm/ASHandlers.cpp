@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: ASHandlers.cpp,v 1.130 2007/09/12 05:04:16 zoulunkai Exp $ */
+/* $Id: ASHandlers.cpp,v 1.131 2007/09/14 03:10:02 nihilus Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -1633,7 +1633,7 @@ SWFHandlers::ActionMbChr(ActionExec& thread)
     thread.ensureStack(1);
 
     wchar_t i = static_cast<wchar_t> (env.top(0).to_int(env));
-    char str[MB_CUR_MAX + 1];
+    char *str = new char[MB_CUR_MAX + 1];
     memset(str, '\0', MB_CUR_MAX + 1);
     if (wctomb(str, i) == -1)
     {
@@ -1643,6 +1643,7 @@ SWFHandlers::ActionMbChr(ActionExec& thread)
     {
         env.top(0).set_string(str);
     }
+    delete[] str;
 }
 
 // also known as WaitForFrame2
