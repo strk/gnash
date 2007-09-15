@@ -29,16 +29,14 @@ INCLUDES = -I$(srcdir)  \
 	    -I$(top_srcdir)/asobjs \
 	    $(INCLTDL)
 
-AM_LDFLAGS =  \
+lirc_la_SOURCES = lirc_ext.cpp lirc_ext.h
+lirc_la_LDFLAGS = -module -avoid-version -no-undefined
+lirc_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) \
 	$(top_builddir)/libbase/libgnashbase.la \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(PTHREAD_LIBS) \
 	$(NULL)
-
-lirc_la_SOURCES = lirc.cpp lirc.h
-lirc_la_LDFLAGS = -module -avoid-version -no-undefined
-lirc_la_LIBDADD = $(LIBADD_DL) $(LIBLTDL) $(AM_LDFLAGS)
 
 check_PROGRAMS = # SharedTest
 CLEANFILES = \

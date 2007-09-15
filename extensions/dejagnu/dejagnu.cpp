@@ -37,8 +37,6 @@ as_value dejagnu_pass(const fn_call& fn);
 as_value dejagnu_fail(const fn_call& fn);
 as_value dejagnu_totals(const fn_call& fn);
 
-LogFile& dbglogfile = LogFile::getDefaultInstance();
-
 class dejagnu_as_object : public as_object
 {
 public:
@@ -95,7 +93,7 @@ DejaGnu::pass (const char *msg)
 //    GNASH_REPORT_FUNCTION;
 
     passed++;
-    dbglogfile << "PASSED: " << msg << endl;
+    log_msg("PASSED: %s\n", msg);
     return NULL;
 }
 
@@ -105,7 +103,7 @@ DejaGnu::fail (const char *msg)
 //    GNASH_REPORT_FUNCTION;
 
     failed++;
-    dbglogfile << "FAILED: " << msg << endl;
+    log_msg("FAILED: %s\n", msg);
     return NULL;
 }
 

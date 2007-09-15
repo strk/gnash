@@ -15,7 +15,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # 
 
-# $Id: Makefile.am,v 1.89 2007/08/29 00:58:02 strk Exp $
+# $Id: Makefile.am,v 1.90 2007/09/15 03:06:37 rsavoye Exp $
 
 ## Process this file with automake to produce Makefile.in
 AUTOMAKE_OPTIONS = 1.6.0
@@ -151,8 +151,8 @@ endif
 	@echo "	Z_LIBS is $(Z_LIBS)"
 	@echo "	LIBXML_CFLAGS is $(LIBXML_CFLAGS)"
 	@echo "	LIBXML_LIBS is $(LIBXML_LIBS)"
-	@echo "	FREETYPE2_CFLAGS is $(FREETYPE2_CFLAGS)"
-	@echo "	FREETYPE2_LIBS is $(FREETYPE2_LIBS)"
+	@echo "	FREETYPE_CFLAGS is $(FREETYPE2_CFLAGS)"
+	@echo "	FREETYPE_LIBS is $(FREETYPE2_LIBS)"
 	@echo "	FONTCONFIG_CFLAGS is $(FONTCONFIG_CFLAGS)"
 	@echo "	FONTCONFIG_LIBS is $(FONTCONFIG_LIBS)"
 if HAVE_DMALLOC
@@ -162,6 +162,10 @@ endif
 if BUILD_MYSQL_EXT
 	@echo "MYSQL_CFLAGS is $(MYSQL_CFLAGS)"
 	@echo "MYSQL_LIBS is $(MYSQL_LIBS)"
+endif
+if BUILD_LIRC_EXT
+	@echo "	LIRC_CFLAGS is $(LIRC_CFLAGS)"
+	@echo "	LIRC_LIBS is $(LIRC_LIBS)"
 endif
 if USE_MAD_ENGINE
 	@echo "	MAD_CFLAGS is $(MAD_CFLAGS)"
@@ -193,8 +197,10 @@ if ENABLE_SWFDEC_TESTSUITE
 	@echo "	SWFDEC_TESTSUITE $(SWFDEC_TESTSUITE)"
 endif
 	@echo "Graphics support..."	
+if BUILD_CAIRO_RENDERER
 	@echo "	CAIRO_CFLAGS is $(CAIRO_CFLAGS)"
 	@echo "	CAIRO_LIBS is $(CAIRO_LIBS)"
+endif
 if BUILD_OGL_RENDERER
 	@echo "	GLEXT_CFLAGS is $(GLEXT_CFLAGS)"
 	@echo "	GLEXT_LIBS is $(GLEXT_LIBS)"
@@ -251,3 +257,4 @@ anal testreport checksum:
 	$(srcdir)/testsuite/anaylse-results.sh
 
 .PHONY : dumpconfig anal testreport checksum check mudflap mudflap-check snapshot deb debian rmp redhat
+

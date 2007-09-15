@@ -15,36 +15,43 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-#ifndef __LIRC_PLUGIN_H__
-#define __LIRC_PLUGIN_H__
+#ifndef __LIRC_H__
+#define __LIRC_H__
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <memory> // for auto_ptr
-#include "as_object.h"
+#include "gnash.h"
+#include "network.h"
 
-namespace gnash
-{
+namespace gnash {
 
-class Lirc {
+class DSOEXPORT Lirc : public Network {
 public:
     Lirc();
     ~Lirc();
-private:
+    bool init();
+    bool init(const char *sockpath);
+    
+    // Whenever lircd receives a IR signal it will broadcast the
+    // following string to each client:
+    // <code> <repeat count> <button name> <remote control name>
+    gnash::key::code getKey();
+    const char *getButton();
+#if 0    
+    char *parseCode(char *packet);
+    int parseCount(char *packet);
+    char *parseButtonName(char *packet);
+    char *parseControlName(char *packet);
+#endif
+  private:
+    const char *sockname;
 };
-
-extern "C" {
-    void lirc_class_init(as_object &obj);  
-    /// Return an  instance
-}
-
-std::auto_ptr<as_object> init_lirc_instance();
 
 } // end of gnash namespace
 
-// __LIRC_PLUGIN_H__
+// __LIRC_H__
 #endif
 
 // Local Variables:

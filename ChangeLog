@@ -1,3 +1,23 @@
+2007-09-14  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* extensions/lirc/Makefile.am: Chnage from lirc.* to lirc_ext.* to
+	avoid name collisions. 
+	* libbase/lirc.h, lirc.cpp: New files for lirc interface for
+	remote control.
+	* extensions/lirc_ext.h, lirc_ext.cpp: Renamed from lirc.*.
+	* libbase/extensions.cpp: Change how extraneous directories get
+	ignored.
+	* Makefile.am: Add debug info for lirc.
+	* backend/Makefile.am: Wrap conditionals around building the
+	libraries. 
+	* extensions/Makefile.am: Add Lirc extension.
+	* extensions/dejagnu/dejagnu.cpp: Change debug support to log_*().
+	* gui/Makefile.am: Add LIRC flags to build.
+	* libbase/Makefile.am: Add lirc.cpp and lirc.h, new files for lirc
+	support.
+	* libbase/network.cpp, network.h: Add connectSocket() for talking
+	to named pipes. 
+
 2007-09-14 Sandro Santilli <strk@keybit.net>
 
 	* server/DynamicShape.cpp: optimized bounds computation by the
@@ -39,6 +59,9 @@
 	  video frame is stored in was merged into one.
 
 2007-09-13  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* libbase/extension.cpp: Change alorithm for which files to ignore
+	when scanning.
 
 	* macros/lirc.m4: Search for lirc files, so we can support a
 	remote control.

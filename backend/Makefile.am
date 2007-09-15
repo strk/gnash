@@ -113,29 +113,33 @@ libgnashbackend_la_SOURCES = $(SOUND_SOURCES)
 libgnashbackend_la_LDFLAGS = -release $(VERSION)
 
 noinst_LTLIBRARIES =		# set later on by conditionals
+
+if  BUILD_OGL_RENDERER
 if HAVE_OPENGL
 noinst_LTLIBRARIES += libgnashogl.la
 #plugins_LTLIBRARIES += libgnashogl.la
 libgnashogl_la_SOURCES = render_handler_tri.cpp render_handler_ogl.cpp 
 #libgnashogl_la_LDFLAGS = -module -avoid-version -no-undefined
-libgnashogl_la_LDFLAGS =
+endif
 endif
 
+if  BUILD_AGG_RENDERER
 if HAVE_AGG
 noinst_LTLIBRARIES += libgnashagg.la
 #plugins_LTLIBRARIES += libgnashagg.la
 libgnashagg_la_SOURCES = render_handler_tri.cpp render_handler_agg.cpp 
 #libgnashagg_la_LDFLAGS = -module -avoid-version -no-undefined
-libgnashagg_la_LDFLAGS = 
 libgnashagg_la_LIBADD = $(AGG_LIBS)
 endif
+endif
 
+if  BUILD_CAIRO_RENDERER
 if HAVE_CAIRO
 noinst_LTLIBRARIES += libgnashcairo.la
 # plugins_LTLIBRARIES += libgnashcairo.la
 libgnashcairo_la_SOURCES = render_handler_tri.cpp  render_handler_cairo.cpp
 #libgnashcairo_la_LDFLAGS = -module -avoid-version -no-undefined
-libgnashcairo_la_LDFLAGS =
+endif
 endif
 
 # Rebuild with GCC 4.x Mudflap support

@@ -45,6 +45,7 @@ AM_CPPFLAGS = -I.. \
 	-DPLUGINSDIR=\"$(pluginsdir)\" \
         $(LIBXML_CFLAGS) \
         $(DMALLOC_CFLAGS) \
+	$(LIRC_CFLAGS) \
 	$(BOOST_CFLAGS) \
         $(PTHREAD_CFLAGS) \
 	$(NULL)
@@ -78,6 +79,8 @@ AM_LDFLAGS =  \
 	$(CURL_LIBS) \
 	$(LIBXML_LIBS) \
 	$(INCLTDL) \
+	$(LIRC_LIBS) \
+	$(MYSQL_LIBS)
 	$(BOOST_LIBS) \
 	$(PTHREAD_LIBS) \
 	$(NULL)
@@ -87,8 +90,7 @@ GNASH_LIBS = \
 	$(top_builddir)/backend/libgnashbackend.la \
 	$(top_builddir)/server/libgnashserver.la \
 	$(top_builddir)/libgeometry/libgnashgeo.la \
-	$(top_builddir)/libbase/libgnashbase.la \
-	$(MYSQL_LIBS)
+	$(top_builddir)/libbase/libgnashbase.la
 
 # Only build loadable modules unless statically linking
 # if DYNAMIC_GUI # make shared libraries suitable for dlopen().
@@ -333,6 +335,11 @@ gtk_gnash_SOURCES += gtk_glue_agg.cpp gtk_glue_agg.h \
 		gtk.cpp gtksup.h gtk_glue.h
 gtk_gnash_LDADD = $(top_builddir)/backend/libgnashagg.la \
 		$(GNASH_LIBS) $(GTK_LIBS) $(AGG_LIBS)
+# if ALP				# Access Linux Platform
+# gtk_gnash_LDFLAGS += "-shared -Xlinker -z -Xlinker defs $(GTK2_LIBS)"
+# gtk_gnash_LDADD += $(ALP_LIBS)
+# endif
+
 endif				# BUILD_AGG_RENDERER
 if BUILD_CAIRO_RENDERER
 gtk_gnash_CPPFLAGS += $(CAIRO_CFLAGS)
@@ -415,4 +422,19 @@ clean-hook:
 # 	for i in $(plugins_LTLIBRARIES); do \
 # 	  $(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$i "$(DESTDIR)$(plugindir)/$$i" ; \
 # 	done
+# endif
+
+# if ALP
+# alpdir = build
+# install-alp: libgnashalp.la
+# 	$(mkinstalldirs) build
+# 	${CP} $(srcdir)/Manifest.xml build/
+# 	$(LIBTOOL) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $(alp_LTLIBRARIES) build
+# 	${RM} build/*.a build/*.T build/*.0
+
+# alp_LTLIBRARIES = libgnashalp.la
+
+# libgnashalp_la_SOURCES = $(gtk_gnash_SOURCES)
+# libgnashalp_la_LDFLAGS = -module -avoid-version
+
 # endif
