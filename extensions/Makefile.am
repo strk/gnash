@@ -35,9 +35,9 @@ if BUILD_LIRC_EXT
 OTHER_DIRS += lirc
 endif
 
-if BUILD_DBUS_EXT
-OTHER_DIRS += dbus
-endif
+# if BUILD_DBUS_EXT
+# OTHER_DIRS += dbus
+# endif
 
 if BUILD_GTK_EXT
 if BUILD_GTK_GUI
