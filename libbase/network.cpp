@@ -43,6 +43,7 @@
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <sys/socket.h>
+# include <sys/un.h>
 # include <netdb.h>
 # include <sys/param.h>
 # include <sys/select.h>
@@ -297,6 +298,98 @@ Network::newConnection(bool block)
     }
 
     return true;
+}
+
+// Connect to a named pipe
+bool
+Network::connectSocket(const char *sockname)
+{
+    GNASH_REPORT_FUNCTION;
+
+    struct sockaddr_un  addr;
+    fd_set              fdset;
+    struct timeval      tval;
+    int                 ret;
+    int                 retries;
+
+    addr.sun_family = AF_UNIX;
+    // socket names must be 108 bytes or less as specifiec in sys/un.h.
+    strncpy(addr.sun_path, sockname, 100);
+
+    _sockfd = ::socket(AF_UNIX, SOCK_STREAM, 0);
+    if (_sockfd < 0)
+        {
+            log_error(_("unable to create socket: %s"), strerror(errno));
+            _sockfd = -1;
+            return false;
+        }
+
+    retries = 2;
+    while (retries-- > 0) {
+        // We use select to wait for the read file descriptor to be
+        // active, which means there is a client waiting to connect.
+        FD_ZERO(&fdset);
+        FD_SET(_sockfd, &fdset);
+
+        // Reset the timeout value, since select modifies it on return. To
+        // block, set the timeout to zero.
+        tval.tv_sec = 5;
+        tval.tv_usec = 0;
+
+        ret = ::select(_sockfd+1, &fdset, NULL, NULL, &tval);
+
+        // If interupted by a system call, try again
+        if (ret == -1 && errno == EINTR)
+            {
+                log_msg(_("The connect() socket for fd %d was interupted by a system call"),
+                        _sockfd);
+                continue;
+            }
+
+        if (ret == -1)
+            {
+                log_msg(_("The connect() socket for fd %d never was available for writing"),
+                        _sockfd);
+#ifdef HAVE_WINSOCK_H
+                ::shutdown(_sockfd, 0); // FIXME: was SHUT_BOTH
+#else
+                ::shutdown(_sockfd, SHUT_RDWR);
+#endif
+                _sockfd = -1;
+                return false;
+            }
+        if (ret == 0) {
+            log_error(_("The connect() socket for fd %d timed out waiting to write"),
+                      _sockfd);
+            continue;
+        }
+
+        if (ret > 0) {
+            ret = ::connect(_sockfd, reinterpret_cast<struct sockaddr *>(&addr), sizeof(addr));
+            if (ret == 0) {
+                log_msg(_("\tsocket name %s for fd %d"), sockname, _sockfd);
+                _connected = true;
+                assert(_sockfd > 0);
+                return true;
+            }
+            if (ret == -1) {
+                log_error(_("The connect() socket for fd %d never was available for writing"),
+                        _sockfd);
+                _sockfd = -1;
+                assert(!_connected);
+                return false;
+            }
+        }
+    }
+    
+
+#ifndef HAVE_WINSOCK_H
+    fcntl(_sockfd, F_SETFL, O_NONBLOCK);
+#endif
+
+    _connected = true;
+    assert(_sockfd > 0);
+    return true;    
 }
 
 // Create a client connection to a tcp/ip based service

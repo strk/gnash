@@ -70,7 +70,10 @@ public:
     // Accept a client connection for the current server.
     bool newConnection(void);
     bool newConnection(bool block);
-    
+
+    // Connect to a named pipe
+    bool connectSocket(const char *sock);
+
     // Create a client connection to a tcp/ip server
     bool createClient(void);
     bool createClient(short port);
