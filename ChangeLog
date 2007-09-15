@@ -1,3 +1,7 @@
+2007-09-15  Rob Savoye  <rob@ripple.welcomehome.org>
+
+	* extensions/lirc/test.as: Test case for Lirc extension.
+
 2007-09-14  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* extensions/lirc/Makefile.am: Chnage from lirc.* to lirc_ext.* to
