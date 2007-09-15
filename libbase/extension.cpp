@@ -16,7 +16,7 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-/* $Id: extension.cpp,v 1.12 2007/07/01 10:54:08 bjacques Exp $ */
+/* $Id: extension.cpp,v 1.13 2007/09/15 17:53:09 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -113,7 +113,6 @@ bool
 Extension::scanAndLoad(as_object &obj)
 {
 //    GNASH_REPORT_FUNCTION;
-//    const char *mod;
     string mod;
     
     if (_modules.size() == 0) {
@@ -179,7 +178,8 @@ Extension::scanDir(const char *dirlist)
     struct dirent *entry;
     //string::size_type pos;
     char *dirlistcopy;
-    char *dir;
+    char *dir, libsdir;
+    char *suffix = 0;
 
 //    scoped_lock lock(lib_mutex);
 
@@ -189,7 +189,7 @@ Extension::scanDir(const char *dirlist)
     if (dir == NULL) {
         dir = dirlistcopy;
     }
-    
+
     while (dir) {
         log_msg(_("Scanning directory \"%s\" for plugins"), dir);
         DIR *library_dir = opendir(dir);
@@ -199,28 +199,33 @@ Extension::scanDir(const char *dirlist)
             return false;
         }
         
-        // By convention, the first two entries in each directory are for . and
-        // .. (``dot'' and ``dot dot''), so we ignore those.
-        entry = readdir(library_dir);
-        entry = readdir(library_dir);
-        
         for (i=0; entry>0; i++) {
             // We only want shared libraries than end with the suffix, otherwise
             // we get all the duplicates.
             entry = readdir(library_dir);
-            if (entry <= NULL) {
-                break;
+
+            if (entry <= NULL) { // All done
+                continue;
             }
+
+            if (strncmp(entry->d_name, ".", 1) == 0) {
+                continue;
+            }            
             
-            if (strstr(entry->d_name, ".la") == 0) {
+            suffix = strrchr(entry->d_name, '.');
+            if (suffix == 0) {
                 continue;
             }
             
-            *(strrchr(entry->d_name, '.')) = 0;
-            log_msg(_("Gnash Plugin name: %s"), entry->d_name);
-            _modules.push_back(entry->d_name);
-            
+            if (strcmp(suffix, ".so") == 0) {
+                *suffix = 0;
+                log_msg(_("Gnash Plugin name: %s"), entry->d_name);
+                _modules.push_back(entry->d_name);
+            } else {
+                continue;
+            }
         }
+        
         if (closedir(library_dir) != 0) {
             return false;
         }

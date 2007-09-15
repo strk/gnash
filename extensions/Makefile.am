@@ -44,5 +44,5 @@ if BUILD_GTK_GUI
 OTHER_DIRS += gtk2
 endif
 endif
-DIST_SUBDIRS = dejagnu fileio mysql gtk2
+DIST_SUBDIRS = dejagnu fileio mysql gtk2 lirc
 SUBDIRS = $(OTHER_DIRS)

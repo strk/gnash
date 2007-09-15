@@ -45,7 +45,8 @@ using namespace std;
 namespace gnash
 {
 
-static LogFile& dbglogfile = LogFile::getDefaultInstance();
+#define dbglogfile cerr		// FIXME: use log_*()
+
 #ifdef USE_DEBUGGER
 static Debugger& debugger = Debugger::getDefaultInstance();
 #endif
@@ -328,7 +329,7 @@ as_value gtkext_widget_show(const fn_call& fn)
     return as_value();
 }
 
-// gtk_main taks no arguments.
+// gtk_main takes no arguments.
 as_value gtkext_main(const fn_call& fn)
 {
 //    GNASH_REPORT_FUNCTION;

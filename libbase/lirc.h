@@ -39,14 +39,9 @@ public:
     // <code> <repeat count> <button name> <remote control name>
     gnash::key::code getKey();
     const char *getButton();
-#if 0    
-    char *parseCode(char *packet);
-    int parseCount(char *packet);
-    char *parseButtonName(char *packet);
-    char *parseControlName(char *packet);
-#endif
   private:
-    const char *sockname;
+    const char *_sockname;
+    char *_button;
 };
 
 } // end of gnash namespace

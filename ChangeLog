@@ -1,5 +1,13 @@
 2007-09-15  Rob Savoye  <rob@ripple.welcomehome.org>
 
+	* libbase/test.as: Only execute tests if the Lirc extension is
+	installed. Check return codes for a clean exit.
+	* libbase/lirc.cpp: Reduce debugging verbosity. Return a pointer
+	with real memory behind it instead of by acident.
+	* libbase/lirc.h: Add a field to contain the button name.
+	* libbase/network.cpp: Don't just see if fd is set, make sure it's
+	greater than zero to avoid problems!
+
 	* extensions/lirc/test.as: Test case for Lirc extension.
 
 2007-09-14  Rob Savoye  <rob@ripple.welcomehome.org>

@@ -36,31 +36,37 @@ namespace gnash {
 // them, it should work for us.
 const int LIRC_PACKET_SIZE = 128;
 const int TIMEOUT = 10;
+const int BUTTONSIZE = 10;
 
 Lirc::Lirc() 
-    : sockname("/tmp/lircd")
+    : _sockname("/tmp/lircd"), _button(0)
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
+    _button = new char[BUTTONSIZE];
 }
 
 Lirc::~Lirc()
 {
-    GNASH_REPORT_FUNCTION;
+//    GNASH_REPORT_FUNCTION;
+    if (_button != 0) {
+	delete _button;
+    }
     closeNet();
 }
 
 bool
 Lirc::init()
 {
-    GNASH_REPORT_FUNCTION;
-    return connectSocket(sockname);
+//    GNASH_REPORT_FUNCTION;
+    return connectSocket(_sockname);
 }
 
 bool
 Lirc::init(const char *sockpath)
 {
-    GNASH_REPORT_FUNCTION;
-    return connectSocket(sockpath);
+//    GNASH_REPORT_FUNCTION;
+    _connected = connectSocket(sockpath);
+    return _connected;
 }
 
 // Whenever lircd receives a IR signal it will broadcast the
@@ -73,13 +79,13 @@ Lirc::init(const char *sockpath)
 gnash::key::code
 Lirc::getKey()
 {
-    GNASH_REPORT_FUNCTION;
-
+//    GNASH_REPORT_FUNCTION;
     key::code key;
     
     char buf[LIRC_PACKET_SIZE];
     memset(buf, 0, LIRC_PACKET_SIZE);
     
+    // read the data if there is any
     readNet(buf, LIRC_PACKET_SIZE, TIMEOUT);
     
     string packet = buf;
@@ -87,7 +93,6 @@ Lirc::getKey()
     string::size_type space2 = packet.find(" ", space1) + 1;
     string::size_type space3 = packet.find(" ", space2) +1;
 
-    // read the data if there is any
     string code_str = packet.substr(0, space1);
     string count_str = packet.substr(space1, space2-space1);    
     string button_str = packet.substr(space2,space3-space2);
@@ -105,56 +110,24 @@ const char *
 Lirc::getButton()
 {
 //    GNASH_REPORT_FUNCTION;
-
+ 
     char buf[LIRC_PACKET_SIZE];
     memset(buf, 0, LIRC_PACKET_SIZE);
     
+    // read the data if there is any
     readNet(buf, LIRC_PACKET_SIZE, TIMEOUT);
     
     string packet = buf;
     string::size_type space1 = packet.find(" ") + 1;
     string::size_type space2 = packet.find(" ", space1) + 1;
-    string::size_type space3 = packet.find(" ", space2) +1;
-
+    string::size_type space3 = packet.find(" ", space2) + 1;
     
-    // read the data if there is any
-    string button_str = packet.substr(space2, space3-space2);
+    string button_str = packet.substr(space2, space3-space2-1);
 
-    return button_str.c_str();
+    memset(_button, 0, BUTTONSIZE);
+    strncpy(_button, button_str.c_str(), BUTTONSIZE);
+    return _button;
 }
-
-#if 0
-char *
-Lirc::parseCode(char *packet)
-{
-    GNASH_REPORT_FUNCTION;
-
-    char *ptr;
-    ptr = strchr(packet, " ");
-
-    return ptr;
-}
-
-int 
-Lirc::parseCount(char *packet)
-{
-    GNASH_REPORT_FUNCTION;
-    
-}
-
-char *
-Lirc::parseButtonName(char *packet)
-{
-    GNASH_REPORT_FUNCTION;
-    
-}
-char *
-Lirc::parseControlName(char *packet)
-{
-    GNASH_REPORT_FUNCTION;
-    
-}
-#endif
 
 } // end of gnash namespace
 

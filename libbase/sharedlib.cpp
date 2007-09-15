@@ -17,7 +17,7 @@
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 
-/* $Id: sharedlib.cpp,v 1.17 2007/07/01 10:54:10 bjacques Exp $ */
+/* $Id: sharedlib.cpp,v 1.18 2007/09/15 17:53:09 rsavoye Exp $ */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -197,6 +197,7 @@ SharedLib::moduleName()
 SharedLib::entrypoint *
 SharedLib::getDllSymbol (std::string &symbol)
 {
+    GNASH_REPORT_FUNCTION;
     return getDllSymbol(symbol.c_str());
 }
 
@@ -223,7 +224,7 @@ SharedLib::getInitEntry (const char *symbol)
 SharedLib::entrypoint *
 SharedLib::getDllSymbol(const char *symbol)
 {
-//    GNASH_REPORT_FUNCTION;
+    GNASH_REPORT_FUNCTION;
     
     lt_ptr run = NULL;
     

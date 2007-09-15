@@ -18,7 +18,7 @@
 // Based on the filesrc and fdsrc element in Gstreamer-core
 //
 
-/* $Id: gstgnashsrc.h,v 1.8 2007/07/01 10:54:08 bjacques Exp $ */
+/* $Id: gstgnashsrc.h,v 1.9 2007/09/15 17:53:09 rsavoye Exp $ */
 
 #ifndef __GST_GNASH_SRC_H__
 #define __GST_GNASH_SRC_H__
@@ -63,7 +63,7 @@ struct _GstGnashSrc {
 
   guint64 read_position;	// position in the stream
 
-  gpointer data;			// data passes with the callbacks
+  gpointer data;                // data passes with the callbacks
   gpointer callbacks;		// struct with the callbacks
 
   gboolean seekable;		// seekable or not

@@ -15,16 +15,13 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-//
-//
-
 // Smart (ref-counting) pointer classes.  Uses "intrusive" approach:
 // the types pointed to must have add_ref() and drop_ref() methods.
 // Typically this is done by inheriting from a ref_counted class,
 // although the nice thing about templates is that no particular
 // ref-counted class is mandated.
 
-/* $Id: smart_ptr.h,v 1.22 2007/07/01 10:54:10 bjacques Exp $ */
+/* $Id: smart_ptr.h,v 1.23 2007/09/15 17:53:09 rsavoye Exp $ */
 
 #ifndef SMART_PTR_H
 #define SMART_PTR_H

@@ -20,7 +20,7 @@
 // compile this test case with Ming makeswf, and then
 // execute it like this gnash -1 -r 0 -v out.swf
 
-rcsid="$Id: test.as,v 1.1 2007/09/15 16:42:55 rsavoye Exp $";
+rcsid="$Id: test.as,v 1.2 2007/09/15 17:53:09 rsavoye Exp $";
 
 var remote = new Lirc();
 
@@ -37,22 +37,30 @@ if (!remote) {
 
 // var keyObj = new Key;
 
-var sock = "/tmp/lircd";
-if (remote.lirc_init(sock)) {
-    var str = "Connected to " + sock;
-    trace(str);
-} else {
-    var str = "ERROR: couldn't connect to " + sock;
-    trace(str);
-}
-
-var button = remote.lirc_getButton();
-trace(button);
-
-button = "QUIT";
-
-while (button != "QUIT") {
-    button = remote.lirc_getButton();
+// If the extension doesn't load, don't do anything.
+if (remote) {
+    var sock = "/tmp/lircd";
+    if (remote.lirc_init(sock)) {
+        var str = "Connected to " + sock;
+        trace(str);
+    } else {
+        var str = "ERROR: couldn't connect to " + sock;
+        trace(str);
+    }
+    
+    var button = remote.lirc_getButton();
     trace(button);
+    
+    while (button != "QUIT" && button != "") {
+        button = remote.lirc_getButton();
+        trace(button);
+    }
+    if (button == "QUIT") {
+        trace("Qutting due to user action");
+    }
+    if (button == "") {
+        trace("Qutting due to socket being closed");
+    }
 }
+
 

@@ -669,7 +669,7 @@ Network::readNet(int fd, char *buffer, int nbytes, int timeout)
             + static_cast<double>(tp.tv_usec*1e-6);
     }
 #endif
-    if (fd) {
+    if (fd > 0) {
         FD_ZERO(&fdset);
         FD_SET(fd, &fdset);
 
