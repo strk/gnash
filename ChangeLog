@@ -1,3 +1,7 @@
+2007-09-16 Zou Lunkai <zoulunkai@gmail.com>
+
+	* server/gnash.h: add gnashCharacter code for proper key handling.
+	
 2007-09-15  Rob Savoye  <rob@ripple.welcomehome.org>
 
 	* libbase/test.as: Only execute tests if the Lirc extension is
