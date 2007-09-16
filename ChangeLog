@@ -1,3 +1,8 @@
+2007-09-16 Sandro Santilli <strk@keybit.net>
+
+	* testsuite/actionscript.all/ops.as: more tests for comparison between
+	  "different" nan values... :/
+
 2007-09-16 Bastiaan Jacques <bastiaan@bjacques.org>
 
 	* plugin/klash/klash_part.{cpp,h}: Properly add URL arguments to

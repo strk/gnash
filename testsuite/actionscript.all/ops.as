@@ -20,9 +20,10 @@
  *  Test binary predicates (equal, less_then, greater_then, logical and bitwise ops)
  */
 
-rcsid="$Id: ops.as,v 1.21 2007/08/27 03:41:43 zoulunkai Exp $";
+rcsid="$Id: ops.as,v 1.22 2007/09/16 19:24:38 strk Exp $";
 
 #include "check.as"
+
 
 //--------------------------------------------
 // Equality operator (ACTION_NEWEQUALS : 0x49)
@@ -66,11 +67,22 @@ x = new Number(3);
 y = 3;
 check(x == y);
 
-x = new Number(NaN);
+// for different nan values...
+x = Number(new Number(NaN));
 y = NaN;
+z = 0/0;
+xcheck_equals(typeof(x), 'number')
+check_equals(typeof(y), 'number');
+check_equals(typeof(z), 'number');
 check(isNaN(x));
 check(isNaN(y));
+check(isNaN(z));
 xcheck(x != y);
+xcheck(y != z);
+xcheck(x != z);
+check(x == x);
+check(y == y);
+check(z == z);
 
 // for Arrays
 ary1 = [1,2,3];
@@ -592,3 +604,4 @@ x = new String("a");
 y = ++x;
 xcheck(y!=NaN);
 check(isNaN(y));
+
